@@ -2,265 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF97B1BD869
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 11:37:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5C691BD86B
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 11:37:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726850AbgD2JhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 05:37:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35354 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726819AbgD2JhH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 05:37:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588153024;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3hW+HeZnFZOKXi+gCk37OElUlM0zG/ML7+gcMlzZtQ4=;
-        b=U0feogkkQnJm8UvNxLhqUjJPEauqzRljDSU0Jpa/qAP63aJvhrBeozTD1J1r503gyLyxdT
-        ICSjzqd+vv/uXN9ygDCJd7BPnYIxJ7Opsk4ueLgu9F+X+1KE5l+myJePgrQ6DaIiYWqpQ6
-        /MozSVUBdL/1rH/nrCACFIoYSvsZBgk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-OHz0JqO7PQmkhkH2HFRKPA-1; Wed, 29 Apr 2020 05:37:02 -0400
-X-MC-Unique: OHz0JqO7PQmkhkH2HFRKPA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CF8B45F;
-        Wed, 29 Apr 2020 09:37:00 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.193.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 188395D9C9;
-        Wed, 29 Apr 2020 09:36:56 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     x86@kernel.org, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: [PATCH RFC 6/6] KVM: x86: Switch KVM guest to using interrupts for page ready APF delivery
-Date:   Wed, 29 Apr 2020 11:36:34 +0200
-Message-Id: <20200429093634.1514902-7-vkuznets@redhat.com>
-In-Reply-To: <20200429093634.1514902-1-vkuznets@redhat.com>
-References: <20200429093634.1514902-1-vkuznets@redhat.com>
+        id S1726792AbgD2JhR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 05:37:17 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36976 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726819AbgD2JhQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 05:37:16 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03T9Vg5I130926;
+        Wed, 29 Apr 2020 05:37:14 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhf8750-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Apr 2020 05:37:14 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03T9VsJK131452;
+        Wed, 29 Apr 2020 05:37:13 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30mfhf8741-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Apr 2020 05:37:13 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03T9aEtK009274;
+        Wed, 29 Apr 2020 09:37:11 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 30mcu59nvy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Apr 2020 09:37:11 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03T9b9IQ55902276
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 Apr 2020 09:37:09 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 61C414C044;
+        Wed, 29 Apr 2020 09:37:09 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 047284C040;
+        Wed, 29 Apr 2020 09:37:09 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.84.78])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 29 Apr 2020 09:37:08 +0000 (GMT)
+Subject: Re: [PATCH v2 08/10] s390x: smp: Wait for sigp completion
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com
+References: <20200423091013.11587-1-frankja@linux.ibm.com>
+ <20200423091013.11587-9-frankja@linux.ibm.com>
+ <6084d368-86d6-b8fd-d4d3-5e0d72cef590@redhat.com>
+ <18b6f022-81b7-6e0d-996d-3abcffceca41@linux.ibm.com>
+ <be5ed01e-f4f6-6e3a-deb0-8f983e658e0f@linux.ibm.com>
+ <8182df06-8190-001d-ad02-ae13fb99ec72@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <802601e1-0bc0-faba-b802-2b0e24e3d96b@linux.ibm.com>
+Date:   Wed, 29 Apr 2020 11:37:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <8182df06-8190-001d-ad02-ae13fb99ec72@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="8jclk4mYtRsZHXn2kDnAmH3atPsfA6eIG"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-29_03:2020-04-28,2020-04-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ phishscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004290076
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM now supports using interrupt for type 2 APF event delivery (page read=
-y
-notifications). Switch KVM guests to using it when the feature is present=
-.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8jclk4mYtRsZHXn2kDnAmH3atPsfA6eIG
+Content-Type: multipart/mixed; boundary="IBASGxB4aMxdlHjjPC7YrfMmVmD1AFU2y"
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/entry/entry_32.S          |  5 ++++
- arch/x86/entry/entry_64.S          |  5 ++++
- arch/x86/include/asm/hardirq.h     |  3 +++
- arch/x86/include/asm/irq_vectors.h |  6 ++++-
- arch/x86/include/asm/kvm_para.h    |  6 +++++
- arch/x86/kernel/irq.c              |  9 +++++++
- arch/x86/kernel/kvm.c              | 42 ++++++++++++++++++++++++++++++
- 7 files changed, 75 insertions(+), 1 deletion(-)
+--IBASGxB4aMxdlHjjPC7YrfMmVmD1AFU2y
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/x86/entry/entry_32.S b/arch/x86/entry/entry_32.S
-index b67bae7091d7..d574dadcb2a1 100644
---- a/arch/x86/entry/entry_32.S
-+++ b/arch/x86/entry/entry_32.S
-@@ -1475,6 +1475,11 @@ BUILD_INTERRUPT3(hv_stimer0_callback_vector, HYPER=
-V_STIMER0_VECTOR,
-=20
- #endif /* CONFIG_HYPERV */
-=20
-+#ifdef CONFIG_KVM_GUEST
-+BUILD_INTERRUPT3(kvm_async_pf_vector, KVM_ASYNC_PF_VECTOR,
-+		 kvm_async_pf_intr)
-+#endif
-+
- SYM_CODE_START(page_fault)
- 	ASM_CLAC
- 	pushl	$do_page_fault
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index 0e9504fabe52..6f127c1a6547 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -1190,6 +1190,11 @@ apicinterrupt3 HYPERVISOR_CALLBACK_VECTOR \
- 	acrn_hv_callback_vector acrn_hv_vector_handler
- #endif
-=20
-+#ifdef CONFIG_KVM_GUEST
-+apicinterrupt3 KVM_ASYNC_PF_VECTOR \
-+	kvm_async_pf_vector kvm_async_pf_intr
-+#endif
-+
- idtentry debug			do_debug		has_error_code=3D0	paranoid=3D1 shift_ist=3DI=
-ST_INDEX_DB ist_offset=3DDB_STACK_OFFSET
- idtentry int3			do_int3			has_error_code=3D0	create_gap=3D1
- idtentry stack_segment		do_stack_segment	has_error_code=3D1
-diff --git a/arch/x86/include/asm/hardirq.h b/arch/x86/include/asm/hardir=
-q.h
-index 07533795b8d2..be0fbb15ad7f 100644
---- a/arch/x86/include/asm/hardirq.h
-+++ b/arch/x86/include/asm/hardirq.h
-@@ -44,6 +44,9 @@ typedef struct {
- 	unsigned int irq_hv_reenlightenment_count;
- 	unsigned int hyperv_stimer0_count;
- #endif
-+#ifdef CONFIG_KVM_GUEST
-+	unsigned int kvm_async_pf_pageready_count;
-+#endif
- } ____cacheline_aligned irq_cpustat_t;
-=20
- DECLARE_PER_CPU_SHARED_ALIGNED(irq_cpustat_t, irq_stat);
-diff --git a/arch/x86/include/asm/irq_vectors.h b/arch/x86/include/asm/ir=
-q_vectors.h
-index 889f8b1b5b7f..8879a9ecd908 100644
---- a/arch/x86/include/asm/irq_vectors.h
-+++ b/arch/x86/include/asm/irq_vectors.h
-@@ -104,7 +104,11 @@
- #define HYPERV_STIMER0_VECTOR		0xed
- #endif
-=20
--#define LOCAL_TIMER_VECTOR		0xec
-+#ifdef CONFIG_KVM_GUEST
-+#define KVM_ASYNC_PF_VECTOR		0xec
-+#endif
-+
-+#define LOCAL_TIMER_VECTOR		0xeb
-=20
- #define NR_VECTORS			 256
-=20
-diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_p=
-ara.h
-index 9b4df6eaa11a..fde4f21607f9 100644
---- a/arch/x86/include/asm/kvm_para.h
-+++ b/arch/x86/include/asm/kvm_para.h
-@@ -4,6 +4,7 @@
-=20
- #include <asm/processor.h>
- #include <asm/alternative.h>
-+#include <linux/interrupt.h>
- #include <uapi/asm/kvm_para.h>
-=20
- extern void kvmclock_init(void);
-@@ -93,6 +94,11 @@ void kvm_async_pf_task_wake(u32 token);
- u32 kvm_read_and_reset_pf_reason(void);
- extern void kvm_disable_steal_time(void);
- void do_async_page_fault(struct pt_regs *regs, unsigned long error_code,=
- unsigned long address);
-+extern void kvm_async_pf_vector(void);
-+#ifdef CONFIG_TRACING
-+#define trace_kvm_async_pf_vector kvm_async_pf_vector
-+#endif
-+__visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs);
-=20
- #ifdef CONFIG_PARAVIRT_SPINLOCKS
- void __init kvm_spinlock_init(void);
-diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index c7965ff429c5..a4c2f25ad74d 100644
---- a/arch/x86/kernel/irq.c
-+++ b/arch/x86/kernel/irq.c
-@@ -159,6 +159,15 @@ int arch_show_interrupts(struct seq_file *p, int pre=
-c)
- 				   irq_stats(j)->hyperv_stimer0_count);
- 		seq_puts(p, "  Hyper-V stimer0 interrupts\n");
- 	}
-+#endif
-+#ifdef CONFIG_KVM_GUEST
-+	if (test_bit(KVM_ASYNC_PF_VECTOR, system_vectors)) {
-+		seq_printf(p, "%*s: ", prec, "APF");
-+		for_each_online_cpu(j)
-+			seq_printf(p, "%10u ",
-+				   irq_stats(j)->kvm_async_pf_pageready_count);
-+		seq_puts(p, "  KVM async PF page ready interrupts\n");
-+	}
- #endif
- 	seq_printf(p, "%*s: %10u\n", prec, "ERR", atomic_read(&irq_err_count));
- #if defined(CONFIG_X86_IO_APIC)
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 6efe0410fb72..1c00c7ba01ff 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -259,9 +259,39 @@ do_async_page_fault(struct pt_regs *regs, unsigned l=
-ong error_code, unsigned lon
- 		rcu_irq_exit();
- 		break;
- 	}
-+
-+	if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT))
-+		wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
- }
- NOKPROBE_SYMBOL(do_async_page_fault);
-=20
-+__visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs)
-+{
-+	u32 token, reason;
-+
-+	entering_ack_irq();
-+
-+	inc_irq_stat(kvm_async_pf_pageready_count);
-+
-+	if (__this_cpu_read(apf_reason.enabled)) {
-+		reason =3D __this_cpu_read(apf_reason.reason);
-+		if (reason =3D=3D KVM_PV_REASON_PAGE_READY) {
-+			token =3D __this_cpu_read(apf_reason.token);
-+			/*
-+			 * Make sure we read 'token' before we reset
-+			 * 'reason' or it can get lost.
-+			 */
-+			mb();
-+			__this_cpu_write(apf_reason.reason, 0);
-+			kvm_async_pf_task_wake(token);
-+		}
-+	}
-+
-+	wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
-+
-+	exiting_irq();
-+}
-+
- static void __init paravirt_ops_setup(void)
- {
- 	pv_info.name =3D "KVM";
-@@ -316,10 +346,17 @@ static void kvm_guest_cpu_init(void)
- 		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_VMEXIT))
- 			pa |=3D KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
-=20
-+		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT))
-+			pa |=3D KVM_ASYNC_PF_DELIVERY_AS_INT;
-+
- 		wrmsrl(MSR_KVM_ASYNC_PF_EN, pa);
- 		__this_cpu_write(apf_reason.enabled, 1);
- 		printk(KERN_INFO"KVM setup async PF for cpu %d\n",
- 		       smp_processor_id());
-+
-+		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT))
-+			wrmsrl(MSR_KVM_ASYNC_PF2, KVM_ASYNC_PF2_ENABLED |
-+			       KVM_ASYNC_PF_VECTOR);
- 	}
-=20
- 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI)) {
-@@ -649,6 +686,11 @@ static void __init kvm_guest_init(void)
- 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
- 		apic_set_eoi_write(kvm_guest_apic_eoi_write);
-=20
-+	if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT)) {
-+		pr_info("KVM using interrupt for async PF page-ready\n");
-+		alloc_intr_gate(KVM_ASYNC_PF_VECTOR, kvm_async_pf_vector);
-+	}
-+
- #ifdef CONFIG_SMP
- 	smp_ops.smp_prepare_cpus =3D kvm_smp_prepare_cpus;
- 	smp_ops.smp_prepare_boot_cpu =3D kvm_smp_prepare_boot_cpu;
---=20
-2.25.3
+On 4/29/20 11:06 AM, David Hildenbrand wrote:
+> On 29.04.20 10:57, Janosch Frank wrote:
+>> On 4/24/20 1:40 PM, Janosch Frank wrote:
+>>> On 4/24/20 12:11 PM, David Hildenbrand wrote:
+>>>> On 23.04.20 11:10, Janosch Frank wrote:
+>>>>> Sigp orders are not necessarily finished when the processor finishe=
+d
+>>>>> the sigp instruction. We need to poll if the order has been finishe=
+d
+>>>>> before we continue.
+>>>>>
+>>>>> For (re)start and stop we already use sigp sense running and sigp
+>>>>> sense loops. But we still lack completion checks for stop and store=
+
+>>>>> status, as well as the cpu resets.
+>>>>>
+>>>>> Let's add them.
+>>>>>
+>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>>>> ---
+>>>>>  lib/s390x/smp.c | 8 ++++++++
+>>>>>  lib/s390x/smp.h | 1 +
+>>>>>  s390x/smp.c     | 4 ++++
+>>>>>  3 files changed, 13 insertions(+)
+>>>>>
+>>>>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+>>>>> index 6ef0335..2555bf4 100644
+>>>>> --- a/lib/s390x/smp.c
+>>>>> +++ b/lib/s390x/smp.c
+>>>>> @@ -154,6 +154,14 @@ int smp_cpu_start(uint16_t addr, struct psw ps=
+w)
+>>>>>  	return rc;
+>>>>>  }
+>>>>> =20
+>>>>> +void smp_cpu_wait_for_completion(uint16_t addr)
+>>>>> +{
+>>>>> +	uint32_t status;
+>>>>> +
+>>>>> +	/* Loops when cc =3D=3D 2, i.e. when the cpu is busy with a sigp =
+order */
+>>>>> +	sigp_retry(1, SIGP_SENSE, 0, &status);
+>>>>> +}
+>>>>> +
+>>>>>  int smp_cpu_destroy(uint16_t addr)
+>>>>>  {
+>>>>>  	struct cpu *cpu;
+>>>>> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+>>>>> index ce63a89..a8b98c0 100644
+>>>>> --- a/lib/s390x/smp.h
+>>>>> +++ b/lib/s390x/smp.h
+>>>>> @@ -45,6 +45,7 @@ int smp_cpu_restart(uint16_t addr);
+>>>>>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>>>>>  int smp_cpu_stop(uint16_t addr);
+>>>>>  int smp_cpu_stop_store_status(uint16_t addr);
+>>>>> +void smp_cpu_wait_for_completion(uint16_t addr);
+>>>>>  int smp_cpu_destroy(uint16_t addr);
+>>>>>  int smp_cpu_setup(uint16_t addr, struct psw psw);
+>>>>>  void smp_teardown(void);
+>>>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>>>> index 7462211..48321f4 100644
+>>>>> --- a/s390x/smp.c
+>>>>> +++ b/s390x/smp.c
+>>>>> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
+>>>>>  	lc->prefix_sa =3D 0;
+>>>>>  	lc->grs_sa[15] =3D 0;
+>>>>>  	smp_cpu_stop_store_status(1);
+>>>>> +	smp_cpu_wait_for_completion(1);
+>>>>>  	mb();
+>>>>>  	report(lc->prefix_sa =3D=3D (uint32_t)(uintptr_t)cpu->lowcore, "p=
+refix");
+>>>>>  	report(lc->grs_sa[15], "stack");
+>>>>> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
+>>>>>  	lc->prefix_sa =3D 0;
+>>>>>  	lc->grs_sa[15] =3D 0;
+>>>>>  	smp_cpu_stop_store_status(1);
+>>>>
+>>>> Just curious: Would it make sense to add that inside
+>>>> smp_cpu_stop_store_status() instead?
+>>>>
+>>>
+>>> I think so, we also wait for stop and start to finish, so why not for=
+
+>>> this order code.
+>>>
+>>
+>> I've moved the waiting into the smp library and now the prefix check f=
+or
+>> stop and store status fails every so often if executed repeatedly.
+>>
+>> I've tried making the lc ptr volatile, a print of the prefix before th=
+e
+>> report seems to fix the issue, a print after the report still shows th=
+e
+>> issue but according to the print both values are the same.
+>>
+>> I'm currently at a loss...
+>=20
+> Are you missing a barrier() somewhere?
+>=20
+
+Maybe, but the question is where?
+
+There's already one before the report:
+smp_cpu_stop_store_status(1);
+mb();
+report(lc->prefix_sa =3D=3D (uint32_t)(uintptr_t)cpu->lowcore, "prefix");=
+
+
+
+
+
+--IBASGxB4aMxdlHjjPC7YrfMmVmD1AFU2y--
+
+--8jclk4mYtRsZHXn2kDnAmH3atPsfA6eIG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6pSsQACgkQ41TmuOI4
+ufi62Q//Qrrr2r9IqXzfJVOnMShi4PFek6mM8JMNK9ylKtqnimDUdWTdqdZ4HjsX
+qX3EIglD5MxyY2q0Vgax+4mtE3zrMBhn1ayQEpBXvSJGs9svweBKuQ4afl6P1ALE
+TMUfxCvtk8xB4ZxzIKKX4l+b6eVEZ7UKS7Aun2AC0xsr3VsOpK/BOWdXmUrk0YRG
+YHwyFqYcvlH3yChnIlu10LS7ZRDT8RTb5dnR5MozHp2qGQZXbcx18JaOG3n2jHy2
+pqy7ANN05CkNe0/mzsHkxX47YBRbzpsc220ZECjqbnqfxex+smBYG2CynN05Kipd
+QzoAmmGGSCyrHaBKIGOyfo98+YisKKUWcugB5tX8gD/c2g/ZfT/Oke2qN+tsjMtN
+zguekReHbsjr4XtOiQuN1QSg16s+uowjYngph+icHZj8wxnYp2oQZ9vnp6X17VyV
+ORM1uWuXIHJwumr5pvIG+EV2DfBLBNxKZ/uNSDtMIFvF0GMaaCEs9XFKJueFVuqP
+U3KJOshLTz6fYCpJ3Lb4ZYHxWuw5e6KRyvVZBUow2J8p/QuZc9t2bc3yc/5GNJBt
+faUN6H5ZO/EAuYgF2D9huIh0HRiRJlhCoFZ1KvP6ZLaOM5C+sobUn8eLSm2a+hzs
+7CmAuULRDzhcwq50xSk4TaybwQqw8IsNumy2OkdEw+LX6gQGYII=
+=G+Q2
+-----END PGP SIGNATURE-----
+
+--8jclk4mYtRsZHXn2kDnAmH3atPsfA6eIG--
 
