@@ -2,154 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F3381BD22D
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 04:20:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C1D21BD42D
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 07:47:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726587AbgD2CU3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 Apr 2020 22:20:29 -0400
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:38163 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726430AbgD2CU3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 Apr 2020 22:20:29 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R731e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01355;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0Tx-0ovS_1588126817;
-Received: from 30.27.118.60(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tx-0ovS_1588126817)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 29 Apr 2020 10:20:19 +0800
-Subject: Re: [PATCH v2 1/7] KVM: s390: clean up redundant 'kvm_run' parameters
-To:     Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org,
-        frankja@linux.ibm.com, david@redhat.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com, maz@kernel.org,
-        james.morse@arm.com, julien.thierry.kdev@gmail.com,
-        suzuki.poulose@arm.com, christoffer.dall@arm.com,
-        peterx@redhat.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200422125810.34847-1-tianjia.zhang@linux.alibaba.com>
- <20200422125810.34847-2-tianjia.zhang@linux.alibaba.com>
- <20200422154543.2efba3dd.cohuck@redhat.com>
- <dc5e0fa3-558b-d606-bda9-ed281cf9e9ae@de.ibm.com>
- <20200422180403.03f60b0c.cohuck@redhat.com>
- <5e1e126d-f1b0-196c-594b-4289d0afb9a8@linux.alibaba.com>
- <20200423123901.72a4c6a4.cohuck@redhat.com>
- <71344f73-c34f-a373-49d1-5d839c6be5f6@linux.alibaba.com>
- <1d73b700-4a20-3d7a-66d1-29b5afa03f4d@de.ibm.com>
- <73f6ecd0-ac47-eaad-0e4f-2d41c2b34450@redhat.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <1b8167f2-eb91-5f17-8dc4-dcfaa5bbb075@linux.alibaba.com>
-Date:   Wed, 29 Apr 2020 10:20:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <73f6ecd0-ac47-eaad-0e4f-2d41c2b34450@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S1726515AbgD2Fq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 01:46:57 -0400
+Received: from mx137-tc.baidu.com ([61.135.168.137]:43907 "EHLO
+        tc-sys-mailedm02.tc.baidu.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725798AbgD2Fq5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 01:46:57 -0400
+Received: from localhost (cp01-cos-dev01.cp01.baidu.com [10.92.119.46])
+        by tc-sys-mailedm02.tc.baidu.com (Postfix) with ESMTP id 044A211C0069;
+        Wed, 29 Apr 2020 13:46:37 +0800 (CST)
+From:   Li RongQing <lirongqing@baidu.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        hpa@zytor.com, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
+        joro@8bytes.org, jmattson@google.com, wanpengli@tencent.com,
+        vkuznets@redhat.com, sean.j.christopherson@intel.com,
+        pbonzini@redhat.com
+Subject: [PATCH][v2] kvm: x86: emulate APERF/MPERF registers
+Date:   Wed, 29 Apr 2020 13:46:36 +0800
+Message-Id: <1588139196-23802-1-git-send-email-lirongqing@baidu.com>
+X-Mailer: git-send-email 1.7.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Guest kernel reports a fixed cpu frequency in /proc/cpuinfo,
+this is confused to user when turbo is enable, and aperf/mperf
+can be used to show current cpu frequency after 7d5905dc14a
+"(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
+so we should emulate aperf mperf to achieve it
 
+the period of aperf/mperf in guest mode are accumulated as
+emulated value, and add per-VM knod to enable emulate mperfaperf
 
-On 2020/4/26 20:59, Thomas Huth wrote:
-> On 23/04/2020 13.00, Christian Borntraeger wrote:
->>
->>
->> On 23.04.20 12:58, Tianjia Zhang wrote:
->>>
->>>
->>> On 2020/4/23 18:39, Cornelia Huck wrote:
->>>> On Thu, 23 Apr 2020 11:01:43 +0800
->>>> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
->>>>
->>>>> On 2020/4/23 0:04, Cornelia Huck wrote:
->>>>>> On Wed, 22 Apr 2020 17:58:04 +0200
->>>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>>>>    
->>>>>>> On 22.04.20 15:45, Cornelia Huck wrote:
->>>>>>>> On Wed, 22 Apr 2020 20:58:04 +0800
->>>>>>>> Tianjia Zhang <tianjia.zhang@linux.alibaba.com> wrote:
->>>>>>>>       
->>>>>>>>> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->>>>>>>>> structure. Earlier than historical reasons, many kvm-related function
->>>>>>>>
->>>>>>>> s/Earlier than/For/ ?
->>>>>>>>       
->>>>>>>>> parameters retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time.
->>>>>>>>> This patch does a unified cleanup of these remaining redundant parameters.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->>>>>>>>> ---
->>>>>>>>>     arch/s390/kvm/kvm-s390.c | 37 ++++++++++++++++++++++---------------
->>>>>>>>>     1 file changed, 22 insertions(+), 15 deletions(-)
->>>>>>>>>
->>>>>>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>>>>>>>> index e335a7e5ead7..d7bb2e7a07ff 100644
->>>>>>>>> --- a/arch/s390/kvm/kvm-s390.c
->>>>>>>>> +++ b/arch/s390/kvm/kvm-s390.c
->>>>>>>>> @@ -4176,8 +4176,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->>>>>>>>>         return rc;
->>>>>>>>>     }
->>>>>>>>>     -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>>>>>>>> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
->>>>>>>>>     {
->>>>>>>>> +    struct kvm_run *kvm_run = vcpu->run;
->>>>>>>>>         struct runtime_instr_cb *riccb;
->>>>>>>>>         struct gs_cb *gscb;
->>>>>>>>>     @@ -4235,7 +4236,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
->>>>>>>>>             }
->>>>>>>>>             if (vcpu->arch.gs_enabled) {
->>>>>>>>>                 current->thread.gs_cb = (struct gs_cb *)
->>>>>>>>> -                        &vcpu->run->s.regs.gscb;
->>>>>>>>> +                        &kvm_run->s.regs.gscb;
->>>>>>>>
->>>>>>>> Not sure if these changes (vcpu->run-> => kvm_run->) are really worth
->>>>>>>> it. (It seems they amount to at least as much as the changes advertised
->>>>>>>> in the patch description.)
->>>>>>>>
->>>>>>>> Other opinions?
->>>>>>>
->>>>>>> Agreed. It feels kind of random. Maybe just do the first line (move kvm_run from the
->>>>>>> function parameter list into the variable declaration)? Not sure if this is better.
->>>>>>>    
->>>>>>
->>>>>> There's more in this patch that I cut... but I think just moving
->>>>>> kvm_run from the parameter list would be much less disruptive.
->>>>>>     
->>>>>
->>>>> I think there are two kinds of code(`vcpu->run->` and `kvm_run->`), but
->>>>> there will be more disruptive, not less.
->>>>
->>>> I just fail to see the benefit; sure, kvm_run-> is convenient, but the
->>>> current code is just fine, and any rework should be balanced against
->>>> the cost (e.g. cluttering git annotate).
->>>>
->>>
->>> cluttering git annotate ? Does it mean Fix xxxx ("comment"). Is it possible to solve this problem by splitting this patch?
->>
->> No its about breaking git blame (and bugfix backports) for just a cosmetic improvement.
-> 
-> It could be slightly more than a cosmetic improvement (depending on the
-> smartness of the compiler): vcpu->run-> are two dereferences, while
-> kvm_run-> is only one dereference. So it could be slightly more compact
-> and faster code.
-> 
->   Thomas
-> 
+diff v1:
+1. support AMD
+2. support per-vm capability to enable
 
-If the compiler is smart enough, this place can be automatically 
-optimized, but we can't just rely on the compiler, if not? This requires 
-a trade-off between code cleanliness readability and breaking git blame.
-In addition, I have removed the changes here and sent a v4 patch. Please 
-also help review it.
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+Signed-off-by: Chai Wen <chaiwen@baidu.com>
+Signed-off-by: Jia Lina <jialina01@baidu.com>
+---
+ Documentation/virt/kvm/api.rst  |  7 +++++++
+ arch/x86/include/asm/kvm_host.h |  4 ++++
+ arch/x86/kvm/cpuid.c            | 13 ++++++++++++-
+ arch/x86/kvm/svm.c              |  6 ++++++
+ arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+ arch/x86/kvm/x86.c              | 37 +++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h              |  6 ++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 8 files changed, 79 insertions(+), 1 deletion(-)
 
-Thanks and best,
-Tianjia
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index efbbe570aa9b..dc4b4036e5d2 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6109,3 +6109,10 @@ KVM can therefore start protected VMs.
+ This capability governs the KVM_S390_PV_COMMAND ioctl and the
+ KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
+ guests when the state change is invalid.
++
++8.23 KVM_CAP_MPERFAPERF
++----------------------------
++
++:Architectures: x86
++
++This capability indicates that KVM supports APERF and MPERF MSR registers
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 42a2d0d3984a..58fd3254804f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -820,6 +820,9 @@ struct kvm_vcpu_arch {
+ 
+ 	/* AMD MSRC001_0015 Hardware Configuration */
+ 	u64 msr_hwcr;
++
++	u64 v_mperf;
++	u64 v_aperf;
+ };
+ 
+ struct kvm_lpage_info {
+@@ -979,6 +982,7 @@ struct kvm_arch {
+ 
+ 	bool guest_can_read_msr_platform_info;
+ 	bool exception_payload_enabled;
++	bool guest_has_mperfaperf;
+ 
+ 	struct kvm_pmu_event_filter *pmu_event_filter;
+ 	struct task_struct *nx_lpage_recovery_thread;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 901cd1fdecd9..3bdd907981b5 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -124,6 +124,14 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+ 					   MSR_IA32_MISC_ENABLE_MWAIT);
+ 	}
+ 
++	best = kvm_find_cpuid_entry(vcpu, 6, 0);
++	if (best) {
++		if (guest_has_mperfaperf(vcpu->kvm) &&
++			boot_cpu_has(X86_FEATURE_APERFMPERF))
++			best->ecx |= 1;
++		else
++			best->ecx &= ~1;
++	}
+ 	/* Update physical-address width */
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+ 	kvm_mmu_reset_context(vcpu);
+@@ -558,7 +566,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 	case 6: /* Thermal management */
+ 		entry->eax = 0x4; /* allow ARAT */
+ 		entry->ebx = 0;
+-		entry->ecx = 0;
++		if (boot_cpu_has(X86_FEATURE_APERFMPERF))
++			entry->ecx = 0x1;
++		else
++			entry->ecx = 0x0;
+ 		entry->edx = 0;
+ 		break;
+ 	/* function 7 has additional index. */
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 851e9cc79930..1d157a8dba46 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -4310,6 +4310,12 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_F10H_DECFG:
+ 		msr_info->data = svm->msr_decfg;
+ 		break;
++	case MSR_IA32_MPERF:
++		msr_info->data = vcpu->arch.v_mperf;
++		break;
++	case MSR_IA32_APERF:
++		msr_info->data = vcpu->arch.v_aperf;
++		break;
+ 	default:
+ 		return kvm_get_msr_common(vcpu, msr_info);
+ 	}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 91749f1254e8..b05e276e262b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1914,6 +1914,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+ 			return 1;
+ 		goto find_shared_msr;
++	case MSR_IA32_MPERF:
++		msr_info->data = vcpu->arch.v_mperf;
++		break;
++	case MSR_IA32_APERF:
++		msr_info->data = vcpu->arch.v_aperf;
++		break;
+ 	default:
+ 	find_shared_msr:
+ 		msr = find_msr_entry(vmx, msr_info->index);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b8124b562dea..38deb11b1544 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3435,6 +3435,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+ 		r = kvm_x86_ops.nested_enable_evmcs != NULL;
+ 		break;
++	case KVM_CAP_MPERFAPERF:
++		r = boot_cpu_has(X86_FEATURE_APERFMPERF) ? 1 : 0;
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -4883,6 +4886,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		kvm->arch.exception_payload_enabled = cap->args[0];
+ 		r = 0;
+ 		break;
++	case KVM_CAP_MPERFAPERF:
++		kvm->arch.guest_has_mperfaperf =
++			boot_cpu_has(X86_FEATURE_APERFMPERF) ? cap->args[0] : 0;
++		r = 0;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -8163,6 +8171,25 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+ 
++
++static void guest_enter_mperfaperf(u64 *mperf, u64 *aperf)
++{
++	rdmsrl(MSR_IA32_MPERF, *mperf);
++	rdmsrl(MSR_IA32_APERF, *aperf);
++}
++
++static void guest_exit_mperfaperf(struct kvm_vcpu *vcpu,
++		u64 mperf, u64 aperf)
++{
++	u64 perf;
++
++	rdmsrl(MSR_IA32_MPERF, perf);
++	vcpu->arch.v_mperf += perf - mperf;
++
++	rdmsrl(MSR_IA32_APERF, perf);
++	vcpu->arch.v_aperf += perf - aperf;
++}
++
+ /*
+  * Returns 1 to let vcpu_run() continue the guest execution loop without
+  * exiting to the userspace.  Otherwise, the value will be returned to the
+@@ -8176,7 +8203,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		kvm_cpu_accept_dm_intr(vcpu);
+ 	enum exit_fastpath_completion exit_fastpath = EXIT_FASTPATH_NONE;
+ 
++	bool enable_mperfaperf = guest_has_mperfaperf(vcpu->kvm);
+ 	bool req_immediate_exit = false;
++	u64 mperf, aperf;
+ 
+ 	if (kvm_request_pending(vcpu)) {
+ 		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
+@@ -8326,6 +8355,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 	preempt_disable();
+ 
++	mperf = aperf = 0;
++	if (unlikely(enable_mperfaperf))
++		guest_enter_mperfaperf(&mperf, &aperf);
++
+ 	kvm_x86_ops.prepare_guest_switch(vcpu);
+ 
+ 	/*
+@@ -8449,6 +8482,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	local_irq_enable();
++
++	if (unlikely(enable_mperfaperf) && mperf)
++		guest_exit_mperfaperf(vcpu, mperf, aperf);
++
+ 	preempt_enable();
+ 
+ 	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index b968acc0516f..69b66ed8d82a 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -355,6 +355,12 @@ static inline bool kvm_dr7_valid(u64 data)
+ 	return !(data >> 32);
+ }
+ 
++
++static inline bool guest_has_mperfaperf(struct kvm *kvm)
++{
++	return kvm->arch.guest_has_mperfaperf;
++}
++
+ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
+ u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 428c7dde6b4b..1f9abdf0d1a9 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_VCPU_RESETS 179
+ #define KVM_CAP_S390_PROTECTED 180
+ #define KVM_CAP_PPC_SECURE_GUEST 181
++#define KVM_CAP_MPERFAPERF 182
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.16.2
+
