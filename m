@@ -2,119 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7A3A1BE49B
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 19:02:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 230421BE4C0
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 19:07:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727841AbgD2RCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 13:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57150 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726456AbgD2RCU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 13:02:20 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E68C03C1AE;
-        Wed, 29 Apr 2020 10:02:20 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id g14so2301814otg.10;
-        Wed, 29 Apr 2020 10:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=B985L7L6vo4SZsi3kVQu81cacr5257tGI7VdWzNQtbc=;
-        b=BK/QhIP5IW+bddXjrA1pREKlRUiMK9Wa2V3gAEYOxqPdactgZ62/420pj3wtm6eJ9C
-         HPR7JOusQPaUNxfJLn76e/Ez4DJlPvUL96k7/WY6gVuonnIGWjETrUj0454zoCzL1fN7
-         abqxu2Yc4vSx0bHI6Z/xT/1O1JmkgxrfkJDA24awcq1rNzegC4eF5okwaRi6KTNIV3i7
-         ocvUXxtnOm7HQSvRRk9zX0o1Exq1do2ynwyZfuts3czTqYt7LnPZ4X7Nz6O0658Dd/Mb
-         C5UEr1euzAXRhYIyHUtpUqMikhKiok+A5kBcQ6yiBANBIz0k0sGDoHwAW7Bo/L4Hv/9s
-         ws/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=B985L7L6vo4SZsi3kVQu81cacr5257tGI7VdWzNQtbc=;
-        b=inkfy7OCPiaGIpc9R938d+upfNLf+w6wemAPzOxZ6kJgJgBHs2Rdl7wkQd0x/kdIzu
-         Dfi1thccd13q7rcx5K0KVIyuvmlYSHznKJhf3SW2zbY3iUNG923KwTVf/7rQ97bxTTkE
-         C/MccqmJ1hZVfdtUOEVoZQnOQrJ+0Nz8T3g3i95yxgGBSHFGfipV2Pyv0GXYpnsfkuc9
-         k0R45ZiV0WMMnFwSVnTVtBckNLwgqM94TWgbKyMpEB3yZ3Uv1anxv7gLvpqVAcEcNQDL
-         iBwKW8iILk3ENIR5tPHi7KQY4O642FjnvzZfztmLqkoLOq3uIMxEl5DBW3aBb5oTyw3i
-         EQtA==
-X-Gm-Message-State: AGi0PuYsHpktyjm+3Mia+NmSojV0bRCass/Bt7troYxAaOaugw3H6q99
-        0UfAA/AgtxIw3XIKbnuVKkwrLOLjwCxQHwreRGzWfSQGkHY=
-X-Google-Smtp-Source: APiQypJbvSlRX+/S2xFHVro3TSK+FAqAJJ9oku9MV9UO98xDHJFqypFdsLNNoZoZ/3TEZBNx8jYUQ6xYULRbhs1VLEc=
-X-Received: by 2002:a9d:2aa9:: with SMTP id e38mr13649191otb.162.1588179740168;
- Wed, 29 Apr 2020 10:02:20 -0700 (PDT)
+        id S1726654AbgD2RHf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 13:07:35 -0400
+Received: from mga05.intel.com ([192.55.52.43]:60134 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726423AbgD2RHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Apr 2020 13:07:35 -0400
+IronPort-SDR: kMgx6c0YEpzFsZm5ZzhOFkdWWM9cE0Uizaj60paNVtRbGV4w5+8rys/zHLj5IB7D1IImb6CA8m
+ RidxYJGi6ITg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2020 10:07:33 -0700
+IronPort-SDR: 4XpjKDssQOU52jRwGmVBekrEIif3t0LGERmfHkrJ8yTGZLP/jtaCmkj8m1D16mqwWJvAldr8j0
+ AIwAx81rxcqg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,332,1583222400"; 
+   d="scan'208";a="276237089"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga002.jf.intel.com with ESMTP; 29 Apr 2020 10:07:33 -0700
+Date:   Wed, 29 Apr 2020 10:07:33 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH 12/13] KVM: x86: Replace late check_nested_events() hack
+ with more precise fix
+Message-ID: <20200429170733.GG15992@linux.intel.com>
+References: <20200423022550.15113-1-sean.j.christopherson@intel.com>
+ <20200423022550.15113-13-sean.j.christopherson@intel.com>
+ <CALMp9eTiGdYPpejAOLNz7zzqP1wPXb_zSL02F27VMHeHGzANJg@mail.gmail.com>
+ <20200428222010.GN12735@linux.intel.com>
+ <6b35ec9b-9565-ea6c-3de5-0957a9f76257@redhat.com>
+ <20200429164547.GF15992@linux.intel.com>
+ <286738de-c268-f0b6-f589-6d9d9ad3dc4a@redhat.com>
 MIME-Version: 1.0
-References: <20200326200634.222009-1-dancol@google.com> <20200401213903.182112-1-dancol@google.com>
- <CAKOZueuu=bGt4O0xjiV=9_PC_8Ey8pa3NjtJ7+O-nHCcYbLnEg@mail.gmail.com>
- <alpine.LRH.2.21.2004230253530.12318@namei.org> <6fcc0093-f154-493e-dc11-359b44ed57ce@schaufler-ca.com>
- <3ffd699d-c2e7-2bc3-eecc-b28457929da9@schaufler-ca.com> <8bef5acd-471e-0288-ad85-72601c3a2234@schaufler-ca.com>
- <CAEjxPJ66ZZKfAUPnUjQiraNJO0h=T3OTY2qTVPuXrWG9va1-2g@mail.gmail.com>
-In-Reply-To: <CAEjxPJ66ZZKfAUPnUjQiraNJO0h=T3OTY2qTVPuXrWG9va1-2g@mail.gmail.com>
-From:   Stephen Smalley <stephen.smalley.work@gmail.com>
-Date:   Wed, 29 Apr 2020 13:02:09 -0400
-Message-ID: <CAEjxPJ4iquFSBfEj+UEFLUFHPsezuQ-Bzv09n+WgOWk38Nyw3w@mail.gmail.com>
-Subject: Re: [PATCH v5 0/3] SELinux support for anonymous inodes and UFFD
-To:     Casey Schaufler <casey@schaufler-ca.com>
-Cc:     Daniel Colascione <dancol@google.com>,
-        James Morris <jmorris@namei.org>,
-        Tim Murray <timmurray@google.com>,
-        SElinux list <selinux@vger.kernel.org>,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Paul Moore <paul@paul-moore.com>,
-        Nick Kralevich <nnk@google.com>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        Lokesh Gidra <lokeshgidra@google.com>,
-        John Johansen <john.johansen@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <286738de-c268-f0b6-f589-6d9d9ad3dc4a@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 27, 2020 at 12:48 PM Stephen Smalley
-<stephen.smalley.work@gmail.com> wrote:
->
-> On Mon, Apr 27, 2020 at 12:19 PM Casey Schaufler <casey@schaufler-ca.com> wrote:
-> >
-> > On 4/23/2020 3:24 PM, Casey Schaufler wrote:
-> > > On 4/22/2020 10:12 AM, Casey Schaufler wrote:
-> > >> On 4/22/2020 9:55 AM, James Morris wrote:
-> > >>> On Mon, 13 Apr 2020, Daniel Colascione wrote:
-> > >>>
-> > >>>> On Wed, Apr 1, 2020 at 2:39 PM Daniel Colascione <dancol@google.com> wrote:
-> > >>>>> Changes from the fourth version of the patch:
-> > >>>> Is there anything else that needs to be done before merging this patch series?
-> > > Do you have a test case that exercises this feature?
-> >
-> > I haven't heard anything back. What would cause this code to be executed?
->
-> See https://lore.kernel.org/selinux/513f6230-1fb3-dbb5-5f75-53cd02b91b28@tycho.nsa.gov/
-> for example.
+On Wed, Apr 29, 2020 at 06:58:45PM +0200, Paolo Bonzini wrote:
+> On 29/04/20 18:45, Sean Christopherson wrote:
+> > 
+> > Can you just drop 9/13, "Prioritize SMI over nested IRQ/NMI" from kvm/queue?
+> > It's probably best to deal with this in a new series rather than trying to
+> > squeeze it in.
+> 
+> With AMD we just have IRQ/NMI/SMI, and it's important to handle SMI in
 
-NB The example cited above needs to be tweaked for changes in the
-logic from the original RFC patch on which the example was
-based.  In particular, the userfaultfd CIL policy needs to be updated
-to define and use the new anon_inode class and to allow create
-permission as follows.
+Ah, forgot about that angle.
 
-$ cat userfaultfd.cil
-(class anon_inode ())
-(classcommon anon_inode file)
-(classorder (unordered anon_inode))
-(type uffd_t)
-; Label the UFFD with uffd_t; this can be specialized per domain
-(typetransition unconfined_t unconfined_t anon_inode "[userfaultfd]"   uffd_t)
-(allow unconfined_t uffd_t (anon_inode (create)))
-; Permit read() and ioctl() on the UFFD.
-; Comment out if you want to test read or basic ioctl enforcement.
-(allow unconfined_t uffd_t (anon_inode (read)))
-(allow unconfined_t uffd_t (anon_inode (ioctl)))
-; Uncomment one of the allowx lines below to test ioctl whitelisting.
-; Currently the 1st one is uncommented; comment that out if trying another.
-; None
-(allowx unconfined_t uffd_t (ioctl anon_inode ((0x00))))
-; UFFDIO_API
-;(allowx unconfined_t uffd_t (ioctl anon_inode ((0xaa3f))))
+> check_nested_events because you can turn SMIs into vmexit without stuff
+> such as dual-monitor treatment.  On the other hand there is no MTF and
+> we're not handling exceptions yet.  So, since SMIs should be pretty rare
+> anyway, I'd rather just add a comment detailing the correct order and
+> why we're not following it.  The minimal fix would be to move SMI above
+> the preemption timer, right?
+
+Yep, that works for now.
+
+I'd still like to do a full fix for SMI and INIT.  Correctness aside, I
+think/hope the changes I have in mind will make it easier to connect the
+dots betwen KVM's event priority and the SDM's event priority.  But that
+can definitely wait for 5.9.
