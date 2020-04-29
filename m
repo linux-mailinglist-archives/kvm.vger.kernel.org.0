@@ -2,1058 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A07B61BDA26
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 12:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C21EB1BDA85
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 13:22:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbgD2Kzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 06:55:46 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59226 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726516AbgD2Kzq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 06:55:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588157741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xJZmXIuMwLWSW0AqYvChgW7PLjskNMjfG3KcMdmB+Ds=;
-        b=G6FhC2kRqyUy4d+qN+mGRGKEkseU5ljZSmuYEhGYai3vzHA1yzRz8rWXN3DFgJfJ54YC8f
-        U2R9VNU085+bEPZBuSHB4KeJnBUTuzkdqa7G+gQAepW7lAGLE/rngwzdBLpa8q2C+1+4+B
-        W2xp0ptr9H/eUQnp2v8Vs0l7EjYxTCw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-ska996SMONuBAGhIBFIvyw-1; Wed, 29 Apr 2020 06:55:40 -0400
-X-MC-Unique: ska996SMONuBAGhIBFIvyw-1
-Received: by mail-wm1-f69.google.com with SMTP id f128so1037410wmf.8
-        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 03:55:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xJZmXIuMwLWSW0AqYvChgW7PLjskNMjfG3KcMdmB+Ds=;
-        b=sVHwUI2+hRBWrcUC50JNo3UDujSeC36uyI0xPDGzbvuMMpsE6DtN/ZIqDK0nAZ6WPW
-         Zo8LrAG01N2eBJrGO7U9muCYGW6XDuepQTQjNfJgL9GUP+FRGmCh3e7ZsbgeZ/1aM64I
-         /QeyTuoVRC0nYvnZjaLmtROb9BMwiAq0x7OPSA2QlKK8CJhy4vZM9CU1jYwfW/iEE+Ln
-         MkAyrk3holwK12v2TLXoE4Zy3Md3BE1c5OwzGwPTi6a4mTFOgHQAdyBD1mqTzt7ySfj/
-         ky/pTXEXAoVJqqfRmWgliLhUrMeC4tB+AVXn/hz6mUGWvTs2PjFDHPzdIkjtLpH2chdY
-         MuZg==
-X-Gm-Message-State: AGi0PuY74nhZ/XOvENMb+N5DhjBUyH9iU5rtd85GXIEuQQIv/SywtPI8
-        rLPm8bVflNyq2r2tVafFLpXtDdkeP6fJueXylfodxYyNLrBmoEyPUDrnpjV4JU5GVFsyPspEcOO
-        +UaogSKd7XYsI
-X-Received: by 2002:a5d:4252:: with SMTP id s18mr37752781wrr.367.1588157738663;
-        Wed, 29 Apr 2020 03:55:38 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIxICSwsqFHyiGqZBOlP3qD8rEtK6aT4fWTvI7SUcN1oJcoTl2TaZcU7C5IMnlYsPJLf4Bg+Q==
-X-Received: by 2002:a5d:4252:: with SMTP id s18mr37752738wrr.367.1588157738199;
-        Wed, 29 Apr 2020 03:55:38 -0700 (PDT)
-Received: from localhost.localdomain ([194.230.155.226])
-        by smtp.gmail.com with ESMTPSA id g6sm29802827wrw.34.2020.04.29.03.55.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2020 03:55:37 -0700 (PDT)
-Subject: Re: [RFC PATCH 2/5] statsfs API: create, add and remove statsfs
- sources and values
-To:     Andreas Dilger <adilger@dilger.ca>
-Cc:     kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, mst@redhat.com,
-        borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
-References: <20200427141816.16703-1-eesposit@redhat.com>
- <20200427141816.16703-3-eesposit@redhat.com>
- <97C10529-DFBF-47E3-9E51-A4C5A63535F3@dilger.ca>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Message-ID: <92ee87c6-1d94-947d-b8a6-5ce26b5d1ef2@redhat.com>
-Date:   Wed, 29 Apr 2020 12:55:36 +0200
+        id S1726770AbgD2LWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 07:22:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3128 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726554AbgD2LWE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 07:22:04 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03TB5kSt102460;
+        Wed, 29 Apr 2020 07:22:01 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30q802h53m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Apr 2020 07:22:01 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 03TB5mnF102512;
+        Wed, 29 Apr 2020 07:22:00 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30q802h537-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Apr 2020 07:22:00 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03TBFYCj004611;
+        Wed, 29 Apr 2020 11:21:58 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 30mcu70a0u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Apr 2020 11:21:58 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03TBLuNu66650550
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 Apr 2020 11:21:56 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 97ACA4C040;
+        Wed, 29 Apr 2020 11:21:56 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A2144C044;
+        Wed, 29 Apr 2020 11:21:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.84.78])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 29 Apr 2020 11:21:56 +0000 (GMT)
+Subject: Re: [PATCH v2 08/10] s390x: smp: Wait for sigp completion
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com
+References: <20200423091013.11587-1-frankja@linux.ibm.com>
+ <20200423091013.11587-9-frankja@linux.ibm.com>
+ <6084d368-86d6-b8fd-d4d3-5e0d72cef590@redhat.com>
+ <18b6f022-81b7-6e0d-996d-3abcffceca41@linux.ibm.com>
+ <be5ed01e-f4f6-6e3a-deb0-8f983e658e0f@linux.ibm.com>
+ <8182df06-8190-001d-ad02-ae13fb99ec72@redhat.com>
+ <802601e1-0bc0-faba-b802-2b0e24e3d96b@linux.ibm.com>
+ <5ef08433-10fd-ccca-eb13-5a93bd462c4c@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <cca03b19-4008-78c8-0528-e928b013b715@linux.ibm.com>
+Date:   Wed, 29 Apr 2020 13:21:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <97C10529-DFBF-47E3-9E51-A4C5A63535F3@dilger.ca>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <5ef08433-10fd-ccca-eb13-5a93bd462c4c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="AFkMIbYYyPMjYuJis6b3AjhZG5e2ItJvQ"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-29_04:2020-04-29,2020-04-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ suspectscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 spamscore=0 clxscore=1015 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004290089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AFkMIbYYyPMjYuJis6b3AjhZG5e2ItJvQ
+Content-Type: multipart/mixed; boundary="8Fu9ttuanlOsX3VIhRL4kTXL8NKMGftkD"
+
+--8Fu9ttuanlOsX3VIhRL4kTXL8NKMGftkD
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 4/29/20 11:55 AM, David Hildenbrand wrote:
+> On 29.04.20 11:37, Janosch Frank wrote:
+>> On 4/29/20 11:06 AM, David Hildenbrand wrote:
+>>> On 29.04.20 10:57, Janosch Frank wrote:
+>>>> On 4/24/20 1:40 PM, Janosch Frank wrote:
+>>>>> On 4/24/20 12:11 PM, David Hildenbrand wrote:
+>>>>>> On 23.04.20 11:10, Janosch Frank wrote:
+>>>>>>> Sigp orders are not necessarily finished when the processor finis=
+hed
+>>>>>>> the sigp instruction. We need to poll if the order has been finis=
+hed
+>>>>>>> before we continue.
+>>>>>>>
+>>>>>>> For (re)start and stop we already use sigp sense running and sigp=
+
+>>>>>>> sense loops. But we still lack completion checks for stop and sto=
+re
+>>>>>>> status, as well as the cpu resets.
+>>>>>>>
+>>>>>>> Let's add them.
+>>>>>>>
+>>>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>>>>>> ---
+>>>>>>>  lib/s390x/smp.c | 8 ++++++++
+>>>>>>>  lib/s390x/smp.h | 1 +
+>>>>>>>  s390x/smp.c     | 4 ++++
+>>>>>>>  3 files changed, 13 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+>>>>>>> index 6ef0335..2555bf4 100644
+>>>>>>> --- a/lib/s390x/smp.c
+>>>>>>> +++ b/lib/s390x/smp.c
+>>>>>>> @@ -154,6 +154,14 @@ int smp_cpu_start(uint16_t addr, struct psw =
+psw)
+>>>>>>>  	return rc;
+>>>>>>>  }
+>>>>>>> =20
+>>>>>>> +void smp_cpu_wait_for_completion(uint16_t addr)
+>>>>>>> +{
+>>>>>>> +	uint32_t status;
+>>>>>>> +
+>>>>>>> +	/* Loops when cc =3D=3D 2, i.e. when the cpu is busy with a sig=
+p order */
+>>>>>>> +	sigp_retry(1, SIGP_SENSE, 0, &status);
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>  int smp_cpu_destroy(uint16_t addr)
+>>>>>>>  {
+>>>>>>>  	struct cpu *cpu;
+>>>>>>> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+>>>>>>> index ce63a89..a8b98c0 100644
+>>>>>>> --- a/lib/s390x/smp.h
+>>>>>>> +++ b/lib/s390x/smp.h
+>>>>>>> @@ -45,6 +45,7 @@ int smp_cpu_restart(uint16_t addr);
+>>>>>>>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>>>>>>>  int smp_cpu_stop(uint16_t addr);
+>>>>>>>  int smp_cpu_stop_store_status(uint16_t addr);
+>>>>>>> +void smp_cpu_wait_for_completion(uint16_t addr);
+>>>>>>>  int smp_cpu_destroy(uint16_t addr);
+>>>>>>>  int smp_cpu_setup(uint16_t addr, struct psw psw);
+>>>>>>>  void smp_teardown(void);
+>>>>>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>>>>>> index 7462211..48321f4 100644
+>>>>>>> --- a/s390x/smp.c
+>>>>>>> +++ b/s390x/smp.c
+>>>>>>> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
+>>>>>>>  	lc->prefix_sa =3D 0;
+>>>>>>>  	lc->grs_sa[15] =3D 0;
+>>>>>>>  	smp_cpu_stop_store_status(1);
+>>>>>>> +	smp_cpu_wait_for_completion(1);
+>>>>>>>  	mb();
+>>>>>>>  	report(lc->prefix_sa =3D=3D (uint32_t)(uintptr_t)cpu->lowcore, =
+"prefix");
+>>>>>>>  	report(lc->grs_sa[15], "stack");
+>>>>>>> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
+>>>>>>>  	lc->prefix_sa =3D 0;
+>>>>>>>  	lc->grs_sa[15] =3D 0;
+>>>>>>>  	smp_cpu_stop_store_status(1);
+>>>>>>
+>>>>>> Just curious: Would it make sense to add that inside
+>>>>>> smp_cpu_stop_store_status() instead?
+>>>>>>
+>>>>>
+>>>>> I think so, we also wait for stop and start to finish, so why not f=
+or
+>>>>> this order code.
+>>>>>
+>>>>
+>>>> I've moved the waiting into the smp library and now the prefix check=
+ for
+>>>> stop and store status fails every so often if executed repeatedly.
+>>>>
+>>>> I've tried making the lc ptr volatile, a print of the prefix before =
+the
+>>>> report seems to fix the issue, a print after the report still shows =
+the
+>>>> issue but according to the print both values are the same.
+>>>>
+>>>> I'm currently at a loss...
+>>>
+>>> Are you missing a barrier() somewhere?
+>>>
+>>
+>> Maybe, but the question is where?
+>>
+>> There's already one before the report:
+>> smp_cpu_stop_store_status(1);
+>> mb();
+>> report(lc->prefix_sa =3D=3D (uint32_t)(uintptr_t)cpu->lowcore, "prefix=
+");
+>=20
+> The issue here is:
+>=20
+> SIGP_SENSE is always handled in the kernel for KVM. Meaning, it will
+> complete even before the target CPU executed the stop and store (in QEM=
+U).
+>=20
+> Reading the PoP:
+>=20
+> "One of the following conditions exists at the
+> addressed CPU: ... A previously issued stop-
+> and-store-status ... has been accepted by the
+> addressed CPU, and execution of the func-
+> tion requested by the order has not yet been
+> completed.
+>=20
+> "If the currently specified order is sense ... then the order
+> is rejected, and condition code 2 is set."
+>=20
+> So, in case of KVM, SENSE does not wait for completion of the previous
+> order. I remember that was a performance improvements, because we wante=
+d
+> to avoid going to user space just to sense if another CPU is running.
+> (and I remember that the documentation was inconsistent)
+
+So, KVM is not architectural compliant when it comes to SIGP SENSE?
+I guess I need to go back to looping until the prefix is > 0
+
+>=20
+> Let me guess, under TCG it works all the time?
+>=20
+
+Looks like it
 
 
-On 4/27/20 11:53 PM, Andreas Dilger wrote:
-> On Apr 27, 2020, at 8:18 AM, Emanuele Giuseppe Esposito <eesposit@redhat.com> wrote:
->>
->> Introduction to the statsfs API, that allows to easily create, add
->> and remove statsfs sources and values.
-> 
-> Not a huge issue, but IMHO the "statsfs" name is confusingly similar to
-> the existing "statfs" function name.  Could you name this interface
-> something more distinct?  Even "fs_stats" or "stats_fs" or similar would
-> at least be visibly different.
+--8Fu9ttuanlOsX3VIhRL4kTXL8NKMGftkD--
 
-You're right, thanks for pointing that out. I am going to change all 
-functions and files into stats_fs. The filesystem name, however, will 
-still stay statsfs because it follows the same naming as 
-debugfs/tracecfs/securityfs and won't interfere or be confused with 
-statfs functions.
+--AFkMIbYYyPMjYuJis6b3AjhZG5e2ItJvQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thank you,
-Emanuele
+-----BEGIN PGP SIGNATURE-----
 
-> 
-> Cheers, Andreas
-> 
->> The API allows to easily building
->> the statistics directory tree to automatically gather them for the linux
->> kernel. The main functionalities are: create a source, add child
->> sources/values/aggregates, register it to the root source (that on
->> the virtual fs would be /sys/kernel/statsfs), ad perform a search for
->> a value/aggregate.
->>
->> This allows creating any kind of source tree, making it more flexible
->> also to future readjustments.
->>
->> The API representation is only logical and will be backed up
->> by a virtual file system in patch 4.
->> Its usage will be shared between the statsfs file system
->> and the end-users like kvm, the former calling it when it needs to
->> display and clear statistics, the latter to add values and sources.
->>
->> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
->> ---
->> fs/Kconfig              |   7 +
->> fs/Makefile             |   1 +
->> fs/statsfs/Makefile     |   4 +
->> fs/statsfs/internal.h   |  20 ++
->> fs/statsfs/statsfs.c    | 618 ++++++++++++++++++++++++++++++++++++++++
->> include/linux/statsfs.h | 222 +++++++++++++++
->> 6 files changed, 872 insertions(+)
->> create mode 100644 fs/statsfs/Makefile
->> create mode 100644 fs/statsfs/internal.h
->> create mode 100644 fs/statsfs/statsfs.c
->> create mode 100644 include/linux/statsfs.h
->>
->> diff --git a/fs/Kconfig b/fs/Kconfig
->> index f08fbbfafd9a..824fcf86d12b 100644
->> --- a/fs/Kconfig
->> +++ b/fs/Kconfig
->> @@ -328,4 +328,11 @@ source "fs/unicode/Kconfig"
->> config IO_WQ
->> 	bool
->>
->> +config STATS_FS
->> +	bool "Statistics Filesystem"
->> +	default y
->> +	help
->> +	  statsfs is a virtual file system that provides counters and other
->> +	  statistics about the running kernel.
->> +
->> endmenu
->> diff --git a/fs/Makefile b/fs/Makefile
->> index 2ce5112b02c8..6942070f54b2 100644
->> --- a/fs/Makefile
->> +++ b/fs/Makefile
->> @@ -125,6 +125,7 @@ obj-$(CONFIG_BEFS_FS)		+= befs/
->> obj-$(CONFIG_HOSTFS)		+= hostfs/
->> obj-$(CONFIG_CACHEFILES)	+= cachefiles/
->> obj-$(CONFIG_DEBUG_FS)		+= debugfs/
->> +obj-$(CONFIG_STATS_FS)		+= statsfs/
->> obj-$(CONFIG_TRACING)		+= tracefs/
->> obj-$(CONFIG_OCFS2_FS)		+= ocfs2/
->> obj-$(CONFIG_BTRFS_FS)		+= btrfs/
->> diff --git a/fs/statsfs/Makefile b/fs/statsfs/Makefile
->> new file mode 100644
->> index 000000000000..d494a3f30ba5
->> --- /dev/null
->> +++ b/fs/statsfs/Makefile
->> @@ -0,0 +1,4 @@
->> +# SPDX-License-Identifier: GPL-2.0-only
->> +statsfs-objs	:= statsfs.o
->> +
->> +obj-$(CONFIG_STATS_FS)	+= statsfs.o
->> diff --git a/fs/statsfs/internal.h b/fs/statsfs/internal.h
->> new file mode 100644
->> index 000000000000..f124683a2ded
->> --- /dev/null
->> +++ b/fs/statsfs/internal.h
->> @@ -0,0 +1,20 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +#ifndef _STATSFS_INTERNAL_H_
->> +#define _STATSFS_INTERNAL_H_
->> +
->> +#include <linux/list.h>
->> +#include <linux/kref.h>
->> +#include <linux/rwsem.h>
->> +#include <linux/statsfs.h>
->> +
->> +/* values, grouped by base */
->> +struct statsfs_value_source {
->> +	void *base_addr;
->> +	bool files_created;
->> +	struct statsfs_value *values;
->> +	struct list_head list_element;
->> +};
->> +
->> +int statsfs_val_get_mode(struct statsfs_value *val);
->> +
->> +#endif /* _STATSFS_INTERNAL_H_ */
->> diff --git a/fs/statsfs/statsfs.c b/fs/statsfs/statsfs.c
->> new file mode 100644
->> index 000000000000..0ad1d985be46
->> --- /dev/null
->> +++ b/fs/statsfs/statsfs.c
->> @@ -0,0 +1,618 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +#include <linux/module.h>
->> +#include <linux/errno.h>
->> +#include <linux/file.h>
->> +#include <linux/fs.h>
->> +#include <linux/slab.h>
->> +#include <linux/rwsem.h>
->> +#include <linux/list.h>
->> +#include <linux/kref.h>
->> +#include <linux/limits.h>
->> +#include <linux/statsfs.h>
->> +
->> +#include "internal.h"
->> +
->> +struct statsfs_aggregate_value {
->> +	uint64_t sum, min, max;
->> +	uint32_t count, count_zero;
->> +};
->> +
->> +static int is_val_signed(struct statsfs_value *val)
->> +{
->> +	return val->type & STATSFS_SIGN;
->> +}
->> +
->> +int statsfs_val_get_mode(struct statsfs_value *val)
->> +{
->> +	return val->mode ? val->mode : 0644;
->> +}
->> +
->> +static struct statsfs_value *find_value(struct statsfs_value_source *src,
->> +					struct statsfs_value *val)
->> +{
->> +	struct statsfs_value *entry;
->> +
->> +	for (entry = src->values; entry->name; entry++) {
->> +		if (entry == val) {
->> +			WARN_ON(strcmp(entry->name, val->name) != 0);
->> +			return entry;
->> +		}
->> +	}
->> +	return NULL;
->> +}
->> +
->> +static struct statsfs_value *
->> +search_value_in_source(struct statsfs_source *src, struct statsfs_value *arg,
->> +		       struct statsfs_value_source **val_src)
->> +{
->> +	struct statsfs_value *entry;
->> +	struct statsfs_value_source *src_entry;
->> +
->> +	list_for_each_entry(src_entry, &src->values_head, list_element) {
->> +		entry = find_value(src_entry, arg);
->> +		if (entry) {
->> +			*val_src = src_entry;
->> +			return entry;
->> +		}
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +/* Called with rwsem held for writing */
->> +static struct statsfs_value_source *create_value_source(void *base)
->> +{
->> +	struct statsfs_value_source *val_src;
->> +
->> +	val_src = kzalloc(sizeof(struct statsfs_value_source), GFP_KERNEL);
->> +	if (!val_src)
->> +		return ERR_PTR(-ENOMEM);
->> +
->> +	val_src->base_addr = base;
->> +	val_src->list_element =
->> +		(struct list_head)LIST_HEAD_INIT(val_src->list_element);
->> +
->> +	return val_src;
->> +}
->> +
->> +int statsfs_source_add_values(struct statsfs_source *source,
->> +			      struct statsfs_value *stat, void *ptr)
->> +{
->> +	struct statsfs_value_source *val_src;
->> +	struct statsfs_value_source *entry;
->> +
->> +	down_write(&source->rwsem);
->> +
->> +	list_for_each_entry(entry, &source->values_head, list_element) {
->> +		if (entry->base_addr == ptr && entry->values == stat) {
->> +			up_write(&source->rwsem);
->> +			return -EEXIST;
->> +		}
->> +	}
->> +
->> +	val_src = create_value_source(ptr);
->> +	val_src->values = (struct statsfs_value *)stat;
->> +
->> +	/* add the val_src to the source list */
->> +	list_add(&val_src->list_element, &source->values_head);
->> +
->> +	up_write(&source->rwsem);
->> +
->> +	return 0;
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_add_values);
->> +
->> +void statsfs_source_add_subordinate(struct statsfs_source *source,
->> +				    struct statsfs_source *sub)
->> +{
->> +	down_write(&source->rwsem);
->> +
->> +	statsfs_source_get(sub);
->> +	list_add(&sub->list_element, &source->subordinates_head);
->> +
->> +	up_write(&source->rwsem);
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_add_subordinate);
->> +
->> +/* Called with rwsem held for writing */
->> +static void
->> +statsfs_source_remove_subordinate_locked(struct statsfs_source *source,
->> +					 struct statsfs_source *sub)
->> +{
->> +	struct list_head *it, *safe;
->> +	struct statsfs_source *src_entry;
->> +
->> +	list_for_each_safe(it, safe, &source->subordinates_head) {
->> +		src_entry = list_entry(it, struct statsfs_source, list_element);
->> +		if (src_entry == sub) {
->> +			WARN_ON(strcmp(src_entry->name, sub->name) != 0);
->> +			list_del_init(&src_entry->list_element);
->> +			statsfs_source_put(src_entry);
->> +			return;
->> +		}
->> +	}
->> +}
->> +
->> +void statsfs_source_remove_subordinate(struct statsfs_source *source,
->> +				       struct statsfs_source *sub)
->> +{
->> +	down_write(&source->rwsem);
->> +	statsfs_source_remove_subordinate_locked(source, sub);
->> +	up_write(&source->rwsem);
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_remove_subordinate);
->> +
->> +/* Called with rwsem held for reading */
->> +static uint64_t get_simple_value(struct statsfs_value_source *src,
->> +				 struct statsfs_value *val)
->> +{
->> +	uint64_t value_found;
->> +	void *address;
->> +
->> +	address = src->base_addr + val->offset;
->> +
->> +	switch (val->type) {
->> +	case STATSFS_U8:
->> +		value_found = *((uint8_t *)address);
->> +		break;
->> +	case STATSFS_U8 | STATSFS_SIGN:
->> +		value_found = *((int8_t *)address);
->> +		break;
->> +	case STATSFS_U16:
->> +		value_found = *((uint16_t *)address);
->> +		break;
->> +	case STATSFS_U16 | STATSFS_SIGN:
->> +		value_found = *((int16_t *)address);
->> +		break;
->> +	case STATSFS_U32:
->> +		value_found = *((uint32_t *)address);
->> +		break;
->> +	case STATSFS_U32 | STATSFS_SIGN:
->> +		value_found = *((int32_t *)address);
->> +		break;
->> +	case STATSFS_U64:
->> +		value_found = *((uint64_t *)address);
->> +		break;
->> +	case STATSFS_U64 | STATSFS_SIGN:
->> +		value_found = *((int64_t *)address);
->> +		break;
->> +	case STATSFS_BOOL:
->> +		value_found = *((uint8_t *)address);
->> +		break;
->> +	default:
->> +		value_found = 0;
->> +		break;
->> +	}
->> +
->> +	return value_found;
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static void clear_simple_value(struct statsfs_value_source *src,
->> +			       struct statsfs_value *val)
->> +{
->> +	void *address;
->> +
->> +	address = src->base_addr + val->offset;
->> +
->> +	switch (val->type) {
->> +	case STATSFS_U8:
->> +		*((uint8_t *)address) = 0;
->> +		break;
->> +	case STATSFS_U8 | STATSFS_SIGN:
->> +		*((int8_t *)address) = 0;
->> +		break;
->> +	case STATSFS_U16:
->> +		*((uint16_t *)address) = 0;
->> +		break;
->> +	case STATSFS_U16 | STATSFS_SIGN:
->> +		*((int16_t *)address) = 0;
->> +		break;
->> +	case STATSFS_U32:
->> +		*((uint32_t *)address) = 0;
->> +		break;
->> +	case STATSFS_U32 | STATSFS_SIGN:
->> +		*((int32_t *)address) = 0;
->> +		break;
->> +	case STATSFS_U64:
->> +		*((uint64_t *)address) = 0;
->> +		break;
->> +	case STATSFS_U64 | STATSFS_SIGN:
->> +		*((int64_t *)address) = 0;
->> +		break;
->> +	case STATSFS_BOOL:
->> +		*((uint8_t *)address) = 0;
->> +		break;
->> +	default:
->> +		break;
->> +	}
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static void search_all_simple_values(struct statsfs_source *src,
->> +				     struct statsfs_value_source *ref_src_entry,
->> +				     struct statsfs_value *val,
->> +				     struct statsfs_aggregate_value *agg)
->> +{
->> +	struct statsfs_value_source *src_entry;
->> +	uint64_t value_found;
->> +
->> +	list_for_each_entry(src_entry, &src->values_head, list_element) {
->> +		/* skip aggregates */
->> +		if (src_entry->base_addr == NULL)
->> +			continue;
->> +
->> +		/* useless to search here */
->> +		if (src_entry->values != ref_src_entry->values)
->> +			continue;
->> +
->> +		/* must be here */
->> +		value_found = get_simple_value(src_entry, val);
->> +		agg->sum += value_found;
->> +		agg->count++;
->> +		agg->count_zero += (value_found == 0);
->> +
->> +		if (is_val_signed(val)) {
->> +			agg->max = (((int64_t)value_found) >=
->> +				    ((int64_t)agg->max)) ?
->> +					   value_found :
->> +					   agg->max;
->> +			agg->min = (((int64_t)value_found) <=
->> +				    ((int64_t)agg->min)) ?
->> +					   value_found :
->> +					   agg->min;
->> +		} else {
->> +			agg->max = (value_found >= agg->max) ? value_found :
->> +							       agg->max;
->> +			agg->min = (value_found <= agg->min) ? value_found :
->> +							       agg->min;
->> +		}
->> +	}
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static void do_recursive_aggregation(struct statsfs_source *root,
->> +				     struct statsfs_value_source *ref_src_entry,
->> +				     struct statsfs_value *val,
->> +				     struct statsfs_aggregate_value *agg)
->> +{
->> +	struct statsfs_source *subordinate;
->> +
->> +	/* search all simple values in this folder */
->> +	search_all_simple_values(root, ref_src_entry, val, agg);
->> +
->> +	/* recursively search in all subfolders */
->> +	list_for_each_entry(subordinate, &root->subordinates_head,
->> +			     list_element) {
->> +		down_read(&subordinate->rwsem);
->> +		do_recursive_aggregation(subordinate, ref_src_entry, val, agg);
->> +		up_read(&subordinate->rwsem);
->> +	}
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static void init_aggregate_value(struct statsfs_aggregate_value *agg,
->> +				 struct statsfs_value *val)
->> +{
->> +	agg->count = agg->count_zero = agg->sum = 0;
->> +	if (is_val_signed(val)) {
->> +		agg->max = S64_MIN;
->> +		agg->min = S64_MAX;
->> +	} else {
->> +		agg->max = 0;
->> +		agg->min = U64_MAX;
->> +	}
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static void store_final_value(struct statsfs_aggregate_value *agg,
->> +			    struct statsfs_value *val, uint64_t *ret)
->> +{
->> +	int operation;
->> +
->> +	operation = val->aggr_kind | is_val_signed(val);
->> +
->> +	switch (operation) {
->> +	case STATSFS_AVG:
->> +		*ret = agg->count ? agg->sum / agg->count : 0;
->> +		break;
->> +	case STATSFS_AVG | STATSFS_SIGN:
->> +		*ret = agg->count ? ((int64_t)agg->sum) / agg->count : 0;
->> +		break;
->> +	case STATSFS_SUM:
->> +	case STATSFS_SUM | STATSFS_SIGN:
->> +		*ret = agg->sum;
->> +		break;
->> +	case STATSFS_MIN:
->> +	case STATSFS_MIN | STATSFS_SIGN:
->> +		*ret = agg->min;
->> +		break;
->> +	case STATSFS_MAX:
->> +	case STATSFS_MAX | STATSFS_SIGN:
->> +		*ret = agg->max;
->> +		break;
->> +	case STATSFS_COUNT_ZERO:
->> +	case STATSFS_COUNT_ZERO | STATSFS_SIGN:
->> +		*ret = agg->count_zero;
->> +		break;
->> +	default:
->> +		break;
->> +	}
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static int statsfs_source_get_value_locked(struct statsfs_source *source,
->> +					   struct statsfs_value *arg,
->> +					   uint64_t *ret)
->> +{
->> +	struct statsfs_value_source *src_entry;
->> +	struct statsfs_value *found;
->> +	struct statsfs_aggregate_value aggr;
->> +
->> +	*ret = 0;
->> +
->> +	if (!arg)
->> +		return -ENOENT;
->> +
->> +	/* look in simple values */
->> +	found = search_value_in_source(source, arg, &src_entry);
->> +
->> +	if (!found) {
->> +		printk(KERN_ERR "Statsfs: Value in source \"%s\" not found!\n",
->> +		       source->name);
->> +		return -ENOENT;
->> +	}
->> +
->> +	if (src_entry->base_addr != NULL) {
->> +		*ret = get_simple_value(src_entry, found);
->> +		return 0;
->> +	}
->> +
->> +	/* look in aggregates */
->> +	init_aggregate_value(&aggr, found);
->> +	do_recursive_aggregation(source, src_entry, found, &aggr);
->> +	store_final_value(&aggr, found, ret);
->> +
->> +	return 0;
->> +}
->> +
->> +int statsfs_source_get_value(struct statsfs_source *source,
->> +			     struct statsfs_value *arg, uint64_t *ret)
->> +{
->> +	int retval;
->> +
->> +	down_read(&source->rwsem);
->> +	retval = statsfs_source_get_value_locked(source, arg, ret);
->> +	up_read(&source->rwsem);
->> +
->> +	return retval;
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_get_value);
->> +
->> +/* Called with rwsem held for reading */
->> +static void set_all_simple_values(struct statsfs_source *src,
->> +				  struct statsfs_value_source *ref_src_entry,
->> +				  struct statsfs_value *val)
->> +{
->> +	struct statsfs_value_source *src_entry;
->> +
->> +	list_for_each_entry(src_entry, &src->values_head, list_element) {
->> +		/* skip aggregates */
->> +		if (src_entry->base_addr == NULL)
->> +			continue;
->> +
->> +		/* wrong to search here */
->> +		if (src_entry->values != ref_src_entry->values)
->> +			continue;
->> +
->> +		if (src_entry->base_addr &&
->> +			src_entry->values == ref_src_entry->values)
->> +			clear_simple_value(src_entry, val);
->> +	}
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static void do_recursive_clean(struct statsfs_source *root,
->> +			       struct statsfs_value_source *ref_src_entry,
->> +			       struct statsfs_value *val)
->> +{
->> +	struct statsfs_source *subordinate;
->> +
->> +	/* search all simple values in this folder */
->> +	set_all_simple_values(root, ref_src_entry, val);
->> +
->> +	/* recursively search in all subfolders */
->> +	list_for_each_entry(subordinate, &root->subordinates_head,
->> +			     list_element) {
->> +		down_read(&subordinate->rwsem);
->> +		do_recursive_clean(subordinate, ref_src_entry, val);
->> +		up_read(&subordinate->rwsem);
->> +	}
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static int statsfs_source_clear_locked(struct statsfs_source *source,
->> +				       struct statsfs_value *val)
->> +{
->> +	struct statsfs_value_source *src_entry;
->> +	struct statsfs_value *found;
->> +
->> +	if (!val)
->> +		return -ENOENT;
->> +
->> +	/* look in simple values */
->> +	found = search_value_in_source(source, val, &src_entry);
->> +
->> +	if (!found) {
->> +		printk(KERN_ERR "Statsfs: Value in source \"%s\" not found!\n",
->> +		       source->name);
->> +		return -ENOENT;
->> +	}
->> +
->> +	if (src_entry->base_addr != NULL) {
->> +		clear_simple_value(src_entry, found);
->> +		return 0;
->> +	}
->> +
->> +	/* look in aggregates */
->> +	do_recursive_clean(source, src_entry, found);
->> +
->> +	return 0;
->> +}
->> +
->> +int statsfs_source_clear(struct statsfs_source *source,
->> +			 struct statsfs_value *val)
->> +{
->> +	int retval;
->> +
->> +	down_read(&source->rwsem);
->> +	retval = statsfs_source_clear_locked(source, val);
->> +	up_read(&source->rwsem);
->> +
->> +	return retval;
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static struct statsfs_value *
->> +find_value_by_name(struct statsfs_value_source *src, char *val)
->> +{
->> +	struct statsfs_value *entry;
->> +
->> +	for (entry = src->values; entry->name; entry++)
->> +		if (!strcmp(entry->name, val))
->> +			return entry;
->> +
->> +	return NULL;
->> +}
->> +
->> +/* Called with rwsem held for reading */
->> +static struct statsfs_value *
->> +search_in_source_by_name(struct statsfs_source *src, char *name)
->> +{
->> +	struct statsfs_value *entry;
->> +	struct statsfs_value_source *src_entry;
->> +
->> +	list_for_each_entry(src_entry, &src->values_head, list_element) {
->> +		entry = find_value_by_name(src_entry, name);
->> +		if (entry)
->> +			return entry;
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +int statsfs_source_get_value_by_name(struct statsfs_source *source, char *name,
->> +				     uint64_t *ret)
->> +{
->> +	struct statsfs_value *val;
->> +	int retval;
->> +
->> +	down_read(&source->rwsem);
->> +	val = search_in_source_by_name(source, name);
->> +
->> +	if (!val) {
->> +		*ret = 0;
->> +		up_read(&source->rwsem);
->> +		return -ENOENT;
->> +	}
->> +
->> +	retval = statsfs_source_get_value_locked(source, val, ret);
->> +	up_read(&source->rwsem);
->> +
->> +	return retval;
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_get_value_by_name);
->> +
->> +void statsfs_source_get(struct statsfs_source *source)
->> +{
->> +	kref_get(&source->refcount);
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_get);
->> +
->> +void statsfs_source_revoke(struct statsfs_source *source)
->> +{
->> +	struct list_head *it, *safe;
->> +	struct statsfs_value_source *val_src_entry;
->> +
->> +	down_write(&source->rwsem);
->> +
->> +	list_for_each_safe(it, safe, &source->values_head) {
->> +		val_src_entry = list_entry(it, struct statsfs_value_source,
->> +					   list_element);
->> +		val_src_entry->base_addr = NULL;
->> +	}
->> +
->> +	up_write(&source->rwsem);
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_revoke);
->> +
->> +/* Called with rwsem held for writing
->> + *
->> + * The refcount is 0 and the lock was taken before refcount
->> + * went from 1 to 0
->> + */
->> +static void statsfs_source_destroy(struct kref *kref_source)
->> +{
->> +	struct statsfs_value_source *val_src_entry;
->> +	struct list_head *it, *safe;
->> +	struct statsfs_source *child, *source;
->> +
->> +	source = container_of(kref_source, struct statsfs_source, refcount);
->> +
->> +	/* iterate through the values and delete them */
->> +	list_for_each_safe(it, safe, &source->values_head) {
->> +		val_src_entry = list_entry(it, struct statsfs_value_source,
->> +					   list_element);
->> +		kfree(val_src_entry);
->> +	}
->> +
->> +	/* iterate through the subordinates and delete them */
->> +	list_for_each_safe(it, safe, &source->subordinates_head) {
->> +		child = list_entry(it, struct statsfs_source, list_element);
->> +		statsfs_source_remove_subordinate_locked(source, child);
->> +	}
->> +
->> +
->> +	up_write(&source->rwsem);
->> +	kfree(source->name);
->> +	kfree(source);
->> +}
->> +
->> +void statsfs_source_put(struct statsfs_source *source)
->> +{
->> +	kref_put_rwsem(&source->refcount, statsfs_source_destroy,
->> +		       &source->rwsem);
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_put);
->> +
->> +struct statsfs_source *statsfs_source_create(const char *fmt, ...)
->> +{
->> +	va_list ap;
->> +	char buf[100];
->> +	struct statsfs_source *ret;
->> +	int char_needed;
->> +
->> +	va_start(ap, fmt);
->> +	char_needed = vsnprintf(buf, 100, fmt, ap);
->> +	va_end(ap);
->> +
->> +	ret = kzalloc(sizeof(struct statsfs_source), GFP_KERNEL);
->> +	if (!ret)
->> +		return ERR_PTR(-ENOMEM);
->> +
->> +	ret->name = kstrdup(buf, GFP_KERNEL);
->> +	if (!ret->name) {
->> +		kfree(ret);
->> +		return ERR_PTR(-ENOMEM);
->> +	}
->> +
->> +	kref_init(&ret->refcount);
->> +	init_rwsem(&ret->rwsem);
->> +
->> +	INIT_LIST_HEAD(&ret->values_head);
->> +	INIT_LIST_HEAD(&ret->subordinates_head);
->> +	INIT_LIST_HEAD(&ret->list_element);
->> +
->> +	return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(statsfs_source_create);
->> diff --git a/include/linux/statsfs.h b/include/linux/statsfs.h
->> new file mode 100644
->> index 000000000000..3f01f094946d
->> --- /dev/null
->> +++ b/include/linux/statsfs.h
->> @@ -0,0 +1,222 @@
->> +/* SPDX-License-Identifier: GPL-2.0
->> + *
->> + *  statsfs.h - a tiny little statistics file system
->> + *
->> + *  Copyright (C) 2020 Emanuele Giuseppe Esposito
->> + *  Copyright (C) 2020 Redhat.
->> + *
->> + */
->> +
->> +#ifndef _STATSFS_H_
->> +#define _STATSFS_H_
->> +
->> +#include <linux/list.h>
->> +
->> +/* Used to distinguish signed types */
->> +#define STATSFS_SIGN 0x8000
->> +
->> +struct statsfs_source;
->> +
->> +enum stat_type {
->> +	STATSFS_U8 = 0,
->> +	STATSFS_U16 = 1,
->> +	STATSFS_U32 = 2,
->> +	STATSFS_U64 = 3,
->> +	STATSFS_BOOL = 4,
->> +	STATSFS_S8 = STATSFS_U8 | STATSFS_SIGN,
->> +	STATSFS_S16 = STATSFS_U16 | STATSFS_SIGN,
->> +	STATSFS_S32 = STATSFS_U32 | STATSFS_SIGN,
->> +	STATSFS_S64 = STATSFS_U64 | STATSFS_SIGN,
->> +};
->> +
->> +enum stat_aggr {
->> +	STATSFS_NONE = 0,
->> +	STATSFS_SUM,
->> +	STATSFS_MIN,
->> +	STATSFS_MAX,
->> +	STATSFS_COUNT_ZERO,
->> +	STATSFS_AVG,
->> +};
->> +
->> +struct statsfs_value {
->> +	/* Name of the stat */
->> +	char *name;
->> +
->> +	/* Offset from base address to field containing the value */
->> +	int offset;
->> +
->> +	/* Type of the stat BOOL,U64,... */
->> +	enum stat_type type;
->> +
->> +	/* Aggregate type: MIN, MAX, SUM,... */
->> +	enum stat_aggr aggr_kind;
->> +
->> +	/* File mode */
->> +	uint16_t mode;
->> +};
->> +
->> +struct statsfs_source {
->> +	struct kref refcount;
->> +
->> +	char *name;
->> +
->> +	/* list of source statsfs_value_source*/
->> +	struct list_head values_head;
->> +
->> +	/* list of struct statsfs_source for subordinate sources */
->> +	struct list_head subordinates_head;
->> +
->> +	struct list_head list_element;
->> +
->> +	struct rw_semaphore rwsem;
->> +
->> +	struct dentry *source_dentry;
->> +};
->> +
->> +/**
->> + * statsfs_source_create - create a statsfs_source
->> + * Creates a statsfs_source with the given name. This
->> + * does not mean it will be backed by the filesystem yet, it will only
->> + * be visible to the user once one of its parents (or itself) are
->> + * registered in statsfs.
->> + *
->> + * Returns a pointer to a statsfs_source if it succeeds.
->> + * This or one of the parents' pointer must be passed to the statsfs_put()
->> + * function when the file is to be removed.  If an error occurs,
->> + * ERR_PTR(-ERROR) will be returned.
->> + */
->> +struct statsfs_source *statsfs_source_create(const char *fmt, ...);
->> +
->> +/**
->> + * statsfs_source_add_values - adds values to the given source
->> + * @source: a pointer to the source that will receive the values
->> + * @val: a pointer to the NULL terminated statsfs_value array to add
->> + * @base_ptr: a pointer to the base pointer used by these values
->> + *
->> + * In addition to adding values to the source, also create the
->> + * files in the filesystem if the source already is backed up by a directory.
->> + *
->> + * Returns 0 it succeeds. If the value are already in the
->> + * source and have the same base_ptr, -EEXIST is returned.
->> + */
->> +int statsfs_source_add_values(struct statsfs_source *source,
->> +			      struct statsfs_value *val, void *base_ptr);
->> +
->> +/**
->> + * statsfs_source_add_subordinate - adds a child to the given source
->> + * @parent: a pointer to the parent source
->> + * @child: a pointer to child source to add
->> + *
->> + * Recursively create all files in the statsfs filesystem
->> + * only if the parent has already a dentry (created with
->> + * statsfs_source_register).
->> + * This avoids the case where this function is called before register.
->> + */
->> +void statsfs_source_add_subordinate(struct statsfs_source *parent,
->> +				    struct statsfs_source *child);
->> +
->> +/**
->> + * statsfs_source_remove_subordinate - removes a child from the given source
->> + * @parent: a pointer to the parent source
->> + * @child: a pointer to child source to remove
->> + *
->> + * Look if there is such child in the parent. If so,
->> + * it will remove all its files and call statsfs_put on the child.
->> + */
->> +void statsfs_source_remove_subordinate(struct statsfs_source *parent,
->> +				       struct statsfs_source *child);
->> +
->> +/**
->> + * statsfs_source_get_value - search a value in the source (and
->> + * subordinates)
->> + * @source: a pointer to the source that will be searched
->> + * @val: a pointer to the statsfs_value to search
->> + * @ret: a pointer to the uint64_t that will hold the found value
->> + *
->> + * Look up in the source if a value with same value pointer
->> + * exists.
->> + * If not, it will return -ENOENT. If it exists and it's a simple value
->> + * (not an aggregate), the value that it points to will be returned.
->> + * If it exists and it's an aggregate (aggr_type != STATSFS_NONE), all
->> + * subordinates will be recursively searched and every simple value match
->> + * will be used to aggregate the final result. For example if it's a sum,
->> + * all suboordinates having the same value will be sum together.
->> + *
->> + * This function will return 0 it succeeds.
->> + */
->> +int statsfs_source_get_value(struct statsfs_source *source,
->> +			     struct statsfs_value *val, uint64_t *ret);
->> +
->> +/**
->> + * statsfs_source_get_value_by_name - search a value in the source (and
->> + * subordinates)
->> + * @source: a pointer to the source that will be searched
->> + * @name: a pointer to the string representing the value to search
->> + *        (for example "exits")
->> + * @ret: a pointer to the uint64_t that will hold the found value
->> + *
->> + * Same as statsfs_source_get_value, but initially the name is used
->> + * to search in the given source if there is a value with a matching
->> + * name. If so, statsfs_source_get_value will be called with the found
->> + * value, otherwise -ENOENT will be returned.
->> + */
->> +int statsfs_source_get_value_by_name(struct statsfs_source *source, char *name,
->> +				     uint64_t *ret);
->> +
->> +/**
->> + * statsfs_source_clear - search and clears a value in the source (and
->> + * subordinates)
->> + * @source: a pointer to the source that will be searched
->> + * @val: a pointer to the statsfs_value to search
->> + *
->> + * Look up in the source if a value with same value pointer
->> + * exists.
->> + * If not, it will return -ENOENT. If it exists and it's a simple value
->> + * (not an aggregate), the value that it points to will be set to 0.
->> + * If it exists and it's an aggregate (aggr_type != STATSFS_NONE), all
->> + * subordinates will be recursively searched and every simple value match
->> + * will be set to 0.
->> + *
->> + * This function will return 0 it succeeds.
->> + */
->> +int statsfs_source_clear(struct statsfs_source *source,
->> +			 struct statsfs_value *val);
->> +
->> +/**
->> + * statsfs_source_revoke - disconnect the source from its backing data
->> + * @source: a pointer to the source that will be revoked
->> + *
->> + * Ensure that statsfs will not access the data that were passed to
->> + * statsfs_source_add_value for this source.
->> + *
->> + * Because open files increase the reference count for a statsfs_source,
->> + * the source can end up living longer than the data that provides the
->> + * values for the source.  Calling statsfs_source_revoke just before the
->> + * backing data is freed avoids accesses to freed data structures.  The
->> + * sources will return 0.
->> + */
->> +void statsfs_source_revoke(struct statsfs_source *source);
->> +
->> +/**
->> + * statsfs_source_get - increases refcount of source
->> + * @source: a pointer to the source whose refcount will be increased
->> + */
->> +void statsfs_source_get(struct statsfs_source *source);
->> +
->> +/**
->> + * statsfs_source_put - decreases refcount of source and deletes if needed
->> + * @source: a pointer to the source whose refcount will be decreased
->> + *
->> + * If refcount arrives to zero, take care of deleting
->> + * and free the source resources and files, by firstly recursively calling
->> + * statsfs_source_remove_subordinate to the child and then deleting
->> + * its own files and allocations.
->> + */
->> +void statsfs_source_put(struct statsfs_source *source);
->> +
->> +/**
->> + * statsfs_initialized - returns true if statsfs fs has been registered
->> + */
->> +bool statsfs_initialized(void);
->> +
->> +#endif
->> --
->> 2.25.2
->>
-> 
-> 
-> Cheers, Andreas
-> 
-> 
-> 
-> 
-> 
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6pY1MACgkQ41TmuOI4
+ufhIDBAAg7ymSuk41BlKrPlv+yMw8Jxns4PcXKvT5D+FSiO2sBIgNEMgz2bvId/I
+0YHyQMlHGLzsmYrdurhnqqHNdQUql6xCU08IapBA0hQwdmclM/ky2EvfsX6cD0GT
+4krK19bYyHgX0f375lyYzrPRK9FZ1j2ipAC0WHhoXXeEdCyTJBLDQlbm+NbBnRXP
+3R+HZieRBz3yRuMI3XpMcNxF6g0aCzlkHbqC9HLnalQ/Kxfo9ZRRobIlyTJmM5bi
+u7koADLK8WcfVwZhV9ru8S9avQM7Cb5+QEY2/0XoyO7xGRHRq8V9/5Mwd34/Akli
+50HNsNKbeePebj1Pyfezb8IKDovTSAGfs82xooAlHamMCpmWJ6L7tEh+VYG3j5jK
++7k/L31G+v98B5J5i+UwPTF+EyKkK3kihiBpme5ENmv7lOsTZR3z1AgCavaVzU4I
+S2XXo7PJVxeApOpylMSUZZtgi9oEVuNrT7o6Jqi1uk/qaPm8dOGhkcLvlGiHVH5v
+919kQgBg/3QusevwtU6gcXg8kEFdAKjZyT0MCgjGPXI0BajTUva7itQcpK5nY1P3
+r5d1U9gV3f9bh7jU1UkIPJ+VIc+cLT5WlFSyJuVwM8piztZh1ovp0vF8mLwg2xC+
+hvnZ3LMoSCaBSaanL9m141RcWpK3GUyNzvcMHjJBI+Ngbu597IY=
+=a5Cu
+-----END PGP SIGNATURE-----
+
+--AFkMIbYYyPMjYuJis6b3AjhZG5e2ItJvQ--
 
