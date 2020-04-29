@@ -2,266 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78C171BD8BA
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 11:49:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 459481BD8DB
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 11:56:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726745AbgD2Jtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 05:49:35 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57974 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726739AbgD2Jtf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 05:49:35 -0400
+        id S1726631AbgD2J4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 05:56:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59259 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726345AbgD2J4G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Apr 2020 05:56:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588153772;
+        s=mimecast20190719; t=1588154164;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bbs27IXMBaJcsgy3STOZVEUhkP5D7KawKdkHQuyWL3c=;
-        b=S72lMrJDjgGGrdhQN9VtoUpcb62qHMfpnwlxBgg9ftY07ZeGLPRmmewCcw6cweF/Og0mmB
-        1odbHVmjS38DkY020JQkyVdiRJjjr/BN5m3++0woW0oka5M2xmtlpqXSabhB5qwdgtikPD
-        yhWV8NCVj9NB1DXaduqGuuZlOD6wtsM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-_9eugQG7Oqm4DToMXmR-yA-1; Wed, 29 Apr 2020 05:49:31 -0400
-X-MC-Unique: _9eugQG7Oqm4DToMXmR-yA-1
-Received: by mail-wr1-f72.google.com with SMTP id r11so1437977wrx.21
-        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 02:49:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=bbs27IXMBaJcsgy3STOZVEUhkP5D7KawKdkHQuyWL3c=;
-        b=m2q7I3dPApvcE1nFGesgiNxclbXv1mHq1FIEQl30H5RKMn96iyrW+rZy131RDMDTPa
-         qghuPYI6n7YVd0Z+l2FtRiuLLK0geiYTyRtGTbbyoFvey6chFQGMZwE93DwskrFy7eX9
-         S45AE1mMLAvJ5y4Iz6WSN26TbHsP90ODtSq0qWmHWpKkztYQUtvs+Idwbt9Dn6D8P5QP
-         1L1QS6LxZd/NoQDaQrJt/O/qEE4WmwFuwJQntVdZFl/rFEtJ7zo6GlBkWW5VxafBTcNO
-         mS4qz8ywc2l7upObbgYgGo6FCI07Ft2YV5zMAXV9TuksaiAVEyIqHW+uEl3p9/Yu6bRk
-         Skcw==
-X-Gm-Message-State: AGi0PuZTXKpu6DbD0xZti3nmEZe7E+sDVOvz0/DbBIvEQp4o7x8BG6Sv
-        SX1QHBl+59deUyM4ZDbRJX+6KnYiici7C52Ty8ykYaOMrlQwr+Pr7MLuuTvtca+37VWIgWd9NSX
-        KEBpWe5apEDle
-X-Received: by 2002:adf:fe87:: with SMTP id l7mr40790316wrr.360.1588153770038;
-        Wed, 29 Apr 2020 02:49:30 -0700 (PDT)
-X-Google-Smtp-Source: APiQypL3lOosPELSXYfi/Ql2ON5M3P/FRdYdFKW7FpT8yKLlLalIpi9flCq1OR+1XzHDC86bYLP/TQ==
-X-Received: by 2002:adf:fe87:: with SMTP id l7mr40790296wrr.360.1588153769812;
-        Wed, 29 Apr 2020 02:49:29 -0700 (PDT)
-Received: from localhost.localdomain.com ([194.230.155.226])
-        by smtp.gmail.com with ESMTPSA id y18sm7506030wmc.45.2020.04.29.02.49.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2020 02:49:29 -0700 (PDT)
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org, mst@redhat.com,
-        borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [RFC PATCH 2/5] statsfs API: create, add and remove statsfs
-Date:   Wed, 29 Apr 2020 11:49:22 +0200
-Message-Id: <20200429094922.55032-1-eesposit@redhat.com>
-X-Mailer: git-send-email 2.25.2
-In-Reply-To: <20200427154727.GH29705@bombadil.infradead.org>
-References: <20200427154727.GH29705@bombadil.infradead.org>
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=PTv1N3GDwYMQz8oxn0ONlic3WoFaVE/vI/jMWjQxhsA=;
+        b=T+mWw9irHyn1SZI62wAvM9kQ2q7jjuH1tIMlgCy+x6MtuNRuv2RKtG+x01wgbsn1pVd3QQ
+        qrfZS1m3UjADoMgJ49OymLVgKC7n+mEfizubYtty2r5UbTKKwqULA+DJnuJOoSa9PUI8ho
+        lENHnKdJZANLu0wptO3FrNrjaMGMQrc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-Bm8qkHT4PCmd7SVpBm4G0Q-1; Wed, 29 Apr 2020 05:56:02 -0400
+X-MC-Unique: Bm8qkHT4PCmd7SVpBm4G0Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7AF3464;
+        Wed, 29 Apr 2020 09:56:01 +0000 (UTC)
+Received: from [10.36.114.55] (ovpn-114-55.ams2.redhat.com [10.36.114.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 450D2282E3;
+        Wed, 29 Apr 2020 09:56:00 +0000 (UTC)
+Subject: Re: [PATCH v2 08/10] s390x: smp: Wait for sigp completion
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com
+References: <20200423091013.11587-1-frankja@linux.ibm.com>
+ <20200423091013.11587-9-frankja@linux.ibm.com>
+ <6084d368-86d6-b8fd-d4d3-5e0d72cef590@redhat.com>
+ <18b6f022-81b7-6e0d-996d-3abcffceca41@linux.ibm.com>
+ <be5ed01e-f4f6-6e3a-deb0-8f983e658e0f@linux.ibm.com>
+ <8182df06-8190-001d-ad02-ae13fb99ec72@redhat.com>
+ <802601e1-0bc0-faba-b802-2b0e24e3d96b@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <5ef08433-10fd-ccca-eb13-5a93bd462c4c@redhat.com>
+Date:   Wed, 29 Apr 2020 11:55:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <802601e1-0bc0-faba-b802-2b0e24e3d96b@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mattew,
-I am trying to apply your Xarrays suggestion, but I don't
-understand how to make them properly work. In particular, the __xa_alloc
-function always returns -EINVAL.
+On 29.04.20 11:37, Janosch Frank wrote:
+> On 4/29/20 11:06 AM, David Hildenbrand wrote:
+>> On 29.04.20 10:57, Janosch Frank wrote:
+>>> On 4/24/20 1:40 PM, Janosch Frank wrote:
+>>>> On 4/24/20 12:11 PM, David Hildenbrand wrote:
+>>>>> On 23.04.20 11:10, Janosch Frank wrote:
+>>>>>> Sigp orders are not necessarily finished when the processor finish=
+ed
+>>>>>> the sigp instruction. We need to poll if the order has been finish=
+ed
+>>>>>> before we continue.
+>>>>>>
+>>>>>> For (re)start and stop we already use sigp sense running and sigp
+>>>>>> sense loops. But we still lack completion checks for stop and stor=
+e
+>>>>>> status, as well as the cpu resets.
+>>>>>>
+>>>>>> Let's add them.
+>>>>>>
+>>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>>>>> ---
+>>>>>>  lib/s390x/smp.c | 8 ++++++++
+>>>>>>  lib/s390x/smp.h | 1 +
+>>>>>>  s390x/smp.c     | 4 ++++
+>>>>>>  3 files changed, 13 insertions(+)
+>>>>>>
+>>>>>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+>>>>>> index 6ef0335..2555bf4 100644
+>>>>>> --- a/lib/s390x/smp.c
+>>>>>> +++ b/lib/s390x/smp.c
+>>>>>> @@ -154,6 +154,14 @@ int smp_cpu_start(uint16_t addr, struct psw p=
+sw)
+>>>>>>  	return rc;
+>>>>>>  }
+>>>>>> =20
+>>>>>> +void smp_cpu_wait_for_completion(uint16_t addr)
+>>>>>> +{
+>>>>>> +	uint32_t status;
+>>>>>> +
+>>>>>> +	/* Loops when cc =3D=3D 2, i.e. when the cpu is busy with a sigp=
+ order */
+>>>>>> +	sigp_retry(1, SIGP_SENSE, 0, &status);
+>>>>>> +}
+>>>>>> +
+>>>>>>  int smp_cpu_destroy(uint16_t addr)
+>>>>>>  {
+>>>>>>  	struct cpu *cpu;
+>>>>>> diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+>>>>>> index ce63a89..a8b98c0 100644
+>>>>>> --- a/lib/s390x/smp.h
+>>>>>> +++ b/lib/s390x/smp.h
+>>>>>> @@ -45,6 +45,7 @@ int smp_cpu_restart(uint16_t addr);
+>>>>>>  int smp_cpu_start(uint16_t addr, struct psw psw);
+>>>>>>  int smp_cpu_stop(uint16_t addr);
+>>>>>>  int smp_cpu_stop_store_status(uint16_t addr);
+>>>>>> +void smp_cpu_wait_for_completion(uint16_t addr);
+>>>>>>  int smp_cpu_destroy(uint16_t addr);
+>>>>>>  int smp_cpu_setup(uint16_t addr, struct psw psw);
+>>>>>>  void smp_teardown(void);
+>>>>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>>>>> index 7462211..48321f4 100644
+>>>>>> --- a/s390x/smp.c
+>>>>>> +++ b/s390x/smp.c
+>>>>>> @@ -75,6 +75,7 @@ static void test_stop_store_status(void)
+>>>>>>  	lc->prefix_sa =3D 0;
+>>>>>>  	lc->grs_sa[15] =3D 0;
+>>>>>>  	smp_cpu_stop_store_status(1);
+>>>>>> +	smp_cpu_wait_for_completion(1);
+>>>>>>  	mb();
+>>>>>>  	report(lc->prefix_sa =3D=3D (uint32_t)(uintptr_t)cpu->lowcore, "=
+prefix");
+>>>>>>  	report(lc->grs_sa[15], "stack");
+>>>>>> @@ -85,6 +86,7 @@ static void test_stop_store_status(void)
+>>>>>>  	lc->prefix_sa =3D 0;
+>>>>>>  	lc->grs_sa[15] =3D 0;
+>>>>>>  	smp_cpu_stop_store_status(1);
+>>>>>
+>>>>> Just curious: Would it make sense to add that inside
+>>>>> smp_cpu_stop_store_status() instead?
+>>>>>
+>>>>
+>>>> I think so, we also wait for stop and start to finish, so why not fo=
+r
+>>>> this order code.
+>>>>
+>>>
+>>> I've moved the waiting into the smp library and now the prefix check =
+for
+>>> stop and store status fails every so often if executed repeatedly.
+>>>
+>>> I've tried making the lc ptr volatile, a print of the prefix before t=
+he
+>>> report seems to fix the issue, a print after the report still shows t=
+he
+>>> issue but according to the print both values are the same.
+>>>
+>>> I'm currently at a loss...
+>>
+>> Are you missing a barrier() somewhere?
+>>
+>=20
+> Maybe, but the question is where?
+>=20
+> There's already one before the report:
+> smp_cpu_stop_store_status(1);
+> mb();
+> report(lc->prefix_sa =3D=3D (uint32_t)(uintptr_t)cpu->lowcore, "prefix"=
+);
 
-I tried to follow the Xarrays kernel doc and the example you provided to
-replace the subordinates linked list, but alloc always returns that error.
+The issue here is:
 
-Below you can find the changes I intended to do.
-Can you help me?
+SIGP_SENSE is always handled in the kernel for KVM. Meaning, it will
+complete even before the target CPU executed the stop and store (in QEMU)=
+.
 
-Thank you,
-Emanuele
+Reading the PoP:
 
------- 8< -----------
-From ad5d20b6ce7995b2d1164104cf958f7bc3e692fa Mon Sep 17 00:00:00 2001
-From: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Date: Tue, 28 Apr 2020 12:21:00 +0200
-Subject: [PATCH] statsfs: switch subordinate sources to xarray
+"One of the following conditions exists at the
+addressed CPU: ... A previously issued stop-
+and-store-status ... has been accepted by the
+addressed CPU, and execution of the func-
+tion requested by the order has not yet been
+completed.
 
----
- fs/statsfs/statsfs.c    | 45 +++++++++++++++++++++++++++--------------
- include/linux/statsfs.h |  5 ++---
- 2 files changed, 32 insertions(+), 18 deletions(-)
+"If the currently specified order is sense ... then the order
+is rejected, and condition code 2 is set."
 
-diff --git a/fs/statsfs/statsfs.c b/fs/statsfs/statsfs.c
-index c8cfa590a3b0..0cf135c36776 100644
---- a/fs/statsfs/statsfs.c
-+++ b/fs/statsfs/statsfs.c
-@@ -107,11 +107,12 @@ const struct file_operations statsfs_ops = {
- static void statsfs_source_remove_files_locked(struct statsfs_source *src)
- {
- 	struct statsfs_source *child;
-+	unsigned long index;
- 
- 	if (src->source_dentry == NULL)
- 		return;
- 
--	list_for_each_entry(child, &src->subordinates_head, list_element)
-+	xa_for_each (&src->subordinates, index, child)
- 		statsfs_source_remove_files(child);
- 
- 	statsfs_remove_recursive(src->source_dentry);
-@@ -180,6 +181,7 @@ static void statsfs_create_files_recursive_locked(struct statsfs_source *source,
- 						  struct dentry *parent_dentry)
- {
- 	struct statsfs_source *child;
-+	unsigned long index;
- 
- 	/* first check values in this folder, since it might be new */
- 	if (!source->source_dentry) {
-@@ -189,7 +191,7 @@ static void statsfs_create_files_recursive_locked(struct statsfs_source *source,
- 
- 	statsfs_create_files_locked(source);
- 
--	list_for_each_entry(child, &source->subordinates_head, list_element) {
-+	xa_for_each (&source->subordinates, index, child) {
- 		if (child->source_dentry == NULL) {
- 			/* assume that if child has a folder,
- 			 * also the sub-child have that.
-@@ -258,10 +260,23 @@ EXPORT_SYMBOL_GPL(statsfs_source_add_values);
- void statsfs_source_add_subordinate(struct statsfs_source *source,
- 				    struct statsfs_source *sub)
- {
-+	int err;
-+	uint32_t index;
-+
- 	down_write(&source->rwsem);
- 
- 	statsfs_source_get(sub);
--	list_add(&sub->list_element, &source->subordinates_head);
-+	err = __xa_alloc(&source->subordinates, &index, sub, xa_limit_32b,
-+		       GFP_KERNEL);
-+
-+	if (err) {
-+		printk(KERN_ERR "Failed to insert subordinate %s\n"
-+			"Too many subordinates in source %s\n",
-+			sub->name, source->name);
-+		up_write(&source->rwsem);
-+		return;
-+	}
-+
- 	if (source->source_dentry)
- 		statsfs_create_files_recursive_locked(sub,
- 						      source->source_dentry);
-@@ -276,10 +291,11 @@ statsfs_source_remove_subordinate_locked(struct statsfs_source *source,
- 					 struct statsfs_source *sub)
- {
- 	struct statsfs_source *src_entry;
-+	unsigned long index;
- 
--	list_for_each_entry(src_entry, &source->subordinates_head, list_element) {
-+	xa_for_each (&source->subordinates, index, src_entry) {
- 		if (src_entry == sub) {
--			list_del_init(&src_entry->list_element);
-+			xa_erase(&source->subordinates, index);
- 			statsfs_source_remove_files(src_entry);
- 			statsfs_source_put(src_entry);
- 			return;
-@@ -431,13 +447,13 @@ static void do_recursive_aggregation(struct statsfs_source *root,
- 				     struct statsfs_aggregate_value *agg)
- {
- 	struct statsfs_source *subordinate;
-+	unsigned long index;
- 
- 	/* search all simple values in this folder */
- 	search_all_simple_values(root, ref_src_entry, val, agg);
- 
- 	/* recursively search in all subfolders */
--	list_for_each_entry(subordinate, &root->subordinates_head,
--			     list_element) {
-+	xa_for_each (&root->subordinates, index, subordinate) {
- 		down_read(&subordinate->rwsem);
- 		do_recursive_aggregation(subordinate, ref_src_entry, val, agg);
- 		up_read(&subordinate->rwsem);
-@@ -571,13 +587,13 @@ static void do_recursive_clean(struct statsfs_source *root,
- 			       struct statsfs_value *val)
- {
- 	struct statsfs_source *subordinate;
-+	unsigned long index;
- 
- 	/* search all simple values in this folder */
- 	set_all_simple_values(root, ref_src_entry, val);
- 
- 	/* recursively search in all subfolders */
--	list_for_each_entry(subordinate, &root->subordinates_head,
--			     list_element) {
-+	xa_for_each (&root->subordinates, index, subordinate) {
- 		down_read(&subordinate->rwsem);
- 		do_recursive_clean(subordinate, ref_src_entry, val);
- 		up_read(&subordinate->rwsem);
-@@ -703,9 +719,10 @@ EXPORT_SYMBOL_GPL(statsfs_source_revoke);
-  */
- static void statsfs_source_destroy(struct kref *kref_source)
- {
--	struct statsfs_value_source *val_src_entry;
- 	struct list_head *it, *safe;
-+	struct statsfs_value_source *val_src_entry;
- 	struct statsfs_source *child, *source;
-+	unsigned long index;
- 
- 	source = container_of(kref_source, struct statsfs_source, refcount);
- 
-@@ -717,15 +734,14 @@ static void statsfs_source_destroy(struct kref *kref_source)
- 	}
- 
- 	/* iterate through the subordinates and delete them */
--	list_for_each_safe(it, safe, &source->subordinates_head) {
--		child = list_entry(it, struct statsfs_source, list_element);
-+	xa_for_each (&source->subordinates, index, child)
- 		statsfs_source_remove_subordinate_locked(source, child);
--	}
- 
- 	statsfs_source_remove_files_locked(source);
- 
- 	up_write(&source->rwsem);
- 	kfree(source->name);
-+	xa_destroy(&source->subordinates);
- 	kfree(source);
- }
- 
-@@ -761,8 +777,7 @@ struct statsfs_source *statsfs_source_create(const char *fmt, ...)
- 	init_rwsem(&ret->rwsem);
- 
- 	INIT_LIST_HEAD(&ret->values_head);
--	INIT_LIST_HEAD(&ret->subordinates_head);
--	INIT_LIST_HEAD(&ret->list_element);
-+	xa_init(&ret->subordinates);
- 
- 	return ret;
- }
-diff --git a/include/linux/statsfs.h b/include/linux/statsfs.h
-index f6e8eead1124..20153f50ffc0 100644
---- a/include/linux/statsfs.h
-+++ b/include/linux/statsfs.h
-@@ -11,6 +11,7 @@
- #define _STATSFS_H_
- 
- #include <linux/list.h>
-+#include <linux/xarray.h>
- 
- /* Used to distinguish signed types */
- #define STATSFS_SIGN 0x8000
-@@ -64,9 +65,7 @@ struct statsfs_source {
- 	struct list_head values_head;
- 
- 	/* list of struct statsfs_source for subordinate sources */
--	struct list_head subordinates_head;
--
--	struct list_head list_element;
-+	struct xarray subordinates;
- 
- 	struct rw_semaphore rwsem;
- 
--- 
-2.25.2
+So, in case of KVM, SENSE does not wait for completion of the previous
+order. I remember that was a performance improvements, because we wanted
+to avoid going to user space just to sense if another CPU is running.
+(and I remember that the documentation was inconsistent)
+
+Let me guess, under TCG it works all the time?
+
+--=20
+Thanks,
+
+David / dhildenb
 
