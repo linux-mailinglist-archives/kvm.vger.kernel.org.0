@@ -2,228 +2,306 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 357D61BE87A
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 22:20:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2A9B1BE9DB
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 23:27:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbgD2UUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 16:20:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726891AbgD2UUd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Apr 2020 16:20:33 -0400
-Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71ED3C035493
-        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 13:20:33 -0700 (PDT)
-Received: by mail-qv1-xf42.google.com with SMTP id fb4so1853174qvb.7
-        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 13:20:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/23J5CKDV/ipNHmolXue3R/OfIDiPvGpq+jfAvjfA5w=;
-        b=T3FVr+bEt2VdzBPMrzXS/XIBxyIAVSo4cc5hilgAj6z9UGWVPy1IuxFPnoT9gd0kVR
-         8j66U0ETtEaBNKqmVbLPTSoEAYnVqJkUHq7EfZK7BQwuHLGoug0Vdon9V2qaYFQStqAf
-         CHXthQOZBq9OkumERtJVuwIGOLluR/p+aF7IPzIH18TaatoKoKyNLgAgiIeo4GlAqK7C
-         rBWRIsUEGMdQNFxhtCrIrQkglZ16dH7U3dRq5ABqKKDVEEgoDfL28Up7BPkw5Jkx/tXT
-         2u5FXuxBKNZHuJZ5mhQ4mCevIAKWqr4DB7Yjpllf0yY4CwIYW6wrafJ1V+YKeYn35lbC
-         0jOg==
+        id S1727102AbgD2V1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 17:27:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58073 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726775AbgD2V1P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Apr 2020 17:27:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588195633;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HoD2nHcDH26n/muu6HahHBzJtT5REhgOGlaAWfH/9F0=;
+        b=GTE6JM4oWCZJVF0Z2hNCtNsllZZVNCWx/6KDaARHKpkVLI/ZQm6fy2+3f1g8OhSANoWcLH
+        qTmsToRBb6oo229XdGTFP7veUzniXqxpdWcbgkvf8uJRjOfjLbvY3QLI8HxdtMXfLO4YuI
+        Pq5MjAtld/5SiS/p+tkiR/5lF5d46L0=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-YdkkUsU3OwGS26U1oK9ndg-1; Wed, 29 Apr 2020 17:27:11 -0400
+X-MC-Unique: YdkkUsU3OwGS26U1oK9ndg-1
+Received: by mail-qv1-f72.google.com with SMTP id ce16so2632128qvb.15
+        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 14:27:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/23J5CKDV/ipNHmolXue3R/OfIDiPvGpq+jfAvjfA5w=;
-        b=rr1IJgHHLSqlerLPhuvvHgdnNE97coKbeZ9Mv4NjF6LZ7Slm1NOjGXx3fHTy098AvW
-         joKmq0+PfK9MCnZGEreD/Xeyrd7hM8t6GoXAPzujZil8ZgcxTYBS5OOwkrs29mI/Wr+w
-         3DfExb0yshRgYSqKcqsRXhad+o8aJvbw6f6Llr2gte2hrJLq6Jhcs/2qh7Bz6FGo1kts
-         npkeLrvKEEC15bngqEoyChKCfhZC+Fe59GSZpl6LZ38ABvd0IgyZPnVlNHme10sN8bfA
-         nQgstVAbE0OhTD/OGs6LsyxIIVF5sQGn+5A6idvEUqJTTLPAHzuItyvmkhXmX1FFgLun
-         9q2g==
-X-Gm-Message-State: AGi0PuZ/pKZVVKhlcgAQxJPv/SskQ1KU3SI/cOpNE+y8dJ5kkLjx7PSr
-        VShfs3HYLE93Q+Jeqyr6hlkcXQ==
-X-Google-Smtp-Source: APiQypKkMahvKj397sz1q0I94z5LXn5ICNCS326/RH9ZD8NjE6V34eIR2HY3CUeHtvPO8iqWEXzn6A==
-X-Received: by 2002:a05:6214:6af:: with SMTP id s15mr35100420qvz.215.1588191632179;
-        Wed, 29 Apr 2020 13:20:32 -0700 (PDT)
-Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
-        by smtp.gmail.com with ESMTPSA id d23sm174920qkj.26.2020.04.29.13.20.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 Apr 2020 13:20:31 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH] kvm: Fix false positive RCU usage warning
-From:   Qian Cai <cai@lca.pw>
-In-Reply-To: <20200428155249.19990-1-madhuparnabhowmik10@gmail.com>
-Date:   Wed, 29 Apr 2020 16:20:29 -0400
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        wanpengli@tencent.com, jmattson@google.com,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=HoD2nHcDH26n/muu6HahHBzJtT5REhgOGlaAWfH/9F0=;
+        b=uQ2I+N/IyUq2avnmTJTjHn/ii/nWAasE7y+Ly2BlpXVt6wakj6ZdHaZyVKLK7dXo1l
+         subYNs4Eqy08ucHY9n7D+Njsp5wrPTdtJZb7r+vZ2VBPJQxZpla6iC0Af7m4U9HZli/i
+         YsSFDdLn6Jz4f7oUhzaLisLYcrdVfnM9hXO+Yk8R8/DyTpKipBDgvKSRtGhhkhpcguo3
+         vjbYYTVP8/S9hOQuV6wm2LkaWb5Y4IFf4p6UAM5K3Thlb+9t5CMw1LwWX6nvooPxb+Ff
+         o9zwIIyv59hhfRBDeta3oV4EPdeU7KBg7U74kE5/NQ57aqutNW10z5zpObOsi01vzVVz
+         07Sw==
+X-Gm-Message-State: AGi0PuaU+2Lh9jOOPrPwz6T0eVT+dEXOLF5n1RQ/g+h6pfvorhcF/s+N
+        x4msQhAOrdG1u3Vl3qwcoDMx2RWAF4zT8JErTtuh8AtSNpvPwZtFBlJFyzsKxFyGzwg8gcZnixF
+        dV18WsC2dJo9J
+X-Received: by 2002:ac8:1c04:: with SMTP id a4mr358160qtk.90.1588195630910;
+        Wed, 29 Apr 2020 14:27:10 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL+VMgtBdoEsKYufs76uj8kQnrQvWVxJhOKzrvhIIc7cBkrB1AV2mdzZ8s3zlMd/kPiXrhAXg==
+X-Received: by 2002:ac8:1c04:: with SMTP id a4mr358127qtk.90.1588195630497;
+        Wed, 29 Apr 2020 14:27:10 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id i129sm307291qke.28.2020.04.29.14.27.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Apr 2020 14:27:09 -0700 (PDT)
+Date:   Wed, 29 Apr 2020 17:27:08 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        "paul E. McKenney" <paulmck@kernel.org>,
-        "Joel Fernandes (Google)" <joel@joelfernandes.org>,
-        Amol Grover <frextrite@gmail.com>, x86 <x86@kernel.org>,
-        kvm@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <014AD5C4-1E88-4694-8637-C07D34A93F58@lca.pw>
-References: <20200428155249.19990-1-madhuparnabhowmik10@gmail.com>
-To:     Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 3/6] KVM: x86: interrupt based APF page-ready event
+ delivery
+Message-ID: <20200429212708.GA40678@xz-x1>
+References: <20200429093634.1514902-1-vkuznets@redhat.com>
+ <20200429093634.1514902-4-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200429093634.1514902-4-vkuznets@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi, Vitaly,
 
+On Wed, Apr 29, 2020 at 11:36:31AM +0200, Vitaly Kuznetsov wrote:
+> +	Type 1 page (page missing) events are currently always delivered as
+> +	synthetic #PF exception. Type 2 (page ready) are either delivered
+> +	by #PF exception (when bit 3 of MSR_KVM_ASYNC_PF_EN is clear) or
+> +	via an APIC interrupt (when bit 3 set). APIC interrupt delivery is
+> +	controlled by MSR_KVM_ASYNC_PF2.
 
-> On Apr 28, 2020, at 11:52 AM, madhuparnabhowmik10@gmail.com wrote:
->=20
-> From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
->=20
-> Fix the following false positive warnings:
->=20
-> [ 9403.765413][T61744] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [ 9403.786541][T61744] WARNING: suspicious RCU usage
-> [ 9403.807865][T61744] 5.7.0-rc1-next-20200417 #4 Tainted: G           =
-  L
-> [ 9403.838945][T61744] -----------------------------
-> [ 9403.860099][T61744] arch/x86/kvm/mmu/page_track.c:257 RCU-list =
-traversed in non-reader section!!
->=20
-> and
->=20
-> [ 9405.859252][T61751] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [ 9405.859258][T61751] WARNING: suspicious RCU usage
-> [ 9405.880867][T61755] -----------------------------
-> [ 9405.911936][T61751] 5.7.0-rc1-next-20200417 #4 Tainted: G           =
-  L
-> [ 9405.911942][T61751] -----------------------------
-> [ 9405.911950][T61751] arch/x86/kvm/mmu/page_track.c:232 RCU-list =
-traversed in non-reader section!!
->=20
-> Since srcu read lock is held, these are false positive warnings.
-> Therefore, pass condition srcu_read_lock_held() to
-> list_for_each_entry_rcu().
+How about MSR_KVM_ASYNC_PF_INT instead of MSR_KVM_ASYNC_PF2 (to match
+MSR_KVM_ASYNC_EN and MSR_KVM_ASYNC_ACK where they're all MSR_KVM_ASYNC_* with a
+meaningful ending word)?
 
-You forgot to add KVM maintainer (adding Paolo now). On the other hand, =
-there could be more places need to audit in x86 KVM. Not sure you want =
-to add them together to one patch or doing separately for each file. For =
-example,
+> +
+> +	For #PF delivery, disabling interrupt inhibits APFs. Guest must
+> +	not enable interrupt before the reason is read, or it may be
+> +	overwritten by another APF. Since APF uses the same exception
+> +	vector as regular page fault guest must reset the reason to 0
+> +	before it does something that can generate normal page fault.
+> +	If during pagefault APF reason is 0 it means that this is regular
+> +	page fault.
+>  
+>  	During delivery of type 1 APF cr2 contains a token that will
+>  	be used to notify a guest when missing page becomes
+> @@ -319,3 +326,18 @@ data:
+>  
+>  	KVM guests can request the host not to poll on HLT, for example if
+>  	they are performing polling themselves.
+> +
+> +MSR_KVM_ASYNC_PF2:
+> +	0x4b564d06
+> +
+> +data:
+> +	Second asynchronous page fault control MSR.
+> +
+> +	Bits 0-7: APIC vector for interrupt based delivery of type 2 APF
+> +	events (page ready notification).
+> +        Bit 8: Interrupt based delivery of type 2 APF events is enabled
+> +        Bits 9-63: Reserved
 
-[29179.937976][T75781] WARNING: suspicious RCU usage
-[29179.942789][T75781] 5.7.0-rc3-next-20200429 #1 Tainted: G           O =
-L  =20
-[29179.949752][T75781] -----------------------------
-[29179.954498][T75781] arch/x86/kvm/../../../virt/kvm/eventfd.c:472 =
-RCU-list traversed in non-reader section!!
-[29179.964768][T75781]=20
-[29179.964768][T75781] other info that might help us debug this:
-[29179.964768][T75781]=20
-[29179.974958][T75781]=20
-[29179.974958][T75781] rcu_scheduler_active =3D 2, debug_locks =3D 1
-[29179.982961][T75781] 3 locks held by qemu-kvm/75781:
-[29179.988145][T75781]  #0: ffff95b3755300d0 (&vcpu->mutex){+.+.}-{3:3}, =
-at: kvm_vcpu_ioctl+0xbd/0x860 [kvm]
-[29179.998450][T75781]  #1: ffffa45946cd7e10 (&kvm->srcu){....}-{0:0}, =
-at: vcpu_enter_guest+0x94e/0x2e50 [kvm]
-[29180.009264][T75781]  #2: ffffa45946cd8b98 =
-(&kvm->irq_srcu){....}-{0:0}, at: kvm_notify_acked_irq+0x92/0x290 [kvm]
-[29180.020471][T75781]=20
-[29180.020471][T75781] stack backtrace:
-[29180.026318][T75781] CPU: 16 PID: 75781 Comm: qemu-kvm Tainted: G      =
-     O L    5.7.0-rc3-next-20200429 #1
-[29180.036480][T75781] Hardware name: HPE ProLiant DL385 Gen10/ProLiant =
-DL385 Gen10, BIOS A40 03/09/2018
-[29180.045765][T75781] Call Trace:
-[29180.048942][T75781]  dump_stack+0xab/0x100
-[29180.053132][T75781]  lockdep_rcu_suspicious+0xea/0xf3
-[29180.058802][T75781]  kvm_notify_acked_gsi+0x10d/0x120 [kvm]
-[29180.065386][T75781]  kvm_notify_acked_irq+0xe5/0x290 [kvm]
-[29180.071529][T75781]  pic_clear_isr+0xa1/0xc0 [kvm]
-[29180.077118][T75781]  pic_ioport_write+0x335/0x5e0 [kvm]
-[29180.082453][T75781]  ? do_raw_spin_lock+0x115/0x1b0
-[29180.088205][T75781]  picdev_write+0x7d/0x130 [kvm]
-[29180.093677][T75781]  picdev_master_write+0x3a/0x50 [kvm]
-[29180.099730][T75781]  __kvm_io_bus_write+0x147/0x180 [kvm]
-[29180.105700][T75781]  kvm_io_bus_write+0xfc/0x1b0 [kvm]
-[29180.111701][T75781]  kernel_pio+0xeb/0x110 [kvm]
-[29180.116991][T75781]  emulator_pio_out+0x14f/0x400 [kvm]
-[29180.122342][T75781]  ? __lock_acquire+0x5c2/0x23f0
-[29180.127229][T75781]  ? __svm_vcpu_run+0x95/0x110 [kvm_amd]
-[29180.133481][T75781]  kvm_fast_pio+0x12f/0x200 [kvm]
-[29180.138733][T75781]  io_interception+0xba/0xe0 [kvm_amd]
-[29180.144164][T75781]  ? svm_sync_dirty_debug_regs+0x170/0x170 =
-[kvm_amd]
-[29180.150843][T75781]  handle_exit+0x403/0x9f0 [kvm_amd]
-[29180.156652][T75781]  ? kvm_arch_vcpu_ioctl_run+0x286/0xb50 [kvm]
-[29180.163648][T75781]  vcpu_enter_guest+0xa08/0x2e50 [kvm]
-[29180.169007][T75781]  ? lock_acquire+0xcd/0x450
-[29180.174364][T75781]  ? kvm_skip_emulated_instruction+0x67/0x80 [kvm]
-[29180.181422][T75781]  kvm_arch_vcpu_ioctl_run+0x286/0xb50 [kvm]
-[29180.188256][T75781]  kvm_vcpu_ioctl+0x2d4/0x860 [kvm]
-[29180.193391][T75781]  ? __fget_light+0xa3/0x170
-[29180.197879][T75781]  ksys_ioctl+0x227/0xb90
-[29180.202159][T75781]  ? find_held_lock+0x35/0xa0
-[29180.206777][T75781]  __x64_sys_ioctl+0x4c/0x5d
-[29180.211443][T75781]  do_syscall_64+0x91/0xb10
-[29180.215840][T75781]  ? trace_hardirqs_off_thunk+0x1a/0x1c
-[29180.221307][T75781]  entry_SYSCALL_64_after_hwframe+0x49/0xb3
-[29180.227100][T75781] RIP: 0033:0x7f2f5a90487b
-[29180.231414][T75781] Code: 0f 1e fa 48 8b 05 0d 96 2c 00 64 c7 00 26 =
-00 00 00 48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 =
-00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d dd 95 2c 00 f7 d8 64 =
-89 01 48
-[29180.251241][T75781] RSP: 002b:00007f2f4b7fd678 EFLAGS: 00000246 =
-ORIG_RAX: 0000000000000010
-[29180.259660][T75781] RAX: ffffffffffffffda RBX: 00007f2f5fc31001 RCX: =
-00007f2f5a90487b
-[29180.267730][T75781] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: =
-0000000000000011
-[29180.275619][T75781] RBP: 0000000000000001 R08: 000055c707b6fad0 R09: =
-00000000000000ff
-[29180.283533][T75781] R10: 0000000000000001 R11: 0000000000000246 R12: =
-000055c707b58100
-[29180.291622][T75781] R13: 0000000000000000 R14: 00007f2f5fc30000 R15: =
-000055c70a1b4c60
+(may need to fix up the indents)
 
->=20
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-> ---
-> arch/x86/kvm/mmu/page_track.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/mmu/page_track.c =
-b/arch/x86/kvm/mmu/page_track.c
-> index ddc1ec3bdacd..1ad79c7aa05b 100644
-> --- a/arch/x86/kvm/mmu/page_track.c
-> +++ b/arch/x86/kvm/mmu/page_track.c
-> @@ -229,7 +229,8 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, =
-gpa_t gpa, const u8 *new,
-> 		return;
->=20
-> 	idx =3D srcu_read_lock(&head->track_srcu);
-> -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
-> +	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
-> +				srcu_read_lock_held(&head->track_srcu))
-> 		if (n->track_write)
-> 			n->track_write(vcpu, gpa, new, bytes, n);
-> 	srcu_read_unlock(&head->track_srcu, idx);
-> @@ -254,7 +255,8 @@ void kvm_page_track_flush_slot(struct kvm *kvm, =
-struct kvm_memory_slot *slot)
-> 		return;
->=20
-> 	idx =3D srcu_read_lock(&head->track_srcu);
-> -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
-> +	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
-> +				srcu_read_lock_held(&head->track_srcu))
-> 		if (n->track_flush_slot)
-> 			n->track_flush_slot(kvm, slot, n);
-> 	srcu_read_unlock(&head->track_srcu, idx);
-> --=20
-> 2.17.1
->=20
+> +
+> +	To switch to interrupt based delivery of type 2 APF events guests
+> +	are supposed to enable asynchronous page faults and set bit 3 in
+> +	MSR_KVM_ASYNC_PF_EN first.
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 42a2d0d3984a..6215f61450cb 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -763,12 +763,15 @@ struct kvm_vcpu_arch {
+>  		bool halted;
+>  		gfn_t gfns[roundup_pow_of_two(ASYNC_PF_PER_VCPU)];
+>  		struct gfn_to_hva_cache data;
+> -		u64 msr_val;
+> +		u64 msr_val; /* MSR_KVM_ASYNC_PF_EN */
+> +		u64 msr2_val; /* MSR_KVM_ASYNC_PF2 */
+> +		u16 vec;
+>  		u32 id;
+>  		bool send_user_only;
+>  		u32 host_apf_reason;
+>  		unsigned long nested_apf_token;
+>  		bool delivery_as_pf_vmexit;
+> +		bool delivery_as_int;
+>  	} apf;
+>  
+>  	/* OSVW MSRs (AMD only) */
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index df2ba34037a2..1bbb0b7e062f 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -50,6 +50,7 @@
+>  #define MSR_KVM_STEAL_TIME  0x4b564d03
+>  #define MSR_KVM_PV_EOI_EN      0x4b564d04
+>  #define MSR_KVM_POLL_CONTROL	0x4b564d05
+> +#define MSR_KVM_ASYNC_PF2	0x4b564d06
+>  
+>  struct kvm_steal_time {
+>  	__u64 steal;
+> @@ -81,6 +82,11 @@ struct kvm_clock_pairing {
+>  #define KVM_ASYNC_PF_ENABLED			(1 << 0)
+>  #define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1)
+>  #define KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT	(1 << 2)
+> +#define KVM_ASYNC_PF_DELIVERY_AS_INT		(1 << 3)
+> +
+> +#define KVM_ASYNC_PF2_VEC_MASK			GENMASK(7, 0)
+> +#define KVM_ASYNC_PF2_ENABLED			BIT(8)
+
+There are two enable bits, this one in ASYNC_PF_EN and the other old one in
+ASYNC_PF2.  Could it work with only one knob (e.g., set bit 0 of ASYNC_PF_EN
+always to enable apf)?  After all we have had bit 3 of ASYNC_PF_EN to show
+whether interrupt is enabled, which seems to be the real switch for whether to
+enable interrupt for apf.
+
+If we can keep the only knob in ASYNC_PF_EN (bit 0), iiuc we can also keep the
+below kvm_async_pf_wakeup_all() untouched (so we only set bit 0 of ASYNC_PF_EN
+after configure everything).
+
+Thanks,
+
+> +
+>  
+>  /* Operations for KVM_HC_MMU_OP */
+>  #define KVM_MMU_OP_WRITE_PTE            1
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7c21c0cf0a33..861dce1e7cf5 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1243,7 +1243,7 @@ static const u32 emulated_msrs_all[] = {
+>  	HV_X64_MSR_TSC_EMULATION_STATUS,
+>  
+>  	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
+> -	MSR_KVM_PV_EOI_EN,
+> +	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF2,
+>  
+>  	MSR_IA32_TSC_ADJUST,
+>  	MSR_IA32_TSCDEADLINE,
+> @@ -2649,8 +2649,8 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+>  {
+>  	gpa_t gpa = data & ~0x3f;
+>  
+> -	/* Bits 3:5 are reserved, Should be zero */
+> -	if (data & 0x38)
+> +	/* Bits 4:5 are reserved, Should be zero */
+> +	if (data & 0x30)
+>  		return 1;
+>  
+>  	vcpu->arch.apf.msr_val = data;
+> @@ -2667,7 +2667,35 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+>  
+>  	vcpu->arch.apf.send_user_only = !(data & KVM_ASYNC_PF_SEND_ALWAYS);
+>  	vcpu->arch.apf.delivery_as_pf_vmexit = data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
+> -	kvm_async_pf_wakeup_all(vcpu);
+> +	vcpu->arch.apf.delivery_as_int = data & KVM_ASYNC_PF_DELIVERY_AS_INT;
+> +
+> +	/*
+> +	 * If delivery via interrupt is configured make sure MSR_KVM_ASYNC_PF2
+> +	 * was written to before sending 'wakeup all'.
+> +	 */
+> +	if (!vcpu->arch.apf.delivery_as_int ||
+> +	    vcpu->arch.apf.msr2_val & KVM_ASYNC_PF2_ENABLED)
+> +		kvm_async_pf_wakeup_all(vcpu);
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_pv_enable_async_pf2(struct kvm_vcpu *vcpu, u64 data)
+> +{
+> +	/* Bits 9-63 are reserved */
+> +	if (data & ~0x1ff)
+> +		return 1;
+> +
+> +	if (!lapic_in_kernel(vcpu))
+> +		return 1;
+> +
+> +	vcpu->arch.apf.msr2_val = data;
+> +
+> +	vcpu->arch.apf.vec = data & KVM_ASYNC_PF2_VEC_MASK;
+> +
+> +	if (data & KVM_ASYNC_PF2_ENABLED)
+> +		kvm_async_pf_wakeup_all(vcpu);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -2883,6 +2911,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (kvm_pv_enable_async_pf(vcpu, data))
+>  			return 1;
+>  		break;
+> +	case MSR_KVM_ASYNC_PF2:
+> +		if (kvm_pv_enable_async_pf2(vcpu, data))
+> +			return 1;
+> +		break;
+>  	case MSR_KVM_STEAL_TIME:
+>  
+>  		if (unlikely(!sched_info_on()))
+> @@ -3159,6 +3191,9 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	case MSR_KVM_ASYNC_PF_EN:
+>  		msr_info->data = vcpu->arch.apf.msr_val;
+>  		break;
+> +	case MSR_KVM_ASYNC_PF2:
+> +		msr_info->data = vcpu->arch.apf.msr2_val;
+> +		break;
+>  	case MSR_KVM_STEAL_TIME:
+>  		msr_info->data = vcpu->arch.st.msr_val;
+>  		break;
+> @@ -10367,6 +10402,16 @@ static int apf_get_user(struct kvm_vcpu *vcpu, u32 *val)
+>  				      sizeof(u32));
+>  }
+>  
+> +static bool apf_slot_free(struct kvm_vcpu *vcpu)
+> +{
+> +	u32 val;
+> +
+> +	if (apf_get_user(vcpu, &val))
+> +		return false;
+> +
+> +	return !val;
+> +}
+> +
+>  static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!vcpu->arch.apf.delivery_as_pf_vmexit && is_guest_mode(vcpu))
+> @@ -10382,11 +10427,23 @@ static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
+>  
+>  bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+>  {
+> +	/*
+> +	 * TODO: when we are injecting a 'page present' event with an interrupt
+> +	 * we may ignore pending exceptions.
+> +	 */
+>  	if (unlikely(!lapic_in_kernel(vcpu) ||
+>  		     kvm_event_needs_reinjection(vcpu) ||
+>  		     vcpu->arch.exception.pending))
+>  		return false;
+>  
+> +	/*'
+> +	 * Regardless of the type of event we're trying to deliver, we need to
+> +	 * check that the previous even was already consumed, this may not be
+> +	 * the case with interrupt based delivery.
+> +	 */
+> +	if (vcpu->arch.apf.delivery_as_int && !apf_slot_free(vcpu))
+> +		return false;
+> +
+>  	if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
+>  		return false;
+
+-- 
+Peter Xu
 
