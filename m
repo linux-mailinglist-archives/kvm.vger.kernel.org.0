@@ -2,72 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 927721BD9B1
-	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 12:35:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A35581BD9B5
+	for <lists+kvm@lfdr.de>; Wed, 29 Apr 2020 12:35:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726634AbgD2KfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 06:35:02 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22513 "EHLO
+        id S1726636AbgD2Kfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 06:35:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37553 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726516AbgD2KfB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 06:35:01 -0400
+        by vger.kernel.org with ESMTP id S1726355AbgD2Kfr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 06:35:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588156500;
+        s=mimecast20190719; t=1588156546;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MvG6U9Dx9wY0k8COf5NQcI7j1f22+LOgfSM/YdEK4/U=;
-        b=ZdQb9SMMHMG1hg4gPn4aTI1Sj5yksugbdSH1wGk0+Czi5ooRQ+/0SOOzJAUgamiPHFN19/
-        M4aWLiJe9Aos0tNYsfVQTKDqWVYhuIhcs4zi3aAcb4KD1EjGdROmlVjCWQTKjFtqE7TTxE
-        ANJyX1hO7M47uxWqZQw2Wxn8Lm+bH6k=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-2ejoKgHzOJiibvJ0psaPWQ-1; Wed, 29 Apr 2020 06:34:54 -0400
-X-MC-Unique: 2ejoKgHzOJiibvJ0psaPWQ-1
-Received: by mail-wr1-f70.google.com with SMTP id x15so1530449wrn.0
-        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 03:34:54 -0700 (PDT)
+        bh=7I38cezud3jcFe2VilVY6KvrLd0TQyKG8EvGPUzd8WM=;
+        b=QXY6iDIoHpG5KXl6d1lJUu09YpQ788Ucm79JSvHbUTxMMsz1PPIYkm/t/Dm9HUwjB6YLKl
+        mPsinsVVmN6OGBm8IUTTU6bu0SIYd1ggS8xyxTYxW1rcbWDMfQGupaO9AfeCgJAeF5DTIj
+        42SMWCrBAVppZ0JEBLolHh9UFf/plH0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-TMR0e_YrORuOGAGO9iNxvw-1; Wed, 29 Apr 2020 06:35:44 -0400
+X-MC-Unique: TMR0e_YrORuOGAGO9iNxvw-1
+Received: by mail-wr1-f69.google.com with SMTP id y10so1513499wrn.5
+        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 03:35:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=MvG6U9Dx9wY0k8COf5NQcI7j1f22+LOgfSM/YdEK4/U=;
-        b=oPpXAXeCE/Pxt6zl87I23OW4YuSdup3iPsFP72lWLqMDdQeiB9XfF+8RR3su1yGbbA
-         5C7q2VxH+x/gUXL7eVsgigCjXGdg4JsEd4+SBk7WHiYnzER2Dzu2tQXdebymZm3fxXdF
-         FnxfnctNvbyLaeSbd0vPL4jX3K8gp/I3SLi37aH+lkhHfTBJiXvLeGO2HNbfcx7JXHxX
-         ay8SD6OCV+vN0PberHhRg0FwVdXWb8HFYQ+hiHKUwstARn9BVdF+8o7wXTXWtzvWYkgO
-         xw+VqBB+b7Hfdm7s0154onhIYNLxYD5ECE04DySs0GZ0jl1MbnzsxVM4xh4L95tzS5HN
-         4Lbg==
-X-Gm-Message-State: AGi0PubKKyUFJxgKp+aQdasgq35jbLeMlzVhKv+vW7vchxrMNGISQYsU
-        tlgWogFapk9qjn0xJJ3yVZEF9O01tShZTdJOfsx6ySP4vx7LgzpySzpNfwf7vnqAE/5BpT6BhFg
-        YRMi6Cpm92fxl
-X-Received: by 2002:adf:ea44:: with SMTP id j4mr41471876wrn.38.1588156493398;
-        Wed, 29 Apr 2020 03:34:53 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKsv04Kl2n9Ejnnl4yI4d1AM613mOCDgy0cvtYoIwAIk6yB89ianzTeiVeeOXFJb7+gpM/E8g==
-X-Received: by 2002:adf:ea44:: with SMTP id j4mr41471860wrn.38.1588156493155;
-        Wed, 29 Apr 2020 03:34:53 -0700 (PDT)
+        bh=7I38cezud3jcFe2VilVY6KvrLd0TQyKG8EvGPUzd8WM=;
+        b=E2vivw/w8R9fv+dnRKaPkbFlrLOBbshxuIPlI1Bm4xGbnEIOXKLghLvFz6OdUCteiX
+         U42R3UboU/30nvsuuLpH1/mbDl0XGHfx0oVSPObW0UmVZobqwSV0jQKkOf2Zi2k4uE6m
+         r1msKQhXut6r7jrLwawNRziWO10SgLsD+LJhPyxf4PDDIZyER7xaiPKISsqsL7j8r3Bb
+         1tmk0r8/t6HlmrHwiDr++t60RcXfDYLLwVutcht8mJZTVwl7a1CACaF5CAKP3B9O2oKa
+         RgVhRQNuAiyqSZjD/zwcENdblBZTBZyLnGAUCShcsnPeqT0SYH7yXuV5NeuvO/7ANAuu
+         9xhQ==
+X-Gm-Message-State: AGi0PuYFL8gjPhLM2ttmSbhVM4OnzGheT4AxfBSY7hhTHGB5OaPzuVXy
+        2LayAfZxI/vrSWsgYKna77XLfqO5NtE8RQ6zMT7PHQcuUJ3iDK1+H/SgUwSlGfWd5mUKxwQ+BWT
+        vtPXsTwvlYKJJ
+X-Received: by 2002:a7b:c927:: with SMTP id h7mr2478542wml.122.1588156542618;
+        Wed, 29 Apr 2020 03:35:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKhPa4YOpJ3QAu7oJS5CwDm4v5IZPmdcbPvhgtaB3/fsszG5m6vHj7DV+yRiljDbhI57Kjrrw==
+X-Received: by 2002:a7b:c927:: with SMTP id h7mr2478525wml.122.1588156542422;
+        Wed, 29 Apr 2020 03:35:42 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id v7sm6952037wmg.3.2020.04.29.03.34.52
+        by smtp.gmail.com with ESMTPSA id h16sm32873454wrw.36.2020.04.29.03.35.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Apr 2020 03:34:52 -0700 (PDT)
-Subject: Re: [RFC PATCH 2/5] statsfs API: create, add and remove statsfs
- sources and values
-To:     Randy Dunlap <rdunlap@infradead.org>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org
+        Wed, 29 Apr 2020 03:35:41 -0700 (PDT)
+Subject: Re: [RFC PATCH 5/5] kvm_main: replace debugfs with statsfs
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>, kvm@vger.kernel.org
 Cc:     linux-fsdevel@vger.kernel.org, mst@redhat.com,
         borntraeger@de.ibm.com
 References: <20200427141816.16703-1-eesposit@redhat.com>
- <20200427141816.16703-3-eesposit@redhat.com>
- <229d83bf-1272-587b-233a-d68ad2e11cde@infradead.org>
+ <20200427141816.16703-6-eesposit@redhat.com>
+ <2bb5bb1d-deb8-d6cd-498b-8948bae6d848@infradead.org>
+ <48259504-7644-43cf-45a2-219981e59a49@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c979c8b-be64-a18c-2223-2964cb96d52a@redhat.com>
-Date:   Wed, 29 Apr 2020 12:34:51 +0200
+Message-ID: <9b19a319-1f79-ef06-6aa3-968a6013835f@redhat.com>
+Date:   Wed, 29 Apr 2020 12:35:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <229d83bf-1272-587b-233a-d68ad2e11cde@infradead.org>
+In-Reply-To: <48259504-7644-43cf-45a2-219981e59a49@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,17 +75,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/04/20 19:47, Randy Dunlap wrote:
->> +config STATS_FS
->> +	bool "Statistics Filesystem"
->> +	default y
-> Not default y. We don't enable things that are not required.
-> Unless you have a convincing argument otherwise.
+On 29/04/20 12:34, Emanuele Giuseppe Esposito wrote:
+>>
+>>
+>> You might want to select STATS_FS here (or depend on it if it is
+>> required),
+>> or you could provide stubs in <linux/statsfs.h> for the cases of STATS_FS
+>> is not set/enabled.
 > 
+> Currently debugfs is not present in the kvm Kconfig, but implements
+> empty stubs as you suggested. I guess it would be a good idea to do the
+> same for statsfs.
+> 
+> Paolo, what do you think?
+> 
+> Regarding the other suggestions, you are right, I will apply them in v2.
 
-I think the best solution is to add stubs to include/linux/statsfs.h,
-and use "imply STATS_FS" in KVM.  This would still "default y" when
-a subsystem that uses the filesystem is in use, but not otherwise.
+I replied in v2 - basically "imply" STATS_FS here instead of "selecting" it.
 
 Paolo
 
