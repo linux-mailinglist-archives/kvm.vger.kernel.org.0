@@ -2,41 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 782521C0853
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 22:41:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEEC81C089C
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 22:54:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727808AbgD3Ul0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 16:41:26 -0400
-Received: from mga17.intel.com ([192.55.52.151]:53235 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726784AbgD3Ul0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 16:41:26 -0400
-IronPort-SDR: 6cjgBb5p4/wi34Y8AduGNh3uJQEt8VU+FC1C8P0lqqa+i+mfqZlknMhKsRp6XqCHYOS2uEzIy0
- 1upZY4zHPOAQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2020 13:41:24 -0700
-IronPort-SDR: z1RGRQUi4pCy6rG9DAyNKUjXl+0fSSUlsOrSnoHpDJFU6ONyTvf/IJ5/EKMIYR8Y6de5JVUFv8
- nfOnyaqPOG1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,337,1583222400"; 
-   d="scan'208";a="249853406"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
-  by fmsmga008.fm.intel.com with ESMTP; 30 Apr 2020 13:41:24 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
-        KarimAllah Raslan <karahmed@amazon.de>
-Subject: [PATCH] KVM: nVMX: Skip IBPB when switching between vmcs01 and vmcs02
-Date:   Thu, 30 Apr 2020 13:41:23 -0700
-Message-Id: <20200430204123.2608-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
+        id S1726449AbgD3Uyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 16:54:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36970 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726045AbgD3Uyx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Apr 2020 16:54:53 -0400
+Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69644C035495
+        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 13:54:53 -0700 (PDT)
+Received: by mail-qv1-xf41.google.com with SMTP id v38so3780360qvf.6
+        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 13:54:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=massaru-org.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WYotVXEQ7QSaXZH0Cb6CySMSy1hNmT60Cfqey+kK7ik=;
+        b=jnjRwyAu+dul5Y4kKLE7Ghb/Vc5TscG+yAoDRRIloYrY59wrKC6a8XzxjHt8F1Dj0e
+         VFMLTpT+9U/DWo9TVhqTr+G/yhBPumcPucHbAZ8QiJUk51xU0Af6cSBZ48nzqPtCUL5e
+         bjeUwvSs9OL5V9YXvXwZ4I9NmO9UA5IG0n1ZCQnT7JOYuDdGUHxjTspOnSc5Ki4BNAiZ
+         bfU1A9oV4+HjOYT1mdjkiMR3EBDEOUP+Andpppt7WtwCwDQlPTXrdxhcv7r5a9SpgWbm
+         kMK46SIX/uy11edzTFrZ6yLt8PJjxua6QkvIyadi2JXfNnT0YwilHmtEMO/Ju5Ya24y7
+         +x4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WYotVXEQ7QSaXZH0Cb6CySMSy1hNmT60Cfqey+kK7ik=;
+        b=MtyiHMdHYzLqmVwJHg6brjSNaMVvCBJJS8Z7QcE1+4aRP9YBmwufncC07k7IsxV+LM
+         D0r/PEpwo8pzwgaNVrCFKAGUWwPmuwxZGw3O78d/m7oHgUdJVRIlXDHrL4ksBBXv/PN0
+         JcttMywT6efbUOoWFVgk2KagSZR2fEF9+RTpUV16kGCBjX4i+HR6UGu4+dXU1A+oJyaD
+         cBaHArHhpXpjn/ygaElmeFbiv7eUEoWjoikLexI7emrvRa10hvcdE2ZeAhuy5iAUpgBi
+         OXlEcm0oSoBKuWlbDdz9Cs65CKGQ4Dg2SCp9tx9NVug94oa2SZzApU1oahHr7QVfy9tF
+         giYw==
+X-Gm-Message-State: AGi0Pua6M94kYasARN4HD2c22PYuByvK2W/bEcZaJyFs1uTtt7mEWHMf
+        6kKn/BxkpnYVS+jUzJfas/WIkg==
+X-Google-Smtp-Source: APiQypK0h2W3QvMGCUPB12GV8ymVk7gxiCl0cTc0DUvsoGMLKTbfcrDwWZOkdVEW+vKkXVSFxmr5hg==
+X-Received: by 2002:a05:6214:cf:: with SMTP id f15mr816040qvs.59.1588280092358;
+        Thu, 30 Apr 2020 13:54:52 -0700 (PDT)
+Received: from bbking.lan ([2804:14c:4a5:36c::cd2])
+        by smtp.gmail.com with ESMTPSA id t7sm652804qtr.93.2020.04.30.13.54.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2020 13:54:51 -0700 (PDT)
+From:   Vitor Massaru Iha <vitor@massaru.org>
+To:     linux-doc@vger.kernel.org
+Cc:     pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, brendanhiggins@google.com,
+        skhan@linuxfoundation.org,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH] Documentation: fix `make htmldocs ` warning
+Date:   Thu, 30 Apr 2020 17:54:47 -0300
+Message-Id: <20200430205447.93458-1-vitor@massaru.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -44,97 +64,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip the Indirect Branch Prediction Barrier that is triggered on a VMCS
-switch when running with spectre_v2_user=on/auto if the switch is
-between two VMCSes in the same guest, i.e. between vmcs01 and vmcs02.
-The IBPB is intended to prevent one guest from attacking another, which
-is unnecessary in the nested case as it's the same guest from KVM's
-perspective.
+Fix 'make htmldocs' warning:
+Documentation/virt/kvm/amd-memory-encryption.rst:76: WARNING: Inline literal start-string without end-string.
 
-This all but eliminates the overhead observed for nested VMX transitions
-when running with CONFIG_RETPOLINE=y and spectre_v2_user=on/auto, which
-can be significant, e.g. roughly 3x on current systems.
-
-Reported-by: Alexander Graf <graf@amazon.com>
-Cc: KarimAllah Raslan <karahmed@amazon.de>
-Cc: stable@vger.kernel.org
-Fixes: 15d45071523d ("KVM/x86: Add IBPB support")
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Vitor Massaru Iha <vitor@massaru.org>
 ---
- arch/x86/kvm/vmx/nested.c |  2 +-
- arch/x86/kvm/vmx/vmx.c    | 12 ++++++++----
- arch/x86/kvm/vmx/vmx.h    |  3 ++-
- 3 files changed, 11 insertions(+), 6 deletions(-)
+ Documentation/virt/kvm/amd-memory-encryption.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2c36f3f53108..1a02bdfeeb2b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -303,7 +303,7 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
- 	cpu = get_cpu();
- 	prev = vmx->loaded_vmcs;
- 	vmx->loaded_vmcs = vmcs;
--	vmx_vcpu_load_vmcs(vcpu, cpu);
-+	vmx_vcpu_load_vmcs(vcpu, cpu, prev);
- 	vmx_sync_vmcs_host_state(vmx, prev);
- 	put_cpu();
+diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+index c3129b9ba5cb..57c01f531e61 100644
+--- a/Documentation/virt/kvm/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+@@ -74,7 +74,7 @@ should point to a file descriptor that is opened on the ``/dev/sev``
+ device, if needed (see individual commands).
  
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3ab6ca6062ce..818dd8ba5e9f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1311,10 +1311,12 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 		pi_set_on(pi_desc);
- }
+ On output, ``error`` is zero on success, or an error code.  Error codes
+-are defined in ``<linux/psp-dev.h>`.
++are defined in ``<linux/psp-dev.h>``.
  
--void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
-+void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
-+			struct loaded_vmcs *buddy)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	bool already_loaded = vmx->loaded_vmcs->cpu == cpu;
-+	struct vmcs *prev;
- 
- 	if (!already_loaded) {
- 		loaded_vmcs_clear(vmx->loaded_vmcs);
-@@ -1333,10 +1335,12 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
- 		local_irq_enable();
- 	}
- 
--	if (per_cpu(current_vmcs, cpu) != vmx->loaded_vmcs->vmcs) {
-+	prev = per_cpu(current_vmcs, cpu);
-+	if (prev != vmx->loaded_vmcs->vmcs) {
- 		per_cpu(current_vmcs, cpu) = vmx->loaded_vmcs->vmcs;
- 		vmcs_load(vmx->loaded_vmcs->vmcs);
--		indirect_branch_prediction_barrier();
-+		if (!buddy || buddy->vmcs != prev)
-+			indirect_branch_prediction_barrier();
- 	}
- 
- 	if (!already_loaded) {
-@@ -1377,7 +1381,7 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
--	vmx_vcpu_load_vmcs(vcpu, cpu);
-+	vmx_vcpu_load_vmcs(vcpu, cpu, NULL);
- 
- 	vmx_vcpu_pi_load(vcpu, cpu);
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index b5e773267abe..d3d48acc6bd9 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -320,7 +320,8 @@ struct kvm_vmx {
- };
- 
- bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
--void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu);
-+void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
-+			struct loaded_vmcs *buddy);
- void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- int allocate_vpid(void);
- void free_vpid(int vpid);
+ KVM implements the following commands to support common lifecycle events of SEV
+ guests, such as launching, running, snapshotting, migrating and decommissioning.
 -- 
-2.26.0
+2.25.1
 
