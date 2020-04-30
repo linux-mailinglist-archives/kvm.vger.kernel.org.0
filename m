@@ -2,43 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86A2F1BF08D
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 08:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ACBD1BF08E
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 08:49:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726433AbgD3Gt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 02:49:29 -0400
-Received: from mga04.intel.com ([192.55.52.120]:47294 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726180AbgD3Gt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 02:49:29 -0400
-IronPort-SDR: 1bFkaxWvZXU8bvar9uxrx78bh4t2ASTXZQ72ZkWCjqYTtbonQp4LBODjMwj5KX3dOUmrrxhXsf
- YHt8FdxRhz0Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2020 23:49:28 -0700
-IronPort-SDR: 9kL5j0T1nObJTAxCY6tYRK1s8mnbRHniBzznHbeT4Q0gj5aVkDCyiMBIpCiSZXctQg9u06FfpV
- kAR6ai7G9o7g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,334,1583222400"; 
-   d="scan'208";a="337203357"
-Received: from unknown (HELO [10.239.13.122]) ([10.239.13.122])
-  by orsmga001.jf.intel.com with ESMTP; 29 Apr 2020 23:49:25 -0700
-Subject: Re: [PATCH][v2] kvm: x86: emulate APERF/MPERF registers
-To:     Li RongQing <lirongqing@baidu.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, hpa@zytor.com, bp@alien8.de,
-        mingo@redhat.com, tglx@linutronix.de, joro@8bytes.org,
-        jmattson@google.com, wanpengli@tencent.com, vkuznets@redhat.com,
-        sean.j.christopherson@intel.com, pbonzini@redhat.com
-References: <1588139196-23802-1-git-send-email-lirongqing@baidu.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <5aa01c91-b874-fd4f-a1fb-1d008753ca84@intel.com>
-Date:   Thu, 30 Apr 2020 14:49:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726505AbgD3Gtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 02:49:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25797 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726489AbgD3Gtq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Apr 2020 02:49:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588229385;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6jDhUGC0q9fpb0E7nmomakw81mS0R94uGtBxC+k3irk=;
+        b=gELFHrg3xdET64gqDt6YQUrU1f/TtBcFAv9WNqtMNNrChiJfZlgIN2BVNbiHAA/nBjTBrT
+        lcLEuQFJO888rb/QPCl7UkXyxPH/VGpn0K7Q22sDh7jAHZaHAoFRqI4KU+paQMJuozTDL7
+        4pHlimrTTJy93Vi2hk/fWxA0a8eWLPI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-3IieWjQiP9u-VhsEO-0j_g-1; Thu, 30 Apr 2020 02:49:43 -0400
+X-MC-Unique: 3IieWjQiP9u-VhsEO-0j_g-1
+Received: by mail-wr1-f69.google.com with SMTP id a3so3388424wro.1
+        for <kvm@vger.kernel.org>; Wed, 29 Apr 2020 23:49:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6jDhUGC0q9fpb0E7nmomakw81mS0R94uGtBxC+k3irk=;
+        b=qcj9zHnemNpGYZxJPBBgiyfZSg0q2teOP6Mw9Kq84NVtEJQYsNGpH0ikdC1UHipnwM
+         K+y3imK5Y7en+NPUccR8R2YE2Jqk3yZCpCHt3Dyi3RxEcbxFmgiSI52lOEekxBBv8FIS
+         I9QzcCszAKAiGOfYmB0YZxcbsjN0avXSPRvAZRk/6T5fpoeXHqk+zf54aK71MpI+hkPF
+         7ppo2Bq3F3muFHi7yGXaZ1gaY2i7WoNhwaMReVES4CfdqO/kSQ8OKmSLifXnI60qF8RV
+         Uy2ObJBNBkzp8T+ZAh+ZyUgAqNWzs6GoFz/HhGXusKDZiyX0EjogsKrJSC5XwS4KZCXd
+         zo/g==
+X-Gm-Message-State: AGi0PuYpbkkinQGcIdutJ/VLrKUYDC5XJercinXlEWB+2KzRaK584Y2z
+        vvULXfET3C79PlUcpjt3dHnrVfKmFK5L3ftdcsi3/ELDEE8H0sadzdjkIvVvUKfCbKJome9amK0
+        cN4TF6wMNq92H
+X-Received: by 2002:adf:d0ce:: with SMTP id z14mr1006545wrh.179.1588229382512;
+        Wed, 29 Apr 2020 23:49:42 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJsr6rw4wP2fqMQl3zalW7R42B7drXGchkN9CzcjY2NDZHyXF3Wa5dNOSiiq9a1MPMvoUroSQ==
+X-Received: by 2002:adf:d0ce:: with SMTP id z14mr1006517wrh.179.1588229382284;
+        Wed, 29 Apr 2020 23:49:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac19:d1fb:3f5f:d54f? ([2001:b07:6468:f312:ac19:d1fb:3f5f:d54f])
+        by smtp.gmail.com with ESMTPSA id g74sm11257055wme.44.2020.04.29.23.49.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Apr 2020 23:49:41 -0700 (PDT)
+Subject: Re: [PATCH RFC 4/6] KVM: x86: acknowledgment mechanism for async pf
+ page ready notifications
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20200429093634.1514902-1-vkuznets@redhat.com>
+ <20200429093634.1514902-5-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b1297936-cf69-227b-d758-c3f3ca09ae5d@redhat.com>
+Date:   Thu, 30 Apr 2020 08:49:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1588139196-23802-1-git-send-email-lirongqing@baidu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200429093634.1514902-5-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -46,59 +79,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/29/2020 1:46 PM, Li RongQing wrote:
-> Guest kernel reports a fixed cpu frequency in /proc/cpuinfo,
-> this is confused to user when turbo is enable, and aperf/mperf
-> can be used to show current cpu frequency after 7d5905dc14a
-> "(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
-> so we should emulate aperf mperf to achieve it
-> 
-> the period of aperf/mperf in guest mode are accumulated as
-> emulated value, and add per-VM knod to enable emulate mperfaperf
-> 
-> diff v1:
-> 1. support AMD
-> 2. support per-vm capability to enable
-> 
-[...]
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 851e9cc79930..1d157a8dba46 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -4310,6 +4310,12 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   	case MSR_F10H_DECFG:
->   		msr_info->data = svm->msr_decfg;
->   		break;
-> +	case MSR_IA32_MPERF:
-> +		msr_info->data = vcpu->arch.v_mperf;
-> +		break;
-> +	case MSR_IA32_APERF:
-> +		msr_info->data = vcpu->arch.v_aperf;
-> +		break;
->   	default:
->   		return kvm_get_msr_common(vcpu, msr_info);
->   	}
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 91749f1254e8..b05e276e262b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1914,6 +1914,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
->   			return 1;
->   		goto find_shared_msr;
-> +	case MSR_IA32_MPERF:
-> +		msr_info->data = vcpu->arch.v_mperf;
-> +		break;
-> +	case MSR_IA32_APERF:
-> +		msr_info->data = vcpu->arch.v_aperf;
+On 29/04/20 11:36, Vitaly Kuznetsov wrote:
+> +	case MSR_KVM_ASYNC_PF_ACK:
+> +		if (data & 0x1)
+> +			kvm_check_async_pf_completion(vcpu);
 > +		break;
 
-They are same for both vmx and svm, you can put them in kvm_get_msr_common()
+Does this work if interrupts are turned off?  I think in that case
+kvm_check_async_pf_completion will refuse to make progress.  You need to
+make this bit stateful (e.g. 1 = async PF in progress, 0 = not in
+progress), and check that for page ready notifications instead of
+EFLAGS.IF.  This probably means that;
 
-BTW, are those two MSR always readable regardless of guest's CPUID?
+- it might be simpler to move it to the vector MSR
 
->   	default:
->   	find_shared_msr:
->   		msr = find_msr_entry(vmx, msr_info->index);
+- it's definitely much simpler to remove the #PF-based mechanism for
+injecting page ready notifications.
 
+Thanks,
+
+Paolo
 
