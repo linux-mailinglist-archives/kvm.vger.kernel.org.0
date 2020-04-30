@@ -2,134 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAD061BF6F5
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 13:39:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5A1C1BF706
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 13:43:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726789AbgD3Lj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 07:39:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44020 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726636AbgD3Lj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 07:39:26 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BE2192076D;
-        Thu, 30 Apr 2020 11:39:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588246765;
-        bh=2rv/Th+U2tvUwoYnI9XJB61R1uEh9ov5BSgYIC5BZ7Y=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=k29nbFT/ev2JNmZkIbIni5U6RVaAGwptOaa/IDd9bcTSXbPY2vVCM9jpToRNnIHv8
-         r9meXIEYdgsv59NHVeo/qW74RI3hVsR0P2ropIAUdsdmYpEX/OHdGqS8CG5u8nwsY0
-         iflC7ZZNThZCxtLxZoJiH6z06rlyNZrLdZGiEIPg=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jU7XI-0080nh-3G; Thu, 30 Apr 2020 12:39:24 +0100
+        id S1726661AbgD3LnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 07:43:20 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34196 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726511AbgD3LnU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Apr 2020 07:43:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588246998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=01ghgmgORZJIZqqxFNV1EG+OflwkdPLMWHhmL4P1sPU=;
+        b=FdXrECkeMVmJXhQLstYe7xHOSfqcLgrqHm8J3qUkyS+PFOPWZBfScV7ChXDFf6MoN3Vlp3
+        twQGbGwOHygDlc5dh6SfkUKe5Njmd/beHEijnmqtXKPrRv6r0KO8yTnaj+swbcAOvScF1K
+        CaF+Q/IO0vrbfdUbgdMv8I/OQfK57eI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-73-SVWPY8iqN1Oj67MFkp-kyw-1; Thu, 30 Apr 2020 07:43:17 -0400
+X-MC-Unique: SVWPY8iqN1Oj67MFkp-kyw-1
+Received: by mail-wm1-f70.google.com with SMTP id n127so474596wme.4
+        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 04:43:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=01ghgmgORZJIZqqxFNV1EG+OflwkdPLMWHhmL4P1sPU=;
+        b=mIGdQjHE1fM3Jkv7dOSytG0HD1BlmsRgkNkg/rxMPFCS9ispv6Ci1gp9I9R8HM1v52
+         2N1LE4yvIzLH4c3Nuy9EvbmzDUQn+tt8+DpFcnMw2KKVhy7gZ/EAeXF1QQG9re+5HqgB
+         iLyHib2kvM0nuD75hcFcg3VRhd7C8KZKfQXUlJ9dOY/b+BgNCvdXAgQbATZZ2cNHyxRE
+         lHCVlOmg1DZk+BIUqwYiysl+eid1llbVRnuh1lqYnUsoiCi7CZFGi3e7gCvlTDivWvD1
+         AhEkouDaRrH9rWLCK1C4QtfLHKFRwzD+vZP+JwBl142rgmWoTMxZ7RckFaVAZSkIDqn4
+         mnYQ==
+X-Gm-Message-State: AGi0PuaxUX9VzutDeernWtfcXQdxDFeTUComdpHpAiW/rhNXmDjEL72t
+        swu2p9y1SYg2UHeap1XmqA1c+0rE0oheQdLxEgyLQQ+p4E1uMhBRImULC+7ykrBJfEkXKaG9TZH
+        33q/CYG5YR9YZ
+X-Received: by 2002:adf:f604:: with SMTP id t4mr3492989wrp.399.1588246995848;
+        Thu, 30 Apr 2020 04:43:15 -0700 (PDT)
+X-Google-Smtp-Source: APiQypICjmRb9Tq+KJtCaNKbRBGX7wvpOe2201Kcc13c42lW2P7T/Z37mLHNY3t+WUJDZtj7WdZ7uw==
+X-Received: by 2002:adf:f604:: with SMTP id t4mr3492963wrp.399.1588246995544;
+        Thu, 30 Apr 2020 04:43:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac19:d1fb:3f5f:d54f? ([2001:b07:6468:f312:ac19:d1fb:3f5f:d54f])
+        by smtp.gmail.com with ESMTPSA id c1sm3732638wrc.4.2020.04.30.04.43.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Apr 2020 04:43:15 -0700 (PDT)
+Subject: Re: [PATCH RFC 4/6] KVM: x86: acknowledgment mechanism for async pf
+ page ready notifications
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20200429093634.1514902-1-vkuznets@redhat.com>
+ <20200429093634.1514902-5-vkuznets@redhat.com>
+ <b1297936-cf69-227b-d758-c3f3ca09ae5d@redhat.com>
+ <87sgglfjt9.fsf@vitty.brq.redhat.com>
+ <18b66e2e-9256-0ef0-4783-f89211eeda88@redhat.com>
+ <87k11xfbsh.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0ff17250-1943-837a-734d-73a8b4a97ae2@redhat.com>
+Date:   Thu, 30 Apr 2020 13:43:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <87k11xfbsh.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Thu, 30 Apr 2020 12:39:24 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Initialize GICv4.1 even in the
- absence of a virtual ITS
-In-Reply-To: <5b23b938-f71f-5523-6d7e-027bcca98dd4@huawei.com>
-References: <20200425094426.162962-1-maz@kernel.org>
- <5b23b938-f71f-5523-6d7e-027bcca98dd4@huawei.com>
-User-Agent: Roundcube Webmail/1.4.3
-Message-ID: <cd9743fabceee2a821808046081930cd@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+On 30/04/20 13:33, Vitaly Kuznetsov wrote:
+>> I would expect that it needs to keep it in a global variable anyway, but
+>> yes this is a good point.  You can also keep the ACK MSR and store the
+>> pending bit in the other MSR, kind of like you have separate ISR and EOI
+>> registers in the LAPIC.
+>>
+> Honestly I was inspired by Hyper-V's HV_X64_MSR_EOM MSR as the protocol
+> we're trying to come up with here is very similar to HV messaging)
 
-On 2020-04-30 12:24, Zenghui Yu wrote:
-> Hi Marc,
-> 
-> On 2020/4/25 17:44, Marc Zyngier wrote:
->> KVM now expects to be able to use HW-accelerated delivery of vSGIs
->> as soon as the guest has enabled thm. Unfortunately, we only
-> them
->> initialize the GICv4 context if we have a virtual ITS exposed to
->> the guest.
->> 
->> Fix it by always initializing the GICv4.1 context if it is
->> available on the host.
->> 
->> Fixes: 2291ff2f2a56 ("KVM: arm64: GICv4.1: Plumb SGI implementation 
->> selection in the distributor")
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>   virt/kvm/arm/vgic/vgic-init.c    | 9 ++++++++-
->>   virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 ++-
->>   2 files changed, 10 insertions(+), 2 deletions(-)
->> 
->> diff --git a/virt/kvm/arm/vgic/vgic-init.c 
->> b/virt/kvm/arm/vgic/vgic-init.c
->> index a963b9d766b73..8e6f350c3bcd1 100644
->> --- a/virt/kvm/arm/vgic/vgic-init.c
->> +++ b/virt/kvm/arm/vgic/vgic-init.c
->> @@ -294,8 +294,15 @@ int vgic_init(struct kvm *kvm)
->>   		}
->>   	}
->>   -	if (vgic_has_its(kvm)) {
->> +	if (vgic_has_its(kvm))
->>   		vgic_lpi_translation_cache_init(kvm);
->> +
->> +	/*
->> +	 * If we have GICv4.1 enabled, unconditionnaly request enable the
->> +	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
->> +	 * enable it if we present a virtual ITS to the guest.
->> +	 */
->> +	if (vgic_supports_direct_msis(kvm)) {
->>   		ret = vgic_v4_init(kvm);
->>   		if (ret)
->>   			goto out;
->> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c 
->> b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> index e72dcc4542475..26b11dcd45524 100644
->> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
->> @@ -50,7 +50,8 @@ bool vgic_has_its(struct kvm *kvm)
->>     bool vgic_supports_direct_msis(struct kvm *kvm)
->>   {
->> -	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
->> +	return (kvm_vgic_global_state.has_gicv4_1 ||
->> +		(kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm)));
->>   }
-> 
-> Not related to this patch, but I think that the function name can be
-> improved a bit after this change. It now indicates whether the vGIC
-> supports direct MSIs injection *or* direct SGIs injection, not just
-> MSIs. And if vgic_has_its() is false, we don't even support MSIs.
+Oh, that's true actually.
 
-Yes, I noticed that too. But in the spirit of keeping the change minimal
-and avoid later conflicts with potential fixes, I decided against 
-changing
-it right now.
+> I'm not exactly sure why we need the pending bit after we drop #PF. When
+> we call kvm_check_async_pf_completion() from MSR_KVM_ASYNC_PF_ACK write
+> it will (in case there are page ready events in the queue) check if the
+> slot is empty, put one there and raise IRQ regardless of guest's current
+> state. It may or may not get injected immediately but we don't care.> The second invocation of kvm_check_async_pf_completion() from vcpu_run()
+> will just go away.
 
-> The fix itself looks correct to me,
-> 
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+You're right, you can just use the value in the guest to see if the
+guest is ready.  This is also similar to how #VE handles re-entrancy,
+however because this is an interrupt we have IF to delay the IRQ until
+after the interrupt handler has finished.
 
-Thanks,
+By dropping the #PF page ready case, we can also drop the ugly case
+where WRMSR injects a page ready page fault even if IF=0.  That one is
+safe on Linux, but Andy didn't like it.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Paolo
+
