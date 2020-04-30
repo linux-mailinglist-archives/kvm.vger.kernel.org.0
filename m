@@ -2,124 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CF021BF99C
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 15:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA1BC1BF9DE
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 15:46:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727784AbgD3NeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 09:34:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41271 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726577AbgD3NeO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 09:34:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588253652;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L25mv4WATkCBD6beOc1gHUKVW8B48wx+KY4Q0xxB/bg=;
-        b=YmTEFhiTjoViIVGkCPiLAIWQw4qoomGHvjVanx/CaDT0brVTb6MNDvhDvGTf5J/xrI6tjg
-        sKITS3Z+BQygdZhWt+PvUCKXznpfgmgFdOdyawF0TuHAlfm7mZBcmODc0BaFbq1CI8jCGR
-        t4ma9Gl4DOvtz41yhR7mvLTVnn9nQ5I=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-b3iax9lRM6CbGgisYcEHDQ-1; Thu, 30 Apr 2020 09:34:11 -0400
-X-MC-Unique: b3iax9lRM6CbGgisYcEHDQ-1
-Received: by mail-wm1-f70.google.com with SMTP id q5so859443wmc.9
-        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 06:34:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=L25mv4WATkCBD6beOc1gHUKVW8B48wx+KY4Q0xxB/bg=;
-        b=dR0Gz0tq+/D0xcteCVhdj2ZmM5yBvzRchTxvpa6uAK7eTQzE5kAauY6keVRRPxH8Pu
-         DZ2cCe5CB1PxF4GRxih45uYH9DJCRFmr07/jGS9BopjX09uWeq+l5V00qVd3irmAHsRU
-         hYbClrRgukfSF5++nc6C778o5YJXOzCax07Ra6ykTaxKFFXaR3gQcIwmTs0bTUZOSHT5
-         RHM1Lyzqq0nIS7aezb/mkU3ICKdRTCuNofJ/llfo9HNZ9JFIhOtk4/z7AJdv8/rnlX0d
-         zj13hAIik4ziYsELYPI734WL6aYLh+yTgBUMt9EyWVpLU90UZFf48N+OqomvBdUTt/In
-         9CUA==
-X-Gm-Message-State: AGi0Puao1kjO1CmHZUWhVflRctLzAxFFT8+W82g+8VfZmWbBvAxHG4jE
-        5tUJYM1rNiTH86DSjoWwZhA1teYDCFQhDPb4YWg5sThlP3DMocp1Yhi9d46rJP/71/rNyeZi+qM
-        COOlHmjWTvT9+
-X-Received: by 2002:a7b:c642:: with SMTP id q2mr3140495wmk.41.1588253649884;
-        Thu, 30 Apr 2020 06:34:09 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJIOuyRTQjX2rQXDMTUkV88W2CMXJaf4hJDpw+3HtN0UnU7BvUQ/GKjLOpDu69QLHFb+aC+uw==
-X-Received: by 2002:a7b:c642:: with SMTP id q2mr3140465wmk.41.1588253649651;
-        Thu, 30 Apr 2020 06:34:09 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id v7sm11562227wmg.3.2020.04.30.06.34.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Apr 2020 06:34:08 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Subject: Re: [PATCH v4 2/7] KVM: X86: Enable fastpath when APICv is enabled
-In-Reply-To: <1588055009-12677-3-git-send-email-wanpengli@tencent.com>
-References: <1588055009-12677-1-git-send-email-wanpengli@tencent.com> <1588055009-12677-3-git-send-email-wanpengli@tencent.com>
-Date:   Thu, 30 Apr 2020 15:34:06 +0200
-Message-ID: <87a72tf67l.fsf@vitty.brq.redhat.com>
+        id S1727080AbgD3Nqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 09:46:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56716 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726577AbgD3Nqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Apr 2020 09:46:55 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6A1732082E;
+        Thu, 30 Apr 2020 13:46:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588254414;
+        bh=cIGsayzyQrmoAosJwNbheDRWF4TGcuP/5fJyINZP78U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BRMV7FauM4SoitKAPFxH/263TwK51GMEbX2WUTdzhWUPJYlLMMchtTpkp3VX4JOUR
+         7ifde/j5zTwb0Zt2UrTSiL0TrRKM9w9fUc4hJ0F5NYKAx1p9Qc9Ah6bCL5S6NGIudW
+         7MDW0NUmac55807mzyt0EoogYvL7pcm3ttyAYaNk=
+Date:   Thu, 30 Apr 2020 14:46:50 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Fix 32bit PC wrap-around
+Message-ID: <20200430134649.GC22842@willie-the-truck>
+References: <20200430101513.318541-1-maz@kernel.org>
+ <20200430102556.GE19932@willie-the-truck>
+ <897baec2a3fad776716bccf3027340fa@kernel.org>
+ <20200430123104.GB22842@willie-the-truck>
+ <1c0175a09a90d2b7c0243e5bcec7cc9a@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c0175a09a90d2b7c0243e5bcec7cc9a@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+On Thu, Apr 30, 2020 at 01:45:51PM +0100, Marc Zyngier wrote:
+> On 2020-04-30 13:31, Will Deacon wrote:
+> > On Thu, Apr 30, 2020 at 11:59:05AM +0100, Marc Zyngier wrote:
+> > > On 2020-04-30 11:25, Will Deacon wrote:
+> > > > On Thu, Apr 30, 2020 at 11:15:13AM +0100, Marc Zyngier wrote:
+> > > > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > > > > index 23ebe51410f0..2a159af82429 100644
+> > > > > --- a/arch/arm64/kvm/guest.c
+> > > > > +++ b/arch/arm64/kvm/guest.c
+> > > > > @@ -200,6 +200,10 @@ static int set_core_reg(struct kvm_vcpu *vcpu,
+> > > > > const struct kvm_one_reg *reg)
+> > > > >  	}
+> > > > >
+> > > > >  	memcpy((u32 *)regs + off, valp, KVM_REG_SIZE(reg->id));
+> > > > > +
+> > > > > +	if (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK)
+> > > > > +		*vcpu_pc(vcpu) = lower_32_bits(*vcpu_pc(vcpu));
+> > > >
+> > > > It seems slightly odd to me that we don't enforce this for *all* the
+> > > > registers when running as a 32-bit guest. Couldn't userspace be equally
+> > > > confused by a 64-bit lr or sp?
+> > > 
+> > > Fair point. How about this on top, which wipes the upper 32 bits for
+> > > each and every register in the current mode:
+> > > 
+> > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > > index 2a159af82429..f958c3c7bf65 100644
+> > > --- a/arch/arm64/kvm/guest.c
+> > > +++ b/arch/arm64/kvm/guest.c
+> > > @@ -201,9 +201,12 @@ static int set_core_reg(struct kvm_vcpu *vcpu,
+> > > const
+> > > struct kvm_one_reg *reg)
+> > > 
+> > >  	memcpy((u32 *)regs + off, valp, KVM_REG_SIZE(reg->id));
+> > > 
+> > > -	if (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK)
+> > > -		*vcpu_pc(vcpu) = lower_32_bits(*vcpu_pc(vcpu));
+> > > +	if (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK) {
+> > > +		int i;
+> > > 
+> > > +		for (i = 0; i < 16; i++)
+> > > +			*vcpu_reg32(vcpu, i) = (u32)*vcpu_reg32(vcpu, i);
+> > 
+> > I think you're missing all the funny banked registers that live all the
+> > way
+> > up to x30 iirc.
+> 
+> No, they are all indirected via vcpu_reg32(), which has the magic tables.
+> And the whole point is that we only want to affect the current mode (no
+> point
+> in repainting the FIQ registers if the PSR says USR).
+> 
+> Or am I missing something obvious?
 
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> We can't observe benefit from single target IPI fastpath when APICv is
-> disabled, let's just enable IPI and Timer fastpath when APICv is enabled
-> for now.
->
-> Tested-by: Haiwei Li <lihaiwei@tencent.com>
-> Cc: Haiwei Li <lihaiwei@tencent.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 2 +-
->  arch/x86/kvm/vmx/vmx.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 8f8fc65..1e7220e 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3344,7 +3344,7 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
->  
->  static enum exit_fastpath_completion svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
->  {
-> -	if (!is_guest_mode(vcpu) &&
-> +	if (!is_guest_mode(vcpu) && vcpu->arch.apicv_active &&
->  	    to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
->  	    to_svm(vcpu)->vmcb->control.exit_info_1)
->  		return handle_fastpath_set_msr_irqoff(vcpu);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 9b5adb4..f207004 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6585,7 +6585,7 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
->  
->  static enum exit_fastpath_completion vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
->  {
-> -	if (!is_guest_mode(vcpu)) {
-> +	if (!is_guest_mode(vcpu) && vcpu->arch.apicv_active) {
->  		switch (to_vmx(vcpu)->exit_reason) {
->  		case EXIT_REASON_MSR_WRITE:
->  			return handle_fastpath_set_msr_irqoff(vcpu);
+Nope, just my inability to parse vcpu_reg32 the first time around! So, for
+the updated patch:
 
-I think that apicv_active checks are specific to APIC MSRs but
-handle_fastpath_set_msr_irqoff() can handle any other MSR as well. I'd
-suggest to move the check inside handle_fastpath_set_msr_irqoff().
+Acked-by: Will Deacon <will@kernel.org?
 
-Also, enabling Hyper-V SynIC leads to disabling apicv. It it still
-pointless to keep fastpath enabled?
+Thanks,
 
--- 
-Vitaly
-
+Will
