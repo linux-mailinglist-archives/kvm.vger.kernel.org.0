@@ -2,176 +2,329 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 297101BF5AD
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 12:38:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3B0F1BF5D5
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 12:46:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726405AbgD3Kie (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 06:38:34 -0400
-Received: from foss.arm.com ([217.140.110.172]:52302 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725280AbgD3Kie (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 06:38:34 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 714731063;
-        Thu, 30 Apr 2020 03:38:33 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C3A5D3F68F;
-        Thu, 30 Apr 2020 03:38:31 -0700 (PDT)
-Date:   Thu, 30 Apr 2020 11:38:28 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Save/restore sp_el0 as part of __guest_enter
-Message-ID: <20200430103828.GC39784@C02TD0UTHF1T.local>
-References: <20200425094321.162752-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200425094321.162752-1-maz@kernel.org>
+        id S1726789AbgD3KqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 06:46:16 -0400
+Received: from mx56.baidu.com ([61.135.168.56]:10275 "EHLO
+        tc-sys-mailedm05.tc.baidu.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726309AbgD3KqQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Apr 2020 06:46:16 -0400
+Received: from localhost (cp01-cos-dev01.cp01.baidu.com [10.92.119.46])
+        by tc-sys-mailedm05.tc.baidu.com (Postfix) with ESMTP id 4AFA41EBA003;
+        Thu, 30 Apr 2020 18:45:56 +0800 (CST)
+From:   Li RongQing <lirongqing@baidu.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        hpa@zytor.com, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
+        jmattson@google.com, wanpengli@tencent.com, vkuznets@redhat.com,
+        sean.j.christopherson@intel.com, pbonzini@redhat.com,
+        xiaoyao.li@intel.com
+Subject: [PATCH] [v3] kvm: x86: support APERF/MPERF registers
+Date:   Thu, 30 Apr 2020 18:45:56 +0800
+Message-Id: <1588243556-11477-1-git-send-email-lirongqing@baidu.com>
+X-Mailer: git-send-email 1.7.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 25, 2020 at 10:43:21AM +0100, Marc Zyngier wrote:
-> We currently save/restore sp_el0 in C code. This is a bit unsafe,
-> as a lot of the C code expects 'current' to be accessible from
-> there (and the opportunity to run kernel code in HYP is specially
-> great with VHE).
-> 
-> Instead, let's move the save/restore of sp_el0 to the assembly
-> code (in __guest_enter), making sure that sp_el0 is correct
-> very early on when we exit the guest, and is preserved as long
-> as possible to its host value when we enter the guest.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Guest kernel reports a fixed cpu frequency in /proc/cpuinfo,
+this is confused to user when turbo is enable, and aperf/mperf
+can be used to show current cpu frequency after 7d5905dc14a
+"(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
+so guest should support aperf/mperf capability
 
-Makes sense to me in principle, but I haven't reviewed the code in
-detail:
+this patch implements aperf/mperf by three mode: none, software
+emulation, and pass-through
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+none: default mode, guest does not support aperf/mperf
 
-Mark.
+software emulation: the period of aperf/mperf in guest mode are
+accumulated as emulated value
 
-> ---
->  arch/arm64/kvm/hyp/entry.S     | 23 +++++++++++++++++++++++
->  arch/arm64/kvm/hyp/sysreg-sr.c | 17 +++--------------
->  2 files changed, 26 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index d22d0534dd600..90186cf6473e0 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -18,6 +18,7 @@
->  
->  #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
->  #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
-> +#define CPU_SP_EL0_OFFSET	(CPU_XREG_OFFSET(30) + 8)
->  
->  	.text
->  	.pushsection	.hyp.text, "ax"
-> @@ -47,6 +48,16 @@
->  	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
->  .endm
->  
-> +.macro save_sp_el0 ctxt, tmp
-> +	mrs	\tmp,	sp_el0
-> +	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
-> +.endm
-> +
-> +.macro restore_sp_el0 ctxt, tmp
-> +	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
-> +	msr	sp_el0, \tmp
-> +.endm
-> +
->  /*
->   * u64 __guest_enter(struct kvm_vcpu *vcpu,
->   *		     struct kvm_cpu_context *host_ctxt);
-> @@ -60,6 +71,9 @@ SYM_FUNC_START(__guest_enter)
->  	// Store the host regs
->  	save_callee_saved_regs x1
->  
-> +	// Save the host's sp_el0
-> +	save_sp_el0	x1, x2
-> +
->  	// Now the host state is stored if we have a pending RAS SError it must
->  	// affect the host. If any asynchronous exception is pending we defer
->  	// the guest entry. The DSB isn't necessary before v8.2 as any SError
-> @@ -83,6 +97,9 @@ alternative_else_nop_endif
->  	// when this feature is enabled for kernel code.
->  	ptrauth_switch_to_guest x29, x0, x1, x2
->  
-> +	// Restore the guest's sp_el0
-> +	restore_sp_el0 x29, x0
-> +
->  	// Restore guest regs x0-x17
->  	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
->  	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
-> @@ -130,6 +147,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
->  	// Store the guest regs x18-x29, lr
->  	save_callee_saved_regs x1
->  
-> +	// Store the guest's sp_el0
-> +	save_sp_el0	x1, x2
-> +
->  	get_host_ctxt	x2, x3
->  
->  	// Macro ptrauth_switch_to_guest format:
-> @@ -139,6 +159,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
->  	// when this feature is enabled for kernel code.
->  	ptrauth_switch_to_host x1, x2, x3, x4, x5
->  
-> +	// Restore the hosts's sp_el0
-> +	restore_sp_el0 x2, x3
-> +
->  	// Now restore the host regs
->  	restore_callee_saved_regs x2
->  
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index 75b1925763f16..6d2df9fe0b5d2 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -15,8 +15,9 @@
->  /*
->   * Non-VHE: Both host and guest must save everything.
->   *
-> - * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and pstate,
-> - * which are handled as part of the el2 return state) on every switch.
-> + * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
-> + * pstate, which are handled as part of the el2 return state) on every
-> + * switch (sp_el0 is being dealt with in the assembly code).
->   * tpidr_el0 and tpidrro_el0 only need to be switched when going
->   * to host userspace or a different VCPU.  EL1 registers only need to be
->   * switched when potentially going to run a different VCPU.  The latter two
-> @@ -26,12 +27,6 @@
->  static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
-> -
-> -	/*
-> -	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
-> -	 * therefore be saved/restored on every entry/exit to/from the guest.
-> -	 */
-> -	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
->  }
->  
->  static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> @@ -99,12 +94,6 @@ NOKPROBE_SYMBOL(sysreg_save_guest_state_vhe);
->  static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
->  {
->  	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
-> -
-> -	/*
-> -	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
-> -	 * therefore be saved/restored on every entry/exit to/from the guest.
-> -	 */
-> -	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
->  }
->  
->  static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-> -- 
-> 2.26.2
-> 
+pass-though: it is only suitable for KVM_HINTS_REALTIME, Because
+that hint guarantees we have a 1:1 vCPU:CPU binding and guaranteed
+no over-commit.
+
+and a per-VM capability is added to configure aperfmperf mode
+
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+Signed-off-by: Chai Wen <chaiwen@baidu.com>
+Signed-off-by: Jia Lina <jialina01@baidu.com>
+---
+diff v2:
+support aperfmperf pass though
+move common codes to kvm_get_msr_common
+
+diff v1:
+1. support AMD, but not test
+2. support per-vm capability to enable
+ Documentation/virt/kvm/api.rst  | 10 ++++++++++
+ arch/x86/include/asm/kvm_host.h | 11 +++++++++++
+ arch/x86/kvm/cpuid.c            | 13 ++++++++++++-
+ arch/x86/kvm/svm.c              |  8 ++++++++
+ arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+ arch/x86/kvm/x86.c              | 42 +++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h              | 15 +++++++++++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 8 files changed, 105 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index efbbe570aa9b..c3be3b6a1717 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6109,3 +6109,13 @@ KVM can therefore start protected VMs.
+ This capability governs the KVM_S390_PV_COMMAND ioctl and the
+ KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
+ guests when the state change is invalid.
++
++8.23 KVM_CAP_APERFMPERF
++----------------------------
++
++:Architectures: x86
++:Parameters: args[0] is aperfmperf mode;
++             0 for not support, 1 for software emulation, 2 for pass-through
++:Returns: 0 on success; -1 on error
++
++This capability indicates that KVM supports APERF and MPERF MSR registers
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 42a2d0d3984a..81477f676f60 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -820,6 +820,9 @@ struct kvm_vcpu_arch {
+ 
+ 	/* AMD MSRC001_0015 Hardware Configuration */
+ 	u64 msr_hwcr;
++
++	u64 v_mperf;
++	u64 v_aperf;
+ };
+ 
+ struct kvm_lpage_info {
+@@ -885,6 +888,12 @@ enum kvm_irqchip_mode {
+ 	KVM_IRQCHIP_SPLIT,        /* created with KVM_CAP_SPLIT_IRQCHIP */
+ };
+ 
++enum kvm_aperfmperf_mode {
++	KVM_APERFMPERF_NONE,
++	KVM_APERFMPERF_SOFT,      /* software emulate aperfmperf */
++	KVM_APERFMPERF_PT,        /* pass-through aperfmperf to guest */
++};
++
+ #define APICV_INHIBIT_REASON_DISABLE    0
+ #define APICV_INHIBIT_REASON_HYPERV     1
+ #define APICV_INHIBIT_REASON_NESTED     2
+@@ -982,6 +991,8 @@ struct kvm_arch {
+ 
+ 	struct kvm_pmu_event_filter *pmu_event_filter;
+ 	struct task_struct *nx_lpage_recovery_thread;
++
++	enum kvm_aperfmperf_mode aperfmperf_mode;
+ };
+ 
+ struct kvm_vm_stat {
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 901cd1fdecd9..7a64ea2c3eef 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -124,6 +124,14 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+ 					   MSR_IA32_MISC_ENABLE_MWAIT);
+ 	}
+ 
++	best = kvm_find_cpuid_entry(vcpu, 6, 0);
++	if (best) {
++		if (guest_has_aperfmperf(vcpu->kvm) &&
++			boot_cpu_has(X86_FEATURE_APERFMPERF))
++			best->ecx |= 1;
++		else
++			best->ecx &= ~1;
++	}
+ 	/* Update physical-address width */
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+ 	kvm_mmu_reset_context(vcpu);
+@@ -558,7 +566,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 	case 6: /* Thermal management */
+ 		entry->eax = 0x4; /* allow ARAT */
+ 		entry->ebx = 0;
+-		entry->ecx = 0;
++		if (boot_cpu_has(X86_FEATURE_APERFMPERF))
++			entry->ecx = 0x1;
++		else
++			entry->ecx = 0x0;
+ 		entry->edx = 0;
+ 		break;
+ 	/* function 7 has additional index. */
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 851e9cc79930..5646b6475049 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -2292,6 +2292,14 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 	svm->msrpm = page_address(msrpm_pages);
+ 	svm_vcpu_init_msrpm(svm->msrpm);
+ 
++	if (guest_aperfmperf_soft(vcpu->kvm)) {
++		set_msr_interception(svm->msrpm, MSR_IA32_MPERF, 1, 0);
++		set_msr_interception(svm->msrpm, MSR_IA32_APERF, 1, 0);
++	} else if (guest_aperfmperf_pt(vcpu->kvm)) {
++		set_msr_interception(svm->msrpm, MSR_IA32_MPERF, 0, 0);
++		set_msr_interception(svm->msrpm, MSR_IA32_APERF, 0, 0);
++	}
++
+ 	svm->nested.msrpm = page_address(nested_msrpm_pages);
+ 	svm_vcpu_init_msrpm(svm->nested.msrpm);
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 91749f1254e8..023c411ce5ad 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6759,6 +6759,12 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+ 		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
+ 		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
+ 	}
++
++	if (guest_aperfmperf_pt(vcpu->kvm)) {
++		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_MPERF, MSR_TYPE_R);
++		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_APERF, MSR_TYPE_R);
++	}
++
+ 	vmx->msr_bitmap_mode = 0;
+ 
+ 	vmx->loaded_vmcs = &vmx->vmcs01;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b8124b562dea..a57f69a0eb6e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3227,6 +3227,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_K7_HWCR:
+ 		msr_info->data = vcpu->arch.msr_hwcr;
+ 		break;
++	case MSR_IA32_MPERF:
++		msr_info->data = vcpu->arch.v_mperf;
++		break;
++	case MSR_IA32_APERF:
++		msr_info->data = vcpu->arch.v_aperf;
++		break;
+ 	default:
+ 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+ 			return kvm_pmu_get_msr(vcpu, msr_info->index, &msr_info->data);
+@@ -3435,6 +3441,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+ 		r = kvm_x86_ops.nested_enable_evmcs != NULL;
+ 		break;
++	case KVM_CAP_APERFMPERF:
++		r = boot_cpu_has(X86_FEATURE_APERFMPERF) ? 1 : 0;
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -4883,6 +4892,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		kvm->arch.exception_payload_enabled = cap->args[0];
+ 		r = 0;
+ 		break;
++	case KVM_CAP_APERFMPERF:
++		kvm->arch.aperfmperf_mode =
++			boot_cpu_has(X86_FEATURE_APERFMPERF) ? cap->args[0] : 0;
++		r = 0;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -8163,6 +8177,25 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+ 
++
++static void guest_enter_aperfmperf(u64 *mperf, u64 *aperf)
++{
++	rdmsrl(MSR_IA32_MPERF, *mperf);
++	rdmsrl(MSR_IA32_APERF, *aperf);
++}
++
++static void guest_exit_aperfmperf(struct kvm_vcpu *vcpu,
++		u64 mperf, u64 aperf)
++{
++	u64 perf;
++
++	rdmsrl(MSR_IA32_MPERF, perf);
++	vcpu->arch.v_mperf += perf - mperf;
++
++	rdmsrl(MSR_IA32_APERF, perf);
++	vcpu->arch.v_aperf += perf - aperf;
++}
++
+ /*
+  * Returns 1 to let vcpu_run() continue the guest execution loop without
+  * exiting to the userspace.  Otherwise, the value will be returned to the
+@@ -8176,7 +8209,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		kvm_cpu_accept_dm_intr(vcpu);
+ 	enum exit_fastpath_completion exit_fastpath = EXIT_FASTPATH_NONE;
+ 
++	bool enable_aperfmperf = guest_aperfmperf_soft(vcpu->kvm);
+ 	bool req_immediate_exit = false;
++	u64 mperf, aperf;
+ 
+ 	if (kvm_request_pending(vcpu)) {
+ 		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
+@@ -8326,6 +8361,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 	preempt_disable();
+ 
++	if (unlikely(enable_aperfmperf))
++		guest_enter_aperfmperf(&mperf, &aperf);
++
+ 	kvm_x86_ops.prepare_guest_switch(vcpu);
+ 
+ 	/*
+@@ -8449,6 +8487,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	local_irq_enable();
++
++	if (unlikely(enable_aperfmperf))
++		guest_exit_aperfmperf(vcpu, mperf, aperf);
++
+ 	preempt_enable();
+ 
+ 	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index b968acc0516f..d58dc4e4f96d 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -355,6 +355,21 @@ static inline bool kvm_dr7_valid(u64 data)
+ 	return !(data >> 32);
+ }
+ 
++static inline bool guest_has_aperfmperf(struct kvm *kvm)
++{
++	return kvm->arch.aperfmperf_mode != KVM_APERFMPERF_NONE;
++}
++
++static inline bool guest_aperfmperf_soft(struct kvm *kvm)
++{
++	return kvm->arch.aperfmperf_mode == KVM_APERFMPERF_SOFT;
++}
++
++static inline bool guest_aperfmperf_pt(struct kvm *kvm)
++{
++	return kvm->arch.aperfmperf_mode == KVM_APERFMPERF_PT;
++}
++
+ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
+ u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 428c7dde6b4b..c67109a02a4d 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_VCPU_RESETS 179
+ #define KVM_CAP_S390_PROTECTED 180
+ #define KVM_CAP_PPC_SECURE_GUEST 181
++#define KVM_CAP_APERFMPERF 182
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.16.2
+
