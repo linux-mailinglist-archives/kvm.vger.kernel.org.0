@@ -2,110 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A4A91BF6CB
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 13:25:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C3EA1BF6E3
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 13:33:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726844AbgD3LZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 07:25:08 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3784 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726413AbgD3LZH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 07:25:07 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B6CDFD5C09F13723E425;
-        Thu, 30 Apr 2020 19:25:03 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 30 Apr 2020
- 19:24:55 +0800
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Initialize GICv4.1 even in the
- absence of a virtual ITS
-To:     Marc Zyngier <maz@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>
-CC:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>
-References: <20200425094426.162962-1-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <5b23b938-f71f-5523-6d7e-027bcca98dd4@huawei.com>
-Date:   Thu, 30 Apr 2020 19:24:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726859AbgD3Ldx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 07:33:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27347 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726053AbgD3Ldx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Apr 2020 07:33:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588246431;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nYHjyQZB66u0Ewnyj3ClGluuIthhdPA1Z2vZ3odLsss=;
+        b=RxVCouHGijFCONd0sGEZBSVY/EhgRnrOHjsQjL1Q2sprnC3L2j1fNNLmZ6G4DbVv5fTNrD
+        cyhOg17+XXBe3nTLxDvSeeqJ85VgXugBr/HS0jMVjX3i56+dW6bXoJUdpHloYvdsarvUaJ
+        IzGxAcCcEilYPjY8DzxOGU5rFpk6dto=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-hp7qaPLyPfGfGaV_XOzfYg-1; Thu, 30 Apr 2020 07:33:49 -0400
+X-MC-Unique: hp7qaPLyPfGfGaV_XOzfYg-1
+Received: by mail-wm1-f69.google.com with SMTP id h6so708302wmi.7
+        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 04:33:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=nYHjyQZB66u0Ewnyj3ClGluuIthhdPA1Z2vZ3odLsss=;
+        b=FaOOpjnu2LlBbnVdFiRXaxDFTBK6uPd4H+dK9KW/HzoowS3guRFNJn+OCXY5Lczd+b
+         HFi5sQGcbAAAZ6bhNMkWXr2KEbrB6jl5YbtMk6omK7sgdHgVPVmPeywsfmi/qzruZCt2
+         q/BFMdqF1pSZ8zXPeReRfdSVrt85MbRTZ0iL1XDS2QVhfoh/3nvDNDUqo6x/yFJgNzh9
+         LEmZxGdKqYy4SwGe6Kqug6ck8MxQ370LmHtjl3Low70lvYdloutpK1mUXyA6+YQNhlGQ
+         AKrfdROTx5QYDs1+e2gXGHFpR7jznq1nNYPOCRfX7nGdwxHu7JGPNy4mRHfvGOD5uwuo
+         qZDA==
+X-Gm-Message-State: AGi0PuYgBIOVUDD5PI2S3si06528ad6Fi8092uCuQJi7fAsycbaYkw1d
+        gxVOSMz0j8/zW/k/WfrCmyh/fafPG31Fn63YFtIticO00FuOVW2IqN3+BeOGu1TFJV5/KKZt55F
+        nqCsmJOMB2VmI
+X-Received: by 2002:adf:f10c:: with SMTP id r12mr3433686wro.409.1588246428708;
+        Thu, 30 Apr 2020 04:33:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJoZaH2lPDWe0GJpyQePdThFimTFd28mPxMCRnVLbCUn/3Kpq62ADMYononpBhZV+7wN64Dbw==
+X-Received: by 2002:adf:f10c:: with SMTP id r12mr3432706wro.409.1588246416469;
+        Thu, 30 Apr 2020 04:33:36 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f2sm3762196wro.59.2020.04.30.04.33.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2020 04:33:35 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 4/6] KVM: x86: acknowledgment mechanism for async pf page ready notifications
+In-Reply-To: <18b66e2e-9256-0ef0-4783-f89211eeda88@redhat.com>
+References: <20200429093634.1514902-1-vkuznets@redhat.com> <20200429093634.1514902-5-vkuznets@redhat.com> <b1297936-cf69-227b-d758-c3f3ca09ae5d@redhat.com> <87sgglfjt9.fsf@vitty.brq.redhat.com> <18b66e2e-9256-0ef0-4783-f89211eeda88@redhat.com>
+Date:   Thu, 30 Apr 2020 13:33:34 +0200
+Message-ID: <87k11xfbsh.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200425094426.162962-1-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 2020/4/25 17:44, Marc Zyngier wrote:
-> KVM now expects to be able to use HW-accelerated delivery of vSGIs
-> as soon as the guest has enabled thm. Unfortunately, we only
-them
-> initialize the GICv4 context if we have a virtual ITS exposed to
-> the guest.
-> 
-> Fix it by always initializing the GICv4.1 context if it is
-> available on the host.
-> 
-> Fixes: 2291ff2f2a56 ("KVM: arm64: GICv4.1: Plumb SGI implementation selection in the distributor")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   virt/kvm/arm/vgic/vgic-init.c    | 9 ++++++++-
->   virt/kvm/arm/vgic/vgic-mmio-v3.c | 3 ++-
->   2 files changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index a963b9d766b73..8e6f350c3bcd1 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -294,8 +294,15 @@ int vgic_init(struct kvm *kvm)
->   		}
->   	}
->   
-> -	if (vgic_has_its(kvm)) {
-> +	if (vgic_has_its(kvm))
->   		vgic_lpi_translation_cache_init(kvm);
-> +
-> +	/*
-> +	 * If we have GICv4.1 enabled, unconditionnaly request enable the
-> +	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
-> +	 * enable it if we present a virtual ITS to the guest.
-> +	 */
-> +	if (vgic_supports_direct_msis(kvm)) {
->   		ret = vgic_v4_init(kvm);
->   		if (ret)
->   			goto out;
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index e72dcc4542475..26b11dcd45524 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -50,7 +50,8 @@ bool vgic_has_its(struct kvm *kvm)
->   
->   bool vgic_supports_direct_msis(struct kvm *kvm)
->   {
-> -	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
-> +	return (kvm_vgic_global_state.has_gicv4_1 ||
-> +		(kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm)));
->   }
+> On 30/04/20 10:40, Vitaly Kuznetsov wrote:
+>>>  I think in that case
+>>> kvm_check_async_pf_completion will refuse to make progress.
+>>> You need to make this bit stateful (e.g. 1 = async PF in progress, 0 =
+>>> not in progress), and check that for page ready notifications instead of
+>>> EFLAGS.IF.  
+>>> This probably means that;
+>>>
+>>> - it might be simpler to move it to the vector MSR
+>> I didn't want to merge 'ACK' with the vector MSR as it forces the guest
+>> to remember the setting. It doesn't matter at all for Linux as we
+>> hardcode the interrupt number but I can imaging an OS assigning IRQ
+>> numbers dynamically, it'll need to keep record to avoid doing rdmsr.
+>
+> I would expect that it needs to keep it in a global variable anyway, but
+> yes this is a good point.  You can also keep the ACK MSR and store the
+> pending bit in the other MSR, kind of like you have separate ISR and EOI
+> registers in the LAPIC.
+>
 
-Not related to this patch, but I think that the function name can be
-improved a bit after this change. It now indicates whether the vGIC
-supports direct MSIs injection *or* direct SGIs injection, not just
-MSIs. And if vgic_has_its() is false, we don't even support MSIs.
+Honestly I was inspired by Hyper-V's HV_X64_MSR_EOM MSR as the protocol
+we're trying to come up with here is very similar to HV messaging)
 
-The fix itself looks correct to me,
+I'm not exactly sure why we need the pending bit after we drop #PF. When
+we call kvm_check_async_pf_completion() from MSR_KVM_ASYNC_PF_ACK write
+it will (in case there are page ready events in the queue) check if the
+slot is empty, put one there and raise IRQ regardless of guest's current
+state. It may or may not get injected immediately but we don't care.
+The second invocation of kvm_check_async_pf_completion() from vcpu_run()
+will just go away.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+I'm probably just missing something, will think of it again while
+working on v1, it seems nobody is against the idea in general. Thanks!
 
-
-Thanks.
+-- 
+Vitaly
 
