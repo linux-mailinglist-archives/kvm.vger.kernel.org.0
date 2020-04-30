@@ -2,45 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A45B1BF715
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 13:47:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 636161BF75F
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 13:58:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbgD3LrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 07:47:24 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:49561 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726053AbgD3LrX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 07:47:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1588247244; x=1619783244;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=Kuj1qenl77tWtVFDi2i82yFw2BFMgW8O9vcfQDZVnIo=;
-  b=OWGSFRw6TR2uT0T3T/RTNFmpgw2T3yReNFdqSy4Vdj16XwuNoXXuZy1k
-   jwUbuwmCerPGsHR/FEEGe4wdqUvNsGTqJs8ir2esbzdKg+Y0xQEEQou57
-   JP2qjU3/5YK2eLQzUTBHzVgnAkDJY/gRC9s/kw2YtWlbuTBvB5CTWWDNd
-   M=;
-IronPort-SDR: /hJ8fJ3qWHwmtayJxhstjxtmWUrDzcxdjlEtgg3asP8CGGbbp9dTgqtjK8ZJhBXlTZAg7KFv3v
- 3/r60mPpAG9A==
-X-IronPort-AV: E=Sophos;i="5.73,334,1583193600"; 
-   d="scan'208";a="40428135"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-57e1d233.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 30 Apr 2020 11:47:22 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-57e1d233.us-east-1.amazon.com (Postfix) with ESMTPS id 1A40E141641;
-        Thu, 30 Apr 2020 11:47:20 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 30 Apr 2020 11:47:19 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.160.65) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 30 Apr 2020 11:47:15 +0000
+        id S1726413AbgD3L6W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 07:58:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27416 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726546AbgD3L6V (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Apr 2020 07:58:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588247900;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PwkVlLlTF6QMPUlS0NrS9fdfO5mc8bH+SjES/5fPWp0=;
+        b=QjdzC+xT2f1d+EnrxUgCZILGUiCMQrwuqMVA4t8vQLwIqi61JF55x7Qha1IdEWuK6D9N47
+        5JxWVcK7tv0DinU4Q4y3oj4b3ZQ8DTDkBB/v2ByRV7Kffw+94q/FigFFfvL9LjbWeuZo5N
+        Pz0IqbyIXolsbRdq5+5jn/UXt3LD+0A=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-K0fCbqXGMBOx4iGT0PZF1Q-1; Thu, 30 Apr 2020 07:58:18 -0400
+X-MC-Unique: K0fCbqXGMBOx4iGT0PZF1Q-1
+Received: by mail-wr1-f70.google.com with SMTP id m5so3733003wru.15
+        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 04:58:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PwkVlLlTF6QMPUlS0NrS9fdfO5mc8bH+SjES/5fPWp0=;
+        b=Rr2S9TAzSStrNWWRRnvbyM8SJ72rudqazvnrdAUjGst9Cc1DPP+S/zksfmGUIkQiio
+         HTJ8QRLjSER+QmLY0fO/lKRiyYVykYUDV3nw5Jl/2bZ5iH8kTRYHKALVwGNNZy+LOrBS
+         KmQ5ovyr1k5+LtT838anDt9U/OZA0dWhgTfU8mTr2WQh08Z7aRyvbr3fCRTYIiVbZ+Bb
+         AZ92453n0Gf5nAts3RYQfQ5F0K36BMSAklucGPVQC8id8AuE2omJzk7Xh67CLphqHJQu
+         Bv3IE7mO82qU+itAGcUghCn9plJNOVXJ5nbTcsTxghf/mRaIa/tFjtyPMtTlVgn6ky6N
+         DdBQ==
+X-Gm-Message-State: AGi0PuYWIBoY/ZMKbO1x4n4PKLZjGfv8WJZR2sSqlQKrCTzLaw1f0kFQ
+        k3yuioic+HUWMXqZJ1eX4Zv/hVuQM2lcDDjR7oqbU7HJbMi9HUWy8gkV8zrjnry3Q7qoXGKHOf2
+        KPvm95+qGqA/x
+X-Received: by 2002:adf:ce0d:: with SMTP id p13mr3952856wrn.66.1588247897405;
+        Thu, 30 Apr 2020 04:58:17 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJed6abco1HDellE1WqxYwYzBLnxa31uFxiz2O4UjVM2SCevc5wILN+RctADRgeJ3od8ZOhzw==
+X-Received: by 2002:adf:ce0d:: with SMTP id p13mr3952839wrn.66.1588247897133;
+        Thu, 30 Apr 2020 04:58:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac19:d1fb:3f5f:d54f? ([2001:b07:6468:f312:ac19:d1fb:3f5f:d54f])
+        by smtp.gmail.com with ESMTPSA id b12sm4006595wro.18.2020.04.30.04.58.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Apr 2020 04:58:16 -0700 (PDT)
 Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Alexander Graf <graf@amazon.com>,
         "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
-        <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Anthony Liguori <aliguori@amazon.com>,
         Benjamin Herrenschmidt <benh@amazon.com>,
         Colm MacCarthaigh <colmmacc@amazon.com>,
         Bjoern Doebel <doebel@amazon.de>,
@@ -49,8 +64,8 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Martin Pohlack <mpohlack@amazon.de>,
         Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
         Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
 References: <20200421184150.68011-1-andraprs@amazon.com>
  <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
  <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
@@ -67,53 +82,50 @@ References: <20200421184150.68011-1-andraprs@amazon.com>
  <0c919928-00ed-beda-e984-35f7b6ca42fb@redhat.com>
  <702b2eaa-e425-204e-e19d-649282bfe170@amazon.com>
  <d13f3c5c-33f5-375b-8582-fe37402777cb@redhat.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <d4091c63-6df6-8980-72c6-282cc553527e@amazon.com>
-Date:   Thu, 30 Apr 2020 13:47:13 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+ <d4091c63-6df6-8980-72c6-282cc553527e@amazon.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bed6e250-9de5-d719-623b-b72db78ebcb9@redhat.com>
+Date:   Thu, 30 Apr 2020 13:58:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <d13f3c5c-33f5-375b-8582-fe37402777cb@redhat.com>
+In-Reply-To: <d4091c63-6df6-8980-72c6-282cc553527e@amazon.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Originating-IP: [10.43.160.65]
-X-ClientProxiedBy: EX13D20UWA002.ant.amazon.com (10.43.160.176) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAzMC4wNC4yMCAxMzozOCwgUGFvbG8gQm9uemluaSB3cm90ZToKPiAKPiBPbiAzMC8wNC8y
-MCAxMzoyMSwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+PiBBbHNvLCB3b3VsZCB5b3UgY29uc2lk
-ZXIgYSBtb2RlIHdoZXJlIG5lX2xvYWRfaW1hZ2UgaXMgbm90IGludm9rZWQgYW5kCj4+PiB0aGUg
-ZW5jbGF2ZSBzdGFydHMgaW4gcmVhbCBtb2RlIGF0IDB4ZmZmZmZmMD8KPj4KPj4gQ29uc2lkZXIs
-IHN1cmUuIEJ1dCBJIGRvbid0IHF1aXRlIHNlZSBhbnkgYmlnIGJlbmVmaXQganVzdCB5ZXQuIFRo
-ZQo+PiBjdXJyZW50IGFic3RyYWN0aW9uIGxldmVsIGZvciB0aGUgYm9vdGVkIHBheWxvYWRzIGlz
-IG11Y2ggaGlnaGVyLiBUaGF0Cj4+IGFsbG93cyB1cyB0byBzaW1wbGlmeSB0aGUgZGV2aWNlIG1v
-ZGVsIGRyYW1hdGljYWxseTogVGhlcmUgaXMgbm8gbmVlZCB0bwo+PiBjcmVhdGUgYSB2aXJ0dWFs
-IGZsYXNoIHJlZ2lvbiBmb3IgZXhhbXBsZS4KPiAKPiBJdCBkb2Vzbid0IGhhdmUgdG8gYmUgZmxh
-c2gsIGl0IGNhbiBiZSBqdXN0IFJPTS4KPiAKPj4gSW4gYWRkaXRpb24sIGJ5IG1vdmluZyBmaXJt
-d2FyZSBpbnRvIHRoZSB0cnVzdGVkIGJhc2UsIGZpcm13YXJlIGNhbgo+PiBleGVjdXRlIHZhbGlk
-YXRpb24gb2YgdGhlIHRhcmdldCBpbWFnZS4gSWYgeW91IG1ha2UgaXQgYWxsIGZsYXQsIGhvdyBk
-bwo+PiB5b3UgdmVyaWZ5IHdoZXRoZXIgd2hhdCB5b3UncmUgYm9vdGluZyBpcyB3aGF0IHlvdSB0
-aGluayB5b3UncmUgYm9vdGluZz8KPiAKPiBTbyB0aGUgaXNzdWUgd291bGQgYmUgdGhhdCBhIGZp
-cm13YXJlIGltYWdlIHByb3ZpZGVkIGJ5IHRoZSBwYXJlbnQgY291bGQKPiBiZSB0YW1wZXJlZCB3
-aXRoIGJ5IHNvbWV0aGluZyBtYWxpY2lvdXMgcnVubmluZyBpbiB0aGUgcGFyZW50IGVuY2xhdmU/
-CgpZb3UgaGF2ZSB0byBoYXZlIGEgcm9vdCBvZiB0cnVzdCBzb21ld2hlcmUuIFRoYXQgcm9vdCB0
-aGVuIGNoZWNrcyBhbmQgCmF0dGVzdHMgZXZlcnl0aGluZyBpdCBydW5zLiBXaGF0IGV4YWN0bHkg
-d291bGQgeW91IGF0dGVzdCBmb3Igd2l0aCBhIApmbGF0IGFkZHJlc3Mgc3BhY2UgbW9kZWw/CgpT
-byB0aGUgaXNzdWUgaXMgdGhhdCB0aGUgZW5jbGF2ZSBjb2RlIGNhbiBub3QgdHJ1c3QgaXRzIG93
-biBpbnRlZ3JpdHkgaWYgCml0IGRvZXNuJ3QgaGF2ZSBhbnl0aGluZyBhdCBhIGhpZ2hlciBsZXZl
-bCBhdHRlc3RpbmcgaXQuIFRoZSB3YXkgdGhpcyBpcyAKdXN1YWxseSBzb2x2ZWQgb24gYmFyZSBt
-ZXRhbCBzeXN0ZW1zIGlzIHRoYXQgeW91IHRydXN0IHlvdXIgQ1BVIHdoaWNoIAp0aGVuIGNoZWNr
-cyB0aGUgZmlybXdhcmUgaW50ZWdyaXR5IChCb290IEd1YXJkKS4gV2hlcmUgd291bGQgeW91IHB1
-dCAKdGhhdCBjaGVjayBpbiBhIFZNIG1vZGVsPyBIb3cgY2xvc2Ugd291bGQgaXQgYmUgdG8gYSBu
-b3JtYWwgVk0gdGhlbj8gQW5kIAppZiBpdCdzIG5vdCwgd2hhdCdzIHRoZSBwb2ludCBvZiBzdGlj
-a2luZyB0byBzdWNoIHRlcnJpYmxlIGxlZ2FjeSBib290IApwYXRocz8KCgpBbGV4CgoKCkFtYXpv
-biBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJl
-cmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdl
-aXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAx
-NDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+On 30/04/20 13:47, Alexander Graf wrote:
+>>
+>> So the issue would be that a firmware image provided by the parent could
+>> be tampered with by something malicious running in the parent enclave?
+> 
+> You have to have a root of trust somewhere. That root then checks and
+> attests everything it runs. What exactly would you attest for with a
+> flat address space model?
+> 
+> So the issue is that the enclave code can not trust its own integrity if
+> it doesn't have anything at a higher level attesting it. The way this is
+> usually solved on bare metal systems is that you trust your CPU which
+> then checks the firmware integrity (Boot Guard). Where would you put
+> that check in a VM model?
+
+In the enclave device driver, I would just limit the attestation to the
+firmware image
+
+So yeah it wouldn't be a mode where ne_load_image is not invoked and
+the enclave starts in real mode at 0xffffff0.  You would still need
+"load image" functionality.
+
+> How close would it be to a normal VM then? And
+> if it's not, what's the point of sticking to such terrible legacy boot
+> paths?
+
+The point is that there's already two plausible loaders for the kernel
+(bzImage and ELF), so I'd like to decouple the loader and the image.
+
+Paolo
 
