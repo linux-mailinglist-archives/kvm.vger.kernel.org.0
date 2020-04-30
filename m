@@ -2,134 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 787741C004A
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 17:29:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08F171C007B
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 17:37:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726950AbgD3P3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 11:29:07 -0400
-Received: from mail-bn8nam12on2088.outbound.protection.outlook.com ([40.107.237.88]:6266
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726545AbgD3P3G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 11:29:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dbyB40fVSV9pFUsWvisrl3P3+n8mnpx0GWnMwl5tiSEU2Lorne8xve1DLfQWdYKc9ZTa8v27m32tvAuJlvdrixiroKnnEy13efxdFNequ2HSkrTUKYFzpm7ni2Z9g+a/PF0NsmGgjjwb1dYhcN1T8fW8OWRBhzsNOe5k9P8tUwB9xz9plKo/dX3Y1bQzRkYbMq4Sr1AzzRk0ofBs9aJ7/tHGz4F2BDC9W73jHhd5Q5FM3vwmbejaJMxDV4sk5oNDByxzhzpAnClw+4rzs0wq8l+W/bV+/64Om0Qnx0G0oPbP3yg8xdJbWD/X67XcnEJpTsJ7m74w50KZg0zohY6HMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbH2YEmi8jbC5qBJqBEOxUCRWGrLCb0i6cAhYbokmOs=;
- b=cZqqJkpHutas3HZ/lsOjC5hmrHuUpQkFlU3/QLQWO0g9iKMPU9sl6GBT95vT3oQGu095Z0Q0VPTRiUyHLmM3mV8pwLydw04Oav+BrmVLLNlu39wWTPEfuhUqiGyj68UiGXs0D0k2KVkYL754W7WWfhy/k9yVx+nJjF+kdxFUMngT9J4ptZIGGGyAxkHPhUgnms1exeBUQff8/KD7S+jx7B6Y4LplAn63Wv8zA2Hcmmo/SNypYUsJhoUcyAMQZzuYwBwDj/cWTz42PjkxmtvxFD1vcPPcd/DK3PtQdxrFrDIFw8SXSh/aHKrOPAY4KGU6TevL50iUo9AGPRCvm/cyuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbH2YEmi8jbC5qBJqBEOxUCRWGrLCb0i6cAhYbokmOs=;
- b=M4qYO1MfzdeIAnApvBhqjoqLpH8eBomPOGNtoU7+SUtHFw2X93QbWwpnRt5YkV+ihAa8T1vx3kZgK4iSQsOi+QZ33EvCzDTOcKeY8qtE2eCbrVX1w9CoxMPxXYYpmHwM2NTMMWD8OKs1qfJdiw1+oPSK52lYUoUkMTaWXLcSgNI=
-Authentication-Results: bstnet.org; dkim=none (message not signed)
- header.d=none;bstnet.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com (2603:10b6:3:7a::18) by
- DM5PR12MB1579.namprd12.prod.outlook.com (2603:10b6:4:c::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2937.22; Thu, 30 Apr 2020 15:29:04 +0000
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744]) by DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744%4]) with mapi id 15.20.2937.023; Thu, 30 Apr 2020
- 15:29:04 +0000
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [PATCH] kvm: ioapic: Introduce arch-specific check for lazy
- update EOI mechanism
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
-        borisvk@bstnet.org
-References: <1587704910-78437-1-git-send-email-suravee.suthikulpanit@amd.com>
- <b051913a-10f4-81d4-6ef8-19d586db61da@redhat.com>
-Message-ID: <445bea5b-a268-2a62-539c-235c0fe0eefa@amd.com>
-Date:   Thu, 30 Apr 2020 22:28:52 +0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
-In-Reply-To: <b051913a-10f4-81d4-6ef8-19d586db61da@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: KL1PR0401CA0009.apcprd04.prod.outlook.com
- (2603:1096:820:f::14) To DM5PR12MB1163.namprd12.prod.outlook.com
- (2603:10b6:3:7a::18)
+        id S1727829AbgD3Ph1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 11:37:27 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60826 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726619AbgD3Ph1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Apr 2020 11:37:27 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id E7D48ABBE;
+        Thu, 30 Apr 2020 15:37:22 +0000 (UTC)
+Subject: Re: [PATCH v7 11/18] mm: x86: Invoke hypercall when page encryption
+ status is changed
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
+Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        srutherford@google.com, rientjes@google.com,
+        venu.busireddy@oracle.com
+References: <cover.1588234824.git.ashish.kalra@amd.com>
+ <c167e7191cb8f9c7635f5d8cfecb1157cc96cf6b.1588234824.git.ashish.kalra@amd.com>
+ <486fe740-0c2d-9d2b-d490-bdb3215a120c@suse.com>
+ <c75af894-b216-d8c0-8863-7df1ccff5c9f@amd.com>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Message-ID: <56455051-055f-e50b-60cb-09d398916305@suse.com>
+Date:   Thu, 30 Apr 2020 17:37:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Suravees-MacBook-Pro.local (2403:6200:8862:99e1:28a3:aa38:c6d8:dc69) by KL1PR0401CA0009.apcprd04.prod.outlook.com (2603:1096:820:f::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19 via Frontend Transport; Thu, 30 Apr 2020 15:29:01 +0000
-X-Originating-IP: [2403:6200:8862:99e1:28a3:aa38:c6d8:dc69]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: eaaba941-072b-44f4-ce01-08d7ed1b36ee
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1579:|DM5PR12MB1579:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1579047514804A68ECCE1581F3AA0@DM5PR12MB1579.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1468;
-X-Forefront-PRVS: 0389EDA07F
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(376002)(396003)(136003)(366004)(39860400002)(66556008)(6486002)(66946007)(186003)(2906002)(6666004)(86362001)(53546011)(36756003)(52116002)(5660300002)(316002)(6506007)(8936002)(15650500001)(16526019)(31696002)(31686004)(66476007)(2616005)(44832011)(478600001)(4326008)(6512007)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 91gPwu01dkboORxt+T2eT9yVYVOkBf9bN+TW/tIUS+b9vaYuBZjt69lgIuwC+mAcicfq2Pm+X1OYPoZ1rnrdcY9+/2ATkYoLoSDktoie8J55sQ0MPIqOF8BGEIkLObl94hnAkq6W//YvGvUD53i6Q0/twnFgm549AAGIHkjP8E70GA+o4mUNGkoAhrotadSsrAZEXHExHgb1dJ1u7OE/7YCLiTRqfJtDRyIWK5eOCzdsm6chD0VMkXvJRAbKxhWT54wUYAMVDhOVcamLTcrMMHc04vkNFVEMjIkp0j2kC/uCc+6MgPzxQ1ARBiB7IsfFZ0Ur1Vh1ceMANttrPEibXcwGB/o/rfFeUqwX+tHcfuvTPZ7KAIo6DX1wXXu2Ya7FdMe8fWaUWMlVTSwHDeEi8c04epO+aEB2io8ZXi7jmphQJHFST/w8dGt8o10uaNjZ
-X-MS-Exchange-AntiSpam-MessageData: SRVMN7nXX/j2P9AAUspDGDbRDu8VQobO7jbnmwlpD7w5hPx+pX0Z/+1sFdBHYgdZUruucSKH+Wup71CQtDz+BpxblAhO6J55Zlsc89i2y3pTIRLEq+iizT57YIwCSelWsy0y3VtYqm6oJLvUre80aaUHiYL0DWKKwMWThXQqaJ+RuugKRGpTcTT8vqoFulx7AB9+5/RIdqf0boagEwuwaId3oqvH6VAzgPl8OJ4L+MhlaxzsaDtqCAKrLXjvs/bQSye/GS+47uCqHBvcIcGxGfu5DjZUcrwfJ/sXjGC3RcO0R7hQhMzRFTAEyh9HmNGBUz7xWx5oWNiqjDrVhl30rbhSk/3rlmA+bv25dl1pltpfpZhNMQGdlAA1KmIv10TR7Nsl22vegGOMolO9McMmgxJ+swKfa6P0pESmOz7Dyk4qy/RTz6vlxO5Ihx7mUVNENaZRYWe+AfgubeyQ/cRMEYUzT/6emxS+/BWH4QbaKDzgddgBAiObMScW03j/PlwrNiiIIN6ZF8YyQe7UoWaP3XMXt+lgQbk2Y56L0vMaJtz7HSKvXv6yuMRd7sYGZwMyenTXsUvhOT9CxNgUACPm2wktI1E8MMH9tNF999wDPlyloSsqRGhYbeJJAmxRPXkNJDNLS5wN782CLLmrJ06z7qJOML0OCUYi+xSfvkyXJAYKK9puyqD+S5GwwH9uI4S+g2ANIbp1g5ZrO1Q3xpuJYYz/GtRoI3OVCC0LvVn8WabaW6W39llmPgkUcgzkFnIMteQg7LYlt1ZEq7ix8jIbV7uCREnceIvPs2WnNrwGanMfXJEwSis6vNza7Nxy0VhTFnU8wSBSzkurCo9q0ev7M3crpmHYtV+jIpx33gDQeyIScOoJc+8TfgFJo+Yr7Ne7
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eaaba941-072b-44f4-ce01-08d7ed1b36ee
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 15:29:03.9853
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rkLQ76+u1weN93p9tGP5sXafft3Mhdbf2lXlgzkGLRTSDb0CErgnZzoop/fHtyf4tVe1nZ7/YKqh3mRmWx3PIw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1579
+In-Reply-To: <c75af894-b216-d8c0-8863-7df1ccff5c9f@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
-
-On 4/25/20 4:52 PM, Paolo Bonzini wrote:
-> On 24/04/20 07:08, Suravee Suthikulpanit wrote:
->> commit f458d039db7e ("kvm: ioapic: Lazy update IOAPIC EOI") introduces
->> the following regression on Intel VMX APICv.
->>
->> BUG: stack guard page was hit at 000000008f595917 \
->> (stack is 00000000bdefe5a4..00000000ae2b06f5)
->> kernel stack overflow (double-fault): 0000 [#1] SMP NOPTI
->> RIP: 0010:kvm_set_irq+0x51/0x160 [kvm]
->> Call Trace:
->>   irqfd_resampler_ack+0x32/0x90 [kvm]
->>   kvm_notify_acked_irq+0x62/0xd0 [kvm]
->>   kvm_ioapic_update_eoi_one.isra.0+0x30/0x120 [kvm]
->>   ioapic_set_irq+0x20e/0x240 [kvm]
->>   kvm_ioapic_set_irq+0x5c/0x80 [kvm]
->>   kvm_set_irq+0xbb/0x160 [kvm]
->>   ? kvm_hv_set_sint+0x20/0x20 [kvm]
->>   irqfd_resampler_ack+0x32/0x90 [kvm]
->>   kvm_notify_acked_irq+0x62/0xd0 [kvm]
->>   kvm_ioapic_update_eoi_one.isra.0+0x30/0x120 [kvm]
->>   ioapic_set_irq+0x20e/0x240 [kvm]
->>   kvm_ioapic_set_irq+0x5c/0x80 [kvm]
->>   kvm_set_irq+0xbb/0x160 [kvm]
->>   ? kvm_hv_set_sint+0x20/0x20 [kvm]
->> ....
->>
->> This is due to the logic always force IOAPIC lazy update EOI mechanism
->> when APICv is activated, which is only needed by AMD SVM AVIC.
->>
->> Fixes by introducing struct kvm_arch.use_lazy_eoi variable to specify
->> whether the architecture needs lazy update EOI support.
+On 30.04.20 17:21, Brijesh Singh wrote:
 > 
-> You are not explaining why the same infinite loop cannot happen on AMD.
->   It seems to me that it is also fixed by adding a check for re-entrancy
-> in ioapic_lazy_update_eoi.  It's easy to add one since
-> ioapic_lazy_update_eoi is called with the ioapic->lock taken.
+> On 4/30/20 4:49 AM, Jürgen Groß wrote:
+>> On 30.04.20 10:45, Ashish Kalra wrote:
+>>> From: Brijesh Singh <Brijesh.Singh@amd.com>
+>>>
+>>> Invoke a hypercall when a memory region is changed from encrypted ->
+>>> decrypted and vice versa. Hypervisor needs to know the page encryption
+>>> status during the guest migration.
+>>>
+>>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>>> Cc: Ingo Molnar <mingo@redhat.com>
+>>> Cc: "H. Peter Anvin" <hpa@zytor.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+>>> Cc: Joerg Roedel <joro@8bytes.org>
+>>> Cc: Borislav Petkov <bp@suse.de>
+>>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+>>> Cc: x86@kernel.org
+>>> Cc: kvm@vger.kernel.org
+>>> Cc: linux-kernel@vger.kernel.org
+>>> Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>> ---
+>>>    arch/x86/include/asm/paravirt.h       | 10 +++++
+>>>    arch/x86/include/asm/paravirt_types.h |  2 +
+>>>    arch/x86/kernel/paravirt.c            |  1 +
+>>>    arch/x86/mm/mem_encrypt.c             | 58 ++++++++++++++++++++++++++-
+>>>    arch/x86/mm/pat/set_memory.c          |  7 ++++
+>>>    5 files changed, 77 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/x86/include/asm/paravirt.h
+>>> b/arch/x86/include/asm/paravirt.h
+>>> index 694d8daf4983..8127b9c141bf 100644
+>>> --- a/arch/x86/include/asm/paravirt.h
+>>> +++ b/arch/x86/include/asm/paravirt.h
+>>> @@ -78,6 +78,12 @@ static inline void paravirt_arch_exit_mmap(struct
+>>> mm_struct *mm)
+>>>        PVOP_VCALL1(mmu.exit_mmap, mm);
+>>>    }
+>>>    +static inline void page_encryption_changed(unsigned long vaddr,
+>>> int npages,
+>>> +                        bool enc)
+>>> +{
+>>> +    PVOP_VCALL3(mmu.page_encryption_changed, vaddr, npages, enc);
+>>> +}
+>>> +
+>>>    #ifdef CONFIG_PARAVIRT_XXL
+>>>    static inline void load_sp0(unsigned long sp0)
+>>>    {
+>>> @@ -946,6 +952,10 @@ static inline void paravirt_arch_dup_mmap(struct
+>>> mm_struct *oldmm,
+>>>    static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
+>>>    {
+>>>    }
+>>> +
+>>> +static inline void page_encryption_changed(unsigned long vaddr, int
+>>> npages, bool enc)
+>>> +{
+>>> +}
+>>>    #endif
+>>>    #endif /* __ASSEMBLY__ */
+>>>    #endif /* _ASM_X86_PARAVIRT_H */
+>>> diff --git a/arch/x86/include/asm/paravirt_types.h
+>>> b/arch/x86/include/asm/paravirt_types.h
+>>> index 732f62e04ddb..03bfd515c59c 100644
+>>> --- a/arch/x86/include/asm/paravirt_types.h
+>>> +++ b/arch/x86/include/asm/paravirt_types.h
+>>> @@ -215,6 +215,8 @@ struct pv_mmu_ops {
+>>>          /* Hook for intercepting the destruction of an mm_struct. */
+>>>        void (*exit_mmap)(struct mm_struct *mm);
+>>> +    void (*page_encryption_changed)(unsigned long vaddr, int npages,
+>>> +                    bool enc);
+>>>      #ifdef CONFIG_PARAVIRT_XXL
+>>>        struct paravirt_callee_save read_cr2;
+>>> diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+>>> index c131ba4e70ef..840c02b23aeb 100644
+>>> --- a/arch/x86/kernel/paravirt.c
+>>> +++ b/arch/x86/kernel/paravirt.c
+>>> @@ -367,6 +367,7 @@ struct paravirt_patch_template pv_ops = {
+>>>                (void (*)(struct mmu_gather *, void *))tlb_remove_page,
+>>>          .mmu.exit_mmap        = paravirt_nop,
+>>> +    .mmu.page_encryption_changed    = paravirt_nop,
+>>>      #ifdef CONFIG_PARAVIRT_XXL
+>>>        .mmu.read_cr2        = __PV_IS_CALLEE_SAVE(native_read_cr2),
+>>> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+>>> index f4bd4b431ba1..603f5abf8a78 100644
+>>> --- a/arch/x86/mm/mem_encrypt.c
+>>> +++ b/arch/x86/mm/mem_encrypt.c
+>>> @@ -19,6 +19,7 @@
+>>>    #include <linux/kernel.h>
+>>>    #include <linux/bitops.h>
+>>>    #include <linux/dma-mapping.h>
+>>> +#include <linux/kvm_para.h>
+>>>      #include <asm/tlbflush.h>
+>>>    #include <asm/fixmap.h>
+>>> @@ -29,6 +30,7 @@
+>>>    #include <asm/processor-flags.h>
+>>>    #include <asm/msr.h>
+>>>    #include <asm/cmdline.h>
+>>> +#include <asm/kvm_para.h>
+>>>      #include "mm_internal.h"
+>>>    @@ -196,6 +198,48 @@ void __init sme_early_init(void)
+>>>            swiotlb_force = SWIOTLB_FORCE;
+>>>    }
+>>>    +static void set_memory_enc_dec_hypercall(unsigned long vaddr, int
+>>> npages,
+>>> +                    bool enc)
+>>> +{
+>>> +    unsigned long sz = npages << PAGE_SHIFT;
+>>> +    unsigned long vaddr_end, vaddr_next;
+>>> +
+>>> +    vaddr_end = vaddr + sz;
+>>> +
+>>> +    for (; vaddr < vaddr_end; vaddr = vaddr_next) {
+>>> +        int psize, pmask, level;
+>>> +        unsigned long pfn;
+>>> +        pte_t *kpte;
+>>> +
+>>> +        kpte = lookup_address(vaddr, &level);
+>>> +        if (!kpte || pte_none(*kpte))
+>>> +            return;
+>>> +
+>>> +        switch (level) {
+>>> +        case PG_LEVEL_4K:
+>>> +            pfn = pte_pfn(*kpte);
+>>> +            break;
+>>> +        case PG_LEVEL_2M:
+>>> +            pfn = pmd_pfn(*(pmd_t *)kpte);
+>>> +            break;
+>>> +        case PG_LEVEL_1G:
+>>> +            pfn = pud_pfn(*(pud_t *)kpte);
+>>> +            break;
+>>> +        default:
+>>> +            return;
+>>> +        }
+>>> +
+>>> +        psize = page_level_size(level);
+>>> +        pmask = page_level_mask(level);
+>>> +
+>>> +        if (x86_platform.hyper.sev_migration_hcall)
+>>> +            x86_platform.hyper.sev_migration_hcall(pfn << PAGE_SHIFT,
+>>> +                                   psize >> PAGE_SHIFT,
+>>> +                                   enc);
+>>
+>> Why do you need two indirections? One via pv.mmu_ops and then another
+>> via x86_platform.hyper? Isn't one enough?
+>>
+> Currently, there is no strong reason to have two indirections other than
+> building a flexibility for the future expansion, e.g when we add SEV
+> support for the Xen then hypercall invocation may be slightly different
+> but the code to walk the page table to find the GPA will be same for
+> both KVM and Xen. The pv.mmu_ops provides a generic indirection which
+> can be used by set_memory_{decrypted,encrypted}. I will look into
+> removing the extra indirection in next version. thanks.
 > 
-> Paolo
+> 
+>> And if x86_platform.hyper.sev_migration_hcall isn't set the whole loop
+>> is basically a nop.
+>>
+> Yes, this double indirection has a draw back that we will be executing
+> the unnecessary code  when x86_platform.hyper.sev_migration_hcall isn't
+> set. I will look into improving it.
+> 
+> 
+>>> +        vaddr_next = (vaddr & pmask) + psize;
+>>> +    }
+>>> +}
+>>> +
+>>>    static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
+>>>    {
+>>>        pgprot_t old_prot, new_prot;
+>>> @@ -253,12 +297,13 @@ static void __init __set_clr_pte_enc(pte_t
+>>> *kpte, int level, bool enc)
+>>>    static int __init early_set_memory_enc_dec(unsigned long vaddr,
+>>>                           unsigned long size, bool enc)
+>>>    {
+>>> -    unsigned long vaddr_end, vaddr_next;
+>>> +    unsigned long vaddr_end, vaddr_next, start;
+>>>        unsigned long psize, pmask;
+>>>        int split_page_size_mask;
+>>>        int level, ret;
+>>>        pte_t *kpte;
+>>>    +    start = vaddr;
+>>>        vaddr_next = vaddr;
+>>>        vaddr_end = vaddr + size;
+>>>    @@ -313,6 +358,8 @@ static int __init
+>>> early_set_memory_enc_dec(unsigned long vaddr,
+>>>          ret = 0;
+>>>    +    set_memory_enc_dec_hypercall(start, PAGE_ALIGN(size) >>
+>>> PAGE_SHIFT,
+>>> +                    enc);
+>>>    out:
+>>>        __flush_tlb_all();
+>>>        return ret;
+>>> @@ -451,6 +498,15 @@ void __init mem_encrypt_init(void)
+>>>        if (sev_active())
+>>>            static_branch_enable(&sev_enable_key);
+>>>    +#ifdef CONFIG_PARAVIRT
+>>> +    /*
+>>> +     * With SEV, we need to make a hypercall when page encryption
+>>> state is
+>>> +     * changed.
+>>> +     */
+>>> +    if (sev_active())
+>>> +        pv_ops.mmu.page_encryption_changed =
+>>> set_memory_enc_dec_hypercall;
+>>> +#endif
+>>> +
+>>>        pr_info("AMD %s active\n",
+>>>            sev_active() ? "Secure Encrypted Virtualization (SEV)"
+>>>                     : "Secure Memory Encryption (SME)");
+>>> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
+>>> index 59eca6a94ce7..9aaf1b6f5a1b 100644
+>>> --- a/arch/x86/mm/pat/set_memory.c
+>>> +++ b/arch/x86/mm/pat/set_memory.c
+>>> @@ -27,6 +27,7 @@
+>>>    #include <asm/proto.h>
+>>>    #include <asm/memtype.h>
+>>>    #include <asm/set_memory.h>
+>>> +#include <asm/paravirt.h>
+>>>      #include "../mm_internal.h"
+>>>    @@ -2003,6 +2004,12 @@ static int __set_memory_enc_dec(unsigned
+>>> long addr, int numpages, bool enc)
+>>>         */
+>>>        cpa_flush(&cpa, 0);
+>>>    +    /* Notify hypervisor that a given memory range is mapped
+>>> encrypted
+>>> +     * or decrypted. The hypervisor will use this information during
+>>> the
+>>> +     * VM migration.
+>>> +     */
+>>> +    page_encryption_changed(addr, numpages, enc);
+>>
+>> Is this operation really so performance critical that a pv-op is
+>> needed? Wouldn't a static key be sufficient here?
+>>
+> Well, in a typical Linux kernel boot it does not get called so many
+> times. We noticed that some drivers (mainly nvme) calls it more often
+> than others. I am open for the suggestions, we went with the pv-op path
+> based on the previous feedbacks. A static key maybe sufficient as well.
 > 
 
-I finally reproduced on AMD system as well. I'll send out a new patch for this based on your suggestion.
+I'm fine with a pv-op if this is seen to be the way to go. But I would
+skip the x86_platform.hyper indirection and call the kvm specific
+function directly. In case Xen gains SEV capability we can still either
+add the indirection again or just copy the KVM function and replace the
+hypercall with the Xen variant.
 
-Suravee
+
+Juergen
