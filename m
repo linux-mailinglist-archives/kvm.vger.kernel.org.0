@@ -2,110 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA1BC1BF9DE
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 15:46:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E98A91BF9F5
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 15:49:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727080AbgD3Nqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 09:46:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56716 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726577AbgD3Nqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 09:46:55 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6A1732082E;
-        Thu, 30 Apr 2020 13:46:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588254414;
-        bh=cIGsayzyQrmoAosJwNbheDRWF4TGcuP/5fJyINZP78U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BRMV7FauM4SoitKAPFxH/263TwK51GMEbX2WUTdzhWUPJYlLMMchtTpkp3VX4JOUR
-         7ifde/j5zTwb0Zt2UrTSiL0TrRKM9w9fUc4hJ0F5NYKAx1p9Qc9Ah6bCL5S6NGIudW
-         7MDW0NUmac55807mzyt0EoogYvL7pcm3ttyAYaNk=
-Date:   Thu, 30 Apr 2020 14:46:50 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Fix 32bit PC wrap-around
-Message-ID: <20200430134649.GC22842@willie-the-truck>
-References: <20200430101513.318541-1-maz@kernel.org>
- <20200430102556.GE19932@willie-the-truck>
- <897baec2a3fad776716bccf3027340fa@kernel.org>
- <20200430123104.GB22842@willie-the-truck>
- <1c0175a09a90d2b7c0243e5bcec7cc9a@kernel.org>
+        id S1727083AbgD3Ntm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 09:49:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47894 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726577AbgD3Ntm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 30 Apr 2020 09:49:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588254580;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IEBaJZZn8G4VkvBwEauwJGfaJC10NnAmuAyBH5fbQnA=;
+        b=iaf3zV3Xgq0QboukIov4LFQs/xI3nDGXw1LztcirUB6aWpJmKX0eM2v1epQsV1mlMnsBS0
+        3rF4EItQqOnOFsJ8/tb8LVl6CHKnbV3ddMXdxjJZZtu+by8aCCV7H/dxj0U3XkfZ0GOfX0
+        KPspAjP8K2MnkPGU4ObYDYRB+lOFt/o=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-B-HPsFwMPm2O4L81L7fZaA-1; Thu, 30 Apr 2020 09:49:36 -0400
+X-MC-Unique: B-HPsFwMPm2O4L81L7fZaA-1
+Received: by mail-wm1-f69.google.com with SMTP id f128so880836wmf.8
+        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 06:49:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=IEBaJZZn8G4VkvBwEauwJGfaJC10NnAmuAyBH5fbQnA=;
+        b=dienl/MQRmdJeiZTCPgF0L6eQ3TitbhgxM5p0whIPiMiZkg98ogBGuNbANSgjsPEwF
+         /7atGxHqEoZ1eIP2nS6woHwVumKjVq8ErQGvqXYnrcPRnP+segOWP5wZYoUBV//JB7PS
+         wNIsMH7RCEs9k00hkdYQuUecryy2vdRR7PUYVf95aYWCjnNRNGEcB3wbCwq+sNpd6NK0
+         8E5sZbtJ14tNTFrv+a4y6PyndlZ5mV5lqeSXUSdzDSHQEjmHGDPLCWftn/LGsO6TFTWd
+         nuem7SXNZ8SbLsamk4QnXCDNdIavMtrS1qB8bq+UMXTRzvSC0/g8wSNAkZgQPO/MhPCV
+         pFvg==
+X-Gm-Message-State: AGi0Pubu5Tk2aM9vdVeuLqluOjN1epZs1ewiE5G28S5xTWmNSJJnIVWL
+        LxEey2iZvcXjlwb2KJraV7sab3kik3Kx8cHZceXS5YvkOXx0fMcwEWOlBYkm/u2CWSnMKFKlUsF
+        kHsEcML4dJ9xy
+X-Received: by 2002:a1c:6a0b:: with SMTP id f11mr3082435wmc.123.1588254575072;
+        Thu, 30 Apr 2020 06:49:35 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKPdUBEwRbmSXCzUBZ0gX8bjI8gMw9HBoTwk6kFinzxWLo9L+OUtgiEezO+fqbN+i/GXfMCCg==
+X-Received: by 2002:a1c:6a0b:: with SMTP id f11mr3082411wmc.123.1588254574896;
+        Thu, 30 Apr 2020 06:49:34 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id 91sm4520928wra.37.2020.04.30.06.49.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2020 06:49:34 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 3/6] KVM: x86: interrupt based APF page-ready event delivery
+In-Reply-To: <20200430132805.GB40678@xz-x1>
+References: <20200429093634.1514902-1-vkuznets@redhat.com> <20200429093634.1514902-4-vkuznets@redhat.com> <20200429212708.GA40678@xz-x1> <87v9lhfk7v.fsf@vitty.brq.redhat.com> <20200430132805.GB40678@xz-x1>
+Date:   Thu, 30 Apr 2020 15:49:33 +0200
+Message-ID: <877dxxf5hu.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c0175a09a90d2b7c0243e5bcec7cc9a@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 01:45:51PM +0100, Marc Zyngier wrote:
-> On 2020-04-30 13:31, Will Deacon wrote:
-> > On Thu, Apr 30, 2020 at 11:59:05AM +0100, Marc Zyngier wrote:
-> > > On 2020-04-30 11:25, Will Deacon wrote:
-> > > > On Thu, Apr 30, 2020 at 11:15:13AM +0100, Marc Zyngier wrote:
-> > > > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > > > > index 23ebe51410f0..2a159af82429 100644
-> > > > > --- a/arch/arm64/kvm/guest.c
-> > > > > +++ b/arch/arm64/kvm/guest.c
-> > > > > @@ -200,6 +200,10 @@ static int set_core_reg(struct kvm_vcpu *vcpu,
-> > > > > const struct kvm_one_reg *reg)
-> > > > >  	}
-> > > > >
-> > > > >  	memcpy((u32 *)regs + off, valp, KVM_REG_SIZE(reg->id));
-> > > > > +
-> > > > > +	if (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK)
-> > > > > +		*vcpu_pc(vcpu) = lower_32_bits(*vcpu_pc(vcpu));
-> > > >
-> > > > It seems slightly odd to me that we don't enforce this for *all* the
-> > > > registers when running as a 32-bit guest. Couldn't userspace be equally
-> > > > confused by a 64-bit lr or sp?
-> > > 
-> > > Fair point. How about this on top, which wipes the upper 32 bits for
-> > > each and every register in the current mode:
-> > > 
-> > > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > > index 2a159af82429..f958c3c7bf65 100644
-> > > --- a/arch/arm64/kvm/guest.c
-> > > +++ b/arch/arm64/kvm/guest.c
-> > > @@ -201,9 +201,12 @@ static int set_core_reg(struct kvm_vcpu *vcpu,
-> > > const
-> > > struct kvm_one_reg *reg)
-> > > 
-> > >  	memcpy((u32 *)regs + off, valp, KVM_REG_SIZE(reg->id));
-> > > 
-> > > -	if (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK)
-> > > -		*vcpu_pc(vcpu) = lower_32_bits(*vcpu_pc(vcpu));
-> > > +	if (*vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK) {
-> > > +		int i;
-> > > 
-> > > +		for (i = 0; i < 16; i++)
-> > > +			*vcpu_reg32(vcpu, i) = (u32)*vcpu_reg32(vcpu, i);
-> > 
-> > I think you're missing all the funny banked registers that live all the
-> > way
-> > up to x30 iirc.
-> 
-> No, they are all indirected via vcpu_reg32(), which has the magic tables.
-> And the whole point is that we only want to affect the current mode (no
-> point
-> in repainting the FIQ registers if the PSR says USR).
-> 
-> Or am I missing something obvious?
+Peter Xu <peterx@redhat.com> writes:
 
-Nope, just my inability to parse vcpu_reg32 the first time around! So, for
-the updated patch:
+> On Thu, Apr 30, 2020 at 10:31:32AM +0200, Vitaly Kuznetsov wrote:
+>> as we need to write to two MSRs to configure the new mechanism ordering
+>> becomes important. If the guest writes to ASYNC_PF_EN first to establish
+>> the shared memory stucture the interrupt in ASYNC_PF2 is not yet set
+>> (and AFAIR '0' is a valid interrupt!) so if an async pf happens
+>> immediately after that we'll be forced to inject INT0 in the guest and
+>> it'll get confused and linkely miss the event.
+>> 
+>> We can probably mandate the reverse sequence: guest has to set up
+>> interrupt in ASYNC_PF2 first and then write to ASYNC_PF_EN (with both
+>> bit 0 and bit 3). In that case the additional 'enable' bit in ASYNC_PF2
+>> seems redundant. This protocol doesn't look too complex for guests to
+>> follow.
+>
+> Yep looks good.  We should also update the document too about the fact.
+>
 
-Acked-by: Will Deacon <will@kernel.org?
+Of course. It will also mention the fact that #PF-based mechanism is
+now depreceted and unless guest opts into interrupt based delivery
+async_pf is not functional (except for APF_HALT).
 
-Thanks,
+-- 
+Vitaly
 
-Will
