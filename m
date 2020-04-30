@@ -2,118 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17DF01BEE00
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 04:01:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F82E1BEE25
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 04:13:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726511AbgD3CBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 22:01:30 -0400
-Received: from mx22.baidu.com ([220.181.50.185]:38918 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726282AbgD3CBa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 Apr 2020 22:01:30 -0400
-Received: from BC-Mail-Ex16.internal.baidu.com (unknown [172.31.51.56])
-        by Forcepoint Email with ESMTPS id 7AD7E984D2F571FACB69;
-        Thu, 30 Apr 2020 09:45:30 +0800 (CST)
-Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
- BC-Mail-Ex16.internal.baidu.com (172.31.51.56) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1531.3; Thu, 30 Apr 2020 09:45:30 +0800
-Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
- BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
- 15.01.1713.004; Thu, 30 Apr 2020 09:45:30 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdW3YyXSBrdm06IHg4NjogZW11bGF0ZSBBUEVSRi9N?=
- =?utf-8?Q?PERF_registers?=
-Thread-Topic: [PATCH][v2] kvm: x86: emulate APERF/MPERF registers
-Thread-Index: AQHWHgPRaxq7VoyE2kqvmC7wjQtzhaiPXbuAgAGG2mA=
-Date:   Thu, 30 Apr 2020 01:45:30 +0000
-Message-ID: <bea20279850d48848e0b21f7cbb39bdb@baidu.com>
-References: <1588139196-23802-1-git-send-email-lirongqing@baidu.com>
- <20200429085440.GG13592@hirez.programming.kicks-ass.net>
- <201824a4-6b0f-9061-ec21-26d71fa11bc4@redhat.com>
-In-Reply-To: <201824a4-6b0f-9061-ec21-26d71fa11bc4@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.198.11]
-x-baidu-bdmsfe-datecheck: 1_BC-Mail-Ex16_2020-04-30 09:45:30:295
-x-baidu-bdmsfe-viruscheck: BC-Mail-Ex16_GRAY_Inside_WithoutAtta_2020-04-30
- 09:45:30:186
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        id S1726784AbgD3CN0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 Apr 2020 22:13:26 -0400
+Received: from foss.arm.com ([217.140.110.172]:47702 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726180AbgD3CN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 Apr 2020 22:13:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C31E61063;
+        Wed, 29 Apr 2020 19:13:25 -0700 (PDT)
+Received: from localhost.localdomain (entos-thunderx2-02.shanghai.arm.com [10.169.138.57])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2019D3F68F;
+        Wed, 29 Apr 2020 19:13:22 -0700 (PDT)
+From:   Jia He <justin.he@arm.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kaly.Xin@arm.com, Jia He <justin.he@arm.com>
+Subject: [PATCH] vhost: vsock: don't send pkt when vq is not started
+Date:   Thu, 30 Apr 2020 10:13:14 +0800
+Message-Id: <20200430021314.6425-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFBhb2xvIEJvbnppbmkg
-W21haWx0bzpwYm9uemluaUByZWRoYXQuY29tXQ0KPiDlj5HpgIHml7bpl7Q6IDIwMjDlubQ05pyI
-Mjnml6UgMTg6MjENCj4g5pS25Lu25Lq6OiBQZXRlciBaaWpsc3RyYSA8cGV0ZXJ6QGluZnJhZGVh
-ZC5vcmc+OyBMaSxSb25ncWluZw0KPiA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+IOaKhOmAgTog
-bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsga3ZtQHZnZXIua2VybmVsLm9yZzsgeDg2QGtl
-cm5lbC5vcmc7DQo+IGhwYUB6eXRvci5jb207IGJwQGFsaWVuOC5kZTsgbWluZ29AcmVkaGF0LmNv
-bTsgdGdseEBsaW51dHJvbml4LmRlOw0KPiBqb3JvQDhieXRlcy5vcmc7IGptYXR0c29uQGdvb2ds
-ZS5jb207IHdhbnBlbmdsaUB0ZW5jZW50LmNvbTsNCj4gdmt1em5ldHNAcmVkaGF0LmNvbTsgc2Vh
-bi5qLmNocmlzdG9waGVyc29uQGludGVsLmNvbQ0KPiDkuLvpopg6IFJlOiBbUEFUQ0hdW3YyXSBr
-dm06IHg4NjogZW11bGF0ZSBBUEVSRi9NUEVSRiByZWdpc3RlcnMNCj4gDQo+IE9uIDI5LzA0LzIw
-IDEwOjU0LCBQZXRlciBaaWpsc3RyYSB3cm90ZToNCj4gPiBPbiBXZWQsIEFwciAyOSwgMjAyMCBh
-dCAwMTo0NjozNlBNICswODAwLCBMaSBSb25nUWluZyB3cm90ZToNCj4gPj4gR3Vlc3Qga2VybmVs
-IHJlcG9ydHMgYSBmaXhlZCBjcHUgZnJlcXVlbmN5IGluIC9wcm9jL2NwdWluZm8sIHRoaXMgaXMN
-Cj4gPj4gY29uZnVzZWQgdG8gdXNlciB3aGVuIHR1cmJvIGlzIGVuYWJsZSwgYW5kIGFwZXJmL21w
-ZXJmIGNhbiBiZSB1c2VkIHRvDQo+ID4+IHNob3cgY3VycmVudCBjcHUgZnJlcXVlbmN5IGFmdGVy
-IDdkNTkwNWRjMTRhDQo+ID4+ICIoeDg2IC8gQ1BVOiBBbHdheXMgc2hvdyBjdXJyZW50IENQVSBm
-cmVxdWVuY3kgaW4gL3Byb2MvY3B1aW5mbykiDQo+ID4+IHNvIHdlIHNob3VsZCBlbXVsYXRlIGFw
-ZXJmIG1wZXJmIHRvIGFjaGlldmUgaXQNCj4gPj4NCj4gPj4gdGhlIHBlcmlvZCBvZiBhcGVyZi9t
-cGVyZiBpbiBndWVzdCBtb2RlIGFyZSBhY2N1bXVsYXRlZCBhcyBlbXVsYXRlZA0KPiA+PiB2YWx1
-ZSwgYW5kIGFkZCBwZXItVk0ga25vZCB0byBlbmFibGUgZW11bGF0ZSBtcGVyZmFwZXJmDQo+ID4+
-DQo+ID4+IGRpZmYgdjE6DQo+ID4+IDEuIHN1cHBvcnQgQU1EDQo+ID4+IDIuIHN1cHBvcnQgcGVy
-LXZtIGNhcGFiaWxpdHkgdG8gZW5hYmxlDQo+ID4gV291bGQgaXQgbWFrZSBzZW5zZSB0byBwcm92
-aWRlIGEgcGFzcy10aHJvdWdoIEFQRVJGL01QRVJGIGZvcg0KPiA+IEtWTV9ISU5UU19SRUFMVElN
-RSA/IEJlY2F1c2UgdGhhdCBoaW50IGd1YXJhbnRlZXMgd2UgaGF2ZSBhIDE6MQ0KPiA+IHZDUFU6
-Q1BVIGJpbmRpbmcgYW5kIGd1YXJhbnRlZWQgbm8gb3Zlci1jb21taXQuDQo+ID4NCj4gDQo+IFll
-cyBidXQgdGhhdCdzIHVwIHRvIHVzZXJzcGFjZS4NCj4gDQo+IFBhb2xvDQoNClNlZW0ga2VybmVs
-IHNob3VsZCBnaXZlIHRoZSBjYXBhYmlsaXR5IHRvIHVzZXJzcGFjZSB0byBkaXNhYmxlIHRoZSBp
-bnRlcmNlcHQgbXBlcmYvYXBlcmYgZm9yIEtWTV9ISU5UU19SRUFMVElNRQ0KDQpTbyBJIHdpbGwg
-Y2hhbmdlIHRoaXMgcGF0Y2ggdG8gc3VwcG9ydCB0aHJlZSBtb2RlIG1wZXJmYXBlcmY6ICBub25l
-LCBzb2Z0d2FyZSBlbXVsYXRlLCBhbmQgcHQNCg0KDQpkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3Zt
-L3N2bS5jIGIvYXJjaC94ODYva3ZtL3N2bS5jDQppbmRleCAxZDE1N2E4ZGJhNDYuLjZiMDVmNzhi
-ZGU3OCAxMDA2NDQNCi0tLSBhL2FyY2gveDg2L2t2bS9zdm0uYw0KKysrIGIvYXJjaC94ODYva3Zt
-L3N2bS5jDQpAQCAtMTY1Nyw5ICsxNjU3LDExIEBAIHN0YXRpYyB2b2lkIGluaXRfdm1jYihzdHJ1
-Y3QgdmNwdV9zdm0gKnN2bSkNCiAgICAgICAgc2V0X2ludGVyY2VwdChzdm0sIElOVEVSQ0VQVF9T
-S0lOSVQpOw0KICAgICAgICBzZXRfaW50ZXJjZXB0KHN2bSwgSU5URVJDRVBUX1dCSU5WRCk7DQog
-ICAgICAgIHNldF9pbnRlcmNlcHQoc3ZtLCBJTlRFUkNFUFRfWFNFVEJWKTsNCi0gICAgICAgc2V0
-X2ludGVyY2VwdChzdm0sIElOVEVSQ0VQVF9SRFBSVSk7DQogICAgICAgIHNldF9pbnRlcmNlcHQo
-c3ZtLCBJTlRFUkNFUFRfUlNNKTsNCiANCisgICAgICAgaWYgKCFndWVzdF9tcGVyZmFwZXJmX3B0
-KHN2bS0+dmNwdS5rdm0pKQ0KKyAgICAgICAgICAgICAgIHNldF9pbnRlcmNlcHQoc3ZtLCBJTlRF
-UkNFUFRfUkRQUlUpOw0KKw0KICAgICAgICBpZiAoIWt2bV9td2FpdF9pbl9ndWVzdChzdm0tPnZj
-cHUua3ZtKSkgew0KICAgICAgICAgICAgICAgIHNldF9pbnRlcmNlcHQoc3ZtLCBJTlRFUkNFUFRf
-TU9OSVRPUik7DQogICAgICAgICAgICAgICAgc2V0X2ludGVyY2VwdChzdm0sIElOVEVSQ0VQVF9N
-V0FJVCk7DQpkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3ZteC92bXguYyBiL2FyY2gveDg2L2t2
-bS92bXgvdm14LmMNCmluZGV4IGIwNWUyNzZlMjYyYi4uMjMxNzMyOTI0YzUwIDEwMDY0NA0KLS0t
-IGEvYXJjaC94ODYva3ZtL3ZteC92bXguYw0KKysrIGIvYXJjaC94ODYva3ZtL3ZteC92bXguYw0K
-QEAgLTY3NjUsNiArNjc2NSwxMiBAQCBzdGF0aWMgaW50IHZteF9jcmVhdGVfdmNwdShzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUpDQogICAgICAgICAgICAgICAgdm14X2Rpc2FibGVfaW50ZXJjZXB0X2Zv
-cl9tc3IobXNyX2JpdG1hcCwgTVNSX0NPUkVfQzZfUkVTSURFTkNZLCBNU1JfVFlQRV9SKTsNCiAg
-ICAgICAgICAgICAgICB2bXhfZGlzYWJsZV9pbnRlcmNlcHRfZm9yX21zcihtc3JfYml0bWFwLCBN
-U1JfQ09SRV9DN19SRVNJREVOQ1ksIE1TUl9UWVBFX1IpOw0KICAgICAgICB9DQorDQorICAgICAg
-IGlmIChndWVzdF9tcGVyZmFwZXJmX3B0KHZjcHUtPmt2bSkpIHsNCisgICAgICAgICAgICAgICB2
-bXhfZGlzYWJsZV9pbnRlcmNlcHRfZm9yX21zcihtc3JfYml0bWFwLCBNU1JfSUEzMl9NUEVSRiwg
-TVNSX1RZUEVfUik7DQorICAgICAgICAgICAgICAgdm14X2Rpc2FibGVfaW50ZXJjZXB0X2Zvcl9t
-c3IobXNyX2JpdG1hcCwgTVNSX0lBMzJfQVBFUkYsIE1TUl9UWVBFX1IpOw0KKyAgICAgICB9DQor
-DQogICAgICAgIHZteC0+bXNyX2JpdG1hcF9tb2RlID0gMDsNCiANCiAgICAgICAgdm14LT5sb2Fk
-ZWRfdm1jcyA9ICZ2bXgtPnZtY3MwMTsNCg0KDQotTGkNCg==
+Ning Bo reported an abnormal 2-second gap when booting Kata container [1].
+The unconditional timeout is caused by VSOCK_DEFAULT_CONNECT_TIMEOUT of
+connect at client side. The vhost vsock client tries to connect an
+initlizing virtio vsock server.
+
+The abnormal flow looks like:
+host-userspace           vhost vsock                       guest vsock
+==============           ===========                       ============
+connect()     -------->  vhost_transport_send_pkt_work()   initializing
+   |                     vq->private_data==NULL
+   |                     will not be queued
+   V
+schedule_timeout(2s)
+                         vhost_vsock_start()  <---------   device ready
+                         set vq->private_data
+
+wait for 2s and failed
+
+connect() again          vq->private_data!=NULL          recv connecting pkt
+
+1. host userspace sends a connect pkt, at that time, guest vsock is under
+initializing, hence the vhost_vsock_start has not been called. So
+vq->private_data==NULL, and the pkt is not been queued to send to guest.
+2. then it sleeps for 2s
+3. after guest vsock finishes initializing, vq->private_data is set.
+4. When host userspace wakes up after 2s, send connecting pkt again,
+everything is fine.
+
+This fixes it by checking vq->private_data in vhost_transport_send_pkt,
+and return at once if !vq->private_data. This makes user connect()
+be returned with ECONNREFUSED.
+
+After this patch, kata-runtime (with vsock enabled) boottime reduces from
+3s to 1s on ThunderX2 arm64 server.
+
+[1] https://github.com/kata-containers/runtime/issues/1917
+
+Reported-by: Ning Bo <n.b@live.com>
+Signed-off-by: Jia He <justin.he@arm.com>
+---
+ drivers/vhost/vsock.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index e36aaf9ba7bd..67474334dd88 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -241,6 +241,7 @@ vhost_transport_send_pkt(struct virtio_vsock_pkt *pkt)
+ {
+ 	struct vhost_vsock *vsock;
+ 	int len = pkt->len;
++	struct vhost_virtqueue *vq;
+ 
+ 	rcu_read_lock();
+ 
+@@ -252,6 +253,13 @@ vhost_transport_send_pkt(struct virtio_vsock_pkt *pkt)
+ 		return -ENODEV;
+ 	}
+ 
++	vq = &vsock->vqs[VSOCK_VQ_RX];
++	if (!vq->private_data) {
++		rcu_read_unlock();
++		virtio_transport_free_pkt(pkt);
++		return -ECONNREFUSED;
++	}
++
+ 	if (pkt->reply)
+ 		atomic_inc(&vsock->queued_replies);
+ 
+-- 
+2.17.1
+
