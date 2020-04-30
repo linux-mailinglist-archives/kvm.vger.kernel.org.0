@@ -2,131 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03AC51BEECC
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 05:59:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 700961BF03C
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 08:27:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726678AbgD3D6u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 Apr 2020 23:58:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46904 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726453AbgD3D6u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 29 Apr 2020 23:58:50 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDB40C035494;
-        Wed, 29 Apr 2020 20:58:48 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id c18so31940ile.5;
-        Wed, 29 Apr 2020 20:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=M+itFqMzz7ThWZKcLuQWzep+uBywhDgUdjtSyvWir0A=;
-        b=K6t4uqKhlLiVCOvHHnfn7uZCyC9NoNl1R56rKLl3c07k3kmUAiZwjvxwt4Qnq37WF7
-         VNgH3/oIiiHYRsbErGlPq2MX4f3T9V59jYn57yNqp3raQY8UYD93+7D9KP6xQjiklK+S
-         Qi4FAXQibliGyxBG9BvvYRntYZRoFOW7K+VFthODpKip1kWfFSAVDMiiHuOXR3dRb3lW
-         D/OxmFfMZg6PZ1xkFQX1ZmteVUKZO8Yt8C/jyoxPgaBv2ON4Qxg2j3apH6yVnjmhi7lP
-         dPH8MeSGv7QcWDP2b0vInXiS21WlWazeaJMniNVqQkhOG7GgWcvlC5Tlvbdw0a63gAF5
-         us9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=M+itFqMzz7ThWZKcLuQWzep+uBywhDgUdjtSyvWir0A=;
-        b=F6pxMFf584FFuO8c3WhZcHUejF7Mle4rBZXNlG48ZuJ9bZdYXH8SwB8Ur7fXGhOO6p
-         mQXAWlCXTfNk13vom1W+G7FUBHF1B9rSSRvI4kJsCf+1NFHiqE3qSH5klA/AI+/75sl/
-         k2ijOJoy36DQZ0QyE8AlGHBFvWBAzSVrEryhZ05+FywBYt7PibuS30jexnByP4s5s+iI
-         ks6wvnlisKdYfhZH5y4r3S0XjIHDmA+xSZcktcez6lg/WwhuiFRJEQAyBeIb3pu1fl2O
-         cmVgO6tvH1/9XC2j+7COLNg3B8xnTWvSYJpZvJNb/ZFaivO9lzf1AP3bgp1pn0bIEC77
-         aLrg==
-X-Gm-Message-State: AGi0PuZoPjrQLcdhGDHdVKra7F4W2ovv81KbUIxsP+eVNequvEeYQxVB
-        RZCDHG5hMo3y0+IDGRg8s5qr6NraA42cqfyyQA8=
-X-Google-Smtp-Source: APiQypJfj+2iP12ImL8Uqdjbw9c8nGy6u7ienyamsjDBxjC1bY7xoUznZGmMTlOrrsIfe3VT2sIUeWH8r3og68HqXio=
-X-Received: by 2002:a92:cece:: with SMTP id z14mr36110ilq.147.1588219128264;
- Wed, 29 Apr 2020 20:58:48 -0700 (PDT)
+        id S1726565AbgD3G14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 02:27:56 -0400
+Received: from condef-03.nifty.com ([202.248.20.68]:17993 "EHLO
+        condef-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726337AbgD3G1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Apr 2020 02:27:55 -0400
+X-Greylist: delayed 376 seconds by postgrey-1.27 at vger.kernel.org; Thu, 30 Apr 2020 02:27:54 EDT
+Received: from conuserg-08.nifty.com ([10.126.8.71])by condef-03.nifty.com with ESMTP id 03U6J5Dw019414
+        for <kvm@vger.kernel.org>; Thu, 30 Apr 2020 15:19:05 +0900
+Received: from oscar.flets-west.jp (softbank126090202047.bbtec.net [126.90.202.47]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 03U6IlOK012831;
+        Thu, 30 Apr 2020 15:18:48 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 03U6IlOK012831
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1588227528;
+        bh=gaD1VqtiOrhems+zmteSxRH2XxSbswTqIOlpgqqgfXA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Thp0FZMEoh6/gGu5f+Rmp8AffXtOAhetOAihhiUIZDUimPVx1rWZ9UuAcKtTnK5Xj
+         pbBWnEjDmXAB307CAnwVmX+vu06+lTjhyEJJBFGwV/BmVCBNukotf3t/EUdYgwV5XM
+         XlIDW4VrB7Qku5syENHYemd8qQXEQ74A8Lyhr0qJAB27y8YCc/HPo2nbA2X3axzazE
+         Jibv9kL+s5513RfohHRDZwdzNcJfsnw5OXjErVCOLtkEuFI/rfSHk1in7S4ZjYflg8
+         XlptkZywIj3vwNqxLwDZBYFmVktjQom0mucSuPr0/WMHwxxD2FSsLxFecqP8n9HxPP
+         mr6QLBmIv8egg==
+X-Nifty-SrcIP: [126.90.202.47]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-kbuild@vger.kernel.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] kconfig: announce removal of 'kvmconfig' and 'xenconfig' shorthands
+Date:   Thu, 30 Apr 2020 15:18:45 +0900
+Message-Id: <20200430061845.775144-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <1588216490-60282-1-git-send-email-zou_wei@huawei.com>
-In-Reply-To: <1588216490-60282-1-git-send-email-zou_wei@huawei.com>
-From:   Huacai Chen <chenhuacai@gmail.com>
-Date:   Thu, 30 Apr 2020 12:06:19 +0800
-Message-ID: <CAAhV-H4Zh60bLLVkhZ7fJTRkBvqxiCuogHyQv-S9rC_e0+HZNw@mail.gmail.com>
-Subject: Re: [PATCH -next] KVM: MIPS/VZ: Remove unneeded semicolon
-To:     Zou Wei <zou_wei@huawei.com>
-Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reviewed-by: Huacai Chen <chenhc@lemote.com>
+kvmconfig' is a shorthand for kvm_guest.config to save 7 character typing.
 
-On Thu, Apr 30, 2020 at 11:08 AM Zou Wei <zou_wei@huawei.com> wrote:
->
-> Fixes coccicheck warnings:
->
-> arch/mips/kvm/vz.c:1186:4-5: Unneeded semicolon
-> arch/mips/kvm/vz.c:1195:3-4: Unneeded semicolon
-> arch/mips/kvm/vz.c:1949:3-4: Unneeded semicolon
-> arch/mips/kvm/vz.c:1121:2-3: Unneeded semicolon
-> arch/mips/kvm/vz.c:2188:3-4: Unneeded semicolon
->
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Zou Wei <zou_wei@huawei.com>
-> ---
->  arch/mips/kvm/vz.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-> index dde2088..389dd0f 100644
-> --- a/arch/mips/kvm/vz.c
-> +++ b/arch/mips/kvm/vz.c
-> @@ -1118,7 +1118,7 @@ static enum emulation_result kvm_vz_gpsi_cache(union mips_instruction inst,
->                 break;
->         default:
->                 break;
-> -       };
-> +       }
->
->         kvm_err("@ %#lx/%#lx CACHE (cache: %#x, op: %#x, base[%d]: %#lx, offset: %#x\n",
->                 curr_pc, vcpu->arch.gprs[31], cache, op, base, arch->gprs[base],
-> @@ -1183,7 +1183,7 @@ static enum emulation_result kvm_trap_vz_handle_gpsi(u32 cause, u32 *opc,
->                                 trace_kvm_hwr(vcpu, KVM_TRACE_RDHWR,
->                                               KVM_TRACE_HWR(rd, sel), 0);
->                                 goto unknown;
-> -                       };
-> +                       }
->
->                         trace_kvm_hwr(vcpu, KVM_TRACE_RDHWR,
->                                       KVM_TRACE_HWR(rd, sel), arch->gprs[rt]);
-> @@ -1192,7 +1192,7 @@ static enum emulation_result kvm_trap_vz_handle_gpsi(u32 cause, u32 *opc,
->                         break;
->                 default:
->                         goto unknown;
-> -               };
-> +               }
->                 break;
->  unknown:
->
-> @@ -1946,7 +1946,7 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *vcpu,
->                 default:
->                         *v = (long)kvm_read_c0_guest_prid(cop0);
->                         break;
-> -               };
-> +               }
->                 break;
->         case KVM_REG_MIPS_CP0_EBASE:
->                 *v = kvm_vz_read_gc0_ebase();
-> @@ -2185,7 +2185,7 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu *vcpu,
->                 default:
->                         kvm_write_c0_guest_prid(cop0, v);
->                         break;
-> -               };
-> +               }
->                 break;
->         case KVM_REG_MIPS_CP0_EBASE:
->                 kvm_vz_write_gc0_ebase(v);
-> --
-> 2.6.2
->
+xenconfig' is a shorthand for xen.config to save 1 character typing.
+
+There is nothing more than that.
+
+There are more files in kernel/configs/, so it is not maintainable
+to wire-up every config fragment to the Kconfig Makefile. Hence,
+we should not do this at all.
+
+These will be removed after Linux 5.10. Meanwhile, the following
+warning message will be displayed if they are used.
+
+WARNING: 'make kvmconfig' will be removed after Linux 5.10
+         Please use 'make kvm_guest.config' instead.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ scripts/kconfig/Makefile | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 1015abec9e58..30c69e83652b 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -96,11 +96,13 @@ configfiles=$(wildcard $(srctree)/kernel/configs/$@ $(srctree)/arch/$(SRCARCH)/c
+ 
+ PHONY += kvmconfig
+ kvmconfig: kvm_guest.config
+-	@:
++	@echo >&2 "WARNING: 'make $@' will be removed after Linux 5.10"
++	@echo >&2 "         Please use 'make $<' instead."
+ 
+ PHONY += xenconfig
+ xenconfig: xen.config
+-	@:
++	@echo >&2 "WARNING: 'make $@' will be removed after Linux 5.10"
++	@echo >&2 "         Please use 'make $<' instead."
+ 
+ PHONY += tinyconfig
+ tinyconfig:
+@@ -137,9 +139,6 @@ help:
+ 	@echo  '  helpnewconfig   - List new options and help text'
+ 	@echo  '  olddefconfig	  - Same as oldconfig but sets new symbols to their'
+ 	@echo  '                    default value without prompting'
+-	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
+-	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel'
+-	@echo  '                    support'
+ 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
+ 	@echo  '  testconfig	  - Run Kconfig unit tests (requires python3 and pytest)'
+ 
+-- 
+2.25.1
+
