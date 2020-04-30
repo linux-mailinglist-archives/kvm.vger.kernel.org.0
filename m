@@ -2,125 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 227951BF5A4
-	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 12:37:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 297101BF5AD
+	for <lists+kvm@lfdr.de>; Thu, 30 Apr 2020 12:38:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726661AbgD3Kg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 Apr 2020 06:36:57 -0400
-Received: from foss.arm.com ([217.140.110.172]:52242 "EHLO foss.arm.com"
+        id S1726405AbgD3Kie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 Apr 2020 06:38:34 -0400
+Received: from foss.arm.com ([217.140.110.172]:52302 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725280AbgD3Kg4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 Apr 2020 06:36:56 -0400
+        id S1725280AbgD3Kie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 Apr 2020 06:38:34 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B27C61063;
-        Thu, 30 Apr 2020 03:36:53 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 714731063;
+        Thu, 30 Apr 2020 03:38:33 -0700 (PDT)
 Received: from C02TD0UTHF1T.local (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A03223F68F;
-        Thu, 30 Apr 2020 03:36:49 -0700 (PDT)
-Date:   Thu, 30 Apr 2020 11:36:46 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C3A5D3F68F;
+        Thu, 30 Apr 2020 03:38:31 -0700 (PDT)
+Date:   Thu, 30 Apr 2020 11:38:28 +0100
 From:   Mark Rutland <mark.rutland@arm.com>
-To:     Jianyong Wu <Jianyong.Wu@arm.com>
-Cc:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
-        "john.stultz@linaro.org" <john.stultz@linaro.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "richardcochran@gmail.com" <richardcochran@gmail.com>,
-        "will@kernel.org" <will@kernel.org>,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>,
-        Steven Price <Steven.Price@arm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Steve Capper <Steve.Capper@arm.com>,
-        Kaly Xin <Kaly.Xin@arm.com>, Justin He <Justin.He@arm.com>,
-        nd <nd@arm.com>, Haibo Xu <Haibo.Xu@arm.com>
-Subject: Re: [RFC PATCH v11 5/9] psci: Add hypercall service for ptp_kvm.
-Message-ID: <20200430103646.GB39784@C02TD0UTHF1T.local>
-References: <20200421032304.26300-1-jianyong.wu@arm.com>
- <20200421032304.26300-6-jianyong.wu@arm.com>
- <20200421095736.GB16306@C02TD0UTHF1T.local>
- <ab629714-c08c-2155-dd13-ad25e7f60b39@arm.com>
- <20200424103953.GD1167@C02TD0UTHF1T.local>
- <b53b0a47-1fe6-ad92-05f4-80d50980c587@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Save/restore sp_el0 as part of __guest_enter
+Message-ID: <20200430103828.GC39784@C02TD0UTHF1T.local>
+References: <20200425094321.162752-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b53b0a47-1fe6-ad92-05f4-80d50980c587@arm.com>
+In-Reply-To: <20200425094321.162752-1-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 07:14:52AM +0100, Jianyong Wu wrote:
-> On 2020/4/24 6:39 PM, Mark Rutland wrote:
-> > On Fri, Apr 24, 2020 at 03:50:22AM +0100, Jianyong Wu wrote:
-> >> On 2020/4/21 5:57 PM, Mark Rutland wrote:
-> >>> On Tue, Apr 21, 2020 at 11:23:00AM +0800, Jianyong Wu wrote:
-> >>>> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-> >>>> index 550dfa3e53cd..a5309c28d4dc 100644
-> >>>> --- a/virt/kvm/arm/hypercalls.c
-> >>>> +++ b/virt/kvm/arm/hypercalls.c
-> >>>> @@ -62,6 +66,44 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >>>>    if (gpa != GPA_INVALID)
-> >>>>    val = gpa;
-> >>>>    break;
-> >>>> +/*
-> >>>> + * This serves virtual kvm_ptp.
-> >>>> + * Four values will be passed back.
-> >>>> + * reg0 stores high 32-bit host ktime;
-> >>>> + * reg1 stores low 32-bit host ktime;
-> >>>> + * reg2 stores high 32-bit difference of host cycles and cntvoff;
-> >>>> + * reg3 stores low 32-bit difference of host cycles and cntvoff.
-> >>>> + */
-> >>>> +case ARM_SMCCC_HYP_KVM_PTP_FUNC_ID:
-> >>> Shouldn't the host opt-in to providing this to the guest, as with other
-> >>> features?
-> >> er, do you mean that "ARM_SMCCC_HV_PV_TIME_XXX" as "opt-in"? if so, I
-> >> think this
-> >>
-> >> kvm_ptp doesn't need a buddy. the driver in guest will call this service
-> >> in a definite way.
-> > I mean that when creating the VM, userspace should be able to choose
-> > whether the PTP service is provided to the guest. The host shouldn't
-> > always provide it as there may be cases where doing so is undesireable.
-> >
-> I think I have implemented in patch 9/9 that userspace can get the info
-> that if the host offers the kvm_ptp service. But for now, the host
-> kernel will always offer the kvm_ptp capability in the current
-> implementation. I think x86 follow the same behavior (see [1]). so I
-> have not considered when and how to disable this kvm_ptp service in
-> host. Do you think we should offer this opt-in?
-
-I think taht should be opt-in, yes.
-
-[...]
-
-> > It's also not clear to me what notion of host time is being exposed to
-> > the guest (and consequently how this would interact with time changes on
-> > the host, time namespaces, etc). Having some description of that would
-> > be very helpful.
+On Sat, Apr 25, 2020 at 10:43:21AM +0100, Marc Zyngier wrote:
+> We currently save/restore sp_el0 in C code. This is a bit unsafe,
+> as a lot of the C code expects 'current' to be accessible from
+> there (and the opportunity to run kernel code in HYP is specially
+> great with VHE).
 > 
-> sorry to have not made it clear.
+> Instead, let's move the save/restore of sp_el0 to the assembly
+> code (in __guest_enter), making sure that sp_el0 is correct
+> very early on when we exit the guest, and is preserved as long
+> as possible to its host value when we enter the guest.
 > 
-> Time will not change in host and only time in guest will change to sync
-> with host. host time is the target that time in guest want to adjust to.
-> guest need to get the host time then compute the different of the time
-> in guest and host, so the guest can adjust the time base on the difference.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-I understood that host time wouldn't change here, but what was not clear
-is which notion of host time is being exposed to the guest.
+Makes sense to me in principle, but I haven't reviewed the code in
+detail:
 
-e.g. is that a raw monotonic clock, or one subject to periodic adjument,
-or wall time in the host? What is the epoch of the host time?
-
-> I will add the base principle of time sync service in guest using
-> kvm_ptp in commit message.
-
-That would be great; thanks!
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 
 Mark.
+
+> ---
+>  arch/arm64/kvm/hyp/entry.S     | 23 +++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/sysreg-sr.c | 17 +++--------------
+>  2 files changed, 26 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index d22d0534dd600..90186cf6473e0 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -18,6 +18,7 @@
+>  
+>  #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
+>  #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
+> +#define CPU_SP_EL0_OFFSET	(CPU_XREG_OFFSET(30) + 8)
+>  
+>  	.text
+>  	.pushsection	.hyp.text, "ax"
+> @@ -47,6 +48,16 @@
+>  	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
+>  .endm
+>  
+> +.macro save_sp_el0 ctxt, tmp
+> +	mrs	\tmp,	sp_el0
+> +	str	\tmp,	[\ctxt, #CPU_SP_EL0_OFFSET]
+> +.endm
+> +
+> +.macro restore_sp_el0 ctxt, tmp
+> +	ldr	\tmp,	  [\ctxt, #CPU_SP_EL0_OFFSET]
+> +	msr	sp_el0, \tmp
+> +.endm
+> +
+>  /*
+>   * u64 __guest_enter(struct kvm_vcpu *vcpu,
+>   *		     struct kvm_cpu_context *host_ctxt);
+> @@ -60,6 +71,9 @@ SYM_FUNC_START(__guest_enter)
+>  	// Store the host regs
+>  	save_callee_saved_regs x1
+>  
+> +	// Save the host's sp_el0
+> +	save_sp_el0	x1, x2
+> +
+>  	// Now the host state is stored if we have a pending RAS SError it must
+>  	// affect the host. If any asynchronous exception is pending we defer
+>  	// the guest entry. The DSB isn't necessary before v8.2 as any SError
+> @@ -83,6 +97,9 @@ alternative_else_nop_endif
+>  	// when this feature is enabled for kernel code.
+>  	ptrauth_switch_to_guest x29, x0, x1, x2
+>  
+> +	// Restore the guest's sp_el0
+> +	restore_sp_el0 x29, x0
+> +
+>  	// Restore guest regs x0-x17
+>  	ldp	x0, x1,   [x29, #CPU_XREG_OFFSET(0)]
+>  	ldp	x2, x3,   [x29, #CPU_XREG_OFFSET(2)]
+> @@ -130,6 +147,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+>  	// Store the guest regs x18-x29, lr
+>  	save_callee_saved_regs x1
+>  
+> +	// Store the guest's sp_el0
+> +	save_sp_el0	x1, x2
+> +
+>  	get_host_ctxt	x2, x3
+>  
+>  	// Macro ptrauth_switch_to_guest format:
+> @@ -139,6 +159,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
+>  	// when this feature is enabled for kernel code.
+>  	ptrauth_switch_to_host x1, x2, x3, x4, x5
+>  
+> +	// Restore the hosts's sp_el0
+> +	restore_sp_el0 x2, x3
+> +
+>  	// Now restore the host regs
+>  	restore_callee_saved_regs x2
+>  
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 75b1925763f16..6d2df9fe0b5d2 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -15,8 +15,9 @@
+>  /*
+>   * Non-VHE: Both host and guest must save everything.
+>   *
+> - * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and pstate,
+> - * which are handled as part of the el2 return state) on every switch.
+> + * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
+> + * pstate, which are handled as part of the el2 return state) on every
+> + * switch (sp_el0 is being dealt with in the assembly code).
+>   * tpidr_el0 and tpidrro_el0 only need to be switched when going
+>   * to host userspace or a different VCPU.  EL1 registers only need to be
+>   * switched when potentially going to run a different VCPU.  The latter two
+> @@ -26,12 +27,6 @@
+>  static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+> -
+> -	/*
+> -	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
+> -	 * therefore be saved/restored on every entry/exit to/from the guest.
+> -	 */
+> -	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+>  }
+>  
+>  static void __hyp_text __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+> @@ -99,12 +94,6 @@ NOKPROBE_SYMBOL(sysreg_save_guest_state_vhe);
+>  static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+> -
+> -	/*
+> -	 * The host arm64 Linux uses sp_el0 to point to 'current' and it must
+> -	 * therefore be saved/restored on every entry/exit to/from the guest.
+> -	 */
+> -	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+>  }
+>  
+>  static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+> -- 
+> 2.26.2
+> 
