@@ -2,144 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 528171C1802
-	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 16:41:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB6131C18E9
+	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 17:05:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729076AbgEAOlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 May 2020 10:41:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20020 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728724AbgEAOk7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 May 2020 10:40:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588344057;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FMCVUX3SZIQcfGxvWeP6Mw5R9IcHL0EXZloLxMg4CEI=;
-        b=fxc/6spGL1Uj0j7d0nuT9sDjNIhdT3Z7CRVpx6S7sHHEqI0DzZ+qG/f4BlDJcTOD7i0iwF
-        svwA5IQcUspbhUxhuxH6m1PX7xJi9jOgFlVMX56fMsuxbc7klClDKTuUbdaWKnOiADk2uX
-        GCKT43J9GQ/FL0lxooud4GmbtAtEgjE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-L0gyVnmKMSiSP4H7BPZOeg-1; Fri, 01 May 2020 10:40:56 -0400
-X-MC-Unique: L0gyVnmKMSiSP4H7BPZOeg-1
-Received: by mail-wm1-f69.google.com with SMTP id f81so2126892wmf.2
-        for <kvm@vger.kernel.org>; Fri, 01 May 2020 07:40:56 -0700 (PDT)
+        id S1728974AbgEAPFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 May 2020 11:05:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37636 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728839AbgEAPFw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 May 2020 11:05:52 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7C0FC061A0C
+        for <kvm@vger.kernel.org>; Fri,  1 May 2020 08:05:50 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id f13so11789465wrm.13
+        for <kvm@vger.kernel.org>; Fri, 01 May 2020 08:05:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=PoH6jt1DJBDclKJb1eavLYFUm0FbR+rhXmhMnwHv2eg=;
+        b=tECm9t6q5LwPWA0k8zPmAqkPYmtf3tBPz1T0Fbzx0C03le9W1PdQNz5lyxXtPbVMuE
+         1aMrK37uCpX0Wm4xnzziWPw6yMBpSDcAlqPxTPrBgbSvGoo+S2A99stNM41Vl+fQiJK/
+         HfOG6PwvfNOYHiTPpTuShgYYq4XwWTw6A/OQQBxJ63jIzqt9GR962OHsPo1fr/X5IRI4
+         xaoPtSzNUTVMcs0t0Zhf8IwqfdXOKu6CrX/MoOli2+w8FQl5McPbjb0vnSLgyc1IQw4x
+         fzy3GqxK5Za8OqKRNyTBKcbKAvVYMBJar1g0JRxEQ3TCm3iLp7P+ShU5uyi9f0QKCmI5
+         lzPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=FMCVUX3SZIQcfGxvWeP6Mw5R9IcHL0EXZloLxMg4CEI=;
-        b=QC22Tcv6gNS2eH3nOCqJ7pTdHpDhGbqc7Yd171X4xL0onmIE/gUN59vb3gvPikqtH9
-         qbQYEiRb/Q+VbehXzoUmdn5FZ1y+9PwojVmABR0KM8xap+Xpg6lVy2lRF9nP5WpHrhCj
-         h/0yWwtr4meeXOk7zsr66Zg3faIzY5AV3dCTa7Irud3n/2entXUGaqk3haRLd3hN2UHS
-         HFTxYNetVHbdAlYLvCWG6SIxj7Nkxg5299kU7CzzJZASkn8dMopZbM1VgfVpRsBmz1eN
-         IMHc84Jb/jbasJNi0bBcE/T+8xzIKh8rOJEpMmnvVCYtPcUNQsQO2G7HsrG/QWQhZyQL
-         S0Ww==
-X-Gm-Message-State: AGi0PuZrHzRJ3AJhRxp/+74Lb9aB2o2sRL0b+ktB97W5KK/orIL05vuK
-        4fZr8mGaSHc4PAylpBBttu2ulYr0+cbEsp0wngreCJcBltku11vy/CfuT8y1YEjurelXq7PynW8
-        7PF5VoAqYIcPM
-X-Received: by 2002:adf:df82:: with SMTP id z2mr4930983wrl.58.1588344054920;
-        Fri, 01 May 2020 07:40:54 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIlKvu49W7Dejd9vm/UPweyZkYbpJJGe7ZlU91a4UNN1ZrYUoJL1vdxXdT4Bd7iUQNCZUPcMg==
-X-Received: by 2002:adf:df82:: with SMTP id z2mr4930967wrl.58.1588344054718;
-        Fri, 01 May 2020 07:40:54 -0700 (PDT)
-Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id j13sm4611452wrq.24.2020.05.01.07.40.53
+        bh=PoH6jt1DJBDclKJb1eavLYFUm0FbR+rhXmhMnwHv2eg=;
+        b=orKB42TxN63nTgHQ+fCVoTD1Y5nyT6SuhRRMta0+pStPcyE8ekq8V5j3Ce+pz0SaDD
+         zRYCllGsXhWeVFdZIIIecUKPpPFl0vzF8ANMrG4DOh77JeUq3w4QluDMb2Q0/3l8R6tq
+         32OcwpcZt4/Yjb1KY4yRvwpx9a0MxeoYMX31umwsIcZzNvX/rM9ciiyBfIW0hOFypBsp
+         CEuK9cwCJLwl5QJd5ywBXQbGzZlndpi9rZb3aYTUQvksb+KwcZvSJRtZgMCB3DAE8FTi
+         OV7OVGG8ESPeEdPBIgtuhrQX6+5sCxLcRR+Ejf8k9xT75zyd0g2RQf4V84BGgvW7gVJw
+         XDUw==
+X-Gm-Message-State: AGi0PubyJwOepOi/W218UEsYl1JB7rv2yfpqCyix/bmiNi4Jmuf1d/7v
+        41zjFU++UeHaqzljBWa8i8w=
+X-Google-Smtp-Source: APiQypITW76Q8YkpUdOty7iPZjas1eiHyyCqPbKp3plSq3ZF/hd4+wNZ2HjCFsFdH9FUQpzD062buA==
+X-Received: by 2002:adf:f684:: with SMTP id v4mr3172681wrp.218.1588345549493;
+        Fri, 01 May 2020 08:05:49 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id h188sm13929wme.8.2020.05.01.08.05.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2020 07:40:53 -0700 (PDT)
-Date:   Fri, 1 May 2020 16:40:51 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jia He <justin.he@arm.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kaly Xin <Kaly.Xin@arm.com>
-Subject: Re: [PATCH v2] vhost: vsock: kick send_pkt worker once device is
- started
-Message-ID: <20200501144051.aotbofpyuy5tqcfp@steredhat>
-References: <20200501043840.186557-1-justin.he@arm.com>
+        Fri, 01 May 2020 08:05:48 -0700 (PDT)
+Date:   Fri, 1 May 2020 16:05:47 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Anders =?iso-8859-1?Q?=D6stling?= <anders.ostling@gmail.com>
+Cc:     kvm@vger.kernel.org, libvir-list@redhat.com,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>,
+        qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>
+Subject: Re: Backup of vm disk images
+Message-ID: <20200501150547.GA221440@stefanha-x1.localdomain>
+References: <CAP4+ddND+RrQG7gGoKQ+ydnwXpr0HLrxUyi-pshc-jsigCwjBg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
 Content-Disposition: inline
-In-Reply-To: <20200501043840.186557-1-justin.he@arm.com>
+In-Reply-To: <CAP4+ddND+RrQG7gGoKQ+ydnwXpr0HLrxUyi-pshc-jsigCwjBg@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 01, 2020 at 12:38:40PM +0800, Jia He wrote:
-> Ning Bo reported an abnormal 2-second gap when booting Kata container [1].
-> The unconditional timeout was caused by VSOCK_DEFAULT_CONNECT_TIMEOUT of
-> connecting from the client side. The vhost vsock client tries to connect
-> an initializing virtio vsock server.
-> 
-> The abnormal flow looks like:
-> host-userspace           vhost vsock                       guest vsock
-> ==============           ===========                       ============
-> connect()     -------->  vhost_transport_send_pkt_work()   initializing
->    |                     vq->private_data==NULL
->    |                     will not be queued
->    V
-> schedule_timeout(2s)
->                          vhost_vsock_start()  <---------   device ready
->                          set vq->private_data
-> 
-> wait for 2s and failed
-> connect() again          vq->private_data!=NULL         recv connecting pkt
-> 
-> Details:
-> 1. Host userspace sends a connect pkt, at that time, guest vsock is under
->    initializing, hence the vhost_vsock_start has not been called. So
->    vq->private_data==NULL, and the pkt is not been queued to send to guest
-> 2. Then it sleeps for 2s
-> 3. After guest vsock finishes initializing, vq->private_data is set
-> 4. When host userspace wakes up after 2s, send connecting pkt again,
->    everything is fine.
-> 
-> As suggested by Stefano Garzarella, this fixes it by additional kicking the
-> send_pkt worker in vhost_vsock_start once the virtio device is started. This
-> makes the pending pkt sent again.
-> 
-> After this patch, kata-runtime (with vsock enabled) boot time is reduced
-> from 3s to 1s on a ThunderX2 arm64 server.
-> 
-> [1] https://github.com/kata-containers/runtime/issues/1917
-> 
-> Reported-by: Ning Bo <n.b@live.com>
-> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-> Signed-off-by: Jia He <justin.he@arm.com>
-> ---
-> v2: new solution suggested by Stefano Garzarella
-> 
->  drivers/vhost/vsock.c | 5 +++++
->  1 file changed, 5 insertions(+)
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+--ReaqsoxgOBHFXBhH
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Stefano
+On Wed, Apr 22, 2020 at 07:51:09AM +0200, Anders =D6stling wrote:
+> I am fighting to understand the difference between backing up a VM by
+> using a regular copy vs using the virsh blockcopy command.
+> What I want to do is to suspend the vm, copy the XML and .QCOW2 files
+> and then resume the vm again. What are your thoughts? What are the
+> drawbacks compared to other methods?
 
-> 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index e36aaf9ba7bd..0716a9cdffee 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -543,6 +543,11 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
->  		mutex_unlock(&vq->mutex);
->  	}
->  
-> +	/* Some packets may have been queued before the device was started,
-> +	 * let's kick the send worker to send them.
-> +	 */
-> +	vhost_work_queue(&vsock->dev, &vsock->send_pkt_work);
-> +
->  	mutex_unlock(&vsock->dev.mutex);
->  	return 0;
->  
-> -- 
-> 2.17.1
-> 
+Hi Anders,
+The kvm@vger.kernel.org mailing list is mostly for the discussion and
+development of the KVM kernel module so you may not get replies.  I have
+CCed libvir-list and developers who have been involved in libvirt backup
+features.
 
+A naive cp(1) command will be very slow because the entire disk image is
+copied to a new file.  The fastest solution with cp(1) is the --reflink
+flag which basically takes a snapshot of the file and shares the disk
+blocks (only available when the host file system supports it and not
+available across mounts).
+
+Libvirt's backup commands are more powerful.  They can do things like
+copy out a point-in-time snapshot of the disk while the guest is
+running.  They also support incremental backup so you don't need to
+store a full copy of the disk image each time you take a backup.
+
+I hope others will join the discussion and give examples of some of the
+available features.
+
+Stefan
+
+--ReaqsoxgOBHFXBhH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6sOsoACgkQnKSrs4Gr
+c8hPawf9HQN6I/s9Pb80GKVYBkQDLBd4K5BH8JPNozYDAwziYHxmgnv1YU/0hP+L
+tuPZT9pVQs4BSxlP1Qy4WdLfZzNIq6rtktAcSZiHDoBdNN5GB50Y+tZc/fKX/HFZ
+allmP7fw+JnEIHDuQqdKfRXz3N9hOrnYb5B3/6YXvc90ROojc1PIWdf64/qAbx+m
+3XHtcgMyGM4QRaYV5MLa9Bdr1VS+ntCMyS4XxEsQBU8AyNqBGLu3ZY5vjyBoIx8O
+KTyGFU0BRE1JII8FlxZZEGA6Om9vAdxXiqrRwIk2RO9vViKQ448GKYLZYYR8t1F9
+O5QYX3siA946sTuLZ9BRBTZHaKWdvQ==
+=3Co8
+-----END PGP SIGNATURE-----
+
+--ReaqsoxgOBHFXBhH--
