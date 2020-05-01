@@ -2,127 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB8DA1C10A5
-	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 12:12:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6964F1C114C
+	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 13:01:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728544AbgEAKMR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 May 2020 06:12:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37096 "EHLO mail.kernel.org"
+        id S1728573AbgEALBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 May 2020 07:01:02 -0400
+Received: from mga18.intel.com ([134.134.136.126]:17502 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728500AbgEAKMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 May 2020 06:12:16 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 89C772192A;
-        Fri,  1 May 2020 10:12:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588327935;
-        bh=FWdojJjPTloAAYOA1G94z/BC4dOQr1JzzPfiDjmSZ/s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=g30UCYx5CnN7AuBqp213+FU87CU30LjAik4HXzjMnOd6cerBQdEldONUb07oKgEXp
-         qk5BOZB8FtjtrZ3HGVE7+2NoYFAO2gpnFcgYQ4w56PtI7K+Fgolrb/IH/pwYwgmWkG
-         nuvVsAx3LgLyFtaRZE22edXOF02HRyemXMAD0Okw=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jUSeU-008J3K-08; Fri, 01 May 2020 11:12:14 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Fangrui Song <maskray@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: [PATCH 4/4] KVM: arm64: Fix 32bit PC wrap-around
-Date:   Fri,  1 May 2020 11:12:04 +0100
-Message-Id: <20200501101204.364798-5-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200501101204.364798-1-maz@kernel.org>
-References: <20200501101204.364798-1-maz@kernel.org>
+        id S1728480AbgEALBC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 May 2020 07:01:02 -0400
+IronPort-SDR: BAAmdjLwB/3zBJWsQVSBKntfL0jO/7kp2/BYcjWSrYJq0UT10HNakLVlKVSyf3H+LBckqi6Zzn
+ o3FRHM4EUXJw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2020 04:01:01 -0700
+IronPort-SDR: 7thJX6Mk0VKlOqLk4+hB4Kpm2nsLgUTfJ8kc6DOkHWiWyxqjaCETOzZ1vx4VCCUY7rlBQXfXJV
+ lNMlFXnL9Kqg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,339,1583222400"; 
+   d="scan'208";a="368415955"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 01 May 2020 04:00:58 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1jUTPe-0003D5-8P; Fri, 01 May 2020 19:00:58 +0800
+Date:   Fri, 1 May 2020 19:00:36 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com
+Cc:     kbuild-all@lists.01.org, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 10/18] x86/paravirt: Add hypervisor specific hypercall
+ for SEV live migration.
+Message-ID: <202005011844.3MBRacmG%lkp@intel.com>
+References: <d0e5e3227e24272ec5f277e6732c5e0a1276d4e1.1588234824.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com, maskray@google.com, mark.rutland@arm.com, ndesaulniers@google.com, will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d0e5e3227e24272ec5f277e6732c5e0a1276d4e1.1588234824.git.ashish.kalra@amd.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the unlikely event that a 32bit vcpu traps into the hypervisor
-on an instruction that is located right at the end of the 32bit
-range, the emulation of that instruction is going to increment
-PC past the 32bit range. This isn't great, as userspace can then
-observe this value and get a bit confused.
+Hi Ashish,
 
-Conversly, userspace can do things like (in the context of a 64bit
-guest that is capable of 32bit EL0) setting PSTATE to AArch64-EL0,
-set PC to a 64bit value, change PSTATE to AArch32-USR, and observe
-that PC hasn't been truncated. More confusion.
+Thank you for the patch! Perhaps something to improve:
 
-Fix both by:
-- truncating PC increments for 32bit guests
-- sanitizing all 32bit regs every time a core reg is changed by
-  userspace, and that PSTATE indicates a 32bit mode.
+[auto build test WARNING on v5.7-rc3]
+[cannot apply to kvm/linux-next tip/x86/mm tip/x86/core next-20200501]
+[if your patch is applied to the wrong git tree, please drop us a note to help
+improve the system. BTW, we also suggest to use '--base' option to specify the
+base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
 
-Cc: stable@vger.kernel.org
-Acked-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+url:    https://github.com/0day-ci/linux/commits/Ashish-Kalra/Add-AMD-SEV-guest-live-migration-support/20200430-202702
+base:    6a8b55ed4056ea5559ebe4f6a4b247f627870d4c
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-191-gc51a0382-dirty
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kbuild test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+
+>> arch/x86/kernel/kvm.c:733:6: sparse: sparse: symbol 'kvm_sev_migration_hcall' was not declared. Should it be static?
+
+Please review and possibly fold the followup patch.
+
 ---
- arch/arm64/kvm/guest.c     | 7 +++++++
- virt/kvm/arm/hyp/aarch32.c | 8 ++++++--
- 2 files changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 23ebe51410f0..50a279d3ddd7 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -200,6 +200,13 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	}
- 
- 	memcpy((u32 *)regs + off, valp, KVM_REG_SIZE(reg->id));
-+
-+	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
-+		int i;
-+
-+		for (i = 0; i < 16; i++)
-+			*vcpu_reg32(vcpu, i) = (u32)*vcpu_reg32(vcpu, i);
-+	}
- out:
- 	return err;
- }
-diff --git a/virt/kvm/arm/hyp/aarch32.c b/virt/kvm/arm/hyp/aarch32.c
-index d31f267961e7..25c0e47d57cb 100644
---- a/virt/kvm/arm/hyp/aarch32.c
-+++ b/virt/kvm/arm/hyp/aarch32.c
-@@ -125,12 +125,16 @@ static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
-  */
- void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
- {
-+	u32 pc = *vcpu_pc(vcpu);
- 	bool is_thumb;
- 
- 	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_AA32_T_BIT);
- 	if (is_thumb && !is_wide_instr)
--		*vcpu_pc(vcpu) += 2;
-+		pc += 2;
- 	else
--		*vcpu_pc(vcpu) += 4;
-+		pc += 4;
-+
-+	*vcpu_pc(vcpu) = pc;
-+
- 	kvm_adjust_itstate(vcpu);
- }
--- 
-2.26.2
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
