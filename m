@@ -2,51 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC26B1C0F82
-	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 10:30:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 116C71C0D7A
+	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 06:39:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728441AbgEAIaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 May 2020 04:30:01 -0400
-Received: from [104.248.214.7] ([104.248.214.7]:53698 "EHLO narrain.in"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728325AbgEAIaB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 May 2020 04:30:01 -0400
-Received: from Shop01 (localhost [127.0.0.1])
-        by narrain.in (Postfix) with SMTP id 66E2D5BA5F1;
-        Thu, 30 Apr 2020 21:54:44 +0000 (UTC)
-Received: from [185.175.43.216] by Shop01 with ESMTP id <713588-77610>; Thu, 30 Apr 2020 23:50:53 +0100
-Message-ID: <03xrj1-5xcqu-r@5jos5c.k64w>
-From:   "JEAN MARIE" <fkinneyofd@tampabay.rr.com>
-Reply-To: "JEAN MARIE" <fkinneyofd@tampabay.rr.com>
-To:     kvlaszlo@pr.hu
-Subject: Please Kindly Acknowledge Receipt
-Date:   Thu, 30 Apr 20 23:50:53 GMT
-X-Mailer: eGroups Message Poster
-MIME-Version: 1.0
-Content-Type: multipart/alternative;
-        boundary="2E8.8_35C77_"
-X-Priority: 3
-X-MSMail-Priority: Normal
+        id S1728232AbgEAEi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 May 2020 00:38:57 -0400
+Received: from foss.arm.com ([217.140.110.172]:36242 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726153AbgEAEi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 May 2020 00:38:56 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB9871FB;
+        Thu, 30 Apr 2020 21:38:55 -0700 (PDT)
+Received: from localhost.localdomain (entos-thunderx2-02.shanghai.arm.com [10.169.138.57])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 29EC83F73D;
+        Thu, 30 Apr 2020 21:38:52 -0700 (PDT)
+From:   Jia He <justin.he@arm.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kaly Xin <Kaly.Xin@arm.com>,
+        Jia He <justin.he@arm.com>
+Subject: [PATCH v2] vhost: vsock: kick send_pkt worker once device is started
+Date:   Fri,  1 May 2020 12:38:40 +0800
+Message-Id: <20200501043840.186557-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Ning Bo reported an abnormal 2-second gap when booting Kata container [1].
+The unconditional timeout was caused by VSOCK_DEFAULT_CONNECT_TIMEOUT of
+connecting from the client side. The vhost vsock client tries to connect
+an initializing virtio vsock server.
 
---2E8.8_35C77_
-Content-Type: text/plain;
-Content-Transfer-Encoding: quoted-printable
+The abnormal flow looks like:
+host-userspace           vhost vsock                       guest vsock
+==============           ===========                       ============
+connect()     -------->  vhost_transport_send_pkt_work()   initializing
+   |                     vq->private_data==NULL
+   |                     will not be queued
+   V
+schedule_timeout(2s)
+                         vhost_vsock_start()  <---------   device ready
+                         set vq->private_data
 
-I 'm a Financial Consultant.  under my network as a financial consultant, =
-there are few private investors offering capital injection as project fund=
-ing or business expansion in critical areas of Investment placements such =
-as Real Estate, Healthcare, Transportation and Agriculture. 
-Get back to me for more details as you express your interest areas of spec=
-ialization.
+wait for 2s and failed
+connect() again          vq->private_data!=NULL         recv connecting pkt
 
-Regards.
-Mr. J. Marie
-fkinneyofd Consulting
+Details:
+1. Host userspace sends a connect pkt, at that time, guest vsock is under
+   initializing, hence the vhost_vsock_start has not been called. So
+   vq->private_data==NULL, and the pkt is not been queued to send to guest
+2. Then it sleeps for 2s
+3. After guest vsock finishes initializing, vq->private_data is set
+4. When host userspace wakes up after 2s, send connecting pkt again,
+   everything is fine.
 
---2E8.8_35C77_--
+As suggested by Stefano Garzarella, this fixes it by additional kicking the
+send_pkt worker in vhost_vsock_start once the virtio device is started. This
+makes the pending pkt sent again.
+
+After this patch, kata-runtime (with vsock enabled) boot time is reduced
+from 3s to 1s on a ThunderX2 arm64 server.
+
+[1] https://github.com/kata-containers/runtime/issues/1917
+
+Reported-by: Ning Bo <n.b@live.com>
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Jia He <justin.he@arm.com>
+---
+v2: new solution suggested by Stefano Garzarella
+
+ drivers/vhost/vsock.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index e36aaf9ba7bd..0716a9cdffee 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -543,6 +543,11 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
+ 		mutex_unlock(&vq->mutex);
+ 	}
+ 
++	/* Some packets may have been queued before the device was started,
++	 * let's kick the send worker to send them.
++	 */
++	vhost_work_queue(&vsock->dev, &vsock->send_pkt_work);
++
+ 	mutex_unlock(&vsock->dev.mutex);
+ 	return 0;
+ 
+-- 
+2.17.1
 
