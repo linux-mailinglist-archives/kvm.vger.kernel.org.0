@@ -2,119 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB6131C18E9
-	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 17:05:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3AC11C1992
+	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 17:30:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728974AbgEAPFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 May 2020 11:05:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728839AbgEAPFw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 May 2020 11:05:52 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7C0FC061A0C
-        for <kvm@vger.kernel.org>; Fri,  1 May 2020 08:05:50 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id f13so11789465wrm.13
-        for <kvm@vger.kernel.org>; Fri, 01 May 2020 08:05:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PoH6jt1DJBDclKJb1eavLYFUm0FbR+rhXmhMnwHv2eg=;
-        b=tECm9t6q5LwPWA0k8zPmAqkPYmtf3tBPz1T0Fbzx0C03le9W1PdQNz5lyxXtPbVMuE
-         1aMrK37uCpX0Wm4xnzziWPw6yMBpSDcAlqPxTPrBgbSvGoo+S2A99stNM41Vl+fQiJK/
-         HfOG6PwvfNOYHiTPpTuShgYYq4XwWTw6A/OQQBxJ63jIzqt9GR962OHsPo1fr/X5IRI4
-         xaoPtSzNUTVMcs0t0Zhf8IwqfdXOKu6CrX/MoOli2+w8FQl5McPbjb0vnSLgyc1IQw4x
-         fzy3GqxK5Za8OqKRNyTBKcbKAvVYMBJar1g0JRxEQ3TCm3iLp7P+ShU5uyi9f0QKCmI5
-         lzPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PoH6jt1DJBDclKJb1eavLYFUm0FbR+rhXmhMnwHv2eg=;
-        b=orKB42TxN63nTgHQ+fCVoTD1Y5nyT6SuhRRMta0+pStPcyE8ekq8V5j3Ce+pz0SaDD
-         zRYCllGsXhWeVFdZIIIecUKPpPFl0vzF8ANMrG4DOh77JeUq3w4QluDMb2Q0/3l8R6tq
-         32OcwpcZt4/Yjb1KY4yRvwpx9a0MxeoYMX31umwsIcZzNvX/rM9ciiyBfIW0hOFypBsp
-         CEuK9cwCJLwl5QJd5ywBXQbGzZlndpi9rZb3aYTUQvksb+KwcZvSJRtZgMCB3DAE8FTi
-         OV7OVGG8ESPeEdPBIgtuhrQX6+5sCxLcRR+Ejf8k9xT75zyd0g2RQf4V84BGgvW7gVJw
-         XDUw==
-X-Gm-Message-State: AGi0PubyJwOepOi/W218UEsYl1JB7rv2yfpqCyix/bmiNi4Jmuf1d/7v
-        41zjFU++UeHaqzljBWa8i8w=
-X-Google-Smtp-Source: APiQypITW76Q8YkpUdOty7iPZjas1eiHyyCqPbKp3plSq3ZF/hd4+wNZ2HjCFsFdH9FUQpzD062buA==
-X-Received: by 2002:adf:f684:: with SMTP id v4mr3172681wrp.218.1588345549493;
-        Fri, 01 May 2020 08:05:49 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id h188sm13929wme.8.2020.05.01.08.05.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2020 08:05:48 -0700 (PDT)
-Date:   Fri, 1 May 2020 16:05:47 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Anders =?iso-8859-1?Q?=D6stling?= <anders.ostling@gmail.com>
-Cc:     kvm@vger.kernel.org, libvir-list@redhat.com,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>,
-        qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>
-Subject: Re: Backup of vm disk images
-Message-ID: <20200501150547.GA221440@stefanha-x1.localdomain>
-References: <CAP4+ddND+RrQG7gGoKQ+ydnwXpr0HLrxUyi-pshc-jsigCwjBg@mail.gmail.com>
+        id S1729195AbgEAPaW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 May 2020 11:30:22 -0400
+Received: from foss.arm.com ([217.140.110.172]:42722 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728812AbgEAPaV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 May 2020 11:30:21 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFD3A30E;
+        Fri,  1 May 2020 08:30:20 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19A0D3F68F;
+        Fri,  1 May 2020 08:30:19 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 19/32] ioport: mmio: Use a mutex and reference
+ counting for locking
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-20-alexandru.elisei@arm.com>
+ <fcc54fdb-3d7d-3a4c-5c99-120bc156d48f@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <e28d41e5-a13b-a3bc-2963-3518dc610dbe@arm.com>
+Date:   Fri, 1 May 2020 16:30:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
-Content-Disposition: inline
-In-Reply-To: <CAP4+ddND+RrQG7gGoKQ+ydnwXpr0HLrxUyi-pshc-jsigCwjBg@mail.gmail.com>
+In-Reply-To: <fcc54fdb-3d7d-3a4c-5c99-120bc156d48f@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
---ReaqsoxgOBHFXBhH
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 3/31/20 12:51 PM, André Przywara wrote:
+> On 26/03/2020 15:24, Alexandru Elisei wrote:
+>
+> Hi,
+>
+>> kvmtool uses brlock for protecting accesses to the ioport and mmio
+>> red-black trees. brlock allows concurrent reads, but only one writer, which
+>> is assumed not to be a VCPU thread (for more information see commit
+>> 0b907ed2eaec ("kvm tools: Add a brlock)). This is done by issuing a
+>> compiler barrier on read and pausing the entire virtual machine on writes.
+>> When KVM_BRLOCK_DEBUG is defined, brlock uses instead a pthread read/write
+>> lock.
+>>
+>> When we will implement reassignable BARs, the mmio or ioport mapping will
+>> be done as a result of a VCPU mmio access. When brlock is a pthread
+>> read/write lock, it means that we will try to acquire a write lock with the
+>> read lock already held by the same VCPU and we will deadlock. When it's
+>> not, a VCPU will have to call kvm__pause, which means the virtual machine
+>> will stay paused forever.
+>>
+>> Let's avoid all this by using a mutex and reference counting the red-black
+>> tree entries. This way we can guarantee that we won't unregister a node
+>> that another thread is currently using for emulation.
+>>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  include/kvm/ioport.h          |  2 +
+>>  include/kvm/rbtree-interval.h |  4 +-
+>>  ioport.c                      | 64 +++++++++++++++++-------
+>>  mmio.c                        | 91 +++++++++++++++++++++++++----------
+>>  4 files changed, 118 insertions(+), 43 deletions(-)
+>>
+>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+>> index 62a719327e3f..039633f76bdd 100644
+>> --- a/include/kvm/ioport.h
+>> +++ b/include/kvm/ioport.h
+>> @@ -22,6 +22,8 @@ struct ioport {
+>>  	struct ioport_operations	*ops;
+>>  	void				*priv;
+>>  	struct device_header		dev_hdr;
+>> +	u32				refcount;
+>> +	bool				remove;
+> The use of this extra "remove" variable seems somehow odd. I think
+> normally you would initialise the refcount to 1, and let the unregister
+> operation do a put as well, with the removal code triggered if the count
+> reaches zero. At least this is what kref does, can we do the same here?
+> Or is there anything that would prevent it? I think it's a good idea to
+> stick to existing design patterns for things like refcounts.
+>
+> Cheers,
+> Andre.
+>
+You're totally right, it didn't cross my mind to initialize refcount to 1, it's a
+great idea, I'll do it like that.
 
-On Wed, Apr 22, 2020 at 07:51:09AM +0200, Anders =D6stling wrote:
-> I am fighting to understand the difference between backing up a VM by
-> using a regular copy vs using the virsh blockcopy command.
-> What I want to do is to suspend the vm, copy the XML and .QCOW2 files
-> and then resume the vm again. What are your thoughts? What are the
-> drawbacks compared to other methods?
-
-Hi Anders,
-The kvm@vger.kernel.org mailing list is mostly for the discussion and
-development of the KVM kernel module so you may not get replies.  I have
-CCed libvir-list and developers who have been involved in libvirt backup
-features.
-
-A naive cp(1) command will be very slow because the entire disk image is
-copied to a new file.  The fastest solution with cp(1) is the --reflink
-flag which basically takes a snapshot of the file and shares the disk
-blocks (only available when the host file system supports it and not
-available across mounts).
-
-Libvirt's backup commands are more powerful.  They can do things like
-copy out a point-in-time snapshot of the disk while the guest is
-running.  They also support incremental backup so you don't need to
-store a full copy of the disk image each time you take a backup.
-
-I hope others will join the discussion and give examples of some of the
-available features.
-
-Stefan
-
---ReaqsoxgOBHFXBhH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6sOsoACgkQnKSrs4Gr
-c8hPawf9HQN6I/s9Pb80GKVYBkQDLBd4K5BH8JPNozYDAwziYHxmgnv1YU/0hP+L
-tuPZT9pVQs4BSxlP1Qy4WdLfZzNIq6rtktAcSZiHDoBdNN5GB50Y+tZc/fKX/HFZ
-allmP7fw+JnEIHDuQqdKfRXz3N9hOrnYb5B3/6YXvc90ROojc1PIWdf64/qAbx+m
-3XHtcgMyGM4QRaYV5MLa9Bdr1VS+ntCMyS4XxEsQBU8AyNqBGLu3ZY5vjyBoIx8O
-KTyGFU0BRE1JII8FlxZZEGA6Om9vAdxXiqrRwIk2RO9vViKQ448GKYLZYYR8t1F9
-O5QYX3siA946sTuLZ9BRBTZHaKWdvQ==
-=3Co8
------END PGP SIGNATURE-----
-
---ReaqsoxgOBHFXBhH--
+Thanks,
+Alex
