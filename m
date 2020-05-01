@@ -2,100 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 116C71C0D7A
-	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 06:39:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD43A1C10A8
+	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 12:12:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728232AbgEAEi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 May 2020 00:38:57 -0400
-Received: from foss.arm.com ([217.140.110.172]:36242 "EHLO foss.arm.com"
+        id S1728480AbgEAKMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 May 2020 06:12:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36968 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726153AbgEAEi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 May 2020 00:38:56 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB9871FB;
-        Thu, 30 Apr 2020 21:38:55 -0700 (PDT)
-Received: from localhost.localdomain (entos-thunderx2-02.shanghai.arm.com [10.169.138.57])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 29EC83F73D;
-        Thu, 30 Apr 2020 21:38:52 -0700 (PDT)
-From:   Jia He <justin.he@arm.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kaly Xin <Kaly.Xin@arm.com>,
-        Jia He <justin.he@arm.com>
-Subject: [PATCH v2] vhost: vsock: kick send_pkt worker once device is started
-Date:   Fri,  1 May 2020 12:38:40 +0800
-Message-Id: <20200501043840.186557-1-justin.he@arm.com>
-X-Mailer: git-send-email 2.17.1
+        id S1728268AbgEAKMN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 May 2020 06:12:13 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CC8272071C;
+        Fri,  1 May 2020 10:12:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588327932;
+        bh=MklRYqz2k5cgg9fDxl/d5X5Bx725+ZQ/Ik6viwGxla4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=X1YhUQCCR6e8QRgIEHrOJrY2OLaP82i20DIb+Jk+ZKCeEwwvw3Zpb0ro3VcUTEhw4
+         gaaZNfih7lrLfPOWi2d/T3xjcde6aAizPmXuK+c1j7yME1SY2dNkQt0+ZatzQuPJ+W
+         LFZ0qpF5NDxuEBSFW5mNfRKLlY02LLeFJT5i58ac=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jUSeR-008J3K-7D; Fri, 01 May 2020 11:12:11 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Fangrui Song <maskray@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm fixes for 5.7, take #2
+Date:   Fri,  1 May 2020 11:12:00 +0100
+Message-Id: <20200501101204.364798-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com, maskray@google.com, mark.rutland@arm.com, ndesaulniers@google.com, will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ning Bo reported an abnormal 2-second gap when booting Kata container [1].
-The unconditional timeout was caused by VSOCK_DEFAULT_CONNECT_TIMEOUT of
-connecting from the client side. The vhost vsock client tries to connect
-an initializing virtio vsock server.
+Paolo,
 
-The abnormal flow looks like:
-host-userspace           vhost vsock                       guest vsock
-==============           ===========                       ============
-connect()     -------->  vhost_transport_send_pkt_work()   initializing
-   |                     vq->private_data==NULL
-   |                     will not be queued
-   V
-schedule_timeout(2s)
-                         vhost_vsock_start()  <---------   device ready
-                         set vq->private_data
+This is the second batch of KVM/arm fixes for 5.7. A compilation fix,
+a GICv4.1 fix, plus a couple of sanity checks (SP_EL0 save/restore,
+and the sanitising of AArch32 registers).
 
-wait for 2s and failed
-connect() again          vq->private_data!=NULL         recv connecting pkt
+Note that the pull request I sent a week ago[1] is still valid, and
+that this new series is built on top of the previous one.
 
-Details:
-1. Host userspace sends a connect pkt, at that time, guest vsock is under
-   initializing, hence the vhost_vsock_start has not been called. So
-   vq->private_data==NULL, and the pkt is not been queued to send to guest
-2. Then it sleeps for 2s
-3. After guest vsock finishes initializing, vq->private_data is set
-4. When host userspace wakes up after 2s, send connecting pkt again,
-   everything is fine.
+Please pull,
 
-As suggested by Stefano Garzarella, this fixes it by additional kicking the
-send_pkt worker in vhost_vsock_start once the virtio device is started. This
-makes the pending pkt sent again.
+	M.
 
-After this patch, kata-runtime (with vsock enabled) boot time is reduced
-from 3s to 1s on a ThunderX2 arm64 server.
+[1] https://lore.kernel.org/kvm/20200423154009.4113562-1-maz@kernel.org/
 
-[1] https://github.com/kata-containers/runtime/issues/1917
+The following changes since commit 446c0768f5509793a0e527a439d4866b24707b0e:
 
-Reported-by: Ning Bo <n.b@live.com>
-Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Jia He <justin.he@arm.com>
----
-v2: new solution suggested by Stefano Garzarella
+  Merge branch 'kvm-arm64/vgic-fixes-5.7' into kvmarm-master/master (2020-04-23 16:27:33 +0100)
 
- drivers/vhost/vsock.c | 5 +++++
- 1 file changed, 5 insertions(+)
+are available in the Git repository at:
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index e36aaf9ba7bd..0716a9cdffee 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -543,6 +543,11 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
- 		mutex_unlock(&vq->mutex);
- 	}
- 
-+	/* Some packets may have been queued before the device was started,
-+	 * let's kick the send worker to send them.
-+	 */
-+	vhost_work_queue(&vsock->dev, &vsock->send_pkt_work);
-+
- 	mutex_unlock(&vsock->dev.mutex);
- 	return 0;
- 
--- 
-2.17.1
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.7-2
 
+for you to fetch changes up to 0225fd5e0a6a32af7af0aefac45c8ebf19dc5183:
+
+  KVM: arm64: Fix 32bit PC wrap-around (2020-05-01 09:51:08 +0100)
+
+----------------------------------------------------------------
+KVM/arm fixes for Linux 5.7, take #2
+
+- Fix compilation with Clang
+- Correctly initialize GICv4.1 in the absence of a virtual ITS
+- Move SP_EL0 save/restore to the guest entry/exit code
+- Handle PC wrap around on 32bit guests, and narrow all 32bit
+  registers on userspace access
+
+----------------------------------------------------------------
+Fangrui Song (1):
+      KVM: arm64: Delete duplicated label in invalid_vector
+
+Marc Zyngier (3):
+      KVM: arm64: Save/restore sp_el0 as part of __guest_enter
+      KVM: arm64: vgic-v4: Initialize GICv4.1 even in the absence of a virtual ITS
+      KVM: arm64: Fix 32bit PC wrap-around
+
+ arch/arm64/kvm/guest.c           |  7 +++++++
+ arch/arm64/kvm/hyp/entry.S       | 23 +++++++++++++++++++++++
+ arch/arm64/kvm/hyp/hyp-entry.S   |  1 -
+ arch/arm64/kvm/hyp/sysreg-sr.c   | 17 +++--------------
+ virt/kvm/arm/hyp/aarch32.c       |  8 ++++++--
+ virt/kvm/arm/vgic/vgic-init.c    |  9 ++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |  3 ++-
+ 7 files changed, 49 insertions(+), 19 deletions(-)
