@@ -2,101 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3AC11C1992
-	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 17:30:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6ECF1C1A9A
+	for <lists+kvm@lfdr.de>; Fri,  1 May 2020 18:31:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729195AbgEAPaW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 May 2020 11:30:22 -0400
-Received: from foss.arm.com ([217.140.110.172]:42722 "EHLO foss.arm.com"
+        id S1729581AbgEAQbT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 May 2020 12:31:19 -0400
+Received: from mga18.intel.com ([134.134.136.126]:34079 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728812AbgEAPaV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 May 2020 11:30:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFD3A30E;
-        Fri,  1 May 2020 08:30:20 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19A0D3F68F;
-        Fri,  1 May 2020 08:30:19 -0700 (PDT)
-Subject: Re: [PATCH v3 kvmtool 19/32] ioport: mmio: Use a mutex and reference
- counting for locking
-To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
-        kvm@vger.kernel.org
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
-References: <20200326152438.6218-1-alexandru.elisei@arm.com>
- <20200326152438.6218-20-alexandru.elisei@arm.com>
- <fcc54fdb-3d7d-3a4c-5c99-120bc156d48f@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <e28d41e5-a13b-a3bc-2963-3518dc610dbe@arm.com>
-Date:   Fri, 1 May 2020 16:30:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1728443AbgEAQbT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 May 2020 12:31:19 -0400
+IronPort-SDR: W5sDEKIs7gx6q57Zw/agA/E19Qt/IYxLuPV/v/5g7tJu8TK7yAikEc/cBCkU16Ixkse2k/L4ih
+ hEbd/uaK5roA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2020 09:31:18 -0700
+IronPort-SDR: cpEtsaaOrcMa0T8NEjZHyuf7OcEaONkNfLXa6DIHBYIQTqjUCVND3/OmJiIN40xVxl9pVTHgus
+ 2PfpTHNI7yKw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,340,1583222400"; 
+   d="scan'208";a="262131602"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by orsmga006.jf.intel.com with ESMTP; 01 May 2020 09:31:18 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
+        KarimAllah Raslan <karahmed@amazon.de>
+Subject: [PATCH v2] KVM: nVMX: Skip IBPB when switching between vmcs01 and vmcs02
+Date:   Fri,  1 May 2020 09:31:17 -0700
+Message-Id: <20200501163117.4655-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-In-Reply-To: <fcc54fdb-3d7d-3a4c-5c99-120bc156d48f@arm.com>
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Skip the Indirect Branch Prediction Barrier that is triggered on a VMCS
+switch when running with spectre_v2_user=on/auto if the switch is
+between two VMCSes in the same guest, i.e. between vmcs01 and vmcs02.
+The IBPB is intended to prevent one guest from attacking another, which
+is unnecessary in the nested case as it's the same guest from KVM's
+perspective.
 
-On 3/31/20 12:51 PM, André Przywara wrote:
-> On 26/03/2020 15:24, Alexandru Elisei wrote:
->
-> Hi,
->
->> kvmtool uses brlock for protecting accesses to the ioport and mmio
->> red-black trees. brlock allows concurrent reads, but only one writer, which
->> is assumed not to be a VCPU thread (for more information see commit
->> 0b907ed2eaec ("kvm tools: Add a brlock)). This is done by issuing a
->> compiler barrier on read and pausing the entire virtual machine on writes.
->> When KVM_BRLOCK_DEBUG is defined, brlock uses instead a pthread read/write
->> lock.
->>
->> When we will implement reassignable BARs, the mmio or ioport mapping will
->> be done as a result of a VCPU mmio access. When brlock is a pthread
->> read/write lock, it means that we will try to acquire a write lock with the
->> read lock already held by the same VCPU and we will deadlock. When it's
->> not, a VCPU will have to call kvm__pause, which means the virtual machine
->> will stay paused forever.
->>
->> Let's avoid all this by using a mutex and reference counting the red-black
->> tree entries. This way we can guarantee that we won't unregister a node
->> that another thread is currently using for emulation.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  include/kvm/ioport.h          |  2 +
->>  include/kvm/rbtree-interval.h |  4 +-
->>  ioport.c                      | 64 +++++++++++++++++-------
->>  mmio.c                        | 91 +++++++++++++++++++++++++----------
->>  4 files changed, 118 insertions(+), 43 deletions(-)
->>
->> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
->> index 62a719327e3f..039633f76bdd 100644
->> --- a/include/kvm/ioport.h
->> +++ b/include/kvm/ioport.h
->> @@ -22,6 +22,8 @@ struct ioport {
->>  	struct ioport_operations	*ops;
->>  	void				*priv;
->>  	struct device_header		dev_hdr;
->> +	u32				refcount;
->> +	bool				remove;
-> The use of this extra "remove" variable seems somehow odd. I think
-> normally you would initialise the refcount to 1, and let the unregister
-> operation do a put as well, with the removal code triggered if the count
-> reaches zero. At least this is what kref does, can we do the same here?
-> Or is there anything that would prevent it? I think it's a good idea to
-> stick to existing design patterns for things like refcounts.
->
-> Cheers,
-> Andre.
->
-You're totally right, it didn't cross my mind to initialize refcount to 1, it's a
-great idea, I'll do it like that.
+This all but eliminates the overhead observed for nested VMX transitions
+when running with CONFIG_RETPOLINE=y and spectre_v2_user=on/auto, which
+can be significant, e.g. roughly 3x on current systems.
 
-Thanks,
-Alex
+Reported-by: Alexander Graf <graf@amazon.com>
+Cc: KarimAllah Raslan <karahmed@amazon.de>
+Cc: stable@vger.kernel.org
+Fixes: 15d45071523d ("KVM/x86: Add IBPB support")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+
+v2: Pass a boolean to indicate a nested VMCS switch and instead WARN if
+    the buddy VMCS is not already loaded.  [Alex]
+
+Paolo, feel free to drop the WARN_ON_ONCE() if you think it's overkill.
+I'm 50/50 as to whether it's useful or just a waste of cycles.  Figured
+it'd be easier for you to delete a line of code while applying than to add
+and test a new WARN.
+
+ arch/x86/kvm/vmx/nested.c | 3 ++-
+ arch/x86/kvm/vmx/vmx.c    | 7 ++++---
+ arch/x86/kvm/vmx/vmx.h    | 2 +-
+ 3 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 2c36f3f53108..b57420f3dd8f 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -302,8 +302,9 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
+ 
+ 	cpu = get_cpu();
+ 	prev = vmx->loaded_vmcs;
++	WARN_ON_ONCE(prev->cpu != cpu || prev->vmcs != per_cpu(current_vmcs, cpu));
+ 	vmx->loaded_vmcs = vmcs;
+-	vmx_vcpu_load_vmcs(vcpu, cpu);
++	vmx_vcpu_load_vmcs(vcpu, cpu, true);
+ 	vmx_sync_vmcs_host_state(vmx, prev);
+ 	put_cpu();
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 3ab6ca6062ce..d3d57b7a67bd 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1311,7 +1311,7 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 		pi_set_on(pi_desc);
+ }
+ 
+-void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
++void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool nested_switch)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	bool already_loaded = vmx->loaded_vmcs->cpu == cpu;
+@@ -1336,7 +1336,8 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
+ 	if (per_cpu(current_vmcs, cpu) != vmx->loaded_vmcs->vmcs) {
+ 		per_cpu(current_vmcs, cpu) = vmx->loaded_vmcs->vmcs;
+ 		vmcs_load(vmx->loaded_vmcs->vmcs);
+-		indirect_branch_prediction_barrier();
++		if (!nested_switch)
++			indirect_branch_prediction_barrier();
+ 	}
+ 
+ 	if (!already_loaded) {
+@@ -1377,7 +1378,7 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+-	vmx_vcpu_load_vmcs(vcpu, cpu);
++	vmx_vcpu_load_vmcs(vcpu, cpu, false);
+ 
+ 	vmx_vcpu_pi_load(vcpu, cpu);
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index b5e773267abe..fa61dc802183 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -320,7 +320,7 @@ struct kvm_vmx {
+ };
+ 
+ bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+-void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu);
++void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool nested_switch);
+ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+ int allocate_vpid(void);
+ void free_vpid(int vpid);
+-- 
+2.26.0
+
