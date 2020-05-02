@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C55A51C22F1
-	for <lists+kvm@lfdr.de>; Sat,  2 May 2020 06:32:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C3AC1C2303
+	for <lists+kvm@lfdr.de>; Sat,  2 May 2020 06:33:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727866AbgEBEck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 May 2020 00:32:40 -0400
-Received: from mga09.intel.com ([134.134.136.24]:55787 "EHLO mga09.intel.com"
+        id S1728070AbgEBEdR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 May 2020 00:33:17 -0400
+Received: from mga09.intel.com ([134.134.136.24]:55789 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727788AbgEBEci (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727791AbgEBEci (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 2 May 2020 00:32:38 -0400
-IronPort-SDR: WgN3tQ+UWPlmfD6XevRqz1dS3mSVZM26auH+rO6HZ2beM33ZU/jrUpBA3BWnK+2ZUhwKmvyy84
- I8CMOPbmsJ8Q==
+IronPort-SDR: 2dSyjpuev4NHOnYfXYwzlj942eApvlbQMYoWcDH9QJFQ68+VPuK+s00EHWVNawkiUVjHjI1S0x
+ kK2PLW7vSHGQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2020 21:32:37 -0700
-IronPort-SDR: Jq4hYXhJD6UfsEAjZz3DJkieTU+JnDgsrt1soCpK+scxwxCCKRYsGZrpLf7VbJ0vI5Bkr829JX
- nME8xDpLABUQ==
+IronPort-SDR: lWUA5Fb1CHqS/CzeMRdFFjJat7n8GOmxhUXWKDuJsoql4LOYgSDp2pxIpEeMldZ0Fa0ZV0tqyy
+ vv59G8X1XOHg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,342,1583222400"; 
-   d="scan'208";a="433516120"
+   d="scan'208";a="433516123"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
   by orsmga005.jf.intel.com with ESMTP; 01 May 2020 21:32:37 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -32,9 +32,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 03/10] KVM: x86: Make kvm_x86_ops' {g,s}et_dr6() hooks optional
-Date:   Fri,  1 May 2020 21:32:27 -0700
-Message-Id: <20200502043234.12481-4-sean.j.christopherson@intel.com>
+Subject: [PATCH 04/10] KVM: x86: Split guts of kvm_update_dr7() to separate helper
+Date:   Fri,  1 May 2020 21:32:28 -0700
+Message-Id: <20200502043234.12481-5-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200502043234.12481-1-sean.j.christopherson@intel.com>
 References: <20200502043234.12481-1-sean.j.christopherson@intel.com>
@@ -45,69 +45,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make get_dr6() and set_dr6() optional and drop the VMX implementations,
-which are for all intents and purposes nops.  This avoids a retpoline on
-VMX when reading/writing DR6, at minimal cost (~1 uop) to SVM.
+Move the calculation of the effective DR7 into a separate helper,
+__kvm_update_dr7(), and make the helper visible to vendor code.  It will
+be used in a future patch to avoid the retpoline associated with
+kvm_x86_ops.set_dr7() when stuffing DR7 during nested VMX transitions.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 11 -----------
- arch/x86/kvm/x86.c     |  6 ++++--
- 2 files changed, 4 insertions(+), 13 deletions(-)
+ arch/x86/kvm/x86.c | 11 +----------
+ arch/x86/kvm/x86.h | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index de18cd386bb1..e157bdc218ea 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5008,15 +5008,6 @@ static int handle_dr(struct kvm_vcpu *vcpu)
- 	return kvm_skip_emulated_instruction(vcpu);
- }
- 
--static u64 vmx_get_dr6(struct kvm_vcpu *vcpu)
--{
--	return vcpu->arch.dr6;
--}
--
--static void vmx_set_dr6(struct kvm_vcpu *vcpu, unsigned long val)
--{
--}
--
- static void vmx_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
- {
- 	get_debugreg(vcpu->arch.db[0], 0);
-@@ -7799,8 +7790,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.set_idt = vmx_set_idt,
- 	.get_gdt = vmx_get_gdt,
- 	.set_gdt = vmx_set_gdt,
--	.get_dr6 = vmx_get_dr6,
--	.set_dr6 = vmx_set_dr6,
- 	.set_dr7 = vmx_set_dr7,
- 	.sync_dirty_debug_regs = vmx_sync_dirty_debug_regs,
- 	.cache_reg = vmx_cache_reg,
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8ec356ac1e6e..eccbfcb6a4e5 100644
+index eccbfcb6a4e5..8893c42eac9e 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1069,7 +1069,8 @@ static void kvm_update_dr0123(struct kvm_vcpu *vcpu)
+@@ -1076,16 +1076,7 @@ static void kvm_update_dr6(struct kvm_vcpu *vcpu)
  
- static void kvm_update_dr6(struct kvm_vcpu *vcpu)
+ static void kvm_update_dr7(struct kvm_vcpu *vcpu)
  {
--	if (!(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP))
-+	if (!(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) &&
-+	    kvm_x86_ops.set_dr6)
- 		kvm_x86_ops.set_dr6(vcpu, vcpu->arch.dr6);
+-	unsigned long dr7;
+-
+-	if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP)
+-		dr7 = vcpu->arch.guest_debug_dr7;
+-	else
+-		dr7 = vcpu->arch.dr7;
+-	kvm_x86_ops.set_dr7(vcpu, dr7);
+-	vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_BP_ENABLED;
+-	if (dr7 & DR7_BP_EN_MASK)
+-		vcpu->arch.switch_db_regs |= KVM_DEBUGREG_BP_ENABLED;
++	kvm_x86_ops.set_dr7(vcpu, __kvm_update_dr7(vcpu));
  }
  
-@@ -1148,7 +1149,8 @@ int kvm_get_dr(struct kvm_vcpu *vcpu, int dr, unsigned long *val)
- 	case 4:
- 		/* fall through */
- 	case 6:
--		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP)
-+		if ((vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) ||
-+		    !kvm_x86_ops.get_dr6)
- 			*val = vcpu->arch.dr6;
- 		else
- 			*val = kvm_x86_ops.get_dr6(vcpu);
+ static u64 kvm_dr6_fixed(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 7b5ed8ed628e..75010b22e379 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -236,6 +236,20 @@ static inline void kvm_register_writel(struct kvm_vcpu *vcpu,
+ 	return kvm_register_write(vcpu, reg, val);
+ }
+ 
++static inline unsigned long __kvm_update_dr7(struct kvm_vcpu *vcpu)
++{
++	unsigned long dr7;
++
++	if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP)
++		dr7 = vcpu->arch.guest_debug_dr7;
++	else
++		dr7 = vcpu->arch.dr7;
++	vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_BP_ENABLED;
++	if (dr7 & DR7_BP_EN_MASK)
++		vcpu->arch.switch_db_regs |= KVM_DEBUGREG_BP_ENABLED;
++	return dr7;
++}
++
+ static inline bool kvm_check_has_quirk(struct kvm *kvm, u64 quirk)
+ {
+ 	return !(kvm->arch.disabled_quirks & quirk);
 -- 
 2.26.0
 
