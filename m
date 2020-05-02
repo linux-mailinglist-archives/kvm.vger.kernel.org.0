@@ -2,135 +2,392 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AD8E1C25F7
-	for <lists+kvm@lfdr.de>; Sat,  2 May 2020 15:58:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 519AC1C2649
+	for <lists+kvm@lfdr.de>; Sat,  2 May 2020 16:47:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728057AbgEBN6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 May 2020 09:58:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41739 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727992AbgEBN6c (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 2 May 2020 09:58:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588427910;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ESS5rOuW2BzSw9OBT5+3Gc3Aet+QYHhLhgxUjYGmRL4=;
-        b=RmMIvHbuEFuhZQatJfSbhh6VxtHyQ2tjQW/m3LD6mxrvP5d8aP8mGF+nzbaGXSYjdndLJY
-        eoiRTGdnNLCf3IJOAOKdkwRW6IGDY6tVEUFDW1ug9xNr3YRrJPx+/AHb83cMT3SjE3zAVD
-        a4ZXmbAO6yyt7Rea6Kvh+56F1glx7GE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-lkSPadkdMESp93m96k5qoQ-1; Sat, 02 May 2020 09:58:16 -0400
-X-MC-Unique: lkSPadkdMESp93m96k5qoQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC03F1800D4A;
-        Sat,  2 May 2020 13:58:15 +0000 (UTC)
-Received: from starship (unknown [10.35.206.40])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8380538A;
-        Sat,  2 May 2020 13:58:14 +0000 (UTC)
-Message-ID: <9ce7bb5c4fb8bcc4ac21103f7534a6edfcbe195d.camel@redhat.com>
-Subject: AVIC related warning in enable_irq_window
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org
-Date:   Sat, 02 May 2020 16:58:13 +0300
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+        id S1728072AbgEBOrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 May 2020 10:47:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32882 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728023AbgEBOrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 May 2020 10:47:19 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132ACC061A0C;
+        Sat,  2 May 2020 07:47:19 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id 188so3223270wmc.2;
+        Sat, 02 May 2020 07:47:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=DahNpcnSFQxBcoT5kqGiidS1iWOdkZNRfHykIlRRIvI=;
+        b=C89odLkXn4Odk9hCQ1/YrH+YYsCmLuVwbQBhMl+UsOf0lqtH0/hzmZY00IdAtksqDk
+         +sonUfSwtUyJLzBVKX6ZOiUQnA57naNuM/7O2ncAvIAnqroOgPDSphLbsXZrf4n6OZbv
+         9+FPirANEA7M+VVb9Nt2DsKM2AG9u11GUkR/LasBWR6SchiO8ca6VVU8dv10+Ns9Tp7H
+         qeLVYGMAEd662pcuT5hy65KFjtst1/lWZ8E3ZjbkaHvg8jLapgL7TkL13InpPc3Z/Kd8
+         Qfo3qCGAx8hAqsIIz1dtuKYRwoGxMuEQNrbx9FZJzKyrWz+NgxWnHExFFk1VfKyd4n32
+         r+rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=DahNpcnSFQxBcoT5kqGiidS1iWOdkZNRfHykIlRRIvI=;
+        b=bPZhCyZR5tvgK2r5Zs+9ky+GKtliDfR5zV6ZSlF31azw2Ncqi3UVtooPObd1j9ruGP
+         52rE90ClotbVOxEecog/wwVezhLt0MV35517otSaLL0oP0n9Uao3b8Wp2FigWUBFZQ81
+         b9MM5x/Qc0OnoggGtXddcmfPUm19oCtL2HV/Nj5ZFHNMB1nzMvrhm/WL7Grh+F6cMzt3
+         szI6KHjbrdwAut/bBX7NA1gsbTVjWkhE2b6XAfjFhdaJWCi/k3NAUXVABFQWBqJQvn89
+         DrQn2fkkb1ORscJHCYgLXW0Y3kkyQBDwqNDTOURhdTXYh8hn1EWQPQRRYsyUoeHCdfjJ
+         YJPQ==
+X-Gm-Message-State: AGi0PuYLOvJzhykVcfZtaHngscXSnOvkym3oQlgp2wuQ5oPDvIIFYkiA
+        fmLh+PgVJ4KaoA/vaPHDG6A19xZdY9A=
+X-Google-Smtp-Source: APiQypKAEIsbqR2ilXo6zhsExljgr4qg9DIz323lQIPhf7tvA+gsNupD+Pw7n88UVXOK11Z5ofIabw==
+X-Received: by 2002:a1c:5403:: with SMTP id i3mr5326006wmb.10.1588430837567;
+        Sat, 02 May 2020 07:47:17 -0700 (PDT)
+Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+        by smtp.gmail.com with ESMTPSA id k23sm4428287wmi.46.2020.05.02.07.47.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 May 2020 07:47:16 -0700 (PDT)
+Date:   Sat, 2 May 2020 17:47:15 +0300
+From:   Jon Doron <arilou@gmail.com>
+To:     Roman Kagan <rvkagan@yandex-team.ru>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, vkuznets@redhat.com
+Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
+Message-ID: <20200502144715.GA2862@jondnuc>
+References: <20200416083847.1776387-1-arilou@gmail.com>
+ <20200416120040.GA3745197@rvkaganb>
+ <20200416125430.GL7606@jondnuc>
+ <20200417104251.GA3009@rvkaganb>
+ <20200418064127.GB1917435@jondnuc>
+ <20200424133742.GA2439920@rvkaganb>
+ <20200425061637.GF1917435@jondnuc>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200425061637.GF1917435@jondnuc>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi!
+On 25/04/2020, Jon Doron wrote:
+>On 24/04/2020, Roman Kagan wrote:
+>>On Sat, Apr 18, 2020 at 09:41:27AM +0300, Jon Doron wrote:
+>>>On 17/04/2020, Roman Kagan wrote:
+>>>> On Thu, Apr 16, 2020 at 03:54:30PM +0300, Jon Doron wrote:
+>>>> > On 16/04/2020, Roman Kagan wrote:
+>>>> > > On Thu, Apr 16, 2020 at 11:38:46AM +0300, Jon Doron wrote:
+>>>> > > > According to the TLFS:
+>>>> > > > "A write to the end of message (EOM) register by the guest causes the
+>>>> > > > hypervisor to scan the internal message buffer queue(s) associated with
+>>>> > > > the virtual processor.
+>>>> > > >
+>>>> > > > If a message buffer queue contains a queued message buffer, the hypervisor
+>>>> > > > attempts to deliver the message.
+>>>> > > >
+>>>> > > > Message delivery succeeds if the SIM page is enabled and the message slot
+>>>> > > > corresponding to the SINTx is empty (that is, the message type in the
+>>>> > > > header is set to HvMessageTypeNone).
+>>>> > > > If a message is successfully delivered, its corresponding internal message
+>>>> > > > buffer is dequeued and marked free.
+>>>> > > > If the corresponding SINTx is not masked, an edge-triggered interrupt is
+>>>> > > > delivered (that is, the corresponding bit in the IRR is set).
+>>>> > > >
+>>>> > > > This register can be used by guests to poll for messages. It can also be
+>>>> > > > used as a way to drain the message queue for a SINTx that has
+>>>> > > > been disabled (that is, masked)."
+>>>> > >
+>>>> > > Doesn't this work already?
+>>>> > >
+>>>> >
+>>>> > Well if you dont have SCONTROL and a GSI associated with the SINT then it
+>>>> > does not...
+>>>>
+>>>> Yes you do need both of these.
+>>>>
+>>>> > > > So basically this means that we need to exit on EOM so the hypervisor
+>>>> > > > will have a chance to send all the pending messages regardless of the
+>>>> > > > SCONTROL mechnaisim.
+>>>> > >
+>>>> > > I might be misinterpreting the spec, but my understanding is that
+>>>> > > SCONTROL {en,dis}ables the message queueing completely.  What the quoted
+>>>> > > part means is that a write to EOM should trigger the message source to
+>>>> > > push a new message into the slot, regardless of whether the SINT was
+>>>> > > masked or not.
+>>>> > >
+>>>> > > And this (I think, haven't tested) should already work.  The userspace
+>>>> > > just keeps using the SINT route as it normally does, posting
+>>>> > > notifications to the corresponding irqfd when posting a message, and
+>>>> > > waiting on the resamplerfd for the message slot to become free.  If the
+>>>> > > SINT is masked KVM will skip injecting the interrupt, that's it.
+>>>> > >
+>>>> > > Roman.
+>>>> >
+>>>> > That's what I was thinking originally as well, but then i noticed KDNET as a
+>>>> > VMBus client (and it basically runs before anything else) is working in this
+>>>> > polling mode, where SCONTROL is disabled and it just loops, and if it saw
+>>>> > there is a PENDING message flag it will issue an EOM to indicate it has free
+>>>> > the slot.
+>>>>
+>>>> Who sets up the message page then?  Doesn't it enabe SCONTROL as well?
+>>>>
+>>>
+>>>KdNet is the one setting the SIMP and it's not setting the SCONTROL, ill
+>>>paste output of KVM traces for the relevant MSRs
+>>>
+>>>> Note that, even if you don't see it being enabled by Windows, it can be
+>>>> enabled by the firmware and/or by the bootloader.
+>>>>
+>>>> Can you perhaps try with the SeaBIOS from
+>>>> https://src.openvz.org/projects/UP/repos/seabios branch hv-scsi?  It
+>>>> enables SCONTROL and leaves it that way.
+>>>>
+>>>> I'd also suggest tracing kvm_msr events (both reads and writes) for
+>>>> SCONTROL and SIMP msrs, to better understand the picture.
+>>>>
+>>>> So far the change you propose appears too heavy to work around the
+>>>> problem of disabled SCONTROL.  You seem to be better off just making
+>>>> sure it's enabled (either by the firmware or slighly violating the spec
+>>>> and initializing to enabled from the start), and sticking to the
+>>>> existing infrastructure for posting messages.
+>>>>
+>>>
+>>>I guess there is something I'm missing here but let's say the BIOS would
+>>>have set the SCONTROL but the OS is not setting it, who is in charge of
+>>>handling the interrupts?
+>>
+>>SCONTROL doesn't enable the interrupts, it enables SynIC as a whole.
+>>The interrupts are enabled via individual SINTx msrs.  This SeaBIOS
+>>branch does exactly this: it enables the SynIC via SCONTROL, and then
+>>specific SynIC functionality via SIMP/SIEFP, but doesn't activate SINTx
+>>and works in polling mode.
+>>
+>>I agree that this global SCONTROL switch seems redundant but it appears
+>>to match the spec.
+>>
+>>>> > (There are a bunch of patches i sent on the QEMU mailing list as well  where
+>>>> > i CCed you, I will probably revise it a bit but was hoping to get  KVM
+>>>> > sorted out first).
+>>>>
+>>>> I'll look through the archive, should be there, thanks.
+>>>>
+>>>> Roman.
+>>>
+>>>I tried testing with both the SeaBIOS branch you have suggested and the
+>>>EDK2, unfortunately I could not get the EDK2 build to identify my VM drive
+>>>to boot from (not sure why)
+>>>
+>>>Here is an output of KVM trace for the relevant MSRs (SCONTROL and SIMP)
+>>>
+>>>QEMU Default BIOS
+>>>-----------------
+>>> qemu-system-x86-613   [000] ....  1121.080722: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
+>>> qemu-system-x86-613   [000] ....  1121.080722: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
+>>> qemu-system-x86-613   [000] .N..  1121.095592: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
+>>> qemu-system-x86-613   [000] .N..  1121.095592: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
+>>>Choose Windows DebugEntry
+>>> qemu-system-x86-613   [001] ....  1165.185227: kvm_msr: msr_read 40000083 = 0x0
+>>> qemu-system-x86-613   [001] ....  1165.185255: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1001 host 0
+>>> qemu-system-x86-613   [001] ....  1165.185255: kvm_msr: msr_write 40000083 = 0xfa1001
+>>> qemu-system-x86-613   [001] ....  1165.193206: kvm_msr: msr_read 40000083 = 0xfa1001
+>>> qemu-system-x86-613   [001] ....  1165.193236: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1000 host 0
+>>> qemu-system-x86-613   [001] ....  1165.193237: kvm_msr: msr_write 40000083 = 0xfa1000
+>>>
+>>>
+>>>SeaBIOS hv-scsci
+>>>----------------
+>>> qemu-system-x86-656   [001] ....  1313.072714: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
+>>> qemu-system-x86-656   [001] ....  1313.072714: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
+>>> qemu-system-x86-656   [001] ....  1313.087752: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x0 host 1
+>>> qemu-system-x86-656   [001] ....  1313.087752: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 1
+>>
+>>Initialization (host == 1)
+>>
+>>> qemu-system-x86-656   [001] ....  1313.156675: kvm_msr: msr_read 40000083 = 0x0
+>>> qemu-system-x86-656   [001] ....  1313.156680: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x7fffe001 host 0
+>>>Choose Windows DebugEntry
+>>
+>>I guess this is a bit misplaced timewise, BIOS is still working here
+>>
+>>> qemu-system-x86-656   [001] ....  1313.156680: kvm_msr: msr_write 40000083 = 0x7fffe001
+>>
+>>BIOS sets up message page
+>>
+>>> qemu-system-x86-656   [001] ....  1313.162111: kvm_msr: msr_read 40000080 = 0x0
+>>> qemu-system-x86-656   [001] ....  1313.162118: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000080 data 0x1 host 0
+>>> qemu-system-x86-656   [001] ....  1313.162119: kvm_msr: msr_write 40000080 = 0x1
+>>
+>>BIOS activates SCONTROL
+>>
+>>> qemu-system-x86-656   [001] ....  1313.246758: kvm_msr: msr_read 40000083 = 0x7fffe001
+>>> qemu-system-x86-656   [001] ....  1313.246764: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0x0 host 0
+>>> qemu-system-x86-656   [001] ....  1313.246764: kvm_msr: msr_write 40000083 = 0x0
+>>
+>>BIOS clears message page (it's not needed once the VMBus device was
+>>brought up)
+>>
+>>I guess the choice of Windows DebugEntry appeared somewhere here.
+>>
+>>> qemu-system-x86-656   [001] ....  1348.904727: kvm_msr: msr_read 40000083 = 0x0
+>>> qemu-system-x86-656   [001] ....  1348.904771: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1001 host 0
+>>> qemu-system-x86-656   [001] ....  1348.904772: kvm_msr: msr_write 40000083 = 0xfa1001
+>>
+>>Bootloader (debug stub?) sets up the message page
+>>
+>>> qemu-system-x86-656   [001] ....  1348.919170: kvm_msr: msr_read 40000083 = 0xfa1001
+>>> qemu-system-x86-656   [001] ....  1348.919183: kvm_hv_synic_set_msr: vcpu_id 0 msr 0x40000083 data 0xfa1000 host 0
+>>> qemu-system-x86-656   [001] ....  1348.919183: kvm_msr: msr_write 40000083 = 0xfa1000
+>>
+>>Message page is being disabled again.
+>>
+>>I guess you only filtered SCONTROL and SIMP, skipping e.g. SVERSION,
+>>GUEST_OS_ID, HYPERCALL, etc., which are also part of the exchange here.
+>>
+>
+>Right my bad :( if you want I can re-run the test with the others as 
+>well (do you need me to?)
+>
+>>> I could not get the EDK2 setup to work though
+>>> (https://src.openvz.org/projects/UP/repos/edk2 branch hv-scsi)
+>>>
+>>>It does not detect my VM hard drive not sure why (this is how i  configured
+>>>it:
+>>> -drive file=./win10.qcow2,format=qcow2,if=none,id=drive_disk0 \
+>>> -device virtio-blk-pci,drive=drive_disk0 \
+>>>
+>>>(Is there something special i need to configure it order for it to  work?, I
+>>>tried building EDK2 with and without SMM_REQUIRE and  SECURE_BOOT_ENABLE)
+>>
+>>No special configuration I can think of.
+>>
+>>>But in general it sounds like there is something I dont fully understand
+>>>when SCONTROL is enabled, then a GSI is associated with this SintRoute.
+>>>
+>>>Then when the guest triggers an EOI via the APIC we will trigger the GSI
+>>>notification, which will give us another go on trying to copy the message
+>>>into it's slot.
+>>
+>>Right.
+>>
+>>>So is it the OS that is in charge of setting the EOI?
+>>
+>>Yes.
+>>
+>>>If so then it needs to
+>>>be aware of SCONTROL being enabled and just having it left set by the BIOS
+>>>might not be enough?
+>>
+>>Yes it needs to be aware of SCONTROL being enabled.  However, this
+>>awareness may be based on a pure assumption that the previous entity
+>>(BIOS or bootloader) did it already.
+>>
+>>>Also in the TLFS (looking at v6) they mention that message queueing has "3
+>>>exit conditions", which will cause the hypervisor to try and attempt to
+>>>deliver the additional messages.
+>>>
+>>>The 3 exit conditions they refer to are:
+>>>* Another message buffer is queued.
+>>>* The guest indicates the “end of interrupt” by writing to the APIC’s   EOI
+>>>register.
+>>>* The guest indicates the “end of message” by writing to the SynIC’s EOM
+>>>register.
+>>>
+>>>Also notice this additional exit is only if there is a pending message and
+>>>not for every EOM.
+>>
+>>This meaning of "exit" doesn't trivially correspond to what we have in
+>>KVM.  A write to an msr does cause a vmexit.  Then KVM notifies resample
+>>eventfds for all SINTs that have them set up, no matter if there's a
+>>pending message in the slot.  It may be slightly more optimal to only
+>>notify those having indicated a pending message, but I don't see the
+>>current behavior break anything or violate the spec, so, as EOMs are not
+>>used on fast paths, I woudn't bother optimizing.
+>>
+>>Roman.
+>
+>Hi Roman,
+>
+>So based on your answer I got to the following conclusions (correct if 
+>they are wrong).
+>
+>First of the one in charge of setting the SCONTROL in the 1st place is 
+>the BIOS (I dont have a real Hyper-V setup so I cannot really debug it 
+>and see, not sure which BIOS they have or if we can "rip" it out and 
+>run it through KVM and see how things look like this way).
+>
+>If the BIOS has not set the SCONTROL I would expect the OS to have 
+>something along the lines:
+>if (!(get_scontrol() & ENABLED))
+>    set_scontrol(ENABLED);
+>
+>So I started looking through the entire Windows system looking what 
+>can set SCONTROL, I believe I have found the flow to be the following:
+>
+>VMBus.sys imports winhv.sys (which is an export library) winhv.sys 
+>will set the SCONTROL prior to VMBus DriverEntry starting here is the 
+>complete flow:
+>winhv!DllInitialize -> winhv!WinHvpInitialize -> 
+>winhv!WinHvReportPresentHypervisor -> winhv!WinHvpConnectToSynic -> 
+>winhv!WinHvpEnableSynic
+>
+>Eventually WinHvpEnableSynic will simply set SCONTROL (for future 
+>reference if anyone needs to look into how HyperV register access 
+>works in Windows it seems like there is an enum representing all the 
+>HyperV registers and to access it there are helper functions to 
+>Get/Set.
+>SCONTROL value in the enum is 0x0a0010 .
+>
+>winhv.sys simply provides very simple API to access the Sints i.e 
+>(WinHvSetSint / WinHvSetEndOfMessage / WinHvSetSintOnCurrentProcessor 
+>/  WinHvGetSintMessage / etc.)
+>
+>So basically it seems like the OS does not really care if the BIOS has 
+>setup the SCONTROL or not, and does so always (if it can) 
+>unfortunately in my flow (via kdnet) VMBus is not loaded yet and so 
+>does winhv.sys so they "fallback" into this Polling mode.
+>
+>So that covers the OS part, after that I have tried looking for 
+>relevant code in bootmgr and winload (which are Windows boot loader 
+>part (like grub) and I could not find any code that might setup 
+>SCONTROL.
+>
+>From your experience with this did you see Hyper-V BIOS simply setting 
+>the SCONTROL? Perhaps if that's the case then the correct fix needs to 
+>be in the SeaBIOS and the EDK .
+>
+>I tried to see if Hyper-V supports giving it a BIOS but could not find 
+>anyway of doing this, so it just might be that Hyper-V assumes the 
+>BIOS is in charge of setting up SCONTROL for all the boot loader 
+>components.
+>
+>But in a way it sounds weird because I would expect to see KDNet 
+>working with the ACPI to trigger the GSI but I could not find any 
+>relevant code that might do that.
+>
+>As I write this I think I'm starting to get your point just to make 
+>sure I understand it:
+>
+>1. When a new SintRoute is created we associate it with a GSI
+>2. When an EOM is set, we trigger all the GSIs so QEMU will get    
+>execution time and send all pending messages if it can.
+>
+>So basically like you said everything "works" from our perspective 
+>regardless if the system has setup SCONTROL or not, because you 
+>trigger the interrupt to QEMU regardless of SCONTROL so it can clear 
+>the pending message.
+>
+>If that's indeed the case then probably the only thing needs fixing in 
+>my scenario is in QEMU where it should not really care for the 
+>SCONTROL if it's enabled or not.
+>
+>Sounds about right?
+>
+>Thanks,
+>-- Jon.
 
-On kernel 5.7-rc3 I get the following warning when I boot a windows 10 VM with AVIC enabled
- 
-[ 6702.706124] WARNING: CPU: 0 PID: 118232 at arch/x86/kvm/svm/svm.c:1372 enable_irq_window+0x6a/0xa0 [kvm_amd]
-[ 6702.706124] Modules linked in: vfio_pci vfio_virqfd vfio_iommu_type1 vfio vhost_net vhost vhost_iotlb tap kvm_amd kvm irqbypass hfsplus ntfs msdos xfs hidp ccm rfcomm xt_MASQUERADE xt_conntrack
-ipt_REJECT iptable_mangle iptable_nat nf_nat ebtable_filter ebtables ip6table_filter ip6_tables tun bridge pmbus ee1004 pmbus_core jc42 cmac bnep sunrpc nls_iso8859_1 nls_cp437 vfat fat dm_mirror
-dm_region_hash dm_log nvidia_uvm(O) ucsi_ccg typec_ucsi typec wmi_bmof mxm_wmi iwlmvm mac80211 edac_mce_amd edac_core libarc4 joydev nvidia(PO) iwlwifi btusb btrtl input_leds btbcm btintel
-snd_hda_codec_hdmi bluetooth snd_usb_audio cdc_acm xpad snd_hda_intel cfg80211 snd_usbmidi_lib ff_memless snd_intel_dspcfg snd_rawmidi snd_hda_codec mc ecdh_generic snd_hwdep snd_seq ecc snd_hda_core
-thunderbolt rfkill i2c_nvidia_gpu pcspkr efi_pstore snd_seq_device bfq snd_pcm snd_timer snd zenpower i2c_piix4 rtc_cmos tpm_crb tpm_tis tpm_tis_core wmi tpm button binfmt_misc ext4 mbcache jbd2
-dm_crypt sd_mod uas
-[ 6702.706146]  usb_storage hid_generic usbhid hid crc32_pclmul amdgpu crc32c_intel gpu_sched ttm drm_kms_helper cfbfillrect ahci syscopyarea libahci cfbimgblt sysfillrect libata sysimgblt igb
-fb_sys_fops ccp cfbcopyarea i2c_algo_bit cec rng_core xhci_pci nvme xhci_hcd drm nvme_core drm_panel_orientation_quirks t10_pi it87 hwmon_vid fuse i2c_dev i2c_core ipv6 autofs4 [last unloaded:
-irqbypass]
-[ 6702.706640] CPU: 0 PID: 118232 Comm: CPU 0/KVM Tainted: P        W  O      5.7.0-rc3+ #30
-[ 6702.706667] Hardware name: Gigabyte Technology Co., Ltd. TRX40 DESIGNARE/TRX40 DESIGNARE, BIOS F4c 03/05/2020
-[ 6702.706712] RIP: 0010:enable_irq_window+0x6a/0xa0 [kvm_amd]
-[ 6702.706759] Code: 0c 10 48 89 df e8 56 3c 00 00 48 8b 83 c8 2d 00 00 f6 40 0c 10 74 31 48 83 bb f0 02 00 00 00 74 0b 80 bb f8 02 00 00 00 74 02 <0f> 0b 81 48 60 00 01 0f 00 c7 40 64 00 00 00 00 48
-8b 83 c8 2d 00
-[ 6702.706804] RSP: 0018:ffffc900073fbd48 EFLAGS: 00010202
-[ 6702.706847] RAX: ffff889f56a51000 RBX: ffff889f6c4f0000 RCX: 0000000000000000
-[ 6702.706871] RDX: 000060603ee37040 RSI: 00000000000000fb RDI: ffff889f6c4f0000
-[ 6702.706913] RBP: ffffc900073fbd50 R08: 0000000000000001 R09: 0000000000000000
-[ 6702.706959] R10: 000000000000029f R11: 0000000000000018 R12: 0000000000000001
-[ 6702.706983] R13: 8000000000000000 R14: ffff889f6c4f0000 R15: ffffc9000729e1a0
-[ 6702.707034] FS:  00007f8fa96f9700(0000) GS:ffff889fbe000000(0000) knlGS:0000000000000000
-[ 6702.707090] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 6702.707114] CR2: 0000000000000000 CR3: 0000001f5d236000 CR4: 0000000000340ef0
-[ 6702.707173] Call Trace:
-[ 6702.707217]  kvm_arch_vcpu_ioctl_run+0x6e3/0x1b50 [kvm]
-[ 6702.707273]  ? kvm_vm_ioctl_irq_line+0x27/0x40 [kvm]
-[ 6702.707298]  ? _copy_to_user+0x26/0x30
-[ 6702.707332]  ? kvm_vm_ioctl+0xb3e/0xd90 [kvm]
-[ 6702.707374]  ? set_next_entity+0x78/0xc0
-[ 6702.707407]  kvm_vcpu_ioctl+0x236/0x610 [kvm]
-[ 6702.707431]  ksys_ioctl+0x8a/0xc0
-[ 6702.707492]  __x64_sys_ioctl+0x1a/0x20
-[ 6702.707528]  do_syscall_64+0x58/0x210
-[ 6702.707553]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[ 6702.707596] RIP: 0033:0x7f8fb35e235b
-[ 6702.707637] Code: 0f 1e fa 48 8b 05 2d 9b 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d fd 9a 0c 00 f7
-d8 64 89 01 48
-[ 6702.707722] RSP: 002b:00007f8fa96f7728 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[ 6702.707747] RAX: ffffffffffffffda RBX: 0000556b7c859b90 RCX: 00007f8fb35e235b
-[ 6702.707788] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000022
-[ 6702.707845] RBP: 00007f8fa96f7820 R08: 0000556b7a6207f0 R09: 00000000000000ff
-[ 6702.707868] R10: 0000556b79f86ecd R11: 0000000000000246 R12: 00007ffd9a4264de
-[ 6702.707908] R13: 00007ffd9a4264df R14: 00007ffd9a4265a0 R15: 00007f8fa96f7a40
-[ 6702.707951] ---[ end trace d8146ba85c79e2a9 ]---
+Hi Roman, any chance you can have a quick look at this and see if I 
+understood you correctly?
 
-
-It looks like what happening is that enable_irq_window sometimes disables AVIC and then
-calls the svm_enable_vintr to enable intercept on the moment when guest enables interrupts.
-
-The AVIC is disabled by svm_toggle_avic_for_irq_window, which calls
-kvm_request_apicv_update, which broadcasts the KVM_REQ_APICV_UPDATE vcpu request,
-however it doesn't broadcast it to CPU on which now we are running, which seems OK,
-because the code that handles that broadcast runs on each VCPU entry, thus
-when this CPU will enter guest mode it will notice and disable the AVIC.
-
-However later in svm_enable_vintr, there is test 'WARN_ON(kvm_vcpu_apicv_active(&svm->vcpu));'
-which is still true on current CPU because of the above.
-
-The code containing this warning was added in commit
-
-64b5bd27042639dfcc1534f01771b7b871a02ffe
-KVM: nSVM: ignore L1 interrupt window while running L2 with V_INTR_MASKING=1
-
-The VM is running with SVM nesting disabled (-cpu svm=off), x2apic disabled, hv_synic disabled
-(but I will send another mail about this soon), and pit lost tick policy set to discard,
-to make AVIC actually be used.
-
-The cpu is 3970X running latest mainline git head. I also tried 'next' branch of the kvm tree
-without noticeable differences.
-
-One thing that is curious is that this CPU (probably bios bug doesn't advertise x2apic, but it
-is actually there. I added a hack to the kernel to pretend that the corresponding CPUID bit is
-set and it actually works. But AVIC doesn't have any support for guest's x2apic thus I disable
-x2apic for the guest completely.
-
-Best regards,
-	Maxim Levitsky
-
-
+Thanks,
+-- Jon.
