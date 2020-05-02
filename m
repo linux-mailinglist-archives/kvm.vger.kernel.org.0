@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9C701C22F5
-	for <lists+kvm@lfdr.de>; Sat,  2 May 2020 06:33:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C55A51C22F1
+	for <lists+kvm@lfdr.de>; Sat,  2 May 2020 06:32:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727832AbgEBEcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 May 2020 00:32:39 -0400
+        id S1727866AbgEBEck (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 May 2020 00:32:40 -0400
 Received: from mga09.intel.com ([134.134.136.24]:55787 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727121AbgEBEch (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 May 2020 00:32:37 -0400
-IronPort-SDR: +sVfs6VTwv1tO/sa1wdOBk6a99rjaplP5E2gXgxE68SqPJ53Qefm17d2kWsLg9IokMH/kYpRyS
- owf/HSs3feeg==
+        id S1727788AbgEBEci (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 May 2020 00:32:38 -0400
+IronPort-SDR: WgN3tQ+UWPlmfD6XevRqz1dS3mSVZM26auH+rO6HZ2beM33ZU/jrUpBA3BWnK+2ZUhwKmvyy84
+ I8CMOPbmsJ8Q==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2020 21:32:37 -0700
-IronPort-SDR: ttUEoi4qvg4UT85uXLGbzQGb6lp6qCUYm1CAP1RECZ8qXBpnHhyd32smMMI5yXsG8BOKLSA2dI
- pSW8iUL7MPPA==
+IronPort-SDR: Jq4hYXhJD6UfsEAjZz3DJkieTU+JnDgsrt1soCpK+scxwxCCKRYsGZrpLf7VbJ0vI5Bkr829JX
+ nME8xDpLABUQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,342,1583222400"; 
-   d="scan'208";a="433516117"
+   d="scan'208";a="433516120"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
   by orsmga005.jf.intel.com with ESMTP; 01 May 2020 21:32:37 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -32,9 +32,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 02/10] KVM: nVMX: Unconditionally validate CR3 during nested transitions
-Date:   Fri,  1 May 2020 21:32:26 -0700
-Message-Id: <20200502043234.12481-3-sean.j.christopherson@intel.com>
+Subject: [PATCH 03/10] KVM: x86: Make kvm_x86_ops' {g,s}et_dr6() hooks optional
+Date:   Fri,  1 May 2020 21:32:27 -0700
+Message-Id: <20200502043234.12481-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200502043234.12481-1-sean.j.christopherson@intel.com>
 References: <20200502043234.12481-1-sean.j.christopherson@intel.com>
@@ -45,59 +45,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unconditionally check the validity of the incoming CR3 during nested
-VM-Enter/VM-Exit to avoid invoking kvm_read_cr3() in the common case
-where the guest isn't using PAE paging.  If vmcs.GUEST_CR3 hasn't yet
-been cached (common case), kvm_read_cr3() will trigger a VMREAD.  The
-VMREAD (~30 cycles) alone is likely slower than nested_cr3_valid()
-(~5 cycles if vcpu->arch.maxphyaddr gets a cache hit), and the poor
-exchange only gets worse when retpolines are enabled as the call to
-kvm_x86_ops.cache_reg() will incur a retpoline (60+ cycles).
+Make get_dr6() and set_dr6() optional and drop the VMX implementations,
+which are for all intents and purposes nops.  This avoids a retpoline on
+VMX when reading/writing DR6, at minimal cost (~1 uop) to SVM.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 11 -----------
+ arch/x86/kvm/x86.c     |  6 ++++--
+ 2 files changed, 4 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b57420f3dd8f..1f2f41e821f9 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1120,21 +1120,20 @@ static bool nested_vmx_transition_mmu_sync(struct kvm_vcpu *vcpu)
- static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool nested_ept,
- 			       u32 *entry_failure_code)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index de18cd386bb1..e157bdc218ea 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5008,15 +5008,6 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 	return kvm_skip_emulated_instruction(vcpu);
+ }
+ 
+-static u64 vmx_get_dr6(struct kvm_vcpu *vcpu)
+-{
+-	return vcpu->arch.dr6;
+-}
+-
+-static void vmx_set_dr6(struct kvm_vcpu *vcpu, unsigned long val)
+-{
+-}
+-
+ static void vmx_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
  {
--	if (cr3 != kvm_read_cr3(vcpu) || (!nested_ept && pdptrs_changed(vcpu))) {
--		if (CC(!nested_cr3_valid(vcpu, cr3))) {
--			*entry_failure_code = ENTRY_FAIL_DEFAULT;
--			return -EINVAL;
--		}
-+	if (CC(!nested_cr3_valid(vcpu, cr3))) {
-+		*entry_failure_code = ENTRY_FAIL_DEFAULT;
-+		return -EINVAL;
-+	}
+ 	get_debugreg(vcpu->arch.db[0], 0);
+@@ -7799,8 +7790,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.set_idt = vmx_set_idt,
+ 	.get_gdt = vmx_get_gdt,
+ 	.set_gdt = vmx_set_gdt,
+-	.get_dr6 = vmx_get_dr6,
+-	.set_dr6 = vmx_set_dr6,
+ 	.set_dr7 = vmx_set_dr7,
+ 	.sync_dirty_debug_regs = vmx_sync_dirty_debug_regs,
+ 	.cache_reg = vmx_cache_reg,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8ec356ac1e6e..eccbfcb6a4e5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1069,7 +1069,8 @@ static void kvm_update_dr0123(struct kvm_vcpu *vcpu)
  
--		/*
--		 * If PAE paging and EPT are both on, CR3 is not used by the CPU and
--		 * must not be dereferenced.
--		 */
--		if (is_pae_paging(vcpu) && !nested_ept) {
--			if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))) {
--				*entry_failure_code = ENTRY_FAIL_PDPTE;
--				return -EINVAL;
--			}
-+	/*
-+	 * If PAE paging and EPT are both on, CR3 is not used by the CPU and
-+	 * must not be dereferenced.
-+	 */
-+	if (!nested_ept && is_pae_paging(vcpu) &&
-+	    (cr3 != kvm_read_cr3(vcpu) || pdptrs_changed(vcpu))) {
-+		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))) {
-+			*entry_failure_code = ENTRY_FAIL_PDPTE;
-+			return -EINVAL;
- 		}
- 	}
+ static void kvm_update_dr6(struct kvm_vcpu *vcpu)
+ {
+-	if (!(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP))
++	if (!(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) &&
++	    kvm_x86_ops.set_dr6)
+ 		kvm_x86_ops.set_dr6(vcpu, vcpu->arch.dr6);
+ }
  
+@@ -1148,7 +1149,8 @@ int kvm_get_dr(struct kvm_vcpu *vcpu, int dr, unsigned long *val)
+ 	case 4:
+ 		/* fall through */
+ 	case 6:
+-		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP)
++		if ((vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) ||
++		    !kvm_x86_ops.get_dr6)
+ 			*val = vcpu->arch.dr6;
+ 		else
+ 			*val = kvm_x86_ops.get_dr6(vcpu);
 -- 
 2.26.0
 
