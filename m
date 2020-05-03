@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 903061C2B20
-	for <lists+kvm@lfdr.de>; Sun,  3 May 2020 12:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A04431C2B24
+	for <lists+kvm@lfdr.de>; Sun,  3 May 2020 12:09:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728164AbgECKIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 May 2020 06:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43048 "EHLO
+        id S1728022AbgECKJp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 May 2020 06:09:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727892AbgECKIb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 3 May 2020 06:08:31 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962CCC061A0C;
-        Sun,  3 May 2020 03:08:31 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id 145so4033466pfw.13;
-        Sun, 03 May 2020 03:08:31 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1727892AbgECKJp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 3 May 2020 06:09:45 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01961C061A0C;
+        Sun,  3 May 2020 03:09:44 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id b6so2318076plz.13;
+        Sun, 03 May 2020 03:09:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Apq9sucfBmwOGXvj0V67gdzCLVL91nlJK5leKBoTGWw=;
-        b=Xks75GZfQ0X6QBtjXLWiC70RvNKvpA7JjnKscIdVbrnnx6Yjrs4aV+D1ELgi9JfsIh
-         M4nLVDw9slUZGMEL8mA9ym2MLviKXQVGK5xbme2G1ke+DVNspIX5ZCAX8bCb/dnPJpRO
-         4ZLmcRjgJITfgV4d0XXPSFtLDrztQ8f8R/i9Rmgk8eVhcv9kMbc0FSG440Zqlw2WD2rn
-         HKYqgfKLsLTotPkPbJJDsCRUOE6kqpUflXNH3SSWtJXoGw0A0j461pWMgBRIu+UKNm1P
-         In0k8V8jvXwvnKMjo78NyStMzPZ6N+ERx/qKnGJx7xtpZn1jmS35pGAvvhiFoZWzpJXI
-         oe2w==
+        bh=oXmStsagWliYLkyg0XA1gqk4mbLGloO7btJZBgB6zp0=;
+        b=tmvji8xyRdqsUB+mJaeyiIe7c4z0UB7U8rXiPb2bKbGmPdMhrnasUqxi90hmQpFHdx
+         ruXEq6E7s3FrcYF+ISN5c77wEr9RBYzYTmP1RD0xIaGlPht/HHovqxEmDuoDqBgJiOIt
+         K6dA4KGRbluVamiZ3dIot1sTu8x1ClLGwy7FzMXJlz/vQfTunKIQHMr+Xgh9mXTawD12
+         +ErNrPUwLIpFnmjaioKv1oXoaVIM/5PPySIy/dzMI6V2TJN/j/gkmMC0VJezv8yg/+sb
+         I4LUv45ywoLmhAcXymKOjLb/NOa9Z6M7x7Df3h7YyHL3790lUWizZzZ73D16oGS92CMD
+         iyqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=Apq9sucfBmwOGXvj0V67gdzCLVL91nlJK5leKBoTGWw=;
-        b=T0z22k6qcFrN+1vbgqlVY5kQlod8AMPpt7zsWrNqcQdC7v3OMowvKGMHzyBKkbwcSb
-         RwV3eaeOUC4stsesE1B+wOIhewurKXHSU/1pSH6oilYqFrOvd/xnd+hrvBQ0VX47qCnn
-         +zOSxvMIbS4Hm+HWFEky1WPx2Tn3nqrAxwCmLM07q8AKzLwnOXSQLG/QRzJ56f83BOai
-         Qqkkbzzg6/LyofNImlUj/B1z8UIB/4xCMOBLRgas807lo9RJbiu8WUGVPM4iqz/v/St4
-         fDNh3yVZYV9zX+yKlaSqHkL84qFZA5nnhp/xTK4K93ANE1YlN7qAF71QCi0RC5dCR1re
-         mhXw==
-X-Gm-Message-State: AGi0PuZ7mSi/l83XvHccQkOfa/5n15z1f3lX2XcsnIgkHjOi5BhphsoU
-        VXeqHPN2GFOmLjoZtEQD7hQ=
-X-Google-Smtp-Source: APiQypI2CbwfAI9/oWf5WDwYq3eUe5P+QBD7gAlrAddN5Qjv2hJyYr/2z5tfeFRn4cKRK5JWcYOEbg==
-X-Received: by 2002:a65:6417:: with SMTP id a23mr13042369pgv.204.1588500511198;
-        Sun, 03 May 2020 03:08:31 -0700 (PDT)
+        bh=oXmStsagWliYLkyg0XA1gqk4mbLGloO7btJZBgB6zp0=;
+        b=S1b2ly+ADGTp6OKgGRblsju4WmRoba9qB5uYBPTgGTd/dFWLUkJcwvvQtB2lN1E78+
+         ogfcbzsKaJtUB+zfvgH0M3eJSsufKNrzOuMU+eS4l8+cAWYK8r2EcdYtnYcp7R9jLdAD
+         TJMEm2Vevpoh3C5q0I9MoZSdA0YhIULE08Gboyre7HHv7Qp56mtejpyul62K9AkSPCCs
+         5bj3wlO1w5DpE0yGPOR2RBOKjY4TEHtStEEpYP1EspM4V/ZyKH6TYiiLOAxiFmAla7WH
+         xP7/IAM1XRUo0URhySqaqwuZO8mxyh3zFs2+Jtc36tYIm7nZtKVMlDhk3AqlZ2HGwEaS
+         Be2A==
+X-Gm-Message-State: AGi0PuaGyPkntWSQarQ1y9AYWQTh9hjS3X4PLGbjl8CiJX3pKHUuDCtL
+        +bQm9z0w5ZQJPAi8sp2e9c8=
+X-Google-Smtp-Source: APiQypLHfD0TtiMXhXxN0eKY+t8XWTg7Jg8VyjEMHD9kmgl9RZx16BaBjW9teT007N/oQXqBBejFFg==
+X-Received: by 2002:a17:902:7203:: with SMTP id ba3mr12506149plb.202.1588500583620;
+        Sun, 03 May 2020 03:09:43 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com. [34.92.144.28])
-        by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.08.28
+        by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.09.40
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 03 May 2020 03:08:30 -0700 (PDT)
+        Sun, 03 May 2020 03:09:43 -0700 (PDT)
 From:   Huacai Chen <chenhc@lemote.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>
@@ -57,9 +57,9 @@ Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org,
         Huacai Chen <chenhuacai@gmail.com>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Huacai Chen <chenhc@lemote.com>
-Subject: [PATCH V3 03/14] KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
-Date:   Sun,  3 May 2020 18:05:56 +0800
-Message-Id: <1588500367-1056-4-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V3 04/14] KVM: MIPS: Add EVENTFD support which is needed by VHOST
+Date:   Sun,  3 May 2020 18:05:57 +0800
+Message-Id: <1588500367-1056-5-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
 References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
@@ -68,30 +68,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Loongson-3 based machines can have as many as 16 CPUs, and so does
-memory slots, so increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16.
+Add EVENTFD support for KVM/MIPS, which is needed by VHOST. Tested on
+Loongson-3 platform.
 
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/include/asm/kvm_host.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/mips/kvm/Kconfig     | 1 +
+ arch/mips/kvm/Makefile    | 2 +-
+ arch/mips/kvm/trap_emul.c | 3 +++
+ arch/mips/kvm/vz.c        | 3 +++
+ 4 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index caa2b936..a7758c0 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -78,8 +78,8 @@
- #define KVM_REG_MIPS_CP0_KSCRATCH6	MIPS_CP0_64(31, 7)
+diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
+index b91d145..d697752 100644
+--- a/arch/mips/kvm/Kconfig
++++ b/arch/mips/kvm/Kconfig
+@@ -22,6 +22,7 @@ config KVM
+ 	select EXPORT_UASM
+ 	select PREEMPT_NOTIFIERS
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
++	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
+ 	select KVM_MMIO
+ 	select MMU_NOTIFIER
+diff --git a/arch/mips/kvm/Makefile b/arch/mips/kvm/Makefile
+index 01affc1..0a3cef6 100644
+--- a/arch/mips/kvm/Makefile
++++ b/arch/mips/kvm/Makefile
+@@ -2,7 +2,7 @@
+ # Makefile for KVM support for MIPS
+ #
  
+-common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
++common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o eventfd.o)
  
--#define KVM_MAX_VCPUS		8
--#define KVM_USER_MEM_SLOTS	8
-+#define KVM_MAX_VCPUS		16
-+#define KVM_USER_MEM_SLOTS	16
- /* memory slots that does not exposed to userspace */
- #define KVM_PRIVATE_MEM_SLOTS	0
+ EXTRA_CFLAGS += -Ivirt/kvm -Iarch/mips/kvm
  
+diff --git a/arch/mips/kvm/trap_emul.c b/arch/mips/kvm/trap_emul.c
+index 5a11e83..f464506b 100644
+--- a/arch/mips/kvm/trap_emul.c
++++ b/arch/mips/kvm/trap_emul.c
+@@ -529,6 +529,9 @@ static int kvm_trap_emul_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MIPS_TE:
+ 		r = 1;
+ 		break;
++	case KVM_CAP_IOEVENTFD:
++		r = 1;
++		break;
+ 	default:
+ 		r = 0;
+ 		break;
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index dde2088..17932ab 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -2927,6 +2927,9 @@ static int kvm_vz_check_extension(struct kvm *kvm, long ext)
+ 		r = 2;
+ 		break;
+ #endif
++	case KVM_CAP_IOEVENTFD:
++		r = 1;
++		break;
+ 	default:
+ 		r = 0;
+ 		break;
 -- 
 2.7.0
 
