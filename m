@@ -2,100 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3991C4640
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 20:47:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E5D31C466E
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 20:53:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727860AbgEDSrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 14:47:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727799AbgEDSrJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 14:47:09 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86EECC061A0E
-        for <kvm@vger.kernel.org>; Mon,  4 May 2020 11:47:09 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id x4so654515wmj.1
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 11:47:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MgCs0wkVJtVHte9mm7xQ9ul/9fE/hpJWdtuiVOjQk7o=;
-        b=gsTMd9LifTAISFhc6cN82h70sRdFoOz/zSiSbTjT/DpfUMiMAb/oYemkZG+pA6Swy0
-         qO9Hb+DTok5EYTsfmcNL/B4ZO2KiWr6Q2B9kscHkmP+OM4g7c5Xd/vV/8M5swSKV0clJ
-         9Qsrn/ZoD1sv2lw0iISCqnFq5nqIQosaJPdiaByycbnVcXACO1PA5BSnFxg4vkfgFYcK
-         LdYRCTq2wfXVeyAUgQ8f2o2kAIm9bFGGOc+qyfj6pXK94MwSpbHdSFAOlHuKQ5QVA4am
-         H39L2E40UFeKvBmncGs0EPPq50hU+usoVxmlEnskw1UUkKsfBYytYjzmpbG8od55HfKx
-         /y7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MgCs0wkVJtVHte9mm7xQ9ul/9fE/hpJWdtuiVOjQk7o=;
-        b=XonbQcEMT1KfC4SNzeFKWsu7NM+WLuQQSk1g1UsVvRUhnDi/a1azVknMqvIiya6MrL
-         +ky3oF7X9VZeSyE6pmpg/wpgMd/R/Zi77+gnWICXKxWZYvtc6U+3ruWICLzGcXAf530R
-         TYMsI/HlL0OlYCzXKZ0tDwE07ZJT/ke0/cnr/ehaDWLqeSf7XsXVZVzXCYCUZu74NSuC
-         HD4yQ6M9+sGj+8IAQCip6UGwzmj8Sv9bwO/tQd57kal/XJAIBxOMx2DxqkYU678LVjAX
-         928KGRWI7zNXSbQ6fbZdvxxzteDJlegjgo0wk4+QsMczRYWlh6cotR0IifxZYGz72hz0
-         Y8Yg==
-X-Gm-Message-State: AGi0PuZrB17tHgRBRmY5jt5h4x3ep/GJkMD44tjRlvFh4icK3T69FfwY
-        EFO50zpdM29hm2HBOlkbaLXcS3c8G5Y=
-X-Google-Smtp-Source: APiQypL+ZUWqwyqa9k4GbCajREHbBcPh5EauxpvUjaZvLpKERGfUgLegtliUFDSPMUj65kur6eXbtg==
-X-Received: by 2002:a1c:4d17:: with SMTP id o23mr15395855wmh.47.1588618027914;
-        Mon, 04 May 2020 11:47:07 -0700 (PDT)
-Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id y18sm470842wmc.45.2020.05.04.11.47.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2020 11:47:07 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH] KVM: VMX: Fix operand constraint of PUSH instructions
-Date:   Mon,  4 May 2020 20:47:00 +0200
-Message-Id: <20200504184700.3078839-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.25.4
+        id S1726678AbgEDSxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 14:53:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32995 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725981AbgEDSxA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 14:53:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588618379;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nL6lAvx0PZBs0tR/mUzSs6IrJPt6ZBwzzVz2VqiOHPM=;
+        b=R5Ahm6BvvaQTbOeoz3iWt0O+GRZJpN1+hiuugHXp7zzqDY4kLZ7KOJOw8lZNaahuo0ZIBN
+        Ei6xAICOiQD8oHIGD+OWNUVJtGwNM0TLKPI9ViXcaYRzIQ0ATnxPL07V0MvYu1S5ryDBJu
+        HOVTOvq1zjq+uncjB7uStj9hro1B2UU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-c41xC3eyMaO8N3yQTQUKsA-1; Mon, 04 May 2020 14:52:55 -0400
+X-MC-Unique: c41xC3eyMaO8N3yQTQUKsA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BB60107ACCD;
+        Mon,  4 May 2020 18:52:54 +0000 (UTC)
+Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A55A60C80;
+        Mon,  4 May 2020 18:52:54 +0000 (UTC)
+Date:   Mon, 4 May 2020 12:52:53 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio-pci: Mask cap zero
+Message-ID: <20200504125253.3d5f9cbf@x1.home>
+In-Reply-To: <20200504180916.0e90cad9.cohuck@redhat.com>
+References: <158836927527.9272.16785800801999547009.stgit@gimli.home>
+        <20200504180916.0e90cad9.cohuck@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PUSH instructions can't handle 64-bit immediate operands, so "i"
-operand constraint is not correct. Use "re" operand constraint
-to limit the range of the immediate operand to a signed 32-bit
-value and also to leave the compiler the freedom to pass the value
-via a register.
+On Mon, 4 May 2020 18:09:16 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Please note that memory operands are not allowed here. These
-operands include stack slots, and these are not valid in this
-asm block due to the clobbered %rsp register.
+> On Fri, 01 May 2020 15:41:24 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+> > There is no PCI spec defined capability with ID 0, therefore we don't
+> > expect to find it in a capability chain and we use this index in an
+> > internal array for tracking the sizes of various capabilities to handle
+> > standard config space.  Therefore if a device does present us with a
+> > capability ID 0, we mark our capability map with nonsense that can
+> > trigger conflicts with other capabilities in the chain.  Ignore ID 0
+> > when walking the capability chain, handling it as a hidden capability.
+> > 
+> > Seen on an NVIDIA Tesla T4.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_config.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> > index 87d0cc8c86ad..5935a804cb88 100644
+> > --- a/drivers/vfio/pci/vfio_pci_config.c
+> > +++ b/drivers/vfio/pci/vfio_pci_config.c
+> > @@ -1487,7 +1487,7 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
+> >  		if (ret)
+> >  			return ret;
+> >  
+> > -		if (cap <= PCI_CAP_ID_MAX) {  
+> 
+> Maybe add a comment:
+> 
+> /* no PCI spec defined capability with ID 0: hide it */
+> 
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
----
- arch/x86/kvm/vmx/vmx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Sure.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 22f3324600e1..56c742effb30 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6299,9 +6299,9 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 		:
- 		[thunk_target]"r"(entry),
- #ifdef CONFIG_X86_64
--		[ss]"i"(__KERNEL_DS),
-+		[ss]"re"(__KERNEL_DS),
- #endif
--		[cs]"i"(__KERNEL_CS)
-+		[cs]"re"(__KERNEL_CS)
- 	);
- 
- 	kvm_after_interrupt(vcpu);
--- 
-2.25.4
+> 
+> > +		if (cap && cap <= PCI_CAP_ID_MAX) {
+> >  			len = pci_cap_length[cap];
+> >  			if (len == 0xFF) { /* Variable length */
+> >  				len = vfio_cap_len(vdev, cap, pos);
+> >   
+> 
+> Is there a requirement for caps to be strictly ordered? If not, could
+> len hold a residual value from a previous iteration?
+
+There is no ordering requirement for capabilities, but len is declared
+non-static with an initial value within the scope of the loop, it's
+reset every iteration.  Thanks,
+
+Alex
 
