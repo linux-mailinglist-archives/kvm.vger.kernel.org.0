@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FDEC1C3FFB
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:34:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AD7B1C3FFF
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:35:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729714AbgEDQeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 12:34:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37672 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729697AbgEDQeY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 12:34:24 -0400
+        id S1729667AbgEDQfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 12:35:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51276 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729602AbgEDQfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 12:35:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588610063;
+        s=mimecast20190719; t=1588610107;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=meXN8fnH7POJ5nXM4MsgSydS0mBB1vuDTCk9COvduPs=;
-        b=TNBTURtdj3BUz81YYBVrJy1JEpCNYb8zFLTVXdLzAKLSiD5cBGcrfz8BG7kbJ+h3IQkB23
-        tX40qX9vZV0NSWl7AfbhfUQbnftTqrRAn0pORJDV2vs07a6gkdWWsLviPfHXijTC5dO52+
-        FFkVSAvsS6A7CP3siRVMiUUooR787n4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-jlev1s-LNBS0H2zJ9XLCSQ-1; Mon, 04 May 2020 12:34:21 -0400
-X-MC-Unique: jlev1s-LNBS0H2zJ9XLCSQ-1
-Received: by mail-wm1-f70.google.com with SMTP id j5so78476wmi.4
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 09:34:21 -0700 (PDT)
+        bh=DrDH6ghGzyKcUJxYpkBmogX/C6/pE28sgM6OjDELncQ=;
+        b=VwPnCPx4nlA1K80x7NS+23wOuqsmeQXpqYBdXUIS8pN7E1w2NqOERZYsSju2ZPLNLg1LWf
+        hLcUgTBZvGivfDemll5nCSUWzWKEmuwcjr4fYte/xxxH/jsSEK5AOyApDQGZUwS0fhPy9+
+        Ph3JRzw+LHS1tiog6lJHj58F4/W2pnU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-gVxqPwPuNDiKQcyi_LGW7g-1; Mon, 04 May 2020 12:35:06 -0400
+X-MC-Unique: gVxqPwPuNDiKQcyi_LGW7g-1
+Received: by mail-wm1-f72.google.com with SMTP id w2so83429wmc.3
+        for <kvm@vger.kernel.org>; Mon, 04 May 2020 09:35:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=meXN8fnH7POJ5nXM4MsgSydS0mBB1vuDTCk9COvduPs=;
-        b=m6OuqdV0qricSDNhbrJ4fzNn1l5Apfz7I5R2GcU+1didXCoCJtpcjll18wJ3S5K8Or
-         itzRO2ZLO4g8H/4H86V+TwfrScEC1tQo6QBlB8rgQONMvqdMAlHjqoIEk0SxgyA9WglM
-         UPKseOMXoO/i6f2ikDYKaivXopT8RBu/ia+Bmz63C3mJ2/eGYy1BPniGhhsWnVpGQp8M
-         TAlvZTXiCT7mP5Q6gq5qISKuHKajcw34dDlFgG+2YNsJl5vfZWMZNf7j0YyW8nr2OXE7
-         j7vlplbP5KWPpb9/+nNjYnus2tibWYN5SsLgLVWaZ9mM7PT/X8nBjlSGZb3ZpRNFeLlE
-         fVpQ==
-X-Gm-Message-State: AGi0PuYlNNuK6/2Ji4NDEBVu5j2S/rR4VUDQryWFUgoaY5EvBLsNl7Jh
-        YIB164U0w/60nBRAU/i4CbDC5zpcoVI2BSCLfzaUdXkZc0ZKonz//NZBbCZpoPGZDvpGOrL7L9u
-        cOyoTRzpLagTB
-X-Received: by 2002:a5d:4fc6:: with SMTP id h6mr21468723wrw.277.1588610060492;
-        Mon, 04 May 2020 09:34:20 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIbJp70n46iTVVSbiakPJEd161uPQFwM/5IMglu/dwNQXKrQl5PLIS1MiU2eQPm3GMoD+dnjg==
-X-Received: by 2002:a5d:4fc6:: with SMTP id h6mr21468705wrw.277.1588610060224;
-        Mon, 04 May 2020 09:34:20 -0700 (PDT)
+        bh=DrDH6ghGzyKcUJxYpkBmogX/C6/pE28sgM6OjDELncQ=;
+        b=l2FlHsEfBCKxQvLJjHPYwF9d6WEG3HgscuLcFt49QFQ9RxttgGeysuKqVAko2rnBJJ
+         tGMm8qEFWR2lRXbmoZ3hR5yqZ95Rbc7dE4mR+NHhW2MM8+XP0IMWixLRWbLv9xHTtLSX
+         BYdmWMMPLxU+1uyoRsoXbrWjUBUXQ6XFG2OaZme+/SjuIDlzw4QJUjOB7wiZICB4RACi
+         A8uTLZlvpummGGUdrSHyNyhbthagWI2DOs705qzQh+6ClTDlvuN3daP9/dwpKpiTbpxh
+         XymmEWpS+lA7WQg2vOvXjWnlYQTsYwgx27STB38kHYdecFn5rW2BjdDjj+PSWHO94vh9
+         +K1A==
+X-Gm-Message-State: AGi0PubqQAgqTH7a+vYCmdTiY8APqF88D1fM24cqSCPOjPpT+nawUhKm
+        u2UWXSvVWnI9pZn7eNwPBLSLtWnF1wuGypgR1VYzMlw8AagKQvM2B0pNJ2W8LETekjwYKzvtiEW
+        IqLlHLVTxroqT
+X-Received: by 2002:adf:e511:: with SMTP id j17mr180986wrm.204.1588610104723;
+        Mon, 04 May 2020 09:35:04 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK7m8dCZk+3SXvCasKSf+G/63e9F96LovywgNA7XWEzGoHgj0nSbjBYsFZjABk8xp58z4zl1w==
+X-Received: by 2002:adf:e511:: with SMTP id j17mr180960wrm.204.1588610104434;
+        Mon, 04 May 2020 09:35:04 -0700 (PDT)
 Received: from [192.168.178.58] ([151.20.132.175])
-        by smtp.gmail.com with ESMTPSA id m15sm14162083wmc.35.2020.05.04.09.34.19
+        by smtp.gmail.com with ESMTPSA id s14sm14546360wme.33.2020.05.04.09.35.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2020 09:34:19 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] nVMX: Check EXIT_QUALIFICATION on VM-Enter
- failures due to bad guest state
+        Mon, 04 May 2020 09:35:03 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: msr: Don't test bits 63:32 of
+ SYSENTER MSRs on 32-bit builds
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     kvm@vger.kernel.org
-References: <20200424174025.1379-1-sean.j.christopherson@intel.com>
+References: <20200428231135.12903-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b0fd2d12-ca9a-9516-1d4c-e375bbf7bceb@redhat.com>
-Date:   Mon, 4 May 2020 18:34:18 +0200
+Message-ID: <2607f2df-a1a1-509a-d54c-b1bd63c6ec0e@redhat.com>
+Date:   Mon, 4 May 2020 18:35:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200424174025.1379-1-sean.j.christopherson@intel.com>
+In-Reply-To: <20200428231135.12903-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,50 +71,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/04/20 19:40, Sean Christopherson wrote:
-> Assert that vmcs.EXIT_QUALIFICATION contains the correct failure code on
-> failed VM-Enter due to invalid guest state.  Hardcode the expected code
-> to the default code, '0', rather than passing in the expected code to
-> minimize churn and boilerplate code, which works for all existing tests.
+On 29/04/20 01:11, Sean Christopherson wrote:
+> Squish the "address" stuffed into SYSENTER_EIP/ESP into an unsigned long
+> so as to drop bits 63:32 on 32-bit builds.  VMX diverges from bare metal
+> in the sense that the associated VMCS fields are natural width fields,
+> whereas the actual MSRs hold 64-bit values, even on CPUs that don't
+> support 64-bit mode.  This causes the tests to fail if bits 63:32 are
+> non-zero and a VM-Exit/VM-Enter occurs on and/or between WRMSR/RDMSR,
+> e.g. when running the tests in L1 or deeper.
+> 
+> Don't bother trying to actually test that bits 63:32 are dropped, the
+> behavior depends on the (virtual) CPU capabilities, not the build, and
+> the behavior is specific to VMX as both SVM and bare metal preserve the
+> full 64-bit values.  And because practically no one cares about 32-bit
+> KVM, let alone an obscure architectural quirk that doesn't affect real
+> world kernels.
 > 
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  x86/vmx.h       | 7 +++++++
->  x86/vmx_tests.c | 3 ++-
->  2 files changed, 9 insertions(+), 1 deletion(-)
+>  x86/msr.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/x86/vmx.h b/x86/vmx.h
-> index 2e28ecb..08b354d 100644
-> --- a/x86/vmx.h
-> +++ b/x86/vmx.h
-> @@ -521,6 +521,13 @@ enum vm_instruction_error_number {
->  	VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID = 28,
->  };
+> diff --git a/x86/msr.c b/x86/msr.c
+> index de2cb6d..f7539c3 100644
+> --- a/x86/msr.c
+> +++ b/x86/msr.c
+> @@ -16,6 +16,7 @@ struct msr_info {
 >  
-> +enum vm_entry_failure_code {
-> +	ENTRY_FAIL_DEFAULT		= 0,
-> +	ENTRY_FAIL_PDPTE		= 2,
-> +	ENTRY_FAIL_NMI			= 3,
-> +	ENTRY_FAIL_VMCS_LINK_PTR	= 4,
-> +};
-> +
->  #define SAVE_GPR				\
->  	"xchg %rax, regs\n\t"			\
->  	"xchg %rcx, regs+0x8\n\t"		\
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 4a3c56b..f5a646f 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -5255,7 +5255,8 @@ static void test_guest_state(const char *test, bool xfail, u64 field,
 >  
->  	report(result.exit_reason.failed_vmentry == xfail &&
->  	       ((xfail && result.exit_reason.basic == VMX_FAIL_STATE) ||
-> -	        (!xfail && result.exit_reason.basic == VMX_VMCALL)),
-> +	        (!xfail && result.exit_reason.basic == VMX_VMCALL)) &&
-> +		(!xfail || vmcs_read(EXI_QUALIFICATION) == ENTRY_FAIL_DEFAULT),
->  	        "%s, %s %lx", test, field_name, field);
+>  #define addr_64 0x0000123456789abcULL
+> +#define addr_ul (unsigned long)addr_64
 >  
->  	if (!result.exit_reason.failed_vmentry)
+>  struct msr_info msr_info[] =
+>  {
+> @@ -23,10 +24,10 @@ struct msr_info msr_info[] =
+>        .val_pairs = {{ .valid = 1, .value = 0x1234, .expected = 0x1234}}
+>      },
+>      { .index = 0x00000175, .name = "MSR_IA32_SYSENTER_ESP",
+> -      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
+> +      .val_pairs = {{ .valid = 1, .value = addr_ul, .expected = addr_ul}}
+>      },
+>      { .index = 0x00000176, .name = "IA32_SYSENTER_EIP",
+> -      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
+> +      .val_pairs = {{ .valid = 1, .value = addr_ul, .expected = addr_ul}}
+>      },
+>      { .index = 0x000001a0, .name = "MSR_IA32_MISC_ENABLE",
+>        // reserved: 1:2, 4:6, 8:10, 13:15, 17, 19:21, 24:33, 35:63
 > 
 
 Queued, thanks.
