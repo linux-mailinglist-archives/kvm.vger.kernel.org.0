@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91ECC1C380A
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 13:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28A4D1C3815
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 13:29:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728492AbgEDL1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 07:27:12 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59112 "EHLO mx2.suse.de"
+        id S1728590AbgEDL3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 07:29:04 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60028 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726445AbgEDL1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 07:27:11 -0400
+        id S1726445AbgEDL3E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 07:29:04 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 00A8CADD3;
-        Mon,  4 May 2020 11:27:10 +0000 (UTC)
-Date:   Mon, 4 May 2020 13:27:06 +0200
+        by mx2.suse.de (Postfix) with ESMTP id 70BD8B03B;
+        Mon,  4 May 2020 11:29:03 +0000 (UTC)
+Date:   Mon, 4 May 2020 13:28:59 +0200
 From:   Joerg Roedel <jroedel@suse.de>
 To:     Borislav Petkov <bp@alien8.de>
 Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
@@ -34,47 +34,49 @@ Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org, hpa@zytor.com,
         Masami Hiramatsu <mhiramat@kernel.org>,
         Mike Stunes <mstunes@vmware.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 12/75] x86/boot/compressed/64: Switch to __KERNEL_CS
- after GDT is loaded
-Message-ID: <20200504112706.GG8135@suse.de>
+Subject: Re: [PATCH v3 13/75] x86/boot/compressed/64: Add IDT Infrastructure
+Message-ID: <20200504112859.GH8135@suse.de>
 References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-13-joro@8bytes.org>
- <20200504104129.GD15046@zn.tnic>
+ <20200428151725.31091-14-joro@8bytes.org>
+ <20200504105445.GE15046@zn.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200504104129.GD15046@zn.tnic>
+In-Reply-To: <20200504105445.GE15046@zn.tnic>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 04, 2020 at 12:41:29PM +0200, Borislav Petkov wrote:
-> On Tue, Apr 28, 2020 at 05:16:22PM +0200, Joerg Roedel wrote:
-> > +	/* Reload CS so IRET returns to a CS actually in the GDT */
-> > +	pushq	$__KERNEL_CS
-> > +	leaq	.Lon_kernel_cs(%rip), %rax
-> > +	pushq	%rax
-> > +	lretq
+On Mon, May 04, 2020 at 12:54:45PM +0200, Borislav Petkov wrote:
+> On Tue, Apr 28, 2020 at 05:16:23PM +0200, Joerg Roedel wrote:
+> > diff --git a/arch/x86/boot/compressed/idt_handlers_64.S b/arch/x86/boot/compressed/idt_handlers_64.S
+> > new file mode 100644
+> > index 000000000000..f86ea872d860
+> > --- /dev/null
+> > +++ b/arch/x86/boot/compressed/idt_handlers_64.S
+> > @@ -0,0 +1,69 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Early IDT handler entry points
+> > + *
+> > + * Copyright (C) 2019 SUSE
+> > + *
+> > + * Author: Joerg Roedel <jroedel@suse.de>
+> > + */
 > > +
-> > +.Lon_kernel_cs:
+> > +#include <asm/segment.h>
 > > +
-> >  	/*
-> >  	 * paging_prepare() sets up the trampoline and checks if we need to
-> >  	 * enable 5-level paging.
-> > -- 
+> > +#include "../../entry/calling.h"
 > 
-> So I'm thinking I should take this one even now on the grounds that
-> it sanitizes CS to something known-good than what was there before and
-> who knows what set it and loaded the kernel...?
-> 
-> And that is a good thing in itself.
+> Leftover from something? Commenting it out doesn't break the build here.
 
-Right, sure. CS is basically undefined at this point and depends on what
-loaded the kernel (EFI, legacy boot code, some container runtime...), so
-setting it to something known is definitly good.
+Yes, probably a leftover from when I tried to use the PT_REGS macros
+there. I'll remove it.
 
-Regards,
+
+Thanks,
 
 	Joerg
+
