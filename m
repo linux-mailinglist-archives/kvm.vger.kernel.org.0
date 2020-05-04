@@ -2,176 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D5FB1C35DA
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 11:36:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9B431C3628
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 11:52:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728359AbgEDJgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 05:36:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33534 "EHLO
+        id S1728385AbgEDJwK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 05:52:10 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55649 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726625AbgEDJgA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 05:36:00 -0400
+        by vger.kernel.org with ESMTP id S1728166AbgEDJwK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 05:52:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588584959;
+        s=mimecast20190719; t=1588585928;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=raiGMQBr/QB8sEi7LcRd99xA1ZNobBB74rqfsqcEmj8=;
-        b=G2rPjjQQHWfYz282tpxROp379Uvry2GihuwO7HWh4cPlOBludBfH34CbNhCOxgnySytGhk
-        kaoHivv3hU6eO3TC7BPjPMhSAP64/MZKNgLGlOa/jkS75uMVd86SlDclNEIeSU35aJTP4h
-        khI0eMAlwWwdcJ5RxwAbpuyeHmY+HLk=
+        bh=Cz/LbRGm4/RWQX7PDtmaj7fSkZzDaX+5dG2vfOr7ypY=;
+        b=bJJUfFMXT7KQenyqCjXkyoIBH2E2dQU7p9GYgQiGZyKYMiqOp6VTsNaug+C0ekWFWneixh
+        HIPPGGXDjzyRDu8E69f/uDJ7ea2/6VliaXFAUdXIgiM9VTefRxb/ax6Ttdbhn5oEk2iIcS
+        JeFPkAXYnNa81qqE47poIMLwE3EqwqU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-NTQ1e72jP8KWwUrB95dTYg-1; Mon, 04 May 2020 05:35:57 -0400
-X-MC-Unique: NTQ1e72jP8KWwUrB95dTYg-1
+ us-mta-72-d3HKFaiXMkO2GdJyJ_S3OQ-1; Mon, 04 May 2020 05:52:03 -0400
+X-MC-Unique: d3HKFaiXMkO2GdJyJ_S3OQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CA4A1B18BC0;
-        Mon,  4 May 2020 09:35:56 +0000 (UTC)
-Received: from gondolin (ovpn-112-215.ams2.redhat.com [10.36.112.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AE3CB60BEC;
-        Mon,  4 May 2020 09:35:54 +0000 (UTC)
-Date:   Mon, 4 May 2020 11:35:51 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jared Rossi <jrossi@linux.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] vfio-ccw: Enable transparent CCW IPL from DASD
-Message-ID: <20200504113551.2e2d1df9.cohuck@redhat.com>
-In-Reply-To: <20200430212959.13070-2-jrossi@linux.ibm.com>
-References: <20200430212959.13070-1-jrossi@linux.ibm.com>
-        <20200430212959.13070-2-jrossi@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4B59107B265;
+        Mon,  4 May 2020 09:52:02 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.110.49])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8609960C87;
+        Mon,  4 May 2020 09:51:59 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+        id B2EAD3E048A; Mon,  4 May 2020 11:51:57 +0200 (CEST)
+Date:   Mon, 4 May 2020 11:51:57 +0200
+From:   Kashyap Chamarthy <kchamart@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Anders =?iso-8859-1?Q?=D6stling?= <anders.ostling@gmail.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>,
+        qemu-block@nongnu.org
+Subject: Re: Backup of vm disk images
+Message-ID: <20200504095157.GJ25680@paraplu>
+References: <CAP4+ddND+RrQG7gGoKQ+ydnwXpr0HLrxUyi-pshc-jsigCwjBg@mail.gmail.com>
+ <20200501150547.GA221440@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200501150547.GA221440@stefanha-x1.localdomain>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 Apr 2020 17:29:59 -0400
-Jared Rossi <jrossi@linux.ibm.com> wrote:
+On Fri, May 01, 2020 at 04:05:47PM +0100, Stefan Hajnoczi wrote:
+> On Wed, Apr 22, 2020 at 07:51:09AM +0200, Anders =C3=96stling wrote:
 
-> Remove the explicit prefetch check when using vfio-ccw devices.
-> This check is not needed in practice as all Linux channel programs
+Hi Anders,
 
-s/is not needed/does not trigger/ ?
+> > I am fighting to understand the difference between backing up a VM by
+> > using a regular copy vs using the virsh blockcopy command.
 
-> are intended to use prefetch.
-> 
-> It is expected that all ORBs issued by Linux will request prefetch.
-> Although non-prefetching ORBs are not rejected, they will prefetch
-> nonetheless. A warning is issued up to once per 5 seconds when a
-> forced prefetch occurs.
-> 
-> A non-prefetch ORB does not necessarily result in an error, however
-> frequent encounters with non-prefetch ORBs indicates that channel
+tl;dr: While 'blockcopy' is one way to do a full backup; there's a
+       better way: 'blockcommit'; see below for a URL to an example.
 
-s/indicates/indicate/
+To add to what Stefan says below, here's the difference: a regular 'cp'
+is just that =E2=80=94 an offline copy when your guest is shutdown or sus=
+pended.
+However, libvirt's 'blockcopy' lets you create a "point-in-time snapshot
+[or copy]" of your VM's disk _while_ the VM is running, and optionally,
+lets your VM to "live-pivot" its storage to the just-created copy.
 
-> programs are being executed in a way that is inconsistent with what
-> the guest is requesting. While there are currently no known errors
-> caused by forced prefetch, it is possible in theory that forced
+The use-case is "live storage migration". =20
 
-"While there is currently no known case of an error caused by forced
-prefetch, ..." ?
+Say, your original storage of your VM is on NFS-A, but you want to do
+some maintenance on NFS-A.  Here, 'blockcopy' lets you live-copy the
+VM's storage from NFS-A to NFS-B, _and_ make the VM use the copy =E2=80=94=
+ all
+this without causing any downtime to the users of the VM.  Now you can
+freely do the maintenance on NFS-A.
 
-> prefetch could result in an error if applied to a channel program
-> that is dependent on non-prefetch.
-> 
-> Signed-off-by: Jared Rossi <jrossi@linux.ibm.com>
-> ---
->  Documentation/s390/vfio-ccw.rst |  4 ++++
->  drivers/s390/cio/vfio_ccw_cp.c  | 16 +++++++---------
->  2 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/Documentation/s390/vfio-ccw.rst b/Documentation/s390/vfio-ccw.rst
-> index fca9c4f5bd9c..8f71071f4403 100644
-> --- a/Documentation/s390/vfio-ccw.rst
-> +++ b/Documentation/s390/vfio-ccw.rst
-> @@ -335,6 +335,10 @@ device.
->  The current code allows the guest to start channel programs via
->  START SUBCHANNEL, and to issue HALT SUBCHANNEL and CLEAR SUBCHANNEL.
->  
-> +Currently all channel programs are prefetched, regardless of the
-> +p-bit setting in the ORB.  As a result, self modifying channel
-> +programs are not supported (IPL is handled as a special case).
+A 'blockcopy' operation has two phases:
 
-"IPL has to be handled as a special case by a userspace/guest program;
-this has been implemented in QEMU's s390-ccw bios as of QEMU 4.1" ?
+(1) It copies a VM's disk image, e.g. from 'orig.raw' to 'copy.qcow2',
+    while the VM is running.  And it will _keep_ copying as long as your
+    VM keeps writing new data.  This is called the "mirroring" phase.
 
-> +
->  vfio-ccw supports classic (command mode) channel I/O only. Transport
->  mode (HPF) is not supported.
->  
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index 3645d1720c4b..48802e9827b6 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -8,6 +8,7 @@
->   *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
->   */
->  
-> +#include <linux/ratelimit.h>
->  #include <linux/mm.h>
->  #include <linux/slab.h>
->  #include <linux/iommu.h>
-> @@ -625,23 +626,20 @@ static int ccwchain_fetch_one(struct ccwchain *chain,
->   * the target channel program from @orb->cmd.iova to the new ccwchain(s).
->   *
->   * Limitations:
-> - * 1. Supports only prefetch enabled mode.
-> - * 2. Supports idal(c64) ccw chaining.
-> - * 3. Supports 4k idaw.
-> + * 1. Supports idal(c64) ccw chaining.
-> + * 2. Supports 4k idaw.
->   *
->   * Returns:
->   *   %0 on success and a negative error value on failure.
->   */
->  int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
->  {
-> +	static DEFINE_RATELIMIT_STATE(ratelimit_state, 5 * HZ, 1);
->  	int ret;
->  
-> -	/*
-> -	 * XXX:
-> -	 * Only support prefetch enable mode now.
-> -	 */
-> -	if (!orb->cmd.pfch)
-> -		return -EOPNOTSUPP;
-> +	/* All Linux channel programs are expected to support prefetching */
+(2) Once the copy.qcow2 has the same content as orig.raw, then you can
+    do two things, either (a) end the copying/mirroring, which results
+    in a point-in-time 'snapshot' of the orig.raw; or (b) you can
+    "live-pivot" the VM's disk image to just-created copy.qcow2.
 
-I think we want a longer comment here as well, not only in the patch
-description.
+Management tools like OpenStack (and possibly others) use libvirt's
+'blockcopy' API under the hood to allow live storage migration.
 
-"We only support prefetching the channel program. We assume all channel
-programs executed by supported guests (i.e. Linux) to support
-prefetching. If prefetching is not specified, executing the channel
-program may still work without problems; but log a message to give at
-least a hint if something goes wrong."
+There are other useful details here, but I'll skip them for brevity.
+Read the "blockcopy" section in `man virsh`.  I admit it can be a little
+hard to parse when you normally don't dwell on these matters, but taking
+time to experiement gives a robust understanding.
 
-?
+> > What I want to do is to suspend the vm, copy the XML and .QCOW2 files
+> > and then resume the vm again. What are your thoughts? What are the
+> > drawbacks compared to other methods?
 
-> +	if (!orb->cmd.pfch && __ratelimit(&ratelimit_state))
-> +		printk(KERN_WARNING "vfio_ccw_cp: prefetch will be forced\n");
+If your main goal is to take a full backup of your disk, *without* any
+downtime to your VM, libvirt does provide some neat ways.
 
-"prefetch will be forced" is a bit misleading: the code does not force
-the p bit in the orb to be on, it's just the vfio-ccw cp translation
-code that relies on prefetching. Maybe rather "executing unsupported
-channel program without prefetch, things may break"?
+One of the most efficient methods to is the so-called "active
+block-commit".  It uses a combination of libvirt commands: `virsh
+snapshot-create-as`, `virsh blockcommit`, and `rsync`:
+  =20
+I've written up a full example here:
 
-Also, this message does not mention the affected device, which makes it
-hard to locate the issuer in the guest. Maybe use
-dev_warn_ratelimited() instead of the home-grown ratelimiting? Or did
-you already try the generic ratelimiting?
+    https://wiki.libvirt.org/page/Live-disk-backup-with-active-blockcommi=
+t
 
->  
->  	INIT_LIST_HEAD(&cp->ccwchain_list);
->  	memcpy(&cp->orb, orb, sizeof(*orb));
+You might also want to refer to this page.
+
+    https://wiki.libvirt.org/page/Live-disk-backup-with-active-blockcommi=
+t
+
+            - - -
+
+For libvirt-based incremental backup examples, I'll defer that to Eric
+Blake (in Cc).
+
+[...]
+
+> A naive cp(1) command will be very slow because the entire disk image i=
+s
+> copied to a new file.  The fastest solution with cp(1) is the --reflink
+> flag which basically takes a snapshot of the file and shares the disk
+> blocks (only available when the host file system supports it and not
+> available across mounts).
+>=20
+> Libvirt's backup commands are more powerful.  They can do things like
+> copy out a point-in-time snapshot of the disk while the guest is
+> running.  They also support incremental backup so you don't need to
+> store a full copy of the disk image each time you take a backup.
+>=20
+> I hope others will join the discussion and give examples of some of the
+> available features.
+
+
+--=20
+/kashyap
 
