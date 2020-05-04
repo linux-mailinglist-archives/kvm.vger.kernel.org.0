@@ -2,75 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70F341C3E91
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 17:33:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B39011C3E9D
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 17:35:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728983AbgEDPdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 11:33:45 -0400
-Received: from mga02.intel.com ([134.134.136.20]:7968 "EHLO mga02.intel.com"
+        id S1729422AbgEDPfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 11:35:08 -0400
+Received: from mga02.intel.com ([134.134.136.20]:8045 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728641AbgEDPdo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 11:33:44 -0400
-IronPort-SDR: py77krxLcPmVlmbPhiK9PryiJgRHoqCO3uB/FHa2FylAOmurpxSCfAcL2uT4nwamEpoNmxK2UE
- dT7f4BbPNVxA==
+        id S1726509AbgEDPfH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 11:35:07 -0400
+IronPort-SDR: E4U8WfJvNQf6Ivjag9VoKvEDaRXwmAJqDa+o/HMvZkzZHJZPvCvRciT4+dQ7qVYm5po8yUEWZt
+ ItuySFAmcB5A==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2020 08:33:44 -0700
-IronPort-SDR: 0rgde3xDthNXHxX+v6bO1rX+ZlxWzI1ZnGZwuNdsyO8Nsdvzvqfwj2JJ/kDWnC41Hf3Qh++QPA
- 1V/7++o65v4w==
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2020 08:35:07 -0700
+IronPort-SDR: wNG88MpeGTwh5P0sEpGjUgEXobg6Tuh4Dw7tF62ERYYy7EVobg60aKBCGDXVM1zVyjZPLLOarf
+ zL/glzex/T+g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,352,1583222400"; 
-   d="scan'208";a="294656227"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga002.fm.intel.com with ESMTP; 04 May 2020 08:33:43 -0700
-Date:   Mon, 4 May 2020 08:33:43 -0700
+   d="scan'208";a="295533046"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by orsmga008.jf.intel.com with ESMTP; 04 May 2020 08:35:07 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v4] KVM: VMX: Improve handle_external_interrupt_irqoff
- inline assembly
-Message-ID: <20200504153343.GD16949@linux.intel.com>
-References: <20200503230545.442042-1-ubizjak@gmail.com>
- <20200504152519.GC16949@linux.intel.com>
- <CAFULd4bWmcrsdfeyc++P9pGhn-MS703yWisKKmr601nAvP86gw@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: nVMX: Replace a BUG_ON(1) with BUG() to squash clang warning
+Date:   Mon,  4 May 2020 08:35:06 -0700
+Message-Id: <20200504153506.28898-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFULd4bWmcrsdfeyc++P9pGhn-MS703yWisKKmr601nAvP86gw@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 04, 2020 at 05:32:19PM +0200, Uros Bizjak wrote:
-> On Mon, May 4, 2020 at 5:25 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Mon, May 04, 2020 at 01:05:45AM +0200, Uros Bizjak wrote:
-> > > Improve handle_external_interrupt_irqoff inline assembly in several ways:
-> > > - use "re" operand constraint instead of "i" and remove
-> > >   unneeded %c operand modifiers and "$" prefixes
-> > > - use %rsp instead of _ASM_SP, since we are in CONFIG_X86_64 part
-> > > - use $-16 immediate to align %rsp
-> > > - remove unneeded use of __ASM_SIZE macro
-> > > - define "ss" named operand only for X86_64
-> > >
-> > > The patch introduces no functional changes.
-> >
-> > Hmm, for handcoded assembly I would argue that the switch from "i" to "re"
-> > is a functional change of sorts.  The switch also needs explicit
-> > justification to explain why it's correct/desirable.  Maybe make it a
-> > separate patch?
-> 
-> I think this would be a good idea. So, in this patch the first point should read
-> 
-> "- remove unneeded %c operand modifiers and "$" prefixes"
-> 
-> The add-on patch will then explain that PUSH can only handle signed
-> 32bit immediates and change "i" to "re".
-> 
-> Is this what you had in mind?
+Use BUG() in the impossible-to-hit default case when switching on the
+scope of INVEPT to squash a warning with clang 11 due to clang treating
+the BUG_ON() as conditional.
 
-Yep, exactly.
+  >> arch/x86/kvm/vmx/nested.c:5246:3: warning: variable 'roots_to_free'
+     is used uninitialized whenever 'if' condition is false
+     [-Wsometimes-uninitialized]
+                   BUG_ON(1);
+
+Reported-by: kbuild test robot <lkp@intel.com>
+Fixes: ce8fe7b77bd8 ("KVM: nVMX: Free only the affected contexts when emulating INVEPT")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 2c36f3f53108..669445136144 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5249,7 +5249,7 @@ static int handle_invept(struct kvm_vcpu *vcpu)
+ 		roots_to_free = KVM_MMU_ROOTS_ALL;
+ 		break;
+ 	default:
+-		BUG_ON(1);
++		BUG();
+ 		break;
+ 	}
+ 
+-- 
+2.26.0
+
