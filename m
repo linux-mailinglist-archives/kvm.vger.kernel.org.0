@@ -2,86 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBF1B1C3555
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 11:13:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F0141C356E
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 11:20:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728305AbgEDJNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 05:13:55 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51969 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726751AbgEDJNz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 05:13:55 -0400
+        id S1728286AbgEDJUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 05:20:06 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58851 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728278AbgEDJUF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 05:20:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588583633;
+        s=mimecast20190719; t=1588584003;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=84FYeu+Y/BZJ25AptG7IThNwoOt4gkPs9yl7t+IFJuc=;
-        b=ilRGt2zTaLdrqY09+IEfCBEl+ylffendz5gXMaTApB1MrNhdYcR2vUc5/gKhW+Ju9N4EJJ
-        gkz1gT5UVcSEqODPqz5T9hCIWAAhj2MBvl2+18M9n6pEWzVv+KQr90Bo4kbPRCW+4BBrUF
-        tWFUnCnC87ru/j8gRcyVvcoQI71sPYg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-ahw7Sc6jNv2Od3h0BoWisA-1; Mon, 04 May 2020 05:13:51 -0400
-X-MC-Unique: ahw7Sc6jNv2Od3h0BoWisA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 508138014C0;
-        Mon,  4 May 2020 09:13:50 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.43])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 14766100239A;
-        Mon,  4 May 2020 09:13:48 +0000 (UTC)
-Message-ID: <159382e7fdf0f9b50d79e29554842289e92e1ed7.camel@redhat.com>
-Subject: Re: AVIC related warning in enable_irq_window
-From:   Maxim Levitsky <mlevitsk@redhat.com>
+        bh=PXKefhyNsVrqhbSaw0uWJPXnOxnNca0tzq80MmeMsgs=;
+        b=OHD89EcN3g5SVUY58hcKs1OwMJMdGDZjxmmZ7T0XCesH3kw94nnvrGxGehJLH8GihR1T2u
+        w4/ZjpkqJ2Hy7ngyGD8ur+o99glxCfp5aScpfarH1TAAtscWyAOeTxA+wG2BErxVDwhR6g
+        eQ7DYMWJk1/DZYN6SXetQLqy6bJ267s=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-XV4_qkPHNTK-KE8JNKD_4g-1; Mon, 04 May 2020 05:19:59 -0400
+X-MC-Unique: XV4_qkPHNTK-KE8JNKD_4g-1
+Received: by mail-wr1-f72.google.com with SMTP id y4so5394613wrt.4
+        for <kvm@vger.kernel.org>; Mon, 04 May 2020 02:19:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PXKefhyNsVrqhbSaw0uWJPXnOxnNca0tzq80MmeMsgs=;
+        b=egKZdY6q6wDGSYJzHptnR5ckIqJ96ak9Qdll1ADHFs+Wlsyss0hfYSkaLCqPrHswtF
+         W1pBhK0RoKFnk9DkWNEY75IC/XydxfsOrNveF/Tqkc0VLFfqw/jJRDxgH6SYqIgKpPTf
+         k2pdTrlcKiG0WBv9ZEhsUzDUXYoXtNsHzn7Zx7cyZIYvwKfKVJ44OhDhZO6dP8hz+B+D
+         ndt60sv2rtQ+z3VIVVWCNk0XIgT37fr5AHTnQM+s1FbJjp+7h6iyD2KIqYbWY9oPOBL5
+         ZJeJUw+AgR2L9qJ8Z47ZfbClmb2dTSGi+Jo3GWeYvRweEYQ72SfNFUuA0tiwO4VZ7XKd
+         z7cg==
+X-Gm-Message-State: AGi0PuZjWoWSmXP32upPJKDUkcvLwOpsSSR4isyGVW8TVj38w1GHM68g
+        hHnEVx1dNb0tfMdL3En8doL3prfK6nTy6r7gUf+6nXCwRwh+dbG7mGsVhPKJ/TQ9HYxTU69LTuX
+        03Un/71InwBn/
+X-Received: by 2002:adf:afd6:: with SMTP id y22mr3795459wrd.417.1588583998718;
+        Mon, 04 May 2020 02:19:58 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKuG6PVHUr7bVaMOUCUhOEqyeRNEbOObtw4ZSVEKStgyvWMt+cncD9RnxxusPFv0UBIOXqGKQ==
+X-Received: by 2002:adf:afd6:: with SMTP id y22mr3795438wrd.417.1588583998478;
+        Mon, 04 May 2020 02:19:58 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.132.175])
+        by smtp.gmail.com with ESMTPSA id i74sm18070472wri.49.2020.05.04.02.19.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 May 2020 02:19:57 -0700 (PDT)
+Subject: Re: [PATCH v2] kvm: ioapic: Introduce arch-specific check for lazy
+ update EOI mechanism
 To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-Date:   Mon, 04 May 2020 12:13:47 +0300
-In-Reply-To: <c5c32371-4b4e-1382-c616-3830ba46bf85@amd.com>
-References: <9ce7bb5c4fb8bcc4ac21103f7534a6edfcbe195d.camel@redhat.com>
-         <758b27a8-74c0-087d-d90b-d95faee2f561@redhat.com>
-         <c5c32371-4b4e-1382-c616-3830ba46bf85@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
+        borisvk@bstnet.org
+References: <1588411495-202521-1-git-send-email-suravee.suthikulpanit@amd.com>
+ <e09f0be9-6a2f-a8ee-3a96-c8ffdf3add3f@redhat.com>
+ <fd2529b7-66f9-fd4e-d071-a38d01e4b61c@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a78c88fa-5d2b-1329-9200-922e1c95e730@redhat.com>
+Date:   Mon, 4 May 2020 11:19:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <fd2529b7-66f9-fd4e-d071-a38d01e4b61c@amd.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-05-04 at 15:46 +0700, Suravee Suthikulpanit wrote:
-> Paolo / Maxim,
+On 04/05/20 08:31, Suravee Suthikulpanit wrote:
+>>
+>>
+>> The re-entrancy happens because the irq state is the OR of
+>> the interrupt state and the resamplefd state.  That is, we don't
+>> want to show the state as 0 until we've had a chance to set the
+>> resamplefd.  But if the interrupt has _not_ gone low then we get an
+>> infinite loop.
 > 
-> On 5/2/20 11:42 PM, Paolo Bonzini wrote:
-> > On 02/05/20 15:58, Maxim Levitsky wrote:
-> > > The AVIC is disabled by svm_toggle_avic_for_irq_window, which calls
-> > > kvm_request_apicv_update, which broadcasts the KVM_REQ_APICV_UPDATE vcpu request,
-> > > however it doesn't broadcast it to CPU on which now we are running, which seems OK,
-> > > because the code that handles that broadcast runs on each VCPU entry, thus
-> > > when this CPU will enter guest mode it will notice and disable the AVIC.
-> > > 
-> > > However later in svm_enable_vintr, there is test 'WARN_ON(kvm_vcpu_apicv_active(&svm->vcpu));'
-> > > which is still true on current CPU because of the above.
-> > 
-> > Good point!  We can just remove the WARN_ON I think.  Can you send a patch?
-> 
-> Instead, as an alternative to remove the WARN_ON(), would it be better to just explicitly
-> calling kvm_vcpu_update_apicv(vcpu) to update the apicv_active flag right after
-> kvm_request_apicv_update()?
-> 
-> Thanks,
-> Suravee
-> 
+> I'm not too familiar w/ the resamplefd.  I must have missed this part.
+> Could you please point out to me where the OR logic is?
 
-This should work IMHO, other that the fact kvm_vcpu_update_apicv will be called again,
-when this vcpu is entered since the KVM_REQ_APICV_UPDATE will still be pending on it.
-It shoudn't be a problem, and we can even add a check to do nothing when it is called
-while avic is already in target enable state.
+It's because kvm_ioapic_set_irq gets the actual state of the interrupt
+line from __kvm_irq_line_state before calling ioapic_set_irq.
 
-Best regards,
-	Maxim Levitsky
+>> But in the case of level-triggered interrupts the VMEXIT already
+>> happens because TMR is set; only edge-triggered interrupts need
+>> the lazy invocation of the ack notifier.  
+> 
+> For AVIC, EOI write for level-triggered would have also be trapped.
+
+Yes, I was talking about AVIC only there.
+
+> And yes, edge-triggered needs lazy ack notifier.
+> 
+>> So this should be the fix:
+>>
+>> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+>> index 7668fed1ce65..ca2d73cd00a3 100644
+>> --- a/arch/x86/kvm/ioapic.c
+>> +++ b/arch/x86/kvm/ioapic.c
+>> @@ -225,12 +225,12 @@ static int ioapic_set_irq(struct kvm_ioapic
+>> *ioapic, unsigned int irq,
+>>       }
+>>         /*
+>> -     * AMD SVM AVIC accelerate EOI write and do not trap,
+>> -     * in-kernel IOAPIC will not be able to receive the EOI.
+>> +     * AMD SVM AVIC accelerate EOI write iff the interrupt is level
+>> +     * triggered, in-kernel IOAPIC will not be able to receive the EOI.
+> 
+> Actually, it should be "AMD SVM AVIC accelerate EOI write iff the
+> interrupt is _edge_ triggered".
+
+Of course, thanks.
+
+Paolo
 
