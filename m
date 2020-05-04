@@ -2,119 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 621A61C495D
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 00:06:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3E221C495E
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 00:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgEDWGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 18:06:16 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51644 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726334AbgEDWGO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 18:06:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588629972;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ldiUHTo4H9fOXrlK9CdJK+WOClXBqbBS4tE+9OydXYY=;
-        b=L5MjTEkanNOZ7Enp+O6rAlTi4fu/Qw2VOyXYtM95dze+2RLqmXjHP5NCWsKq9B4jDY6Nki
-        j3S1u86dwC0M5G0x1iCGUNHjbB9vKc0M9IHmXqac+/6sjLVTzi2V98KvPnQ4FE+FrWuXJ6
-        FlU0NkpllTiUFDDklLDOSEuZMGFOVxk=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-IQgfwITeMSOXx403ewmwjw-1; Mon, 04 May 2020 18:06:11 -0400
-X-MC-Unique: IQgfwITeMSOXx403ewmwjw-1
-Received: by mail-qt1-f200.google.com with SMTP id g8so1224503qtq.2
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 15:06:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ldiUHTo4H9fOXrlK9CdJK+WOClXBqbBS4tE+9OydXYY=;
-        b=gcEg6WLna068ctqYDVvWSZbz/+cBlWBtoFXYskOMImUF4ABLq/27DqFo0COjzN9mJ2
-         somipdaaO77cNz6hTUhL13qXAlYLC0MjQiZVzCOofJj942tyiC5gNJFhl4xILL/b4c6I
-         DPQjJghFkJSzHDXSkacY43Q35VqZgYHXLqPubHiwRoKUVBCX//w77mW6OO5RtL5DqZwV
-         WFacIE4d/FX0DvOGxfQboc3aIjgoIrrp/+04hewabylbX3fiZiJFsE/UPXxSp/TtXSll
-         7C7t6LzeMLvsnX2bsEBfWysFR/MyKsdyvtBTOdxds9FgdnbTOAjMw04jgPFCGJQ1gfOF
-         1ZaA==
-X-Gm-Message-State: AGi0PuY5GU1MTQrKrkrDFGO9NTMylrHcX6Gj6qXsCuWIxzRE2yMp0D2n
-        icoFEEoOtimUKex7OGtte2zXQSiqcIOgn453+D0RFyvkC8wu6zPJHkAPv2CUjEgljRQ+YT5Ubpq
-        SBBxmVrsMH4Px
-X-Received: by 2002:a37:9ed5:: with SMTP id h204mr526772qke.446.1588629970536;
-        Mon, 04 May 2020 15:06:10 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI5ratxafcXWdXR+7DiDQCFg9ET2QsWxNKpq+Gblz9ExXQG316TfcD4OkoqLvruQxBYtCMisg==
-X-Received: by 2002:a37:9ed5:: with SMTP id h204mr526742qke.446.1588629970165;
-        Mon, 04 May 2020 15:06:10 -0700 (PDT)
-Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id w18sm279534qkw.113.2020.05.04.15.06.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2020 15:06:09 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH] KVM: selftests: Fix build for evmcs.h
-Date:   Mon,  4 May 2020 18:06:07 -0400
-Message-Id: <20200504220607.99627-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.26.2
+        id S1728073AbgEDWIL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 18:08:11 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:15422 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726453AbgEDWIK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 18:08:10 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5eb092050000>; Mon, 04 May 2020 15:07:01 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Mon, 04 May 2020 15:08:10 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Mon, 04 May 2020 15:08:10 -0700
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May
+ 2020 22:08:10 +0000
+Received: from nvidia.com (10.124.1.5) by DRHQMAIL107.nvidia.com (10.27.9.16)
+ with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May 2020 22:08:09
+ +0000
+Date:   Mon, 4 May 2020 15:08:08 -0700
+From:   Neo Jia <cjia@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vfio-pci: Mask cap zero
+Message-ID: <20200504220804.GA22939@nvidia.com>
+References: <158836927527.9272.16785800801999547009.stgit@gimli.home>
+ <20200504180916.0e90cad9.cohuck@redhat.com>
+ <20200504125253.3d5f9cbf@x1.home>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200504125253.3d5f9cbf@x1.home>
+X-NVConfidentiality: public
+User-Agent: Mutt/1.6.2 (2016-07-01)
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1588630021; bh=JXAyL5A4QuiGFAr0EoNzJWVZWQesfo7f59rSLV8U+Fg=;
+        h=X-PGP-Universal:Date:From:To:CC:Subject:Message-ID:References:
+         MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+         X-NVConfidentiality:User-Agent:X-Originating-IP:X-ClientProxiedBy;
+        b=Jfoszp2CT/oVndR4WOGkzha7sg0rSCntqcfP0FsU/ndCqiQggxXj3HNLhaPiw8GDZ
+         J7XaDvBkOZvREazB9AyXQwuIusG7/cfRGkr+goxRzvX8ObtYp1XHCoCHQJBaPzFWeW
+         WlnJcI7RnwMuUVEy2pqXrondCo//5rcOV3mT4Y3Frp6dt15wCYeIhxwojbWHD53F7K
+         fJzucxSuBmy7o1GkzHhChS2fKJJk+LDB2B/ONQCLkcU2BWDt/qlyEjLW22OXxzuacG
+         aVIaXYmEGlndcyFUfkX4n3FylAu2z7mVaBN5JC3NgRLG/yT1gW2rYHfRCx91C2rA+T
+         dv2PPVaGS3ayg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I got this error when building kvm selftests:
+On Mon, May 04, 2020 at 12:52:53PM -0600, Alex Williamson wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> On Mon, 4 May 2020 18:09:16 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Fri, 01 May 2020 15:41:24 -0600
+> > Alex Williamson <alex.williamson@redhat.com> wrote:
+> >
+> > > There is no PCI spec defined capability with ID 0, therefore we don't
+> > > expect to find it in a capability chain and we use this index in an
+> > > internal array for tracking the sizes of various capabilities to handle
+> > > standard config space.  Therefore if a device does present us with a
+> > > capability ID 0, we mark our capability map with nonsense that can
+> > > trigger conflicts with other capabilities in the chain.  Ignore ID 0
+> > > when walking the capability chain, handling it as a hidden capability.
+> > >
+> > > Seen on an NVIDIA Tesla T4.
+> > >
+> > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > > ---
+> > >  drivers/vfio/pci/vfio_pci_config.c |    2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> > > index 87d0cc8c86ad..5935a804cb88 100644
+> > > --- a/drivers/vfio/pci/vfio_pci_config.c
+> > > +++ b/drivers/vfio/pci/vfio_pci_config.c
+> > > @@ -1487,7 +1487,7 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
+> > >             if (ret)
+> > >                     return ret;
+> > >
+> > > -           if (cap <= PCI_CAP_ID_MAX) {
+> >
+> > Maybe add a comment:
+> >
+> > /* no PCI spec defined capability with ID 0: hide it */
 
-/usr/bin/ld: /home/xz/git/linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:222: multiple definition of `current_evmcs'; /tmp/cco1G48P.o:/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:222: first defined here
-/usr/bin/ld: /home/xz/git/linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:223: multiple definition of `current_vp_assist'; /tmp/cco1G48P.o:/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:223: first defined here
+Hi Alex,
 
-I think it's because evmcs.h is included both in a test file and a lib file so
-the structs have multiple declarations when linking.  After all it's not a good
-habit to declare structs in the header files.
+I think this is NULL Capability defined in Codes and IDs spec, probably we
+should just add a new enum to represent that?
 
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
+Thanks,
+Neo
 
-I initially thought it was something about my GCC 10 upgrade that I recently
-did to my laptop - gcc10 even fails the build of the latest kernel after
-all (though it turns out to be a kernel bug on build system rather than a gcc
-bug). but I'm not sure about this one...
----
- tools/testing/selftests/kvm/include/evmcs.h  | 4 ++--
- tools/testing/selftests/kvm/lib/x86_64/vmx.c | 3 +++
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/include/evmcs.h b/tools/testing/selftests/kvm/include/evmcs.h
-index d8f4d6bfe05d..a034438b6266 100644
---- a/tools/testing/selftests/kvm/include/evmcs.h
-+++ b/tools/testing/selftests/kvm/include/evmcs.h
-@@ -219,8 +219,8 @@ struct hv_enlightened_vmcs {
- #define HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_MASK	\
- 		(~((1ull << HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_SHIFT) - 1))
- 
--struct hv_enlightened_vmcs *current_evmcs;
--struct hv_vp_assist_page *current_vp_assist;
-+extern struct hv_enlightened_vmcs *current_evmcs;
-+extern struct hv_vp_assist_page *current_vp_assist;
- 
- int vcpu_enable_evmcs(struct kvm_vm *vm, int vcpu_id);
- 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-index 6f17f69394be..4ae104f6ce69 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-@@ -17,6 +17,9 @@
- 
- bool enable_evmcs;
- 
-+struct hv_enlightened_vmcs *current_evmcs;
-+struct hv_vp_assist_page *current_vp_assist;
-+
- struct eptPageTableEntry {
- 	uint64_t readable:1;
- 	uint64_t writable:1;
--- 
-2.26.2
-
+> >
+> 
+> Sure.
+> 
+> >
+> > > +           if (cap && cap <= PCI_CAP_ID_MAX) {
+> > >                     len = pci_cap_length[cap];
+> > >                     if (len == 0xFF) { /* Variable length */
+> > >                             len = vfio_cap_len(vdev, cap, pos);
+> > >
+> >
+> > Is there a requirement for caps to be strictly ordered? If not, could
+> > len hold a residual value from a previous iteration?
+> 
+> There is no ordering requirement for capabilities, but len is declared
+> non-static with an initial value within the scope of the loop, it's
+> reset every iteration.  Thanks,
+> 
+> Alex
+> 
