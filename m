@@ -2,115 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A45401C3FD9
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:29:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C6E51C3FEB
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:32:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729626AbgEDQ31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 12:29:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36203 "EHLO
+        id S1729577AbgEDQcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 12:32:02 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22672 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729614AbgEDQ31 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 12:29:27 -0400
+        by vger.kernel.org with ESMTP id S1728655AbgEDQcC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 12:32:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588609765;
+        s=mimecast20190719; t=1588609920;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc; bh=u9wd2N5ZqA9eKBgCPlh0DHQo6aOCCyRgqsmnMGl7hh0=;
-        b=gNNs7gzK+PcP1UxfPL5XIdWtY4c9nzWZGPfzg2asIXDjm3PxZggBRtWQ8TuhUznQ8ydgpv
-        8t6bYfDwkA8HzOpp3dHO8JbFIfRfaOBZxPo+9sMsMGFYhBS07W2lYuWvT7hCQ7QNy9wp2K
-        LD9/tBuAHBBo1Lafxxrvm8RT8dW69Mo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-Byz0ITRxPLWl15gL0K7H1g-1; Mon, 04 May 2020 12:29:24 -0400
-X-MC-Unique: Byz0ITRxPLWl15gL0K7H1g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2430E8014D5;
-        Mon,  4 May 2020 16:29:23 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D2D875D9D5;
-        Mon,  4 May 2020 16:29:22 +0000 (UTC)
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IyB269AFKOC157sfM//hC6JyvCfXoWoNiIwhZiVaINM=;
+        b=ReED0/OPe7tGVYI0iIubbgzdv557Vk5laYfoZGVX4YuK4sOkjJwwPEEFEhA2O5xLc0GBEb
+        UwzuKA4RSs76DtdaKo+pgA+iGdFc/aDPSZnNknPqM6Fye6pPQJ/Z0wxdgMDlKXTOXkoaTY
+        r3VwRCt2S7bz+s/XD26NmT+oHtX6hyk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-R_hB2s1COwSBiOsl6hOUUQ-1; Mon, 04 May 2020 12:31:59 -0400
+X-MC-Unique: R_hB2s1COwSBiOsl6hOUUQ-1
+Received: by mail-wr1-f72.google.com with SMTP id e5so11027031wrs.23
+        for <kvm@vger.kernel.org>; Mon, 04 May 2020 09:31:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=IyB269AFKOC157sfM//hC6JyvCfXoWoNiIwhZiVaINM=;
+        b=nJBHLo5N5oHfNEn1WOtRQFzAtqzuRChKj9mG3SBG647UTFaJCVb40u6Nwgx8Nb2dni
+         d+aNG/r8vP0MwAESR6drCZj6lRHkW0oO5L42vCBjdQL5FOKi2qNye6FPGdeBXoELqWNx
+         vNkngs/jDmCEKYCa8uRmT3A4imVtEMMxeL+gq46ayQJilGdg3gqToX3oKgzKgkmPy2Zg
+         toAdAi6xATmpQmTshQBnVJv5v8UIKvI18dnzCuTVc3w+Cul/Raky0yZ1ilEvLClQop0e
+         73LXtnenRO/0qTAXSNvTiwCbwx5G89IVKGjd0QLW8dKiLHZjz1ZGdYmhNkXOxMzpvCr2
+         cRpw==
+X-Gm-Message-State: AGi0PuY8OvH4eYwx+xLKZ1QHuP/X3hMMUmcyBFWGaxJsQw7lT9Kh0VN3
+        nYyBpyUoRY+q4aWLCAQ7TJu6XPVwWYQTltocaKtUpumtqGcW2rX3OoZxwX4lqkUap2oI7fybpC8
+        5hY5f77rA/f+G
+X-Received: by 2002:adf:f041:: with SMTP id t1mr126253wro.346.1588609917648;
+        Mon, 04 May 2020 09:31:57 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIljPCI6hKiLiZGCDmI3dbBzFUE7Mbf/4Rf+dtHDl8lZ1cM0scqk2VQvKw/T7tOEUd5BJx0WA==
+X-Received: by 2002:adf:f041:: with SMTP id t1mr126236wro.346.1588609917401;
+        Mon, 04 May 2020 09:31:57 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.132.175])
+        by smtp.gmail.com with ESMTPSA id d5sm19653025wrp.44.2020.05.04.09.31.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 May 2020 09:31:56 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v3] x86: nVMX: add new test for
+ vmread/vmwrite flags preservation
+To:     Simon Smith <brigidsmith@google.com>, kvm@vger.kernel.org
+References: <20200420175834.258122-1-brigidsmith@google.com>
+ <CAHfZhxt1c6PBM+VLFuhDnkUPcCwJCs17xL4bngzfq9YyJNDpJA@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] kvm: ioapic: Restrict lazy EOI update to edge-triggered interrupts
-Date:   Mon,  4 May 2020 12:29:22 -0400
-Message-Id: <20200504162922.404532-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Message-ID: <6c7a19a9-0030-9c32-33f9-9de86cb89bb2@redhat.com>
+Date:   Mon, 4 May 2020 18:31:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <CAHfZhxt1c6PBM+VLFuhDnkUPcCwJCs17xL4bngzfq9YyJNDpJA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit f458d039db7e ("kvm: ioapic: Lazy update IOAPIC EOI") introduces
-the following infinite loop:
+On 04/05/20 18:19, Simon Smith wrote:
+> Ping!  (I realized I sent this via non-plaintext and the listserv rejected it.)
 
-BUG: stack guard page was hit at 000000008f595917 \
-(stack is 00000000bdefe5a4..00000000ae2b06f5)
-kernel stack overflow (double-fault): 0000 [#1] SMP NOPTI
-RIP: 0010:kvm_set_irq+0x51/0x160 [kvm]
-Call Trace:
- irqfd_resampler_ack+0x32/0x90 [kvm]
- kvm_notify_acked_irq+0x62/0xd0 [kvm]
- kvm_ioapic_update_eoi_one.isra.0+0x30/0x120 [kvm]
- ioapic_set_irq+0x20e/0x240 [kvm]
- kvm_ioapic_set_irq+0x5c/0x80 [kvm]
- kvm_set_irq+0xbb/0x160 [kvm]
- ? kvm_hv_set_sint+0x20/0x20 [kvm]
- irqfd_resampler_ack+0x32/0x90 [kvm]
- kvm_notify_acked_irq+0x62/0xd0 [kvm]
- kvm_ioapic_update_eoi_one.isra.0+0x30/0x120 [kvm]
- ioapic_set_irq+0x20e/0x240 [kvm]
- kvm_ioapic_set_irq+0x5c/0x80 [kvm]
- kvm_set_irq+0xbb/0x160 [kvm]
- ? kvm_hv_set_sint+0x20/0x20 [kvm]
-....
+Queued now, thanks!
 
-The re-entrancy happens because the irq state is the OR of
-the interrupt state and the resamplefd state.  That is, we don't
-want to show the state as 0 until we've had a chance to set the
-resamplefd.  But if the interrupt has _not_ gone low then
-ioapic_set_irq is invoked again, causing an infinite loop.
+Paolo
 
-This can only happen for a level-triggered interrupt, otherwise
-irqfd_inject would immediately set the KVM_USERSPACE_IRQ_SOURCE_ID high
-and then low.  Fortunately, in the case of level-triggered interrupts the VMEXIT already happens because
-TMR is set.  Thus, fix the bug by restricting the lazy invocation
-of the ack notifier to edge-triggered interrupts, the only ones that
-need it.
-
-Tested-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Reported-by: borisvk@bstnet.org
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Link: https://www.spinics.net/lists/kvm/msg213512.html
-Fixes: f458d039db7e ("kvm: ioapic: Lazy update IOAPIC EOI")
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=207489
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/ioapic.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 750ff0b29404..d057376bd3d3 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -225,12 +225,12 @@ static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
- 	}
- 
- 	/*
--	 * AMD SVM AVIC accelerate EOI write and do not trap,
--	 * in-kernel IOAPIC will not be able to receive the EOI.
--	 * In this case, we do lazy update of the pending EOI when
--	 * trying to set IOAPIC irq.
-+	 * AMD SVM AVIC accelerate EOI write iff the interrupt is edge
-+	 * triggered, in which case the in-kernel IOAPIC will not be able
-+	 * to receive the EOI.  In this case, we do a lazy update of the
-+	 * pending EOI when trying to set IOAPIC irq.
- 	 */
--	if (kvm_apicv_activated(ioapic->kvm))
-+	if (edge && kvm_apicv_activated(ioapic->kvm))
- 		ioapic_lazy_update_eoi(ioapic, irq);
- 
- 	/*
--- 
-2.18.2
+> 
+> On Mon, Apr 20, 2020 at 10:59 AM Simon Smith <brigidsmith@google.com> wrote:
+>>
+>> This commit adds new unit tests for commit a4d956b93904 ("KVM: nVMX:
+>> vmread should not set rflags to specify success in case of #PF")
+>>
+>> The two new tests force a vmread and a vmwrite on an unmapped
+>> address to cause a #PF and verify that the low byte of %rflags is
+>> preserved and that %rip is not advanced.  The commit fixed a
+>> bug in vmread, but we include a test for vmwrite as well for
+>> completeness.
+>>
+>> Before the aforementioned commit, the ALU flags would be incorrectly
+>> cleared and %rip would be advanced (for vmread).
+>>
+>> Signed-off-by: Simon Smith <brigidsmith@google.com>
+>> Reviewed-by: Jim Mattson <jmattson@google.com>
+>> Reviewed-by: Peter Shier <pshier@google.com>
+>> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Reviewed-by: Oliver Upton <oupton@google.com>
+>> ---
+>>  x86/vmx.c | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 140 insertions(+)
+>>
+>> diff --git a/x86/vmx.c b/x86/vmx.c
+>> index 4c47eec1a1597..cbe68761894d4 100644
+>> --- a/x86/vmx.c
+>> +++ b/x86/vmx.c
+>> @@ -32,6 +32,7 @@
+>>  #include "processor.h"
+>>  #include "alloc_page.h"
+>>  #include "vm.h"
+>> +#include "vmalloc.h"
+>>  #include "desc.h"
+>>  #include "vmx.h"
+>>  #include "msr.h"
+>> @@ -387,6 +388,141 @@ static void test_vmwrite_vmread(void)
+>>         free_page(vmcs);
+>>  }
+>>
+>> +ulong finish_fault;
+>> +u8 sentinel;
+>> +bool handler_called;
+>> +
+>> +static void pf_handler(struct ex_regs *regs)
+>> +{
+>> +       /*
+>> +        * check that RIP was not improperly advanced and that the
+>> +        * flags value was preserved.
+>> +        */
+>> +       report(regs->rip < finish_fault, "RIP has not been advanced!");
+>> +       report(((u8)regs->rflags == ((sentinel | 2) & 0xd7)),
+>> +              "The low byte of RFLAGS was preserved!");
+>> +       regs->rip = finish_fault;
+>> +       handler_called = true;
+>> +
+>> +}
+>> +
+>> +static void prep_flags_test_env(void **vpage, struct vmcs **vmcs, handler *old)
+>> +{
+>> +       /*
+>> +        * get an unbacked address that will cause a #PF
+>> +        */
+>> +       *vpage = alloc_vpage();
+>> +
+>> +       /*
+>> +        * set up VMCS so we have something to read from
+>> +        */
+>> +       *vmcs = alloc_page();
+>> +
+>> +       memset(*vmcs, 0, PAGE_SIZE);
+>> +       (*vmcs)->hdr.revision_id = basic.revision;
+>> +       assert(!vmcs_clear(*vmcs));
+>> +       assert(!make_vmcs_current(*vmcs));
+>> +
+>> +       *old = handle_exception(PF_VECTOR, &pf_handler);
+>> +}
+>> +
+>> +static void test_read_sentinel(void)
+>> +{
+>> +       void *vpage;
+>> +       struct vmcs *vmcs;
+>> +       handler old;
+>> +
+>> +       prep_flags_test_env(&vpage, &vmcs, &old);
+>> +
+>> +       /*
+>> +        * set the proper label
+>> +        */
+>> +       extern char finish_read_fault;
+>> +
+>> +       finish_fault = (ulong)&finish_read_fault;
+>> +
+>> +       /*
+>> +        * execute the vmread instruction that will cause a #PF
+>> +        */
+>> +       handler_called = false;
+>> +       asm volatile ("movb %[byte], %%ah\n\t"
+>> +                     "sahf\n\t"
+>> +                     "vmread %[enc], %[val]; finish_read_fault:"
+>> +                     : [val] "=m" (*(u64 *)vpage)
+>> +                     : [byte] "Krm" (sentinel),
+>> +                     [enc] "r" ((u64)GUEST_SEL_SS)
+>> +                     : "cc", "ah");
+>> +       report(handler_called, "The #PF handler was invoked");
+>> +
+>> +       /*
+>> +        * restore the old #PF handler
+>> +        */
+>> +       handle_exception(PF_VECTOR, old);
+>> +}
+>> +
+>> +static void test_vmread_flags_touch(void)
+>> +{
+>> +       /*
+>> +        * set up the sentinel value in the flags register. we
+>> +        * choose these two values because they candy-stripe
+>> +        * the 5 flags that sahf sets.
+>> +        */
+>> +       sentinel = 0x91;
+>> +       test_read_sentinel();
+>> +
+>> +       sentinel = 0x45;
+>> +       test_read_sentinel();
+>> +}
+>> +
+>> +static void test_write_sentinel(void)
+>> +{
+>> +       void *vpage;
+>> +       struct vmcs *vmcs;
+>> +       handler old;
+>> +
+>> +       prep_flags_test_env(&vpage, &vmcs, &old);
+>> +
+>> +       /*
+>> +        * set the proper label
+>> +        */
+>> +       extern char finish_write_fault;
+>> +
+>> +       finish_fault = (ulong)&finish_write_fault;
+>> +
+>> +       /*
+>> +        * execute the vmwrite instruction that will cause a #PF
+>> +        */
+>> +       handler_called = false;
+>> +       asm volatile ("movb %[byte], %%ah\n\t"
+>> +                     "sahf\n\t"
+>> +                     "vmwrite %[val], %[enc]; finish_write_fault:"
+>> +                     : [val] "=m" (*(u64 *)vpage)
+>> +                     : [byte] "Krm" (sentinel),
+>> +                     [enc] "r" ((u64)GUEST_SEL_SS)
+>> +                     : "cc", "ah");
+>> +       report(handler_called, "The #PF handler was invoked");
+>> +
+>> +       /*
+>> +        * restore the old #PF handler
+>> +        */
+>> +       handle_exception(PF_VECTOR, old);
+>> +}
+>> +
+>> +static void test_vmwrite_flags_touch(void)
+>> +{
+>> +       /*
+>> +        * set up the sentinel value in the flags register. we
+>> +        * choose these two values because they candy-stripe
+>> +        * the 5 flags that sahf sets.
+>> +        */
+>> +       sentinel = 0x91;
+>> +       test_write_sentinel();
+>> +
+>> +       sentinel = 0x45;
+>> +       test_write_sentinel();
+>> +}
+>> +
+>> +
+>>  static void test_vmcs_high(void)
+>>  {
+>>         struct vmcs *vmcs = alloc_page();
+>> @@ -1988,6 +2124,10 @@ int main(int argc, const char *argv[])
+>>                 test_vmcs_lifecycle();
+>>         if (test_wanted("test_vmx_caps", argv, argc))
+>>                 test_vmx_caps();
+>> +       if (test_wanted("test_vmread_flags_touch", argv, argc))
+>> +               test_vmread_flags_touch();
+>> +       if (test_wanted("test_vmwrite_flags_touch", argv, argc))
+>> +               test_vmwrite_flags_touch();
+>>
+>>         /* Balance vmxon from test_vmxon. */
+>>         vmx_off();
+>> --
+>> 2.26.1.301.g55bc3eb7cb9-goog
+>>
+> 
 
