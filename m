@@ -2,129 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 374A21C3CD6
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 16:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4BCF1C3D00
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 16:29:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729122AbgEDOVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 10:21:05 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52844 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729118AbgEDOVD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 10:21:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588602062;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kEhPnil3Au9ljZyWx7OUd3eWbeEZNvjibden46SQ+d8=;
-        b=ScLmwShLfKCvGiiAr5GitGXpOzl4cSVlZls65pwPdNBbcjMnIMCrthgyUqzeNkDXsFFUM8
-        xDfH56K7fs+nDABS/SQJnKITGF30JWqFEFZfmuAGeoxtGHN1hN0qmu6D0dDhIAfS+dLe8g
-        pfuY9/n8xbBa2/5gUZHTlKz8ZxOGtk4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-d5U_WhvSPbmwh6DTLH-6NA-1; Mon, 04 May 2020 10:21:00 -0400
-X-MC-Unique: d5U_WhvSPbmwh6DTLH-6NA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0A1518FE861;
-        Mon,  4 May 2020 14:20:58 +0000 (UTC)
-Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB11958;
-        Mon,  4 May 2020 14:20:55 +0000 (UTC)
-Date:   Mon, 4 May 2020 08:20:55 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, peterx@redhat.com
-Subject: Re: [PATCH 2/3] vfio-pci: Fault mmaps to enable vma tracking
-Message-ID: <20200504082055.0faeef8b@x1.home>
-In-Reply-To: <20200501232550.GP26002@ziepe.ca>
-References: <158836742096.8433.685478071796941103.stgit@gimli.home>
-        <158836915917.8433.8017639758883869710.stgit@gimli.home>
-        <20200501232550.GP26002@ziepe.ca>
-Organization: Red Hat
+        id S1729042AbgEDO3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 10:29:38 -0400
+Received: from mga12.intel.com ([192.55.52.136]:10186 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728486AbgEDO3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 10:29:38 -0400
+IronPort-SDR: DqN//+WXfewpoXY2ugTjMm6t3xEP6iMEgcDRBevVPTDROxHjOT1GLpmnt35r8z7hdIfr1sngUp
+ 8urm3+dscnVg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2020 07:29:37 -0700
+IronPort-SDR: iDqMIApWMrLvqyrp4b+noLJWhA1sSSJaN1o4qQFAscjAq2F3HVn8fIQsk4NZNSGa3ScNI5X32X
+ sl3/q3dfiOoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,352,1583222400"; 
+   d="scan'208";a="460683383"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga005.fm.intel.com with ESMTP; 04 May 2020 07:29:33 -0700
+Date:   Mon, 4 May 2020 07:29:33 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        KarimAllah Raslan <karahmed@amazon.de>
+Subject: Re: [PATCH v2] KVM: nVMX: Skip IBPB when switching between vmcs01
+ and vmcs02
+Message-ID: <20200504142933.GA16949@linux.intel.com>
+References: <20200501163117.4655-1-sean.j.christopherson@intel.com>
+ <1de7b016-8bc9-23d4-7f8b-145c30d7e58a@amazon.com>
+ <9d0d09da-3920-16d6-11ae-51b864171b66@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d0d09da-3920-16d6-11ae-51b864171b66@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 1 May 2020 20:25:50 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
-
-> On Fri, May 01, 2020 at 03:39:19PM -0600, Alex Williamson wrote:
-> > Rather than calling remap_pfn_range() when a region is mmap'd, setup
-> > a vm_ops handler to support dynamic faulting of the range on access.
-> > This allows us to manage a list of vmas actively mapping the area that
-> > we can later use to invalidate those mappings.  The open callback
-> > invalidates the vma range so that all tracking is inserted in the
-> > fault handler and removed in the close handler.
-> > 
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci.c         |   76 ++++++++++++++++++++++++++++++++++-
-> >  drivers/vfio/pci/vfio_pci_private.h |    7 +++
-> >  2 files changed, 81 insertions(+), 2 deletions(-)  
+On Mon, May 04, 2020 at 03:12:36PM +0200, Paolo Bonzini wrote:
+> On 04/05/20 14:01, Alexander Graf wrote:
+> > I like the WARN_ON :). It should be almost free during execution, but
+> > helps us catch problems early.
 > 
-> > +static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
-> > +{
-> > +	struct vm_area_struct *vma = vmf->vma;
-> > +	struct vfio_pci_device *vdev = vma->vm_private_data;
-> > +
-> > +	if (vfio_pci_add_vma(vdev, vma))
-> > +		return VM_FAULT_OOM;
-> > +
-> > +	if (remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
-> > +			    vma->vm_end - vma->vm_start, vma->vm_page_prot))
-> > +		return VM_FAULT_SIGBUS;
-> > +
-> > +	return VM_FAULT_NOPAGE;
-> > +}
-> > +
-> > +static const struct vm_operations_struct vfio_pci_mmap_ops = {
-> > +	.open = vfio_pci_mmap_open,
-> > +	.close = vfio_pci_mmap_close,
-> > +	.fault = vfio_pci_mmap_fault,
-> > +};
-> > +
-> >  static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> >  {
-> >  	struct vfio_pci_device *vdev = device_data;
-> > @@ -1357,8 +1421,14 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> >  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> >  	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
-> >  
-> > -	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
-> > -			       req_len, vma->vm_page_prot);
-> > +	/*
-> > +	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
-> > +	 * change vm_flags within the fault handler.  Set them now.
-> > +	 */
-> > +	vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
-> > +	vma->vm_ops = &vfio_pci_mmap_ops;  
+> Yes, it's nice.  I didn't mind the "buddy" argument either, but if we're 
+> going to get a bool I prefer positive logic so I'd like to squash this:
+
+I don't love need_ibpb as a param name, it doesn't provide any information
+as to why the IBPB is needed.  But, I can't come up with anything better
+that isn't absurdly long because e.g. "different_guest" isn't necessarily
+true in the vmx_vcpu_load() path.
+
+What about going the @buddy route and adding the comment and WARN in
+vmx_vcpu_load_vmcs()?  E.g.
+
+        prev = per_cpu(current_vmcs, cpu);
+        if (prev != vmx->loaded_vmcs->vmcs) {
+                per_cpu(current_vmcs, cpu) = vmx->loaded_vmcs->vmcs;
+                vmcs_load(vmx->loaded_vmcs->vmcs);
+
+                /*
+                 * No indirect branch prediction barrier needed when switching
+		 * the active VMCS within a guest, e.g. on nested VM-Enter.
+		 * The L1 VMM can protect itself with retpolines, IBPB or IBRS.
+                 */
+                if (!buddy || WARN_ON_ONCE(buddy->vmcs != prev))
+                        indirect_branch_prediction_barrier();
+        }
+
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index b57420f3dd8f..299393750a18 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -304,7 +304,13 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
+>  	prev = vmx->loaded_vmcs;
+>  	WARN_ON_ONCE(prev->cpu != cpu || prev->vmcs != per_cpu(current_vmcs, cpu));
+>  	vmx->loaded_vmcs = vmcs;
+> -	vmx_vcpu_load_vmcs(vcpu, cpu, true);
+> +
+> +	/*
+> +	 * This is the same guest from our point of view, so no
+> +	 * indirect branch prediction barrier is needed.  The L1
+> +	 * guest can protect itself with retpolines, IBPB or IBRS.
+> +	 */
+> +	vmx_vcpu_load_vmcs(vcpu, cpu, false);
+>  	vmx_sync_vmcs_host_state(vmx, prev);
+>  	put_cpu();
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 669e14947ba9..0f9c8d2dd7f6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1311,7 +1311,7 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+>  		pi_set_on(pi_desc);
+>  }
+>  
+> -void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool nested_switch)
+> +void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool need_ibpb)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	bool already_loaded = vmx->loaded_vmcs->cpu == cpu;
+> @@ -1336,7 +1336,7 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool nested_switch)
+>  	if (per_cpu(current_vmcs, cpu) != vmx->loaded_vmcs->vmcs) {
+>  		per_cpu(current_vmcs, cpu) = vmx->loaded_vmcs->vmcs;
+>  		vmcs_load(vmx->loaded_vmcs->vmcs);
+> -		if (!nested_switch)
+> +		if (need_ibpb)
+>  			indirect_branch_prediction_barrier();
+>  	}
+>  
+> @@ -1378,7 +1378,7 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  
+> -	vmx_vcpu_load_vmcs(vcpu, cpu, false);
+> +	vmx_vcpu_load_vmcs(vcpu, cpu, true);
+>  
+>  	vmx_vcpu_pi_load(vcpu, cpu);
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index fa61dc802183..e584ee9b3e94 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -320,7 +320,7 @@ struct kvm_vmx {
+>  };
+>  
+>  bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+> -void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool nested_switch);
+> +void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool need_ibpb);
+>  void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+>  int allocate_vpid(void);
+>  void free_vpid(int vpid);
 > 
-> Perhaps do the vfio_pci_add_vma & remap_pfn_range combo here if the
-> BAR is activated ? That way a fully populated BAR is presented in the
-> common case and avoids taking a fault path?
 > 
-> But it does seem OK as is
-
-Thanks for reviewing.  There's also an argument that we defer
-remap_pfn_range() until the device is actually touched, which might
-reduce the startup latency.  It's also a bit inconsistent with the
-vm_ops.open() path where I can't return error, so I can't call
-vfio_pci_add_vma(), I can only zap the vma so that the fault handler
-can return an error if necessary.  Therefore it felt more consistent,
-with potential startup latency improvements, to defer all mappings to
-the fault handler.  If there's a good reason to do otherwise, I can
-make the change, but I doubt I'd have encountered the dma mapping of an
-unfaulted vma issue had I done it this way, so maybe there's a test
-coverage argument as well.  Thanks,
-
-Alex
-
+> Paolo
+> 
