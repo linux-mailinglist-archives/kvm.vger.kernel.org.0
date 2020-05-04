@@ -2,100 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DD881C3F59
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:06:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 099AA1C3F6D
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:09:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729464AbgEDQF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 12:05:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39721 "EHLO
+        id S1729425AbgEDQJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 12:09:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27042 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726551AbgEDQF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 12:05:58 -0400
+        with ESMTP id S1726551AbgEDQJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 12:09:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588608356;
+        s=mimecast20190719; t=1588608565;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/JVeck58huMvFA8/TA03p+8Qjm09cOK85lDBTKzlyGU=;
-        b=agB51x/fADpyzZBsaGRIpLggkwpd0EaL4wJW6JzJsQqbVexuKI9rWysHnZSe3V82Mew9EV
-        r/fQetHiZZL6JYFW4djS9CjmrSOZeadXWF41APO2wuD4IfoZ47NGUpdevH6ZdKEtDplTnK
-        3XmX4ITxCGjw/UQBPH5XZkiBa9ok6hY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-wpXjhwFZMniCKZ7Hp3DFmQ-1; Mon, 04 May 2020 12:05:54 -0400
-X-MC-Unique: wpXjhwFZMniCKZ7Hp3DFmQ-1
-Received: by mail-wr1-f71.google.com with SMTP id m5so11001342wru.15
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 09:05:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/JVeck58huMvFA8/TA03p+8Qjm09cOK85lDBTKzlyGU=;
-        b=AjfWyEixE9EeNOZJYi57euHMinK1D9IxHHyTbCKdET6gsw0OCMXFU8uOMZFTy1P1AJ
-         ZYvAL788+Pj4nZGUTtXj2oeRjh4x4dr+eV9Hd2U9iHJqgDUMwGKEySWLHeJQ6maWhezU
-         TCyy05Zph7o/6TbVUsxAVRbDW5L7SyVBRbHHmPYqHeO5jjqfJupGKV/jljlryGJgepOZ
-         hjzHLWGqaNhrK+iX2Xc8J1hzMKB91oQgjOgh9LJMcNlKu8z92X2WTfqS9ED9p6JfpzOP
-         H0qrTHxgnnMsSBloJVLzDmhedoGR/wxPDVHHo+qX9hbaDutuCvN3n7ZaceGeuYatWlgT
-         p7nQ==
-X-Gm-Message-State: AGi0PubaFWbbOkv3DoWiD+TzUihDdNmqIWC0+3wi5S87HgQx4EnGBilS
-        p+iP5Zxa2e8OwI8cA+/3xfui9H/Fot57I5i32X4g3nEIbF847QtGeZrx7MflR+Df6mXFaTJmVYO
-        SMdKuMAkW2O6C
-X-Received: by 2002:a1c:4e16:: with SMTP id g22mr14716563wmh.157.1588608353288;
-        Mon, 04 May 2020 09:05:53 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLl+FvW2SgRJan9DFKftDDZJg4qPN8I25yOxi5TFHxm89GNl7rDCkuf9ca4ZxOYRM+JtKXkfg==
-X-Received: by 2002:a1c:4e16:: with SMTP id g22mr14716532wmh.157.1588608353041;
-        Mon, 04 May 2020 09:05:53 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.132.175])
-        by smtp.gmail.com with ESMTPSA id n7sm1072795wrm.86.2020.05.04.09.05.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2020 09:05:52 -0700 (PDT)
-Subject: Re: [GIT PULL] KVM/arm fixes for 5.7, take #2
-To:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Fangrui Song <maskray@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-References: <20200501101204.364798-1-maz@kernel.org>
- <20200504113051.GB1326@willie-the-truck>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <df78d984-6ce3-f887-52a9-a3e9164a6dee@redhat.com>
-Date:   Mon, 4 May 2020 18:05:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        bh=pOI+TMZk0mW52qGvJviHKz87dbXpvjDlm/3+gbp0a/U=;
+        b=H0HhnvGLWTS4s+yMUN9YDpnQu4tVhnx2xxP34JOTp2Iyd0cSIL3Mmmm64oj27RSTxv4jbA
+        +MzHYQsLp+l05CaIA+bwEFM55fTot8Ov9hegKiv0I4cOkdNLA5sMHco8okiRkPvMlw6FBp
+        Rnl51fhtjUZl7VjGukOHiCaAaYf0FyY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-Ar8pQBrtMzebeUSBYqXFJw-1; Mon, 04 May 2020 12:09:23 -0400
+X-MC-Unique: Ar8pQBrtMzebeUSBYqXFJw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0DF88014D5;
+        Mon,  4 May 2020 16:09:22 +0000 (UTC)
+Received: from gondolin (ovpn-112-215.ams2.redhat.com [10.36.112.215])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D84232DE6B;
+        Mon,  4 May 2020 16:09:18 +0000 (UTC)
+Date:   Mon, 4 May 2020 18:09:16 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio-pci: Mask cap zero
+Message-ID: <20200504180916.0e90cad9.cohuck@redhat.com>
+In-Reply-To: <158836927527.9272.16785800801999547009.stgit@gimli.home>
+References: <158836927527.9272.16785800801999547009.stgit@gimli.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200504113051.GB1326@willie-the-truck>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/05/20 13:30, Will Deacon wrote:
-> I don't see this queued up in the kvm tree, which appears to have been
-> sitting dormant for 10 days. Consequently, there are fixes sitting in
-> limbo and we /still/ don't have a sensible base for arm64/kvm patches
-> targetting 5.8.
+On Fri, 01 May 2020 15:41:24 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
+
+> There is no PCI spec defined capability with ID 0, therefore we don't
+> expect to find it in a capability chain and we use this index in an
+> internal array for tracking the sizes of various capabilities to handle
+> standard config space.  Therefore if a device does present us with a
+> capability ID 0, we mark our capability map with nonsense that can
+> trigger conflicts with other capabilities in the chain.  Ignore ID 0
+> when walking the capability chain, handling it as a hidden capability.
 > 
-> Paolo -- how can I help get this stuff moving again? I'm more than happy
-> to send this lot up to Linus via arm64 if you're busy atm. Please just
-> let me know.
+> Seen on an NVIDIA Tesla T4.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_config.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index 87d0cc8c86ad..5935a804cb88 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1487,7 +1487,7 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
+>  		if (ret)
+>  			return ret;
+>  
+> -		if (cap <= PCI_CAP_ID_MAX) {
 
-10 days is one week during which I could hardly work and the two
-adjacent weekends.  So this is basically really bad timing in Marc's
-first pull request, that he couldn't have anticipated.
+Maybe add a comment:
 
-I have pulled both trees now, so you can base 5.8 development on
-kvm/master.  It will get to Linus in a couple days.
+/* no PCI spec defined capability with ID 0: hide it */
 
-Paolo
+?
+
+> +		if (cap && cap <= PCI_CAP_ID_MAX) {
+>  			len = pci_cap_length[cap];
+>  			if (len == 0xFF) { /* Variable length */
+>  				len = vfio_cap_len(vdev, cap, pos);
+> 
+
+Is there a requirement for caps to be strictly ordered? If not, could
+len hold a residual value from a previous iteration?
 
