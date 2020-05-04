@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0CCA1C40A6
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 19:00:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 513F21C40A7
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 19:00:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729776AbgEDRAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 13:00:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33746 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729540AbgEDRAJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 13:00:09 -0400
+        id S1729908AbgEDRAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 13:00:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40699 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729540AbgEDRAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 13:00:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588611608;
+        s=mimecast20190719; t=1588611619;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=T5ofgZ5+dv6kvzg6y8qAYvtHj1yOL06CYyaplh6HCPI=;
-        b=TiA80AzvapkTObw96l/+0IhRii5ES9/H39kQC3eE0ZtXHpiZ5dfipv9n6MW9NL7u7Ex7BR
-        0On8TinStg7uush96npPAR+pHpodB97KLluaVVNnsLUiyykxAdfobZbTIubOUoNXuTLOgx
-        l0X5FjlpsZXVdZW2EaZAtbDY7JXOJK8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-HtgPs4HDPrGwG-CSPAREyA-1; Mon, 04 May 2020 12:59:56 -0400
-X-MC-Unique: HtgPs4HDPrGwG-CSPAREyA-1
-Received: by mail-wr1-f71.google.com with SMTP id q13so11682wrn.14
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 09:59:56 -0700 (PDT)
+        bh=XZwSHDTgAJY55QsWjO425HTimSCFfyLWLSNByzoLLc4=;
+        b=Z1JmlEj/ncuX1AnevsXt++7xoLZL3Uwx+hT3iWbnr/a9D+noJ3L3+9LBCPzRMaMVdJolR3
+        E8YgIIV3QOL6lFQbK5PR+4jW6PuWUXgEG6kNiEe5c6T7GrARXcGWqzpjm5FFY40Dt23CZd
+        ipYxSZY/czvjOdzb6k6qSUAwC+fvoRQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-443-pKMin8KGP7G9-OUkyzjw9g-1; Mon, 04 May 2020 13:00:14 -0400
+X-MC-Unique: pKMin8KGP7G9-OUkyzjw9g-1
+Received: by mail-wr1-f70.google.com with SMTP id o6so34153wrn.0
+        for <kvm@vger.kernel.org>; Mon, 04 May 2020 10:00:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=T5ofgZ5+dv6kvzg6y8qAYvtHj1yOL06CYyaplh6HCPI=;
-        b=JfpOvHHj6fbuG7bVCGnHGAlEwxRf6vZ+fC7zFeYnu21LFerY8MiDVdOF42d88FzfZ5
-         HH8OljYNbq6kcK4L2wOtfzDLN+YLTzEbaQJNKbU6Sbq4frkY/oWSBdWmS5v0zARD6qOG
-         VSdaW2k51KlFaSIUWMqS4p6Bqm7gjB7saJrt+2zQ7o3nNYG5YrVEuNLSuuTAy572yZGE
-         lHnFy8wmQYXjkbIOynpa1b7udwz9Hx6NfGTbN7C53FR5oMB/Nz/Y92BH1uX+2WM3hVc2
-         KteLvTIgeFk6FnqZS9zEo4rqEkaoFtjXmNggZtOPTrXEz96Sby/t7QB76UrEZ/C6RLuS
-         Ty2A==
-X-Gm-Message-State: AGi0PuacId9rSAIVEMrmFp97A0vQzfRUGSyJ32I0BQGFpUL0yirRAVOa
-        YHzPeIiUHEs9kAYsJ9IO62zPcS1L+owO+bGnsuQyjOzicc7o/EeYfuDFpci2iJuOcKDm8wV435v
-        WNymQWpyt1Y8I
-X-Received: by 2002:adf:9447:: with SMTP id 65mr8663890wrq.331.1588611595430;
-        Mon, 04 May 2020 09:59:55 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ+KIAi0eC0xc/MKvOmRj5G3YFr3fTwZrqCcx5ZM71qDGqxJYRhwafgE0Ns5QUMpNxOJyP2VA==
-X-Received: by 2002:adf:9447:: with SMTP id 65mr8663867wrq.331.1588611595221;
-        Mon, 04 May 2020 09:59:55 -0700 (PDT)
+        bh=XZwSHDTgAJY55QsWjO425HTimSCFfyLWLSNByzoLLc4=;
+        b=pcbd/aqbtnKbuioa9RPZGtVa1INirSMDUAOuA6nRj6sBvcnYNOu/33R4lDmuly1Fr8
+         RvxkD1odDTSJn+iFy2EWx/apUW/n/Dq6TlyeyF9bJBXZRKGh4czggwrgJ+5s1j3dm41e
+         Wod72rAImPzdtj1oVTfZx7CbUA7XDv+JC7CnuRz0ZmC3+qODFA2AJEcTCwYh+XyOoboE
+         ikf08SLQY3yjDSPvVtC/eKhpCifFO5OpzR1b4JIS6nZQtA8k6EAqUBVTYCbG+US0Pa/a
+         IHlB/p0uZ1td+zMXp0qCxahRIRrz+lKQp6onPmXsoU9wrQi2XahBTJygGFKLWqI47DZB
+         iSfg==
+X-Gm-Message-State: AGi0Puan9PhHCS/o+O6dliB+lgGWhsZeQto0J91WkIe/SnqVNkGflBw9
+        Rs/ao3KWzfcHRqdGqbskLRFHENpslSwFYb5KxK7eic2N5lwEsxGOHrbsbxSTtYJnPrCOP5aMRt5
+        umTsPqSVpi/pc
+X-Received: by 2002:a05:600c:2:: with SMTP id g2mr16326090wmc.85.1588611613313;
+        Mon, 04 May 2020 10:00:13 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ41oygDiuT1qZ0XdnetyQ4B6+1kUn6yL5hrKBBZ6sRup8CrAvAib+rpBZ4eSHnMvvBKSpOkQ==
+X-Received: by 2002:a05:600c:2:: with SMTP id g2mr16326061wmc.85.1588611613127;
+        Mon, 04 May 2020 10:00:13 -0700 (PDT)
 Received: from [192.168.178.58] ([151.20.132.175])
-        by smtp.gmail.com with ESMTPSA id y9sm23390wmm.26.2020.05.04.09.59.54
+        by smtp.gmail.com with ESMTPSA id 89sm7720568wrj.37.2020.05.04.10.00.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2020 09:59:54 -0700 (PDT)
-Subject: Re: [PATCH] KVM: X86: Sanity check on gfn before removal
+        Mon, 04 May 2020 10:00:12 -0700 (PDT)
+Subject: Re: [PATCH] KVM: Documentation: Fix up cpuid page
 To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20200416155910.267514-1-peterx@redhat.com>
+References: <20200416155913.267562-1-peterx@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <62c1d747-aca3-fc9e-f4a5-8a147012ded5@redhat.com>
-Date:   Mon, 4 May 2020 18:59:54 +0200
+Message-ID: <16eba56e-226e-2ad7-5cdd-0f2e90f152e8@redhat.com>
+Date:   Mon, 4 May 2020 19:00:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200416155910.267514-1-peterx@redhat.com>
+In-Reply-To: <20200416155913.267562-1-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,33 +72,27 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 16/04/20 17:59, Peter Xu wrote:
-> The index returned by kvm_async_pf_gfn_slot() will be removed when an
-> async pf gfn is going to be removed.  However kvm_async_pf_gfn_slot()
-> is not reliable in that it can return the last key it loops over even
-> if the gfn is not found in the async gfn array.  It should never
-> happen, but it's still better to sanity check against that to make
-> sure no unexpected gfn will be removed.
+> 0x4b564d00 and 0x4b564d01 belong to KVM_FEATURE_CLOCKSOURCE2.
 > 
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  arch/x86/kvm/x86.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  Documentation/virt/kvm/cpuid.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fc74dafa72ff..f1c6e604dd12 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10308,6 +10308,10 @@ static void kvm_del_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
->  	u32 i, j, k;
+> diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
+> index 01b081f6e7ea..f721c89327ec 100644
+> --- a/Documentation/virt/kvm/cpuid.rst
+> +++ b/Documentation/virt/kvm/cpuid.rst
+> @@ -50,8 +50,8 @@ KVM_FEATURE_NOP_IO_DELAY          1           not necessary to perform delays
+>  KVM_FEATURE_MMU_OP                2           deprecated
 >  
->  	i = j = kvm_async_pf_gfn_slot(vcpu, gfn);
+>  KVM_FEATURE_CLOCKSOURCE2          3           kvmclock available at msrs
+> -
+>                                                0x4b564d00 and 0x4b564d01
 > +
-> +	if (WARN_ON_ONCE(vcpu->arch.apf.gfns[i] != gfn))
-> +		return;
-> +
->  	while (true) {
->  		vcpu->arch.apf.gfns[i] = ~0;
->  		do {
+>  KVM_FEATURE_ASYNC_PF              4           async pf can be enabled by
+>                                                writing to msr 0x4b564d02
+>  
 > 
 
 Queued, thanks.
