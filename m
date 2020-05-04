@@ -2,156 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8362E1C32F7
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 08:31:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2A6B1C33E7
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 09:59:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727882AbgEDGbQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 02:31:16 -0400
-Received: from mail-eopbgr760078.outbound.protection.outlook.com ([40.107.76.78]:30786
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726404AbgEDGbP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 02:31:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K1MEnqCYMt3Ws+6WCHoYwzN7V2XBnXUeV8pncfmjqJHogg0rPHkXKjjutlBFMnidgy1OpEsHG90GlW08emF/v9VPrRNXgP2ZEqNd/18qwTkMXJAAKDU7ykBxttQYIMMval0Mh5ASkvnjLYDtCQd+YCtZ0d6jQklUvqqpP5VrkCIzfRa8xA9Jz04g1WmUU8e3Z8gGPrb+e8YcUo5toKMUJwSHcqbiVM+RDEpMN97vT1yU0vAy8iJMQqBAG1KhlPncqe0TArdlYJ4o5PjGeDBPU0dnyTgaPklWqjF6QiOtSURfAImiQqQAB4kHvyT3TMx1uvvVEbDUGVtICbssnszhVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pJs9APsA/TA2m/74703C5FE7qbDPux9zMDGgDchf5J0=;
- b=NM5+rT93mF9/OV6ef8MIeOqJe1MCjT3gV+6do+lO5cp+OFtNw/7a9Sw0P1PQOhVF2/uIkA1Ok9xWagN7ynvmCsbZmWmuW4W9hJLbHTv6MZxgYIONeZRWYqUdasQbEnu8kDEO93bvIKtKWHCjlt1dFP7cMZBCrIf2+doP+cK0k7zgLQIjC/Bd3LA7syT5fShsyHGBS9BSCZN6W+0ksw06VXRDqs4kI/8F8ffapB9DGt17C30bgfMPQa3HrxOaIZJi5wcADHnhX+GyZBGoAb3uGuN4uMK/dDlLbkLmM3UbuwatKszmcQiW1/KkGQ7RmQFH99LaKcGpi/z3cv/LOBhQlA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pJs9APsA/TA2m/74703C5FE7qbDPux9zMDGgDchf5J0=;
- b=2oipZs19OF2Chopy4zHtywlwKeztQEfyUGjV+oyk0O5NwsYWgXPqclNtqE7woCsTvi2iqJG8y/H8LL7+uQkzn9pSDBuQ0xu8pC+Iy5n9y3lthwJV2rS/otOOVIdrN7ZZvPeYWF3L7hVx93sejuugNGWDjUmOCbkaGO5J+KgIVmg=
-Authentication-Results: bstnet.org; dkim=none (message not signed)
- header.d=none;bstnet.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com (2603:10b6:3:7a::18) by
- DM5PR12MB1466.namprd12.prod.outlook.com (2603:10b6:4:d::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.29; Mon, 4 May 2020 06:31:12 +0000
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744]) by DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744%4]) with mapi id 15.20.2958.029; Mon, 4 May 2020
- 06:31:12 +0000
-Subject: Re: [PATCH v2] kvm: ioapic: Introduce arch-specific check for lazy
- update EOI mechanism
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
-        borisvk@bstnet.org
-References: <1588411495-202521-1-git-send-email-suravee.suthikulpanit@amd.com>
- <e09f0be9-6a2f-a8ee-3a96-c8ffdf3add3f@redhat.com>
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Message-ID: <fd2529b7-66f9-fd4e-d071-a38d01e4b61c@amd.com>
-Date:   Mon, 4 May 2020 13:31:02 +0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
-In-Reply-To: <e09f0be9-6a2f-a8ee-3a96-c8ffdf3add3f@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR04CA0181.apcprd04.prod.outlook.com
- (2603:1096:4:14::19) To DM5PR12MB1163.namprd12.prod.outlook.com
- (2603:10b6:3:7a::18)
+        id S1727838AbgEDH7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 03:59:00 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58274 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbgEDH7A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 03:59:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588579138;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qdo5pHbYFQOLbGu7gTnccHLQen1aY6ME41KM5kNPtL4=;
+        b=inw3nGSxvZUPMdAWhxVluC298Wan3QeFsysQSpDfaUSddsk+/+W5e/FSazt6E/LoCNnL/p
+        2S7xk8cVt33fza/K0xBUXVR8g1rCQQOHaUpBXuDUgnNyGdJ8FA95FwXScOMzippxuCqmli
+        Jk9skgKV1UuSwEOPTX06TnjS1+uKpng=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-Pwo7g_CQNCeVRpnz58h98w-1; Mon, 04 May 2020 03:58:54 -0400
+X-MC-Unique: Pwo7g_CQNCeVRpnz58h98w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A576C8AB381;
+        Mon,  4 May 2020 07:58:53 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.40.208.39])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C0C346292F;
+        Mon,  4 May 2020 07:58:48 +0000 (UTC)
+Date:   Mon, 4 May 2020 09:58:45 +0200
+From:   Peter Krempa <pkrempa@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Anders =?iso-8859-1?Q?=D6stling?= <anders.ostling@gmail.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        kvm@vger.kernel.org, qemu-block@nongnu.org, libvir-list@redhat.com,
+        John Snow <jsnow@redhat.com>
+Subject: Re: Backup of vm disk images
+Message-ID: <20200504075845.GA2102825@angien.pipo.sk>
+References: <CAP4+ddND+RrQG7gGoKQ+ydnwXpr0HLrxUyi-pshc-jsigCwjBg@mail.gmail.com>
+ <20200501150547.GA221440@stefanha-x1.localdomain>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Suravees-MacBook-Pro.local (2403:6200:8862:d0e7:1811:ded2:5c1a:f796) by SG2PR04CA0181.apcprd04.prod.outlook.com (2603:1096:4:14::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19 via Frontend Transport; Mon, 4 May 2020 06:31:09 +0000
-X-Originating-IP: [2403:6200:8862:d0e7:1811:ded2:5c1a:f796]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 2ad30cfa-711d-4639-1422-08d7eff4bd16
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1466:|DM5PR12MB1466:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1466CCAD497D203C88FB69B3F3A60@DM5PR12MB1466.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 03932714EB
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rnV7mmZi8YH+pYCwewJqBU0sh2JVPuve+0Z+idkAqWtOBwnDukOr1EkuDJq82kjTjH0jOQfQR9T1UNh5hQnzCLq9yfd4FNO4wm4c4ZiiZ4GYTmdQEd0Mn04G74oeKzUEeFcFDDUIPkbBeHGpbnjKkDjLtBnCVDNMB1HqYMv/pI1/6z1z4tkuwTWesn5TIdAvZGJKxBnjZ/6voiOUOqRI6sD/wYtXA64gRAKwn+pzbm90NqMxrdIAAjGJQgwixxEQqIcSkfYI7OIOb1gi+nFsdgt1ZtgVldE2JGud+yyLgHO+YguQ/gSYSvo6Axvkifx8S5Dp8v/kre8rts1Y1xvCATXvlmVq8wbAoxe0tyRt6XZpv14+gLrdZY63gZ/YfPwT8la+akwHjOgYr6SSb0gc1HMxbpM3QRsILeKxH0NmClwADu4u4HkrNIv6O9RDMERS
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(39860400002)(366004)(396003)(346002)(44832011)(6666004)(5660300002)(2616005)(86362001)(31696002)(2906002)(4326008)(31686004)(15650500001)(6512007)(478600001)(6486002)(66556008)(66476007)(66946007)(8676002)(52116002)(316002)(36756003)(6506007)(8936002)(53546011)(186003)(16526019);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: S+bPUe2GdRjQtn7rbPlTG/aBqWWtJu1AHu+QjTuEUgAiDVujBfJLvyKwFWZvVvFtnOaUdgjj5nmJeD0nzuUMeyuzThfPRmPCk226uFmopkigk5VmWl9zgGZNNNiqc13PVC+LFqS1ZKx5speOaxH124kQ+ENqTyFrIvMqAxdK2BrukOdKf7s2shRrNnqNXZyL8s15Ibp+adRLVmgNth8NsWYYLUoaBwoSt9yuir0aZWN08Eu/b4lu3COL9Wyu+EvAsP+DHvzthEEcloIXCJb5zCGo6/IcliTT1xkn9DEcuxvDmjPuqgv/WnfUK3hT44zRDC+Hfpgj2Im1Lbd+E1p0DmyZVhlCxX3M4/TNsTH9BCqUAP/CyLuLBmyiUsZtO0sCxCCIccVWPWwg8/abuna1OLIhPDFobVzz3H2QFECMc/qZHskgTMcPbLHIYl+egJn4JIUP5CU2aEsRVH+s/wH3NvVT/g4nobf1ctGo4ngG7W8SJmW9xBcESrpCwPY7KPkUyc3tYkLj1FjMqiZA8x8O9RE+5nkdi+wdFRnNPYCyMDFTA/8Pvyjl6pL7pg95hhIjSQRpv3O6sq4QPYAc39LV9gDb4/MeUwh4Dqclw1MxveskPX+E7E4COuWnDNo2FGWviMccNMt57rhpKGVDv40FdFovcJyZIFNX0sq6wcqNp5xDJB5KFwzMA7PcCggYmjzL0MKJRew3R0PtHxYLsuntGu7LF6WzMIJF552ABmmL2qsJOnlXCtnvixOMDmWw/b5orhX7LPUJ9RvQxCu2XsvCX6HUtHGcaIFzWqByD+/mHPSEcL9jkXsZrozmaS/mJNsy/f6raUl2RUGoxOFbGqSVGfHsRdFahiilLb5XwWdgl78M/44Ltrxiq6S8i+AL8n05
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ad30cfa-711d-4639-1422-08d7eff4bd16
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2020 06:31:12.1723
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PnJ4T0WZy1SIMNS51bntGhdrbk8OCOU/YNqvQttHlJuDqGI8Hh6rGxlsdnrYokGaU1PTf1pv+Q/43hjC5clwSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1466
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20200501150547.GA221440@stefanha-x1.localdomain>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+On Fri, May 01, 2020 at 16:05:47 +0100, Stefan Hajnoczi wrote:
+> On Wed, Apr 22, 2020 at 07:51:09AM +0200, Anders =D6stling wrote:
+> > I am fighting to understand the difference between backing up a VM by
+> > using a regular copy vs using the virsh blockcopy command.
+> > What I want to do is to suspend the vm, copy the XML and .QCOW2 files
+> > and then resume the vm again. What are your thoughts? What are the
+> > drawbacks compared to other methods?
 
-On 5/3/20 12:19 AM, Paolo Bonzini wrote:
-> On 02/05/20 11:24, Suravee Suthikulpanit wrote:
-> ....
-> The questions to answer are: what is causing the re-entrancy? and why
-> is dropping the second EOI update safe?
-> 
-> The answer to the latter could well be "because we've already processed
-> it", but the answer to the former is more important.
-> 
-> The re-entrancy happens because the irq state is the OR of
-> the interrupt state and the resamplefd state.  That is, we don't
-> want to show the state as 0 until we've had a chance to set the
-> resamplefd.  But if the interrupt has _not_ gone low then we get an
-> infinite loop.
+The approaches have diffrerent kind of data integrity they provide and
+downtime they require.
 
-I'm not too familiar w/ the resamplefd.  I must have missed this part.
-Could you please point out to me where the OR logic is?
+Assuming from the above that you don't want to shutdown the OS in the VM
+you've got following options:
 
-> So the actual root cause is that this is a level-triggered interrupt,
-> otherwise irqfd_inject would immediately set the KVM_USERSPACE_IRQ_SOURCE_ID
-> high and then low and you wouldn't have the infinite loop.  
+1) pause VM and copy images as described above
+  I definitely don't recommend this approach at all. The drawback is
+  that the QCOW2 file on the disk may have inconsistent metadata. Even
+  if you ensure that the gues OS state is consistend and written to disk
+  it's not guaranteed that qemu's buffers were flushed.
 
-Okay.
+  Also the VM needs to be suspended during the whole copy, unless you
+  have the image on a filesystem which has --reflink support as  pointed
+  out by Stefan.
 
-> But in the case of level-triggered interrupts the VMEXIT already happens because
-> TMR is set; only edge-triggered interrupts need the lazy invocation
-> of the ack notifier.  
+2) 'virsh blockcopy'
+ The original idea of blockcopy is to move storage of an active VM to a
+ different location. It can be used though to "copy" the active disk and
+ ensure that the metadata is correct when combined with 'virsh blockjob
+ --abort' to finish it. This still requires the guest OS in the VM to
+ ensure that the filesystems on the backed-up disk are consistent.
 
-For AVIC, EOI write for level-triggered would have also be trapped.
-And yes, edge-triggered needs lazy ack notifier.
+ Also the API has one very severe limitation if your VM has multiple
+ disks: There is no way to ensure that you cancel all the copies at the
+ same time, so the 'backup' done this way is not taken at a single point
+ in time. It's also worth noting that the point in time the backup is
+ taken is when the job is --abort-ed.
 
-> So this should be the fix:
-> 
-> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-> index 7668fed1ce65..ca2d73cd00a3 100644
-> --- a/arch/x86/kvm/ioapic.c
-> +++ b/arch/x86/kvm/ioapic.c
-> @@ -225,12 +225,12 @@ static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
->   	}
->   
->   	/*
-> -	 * AMD SVM AVIC accelerate EOI write and do not trap,
-> -	 * in-kernel IOAPIC will not be able to receive the EOI.
-> +	 * AMD SVM AVIC accelerate EOI write iff the interrupt is level
-> +	 * triggered, in-kernel IOAPIC will not be able to receive the EOI.
+3) virsh backup
+ This is the newest set of APIs specifically designed to do disk backups
+ of the VM, offers consistency of the image metadata, and taking of the
+ backups of multiple disks at the same point in time. Also the point in
+ time is when the API is started, regardless of how long the actual data
+ handling takes.
 
-Actually, it should be "AMD SVM AVIC accelerate EOI write iff the interrupt is _edge_ triggered".
+ Your gues OS still needs to ensure filesystem consistency though.
 
->   	 * In this case, we do lazy update of the pending EOI when
->   	 * trying to set IOAPIC irq.
->   	 */
-> -	if (kvm_apicv_activated(ioapic->kvm))
-> +	if (edge && kvm_apicv_activated(ioapic->kvm))
->   		ioapic_lazy_update_eoi(ioapic, irq);
->   
->   	/*
-> 
-> Did I miss anything in the above analysis with respect to AVIC?
+ Additionally as mentioned by Stefan below you can also do incremental
+ backups as well.
+
+ One thing to note though is that the backup integration is not entirely
+ finished in libvirt and thus in a 'tech-preview' state. Some
+ interactions corrupt the state for incremental backups.
+
+ If you are interested, I can give you specific info how to enable
+ support for backups as well as the specifics of the current state of
+ implementation.
+
+4) snapshots
+ Libvirt's snapshot implementation supports taking full VM snapshots
+ including memory and disk image state. This sidesteps the problem of
+ inconsistent filesystem state as the memory state contains also all the
+ buffers.
+
+ When an external snapshot is created, we add a new set of overlay files
+ on top of the original disk images. This means that they become
+ effectively read-only. You can then copy them aside if you want so. The
+ memory image taken along can be then used to fully restore the state of
+ the VM.
+
+ There are a few caveats here as well. If the image chain created this
+ way becomes too long it may negatively impact performance. Also
+ reverting the memory image is a partially manual operation for now. I
+ can give specifics if you want.
+
+>=20
+> Hi Anders,
+> The kvm@vger.kernel.org mailing list is mostly for the discussion and
+> development of the KVM kernel module so you may not get replies.  I hav=
+e
+> CCed libvir-list and developers who have been involved in libvirt backu=
+p
+> features.
+>=20
+> A naive cp(1) command will be very slow because the entire disk image i=
+s
+> copied to a new file.  The fastest solution with cp(1) is the --reflink
+> flag which basically takes a snapshot of the file and shares the disk
+> blocks (only available when the host file system supports it and not
+> available across mounts).
+>=20
+> Libvirt's backup commands are more powerful.  They can do things like
+> copy out a point-in-time snapshot of the disk while the guest is
+> running.  They also support incremental backup so you don't need to
+> store a full copy of the disk image each time you take a backup.
+>=20
+> I hope others will join the discussion and give examples of some of the
+> available features.
+>=20
+> Stefan
 
 
-For AMD:
-Tested-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-
-Thanks,
-Suravee
