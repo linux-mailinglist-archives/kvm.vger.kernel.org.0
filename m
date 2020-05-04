@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C6E51C3FEB
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:32:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54B0A1C3FF7
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:33:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729577AbgEDQcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 12:32:02 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22672 "EHLO
+        id S1729696AbgEDQdt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 12:33:49 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23980 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728655AbgEDQcC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 12:32:02 -0400
+        by vger.kernel.org with ESMTP id S1728158AbgEDQdt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 12:33:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588609920;
+        s=mimecast20190719; t=1588610027;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IyB269AFKOC157sfM//hC6JyvCfXoWoNiIwhZiVaINM=;
-        b=ReED0/OPe7tGVYI0iIubbgzdv557Vk5laYfoZGVX4YuK4sOkjJwwPEEFEhA2O5xLc0GBEb
-        UwzuKA4RSs76DtdaKo+pgA+iGdFc/aDPSZnNknPqM6Fye6pPQJ/Z0wxdgMDlKXTOXkoaTY
-        r3VwRCt2S7bz+s/XD26NmT+oHtX6hyk=
+        bh=hEpx8ijsNtOVF5thD83WQ9QtmFhV5BTDZrsTGbIGCpY=;
+        b=QBYz8iGk9KniTrI0OChqrgb4p08cELOKyy8Iqj29zQ4PkqC/xg7zjAT6vxql4UxcVwk8VD
+        mCYds8K2pW09wYRucM5mgDTdYR6ose/Bzs0QdFnMGoBfU+EumPXlxD2O/ztgZIEtN/5102
+        tEb5SUFWuoUG4gPGidXZHxrZTNUt/SM=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-R_hB2s1COwSBiOsl6hOUUQ-1; Mon, 04 May 2020 12:31:59 -0400
-X-MC-Unique: R_hB2s1COwSBiOsl6hOUUQ-1
-Received: by mail-wr1-f72.google.com with SMTP id e5so11027031wrs.23
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 09:31:58 -0700 (PDT)
+ us-mta-183-xsktki65NT2_6bd62r9Mgg-1; Mon, 04 May 2020 12:33:46 -0400
+X-MC-Unique: xsktki65NT2_6bd62r9Mgg-1
+Received: by mail-wr1-f72.google.com with SMTP id q13so2201573wrn.14
+        for <kvm@vger.kernel.org>; Mon, 04 May 2020 09:33:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=IyB269AFKOC157sfM//hC6JyvCfXoWoNiIwhZiVaINM=;
-        b=nJBHLo5N5oHfNEn1WOtRQFzAtqzuRChKj9mG3SBG647UTFaJCVb40u6Nwgx8Nb2dni
-         d+aNG/r8vP0MwAESR6drCZj6lRHkW0oO5L42vCBjdQL5FOKi2qNye6FPGdeBXoELqWNx
-         vNkngs/jDmCEKYCa8uRmT3A4imVtEMMxeL+gq46ayQJilGdg3gqToX3oKgzKgkmPy2Zg
-         toAdAi6xATmpQmTshQBnVJv5v8UIKvI18dnzCuTVc3w+Cul/Raky0yZ1ilEvLClQop0e
-         73LXtnenRO/0qTAXSNvTiwCbwx5G89IVKGjd0QLW8dKiLHZjz1ZGdYmhNkXOxMzpvCr2
-         cRpw==
-X-Gm-Message-State: AGi0PuY8OvH4eYwx+xLKZ1QHuP/X3hMMUmcyBFWGaxJsQw7lT9Kh0VN3
-        nYyBpyUoRY+q4aWLCAQ7TJu6XPVwWYQTltocaKtUpumtqGcW2rX3OoZxwX4lqkUap2oI7fybpC8
-        5hY5f77rA/f+G
-X-Received: by 2002:adf:f041:: with SMTP id t1mr126253wro.346.1588609917648;
-        Mon, 04 May 2020 09:31:57 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIljPCI6hKiLiZGCDmI3dbBzFUE7Mbf/4Rf+dtHDl8lZ1cM0scqk2VQvKw/T7tOEUd5BJx0WA==
-X-Received: by 2002:adf:f041:: with SMTP id t1mr126236wro.346.1588609917401;
-        Mon, 04 May 2020 09:31:57 -0700 (PDT)
+        bh=hEpx8ijsNtOVF5thD83WQ9QtmFhV5BTDZrsTGbIGCpY=;
+        b=U4Ap6gfH3QG4fxbsmLEPPpJxnDw46mCmeaewN7uKE0uj1eu57U1B14FGk1/+yVo28p
+         P+VnbuHkXituV9O7PSlfr5mhl25IKG86Nb8dqHvb6Jwamld+mNc3WTRUDDQZoptd34R+
+         enAjGrqHOoOK0zF3sqyp6gteCbrMz58dtaYa8mQnW/gb/uY0AWz6YrfTXnNyLUWJdiXA
+         ev6Afg/eZSgSsYTU9L8Z6CJw2kY/k/L7oPRLvqzr1t3o6fjnBreaYEnMfKXIFj5OaPS5
+         UzVlf2ns8Btx+RyBXpjtc+WT+MhClWF9e79fEl5ycGISHqoynjfG6M7Un8a68qkWIGaU
+         jllQ==
+X-Gm-Message-State: AGi0PuYbGTupPzR2NlWpvoq19OYGrR5DDr9PvUlXpfS7B4Jmyif71a1m
+        qC2jV8ol2TsXxWwr3xC+IGQNJMDiiLGYrQUnh9KnSkvBFr3J1c/CG5uhrvj72btJF+7NazktDWC
+        Hd64a+sc1NQGt
+X-Received: by 2002:adf:bb4e:: with SMTP id x14mr114213wrg.63.1588610025008;
+        Mon, 04 May 2020 09:33:45 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLp5LlkN9O7rjWacff63es870g2BhlZ3YY8RkJhwBJnJLHFQa7k5VbWZXNuRl6jWlpqc+eC/A==
+X-Received: by 2002:adf:bb4e:: with SMTP id x14mr114198wrg.63.1588610024831;
+        Mon, 04 May 2020 09:33:44 -0700 (PDT)
 Received: from [192.168.178.58] ([151.20.132.175])
-        by smtp.gmail.com with ESMTPSA id d5sm19653025wrp.44.2020.05.04.09.31.56
+        by smtp.gmail.com with ESMTPSA id h16sm21663437wrw.36.2020.05.04.09.33.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2020 09:31:56 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v3] x86: nVMX: add new test for
- vmread/vmwrite flags preservation
-To:     Simon Smith <brigidsmith@google.com>, kvm@vger.kernel.org
-References: <20200420175834.258122-1-brigidsmith@google.com>
- <CAHfZhxt1c6PBM+VLFuhDnkUPcCwJCs17xL4bngzfq9YyJNDpJA@mail.gmail.com>
+        Mon, 04 May 2020 09:33:44 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: ioapic: Run physical destination mode
+ test iff cpu_count() > 1
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Nitesh Narayan Lal <nitesh@redhat.com>
+References: <20200423195050.26310-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6c7a19a9-0030-9c32-33f9-9de86cb89bb2@redhat.com>
-Date:   Mon, 4 May 2020 18:31:55 +0200
+Message-ID: <ca7f71b1-82aa-53aa-fe81-2f61e3407a82@redhat.com>
+Date:   Mon, 4 May 2020 18:33:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAHfZhxt1c6PBM+VLFuhDnkUPcCwJCs17xL4bngzfq9YyJNDpJA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200423195050.26310-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -71,204 +71,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/05/20 18:19, Simon Smith wrote:
-> Ping!  (I realized I sent this via non-plaintext and the listserv rejected it.)
+On 23/04/20 21:50, Sean Christopherson wrote:
+> Make test_ioapic_physical_destination_mode() depending on having at
+> least two CPUs as it sets ->dest_id to '1', i.e. expects CPU0 and CPU1
+> to exist.  This analysis is backed up by the fact that the test was
+> originally gated by cpu_count() > 1.
+> 
+> Fixes: dcf27dc5b5499 ("x86: Fix the logical destination mode test")
+> Cc: Nitesh Narayan Lal <nitesh@redhat.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  x86/ioapic.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/x86/ioapic.c b/x86/ioapic.c
+> index 3106531..f315e4b 100644
+> --- a/x86/ioapic.c
+> +++ b/x86/ioapic.c
+> @@ -504,7 +504,8 @@ int main(void)
+>  	test_ioapic_level_tmr(true);
+>  	test_ioapic_edge_tmr(true);
+>  
+> -	test_ioapic_physical_destination_mode();
+> +	if (cpu_count() > 1)
+> +		test_ioapic_physical_destination_mode();
+>  	if (cpu_count() > 3)
+>  		test_ioapic_logical_destination_mode();
+>  
+> 
 
-Queued now, thanks!
+Queued, thanks.
 
 Paolo
-
-> 
-> On Mon, Apr 20, 2020 at 10:59 AM Simon Smith <brigidsmith@google.com> wrote:
->>
->> This commit adds new unit tests for commit a4d956b93904 ("KVM: nVMX:
->> vmread should not set rflags to specify success in case of #PF")
->>
->> The two new tests force a vmread and a vmwrite on an unmapped
->> address to cause a #PF and verify that the low byte of %rflags is
->> preserved and that %rip is not advanced.  The commit fixed a
->> bug in vmread, but we include a test for vmwrite as well for
->> completeness.
->>
->> Before the aforementioned commit, the ALU flags would be incorrectly
->> cleared and %rip would be advanced (for vmread).
->>
->> Signed-off-by: Simon Smith <brigidsmith@google.com>
->> Reviewed-by: Jim Mattson <jmattson@google.com>
->> Reviewed-by: Peter Shier <pshier@google.com>
->> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->> Reviewed-by: Oliver Upton <oupton@google.com>
->> ---
->>  x86/vmx.c | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 140 insertions(+)
->>
->> diff --git a/x86/vmx.c b/x86/vmx.c
->> index 4c47eec1a1597..cbe68761894d4 100644
->> --- a/x86/vmx.c
->> +++ b/x86/vmx.c
->> @@ -32,6 +32,7 @@
->>  #include "processor.h"
->>  #include "alloc_page.h"
->>  #include "vm.h"
->> +#include "vmalloc.h"
->>  #include "desc.h"
->>  #include "vmx.h"
->>  #include "msr.h"
->> @@ -387,6 +388,141 @@ static void test_vmwrite_vmread(void)
->>         free_page(vmcs);
->>  }
->>
->> +ulong finish_fault;
->> +u8 sentinel;
->> +bool handler_called;
->> +
->> +static void pf_handler(struct ex_regs *regs)
->> +{
->> +       /*
->> +        * check that RIP was not improperly advanced and that the
->> +        * flags value was preserved.
->> +        */
->> +       report(regs->rip < finish_fault, "RIP has not been advanced!");
->> +       report(((u8)regs->rflags == ((sentinel | 2) & 0xd7)),
->> +              "The low byte of RFLAGS was preserved!");
->> +       regs->rip = finish_fault;
->> +       handler_called = true;
->> +
->> +}
->> +
->> +static void prep_flags_test_env(void **vpage, struct vmcs **vmcs, handler *old)
->> +{
->> +       /*
->> +        * get an unbacked address that will cause a #PF
->> +        */
->> +       *vpage = alloc_vpage();
->> +
->> +       /*
->> +        * set up VMCS so we have something to read from
->> +        */
->> +       *vmcs = alloc_page();
->> +
->> +       memset(*vmcs, 0, PAGE_SIZE);
->> +       (*vmcs)->hdr.revision_id = basic.revision;
->> +       assert(!vmcs_clear(*vmcs));
->> +       assert(!make_vmcs_current(*vmcs));
->> +
->> +       *old = handle_exception(PF_VECTOR, &pf_handler);
->> +}
->> +
->> +static void test_read_sentinel(void)
->> +{
->> +       void *vpage;
->> +       struct vmcs *vmcs;
->> +       handler old;
->> +
->> +       prep_flags_test_env(&vpage, &vmcs, &old);
->> +
->> +       /*
->> +        * set the proper label
->> +        */
->> +       extern char finish_read_fault;
->> +
->> +       finish_fault = (ulong)&finish_read_fault;
->> +
->> +       /*
->> +        * execute the vmread instruction that will cause a #PF
->> +        */
->> +       handler_called = false;
->> +       asm volatile ("movb %[byte], %%ah\n\t"
->> +                     "sahf\n\t"
->> +                     "vmread %[enc], %[val]; finish_read_fault:"
->> +                     : [val] "=m" (*(u64 *)vpage)
->> +                     : [byte] "Krm" (sentinel),
->> +                     [enc] "r" ((u64)GUEST_SEL_SS)
->> +                     : "cc", "ah");
->> +       report(handler_called, "The #PF handler was invoked");
->> +
->> +       /*
->> +        * restore the old #PF handler
->> +        */
->> +       handle_exception(PF_VECTOR, old);
->> +}
->> +
->> +static void test_vmread_flags_touch(void)
->> +{
->> +       /*
->> +        * set up the sentinel value in the flags register. we
->> +        * choose these two values because they candy-stripe
->> +        * the 5 flags that sahf sets.
->> +        */
->> +       sentinel = 0x91;
->> +       test_read_sentinel();
->> +
->> +       sentinel = 0x45;
->> +       test_read_sentinel();
->> +}
->> +
->> +static void test_write_sentinel(void)
->> +{
->> +       void *vpage;
->> +       struct vmcs *vmcs;
->> +       handler old;
->> +
->> +       prep_flags_test_env(&vpage, &vmcs, &old);
->> +
->> +       /*
->> +        * set the proper label
->> +        */
->> +       extern char finish_write_fault;
->> +
->> +       finish_fault = (ulong)&finish_write_fault;
->> +
->> +       /*
->> +        * execute the vmwrite instruction that will cause a #PF
->> +        */
->> +       handler_called = false;
->> +       asm volatile ("movb %[byte], %%ah\n\t"
->> +                     "sahf\n\t"
->> +                     "vmwrite %[val], %[enc]; finish_write_fault:"
->> +                     : [val] "=m" (*(u64 *)vpage)
->> +                     : [byte] "Krm" (sentinel),
->> +                     [enc] "r" ((u64)GUEST_SEL_SS)
->> +                     : "cc", "ah");
->> +       report(handler_called, "The #PF handler was invoked");
->> +
->> +       /*
->> +        * restore the old #PF handler
->> +        */
->> +       handle_exception(PF_VECTOR, old);
->> +}
->> +
->> +static void test_vmwrite_flags_touch(void)
->> +{
->> +       /*
->> +        * set up the sentinel value in the flags register. we
->> +        * choose these two values because they candy-stripe
->> +        * the 5 flags that sahf sets.
->> +        */
->> +       sentinel = 0x91;
->> +       test_write_sentinel();
->> +
->> +       sentinel = 0x45;
->> +       test_write_sentinel();
->> +}
->> +
->> +
->>  static void test_vmcs_high(void)
->>  {
->>         struct vmcs *vmcs = alloc_page();
->> @@ -1988,6 +2124,10 @@ int main(int argc, const char *argv[])
->>                 test_vmcs_lifecycle();
->>         if (test_wanted("test_vmx_caps", argv, argc))
->>                 test_vmx_caps();
->> +       if (test_wanted("test_vmread_flags_touch", argv, argc))
->> +               test_vmread_flags_touch();
->> +       if (test_wanted("test_vmwrite_flags_touch", argv, argc))
->> +               test_vmwrite_flags_touch();
->>
->>         /* Balance vmxon from test_vmxon. */
->>         vmx_off();
->> --
->> 2.26.1.301.g55bc3eb7cb9-goog
->>
-> 
 
