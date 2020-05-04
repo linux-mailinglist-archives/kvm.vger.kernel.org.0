@@ -2,97 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92E281C3B2E
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 15:26:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA33E1C3B60
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 15:37:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727104AbgEDN0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 09:26:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52834 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726922AbgEDN0D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 09:26:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588598762;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=i4pzL4umPonPhC4u7wWwTYbUYUN1KN4vROxppSrw3+E=;
-        b=DXuHeBD55BYoq0T3ETff1t7WXd6w9XGllrlXndeI5VFK2y3icxH8YnzjI6ww6FAbCQrSIh
-        3ngQbmZQ2A77wvMQ+8ECc6Y413jHzJVxrnNWab93pSegN226BaLPkU7JLhWrJxNyphhbHU
-        DE2n4PlwVxj3/aDVGWH9cpSCPNXfMAI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-eNzbowHlNJOUnydVvS_nRQ-1; Mon, 04 May 2020 09:26:00 -0400
-X-MC-Unique: eNzbowHlNJOUnydVvS_nRQ-1
-Received: by mail-wm1-f70.google.com with SMTP id h184so4865078wmf.5
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 06:26:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=i4pzL4umPonPhC4u7wWwTYbUYUN1KN4vROxppSrw3+E=;
-        b=C3uxeeD3mlriittaIbx/bRdFwc6v5FGIrRnqy/jt8fu3sHx0Du7IZQWOn/UqztQOOP
-         4u+FY6BLxgnp1p6lAlq++8xu/vX/d2Ny+tKwM7aAFtY8fZdN9xbNT7Z6bW/IYeQlFFsa
-         iyClZgTscD9Gh/rLC7HU7FT6WuXO+6B2u5QJvPfgB4GwZFb6ON3ODc1pqfz9XMsWUF0u
-         ZJ/ojmlHWq/h59aCn/Vjl7qdldAYoETBwbrW04DLYm5aMRic6IwOaXrqaEioulqJwooZ
-         zqFF5E9lowvgG87MWTVUDkz2tOXWykSzYYxDwssgva2A1ZSFXJsrt5GCxzzPiqfTY9I2
-         xIKw==
-X-Gm-Message-State: AGi0Pua1AuYtDA0xU4Rs9dk/dEJ1r2OTrq+kUGPXJhC5FWYhQ4bYa04O
-        ZiXISQZlvCYb8fG7VCPkIF8npM5oHV+v4rS2bfP2YHw3r/Wq3HLjhbrOYpdY57eyxayKUzT82pl
-        /VRfQreJdUylh
-X-Received: by 2002:adf:b246:: with SMTP id y6mr19634358wra.205.1588598759722;
-        Mon, 04 May 2020 06:25:59 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJDk5TIWUOHalS5JGIMZEe9cIgedoGf1dImAxSG/0eN+CuQo328XZeIltJiaklS1Cr1myn0gg==
-X-Received: by 2002:adf:b246:: with SMTP id y6mr19634338wra.205.1588598759507;
-        Mon, 04 May 2020 06:25:59 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.132.175])
-        by smtp.gmail.com with ESMTPSA id l16sm18526002wrp.91.2020.05.04.06.25.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 May 2020 06:25:59 -0700 (PDT)
-Subject: Re: [PATCH 00/10] KVM: x86: Misc anti-retpoline optimizations
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200502043234.12481-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <76c2fc30-58e3-4d90-4b66-85b6fb4741b5@redhat.com>
-Date:   Mon, 4 May 2020 15:25:58 +0200
+        id S1728187AbgEDNhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 09:37:01 -0400
+Received: from foss.arm.com ([217.140.110.172]:44990 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726404AbgEDNhB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 09:37:01 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9EC611FB;
+        Mon,  4 May 2020 06:37:00 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDAFC3F71F;
+        Mon,  4 May 2020 06:36:59 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 24/32] pci: Limit configuration transaction
+ size to 32 bits
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-25-alexandru.elisei@arm.com>
+ <c1f0db1a-5df1-492b-8d91-a972fe2a4d42@arm.com>
+ <30df4164-f7db-c00d-e67c-5d2cdb696354@arm.com>
+Message-ID: <da28f15f-56c3-797d-a5fd-64cb7f3d7295@arm.com>
+Date:   Mon, 4 May 2020 14:37:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200502043234.12481-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <30df4164-f7db-c00d-e67c-5d2cdb696354@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/05/20 06:32, Sean Christopherson wrote:
-> A smattering of optimizations geared toward avoiding retpolines, though
-> IMO most of the patches are worthwhile changes irrespective of retpolines.
-> I can split this up into separate patches if desired, outside of the
-> obvious combos there are no dependencies.
+Hi,
 
-Most of them are good stuff anyway, I agree.
+On 5/4/20 2:00 PM, Alexandru Elisei wrote:
+> Hi,
+>
+> On 4/2/20 9:34 AM, André Przywara wrote:
+>> On 26/03/2020 15:24, Alexandru Elisei wrote:
+>>> From PCI Local Bus Specification Revision 3.0. section 3.8 "64-Bit Bus
+>>> Extension":
+>>>
+>>> "The bandwidth requirements for I/O and configuration transactions cannot
+>>> justify the added complexity, and, therefore, only memory transactions
+>>> support 64-bit data transfers".
+>>>
+>>> Further down, the spec also describes the possible responses of a target
+>>> which has been requested to do a 64-bit transaction. Limit the transaction
+>>> to the lower 32 bits, to match the second accepted behaviour.
+>> That looks like a reasonable behaviour.
+>> AFAICS there is one code path from powerpc/spapr_pci.c which isn't
+>> covered by those limitations (rtas_ibm_write_pci_config() ->
+>> pci__config_wr() -> cfg_ops.write() -> vfio_pci_cfg_write()).
+>> Same for read.
+> The code compares the access size to 1, 2 and 4, so I think powerpc doesn't expect
+> 64 bit accesses either. The change looks straightforward, I'll do it for consistency.
+>
+Read the code more carefully and powerpc already limits the access size to 4 bytes:
 
-Since I like to believe that static calls _are_ close, I queued these:
+static void rtas_ibm_read_pci_config(struct kvm_cpu *vcpu,
+                     uint32_t token, uint32_t nargs,
+                     target_ulong args,
+                     uint32_t nret, target_ulong rets)
+{
+    [..]
+    if (buid != phb.buid || !dev || (size > 4)) {
+        phb_dprintf("- cfgRd buid 0x%lx cfg addr 0x%x size %d not found\n",
+                buid, addr.w, size);
 
-      KVM: x86: Save L1 TSC offset in 'struct kvm_vcpu_arch'
-      KVM: nVMX: Unconditionally validate CR3 during nested transitions
-      KVM: VMX: Add proper cache tracking for CR4
-      KVM: VMX: Add proper cache tracking for CR0
-      KVM: VMX: Move nested EPT out of kvm_x86_ops.get_tdp_level() hook
-      KVM: x86/mmu: Capture TDP level when updating CPUID
+        rtas_st(vcpu->kvm, rets, 0, -1);
+        return;
+    }
+    pci__config_rd(vcpu->kvm, addr, &val, size);
+    [..]
+}
 
-and I don't disagree with the DR6 one though it can be even improved a
-bit so I'll send a patch myself.
+It's the same for all the functions where pci__config_{rd,wr} are called directly.
+So no changes are needed.
 
-Paolo
-
+Thanks,
+Alex
