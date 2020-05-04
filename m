@@ -2,145 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D65351C3C5D
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 16:07:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 374A21C3CD6
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 16:21:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728486AbgEDOHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 10:07:21 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38092 "EHLO
+        id S1729122AbgEDOVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 10:21:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52844 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728187AbgEDOHV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 10:07:21 -0400
+        by vger.kernel.org with ESMTP id S1729118AbgEDOVD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 10:21:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588601238;
+        s=mimecast20190719; t=1588602062;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UNEInDzsZUfgj6dVPP9TtTfYbCtjbqhCfb5bgYwLZbY=;
-        b=D1DKyhwp9PpYL3iIu5XGrOSH3WB7RuxMmpxhcJeYlZvmddq4P4DMwzog+IRk0ETiR7zeKJ
-        n4nqnFjf6yPFBuJesQ6UQe2JnddZic9dZiVZkruIFvTGJMv4iYk5of4FULdUUNzSwuu381
-        aOCzEis52MqIfLsSai2vXxhrbhwxQUg=
+        bh=kEhPnil3Au9ljZyWx7OUd3eWbeEZNvjibden46SQ+d8=;
+        b=ScLmwShLfKCvGiiAr5GitGXpOzl4cSVlZls65pwPdNBbcjMnIMCrthgyUqzeNkDXsFFUM8
+        xDfH56K7fs+nDABS/SQJnKITGF30JWqFEFZfmuAGeoxtGHN1hN0qmu6D0dDhIAfS+dLe8g
+        pfuY9/n8xbBa2/5gUZHTlKz8ZxOGtk4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-5Qn0jHjGNO2YUpdhuNEjLg-1; Mon, 04 May 2020 10:07:15 -0400
-X-MC-Unique: 5Qn0jHjGNO2YUpdhuNEjLg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-119-d5U_WhvSPbmwh6DTLH-6NA-1; Mon, 04 May 2020 10:21:00 -0400
+X-MC-Unique: d5U_WhvSPbmwh6DTLH-6NA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FA471856FD5;
-        Mon,  4 May 2020 14:06:34 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0A1518FE861;
+        Mon,  4 May 2020 14:20:58 +0000 (UTC)
 Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9335D78B21;
-        Mon,  4 May 2020 14:06:31 +0000 (UTC)
-Date:   Mon, 4 May 2020 08:06:30 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB11958;
+        Mon,  4 May 2020 14:20:55 +0000 (UTC)
+Date:   Mon, 4 May 2020 08:20:55 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         cohuck@redhat.com, peterx@redhat.com
-Subject: Re: [PATCH 1/3] vfio/type1: Support faulting PFNMAP vmas
-Message-ID: <20200504080630.293f33e8@x1.home>
-In-Reply-To: <20200501235033.GA19929@ziepe.ca>
+Subject: Re: [PATCH 2/3] vfio-pci: Fault mmaps to enable vma tracking
+Message-ID: <20200504082055.0faeef8b@x1.home>
+In-Reply-To: <20200501232550.GP26002@ziepe.ca>
 References: <158836742096.8433.685478071796941103.stgit@gimli.home>
-        <158836914801.8433.9711545991918184183.stgit@gimli.home>
-        <20200501235033.GA19929@ziepe.ca>
+        <158836915917.8433.8017639758883869710.stgit@gimli.home>
+        <20200501232550.GP26002@ziepe.ca>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 1 May 2020 20:50:33 -0300
+On Fri, 1 May 2020 20:25:50 -0300
 Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-> On Fri, May 01, 2020 at 03:39:08PM -0600, Alex Williamson wrote:
-> > With conversion to follow_pfn(), DMA mapping a PFNMAP range depends on
-> > the range being faulted into the vma.  Add support to manually provide
-> > that, in the same way as done on KVM with hva_to_pfn_remapped().
+> On Fri, May 01, 2020 at 03:39:19PM -0600, Alex Williamson wrote:
+> > Rather than calling remap_pfn_range() when a region is mmap'd, setup
+> > a vm_ops handler to support dynamic faulting of the range on access.
+> > This allows us to manage a list of vmas actively mapping the area that
+> > we can later use to invalidate those mappings.  The open callback
+> > invalidates the vma range so that all tracking is inserted in the
+> > fault handler and removed in the close handler.
 > > 
 > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> >  drivers/vfio/vfio_iommu_type1.c |   36 +++++++++++++++++++++++++++++++++---
-> >  1 file changed, 33 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index cc1d64765ce7..4a4cb7cd86b2 100644
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -317,6 +317,32 @@ static int put_pfn(unsigned long pfn, int prot)
-> >  	return 0;
-> >  }
-> >  
-> > +static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
-> > +			    unsigned long vaddr, unsigned long *pfn,
-> > +			    bool write_fault)
+> > ---
+> >  drivers/vfio/pci/vfio_pci.c         |   76 ++++++++++++++++++++++++++++++++++-
+> >  drivers/vfio/pci/vfio_pci_private.h |    7 +++
+> >  2 files changed, 81 insertions(+), 2 deletions(-)  
+> 
+> > +static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
 > > +{
-> > +	int ret;
+> > +	struct vm_area_struct *vma = vmf->vma;
+> > +	struct vfio_pci_device *vdev = vma->vm_private_data;
 > > +
-> > +	ret = follow_pfn(vma, vaddr, pfn);
-> > +	if (ret) {
-> > +		bool unlocked = false;
+> > +	if (vfio_pci_add_vma(vdev, vma))
+> > +		return VM_FAULT_OOM;
 > > +
-> > +		ret = fixup_user_fault(NULL, mm, vaddr,
-> > +				       FAULT_FLAG_REMOTE |
-> > +				       (write_fault ?  FAULT_FLAG_WRITE : 0),
-> > +				       &unlocked);
-> > +		if (unlocked)
-> > +			return -EAGAIN;
+> > +	if (remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+> > +			    vma->vm_end - vma->vm_start, vma->vm_page_prot))
+> > +		return VM_FAULT_SIGBUS;
 > > +
-> > +		if (ret)
-> > +			return ret;
-> > +
-> > +		ret = follow_pfn(vma, vaddr, pfn);
-> > +	}
-> > +
-> > +	return ret;
+> > +	return VM_FAULT_NOPAGE;
 > > +}
 > > +
-> >  static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
-> >  			 int prot, unsigned long *pfn)
-> >  {
-> > @@ -339,12 +365,16 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
-> >  
-> >  	vaddr = untagged_addr(vaddr);
-> >  
-> > +retry:
-> >  	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
-> >  
-> >  	if (vma && vma->vm_flags & VM_PFNMAP) {
-> > -		if (!follow_pfn(vma, vaddr, pfn) &&
-> > -		    is_invalid_reserved_pfn(*pfn))
-> > -			ret = 0;
-> > +		ret = follow_fault_pfn(vma, mm, vaddr, pfn, prot & IOMMU_WRITE);
-> > +		if (ret == -EAGAIN)
-> > +			goto retry;
+> > +static const struct vm_operations_struct vfio_pci_mmap_ops = {
+> > +	.open = vfio_pci_mmap_open,
+> > +	.close = vfio_pci_mmap_close,
+> > +	.fault = vfio_pci_mmap_fault,
+> > +};
 > > +
-> > +		if (!ret && !is_invalid_reserved_pfn(*pfn))
-> > +			ret = -EFAULT;  
+> >  static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+> >  {
+> >  	struct vfio_pci_device *vdev = device_data;
+> > @@ -1357,8 +1421,14 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+> >  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> >  	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
+> >  
+> > -	return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+> > -			       req_len, vma->vm_page_prot);
+> > +	/*
+> > +	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
+> > +	 * change vm_flags within the fault handler.  Set them now.
+> > +	 */
+> > +	vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
+> > +	vma->vm_ops = &vfio_pci_mmap_ops;  
 > 
-> I suggest checking vma->vm_ops == &vfio_pci_mmap_ops and adding a
-> comment that this is racy and needs to be fixed up. The ops check
-> makes this only used by other vfio bars and should prevent some
-> abuses of this hacky thing
+> Perhaps do the vfio_pci_add_vma & remap_pfn_range combo here if the
+> BAR is activated ? That way a fully populated BAR is presented in the
+> common case and avoids taking a fault path?
+> 
+> But it does seem OK as is
 
-We can't do that, vfio-pci is only one bus driver within the vfio
-ecosystem.
-
-> However, I wonder if this chould just link itself into the
-> vma->private data so that when the vfio that owns the bar goes away,
-> so does the iommu mapping?
-
-I don't really see why we wouldn't use mmu notifiers so that the vfio
-iommu backend and vfio bus driver remain independent.
-
-> I feel like this patch set is not complete unless it also handles the
-> shootdown of this path too?
-
-It would be nice to solve both issues and I'll start working on the mmu
-notifier side of things, but this series does solve a real issue on
-its own and we're not changing the iommu mapping behavior here.  Thanks,
+Thanks for reviewing.  There's also an argument that we defer
+remap_pfn_range() until the device is actually touched, which might
+reduce the startup latency.  It's also a bit inconsistent with the
+vm_ops.open() path where I can't return error, so I can't call
+vfio_pci_add_vma(), I can only zap the vma so that the fault handler
+can return an error if necessary.  Therefore it felt more consistent,
+with potential startup latency improvements, to defer all mappings to
+the fault handler.  If there's a good reason to do otherwise, I can
+make the change, but I doubt I'd have encountered the dma mapping of an
+unfaulted vma issue had I done it this way, so maybe there's a test
+coverage argument as well.  Thanks,
 
 Alex
 
