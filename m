@@ -2,41 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 523321C3FD2
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A45401C3FD9
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:29:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729598AbgEDQ3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 12:29:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54661 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729590AbgEDQ3A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 12:29:00 -0400
+        id S1729626AbgEDQ31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 12:29:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36203 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729614AbgEDQ31 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 12:29:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588609739;
+        s=mimecast20190719; t=1588609765;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=vyYYYfDE98dZ74NRX6gFiGAARZEAda2ko5w/z7U1TOY=;
-        b=Esnrn88KsElsfJxD8Dn6pk1Cca7jpfOPsFAUv15nAzf5BVB3R6aHtNDIiqfqRT7dDHInw8
-        wxtXHwC3DSR3o/BMdKv1qanOOdLqUqD4VcAhaM0gzCFa590ya9NN+UYoJxbHfRIBtecxtG
-        CM0hcoHH7dtayFyy4sED4xAoyS0zW5I=
+         to:to:cc; bh=u9wd2N5ZqA9eKBgCPlh0DHQo6aOCCyRgqsmnMGl7hh0=;
+        b=gNNs7gzK+PcP1UxfPL5XIdWtY4c9nzWZGPfzg2asIXDjm3PxZggBRtWQ8TuhUznQ8ydgpv
+        8t6bYfDwkA8HzOpp3dHO8JbFIfRfaOBZxPo+9sMsMGFYhBS07W2lYuWvT7hCQ7QNy9wp2K
+        LD9/tBuAHBBo1Lafxxrvm8RT8dW69Mo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-desGePx4MY68frG5i3_GMQ-1; Mon, 04 May 2020 12:28:55 -0400
-X-MC-Unique: desGePx4MY68frG5i3_GMQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-32-Byz0ITRxPLWl15gL0K7H1g-1; Mon, 04 May 2020 12:29:24 -0400
+X-MC-Unique: Byz0ITRxPLWl15gL0K7H1g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23F818014D5;
-        Mon,  4 May 2020 16:28:54 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2430E8014D5;
+        Mon,  4 May 2020 16:29:23 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A1FDA60C81;
-        Mon,  4 May 2020 16:28:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2D875D9D5;
+        Mon,  4 May 2020 16:29:22 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 Subject: [PATCH] kvm: ioapic: Restrict lazy EOI update to edge-triggered interrupts
-Date:   Mon,  4 May 2020 12:28:52 -0400
-Message-Id: <20200504162852.404422-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Date:   Mon,  4 May 2020 12:29:22 -0400
+Message-Id: <20200504162922.404532-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -85,7 +84,7 @@ Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Link: https://www.spinics.net/lists/kvm/msg213512.html
 Fixes: f458d039db7e ("kvm: ioapic: Lazy update IOAPIC EOI")
 Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=207489
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  arch/x86/kvm/ioapic.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
