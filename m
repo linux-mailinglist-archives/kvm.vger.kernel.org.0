@@ -2,213 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77DF31C38CB
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 14:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 805AC1C390E
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 14:14:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728682AbgEDMCI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 08:02:08 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:59234 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726445AbgEDMCI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 08:02:08 -0400
+        id S1728714AbgEDMOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 08:14:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59136 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728614AbgEDMOE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 08:14:04 -0400
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E491BC061A0F
+        for <kvm@vger.kernel.org>; Mon,  4 May 2020 05:14:03 -0700 (PDT)
+Received: by mail-qk1-x744.google.com with SMTP id n14so8153967qke.8
+        for <kvm@vger.kernel.org>; Mon, 04 May 2020 05:14:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1588593728; x=1620129728;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=oz/2ALb5OVTxQnVg7IfzEFgf/Uw6IfZKqeh0udnmnjg=;
-  b=qQf6XSk7brf4LID4dKCKcDk+kHXJIZXiHuSFWXO4Y1Qfsa4VWLR2ggDI
-   xHUgUObj6ZXLkHNHvNMAxOPOUg+L8n/jt/pDwGbzsMNrz7rCpExvl5Gak
-   R5QocMILYFWIP1jumHP4gzS1/xZGNYtPFyHMlUa22Z6JQfDTgUgidxkMA
-   I=;
-IronPort-SDR: D9MG6OUrNRO3shhHXPKjuNCQd3zrfkdDTNWVXm3w7W8GpmmWJb7x2Ghr4OsPW6akkDY0+i5its
- 089G92bYV8cw==
-X-IronPort-AV: E=Sophos;i="5.73,351,1583193600"; 
-   d="scan'208";a="29930547"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-f273de60.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 04 May 2020 12:01:54 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-f273de60.us-east-1.amazon.com (Postfix) with ESMTPS id 021E3A450F;
-        Mon,  4 May 2020 12:01:51 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 4 May 2020 12:01:51 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.247) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 4 May 2020 12:01:48 +0000
-Subject: Re: [PATCH v2] KVM: nVMX: Skip IBPB when switching between vmcs01 and
- vmcs02
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        KarimAllah Raslan <karahmed@amazon.de>
-References: <20200501163117.4655-1-sean.j.christopherson@intel.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <1de7b016-8bc9-23d4-7f8b-145c30d7e58a@amazon.com>
-Date:   Mon, 4 May 2020 14:01:46 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.7.0
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=uYct+1EXK4RvBhS2R9oCZJOA6YnnY92fxMdH3FTHSR4=;
+        b=nG7On+yMwtfGBMG3EEnGP/Eyr+dDKC4jICpKbPO6K4fszentgI/sW7dpsCMmC3kiqN
+         r05PiNpFvfalngk5g8x2kENDR3bKi+zfFry4JRXeKkoS3rM3hNXK/XEdpT8Eq/owHSGW
+         UdGPVNu1ZZE1RFEa4aePGP7JUhSU9acIvXIAgsAUBkHPimnV3tZu8BatePbjTXLAgV7+
+         9j2xKqJiFFEFoCV0uizdmuOa8BXz0tOnGSMScdbrYZl1Tgqm2W/ItGaqMvd7WKHjuPUD
+         CVJsX/sNmyL9+anfWB63V5O4sThGrMWEzqEkdprm3ZBcuTYZytOlWIPSHHZERyGUDr5J
+         kOZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=uYct+1EXK4RvBhS2R9oCZJOA6YnnY92fxMdH3FTHSR4=;
+        b=je9DA9gPtJeUwKdegVLrUY3D3T3sPTrjkWqX5u9MMUVXLFAsS5a0NCBzMrER42Xg0U
+         ikpZuwJxxxOSA2FkgwkZ/Iy0gVdM6/RjAwHMiXPqt6GnPBw1etAYPDSTypUArqtgTi8K
+         s8ePag5R7ZGFtMRhxvhresutgqNFzQwBZX0SEJXUXXP44+LGwxd1yLFo9of3lwsj4wKt
+         LFAoQwT81C+eoxZVKgaBYzdQTNwB4w43qXBFwKfJ6ofQsBNEtBfL5uWX2ZZ1l8AvPX1i
+         1G5Anz4IX7PRl3kGB2pQyVVkhd/XU2DDxxE+wtrRr3loXww3gaz4b+fZeg5CW1GL/tdn
+         86oQ==
+X-Gm-Message-State: AGi0PubE/bXY5MU1Ly47TP1t1vZ6XX06IbsFANW3LNkv65dCTbq9RoWn
+        6heOtyDby+EsHCs4trNReOr/9Q==
+X-Google-Smtp-Source: APiQypJo409ZJxzf2nxC+vnBmVCvb7bUK735uBejgyjN4EXp0iDnDYCtO3gUOEBm4tnsvWXbjqQYtA==
+X-Received: by 2002:a37:5941:: with SMTP id n62mr15543383qkb.419.1588594442936;
+        Mon, 04 May 2020 05:14:02 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id a139sm5077890qkg.107.2020.05.04.05.14.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 04 May 2020 05:14:02 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jVZyz-0005Zd-K8; Mon, 04 May 2020 09:14:01 -0300
+Date:   Mon, 4 May 2020 09:14:01 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Dey, Megha" <megha.dey@linux.intel.com>
+Cc:     Dave Jiang <dave.jiang@intel.com>, vkoul@kernel.org,
+        maz@kernel.org, bhelgaas@google.com, rafael@kernel.org,
+        gregkh@linuxfoundation.org, tglx@linutronix.de, hpa@zytor.com,
+        alex.williamson@redhat.com, jacob.jun.pan@intel.com,
+        ashok.raj@intel.com, yi.l.liu@intel.com, baolu.lu@intel.com,
+        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, jing.lin@intel.com, dan.j.williams@intel.com,
+        kwankhede@nvidia.com, eric.auger@redhat.com, parav@mellanox.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH RFC 04/15] drivers/base: Add support for a new IMS irq
+ domain
+Message-ID: <20200504121401.GV26002@ziepe.ca>
+References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
+ <158751205175.36773.1874642824360728883.stgit@djiang5-desk3.ch.intel.com>
+ <20200423201118.GA29567@ziepe.ca>
+ <35f701d9-1034-09c7-8117-87fb8796a017@linux.intel.com>
+ <20200503222513.GS26002@ziepe.ca>
+ <1ededeb8-deff-4db7-40e5-1d5e8a800f52@linux.intel.com>
+ <20200503224659.GU26002@ziepe.ca>
+ <8ff2aace-0697-b8ef-de68-1bcc49d6727f@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200501163117.4655-1-sean.j.christopherson@intel.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.247]
-X-ClientProxiedBy: EX13D07UWB004.ant.amazon.com (10.43.161.196) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ff2aace-0697-b8ef-de68-1bcc49d6727f@linux.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, May 03, 2020 at 05:25:28PM -0700, Dey, Megha wrote:
+> > > The use case if when we have a device assigned to a guest and we
+> > > want to allocate IMS(platform-msi) interrupts for that
+> > > guest-assigned device. Currently, this is abstracted through a mdev
+> > > interface.
+> > 
+> > And the mdev has the pci_device internally, so it should simply pass
+> > that pci_device to the platform_msi machinery.
+> 
+> hmm i am not sure I follow this. mdev has a pci_device internally? which
+> struct are you referring to here?
 
+mdev in general may not, but any ADI trying to use mdev will
+necessarily have access to a struct pci_device.
 
-On 01.05.20 18:31, Sean Christopherson wrote:
-> =
+> mdev is merely a micropartitioned PCI device right, which no real PCI
+> resource backing. I am not how else we can find the IRQ domain associated
+> with an mdev..
 
-> Skip the Indirect Branch Prediction Barrier that is triggered on a VMCS
-> switch when running with spectre_v2_user=3Don/auto if the switch is
-> between two VMCSes in the same guest, i.e. between vmcs01 and vmcs02.
-> The IBPB is intended to prevent one guest from attacking another, which
-> is unnecessary in the nested case as it's the same guest from KVM's
-> perspective.
-> =
+ADI always has real PCI resource backing.
 
-> This all but eliminates the overhead observed for nested VMX transitions
-> when running with CONFIG_RETPOLINE=3Dy and spectre_v2_user=3Don/auto, whi=
-ch
-> can be significant, e.g. roughly 3x on current systems.
-> =
-
-> Reported-by: Alexander Graf <graf@amazon.com>
-> Cc: KarimAllah Raslan <karahmed@amazon.de>
-> Cc: stable@vger.kernel.org
-> Fixes: 15d45071523d ("KVM/x86: Add IBPB support")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
-> =
-
-> v2: Pass a boolean to indicate a nested VMCS switch and instead WARN if
->      the buddy VMCS is not already loaded.  [Alex]
-> =
-
-> Paolo, feel free to drop the WARN_ON_ONCE() if you think it's overkill.
-> I'm 50/50 as to whether it's useful or just a waste of cycles.  Figured
-> it'd be easier for you to delete a line of code while applying than to add
-> and test a new WARN.
-
-I like the WARN_ON :). It should be almost free during execution, but =
-
-helps us catch problems early.
-
-> =
-
->   arch/x86/kvm/vmx/nested.c | 3 ++-
->   arch/x86/kvm/vmx/vmx.c    | 7 ++++---
->   arch/x86/kvm/vmx/vmx.h    | 2 +-
->   3 files changed, 7 insertions(+), 5 deletions(-)
-> =
-
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 2c36f3f53108..b57420f3dd8f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -302,8 +302,9 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, st=
-ruct loaded_vmcs *vmcs)
-> =
-
->          cpu =3D get_cpu();
->          prev =3D vmx->loaded_vmcs;
-> +       WARN_ON_ONCE(prev->cpu !=3D cpu || prev->vmcs !=3D per_cpu(curren=
-t_vmcs, cpu));
->          vmx->loaded_vmcs =3D vmcs;
-> -       vmx_vcpu_load_vmcs(vcpu, cpu);
-> +       vmx_vcpu_load_vmcs(vcpu, cpu, true);
->          vmx_sync_vmcs_host_state(vmx, prev);
->          put_cpu();
-> =
-
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 3ab6ca6062ce..d3d57b7a67bd 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1311,7 +1311,7 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu,=
- int cpu)
->                  pi_set_on(pi_desc);
->   }
-> =
-
-> -void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
-> +void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool nested_swit=
-ch)
->   {
->          struct vcpu_vmx *vmx =3D to_vmx(vcpu);
->          bool already_loaded =3D vmx->loaded_vmcs->cpu =3D=3D cpu;
-> @@ -1336,7 +1336,8 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int =
-cpu)
->          if (per_cpu(current_vmcs, cpu) !=3D vmx->loaded_vmcs->vmcs) {
->                  per_cpu(current_vmcs, cpu) =3D vmx->loaded_vmcs->vmcs;
->                  vmcs_load(vmx->loaded_vmcs->vmcs);
-> -               indirect_branch_prediction_barrier();
-
-... however, this really needs an in-code comment to explain why it's =
-
-safe not to flush the branch predictor cache here.
-
-
-Alex
-
-> +               if (!nested_switch)
-> +                       indirect_branch_prediction_barrier();
->          }
-> =
-
->          if (!already_loaded) {
-> @@ -1377,7 +1378,7 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->   {
->          struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-> =
-
-> -       vmx_vcpu_load_vmcs(vcpu, cpu);
-> +       vmx_vcpu_load_vmcs(vcpu, cpu, false);
-> =
-
->          vmx_vcpu_pi_load(vcpu, cpu);
-> =
-
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index b5e773267abe..fa61dc802183 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -320,7 +320,7 @@ struct kvm_vmx {
->   };
-> =
-
->   bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
-> -void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu);
-> +void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu, bool nested_swit=
-ch);
->   void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
->   int allocate_vpid(void);
->   void free_vpid(int vpid);
-> --
-> 2.26.0
-> =
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Jason
