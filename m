@@ -2,115 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F6C41C3F2D
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 17:57:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 289131C3FEC
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 18:32:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729507AbgEDP5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 11:57:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37540 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726551AbgEDP5P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 11:57:15 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8275BC061A0E
-        for <kvm@vger.kernel.org>; Mon,  4 May 2020 08:57:15 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id x4so55969wmj.1
-        for <kvm@vger.kernel.org>; Mon, 04 May 2020 08:57:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=X1WqU9HNBXbnLtwhNjQWNZBJ+A0XFPN2T0T20+XM+FU=;
-        b=r6p8lve4t2fTdGX29pInoSZbKrDADNQLJHVOm5YwQAq13OxxihnpYfNa26bdga78Fu
-         ig2KRr7cXrtrbbN6EHmOHn5k/yiU/5pkXmj8Au9iT0k0lmTQVLYxOGumAE/qaTxX1WD/
-         04grJ2RIN6sPqnYqSFmY+TKbTThrCVzWUr5jiygcW2WRzdt3CpCkR3OD2qELX6NSGnnB
-         QBmF1V7qT5DkGZ4TBwSLBqm7+RzRQzgfugo4YENi0gIHRRiBkb9jpQzGrvOHZOlN0OrW
-         UtYr6Mc/g7hoD5WxiXLkzwdVEgk2AjZc4Y+FgOyv7VeHNv4w8wpxJw3H6YATh+P16J16
-         BmjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=X1WqU9HNBXbnLtwhNjQWNZBJ+A0XFPN2T0T20+XM+FU=;
-        b=OpV7zo7EJtVc6xhEncC/lqzt0/JhH9XVK0uljIMkE+h0uHC3HzAoExRiz7BrB8jxEk
-         MV5uTnygqh+KsvPK9xzUmcHoOwGwVmJ+A6y8xhJTYzmPrdNiMwdsVrHsost8q1HZ55D9
-         t+HfrclIdgR1armsxMspXQooMX/xzcGKCalvtWYJ7PKBFPoXxHUepc3Nn3UKQ8Sg1Wqb
-         wvgjrRLk+oefKKaEtBq1Si6iWV8zLsGIixwmGJFdK/qegcajUWUrHksEeMzkyupIkWUN
-         Lk8q423OGbQAeuAq0hV6xqBF7nBYBY5V4G4crPosE0jPrUXLLxd/KEyg3oKw1D5cf22W
-         zRhw==
-X-Gm-Message-State: AGi0PuZKnT/l7EoJ6a7MbTP+c5d0RAgfkDOi0hPX20yQDjo5RVAcKRav
-        vuJY945T7HDVB+2x8sCGEOsrr/t1Q88=
-X-Google-Smtp-Source: APiQypKGX0gm27mN8Mfsm008qocKLMe8Tj3esRGrj9PoTav/ZRjxJ2U+Z+V2Z5ZI20gabDwH65ao0g==
-X-Received: by 2002:a05:600c:218e:: with SMTP id e14mr16453544wme.140.1588607833947;
-        Mon, 04 May 2020 08:57:13 -0700 (PDT)
-Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id n6sm13827545wmc.28.2020.05.04.08.57.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2020 08:57:13 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v5] KVM: VMX: Improve handle_external_interrupt_irqoff inline assembly
-Date:   Mon,  4 May 2020 17:57:06 +0200
-Message-Id: <20200504155706.2516956-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.25.4
+        id S1729665AbgEDQcQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 12:32:16 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:10644 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729604AbgEDQcP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 May 2020 12:32:15 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5eb043490000>; Mon, 04 May 2020 09:31:06 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 04 May 2020 09:32:15 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 04 May 2020 09:32:15 -0700
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May
+ 2020 16:32:15 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 4 May 2020 16:32:08 +0000
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+To:     <alex.williamson@redhat.com>, <cjia@nvidia.com>
+CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>
+Subject: [PATCH Kernel v18 0/7] KABIs to support migration for VFIO devices
+Date:   Mon, 4 May 2020 21:28:52 +0530
+Message-ID: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+X-NVConfidentiality: public
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1588609866; bh=ZbX+QQV922iYQMwb1v9icsD1X5ueLZ4WbJNPZqSyR0U=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         X-NVConfidentiality:MIME-Version:Content-Type;
+        b=sCX816iJof9Djm8+Y6ddYHXpQl+LZcb/sliaqCkD5mgoLoMmjalDaxvOWie05F4jz
+         18Ao99gEKyEQ3d4gGL8Bra+7BEQFp4z2wvI2/fOjaDptzl+HZ9G8djKioIpZr1S5Qg
+         /DKz1gWf1KUU6VBgDIjwd9+xY/IgfZI4uX2pNBsIFV6jIeqgG9PdEHAV1nP+55X73P
+         TyTsbcKIvZLU+WlodTneOphCtqtdA2c77fGfpBWVJP/tN7omC2WVeqyru0YFK5qO2O
+         zO3JGQvHsfph9dsJgpf1HelxLji1hIRqQrr+r3R6pGvHDkgBH5Tyx4JhKpAkTiqrEa
+         YjGPBcPAGJmNA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Improve handle_external_interrupt_irqoff inline assembly in several ways:
-- remove unneeded %c operand modifiers and "$" prefixes
-- use %rsp instead of _ASM_SP, since we are in CONFIG_X86_64 part
-- use $-16 immediate to align %rsp
-- remove unneeded use of __ASM_SIZE macro
-- define "ss" named operand only for X86_64
+Hi,
 
-The patch introduces no functional changes.
+This patch set adds:
+* IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+  respect to IOMMU container rather than per device. All pages pinned by
+  vendor driver through vfio_pin_pages external API has to be marked as
+  dirty during  migration. When IOMMU capable device is present in the
+  container and all pages are pinned and mapped, then all pages are marked
+  dirty.
+  When there are CPU writes, CPU dirty page tracking can identify dirtied
+  pages, but any page pinned by vendor driver can also be written by
+  device. As of now there is no device which has hardware support for
+  dirty page tracking. So all pages which are pinned should be considered
+  as dirty.
+  This ioctl is also used to start/stop dirty pages tracking for pinned and
+  unpinned pages while migration is active.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
----
- arch/x86/kvm/vmx/vmx.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+* Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
+  unmapping IO virtual address range.
+  With vIOMMU, during pre-copy phase of migration, while CPUs are still
+  running, IO virtual address unmap can happen while device still keeping
+  reference of guest pfns. Those pages should be reported as dirty before
+  unmap, so that VFIO user space application can copy content of those
+  pages from source to destination.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c2c6335a998c..22f3324600e1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6283,13 +6283,13 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 
- 	asm volatile(
- #ifdef CONFIG_X86_64
--		"mov %%" _ASM_SP ", %[sp]\n\t"
--		"and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
--		"push $%c[ss]\n\t"
-+		"mov %%rsp, %[sp]\n\t"
-+		"and $-16, %%rsp\n\t"
-+		"push %[ss]\n\t"
- 		"push %[sp]\n\t"
- #endif
- 		"pushf\n\t"
--		__ASM_SIZE(push) " $%c[cs]\n\t"
-+		"push %[cs]\n\t"
- 		CALL_NOSPEC
- 		:
- #ifdef CONFIG_X86_64
-@@ -6298,7 +6298,9 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
- 		ASM_CALL_CONSTRAINT
- 		:
- 		[thunk_target]"r"(entry),
-+#ifdef CONFIG_X86_64
- 		[ss]"i"(__KERNEL_DS),
-+#endif
- 		[cs]"i"(__KERNEL_CS)
- 	);
- 
+* Patch 7 detect if IOMMU capable device driver is smart to report pages
+  to be marked dirty by pinning pages using vfio_pin_pages() API.
+
+
+Yet TODO:
+Since there is no device which has hardware support for system memmory
+dirty bitmap tracking, right now there is no other API from vendor driver
+to VFIO IOMMU module to report dirty pages. In future, when such hardware
+support will be implemented, an API will be required such that vendor
+driver could report dirty pages to VFIO module during migration phases.
+
+Adding revision history from previous QEMU patch set to understand KABI
+changes done till now
+
+v17 -> v18
+- Add migration capability to the capability chain for VFIO_IOMMU_GET_INFO
+  ioctl
+- Updated UMAP_DMA ioctl to return bitmap of multiple vfio_dma
+
+v16 -> v17
+- Fixed errors reported by kbuild test robot <lkp@intel.com> on i386
+
+v15 -> v16
+- Minor edits and nit picks (Auger Eric)
+- On copying bitmap to user, re-populated bitmap only for pinned pages,
+  excluding unmapped pages and CPU dirtied pages.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
+
+v14 -> v15
+- Minor edits and nit picks.
+- In the verification of user allocated bitmap memory, added check of
+   maximum size.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
+
+v13 -> v14
+- Added struct vfio_bitmap to kabi. updated structure
+  vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
+- All small changes suggested by Alex.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
+
+v12 -> v13
+- Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
+- Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
+- Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
+  field.
+
+v11 -> v12
+- Changed bitmap allocation in vfio_iommu_type1.
+- Remove atomicity of ref_count.
+- Updated comments for migration device state structure about error
+  reporting.
+- Nit picks from v11 reviews
+
+v10 -> v11
+- Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
+- Added proposal to detect if IOMMU capable device calls external pin pages
+  API to mark pages dirty.
+- Nit picks from v10 reviews
+
+v9 -> v10:
+- Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
+  during unmap while migration is active
+- Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
+  tracking.
+- If iommu_mapped, mark all pages dirty.
+- Added unpinned pages tracking while migration is active.
+- Updated comments for migration device state structure with bit
+  combination table and state transition details.
+
+v8 -> v9:
+- Split patch set in 2 sets, Kernel and QEMU.
+- Dirty pages bitmap is queried from IOMMU container rather than from
+  vendor driver for per device. Added 2 ioctls to achieve this.
+
+v7 -> v8:
+- Updated comments for KABI
+- Added BAR address validation check during PCI device's config space load
+  as suggested by Dr. David Alan Gilbert.
+- Changed vfio_migration_set_state() to set or clear device state flags.
+- Some nit fixes.
+
+v6 -> v7:
+- Fix build failures.
+
+v5 -> v6:
+- Fix build failure.
+
+v4 -> v5:
+- Added decriptive comment about the sequence of access of members of
+  structure vfio_device_migration_info to be followed based on Alex's
+  suggestion
+- Updated get dirty pages sequence.
+- As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+  get_object, save_config and load_config.
+- Fixed multiple nit picks.
+- Tested live migration with multiple vfio device assigned to a VM.
+
+v3 -> v4:
+- Added one more bit for _RESUMING flag to be set explicitly.
+- data_offset field is read-only for user space application.
+- data_size is read for every iteration before reading data from migration,
+  that is removed assumption that data will be till end of migration
+  region.
+- If vendor driver supports mappable sparsed region, map those region
+  during setup state of save/load, similarly unmap those from cleanup
+  routines.
+- Handles race condition that causes data corruption in migration region
+  during save device state by adding mutex and serialiaing save_buffer and
+  get_dirty_pages routines.
+- Skip called get_dirty_pages routine for mapped MMIO region of device.
+- Added trace events.
+- Split into multiple functional patches.
+
+v2 -> v3:
+- Removed enum of VFIO device states. Defined VFIO device state with 2
+  bits.
+- Re-structured vfio_device_migration_info to keep it minimal and defined
+  action on read and write access on its members.
+
+v1 -> v2:
+- Defined MIGRATION region type and sub-type which should be used with
+  region type capability.
+- Re-structured vfio_device_migration_info. This structure will be placed
+  at 0th offset of migration region.
+- Replaced ioctl with read/write for trapped part of migration region.
+- Added both type of access support, trapped or mmapped, for data section
+  of the region.
+- Moved PCI device functions to pci file.
+- Added iteration to get dirty page bitmap until bitmap for all requested
+  pages are copied.
+
+Thanks,
+Kirti
+
+
+
+
+Kirti Wankhede (7):
+  vfio: UAPI for migration interface for device state
+  vfio iommu: Remove atomicity of ref_count of pinned pages
+  vfio iommu: Add ioctl definition for dirty pages tracking.
+  vfio iommu: Implementation of ioctl for dirty pages tracking.
+  vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
+  vfio iommu: Add migration capability to report supported features
+  vfio: Selective dirty page tracking if IOMMU backed device pins pages
+
+ drivers/vfio/vfio.c             |  13 +-
+ drivers/vfio/vfio_iommu_type1.c | 464 ++++++++++++++++++++++++++++++++++++++--
+ include/linux/vfio.h            |   4 +-
+ include/uapi/linux/vfio.h       | 308 ++++++++++++++++++++++++++
+ 4 files changed, 770 insertions(+), 19 deletions(-)
+
 -- 
-2.25.4
+2.7.0
 
