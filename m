@@ -2,107 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E5D31C466E
-	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 20:53:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A7191C4676
+	for <lists+kvm@lfdr.de>; Mon,  4 May 2020 20:55:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726678AbgEDSxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 14:53:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32995 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725981AbgEDSxA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 14:53:00 -0400
+        id S1726519AbgEDSzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 May 2020 14:55:39 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21351 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725956AbgEDSzi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 May 2020 14:55:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588618379;
+        s=mimecast20190719; t=1588618537;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nL6lAvx0PZBs0tR/mUzSs6IrJPt6ZBwzzVz2VqiOHPM=;
-        b=R5Ahm6BvvaQTbOeoz3iWt0O+GRZJpN1+hiuugHXp7zzqDY4kLZ7KOJOw8lZNaahuo0ZIBN
-        Ei6xAICOiQD8oHIGD+OWNUVJtGwNM0TLKPI9ViXcaYRzIQ0ATnxPL07V0MvYu1S5ryDBJu
-        HOVTOvq1zjq+uncjB7uStj9hro1B2UU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-c41xC3eyMaO8N3yQTQUKsA-1; Mon, 04 May 2020 14:52:55 -0400
-X-MC-Unique: c41xC3eyMaO8N3yQTQUKsA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BB60107ACCD;
-        Mon,  4 May 2020 18:52:54 +0000 (UTC)
-Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A55A60C80;
-        Mon,  4 May 2020 18:52:54 +0000 (UTC)
-Date:   Mon, 4 May 2020 12:52:53 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio-pci: Mask cap zero
-Message-ID: <20200504125253.3d5f9cbf@x1.home>
-In-Reply-To: <20200504180916.0e90cad9.cohuck@redhat.com>
-References: <158836927527.9272.16785800801999547009.stgit@gimli.home>
-        <20200504180916.0e90cad9.cohuck@redhat.com>
-Organization: Red Hat
+        bh=Cx2x2osOhFhdNBb63MzyccRaN5HnojRzjf9rZPXLgjY=;
+        b=E3dcjIuWlOoN9Wfk5Ftp10xhUjV52M0ioMkGi5VyyvKuWAh7Wq44ZcPPMPf9q+GtadtEPV
+        OcMUFmXjiSI+mBurpxeyG1ttkYwRxyNI5dHI9Es4NAi9j5cHazLHjH2LTOaJzX7BRMW4VZ
+        SHCmsb40u0HBiOirCf17v3oJcyS7PMA=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-460-2l5mSl9bPR6KoDBlI5MwyA-1; Mon, 04 May 2020 14:55:33 -0400
+X-MC-Unique: 2l5mSl9bPR6KoDBlI5MwyA-1
+Received: by mail-qk1-f198.google.com with SMTP id a62so321897qkd.4
+        for <kvm@vger.kernel.org>; Mon, 04 May 2020 11:55:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Cx2x2osOhFhdNBb63MzyccRaN5HnojRzjf9rZPXLgjY=;
+        b=NJK98v4a33j77pUgdPz7dkteWkoQhl2M9Efe/A3RkTmCLzE1Mkb27+FS2ntfmS3iDW
+         9eWm1vSuARdbugrj/FhStHxeodxShQUt5NC8S3fI20cM8a1sssf/kNlIXhwnqX8z9VBR
+         uEdrb2G8RCXxrOeML2x7ENAod5lm9aunKYTa5HQMPzpbgwAhGqof+txWxTJFbk0AUDnf
+         RkEMcmQqq8+G6i2u3Q+H63X7Zpuz7+fIVtRXhJ6s8WOk+SDGVXt6Zo3gOd5S9gwVHpfM
+         21hn8uWNaojaTlIncSsta23YZL+YM0efJncSxh44yy6oUgJyIYJ8LbdSTPLatFvYafk8
+         3SSw==
+X-Gm-Message-State: AGi0PuZqmPWS+YGemu0Q9RQTa7dax1NWPunGV7GTB3s3yBTnX6gsx3rN
+        BWjjHo+yv3qLTazjEI/Fy8suNQ0HAJkqhrJzlhWgF+IY6JV0JrdBGKxfjvmGUUaKqCpRBCxCUab
+        QMv6m/FIBU22b
+X-Received: by 2002:a05:620a:34a:: with SMTP id t10mr697076qkm.414.1588618533050;
+        Mon, 04 May 2020 11:55:33 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJq+J633mf+y1J7g3ZxshaxAtV+nb5njYJJPi1tK5geEfdEQtTK5uET4NS5qWHnowkUi6cMNg==
+X-Received: by 2002:a05:620a:34a:: with SMTP id t10mr697048qkm.414.1588618532684;
+        Mon, 04 May 2020 11:55:32 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id p24sm12299786qtp.59.2020.05.04.11.55.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2020 11:55:32 -0700 (PDT)
+Date:   Mon, 4 May 2020 14:55:30 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 0/3] KVM: x86: cleanup and fixes for debug register
+ accesses
+Message-ID: <20200504185530.GE6299@xz-x1>
+References: <20200504155558.401468-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200504155558.401468-1-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 4 May 2020 18:09:16 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Mon, May 04, 2020 at 11:55:55AM -0400, Paolo Bonzini wrote:
+> The purpose of this series is to get rid of the get_dr6 accessor
+> and, on Intel, of set_dr6 as well.  This is done mostly in patch 2,
+> since patch 3 is only the resulting cleanup.  Patch 1 is a related
+> bug fix that I found while inspecting the code.
 
-> On Fri, 01 May 2020 15:41:24 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > There is no PCI spec defined capability with ID 0, therefore we don't
-> > expect to find it in a capability chain and we use this index in an
-> > internal array for tracking the sizes of various capabilities to handle
-> > standard config space.  Therefore if a device does present us with a
-> > capability ID 0, we mark our capability map with nonsense that can
-> > trigger conflicts with other capabilities in the chain.  Ignore ID 0
-> > when walking the capability chain, handling it as a hidden capability.
-> > 
-> > Seen on an NVIDIA Tesla T4.
-> > 
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_config.c |    2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> > index 87d0cc8c86ad..5935a804cb88 100644
-> > --- a/drivers/vfio/pci/vfio_pci_config.c
-> > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> > @@ -1487,7 +1487,7 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
-> >  		if (ret)
-> >  			return ret;
-> >  
-> > -		if (cap <= PCI_CAP_ID_MAX) {  
-> 
-> Maybe add a comment:
-> 
-> /* no PCI spec defined capability with ID 0: hide it */
-> 
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Sure.
+(Btw, the db_interception() change in patch 2 seems to be a real fix to me)
 
 > 
-> > +		if (cap && cap <= PCI_CAP_ID_MAX) {
-> >  			len = pci_cap_length[cap];
-> >  			if (len == 0xFF) { /* Variable length */
-> >  				len = vfio_cap_len(vdev, cap, pos);
-> >   
-> 
-> Is there a requirement for caps to be strictly ordered? If not, could
-> len hold a residual value from a previous iteration?
+> A guest debugging selftest is sorely needed if anyone wants to take
+> a look!
 
-There is no ordering requirement for capabilities, but len is declared
-non-static with an initial value within the scope of the loop, it's
-reset every iteration.  Thanks,
+I have that in my list, but I don't know it's "sorely" needed. :) It was low
+after I knew the fact that we've got one test in kvm-unit-test, but I can for
+sure do that earlier.
 
-Alex
+I am wondering whether we still want a test in selftests if there's a similar
+test in kvm-unit-test already.  For this one I guess at least the guest debug
+test is still missing.
+
+Thanks,
+
+-- 
+Peter Xu
 
