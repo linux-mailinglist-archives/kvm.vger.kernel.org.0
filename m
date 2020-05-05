@@ -2,119 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08EC71C62F8
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 23:22:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B8F41C637B
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 23:55:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729323AbgEEVWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 17:22:33 -0400
-Received: from mail-eopbgr680083.outbound.protection.outlook.com ([40.107.68.83]:13287
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729012AbgEEVWd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 17:22:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hVJjNCRCRdWZZYpJ1nhQ2HEwyEtvfNu5KUHjcIH9K1RiC2GuZwoq0EHrG+da3EkBNnsKi73SRoy9lB/cNxnSTEFTGyEGB6AKaA8mYrywGeaamgB79FlEgQsW0/fmJINUH8QOOkYHHuFfV1BCB0LMqdnPZBiZGkfFUfZKAF+h6AUYJgcKElG/t/4FZ7EHXAVC0kcGZTUkwtitM9tslo2sOTDIDGV20uRVbHriVyGr7sVqfmOzrQX6HrZ8lVFTLty80xEFcpN+8mWmWsjw40uQaTlX09CEDTxtKHLvE2V4aaZvHFJC6swoHip4jCxbc6QOkqajNzvaWfp307sjUBnt2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L9098FbS/ih6PujoFe74gEOURfZhPMlbdmUwU1cvULw=;
- b=D0+HeN0qwr6mtOerRcVYONay3p4yjXmbnYfiyi05YZsE2GVuYt6VCLQVhKE4uq6BL3EFcies+vUmUfCNFQQMT9vlf7FT79ZyNaiL/fzqf8QBC5uW6bN3PgeLeOdsH3PUX8hFZIS7NkxBWV2dPSAovWvfdQatKkEYJOY2bvUTLaROL1FJSIUuurD0cjfXfj4sSXs6202qjclO/XpPfGprk4WkD7vmUUXr4qaoT2d4Q4SQnUZuKuxM77QFeCCVjAlw4wTJXh0C6prFj0kB4xGmMlSjddEIUKl0vRAMamgDqcLEuZERr0ffUyKc5bde/cPzWDtLK492l++AsJDPCrzUrA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L9098FbS/ih6PujoFe74gEOURfZhPMlbdmUwU1cvULw=;
- b=BF7l7040aFllP0Zoj759Rvr4oTg+HQzdBTYfKiW1jUWl0Zuv3qzOEzPaByLSXg5zNt36BGSh/JerzSGkbxYvQnNa7+Wap72Q5zE98k1g4GGq5gKazypO4wFA5mltSvL+yIqanxdrqt8vyIRXbGjTptm3R6HSJJUhyFKop3Rg+QM=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1386.namprd12.prod.outlook.com (2603:10b6:3:77::9) by
- DM5PR12MB2518.namprd12.prod.outlook.com (2603:10b6:4:b0::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.20; Tue, 5 May 2020 21:22:30 +0000
-Received: from DM5PR12MB1386.namprd12.prod.outlook.com
- ([fe80::6962:a808:3fd5:7adb]) by DM5PR12MB1386.namprd12.prod.outlook.com
- ([fe80::6962:a808:3fd5:7adb%3]) with mapi id 15.20.2958.030; Tue, 5 May 2020
- 21:22:30 +0000
-From:   Ashish Kalra <Ashish.Kalra@amd.com>
-To:     pbonzini@redhat.com
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, Thomas.Lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, rientjes@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH v8 18/18] KVM: SVM: Enable SEV live migration feature implicitly on Incoming VM(s).
-Date:   Tue,  5 May 2020 21:22:21 +0000
-Message-Id: <a70e7ea40c47116339f968b7d2d2bf120f452c1e.1588711355.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1588711355.git.ashish.kalra@amd.com>
-References: <cover.1588711355.git.ashish.kalra@amd.com>
-Content-Type: text/plain
-X-ClientProxiedBy: DM5PR16CA0025.namprd16.prod.outlook.com
- (2603:10b6:4:15::11) To DM5PR12MB1386.namprd12.prod.outlook.com
- (2603:10b6:3:77::9)
+        id S1728756AbgEEVyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 17:54:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28860 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728076AbgEEVyo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 17:54:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588715682;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ruRIwLyK3gyVc7TdrpR1YTdwCD5wsXYlQVD4A6a2gC0=;
+        b=Z5awgtQ+EzvoF8OL89jHpl6wo6hX46B4bHGEhTziC+RjddY6YSf0ZS4VqqBowbiOlykF4o
+        Ged2iwtpftOgJQvXZ4hM+HKuhI7V54oL/WU9QQKK6hZ6HzsPbVqIdGDHBpWzsaVLRAiNH3
+        0GXA5gKN90ySG8LbHASERl1yos4l4vo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-494-J0qlrQ_iOTu3mBLyNMRLpA-1; Tue, 05 May 2020 17:54:40 -0400
+X-MC-Unique: J0qlrQ_iOTu3mBLyNMRLpA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF113107ACCA;
+        Tue,  5 May 2020 21:54:39 +0000 (UTC)
+Received: from gimli.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB7961FDE1;
+        Tue,  5 May 2020 21:54:36 +0000 (UTC)
+Subject: [PATCH v2 0/3] vfio-pci: Block user access to disabled device MMIO
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, cohuck@redhat.com, jgg@ziepe.ca
+Date:   Tue, 05 May 2020 15:54:36 -0600
+Message-ID: <158871401328.15589.17598154478222071285.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by DM5PR16CA0025.namprd16.prod.outlook.com (2603:10b6:4:15::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.27 via Frontend Transport; Tue, 5 May 2020 21:22:29 +0000
-X-Mailer: git-send-email 2.17.1
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 84ccae53-9f40-4866-8709-08d7f13a6aec
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2518:|DM5PR12MB2518:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB2518300D9BB507C9B27338828EA70@DM5PR12MB2518.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:372;
-X-Forefront-PRVS: 0394259C80
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MlmxByyXe++BTu6JcdeTXf7/yF8V4aioABz8YqmuEDDew2x30RtX5nPcTXudbo/VFP6ZhnKR+afGdezE2lCcbWa+OsFy6NuP3UGKxyhxyqDqzQa8inTRAz7Ghgm282UvqHkwKsW0anO6fuMSl/HK/q6rXi2JknZ+JzszERiMVU8qauVGg7YBaAkYQug/86WKosuxUohTYy11vk0UYtOEQ5+5THMVKsSrEI547p+2mh0PLP+NbNbigzWRbVcqBHN3e9NRql/MFykVQcAP/+XuBPgc9NTm0Ic5WCEJMxOqVwfKfvrSQ5o2bCXMwapwLDt8TMoekDYrDpXGIXIxYZIYlsIBqOIXeZsu5b2x7WVYtxHRrkK+q0XX05Eqqocrzf18Q4rW5FK9qvzDg9j9dhz/kqotcNfzAb84GQLcb3ct/zxpsaTJxJofdunMnax1y1ZZzyj37wv2cbHCSP0adiAZJ1aQrD+FoZCN2wFTKHdnjlnu5rq1WJT80+1zydy+xlSxBByBLVZp+83nyHSdrGSMUZI8LiHOyFwB1WLhCGT9V6PKy/10t0HGn7b2KjpKJJsj
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1386.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(376002)(39860400002)(136003)(366004)(396003)(33430700001)(86362001)(8676002)(66556008)(7696005)(66476007)(52116002)(8936002)(7416002)(4326008)(33440700001)(316002)(66946007)(16526019)(478600001)(6486002)(6916009)(26005)(36756003)(956004)(4744005)(5660300002)(2906002)(6666004)(186003)(2616005)(136400200001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: coU6DRLgi07RTD0efX+TmUokISpYK6dXVvSI24mnlDlztiEdjpIOzk4C1+rN6s5/0ZXp3bDJYMHkAkQ32PvGkqUp/ONDy+kLwN+Eg2gYXuRoc9WNpuvaDcM4mQaED6wDumH6H0T+EOW0U1ufTunuALPVrMyEvE5ZPSYig4symnOyDrRRbh4fsUJ4WurNbZX1vG4GxV8uAY1j7m223DaVkKD0YP1Wxkd2mZbYCE+n4l1nNbtWxQKMlTEws1m5hMTAhykYjuV+7K5qxoBOtaLjOer39DmDfoVaisLcnN1PCCNJAIaQVnohBOKWEgS1Xo+K3wZSpFc69pJPgpQyyNRSXv1jojl5NoRMjkps4NoFTI+MPe+Entrb65PkVZ59xCzriC5WGVgD48Bgw6grf4KRMeFWFziMmrX86ythQ3PYxuj2BjGW20C+SY+l8Wa/0//HkaxMDlp65IhNkblhXUmXe1PaaACPCvqJwe7cXRIeimpIUe88J18IJ6Q/MRUwhcQ5DFXTNNFvHsGbP17OfsdszjmDVoM3VApXwgCjHWlysOQVqT8GxHqsFrFzArNLEQZTBXoMVFqlk6/PjTYYScfVSNgKkeusmu/YnZRv/VfwpdvyiNDEePS85dC8vuRVQ0CD1ra04o0IsBweZJ9aqaRRBloBfKtueKc1IRyQLtTBoOo+Lxkw+DypqaOFCOj+WgOJyZim0auF+YmEZ+KdB5Iu8qbup6IUSbbHxekpNw4CMj0JKLsbcnPO7ric2w1GOEX0Yyo5au2nMwwwJvFI3VwoFQZN1yykbCiTrto+su0py1c=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84ccae53-9f40-4866-8709-08d7f13a6aec
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2020 21:22:30.2716
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l62jqcMv1DGJEmF36LtbVBv02nkvRcqICJhYZY+ZEYFgTMgUI9Q+VtVL3MV249aGFT24Xck1VOJyOoe9ElCptg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2518
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+v2:
 
-For source VM, live migration feature is enabled explicitly
-when the guest is booting, for the incoming VM(s) it is implied.
-This is required for handling A->B->C->... VM migrations case.
+Locking in 3/ is substantially changed to avoid the retry scenario
+within the fault handler, therefore a caller who does not allow retry
+will no longer receive a SIGBUS on contention.  IOMMU invalidations
+are still not included here, I expect that will be a future follow-on
+change as we're not fundamentally changing that issue in this series.
+The 'add to vma list only on fault' behavior is also still included
+here, per the discussion I think it's still a valid approach and has
+some advantages, particularly in a VM scenario where we potentially
+defer the mapping until the MMIO BAR is actually DMA mapped into the
+VM address space (or the guest driver actually accesses the device
+if that DMA mapping is eliminated at some point).  Further discussion
+and review appreciated.  Thanks,
 
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+Alex
+
+v1:
+
+Add tracking of the device memory enable bit and block/fault accesses
+to device MMIO space while disabled.  This provides synchronous fault
+handling for CPU accesses to the device and prevents the user from
+triggering platform level error handling present on some systems.
+Device reset and MSI-X vector table accesses are also included such
+that access is blocked across reset and vector table accesses do not
+depend on the user configuration of the device.
+
+This is based on the vfio for-linus branch currently in next, making
+use of follow_pfn() in vaddr_get_pfn() and therefore requiring patch
+1/ to force the user fault in the case that a PFNMAP vma might be
+DMA mapped before user access.  Further PFNMAP iommu invalidation
+tracking is not yet included here.
+
+As noted in the comments, I'm copying quite a bit of the logic from
+rdma code for performing the zap_vma_ptes() calls and I'm also
+attempting to resolve lock ordering issues in the fault handler to
+lockdep's satisfaction.  I appreciate extra eyes on these sections in
+particular.
+
+I expect this to be functionally equivalent for any well behaved
+userspace driver, but obviously there is a potential for the user to
+get -EIO or SIGBUS on device access.  The device is provided to the
+user enabled and device resets will restore the command register, so
+by my evaluation a user would need to explicitly disable the memory
+enable bit to trigger these faults.  We could potentially remap vmas
+to a zero page rather than SIGBUS if we experience regressions, but
+without known code requiring that, SIGBUS seems the appropriate
+response to this condition.  Thanks,
+
+Alex
+
 ---
- arch/x86/kvm/svm/sev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6f69c3a47583..ba7c0ebfa1f3 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1592,6 +1592,13 @@ int svm_set_page_enc_bitmap(struct kvm *kvm,
- 	if (ret)
- 		goto unlock;
- 
-+	/*
-+	 * For source VM, live migration feature is enabled
-+	 * explicitly when the guest is booting, for the
-+	 * incoming VM(s) it is implied.
-+	 */
-+	sev_update_migration_flags(kvm, KVM_SEV_LIVE_MIGRATION_ENABLED);
-+
- 	bitmap_copy(sev->page_enc_bmap + BIT_WORD(gfn_start), bitmap,
- 		    (gfn_end - gfn_start));
- 
--- 
-2.17.1
+Alex Williamson (3):
+      vfio/type1: Support faulting PFNMAP vmas
+      vfio-pci: Fault mmaps to enable vma tracking
+      vfio-pci: Invalidate mmaps and block MMIO access on disabled memory
+
+
+ drivers/vfio/pci/vfio_pci.c         |  321 +++++++++++++++++++++++++++++++++--
+ drivers/vfio/pci/vfio_pci_config.c  |   36 +++-
+ drivers/vfio/pci/vfio_pci_intrs.c   |   18 ++
+ drivers/vfio/pci/vfio_pci_private.h |   12 +
+ drivers/vfio/pci/vfio_pci_rdwr.c    |   12 +
+ drivers/vfio/vfio_iommu_type1.c     |   36 ++++
+ 6 files changed, 405 insertions(+), 30 deletions(-)
 
