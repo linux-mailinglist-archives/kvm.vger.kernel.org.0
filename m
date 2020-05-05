@@ -2,153 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A5C61C4D65
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 06:46:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D58171C4E12
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 08:09:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbgEEEqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 00:46:46 -0400
-Received: from mga06.intel.com ([134.134.136.31]:7601 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725298AbgEEEqq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 00:46:46 -0400
-IronPort-SDR: leSQzBa6urcowRP8QAIIvwb4jo1+IcbQJcnP5aIjTVCwcQKNpT6gurwE1oeJBePs0Avryq8ZhI
- fHOH8jmZmIcA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2020 21:46:45 -0700
-IronPort-SDR: wXCpqmVPfLx0GyKFbxYYM5IXnFBMDbSAwZ++Mtx93Kpb+zm7tKcl9CElJQ4sRfjtcNmtEJFpaT
- YmW548qCFYGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,354,1583222400"; 
-   d="scan'208";a="369300834"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
-  by fmsmga001.fm.intel.com with ESMTP; 04 May 2020 21:46:45 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
-        KarimAllah Raslan <karahmed@amazon.de>
-Subject: [PATCH v3] KVM: nVMX: Skip IBPB when switching between vmcs01 and vmcs02
-Date:   Mon,  4 May 2020 21:46:44 -0700
-Message-Id: <20200505044644.16563-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
+        id S1728248AbgEEGJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 02:09:53 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22308 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725320AbgEEGJv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 02:09:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588658990;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=O7LlKBGs5CgTE1OyD7RL3R2uC0X6yz7gneyPxwwVA04=;
+        b=Wvn6sDD7Ru6EKEzriVHn8xqQ7gGxTHrk02QrZRdP4mYizOdSL9VR/dGnbuEEGBJbH69W07
+        NKPeK3S11uOUvOrTYwI36myOiI9l2juOp2z5DYJnc+vPpMwsgqxo0IAWgkoKPBZga/NOp7
+        IxcQJEKckoUAA4tPgoioyxkhkiQvr1E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-OIVSgUQ2PoyaDxWxIHVoKg-1; Tue, 05 May 2020 02:09:46 -0400
+X-MC-Unique: OIVSgUQ2PoyaDxWxIHVoKg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 764EE80B713;
+        Tue,  5 May 2020 06:09:45 +0000 (UTC)
+Received: from gondolin (ovpn-112-219.ams2.redhat.com [10.36.112.219])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 66B7363F84;
+        Tue,  5 May 2020 06:09:41 +0000 (UTC)
+Date:   Tue, 5 May 2020 08:09:39 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Neo Jia <cjia@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] vfio-pci: Mask cap zero
+Message-ID: <20200505080939.1e5a224a.cohuck@redhat.com>
+In-Reply-To: <20200504170354.3b49d07b@x1.home>
+References: <158836927527.9272.16785800801999547009.stgit@gimli.home>
+        <20200504180916.0e90cad9.cohuck@redhat.com>
+        <20200504125253.3d5f9cbf@x1.home>
+        <20200504220804.GA22939@nvidia.com>
+        <20200504170354.3b49d07b@x1.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip the Indirect Branch Prediction Barrier that is triggered on a VMCS
-switch when running with spectre_v2_user=on/auto if the switch is
-guaranteed to be between two VMCSes in the same guest, i.e. between
-vmcs01 and vmcs02.  The IBPB is intended to prevent one guest from
-attacking another, which is unnecessary in the nested case as it's the
-same guest from KVM's perspective.
+On Mon, 4 May 2020 17:03:54 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-This all but eliminates the overhead observed for nested VMX transitions
-when running with CONFIG_RETPOLINE=y and spectre_v2_user=on/auto, which
-can be significant, e.g. roughly 3x on current systems.
+> On Mon, 4 May 2020 15:08:08 -0700
+> Neo Jia <cjia@nvidia.com> wrote:
+>=20
+> > On Mon, May 04, 2020 at 12:52:53PM -0600, Alex Williamson wrote: =20
+> > > External email: Use caution opening links or attachments
+> > >=20
+> > >=20
+> > > On Mon, 4 May 2020 18:09:16 +0200
+> > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > >    =20
+> > > > On Fri, 01 May 2020 15:41:24 -0600
+> > > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > > >   =20
+> > > > > There is no PCI spec defined capability with ID 0, therefore we d=
+on't
+> > > > > expect to find it in a capability chain and we use this index in =
+an
+> > > > > internal array for tracking the sizes of various capabilities to =
+handle
+> > > > > standard config space.  Therefore if a device does present us wit=
+h a
+> > > > > capability ID 0, we mark our capability map with nonsense that can
+> > > > > trigger conflicts with other capabilities in the chain.  Ignore I=
+D 0
+> > > > > when walking the capability chain, handling it as a hidden capabi=
+lity.
+> > > > >
+> > > > > Seen on an NVIDIA Tesla T4.
+> > > > >
+> > > > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > > > > ---
+> > > > >  drivers/vfio/pci/vfio_pci_config.c |    2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pc=
+i/vfio_pci_config.c
+> > > > > index 87d0cc8c86ad..5935a804cb88 100644
+> > > > > --- a/drivers/vfio/pci/vfio_pci_config.c
+> > > > > +++ b/drivers/vfio/pci/vfio_pci_config.c
+> > > > > @@ -1487,7 +1487,7 @@ static int vfio_cap_init(struct vfio_pci_de=
+vice *vdev)
+> > > > >             if (ret)
+> > > > >                     return ret;
+> > > > >
+> > > > > -           if (cap <=3D PCI_CAP_ID_MAX) {   =20
+> > > >
+> > > > Maybe add a comment:
+> > > >
+> > > > /* no PCI spec defined capability with ID 0: hide it */   =20
+> >=20
+> > Hi Alex,
+> >=20
+> > I think this is NULL Capability defined in Codes and IDs spec, probably=
+ we
+> > should just add a new enum to represent that? =20
+>=20
+> Yes, it looks like the 1.1 version of that specification from June 2015
+> changed ID 0 from reserved to a NULL capability.  So my description and
+> this comment are wrong, but I wonder if we should did anything
+> different with the handling of this capability.  It's specified to
+> contain only the ID and next pointer, so I'd expect it's primarily a
+> mechanism for hardware vendors to blow fuses in config space to
+> maintain a capability chain while maybe hiding a feature not supported
+> by the product sku.  Hiding the capability in vfio is trivial, exposing
+> it implies some changes to our config space map that might be more
+> subtle.  I'm inclined to stick with this solution for now.  Thanks,
+>=20
+> Alex
 
-Reported-by: Alexander Graf <graf@amazon.com>
-Cc: KarimAllah Raslan <karahmed@amazon.de>
-Cc: stable@vger.kernel.org
-Fixes: 15d45071523d ("KVM/x86: Add IBPB support")
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-v3: Switch back to passing 'struct loaded_vmcs buddy', but keep the WARN
-    if the buddy VMCS isn't already loaded as well as the comment as to
-    why skipping IBPB in the nested case is ok. [Paolo]
-
-v2: Pass a boolean to indicate a nested VMCS switch and instead WARN if
-    the buddy VMCS is not already loaded.  [Alex]
-
- arch/x86/kvm/vmx/nested.c |  2 +-
- arch/x86/kvm/vmx/vmx.c    | 18 ++++++++++++++----
- arch/x86/kvm/vmx/vmx.h    |  3 ++-
- 3 files changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2c36f3f53108..1a02bdfeeb2b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -303,7 +303,7 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
- 	cpu = get_cpu();
- 	prev = vmx->loaded_vmcs;
- 	vmx->loaded_vmcs = vmcs;
--	vmx_vcpu_load_vmcs(vcpu, cpu);
-+	vmx_vcpu_load_vmcs(vcpu, cpu, prev);
- 	vmx_sync_vmcs_host_state(vmx, prev);
- 	put_cpu();
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3ab6ca6062ce..06ee0572b929 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1311,10 +1311,12 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 		pi_set_on(pi_desc);
- }
- 
--void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
-+void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
-+			struct loaded_vmcs *buddy)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	bool already_loaded = vmx->loaded_vmcs->cpu == cpu;
-+	struct vmcs *prev;
- 
- 	if (!already_loaded) {
- 		loaded_vmcs_clear(vmx->loaded_vmcs);
-@@ -1333,10 +1335,18 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
- 		local_irq_enable();
- 	}
- 
--	if (per_cpu(current_vmcs, cpu) != vmx->loaded_vmcs->vmcs) {
-+	prev = per_cpu(current_vmcs, cpu);
-+	if (prev != vmx->loaded_vmcs->vmcs) {
- 		per_cpu(current_vmcs, cpu) = vmx->loaded_vmcs->vmcs;
- 		vmcs_load(vmx->loaded_vmcs->vmcs);
--		indirect_branch_prediction_barrier();
-+
-+		/*
-+		 * No indirect branch prediction barrier needed when switching
-+		 * the active VMCS within a guest, e.g. on nested VM-Enter.
-+		 * The L1 VMM can protect itself with retpolines, IBPB or IBRS.
-+		 */
-+		if (!buddy || WARN_ON_ONCE(buddy->vmcs != prev))
-+			indirect_branch_prediction_barrier();
- 	}
- 
- 	if (!already_loaded) {
-@@ -1377,7 +1387,7 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
--	vmx_vcpu_load_vmcs(vcpu, cpu);
-+	vmx_vcpu_load_vmcs(vcpu, cpu, NULL);
- 
- 	vmx_vcpu_pi_load(vcpu, cpu);
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index b5e773267abe..d3d48acc6bd9 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -320,7 +320,8 @@ struct kvm_vmx {
- };
- 
- bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
--void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu);
-+void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
-+			struct loaded_vmcs *buddy);
- void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- int allocate_vpid(void);
- void free_vpid(int vpid);
--- 
-2.26.0
+=46rom this description, I also think that we should simply hide these
+NULL capabilities.
 
