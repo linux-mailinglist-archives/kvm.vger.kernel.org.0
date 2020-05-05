@@ -2,155 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E31D01C5C61
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 17:47:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEA271C5C65
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 17:48:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730504AbgEEPrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 11:47:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46543 "EHLO
+        id S1730169AbgEEPr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 11:47:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54860 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730457AbgEEPra (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 11:47:30 -0400
+        with ESMTP id S1729569AbgEEPr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 11:47:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588693648;
+        s=mimecast20190719; t=1588693677;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=CXSDb19dE2QCf06dgi6foK1UYMiGs0Wvb6l4Uj5Is34=;
-        b=RflT+PjmXoPp+NMHgRIS4OoDHGBniAScZKmZPhc+wm271skNnohLs4o+GEpJpiPeP71win
-        w6ypQew5yQXG+lNeZaBmOgdhkpwXWDbWrqpHBODHYyJWckw7p9IGeKCDrlmuYfsOoOG6kW
-        rKiG0X+1v+XULfI+EN91oE4On44m7ws=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-o4HH4TSGOqaZJZTJUYbsFw-1; Tue, 05 May 2020 11:47:23 -0400
-X-MC-Unique: o4HH4TSGOqaZJZTJUYbsFw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DDC6190B696;
-        Tue,  5 May 2020 15:46:47 +0000 (UTC)
-Received: from [10.36.114.14] (ovpn-114-14.ams2.redhat.com [10.36.114.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 717C619C4F;
-        Tue,  5 May 2020 15:46:45 +0000 (UTC)
-Subject: Re: [vhost:vhost 8/22] drivers/virtio/virtio_mem.c:1375:20: error:
- implicit declaration of function 'kzalloc'; did you mean 'vzalloc'?
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-References: <202005052221.83QerHmG%lkp@intel.com>
- <7dea2810-85cf-0892-20a8-bba3e3a2c133@redhat.com>
- <20200505114433-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <3eaebd8d-750a-d046-15f5-706fb00a196e@redhat.com>
-Date:   Tue, 5 May 2020 17:46:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=EQ23tM5kMyn811fS97lNvm/DAC1rh32RC7gp61B/0ws=;
+        b=G/NxtHkzBV4UitB7b8BupWaK+oJ4B+tvYn71++9gYEKYuT4yvfdpTWB+4/JVqv4uB0XL7u
+        /m/6ViANMTy3z0HSJzJspeWX8yP0lJHEFNLM7Wnfr0CQXZeaG6DSqD8LrlHEri/DDKBg2O
+        dfUlk3I4ioORLfEIR/7rizOj+HHnHug=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-ekGlSkOgPRm2NexKPgRNDw-1; Tue, 05 May 2020 11:47:53 -0400
+X-MC-Unique: ekGlSkOgPRm2NexKPgRNDw-1
+Received: by mail-qt1-f197.google.com with SMTP id q43so2114054qtj.11
+        for <kvm@vger.kernel.org>; Tue, 05 May 2020 08:47:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=EQ23tM5kMyn811fS97lNvm/DAC1rh32RC7gp61B/0ws=;
+        b=KwLCTfjcvcopc34KHghMGC2GB8oF62NoE5rnHozwRoSYigtOWViY+qiIuxcYPly8nK
+         j64ufjKw/qbG4d+aoY54xKjf0P+enHRBL3pAUVJ/JCdSohDWjqRGYKHsZ3h0oLhpZz0I
+         v1Bl1uMlR+an223DrF2hAlZosiUFOmvvxGofjcy8yeyzn5MbsFCUuKlX7r+nU94gzx9H
+         qHU5wf+WcT6ClXy0l8l4XugV+eixyZfHmyY3qJtJPcv3oNAp2pC7wtpkhBXymPlpUBjo
+         GvuE1TXT4WuWHLyqCnDCgUuTKvD56vxzqGcgNMppWZj9OkKWB2+H8Nbtc56m8bHZ7LOz
+         3kzg==
+X-Gm-Message-State: AGi0PubzXcnqU1PpOEG9FkBXhtST7sZZLD2G3K57waGPZtC12KmxiWEs
+        IoHLs4IHBu6EAga/sfQ3Za2yaBFaL10GFJRiZpnLHbEhoSLKfUezLKu2RMJp5OI0IKVPvZ+4zaK
+        KSQLL2dfROlFt
+X-Received: by 2002:a37:af05:: with SMTP id y5mr4261809qke.471.1588693672989;
+        Tue, 05 May 2020 08:47:52 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLoIwGDPk77az/a2DrITfutNeyY8xsNdsMX2fUvJgFNvtmn7qg0F/iELQj44ngrT8/uGNZ7sg==
+X-Received: by 2002:a37:af05:: with SMTP id y5mr4261783qke.471.1588693672668;
+        Tue, 05 May 2020 08:47:52 -0700 (PDT)
+Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id u5sm2081443qkm.116.2020.05.05.08.47.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2020 08:47:52 -0700 (PDT)
+From:   Peter Xu <peterx@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH] KVM: X86: Declare KVM_CAP_SET_GUEST_DEBUG properly
+Date:   Tue,  5 May 2020 11:47:50 -0400
+Message-Id: <20200505154750.126300-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200505114433-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.05.20 17:44, Michael S. Tsirkin wrote:
-> On Tue, May 05, 2020 at 04:50:13PM +0200, David Hildenbrand wrote:
->> On 05.05.20 16:15, kbuild test robot wrote:
->>> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
->>> head:   da1742791d8c0c0a8e5471f181549c4726a5c5f9
->>> commit: 7527631e900d464ed2d533f799cb0da2b29cc6f0 [8/22] virtio-mem: Paravirtualized memory hotplug
->>> config: x86_64-randconfig-b002-20200505 (attached as .config)
->>> compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
->>> reproduce:
->>>         git checkout 7527631e900d464ed2d533f799cb0da2b29cc6f0
->>>         # save the attached .config to linux build tree
->>>         make ARCH=x86_64 
->>>
->>> If you fix the issue, kindly add following tag as appropriate
->>> Reported-by: kbuild test robot <lkp@intel.com>
->>>
->>> All error/warnings (new ones prefixed by >>):
->>>
->>>    drivers/virtio/virtio_mem.c: In function 'virtio_mem_probe':
->>>>> drivers/virtio/virtio_mem.c:1375:20: error: implicit declaration of function 'kzalloc'; did you mean 'vzalloc'? [-Werror=implicit-function-declaration]
->>>      vdev->priv = vm = kzalloc(sizeof(*vm), GFP_KERNEL);
->>>                        ^~~~~~~
->>>                        vzalloc
->>>>> drivers/virtio/virtio_mem.c:1375:18: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
->>>      vdev->priv = vm = kzalloc(sizeof(*vm), GFP_KERNEL);
->>>                      ^
->>>>> drivers/virtio/virtio_mem.c:1419:2: error: implicit declaration of function 'kfree'; did you mean 'vfree'? [-Werror=implicit-function-declaration]
->>>      kfree(vm);
->>>      ^~~~~
->>>      vfree
->>>    cc1: some warnings being treated as errors
->>>
->>> vim +1375 drivers/virtio/virtio_mem.c
->>
->> Guess we simply need
->>
->>  #include <linux/slab.h>
->>
->> to make it work for that config.
-> 
-> 
-> OK I added that in the 1st commit that introduced virtio-mem.
+KVM_CAP_SET_GUEST_DEBUG should be supported for x86 however it's not declared
+as supported.  My wild guess is that userspaces like QEMU are using "#ifdef
+KVM_CAP_SET_GUEST_DEBUG" to check for the capability instead, but that could be
+wrong because the compilation host may not be the runtime host.
 
-Thanks. I have some addon-patches ready, what's the best way to continue
-with these?
+The userspace might still want to keep the old "#ifdef" though to not break the
+guest debug on old kernels.
 
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
 
+I also think both ppc and s390 may need similar thing, but I didn't touch them
+yet because of not confident enough to cover all cases.
+---
+ arch/x86/kvm/x86.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c5835f9cb9ad..ac7b0e6f4000 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3385,6 +3385,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_GET_MSR_FEATURES:
+ 	case KVM_CAP_MSR_PLATFORM_INFO:
+ 	case KVM_CAP_EXCEPTION_PAYLOAD:
++	case KVM_CAP_SET_GUEST_DEBUG:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SYNC_REGS:
 -- 
-Thanks,
-
-David / dhildenb
+2.26.2
 
