@@ -2,297 +2,377 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B2FD1C544D
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 13:24:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26E661C545A
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 13:28:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728693AbgEELX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 07:23:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43938 "EHLO
+        id S1728514AbgEEL2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 07:28:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45930 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728233AbgEELX6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 07:23:58 -0400
+        by vger.kernel.org with ESMTP id S1725766AbgEEL2x (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 07:28:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588677836;
+        s=mimecast20190719; t=1588678130;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=An1TQbkAZLM02pJPe45UyHhgYjOOpMP1wtr1k+j8owo=;
-        b=jCMGUbWI2bsHCNKFSggXA1Hw38r5d784Kujrp9r3mtwMyB7ThI0531xo2eygWhEoVaLn5S
-        FQkiuzOAOehpCLftprznIh3b+83N3I5wev3VdgJqJ0a6ylarikopAB+/Z11tMO5ZrZpS6D
-        s0d6QJyT25W0kIy+MTHzju5CGg2wXvM=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=pH5v8lnkymv75dSfzGEf3HUvcOnzC2qJ7vr+cN2+9sQ=;
+        b=S60OcNZZkVJ7OLXyCQOIxwC+f+oYL5IR4Z4lJsGbnXk89r1488dJ8g/LOjU6On5yFt8sAE
+        2gNZbpIIoKIt6I7M8GQHfcQ5EC9DRF63Cy1Ctu2l3Y+JD6UubIftHZQ9cjRbNAvZzkEO9H
+        sxxlme1YUFSE9NJ5yJM0fgUnfCTDCVo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-wMGo37SfNk66VgI8OzLXRw-1; Tue, 05 May 2020 07:23:54 -0400
-X-MC-Unique: wMGo37SfNk66VgI8OzLXRw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-218-3iuswwebPdyJJlS2QcFZpQ-1; Tue, 05 May 2020 07:28:46 -0400
+X-MC-Unique: 3iuswwebPdyJJlS2QcFZpQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FC625E4;
-        Tue,  5 May 2020 11:23:52 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BBCDC600F5;
-        Tue,  5 May 2020 11:23:44 +0000 (UTC)
-Date:   Tue, 5 May 2020 13:23:42 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
-        <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>,
-        <fam@euphon.net>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <mtosatti@redhat.com>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
-        <pbonzini@redhat.com>, <zhengxiang9@huawei.com>,
-        <Jonathan.Cameron@huawei.com>, <linuxarm@huawei.com>
-Subject: Re: [PATCH v25 09/10] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-Message-ID: <20200505124838.0e7e13b0@redhat.com>
-In-Reply-To: <20200410114639.32844-10-gengdongjiu@huawei.com>
-References: <20200410114639.32844-1-gengdongjiu@huawei.com>
- <20200410114639.32844-10-gengdongjiu@huawei.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3027510766DB
+        for <kvm@vger.kernel.org>; Tue,  5 May 2020 11:28:45 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.110.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5112D60BEC;
+        Tue,  5 May 2020 11:28:43 +0000 (UTC)
+From:   Kashyap Chamarthy <kchamart@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, dgilbert@redhat.com, cohuck@redhat.com,
+        vkuznets@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
+Subject: [PATCH v3] docs/virt/kvm: Document configuring and running nested guests
+Date:   Tue,  5 May 2020 13:28:39 +0200
+Message-Id: <20200505112839.30534-1-kchamart@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Apr 2020 19:46:38 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+This is a rewrite of this[1] Wiki page with further enhancements.  The
+doc also includes a section on debugging problems in nested
+environments, among other improvements.
 
-> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> translates the host VA delivered by host to guest PA, then fills this PA
-> to guest APEI GHES memory, then notifies guest according to the SIGBUS
-> type.
-> 
-> When guest accesses the poisoned memory, it will generate a Synchronous
-> External Abort(SEA). Then host kernel gets an APEI notification and calls
-> memory_failure() to unmapped the affected page in stage 2, finally
-> returns to guest.
-> 
-> Guest continues to access the PG_hwpoison page, it will trap to KVM as
-> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
-> Qemu, Qemu records this error address into guest APEI GHES memory and
-> notifes guest using Synchronous-External-Abort(SEA).
-> 
-> In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
-> in which we can setup the type of exception and the syndrome information.
-> When switching to guest, the target vcpu will jump to the synchronous
-> external abort vector table entry.
-> 
-> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
-> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
-> not valid and hold an UNKNOWN value. These values will be set to KVM
-> register structures through KVM_SET_ONE_REG IOCTL.
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[1] https://www.linux-kvm.org/page/Nested_Guests
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+---
+- In v3:
+  - Address feedback from Paolo and Cornelia from v2:
+    https://marc.info/?t=3D158738155500003&r=3D1&w=3D2
 
-> ---
->  include/sysemu/kvm.h    |  3 +-
->  target/arm/cpu.h        |  4 +++
->  target/arm/helper.c     |  2 +-
->  target/arm/internals.h  |  5 ++--
->  target/arm/kvm64.c      | 77 +++++++++++++++++++++++++++++++++++++++++++++++++
->  target/arm/tlb_helper.c |  2 +-
->  target/i386/cpu.h       |  2 ++
->  7 files changed, 89 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 141342d..3b22504 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -379,8 +379,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
->  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
->  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
->  
-> -#ifdef TARGET_I386
-> -#define KVM_HAVE_MCE_INJECTION 1
-> +#ifdef KVM_HAVE_MCE_INJECTION
->  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
->  #endif
->  
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 8b9f296..6a9838d 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -28,6 +28,10 @@
->  /* ARM processors have a weak memory model */
->  #define TCG_GUEST_DEFAULT_MO      (0)
->  
-> +#ifdef TARGET_AARCH64
-> +#define KVM_HAVE_MCE_INJECTION 1
-> +#endif
-> +
->  #define EXCP_UDEF            1   /* undefined instruction */
->  #define EXCP_SWI             2   /* software interrupt */
->  #define EXCP_PREFETCH_ABORT  3
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 163c91a..b2c30f2 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3517,7 +3517,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
->               * Report exception with ESR indicating a fault due to a
->               * translation table walk for a cache maintenance instruction.
->               */
-> -            syn = syn_data_abort_no_iss(current_el == target_el,
-> +            syn = syn_data_abort_no_iss(current_el == target_el, 0,
->                                          fi.ea, 1, fi.s1ptw, 1, fsc);
->              env->exception.vaddress = value;
->              env->exception.fsr = fsr;
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index e633aff..37c22a9 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -451,13 +451,14 @@ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
->          | ARM_EL_IL | (ea << 9) | (s1ptw << 7) | fsc;
->  }
->  
-> -static inline uint32_t syn_data_abort_no_iss(int same_el,
-> +static inline uint32_t syn_data_abort_no_iss(int same_el, int fnv,
->                                               int ea, int cm, int s1ptw,
->                                               int wnr, int fsc)
->  {
->      return (EC_DATAABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
->             | ARM_EL_IL
-> -           | (ea << 9) | (cm << 8) | (s1ptw << 7) | (wnr << 6) | fsc;
-> +           | (fnv << 10) | (ea << 9) | (cm << 8) | (s1ptw << 7)
-> +           | (wnr << 6) | fsc;
->  }
->  
->  static inline uint32_t syn_data_abort_with_iss(int same_el,
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index be5b31c..d53f7f2 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -28,6 +28,9 @@
->  #include "sysemu/kvm_int.h"
->  #include "kvm_arm.h"
->  #include "internals.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/ghes.h"
-> +#include "hw/arm/virt.h"
->  
->  static bool have_guest_debug;
->  
-> @@ -893,6 +896,30 @@ int kvm_arm_cpreg_level(uint64_t regidx)
->      return KVM_PUT_RUNTIME_STATE;
->  }
->  
-> +/* Callers must hold the iothread mutex lock */
-> +static void kvm_inject_arm_sea(CPUState *c)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(c);
-> +    CPUARMState *env = &cpu->env;
-> +    CPUClass *cc = CPU_GET_CLASS(c);
-> +    uint32_t esr;
-> +    bool same_el;
-> +
-> +    c->exception_index = EXCP_DATA_ABORT;
-> +    env->exception.target_el = 1;
-> +
-> +    /*
-> +     * Set the DFSC to synchronous external abort and set FnV to not valid,
-> +     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
-> +     */
-> +    same_el = arm_current_el(env) == env->exception.target_el;
-> +    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
-> +
-> +    env->exception.syndrome = esr;
-> +
-> +    cc->do_interrupt(c);
-> +}
-> +
->  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
->  
-> @@ -1326,6 +1353,56 @@ int kvm_arch_get_registers(CPUState *cs)
->      return ret;
->  }
->  
-> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-> +{
-> +    ram_addr_t ram_addr;
-> +    hwaddr paddr;
-> +    Object *obj = qdev_get_machine();
-> +    VirtMachineState *vms = VIRT_MACHINE(obj);
-> +    bool acpi_enabled = virt_is_acpi_enabled(vms);
-> +
-> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
-> +
-> +    if (acpi_enabled && addr &&
-> +            object_property_get_bool(obj, "ras", NULL)) {
-> +        ram_addr = qemu_ram_addr_from_host(addr);
-> +        if (ram_addr != RAM_ADDR_INVALID &&
-> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> +            kvm_hwpoison_page_add(ram_addr);
-> +            /*
-> +             * If this is a BUS_MCEERR_AR, we know we have been called
-> +             * synchronously from the vCPU thread, so we can easily
-> +             * synchronize the state and inject an error.
-> +             *
-> +             * TODO: we currently don't tell the guest at all about
-> +             * BUS_MCEERR_AO. In that case we might either be being
-> +             * called synchronously from the vCPU thread, or a bit
-> +             * later from the main thread, so doing the injection of
-> +             * the error would be more complicated.
-> +             */
-> +            if (code == BUS_MCEERR_AR) {
-> +                kvm_cpu_synchronize_state(c);
-> +                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
-> +                    kvm_inject_arm_sea(c);
-> +                } else {
-> +                    error_report("failed to record the error");
-> +                    abort();
-> +                }
-> +            }
-> +            return;
-> +        }
-> +        if (code == BUS_MCEERR_AO) {
-> +            error_report("Hardware memory error at addr %p for memory used by "
-> +                "QEMU itself instead of guest system!", addr);
-> +        }
-> +    }
-> +
-> +    if (code == BUS_MCEERR_AR) {
-> +        error_report("Hardware memory error!");
-> +        exit(1);
-> +    }
-> +}
-> +
->  /* C6.6.29 BRK instruction */
->  static const uint32_t brk_insn = 0xd4200000;
->  
-> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
-> index e63f8bd..7388494 100644
-> --- a/target/arm/tlb_helper.c
-> +++ b/target/arm/tlb_helper.c
-> @@ -33,7 +33,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
->       * ISV field.
->       */
->      if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
-> -        syn = syn_data_abort_no_iss(same_el,
-> +        syn = syn_data_abort_no_iss(same_el, 0,
->                                      ea, 0, s1ptw, is_write, fsc);
->      } else {
->          /*
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index e818fc7..408392d 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -29,6 +29,8 @@
->  /* The x86 has a strong memory model with some store-after-load re-ordering */
->  #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
->  
-> +#define KVM_HAVE_MCE_INJECTION 1
-> +
->  /* Maximum instruction code size */
->  #define TARGET_MAX_INSN_SIZE 16
->  
+- In v2:
+  - Address Cornelia's feedback v1:
+    https://marc.info/?l=3Dkvm&m=3D158109042605606&w=3D2
+  - Address Dave's feedback from v1:
+    https://marc.info/?l=3Dkvm&m=3D158109134905930&w=3D2
+
+- v1 is here: https://marc.info/?l=3Dkvm&m=3D158108941605311&w=3D2
+---
+ .../virt/kvm/running-nested-guests.rst        | 287 ++++++++++++++++++
+ 1 file changed, 287 insertions(+)
+ create mode 100644 Documentation/virt/kvm/running-nested-guests.rst
+
+diff --git a/Documentation/virt/kvm/running-nested-guests.rst b/Documenta=
+tion/virt/kvm/running-nested-guests.rst
+new file mode 100644
+index 0000000000000000000000000000000000000000..72b5a9bc7b456c28ea5c45f22=
+89ff4ba0211db6f
+--- /dev/null
++++ b/Documentation/virt/kvm/running-nested-guests.rst
+@@ -0,0 +1,287 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
++Running nested guests with KVM
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
++
++A nested guest is the ability to run a guest inside another guest (it
++can be KVM-based or a different hypervisor).  The straightforward
++example is a KVM guest that in turn runs on a KVM guest (the rest of
++this document is built on this example)::
++
++              .----------------.  .----------------.
++              |                |  |                |
++              |      L2        |  |      L2        |
++              | (Nested Guest) |  | (Nested Guest) |
++              |                |  |                |
++              |----------------'--'----------------|
++              |                                    |
++              |       L1 (Guest Hypervisor)        |
++              |          KVM (/dev/kvm)            |
++              |                                    |
++      .------------------------------------------------------.
++      |                 L0 (Host Hypervisor)                 |
++      |                    KVM (/dev/kvm)                    |
++      |------------------------------------------------------|
++      |        Hardware (with virtualization extensions)     |
++      '------------------------------------------------------'
++
++Terminology:
++
++- L0 =E2=80=93 level-0; the bare metal host, running KVM
++
++- L1 =E2=80=93 level-1 guest; a VM running on L0; also called the "guest
++  hypervisor", as it itself is capable of running KVM.
++
++- L2 =E2=80=93 level-2 guest; a VM running on L1, this is the "nested gu=
+est"
++
++.. note:: The above diagram is modelled after the x86 architecture;
++          s390x, ppc64 and other architectures are likely to have
++          a different design for nesting.
++
++          For example, s390x always has an LPAR (LogicalPARtition)
++          hypervisor running on bare metal, adding another layer and
++          resulting in at least four levels in a nested setup =E2=80=94 =
+L0 (bare
++          metal, running the LPAR hypervisor), L1 (host hypervisor), L2
++          (guest hypervisor), L3 (nested guest).
++
++          This document will stick with the three-level terminology (L0,
++          L1, and L2) for all architectures; and will largely focus on
++          x86.
++
++
++Use Cases
++---------
++
++There are several scenarios where nested KVM can be useful, to name a
++few:
++
++- As a developer, you want to test your software on different operating
++  systems (OSes).  Instead of renting multiple VMs from a Cloud
++  Provider, using nested KVM lets you rent a large enough "guest
++  hypervisor" (level-1 guest).  This in turn allows you to create
++  multiple nested guests (level-2 guests), running different OSes, on
++  which you can develop and test your software.
++
++- Live migration of "guest hypervisors" and their nested guests, for
++  load balancing, disaster recovery, etc.
++
++- VM image creation tools (e.g. ``virt-install``,  etc) often run
++  their own VM, and users expect these to work inside a VM.
++
++- Some OSes use virtualization internally for security (e.g. to let
++  applications run safely in isolation).
++
++
++Enabling "nested" (x86)
++-----------------------
++
++From Linux kernel v4.19 onwards, the ``nested`` KVM parameter is enabled
++by default for Intel and AMD.  (Though your Linux distribution might
++override this default.)
++
++In case you are running a Linux kernel older than v4.19, to enable
++nesting, set the ``nested`` KVM module parameter to ``Y`` or ``1``.  To
++persist this setting across reboots, you can add it in a config file, as
++shown below:
++
++1. On the bare metal host (L0), list the kernel modules and ensure that
++   the KVM modules::
++
++    $ lsmod | grep -i kvm
++    kvm_intel             133627  0
++    kvm                   435079  1 kvm_intel
++
++2. Show information for ``kvm_intel`` module::
++
++    $ modinfo kvm_intel | grep -i nested
++    parm:           nested:boolkvm                   435079  1 kvm_intel
++
++3. For the nested KVM configuration to persist across reboots, place the
++   below in ``/etc/modprobed/kvm_intel.conf`` (create the file if it
++   doesn't exist)::
++
++    $ cat /etc/modprobe.d/kvm_intel.conf
++    options kvm-intel nested=3Dy
++
++4. Unload and re-load the KVM Intel module::
++
++    $ sudo rmmod kvm-intel
++    $ sudo modprobe kvm-intel
++
++5. Verify if the ``nested`` parameter for KVM is enabled::
++
++    $ cat /sys/module/kvm_intel/parameters/nested
++    Y
++
++For AMD hosts, the process is the same as above, except that the module
++name is ``kvm-amd``.
++
++
++Additional nested-related kernel parameters (x86)
++-------------------------------------------------
++
++If your hardware is sufficiently advanced (Intel Haswell processor or
++higher, which has newer hardware virt extensions), the following
++additional features will also be enabled by default: "Shadow VMCS
++(Virtual Machine Control Structure)", APIC Virtualization on your bare
++metal host (L0).  Parameters for Intel hosts::
++
++    $ cat /sys/module/kvm_intel/parameters/enable_shadow_vmcs
++    Y
++
++    $ cat /sys/module/kvm_intel/parameters/enable_apicv
++    Y
++
++    $ cat /sys/module/kvm_intel/parameters/ept
++    Y
++
++.. note:: If you suspect your L2 (i.e. nested guest) is running slower,
++          ensure the above are enabled (particularly
++          ``enable_shadow_vmcs`` and ``ept``).
++
++
++Starting a nested guest (x86)
++-----------------------------
++
++Once your bare metal host (L0) is configured for nesting, you should be
++able to start an L1 guest with::
++
++    $ qemu-kvm -cpu host [...]
++
++The above will pass through the host CPU's capabilities as-is to the
++gues); or for better live migration compatibility, use a named CPU
++model supported by QEMU. e.g.::
++
++    $ qemu-kvm -cpu Haswell-noTSX-IBRS,vmx=3Don
++
++then the guest hypervisor will subsequently be capable of running a
++nested guest with accelerated KVM.
++
++
++Enabling "nested" (s390x)
++-------------------------
++
++1. On the host hypervisor (L0), enable the ``nested`` parameter on
++   s390x::
++
++    $ rmmod kvm
++    $ modprobe kvm nested=3D1
++
++.. note:: On s390x, the kernel parameter ``hpage`` is mutually exclusive
++          with the ``nested`` paramter =E2=80=94 i.e. to be able to enab=
+le
++          ``nested``, the ``hpage`` parameter *must* be disabled.
++
++2. The guest hypervisor (L1) must be provided with the ``sie`` CPU
++   feature =E2=80=94 with QEMU, this can be done by using "host passthro=
+ugh"
++   (via the command-line ``-cpu host``).
++
++3. Now the KVM module can be loaded in the L1 (guest hypervisor)::
++
++    $ modprobe kvm
++
++
++Live migration with nested KVM
++------------------------------
++
++The below live migration scenarios should work as of Linux kernel 5.3
++and QEMU 4.2.0 for x86; for s390x, even older versions might work.
++In all the below cases, L1 exposes ``/dev/kvm`` in it, i.e. the L2 guest
++is a "KVM-accelerated guest", not a "plain emulated guest" (as done by
++QEMU's TCG).
++
++- Migrating a nested guest (L2) to another L1 guest on the *same* bare
++  metal host.
++
++- Migrating a nested guest (L2) to another L1 guest on a *different*
++  bare metal host.
++
++- Migrating an L1 guest, with an *offline* nested guest in it, to
++  another bare metal host.
++
++- Migrating an L1 guest, with a  *live* nested guest in it, to another
++  bare metal host.
++
++Limitations on Linux kernel versions older than 5.3 (x86)
++---------------------------------------------------------
++
++On Linux kernel versions older than 5.3, once an L1 guest has started an
++L2 guest, the L1 guest would no longer capable of being migrated, saved,
++or loaded (refer to QEMU documentation on "save"/"load") until the L2
++guest shuts down.
++
++Attempting to migrate or save-and-load an L1 guest while an L2 guest is
++running will result in undefined behavior.  You might see a ``kernel
++BUG!`` entry in ``dmesg``, a kernel 'oops', or an outright kernel panic.
++Such a migrated or loaded L1 guest can no longer be considered stable or
++secure, and must be restarted.
++
++Migrating an L1 guest merely configured to support nesting, while not
++actually running L2 guests, is expected to function normally.
++Live-migrating an L2 guest from one L1 guest to another is also expected
++to succeed.
++
++Reporting bugs from nested setups
++-----------------------------------
++
++Debugging "nested" problems can involve sifting through log files across
++L0, L1 and L2; this can result in tedious back-n-forth between the bug
++reporter and the bug fixer.
++
++- Mention that you are in a "nested" setup.  If you are running any kind
++  of "nesting" at all, say so.  Unfortunately, this needs to be called
++  out because when reporting bugs, people tend to forget to even
++  *mention* that they're using nested virtualization.
++
++- Ensure you are actually running KVM on KVM.  Sometimes people do not
++  have KVM enabled for their guest hypervisor (L1), which results in
++  them running with pure emulation or what QEMU calls it as "TCG", but
++  they think they're running nested KVM.  Thus confusing "nested Virt"
++  (which could also mean, QEMU on KVM) with "nested KVM" (KVM on KVM).
++
++Information to collect (generic)
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++The following is not an exhaustive list, but a very good starting point:
++
++  - Kernel, libvirt, and QEMU version from L0
++
++  - Kernel, libvirt and QEMU version from L1
++
++  - QEMU command-line of L1 -- when using libvirt, you'll find it here:
++    ``/var/log/libvirt/qemu/instance.log``
++
++  - QEMU command-line of L2 -- as above, when using libvirt, get the
++    complete libvirt-generated QEMU command-line
++
++  - ``cat /sys/cpuinfo`` from L0
++
++  - ``cat /sys/cpuinfo`` from L1
++
++  - ``lscpu`` from L0
++
++  - ``lscpu`` from L1
++
++  - Full ``dmesg`` output from L0
++
++  - Full ``dmesg`` output from L1
++
++x86-specific info to collect
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Both the below commands, ``x86info`` and ``dmidecode``, should be
++available on most Linux distributions with the same name:
++
++  - Output of: ``x86info -a`` from L0
++
++  - Output of: ``x86info -a`` from L1
++
++  - Output of: ``dmidecode`` from L0
++
++  - Output of: ``dmidecode`` from L1
++
++s390x-specific info to collect
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Along with the earlier mentioned generic details, the below is
++also recommended:
++
++  - ``/proc/sysinfo`` from L1; this will also include the info from L0
+--=20
+2.21.1
 
