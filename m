@@ -2,137 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0987A1C6389
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 23:59:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E5101C63DE
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 00:27:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728135AbgEEV6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 17:58:13 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:10549 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727089AbgEEV6M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 17:58:12 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5eb1e12d0002>; Tue, 05 May 2020 14:57:01 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 05 May 2020 14:58:11 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 05 May 2020 14:58:11 -0700
-Received: from nvidia.com (10.124.1.5) by HQMAIL107.nvidia.com (172.20.187.13)
- with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 5 May 2020 21:58:11
- +0000
-Date:   Tue, 5 May 2020 14:58:10 -0700
-From:   Neo Jia <cjia@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] vfio-pci: Mask cap zero
-Message-ID: <20200505215810.GB7633@nvidia.com>
-References: <158836927527.9272.16785800801999547009.stgit@gimli.home>
- <20200504180916.0e90cad9.cohuck@redhat.com>
- <20200504125253.3d5f9cbf@x1.home>
- <20200504220804.GA22939@nvidia.com>
- <20200504170354.3b49d07b@x1.home>
- <20200505080939.1e5a224a.cohuck@redhat.com>
+        id S1729348AbgEEW1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 18:27:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60907 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727895AbgEEW1J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 18:27:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588717628;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=m7nBhUhZbP+Z+qbn0o5hwDg4WpYxThNrJoLfGxtRcL8=;
+        b=cxX7WsqafQqUlT+pbsJ7NKkChxXcSYSCstoHfH4yQDxBCy+OjHkveFrpF5wbOuDTPqJ7XS
+        GS5LccRFemKEKNAv7S1JyLoCicrepswEgdaES7Cofd23pUK0gXUS1yUZKJCl17c9yMmLo3
+        u8Hs5LSU0Dqv5jNrYhqO5jT74xj1YqM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-CkLO7d3-OJqY9olCe8Tm5A-1; Tue, 05 May 2020 18:27:06 -0400
+X-MC-Unique: CkLO7d3-OJqY9olCe8Tm5A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DD56100A8EA;
+        Tue,  5 May 2020 22:27:05 +0000 (UTC)
+Received: from gimli.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D88355D9DA;
+        Tue,  5 May 2020 22:27:01 +0000 (UTC)
+Subject: [PATCH v2] vfio-pci: Mask cap zero
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, cohuck@redhat.com, cjia@nvidia.com
+Date:   Tue, 05 May 2020 16:27:01 -0600
+Message-ID: <158871758778.17183.9778359960687348692.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200505080939.1e5a224a.cohuck@redhat.com>
-X-NVConfidentiality: public
-User-Agent: Mutt/1.6.2 (2016-07-01)
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1588715821; bh=P41elko9IrlOm144HCO8E+rJooi/jmvfumqPzFrywJ4=;
-        h=X-PGP-Universal:Date:From:To:CC:Subject:Message-ID:References:
-         MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-         X-NVConfidentiality:User-Agent:X-Originating-IP:X-ClientProxiedBy;
-        b=OAJCUqL6qHSYb+ULNtTgItqmX+75YAnB0BsliYNfheCY0vfZ9yJ2LzZ1acvoFji6V
-         t42thWvwtd2/epCaf5Oc22e3YSBVKMxZOfHHE1sALj8AINJIqlmnM/V1REzcPjqcH1
-         wjtWp1C40Fkrm/yqXbGzu0rK5szvDyf80HDgoovmnIY03M0fOpTaj+7Sa1A1eQGOHG
-         7SHpIarvW8YpT0x5NieVYz6erHUkE2/+JwPMzX5ELqtdWIe/41WYdcNp6WSDOflOzU
-         u6R0oECRwHAtbi7FUrB3Cl4i8aPqNFgGxH3BROxbrWnTa7a71UEnK7Z79Q4i58bKGV
-         5T+krrl39Um7A==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 05, 2020 at 08:09:39AM +0200, Cornelia Huck wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> On Mon, 4 May 2020 17:03:54 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > On Mon, 4 May 2020 15:08:08 -0700
-> > Neo Jia <cjia@nvidia.com> wrote:
-> >
-> > > On Mon, May 04, 2020 at 12:52:53PM -0600, Alex Williamson wrote:
-> > > > External email: Use caution opening links or attachments
-> > > >
-> > > >
-> > > > On Mon, 4 May 2020 18:09:16 +0200
-> > > > Cornelia Huck <cohuck@redhat.com> wrote:
-> > > >
-> > > > > On Fri, 01 May 2020 15:41:24 -0600
-> > > > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > > > >
-> > > > > > There is no PCI spec defined capability with ID 0, therefore we don't
-> > > > > > expect to find it in a capability chain and we use this index in an
-> > > > > > internal array for tracking the sizes of various capabilities to handle
-> > > > > > standard config space.  Therefore if a device does present us with a
-> > > > > > capability ID 0, we mark our capability map with nonsense that can
-> > > > > > trigger conflicts with other capabilities in the chain.  Ignore ID 0
-> > > > > > when walking the capability chain, handling it as a hidden capability.
-> > > > > >
-> > > > > > Seen on an NVIDIA Tesla T4.
-> > > > > >
-> > > > > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > ---
-> > > > > >  drivers/vfio/pci/vfio_pci_config.c |    2 +-
-> > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> > > > > > index 87d0cc8c86ad..5935a804cb88 100644
-> > > > > > --- a/drivers/vfio/pci/vfio_pci_config.c
-> > > > > > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> > > > > > @@ -1487,7 +1487,7 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
-> > > > > >             if (ret)
-> > > > > >                     return ret;
-> > > > > >
-> > > > > > -           if (cap <= PCI_CAP_ID_MAX) {
-> > > > >
-> > > > > Maybe add a comment:
-> > > > >
-> > > > > /* no PCI spec defined capability with ID 0: hide it */
-> > >
-> > > Hi Alex,
-> > >
-> > > I think this is NULL Capability defined in Codes and IDs spec, probably we
-> > > should just add a new enum to represent that?
-> >
-> > Yes, it looks like the 1.1 version of that specification from June 2015
-> > changed ID 0 from reserved to a NULL capability.  So my description and
-> > this comment are wrong, but I wonder if we should did anything
-> > different with the handling of this capability.  It's specified to
-> > contain only the ID and next pointer, so I'd expect it's primarily a
-> > mechanism for hardware vendors to blow fuses in config space to
-> > maintain a capability chain while maybe hiding a feature not supported
-> > by the product sku.  Hiding the capability in vfio is trivial, exposing
-> > it implies some changes to our config space map that might be more
-> > subtle.  I'm inclined to stick with this solution for now.  Thanks,
-> >
-> > Alex
-> 
-> From this description, I also think that we should simply hide these
-> NULL capabilities.
+The PCI Code and ID Assignment Specification changed capability ID 0
+from reserved to a NULL capability in the v1.1 revision.  The NULL
+capability is defined to include only the 16-bit capability header,
+ie. only the ID and next pointer.  Unfortunately vfio-pci creates a
+map of config space, where ID 0 is used to reserve the standard type
+0 header.  Finding an actual capability with this ID therefore results
+in a bogus range marked in that map and conflicts with subsequent
+capabilities.  As this seems to be a dummy capability anyway and we
+already support dropping capabilities, let's hide this one rather than
+delving into the potentially subtle dependencies within our map.
 
-I don't have a strong preference either way, the current implementation looks
-fine.
+Seen on an NVIDIA Tesla T4.
 
-Thanks,
-Neo
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ drivers/vfio/pci/vfio_pci_config.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-> 
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 3dcddbd572e6..0d110e268094 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -1486,7 +1486,12 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
+ 		if (ret)
+ 			return ret;
+ 
+-		if (cap <= PCI_CAP_ID_MAX) {
++		/*
++		 * ID 0 is a NULL capability, conflicting with our fake
++		 * PCI_CAP_ID_BASIC.  As it has no content, consider it
++		 * hidden for now.
++		 */
++		if (cap && cap <= PCI_CAP_ID_MAX) {
+ 			len = pci_cap_length[cap];
+ 			if (len == 0xFF) { /* Variable length */
+ 				len = vfio_cap_len(vdev, cap, pos);
+
