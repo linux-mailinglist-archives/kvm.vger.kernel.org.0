@@ -2,86 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72D481C606E
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 20:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0832C1C6087
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 20:59:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728180AbgEEStw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 14:49:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35708 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726350AbgEEStv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 14:49:51 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FD4C061A0F
-        for <kvm@vger.kernel.org>; Tue,  5 May 2020 11:49:51 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id k6so2701876iob.3
-        for <kvm@vger.kernel.org>; Tue, 05 May 2020 11:49:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=25DNXBEo9mxNWn6NxcAV3IwfSkfCUfjgs/WrJpbKFYI=;
-        b=YwXqNCxDTXEMAxsGRi0KUOTeISgCUQlPxcpcBBVeZ5dIDnC4kLxqO1Vrr2Wqwjg7mH
-         cm9WKt6zk7E+ODBVQS5G8TNJHiwL+H13gseJirCooUY/57lggtEvsB53FninbUfefV7D
-         RmuNZIR2paEbhbkS6Eih3+0/X4lyVleS6w2HC7L2mx/mVDFSQlfTggItqfuZzpewMdtw
-         R+EpJjU2DkyqmQRwktXOtw7bz4CBXHFHkX3sM34uDQ9pZ6oiYoqYz6Ea4McOhUBe9ZJX
-         F0kUZcDoqiYRkVsUaW+lOup2zQwnadm0ezfKk3IZU3KGJPzyWEW5+v7yghk8JkApUl4r
-         HFmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=25DNXBEo9mxNWn6NxcAV3IwfSkfCUfjgs/WrJpbKFYI=;
-        b=W2UfK3xTW/qlvVkLrJRl629hX7tT1Pc+vbj8QHNFIY3+mcBqE/1u4y3MCEwu2hGzBc
-         LIYrOn1nXwk0JWhh0PcPIjYlsjqKFyHBjWt8GYO7OTbdCZHlly+uQIM9/5aQcec1OCZj
-         jAVH8rYbb5kV+e/J6N3J0PSJa7BvtUgdMkTaX/ZFN2H0gngqYaGv8jiLJHLvk+UWNdBO
-         2O+7EK1HlK+JNGHM/nBxtVBEdF5/ZFglKLxvcvEtN5UJLBPAS5zGfDwbfZ9HbbvhAzL6
-         st8Mv9SXemzC/Fp5EBLaNs4bilCyd4v+P3pi4vCmI40cwiX7EL08rqD8+CNjCrXLaxJt
-         69/Q==
-X-Gm-Message-State: AGi0PuYgoIPqb6wNQhceCfHUMbS55WhAZJ6jP/0TuPwQX/cPJL49JLz6
-        d9mRqOVIgJh6wAzXlkHuJWPUoUAIGgXrYwvSmjr9gQ==
-X-Google-Smtp-Source: APiQypJNCD0h0iuMHFgfvXcd238NjYPVZLtz5aO1TdS4cVgkrYEYX2J9B64+CjKPpcNNzjpaqWAtRTLmQu3//94thco=
-X-Received: by 2002:a6b:c910:: with SMTP id z16mr4793739iof.164.1588704589972;
- Tue, 05 May 2020 11:49:49 -0700 (PDT)
+        id S1728292AbgEES7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 14:59:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35358 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727083AbgEES7l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 14:59:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588705180;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0QimJWICcVgawJQV6KSoD8l4L46cS4D64iKKzoz7TGE=;
+        b=iH34Ipcz3bv5Osnvbn/xTsSkCBToXnXSTDhmu15uMRX1UvsP9bLuVlnoxdH///XNu/xXbQ
+        yjs4HfOnW7+NmxZPmTeP3Hu7gHO2u6J1SDis4ES+cwyusAmVt6jrrc+bG9UNqamTpGtIbt
+        EADGUOCvCecNk7bufcgjn7brP/7jh+Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-JSQ0t69xNUmsWKb7_pld1A-1; Tue, 05 May 2020 14:59:38 -0400
+X-MC-Unique: JSQ0t69xNUmsWKb7_pld1A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A802FEC1A6;
+        Tue,  5 May 2020 18:59:36 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-211.rdu2.redhat.com [10.10.116.211])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E81D610021B3;
+        Tue,  5 May 2020 18:59:35 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 5A7A3222F75; Tue,  5 May 2020 14:59:35 -0400 (EDT)
+Date:   Tue, 5 May 2020 14:59:35 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 6/6] KVM: x86: Switch KVM guest to using interrupts
+ for page ready APF delivery
+Message-ID: <20200505185935.GC7155@redhat.com>
+References: <20200429093634.1514902-1-vkuznets@redhat.com>
+ <20200429093634.1514902-7-vkuznets@redhat.com>
+ <ee587bd6-a06f-8a38-9182-94218f7d08bb@redhat.com>
 MIME-Version: 1.0
-References: <20200501185147.208192-1-yuanyu@google.com> <20200501185147.208192-2-yuanyu@google.com>
- <20200501204552.GD4760@linux.intel.com> <49fea649-9376-f8f8-1718-72672926e1bf@oracle.com>
-In-Reply-To: <49fea649-9376-f8f8-1718-72672926e1bf@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 5 May 2020 11:49:38 -0700
-Message-ID: <CALMp9eSr4J70G1PGqiAoxA9RCeR-N_FcLeJgXMr8AbtFCVKc7Q@mail.gmail.com>
-Subject: Re: [PATCH RFC 1/1] KVM: x86: add KVM_HC_UCALL hypercall
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Forrest Yuan Yu <yuanyu@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ee587bd6-a06f-8a38-9182-94218f7d08bb@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 1, 2020 at 6:05 PM Liran Alon <liran.alon@oracle.com> wrote:
->
->
-> On 01/05/2020 23:45, Sean Christopherson wrote:
-> > Off the top of my head, IO and/or MMIO has a few advantages:
-> >
-> >    - Allows the guest kernel to delegate permissions to guest userspace,
-> >      whereas KVM restrict hypercalls to CPL0.
-> >    - Allows "pass-through", whereas VMCALL is unconditionally forwarded to
-> >      L1.
-> >    - Is vendor agnostic, e.g. VMX and SVM recognized different opcodes for
-> >      VMCALL vs VMMCALL.
-> I agree with all the above (I believe similar rational had led VMware to
-> design their Backdoor PIO interface).
+On Wed, Apr 29, 2020 at 12:53:33PM +0200, Paolo Bonzini wrote:
+> On 29/04/20 11:36, Vitaly Kuznetsov wrote:
+> > +
+> > +	if (__this_cpu_read(apf_reason.enabled)) {
+> > +		reason = __this_cpu_read(apf_reason.reason);
+> > +		if (reason == KVM_PV_REASON_PAGE_READY) {
+> > +			token = __this_cpu_read(apf_reason.token);
+> > +			/*
+> > +			 * Make sure we read 'token' before we reset
+> > +			 * 'reason' or it can get lost.
+> > +			 */
+> > +			mb();
+> > +			__this_cpu_write(apf_reason.reason, 0);
+> > +			kvm_async_pf_task_wake(token);
+> > +		}
+> 
+> If tokens cannot be zero, could we avoid using reason for the page ready
+> interrupt (and ultimately retire "reason" completely)?
 
-Just to set the record straight...
+If we are planning to report errors using this interface, then retaining
+KVM_PV_REASON_PAGE_READY makes sense because we can then introduce another
+state say KVM_PV_REASON_PAGE_ERROR.
 
-VMware's backdoor PIO interface predates both VMX and SVM, so VMCALL
-and VMMCALL played no role whatsoever in its design. Moreover,
-VMware's backdoor PIO interface actually does not allow the guest
-kernel to delegate permissions to guest userspace. VMware ignores the
-I/O permission bitmap in the TSS for the backdoor ports, so userspace
-always has access to them. It's the VMware hypervisor that decides
-whether or not to accept certain hypercalls at CPL>0.
+Thanks
+Vivek
+
