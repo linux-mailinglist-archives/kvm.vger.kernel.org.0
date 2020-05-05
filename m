@@ -2,115 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C2BE1C5E9C
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F8FE1C5EAF
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:22:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729488AbgEERQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 13:16:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729199AbgEERQi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 13:16:38 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5BFC061A0F
-        for <kvm@vger.kernel.org>; Tue,  5 May 2020 10:16:37 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id x25so3156616wmc.0
-        for <kvm@vger.kernel.org>; Tue, 05 May 2020 10:16:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=j/K4PATbLRvXzOHJ5kuvFj7wv+7GxYy2AO2wgULDc48=;
-        b=UdfGkBCaEekX1+Ogl521QElFibeK4JEuXmv+9Qyn1i1eO1zr1X48fFX03epvhY+IY6
-         ndvidFnMb1LphudrcVRhoWifpNWD22iZNraDpuomYuRhOEn76EjZ3b9SSDCBtT8Y4GQ7
-         jt6vabzBm6D8UD+o4kzd9GJibXajbtWD8IdhX9Lmgfrh0w0ORRwY8fXa2Ya6/ryu3evu
-         SBcPxJ45+56nOeQDG0Egjl56sijaUTDF0SJfEaOmqBuxiSyv38xKB49H6095OwlH+Mad
-         6s4qyd1ojEeGZwrkhd05xwnwU2rFCDNGqF17NcmacWdRCjdzQak93yG3czezNQwM0bZg
-         /ISA==
+        id S1730188AbgEERWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 13:22:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26481 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730243AbgEERWD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 13:22:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588699321;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NLBNUm/fluAXkFzdIYicKdp0CV+hI9Whe6Z74OvWRXA=;
+        b=QjTGf2PvX19fFNY2nzTiM1XC31jTrRLX00NGudTxsfM/qG2FCEzLAbMnxiMPPuiC6O2uv9
+        YRvOdN50f8bqLgq8AIwWox8ifoqdh9ze+5cfo9Mr7bYQJR18wBinjgUzjNCLfd4Ukgskcc
+        CW44EKsDIODkqO3joGSpXFXBWyk1cFM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-v3A8z3xoMr27MpRbYdp3Sg-1; Tue, 05 May 2020 13:21:57 -0400
+X-MC-Unique: v3A8z3xoMr27MpRbYdp3Sg-1
+Received: by mail-wm1-f72.google.com with SMTP id h6so1369631wmi.7
+        for <kvm@vger.kernel.org>; Tue, 05 May 2020 10:21:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=j/K4PATbLRvXzOHJ5kuvFj7wv+7GxYy2AO2wgULDc48=;
-        b=SN4VUZqcuFY5oLQ1wI26uwPF8h+TfKwlISupKLxyF3F/uq5gl5IWg5K9G3vkYRsagS
-         E6WSYvl7CWhGXXLouLf1VEFS2x+yJJtTJsvRpPtcU6utA0nhbF0ojn02rKVWvgIpJe05
-         sGc2gNfcc27ZsqEm5OddgomVxgVPS0drDIlL3gP1LZbIjie2ZPNLxV4ZX1YCpa7cIFCF
-         LmvIFtlvw8tWrbjPnuphYTpnmg2KNACVsU1EasMjIp4HBvKAUiqDUi237tffx5396PSg
-         OplL4o8Du5z0WI4uLgVNsgsIJkjnYHP+fsnfJDofQ7qeWYDcVxzR4/yXBYBKpBZMrG7e
-         N9IQ==
-X-Gm-Message-State: AGi0PuaPjcIrMJZunpbzRRIJ54c5xZbeHKnUufOnWquSaGLQfU2WdXKp
-        ME2kaCAiUujTjN1kj8SrqG2EzEiYc3/KVA==
-X-Google-Smtp-Source: APiQypLAF/GA9/GggAGCjJYWWbPUt/ZLtlJkLB0SJTpOIVPoR1ng5wPO0c9UIGGAGmCzyMuR7y9mNA==
-X-Received: by 2002:a1c:3c87:: with SMTP id j129mr4234274wma.157.1588698996194;
-        Tue, 05 May 2020 10:16:36 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
-        by smtp.gmail.com with ESMTPSA id z22sm4692812wma.20.2020.05.05.10.16.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2020 10:16:35 -0700 (PDT)
-Date:   Tue, 5 May 2020 18:16:31 +0100
-From:   Andrew Scull <ascull@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 06/26] arm64: Add level-hinted TLB invalidation helper
-Message-ID: <20200505171631.GC237572@google.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-7-maz@kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NLBNUm/fluAXkFzdIYicKdp0CV+hI9Whe6Z74OvWRXA=;
+        b=t/tMmI0g/7yneesRSl9BGtv0stK0skM8wtI1hgBzP9W6NI2FFbr7d9S7rmvg+F1/96
+         mQL427A7ITa9vXqDMmCcpsIilvm7QxtZKRMhIzgDEofm1oBDf6p2UhFNdTcvhy8oknzK
+         hDnYkbHyBMguDAtxtJW3EPF2ex+z8x0sy78G8WiPrPvf+hi0fEfIkzXLS32IDgZD+JY9
+         j8N6fH2HQ2SJz+bh9xzoAvqWbyub4GAKR3Zq0qSuWPPc7VhYa6XfsSpNNIm6IoYIeZ0I
+         JLzSdsXyb0ThOZYAfzCxGP+qfU0WbhQWqbWBXi1WsugoTu29SfTV0dG4CAFw8Zzb+eeG
+         lXsg==
+X-Gm-Message-State: AGi0PubI1lrnxWhVsHzuuBlS6xVAoLkKoUrQojpiellrr/RL+QhgwOqp
+        ZAdp0MuIkSgHLjca3oNa7y+0YZfidiH1yYlSzKLgOQgfSQHrOMZt+ZWCt5fXDXs6g8Uc+rPurlE
+        MHxJfuM/lLpqp
+X-Received: by 2002:adf:dfcf:: with SMTP id q15mr4600173wrn.137.1588699316441;
+        Tue, 05 May 2020 10:21:56 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIVV+df8r3YAEgu8Bx29AN2Dhx6gB2SP3zMh8KI8zL75cn1CSbSYF73IUInRaU7M6AlZnT4Aw==
+X-Received: by 2002:adf:dfcf:: with SMTP id q15mr4600142wrn.137.1588699316221;
+        Tue, 05 May 2020 10:21:56 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.132.175])
+        by smtp.gmail.com with ESMTPSA id q17sm4693287wmj.45.2020.05.05.10.21.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 May 2020 10:21:55 -0700 (PDT)
+Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
+ kernel statistics
+To:     David Rientjes <rientjes@google.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Jonathan Adams <jwadams@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>
+References: <20200504110344.17560-1-eesposit@redhat.com>
+ <alpine.DEB.2.22.394.2005041429210.224786@chino.kir.corp.google.com>
+ <f2654143-b8e5-5a1f-8bd0-0cb0df2cd638@redhat.com>
+ <CALMp9eQYcLr_REzDC1kWTHX4SJWt7x+Zd1KwNvS1YGd5TVM1xA@mail.gmail.com>
+ <1d12f846-bf89-7b0a-5c71-e61d83b1a36f@redhat.com>
+ <alpine.DEB.2.22.394.2005051003380.216575@chino.kir.corp.google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6cfdf81f-caef-2489-0906-25915d9d58ff@redhat.com>
+Date:   Tue, 5 May 2020 19:21:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200422120050.3693593-7-maz@kernel.org>
+In-Reply-To: <alpine.DEB.2.22.394.2005051003380.216575@chino.kir.corp.google.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +#define __tlbi_level(op, addr, level)					\
-> +	do {								\
-> +		u64 arg = addr;						\
-> +									\
-> +		if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&	\
-> +		    level) {						\
-> +			u64 ttl = level;				\
-> +									\
-> +			switch (PAGE_SIZE) {				\
-> +			case SZ_4K:					\
-> +				ttl |= 1 << 2;				\
-> +				break;					\
-> +			case SZ_16K:					\
-> +				ttl |= 2 << 2;				\
-> +				break;					\
-> +			case SZ_64K:					\
-> +				ttl |= 3 << 2;				\
-> +				break;					\
-> +			}						\
-> +									\
-> +			arg &= ~TLBI_TTL_MASK;				\
-> +			arg |= FIELD_PREP(TLBI_TTL_MASK, ttl);		\
+On 05/05/20 19:07, David Rientjes wrote:
+>> I am totally in favor of having a binary format, but it should be
+>> introduced as a separate series on top of this one---and preferably by
+>> someone who has already put some thought into the problem (which
+>> Emanuele and I have not, beyond ensuring that the statsfs concept and
+>> API is flexible enough).
+>>
+> The concern is that once this series is merged then /sys/kernel/stats 
+> could be considered an ABI and there would be a reasonable expectation 
+> that it will remain stable, in so far as the stats that userspace is 
+> interested in are stable and not obsoleted.
+> 
+> So is this a suggestion that the binary format becomes complementary to 
+> statsfs and provide a means for getting all stats from a single subsystem, 
+> or that this series gets converted to such a format before it is merged?
 
-Despite the spec saying both tables apply to TLB maintenance
-instructions that do not apply to a range of addresses I think it only
-means the 4-bit version (bug report to Arm, or I'm on the wrong spec).
+The binary format should be complementary.  The ASCII format should
+indeed be considered stable even though individual statistics would come
+and go.  It may make sense to allow disabling ASCII files via mount
+and/or Kconfig options; but either way, the binary format can and should
+be added on top.
 
-This is consistent with Table D5-53 and the macro takes a single address
-argument to make misuse with range based tlbi less likely.
+I have not put any thought into what the binary format would look like
+and what its features would be.  For example these are but the first
+questions that come to mind:
 
-It relies on the caller to get the level right and getting it wrong
-could be pretty bad as the spec says all bets are off in that case. Is
-it worth adding a check of the level against the address (seems a bit
-involved), or that it is just 2 bits or adding a short doc comment to
-explain it?
+* would it be possible to read/clear an arbitrary statistic with
+pread/pwrite, or do you have to read all of them?
 
-(Looks like we get some constants for the levels in a later patch that
-could be referenced with some form of time travel)
+* if userspace wants to read the schema just once and then read the
+statistics many times, how is it informed of schema changes?
 
-> +		}							\
-> +									\
-> +		__tlbi(op,  arg);					\
+* and of course the details of how the schema (names of stat and
+subsources) is encoded and what details it should include about the
+values (e.g. type or just signedness).
 
-cosmetic nit: double space in here
+Another possibility is to query stats via BPF.  This could be a third
+way to access the stats, or it could be alternative to a binary format.
+
+Paolo
+
