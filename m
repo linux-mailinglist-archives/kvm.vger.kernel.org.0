@@ -2,248 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3480E1C6429
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 00:50:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62D391C642D
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 00:51:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728737AbgEEWuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 18:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45182 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727989AbgEEWuo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 18:50:44 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 066A6C061A0F
-        for <kvm@vger.kernel.org>; Tue,  5 May 2020 15:50:43 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id w65so3708pfc.12
-        for <kvm@vger.kernel.org>; Tue, 05 May 2020 15:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+/snCucJYmXVL3VfK5/0iPYTFLegLBtAM5Ty8Sf5ask=;
-        b=VcEi8NcxFNwjBWDj2dLrM79vjG9QfCzrkcOQncGzWuaSPSTxHLahKtlCxtVmahLCtT
-         aZiVeYbwvmBTOe0qPUDrhYUqqARNkQZG+RQix9Tzjn0lBC+xiq2bK+tUJqy+CQvY977D
-         3oLi481+zfmfiU7Lbapq0agP0HjD7ghTCb7j+8jnevSnyxI8ism/C49Nf+Y2Ckeb5LlH
-         WfwxC/AW+FPeK/IPJhpXw6nhijrbNUhBInqzA6CMiRooQPsl8JpZNhxZ45fmE0Pf7eyQ
-         XhAlu51ozlgAxiUC7wXFpuIBYerTL9QzHDoAjTYzdbUEiDjrOXJddO10jQ3I2KrrSnRA
-         nYhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+/snCucJYmXVL3VfK5/0iPYTFLegLBtAM5Ty8Sf5ask=;
-        b=sdvsMgoZzMBZw6sDEDH8OsIJW5n030BA0jAZ68goW0CR0VKQ7M39cYIUeSpRsu3t9s
-         GeI1kGMCiB/QA+qltiVn8hXVRa81xomIi8wvFZ7zE+BktNLidOpIZcMrSYobIWlPV4o7
-         S4MopvDNCZC9tTTfJjJnNDDhmDcYPUvXTmbXAWUtyktHrWv4zoxZmT7qCIVImT9sG9yR
-         S0MCN6ktXji8/w0+NLb8Rugj/yitUkORypTNUk4B4KNm+rG/+LG+r6idmQ5dcc7irciV
-         0pQzMBcMdMU2OOTj6J90GoBeFV4PH8igwlKSAUpi8hf2nwRGea5tBmFNRai6ANcC1c+0
-         3aGw==
-X-Gm-Message-State: AGi0Pub1f6/ESJJTpdWrt7oie3GELb+ZemXXA+7L5FO2MuDNVnAOIYG0
-        N76tQI1UMzGEN8Qn27KVj+iAwQ==
-X-Google-Smtp-Source: APiQypIANoA+BHt51IyzJhaxcN/lxc/pwYJsdliLzwUX+3STkyVrKH960UHFmSjTDO0aipkre79WLg==
-X-Received: by 2002:aa7:9891:: with SMTP id r17mr5265176pfl.5.1588719042908;
-        Tue, 05 May 2020 15:50:42 -0700 (PDT)
-Received: from google.com ([2620:0:1008:11:304b:ceac:77c4:3da4])
-        by smtp.gmail.com with ESMTPSA id t23sm2962204pji.32.2020.05.05.15.50.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2020 15:50:42 -0700 (PDT)
-Date:   Tue, 5 May 2020 15:50:37 -0700
-From:   Forrest Yuan Yu <yuanyu@google.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, alaingef@google.com, ningyang@google.com
-Subject: Re: [PATCH RFC 1/1] KVM: x86: add KVM_HC_UCALL hypercall
-Message-ID: <20200505225037.GC192370@google.com>
-References: <20200501185147.208192-1-yuanyu@google.com>
- <20200501185147.208192-2-yuanyu@google.com>
- <20200501204552.GD4760@linux.intel.com>
+        id S1729445AbgEEWvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 18:51:25 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:40580 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726568AbgEEWvY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 18:51:24 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 045MnI6G098056;
+        Tue, 5 May 2020 22:51:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
+ bh=XGDjKTGSNe5944Iga4irJ5tXqXpy64d2pGEDwm2UX08=;
+ b=Lve8JeNENcrCnjFxaTo9gH5MmkFHM28dsoh0oV+FzWG8/kiOKUdIWgvzetkaTXYPwVnW
+ siRkgLlJIF8YTwFh3GUS60ic93UxS2rStj536ABrnPXaI3at4y/gfmH3l67SjeqOFSwg
+ JglBNP+ihvzcvZJu+hBfJ+wRQ2VkzZzE7kizp7e2qZmIpOKmaPYTALFcsRuedtCFt3P7
+ DTc9qS5xH5CnqP26UxfFFmFmkGvixb51nFSg2gVpdlw1XnB2sqNBvEbu/1iS6zz+hid9
+ P06PxV3Eqlkcaw7TaJez+LxLgARinNLttQ3dUv4hDPaSGUTqq9uUiBym2UNB5Dm0C/e5 gQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 30s0tmfej8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 05 May 2020 22:51:05 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 045MliHE098246;
+        Tue, 5 May 2020 22:51:04 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 30t1r65wn5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 05 May 2020 22:51:04 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 045Mp28D009762;
+        Tue, 5 May 2020 22:51:03 GMT
+Received: from vbusired-dt (/10.154.183.230)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 05 May 2020 15:51:02 -0700
+Date:   Tue, 5 May 2020 17:51:03 -0500
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
+        Thomas.Lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        rientjes@google.com, brijesh.singh@amd.com
+Subject: Re: [PATCH v8 03/18] KVM: SVM: Add KVM_SEV_SEND_FINISH command
+Message-ID: <20200505225103.GB1721674@vbusired-dt>
+References: <cover.1588711355.git.ashish.kalra@amd.com>
+ <3ad971e9977700140d9092259d5326caab986f1f.1588711355.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200501204552.GD4760@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3ad971e9977700140d9092259d5326caab986f1f.1588711355.git.ashish.kalra@amd.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 suspectscore=1
+ spamscore=0 mlxlogscore=999 malwarescore=0 phishscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005050171
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 suspectscore=1
+ phishscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005050171
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 01, 2020 at 01:45:52PM -0700, Sean Christopherson wrote:
-> On Fri, May 01, 2020 at 11:51:47AM -0700, Forrest Yuan Yu wrote:
-> > The purpose of this new hypercall is to exchange message between
-> > guest and hypervisor. For example, a guest may want to ask hypervisor
-> > to harden security by setting restricted access permission on guest
-> > SLAT entry. In this case, the guest can use this hypercall to send
+On 2020-05-05 21:15:11 +0000, Ashish Kalra wrote:
+> From: Brijesh Singh <Brijesh.Singh@amd.com>
 > 
-> Please do s/SLAT/TDP everywhere.  IMO, TDP is a less than stellar acronym,
-> e.g. what will we do if we go to three dimensions!?!?  But, we're stuck
-> with it :-)
-
-Will do.
-
+> The command is used to finailize the encryption context created with
+> KVM_SEV_SEND_START command.
 > 
-> > a message to the hypervisor which will do its job and send back
-> > anything it wants the guest to know.
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Steve Rutherford <srutherford@google.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+
+> ---
+>  .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
+>  arch/x86/kvm/svm/sev.c                        | 23 +++++++++++++++++++
+>  2 files changed, 31 insertions(+)
 > 
-> Hrm, so this reintroduces KVM_EXIT_HYPERCALL without justifying _why_ it
-> needs to be reintroduced.  I'm not familiar with the history, but the
-> comments in the documentation advise "use KVM_EXIT_IO or KVM_EXIT_MMIO".
-> 
-> Off the top of my head, IO and/or MMIO has a few advantages:
-> 
->   - Allows the guest kernel to delegate permissions to guest userspace,
->     whereas KVM restrict hypercalls to CPL0.
->   - Allows "pass-through", whereas VMCALL is unconditionally forwarded to
->     L1.
->   - Is vendor agnostic, e.g. VMX and SVM recognized different opcodes for
->     VMCALL vs VMMCALL.
-
-Yes I'm aware of the document advice but still feel hypercall is the
-right thing to do. First of all, hypercalls, by definition, exist for
-exactly these kind of jobs. When a guest wants to talk to the
-hypervisor, it makes a hypercall. It just feels natural.
-
-Of course IO/MMIO can do the same thing, but for simple jobs like asking
-hypervisor to set restricted access permission, IO/MMIO feels heavy (and
-IMHO feels a little hacky).
-
-Also I'm not reintroducing KVM_EXIT_HYPERCALL the same way as before, in
-that we don't pass all unkown hypercalls to userspace. Instead, we just
-pass one specific call to userspace, one that userspace has opted into.
-
-When userspace does nothing -- not opting in -- the behavior is the same
-as the current code base.
-
-There are many ways to allow certain hypercalls to be delegated from the
-guest kernel to guest userspace, and we would probably want a mechanism
-that allows finer control than I/O permission bitmaps (for PIO) or
-mapping MMIO regions as writable in a userspace context. Something like
-this is not tied to a particular communication channel.
-
-Regarding the nested scenario, I would argue there should not be a
-hypercall interface from a guest to any hypervisor other than its
-immediate parent.
-
-VMCALL and VMMCALL having different opcodes shouldn't be a problem since
-kvm already supports hypercalls using these opcodes.
-
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index d0dfa5b54e4f..93884ec8918e 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -314,6 +314,14 @@ Returns: 0 on success, -negative on error
+>                  __u32 trans_len;
+>          };
 >  
-> > Signed-off-by: Forrest Yuan Yu <yuanyu@google.com>
-> > ---
-> > diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-> > index 01b081f6e7ea..ff313f6827bf 100644
-> > --- a/Documentation/virt/kvm/cpuid.rst
-> > +++ b/Documentation/virt/kvm/cpuid.rst
-> > @@ -86,6 +86,9 @@ KVM_FEATURE_PV_SCHED_YIELD        13          guest checks this feature bit
-> >                                                before using paravirtualized
-> >                                                sched yield.
-> >  
-> > +KVM_FEATURE_UCALL                 14          guest checks this feature bit
-> > +                                              before calling hypercall ucall.
+> +12. KVM_SEV_SEND_FINISH
+> +------------------------
+> +
+> +After completion of the migration flow, the KVM_SEV_SEND_FINISH command can be
+> +issued by the hypervisor to delete the encryption context.
+> +
+> +Returns: 0 on success, -negative on error
+> +
+>  References
+>  ==========
+>  
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 7031b660f64d..4d3031c9fdcf 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1153,6 +1153,26 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return ret;
+>  }
+>  
+> +static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_send_finish *data;
+> +	int ret;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	data->handle = sev->handle;
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_FINISH, data, &argp->error);
+> +
+> +	kfree(data);
+> +	return ret;
+> +}
+> +
+>  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -1203,6 +1223,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_SEND_UPDATE_DATA:
+>  		r = sev_send_update_data(kvm, &sev_cmd);
+>  		break;
+> +	case KVM_SEV_SEND_FINISH:
+> +		r = sev_send_finish(kvm, &sev_cmd);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		goto out;
+> -- 
+> 2.17.1
 > 
-> Why make the UCALL a KVM CPUID feature?  I can understand wanting to query
-> KVM support from host userspace, but presumably the guest will care about
-> capabiliteis built on top of the UCALL, not the UCALL itself.
-
-This is to keep the behavior the same when UCALL is not recognized by
-the current userspaces which are not aware of this hypercall. Without
-this, userspace may break if a guest invokes UCALL.
-
-> 
-> > +
-> >  KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
-> >                                                per-cpu warps are expeced in
-> >                                                kvmclock
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index c5835f9cb9ad..388a4f89464d 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3385,6 +3385,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  	case KVM_CAP_GET_MSR_FEATURES:
-> >  	case KVM_CAP_MSR_PLATFORM_INFO:
-> >  	case KVM_CAP_EXCEPTION_PAYLOAD:
-> > +	case KVM_CAP_UCALL:
-> 
-> For whatever reason I have a metnal block with UCALL, can we call this
-> KVM_CAP_USERSPACE_HYPERCALL
-
-I was trying to follow the convention. The name UCALL was used in places
-like tools/testing/selftests/kvm/include/kvm_util.h for similar
-purposes. I can rename it for better readability.
-
-> 
-> >  		r = 1;
-> >  		break;
-> >  	case KVM_CAP_SYNC_REGS:
-> > @@ -4895,6 +4896,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >  		kvm->arch.exception_payload_enabled = cap->args[0];
-> >  		r = 0;
-> >  		break;
-> > +	case KVM_CAP_UCALL:
-> > +		kvm->arch.hypercall_ucall_enabled = cap->args[0];
-> > +		r = 0;
-> > +		break;
-> >  	default:
-> >  		r = -EINVAL;
-> >  		break;
-> > @@ -7554,6 +7559,19 @@ static void kvm_sched_yield(struct kvm *kvm, unsigned long dest_id)
-> >  		kvm_vcpu_yield_to(target);
-> >  }
-> >  
-> > +static int complete_hypercall(struct kvm_vcpu *vcpu)
-> > +{
-> > +	u64 ret = vcpu->run->hypercall.ret;
-> > +
-> > +	if (!is_64_bit_mode(vcpu))
-> 
-> Do we really anticipate adding support in 32-bit guests?  Honest question.
-
-Oh I was trying to keep the behavior exactly the same. It was there
-under kvm_emulate_hypercall() so I pasted this block here.
-
-> 
-> > +		ret = (u32)ret;
-> > +	kvm_rax_write(vcpu, ret);
-> > +
-> > +	++vcpu->stat.hypercalls;
-> > +
-> > +	return kvm_skip_emulated_instruction(vcpu);
-> > +}
-> > +
-> >  int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> >  {
-> >  	unsigned long nr, a0, a1, a2, a3, ret;
-> > @@ -7605,17 +7623,26 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> >  		kvm_sched_yield(vcpu->kvm, a0);
-> >  		ret = 0;
-> >  		break;
-> > +	case KVM_HC_UCALL:
-> > +		if (vcpu->kvm->arch.hypercall_ucall_enabled) {
-> > +			vcpu->run->hypercall.nr = nr;
-> > +			vcpu->run->hypercall.args[0] = a0;
-> > +			vcpu->run->hypercall.args[1] = a1;
-> > +			vcpu->run->hypercall.args[2] = a2;
-> > +			vcpu->run->hypercall.args[3] = a3;
-> 
-> If performance is a justification for a more direct userspace exit, why
-> limit it to just four parameters?  E.g. why not copy all registers to
-> kvm_sync_regs and reverse the process on the way back in?
-> 
-> > +			vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
-> > +			vcpu->arch.complete_userspace_io = complete_hypercall;
-> > +			return 0; // message is going to userspace
-> > +		}
-> > +		ret = -KVM_ENOSYS;
-> > +		break;
-> >  	default:
-> >  		ret = -KVM_ENOSYS;
-> >  		break;
-> >  	}
-> >  out:
-> > -	if (!op_64_bit)
-> > -		ret = (u32)ret;
-> > -	kvm_rax_write(vcpu, ret);
-> > -
-> > -	++vcpu->stat.hypercalls;
-> > -	return kvm_skip_emulated_instruction(vcpu);
-> > +	vcpu->run->hypercall.ret = ret;
-> > +	return complete_hypercall(vcpu);
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
