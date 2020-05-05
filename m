@@ -2,107 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E190F1C4C7E
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 05:07:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 127911C4D10
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 06:15:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728194AbgEEDHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 May 2020 23:07:38 -0400
-Received: from mga05.intel.com ([192.55.52.43]:59066 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726286AbgEEDHh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 May 2020 23:07:37 -0400
-IronPort-SDR: lBwvHkb6E58fXMTWZA+wEINjQ5bzZV8qOIWrlLnBbL/JnRYV70W+CmK9qOWMrp32x8r6jw42Dq
- lYsf8h9FVk/w==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2020 20:07:36 -0700
-IronPort-SDR: SwhgkA8cwK89qvG3vWnOmOVOnFq6YT9L7YT83Qy8wMgzgXxlnIBVfG/BQSI0J13II96ttct2XF
- UgSBjsCQ/mZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,354,1583222400"; 
-   d="scan'208";a="263014770"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga006.jf.intel.com with ESMTP; 04 May 2020 20:07:36 -0700
-Date:   Mon, 4 May 2020 20:07:36 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>
-Subject: Re: [PATCH v8 4/4] kvm: vmx: virtualize split lock detection
-Message-ID: <20200505030736.GA20916@linux.intel.com>
-References: <20200414063129.133630-5-xiaoyao.li@intel.com>
- <871rooodad.fsf@nanos.tec.linutronix.de>
- <20200415191802.GE30627@linux.intel.com>
- <87tv1kmol8.fsf@nanos.tec.linutronix.de>
- <20200415214318.GH30627@linux.intel.com>
+        id S1726267AbgEEEPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 00:15:40 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:16300 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725272AbgEEEPj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 00:15:39 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R491e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04397;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0TxXItq5_1588652118;
+Received: from 30.27.236.135(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TxXItq5_1588652118)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 05 May 2020 12:15:22 +0800
+Subject: Re: [PATCH v4 0/7] clean up redundant 'kvm_run' parameters
+To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
+        chenhuacai@gmail.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <b660f6cb-a89b-2452-c15b-095add6413ec@linux.alibaba.com>
+Date:   Tue, 5 May 2020 12:15:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200415214318.GH30627@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 15, 2020 at 02:43:18PM -0700, Sean Christopherson wrote:
-> On Wed, Apr 15, 2020 at 11:22:11PM +0200, Thomas Gleixner wrote:
-> > Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> > > I don't see any way to avoid having KVM differentiate between sld_warn and
-> > > sld_fatal.  Even if KVM is able to virtualize SLD in sld_fatal mode, e.g.
-> > > by telling the guest it must not try to disable SLD, KVM would still need
-> > > to know the kernel is sld_fatal so that it can forward that information to
-> > > the guest.
-> > 
-> > Huch? There is absolutely zero code like that. The only place where
-> > sld_state is used is:
-> > 
-> > + static inline void vmx_update_sld(struct kvm_vcpu *vcpu, bool on)
-> > + {
-> > +	if (sld_state == sld_warn && guest_cpu_has_feature_sld(vcpu) &&
-> > +	    on == test_thread_flag(TIF_SLD)) {
-> > +		    sld_update_msr(on);
-> > +		    update_thread_flag(TIF_SLD, !on);
-> > +	}
-> > 
-> > You might have some faint memories from the previous trainwrecks :)
+Paolo Bonzini, any opinion on this?
+
+Thanks and best,
+Tianjia
+
+On 2020/4/27 12:35, Tianjia Zhang wrote:
+> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> structure. For historical reasons, many kvm-related function parameters
+> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+> patch does a unified cleanup of these remaining redundant parameters.
 > 
-> Yeah, I was thinking SLD was only being exposed if the host is sld_warn.
-> I'll work with Xiaoyao to figure out a cleaner interface for this code.
-
-...
-
-> > So we can go with the proposed mode of allowing the write but not
-> > propagating it. If the resulting split lock #AC originates from CPL != 3
-> > then the guest will be killed with SIGBUS. If it originates from CPL ==
-> > 3 and the guest has user #AC disabled then it will be killed as well.
+> This series of patches has completely cleaned the architecture of
+> arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
+> the large number of modified codes, a separate patch is made for each
+> platform. On the ppc platform, there is also a redundant structure
+> pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
+> separately.
 > 
-> An idea that's been floated around to avoid killing the guest on a CPL==3
-> split-lock #AC is to add a STICKY bit to MSR_TEST_CTRL that KVM can
-> virtualize to tell the guest that attempting to disable SLD is futile,
-> e.g. so that the guest can kill its misbehaving userspace apps instead of
-> trying to disable SLD and getting killed by the host.
-
-Circling back to this.  KVM needs access to sld_state in one form or another
-if we want to add a KVM hint when the host is in fatal mode.  Three options
-I've come up with:
-
-  1. Bite the bullet and export sld_state.  
-
-  2. Add an is_split_fatal_wrapper().  Ugly since it needs to be non-inline
-     to avoid triggering (1).
-
-  3. Add a synthetic feature flag, e.g. X86_FEATURE_SLD_FATAL, and drop
-     sld_state altogether.
-
-I like (3) because it requires the least amount of code when all is said
-and done, doesn't require more exports, and as a bonus it'd probably be nice
-for userspace to see sld_fatal in /proc/cpuinfo.
-
-Thoughts?
+> ---
+> v4 change:
+>    mips: fixes two errors in entry.c.
+> 
+> v3 change:
+>    Keep the existing `vcpu->run` in the function body unchanged.
+> 
+> v2 change:
+>    s390 retains the original variable name and minimizes modification.
+> 
+> Tianjia Zhang (7):
+>    KVM: s390: clean up redundant 'kvm_run' parameters
+>    KVM: arm64: clean up redundant 'kvm_run' parameters
+>    KVM: PPC: Remove redundant kvm_run from vcpu_arch
+>    KVM: PPC: clean up redundant 'kvm_run' parameters
+>    KVM: PPC: clean up redundant kvm_run parameters in assembly
+>    KVM: MIPS: clean up redundant 'kvm_run' parameters
+>    KVM: MIPS: clean up redundant kvm_run parameters in assembly
+> 
+>   arch/arm64/include/asm/kvm_coproc.h      |  12 +--
+>   arch/arm64/include/asm/kvm_host.h        |  11 +--
+>   arch/arm64/include/asm/kvm_mmu.h         |   2 +-
+>   arch/arm64/kvm/handle_exit.c             |  36 +++----
+>   arch/arm64/kvm/sys_regs.c                |  13 ++-
+>   arch/mips/include/asm/kvm_host.h         |  32 +------
+>   arch/mips/kvm/emulate.c                  |  59 ++++--------
+>   arch/mips/kvm/entry.c                    |  21 ++---
+>   arch/mips/kvm/mips.c                     |  14 +--
+>   arch/mips/kvm/trap_emul.c                | 114 ++++++++++-------------
+>   arch/mips/kvm/vz.c                       |  26 ++----
+>   arch/powerpc/include/asm/kvm_book3s.h    |  16 ++--
+>   arch/powerpc/include/asm/kvm_host.h      |   1 -
+>   arch/powerpc/include/asm/kvm_ppc.h       |  27 +++---
+>   arch/powerpc/kvm/book3s.c                |   4 +-
+>   arch/powerpc/kvm/book3s.h                |   2 +-
+>   arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +--
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c   |   4 +-
+>   arch/powerpc/kvm/book3s_emulate.c        |  10 +-
+>   arch/powerpc/kvm/book3s_hv.c             |  64 ++++++-------
+>   arch/powerpc/kvm/book3s_hv_nested.c      |  12 +--
+>   arch/powerpc/kvm/book3s_interrupts.S     |  17 ++--
+>   arch/powerpc/kvm/book3s_paired_singles.c |  72 +++++++-------
+>   arch/powerpc/kvm/book3s_pr.c             |  33 ++++---
+>   arch/powerpc/kvm/booke.c                 |  39 ++++----
+>   arch/powerpc/kvm/booke.h                 |   8 +-
+>   arch/powerpc/kvm/booke_emulate.c         |   2 +-
+>   arch/powerpc/kvm/booke_interrupts.S      |   9 +-
+>   arch/powerpc/kvm/bookehv_interrupts.S    |  10 +-
+>   arch/powerpc/kvm/e500_emulate.c          |  15 ++-
+>   arch/powerpc/kvm/emulate.c               |  10 +-
+>   arch/powerpc/kvm/emulate_loadstore.c     |  32 +++----
+>   arch/powerpc/kvm/powerpc.c               |  72 +++++++-------
+>   arch/powerpc/kvm/trace_hv.h              |   6 +-
+>   arch/s390/kvm/kvm-s390.c                 |  23 +++--
+>   virt/kvm/arm/arm.c                       |   6 +-
+>   virt/kvm/arm/mmio.c                      |  11 ++-
+>   virt/kvm/arm/mmu.c                       |   5 +-
+>   38 files changed, 392 insertions(+), 470 deletions(-)
+> 
