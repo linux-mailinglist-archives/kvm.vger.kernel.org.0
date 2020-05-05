@@ -2,130 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CBE21C5581
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:36:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5174E1C5606
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:56:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728879AbgEEMgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 08:36:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51360 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728737AbgEEMgI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 08:36:08 -0400
+        id S1728984AbgEEM4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 08:56:46 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35996 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728497AbgEEM4q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 08:56:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588682167;
+        s=mimecast20190719; t=1588683404;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bsccUuRQy2jvqaOH6LGPQ4vtE+LhlW8wtgFKVDHoZ34=;
-        b=Fuz1dMCdmENHkQ02ItSNmjYcXYWx4toVKxKqYMlgz1/CLhJsACtBbFcezQ9elWIazb49C1
-        7kxcpObQJ1KvU1IbK3tbo3JNItbZSQqisrKa+ALlbs2qfGaAExLi1uDlgr+8DxCX15n08d
-        8mrdDTiumdR4UdYkpYqlh89EV2q4bZ4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-2j3nawNIOxe2ZSCd_nYM1A-1; Tue, 05 May 2020 08:36:05 -0400
-X-MC-Unique: 2j3nawNIOxe2ZSCd_nYM1A-1
-Received: by mail-wr1-f70.google.com with SMTP id a3so1134135wro.1
-        for <kvm@vger.kernel.org>; Tue, 05 May 2020 05:36:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bsccUuRQy2jvqaOH6LGPQ4vtE+LhlW8wtgFKVDHoZ34=;
-        b=dxlAVuONXVvKaYia5pVUiX5m/M7DWawUq2AY/zrafUvZflvvfZTWTOfXJp7aOp6jLN
-         e48stqiDphO3ezravC1ZVZD7X2T3WsEMIzUz93CZge2OrKjZDeNxQFnUiutDaRts8QXZ
-         XhftZY2EGDQ5pI2izYQmQiaAbbYi6rRfwI0UEA8RAsJ/Hs11p8HBRtH3kw4LI3Hy8ewt
-         bu492YR0VWT+lyfRQEMMx23rGgPffI3dykeghDOVH/jM76RN7EjEFSYea827S4rICsDg
-         JfgrYltzlspjXSsoJI5G9PrOh4YehSUq2YXXonIduFSCkGay55v0qq/ItYay3jv3TT8c
-         vCWQ==
-X-Gm-Message-State: AGi0PubKyVWJ1E8sYYDuf72MU1YcQRyq/FjR4kKDSi6zOOuPahkPGCnE
-        PgpPwDuLjaEl6P0UaqPn57fySxyx62ARqhPq88TY60u25sEUTSXY+GK2DodW9c39l/mZDGHzr1E
-        1mgIV/6172Xpj
-X-Received: by 2002:a1c:3884:: with SMTP id f126mr3489103wma.91.1588682164246;
-        Tue, 05 May 2020 05:36:04 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK2yQysqNlaBNEYFJEQoeRAd/S5v9BFxPbGikdmb1C+ke6RMlOFyst7gVZvWv7bHJDRTKfFpw==
-X-Received: by 2002:a1c:3884:: with SMTP id f126mr3489080wma.91.1588682164010;
-        Tue, 05 May 2020 05:36:04 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.132.175])
-        by smtp.gmail.com with ESMTPSA id 17sm3507092wmo.2.2020.05.05.05.36.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2020 05:36:03 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Fix build for evmcs.h
-To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20200504220607.99627-1-peterx@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <aebe1f8a-8c58-7508-80ed-848d3143fcad@redhat.com>
-Date:   Tue, 5 May 2020 14:36:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        bh=8yWr9it9UVIjIozeui22t/drP1zIlGmphNP17FFVfPs=;
+        b=OY3sDZeWrvTWdSjmLPL+cJXn//CEeNQvkbUKj9l6EPuyfewKxFGFRE+P5Lhe0ORJre0thh
+        JEE7Bck9IhZ+GhsaHAnGnIAO79LbQp7SgHTdQtVlFk2z0y6IGDuiCCJjtAd8w8XvF6Gw/Y
+        D3p+B6OaxnWfMF/UQZoDVS1Rn4rMBho=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-WUe0cykJMFWeOHT_sxDAZg-1; Tue, 05 May 2020 08:56:39 -0400
+X-MC-Unique: WUe0cykJMFWeOHT_sxDAZg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7262E108BD15;
+        Tue,  5 May 2020 12:56:38 +0000 (UTC)
+Received: from gondolin (ovpn-112-219.ams2.redhat.com [10.36.112.219])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12F5A5C1B2;
+        Tue,  5 May 2020 12:56:36 +0000 (UTC)
+Date:   Tue, 5 May 2020 14:56:34 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>
+Subject: Re: [PATCH v4 0/8] s390x/vfio-ccw: Channel Path Handling [KVM]
+Message-ID: <20200505145435.40113d4c.cohuck@redhat.com>
+In-Reply-To: <20200505122745.53208-1-farman@linux.ibm.com>
+References: <20200505122745.53208-1-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200504220607.99627-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/20 00:06, Peter Xu wrote:
-> I got this error when building kvm selftests:
-> 
-> /usr/bin/ld: /home/xz/git/linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:222: multiple definition of `current_evmcs'; /tmp/cco1G48P.o:/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:222: first defined here
-> /usr/bin/ld: /home/xz/git/linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:223: multiple definition of `current_vp_assist'; /tmp/cco1G48P.o:/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:223: first defined here
-> 
-> I think it's because evmcs.h is included both in a test file and a lib file so
-> the structs have multiple declarations when linking.  After all it's not a good
-> habit to declare structs in the header files.
-> 
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
-> 
-> I initially thought it was something about my GCC 10 upgrade that I recently
-> did to my laptop - gcc10 even fails the build of the latest kernel after
-> all (though it turns out to be a kernel bug on build system rather than a gcc
-> bug). but I'm not sure about this one...
-> ---
->  tools/testing/selftests/kvm/include/evmcs.h  | 4 ++--
->  tools/testing/selftests/kvm/lib/x86_64/vmx.c | 3 +++
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/evmcs.h b/tools/testing/selftests/kvm/include/evmcs.h
-> index d8f4d6bfe05d..a034438b6266 100644
-> --- a/tools/testing/selftests/kvm/include/evmcs.h
-> +++ b/tools/testing/selftests/kvm/include/evmcs.h
-> @@ -219,8 +219,8 @@ struct hv_enlightened_vmcs {
->  #define HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_MASK	\
->  		(~((1ull << HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_SHIFT) - 1))
->  
-> -struct hv_enlightened_vmcs *current_evmcs;
-> -struct hv_vp_assist_page *current_vp_assist;
-> +extern struct hv_enlightened_vmcs *current_evmcs;
-> +extern struct hv_vp_assist_page *current_vp_assist;
->  
->  int vcpu_enable_evmcs(struct kvm_vm *vm, int vcpu_id);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-> index 6f17f69394be..4ae104f6ce69 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-> @@ -17,6 +17,9 @@
->  
->  bool enable_evmcs;
->  
-> +struct hv_enlightened_vmcs *current_evmcs;
-> +struct hv_vp_assist_page *current_vp_assist;
-> +
->  struct eptPageTableEntry {
->  	uint64_t readable:1;
->  	uint64_t writable:1;
-> 
+On Tue,  5 May 2020 14:27:37 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Queued, thanks.
+> Here is a new pass at the channel-path handling code for vfio-ccw.
+> Changes from previous versions are recorded in git notes for each patch.
+> Patches 5 through 7 got swizzled a little bit, in order to better
+> compartmentalize the code they define. Basically, the IRQ definitions
+> were moved from patch 7 to 5, and then patch 6 was placed ahead of
+> patch 5.
+> 
+> I have put Conny's r-b's on patches 1, 3, 4, (new) 5, and 8, and believe
+> I have addressed all comments from v3, with two exceptions:
+> 
+> > I'm wondering if we should make this [vfio_ccw_schib_region_{write,release}]
+> > callback optional (not in this patch).  
+> 
+> I have that implemented on top of this series, and will send later as part
+> of a larger cleanup series.
 
-Paolo
+Good, sounds reasonable.
+
+> 
+> > One thing though that keeps coming up: do we need any kind of
+> > serialization? Can there be any confusion from concurrent reads from
+> > userspace, or are we sure that we always provide consistent data?  
+> 
+> I _think_ this is in good shape, though as suggested another set of
+> eyeballs would be nice. There is still a problem on the main
+> interrupt/FSM path, which I'm not attempting to address here.
+
+I'll try to think about it some more.
+
+> 
+> With this code plus the corresponding QEMU series (posted momentarily)
+> applied I am able to configure off/on a CHPID (for example, by issuing
+> "chchp -c 0/1 xx" on the host), and the guest is able to see both the
+> events and reflect the updated path masks in its structures.
+> 
+> v3: https://lore.kernel.org/kvm/20200417023001.65006-1-farman@linux.ibm.com/
+> v2: https://lore.kernel.org/kvm/20200206213825.11444-1-farman@linux.ibm.com/
+> v1: https://lore.kernel.org/kvm/20191115025620.19593-1-farman@linux.ibm.com/
+> 
+> Eric Farman (3):
+>   vfio-ccw: Refactor the unregister of the async regions
+>   vfio-ccw: Refactor IRQ handlers
+>   vfio-ccw: Add trace for CRW event
+> 
+> Farhan Ali (5):
+>   vfio-ccw: Introduce new helper functions to free/destroy regions
+>   vfio-ccw: Register a chp_event callback for vfio-ccw
+>   vfio-ccw: Introduce a new schib region
+>   vfio-ccw: Introduce a new CRW region
+>   vfio-ccw: Wire up the CRW irq and CRW region
+> 
+>  Documentation/s390/vfio-ccw.rst     |  38 ++++++-
+>  drivers/s390/cio/Makefile           |   2 +-
+>  drivers/s390/cio/vfio_ccw_chp.c     | 148 +++++++++++++++++++++++++
+>  drivers/s390/cio/vfio_ccw_drv.c     | 165 ++++++++++++++++++++++++++--
+>  drivers/s390/cio/vfio_ccw_ops.c     |  65 ++++++++---
+>  drivers/s390/cio/vfio_ccw_private.h |  16 +++
+>  drivers/s390/cio/vfio_ccw_trace.c   |   1 +
+>  drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++
+>  include/uapi/linux/vfio.h           |   3 +
+>  include/uapi/linux/vfio_ccw.h       |  18 +++
+>  10 files changed, 458 insertions(+), 28 deletions(-)
+>  create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
+> 
 
