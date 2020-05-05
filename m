@@ -2,155 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C2811C561E
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 15:00:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D57F1C562B
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 15:02:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729021AbgEENA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 09:00:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24029 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728268AbgEENA1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 09:00:27 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045CZjf6018171;
-        Tue, 5 May 2020 09:00:27 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s45tu31t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 09:00:25 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045CaATw020820;
-        Tue, 5 May 2020 09:00:24 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s45tu2yb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 09:00:23 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045CtnAm007314;
-        Tue, 5 May 2020 13:00:21 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04wdc.us.ibm.com with ESMTP id 30s0g6rqgm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 13:00:21 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045D0LMY49152264
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 May 2020 13:00:21 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0BDCF12405B;
-        Tue,  5 May 2020 13:00:21 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 96862124060;
-        Tue,  5 May 2020 13:00:20 +0000 (GMT)
-Received: from [9.160.31.2] (unknown [9.160.31.2])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  5 May 2020 13:00:20 +0000 (GMT)
-Subject: Re: [PATCH v4 0/8] s390x/vfio-ccw: Channel Path Handling [KVM]
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>
-References: <20200505122745.53208-1-farman@linux.ibm.com>
- <20200505145435.40113d4c.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <14c3cf68-c1e5-b46f-d75e-955dbdd63df8@linux.ibm.com>
-Date:   Tue, 5 May 2020 09:00:20 -0400
+        id S1728939AbgEENCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 09:02:20 -0400
+Received: from foss.arm.com ([217.140.110.172]:39348 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728512AbgEENCU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 09:02:20 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 69E5230E;
+        Tue,  5 May 2020 06:02:19 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 977013F68F;
+        Tue,  5 May 2020 06:02:18 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 26/32] vesa: Create device exactly once
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-27-alexandru.elisei@arm.com>
+ <f80227c9-a57c-952f-f362-58d15e19690e@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f4e71b50-1391-f2ac-dc31-01d19b42dfac@arm.com>
+Date:   Tue, 5 May 2020 14:02:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200505145435.40113d4c.cohuck@redhat.com>
+In-Reply-To: <f80227c9-a57c-952f-f362-58d15e19690e@arm.com>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-05-05_08:2020-05-04,2020-05-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
- phishscore=0 clxscore=1015 suspectscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005050100
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
+On 4/2/20 9:58 AM, André Przywara wrote:
+> On 26/03/2020 15:24, Alexandru Elisei wrote:
+>> A vesa device is used by the SDL, GTK or VNC framebuffers. Don't allow the
+>> user to specify more than one of these options because kvmtool will create
+>> identical devices and bad things will happen:
+>>
+>> $ ./lkvm run -c2 -m2048 -k bzImage --sdl --gtk
+>>   # lkvm run -k bzImage -m 2048 -c 2 --name guest-10159
+>>   Error: device region [d0000000-d012bfff] would overlap device region [d0000000-d012bfff]
+>> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+>> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+>> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+>> ======= Backtrace: =========
+>> ======= Backtrace: =========
+>> /lib/x86_64-linux-gnu/libc.so.6(+0x777e5)[0x7fae0ed447e5]
+>> ======= Backtrace: =========
+>> /lib/x86_64-linux-gnu/libc.so.6/lib/x86_64-linux-gnu/libc.so.6(+0x8037a)[0x7fae0ed4d37a]
+>> (+0x777e5)[0x7fae0ed447e5]
+>> /lib/x86_64-linux-gnu/libc.so.6(+0x777e5)[0x7fae0ed447e5]
+>> /lib/x86_64-linux-gnu/libc.so.6(+0x8037a)[0x7fae0ed4d37a]
+>> /lib/x86_64-linux-gnu/libc.so.6(cfree+0x4c)[0x7fae0ed5153c]
+>> *** Error in `./lkvm': free(): invalid pointer: 0x00007fad78002e40 ***
+>> /lib/x86_64-linux-gnu/libglib-2.0.so.0(g_string_free+0x3b)[0x7fae0f814dab]
+>> /lib/x86_64-linux-gnu/libglib-2.0.so.0(g_string_free+0x3b)[0x7fae0f814dab]
+>> /usr/lib/x86_64-linux-gnu/libgtk-3.so.0(+0x21121c)[0x7fae1023321c]
+>> /usr/lib/x86_64-linux-gnu/libgtk-3.so.0(+0x21121c)[0x7fae1023321c]
+>> ======= Backtrace: =========
+>> Aborted (core dumped)
+>>
+>> The vesa device is explicitly created during the initialization phase of
+>> the above framebuffers. Remove the superfluous check for their existence.
+>>
+> Not really happy about this pointer comparison, but I don't see a better
+> way, and it's surely good enough for that purpose.
 
-On 5/5/20 8:56 AM, Cornelia Huck wrote:
-> On Tue,  5 May 2020 14:27:37 +0200
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> Here is a new pass at the channel-path handling code for vfio-ccw.
->> Changes from previous versions are recorded in git notes for each patch.
->> Patches 5 through 7 got swizzled a little bit, in order to better
->> compartmentalize the code they define. Basically, the IRQ definitions
->> were moved from patch 7 to 5, and then patch 6 was placed ahead of
->> patch 5.
->>
->> I have put Conny's r-b's on patches 1, 3, 4, (new) 5, and 8, and believe
->> I have addressed all comments from v3, with two exceptions:
->>
->>> I'm wondering if we should make this [vfio_ccw_schib_region_{write,release}]
->>> callback optional (not in this patch).  
->>
->> I have that implemented on top of this series, and will send later as part
->> of a larger cleanup series.
-> 
-> Good, sounds reasonable.
-> 
->>
->>> One thing though that keeps coming up: do we need any kind of
->>> serialization? Can there be any confusion from concurrent reads from
->>> userspace, or are we sure that we always provide consistent data?  
->>
->> I _think_ this is in good shape, though as suggested another set of
->> eyeballs would be nice. There is still a problem on the main
->> interrupt/FSM path, which I'm not attempting to address here.
-> 
-> I'll try to think about it some more.
+I've been giving this patch some thought. I think the fix is wrong. The problem is
+that the user is allowed to specify more than one of --gtk, --sdl and --vnc. I'll
+rewrite the patch to fix that, and print an error message that is actually useful
+for the user.
 
-Re: interrupt/FSM, I now have two separate patches that each straighten
-things out on their own.  And a handful of debug patches that probably
-only make things worse.  :)  I'll get one/both of those meaningful
-patches sent to the list so we can have that discussion separately from
-this code.
-
-> 
+Thanks,
+Alex
+>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+>
+> Cheers,
+> Andre
+>
+>> ---
+>>  hw/vesa.c | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
 >>
->> With this code plus the corresponding QEMU series (posted momentarily)
->> applied I am able to configure off/on a CHPID (for example, by issuing
->> "chchp -c 0/1 xx" on the host), and the guest is able to see both the
->> events and reflect the updated path masks in its structures.
+>> diff --git a/hw/vesa.c b/hw/vesa.c
+>> index dd59a112330b..8071ad153f27 100644
+>> --- a/hw/vesa.c
+>> +++ b/hw/vesa.c
+>> @@ -61,8 +61,11 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+>>  	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
+>>  	BUILD_BUG_ON(VESA_MEM_SIZE < VESA_BPP/8 * VESA_WIDTH * VESA_HEIGHT);
+>>  
+>> -	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
+>> -		return NULL;
+>> +	if (device__find_dev(vesa_device.bus_type, vesa_device.dev_num) == &vesa_device) {
+>> +		r = -EEXIST;
+>> +		goto out_error;
+>> +	}
+>> +
+>>  	vesa_base_addr = pci_get_io_port_block(PCI_IO_SIZE);
+>>  	r = ioport__register(kvm, vesa_base_addr, &vesa_io_ops, PCI_IO_SIZE, NULL);
+>>  	if (r < 0)
 >>
->> v3: https://lore.kernel.org/kvm/20200417023001.65006-1-farman@linux.ibm.com/
->> v2: https://lore.kernel.org/kvm/20200206213825.11444-1-farman@linux.ibm.com/
->> v1: https://lore.kernel.org/kvm/20191115025620.19593-1-farman@linux.ibm.com/
->>
->> Eric Farman (3):
->>   vfio-ccw: Refactor the unregister of the async regions
->>   vfio-ccw: Refactor IRQ handlers
->>   vfio-ccw: Add trace for CRW event
->>
->> Farhan Ali (5):
->>   vfio-ccw: Introduce new helper functions to free/destroy regions
->>   vfio-ccw: Register a chp_event callback for vfio-ccw
->>   vfio-ccw: Introduce a new schib region
->>   vfio-ccw: Introduce a new CRW region
->>   vfio-ccw: Wire up the CRW irq and CRW region
->>
->>  Documentation/s390/vfio-ccw.rst     |  38 ++++++-
->>  drivers/s390/cio/Makefile           |   2 +-
->>  drivers/s390/cio/vfio_ccw_chp.c     | 148 +++++++++++++++++++++++++
->>  drivers/s390/cio/vfio_ccw_drv.c     | 165 ++++++++++++++++++++++++++--
->>  drivers/s390/cio/vfio_ccw_ops.c     |  65 ++++++++---
->>  drivers/s390/cio/vfio_ccw_private.h |  16 +++
->>  drivers/s390/cio/vfio_ccw_trace.c   |   1 +
->>  drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++
->>  include/uapi/linux/vfio.h           |   3 +
->>  include/uapi/linux/vfio_ccw.h       |  18 +++
->>  10 files changed, 458 insertions(+), 28 deletions(-)
->>  create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
->>
-> 
