@@ -2,123 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 872BC1C4FCB
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 10:02:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06BD81C4FD4
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 10:04:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728217AbgEEICE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 04:02:04 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:45756 "EHLO
-        forwardcorp1p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725766AbgEEICD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 04:02:03 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::301])
-        by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 980322E152E;
-        Tue,  5 May 2020 11:02:00 +0300 (MSK)
-Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
-        by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id 1uP1N2AxLk-1xbu0oLA;
-        Tue, 05 May 2020 11:02:00 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1588665720; bh=M6FIiLV7jSLfXNrCrNok4CWJZSeN7a/htiSx6vThNRQ=;
-        h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
-        b=gt36QSU5AVIrTwOl1DjSrzrZxVCEL+gZKnWoRBqclxY9ntLUOkgYAGe4iPXpiS5Iu
-         srgo4Dn+OLvoShn+oNyi8nVNjDTBNkH+/bXkH91lMVh27E8pFHQeKaXWTYjviMiZ2u
-         WvrNLgGlypNkH7nIn0ziO4eabSla5mYVZwT9Yux0=
-Authentication-Results: mxbackcorp1o.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b080:7013::1:1])
-        by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id yw9eFxp7nr-1xWSXHHR;
-        Tue, 05 May 2020 11:01:59 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Date:   Tue, 5 May 2020 11:01:58 +0300
-From:   Roman Kagan <rvkagan@yandex-team.ru>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
-Message-ID: <20200505080158.GA400685@rvkaganb>
-Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-References: <20200416083847.1776387-1-arilou@gmail.com>
- <20200416120040.GA3745197@rvkaganb>
- <20200416125430.GL7606@jondnuc>
- <20200417104251.GA3009@rvkaganb>
- <20200418064127.GB1917435@jondnuc>
- <20200424133742.GA2439920@rvkaganb>
- <20200425061637.GF1917435@jondnuc>
- <20200503191900.GA389956@rvkaganb>
- <87a72nelup.fsf@vitty.brq.redhat.com>
+        id S1726129AbgEEIEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 04:04:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36687 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725766AbgEEIEm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 04:04:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588665880;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=U/X846ocdDRkR6DLvj/ZzXDH4y/nWDA8hqWi/Ryk5iY=;
+        b=PRQtNaZNYUoXku/PZ3w7JMzVWKOnAia5pGKelMiHh7QZKzW6i2FhQNcg3J/+Z+j/SbeH3O
+        jgiWe+3mBz/h+ebBiK4mjw1dyShlNCYiILE/VB5lMnvtbN745/+uOFC7gSKooRWXNjvKf6
+        qlGrSPkJBHuJDomv5ay0a5djQYGvjBA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-wEA5geRXMVmsQYF1rgapHw-1; Tue, 05 May 2020 04:04:39 -0400
+X-MC-Unique: wEA5geRXMVmsQYF1rgapHw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6F6080183C;
+        Tue,  5 May 2020 08:04:37 +0000 (UTC)
+Received: from [10.36.114.14] (ovpn-114-14.ams2.redhat.com [10.36.114.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F406C6249B;
+        Tue,  5 May 2020 08:04:35 +0000 (UTC)
+Subject: Re: [PATCH] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
+ instruction
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Qian Cai <cailca@icloud.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+References: <20200505073525.2287-1-borntraeger@de.ibm.com>
+ <20200505095332.528254e5.cohuck@redhat.com>
+ <f3512a63-91dc-ab9a-a9ab-3e2a6e24fea3@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <59f1b90c-47d6-2661-0e99-548a53c9bcd6@redhat.com>
+Date:   Tue, 5 May 2020 10:04:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a72nelup.fsf@vitty.brq.redhat.com>
+In-Reply-To: <f3512a63-91dc-ab9a-a9ab-3e2a6e24fea3@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 04, 2020 at 05:55:10PM +0200, Vitaly Kuznetsov wrote:
-> Roman Kagan <rvkagan@yandex-team.ru> writes:
+On 05.05.20 09:55, Christian Borntraeger wrote:
 > 
-> > On Sat, Apr 25, 2020 at 09:16:37AM +0300, Jon Doron wrote:
-> >
-> >> If that's indeed the case then probably the only thing needs fixing in my
-> >> scenario is in QEMU where it should not really care for the SCONTROL if it's
-> >> enabled or not.
-> >
-> > Right.  However, even this shouldn't be necessary as SeaBIOS from that
-> > branch would enable SCONTROL and leave it that way when passing the
-> > control over to the bootloader, so, unless something explicitly clears
-> > SCONTROL, it should remain set thereafter.  I'd rather try going ahead
-> > with that scheme first, because making QEMU ignore SCONTROL appears to
-> > violate the spec.
 > 
-> FWIW, I just checked 'genuine' Hyper-V 2016 with
+> On 05.05.20 09:53, Cornelia Huck wrote:
+>> On Tue,  5 May 2020 09:35:25 +0200
+>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>
+>>> In LPAR we will only get an intercept for FC==3 for the PQAP
+>>> instruction. Running nested under z/VM can result in other intercepts as
+>>> well, for example PQAP(QCI). So the WARN_ON_ONCE is not right. Let
+>>> us simply remove it.
+>>
+>> While I agree with removing the WARN_ON_ONCE, I'm wondering why z/VM
+>> gives us intercepts for those fcs... is that just a result of nesting
+>> (or the z/VM implementation), or is there anything we might want to do?
 > 
-> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-> index fd51bac11b46..c5ea759728d9 100644
-> --- a/arch/x86/hyperv/hv_init.c
-> +++ b/arch/x86/hyperv/hv_init.c
-> @@ -314,10 +314,14 @@ void __init hyperv_init(void)
->         u64 guest_id, required_msrs;
->         union hv_x64_msr_hypercall_contents hypercall_msr;
->         int cpuhp, i;
-> +       u64 val;
->  
->         if (x86_hyper_type != X86_HYPER_MS_HYPERV)
->                 return;
->  
-> +       hv_get_synic_state(val);
-> +       printk("Hyper-V: SCONTROL state: %llx\n", val);
-> +
->         /* Absolutely required MSRs */
->         required_msrs = HV_X64_MSR_HYPERCALL_AVAILABLE |
->                 HV_X64_MSR_VP_INDEX_AVAILABLE;
+> Yes nesting. 
+> The ECA bit for interpretion is an effective one. So if the ECA bit is off
+> in z/VM (no crypto cards) our ECA bit is basically ignored as these bits
+> are ANDed.
+> I asked Tony to ask the z/VM team if that is the case here.
+> 
 
-Thanks for having done this check!
+So we can't detect if we have support for ECA_APIE, because there is no
+explicit feature bit, right? Rings a bell. Still an ugly
+hardware/firmware specification.
 
-> and it seems the default state of HV_X64_MSR_SCONTROL is '1', we should
-> probably do the same.
+Seems to be the right thing to do
 
-This is the state the OS sees, after the firmware.  You'd see the same
-with QEMU/KVM if you used Hyper-V-aware SeaBIOS or OVMF.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-> Is there any reason to *not* do this in KVM when
-> KVM_CAP_HYPERV_SYNIC[,2] is enabled?
-
-Yes there is: quoting Hyper-V TLFS v6.0 11.8.1:
-
-  At virtual processor creation time and upon processor reset, the value
-  of this SCONTROL (SynIC control register) is 0x0000000000000000. Thus,
-  message queuing and event flag notifications will be disabled.
-
-And, even if we decide to violate the spec it's better done in
-userspace, loading the initial value and adjusting the synic state at
-vcpu reset.
-
-However leaving it up to the guest (firmware or OS) looks more natural
-to me.
-
+-- 
 Thanks,
-Roman.
+
+David / dhildenb
+
