@@ -2,124 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 127911C4D10
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 06:15:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A5C61C4D65
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 06:46:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbgEEEPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 00:15:40 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:16300 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725272AbgEEEPj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 00:15:39 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R491e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04397;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0TxXItq5_1588652118;
-Received: from 30.27.236.135(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TxXItq5_1588652118)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 05 May 2020 12:15:22 +0800
-Subject: Re: [PATCH v4 0/7] clean up redundant 'kvm_run' parameters
-To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <b660f6cb-a89b-2452-c15b-095add6413ec@linux.alibaba.com>
-Date:   Tue, 5 May 2020 12:15:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726638AbgEEEqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 00:46:46 -0400
+Received: from mga06.intel.com ([134.134.136.31]:7601 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725298AbgEEEqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 00:46:46 -0400
+IronPort-SDR: leSQzBa6urcowRP8QAIIvwb4jo1+IcbQJcnP5aIjTVCwcQKNpT6gurwE1oeJBePs0Avryq8ZhI
+ fHOH8jmZmIcA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2020 21:46:45 -0700
+IronPort-SDR: wXCpqmVPfLx0GyKFbxYYM5IXnFBMDbSAwZ++Mtx93Kpb+zm7tKcl9CElJQ4sRfjtcNmtEJFpaT
+ YmW548qCFYGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,354,1583222400"; 
+   d="scan'208";a="369300834"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by fmsmga001.fm.intel.com with ESMTP; 04 May 2020 21:46:45 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
+        KarimAllah Raslan <karahmed@amazon.de>
+Subject: [PATCH v3] KVM: nVMX: Skip IBPB when switching between vmcs01 and vmcs02
+Date:   Mon,  4 May 2020 21:46:44 -0700
+Message-Id: <20200505044644.16563-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-In-Reply-To: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini, any opinion on this?
+Skip the Indirect Branch Prediction Barrier that is triggered on a VMCS
+switch when running with spectre_v2_user=on/auto if the switch is
+guaranteed to be between two VMCSes in the same guest, i.e. between
+vmcs01 and vmcs02.  The IBPB is intended to prevent one guest from
+attacking another, which is unnecessary in the nested case as it's the
+same guest from KVM's perspective.
 
-Thanks and best,
-Tianjia
+This all but eliminates the overhead observed for nested VMX transitions
+when running with CONFIG_RETPOLINE=y and spectre_v2_user=on/auto, which
+can be significant, e.g. roughly 3x on current systems.
 
-On 2020/4/27 12:35, Tianjia Zhang wrote:
-> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
-> structure. For historical reasons, many kvm-related function parameters
-> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
-> patch does a unified cleanup of these remaining redundant parameters.
-> 
-> This series of patches has completely cleaned the architecture of
-> arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
-> the large number of modified codes, a separate patch is made for each
-> platform. On the ppc platform, there is also a redundant structure
-> pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
-> separately.
-> 
-> ---
-> v4 change:
->    mips: fixes two errors in entry.c.
-> 
-> v3 change:
->    Keep the existing `vcpu->run` in the function body unchanged.
-> 
-> v2 change:
->    s390 retains the original variable name and minimizes modification.
-> 
-> Tianjia Zhang (7):
->    KVM: s390: clean up redundant 'kvm_run' parameters
->    KVM: arm64: clean up redundant 'kvm_run' parameters
->    KVM: PPC: Remove redundant kvm_run from vcpu_arch
->    KVM: PPC: clean up redundant 'kvm_run' parameters
->    KVM: PPC: clean up redundant kvm_run parameters in assembly
->    KVM: MIPS: clean up redundant 'kvm_run' parameters
->    KVM: MIPS: clean up redundant kvm_run parameters in assembly
-> 
->   arch/arm64/include/asm/kvm_coproc.h      |  12 +--
->   arch/arm64/include/asm/kvm_host.h        |  11 +--
->   arch/arm64/include/asm/kvm_mmu.h         |   2 +-
->   arch/arm64/kvm/handle_exit.c             |  36 +++----
->   arch/arm64/kvm/sys_regs.c                |  13 ++-
->   arch/mips/include/asm/kvm_host.h         |  32 +------
->   arch/mips/kvm/emulate.c                  |  59 ++++--------
->   arch/mips/kvm/entry.c                    |  21 ++---
->   arch/mips/kvm/mips.c                     |  14 +--
->   arch/mips/kvm/trap_emul.c                | 114 ++++++++++-------------
->   arch/mips/kvm/vz.c                       |  26 ++----
->   arch/powerpc/include/asm/kvm_book3s.h    |  16 ++--
->   arch/powerpc/include/asm/kvm_host.h      |   1 -
->   arch/powerpc/include/asm/kvm_ppc.h       |  27 +++---
->   arch/powerpc/kvm/book3s.c                |   4 +-
->   arch/powerpc/kvm/book3s.h                |   2 +-
->   arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +--
->   arch/powerpc/kvm/book3s_64_mmu_radix.c   |   4 +-
->   arch/powerpc/kvm/book3s_emulate.c        |  10 +-
->   arch/powerpc/kvm/book3s_hv.c             |  64 ++++++-------
->   arch/powerpc/kvm/book3s_hv_nested.c      |  12 +--
->   arch/powerpc/kvm/book3s_interrupts.S     |  17 ++--
->   arch/powerpc/kvm/book3s_paired_singles.c |  72 +++++++-------
->   arch/powerpc/kvm/book3s_pr.c             |  33 ++++---
->   arch/powerpc/kvm/booke.c                 |  39 ++++----
->   arch/powerpc/kvm/booke.h                 |   8 +-
->   arch/powerpc/kvm/booke_emulate.c         |   2 +-
->   arch/powerpc/kvm/booke_interrupts.S      |   9 +-
->   arch/powerpc/kvm/bookehv_interrupts.S    |  10 +-
->   arch/powerpc/kvm/e500_emulate.c          |  15 ++-
->   arch/powerpc/kvm/emulate.c               |  10 +-
->   arch/powerpc/kvm/emulate_loadstore.c     |  32 +++----
->   arch/powerpc/kvm/powerpc.c               |  72 +++++++-------
->   arch/powerpc/kvm/trace_hv.h              |   6 +-
->   arch/s390/kvm/kvm-s390.c                 |  23 +++--
->   virt/kvm/arm/arm.c                       |   6 +-
->   virt/kvm/arm/mmio.c                      |  11 ++-
->   virt/kvm/arm/mmu.c                       |   5 +-
->   38 files changed, 392 insertions(+), 470 deletions(-)
-> 
+Reported-by: Alexander Graf <graf@amazon.com>
+Cc: KarimAllah Raslan <karahmed@amazon.de>
+Cc: stable@vger.kernel.org
+Fixes: 15d45071523d ("KVM/x86: Add IBPB support")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+
+v3: Switch back to passing 'struct loaded_vmcs buddy', but keep the WARN
+    if the buddy VMCS isn't already loaded as well as the comment as to
+    why skipping IBPB in the nested case is ok. [Paolo]
+
+v2: Pass a boolean to indicate a nested VMCS switch and instead WARN if
+    the buddy VMCS is not already loaded.  [Alex]
+
+ arch/x86/kvm/vmx/nested.c |  2 +-
+ arch/x86/kvm/vmx/vmx.c    | 18 ++++++++++++++----
+ arch/x86/kvm/vmx/vmx.h    |  3 ++-
+ 3 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 2c36f3f53108..1a02bdfeeb2b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -303,7 +303,7 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
+ 	cpu = get_cpu();
+ 	prev = vmx->loaded_vmcs;
+ 	vmx->loaded_vmcs = vmcs;
+-	vmx_vcpu_load_vmcs(vcpu, cpu);
++	vmx_vcpu_load_vmcs(vcpu, cpu, prev);
+ 	vmx_sync_vmcs_host_state(vmx, prev);
+ 	put_cpu();
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 3ab6ca6062ce..06ee0572b929 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1311,10 +1311,12 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 		pi_set_on(pi_desc);
+ }
+ 
+-void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
++void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
++			struct loaded_vmcs *buddy)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	bool already_loaded = vmx->loaded_vmcs->cpu == cpu;
++	struct vmcs *prev;
+ 
+ 	if (!already_loaded) {
+ 		loaded_vmcs_clear(vmx->loaded_vmcs);
+@@ -1333,10 +1335,18 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
+ 		local_irq_enable();
+ 	}
+ 
+-	if (per_cpu(current_vmcs, cpu) != vmx->loaded_vmcs->vmcs) {
++	prev = per_cpu(current_vmcs, cpu);
++	if (prev != vmx->loaded_vmcs->vmcs) {
+ 		per_cpu(current_vmcs, cpu) = vmx->loaded_vmcs->vmcs;
+ 		vmcs_load(vmx->loaded_vmcs->vmcs);
+-		indirect_branch_prediction_barrier();
++
++		/*
++		 * No indirect branch prediction barrier needed when switching
++		 * the active VMCS within a guest, e.g. on nested VM-Enter.
++		 * The L1 VMM can protect itself with retpolines, IBPB or IBRS.
++		 */
++		if (!buddy || WARN_ON_ONCE(buddy->vmcs != prev))
++			indirect_branch_prediction_barrier();
+ 	}
+ 
+ 	if (!already_loaded) {
+@@ -1377,7 +1387,7 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+-	vmx_vcpu_load_vmcs(vcpu, cpu);
++	vmx_vcpu_load_vmcs(vcpu, cpu, NULL);
+ 
+ 	vmx_vcpu_pi_load(vcpu, cpu);
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index b5e773267abe..d3d48acc6bd9 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -320,7 +320,8 @@ struct kvm_vmx {
+ };
+ 
+ bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+-void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu);
++void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
++			struct loaded_vmcs *buddy);
+ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+ int allocate_vpid(void);
+ void free_vpid(int vpid);
+-- 
+2.26.0
+
