@@ -2,69 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E6581C5A66
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 17:03:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EF3B1C5AF2
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 17:23:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729602AbgEEPDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 11:03:18 -0400
-Received: from ms11p00im-qufo17281401.me.com ([17.58.38.51]:54760 "EHLO
-        ms11p00im-qufo17281401.me.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729808AbgEEPDR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 11:03:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-        s=1a1hai; t=1588690994;
-        bh=hugAbAdicGIQPpOvFrvbfBGy0r8E0OtiFQgVDHWbtiU=;
-        h=Content-Type:Subject:From:Date:Message-Id:To;
-        b=AjMXCm7DRH06AK4EFFiXQ+u4b2cF/AqmgrGvHdmFmpIRikerunRvCtZitXiAgwA/C
-         T1u2S4/NEQ/Ab4jxPyoN4usHVFQba9Lo0fM+xenwBbJSJ+DvKoKHr0CAIR+6+a19qE
-         bBbOa2QA9KgWHY6W7oSoESSE2TNa7x6dLk2FdrpBDxdE74qgEehSTsg6nGuIJfj20D
-         XJ+qiWqW8hXMi3uMWpiyx/FvHfqBBCE0y5OC8a9rSHRRjvPEwA1yY9UEwZ9xXy015O
-         y3Yt564GMxsT6GiFODY4AocB5PELfZmQ9zxAiM7fvYH2pXdEMd0T+jc/tpk6lVYxD0
-         ea0dUoN3rat1A==
-Received: from [192.168.1.153] (pool-71-184-117-43.bstnma.fios.verizon.net [71.184.117.43])
-        by ms11p00im-qufo17281401.me.com (Postfix) with ESMTPSA id 2E359BC02F9;
-        Tue,  5 May 2020 15:03:14 +0000 (UTC)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
- instruction
-From:   Qian Cai <cailca@icloud.com>
-In-Reply-To: <a9dcc2b8-15a5-73ff-5784-46c61c8eb2b8@de.ibm.com>
-Date:   Tue, 5 May 2020 11:03:12 -0400
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <9D5D39B5-B4FE-4371-A8D3-A03D7CC78C2F@icloud.com>
-References: <20200505083515.2720-1-borntraeger@de.ibm.com>
- <a9dcc2b8-15a5-73ff-5784-46c61c8eb2b8@de.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-05-05_08:2020-05-04,2020-05-05 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 clxscore=1011 mlxscore=0
- mlxlogscore=953 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-2002250000 definitions=main-2005050122
+        id S1729489AbgEEPXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 11:23:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21703 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729261AbgEEPXF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 11:23:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588692184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xGX2KJ9vX1ibQ6yn0wPSitM9s4UBDa59NfCH4/27h40=;
+        b=SWiXCdsevmMBv7ggT2vQwvZ3wG0p4lk/53i2O1NEtX0+kzMBGHda6YoKZXAzyUVRKr4PbT
+        OX5gIxaELgIM8f8eSgLB8frLHAKMSKJBUMNV5me3+SDUlRQWI7b6Qzybs0louhvaThpRu0
+        E421NkyjwQYUqiuzQBPP+gcfsD3MC+w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-CljtSOCiPW2IFU6WEmFjaw-1; Tue, 05 May 2020 11:23:01 -0400
+X-MC-Unique: CljtSOCiPW2IFU6WEmFjaw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65205800687;
+        Tue,  5 May 2020 15:22:59 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-211.rdu2.redhat.com [10.10.116.211])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD8431000327;
+        Tue,  5 May 2020 15:22:58 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 2620B222F75; Tue,  5 May 2020 11:22:58 -0400 (EDT)
+Date:   Tue, 5 May 2020 11:22:58 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 3/6] KVM: x86: interrupt based APF page-ready event
+ delivery
+Message-ID: <20200505152258.GB7155@redhat.com>
+References: <20200429093634.1514902-1-vkuznets@redhat.com>
+ <20200429093634.1514902-4-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200429093634.1514902-4-vkuznets@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Apr 29, 2020 at 11:36:31AM +0200, Vitaly Kuznetsov wrote:
+> Concerns were expressed around APF delivery via synthetic #PF exception as
+> in some cases such delivery may collide with real page fault. For type 2
+> (page ready) notifications we can easily switch to using an interrupt
+> instead. Introduce new MSR_KVM_ASYNC_PF2 mechanism.
+> 
+> One notable difference between the two mechanisms is that interrupt may not
+> get handled immediately so whenever we would like to deliver next event
+> (regardless of its type) we must be sure the guest had read and cleared
+> previous event in the slot.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  Documentation/virt/kvm/msr.rst       | 38 +++++++++++---
+>  arch/x86/include/asm/kvm_host.h      |  5 +-
+>  arch/x86/include/uapi/asm/kvm_para.h |  6 +++
+>  arch/x86/kvm/x86.c                   | 77 ++++++++++++++++++++++++++--
+>  4 files changed, 113 insertions(+), 13 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
+> index 33892036672d..7433e55f7184 100644
+> --- a/Documentation/virt/kvm/msr.rst
+> +++ b/Documentation/virt/kvm/msr.rst
+> @@ -203,14 +203,21 @@ data:
+>  	the hypervisor at the time of asynchronous page fault (APF)
+>  	injection to indicate type of asynchronous page fault. Value
+>  	of 1 means that the page referred to by the page fault is not
+> -	present. Value 2 means that the page is now available. Disabling
+> -	interrupt inhibits APFs. Guest must not enable interrupt
+> -	before the reason is read, or it may be overwritten by another
+> -	APF. Since APF uses the same exception vector as regular page
+> -	fault guest must reset the reason to 0 before it does
+> -	something that can generate normal page fault.  If during page
+> -	fault APF reason is 0 it means that this is regular page
+> -	fault.
+> +	present. Value 2 means that the page is now available.
+> +
+> +	Type 1 page (page missing) events are currently always delivered as
+> +	synthetic #PF exception. Type 2 (page ready) are either delivered
+> +	by #PF exception (when bit 3 of MSR_KVM_ASYNC_PF_EN is clear) or
+> +	via an APIC interrupt (when bit 3 set). APIC interrupt delivery is
+> +	controlled by MSR_KVM_ASYNC_PF2.
+> +
+> +	For #PF delivery, disabling interrupt inhibits APFs. Guest must
+> +	not enable interrupt before the reason is read, or it may be
+> +	overwritten by another APF. Since APF uses the same exception
+> +	vector as regular page fault guest must reset the reason to 0
+> +	before it does something that can generate normal page fault.
+> +	If during pagefault APF reason is 0 it means that this is regular
+> +	page fault.
 
+Hi Vitaly,
 
-> On May 5, 2020, at 5:15 AM, Christian Borntraeger =
-<borntraeger@de.ibm.com> wrote:
+Again, thinking about how errors will be delivered. Will these be using
+same interrupt path? 
 
-> applied for kvms390/master.
->=20
-> Qian Cai, can you verify that this fixes the issue?
+As you mentioned that if interrupts are disabled, APFs are blocked. That
+means host will fall back to synchronous fault? If yes, that means we
+will need a mechanism to report errors in synchronous path too.
 
-Thank you for tracking it down and removed the warning, so there is no =
-way for me to trigger it anymore. Otherwise, my simple test case works =
-fine for z/VM nested KVM here.
+Thanks
+Vivek
 
