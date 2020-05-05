@@ -2,181 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC1D81C5ED4
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:30:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 143CF1C5F7D
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 20:00:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730490AbgEERas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 13:30:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8826 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726350AbgEERar (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 13:30:47 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045H5vFS163158;
-        Tue, 5 May 2020 13:30:41 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30u8sqgmyf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 13:30:40 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045H63eX163699;
-        Tue, 5 May 2020 13:30:40 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30u8sqgmxk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 13:30:40 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045HKdA9015166;
-        Tue, 5 May 2020 17:30:37 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 30s0g5qf9e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 17:30:37 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045HUZou57868652
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 May 2020 17:30:35 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6B4A311C058;
-        Tue,  5 May 2020 17:30:35 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BBBB711C04A;
-        Tue,  5 May 2020 17:30:32 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.49.139])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  5 May 2020 17:30:32 +0000 (GMT)
-Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
- kernel statistics
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Jonathan Adams <jwadams@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Stefan Raspl <raspl@linux.ibm.com>
-References: <20200504110344.17560-1-eesposit@redhat.com>
- <alpine.DEB.2.22.394.2005041429210.224786@chino.kir.corp.google.com>
- <f2654143-b8e5-5a1f-8bd0-0cb0df2cd638@redhat.com>
- <CALMp9eQYcLr_REzDC1kWTHX4SJWt7x+Zd1KwNvS1YGd5TVM1xA@mail.gmail.com>
- <1d12f846-bf89-7b0a-5c71-e61d83b1a36f@redhat.com>
- <alpine.DEB.2.22.394.2005051003380.216575@chino.kir.corp.google.com>
- <6cfdf81f-caef-2489-0906-25915d9d58ff@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <02518c19-59b3-ffbd-cf50-dfdd0d277e0f@de.ibm.com>
-Date:   Tue, 5 May 2020 19:30:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <6cfdf81f-caef-2489-0906-25915d9d58ff@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-05-05_09:2020-05-04,2020-05-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 spamscore=0 lowpriorityscore=0 clxscore=1011 mlxscore=0
- mlxlogscore=999 impostorscore=0 adultscore=0 suspectscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005050131
+        id S1729695AbgEESAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 14:00:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53032 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730243AbgEESAC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 14:00:02 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 948072075A;
+        Tue,  5 May 2020 18:00:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588701601;
+        bh=yhuu/o3EzoH1HmkCKzTB+u/7msrEd4fTYFMNJZelWl4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=rpE0djmo3gOuHHXAwnJbfW+5wjchpdP9pNPQAcOSe31UDyhNdFk0BxmL11ktwyRyw
+         VOj80xtEX0kCByhcLsDolv1tWCDDRazIm9XiMEjuMO4QR5Rt33Jfn4J8lkv7+q6w2I
+         xTcaDYNIyYHmrfKINQonq2b8C6r2A3ki9iF5uOjM=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=big-swifty.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jW1rL-009bAi-C8; Tue, 05 May 2020 19:00:00 +0100
+Date:   Tue, 05 May 2020 18:59:56 +0100
+Message-ID: <86o8r2tg83.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from struct kvm
+In-Reply-To: <660a6638-5ee0-54c5-4a9d-d0d9235553ad@arm.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+        <20200422120050.3693593-4-maz@kernel.org>
+        <660a6638-5ee0-54c5-4a9d-d0d9235553ad@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adding Stefan Raspl, who has done a lot of kvm_stat work in the past.
+Hi James,
 
-On 05.05.20 19:21, Paolo Bonzini wrote:
-> On 05/05/20 19:07, David Rientjes wrote:
->>> I am totally in favor of having a binary format, but it should be
->>> introduced as a separate series on top of this one---and preferably by
->>> someone who has already put some thought into the problem (which
->>> Emanuele and I have not, beyond ensuring that the statsfs concept and
->>> API is flexible enough).
->>>
->> The concern is that once this series is merged then /sys/kernel/stats 
->> could be considered an ABI and there would be a reasonable expectation 
->> that it will remain stable, in so far as the stats that userspace is 
->> interested in are stable and not obsoleted.
->>
->> So is this a suggestion that the binary format becomes complementary to 
->> statsfs and provide a means for getting all stats from a single subsystem, 
->> or that this series gets converted to such a format before it is merged?
+On Tue, 05 May 2020 17:03:15 +0100,
+James Morse <james.morse@arm.com> wrote:
 > 
-> The binary format should be complementary.  The ASCII format should
-> indeed be considered stable even though individual statistics would come
-> and go.  It may make sense to allow disabling ASCII files via mount
-> and/or Kconfig options; but either way, the binary format can and should
-> be added on top.
+> Hi Marc,
 > 
-> I have not put any thought into what the binary format would look like
-> and what its features would be.  For example these are but the first
-> questions that come to mind:
+> On 22/04/2020 13:00, Marc Zyngier wrote:
+> > From: Christoffer Dall <christoffer.dall@arm.com>
+> > 
+> > As we are about to reuse our stage 2 page table manipulation code for
+> > shadow stage 2 page tables in the context of nested virtualization, we
+> > are going to manage multiple stage 2 page tables for a single VM.
+> > 
+> > This requires some pretty invasive changes to our data structures,
+> > which moves the vmid and pgd pointers into a separate structure and
+> > change pretty much all of our mmu code to operate on this structure
+> > instead.
+> > 
+> > The new structure is called struct kvm_s2_mmu.
+> > 
+> > There is no intended functional change by this patch alone.
 > 
-> * would it be possible to read/clear an arbitrary statistic with
-> pread/pwrite, or do you have to read all of them?
+> It's not obvious to me that VTCR_EL2.T0SZ is a per-vm thing, today
+> the size of the IPA space comes from the VMM, its not a
+> hardware/compile-time property. Where does the vEL2's T0SZ go?
+> ... but using this for nested guests would 'only' cause a
+> translation fault, it would still need handling in the emulation
+> code. So making it per-vm should be simpler.
+
+My reasoning is that this VTCR defines the virtual HW, and the guest's
+own VTCR_EL2 is just another guest system register. It is the role of
+the NV code to compose the two in a way that makes sense (delivering
+translation faults if the NV guest's S2 output range doesn't fit in
+the host's view of the VM IPA range).
+
+> But accessing VTCR is why the stage2_dissolve_p?d() stuff still
+> needs the kvm pointer, hence the backreference... it might be neater
+> to push the vtcr properties into kvm_s2_mmu that way you could drop
+> the kvm backref, and only things that take vm-wide locks would need
+> the kvm pointer. But I don't think it matters.
+
+That's an interesting consideration. I'll have a look.
+
+> I think I get it. I can't see anything that should be the other
+> vm/vcpu pointer.
 > 
-> * if userspace wants to read the schema just once and then read the
-> statistics many times, how is it informed of schema changes?
+> Reviewed-by: James Morse <james.morse@arm.com>
+
+Thanks!
+
+> Some boring fiddly stuff:
 > 
-> * and of course the details of how the schema (names of stat and
-> subsources) is encoded and what details it should include about the
-> values (e.g. type or just signedness).
+> [...]
 > 
-> Another possibility is to query stats via BPF.  This could be a third
-> way to access the stats, or it could be alternative to a binary format.
+> > @@ -125,24 +123,24 @@ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
+> >  	}
+> >  }
+> >  
+> > -static void __hyp_text __tlb_switch_to_host(struct kvm *kvm,
+> > +static void __hyp_text __tlb_switch_to_host(struct kvm_s2_mmu *mmu,
+> >  					    struct tlb_inv_context *cxt)
+> >  {
+> >  	if (has_vhe())
+> > -		__tlb_switch_to_host_vhe(kvm, cxt);
+> > +		__tlb_switch_to_host_vhe(cxt);
+> >  	else
+> > -		__tlb_switch_to_host_nvhe(kvm, cxt);
+> > +		__tlb_switch_to_host_nvhe(cxt);
+> >  }
 > 
-> Paolo
+> What does __tlb_switch_to_host() need the kvm_s2_mmu for?
+
+Not much. Obviously mechanical conversion of kvm->kvm_s2_mmu, and not
+finishing the job. I'll fix that.
+
 > 
+> [...]
+> 
+> 
+> >  void __hyp_text __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu)
+> >  {
+> > -	struct kvm *kvm = kern_hyp_va(kern_hyp_va(vcpu)->kvm);
+> > +	struct kvm_s2_mmu *mmu = kern_hyp_va(kern_hyp_va(vcpu)->arch.hw_mmu);
+> >  	struct tlb_inv_context cxt;
+> >
+> >  	/* Switch to requested VMID */
+> > -	__tlb_switch_to_guest(kvm, &cxt);
+> > +	__tlb_switch_to_guest(mmu, &cxt);
+> >
+> >  	__tlbi(vmalle1);
+> >  	dsb(nsh);
+> >  	isb();
+> >
+> > -	__tlb_switch_to_host(kvm, &cxt);
+> > +	__tlb_switch_to_host(mmu, &cxt);
+> >  }
+> 
+> Does this need the vcpu in the future?
+> Its the odd one out, the other tlb functions here take the s2_mmu, or nothing.
+> We only use the s2_mmu here.
+
+I think this was done as a way not impact the 32bit code (rest in
+peace). Definitely a candidate for immediate cleanup.
+
+> 
+> [...]
+> 
+> 
+> > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> > index e3b9ee268823b..2f99749048285 100644
+> > --- a/virt/kvm/arm/mmu.c
+> > +++ b/virt/kvm/arm/mmu.c
+> 
+> > @@ -96,31 +96,33 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+> >   *
+> >   * Function clears a PMD entry, flushes addr 1st and 2nd stage TLBs.
+> >   */
+> > -static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
+> > +static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
+> 
+> The comment above this function still has '@kvm:	pointer to kvm structure.'
+> 
+> [...]
+> 
+> 
+> > @@ -331,8 +339,9 @@ static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
+> >   * destroying the VM), otherwise another faulting VCPU may come in and mess
+> >   * with things behind our backs.
+> >   */
+> > -static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+> > +static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+> 
+> The comment above this function still has '@kvm:   The VM pointer'
+> 
+> [...]
+> 
+> > -static void stage2_flush_memslot(struct kvm *kvm,
+> > +static void stage2_flush_memslot(struct kvm_s2_mmu *mmu,
+> >  				 struct kvm_memory_slot *memslot)
+> >  {
+> 
+> Wouldn't something manipulating a memslot have to mess with a set of
+> kvm_s2_mmu once this is all assembled?  stage2_unmap_memslot() takes
+> struct kvm, it seems odd to pass one kvm_s2_mmu here.
+
+Indeed, that doesn't make sense. I guess this was done to match
+kvm_stage2_flush_range, which does need to take a kvm_s2_mmu (it is
+directly called from the nesting code).
+
+stage2_flush_memslot() only affects the "main" S2 PTs, so passing kvm
+here should be the right thing to do.
+
+> 
+> [...]
+> 
+> > @@ -886,21 +898,23 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+> 
+> > -int kvm_alloc_stage2_pgd(struct kvm *kvm)
+> > +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+> >  {
+> >  	phys_addr_t pgd_phys;
+> >  	pgd_t *pgd;
+> > +	int cpu;
+> >  
+> > -	if (kvm->arch.pgd != NULL) {
+> > +	if (mmu->pgd != NULL) {
+> >  		kvm_err("kvm_arch already initialized?\n");
+> 
+> Does this error message still make sense?
+
+Probably not anymore. I'll revisit that shortly.
+
+> 
+> 
+> >  		return -EINVAL;
+> >  	}
+> 
+> [...]
+> 
+> > @@ -1439,9 +1467,10 @@ static void stage2_wp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
+> >   * @addr:	range start address
+> >   * @end:	range end address
+> >   */
+> > -static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
+> > +static void stage2_wp_pmds(struct kvm_s2_mmu *mmu, pud_t *pud,
+> >  			   phys_addr_t addr, phys_addr_t end)
+> 
+> The comment above this function still has 'kvm:		kvm instance for the VM'.
+> 
+> 
+> >  {
+> > +	struct kvm *kvm = mmu->kvm;
+> >  	pmd_t *pmd;
+> >  	phys_addr_t next;
+> >  
+> > @@ -1461,14 +1490,15 @@ static void stage2_wp_pmds(struct kvm *kvm, pud_t *pud,
+> >  }
+> >  
+> >  /**
+> > - * stage2_wp_puds - write protect PGD range
+> > - * @pgd:	pointer to pgd entry
+> > - * @addr:	range start address
+> > - * @end:	range end address
+> > - */
+> > -static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
+> > +  * stage2_wp_puds - write protect PGD range
+> > +  * @pgd:	pointer to pgd entry
+> > +  * @addr:	range start address
+> > +  * @end:	range end address
+> > +  */
+> > +static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+> >  			    phys_addr_t addr, phys_addr_t end)
+> 
+> Comment was missing @kvm, now its missing @mmu....
+> 
+> 
+> >  {
+> > +	struct kvm *kvm __maybe_unused = mmu->kvm;
+> >  	pud_t *pud;
+> >  	phys_addr_t next;
+> >  
+> 
+> > @@ -1492,12 +1522,13 @@ static void  stage2_wp_puds(struct kvm *kvm, pgd_t *pgd,
+> >   * @addr:	Start address of range
+> >   * @end:	End address of range
+> >   */
+> > -static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+> > +static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+> 
+> The comment above this function still ... you get the picture.
+
+Thanks a lot for the careful review. I'll respin this shortly, as this
+is one of the patch I'd like to get in early.
+
+	M.
+
+-- 
+Jazz is not dead, it just smells funny.
