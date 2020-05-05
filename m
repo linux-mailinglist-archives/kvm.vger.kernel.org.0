@@ -2,115 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B3FC1C5E6E
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:12:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C2BE1C5E9C
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:16:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729829AbgEERMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 13:12:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30706 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729777AbgEERMn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 13:12:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588698762;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TWi1/ExgoalyHAzreZR6yoN0Ak47l5IuTf5AyOZQ3ik=;
-        b=J3VbiBvlbnW/bOjWdmtfYynu79rzK+vlINoDwmWcaTKqja1XSdBgUmE138nPcSu/GA1oG8
-        gZhG5MJiDv9m5GCO9jAlIHxYDeQWbLo6DlHtEPVOCg19hyRgUNw9t9AgpYNAFfalsAg7Eo
-        T9dnKWzV1zUCCbROrM2Fw4UWXyEufP0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-o22COhwcNFq3DDs8H1qKzQ-1; Tue, 05 May 2020 13:12:40 -0400
-X-MC-Unique: o22COhwcNFq3DDs8H1qKzQ-1
-Received: by mail-wr1-f71.google.com with SMTP id f2so1543371wrm.9
-        for <kvm@vger.kernel.org>; Tue, 05 May 2020 10:12:40 -0700 (PDT)
+        id S1729488AbgEERQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 13:16:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729199AbgEERQi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 13:16:38 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5BFC061A0F
+        for <kvm@vger.kernel.org>; Tue,  5 May 2020 10:16:37 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id x25so3156616wmc.0
+        for <kvm@vger.kernel.org>; Tue, 05 May 2020 10:16:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=j/K4PATbLRvXzOHJ5kuvFj7wv+7GxYy2AO2wgULDc48=;
+        b=UdfGkBCaEekX1+Ogl521QElFibeK4JEuXmv+9Qyn1i1eO1zr1X48fFX03epvhY+IY6
+         ndvidFnMb1LphudrcVRhoWifpNWD22iZNraDpuomYuRhOEn76EjZ3b9SSDCBtT8Y4GQ7
+         jt6vabzBm6D8UD+o4kzd9GJibXajbtWD8IdhX9Lmgfrh0w0ORRwY8fXa2Ya6/ryu3evu
+         SBcPxJ45+56nOeQDG0Egjl56sijaUTDF0SJfEaOmqBuxiSyv38xKB49H6095OwlH+Mad
+         6s4qyd1ojEeGZwrkhd05xwnwU2rFCDNGqF17NcmacWdRCjdzQak93yG3czezNQwM0bZg
+         /ISA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TWi1/ExgoalyHAzreZR6yoN0Ak47l5IuTf5AyOZQ3ik=;
-        b=jWa1xNMpB7PlAUHLiu6c4uGOOo6VeA3IKyNtD/lZAampdsMyq7v88R5nAcjLxPMRAx
-         9tbTK7k4sP3FRH+sz/OsSC90mas/WfENyKQJEFiPm1ogRtpy5BzuEq5U/tuEyo4N0bgF
-         IFh/2SygGA++xiyQ/KjPx34rGDcuQ6BC2/+OFbPaUEMvf1i4vP37oQAxXg6lxeYOjdv6
-         2o7wSHXyh+BFMb7yJy2olLnGIEblTbjybC0PRYkZhRlDfvbbbhyl+IqgIz0Ff6f/BCnx
-         UUP2Z83mkMyMF9Dx2AmhXnq/f11eko78viOR5nlTOsDGwUZkmfZXWP4V0cZGLO6L9RMh
-         ZA4A==
-X-Gm-Message-State: AGi0PuY74P26kD5PY66gCwe0c9mEMPFquHDF8nEfNdPlcubBQKKt8vti
-        h0/wge+9B5rnMGoKbB3QYsyhB7nRJL5O6yiXnQKXPk/c6Ymc+rXQ4no32o5ghyMoTuCLQOtEEFf
-        RdJW3HK6tFM/Q
-X-Received: by 2002:adf:a297:: with SMTP id s23mr4902257wra.54.1588698759216;
-        Tue, 05 May 2020 10:12:39 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ+wioukX6WMwi3IK6WjkRtFHM+jyaRgxTXMYD/QERUdMXHggoBt0hb8YQ1Vh2W9SGOmrpABw==
-X-Received: by 2002:adf:a297:: with SMTP id s23mr4902243wra.54.1588698759017;
-        Tue, 05 May 2020 10:12:39 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.132.175])
-        by smtp.gmail.com with ESMTPSA id 5sm1798016wmz.16.2020.05.05.10.12.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 May 2020 10:12:38 -0700 (PDT)
-Subject: Re: [PATCH] KVM: X86: Declare KVM_CAP_SET_GUEST_DEBUG properly
-To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20200505154750.126300-1-peterx@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <127c6e28-2dea-8f28-7200-2185d0d49505@redhat.com>
-Date:   Tue, 5 May 2020 19:12:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=j/K4PATbLRvXzOHJ5kuvFj7wv+7GxYy2AO2wgULDc48=;
+        b=SN4VUZqcuFY5oLQ1wI26uwPF8h+TfKwlISupKLxyF3F/uq5gl5IWg5K9G3vkYRsagS
+         E6WSYvl7CWhGXXLouLf1VEFS2x+yJJtTJsvRpPtcU6utA0nhbF0ojn02rKVWvgIpJe05
+         sGc2gNfcc27ZsqEm5OddgomVxgVPS0drDIlL3gP1LZbIjie2ZPNLxV4ZX1YCpa7cIFCF
+         LmvIFtlvw8tWrbjPnuphYTpnmg2KNACVsU1EasMjIp4HBvKAUiqDUi237tffx5396PSg
+         OplL4o8Du5z0WI4uLgVNsgsIJkjnYHP+fsnfJDofQ7qeWYDcVxzR4/yXBYBKpBZMrG7e
+         N9IQ==
+X-Gm-Message-State: AGi0PuaPjcIrMJZunpbzRRIJ54c5xZbeHKnUufOnWquSaGLQfU2WdXKp
+        ME2kaCAiUujTjN1kj8SrqG2EzEiYc3/KVA==
+X-Google-Smtp-Source: APiQypLAF/GA9/GggAGCjJYWWbPUt/ZLtlJkLB0SJTpOIVPoR1ng5wPO0c9UIGGAGmCzyMuR7y9mNA==
+X-Received: by 2002:a1c:3c87:: with SMTP id j129mr4234274wma.157.1588698996194;
+        Tue, 05 May 2020 10:16:36 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
+        by smtp.gmail.com with ESMTPSA id z22sm4692812wma.20.2020.05.05.10.16.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 May 2020 10:16:35 -0700 (PDT)
+Date:   Tue, 5 May 2020 18:16:31 +0100
+From:   Andrew Scull <ascull@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 06/26] arm64: Add level-hinted TLB invalidation helper
+Message-ID: <20200505171631.GC237572@google.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-7-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200505154750.126300-1-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422120050.3693593-7-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/20 17:47, Peter Xu wrote:
-> KVM_CAP_SET_GUEST_DEBUG should be supported for x86 however it's not declared
-> as supported.  My wild guess is that userspaces like QEMU are using "#ifdef
-> KVM_CAP_SET_GUEST_DEBUG" to check for the capability instead, but that could be
-> wrong because the compilation host may not be the runtime host.
-> 
-> The userspace might still want to keep the old "#ifdef" though to not break the
-> guest debug on old kernels.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
-> 
-> I also think both ppc and s390 may need similar thing, but I didn't touch them
-> yet because of not confident enough to cover all cases.
+> +#define __tlbi_level(op, addr, level)					\
+> +	do {								\
+> +		u64 arg = addr;						\
+> +									\
+> +		if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&	\
+> +		    level) {						\
+> +			u64 ttl = level;				\
+> +									\
+> +			switch (PAGE_SIZE) {				\
+> +			case SZ_4K:					\
+> +				ttl |= 1 << 2;				\
+> +				break;					\
+> +			case SZ_16K:					\
+> +				ttl |= 2 << 2;				\
+> +				break;					\
+> +			case SZ_64K:					\
+> +				ttl |= 3 << 2;				\
+> +				break;					\
+> +			}						\
+> +									\
+> +			arg &= ~TLBI_TTL_MASK;				\
+> +			arg |= FIELD_PREP(TLBI_TTL_MASK, ttl);		\
 
-Indeed, I'll squash this:
+Despite the spec saying both tables apply to TLB maintenance
+instructions that do not apply to a range of addresses I think it only
+means the 4-bit version (bug report to Arm, or I'm on the wrong spec).
 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index e15166b0a16d..ad2f172c26a6 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -521,6 +521,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_IOEVENTFD:
- 	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_IMMEDIATE_EXIT:
-+	case KVM_CAP_SET_GUEST_DEBUG:
- 		r = 1;
- 		break;
- 	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 5dcf9ff12828..d05bb040fd42 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -545,6 +545,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_AIS:
- 	case KVM_CAP_S390_AIS_MIGRATION:
- 	case KVM_CAP_S390_VCPU_RESETS:
-+	case KVM_CAP_SET_GUEST_DEBUG:
- 		r = 1;
- 		break;
- 	case KVM_CAP_S390_HPAGE_1M:
+This is consistent with Table D5-53 and the macro takes a single address
+argument to make misuse with range based tlbi less likely.
 
+It relies on the caller to get the level right and getting it wrong
+could be pretty bad as the spec says all bets are off in that case. Is
+it worth adding a check of the level against the address (seems a bit
+involved), or that it is just 2 bits or adding a short doc comment to
+explain it?
+
+(Looks like we get some constants for the levels in a later patch that
+could be referenced with some form of time travel)
+
+> +		}							\
+> +									\
+> +		__tlbi(op,  arg);					\
+
+cosmetic nit: double space in here
