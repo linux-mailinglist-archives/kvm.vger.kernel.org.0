@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4EBE1C5563
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:27:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 632921C555F
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:27:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728842AbgEEM1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 08:27:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51822 "EHLO
+        id S1728770AbgEEM1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 08:27:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39604 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728695AbgEEM1w (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 08:27:52 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045CRP3X076301;
+        by vger.kernel.org with ESMTP id S1728660AbgEEM1v (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 08:27:51 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045CROX6066484;
         Tue, 5 May 2020 08:27:51 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s28g962u-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30s510sh54-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 05 May 2020 08:27:51 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045CRe9j077859;
-        Tue, 5 May 2020 08:27:51 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s28g960y-1
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045CRijF067869;
+        Tue, 5 May 2020 08:27:50 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30s510sh3k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 05 May 2020 08:27:50 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045CQ4Su012085;
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045CQ97x025436;
         Tue, 5 May 2020 12:27:48 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 30s0g5jt0h-1
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 30s0g5atx2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 05 May 2020 12:27:48 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045CQZ69197336
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045CRjP843843798
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 May 2020 12:26:35 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72D71A4064;
+        Tue, 5 May 2020 12:27:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71E5FAE055;
         Tue,  5 May 2020 12:27:45 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6081EA4054;
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5FD51AE045;
         Tue,  5 May 2020 12:27:45 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Tue,  5 May 2020 12:27:45 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 16DB6E01C6; Tue,  5 May 2020 14:27:45 +0200 (CEST)
+        id 18794E02BA; Tue,  5 May 2020 14:27:45 +0200 (CEST)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Cornelia Huck <cohuck@redhat.com>,
@@ -54,81 +54,119 @@ Cc:     Cornelia Huck <cohuck@redhat.com>,
         Jason Herne <jjherne@linux.ibm.com>,
         Jared Rossi <jrossi@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v4 0/8] s390x/vfio-ccw: Channel Path Handling [KVM]
-Date:   Tue,  5 May 2020 14:27:37 +0200
-Message-Id: <20200505122745.53208-1-farman@linux.ibm.com>
+Subject: [PATCH v4 1/8] vfio-ccw: Introduce new helper functions to free/destroy regions
+Date:   Tue,  5 May 2020 14:27:38 +0200
+Message-Id: <20200505122745.53208-2-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200505122745.53208-1-farman@linux.ibm.com>
+References: <20200505122745.53208-1-farman@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-05-05_06:2020-05-04,2020-05-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- impostorscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
- mlxscore=0 malwarescore=0 bulkscore=0 adultscore=0 mlxlogscore=999
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005050093
+ definitions=2020-05-05_07:2020-05-04,2020-05-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ clxscore=1015 suspectscore=2 mlxlogscore=854 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005050098
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Here is a new pass at the channel-path handling code for vfio-ccw.
-Changes from previous versions are recorded in git notes for each patch.
-Patches 5 through 7 got swizzled a little bit, in order to better
-compartmentalize the code they define. Basically, the IRQ definitions
-were moved from patch 7 to 5, and then patch 6 was placed ahead of
-patch 5.
+From: Farhan Ali <alifm@linux.ibm.com>
 
-I have put Conny's r-b's on patches 1, 3, 4, (new) 5, and 8, and believe
-I have addressed all comments from v3, with two exceptions:
+Consolidate some of the cleanup code for the regions, so that
+as more are added we reduce code duplication.
 
-> I'm wondering if we should make this [vfio_ccw_schib_region_{write,release}]
-> callback optional (not in this patch).
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
 
-I have that implemented on top of this series, and will send later as part
-of a larger cleanup series.
+Notes:
+    v1->v2:
+     - Add Conny's r-b
+    
+    v0->v1: [EF]
+     - Commit message
 
-> One thing though that keeps coming up: do we need any kind of
-> serialization? Can there be any confusion from concurrent reads from
-> userspace, or are we sure that we always provide consistent data?
+ drivers/s390/cio/vfio_ccw_drv.c | 28 ++++++++++++++++++----------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
 
-I _think_ this is in good shape, though as suggested another set of
-eyeballs would be nice. There is still a problem on the main
-interrupt/FSM path, which I'm not attempting to address here.
-
-With this code plus the corresponding QEMU series (posted momentarily)
-applied I am able to configure off/on a CHPID (for example, by issuing
-"chchp -c 0/1 xx" on the host), and the guest is able to see both the
-events and reflect the updated path masks in its structures.
-
-v3: https://lore.kernel.org/kvm/20200417023001.65006-1-farman@linux.ibm.com/
-v2: https://lore.kernel.org/kvm/20200206213825.11444-1-farman@linux.ibm.com/
-v1: https://lore.kernel.org/kvm/20191115025620.19593-1-farman@linux.ibm.com/
-
-Eric Farman (3):
-  vfio-ccw: Refactor the unregister of the async regions
-  vfio-ccw: Refactor IRQ handlers
-  vfio-ccw: Add trace for CRW event
-
-Farhan Ali (5):
-  vfio-ccw: Introduce new helper functions to free/destroy regions
-  vfio-ccw: Register a chp_event callback for vfio-ccw
-  vfio-ccw: Introduce a new schib region
-  vfio-ccw: Introduce a new CRW region
-  vfio-ccw: Wire up the CRW irq and CRW region
-
- Documentation/s390/vfio-ccw.rst     |  38 ++++++-
- drivers/s390/cio/Makefile           |   2 +-
- drivers/s390/cio/vfio_ccw_chp.c     | 148 +++++++++++++++++++++++++
- drivers/s390/cio/vfio_ccw_drv.c     | 165 ++++++++++++++++++++++++++--
- drivers/s390/cio/vfio_ccw_ops.c     |  65 ++++++++---
- drivers/s390/cio/vfio_ccw_private.h |  16 +++
- drivers/s390/cio/vfio_ccw_trace.c   |   1 +
- drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++
- include/uapi/linux/vfio.h           |   3 +
- include/uapi/linux/vfio_ccw.h       |  18 +++
- 10 files changed, 458 insertions(+), 28 deletions(-)
- create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
-
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index 339a6bc0339b..8715c1c2f1e1 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -116,6 +116,14 @@ static void vfio_ccw_sch_irq(struct subchannel *sch)
+ 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_INTERRUPT);
+ }
+ 
++static void vfio_ccw_free_regions(struct vfio_ccw_private *private)
++{
++	if (private->cmd_region)
++		kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
++	if (private->io_region)
++		kmem_cache_free(vfio_ccw_io_region, private->io_region);
++}
++
+ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ {
+ 	struct pmcw *pmcw = &sch->schib.pmcw;
+@@ -181,10 +189,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 	cio_disable_subchannel(sch);
+ out_free:
+ 	dev_set_drvdata(&sch->dev, NULL);
+-	if (private->cmd_region)
+-		kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
+-	if (private->io_region)
+-		kmem_cache_free(vfio_ccw_io_region, private->io_region);
++	vfio_ccw_free_regions(private);
+ 	kfree(private->cp.guest_cp);
+ 	kfree(private);
+ 	return ret;
+@@ -200,8 +205,7 @@ static int vfio_ccw_sch_remove(struct subchannel *sch)
+ 
+ 	dev_set_drvdata(&sch->dev, NULL);
+ 
+-	kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
+-	kmem_cache_free(vfio_ccw_io_region, private->io_region);
++	vfio_ccw_free_regions(private);
+ 	kfree(private->cp.guest_cp);
+ 	kfree(private);
+ 
+@@ -304,6 +308,12 @@ static void vfio_ccw_debug_exit(void)
+ 	debug_unregister(vfio_ccw_debug_trace_id);
+ }
+ 
++static void vfio_ccw_destroy_regions(void)
++{
++	kmem_cache_destroy(vfio_ccw_cmd_region);
++	kmem_cache_destroy(vfio_ccw_io_region);
++}
++
+ static int __init vfio_ccw_sch_init(void)
+ {
+ 	int ret;
+@@ -346,8 +356,7 @@ static int __init vfio_ccw_sch_init(void)
+ 	return ret;
+ 
+ out_err:
+-	kmem_cache_destroy(vfio_ccw_cmd_region);
+-	kmem_cache_destroy(vfio_ccw_io_region);
++	vfio_ccw_destroy_regions();
+ 	destroy_workqueue(vfio_ccw_work_q);
+ 	vfio_ccw_debug_exit();
+ 	return ret;
+@@ -357,8 +366,7 @@ static void __exit vfio_ccw_sch_exit(void)
+ {
+ 	css_driver_unregister(&vfio_ccw_sch_driver);
+ 	isc_unregister(VFIO_CCW_ISC);
+-	kmem_cache_destroy(vfio_ccw_io_region);
+-	kmem_cache_destroy(vfio_ccw_cmd_region);
++	vfio_ccw_destroy_regions();
+ 	destroy_workqueue(vfio_ccw_work_q);
+ 	vfio_ccw_debug_exit();
+ }
 -- 
 2.17.1
 
