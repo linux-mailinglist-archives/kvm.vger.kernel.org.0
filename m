@@ -2,111 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F87B1C5E61
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:07:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C37A91C5E6C
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:12:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730352AbgEERHd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 13:07:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48044 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729604AbgEERHc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 13:07:32 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2D9C061BD3
-        for <kvm@vger.kernel.org>; Tue,  5 May 2020 10:07:32 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id x2so1162867pfx.7
-        for <kvm@vger.kernel.org>; Tue, 05 May 2020 10:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=vBqzVx+qxfalnXJK7KTGtarAHizzhkjQWkeOeL25v0I=;
-        b=O5i7do4icdhMgjwpo9TCdui1mhr1arbAoT6CXE/FL4FNU3azDor8xRsQqnf1oekzW/
-         7Qdnbc7WereNZhHIyoLYjd3kSqw20Zgo4WpUa6FDM3lp00UVK8MuXDFlE01cNDiRoL/O
-         EAJ+Ut2sB0upkwibNjvyQBcsbJtaD+jjUHszOCYm3fAaoq1qP93jucL3eyvdClOkn4r9
-         aH+4c51iqcLP9pbxn4M3XH4t32uYqryQbnelLqdVh/XN7PZz087P/5s0HNVg2D8n0IWM
-         Us9QoDxYRHRAsocKaYP+GGGf+vkaem3+rBmS0NeZS6uvBlq/NtEMkGqiIrBNdRSUHVrW
-         Rf/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=vBqzVx+qxfalnXJK7KTGtarAHizzhkjQWkeOeL25v0I=;
-        b=J6W6t0jJvft4z6HQnrNHxnf3/0QCcqAruqZ/nXOlMvJAA87nAAFl7ZCxj+MqXJa6+h
-         n+jor7FEIktee9wcXYvhmLHmmYFGRkQgs4UqGx17ZEoR2cOc86efLUfxrlu3y1Fw9Wch
-         inz4ktgELgQP5GwQeug2u4Ak4o/RZxSJMImKPQp4+MMUsdjIwINe3FK4XAB1s9pGpRwT
-         IJFlqfoMJU2Oj/MfW2xZweb8YEhsMdVYO/P/HGHtdmZq3odVDaYLCo47Gca4+8eWCBLv
-         7JRMnrEo2gTvH5Df6XPnK8og2fNfw9Zqr2hin9HImfi2xnW3w2f7JsWtgNk8lghK0TPc
-         QBDA==
-X-Gm-Message-State: AGi0PuYEy6qGQ2GGJc7ux05PeeMBAb4jXSOD4fXMoH6nOJnFDxVPvkqh
-        puBw9E0SIFdemsQd6JyTZlUYjA==
-X-Google-Smtp-Source: APiQypL1cJk6Ptxu94QvTpoApcHVyzDf/w6RUKic+BQutwZLjzt9TVLdFv2iA8r9azHBa6jgEpe/WQ==
-X-Received: by 2002:a63:778d:: with SMTP id s135mr3848663pgc.238.1588698451129;
-        Tue, 05 May 2020 10:07:31 -0700 (PDT)
-Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
-        by smtp.gmail.com with ESMTPSA id z190sm2471532pfb.1.2020.05.05.10.07.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2020 10:07:30 -0700 (PDT)
-Date:   Tue, 5 May 2020 10:07:29 -0700 (PDT)
-From:   David Rientjes <rientjes@google.com>
-X-X-Sender: rientjes@chino.kir.corp.google.com
-To:     Paolo Bonzini <pbonzini@redhat.com>
-cc:     Jim Mattson <jmattson@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Jonathan Adams <jwadams@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
- kernel statistics
-In-Reply-To: <1d12f846-bf89-7b0a-5c71-e61d83b1a36f@redhat.com>
-Message-ID: <alpine.DEB.2.22.394.2005051003380.216575@chino.kir.corp.google.com>
-References: <20200504110344.17560-1-eesposit@redhat.com> <alpine.DEB.2.22.394.2005041429210.224786@chino.kir.corp.google.com> <f2654143-b8e5-5a1f-8bd0-0cb0df2cd638@redhat.com> <CALMp9eQYcLr_REzDC1kWTHX4SJWt7x+Zd1KwNvS1YGd5TVM1xA@mail.gmail.com>
- <1d12f846-bf89-7b0a-5c71-e61d83b1a36f@redhat.com>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+        id S1729593AbgEERMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 13:12:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27382 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729199AbgEERMi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 13:12:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588698756;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VY3mpgQiTbdJZabwq0nBtN+dwhOXmFZGPofJwgyYIco=;
+        b=Hc8H8EsdMccFu/5LJ/jPO8LL88hQHeFcPBV9PjumlMMDz2LJORsJcwuQlpLHHIUntBYDEF
+        v4c5YPCmT2xPSrZzj8SrTaPYpTp1/e+WkgAJgprmyE9D2ygcB6e6Metuppp9n4hAcW/yg5
+        tG2YHjJAI8HG0oX5+s6PnbRdGB2kv7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-rAjydpGcNrm94b73QhlXSQ-1; Tue, 05 May 2020 13:12:32 -0400
+X-MC-Unique: rAjydpGcNrm94b73QhlXSQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AD3D107ACCA;
+        Tue,  5 May 2020 17:12:31 +0000 (UTC)
+Received: from w520.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2BEE95F7E2;
+        Tue,  5 May 2020 17:12:28 +0000 (UTC)
+Date:   Tue, 5 May 2020 11:12:27 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, peterx@redhat.com
+Subject: Re: [PATCH 3/3] vfio-pci: Invalidate mmaps and block MMIO access on
+ disabled memory
+Message-ID: <20200505111227.02ac9cee@w520.home>
+In-Reply-To: <20200504200123.GA26002@ziepe.ca>
+References: <158836742096.8433.685478071796941103.stgit@gimli.home>
+        <158836917028.8433.13715345616117345453.stgit@gimli.home>
+        <20200501234849.GQ26002@ziepe.ca>
+        <20200504122643.52267e44@x1.home>
+        <20200504184436.GZ26002@ziepe.ca>
+        <20200504133552.3d00c77d@x1.home>
+        <20200504200123.GA26002@ziepe.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 5 May 2020, Paolo Bonzini wrote:
+On Mon, 4 May 2020 17:01:23 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-> >>> Since this is becoming a generic API (good!!), maybe we can discuss
-> >>> possible ways to optimize gathering of stats in mass?
-> >> Sure, the idea of a binary format was considered from the beginning in
-> >> [1], and it can be done either together with the current filesystem, or
-> >> as a replacement via different mount options.
-> > 
-> > ASCII stats are not scalable. A binary format is definitely the way to go.
+> On Mon, May 04, 2020 at 01:35:52PM -0600, Alex Williamson wrote:
 > 
-> I am totally in favor of having a binary format, but it should be
-> introduced as a separate series on top of this one---and preferably by
-> someone who has already put some thought into the problem (which
-> Emanuele and I have not, beyond ensuring that the statsfs concept and
-> API is flexible enough).
+> > Ok, this all makes a lot more sense with memory_lock still in the
+> > picture.  And it looks like you're not insisting on the wait_event, we
+> > can block on memory_lock so long as we don't have an ordering issue.
+> > I'll see what I can do.  Thanks,  
 > 
+> Right, you can block on the rwsem if it is ordered properly vs
+> mmap_sem.
 
-The concern is that once this series is merged then /sys/kernel/stats 
-could be considered an ABI and there would be a reasonable expectation 
-that it will remain stable, in so far as the stats that userspace is 
-interested in are stable and not obsoleted.
+This is what I've come up with, please see if you agree with the logic:
 
-So is this a suggestion that the binary format becomes complementary to 
-statsfs and provide a means for getting all stats from a single subsystem, 
-or that this series gets converted to such a format before it is merged?
+void vfio_pci_zap_and_down_write_memory_lock(struct vfio_pci_device *vdev)
+{
+        struct vfio_pci_mmap_vma *mmap_vma, *tmp;
 
-> ASCII stats are necessary for quick userspace consumption and for
-> backwards compatibility with KVM debugfs (which is not an ABI, but it's
-> damn useful and should not be dropped without providing something as
-> handy), so this is what this series starts from.
-> 
+        /*
+         * Lock ordering:
+         * vma_lock is nested under mmap_sem for vm_ops callback paths.
+         * The memory_lock semaphore is used by both code paths calling
+         * into this function to zap vmas and the vm_ops.fault callback
+         * to protect the memory enable state of the device.
+         *
+         * When zapping vmas we need to maintain the mmap_sem => vma_lock
+         * ordering, which requires using vma_lock to walk vma_list to
+         * acquire an mm, then dropping vma_lock to get the mmap_sem and
+         * reacquiring vma_lock.  This logic is derived from similar
+         * requirements in uverbs_user_mmap_disassociate().
+         *
+         * mmap_sem must always be the top-level lock when it is taken.
+         * Therefore we can only hold the memory_lock write lock when
+         * vma_list is empty, as we'd need to take mmap_sem to clear
+         * entries.  vma_list can only be guaranteed empty when holding
+         * vma_lock, thus memory_lock is nested under vma_lock.
+         *
+         * This enables the vm_ops.fault callback to acquire vma_lock,
+         * followed by memory_lock read lock, while already holding
+         * mmap_sem without risk of deadlock.
+         */
+        while (1) {
+                struct mm_struct *mm = NULL;
+
+                mutex_lock(&vdev->vma_lock);
+                while (!list_empty(&vdev->vma_list)) {
+                        mmap_vma = list_first_entry(&vdev->vma_list,
+                                                    struct vfio_pci_mmap_vma,
+                                                    vma_next);
+                        mm = mmap_vma->vma->vm_mm;
+                        if (mmget_not_zero(mm))
+                                break;
+
+                        list_del(&mmap_vma->vma_next);
+                        kfree(mmap_vma);
+                        mm = NULL;
+                }
+
+                if (!mm)
+                        break;
+                mutex_unlock(&vdev->vma_lock);
+
+                down_read(&mm->mmap_sem);
+                if (mmget_still_valid(mm)) {
+                        mutex_lock(&vdev->vma_lock);
+                        list_for_each_entry_safe(mmap_vma, tmp,
+                                                 &vdev->vma_list, vma_next) {
+                                struct vm_area_struct *vma = mmap_vma->vma;
+
+                                if (vma->vm_mm != mm)
+                                        continue;
+
+                                list_del(&mmap_vma->vma_next);
+                                kfree(mmap_vma);
+
+                                zap_vma_ptes(vma, vma->vm_start,
+                                             vma->vm_end - vma->vm_start);
+                        }
+                        mutex_unlock(&vdev->vma_lock);
+                }
+                up_read(&mm->mmap_sem);
+                mmput(mm);
+        }
+
+        down_write(&vdev->memory_lock);
+        mutex_unlock(&vdev->vma_lock);
+}
+
+As noted in the comment, the fault handler can simply do:
+
+mutex_lock(&vdev->vma_lock);
+down_read(&vdev->memory_lock);
+
+This should be deadlock free now, so we can drop the retry handling
+
+Paths needing to acquire memory_lock with vmas zapped (device reset,
+memory bit *->0 transition) call this function, perform their
+operation, then simply release with up_write(&vdev->memory_lock).  Both
+the read and write version of acquiring memory_lock can still occur
+outside this function for operations that don't require flushing all
+vmas or otherwise touch vma_lock or mmap_sem (ex. read/write, MSI-X
+vector table access, writing *->1 to memory enable bit).
+
+I still need to work on the bus reset path as acquiring memory_lock
+write locks across multiple devices seems like it requires try-lock
+behavior, which is clearly complicated, or at least messy in the above
+function.
+
+Does this seem like it's going in a reasonable direction?  Thanks,
+
+Alex
+
