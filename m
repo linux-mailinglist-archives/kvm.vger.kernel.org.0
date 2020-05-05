@@ -2,163 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C5491C554D
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:18:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4EBE1C5563
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:27:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728841AbgEEMSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 08:18:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43294 "EHLO
+        id S1728842AbgEEM1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 08:27:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51822 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728512AbgEEMS3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 08:18:29 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045C3jrM027719;
-        Tue, 5 May 2020 08:18:29 -0400
+        by vger.kernel.org with ESMTP id S1728695AbgEEM1w (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 08:27:52 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045CRP3X076301;
+        Tue, 5 May 2020 08:27:51 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s5d50q2q-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30s28g962u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 08:18:28 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045C3ogC027950;
-        Tue, 5 May 2020 08:18:28 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s5d50q1c-1
+        Tue, 05 May 2020 08:27:51 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045CRe9j077859;
+        Tue, 5 May 2020 08:27:51 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30s28g960y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 08:18:28 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045CAl4E020686;
-        Tue, 5 May 2020 12:18:25 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 30s0g62ssc-1
+        Tue, 05 May 2020 08:27:50 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045CQ4Su012085;
+        Tue, 5 May 2020 12:27:48 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 30s0g5jt0h-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 12:18:25 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045CIMDj64029152
+        Tue, 05 May 2020 12:27:48 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045CQZ69197336
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 May 2020 12:18:22 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0FAD52059;
-        Tue,  5 May 2020 12:18:22 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.23.208])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3BDB452050;
-        Tue,  5 May 2020 12:18:22 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
- instruction
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Qian Cai <cailca@icloud.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-References: <20200505073525.2287-1-borntraeger@de.ibm.com>
- <20200505095332.528254e5.cohuck@redhat.com>
- <f3512a63-91dc-ab9a-a9ab-3e2a6e24fea3@de.ibm.com>
- <59f1b90c-47d6-2661-0e99-548a53c9bcd6@redhat.com>
- <480b0bff-8eb5-f75c-a3ce-2555e38917ee@de.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <1ef464b8-bba7-4ec6-558f-7f76c6690fb2@linux.ibm.com>
-Date:   Tue, 5 May 2020 14:18:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <480b0bff-8eb5-f75c-a3ce-2555e38917ee@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Tue, 5 May 2020 12:26:35 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 72D71A4064;
+        Tue,  5 May 2020 12:27:45 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6081EA4054;
+        Tue,  5 May 2020 12:27:45 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue,  5 May 2020 12:27:45 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 16DB6E01C6; Tue,  5 May 2020 14:27:45 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH v4 0/8] s390x/vfio-ccw: Channel Path Handling [KVM]
+Date:   Tue,  5 May 2020 14:27:37 +0200
+Message-Id: <20200505122745.53208-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-05-05_07:2020-05-04,2020-05-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- impostorscore=0 mlxscore=0 phishscore=0 spamscore=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005050098
+ definitions=2020-05-05_06:2020-05-04,2020-05-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ impostorscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
+ mlxscore=0 malwarescore=0 bulkscore=0 adultscore=0 mlxlogscore=999
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005050093
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Here is a new pass at the channel-path handling code for vfio-ccw.
+Changes from previous versions are recorded in git notes for each patch.
+Patches 5 through 7 got swizzled a little bit, in order to better
+compartmentalize the code they define. Basically, the IRQ definitions
+were moved from patch 7 to 5, and then patch 6 was placed ahead of
+patch 5.
 
+I have put Conny's r-b's on patches 1, 3, 4, (new) 5, and 8, and believe
+I have addressed all comments from v3, with two exceptions:
 
-On 2020-05-05 10:27, Christian Borntraeger wrote:
-> 
-> 
-> On 05.05.20 10:04, David Hildenbrand wrote:
->> On 05.05.20 09:55, Christian Borntraeger wrote:
->>>
->>>
->>> On 05.05.20 09:53, Cornelia Huck wrote:
->>>> On Tue,  5 May 2020 09:35:25 +0200
->>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>>
->>>>> In LPAR we will only get an intercept for FC==3 for the PQAP
->>>>> instruction. Running nested under z/VM can result in other intercepts as
->>>>> well, for example PQAP(QCI). So the WARN_ON_ONCE is not right. Let
->>>>> us simply remove it.
->>>>
->>>> While I agree with removing the WARN_ON_ONCE, I'm wondering why z/VM
->>>> gives us intercepts for those fcs... is that just a result of nesting
->>>> (or the z/VM implementation), or is there anything we might want to do?
->>>
->>> Yes nesting.
->>> The ECA bit for interpretion is an effective one. So if the ECA bit is off
->>> in z/VM (no crypto cards) our ECA bit is basically ignored as these bits
->>> are ANDed.
->>> I asked Tony to ask the z/VM team if that is the case here.
->>>
->>
->> So we can't detect if we have support for ECA_APIE, because there is no
->> explicit feature bit, right? Rings a bell. Still an ugly
->> hardware/firmware specification.
+> I'm wondering if we should make this [vfio_ccw_schib_region_{write,release}]
+> callback optional (not in this patch).
 
-Sorry to be late but you were really too fast for me. :)
+I have that implemented on top of this series, and will send later as part
+of a larger cleanup series.
 
-AFAIK we detect if we have AP instructions enabled by ECA_APIE for the 
-host by probing with a PQAP(TESTQ) during the boot.
-If the hypervizor accept this instruction it is supposed to work as if 
-it has set APIE present for the Linux host.
-If the instruction is rejected we do not enable AP instructions for the 
-guest
+> One thing though that keeps coming up: do we need any kind of
+> serialization? Can there be any confusion from concurrent reads from
+> userspace, or are we sure that we always provide consistent data?
 
-We also detect if we can use QCI by testing the facility bit and 
-propagate only the facility bits we have earned or emulate don't we?
+I _think_ this is in good shape, though as suggested another set of
+eyeballs would be nice. There is still a problem on the main
+interrupt/FSM path, which I'm not attempting to address here.
 
-So here I am curious why we got an interception.
+With this code plus the corresponding QEMU series (posted momentarily)
+applied I am able to configure off/on a CHPID (for example, by issuing
+"chchp -c 0/1 xx" on the host), and the guest is able to see both the
+events and reflect the updated path masks in its structures.
 
-Did we give false information to the guest?
-Is the guest right to issue the instruction intercepted?
-Did z/VM provide the host with false facility information?
-Did z/VM dynamically change the virtualization scheme after the boot?
+v3: https://lore.kernel.org/kvm/20200417023001.65006-1-farman@linux.ibm.com/
+v2: https://lore.kernel.org/kvm/20200206213825.11444-1-farman@linux.ibm.com/
+v1: https://lore.kernel.org/kvm/20191115025620.19593-1-farman@linux.ibm.com/
 
-I did not find evidence of the first assumption which would have been a 
-legitimate warning.
-The next 3 are, IMHO, misbehavior from the guest or z/VM, and do not 
-justify a warning there so I find right to remove it.
+Eric Farman (3):
+  vfio-ccw: Refactor the unregister of the async regions
+  vfio-ccw: Refactor IRQ handlers
+  vfio-ccw: Add trace for CRW event
 
-consider it as a "late" reviewed-by.
+Farhan Ali (5):
+  vfio-ccw: Introduce new helper functions to free/destroy regions
+  vfio-ccw: Register a chp_event callback for vfio-ccw
+  vfio-ccw: Introduce a new schib region
+  vfio-ccw: Introduce a new CRW region
+  vfio-ccw: Wire up the CRW irq and CRW region
 
-Regards,
-Pierre
-
-
-> 
-> Yes, no matter if this is the case here, we cannot rely on ECA_APIE to not
-> trigger intercepts. So we must remove the WARN_ON.
-
-
-
-
-> 
-> cc stable?
-> 
->>
->> Seems to be the right thing to do
->>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->>
+ Documentation/s390/vfio-ccw.rst     |  38 ++++++-
+ drivers/s390/cio/Makefile           |   2 +-
+ drivers/s390/cio/vfio_ccw_chp.c     | 148 +++++++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_drv.c     | 165 ++++++++++++++++++++++++++--
+ drivers/s390/cio/vfio_ccw_ops.c     |  65 ++++++++---
+ drivers/s390/cio/vfio_ccw_private.h |  16 +++
+ drivers/s390/cio/vfio_ccw_trace.c   |   1 +
+ drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++
+ include/uapi/linux/vfio.h           |   3 +
+ include/uapi/linux/vfio_ccw.h       |  18 +++
+ 10 files changed, 458 insertions(+), 28 deletions(-)
+ create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.17.1
+
