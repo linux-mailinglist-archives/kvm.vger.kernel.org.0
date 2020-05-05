@@ -2,192 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C8241C5575
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:31:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CBE21C5581
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 14:36:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728822AbgEEMbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 08:31:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55164 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728609AbgEEMbs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 08:31:48 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 045CTjOF082521;
-        Tue, 5 May 2020 08:31:46 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30s50gjw4c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 08:31:46 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045CTtwF083388;
-        Tue, 5 May 2020 08:31:45 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 30s50gjw3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 08:31:45 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045CQ98P025436;
-        Tue, 5 May 2020 12:31:43 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 30s0g5au0v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 May 2020 12:31:43 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 045CVesS64159830
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 May 2020 12:31:41 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E2F36AE053;
-        Tue,  5 May 2020 12:31:40 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C6C5AE04D;
-        Tue,  5 May 2020 12:31:40 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.49.139])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  5 May 2020 12:31:40 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
- instruction
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Qian Cai <cailca@icloud.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-References: <20200505073525.2287-1-borntraeger@de.ibm.com>
- <20200505095332.528254e5.cohuck@redhat.com>
- <f3512a63-91dc-ab9a-a9ab-3e2a6e24fea3@de.ibm.com>
- <59f1b90c-47d6-2661-0e99-548a53c9bcd6@redhat.com>
- <480b0bff-8eb5-f75c-a3ce-2555e38917ee@de.ibm.com>
- <1ef464b8-bba7-4ec6-558f-7f76c6690fb2@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <6c449373-430c-5bff-582a-1f9db57336fc@de.ibm.com>
-Date:   Tue, 5 May 2020 14:31:40 +0200
+        id S1728879AbgEEMgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 08:36:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51360 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728737AbgEEMgI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 08:36:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588682167;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bsccUuRQy2jvqaOH6LGPQ4vtE+LhlW8wtgFKVDHoZ34=;
+        b=Fuz1dMCdmENHkQ02ItSNmjYcXYWx4toVKxKqYMlgz1/CLhJsACtBbFcezQ9elWIazb49C1
+        7kxcpObQJ1KvU1IbK3tbo3JNItbZSQqisrKa+ALlbs2qfGaAExLi1uDlgr+8DxCX15n08d
+        8mrdDTiumdR4UdYkpYqlh89EV2q4bZ4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-165-2j3nawNIOxe2ZSCd_nYM1A-1; Tue, 05 May 2020 08:36:05 -0400
+X-MC-Unique: 2j3nawNIOxe2ZSCd_nYM1A-1
+Received: by mail-wr1-f70.google.com with SMTP id a3so1134135wro.1
+        for <kvm@vger.kernel.org>; Tue, 05 May 2020 05:36:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bsccUuRQy2jvqaOH6LGPQ4vtE+LhlW8wtgFKVDHoZ34=;
+        b=dxlAVuONXVvKaYia5pVUiX5m/M7DWawUq2AY/zrafUvZflvvfZTWTOfXJp7aOp6jLN
+         e48stqiDphO3ezravC1ZVZD7X2T3WsEMIzUz93CZge2OrKjZDeNxQFnUiutDaRts8QXZ
+         XhftZY2EGDQ5pI2izYQmQiaAbbYi6rRfwI0UEA8RAsJ/Hs11p8HBRtH3kw4LI3Hy8ewt
+         bu492YR0VWT+lyfRQEMMx23rGgPffI3dykeghDOVH/jM76RN7EjEFSYea827S4rICsDg
+         JfgrYltzlspjXSsoJI5G9PrOh4YehSUq2YXXonIduFSCkGay55v0qq/ItYay3jv3TT8c
+         vCWQ==
+X-Gm-Message-State: AGi0PubKyVWJ1E8sYYDuf72MU1YcQRyq/FjR4kKDSi6zOOuPahkPGCnE
+        PgpPwDuLjaEl6P0UaqPn57fySxyx62ARqhPq88TY60u25sEUTSXY+GK2DodW9c39l/mZDGHzr1E
+        1mgIV/6172Xpj
+X-Received: by 2002:a1c:3884:: with SMTP id f126mr3489103wma.91.1588682164246;
+        Tue, 05 May 2020 05:36:04 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK2yQysqNlaBNEYFJEQoeRAd/S5v9BFxPbGikdmb1C+ke6RMlOFyst7gVZvWv7bHJDRTKfFpw==
+X-Received: by 2002:a1c:3884:: with SMTP id f126mr3489080wma.91.1588682164010;
+        Tue, 05 May 2020 05:36:04 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.132.175])
+        by smtp.gmail.com with ESMTPSA id 17sm3507092wmo.2.2020.05.05.05.36.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 May 2020 05:36:03 -0700 (PDT)
+Subject: Re: [PATCH] KVM: selftests: Fix build for evmcs.h
+To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20200504220607.99627-1-peterx@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aebe1f8a-8c58-7508-80ed-848d3143fcad@redhat.com>
+Date:   Tue, 5 May 2020 14:36:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1ef464b8-bba7-4ec6-558f-7f76c6690fb2@linux.ibm.com>
+In-Reply-To: <20200504220607.99627-1-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-05-05_07:2020-05-04,2020-05-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 impostorscore=0 adultscore=0 priorityscore=1501
- malwarescore=0 phishscore=0 mlxscore=0 spamscore=0 mlxlogscore=999
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005050098
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 05/05/20 00:06, Peter Xu wrote:
+> I got this error when building kvm selftests:
+> 
+> /usr/bin/ld: /home/xz/git/linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:222: multiple definition of `current_evmcs'; /tmp/cco1G48P.o:/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:222: first defined here
+> /usr/bin/ld: /home/xz/git/linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:223: multiple definition of `current_vp_assist'; /tmp/cco1G48P.o:/home/xz/git/linux/tools/testing/selftests/kvm/include/evmcs.h:223: first defined here
+> 
+> I think it's because evmcs.h is included both in a test file and a lib file so
+> the structs have multiple declarations when linking.  After all it's not a good
+> habit to declare structs in the header files.
+> 
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+> 
+> I initially thought it was something about my GCC 10 upgrade that I recently
+> did to my laptop - gcc10 even fails the build of the latest kernel after
+> all (though it turns out to be a kernel bug on build system rather than a gcc
+> bug). but I'm not sure about this one...
+> ---
+>  tools/testing/selftests/kvm/include/evmcs.h  | 4 ++--
+>  tools/testing/selftests/kvm/lib/x86_64/vmx.c | 3 +++
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/evmcs.h b/tools/testing/selftests/kvm/include/evmcs.h
+> index d8f4d6bfe05d..a034438b6266 100644
+> --- a/tools/testing/selftests/kvm/include/evmcs.h
+> +++ b/tools/testing/selftests/kvm/include/evmcs.h
+> @@ -219,8 +219,8 @@ struct hv_enlightened_vmcs {
+>  #define HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_MASK	\
+>  		(~((1ull << HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_SHIFT) - 1))
+>  
+> -struct hv_enlightened_vmcs *current_evmcs;
+> -struct hv_vp_assist_page *current_vp_assist;
+> +extern struct hv_enlightened_vmcs *current_evmcs;
+> +extern struct hv_vp_assist_page *current_vp_assist;
+>  
+>  int vcpu_enable_evmcs(struct kvm_vm *vm, int vcpu_id);
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> index 6f17f69394be..4ae104f6ce69 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> @@ -17,6 +17,9 @@
+>  
+>  bool enable_evmcs;
+>  
+> +struct hv_enlightened_vmcs *current_evmcs;
+> +struct hv_vp_assist_page *current_vp_assist;
+> +
+>  struct eptPageTableEntry {
+>  	uint64_t readable:1;
+>  	uint64_t writable:1;
+> 
 
+Queued, thanks.
 
-On 05.05.20 14:18, Pierre Morel wrote:
-> 
-> 
-> On 2020-05-05 10:27, Christian Borntraeger wrote:
->>
->>
->> On 05.05.20 10:04, David Hildenbrand wrote:
->>> On 05.05.20 09:55, Christian Borntraeger wrote:
->>>>
->>>>
->>>> On 05.05.20 09:53, Cornelia Huck wrote:
->>>>> On Tue,  5 May 2020 09:35:25 +0200
->>>>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>>>
->>>>>> In LPAR we will only get an intercept for FC==3 for the PQAP
->>>>>> instruction. Running nested under z/VM can result in other intercepts as
->>>>>> well, for example PQAP(QCI). So the WARN_ON_ONCE is not right. Let
->>>>>> us simply remove it.
->>>>>
->>>>> While I agree with removing the WARN_ON_ONCE, I'm wondering why z/VM
->>>>> gives us intercepts for those fcs... is that just a result of nesting
->>>>> (or the z/VM implementation), or is there anything we might want to do?
->>>>
->>>> Yes nesting.
->>>> The ECA bit for interpretion is an effective one. So if the ECA bit is off
->>>> in z/VM (no crypto cards) our ECA bit is basically ignored as these bits
->>>> are ANDed.
->>>> I asked Tony to ask the z/VM team if that is the case here.
->>>>
->>>
->>> So we can't detect if we have support for ECA_APIE, because there is no
->>> explicit feature bit, right? Rings a bell. Still an ugly
->>> hardware/firmware specification.
-> 
-> Sorry to be late but you were really too fast for me. :)
-> 
-> AFAIK we detect if we have AP instructions enabled by ECA_APIE for the host by probing with a PQAP(TESTQ) during the boot.
-> If the hypervizor accept this instruction it is supposed to work as if it has set APIE present for the Linux host.
-> If the instruction is rejected we do not enable AP instructions for the guest
+Paolo
 
-Yes, we do have the AP instruction in the KVM host (z/VM guest). It seems that this is implemented without ECA_APIE on the z/VM side
-as there is no domain assigned yet (and it is still possible to attach a virtual crypto device/domain).
-It seems to me that z/VM implements all of this with a software implementation. This then is not used for VSIE.
-Instead it relies on the architecture saying that ECA_APIE is an effective control.
-
-> 
-> We also detect if we can use QCI by testing the facility bit and propagate only the facility bits we have earned or emulate don't we?
-> 
-> So here I am curious why we got an interception.
-> 
-> Did we give false information to the guest?
-> Is the guest right to issue the instruction intercepted?
-> Did z/VM provide the host with false facility information?
-> Did z/VM dynamically change the virtualization scheme after the boot?
-> 
-> I did not find evidence of the first assumption which would have been a legitimate warning.
-> The next 3 are, IMHO, misbehavior from the guest or z/VM, and do not justify a warning there so I find right to remove it.
-> 
-> consider it as a "late" reviewed-by.
-> 
-> Regards,
-> 
