@@ -2,172 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C37A91C5E6C
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:12:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B3FC1C5E6E
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 19:12:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729593AbgEERMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 13:12:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27382 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729199AbgEERMi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 13:12:38 -0400
+        id S1729829AbgEERMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 13:12:44 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30706 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729777AbgEERMn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 May 2020 13:12:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588698756;
+        s=mimecast20190719; t=1588698762;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VY3mpgQiTbdJZabwq0nBtN+dwhOXmFZGPofJwgyYIco=;
-        b=Hc8H8EsdMccFu/5LJ/jPO8LL88hQHeFcPBV9PjumlMMDz2LJORsJcwuQlpLHHIUntBYDEF
-        v4c5YPCmT2xPSrZzj8SrTaPYpTp1/e+WkgAJgprmyE9D2ygcB6e6Metuppp9n4hAcW/yg5
-        tG2YHjJAI8HG0oX5+s6PnbRdGB2kv7k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-rAjydpGcNrm94b73QhlXSQ-1; Tue, 05 May 2020 13:12:32 -0400
-X-MC-Unique: rAjydpGcNrm94b73QhlXSQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AD3D107ACCA;
-        Tue,  5 May 2020 17:12:31 +0000 (UTC)
-Received: from w520.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2BEE95F7E2;
-        Tue,  5 May 2020 17:12:28 +0000 (UTC)
-Date:   Tue, 5 May 2020 11:12:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, peterx@redhat.com
-Subject: Re: [PATCH 3/3] vfio-pci: Invalidate mmaps and block MMIO access on
- disabled memory
-Message-ID: <20200505111227.02ac9cee@w520.home>
-In-Reply-To: <20200504200123.GA26002@ziepe.ca>
-References: <158836742096.8433.685478071796941103.stgit@gimli.home>
-        <158836917028.8433.13715345616117345453.stgit@gimli.home>
-        <20200501234849.GQ26002@ziepe.ca>
-        <20200504122643.52267e44@x1.home>
-        <20200504184436.GZ26002@ziepe.ca>
-        <20200504133552.3d00c77d@x1.home>
-        <20200504200123.GA26002@ziepe.ca>
+        bh=TWi1/ExgoalyHAzreZR6yoN0Ak47l5IuTf5AyOZQ3ik=;
+        b=J3VbiBvlbnW/bOjWdmtfYynu79rzK+vlINoDwmWcaTKqja1XSdBgUmE138nPcSu/GA1oG8
+        gZhG5MJiDv9m5GCO9jAlIHxYDeQWbLo6DlHtEPVOCg19hyRgUNw9t9AgpYNAFfalsAg7Eo
+        T9dnKWzV1zUCCbROrM2Fw4UWXyEufP0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-o22COhwcNFq3DDs8H1qKzQ-1; Tue, 05 May 2020 13:12:40 -0400
+X-MC-Unique: o22COhwcNFq3DDs8H1qKzQ-1
+Received: by mail-wr1-f71.google.com with SMTP id f2so1543371wrm.9
+        for <kvm@vger.kernel.org>; Tue, 05 May 2020 10:12:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TWi1/ExgoalyHAzreZR6yoN0Ak47l5IuTf5AyOZQ3ik=;
+        b=jWa1xNMpB7PlAUHLiu6c4uGOOo6VeA3IKyNtD/lZAampdsMyq7v88R5nAcjLxPMRAx
+         9tbTK7k4sP3FRH+sz/OsSC90mas/WfENyKQJEFiPm1ogRtpy5BzuEq5U/tuEyo4N0bgF
+         IFh/2SygGA++xiyQ/KjPx34rGDcuQ6BC2/+OFbPaUEMvf1i4vP37oQAxXg6lxeYOjdv6
+         2o7wSHXyh+BFMb7yJy2olLnGIEblTbjybC0PRYkZhRlDfvbbbhyl+IqgIz0Ff6f/BCnx
+         UUP2Z83mkMyMF9Dx2AmhXnq/f11eko78viOR5nlTOsDGwUZkmfZXWP4V0cZGLO6L9RMh
+         ZA4A==
+X-Gm-Message-State: AGi0PuY74P26kD5PY66gCwe0c9mEMPFquHDF8nEfNdPlcubBQKKt8vti
+        h0/wge+9B5rnMGoKbB3QYsyhB7nRJL5O6yiXnQKXPk/c6Ymc+rXQ4no32o5ghyMoTuCLQOtEEFf
+        RdJW3HK6tFM/Q
+X-Received: by 2002:adf:a297:: with SMTP id s23mr4902257wra.54.1588698759216;
+        Tue, 05 May 2020 10:12:39 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ+wioukX6WMwi3IK6WjkRtFHM+jyaRgxTXMYD/QERUdMXHggoBt0hb8YQ1Vh2W9SGOmrpABw==
+X-Received: by 2002:adf:a297:: with SMTP id s23mr4902243wra.54.1588698759017;
+        Tue, 05 May 2020 10:12:39 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.132.175])
+        by smtp.gmail.com with ESMTPSA id 5sm1798016wmz.16.2020.05.05.10.12.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 May 2020 10:12:38 -0700 (PDT)
+Subject: Re: [PATCH] KVM: X86: Declare KVM_CAP_SET_GUEST_DEBUG properly
+To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20200505154750.126300-1-peterx@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <127c6e28-2dea-8f28-7200-2185d0d49505@redhat.com>
+Date:   Tue, 5 May 2020 19:12:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200505154750.126300-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 4 May 2020 17:01:23 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
-
-> On Mon, May 04, 2020 at 01:35:52PM -0600, Alex Williamson wrote:
+On 05/05/20 17:47, Peter Xu wrote:
+> KVM_CAP_SET_GUEST_DEBUG should be supported for x86 however it's not declared
+> as supported.  My wild guess is that userspaces like QEMU are using "#ifdef
+> KVM_CAP_SET_GUEST_DEBUG" to check for the capability instead, but that could be
+> wrong because the compilation host may not be the runtime host.
 > 
-> > Ok, this all makes a lot more sense with memory_lock still in the
-> > picture.  And it looks like you're not insisting on the wait_event, we
-> > can block on memory_lock so long as we don't have an ordering issue.
-> > I'll see what I can do.  Thanks,  
+> The userspace might still want to keep the old "#ifdef" though to not break the
+> guest debug on old kernels.
 > 
-> Right, you can block on the rwsem if it is ordered properly vs
-> mmap_sem.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+> 
+> I also think both ppc and s390 may need similar thing, but I didn't touch them
+> yet because of not confident enough to cover all cases.
 
-This is what I've come up with, please see if you agree with the logic:
+Indeed, I'll squash this:
 
-void vfio_pci_zap_and_down_write_memory_lock(struct vfio_pci_device *vdev)
-{
-        struct vfio_pci_mmap_vma *mmap_vma, *tmp;
-
-        /*
-         * Lock ordering:
-         * vma_lock is nested under mmap_sem for vm_ops callback paths.
-         * The memory_lock semaphore is used by both code paths calling
-         * into this function to zap vmas and the vm_ops.fault callback
-         * to protect the memory enable state of the device.
-         *
-         * When zapping vmas we need to maintain the mmap_sem => vma_lock
-         * ordering, which requires using vma_lock to walk vma_list to
-         * acquire an mm, then dropping vma_lock to get the mmap_sem and
-         * reacquiring vma_lock.  This logic is derived from similar
-         * requirements in uverbs_user_mmap_disassociate().
-         *
-         * mmap_sem must always be the top-level lock when it is taken.
-         * Therefore we can only hold the memory_lock write lock when
-         * vma_list is empty, as we'd need to take mmap_sem to clear
-         * entries.  vma_list can only be guaranteed empty when holding
-         * vma_lock, thus memory_lock is nested under vma_lock.
-         *
-         * This enables the vm_ops.fault callback to acquire vma_lock,
-         * followed by memory_lock read lock, while already holding
-         * mmap_sem without risk of deadlock.
-         */
-        while (1) {
-                struct mm_struct *mm = NULL;
-
-                mutex_lock(&vdev->vma_lock);
-                while (!list_empty(&vdev->vma_list)) {
-                        mmap_vma = list_first_entry(&vdev->vma_list,
-                                                    struct vfio_pci_mmap_vma,
-                                                    vma_next);
-                        mm = mmap_vma->vma->vm_mm;
-                        if (mmget_not_zero(mm))
-                                break;
-
-                        list_del(&mmap_vma->vma_next);
-                        kfree(mmap_vma);
-                        mm = NULL;
-                }
-
-                if (!mm)
-                        break;
-                mutex_unlock(&vdev->vma_lock);
-
-                down_read(&mm->mmap_sem);
-                if (mmget_still_valid(mm)) {
-                        mutex_lock(&vdev->vma_lock);
-                        list_for_each_entry_safe(mmap_vma, tmp,
-                                                 &vdev->vma_list, vma_next) {
-                                struct vm_area_struct *vma = mmap_vma->vma;
-
-                                if (vma->vm_mm != mm)
-                                        continue;
-
-                                list_del(&mmap_vma->vma_next);
-                                kfree(mmap_vma);
-
-                                zap_vma_ptes(vma, vma->vm_start,
-                                             vma->vm_end - vma->vm_start);
-                        }
-                        mutex_unlock(&vdev->vma_lock);
-                }
-                up_read(&mm->mmap_sem);
-                mmput(mm);
-        }
-
-        down_write(&vdev->memory_lock);
-        mutex_unlock(&vdev->vma_lock);
-}
-
-As noted in the comment, the fault handler can simply do:
-
-mutex_lock(&vdev->vma_lock);
-down_read(&vdev->memory_lock);
-
-This should be deadlock free now, so we can drop the retry handling
-
-Paths needing to acquire memory_lock with vmas zapped (device reset,
-memory bit *->0 transition) call this function, perform their
-operation, then simply release with up_write(&vdev->memory_lock).  Both
-the read and write version of acquiring memory_lock can still occur
-outside this function for operations that don't require flushing all
-vmas or otherwise touch vma_lock or mmap_sem (ex. read/write, MSI-X
-vector table access, writing *->1 to memory enable bit).
-
-I still need to work on the bus reset path as acquiring memory_lock
-write locks across multiple devices seems like it requires try-lock
-behavior, which is clearly complicated, or at least messy in the above
-function.
-
-Does this seem like it's going in a reasonable direction?  Thanks,
-
-Alex
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index e15166b0a16d..ad2f172c26a6 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -521,6 +521,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_IOEVENTFD:
+ 	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
++	case KVM_CAP_SET_GUEST_DEBUG:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_PPC_GUEST_DEBUG_SSTEP:
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 5dcf9ff12828..d05bb040fd42 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -545,6 +545,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_S390_AIS:
+ 	case KVM_CAP_S390_AIS_MIGRATION:
+ 	case KVM_CAP_S390_VCPU_RESETS:
++	case KVM_CAP_SET_GUEST_DEBUG:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_S390_HPAGE_1M:
 
