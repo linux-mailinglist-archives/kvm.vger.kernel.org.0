@@ -2,106 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1C351C50BF
-	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 10:46:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B19891C5109
+	for <lists+kvm@lfdr.de>; Tue,  5 May 2020 10:47:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728341AbgEEIqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 May 2020 04:46:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23652 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728351AbgEEIqY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 May 2020 04:46:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588668383;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Xo0QgrHWJ/5ZJxRirXqRejd7DgB0g48e4+rdKXViSlI=;
-        b=Xm1+ERYk0nsc6SWU7DKmRmlu4EhIQu88Nj4AT6i0FHHB6KZBS9b1kJtog/6lDxKrDMMmdp
-        ky6Gc3vrUNRgtuSS1aBUozSyNUpMzZXVkpJoItEA1bPg0FjvQxx5d199D9OP2k+1vhDjqO
-        BmEK8phDDJ6xAwQtIxUUg453mXgu2B4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-5yF6fGg3PTaqid8vf2VP3A-1; Tue, 05 May 2020 04:46:18 -0400
-X-MC-Unique: 5yF6fGg3PTaqid8vf2VP3A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 599CF800687;
-        Tue,  5 May 2020 08:46:17 +0000 (UTC)
-Received: from gondolin (ovpn-112-219.ams2.redhat.com [10.36.112.219])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E79655D796;
-        Tue,  5 May 2020 08:46:12 +0000 (UTC)
-Date:   Tue, 5 May 2020 10:46:10 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Qian Cai <cailca@icloud.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: [PATCH v2] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
- instruction
-Message-ID: <20200505104610.469be44e.cohuck@redhat.com>
-In-Reply-To: <20200505083515.2720-1-borntraeger@de.ibm.com>
-References: <20200505083515.2720-1-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1728775AbgEEIqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 May 2020 04:46:54 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:52056 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728726AbgEEIql (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 May 2020 04:46:41 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20200505084639euoutp02edcb88b0f49e06356f74b8af501ccd58~MFX3qheiD2627826278euoutp02z
+        for <kvm@vger.kernel.org>; Tue,  5 May 2020 08:46:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20200505084639euoutp02edcb88b0f49e06356f74b8af501ccd58~MFX3qheiD2627826278euoutp02z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1588668399;
+        bh=TxE/6G1g28mmKh7hooUAC2aT+D+6azanETRBOwRYElg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=omkg7R3W/3Q2Bl+cb32xRIYW7VX/up76W1blrssWmzK4/YV9vkZmGlUAHrftdH/ky
+         sBm3jWLZP1zBzJJT1oktuawgrGb+xZ++K3Cust+asUCXnN8sc9seby6u1Iz1mdAPcQ
+         6J8uGx4WXNmvPiCCXkEoHiF7i93T48TUIMuyi/8U=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200505084638eucas1p14d6b13af09eff6253e2019c1163d2ea3~MFX3YaiQa2425224252eucas1p1F;
+        Tue,  5 May 2020 08:46:38 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 54.42.60679.EE721BE5; Tue,  5
+        May 2020 09:46:38 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20200505084638eucas1p24f356b441a3589e9528d239c0b9ac666~MFX28WU0-1948219482eucas1p2b;
+        Tue,  5 May 2020 08:46:38 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200505084638eusmtrp186bd6d7ec444ca0de6918ea0b42f52cb~MFX27rb8P0969409694eusmtrp1G;
+        Tue,  5 May 2020 08:46:38 +0000 (GMT)
+X-AuditID: cbfec7f4-0e5ff7000001ed07-58-5eb127ee86c4
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id A1.24.08375.EE721BE5; Tue,  5
+        May 2020 09:46:38 +0100 (BST)
+Received: from AMDC2765.digital.local (unknown [106.120.51.73]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200505084637eusmtip174e6b9fe26a7b71a38ddfeb81a667898~MFX2aZfgP0580805808eusmtip1C;
+        Tue,  5 May 2020 08:46:37 +0000 (GMT)
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+To:     dri-devel@lists.freedesktop.org, iommu@lists.linux-foundation.org,
+        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org
+Cc:     Marek Szyprowski <m.szyprowski@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-arm-kernel@lists.infradead.org,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: [PATCH v3 24/25] samples: vfio-mdev/mbochs: fix common struct
+ sg_table related issues
+Date:   Tue,  5 May 2020 10:46:13 +0200
+Message-Id: <20200505084614.30424-24-m.szyprowski@samsung.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200505084614.30424-1-m.szyprowski@samsung.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA0VSa0hTYRjmO7edTSenafhhkTDIMEjTJA4YZuCPE4hFEYaVecqDl9y0zVku
+        SmkosZx4KROvQzKvc9PUeSHU5TVBRMW0LJP5J2tecomZaZsH699ze9/n5eMjUUkb7kUmyFM5
+        hZxNkhIirH3w19iJ5WPN0ScLKvxp3dgIQjcXG3F6tz0fpad+rhB0XcMAQut7gumy53fp1tFy
+        QNunFhC6xTqN05NdZQRt6P8koPtWF/FQMdNY0QiYNxt6jDFvfMGZ+adDCPP6ZQbzcceKMoUz
+        NYDpns0kGJ1mmWByW+sBs95y5KJLlOhMLJeUkMYp/ENiRPGzVVlYitnt/nDZWzwT5LhqgZCE
+        VBDMqm4mtEBESqhaADs2DbjTkFB2ALsqhbyxDuBW+ziyP/H5R72AN2oAzLUaMJ44JpqWnhHO
+        FEEFQK1Nu4c9qCwAh3WuzhBKTSPQ9md5r8OdioH2ueo9jFFHoeZ3EebEYioEduvacL7OGzaY
+        elEnFjp068Tc3rGQGhTAfsuM4w7SQcJg7bKKz7vDpaFWAY8Pw9HCHIzPawBcGDMIeJID4OTj
+        YsCnguHc2BbhXIRSvtDY5c/L56B2Y5Lg97vBGdsBp4w6YEH7C5SXxfBJtoRP+8CSoaZ/tX3j
+        EyiPGdihK0f4BxoA8FvnNp4HvEv+l+kBqAeenEopi+OUgXLunp+SlSlV8ji/28myFuD4TKM7
+        Q/YO0LV9ywIoEkhdxVfXjdESnE1TpsssAJKo1EP8atMULRHHsulqTpF8U6FK4pQWcIjEpJ7i
+        U1Vfb0ioODaVu8NxKZxi30VIoVcmuD59xdOXuyDUtLi72gK9Dk7YXUJDdksLY2cNlS+ljfLz
+        a8YPrCg/rzCMLE3vaauJnI84PZzNvFttCnp4afOyLUKv3vierk40g7pJtQaPmusuD/fpdFs0
+        XRsxv1eZM4rid1WayhnfLWO1XZIYzvaeHX2wsiZzMyVK4aOiyEgppoxnA46jCiX7Fz5EzGxI
+        AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOIsWRmVeSWpSXmKPExsVy+t/xu7rv1DfGGey5L2jRe+4kk8XGGetZ
+        Lf5vm8hsceXrezaLlauPMlks2G9tMWdqocWW03MZLb5cechksenxNVaLy7vmsFmsPXKX3eLg
+        hyesDrwea+atYfTY+20Bi8f2bw9YPe53H2fy2Lyk3uP2v8fMHpNvLGf02H2zgc2jt/kdm0ff
+        llWMHp83yQVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZpKTmZJal
+        FunbJehl3FzUylKwna/ixJzDrA2MPTxdjJwcEgImEvc+rWLvYuTiEBJYyiix//ouFoiEjMTJ
+        aQ2sELawxJ9rXWwQRZ8YJR6f/whWxCZgKNH1FiIhItDJKDGt+yM7SIJZ4B6TxN51fiC2sECc
+        xNrNcxlBbBYBVYnm39PAmnkF7CR2926F2iAvsXrDAWYQmxMo/vjSHTYQW0igUOLD+e+sExj5
+        FjAyrGIUSS0tzk3PLTbUK07MLS7NS9dLzs/dxAiMlG3Hfm7ewXhpY/AhRgEORiUe3ojP6+OE
+        WBPLiitzDzFKcDArifAu+7EhTog3JbGyKrUoP76oNCe1+BCjKdBRE5mlRJPzgVGcVxJvaGpo
+        bmFpaG5sbmxmoSTO2yFwMEZIID2xJDU7NbUgtQimj4mDU6qB0WDZBFGvy0efej3/vNFwUvnq
+        7Y+P9t25sOyPjaDdzg/1fZuuaMVvUF+4KkRLeLIi5+sLf9/O2pJYzcG2yXqzaPG561YH8sIS
+        NuxL+OLNGrR760KPOes3HzKO4fEpKTeN2Za65cTOG4vi7GYL2K1Yv7u5N4dpuUzs+Y6jqd9f
+        fjj96Kcd58uVivOUWIozEg21mIuKEwHQUyHvqgIAAA==
+X-CMS-MailID: 20200505084638eucas1p24f356b441a3589e9528d239c0b9ac666
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20200505084638eucas1p24f356b441a3589e9528d239c0b9ac666
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200505084638eucas1p24f356b441a3589e9528d239c0b9ac666
+References: <20200505083926.28503-1-m.szyprowski@samsung.com>
+        <20200505084614.30424-1-m.szyprowski@samsung.com>
+        <CGME20200505084638eucas1p24f356b441a3589e9528d239c0b9ac666@eucas1p2.samsung.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  5 May 2020 10:35:15 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+The Documentation/DMA-API-HOWTO.txt states that dma_map_sg returns the
+numer of the created entries in the DMA address space. However the
+subsequent calls to dma_sync_sg_for_{device,cpu} and dma_unmap_sg must be
+called with the original number of the entries passed to dma_map_sg. The
+sg_table->nents in turn holds the result of the dma_map_sg call as stated
+in include/linux/scatterlist.h. A common mistake was to ignore a result
+of the dma_map_sg function and don't use the sg_table->orig_nents at all.
 
-> In LPAR we will only get an intercept for FC==3 for the PQAP
-> instruction. Running nested under z/VM can result in other intercepts as
-> well as ECA_APIE is an effective bit: If one hypervisor layer has
-> turned this bit off, the end result will be that we will get intercepts for
-> all function codes. Usually the first one will be a query like PQAP(QCI).
-> So the WARN_ON_ONCE is not right. Let us simply remove it.
+To avoid such issues, lets use common dma-mapping wrappers operating
+directly on the struct sg_table objects and adjust references to the
+nents and orig_nents respectively.
 
-Thanks, that is helpful to describe.
+While touching this code, also add missing call to dma_unmap_sgtable.
 
-Fixes: e5282de93105 ("s390: ap: kvm: add PQAP interception for AQIC")
+Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
+---
+For more information, see '[PATCH v3 00/25] DRM: fix struct sg_table nents
+vs. orig_nents misuse' thread: https://lkml.org/lkml/2020/5/5/187
+---
+ samples/vfio-mdev/mbochs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> Cc: Pierre Morel <pmorel@linux.ibm.com>
-> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
-> Cc: stable@vger.kernel.org
-> Link: https://lore.kernel.org/kvm/20200505073525.2287-1-borntraeger@de.ibm.com
-
-This links to v1, which is probably not what you want :)
-
-> Reported-by: Qian Cai <cailca@icloud.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  arch/s390/kvm/priv.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 69a824f9ef0b..893893642415 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -626,10 +626,12 @@ static int handle_pqap(struct kvm_vcpu *vcpu)
->  	 * available for the guest are AQIC and TAPQ with the t bit set
->  	 * since we do not set IC.3 (FIII) we currently will only intercept
->  	 * the AQIC function code.
-> +	 * Note: running nested under z/VM can result in intercepts for other
-> +	 * function codes, e.g. PQAP(QCI). We do not support this and bail out.
->  	 */
->  	reg0 = vcpu->run->s.regs.gprs[0];
->  	fc = (reg0 >> 24) & 0xff;
-> -	if (WARN_ON_ONCE(fc != 0x03))
-> +	if (fc != 0x03)
->  		return -EOPNOTSUPP;
->  
->  	/* PQAP instruction is allowed for guest kernel only */
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index 3cc5e59..f2c62e0 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -846,7 +846,7 @@ static struct sg_table *mbochs_map_dmabuf(struct dma_buf_attachment *at,
+ 	if (sg_alloc_table_from_pages(sg, dmabuf->pages, dmabuf->pagecount,
+ 				      0, dmabuf->mode.size, GFP_KERNEL) < 0)
+ 		goto err2;
+-	if (!dma_map_sg(at->dev, sg->sgl, sg->nents, direction))
++	if (dma_map_sgtable(at->dev, sg, direction))
+ 		goto err3;
+ 
+ 	return sg;
+@@ -868,6 +868,7 @@ static void mbochs_unmap_dmabuf(struct dma_buf_attachment *at,
+ 
+ 	dev_dbg(dev, "%s: %d\n", __func__, dmabuf->id);
+ 
++	dma_unmap_sgtable(at->dev, sg, direction);
+ 	sg_free_table(sg);
+ 	kfree(sg);
+ }
+-- 
+1.9.1
 
