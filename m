@@ -2,79 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81B9C1C75D0
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:10:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60BBA1C75E3
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:11:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729966AbgEFQKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 12:10:54 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56751 "EHLO
+        id S1730092AbgEFQK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 12:10:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27730 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729505AbgEFQKy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 12:10:54 -0400
+        by vger.kernel.org with ESMTP id S1729688AbgEFQK5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 12:10:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588781453;
+        s=mimecast20190719; t=1588781455;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=pK8XLGVgtLQ7Wuz0EniH4HZPeCKMh3d83lQPtPWl3h4=;
-        b=KZSIRiTfeG5+JQd21pzLmD5rvJSkgKExANGQGD6F7BeL+UpNWzMUxlkxV6X7owbyRBDgD0
-        iSPOMheFXJeYKgEih73qDoxVK/YWM+mkkPgGrt+xsPFpZI3FYi7zJwFYexubvGex5UHGIa
-        ijh/Dp2L43ZcRix3Xi4MmlIHrOGj6qI=
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=kZPPxriWZX6GKqib57CUR0KHurjWMqJXVQoLVEPp5t4=;
+        b=f1zstsF2BwvoIVYFb+z+mQqgKv0mbca5HQ4uU7U5WS8cQ+tjqPxBm9Ap/XjWhbnlvo2WN6
+        habu9FoIJf3zomYkByzK9JLuy70p4stMiZIXznWXCqJZC8JvTlinlGf/Z9CHhCue4+IR57
+        4CQoEb4Q6DHxC/H2pSgMnZMSlaS1mXk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-fmYHDPn_MOGx2iku1zuVsg-1; Wed, 06 May 2020 12:10:51 -0400
-X-MC-Unique: fmYHDPn_MOGx2iku1zuVsg-1
+ us-mta-470-Pk5GFsTpPHCClfx87srNYQ-1; Wed, 06 May 2020 12:10:53 -0400
+X-MC-Unique: Pk5GFsTpPHCClfx87srNYQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 522021842D22;
-        Wed,  6 May 2020 16:10:50 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFB2880058A;
+        Wed,  6 May 2020 16:10:51 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 04949165F6;
-        Wed,  6 May 2020 16:10:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 81A2527C39;
+        Wed,  6 May 2020 16:10:50 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     wanpengli@tencent.com, linxl3@wangsu.com
-Subject: [PATCH v5 0/7] KVM: VMX: Tscdeadline timer emulation fastpath
-Date:   Wed,  6 May 2020 12:10:41 -0400
-Message-Id: <20200506161048.28840-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc:     wanpengli@tencent.com, linxl3@wangsu.com,
+        Haiwei Li <lihaiwei@tencent.com>
+Subject: [PATCH 1/7] KVM: VMX: Introduce generic fastpath handler
+Date:   Wed,  6 May 2020 12:10:42 -0400
+Message-Id: <20200506161048.28840-2-pbonzini@redhat.com>
+In-Reply-To: <20200506161048.28840-1-pbonzini@redhat.com>
+References: <20200506161048.28840-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is my cleaned up version of Wanpeng's TSC deadline timer
-optimizations.  The main change is a reorganization of the fast
-path enums, removing EXIT_FASTPATH_SKIP_EMUL_INS (following the
-suggestion of =E6=9E=97=E9=91=AB=E9=BE=99) and renaming EXIT_FASTPATH_NOP=
- to
-EXIT_FASTPATH_EXIT_HANDLED.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Paolo Bonzini (1):
-  KVM: x86: introduce kvm_can_use_hv_timer
+Introduce generic fastpath handler to handle MSR fastpath, VMX-preemption
+timer fastpath etc; move it after vmx_complete_interrupts() in order to
+catch events delivered to the guest, and abort the fast path in later
+patches.  While at it, move the kvm_exit tracepoint so that it is printed
+for fastpath vmexits as well.
 
-Wanpeng Li (6):
-  KVM: VMX: Introduce generic fastpath handler
-  KVM: X86: Introduce kvm_vcpu_exit_request() helper
-  KVM: X86: Introduce more exit_fastpath_completion enum values
-  KVM: VMX: Optimize posted-interrupt delivery for timer fastpath
-  KVM: X86: TSCDEADLINE MSR emulation fastpath
-  KVM: VMX: Handle preemption timer fastpath
+There is no observed performance effect for the IPI fastpath after this patch.
 
- arch/x86/include/asm/kvm_host.h |  4 +-
- arch/x86/kvm/lapic.c            | 31 ++++++++++-----
- arch/x86/kvm/lapic.h            |  2 +-
- arch/x86/kvm/svm/svm.c          | 15 ++++---
- arch/x86/kvm/vmx/vmx.c          | 69 +++++++++++++++++++++++----------
- arch/x86/kvm/x86.c              | 45 +++++++++++++++------
- arch/x86/kvm/x86.h              |  3 +-
- virt/kvm/kvm_main.c             |  1 +
- 8 files changed, 118 insertions(+), 52 deletions(-)
+Tested-by: Haiwei Li <lihaiwei@tencent.com>
+Cc: Haiwei Li <lihaiwei@tencent.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Message-Id: <1588055009-12677-2-git-send-email-wanpengli@tencent.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
---=20
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 13cdb8469848..ad57c4744b99 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5907,8 +5907,6 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu,
+ 	u32 exit_reason = vmx->exit_reason;
+ 	u32 vectoring_info = vmx->idt_vectoring_info;
+ 
+-	trace_kvm_exit(exit_reason, vcpu, KVM_ISA_VMX);
+-
+ 	/*
+ 	 * Flush logged GPAs PML buffer, this will make dirty_bitmap more
+ 	 * updated. Another good is, in kvm_vm_ioctl_get_dirty_log, before
+@@ -6604,6 +6602,16 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
+ 	}
+ }
+ 
++static enum exit_fastpath_completion vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
++{
++	switch (to_vmx(vcpu)->exit_reason) {
++	case EXIT_REASON_MSR_WRITE:
++		return handle_fastpath_set_msr_irqoff(vcpu);
++	default:
++		return EXIT_FASTPATH_NONE;
++	}
++}
++
+ bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
+ 
+ static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
+@@ -6778,17 +6786,18 @@ static enum exit_fastpath_completion vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (unlikely(vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+ 		return EXIT_FASTPATH_NONE;
+ 
+-	if (!is_guest_mode(vcpu) && vmx->exit_reason == EXIT_REASON_MSR_WRITE)
+-		exit_fastpath = handle_fastpath_set_msr_irqoff(vcpu);
+-	else
+-		exit_fastpath = EXIT_FASTPATH_NONE;
+-
+ 	vmx->loaded_vmcs->launched = 1;
+ 	vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
+ 
+ 	vmx_recover_nmi_blocking(vmx);
+ 	vmx_complete_interrupts(vmx);
+ 
++	trace_kvm_exit(vmx->exit_reason, vcpu, KVM_ISA_VMX);
++
++	if (is_guest_mode(vcpu))
++		return EXIT_FASTPATH_NONE;
++
++	exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
+ 	return exit_fastpath;
+ }
+ 
+-- 
 2.18.2
+
 
