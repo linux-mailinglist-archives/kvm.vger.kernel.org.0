@@ -2,114 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E0461C700F
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 14:12:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 840E91C7010
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 14:13:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727954AbgEFMM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 08:12:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33290 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727777AbgEFMM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 08:12:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588767175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mGKAKOoXib9J9GLorrHt4wp5oK180n6GKU4cMIBxKAk=;
-        b=flHknYVt0fKo7ce1PxKSwsHp1R5cRuaLnwFBHlxB/87xAHvAAxUx+azeeDZDnCWbDi/H+J
-        zL3mcq+Hb2vtA0HU1r1eiIx6njCurANsE7CGup/C00/nUr2mAVBE6FwgNhgNPZ05L8eu7U
-        79eoI/Cv84aLzDwKL0frAHF7bGBXFQU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-ZzkzU8rcOGOM5uUll5Di3g-1; Wed, 06 May 2020 08:12:52 -0400
-X-MC-Unique: ZzkzU8rcOGOM5uUll5Di3g-1
-Received: by mail-wm1-f69.google.com with SMTP id f17so674880wmm.5
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 05:12:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mGKAKOoXib9J9GLorrHt4wp5oK180n6GKU4cMIBxKAk=;
-        b=EbpG4WdoJvG3x/tSg3kLwGfIB06vnUgTyEdC/Z2yaEMBEvF3KMpsctRvl0/fT4ZQ1c
-         bdE5MTlszQykYjY85ZOxWnWCOkN2E4MQseDCHbbOxcoYMMogR569XgZyhF0HzdGiV+Da
-         W9XT2JniifSFG4tKE7IeZXO+J0GCbNd2jjkFAeC3vgOMlg+YDoKh2DbDq/gKfLJ9sWHo
-         4mATRFt2s7cCh5SYBuOVFn4R0rRKmyCQfQVB4Q4FwBZy3vMvxpB46opX2oj48gkcEm1T
-         +9KmtRzaoKyn9btCpBQ9+LZadwAJKBML5lapGRgUZvuH8wK6Root4HCaAg7OnnUpE3dw
-         JnDQ==
-X-Gm-Message-State: AGi0PuajJFHnStcnY+DRvDnMBC16+0FQZHyVx8lM/Tl19M0T/gvCyECz
-        AwYNfER4cjcEw9YyPS301P2MtCQ4LeYdfX+Zp2eYguEobNYO9JW+HhAXTgQLwWIy1A2zXRPAN7Y
-        BGYB2R2i7o1yT
-X-Received: by 2002:a1c:5403:: with SMTP id i3mr4520787wmb.10.1588767170595;
-        Wed, 06 May 2020 05:12:50 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKzFzMB1AUH6OYu+u4u9EhJqeki41lDE4NjZD/BfMex3GyyxvZlvlNEqY2FSNPFuCVgRMQODA==
-X-Received: by 2002:a1c:5403:: with SMTP id i3mr4520743wmb.10.1588767170169;
-        Wed, 06 May 2020 05:12:50 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:11d7:2f21:f38b:17e? ([2001:b07:6468:f312:11d7:2f21:f38b:17e])
-        by smtp.gmail.com with ESMTPSA id k23sm2529672wmi.46.2020.05.06.05.12.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2020 05:12:49 -0700 (PDT)
-Subject: Re: [GIT PULL 0/1] KVM: s390: Fix for running nested under z/VM
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-References: <20200506115945.13132-1-borntraeger@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <918fcace-dac6-bc33-6713-19703fc96180@redhat.com>
-Date:   Wed, 6 May 2020 14:12:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727995AbgEFMM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 08:12:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56874 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727969AbgEFMM7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 08:12:59 -0400
+Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 758A9C061A0F;
+        Wed,  6 May 2020 05:12:59 -0700 (PDT)
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jWIuv-0002Ol-V2; Wed, 06 May 2020 14:12:50 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 6C6291001F5; Wed,  6 May 2020 14:12:48 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>
+Subject: Re: [PATCH v8 4/4] kvm: vmx: virtualize split lock detection
+In-Reply-To: <20200505030736.GA20916@linux.intel.com>
+References: <20200414063129.133630-5-xiaoyao.li@intel.com> <871rooodad.fsf@nanos.tec.linutronix.de> <20200415191802.GE30627@linux.intel.com> <87tv1kmol8.fsf@nanos.tec.linutronix.de> <20200415214318.GH30627@linux.intel.com> <20200505030736.GA20916@linux.intel.com>
+Date:   Wed, 06 May 2020 14:12:48 +0200
+Message-ID: <87h7wtl0sf.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20200506115945.13132-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/20 13:59, Christian Borntraeger wrote:
-> Paolo,
-> a fix for kvm/master.
-> 
-> The following changes since commit 2a173ec993baa6a97e7b0fb89240200a88d90746:
-> 
->   MAINTAINERS: add a reviewer for KVM/s390 (2020-04-20 11:24:00 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.7-3
-> 
-> for you to fetch changes up to 5615e74f48dcc982655543e979b6c3f3f877e6f6:
-> 
->   KVM: s390: Remove false WARN_ON_ONCE for the PQAP instruction (2020-05-05 11:15:05 +0200)
-> 
-> ----------------------------------------------------------------
-> KVM: s390: Fix for running nested uner z/VM
-> 
-> There are circumstances when running nested under z/VM that would trigger a
-> WARN_ON_ONCE. Remove the WARN_ON_ONCE. Long term we certainly want to make this
-> code more robust and flexible, but just returning instead of WARNING makes
-> guest bootable again.
-> 
-> ----------------------------------------------------------------
-> Christian Borntraeger (1):
->       KVM: s390: Remove false WARN_ON_ONCE for the PQAP instruction
-> 
->  arch/s390/kvm/priv.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> On Wed, Apr 15, 2020 at 02:43:18PM -0700, Sean Christopherson wrote:
+>> On Wed, Apr 15, 2020 at 11:22:11PM +0200, Thomas Gleixner wrote:
+>> > So we can go with the proposed mode of allowing the write but not
+>> > propagating it. If the resulting split lock #AC originates from CPL != 3
+>> > then the guest will be killed with SIGBUS. If it originates from CPL ==
+>> > 3 and the guest has user #AC disabled then it will be killed as well.
+>> 
+>> An idea that's been floated around to avoid killing the guest on a CPL==3
+>> split-lock #AC is to add a STICKY bit to MSR_TEST_CTRL that KVM can
+>> virtualize to tell the guest that attempting to disable SLD is futile,
+>> e.g. so that the guest can kill its misbehaving userspace apps instead of
+>> trying to disable SLD and getting killed by the host.
+>
+> Circling back to this.  KVM needs access to sld_state in one form or another
+> if we want to add a KVM hint when the host is in fatal mode.  Three options
+> I've come up with:
+>
+>   1. Bite the bullet and export sld_state.  
+>
+>   2. Add an is_split_fatal_wrapper().  Ugly since it needs to be non-inline
+>      to avoid triggering (1).
+>
+>   3. Add a synthetic feature flag, e.g. X86_FEATURE_SLD_FATAL, and drop
+>      sld_state altogether.
+>
+> I like (3) because it requires the least amount of code when all is said
+> and done, doesn't require more exports, and as a bonus it'd probably be nice
+> for userspace to see sld_fatal in /proc/cpuinfo.
 
-Pulled, thanks.
+#3 makes sense and is elegant.
 
-Paolo
+Thanks,
 
+        tglx
