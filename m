@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AC541C6CC5
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BED41C6CC9
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:24:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728887AbgEFJWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 05:22:31 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38088 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728857AbgEFJWb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 05:22:31 -0400
+        id S1729050AbgEFJYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 05:24:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24325 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728559AbgEFJYE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 05:24:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588756950;
+        s=mimecast20190719; t=1588757043;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc; bh=CBdTHlgR58fqrVhQa11e/qboBcj6G8ntplKxPy2GBxU=;
-        b=MElx+MzyDkY8Q38uCP2mANKG+TIM4AtFd+ao4K9JUq7xInl1Gm9hlHlEr5CdiyyOrPG6Lh
-        BogQeWcJSZXjvHoqxmLtra7niwN6uW0WY2CBQv68fR4JMqIy3fuImfb8RG1GTukpd4nmck
-        BfguvQxvpyTZhHWIIazPn8sri/9QvQ4=
+         to:to:cc; bh=sZqM58Ec3WZKbAvwY/cBh3RDnWev4QH4nWVhzFDl5Zo=;
+        b=JycxjTwAHGMj/nI3BBxYwICFt0smVhXZajPP0mlTQHx5+lKh/Hr7pEW396AnPURsnf3LyD
+        AEtx4blXc4tGE1Kt4cYC7evSCLbupCbenUH8S8KYt0B51/6nwaU2bcXotsr1L4PZQzTXq2
+        CX2ksXTnCiP3zEq4YC1euZFNNuwfmJU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-AJeojHx0OeioLnMVoERQNA-1; Wed, 06 May 2020 05:22:28 -0400
-X-MC-Unique: AJeojHx0OeioLnMVoERQNA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-434-r5NlPNRMPC6HpDHTJCbI2Q-1; Wed, 06 May 2020 05:24:01 -0400
+X-MC-Unique: r5NlPNRMPC6HpDHTJCbI2Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BC4E107ACCD;
-        Wed,  6 May 2020 09:22:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74A001800D4A;
+        Wed,  6 May 2020 09:24:00 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 434C8261A1;
-        Wed,  6 May 2020 09:22:27 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 180365D9C5;
+        Wed,  6 May 2020 09:24:00 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH v2] KVM: x86: fix DR6 delivery for various cases of #DB injection
-Date:   Wed,  6 May 2020 05:22:26 -0400
-Message-Id: <20200506092226.26394-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Subject: [PATCH v3] KVM: x86: fix DR6 delivery for various cases of #DB injection
+Date:   Wed,  6 May 2020 05:23:59 -0400
+Message-Id: <20200506092359.26797-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -48,15 +48,20 @@ kvm_deliver_exception_payload that is needed on AMD.
 Reported-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 6 ++----
+ arch/x86/kvm/vmx/vmx.c | 8 ++------
  arch/x86/kvm/x86.c     | 6 +++---
- 2 files changed, 5 insertions(+), 7 deletions(-)
+ 2 files changed, 5 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c2c6335a998c..254c46a5d69d 100644
+index c2c6335a998c..bb5a527e49d9 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4682,7 +4682,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+@@ -4677,12 +4677,10 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ 		dr6 = vmcs_readl(EXIT_QUALIFICATION);
+ 		if (!(vcpu->guest_debug &
+ 		      (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))) {
+-			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+-			vcpu->arch.dr6 |= dr6 | DR6_RTM;
  			if (is_icebp(intr_info))
  				WARN_ON(!skip_emulated_instruction(vcpu));
  
@@ -65,7 +70,7 @@ index c2c6335a998c..254c46a5d69d 100644
  			return 1;
  		}
  		kvm_run->debug.arch.dr6 = dr6 | DR6_FIXED_1;
-@@ -4936,9 +4936,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+@@ -4936,9 +4934,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
  			vcpu->run->exit_reason = KVM_EXIT_DEBUG;
  			return 0;
  		} else {
