@@ -2,90 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D9531C69F7
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 09:23:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A7471C6A1D
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 09:35:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728088AbgEFHW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 03:22:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22943 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726451AbgEFHW6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 03:22:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588749777;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PAQFi5DmAuxLAp4Qxu8jHGyEya4c8hpKA4inepD4zvw=;
-        b=NKaONBsjNpx/s49Ef1WoqP7ofvoNIYWvQO2s4SsO3U06NQ2YddU7hRHfD4R1RiOnTDnEMJ
-        0T98cO8S5vxn1vhFuZZxDi0wnbUtc8zwfBMMMpL70qCGyGmPZ441rku+cTnQjShqW/5C0Z
-        HN+cdrDKPZJWdje/xupTPfv7B8H8Vs4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-578HvLSWNlynXV00ztaB0g-1; Wed, 06 May 2020 03:22:55 -0400
-X-MC-Unique: 578HvLSWNlynXV00ztaB0g-1
-Received: by mail-wr1-f70.google.com with SMTP id e14so848249wrv.11
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 00:22:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PAQFi5DmAuxLAp4Qxu8jHGyEya4c8hpKA4inepD4zvw=;
-        b=Mky9ZlnOu+OFyhR2OLoKdy2/WAy7Sc1BbNXc/WSy877Ce9ZtyL/o4ukUATtAHBWqbw
-         j2D7kPYKiNszFtxmKscPf4HyBVba6mOcWC/Knq8lz+aLRp9Kcjw5u3qH7VB9gjAFgLZw
-         rYJtvCtLhaaAXC7tztMs5gtAQHpvBpFeZcX5zmQzYnGeklzvcBt59s21t+eMpn+g7jrZ
-         IwY6dXV1oKFRhFqI2Fa11JwJLPx95cRfVcB7jWA3BLHKHuwreL65Hz/NEmVVhM9q4Q2o
-         aLgzqduxtv4Xlxni4xx5hYKKksiGd8b138Xcr74m+75qBOP6NZIQcVPVto3rWrrnRYBK
-         Qqkg==
-X-Gm-Message-State: AGi0PubJKNaxz/HWfqm7MUFzznCpEOdWFVaHhmnYkz5uSizjhPqTu9Ij
-        shKgxPnE6igKkP/i61Nho8X6kH4tVC/Q00n3tXVJjR3wXu3z/nQbdafycbuGzYN2Tr8ocHRVvTc
-        FnShLeGWRomRJ
-X-Received: by 2002:a7b:c10d:: with SMTP id w13mr2807026wmi.78.1588749774596;
-        Wed, 06 May 2020 00:22:54 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKjqbWk3J+KT20Dfvh+mDhrG00ULi4I4teLGNNxi48vnUTP/k2QiQ89DPaMCmFhJxFulfh75Q==
-X-Received: by 2002:a7b:c10d:: with SMTP id w13mr2807008wmi.78.1588749774359;
-        Wed, 06 May 2020 00:22:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:11d7:2f21:f38b:17e? ([2001:b07:6468:f312:11d7:2f21:f38b:17e])
-        by smtp.gmail.com with ESMTPSA id o6sm1283509wrw.63.2020.05.06.00.22.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2020 00:22:53 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] KVM: VMX: add test for NMI delivery during
- HLT
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>
-References: <20200505160512.22845-1-pbonzini@redhat.com>
- <20200506065816.tzl4jytqt3oxhfdq@kamzik.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <80f5c1f6-3c4f-a300-4a1e-10694618b704@redhat.com>
-Date:   Wed, 6 May 2020 09:22:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728301AbgEFHfc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 03:35:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37220 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728069AbgEFHfc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 03:35:32 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B997420753;
+        Wed,  6 May 2020 07:35:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588750527;
+        bh=wJB7AVgD0h7fCY7ouJXiaTz3ZITva1KOZ+RtXVFf+gI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=R3i+qZy5IfS2N3VlFHdc2WEfSK/bY6El8PmmoTZ6sXyW50BL/Zu6sCFbupelNktoI
+         5Wftdz5V8zLoFsrrbwz1aVv5OdSjBVYpJp9r9E3bqg3V9zyq/Gy82ypV+g733qeEQU
+         cUA7bOsbPwJNorsKbfq7frvec8s1Ohp7BwhzxJ24=
+Date:   Wed, 6 May 2020 09:35:25 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Justin He <Justin.He@arm.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "ldigby@redhat.com" <ldigby@redhat.com>,
+        "n.b@live.com" <n.b@live.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [GIT PULL] vhost: fixes
+Message-ID: <20200506073525.GC2336830@kroah.com>
+References: <20200504081540-mutt-send-email-mst@kernel.org>
+ <AM6PR08MB40696EFF8BE389C134AC04F6F7A40@AM6PR08MB4069.eurprd08.prod.outlook.com>
+ <20200506031918-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200506065816.tzl4jytqt3oxhfdq@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200506031918-mutt-send-email-mst@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/20 08:58, Andrew Jones wrote:
-> On Tue, May 05, 2020 at 12:05:12PM -0400, Paolo Bonzini wrote:
->> From: Cathy Avery <cavery@redhat.com>
->>
->> Signed-off-by: Cathy Avery <cavery@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  x86/vmx_tests.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 120 insertions(+)
+On Wed, May 06, 2020 at 03:19:55AM -0400, Michael S. Tsirkin wrote:
+> On Wed, May 06, 2020 at 03:28:47AM +0000, Justin He wrote:
+> > Hi Michael
+> > 
+> > > -----Original Message-----
+> > > From: Michael S. Tsirkin <mst@redhat.com>
+> > > Sent: Monday, May 4, 2020 8:16 PM
+> > > To: Linus Torvalds <torvalds@linux-foundation.org>
+> > > Cc: kvm@vger.kernel.org; virtualization@lists.linux-foundation.org;
+> > > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Justin He
+> > > <Justin.He@arm.com>; ldigby@redhat.com; mst@redhat.com; n.b@live.com;
+> > > stefanha@redhat.com
+> > > Subject: [GIT PULL] vhost: fixes
+> > >
+> > > The following changes since commit
+> > > 6a8b55ed4056ea5559ebe4f6a4b247f627870d4c:
+> > >
+> > >   Linux 5.7-rc3 (2020-04-26 13:51:02 -0700)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> > >
+> > > for you to fetch changes up to
+> > > 0b841030625cde5f784dd62aec72d6a766faae70:
+> > >
+> > >   vhost: vsock: kick send_pkt worker once device is started (2020-05-02
+> > > 10:28:21 -0400)
+> > >
+> > > ----------------------------------------------------------------
+> > > virtio: fixes
+> > >
+> > > A couple of bug fixes.
+> > >
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >
+> > > ----------------------------------------------------------------
+> > > Jia He (1):
+> > >       vhost: vsock: kick send_pkt worker once device is started
+> > 
+> > Should this fix also be CC-ed to stable? Sorry I forgot to cc it to stable.
+> > 
+> > --
+> > Cheers,
+> > Justin (Jia He)
 > 
-> Much of this patch is using four space indentation instead of tabs.
+> 
+> Go ahead, though recently just including Fixes seems to be enough.
 
-Hmm, true -- because it's copied from svm_tests.c which uses 4 spaces.
-I'll adjust it.
+You are getting lucky if you only apply a "Fixes:" tag, as that is much
+lower down our list of things to look at.  We are forced to do that
+because of subsystems and maintainers that do not use the cc: stable
+tag, as has been documented for the patch 15+ years :(
 
-Paolo
+So please be explicit if you know you want it merged to the stable
+trees, otherwise it is not a guarantee at all if you only use "fixes:".
 
+thanks,
+
+greg k-h
