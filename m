@@ -2,145 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74A7E1C7B4F
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 22:32:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2E901C7B79
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 22:47:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728186AbgEFUci (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 16:32:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55314 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725966AbgEFUci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 16:32:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588797156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1VXIoJyVGTqnv0xmGyjiKd0uopuusoRfelVhVxRM1M0=;
-        b=dW3kreN06TogibFj3ir5CE4exSsnCRLzFbg4EV2kEC/Jbc9JPmDLRBQSAL1TuOLvyegXmx
-        5h8BrPjhsZOO6/WVr66ZdUBTVKdXWJCC61ElRut9342rLlHzFhSq9zIphWRMx+FyYjOj/p
-        T8aQlH9LEpnbQ/2evrsYE5ZmCzxhMNk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-Z3I0RdVeOZCqUDSwAdlPLQ-1; Wed, 06 May 2020 16:32:34 -0400
-X-MC-Unique: Z3I0RdVeOZCqUDSwAdlPLQ-1
-Received: by mail-wr1-f69.google.com with SMTP id p2so1917500wrx.12
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 13:32:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=1VXIoJyVGTqnv0xmGyjiKd0uopuusoRfelVhVxRM1M0=;
-        b=EOOlC2TEYyRU5w8by50xTYVzsYIl9osn1takX/M0UoFEwkD8I6dqab4Ji6XJZXg7Yd
-         TA+j1FBLPXnTIPllU4SmVnYdtAfM4s95MZVVZCmJUX8wQpP0SANPhU/teUBH7XsDQGWV
-         4fWCvUl672z85ewvUp7pa65BF8s3SQYd6E8P4Dc6uM4O3eLJ1U1sptii9DTPhwMCM9Zy
-         PkUomFq7cJLCcjJPuEvM3V9WwK8ovLgve4zj6aO81V4x1GzuhUWbMuKK92+xGY5MDupl
-         PZXeFGAMrqIjyOhzQvVxnIXNpHwiqtzf1e18Ur7pdHhnRqtkvp1H8SHJVeY2qPYDRghC
-         US+g==
-X-Gm-Message-State: AGi0PuaIsF9Sw7XfE4nm2UvDekeGMIkTqqL5pjPOyOnLDIkJrFfr9c8s
-        n//YCDl4nPSzHxXsXIzoSxJtDsWg2jstLDe8bIfHeD+dio0k93Uo/prA5ynNFl8+S0pgL2vF+rP
-        zAVz1dtXICvuD
-X-Received: by 2002:a1c:1985:: with SMTP id 127mr6863942wmz.13.1588797153239;
-        Wed, 06 May 2020 13:32:33 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJv7PfYup3I6WYvehP//5E0f+r/yzOVi/hf1AH4YTqq+ORSfr5YBr27by97VoXD8zbqpFHwKQ==
-X-Received: by 2002:a1c:1985:: with SMTP id 127mr6863918wmz.13.1588797152983;
-        Wed, 06 May 2020 13:32:32 -0700 (PDT)
-Received: from [192.168.3.122] (p5B0C679D.dip0.t-ipconnect.de. [91.12.103.157])
-        by smtp.gmail.com with ESMTPSA id i25sm4449561wml.43.2020.05.06.13.32.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2020 13:32:32 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   David Hildenbrand <david@redhat.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [vhost:vhost 8/22] drivers/virtio/virtio_mem.c:1375:20: error: implicit declaration of function 'kzalloc'; did you mean 'vzalloc'?
-Date:   Wed, 6 May 2020 22:32:31 +0200
-Message-Id: <37C99432-6290-4130-B0AF-953DDE09D5DC@redhat.com>
-References: <20200506162751-mutt-send-email-mst@kernel.org>
-Cc:     David Hildenbrand <david@redhat.com>,
-        kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-In-Reply-To: <20200506162751-mutt-send-email-mst@kernel.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-X-Mailer: iPhone Mail (17D50)
+        id S1729122AbgEFUqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 16:46:55 -0400
+Received: from mga14.intel.com ([192.55.52.115]:10412 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727984AbgEFUqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 16:46:55 -0400
+IronPort-SDR: eLwSlkkeD9bgYUVZyJvrf1CXZFoe2lrRmqJC1y2RgPsOEwAsB/SyiB8uGxPhx399j0fnoMqozf
+ Fmt7KXzHNi6A==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 13:46:54 -0700
+IronPort-SDR: ADWdu/2AJnNYrEuYmusZKmq5/Bt1ju1DiUUzsmwbVmNR23iLMYujA9nPwIo2TisLcL0KDhewdB
+ Sge3yu8LYtEQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,360,1583222400"; 
+   d="scan'208";a="296304662"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by orsmga008.jf.intel.com with ESMTP; 06 May 2020 13:46:54 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: nVMX: Remove unused 'ops' param from nested_vmx_hardware_setup()
+Date:   Wed,  6 May 2020 13:46:53 -0700
+Message-Id: <20200506204653.14683-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Remove a 'struct kvm_x86_ops' param that got left behind when the nested
+ops were moved to their own struct.
 
+Fixes: 33b22172452f0 ("KVM: x86: move nested-related kvm_x86_ops to a separate struct")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/nested.c | 3 +--
+ arch/x86/kvm/vmx/nested.h | 3 +--
+ arch/x86/kvm/vmx/vmx.c    | 3 +--
+ 3 files changed, 3 insertions(+), 6 deletions(-)
 
-> Am 06.05.2020 um 22:28 schrieb Michael S. Tsirkin <mst@redhat.com>:
->=20
-> =EF=BB=BFOn Tue, May 05, 2020 at 06:22:51PM +0200, David Hildenbrand wrote=
-:
->>> On 05.05.20 18:20, Michael S. Tsirkin wrote:
->>> On Tue, May 05, 2020 at 05:46:44PM +0200, David Hildenbrand wrote:
->>>> On 05.05.20 17:44, Michael S. Tsirkin wrote:
->>>>> On Tue, May 05, 2020 at 04:50:13PM +0200, David Hildenbrand wrote:
->>>>>> On 05.05.20 16:15, kbuild test robot wrote:
->>>>>>> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.gi=
-t vhost
->>>>>>> head:   da1742791d8c0c0a8e5471f181549c4726a5c5f9
->>>>>>> commit: 7527631e900d464ed2d533f799cb0da2b29cc6f0 [8/22] virtio-mem: P=
-aravirtualized memory hotplug
->>>>>>> config: x86_64-randconfig-b002-20200505 (attached as .config)
->>>>>>> compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
->>>>>>> reproduce:
->>>>>>>        git checkout 7527631e900d464ed2d533f799cb0da2b29cc6f0
->>>>>>>        # save the attached .config to linux build tree
->>>>>>>        make ARCH=3Dx86_64=20
->>>>>>>=20
->>>>>>> If you fix the issue, kindly add following tag as appropriate
->>>>>>> Reported-by: kbuild test robot <lkp@intel.com>
->>>>>>>=20
->>>>>>> All error/warnings (new ones prefixed by >>):
->>>>>>>=20
->>>>>>>   drivers/virtio/virtio_mem.c: In function 'virtio_mem_probe':
->>>>>>>>> drivers/virtio/virtio_mem.c:1375:20: error: implicit declaration o=
-f function 'kzalloc'; did you mean 'vzalloc'? [-Werror=3Dimplicit-function-d=
-eclaration]
->>>>>>>     vdev->priv =3D vm =3D kzalloc(sizeof(*vm), GFP_KERNEL);
->>>>>>>                       ^~~~~~~
->>>>>>>                       vzalloc
->>>>>>>>> drivers/virtio/virtio_mem.c:1375:18: warning: assignment makes poi=
-nter from integer without a cast [-Wint-conversion]
->>>>>>>     vdev->priv =3D vm =3D kzalloc(sizeof(*vm), GFP_KERNEL);
->>>>>>>                     ^
->>>>>>>>> drivers/virtio/virtio_mem.c:1419:2: error: implicit declaration of=
- function 'kfree'; did you mean 'vfree'? [-Werror=3Dimplicit-function-declar=
-ation]
->>>>>>>     kfree(vm);
->>>>>>>     ^~~~~
->>>>>>>     vfree
->>>>>>>   cc1: some warnings being treated as errors
->>>>>>>=20
->>>>>>> vim +1375 drivers/virtio/virtio_mem.c
->>>>>>=20
->>>>>> Guess we simply need
->>>>>>=20
->>>>>> #include <linux/slab.h>
->>>>>>=20
->>>>>> to make it work for that config.
->>>>>=20
->>>>>=20
->>>>> OK I added that in the 1st commit that introduced virtio-mem.
->>>>=20
->>>> Thanks. I have some addon-patches ready, what's the best way to continu=
-e
->>>> with these?
->>>=20
->>> If these are bugfixes, just respin the series (including this fix).
->>=20
->> There are two really minor bugfixes for corner-case error handling and
->> one simplification. I can squash them and resend, makes things easier.
->=20
-> OK try to do it ASAP, we don't want to repeat the drama we had with vdpa.
->=20
-
-Yeah, did some more testing today. Will send v3 out tomorrow.
-
-Cheers!=
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 20a9edca51fa5..fb1548279258a 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -6425,8 +6425,7 @@ void nested_vmx_hardware_unsetup(void)
+ 	}
+ }
+ 
+-__init int nested_vmx_hardware_setup(struct kvm_x86_ops *ops,
+-				     int (*exit_handlers[])(struct kvm_vcpu *))
++__init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
+ {
+ 	int i;
+ 
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index 5cc72ae0e277b..758bccc26cf98 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -19,8 +19,7 @@ enum nvmx_vmentry_status {
+ void vmx_leave_nested(struct kvm_vcpu *vcpu);
+ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps);
+ void nested_vmx_hardware_unsetup(void);
+-__init int nested_vmx_hardware_setup(struct kvm_x86_ops *ops,
+-				     int (*exit_handlers[])(struct kvm_vcpu *));
++__init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *));
+ void nested_vmx_set_vmcs_shadowing_bitmap(void);
+ void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
+ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 94f49c5ae89aa..b413903b55089 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8112,8 +8112,7 @@ static __init int hardware_setup(void)
+ 		nested_vmx_setup_ctls_msrs(&vmcs_config.nested,
+ 					   vmx_capability.ept);
+ 
+-		r = nested_vmx_hardware_setup(&vmx_x86_ops,
+-					      kvm_vmx_exit_handlers);
++		r = nested_vmx_hardware_setup(kvm_vmx_exit_handlers);
+ 		if (r)
+ 			return r;
+ 	}
+-- 
+2.26.0
 
