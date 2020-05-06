@@ -2,167 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2917B1C7172
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 15:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2573C1C718B
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 15:18:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728444AbgEFNKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 09:10:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30212 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728045AbgEFNKb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 09:10:31 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 046D46hX104181;
-        Wed, 6 May 2020 09:10:29 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s4v97uv4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 May 2020 09:10:29 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 046D5HBa112926;
-        Wed, 6 May 2020 09:10:28 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s4v97uu4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 May 2020 09:10:28 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 046DAKBg010962;
-        Wed, 6 May 2020 13:10:26 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma02fra.de.ibm.com with ESMTP id 30s0g5brvc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 May 2020 13:10:26 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 046DANVd64094280
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 6 May 2020 13:10:23 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA673A405C;
-        Wed,  6 May 2020 13:10:23 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 40E01A4065;
-        Wed,  6 May 2020 13:10:23 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.29.248])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  6 May 2020 13:10:23 +0000 (GMT)
-Subject: Re: [GIT PULL 1/1] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
- instruction
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Qian Cai <cailca@icloud.com>
-References: <20200506115945.13132-1-borntraeger@de.ibm.com>
- <20200506115945.13132-2-borntraeger@de.ibm.com>
- <bcd98cbd-1e28-47a2-6cbd-668da4ddb9f5@redhat.com>
- <fe991071-25d0-3842-73cc-23cb365850f3@de.ibm.com>
- <a8688ff1-edc6-fdd8-9575-adbf726f9f06@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <b23f54fd-7c6b-0648-7806-3a5d985cc64b@de.ibm.com>
-Date:   Wed, 6 May 2020 15:10:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728701AbgEFNSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 09:18:38 -0400
+Received: from mail-eopbgr760078.outbound.protection.outlook.com ([40.107.76.78]:6525
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728082AbgEFNSU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 09:18:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z0Byoi1YFrZlLtiOOhTxuToVEhHBu4DV/dHx24R+M6UfVXe508JZu+ReJYGwNduLD6H9WWaQJCmv0iI894QGn7QOj0ViDbujKHwy1SVjpNVMipqNwFtlO55rODEqQQ8d+Ct5ppaGha/nGzzZQOjCgBuz0P7ozDFSNgpdZTzSmmr8x6jNCwO6o5o4AOzXyGNN0w5D/XeLoaXLcFe2U5mK/TVGG3bgwKTKYEm9h7KeDhSpXpjtWM1OX+IRwlLCZE9fvpE5svo8O9+oPR/Rluh8CoT7eqQXvhBTtPh7KaOXbcYRvs8Z/RjX+1L7IkrOf2v/kabSnhQcSml7kNU0qjx8hg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EHKuqxcnGfkscwD9jFe/Y0HVKRgyHsMiTITckECT99Q=;
+ b=gGX5al10LX4uP5x5zMWjuss06tWldtaJ6/MngMwYXxTMzXbi5ALZn6Xi9hrGKKAIspvC+N2ibTF5a1pO/Bu18JvVzu1HZ8rjCt4F/b42eO83BH5Ba9IYoBb+rfgxlAwe+LDXb/VbLZ8mFvORXszz0k6ToZC+xvSVPVmPtS8bzTs8F1fRFeWsqijR8UlszaA6ESjf825zlrhgdKALD1QoK85oJgx8SzEP/7EHntQ+39CmiXJOuWU397T9s7o3LJxojuXjOoUZoXesaSq8dQbDE8pZRCzOuN3AkpWovpJf7zefYaQoAKxVJvS+mfaiT+88hZa0/GK8lYFoGlrjJ2qqbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EHKuqxcnGfkscwD9jFe/Y0HVKRgyHsMiTITckECT99Q=;
+ b=XjGQZSODJ1WdJxhibH3gE706GWR5aJ3UcMmYssPCwnYBeCNM95fcoIy6tPoxQ0S/lzZH46jMFQI/YlRf/angONk8Vdxppa+vWpk6AQ2cE8QnMCr/XzfwJffhIspyCKHqRRCr3pYeFK0gO33Ww4vkzExhxeenjC1Qs4ub79x1N1U=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1163.namprd12.prod.outlook.com (2603:10b6:3:7a::18) by
+ DM5PR12MB1258.namprd12.prod.outlook.com (2603:10b6:3:79::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2958.29; Wed, 6 May 2020 13:18:13 +0000
+Received: from DM5PR12MB1163.namprd12.prod.outlook.com
+ ([fe80::d061:4c5:954e:4744]) by DM5PR12MB1163.namprd12.prod.outlook.com
+ ([fe80::d061:4c5:954e:4744%4]) with mapi id 15.20.2958.030; Wed, 6 May 2020
+ 13:18:13 +0000
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
+        mlevitsk@redhat.com,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: [PATCH 0/4] KVM: SVM: Fix AVIC warning when enable irq window
+Date:   Wed,  6 May 2020 08:17:52 -0500
+Message-Id: <1588771076-73790-1-git-send-email-suravee.suthikulpanit@amd.com>
+X-Mailer: git-send-email 1.8.3.1
+Content-Type: text/plain
+X-ClientProxiedBy: DM5PR12CA0071.namprd12.prod.outlook.com
+ (2603:10b6:3:103::33) To DM5PR12MB1163.namprd12.prod.outlook.com
+ (2603:10b6:3:7a::18)
 MIME-Version: 1.0
-In-Reply-To: <a8688ff1-edc6-fdd8-9575-adbf726f9f06@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
- definitions=2020-05-06_05:2020-05-05,2020-05-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- suspectscore=0 adultscore=0 clxscore=1015 impostorscore=0
- lowpriorityscore=0 bulkscore=0 phishscore=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005060098
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ssuthiku-rhel7-ssp.amd.com (165.204.78.2) by DM5PR12CA0071.namprd12.prod.outlook.com (2603:10b6:3:103::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28 via Frontend Transport; Wed, 6 May 2020 13:18:13 +0000
+X-Mailer: git-send-email 1.8.3.1
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: aa30d1ed-7187-432f-1d25-08d7f1bfee41
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1258:|DM5PR12MB1258:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1258C7AB76E7CD2F1627CBBAF3A40@DM5PR12MB1258.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Forefront-PRVS: 03950F25EC
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: woCpf5rMpKquxVwBPccdASWdqALHeDcrZV469u/YUg16pPmZDHl+XbT7P/qxsGixC2PL9rVxyM+G9MMjl/8RsqapDyiYaiZ+UziM710FS5bGuILSHrrhwhAIz3WXHLad2LVjC9bDENIYQYYpWjA+usRGIp6NRUIg7NZpdQcw/FTagg+U1VWRM4X7ZYGedddaxZ+WCynqiDf8sesQsXrOjjybK7g6FxccjHHQ6fumVs3cGhoXPM/IE2p2hjpR1Wss2mJlwvK3aASKHXXkyBU1QJ8G78JI3XHdBtw1FkMD+lSduicSX8pVJeJ23cZ4SBnrNiZkU0JUp98d//4mi/tySwtSVVyID0vUvLXz1EPBhI1xBLlwHzpt8FBVWVUay+v5xn871HWjMJ80xkFi+ENagmh7J7kdmRwNbaVCTw3aC2g2HWAFSfyMShmaUCsXAUG0chu/lkGS0OJg6WD3QJiEpMArQOg/V5XlHpTPAheBY1TEndYO8g47fKAvBXrX1JDsehQ16osm1chnaLJpcAtvhg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(376002)(136003)(396003)(346002)(33430700001)(4744005)(5660300002)(66556008)(66476007)(66946007)(7696005)(52116002)(8676002)(478600001)(8936002)(44832011)(6666004)(2906002)(2616005)(956004)(6486002)(86362001)(316002)(33440700001)(26005)(16526019)(186003)(36756003)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: FmCoi+XAtpKOKCUgBSPYUkKicDaDzGU6ybCYrb7303KCho29MsVEE/EmG6CDNlt09fJOM5sTY1HR5YxDMOhXmgfpxpj0B7KyU1slO00lZmeu1upHf1oLyvuDR8TqXukbblI9VrJALNt3R4YZDu3VZNTxPn51G9OgsnvVezZwSDl8KKLR1GuGr979Img1DI4B52+okNLF3OYvFqOJK1wMxRg8O8h1uPQTTl6+APBEPzBRr4DYQU8AD2440Iv7bPnktwoHV/CPzLXT7W5/KCfVpzHYDrChF8ro9E9BqrfS7zAT0woON99K5bkazcYAWeQttRdXTRzV5X6q6HGC1ZIMFEPYSa0uHV1P0tVd6g46pZ+uGUCvTZFBcbybrVn0PyylWzUer88fLlCo7UMpslYjk35T+yUAcVwLJvADiqa4dy3t5/rCTnoVYjktB84QGIV8cCW5V5u7ueIgvg0fnuihVsPXE7UeXQ34XU9ibHUuOjBXTtPoo4ryIpPehki8zVqAscuHNMmrmL0GFVwuhr+AXAWSdADFnOU4bblXM+bLQZGludkpyTlZPWS3Zs/VJvlctGVsXbk00IuvjxtAZ/9PD56/My1MKWqmryoFeD/sCwygi1jzm3Xnly53mJBRbQwLsJKLCILAEs+hzDhnLWdfduY8B7XeT5J4O6rgFa+SHBSSbElWQolB9RHv2JPMyVGwtu5LPCyHUpMwHmARD45rgcqX0suy/CkumxGMnXm/zlbQc0GDznpL1Tu9Bk7nly5EaipW+YfHVr27slw30UhGds6gsR9NYMONV6GeGa7pZfo=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa30d1ed-7187-432f-1d25-08d7f1bfee41
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2020 13:18:13.7765
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FqR3QiAgo2gfaI9LfQg3YpL4VPjArgrBaWYKDYwF5jn8ToWytaR4p0U2BiYnSuRs23a8owCAf4LZjFUn44JmVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1258
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Introduce kvm_make_all_cpus_request_except(), which is used
+in the subsequent patch 2 to fix AVIC warning.
 
+Also include miscelleneous clean ups.
 
-On 06.05.20 15:04, Paolo Bonzini wrote:
-> On 06/05/20 14:23, Christian Borntraeger wrote:
->>
->> the problem is that z/VM seems to have disabled that bit. The interpretion
->> only works when all layers have this bit set. (Its called an effective bit). 
->> So we have
->> LPAR -> ECA_APIE = 1
->> Z/VM -> ECA_APIE = 0
->> KVM  -> ECA_APIE = 1
->> nested KVM guest --> does during boot in ap_instructions_available PQAP with
->> FC==0 to test if crypto is available.
->>
->> As the nested guest is in fact a shadow guest of z/VM
->> this will now intercept to z/VM, which will forward that to KVM.
-> 
-> Right, and I'd understand, that since KVM has set ECA_APIE=1, z/VM
-> should either:
-> 
-> * not forward the intercept to KVM unless FC==3
-> 
-> * toggle ECA_APIE back to 1 while running the KVM nested guest.
-> 
-> Of course I have no idea if either of these choices is impossible, or
-> too expensive, but this is how we'd try to handle it for x86 features.
-> 
-> So it would be a z/VM bug, because it's not virtualizing ECA_APIE=1
+Thanks,
+Suravee
 
-It would be kind of a z/VM bug, but its ok according to the docs.
+Suravee Suthikulpanit (4):
+  KVM: Introduce kvm_make_all_cpus_request_except()
+  KVM: SVM: Fixes setting V_IRQ while AVIC is still enabled
+  KVM: SVM: Merge svm_enable_vintr into svm_set_vintr
+  KVM: SVM: Remove unnecessary V_IRQ unsetting
 
-> correctly.  The next question is, if removing the WARN_ON is okay for
-> you, should KVM not bother setting ECA_APIE=1 so that you don't trigger
-> the z/VM bug at all?
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/hyperv.c           |  6 ++++--
+ arch/x86/kvm/i8254.c            |  4 ++--
+ arch/x86/kvm/svm/avic.c         |  2 +-
+ arch/x86/kvm/svm/svm.c          | 18 ++++++------------
+ arch/x86/kvm/x86.c              | 16 +++++++++++++---
+ include/linux/kvm_host.h        |  3 +++
+ virt/kvm/kvm_main.c             | 14 +++++++++++---
+ 8 files changed, 41 insertions(+), 24 deletions(-)
 
-We need ECA_APIE as this is the only way to provide hardware passthrough.
-In the end running KVM under z/VM kind of works but it is not something that
-I would consider supported. 
+-- 
+1.8.3.1
+
