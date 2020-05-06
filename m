@@ -2,95 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CDF91C75C8
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:09:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81B9C1C75D0
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:10:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729927AbgEFQJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 12:09:30 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31396 "EHLO
+        id S1729966AbgEFQKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 12:10:54 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56751 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729418AbgEFQJ3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 12:09:29 -0400
+        by vger.kernel.org with ESMTP id S1729505AbgEFQKy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 12:10:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588781368;
+        s=mimecast20190719; t=1588781453;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LSgQ8YJxEMhLIrqO/YJcdGSlP0f7eNQQ/CQ1CO6dBlo=;
-        b=NieykpUA7el+C8mFb/2qgkHAZrHy5wz4Q/oOjOjm/FejcrWEg8dqFku/LLOeNTeZ0dPNoF
-        hrjQKbeqvbda7BR3UfeJUl0QMdoI1Ye0PtSTK450w1sA+bbe5KqsOH8uYwfFMPcy5Q9NeP
-        VFt9o3z/ztiJUvUEs6lCZZanQkzn4SY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-mgiBIZ4bP7-bz7YuUeEWew-1; Wed, 06 May 2020 12:09:27 -0400
-X-MC-Unique: mgiBIZ4bP7-bz7YuUeEWew-1
-Received: by mail-wr1-f72.google.com with SMTP id p8so1571247wrj.5
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 09:09:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LSgQ8YJxEMhLIrqO/YJcdGSlP0f7eNQQ/CQ1CO6dBlo=;
-        b=I1XzA5YnbfZLsFAhEoJsAlh3vRyjbgUrbsZ0zgVNZyP5rVSfgoTZQ3segPb4nd+0dF
-         her0pSXW6S5Re8Sal4KEUIPm7zBarGq9kIladX8DIpDcCEjcAD+sxNShZrixDirUsg0a
-         NiIZTIL3umoX3NBQLLMzW5ohLGgsIjPvVauevgLv0QIrEEiA6AWmAQeIT2vAj5fBhvlH
-         APN2D/x0T7QFS0CkNc4b1xFwdXKwUkd1mv6FRnE4yZtT19EEqlX3hVoFiKOCUGbMgDx3
-         JyLxrBd+eD59LyQtBRHdnHlX1P1KWt0+XXSBwBEwMzO411E8V6HVwyJZ+0Wqw3/IM2CS
-         F/uQ==
-X-Gm-Message-State: AGi0PuaieNzocpc2+ZKeMyLmOETbreitQbwjfvBRJS/Ar5wkUMhyTjJ9
-        84/EmQfSLg5CHlYCwIK9vxSBbCuAtLGxboAATt1LxyM9Ru8bLY0VEQnAzUDI5jHIg/jAsHpZ7pi
-        YXKuhFNWNI2yI
-X-Received: by 2002:a05:600c:22d6:: with SMTP id 22mr5176817wmg.121.1588781365654;
-        Wed, 06 May 2020 09:09:25 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI7gzG5qcbx8VG1Ygu0+6ZEU8iGxjvwNjrNCvKqYtR7y1a21HzIpeztonpTyCyr1MPQTdPsGQ==
-X-Received: by 2002:a05:600c:22d6:: with SMTP id 22mr5176789wmg.121.1588781365458;
-        Wed, 06 May 2020 09:09:25 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:11d7:2f21:f38b:17e? ([2001:b07:6468:f312:11d7:2f21:f38b:17e])
-        by smtp.gmail.com with ESMTPSA id m188sm3461061wme.47.2020.05.06.09.09.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2020 09:09:24 -0700 (PDT)
-Subject: Re: [PATCH 7/9] KVM: x86: simplify dr6 accessors in kvm_x86_ops
-To:     Peter Xu <peterx@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200506111034.11756-1-pbonzini@redhat.com>
- <20200506111034.11756-8-pbonzini@redhat.com> <20200506160623.GO6299@xz-x1>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=pK8XLGVgtLQ7Wuz0EniH4HZPeCKMh3d83lQPtPWl3h4=;
+        b=KZSIRiTfeG5+JQd21pzLmD5rvJSkgKExANGQGD6F7BeL+UpNWzMUxlkxV6X7owbyRBDgD0
+        iSPOMheFXJeYKgEih73qDoxVK/YWM+mkkPgGrt+xsPFpZI3FYi7zJwFYexubvGex5UHGIa
+        ijh/Dp2L43ZcRix3Xi4MmlIHrOGj6qI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-fmYHDPn_MOGx2iku1zuVsg-1; Wed, 06 May 2020 12:10:51 -0400
+X-MC-Unique: fmYHDPn_MOGx2iku1zuVsg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 522021842D22;
+        Wed,  6 May 2020 16:10:50 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04949165F6;
+        Wed,  6 May 2020 16:10:48 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d44c75f-00df-3cae-31a8-982a0b95f0b0@redhat.com>
-Date:   Wed, 6 May 2020 18:09:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     wanpengli@tencent.com, linxl3@wangsu.com
+Subject: [PATCH v5 0/7] KVM: VMX: Tscdeadline timer emulation fastpath
+Date:   Wed,  6 May 2020 12:10:41 -0400
+Message-Id: <20200506161048.28840-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200506160623.GO6299@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/20 18:06, Peter Xu wrote:
-> On Wed, May 06, 2020 at 07:10:32AM -0400, Paolo Bonzini wrote:
->> kvm_x86_ops.set_dr6 is only ever called with vcpu->arch.dr6 as the
->> second argument, and for both SVM and VMX the VMCB value is kept
->> synchronized with vcpu->arch.dr6 on #DB; we can therefore remove the
->> read accessor.
->>
->> For the write accessor we can avoid the retpoline penalty on Intel
->> by accepting a NULL value and just skipping the call in that case.
->>
->> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> (I think this patch and the previous one seem to be the same as the previous
->  version.  Anyway...)
+This is my cleaned up version of Wanpeng's TSC deadline timer
+optimizations.  The main change is a reorganization of the fast
+path enums, removing EXIT_FASTPATH_SKIP_EMUL_INS (following the
+suggestion of =E6=9E=97=E9=91=AB=E9=BE=99) and renaming EXIT_FASTPATH_NOP=
+ to
+EXIT_FASTPATH_EXIT_HANDLED.
 
-Yes, I placed them here because they are needed to solve the SVM bugs in
-patch 8.  Sorry for not adding your Reviewed-by.
+Paolo Bonzini (1):
+  KVM: x86: introduce kvm_can_use_hv_timer
 
-Paolo
+Wanpeng Li (6):
+  KVM: VMX: Introduce generic fastpath handler
+  KVM: X86: Introduce kvm_vcpu_exit_request() helper
+  KVM: X86: Introduce more exit_fastpath_completion enum values
+  KVM: VMX: Optimize posted-interrupt delivery for timer fastpath
+  KVM: X86: TSCDEADLINE MSR emulation fastpath
+  KVM: VMX: Handle preemption timer fastpath
 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+ arch/x86/include/asm/kvm_host.h |  4 +-
+ arch/x86/kvm/lapic.c            | 31 ++++++++++-----
+ arch/x86/kvm/lapic.h            |  2 +-
+ arch/x86/kvm/svm/svm.c          | 15 ++++---
+ arch/x86/kvm/vmx/vmx.c          | 69 +++++++++++++++++++++++----------
+ arch/x86/kvm/x86.c              | 45 +++++++++++++++------
+ arch/x86/kvm/x86.h              |  3 +-
+ virt/kvm/kvm_main.c             |  1 +
+ 8 files changed, 118 insertions(+), 52 deletions(-)
+
+--=20
+2.18.2
 
