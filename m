@@ -2,95 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95B0F1C7682
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:33:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 563F31C7705
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:49:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729908AbgEFQci (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 12:32:38 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43232 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729414AbgEFQch (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 12:32:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588782756;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Eto8D2lggcYgztZWQWQcJNTVs0npVvmn/qS+mjsJ8Oc=;
-        b=XrPNyImu6+bJubB8zKSmp/qYKuD0SIfwq+/TMmte+Xqv5LSJuT8N81650R5rjkSip0CuD9
-        x1CR7kochL1jsg1nUq18uTOe+mVgoqnGpZqM1TKI07dEcwZ0frVhNDUGnEOztTp+tUmzS3
-        LeFO/K9Xh9vL/i5jz39jSY3eqPt1LkA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-6h32-QXKMymEPoE7Hwkg0A-1; Wed, 06 May 2020 12:32:35 -0400
-X-MC-Unique: 6h32-QXKMymEPoE7Hwkg0A-1
-Received: by mail-wr1-f69.google.com with SMTP id f15so1613936wrj.2
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 09:32:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Eto8D2lggcYgztZWQWQcJNTVs0npVvmn/qS+mjsJ8Oc=;
-        b=MjcZZBUjhUyJO/ZYMzqgJKIvoGL6H/0hY3PCjY7yGc0RvdAzdih0/qntcq3nmsYrQX
-         bA4j9H+i2YFjVDOO2QcJAFvKzkYKiDssXEeHAB5xFnrUw+FzG1fJQazGSyzFFK3dUCdD
-         gfO/c3Gwdq9a+d5DZOF9YU3K0lreYm8DbtPVWXf6QTQj7B4rM3w2AUpRcFZZFbplLx20
-         +MfM9YxICE+03Afoe17cbytfL6gHX7sYj8SMdgC+J4nAlKITGCcGDikOzbATYpwWOGPi
-         kDdZDL3lqlinvuUqO+I6CRgjWilXWfIfG27YJOmlCWUVLKDqRp7vMiZIE+RgZwnsH0TD
-         pdNg==
-X-Gm-Message-State: AGi0PuZcJ8UdwC2h0s6Bq7RTzpF9OXL3L4oBjmagIrVEIQJ8O4holCYF
-        QIHEEZaEoG8UCW2s+/GbwKb5z0RVupmkRCfqes2dAj139JgJNP16ZVqKqvzlcB88NWfWrHTe1pz
-        UtRmKX+TWiM3e
-X-Received: by 2002:a1c:7905:: with SMTP id l5mr5808912wme.5.1588782753813;
-        Wed, 06 May 2020 09:32:33 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIJSexrvgOJNLVQa/etXRciWaQ/D774pIxh3E6Vt7DGP7fIhMjBImMDvouP3JiXnqRE9kjItg==
-X-Received: by 2002:a1c:7905:: with SMTP id l5mr5808887wme.5.1588782753631;
-        Wed, 06 May 2020 09:32:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:11d7:2f21:f38b:17e? ([2001:b07:6468:f312:11d7:2f21:f38b:17e])
-        by smtp.gmail.com with ESMTPSA id y3sm3407680wrt.87.2020.05.06.09.32.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2020 09:32:32 -0700 (PDT)
-Subject: Re: [GIT PULL 1/1] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
- instruction
-To:     David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Qian Cai <cailca@icloud.com>
-References: <20200506115945.13132-1-borntraeger@de.ibm.com>
- <20200506115945.13132-2-borntraeger@de.ibm.com>
- <bcd98cbd-1e28-47a2-6cbd-668da4ddb9f5@redhat.com>
- <fe991071-25d0-3842-73cc-23cb365850f3@de.ibm.com>
- <a8688ff1-edc6-fdd8-9575-adbf726f9f06@redhat.com>
- <328f4d06-5c1e-5255-cb4f-e8534f2171bf@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e955f2f0-904b-394e-fa19-e3a461ecc92f@redhat.com>
-Date:   Wed, 6 May 2020 18:32:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1730606AbgEFQs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 12:48:59 -0400
+Received: from mga14.intel.com ([192.55.52.115]:56576 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730597AbgEFQs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 12:48:57 -0400
+IronPort-SDR: 6dieWrb4oYcWOHIyr1uJ+SK6IA8SevS8fEsZ6Ua3LwCYWnEagenicAfM0cv+QyT3njXtxaAWSd
+ DhhK+U1FeAMQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 09:48:56 -0700
+IronPort-SDR: KnHuCAnmqGfXB0pKuEQdHQBYzCvEzb6N530gqtP7iz6jU6pLe2UgXNp5Lebzi8XpFaSOOF+RPy
+ ICz3eVgkgb8Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,360,1583222400"; 
+   d="scan'208";a="249816238"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga007.fm.intel.com with ESMTP; 06 May 2020 09:48:56 -0700
+Date:   Wed, 6 May 2020 09:48:56 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH] kvm: x86: get vmcs12 pages before checking pending
+ interrupts
+Message-ID: <20200506164856.GE3329@linux.intel.com>
+References: <20200505232201.923-1-oupton@google.com>
+ <262881d0-cc24-99c2-2895-c5cbdc3487d0@redhat.com>
+ <20200506152555.GA3329@linux.intel.com>
+ <1f91d445-c3f3-fe35-3d65-0b7e0a6ff699@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <328f4d06-5c1e-5255-cb4f-e8534f2171bf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f91d445-c3f3-fe35-3d65-0b7e0a6ff699@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/20 15:09, David Hildenbrand wrote:
-> IIRC, it's perfectly valid - according to the documentation - to ignore
-> ECA_APIE. That's the weird thing about effective controls. You don't
-> really know what you get in the end.
+On Wed, May 06, 2020 at 06:00:03PM +0200, Paolo Bonzini wrote:
+> On 06/05/20 17:25, Sean Christopherson wrote:
+> >>
+> >> The patch is a bit ad hoc, I'd rather move the whole "if
+> >> (kvm_request_pending(vcpu))" from vcpu_enter_guest to vcpu_run (via a
+> >> new function).
+> > It might make sense to go with an ad hoc patch to get the thing fixed, then
+> > worry about cleaning up the pending request crud.  It'd be nice to get rid
+> > of the extra nested_ops->check_events() call in kvm_vcpu_running(), as well
+> > as all of the various request checks in (or triggered by) vcpu_block().
+> 
+> Yes, I agree that there are unnecessary tests in kvm_vcpu_running() if
+> requests are handled before vcpu_block and that would be a nice cleanup,
+> but I'm asking about something less ambitious.
+> 
+> Can you think of something that can go wrong if we just move all
+> requests, except for KVM_REQ_EVENT, up from vcpu_enter_guest() to
+> vcpu_run()?  That might be more or less as ad hoc as Oliver's patch, but
+> without the code duplication at least.
 
-Ah okay, then yeah it could be considered a quality of implementation
-issue but not a bug.  Thanks for the lecture! :)
+I believe the kvm_hv_has_stimer_pending() check in kvm_vcpu_has_events()
+will get messed up, e.g. handling KVM_REQ_HV_STIMER will clear the pending
+bit.  No idea if that can interact with HLT though.
 
-Paolo
+Everything else looks ok, but I didn't exactly do a thorough audit.
 
+My big concern is that we'd break something and never notice because the
+failure mode would be a delayed interrupt or poor performance in various
+corner cases.  Don't get me wrong, I'll all for hoisting request handling
+out of vcpu_enter_guest(), but if we're goint to risk breaking things I'd
+prefer to commit to a complete cleanup.
