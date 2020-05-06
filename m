@@ -2,146 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 297C11C6D1F
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:40:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61DD21C6D1C
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:40:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729108AbgEFJkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 05:40:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58657 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729063AbgEFJkG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 05:40:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588758004;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kJ4kEjO/bwheMovYORrIfy7ArmLVCRzD0yejl3ZmrDY=;
-        b=E9W0AqRq+Ox5B99rUQyBTAQQna4cGKSjOxsKuLC8/RanSz39wNtXImB8mdld9q7ejLDln4
-        pJcWtEqUbBaEhXKdp8nLE1SWNog9Fqu6M6+K0jkNw/WBDKqJjI/jgB6uSNt3lYrNUXEeRA
-        kX3QWCEtGKpd/9YWlxC58OQdszWGPUs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-yHgD0S8yNsKddokKHvx9fg-1; Wed, 06 May 2020 05:40:00 -0400
-X-MC-Unique: yHgD0S8yNsKddokKHvx9fg-1
-Received: by mail-wr1-f70.google.com with SMTP id h12so1013290wrr.19
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 02:39:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kJ4kEjO/bwheMovYORrIfy7ArmLVCRzD0yejl3ZmrDY=;
-        b=LRcM/HFWzM6kw+TrctKiIFGXMrtxkqtbm8C5qLs1uYoIf3eTpkMGVpt1Pv/OCWr1TA
-         m4wuotIfylctYZJgLve9Y9z1RJT2qhuTflMgQlVGH2r6eANZGOS5UrhUObjZt5Oik1Ko
-         Z0OwTXs9VS8PnWKI8WUvXGSvBKh4bGYyNrbOIf+DF70HszUq18DAVxKtuQWGpi0t3Gq8
-         P7xTm7xZM7HE7mImbIBG9AcZgnvFnI1XXcW+Ca2fEFhUVNzjLD+hMjC4VbWbX7xIrgdn
-         mXvXGzHsyrUCzkFOFqSzzAdFfDfa1tfAHIwSWZ5h/qTrBIJKskmJlpldHZ3V8qY9b/+Q
-         xJSg==
-X-Gm-Message-State: AGi0PuZ9jvZdOTim1oSEQxGXl7fc/rJEryni0YxEope7asFi25+F6T2C
-        LbAs8c+UJF5e5DAWqzXlscCMZhh6tw8wcPMFTKhqYEi/hdEdZGD+1ujsowL6Y6D/VnBFi0Phr9/
-        OeoMuvMlEFLQD
-X-Received: by 2002:a5d:4c4b:: with SMTP id n11mr8949400wrt.139.1588757999144;
-        Wed, 06 May 2020 02:39:59 -0700 (PDT)
-X-Google-Smtp-Source: APiQypK13X0Zo4jMSTyL7ujAS9WuUrdxRvvZsqJbiGw8vpveKPhCdyH4OKPB+Frf82bNzjKr1/MqGg==
-X-Received: by 2002:a5d:4c4b:: with SMTP id n11mr8949372wrt.139.1588757998970;
-        Wed, 06 May 2020 02:39:58 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
-        by smtp.gmail.com with ESMTPSA id m4sm1993050wrb.42.2020.05.06.02.39.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2020 02:39:58 -0700 (PDT)
-Date:   Wed, 6 May 2020 05:39:55 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Greg KH <gregkh@linuxfoundation.org>,
-        Justin He <Justin.He@arm.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "ldigby@redhat.com" <ldigby@redhat.com>,
-        "n.b@live.com" <n.b@live.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] vhost: fixes
-Message-ID: <20200506053948-mutt-send-email-mst@kernel.org>
-References: <20200504081540-mutt-send-email-mst@kernel.org>
- <AM6PR08MB40696EFF8BE389C134AC04F6F7A40@AM6PR08MB4069.eurprd08.prod.outlook.com>
- <20200506031918-mutt-send-email-mst@kernel.org>
- <20200506092546.o6prnn4d66tavmjl@steredhat>
+        id S1729044AbgEFJkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 05:40:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44874 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728306AbgEFJkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 05:40:02 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 56CAB2075E;
+        Wed,  6 May 2020 09:40:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588758001;
+        bh=PnheU1SB759b1ecFKgOFt4WnUTjCjzVdAEES0Im2Xtc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=EtcPzrkg+dKsEn/zxiZdqfiIiMAg3jdP8w21mkGZg1GrxW7TqJqSFSW6NUYyq16jD
+         jhC9kvc6joqytrdElp4LjrtbTnUjLDtCf6b6UTAGwZDaQULMpC479xmeoZvCDYSlQJ
+         VPObgH6EMZ79giLTHPXYGwbJ3OnwgooE3ClKJfdk=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jWGX1-009uGa-OB; Wed, 06 May 2020 10:39:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200506092546.o6prnn4d66tavmjl@steredhat>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 06 May 2020 10:39:59 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Scull <ascull@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 05/26] arm64: Document SW reserved PTE/PMD bits in Stage-2
+ descriptors
+In-Reply-To: <20200505155916.GB237572@google.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-6-maz@kernel.org>
+ <20200505155916.GB237572@google.com>
+User-Agent: Roundcube Webmail/1.4.3
+Message-ID: <8b399c95ca1393e63cc1077ede8a45f6@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: ascull@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, andre.przywara@arm.com, Dave.Martin@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 06, 2020 at 11:25:46AM +0200, Stefano Garzarella wrote:
-> On Wed, May 06, 2020 at 03:19:55AM -0400, Michael S. Tsirkin wrote:
-> > On Wed, May 06, 2020 at 03:28:47AM +0000, Justin He wrote:
-> > > Hi Michael
-> > > 
-> > > > -----Original Message-----
-> > > > From: Michael S. Tsirkin <mst@redhat.com>
-> > > > Sent: Monday, May 4, 2020 8:16 PM
-> > > > To: Linus Torvalds <torvalds@linux-foundation.org>
-> > > > Cc: kvm@vger.kernel.org; virtualization@lists.linux-foundation.org;
-> > > > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Justin He
-> > > > <Justin.He@arm.com>; ldigby@redhat.com; mst@redhat.com; n.b@live.com;
-> > > > stefanha@redhat.com
-> > > > Subject: [GIT PULL] vhost: fixes
-> > > >
-> > > > The following changes since commit
-> > > > 6a8b55ed4056ea5559ebe4f6a4b247f627870d4c:
-> > > >
-> > > >   Linux 5.7-rc3 (2020-04-26 13:51:02 -0700)
-> > > >
-> > > > are available in the Git repository at:
-> > > >
-> > > >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-> > > >
-> > > > for you to fetch changes up to
-> > > > 0b841030625cde5f784dd62aec72d6a766faae70:
-> > > >
-> > > >   vhost: vsock: kick send_pkt worker once device is started (2020-05-02
-> > > > 10:28:21 -0400)
-> > > >
-> > > > ----------------------------------------------------------------
-> > > > virtio: fixes
-> > > >
-> > > > A couple of bug fixes.
-> > > >
-> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > >
-> > > > ----------------------------------------------------------------
-> > > > Jia He (1):
-> > > >       vhost: vsock: kick send_pkt worker once device is started
-> > > 
-> > > Should this fix also be CC-ed to stable? Sorry I forgot to cc it to stable.
-> > > 
-> > > --
-> > > Cheers,
-> > > Justin (Jia He)
-> > 
-> > 
-> > Go ahead, though recently just including Fixes seems to be enough.
-> > 
-> 
-> The following patch Justin refers to does not contain the "Fixes:" tag:
-> 
-> 0b841030625c vhost: vsock: kick send_pkt worker once device is started
-> 
-> 
-> I think we should merge it on stable branches, so if needed, I can backport
-> and send it.
-> 
-> Stefano
+Hi Andrew,
 
-Go ahead.
+On 2020-05-05 16:59, Andrew Scull wrote:
+> On Wed, Apr 22, 2020 at 01:00:29PM +0100, Marc Zyngier wrote:
+>> Advertise bits [58:55] as reserved for SW in the S2 descriptors.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  arch/arm64/include/asm/pgtable-hwdef.h | 2 ++
+>>  1 file changed, 2 insertions(+)
+>> 
+>> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h 
+>> b/arch/arm64/include/asm/pgtable-hwdef.h
+>> index 6bf5e650da788..7eab0d23cdb52 100644
+>> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+>> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+>> @@ -177,10 +177,12 @@
+>>  #define PTE_S2_RDONLY		(_AT(pteval_t, 1) << 6)   /* HAP[2:1] */
+>>  #define PTE_S2_RDWR		(_AT(pteval_t, 3) << 6)   /* HAP[2:1] */
+>>  #define PTE_S2_XN		(_AT(pteval_t, 2) << 53)  /* XN[1:0] */
+>> +#define PTE_S2_SW_RESVD		(_AT(pteval_t, 15) << 55) /* Reserved for SW 
+>> */
+>> 
+>>  #define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
+>>  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
+>>  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
+>> +#define PMD_S2_SW_RESVD		(_AT(pmdval_t, 15) << 55) /* Reserved for SW 
+>> */
+>> 
+>>  #define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
+>>  #define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
+>> --
+>> 2.26.1
+>> 
+>> _______________________________________________
+>> kvmarm mailing list
+>> kvmarm@lists.cs.columbia.edu
+>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+> This is consistent with "Attribute fields in stage 1 VMSAv8-64 Block 
+> and
+> Page descriptors"
 
+Do you mean "stage 2" instead? The reserved bits are the same, but I 
+want
+to be sure we have looked at the same thing (ARM DDI 0487F.a, D5-2603).
+
+> Reviewed-by: Andrew Scull <ascull@google.com>
+
+Thanks,
+
+          M.
 -- 
-MST
-
+Jazz is not dead. It just smells funny...
