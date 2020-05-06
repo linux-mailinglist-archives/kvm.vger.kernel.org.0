@@ -2,224 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 043181C6D9D
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:51:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F19171C6DDF
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 12:00:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729276AbgEFJvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 05:51:11 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60104 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729280AbgEFJvK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 05:51:10 -0400
+        id S1728537AbgEFKAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 06:00:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22983 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728180AbgEFKAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 06:00:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588758668;
+        s=mimecast20190719; t=1588759223;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rWys4epAU2XbucOUD2NVIBpXUWNVgzGVlwwLM5nrzXo=;
-        b=OhL/LYtP/L2en4Zo2fYK5EMRL5yknDpkBBaauKFn5ptyo1ga/DoeLwNvSc5ODY2jkMxunc
-        qdCETX5zSU6F/tmKeWTzMTQe3Jd7WRcvPXoU/kax7ktw7KAS4ayCgsNRiu5wqJIRw9PazH
-        2HYHInwrQMzonZqQApRcWvQDDiVoFmU=
+         to:to:cc:cc; bh=V+s+EVTjLJSoyQgVEndJ36QCIydluEdbqn+8ObHr7LM=;
+        b=GFrtjBBRSw0u6LrYQ9k7W3tMskFqCOQm9SHi4hclcoR5U6/QnWdijZmj54pcQD+T9DgM6f
+        LMIk+WdzGoRfa/mBawYCgWP3LrSVfRmoNtq9bXBfKJRaHUrsomdbwCEdSqY0jo4SWpV+AW
+        XEvkTWaP0ERlhRW7I+oxXWzbzZTKoeA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-Xl0oQs4VM6OnDDsJytsSUg-1; Wed, 06 May 2020 05:51:07 -0400
-X-MC-Unique: Xl0oQs4VM6OnDDsJytsSUg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-358-FuhPtV1tOs20XK-JbOdIAQ-1; Wed, 06 May 2020 06:00:18 -0400
+X-MC-Unique: FuhPtV1tOs20XK-JbOdIAQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 148DC80058A;
-        Wed,  6 May 2020 09:51:06 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-17.ams2.redhat.com [10.36.113.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B4A7D5C1BD;
-        Wed,  6 May 2020 09:51:03 +0000 (UTC)
-From:   David Hildenbrand <david@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>
-Subject: [PATCH v1 17/17] virtio-pci: Send qapi events when the virtio-mem size changes
-Date:   Wed,  6 May 2020 11:49:48 +0200
-Message-Id: <20200506094948.76388-18-david@redhat.com>
-In-Reply-To: <20200506094948.76388-1-david@redhat.com>
-References: <20200506094948.76388-1-david@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Content-Transfer-Encoding: quoted-printable
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0B9B106B242;
+        Wed,  6 May 2020 10:00:17 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B92446294E;
+        Wed,  6 May 2020 10:00:14 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     peterx@redhat.com
+Subject: [PATCH] KVM: x86: pass correct DR6 for GD userspace exit
+Date:   Wed,  6 May 2020 06:00:14 -0400
+Message-Id: <20200506100014.7451-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's register the notifier and trigger the qapi event with the right
-device id.
+When KVM_EXIT_DEBUG is raised for the disabled-breakpoints case (DR7.GD),
+DR6 was incorrectly copied from the value in the VM.  Instead,
+DR6.BD should be set in order to catch this case.
 
-MEMORY_DEVICE_SIZE_CHANGE is similar to BALLOON_CHANGE, however on a
-memory device level.
-
-Don't unregister the notifier (we neither have finalize() nor unrealize()
-for VirtIOPCIProxy, so it's not that simple to do it) - both devices are
-expected to vanish at the same time.
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/virtio/virtio-mem-pci.c | 28 ++++++++++++++++++++++++++++
- hw/virtio/virtio-mem-pci.h |  1 +
- hw/virtio/virtio-mem.c     |  2 +-
- monitor/monitor.c          |  1 +
- qapi/misc.json             | 25 +++++++++++++++++++++++++
- 5 files changed, 56 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c                        |  2 +-
+ .../testing/selftests/kvm/x86_64/debug_regs.c | 24 ++++++++++++++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
-index a47d21c81f..780d7b4af7 100644
---- a/hw/virtio/virtio-mem-pci.c
-+++ b/hw/virtio/virtio-mem-pci.c
-@@ -15,6 +15,7 @@
- #include "virtio-mem-pci.h"
- #include "hw/mem/memory-device.h"
- #include "qapi/error.h"
-+#include "qapi/qapi-events-misc.h"
-=20
- static void virtio_mem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **err=
-p)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 2384a2dbec44..ce534336c115 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4927,7 +4927,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 		 * guest debugging itself.
+ 		 */
+ 		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) {
+-			vcpu->run->debug.arch.dr6 = vcpu->arch.dr6;
++			vcpu->run->debug.arch.dr6 = DR6_BD | DR6_RTM | DR6_FIXED_1;
+ 			vcpu->run->debug.arch.dr7 = dr7;
+ 			vcpu->run->debug.arch.pc = kvm_get_linear_rip(vcpu);
+ 			vcpu->run->debug.arch.exception = DB_VECTOR;
+diff --git a/tools/testing/selftests/kvm/x86_64/debug_regs.c b/tools/testing/selftests/kvm/x86_64/debug_regs.c
+index 2b7187db061d..ed94c0b3da35 100644
+--- a/tools/testing/selftests/kvm/x86_64/debug_regs.c
++++ b/tools/testing/selftests/kvm/x86_64/debug_regs.c
+@@ -11,10 +11,13 @@
+ 
+ #define VCPU_ID 0
+ 
++#define DR6_BD		(1 << 13)
++#define DR7_GD		(1 << 13)
++
+ /* For testing data access debug BP */
+ uint32_t guest_value;
+ 
+-extern unsigned char sw_bp, hw_bp, write_data, ss_start;
++extern unsigned char sw_bp, hw_bp, write_data, ss_start, bd_start;
+ 
+ static void guest_code(void)
  {
-@@ -75,6 +76,21 @@ static void virtio_mem_pci_fill_device_info(const Memo=
-ryDeviceState *md,
-     info->type =3D MEMORY_DEVICE_INFO_KIND_VIRTIO_MEM;
+@@ -43,6 +46,8 @@ static void guest_code(void)
+ 		     "rdmsr\n\t"
+ 		     : : : "rax", "ecx");
+ 
++	/* DR6.BD test */
++	asm volatile("bd_start: mov %%dr0, %%rax" : : : "rax");
+ 	GUEST_DONE();
  }
-=20
-+static void virtio_mem_pci_size_change_notify(Notifier *notifier, void *=
-data)
-+{
-+    VirtIOMEMPCI *pci_mem =3D container_of(notifier, VirtIOMEMPCI,
-+                                         size_change_notifier);
-+    DeviceState *dev =3D DEVICE(pci_mem);
-+    const uint64_t * const size_p =3D data;
-+    const char *id =3D NULL;
+ 
+@@ -165,6 +170,23 @@ int main(void)
+ 			    target_dr6);
+ 	}
+ 
++	/* Disable all debug controls, run to the end */
++	CLEAR_DEBUG();
++	debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_HW_BP;
++	debug.arch.debugreg[7] = 0x400 | DR7_GD;
++	APPLY_DEBUG();
++	vcpu_run(vm, VCPU_ID);
++	target_dr6 = 0xffff0ff0 | DR6_BD;
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_DEBUG &&
++		    run->debug.arch.exception == DB_VECTOR &&
++		    run->debug.arch.pc == CAST_TO_RIP(bd_start) &&
++		    run->debug.arch.dr6 == target_dr6,
++			    "DR7.GD: exit %d exception %d rip 0x%llx "
++			    "(should be 0x%llx) dr6 0x%llx (should be 0x%llx)",
++			    run->exit_reason, run->debug.arch.exception,
++			    run->debug.arch.pc, target_rip, run->debug.arch.dr6,
++			    target_dr6);
 +
-+    if (dev->id) {
-+        id =3D g_strdup(dev->id);
-+    }
-+
-+    qapi_event_send_memory_device_size_change(!!id, id, *size_p);
-+}
-+
- static void virtio_mem_pci_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -99,9 +115,21 @@ static void virtio_mem_pci_class_init(ObjectClass *kl=
-ass, void *data)
- static void virtio_mem_pci_instance_init(Object *obj)
- {
-     VirtIOMEMPCI *dev =3D VIRTIO_MEM_PCI(obj);
-+    VirtIOMEMClass *vmc;
-+    VirtIOMEM *vmem;
-=20
-     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VIRTIO_MEM);
-+
-+    dev->size_change_notifier.notify =3D virtio_mem_pci_size_change_noti=
-fy;
-+    vmem =3D VIRTIO_MEM(&dev->vdev);
-+    vmc =3D VIRTIO_MEM_GET_CLASS(vmem);
-+    /*
-+     * We never remove the notifier again, as we expect both devices to
-+     * disappear at the same time.
-+     */
-+    vmc->add_size_change_notifier(vmem, &dev->size_change_notifier);
-+
-     object_property_add_alias(obj, VIRTIO_MEM_BLOCK_SIZE_PROP,
-                               OBJECT(&dev->vdev),
-                               VIRTIO_MEM_BLOCK_SIZE_PROP, &error_abort);
-diff --git a/hw/virtio/virtio-mem-pci.h b/hw/virtio/virtio-mem-pci.h
-index 8820cd6628..b51a28b275 100644
---- a/hw/virtio/virtio-mem-pci.h
-+++ b/hw/virtio/virtio-mem-pci.h
-@@ -28,6 +28,7 @@ typedef struct VirtIOMEMPCI VirtIOMEMPCI;
- struct VirtIOMEMPCI {
-     VirtIOPCIProxy parent_obj;
-     VirtIOMEM vdev;
-+    Notifier size_change_notifier;
- };
-=20
- #endif /* QEMU_VIRTIO_MEM_PCI_H */
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index 88a99a0d90..eb5cf66855 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -491,7 +491,7 @@ static void virtio_mem_device_unrealize(DeviceState *=
-dev, Error **errp)
-     virtio_del_queue(vdev, 0);
-     virtio_cleanup(vdev);
-     g_free(vmem->bitmap);
--    ramblock_discard_set_required(false);
-+    ram_block_discard_set_required(false);
- }
-=20
- static int virtio_mem_pre_save(void *opaque)
-diff --git a/monitor/monitor.c b/monitor/monitor.c
-index 125494410a..19dcb8fbe3 100644
---- a/monitor/monitor.c
-+++ b/monitor/monitor.c
-@@ -235,6 +235,7 @@ static MonitorQAPIEventConf monitor_qapi_event_conf[Q=
-API_EVENT__MAX] =3D {
-     [QAPI_EVENT_QUORUM_REPORT_BAD] =3D { 1000 * SCALE_MS },
-     [QAPI_EVENT_QUORUM_FAILURE]    =3D { 1000 * SCALE_MS },
-     [QAPI_EVENT_VSERPORT_CHANGE]   =3D { 1000 * SCALE_MS },
-+    [QAPI_EVENT_MEMORY_DEVICE_SIZE_CHANGE] =3D { 1000 * SCALE_MS },
- };
-=20
- /*
-diff --git a/qapi/misc.json b/qapi/misc.json
-index feaeacec22..58b073562b 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1432,6 +1432,31 @@
- ##
- { 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
-=20
-+##
-+# @MEMORY_DEVICE_SIZE_CHANGE:
-+#
-+# Emitted when the size of a memory device changes. Only emitted for mem=
-ory
-+# devices that can actually change the size (e.g., virtio-mem due to gue=
-st
-+# action).
-+#
-+# @id: device's ID
-+# @size: the new size of memory that the device provides
-+#
-+# Note: this event is rate-limited.
-+#
-+# Since: 5.1
-+#
-+# Example:
-+#
-+# <- { "event": "MEMORY_DEVICE_SIZE_CHANGE",
-+#      "data": { "id": "vm0", "size": 1073741824},
-+#      "timestamp": { "seconds": 1588168529, "microseconds": 201316 } }
-+#
-+##
-+{ 'event': 'MEMORY_DEVICE_SIZE_CHANGE',
-+  'data': { '*id': 'str', 'size': 'size' } }
-+
-+
- ##
- # @MEM_UNPLUG_ERROR:
- #
---=20
-2.25.3
+ 	/* Disable all debug controls, run to the end */
+ 	CLEAR_DEBUG();
+ 	APPLY_DEBUG();
+-- 
+2.18.2
 
