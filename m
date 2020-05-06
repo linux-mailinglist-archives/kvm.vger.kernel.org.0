@@ -2,81 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 840E91C7010
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 14:13:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBAD11C702A
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 14:19:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727995AbgEFMM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 08:12:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56874 "EHLO
+        id S1727932AbgEFMTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 08:19:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727969AbgEFMM7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 08:12:59 -0400
-Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 758A9C061A0F;
-        Wed,  6 May 2020 05:12:59 -0700 (PDT)
-Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1jWIuv-0002Ol-V2; Wed, 06 May 2020 14:12:50 +0200
-Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
-        id 6C6291001F5; Wed,  6 May 2020 14:12:48 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>
-Subject: Re: [PATCH v8 4/4] kvm: vmx: virtualize split lock detection
-In-Reply-To: <20200505030736.GA20916@linux.intel.com>
-References: <20200414063129.133630-5-xiaoyao.li@intel.com> <871rooodad.fsf@nanos.tec.linutronix.de> <20200415191802.GE30627@linux.intel.com> <87tv1kmol8.fsf@nanos.tec.linutronix.de> <20200415214318.GH30627@linux.intel.com> <20200505030736.GA20916@linux.intel.com>
-Date:   Wed, 06 May 2020 14:12:48 +0200
-Message-ID: <87h7wtl0sf.fsf@nanos.tec.linutronix.de>
+        by vger.kernel.org with ESMTP id S1725887AbgEFMTT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 08:19:19 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA3FCC061A0F
+        for <kvm@vger.kernel.org>; Wed,  6 May 2020 05:19:18 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id r26so2411786wmh.0
+        for <kvm@vger.kernel.org>; Wed, 06 May 2020 05:19:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Q5Os8dyJUPDIZSodvUQVJilx4gN1PaRSjUCuQBbM0mQ=;
+        b=Zl/YPtzCbjnKh6wZrq+ztO4RT2QB7HVj/Fm35cN0vmJFvqFi13cmxN5LIsm5d03CLI
+         fu0+rrx1Vna/2asInbpRTI7RCxeXJxZP0zCB3nZd5VQhDpxdoXdyVeiO1IB9OQH13UYd
+         NYEvcWGgcIQpfRFnxGg8STfhlrXBReejpxNtxUS+nmDTHfwJe6j00fFUYhxDcBQeH2bn
+         pdy77N2b5mgi6C04szucCsLccyVT2OOlGN7ebAjodQWwjdo00MAXtUcmlZP3oYtz89pt
+         iKd/8rTY2QlN0FnxTaFVTQzzm2qN6TTpzHTpF51Phw/g/i0Wn1opMGqz8Yh8AHFYdY94
+         lirA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Q5Os8dyJUPDIZSodvUQVJilx4gN1PaRSjUCuQBbM0mQ=;
+        b=CpMRk7jM9v6LjAMdVkIlpiIbwyA9hYBJGauQjhdheuITh6e6m1bnyh7t46itOO9x+m
+         6qANzUOIDgkHQtZttyr91eLM/mHY+4g+4mZoUMZnc/m//0jilqasRgpyj4haeEJIxMSu
+         hXW/ZdRjT0ShKW1sXT72jV7KPE/x+UedE5ovQ18OzeHoFrWc5UIqFMospZQ/XOxXsCSl
+         qP+wW/F3utQyGhRkB9e3jaExduCxF+kiP8OnC84rol0EMnV+5Pk0ak5oQmIAPrwh95L+
+         iKpJdiwwfCB+3T4ZDv1YCX01n8ZZrUvphZ2mx4K5Ysx2EYcBPp2RoVRIJPPP5k8t5oz7
+         p9CQ==
+X-Gm-Message-State: AGi0PuZ8Ut+GQxrPUdrXjgjHauou862mZ1Iu+XRBNAjByOhhg2ZrerwQ
+        bSlrICQgjpVyZT5IE2spDnhFSYLeEVvZmkGvzZEUxol5RHo=
+X-Google-Smtp-Source: APiQypLeVpH913RfqJfPYP+brXYqrIS3pVomgf/Ib0DVEAcv2ZzAJrpwgG3sdpFOPJ5/HfFPbqmzCByzbt0QkhZ5Ytk=
+X-Received: by 2002:a1c:3c08:: with SMTP id j8mr4111430wma.30.1588767557342;
+ Wed, 06 May 2020 05:19:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+References: <20200506094948.76388-1-david@redhat.com> <20200506094948.76388-16-david@redhat.com>
+In-Reply-To: <20200506094948.76388-16-david@redhat.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Wed, 6 May 2020 14:19:06 +0200
+Message-ID: <CAM9Jb+gZGjWUthoU4E3U4nAowa2Kr8_5PWBZ0VkdAtL86TPE2A@mail.gmail.com>
+Subject: Re: [PATCH v1 15/17] pc: Support for virtio-mem-pci
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        kvm@vger.kernel.org, "Michael S . Tsirkin" <mst@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> On Wed, Apr 15, 2020 at 02:43:18PM -0700, Sean Christopherson wrote:
->> On Wed, Apr 15, 2020 at 11:22:11PM +0200, Thomas Gleixner wrote:
->> > So we can go with the proposed mode of allowing the write but not
->> > propagating it. If the resulting split lock #AC originates from CPL != 3
->> > then the guest will be killed with SIGBUS. If it originates from CPL ==
->> > 3 and the guest has user #AC disabled then it will be killed as well.
->> 
->> An idea that's been floated around to avoid killing the guest on a CPL==3
->> split-lock #AC is to add a STICKY bit to MSR_TEST_CTRL that KVM can
->> virtualize to tell the guest that attempting to disable SLD is futile,
->> e.g. so that the guest can kill its misbehaving userspace apps instead of
->> trying to disable SLD and getting killed by the host.
+> Let's wire it up similar to virtio-pmem. Also disallow unplug, so it's
+> harder for users to shoot themselves into the foot.
 >
-> Circling back to this.  KVM needs access to sld_state in one form or another
-> if we want to add a KVM hint when the host is in fatal mode.  Three options
-> I've come up with:
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/i386/Kconfig |  1 +
+>  hw/i386/pc.c    | 49 ++++++++++++++++++++++++++++---------------------
+>  2 files changed, 29 insertions(+), 21 deletions(-)
 >
->   1. Bite the bullet and export sld_state.  
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index c93f32f657..03e347b207 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -35,6 +35,7 @@ config PC
+>      select ACPI_PCI
+>      select ACPI_VMGENID
+>      select VIRTIO_PMEM_SUPPORTED
+> +    select VIRTIO_MEM_SUPPORTED
 >
->   2. Add an is_split_fatal_wrapper().  Ugly since it needs to be non-inline
->      to avoid triggering (1).
+>  config PC_PCI
+>      bool
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f6b8431c8b..588804f895 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -86,6 +86,7 @@
+>  #include "hw/net/ne2000-isa.h"
+>  #include "standard-headers/asm-x86/bootparam.h"
+>  #include "hw/virtio/virtio-pmem-pci.h"
+> +#include "hw/virtio/virtio-mem-pci.h"
+>  #include "hw/mem/memory-device.h"
+>  #include "sysemu/replay.h"
+>  #include "qapi/qmp/qerror.h"
+> @@ -1654,8 +1655,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      numa_cpu_pre_plug(cpu_slot, dev, errp);
+>  }
 >
->   3. Add a synthetic feature flag, e.g. X86_FEATURE_SLD_FATAL, and drop
->      sld_state altogether.
+> -static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+> -                                        DeviceState *dev, Error **errp)
+> +static void pc_virtio_md_pci_pre_plug(HotplugHandler *hotplug_dev,
+> +                                      DeviceState *dev, Error **errp)
+>  {
+>      HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+>      Error *local_err = NULL;
+> @@ -1666,7 +1667,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+>           * order. This should never be the case on x86, however better add
+>           * a safety net.
+>           */
+> -        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
+> +        error_setg(errp,
+> +                   "virtio based memory devices not supported on this bus.");
+>          return;
+>      }
+>      /*
+> @@ -1681,8 +1683,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
+>      error_propagate(errp, local_err);
+>  }
 >
-> I like (3) because it requires the least amount of code when all is said
-> and done, doesn't require more exports, and as a bonus it'd probably be nice
-> for userspace to see sld_fatal in /proc/cpuinfo.
+> -static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
+> -                                    DeviceState *dev, Error **errp)
+> +static void pc_virtio_md_pci_plug(HotplugHandler *hotplug_dev,
+> +                                  DeviceState *dev, Error **errp)
+>  {
+>      HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
+>      Error *local_err = NULL;
+> @@ -1700,17 +1702,17 @@ static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
+>      error_propagate(errp, local_err);
+>  }
+>
+> -static void pc_virtio_pmem_pci_unplug_request(HotplugHandler *hotplug_dev,
+> -                                              DeviceState *dev, Error **errp)
+> +static void pc_virtio_md_pci_unplug_request(HotplugHandler *hotplug_dev,
+> +                                            DeviceState *dev, Error **errp)
+>  {
+> -    /* We don't support virtio pmem hot unplug */
+> -    error_setg(errp, "virtio pmem device unplug not supported.");
+> +    /* We don't support hot unplug of virtio based memory devices */
+> +    error_setg(errp, "virtio based memory devices cannot be unplugged.");
+>  }
+>
+> -static void pc_virtio_pmem_pci_unplug(HotplugHandler *hotplug_dev,
+> -                                      DeviceState *dev, Error **errp)
+> +static void pc_virtio_md_pci_unplug(HotplugHandler *hotplug_dev,
+> +                                    DeviceState *dev, Error **errp)
+>  {
+> -    /* We don't support virtio pmem hot unplug */
+> +    /* We don't support hot unplug of virtio based memory devices */
+>  }
+>
+>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> @@ -1720,8 +1722,9 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>          pc_memory_pre_plug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          pc_cpu_pre_plug(hotplug_dev, dev, errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+> -        pc_virtio_pmem_pci_pre_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
+> +               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> +        pc_virtio_md_pci_pre_plug(hotplug_dev, dev, errp);
+>      }
+>  }
+>
+> @@ -1732,8 +1735,9 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+>          pc_memory_plug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          pc_cpu_plug(hotplug_dev, dev, errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+> -        pc_virtio_pmem_pci_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
+> +               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> +        pc_virtio_md_pci_plug(hotplug_dev, dev, errp);
+>      }
+>  }
+>
+> @@ -1744,8 +1748,9 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>          pc_memory_unplug_request(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+> -        pc_virtio_pmem_pci_unplug_request(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
+> +               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> +        pc_virtio_md_pci_unplug_request(hotplug_dev, dev, errp);
+>      } else {
+>          error_setg(errp, "acpi: device unplug request for not supported device"
+>                     " type: %s", object_get_typename(OBJECT(dev)));
+> @@ -1759,8 +1764,9 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
+>          pc_memory_unplug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          pc_cpu_unplug_cb(hotplug_dev, dev, errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+> -        pc_virtio_pmem_pci_unplug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
+> +               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> +        pc_virtio_md_pci_unplug(hotplug_dev, dev, errp);
+>      } else {
+>          error_setg(errp, "acpi: device unplug for not supported device"
+>                     " type: %s", object_get_typename(OBJECT(dev)));
+> @@ -1772,7 +1778,8 @@ static HotplugHandler *pc_get_hotplug_handler(MachineState *machine,
+>  {
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+>          object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
+> -        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
+> +        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
+> +        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+>          return HOTPLUG_HANDLER(machine);
+>      }
+>
+> --
 
-#3 makes sense and is elegant.
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 
-Thanks,
-
-        tglx
+> 2.25.3
+>
+>
