@@ -2,139 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1221A1C6CD1
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F1B51C6CF4
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:30:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729073AbgEFJZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 05:25:56 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45539 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728712AbgEFJZz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 05:25:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588757154;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bim1c8eCjYcLbuTSswn0dpCBvXNi8zOQ0N1tlPafZn4=;
-        b=a/WX2MvpVfdLwgMlWsGaXFmhPJcEm7GcakNQf4XqzojKV3Faq0mIzyu3iSox1aInkgs6G2
-        3kXdS1nfFOMklUg4HOCBZHDgQMasoFz6YVizWYfuT7YcnmF96jDMbwGqbTZaYEkyJMCYHv
-        uyows5NyV74pEW5pv34t7DNBcGNFeTI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-HslA_mUFPZyHeepQ4Iwnzw-1; Wed, 06 May 2020 05:25:51 -0400
-X-MC-Unique: HslA_mUFPZyHeepQ4Iwnzw-1
-Received: by mail-wr1-f72.google.com with SMTP id s11so1006303wru.6
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 02:25:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Bim1c8eCjYcLbuTSswn0dpCBvXNi8zOQ0N1tlPafZn4=;
-        b=dIlhd7kyRzb373ZTdzO6F5W9wUR8EHyV51n0slug3ECg03xv7GpEsZR2wCuviYuzpu
-         C+AUW4JvQscUx0Zakt+W/V3pUA9/vPbboRxBVLFvHFyUCXgAtyds5Tw+TDIKVF3uAk6G
-         O7OnamwbU0KCPbUgSjd4qDdRKLW013PDZ6QTd3Z6DvtFXvXa494x6qQYZZtcLqtFD4zM
-         X7pDOzv8HGfY9rW+BrD9+1dVdpIvm/M5vcoz7nctpy2P2jF4W1KDbfuMZpWkkCBTss45
-         jPGv/MBYei/3IG7pEM08KjeyEZ46IyhKyqEKZBhN5rBpPhF9pu2ZqjCMthJesRqaekjm
-         mt5A==
-X-Gm-Message-State: AGi0PuYLOEJGDxNU2DYkKuRjt5nXJTuBhf5hCf6/oZYIMjmTNOo3V/nz
-        oE84iF+VdxuxcXuTfcWXTKnx49mqVrBgQp3NPayTcp3RHxFFVbb7IKiQClGnp3ZaAx6l4sw+tRV
-        AuFqBaPTWPAgk
-X-Received: by 2002:adf:dfcd:: with SMTP id q13mr7131683wrn.22.1588757149675;
-        Wed, 06 May 2020 02:25:49 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKDcQLCEb81yrXyKaZpg3LwlEaXE+I6k94/3G8d4AwC2GS8U1KX5Fn5b7fyFPoR8Cv9PqLECw==
-X-Received: by 2002:adf:dfcd:: with SMTP id q13mr7131657wrn.22.1588757149453;
-        Wed, 06 May 2020 02:25:49 -0700 (PDT)
-Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id c25sm2030281wmb.44.2020.05.06.02.25.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2020 02:25:48 -0700 (PDT)
-Date:   Wed, 6 May 2020 11:25:46 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc:     Justin He <Justin.He@arm.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "ldigby@redhat.com" <ldigby@redhat.com>,
-        "n.b@live.com" <n.b@live.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] vhost: fixes
-Message-ID: <20200506092546.o6prnn4d66tavmjl@steredhat>
-References: <20200504081540-mutt-send-email-mst@kernel.org>
- <AM6PR08MB40696EFF8BE389C134AC04F6F7A40@AM6PR08MB4069.eurprd08.prod.outlook.com>
- <20200506031918-mutt-send-email-mst@kernel.org>
+        id S1728941AbgEFJag (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 05:30:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33572 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728648AbgEFJag (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 05:30:36 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3C8022073A;
+        Wed,  6 May 2020 09:30:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588757433;
+        bh=Fz1Pqdbpgc/bySY2VzRgx4entrNkwjB8l09H9tBKs+Q=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=A6AXkxkOxO9KqbRlc+m5bTrgAkj41jx0GT7sLL5hOC4ygkxzOEKUhn9deltnjF2SI
+         ZkHf3lD/5cJAMJXWSEF0GBGdc4k2G0dD+DGGrEO3Zib+4Z9yE5J8wneTTJzkZm44Kw
+         dygjsIJjIyP2cVfm2Y3xLSoEReD5OxHsOxUw0xLA=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jWGNr-009u8C-Ky; Wed, 06 May 2020 10:30:31 +0100
+Date:   Wed, 6 May 2020 10:30:29 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+Message-ID: <20200506103029.4f6ca0d3@why>
+In-Reply-To: <86o8r2tg83.wl-maz@kernel.org>
+References: <20200422120050.3693593-1-maz@kernel.org>
+        <20200422120050.3693593-4-maz@kernel.org>
+        <660a6638-5ee0-54c5-4a9d-d0d9235553ad@arm.com>
+        <86o8r2tg83.wl-maz@kernel.org>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200506031918-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 06, 2020 at 03:19:55AM -0400, Michael S. Tsirkin wrote:
-> On Wed, May 06, 2020 at 03:28:47AM +0000, Justin He wrote:
-> > Hi Michael
-> > 
-> > > -----Original Message-----
-> > > From: Michael S. Tsirkin <mst@redhat.com>
-> > > Sent: Monday, May 4, 2020 8:16 PM
-> > > To: Linus Torvalds <torvalds@linux-foundation.org>
-> > > Cc: kvm@vger.kernel.org; virtualization@lists.linux-foundation.org;
-> > > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Justin He
-> > > <Justin.He@arm.com>; ldigby@redhat.com; mst@redhat.com; n.b@live.com;
-> > > stefanha@redhat.com
-> > > Subject: [GIT PULL] vhost: fixes
-> > >
-> > > The following changes since commit
-> > > 6a8b55ed4056ea5559ebe4f6a4b247f627870d4c:
-> > >
-> > >   Linux 5.7-rc3 (2020-04-26 13:51:02 -0700)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-> > >
-> > > for you to fetch changes up to
-> > > 0b841030625cde5f784dd62aec72d6a766faae70:
-> > >
-> > >   vhost: vsock: kick send_pkt worker once device is started (2020-05-02
-> > > 10:28:21 -0400)
-> > >
-> > > ----------------------------------------------------------------
-> > > virtio: fixes
-> > >
-> > > A couple of bug fixes.
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > >
-> > > ----------------------------------------------------------------
-> > > Jia He (1):
-> > >       vhost: vsock: kick send_pkt worker once device is started
-> > 
-> > Should this fix also be CC-ed to stable? Sorry I forgot to cc it to stable.
-> > 
-> > --
-> > Cheers,
-> > Justin (Jia He)
+On Tue, 05 May 2020 18:59:56 +0100
+Marc Zyngier <maz@kernel.org> wrote:
+
+Hi James,
+
+> > But accessing VTCR is why the stage2_dissolve_p?d() stuff still
+> > needs the kvm pointer, hence the backreference... it might be neater
+> > to push the vtcr properties into kvm_s2_mmu that way you could drop
+> > the kvm backref, and only things that take vm-wide locks would need
+> > the kvm pointer. But I don't think it matters.  
 > 
-> 
-> Go ahead, though recently just including Fixes seems to be enough.
-> 
+> That's an interesting consideration. I'll have a look.
 
-The following patch Justin refers to does not contain the "Fixes:" tag:
+So I went back on forth on this (the joys of not sleeping), and decided
+to keep the host's VTCR_EL2 where it is today (in the kvm structure).
+Two reasons for this:
 
-0b841030625c vhost: vsock: kick send_pkt worker once device is started
+- This field is part of the host configuration. Moving it to the S2 MMU
+  structure muddies the waters a bit once you start nesting, as this
+  structure really describes an inner guest context. It has its own
+  associated VTCR, which lives in the sysreg file, and it becomes a bit
+  confusing to look at a kvm_s2_mmu structure in isolation and wonder
+  whether this field is directly related to the PTs in this structure,
+  or to something else.
 
+- It duplicates state. If there is one thing I have learned over the
+  past years, it is that you should keep a given state in one single
+  place at all times. Granted, VTCR doesn't change over the lifetime of
+  the guest, but still.
 
-I think we should merge it on stable branches, so if needed, I can backport
-and send it.
+I guess the one thing that would push me to the other side of the
+debate is if we can show that the amount of pointer chasing generated
+by the mmu->kvm->vtcr dance is causing actual performance issues. So
+far, I haven't measured such an impact.
 
-Stefano
+Thanks,
 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
