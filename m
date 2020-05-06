@@ -2,122 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A09B21C7B34
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 22:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D3BB1C7B3F
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 22:28:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727984AbgEFUZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 16:25:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44634 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726627AbgEFUZ6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 16:25:58 -0400
+        id S1726815AbgEFU24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 16:28:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56597 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726093AbgEFU2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 16:28:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588796756;
+        s=mimecast20190719; t=1588796934;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=edUuwFI9D0pStLV5uuIILbcmJQZgHW0O1swcyaE3mzo=;
-        b=f72QJ9fPdwWSZqujnSIkcpIhlhVTqQlYccqafNr+Vt1hIkxGFUflhYdZikwwxStItcFn92
-        0FF5ELsvoAvf0DbgykfST3tR4US+PPwNQ8MI0k5XCisBVEwlquGhNzlcbJLNY5e8k5mhj/
-        qnkYWQt563hFXVn3ad+mRVlh5hTTQzw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-51-TcDd7PC2bWNBa7iRCOg-1; Wed, 06 May 2020 16:25:45 -0400
-X-MC-Unique: 51-TcDd7PC2bWNBa7iRCOg-1
-Received: by mail-wr1-f70.google.com with SMTP id s11so1916870wru.6
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 13:25:45 -0700 (PDT)
+        bh=Cu+S4C27UOFa3OfMh+dHOhDVzuXz2x4jIHvsepSqLnk=;
+        b=RzgjY1X2YUq6hq6LT+O2X3l0faNp8tObRVD2LNhIR854zoOO3LJ5YdV9qc6xBb44ao60q3
+        OGEIsyL6e3f0xTAPtESOsU77cEkxI3WcQ1mO8qtTU2depTO7oukNZXG49boiDldYphe9pz
+        eBWh7g75DdWVA+PwBXB8JWl6JMtpH8M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-502-KyBJeo1TMPuYgGdw0exw_g-1; Wed, 06 May 2020 16:28:52 -0400
+X-MC-Unique: KyBJeo1TMPuYgGdw0exw_g-1
+Received: by mail-wm1-f71.google.com with SMTP id s12so1856184wmj.6
+        for <kvm@vger.kernel.org>; Wed, 06 May 2020 13:28:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=edUuwFI9D0pStLV5uuIILbcmJQZgHW0O1swcyaE3mzo=;
-        b=k4d6IK0itetvguPpYxHNuRSwqFdIQBvVhGYgfxPKsbGBIu7vbcU8TWbB1RpmOmbR3F
-         amz0o0pEmxRYpcWD79AttwbWIz31dHO5H8iYaK8aLzxy2IzbUqoqzSE/MOFtZCb8JjKz
-         g/DYJlhYyibvMCSBsO0d5IBEDEG7d7pa8p/mFvAhXo6cRWTUEbBdnCWAD2DW6Jso9i9/
-         HgUbV081QDT8ltqvW6XmpBGeVL3aStxUgXvDMxIbFcboSkpRs5v/x0x+JC5elLcRAaEc
-         S1Jg8SMeIvKQ2XPzxX60dEQhQzPPWQGo15pzgKIG0FatNMqB4LNVVGfkQUUbKAnuhyG1
-         tSSQ==
-X-Gm-Message-State: AGi0Pua6EDtwrhAflT3wNxxSfIRo/5Ikj9eFubRtT2wuQ0weOOmAM7pn
-        j9wJWn/Mh2Kn+jX08IWrrSoSnj/a1mLih8vb2eEOlycaJHFRHVtujTMipTL7Z1L1x1zdA0QsMWX
-        fwTMg2VdEOusq
-X-Received: by 2002:adf:cd92:: with SMTP id q18mr11911021wrj.237.1588796744842;
-        Wed, 06 May 2020 13:25:44 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLr5mIzOctWGAL44hzABFWBlJedhhmvj1Vvwl+8wJ2ivTbFytNvLxDP4zUeTtIqhFS6heuVnA==
-X-Received: by 2002:adf:cd92:: with SMTP id q18mr11911002wrj.237.1588796744645;
-        Wed, 06 May 2020 13:25:44 -0700 (PDT)
+        bh=Cu+S4C27UOFa3OfMh+dHOhDVzuXz2x4jIHvsepSqLnk=;
+        b=COV6E9a2iZE/EGK1kbRzTpF9yqlSjiIuH457l21F/oDnGJP1CAy4ud+qrsWYHuW/AY
+         J0It7xYpp7cTFpp/SSlwnKWXnhtUXyCw/m/bcDKovTU+SvcF+/vAazPTMyjmIGdkWMOP
+         E4k6KWowwxkBQX72RFTP3p8Z/RT99d3PgppDGzVHafM4bm/DMDlyWdP8o9TT8iCWnx3d
+         kiFFOF63fu4C7GlBue8PCJSAcbuf76CT50YR2aG4Ym1b4/Oeegh2huQAcO/Jb+mRacft
+         TpYs9gYm9Ocr941RVrZ86FrUnqxf9c9mB935ikLXaHzVvEMU7Ev4TlKn+MSlXq+u7sYT
+         yM8Q==
+X-Gm-Message-State: AGi0Pub0TlQ5MaIuBSbUfjsiYkec09YDXs5hrM7tywRRXdGQu55eOUof
+        J/jddc18dpTMqs76CE0JZQi6QCkNuhuzBZZTmzlSIDa0wQA6q3N+ZJRpPhqo8bK1m65xKeuOuR6
+        iNWPVJpxrwEvY
+X-Received: by 2002:adf:e449:: with SMTP id t9mr11428842wrm.108.1588796931026;
+        Wed, 06 May 2020 13:28:51 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJYl+rPKkzHvCZgpgimxYFgM4/uAdMXx173aAgzcr8cA+F2M7DbC5yVSSYFy58Q5bTl4e+qyg==
+X-Received: by 2002:adf:e449:: with SMTP id t9mr11428829wrm.108.1588796930811;
+        Wed, 06 May 2020 13:28:50 -0700 (PDT)
 Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
-        by smtp.gmail.com with ESMTPSA id 1sm4679753wmi.0.2020.05.06.13.25.42
+        by smtp.gmail.com with ESMTPSA id q4sm4632965wrx.9.2020.05.06.13.28.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2020 13:25:44 -0700 (PDT)
-Date:   Wed, 6 May 2020 16:25:41 -0400
+        Wed, 06 May 2020 13:28:50 -0700 (PDT)
+Date:   Wed, 6 May 2020 16:28:48 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     gengdongjiu <gengdongjiu@huawei.com>
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Fam Zheng <fam@euphon.net>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v25 00/10] Add ARMv8 RAS virtualization support in QEMU
-Message-ID: <20200506162439-mutt-send-email-mst@kernel.org>
-References: <20200410114639.32844-1-gengdongjiu@huawei.com>
- <CAFEAcA9oNuDf=bdSSE8mZWrB23+FegD5NeSAmu8dGWhB=adBQg@mail.gmail.com>
- <da3cbdfd-a75d-c87f-3ece-616278aa64d5@huawei.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Subject: Re: [vhost:vhost 8/22] drivers/virtio/virtio_mem.c:1375:20: error:
+ implicit declaration of function 'kzalloc'; did you mean 'vzalloc'?
+Message-ID: <20200506162751-mutt-send-email-mst@kernel.org>
+References: <202005052221.83QerHmG%lkp@intel.com>
+ <7dea2810-85cf-0892-20a8-bba3e3a2c133@redhat.com>
+ <20200505114433-mutt-send-email-mst@kernel.org>
+ <3eaebd8d-750a-d046-15f5-706fb00a196e@redhat.com>
+ <20200505121732-mutt-send-email-mst@kernel.org>
+ <e607a850-ba5c-6033-93fc-144639b125b8@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <da3cbdfd-a75d-c87f-3ece-616278aa64d5@huawei.com>
+In-Reply-To: <e607a850-ba5c-6033-93fc-144639b125b8@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 06, 2020 at 07:42:19PM +0800, gengdongjiu wrote:
-> On 2020/4/17 21:32, Peter Maydell wrote:
-> > On Fri, 10 Apr 2020 at 12:46, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+On Tue, May 05, 2020 at 06:22:51PM +0200, David Hildenbrand wrote:
+> On 05.05.20 18:20, Michael S. Tsirkin wrote:
+> > On Tue, May 05, 2020 at 05:46:44PM +0200, David Hildenbrand wrote:
+> >> On 05.05.20 17:44, Michael S. Tsirkin wrote:
+> >>> On Tue, May 05, 2020 at 04:50:13PM +0200, David Hildenbrand wrote:
+> >>>> On 05.05.20 16:15, kbuild test robot wrote:
+> >>>>> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+> >>>>> head:   da1742791d8c0c0a8e5471f181549c4726a5c5f9
+> >>>>> commit: 7527631e900d464ed2d533f799cb0da2b29cc6f0 [8/22] virtio-mem: Paravirtualized memory hotplug
+> >>>>> config: x86_64-randconfig-b002-20200505 (attached as .config)
+> >>>>> compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+> >>>>> reproduce:
+> >>>>>         git checkout 7527631e900d464ed2d533f799cb0da2b29cc6f0
+> >>>>>         # save the attached .config to linux build tree
+> >>>>>         make ARCH=x86_64 
+> >>>>>
+> >>>>> If you fix the issue, kindly add following tag as appropriate
+> >>>>> Reported-by: kbuild test robot <lkp@intel.com>
+> >>>>>
+> >>>>> All error/warnings (new ones prefixed by >>):
+> >>>>>
+> >>>>>    drivers/virtio/virtio_mem.c: In function 'virtio_mem_probe':
+> >>>>>>> drivers/virtio/virtio_mem.c:1375:20: error: implicit declaration of function 'kzalloc'; did you mean 'vzalloc'? [-Werror=implicit-function-declaration]
+> >>>>>      vdev->priv = vm = kzalloc(sizeof(*vm), GFP_KERNEL);
+> >>>>>                        ^~~~~~~
+> >>>>>                        vzalloc
+> >>>>>>> drivers/virtio/virtio_mem.c:1375:18: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
+> >>>>>      vdev->priv = vm = kzalloc(sizeof(*vm), GFP_KERNEL);
+> >>>>>                      ^
+> >>>>>>> drivers/virtio/virtio_mem.c:1419:2: error: implicit declaration of function 'kfree'; did you mean 'vfree'? [-Werror=implicit-function-declaration]
+> >>>>>      kfree(vm);
+> >>>>>      ^~~~~
+> >>>>>      vfree
+> >>>>>    cc1: some warnings being treated as errors
+> >>>>>
+> >>>>> vim +1375 drivers/virtio/virtio_mem.c
+> >>>>
+> >>>> Guess we simply need
+> >>>>
+> >>>>  #include <linux/slab.h>
+> >>>>
+> >>>> to make it work for that config.
+> >>>
+> >>>
+> >>> OK I added that in the 1st commit that introduced virtio-mem.
 > >>
-> >> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA)
-> >> and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed
-> >> information of guest, so it is expected that guest can do the recovery. For example, if an
-> >> exception happens in a guest user-space application, host does not know which application
-> >> encounters errors, only guest knows it.
-> >>
-> >> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
-> >> After user space gets the notification, it will record the CPER into guest GHES
-> >> buffer and inject an exception or IRQ to guest.
-> >>
-> >> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
-> >> treat it as a synchronous exception, and notify guest with ARMv8 SEA
-> >> notification type after recording CPER into guest.
+> >> Thanks. I have some addon-patches ready, what's the best way to continue
+> >> with these?
 > > 
-> > Hi. I left a comment on patch 1. The other 3 patches unreviewed
-> > are 5, 6 and 8, which are all ACPI core code, so that's for
-> > MST, Igor or Shannon to review.
-> > 
-> > Once those have been reviewed, please ping me if you want this
-> > to go via target-arm.next.
+> > If these are bugfixes, just respin the series (including this fix).
 > 
-> Hi Peter,
->    Igor have reviewed all ACPI core code. whether you can apply this series to target-arm.next? I can make another patches to solve your comments on patch1 and another APCI comment.
-> Thanks very much in advance.
+> There are two really minor bugfixes for corner-case error handling and
+> one simplification. I can squash them and resend, makes things easier.
 
-Given it all starts with patch 1, it's probably easier to address the
-comment and repost.
+OK try to do it ASAP, we don't want to repeat the drama we had with vdpa.
 
-
-> > 
-> > thanks
-> > -- PMM
-> > 
-> > .
-> > 
+> The other stuff I have are extensions, I will send as add-on.
+> 
+> Thanks!
+> 
+> 
+> -- 
+> Thanks,
+> 
+> David / dhildenb
 
