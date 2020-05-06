@@ -2,67 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37CCA1C765A
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:31:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95B0F1C7682
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 18:33:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730228AbgEFQa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 12:30:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58308 "EHLO
+        id S1729908AbgEFQci (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 12:32:38 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43232 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730109AbgEFQa5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 12:30:57 -0400
+        by vger.kernel.org with ESMTP id S1729414AbgEFQch (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 12:32:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588782655;
+        s=mimecast20190719; t=1588782756;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tSUQHAQlY7PhB1CMSPEa9ZgQrRD15euTGzalw6ZzZR8=;
-        b=WV35MQD06vkvVsk8LCAua89e3gG1JG8xysgdNTxnUtvLOlsVDUV0jSO27EY1hIp+cUsc1+
-        TpZjRqVQgZFE8L/d06sjm5yRuOQXEtreVZFjOZx2ZRadraCJBciareBk0D8il6/SKD4IE/
-        609UoHglql17nFhyca8K6c7KuR4BdPY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-rYBLFsxVN2yEkzk0Vk1alA-1; Wed, 06 May 2020 12:30:53 -0400
-X-MC-Unique: rYBLFsxVN2yEkzk0Vk1alA-1
-Received: by mail-wm1-f71.google.com with SMTP id l21so1536254wmh.2
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 09:30:53 -0700 (PDT)
+        bh=Eto8D2lggcYgztZWQWQcJNTVs0npVvmn/qS+mjsJ8Oc=;
+        b=XrPNyImu6+bJubB8zKSmp/qYKuD0SIfwq+/TMmte+Xqv5LSJuT8N81650R5rjkSip0CuD9
+        x1CR7kochL1jsg1nUq18uTOe+mVgoqnGpZqM1TKI07dEcwZ0frVhNDUGnEOztTp+tUmzS3
+        LeFO/K9Xh9vL/i5jz39jSY3eqPt1LkA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-6h32-QXKMymEPoE7Hwkg0A-1; Wed, 06 May 2020 12:32:35 -0400
+X-MC-Unique: 6h32-QXKMymEPoE7Hwkg0A-1
+Received: by mail-wr1-f69.google.com with SMTP id f15so1613936wrj.2
+        for <kvm@vger.kernel.org>; Wed, 06 May 2020 09:32:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=tSUQHAQlY7PhB1CMSPEa9ZgQrRD15euTGzalw6ZzZR8=;
-        b=sjue6Mx5Fp5wTONX100qxYi1fYrMPB4Wjg/fcrLO+wBbS14CNVYYN0A5O0E1YTZiQ4
-         t6tGzs9aPyhvkbyCtHMhXjnVmDwK++z1CJTJUsOxM8J/ZHFvnJ/isAgNR827j6YnY+Rr
-         JRJLTjeYzavnCiazg0oq92FCzz7HZ3mleLm0SkWATKg36TLImkDp2EqWStBowwWCDR66
-         m/cO5RE4nS5kNN+mLlJV0mjyd6f3B/3rYNvZiGcA4LSszHZKsru87A711LH23aKZYIHD
-         OL0fX6nxIKcvcfJVRAlY0XvqIps435zQk6e6YKlQjvfxefoVbju7ieh0ESFc4p0P+d+K
-         B99w==
-X-Gm-Message-State: AGi0PuaFcmIH1SvDkx1lkBcFzZuvSyI+sGA9VAG12BtT/ptwl+KJ/8xC
-        9bO9PCjTT3WNCXNp9hPRfQEPjW2UKKzg7GaniCF7OSUZgsLyi2rnYwCZdWMZ8bzudeopbbVSPLa
-        0YxHLsYuQsTZB
-X-Received: by 2002:a7b:c399:: with SMTP id s25mr5140607wmj.169.1588782652111;
-        Wed, 06 May 2020 09:30:52 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJTP3V/5TCFRJx9MxMBaSz92xOqGZitDKvJVsqE7DLtHLB+Swt6r384A6P5/3ZRst3QHjuzDw==
-X-Received: by 2002:a7b:c399:: with SMTP id s25mr5140588wmj.169.1588782651844;
-        Wed, 06 May 2020 09:30:51 -0700 (PDT)
+        bh=Eto8D2lggcYgztZWQWQcJNTVs0npVvmn/qS+mjsJ8Oc=;
+        b=MjcZZBUjhUyJO/ZYMzqgJKIvoGL6H/0hY3PCjY7yGc0RvdAzdih0/qntcq3nmsYrQX
+         bA4j9H+i2YFjVDOO2QcJAFvKzkYKiDssXEeHAB5xFnrUw+FzG1fJQazGSyzFFK3dUCdD
+         gfO/c3Gwdq9a+d5DZOF9YU3K0lreYm8DbtPVWXf6QTQj7B4rM3w2AUpRcFZZFbplLx20
+         +MfM9YxICE+03Afoe17cbytfL6gHX7sYj8SMdgC+J4nAlKITGCcGDikOzbATYpwWOGPi
+         kDdZDL3lqlinvuUqO+I6CRgjWilXWfIfG27YJOmlCWUVLKDqRp7vMiZIE+RgZwnsH0TD
+         pdNg==
+X-Gm-Message-State: AGi0PuZcJ8UdwC2h0s6Bq7RTzpF9OXL3L4oBjmagIrVEIQJ8O4holCYF
+        QIHEEZaEoG8UCW2s+/GbwKb5z0RVupmkRCfqes2dAj139JgJNP16ZVqKqvzlcB88NWfWrHTe1pz
+        UtRmKX+TWiM3e
+X-Received: by 2002:a1c:7905:: with SMTP id l5mr5808912wme.5.1588782753813;
+        Wed, 06 May 2020 09:32:33 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIJSexrvgOJNLVQa/etXRciWaQ/D774pIxh3E6Vt7DGP7fIhMjBImMDvouP3JiXnqRE9kjItg==
+X-Received: by 2002:a1c:7905:: with SMTP id l5mr5808887wme.5.1588782753631;
+        Wed, 06 May 2020 09:32:33 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:11d7:2f21:f38b:17e? ([2001:b07:6468:f312:11d7:2f21:f38b:17e])
-        by smtp.gmail.com with ESMTPSA id x5sm3240420wro.12.2020.05.06.09.30.50
+        by smtp.gmail.com with ESMTPSA id y3sm3407680wrt.87.2020.05.06.09.32.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 May 2020 09:30:51 -0700 (PDT)
-Subject: Re: [PATCH 0/4] KVM: SVM: Fix AVIC warning when enable irq window
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     joro@8bytes.org, jon.grimm@amd.com, mlevitsk@redhat.com
-References: <1588771076-73790-1-git-send-email-suravee.suthikulpanit@amd.com>
+        Wed, 06 May 2020 09:32:32 -0700 (PDT)
+Subject: Re: [GIT PULL 1/1] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
+ instruction
+To:     David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Qian Cai <cailca@icloud.com>
+References: <20200506115945.13132-1-borntraeger@de.ibm.com>
+ <20200506115945.13132-2-borntraeger@de.ibm.com>
+ <bcd98cbd-1e28-47a2-6cbd-668da4ddb9f5@redhat.com>
+ <fe991071-25d0-3842-73cc-23cb365850f3@de.ibm.com>
+ <a8688ff1-edc6-fdd8-9575-adbf726f9f06@redhat.com>
+ <328f4d06-5c1e-5255-cb4f-e8534f2171bf@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d918ad5a-f7c0-7915-9a98-e33bef34b623@redhat.com>
-Date:   Wed, 6 May 2020 18:30:50 +0200
+Message-ID: <e955f2f0-904b-394e-fa19-e3a461ecc92f@redhat.com>
+Date:   Wed, 6 May 2020 18:32:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1588771076-73790-1-git-send-email-suravee.suthikulpanit@amd.com>
+In-Reply-To: <328f4d06-5c1e-5255-cb4f-e8534f2171bf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,35 +84,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/20 15:17, Suravee Suthikulpanit wrote:
-> Introduce kvm_make_all_cpus_request_except(), which is used
-> in the subsequent patch 2 to fix AVIC warning.
-> 
-> Also include miscelleneous clean ups.
-> 
-> Thanks,
-> Suravee
-> 
-> Suravee Suthikulpanit (4):
->   KVM: Introduce kvm_make_all_cpus_request_except()
->   KVM: SVM: Fixes setting V_IRQ while AVIC is still enabled
->   KVM: SVM: Merge svm_enable_vintr into svm_set_vintr
->   KVM: SVM: Remove unnecessary V_IRQ unsetting
-> 
->  arch/x86/include/asm/kvm_host.h |  2 +-
->  arch/x86/kvm/hyperv.c           |  6 ++++--
->  arch/x86/kvm/i8254.c            |  4 ++--
->  arch/x86/kvm/svm/avic.c         |  2 +-
->  arch/x86/kvm/svm/svm.c          | 18 ++++++------------
->  arch/x86/kvm/x86.c              | 16 +++++++++++++---
->  include/linux/kvm_host.h        |  3 +++
->  virt/kvm/kvm_main.c             | 14 +++++++++++---
->  8 files changed, 41 insertions(+), 24 deletions(-)
-> 
+On 06/05/20 15:09, David Hildenbrand wrote:
+> IIRC, it's perfectly valid - according to the documentation - to ignore
+> ECA_APIE. That's the weird thing about effective controls. You don't
+> really know what you get in the end.
 
-I merged patches 1-3-4, you can send out 2 independently.
-
-Thanks,
+Ah okay, then yeah it could be considered a quality of implementation
+issue but not a bug.  Thanks for the lecture! :)
 
 Paolo
 
