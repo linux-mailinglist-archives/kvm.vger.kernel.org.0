@@ -2,162 +2,344 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5CFF1C7038
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 14:23:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C96991C70AF
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 14:48:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727995AbgEFMXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 08:23:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27718 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727792AbgEFMXU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 08:23:20 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 046C3kPp027380;
-        Wed, 6 May 2020 08:23:20 -0400
+        id S1728298AbgEFMrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 08:47:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18436 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727953AbgEFMrP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 08:47:15 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 046CVVWT031516;
+        Wed, 6 May 2020 08:47:13 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s4gvysmp-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30s2g42r5f-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 May 2020 08:23:19 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 046C4QlG029123;
-        Wed, 6 May 2020 08:23:19 -0400
+        Wed, 06 May 2020 08:47:13 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 046CVhcp032916;
+        Wed, 6 May 2020 08:47:13 -0400
 Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 30s4gvyskj-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 30s2g42r4q-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 May 2020 08:23:19 -0400
+        Wed, 06 May 2020 08:47:13 -0400
 Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 046CADns001107;
-        Wed, 6 May 2020 12:23:16 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 30s0g5s407-1
+        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 046CjRPC027100;
+        Wed, 6 May 2020 12:47:11 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 30s0g5s5g9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 May 2020 12:23:16 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 046CNEMQ65339562
+        Wed, 06 May 2020 12:47:11 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 046Cl83243647108
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 6 May 2020 12:23:14 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 06EC1A4053;
-        Wed,  6 May 2020 12:23:14 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 59A98A4057;
-        Wed,  6 May 2020 12:23:13 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.29.248])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  6 May 2020 12:23:13 +0000 (GMT)
-Subject: Re: [GIT PULL 1/1] KVM: s390: Remove false WARN_ON_ONCE for the PQAP
- instruction
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        Wed, 6 May 2020 12:47:08 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B1FFB42047;
+        Wed,  6 May 2020 12:47:08 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4AD8942042;
+        Wed,  6 May 2020 12:47:08 +0000 (GMT)
+Received: from marcibm.ibmuc.com (unknown [9.145.158.168])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  6 May 2020 12:47:08 +0000 (GMT)
+From:   Marc Hartmayer <mhartmay@linux.ibm.com>
+To:     <kvm@vger.kernel.org>
+Cc:     Thomas Huth <thuth@redhat.com>,
         David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Qian Cai <cailca@icloud.com>
-References: <20200506115945.13132-1-borntraeger@de.ibm.com>
- <20200506115945.13132-2-borntraeger@de.ibm.com>
- <bcd98cbd-1e28-47a2-6cbd-668da4ddb9f5@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <fe991071-25d0-3842-73cc-23cb365850f3@de.ibm.com>
-Date:   Wed, 6 May 2020 14:23:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests RFC] s390x: Add Protected VM support
+Date:   Wed,  6 May 2020 14:46:36 +0200
+Message-Id: <20200506124636.21876-1-mhartmay@linux.ibm.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-In-Reply-To: <bcd98cbd-1e28-47a2-6cbd-668da4ddb9f5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
  definitions=2020-05-06_05:2020-05-05,2020-05-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0 mlxscore=0
- priorityscore=1501 malwarescore=0 phishscore=0 spamscore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ suspectscore=1 bulkscore=0 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=999 clxscore=1011
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2005060095
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Add support for Protected Virtual Machine (PVM) tests. For starting a
+PVM guest we must be able to generate a PVM image by using the
+`genprotimg` tool from the s390-tools collection. This requires the
+ability to pass a machine-specific host-key document, so the option
+`--host-key-document` is added to the configure script.
 
+Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+---
+ .gitignore          |  1 +
+ configure           |  8 ++++++++
+ s390x/Makefile      | 16 +++++++++++++---
+ s390x/unittests.cfg | 20 ++++++++++++++++++++
+ scripts/common.bash | 30 +++++++++++++++++++++++++++++-
+ 5 files changed, 71 insertions(+), 4 deletions(-)
 
-On 06.05.20 14:12, Paolo Bonzini wrote:
-> On 06/05/20 13:59, Christian Borntraeger wrote:
->> Running nested under z/VM can result in other intercepts as
->> well as ECA_APIE is an effective bit: If one hypervisor layer has
->> turned this bit off, the end result will be that we will get intercepts for
->> all function codes. Usually the first one will be a query like PQAP(QCI).
->> So the WARN_ON_ONCE is not right. Let us simply remove it.
-> 
-> Possibly stupid question since I can only recognize some words here. :)
-> But anyway... shouldn't z/VM trap this intercept when the guest has
-> turned off the bit, and only reflect the SIE exit based on the function
-> code?
+diff --git a/.gitignore b/.gitignore
+index 784cb2ddbcb8..1fa5c0c0ea76 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -4,6 +4,7 @@
+ *.o
+ *.flat
+ *.elf
++*.img
+ .pc
+ patches
+ .stgit-*
+diff --git a/configure b/configure
+index 5d2cd90cd180..29191f4b0994 100755
+--- a/configure
++++ b/configure
+@@ -18,6 +18,7 @@ u32_long=
+ vmm="qemu"
+ errata_force=0
+ erratatxt="errata.txt"
++host_key_document=
+ 
+ usage() {
+     cat <<-EOF
+@@ -40,6 +41,8 @@ usage() {
+ 	                           no environ is provided by the user (enabled by default)
+ 	    --erratatxt=FILE       specify a file to use instead of errata.txt. Use
+ 	                           '--erratatxt=' to ensure no file is used.
++	    --host-key-document=HOST_KEY_DOCUMENT
++	                           host-key-document to use (s390x only)
+ EOF
+     exit 1
+ }
+@@ -91,6 +94,9 @@ while [[ "$1" = -* ]]; do
+ 	--erratatxt)
+ 	    erratatxt="$arg"
+ 	    ;;
++	--host-key-document)
++	    host_key_document="$arg"
++	    ;;
+ 	--help)
+ 	    usage
+ 	    ;;
+@@ -207,6 +213,8 @@ PRETTY_PRINT_STACKS=$pretty_print_stacks
+ ENVIRON_DEFAULT=$environ_default
+ ERRATATXT=$erratatxt
+ U32_LONG_FMT=$u32_long
++GENPROTIMG=genprotimg
++HOST_KEY_DOCUMENT=$host_key_document
+ EOF
+ 
+ cat <<EOF > lib/config.h
+diff --git a/s390x/Makefile b/s390x/Makefile
+index ddb4b48ecbf9..a57655dcce10 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -17,12 +17,19 @@ tests += $(TEST_DIR)/stsi.elf
+ tests += $(TEST_DIR)/skrf.elf
+ tests += $(TEST_DIR)/smp.elf
+ tests += $(TEST_DIR)/sclp.elf
+-tests_binary = $(patsubst %.elf,%.bin,$(tests))
+ 
+-all: directories test_cases test_cases_binary
++tests_binary = $(patsubst %.elf,%.bin,$(tests))
++ifneq ($(HOST_KEY_DOCUMENT),)
++tests_pv_img = $(patsubst %.elf,%.pv.img,$(tests))
++else
++tests_pv_img =
++endif
++
++all: directories test_cases test_cases_binary test_cases_pv
+ 
+ test_cases: $(tests)
+ test_cases_binary: $(tests_binary)
++test_cases_pv: $(tests_pv_img)
+ 
+ CFLAGS += -std=gnu99
+ CFLAGS += -ffreestanding
+@@ -68,8 +75,11 @@ FLATLIBS = $(libcflat)
+ %.bin: %.elf
+ 	$(OBJCOPY) -O binary  $< $@
+ 
++%.pv.img: %.bin $(HOST_KEY_DOCUMENT)
++	$(GENPROTIMG) --host-key-document $(HOST_KEY_DOCUMENT) --no-verify --image $< -o $@
++
+ arch_clean: asm_offsets_clean
+-	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(TEST_DIR)/.*.d lib/s390x/.*.d
++	$(RM) $(TEST_DIR)/*.{o,elf,bin,img} $(TEST_DIR)/.*.d lib/s390x/.*.d
+ 
+ generated-files = $(asm-offsets)
+ $(tests:.elf=.o) $(cstart.o) $(cflatobjs): $(generated-files)
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index b307329354f6..6beaca45fb20 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -16,6 +16,8 @@
+ #			 # a test. The check line can contain multiple files
+ #			 # to check separated by a space but each check
+ #			 # parameter needs to be of the form <path>=<value>
++# pv_support = 0|1       # Optionally specify whether a test supports the
++#                        # execution as a PV guest.
+ ##############################################################################
+ 
+ [selftest-setup]
+@@ -25,62 +27,80 @@ extra_params = -append 'test 123'
+ 
+ [intercept]
+ file = intercept.elf
++pv_support = 1
+ 
+ [emulator]
+ file = emulator.elf
++pv_support = 1
+ 
+ [sieve]
+ file = sieve.elf
+ groups = selftest
+ # can take fairly long when KVM is nested inside z/VM
+ timeout = 600
++pv_support = 1
+ 
+ [sthyi]
+ file = sthyi.elf
++pv_support = 1
+ 
+ [skey]
+ file = skey.elf
++pv_support = 1
+ 
+ [diag10]
+ file = diag10.elf
++pv_support = 1
+ 
+ [diag308]
+ file = diag308.elf
++pv_support = 1
+ 
+ [pfmf]
+ file = pfmf.elf
++pv_support = 1
+ 
+ [cmm]
+ file = cmm.elf
++pv_support = 1
+ 
+ [vector]
+ file = vector.elf
++pv_support = 1
+ 
+ [gs]
+ file = gs.elf
++pv_support = 1
+ 
+ [iep]
+ file = iep.elf
++pv_support = 1
+ 
+ [cpumodel]
+ file = cpumodel.elf
++pv_support = 1
+ 
+ [diag288]
+ file = diag288.elf
+ extra_params=-device diag288,id=watchdog0 --watchdog-action inject-nmi
++pv_support = 1
+ 
+ [stsi]
+ file = stsi.elf
+ extra_params=-name kvm-unit-test --uuid 0fb84a86-727c-11ea-bc55-0242ac130003 -smp 1,maxcpus=8
++pv_support = 1
+ 
+ [smp]
+ file = smp.elf
+ smp = 2
++pv_support = 1
+ 
+ [sclp-1g]
+ file = sclp.elf
+ extra_params = -m 1G
++pv_support = 1
+ 
+ [sclp-3g]
+ file = sclp.elf
+ extra_params = -m 3G
++pv_support = 1
+diff --git a/scripts/common.bash b/scripts/common.bash
+index 9a6ebbd7f287..971d0661287c 100644
+--- a/scripts/common.bash
++++ b/scripts/common.bash
+@@ -1,3 +1,20 @@
++function pv_cmd ()
++{
++	local cmd=$1
++	local testname=$2
++	local groups=$3
++	local smp=$4
++	local kernel=$5
++	local opts=$6
++	local arch=$7
++	local check=$8
++	local accel=$9
++	local timeout=${10}
++
++	kernel=${kernel%.elf}.pv.img
++	# do not run the PV test cases by default
++	"$cmd" "${testname}_PV" "$groups pv nodefault" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++}
+ 
+ function for_each_unittest()
+ {
+@@ -12,12 +29,16 @@ function for_each_unittest()
+ 	local check
+ 	local accel
+ 	local timeout
++	local pv_support
+ 
+ 	exec {fd}<"$unittests"
+ 
+ 	while read -r -u $fd line; do
+ 		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+-			"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++			if [ "${pv_support}" == 1 ]; then
++				pv_cmd "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++			fi
++
+ 			testname=${BASH_REMATCH[1]}
+ 			smp=1
+ 			kernel=""
+@@ -27,6 +48,7 @@ function for_each_unittest()
+ 			check=""
+ 			accel=""
+ 			timeout=""
++			pv_support=""
+ 		elif [[ $line =~ ^file\ *=\ *(.*)$ ]]; then
+ 			kernel=$TEST_DIR/${BASH_REMATCH[1]}
+ 		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
+@@ -43,8 +65,14 @@ function for_each_unittest()
+ 			accel=${BASH_REMATCH[1]}
+ 		elif [[ $line =~ ^timeout\ *=\ *(.*)$ ]]; then
+ 			timeout=${BASH_REMATCH[1]}
++		elif [[ $line =~ ^pv_support\ *=\ *(.*)$ ]]; then
++			pv_support=${BASH_REMATCH[1]}
+ 		fi
+ 	done
++
+ 	"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++	if [ "${pv_support}" == 1 ]; then
++		pv_cmd "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++	fi
+ 	exec {fd}<&-
+ }
+-- 
+2.17.0
 
-So here is my theory.
-
-the problem is that z/VM seems to have disabled that bit. The interpretion
-only works when all layers have this bit set. (Its called an effective bit). 
-So we have
-LPAR -> ECA_APIE = 1
-Z/VM -> ECA_APIE = 0
-KVM  -> ECA_APIE = 1
-nested KVM guest --> does during boot in ap_instructions_available PQAP with
-FC==0 to test if crypto is available.
-
-As the nested guest is in fact a shadow guest of z/VM
-this will now intercept to z/VM, which will forward that to KVM.
-
-As PQAP with FC==0 DOES work in the KVM, KVM believes that we have crypto
-support and we will enable it for our guests. So all the early checks in
-handle_pqap will succeed until we run in the check for fc!=3.
-
-In the end this is obviously a case how this warning can trigger. So we better
-remove it and rely on the error path to clean up.
