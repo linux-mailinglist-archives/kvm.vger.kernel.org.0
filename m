@@ -2,123 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DDB31C6E1A
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 12:11:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C557A1C6E5C
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 12:27:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728614AbgEFKLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 06:11:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37982 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728314AbgEFKLW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 06:11:22 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DC73C061A0F
-        for <kvm@vger.kernel.org>; Wed,  6 May 2020 03:11:22 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id u16so1937417wmc.5
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 03:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=CZGxVEINRFfXco4KoTv4rMN52n6V3TJRcAbrE28fW9I=;
-        b=gV9RfLluzH10SNhxg/ntUX82VqQaIDxo5hreeCRlMY9MSi58DD1Rdv8yrkNnxMUNdc
-         lqqVgDIDm3KKLgwIIfqxX9p7vAryeLm1fKw2t1OPaSbqw8YrMfm1wrFSJ7BawFFe5mII
-         XVVAXr9hAmR1dSQMhxBFiMv+jFhDF5JgqnK8YOlezXRMvHPp7CiEqnjwQJeUJc8TTebd
-         xyl4YYbHvzEgaYk8eLDwc8AsaW5okMx3l4dFvMInLPONGXPKs4yAL1bV1he8DCSqr8sv
-         7DlRNJpYJsXkdlD8kNP0c6Uo5Q58EVfFd0/sng6OXjXzWFH9lZOn8SHyFXSXYRRuDR80
-         Esfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CZGxVEINRFfXco4KoTv4rMN52n6V3TJRcAbrE28fW9I=;
-        b=SFSq6SO6hiB/zhV6E0jlcqNPyl6OG044RfwVx6f199WNaN7UXetk6ncxZXomNJi/J6
-         aFUA6W0RyioE2ySk6Y8ClGodjgFeHAx9o7yXuVYcQscr6ckg7rPc2um1y5A7TFttbHhx
-         to5pNi4W5uG5Hb8e5aWdiLWL5dcCF5YJxG4396o69EZ75VNj4qTNkovdINX8hnmihdYe
-         /GXxzEE+t5uMID0cNUeGRQPTWiIZihgNE/myHWUycTDoS17GRWYQaiFWlRK1K7cfJYph
-         ZTjrEL+zUEFetrzbAA/36hpoR6KPdXRw8xB+69AVaBpHZXlSVDpAJMP6mMEx/loxIEbE
-         jeGw==
-X-Gm-Message-State: AGi0PuZZZe8Fialsa/3DQxOCp0YP5OzwlRk9vEa/eoZWh6crt5P591bL
-        z5JG0Zn51535/oUlT5Dgz8QPtA==
-X-Google-Smtp-Source: APiQypID1DXJTOWcDNEDu4jVNP7gVAm/OBszOGtJjHaEN3aiIon6FlVQi2/8ZdUD+TQYi0xLYGD29A==
-X-Received: by 2002:a7b:ce88:: with SMTP id q8mr3737522wmj.161.1588759880879;
-        Wed, 06 May 2020 03:11:20 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
-        by smtp.gmail.com with ESMTPSA id q8sm2109623wrp.58.2020.05.06.03.11.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 May 2020 03:11:19 -0700 (PDT)
-Date:   Wed, 6 May 2020 11:11:15 +0100
-From:   Andrew Scull <ascull@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 05/26] arm64: Document SW reserved PTE/PMD bits in
- Stage-2 descriptors
-Message-ID: <20200506101115.GF237572@google.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-6-maz@kernel.org>
- <20200505155916.GB237572@google.com>
- <8b399c95ca1393e63cc1077ede8a45f6@kernel.org>
+        id S1729067AbgEFK1p convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 6 May 2020 06:27:45 -0400
+Received: from mga14.intel.com ([192.55.52.115]:29055 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728713AbgEFK1o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 06:27:44 -0400
+IronPort-SDR: ag+EIYoBR4TVmXtX0WzlfT7BJzQlj/KzLh3belSJjnNk++1+b7qalEMpUjPj9Q2HgHiMIYOs1P
+ 5MrsgL/O6jow==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 03:27:44 -0700
+IronPort-SDR: GUoiCivGoWEh00L1AYi7caXVsRR8Ir6+hS6yJ7Kdnc1B/DhsaZ5KbxJl3siUuW2Zssx26Lc+dC
+ i6VhSvMUWXgQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,358,1583222400"; 
+   d="scan'208";a="369757094"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by fmsmga001.fm.intel.com with ESMTP; 06 May 2020 03:27:44 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 May 2020 03:27:44 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 6 May 2020 03:27:43 -0700
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 6 May 2020 03:27:43 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.210]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.95]) with mapi id 14.03.0439.000;
+ Wed, 6 May 2020 18:27:40 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        "Dey, Megha" <megha.dey@linux.intel.com>
+CC:     "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH RFC 04/15] drivers/base: Add support for a new IMS irq
+ domain
+Thread-Topic: [PATCH RFC 04/15] drivers/base: Add support for a new IMS irq
+ domain
+Thread-Index: AQHWGDVoji+pYTNAZUCFs9wcRhPwDaiGoCsAgAy5aQCAAyNRgIAABFYAgAABv4CAABuEAIAAxfiAgAOJvpA=
+Date:   Wed, 6 May 2020 10:27:40 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D903AED@SHSMSX104.ccr.corp.intel.com>
+References: <158751095889.36773.6009825070990637468.stgit@djiang5-desk3.ch.intel.com>
+ <158751205175.36773.1874642824360728883.stgit@djiang5-desk3.ch.intel.com>
+ <20200423201118.GA29567@ziepe.ca>
+ <35f701d9-1034-09c7-8117-87fb8796a017@linux.intel.com>
+ <20200503222513.GS26002@ziepe.ca>
+ <1ededeb8-deff-4db7-40e5-1d5e8a800f52@linux.intel.com>
+ <20200503224659.GU26002@ziepe.ca>
+ <8ff2aace-0697-b8ef-de68-1bcc49d6727f@linux.intel.com>
+ <20200504121401.GV26002@ziepe.ca>
+In-Reply-To: <20200504121401.GV26002@ziepe.ca>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b399c95ca1393e63cc1077ede8a45f6@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 06, 2020 at 10:39:59AM +0100, Marc Zyngier wrote:
-> Hi Andrew,
+> From: Jason Gunthorpe <jgg@ziepe.ca>
+> Sent: Monday, May 4, 2020 8:14 PM
 > 
-> On 2020-05-05 16:59, Andrew Scull wrote:
-> > On Wed, Apr 22, 2020 at 01:00:29PM +0100, Marc Zyngier wrote:
-> > > Advertise bits [58:55] as reserved for SW in the S2 descriptors.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/pgtable-hwdef.h | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/pgtable-hwdef.h
-> > > b/arch/arm64/include/asm/pgtable-hwdef.h
-> > > index 6bf5e650da788..7eab0d23cdb52 100644
-> > > --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> > > +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> > > @@ -177,10 +177,12 @@
-> > >  #define PTE_S2_RDONLY		(_AT(pteval_t, 1) << 6)   /* HAP[2:1] */
-> > >  #define PTE_S2_RDWR		(_AT(pteval_t, 3) << 6)   /* HAP[2:1] */
-> > >  #define PTE_S2_XN		(_AT(pteval_t, 2) << 53)  /* XN[1:0] */
-> > > +#define PTE_S2_SW_RESVD		(_AT(pteval_t, 15) << 55) /* Reserved for
-> > > SW */
-> > > 
-> > >  #define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
-> > >  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
-> > >  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
-> > > +#define PMD_S2_SW_RESVD		(_AT(pmdval_t, 15) << 55) /* Reserved for
-> > > SW */
-> > > 
-> > >  #define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
-> > >  #define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
-> > > --
-> > > 2.26.1
-> > > 
-> > > _______________________________________________
-> > > kvmarm mailing list
-> > > kvmarm@lists.cs.columbia.edu
-> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> > 
-> > This is consistent with "Attribute fields in stage 1 VMSAv8-64 Block and
-> > Page descriptors"
+> On Sun, May 03, 2020 at 05:25:28PM -0700, Dey, Megha wrote:
+> > > > The use case if when we have a device assigned to a guest and we
+> > > > want to allocate IMS(platform-msi) interrupts for that
+> > > > guest-assigned device. Currently, this is abstracted through a mdev
+> > > > interface.
+> > >
+> > > And the mdev has the pci_device internally, so it should simply pass
+> > > that pci_device to the platform_msi machinery.
+> >
+> > hmm i am not sure I follow this. mdev has a pci_device internally? which
+> > struct are you referring to here?
 > 
-> Do you mean "stage 2" instead? The reserved bits are the same, but I want
-> to be sure we have looked at the same thing (ARM DDI 0487F.a, D5-2603).
+> mdev in general may not, but any ADI trying to use mdev will
+> necessarily have access to a struct pci_device.
 
-My turn for the copy-paste bug, yes "Attribute fields in stage 2
-VMSAv8-64 Block and Page descriptors". And conviniently the same bits
-are reserved for SW in both.
+Agree here. Mdev is just driver internal concept. It doesn't make sense to
+expose it in driver/base, just like how we avoided exposing mdev in iommu
+layer.
+
+Megha, every mdev/ADI has a parent device, which is the struct pci_device
+that Jason refers to. In irq domain level, it only needs to care about the
+PCI device and related IMS management. It doesn't matter whether the
+allocated IMS entry is used for a mdev or by parent driver itself.
+
+Thanks
+Kevin
