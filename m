@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AFDE1C7184
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 15:18:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 427201C7189
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 15:18:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728297AbgEFNSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 09:18:20 -0400
-Received: from mail-dm6nam10on2041.outbound.protection.outlook.com ([40.107.93.41]:24036
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        id S1728665AbgEFNSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 09:18:30 -0400
+Received: from mail-eopbgr760078.outbound.protection.outlook.com ([40.107.76.78]:6525
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728058AbgEFNST (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 09:18:19 -0400
+        id S1728592AbgEFNS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 09:18:26 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BXee8xr9VexgtAMd2L7YvOrJAhd5m1Qhl6MFXfeFvSH60tFB1XnOSKMSwUlGPm86ggUs+iL9xb9BrTSiAc9QTQuP+uNWTnRxTxL83mQQvw1Qw8kS1K1FoHjoDfSjHCK0LpvfjEQpkCi83EMj+xhYAKkpjs+9/olOmSYdYFRJMzoFVS4tFWM0Rxj5IuFamEYONoMwePnmRLPeATZ8f7i+LNFyshsl301BkR89cMik/CH6NAIODJqszbsifkNmP7NOKcEKVF2WtkyFaxFWANU2Mx4qmUwBBOET0MjkSlR5W812Nakm1p8pif/TpK/cx+mCd7ldsScpWHGBd35lags/xA==
+ b=FcRzv95RBl9DzestTRdVXxxqRS7wiQDWDqnOhUpNV6OVM5BNkbkBufJdGlobmTi5zrMukQ3uIHE7AJAamgt4eto1O80rHRM/QJaFgt0XxO/+OgGtDC6Yv+3gUWXz1wJ2Oka5fjS5pU+E7TljRVcPTGZbBdLEGsNQafY4zYUGDtEforxrIhsiVY9RzLVcxyTAWstLfxPjN49Rom5s2S84K+6P1JhBRQgWA+p7mX9+h6viHobtVp2HPFxiV/PjxJCtVOHh16krlcBzfcrcA5nLmCIZ5Wji2EdPWAbipDt0thdGPBg1vvgJh2nkZaJN4QrpScInKz+K8CYx7eQZtfMbyg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TgZ7+vNXdghQPjoh51NjFBqLLho2bNsqf1chHxvfiUo=;
- b=HfkuGg8ZkTmF5diZaYoFAVNWFZXdNsuZ2A4JXkUyQBMIeGCcCQyQdI0JTBIVD6qPXv5E6T/kZkWYKexzhlc6S13D8dfM94WydmfY3rOsdtSee9uI1QMJHlUXFBp6f2nWj+AIF/q90nadaCk/0rmPsOexJti0OjCyHwHfGhkTqTaVfRG0wxT5bIbtdgrtCfZov1jUCPFcjwsAiyoB8mUy3HwFntJiZOS1n6Pz1ZkSnQoatnO0bb2qerqcr+fKXC1rFC09y5VZU6H/dlBZYIHMt4PHQS9tVHlGgdY8qdpbXSGIR+QLUYCpcGcnYa3DRfmZ3q+hEB+V1HmFQkroZNRBUA==
+ bh=lHHOMZpR3eK2tzrC3sApZvAs3wH0hW3rPgR6Bn26IDQ=;
+ b=TdgjoR5IjbvarIGnLfuiRAeKPraLNDlRLXjlP04jjmBPCCAZ97klgRaWqK8RVYE/hHyDZmAovGflJzihAK6V9FnmhCLu51l3C81qFEZnNtCcFsvXGSZZZcD/9uKill6EQgzad0JmyH/IUjGxGf31jMMYUu0jSmGj9gSwoDPmrEBO5O2xD/HppFl9OlyOLu9A8tGceqwZ0T+KamXKfPUj/qs5ydW4DdO1Q78ZnKVI7AKG6/8gYyDt0sMPDPKF7lYBas7Oo9qWhCH5ngZU4Y3IOzpgK4KgdZ4CffsS5rmTnB66oSSlLpoHFTJqiS8cX2C6KMAeDkA4LtncDXi7bLtTrw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TgZ7+vNXdghQPjoh51NjFBqLLho2bNsqf1chHxvfiUo=;
- b=F0EiLJjVFhrlk561eIcCgfqvUngkUzWrG228MrmMmz5jl6ldACzDYeGiAqHHhd1UF7PzGLhGZ07YXb9Dj6J6JGtk0Dw/4L2VayTHcb5Wso63Brw/Z/k2hNxyJMn/2UitkoC0ixoO8t+6a2UDMciPx9qEezkmCHUmTWDCye8KxK0=
+ bh=lHHOMZpR3eK2tzrC3sApZvAs3wH0hW3rPgR6Bn26IDQ=;
+ b=3SYn7fl8K95y2fVN81/AKc/+Doe4LzAVoDHiJdkaTyxJzFhPfM3pvJiOfftzhMCnyOIvqf2lnZRp2Z6UPLQvW9PKbYp8R0UucJCCn3LQBZigC3ms+4fhQLcR5EU1cq1vosR1Sq/xCtentLW1++yuvjKV9iZPSjfl1mfGdneS1rk=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR12MB1163.namprd12.prod.outlook.com (2603:10b6:3:7a::18) by
- DM5PR12MB1228.namprd12.prod.outlook.com (2603:10b6:3:74::19) with Microsoft
+ DM5PR12MB1258.namprd12.prod.outlook.com (2603:10b6:3:79::14) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.29; Wed, 6 May 2020 13:18:17 +0000
+ 15.20.2958.29; Wed, 6 May 2020 13:18:18 +0000
 Received: from DM5PR12MB1163.namprd12.prod.outlook.com
  ([fe80::d061:4c5:954e:4744]) by DM5PR12MB1163.namprd12.prod.outlook.com
  ([fe80::d061:4c5:954e:4744%4]) with mapi id 15.20.2958.030; Wed, 6 May 2020
- 13:18:16 +0000
+ 13:18:18 +0000
 From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
         mlevitsk@redhat.com,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [PATCH 3/4] KVM: SVM: Merge svm_enable_vintr into svm_set_vintr
-Date:   Wed,  6 May 2020 08:17:55 -0500
-Message-Id: <1588771076-73790-4-git-send-email-suravee.suthikulpanit@amd.com>
+Subject: [PATCH 4/4] KVM: SVM: Remove unnecessary V_IRQ unsetting
+Date:   Wed,  6 May 2020 08:17:56 -0500
+Message-Id: <1588771076-73790-5-git-send-email-suravee.suthikulpanit@amd.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1588771076-73790-1-git-send-email-suravee.suthikulpanit@amd.com>
 References: <1588771076-73790-1-git-send-email-suravee.suthikulpanit@amd.com>
@@ -54,77 +54,56 @@ X-ClientProxiedBy: DM5PR12CA0071.namprd12.prod.outlook.com
  (2603:10b6:3:7a::18)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ssuthiku-rhel7-ssp.amd.com (165.204.78.2) by DM5PR12CA0071.namprd12.prod.outlook.com (2603:10b6:3:103::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28 via Frontend Transport; Wed, 6 May 2020 13:18:15 +0000
+Received: from ssuthiku-rhel7-ssp.amd.com (165.204.78.2) by DM5PR12CA0071.namprd12.prod.outlook.com (2603:10b6:3:103::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28 via Frontend Transport; Wed, 6 May 2020 13:18:17 +0000
 X-Mailer: git-send-email 1.8.3.1
 X-Originating-IP: [165.204.78.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e13ec9f6-87e1-4a61-b188-08d7f1bfefff
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1228:|DM5PR12MB1228:
+X-MS-Office365-Filtering-Correlation-Id: 87063f03-a4d9-4056-9065-08d7f1bff0bf
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1258:|DM5PR12MB1258:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB12284C1B7A0434F4C1EECFEDF3A40@DM5PR12MB1228.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:628;
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1258F13CC10A583FA258F6ADF3A40@DM5PR12MB1258.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:163;
 X-Forefront-PRVS: 03950F25EC
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TtyUGAF+y9GvL9pqo79rOEQfX0TfJUbaUWvWEg8F77b5wiETYIoAlu7F2M7ecfHtEJ62EJCVXBO9/5EvhwVMpYjcu9+4GU8XTXCUmuG1BExMV+6YDQpmK/4xFOEE2jg7N1TQnsxdomlRtsXVRdJjwRTLG06xKiNRrmJJbiMGp14FNAAq9y5PO0CI4bJo1TnTZuanWlgqcJtHKun0u5QuHocSvtOe4IU4DNRcgsdXjxEM1Tbjw3A7ujzm/sCtqkxz1UBAW14s5Mw4zfrxUE1OhQslFMjLV8D6yGgz7P6J7wIVKPgcWc8Rpj1MNCrxvxjnfEksmbk0+h5LcQFQgi2UzK2Wf+giwukqw52vg8L9yt66TBr5WxfjxRJaXjpdR+mrx+5Iag7H594d4Ze19ac4nISJPSKOXL7tk36DgbtwZ7sVFIwc/uH+KTtzen2haGwxJMyPwYFZ2IX8KQI6tf07YmACtMO33/24PCejAJFlHnYY+PnL6N2GxdTU/Lg5imhHIgwzVx56SxkgfauYvF5k3w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(39860400002)(376002)(136003)(396003)(366004)(33430700001)(478600001)(956004)(2616005)(52116002)(7696005)(316002)(2906002)(44832011)(8936002)(36756003)(4326008)(8676002)(186003)(5660300002)(26005)(6486002)(66946007)(33440700001)(16526019)(66556008)(86362001)(6666004)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: S3OEfU6Hy/x32D3XDXa7/8EP+omNMrBEfwPgZxzCtjOPlMAZsYPkrsWn6gI7uKx/7oQ5Hwqe5h+dy2ogNqP1wk7NHgF7q3wAmA5riwg/hOX0YwrL/a8FZDYTA64b2A63d1+A8QzyupLsukd32e0QzipeyiCCZSFieYQ9+EppSP1AqExO48RxrYqHeyQb0KM63Aqo7LILp/j2ydjjB684JwOtxRUoBcRJm8SJB3VTcACu6EEN8Y85lDFu7kzdXfT9Im8p7koE51q8O588+YcAJMw569T1hxxRoNjHkrupbX6pqW30mgs4twTLZKD8sLEqvlj/cPHPDdxPtjK3JrqueARPVdh7ypDce39YthsocR5LBhg+BGnYOMBj4+gJUTZEWA7vKwgA08PVCmoPoiXb+NehDHn3YVekRJhPiMwVw4HbO+O8MB8GqkVw3sARpWmpEREU5wjbbITnp/xe41Guk4yleYEwXSM0e4zNP4Ve5URJ9XG40qhYp7+fhKsRhjWnMsGmzXLVZDkcO/iSAskuQcEjoko1tFv0T/U9Ljjb6BbiQYV9LdZAdaNj718/P9p5ECTiZQYbjjdBZ0c8N+bRsBviPskq/0Y3vmIcXQ/DdEjUSNjX51TE5MeNH7Epm7e4aAAwdccogOndE9VBHPwWMLkmidVjEvGr+syFhA3iETcHv2E4bYNJ8k7U9XIKJJGAGXQ/6IMos064GFYPRUZZN8w8sXlw2GEhg4gCC3Ldq+WHBcSDCBptgZe+UBCrdUvCWjRTfD+c+LdHRxksZALZSKQjG0Tun1RpfREJ9sf3QwM=
+X-Microsoft-Antispam-Message-Info: YxVyEbAAxdVfihqs20JH4GMLNpHv5OudBbqhAou0ICSFFRVAle4VNLwwyu+U0vjTvpk5TRXFHOQ/DQUk76HpL7se8IejSRZTyiXA+Zt0luazWCMyGwPTDe9ideJjWOByMZXKkp8uGlHr6QYTafWw2WwRXgW/aEoCzBmFO7FcAWs6BtaV8Fx8Pz55/A2LRSZ7TBPkwyLg8NlNiJMwTOlf10py3Kkb5aApuuteQ26WnxydV7/IoURueCaiva/CiTS5YeyVz0I+OKc+3JyyL5snue3PFIQUNJ9ArbEp+2iT2O26R0TOHlh36qgkBJHioRA7X538B7rTTz91AZQ9fnQCfTzo7hWTy1UgTo+W2pvpT70zR2qcQJuM6sTxzxyI90OM5DbhVD7AXjZghUWoPueyEV28mVcoF0VqS63Du32Xkau1se3CCDnvEsIfB+yRW98+IjIso5ExbVW2eOx1QJowXNvT0j+U6ElnbGFgCtZSR9XyshLRjVF+0vez94ExVWnfSxoWT/yQIfpIJcu3lXvVIQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(376002)(136003)(396003)(346002)(33430700001)(4744005)(5660300002)(66556008)(66476007)(66946007)(7696005)(52116002)(8676002)(478600001)(8936002)(44832011)(6666004)(2906002)(2616005)(956004)(6486002)(86362001)(316002)(33440700001)(26005)(16526019)(186003)(36756003)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 5tqXaAUgaPvuF5qL9AJamN4jGXw+/PreR8eGhQKlx4qE8Qdsn7uB09dBQpG3B2ak7CNXmY6S6nf0imPbZEOmMxNZkoz6eDo1InBeOKGU5754YW7Xp3Fy8y+Do1NA5vQg8Am85mmsm4/lIN53gr88qWTSvTe/hvZHeo7CKmNqefK+x6b5Agutth7dQCCzpyGTYv8Z55nMQVR9q5z7e/m5SSLYnesgIia3vCXg3kX6vTt59hvfylIF4iCR6Rj+mZXlX//hgWw8wXpsgTZ0S0PKEeRLpMlGJOQTMpIrBlaOrnUfjcIioNka4ZJr6GnSaEUlbnteIHvnnr0vJVjeiiT5i00oDK2v+LffNBQfet0IBVOdiE6pOTuZ5BqyjqaitIOXWjvmDWVUi+2HDwLgeX3ar0aWBaW+/s2/Z9Sa3E78RSnhWcUZ/Q/wGd489Mfl/od7Q7XrccDC5VlLnthd6FTQllO+u4PHPYso/u4m330fnNfwdH4TvjX+XmlUKVf30yAYN6lV9CPG9zy9zDhbBOwJotoYmMNmpSDWHXAiHK3EqEes6KawZ5epHtBmLEnNSwMRmLR9Q0XO150XnU1Uyb8cH9N1owv0FYSroXZ09zgpU2IwX9qEcl89j/ph/G+1XMKGK53N8nkaDVfUvdJ9MF5UZIGYsp9zChyr804Cx3RSCG+DjWrobhjW0b83EaRzqxlLbHG/C7qb6vf8p8RZcgdFbsHs8EFbqlPJwJO+OvvzRII5ivJpPH/3oSO5lBVjwEMq7d+49oMS0xuaCVFG0ti4QCKlsswY/wtXKjrlcUdc+3M=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e13ec9f6-87e1-4a61-b188-08d7f1bfefff
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2020 13:18:16.7852
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87063f03-a4d9-4056-9065-08d7f1bff0bf
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2020 13:18:18.2595
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /sF0bIM7c/29VjQrtr2Q9mOn83+YXEE+ZyLRduJNinuJrNmznkVSZWRM1vDmXgXwxMD9nTnDPCmwZC9VCfhj3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1228
+X-MS-Exchange-CrossTenant-UserPrincipalName: Yhz4BxlkO8bnIiCNipRJCylvmYlutyD9szQ11caOsi75v2augd/djpx3Uufx3/QJlxwILjl8pKpRo3/E78c/zQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1258
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Code clean up and remove unnecessary intercept check for
-INTERCEPT_VINTR.
+This has already been handled in the prior call to svm_clear_vintr().
 
 Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 ---
- arch/x86/kvm/svm/svm.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ arch/x86/kvm/svm/svm.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c2117cd..8ac00b2 100644
+index 8ac00b2..553d4b6 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -1364,12 +1364,13 @@ static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 	}
+@@ -2662,8 +2662,6 @@ static int interrupt_window_interception(struct vcpu_svm *svm)
+ 	 */
+ 	svm_toggle_avic_for_irq_window(&svm->vcpu, true);
+ 
+-	svm->vmcb->control.int_ctl &= ~V_IRQ_MASK;
+-	mark_dirty(svm->vmcb, VMCB_INTR);
+ 	++svm->vcpu.stat.irq_window_exits;
+ 	return 1;
  }
- 
--static inline void svm_enable_vintr(struct vcpu_svm *svm)
-+static void svm_set_vintr(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control;
- 
- 	/* The following fields are ignored when AVIC is enabled */
- 	WARN_ON(kvm_vcpu_apicv_active(&svm->vcpu));
-+	set_intercept(svm, INTERCEPT_VINTR);
- 
- 	/*
- 	 * This is just a dummy VINTR to actually cause a vmexit to happen.
-@@ -1383,13 +1384,6 @@ static inline void svm_enable_vintr(struct vcpu_svm *svm)
- 	mark_dirty(svm->vmcb, VMCB_INTR);
- }
- 
--static void svm_set_vintr(struct vcpu_svm *svm)
--{
--	set_intercept(svm, INTERCEPT_VINTR);
--	if (is_intercept(svm, INTERCEPT_VINTR))
--		svm_enable_vintr(svm);
--}
--
- static void svm_clear_vintr(struct vcpu_svm *svm)
- {
- 	clr_intercept(svm, INTERCEPT_VINTR);
 -- 
 1.8.3.1
 
