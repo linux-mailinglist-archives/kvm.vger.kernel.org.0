@@ -2,134 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AA521C6713
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 06:49:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E88891C674F
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 07:12:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725821AbgEFEte (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 00:49:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44258 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725771AbgEFEtd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 00:49:33 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81D71C061A0F;
-        Tue,  5 May 2020 21:49:33 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id k1so520212wrx.4;
-        Tue, 05 May 2020 21:49:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wfKY4GkIahR7CykH5E5LZ7evKcIEeSBnuPWwKOPjFUM=;
-        b=bdoxXRYgoq1jfayeYIm43J9z2YvPN2PkInHz4whglgs399FK0lZEK3sfp8hc0KpFeD
-         ymY22JmUnkor3AbyExSywergBiqjQcXlc+EPDvBveImUsnG2rWklaAcWjCkRk4LERzFS
-         q27JQWf99XHPu+5GCNhyIKIKe6aXDFBkS6WFx4mBSHL717q4KuqHHFVTSTrSuLP3fdtg
-         5tvMMZpJB2v5SSWxBCjAuRsxf/m9bCmq3kYDxzeNuPK5Xiydv/c8I/HB1DTk3IaTiGqW
-         /g/DLNVxBxMV/S5eIKXJ5uRqvW7KWhat9m05fePiIREw9DOugWLeeb68nVn+LA9HIN5G
-         srcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wfKY4GkIahR7CykH5E5LZ7evKcIEeSBnuPWwKOPjFUM=;
-        b=lq5B42rIPaAxQO6iBfR9sAywNY+CDgSK+k4nTKGNV9Gox4KhX7bFoXBiloc8U1vrD4
-         7aPCqRyDo9ChkiabdDdEGHO0gEpRHNu43Irc/J3TXqSvpMCDz6RM95t7N7P/5rW3aQw4
-         2fG0Yu5wJIZoCif9M37imdhccjYoNnE0o/gyQg2CZO0+J3NvYt+tarGKg3Nac8fQyzHj
-         JcDwWk2ftm3YoJjT8KzfYU//t51c7LjBoGkAKL6hwaKdm+KE2shfEeHzO2wdRS0PRzMt
-         ycAhMEDefAEs40WE3dTRXIXK/vBawK/tTKhIT6Y274t4FSiw15PLoGut7LJyBTfXYXpY
-         GIPQ==
-X-Gm-Message-State: AGi0PuYZWrEKbzdKhW50vs1ntfNXzFhzM1TJQjqn6/KKpSaMIT7QEl3e
-        564B96Mf5wc8dXOJ/0WZ7vc=
-X-Google-Smtp-Source: APiQypLsIIVkQapdMZPA6joPwy7NuXaxV16GHg4q5ZFNmX8IByECIO1iOWXn03gtkNtSc25p7q66Fw==
-X-Received: by 2002:adf:f38c:: with SMTP id m12mr7026307wro.167.1588740572047;
-        Tue, 05 May 2020 21:49:32 -0700 (PDT)
-Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
-        by smtp.gmail.com with ESMTPSA id x5sm689439wro.12.2020.05.05.21.49.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2020 21:49:31 -0700 (PDT)
-Date:   Wed, 6 May 2020 07:49:29 +0300
-From:   Jon Doron <arilou@gmail.com>
-To:     Roman Kagan <rvkagan@yandex-team.ru>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
-Message-ID: <20200506044929.GD2862@jondnuc>
-References: <20200416125430.GL7606@jondnuc>
- <20200417104251.GA3009@rvkaganb>
- <20200418064127.GB1917435@jondnuc>
- <20200424133742.GA2439920@rvkaganb>
- <20200425061637.GF1917435@jondnuc>
- <20200503191900.GA389956@rvkaganb>
- <87a72nelup.fsf@vitty.brq.redhat.com>
- <20200505080158.GA400685@rvkaganb>
- <20200505103821.GB2862@jondnuc>
- <20200505200010.GB400685@rvkaganb>
+        id S1727771AbgEFFMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 01:12:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47882 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725857AbgEFFMb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 01:12:31 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A6D5C061A0F;
+        Tue,  5 May 2020 22:12:31 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 49H4Tl5Brzz9sSw; Wed,  6 May 2020 15:12:27 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1588741947; bh=Jt8KIzci0gy2YxX2jQYZA8AehfqZw/2Pk9tmasBajkU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rgy/bb75LbWZAJRxY1RKVgfXYFjWXLSye77DI8lVkNAgfHno2PfywNXmU7vMgX8hc
+         2rrq8Okwk2tS5IIseRULN7zPnI5VXxwwfLE+K+P0ocVhq7uggO4u8XUzdtemHGehAg
+         1NNKjf2qG2WDxt8hm0yIHea+48jiocskLlz9bD/gh/ASCe8BW1kIzCUQDyFMxdeYZ4
+         SeOtIOB//TtXlKwn+yriPo4ROhWTBgsire5zuWILuWmB69qKdMWEmaEC7y8dUsiS3m
+         emHKC4lwdaC6Mg70VNB25fX7OBfm04CzvCqbdVJ3lfkSnhC9w6kTmztCPJHtpkr8v+
+         CWXmUOSKumUhw==
+Date:   Wed, 6 May 2020 15:12:18 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Laurent Vivier <lvivier@redhat.com>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 4/4] KVM: PPC: Book3S HV: Flush guest mappings when
+ turning dirty tracking on/off
+Message-ID: <20200506051217.GA24968@blackberry>
+References: <20181212041430.GA22265@blackberry>
+ <20181212041717.GE22265@blackberry>
+ <58247760-00de-203d-a779-7fda3a739248@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200505200010.GB400685@rvkaganb>
+In-Reply-To: <58247760-00de-203d-a779-7fda3a739248@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/2020, Roman Kagan wrote:
->On Tue, May 05, 2020 at 01:38:21PM +0300, Jon Doron wrote:
->> On 05/05/2020, Roman Kagan wrote:
->> > On Mon, May 04, 2020 at 05:55:10PM +0200, Vitaly Kuznetsov wrote:
->> > > and it seems the default state of HV_X64_MSR_SCONTROL is '1', we should
->> > > probably do the same.
->> >
->> > This is the state the OS sees, after the firmware.  You'd see the same
->> > with QEMU/KVM if you used Hyper-V-aware SeaBIOS or OVMF.
->> >
->> > > Is there any reason to *not* do this in KVM when
->> > > KVM_CAP_HYPERV_SYNIC[,2] is enabled?
->> >
->> > Yes there is: quoting Hyper-V TLFS v6.0 11.8.1:
->> >
->> >  At virtual processor creation time and upon processor reset, the value
->> >  of this SCONTROL (SynIC control register) is 0x0000000000000000. Thus,
->> >  message queuing and event flag notifications will be disabled.
->> >
->> > And, even if we decide to violate the spec it's better done in
->> > userspace, loading the initial value and adjusting the synic state at
->> > vcpu reset.
->> >
->> > However leaving it up to the guest (firmware or OS) looks more natural
->> > to me.
->>
->> I under where you are coming from in the idea of leaving it to the OS
->
->I'm coming from the HyperV spec, see the quote above.
->
->> but I think in this specific case it does not make much sense, after
->> all HyperV has it's own proprietary BIOS which Windows assumes has
->> setup some of the MSRs, since we dont have that BIOS we need to
->> "emulate" it's behaviour.
->
->We don't have that BIOS, but we have another BIOS which does the same
->and is not proprietary.  Using it allows to do synic message posting
->even with a non-compliant guest OS which doesn't properly enable
->SCONTROL on its own.  (Note that there used to be no problem with this
->so far, this must be specific to your use case.)
->
->I'm failing to see why this is a stumbling block for the work you're
->doing.
->
->And I'm not convinced we need to work around a non-compliant guest with
->kludges to KVM or QEMU (including back-compat stuff as that would change
->the existing behavior), when the desired effect can be achieved with the
->existing code.
->
->Thanks,
->Roman.
+On Tue, Apr 28, 2020 at 05:57:59PM +0200, Laurent Vivier wrote:
+> On 12/12/2018 05:17, Paul Mackerras wrote:
+> > +	if (change == KVM_MR_FLAGS_ONLY && kvm_is_radix(kvm) &&
+> > +	    ((new->flags ^ old->flags) & KVM_MEM_LOG_DIRTY_PAGES))
+> > +		kvmppc_radix_flush_memslot(kvm, old);
+> >  }
+> 
+> Hi,
+> 
+> this part introduces a regression in QEMU test suite.
+> 
+> We have the following warning in the host kernel log:
+> 
+[snip]
+> 
+> The problem is detected with the "migration-test" test program in qemu,
+> on a POWER9 host in radix mode with THP. It happens only the first time
+> the test program is run after loading kvm_hv. The warning is an explicit
+> detection [1] of a problem:
 
-Thanks Roman, I see your point, it's important for me to get the EDK2 
-working properly not sure why it's not working for me.
+Yes, we found a valid PTE where we didn't expect there to be one.
 
-Do you know by any chance if the EDK2 hyperv patches were submitted and 
-if they were why they were not merged in?
+[snip]
+> I reproduce the problem in QEMU 4.2 build directory with :
+> 
+>  sudo rmmod kvm_hv
+>  sudo modprobe kvm_hv
+>  make check-qtest-ppc64
+> 
+> or once the test binary is built with
+> 
+>  sudo rmmod kvm_hv
+>  sudo modprobe kvm_hv
+>  export QTEST_QEMU_BINARY=ppc64-softmmu/qemu-system-ppc64
+>  tests/qtest/migration-test
+> 
+> The sub-test is "/migration/validate_uuid_error" that generates some
+> memory stress with a SLOF program in the source guest and fails because
+> of a mismatch with the destination guest. So the source guest continues
+> to execute the stress program while the migration is aborted.
+> 
+> Another way to reproduce the problem is:
+> 
+> Source guest:
+> 
+> sudo rmmod kvm-hv
+> sudo modprobe kvm-hv
+> qemu-system-ppc64 -display none -accel kvm -name source -m 256M \
+>                   -nodefaults -prom-env use-nvramrc?=true \
+>                   -prom-env 'nvramrc=hex ." _" begin 6400000 100000 \
+>                   do i c@ 1 + i c! 1000 +loop ." B" 0 until' -monitor \
+>                   stdio
+> 
+> Destination guest (on the same host):
+> 
+> qemu-system-ppc64 -display none -accel kvm -name source -m 512M \
+>                   -nodefaults -monitor stdio -incoming tcp:0:4444
+> 
+> Then in source guest monitor:
+> 
+> (qemu) migrate tcp:localhost:4444
+> 
+> The migration intentionally fails because of a memory size mismatch and
+> the warning is generated in the host kernel log.
 
-Thanks,
--- Jon.
+I built QEMU 4.2 and tried all three methods you list without seeing
+the problem manifest itself.  Is there any other configuration
+regarding THP or anything necessary?
+
+I was using the patch below, which you could try also, since you are
+better able to trigger the problem.  I never saw the "flush_memslot
+was necessary" message nor the WARN_ON.  If you see the flush_memslot
+message then that will give us a clue as to where the problem is
+coming from.
+
+Regards,
+Paul.
+
+--
+diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
+index 506e4df2d730..14ddf1411279 100644
+--- a/arch/powerpc/include/asm/kvm_book3s.h
++++ b/arch/powerpc/include/asm/kvm_book3s.h
+@@ -220,7 +220,7 @@ extern int kvm_test_age_radix(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 			unsigned long gfn);
+ extern long kvmppc_hv_get_dirty_log_radix(struct kvm *kvm,
+ 			struct kvm_memory_slot *memslot, unsigned long *map);
+-extern void kvmppc_radix_flush_memslot(struct kvm *kvm,
++extern int kvmppc_radix_flush_memslot(struct kvm *kvm,
+ 			const struct kvm_memory_slot *memslot);
+ extern int kvmhv_get_rmmu_info(struct kvm *kvm, struct kvm_ppc_rmmu_info *info);
+ 
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index aa12cd4078b3..930042632d8f 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -433,7 +433,7 @@ static void kvmppc_unmap_free_pte(struct kvm *kvm, pte_t *pte, bool full,
+ 		for (it = 0; it < PTRS_PER_PTE; ++it, ++p) {
+ 			if (pte_val(*p) == 0)
+ 				continue;
+-			WARN_ON_ONCE(1);
++			WARN_ON(1);
+ 			kvmppc_unmap_pte(kvm, p,
+ 					 pte_pfn(*p) << PAGE_SHIFT,
+ 					 PAGE_SHIFT, NULL, lpid);
+@@ -1092,30 +1092,34 @@ long kvmppc_hv_get_dirty_log_radix(struct kvm *kvm,
+ 	return 0;
+ }
+ 
+-void kvmppc_radix_flush_memslot(struct kvm *kvm,
++int kvmppc_radix_flush_memslot(struct kvm *kvm,
+ 				const struct kvm_memory_slot *memslot)
+ {
+ 	unsigned long n;
+ 	pte_t *ptep;
+ 	unsigned long gpa;
+ 	unsigned int shift;
++	int ret = 0;
+ 
+ 	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_START)
+ 		kvmppc_uvmem_drop_pages(memslot, kvm, true);
+ 
+ 	if (kvm->arch.secure_guest & KVMPPC_SECURE_INIT_DONE)
+-		return;
++		return 0;
+ 
+ 	gpa = memslot->base_gfn << PAGE_SHIFT;
+ 	spin_lock(&kvm->mmu_lock);
+ 	for (n = memslot->npages; n; --n) {
+ 		ptep = __find_linux_pte(kvm->arch.pgtable, gpa, NULL, &shift);
+-		if (ptep && pte_present(*ptep))
++		if (ptep && pte_present(*ptep)) {
+ 			kvmppc_unmap_pte(kvm, ptep, gpa, shift, memslot,
+ 					 kvm->arch.lpid);
++			ret = 1;
++		}
+ 		gpa += PAGE_SIZE;
+ 	}
+ 	spin_unlock(&kvm->mmu_lock);
++	return ret;
+ }
+ 
+ static void add_rmmu_ap_encoding(struct kvm_ppc_rmmu_info *info,
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 93493f0cbfe8..40b50f867835 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -4508,6 +4508,10 @@ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
+ 	if (change == KVM_MR_FLAGS_ONLY && kvm_is_radix(kvm) &&
+ 	    ((new->flags ^ old->flags) & KVM_MEM_LOG_DIRTY_PAGES))
+ 		kvmppc_radix_flush_memslot(kvm, old);
++	else if (kvm_is_radix(kvm) && kvmppc_radix_flush_memslot(kvm, old))
++		pr_err("flush_memslot was necessary - change = %d flags %x -> %x\n",
++		       change, old->flags, new->flags);
++
+ 	/*
+ 	 * If UV hasn't yet called H_SVM_INIT_START, don't register memslots.
+ 	 */
