@@ -2,115 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61DD21C6D1C
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CF231C6D70
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:44:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729044AbgEFJkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 05:40:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44874 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728306AbgEFJkC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 05:40:02 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1729232AbgEFJom (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 05:44:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55502 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729164AbgEFJol (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 05:44:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588758280;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=U3jHrb3ElqPyuqAafMEzJZ29hoRVGrLR/TI1FtwisFA=;
+        b=hTiu3o+PYiHmj/8AAUn5tAeGLDNQlPlnzj5jv4jmcGQ08bBK5sqh9XDHhGSO4lHbxu4onO
+        8TYSUXbjERorOsTeCGwbTFUd/FtLBShymSKyDPYl5GepnJOPv40BwlJ8vXkfPNJwBw3/s7
+        ARxZEo0Mc+RM/o0s9f09hYx96+iNzSo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-437-b6TwxCKoNd2qSp1btsNAgg-1; Wed, 06 May 2020 05:44:38 -0400
+X-MC-Unique: b6TwxCKoNd2qSp1btsNAgg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 56CAB2075E;
-        Wed,  6 May 2020 09:40:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588758001;
-        bh=PnheU1SB759b1ecFKgOFt4WnUTjCjzVdAEES0Im2Xtc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=EtcPzrkg+dKsEn/zxiZdqfiIiMAg3jdP8w21mkGZg1GrxW7TqJqSFSW6NUYyq16jD
-         jhC9kvc6joqytrdElp4LjrtbTnUjLDtCf6b6UTAGwZDaQULMpC479xmeoZvCDYSlQJ
-         VPObgH6EMZ79giLTHPXYGwbJ3OnwgooE3ClKJfdk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jWGX1-009uGa-OB; Wed, 06 May 2020 10:39:59 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 06 May 2020 10:39:59 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Scull <ascull@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 05/26] arm64: Document SW reserved PTE/PMD bits in Stage-2
- descriptors
-In-Reply-To: <20200505155916.GB237572@google.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-6-maz@kernel.org>
- <20200505155916.GB237572@google.com>
-User-Agent: Roundcube Webmail/1.4.3
-Message-ID: <8b399c95ca1393e63cc1077ede8a45f6@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ascull@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, andre.przywara@arm.com, Dave.Martin@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 918001005510;
+        Wed,  6 May 2020 09:44:37 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C24060C18;
+        Wed,  6 May 2020 09:44:36 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jmattson@google.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH] kvm: x86: Use KVM CPU capabilities to determine CR4 reserved bits
+Date:   Wed,  6 May 2020 05:44:36 -0400
+Message-Id: <20200506094436.3202-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andrew,
+Using CPUID data can be useful for the processor compatibility
+check, but that's it.  Using it to compute guest-reserved bits
+can have both false positives (such as LA57 and UMIP which we
+are already handling) and false negatives: in particular, with
+this patch we don't allow anymore a KVM guest to set CR4.PKE
+when CR4.PKE is clear on the host.
 
-On 2020-05-05 16:59, Andrew Scull wrote:
-> On Wed, Apr 22, 2020 at 01:00:29PM +0100, Marc Zyngier wrote:
->> Advertise bits [58:55] as reserved for SW in the S2 descriptors.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/include/asm/pgtable-hwdef.h | 2 ++
->>  1 file changed, 2 insertions(+)
->> 
->> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h 
->> b/arch/arm64/include/asm/pgtable-hwdef.h
->> index 6bf5e650da788..7eab0d23cdb52 100644
->> --- a/arch/arm64/include/asm/pgtable-hwdef.h
->> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
->> @@ -177,10 +177,12 @@
->>  #define PTE_S2_RDONLY		(_AT(pteval_t, 1) << 6)   /* HAP[2:1] */
->>  #define PTE_S2_RDWR		(_AT(pteval_t, 3) << 6)   /* HAP[2:1] */
->>  #define PTE_S2_XN		(_AT(pteval_t, 2) << 53)  /* XN[1:0] */
->> +#define PTE_S2_SW_RESVD		(_AT(pteval_t, 15) << 55) /* Reserved for SW 
->> */
->> 
->>  #define PMD_S2_RDONLY		(_AT(pmdval_t, 1) << 6)   /* HAP[2:1] */
->>  #define PMD_S2_RDWR		(_AT(pmdval_t, 3) << 6)   /* HAP[2:1] */
->>  #define PMD_S2_XN		(_AT(pmdval_t, 2) << 53)  /* XN[1:0] */
->> +#define PMD_S2_SW_RESVD		(_AT(pmdval_t, 15) << 55) /* Reserved for SW 
->> */
->> 
->>  #define PUD_S2_RDONLY		(_AT(pudval_t, 1) << 6)   /* HAP[2:1] */
->>  #define PUD_S2_RDWR		(_AT(pudval_t, 3) << 6)   /* HAP[2:1] */
->> --
->> 2.26.1
->> 
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
-> This is consistent with "Attribute fields in stage 1 VMSAv8-64 Block 
-> and
-> Page descriptors"
+Fixes: b9dd21e104bc ("KVM: x86: simplify handling of PKRU")
+Reported-by: Jim Mattson <jmattson@google.com>
+Tested-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/x86.c | 20 +++++---------------
+ 1 file changed, 5 insertions(+), 15 deletions(-)
 
-Do you mean "stage 2" instead? The reserved bits are the same, but I 
-want
-to be sure we have looked at the same thing (ARM DDI 0487F.a, D5-2603).
-
-> Reviewed-by: Andrew Scull <ascull@google.com>
-
-Thanks,
-
-          M.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 45688d075044..e0639b2c332e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -929,19 +929,6 @@ EXPORT_SYMBOL_GPL(kvm_set_xcr);
+ 	__reserved_bits;				\
+ })
+ 
+-static u64 kvm_host_cr4_reserved_bits(struct cpuinfo_x86 *c)
+-{
+-	u64 reserved_bits = __cr4_reserved_bits(cpu_has, c);
+-
+-	if (kvm_cpu_cap_has(X86_FEATURE_LA57))
+-		reserved_bits &= ~X86_CR4_LA57;
+-
+-	if (kvm_cpu_cap_has(X86_FEATURE_UMIP))
+-		reserved_bits &= ~X86_CR4_UMIP;
+-
+-	return reserved_bits;
+-}
+-
+ static int kvm_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ {
+ 	if (cr4 & cr4_reserved_bits)
+@@ -9674,7 +9661,9 @@ int kvm_arch_hardware_setup(void *opaque)
+ 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+ 		supported_xss = 0;
+ 
+-	cr4_reserved_bits = kvm_host_cr4_reserved_bits(&boot_cpu_data);
++#define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
++	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
++#undef __kvm_cpu_cap_has
+ 
+ 	if (kvm_has_tsc_control) {
+ 		/*
+@@ -9706,7 +9695,8 @@ int kvm_arch_check_processor_compat(void *opaque)
+ 
+ 	WARN_ON(!irqs_disabled());
+ 
+-	if (kvm_host_cr4_reserved_bits(c) != cr4_reserved_bits)
++	if (__cr4_reserved_bits(cpu_has, c) !=
++	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+ 		return -EIO;
+ 
+ 	return ops->check_processor_compatibility();
 -- 
-Jazz is not dead. It just smells funny...
+2.18.2
+
