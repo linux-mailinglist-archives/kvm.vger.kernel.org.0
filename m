@@ -2,127 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3268E1C7D4E
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 00:26:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A4F41C7D50
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 00:27:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730071AbgEFW0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 18:26:44 -0400
-Received: from mga11.intel.com ([192.55.52.93]:17753 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728888AbgEFW0n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 18:26:43 -0400
-IronPort-SDR: Wm0QnBk76CkD5yHGOkJKtGXMpTWpR4MtQUyspzirQkBO+xVu/dbp6oBNBKn0K82NIXwLeexkwV
- BrDcB7OCf8Uw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 15:26:43 -0700
-IronPort-SDR: lSsaQZ/Z10+OP2JmbuBbpFWmMm+JGxyRoLyg0rjh8IDtudYVq87/IidO0y1whloGcFnEqct64P
- r7QuGcdiYs/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,360,1583222400"; 
-   d="scan'208";a="260324078"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga003.jf.intel.com with ESMTP; 06 May 2020 15:26:43 -0700
-Date:   Wed, 6 May 2020 15:26:43 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        hpa@zytor.com, pbonzini@redhat.com, x86@kernel.org,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, dave.hansen@linux.intel.com, luto@kernel.org,
-        peterz@infradead.org, mchehab+samsung@kernel.org,
-        changbin.du@intel.com, namit@vmware.com, bigeasy@linutronix.de,
-        yang.shi@linux.alibaba.com, asteinhauser@google.com,
-        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
-        akpm@linux-foundation.org, steven.price@arm.com,
-        rppt@linux.vnet.ibm.com, peterx@redhat.com,
-        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
-        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
-        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
-        jgross@suse.com, andrew.cooper3@citrix.com,
-        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
-        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
-        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: SVM: Add support for MPK feature on AMD
-Message-ID: <20200506222643.GL3329@linux.intel.com>
-References: <158880240546.11615.2219410169137148044.stgit@naples-babu.amd.com>
- <158880254122.11615.156420638099504288.stgit@naples-babu.amd.com>
+        id S1729543AbgEFW1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 18:27:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26161 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728888AbgEFW1t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 18:27:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588804067;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xtyZQxIBvrwGclxq/zCovldcHxaVBe7Li+rCCyfx+sE=;
+        b=UWViOqlPL/UF7ecRxZj5wx52PoR0ZjCp4ldrlbKqxDxdQMBlikVb1ERi5ma2yttYbZZKWC
+        17wom2FWhK7c+XKarNdM2ItSHJMbjmJ1pfut65jpjvt4HvXAQ8otpdHEKToVaYorD0Z38B
+        0M/EATN0nE5ZMQJ5rPRDPuQR3GNXxlA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-5x6HgCc7N-mvSSmOZ1TKEg-1; Wed, 06 May 2020 18:27:43 -0400
+X-MC-Unique: 5x6HgCc7N-mvSSmOZ1TKEg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 055E78014D9;
+        Wed,  6 May 2020 22:27:41 +0000 (UTC)
+Received: from w520.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6DCCE1001920;
+        Wed,  6 May 2020 22:27:39 +0000 (UTC)
+Date:   Wed, 6 May 2020 16:27:38 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH Kernel v18 6/7] vfio iommu: Add migration capability to
+ report supported features
+Message-ID: <20200506162738.6e08dbf2@w520.home>
+In-Reply-To: <1588607939-26441-7-git-send-email-kwankhede@nvidia.com>
+References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
+        <1588607939-26441-7-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <158880254122.11615.156420638099504288.stgit@naples-babu.amd.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 06, 2020 at 05:02:21PM -0500, Babu Moger wrote:
->  static __init int svm_hardware_setup(void)
-> @@ -1300,6 +1304,8 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  		indirect_branch_prediction_barrier();
->  	}
->  	avic_vcpu_load(vcpu, cpu);
-> +
-> +	svm->host_pkru = read_pkru();
+On Mon, 4 May 2020 21:28:58 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Move vcpu_vmx's host_prku to kvm_vcpu_arch instead of duplicating it to
-SVM.  And I'm 99% certain "vcpu->arch.host_pkru = read_pkru()" can be moved
-to kvm_arch_vcpu_load().  The only direct calls to vmx_vcpu_load() are to
-get the right VMCS loaded.  Actually, those calls shouldn't be using
-vmx_vcpu_load(), especially since that'll trigger IBPB.  I'll send a patch
-for that.
-
+> Added migration capability in IOMMU info chain.
+> User application should check IOMMU info chain for migration capability
+> to use dirty page tracking feature provided by kernel module.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 15 +++++++++++++++
+>  include/uapi/linux/vfio.h       | 14 ++++++++++++++
+>  2 files changed, 29 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 8b27faf1ec38..b38d278d7bff 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2378,6 +2378,17 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+>  	return ret;
 >  }
 >  
->  static void svm_vcpu_put(struct kvm_vcpu *vcpu)
-> @@ -3318,6 +3324,12 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->  	clgi();
->  	kvm_load_guest_xsave_state(vcpu);
->  
-> +	/* Load the guest pkru state */
-> +	if (static_cpu_has(X86_FEATURE_PKU) &&
-> +	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
-> +	    vcpu->arch.pkru != svm->host_pkru)
-> +		__write_pkru(vcpu->arch.pkru);
-
-This and the restoration should be moved to common x86 helpers, at a glance
-they look identical.
-
-In short, pretty much all of this belongs in common x86.
-
+> +static int vfio_iommu_migration_build_caps(struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_iommu_type1_info_cap_migration cap_mig;
 > +
->  	if (lapic_in_kernel(vcpu) &&
->  		vcpu->arch.apic->lapic_timer.timer_advance_ns)
->  		kvm_wait_lapic_expire(vcpu);
-> @@ -3371,6 +3383,14 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->  	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
->  		kvm_before_interrupt(&svm->vcpu);
->  
-> +	/* Save the guest pkru state and restore the host pkru state back */
-> +	if (static_cpu_has(X86_FEATURE_PKU) &&
-> +	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE)) {
-> +		vcpu->arch.pkru = rdpkru();
-> +		if (vcpu->arch.pkru != svm->host_pkru)
-> +			__write_pkru(svm->host_pkru);
-> +	}
+> +	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
+> +	cap_mig.header.version = 1;
+> +	cap_mig.flags = VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK;
 > +
->  	kvm_load_host_xsave_state(vcpu);
->  	stgi();
->  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index df3474f4fb02..5d20a28c1b0e 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -158,6 +158,8 @@ struct vcpu_svm {
->  	u64 *avic_physical_id_cache;
->  	bool avic_is_running;
->  
-> +	u32 host_pkru;
+> +	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+> +}
 > +
->  	/*
->  	 * Per-vcpu list of struct amd_svm_iommu_ir:
->  	 * This is used mainly to store interrupt remapping information used
-> 
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -2427,6 +2438,10 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  		if (ret)
+>  			return ret;
+>  
+> +		ret = vfio_iommu_migration_build_caps(&caps);
+> +		if (ret)
+> +			return ret;
+> +
+>  		if (caps.size) {
+>  			info.flags |= VFIO_IOMMU_INFO_CAPS;
+>  
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index e3cbf8b78623..df9ce8aaafab 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1013,6 +1013,20 @@ struct vfio_iommu_type1_info_cap_iova_range {
+>  	struct	vfio_iova_range iova_ranges[];
+>  };
+>  
+> +/*
+> + * The migration capability allows to report supported features for migration.
+> + *
+> + * The structures below define version 1 of this capability.
+> + */
+> +#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
+> +
+> +struct vfio_iommu_type1_info_cap_migration {
+> +	struct	vfio_info_cap_header header;
+> +	__u32	flags;
+> +	/* supports dirty page tracking */
+> +#define VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK	(1 << 0)
+> +};
+> +
+
+What about exposing the maximum supported dirty bitmap size and the
+supported page sizes?  Thanks,
+
+Alex
+
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>  
+>  /**
+
