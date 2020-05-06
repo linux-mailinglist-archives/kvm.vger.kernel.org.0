@@ -2,31 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15F171C7D59
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 00:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A13A1C7D6F
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 00:36:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730266AbgEFW2Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 18:28:16 -0400
-Received: from mga14.intel.com ([192.55.52.115]:17391 "EHLO mga14.intel.com"
+        id S1729654AbgEFWgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 18:36:18 -0400
+Received: from ale.deltatee.com ([207.54.116.67]:33948 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729977AbgEFW2P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 18:28:15 -0400
-IronPort-SDR: KJypO08LcXX9HaC0OiFoXbYc6NFcO5LRvfbj0f2bjJ2ghQntHQ26xzwNHPjbfc3FcB/ZE9YX98
- bEuv+W5bLqzg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 15:28:13 -0700
-IronPort-SDR: JnLO/5Si9WDNmUop/7CRJpN5fdHQ7GFxueAPNtbpjaxbaODkhjQY3+H+bT6oKMKC4wJjBpZ+7l
- o5Invn+xPZ3Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,360,1583222400"; 
-   d="scan'208";a="263732209"
-Received: from mmahler-mobl1.amr.corp.intel.com (HELO [10.254.74.145]) ([10.254.74.145])
-  by orsmga006.jf.intel.com with ESMTP; 06 May 2020 15:28:11 -0700
-Subject: Re: [PATCH 1/2] arch/x86: Rename config
- X86_INTEL_MEMORY_PROTECTION_KEYS to generic x86
-To:     Babu Moger <babu.moger@amd.com>, corbet@lwn.net,
+        id S1728888AbgEFWgS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 18:36:18 -0400
+Received: from s0106602ad0811846.cg.shawcable.net ([68.147.191.165] helo=[192.168.0.12])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1jWSeG-0001RP-PL; Wed, 06 May 2020 16:36:17 -0600
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Babu Moger <babu.moger@amd.com>, corbet@lwn.net,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
         pbonzini@redhat.com, sean.j.christopherson@intel.com
 Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
@@ -37,7 +28,7 @@ Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
         anshuman.khandual@arm.com, jan.kiszka@siemens.com,
         akpm@linux-foundation.org, steven.price@arm.com,
         rppt@linux.vnet.ibm.com, peterx@redhat.com,
-        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
+        dan.j.williams@intel.com, arjunroy@google.com,
         thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
         robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
         jgross@suse.com, andrew.cooper3@citrix.com,
@@ -48,71 +39,66 @@ Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
 References: <158880240546.11615.2219410169137148044.stgit@naples-babu.amd.com>
  <158880253347.11615.8499618616856685179.stgit@naples-babu.amd.com>
  <4d86b207-77af-dc5d-88a4-f092be0043f6@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <6d2c0275-3711-6362-08f7-2c48e67fccd1@intel.com>
-Date:   Wed, 6 May 2020 15:28:11 -0700
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <5081782d-bec2-b82c-8d3b-87fcb5d847ae@deltatee.com>
+Date:   Wed, 6 May 2020 16:36:05 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
 In-Reply-To: <4d86b207-77af-dc5d-88a4-f092be0043f6@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 68.147.191.165
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, acme@redhat.com, sam@ravnborg.org, yamada.masahiro@socionext.com, vineela.tummalapalli@intel.com, fenghua.yu@intel.com, pawan.kumar.gupta@linux.intel.com, andrew.cooper3@citrix.com, jgross@suse.com, keescook@chromium.org, ira.weiny@intel.com, robin.murphy@arm.com, justin.he@arm.com, aarcange@redhat.com, thellstrom@vmware.com, arjunroy@google.com, dan.j.williams@intel.com, peterx@redhat.com, rppt@linux.vnet.ibm.com, steven.price@arm.com, akpm@linux-foundation.org, jan.kiszka@siemens.com, anshuman.khandual@arm.com, asteinhauser@google.com, yang.shi@linux.alibaba.com, bigeasy@linutronix.de, namit@vmware.com, changbin.du@intel.com, mchehab+samsung@kernel.org, peterz@infradead.org, luto@kernel.org, dave.hansen@linux.intel.com, joro@8bytes.org, jmattson@google.com, wanpengli@tencent.com, vkuznets@redhat.com, x86@kernel.org, sean.j.christopherson@intel.com, pbonzini@redhat.com, hpa@zytor.com, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de, corbet@lwn.net, babu.moger@amd.com, dave.hansen@intel.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on ale.deltatee.com
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.9 required=5.0 tests=ALL_TRUSTED,BAYES_00,
+        GREYLIST_ISWHITE autolearn=ham autolearn_force=no version=3.4.2
+Subject: Re: [PATCH 1/2] arch/x86: Rename config
+ X86_INTEL_MEMORY_PROTECTION_KEYS to generic x86
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/20 3:21 PM, Dave Hansen wrote:
-> I'm really just wondering what the point of the churn is.
 
-The config option is also in the manpages, fwiw:
 
-	http://man7.org/linux/man-pages/man7/pkeys.7.html
+On 2020-05-06 4:21 p.m., Dave Hansen wrote:
+>> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+>> index 1197b5596d5a..8630b9fa06f5 100644
+>> --- a/arch/x86/Kconfig
+>> +++ b/arch/x86/Kconfig
+>> @@ -1886,11 +1886,11 @@ config X86_UMIP
+>>  	  specific cases in protected and virtual-8086 modes. Emulated
+>>  	  results are dummy.
+>>  
+>> -config X86_INTEL_MEMORY_PROTECTION_KEYS
+>> -	prompt "Intel Memory Protection Keys"
+>> +config X86_MEMORY_PROTECTION_KEYS
+>> +	prompt "Memory Protection Keys"
+>>  	def_bool y
+>>  	# Note: only available in 64-bit mode
+>> -	depends on CPU_SUP_INTEL && X86_64
+>> +	depends on X86_64 && (CPU_SUP_INTEL || CPU_SUP_AMD)
+>>  	select ARCH_USES_HIGH_VMA_FLAGS
+>>  	select ARCH_HAS_PKEYS
+>>  	---help---
+> 
+> It's a bit of a bummer that we're going to prompt everybody doing
+> oldconfig's for this new option.  But, I don't know any way for Kconfig
+> to suppress it if the name is changed.  Also, I guess the def_bool=y
+> means that menuconfig and olddefconfig will tend to do the right thing.
+> 
+> Do we *really* need to change the Kconfig name?  The text prompt, sure.
+>  End users see that and having Intel in there is massively confusing.
+> 
+> If I have to put up with seeing 'amd64' all over my Debian package
+> names, you can put up with a Kconfig name. :P
 
-By the way, I am regretting ever sticking "INTEL_" in there.  Seems like
-a good best practice would be to leave those things out in the future if
-there's any credible opportunity for another vendor to add support.
+Lol, isn't that just Intel's penance for Itanium?
+
+Logan
