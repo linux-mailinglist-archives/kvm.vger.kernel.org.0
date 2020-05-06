@@ -2,83 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A69E1C6C29
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 10:46:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AC541C6CC5
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 11:22:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729008AbgEFIqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 04:46:24 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:44582 "EHLO
-        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728511AbgEFIqX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 04:46:23 -0400
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::301])
-        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id CF01F2E14AC;
-        Wed,  6 May 2020 11:46:20 +0300 (MSK)
-Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
-        by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id 8lWMk1HLlf-kGb8PuG7;
-        Wed, 06 May 2020 11:46:20 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1588754780; bh=tzipwafqwMZKcvDRA5wYvzE0sK16bTgRO8O/S+yW0cg=;
-        h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
-        b=grlUZ1Uq7wY0xGJFbdO9mpus4qCf4hY98vTc8rTJc+TPBalL9J/HkfQ1wlsAjzi3m
-         vN+XSBB+OaF9rtlSbnXIFJgjSvXSHP9lAt2GbR/ZxDvwypn8tFF+WrE0mql6tP9u88
-         IKtnuVtXjTdNG2Dr0o1ZYuEfpfwvpG220dMDRTbw=
-Authentication-Results: mxbackcorp1o.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b080:6907::1:5])
-        by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 2GB9My1rM5-kGWSs5Qw;
-        Wed, 06 May 2020 11:46:16 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Date:   Wed, 6 May 2020 11:46:15 +0300
-From:   Roman Kagan <rvkagan@yandex-team.ru>
-To:     Jon Doron <arilou@gmail.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
-Message-ID: <20200506084615.GA32841@rvkaganb>
-Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
-        Jon Doron <arilou@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-References: <20200417104251.GA3009@rvkaganb>
- <20200418064127.GB1917435@jondnuc>
- <20200424133742.GA2439920@rvkaganb>
- <20200425061637.GF1917435@jondnuc>
- <20200503191900.GA389956@rvkaganb>
- <87a72nelup.fsf@vitty.brq.redhat.com>
- <20200505080158.GA400685@rvkaganb>
- <20200505103821.GB2862@jondnuc>
- <20200505200010.GB400685@rvkaganb>
- <20200506044929.GD2862@jondnuc>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200506044929.GD2862@jondnuc>
+        id S1728887AbgEFJWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 05:22:31 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38088 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728857AbgEFJWb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 05:22:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588756950;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc; bh=CBdTHlgR58fqrVhQa11e/qboBcj6G8ntplKxPy2GBxU=;
+        b=MElx+MzyDkY8Q38uCP2mANKG+TIM4AtFd+ao4K9JUq7xInl1Gm9hlHlEr5CdiyyOrPG6Lh
+        BogQeWcJSZXjvHoqxmLtra7niwN6uW0WY2CBQv68fR4JMqIy3fuImfb8RG1GTukpd4nmck
+        BfguvQxvpyTZhHWIIazPn8sri/9QvQ4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-AJeojHx0OeioLnMVoERQNA-1; Wed, 06 May 2020 05:22:28 -0400
+X-MC-Unique: AJeojHx0OeioLnMVoERQNA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BC4E107ACCD;
+        Wed,  6 May 2020 09:22:27 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 434C8261A1;
+        Wed,  6 May 2020 09:22:27 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH v2] KVM: x86: fix DR6 delivery for various cases of #DB injection
+Date:   Wed,  6 May 2020 05:22:26 -0400
+Message-Id: <20200506092226.26394-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 06, 2020 at 07:49:29AM +0300, Jon Doron wrote:
-> Thanks Roman, I see your point, it's important for me to get the EDK2
-> working properly not sure why it's not working for me.
+Go through kvm_queue_exception_p so that the payload is correctly delivered
+through the exit qualification, and add a kvm_update_dr6 call to
+kvm_deliver_exception_payload that is needed on AMD.
 
-As I wrote a good deal of that code I hope I should be able to help (and
-I'd be interested, too).  How exactly does the "not working" look like?
+Reported-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 6 ++----
+ arch/x86/kvm/x86.c     | 6 +++---
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-Also I'm a bit confused as to why UEFI is critical for the work you're
-doing?  Can't it be made to work with BIOS first?
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c2c6335a998c..254c46a5d69d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4682,7 +4682,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ 			if (is_icebp(intr_info))
+ 				WARN_ON(!skip_emulated_instruction(vcpu));
+ 
+-			kvm_queue_exception(vcpu, DB_VECTOR);
++			kvm_queue_exception_p(vcpu, DB_VECTOR, dr6);
+ 			return 1;
+ 		}
+ 		kvm_run->debug.arch.dr6 = dr6 | DR6_FIXED_1;
+@@ -4936,9 +4936,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 			vcpu->run->exit_reason = KVM_EXIT_DEBUG;
+ 			return 0;
+ 		} else {
+-			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+-			vcpu->arch.dr6 |= DR6_BD | DR6_RTM;
+-			kvm_queue_exception(vcpu, DB_VECTOR);
++			kvm_queue_exception_p(vcpu, DB_VECTOR, DR6_BD);
+ 			return 1;
+ 		}
+ 	}
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c5835f9cb9ad..f571e40de438 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -104,6 +104,7 @@ static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
+                                     KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
+ 
+ static void update_cr8_intercept(struct kvm_vcpu *vcpu);
++static void kvm_update_dr6(struct kvm_vcpu *vcpu);
+ static void process_nmi(struct kvm_vcpu *vcpu);
+ static void enter_smm(struct kvm_vcpu *vcpu);
+ static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+@@ -473,6 +474,7 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu)
+ 		 * breakpoint), it is reserved and must be zero in DR6.
+ 		 */
+ 		vcpu->arch.dr6 &= ~BIT(12);
++		kvm_update_dr6(vcpu);
+ 		break;
+ 	case PF_VECTOR:
+ 		vcpu->arch.cr2 = payload;
+@@ -6731,9 +6733,7 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
+ 					   vcpu->arch.db);
+ 
+ 		if (dr6 != 0) {
+-			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+-			vcpu->arch.dr6 |= dr6 | DR6_RTM;
+-			kvm_queue_exception(vcpu, DB_VECTOR);
++			kvm_queue_exception_p(vcpu, DB_VECTOR, dr6);
+ 			*r = 1;
+ 			return true;
+ 		}
+-- 
+2.18.2
 
-> Do you know by any chance if the EDK2 hyperv patches were submitted and if
-> they were why they were not merged in?
-
-I do, as I'm probably the only one who could have submitted them :)
-
-No they were not submitted.  Neither were the ones for SeaBIOS nor iPXE.
-The reason was that I had found no way to use alternative firmware with
-HyperV, so the only environment where that would be useful and testable
-was QEMU with VMBus.  Therefore I thought it made no sense to submit
-them until VMBus landed in QEMU.
-
-Thanks,
-Roman.
