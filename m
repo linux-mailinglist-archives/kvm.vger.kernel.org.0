@@ -2,72 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B9411C7C3F
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 23:19:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA2801C7C4C
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 23:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729199AbgEFVTh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 17:19:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728621AbgEFVTh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 17:19:37 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26BA3C061A0F
-        for <kvm@vger.kernel.org>; Wed,  6 May 2020 14:19:37 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id q10so3241712ile.0
-        for <kvm@vger.kernel.org>; Wed, 06 May 2020 14:19:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UdGUebmYhj34sXXz4/gfkMRluMVMoxZCbr/Vo1r6b6c=;
-        b=TJP7GIcQxDHhteVTcWcaKBaQRwSAgSvrCxtU2yu0ckEG4ewGHIaiIknnU3PqbsAqWl
-         lp5q7nfOwefULix+L6wn6rw2f7LTrQpIr61M4H/tfQfUxCBx9eoCGI5yepmGRT8TvUxK
-         ICxTwVAi9lvht2kvBxwbuaGCHWz/bLZ+YImAR6ak9lHVzmku09Ah7OKQ0LM7EefRFOVm
-         Q97lBhUrD5rY6dVebVEA2SgjApbkJZxhmNRM0zoHanGRI/5h0M9Fj4+7+sH0iRNqRBCo
-         DqQSIdRyC+i4BaxrCV9lPzc0cX4JzRXHztE7oprzUSHJguXMq/Mcy9qKSHj1YSzXubEK
-         j2LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UdGUebmYhj34sXXz4/gfkMRluMVMoxZCbr/Vo1r6b6c=;
-        b=naFXdsdfLkmeg5lapZwgNlqVUOLSYZWohQZ0jSvz9vtwKHZjUBD4VX1AywtFeX9bTy
-         e57qsAegA3sZuJPU20EzKVv5WAUNa7dSxmuPT1CmY/L1/VsnVPypoOW36ESXFl1zWsAn
-         oyxKNZX5CjtlW1g1E6DzBS7Gp0dTMBvhTI0/pjuCCWET7Ydce4Up8margxOLiaOsjo81
-         fQMyMFS32CfUp/sOJRFje4vIR7QRCATrxK/NFqoJaETTAXpE7dhsejBRiZY0kQz8dd9j
-         /l5sRybNCB3lWDqIvVwROOhDDte4Rl82la5CkRoe2QAJSpVD7yn76njAUBClKE1ZcOnt
-         Oejg==
-X-Gm-Message-State: AGi0PuYTTZJJmoi6LjuP6uEFzHC0JezioEhSVqwzVX5uKvHeUiK2aC0F
-        hdgGdy/JntT+tfi0sosVHkcfomNZf5A5GBT2+Lx14Q==
-X-Google-Smtp-Source: APiQypJwyeQORbeD/PvDFZY5unv3m+3b1J31pHftGy1dVo1BsJvrcLBXS6mbqchIrJMuAYFEH+SmaLP50wW049cWNGo=
-X-Received: by 2002:a92:3d85:: with SMTP id k5mr11534107ilf.26.1588799976294;
- Wed, 06 May 2020 14:19:36 -0700 (PDT)
+        id S1729936AbgEFVUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 17:20:49 -0400
+Received: from mga07.intel.com ([134.134.136.100]:36045 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729261AbgEFVUs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 May 2020 17:20:48 -0400
+IronPort-SDR: 3XE+h1O0rKeKGPGODI6hyeLCbmifvrwIxIKDICcOu+T3IpxYkUlx0KVkZPeuPF4QFA5I0UVKaA
+ BholU1HrEDBQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2020 14:20:48 -0700
+IronPort-SDR: 7FHw8IPu5zZtxN0jVY3CaKmKvRW8133qel+vSUhsGfanEg5yKMz5OA2uFt+jy+UqKI5WsVZOmQ
+ vSkT9Sp4OTbw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,360,1583222400"; 
+   d="scan'208";a="369917772"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga001.fm.intel.com with ESMTP; 06 May 2020 14:20:47 -0700
+Date:   Wed, 6 May 2020 14:20:47 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 8/9] KVM: x86, SVM: do not clobber guest DR6 on
+ KVM_EXIT_DEBUG
+Message-ID: <20200506212047.GI3329@linux.intel.com>
+References: <20200506111034.11756-1-pbonzini@redhat.com>
+ <20200506111034.11756-9-pbonzini@redhat.com>
+ <20200506181515.GR6299@xz-x1>
+ <8f7f319c-4093-0ddc-f9f5-002c41d5622c@redhat.com>
+ <20200506211356.GD228260@xz-x1>
 MIME-Version: 1.0
-References: <20200506204653.14683-1-sean.j.christopherson@intel.com>
-In-Reply-To: <20200506204653.14683-1-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 6 May 2020 14:19:25 -0700
-Message-ID: <CALMp9eSbB=Hwy+uGik4SSSwe1_pu82XY9_SmAWYz2KLY_Ek7=Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Remove unused 'ops' param from nested_vmx_hardware_setup()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200506211356.GD228260@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 6, 2020 at 1:46 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Remove a 'struct kvm_x86_ops' param that got left behind when the nested
-> ops were moved to their own struct.
->
-> Fixes: 33b22172452f0 ("KVM: x86: move nested-related kvm_x86_ops to a separate struct")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On Wed, May 06, 2020 at 05:13:56PM -0400, Peter Xu wrote:
+> Oh... so is dr6 going to have some leftover bit set in the GD test if without
+> this patch for AMD?  Btw, I noticed a small difference on Intel/AMD spec for
+> this case, e.g., B[0-3] definitions on such leftover bits...
+> 
+> Intel says:
+> 
+>         B0 through B3 (breakpoint condition detected) flags (bits 0 through 3)
+>         — Indicates (when set) that its associated breakpoint condition was met
+>         when a debug exception was generated. These flags are set if the
+>         condition described for each breakpoint by the LENn, and R/Wn flags in
+>         debug control register DR7 is true. They may or may not be set if the
+>         breakpoint is not enabled by the Ln or the Gn flags in register
+>         DR7. Therefore on a #DB, a debug handler should check only those B0-B3
+>         bits which correspond to an enabled breakpoint.
+> 
+> AMD says:
+> 
+>         Breakpoint-Condition Detected (B3–B0)—Bits 3:0. The processor updates
+>         these four bits on every debug breakpoint or general-detect
+>         condition. A bit is set to 1 if the corresponding address- breakpoint
+>         register detects an enabled breakpoint condition, as specified by the
+>         DR7 Ln, Gn, R/Wn and LENn controls, and is cleared to 0 otherwise. For
+>         example, B1 (bit 1) is set to 1 if an address- breakpoint condition is
+>         detected by DR1.
+> 
+> I'm not sure whether it means AMD B[0-3] bits are more strict on the Intel ones
+> (if so, then the selftest could be a bit too strict to VMX).
+
+If the question is "can DR6 bits 3:0 be set on Intel CPUs even if the
+associated breakpoint is disabled?", then the answer is yes.  I haven't
+looked at the selftest, but if it's checking DR6 then it should ignore
+bits corresponding to disabled breakpoints.
