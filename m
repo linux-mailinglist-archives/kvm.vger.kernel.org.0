@@ -2,89 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 232A41C6F86
-	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 13:42:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D1861C6FC9
+	for <lists+kvm@lfdr.de>; Wed,  6 May 2020 13:59:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728051AbgEFLmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 07:42:36 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3819 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726734AbgEFLmf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 07:42:35 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 1A14C7508B45178499CB;
-        Wed,  6 May 2020 19:42:34 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Wed, 6 May 2020
- 19:42:22 +0800
-Subject: Re: [PATCH v25 00/10] Add ARMv8 RAS virtualization support in QEMU
-To:     Peter Maydell <peter.maydell@linaro.org>
-CC:     Fam Zheng <fam@euphon.net>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Igor Mammedov" <imammedo@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-References: <20200410114639.32844-1-gengdongjiu@huawei.com>
- <CAFEAcA9oNuDf=bdSSE8mZWrB23+FegD5NeSAmu8dGWhB=adBQg@mail.gmail.com>
-From:   gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <da3cbdfd-a75d-c87f-3ece-616278aa64d5@huawei.com>
-Date:   Wed, 6 May 2020 19:42:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+        id S1728004AbgEFL7y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 07:59:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38210 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725985AbgEFL7x (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 07:59:53 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 046BWqkX056618;
+        Wed, 6 May 2020 07:59:53 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30uf8hwhtn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 May 2020 07:59:53 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 046BjNZ2116765;
+        Wed, 6 May 2020 07:59:52 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30uf8hwhsu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 May 2020 07:59:52 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 046BoePO014961;
+        Wed, 6 May 2020 11:59:50 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 30s0g5kp0u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 May 2020 11:59:49 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 046Bxlt451118108
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 6 May 2020 11:59:47 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0DB2511C050;
+        Wed,  6 May 2020 11:59:47 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ED00511C054;
+        Wed,  6 May 2020 11:59:46 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed,  6 May 2020 11:59:46 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id A6AB3E0554; Wed,  6 May 2020 13:59:46 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Subject: [GIT PULL 0/1] KVM: s390: Fix for running nested under z/VM
+Date:   Wed,  6 May 2020 13:59:44 +0200
+Message-Id: <20200506115945.13132-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9oNuDf=bdSSE8mZWrB23+FegD5NeSAmu8dGWhB=adBQg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-05-06_04:2020-05-05,2020-05-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 malwarescore=0 mlxscore=0
+ lowpriorityscore=0 adultscore=0 mlxlogscore=879 phishscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005060088
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/4/17 21:32, Peter Maydell wrote:
-> On Fri, 10 Apr 2020 at 12:46, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->>
->> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA)
->> and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed
->> information of guest, so it is expected that guest can do the recovery. For example, if an
->> exception happens in a guest user-space application, host does not know which application
->> encounters errors, only guest knows it.
->>
->> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
->> After user space gets the notification, it will record the CPER into guest GHES
->> buffer and inject an exception or IRQ to guest.
->>
->> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
->> treat it as a synchronous exception, and notify guest with ARMv8 SEA
->> notification type after recording CPER into guest.
-> 
-> Hi. I left a comment on patch 1. The other 3 patches unreviewed
-> are 5, 6 and 8, which are all ACPI core code, so that's for
-> MST, Igor or Shannon to review.
-> 
-> Once those have been reviewed, please ping me if you want this
-> to go via target-arm.next.
+Paolo,
+a fix for kvm/master.
 
-Hi Peter,
-   Igor have reviewed all ACPI core code. whether you can apply this series to target-arm.next? I can make another patches to solve your comments on patch1 and another APCI comment.
-Thanks very much in advance.
+The following changes since commit 2a173ec993baa6a97e7b0fb89240200a88d90746:
 
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
+  MAINTAINERS: add a reviewer for KVM/s390 (2020-04-20 11:24:00 +0200)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.7-3
+
+for you to fetch changes up to 5615e74f48dcc982655543e979b6c3f3f877e6f6:
+
+  KVM: s390: Remove false WARN_ON_ONCE for the PQAP instruction (2020-05-05 11:15:05 +0200)
+
+----------------------------------------------------------------
+KVM: s390: Fix for running nested uner z/VM
+
+There are circumstances when running nested under z/VM that would trigger a
+WARN_ON_ONCE. Remove the WARN_ON_ONCE. Long term we certainly want to make this
+code more robust and flexible, but just returning instead of WARNING makes
+guest bootable again.
+
+----------------------------------------------------------------
+Christian Borntraeger (1):
+      KVM: s390: Remove false WARN_ON_ONCE for the PQAP instruction
+
+ arch/s390/kvm/priv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
