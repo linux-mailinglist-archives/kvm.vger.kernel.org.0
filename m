@@ -2,106 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B97F41C9E85
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 00:34:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 870D81C9F50
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 01:54:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgEGWep (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 18:34:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54178 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726515AbgEGWep (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 18:34:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588890884;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YFxt0hAMAmZMhnnigW2On7zZSB0TMxbZAm7tsfbKgfA=;
-        b=Fh45KTMZ7E/w3pwNnI7aK0L7zP9uSP4YrRHpqQM8Q0JfSJwpvUPiuYRhZAZwhB3+epWwYQ
-        WirJY5aMxyc6/biPYEnPlp4u6Nt3Z7+PNRLry6CUqA/AVIFhtbX8dnpSKPdn4pPWydawXp
-        wIhzD5XgleItkziCemCOcRzBDHYO/Nk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-pXGr9zU4Nwa0r0PzW6Vb6A-1; Thu, 07 May 2020 18:34:42 -0400
-X-MC-Unique: pXGr9zU4Nwa0r0PzW6Vb6A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C59C107ACCA;
-        Thu,  7 May 2020 22:34:41 +0000 (UTC)
-Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E05A5C1B0;
-        Thu,  7 May 2020 22:34:38 +0000 (UTC)
-Date:   Thu, 7 May 2020 16:34:37 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
+        id S1726538AbgEGXyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 19:54:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52578 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726476AbgEGXyY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 19:54:24 -0400
+Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F44C05BD09
+        for <kvm@vger.kernel.org>; Thu,  7 May 2020 16:54:24 -0700 (PDT)
+Received: by mail-qv1-xf42.google.com with SMTP id h6so3640770qvz.8
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 16:54:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=/raYmft6nSaYLNIgpOxoChFcf5nF1Q2ACz6k5lK6B/4=;
+        b=QSBVJtiYPNgCyg1Ax8MDmIonk9zKYH0IwrH/+u1j84YGMeisn3e+g5EGfpuObjJv7H
+         wXFl0tfpZnxNnL053pF5sRWfIpTmu9eUL4M/zurqAuPqCZexdEgP1pM2dggKDOZjnEyy
+         f6umf0+v8hfXZ4AZKWQYtiLz6vbcbQ/SZhptvHMrDLwUmI9k8+UWJ8gEEN+lNSZiuSKN
+         rgbjcYlDgqSq19b+5VbYruXqDxWlnvU6ogiMB6YnPypcQltpT5B/nG/bL2YQfDfbt0yM
+         FeKyBoa4zJpeEKZGnc4fSHBnCA/++Yf4pPt5kyhoPiECazyfelAm9wkjL4fNtPGd5gQE
+         5vUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=/raYmft6nSaYLNIgpOxoChFcf5nF1Q2ACz6k5lK6B/4=;
+        b=GCEiWKwWA1xU6z4KlzUSULpo7WQC9QsGi8WTMbcJk7BITNf6+vgQZAeEt7Eu5b31xi
+         WeCNFJ6UFh//8y362KyEB1YHx/BUuxka2NvHIKnk1EPGnf9xAYQ46NI+R+bNal2bfIWG
+         na3K+/ZN8L8WCiA5V8rV+QyE35bQGEZroID9EgnHtPdNjUJ4f5sCHWJoFxjuQauHuioC
+         97r1XVzeCtHXAlcJv1QNXnOz3tP91xCYQe3slqk7HpWeQ+9hT/52wmeKSfA7QkAKgiDr
+         x6LnU23Bq6KmT+0q4ICWyx2yPpvRNjyshYgFSHxjbeOHAGKZHDBpPcGsg4sU3Bs9hO1h
+         bBgg==
+X-Gm-Message-State: AGi0PuZ79Po9kV6eGs8oc8KJ0ijUDnel7PL7DWmXmKrgB9XoKAltbYxe
+        pguKN1CCYCh8J6DqQ+JoTK2GvA==
+X-Google-Smtp-Source: APiQypJYoWIyvU8RY67V0VqBgsWt6nPorPZktKfWBDwkHhKb5x5+IKwxKG3GMtrHiOuUW542Jyo5Xw==
+X-Received: by 2002:ad4:4966:: with SMTP id p6mr61018qvy.161.1588895663160;
+        Thu, 07 May 2020 16:54:23 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id j11sm4877452qkk.33.2020.05.07.16.54.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 07 May 2020 16:54:22 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jWqLN-00070n-OS; Thu, 07 May 2020 20:54:21 -0300
+Date:   Thu, 7 May 2020 20:54:21 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, jgg@ziepe.ca
-Subject: Re: [PATCH v2 0/3] vfio-pci: Block user access to disabled device
- MMIO
-Message-ID: <20200507163437.77b4bf2e@x1.home>
-In-Reply-To: <20200507215908.GQ228260@xz-x1>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cohuck@redhat.com
+Subject: Re: [PATCH v2 1/3] vfio/type1: Support faulting PFNMAP vmas
+Message-ID: <20200507235421.GK26002@ziepe.ca>
 References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
-        <20200507215908.GQ228260@xz-x1>
-Organization: Red Hat
+ <158871568480.15589.17339878308143043906.stgit@gimli.home>
+ <20200507212443.GO228260@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200507212443.GO228260@xz-x1>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 7 May 2020 17:59:08 -0400
-Peter Xu <peterx@redhat.com> wrote:
-
-> On Tue, May 05, 2020 at 03:54:36PM -0600, Alex Williamson wrote:
-> > v2:
+On Thu, May 07, 2020 at 05:24:43PM -0400, Peter Xu wrote:
+> On Tue, May 05, 2020 at 03:54:44PM -0600, Alex Williamson wrote:
+> > With conversion to follow_pfn(), DMA mapping a PFNMAP range depends on
+> > the range being faulted into the vma.  Add support to manually provide
+> > that, in the same way as done on KVM with hva_to_pfn_remapped().
 > > 
-> > Locking in 3/ is substantially changed to avoid the retry scenario
-> > within the fault handler, therefore a caller who does not allow retry
-> > will no longer receive a SIGBUS on contention.  IOMMU invalidations
-> > are still not included here, I expect that will be a future follow-on
-> > change as we're not fundamentally changing that issue in this series.
-> > The 'add to vma list only on fault' behavior is also still included
-> > here, per the discussion I think it's still a valid approach and has
-> > some advantages, particularly in a VM scenario where we potentially
-> > defer the mapping until the MMIO BAR is actually DMA mapped into the
-> > VM address space (or the guest driver actually accesses the device
-> > if that DMA mapping is eliminated at some point).  Further discussion
-> > and review appreciated.  Thanks,  
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> >  drivers/vfio/vfio_iommu_type1.c |   36 +++++++++++++++++++++++++++++++++---
+> >  1 file changed, 33 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index cc1d64765ce7..4a4cb7cd86b2 100644
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -317,6 +317,32 @@ static int put_pfn(unsigned long pfn, int prot)
+> >  	return 0;
+> >  }
+> >  
+> > +static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
+> > +			    unsigned long vaddr, unsigned long *pfn,
+> > +			    bool write_fault)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = follow_pfn(vma, vaddr, pfn);
+> > +	if (ret) {
+> > +		bool unlocked = false;
+> > +
+> > +		ret = fixup_user_fault(NULL, mm, vaddr,
+> > +				       FAULT_FLAG_REMOTE |
+> > +				       (write_fault ?  FAULT_FLAG_WRITE : 0),
+> > +				       &unlocked);
+> > +		if (unlocked)
+> > +			return -EAGAIN;
 > 
 > Hi, Alex,
 > 
-> I have a general question on the series.
-> 
-> IIUC this series tries to protect illegal vfio userspace writes to device MMIO
-> regions which may cause platform-level issues.  That makes perfect sense to me.
-> However what if the write comes from the devices' side?  E.g.:
-> 
->   - Device A maps MMIO region X
-> 
->   - Device B do VFIO_IOMMU_DMA_MAP on Device A's MMIO region X
->     (so X's MMIO PFNs are mapped in device B's IOMMU page table)
-> 
->   - Device A clears PCI_COMMAND_MEMORY (reset, etc.)
->     - this should zap all existing vmas that mapping region X, however device
->       B's IOMMU page table is not aware of this?
-> 
->   - Device B writes to MMIO region X of device A even if PCI_COMMAND_MEMORY
->     cleared on device A's PCI_COMMAND register
-> 
-> Could this happen?
+> IIUC this retry is not needed too because fixup_user_fault() will guarantee the
+> fault-in is done correctly with the valid PTE as long as ret==0, even if
+> unlocked==true.
 
-Yes, this can happen and Jason has brought up variations on this
-scenario that are important to fix as well.  I've got some ideas, but
-the access in this series was the current priority.  There are also
-issues in the above scenario that if a platform considers a DMA write
-to an invalid IOMMU PTE and triggering an IOMMU fault to have the same
-severity as the write to disabled MMIO space we've prevented, then our
-hands are tied.  Thanks,
+It is true, and today it is fine, but be careful when reworking this
+to use notifiers as unlocked also means things like the vma pointer
+are invalidated.
 
-Alex
-
+Jason
