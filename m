@@ -2,104 +2,334 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E4401C8734
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 12:47:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04CF71C8737
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 12:48:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725964AbgEGKrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 06:47:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52608 "EHLO
+        id S1726531AbgEGKsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 06:48:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59688 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725914AbgEGKrk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 06:47:40 -0400
+        with ESMTP id S1725914AbgEGKsW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 06:48:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588848459;
+        s=mimecast20190719; t=1588848500;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5GBZ1BPaYoUZGlKv+l0CXQxh4T9djzRMOd1T5tvSABs=;
-        b=QbKXJKbB1MkI06PS2+PwYfsG7LATq18yKcePAHwHhGA34r6qPUbcaVzO7OAeCuDVjybSZH
-        Gy55vXi3ArhKoAX5rLC7x/IgjnT2z1t9sdbgjnbm2wXkXkvOy/V23kJL9Tv5VaVh1MytD1
-        rRb0/q/Cj02Oe4TW1hFatfjnlsFNhH4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-ho5-gsoTOvGpG3Mdy-8_8g-1; Thu, 07 May 2020 06:47:37 -0400
-X-MC-Unique: ho5-gsoTOvGpG3Mdy-8_8g-1
-Received: by mail-wm1-f71.google.com with SMTP id t62so3147879wma.0
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 03:47:37 -0700 (PDT)
+        bh=HDJlw7bDQi8Wi4/pLpjel0dn8YQBpbxuhOnB1M+bLZ8=;
+        b=a80ZOeQuLcZqsA9Vj6eSTtfm7wIdFc6LM5Y9r3WU0N8GlOTxispQVtrW/2D3zQHfxUJpHU
+        +O+0yT5Fl3guVWOhAex15ribtX3DAjgdgAE3IVm4Wg3CJvXVM/Yglh/+6gxWao/5qaVjtJ
+        gYY5lngQ6xXsST8B/u4T7TEGwBBEwhg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-6IP27wUIM1WqhuL7ZRrfQA-1; Thu, 07 May 2020 06:48:18 -0400
+X-MC-Unique: 6IP27wUIM1WqhuL7ZRrfQA-1
+Received: by mail-wr1-f69.google.com with SMTP id x8so3183052wrl.16
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 03:48:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=5GBZ1BPaYoUZGlKv+l0CXQxh4T9djzRMOd1T5tvSABs=;
-        b=q8ivciUkM3WUuYX+3/6oh71yjp+VeeNcxUEFmnRYsThJZwTHEutcWNzB08kF8DHQJJ
-         jh1bpePPbp5a/v3ohFaH0PDAS92zm3z7WFoaM1pO8ECBzeTLkLWA4BgHTtdkqvSHIQBu
-         IIVpk54XSOwsKledtQlnlNyw5Qx0cpUkqL6/qNUBNd9ytHyq1H3/M4xUE9x/MNXIFU9U
-         5WYCahnrMfPcSILp2NPRQxeUxUe3F4/wgXmbYHBQl4hVQ/b9CgF7VXg0XPoXmRLMCU1q
-         L4XjFi+a/a1SzEBlIXADVBWwW/f6VZGR5IWw/Q0POHJuOASyBQAr7FR1/sEiKOYCCBhr
-         3u7Q==
-X-Gm-Message-State: AGi0Pubh3RtMci59E5VPn2yOdhIT4/6y6IquUkRCqGJECHVXPwu41Yz1
-        cb0FWSb460AEIkNMu7IXFspXwwK0YfpAT+L/lUVaPGZph0PShq7J1IgA6DWHgdBD0n6QfrG8cb8
-        jie83lHCyw9Ir
-X-Received: by 2002:adf:e751:: with SMTP id c17mr15873038wrn.351.1588848456324;
-        Thu, 07 May 2020 03:47:36 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLG5sLX7vjTBpzQVJYqyJozq0EEasF4Ci+xsJ7MLTLakuqA8erklYkKxDwmmh/F0jhS05XJgw==
-X-Received: by 2002:adf:e751:: with SMTP id c17mr15873017wrn.351.1588848456163;
-        Thu, 07 May 2020 03:47:36 -0700 (PDT)
+        bh=HDJlw7bDQi8Wi4/pLpjel0dn8YQBpbxuhOnB1M+bLZ8=;
+        b=nmPL/0emg+pugbk+sJ0391vX7+lEba9FuUheFOB+DOjOSbaNmTRuNCnBdNWEEN6a3k
+         y0cEnwRmRiymzbKeoJtoiMjlpp07AB4HXnJZRgx9xct05LXBBaoYZdzrYvzzuFpX9olu
+         +eBX9FgMAFLRRx1XP9AmsmzflBGbF2OkpSAqShiogl3yUSEKixsKGTDeLqofdAThqdYO
+         McuJt5fnmYKoQsHH7+oKImy5+HUUk5dVfWYY1abEZ/VRXb3TcNmBVUvlbfQ4TZRig2Uz
+         6Qw6AdJOlTeJcuTdXgW/rrx4Q+WxzVa2NS9NwNR53YWnNn0Lk19PEThmTrjiPXhWbT2X
+         5mIw==
+X-Gm-Message-State: AGi0PuZwuh+5YaUTRrC0ALNlKu1BwxlE65TH7LnmixJOnWPnlbIgbBcr
+        2Zb0PjfAwRM+k/jK2094hRVe+Vf8jLrZ9IltOQfKRdgl3619/N26hYPMaIqErhD+AynHWmFSds5
+        E10MEXeUZpxOy
+X-Received: by 2002:adf:a4c5:: with SMTP id h5mr14486173wrb.408.1588848497386;
+        Thu, 07 May 2020 03:48:17 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL4+7pUE08G0jxdS6pm75fKLU9uxI5bwpKwaX3aZ2jOo0uivuxhRm4gpV4SaVV9oM0knr2o7w==
+X-Received: by 2002:adf:a4c5:: with SMTP id h5mr14486114wrb.408.1588848496853;
+        Thu, 07 May 2020 03:48:16 -0700 (PDT)
 Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
-        by smtp.gmail.com with ESMTPSA id a9sm7225179wmm.38.2020.05.07.03.47.34
+        by smtp.gmail.com with ESMTPSA id s14sm7033661wmh.18.2020.05.07.03.48.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2020 03:47:35 -0700 (PDT)
-Date:   Thu, 7 May 2020 06:47:33 -0400
+        Thu, 07 May 2020 03:48:16 -0700 (PDT)
+Date:   Thu, 7 May 2020 06:48:12 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     David Hildenbrand <david@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 10/15] MAINTAINERS: Add myself as virtio-mem maintainer
-Message-ID: <20200507064709-mutt-send-email-mst@kernel.org>
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        Juergen Gross <jgross@suse.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Pavel Tatashin <pavel.tatashin@microsoft.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Qian Cai <cai@lca.pw>, Pingfan Liu <kernelfans@gmail.com>
+Subject: Re: [PATCH v3 05/15] mm: Allow to offline unmovable PageOffline()
+ pages via MEM_GOING_OFFLINE
+Message-ID: <20200507064750-mutt-send-email-mst@kernel.org>
 References: <20200507103119.11219-1-david@redhat.com>
- <20200507103119.11219-11-david@redhat.com>
+ <20200507103119.11219-6-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200507103119.11219-11-david@redhat.com>
+In-Reply-To: <20200507103119.11219-6-david@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 07, 2020 at 12:31:14PM +0200, David Hildenbrand wrote:
-> Let's make sure patches/bug reports find the right person.
+On Thu, May 07, 2020 at 12:31:09PM +0200, David Hildenbrand wrote:
+> virtio-mem wants to allow to offline memory blocks of which some parts
+> were unplugged (allocated via alloc_contig_range()), especially, to later
+> offline and remove completely unplugged memory blocks. The important part
+> is that PageOffline() has to remain set until the section is offline, so
+> these pages will never get accessed (e.g., when dumping). The pages should
+> not be handed back to the buddy (which would require clearing PageOffline()
+> and result in issues if offlining fails and the pages are suddenly in the
+> buddy).
 > 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Let's allow to do that by allowing to isolate any PageOffline() page
+> when offlining. This way, we can reach the memory hotplug notifier
+> MEM_GOING_OFFLINE, where the driver can signal that he is fine with
+> offlining this page by dropping its reference count. PageOffline() pages
+> with a reference count of 0 can then be skipped when offlining the
+> pages (like if they were free, however they are not in the buddy).
+> 
+> Anybody who uses PageOffline() pages and does not agree to offline them
+> (e.g., Hyper-V balloon, XEN balloon, VMWare balloon for 2MB pages) will not
+> decrement the reference count and make offlining fail when trying to
+> migrate such an unmovable page. So there should be no observable change.
+> Same applies to balloon compaction users (movable PageOffline() pages), the
+> pages will simply be migrated.
+> 
+> Note 1: If offlining fails, a driver has to increment the reference
+> 	count again in MEM_CANCEL_OFFLINE.
+> 
+> Note 2: A driver that makes use of this has to be aware that re-onlining
+> 	the memory block has to be handled by hooking into onlining code
+> 	(online_page_callback_t), resetting the page PageOffline() and
+> 	not giving them to the buddy.
+> 
+> Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> Acked-by: Michal Hocko <mhocko@suse.com>
+> Tested-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> Cc: Pavel Tatashin <pavel.tatashin@microsoft.com>
+> Cc: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> Cc: Vlastimil Babka <vbabka@suse.cz>
+> Cc: Johannes Weiner <hannes@cmpxchg.org>
+> Cc: Anthony Yznaga <anthony.yznaga@oracle.com>
+> Cc: Michal Hocko <mhocko@suse.com>
+> Cc: Oscar Salvador <osalvador@suse.de>
+> Cc: Mel Gorman <mgorman@techsingularity.net>
+> Cc: Mike Rapoport <rppt@linux.ibm.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Anshuman Khandual <anshuman.khandual@arm.com>
+> Cc: Qian Cai <cai@lca.pw>
+> Cc: Pingfan Liu <kernelfans@gmail.com>
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Make this patch 2 in the series, or even squash into patch 1.
+Didn't you lose some Andrew Morton's ack on this?
 
 > ---
->  MAINTAINERS | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  include/linux/page-flags.h | 10 +++++++++
+>  mm/memory_hotplug.c        | 44 +++++++++++++++++++++++++++++---------
+>  mm/page_alloc.c            | 24 +++++++++++++++++++++
+>  mm/page_isolation.c        |  9 ++++++++
+>  4 files changed, 77 insertions(+), 10 deletions(-)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4d43ea5468b5..ad2b34f4dd66 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -18037,6 +18037,13 @@ S:	Maintained
->  F:	drivers/iommu/virtio-iommu.c
->  F:	include/uapi/linux/virtio_iommu.h
+> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> index 222f6f7b2bb3..6be1aa559b1e 100644
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -777,6 +777,16 @@ PAGE_TYPE_OPS(Buddy, buddy)
+>   * not onlined when onlining the section).
+>   * The content of these pages is effectively stale. Such pages should not
+>   * be touched (read/write/dump/save) except by their owner.
+> + *
+> + * If a driver wants to allow to offline unmovable PageOffline() pages without
+> + * putting them back to the buddy, it can do so via the memory notifier by
+> + * decrementing the reference count in MEM_GOING_OFFLINE and incrementing the
+> + * reference count in MEM_CANCEL_OFFLINE. When offlining, the PageOffline()
+> + * pages (now with a reference count of zero) are treated like free pages,
+> + * allowing the containing memory block to get offlined. A driver that
+> + * relies on this feature is aware that re-onlining the memory block will
+> + * require to re-set the pages PageOffline() and not giving them to the
+> + * buddy via online_page_callback_t.
+>   */
+>  PAGE_TYPE_OPS(Offline, offline)
 >  
-> +VIRTIO MEM DRIVER
-> +M:	David Hildenbrand <david@redhat.com>
-> +L:	virtualization@lists.linux-foundation.org
-> +S:	Maintained
-> +F:	drivers/virtio/virtio_mem.c
-> +F:	include/uapi/linux/virtio_mem.h
+> diff --git a/mm/memory_hotplug.c b/mm/memory_hotplug.c
+> index 555137bd0882..936bfe208a6e 100644
+> --- a/mm/memory_hotplug.c
+> +++ b/mm/memory_hotplug.c
+> @@ -1151,11 +1151,17 @@ struct zone *test_pages_in_a_zone(unsigned long start_pfn,
+>  
+>  /*
+>   * Scan pfn range [start,end) to find movable/migratable pages (LRU pages,
+> - * non-lru movable pages and hugepages). We scan pfn because it's much
+> - * easier than scanning over linked list. This function returns the pfn
+> - * of the first found movable page if it's found, otherwise 0.
+> + * non-lru movable pages and hugepages). Will skip over most unmovable
+> + * pages (esp., pages that can be skipped when offlining), but bail out on
+> + * definitely unmovable pages.
+> + *
+> + * Returns:
+> + *	0 in case a movable page is found and movable_pfn was updated.
+> + *	-ENOENT in case no movable page was found.
+> + *	-EBUSY in case a definitely unmovable page was found.
+>   */
+> -static unsigned long scan_movable_pages(unsigned long start, unsigned long end)
+> +static int scan_movable_pages(unsigned long start, unsigned long end,
+> +			      unsigned long *movable_pfn)
+>  {
+>  	unsigned long pfn;
+>  
+> @@ -1167,18 +1173,30 @@ static unsigned long scan_movable_pages(unsigned long start, unsigned long end)
+>  			continue;
+>  		page = pfn_to_page(pfn);
+>  		if (PageLRU(page))
+> -			return pfn;
+> +			goto found;
+>  		if (__PageMovable(page))
+> -			return pfn;
+> +			goto found;
 > +
->  VIRTUAL BOX GUEST DEVICE DRIVER
->  M:	Hans de Goede <hdegoede@redhat.com>
->  M:	Arnd Bergmann <arnd@arndb.de>
+> +		/*
+> +		 * PageOffline() pages that are not marked __PageMovable() and
+> +		 * have a reference count > 0 (after MEM_GOING_OFFLINE) are
+> +		 * definitely unmovable. If their reference count would be 0,
+> +		 * they could at least be skipped when offlining memory.
+> +		 */
+> +		if (PageOffline(page) && page_count(page))
+> +			return -EBUSY;
+>  
+>  		if (!PageHuge(page))
+>  			continue;
+>  		head = compound_head(page);
+>  		if (page_huge_active(head))
+> -			return pfn;
+> +			goto found;
+>  		skip = compound_nr(head) - (page - head);
+>  		pfn += skip - 1;
+>  	}
+> +	return -ENOENT;
+> +found:
+> +	*movable_pfn = pfn;
+>  	return 0;
+>  }
+>  
+> @@ -1441,7 +1459,8 @@ static int __ref __offline_pages(unsigned long start_pfn,
+>  	}
+>  
+>  	do {
+> -		for (pfn = start_pfn; pfn;) {
+> +		pfn = start_pfn;
+> +		do {
+>  			if (signal_pending(current)) {
+>  				ret = -EINTR;
+>  				reason = "signal backoff";
+> @@ -1451,14 +1470,19 @@ static int __ref __offline_pages(unsigned long start_pfn,
+>  			cond_resched();
+>  			lru_add_drain_all();
+>  
+> -			pfn = scan_movable_pages(pfn, end_pfn);
+> -			if (pfn) {
+> +			ret = scan_movable_pages(pfn, end_pfn, &pfn);
+> +			if (!ret) {
+>  				/*
+>  				 * TODO: fatal migration failures should bail
+>  				 * out
+>  				 */
+>  				do_migrate_range(pfn, end_pfn);
+>  			}
+> +		} while (!ret);
+> +
+> +		if (ret != -ENOENT) {
+> +			reason = "unmovable page";
+> +			goto failed_removal_isolated;
+>  		}
+>  
+>  		/*
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index 64fcaf86763b..6fb3dfca2a97 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -8230,6 +8230,19 @@ struct page *has_unmovable_pages(struct zone *zone, struct page *page,
+>  		if ((flags & MEMORY_OFFLINE) && PageHWPoison(page))
+>  			continue;
+>  
+> +		/*
+> +		 * We treat all PageOffline() pages as movable when offlining
+> +		 * to give drivers a chance to decrement their reference count
+> +		 * in MEM_GOING_OFFLINE in order to indicate that these pages
+> +		 * can be offlined as there are no direct references anymore.
+> +		 * For actually unmovable PageOffline() where the driver does
+> +		 * not support this, we will fail later when trying to actually
+> +		 * move these pages that still have a reference count > 0.
+> +		 * (false negatives in this function only)
+> +		 */
+> +		if ((flags & MEMORY_OFFLINE) && PageOffline(page))
+> +			continue;
+> +
+>  		if (__PageMovable(page) || PageLRU(page))
+>  			continue;
+>  
+> @@ -8650,6 +8663,17 @@ __offline_isolated_pages(unsigned long start_pfn, unsigned long end_pfn)
+>  			offlined_pages++;
+>  			continue;
+>  		}
+> +		/*
+> +		 * At this point all remaining PageOffline() pages have a
+> +		 * reference count of 0 and can simply be skipped.
+> +		 */
+> +		if (PageOffline(page)) {
+> +			BUG_ON(page_count(page));
+> +			BUG_ON(PageBuddy(page));
+> +			pfn++;
+> +			offlined_pages++;
+> +			continue;
+> +		}
+>  
+>  		BUG_ON(page_count(page));
+>  		BUG_ON(!PageBuddy(page));
+> diff --git a/mm/page_isolation.c b/mm/page_isolation.c
+> index 2c11a38d6e87..f6d07c5f0d34 100644
+> --- a/mm/page_isolation.c
+> +++ b/mm/page_isolation.c
+> @@ -151,6 +151,7 @@ __first_valid_page(unsigned long pfn, unsigned long nr_pages)
+>   *			a bit mask)
+>   *			MEMORY_OFFLINE - isolate to offline (!allocate) memory
+>   *					 e.g., skip over PageHWPoison() pages
+> + *					 and PageOffline() pages.
+>   *			REPORT_FAILURE - report details about the failure to
+>   *			isolate the range
+>   *
+> @@ -259,6 +260,14 @@ __test_page_isolated_in_pageblock(unsigned long pfn, unsigned long end_pfn,
+>  		else if ((flags & MEMORY_OFFLINE) && PageHWPoison(page))
+>  			/* A HWPoisoned page cannot be also PageBuddy */
+>  			pfn++;
+> +		else if ((flags & MEMORY_OFFLINE) && PageOffline(page) &&
+> +			 !page_count(page))
+> +			/*
+> +			 * The responsible driver agreed to skip PageOffline()
+> +			 * pages when offlining memory by dropping its
+> +			 * reference in MEM_GOING_OFFLINE.
+> +			 */
+> +			pfn++;
+>  		else
+>  			break;
+>  	}
 > -- 
 > 2.25.3
 
