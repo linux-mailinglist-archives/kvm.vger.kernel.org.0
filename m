@@ -2,85 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BBAA1C9E54
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 00:21:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8A811C9E64
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 00:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726937AbgEGWVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 18:21:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53243 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726776AbgEGWVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 18:21:09 -0400
+        id S1727790AbgEGWWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 18:22:31 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34877 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726792AbgEGWWa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 18:22:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588890068;
+        s=mimecast20190719; t=1588890148;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=AZoTGnbCXcMKyRQ9mPxmL7dzgnwDNH85/mAMTGS95ms=;
-        b=HA3o5kIQyIQjF+uw+fizTpkT0ceaFuinyNahPnSlRv3bvQMtLtk7I3kwN6WiEoRsFKdFsN
-        vfo/dpLpJ+W01w1nhzRMmDnhQOLMiJD840NTpRy7cz5MN7Tpe35qbvwa5UnNEpksxq5Xjk
-        tG3ss+FCt8+NlwpH+tAdTqlkHQvHkV4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-_tlYO-PPMJ6BgMe03y9H_Q-1; Thu, 07 May 2020 18:21:06 -0400
-X-MC-Unique: _tlYO-PPMJ6BgMe03y9H_Q-1
-Received: by mail-wr1-f72.google.com with SMTP id e5so4223814wrs.23
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 15:21:05 -0700 (PDT)
+        bh=VrCaRnveWzqCUdGFPO9163Kj4SQtWQk9E23zb+Vye0g=;
+        b=PX02cvA9y1BTZbf4ZCvfLRfPrA/SQN0Q6ILbyJsfYfVo6p1nuHX33L4Zg3XSSgGbHFDbvf
+        D0FnfO1sa628grwcl4wgfOmrfPQouI5sfYxDt9MDenYLoH6YmfiQshQZcdKc6fczmGX7Nk
+        k/HWuNUXa/tnDMlyWGvIl8/wA1K1m8A=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84-P_RqwC4WNLKRbRsdgcuj9A-1; Thu, 07 May 2020 18:22:27 -0400
+X-MC-Unique: P_RqwC4WNLKRbRsdgcuj9A-1
+Received: by mail-qv1-f72.google.com with SMTP id dh14so7411606qvb.4
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 15:22:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AZoTGnbCXcMKyRQ9mPxmL7dzgnwDNH85/mAMTGS95ms=;
-        b=YRxDTa+sjBm0sDN6RzXXV03lNpPmpV7Z2KAzFdsu4rtjBPNthU5tYJ2GzkksWvz6a8
-         rDzfpJNxBjFFtI0I3NYUvaN0ghmXwxz770M4b9wa14z9usAZXQhFbr4w0Jpb7wP7xY3l
-         0fa5AEiZDAJRX0IQ7gAszVVvLzi21y9LZo2AqTm2XANdhcqvQdp0SbT408OrFJsn7Aj3
-         Bu6+y9VIICU0pqJFSHX7vOqImjI2rqd1rIorFRcjuy2rDbTL9W+vklQCK5bB0/w71hs7
-         A+3TBtXJ/RxaTluQ8+ONTKC3GDtL3e8TJjjvWFpirphltQoY+98eHiRXcj3uiUhh/gqb
-         yWew==
-X-Gm-Message-State: AGi0Pubn6B1gCkoUNir3KB2RrN4LzwLQlIOS0Ovqqgmj/nbkdktw6Zwf
-        /rMl+wlxwYue/iNillNiY2qgNglTLXhVj6mWyiWaE/jWNiSI6xITtHs/wnYE6rxJCkZ59QAHIEU
-        zWKoRNqe4p2Cj
-X-Received: by 2002:a5d:510f:: with SMTP id s15mr19666487wrt.103.1588890064409;
-        Thu, 07 May 2020 15:21:04 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLUV4HMfiKwgurDoaoGbriEeAIIhW/Gxxjg07T2LtNMBH9vWdh9mS5ffncMlq2akBCU6Erg8g==
-X-Received: by 2002:a5d:510f:: with SMTP id s15mr19666469wrt.103.1588890064128;
-        Thu, 07 May 2020 15:21:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8d3e:39e5:cd88:13cc? ([2001:b07:6468:f312:8d3e:39e5:cd88:13cc])
-        by smtp.gmail.com with ESMTPSA id z132sm7704638wmc.29.2020.05.07.15.21.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2020 15:21:03 -0700 (PDT)
-Subject: Re: [PATCH v2 7/9] KVM: SVM: keep DR6 synchronized with
- vcpu->arch.dr6
-To:     Peter Xu <peterx@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20200507115011.494562-1-pbonzini@redhat.com>
- <20200507115011.494562-8-pbonzini@redhat.com> <20200507182220.GI228260@xz-x1>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d6e61be1-f1e0-59a5-f5a0-538c739d0805@redhat.com>
-Date:   Fri, 8 May 2020 00:21:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VrCaRnveWzqCUdGFPO9163Kj4SQtWQk9E23zb+Vye0g=;
+        b=Os7lPUVFEs59f+i+XnpGcsv1ZSNQbpiWKcZxMhxO52XC+ejsBKq0yfoqxXQe7H1DNl
+         tNri8KtvG9YJaX8NieC4VaMQ47YyVOjKb9sybfXAq6a6E0doX9HGbElKPSqXoUaHobII
+         Chr38xskNxX2E0wShczk69L4j1xlGhwgpaJeTpNdjwKsWhDwVik43Z/4S65VlR+MMjQv
+         hSsHDIbM8+Qy0UgAmsAU8cEg5YWc82Z9fvIuqooQ5Nu0nT+1Cl/oOFlq4Lf5sOSsc39h
+         Lq2FoEwH3Ttyl6tKoZ5q9Bqo0Zkt/GBqRFV3tduFF1y1HwSJ44QMfVTcNcw0xt2KCYaf
+         5J1Q==
+X-Gm-Message-State: AGi0PubScFW0ETmkKCE0yKpgPn3NuLqijTx5pquB6dP50UkzUr+rFPFT
+        gw7hWgUHi/+mczD6N6cydsH2BUCVVOxVwBu7YWhxicrHirgtn0kBicRN6RTrcaPm93LsXj0daEV
+        K5G8YWpHPM0Rj
+X-Received: by 2002:a37:6506:: with SMTP id z6mr17528011qkb.246.1588890146290;
+        Thu, 07 May 2020 15:22:26 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJTQTsmMRai3gKYHqoSOSsZvO38PckI9bGxFINKOwTWsdXRocbOFie6ARImAo10Fpzu1f/nJQ==
+X-Received: by 2002:a37:6506:: with SMTP id z6mr17527990qkb.246.1588890145939;
+        Thu, 07 May 2020 15:22:25 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id q130sm5202185qke.80.2020.05.07.15.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2020 15:22:25 -0700 (PDT)
+Date:   Thu, 7 May 2020 18:22:23 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, jgg@ziepe.ca
+Subject: Re: [PATCH v2 2/3] vfio-pci: Fault mmaps to enable vma tracking
+Message-ID: <20200507222223.GR228260@xz-x1>
+References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
+ <158871569380.15589.16950418949340311053.stgit@gimli.home>
+ <20200507214744.GP228260@xz-x1>
+ <20200507160334.4c029518@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <20200507182220.GI228260@xz-x1>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20200507160334.4c029518@x1.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/05/20 20:22, Peter Xu wrote:
->> -	svm->vmcb->save.dr6 = nested_vmcb->save.dr6;
->> +	svm->vcpu.arch.dr6  = nested_vmcb->save.dr6;
-> The rest looks very sane to me, but here I failed to figure out how arch.dr6
-> finally applied to save.dr6.  I saw it is applied in svm_vcpu_run() in the next
-> patch, but if that's the case then iiuc this commit may break bisection. Thanks,
+On Thu, May 07, 2020 at 04:03:34PM -0600, Alex Williamson wrote:
+> On Thu, 7 May 2020 17:47:44 -0400
+> Peter Xu <peterx@redhat.com> wrote:
+> 
+> > Hi, Alex,
+> > 
+> > On Tue, May 05, 2020 at 03:54:53PM -0600, Alex Williamson wrote:
+> > > +/*
+> > > + * Zap mmaps on open so that we can fault them in on access and therefore
+> > > + * our vma_list only tracks mappings accessed since last zap.
+> > > + */
+> > > +static void vfio_pci_mmap_open(struct vm_area_struct *vma)
+> > > +{
+> > > +	zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);  
+> > 
+> > A pure question: is this only a safety-belt or it is required in some known
+> > scenarios?
+> 
+> It's not required.  I originally did this so that I'm not allocating a
+> vma_list entry in a path where I can't return error, but as Jason
+> suggested I could zap here only in the case that I do encounter that
+> allocation fault.  However I still like consolidating the vma_list
+> handling to the vm_ops .fault and .close callbacks and potentially we
+> reduce the zap latency by keeping the vma_list to actual users, which
+> we'll get to eventually anyway in the VM case as memory BARs are sized
+> and assigned addresses.
 
-You're right, this needs a call to kvm_update_dr6 (which would go away
-on the next patch).
+Yes, I don't see much problem either on doing the vma_list maintainance only in
+.fault() and .close().  My understandingg is that the worst case is the perf
+critical applications (e.g. DPDK) could pre-fault these MMIO region easily
+during setup if they want.  My question was majorly about whether the vma
+should be guaranteed to have no mapping at all when .open() is called.  But I
+agree with you that it's always good to have that as safety-belt anyways.
 
-Paolo
+Thanks!
+
+-- 
+Peter Xu
 
