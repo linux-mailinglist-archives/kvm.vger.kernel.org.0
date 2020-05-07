@@ -2,41 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34CBF1C885D
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA2981C8858
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:34:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726660AbgEGLeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 07:34:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51645 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725857AbgEGLeC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 07:34:02 -0400
+        id S1726069AbgEGLeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 07:34:01 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25871 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725857AbgEGLeA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 07:34:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588851241;
+        s=mimecast20190719; t=1588851238;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=8VIb55B0D3pkc+IA+1unlokfvrjPci9Ef1J7Es7C5zo=;
-        b=ejFGffzdOwWxi+dtlSr+CN/Y3DaE+9oODWWEbchSBcSkNcq8TkLperPZwn1bSIB9RzsqEr
-        9xoSsdjHeBoUqg5wPWhavskxhRXMI1MXapo5R163SKJjKEfprBmPCSPupDSWaU58oxVhZy
-        QejSuxzwcGOGNeRJaFIILP7yBTSFp8c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-6BmYjKPcOPOuPh2aT8yQUA-1; Thu, 07 May 2020 07:33:56 -0400
-X-MC-Unique: 6BmYjKPcOPOuPh2aT8yQUA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C4D5107B7F9;
-        Thu,  7 May 2020 11:33:52 +0000 (UTC)
-Received: from [10.36.113.245] (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E36B1C933;
-        Thu,  7 May 2020 11:33:24 +0000 (UTC)
-Subject: Re: [PATCH v3 07/15] mm/memory_hotplug: Introduce
- offline_and_remove_memory()
-From:   David Hildenbrand <david@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=XwlnVfeL8zwiME3AXkx3OodZgfIVpDR8QDqNxlTyOzM=;
+        b=bd4X0INYy30pScpLP/XevgIif1/f52rOJ4/PEoTsyEJJNUdcN7UMBB/gAbl8NaDgpctHQi
+        0/K4IbLwvL5eb2wzGcfwHYke/Cj4lOQqIljiRkyt0JR4TxO3zrXwA6LdVuAuc2klBOtTpF
+        JT7q6++0W1KoJWEKskqKO7Ypn81W/es=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-Lz5SdlDpNbK-HnfKcot4Eg-1; Thu, 07 May 2020 07:33:57 -0400
+X-MC-Unique: Lz5SdlDpNbK-HnfKcot4Eg-1
+Received: by mail-wm1-f70.google.com with SMTP id o26so2478616wmh.1
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 04:33:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XwlnVfeL8zwiME3AXkx3OodZgfIVpDR8QDqNxlTyOzM=;
+        b=ASVbubHxWScQDT5EQObGZt6vaXJc7glfDNMuH5bd2fbqhGmj9MppgWPcVXo2sXlLqF
+         B+pFJhwwp2XpH4Xnd/TAJhMZpjML8UpoTO9VT5HjaEHO18WCEdZfSuZwXZeBrpEZca1R
+         +pt8eXC0meA8YLzLqSLmYDxCgDZULwPkd6t9uwzedTRA0ZiCnZjVAj6Ay2hSfGNaDaGe
+         XFDxs/Y33ciy6V5hZXvQYygpX2Qi8bjEqLt6+8VDKoTuM+oE+KSE3ageMbgoP3kV/z4+
+         3xXLiRFZ5LbEGAK1Dg3kDyRLdK7mVOb4VYorQaxEw517uyylJ/nTLthaiPeNdEpRheD0
+         pQyw==
+X-Gm-Message-State: AGi0PuZUl0DNm/ix+Se7f2uQvhL2n9Z5n6eboVA+tYWH/dLWrvDmeDgk
+        X8EShdzMsqwWsZ0b6/2Z99/2J+caWmeh2U3kOgay8DvrHgC/wmB28ZjfJyF6PDYEcKufsJi+oOR
+        bBDR8YVlqRKUC
+X-Received: by 2002:a1c:f20c:: with SMTP id s12mr10636332wmc.83.1588851236203;
+        Thu, 07 May 2020 04:33:56 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKGIkZb1OCioKL4MfDtVCIXay4HVUxjU1z1uE6butvfdGNej6NGsQ5cSCDAt+neZC4D4zgsoQ==
+X-Received: by 2002:a1c:f20c:: with SMTP id s12mr10636305wmc.83.1588851235952;
+        Thu, 07 May 2020 04:33:55 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+        by smtp.gmail.com with ESMTPSA id t4sm2834162wmf.33.2020.05.07.04.33.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2020 04:33:55 -0700 (PDT)
+Date:   Thu, 7 May 2020 07:33:51 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
@@ -48,76 +63,70 @@ Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Pavel Tatashin <pasha.tatashin@soleen.com>,
         Wei Yang <richard.weiyang@gmail.com>,
         Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
+Subject: Re: [PATCH v3 07/15] mm/memory_hotplug: Introduce
+ offline_and_remove_memory()
+Message-ID: <20200507073302-mutt-send-email-mst@kernel.org>
 References: <20200507103119.11219-1-david@redhat.com>
  <20200507103119.11219-8-david@redhat.com>
  <20200507064558-mutt-send-email-mst@kernel.org>
  <a915653f-232e-aa13-68f7-f988704fa84c@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <441bfb92-ecfa-f54e-3661-b219ea166e55@redhat.com>
-Date:   Thu, 7 May 2020 13:33:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <a915653f-232e-aa13-68f7-f988704fa84c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> I get:
->>
->> error: sha1 information is lacking or useless (mm/memory_hotplug.c).
->> error: could not build fake ancestor
->>
->> which version is this against? Pls post patches on top of some tag
->> in Linus' tree if possible.
+On Thu, May 07, 2020 at 01:24:38PM +0200, David Hildenbrand wrote:
+> On 07.05.20 12:46, Michael S. Tsirkin wrote:
+> > On Thu, May 07, 2020 at 12:31:11PM +0200, David Hildenbrand wrote:
+> >> virtio-mem wants to offline and remove a memory block once it unplugged
+> >> all subblocks (e.g., using alloc_contig_range()). Let's provide
+> >> an interface to do that from a driver. virtio-mem already supports to
+> >> offline partially unplugged memory blocks. Offlining a fully unplugged
+> >> memory block will not require to migrate any pages. All unplugged
+> >> subblocks are PageOffline() and have a reference count of 0 - so
+> >> offlining code will simply skip them.
+> >>
+> >> All we need is an interface to offline and remove the memory from kernel
+> >> module context, where we don't have access to the memory block devices
+> >> (esp. find_memory_block() and device_offline()) and the device hotplug
+> >> lock.
+> >>
+> >> To keep things simple, allow to only work on a single memory block.
+> >>
+> >> Acked-by: Michal Hocko <mhocko@suse.com>
+> >> Tested-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> >> Cc: Andrew Morton <akpm@linux-foundation.org>
+> >> Cc: David Hildenbrand <david@redhat.com>
+> >> Cc: Oscar Salvador <osalvador@suse.com>
+> >> Cc: Michal Hocko <mhocko@suse.com>
+> >> Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
+> >> Cc: Wei Yang <richard.weiyang@gmail.com>
+> >> Cc: Dan Williams <dan.j.williams@intel.com>
+> >> Cc: Qian Cai <cai@lca.pw>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> > 
+> > 
+> > didn't you lose Andrew Morton's ack here?
+> 
+> Yeah, thanks for noticing.
+> 
+> > 
+> >> ---
+> >>  include/linux/memory_hotplug.h |  1 +
+> >>  mm/memory_hotplug.c            | 37 ++++++++++++++++++++++++++++++++++
+> >>  2 files changed, 38 insertions(+)
+> > 
+> > I get:
+> > 
+> > error: sha1 information is lacking or useless (mm/memory_hotplug.c).
+> > error: could not build fake ancestor
+> > 
+> > which version is this against? Pls post patches on top of some tag
+> > in Linus' tree if possible.
 > 
 > As the cover states, latest linux-next. To be precise
 > 
@@ -129,20 +138,12 @@ X-Mailing-List: kvm@vger.kernel.org
 >     Add linux-next specific files for 20200507
 > 
 
-The patches seem to apply cleanly on top of
-
-commit a811c1fa0a02c062555b54651065899437bacdbe (linus/master)
-Merge: b9388959ba50 16f8036086a9
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed May 6 20:53:22 2020 -0700
-
-    Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+Don't base on linux-next please. Generally base on the tree you are
+targeting, or Linus' tree.
 
 
-I can resend based on that, after giving it a short test.
-
--- 
-Thanks,
-
-David / dhildenb
+> -- 
+> Thanks,
+> 
+> David / dhildenb
 
