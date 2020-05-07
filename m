@@ -2,128 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C70F1C98B6
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 20:05:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B26A41C9924
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 20:20:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728129AbgEGSFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 14:05:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25636 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726514AbgEGSFO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 14:05:14 -0400
+        id S1726598AbgEGSUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 14:20:05 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57105 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726320AbgEGSUF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 14:20:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588874713;
+        s=mimecast20190719; t=1588875604;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7ZT8uf+8nR83y0d403Od1JUqxjPNizjmPd+u74qytwY=;
-        b=D2jslFUT5Rl7HJZ/VlZce5w0OQMurEQ1B0h2GRkieAUEdthSHmt+mYIyyzxLiCzVKVQ2sC
-        4POOBExoDBQ8gxUkqm/Zfwv7SrggrppXKUY4O7OlQ7CsmXlp2AWuGR+XkxMtQPHvqWvL1I
-        akr0Upcq/knyALRi9cDF1JvbqPjChgE=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-LYbaVjWiNZSP57J2hG_2eQ-1; Thu, 07 May 2020 14:05:11 -0400
-X-MC-Unique: LYbaVjWiNZSP57J2hG_2eQ-1
-Received: by mail-qv1-f70.google.com with SMTP id dh14so6684278qvb.4
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 11:05:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7ZT8uf+8nR83y0d403Od1JUqxjPNizjmPd+u74qytwY=;
-        b=g0ZcDmbySf7PRNlLgAUl67V+54A2vzzU0mV7Uu47Lq3MG+Sbe7Q09QrqdAysJ7NyfD
-         GCRGzYrxJdpVcgjqf4AOR8a+zFyjJhIfAS0Rw4gCVN+nSHTMmwYU8f77pUc6CptaR3do
-         JVxXoNT8Gfi4AvJZsBYD/evNZmoZiSDF4on15XKLbP05hDEpIF+q55/d6JgT+AsKT6dV
-         xOljnEIqs3uJqnop6Sf6anqKEVTNNMHbYT1iOm8oDAEIm70aPnqmOg19teDqcZg/E3aG
-         UfRwk5Wc4zU0VnHLoUU0iHzk35IEmeyJuVWS9D+Y0ncaF0P5IX39Cb4FlZMjeEeAYVKA
-         rCvg==
-X-Gm-Message-State: AGi0Pua/ZitpPIQvQqwQnJNpRDOWdPtIrDB34XBkF592+zpqtjWFu8/r
-        lmN49v6UcbUapLVRgC2hIu1w64SghYerV8tNvxV7q21ZatrbpUASC0yIkoXuK4AVzq86bkJBd3b
-        ePFntMj6b8w/b
-X-Received: by 2002:a37:8d07:: with SMTP id p7mr16276235qkd.500.1588874711175;
-        Thu, 07 May 2020 11:05:11 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLaD9wsQNdumwebtoAZ7rJYDUyJERvx2DqBTrcl3tFL8/q8qwbOR3ce/0xUX7ee+QK3N2tBXw==
-X-Received: by 2002:a37:8d07:: with SMTP id p7mr16276184qkd.500.1588874710644;
-        Thu, 07 May 2020 11:05:10 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id o16sm4104750qko.38.2020.05.07.11.05.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2020 11:05:09 -0700 (PDT)
-Date:   Thu, 7 May 2020 14:05:08 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 9/9] KVM: VMX: pass correct DR6 for GD userspace exit
-Message-ID: <20200507180508.GH228260@xz-x1>
-References: <20200507115011.494562-1-pbonzini@redhat.com>
- <20200507115011.494562-10-pbonzini@redhat.com>
- <20200507161854.GF228260@xz-x1>
- <7abe5f7b-2b5a-4e32-34e2-f37d0afef00a@redhat.com>
- <20200507163839.GG228260@xz-x1>
- <db06ffa7-1e3c-14e5-28b8-5053f4383ecf@redhat.com>
+        bh=UgewtUy9bTNyZauHpI56baWIlBcAHHHwwe5CUmUNguk=;
+        b=f24JsHq8PIKEvtblQYnI2TrRqm+Qen4tcuhV/o0POV/9Dvx9dcPvhu98fjIUaxy4scESW9
+        u5Szl+Dbj7tRAhXWoEX8rov856u3+DmqzAaDIyn1OXOxQbIbPitrqZRpABgA4ojjJQQMYl
+        LL/RQjaXv2KXVISaf69TOgPnWrMgFk4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-1X-11krePSqtA8qFXcj8yA-1; Thu, 07 May 2020 14:20:00 -0400
+X-MC-Unique: 1X-11krePSqtA8qFXcj8yA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C257107ACCD;
+        Thu,  7 May 2020 18:19:58 +0000 (UTC)
+Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98CB970559;
+        Thu,  7 May 2020 18:19:56 +0000 (UTC)
+Date:   Thu, 7 May 2020 12:19:56 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH Kernel v18 4/7] vfio iommu: Implementation of ioctl for
+ dirty pages tracking.
+Message-ID: <20200507121956.45b2500f@x1.home>
+In-Reply-To: <24223faa-15ac-bd71-6c5d-9d0401fbd839@nvidia.com>
+References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
+        <1588607939-26441-5-git-send-email-kwankhede@nvidia.com>
+        <20200506081510.GC19334@joy-OptiPlex-7040>
+        <24223faa-15ac-bd71-6c5d-9d0401fbd839@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <db06ffa7-1e3c-14e5-28b8-5053f4383ecf@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 07, 2020 at 07:42:25PM +0200, Paolo Bonzini wrote:
-> On 07/05/20 18:38, Peter Xu wrote:
-> > On Thu, May 07, 2020 at 06:21:18PM +0200, Paolo Bonzini wrote:
-> >> On 07/05/20 18:18, Peter Xu wrote:
-> >>>>  		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) {
-> >>>> -			vcpu->run->debug.arch.dr6 = vcpu->arch.dr6;
-> >>>> +			vcpu->run->debug.arch.dr6 = DR6_BD | DR6_RTM | DR6_FIXED_1;
-> >>> After a second thought I'm thinking whether it would be okay to have BS set in
-> >>> that test case.  I just remembered there's a test case in the kvm-unit-test
-> >>> that checks explicitly against BS leftover as long as dr6 is not cleared
-> >>> explicitly by the guest code, while the spec seems to have no explicit
-> >>> description on this case.
-> >>
-> >> Yes, I noticed that test as well.  But I don't like having different
-> >> behavior for Intel and AMD, and the Intel behavior is more sensible.
-> >> Also...
-> > 
-> > Do you mean the AMD behavior is more sensible instead? :)
-> 
-> No, I mean within the context of KVM_EXIT_DEBUG: the Intel behavior is
-> to only include the latest debug exception in kvm_run's DR6 field, while
-> the AMD behavior would be to include all of them.  This was an
-> implementation detail (it happens because Intel sets kvm_run's DR6 from
-> the exit qualification of #DB), but it's more sensible too.
-> 
-> In addition:
-> 
-> * AMD was completely broken until this week, so the behavior of
-> KVM_EXIT_DEBUG is defined de facto by kvm_intel.ko.  Userspace has not
-> been required to set DR6 with KVM_SET_GUEST_DEBUG, and since we can
-> emulate that on AMD, we should.
-> 
-> * we have to fix anyway the fact that on AMD a KVM_EXIT_DEBUG is
-> clobbering the contents of the guest's DR6
-> 
-> >>> Intead of above, I'm thinking whether we should allow the userspace to also
-> >>> change dr6 with the KVM_SET_GUEST_DEBUG ioctl when they wanted to (right now
-> >>> iiuc dr6 from userspace is completely ignored), instead of offering a fake dr6.
-> >>> Or to make it simple, maybe we can just check BD bit only?
-> >>
-> >> ... I'm afraid that this would be a backwards-incompatible change, and
-> >> it would require changes in userspace.  If you look at v2, emulating the
-> >> Intel behavior in AMD turns out to be self-contained and relatively
-> >> elegant (will be better when we finish cleaning up nested SVM).
-> > 
-> > I'm still trying to read the other patches (I need some more digest because I'm
-> > even less familiar with nested...).  I agree that it would be good to keep the
-> > same behavior across Intel/AMD.  Actually that also does not violate Intel spec
-> > because the AMD one is stricter.
-> 
-> Again, careful---we're talking about KVM_EXIT_DEBUG, not the #DB exception.
+On Thu, 7 May 2020 01:12:25 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-OK I get your point now.  Thanks,
+> On 5/6/2020 1:45 PM, Yan Zhao wrote:
+> > On Mon, May 04, 2020 at 11:58:56PM +0800, Kirti Wankhede wrote:  
+> 
+> <snip>
+> 
+> >>   /*
+> >>    * Helper Functions for host iova-pfn list
+> >>    */
+> >> @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>   			vfio_unpin_page_external(dma, iova, do_accounting);
+> >>   			goto pin_unwind;
+> >>   		}
+> >> +
+> >> +		if (iommu->dirty_page_tracking) {
+> >> +			unsigned long pgshift =
+> >> +					 __ffs(vfio_pgsize_bitmap(iommu));
+> >> +  
+> > hi Kirti,
+> > may I know if there's any vfio_pin_pages() happpening during NVidia's vGPU migration?
+> > the code would enter into deadlock as I reported in last version.
+> >   
+> 
+> Hm, you are right and same is the case in vfio_iommu_type1_dma_rw_chunk().
+> 
+> Instead of calling vfio_pgsize_bitmap() from lots of places, I'm 
+> thinking of saving pgsize_bitmap in struct vfio_iommu, which should be 
+> populated whenever domain_list is updated. Alex, will that be fine?
 
--- 
-Peter Xu
+I've wondered why we don't already cache this, so yes, that's fine, but
+the cached value will only be valid when evaluated under iommu->lock.
+Thanks,
+
+Alex
 
