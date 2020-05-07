@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A0F91C8D51
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 16:03:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A66C61C8D59
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 16:03:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgEGOCc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 10:02:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59511 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726900AbgEGOCb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 10:02:31 -0400
+        id S1727122AbgEGOCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 10:02:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40008 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727111AbgEGOCp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 10:02:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588860149;
+        s=mimecast20190719; t=1588860163;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=isN0G/yjNxcpWVJmfp7YcIP/HW80M+R6soGqhwqRcPs=;
-        b=GRGDreuh4QtLGIMplNaB8ZvGNKyY/EY+TZ6sY6KX7M7PWfQsqG4ZLd8BIoFt6e5lwZFyty
-        U+OxpML8Nz+1bYiBSMgIxG3EAE3Llk9P9lz7CSwoyII92+tkGV0BmRAaMLlUWX8oAY+UtR
-        lCpK1882FQczUR+dzDHaE/GRWVZ3yRE=
+        bh=6AeTXBUWraUGOO3RfZQVHeXymOvT6+H0zVdHTC1hVsA=;
+        b=Ny/6qot4Pf5yt2xkVzaBuwXDdyJX2Qpj2EOc1foBSs2N/3M4lAGkbu8KdRH4GziucdRmhw
+        V8PLuKwFtsuSjVWC9/2vIggQHI9AuqBZ46lsmvh2EObtuU1BsPxA3Fc+qCnIwbQmRcesrJ
+        P2tw7oZ9dRqDFwvwXIqcFA52lLjm3tU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-e1-Av0ZrMeilnseDjT5nEA-1; Thu, 07 May 2020 10:02:23 -0400
-X-MC-Unique: e1-Av0ZrMeilnseDjT5nEA-1
+ us-mta-98-GR6CGQAuPhGTi2DnZ_knSg-1; Thu, 07 May 2020 10:02:36 -0400
+X-MC-Unique: GR6CGQAuPhGTi2DnZ_knSg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF206100945E;
-        Thu,  7 May 2020 14:02:20 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3B548014D9;
+        Thu,  7 May 2020 14:02:34 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2CBD960BEC;
-        Thu,  7 May 2020 14:02:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29CAA60BEC;
+        Thu,  7 May 2020 14:02:21 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
@@ -41,8 +41,6 @@ Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
         Andrew Morton <akpm@linux-foundation.org>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         David Hildenbrand <david@redhat.com>,
-        Michal Hocko <mhocko@suse.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
         Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
         Jason Wang <jasowang@redhat.com>,
         Oscar Salvador <osalvador@suse.de>,
@@ -51,11 +49,10 @@ Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
         Dan Williams <dan.j.williams@intel.com>,
         Pavel Tatashin <pasha.tatashin@soleen.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>, Len Brown <lenb@kernel.org>,
-        linux-acpi@vger.kernel.org
-Subject: [PATCH v4 03/15] virtio-mem: Allow to specify an ACPI PXM as nid
-Date:   Thu,  7 May 2020 16:01:27 +0200
-Message-Id: <20200507140139.17083-4-david@redhat.com>
+        Vlastimil Babka <vbabka@suse.cz>
+Subject: [PATCH v4 04/15] virtio-mem: Paravirtualized memory hotunplug part 1
+Date:   Thu,  7 May 2020 16:01:28 +0200
+Message-Id: <20200507140139.17083-5-david@redhat.com>
 In-Reply-To: <20200507140139.17083-1-david@redhat.com>
 References: <20200507140139.17083-1-david@redhat.com>
 MIME-Version: 1.0
@@ -66,14 +63,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We want to allow to specify (similar as for a DIMM), to which node a
-virtio-mem device (and, therefore, its memory) belongs. Add a new
-virtio-mem feature flag and export pxm_to_node, so it can be used in kernel
-module context.
+Unplugging subblocks of memory blocks that are offline is easy. All we
+have to do is watch out for concurrent onlining activity.
 
-Acked-by: Michal Hocko <mhocko@suse.com> # for the export
-Acked-by: "Rafael J. Wysocki" <rafael@kernel.org> # for the export
-Acked-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 Tested-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -86,167 +78,174 @@ Cc: Dan Williams <dan.j.williams@intel.com>
 Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Vlastimil Babka <vbabka@suse.cz>
-Cc: Len Brown <lenb@kernel.org>
-Cc: linux-acpi@vger.kernel.org
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- drivers/acpi/numa/srat.c        |  1 +
- drivers/virtio/virtio_mem.c     | 39 +++++++++++++++++++++++++++++++--
- include/uapi/linux/virtio_mem.h | 10 ++++++++-
- 3 files changed, 47 insertions(+), 3 deletions(-)
+ drivers/virtio/virtio_mem.c | 116 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 114 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/acpi/numa/srat.c b/drivers/acpi/numa/srat.c
-index 47b4969d9b93..5be5a977da1b 100644
---- a/drivers/acpi/numa/srat.c
-+++ b/drivers/acpi/numa/srat.c
-@@ -35,6 +35,7 @@ int pxm_to_node(int pxm)
- 		return NUMA_NO_NODE;
- 	return pxm_to_node_map[pxm];
- }
-+EXPORT_SYMBOL(pxm_to_node);
- 
- int node_to_pxm(int node)
- {
 diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
-index 5d1dcaa6fc42..270ddeaec059 100644
+index 270ddeaec059..a3ec795be8be 100644
 --- a/drivers/virtio/virtio_mem.c
 +++ b/drivers/virtio/virtio_mem.c
-@@ -21,6 +21,8 @@
- #include <linux/bitmap.h>
- #include <linux/lockdep.h>
+@@ -123,7 +123,7 @@ struct virtio_mem {
+ 	 *
+ 	 * When this lock is held the pointers can't change, ONLINE and
+ 	 * OFFLINE blocks can't change the state and no subblocks will get
+-	 * plugged.
++	 * plugged/unplugged.
+ 	 */
+ 	struct mutex hotplug_mutex;
+ 	bool hotplug_active;
+@@ -280,6 +280,12 @@ static int virtio_mem_mb_state_prepare_next_mb(struct virtio_mem *vm)
+ 	     _mb_id++) \
+ 		if (virtio_mem_mb_get_state(_vm, _mb_id) == _state)
  
-+#include <acpi/acpi_numa.h>
++#define virtio_mem_for_each_mb_state_rev(_vm, _mb_id, _state) \
++	for (_mb_id = _vm->next_mb_id - 1; \
++	     _mb_id >= _vm->first_mb_id && _vm->nb_mb_state[_state]; \
++	     _mb_id--) \
++		if (virtio_mem_mb_get_state(_vm, _mb_id) == _state)
 +
- enum virtio_mem_mb_state {
- 	/* Unplugged, not added to Linux. Can be reused later. */
- 	VIRTIO_MEM_MB_STATE_UNUSED = 0,
-@@ -72,6 +74,8 @@ struct virtio_mem {
- 
- 	/* The device block size (for communicating with the device). */
- 	uint32_t device_block_size;
-+	/* The translated node id. NUMA_NO_NODE in case not specified. */
-+	int nid;
- 	/* Physical start address of the memory region. */
- 	uint64_t addr;
- 	/* Maximum region size in bytes. */
-@@ -389,7 +393,10 @@ static int virtio_mem_sb_bitmap_prepare_next_mb(struct virtio_mem *vm)
- static int virtio_mem_mb_add(struct virtio_mem *vm, unsigned long mb_id)
- {
- 	const uint64_t addr = virtio_mem_mb_id_to_phys(mb_id);
--	int nid = memory_add_physaddr_to_nid(addr);
-+	int nid = vm->nid;
-+
-+	if (nid == NUMA_NO_NODE)
-+		nid = memory_add_physaddr_to_nid(addr);
- 
- 	dev_dbg(&vm->vdev->dev, "adding memory block: %lu\n", mb_id);
- 	return add_memory(nid, addr, memory_block_size_bytes());
-@@ -407,7 +414,10 @@ static int virtio_mem_mb_add(struct virtio_mem *vm, unsigned long mb_id)
- static int virtio_mem_mb_remove(struct virtio_mem *vm, unsigned long mb_id)
- {
- 	const uint64_t addr = virtio_mem_mb_id_to_phys(mb_id);
--	int nid = memory_add_physaddr_to_nid(addr);
-+	int nid = vm->nid;
-+
-+	if (nid == NUMA_NO_NODE)
-+		nid = memory_add_physaddr_to_nid(addr);
- 
- 	dev_dbg(&vm->vdev->dev, "removing memory block: %lu\n", mb_id);
- 	return remove_memory(nid, addr, memory_block_size_bytes());
-@@ -426,6 +436,17 @@ static void virtio_mem_retry(struct virtio_mem *vm)
- 	spin_unlock_irqrestore(&vm->removal_lock, flags);
+ /*
+  * Mark all selected subblocks plugged.
+  *
+@@ -325,6 +331,19 @@ static bool virtio_mem_mb_test_sb_plugged(struct virtio_mem *vm,
+ 	       bit + count;
  }
  
-+static int virtio_mem_translate_node_id(struct virtio_mem *vm, uint16_t node_id)
++/*
++ * Test if all selected subblocks are unplugged.
++ */
++static bool virtio_mem_mb_test_sb_unplugged(struct virtio_mem *vm,
++					    unsigned long mb_id, int sb_id,
++					    int count)
 +{
-+	int node = NUMA_NO_NODE;
++	const int bit = (mb_id - vm->first_mb_id) * vm->nb_sb_per_mb + sb_id;
 +
-+#if defined(CONFIG_ACPI_NUMA)
-+	if (virtio_has_feature(vm->vdev, VIRTIO_MEM_F_ACPI_PXM))
-+		node = pxm_to_node(node_id);
-+#endif
-+	return node;
++	/* TODO: Helper similar to bitmap_set() */
++	return find_next_bit(vm->sb_bitmap, bit + count, bit) >= bit + count;
 +}
 +
  /*
-  * Test if a virtio-mem device overlaps with the given range. Can be called
-  * from (notifier) callbacks lockless.
-@@ -1267,6 +1288,7 @@ static bool virtio_mem_any_memory_present(unsigned long start,
- static int virtio_mem_init(struct virtio_mem *vm)
- {
- 	const uint64_t phys_limit = 1UL << MAX_PHYSMEM_BITS;
-+	uint16_t node_id;
- 
- 	if (!vm->vdev->config->get) {
- 		dev_err(&vm->vdev->dev, "config access disabled\n");
-@@ -1287,6 +1309,9 @@ static int virtio_mem_init(struct virtio_mem *vm)
- 		     &vm->plugged_size);
- 	virtio_cread(vm->vdev, struct virtio_mem_config, block_size,
- 		     &vm->device_block_size);
-+	virtio_cread(vm->vdev, struct virtio_mem_config, node_id,
-+		     &node_id);
-+	vm->nid = virtio_mem_translate_node_id(vm, node_id);
- 	virtio_cread(vm->vdev, struct virtio_mem_config, addr, &vm->addr);
- 	virtio_cread(vm->vdev, struct virtio_mem_config, region_size,
- 		     &vm->region_size);
-@@ -1365,6 +1390,8 @@ static int virtio_mem_init(struct virtio_mem *vm)
- 		 memory_block_size_bytes());
- 	dev_info(&vm->vdev->dev, "subblock size: 0x%x",
- 		 vm->subblock_size);
-+	if (vm->nid != NUMA_NO_NODE)
-+		dev_info(&vm->vdev->dev, "nid: %d", vm->nid);
- 
- 	return 0;
+  * Find the first plugged subblock. Returns vm->nb_sb_per_mb in case there is
+  * none.
+@@ -513,6 +532,9 @@ static void virtio_mem_notify_offline(struct virtio_mem *vm,
+ 		BUG();
+ 		break;
+ 	}
++
++	/* trigger the workqueue, maybe we can now unplug memory. */
++	virtio_mem_retry(vm);
  }
-@@ -1508,12 +1535,20 @@ static int virtio_mem_restore(struct virtio_device *vdev)
+ 
+ static void virtio_mem_notify_online(struct virtio_mem *vm, unsigned long mb_id,
+@@ -1122,6 +1144,94 @@ static int virtio_mem_plug_request(struct virtio_mem *vm, uint64_t diff)
+ 	return rc;
  }
- #endif
  
-+static unsigned int virtio_mem_features[] = {
-+#if defined(CONFIG_NUMA) && defined(CONFIG_ACPI_NUMA)
-+	VIRTIO_MEM_F_ACPI_PXM,
-+#endif
-+};
++/*
++ * Unplug the desired number of plugged subblocks of an offline memory block.
++ * Will fail if any subblock cannot get unplugged (instead of skipping it).
++ *
++ * Will modify the state of the memory block. Might temporarily drop the
++ * hotplug_mutex.
++ *
++ * Note: Can fail after some subblocks were successfully unplugged.
++ */
++static int virtio_mem_mb_unplug_any_sb_offline(struct virtio_mem *vm,
++					       unsigned long mb_id,
++					       uint64_t *nb_sb)
++{
++	int rc;
 +
- static struct virtio_device_id virtio_mem_id_table[] = {
- 	{ VIRTIO_ID_MEM, VIRTIO_DEV_ANY_ID },
- 	{ 0 },
- };
++	rc = virtio_mem_mb_unplug_any_sb(vm, mb_id, nb_sb);
++
++	/* some subblocks might have been unplugged even on failure */
++	if (!virtio_mem_mb_test_sb_plugged(vm, mb_id, 0, vm->nb_sb_per_mb))
++		virtio_mem_mb_set_state(vm, mb_id,
++					VIRTIO_MEM_MB_STATE_OFFLINE_PARTIAL);
++	if (rc)
++		return rc;
++
++	if (virtio_mem_mb_test_sb_unplugged(vm, mb_id, 0, vm->nb_sb_per_mb)) {
++		/*
++		 * Remove the block from Linux - this should never fail.
++		 * Hinder the block from getting onlined by marking it
++		 * unplugged. Temporarily drop the mutex, so
++		 * any pending GOING_ONLINE requests can be serviced/rejected.
++		 */
++		virtio_mem_mb_set_state(vm, mb_id,
++					VIRTIO_MEM_MB_STATE_UNUSED);
++
++		mutex_unlock(&vm->hotplug_mutex);
++		rc = virtio_mem_mb_remove(vm, mb_id);
++		BUG_ON(rc);
++		mutex_lock(&vm->hotplug_mutex);
++	}
++	return 0;
++}
++
++/*
++ * Try to unplug the requested amount of memory.
++ */
++static int virtio_mem_unplug_request(struct virtio_mem *vm, uint64_t diff)
++{
++	uint64_t nb_sb = diff / vm->subblock_size;
++	unsigned long mb_id;
++	int rc;
++
++	if (!nb_sb)
++		return 0;
++
++	/*
++	 * We'll drop the mutex a couple of times when it is safe to do so.
++	 * This might result in some blocks switching the state (online/offline)
++	 * and we could miss them in this run - we will retry again later.
++	 */
++	mutex_lock(&vm->hotplug_mutex);
++
++	/* Try to unplug subblocks of partially plugged offline blocks. */
++	virtio_mem_for_each_mb_state_rev(vm, mb_id,
++					 VIRTIO_MEM_MB_STATE_OFFLINE_PARTIAL) {
++		rc = virtio_mem_mb_unplug_any_sb_offline(vm, mb_id,
++							 &nb_sb);
++		if (rc || !nb_sb)
++			goto out_unlock;
++		cond_resched();
++	}
++
++	/* Try to unplug subblocks of plugged offline blocks. */
++	virtio_mem_for_each_mb_state_rev(vm, mb_id,
++					 VIRTIO_MEM_MB_STATE_OFFLINE) {
++		rc = virtio_mem_mb_unplug_any_sb_offline(vm, mb_id,
++							 &nb_sb);
++		if (rc || !nb_sb)
++			goto out_unlock;
++		cond_resched();
++	}
++
++	mutex_unlock(&vm->hotplug_mutex);
++	return 0;
++out_unlock:
++	mutex_unlock(&vm->hotplug_mutex);
++	return rc;
++}
++
+ /*
+  * Try to unplug all blocks that couldn't be unplugged before, for example,
+  * because the hypervisor was busy.
+@@ -1204,8 +1314,10 @@ static void virtio_mem_run_wq(struct work_struct *work)
+ 		if (vm->requested_size > vm->plugged_size) {
+ 			diff = vm->requested_size - vm->plugged_size;
+ 			rc = virtio_mem_plug_request(vm, diff);
++		} else {
++			diff = vm->plugged_size - vm->requested_size;
++			rc = virtio_mem_unplug_request(vm, diff);
+ 		}
+-		/* TODO: try to unplug memory */
+ 	}
  
- static struct virtio_driver virtio_mem_driver = {
-+	.feature_table = virtio_mem_features,
-+	.feature_table_size = ARRAY_SIZE(virtio_mem_features),
- 	.driver.name = KBUILD_MODNAME,
- 	.driver.owner = THIS_MODULE,
- 	.id_table = virtio_mem_id_table,
-diff --git a/include/uapi/linux/virtio_mem.h b/include/uapi/linux/virtio_mem.h
-index 1bfade78bdfd..e0a9dc7397c3 100644
---- a/include/uapi/linux/virtio_mem.h
-+++ b/include/uapi/linux/virtio_mem.h
-@@ -83,6 +83,12 @@
-  * device is busy.
-  */
- 
-+/* --- virtio-mem: feature bits --- */
-+
-+/* node_id is an ACPI PXM and is valid */
-+#define VIRTIO_MEM_F_ACPI_PXM		0
-+
-+
- /* --- virtio-mem: guest -> host requests --- */
- 
- /* request to plug memory blocks */
-@@ -177,7 +183,9 @@ struct virtio_mem_resp {
- struct virtio_mem_config {
- 	/* Block size and alignment. Cannot change. */
- 	__u32 block_size;
--	__u32 padding;
-+	/* Valid with VIRTIO_MEM_F_ACPI_PXM. Cannot change. */
-+	__u16 node_id;
-+	__u16 padding;
- 	/* Start address of the memory region. Cannot change. */
- 	__u64 addr;
- 	/* Region size (maximum). Cannot change. */
+ 	switch (rc) {
 -- 
 2.25.3
 
