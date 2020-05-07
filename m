@@ -2,150 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A54C01C800C
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 04:35:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A2781C803D
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 05:00:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728003AbgEGCft (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 May 2020 22:35:49 -0400
-Received: from mail-dm6nam10on2084.outbound.protection.outlook.com ([40.107.93.84]:6058
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726218AbgEGCft (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 May 2020 22:35:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ctsxaRxcRoM8DInmPZ7iHRqV7SCiZdvPboCEjSwm2ytd7DP2AWNAIPQBhyfPMWiokU5PCxI4tZ4zFFyL2fRWMM0SO9+umkQeQZSPMBE6iJ1Q14/G/r2ZGkSuWQa/wrTp5fU9a6uWlXihTwfGM6BiL/Vo71ZOk9xKJNc2xORC8dTjrEOxQFEvWNq1NCGMPYEdzEelsTUBtkriSYND2mqeSvKqAVxWkQWtk5ekkEwOuljApxOyn03E0FSra1YOlZ/jsUQz+Rs3PsKwPDuePsMBFKAXmyMyOyOimDISXepBey2pyWKQzlQh8LfdbyY4HpjVZxsWWMJEmoTOJu7swjV0mQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8G7Ca0agfDFFQ3J1uPht5rubdXkJpsWQ9jleN+Qzjpg=;
- b=U6bW2Y8I+K/vAj/xLazjlM3rT7iV3uJWIxGfjC5RlJ+ZxFlAu0RjHzTM8eeb8y0N/RuO7kIw+MLRjJAt8fhbMGAGFRBiJbH0jYO4JMjyaVdvmvLxY7sYQuZi5v6y5mAgUniSYqhN4CNQt/7i/00z9QB3+I5uImUXvLdS/H/WqLsPqf1g9Z3IKJjnK6JaG5iJsBXMT9P3hLjZ6NFYf3DIbn3cTHaAV6B6xXj4Xc5vJvbhPrcpnOiRRF0EQaT8KX930ZLKk2kAHSIxUbKjyaoMZKAElfHK08TwVCOb2TjsrpdeSFxESzyIi6yM1IpIA/ckhkZuLefvtOcna8AnufRJAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1727915AbgEGDAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 May 2020 23:00:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727106AbgEGDAn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 May 2020 23:00:43 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB58C061A0F;
+        Wed,  6 May 2020 20:00:41 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id z8so4511692wrw.3;
+        Wed, 06 May 2020 20:00:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8G7Ca0agfDFFQ3J1uPht5rubdXkJpsWQ9jleN+Qzjpg=;
- b=Wjfjz2TjQNQNrTlb/GT49Rr+8OskLHdBzSMEdAYv7pCxQ1h2K8qWxgpPYEOemfvEvpoLLH29Dv39/JjpNNyXRb0VdvKuydcIbrdN91NdVTwi+Rgsj96SpUqvTulX/DxiS4/cgyH02zb51UewvTds4Z5hB52K838X2daP/hl1YhM=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com (2603:10b6:3:7a::18) by
- DM5PR12MB1130.namprd12.prod.outlook.com (2603:10b6:3:75::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.20; Thu, 7 May 2020 02:35:45 +0000
-Received: from DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744]) by DM5PR12MB1163.namprd12.prod.outlook.com
- ([fe80::d061:4c5:954e:4744%4]) with mapi id 15.20.2958.030; Thu, 7 May 2020
- 02:35:45 +0000
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, joro@8bytes.org, jon.grimm@amd.com,
-        mlevitsk@redhat.com,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [PATCH v2] KVM: SVM: Disable AVIC before setting V_IRQ
-Date:   Wed,  6 May 2020 21:35:39 -0500
-Message-Id: <1588818939-54264-1-git-send-email-suravee.suthikulpanit@amd.com>
-X-Mailer: git-send-email 1.8.3.1
-Content-Type: text/plain
-X-ClientProxiedBy: SN4PR0201CA0051.namprd02.prod.outlook.com
- (2603:10b6:803:20::13) To DM5PR12MB1163.namprd12.prod.outlook.com
- (2603:10b6:3:7a::18)
+        d=gmail.com; s=20161025;
+        h=date:from:to:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dFNA74RHr/B0YCNDQy2zQLL9WCg7uP2pI8pODcjJZLo=;
+        b=UlxwjTXFzumUixnRmqThlCscCI/ihO/R+RyMUmFFw2uw4nEl2xFME5/reioXVMYVkn
+         5XWIHrEii4Zi4XhL96HI6CsXMz/j28Jmpy0meWCM6LKC63o6375rgJY19asv928X76QT
+         bme/whzo9ZetNBtGc9P8Oq3dVaV9phPmIxo91HhriszxhCnjrgl/YE6IH0UHPnTonnIu
+         q14EJUv08FPw/F8gOJVPt+kMwtPT+8N0aZfBvjxxkmeXnEk5UKk/3OBOFljpzV7DU2uM
+         jSZuM+Oym3crPGMDwEPXrlvtfwjIHDdelsfnTBw8lqMzsEbov1k5ikq8y3JFDIuxQzre
+         UEXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dFNA74RHr/B0YCNDQy2zQLL9WCg7uP2pI8pODcjJZLo=;
+        b=Z0NQnobG7qpCpIi8yoKenbTz1RWW4jKlKwlVT7vVgHHhCiCl5GjNGYAbkNlNbGc49k
+         OzGJST/giYiCt329x4nq63nJH9vxdId889h2NYbX95UY6XRFP1Vzcp/AWn8pXx2aNHJz
+         4ovYUFGrclLEr115+FdEVOBmYWEhhvqOcqlwW83HxDrCq9k7RNGHH/tTlR/JQ0YnqzyP
+         QXYIEyEb2C1JTCrBAYcs0AnY3C1aHdSF3QwFGSK4YGjodwxq7hOj5Re/VevkqXyAFdt4
+         vUNMvaEUQgJQWJR6GIF2q14o1HswXB/RildTYH7XvTy89rBkWc+CRkAsNnLTNh0+z2ZU
+         3+bQ==
+X-Gm-Message-State: AGi0PuZjS1HiyJxWv/u9oLXVSCmc5rKFn9XDhV/Y1Fzv2T/7S7163bRp
+        M3RLO27Kyhpv/RFNV3nS9S0=
+X-Google-Smtp-Source: APiQypJ8ZcAF8AaoB8LwzngzBV9iAUwVjSPCJy3LJFKEGWxbq2DYqV/sWcyulbcEEL0i0zhcS+7CWg==
+X-Received: by 2002:adf:c38c:: with SMTP id p12mr13613055wrf.357.1588820439856;
+        Wed, 06 May 2020 20:00:39 -0700 (PDT)
+Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+        by smtp.gmail.com with ESMTPSA id s11sm5492525wrp.79.2020.05.06.20.00.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 May 2020 20:00:39 -0700 (PDT)
+Date:   Thu, 7 May 2020 06:00:37 +0300
+From:   Jon Doron <arilou@gmail.com>
+To:     Roman Kagan <rvkagan@yandex-team.ru>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
+Message-ID: <20200507030037.GE2862@jondnuc>
+References: <20200418064127.GB1917435@jondnuc>
+ <20200424133742.GA2439920@rvkaganb>
+ <20200425061637.GF1917435@jondnuc>
+ <20200503191900.GA389956@rvkaganb>
+ <87a72nelup.fsf@vitty.brq.redhat.com>
+ <20200505080158.GA400685@rvkaganb>
+ <20200505103821.GB2862@jondnuc>
+ <20200505200010.GB400685@rvkaganb>
+ <20200506044929.GD2862@jondnuc>
+ <20200506084615.GA32841@rvkaganb>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ssuthiku-rhel7-ssp.amd.com (165.204.78.2) by SN4PR0201CA0051.namprd02.prod.outlook.com (2603:10b6:803:20::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26 via Frontend Transport; Thu, 7 May 2020 02:35:45 +0000
-X-Mailer: git-send-email 1.8.3.1
-X-Originating-IP: [165.204.78.2]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 207996f9-af26-4e9f-177f-08d7f22f5850
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1130:|DM5PR12MB1130:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB11307F02672977B7FE769C88F3A50@DM5PR12MB1130.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:983;
-X-Forefront-PRVS: 03965EFC76
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LA8P/Y6JxDI91OQNn738QNxhUzxkUuV5MwJRHPoQy+Z/Q3SvIBzUQ7IxwSSs9/vTRIuYD+zjQ/F/eyJaxiv/aEW9VWCWkliYQ9TYleTQcz/dZu1pbRavrktphoqBho6CkPVSv9Ob5tBHQkoD59+EybySCiKxZC5Dpxm0AnirAWoTpklVpo1xcrPhEAHBBJqHK/AGFrQMfSrRQo+bFh1KaSR1oS7DOPlSuXUH7CgVRHV7QadO/66h00ssR24cmRn1FcJtQxbb+qb11LJ4ZV4vA1EcZXFDxidEHCwzEWFa/71Lqg3rDMKIVJAiKusnSyYW7JeF5X+qjaW8qzuG5qmCt5rgFL4DzojoJ/1w+SPYxYiDu0IT+DK/zJL4s7hEgrpKZeX2FTGay3HwLJBqaJG+nrZ7owi64HXt2wBbOJpCaFI5gXAY28xORlIb9Wppjr1MRswKN7jayWWwV9Jq/i+ae9EJ0PtKK0d5vS4vizwJhW2GS13852C27K3lgsAv+l1gDt0OKxTMSuTBzPPL2wtJNFsSKJ6Cr3PQid3h2KM9UdNCLhxsOm/7RjEti5ZJKg6lyngzmc4iNj7meVPStkcdtGMA3ZRwOfEe0nVcqPAnxN4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1163.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(136003)(366004)(376002)(346002)(396003)(33430700001)(66946007)(8676002)(66556008)(8936002)(5660300002)(66476007)(4326008)(52116002)(16526019)(26005)(7696005)(966005)(6486002)(2906002)(478600001)(186003)(36756003)(316002)(2616005)(44832011)(33440700001)(6666004)(956004)(86362001)(83300400001)(83310400001)(83320400001)(83280400001)(83290400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: Y8+oeBfM0pPiW4vwcyTmbVZeMFYcHcIc3w3LJU04hjNgkkty9sc6xTacKMal7hlBZTG9r5NlkuoiESWHizsN4ufRUTlEV7WGYbcHKFrTJQVe0v3nVEFxBSeYWot9y+Tk/Dy9CWWAiwiKEEHWbxj82VWUH0AkSSavys+xePriqeel83TAoVYQlu49j3laNPqifLVA3iYFruZXuURreu8uKpvW19Vyb1yYcKTHs7wn80Tnue58cWnvmyfex/jAl/QV6ZjZHnxpaIoM3zhL6Yczud3zb8Dl3ZfwSNX6H0O45qw5ICBnhnjZhxrp+LHHtqv2pHZGa+7aq3Z+iNMayohaTBAOnFUiseIsGcU5JZYm8M4KoExbvyZN5lX4wXWYwyO7KaXmOlKQW3VsKrJ+hlwaIwOohaySvEem1vWejbtRaIIE5YIFOpEx9eEdaIZIkJ/nLu/3IRgBCzP5p1uVgABtQmDEzyjKNU+5A/hWcWiFwq/wGtm7sgQx26SsSFPlb09HJHG2F4f5Lj9Pae34JzwfsqO8o1E//vx4ap+KYKN7fakxz276agR1Leri5j94y5mDmzw1olrXUDM8Iya07i33AASuADPwzRZskVzWRyonhhTEF5oASfTnqd06UCRBLPTs5m240eaRqrkNatUAf6NjIXY3etSoTOVgKM6OK66xEWfWwpah3z0kFPbDaGIbfQMHTltFPI6y2pXhFOpqudiGWvgTBgyf57MX3s+VI2Ypbu9rx/62PvVBzziB06w9/WlpjIZnsuQoKjVqVWAS4hNGQ60xqoNVv9bvePMutKSqc1s=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 207996f9-af26-4e9f-177f-08d7f22f5850
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2020 02:35:45.7392
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DDn//I0STdTOc44A4YMJj+U1N9AY14vbYsw1r94xtrL20mPmvEEQ/H16MNjNzkOTHdAcyqZVWPjSuhTWBypc+g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1130
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200506084615.GA32841@rvkaganb>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The commit 64b5bd270426 ("KVM: nSVM: ignore L1 interrupt window
-while running L2 with V_INTR_MASKING=1") introduced a WARN_ON,
-which checks if AVIC is enabled when trying to set V_IRQ
-in the VMCB for enabling irq window.
+On 06/05/2020, Roman Kagan wrote:
+>On Wed, May 06, 2020 at 07:49:29AM +0300, Jon Doron wrote:
+>> Thanks Roman, I see your point, it's important for me to get the EDK2
+>> working properly not sure why it's not working for me.
+>
+>As I wrote a good deal of that code I hope I should be able to help (and
+>I'd be interested, too).  How exactly does the "not working" look like?
+>
 
-The following warning is triggered because the requesting vcpu
-(to deactivate AVIC) does not get to process APICv update request
-for itself until the next #vmexit.
+Basically when I built the BIOS from the hv-scsi branch you pointed me 
+out to, the BIOS did not see the virtio-blk device to boot from, I 
+usually take the BIOS from (https://www.kraxel.org/repos/) but I will 
+try to build the latest EDK2 and see if it identifies the virtio-blk 
+device and boots from it, if that's the case perhaps i just need to 
+rebase your branch over the latest master of EDK2.
 
-WARNING: CPU: 0 PID: 118232 at arch/x86/kvm/svm/svm.c:1372 enable_irq_window+0x6a/0xa0 [kvm_amd]
- RIP: 0010:enable_irq_window+0x6a/0xa0 [kvm_amd]
- Call Trace:
-  kvm_arch_vcpu_ioctl_run+0x6e3/0x1b50 [kvm]
-  ? kvm_vm_ioctl_irq_line+0x27/0x40 [kvm]
-  ? _copy_to_user+0x26/0x30
-  ? kvm_vm_ioctl+0xb3e/0xd90 [kvm]
-  ? set_next_entity+0x78/0xc0
-  kvm_vcpu_ioctl+0x236/0x610 [kvm]
-  ksys_ioctl+0x8a/0xc0
-  __x64_sys_ioctl+0x1a/0x20
-  do_syscall_64+0x58/0x210
-  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>Also I'm a bit confused as to why UEFI is critical for the work you're
+>doing?  Can't it be made to work with BIOS first?
+>
 
-Fixes by sending APICV update request to all other vcpus, and
-immediately update APIC for itself.
+The reason I want to have the UEFI option is because I need SecureBoot 
+to turn on VBS.
 
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Link: https://lkml.org/lkml/2020/5/2/167
-Fixes: 64b5bd270426 ("KVM: nSVM: ignore L1 interrupt window while running L2 with V_INTR_MASKING=1")
----
- arch/x86/kvm/x86.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+>> Do you know by any chance if the EDK2 hyperv patches were submitted and if
+>> they were why they were not merged in?
+>
+>I do, as I'm probably the only one who could have submitted them :)
+>
+>No they were not submitted.  Neither were the ones for SeaBIOS nor iPXE.
+>The reason was that I had found no way to use alternative firmware with
+>HyperV, so the only environment where that would be useful and testable
+>was QEMU with VMBus.  Therefore I thought it made no sense to submit
+>them until VMBus landed in QEMU.
+>
+>Thanks,
+>Roman.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index df473f9..69a01ea 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8085,6 +8085,7 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
-  */
- void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
- {
-+	struct kvm_vcpu *except;
- 	unsigned long old, new, expected;
- 
- 	if (!kvm_x86_ops.check_apicv_inhibit_reasons ||
-@@ -8110,7 +8111,17 @@ void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
- 	trace_kvm_apicv_update_request(activate, bit);
- 	if (kvm_x86_ops.pre_update_apicv_exec_ctrl)
- 		kvm_x86_ops.pre_update_apicv_exec_ctrl(kvm, activate);
--	kvm_make_all_cpus_request(kvm, KVM_REQ_APICV_UPDATE);
-+
-+	/*
-+	 * Sending request to update APICV for all other vcpus,
-+	 * while update the calling vcpu immediately instead of
-+	 * waiting for another #VMEXIT to handle the request.
-+	 */
-+	except = kvm_get_running_vcpu();
-+	kvm_make_all_cpus_request_except(kvm, KVM_REQ_APICV_UPDATE,
-+					 except);
-+	if (except)
-+		kvm_vcpu_update_apicv(except);
- }
- EXPORT_SYMBOL_GPL(kvm_request_apicv_update);
- 
--- 
-1.8.3.1
+Heh I see, well I'm really happy that you are here helping so we can try 
+and finally add VMBus to QEMU, I realize it's a big effort but I'm 
+willing to spend the time and do the required changes...
 
+I'm working this only during my free time so things takes me longer than 
+usual (sorry for that..)
+
+I will keep update on results once I get to test with latest EDK2 :) 
+
+Thanks,
+-- Jon.
