@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B72C11C86E5
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 12:35:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB83F1C86E7
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 12:35:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727083AbgEGKdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 06:33:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60496 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727067AbgEGKdA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 06:33:00 -0400
+        id S1727106AbgEGKdJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 06:33:09 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35082 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727084AbgEGKdH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 06:33:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588847578;
+        s=mimecast20190719; t=1588847586;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WsWC5kNCuNT2tK5daPiXWaoy0z2HcrZA36JQLbaWqFQ=;
-        b=cHsy9BcQVAl64yvviHiqjyd/gOqOrmUlh1Kc5yLgYMF2ilhsJX1vtrFsqH5+A3DpziBGs0
-        1x7C+vo6VjwVOxo1eoDbblTRH8ld+IZXwHTSJ9NA0MXsdJRI3q0+Ku0Qj0u82pj0L9ShQj
-        JkZJH8V/nafcaDcbtZVQByLs4DETNLQ=
+        bh=LfKs05RuoTQVAkleaDqaXa4vjxynrDAbg0h7VJOtKyY=;
+        b=UOu2Ds7owDyR0kyOjYjVZ7iJ3ztzUx4OM9cUFK1bD8z4AngfTFqiDzsBv8BIzEiskYoZyI
+        qsMivQVK3Pvw21oMJN+HI6kdua1gNH6yTHSVwapVbw5gry9Cg0SGUwxAK0U1ZncNLVQ+NT
+        65b+3Rpp4qTBUaUKRKnIa5/wnpAxPBg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-Y-DGf1eNMO2RvRtpmRn8vw-1; Thu, 07 May 2020 06:32:53 -0400
-X-MC-Unique: Y-DGf1eNMO2RvRtpmRn8vw-1
+ us-mta-357-CMkwtfsPM12pJ7l3auCYKg-1; Thu, 07 May 2020 06:33:02 -0400
+X-MC-Unique: CMkwtfsPM12pJ7l3auCYKg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 370CB1005510;
-        Thu,  7 May 2020 10:32:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18828107ACF3;
+        Thu,  7 May 2020 10:33:00 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A6265D9C5;
-        Thu,  7 May 2020 10:32:42 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 820BC5D9C5;
+        Thu,  7 May 2020 10:32:51 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
@@ -41,163 +41,118 @@ Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
         Andrew Morton <akpm@linux-foundation.org>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         David Hildenbrand <david@redhat.com>,
+        Michal Hocko <mhocko@suse.com>,
         Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Dave Young <dyoung@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
+        Oscar Salvador <osalvador@suse.com>,
         Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>
-Subject: [PATCH v3 06/15] virtio-mem: Allow to offline partially unplugged memory blocks
-Date:   Thu,  7 May 2020 12:31:10 +0200
-Message-Id: <20200507103119.11219-7-david@redhat.com>
+        Wei Yang <richard.weiyang@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
+Subject: [PATCH v3 07/15] mm/memory_hotplug: Introduce offline_and_remove_memory()
+Date:   Thu,  7 May 2020 12:31:11 +0200
+Message-Id: <20200507103119.11219-8-david@redhat.com>
 In-Reply-To: <20200507103119.11219-1-david@redhat.com>
 References: <20200507103119.11219-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dropping the reference count of PageOffline() pages during MEM_GOING_ONLINE
-allows offlining code to skip them. However, we also have to clear
-PG_reserved, because PG_reserved pages get detected as unmovable right
-away. Take care of restoring the reference count when offlining is
-canceled.
+virtio-mem wants to offline and remove a memory block once it unplugged
+all subblocks (e.g., using alloc_contig_range()). Let's provide
+an interface to do that from a driver. virtio-mem already supports to
+offline partially unplugged memory blocks. Offlining a fully unplugged
+memory block will not require to migrate any pages. All unplugged
+subblocks are PageOffline() and have a reference count of 0 - so
+offlining code will simply skip them.
 
-Clarify why we don't have to perform any action when unloading the
-driver. Also, let's add a warning if anybody is still holding a
-reference to unplugged pages when offlining.
+All we need is an interface to offline and remove the memory from kernel
+module context, where we don't have access to the memory block devices
+(esp. find_memory_block() and device_offline()) and the device hotplug
+lock.
 
+To keep things simple, allow to only work on a single memory block.
+
+Acked-by: Michal Hocko <mhocko@suse.com>
 Tested-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Oscar Salvador <osalvador@suse.de>
-Cc: Michal Hocko <mhocko@kernel.org>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Dave Young <dyoung@redhat.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Oscar Salvador <osalvador@suse.com>
+Cc: Michal Hocko <mhocko@suse.com>
 Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>
+Cc: Wei Yang <richard.weiyang@gmail.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Qian Cai <cai@lca.pw>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- drivers/virtio/virtio_mem.c | 68 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 67 insertions(+), 1 deletion(-)
+ include/linux/memory_hotplug.h |  1 +
+ mm/memory_hotplug.c            | 37 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
-index 74f0d3cb1d22..b0b41c73ce89 100644
---- a/drivers/virtio/virtio_mem.c
-+++ b/drivers/virtio/virtio_mem.c
-@@ -572,6 +572,57 @@ static void virtio_mem_notify_online(struct virtio_mem *vm, unsigned long mb_id,
- 		virtio_mem_retry(vm);
+diff --git a/include/linux/memory_hotplug.h b/include/linux/memory_hotplu=
+g.h
+index 7dca9cd6076b..d641828e5596 100644
+--- a/include/linux/memory_hotplug.h
++++ b/include/linux/memory_hotplug.h
+@@ -318,6 +318,7 @@ extern void try_offline_node(int nid);
+ extern int offline_pages(unsigned long start_pfn, unsigned long nr_pages=
+);
+ extern int remove_memory(int nid, u64 start, u64 size);
+ extern void __remove_memory(int nid, u64 start, u64 size);
++extern int offline_and_remove_memory(int nid, u64 start, u64 size);
+=20
+ #else
+ static inline void try_offline_node(int nid) {}
+diff --git a/mm/memory_hotplug.c b/mm/memory_hotplug.c
+index 936bfe208a6e..bf1941f02a60 100644
+--- a/mm/memory_hotplug.c
++++ b/mm/memory_hotplug.c
+@@ -1748,4 +1748,41 @@ int remove_memory(int nid, u64 start, u64 size)
+ 	return rc;
  }
- 
-+static void virtio_mem_notify_going_offline(struct virtio_mem *vm,
-+					    unsigned long mb_id)
+ EXPORT_SYMBOL_GPL(remove_memory);
++
++/*
++ * Try to offline and remove a memory block. Might take a long time to
++ * finish in case memory is still in use. Primarily useful for memory de=
+vices
++ * that logically unplugged all memory (so it's no longer in use) and wa=
+nt to
++ * offline + remove the memory block.
++ */
++int offline_and_remove_memory(int nid, u64 start, u64 size)
 +{
-+	const unsigned long nr_pages = PFN_DOWN(vm->subblock_size);
-+	struct page *page;
-+	unsigned long pfn;
-+	int sb_id, i;
++	struct memory_block *mem;
++	int rc =3D -EINVAL;
 +
-+	for (sb_id = 0; sb_id < vm->nb_sb_per_mb; sb_id++) {
-+		if (virtio_mem_mb_test_sb_plugged(vm, mb_id, sb_id, 1))
-+			continue;
-+		/*
-+		 * Drop our reference to the pages so the memory can get
-+		 * offlined and add the unplugged pages to the managed
-+		 * page counters (so offlining code can correctly subtract
-+		 * them again).
-+		 */
-+		pfn = PFN_DOWN(virtio_mem_mb_id_to_phys(mb_id) +
-+			       sb_id * vm->subblock_size);
-+		adjust_managed_page_count(pfn_to_page(pfn), nr_pages);
-+		for (i = 0; i < nr_pages; i++) {
-+			page = pfn_to_page(pfn + i);
-+			if (WARN_ON(!page_ref_dec_and_test(page)))
-+				dump_page(page, "unplugged page referenced");
-+		}
-+	}
-+}
++	if (!IS_ALIGNED(start, memory_block_size_bytes()) ||
++	    size !=3D memory_block_size_bytes())
++		return rc;
 +
-+static void virtio_mem_notify_cancel_offline(struct virtio_mem *vm,
-+					     unsigned long mb_id)
-+{
-+	const unsigned long nr_pages = PFN_DOWN(vm->subblock_size);
-+	unsigned long pfn;
-+	int sb_id, i;
++	lock_device_hotplug();
++	mem =3D find_memory_block(__pfn_to_section(PFN_DOWN(start)));
++	if (mem)
++		rc =3D device_offline(&mem->dev);
++	/* Ignore if the device is already offline. */
++	if (rc > 0)
++		rc =3D 0;
 +
-+	for (sb_id = 0; sb_id < vm->nb_sb_per_mb; sb_id++) {
-+		if (virtio_mem_mb_test_sb_plugged(vm, mb_id, sb_id, 1))
-+			continue;
-+		/*
-+		 * Get the reference we dropped when going offline and
-+		 * subtract the unplugged pages from the managed page
-+		 * counters.
-+		 */
-+		pfn = PFN_DOWN(virtio_mem_mb_id_to_phys(mb_id) +
-+			       sb_id * vm->subblock_size);
-+		adjust_managed_page_count(pfn_to_page(pfn), -nr_pages);
-+		for (i = 0; i < nr_pages; i++)
-+			page_ref_inc(pfn_to_page(pfn + i));
-+	}
-+}
-+
- /*
-  * This callback will either be called synchronously from add_memory() or
-  * asynchronously (e.g., triggered via user space). We have to be careful
-@@ -618,6 +669,7 @@ static int virtio_mem_memory_notifier_cb(struct notifier_block *nb,
- 			break;
- 		}
- 		vm->hotplug_active = true;
-+		virtio_mem_notify_going_offline(vm, mb_id);
- 		break;
- 	case MEM_GOING_ONLINE:
- 		mutex_lock(&vm->hotplug_mutex);
-@@ -642,6 +694,12 @@ static int virtio_mem_memory_notifier_cb(struct notifier_block *nb,
- 		mutex_unlock(&vm->hotplug_mutex);
- 		break;
- 	case MEM_CANCEL_OFFLINE:
-+		if (!vm->hotplug_active)
-+			break;
-+		virtio_mem_notify_cancel_offline(vm, mb_id);
-+		vm->hotplug_active = false;
-+		mutex_unlock(&vm->hotplug_mutex);
-+		break;
- 	case MEM_CANCEL_ONLINE:
- 		if (!vm->hotplug_active)
- 			break;
-@@ -668,8 +726,11 @@ static void virtio_mem_set_fake_offline(unsigned long pfn,
- 		struct page *page = pfn_to_page(pfn);
- 
- 		__SetPageOffline(page);
--		if (!onlined)
-+		if (!onlined) {
- 			SetPageDirty(page);
-+			/* FIXME: remove after cleanups */
-+			ClearPageReserved(page);
-+		}
- 	}
- }
- 
-@@ -1722,6 +1783,11 @@ static void virtio_mem_remove(struct virtio_device *vdev)
- 		BUG_ON(rc);
- 		virtio_mem_mb_set_state(vm, mb_id, VIRTIO_MEM_MB_STATE_UNUSED);
- 	}
 +	/*
-+	 * After we unregistered our callbacks, user space can no longer
-+	 * offline partially plugged online memory blocks. No need to worry
-+	 * about them.
++	 * In case we succeeded to offline the memory block, remove it.
++	 * This cannot fail as it cannot get onlined in the meantime.
 +	 */
- 
- 	/* unregister callbacks */
- 	unregister_virtio_mem_device(vm);
--- 
++	if (!rc) {
++		rc =3D try_remove_memory(nid, start, size);
++		WARN_ON_ONCE(rc);
++	}
++	unlock_device_hotplug();
++
++	return rc;
++}
++EXPORT_SYMBOL_GPL(offline_and_remove_memory);
+ #endif /* CONFIG_MEMORY_HOTREMOVE */
+--=20
 2.25.3
 
