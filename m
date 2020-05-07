@@ -2,113 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B26A41C9924
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 20:20:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD4FB1C992B
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 20:22:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbgEGSUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 14:20:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57105 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726320AbgEGSUF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 14:20:05 -0400
+        id S1728098AbgEGSW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 14:22:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31852 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726367AbgEGSW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 14:22:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588875604;
+        s=mimecast20190719; t=1588875746;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UgewtUy9bTNyZauHpI56baWIlBcAHHHwwe5CUmUNguk=;
-        b=f24JsHq8PIKEvtblQYnI2TrRqm+Qen4tcuhV/o0POV/9Dvx9dcPvhu98fjIUaxy4scESW9
-        u5Szl+Dbj7tRAhXWoEX8rov856u3+DmqzAaDIyn1OXOxQbIbPitrqZRpABgA4ojjJQQMYl
-        LL/RQjaXv2KXVISaf69TOgPnWrMgFk4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-1X-11krePSqtA8qFXcj8yA-1; Thu, 07 May 2020 14:20:00 -0400
-X-MC-Unique: 1X-11krePSqtA8qFXcj8yA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C257107ACCD;
-        Thu,  7 May 2020 18:19:58 +0000 (UTC)
-Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 98CB970559;
-        Thu,  7 May 2020 18:19:56 +0000 (UTC)
-Date:   Thu, 7 May 2020 12:19:56 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH Kernel v18 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200507121956.45b2500f@x1.home>
-In-Reply-To: <24223faa-15ac-bd71-6c5d-9d0401fbd839@nvidia.com>
-References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
-        <1588607939-26441-5-git-send-email-kwankhede@nvidia.com>
-        <20200506081510.GC19334@joy-OptiPlex-7040>
-        <24223faa-15ac-bd71-6c5d-9d0401fbd839@nvidia.com>
-Organization: Red Hat
+        bh=uY7dbQBmsUoAzmKGSYRJNZ21+7owwaWmUZw/eXb9gjM=;
+        b=F82e2qyYhONLSEbuO63WFstwg/Sa+EwwQnZ8qPm5xt6JY7dFsp2GNbzyiQl1wz63f4q5do
+        69mU1hpCPSH218Nvuw2wQdVmTg6FGyDIi/bxZkD5VMurhlZ4mLyHmgqvfQ+Yt7bb4TU1Pl
+        x9xMeDM7oF3TmTI82iuBtqfY7i46oH8=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-mE5_Yw-WN_qSqMu4OJ7Jng-1; Thu, 07 May 2020 14:22:23 -0400
+X-MC-Unique: mE5_Yw-WN_qSqMu4OJ7Jng-1
+Received: by mail-qk1-f199.google.com with SMTP id d19so6658267qkj.21
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 11:22:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uY7dbQBmsUoAzmKGSYRJNZ21+7owwaWmUZw/eXb9gjM=;
+        b=BYIcMd3ibD5K79xyMXpxyP6OUkBI4cwaHlLLYrszQZKfByFGxsmdnJ9N9NaCA85C0O
+         /4FasIESkn/jKYAUb4wlHf0MBJBNT9+1apTtkKFQgEMMPEeZNgkPWUDObNTEDEIe3fp3
+         lnL4k0MB+7MOScyottjed/H5B0cXfB51Qa7qxgSlzQIvBdprCBTOVdiwg27Q0QtClsAu
+         /2NNYTy9L0vhHBjIEYoTBDUpCvp/xMXGmzLvctAEqgdvGZK13dreWfyHo5Mf1auReBKx
+         fp8//uQJ3VKDtuZjJncO89fE/O+wmApuHCPOzsiT8ilVL+2sqeLh8bBL1CewYVUCOHuK
+         EodA==
+X-Gm-Message-State: AGi0Pua401/xv8ZRwSl06FO/O3gGWfnKgjDcqbN/07ZlNGpcB6gMVCl1
+        DDS6yNfxz054jnXmo9yHWHmhYVElAZT0xaDl2KrUBIuDm8o+UnSPo6Vl5pqIlTkjbHto3VltVyZ
+        9/4vnY8gC5ovb
+X-Received: by 2002:a05:620a:3c5:: with SMTP id r5mr16131927qkm.138.1588875742718;
+        Thu, 07 May 2020 11:22:22 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJtNBFACRv+C675BBmb3U5pDjlBVo0aQUE1Kz2y73CScdi8+R9TWP79HmHhMhLl2mdB+odeyQ==
+X-Received: by 2002:a05:620a:3c5:: with SMTP id r5mr16131906qkm.138.1588875742430;
+        Thu, 07 May 2020 11:22:22 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id y3sm4857000qkc.4.2020.05.07.11.22.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2020 11:22:21 -0700 (PDT)
+Date:   Thu, 7 May 2020 14:22:20 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 7/9] KVM: SVM: keep DR6 synchronized with
+ vcpu->arch.dr6
+Message-ID: <20200507182220.GI228260@xz-x1>
+References: <20200507115011.494562-1-pbonzini@redhat.com>
+ <20200507115011.494562-8-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200507115011.494562-8-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 7 May 2020 01:12:25 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Thu, May 07, 2020 at 07:50:09AM -0400, Paolo Bonzini wrote:
+> @@ -267,7 +268,7 @@ void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
+>  	svm->vmcb->save.rsp = nested_vmcb->save.rsp;
+>  	svm->vmcb->save.rip = nested_vmcb->save.rip;
+>  	svm->vmcb->save.dr7 = nested_vmcb->save.dr7;
+> -	svm->vmcb->save.dr6 = nested_vmcb->save.dr6;
+> +	svm->vcpu.arch.dr6  = nested_vmcb->save.dr6;
 
-> On 5/6/2020 1:45 PM, Yan Zhao wrote:
-> > On Mon, May 04, 2020 at 11:58:56PM +0800, Kirti Wankhede wrote:  
-> 
-> <snip>
-> 
-> >>   /*
-> >>    * Helper Functions for host iova-pfn list
-> >>    */
-> >> @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> >>   			vfio_unpin_page_external(dma, iova, do_accounting);
-> >>   			goto pin_unwind;
-> >>   		}
-> >> +
-> >> +		if (iommu->dirty_page_tracking) {
-> >> +			unsigned long pgshift =
-> >> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> >> +  
-> > hi Kirti,
-> > may I know if there's any vfio_pin_pages() happpening during NVidia's vGPU migration?
-> > the code would enter into deadlock as I reported in last version.
-> >   
-> 
-> Hm, you are right and same is the case in vfio_iommu_type1_dma_rw_chunk().
-> 
-> Instead of calling vfio_pgsize_bitmap() from lots of places, I'm 
-> thinking of saving pgsize_bitmap in struct vfio_iommu, which should be 
-> populated whenever domain_list is updated. Alex, will that be fine?
+The rest looks very sane to me, but here I failed to figure out how arch.dr6
+finally applied to save.dr6.  I saw it is applied in svm_vcpu_run() in the next
+patch, but if that's the case then iiuc this commit may break bisection. Thanks,
 
-I've wondered why we don't already cache this, so yes, that's fine, but
-the cached value will only be valid when evaluated under iommu->lock.
-Thanks,
-
-Alex
+-- 
+Peter Xu
 
