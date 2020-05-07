@@ -2,168 +2,425 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D31A1C94B3
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 17:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A606A1C95E2
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 18:03:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727956AbgEGPRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 11:17:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54523 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726860AbgEGPRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 11:17:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588864635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z/OlOzT8kXQ9tIV1zzNzkxq8AeByeB5Iybv/LYpMqOY=;
-        b=B09M4sQNDoyQkpvFWzQbYAO7WD8zs6e/bvAgF5aK6/okOVxDRkZe9XJJhEjI5/J6x1xg+C
-        kKTB+FSg2kZCy9xFQYDC0LG2TdjGXGqxvdPDSzNsaL3CWHZyu4HGddB4/kjaDzusk2ubia
-        QQJDl4jZQfSZgoPMSYM8GrwMjxCirZA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-YmlexjKBPbq3u_QbS9JsXQ-1; Thu, 07 May 2020 11:17:13 -0400
-X-MC-Unique: YmlexjKBPbq3u_QbS9JsXQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1625B473;
-        Thu,  7 May 2020 15:17:11 +0000 (UTC)
-Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CFC8D9323;
-        Thu,  7 May 2020 15:17:07 +0000 (UTC)
-Date:   Thu, 7 May 2020 09:17:06 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH Kernel v18 6/7] vfio iommu: Add migration capability to
- report supported features
-Message-ID: <20200507091706.4ca1508e@x1.home>
-In-Reply-To: <79f1a586-52be-ab72-493a-3a3c5ae6e252@nvidia.com>
-References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
-        <1588607939-26441-7-git-send-email-kwankhede@nvidia.com>
-        <20200506162738.6e08dbf2@w520.home>
-        <79f1a586-52be-ab72-493a-3a3c5ae6e252@nvidia.com>
-Organization: Red Hat
+        id S1726641AbgEGQDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 12:03:16 -0400
+Received: from namei.org ([65.99.196.166]:57536 "EHLO namei.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725969AbgEGQDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 12:03:15 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by namei.org (8.14.4/8.14.4) with ESMTP id 047G2fNj024861;
+        Thu, 7 May 2020 16:02:41 GMT
+Date:   Fri, 8 May 2020 02:02:41 +1000 (AEST)
+From:   James Morris <jmorris@namei.org>
+To:     Daniel Colascione <dancol@google.com>,
+        Al Viro <viro@ftp.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>
+cc:     timmurray@google.com, selinux@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paul Moore <paul@paul-moore.com>,
+        nnk@google.com, Stephen Smalley <sds@tycho.nsa.gov>,
+        lokeshgidra@google.com
+Subject: Re: [PATCH v5 1/3] Add a new LSM-supporting anonymous inode
+ interface
+In-Reply-To: <20200401213903.182112-2-dancol@google.com>
+Message-ID: <alpine.LRH.2.21.2005080201220.15191@namei.org>
+References: <20200326200634.222009-1-dancol@google.com> <20200401213903.182112-1-dancol@google.com> <20200401213903.182112-2-dancol@google.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 7 May 2020 11:07:26 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Wed, 1 Apr 2020, Daniel Colascione wrote:
 
-> On 5/7/2020 3:57 AM, Alex Williamson wrote:
-> > On Mon, 4 May 2020 21:28:58 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> Added migration capability in IOMMU info chain.
-> >> User application should check IOMMU info chain for migration capability
-> >> to use dirty page tracking feature provided by kernel module.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> ---
-> >>   drivers/vfio/vfio_iommu_type1.c | 15 +++++++++++++++
-> >>   include/uapi/linux/vfio.h       | 14 ++++++++++++++
-> >>   2 files changed, 29 insertions(+)
-> >>
-> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >> index 8b27faf1ec38..b38d278d7bff 100644
-> >> --- a/drivers/vfio/vfio_iommu_type1.c
-> >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >> @@ -2378,6 +2378,17 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
-> >>   	return ret;
-> >>   }
-> >>   
-> >> +static int vfio_iommu_migration_build_caps(struct vfio_info_cap *caps)
-> >> +{
-> >> +	struct vfio_iommu_type1_info_cap_migration cap_mig;
-> >> +
-> >> +	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
-> >> +	cap_mig.header.version = 1;
-> >> +	cap_mig.flags = VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK;
-> >> +
-> >> +	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
-> >> +}
-> >> +
-> >>   static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >>   				   unsigned int cmd, unsigned long arg)
-> >>   {
-> >> @@ -2427,6 +2438,10 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >>   		if (ret)
-> >>   			return ret;
-> >>   
-> >> +		ret = vfio_iommu_migration_build_caps(&caps);
-> >> +		if (ret)
-> >> +			return ret;
-> >> +
-> >>   		if (caps.size) {
-> >>   			info.flags |= VFIO_IOMMU_INFO_CAPS;
-> >>   
-> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> >> index e3cbf8b78623..df9ce8aaafab 100644
-> >> --- a/include/uapi/linux/vfio.h
-> >> +++ b/include/uapi/linux/vfio.h
-> >> @@ -1013,6 +1013,20 @@ struct vfio_iommu_type1_info_cap_iova_range {
-> >>   	struct	vfio_iova_range iova_ranges[];
-> >>   };
-> >>   
-> >> +/*
-> >> + * The migration capability allows to report supported features for migration.
-> >> + *
-> >> + * The structures below define version 1 of this capability.
-> >> + */
-> >> +#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
-> >> +
-> >> +struct vfio_iommu_type1_info_cap_migration {
-> >> +	struct	vfio_info_cap_header header;
-> >> +	__u32	flags;
-> >> +	/* supports dirty page tracking */
-> >> +#define VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK	(1 << 0)
-> >> +};
-> >> +  
-> > 
-> > What about exposing the maximum supported dirty bitmap size and the
-> > supported page sizes?  Thanks,
-> >   
+> This change adds two new functions, anon_inode_getfile_secure and
+> anon_inode_getfd_secure, that create anonymous-node files with
+> individual non-S_PRIVATE inodes to which security modules can apply
+> policy. Existing callers continue using the original singleton-inode
+> kind of anonymous-inode file. We can transition anonymous inode users
+> to the new kind of anonymous inode in individual patches for the sake
+> of bisection and review.
 > 
-> How should user application use that?
+> The new functions accept an optional context_inode parameter that
+> callers can use to provide additional contextual information to
+> security modules, e.g., indicating that one anonymous struct file is a
+> logical child of another, allowing a security model to propagate
+> security information from one to the other.
+> 
+> Signed-off-by: Daniel Colascione <dancol@google.com>
 
-How does a user application currently discover that only a PAGE_SIZE
-dirty bitmap granularity is supported or that the when performing an
-unmap while requesting the dirty bitmap, those unmaps need to be
-chunked to no more than 2^31 * PAGE_SIZE?  I don't see anything in the
-uapi that expresses these restrictions.
+Al, Andrew, wondering if you could look at these anon inode changes 
+before we merge this?
 
-It seems we're currently relying on the QEMU implementation to
-coincide with bitmap granularity support, with no mechanism other than
-trial and error to validate or expand that support.  Likewise, I think
-it's largely a coincidence that KVM also has the same slot size
-restrictions, so we're unlikely to see an unmap exceeding this limit,
-but our api does not restrict an unmap to only cover a single mapping.
-We probably also need to think about whether we need to expose a
-mapping chunk limitation separately or if it should be extrapolated
-from the migration support (we might have non-migration reasons to
-limit it at some point).
 
-If we leave these as assumptions then we risk breaking userspace or
-limiting the usefulness of expending this support.  If we include
-within the uapi a mechanism for learning about these restrictions, then
-it becomes a userspace problem to follow the uapi and take advantage of
-the uapi provided.  Thanks,
 
-Alex
+> ---
+>  fs/anon_inodes.c            | 191 ++++++++++++++++++++++++++++--------
+>  include/linux/anon_inodes.h |  13 +++
+>  include/linux/lsm_hooks.h   |  11 +++
+>  include/linux/security.h    |   3 +
+>  security/security.c         |   9 ++
+>  5 files changed, 186 insertions(+), 41 deletions(-)
+> 
+> diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
+> index 89714308c25b..f87f221167cf 100644
+> --- a/fs/anon_inodes.c
+> +++ b/fs/anon_inodes.c
+> @@ -55,61 +55,108 @@ static struct file_system_type anon_inode_fs_type = {
+>  	.kill_sb	= kill_anon_super,
+>  };
+>  
+> -/**
+> - * anon_inode_getfile - creates a new file instance by hooking it up to an
+> - *                      anonymous inode, and a dentry that describe the "class"
+> - *                      of the file
+> - *
+> - * @name:    [in]    name of the "class" of the new file
+> - * @fops:    [in]    file operations for the new file
+> - * @priv:    [in]    private data for the new file (will be file's private_data)
+> - * @flags:   [in]    flags
+> - *
+> - * Creates a new file by hooking it on a single inode. This is useful for files
+> - * that do not need to have a full-fledged inode in order to operate correctly.
+> - * All the files created with anon_inode_getfile() will share a single inode,
+> - * hence saving memory and avoiding code duplication for the file/inode/dentry
+> - * setup.  Returns the newly created file* or an error pointer.
+> - */
+> -struct file *anon_inode_getfile(const char *name,
+> -				const struct file_operations *fops,
+> -				void *priv, int flags)
+> +static struct inode *anon_inode_make_secure_inode(
+> +	const char *name,
+> +	const struct inode *context_inode)
+> +{
+> +	struct inode *inode;
+> +	const struct qstr qname = QSTR_INIT(name, strlen(name));
+> +	int error;
+> +
+> +	inode = alloc_anon_inode(anon_inode_mnt->mnt_sb);
+> +	if (IS_ERR(inode))
+> +		return inode;
+> +	inode->i_flags &= ~S_PRIVATE;
+> +	error =	security_inode_init_security_anon(
+> +		inode, &qname, context_inode);
+> +	if (error) {
+> +		iput(inode);
+> +		return ERR_PTR(error);
+> +	}
+> +	return inode;
+> +}
+> +
+> +struct file *_anon_inode_getfile(const char *name,
+> +				 const struct file_operations *fops,
+> +				 void *priv, int flags,
+> +				 const struct inode *context_inode,
+> +				 bool secure)
+>  {
+> +	struct inode *inode;
+>  	struct file *file;
+>  
+> -	if (IS_ERR(anon_inode_inode))
+> -		return ERR_PTR(-ENODEV);
+> +	if (secure) {
+> +		inode =	anon_inode_make_secure_inode(
+> +			name, context_inode);
+> +		if (IS_ERR(inode))
+> +			return ERR_PTR(PTR_ERR(inode));
+> +	} else {
+> +		inode =	anon_inode_inode;
+> +		if (IS_ERR(inode))
+> +			return ERR_PTR(-ENODEV);
+> +		/*
+> +		 * We know the anon_inode inode count is always
+> +		 * greater than zero, so ihold() is safe.
+> +		 */
+> +		ihold(inode);
+> +	}
+>  
+> -	if (fops->owner && !try_module_get(fops->owner))
+> -		return ERR_PTR(-ENOENT);
+> +	if (fops->owner && !try_module_get(fops->owner)) {
+> +		file = ERR_PTR(-ENOENT);
+> +		goto err;
+> +	}
+>  
+> -	/*
+> -	 * We know the anon_inode inode count is always greater than zero,
+> -	 * so ihold() is safe.
+> -	 */
+> -	ihold(anon_inode_inode);
+> -	file = alloc_file_pseudo(anon_inode_inode, anon_inode_mnt, name,
+> +	file = alloc_file_pseudo(inode, anon_inode_mnt, name,
+>  				 flags & (O_ACCMODE | O_NONBLOCK), fops);
+>  	if (IS_ERR(file))
+>  		goto err;
+>  
+> -	file->f_mapping = anon_inode_inode->i_mapping;
+> +	file->f_mapping = inode->i_mapping;
+>  
+>  	file->private_data = priv;
+>  
+>  	return file;
+>  
+>  err:
+> -	iput(anon_inode_inode);
+> +	iput(inode);
+>  	module_put(fops->owner);
+>  	return file;
+>  }
+> -EXPORT_SYMBOL_GPL(anon_inode_getfile);
+>  
+>  /**
+> - * anon_inode_getfd - creates a new file instance by hooking it up to an
+> - *                    anonymous inode, and a dentry that describe the "class"
+> - *                    of the file
+> + * anon_inode_getfile_secure - creates a new file instance by hooking
+> + *                             it up to a new anonymous inode and a
+> + *                             dentry that describe the "class" of the
+> + *                             file.  Make it possible to use security
+> + *                             modules to control access to the
+> + *                             new file.
+> + *
+> + * @name:    [in]    name of the "class" of the new file
+> + * @fops:    [in]    file operations for the new file
+> + * @priv:    [in]    private data for the new file (will be file's private_data)
+> + * @flags:   [in]    flags
+> + *
+> + * Creates a new file by hooking it on an unspecified inode. This is
+> + * useful for files that do not need to have a full-fledged filesystem
+> + * to operate correctly.  All the files created with
+> + * anon_inode_getfile_secure() will have distinct inodes, avoiding
+> + * code duplication for the file/inode/dentry setup.  Returns the
+> + * newly created file* or an error pointer.
+> + */
+> +struct file *anon_inode_getfile_secure(const char *name,
+> +				       const struct file_operations *fops,
+> +				       void *priv, int flags,
+> +				       const struct inode *context_inode)
+> +{
+> +	return _anon_inode_getfile(
+> +		name, fops, priv, flags, context_inode, true);
+> +}
+> +EXPORT_SYMBOL_GPL(anon_inode_getfile_secure);
+> +
+> +/**
+> + * anon_inode_getfile - creates a new file instance by hooking it up to an
+> + *                      anonymous inode, and a dentry that describe the "class"
+> + *                      of the file
+>   *
+>   * @name:    [in]    name of the "class" of the new file
+>   * @fops:    [in]    file operations for the new file
+> @@ -118,12 +165,23 @@ EXPORT_SYMBOL_GPL(anon_inode_getfile);
+>   *
+>   * Creates a new file by hooking it on a single inode. This is useful for files
+>   * that do not need to have a full-fledged inode in order to operate correctly.
+> - * All the files created with anon_inode_getfd() will share a single inode,
+> + * All the files created with anon_inode_getfile() will share a single inode,
+>   * hence saving memory and avoiding code duplication for the file/inode/dentry
+> - * setup.  Returns new descriptor or an error code.
+> + * setup.  Returns the newly created file* or an error pointer.
+>   */
+> -int anon_inode_getfd(const char *name, const struct file_operations *fops,
+> -		     void *priv, int flags)
+> +struct file *anon_inode_getfile(const char *name,
+> +				const struct file_operations *fops,
+> +				void *priv, int flags)
+> +{
+> +	return _anon_inode_getfile(name, fops, priv, flags, NULL, false);
+> +}
+> +EXPORT_SYMBOL_GPL(anon_inode_getfile);
+> +
+> +static int _anon_inode_getfd(const char *name,
+> +			     const struct file_operations *fops,
+> +			     void *priv, int flags,
+> +			     const struct inode *context_inode,
+> +			     bool secure)
+>  {
+>  	int error, fd;
+>  	struct file *file;
+> @@ -133,7 +191,8 @@ int anon_inode_getfd(const char *name, const struct file_operations *fops,
+>  		return error;
+>  	fd = error;
+>  
+> -	file = anon_inode_getfile(name, fops, priv, flags);
+> +	file = _anon_inode_getfile(name, fops, priv, flags, context_inode,
+> +				   secure);
+>  	if (IS_ERR(file)) {
+>  		error = PTR_ERR(file);
+>  		goto err_put_unused_fd;
+> @@ -146,6 +205,57 @@ int anon_inode_getfd(const char *name, const struct file_operations *fops,
+>  	put_unused_fd(fd);
+>  	return error;
+>  }
+> +
+> +/**
+> + * anon_inode_getfd_secure - creates a new file instance by hooking it
+> + *                           up to a new anonymous inode and a dentry
+> + *                           that describe the "class" of the file.
+> + *                           Make it possible to use security modules
+> + *                           to control access to the new file.
+> + *
+> + * @name:    [in]    name of the "class" of the new file
+> + * @fops:    [in]    file operations for the new file
+> + * @priv:    [in]    private data for the new file (will be file's private_data)
+> + * @flags:   [in]    flags
+> + *
+> + * Creates a new file by hooking it on an unspecified inode. This is
+> + * useful for files that do not need to have a full-fledged filesystem
+> + * to operate correctly.  All the files created with
+> + * anon_inode_getfile_secure() will have distinct inodes, avoiding
+> + * code duplication for the file/inode/dentry setup.  Returns a newly
+> + * created file descriptor or an error code.
+> + */
+> +int anon_inode_getfd_secure(const char *name, const struct file_operations *fops,
+> +			    void *priv, int flags,
+> +			    const struct inode *context_inode)
+> +{
+> +	return _anon_inode_getfd(name, fops, priv, flags,
+> +				 context_inode, true);
+> +}
+> +EXPORT_SYMBOL_GPL(anon_inode_getfd_secure);
+> +
+> +/**
+> + * anon_inode_getfd - creates a new file instance by hooking it up to
+> + *                    an anonymous inode and a dentry that describe
+> + *                    the "class" of the file
+> + *
+> + * @name:    [in]    name of the "class" of the new file
+> + * @fops:    [in]    file operations for the new file
+> + * @priv:    [in]    private data for the new file (will be file's private_data)
+> + * @flags:   [in]    flags
+> + *
+> + * Creates a new file by hooking it on a single inode. This is
+> + * useful for files that do not need to have a full-fledged inode in
+> + * order to operate correctly.  All the files created with
+> + * anon_inode_getfile() will use the same singleton inode, reducing
+> + * memory use and avoiding code duplication for the file/inode/dentry
+> + * setup.  Returns a newly created file descriptor or an error code.
+> + */
+> +int anon_inode_getfd(const char *name, const struct file_operations *fops,
+> +		     void *priv, int flags)
+> +{
+> +	return _anon_inode_getfd(name, fops, priv, flags, NULL, false);
+> +}
+>  EXPORT_SYMBOL_GPL(anon_inode_getfd);
+>  
+>  static int __init anon_inode_init(void)
+> @@ -162,4 +272,3 @@ static int __init anon_inode_init(void)
+>  }
+>  
+>  fs_initcall(anon_inode_init);
+> -
+> diff --git a/include/linux/anon_inodes.h b/include/linux/anon_inodes.h
+> index d0d7d96261ad..67bd85d92dca 100644
+> --- a/include/linux/anon_inodes.h
+> +++ b/include/linux/anon_inodes.h
+> @@ -10,12 +10,25 @@
+>  #define _LINUX_ANON_INODES_H
+>  
+>  struct file_operations;
+> +struct inode;
+> +
+> +struct file *anon_inode_getfile_secure(const char *name,
+> +				       const struct file_operations *fops,
+> +				       void *priv, int flags,
+> +				       const struct inode *context_inode);
+>  
+>  struct file *anon_inode_getfile(const char *name,
+>  				const struct file_operations *fops,
+>  				void *priv, int flags);
+> +
+> +int anon_inode_getfd_secure(const char *name,
+> +			    const struct file_operations *fops,
+> +			    void *priv, int flags,
+> +			    const struct inode *context_inode);
+> +
+>  int anon_inode_getfd(const char *name, const struct file_operations *fops,
+>  		     void *priv, int flags);
+>  
+> +
+>  #endif /* _LINUX_ANON_INODES_H */
+>  
+> diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
+> index 20d8cf194fb7..5434c1d285b2 100644
+> --- a/include/linux/lsm_hooks.h
+> +++ b/include/linux/lsm_hooks.h
+> @@ -215,6 +215,13 @@
+>   *	Returns 0 if @name and @value have been successfully set,
+>   *	-EOPNOTSUPP if no security attribute is needed, or
+>   *	-ENOMEM on memory allocation failure.
+> + * @inode_init_security_anon:
+> + *      Set up a secure anonymous inode.
+> + *      @inode contains the inode structure
+> + *      @name name of the anonymous inode class
+> + *      @context_inode optional related inode
+> + *	Returns 0 on success. Returns -EPERM if	the security module denies
+> + *	the creation of this inode.
+>   * @inode_create:
+>   *	Check permission to create a regular file.
+>   *	@dir contains inode structure of the parent of the new file.
+> @@ -1552,6 +1559,9 @@ union security_list_options {
+>  					const struct qstr *qstr,
+>  					const char **name, void **value,
+>  					size_t *len);
+> +	int (*inode_init_security_anon)(struct inode *inode,
+> +					const struct qstr *name,
+> +					const struct inode *context_inode);
+>  	int (*inode_create)(struct inode *dir, struct dentry *dentry,
+>  				umode_t mode);
+>  	int (*inode_link)(struct dentry *old_dentry, struct inode *dir,
+> @@ -1884,6 +1894,7 @@ struct security_hook_heads {
+>  	struct hlist_head inode_alloc_security;
+>  	struct hlist_head inode_free_security;
+>  	struct hlist_head inode_init_security;
+> +	struct hlist_head inode_init_security_anon;
+>  	struct hlist_head inode_create;
+>  	struct hlist_head inode_link;
+>  	struct hlist_head inode_unlink;
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 64b19f050343..2108c3ce0666 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -320,6 +320,9 @@ void security_inode_free(struct inode *inode);
+>  int security_inode_init_security(struct inode *inode, struct inode *dir,
+>  				 const struct qstr *qstr,
+>  				 initxattrs initxattrs, void *fs_data);
+> +int security_inode_init_security_anon(struct inode *inode,
+> +				      const struct qstr *name,
+> +				      const struct inode *context_inode);
+>  int security_old_inode_init_security(struct inode *inode, struct inode *dir,
+>  				     const struct qstr *qstr, const char **name,
+>  				     void **value, size_t *len);
+> diff --git a/security/security.c b/security/security.c
+> index 565bc9b67276..70bfebada024 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -1033,6 +1033,15 @@ int security_inode_init_security(struct inode *inode, struct inode *dir,
+>  }
+>  EXPORT_SYMBOL(security_inode_init_security);
+>  
+> +int
+> +security_inode_init_security_anon(struct inode *inode,
+> +				  const struct qstr *name,
+> +				  const struct inode *context_inode)
+> +{
+> +	return call_int_hook(inode_init_security_anon, 0, inode, name,
+> +			     context_inode);
+> +}
+> +
+>  int security_old_inode_init_security(struct inode *inode, struct inode *dir,
+>  				     const struct qstr *qstr, const char **name,
+>  				     void **value, size_t *len)
+> 
+
+-- 
+James Morris
+<jmorris@namei.org>
 
