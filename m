@@ -2,208 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE9661C888A
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:41:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CA591C88DA
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:51:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725969AbgEGLln (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 07:41:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:57378 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725848AbgEGLln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 07:41:43 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67A991FB;
-        Thu,  7 May 2020 04:41:42 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DA9D3F68F;
-        Thu,  7 May 2020 04:41:40 -0700 (PDT)
-Subject: Re: [PATCH 01/26] KVM: arm64: Check advertised Stage-2 page size
- capability
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-2-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <f2de215f-2ad4-da04-36ab-8932d35abba6@arm.com>
-Date:   Thu, 7 May 2020 12:42:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200422120050.3693593-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S1726542AbgEGLuT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 07:50:19 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58967 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725985AbgEGLuT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 07:50:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588852217;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=HpySo1fPq0F4Fe5nieQHEfTObO9AX94O/qzGxsIgTec=;
+        b=EuXEDKyXkcsbch+mo96bh7IWx/osBnm7S2Llw+ksM6vDZ0Cx9x4Rs06AyJq5GSDQLMl5sP
+        sK8xh+z6r76aSB8vF/1ih716ZBv8S/wryr6ZBfQXMr5FrbSG90wTzl4cH5SNV7xHrVnpor
+        bOtZGIZ+3TCil6ug1vqghHaH3JPeCRc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-vreDZiYOMKqkFon784JXFg-1; Thu, 07 May 2020 07:50:16 -0400
+X-MC-Unique: vreDZiYOMKqkFon784JXFg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A080801504;
+        Thu,  7 May 2020 11:50:15 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E24341C933;
+        Thu,  7 May 2020 11:50:11 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     peterx@redhat.com
+Subject: [PATCH v2 0/9] KVM_SET_GUEST_DEBUG tests and fixes, DR accessors cleanups
+Date:   Thu,  7 May 2020 07:50:02 -0400
+Message-Id: <20200507115011.494562-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+This new version of the patches improves the AMD bugfix where
+KVM_EXIT_DEBUG clobbers the guest DR6 and includes stale causes.
+The improved fix makes it possible to drop kvm_set_dr6 and
+kvm_update_dr6 altogether.
 
-On 4/22/20 1:00 PM, Marc Zyngier wrote:
-> With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
-> advertise the supported Stage-2 page sizes.
->
-> Let's check this at boot time.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 +-
->  arch/arm64/include/asm/sysreg.h   |  3 +++
->  arch/arm64/kernel/cpufeature.c    |  8 +++++++
->  arch/arm64/kvm/reset.c            | 40 ++++++++++++++++++++++++++++---
->  virt/kvm/arm/arm.c                |  4 +---
->  5 files changed, 50 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 32c8a675e5a4a..7dd8fefa6aecd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -670,7 +670,7 @@ static inline int kvm_arm_have_ssbd(void)
->  void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
->  
-> -void kvm_set_ipa_limit(void);
-> +int kvm_set_ipa_limit(void);
->  
->  #define __KVM_HAVE_ARCH_VM_ALLOC
->  struct kvm *kvm_arch_alloc_vm(void);
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index ebc6224328318..5d10c9148e844 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -686,6 +686,9 @@
->  #define ID_AA64ZFR0_SVEVER_SVE2		0x1
->  
->  /* id_aa64mmfr0 */
-> +#define ID_AA64MMFR0_TGRAN4_2_SHIFT	40
-> +#define ID_AA64MMFR0_TGRAN64_2_SHIFT	36
-> +#define ID_AA64MMFR0_TGRAN16_2_SHIFT	32
->  #define ID_AA64MMFR0_TGRAN4_SHIFT	28
->  #define ID_AA64MMFR0_TGRAN64_SHIFT	24
->  #define ID_AA64MMFR0_TGRAN16_SHIFT	20
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 9fac745aa7bb2..9892a845d06c9 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -208,6 +208,14 @@ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
->  };
->  
->  static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
-> +	/*
-> +	 * Page size not being supported at Stage-2 are not fatal. You
+v1->v2: - merge v1 patch 6 with get_dr6 part of v1 patch 7, cover nested SVM
+	- new patch "KVM: nSVM: trap #DB and #BP to userspace if guest debugging is on"
+	- rewritten patch 8 to get rid of set_dr6 completely
 
-s/are not fatal/is not fatal
+Paolo Bonzini (5):
+  KVM: x86: fix DR6 delivery for various cases of #DB injection
+  KVM: nSVM: trap #DB and #BP to userspace if guest debugging is on
+  KVM: SVM: keep DR6 synchronized with vcpu->arch.dr6
+  KVM: x86, SVM: isolate vcpu->arch.dr6 from vmcb->save.dr6
+  KVM: VMX: pass correct DR6 for GD userspace exit
 
-> +	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
-> +	 * your favourite nesting hypervisor.
-> +	 */
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
-> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
->  	/*
->  	 * We already refuse to boot CPUs that don't support our configured
->  	 * page size, so we can only detect mismatches for a page size other
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 30b7ea680f66c..241db35a7ef4f 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -9,6 +9,7 @@
->   */
->  
->  #include <linux/errno.h>
-> +#include <linux/bitfield.h>
->  #include <linux/kernel.h>
->  #include <linux/kvm_host.h>
->  #include <linux/kvm.h>
-> @@ -340,11 +341,42 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  	return ret;
->  }
->  
-> -void kvm_set_ipa_limit(void)
-> +int kvm_set_ipa_limit(void)
->  {
-> -	unsigned int ipa_max, pa_max, va_max, parange;
-> +	unsigned int ipa_max, pa_max, va_max, parange, tgran_2;
-> +	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
->  
-> -	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
-> +	/*
-> +	 * Check with ARMv8.5-GTG that our PAGE_SIZE is supported at
-> +	 * Stage-2. If not, things will stop very quickly.
-> +	 */
-> +	switch (PAGE_SIZE) {
-> +	default:
-> +	case SZ_4K:
-> +		tgran_2 = ID_AA64MMFR0_TGRAN4_2_SHIFT;
-> +		break;
-> +	case SZ_16K:
-> +		tgran_2 = ID_AA64MMFR0_TGRAN16_2_SHIFT;
-> +		break;
-> +	case SZ_64K:
-> +		tgran_2 = ID_AA64MMFR0_TGRAN64_2_SHIFT;
-> +		break;
-> +	}
-> +
-> +	switch (FIELD_GET(0xFUL << tgran_2, mmfr0)) {
-> +	default:
-> +	case 1:
-> +		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
-> +		return -EINVAL;
-> +	case 0:
-> +		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
-> +		break;
-> +	case 2:
-> +		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
-> +		break;
-> +	}
-> +
-> +	parange = mmfr0 & 0x7;
->  	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
->  
->  	/* Clamp the IPA limit to the PA size supported by the kernel */
-> @@ -378,6 +410,8 @@ void kvm_set_ipa_limit(void)
->  	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
->  	kvm_ipa_limit = ipa_max;
->  	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
-> +
-> +	return 0;
->  }
->  
->  /*
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 48d0ec44ad77e..53b3ba9173ba7 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -1387,9 +1387,7 @@ static inline void hyp_cpu_pm_exit(void)
->  
->  static int init_common_resources(void)
->  {
-> -	kvm_set_ipa_limit();
-> -
-> -	return 0;
-> +	return kvm_set_ipa_limit();
->  }
->  
->  static int init_subsystems(void)
+Peter Xu (4):
+  KVM: X86: Declare KVM_CAP_SET_GUEST_DEBUG properly
+  KVM: X86: Set RTM for DB_VECTOR too for KVM_EXIT_DEBUG
+  KVM: X86: Fix single-step with KVM_SET_GUEST_DEBUG
+  KVM: selftests: Add KVM_SET_GUEST_DEBUG test
 
-For what is worth, I've taken a look at the ARMv8.5-GTG spec and your patch looks
-fine to me:
+ arch/powerpc/kvm/powerpc.c                    |   1 +
+ arch/s390/kvm/kvm-s390.c                      |   1 +
+ arch/x86/include/asm/kvm_host.h               |   3 +-
+ arch/x86/kvm/svm/nested.c                     |  39 +++-
+ arch/x86/kvm/svm/svm.c                        |  36 ++--
+ arch/x86/kvm/vmx/vmx.c                        |  23 +-
+ arch/x86/kvm/x86.c                            |  27 +--
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   9 +
+ .../testing/selftests/kvm/x86_64/debug_regs.c | 202 ++++++++++++++++++
+ 11 files changed, 281 insertions(+), 63 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/debug_regs.c
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+-- 
+2.18.2
 
-Thanks,
-Alex
