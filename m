@@ -2,54 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 424821C880F
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:25:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EABD71C881A
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:25:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726761AbgEGLZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 07:25:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35896 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726625AbgEGLZC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 07:25:02 -0400
+        id S1726533AbgEGLZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 07:25:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36940 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725910AbgEGLZo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 07:25:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588850699;
+        s=mimecast20190719; t=1588850742;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=BAFRcT5+H2Bnu3yV9VV0Ah0g4zEN4D3QnRh+Wv7aZKQ=;
-        b=MuaZd4NIskKwND/YewfGdhBbZxUZF3PNcsjLvRMWOoxuaGKtPnSBfJiPeBMPYaBPL0C3JN
-        C1zY0SnaRRB027cA410MnxOENTqzSdTd8o1zLDebcJ2My6h7ZEi6PGutn/y77aTTcngqM6
-        fhueNrVEl1jAYpvfN9hg/DfglKLXklE=
+        bh=wsilQ0lGM6y2+97iYso+FoAv2L6zBeAOdPWrDaICIRA=;
+        b=ZMChT8nTYbRPFwNRVyjUWiOuL5TN5EZa7yc4amDGmmvBPvDdiQOhCOQAp6ZLpkAt36a2tu
+        Eov4vv3dvbgoZe7C4WLoSfjR+d1l7SrVlcYeFRMzrAvjkSJh5GcFx9F2l3w9qd6OXpCEyV
+        CI4NlRjlNHCxv35qrZ/du84qncVGGvs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237--l2bUu0wMJimPess7AIcUA-1; Thu, 07 May 2020 07:24:55 -0400
-X-MC-Unique: -l2bUu0wMJimPess7AIcUA-1
+ us-mta-426-RF1TzD3nM7mYeuU1Jux2Bw-1; Thu, 07 May 2020 07:25:39 -0400
+X-MC-Unique: RF1TzD3nM7mYeuU1Jux2Bw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAB40101AFAD;
-        Thu,  7 May 2020 11:24:41 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D839218A0721;
+        Thu,  7 May 2020 11:25:37 +0000 (UTC)
 Received: from [10.36.113.245] (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 012401C950;
-        Thu,  7 May 2020 11:24:38 +0000 (UTC)
-Subject: Re: [PATCH v3 07/15] mm/memory_hotplug: Introduce
- offline_and_remove_memory()
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E8052618B;
+        Thu,  7 May 2020 11:25:36 +0000 (UTC)
+Subject: Re: [PATCH v3 10/15] MAINTAINERS: Add myself as virtio-mem maintainer
 To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@suse.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Wei Yang <richard.weiyang@gmail.com>,
-        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
+        Andrew Morton <akpm@linux-foundation.org>
 References: <20200507103119.11219-1-david@redhat.com>
- <20200507103119.11219-8-david@redhat.com>
- <20200507064558-mutt-send-email-mst@kernel.org>
+ <20200507103119.11219-11-david@redhat.com>
+ <20200507064709-mutt-send-email-mst@kernel.org>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -95,12 +88,12 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <a915653f-232e-aa13-68f7-f988704fa84c@redhat.com>
-Date:   Thu, 7 May 2020 13:24:38 +0200
+Message-ID: <fdb4315e-679c-d197-f558-7d0901c0fe87@redhat.com>
+Date:   Thu, 7 May 2020 13:25:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200507064558-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200507064709-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -110,62 +103,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.05.20 12:46, Michael S. Tsirkin wrote:
-> On Thu, May 07, 2020 at 12:31:11PM +0200, David Hildenbrand wrote:
->> virtio-mem wants to offline and remove a memory block once it unplugged
->> all subblocks (e.g., using alloc_contig_range()). Let's provide
->> an interface to do that from a driver. virtio-mem already supports to
->> offline partially unplugged memory blocks. Offlining a fully unplugged
->> memory block will not require to migrate any pages. All unplugged
->> subblocks are PageOffline() and have a reference count of 0 - so
->> offlining code will simply skip them.
+On 07.05.20 12:47, Michael S. Tsirkin wrote:
+> On Thu, May 07, 2020 at 12:31:14PM +0200, David Hildenbrand wrote:
+>> Let's make sure patches/bug reports find the right person.
 >>
->> All we need is an interface to offline and remove the memory from kernel
->> module context, where we don't have access to the memory block devices
->> (esp. find_memory_block() and device_offline()) and the device hotplug
->> lock.
->>
->> To keep things simple, allow to only work on a single memory block.
->>
->> Acked-by: Michal Hocko <mhocko@suse.com>
->> Tested-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
->> Cc: Andrew Morton <akpm@linux-foundation.org>
->> Cc: David Hildenbrand <david@redhat.com>
->> Cc: Oscar Salvador <osalvador@suse.com>
->> Cc: Michal Hocko <mhocko@suse.com>
->> Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
->> Cc: Wei Yang <richard.weiyang@gmail.com>
->> Cc: Dan Williams <dan.j.williams@intel.com>
->> Cc: Qian Cai <cai@lca.pw>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
 >> Signed-off-by: David Hildenbrand <david@redhat.com>
 > 
-> 
-> didn't you lose Andrew Morton's ack here?
+> Make this patch 2 in the series, or even squash into patch 1.
 
-Yeah, thanks for noticing.
-
-> 
->> ---
->>  include/linux/memory_hotplug.h |  1 +
->>  mm/memory_hotplug.c            | 37 ++++++++++++++++++++++++++++++++++
->>  2 files changed, 38 insertions(+)
-> 
-> I get:
-> 
-> error: sha1 information is lacking or useless (mm/memory_hotplug.c).
-> error: could not build fake ancestor
-> 
-> which version is this against? Pls post patches on top of some tag
-> in Linus' tree if possible.
-
-As the cover states, latest linux-next. To be precise
-
-commit 6b43f715b6379433e8eb30aa9bcc99bd6a585f77 (tag: next-20200507,
-next/master)
-Author: Stephen Rothwell <sfr@canb.auug.org.au>
-Date:   Thu May 7 18:11:31 2020 +1000
-
-    Add linux-next specific files for 20200507
+I'll move it to #2. If there are strong feelings, I can squash. Thanks!
 
 
 -- 
