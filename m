@@ -2,137 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4A491C908C
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 16:45:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48B311C938D
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 17:04:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728250AbgEGOor (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 10:44:47 -0400
-Received: from mga14.intel.com ([192.55.52.115]:13074 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726069AbgEGOor (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 10:44:47 -0400
-IronPort-SDR: y4XDnlcFXx1rnW1BhOFtYUp2Vwbc59k8Eh4Y2HlqnwP0h5BUF7uuUC7cAgYifzQ2lZcmcnhhIN
- wXF3SKIXLlCg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2020 07:44:45 -0700
-IronPort-SDR: 9i3xISujTRUf3ti8cieSFQSZ916JIV3ob91xq5STMWcgLzGqBILU2lddGBJB4zPBKrCadZ8weZ
- sjKSe2RlgVNQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,364,1583222400"; 
-   d="scan'208";a="263956282"
-Received: from smericks-mobl.amr.corp.intel.com (HELO [10.252.140.100]) ([10.252.140.100])
-  by orsmga006.jf.intel.com with ESMTP; 07 May 2020 07:44:44 -0700
-Subject: Re: [PATCH 1/2] arch/x86: Rename config
- X86_INTEL_MEMORY_PROTECTION_KEYS to generic x86
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     Babu Moger <babu.moger@amd.com>, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, dave.hansen@linux.intel.com,
-        luto@kernel.org, peterz@infradead.org, mchehab+samsung@kernel.org,
-        changbin.du@intel.com, namit@vmware.com,
-        yang.shi@linux.alibaba.com, asteinhauser@google.com,
-        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
-        akpm@linux-foundation.org, steven.price@arm.com,
-        rppt@linux.vnet.ibm.com, peterx@redhat.com,
-        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
-        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
-        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
-        jgross@suse.com, andrew.cooper3@citrix.com,
-        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
-        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
-        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <158880240546.11615.2219410169137148044.stgit@naples-babu.amd.com>
- <158880253347.11615.8499618616856685179.stgit@naples-babu.amd.com>
- <4d86b207-77af-dc5d-88a4-f092be0043f6@intel.com>
- <20200507072934.d5l6cpqyy54lrrla@linutronix.de>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <034cfb90-7f75-8e36-5b1e-ceaef0dfa50d@intel.com>
-Date:   Thu, 7 May 2020 07:44:44 -0700
+        id S1726863AbgEGPD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 11:03:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47334 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726029AbgEGPD5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 11:03:57 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 047F1lj3045490;
+        Thu, 7 May 2020 11:03:55 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30u8t871m4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 May 2020 11:03:54 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 047F1sFE046123;
+        Thu, 7 May 2020 11:03:50 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30u8t871br-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 May 2020 11:03:48 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 047F2PYG014941;
+        Thu, 7 May 2020 15:03:40 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma02wdc.us.ibm.com with ESMTP id 30s0g72k8t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 May 2020 15:03:40 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 047F3bN053412304
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 7 May 2020 15:03:37 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 673C9BE05F;
+        Thu,  7 May 2020 15:03:37 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 04B4DBE054;
+        Thu,  7 May 2020 15:03:35 +0000 (GMT)
+Received: from cpe-172-100-175-116.stny.res.rr.com (unknown [9.85.169.140])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu,  7 May 2020 15:03:35 +0000 (GMT)
+Subject: Re: [PATCH v7 03/15] s390/zcrypt: driver callback to indicate
+ resource in use
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pmorel@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com, fiuczy@linux.ibm.com
+References: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <7f9872f4-3ccb-bc5b-6c25-ab2eedb8f3d9@linux.ibm.com>
+Date:   Thu, 7 May 2020 11:03:35 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200507072934.d5l6cpqyy54lrrla@linutronix.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200407192015.19887-1-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-07_09:2020-05-07,2020-05-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 suspectscore=3 bulkscore=0 spamscore=0 mlxlogscore=999
+ malwarescore=0 priorityscore=1501 phishscore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005070118
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/7/20 12:29 AM, Sebastian Andrzej Siewior wrote:
->>> -config X86_INTEL_MEMORY_PROTECTION_KEYS
->>> -	prompt "Intel Memory Protection Keys"
->>> +config X86_MEMORY_PROTECTION_KEYS
->>> +	prompt "Memory Protection Keys"
->>>  	def_bool y
->>>  	# Note: only available in 64-bit mode
->>> -	depends on CPU_SUP_INTEL && X86_64
->>> +	depends on X86_64 && (CPU_SUP_INTEL || CPU_SUP_AMD)
->>>  	select ARCH_USES_HIGH_VMA_FLAGS
->>>  	select ARCH_HAS_PKEYS
->>>  	---help---
->> It's a bit of a bummer that we're going to prompt everybody doing
->> oldconfig's for this new option.  But, I don't know any way for Kconfig
->> to suppress it if the name is changed.  Also, I guess the def_bool=y
->> means that menuconfig and olddefconfig will tend to do the right thing.
-> You could add a new option (X86_MEMORY_PROTECTION_KEYS) which is
-> def_bool X86_INTEL_MEMORY_PROTECTION_KEYS and avoiding the prompt line.
-> Soo it is selected based on the old option and the user isn't bother. A
-> few cycles later you could remove intel option and add prompt to other.
-> But still little work for…
+The review of this series seems to have come to a standstill, so I'm
+pinging the list to see if we can't get things going again.
 
-That does sound viable, if we decide it's all worth it.
+On 4/14/20 8:08 AM, Cornelia Huck wrote:
+> The current design for AP pass-through does not support making dynamic
+> changes to the AP matrix of a running guest resulting in a few
+> deficiencies this patch series is intended to mitigate:
+>
+> 1. Adapters, domains and control domains can not be added to or removed
+>     from a running guest. In order to modify a guest's AP configuration,
+>     the guest must be terminated; only then can AP resources be assigned
+>     to or unassigned from the guest's matrix mdev. The new AP
+>     configuration becomes available to the guest when it is subsequently
+>     restarted.
+>
+> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
+>     be modified by a root user without any restrictions. A change to
+>     either mask can result in AP queue devices being unbound from the
+>     vfio_ap device driver and bound to a zcrypt device driver even if a
+>     guest is using the queues, thus giving the host access to the guest's
+>     private crypto data and vice versa.
+>
+> 3. The APQNs derived from the Cartesian product of the APIDs of the
+>     adapters and APQIs of the domains assigned to a matrix mdev must
+>     reference an AP queue device bound to the vfio_ap device driver. The
+>     AP architecture allows assignment of AP resources that are not
+>     available to the system, so this artificial restriction is not
+>     compliant with the architecture.
+>
+> 4. The AP configuration profile can be dynamically changed for the linux
+>     host after a KVM guest is started. For example, a new domain can be
+>     dynamically added to the configuration profile via the SE or an HMC
+>     connected to a DPM enabled lpar. Likewise, AP adapters can be
+>     dynamically configured (online state) and deconfigured (standby state)
+>     using the SE, an SCLP command or an HMC connected to a DPM enabled
+>     lpar. This can result in inadvertent sharing of AP queues between the
+>     guest and host.
+>
+> 5. A root user can manually unbind an AP queue device representing a
+>     queue in use by a KVM guest via the vfio_ap device driver's sysfs
+>     unbind attribute. In this case, the guest will be using a queue that
+>     is not bound to the driver which violates the device model.
+>
+> This patch series introduces the following changes to the current design
+> to alleviate the shortcomings described above as well as to implement
+> more of the AP architecture:
+>
+> 1. A root user will be prevented from making changes to the AP bus's
+>     /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the ownership of an APQN
+>     changes from the vfio_ap device driver to a zcrypt driver when the
+>     APQN is assigned to a matrix mdev.
+>
+> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
+>     domains using the matrix mdev's assign/unassign attributes.
+>
+> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
+>     it results in assignment of an APQN that does not reference an AP
+>     queue device bound to the vfio_ap device driver, as long as the APQN
+>     is not reserved for use by the default zcrypt drivers (also known as
+>     over-provisioning of AP resources). Allowing over-provisioning of AP
+>     resources better models the architecture which does not preclude
+>     assigning AP resources that are not yet available in the system.
+>
+> 5. Handle dynamic changes to the AP device model.
+>
+> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
+> ----------------------------------------------------------
+> Due to the extremely sensitive nature of cryptographic data, it is
+> imperative that great care be taken to ensure that such data is secured.
+> Allowing a root user, either inadvertently or maliciously, to configure
+> these masks such that a queue is shared between the host and a guest is
+> not only avoidable, it is advisable. It was suggested that this scenario
+> is better handled in user space with management software, but that does
+> not preclude a malicious administrator from using the sysfs interfaces
+> to gain access to a guest's crypto data. It was also suggested that this
+> scenario could be avoided by taking access to the adapter away from the
+> guest and zeroing out the queues prior to the vfio_ap driver releasing the
+> device; however, stealing an adapter in use from a guest as a by-product
+> of an operation is bad and will likely cause problems for the guest
+> unnecessarily. It was decided that the most effective solution with the
+> least number of negative side effects is to prevent the situation at the
+> source.
+>
+> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
+> ----------------------------------------------------------------
+> Allowing a user to hot plug/unplug AP resources using the matrix mdev
+> sysfs interfaces circumvents the need to terminate the guest in order to
+> modify its AP configuration. Allowing dynamic configuration makes
+> reconfiguring a guest's AP matrix much less disruptive.
+>
+> 3. Rationale for allowing over-provisioning of AP resources:
+> -----------------------------------------------------------
+> Allowing assignment of AP resources to a matrix mdev and ultimately to a
+> guest better models the AP architecture. The architecture does not
+> preclude assignment of unavailable AP resources. If a queue subsequently
+> becomes available while a guest using the matrix mdev to which its APQN
+> is assigned, the guest will be given access to it. If an APQN
+> is dynamically unassigned from the underlying host system, it will
+> automatically become unavailable to the guest.
+>
+> Change log v6-v7:
+> ----------------
+> * Added callbacks to AP bus:
+>    - on_config_changed: Notifies implementing drivers that
+>      the AP configuration has changed since last AP device scan.
+>    - on_scan_complete: Notifies implementing drivers that the device scan
+>      has completed.
+>    - implemented on_config_changed and on_scan_complete callbacks for
+>      vfio_ap device driver.
+>    - updated vfio_ap device driver's probe and remove callbacks to handle
+>      dynamic changes to the AP device model.
+> * Added code to filter APQNs when assigning AP resources to a KVM guest's
+>    CRYCB
+>
+> Change log v5-v6:
+> ----------------
+> * Fixed a bug in ap_bus.c introduced with patch 2/7 of the v5
+>    series. Harald Freudenberer pointed out that the mutex lock
+>    for ap_perms_mutex in the apmask_store and aqmask_store functions
+>    was not being freed.
+>
+> * Removed patch 6/7 which added logging to the vfio_ap driver
+>    to expedite acceptance of this series. The logging will be introduced
+>    with a separate patch series to allow more time to explore options
+>    such as DBF logging vs. tracepoints.
+>
+> * Added 3 patches related to ensuring that APQNs that do not reference
+>    AP queue devices bound to the vfio_ap device driver are not assigned
+>    to the guest CRYCB:
+>
+>    Patch 4: Filter CRYCB bits for unavailable queue devices
+>    Patch 5: sysfs attribute to display the guest CRYCB
+>    Patch 6: update guest CRYCB in vfio_ap probe and remove callbacks
+>
+> * Added a patch (Patch 9) to version the vfio_ap module.
+>
+> * Reshuffled patches to allow the in_use callback implementation to
+>    invoke the vfio_ap_mdev_verify_no_sharing() function introduced in
+>    patch 2.
+>
+> Change log v4-v5:
+> ----------------
+> * Added a patch to provide kernel s390dbf debug logs for VFIO AP
+>
+> Change log v3->v4:
+> -----------------
+> * Restored patches preventing root user from changing ownership of
+>    APQNs from zcrypt drivers to the vfio_ap driver if the APQN is
+>    assigned to an mdev.
+>
+> * No longer enforcing requirement restricting guest access to
+>    queues represented by a queue device bound to the vfio_ap
+>    device driver.
+>
+> * Removed shadow CRYCB and now directly updating the guest CRYCB
+>    from the matrix mdev's matrix.
+>
+> * Rebased the patch series on top of 'vfio: ap: AP Queue Interrupt
+>    Control' patches.
+>
+> * Disabled bind/unbind sysfs interfaces for vfio_ap driver
+>
+> Change log v2->v3:
+> -----------------
+> * Allow guest access to an AP queue only if the queue is bound to
+>    the vfio_ap device driver.
+>
+> * Removed the patch to test CRYCB masks before taking the vCPUs
+>    out of SIE. Now checking the shadow CRYCB in the vfio_ap driver.
+>
+> Change log v1->v2:
+> -----------------
+> * Removed patches preventing root user from unbinding AP queues from
+>    the vfio_ap device driver
+> * Introduced a shadow CRYCB in the vfio_ap driver to manage dynamic
+>    changes to the AP guest configuration due to root user interventions
+>    or hardware anomalies.
+>
+> Harald Freudenberger (1):
+>    s390/zcrypt: Notify driver on config changed and scan complete
+>      callbacks
+>
+> Tony Krowiak (14):
+>    s390/vfio-ap: store queue struct in hash table for quick access
+>    s390/vfio-ap: manage link between queue struct and matrix mdev
+>    s390/zcrypt: driver callback to indicate resource in use
+>    s390/vfio-ap: implement in-use callback for vfio_ap driver
+>    s390/vfio-ap: introduce shadow CRYCB
+>    s390/vfio-ap: sysfs attribute to display the guest CRYCB
+>    s390/vfio-ap: filter CRYCB bits for unavailable queue devices
+>    s390/vfio_ap: add qlink from ap_matrix_mdev struct to vfio_ap_queue
+>      struct
+>    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
+>    s390/vfio-ap: allow configuration of matrix mdev in use by a KVM guest
+>    s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
+>    s390/vfio-ap: handle host AP config change notification
+>    s390/vfio-ap: handle AP bus scan completed notification
+>    s390/vfio-ap: handle probe/remove not due to host AP config changes
+>
+>   drivers/s390/crypto/ap_bus.c          |  301 ++++++-
+>   drivers/s390/crypto/ap_bus.h          |   17 +
+>   drivers/s390/crypto/vfio_ap_drv.c     |   35 +-
+>   drivers/s390/crypto/vfio_ap_ops.c     | 1103 +++++++++++++++++++------
+>   drivers/s390/crypto/vfio_ap_private.h |   24 +-
+>   5 files changed, 1167 insertions(+), 313 deletions(-)
+>
 
-So, for now my preference would be to change the prompt, but leave the
-CONFIG_ naming in place.  If we decide that transitioning the config is
-the right thing (I don't feel super strongly either way), let's use
-Sebastian's trick to avoid the Kconfig prompts.
