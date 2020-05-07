@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23B7C1C88F4
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:53:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C47731C88F7
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:53:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbgEGLx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 07:53:29 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26401 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725948AbgEGLx1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 07:53:27 -0400
+        id S1726774AbgEGLxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 07:53:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60768 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726580AbgEGLxi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 07:53:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588852406;
+        s=mimecast20190719; t=1588852416;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc; bh=oJNhrRBC0c+BFGHFCS+s7JJ0R5CeLnnrd6LkdO80vW4=;
-        b=JkaYZiam3G6JGPcqod1r+SrcRaaWkpkTZsLidhZxsCjsU7LPohv4i22LWTzDnrTdOI9Ml8
-        pneeBU5vMVQ4UsI7a8yqtmp/pHVWxHHhzkcV1y15YZFRU1TroYkeutnhzy7G3phn7+/icZ
-        Q6S8Yb9ywKFPXnj/oJf9GFE/ui3P9mQ=
+         to:to:cc:cc; bh=oJNhrRBC0c+BFGHFCS+s7JJ0R5CeLnnrd6LkdO80vW4=;
+        b=HQei5SeVaDd6hPqjS4D1PRRpCbpdlC7Ci8jM9g2KMtmvCuwmcqWrY1k9F/oDe1dnJNqu8H
+        w1XI4CixLnftHTe8Qt6RwBNn2VQEK9YXkq86Yri5bjiZ6g9TFoC37oiq2/fel5mSVvgQ7C
+        C3JP8mlpF088z/nOGwhuAgn5Q2X0Wn8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-KMK427m6N2a7db-dpEdpog-1; Thu, 07 May 2020 07:53:23 -0400
-X-MC-Unique: KMK427m6N2a7db-dpEdpog-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-187-r-JReGUDMy6MKKvTDqstzw-1; Thu, 07 May 2020 07:53:34 -0400
+X-MC-Unique: r-JReGUDMy6MKKvTDqstzw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA47480058A;
-        Thu,  7 May 2020 11:53:22 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 821341005510;
+        Thu,  7 May 2020 11:53:33 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 599246ACE6;
-        Thu,  7 May 2020 11:53:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 11C1F1C933;
+        Thu,  7 May 2020 11:53:32 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Subject: [GIT PULL] KVM changes for Linux 5.7-rc5
-Date:   Thu,  7 May 2020 07:53:22 -0400
-Message-Id: <20200507115322.495846-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Date:   Thu,  7 May 2020 07:53:32 -0400
+Message-Id: <20200507115332.495930-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
