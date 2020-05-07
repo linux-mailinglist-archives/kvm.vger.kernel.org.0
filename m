@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DD411C8ED4
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 16:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FD0A1C8F3A
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 16:36:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728709AbgEGO3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 10:29:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58166 "EHLO mail.kernel.org"
+        id S1726860AbgEGOaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 10:30:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58798 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728701AbgEGO3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 10:29:53 -0400
+        id S1728775AbgEGOaL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 10:30:11 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 98A432073A;
-        Thu,  7 May 2020 14:29:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7CDED2083B;
+        Thu,  7 May 2020 14:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588861793;
-        bh=tlexJ6+5pQ8PKYEfsm7LF5qfXmJIMCzchx3BxtlYmfY=;
+        s=default; t=1588861810;
+        bh=Wej/uY5j7bc1JjjVM8N9kGzpXqK5HqUHUQm4FqUdtTE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qt12gGOIgezJbWIyYrzBZwGmwRq5IODR8i/e8i23dXJ8aO6T0aa+88lHxxK7trSe6
-         c4lr0ZF3EL31hVGpWC/F1Sj5aC1RGgan/kGl5v+TbFToMMi3/HSMYyFUhKgIJjia87
-         d0BsdnQFT/VWWzLZICb3qm7vcDpNUC0YzHQxLegg=
+        b=m+4kIlrqeeSNHIxhqI86W6Fo7M6JUzbVpyEaDYx8W6qKLLZiIbPzNx2vSWQeimG4m
+         JgOYkvCAPvaOgueAK/yMrn3NpU/CgeFXfK+sOjDDrm58bWflC3jYzVQMcsL40I+47M
+         2JElei9Sk5ObsH0XtVmjUjCFWsiowp6CpbQFhUHo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 08/16] vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()
-Date:   Thu,  7 May 2020 10:29:35 -0400
-Message-Id: <20200507142943.26848-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 05/11] vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()
+Date:   Thu,  7 May 2020 10:29:57 -0400
+Message-Id: <20200507143003.27047-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200507142943.26848-1-sashal@kernel.org>
-References: <20200507142943.26848-1-sashal@kernel.org>
+In-Reply-To: <20200507143003.27047-1-sashal@kernel.org>
+References: <20200507143003.27047-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -98,11 +98,11 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 690ae081eedc7..35a3750a6ddd3 100644
+index 0d5b667c0e652..a9f58f3867f02 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -378,8 +378,8 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
- 	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
+@@ -229,8 +229,8 @@ static int vaddr_get_pfn(unsigned long vaddr, int prot, unsigned long *pfn)
+ 	vma = find_vma_intersection(current->mm, vaddr, vaddr + 1);
  
  	if (vma && vma->vm_flags & VM_PFNMAP) {
 -		*pfn = ((vaddr - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
