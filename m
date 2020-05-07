@@ -2,156 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A38EA1C8404
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 09:57:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6AEA1C8407
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 09:57:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725923AbgEGH5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 03:57:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25260 "EHLO
+        id S1725849AbgEGH5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 03:57:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30145 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725848AbgEGH5N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 03:57:13 -0400
+        with ESMTP id S1725900AbgEGH5a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 03:57:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588838231;
+        s=mimecast20190719; t=1588838249;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y9mwxyuCup0Q6hGGVaVop/Mcsx5sPEES6xR+JKy3xlE=;
-        b=V854R5vXvdDRQXPHZpUvoYbX/wxLa+DCdkGbSE012N0pIQsytM8Ho4uw3B48cgiZOQLuRk
-        fRoxDtUjpB65fqK2x8bNpMmzl2/p/LZN5nlfPfe0cGWhR9M3QLAKmNTtozOL6dan6+NU5t
-        TN7FCIDppUKhEotKQCgv8QeRXNTUmaU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-7C35HNUoOb6lFS50bE4gOA-1; Thu, 07 May 2020 03:57:09 -0400
-X-MC-Unique: 7C35HNUoOb6lFS50bE4gOA-1
-Received: by mail-wr1-f72.google.com with SMTP id q13so2926609wrn.14
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 00:57:09 -0700 (PDT)
+        bh=94+p4rTx3aXgc1s8HtnXaNBbbzovzVYBrsIG0gSLOL0=;
+        b=cFP21NDtUbz/Zzl4b3C3l/TiWH4zX+aLkk36UTcWWB3L0Nosfs/DXat60cyBEsNbI0QoVo
+        6hogHOu+A3tSlffiyn18sEVf323bPZAerY3S2pk1m+0Wg2QNAI4ExDb9RYyEivvgtdXdyr
+        F3Q5nwAvjsyl0ia+R5tYdO3YbeazuLM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-3T9-L8_pN6GS_ZhT3SbRsg-1; Thu, 07 May 2020 03:57:27 -0400
+X-MC-Unique: 3T9-L8_pN6GS_ZhT3SbRsg-1
+Received: by mail-wr1-f71.google.com with SMTP id 30so2911853wrq.15
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 00:57:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=y9mwxyuCup0Q6hGGVaVop/Mcsx5sPEES6xR+JKy3xlE=;
-        b=DgpVzP1CXfrwLPtJXztH5J0ip+rbnGV38b1rIj9253YQzJlJGql1Yrl03y/TN74/v8
-         BcgMMk/XoNydvYz+oeWILOu6Oxv4tFdErDkbYgXGMt8jCbWDMk9DCX98YkmNvLQR5ZEr
-         cmObVcBs2KruhmBpLGiaW/VmwxZCG0p361dimBuUY3McSLt3K7GjFRMqYWR0k5+3an85
-         Wd9uMZKMCx7Rd8KcEtyCMRwYKs8LZA8GZjDNbiDzp0VbflNozCIypyLXrszNCXo2yfUq
-         UpwxRZsqQktZxNgs1M+CHKLWhMcirZA7ICjBLv67rJghi2p1kx6gfImtSxTWqDloz/Tl
-         x7Kw==
-X-Gm-Message-State: AGi0PuYRK43E2113phk/PkKAxeMESkVxIYOKfb+cHSUft/UrK+xeVRMX
-        qSLCbjXgxjprFCC+G4lucD6wpEuk0y3XdVw011X37evmj1lwjzVrUJFmB7EahUFDSmx6mHL7Rxa
-        dKsBEnJyIRSbu
-X-Received: by 2002:a1c:3206:: with SMTP id y6mr8660126wmy.111.1588838228718;
-        Thu, 07 May 2020 00:57:08 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ1HGj369geDqMTet3EHW3ra3/6X7k36PjWNlzfDZu8OSHXRqpZOWKYn7h+nDpGIM9yv2dipw==
-X-Received: by 2002:a1c:3206:: with SMTP id y6mr8660098wmy.111.1588838228397;
-        Thu, 07 May 2020 00:57:08 -0700 (PDT)
+        bh=94+p4rTx3aXgc1s8HtnXaNBbbzovzVYBrsIG0gSLOL0=;
+        b=jZ5UduajoaY0g+zlV5XlxxS60FFXXSevOTA9hG8Qr+ayGLVJ7bbXMiyIIJVWvtMzyR
+         LCQWjoZwHpQOuaHnJHk7oEao5NDew2NJCUpNTT9EvhkDgsS23FTZA5pkK7EiJRp/dnhY
+         gozRPpz+aICS9QWCSYREJ7wuJ2i4oMDhWhv3EJgjX8GPVlL5NZ3ek3PgrxN/D4pmWDyd
+         8bqtjGLm1+x+gfyC65/ht437o8FifRp2p6WtFiIBe3CQlV6dZDQxwxe2gKsULWU/YKPP
+         FZF3V2lJGtEVd/WkZkXvNWkZixUug7801igl1NNbfVufqD3ULHJsf/JPVGfZpxhErdRG
+         nNYQ==
+X-Gm-Message-State: AGi0PuYS3ARLo9qtCEzaVpiIhFKJap1oDDXhJGGAEBXKnCIvpj534e2A
+        MQy3lM39uEn9Oe8mnlAzMWISvduYCLqJ6N/4Osguu+4lL58ffcM56CzdXrv0UBvV5dyEyOmxpKw
+        BUoWRlxO/vhFx
+X-Received: by 2002:a1c:5402:: with SMTP id i2mr8528339wmb.2.1588838245996;
+        Thu, 07 May 2020 00:57:25 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLS9zfhthG/IcPQ1OXwTaDPpA5GtnV/LzhaWTU+KmBhNY4Vze9DeatJeXZ7ts1IL1uZA+t+sQ==
+X-Received: by 2002:a1c:5402:: with SMTP id i2mr8528315wmb.2.1588838245719;
+        Thu, 07 May 2020 00:57:25 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:8d3e:39e5:cd88:13cc? ([2001:b07:6468:f312:8d3e:39e5:cd88:13cc])
-        by smtp.gmail.com with ESMTPSA id m15sm6619827wmc.35.2020.05.07.00.57.07
+        by smtp.gmail.com with ESMTPSA id v124sm4823503wme.45.2020.05.07.00.57.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2020 00:57:07 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: x86/pmu: Support full width counting
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200507021452.174646-1-like.xu@linux.intel.com>
+        Thu, 07 May 2020 00:57:25 -0700 (PDT)
+Subject: Re: [PATCH v11 0/7] x86/kvm/hyper-v: add support for synthetic
+ debugger
+To:     Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Cc:     vkuznets@redhat.com
+References: <20200424113746.3473563-1-arilou@gmail.com>
+ <20200507030141.GF2862@jondnuc>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3fb56700-7f0b-59e1-527a-f8eb601185b1@redhat.com>
-Date:   Thu, 7 May 2020 09:57:08 +0200
+Message-ID: <d1a07fdd-c9ae-a042-3325-54a5cf42dab5@redhat.com>
+Date:   Thu, 7 May 2020 09:57:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200507021452.174646-1-like.xu@linux.intel.com>
+In-Reply-To: <20200507030141.GF2862@jondnuc>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/05/20 04:14, Like Xu wrote:
-> +static inline u64 vmx_get_perf_capabilities(void)
-> +{
-> +	u64 perf_cap = 0;
-> +
-> +	if (boot_cpu_has(X86_FEATURE_PDCM))
-> +		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
-> +
-> +	/* Currently, KVM only supports Full-Width Writes. */
-> +	perf_cap &= PMU_CAP_FW_WRITES;
-> +
-> +	return perf_cap;
-> +}
-> +
+On 07/05/20 05:01, Jon Doron wrote:
+> Paolo was this merged in or by any chance in the queue?
 
-Since counters are virtualized, it seems to me that you can support
-PMU_CAP_FW_WRITES unconditionally, even if the host lacks it.  So just
-return PMU_CAP_FW_WRITES from this function.
-
-> +	case MSR_IA32_PERF_CAPABILITIES:
-> +		return 1; /* RO MSR */
->  	default:
-
-You need to allow writes from the host if (data &
-~vmx_get_perf_capabilities()) == 0.
-
-> -			if (!msr_info->host_initiated)
-> +		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
-> +			(pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-> +			if (data & ~pmu->counter_bitmask[KVM_PMC_GP])
-> +				return 1;
-> +			if (!fw_writes_is_enabled(pmu))
->  				data = (s64)(s32)data;
-
-
-You are dropping the test on msr_info->host_initiated here, you should
-keep it otherwise you allow full-width write to MSR_IA32_PERFCTR0 as
-well.  So:
-
-#define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
-
-	if (!msr_info->host_initiated && !(msr & MSR_PMC_FULL_WIDTH_BIT))
-		data = (s64)(s32)data;
-
-> +	case MSR_IA32_PERF_CAPABILITIES:
-> +		if (!nested)
-> +			return 1;
-> +		msr->data = vmx_get_perf_capabilities();
-> +		return 0;
-
-The !nested check is wrong.
-
-> 
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1220,6 +1220,13 @@ static const u32 msrs_to_save_all[] = {
->  	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
->  	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
->  	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
-> +
-> +	MSR_IA32_PMC0, MSR_IA32_PMC0 + 1, MSR_IA32_PMC0 + 2,
-> +	MSR_IA32_PMC0 + 3, MSR_IA32_PMC0 + 4, MSR_IA32_PMC0 + 5,
-> +	MSR_IA32_PMC0 + 6, MSR_IA32_PMC0 + 7, MSR_IA32_PMC0 + 8,
-> +	MSR_IA32_PMC0 + 9, MSR_IA32_PMC0 + 10, MSR_IA32_PMC0 + 11,
-> +	MSR_IA32_PMC0 + 12, MSR_IA32_PMC0 + 13, MSR_IA32_PMC0 + 14,
-> +	MSR_IA32_PMC0 + 15, MSR_IA32_PMC0 + 16, MSR_IA32_PMC0 + 17,
->  };
-
-This is not needed because the full-width content is already accessible
-from the host via MSR_IA32_PERFCTRn.
-
-Given the bugs, it is clear that you should also modify the pmu.c
-testcase for kvm-unit-tests to cover full-width writes (and especially
-the non-full-width write behavior of MSR_IA32_PERFCTRn).  Even before
-the QEMU side is begin worked on, you can test it with "-cpu
-host,migratable=off".
-
-Thanks,
+No, I'll get to it today.
 
 Paolo
+
+> Thanks,
+> -- Jon.
+> 
+> On 24/04/2020, Jon Doron wrote:
+>> Add support for the synthetic debugger interface of hyper-v, the
+>> synthetic debugger has 2 modes.
+>> 1. Use a set of MSRs to send/recv information (undocumented so it's not
+>>   going to the hyperv-tlfs.h)
+>> 2. Use hypercalls
+>>
+>> The first mode is based the following MSRs:
+>> 1. Control/Status MSRs which either asks for a send/recv .
+>> 2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
+>> 3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
+>>   indicates if there is data pending to issue a recv VMEXIT.
+>>
+>> The first mode implementation is to simply exit to user-space when
+>> either the control MSR or the pending MSR are being set.
+>> Then it's up-to userspace to implement the rest of the logic of
+>> sending/recving.
+>>
+>> In the second mode instead of using MSRs KNet will simply issue
+>> Hypercalls with the information to send/recv, in this mode the data
+>> being transferred is UDP encapsulated, unlike in the previous mode in
+>> which you get just the data to send.
+>>
+>> The new hypercalls will exit to userspace which will be incharge of
+>> re-encapsulating if needed the UDP packets to be sent.
+>>
+>> There is an issue though in which KDNet does not respect the hypercall
+>> page and simply issues vmcall/vmmcall instructions depending on the cpu
+>> type expecting them to be handled as it a real hypercall was issued.
+>>
+>> It's important to note that part of this feature has been subject to be
+>> removed in future versions of Windows, which is why some of the
+>> defintions will not be present the the TLFS but in the kvm hyperv header
+>> instead.
+>>
+>> v11:
+>> Fixed all reviewed by and rebased on latest origin/master
+>>
+>> Jon Doron (6):
+>>  x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+>>  x86/kvm/hyper-v: Simplify addition for custom cpuid leafs
+>>  x86/hyper-v: Add synthetic debugger definitions
+>>  x86/kvm/hyper-v: Add support for synthetic debugger capability
+>>  x86/kvm/hyper-v: enable hypercalls without hypercall page with syndbg
+>>  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
+>>
+>> Vitaly Kuznetsov (1):
+>>  KVM: selftests: update hyperv_cpuid with SynDBG tests
+>>
+>> Documentation/virt/kvm/api.rst                |  18 ++
+>> arch/x86/include/asm/hyperv-tlfs.h            |   6 +
+>> arch/x86/include/asm/kvm_host.h               |  14 +
+>> arch/x86/kvm/hyperv.c                         | 242 ++++++++++++++++--
+>> arch/x86/kvm/hyperv.h                         |  33 +++
+>> arch/x86/kvm/trace.h                          |  51 ++++
+>> arch/x86/kvm/x86.c                            |  13 +
+>> include/uapi/linux/kvm.h                      |  13 +
+>> .../selftests/kvm/x86_64/hyperv_cpuid.c       | 143 +++++++----
+>> 9 files changed, 468 insertions(+), 65 deletions(-)
+>>
+>> -- 
+>> 2.24.1
+>>
+> 
 
