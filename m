@@ -2,126 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFE061C8CD7
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 15:46:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 258331C8CDE
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 15:46:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726320AbgEGNqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 09:46:17 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55896 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725879AbgEGNqQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 09:46:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588859175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DGmeNlAT2Tpja07VB0b+14eYJ13Gy9SOk4Jv5Ofw8q0=;
-        b=dkgJ5kTx7eflNFRY1Yoeqg0MSEpdjwBFsPYRZswWK6wOuOL26s8zP6wYuPmhnA0UB39PE0
-        UrvfS20Shn0sMcf6heThRdido58Hqey92jg393Axa+QxZ3Ieyc8uQcCd9/Bv0IhPE2KiMz
-        xTtqP9Tu1HZJuPsx56lWreWTSB6ajGU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-HB9v4dCXOFGA_zsq4C0tPA-1; Thu, 07 May 2020 09:46:13 -0400
-X-MC-Unique: HB9v4dCXOFGA_zsq4C0tPA-1
-Received: by mail-wr1-f69.google.com with SMTP id q13so3467173wrn.14
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 06:46:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DGmeNlAT2Tpja07VB0b+14eYJ13Gy9SOk4Jv5Ofw8q0=;
-        b=dN8fnkH5JRGQo8EXtOcLQXAKQS+HCMmmqczlS5/+IwELTScf9Piz+l/cWv2nfsT+uT
-         5EWK5PbyhPrbndsvc1KKrQ8wlScRiwjWyVvsAAsbGcBXw6agydt2F0rxzpbD6UnoHuZR
-         mnpWIclYY9zrIwCRATvUuiHDr3zMAspjj6DXT3WmfoCS++Q106niz/Aw+N5iqZmQtfmg
-         VbuBohs8rhQeAiVpqH/Hy6B4UBe1gHKUyY/ZDH1ciyRkTUbplCLzc9uXNhr8QORzlDRQ
-         81e1DnfJcynCkLr2IA4WDlSyUECmH016a/tP4fsmjpFVLNRUynRkjxVegD1f8WCXhw+I
-         ogbA==
-X-Gm-Message-State: AGi0PuZDy3QUAUcLQRfQrDQ/oKbv0+z0ExZT8NXbfpFVwoTYc9x0OOZ+
-        Sl+ueMAXBLDiSO0Lg6O2jaXqzNENfUoWkfFDTvz0ciIwqU2xHMWDWO0iyWTm1+F4QpYj5ZNHvbq
-        dJRJuhaEpb94B
-X-Received: by 2002:a7b:c3d4:: with SMTP id t20mr10931687wmj.170.1588859171946;
-        Thu, 07 May 2020 06:46:11 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJbx06UMPSuVoCTfzSmaWfd73H+Wgu8lr0gOB9Q94WZ+0p0Ewh2qBzXnS0J3hAUvG35EApplA==
-X-Received: by 2002:a7b:c3d4:: with SMTP id t20mr10931643wmj.170.1588859171365;
-        Thu, 07 May 2020 06:46:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8d3e:39e5:cd88:13cc? ([2001:b07:6468:f312:8d3e:39e5:cd88:13cc])
-        by smtp.gmail.com with ESMTPSA id a8sm8171159wrg.85.2020.05.07.06.46.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2020 06:46:10 -0700 (PDT)
-Subject: Re: [PATCH 1/2] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are not
- set on vmrun of nested guests
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org,
-        Wei Huang <wei.huang2@amd.com>
-References: <20200504223523.7166-1-krish.sadhukhan@oracle.com>
- <20200504223523.7166-2-krish.sadhukhan@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bb452b34-9bcd-d3f7-18db-c8bff02da698@redhat.com>
-Date:   Thu, 7 May 2020 15:46:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727083AbgEGNqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 09:46:40 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:45464 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726218AbgEGNqj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 09:46:39 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id BD7ED9A4637A1595BE71;
+        Thu,  7 May 2020 21:46:37 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 7 May 2020
+ 21:46:30 +0800
+Subject: Re: [PATCH v25 00/10] Add ARMv8 RAS virtualization support in QEMU
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+CC:     Peter Maydell <peter.maydell@linaro.org>,
+        Fam Zheng <fam@euphon.net>,
+        "Xiao Guangrong" <xiaoguangrong.eric@gmail.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Zheng Xiang <zhengxiang9@huawei.com>,
+        qemu-arm <qemu-arm@nongnu.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Igor Mammedov" <imammedo@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200410114639.32844-1-gengdongjiu@huawei.com>
+ <CAFEAcA9oNuDf=bdSSE8mZWrB23+FegD5NeSAmu8dGWhB=adBQg@mail.gmail.com>
+ <da3cbdfd-a75d-c87f-3ece-616278aa64d5@huawei.com>
+ <20200506162439-mutt-send-email-mst@kernel.org>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <9198eac5-87ac-839c-f5dd-598880748b8e@huawei.com>
+Date:   Thu, 7 May 2020 21:46:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200504223523.7166-2-krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200506162439-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/05/20 00:35, Krish Sadhukhan wrote:
-> +	if (!(vmcb->save.efer & EFER_LMA)) {
-> +		if (vmcb->save.cr4 & X86_CR4_PAE) {
-> +			if (vmcb->save.cr3 & MSR_CR3_LEGACY_PAE_RESERVED_MASK)
-> +				return false;
-> +		} else {
-> +			if (vmcb->save.cr3 & MSR_CR3_LEGACY_RESERVED_MASK)
-> +				return false;
-> +		}
-> +		if (vmcb->save.cr4 & MSR_CR4_LEGACY_RESERVED_MASK)
-> +			return false;
-> +	} else {
-> +		if ((vmcb->save.cr4 & X86_CR4_PAE) &&
-> +		    (vmcb->save.cr3 & MSR_CR3_LONG_RESERVED_MASK))
-> +			return false;
-> +		if (vmcb->save.cr4 & MSR_CR4_RESERVED_MASK)
-> +			return false;
-> +	}
-> +
->  	if ((vmcb->control.intercept & (1ULL << INTERCEPT_VMRUN)) == 0)
->  		return false;
->  
 
-I think checking LMA from the guest state is incorrect, the number of
-bits in CR3 and CR4 remains 64 as long as the host processor is 64-bits.
- This of course is unless you have reproduced on bare metal that a
-hypervisor running in 32-bit mode ignores the top 32 bits.
 
-Also, the checks for CR4 must use the guest's reserved bits, using
-kvm_valid_cr4.  However this can be a bit slow so it is probably a good
-idea to cache the bits in kvm_update_cpuid.
+On 2020/5/7 4:25, Michael S. Tsirkin wrote:
+> On Wed, May 06, 2020 at 07:42:19PM +0800, gengdongjiu wrote:
+>> On 2020/4/17 21:32, Peter Maydell wrote:
+>>> On Fri, 10 Apr 2020 at 12:46, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>>>>
+>>>> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA)
+>>>> and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed
+>>>> information of guest, so it is expected that guest can do the recovery. For example, if an
+>>>> exception happens in a guest user-space application, host does not know which application
+>>>> encounters errors, only guest knows it.
+>>>>
+>>>> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
+>>>> After user space gets the notification, it will record the CPER into guest GHES
+>>>> buffer and inject an exception or IRQ to guest.
+>>>>
+>>>> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
+>>>> treat it as a synchronous exception, and notify guest with ARMv8 SEA
+>>>> notification type after recording CPER into guest.
+>>>
+>>> Hi. I left a comment on patch 1. The other 3 patches unreviewed
+>>> are 5, 6 and 8, which are all ACPI core code, so that's for
+>>> MST, Igor or Shannon to review.
+>>>
+>>> Once those have been reviewed, please ping me if you want this
+>>> to go via target-arm.next.
+>>
+>> Hi Peter,
+>>    Igor have reviewed all ACPI core code. whether you can apply this series to target-arm.next I can make another patches to solve your comments on patch1 and another APCI comment.
+>> Thanks very much in advance.
+> 
+> Given it all starts with patch 1, it's probably easier to address the
+> comment and repost.
 
-Thanks,
+  Done.
 
-Paolo
-
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index df3474f..796c083 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -354,7 +354,12 @@ static inline bool gif_set(struct vcpu_svm *svm)
->  }
->  
->  /* svm.c */
-> -#define MSR_INVALID			0xffffffffU
-> +#define MSR_CR3_LEGACY_RESERVED_MASK		0xfe7U
-> +#define MSR_CR3_LEGACY_PAE_RESERVED_MASK	0x7U
-> +#define MSR_CR3_LONG_RESERVED_MASK		0xfff0000000000fe7U
-> +#define MSR_CR4_LEGACY_RESERVED_MASK		0xffbaf000U
-> +#define MSR_CR4_RESERVED_MASK			0xffffffffffbaf000U
-> +#define MSR_INVALID				0xffffffffU
->  
+  Hi Peter,
+      Please review the patch 1 in the patchset v26. Thanks.
+> 
+> 
+>>>
+>>> thanks
+>>> -- PMM
+>>>
+>>> .
+>>>
+> 
+> .
+> 
 
