@@ -2,158 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D66E11C8874
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:38:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE9661C888A
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:41:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726437AbgEGLhq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 07:37:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49919 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725914AbgEGLhq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 07:37:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588851464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=/1Y1rEIgorgDtIzXrfE+9YlewIwGKnH0WZNfOWzA8lc=;
-        b=RTHNk0ZJYiDgNw58OMXP3abfnXaKWCJKfPUcQO9MmmOYX6QRqk1rXTZLp/SoLU6MLbtkR2
-        JcITODhEDFVVrvGMQIsZi2Qq65/xXrNqgHcjtdVVwHoArftUSrIt6vIdvxeHPWct392aPn
-        TXCXhXclRXPhCA9BKJcO5tbYotTWxEc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-PhwZsza4PZmoSOaLcWq3jg-1; Thu, 07 May 2020 07:37:40 -0400
-X-MC-Unique: PhwZsza4PZmoSOaLcWq3jg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8229D884E64;
-        Thu,  7 May 2020 11:37:37 +0000 (UTC)
-Received: from [10.36.113.245] (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BC85A1001920;
-        Thu,  7 May 2020 11:37:31 +0000 (UTC)
-Subject: Re: [PATCH v3 07/15] mm/memory_hotplug: Introduce
- offline_and_remove_memory()
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@suse.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Wei Yang <richard.weiyang@gmail.com>,
-        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
-References: <20200507103119.11219-1-david@redhat.com>
- <20200507103119.11219-8-david@redhat.com>
- <20200507064558-mutt-send-email-mst@kernel.org>
- <a915653f-232e-aa13-68f7-f988704fa84c@redhat.com>
- <441bfb92-ecfa-f54e-3661-b219ea166e55@redhat.com>
- <20200507073408-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <3bed2d1d-d94a-45ca-afe3-5e6ee660b0fc@redhat.com>
-Date:   Thu, 7 May 2020 13:37:30 +0200
+        id S1725969AbgEGLln (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 07:41:43 -0400
+Received: from foss.arm.com ([217.140.110.172]:57378 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725848AbgEGLln (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 07:41:43 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67A991FB;
+        Thu,  7 May 2020 04:41:42 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DA9D3F68F;
+        Thu,  7 May 2020 04:41:40 -0700 (PDT)
+Subject: Re: [PATCH 01/26] KVM: arm64: Check advertised Stage-2 page size
+ capability
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-2-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f2de215f-2ad4-da04-36ab-8932d35abba6@arm.com>
+Date:   Thu, 7 May 2020 12:42:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200507073408-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200422120050.3693593-2-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.05.20 13:34, Michael S. Tsirkin wrote:
-> On Thu, May 07, 2020 at 01:33:23PM +0200, David Hildenbrand wrote:
->>>> I get:
->>>>
->>>> error: sha1 information is lacking or useless (mm/memory_hotplug.c).
->>>> error: could not build fake ancestor
->>>>
->>>> which version is this against? Pls post patches on top of some tag
->>>> in Linus' tree if possible.
->>>
->>> As the cover states, latest linux-next. To be precise
->>>
->>> commit 6b43f715b6379433e8eb30aa9bcc99bd6a585f77 (tag: next-20200507,
->>> next/master)
->>> Author: Stephen Rothwell <sfr@canb.auug.org.au>
->>> Date:   Thu May 7 18:11:31 2020 +1000
->>>
->>>     Add linux-next specific files for 20200507
->>>
->>
->> The patches seem to apply cleanly on top of
->>
->> commit a811c1fa0a02c062555b54651065899437bacdbe (linus/master)
->> Merge: b9388959ba50 16f8036086a9
->> Author: Linus Torvalds <torvalds@linux-foundation.org>
->> Date:   Wed May 6 20:53:22 2020 -0700
->>
->>     Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
-> 
-> Because you have the relevant hashes in your git tree not pruned yet.
-> Do a new clone and they won't apply.
-> 
+Hi,
 
-Yeah, most probably, it knows how to merge. I'm used to sending all my
--mm stuff based on -next, so this here is different.
+On 4/22/20 1:00 PM, Marc Zyngier wrote:
+> With ARMv8.5-GTG, the hardware (or more likely a hypervisor) can
+> advertise the supported Stage-2 page sizes.
+>
+> Let's check this at boot time.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/include/asm/sysreg.h   |  3 +++
+>  arch/arm64/kernel/cpufeature.c    |  8 +++++++
+>  arch/arm64/kvm/reset.c            | 40 ++++++++++++++++++++++++++++---
+>  virt/kvm/arm/arm.c                |  4 +---
+>  5 files changed, 50 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 32c8a675e5a4a..7dd8fefa6aecd 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -670,7 +670,7 @@ static inline int kvm_arm_have_ssbd(void)
+>  void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu);
+>  
+> -void kvm_set_ipa_limit(void);
+> +int kvm_set_ipa_limit(void);
+>  
+>  #define __KVM_HAVE_ARCH_VM_ALLOC
+>  struct kvm *kvm_arch_alloc_vm(void);
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index ebc6224328318..5d10c9148e844 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -686,6 +686,9 @@
+>  #define ID_AA64ZFR0_SVEVER_SVE2		0x1
+>  
+>  /* id_aa64mmfr0 */
+> +#define ID_AA64MMFR0_TGRAN4_2_SHIFT	40
+> +#define ID_AA64MMFR0_TGRAN64_2_SHIFT	36
+> +#define ID_AA64MMFR0_TGRAN16_2_SHIFT	32
+>  #define ID_AA64MMFR0_TGRAN4_SHIFT	28
+>  #define ID_AA64MMFR0_TGRAN64_SHIFT	24
+>  #define ID_AA64MMFR0_TGRAN16_SHIFT	20
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 9fac745aa7bb2..9892a845d06c9 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -208,6 +208,14 @@ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
+>  };
+>  
+>  static const struct arm64_ftr_bits ftr_id_aa64mmfr0[] = {
+> +	/*
+> +	 * Page size not being supported at Stage-2 are not fatal. You
 
-I'll wait a bit and then send v4 based on latest linus/master, adding
-the two acks and reshuffling the MAINTAINERS patch. Thanks.
+s/are not fatal/is not fatal
 
--- 
+> +	 * just give up KVM if PAGE_SIZE isn't supported there. Go fix
+> +	 * your favourite nesting hypervisor.
+> +	 */
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN4_2_SHIFT, 4, 1),
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN64_2_SHIFT, 4, 1),
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_EXACT, ID_AA64MMFR0_TGRAN16_2_SHIFT, 4, 1),
+>  	/*
+>  	 * We already refuse to boot CPUs that don't support our configured
+>  	 * page size, so we can only detect mismatches for a page size other
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 30b7ea680f66c..241db35a7ef4f 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -9,6 +9,7 @@
+>   */
+>  
+>  #include <linux/errno.h>
+> +#include <linux/bitfield.h>
+>  #include <linux/kernel.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/kvm.h>
+> @@ -340,11 +341,42 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	return ret;
+>  }
+>  
+> -void kvm_set_ipa_limit(void)
+> +int kvm_set_ipa_limit(void)
+>  {
+> -	unsigned int ipa_max, pa_max, va_max, parange;
+> +	unsigned int ipa_max, pa_max, va_max, parange, tgran_2;
+> +	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+>  
+> -	parange = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1) & 0x7;
+> +	/*
+> +	 * Check with ARMv8.5-GTG that our PAGE_SIZE is supported at
+> +	 * Stage-2. If not, things will stop very quickly.
+> +	 */
+> +	switch (PAGE_SIZE) {
+> +	default:
+> +	case SZ_4K:
+> +		tgran_2 = ID_AA64MMFR0_TGRAN4_2_SHIFT;
+> +		break;
+> +	case SZ_16K:
+> +		tgran_2 = ID_AA64MMFR0_TGRAN16_2_SHIFT;
+> +		break;
+> +	case SZ_64K:
+> +		tgran_2 = ID_AA64MMFR0_TGRAN64_2_SHIFT;
+> +		break;
+> +	}
+> +
+> +	switch (FIELD_GET(0xFUL << tgran_2, mmfr0)) {
+> +	default:
+> +	case 1:
+> +		kvm_err("PAGE_SIZE not supported at Stage-2, giving up\n");
+> +		return -EINVAL;
+> +	case 0:
+> +		kvm_debug("PAGE_SIZE supported at Stage-2 (default)\n");
+> +		break;
+> +	case 2:
+> +		kvm_debug("PAGE_SIZE supported at Stage-2 (advertised)\n");
+> +		break;
+> +	}
+> +
+> +	parange = mmfr0 & 0x7;
+>  	pa_max = id_aa64mmfr0_parange_to_phys_shift(parange);
+>  
+>  	/* Clamp the IPA limit to the PA size supported by the kernel */
+> @@ -378,6 +410,8 @@ void kvm_set_ipa_limit(void)
+>  	     "KVM IPA limit (%d bit) is smaller than default size\n", ipa_max);
+>  	kvm_ipa_limit = ipa_max;
+>  	kvm_info("IPA Size Limit: %dbits\n", kvm_ipa_limit);
+> +
+> +	return 0;
+>  }
+>  
+>  /*
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 48d0ec44ad77e..53b3ba9173ba7 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1387,9 +1387,7 @@ static inline void hyp_cpu_pm_exit(void)
+>  
+>  static int init_common_resources(void)
+>  {
+> -	kvm_set_ipa_limit();
+> -
+> -	return 0;
+> +	return kvm_set_ipa_limit();
+>  }
+>  
+>  static int init_subsystems(void)
+
+For what is worth, I've taken a look at the ARMv8.5-GTG spec and your patch looks
+fine to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
 Thanks,
-
-David / dhildenb
-
+Alex
