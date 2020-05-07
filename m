@@ -2,142 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BCD71C82EE
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 08:59:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D00971C8376
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 09:31:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726134AbgEGG7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 02:59:36 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2160 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725834AbgEGG7f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 02:59:35 -0400
-Received: from lhreml715-chm.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 3EF2735A948518C8025E;
-        Thu,  7 May 2020 07:59:33 +0100 (IST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml715-chm.china.huawei.com (10.201.108.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Thu, 7 May 2020 07:59:32 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1913.007; Thu, 7 May 2020 07:59:32 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        Zhangfei Gao <zhangfei.gao@linaro.org>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-CC:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "tn@semihalf.com" <tn@semihalf.com>,
-        "bbhushan2@marvell.com" <bbhushan2@marvell.com>
-Subject: RE: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Topic: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Index: AQHWEm6UKSWHwUIWVEisrcDF38xxfKh7GISAgAA31ACAFixYIIAK1E8A
-Date:   Thu, 7 May 2020 06:59:32 +0000
-Message-ID: <c7786a2a314e4c4ab37ef157ddfa23af@huawei.com>
-References: <20200414150607.28488-1-eric.auger@redhat.com>
- <eb27f625-ad7a-fcb5-2185-5471e4666f09@linaro.org>
- <06fe02f7-2556-8986-2f1e-dcdf59773b8c@redhat.com> 
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.81.249]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1725985AbgEGHbG convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 7 May 2020 03:31:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40072 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725802AbgEGHbG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 03:31:06 -0400
+Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE34C061A10;
+        Thu,  7 May 2020 00:31:06 -0700 (PDT)
+Received: from bigeasy by Galois.linutronix.de with local (Exim 4.80)
+        (envelope-from <bigeasy@linutronix.de>)
+        id 1jWayM-0002td-RD; Thu, 07 May 2020 09:29:34 +0200
+Date:   Thu, 7 May 2020 09:29:34 +0200
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Babu Moger <babu.moger@amd.com>, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, dave.hansen@linux.intel.com,
+        luto@kernel.org, peterz@infradead.org, mchehab+samsung@kernel.org,
+        changbin.du@intel.com, namit@vmware.com,
+        yang.shi@linux.alibaba.com, asteinhauser@google.com,
+        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
+        akpm@linux-foundation.org, steven.price@arm.com,
+        rppt@linux.vnet.ibm.com, peterx@redhat.com,
+        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
+        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
+        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
+        jgross@suse.com, andrew.cooper3@citrix.com,
+        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
+        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
+        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] arch/x86: Rename config
+ X86_INTEL_MEMORY_PROTECTION_KEYS to generic x86
+Message-ID: <20200507072934.d5l6cpqyy54lrrla@linutronix.de>
+References: <158880240546.11615.2219410169137148044.stgit@naples-babu.amd.com>
+ <158880253347.11615.8499618616856685179.stgit@naples-babu.amd.com>
+ <4d86b207-77af-dc5d-88a4-f092be0043f6@intel.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <4d86b207-77af-dc5d-88a4-f092be0043f6@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgRXJpYywNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTaGFtZWVy
-YWxpIEtvbG90aHVtIFRob2RpDQo+IFNlbnQ6IDMwIEFwcmlsIDIwMjAgMTA6MzgNCj4gVG86ICdB
-dWdlciBFcmljJyA8ZXJpYy5hdWdlckByZWRoYXQuY29tPjsgWmhhbmdmZWkgR2FvDQo+IDx6aGFu
-Z2ZlaS5nYW9AbGluYXJvLm9yZz47IGVyaWMuYXVnZXIucHJvQGdtYWlsLmNvbTsNCj4gaW9tbXVA
-bGlzdHMubGludXgtZm91bmRhdGlvbi5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7
-DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHU7IHdp
-bGxAa2VybmVsLm9yZzsNCj4gam9yb0A4Ynl0ZXMub3JnOyBtYXpAa2VybmVsLm9yZzsgcm9iaW4u
-bXVycGh5QGFybS5jb20NCj4gQ2M6IGplYW4tcGhpbGlwcGVAbGluYXJvLm9yZzsgYWxleC53aWxs
-aWFtc29uQHJlZGhhdC5jb207DQo+IGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tOyB5aS5s
-LmxpdUBpbnRlbC5jb207IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsNCj4gdG5Ac2VtaWhhbGYu
-Y29tOyBiYmh1c2hhbjJAbWFydmVsbC5jb20NCj4gU3ViamVjdDogUkU6IFtQQVRDSCB2MTEgMDAv
-MTNdIFNNTVV2MyBOZXN0ZWQgU3RhZ2UgU2V0dXAgKElPTU1VIHBhcnQpDQo+IA0KPiBIaSBFcmlj
-LA0KPiANCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IEF1Z2VyIEVy
-aWMgW21haWx0bzplcmljLmF1Z2VyQHJlZGhhdC5jb21dDQo+ID4gU2VudDogMTYgQXByaWwgMjAy
-MCAwODo0NQ0KPiA+IFRvOiBaaGFuZ2ZlaSBHYW8gPHpoYW5nZmVpLmdhb0BsaW5hcm8ub3JnPjsg
-ZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOw0KPiA+IGlvbW11QGxpc3RzLmxpbnV4LWZvdW5kYXRp
-b24ub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPiA+IGt2bUB2Z2VyLmtlcm5l
-bC5vcmc7IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHU7IHdpbGxAa2VybmVsLm9yZzsNCj4g
-PiBqb3JvQDhieXRlcy5vcmc7IG1hekBrZXJuZWwub3JnOyByb2Jpbi5tdXJwaHlAYXJtLmNvbQ0K
-PiA+IENjOiBqZWFuLXBoaWxpcHBlQGxpbmFyby5vcmc7IFNoYW1lZXJhbGkgS29sb3RodW0gVGhv
-ZGkNCj4gPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPjsgYWxleC53aWxs
-aWFtc29uQHJlZGhhdC5jb207DQo+ID4gamFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb207IHlp
-LmwubGl1QGludGVsLmNvbTsgcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOw0KPiA+IHRuQHNlbWlo
-YWxmLmNvbTsgYmJodXNoYW4yQG1hcnZlbGwuY29tDQo+ID4gU3ViamVjdDogUmU6IFtQQVRDSCB2
-MTEgMDAvMTNdIFNNTVV2MyBOZXN0ZWQgU3RhZ2UgU2V0dXAgKElPTU1VIHBhcnQpDQo+ID4NCj4g
-PiBIaSBaaGFuZ2ZlaSwNCj4gPg0KPiA+IE9uIDQvMTYvMjAgNjoyNSBBTSwgWmhhbmdmZWkgR2Fv
-IHdyb3RlOg0KPiA+ID4NCj4gPiA+DQo+ID4gPiBPbiAyMDIwLzQvMTQg5LiL5Y2IMTE6MDUsIEVy
-aWMgQXVnZXIgd3JvdGU6DQo+ID4gPj4gVGhpcyB2ZXJzaW9uIGZpeGVzIGFuIGlzc3VlIG9ic2Vy
-dmVkIGJ5IFNoYW1lZXIgb24gYW4gU01NVSAzLjIsDQo+ID4gPj4gd2hlbiBtb3ZpbmcgZnJvbSBk
-dWFsIHN0YWdlIGNvbmZpZyB0byBzdGFnZSAxIG9ubHkgY29uZmlnLg0KPiA+ID4+IFRoZSAyIGhp
-Z2ggNjRiIG9mIHRoZSBTVEUgbm93IGdldCByZXNldC4gT3RoZXJ3aXNlLCBsZWF2aW5nIHRoZQ0K
-PiA+ID4+IFMyVFRCIHNldCBtYXkgY2F1c2UgYSBDX0JBRF9TVEUgZXJyb3IuDQo+ID4gPj4NCj4g
-PiA+PiBUaGlzIHNlcmllcyBjYW4gYmUgZm91bmQgYXQ6DQo+ID4gPj4gaHR0cHM6Ly9naXRodWIu
-Y29tL2VhdWdlci9saW51eC90cmVlL3Y1LjYtMnN0YWdlLXYxMV8xMC4xDQo+ID4gPj4gKGluY2x1
-ZGluZyB0aGUgVkZJTyBwYXJ0KQ0KPiA+ID4+IFRoZSBRRU1VIGZlbGxvdyBzZXJpZXMgc3RpbGwg
-Y2FuIGJlIGZvdW5kIGF0Og0KPiA+ID4+IGh0dHBzOi8vZ2l0aHViLmNvbS9lYXVnZXIvcWVtdS90
-cmVlL3Y0LjIuMC0yc3RhZ2UtcmZjdjYNCj4gPiA+Pg0KPiA+ID4+IFVzZXJzIGhhdmUgZXhwcmVz
-c2VkIGludGVyZXN0IGluIHRoYXQgd29yayBhbmQgdGVzdGVkIHY5L3YxMDoNCj4gPiA+PiAtIGh0
-dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvY292ZXIvMTEwMzk5OTUvIzIzMDEyMzgxDQo+ID4g
-Pj4gLSBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL2NvdmVyLzExMDM5OTk1LyMyMzE5NzIz
-NQ0KPiA+ID4+DQo+ID4gPj4gQmFja2dyb3VuZDoNCj4gPiA+Pg0KPiA+ID4+IFRoaXMgc2VyaWVz
-IGJyaW5ncyB0aGUgSU9NTVUgcGFydCBvZiBIVyBuZXN0ZWQgcGFnaW5nIHN1cHBvcnQNCj4gPiA+
-PiBpbiB0aGUgU01NVXYzLiBUaGUgVkZJTyBwYXJ0IGlzIHN1Ym1pdHRlZCBzZXBhcmF0ZWx5Lg0K
-PiA+ID4+DQo+ID4gPj4gVGhlIElPTU1VIEFQSSBpcyBleHRlbmRlZCB0byBzdXBwb3J0IDIgbmV3
-IEFQSSBmdW5jdGlvbmFsaXRpZXM6DQo+ID4gPj4gMSkgcGFzcyB0aGUgZ3Vlc3Qgc3RhZ2UgMSBj
-b25maWd1cmF0aW9uDQo+ID4gPj4gMikgcGFzcyBzdGFnZSAxIE1TSSBiaW5kaW5ncw0KPiA+ID4+
-DQo+ID4gPj4gVGhlbiB0aG9zZSBjYXBhYmlsaXRpZXMgZ2V0cyBpbXBsZW1lbnRlZCBpbiB0aGUg
-U01NVXYzIGRyaXZlci4NCj4gPiA+Pg0KPiA+ID4+IFRoZSB2aXJ0dWFsaXplciBwYXNzZXMgaW5m
-b3JtYXRpb24gdGhyb3VnaCB0aGUgVkZJTyB1c2VyIEFQSQ0KPiA+ID4+IHdoaWNoIGNhc2NhZGVz
-IHRoZW0gdG8gdGhlIGlvbW11IHN1YnN5c3RlbS4gVGhpcyBhbGxvd3MgdGhlIGd1ZXN0DQo+ID4g
-Pj4gdG8gb3duIHN0YWdlIDEgdGFibGVzIGFuZCBjb250ZXh0IGRlc2NyaXB0b3JzIChzby1jYWxs
-ZWQgUEFTSUQNCj4gPiA+PiB0YWJsZSkgd2hpbGUgdGhlIGhvc3Qgb3ducyBzdGFnZSAyIHRhYmxl
-cyBhbmQgbWFpbiBjb25maWd1cmF0aW9uDQo+ID4gPj4gc3RydWN0dXJlcyAoU1RFKS4NCj4gPiA+
-Pg0KPiA+ID4+DQo+ID4gPg0KPiA+ID4gVGhhbmtzIEVyaWMNCj4gPiA+DQo+ID4gPiBUZXN0ZWQg
-djExIG9uIEhpc2lsaWNvbiBrdW5wZW5nOTIwIGJvYXJkIHZpYSBoYXJkd2FyZSB6aXAgYWNjZWxl
-cmF0b3IuDQo+ID4gPiAxLiBuby1zdmEgd29ya3MsIHdoZXJlIGd1ZXN0IGFwcCBkaXJlY3RseSB1
-c2UgcGh5c2ljYWwgYWRkcmVzcyB2aWEgaW9jdGwuDQo+ID4gVGhhbmsgeW91IGZvciB0aGUgdGVz
-dGluZy4gR2xhZCBpdCB3b3JrcyBmb3IgeW91Lg0KPiA+ID4gMi4gdlNWQSBzdGlsbCBub3Qgd29y
-aywgc2FtZSBhcyB2MTAsDQo+ID4gWWVzIHRoYXQncyBub3JtYWwgdGhpcyBzZXJpZXMgaXMgbm90
-IG1lYW50IHRvIHN1cHBvcnQgdlNWTSBhdCB0aGlzIHN0YWdlLg0KPiA+DQo+ID4gSSBpbnRlbmQg
-dG8gYWRkIHRoZSBtaXNzaW5nIHBpZWNlcyBkdXJpbmcgdGhlIG5leHQgd2Vla3MuDQo+IA0KPiBU
-aGFua3MgZm9yIHRoYXQuIEkgaGF2ZSBtYWRlIGFuIGF0dGVtcHQgdG8gYWRkIHRoZSB2U1ZBIGJh
-c2VkIG9uDQo+IHlvdXIgdjEwICsgSlBCcyBzdmEgcGF0Y2hlcy4gVGhlIGhvc3Qga2VybmVsIGFu
-ZCBRZW11IGNoYW5nZXMgY2FuDQo+IGJlIGZvdW5kIGhlcmVbMV1bMl0uDQo+IA0KPiBUaGlzIGJh
-c2ljYWxseSBhZGRzIG11bHRpcGxlIHBhc2lkIHN1cHBvcnQgb24gdG9wIG9mIHlvdXIgY2hhbmdl
-cy4NCj4gSSBoYXZlIGRvbmUgc29tZSBiYXNpYyBzYW5pdHkgdGVzdGluZyBhbmQgd2UgaGF2ZSBz
-b21lIGluaXRpYWwgc3VjY2Vzcw0KPiB3aXRoIHRoZSB6aXAgdmYgZGV2IG9uIG91ciBEMDYgcGxh
-dGZvcm0uIFBsZWFzZSBub3RlIHRoYXQgdGhlIFNUQUxMIGV2ZW50IGlzDQo+IG5vdCB5ZXQgc3Vw
-cG9ydGVkIHRob3VnaCwgYnV0IHdvcmtzIGZpbmUgaWYgd2UgbWxvY2soKSBndWVzdCB1c3IgbWVt
-Lg0KDQpJIGhhdmUgYWRkZWQgU1RBTEwgc3VwcG9ydCBmb3Igb3VyIHZTVkEgcHJvdG90eXBlIGFu
-ZCBpdCBzZWVtcyB0byBiZQ0Kd29ya2luZyhvbiBvdXIgaGFyZHdhcmUpLiBJIGhhdmUgdXBkYXRl
-ZCB0aGUga2VybmVsIGFuZCBxZW11IGJyYW5jaGVzIHdpdGgNCnRoZSBzYW1lWzFdWzJdLiBJIHNo
-b3VsZCB3YXJuIHlvdSB0aG91Z2ggdGhhdCB0aGVzZSBhcmUgcHJvdG90eXBlIGNvZGUgYW5kIEkg
-YW0gcHJldHR5DQptdWNoIHJlLXVzaW5nIHRoZSBWRklPX0lPTU1VX1NFVF9QQVNJRF9UQUJMRSBp
-bnRlcmZhY2UgZm9yIGFsbW9zdCBldmVyeXRoaW5nLg0KQnV0IHRob3VnaHQgb2Ygc2hhcmluZywg
-aW4gY2FzZSBpZiBpdCBpcyB1c2VmdWwgc29tZWhvdyEuDQoNClRoYW5rcywNClNoYW1lZXINCg0K
-WzFdaHR0cHM6Ly9naXRodWIuY29tL2hpc2lsaWNvbi9rZXJuZWwtZGV2L2NvbW1pdHMvdnN2YS1w
-cm90b3R5cGUtaG9zdC12MQ0KDQpbMl1odHRwczovL2dpdGh1Yi5jb20vaGlzaWxpY29uL3FlbXUv
-dHJlZS92NC4yLjAtMnN0YWdlLXJmY3Y2LXZzdmEtcHJvdG90eXBlLXYxDQo=
+On 2020-05-06 15:21:29 [-0700], Dave Hansen wrote:
+> > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> > index 1197b5596d5a..8630b9fa06f5 100644
+> > --- a/arch/x86/Kconfig
+> > +++ b/arch/x86/Kconfig
+> > @@ -1886,11 +1886,11 @@ config X86_UMIP
+> >  	  specific cases in protected and virtual-8086 modes. Emulated
+> >  	  results are dummy.
+> >  
+> > -config X86_INTEL_MEMORY_PROTECTION_KEYS
+> > -	prompt "Intel Memory Protection Keys"
+> > +config X86_MEMORY_PROTECTION_KEYS
+> > +	prompt "Memory Protection Keys"
+> >  	def_bool y
+> >  	# Note: only available in 64-bit mode
+> > -	depends on CPU_SUP_INTEL && X86_64
+> > +	depends on X86_64 && (CPU_SUP_INTEL || CPU_SUP_AMD)
+> >  	select ARCH_USES_HIGH_VMA_FLAGS
+> >  	select ARCH_HAS_PKEYS
+> >  	---help---
+> 
+> It's a bit of a bummer that we're going to prompt everybody doing
+> oldconfig's for this new option.  But, I don't know any way for Kconfig
+> to suppress it if the name is changed.  Also, I guess the def_bool=y
+> means that menuconfig and olddefconfig will tend to do the right thing.
+
+You could add a new option (X86_MEMORY_PROTECTION_KEYS) which is
+def_bool X86_INTEL_MEMORY_PROTECTION_KEYS and avoiding the prompt line.
+Soo it is selected based on the old option and the user isn't bother. A
+few cycles later you could remove intel option and add prompt to other.
+But still little work for…
+
+> Do we *really* need to change the Kconfig name?  The text prompt, sure.
+>  End users see that and having Intel in there is massively confusing.
+> 
+> If I have to put up with seeing 'amd64' all over my Debian package
+> names, you can put up with a Kconfig name. :P
+
+:) Right. On AMD you also use the crc32c-intel (if possible) and I
+haven't seen people complain about this one.
+
+> I'm really just wondering what the point of the churn is.
+
+Sebastian
