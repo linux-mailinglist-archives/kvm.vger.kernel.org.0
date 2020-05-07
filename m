@@ -2,196 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A4081C86F4
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 12:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0594E1C8731
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 12:47:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727845AbgEGKdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 06:33:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22764 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727879AbgEGKdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 06:33:39 -0400
+        id S1726579AbgEGKq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 06:46:56 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29904 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725923AbgEGKq4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 06:46:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588847617;
+        s=mimecast20190719; t=1588848414;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=ETQ6uKGHMQumDeMEnt+lmo6qtl8Y1L8zkXdal0m3TTw=;
-        b=Xi83Jr/jloetrwDLBEruUm4uTUXniiwsL3YZRtmr+nBRK5MeFboQlLhqaoGfNOxpf43Lae
-        tVu1cAtuf/n9UR7H/Utueul25ReLVbrr8HPuDLYRrNwx345FLb1lKrqYbC9idwhzicxhFs
-        BFtvmB8OGP7E+z4ikP/mq4E33ElK8p0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-zu1RLbGwPVy20Z2PfAoPog-1; Thu, 07 May 2020 06:33:35 -0400
-X-MC-Unique: zu1RLbGwPVy20Z2PfAoPog-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B53F19200C1;
-        Thu,  7 May 2020 10:33:34 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7BF5D5D9C5;
-        Thu,  7 May 2020 10:33:32 +0000 (UTC)
-From:   David Hildenbrand <david@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
+        bh=jwFSP1qKPzAiDWVK6ecZi/lZRSGtCCdB3pW0dxf0VHw=;
+        b=D0pXP0IUIMyXohYPb51/MwOqKX3cwc8P3CtBT1BmWOlAcovCp183l3rbTn1Px4Btyw5R//
+        gNbfNHE5PRtqKcHOKz3qDV2dfoh6wXYpAbT2gtuddFNAXOUazg5TNJzXN041miT2NcPORQ
+        dtQTNv7YqmwPF3o9p+o4GAb5jQ97E2Y=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-zwcxIzJvNU2ynEwlGlubdg-1; Thu, 07 May 2020 06:46:53 -0400
+X-MC-Unique: zwcxIzJvNU2ynEwlGlubdg-1
+Received: by mail-wm1-f70.google.com with SMTP id u11so2311985wmc.7
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 03:46:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jwFSP1qKPzAiDWVK6ecZi/lZRSGtCCdB3pW0dxf0VHw=;
+        b=He6eymBOBlgdeijXUZ/TlpWeB+ujG4xuGCioUdoBMy1lPea0pCpL6jQXJapxpTL/03
+         FdhMAkaKHPktf7ZNjg/oC4AdCto/vFU2ha5vy6vLMzfn5yPFOWztZzXSO3RsEUY9VOJy
+         SLGr56Kx+UXqeI+ZzDrwl0GSMzj2b+E1bqRX7vh1y1Nko3VFOBFxt/CKHqVj76QROWKt
+         7Qmsywlk6PlAdHr2JG1Cu2DMK3F1++uP9bfOKL8SWubkiiSRAn7MjcFPNQ7JriBfD0Pg
+         KJ6oJATVdXl3seKqW0quaUf5ASV00TbkOpncwMGJhMpqFHTsjy0qPI7KJX4RlG1U8Iqk
+         oQ1Q==
+X-Gm-Message-State: AGi0PuZLTUiOcUEoql8m9TAp5BDOABNgVD1CXMhH6Ibb4++u4splkViu
+        xg8JaEcbaTK9rQQ+8dRpdtrfSB0vAHuO6LbpevRQzRELoeBISnVVBbrjqYGcGfCcs6EgjLUiulx
+        OXqC7md8mltML
+X-Received: by 2002:a1c:4b16:: with SMTP id y22mr9704522wma.170.1588848411508;
+        Thu, 07 May 2020 03:46:51 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJwkpcsvMDTihRmO/58UI/oBdWetzX3zNTW+RN5tQqtGOSRJ/Ox4DqJrFYHImjL7fq9CHlvYA==
+X-Received: by 2002:a1c:4b16:: with SMTP id y22mr9704494wma.170.1588848411214;
+        Thu, 07 May 2020 03:46:51 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+        by smtp.gmail.com with ESMTPSA id v11sm7638062wrv.53.2020.05.07.03.46.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2020 03:46:50 -0700 (PDT)
+Date:   Thu, 7 May 2020 06:46:46 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         Michal Hocko <mhocko@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Subject: [PATCH v3 15/15] virtio-mem: Try to unplug the complete online memory block first
-Date:   Thu,  7 May 2020 12:31:19 +0200
-Message-Id: <20200507103119.11219-16-david@redhat.com>
-In-Reply-To: <20200507103119.11219-1-david@redhat.com>
+        Michal Hocko <mhocko@suse.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        Oscar Salvador <osalvador@suse.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Wei Yang <richard.weiyang@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
+Subject: Re: [PATCH v3 07/15] mm/memory_hotplug: Introduce
+ offline_and_remove_memory()
+Message-ID: <20200507064558-mutt-send-email-mst@kernel.org>
 References: <20200507103119.11219-1-david@redhat.com>
+ <20200507103119.11219-8-david@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200507103119.11219-8-david@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Right now, we always try to unplug single subblocks when processing an
-online memory block. Let's try to unplug the complete online memory block
-first, in case it is fully plugged and the unplug request is large
-enough. Fallback to single subblocks in case the memory block cannot get
-unplugged as a whole.
+On Thu, May 07, 2020 at 12:31:11PM +0200, David Hildenbrand wrote:
+> virtio-mem wants to offline and remove a memory block once it unplugged
+> all subblocks (e.g., using alloc_contig_range()). Let's provide
+> an interface to do that from a driver. virtio-mem already supports to
+> offline partially unplugged memory blocks. Offlining a fully unplugged
+> memory block will not require to migrate any pages. All unplugged
+> subblocks are PageOffline() and have a reference count of 0 - so
+> offlining code will simply skip them.
+> 
+> All we need is an interface to offline and remove the memory from kernel
+> module context, where we don't have access to the memory block devices
+> (esp. find_memory_block() and device_offline()) and the device hotplug
+> lock.
+> 
+> To keep things simple, allow to only work on a single memory block.
+> 
+> Acked-by: Michal Hocko <mhocko@suse.com>
+> Tested-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Oscar Salvador <osalvador@suse.com>
+> Cc: Michal Hocko <mhocko@suse.com>
+> Cc: Pavel Tatashin <pasha.tatashin@soleen.com>
+> Cc: Wei Yang <richard.weiyang@gmail.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Qian Cai <cai@lca.pw>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- drivers/virtio/virtio_mem.c | 88 ++++++++++++++++++++++++-------------
- 1 file changed, 57 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
-index abd93b778a26..9e523db3bee1 100644
---- a/drivers/virtio/virtio_mem.c
-+++ b/drivers/virtio/virtio_mem.c
-@@ -1307,6 +1307,46 @@ static int virtio_mem_mb_unplug_any_sb_offline(str=
-uct virtio_mem *vm,
- 	return 0;
- }
-=20
-+/*
-+ * Unplug the given plugged subblocks of an online memory block.
-+ *
-+ * Will modify the state of the memory block.
-+ */
-+static int virtio_mem_mb_unplug_sb_online(struct virtio_mem *vm,
-+					  unsigned long mb_id, int sb_id,
-+					  int count)
-+{
-+	const unsigned long nr_pages =3D PFN_DOWN(vm->subblock_size) * count;
-+	unsigned long start_pfn;
-+	int rc;
-+
-+	start_pfn =3D PFN_DOWN(virtio_mem_mb_id_to_phys(mb_id) +
-+			     sb_id * vm->subblock_size);
-+	rc =3D alloc_contig_range(start_pfn, start_pfn + nr_pages,
-+				MIGRATE_MOVABLE, GFP_KERNEL);
-+	if (rc =3D=3D -ENOMEM)
-+		/* whoops, out of memory */
-+		return rc;
-+	if (rc)
-+		return -EBUSY;
-+
-+	/* Mark it as fake-offline before unplugging it */
-+	virtio_mem_set_fake_offline(start_pfn, nr_pages, true);
-+	adjust_managed_page_count(pfn_to_page(start_pfn), -nr_pages);
-+
-+	/* Try to unplug the allocated memory */
-+	rc =3D virtio_mem_mb_unplug_sb(vm, mb_id, sb_id, count);
-+	if (rc) {
-+		/* Return the memory to the buddy. */
-+		virtio_mem_fake_online(start_pfn, nr_pages);
-+		return rc;
-+	}
-+
-+	virtio_mem_mb_set_state(vm, mb_id,
-+				VIRTIO_MEM_MB_STATE_ONLINE_PARTIAL);
-+	return 0;
-+}
-+
- /*
-  * Unplug the desired number of plugged subblocks of an online memory bl=
-ock.
-  * Will skip subblock that are busy.
-@@ -1321,16 +1361,21 @@ static int virtio_mem_mb_unplug_any_sb_online(str=
-uct virtio_mem *vm,
- 					      unsigned long mb_id,
- 					      uint64_t *nb_sb)
- {
--	const unsigned long nr_pages =3D PFN_DOWN(vm->subblock_size);
--	unsigned long start_pfn;
- 	int rc, sb_id;
-=20
--	/*
--	 * TODO: To increase the performance we want to try bigger, consecutive
--	 * subblocks first before falling back to single subblocks. Also,
--	 * we should sense via something like is_mem_section_removable()
--	 * first if it makes sense to go ahead any try to allocate.
--	 */
-+	/* If possible, try to unplug the complete block in one shot. */
-+	if (*nb_sb >=3D vm->nb_sb_per_mb &&
-+	    virtio_mem_mb_test_sb_plugged(vm, mb_id, 0, vm->nb_sb_per_mb)) {
-+		rc =3D virtio_mem_mb_unplug_sb_online(vm, mb_id, 0,
-+						    vm->nb_sb_per_mb);
-+		if (!rc) {
-+			*nb_sb -=3D vm->nb_sb_per_mb;
-+			goto unplugged;
-+		} else if (rc !=3D -EBUSY)
-+			return rc;
-+	}
-+
-+	/* Fallback to single subblocks. */
- 	for (sb_id =3D vm->nb_sb_per_mb - 1; sb_id >=3D 0 && *nb_sb; sb_id--) {
- 		/* Find the next candidate subblock */
- 		while (sb_id >=3D 0 &&
-@@ -1339,34 +1384,15 @@ static int virtio_mem_mb_unplug_any_sb_online(str=
-uct virtio_mem *vm,
- 		if (sb_id < 0)
- 			break;
-=20
--		start_pfn =3D PFN_DOWN(virtio_mem_mb_id_to_phys(mb_id) +
--				     sb_id * vm->subblock_size);
--		rc =3D alloc_contig_range(start_pfn, start_pfn + nr_pages,
--					MIGRATE_MOVABLE, GFP_KERNEL);
--		if (rc =3D=3D -ENOMEM)
--			/* whoops, out of memory */
--			return rc;
--		if (rc)
--			/* memory busy, we can't unplug this chunk */
-+		rc =3D virtio_mem_mb_unplug_sb_online(vm, mb_id, sb_id, 1);
-+		if (rc =3D=3D -EBUSY)
- 			continue;
--
--		/* Mark it as fake-offline before unplugging it */
--		virtio_mem_set_fake_offline(start_pfn, nr_pages, true);
--		adjust_managed_page_count(pfn_to_page(start_pfn), -nr_pages);
--
--		/* Try to unplug the allocated memory */
--		rc =3D virtio_mem_mb_unplug_sb(vm, mb_id, sb_id, 1);
--		if (rc) {
--			/* Return the memory to the buddy. */
--			virtio_mem_fake_online(start_pfn, nr_pages);
-+		else if (rc)
- 			return rc;
--		}
--
--		virtio_mem_mb_set_state(vm, mb_id,
--					VIRTIO_MEM_MB_STATE_ONLINE_PARTIAL);
- 		*nb_sb -=3D 1;
- 	}
-=20
-+unplugged:
- 	/*
- 	 * Once all subblocks of a memory block were unplugged, offline and
- 	 * remove it. This will usually not fail, as no memory is in use
---=20
-2.25.3
+didn't you lose Andrew Morton's ack here?
+
+> ---
+>  include/linux/memory_hotplug.h |  1 +
+>  mm/memory_hotplug.c            | 37 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 38 insertions(+)
+
+I get:
+
+error: sha1 information is lacking or useless (mm/memory_hotplug.c).
+error: could not build fake ancestor
+
+which version is this against? Pls post patches on top of some tag
+in Linus' tree if possible.
+
+
+> diff --git a/include/linux/memory_hotplug.h b/include/linux/memory_hotplug.h
+> index 7dca9cd6076b..d641828e5596 100644
+> --- a/include/linux/memory_hotplug.h
+> +++ b/include/linux/memory_hotplug.h
+> @@ -318,6 +318,7 @@ extern void try_offline_node(int nid);
+>  extern int offline_pages(unsigned long start_pfn, unsigned long nr_pages);
+>  extern int remove_memory(int nid, u64 start, u64 size);
+>  extern void __remove_memory(int nid, u64 start, u64 size);
+> +extern int offline_and_remove_memory(int nid, u64 start, u64 size);
+>  
+>  #else
+>  static inline void try_offline_node(int nid) {}
+> diff --git a/mm/memory_hotplug.c b/mm/memory_hotplug.c
+> index 936bfe208a6e..bf1941f02a60 100644
+> --- a/mm/memory_hotplug.c
+> +++ b/mm/memory_hotplug.c
+> @@ -1748,4 +1748,41 @@ int remove_memory(int nid, u64 start, u64 size)
+>  	return rc;
+>  }
+>  EXPORT_SYMBOL_GPL(remove_memory);
+> +
+> +/*
+> + * Try to offline and remove a memory block. Might take a long time to
+> + * finish in case memory is still in use. Primarily useful for memory devices
+> + * that logically unplugged all memory (so it's no longer in use) and want to
+> + * offline + remove the memory block.
+> + */
+> +int offline_and_remove_memory(int nid, u64 start, u64 size)
+> +{
+> +	struct memory_block *mem;
+> +	int rc = -EINVAL;
+> +
+> +	if (!IS_ALIGNED(start, memory_block_size_bytes()) ||
+> +	    size != memory_block_size_bytes())
+> +		return rc;
+> +
+> +	lock_device_hotplug();
+> +	mem = find_memory_block(__pfn_to_section(PFN_DOWN(start)));
+> +	if (mem)
+> +		rc = device_offline(&mem->dev);
+> +	/* Ignore if the device is already offline. */
+> +	if (rc > 0)
+> +		rc = 0;
+> +
+> +	/*
+> +	 * In case we succeeded to offline the memory block, remove it.
+> +	 * This cannot fail as it cannot get onlined in the meantime.
+> +	 */
+> +	if (!rc) {
+> +		rc = try_remove_memory(nid, start, size);
+> +		WARN_ON_ONCE(rc);
+> +	}
+> +	unlock_device_hotplug();
+> +
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_GPL(offline_and_remove_memory);
+>  #endif /* CONFIG_MEMORY_HOTREMOVE */
+> -- 
+> 2.25.3
 
