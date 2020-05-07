@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FD0A1C8F3A
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 16:36:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E7CC1C8F49
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 16:36:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726860AbgEGOaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 10:30:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58798 "EHLO mail.kernel.org"
+        id S1728839AbgEGOa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 10:30:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59286 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728775AbgEGOaL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 10:30:11 -0400
+        id S1728822AbgEGOaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 10:30:25 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7CDED2083B;
-        Thu,  7 May 2020 14:30:09 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DB87620A8B;
+        Thu,  7 May 2020 14:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588861810;
-        bh=Wej/uY5j7bc1JjjVM8N9kGzpXqK5HqUHUQm4FqUdtTE=;
+        s=default; t=1588861824;
+        bh=oFmEvwMhzT1oMjagkBpiXYcgW4V972smE29+gs+dHNc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=m+4kIlrqeeSNHIxhqI86W6Fo7M6JUzbVpyEaDYx8W6qKLLZiIbPzNx2vSWQeimG4m
-         JgOYkvCAPvaOgueAK/yMrn3NpU/CgeFXfK+sOjDDrm58bWflC3jYzVQMcsL40I+47M
-         2JElei9Sk5ObsH0XtVmjUjCFWsiowp6CpbQFhUHo=
+        b=gLQxQCa0MCwjhYScMC/I8e2f95wg8h8xtXODSQtklQPMZQCTbnfi4msUOoa+SP1kx
+         S5mqnbRYvUjra5gsP0RyBLsWDBTQ1co1H/v/u5aaD85StzoPfVy1jYr9Xpa/UtD/kG
+         7d22rRQlspk5v8mSm/9jnf188QJWXpxwSKQ9rlWg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 05/11] vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()
-Date:   Thu,  7 May 2020 10:29:57 -0400
-Message-Id: <20200507143003.27047-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 5/9] vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()
+Date:   Thu,  7 May 2020 10:30:14 -0400
+Message-Id: <20200507143018.27195-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200507143003.27047-1-sashal@kernel.org>
-References: <20200507143003.27047-1-sashal@kernel.org>
+In-Reply-To: <20200507143018.27195-1-sashal@kernel.org>
+References: <20200507143018.27195-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -98,10 +98,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0d5b667c0e652..a9f58f3867f02 100644
+index 875634d0d020f..d394911ec0c98 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -229,8 +229,8 @@ static int vaddr_get_pfn(unsigned long vaddr, int prot, unsigned long *pfn)
+@@ -227,8 +227,8 @@ static int vaddr_get_pfn(unsigned long vaddr, int prot, unsigned long *pfn)
  	vma = find_vma_intersection(current->mm, vaddr, vaddr + 1);
  
  	if (vma && vma->vm_flags & VM_PFNMAP) {
