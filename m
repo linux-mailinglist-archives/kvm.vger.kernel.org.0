@@ -2,144 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C47731C88F7
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:53:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 508AE1C8911
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:58:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726774AbgEGLxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 07:53:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60768 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726580AbgEGLxi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 07:53:38 -0400
+        id S1726222AbgEGL6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 07:58:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57148 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725879AbgEGL6k (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 07:58:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588852416;
+        s=mimecast20190719; t=1588852719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=oJNhrRBC0c+BFGHFCS+s7JJ0R5CeLnnrd6LkdO80vW4=;
-        b=HQei5SeVaDd6hPqjS4D1PRRpCbpdlC7Ci8jM9g2KMtmvCuwmcqWrY1k9F/oDe1dnJNqu8H
-        w1XI4CixLnftHTe8Qt6RwBNn2VQEK9YXkq86Yri5bjiZ6g9TFoC37oiq2/fel5mSVvgQ7C
-        C3JP8mlpF088z/nOGwhuAgn5Q2X0Wn8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-r-JReGUDMy6MKKvTDqstzw-1; Thu, 07 May 2020 07:53:34 -0400
-X-MC-Unique: r-JReGUDMy6MKKvTDqstzw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 821341005510;
-        Thu,  7 May 2020 11:53:33 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 11C1F1C933;
-        Thu,  7 May 2020 11:53:32 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yiPqmyXt2urT2VSeZ8MvHvwecfn5nr3uxgLaKR1t8OI=;
+        b=V9JDVXPjNIacWy1fzUjRnsQ3thNdE73vdsh3PJvn7ZOECkg8CjFX3o0gSqcTXUAZFHvwI/
+        aZ7AHEawNGxPhWzyy0zHflOgm+/o8cNDc2tfU8q6hBfxMB7gSkZ5fKt2o0jSs21W/0FN0t
+        QNZgq7YesQF08OYpzDMiEQZiHJyZn+U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-W9S0y8o8Op-zGcyR-win4Q-1; Thu, 07 May 2020 07:58:37 -0400
+X-MC-Unique: W9S0y8o8Op-zGcyR-win4Q-1
+Received: by mail-wm1-f72.google.com with SMTP id q5so3221466wmc.9
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 04:58:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yiPqmyXt2urT2VSeZ8MvHvwecfn5nr3uxgLaKR1t8OI=;
+        b=MsufuTClT9GuF/SeLWNmN6wGOEHiHcigb8KnqxeFAI76jCxzqCbqsGeiBJDbsBkqfl
+         cfnMSOeldPwHx3R8HLA4nJdodXApSi13HsTks+0t/QyWEB64bA6zQVqFtosPuo1j4Xw5
+         KqXB3WSlNofJ7F5dMpzRV/7FdyByB9DL9MSCnWrGtnQyLDwgace0vE9SiOlclWiKr3P5
+         eNsQZtmZ6V06nupXy5QKgiSBOKskavynH354eMPfLeSsgO/JIDdRPIC2NFL96zNd6e2z
+         AWs2+3htYPD9f6+3T/WPNSOSyMa/7xx8Azxaz3urZCCltgWEOG8Ci+LaaHSZe05OWqOC
+         2CHQ==
+X-Gm-Message-State: AGi0PuaY6uXbeAf2WYy3pX/wdfPYacJiyDEUKDGY2LK0A55h2NG0S0iG
+        gM11oSDr6dzJmfldV80zNfrF97DFqNgxtUt4C9nM2bSToBrXUnRE6XNDKewxIDIzUGg3UypAKB6
+        FSTCnuUeVS/rv
+X-Received: by 2002:a5d:69c3:: with SMTP id s3mr14667094wrw.305.1588852716395;
+        Thu, 07 May 2020 04:58:36 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKzVix44sPWmS0TD7/0MINztaLpqYGgLdl9qHxVJpBT4xptKl3C4qytYcX122+5P0GjR+9v+g==
+X-Received: by 2002:a5d:69c3:: with SMTP id s3mr14667077wrw.305.1588852716097;
+        Thu, 07 May 2020 04:58:36 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8d3e:39e5:cd88:13cc? ([2001:b07:6468:f312:8d3e:39e5:cd88:13cc])
+        by smtp.gmail.com with ESMTPSA id e17sm7455415wrr.32.2020.05.07.04.58.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 May 2020 04:58:35 -0700 (PDT)
+Subject: Re: [PATCH 0/2] KVM: nVMX: Skip IPBP on nested VMCS switch
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200506235850.22600-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for Linux 5.7-rc5
-Date:   Thu,  7 May 2020 07:53:32 -0400
-Message-Id: <20200507115332.495930-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Message-ID: <0cc08cc0-252c-378e-15b3-6d9639ee5552@redhat.com>
+Date:   Thu, 7 May 2020 13:58:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200506235850.22600-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On 07/05/20 01:58, Sean Christopherson wrote:
+> Or as Jim would say, "Really skip IPBP on nested VMCS switch" :-D
+> 
+> Patch 1 is the delta between kvm/queue and v3 of the original patch[*],
+> i.e. I just cherry-picked v3 and fixed the conflicts.
+> 
+> Patch 2 applies the "no IPBP" logic to copy_vmcs02_to_vmcs12_rare().
+> 
+> Feel free to sqaush both of these to commit 7407a52f23732 ("KVM: nVMX:
+> Skip IBPB when switching between vmcs01 and vmcs02") if you so desire.
 
-The following changes since commit 00a6a5ef39e7db3648b35c86361058854db84c83:
-
-  Merge tag 'kvm-ppc-fixes-5.7-1' of git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc into kvm-master (2020-04-21 09:39:55 -0400)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 2673cb6849722a4ffd74c27a9200a9ec43f64be3:
-
-  Merge tag 'kvm-s390-master-5.7-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2020-05-06 08:09:17 -0400)
-
-----------------------------------------------------------------
-Bugfixes, mostly for ARM and AMD, and more documentation.
-
-----------------------------------------------------------------
-
-Slightly bigger than usual because I couldn't send out what was pending
-for rc4, but there is nothing worrisome going on.  I have more
-fixes pending for guest debugging support (gdbstub) but I will send them
-next week.
-
-Thanks,
+I squashed patch 1 and applied patch 2 separately.  Thanks!
 
 Paolo
 
-Christian Borntraeger (1):
-      KVM: s390: Remove false WARN_ON_ONCE for the PQAP instruction
-
-Fangrui Song (1):
-      KVM: arm64: Delete duplicated label in invalid_vector
-
-Kashyap Chamarthy (1):
-      docs/virt/kvm: Document configuring and running nested guests
-
-Marc Zyngier (11):
-      KVM: arm: vgic: Fix limit condition when writing to GICD_I[CS]ACTIVER
-      KVM: arm64: PSCI: Narrow input registers when using 32bit functions
-      KVM: arm64: PSCI: Forbid 64bit functions for 32bit guests
-      KVM: arm: vgic: Synchronize the whole guest on GIC{D,R}_I{S,C}ACTIVER read
-      KVM: arm: vgic: Only use the virtual state when userspace accesses enable bits
-      KVM: arm: vgic-v2: Only use the virtual state when userspace accesses pending bits
-      Merge branch 'kvm-arm64/psci-fixes-5.7' into kvmarm-master/master
-      Merge branch 'kvm-arm64/vgic-fixes-5.7' into kvmarm-master/master
-      KVM: arm64: Save/restore sp_el0 as part of __guest_enter
-      KVM: arm64: vgic-v4: Initialize GICv4.1 even in the absence of a virtual ITS
-      KVM: arm64: Fix 32bit PC wrap-around
-
-Paolo Bonzini (6):
-      KVM: SVM: fill in kvm_run->debug.arch.dr[67]
-      Merge tag 'kvmarm-fixes-5.7-1' of git://git.kernel.org/.../kvmarm/kvmarm into kvm-master
-      Merge tag 'kvmarm-fixes-5.7-2' of git://git.kernel.org/.../kvmarm/kvmarm into kvm-master
-      kvm: ioapic: Restrict lazy EOI update to edge-triggered interrupts
-      kvm: x86: Use KVM CPU capabilities to determine CR4 reserved bits
-      Merge tag 'kvm-s390-master-5.7-3' of git://git.kernel.org/.../kvms390/linux into HEAD
-
-Peter Xu (2):
-      KVM: selftests: Fix build for evmcs.h
-      KVM: X86: Declare KVM_CAP_SET_GUEST_DEBUG properly
-
-Sean Christopherson (2):
-      KVM: nVMX: Replace a BUG_ON(1) with BUG() to squash clang warning
-      KVM: VMX: Explicitly clear RFLAGS.CF and RFLAGS.ZF in VM-Exit RSB path
-
-Suravee Suthikulpanit (1):
-      KVM: x86: Fixes posted interrupt check for IRQs delivery modes
-
-Zenghui Yu (2):
-      KVM: arm64: vgic-v3: Retire all pending LPIs on vcpu destroy
-      KVM: arm64: vgic-its: Fix memory leak on the error path of vgic_add_lpi()
-
- Documentation/virt/kvm/index.rst                 |   2 +
- Documentation/virt/kvm/running-nested-guests.rst | 276 +++++++++++++++++++++++
- arch/arm64/kvm/guest.c                           |   7 +
- arch/arm64/kvm/hyp/entry.S                       |  23 ++
- arch/arm64/kvm/hyp/hyp-entry.S                   |   1 -
- arch/arm64/kvm/hyp/sysreg-sr.c                   |  17 +-
- arch/powerpc/kvm/powerpc.c                       |   1 +
- arch/s390/kvm/kvm-s390.c                         |   1 +
- arch/s390/kvm/priv.c                             |   4 +-
- arch/x86/include/asm/kvm_host.h                  |   4 +-
- arch/x86/kvm/ioapic.c                            |  10 +-
- arch/x86/kvm/svm/svm.c                           |   2 +
- arch/x86/kvm/vmx/nested.c                        |   2 +-
- arch/x86/kvm/vmx/vmenter.S                       |   3 +
- arch/x86/kvm/x86.c                               |  21 +-
- tools/testing/selftests/kvm/include/evmcs.h      |   4 +-
- tools/testing/selftests/kvm/lib/x86_64/vmx.c     |   3 +
- virt/kvm/arm/hyp/aarch32.c                       |   8 +-
- virt/kvm/arm/psci.c                              |  40 ++++
- virt/kvm/arm/vgic/vgic-init.c                    |  19 +-
- virt/kvm/arm/vgic/vgic-its.c                     |  11 +-
- virt/kvm/arm/vgic/vgic-mmio-v2.c                 |  16 +-
- virt/kvm/arm/vgic/vgic-mmio-v3.c                 |  31 +--
- virt/kvm/arm/vgic/vgic-mmio.c                    | 228 ++++++++++++++-----
- virt/kvm/arm/vgic/vgic-mmio.h                    |  19 ++
- 25 files changed, 628 insertions(+), 125 deletions(-)
- create mode 100644 Documentation/virt/kvm/running-nested-guests.rst
+> [*] https://lkml.kernel.org/r/20200505044644.16563-1-sean.j.christopherson@intel.com
+> 
+> Sean Christopherson (2):
+>   KVM: nVMX: Refactor IBPB handling on VMCS switch to genericize code
+>   KVM: nVMX: Skip IPBP when switching between vmcs01 and vmcs02, redux
+> 
+>  arch/x86/kvm/vmx/nested.c | 13 +++----------
+>  arch/x86/kvm/vmx/vmx.c    | 19 ++++++++++++++-----
+>  arch/x86/kvm/vmx/vmx.h    |  4 ++--
+>  3 files changed, 19 insertions(+), 17 deletions(-)
+> 
 
