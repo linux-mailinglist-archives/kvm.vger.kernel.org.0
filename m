@@ -2,221 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00CBA1C9832
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 19:46:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C70F1C98B6
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 20:05:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728078AbgEGRqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 13:46:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727084AbgEGRqT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 13:46:19 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D686CC05BD0C
-        for <kvm@vger.kernel.org>; Thu,  7 May 2020 10:46:18 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id e9so3714249iok.9
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 10:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=yU0mJ28GxeMYjUBMEveE72PctswqptxZPEqLuEZt3cA=;
-        b=vnd3Wz+k5EBZmosgqi5KKkGOlJPJfOp4+cC5rwQ5WKpxRuQIpmmoJ3cc9pg33/Ra2g
-         /q3iGdwk0pNt0z7FaQrx4sYZVKT6xvn6L11gFpzroAtPAbaIaFOaFA33AOzmsY2oJVzE
-         jtgyAMHmQRTny/Ymt7q8IJQ7lmehM/dp2fOPtkiEAf4fIS+TJ1gOCEXPyqVc+EempRvT
-         LnIlcIIg3aPKzbfL50LWiVOlU2fXt/KiLSoS1PkVzECJlOLjp7YUx+z81+MOMhjkymjK
-         17ES11qP77zrlhR4/OPv4Jsjafu984eSlgI/TG6K8fqacWkVukhDDXeHg0UV09ujnOXR
-         8eVw==
+        id S1728129AbgEGSFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 14:05:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25636 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726514AbgEGSFO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 14:05:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588874713;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7ZT8uf+8nR83y0d403Od1JUqxjPNizjmPd+u74qytwY=;
+        b=D2jslFUT5Rl7HJZ/VlZce5w0OQMurEQ1B0h2GRkieAUEdthSHmt+mYIyyzxLiCzVKVQ2sC
+        4POOBExoDBQ8gxUkqm/Zfwv7SrggrppXKUY4O7OlQ7CsmXlp2AWuGR+XkxMtQPHvqWvL1I
+        akr0Upcq/knyALRi9cDF1JvbqPjChgE=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-LYbaVjWiNZSP57J2hG_2eQ-1; Thu, 07 May 2020 14:05:11 -0400
+X-MC-Unique: LYbaVjWiNZSP57J2hG_2eQ-1
+Received: by mail-qv1-f70.google.com with SMTP id dh14so6684278qvb.4
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 11:05:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=yU0mJ28GxeMYjUBMEveE72PctswqptxZPEqLuEZt3cA=;
-        b=n3pKifuxNkWFZqd0MlpAb3ngzYmWLc8YjenbafuAUc3v39GPNlJ4RPUgfYTH4RajRe
-         PiH7XKmNIAcufnuRvKI54Xwmo0iwGQBvGucei1IR7h1wL3hRg5fhXA3W5YlaLIxiUPyc
-         WgBElvb2Hniz9F1UnSCj/xqWryY1HsLTp/WMPk3G4jFxSfvY71TjkvFIvBpViSj+P0q3
-         evdcvRrxnxVJeXyWM/dy8Ev2qbjBViQ+ypYIeLu6COAkw2mrYIt44WXJRCa0/X1hz4yC
-         6611JBQ3K9zecAxPh8M8uArnbJmp/7U66u547jYJTIVwk7MRSQTU7Lafjt2fLhS3cJBw
-         70lA==
-X-Gm-Message-State: AGi0PuaU0s/1+9Vwz0S/Hcf6XmpQeEAbnjZXkphA4/q1S5nuUI863LtB
-        cmMRJiE+RUMbWTb7YymIcTUghyV1I9YgtyCisJgc
-X-Google-Smtp-Source: APiQypKtjV9RP7CzUz6PwlgUeogcwCqPXHQgs82XapWkRetj+C9fCnc4inT+4h675n5xp5ipP2PRJql00+jL03kLjws=
-X-Received: by 2002:a6b:c9cc:: with SMTP id z195mr2514506iof.164.1588873577069;
- Thu, 07 May 2020 10:46:17 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7ZT8uf+8nR83y0d403Od1JUqxjPNizjmPd+u74qytwY=;
+        b=g0ZcDmbySf7PRNlLgAUl67V+54A2vzzU0mV7Uu47Lq3MG+Sbe7Q09QrqdAysJ7NyfD
+         GCRGzYrxJdpVcgjqf4AOR8a+zFyjJhIfAS0Rw4gCVN+nSHTMmwYU8f77pUc6CptaR3do
+         JVxXoNT8Gfi4AvJZsBYD/evNZmoZiSDF4on15XKLbP05hDEpIF+q55/d6JgT+AsKT6dV
+         xOljnEIqs3uJqnop6Sf6anqKEVTNNMHbYT1iOm8oDAEIm70aPnqmOg19teDqcZg/E3aG
+         UfRwk5Wc4zU0VnHLoUU0iHzk35IEmeyJuVWS9D+Y0ncaF0P5IX39Cb4FlZMjeEeAYVKA
+         rCvg==
+X-Gm-Message-State: AGi0Pua/ZitpPIQvQqwQnJNpRDOWdPtIrDB34XBkF592+zpqtjWFu8/r
+        lmN49v6UcbUapLVRgC2hIu1w64SghYerV8tNvxV7q21ZatrbpUASC0yIkoXuK4AVzq86bkJBd3b
+        ePFntMj6b8w/b
+X-Received: by 2002:a37:8d07:: with SMTP id p7mr16276235qkd.500.1588874711175;
+        Thu, 07 May 2020 11:05:11 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLaD9wsQNdumwebtoAZ7rJYDUyJERvx2DqBTrcl3tFL8/q8qwbOR3ce/0xUX7ee+QK3N2tBXw==
+X-Received: by 2002:a37:8d07:: with SMTP id p7mr16276184qkd.500.1588874710644;
+        Thu, 07 May 2020 11:05:10 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id o16sm4104750qko.38.2020.05.07.11.05.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2020 11:05:09 -0700 (PDT)
+Date:   Thu, 7 May 2020 14:05:08 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 9/9] KVM: VMX: pass correct DR6 for GD userspace exit
+Message-ID: <20200507180508.GH228260@xz-x1>
+References: <20200507115011.494562-1-pbonzini@redhat.com>
+ <20200507115011.494562-10-pbonzini@redhat.com>
+ <20200507161854.GF228260@xz-x1>
+ <7abe5f7b-2b5a-4e32-34e2-f37d0afef00a@redhat.com>
+ <20200507163839.GG228260@xz-x1>
+ <db06ffa7-1e3c-14e5-28b8-5053f4383ecf@redhat.com>
 MIME-Version: 1.0
-References: <20200504110344.17560-1-eesposit@redhat.com>
-In-Reply-To: <20200504110344.17560-1-eesposit@redhat.com>
-From:   Jonathan Adams <jwadams@google.com>
-Date:   Thu, 7 May 2020 10:45:40 -0700
-Message-ID: <CA+VK+GN=iDhDV2ZDJbBsxrjZ3Qoyotk_L0DvsbwDVvqrpFZ8fQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
- kernel statistics
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <db06ffa7-1e3c-14e5-28b8-5053f4383ecf@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 4, 2020 at 4:05 AM Emanuele Giuseppe Esposito
-<eesposit@redhat.com> wrote:
-...
-> Statsfs offers a generic and stable API, allowing any kind of
-> directory/file organization and supporting multiple kind of aggregations
-> (not only sum, but also average, max, min and count_zero) and data types
-> (all unsigned and signed types plus boolean). The implementation, which i=
-s
-> a generalization of KVM=E2=80=99s debugfs statistics code, takes care of =
-gathering
-> and displaying information at run time; users only need to specify the
-> values to be included in each source.
->
-> Statsfs would also be a different mountpoint from debugfs, and would not
-> suffer from limited access due to the security lock down patches. Its mai=
-n
-> function is to display each statistics as a file in the desired folder
-> hierarchy defined through the API. Statsfs files can be read, and possibl=
-y
-> cleared if their file mode allows it.
->
-> Statsfs has two main components: the public API defined by
-> include/linux/statsfs.h, and the virtual file system which should end up
-> in /sys/kernel/stats.
+On Thu, May 07, 2020 at 07:42:25PM +0200, Paolo Bonzini wrote:
+> On 07/05/20 18:38, Peter Xu wrote:
+> > On Thu, May 07, 2020 at 06:21:18PM +0200, Paolo Bonzini wrote:
+> >> On 07/05/20 18:18, Peter Xu wrote:
+> >>>>  		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) {
+> >>>> -			vcpu->run->debug.arch.dr6 = vcpu->arch.dr6;
+> >>>> +			vcpu->run->debug.arch.dr6 = DR6_BD | DR6_RTM | DR6_FIXED_1;
+> >>> After a second thought I'm thinking whether it would be okay to have BS set in
+> >>> that test case.  I just remembered there's a test case in the kvm-unit-test
+> >>> that checks explicitly against BS leftover as long as dr6 is not cleared
+> >>> explicitly by the guest code, while the spec seems to have no explicit
+> >>> description on this case.
+> >>
+> >> Yes, I noticed that test as well.  But I don't like having different
+> >> behavior for Intel and AMD, and the Intel behavior is more sensible.
+> >> Also...
+> > 
+> > Do you mean the AMD behavior is more sensible instead? :)
+> 
+> No, I mean within the context of KVM_EXIT_DEBUG: the Intel behavior is
+> to only include the latest debug exception in kvm_run's DR6 field, while
+> the AMD behavior would be to include all of them.  This was an
+> implementation detail (it happens because Intel sets kvm_run's DR6 from
+> the exit qualification of #DB), but it's more sensible too.
+> 
+> In addition:
+> 
+> * AMD was completely broken until this week, so the behavior of
+> KVM_EXIT_DEBUG is defined de facto by kvm_intel.ko.  Userspace has not
+> been required to set DR6 with KVM_SET_GUEST_DEBUG, and since we can
+> emulate that on AMD, we should.
+> 
+> * we have to fix anyway the fact that on AMD a KVM_EXIT_DEBUG is
+> clobbering the contents of the guest's DR6
+> 
+> >>> Intead of above, I'm thinking whether we should allow the userspace to also
+> >>> change dr6 with the KVM_SET_GUEST_DEBUG ioctl when they wanted to (right now
+> >>> iiuc dr6 from userspace is completely ignored), instead of offering a fake dr6.
+> >>> Or to make it simple, maybe we can just check BD bit only?
+> >>
+> >> ... I'm afraid that this would be a backwards-incompatible change, and
+> >> it would require changes in userspace.  If you look at v2, emulating the
+> >> Intel behavior in AMD turns out to be self-contained and relatively
+> >> elegant (will be better when we finish cleaning up nested SVM).
+> > 
+> > I'm still trying to read the other patches (I need some more digest because I'm
+> > even less familiar with nested...).  I agree that it would be good to keep the
+> > same behavior across Intel/AMD.  Actually that also does not violate Intel spec
+> > because the AMD one is stricter.
+> 
+> Again, careful---we're talking about KVM_EXIT_DEBUG, not the #DB exception.
 
-This is good work.  As David Rientjes mentioned, I'm currently investigatin=
-g
-a similar project, based on a google-internal debugfs-based FS we call
-"metricfs".  It's
-designed in a slightly different fashion than statsfs here is, and the
-statistics exported are
-mostly fed into our OpenTelemetry-like system.  We're motivated by
-wanting an upstreamed solution, so that we can upstream the metrics we
-create that are of general interest, and lower the overall rebasing
-burden for our tree.
+OK I get your point now.  Thanks,
 
-Some feedback on your design as proposed:
+-- 
+Peter Xu
 
- - the 8/16/32/64 signed/unsigned integers seems like a wart, and the
-built-in support to grab any offset from a structure doesn't seem like
-much of an advantage.  A simpler interface would be to just support an
-"integer" (possibly signed/unsigned) type, which is always 64-bit, and
-allow the caller to provide a function pointer to retrieve the value,
-with one or two void *s cbargs.  Then the framework could provide an
-offset-based callback (or callbacks) similar to the existing
-functionality, and a similar one for per-CPU based statistics.  A
-second "clear" callback could be optionally provided to allow for
-statistics to be cleared, as in your current proposal.
-
- - A callback-style interface also allows for a lot more flexibility
-in sourcing values, and doesn't lock your callers into one way of
-storing them.  You would, of course, have to be clear about locking
-rules etc. for the callbacks.
-
- - Beyond the statistic's type, one *very* useful piece of metadata
-for telemetry tools is knowing whether a given statistic is
-"cumulative" (an unsigned counter which is only ever increased), as
-opposed to a floating value (like "amount of memory used").
-
-I agree with the folks asking for a binary interface to read
-statistics, but I also agree that it can be added on later.  I'm more
-concerned with getting the statistics model and capabilities right
-from the beginning, because those are harder to adjust later.
-
-Would you be open to collaborating on the statsfs design?  As
-background for this discussion, here are some details of how our
-metricfs implementation approaches statistics:
-
-1. Each metricfs metric can have one or two string or integer "keys".
-If these exist, they expand the metric from a single value into a
-multi-dimensional table. For example, we use this to report a hash
-table we keep of functions calling "WARN()", in a 'warnings'
-statistic:
-
-% cat .../warnings/values
-x86_pmu_stop 1
-%
-
-Indicates that the x86_pmu_stop() function has had a WARN() fire once
-since the system was booted.  If multiple functions have fired
-WARN()s, they are listed in this table with their own counts. [1]  We
-also use these to report per-CPU counters on a CPU-by-CPU basis:
-
-% cat .../irq_x86/NMI/values
-0 42
-1 18
-... one line per cpu
-%
-
-2.  We also export some metadata about each statistic.  For example,
-the metadata for the NMI counter above looks like:
-
-% cat .../NMI/annotations
-DESCRIPTION Non-maskable\ interrupts
-CUMULATIVE
-% cat .../NMI/fields
-cpu value
-int int
-%
-
-(Describing the statistic, marking it as "cumulative", and saying the
-fields are "cpu" and "value", both ints).  The metadata doesn't change
-much, so having separate files allows the user-space agent to read
-them once and then the values multiple times.
-
-3. We have a (very few) statistics where the value itself is a string,
-usually for device statuses.
-
-For our use cases, we generally don't both output a statistic and it's
-aggregation from the kernel; either we sum up things in the kernel
-(e.g. over a bunch of per-cpu or per-memcg counters) and only have the
-result statistic, or we expect user-space to sum up the data if it's
-interested.  The tabular form makes it pretty easy to do so (i.e. you
-can use awk(1) to sum all of the per-cpu NMI counters).  We don't
-generally reset statistics, except as a side effect of removing a
-device.
-
-Thanks again for the patchset, and for pointing out that KVM also
-needs statistics sent out; it's great that there is interest in this.
-
-Cheers,
-- jonathan
-
-P.S.  I also have a couple (non-critical) high-level notes:
-  * It's not clear what tree your patches are against, or their
-dependencies; I was able to get them to apply to linux-next master
-with a little massaging, but then they failed to compile because
-they're built on top of your "libfs: group and simplify linux fs code"
-patch series you sent out in late april.  Including a git link or at
-least a baseline tree and a list of the patch series you rely upon is
-helpful for anyone wanting to try out your changes.
-
-  * The main reason I was trying to try out your patches was to get a
-sense of the set of directories and things the KVM example generates;
-while it's apparently the same as the existing KVM debugfs tree, it's
-useful to know how this ends up looking on a real system, and I'm not
-familiar with the KVM stats.  Since this patch is intended slightly
-more broadly than just KVM, it might have been useful to include
-sample output for those not familiar with how things are today.
-
-
-[1]    We also use this to export various network/storage statistics
-on a per-device basis.  e.g. network bytes received counts:
-
-% cat .../rx_bytes/values
-lo 501360681
-eth0 1457631256
-...
-%
