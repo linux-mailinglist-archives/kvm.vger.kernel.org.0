@@ -2,48 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EABD71C881A
-	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:25:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34CBF1C885D
+	for <lists+kvm@lfdr.de>; Thu,  7 May 2020 13:34:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726533AbgEGLZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 07:25:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36940 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725910AbgEGLZo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 May 2020 07:25:44 -0400
+        id S1726660AbgEGLeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 07:34:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51645 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725857AbgEGLeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 07:34:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588850742;
+        s=mimecast20190719; t=1588851241;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=wsilQ0lGM6y2+97iYso+FoAv2L6zBeAOdPWrDaICIRA=;
-        b=ZMChT8nTYbRPFwNRVyjUWiOuL5TN5EZa7yc4amDGmmvBPvDdiQOhCOQAp6ZLpkAt36a2tu
-        Eov4vv3dvbgoZe7C4WLoSfjR+d1l7SrVlcYeFRMzrAvjkSJh5GcFx9F2l3w9qd6OXpCEyV
-        CI4NlRjlNHCxv35qrZ/du84qncVGGvs=
+        bh=8VIb55B0D3pkc+IA+1unlokfvrjPci9Ef1J7Es7C5zo=;
+        b=ejFGffzdOwWxi+dtlSr+CN/Y3DaE+9oODWWEbchSBcSkNcq8TkLperPZwn1bSIB9RzsqEr
+        9xoSsdjHeBoUqg5wPWhavskxhRXMI1MXapo5R163SKJjKEfprBmPCSPupDSWaU58oxVhZy
+        QejSuxzwcGOGNeRJaFIILP7yBTSFp8c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-RF1TzD3nM7mYeuU1Jux2Bw-1; Thu, 07 May 2020 07:25:39 -0400
-X-MC-Unique: RF1TzD3nM7mYeuU1Jux2Bw-1
+ us-mta-200-6BmYjKPcOPOuPh2aT8yQUA-1; Thu, 07 May 2020 07:33:56 -0400
+X-MC-Unique: 6BmYjKPcOPOuPh2aT8yQUA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D839218A0721;
-        Thu,  7 May 2020 11:25:37 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C4D5107B7F9;
+        Thu,  7 May 2020 11:33:52 +0000 (UTC)
 Received: from [10.36.113.245] (ovpn-113-245.ams2.redhat.com [10.36.113.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E8052618B;
-        Thu,  7 May 2020 11:25:36 +0000 (UTC)
-Subject: Re: [PATCH v3 10/15] MAINTAINERS: Add myself as virtio-mem maintainer
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E36B1C933;
+        Thu,  7 May 2020 11:33:24 +0000 (UTC)
+Subject: Re: [PATCH v3 07/15] mm/memory_hotplug: Introduce
+ offline_and_remove_memory()
+From:   David Hildenbrand <david@redhat.com>
 To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@suse.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        Oscar Salvador <osalvador@suse.com>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Wei Yang <richard.weiyang@gmail.com>,
+        Dan Williams <dan.j.williams@intel.com>, Qian Cai <cai@lca.pw>
 References: <20200507103119.11219-1-david@redhat.com>
- <20200507103119.11219-11-david@redhat.com>
- <20200507064709-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
+ <20200507103119.11219-8-david@redhat.com>
+ <20200507064558-mutt-send-email-mst@kernel.org>
+ <a915653f-232e-aa13-68f7-f988704fa84c@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -88,12 +96,12 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <fdb4315e-679c-d197-f558-7d0901c0fe87@redhat.com>
-Date:   Thu, 7 May 2020 13:25:35 +0200
+Message-ID: <441bfb92-ecfa-f54e-3661-b219ea166e55@redhat.com>
+Date:   Thu, 7 May 2020 13:33:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200507064709-mutt-send-email-mst@kernel.org>
+In-Reply-To: <a915653f-232e-aa13-68f7-f988704fa84c@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -103,17 +111,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.05.20 12:47, Michael S. Tsirkin wrote:
-> On Thu, May 07, 2020 at 12:31:14PM +0200, David Hildenbrand wrote:
->> Let's make sure patches/bug reports find the right person.
+>> I get:
 >>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> error: sha1 information is lacking or useless (mm/memory_hotplug.c).
+>> error: could not build fake ancestor
+>>
+>> which version is this against? Pls post patches on top of some tag
+>> in Linus' tree if possible.
 > 
-> Make this patch 2 in the series, or even squash into patch 1.
+> As the cover states, latest linux-next. To be precise
+> 
+> commit 6b43f715b6379433e8eb30aa9bcc99bd6a585f77 (tag: next-20200507,
+> next/master)
+> Author: Stephen Rothwell <sfr@canb.auug.org.au>
+> Date:   Thu May 7 18:11:31 2020 +1000
+> 
+>     Add linux-next specific files for 20200507
+> 
 
-I'll move it to #2. If there are strong feelings, I can squash. Thanks!
+The patches seem to apply cleanly on top of
 
+commit a811c1fa0a02c062555b54651065899437bacdbe (linus/master)
+Merge: b9388959ba50 16f8036086a9
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed May 6 20:53:22 2020 -0700
+
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+
+
+I can resend based on that, after giving it a short test.
 
 -- 
 Thanks,
