@@ -2,84 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86E9D1CB775
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 20:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 584541CB89F
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 21:53:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727104AbgEHSjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 14:39:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30742 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726817AbgEHSjI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 May 2020 14:39:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588963146;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QXBRgjOwY+dvVSQ4b8KNQAdFl7K/2dDkBF+n7DPUAd0=;
-        b=WiGbvW0TvJ6dluOdscrBrtG2f3+Riy0AQPpI/7iX8F16sItwh2aGu9eeZKCQSEv0R8jz7P
-        347IpP9eKcj2Bo3sBlJbnd87H47p/tQx7wdQKe2ec+BGA4zHAGJzMgdb21A2VNFRDqcZyX
-        RUs8kXC+2oWv5mFWDJJWO8aJ3m3fP7I=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428--H3pFKI0OWCEvifpbpwV-A-1; Fri, 08 May 2020 14:39:04 -0400
-X-MC-Unique: -H3pFKI0OWCEvifpbpwV-A-1
-Received: by mail-qk1-f200.google.com with SMTP id v6so1909742qkh.7
-        for <kvm@vger.kernel.org>; Fri, 08 May 2020 11:39:04 -0700 (PDT)
+        id S1726904AbgEHTw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 15:52:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42104 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726767AbgEHTw6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 15:52:58 -0400
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F91C05BD43
+        for <kvm@vger.kernel.org>; Fri,  8 May 2020 12:52:58 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id f13so2401814qkh.2
+        for <kvm@vger.kernel.org>; Fri, 08 May 2020 12:52:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=+PiQ6ckxUTnSDo+AGLRh/Fg+o3k0O3ko3wY06x3JoKE=;
+        b=Ts3CIrENqZECosUV9ufuB6NplQ4bZIANry4cTq9ctiFl2W3eKhj5UpDDQOEaY6A2Yd
+         mNvqS8MpDNbFmXG47isv0LHHuWhU9DrWeNeUqpMHP3rRP+c5b6gcvtAg+8ZLRMd/gdoD
+         1i8v4D54gKF1JaotzplFLT3nMfQ5VKcTVTMjFomlH2d9ykBhs9YeoAV4r0fEyjl3TlPr
+         v2KDioACvLG1JOHWROC3jtqtFiE8v+6chVfwhJVwQ6LpHrO+DnmO5kWS3VjbGmk9WNEY
+         aeK1VQ7Ix6UqBc9nyw9EdxtaWdyBCOYz2f1ZZWBmiN42UGRN2WCkIjnAj9hWJy7yjUPW
+         HsMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QXBRgjOwY+dvVSQ4b8KNQAdFl7K/2dDkBF+n7DPUAd0=;
-        b=QXSXOrBbh8UIWCpdA0My0zvKPiPCTLwEqk2iIrlq54/FSkgbHk9yE6LwQ46evbK0d2
-         2swLyJCQN7LmtAVq97OSQgblpOazYvrOi/FNwCxhB8rv/KUE0HKrnhg7OKT5FhSOa0VK
-         qshOY9R6rgHwmWcBxiMw0fzQO8XSAuXO8hziTHiYWXiB/pV9eLWbmpoQHGlCBGEY2RmW
-         nDeOzAF2zt8r+/OU46o34wqxridK2I8xV9tvRPVSB+mdJvv386SAL2IMdRQw6P61kjWp
-         YeiB5JFo4MuR7GKD7nfY++CeYvrSjBH0JWkdBoIwoUs3TlnHegakLp46Oud61SMqnr8F
-         85hg==
-X-Gm-Message-State: AGi0PuZXx+9oa3Ma3XnGaPfjCfFdV6abWZip6sazbmRq5TFbFK4+3m/s
-        gFpKcCQ4o9ISqxlLWd8CasiJYJIOBNvzYkR0BeHM4h87++cpHP0F0q11yyZRsmYliSZB6RiqhB1
-        jtR+LQHYBnETe
-X-Received: by 2002:a37:8186:: with SMTP id c128mr4175551qkd.455.1588963143839;
-        Fri, 08 May 2020 11:39:03 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLAr9Bm1koeUWkBXdivXMQD24n6jI17gBz0LpLaBEJYM0Mlc3/QNdh4XtLoIYudJtbnYdNUSQ==
-X-Received: by 2002:a37:8186:: with SMTP id c128mr4175527qkd.455.1588963143546;
-        Fri, 08 May 2020 11:39:03 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id i4sm1719360qkh.66.2020.05.08.11.39.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2020 11:39:02 -0700 (PDT)
-Date:   Fri, 8 May 2020 14:39:01 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, jgg@ziepe.ca
-Subject: Re: [PATCH v2 1/3] vfio/type1: Support faulting PFNMAP vmas
-Message-ID: <20200508183901.GC228260@xz-x1>
-References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
- <158871568480.15589.17339878308143043906.stgit@gimli.home>
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=+PiQ6ckxUTnSDo+AGLRh/Fg+o3k0O3ko3wY06x3JoKE=;
+        b=ZX3WV5je0CtEfnxde+TT3ZuLodUQECayLsFS3cYohtPitcflovCZIukQtRnmds88uL
+         QmwjjIcKYL20U87cWCCKWLEzFHfCoQGJff0Kj7HpgxOzs0oOAiCdTX7EG+kvvHiNWS/9
+         CEr3EpSCKP5uGg9DRMTgNOPLjntL+l+e+ytY5tXdDpJGca0REvR+hpqs0loYz7pXEuZq
+         HIfmi+iswWtiJDGQqzx3/QQHSt5vSNtnIKmlXE7LdNlUNUWGRSGO3VJdbz9hXrb5Ui9h
+         1CcmJ3egn2qYcD/8Husvhn6gdS5giUVBEevb8L3ltOBqlXHwuUa6GJbivPgn/bs0tyrO
+         j/gQ==
+X-Gm-Message-State: AGi0PuYBkZlbyJNUCnIiDuSrpJsQXzmq+B/MjhrndTl6uQHo6mDL0Ikg
+        tTl0nfLoe28m1gw6+OfLOO3ydw==
+X-Google-Smtp-Source: APiQypJ92/0qZ5iunL9hikarn4eDK0RllMv8mjTvIrEJ1zjbLNqAjWeKqDY9cc4vVlZEbqAojJlNqA==
+X-Received: by 2002:a37:a4d8:: with SMTP id n207mr4488919qke.354.1588967577470;
+        Fri, 08 May 2020 12:52:57 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
+        by smtp.gmail.com with ESMTPSA id c4sm1945896qkf.120.2020.05.08.12.52.56
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 08 May 2020 12:52:56 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jX93I-0002SQ-9Q; Fri, 08 May 2020 16:52:56 -0300
+Date:   Fri, 8 May 2020 16:52:56 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH 09/12] rdma: use __anon_inode_getfd
+Message-ID: <20200508195256.GA8912@ziepe.ca>
+References: <20200508153634.249933-1-hch@lst.de>
+ <20200508153634.249933-10-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <158871568480.15589.17339878308143043906.stgit@gimli.home>
+In-Reply-To: <20200508153634.249933-10-hch@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 05, 2020 at 03:54:44PM -0600, Alex Williamson wrote:
-> With conversion to follow_pfn(), DMA mapping a PFNMAP range depends on
-> the range being faulted into the vma.  Add support to manually provide
-> that, in the same way as done on KVM with hva_to_pfn_remapped().
+On Fri, May 08, 2020 at 05:36:31PM +0200, Christoph Hellwig wrote:
+> Use __anon_inode_getfd instead of opencoding the logic using
+> get_unused_fd_flags + anon_inode_getfile.
 > 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/infiniband/core/rdma_core.c | 17 ++++-------------
+>  1 file changed, 4 insertions(+), 13 deletions(-)
 
-And since after the discussion...
+ 
+> diff --git a/drivers/infiniband/core/rdma_core.c b/drivers/infiniband/core/rdma_core.c
+> index 5128cb16bb485..541e5e06347f6 100644
+> --- a/drivers/infiniband/core/rdma_core.c
+> +++ b/drivers/infiniband/core/rdma_core.c
+> @@ -462,30 +462,21 @@ alloc_begin_fd_uobject(const struct uverbs_api_object *obj,
+>  	if (WARN_ON(fd_type->fops->release != &uverbs_uobject_fd_release))
+>  		return ERR_PTR(-EINVAL);
+>  
+> -	new_fd = get_unused_fd_flags(O_CLOEXEC);
+> -	if (new_fd < 0)
+> -		return ERR_PTR(new_fd);
+> -
+>  	uobj = alloc_uobj(attrs, obj);
+>  	if (IS_ERR(uobj))
+> -		goto err_fd;
+> +		return uobj;
+>  
+>  	/* Note that uverbs_uobject_fd_release() is called during abort */
+> -	filp = anon_inode_getfile(fd_type->name, fd_type->fops, NULL,
+> -				  fd_type->flags);
+> -	if (IS_ERR(filp)) {
+> -		uobj = ERR_CAST(filp);
+> +	new_fd = __anon_inode_getfd(fd_type->name, fd_type->fops, NULL,
+> +			fd_type->flags | O_CLOEXEC, &filp);
+> +	if (new_fd < 0)
+>  		goto err_uobj;
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+This will conflict with a fix (83a267021221 'RDMA/core: Fix
+overwriting of uobj in case of error') that is going to go to -rc
+soon.
 
-Thanks,
+Also the above misses returning an ERR_PTR if __anon_inode_getfd fails, it
+returns a uobj that had been freed.. I suppose it should be something
+like
 
--- 
-Peter Xu
+if (new_fd < 0) {
+   uverbs_uobject_put(uobj);
+   return ERR_PTR(new_fd)
+}
 
+?
+
+Jason
