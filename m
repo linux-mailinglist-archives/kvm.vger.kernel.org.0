@@ -2,88 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07D9E1CAAFB
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 14:40:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75A571CAE8E
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 15:11:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728465AbgEHMip (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 08:38:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55058 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728441AbgEHMik (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 May 2020 08:38:40 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        id S1730387AbgEHNKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 09:10:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729949AbgEHNKh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 09:10:37 -0400
+Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6F3C05BD43;
+        Fri,  8 May 2020 06:10:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=9fPfGBUeWH76iSErjKUiHDxoBdDt6EY4XksU520aETo=; b=s7KP3XCxpCx+K/Slw5SeghBHSX
+        TwDFHErvrjxjAo0LAa20vuJ5CUoqLVW2GxY6UAsl/HND70HEQnUtYP9rnoF0yCY36kJVyRG59c/mE
+        vTxDEZqi1rcZdyalffvFZVNlI3+6mQX2hNklBwG1Q46qE+VMjpG6ca9Zh4JOkAnXBGtw3hOmUceji
+        EcriRSBQmV/kbrXCWHGZ8gQjmGa8imgUaQ+Xt7ZVjUOujiO5EfWLQCo5shW8djvF0CNj54jO/NR4p
+        DNmAvxLY3gZIyOSdDO2qmu4gb4Ed/9jBxVN2yPyqJ49OdZWnisW17pdzAOdMebTsQAHOUt+mkorgl
+        N8AILqaQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jX2kw-0003No-Ks; Fri, 08 May 2020 13:09:34 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 50A882495F;
-        Fri,  8 May 2020 12:38:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588941518;
-        bh=4RRrK7MglMPlDjzWMyuZn/iF6F0PRJ7h/i9OJjOr3GE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=U1P2KxEuuZJCt7TSyJYbmZdxUZhpbrAU0Ejopw2DgDY4IobmM2vg6vcGavVh1uqUw
-         3E5wz4D90VZ/YFOFivEZVh9KtV077TiSOrlP2pRJJySQA2IDY2MVstqUzsEtQzHLGn
-         NAg8CxAlQEK3Cn00AzkhSblkdqAzvTXjtZVCXrlI=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, James Hogan <james.hogan@imgtec.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Ralf Baechle <ralf@linux-mips.org>, linux-mips@linux-mips.org,
-        kvm@vger.kernel.org
-Subject: [PATCH 4.4 026/312] MIPS: KVM: Fix translation of MFC0 ErrCtl
-Date:   Fri,  8 May 2020 14:30:17 +0200
-Message-Id: <20200508123126.325941201@linuxfoundation.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200508123124.574959822@linuxfoundation.org>
-References: <20200508123124.574959822@linuxfoundation.org>
-User-Agent: quilt/0.66
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4404F30797E;
+        Fri,  8 May 2020 15:09:31 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 282C82B8D7782; Fri,  8 May 2020 15:09:31 +0200 (CEST)
+Date:   Fri, 8 May 2020 15:09:31 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wei.w.wang@intel.com,
+        ak@linux.intel.com
+Subject: Re: [PATCH v10 08/11] KVM: x86/pmu: Add LBR feature emulation via
+ guest LBR event
+Message-ID: <20200508130931.GE5298@hirez.programming.kicks-ass.net>
+References: <20200423081412.164863-1-like.xu@linux.intel.com>
+ <20200423081412.164863-9-like.xu@linux.intel.com>
+ <20200424121626.GB20730@hirez.programming.kicks-ass.net>
+ <87abf620-d292-d997-c9be-9a5d2544f3fa@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <87abf620-d292-d997-c9be-9a5d2544f3fa@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: James Hogan <james.hogan@imgtec.com>
+On Mon, Apr 27, 2020 at 11:16:40AM +0800, Like Xu wrote:
+> On 2020/4/24 20:16, Peter Zijlstra wrote:
 
-commit 66ffc50c480e7ab6ad5642f47276435a8873c31a upstream.
+> > And I suppose that is why you need that horrible:
+> > needs_guest_lbr_without_counter() thing to begin with.
+> 
+> Do you suggest to use event->attr.config check to replace
+> "needs_branch_stack(event) && is_kernel_event(event) &&
+> event->attr.exclude_host" check for guest LBR event ?
 
-The MIPS KVM dynamic translation is meant to translate "MFC0 rt, ErrCtl"
-instructions into "ADD rt, zero, zero" to zero the destination register,
-however the rt register number was copied into rt of the ADD instruction
-encoding, which is the 2nd source operand. This results in "ADD zero,
-zero, rt" which is a no-op, so only the first execution of each such
-MFC0 from ErrCtl will actually read 0.
+That's what the BTS thing does.
 
-Fix the shift to put the rt from the MFC0 encoding into the rd field of
-the ADD.
+> > Please allocate yourself an event from the pseudo event range:
+> > event==0x00. Currently we only have umask==3 for Fixed2 and umask==4
+> > for Fixed3, given you claim 58, which is effectively Fixed25,
+> > umask==0x1a might be appropriate.
+> 
+> OK, I assume that adding one more field ".config = 0x1a00" is
+> efficient enough for perf_event_attr to allocate guest LBR events.
 
-Fixes: 50c8308538dc ("KVM/MIPS32: Binary patching of select privileged instructions.")
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Ralf Baechle <ralf@linux-mips.org>
-Cc: linux-mips@linux-mips.org
-Cc: kvm@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Uh what? The code is already setting .config. You just have to change it
+do another value.
 
----
- arch/mips/kvm/dyntrans.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> > Also, I suppose we need to claim 0x0000 as an error, so that other
+> > people won't try this again.
+> 
+> Does the following fix address your concern on this ?
+> 
+> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+> index 2405926e2dba..32d2a3f8c51f 100644
+> --- a/arch/x86/events/core.c
+> +++ b/arch/x86/events/core.c
+> @@ -498,6 +498,9 @@ int x86_pmu_max_precise(void)
+> 
+>  int x86_pmu_hw_config(struct perf_event *event)
+>  {
+> +       if (!unlikely(event->attr.config & X86_ARCH_EVENT_MASK))
+> +               return -EINVAL;
+> +
+>         if (event->attr.precise_ip) {
+>                 int precise = x86_pmu_max_precise();
 
---- a/arch/mips/kvm/dyntrans.c
-+++ b/arch/mips/kvm/dyntrans.c
-@@ -82,7 +82,7 @@ int kvm_mips_trans_mfc0(uint32_t inst, u
- 
- 	if ((rd == MIPS_CP0_ERRCTL) && (sel == 0)) {
- 		mfc0_inst = CLEAR_TEMPLATE;
--		mfc0_inst |= ((rt & 0x1f) << 16);
-+		mfc0_inst |= ((rt & 0x1f) << 11);
- 	} else {
- 		mfc0_inst = LW_TEMPLATE;
- 		mfc0_inst |= ((rt & 0x1f) << 16);
+That wouldn't work right for AMD. But yes, something like that.
 
+> > Also, what happens if you fail programming due to a conflicting cpu
+> > event? That pinned doesn't guarantee you'll get the event, it just means
+> > you'll error instead of getting RR.
+> > 
+> > I didn't find any code checking the event state.
+> > 
+> 
+> Error instead of RR is expected.
+> 
+> If the KVM fails programming due to a conflicting cpu event
+> the LBR registers will not be passthrough to the guest,
+> and KVM would return zero for any guest LBR records accesses
+> until the next attempt to program the guest LBR event.
+> 
+> Every time before cpu enters the non-root mode where irq is
+> disabled, the "event-> oncpu! =-1" check will be applied.
+> (more details in the comment around intel_pmu_availability_check())
+> 
+> The guests administer is supposed to know the result of guest
+> LBR records is inaccurate if someone is using LBR to record
+> guest or hypervisor on the host side.
+> 
+> Is this acceptable to you？
+> 
+> If there is anything needs to be improved, please let me know.
 
+It might be nice to emit a pr_warn() or something on the host when this
+happens. Then at least the host admin can know he wrecked things for
+which guest.
