@@ -2,135 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50F781CB910
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 22:37:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D68AD1CB912
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 22:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727119AbgEHUhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 16:37:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
+        id S1727088AbgEHUjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 16:39:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727108AbgEHUhG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 16:37:06 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F1FFC05BD43
-        for <kvm@vger.kernel.org>; Fri,  8 May 2020 13:37:06 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id h185so3542081ybg.6
-        for <kvm@vger.kernel.org>; Fri, 08 May 2020 13:37:06 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1726883AbgEHUjm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 16:39:42 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8477EC061A0C
+        for <kvm@vger.kernel.org>; Fri,  8 May 2020 13:39:42 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id n22so3294541qtp.15
+        for <kvm@vger.kernel.org>; Fri, 08 May 2020 13:39:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=w4qW/VNK1GgqP6kbHy5LSEPtJWF2jV3O0V1qObPzmFA=;
-        b=c5Ie1kbX0guPcgMQEvwztbLcikBY8qYpIPyKl3/uQuStvCvAktbbhjFssCEcZTaxd+
-         0+ITTk+kGrgK5h/OGT1lXOzuQ4BOAuVlfqIajuk3C1aTO5OkBsUIYhkZIQEjMsQnANo8
-         XPVOGgz7GEMttLQPYVw9fwsiJyhSlrPp1WWuhMGBMm6KBycDfdSFf4z+zJtwtl25kklW
-         27QXlBaTIIRUfcnhlDaJgHBOkuY6tutdbG/RRLYlyyx8TkqnR4VCtVL7TjIJELkj3kax
-         qTz+rHmp/mo/O98POKM0h94siSAVBIdTh52loifb0qvF07qsEfRN7qUnX6NsYOLNx2fJ
-         2e5Q==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=VL335T+eqD2/ZBcv6CJbEsGdKB/CUVQDdXI0UV5ucn0=;
+        b=aRYoiHzxy6SVHTf7dDLxOnfbIxX8CO74SxEIwvJ6BY9+nTaQlpEWRGz/yfIL4xRnbT
+         87CD82MCbLu5MgtNhv1PLFFyyvax94xb6HNuWwWBa0J/dQkth5BrYgENlLmoVQ+UI3Uk
+         QqMhlVxF8Fgy3LH1zYls+t5VzFD2faKLBjqwyw6KmRWWJqQB4CBs80XZjc8cPvPzeyj1
+         TpRhbDGZbN3Gz53Ltk3aG7gSzkEuXs4QGkZFP8GzYBb7NkOqBYDqu4jrWrj2iTVvXdaI
+         LQBP+NBEtysKiKBSgOkmnGwVi9SvRYo63D63Okg8fRD1X3IkSSuoRLCh7g48Bem7ozXy
+         XH4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=w4qW/VNK1GgqP6kbHy5LSEPtJWF2jV3O0V1qObPzmFA=;
-        b=QIgK/mitHMWhJWnbt9UOZRqosthYwEMM44sDrz+JhPuDr0K+pKe/G++gX4uA92l5gT
-         822SVxTGmjsu/qkzZjCnEg7zBF5z+xm7GxVZwSxSKnDpm7Bu48IApmkcqwOfmCs0YEXh
-         i5bZp7nnlTEp84kLd/8b3qRJ77SEb2qWbd0ZX/7N5rT5Xfy3wq+qfAq+l8covDRpf+SS
-         +m56EZCgDIW2KIwo93jKv56nsEWTBIBviBUwoqBzqZgtoQEeVV2RL2myOqYO8nPJvU5j
-         i+IQORcBKVJU/gY9WzM0keJqMj2r3WeQvFjpDAo2C4pBtUX8Ut7pl3g2h6075liwX5wj
-         3wMA==
-X-Gm-Message-State: AGi0PuaRxuqTj1WZsjAJV25DLPpsyxJzjbYGY2Ko9zThz+DqlYfRJYT8
-        9/wXqWopoS1dXzaiL7TgJ15MaTVZPQ8oVjUXS44U5IKeZq51Dxp/SBx2TvxXKsMo6lswIu6oo8G
-        S3bWgDQ1nG73sKtC4zG5ky4RF94fxj9gcB0Y2tQtR/utUCRAtHh6TvrxHU0DlmQg=
-X-Google-Smtp-Source: APiQypKH0sBHGa5DkYxxf1H3iw4LhgfmRCRIOY2M6wDnkw/EWf4VgkJ3aYEXF2GDVwk8/enrmY14dXMwL7qwKg==
-X-Received: by 2002:a25:ac13:: with SMTP id w19mr8083110ybi.467.1588970225447;
- Fri, 08 May 2020 13:37:05 -0700 (PDT)
-Date:   Fri,  8 May 2020 13:36:43 -0700
-In-Reply-To: <20200508203643.85477-1-jmattson@google.com>
-Message-Id: <20200508203643.85477-4-jmattson@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=VL335T+eqD2/ZBcv6CJbEsGdKB/CUVQDdXI0UV5ucn0=;
+        b=p69rK7fO94EqRYE1PcH9W9qNBHA4bctt8ANM34l/1kMWTVvQ0+/jeOX4xNY2ZdR5tN
+         CxlZmNmhvmeBLH10e016C46hXUUUYfow0i+ElT46H5dQ6kCg3cGUuFeoz5NQj35dI4ME
+         GF67u66uuvjwEO0UerxukefhxQUycAW3giPy3AUrNBXHIR9NryQ92wYiuceDQNIFpad3
+         7laf6zK+jjQYo39u85L6DZIIV3/ocUdeiQAZuIa1HEZtkk8IuTv2EsW8lellGArZhoMB
+         gCD2MFfGB6xhQBuXOZ8T8oST6Rs8o5OGfKMWC6g4gd56CnebNUj3lBkeOhOonyP/Ab4o
+         3lZQ==
+X-Gm-Message-State: AGi0PuZmWdb0mY3aWBlPqfQE5ztBKgFD9p+6alJBMGb7cP1WQPhNYyTX
+        CWfffpH4lMmiqsNfmUYVoLvM6vHs09ruL2tDh1Lb3Ds+Bs33KRPEXmzSkLQ7wR1dvwEiKqE4eT0
+        YJW7i/5r4zIdG7p/ZJNnGyvGnHSJoK2bilD+CV8G7JW0JLxAT76Pu5raveklOzuI=
+X-Google-Smtp-Source: APiQypJQ4vTDQ09rua+3iAAyxw11ZthdaLMY8rdnELWJS6FXrGVYbS2Dwx0z5W1PuCQVo7M18ulRDxcAXnZVXA==
+X-Received: by 2002:a05:6214:8e9:: with SMTP id dr9mr4758232qvb.84.1588970381555;
+ Fri, 08 May 2020 13:39:41 -0700 (PDT)
+Date:   Fri,  8 May 2020 13:39:38 -0700
+Message-Id: <20200508203938.88508-1-jmattson@google.com>
 Mime-Version: 1.0
-References: <20200508203643.85477-1-jmattson@google.com>
 X-Mailer: git-send-email 2.26.2.645.ge9eca65c58-goog
-Subject: [PATCH 3/3] KVM: nVMX: Migrate the VMX-preemption timer
+Subject: [kvm-unit-tests PATCH] x86: VMX: Add a VMX-preemption timer
+ expiration test
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>
+Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The hrtimer used to emulate the VMX-preemption timer must be pinned to
-the same logical processor as the vCPU thread to be interrupted if we
-want to have any hope of adhering to the architectural specification
-of the VMX-preemption timer. Even with this change, the emulated
-VMX-preemption timer VM-exit occasionally arrives too late.
+When the VMX-preemption timer is activated, code executing in VMX
+non-root operation should never be able to record a TSC value beyond
+the deadline imposed by adding the scaled VMX-preemption timer value
+to the first TSC value observed by the guest after VM-entry.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/irq.c              |  2 ++
- arch/x86/kvm/vmx/vmx.c          | 11 +++++++++++
- 3 files changed, 15 insertions(+)
+ lib/x86/processor.h | 23 +++++++++++++
+ x86/vmx.h           | 21 ++++++++++++
+ x86/vmx_tests.c     | 81 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 125 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 42a2d0d3984a..a47c71d13039 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1254,6 +1254,8 @@ struct kvm_x86_ops {
- 
- 	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
- 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
-+
-+	void (*migrate_timers)(struct kvm_vcpu *vcpu);
- };
- 
- struct kvm_x86_init_ops {
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index e330e7d125f7..54f7ea68083b 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -159,6 +159,8 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu)
- {
- 	__kvm_migrate_apic_timer(vcpu);
- 	__kvm_migrate_pit_timer(vcpu);
-+	if (kvm_x86_ops.migrate_timers)
-+		kvm_x86_ops.migrate_timers(vcpu);
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 804673b..cf3acf6 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -479,6 +479,29 @@ static inline unsigned long long rdtsc(void)
+ 	return r;
  }
  
- bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c2c6335a998c..3896dea72082 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7687,6 +7687,16 @@ static bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
- 	return to_vmx(vcpu)->nested.vmxon;
- }
- 
-+static void vmx_migrate_timers(struct kvm_vcpu *vcpu)
++/*
++ * Per the advice in the SDM, volume 2, the sequence "mfence; lfence"
++ * executed immediately before rdtsc ensures that rdtsc will be
++ * executed only after all previous instructions have executed and all
++ * previous loads and stores are globally visible. In addition, the
++ * lfence immediately after rdtsc ensures that rdtsc will be executed
++ * prior to the execution of any subsequent instruction.
++ */
++static inline unsigned long long fenced_rdtsc(void)
 +{
-+	if (is_guest_mode(vcpu)) {
-+		struct hrtimer *timer = &to_vmx(vcpu)->nested.preemption_timer;
++	unsigned long long tsc;
 +
-+		if (hrtimer_try_to_cancel(timer) == 1)
-+			hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED);
-+	}
++#ifdef __x86_64__
++	unsigned int eax, edx;
++
++	asm volatile ("mfence; lfence; rdtsc; lfence" : "=a"(eax), "=d"(edx));
++	tsc = eax | ((unsigned long long)edx << 32);
++#else
++	asm volatile ("mfence; lfence; rdtsc; lfence" : "=A"(tsc));
++#endif
++	return tsc;
 +}
 +
- static void hardware_unsetup(void)
+ static inline unsigned long long rdtscp(u32 *aux)
  {
- 	if (nested)
-@@ -7838,6 +7848,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.nested_get_evmcs_version = NULL,
- 	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
- 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-+	.migrate_timers = vmx_migrate_timers,
+        long long r;
+diff --git a/x86/vmx.h b/x86/vmx.h
+index 08b354d..71fdaa0 100644
+--- a/x86/vmx.h
++++ b/x86/vmx.h
+@@ -118,6 +118,27 @@ union vmx_ctrl_msr {
+ 	};
  };
  
- static __init int hardware_setup(void)
++union vmx_misc {
++	u64 val;
++	struct {
++		u32 pt_bit:5,
++		    stores_lma:1,
++		    act_hlt:1,
++		    act_shutdown:1,
++		    act_wfsipi:1,
++		    :5,
++		    vmx_pt:1,
++		    smm_smbase:1,
++		    cr3_targets:9,
++		    msr_list_size:3,
++		    smm_mon_ctl:1,
++		    vmwrite_any:1,
++		    inject_len0:1,
++		    :1;
++		u32 mseg_revision;
++	};
++};
++
+ union vmx_ept_vpid {
+ 	u64 val;
+ 	struct {
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 0909adb..991c317 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -8555,6 +8555,86 @@ static void vmx_preemption_timer_tf_test(void)
+ 	handle_exception(DB_VECTOR, old_db);
+ }
+ 
++#define VMX_PREEMPTION_TIMER_EXPIRY_CYCLES 1000000
++
++static u64 vmx_preemption_timer_expiry_start;
++static u64 vmx_preemption_timer_expiry_finish;
++
++static void vmx_preemption_timer_expiry_test_guest(void)
++{
++	vmcall();
++	vmx_preemption_timer_expiry_start = fenced_rdtsc();
++
++	while (vmx_get_test_stage() == 0)
++		vmx_preemption_timer_expiry_finish = fenced_rdtsc();
++}
++
++/*
++ * Test that the VMX-preemption timer is not excessively delayed.
++ *
++ * Per the SDM, volume 3, VM-entry starts the VMX-preemption timer
++ * with the unsigned value in the VMX-preemption timer-value field,
++ * and the VMX-preemption timer counts down by 1 every time bit X in
++ * the TSC changes due to a TSC increment (where X is
++ * IA32_VMX_MISC[4:0]). If the timer counts down to zero in any state
++ * other than the wait-for-SIPI state, the logical processor
++ * transitions to the C0 C-state and causes a VM-exit.
++ *
++ * The guest code above reads the starting TSC after VM-entry. At this
++ * point, the VMX-preemption timer has already been activated. Next,
++ * the guest code reads the current TSC in a loop, storing the value
++ * read to memory.
++ *
++ * If the RDTSC in the loop reads a value past the VMX-preemption
++ * timer deadline, then the VMX-preemption timer VM-exit must be
++ * delivered before the next instruction retires. Even if a higher
++ * priority SMI is delivered first, the VMX-preemption timer VM-exit
++ * must be delivered before the next instruction retires. Hence, a TSC
++ * value past the VMX-preemption timer deadline might be read, but it
++ * cannot be stored. If a TSC value past the deadline *is* stored,
++ * then the architectural specification has been violated.
++ */
++static void vmx_preemption_timer_expiry_test(void)
++{
++	u32 preemption_timer_value;
++	union vmx_misc misc;
++	u64 tsc_deadline;
++	u32 reason;
++
++	if (!(ctrl_pin_rev.clr & PIN_PREEMPT)) {
++		report_skip("'Activate VMX-preemption timer' not supported");
++		return;
++	}
++
++	test_set_guest(vmx_preemption_timer_expiry_test_guest);
++
++	enter_guest();
++	skip_exit_vmcall();
++
++	misc.val = rdmsr(MSR_IA32_VMX_MISC);
++	preemption_timer_value =
++		VMX_PREEMPTION_TIMER_EXPIRY_CYCLES >> misc.pt_bit;
++
++	vmcs_set_bits(PIN_CONTROLS, PIN_PREEMPT);
++	vmcs_write(PREEMPT_TIMER_VALUE, preemption_timer_value);
++	vmx_set_test_stage(0);
++
++	enter_guest();
++	reason = (u32)vmcs_read(EXI_REASON);
++	TEST_ASSERT(reason == VMX_PREEMPT);
++
++	vmcs_clear_bits(PIN_CONTROLS, PIN_PREEMPT);
++	vmx_set_test_stage(1);
++	enter_guest();
++
++	tsc_deadline = ((vmx_preemption_timer_expiry_start >> misc.pt_bit) <<
++			misc.pt_bit) + (preemption_timer_value << misc.pt_bit);
++
++	report(vmx_preemption_timer_expiry_finish < tsc_deadline,
++	       "Last stored guest TSC (%lu) < TSC deadline (%lu)",
++	       vmx_preemption_timer_expiry_finish, tsc_deadline);
++}
++
+ static void vmx_db_test_guest(void)
+ {
+ 	/*
+@@ -9861,6 +9941,7 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(vmx_store_tsc_test),
+ 	TEST(vmx_preemption_timer_zero_test),
+ 	TEST(vmx_preemption_timer_tf_test),
++	TEST(vmx_preemption_timer_expiry_test),
+ 	/* EPT access tests. */
+ 	TEST(ept_access_test_not_present),
+ 	TEST(ept_access_test_read_only),
 -- 
-2.26.2.645.ge9eca65c58-goog
+2.26.2.526.g744177e7f7-goog
 
