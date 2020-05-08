@@ -2,91 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC1211CA979
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 13:23:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85A591CA9DB
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 13:43:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726811AbgEHLXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 07:23:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        id S1727109AbgEHLnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 07:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726618AbgEHLXY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 07:23:24 -0400
+        by vger.kernel.org with ESMTP id S1726792AbgEHLno (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 07:43:44 -0400
 Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61AFCC05BD43
-        for <kvm@vger.kernel.org>; Fri,  8 May 2020 04:23:24 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id y3so1441111wrt.1
-        for <kvm@vger.kernel.org>; Fri, 08 May 2020 04:23:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59843C05BD43;
+        Fri,  8 May 2020 04:43:44 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id k1so1496377wrx.4;
+        Fri, 08 May 2020 04:43:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bWU6zlynIfW1qhiMuwM2Wph5uDsDlfbABaGeEVTQWfU=;
-        b=fMYmUryVpDa9Czd920mdsI5wH3fvqg0UXkKauH8ZH4w3Js888m/+EEIE/0BqRTHltP
-         6mb3nRbgJoBru8144W7Fs0SLiQT6GfQRrFN07SaUIXow5H25SoAxv0+rpYKaSBFYqXsU
-         vszxFX88V+ilRSx6YHPBbc4HeoP24imuslBw78OHNYXD8e7Nwen5SWuHg5c+0F4sHYt2
-         RdngWhXtDzpPhNryCowJZyV3K32BWlnaP87Q6HTxBsqs2g6VuNZnvb+33CtXwXHYsY3T
-         wxxf3YBselWW3FWZtOc3YyQe7jAWTh9EuVKj2RwlYhDjozC0pXYF6EZNw0UXUdYbH2EN
-         r/FA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=qKGhrUPEHY1fphcNoABX/IHv164kpoZpOU/cK61zd18=;
+        b=gIfE0RDCPNifBmsmWO7ny5anKMbhPu3jhwrv8CXiPnxjeuz95+8OyDHZmJFYj7jAvd
+         hpCHM8e4T4P8d2hDJpLvDDRrnT5y3+iZJ8F6F8kHQZiEE4vxnm+lK5PdS9HtaHxhG7d5
+         jao8mgYREs4uQpenwhP3hLfKVRbTmhhUNyvNrOjwsbTLNl6P0mSPeHTnuTrr7PL41Xez
+         hsrQHIUl9YmfMsCKshraJNWLs/opu6CzMxV23p29+SCRzRR6g7dRjGswaYNZkTuQi8SY
+         DcaSsmRp4t/9qof9GgGaZWzBlMY1A0MdMJM/1tzO4eYLK87TuHUi2DKTvr3RB+mK9NEv
+         k8BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bWU6zlynIfW1qhiMuwM2Wph5uDsDlfbABaGeEVTQWfU=;
-        b=YXoUOEMrkxBfNjYnIruj/WGyAsweUm1dcb2liwSmGdWGIV/iy7Dn76UElJ0jZS86pU
-         SdSimT7TyJIbSzUjfjfNqkh8Pf5uClEUAv9h4GIL0BtZThQex6m6ZhacwdiCCHYzTiuc
-         yclQNhiWJl8f1Rfur2A1kRQC+fqBio/VXT1GWUIiW5PKK7fAy70efEW8X+UwT6QEvV3b
-         yPPlx0gbZb3Y+WFiW7i504CCVuhmlaVmKLh8Aw5HOso5QHU0hX0WfMtQKEmTT/cCUEvn
-         AULF5QzSICStjguq1M+vAlcDWMoER3a0UCgA6gI++ReCAZfuvmGWCzlWO1MNgjGYh1S7
-         HYGA==
-X-Gm-Message-State: AGi0PuZbybC2AHWGARVYfdAKWhEnyz7NP1yjBgwuX9PTR2znLQfMH26n
-        LPhwak/NlGIXqLHnreBxzVPwQJU7aWQ=
-X-Google-Smtp-Source: APiQypL+amOT71OXAYlZlxzEDBJCWZ0wAdYZVVZ6wDv5LXbjFTQqsQUDmiP251PupGULSgyyfi0myw==
-X-Received: by 2002:adf:b1c9:: with SMTP id r9mr2554304wra.271.1588937002851;
-        Fri, 08 May 2020 04:23:22 -0700 (PDT)
-Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id p7sm2569854wrf.31.2020.05.08.04.23.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2020 04:23:21 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] KVM: x86: Use VMCALL and VMMCALL mnemonics in kvm_para.h
-Date:   Fri,  8 May 2020 13:23:05 +0200
-Message-Id: <20200508112305.215742-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.25.4
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=qKGhrUPEHY1fphcNoABX/IHv164kpoZpOU/cK61zd18=;
+        b=i0drPRRBRu01qWWmRfdd03b1VU5WXZLyDyHgaCgv7jNYDrBOxNOkbh7ZmcFJ9hthD+
+         Ozcp3HaO4qFjh3XzVve+IkC7/bZ+zKUzfCRZkj0sc2mFwC++m5YLGS4XN7IOxClnAc6P
+         z5F5UPOifgUrs7tkbmcVpv4XCMkgt+gxCiW7bkEvpvEfND7pvgc4GxSUdQ5PXn3U5ulD
+         tY5PdBjQtvavQ+Mxkjjbsh3QalUTxA5LV2Agut+4vAqDK73s8QfTCrKOBQdRYuKXT9KO
+         NbiuxXbvJ0OO2DQ+AyXf8RE2gPDg+94jUqGZO2ioHppOj+CsSYKrI3rPtVbJauLifpVX
+         4ROA==
+X-Gm-Message-State: AGi0Pubg67W8fLCOdZkmyvEFYHyxcWdJg1j9TM8AAp0yrku9CPwJe+wA
+        ZizNRPKYMKuLa7pmpMIKdWyWCm9ic3jYLEMb+H4=
+X-Google-Smtp-Source: APiQypK/2c0ZqyQa5bx07zYKDpZDBfCeDhkkWNQ5ES1fs2vEL0KHQqN5iu+gcwH1k/K8c88MGNYIffy75833IjusxZE=
+X-Received: by 2002:adf:dc50:: with SMTP id m16mr2524484wrj.329.1588938222913;
+ Fri, 08 May 2020 04:43:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
+From:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date:   Fri, 8 May 2020 13:43:30 +0200
+Message-ID: <CAHiYmc4f1N-8mvMEZNcxVP+zbxjp0=OWFQc2pDDssnpmZ6eJig@mail.gmail.com>
+Subject: Re: [PATCH V3 00/14] KVM: MIPS: Add Loongson-3 support (Host Side)
+To:     Huacai Chen <chenhc@lemote.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        kvm@vger.kernel.org, QEMU Developers <qemu-devel@nongnu.org>,
+        linux-mips@vger.kernel.org,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Current minimum required version of binutils is 2.23,
-which supports VMCALL and VMMCALL instruction mnemonics.
+=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:06 Huacai Chen <c=
+henhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
+=D0=BB=D0=B0:
+>
+> We are preparing to add KVM support for Loongson-3. VZ extension is
+> fully supported in Loongson-3A R4+, and we will not care about old CPUs
+> (at least now). We already have a full functional Linux kernel (based
+> on Linux-5.4.x LTS) and QEMU (based on 5.0.0-rc2) and their git
+> repositories are here:
+>
+> QEMU: https://github.com/chenhuacai/qemu
+> Kernel: https://github.com/chenhuacai/linux
+>
+> Of course these two repositories need to be rework and not suitable for
+> upstream (especially the commits need to be splitted). We show them here
+> is just to tell others what we have done, and how KVM/Loongson will look
+> like.
+>
+> Our plan is make the KVM host side be upstream first, and after that,
+> we will make the KVM guest side and QEMU emulator be upstream.
+>
 
-Replace the byte-wise specification of VMCALL and
-VMMCALL with these proper mnemonics.
+Huacei, I absolutely salute this series, as it is, in my opinion, of
+tremendous significance not only for Loongson, but also for KVM for
+MIPS in general.
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_para.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+As you probably know, James Hogan left KVM for MIPS kernel
+maintainership some time ago. It was really too bad, as he was and
+still is, from my direct experience, an excellent colleague and
+engineer.
 
-diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-index 9b4df6eaa11a..5e5e6c027424 100644
---- a/arch/x86/include/asm/kvm_para.h
-+++ b/arch/x86/include/asm/kvm_para.h
-@@ -18,7 +18,7 @@ static inline bool kvm_check_and_clear_guest_paused(void)
- #endif /* CONFIG_KVM_GUEST */
- 
- #define KVM_HYPERCALL \
--        ALTERNATIVE(".byte 0x0f,0x01,0xc1", ".byte 0x0f,0x01,0xd9", X86_FEATURE_VMMCALL)
-+        ALTERNATIVE("vmcall", "vmmcall", X86_FEATURE_VMMCALL)
- 
- /* For KVM hypercalls, a three-byte sequence of either the vmcall or the vmmcall
-  * instruction.  The hypervisor may replace it with something else but only the
--- 
-2.25.4
+KVM for MIPS kernel maintainership left orphaned put me (as the
+maintainer for KVM for MIPS in QEMU) in an awkward position.
 
+May I ask that you and me jointly assume KVM for MIPS kernel
+maintainership? For me, it makes perfect sense, and I would certainly
+enjoy working with you. If you agree, please add such patch at the end
+of this series, in its next version.
+
+Yours,
+Aleksandar
+
+
+> V1 -> V2:
+> 1, Remove "mips: define pud_index() regardless of page table folding"
+>    because it has been applied.
+> 2, Make Loongson-specific code be guarded by CONFIG_CPU_LOONGSON64.
+>
+> V2 -> V3:
+> 1, Emulate a reduced feature list of CPUCFG.
+> 2, Fix all possible checkpatch.pl errors and warnings.
+>
+> Xing Li(2):
+>  KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
+>  KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
+>
+> Huacai Chen(12):
+>  KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
+>  KVM: MIPS: Add EVENTFD support which is needed by VHOST
+>  KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
+>  KVM: MIPS: Introduce and use cpu_guest_has_ldpte
+>  KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
+>  KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
+>  KVM: MIPS: Add more types of virtual interrupts
+>  KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
+>  KVM: MIPS: Add CPUCFG emulation for Loongson-3
+>  KVM: MIPS: Add CONFIG6 and DIAG registers emulation
+>  KVM: MIPS: Add more MMIO load/store instructions emulation
+>  KVM: MIPS: Enable KVM support for Loongson-3
+>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> ---
+>  arch/mips/Kconfig                    |   1 +
+>  arch/mips/include/asm/cpu-features.h |   3 +
+>  arch/mips/include/asm/kvm_host.h     |  52 +++-
+>  arch/mips/include/asm/mipsregs.h     |   7 +
+>  arch/mips/include/uapi/asm/inst.h    |  11 +
+>  arch/mips/kernel/cpu-probe.c         |   2 +
+>  arch/mips/kvm/Kconfig                |   1 +
+>  arch/mips/kvm/Makefile               |   5 +-
+>  arch/mips/kvm/emulate.c              | 503 +++++++++++++++++++++++++++++=
++++++-
+>  arch/mips/kvm/entry.c                |  19 +-
+>  arch/mips/kvm/interrupt.c            |  93 +------
+>  arch/mips/kvm/interrupt.h            |  14 +-
+>  arch/mips/kvm/loongson_ipi.c         | 214 +++++++++++++++
+>  arch/mips/kvm/mips.c                 |  49 +++-
+>  arch/mips/kvm/tlb.c                  |  41 +++
+>  arch/mips/kvm/trap_emul.c            |   3 +
+>  arch/mips/kvm/vz.c                   | 235 +++++++++++-----
+>  17 files changed, 1087 insertions(+), 166 deletions(-)
+>  create mode 100644 arch/mips/kvm/loongson_ipi.c
+> --
+> 2.7.0
