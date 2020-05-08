@@ -2,127 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 584541CB89F
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 21:53:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10FFA1CB8D1
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 22:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726904AbgEHTw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 15:52:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42104 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726767AbgEHTw6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 15:52:58 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F91C05BD43
-        for <kvm@vger.kernel.org>; Fri,  8 May 2020 12:52:58 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id f13so2401814qkh.2
-        for <kvm@vger.kernel.org>; Fri, 08 May 2020 12:52:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=+PiQ6ckxUTnSDo+AGLRh/Fg+o3k0O3ko3wY06x3JoKE=;
-        b=Ts3CIrENqZECosUV9ufuB6NplQ4bZIANry4cTq9ctiFl2W3eKhj5UpDDQOEaY6A2Yd
-         mNvqS8MpDNbFmXG47isv0LHHuWhU9DrWeNeUqpMHP3rRP+c5b6gcvtAg+8ZLRMd/gdoD
-         1i8v4D54gKF1JaotzplFLT3nMfQ5VKcTVTMjFomlH2d9ykBhs9YeoAV4r0fEyjl3TlPr
-         v2KDioACvLG1JOHWROC3jtqtFiE8v+6chVfwhJVwQ6LpHrO+DnmO5kWS3VjbGmk9WNEY
-         aeK1VQ7Ix6UqBc9nyw9EdxtaWdyBCOYz2f1ZZWBmiN42UGRN2WCkIjnAj9hWJy7yjUPW
-         HsMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=+PiQ6ckxUTnSDo+AGLRh/Fg+o3k0O3ko3wY06x3JoKE=;
-        b=ZX3WV5je0CtEfnxde+TT3ZuLodUQECayLsFS3cYohtPitcflovCZIukQtRnmds88uL
-         QmwjjIcKYL20U87cWCCKWLEzFHfCoQGJff0Kj7HpgxOzs0oOAiCdTX7EG+kvvHiNWS/9
-         CEr3EpSCKP5uGg9DRMTgNOPLjntL+l+e+ytY5tXdDpJGca0REvR+hpqs0loYz7pXEuZq
-         HIfmi+iswWtiJDGQqzx3/QQHSt5vSNtnIKmlXE7LdNlUNUWGRSGO3VJdbz9hXrb5Ui9h
-         1CcmJ3egn2qYcD/8Husvhn6gdS5giUVBEevb8L3ltOBqlXHwuUa6GJbivPgn/bs0tyrO
-         j/gQ==
-X-Gm-Message-State: AGi0PuYBkZlbyJNUCnIiDuSrpJsQXzmq+B/MjhrndTl6uQHo6mDL0Ikg
-        tTl0nfLoe28m1gw6+OfLOO3ydw==
-X-Google-Smtp-Source: APiQypJ92/0qZ5iunL9hikarn4eDK0RllMv8mjTvIrEJ1zjbLNqAjWeKqDY9cc4vVlZEbqAojJlNqA==
-X-Received: by 2002:a37:a4d8:: with SMTP id n207mr4488919qke.354.1588967577470;
-        Fri, 08 May 2020 12:52:57 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-57-212.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.57.212])
-        by smtp.gmail.com with ESMTPSA id c4sm1945896qkf.120.2020.05.08.12.52.56
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 08 May 2020 12:52:56 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jX93I-0002SQ-9Q; Fri, 08 May 2020 16:52:56 -0300
-Date:   Fri, 8 May 2020 16:52:56 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH 09/12] rdma: use __anon_inode_getfd
-Message-ID: <20200508195256.GA8912@ziepe.ca>
-References: <20200508153634.249933-1-hch@lst.de>
- <20200508153634.249933-10-hch@lst.de>
+        id S1727794AbgEHUN4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 16:13:56 -0400
+Received: from mga17.intel.com ([192.55.52.151]:7963 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726797AbgEHUN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 May 2020 16:13:56 -0400
+IronPort-SDR: m8pdf0NzRfqVhIDIaDg4rXGUdKPxdGllyuTG/G7o5uopK2LA1pkfdFnlWP1gWGVU7D/71cZ8HO
+ DhCOa6UnNawA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 13:13:55 -0700
+IronPort-SDR: y4g5nsyjWS+5oiCxcwofr7ePTc8VpZ3E/YSVNyyNDQETMLm2mu8rOOzmegxmmgVNxTxok7MUcZ
+ 7WxS+kd03CAA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,369,1583222400"; 
+   d="scan'208";a="249853292"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga007.jf.intel.com with ESMTP; 08 May 2020 13:13:55 -0700
+Date:   Fri, 8 May 2020 13:13:55 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jon Cargille <jcargill@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Feiner <pfeiner@google.com>
+Subject: Re: [PATCH] kvm: x86 mmu: avoid mmu_page_hash lookup for
+ direct_map-only VM
+Message-ID: <20200508201355.GS27052@linux.intel.com>
+References: <20200508182425.69249-1-jcargill@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200508153634.249933-10-hch@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200508182425.69249-1-jcargill@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 08, 2020 at 05:36:31PM +0200, Christoph Hellwig wrote:
-> Use __anon_inode_getfd instead of opencoding the logic using
-> get_unused_fd_flags + anon_inode_getfile.
+On Fri, May 08, 2020 at 11:24:25AM -0700, Jon Cargille wrote:
+> From: Peter Feiner <pfeiner@google.com>
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Optimization for avoiding lookups in mmu_page_hash. When there's a
+> single direct root, a shadow page has at most one parent SPTE
+> (non-root SPs have exactly one; the root has none). Thus, if an SPTE
+> is non-present, it can be linked to a newly allocated SP without
+> first checking if the SP already exists.
+
+Some mechanical comments below.  I'll think through the actual logic next
+week, my brain needs to be primed anytime the MMU is involved :-)
+
+> This optimization has proven significant in batch large SP shattering
+> where the hash lookup accounted for 95% of the overhead.
+> 
+> Signed-off-by: Peter Feiner <pfeiner@google.com>
+> Signed-off-by: Jon Cargille <jcargill@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> 
 > ---
->  drivers/infiniband/core/rdma_core.c | 17 ++++-------------
->  1 file changed, 4 insertions(+), 13 deletions(-)
-
- 
-> diff --git a/drivers/infiniband/core/rdma_core.c b/drivers/infiniband/core/rdma_core.c
-> index 5128cb16bb485..541e5e06347f6 100644
-> --- a/drivers/infiniband/core/rdma_core.c
-> +++ b/drivers/infiniband/core/rdma_core.c
-> @@ -462,30 +462,21 @@ alloc_begin_fd_uobject(const struct uverbs_api_object *obj,
->  	if (WARN_ON(fd_type->fops->release != &uverbs_uobject_fd_release))
->  		return ERR_PTR(-EINVAL);
+>  arch/x86/include/asm/kvm_host.h | 13 ++++++++
+>  arch/x86/kvm/mmu/mmu.c          | 55 +++++++++++++++++++--------------
+>  2 files changed, 45 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index a239a297be33..9b70d764b626 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -913,6 +913,19 @@ struct kvm_arch {
+>  	struct kvm_page_track_notifier_node mmu_sp_tracker;
+>  	struct kvm_page_track_notifier_head track_notifier_head;
 >  
-> -	new_fd = get_unused_fd_flags(O_CLOEXEC);
-> -	if (new_fd < 0)
-> -		return ERR_PTR(new_fd);
-> -
->  	uobj = alloc_uobj(attrs, obj);
->  	if (IS_ERR(uobj))
-> -		goto err_fd;
-> +		return uobj;
+> +	/*
+> +	 * Optimization for avoiding lookups in mmu_page_hash. When there's a
+> +	 * single direct root, a shadow page has at most one parent SPTE
+> +	 * (non-root SPs have exactly one; the root has none). Thus, if an SPTE
+> +	 * is non-present, it can be linked to a newly allocated SP without
+> +	 * first checking if the SP already exists.
+> +	 *
+> +	 * False initially because there are no indirect roots.
+> +	 *
+> +	 * Guarded by mmu_lock.
+> +	 */
+> +	bool shadow_page_may_have_multiple_parents;
+
+Why make this a one-way bool?  Wouldn't it be better to let this transition
+back to '0' once all nested guests go away?
+
+And maybe a shorter name that reflects what it tracks instead of how its
+used, e.g. has_indirect_mmu or indirect_mmu_count.
+
+> +
+>  	struct list_head assigned_dev_head;
+>  	struct iommu_domain *iommu_domain;
+>  	bool iommu_noncoherent;
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e618472c572b..d94552b0ed77 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2499,35 +2499,40 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>  		quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
+>  		role.quadrant = quadrant;
+>  	}
+> -	for_each_valid_sp(vcpu->kvm, sp, gfn) {
+> -		if (sp->gfn != gfn) {
+> -			collisions++;
+> -			continue;
+> -		}
 >  
->  	/* Note that uverbs_uobject_fd_release() is called during abort */
-> -	filp = anon_inode_getfile(fd_type->name, fd_type->fops, NULL,
-> -				  fd_type->flags);
-> -	if (IS_ERR(filp)) {
-> -		uobj = ERR_CAST(filp);
-> +	new_fd = __anon_inode_getfd(fd_type->name, fd_type->fops, NULL,
-> +			fd_type->flags | O_CLOEXEC, &filp);
-> +	if (new_fd < 0)
->  		goto err_uobj;
+> -		if (!need_sync && sp->unsync)
+> -			need_sync = true;
+> +	if (vcpu->kvm->arch.shadow_page_may_have_multiple_parents ||
+> +	    level == vcpu->arch.mmu->root_level) {
 
-This will conflict with a fix (83a267021221 'RDMA/core: Fix
-overwriting of uobj in case of error') that is going to go to -rc
-soon.
+Might be worth a goto to preserve the for-loop.
 
-Also the above misses returning an ERR_PTR if __anon_inode_getfd fails, it
-returns a uobj that had been freed.. I suppose it should be something
-like
+> +		for_each_valid_sp(vcpu->kvm, sp, gfn) {
+> +			if (sp->gfn != gfn) {
+> +				collisions++;
+> +				continue;
+> +			}
+>  
+> -		if (sp->role.word != role.word)
+> -			continue;
+> +			if (!need_sync && sp->unsync)
+> +				need_sync = true;
+>  
+> -		if (sp->unsync) {
+> -			/* The page is good, but __kvm_sync_page might still end
+> -			 * up zapping it.  If so, break in order to rebuild it.
+> -			 */
+> -			if (!__kvm_sync_page(vcpu, sp, &invalid_list))
+> -				break;
+> +			if (sp->role.word != role.word)
+> +				continue;
+>  
+> -			WARN_ON(!list_empty(&invalid_list));
+> -			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> -		}
+> +			if (sp->unsync) {
+> +				/* The page is good, but __kvm_sync_page might
+> +				 * still end up zapping it.  If so, break in
+> +				 * order to rebuild it.
+> +				 */
+> +				if (!__kvm_sync_page(vcpu, sp, &invalid_list))
+> +					break;
+>  
+> -		if (sp->unsync_children)
+> -			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> +				WARN_ON(!list_empty(&invalid_list));
+> +				kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> +			}
+>  
+> -		__clear_sp_write_flooding_count(sp);
+> -		trace_kvm_mmu_get_page(sp, false);
+> -		goto out;
+> +			if (sp->unsync_children)
+> +				kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> +
+> +			__clear_sp_write_flooding_count(sp);
+> +			trace_kvm_mmu_get_page(sp, false);
+> +			goto out;
+> +		}
+>  	}
+>  
+>  	++vcpu->kvm->stat.mmu_cache_miss;
+> @@ -3735,6 +3740,10 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+>  	gfn_t root_gfn, root_pgd;
+>  	int i;
+>  
+> +	spin_lock(&vcpu->kvm->mmu_lock);
+> +	vcpu->kvm->arch.shadow_page_may_have_multiple_parents = true;
+> +	spin_unlock(&vcpu->kvm->mmu_lock);
 
-if (new_fd < 0) {
-   uverbs_uobject_put(uobj);
-   return ERR_PTR(new_fd)
-}
+Taking the lock every time is unnecessary, even if this is changed to a
+refcount type variable, e.g.
 
-?
+	if (!has_indirect_mmu) {
+		lock_and_set
+	}
 
-Jason
+or
+
+	if (atomic_inc_return(&indirect_mmu_count) == 1)
+		lock_and_unlock;
+
+	
+> +
+>  	root_pgd = vcpu->arch.mmu->get_guest_pgd(vcpu);
+>  	root_gfn = root_pgd >> PAGE_SHIFT;
+>  
+> -- 
+> 2.26.2.303.gf8c07b1a785-goog
+> 
