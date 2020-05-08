@@ -2,137 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EBE01CB1D3
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 16:29:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 238371CB1D6
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 16:31:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727788AbgEHO36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 10:29:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47968 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726873AbgEHO35 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 10:29:57 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83471C05BD43;
-        Fri,  8 May 2020 07:29:57 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id z8so2155593wrw.3;
-        Fri, 08 May 2020 07:29:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2+2RrQGnTFUDHo1nQ+eoI91mES5cwFOLmSedeSlm/AU=;
-        b=kO/BTSbr2v4J2zrxepOmL3FGrXq4Lncu493CrzjLaqUMozqba70YjROg0oyHLMBqDg
-         yZWQodqA4QAnPk5z7FAnHCSL8jDeQS58n7dw3J4/hx4Jzi0Ma6M/qh41faBZUhPZFKXq
-         ZWsX+kMOhad4vcnlfnz8/iUXTPw6/Cn218jJ/MQPHretKZ95c36IiNxMqW3zSMNNZkhO
-         XnW66AFEhdNAPSjkBwMYpMJTECzW9pkLxGRG1zWEMTQ1fvkD7dH4JTUBNfs7j9PJ6A1k
-         tmOVMQ1GJRA9EUaIUaVrUgnkmNFg8kiP9sbOU8LKas7YUa8YLLvYhm2V7GiFTwMnxPjt
-         cpcg==
+        id S1727841AbgEHObB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 10:31:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45170 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726873AbgEHObB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 May 2020 10:31:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588948259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lIRjAGCSvbO1PdVeTIb+ibHQAikoDQgX7hMGEBLwgkE=;
+        b=bLxCpf7RASqSQKjPP6jHdJ62mCdcZb9NX1i2TQeBDKsSsJfh6n32kY6C2f7Am7E7aa7jCh
+        NVSYrdimWeW6HdSngxq4sTajowM2dw9D0BR+Kfqafs0fZrUYNESFwvKAK1yO6350HoH869
+        ADlpdc2eEWORrCpQxSJEvU0XOynfLaM=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-Rxe0gd7VOuCHzoEN3AptAg-1; Fri, 08 May 2020 10:30:48 -0400
+X-MC-Unique: Rxe0gd7VOuCHzoEN3AptAg-1
+Received: by mail-qk1-f200.google.com with SMTP id d19so2181622qkj.21
+        for <kvm@vger.kernel.org>; Fri, 08 May 2020 07:30:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=2+2RrQGnTFUDHo1nQ+eoI91mES5cwFOLmSedeSlm/AU=;
-        b=QwhnQVIcLtsCx+fokNYmenQwZ7xPkv/ArHUQxFklm7k1Bu5jMUwgTCc6gfMSXMNmmi
-         dnaDhx+smQoWnWYDILaeueaUKo03y+GrF7EboDxLXw6QQHOLUfwnIgC6b69bhPsT+/iH
-         6FXL/bzE5s+ke2uzJj6OzEJQgirwWFLhPAf5KXcdFPyCEmCGrtXoc5FlXCJWrmh4g36B
-         5D76v02JFppYal3zbQUm9vSGu0p7RdgrynDJ3zPryxnU47pNAagFxUfFm8ySQ55AHaZP
-         fo8tiAJWQdKM2mAYajv6UBVWgulNJ/7oxnzO4K3M/55LP2lQ2P6UH4SJ7mXRMXBQ0V++
-         0qfg==
-X-Gm-Message-State: AGi0PuYKk7eTibwBkCx9nNR3bsu3UPdVDu1zQR2yCyB/CnDwnd6IZp87
-        5dtwJ0k8fozxsoVmh0EiDSCVg+/WfwU=
-X-Google-Smtp-Source: APiQypKRq/86ukxOi4pyRK4Wppqzwc6rxIoOmYILWTYPYbRx5S2g/b+6xIw4Xm9krjGsih4ey/mrQA==
-X-Received: by 2002:a5d:5682:: with SMTP id f2mr3192542wrv.382.1588948196243;
-        Fri, 08 May 2020 07:29:56 -0700 (PDT)
-Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
-        by smtp.gmail.com with ESMTPSA id r23sm3746563wra.74.2020.05.08.07.29.54
+        bh=lIRjAGCSvbO1PdVeTIb+ibHQAikoDQgX7hMGEBLwgkE=;
+        b=I5V9dZCORRw7qFnqsCUnnF1hy4jKTu8V0keAs9ST5Q7pqzH0Hn6xqbcpxTH3wlWz1H
+         V9dASqPD7aiQ33dvUqm8Aq8Xfqus4un83S/lrJgj4miYnRkN7uyVvAF4Um7qBbPGhoPA
+         fy07nfvFXO4jk2h9/AL9NyQO223MmAZ4O50MnvpZw90BTQI5CwDyrh+UzJG6JQI/RZLA
+         1xKDm7ZeJ9e77EA4mRhOT24fHqhSHWBK7kDOcgffDsA54v9uJ3lXUCAPODrM1leDe70Q
+         Qh5KYaPtKwj9kfURy+P6FYzzGCUQnhBHkWMdqiRrefFe9tNXYRZhmyHVYjn//uhc9rwq
+         CIug==
+X-Gm-Message-State: AGi0PuaZ4+2YqxvKxsCaeXarnrHtYN57gnw7Ef4Dz1S3H4qHHekfJ2a4
+        duWQqdqIEQ/1fOmSDt5XtUFB9S7KWN1hM87LkZCzUeZ0IyDyy10nDMpZYZsguMfoDAwTuR9VAl3
+        4XvseiezqbdnQ
+X-Received: by 2002:aed:2e24:: with SMTP id j33mr3254493qtd.117.1588948247011;
+        Fri, 08 May 2020 07:30:47 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLpIgVamTZ1EUCABaqOg/LRWWRWl2ZAJbE/Vu45j1TY2btxCLAF4n4xUil/Okkd6JIjfe6Bqg==
+X-Received: by 2002:aed:2e24:: with SMTP id j33mr3254355qtd.117.1588948245283;
+        Fri, 08 May 2020 07:30:45 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id k58sm1603302qtf.40.2020.05.08.07.30.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2020 07:29:55 -0700 (PDT)
-Date:   Fri, 8 May 2020 17:29:54 +0300
-From:   Jon Doron <arilou@gmail.com>
-To:     Roman Kagan <rvkagan@yandex-team.ru>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
-Message-ID: <20200508142954.GH2862@jondnuc>
-References: <20200424133742.GA2439920@rvkaganb>
- <20200425061637.GF1917435@jondnuc>
- <20200503191900.GA389956@rvkaganb>
- <87a72nelup.fsf@vitty.brq.redhat.com>
- <20200505080158.GA400685@rvkaganb>
- <20200505103821.GB2862@jondnuc>
- <20200505200010.GB400685@rvkaganb>
- <20200506044929.GD2862@jondnuc>
- <20200506084615.GA32841@rvkaganb>
- <20200507030037.GE2862@jondnuc>
+        Fri, 08 May 2020 07:30:44 -0700 (PDT)
+Date:   Fri, 8 May 2020 10:30:42 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cohuck@redhat.com
+Subject: Re: [PATCH v2 1/3] vfio/type1: Support faulting PFNMAP vmas
+Message-ID: <20200508143042.GY228260@xz-x1>
+References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
+ <158871568480.15589.17339878308143043906.stgit@gimli.home>
+ <20200507212443.GO228260@xz-x1>
+ <20200507235421.GK26002@ziepe.ca>
+ <20200508021939.GT228260@xz-x1>
+ <20200508121013.GO26002@ziepe.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200507030037.GE2862@jondnuc>
+In-Reply-To: <20200508121013.GO26002@ziepe.ca>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/05/2020, Jon Doron wrote:
->On 06/05/2020, Roman Kagan wrote:
->>On Wed, May 06, 2020 at 07:49:29AM +0300, Jon Doron wrote:
->>>Thanks Roman, I see your point, it's important for me to get the EDK2
->>>working properly not sure why it's not working for me.
->>
->>As I wrote a good deal of that code I hope I should be able to help (and
->>I'd be interested, too).  How exactly does the "not working" look like?
->>
->
->Basically when I built the BIOS from the hv-scsi branch you pointed me 
->out to, the BIOS did not see the virtio-blk device to boot from, I 
->usually take the BIOS from (https://www.kraxel.org/repos/) but I will 
->try to build the latest EDK2 and see if it identifies the virtio-blk 
->device and boots from it, if that's the case perhaps i just need to 
->rebase your branch over the latest master of EDK2.
->
->>Also I'm a bit confused as to why UEFI is critical for the work you're
->>doing?  Can't it be made to work with BIOS first?
->>
->
->The reason I want to have the UEFI option is because I need SecureBoot 
->to turn on VBS.
->
->>>Do you know by any chance if the EDK2 hyperv patches were submitted and if
->>>they were why they were not merged in?
->>
->>I do, as I'm probably the only one who could have submitted them :)
->>
->>No they were not submitted.  Neither were the ones for SeaBIOS nor iPXE.
->>The reason was that I had found no way to use alternative firmware with
->>HyperV, so the only environment where that would be useful and testable
->>was QEMU with VMBus.  Therefore I thought it made no sense to submit
->>them until VMBus landed in QEMU.
->>
->>Thanks,
->>Roman.
->
->Heh I see, well I'm really happy that you are here helping so we can 
->try and finally add VMBus to QEMU, I realize it's a big effort but I'm 
->willing to spend the time and do the required changes...
->
->I'm working this only during my free time so things takes me longer 
->than usual (sorry for that..)
->
->I will keep update on results once I get to test with latest EDK2 :)
->
->Thanks,
->-- Jon.
+On Fri, May 08, 2020 at 09:10:13AM -0300, Jason Gunthorpe wrote:
+> On Thu, May 07, 2020 at 10:19:39PM -0400, Peter Xu wrote:
+> > On Thu, May 07, 2020 at 08:54:21PM -0300, Jason Gunthorpe wrote:
+> > > On Thu, May 07, 2020 at 05:24:43PM -0400, Peter Xu wrote:
+> > > > On Tue, May 05, 2020 at 03:54:44PM -0600, Alex Williamson wrote:
+> > > > > With conversion to follow_pfn(), DMA mapping a PFNMAP range depends on
+> > > > > the range being faulted into the vma.  Add support to manually provide
+> > > > > that, in the same way as done on KVM with hva_to_pfn_remapped().
+> > > > > 
+> > > > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > > > >  drivers/vfio/vfio_iommu_type1.c |   36 +++++++++++++++++++++++++++++++++---
+> > > > >  1 file changed, 33 insertions(+), 3 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > > > > index cc1d64765ce7..4a4cb7cd86b2 100644
+> > > > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > > > @@ -317,6 +317,32 @@ static int put_pfn(unsigned long pfn, int prot)
+> > > > >  	return 0;
+> > > > >  }
+> > > > >  
+> > > > > +static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
+> > > > > +			    unsigned long vaddr, unsigned long *pfn,
+> > > > > +			    bool write_fault)
+> > > > > +{
+> > > > > +	int ret;
+> > > > > +
+> > > > > +	ret = follow_pfn(vma, vaddr, pfn);
+> > > > > +	if (ret) {
+> > > > > +		bool unlocked = false;
+> > > > > +
+> > > > > +		ret = fixup_user_fault(NULL, mm, vaddr,
+> > > > > +				       FAULT_FLAG_REMOTE |
+> > > > > +				       (write_fault ?  FAULT_FLAG_WRITE : 0),
+> > > > > +				       &unlocked);
+> > > > > +		if (unlocked)
+> > > > > +			return -EAGAIN;
+> > > > 
+> > > > Hi, Alex,
+> > > > 
+> > > > IIUC this retry is not needed too because fixup_user_fault() will guarantee the
+> > > > fault-in is done correctly with the valid PTE as long as ret==0, even if
+> > > > unlocked==true.
+> > > 
+> > > It is true, and today it is fine, but be careful when reworking this
+> > > to use notifiers as unlocked also means things like the vma pointer
+> > > are invalidated.
+> > 
+> > Oh right, thanks for noticing that.  Then we should probably still keep the
+> > retry logic... because otherwise the latter follow_pfn() could be referencing
+> > an invalid vma already...
+> 
+> I looked briefly and thought this flow used the vma only once?
 
-Hi, just wanted to update you I did some stupid mistake when I did the 
-UEFI setup test (that's why I could not boot my Win10).
+        ret = follow_pfn(vma, vaddr, pfn);
+        if (ret) {
+                bool unlocked = false;
+ 
+                ret = fixup_user_fault(NULL, mm, vaddr,
+                                       FAULT_FLAG_REMOTE |
+                                       (write_fault ?  FAULT_FLAG_WRITE : 0),
+                                       &unlocked);
+                if (unlocked)
+                        return -EAGAIN;
+ 
+                if (ret)
+                        return ret;
+ 
+                ret = follow_pfn(vma, vaddr, pfn);      <--------------- [1]
+        }
 
-I suggest we will abandon this patch, and try to keep going on the QEMU 
-VMBus patchset.
-
-And perhaps submit a very basic patch to SeaBIOS and EDK2 which just 
-enable SCONTROL.
-
-Does that sound like a good plan to you?
+So imo the 2nd follow_pfn() [1] could be racy if without the unlocked check.
 
 Thanks,
--- Jon.
+
+-- 
+Peter Xu
+
