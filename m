@@ -2,93 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83EA01CA08E
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 04:13:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA4A91CA094
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 04:17:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726618AbgEHCNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 22:13:45 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:46520 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726509AbgEHCNo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 22:13:44 -0400
-Received: from BC-Mail-Ex14.internal.baidu.com (unknown [172.31.51.54])
-        by Forcepoint Email with ESMTPS id DBA462D79D7BEB6C9639;
-        Fri,  8 May 2020 09:57:43 +0800 (CST)
-Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
- BC-Mail-Ex14.internal.baidu.com (172.31.51.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1531.3; Fri, 8 May 2020 09:57:43 +0800
-Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
- BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
- 15.01.1713.004; Fri, 8 May 2020 09:57:43 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     kbuild test robot <lkp@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "xiaoyao.li@intel.com" <xiaoyao.li@intel.com>,
-        "wei.huang2@amd.com" <wei.huang2@amd.com>
-CC:     "kbuild-all@lists.01.org" <kbuild-all@lists.01.org>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBbdjRdIEtWTTogWDg2OiBzdXBwb3J0IEFQRVJGL01Q?=
- =?gb2312?Q?ERF_registers?=
-Thread-Topic: [PATCH] [v4] KVM: X86: support APERF/MPERF registers
-Thread-Index: AQHWI4hA2UL01sCWs0SOXj1gXofOAKibPPeAgAIzWnA=
-Date:   Fri, 8 May 2020 01:57:43 +0000
-Message-ID: <279090c97595496db37658c4abab1ca4@baidu.com>
-References: <1588757115-19754-1-git-send-email-lirongqing@baidu.com>
- <202005070842.JFNeGs0v%lkp@intel.com>
-In-Reply-To: <202005070842.JFNeGs0v%lkp@intel.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.198.9]
-x-baidu-bdmsfe-datecheck: 1_BC-Mail-Ex14_2020-05-08 09:57:43:943
-x-baidu-bdmsfe-viruscheck: BC-Mail-Ex14_GRAY_Inside_WithoutAtta_2020-05-08
- 09:57:43:912
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        id S1726712AbgEHCRD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 May 2020 22:17:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32519 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726616AbgEHCRC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 May 2020 22:17:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588904221;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WtjazxlEuskMF4wPNnQP3Ty5Cta06wXamFiE9VjuwNg=;
+        b=Cf0mh8piFkUCVgISaaruR0DviQQ3W3E2VxzoT3X61m0+5lWjgtPqdN9bsrRGPyeYcvPpGy
+        3d51BgyF0Si3Y6zU032Tb+BfMYthKVB/MRpvrHzU7ZxvJLuCoxntCJkrbjIGzpR0Z2wrzO
+        o6yMIPt8lUG3b+23ce+6FhUq3eTLcpM=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-485-YGOK0f52PsWUDGaw0c4zrg-1; Thu, 07 May 2020 22:16:59 -0400
+X-MC-Unique: YGOK0f52PsWUDGaw0c4zrg-1
+Received: by mail-qk1-f198.google.com with SMTP id v6so394678qkd.9
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 19:16:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WtjazxlEuskMF4wPNnQP3Ty5Cta06wXamFiE9VjuwNg=;
+        b=QaHY81hpLP3sIQLOv7LtoRw9XiZJnwH6omgXdiSz9QyUdDi66OU/a5qYvYKkPr9KxK
+         C3p21Qm8HWHGfvMsIwK0RxB0KmQeNVvT6+zrKK7KD1KppNoJ5ejuG3Ka0tvhG/GhiBZt
+         G3Af1NMYuxdhGcCCqZ+MwL2Z8lIZRwfdQdA7LO/b6ZqUkANKGedDI8W5McoXTRZYkkxS
+         m3JHLt/PfMYJJfEuiwVFloViYsa4EibuF3zzf4c8QsjUbIZlJbmxQkCPY+tdZa8YuMOO
+         aKr0lzAeKPSgkcZNt6fB5gXtV9uPqv+pEXhsL/YmYVJ92yo7XmVTX7qrECmGTKlQegSG
+         uB5g==
+X-Gm-Message-State: AGi0PuaTofkx7Wn33BDeqh9OCyFbraUxhwPSd6jgGpw4Wx4H63k5RsD8
+        3dIzAHEHg2YU53gMDi37GfJ4D2/feyRJ6RkA9wL0gnQKddcE7gO+oCX1nSj1j4f8Yuc/nYe5bfa
+        Mtx5UsSdIC8J3
+X-Received: by 2002:ac8:1e91:: with SMTP id c17mr513579qtm.237.1588904218796;
+        Thu, 07 May 2020 19:16:58 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKMCJLQFlz4Jrv1e8UQwTefpV+CtILqg45Ii+fu35tC1S+zdxR7Le6TrpKICh1tIWhWqh9sEQ==
+X-Received: by 2002:ac8:1e91:: with SMTP id c17mr513566qtm.237.1588904218488;
+        Thu, 07 May 2020 19:16:58 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id p68sm45146qka.56.2020.05.07.19.16.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 May 2020 19:16:57 -0700 (PDT)
+Date:   Thu, 7 May 2020 22:16:56 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cohuck@redhat.com
+Subject: Re: [PATCH v2 2/3] vfio-pci: Fault mmaps to enable vma tracking
+Message-ID: <20200508021656.GS228260@xz-x1>
+References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
+ <158871569380.15589.16950418949340311053.stgit@gimli.home>
+ <20200507214744.GP228260@xz-x1>
+ <20200507160334.4c029518@x1.home>
+ <20200507222223.GR228260@xz-x1>
+ <20200507235633.GL26002@ziepe.ca>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200507235633.GL26002@ziepe.ca>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBIaSBMaSwNCj4gDQo+IFRoYW5rIHlvdSBmb3IgdGhlIHBhdGNoISBQZXJoYXBzIHNvbWV0aGlu
-ZyB0byBpbXByb3ZlOg0KPiANCj4gW2F1dG8gYnVpbGQgdGVzdCBXQVJOSU5HIG9uIGt2bS9saW51
-eC1uZXh0XSBbYWxzbyBidWlsZCB0ZXN0IFdBUk5JTkcgb24NCj4gbmV4dC0yMDIwMDUwNV0gW2Nh
-bm5vdCBhcHBseSB0byB0aXAvYXV0by1sYXRlc3QgbGludXMvbWFzdGVyIGxpbnV4L21hc3Rlcg0K
-PiB2NS43LXJjNF0gW2lmIHlvdXIgcGF0Y2ggaXMgYXBwbGllZCB0byB0aGUgd3JvbmcgZ2l0IHRy
-ZWUsIHBsZWFzZSBkcm9wIHVzIGEgbm90ZSB0bw0KPiBoZWxwIGltcHJvdmUgdGhlIHN5c3RlbS4g
-QlRXLCB3ZSBhbHNvIHN1Z2dlc3QgdG8gdXNlICctLWJhc2UnIG9wdGlvbiB0byBzcGVjaWZ5DQo+
-IHRoZSBiYXNlIHRyZWUgaW4gZ2l0IGZvcm1hdC1wYXRjaCwgcGxlYXNlIHNlZQ0KPiBodHRwczov
-L3N0YWNrb3ZlcmZsb3cuY29tL2EvMzc0MDY5ODJdDQo+IA0KPiB1cmw6DQo+IGh0dHBzOi8vZ2l0
-aHViLmNvbS8wZGF5LWNpL2xpbnV4L2NvbW1pdHMvTGktUm9uZ1FpbmcvS1ZNLVg4Ni1zdXBwb3J0
-LUFQRQ0KPiBSRi1NUEVSRi1yZWdpc3RlcnMvMjAyMDA1MDctMDIzMzI3DQo+IGJhc2U6ICAgaHR0
-cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL3ZpcnQva3ZtL2t2bS5naXQgbGludXgtbmV4dA0K
-PiBjb25maWc6IHg4Nl82NC1hbGxtb2Rjb25maWcgKGF0dGFjaGVkIGFzIC5jb25maWcpDQo+IGNv
-bXBpbGVyOiBnY2MtNyAoVWJ1bnR1IDcuNS4wLTZ1YnVudHUyKSA3LjUuMA0KPiByZXByb2R1Y2U6
-DQo+ICAgICAgICAgIyBzYXZlIHRoZSBhdHRhY2hlZCAuY29uZmlnIHRvIGxpbnV4IGJ1aWxkIHRy
-ZWUNCj4gICAgICAgICBtYWtlIEFSQ0g9eDg2XzY0DQo+IA0KPiBJZiB5b3UgZml4IHRoZSBpc3N1
-ZSwga2luZGx5IGFkZCBmb2xsb3dpbmcgdGFnIGFzIGFwcHJvcHJpYXRlDQo+IFJlcG9ydGVkLWJ5
-OiBrYnVpbGQgdGVzdCByb2JvdCA8bGtwQGludGVsLmNvbT4NCj4gDQo+IE5vdGU6IGl0IG1heSB3
-ZWxsIGJlIGEgRkFMU0Ugd2FybmluZy4gRldJVyB5b3UgYXJlIGF0IGxlYXN0IGF3YXJlIG9mIGl0
-IG5vdy4NCj4gaHR0cDovL2djYy5nbnUub3JnL3dpa2kvQmV0dGVyX1VuaW5pdGlhbGl6ZWRfV2Fy
-bmluZ3MNCj4gDQo+IEFsbCB3YXJuaW5ncyAobmV3IG9uZXMgcHJlZml4ZWQgYnkgPj4pOg0KPiAN
-Cj4gICAgYXJjaC94ODYva3ZtL3g4Ni5jOiBJbiBmdW5jdGlvbiAndmNwdV9lbnRlcl9ndWVzdCc6
-DQo+ID4+IGFyY2gveDg2L2t2bS94ODYuYzo4MjE5OjEzOiB3YXJuaW5nOiAnYXBlcmYnIG1heSBi
-ZSB1c2VkDQo+ID4+IHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbiBbLVdtYXliZS11bmlu
-aXRpYWxpemVkXQ0KPiAgICAgIHU2NCBtcGVyZiwgYXBlcmY7DQo+ICAgICAgICAgICAgICAgICBe
-fn5+fg0KPiA+PiBhcmNoL3g4Ni9rdm0veDg2LmM6ODIxOTo2OiB3YXJuaW5nOiAnbXBlcmYnIG1h
-eSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQNCj4gPj4gaW4gdGhpcyBmdW5jdGlvbiBbLVdtYXliZS11
-bmluaXRpYWxpemVkXQ0KPiAgICAgIHU2NCBtcGVyZiwgYXBlcmY7DQo+ICAgICAgICAgIF5+fn5+
-DQoNCkkgdGhpbmsgdGhpcyBpcyBhIEZBTFNFIHdhcm5pbmcsIHNldCBhbmQgdXNlIG1wZXJmL2Fw
-ZXJmIG9ubHkgaWYgZW5hYmxlX2FwZXJmbXBlcmYgaXMgdHJ1ZQ0KDQoNCi1MaQ0K
+On Thu, May 07, 2020 at 08:56:33PM -0300, Jason Gunthorpe wrote:
+> On Thu, May 07, 2020 at 06:22:23PM -0400, Peter Xu wrote:
+> > On Thu, May 07, 2020 at 04:03:34PM -0600, Alex Williamson wrote:
+> > > On Thu, 7 May 2020 17:47:44 -0400
+> > > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > > Hi, Alex,
+> > > > 
+> > > > On Tue, May 05, 2020 at 03:54:53PM -0600, Alex Williamson wrote:
+> > > > > +/*
+> > > > > + * Zap mmaps on open so that we can fault them in on access and therefore
+> > > > > + * our vma_list only tracks mappings accessed since last zap.
+> > > > > + */
+> > > > > +static void vfio_pci_mmap_open(struct vm_area_struct *vma)
+> > > > > +{
+> > > > > +	zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);  
+> > > > 
+> > > > A pure question: is this only a safety-belt or it is required in some known
+> > > > scenarios?
+> > > 
+> > > It's not required.  I originally did this so that I'm not allocating a
+> > > vma_list entry in a path where I can't return error, but as Jason
+> > > suggested I could zap here only in the case that I do encounter that
+> > > allocation fault.  However I still like consolidating the vma_list
+> > > handling to the vm_ops .fault and .close callbacks and potentially we
+> > > reduce the zap latency by keeping the vma_list to actual users, which
+> > > we'll get to eventually anyway in the VM case as memory BARs are sized
+> > > and assigned addresses.
+> > 
+> > Yes, I don't see much problem either on doing the vma_list maintainance only in
+> > .fault() and .close().  My understandingg is that the worst case is the perf
+> > critical applications (e.g. DPDK) could pre-fault these MMIO region easily
+> > during setup if they want.  My question was majorly about whether the vma
+> > should be guaranteed to have no mapping at all when .open() is called.  But I
+> > agree with you that it's always good to have that as safety-belt anyways.
+> 
+> If the VMA has a mapping then that specific VMA has to be in the
+> linked list.
+> 
+> So if the zap is skipped then the you have to allocate something and
+> add to the linked list to track the VMA with mapping.
+> 
+> It is not a 'safety belt'
+
+But shouldn't open() only be called when the VMA is created for a memory range?
+If so, does it also mean that the address range must have not been mapped yet?
+
+Thanks,
+
+-- 
+Peter Xu
+
