@@ -2,125 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF0471CA0F4
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 04:32:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1B271CA3D7
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 08:28:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbgEHCcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 May 2020 22:32:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55262 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726678AbgEHCcC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 May 2020 22:32:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588905120;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bIUx96mA/EP7X7OGaqdPckgPL6bFvqgGtFSQHtpt5Dw=;
-        b=UHTHr65DqkYo0WZzbShmHt4zB1NMRgUkslyHVcxls5WgfER/V2EJWgl9HmLdFkDxEZZcgi
-        qFbA/nnim4M4dh3Tr1aScpVHZ0olLyw+j8gBNr3yPixIHGobQ7JVJ0AGmh8B13juCjG9cg
-        WCHCjqX2lXmTbY+/+TWQY9Cm1KxhbXM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-wzSg8r-PMUGtm-e4DCzhjA-1; Thu, 07 May 2020 22:31:59 -0400
-X-MC-Unique: wzSg8r-PMUGtm-e4DCzhjA-1
-Received: by mail-qk1-f197.google.com with SMTP id v6so428937qkd.9
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 19:31:58 -0700 (PDT)
+        id S1726689AbgEHG2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 02:28:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726009AbgEHG2P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 02:28:15 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59B6C05BD43
+        for <kvm@vger.kernel.org>; Thu,  7 May 2020 23:28:14 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id u16so9337776wmc.5
+        for <kvm@vger.kernel.org>; Thu, 07 May 2020 23:28:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JKemrS/nzNf0fJmxK8GiyXOkbcPtsp55SlKT7ZKdxkk=;
+        b=aVK1uqUlziSJOYj9tAQs1q/ny43Tj8h/SlRP9iNrV+9Hh0zc4XZVXZ1piMNHxdruUs
+         wUt4k/tez67ABbSxmHNMqUWoVH/3HLUHi1CkYnzKTUmbAcUxfTxHb+8nciaf6qCtJ9NJ
+         HE17gb87QQudszJS7PCtm7H60muaBB5KgsaHfILi6ywL5k9KyngTK68P+R+4H7FXxaGJ
+         0TzyNGQNinC7AHP3U+5lj5fHhSccZAYX5z6p6pOqkftMS5Ud4LINenOoY3YzB4FBzUw9
+         MJIeN4/LV3c/50TOBbB0CQRBiYokz/XKaykr2ySDpV5Lxyao8b9wLHJPbWQ53QIeTutz
+         orjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bIUx96mA/EP7X7OGaqdPckgPL6bFvqgGtFSQHtpt5Dw=;
-        b=qa7fO2FaP7Eima5HY5v6BYEbGWg2OTnQEsWvHYewzFv1nu/2ODJoPkGUmhQNqJlyX+
-         l06GVOvcn+O6/zkamVHLWhfEhriVOt5hOwgkp/4tWIVPNas5hrnzJoUhBgFdsSNIXr/5
-         jbXIVfNAjfT+SFUb9Z5ItQcoZHwRbaqm4XPMr2MbC+pGocDvbs5J8tGePPHxcHK6P0v5
-         nNGvDI2k/U4l1S8V7ESXeCnyWkFHU41QrorejT9DhZkl10WATRC6UOVL9cdKPF2xpcLK
-         axruJ1wOD/TIG+8bHumoeR8YbjA7Y5yykfyDReEzOMl/zHpek4H3zy+5nn+ELB7a/ZaB
-         x7ng==
-X-Gm-Message-State: AGi0PuY/vfaiiHoMktEz00h8Nc3OgWWK0RLUiDVX1D9fB7BtI4dApjWf
-        3gOrTbFb3zrQt2MGvIP+sq1XoJ8hnJTV4R3xepHouaDYFktBKu2SOH9ij7bm8Ktm/sbv9ySZ9/H
-        RGw2N5Ka9Osa7
-X-Received: by 2002:aed:2744:: with SMTP id n62mr612556qtd.112.1588905118349;
-        Thu, 07 May 2020 19:31:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIcclFny/DXEGjmyqjelNu3QHTKwYMIpTiZjqFGlhy9uH/EYQIP+qoJWgqSp4XGqubYl7AoHQ==
-X-Received: by 2002:aed:2744:: with SMTP id n62mr612540qtd.112.1588905118097;
-        Thu, 07 May 2020 19:31:58 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id p22sm365463qte.2.2020.05.07.19.31.56
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JKemrS/nzNf0fJmxK8GiyXOkbcPtsp55SlKT7ZKdxkk=;
+        b=C4vwS5UM3FVGWuz89e2PqFCMIREMC5+F0+nN0PBt+8HFoyZRsEdq0wKtd/Lyail/aS
+         2jW5F7mw2tlMA7bLeSeEGickqkZQacM2EKvwBNogLPYzk/zMj9B5ZB+Y1ya9dcUAcLmU
+         iIb0nIHXF6iIqeI11XnFpQVbrzMnNrCDZgC6CK/0PBTsq2ERHyJ5cKQdDdC3L69eM1y4
+         X7cIm5mK28s7qOzjOYDiaW425fC0Ux505xs9+V+8UwawPLDlopds7cRwuXxeXW9JGUiA
+         FEsdxV8t3Wp4Z3efSywl+txBs8bMi70Kibz5ypWvsu468z16AWGl1wXlLFEKT2Dfnemv
+         9BzQ==
+X-Gm-Message-State: AGi0PuZ9rShvgQYWhMTzZSgTUkgf4VZ338oAbWU86Ea3D3Lc2tspLxqj
+        +pAs55/siSVsyrDymvd5h3GwPz1VRpg=
+X-Google-Smtp-Source: APiQypIYA9aYUj7KHJpu9f3gXejqXxO3Ocld5Ir0ds4cw/hdkLJ11cPkg4YHvVGykOTW0cOV69M+OQ==
+X-Received: by 2002:a1c:7513:: with SMTP id o19mr11790871wmc.9.1588919291092;
+        Thu, 07 May 2020 23:28:11 -0700 (PDT)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id r11sm99873wrv.14.2020.05.07.23.28.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2020 19:31:57 -0700 (PDT)
-Date:   Thu, 7 May 2020 22:31:56 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, jgg@ziepe.ca
-Subject: Re: [PATCH v2 0/3] vfio-pci: Block user access to disabled device
- MMIO
-Message-ID: <20200508023156.GV228260@xz-x1>
-References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
- <20200507215908.GQ228260@xz-x1>
- <20200507163437.77b4bf2e@x1.home>
+        Thu, 07 May 2020 23:28:10 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] KVM: x86: Move definition of __ex to kvm_host.h
+Date:   Fri,  8 May 2020 08:27:53 +0200
+Message-Id: <20200508062753.10889-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200507163437.77b4bf2e@x1.home>
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 07, 2020 at 04:34:37PM -0600, Alex Williamson wrote:
-> On Thu, 7 May 2020 17:59:08 -0400
-> Peter Xu <peterx@redhat.com> wrote:
-> 
-> > On Tue, May 05, 2020 at 03:54:36PM -0600, Alex Williamson wrote:
-> > > v2:
-> > > 
-> > > Locking in 3/ is substantially changed to avoid the retry scenario
-> > > within the fault handler, therefore a caller who does not allow retry
-> > > will no longer receive a SIGBUS on contention.  IOMMU invalidations
-> > > are still not included here, I expect that will be a future follow-on
-> > > change as we're not fundamentally changing that issue in this series.
-> > > The 'add to vma list only on fault' behavior is also still included
-> > > here, per the discussion I think it's still a valid approach and has
-> > > some advantages, particularly in a VM scenario where we potentially
-> > > defer the mapping until the MMIO BAR is actually DMA mapped into the
-> > > VM address space (or the guest driver actually accesses the device
-> > > if that DMA mapping is eliminated at some point).  Further discussion
-> > > and review appreciated.  Thanks,  
-> > 
-> > Hi, Alex,
-> > 
-> > I have a general question on the series.
-> > 
-> > IIUC this series tries to protect illegal vfio userspace writes to device MMIO
-> > regions which may cause platform-level issues.  That makes perfect sense to me.
-> > However what if the write comes from the devices' side?  E.g.:
-> > 
-> >   - Device A maps MMIO region X
-> > 
-> >   - Device B do VFIO_IOMMU_DMA_MAP on Device A's MMIO region X
-> >     (so X's MMIO PFNs are mapped in device B's IOMMU page table)
-> > 
-> >   - Device A clears PCI_COMMAND_MEMORY (reset, etc.)
-> >     - this should zap all existing vmas that mapping region X, however device
-> >       B's IOMMU page table is not aware of this?
-> > 
-> >   - Device B writes to MMIO region X of device A even if PCI_COMMAND_MEMORY
-> >     cleared on device A's PCI_COMMAND register
-> > 
-> > Could this happen?
-> 
-> Yes, this can happen and Jason has brought up variations on this
-> scenario that are important to fix as well.  I've got some ideas, but
-> the access in this series was the current priority.  There are also
-> issues in the above scenario that if a platform considers a DMA write
-> to an invalid IOMMU PTE and triggering an IOMMU fault to have the same
-> severity as the write to disabled MMIO space we've prevented, then our
-> hands are tied.  Thanks,
+Move the definition of __ex to a common include to be
+shared between VMX and SVM.
 
-I see the point now; it makes sense to start with a series like this. Thanks, Alex.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+---
+ arch/x86/include/asm/kvm_host.h | 2 ++
+ arch/x86/kvm/svm/svm.c          | 2 --
+ arch/x86/kvm/vmx/ops.h          | 2 --
+ 3 files changed, 2 insertions(+), 4 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 35a915787559..4df0c07b0a62 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1620,6 +1620,8 @@ asmlinkage void kvm_spurious_fault(void);
+ 	"668: \n\t"							\
+ 	_ASM_EXTABLE(666b, 667b)
+ 
++#define __ex(x) __kvm_handle_fault_on_reboot(x)
++
+ #define KVM_ARCH_WANT_MMU_NOTIFIER
+ int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
+ int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 57fdd752d2bb..9ea0a69d7fee 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -42,8 +42,6 @@
+ 
+ #include "svm.h"
+ 
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
+-
+ MODULE_AUTHOR("Qumranet");
+ MODULE_LICENSE("GPL");
+ 
+diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
+index 5f1ac002b4b6..3cec799837e8 100644
+--- a/arch/x86/kvm/vmx/ops.h
++++ b/arch/x86/kvm/vmx/ops.h
+@@ -10,8 +10,6 @@
+ #include "evmcs.h"
+ #include "vmcs.h"
+ 
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
+-
+ asmlinkage void vmread_error(unsigned long field, bool fault);
+ __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+ 							 bool fault);
 -- 
-Peter Xu
+2.25.4
 
