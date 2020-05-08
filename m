@@ -2,116 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1B271CA3D7
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 08:28:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5D751CA472
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 08:45:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbgEHG2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 02:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57408 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726009AbgEHG2P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 02:28:15 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59B6C05BD43
-        for <kvm@vger.kernel.org>; Thu,  7 May 2020 23:28:14 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id u16so9337776wmc.5
-        for <kvm@vger.kernel.org>; Thu, 07 May 2020 23:28:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=JKemrS/nzNf0fJmxK8GiyXOkbcPtsp55SlKT7ZKdxkk=;
-        b=aVK1uqUlziSJOYj9tAQs1q/ny43Tj8h/SlRP9iNrV+9Hh0zc4XZVXZ1piMNHxdruUs
-         wUt4k/tez67ABbSxmHNMqUWoVH/3HLUHi1CkYnzKTUmbAcUxfTxHb+8nciaf6qCtJ9NJ
-         HE17gb87QQudszJS7PCtm7H60muaBB5KgsaHfILi6ywL5k9KyngTK68P+R+4H7FXxaGJ
-         0TzyNGQNinC7AHP3U+5lj5fHhSccZAYX5z6p6pOqkftMS5Ud4LINenOoY3YzB4FBzUw9
-         MJIeN4/LV3c/50TOBbB0CQRBiYokz/XKaykr2ySDpV5Lxyao8b9wLHJPbWQ53QIeTutz
-         orjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=JKemrS/nzNf0fJmxK8GiyXOkbcPtsp55SlKT7ZKdxkk=;
-        b=C4vwS5UM3FVGWuz89e2PqFCMIREMC5+F0+nN0PBt+8HFoyZRsEdq0wKtd/Lyail/aS
-         2jW5F7mw2tlMA7bLeSeEGickqkZQacM2EKvwBNogLPYzk/zMj9B5ZB+Y1ya9dcUAcLmU
-         iIb0nIHXF6iIqeI11XnFpQVbrzMnNrCDZgC6CK/0PBTsq2ERHyJ5cKQdDdC3L69eM1y4
-         X7cIm5mK28s7qOzjOYDiaW425fC0Ux505xs9+V+8UwawPLDlopds7cRwuXxeXW9JGUiA
-         FEsdxV8t3Wp4Z3efSywl+txBs8bMi70Kibz5ypWvsu468z16AWGl1wXlLFEKT2Dfnemv
-         9BzQ==
-X-Gm-Message-State: AGi0PuZ9rShvgQYWhMTzZSgTUkgf4VZ338oAbWU86Ea3D3Lc2tspLxqj
-        +pAs55/siSVsyrDymvd5h3GwPz1VRpg=
-X-Google-Smtp-Source: APiQypIYA9aYUj7KHJpu9f3gXejqXxO3Ocld5Ir0ds4cw/hdkLJ11cPkg4YHvVGykOTW0cOV69M+OQ==
-X-Received: by 2002:a1c:7513:: with SMTP id o19mr11790871wmc.9.1588919291092;
-        Thu, 07 May 2020 23:28:11 -0700 (PDT)
-Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
-        by smtp.gmail.com with ESMTPSA id r11sm99873wrv.14.2020.05.07.23.28.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 May 2020 23:28:10 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] KVM: x86: Move definition of __ex to kvm_host.h
-Date:   Fri,  8 May 2020 08:27:53 +0200
-Message-Id: <20200508062753.10889-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.25.4
+        id S1726913AbgEHGo6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 02:44:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29334 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726616AbgEHGo6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 02:44:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588920297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ldgRmfrU61jak98QbW+ZRtHuHZaSuicPr557G5QWVUo=;
+        b=Rz/6BM5o9Wn/WJ4WOgogGGeaUBae39WvJalA+rCCvU9VhtTl6joZ8nHU4tOiFWpytwZfRw
+        Nz0+gRopweNAmJUTQxat7Vv6Ajs0ZJhfbf3pyQXNWGRisGafSU9018VvqO3g7AZwMdysvz
+        fwlSvE7X0YjYZnhBiYARFWWSGvED0cA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-514-xbTrrzdBMpeHOn8_IOa8PA-1; Fri, 08 May 2020 02:44:55 -0400
+X-MC-Unique: xbTrrzdBMpeHOn8_IOa8PA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C698D1B18BC6;
+        Fri,  8 May 2020 06:44:53 +0000 (UTC)
+Received: from [10.72.13.98] (ovpn-13-98.pek2.redhat.com [10.72.13.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 96B2810429AF;
+        Fri,  8 May 2020 06:44:46 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] vfio-pci: Fault mmaps to enable vma tracking
+To:     Peter Xu <peterx@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cohuck@redhat.com
+References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
+ <158871569380.15589.16950418949340311053.stgit@gimli.home>
+ <20200507214744.GP228260@xz-x1> <20200507160334.4c029518@x1.home>
+ <20200507222223.GR228260@xz-x1> <20200507235633.GL26002@ziepe.ca>
+ <20200508021656.GS228260@xz-x1>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <0ee2fd04-d544-d03b-0a7c-90c22275aac9@redhat.com>
+Date:   Fri, 8 May 2020 14:44:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <20200508021656.GS228260@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the definition of __ex to a common include to be
-shared between VMX and SVM.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
----
- arch/x86/include/asm/kvm_host.h | 2 ++
- arch/x86/kvm/svm/svm.c          | 2 --
- arch/x86/kvm/vmx/ops.h          | 2 --
- 3 files changed, 2 insertions(+), 4 deletions(-)
+On 2020/5/8 上午10:16, Peter Xu wrote:
+> On Thu, May 07, 2020 at 08:56:33PM -0300, Jason Gunthorpe wrote:
+>> On Thu, May 07, 2020 at 06:22:23PM -0400, Peter Xu wrote:
+>>> On Thu, May 07, 2020 at 04:03:34PM -0600, Alex Williamson wrote:
+>>>> On Thu, 7 May 2020 17:47:44 -0400
+>>>> Peter Xu <peterx@redhat.com> wrote:
+>>>>
+>>>>> Hi, Alex,
+>>>>>
+>>>>> On Tue, May 05, 2020 at 03:54:53PM -0600, Alex Williamson wrote:
+>>>>>> +/*
+>>>>>> + * Zap mmaps on open so that we can fault them in on access and therefore
+>>>>>> + * our vma_list only tracks mappings accessed since last zap.
+>>>>>> + */
+>>>>>> +static void vfio_pci_mmap_open(struct vm_area_struct *vma)
+>>>>>> +{
+>>>>>> +	zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);
+>>>>> A pure question: is this only a safety-belt or it is required in some known
+>>>>> scenarios?
+>>>> It's not required.  I originally did this so that I'm not allocating a
+>>>> vma_list entry in a path where I can't return error, but as Jason
+>>>> suggested I could zap here only in the case that I do encounter that
+>>>> allocation fault.  However I still like consolidating the vma_list
+>>>> handling to the vm_ops .fault and .close callbacks and potentially we
+>>>> reduce the zap latency by keeping the vma_list to actual users, which
+>>>> we'll get to eventually anyway in the VM case as memory BARs are sized
+>>>> and assigned addresses.
+>>> Yes, I don't see much problem either on doing the vma_list maintainance only in
+>>> .fault() and .close().  My understandingg is that the worst case is the perf
+>>> critical applications (e.g. DPDK) could pre-fault these MMIO region easily
+>>> during setup if they want.  My question was majorly about whether the vma
+>>> should be guaranteed to have no mapping at all when .open() is called.  But I
+>>> agree with you that it's always good to have that as safety-belt anyways.
+>> If the VMA has a mapping then that specific VMA has to be in the
+>> linked list.
+>>
+>> So if the zap is skipped then the you have to allocate something and
+>> add to the linked list to track the VMA with mapping.
+>>
+>> It is not a 'safety belt'
+> But shouldn't open() only be called when the VMA is created for a memory range?
+> If so, does it also mean that the address range must have not been mapped yet?
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 35a915787559..4df0c07b0a62 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1620,6 +1620,8 @@ asmlinkage void kvm_spurious_fault(void);
- 	"668: \n\t"							\
- 	_ASM_EXTABLE(666b, 667b)
- 
-+#define __ex(x) __kvm_handle_fault_on_reboot(x)
-+
- #define KVM_ARCH_WANT_MMU_NOTIFIER
- int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 57fdd752d2bb..9ea0a69d7fee 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -42,8 +42,6 @@
- 
- #include "svm.h"
- 
--#define __ex(x) __kvm_handle_fault_on_reboot(x)
--
- MODULE_AUTHOR("Qumranet");
- MODULE_LICENSE("GPL");
- 
-diff --git a/arch/x86/kvm/vmx/ops.h b/arch/x86/kvm/vmx/ops.h
-index 5f1ac002b4b6..3cec799837e8 100644
---- a/arch/x86/kvm/vmx/ops.h
-+++ b/arch/x86/kvm/vmx/ops.h
-@@ -10,8 +10,6 @@
- #include "evmcs.h"
- #include "vmcs.h"
- 
--#define __ex(x) __kvm_handle_fault_on_reboot(x)
--
- asmlinkage void vmread_error(unsigned long field, bool fault);
- __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
- 							 bool fault);
--- 
-2.25.4
+
+Probably not, e.g when VMA is being split.
+
+Thanks
+
+
+>
+> Thanks,
+>
 
