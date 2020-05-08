@@ -2,94 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F09591CBB4E
-	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 01:37:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08C0E1CBB50
+	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 01:38:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728339AbgEHXhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 19:37:24 -0400
-Received: from mga03.intel.com ([134.134.136.65]:30475 "EHLO mga03.intel.com"
+        id S1728349AbgEHXh4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 19:37:56 -0400
+Received: from mga18.intel.com ([134.134.136.126]:18506 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728326AbgEHXhY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 May 2020 19:37:24 -0400
-IronPort-SDR: hjRljdP1dIYM6N1fQjEkcf4BBzEy3FEDv7ypUPcUweg9PhBqNHMe/5qdLGuttZj1cdAhWrznYv
- 54xZZL9ELkug==
+        id S1727934AbgEHXh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 May 2020 19:37:56 -0400
+IronPort-SDR: G5QTfzukAK/xxcAVOFUpuQODtBlWQmp+H4pyWS/9qRXKNpgvjz555j4Y/ATYLHZmVKCKhuPgkB
+ arynb8vK8VuQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 16:37:23 -0700
-IronPort-SDR: mDu59PUD3Xz8fPlv7B3ug2MFvPj6an5eHH9YiBTYLWQvMwwAZWyDTauvc60FO7ngQI4pl6mt/V
- u6YNVCkPa8qA==
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 16:37:55 -0700
+IronPort-SDR: nskYbpXcg3aL2xjCO5ZbZPqNER0UOODRipa26VvaWqS/3iYCRsu89UzDueaSj+1jFAmhzvCK+c
+ T3Mkc/R1YfDg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,369,1583222400"; 
-   d="scan'208";a="249898446"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga007.jf.intel.com with ESMTP; 08 May 2020 16:37:23 -0700
-Date:   Fri, 8 May 2020 16:37:23 -0700
+   d="scan'208";a="279184846"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by orsmga002.jf.intel.com with ESMTP; 08 May 2020 16:37:54 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] nVMX: Check EXIT_QUALIFICATION on
- VM-Enter failures due to bad guest state
-Message-ID: <20200508233723.GW27052@linux.intel.com>
-References: <20200424174025.1379-1-sean.j.christopherson@intel.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH] KVM: x86: Restore update of required xstate size in guest's CPUID
+Date:   Fri,  8 May 2020 16:37:49 -0700
+Message-Id: <20200508233749.3417-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200424174025.1379-1-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 10:40:25AM -0700, Sean Christopherson wrote:
-> Assert that vmcs.EXIT_QUALIFICATION contains the correct failure code on
-> failed VM-Enter due to invalid guest state.  Hardcode the expected code
-> to the default code, '0', rather than passing in the expected code to
-> minimize churn and boilerplate code, which works for all existing tests.
-                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Restore a guest CPUID update that was unintentional collateral damage
+when the per-vCPU guest_xstate_size field was removed.
 
-...except for atomic_switch_overflow_msrs_test.  I'll get a fix sent out
-next week.
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+Fixes: d87277414b851 ("kvm: x86: Cleanup vcpu->arch.guest_xstate_size")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  x86/vmx.h       | 7 +++++++
->  x86/vmx_tests.c | 3 ++-
->  2 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/x86/vmx.h b/x86/vmx.h
-> index 2e28ecb..08b354d 100644
-> --- a/x86/vmx.h
-> +++ b/x86/vmx.h
-> @@ -521,6 +521,13 @@ enum vm_instruction_error_number {
->  	VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID = 28,
->  };
->  
-> +enum vm_entry_failure_code {
-> +	ENTRY_FAIL_DEFAULT		= 0,
-> +	ENTRY_FAIL_PDPTE		= 2,
-> +	ENTRY_FAIL_NMI			= 3,
-> +	ENTRY_FAIL_VMCS_LINK_PTR	= 4,
-> +};
-> +
->  #define SAVE_GPR				\
->  	"xchg %rax, regs\n\t"			\
->  	"xchg %rcx, regs+0x8\n\t"		\
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 4a3c56b..f5a646f 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -5255,7 +5255,8 @@ static void test_guest_state(const char *test, bool xfail, u64 field,
->  
->  	report(result.exit_reason.failed_vmentry == xfail &&
->  	       ((xfail && result.exit_reason.basic == VMX_FAIL_STATE) ||
-> -	        (!xfail && result.exit_reason.basic == VMX_VMCALL)),
-> +	        (!xfail && result.exit_reason.basic == VMX_VMCALL)) &&
-> +		(!xfail || vmcs_read(EXI_QUALIFICATION) == ENTRY_FAIL_DEFAULT),
->  	        "%s, %s %lx", test, field_name, field);
->  
->  	if (!result.exit_reason.failed_vmentry)
-> -- 
-> 2.26.0
-> 
+There's nothing more thrilling than watching bisect home in on your own
+commits, only to land on someone else's on the very last step.
+
+ arch/x86/kvm/cpuid.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 35845704cf57a..cd708b0b460a0 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -84,11 +84,13 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+ 				   kvm_read_cr4_bits(vcpu, X86_CR4_PKE));
+ 
+ 	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
+-	if (!best)
++	if (!best) {
+ 		vcpu->arch.guest_supported_xcr0 = 0;
+-	else
++	} else {
+ 		vcpu->arch.guest_supported_xcr0 =
+ 			(best->eax | ((u64)best->edx << 32)) & supported_xcr0;
++		best->ebx = xstate_required_size(vcpu->arch.xcr0, false);
++	}
+ 
+ 	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
+ 	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
+-- 
+2.26.0
+
