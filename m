@@ -2,146 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA2FC1CA649
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 10:42:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFA481CA687
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 10:48:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726767AbgEHImF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 04:42:05 -0400
-Received: from mga02.intel.com ([134.134.136.20]:16873 "EHLO mga02.intel.com"
+        id S1727030AbgEHIsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 04:48:36 -0400
+Received: from mga18.intel.com ([134.134.136.126]:31689 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726598AbgEHImE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 May 2020 04:42:04 -0400
-IronPort-SDR: JzLmgT8388nsuRevE1If3FhfU6Sv9gotl3pIXB3cp/uw+/OGNxmciOnKbg+LFSw3bxEkYDCYib
- LYY7Fj+XpPWw==
+        id S1726616AbgEHIsf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 May 2020 04:48:35 -0400
+IronPort-SDR: uiWwEpsLk3KC1hqlUobUmzl70VNTqTo4jqVpFJ0/EBpugrHbHLrShh0giCaM19vtt+IayYd0YO
+ ZjpkGG4oMUrA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 01:42:04 -0700
-IronPort-SDR: Zrk0YVJAwrNi0wgEAjBxIEnF+Ma2ZBKnHXD1TJaTvJI/h2NX/Xp4qAuJEOeksFV5F4s5scW25V
- aJW/QaMWG53A==
-X-ExtLoop1: 1
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 01:48:35 -0700
+IronPort-SDR: o/UFJtcmQaq+kZTdWiOUM5OwBW/Hlzau4txwZwl9ISo4XMuA7AhP6r/AMSy4kFa9nSeEQU1cPr
+ plKUyFVeSD+g==
 X-IronPort-AV: E=Sophos;i="5.73,367,1583222400"; 
-   d="scan'208";a="296009850"
+   d="scan'208";a="407953065"
 Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.141]) ([10.238.4.141])
-  by fmsmga002.fm.intel.com with ESMTP; 08 May 2020 01:42:01 -0700
-Reply-To: like.xu@intel.com
-Subject: Re: [PATCH v2] KVM: x86/pmu: Support full width counting
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Like Xu <like.xu@linux.intel.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 01:48:32 -0700
+Subject: Re: [PATCH v10 08/11] KVM: x86/pmu: Add LBR feature emulation via
+ guest LBR event
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200507021452.174646-1-like.xu@linux.intel.com>
- <3fb56700-7f0b-59e1-527a-f8eb601185b1@redhat.com>
-From:   "Xu, Like" <like.xu@intel.com>
+        linux-kernel@vger.kernel.org, wei.w.wang@intel.com,
+        ak@linux.intel.com
+References: <20200423081412.164863-1-like.xu@linux.intel.com>
+ <20200423081412.164863-9-like.xu@linux.intel.com>
+ <20200424121626.GB20730@hirez.programming.kicks-ass.net>
+ <87abf620-d292-d997-c9be-9a5d2544f3fa@linux.intel.com>
 Organization: Intel OTC
-Message-ID: <72d7d120-85af-d846-a0d5-fe8fe058be34@intel.com>
-Date:   Fri, 8 May 2020 16:42:00 +0800
+Message-ID: <c9b4df65-ca2d-083a-883d-415e6be52ac2@linux.intel.com>
+Date:   Fri, 8 May 2020 16:48:30 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <3fb56700-7f0b-59e1-527a-f8eb601185b1@redhat.com>
+In-Reply-To: <87abf620-d292-d997-c9be-9a5d2544f3fa@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Hi Peter,
 
-Thanks for your detailed comments.
+On 2020/4/27 11:16, Like Xu wrote:
+> Hi Peter,
+> 
+> On 2020/4/24 20:16, Peter Zijlstra wrote:
+>> On Thu, Apr 23, 2020 at 04:14:09PM +0800, Like Xu wrote:
+>>> +static int intel_pmu_create_lbr_event(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +    struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>> +    struct perf_event *event;
+>>> +
+>>> +    /*
+>>> +     * The perf_event_attr is constructed in the minimum efficient way:
+>>> +     * - set 'pinned = true' to make it task pinned so that if another
+>>> +     *   cpu pinned event reclaims LBR, the event->oncpu will be set to 
+>>> -1;
+>>> +     *
+>>> +     * - set 'sample_type = PERF_SAMPLE_BRANCH_STACK' and
+>>> +     *   'exclude_host = true' to mark it as a guest LBR event which
+>>> +     *   indicates host perf to schedule it without but a fake counter,
+>>> +     *   check is_guest_lbr_event() and intel_guest_event_constraints();
+>>> +     *
+>>> +     * - set 'branch_sample_type = PERF_SAMPLE_BRANCH_CALL_STACK |
+>>> +     *   PERF_SAMPLE_BRANCH_USER' to configure it to use callstack mode,
+>>> +     *   which allocs 'ctx->task_ctx_data' and request host perf subsystem
+>>> +     *   to save/restore guest LBR records during host context switches,
+>>> +     *   check branch_user_callstack() and intel_pmu_lbr_sched_task();
+>>> +     */
+>>> +    struct perf_event_attr attr = {
+>>> +        .type = PERF_TYPE_RAW,
+>>
+>> This is not right; this needs a .config
+> 
+> Now we know the default value .config = 0 for attr is not acceptable.
+> 
+>>
+>> And I suppose that is why you need that horrible:
+>> needs_guest_lbr_without_counter() thing to begin with.
+> 
+> Do you suggest to use event->attr.config check to replace
+> "needs_branch_stack(event) && is_kernel_event(event) &&
+> event->attr.exclude_host" check for guest LBR event ?
+> 
+>>
+>> Please allocate yourself an event from the pseudo event range:
+>> event==0x00. Currently we only have umask==3 for Fixed2 and umask==4
+>> for Fixed3, given you claim 58, which is effectively Fixed25,
+>> umask==0x1a might be appropriate.
+> 
+> OK, I assume that adding one more field ".config = 0x1a00" is
+> efficient enough for perf_event_attr to allocate guest LBR events.
 
-On 2020/5/7 15:57, Paolo Bonzini wrote:
-> On 07/05/20 04:14, Like Xu wrote:
->> +static inline u64 vmx_get_perf_capabilities(void)
->> +{
->> +	u64 perf_cap = 0;
->> +
->> +	if (boot_cpu_has(X86_FEATURE_PDCM))
->> +		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
->> +
->> +	/* Currently, KVM only supports Full-Width Writes. */
->> +	perf_cap &= PMU_CAP_FW_WRITES;
->> +
->> +	return perf_cap;
->> +}
->> +
-> Since counters are virtualized, it seems to me that you can support
-> PMU_CAP_FW_WRITES unconditionally, even if the host lacks it.  So just
-> return PMU_CAP_FW_WRITES from this function.
-Sure, let's export PMU_CAP_FW_WRITES unconditionally.
->
->> +	case MSR_IA32_PERF_CAPABILITIES:
->> +		return 1; /* RO MSR */
->>   	default:
-> You need to allow writes from the host if (data &
-> ~vmx_get_perf_capabilities()) == 0.
-Yes, it makes sense after I understand the intention of host_initiated.
->
->> -			if (!msr_info->host_initiated)
->> +		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
->> +			(pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
->> +			if (data & ~pmu->counter_bitmask[KVM_PMC_GP])
->> +				return 1;
->> +			if (!fw_writes_is_enabled(pmu))
->>   				data = (s64)(s32)data;
->
-> You are dropping the test on msr_info->host_initiated here, you should
-> keep it otherwise you allow full-width write to MSR_IA32_PERFCTR0 as
-> well.  So:
->
-> #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
->
-> 	if (!msr_info->host_initiated && !(msr & MSR_PMC_FULL_WIDTH_BIT))
-> 		data = (s64)(s32)data;
-Thanks, it looks good to me and I'll apply it.
->
->> +	case MSR_IA32_PERF_CAPABILITIES:
->> +		if (!nested)
->> +			return 1;
->> +		msr->data = vmx_get_perf_capabilities();
->> +		return 0;
-> The !nested check is wrong.
-You're absolutely right about this.
->
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1220,6 +1220,13 @@ static const u32 msrs_to_save_all[] = {
->>   	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
->>   	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
->>   	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
->> +
->> +	MSR_IA32_PMC0, MSR_IA32_PMC0 + 1, MSR_IA32_PMC0 + 2,
->> +	MSR_IA32_PMC0 + 3, MSR_IA32_PMC0 + 4, MSR_IA32_PMC0 + 5,
->> +	MSR_IA32_PMC0 + 6, MSR_IA32_PMC0 + 7, MSR_IA32_PMC0 + 8,
->> +	MSR_IA32_PMC0 + 9, MSR_IA32_PMC0 + 10, MSR_IA32_PMC0 + 11,
->> +	MSR_IA32_PMC0 + 12, MSR_IA32_PMC0 + 13, MSR_IA32_PMC0 + 14,
->> +	MSR_IA32_PMC0 + 15, MSR_IA32_PMC0 + 16, MSR_IA32_PMC0 + 17,
->>   };
-> This is not needed because the full-width content is already accessible
-> from the host via MSR_IA32_PERFCTRn.
-That's true because they're just alias registers for MSR_IA32_PERFCTRn.
->
-> Given the bugs, it is clear that you should also modify the pmu.c
-> testcase for kvm-unit-tests to cover full-width writes (and especially
-> the non-full-width write behavior of MSR_IA32_PERFCTRn).  Even before
-> the QEMU side is begin worked on, you can test it with "-cpu
-> host,migratable=off".
-Sure, I added some testcases in pmu.c to cover this feature.
+Do you have any comment for this ?
 
-Please review the v3 patch 
-https://lore.kernel.org/kvm/20200508083218.120559-1-like.xu@linux.intel.com/
-as well as the kvm-unit-tests testcase.
+> 
+>>
+>> Also, I suppose we need to claim 0x0000 as an error, so that other
+>> people won't try this again.
+> 
+> Does the following fix address your concern on this ?
 
-Thanks,
-Like Xu
->
+Does the following fix address your concern on this ?
+
+> 
+> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+> index 2405926e2dba..32d2a3f8c51f 100644
+> --- a/arch/x86/events/core.c
+> +++ b/arch/x86/events/core.c
+> @@ -498,6 +498,9 @@ int x86_pmu_max_precise(void)
+> 
+>   int x86_pmu_hw_config(struct perf_event *event)
+>   {
+> +       if (!unlikely(event->attr.config & X86_ARCH_EVENT_MASK))
+> +               return -EINVAL;
+> +
+>          if (event->attr.precise_ip) {
+>                  int precise = x86_pmu_max_precise();
+> 
+> diff --git a/arch/x86/include/asm/perf_event.h 
+> b/arch/x86/include/asm/perf_event.h
+> index 2e6c59308344..bdba87a6f0af 100644
+> --- a/arch/x86/include/asm/perf_event.h
+> +++ b/arch/x86/include/asm/perf_event.h
+> @@ -47,6 +47,8 @@
+>          (ARCH_PERFMON_EVENTSEL_EVENT | (0x0FULL << 32))
+>   #define INTEL_ARCH_EVENT_MASK  \
+>          (ARCH_PERFMON_EVENTSEL_UMASK | ARCH_PERFMON_EVENTSEL_EVENT)
+> +#define X86_ARCH_EVENT_MASK    \
+> +       (ARCH_PERFMON_EVENTSEL_UMASK | ARCH_PERFMON_EVENTSEL_EVENT)
+> 
+>   #define AMD64_L3_SLICE_SHIFT                           48
+>   #define AMD64_L3_SLICE_MASK
+> 
+
+>>
+>>> +        .size = sizeof(attr),
+>>> +        .pinned = true,
+>>> +        .exclude_host = true,
+>>> +        .sample_type = PERF_SAMPLE_BRANCH_STACK,
+>>> +        .branch_sample_type = PERF_SAMPLE_BRANCH_CALL_STACK |
+>>> +                    PERF_SAMPLE_BRANCH_USER,
+>>> +    };
+>>> +
+>>> +    if (unlikely(pmu->lbr_event))
+>>> +        return 0;
+>>> +
+>>> +    event = perf_event_create_kernel_counter(&attr, -1,
+>>> +                        current, NULL, NULL);
+>>> +    if (IS_ERR(event)) {
+>>> +        pr_debug_ratelimited("%s: failed %ld\n",
+>>> +                    __func__, PTR_ERR(event));
+>>> +        return -ENOENT;
+>>> +    }
+>>> +    pmu->lbr_event = event;
+>>> +    pmu->event_count++;
+>>> +    return 0;
+>>> +}
+>>
+>> Also, what happens if you fail programming due to a conflicting cpu
+>> event? That pinned doesn't guarantee you'll get the event, it just means
+>> you'll error instead of getting RR.
+>>
+>> I didn't find any code checking the event state.
+>>
+> 
+> Error instead of RR is expected.
+> 
+> If the KVM fails programming due to a conflicting cpu event
+> the LBR registers will not be passthrough to the guest,
+> and KVM would return zero for any guest LBR records accesses
+> until the next attempt to program the guest LBR event.
+> 
+> Every time before cpu enters the non-root mode where irq is
+> disabled, the "event-> oncpu! =-1" check will be applied.
+> (more details in the comment around intel_pmu_availability_check())
+> 
+> The guests administer is supposed to know the result of guest
+> LBR records is inaccurate if someone is using LBR to record
+> guest or hypervisor on the host side.
+> 
+> Is this acceptable to you？
+> 
+> If there is anything needs to be improved, please let me know.
+
+Is this acceptable to you？
+
+If there is anything needs to be improved, please let me know.
+
+> 
 > Thanks,
->
-> Paolo
->
+> Like Xu
+> 
 
