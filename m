@@ -2,86 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E3551CB44E
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 18:05:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10F151CB53E
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 18:56:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726904AbgEHQFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 12:05:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21664 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726825AbgEHQFi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 May 2020 12:05:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588953936;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SzNGIg9wCojzQE1LmaJBjj2Riqjs4hcmRh8uNcepGBA=;
-        b=Y2Xga9iAmDo6y0Bo2A6YoNmxLVPazm4QajSf8Iz+ZcU1c1YKwxk90bUqPYPPb86wcFmaA+
-        QPEX1hsIhvElZcapmWSq4icCJfsaWwrnzKnuHgjkRapPMl8oCTseK2CZGNIvXSBKlm3n/4
-        k8ZaBjO2b3boT1ZPPPiup8lPEXo2oww=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-KPE6IlAQNwSr5OvtkBZ_MQ-1; Fri, 08 May 2020 12:05:34 -0400
-X-MC-Unique: KPE6IlAQNwSr5OvtkBZ_MQ-1
-Received: by mail-qt1-f200.google.com with SMTP id z5so862922qtz.16
-        for <kvm@vger.kernel.org>; Fri, 08 May 2020 09:05:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=SzNGIg9wCojzQE1LmaJBjj2Riqjs4hcmRh8uNcepGBA=;
-        b=pfcmDiJLD++Ay2GrN1v5t4F014nfTJsPXjnn7sj5SbArQFNTeLmsF4w1WzgR8TZFNs
-         aR6djPBk3W+8DTbbetVn3enZB/4lmbEERXkPjqYrSfquL06kBsENEszJ83H8nlLIg9ej
-         AFdcKHrnMjUc8F63a7NFhrAFU/+mVS0tDv/PgOlh0Rl5mDzaqjsX9Mb/9GdTUFZsSNna
-         YQjWt6M6Evf572x32c2c/kIJXfkFFFD3hOUugMK7N3zA+A3jXvS8n88GcAgQ+4jOHAci
-         Ij21EjG3pcfq8oYQCOxydMQnovTOKnzWDU51UUblAlVG5AdV1IrPKqyLjsQhUFSQmCB5
-         tSGQ==
-X-Gm-Message-State: AGi0Pubivpf9h+rJ/wMsi1/dSCk/oeKIAQhCOVMOa1pAIaQFbzNuJ4/o
-        HLW5DuuhrT2ND1PwEJO3YClJgcZD5rdyJF+qpXfHsWC24LAQiK/I62YPVbtgD1g4myOuR/ukxwP
-        jRl9/GCeDlAyw
-X-Received: by 2002:a05:6214:42b:: with SMTP id a11mr3487479qvy.186.1588953934343;
-        Fri, 08 May 2020 09:05:34 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJEZbUB9JpX5nQ5mBjKk/50jvAujXFWp5fDu/JL2c2EKEzr4jVhJs06Er18X2ZJXYM9xvwVNA==
-X-Received: by 2002:a05:6214:42b:: with SMTP id a11mr3487445qvy.186.1588953934079;
-        Fri, 08 May 2020 09:05:34 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id t7sm1700790qtr.93.2020.05.08.09.05.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2020 09:05:33 -0700 (PDT)
-Date:   Fri, 8 May 2020 12:05:32 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cohuck@redhat.com
-Subject: Re: [PATCH v2 1/3] vfio/type1: Support faulting PFNMAP vmas
-Message-ID: <20200508160532.GB228260@xz-x1>
-References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
- <158871568480.15589.17339878308143043906.stgit@gimli.home>
- <20200507212443.GO228260@xz-x1>
- <20200507235421.GK26002@ziepe.ca>
- <20200508021939.GT228260@xz-x1>
- <20200508121013.GO26002@ziepe.ca>
- <20200508143042.GY228260@xz-x1>
- <20200508150540.GP26002@ziepe.ca>
- <20200508094213.0183c645@w520.home>
+        id S1727805AbgEHQ4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 12:56:37 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:58036 "EHLO
+        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726750AbgEHQ4h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 12:56:37 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::162])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 0F68E2E0E43;
+        Fri,  8 May 2020 19:56:34 +0300 (MSK)
+Received: from sas2-32987e004045.qloud-c.yandex.net (sas2-32987e004045.qloud-c.yandex.net [2a02:6b8:c08:b889:0:640:3298:7e00])
+        by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id TLSYbsq6XL-uXWWRMSI;
+        Fri, 08 May 2020 19:56:34 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1588956994; bh=JPwhDlNygUCNya+u1OVmS0FqYzzk+3lVFpXzWTtC53w=;
+        h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+        b=eXvLIrPpB4iTv5aWogftFjlyE1MwRAAyuFcvCBzQkOHWwIXwwyke+z2C/XstcyHgk
+         z2EQZ6SNmd3OacAEquRWGtzcuicnaxIk9QPmYw0cYY12UZ3oE/JcllTHbxMfCu2KQf
+         8Tk3WPlMHDDkcG2duyBJSw1yIl11KAByEfQplXEQ=
+Authentication-Results: mxbackcorp1j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net [2a02:6b8:b081:517::1:a])
+        by sas2-32987e004045.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id Dm1QRpJe3P-uWWKLl5J;
+        Fri, 08 May 2020 19:56:32 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Date:   Fri, 8 May 2020 19:56:31 +0300
+From:   Roman Kagan <rvkagan@yandex-team.ru>
+To:     Jon Doron <arilou@gmail.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH v2 0/1] x86/kvm/hyper-v: Add support to SYNIC exit on EOM
+Message-ID: <20200508165631.GA9576@rvkaganb>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+        Jon Doron <arilou@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+References: <20200425061637.GF1917435@jondnuc>
+ <20200503191900.GA389956@rvkaganb>
+ <87a72nelup.fsf@vitty.brq.redhat.com>
+ <20200505080158.GA400685@rvkaganb>
+ <20200505103821.GB2862@jondnuc>
+ <20200505200010.GB400685@rvkaganb>
+ <20200506044929.GD2862@jondnuc>
+ <20200506084615.GA32841@rvkaganb>
+ <20200507030037.GE2862@jondnuc>
+ <20200508142954.GH2862@jondnuc>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200508094213.0183c645@w520.home>
+In-Reply-To: <20200508142954.GH2862@jondnuc>
+Received: from fastsrv.yandex-team.ru (iva8-96b94b6ea53b.qloud-c.yandex.net
+ [2a02:6b8:c0c:2f26:0:640:96b9:4b6e]) by mxbackcorp1o.mail.yandex.net with
+ LMTP id aBVHqGFBXH-OtHdu90kJuQ1 for <rvkagan@mail.yandex-team.ru>; Fri, 08
+ May 2020 19:55:26 +0300
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 08, 2020 at 09:42:13AM -0600, Alex Williamson wrote:
-> Thanks for the discussion.  I gather then that this patch is correct as
-> written, which probably also mean the patch Peter linked for KVM should
-> not be applied since the logic is the same there.  Correct?  Thanks,
+On Fri, May 08, 2020 at 05:29:54PM +0300, Jon Doron wrote:
+> Hi, just wanted to update you I did some stupid mistake when I did the UEFI
+> setup test (that's why I could not boot my Win10).
+> 
+> I suggest we will abandon this patch, and try to keep going on the QEMU
+> VMBus patchset.
+> 
+> And perhaps submit a very basic patch to SeaBIOS and EDK2 which just enable
+> SCONTROL.
+> 
+> Does that sound like a good plan to you?
 
-Right.  I've already replied yesterday in that thread so Paolo unqueue that
-patch too.  Thanks,
+Absolutely.
 
--- 
-Peter Xu
-
+Thanks,
+Roman.
