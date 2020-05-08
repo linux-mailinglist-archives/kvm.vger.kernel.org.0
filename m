@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C9471CB90F
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 22:37:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50F781CB910
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 22:37:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727798AbgEHUhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 16:37:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49022 "EHLO
+        id S1727119AbgEHUhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 16:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727119AbgEHUhD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 16:37:03 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF5FC05BD09
-        for <kvm@vger.kernel.org>; Fri,  8 May 2020 13:37:03 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id e2so3483431ybm.19
-        for <kvm@vger.kernel.org>; Fri, 08 May 2020 13:37:03 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1727108AbgEHUhG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 16:37:06 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F1FFC05BD43
+        for <kvm@vger.kernel.org>; Fri,  8 May 2020 13:37:06 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id h185so3542081ybg.6
+        for <kvm@vger.kernel.org>; Fri, 08 May 2020 13:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=bDA1/4UWq3adzuN/eFYQ6blf4dCGtForBLd4rlJVQeQ=;
-        b=KmJ03/aH3GNYNIjMppA4tkWIBFQOpt/I9LWla5xHPJOe2xUqR1mXebaYnz+u43orHd
-         ksABti4aur9lE2CaeeXV8L5OZg+zbw4+Pr3N3D9U0nds/H5NByo/VAojx/Ht9BWz3txy
-         FJ64rA0hKG1FZrjNap/oZHV1PBe9HaXotsbRb9JGfsqaXlgAt18YLnelLnPb58XhLc56
-         Ic8JR1pR97RwGgh1D8lC5FIyZBLjNQbDmB+bP0cfBMIGepQUhzhGPBScP84AR+X4+l/w
-         FpLceRZiFmsM8+5RchzuneWNzLFCigbYk3ssVkK94VMdHel4f2aWS9/p0X2qZCgd4S+t
-         o4uA==
+        bh=w4qW/VNK1GgqP6kbHy5LSEPtJWF2jV3O0V1qObPzmFA=;
+        b=c5Ie1kbX0guPcgMQEvwztbLcikBY8qYpIPyKl3/uQuStvCvAktbbhjFssCEcZTaxd+
+         0+ITTk+kGrgK5h/OGT1lXOzuQ4BOAuVlfqIajuk3C1aTO5OkBsUIYhkZIQEjMsQnANo8
+         XPVOGgz7GEMttLQPYVw9fwsiJyhSlrPp1WWuhMGBMm6KBycDfdSFf4z+zJtwtl25kklW
+         27QXlBaTIIRUfcnhlDaJgHBOkuY6tutdbG/RRLYlyyx8TkqnR4VCtVL7TjIJELkj3kax
+         qTz+rHmp/mo/O98POKM0h94siSAVBIdTh52loifb0qvF07qsEfRN7qUnX6NsYOLNx2fJ
+         2e5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=bDA1/4UWq3adzuN/eFYQ6blf4dCGtForBLd4rlJVQeQ=;
-        b=qEXKjZc/OO+BygQJkuaA4yMEwVPFXU4TeHVwgCVS2Lk/PlPQX7Cb8lAZUfhAI0s3Yw
-         kVpQqw6as/A4D4ARfEEVCkNFZm4vegHJi2ekLEpwh2CwF+mpcS7AofACBt9Mx43yIT8f
-         BX2smQigcarY3iDW2dUxB9WMlDhLP1gQo6tB+d/ypYx73KnzK9rae6MgPf4LJ1z5b5j2
-         sPAaC1rxBkmf8MsqUuStLHbc860y7P4UGK9tSMUmKB+S3kR058w8eMIb0XeaCE4Et3eQ
-         mJubDCzN17jSaL3MQ5N/Jk7U8ZymyjE1MDcayp6qveoZz8c0yX6SZgvjsDwM7nQYK3Wv
-         cF4w==
-X-Gm-Message-State: AGi0PuaHeIhpkyUEVibtX6JPeZrKh0Is+1tt2JK8JX9+OUzbzFsZgNgX
-        1SBiqxa+/URr80LUlzaw/6OzCFI0ZW09/WYEw8X+oP7btZgsxlF+69IVAFqwzOLY4FviL87222w
-        iv98q2UZj47Pn6hCH/1MD+LOfjfPFgGhgkdAkVwFnC5K/4kVhHVaQLPddgms13cI=
-X-Google-Smtp-Source: APiQypLLKa9+gLSOiHY7sDhxzhx+tvo03jD6CV3zZ4lMk9RLpxYBNHJvvfIFNrQjcKigi5IfEsnBg1FBmzhNwg==
-X-Received: by 2002:a25:ce88:: with SMTP id x130mr1178224ybe.523.1588970222696;
- Fri, 08 May 2020 13:37:02 -0700 (PDT)
-Date:   Fri,  8 May 2020 13:36:42 -0700
+        bh=w4qW/VNK1GgqP6kbHy5LSEPtJWF2jV3O0V1qObPzmFA=;
+        b=QIgK/mitHMWhJWnbt9UOZRqosthYwEMM44sDrz+JhPuDr0K+pKe/G++gX4uA92l5gT
+         822SVxTGmjsu/qkzZjCnEg7zBF5z+xm7GxVZwSxSKnDpm7Bu48IApmkcqwOfmCs0YEXh
+         i5bZp7nnlTEp84kLd/8b3qRJ77SEb2qWbd0ZX/7N5rT5Xfy3wq+qfAq+l8covDRpf+SS
+         +m56EZCgDIW2KIwo93jKv56nsEWTBIBviBUwoqBzqZgtoQEeVV2RL2myOqYO8nPJvU5j
+         i+IQORcBKVJU/gY9WzM0keJqMj2r3WeQvFjpDAo2C4pBtUX8Ut7pl3g2h6075liwX5wj
+         3wMA==
+X-Gm-Message-State: AGi0PuaRxuqTj1WZsjAJV25DLPpsyxJzjbYGY2Ko9zThz+DqlYfRJYT8
+        9/wXqWopoS1dXzaiL7TgJ15MaTVZPQ8oVjUXS44U5IKeZq51Dxp/SBx2TvxXKsMo6lswIu6oo8G
+        S3bWgDQ1nG73sKtC4zG5ky4RF94fxj9gcB0Y2tQtR/utUCRAtHh6TvrxHU0DlmQg=
+X-Google-Smtp-Source: APiQypKH0sBHGa5DkYxxf1H3iw4LhgfmRCRIOY2M6wDnkw/EWf4VgkJ3aYEXF2GDVwk8/enrmY14dXMwL7qwKg==
+X-Received: by 2002:a25:ac13:: with SMTP id w19mr8083110ybi.467.1588970225447;
+ Fri, 08 May 2020 13:37:05 -0700 (PDT)
+Date:   Fri,  8 May 2020 13:36:43 -0700
 In-Reply-To: <20200508203643.85477-1-jmattson@google.com>
-Message-Id: <20200508203643.85477-3-jmattson@google.com>
+Message-Id: <20200508203643.85477-4-jmattson@google.com>
 Mime-Version: 1.0
 References: <20200508203643.85477-1-jmattson@google.com>
 X-Mailer: git-send-email 2.26.2.645.ge9eca65c58-goog
-Subject: [PATCH 2/3] KVM: nVMX: Change emulated VMX-preemption timer hrtimer
- to absolute
+Subject: [PATCH 3/3] KVM: nVMX: Migrate the VMX-preemption timer
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
@@ -62,39 +61,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prepare for migration of this hrtimer, by changing it from relative to
-absolute. (I couldn't get migration to work with a relative timer.)
+The hrtimer used to emulate the VMX-preemption timer must be pinned to
+the same logical processor as the vCPU thread to be interrupted if we
+want to have any hope of adhering to the architectural specification
+of the VMX-preemption timer. Even with this change, the emulated
+VMX-preemption timer VM-exit occasionally arrives too late.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/irq.c              |  2 ++
+ arch/x86/kvm/vmx/vmx.c          | 11 +++++++++++
+ 3 files changed, 15 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 1f7fe6f47cbc..3ca792e3cd66 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2041,7 +2041,8 @@ static void vmx_start_preemption_timer(struct kvm_vcpu *vcpu)
- 	preemption_timeout *= 1000000;
- 	do_div(preemption_timeout, vcpu->arch.virtual_tsc_khz);
- 	hrtimer_start(&vmx->nested.preemption_timer,
--		      ns_to_ktime(preemption_timeout), HRTIMER_MODE_REL_PINNED);
-+		      ktime_add_ns(ktime_get(), preemption_timeout),
-+		      HRTIMER_MODE_ABS_PINNED);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 42a2d0d3984a..a47c71d13039 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1254,6 +1254,8 @@ struct kvm_x86_ops {
+ 
+ 	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
+ 	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
++
++	void (*migrate_timers)(struct kvm_vcpu *vcpu);
+ };
+ 
+ struct kvm_x86_init_ops {
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index e330e7d125f7..54f7ea68083b 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -159,6 +159,8 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu)
+ {
+ 	__kvm_migrate_apic_timer(vcpu);
+ 	__kvm_migrate_pit_timer(vcpu);
++	if (kvm_x86_ops.migrate_timers)
++		kvm_x86_ops.migrate_timers(vcpu);
  }
  
- static u64 nested_vmx_calc_efer(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
-@@ -4614,7 +4615,7 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
- 		goto out_shadow_vmcs;
+ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c2c6335a998c..3896dea72082 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7687,6 +7687,16 @@ static bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ 	return to_vmx(vcpu)->nested.vmxon;
+ }
  
- 	hrtimer_init(&vmx->nested.preemption_timer, CLOCK_MONOTONIC,
--		     HRTIMER_MODE_REL_PINNED);
-+		     HRTIMER_MODE_ABS_PINNED);
- 	vmx->nested.preemption_timer.function = vmx_preemption_timer_fn;
++static void vmx_migrate_timers(struct kvm_vcpu *vcpu)
++{
++	if (is_guest_mode(vcpu)) {
++		struct hrtimer *timer = &to_vmx(vcpu)->nested.preemption_timer;
++
++		if (hrtimer_try_to_cancel(timer) == 1)
++			hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED);
++	}
++}
++
+ static void hardware_unsetup(void)
+ {
+ 	if (nested)
+@@ -7838,6 +7848,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.nested_get_evmcs_version = NULL,
+ 	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
+ 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
++	.migrate_timers = vmx_migrate_timers,
+ };
  
- 	vmx->nested.vpid02 = allocate_vpid();
+ static __init int hardware_setup(void)
 -- 
 2.26.2.645.ge9eca65c58-goog
 
