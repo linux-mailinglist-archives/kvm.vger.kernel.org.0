@@ -2,129 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8216F1CB41B
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 17:55:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E3551CB44E
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 18:05:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgEHPzR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 11:55:17 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60355 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727832AbgEHPzQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 11:55:16 -0400
+        id S1726904AbgEHQFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 12:05:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21664 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726825AbgEHQFi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 May 2020 12:05:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588953315;
+        s=mimecast20190719; t=1588953936;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=o2NuVDMsNek1XqDZ23KXOT0aYU3U9mtuti+eij0cQ3Y=;
-        b=RH/5e3x/Aznsbd5AM1J6BO+2cqjJRQKQ+ghv58yZ4onqXKu52Yll3jfDrYllFqRXnZ0nKO
-        3f2rtaNllTzDrvWbaSRolJ2itxGSdcZE0opMh4qcFX2KXuNbcI3CtqooBvkUkAiwE+/gsb
-        us/8o0UifSojcAi6TAgXtPfpSD3kH2Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-tB1ktjf7Nd6ZDjXX8AJRsw-1; Fri, 08 May 2020 11:55:11 -0400
-X-MC-Unique: tB1ktjf7Nd6ZDjXX8AJRsw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59A41107ACCA;
-        Fri,  8 May 2020 15:55:09 +0000 (UTC)
-Received: from w520.home (ovpn-113-111.phx2.redhat.com [10.3.113.111])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 615F6341E3;
-        Fri,  8 May 2020 15:55:08 +0000 (UTC)
-Date:   Fri, 8 May 2020 09:55:07 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH 08/12] vfio: use __anon_inode_getfd
-Message-ID: <20200508095507.54051943@w520.home>
-In-Reply-To: <20200508153634.249933-9-hch@lst.de>
-References: <20200508153634.249933-1-hch@lst.de>
-        <20200508153634.249933-9-hch@lst.de>
+        bh=SzNGIg9wCojzQE1LmaJBjj2Riqjs4hcmRh8uNcepGBA=;
+        b=Y2Xga9iAmDo6y0Bo2A6YoNmxLVPazm4QajSf8Iz+ZcU1c1YKwxk90bUqPYPPb86wcFmaA+
+        QPEX1hsIhvElZcapmWSq4icCJfsaWwrnzKnuHgjkRapPMl8oCTseK2CZGNIvXSBKlm3n/4
+        k8ZaBjO2b3boT1ZPPPiup8lPEXo2oww=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-KPE6IlAQNwSr5OvtkBZ_MQ-1; Fri, 08 May 2020 12:05:34 -0400
+X-MC-Unique: KPE6IlAQNwSr5OvtkBZ_MQ-1
+Received: by mail-qt1-f200.google.com with SMTP id z5so862922qtz.16
+        for <kvm@vger.kernel.org>; Fri, 08 May 2020 09:05:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SzNGIg9wCojzQE1LmaJBjj2Riqjs4hcmRh8uNcepGBA=;
+        b=pfcmDiJLD++Ay2GrN1v5t4F014nfTJsPXjnn7sj5SbArQFNTeLmsF4w1WzgR8TZFNs
+         aR6djPBk3W+8DTbbetVn3enZB/4lmbEERXkPjqYrSfquL06kBsENEszJ83H8nlLIg9ej
+         AFdcKHrnMjUc8F63a7NFhrAFU/+mVS0tDv/PgOlh0Rl5mDzaqjsX9Mb/9GdTUFZsSNna
+         YQjWt6M6Evf572x32c2c/kIJXfkFFFD3hOUugMK7N3zA+A3jXvS8n88GcAgQ+4jOHAci
+         Ij21EjG3pcfq8oYQCOxydMQnovTOKnzWDU51UUblAlVG5AdV1IrPKqyLjsQhUFSQmCB5
+         tSGQ==
+X-Gm-Message-State: AGi0Pubivpf9h+rJ/wMsi1/dSCk/oeKIAQhCOVMOa1pAIaQFbzNuJ4/o
+        HLW5DuuhrT2ND1PwEJO3YClJgcZD5rdyJF+qpXfHsWC24LAQiK/I62YPVbtgD1g4myOuR/ukxwP
+        jRl9/GCeDlAyw
+X-Received: by 2002:a05:6214:42b:: with SMTP id a11mr3487479qvy.186.1588953934343;
+        Fri, 08 May 2020 09:05:34 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJEZbUB9JpX5nQ5mBjKk/50jvAujXFWp5fDu/JL2c2EKEzr4jVhJs06Er18X2ZJXYM9xvwVNA==
+X-Received: by 2002:a05:6214:42b:: with SMTP id a11mr3487445qvy.186.1588953934079;
+        Fri, 08 May 2020 09:05:34 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id t7sm1700790qtr.93.2020.05.08.09.05.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2020 09:05:33 -0700 (PDT)
+Date:   Fri, 8 May 2020 12:05:32 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cohuck@redhat.com
+Subject: Re: [PATCH v2 1/3] vfio/type1: Support faulting PFNMAP vmas
+Message-ID: <20200508160532.GB228260@xz-x1>
+References: <158871401328.15589.17598154478222071285.stgit@gimli.home>
+ <158871568480.15589.17339878308143043906.stgit@gimli.home>
+ <20200507212443.GO228260@xz-x1>
+ <20200507235421.GK26002@ziepe.ca>
+ <20200508021939.GT228260@xz-x1>
+ <20200508121013.GO26002@ziepe.ca>
+ <20200508143042.GY228260@xz-x1>
+ <20200508150540.GP26002@ziepe.ca>
+ <20200508094213.0183c645@w520.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200508094213.0183c645@w520.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  8 May 2020 17:36:30 +0200
-Christoph Hellwig <hch@lst.de> wrote:
+On Fri, May 08, 2020 at 09:42:13AM -0600, Alex Williamson wrote:
+> Thanks for the discussion.  I gather then that this patch is correct as
+> written, which probably also mean the patch Peter linked for KVM should
+> not be applied since the logic is the same there.  Correct?  Thanks,
 
-> Use __anon_inode_getfd instead of opencoding the logic using
-> get_unused_fd_flags + anon_inode_getfile.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/vfio/vfio.c | 37 ++++++++-----------------------------
->  1 file changed, 8 insertions(+), 29 deletions(-)
+Right.  I've already replied yesterday in that thread so Paolo unqueue that
+patch too.  Thanks,
 
-
-Thanks!
-
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 765e0e5d83ed9..33a88103f857f 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -1451,42 +1451,21 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
->  		return ret;
->  	}
->  
-> -	/*
-> -	 * We can't use anon_inode_getfd() because we need to modify
-> -	 * the f_mode flags directly to allow more than just ioctls
-> -	 */
-> -	ret = get_unused_fd_flags(O_CLOEXEC);
-> -	if (ret < 0) {
-> -		device->ops->release(device->device_data);
-> -		vfio_device_put(device);
-> -		return ret;
-> -	}
-> -
-> -	filep = anon_inode_getfile("[vfio-device]", &vfio_device_fops,
-> -				   device, O_RDWR);
-> -	if (IS_ERR(filep)) {
-> -		put_unused_fd(ret);
-> -		ret = PTR_ERR(filep);
-> -		device->ops->release(device->device_data);
-> -		vfio_device_put(device);
-> -		return ret;
-> -	}
-> -
-> -	/*
-> -	 * TODO: add an anon_inode interface to do this.
-> -	 * Appears to be missing by lack of need rather than
-> -	 * explicitly prevented.  Now there's need.
-> -	 */
-> +	ret = __anon_inode_getfd("[vfio-device]", &vfio_device_fops,
-> +				   device, O_CLOEXEC | O_RDWR, &filep);
-> +	if (ret < 0)
-> +		goto release;
->  	filep->f_mode |= (FMODE_LSEEK | FMODE_PREAD | FMODE_PWRITE);
-> -
->  	atomic_inc(&group->container_users);
-> -
->  	fd_install(ret, filep);
->  
->  	if (group->noiommu)
->  		dev_warn(device->dev, "vfio-noiommu device opened by user "
->  			 "(%s:%d)\n", current->comm, task_pid_nr(current));
-> -
-> +	return ret;
-> +release:
-> +	device->ops->release(device->device_data);
-> +	vfio_device_put(device);
->  	return ret;
->  }
->  
+-- 
+Peter Xu
 
