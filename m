@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5947C1CA9E7
-	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 13:46:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88D531CA9EF
+	for <lists+kvm@lfdr.de>; Fri,  8 May 2020 13:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbgEHLqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 07:46:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50736 "EHLO
+        id S1726776AbgEHLsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 07:48:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726618AbgEHLqy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 07:46:54 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32A4C05BD43;
-        Fri,  8 May 2020 04:46:53 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id g14so936707wme.1;
-        Fri, 08 May 2020 04:46:53 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1726736AbgEHLsP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 May 2020 07:48:15 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F897C05BD43;
+        Fri,  8 May 2020 04:48:15 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id r26so10289343wmh.0;
+        Fri, 08 May 2020 04:48:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=Zeg1isCk/qA15Nm8XJ//2/bcp2eI0rlW3j2tOTx8cFg=;
-        b=mNgMV+3to1jAspW72+9rQCzpUFmL0hFu8D4NSJ8zZIzOTKIkfwDygd2ZDsGbNsIa5n
-         4ETE4ol86MfEZiXplLnakmSlK3LmKqlElweTKKbkf8D2sPCFsgVoL9Qtwud/AaTFiTtM
-         haznP9anbYkKhm6aviLXazBGJGV3eek9G3a189H2I+n4bGu0yU4ur5Hc4VjyhsbkBkWZ
-         sIFK6xxY60XnoXHFciqYPpq851WJLz0ER6ReF5UP2bW64EaQz93dSF/JKSo/gCcpWpwR
-         y4jAbR9QUfNF/H9wOu8lk7biL0M5fPe5DVTQCkutPCnfMAET2hPDonKNbsGqSUZSs68G
-         XsbA==
+        bh=bEbkhar1PKZKTQvydL7IrgAmCSnKp8TXDjfEw0RAOKU=;
+        b=hnojhARyfP2VjCuc7u7dtwHzwIinK/tDUhSZsObiIsaWQkxEMfUC5xs/eFRRtHyTAa
+         yPcaXOf5VknaxyndKN49rS9s++MBhapLdRTr/mWuQ1kK5NoOFBiXlgEsnTNwWv81eVZN
+         4NF64wpctxenbma3znQFuQq834UU7kwadR+hS3EPH/c+pPsk9hS1d19RFRVDHz+QcbC7
+         7FdezPCFHYRWWJjepYBShOY8Ls55UgsoePhOVYlUwf/eqnh8T49ucDev1QYBa8Zh12Jz
+         2rbyHnDLhLSJckQ09zoQHY6Qv1x34h/Zxa2e32HCPRdMf5qA98LDNzDrFyWjHKdP9XJW
+         MJtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Zeg1isCk/qA15Nm8XJ//2/bcp2eI0rlW3j2tOTx8cFg=;
-        b=ucLZT8qJ9WdWCVyDKZ3WHPFnd+KxcRy7ySGOGZqACE2DT5MaJG90FKw8zFkMlYv64/
-         f1VhfDWAeSFz140GD9qLUytZrCp9fAqt8YYOOJlXqIrPRhYrPgDIJoKQOHmkro/v5NCr
-         cV3zjsYQa5AghfdpaIyuC1enKgRNFvvQ+n55K4EG5xOkHN00YIp5DPUJj6oPzT/O15Uy
-         iL39yKz9/YGQF81uJTckQi9DBvO8ZF4i97sxuig3y6eYkCf1/gzPD4CZlAwnCDb996o4
-         xiH8BtTPekw99LNXH3Qnkl+zeWOThd79GxR7CJojomes2+Xv1k+MfixGEFaye6rc8Gli
-         lckg==
-X-Gm-Message-State: AGi0Pubcv1tNG2D0x6m/FXw81NqKU2OuAhbwxHzoF1202Dt90BVqHf+V
-        hu80fZEolsnBvXICCAdrbDopcZ09VMAoKggunEfwICTfOjo=
-X-Google-Smtp-Source: APiQypJ3a/GnVTNavr/YqLa//bJaveHv64RQQCCDMj1MEEaZFVw5xhyEagcqDZxhFDFslNNb+pWju0btFqaBPQX2WdA=
-X-Received: by 2002:a1c:f211:: with SMTP id s17mr17313372wmc.168.1588938412505;
- Fri, 08 May 2020 04:46:52 -0700 (PDT)
+        bh=bEbkhar1PKZKTQvydL7IrgAmCSnKp8TXDjfEw0RAOKU=;
+        b=RDo1aEu3iUDdkP+dHfgL2Dzedp1Zloxq0tsVgsB5916HZz8FqPL8xHi0AamX65Rmsv
+         EXjJE2iD29lspDBiV+Xe4oawkxTO7Stt1HmlsVtQxVvrlY4ILZ8LLQeLxmLvxe64O0mW
+         z0S//NMyS+ARYuiuY80wxcg/IauuFtlfhDiZ6Rl56J43iaKPe9bIBN4x8OZ2rKBJUbQB
+         MIDEAw0W1SM225fsxcNeqTNu7H85Iup4IxTJWYxmPtaDDbA/a2V+4p/SySPGOm4NiZnU
+         hd2Eh+TPUf53xZqnaU9ZYgEHrbttjA74TGlougyO2RR17PJIGk+uOj7wqUeilOJzYRrm
+         qd3w==
+X-Gm-Message-State: AGi0Pubr2qfDIWd6zhNtcTbIEZ35NTVn1k/oV7TjgoyipP2WpuWXqteR
+        3xkXy9i1mEitUcD/zaWwbsuL2d1QhOrGyEn+IIw=
+X-Google-Smtp-Source: APiQypKvpHQOGLMUYf9qoStCJRH2CNNopCBsbQqp/p88v1Z9oJi+hlCyUHqzqLuDshaWLmZLl72j5KRfziFdyAeSbBo=
+X-Received: by 2002:a7b:c190:: with SMTP id y16mr16801046wmi.50.1588938493898;
+ Fri, 08 May 2020 04:48:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <1588500367-1056-1-git-send-email-chenhc@lemote.com> <1588500367-1056-14-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1588500367-1056-14-git-send-email-chenhc@lemote.com>
+References: <1588500367-1056-1-git-send-email-chenhc@lemote.com> <1588500367-1056-10-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1588500367-1056-10-git-send-email-chenhc@lemote.com>
 From:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date:   Fri, 8 May 2020 13:46:39 +0200
-Message-ID: <CAHiYmc4sNYYO=diSrXFUyWY15FeyNPiOXqQStnnEMF9As7h=QA@mail.gmail.com>
-Subject: Re: [PATCH V3 13/14] KVM: MIPS: Add more MMIO load/store instructions emulation
+Date:   Fri, 8 May 2020 13:47:59 +0200
+Message-ID: <CAHiYmc6QwSbPspACNJGmzeJ-rJB09NLOyx7W1W5xuaW+HUVhGQ@mail.gmail.com>
+Subject: Re: [PATCH V3 09/14] KVM: MIPS: Add more types of virtual interrupts
 To:     Huacai Chen <chenhc@lemote.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
@@ -66,639 +66,372 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:16 Huacai Chen <c=
+=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:13 Huacai Chen <c=
 henhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
 =D0=BB=D0=B0:
 >
-> This patch add more MMIO load/store instructions emulation, which can
-> be observed in QXL and some other device drivers:
->
-> 1, LWL, LWR, LDW, LDR, SWL, SWR, SDL and SDR for all MIPS;
-> 2, GSLBX, GSLHX, GSLWX, GSLDX, GSSBX, GSSHX, GSSWX and GSSDX for
->    Loongson-3.
+> In current implementation, MIPS KVM uses IP2, IP3, IP4 and IP7 for
+> external interrupt, two kinds of IPIs and timer interrupt respectively,
+> but Loongson-3 based machines prefer to use IP2, IP3, IP6 and IP7 for
+> two kinds of external interrupts, IPI and timer interrupt. So we define
+> two priority-irq mapping tables: kvm_loongson3_priority_to_irq[] for
+> Loongson-3, and kvm_default_priority_to_irq[] for others. The virtual
+> interrupt infrastructure is updated to deliver all types of interrupts
+> from IP2, IP3, IP4, IP6 and IP7.
 >
 > Signed-off-by: Huacai Chen <chenhc@lemote.com>
 > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 > ---
->  arch/mips/kvm/emulate.c | 480 ++++++++++++++++++++++++++++++++++++++++++=
-+++++-
->  1 file changed, 470 insertions(+), 10 deletions(-)
+>  arch/mips/kvm/interrupt.c | 93 +++++++----------------------------------=
+------
+>  arch/mips/kvm/interrupt.h | 14 ++++---
+>  arch/mips/kvm/mips.c      | 40 ++++++++++++++++++--
+>  arch/mips/kvm/vz.c        | 53 ++++-----------------------
+>  4 files changed, 67 insertions(+), 133 deletions(-)
 >
-> diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
-> index 3946499..71316fa 100644
-> --- a/arch/mips/kvm/emulate.c
-> +++ b/arch/mips/kvm/emulate.c
-> @@ -1604,6 +1604,7 @@ enum emulation_result kvm_mips_emulate_store(union =
-mips_instruction inst,
->         enum emulation_result er;
->         u32 rt;
->         void *data =3D run->mmio.data;
-> +       unsigned int imme;
->         unsigned long curr_pc;
+> diff --git a/arch/mips/kvm/interrupt.c b/arch/mips/kvm/interrupt.c
+> index 7257e8b6..d28c2c9c 100644
+> --- a/arch/mips/kvm/interrupt.c
+> +++ b/arch/mips/kvm/interrupt.c
+> @@ -61,27 +61,8 @@ void kvm_mips_queue_io_int_cb(struct kvm_vcpu *vcpu,
+>          * the EXC code will be set when we are actually
+>          * delivering the interrupt:
+>          */
+> -       switch (intr) {
+> -       case 2:
+> -               kvm_set_c0_guest_cause(vcpu->arch.cop0, (C_IRQ0));
+> -               /* Queue up an INT exception for the core */
+> -               kvm_mips_queue_irq(vcpu, MIPS_EXC_INT_IO);
+> -               break;
+> -
+> -       case 3:
+> -               kvm_set_c0_guest_cause(vcpu->arch.cop0, (C_IRQ1));
+> -               kvm_mips_queue_irq(vcpu, MIPS_EXC_INT_IPI_1);
+> -               break;
+> -
+> -       case 4:
+> -               kvm_set_c0_guest_cause(vcpu->arch.cop0, (C_IRQ2));
+> -               kvm_mips_queue_irq(vcpu, MIPS_EXC_INT_IPI_2);
+> -               break;
+> -
+> -       default:
+> -               break;
+> -       }
+> -
+> +       kvm_set_c0_guest_cause(vcpu->arch.cop0, 1 << (intr + 8));
+> +       kvm_mips_queue_irq(vcpu, kvm_irq_to_priority(intr));
+>  }
 >
->         /*
-> @@ -1661,6 +1662,211 @@ enum emulation_result kvm_mips_emulate_store(unio=
-n mips_instruction inst,
->                           vcpu->arch.gprs[rt], *(u8 *)data);
->                 break;
+>  void kvm_mips_dequeue_io_int_cb(struct kvm_vcpu *vcpu,
+> @@ -89,26 +70,8 @@ void kvm_mips_dequeue_io_int_cb(struct kvm_vcpu *vcpu,
+>  {
+>         int intr =3D (int)irq->irq;
 >
-> +       case swl_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x3);
-> +               run->mmio.len =3D 4;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
-> +               switch (imme) {
-> +               case 0:
-> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffffff00) |
-> +                                       (vcpu->arch.gprs[rt] >> 24);
-> +                       break;
-> +               case 1:
-> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffff0000) |
-> +                                       (vcpu->arch.gprs[rt] >> 16);
-> +                       break;
-> +               case 2:
-> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xff000000) |
-> +                                       (vcpu->arch.gprs[rt] >> 8);
-> +                       break;
-> +               case 3:
-> +                       *(u32 *)data =3D vcpu->arch.gprs[rt];
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +
-> +               kvm_debug("[%#lx] OP_SWL: eaddr: %#lx, gpr: %#lx, data: %=
-#x\n",
-> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
-> +                         vcpu->arch.gprs[rt], *(u32 *)data);
-> +               break;
-> +
-> +       case swr_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x3);
-> +               run->mmio.len =3D 4;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
-> +               switch (imme) {
-> +               case 0:
-> +                       *(u32 *)data =3D vcpu->arch.gprs[rt];
-> +                       break;
-> +               case 1:
-> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xff) |
-> +                                       (vcpu->arch.gprs[rt] << 8);
-> +                       break;
-> +               case 2:
-> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffff) |
-> +                                       (vcpu->arch.gprs[rt] << 16);
-> +                       break;
-> +               case 3:
-> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffffff) |
-> +                                       (vcpu->arch.gprs[rt] << 24);
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +
-> +               kvm_debug("[%#lx] OP_SWR: eaddr: %#lx, gpr: %#lx, data: %=
-#x\n",
-> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
-> +                         vcpu->arch.gprs[rt], *(u32 *)data);
-> +               break;
-> +
-> +       case sdl_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x7);
-> +
-> +               run->mmio.len =3D 8;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
-> +               switch (imme) {
-> +               case 0:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
-ff00) |
-> +                                       ((vcpu->arch.gprs[rt] >> 56) & 0x=
-ff);
-> +                       break;
-> +               case 1:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
-0000) |
-> +                                       ((vcpu->arch.gprs[rt] >> 48) & 0x=
-ffff);
-> +                       break;
-> +               case 2:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffff00=
-0000) |
-> +                                       ((vcpu->arch.gprs[rt] >> 40) & 0x=
-ffffff);
-> +                       break;
-> +               case 3:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffff0000=
-0000) |
-> +                                       ((vcpu->arch.gprs[rt] >> 32) & 0x=
-ffffffff);
-> +                       break;
-> +               case 4:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffff000000=
-0000) |
-> +                                       ((vcpu->arch.gprs[rt] >> 24) & 0x=
-ffffffffff);
-> +                       break;
-> +               case 5:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffff00000000=
-0000) |
-> +                                       ((vcpu->arch.gprs[rt] >> 16) & 0x=
-ffffffffffff);
-> +                       break;
-> +               case 6:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xff0000000000=
-0000) |
-> +                                       ((vcpu->arch.gprs[rt] >> 8) & 0xf=
-fffffffffffff);
-> +                       break;
-> +               case 7:
-> +                       *(u64 *)data =3D vcpu->arch.gprs[rt];
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +
-> +               kvm_debug("[%#lx] OP_SDL: eaddr: %#lx, gpr: %#lx, data: %=
-llx\n",
-> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
-> +                         vcpu->arch.gprs[rt], *(u64 *)data);
-> +               break;
-> +
-> +       case sdr_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x7);
-> +
-> +               run->mmio.len =3D 8;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
-> +               switch (imme) {
-> +               case 0:
-> +                       *(u64 *)data =3D vcpu->arch.gprs[rt];
-> +                       break;
-> +               case 1:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xff) |
-> +                                       (vcpu->arch.gprs[rt] << 8);
-> +                       break;
-> +               case 2:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffff) |
-> +                                       (vcpu->arch.gprs[rt] << 16);
-> +                       break;
-> +               case 3:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffff) |
-> +                                       (vcpu->arch.gprs[rt] << 24);
-> +                       break;
-> +               case 4:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffff) |
-> +                                       (vcpu->arch.gprs[rt] << 32);
-> +                       break;
-> +               case 5:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffff) =
-|
-> +                                       (vcpu->arch.gprs[rt] << 40);
-> +                       break;
-> +               case 6:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
-) |
-> +                                       (vcpu->arch.gprs[rt] << 48);
-> +                       break;
-> +               case 7:
-> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
-ff) |
-> +                                       (vcpu->arch.gprs[rt] << 56);
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +
-> +               kvm_debug("[%#lx] OP_SDR: eaddr: %#lx, gpr: %#lx, data: %=
-llx\n",
-> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
-> +                         vcpu->arch.gprs[rt], *(u64 *)data);
-> +               break;
-> +
-> +#ifdef CONFIG_CPU_LOONGSON64
-> +       case sdc2_op:
-> +               rt =3D inst.loongson3_lsdc2_format.rt;
-> +               switch (inst.loongson3_lsdc2_format.opcode1) {
-> +               /*
-> +                * Loongson-3 overridden sdc2 instructions.
-> +                * opcode1              instruction
-> +                *   0x0          gssbx: store 1 bytes from GPR
-> +                *   0x1          gsshx: store 2 bytes from GPR
-> +                *   0x2          gsswx: store 4 bytes from GPR
-> +                *   0x3          gssdx: store 8 bytes from GPR
-> +                */
-> +               case 0x0:
-> +                       run->mmio.len =3D 1;
-> +                       *(u8 *)data =3D vcpu->arch.gprs[rt];
-> +
-> +                       kvm_debug("[%#lx] OP_GSSBX: eaddr: %#lx, gpr: %#l=
-x, data: %#x\n",
-> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
-addr,
-> +                                 vcpu->arch.gprs[rt], *(u8 *)data);
-> +                       break;
-> +               case 0x1:
-> +                       run->mmio.len =3D 2;
-> +                       *(u16 *)data =3D vcpu->arch.gprs[rt];
-> +
-> +                       kvm_debug("[%#lx] OP_GSSSHX: eaddr: %#lx, gpr: %#=
-lx, data: %#x\n",
-> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
-addr,
-> +                                 vcpu->arch.gprs[rt], *(u16 *)data);
-> +                       break;
-> +               case 0x2:
-> +                       run->mmio.len =3D 4;
-> +                       *(u32 *)data =3D vcpu->arch.gprs[rt];
-> +
-> +                       kvm_debug("[%#lx] OP_GSSWX: eaddr: %#lx, gpr: %#l=
-x, data: %#x\n",
-> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
-addr,
-> +                                 vcpu->arch.gprs[rt], *(u32 *)data);
-> +                       break;
-> +               case 0x3:
-> +                       run->mmio.len =3D 8;
-> +                       *(u64 *)data =3D vcpu->arch.gprs[rt];
-> +
-> +                       kvm_debug("[%#lx] OP_GSSDX: eaddr: %#lx, gpr: %#l=
-x, data: %#llx\n",
-> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
-addr,
-> +                                 vcpu->arch.gprs[rt], *(u64 *)data);
-> +                       break;
-> +               default:
-> +                       kvm_err("Godson Exteneded GS-Store not yet suppor=
-ted (inst=3D0x%08x)\n",
-> +                               inst.word);
-> +                       break;
-> +               }
-> +               break;
-> +#endif
->         default:
->                 kvm_err("Store not yet supported (inst=3D0x%08x)\n",
->                         inst.word);
-> @@ -1695,6 +1901,7 @@ enum emulation_result kvm_mips_emulate_load(union m=
-ips_instruction inst,
->         enum emulation_result er;
->         unsigned long curr_pc;
->         u32 op, rt;
-> +       unsigned int imme;
+> -       switch (intr) {
+> -       case -2:
+> -               kvm_clear_c0_guest_cause(vcpu->arch.cop0, (C_IRQ0));
+> -               kvm_mips_dequeue_irq(vcpu, MIPS_EXC_INT_IO);
+> -               break;
+> -
+> -       case -3:
+> -               kvm_clear_c0_guest_cause(vcpu->arch.cop0, (C_IRQ1));
+> -               kvm_mips_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_1);
+> -               break;
+> -
+> -       case -4:
+> -               kvm_clear_c0_guest_cause(vcpu->arch.cop0, (C_IRQ2));
+> -               kvm_mips_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_2);
+> -               break;
+> -
+> -       default:
+> -               break;
+> -       }
+> -
+> +       kvm_clear_c0_guest_cause(vcpu->arch.cop0, 1 << (-intr + 8));
+> +       kvm_mips_dequeue_irq(vcpu, kvm_irq_to_priority(-intr));
+>  }
 >
->         rt =3D inst.i_format.rt;
->         op =3D inst.i_format.opcode;
-> @@ -1747,6 +1954,162 @@ enum emulation_result kvm_mips_emulate_load(union=
- mips_instruction inst,
->                 run->mmio.len =3D 1;
->                 break;
+>  /* Deliver the interrupt of the corresponding priority, if possible. */
+> @@ -116,50 +79,20 @@ int kvm_mips_irq_deliver_cb(struct kvm_vcpu *vcpu, u=
+nsigned int priority,
+>                             u32 cause)
+>  {
+>         int allowed =3D 0;
+> -       u32 exccode;
+> +       u32 exccode, ie;
 >
-> +       case lwl_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x3);
-> +
-> +               run->mmio.len =3D 4;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
-> +               switch (imme) {
-> +               case 0:
-> +                       vcpu->mmio_needed =3D 3;  /* 1 byte */
-> +                       break;
-> +               case 1:
-> +                       vcpu->mmio_needed =3D 4;  /* 2 bytes */
-> +                       break;
-> +               case 2:
-> +                       vcpu->mmio_needed =3D 5;  /* 3 bytes */
-> +                       break;
-> +               case 3:
-> +                       vcpu->mmio_needed =3D 6;  /* 4 bytes */
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +               break;
-> +
-> +       case lwr_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x3);
-> +
-> +               run->mmio.len =3D 4;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
-> +               switch (imme) {
-> +               case 0:
-> +                       vcpu->mmio_needed =3D 7;  /* 4 bytes */
-> +                       break;
-> +               case 1:
-> +                       vcpu->mmio_needed =3D 8;  /* 3 bytes */
-> +                       break;
-> +               case 2:
-> +                       vcpu->mmio_needed =3D 9;  /* 2 bytes */
-> +                       break;
-> +               case 3:
-> +                       vcpu->mmio_needed =3D 10; /* 1 byte */
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +               break;
-> +
-> +       case ldl_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x7);
-> +
-> +               run->mmio.len =3D 8;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
-> +               switch (imme) {
-> +               case 0:
-> +                       vcpu->mmio_needed =3D 11; /* 1 byte */
-> +                       break;
-> +               case 1:
-> +                       vcpu->mmio_needed =3D 12; /* 2 bytes */
-> +                       break;
-> +               case 2:
-> +                       vcpu->mmio_needed =3D 13; /* 3 bytes */
-> +                       break;
-> +               case 3:
-> +                       vcpu->mmio_needed =3D 14; /* 4 bytes */
-> +                       break;
-> +               case 4:
-> +                       vcpu->mmio_needed =3D 15; /* 5 bytes */
-> +                       break;
-> +               case 5:
-> +                       vcpu->mmio_needed =3D 16; /* 6 bytes */
-> +                       break;
-> +               case 6:
-> +                       vcpu->mmio_needed =3D 17; /* 7 bytes */
-> +                       break;
-> +               case 7:
-> +                       vcpu->mmio_needed =3D 18; /* 8 bytes */
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +               break;
-> +
-> +       case ldr_op:
-> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
-> +                                       vcpu->arch.host_cp0_badvaddr) & (=
-~0x7);
-> +
-> +               run->mmio.len =3D 8;
-> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
-> +               switch (imme) {
-> +               case 0:
-> +                       vcpu->mmio_needed =3D 19; /* 8 bytes */
-> +                       break;
-> +               case 1:
-> +                       vcpu->mmio_needed =3D 20; /* 7 bytes */
-> +                       break;
-> +               case 2:
-> +                       vcpu->mmio_needed =3D 21; /* 6 bytes */
-> +                       break;
-> +               case 3:
-> +                       vcpu->mmio_needed =3D 22; /* 5 bytes */
-> +                       break;
-> +               case 4:
-> +                       vcpu->mmio_needed =3D 23; /* 4 bytes */
-> +                       break;
-> +               case 5:
-> +                       vcpu->mmio_needed =3D 24; /* 3 bytes */
-> +                       break;
-> +               case 6:
-> +                       vcpu->mmio_needed =3D 25; /* 2 bytes */
-> +                       break;
-> +               case 7:
-> +                       vcpu->mmio_needed =3D 26; /* 1 byte */
-> +                       break;
-> +               default:
-> +                       break;
-> +               }
-> +               break;
-> +
-> +#ifdef CONFIG_CPU_LOONGSON64
-> +       case ldc2_op:
-> +               rt =3D inst.loongson3_lsdc2_format.rt;
-> +               switch (inst.loongson3_lsdc2_format.opcode1) {
-> +               /*
-> +                * Loongson-3 overridden ldc2 instructions.
-> +                * opcode1              instruction
-> +                *   0x0          gslbx: store 1 bytes from GPR
-> +                *   0x1          gslhx: store 2 bytes from GPR
-> +                *   0x2          gslwx: store 4 bytes from GPR
-> +                *   0x3          gsldx: store 8 bytes from GPR
-> +                */
-> +               case 0x0:
-> +                       run->mmio.len =3D 1;
-> +                       vcpu->mmio_needed =3D 27; /* signed */
-> +                       break;
-> +               case 0x1:
-> +                       run->mmio.len =3D 2;
-> +                       vcpu->mmio_needed =3D 28; /* signed */
-> +                       break;
-> +               case 0x2:
-> +                       run->mmio.len =3D 4;
-> +                       vcpu->mmio_needed =3D 29; /* signed */
-> +                       break;
-> +               case 0x3:
-> +                       run->mmio.len =3D 8;
-> +                       vcpu->mmio_needed =3D 30; /* signed */
-> +                       break;
-> +               default:
-> +                       kvm_err("Godson Exteneded GS-Load for float not y=
-et supported (inst=3D0x%08x)\n",
-> +                               inst.word);
-> +                       break;
-> +               }
-> +               break;
-> +#endif
-> +
->         default:
->                 kvm_err("Load not yet supported (inst=3D0x%08x)\n",
->                         inst.word);
-> @@ -2612,28 +2975,125 @@ enum emulation_result kvm_mips_complete_mmio_loa=
-d(struct kvm_vcpu *vcpu,
+>         struct kvm_vcpu_arch *arch =3D &vcpu->arch;
+>         struct mips_coproc *cop0 =3D vcpu->arch.cop0;
 >
->         switch (run->mmio.len) {
->         case 8:
-> -               *gpr =3D *(s64 *)run->mmio.data;
-> +               switch (vcpu->mmio_needed) {
-> +               case 11:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffffffffff) |
-> +                               (((*(s64 *)run->mmio.data) & 0xff) << 56)=
-;
-> +                       break;
-> +               case 12:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffffffff) |
-> +                               (((*(s64 *)run->mmio.data) & 0xffff) << 4=
-8);
-> +                       break;
-> +               case 13:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffffff) |
-> +                               (((*(s64 *)run->mmio.data) & 0xffffff) <<=
- 40);
-> +                       break;
-> +               case 14:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffff) |
-> +                               (((*(s64 *)run->mmio.data) & 0xffffffff) =
-<< 32);
-> +                       break;
-> +               case 15:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffff) |
-> +                               (((*(s64 *)run->mmio.data) & 0xffffffffff=
-) << 24);
-> +                       break;
-> +               case 16:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffff) |
-> +                               (((*(s64 *)run->mmio.data) & 0xffffffffff=
-ff) << 16);
-> +                       break;
-> +               case 17:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ff) |
-> +                               (((*(s64 *)run->mmio.data) & 0xffffffffff=
-ffff) << 8);
-> +                       break;
-> +               case 18:
-> +               case 19:
-> +                       *gpr =3D *(s64 *)run->mmio.data;
-> +                       break;
-> +               case 20:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ff00000000000000) |
-> +                               ((((*(s64 *)run->mmio.data)) >> 8) & 0xff=
-ffffffffffff);
-> +                       break;
-> +               case 21:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffff000000000000) |
-> +                               ((((*(s64 *)run->mmio.data)) >> 16) & 0xf=
-fffffffffff);
-> +                       break;
-> +               case 22:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffff0000000000) |
-> +                               ((((*(s64 *)run->mmio.data)) >> 24) & 0xf=
-fffffffff);
-> +                       break;
-> +               case 23:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffff00000000) |
-> +                               ((((*(s64 *)run->mmio.data)) >> 32) & 0xf=
-fffffff);
-> +                       break;
-> +               case 24:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffffff000000) |
-> +                               ((((*(s64 *)run->mmio.data)) >> 40) & 0xf=
-fffff);
-> +                       break;
-> +               case 25:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffffffff0000) |
-> +                               ((((*(s64 *)run->mmio.data)) >> 48) & 0xf=
-fff);
-> +                       break;
-> +               case 26:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffffffffffff00) |
-> +                               ((((*(s64 *)run->mmio.data)) >> 56) & 0xf=
-f);
-> +                       break;
-> +               default:
-> +                       *gpr =3D *(s64 *)run->mmio.data;
-> +               }
->                 break;
+> -       switch (priority) {
+> -       case MIPS_EXC_INT_TIMER:
+> -               if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
+> -                   && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0=
+_ERL)))
+> -                   && (kvm_read_c0_guest_status(cop0) & IE_IRQ5)) {
+> -                       allowed =3D 1;
+> -                       exccode =3D EXCCODE_INT;
+> -               }
+> -               break;
+> -
+> -       case MIPS_EXC_INT_IO:
+> -               if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
+> -                   && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0=
+_ERL)))
+> -                   && (kvm_read_c0_guest_status(cop0) & IE_IRQ0)) {
+> -                       allowed =3D 1;
+> -                       exccode =3D EXCCODE_INT;
+> -               }
+> -               break;
+> -
+> -       case MIPS_EXC_INT_IPI_1:
+> -               if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
+> -                   && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0=
+_ERL)))
+> -                   && (kvm_read_c0_guest_status(cop0) & IE_IRQ1)) {
+> -                       allowed =3D 1;
+> -                       exccode =3D EXCCODE_INT;
+> -               }
+> -               break;
+> -
+> -       case MIPS_EXC_INT_IPI_2:
+> -               if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
+> -                   && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0=
+_ERL)))
+> -                   && (kvm_read_c0_guest_status(cop0) & IE_IRQ2)) {
+> -                       allowed =3D 1;
+> -                       exccode =3D EXCCODE_INT;
+> -               }
+> -               break;
+> +       if (priority =3D=3D MIPS_EXC_MAX)
+> +               return 0;
 >
->         case 4:
-> -               if (vcpu->mmio_needed =3D=3D 2)
-> -                       *gpr =3D *(s32 *)run->mmio.data;
-> -               else
-> +               switch (vcpu->mmio_needed) {
-> +               case 1:
->                         *gpr =3D *(u32 *)run->mmio.data;
-> +                       break;
-> +               case 2:
-> +                       *gpr =3D *(s32 *)run->mmio.data;
-> +                       break;
-> +               case 3:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffff) |
-> +                               (((*(s32 *)run->mmio.data) & 0xff) << 24)=
-;
-> +                       break;
-> +               case 4:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffff) |
-> +                               (((*(s32 *)run->mmio.data) & 0xffff) << 1=
-6);
-> +                       break;
-> +               case 5:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ff) |
-> +                               (((*(s32 *)run->mmio.data) & 0xffffff) <<=
- 8);
-> +                       break;
-> +               case 6:
-> +               case 7:
-> +                       *gpr =3D *(s32 *)run->mmio.data;
-> +                       break;
-> +               case 8:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ff000000) |
-> +                               ((((*(s32 *)run->mmio.data)) >> 8) & 0xff=
-ffff);
-> +                       break;
-> +               case 9:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffff0000) |
-> +                               ((((*(s32 *)run->mmio.data)) >> 16) & 0xf=
-fff);
-> +                       break;
-> +               case 10:
-> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
-ffffff00) |
-> +                               ((((*(s32 *)run->mmio.data)) >> 24) & 0xf=
-f);
-> +                       break;
-> +               default:
-> +                       *gpr =3D *(s32 *)run->mmio.data;
-> +               }
->                 break;
->
->         case 2:
-> -               if (vcpu->mmio_needed =3D=3D 2)
-> -                       *gpr =3D *(s16 *) run->mmio.data;
-> -               else
-> +               if (vcpu->mmio_needed =3D=3D 1)
->                         *gpr =3D *(u16 *)run->mmio.data;
-> +               else
-> +                       *gpr =3D *(s16 *)run->mmio.data;
->
->                 break;
->         case 1:
-> -               if (vcpu->mmio_needed =3D=3D 2)
-> -                       *gpr =3D *(s8 *) run->mmio.data;
-> +               if (vcpu->mmio_needed =3D=3D 1)
-> +                       *gpr =3D *(u8 *)run->mmio.data;
->                 else
-> -                       *gpr =3D *(u8 *) run->mmio.data;
-> +                       *gpr =3D *(s8 *)run->mmio.data;
->                 break;
+> -       default:
+> -               break;
+> +       ie =3D 1 << (kvm_priority_to_irq[priority] + 8);
+> +       if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
+> +           && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0_ERL)))
+> +           && (kvm_read_c0_guest_status(cop0) & ie)) {
+> +               allowed =3D 1;
+> +               exccode =3D EXCCODE_INT;
 >         }
 >
+>         /* Are we allowed to deliver the interrupt ??? */
+> diff --git a/arch/mips/kvm/interrupt.h b/arch/mips/kvm/interrupt.h
+> index 3bf0a49..c3e878c 100644
+> --- a/arch/mips/kvm/interrupt.h
+> +++ b/arch/mips/kvm/interrupt.h
+> @@ -21,11 +21,12 @@
+>  #define MIPS_EXC_NMI                5
+>  #define MIPS_EXC_MCHK               6
+>  #define MIPS_EXC_INT_TIMER          7
+> -#define MIPS_EXC_INT_IO             8
+> -#define MIPS_EXC_EXECUTE            9
+> -#define MIPS_EXC_INT_IPI_1          10
+> -#define MIPS_EXC_INT_IPI_2          11
+> -#define MIPS_EXC_MAX                12
+> +#define MIPS_EXC_INT_IO_1           8
+> +#define MIPS_EXC_INT_IO_2           9
+> +#define MIPS_EXC_EXECUTE            10
+> +#define MIPS_EXC_INT_IPI_1          11
+> +#define MIPS_EXC_INT_IPI_2          12
+> +#define MIPS_EXC_MAX                13
+>  /* XXXSL More to follow */
+>
+>  #define C_TI        (_ULCAST_(1) << 30)
+> @@ -38,6 +39,9 @@
+>  #define KVM_MIPS_IRQ_CLEAR_ALL_AT_ONCE   (0)
+>  #endif
+>
+> +extern u32 *kvm_priority_to_irq;
+> +u32 kvm_irq_to_priority(u32 irq);
+> +
+>  void kvm_mips_queue_irq(struct kvm_vcpu *vcpu, unsigned int priority);
+>  void kvm_mips_dequeue_irq(struct kvm_vcpu *vcpu, unsigned int priority);
+>  int kvm_mips_pending_timer(struct kvm_vcpu *vcpu);
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 8f05dd0..5ca122c 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -489,7 +489,10 @@ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+>         int intr =3D (int)irq->irq;
+>         struct kvm_vcpu *dvcpu =3D NULL;
+>
+> -       if (intr =3D=3D 3 || intr =3D=3D -3 || intr =3D=3D 4 || intr =3D=
+=3D -4)
+> +       if (intr =3D=3D kvm_priority_to_irq[MIPS_EXC_INT_IPI_1] ||
+> +           intr =3D=3D kvm_priority_to_irq[MIPS_EXC_INT_IPI_2] ||
+> +           intr =3D=3D (-kvm_priority_to_irq[MIPS_EXC_INT_IPI_1]) ||
+> +           intr =3D=3D (-kvm_priority_to_irq[MIPS_EXC_INT_IPI_2]))
+>                 kvm_debug("%s: CPU: %d, INTR: %d\n", __func__, irq->cpu,
+>                           (int)intr);
+>
+> @@ -498,10 +501,10 @@ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+>         else
+>                 dvcpu =3D vcpu->kvm->vcpus[irq->cpu];
+>
+> -       if (intr =3D=3D 2 || intr =3D=3D 3 || intr =3D=3D 4) {
+> +       if (intr =3D=3D 2 || intr =3D=3D 3 || intr =3D=3D 4 || intr =3D=
+=3D 6) {
+>                 kvm_mips_callbacks->queue_io_int(dvcpu, irq);
+>
+> -       } else if (intr =3D=3D -2 || intr =3D=3D -3 || intr =3D=3D -4) {
+> +       } else if (intr =3D=3D -2 || intr =3D=3D -3 || intr =3D=3D -4 || =
+intr =3D=3D -6) {
+>                 kvm_mips_callbacks->dequeue_io_int(dvcpu, irq);
+>         } else {
+>                 kvm_err("%s: invalid interrupt ioctl (%d:%d)\n", __func__=
+,
+> @@ -1620,6 +1623,34 @@ static struct notifier_block kvm_mips_csr_die_noti=
+fier =3D {
+>         .notifier_call =3D kvm_mips_csr_die_notify,
+>  };
+>
+> +static u32 kvm_default_priority_to_irq[MIPS_EXC_MAX] =3D {
+> +       [MIPS_EXC_INT_TIMER] =3D C_IRQ5,
+> +       [MIPS_EXC_INT_IO_1]  =3D C_IRQ0,
+> +       [MIPS_EXC_INT_IPI_1] =3D C_IRQ1,
+> +       [MIPS_EXC_INT_IPI_2] =3D C_IRQ2,
+> +};
+> +
+> +static u32 kvm_loongson3_priority_to_irq[MIPS_EXC_MAX] =3D {
+> +       [MIPS_EXC_INT_TIMER] =3D C_IRQ5,
+> +       [MIPS_EXC_INT_IO_1]  =3D C_IRQ0,
+> +       [MIPS_EXC_INT_IO_2]  =3D C_IRQ1,
+> +       [MIPS_EXC_INT_IPI_1] =3D C_IRQ4,
+> +};
+> +
+> +u32 *kvm_priority_to_irq =3D kvm_default_priority_to_irq;
+> +
+> +u32 kvm_irq_to_priority(u32 irq)
+> +{
+> +       int i;
+> +
+> +       for (i =3D MIPS_EXC_INT_TIMER; i < MIPS_EXC_MAX; i++) {
+> +               if (kvm_priority_to_irq[i] =3D=3D (1 << (irq + 8)))
+> +                       return i;
+> +       }
+> +
+> +       return MIPS_EXC_MAX;
+> +}
+> +
+>  static int __init kvm_mips_init(void)
+>  {
+>         int ret;
+> @@ -1638,6 +1669,9 @@ static int __init kvm_mips_init(void)
+>         if (ret)
+>                 return ret;
+>
+> +       if (boot_cpu_type() =3D=3D CPU_LOONGSON64)
+> +               kvm_priority_to_irq =3D kvm_loongson3_priority_to_irq;
+> +
+>         register_die_notifier(&kvm_mips_csr_die_notifier);
+>
+>         return 0;
+> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+> index ab320f0..63d5b35 100644
+> --- a/arch/mips/kvm/vz.c
+> +++ b/arch/mips/kvm/vz.c
+> @@ -225,23 +225,7 @@ static void kvm_vz_queue_io_int_cb(struct kvm_vcpu *=
+vcpu,
+>          * interrupts are asynchronous to vcpu execution therefore defer =
+guest
+>          * cp0 accesses
+>          */
+> -       switch (intr) {
+> -       case 2:
+> -               kvm_vz_queue_irq(vcpu, MIPS_EXC_INT_IO);
+> -               break;
+> -
+> -       case 3:
+> -               kvm_vz_queue_irq(vcpu, MIPS_EXC_INT_IPI_1);
+> -               break;
+> -
+> -       case 4:
+> -               kvm_vz_queue_irq(vcpu, MIPS_EXC_INT_IPI_2);
+> -               break;
+> -
+> -       default:
+> -               break;
+> -       }
+> -
+> +       kvm_vz_queue_irq(vcpu, kvm_irq_to_priority(intr));
+>  }
+>
+>  static void kvm_vz_dequeue_io_int_cb(struct kvm_vcpu *vcpu,
+> @@ -253,44 +237,22 @@ static void kvm_vz_dequeue_io_int_cb(struct kvm_vcp=
+u *vcpu,
+>          * interrupts are asynchronous to vcpu execution therefore defer =
+guest
+>          * cp0 accesses
+>          */
+> -       switch (intr) {
+> -       case -2:
+> -               kvm_vz_dequeue_irq(vcpu, MIPS_EXC_INT_IO);
+> -               break;
+> -
+> -       case -3:
+> -               kvm_vz_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_1);
+> -               break;
+> -
+> -       case -4:
+> -               kvm_vz_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_2);
+> -               break;
+> -
+> -       default:
+> -               break;
+> -       }
+> -
+> +       kvm_vz_dequeue_irq(vcpu, kvm_irq_to_priority(-intr));
+>  }
+>
+> -static u32 kvm_vz_priority_to_irq[MIPS_EXC_MAX] =3D {
+> -       [MIPS_EXC_INT_TIMER] =3D C_IRQ5,
+> -       [MIPS_EXC_INT_IO]    =3D C_IRQ0,
+> -       [MIPS_EXC_INT_IPI_1] =3D C_IRQ1,
+> -       [MIPS_EXC_INT_IPI_2] =3D C_IRQ2,
+> -};
+> -
+>  static int kvm_vz_irq_deliver_cb(struct kvm_vcpu *vcpu, unsigned int pri=
+ority,
+>                                  u32 cause)
+>  {
+>         u32 irq =3D (priority < MIPS_EXC_MAX) ?
+> -               kvm_vz_priority_to_irq[priority] : 0;
+> +               kvm_priority_to_irq[priority] : 0;
+>
+>         switch (priority) {
+>         case MIPS_EXC_INT_TIMER:
+>                 set_gc0_cause(C_TI);
+>                 break;
+>
+> -       case MIPS_EXC_INT_IO:
+> +       case MIPS_EXC_INT_IO_1:
+> +       case MIPS_EXC_INT_IO_2:
+>         case MIPS_EXC_INT_IPI_1:
+>         case MIPS_EXC_INT_IPI_2:
+>                 if (cpu_has_guestctl2)
+> @@ -311,7 +273,7 @@ static int kvm_vz_irq_clear_cb(struct kvm_vcpu *vcpu,=
+ unsigned int priority,
+>                                u32 cause)
+>  {
+>         u32 irq =3D (priority < MIPS_EXC_MAX) ?
+> -               kvm_vz_priority_to_irq[priority] : 0;
+> +               kvm_priority_to_irq[priority] : 0;
+>
+>         switch (priority) {
+>         case MIPS_EXC_INT_TIMER:
+> @@ -329,7 +291,8 @@ static int kvm_vz_irq_clear_cb(struct kvm_vcpu *vcpu,=
+ unsigned int priority,
+>                 }
+>                 break;
+>
+> -       case MIPS_EXC_INT_IO:
+> +       case MIPS_EXC_INT_IO_1:
+> +       case MIPS_EXC_INT_IO_2:
+>         case MIPS_EXC_INT_IPI_1:
+>         case MIPS_EXC_INT_IPI_2:
+>                 /* Clear GuestCtl2.VIP irq if not using Hardware Clear */
 > --
 > 2.7.0
 >
