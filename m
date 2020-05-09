@@ -2,63 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C4CB1CC398
-	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 20:03:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 570FC1CC415
+	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 21:21:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728276AbgEISDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 May 2020 14:03:18 -0400
-Received: from sv228.xserver.jp ([219.94.203.129]:46672 "EHLO sv228.xserver.jp"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727106AbgEISDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 May 2020 14:03:18 -0400
-X-Greylist: delayed 390 seconds by postgrey-1.27 at vger.kernel.org; Sat, 09 May 2020 14:03:17 EDT
-Received: from virusgw2.xserver.jp (virusgw2.xserver.jp [219.94.203.91])
-        by sv228.xserver.jp (Postfix) with ESMTP id 24D453E0370017;
-        Sun, 10 May 2020 02:56:47 +0900 (JST)
-Received: from sv228.xserver.jp (219.94.203.129)
- by virusgw2.xserver.jp (F-Secure/fsigk_smtp/521/virusgw2.xserver.jp);
- Sun, 10 May 2020 02:56:46 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/521/virusgw2.xserver.jp)
-Received: from webmail.xserver.ne.jp (webmail.xserver.ne.jp [210.188.201.183])
-        by sv228.xserver.jp (Postfix) with ESMTPA id ABBEA3E0D11800;
-        Sun, 10 May 2020 02:56:46 +0900 (JST)
+        id S1728244AbgEITV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 May 2020 15:21:29 -0400
+Received: from jabberwock.ucw.cz ([46.255.230.98]:51526 "EHLO
+        jabberwock.ucw.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727938AbgEITV3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 May 2020 15:21:29 -0400
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 1EEA61C0257; Sat,  9 May 2020 21:21:27 +0200 (CEST)
+Date:   Sat, 9 May 2020 21:21:25 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@amazon.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>, Balbir Singh <sblbir@amazon.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
+Message-ID: <20200509192125.GA1597@bug>
+References: <20200421184150.68011-1-andraprs@amazon.com>
+ <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
+ <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
+ <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com>
+ <20200507174438.GB1216@bug>
+ <620bf5ae-eade-37da-670d-a8704d9b4397@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Sun, 10 May 2020 01:56:46 +0800
-From:   Chan Leap Phala <9@qraud.com>
-To:     undisclosed-recipients:;
-Subject: Fw:
-Reply-To: chan.l.phala@gmail.com
-Mail-Reply-To: chan.l.phala@gmail.com
-Message-ID: <8b5bf4610d8cbedf55d565ffbaf6c300@qraud.com>
-X-Sender: 9@qraud.com
-User-Agent: Roundcube Webmail/1.2.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <620bf5ae-eade-37da-670d-a8704d9b4397@amazon.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Gorące pozdrowienia,
+On Fri 2020-05-08 10:00:27, Paraschiv, Andra-Irina wrote:
+> 
+> 
+> On 07/05/2020 20:44, Pavel Machek wrote:
+> >
+> >Hi!
+> >
+> >>>it uses its own memory and CPUs + its virtio-vsock emulated device for
+> >>>communication with the primary VM.
+> >>>
+> >>>The memory and CPUs are carved out of the primary VM, they are dedicated
+> >>>for the enclave. The Nitro hypervisor running on the host ensures memory
+> >>>and CPU isolation between the primary VM and the enclave VM.
+> >>>
+> >>>These two components need to reflect the same state e.g. when the
+> >>>enclave abstraction process (1) is terminated, the enclave VM (2) is
+> >>>terminated as well.
+> >>>
+> >>>With regard to the communication channel, the primary VM has its own
+> >>>emulated virtio-vsock PCI device. The enclave VM has its own emulated
+> >>>virtio-vsock device as well. This channel is used, for example, to fetch
+> >>>data in the enclave and then process it. An application that sets up the
+> >>>vsock socket and connects or listens, depending on the use case, is then
+> >>>developed to use this channel; this happens on both ends - primary VM
+> >>>and enclave VM.
+> >>>
+> >>>Let me know if further clarifications are needed.
+> >>Thanks, this is all useful.  However can you please clarify the
+> >>low-level details here?
+> >Is the virtual machine manager open-source? If so, I guess pointer for sources
+> >would be useful.
+> 
+> Hi Pavel,
+> 
+> Thanks for reaching out.
+> 
+> The VMM that is used for the primary / parent VM is not open source.
 
-Wysłałem ci ten list miesiąc temu, ale nie jestem pewien, czy go 
-otrzymałeś, ponieważ nie otrzymałem od ciebie żadnej odpowiedzi, dlatego 
-ponownie go wysyłam.
+Do we want to merge code that opensource community can not test?
 
-Jestem adwokatem Chan Leap Phala, osobistym prawnikiem mojego zmarłego 
-klienta przed jego przedwczesną śmiercią z rodziną. Otrzymałem od jego 
-banku mandat na dostarczenie / przedstawienie bliskich krewnych kwoty 
-jego funduszu o wartości Siedemdziesiąt Osiem Milionów Pięćset Sto 
-Osiemdziesięciu Tysięcy Dolarów Amerykańskich 78 580 000 USD, więc 
-skontaktowałem się z Tobą. Po nieudanej próbie znalezienia krewnego 
-mojego zmarłego klienta postanowiłem się z tobą skontaktować, ponieważ 
-ma on to samo nazwisko i narodowość.
+								Pavel
 
-Proszę o kontakt w celu uzyskania dalszych informacji: 
-(chan.l.phala@gmail.com)
-
-Z poważaniem
-Barrister Chan Leap PHALA
-Prawnik / Adwokaci
-E-mail: chan.l.phala@gmail.com
+-- (english) http://www.livejournal.com/~pavelmachek (cesky, pictures) 
+http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
