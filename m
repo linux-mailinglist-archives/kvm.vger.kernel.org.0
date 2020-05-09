@@ -2,146 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE3AD1CBB75
-	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 01:54:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1518F1CBB93
+	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 02:09:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728417AbgEHXxw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 19:53:52 -0400
-Received: from mga14.intel.com ([192.55.52.115]:30638 "EHLO mga14.intel.com"
+        id S1728194AbgEIAJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 20:09:12 -0400
+Received: from mga17.intel.com ([192.55.52.151]:23037 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728402AbgEHXxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 May 2020 19:53:50 -0400
-IronPort-SDR: eb4dPC6Lob1KkcQu5GBySjLtqolArbKuw7M8wiAJrwa6sTzBScs6wJ0R1IKyhTQgPeMkfXIgdt
- VL8ZoZtQrH5A==
+        id S1726380AbgEIAJK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 May 2020 20:09:10 -0400
+IronPort-SDR: LFPKURXgjl9ZLfZxQXo9dWUEIOIksGaMDp+QfuIiRA8YZxWkA6vO9DkcRQnUeFH5SeX18o3T+z
+ ELudsbypXAvw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 16:53:50 -0700
-IronPort-SDR: qIUwwQfgerFjgt33YyyA1GCH11D9cCL5riMGpgpEbqcjc+xADTgbk9TSQjuJOeuqRRhwBx35RH
- SG0RzKFbmwzA==
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 17:09:10 -0700
+IronPort-SDR: Y8YO7D+f89XLasVgvo7I+tiJRACov1CBSDE68TG8unNse8tI9sEOhqaA1F2mAEV03HJ/7P44Nw
+ +Xjcv56Isi6Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,369,1583222400"; 
-   d="scan'208";a="264546906"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
-  by orsmga006.jf.intel.com with ESMTP; 08 May 2020 16:53:49 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: x86: Print symbolic names of VMX VM-Exit flags in traces
-Date:   Fri,  8 May 2020 16:53:48 -0700
-Message-Id: <20200508235348.19427-3-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200508235348.19427-1-sean.j.christopherson@intel.com>
-References: <20200508235348.19427-1-sean.j.christopherson@intel.com>
+   d="scan'208";a="250608479"
+Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.25])
+  by fmsmga007.fm.intel.com with ESMTP; 08 May 2020 17:09:08 -0700
+Date:   Fri, 8 May 2020 17:09:09 -0700
+From:   "Raj, Ashok" <ashok.raj@intel.com>
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Lin, Jing" <jing.lin@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
+ support for the idxd driver.
+Message-ID: <20200509000909.GA79981@otc-nc-03>
+References: <20200424181203.GU13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
+ <20200426191357.GB13640@mellanox.com>
+ <20200426214355.29e19d33@x1.home>
+ <20200427115818.GE13640@mellanox.com>
+ <20200427071939.06aa300e@x1.home>
+ <20200427132218.GG13640@mellanox.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D8E34AA@SHSMSX104.ccr.corp.intel.com>
+ <20200508204710.GA78778@otc-nc-03>
+ <20200508231610.GO19158@mellanox.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200508231610.GO19158@mellanox.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use __print_flags() to display the names of VMX flags in VM-Exit traces
-and strip the flags when printing the basic exit reason, e.g. so that a
-failed VM-Entry due to invalid guest state gets recorded as
-"INVALID_STATE FAILED_VMENTRY" instead of "0x80000021".
+Hi Jason
 
-Opportunstically fix misaligned variables in the kvm_exit and
-kvm_nested_vmexit_inject tracepoints.
+On Fri, May 08, 2020 at 08:16:10PM -0300, Jason Gunthorpe wrote:
+> On Fri, May 08, 2020 at 01:47:10PM -0700, Raj, Ashok wrote:
+> 
+> > Even when uaccel was under development, one of the options
+> > was to use VFIO as the transport, goal was the same i.e to keep
+> > the user space have one interface. 
+> 
+> I feel a bit out of the loop here, uaccel isn't in today's kernel is
+> it? I've heard about it for a while, it sounds very similar to RDMA,
+> so I hope they took some of my advice...
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/uapi/asm/vmx.h |  3 +++
- arch/x86/kvm/trace.h            | 32 +++++++++++++++++---------------
- 2 files changed, 20 insertions(+), 15 deletions(-)
+I think since 5.7 maybe? drivers/misc/uacce. I don't think this is like
+RDMA, its just a plain accelerator. There is no connection management,
+memory registration or other things.. IB was my first job at Intel,
+but saying that i would be giving my age away :)
 
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index e95b72ec19bc0..b8ff9e8ac0d51 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -150,6 +150,9 @@
- 	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
- 	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
- 
-+#define VMX_EXIT_REASON_FLAGS \
-+	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
-+
- #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
- #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
- #define VMX_ABORT_LOAD_HOST_MSR_FAIL         4
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 249062f24b940..54a10c98d7466 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -225,6 +225,14 @@ TRACE_EVENT(kvm_apic,
- #define KVM_ISA_VMX   1
- #define KVM_ISA_SVM   2
- 
-+#define kvm_print_exit_reason(exit_reason, isa)				\
-+	(isa == KVM_ISA_VMX) ?						\
-+	__print_symbolic(exit_reason & 0xffff, VMX_EXIT_REASONS) :	\
-+	__print_symbolic(exit_reason, SVM_EXIT_REASONS),		\
-+	(isa == KVM_ISA_VMX && exit_reason & ~0xffff) ? " " : "",	\
-+	(isa == KVM_ISA_VMX) ?						\
-+	__print_flags(exit_reason & ~0xffff, " ", VMX_EXIT_REASON_FLAGS) : ""
-+
- /*
-  * Tracepoint for kvm guest exit:
-  */
-@@ -250,12 +258,10 @@ TRACE_EVENT(kvm_exit,
- 					   &__entry->info2);
- 	),
- 
--	TP_printk("vcpu %u reason %s rip 0x%lx info %llx %llx",
-+	TP_printk("vcpu %u reason %s%s%s rip 0x%lx info %llx %llx",
- 		  __entry->vcpu_id,
--		 (__entry->isa == KVM_ISA_VMX) ?
--		 __print_symbolic(__entry->exit_reason, VMX_EXIT_REASONS) :
--		 __print_symbolic(__entry->exit_reason, SVM_EXIT_REASONS),
--		 __entry->guest_rip, __entry->info1, __entry->info2)
-+		  kvm_print_exit_reason(__entry->exit_reason, __entry->isa),
-+		  __entry->guest_rip, __entry->info1, __entry->info2)
- );
- 
- /*
-@@ -588,12 +594,10 @@ TRACE_EVENT(kvm_nested_vmexit,
- 		__entry->exit_int_info_err	= exit_int_info_err;
- 		__entry->isa			= isa;
- 	),
--	TP_printk("rip: 0x%016llx reason: %s ext_inf1: 0x%016llx "
-+	TP_printk("rip: 0x%016llx reason: %s%s%s ext_inf1: 0x%016llx "
- 		  "ext_inf2: 0x%016llx ext_int: 0x%08x ext_int_err: 0x%08x",
- 		  __entry->rip,
--		 (__entry->isa == KVM_ISA_VMX) ?
--		 __print_symbolic(__entry->exit_code, VMX_EXIT_REASONS) :
--		 __print_symbolic(__entry->exit_code, SVM_EXIT_REASONS),
-+		  kvm_print_exit_reason(__entry->exit_code, __entry->isa),
- 		  __entry->exit_info1, __entry->exit_info2,
- 		  __entry->exit_int_info, __entry->exit_int_info_err)
- );
-@@ -626,13 +630,11 @@ TRACE_EVENT(kvm_nested_vmexit_inject,
- 		__entry->isa			= isa;
- 	),
- 
--	TP_printk("reason: %s ext_inf1: 0x%016llx "
-+	TP_printk("reason: %s%s%s ext_inf1: 0x%016llx "
- 		  "ext_inf2: 0x%016llx ext_int: 0x%08x ext_int_err: 0x%08x",
--		 (__entry->isa == KVM_ISA_VMX) ?
--		 __print_symbolic(__entry->exit_code, VMX_EXIT_REASONS) :
--		 __print_symbolic(__entry->exit_code, SVM_EXIT_REASONS),
--		__entry->exit_info1, __entry->exit_info2,
--		__entry->exit_int_info, __entry->exit_int_info_err)
-+		  kvm_print_exit_reason(__entry->exit_code, __entry->isa),
-+		  __entry->exit_info1, __entry->exit_info2,
-+		  __entry->exit_int_info, __entry->exit_int_info_err)
- );
- 
- /*
--- 
-2.26.0
+> 
+> > But the needs of generic user space application is significantly
+> > different from exporting a more functional device model to guest,
+> > which isn't full emulated device. which is why VFIO didn't make
+> > sense for native use.
+> 
+> I'm not sure this is true. We've done these kinds of emulated SIOV
+> like things already and there is a huge overlap between what a generic
+> user application needs and what the VMM neds. Actually almost a
+> perfect subset except for interrupt remapping (which is quite
+> trivial).
+
+From a simple user application POV, if we need to do simple compression
+or such with a shared WQ, all the application needs do do is
+bind_mm() that somehow associates the process address space with the 
+IOMMU to create that association and communication channel.
+
+For supporting this with guest user, we need to support the same actions
+from a guest OS. i.e a guest OS bind should be serviced and end up with the 
+IOMMU plumbing it with the guest cr3, and making sure the guest 2nd level 
+is plumed right for the nested walk. 
+
+Now we can certainly go bolt all these things again. When VFIO has already 
+done the pluming in a generic way.
+
+> 
+> The things vfio focuses on, like groups and managing a real config
+> space just don't apply here.
+> 
+> > And when we move things from VFIO which is already established
+> > as a general device model and accepted by multiple VMM's it gives
+> > instant footing without a whole redesign. 
+> 
+> Yes, I understand, but I think you need to get more people to support
+> this idea. From my standpoint this is taking secure lean VMMs and
+
+When we decided on VFIO, it was after using the best practices then,
+after discussion with Kirti Wankhede and Alex. Kevin had used it for
+graphics virtualization. It was even presented at KVM forum and such
+dating back to 2017. No one has raised alarms until now :-)
+
+
+> putting emulation code back into them, except in a more dangerous
+> kernel location. This does not seem like a net win to me.
+
+Its not a whole lot of emulation right? mdev are soft partitioned. There is
+just a single PF, but we can create a separate partition for the guest using
+PASID along with the normal BDF (RID). And exposing a consistent PCI like
+interface to user space you get everything else for free.
+
+Yes, its not SRIOV, but giving that interface to user space via VFIO, we get 
+all of that functionality without having to reinvent a different way to do it.
+
+vDPA went the other way, IRC, they went and put a HW implementation of what
+virtio is in hardware. So they sort of fit the model. Here the instance
+looks and feels like real hardware for the setup and control aspect.
+
+
+> 
+> You'd be much better to have some userspace library scheme instead of
+> being completely tied to a kernel interface for modularity.
+
+Couldn't agree more :-).. all I'm asking is if we can do a phased approach to 
+get to that goodness! If we need to move things to user space for emulation
+that's a great goal, but it can be evolutionary.
+
+> 
+> > When we move things from VFIO to uaccel to bolt on the functionality
+> > like VFIO, I suspect we would be moving code/functionality from VFIO
+> > to Uaccel. I don't know what the net gain would be.
+> 
+> Most of VFIO functionality is already decomposed inside the kernel,
+> and you need most of it to do secure user access anyhow.
+> 
+> > For mdev, would you agree we can keep the current architecture,
+> > and investigate moving some emulation code to user space (say even for
+> > standard vfio_pci) and then expand scope later.
+> 
+> I won't hard NAK this, but I think you need more people to support
+> this general idea of more emulation code in the kernel to go ahead -
+> particularly since this is one of many future drivers along this
+> design.
+> 
+> It would be good to hear from the VMM teams that this is what they
+> want (and why), for instance.
+
+IRC Paolo was present I think and we can find other VMM folks to chime in if
+that helps.
 
