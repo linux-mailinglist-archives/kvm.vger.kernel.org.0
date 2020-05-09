@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E7B81CBCB3
-	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 05:04:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 132FE1CBCB5
+	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 05:04:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728768AbgEIDDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 May 2020 23:03:54 -0400
-Received: from mga12.intel.com ([192.55.52.136]:55120 "EHLO mga12.intel.com"
+        id S1728787AbgEIDD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 May 2020 23:03:59 -0400
+Received: from mga12.intel.com ([192.55.52.136]:55127 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728692AbgEIDDw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 May 2020 23:03:52 -0400
-IronPort-SDR: U9l+Iq81pNEVyB5k8csACETrXBqnYFWSbA+sWzf9+YzS5IgrP7HZzGLUYgjeJnB+xSaxyicstU
- 2UBgfPzbZ3TQ==
+        id S1728718AbgEIDD5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 May 2020 23:03:57 -0400
+IronPort-SDR: 6vXjjzZfwAWo6AH0Zqhyntqwqy38ZTfpXgpPOh61vsZj708UkI2iyIAT4nAgqo6rBDxL+P+SIc
+ dMwYBstv8ScQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 20:03:52 -0700
-IronPort-SDR: XnVfzQjeJ2drVnSfFyargOrUUqXVWmNQRzk+Vucny6ZydagwnsP8bRWSVS+Ilnsfg1/MU8DSz3
- qolzq8oKEq7Q==
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2020 20:03:57 -0700
+IronPort-SDR: IH3LtByqkiLmCjjX1nZJz2E2JCjchxKQZ7+/3LW8VOr8UgyRDKzILsAY+XQbuB5s3F1wZa3rVS
+ bjGjBUsEVnWw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,370,1583222400"; 
-   d="scan'208";a="408311062"
+   d="scan'208";a="408311074"
 Received: from lxy-dell.sh.intel.com ([10.239.159.21])
-  by orsmga004.jf.intel.com with ESMTP; 08 May 2020 20:03:48 -0700
+  by orsmga004.jf.intel.com with ESMTP; 08 May 2020 20:03:52 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -37,9 +37,9 @@ Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
         Tony Luck <tony.luck@intel.com>,
         Fenghua Yu <fenghua.yu@intel.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v9 4/8] x86/split_lock: Introduce split_lock_virt_switch() and two wrappers
-Date:   Sat,  9 May 2020 19:05:38 +0800
-Message-Id: <20200509110542.8159-5-xiaoyao.li@intel.com>
+Subject: [PATCH v9 5/8] x86/kvm: Introduce paravirt split lock detection enumeration
+Date:   Sat,  9 May 2020 19:05:39 +0800
+Message-Id: <20200509110542.8159-6-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200509110542.8159-1-xiaoyao.li@intel.com>
 References: <20200509110542.8159-1-xiaoyao.li@intel.com>
@@ -48,102 +48,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce split_lock_virt_switch(), which is used for toggling split
-lock detection setting as well as updating TIF_SLD_DISABLED flag to make
-them consistent. Note, it can only be used in sld warn mode, i.e.,
-X86_FEATURE_SPLIT_LOCK_DETECT && !X86_FEATURE_SLD_FATAL.
+Introduce KVM_FEATURE_SPLIT_LOCK_DETECT, for which linux guest running
+on KVM can enumerate the avaliablility of feature split lock detection.
 
-The FATAL check is handled by wrappers, split_lock_set_guest() and
-split_lock_restore_host(), that will be used by KVM when virtualizing
-split lock detection for guest in the future.
+Introduce KVM_HINTS_SLD_FATAL, which tells whether host is sld_fatal mode,
+i.e., whether split lock detection is forced on for guest vcpu.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- arch/x86/include/asm/cpu.h  | 33 +++++++++++++++++++++++++++++++++
- arch/x86/kernel/cpu/intel.c | 20 ++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ Documentation/virt/kvm/cpuid.rst     | 29 ++++++++++++++++++++--------
+ arch/x86/include/uapi/asm/kvm_para.h |  8 +++++---
+ 2 files changed, 26 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-index dd17c2da1af5..a57f00f1d5b5 100644
---- a/arch/x86/include/asm/cpu.h
-+++ b/arch/x86/include/asm/cpu.h
-@@ -45,6 +45,7 @@ extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
- extern void switch_to_sld(unsigned long tifn);
- extern bool handle_user_split_lock(struct pt_regs *regs, long error_code);
- extern bool handle_guest_split_lock(unsigned long ip);
-+extern bool split_lock_virt_switch(bool on);
- #else
- static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
- static inline void switch_to_sld(unsigned long tifn) {}
-@@ -57,5 +58,37 @@ static inline bool handle_guest_split_lock(unsigned long ip)
- {
- 	return false;
- }
-+
-+static inline bool split_lock_virt_switch(bool on) { return false; }
- #endif
-+
-+/**
-+ * split_lock_set_guest - Set SLD state for a guest
-+ * @guest_sld_on:	If SLD is on in the guest
-+ *
-+ * returns:		%true if SLD was enabled in the task
-+ *
-+ * Must be called when X86_FEATURE_SPLIT_LOCK_DETECT is available.
-+ */
-+static inline bool split_lock_set_guest(bool guest_sld_on)
-+{
-+	if (static_cpu_has(X86_FEATURE_SLD_FATAL))
-+		return true;
-+
-+	return split_lock_virt_switch(guest_sld_on);
-+}
-+
-+/**
-+ * split_lock_restore_host - Restore host SLD state
-+ * @host_sld_on:		If SLD is on in the host
-+ *
-+ * Must be called when X86_FEATURE_SPLIT_LOCK_DETECT is available.
-+ */
-+static inline void split_lock_restore_host(bool host_sld_on)
-+{
-+	if (static_cpu_has(X86_FEATURE_SLD_FATAL))
-+		return;
-+
-+	split_lock_virt_switch(host_sld_on);
-+}
- #endif /* _ASM_X86_CPU_H */
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index 93b8ccf2fa11..1e2a74e8c592 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -1062,6 +1062,26 @@ static void split_lock_init(void)
- 	split_lock_verify_msr(boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT));
- }
+diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
+index 01b081f6e7ea..a7e85ac090a8 100644
+--- a/Documentation/virt/kvm/cpuid.rst
++++ b/Documentation/virt/kvm/cpuid.rst
+@@ -86,6 +86,12 @@ KVM_FEATURE_PV_SCHED_YIELD        13          guest checks this feature bit
+                                               before using paravirtualized
+                                               sched yield.
  
-+/*
-+ * It should never be called directly but should use split_lock_set_guest()
-+ * and split_lock_restore_host() instead.
-+ *
-+ * The caller needs to be in preemption disabled context to ensure
-+ * MSR state and TIF_SLD_DISABLED state consistent.
-+ */
-+bool split_lock_virt_switch(bool on)
-+{
-+	bool was_on = !test_thread_flag(TIF_SLD_DISABLED);
++KVM_FEATURE_SPLIT_LOCK_DETECT     14          guest checks this feature bit for
++                                              available of split lock detection.
 +
-+	if (on != was_on) {
-+		sld_update_msr(on);
-+		update_thread_flag(TIF_SLD_DISABLED, !on);
-+	}
++                                              KVM doesn't support enumerating
++					      split lock detection via CPU model
 +
-+	return was_on;
-+}
-+EXPORT_SYMBOL_GPL(split_lock_virt_switch);
+ KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
+                                               per-cpu warps are expeced in
+                                               kvmclock
+@@ -97,11 +103,18 @@ KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
+ 
+ Where ``flag`` here is defined as below:
+ 
+-================== ============ =================================
+-flag               value        meaning
+-================== ============ =================================
+-KVM_HINTS_REALTIME 0            guest checks this feature bit to
+-                                determine that vCPUs are never
+-                                preempted for an unlimited time
+-                                allowing optimizations
+-================== ============ =================================
++================================ ============ =================================
++flag                             value        meaning
++================================ ============ =================================
++KVM_HINTS_REALTIME               0            guest checks this feature bit to
++                                              determine that vCPUs are never
++                                              preempted for an unlimited time
++                                              allowing optimizations
 +
- static void split_lock_warn(unsigned long ip)
- {
- 	pr_warn_ratelimited("#AC: %s/%d took a split_lock trap at address: 0x%lx\n",
++KVM_HINTS_SLD_FATAL              1            set if split lock detection is
++                                              forced on in the host, in which
++					      case KVM will kill the guest if it
++					      generates a split lock #AC with
++					      SLD disabled from guest's
++					      perspective
++================================ ============ =================================
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index 2a8e0b6b9805..a8fe0221403a 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -31,14 +31,16 @@
+ #define KVM_FEATURE_PV_SEND_IPI	11
+ #define KVM_FEATURE_POLL_CONTROL	12
+ #define KVM_FEATURE_PV_SCHED_YIELD	13
+-
+-#define KVM_HINTS_REALTIME      0
+-
++#define KVM_FEATURE_SPLIT_LOCK_DETECT	14
+ /* The last 8 bits are used to indicate how to interpret the flags field
+  * in pvclock structure. If no bits are set, all flags are ignored.
+  */
+ #define KVM_FEATURE_CLOCKSOURCE_STABLE_BIT	24
+ 
++/* KVM feature hints in CPUID.0x40000001.EDX */
++#define KVM_HINTS_REALTIME	0
++#define KVM_HINTS_SLD_FATAL	1
++
+ #define MSR_KVM_WALL_CLOCK  0x11
+ #define MSR_KVM_SYSTEM_TIME 0x12
+ 
 -- 
 2.18.2
 
