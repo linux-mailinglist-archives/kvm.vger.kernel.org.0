@@ -2,96 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B89B71CC1CA
-	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 15:28:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 850051CC1FF
+	for <lists+kvm@lfdr.de>; Sat,  9 May 2020 16:06:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726904AbgEIN2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 May 2020 09:28:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39899 "EHLO
+        id S1727106AbgEIOGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 May 2020 10:06:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35211 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726942AbgEIN2t (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 9 May 2020 09:28:49 -0400
+        by vger.kernel.org with ESMTP id S1727092AbgEIOGV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 9 May 2020 10:06:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589030929;
+        s=mimecast20190719; t=1589033180;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pgV5qMXPn6nUxGDkwIRdUCv59PWTCDtCRVhIT5FCAXg=;
-        b=ViJD2OeXJGeO0/dMmP4Ut1WB0Bz7I9SyImS0CsMu/I9g1Jj2F3ZM0ekuOcWV/9G26jCLWZ
-        GYgAqqhZZxZAlh/OirorMuh/gPR9gA7cLuGK9GOKMBDO6mSSEb8RgMJaW4758jJ0Xn9Xth
-        f5/dEaf7bj84RfnHpxmLw+8SnKc/mwM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-m4rbHNbbN9611UdwSF_qaw-1; Sat, 09 May 2020 09:28:47 -0400
-X-MC-Unique: m4rbHNbbN9611UdwSF_qaw-1
-Received: by mail-wr1-f69.google.com with SMTP id r11so2374848wrx.21
-        for <kvm@vger.kernel.org>; Sat, 09 May 2020 06:28:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pgV5qMXPn6nUxGDkwIRdUCv59PWTCDtCRVhIT5FCAXg=;
-        b=a5WjPIyJMzQbVjhD4YDbBI0USmYsAYupgYfRosZPCXqzpe3Gl5AH8gndBvlpSSTeYR
-         W4gC5KJrnR8p6kq9kKdFu2y21AV5fdi09g3A2B0Y3rCkZ6Q6kHPB8uXpfbeFExSUUpr/
-         d81XcdLWPP+/IlzUkAGdRFh3rWiNJPa6lvpRbNL6G35ILoBK7PxJvIHYZnIizL0Z7aHb
-         J9dq6IXOi6+YE9ASQneb+kFOKmI0mJ2Gid7sTuWkpaELlSIJ4oZmXmCPHhYLHWMi8ayj
-         gXTNxFzSrhUXQO+TUyprd6ZJOreUXtLuJ7fK6WAYbmO4fCKjHM5yf2DrPt5brHC+LMP+
-         xUQA==
-X-Gm-Message-State: AGi0Pua6ohK6i8zY6l96bwbhWGjSzZo8RNmBOerJYxN5fCG1kQ31Z+3Z
-        2COWi1XBWP64ACQw+VGcdpA5sYII7vJE6USLjLAl5IecFsyM8FkVZTiaSF9I1bvaYF+SQuWGaP6
-        1Uqel2Mj1YuRn
-X-Received: by 2002:a5d:66c9:: with SMTP id k9mr6288186wrw.307.1589030925673;
-        Sat, 09 May 2020 06:28:45 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI2iks93LwOr88tUV8jDKcOHKVjqxqThuwkg1n5O41W5X1Qga1b8PVXal6PWA7BMuHirdznnQ==
-X-Received: by 2002:a5d:66c9:: with SMTP id k9mr6288169wrw.307.1589030925435;
-        Sat, 09 May 2020 06:28:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1cb4:2b36:6750:73ce? ([2001:b07:6468:f312:1cb4:2b36:6750:73ce])
-        by smtp.gmail.com with ESMTPSA id f123sm4155582wmf.44.2020.05.09.06.28.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 May 2020 06:28:44 -0700 (PDT)
-Subject: Re: [PATCH v2 8/9] KVM: x86, SVM: isolate vcpu->arch.dr6 from
- vmcb->save.dr6
-To:     Peter Xu <peterx@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20200507115011.494562-1-pbonzini@redhat.com>
- <20200507115011.494562-9-pbonzini@redhat.com> <20200507192808.GK228260@xz-x1>
- <dd8eb45b-4556-6aaa-0061-11b9124020b1@redhat.com>
- <20200508153210.GZ228260@xz-x1>
+         to:to:cc; bh=4i8mGUWttw4oOkp1Jk8ARsgUGl5YbWkieitfPAJSHiA=;
+        b=f9Dwad1P+RYqIw5nX752alfqLv973EZ0/LtImKphsLelKKG2opSy3TpP+J3UHLFr5nrc7t
+        lkWMAmBpMt2dcAC3c4sBKlXezYFZ9IdzOoxR6UuJxpjbG1POS5DyvmUzH0Vu1NFM8OZqJ7
+        bUTlcg/50gWfKtr1SRTnlyeWm97db9k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-11Dnuj8vNXqWR5uP-mxXTQ-1; Sat, 09 May 2020 10:06:16 -0400
+X-MC-Unique: 11Dnuj8vNXqWR5uP-mxXTQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA7751895A3F
+        for <kvm@vger.kernel.org>; Sat,  9 May 2020 14:06:15 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 95FB219C58
+        for <kvm@vger.kernel.org>; Sat,  9 May 2020 14:06:15 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a0dd65bc-bfea-75b8-60d7-5060b9ee6c51@redhat.com>
-Date:   Sat, 9 May 2020 15:28:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200508153210.GZ228260@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] svm_tests: add RSM intercept test
+Date:   Sat,  9 May 2020 10:06:14 -0400
+Message-Id: <20200509140614.531850-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/05/20 17:32, Peter Xu wrote:
-> On Fri, May 08, 2020 at 12:33:57AM +0200, Paolo Bonzini wrote:
->> On 07/05/20 21:28, Peter Xu wrote:
->>>> -	svm->vcpu.arch.dr6 = dr6;
->>>> +	WARN_ON(svm->vcpu.arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT);
->>>> +	svm->vcpu.arch.dr6 &= ~(DR_TRAP_BITS | DR6_RTM);
->>>> +	svm->vcpu.arch.dr6 |= dr6 & ~DR6_FIXED_1;
->>> I failed to figure out what the above calculation is going to do... 
->>
->> The calculation is merging the cause of the #DB with the guest DR6.
->> It's basically the same effect as kvm_deliver_exception_payload.
-> 
-> Shall we introduce a helper for both kvm_deliver_exception_payload and here
-> (e.g. kvm_merge_dr6)?  Also, wondering whether this could be a bit easier to
-> follow by defining:
+This test is currently broken, but it passes under QEMU.
 
-It would make sense indeed but I plan to get rid of this in 5.9 (so in
-about a month), as explained in the comment.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/svm_tests.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-Paolo
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index cb3ace1..c1abd55 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -66,6 +66,52 @@ static bool check_vmrun(struct svm_test *test)
+     return vmcb->control.exit_code == SVM_EXIT_VMRUN;
+ }
+ 
++static void prepare_rsm_intercept(struct svm_test *test)
++{
++    default_prepare(test);
++    vmcb->control.intercept |= 1 << INTERCEPT_RSM;
++    vmcb->control.intercept_exceptions |= (1ULL << UD_VECTOR);
++}
++
++static void test_rsm_intercept(struct svm_test *test)
++{
++    asm volatile ("rsm" : : : "memory");
++}
++
++static bool check_rsm_intercept(struct svm_test *test)
++{
++    return get_test_stage(test) == 2;
++}
++
++static bool finished_rsm_intercept(struct svm_test *test)
++{
++    switch (get_test_stage(test)) {
++    case 0:
++        if (vmcb->control.exit_code != SVM_EXIT_RSM) {
++            report(false, "VMEXIT not due to rsm. Exit reason 0x%x",
++                   vmcb->control.exit_code);
++            return true;
++        }
++        vmcb->control.intercept &= ~(1 << INTERCEPT_RSM);
++        inc_test_stage(test);
++        break;
++
++    case 1:
++        if (vmcb->control.exit_code != SVM_EXIT_EXCP_BASE + UD_VECTOR) {
++            report(false, "VMEXIT not due to #UD. Exit reason 0x%x",
++                   vmcb->control.exit_code);
++            return true;
++        }
++        vmcb->save.rip += 2;
++        inc_test_stage(test);
++        break;
++
++    default:
++        return true;
++    }
++    return get_test_stage(test) == 2;
++}
++
+ static void prepare_cr3_intercept(struct svm_test *test)
+ {
+     default_prepare(test);
+@@ -1819,6 +1865,9 @@ struct svm_test svm_tests[] = {
+     { "vmrun intercept check", default_supported, prepare_no_vmrun_int,
+       default_prepare_gif_clear, null_test, default_finished,
+       check_no_vmrun_int },
++    { "rsm", default_supported,
++      prepare_rsm_intercept, default_prepare_gif_clear,
++      test_rsm_intercept, finished_rsm_intercept, check_rsm_intercept },
+     { "cr3 read intercept", default_supported,
+       prepare_cr3_intercept, default_prepare_gif_clear,
+       test_cr3_intercept, default_finished, check_cr3_intercept },
+-- 
+2.18.2
 
