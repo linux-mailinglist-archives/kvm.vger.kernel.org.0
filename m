@@ -2,135 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AACB51CCAB8
-	for <lists+kvm@lfdr.de>; Sun, 10 May 2020 14:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F24A1CCC32
+	for <lists+kvm@lfdr.de>; Sun, 10 May 2020 18:17:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728789AbgEJMNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 May 2020 08:13:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54767 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728645AbgEJMNK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 10 May 2020 08:13:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589112789;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qP/sxaANp1JY7bumO45mdIobp9ZW6EsO7vb9OqH2jFM=;
-        b=M09fODKFt9rfQjK6laSNbYgg3E++kkevi0880vST1Oy6/D6+76jflEmF1zxJ65PNhgHvpR
-        ncyoRVwmYFQCclI/8m0N5eZORGc1BupngcjJvht3NyJCnRKj5thxtz54mBLH/4uTp4lv2T
-        ORissmH02F3shIOB0td4KQVmk7hSz/M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-lcTXQcuvOVOjDDiNIm7p9w-1; Sun, 10 May 2020 08:13:03 -0400
-X-MC-Unique: lcTXQcuvOVOjDDiNIm7p9w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77E66460;
-        Sun, 10 May 2020 12:13:02 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E4BA6AD10;
-        Sun, 10 May 2020 12:13:00 +0000 (UTC)
-Message-ID: <a221de5c2a823c508e09b664ce38db4e980e83d6.camel@redhat.com>
-Subject: Re: [PATCH v2] KVM: SVM: Disable AVIC before setting V_IRQ
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     joro@8bytes.org, jon.grimm@amd.com
-Date:   Sun, 10 May 2020 15:13:00 +0300
-In-Reply-To: <793e7151-e14c-f254-7911-a4371ad635aa@redhat.com>
-References: <1588818939-54264-1-git-send-email-suravee.suthikulpanit@amd.com>
-         <793e7151-e14c-f254-7911-a4371ad635aa@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1729085AbgEJQRI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 May 2020 12:17:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58984 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728123AbgEJQRH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 10 May 2020 12:17:07 -0400
+Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20B4C061A0C
+        for <kvm@vger.kernel.org>; Sun, 10 May 2020 09:17:07 -0700 (PDT)
+Received: by mail-qt1-x843.google.com with SMTP id v4so4980331qte.3
+        for <kvm@vger.kernel.org>; Sun, 10 May 2020 09:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lca.pw; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JpYYcxBZr7TCP2ENX63uBdQLllRDV18FrRXkes3kPkc=;
+        b=iHK7iF0PjUPS4eJxdGh+6gxsf97besUffeTmdryBOgmkZiFoyLXL4CRssiZR8lsPD4
+         E9WhvbtWztWO5TaFNPMf5YkZN32iZcFaw5xzfMbAiy8TGX1d0c1xtl8ABjXU0OUD8f7e
+         Y8SiMUtrim7Zr33uOPGCzgFUTQMK0tH0fcl7BRNDIqMhVYmIsTBRqTaXGtRBdpbXEnTS
+         lnVX5wJYTtEsa28KSBXy9e4RWbWTOYX8DaLCwkqN5mDB9diFfsFCdidCk+7FAW7QBp6m
+         kQ8zlrR9fH5Bst0pk7i7cmSh3nq2EM0nPbSHnRJ2ooQoCvP6ATivGeve+bvv4Mg3cHfJ
+         w3xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JpYYcxBZr7TCP2ENX63uBdQLllRDV18FrRXkes3kPkc=;
+        b=AKqbXCsC8YA7czqWmM7FG9+/lTxAYIW9wlmNBpkMOFtm/GXoCRWv8pbUH2+NSKEX8x
+         7fX+0UY9LzGjvVVem5a/eEEiXaUZc3oytrEI5f91N0rT18/09PEUriXh0Mfczqt35J3b
+         lzFgNrz2FnZbIfZXu/rnDzw/ErJwSJjXzblhLP3TZPHb+u/ruPDPBZiEsYOhC7BwEV0B
+         gYw5HgLSwOF5VQ6gYkcuflsPjU3lv8gE7+C6qZglXF7fXMdflUQJY7t8lHaEqhSlEslJ
+         xDqtmnqPBGI1p/Sx7QRPhRx1D+4EA9MCtvmGfKS/iKtb4BUaA9i2k0awx9wrLrgukKdK
+         p7eg==
+X-Gm-Message-State: AGi0Pub08Pp/BbcV3cCrN7C8P5sfue6S4lvHHDV1gCcH8dP1HpsLcDja
+        XJLVXzaqwhFlxf0lHdwxQ1aBMdjyHOolbQ==
+X-Google-Smtp-Source: APiQypIszZjwLtfzKWJkbg6ANv4kgjHqMD9Iqqo/jM+kZ4lEgybs++KRtUkURoZq/TIboSANZ+BeLg==
+X-Received: by 2002:ac8:5208:: with SMTP id r8mr12614851qtn.11.1589127426897;
+        Sun, 10 May 2020 09:17:06 -0700 (PDT)
+Received: from ovpn-112-210.rdu2.redhat.com (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
+        by smtp.gmail.com with ESMTPSA id t67sm6225872qka.17.2020.05.10.09.17.05
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 10 May 2020 09:17:06 -0700 (PDT)
+From:   Qian Cai <cai@lca.pw>
+To:     alex.williamson@redhat.com
+Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
+Subject: [PATCH] vfio/pci: fix memory leaks in alloc_perm_bits()
+Date:   Sun, 10 May 2020 12:16:56 -0400
+Message-Id: <20200510161656.1415-1-cai@lca.pw>
+X-Mailer: git-send-email 2.21.0 (Apple Git-122.2)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-05-07 at 10:27 +0200, Paolo Bonzini wrote:
-> On 07/05/20 04:35, Suravee Suthikulpanit wrote:
-> > The commit 64b5bd270426 ("KVM: nSVM: ignore L1 interrupt window
-> > while running L2 with V_INTR_MASKING=1") introduced a WARN_ON,
-> > which checks if AVIC is enabled when trying to set V_IRQ
-> > in the VMCB for enabling irq window.
-> > 
-> > The following warning is triggered because the requesting vcpu
-> > (to deactivate AVIC) does not get to process APICv update request
-> > for itself until the next #vmexit.
-> > 
-> > WARNING: CPU: 0 PID: 118232 at arch/x86/kvm/svm/svm.c:1372 enable_irq_window+0x6a/0xa0 [kvm_amd]
-> >  RIP: 0010:enable_irq_window+0x6a/0xa0 [kvm_amd]
-> >  Call Trace:
-> >   kvm_arch_vcpu_ioctl_run+0x6e3/0x1b50 [kvm]
-> >   ? kvm_vm_ioctl_irq_line+0x27/0x40 [kvm]
-> >   ? _copy_to_user+0x26/0x30
-> >   ? kvm_vm_ioctl+0xb3e/0xd90 [kvm]
-> >   ? set_next_entity+0x78/0xc0
-> >   kvm_vcpu_ioctl+0x236/0x610 [kvm]
-> >   ksys_ioctl+0x8a/0xc0
-> >   __x64_sys_ioctl+0x1a/0x20
-> >   do_syscall_64+0x58/0x210
-> >   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > 
-> > Fixes by sending APICV update request to all other vcpus, and
-> > immediately update APIC for itself.
-> > 
-> > Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> > Link: https://lkml.org/lkml/2020/5/2/167
-> > Fixes: 64b5bd270426 ("KVM: nSVM: ignore L1 interrupt window while running L2 with V_INTR_MASKING=1")
-> > ---
-> >  arch/x86/kvm/x86.c | 13 ++++++++++++-
-> >  1 file changed, 12 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index df473f9..69a01ea 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -8085,6 +8085,7 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
-> >   */
-> >  void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
-> >  {
-> > +	struct kvm_vcpu *except;
-> >  	unsigned long old, new, expected;
-> >  
-> >  	if (!kvm_x86_ops.check_apicv_inhibit_reasons ||
-> > @@ -8110,7 +8111,17 @@ void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
-> >  	trace_kvm_apicv_update_request(activate, bit);
-> >  	if (kvm_x86_ops.pre_update_apicv_exec_ctrl)
-> >  		kvm_x86_ops.pre_update_apicv_exec_ctrl(kvm, activate);
-> > -	kvm_make_all_cpus_request(kvm, KVM_REQ_APICV_UPDATE);
-> > +
-> > +	/*
-> > +	 * Sending request to update APICV for all other vcpus,
-> > +	 * while update the calling vcpu immediately instead of
-> > +	 * waiting for another #VMEXIT to handle the request.
-> > +	 */
-> > +	except = kvm_get_running_vcpu();
-> > +	kvm_make_all_cpus_request_except(kvm, KVM_REQ_APICV_UPDATE,
-> > +					 except);
-> > +	if (except)
-> > +		kvm_vcpu_update_apicv(except);
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_request_apicv_update);
-> >  
-> > 
-> 
-> Queued, thanks.
-> 
-> Paolo
-> 
-I tested this patch today on top of kvm/queue,
-the patch that add kvm_make_all_cpus_request_except and this patch
-(the former patch needs slight adjustment to apply).
+vfio_pci_disable() calls vfio_config_free() but forgets to call
+free_perm_bits() resulting in memory leaks,
 
-Best regards,
-	Maxim Levitsky
+unreferenced object 0xc000000c4db2dee0 (size 16):
+  comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
+  hex dump (first 16 bytes):
+    00 00 ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
+  backtrace:
+    [<00000000a6a4552d>] alloc_perm_bits+0x58/0xe0 [vfio_pci]
+    [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
+    init_pci_cap_msi_perm at drivers/vfio/pci/vfio_pci_config.c:1125
+    (inlined by) vfio_msi_cap_len at drivers/vfio/pci/vfio_pci_config.c:1180
+    (inlined by) vfio_cap_len at drivers/vfio/pci/vfio_pci_config.c:1241
+    (inlined by) vfio_cap_init at drivers/vfio/pci/vfio_pci_config.c:1468
+    (inlined by) vfio_config_init at drivers/vfio/pci/vfio_pci_config.c:1707
+    [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
+    [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
+    [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
+    [<000000006577923d>] sys_ioctl+0x28/0x40
+    [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
+    [<0000000008ea7dd5>] system_call_common+0xf0/0x278
+unreferenced object 0xc000000c4db2e330 (size 16):
+  comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
+  hex dump (first 16 bytes):
+    00 ff ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
+  backtrace:
+    [<000000004c71914f>] alloc_perm_bits+0x44/0xe0 [vfio_pci]
+    [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
+    [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
+    [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
+    [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
+    [<000000006577923d>] sys_ioctl+0x28/0x40
+    [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
+    [<0000000008ea7dd5>] system_call_common+0xf0/0x278
 
+Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+Signed-off-by: Qian Cai <cai@lca.pw>
+---
+ drivers/vfio/pci/vfio_pci_config.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 90c0b80f8acf..f9fdc72a5f4e 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -1728,6 +1728,7 @@ void vfio_config_free(struct vfio_pci_device *vdev)
+ 	vdev->vconfig = NULL;
+ 	kfree(vdev->pci_config_map);
+ 	vdev->pci_config_map = NULL;
++	free_perm_bits(vdev->msi_perm);
+ 	kfree(vdev->msi_perm);
+ 	vdev->msi_perm = NULL;
+ }
+-- 
+2.21.0 (Apple Git-122.2)
 
