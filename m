@@ -2,171 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42A031CC6EF
-	for <lists+kvm@lfdr.de>; Sun, 10 May 2020 07:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3392F1CCA87
+	for <lists+kvm@lfdr.de>; Sun, 10 May 2020 13:02:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728146AbgEJFPy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 May 2020 01:15:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45198 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726629AbgEJFPy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 May 2020 01:15:54 -0400
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 02E432495C
-        for <kvm@vger.kernel.org>; Sun, 10 May 2020 05:15:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589087754;
-        bh=t7OQLTIXuGL96dx+kNLL3AbQ0katVk2LF5iQG5oESdE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=i3eHbpXjw0bJe+9YiwcIjIDdALHuGcSyvHQ1VZFUqLub0EFjw05+GGO8GYJi/oTt8
-         1cGg+K/WtpmSdBIAbE83ds8iKnbRO/M0bvTT7OQeiW5Khv5QkZm3CsYgxUBiLblT0T
-         xvhF1pSf8DMlpoqf5RvnJxEQaIw5LSWdsDaItFfc=
-Received: by mail-wr1-f49.google.com with SMTP id j5so6676067wrq.2
-        for <kvm@vger.kernel.org>; Sat, 09 May 2020 22:15:53 -0700 (PDT)
-X-Gm-Message-State: AGi0Pub2HkkQexL+mLILQnIGd4fvsOrP3gUAu7JND9wzw6aJ0ru4bkS6
-        +CLnsdH+VIJijGIKS/MVKs7rfZ1geZ6m5lesb+ClLQ==
-X-Google-Smtp-Source: APiQypI/2IcENdMUlGzuFOkNQBcqpLGrIdvnZu9gpjupdPaPbLc1HLvZZh1HqrthlXt2P8chNZ4GK+Wlpj8/O/fmpB8=
-X-Received: by 2002:adf:f446:: with SMTP id f6mr4007350wrp.75.1589087752473;
- Sat, 09 May 2020 22:15:52 -0700 (PDT)
+        id S1726629AbgEJLCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 May 2020 07:02:23 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:7454 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726043AbgEJLCW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 May 2020 07:02:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1589108542; x=1620644542;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=kRA32J9VjPd5GhXxmUjtK9WR+tdYKtXlyIKqjRjvds4=;
+  b=kwOM9dPoNKU0tdkaz3jMuVkZYLl72dECF7EWw9463waGE+M7ua2Ugl64
+   GlwvCShwz4GvqEuDOBiveed8l+b8/eKHumirFXbr5r+zCFJMWMgmf6S0z
+   TSX7m9TbdH+GXve/TfVXUuOLwrrfRAWpt5BAmkyzAZJV/qS8wEdGkX99t
+   Q=;
+IronPort-SDR: MwGxtAgcSS4nmDlykRZalRVijBBroxmPd+GcNzGvuCZ1UIY6VFnz0hwuRBflNbKCYLzpl6rJ6b
+ rbHganDI9qRg==
+X-IronPort-AV: E=Sophos;i="5.73,375,1583193600"; 
+   d="scan'208";a="42326554"
+Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
+Thread-Topic: [PATCH v1 00/15] Add support for Nitro Enclaves
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-17c49630.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 10 May 2020 11:02:20 +0000
+Received: from EX13MTAUWA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1e-17c49630.us-east-1.amazon.com (Postfix) with ESMTPS id 2BE10A1E8B;
+        Sun, 10 May 2020 11:02:18 +0000 (UTC)
+Received: from EX13D10UWA003.ant.amazon.com (10.43.160.248) by
+ EX13MTAUWA001.ant.amazon.com (10.43.160.118) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sun, 10 May 2020 11:02:18 +0000
+Received: from EX13D21UWA003.ant.amazon.com (10.43.160.184) by
+ EX13D10UWA003.ant.amazon.com (10.43.160.248) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sun, 10 May 2020 11:02:18 +0000
+Received: from EX13D21UWA003.ant.amazon.com ([10.43.160.184]) by
+ EX13D21UWA003.ant.amazon.com ([10.43.160.184]) with mapi id 15.00.1497.006;
+ Sun, 10 May 2020 11:02:18 +0000
+From:   "Herrenschmidt, Benjamin" <benh@amazon.com>
+To:     "pavel@ucw.cz" <pavel@ucw.cz>,
+        "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "Liguori, Anthony" <aliguori@amazon.com>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "ne-devel-upstream@amazon.com" <ne-devel-upstream@amazon.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "van der Linden, Frank" <fllinden@amazon.com>,
+        "Smith, Stewart" <trawets@amazon.com>,
+        "Pohlack, Martin" <mpohlack@amazon.de>,
+        "Wilson, Matt" <msw@amazon.com>, "Dannowski, Uwe" <uwed@amazon.de>,
+        "Doebel, Bjoern" <doebel@amazon.de>
+Thread-Index: AQHWJQZmwcsXbLPvp0aDqkxP7IsAE6igJAKAgAEG3wA=
+Date:   Sun, 10 May 2020 11:02:18 +0000
+Message-ID: <1b00857202884c2a27d0e381d6de312201d17868.camel@amazon.com>
+References: <20200421184150.68011-1-andraprs@amazon.com>
+         <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
+         <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
+         <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com>
+         <20200507174438.GB1216@bug>
+         <620bf5ae-eade-37da-670d-a8704d9b4397@amazon.com>
+         <20200509192125.GA1597@bug>
+In-Reply-To: <20200509192125.GA1597@bug>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.162.200]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2CEE01186C01554B923E06BDA18EFCCA@amazon.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200509110542.8159-1-xiaoyao.li@intel.com> <20200509110542.8159-9-xiaoyao.li@intel.com>
-In-Reply-To: <20200509110542.8159-9-xiaoyao.li@intel.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Sat, 9 May 2020 22:15:41 -0700
-X-Gmail-Original-Message-ID: <CALCETrWJGyyyvsgryvro45WNNpnSZ2k_QEjm95-+5rvREztOYA@mail.gmail.com>
-Message-ID: <CALCETrWJGyyyvsgryvro45WNNpnSZ2k_QEjm95-+5rvREztOYA@mail.gmail.com>
-Subject: Re: [PATCH v9 8/8] x86/split_lock: Enable split lock detection
- initialization when running as an guest on KVM
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Tony Luck <tony.luck@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>
-Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 8, 2020 at 8:04 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> When running as guest, enumerating feature split lock detection through
-> CPU model is not easy since CPU model is configurable by host VMM.
->
-> If running upon KVM, it can be enumerated through
-> KVM_FEATURE_SPLIT_LOCK_DETECT,
-
-This needs crystal clear documentation.  What, exactly, is the host
-telling the guest if it sets this flag?
-
-> and if KVM_HINTS_SLD_FATAL is set, it
-> needs to be set to sld_fatal mode.
-
-
-This needs much better docs.  Do you mean:
-
-"If KVM_HINTS_SLD_FATAL is set, then the guest will get #AC if it does
-a split-lock regardless of what is written to MSR_TEST_CTRL?"
-
-
->
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  arch/x86/include/asm/cpu.h  |  2 ++
->  arch/x86/kernel/cpu/intel.c | 12 ++++++++++--
->  arch/x86/kernel/kvm.c       |  3 +++
->  3 files changed, 15 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-> index a57f00f1d5b5..5d5b488b4b45 100644
-> --- a/arch/x86/include/asm/cpu.h
-> +++ b/arch/x86/include/asm/cpu.h
-> @@ -42,12 +42,14 @@ unsigned int x86_model(unsigned int sig);
->  unsigned int x86_stepping(unsigned int sig);
->  #ifdef CONFIG_CPU_SUP_INTEL
->  extern void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
-> +extern void __init split_lock_setup(bool fatal);
->  extern void switch_to_sld(unsigned long tifn);
->  extern bool handle_user_split_lock(struct pt_regs *regs, long error_code);
->  extern bool handle_guest_split_lock(unsigned long ip);
->  extern bool split_lock_virt_switch(bool on);
->  #else
->  static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
-> +static inline void __init split_lock_setup(bool fatal) {}
->  static inline void switch_to_sld(unsigned long tifn) {}
->  static inline bool handle_user_split_lock(struct pt_regs *regs, long error_code)
->  {
-> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-> index 1e2a74e8c592..02e24134b9b5 100644
-> --- a/arch/x86/kernel/cpu/intel.c
-> +++ b/arch/x86/kernel/cpu/intel.c
-> @@ -996,12 +996,18 @@ static bool split_lock_verify_msr(bool on)
->         return ctrl == tmp;
->  }
->
-> -static void __init split_lock_setup(void)
-> +void __init split_lock_setup(bool fatal)
->  {
->         enum split_lock_detect_state state = sld_warn;
->         char arg[20];
->         int i, ret;
->
-> +       if (fatal) {
-> +               state = sld_fatal;
-> +               pr_info("forced on, sending SIGBUS on user-space split_locks\n");
-> +               goto set_cap;
-> +       }
-> +
->         if (!split_lock_verify_msr(false)) {
->                 pr_info("MSR access failed: Disabled\n");
->                 return;
-> @@ -1037,6 +1043,7 @@ static void __init split_lock_setup(void)
->                 return;
->         }
->
-> +set_cap:
->         setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
->         if (state == sld_fatal)
->                 setup_force_cpu_cap(X86_FEATURE_SLD_FATAL);
-> @@ -1161,6 +1168,7 @@ void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c)
->         const struct x86_cpu_id *m;
->         u64 ia32_core_caps;
->
-> +       /* Note, paravirt support can enable SLD, e.g., see kvm_guest_init(). */
->         if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
->                 return;
->
-> @@ -1182,5 +1190,5 @@ void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c)
->                 return;
->         }
->
-> -       split_lock_setup();
-> +       split_lock_setup(false);
->  }
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 6efe0410fb72..489ea89e2e8e 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -670,6 +670,9 @@ static void __init kvm_guest_init(void)
->          * overcommitted.
->          */
->         hardlockup_detector_disable();
-> +
-> +       if (kvm_para_has_feature(KVM_FEATURE_SPLIT_LOCK_DETECT))
-> +               split_lock_setup(kvm_para_has_hint(KVM_HINTS_SLD_FATAL));
->  }
->
->  static noinline uint32_t __kvm_cpuid_base(void)
-> --
-> 2.18.2
->
+T24gU2F0LCAyMDIwLTA1LTA5IGF0IDIxOjIxICswMjAwLCBQYXZlbCBNYWNoZWsgd3JvdGU6DQo+
+IA0KPiBPbiBGcmkgMjAyMC0wNS0wOCAxMDowMDoyNywgUGFyYXNjaGl2LCBBbmRyYS1JcmluYSB3
+cm90ZToNCj4gPiANCj4gPiANCj4gPiBPbiAwNy8wNS8yMDIwIDIwOjQ0LCBQYXZlbCBNYWNoZWsg
+d3JvdGU6DQo+ID4gPiANCj4gPiA+IEhpIQ0KPiA+ID4gDQo+ID4gPiA+ID4gaXQgdXNlcyBpdHMg
+b3duIG1lbW9yeSBhbmQgQ1BVcyArIGl0cyB2aXJ0aW8tdnNvY2sgZW11bGF0ZWQgZGV2aWNlIGZv
+cg0KPiA+ID4gPiA+IGNvbW11bmljYXRpb24gd2l0aCB0aGUgcHJpbWFyeSBWTS4NCj4gPiA+ID4g
+PiANCj4gPiA+ID4gPiBUaGUgbWVtb3J5IGFuZCBDUFVzIGFyZSBjYXJ2ZWQgb3V0IG9mIHRoZSBw
+cmltYXJ5IFZNLCB0aGV5IGFyZSBkZWRpY2F0ZWQNCj4gPiA+ID4gPiBmb3IgdGhlIGVuY2xhdmUu
+IFRoZSBOaXRybyBoeXBlcnZpc29yIHJ1bm5pbmcgb24gdGhlIGhvc3QgZW5zdXJlcyBtZW1vcnkN
+Cj4gPiA+ID4gPiBhbmQgQ1BVIGlzb2xhdGlvbiBiZXR3ZWVuIHRoZSBwcmltYXJ5IFZNIGFuZCB0
+aGUgZW5jbGF2ZSBWTS4NCj4gPiA+ID4gPiANCj4gPiA+ID4gPiBUaGVzZSB0d28gY29tcG9uZW50
+cyBuZWVkIHRvIHJlZmxlY3QgdGhlIHNhbWUgc3RhdGUgZS5nLiB3aGVuIHRoZQ0KPiA+ID4gPiA+
+IGVuY2xhdmUgYWJzdHJhY3Rpb24gcHJvY2VzcyAoMSkgaXMgdGVybWluYXRlZCwgdGhlIGVuY2xh
+dmUgVk0gKDIpIGlzDQo+ID4gPiA+ID4gdGVybWluYXRlZCBhcyB3ZWxsLg0KPiA+ID4gPiA+IA0K
+PiA+ID4gPiA+IFdpdGggcmVnYXJkIHRvIHRoZSBjb21tdW5pY2F0aW9uIGNoYW5uZWwsIHRoZSBw
+cmltYXJ5IFZNIGhhcyBpdHMgb3duDQo+ID4gPiA+ID4gZW11bGF0ZWQgdmlydGlvLXZzb2NrIFBD
+SSBkZXZpY2UuIFRoZSBlbmNsYXZlIFZNIGhhcyBpdHMgb3duIGVtdWxhdGVkDQo+ID4gPiA+ID4g
+dmlydGlvLXZzb2NrIGRldmljZSBhcyB3ZWxsLiBUaGlzIGNoYW5uZWwgaXMgdXNlZCwgZm9yIGV4
+YW1wbGUsIHRvIGZldGNoDQo+ID4gPiA+ID4gZGF0YSBpbiB0aGUgZW5jbGF2ZSBhbmQgdGhlbiBw
+cm9jZXNzIGl0LiBBbiBhcHBsaWNhdGlvbiB0aGF0IHNldHMgdXAgdGhlDQo+ID4gPiA+ID4gdnNv
+Y2sgc29ja2V0IGFuZCBjb25uZWN0cyBvciBsaXN0ZW5zLCBkZXBlbmRpbmcgb24gdGhlIHVzZSBj
+YXNlLCBpcyB0aGVuDQo+ID4gPiA+ID4gZGV2ZWxvcGVkIHRvIHVzZSB0aGlzIGNoYW5uZWw7IHRo
+aXMgaGFwcGVucyBvbiBib3RoIGVuZHMgLSBwcmltYXJ5IFZNDQo+ID4gPiA+ID4gYW5kIGVuY2xh
+dmUgVk0uDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gTGV0IG1lIGtub3cgaWYgZnVydGhlciBjbGFy
+aWZpY2F0aW9ucyBhcmUgbmVlZGVkLg0KPiA+ID4gPiANCj4gPiA+ID4gVGhhbmtzLCB0aGlzIGlz
+IGFsbCB1c2VmdWwuICBIb3dldmVyIGNhbiB5b3UgcGxlYXNlIGNsYXJpZnkgdGhlDQo+ID4gPiA+
+IGxvdy1sZXZlbCBkZXRhaWxzIGhlcmU/DQo+ID4gPiANCj4gPiA+IElzIHRoZSB2aXJ0dWFsIG1h
+Y2hpbmUgbWFuYWdlciBvcGVuLXNvdXJjZT8gSWYgc28sIEkgZ3Vlc3MgcG9pbnRlciBmb3Igc291
+cmNlcw0KPiA+ID4gd291bGQgYmUgdXNlZnVsLg0KPiA+IA0KPiA+IEhpIFBhdmVsLA0KPiA+IA0K
+PiA+IFRoYW5rcyBmb3IgcmVhY2hpbmcgb3V0Lg0KPiA+IA0KPiA+IFRoZSBWTU0gdGhhdCBpcyB1
+c2VkIGZvciB0aGUgcHJpbWFyeSAvIHBhcmVudCBWTSBpcyBub3Qgb3BlbiBzb3VyY2UuDQo+IA0K
+PiBEbyB3ZSB3YW50IHRvIG1lcmdlIGNvZGUgdGhhdCBvcGVuc291cmNlIGNvbW11bml0eSBjYW4g
+bm90IHRlc3Q/DQoNCkhlaGUuLiB0aGlzIGlzbid0IHF1aXRlIHRoZSBzdG9yeSBQYXZlbCA6KQ0K
+DQpXZSBtZXJnZSBzdXBwb3J0IGZvciBwcm9wcmlldGFyeSBoeXBlcnZpc29ycywgdGhpcyBpcyBu
+byBkaWZmZXJlbnQuIFlvdQ0KY2FuIHRlc3QgaXQsIHdlbGwgYXQgbGVhc3QgeW91J2xsIGJlIGFi
+bGUgdG8gLi4uIHdoZW4gQVdTIGRlcGxveXMgdGhlDQpmdW5jdGlvbmFsaXR5LiBZb3UgZG9uJ3Qg
+bmVlZCB0aGUgaHlwZXJ2aXNvciBpdHNlbGYgdG8gYmUgb3BlbiBzb3VyY2UuDQoNCkluIGZhY3Qs
+IGluIHRoaXMgY2FzZSwgaXQncyBub3QgZXZlbiBsb3cgbGV2ZWwgaW52YXNpdmUgYXJjaCBjb2Rl
+IGxpa2UNCnNvbWUgb2YgdGhlIGFib3ZlIGNhbiBiZS4gSXQncyBhIGRyaXZlciBmb3IgYSBQQ0kg
+ZGV2aWNlIDotKSBHcmFudGVkIGENCnZpcnR1YWwgb25lLiBXZSBtZXJnZSBkcml2ZXJzIGZvciBQ
+Q0kgZGV2aWNlcyByb3V0aW5lbHkgd2l0aG91dCB0aGUgUlRMDQpvciBmaXJtd2FyZSBvZiB0aG9z
+ZSBkZXZpY2VzIGJlaW5nIG9wZW4gc291cmNlLg0KDQpTbyB5ZXMsIHdlIHByb2JhYmx5IHdhbnQg
+dGhpcyBpZiBpdCdzIGdvaW5nIHRvIGJlIGEgdXNlZnVsIGZlYXR1cmVzIHRvDQp1c2VycyB3aGVu
+IHJ1bm5pbmcgb24gQVdTIEVDMi4gKERpc2NsYWltZXI6IEkgd29yayBmb3IgQVdTIHRoZXNlIGRh
+eXMpLg0KDQpDaGVlcnMsDQpCZW4uDQoNCg==
