@@ -2,83 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB5C81CDFED
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 18:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E634B1CE031
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 18:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730561AbgEKQFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 12:05:49 -0400
-Received: from mga17.intel.com ([192.55.52.151]:4979 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729556AbgEKQFt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 12:05:49 -0400
-IronPort-SDR: WyOoBFdLgQZkD3SGqrwvEQD9YVgA35ycz63XCKo4Jb4HX2FJ4JfeGyKLXOy1D0MHtyiwlgdXgf
- NFdiZ4LTt7og==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 09:05:37 -0700
-IronPort-SDR: CuMDmvp+guQCKnW5QRpcjkWNuNQFRokn/Nj3L8qOqtPmgy06fw4MKiTsfMC/lEktCXYOblITrY
- UgO4wK6iXg2Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,380,1583222400"; 
-   d="scan'208";a="463220514"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga005.fm.intel.com with ESMTP; 11 May 2020 09:05:37 -0700
-Date:   Mon, 11 May 2020 09:05:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Oliver Upton <oupton@google.com>,
-        Tony Cook <tony-cook@bigpond.com>, zoran.davidovac@gmail.com,
-        euloanty@live.com
-Subject: Re: [PATCH] KVM: Fix a warning in __kvm_gfn_to_hva_cache_init()
-Message-ID: <20200511160537.GC24052@linux.intel.com>
-References: <20200504190526.84456-1-peterx@redhat.com>
- <20200505013929.GA17225@linux.intel.com>
- <20200505141245.GH6299@xz-x1>
+        id S1730575AbgEKQPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 12:15:11 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26290 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726687AbgEKQPL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 12:15:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589213710;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hMmg8VXRFHP3NtN5OvlSRCC/9CYursiCkwl7Hbg93g0=;
+        b=UcM2L5DBBTShsOTMIDTriHKkzKFhg7Zkbn6FgbSVseu2LVGP6GIcLK2CnjKodb4qjEaE78
+        r+gRISeeAT8/p/noO4IGBqZ4pCz9mJuQ3xNor4kcRwz2LQogWmRi2eVoefS1pwA1tcCJhd
+        9C1BKRURx3eMR/xozqE4iN0Zx3O3rmI=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-GMRiycZRP0i7uYPGyKieBw-1; Mon, 11 May 2020 12:15:08 -0400
+X-MC-Unique: GMRiycZRP0i7uYPGyKieBw-1
+Received: by mail-qk1-f199.google.com with SMTP id l4so10571558qke.2
+        for <kvm@vger.kernel.org>; Mon, 11 May 2020 09:15:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hMmg8VXRFHP3NtN5OvlSRCC/9CYursiCkwl7Hbg93g0=;
+        b=eHma7LXGhk/IYSYC5i8X0WYAiUwf2aWhYJiZTdzBB5omyUNGfQgwv67lkF/dJsT0ni
+         7ACVmAdmFlORj4+u+cNlmGSfz2DaOrcB8gCLOf1QLQt9RST254hf854w8JwSrBanH1pV
+         T6gZV7mVvtlgBQERNAEzV6xEdJTFOMqxqJsVNOqrUmrTFhZwgXisSpqAj+ZLdCnFa4OO
+         krfHWpCdLoQc0Mah0xNhqp3sSws/SQqeJubyj9rVS6oJPBDPvqdulvhC476kdG7GExnf
+         JaKWELRsUo+3b2bSuW9bR6jO/WTZPAi4D73gEp1dtMlEyrlRqqqc3dhDf3nqjE6VRVhS
+         xErg==
+X-Gm-Message-State: AGi0PuZHkUWtqAz/kqXsCWd636c0n84euNAUVnmtXYbP7V7GFmmTPTqY
+        +j5egkJUI8eqwV06ZBAM0MaEDwW2BXqhDiel8609IB5CZTqznzpB1sLHyFZzeWKN94zL0mMn7hl
+        ol9/mMCvpy0XK
+X-Received: by 2002:a05:620a:13a7:: with SMTP id m7mr14264305qki.498.1589213708412;
+        Mon, 11 May 2020 09:15:08 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLFlqG5vF/e7y0pD5EcKe9ThQIhRa2tEFR+EpAWfKOuQOPTdjVG8EmWZz7lFamA9ZguN16SpQ==
+X-Received: by 2002:a05:620a:13a7:: with SMTP id m7mr14264282qki.498.1589213708136;
+        Mon, 11 May 2020 09:15:08 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id c24sm6645942qtd.26.2020.05.11.09.15.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2020 09:15:06 -0700 (PDT)
+Date:   Mon, 11 May 2020 12:15:05 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 8/9] KVM: x86, SVM: isolate vcpu->arch.dr6 from
+ vmcb->save.dr6
+Message-ID: <20200511161505.GI228260@xz-x1>
+References: <20200507115011.494562-1-pbonzini@redhat.com>
+ <20200507115011.494562-9-pbonzini@redhat.com>
+ <20200507192808.GK228260@xz-x1>
+ <dd8eb45b-4556-6aaa-0061-11b9124020b1@redhat.com>
+ <20200508153210.GZ228260@xz-x1>
+ <a0dd65bc-bfea-75b8-60d7-5060b9ee6c51@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200505141245.GH6299@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <a0dd65bc-bfea-75b8-60d7-5060b9ee6c51@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+cc a few other people that have reported this at one time or another.
-
-On Tue, May 05, 2020 at 10:12:45AM -0400, Peter Xu wrote:
-> On Mon, May 04, 2020 at 06:39:29PM -0700, Sean Christopherson wrote:
-> > On Mon, May 04, 2020 at 03:05:26PM -0400, Peter Xu wrote:
-> > > GCC 10.0.1 gives me this warning when building KVM:
-> > > 
-> > >   warning: ‘nr_pages_avail’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-> > >   2442 |  for ( ; start_gfn <= end_gfn; start_gfn += nr_pages_avail) {
-> > > 
-> > > It should not happen, but silent it.
+On Sat, May 09, 2020 at 03:28:44PM +0200, Paolo Bonzini wrote:
+> On 08/05/20 17:32, Peter Xu wrote:
+> > On Fri, May 08, 2020 at 12:33:57AM +0200, Paolo Bonzini wrote:
+> >> On 07/05/20 21:28, Peter Xu wrote:
+> >>>> -	svm->vcpu.arch.dr6 = dr6;
+> >>>> +	WARN_ON(svm->vcpu.arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT);
+> >>>> +	svm->vcpu.arch.dr6 &= ~(DR_TRAP_BITS | DR6_RTM);
+> >>>> +	svm->vcpu.arch.dr6 |= dr6 & ~DR6_FIXED_1;
+> >>> I failed to figure out what the above calculation is going to do... 
+> >>
+> >> The calculation is merging the cause of the #DB with the guest DR6.
+> >> It's basically the same effect as kvm_deliver_exception_payload.
 > > 
-> > Heh, third times a charm?  This has been reported and proposed twice
-> > before[1][2].  Are you using any custom compiler flags?  E.g. -O3 is known
-> > to cause false positives with -Wmaybe-uninitialized.
+> > Shall we introduce a helper for both kvm_deliver_exception_payload and here
+> > (e.g. kvm_merge_dr6)?  Also, wondering whether this could be a bit easier to
+> > follow by defining:
 > 
-> No, what I did was only upgrading to Fedora 32 (which will auto-upgrade GCC),
-> so it should be using the default params of whatever provided.
-> 
-> > 
-> > If we do end up killing this warning, I'd still prefer to use
-> > uninitialized_var() over zero-initializing the variable.
-> > 
-> > [1] https://lkml.kernel.org/r/20200218184756.242904-1-oupton@google.com
-> > [2] https://bugzilla.kernel.org/show_bug.cgi?id=207173
-> 
-> OK, I didn't know this is a known problem and discussions going on.  But I
-> guess it would be good to address this sooner because it could become a common
-> warning very soon after people upgrades gcc.
+> It would make sense indeed but I plan to get rid of this in 5.9 (so in
+> about a month), as explained in the comment.
 
-Ya, others are hitting this as well.  It's especially painful with the
-existence of KVM_WERROR.
+OK. I thought it would be easy to change and verify when with the selftests,
+however it's definitely ok to work upon it too.  Thanks,
 
-Paolo, any preference on how to resolve this?  It would appear GCC 10 got
-"smarter".
+-- 
+Peter Xu
+
