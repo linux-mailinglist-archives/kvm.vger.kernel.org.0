@@ -2,94 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C42121CE7F8
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 00:19:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 278881CE898
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 00:57:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725881AbgEKWTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 18:19:06 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52060 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725836AbgEKWTG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 18:19:06 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04BMCeEX016297;
-        Mon, 11 May 2020 22:19:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=0udyAlAcqwN6BbJGZkL7OUkK/UgYraR4SM77vi3XkY0=;
- b=i4/9+jpI3Bc33iUu2umOMfn7A+vt6Q9kp/VzA8Ft9Y0Fdsv9f2ow77rM+1eYyn4YxzP2
- 7pBi8uTtLSTL5lU5SBoUKzTIU8bwySaN7JODfT7E0kRKcVIVAcmOVLq06dObMsgFg/Ym
- Y2cqjeKDy33Vd0oCU/NNFiAfGouGrQ4ZEX6h9YLYLoexCbPwMWiE9tJFokoDZvaxe6XN
- b01m0SKOxoMAIwbkSTKaFnLzmZq7Ja9p5QFfhIdKaaCQhcClscKGJeTJazuGa+aux1Pm
- q+qT5ZGPOmdxCbwC1BIdrLVb4zxEjLmUnrP3ZR4EU9bQopiwJVxQymn18KlT6VWxbRxn yg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 30x3gmftg9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 11 May 2020 22:19:01 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04BMIVK8089743;
-        Mon, 11 May 2020 22:19:00 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 30xbgfxdc4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 May 2020 22:19:00 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04BMJ0iS018952;
-        Mon, 11 May 2020 22:19:00 GMT
-Received: from supannee-devvm-ol7.osdevelopmeniad.oraclevcn.com (/100.100.231.179)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 11 May 2020 15:19:00 -0700
-From:   Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
-To:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
-Subject: [PATCH] vhost: scsi: notify TCM about the maximum sg entries supported per command.
-Date:   Mon, 11 May 2020 22:18:52 +0000
-Message-Id: <1589235532-10333-1-git-send-email-sudhakar.panneerselvam@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- spamscore=0 suspectscore=0 phishscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005110166
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- clxscore=1011 spamscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0
- malwarescore=0 priorityscore=1501 mlxscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005110165
+        id S1726079AbgEKW5C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 18:57:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34062 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725854AbgEKW5B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 18:57:01 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E4BC061A0C
+        for <kvm@vger.kernel.org>; Mon, 11 May 2020 15:57:00 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id y60so9387710qvy.13
+        for <kvm@vger.kernel.org>; Mon, 11 May 2020 15:57:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=VTdpLz5V6/LGlvRs4Pjdcz6Ell8P6OcCKx2MGJVF8uc=;
+        b=BrN8i96Patmx0wBxgndIVZrgUBR4dw7eIKuHDar+HyJVTT6QqVTHolRVtwbmCYjqnm
+         lu+dPn0CeyHU/Jnu31O1jVWcbXysRCr8x+ve9nLW/lcKzs2kLoB8TL7w2HB2ba4cjLsq
+         feSOgcbA+M7ndKlGzozd7HAknoNu7O5Egnuu4qoIqL9Ix7TbpACtd/5ZLwMZMAKQscKe
+         OXrSSWm0prZ9mN+cbcJ+5yo985+SqGg7GRWUAccKhSCs3I9OswpTwR8WFieWz7XEQUpM
+         PMB91Ayu3PRldho7BlXCBS6WePWjBKg6g7XkxKvK5Lp7Tb4uoOKLS0r+E4P1jDh6yp/T
+         f5iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=VTdpLz5V6/LGlvRs4Pjdcz6Ell8P6OcCKx2MGJVF8uc=;
+        b=nYQkhaxycY72sK6Yo/MJCIkuQAeoDfhC6m8A8KCmfB22FfScZDxcY5QQFcuS/ZlALs
+         M+LfvDl6O+7vfaaYPfOgEr/Is7PW8pvkLKvXZfJzeZWzFkTypZa+8XkQsrGM/t5sPSfE
+         7C4XhMGJOjY9FeZIEtAEEk/xtlD0yJQ9C2mNVBSiFZ1EOfxf/A85bO6E9e76jAFTnAcC
+         kzMTpGK76lumqKFU2rsk0hI6IpDZBRaSaaTk6ee42OkCaOWFeMBIikUn2qwQJq+/faUe
+         2YWaX43UtBfgDFlR/0W2gry0jVsXNdj3vKUnF7h+5Rwgvpttb3K0XCAIH8ExQE+LyYzX
+         cZXQ==
+X-Gm-Message-State: AGi0PuaPMoeJJMoF009uPKxKX0U0RbHzEtFD2nRJ28JEYUFpOkUdrteL
+        s/lwxv32kHFSsef9siRGh06ATlAj3p0PGurr+J5CnnDcxxbuJgOtNu/OD6QlikOEsTUKlP2/l7a
+        0EfZ3vxPqJqCXQdzMWIRHx/qEtLdDurfRyeAFh5zKuBVveMDtRRNfNaZs0UkLKxM=
+X-Google-Smtp-Source: APiQypJNIV9Soq4zFlRo7C4w9sAwU9layBGNtrWixcjD+1Oc1m3Tl3L1CUAiqIEcDjNfC78LeyGlWDBmTobeFA==
+X-Received: by 2002:a0c:e7c2:: with SMTP id c2mr7976983qvo.118.1589237819159;
+ Mon, 11 May 2020 15:56:59 -0700 (PDT)
+Date:   Mon, 11 May 2020 15:56:16 -0700
+Message-Id: <20200511225616.19557-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.2.645.ge9eca65c58-goog
+Subject: [PATCH] KVM: x86: Fix off-by-one error in kvm_vcpu_ioctl_x86_setup_mce
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Jue Wang <juew@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vhost-scsi pre-allocates the maximum sg entries per command and if a
-command requires more than VHOST_SCSI_PREALLOC_SGLS entries, then that
-command is failed by it. This patch lets vhost communicate the max sg limit
-when it registers vhost_scsi_ops with TCM. With this change, TCM would
-report the max sg entries through "Block Limits" VPD page which will be
-typically queried by the SCSI initiator during device discovery. By knowing
-this limit, the initiator could ensure the maximum transfer length is less
-than or equal to what is reported by vhost-scsi.
+Bank_num is a one-based count of banks, not a zero-based index. It
+overflows the allocated space only when strictly greater than
+KVM_MAX_MCE_BANKS.
 
-Signed-off-by: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Fixes: a9e38c3e01ad ("KVM: x86: Catch potential overrun in MCE setup")
+Signed-off-by: Jue Wang <juew@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
 ---
- drivers/vhost/scsi.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index c39952243fd3..8b104f76f324 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -2280,6 +2280,7 @@ static void vhost_scsi_drop_tport(struct se_wwn *wwn)
- static const struct target_core_fabric_ops vhost_scsi_ops = {
- 	.module				= THIS_MODULE,
- 	.fabric_name			= "vhost",
-+	.max_data_sg_nents		= VHOST_SCSI_PREALLOC_SGLS,
- 	.tpg_get_wwn			= vhost_scsi_get_fabric_wwn,
- 	.tpg_get_tag			= vhost_scsi_get_tpgt,
- 	.tpg_check_demo_mode		= vhost_scsi_check_true,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d786c7d27ce5..5bf45c9aa8e5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3751,7 +3751,7 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+ 	unsigned bank_num = mcg_cap & 0xff, bank;
+ 
+ 	r = -EINVAL;
+-	if (!bank_num || bank_num >= KVM_MAX_MCE_BANKS)
++	if (!bank_num || bank_num > KVM_MAX_MCE_BANKS)
+ 		goto out;
+ 	if (mcg_cap & ~(kvm_mce_cap_supported | 0xff | 0xff0000))
+ 		goto out;
 -- 
-1.8.3.1
+2.26.2.645.ge9eca65c58-goog
 
