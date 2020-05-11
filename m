@@ -2,164 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69D2E1CDBC0
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 15:49:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87B461CDBC4
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 15:49:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730178AbgEKNtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 09:49:13 -0400
-Received: from mail-bn8nam11on2054.outbound.protection.outlook.com ([40.107.236.54]:30209
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729741AbgEKNtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 09:49:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DHuZUG2XqDiAeHEzHG7stEjJ9queoLjmTmJNNsDVzkkW6PzrIkAJBykfQNro4B1CGTwYs44XZEV2QgzNbETin7krautx0qIGn1qElcxNKH87BoIEUkAZJgfJC2t2qq1TEYpNAqBFdpA4/TBKSgHNhmZEuoHMO3IqDCQv/WhPdGejNy8dEVeDQTq/xDObkGHIkM6b1e14dcMrla5olbczX1DJaXhWVZ7+siUq9A5tyjlc0JKLiStrbu1zp78f3bu9+r5H80C5/EzQN0CSkrAAO1psdee0Bb3KIEJIOgGR/pvKQfLrTFQWck3NAKKPkX/7uYVnT0OOq/iS03YSWZvWCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zo/7Jq60TiX1A69TavXWGlbg4Qrw0AlJdWNoNLqVvgQ=;
- b=UdCfyBl/LhjTU/PaKsA5TtvnyfGhwhpdAs02bM4FxhuSJ3Qmt6DF7YSj1+ZWu7yjLOt4hnAYixZqvBI4+CcXOJWeVxMt8vw8zbcGMrE6uQ1ez125o8Ls46WUUFbA6kMgRh087fQS0DZGu9hcwV/Zb2Wccb7+fThnVSE17WcvIsTNBdiCvx5c+N2yoD5u+pNi9Qwye4S8LqVSNqbNYcS+DSlXsfBlVcFKJAonPmkiHCatIzuzHXUzYy6fK97TT5dGc71s2b9e9EHOlNOES5xY5OkCNgUOE/3Lr19+b4bGkTC0HUpuC3DI9WBzOTRcdxW9mvTvQJJ28LgBwAp0zRSioA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1730218AbgEKNtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 09:49:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729743AbgEKNtl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 09:49:41 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F06DC061A0C;
+        Mon, 11 May 2020 06:49:41 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id k12so18081017wmj.3;
+        Mon, 11 May 2020 06:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zo/7Jq60TiX1A69TavXWGlbg4Qrw0AlJdWNoNLqVvgQ=;
- b=2wMyGPfa+vSJh8OmEp9jeTC0qKEuaWjqKwx22tyw6DOCvyvmnrXCmkB6BOV2M64MO86em3Va9vhg7zjnOlJCa7e+IhEZZbcQ56KO4IXpe7GittCAtPrl91+aLQLzpM4ipRuh0a6vGVHU6itOj7yJYy6DeUZg9KVfIuYz9fUalL8=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2558.namprd12.prod.outlook.com (2603:10b6:802:2b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28; Mon, 11 May
- 2020 13:49:06 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2979.033; Mon, 11 May 2020
- 13:49:06 +0000
-Subject: Re: [PATCH v2 2/3] KVM: x86: Move pkru save/restore to x86.c
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        mchehab+samsung@kernel.org, changbin.du@intel.com,
-        Nadav Amit <namit@vmware.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        yang.shi@linux.alibaba.com, asteinhauser@google.com,
-        anshuman.khandual@arm.com, Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        steven.price@arm.com, rppt@linux.vnet.ibm.com, peterx@redhat.com,
-        Dan Williams <dan.j.williams@intel.com>, arjunroy@google.com,
-        logang@deltatee.com, Thomas Hellstrom <thellstrom@vmware.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, justin.he@arm.com,
-        robin.murphy@arm.com, ira.weiny@intel.com,
-        Kees Cook <keescook@chromium.org>,
-        Juergen Gross <jgross@suse.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        pawan.kumar.gupta@linux.intel.com,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
-        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>
-References: <158897190718.22378.3974700869904223395.stgit@naples-babu.amd.com>
- <158897219574.22378.9077333868984828038.stgit@naples-babu.amd.com>
- <CALMp9eQj_aFcqR+v9SvFjKFxVjaHHzU44udcczJVqOR5vLQbWQ@mail.gmail.com>
- <90657d4b-cb2b-0678-fd9c-a281bb85fadf@redhat.com>
-From:   Babu Moger <babu.moger@amd.com>
-Message-ID: <6bdf365d-f283-d26c-2465-2be28d7b55bf@amd.com>
-Date:   Mon, 11 May 2020 08:49:03 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-In-Reply-To: <90657d4b-cb2b-0678-fd9c-a281bb85fadf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0801CA0011.namprd08.prod.outlook.com
- (2603:10b6:803:29::21) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RdmVAG4h2TTK6N6GlwwtgHg/wD3HGMTD56EkKtYvHNc=;
+        b=EEGao2G0ia27wRwnHCco4HjQMtImSkEmNOXEqxvrc1xTbcJ9X0JJ0F5HXhcjV5kfqZ
+         JFKyGi0h7EJA5DHCFbmqgD35wp2+SAKeYKBE9C7c2NmyoDT6c3Nh9f1L8GqBt1IQI50Z
+         AKo2Jo6ocR2zpjAIGVjYQ/czTe2NJs7h9jcERusgtSbpshLD3T8TjruZvPfmLS1tFHLx
+         OawsIZyvcr1CTQKIpKdCpdOJBjrdnGkTqkKc+7frGQAuwKLyvKcBSYv4KKQC2nanJTTq
+         azoyDaJoKKaqW1qZExRjG8JvH9UdMRou64CF2WwldHTRhfispBTlWMFWY4NwnCUNcLeb
+         A5zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RdmVAG4h2TTK6N6GlwwtgHg/wD3HGMTD56EkKtYvHNc=;
+        b=WoXpX5KF4rCtELDNzqKfwsu/X/A61YYINV3WWSGK8xcmF6JyQ+xTym8qFo+pHoCNYx
+         TtrQH1HpThhqUCZUe42g2UTO9FZNPsNFN7eMGzL28O2U3QBJbtrqrC31zdjvfUGn/Ksu
+         pLDejFfIroQ2FPgOB33XQpfN0jgUrY4xu/IighkK23YwFnBF0Sq1c/TmTFbWbCTdOWzI
+         DjXiZYM9N9uCpjwu0tTvY6TrywmLoMmA6hQoiiECJBLe8Mo4SWMtzYCUqzEWBd6kW+31
+         5Vf5cn3TRhykAT5Iakfpn/fkMgFnO3vpLjvO4g9w+3IMIEocYU1qXthfD8PzJXqnR2yR
+         sbkQ==
+X-Gm-Message-State: AGi0PubhRsZjyJzlwF2+XIXWIyFw/4SB6qTfjOnjMT290JgC9WuoRzQH
+        j00+nSfsoKC64hHWorU7p2Q=
+X-Google-Smtp-Source: APiQypI2iR53YjF4Z/gltGU091c+JKLWoSkOu20XvgwxtlTl1qgJSoytDdwgmV4uF1rbsQ9Q6RBMCg==
+X-Received: by 2002:a05:600c:2157:: with SMTP id v23mr29946072wml.149.1589204980001;
+        Mon, 11 May 2020 06:49:40 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id d1sm16645459wrx.65.2020.05.11.06.49.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2020 06:49:38 -0700 (PDT)
+Date:   Mon, 11 May 2020 14:49:37 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     "Herrenschmidt, Benjamin" <benh@amazon.com>
+Cc:     "pavel@ucw.cz" <pavel@ucw.cz>,
+        "Paraschiv, Andra-Irina" <andraprs@amazon.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "Liguori, Anthony" <aliguori@amazon.com>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "ne-devel-upstream@amazon.com" <ne-devel-upstream@amazon.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "van der Linden, Frank" <fllinden@amazon.com>,
+        "Smith, Stewart" <trawets@amazon.com>,
+        "Pohlack, Martin" <mpohlack@amazon.de>,
+        "Wilson, Matt" <msw@amazon.com>, "Dannowski, Uwe" <uwed@amazon.de>,
+        "Doebel, Bjoern" <doebel@amazon.de>
+Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
+Message-ID: <20200511134937.GA182627@stefanha-x1.localdomain>
+References: <20200421184150.68011-1-andraprs@amazon.com>
+ <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
+ <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
+ <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com>
+ <20200507174438.GB1216@bug>
+ <620bf5ae-eade-37da-670d-a8704d9b4397@amazon.com>
+ <20200509192125.GA1597@bug>
+ <1b00857202884c2a27d0e381d6de312201d17868.camel@amazon.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.87] (165.204.77.1) by SN4PR0801CA0011.namprd08.prod.outlook.com (2603:10b6:803:29::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26 via Frontend Transport; Mon, 11 May 2020 13:49:04 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 26426fb4-81e4-451b-fbf2-08d7f5b21279
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2558:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB25586C6D51AA7B297E0D3E1C95A10@SN1PR12MB2558.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 04004D94E2
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0q4Khsa0gyZsctNlSgdFblXEQwSVvw+pEXSCB2HgYZ4jJNzi54y1AL/rz9siNJakoTctxBR13Rq/m5MH1FjcnOWuGfeYRi/XXmxc0Ky8whvl1kMiohZpG5jGDl+C0Bky7v0jezGm+eK4y4r0zexcjAIZc6nu8QBhAW8mG3wkdhTg6ahwKHmBEvTKdqctxmL7SnL5bDgzNJkhysb5A73a53f8QSDrer5B7rsAtrBDj4lo/3vTqpn7bbPdDqVf9pw3uvNs+MuCOSlYG9KkrskzmhXQUecp8fP6VE5FkPFc2Z806CnuyFfqR+SlUgjAjzCt3ALdvc2h7aLh5xuwLtbFZ7A3iQZvKzVxXAO8oBWBRMxI6OJxs1rcW5T15O7Ob02krr0cYQMbD6JsCLEXlhUxdJ/eWfQA9244tiDVQoOw6w1i8MvU0Ui5LyXc4lBk6GpS+JL6khLMGJJ/A5nxOf4d8E0EO4Y2cDeWDrOHCrAkgkXj/DV2LkpJ/l4HxsqVXgRfelsaacZfx59FM+YJLjyLWaE9/MWA9w4DP+M3d/3QRdDVKcNqmPbRnMiugNjC/K+4
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(33430700001)(4326008)(478600001)(5660300002)(31686004)(2906002)(956004)(44832011)(2616005)(6486002)(33440700001)(8936002)(7416002)(7406005)(8676002)(66946007)(66476007)(66556008)(86362001)(31696002)(36756003)(52116002)(110136005)(186003)(316002)(16576012)(53546011)(54906003)(26005)(16526019)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 7TRexuNWePNl69CPRTLGZWlWACB/bfW8H9JBg6EZ/+TIZ6aPcJtFf57O7+XheQ8wvyRFaJ0LIG1UCwj4GpWmZ9JCiHA4gvEogzfThUDTqhNMoXpFMWjScCSr70dNixY4rkxL5Jpe5N2d1FSDqUpMNwS/9FzMqgCERT1JzracbJFm85bLThY+Hamz7XzwOBGb8sce78MjsPSl510qUKz5WJ8S7YAraW1Is0aAYPelx2ykiuN7HeuYfvgQArhqoZmApOGcdTq9ga17tnk8oXctr0Mgzbe+YNrzkwxXY3u64sk6Qb9/m3q3ffNjB46FWsTch5fi+KEJWcQ7tEaigqNkm1ykCvYpgjNUaPYgSCkz6h5rs87W/uhluvVEfV0VSP19nr86gVMaPW9PQT8IJqnp+DyUwZvLcXRWCdQIyvP8Bcuo7HcPqPoLy6Ppm1vL0DcwIcUJlqyN/XMWQFWjoqF+92yza1Pk++56DqBcgxjlyk8=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26426fb4-81e4-451b-fbf2-08d7f5b21279
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 13:49:06.3320
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: X5tsROczz7DxGoVULoFTlsHU7rmiIu5R5sw4k6lI6YQTTHH7AxI7r6AQP1J0HO9K
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2558
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="lrZ03NoBR/3+SXJZ"
+Content-Disposition: inline
+In-Reply-To: <1b00857202884c2a27d0e381d6de312201d17868.camel@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+--lrZ03NoBR/3+SXJZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 5/9/20 7:59 AM, Paolo Bonzini wrote:
-> On 09/05/20 00:09, Jim Mattson wrote:
->>> +       if (static_cpu_has(X86_FEATURE_PKU) &&
->>> +           kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
->>> +           vcpu->arch.pkru != vcpu->arch.host_pkru)
->>> +               __write_pkru(vcpu->arch.pkru);
->> This doesn't seem quite right to me. Though rdpkru and wrpkru are
->> contingent upon CR4.PKE, the PKRU resource isn't. It can be read with
->> XSAVE and written with XRSTOR. So, if we don't set the guest PKRU
->> value here, the guest can read the host value, which seems dodgy at
->> best.
->>
->> Perhaps the second conjunct should be: (kvm_read_cr4_bits(vcpu,
->> X86_CR4_PKE) || (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)).
+On Sun, May 10, 2020 at 11:02:18AM +0000, Herrenschmidt, Benjamin wrote:
+> On Sat, 2020-05-09 at 21:21 +0200, Pavel Machek wrote:
+> >=20
+> > On Fri 2020-05-08 10:00:27, Paraschiv, Andra-Irina wrote:
+> > >=20
+> > >=20
+> > > On 07/05/2020 20:44, Pavel Machek wrote:
+> > > >=20
+> > > > Hi!
+> > > >=20
+> > > > > > it uses its own memory and CPUs + its virtio-vsock emulated dev=
+ice for
+> > > > > > communication with the primary VM.
+> > > > > >=20
+> > > > > > The memory and CPUs are carved out of the primary VM, they are =
+dedicated
+> > > > > > for the enclave. The Nitro hypervisor running on the host ensur=
+es memory
+> > > > > > and CPU isolation between the primary VM and the enclave VM.
+> > > > > >=20
+> > > > > > These two components need to reflect the same state e.g. when t=
+he
+> > > > > > enclave abstraction process (1) is terminated, the enclave VM (=
+2) is
+> > > > > > terminated as well.
+> > > > > >=20
+> > > > > > With regard to the communication channel, the primary VM has it=
+s own
+> > > > > > emulated virtio-vsock PCI device. The enclave VM has its own em=
+ulated
+> > > > > > virtio-vsock device as well. This channel is used, for example,=
+ to fetch
+> > > > > > data in the enclave and then process it. An application that se=
+ts up the
+> > > > > > vsock socket and connects or listens, depending on the use case=
+, is then
+> > > > > > developed to use this channel; this happens on both ends - prim=
+ary VM
+> > > > > > and enclave VM.
+> > > > > >=20
+> > > > > > Let me know if further clarifications are needed.
+> > > > >=20
+> > > > > Thanks, this is all useful.  However can you please clarify the
+> > > > > low-level details here?
+> > > >=20
+> > > > Is the virtual machine manager open-source? If so, I guess pointer =
+for sources
+> > > > would be useful.
+> > >=20
+> > > Hi Pavel,
+> > >=20
+> > > Thanks for reaching out.
+> > >=20
+> > > The VMM that is used for the primary / parent VM is not open source.
+> >=20
+> > Do we want to merge code that opensource community can not test?
+>=20
+> Hehe.. this isn't quite the story Pavel :)
+>=20
+> We merge support for proprietary hypervisors, this is no different. You
+> can test it, well at least you'll be able to ... when AWS deploys the
+> functionality. You don't need the hypervisor itself to be open source.
+>=20
+> In fact, in this case, it's not even low level invasive arch code like
+> some of the above can be. It's a driver for a PCI device :-) Granted a
+> virtual one. We merge drivers for PCI devices routinely without the RTL
+> or firmware of those devices being open source.
+>=20
+> So yes, we probably want this if it's going to be a useful features to
+> users when running on AWS EC2. (Disclaimer: I work for AWS these days).
 
-Thanks Jim.
-> 
-> You're right.  The bug was preexistent, but we should fix it in 5.7 and
-> stable as well.
-Paolo, Do you want me to send this fix separately? Or I will send v3 just
-adding this fix. Thanks
+I agree that the VMM does not need to be open source.
 
-> 
->>>  }
->>>  EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
->>>
->>>  void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
->>>  {
->>> +       /*
->>> +        * eager fpu is enabled if PKEY is supported and CR4 is switched
->>> +        * back on host, so it is safe to read guest PKRU from current
->>> +        * XSAVE.
->>> +        */
->> I don't understand the relevance of this comment to the code below.
->>
-> 
-> It's probably stale.
+What is missing though are details of the enclave's initial state and
+the image format required to boot code. Until this documentation is
+available only Amazon can write a userspace application that does
+anything useful with this driver.
 
-Will remove it.
-> 
-> Paolo
-> 
+Some of the people from Amazon are long-time Linux contributors (such as
+yourself!) and the intent to publish this information has been
+expressed, so I'm sure that will be done.
+
+Until then, it's cool but no one else can play with it.
+
+Stefan
+
+--lrZ03NoBR/3+SXJZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl65V/EACgkQnKSrs4Gr
+c8ixDgf9G2NkzityHPlx7cfril8TnwwL7OBcubfkDwaDvi8JhzAfQwq8HIb8T34r
+2425zIaswd+4VyzEMiFov3VCEVnvG/r5lPXo9LuWArfLUTHlk/XubjGuo8+86TcY
+vn6aeuIZiEBSZ5oe86ORCxjvEJiev7hiJBIsHwMcfL2zmObl19dGvhDRFwKLR5yg
+QIaLtzivB9ABTnVbnVmoxKqWvFWd7tHuwPosN156I/aJa32Xec6ajUL872Q7Ur+J
+siVUZyr/EnA+0pqKk4Spz+aumR4RjWtgVpRzjXSn1KCXFlY5x8uRC/S+vajr3xKb
+izI+sWVFvvBYGohLeUQTqg9bU8I1fQ==
+=Y/jb
+-----END PGP SIGNATURE-----
+
+--lrZ03NoBR/3+SXJZ--
