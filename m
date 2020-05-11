@@ -2,135 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D99821CE1CD
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 19:34:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADC7C1CE26C
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 20:17:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731013AbgEKRem (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 13:34:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60829 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730215AbgEKRem (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 13:34:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589218480;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jCAJG5qvZrEQpE9xVUmgEKkY6ZGLKpgEhGop1JiyIl0=;
-        b=dIc53VR2sD98xVcGm7/NzRUMxKrOmsaiadtecNUEztPcSObavKmSWGUtST7hrU93ifCLyP
-        He+4xXgfGDpotx3IoKiT91bXSWxzzB4lT57ywtX7OnSQt7AXwOamAcslSscbiK5XffmY5u
-        bZ/5HW5MHVgeL8zKf4OnGZUzc0w+gSw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-1EwWHmA9MOaXH7ZSf2kcwQ-1; Mon, 11 May 2020 13:34:32 -0400
-X-MC-Unique: 1EwWHmA9MOaXH7ZSf2kcwQ-1
-Received: by mail-wm1-f69.google.com with SMTP id q5so8642397wmc.9
-        for <kvm@vger.kernel.org>; Mon, 11 May 2020 10:34:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jCAJG5qvZrEQpE9xVUmgEKkY6ZGLKpgEhGop1JiyIl0=;
-        b=gQ1pe+jQF6Qm0zkt10XURZudav3Npv/aKovxFjurNDZPPWxnilfAzPc/8p5VeNtOg0
-         Pbu2eO6eM0W+BX8U4L//i3lNuFcBW9sGtsbC4JkUeXFQDu/R39Tpdu9MADXf+fzaqqlu
-         3aVrlesbIfik2jpM9P3f8b7eRj1gxfBQsHC4DHPpCJvsN/a8a8RVQuEk38Yj7dW2A7YN
-         AKz3jhtfQfnHqyNq58cslddC5MdFmJaP9u18vewcWBeWXLl8JqK7j0MOL5MgSdMNHjlU
-         NqT+ULqHImU2ZTaylo1g5NVRmCGPmvXOESYby2Ev+HZVJTxh6GYdmXni/FxTZ2ThKy/B
-         EPxg==
-X-Gm-Message-State: AGi0PubiPZdRoyeBEZqSvKiwv6hZfC2wgPgf7fcbx+9QT7LtIWSUthj4
-        T/xJzgc3mCP8eF+xE/tj+8MBo0emppph5JM+FbR+oMjtWo9ZoNGejBgEjd+aqzbWoPA8BXQ6QeW
-        sFLhPF4vBRsyO
-X-Received: by 2002:a5d:49ca:: with SMTP id t10mr12469218wrs.285.1589218471440;
-        Mon, 11 May 2020 10:34:31 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJNe6I7z0SbQYOHpqyl28aME7TxGvpzSGiIlzFVueJrlC+GRcVDtQgQEgjyS86Oa3oOuu0xgw==
-X-Received: by 2002:a5d:49ca:: with SMTP id t10mr12469194wrs.285.1589218471191;
-        Mon, 11 May 2020 10:34:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4c95:a679:8cf7:9fb6? ([2001:b07:6468:f312:4c95:a679:8cf7:9fb6])
-        by smtp.gmail.com with ESMTPSA id 89sm18102311wrj.37.2020.05.11.10.34.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 10:34:30 -0700 (PDT)
-Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
- kernel statistics
-To:     Jonathan Adams <jwadams@google.com>
-Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        id S1731101AbgEKSRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 14:17:45 -0400
+Received: from mga03.intel.com ([134.134.136.65]:53739 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729643AbgEKSRp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 14:17:45 -0400
+IronPort-SDR: SjcOT8Syf+YMgUMB6EuYVtTFHC0yTl+hxCHpBth3WoRzNP6OeS973hPtOPXr+Yc1sYP1cXqUKF
+ pqWyTlPNTRug==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 11:17:44 -0700
+IronPort-SDR: S4r1fZ5oBzH+5W8qh1aHRie2tfvQereT2aab4/Wgzm9tNyHvCxkt3Xv6ofnbGa2wlWF1R1+Whq
+ X9YSTU8ZOJJQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,380,1583222400"; 
+   d="scan'208";a="261849896"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga003.jf.intel.com with ESMTP; 11 May 2020 11:17:44 -0700
+Date:   Mon, 11 May 2020 11:17:44 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         kvm list <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20200504110344.17560-1-eesposit@redhat.com>
- <CA+VK+GN=iDhDV2ZDJbBsxrjZ3Qoyotk_L0DvsbwDVvqrpFZ8fQ@mail.gmail.com>
- <29982969-92f6-b6d0-aeae-22edb401e3ac@redhat.com>
- <CA+VK+GOccmwVov9Fx1eMZkzivBduWRuoyAuCRtjMfM4LemRkgw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fe21094c-bdb0-b802-482e-72bc17e5232a@redhat.com>
-Date:   Mon, 11 May 2020 19:34:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Tony Luck <tony.luck@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>
+Subject: Re: [PATCH v9 3/8] x86/split_lock: Introduce flag
+ X86_FEATURE_SLD_FATAL and drop sld_state
+Message-ID: <20200511181744.GF24052@linux.intel.com>
+References: <20200509110542.8159-1-xiaoyao.li@intel.com>
+ <20200509110542.8159-4-xiaoyao.li@intel.com>
+ <CALCETrXwtj5rhVM6YYNEDeDqT3eKFNkGFCgSB_hUd7aOYBFXmw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+VK+GOccmwVov9Fx1eMZkzivBduWRuoyAuCRtjMfM4LemRkgw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrXwtj5rhVM6YYNEDeDqT3eKFNkGFCgSB_hUd7aOYBFXmw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jonathan, I think the remaining sticky point is this one:
-
-On 11/05/20 19:02, Jonathan Adams wrote:
-> I think I'd characterize this slightly differently; we have a set of
-> statistics which are essentially "in parallel":
+On Sat, May 09, 2020 at 10:14:02PM -0700, Andy Lutomirski wrote:
+> On Fri, May 8, 2020 at 8:03 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+> >
+> > Introduce a synthetic feature flag X86_FEATURE_SLD_FATAL, which means
+> > kernel is in sld_fatal mode if set.
+> >
+> > Now sld_state is not needed any more that the state of SLD can be
+> > inferred from X86_FEATURE_SPLIT_LOCK_DETECT and X86_FEATURE_SLD_FATAL.
 > 
->   - a variety of statistics, N CPUs they're available for, or
->   - a variety of statistics, N interfaces they're available for.
->   - a variety of statistics, N kvm object they're available for.
-> 
-> Recreating a parallel hierarchy of statistics any time we add/subtract
-> a CPU or interface seems like a lot of overhead.  Perhaps a better 
-> model would be some sort of "parameter enumn" (naming is hard;
-> parameter set?), so when a CPU/network interface/etc is added you'd
-> add its ID to the "CPUs" we know about, and at removal time you'd
-> take it out; it would have an associated cbarg for the value getting
-> callback.
-> 
->> Yep, the above "not create a dentry" flag would handle the case where
->> you sum things up in the kernel because the more fine grained counters
->> would be overwhelming.
->
-> nodnod; or the callback could handle the sum itself.
+> Is it too much to ask for Intel to actually allocate and define a
+> CPUID bit that means "this CPU *always* sends #AC on a split lock"?
+> This would be a pure documentation change, but it would make this
+> architectural rather than something that each hypervisor needs to hack
+> up.
 
-In general for statsfs we took a more explicit approach where each
-addend in a sum is a separate stats_fs_source.  In this version of the
-patches it's also a directory, but we'll take your feedback and add both
-the ability to hide directories (first) and to list values (second).
+The original plan was to request a bit in MSR_TEST_CTRL be documented as
+such.  Then we discovered that defining IA32_CORE_CAPABILITIES enumeration
+as architectural was an SDM bug[*].  At that point, enumerating SLD to a
+KVM guest through a KVM CPUID leaf is the least awful option.  Emulating the
+model specific behavior doesn't provide userspace with a sane way to disable
+SLD for a guest, and emulating IA32_CORE_CAPABILITIES behavior would be
+tantamount to emulating model specific behavior.
 
-So, in the cases of interfaces and KVM objects I would prefer to keep
-each addend separate.
+Once paravirt is required for basic SLD enumeration, tacking on the "fatal"
+indicator is a minor blip.
 
-For CPUs that however would be pretty bad.  Many subsystems might
-accumulate stats percpu for performance reason, which would then be
-exposed as the sum (usually).  So yeah, native handling of percpu values
-makes sense.  I think it should fit naturally into the same custom
-aggregation framework as hash table keys, we'll see if there's any devil
-in the details.
+I agree that having to reinvent the wheel for every hypervisor is completely
+ridiculous, but it provides well defined and controllable behavior.  We
+could try to get two CPUID bits defined in the SDM, but pushing through all
+the bureaucracy that gates SDM changes means we wouldn't have a resolution
+for at least multiple months, assuming the proposal was even accepted.
 
-Core kernel stats such as /proc/interrupts or /proc/stat are the
-exception here, since individual per-CPU values can be vital for
-debugging.  For those, creating a source per stat, possibly on-the-fly
-at hotplug/hot-unplug time because NR_CPUS can be huge, would still be
-my preferred way to do it.
+[*] https://lkml.kernel.org/r/20200416205754.21177-3-tony.luck@intel.com
+ 
+> Meanwhile, I don't see why adding a cpufeature flag is worthwhile to
+> avoid a less bizarre global variable.  There's no performance issue
+> here, and the old code looked a lot more comprehensible than the new
+> code.
 
-Thanks,
+The flag has two main advantages:
 
-Paolo
+  - Automatically available to modules, i.e. KVM.
+  - Visible to userspace in /proc/cpuinfo.
 
+Making the global variable available to KVM is ugly because it either
+requires exporting the variable and the enums (which gets especially nasty
+because kvm_intel can be built with CONFIG_CPU_SUP_INTEL=n), or requires
+adding a dedicated is_sld_fatal() wrapper and thus more exported crud.
+
+And IMO, the feature flag is the less bizarre option once it's "public"
+knowledge, e.g. more in line with features that enumerate both basic support
+and sub-features via CPUID bits.
