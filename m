@@ -2,107 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADC7C1CE26C
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 20:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8A091CE3BF
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 21:17:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731101AbgEKSRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 14:17:45 -0400
-Received: from mga03.intel.com ([134.134.136.65]:53739 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729643AbgEKSRp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 14:17:45 -0400
-IronPort-SDR: SjcOT8Syf+YMgUMB6EuYVtTFHC0yTl+hxCHpBth3WoRzNP6OeS973hPtOPXr+Yc1sYP1cXqUKF
- pqWyTlPNTRug==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 11:17:44 -0700
-IronPort-SDR: S4r1fZ5oBzH+5W8qh1aHRie2tfvQereT2aab4/Wgzm9tNyHvCxkt3Xv6ofnbGa2wlWF1R1+Whq
- X9YSTU8ZOJJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,380,1583222400"; 
-   d="scan'208";a="261849896"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga003.jf.intel.com with ESMTP; 11 May 2020 11:17:44 -0700
-Date:   Mon, 11 May 2020 11:17:44 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        id S1731374AbgEKTR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 15:17:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60812 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731243AbgEKTR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 15:17:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589224644;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7ie7/DlaccXJnR8nAMaUf9Lp/+6UCJjEnsPmnssVsEw=;
+        b=KoAlgSyN6xu8qboAuV8fOO/nfv3q/zvnGfeE3cDo9RB6Pj5rHRtPuCgffvG4Ce1asu40eg
+        taY28GaWe8U7+mSt5tlozzi8bviSURJpTep2cgCPhIoFMStWZMcu05sFJv6TGkxeCzlbM1
+        doxvDGjMr4XymT7iVpztYPYHhgcLkpE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-QPfJ05Z2PdSTRFakJ_ozFA-1; Mon, 11 May 2020 15:17:23 -0400
+X-MC-Unique: QPfJ05Z2PdSTRFakJ_ozFA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31798107ACCA;
+        Mon, 11 May 2020 19:17:21 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-114-80.rdu2.redhat.com [10.10.114.80])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C51AB5C1D3;
+        Mon, 11 May 2020 19:17:20 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 40169220C05; Mon, 11 May 2020 15:17:20 -0400 (EDT)
+Date:   Mon, 11 May 2020 15:17:20 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Tony Luck <tony.luck@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>
-Subject: Re: [PATCH v9 3/8] x86/split_lock: Introduce flag
- X86_FEATURE_SLD_FATAL and drop sld_state
-Message-ID: <20200511181744.GF24052@linux.intel.com>
-References: <20200509110542.8159-1-xiaoyao.li@intel.com>
- <20200509110542.8159-4-xiaoyao.li@intel.com>
- <CALCETrXwtj5rhVM6YYNEDeDqT3eKFNkGFCgSB_hUd7aOYBFXmw@mail.gmail.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 1/6] Revert "KVM: async_pf: Fix #DF due to inject
+ "Page not Present" and "Page Ready" exceptions simultaneously"
+Message-ID: <20200511191720.GC111882@redhat.com>
+References: <20200429093634.1514902-1-vkuznets@redhat.com>
+ <20200429093634.1514902-2-vkuznets@redhat.com>
+ <20200505141603.GA7155@redhat.com>
+ <87y2q5ay8q.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALCETrXwtj5rhVM6YYNEDeDqT3eKFNkGFCgSB_hUd7aOYBFXmw@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <87y2q5ay8q.fsf@vitty.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 09, 2020 at 10:14:02PM -0700, Andy Lutomirski wrote:
-> On Fri, May 8, 2020 at 8:03 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On Wed, May 06, 2020 at 05:17:57PM +0200, Vitaly Kuznetsov wrote:
+
+[..]
 > >
-> > Introduce a synthetic feature flag X86_FEATURE_SLD_FATAL, which means
-> > kernel is in sld_fatal mode if set.
+> > So either we need a way to report errors back while doing synchrounous
+> > page faults or we can't fall back to synchorounous page faults while
+> > async page faults are enabled.
 > >
-> > Now sld_state is not needed any more that the state of SLD can be
-> > inferred from X86_FEATURE_SPLIT_LOCK_DETECT and X86_FEATURE_SLD_FATAL.
+> > While we are reworking async page mechanism, want to make sure that
+> > error reporting part has been taken care of as part of design. Don't
+> > want to be dealing with it after the fact.
 > 
-> Is it too much to ask for Intel to actually allocate and define a
-> CPUID bit that means "this CPU *always* sends #AC on a split lock"?
-> This would be a pure documentation change, but it would make this
-> architectural rather than something that each hypervisor needs to hack
-> up.
+> The main issue I'm seeing here is that we'll need to deliver these
+> errors 'right now' and not some time later. Generally, exceptions
+> (e.g. #VE) should work but there are some corner cases, I remember Paolo
+> and Andy discussing these (just hoping they'll jump in with their
+> conclusions :-). If we somehow manage to exclude interrupts-disabled
+> context from our scope we should be good, I don't see reasons to skip
+> delivering #VE there.
 
-The original plan was to request a bit in MSR_TEST_CTRL be documented as
-such.  Then we discovered that defining IA32_CORE_CAPABILITIES enumeration
-as architectural was an SDM bug[*].  At that point, enumerating SLD to a
-KVM guest through a KVM CPUID leaf is the least awful option.  Emulating the
-model specific behavior doesn't provide userspace with a sane way to disable
-SLD for a guest, and emulating IA32_CORE_CAPABILITIES behavior would be
-tantamount to emulating model specific behavior.
+Hi Vitaly,
 
-Once paravirt is required for basic SLD enumeration, tacking on the "fatal"
-indicator is a minor blip.
+If we can't find a good solution for interrupt disabled regions, then
+I guess I will live with error reporting with interrupts enabled only
+for now. It should solve a class of problems. Once users show up which
+need error handling with interrupts disabled, then we will need to
+solve it.
 
-I agree that having to reinvent the wheel for every hypervisor is completely
-ridiculous, but it provides well defined and controllable behavior.  We
-could try to get two CPUID bits defined in the SDM, but pushing through all
-the bureaucracy that gates SDM changes means we wouldn't have a resolution
-for at least multiple months, assuming the proposal was even accepted.
+> 
+> For the part this series touches, "page ready" notifications, we don't
+> skip them but at the same time there is no timely delivery guarantee, we
+> just queue an interrupt. I'm not sure you'll need these for virtio-fs
+> though.
 
-[*] https://lkml.kernel.org/r/20200416205754.21177-3-tony.luck@intel.com
- 
-> Meanwhile, I don't see why adding a cpufeature flag is worthwhile to
-> avoid a less bizarre global variable.  There's no performance issue
-> here, and the old code looked a lot more comprehensible than the new
-> code.
 
-The flag has two main advantages:
+I think virtiofs will need both (synchronous as well as asynchrous
+error reporting).
 
-  - Automatically available to modules, i.e. KVM.
-  - Visible to userspace in /proc/cpuinfo.
+- If we can deliver async pf to guest, then we will send "page not present"
+  to guest and try to fault in the page. If we figure out that page can't be
+  faulted in, then we can send "page fault error" notification using interrupt
+  (as you are doing for "page ready").
 
-Making the global variable available to KVM is ugly because it either
-requires exporting the variable and the enums (which gets especially nasty
-because kvm_intel can be built with CONFIG_CPU_SUP_INTEL=n), or requires
-adding a dedicated is_sld_fatal() wrapper and thus more exported crud.
+- If async page fault can't be injected in guest and we fall back to
+  synchronous fault, and we figure out that fault can't be completed,
+  we need to inject error using #VE (or some exception).
 
-And IMO, the feature flag is the less bizarre option once it's "public"
-knowledge, e.g. more in line with features that enumerate both basic support
-and sub-features via CPUID bits.
+Thanks
+Vivek
+
+> 
+> Thanks for the feedback!
+> 
+> -- 
+> Vitaly
+> 
+
