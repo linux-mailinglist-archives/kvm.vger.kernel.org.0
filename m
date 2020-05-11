@@ -2,116 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F29B1CD569
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 11:37:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AD611CD5CD
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 12:02:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729471AbgEKJhK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 05:37:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32761 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729457AbgEKJhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 05:37:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589189828;
+        id S1728710AbgEKKCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 06:02:09 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:55062 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725983AbgEKKCI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 06:02:08 -0400
+Received: from zn.tnic (p200300EC2F05F1002C1974F11FB72105.dip0.t-ipconnect.de [IPv6:2003:ec:2f05:f100:2c19:74f1:1fb7:2105])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 45A641EC02FA;
+        Mon, 11 May 2020 12:02:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1589191327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9/z8oJy0DrW82NKQzFo0pYOXFvWx+Vn3ieQ420AJ3lc=;
-        b=Or824gshAxJh9WOS+X/WmIVuhaACN/xsBpOMow3E7W7/tNv3v5zydn5wBdNRVYnKgMGqZd
-        hIRYGEyJpBX3pyvj0YrEdtX07AhYX1+AuEUmgX4kjIaQKr6/Viugg2zG5STQwWBQA2NORY
-        y0JlmGkDpG9l4Oc4H8vCPart9d87y9U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-uIkTcxVwMH6JnwZ4wrnGcQ-1; Mon, 11 May 2020 05:37:05 -0400
-X-MC-Unique: uIkTcxVwMH6JnwZ4wrnGcQ-1
-Received: by mail-wr1-f70.google.com with SMTP id j16so4955589wrw.20
-        for <kvm@vger.kernel.org>; Mon, 11 May 2020 02:37:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9/z8oJy0DrW82NKQzFo0pYOXFvWx+Vn3ieQ420AJ3lc=;
-        b=bdmZgTeKNQWUoofR8jM9/LybWN87awDrLtT69g2OxAmQzuPAa2M8STtHPjk6wE1hQp
-         eD1LGjv9nHkXYjdi5m7VnrU5TDQrAzMaYJnhG1ebLOv3tVmDd3vGHH86u4hJoaCUYZ8S
-         5KH7vvQN1GBYSYkfdOPlTT9bIfpM2jxM4zWhbI8H96kxE6ojOZasSzAIFRsuY+P4eR4w
-         aVSivJbTEcN47Y0SmvsJ/LNkTZ+yuFTuMDeUUnQ0VO5TeMFK5tpi1F27mbKXBHO5b39u
-         vL3MCZ6H8kgT5dyxWlSE8TbSjBsz//vRlMvGMJl787Swuzs9z5NyTKZo8ljZb8S6RoxN
-         GQGA==
-X-Gm-Message-State: AGi0Puah9lGGPAJqtqcwcykpwDb8PTi3SYwnTSDfN44cKK22WcXHvlqC
-        lQfXeS686e1PaY4KRyYM6Qabjp6OeE/1sxfGJ1SYmXAmQOv4i9t2HUgb0RjKoBsEjRkejIfVQ7R
-        RlA5OQTJJBvE+
-X-Received: by 2002:adf:9447:: with SMTP id 65mr18006251wrq.331.1589189824501;
-        Mon, 11 May 2020 02:37:04 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLgXJL2J4QG833y891iupVzJ12ZpeHXWlbbAPxxD6jgWVlOjQHWoAXK6Z1hUwl6JqLwXHJL/w==
-X-Received: by 2002:adf:9447:: with SMTP id 65mr18006221wrq.331.1589189824311;
-        Mon, 11 May 2020 02:37:04 -0700 (PDT)
-Received: from localhost.localdomain ([194.230.155.159])
-        by smtp.gmail.com with ESMTPSA id r14sm1636537wmb.2.2020.05.11.02.37.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 02:37:03 -0700 (PDT)
-Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
- kernel statistics
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Adams <jwadams@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        David Rientjes <rientjes@google.com>
-References: <20200504110344.17560-1-eesposit@redhat.com>
- <CA+VK+GN=iDhDV2ZDJbBsxrjZ3Qoyotk_L0DvsbwDVvqrpFZ8fQ@mail.gmail.com>
- <29982969-92f6-b6d0-aeae-22edb401e3ac@redhat.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Message-ID: <20c45f7b-3daa-c300-a8e7-0fd26664080b@redhat.com>
-Date:   Mon, 11 May 2020 11:37:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=zwMOv/5lYrHVlC0KrboBSXdHgtiHMsqiApbipX705iE=;
+        b=g1zePbp4zFJpzqNjEzIJ0MjfU42ysbAD86M/i6EJcFGZYnQFoUwU9TZWE9EGYpwUSqVVOB
+        x8cBcUP13CAUZH+OvPxcw2KH21AwRYvi8CqxzNDqkT6mvEcdATfTQk1Ngx3Q8T8HcZ2x6x
+        BFna8ZFwCLH3XjZeRCFMJ8EokPVQd80=
+Date:   Mon, 11 May 2020 12:02:01 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 22/75] x86/boot/compressed/64: Add
+ set_page_en/decrypted() helpers
+Message-ID: <20200511100201.GA25861@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-23-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <29982969-92f6-b6d0-aeae-22edb401e3ac@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20200428151725.31091-23-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 5/8/20 11:44 AM, Paolo Bonzini wrote:
-> So in general I'd say the sources/values model holds up.  We certainly
-> want to:
+On Tue, Apr 28, 2020 at 05:16:32PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
-> - switch immediately to callbacks instead of the type constants (so that
-> core statsfs code only does signed/unsigned)
+> The functions are needed to map the GHCB for SEV-ES guests. The GHCB is
+> used for communication with the hypervisor, so its content must not be
+> encrypted. After the GHCB is not needed anymore it must be mapped
+> encrypted again so that the running kernel image can safely re-use the
+> memory.
 > 
-> - add a field to distinguish cumulative and floating properties (and use
-> it to determine the default file mode)
-> 
-> - add a new argument to statsfs_create_source and statsfs_create_values
-> that makes it not create directories and files respectively
-> 
-> - add a new API to look for a statsfs_value recursively in all the
-> subordinate sources, and pass the source/value pair to a callback
-> function; and reimplement recursive aggregation and clear in terms of
-> this function.
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/boot/compressed/ident_map_64.c | 134 ++++++++++++++++++++++++
+>  arch/x86/boot/compressed/misc.h         |   2 +
+>  2 files changed, 136 insertions(+)
 
-Ok I will apply this, thank you for all the suggestions. 
-I will post the v3 patchset in the next few weeks. 
+...
 
-In the meanwhile, I wrote the documentation you asked (even though it's 
-going to change in v3), you can find it here:
+> +
+> +static int set_clr_page_flags(struct x86_mapping_info *info,
+> +			      unsigned long address,
+> +			      pteval_t set, pteval_t clr)
+> +{
+> +	unsigned long scratch, *target;
+> +	pgd_t *pgdp = (pgd_t *)top_level_pgt;
+> +	p4d_t *p4dp;
+> +	pud_t *pudp;
+> +	pmd_t *pmdp;
+> +	pte_t *ptep, pte;
+> +
+> +	/*
+> +	 * First make sure there is a PMD mapping for 'address'.
+> +	 * It should already exist, but keep things generic.
+> +	 *
+> +	 * To map the page just read from it and fault it in if there is no
+> +	 * mapping yet. add_identity_map() can't be called here because that
+> +	 * would unconditionally map the address on PMD level, destroying any
+> +	 * PTE-level mappings that might already exist.  Also do something
+> +	 * useless
 
-https://github.com/esposem/linux/commit/dfa92f270f1aed73d5f3b7f12640b2a1635c711f
+You mean something like this?
 
-Thank you,
-Emanuele
+        asm volatile("mov %[address], %%r9"
+                     :: [address] "g" (*(unsigned long *)address)
+                     : "r9", "memory");
 
+The "memory" clobber should prevent gcc from optimizing that thing away
+and r9 is callee-clobbered.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
