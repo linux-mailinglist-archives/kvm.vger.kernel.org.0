@@ -2,176 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 130A61CD9DB
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 14:30:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69D2E1CDBC0
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 15:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729941AbgEKM3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 08:29:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24812 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729912AbgEKM3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 08:29:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589200176;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L8L4dH79F/shaoDlU4MtTMVVRmb5egfDfK9KucJ74l8=;
-        b=huSvlD/4V8ymdevWIYQxB6GpqBtcZbPNX5LSmWSo3UwqQp/l1xaYAXybWy1J/B3a2w3jft
-        sR0UIdPsJzEwSdrFTZqLC2Jr9CDHT57qfIL+pdABTcB7AZqP17IHnR2dpAo9t6/VF4Dkva
-        cDK0cRpiOHrU7LbtVRaNlA9tDDbFmAA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-3S5S_ZHHNHyUO1Z-WA_w4A-1; Mon, 11 May 2020 08:29:34 -0400
-X-MC-Unique: 3S5S_ZHHNHyUO1Z-WA_w4A-1
-Received: by mail-wr1-f69.google.com with SMTP id 90so5111512wrg.23
-        for <kvm@vger.kernel.org>; Mon, 11 May 2020 05:29:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=L8L4dH79F/shaoDlU4MtTMVVRmb5egfDfK9KucJ74l8=;
-        b=XDsPnoHO5L4fMwckIQZxKK+0YPYeJ8kfGNmpTI4I30aOcJp7lWYWX+9GyLv7/TSFYc
-         fKUjEH46rmwtStaui3AQKS4nfbLgJzGz2jUKCvnA42STr9brrw7KH7q8vkO+AFH44jPC
-         FC82gX1iZlD31+OyGL1OCzOik8cC/jcdgIS+mcVUf02hEc0uhb17V8sFd3kDCqL98kUh
-         TbIbrdKh8bYsIoY6WaXIaIHbxyvBfHsSZcWnc+RbkO4l/4UXtMr28Ly8tc+B/VNi3Lmh
-         GqR2othFXAy6W+bGK3hbCqxlOkasc6a1noqCZd4u5+iq5oe6Xiur2KOEPdgmv22y1vbN
-         NqIg==
-X-Gm-Message-State: AGi0PuZPqcIyt/v5qE4IbfVu/5RQFCG7vvtqcTK651U0pRzRFXjDWYL1
-        aozlgTJUPFZ3Y04kIXuDH1WqSGpE9u8hF5n0cgJ+MyuiVvO7P2m+ctrgWuLgSljRosR/u92Rcau
-        hHFX5S2QBp48r
-X-Received: by 2002:a5d:6b90:: with SMTP id n16mr439010wrx.220.1589200173501;
-        Mon, 11 May 2020 05:29:33 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKcKEiOnqfAsZMxICoK31AGYiX38a3/H8tq8UPmIBsMSzRauMwJT4miSZdGi0Vew+lO78Z9xw==
-X-Received: by 2002:a5d:6b90:: with SMTP id n16mr438995wrx.220.1589200173317;
-        Mon, 11 May 2020 05:29:33 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net. [88.21.202.17])
-        by smtp.gmail.com with ESMTPSA id q17sm9650822wmk.36.2020.05.11.05.29.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 05:29:32 -0700 (PDT)
-Subject: Re: [PATCH v26 01/10] acpi: nvdimm: change NVDIMM_UUID_LE to a common
- macro
-To:     Dongjiu Geng <gengdongjiu@huawei.com>, imammedo@redhat.com,
-        mst@redhat.com, xiaoguangrong.eric@gmail.com,
-        peter.maydell@linaro.org, shannon.zhaosl@gmail.com,
-        pbonzini@redhat.com, fam@euphon.net, rth@twiddle.net,
-        ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, qemu-arm@nongnu.org
-Cc:     zhengxiang9@huawei.com, Jonathan.Cameron@huawei.com,
-        linuxarm@huawei.com
-References: <20200507134205.7559-1-gengdongjiu@huawei.com>
- <20200507134205.7559-2-gengdongjiu@huawei.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4f29e19c-cb37-05e6-0ae3-c019370e090b@redhat.com>
-Date:   Mon, 11 May 2020 14:29:31 +0200
+        id S1730178AbgEKNtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 09:49:13 -0400
+Received: from mail-bn8nam11on2054.outbound.protection.outlook.com ([40.107.236.54]:30209
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729741AbgEKNtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 09:49:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DHuZUG2XqDiAeHEzHG7stEjJ9queoLjmTmJNNsDVzkkW6PzrIkAJBykfQNro4B1CGTwYs44XZEV2QgzNbETin7krautx0qIGn1qElcxNKH87BoIEUkAZJgfJC2t2qq1TEYpNAqBFdpA4/TBKSgHNhmZEuoHMO3IqDCQv/WhPdGejNy8dEVeDQTq/xDObkGHIkM6b1e14dcMrla5olbczX1DJaXhWVZ7+siUq9A5tyjlc0JKLiStrbu1zp78f3bu9+r5H80C5/EzQN0CSkrAAO1psdee0Bb3KIEJIOgGR/pvKQfLrTFQWck3NAKKPkX/7uYVnT0OOq/iS03YSWZvWCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zo/7Jq60TiX1A69TavXWGlbg4Qrw0AlJdWNoNLqVvgQ=;
+ b=UdCfyBl/LhjTU/PaKsA5TtvnyfGhwhpdAs02bM4FxhuSJ3Qmt6DF7YSj1+ZWu7yjLOt4hnAYixZqvBI4+CcXOJWeVxMt8vw8zbcGMrE6uQ1ez125o8Ls46WUUFbA6kMgRh087fQS0DZGu9hcwV/Zb2Wccb7+fThnVSE17WcvIsTNBdiCvx5c+N2yoD5u+pNi9Qwye4S8LqVSNqbNYcS+DSlXsfBlVcFKJAonPmkiHCatIzuzHXUzYy6fK97TT5dGc71s2b9e9EHOlNOES5xY5OkCNgUOE/3Lr19+b4bGkTC0HUpuC3DI9WBzOTRcdxW9mvTvQJJ28LgBwAp0zRSioA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zo/7Jq60TiX1A69TavXWGlbg4Qrw0AlJdWNoNLqVvgQ=;
+ b=2wMyGPfa+vSJh8OmEp9jeTC0qKEuaWjqKwx22tyw6DOCvyvmnrXCmkB6BOV2M64MO86em3Va9vhg7zjnOlJCa7e+IhEZZbcQ56KO4IXpe7GittCAtPrl91+aLQLzpM4ipRuh0a6vGVHU6itOj7yJYy6DeUZg9KVfIuYz9fUalL8=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2558.namprd12.prod.outlook.com (2603:10b6:802:2b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28; Mon, 11 May
+ 2020 13:49:06 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2979.033; Mon, 11 May 2020
+ 13:49:06 +0000
+Subject: Re: [PATCH v2 2/3] KVM: x86: Move pkru save/restore to x86.c
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        mchehab+samsung@kernel.org, changbin.du@intel.com,
+        Nadav Amit <namit@vmware.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        yang.shi@linux.alibaba.com, asteinhauser@google.com,
+        anshuman.khandual@arm.com, Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        steven.price@arm.com, rppt@linux.vnet.ibm.com, peterx@redhat.com,
+        Dan Williams <dan.j.williams@intel.com>, arjunroy@google.com,
+        logang@deltatee.com, Thomas Hellstrom <thellstrom@vmware.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, justin.he@arm.com,
+        robin.murphy@arm.com, ira.weiny@intel.com,
+        Kees Cook <keescook@chromium.org>,
+        Juergen Gross <jgross@suse.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        pawan.kumar.gupta@linux.intel.com,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
+        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
+References: <158897190718.22378.3974700869904223395.stgit@naples-babu.amd.com>
+ <158897219574.22378.9077333868984828038.stgit@naples-babu.amd.com>
+ <CALMp9eQj_aFcqR+v9SvFjKFxVjaHHzU44udcczJVqOR5vLQbWQ@mail.gmail.com>
+ <90657d4b-cb2b-0678-fd9c-a281bb85fadf@redhat.com>
+From:   Babu Moger <babu.moger@amd.com>
+Message-ID: <6bdf365d-f283-d26c-2465-2be28d7b55bf@amd.com>
+Date:   Mon, 11 May 2020 08:49:03 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200507134205.7559-2-gengdongjiu@huawei.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+ Thunderbird/68.7.0
+In-Reply-To: <90657d4b-cb2b-0678-fd9c-a281bb85fadf@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0801CA0011.namprd08.prod.outlook.com
+ (2603:10b6:803:29::21) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by SN4PR0801CA0011.namprd08.prod.outlook.com (2603:10b6:803:29::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26 via Frontend Transport; Mon, 11 May 2020 13:49:04 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 26426fb4-81e4-451b-fbf2-08d7f5b21279
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2558:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB25586C6D51AA7B297E0D3E1C95A10@SN1PR12MB2558.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 04004D94E2
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0q4Khsa0gyZsctNlSgdFblXEQwSVvw+pEXSCB2HgYZ4jJNzi54y1AL/rz9siNJakoTctxBR13Rq/m5MH1FjcnOWuGfeYRi/XXmxc0Ky8whvl1kMiohZpG5jGDl+C0Bky7v0jezGm+eK4y4r0zexcjAIZc6nu8QBhAW8mG3wkdhTg6ahwKHmBEvTKdqctxmL7SnL5bDgzNJkhysb5A73a53f8QSDrer5B7rsAtrBDj4lo/3vTqpn7bbPdDqVf9pw3uvNs+MuCOSlYG9KkrskzmhXQUecp8fP6VE5FkPFc2Z806CnuyFfqR+SlUgjAjzCt3ALdvc2h7aLh5xuwLtbFZ7A3iQZvKzVxXAO8oBWBRMxI6OJxs1rcW5T15O7Ob02krr0cYQMbD6JsCLEXlhUxdJ/eWfQA9244tiDVQoOw6w1i8MvU0Ui5LyXc4lBk6GpS+JL6khLMGJJ/A5nxOf4d8E0EO4Y2cDeWDrOHCrAkgkXj/DV2LkpJ/l4HxsqVXgRfelsaacZfx59FM+YJLjyLWaE9/MWA9w4DP+M3d/3QRdDVKcNqmPbRnMiugNjC/K+4
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(33430700001)(4326008)(478600001)(5660300002)(31686004)(2906002)(956004)(44832011)(2616005)(6486002)(33440700001)(8936002)(7416002)(7406005)(8676002)(66946007)(66476007)(66556008)(86362001)(31696002)(36756003)(52116002)(110136005)(186003)(316002)(16576012)(53546011)(54906003)(26005)(16526019)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 7TRexuNWePNl69CPRTLGZWlWACB/bfW8H9JBg6EZ/+TIZ6aPcJtFf57O7+XheQ8wvyRFaJ0LIG1UCwj4GpWmZ9JCiHA4gvEogzfThUDTqhNMoXpFMWjScCSr70dNixY4rkxL5Jpe5N2d1FSDqUpMNwS/9FzMqgCERT1JzracbJFm85bLThY+Hamz7XzwOBGb8sce78MjsPSl510qUKz5WJ8S7YAraW1Is0aAYPelx2ykiuN7HeuYfvgQArhqoZmApOGcdTq9ga17tnk8oXctr0Mgzbe+YNrzkwxXY3u64sk6Qb9/m3q3ffNjB46FWsTch5fi+KEJWcQ7tEaigqNkm1ykCvYpgjNUaPYgSCkz6h5rs87W/uhluvVEfV0VSP19nr86gVMaPW9PQT8IJqnp+DyUwZvLcXRWCdQIyvP8Bcuo7HcPqPoLy6Ppm1vL0DcwIcUJlqyN/XMWQFWjoqF+92yza1Pk++56DqBcgxjlyk8=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26426fb4-81e4-451b-fbf2-08d7f5b21279
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 13:49:06.3320
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X5tsROczz7DxGoVULoFTlsHU7rmiIu5R5sw4k6lI6YQTTHH7AxI7r6AQP1J0HO9K
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2558
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/7/20 3:41 PM, Dongjiu Geng wrote:
-> The little end UUID is used in many places, so make
-> NVDIMM_UUID_LE to a common macro to convert the UUID
-> to a little end array.
-> 
-> Reviewed-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
-> Change since v25:
-> 1. Address Peter's comments to add a proper doc-comment comment for
->     UUID_LE macros.
-> ---
->   hw/acpi/nvdimm.c    | 10 +++-------
->   include/qemu/uuid.h | 26 ++++++++++++++++++++++++++
->   slirp               |  2 +-
->   3 files changed, 30 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index fa7bf8b..9316d12 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -27,6 +27,7 @@
->    */
->   
->   #include "qemu/osdep.h"
-> +#include "qemu/uuid.h"
->   #include "hw/acpi/acpi.h"
->   #include "hw/acpi/aml-build.h"
->   #include "hw/acpi/bios-linker-loader.h"
-> @@ -34,18 +35,13 @@
->   #include "hw/mem/nvdimm.h"
->   #include "qemu/nvdimm-utils.h"
->   
-> -#define NVDIMM_UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
-> -   { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-> -     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
-> -     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
-> -
->   /*
->    * define Byte Addressable Persistent Memory (PM) Region according to
->    * ACPI 6.0: 5.2.25.1 System Physical Address Range Structure.
->    */
->   static const uint8_t nvdimm_nfit_spa_uuid[] =
-> -      NVDIMM_UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-> -                     0x18, 0xb7, 0x8c, 0xdb);
-> +      UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-> +              0x18, 0xb7, 0x8c, 0xdb);
->   
->   /*
->    * NVDIMM Firmware Interface Table
-> diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-> index 129c45f..2d17a90 100644
-> --- a/include/qemu/uuid.h
-> +++ b/include/qemu/uuid.h
-> @@ -34,6 +34,32 @@ typedef struct {
->       };
->   } QemuUUID;
->   
-> +/**
-> + * @time_low: The low field of the timestamp
-> + * @time_mid: The middle field of the timestamp
-> + * @time_hi_and_version: The high field of the timestamp
-> + *                       multiplexed with the version number
-> + * @clock_seq_hi_and_reserved: The high field of the clock
-> + *                             sequence multiplexed with the variant
-> + * @clock_seq_low: The low field of the clock sequence
-> + * @node0: The spatially unique node0 identifier
-> + * @node1: The spatially unique node1 identifier
-> + * @node2: The spatially unique node2 identifier
-> + * @node3: The spatially unique node3 identifier
-> + * @node4: The spatially unique node4 identifier
-> + * @node5: The spatially unique node5 identifier
-> + *
-> + * This macro converts the fields of UUID to little-endian array
-> + */
-> +#define UUID_LE(time_low, time_mid, time_hi_and_version, \
-> +  clock_seq_hi_and_reserved, clock_seq_low, node0, node1, node2, \
-> +  node3, node4, node5) \
-> +  { (time_low) & 0xff, ((time_low) >> 8) & 0xff, ((time_low) >> 16) & 0xff, \
-> +    ((time_low) >> 24) & 0xff, (time_mid) & 0xff, ((time_mid) >> 8) & 0xff, \
-> +    (time_hi_and_version) & 0xff, ((time_hi_and_version) >> 8) & 0xff, \
-> +    (clock_seq_hi_and_reserved), (clock_seq_low), (node0), (node1), (node2),\
-> +    (node3), (node4), (node5) }
-> +
->   #define UUID_FMT "%02hhx%02hhx%02hhx%02hhx-" \
->                    "%02hhx%02hhx-%02hhx%02hhx-" \
->                    "%02hhx%02hhx-" \
-> diff --git a/slirp b/slirp
-> index 2faae0f..55ab21c 160000
-> --- a/slirp
-> +++ b/slirp
-> @@ -1 +1 @@
-> -Subproject commit 2faae0f778f818fadc873308f983289df697eb93
-> +Subproject commit 55ab21c9a36852915b81f1b41ebaf3b6509dd8ba
 
-The SLiRP submodule change is certainly unrelated.
 
+On 5/9/20 7:59 AM, Paolo Bonzini wrote:
+> On 09/05/20 00:09, Jim Mattson wrote:
+>>> +       if (static_cpu_has(X86_FEATURE_PKU) &&
+>>> +           kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
+>>> +           vcpu->arch.pkru != vcpu->arch.host_pkru)
+>>> +               __write_pkru(vcpu->arch.pkru);
+>> This doesn't seem quite right to me. Though rdpkru and wrpkru are
+>> contingent upon CR4.PKE, the PKRU resource isn't. It can be read with
+>> XSAVE and written with XRSTOR. So, if we don't set the guest PKRU
+>> value here, the guest can read the host value, which seems dodgy at
+>> best.
+>>
+>> Perhaps the second conjunct should be: (kvm_read_cr4_bits(vcpu,
+>> X86_CR4_PKE) || (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)).
+
+Thanks Jim.
+> 
+> You're right.  The bug was preexistent, but we should fix it in 5.7 and
+> stable as well.
+Paolo, Do you want me to send this fix separately? Or I will send v3 just
+adding this fix. Thanks
+
+> 
+>>>  }
+>>>  EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
+>>>
+>>>  void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+>>>  {
+>>> +       /*
+>>> +        * eager fpu is enabled if PKEY is supported and CR4 is switched
+>>> +        * back on host, so it is safe to read guest PKRU from current
+>>> +        * XSAVE.
+>>> +        */
+>> I don't understand the relevance of this comment to the code below.
+>>
+> 
+> It's probably stale.
+
+Will remove it.
+> 
+> Paolo
+> 
