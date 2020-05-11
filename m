@@ -2,105 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15A641CE0F0
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 18:49:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FC2F1CE10E
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 19:00:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730827AbgEKQs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 12:48:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47189 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730826AbgEKQs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 12:48:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589215735;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=X8L7h7D0ZYrLjNfJnLUVqpCrchUXXgbyRVZhx5BAtmY=;
-        b=eGR/GXA9pDrHZ5jVJTg/sCc6E1VYGqnfshHqAZUGOqMdlrYvJ5bedO7Mnw4r6zxXFQmUKx
-        xisi12yeD06WYkOhHsnuTqig1MFNhxifdaPgA252rPVYnb26asEvNkxuFHIaijVeN5vFzQ
-        8kge0fvbm9VT3zQentYm0epSYPMNrPg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-KuiF88lPMBKdzDRTKad1FQ-1; Mon, 11 May 2020 12:48:51 -0400
-X-MC-Unique: KuiF88lPMBKdzDRTKad1FQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE8C71899520;
-        Mon, 11 May 2020 16:48:49 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 63CE6341FF;
-        Mon, 11 May 2020 16:48:46 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, x86@kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vivek Goyal <vgoyal@redhat.com>, Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 8/8] KVM: x86: drop KVM_PV_REASON_PAGE_READY case from kvm_handle_page_fault()
-Date:   Mon, 11 May 2020 18:47:52 +0200
-Message-Id: <20200511164752.2158645-9-vkuznets@redhat.com>
-In-Reply-To: <20200511164752.2158645-1-vkuznets@redhat.com>
-References: <20200511164752.2158645-1-vkuznets@redhat.com>
+        id S1730739AbgEKRAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 13:00:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34788 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730066AbgEKRAD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 13:00:03 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F363BC061A0C
+        for <kvm@vger.kernel.org>; Mon, 11 May 2020 10:00:02 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id x17so11917873wrt.5
+        for <kvm@vger.kernel.org>; Mon, 11 May 2020 10:00:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9kWXNAxgTfIQIU7fxFBJpa0sS9+TkbaWh3pDq6++0rA=;
+        b=bs1VBD1JIL44wVJ24en8AeeQKL9fARRQgMeYcZZTzIyEZ58qGou8X63Y8fF3o56azJ
+         KfwXivx/UEpQpEXxj9gg0pZohGa7L13g4sNgCEns2Ax1X4TNVjJWHc202d23y8NA/6YP
+         S+F37AyBsMuVYuH/HvzjOXUzjVl0gZpbNsSkhj5fps4+o3zyZOeck5H1gXNrBvfxvNJi
+         hv8QVU58pW1+jKghF9OPlbd4RkGXFVNJk1PHnM0n9WttDnZ48dyNDoWQD1KgDlQS+wjB
+         QMsPoPSXnVw3yqu4TR2w2pHFcOTExOMhO7kHn1Bq1dQsEXKCYo4FREkFTmNbQRvlFPym
+         bXUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=9kWXNAxgTfIQIU7fxFBJpa0sS9+TkbaWh3pDq6++0rA=;
+        b=Owa8J08Ejn0CvWr+pqOKYnQLWC0U0TgrlftMhD2jLtrveFaPq4SEs3Z/gXTBF7rm+r
+         vHaxB/cE+SR5B7mmnG8C7LuOEHTsR42wUKXpgJunm81LRiSvJqLc1KBgJW0eCj9ecogr
+         DkqjBQGGEWOo6u6hZcvtE43cwlZowWoQ2Krl1PQC84QpXR8BL24slJFBdL44fnJXiCyK
+         as98FVJIl87dQ5xVMkmTZqWzPi/hqccAIqaPOj9TAHRe9kLePFkrf/JffGvQsCj+gbkG
+         fYlBz/kXcZ0z75OydcBbHYnCog3OloWJpb/12n37CbcSOrv+yKYK4rIIlTERQRBcl7g6
+         PUxw==
+X-Gm-Message-State: AGi0PuZIl03QAPwnVtlKXubWerz3vvejT95E+VcOlO9FAEYmTfsVnc4T
+        9mbHzTJ3hLQZ3eM0CRqPZ8GsHjd8EHI=
+X-Google-Smtp-Source: APiQypKTlfhnV9AY9ECkxury0177vlKVo++RPFjZ/bv7HU0qlkkzVUb1NxRuMceFP1oLwQwDa5isUQ==
+X-Received: by 2002:adf:afd6:: with SMTP id y22mr19681325wrd.417.1589216401444;
+        Mon, 11 May 2020 10:00:01 -0700 (PDT)
+Received: from donizetti.redhat.com ([2001:b07:6468:f312:4c95:a679:8cf7:9fb6])
+        by smtp.gmail.com with ESMTPSA id m3sm2947258wrn.96.2020.05.11.10.00.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 May 2020 10:00:00 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: [PATCH kvm-unit-tests] x86: avoid multiply defined symbol
+Date:   Mon, 11 May 2020 18:59:59 +0200
+Message-Id: <20200511165959.42442-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM guest code in Linux enables APF only when KVM_FEATURE_ASYNC_PF_INT
-is supported, this means we will never see KVM_PV_REASON_PAGE_READY
-when handling page fault vmexit in KVM.
+Fedora 32 croaks about a symbol that is defined twice, fix it.
 
-While on it, make sure we only follow genuine page fault path when
-APF reason is zero. If we happen to see something else this means
-that the underlying hypervisor is misbehaving. Leave WARN_ON_ONCE()
-to catch that.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ lib/x86/fault_test.c |  2 +-
+ lib/x86/usermode.c   |  2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8071952e9cf2..5a9fca908ca9 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4187,7 +4187,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+diff --git a/lib/x86/fault_test.c b/lib/x86/fault_test.c
+index 078dae3..e15a218 100644
+--- a/lib/x86/fault_test.c
++++ b/lib/x86/fault_test.c
+@@ -1,6 +1,6 @@
+ #include "fault_test.h"
  
- 	vcpu->arch.l1tf_flush_l1d = true;
- 	switch (vcpu->arch.apf.host_apf_reason) {
--	default:
-+	case 0:
- 		trace_kvm_page_fault(fault_address, error_code);
+-jmp_buf jmpbuf;
++static jmp_buf jmpbuf;
  
- 		if (kvm_event_needs_reinjection(vcpu))
-@@ -4201,12 +4201,8 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 		kvm_async_pf_task_wait(fault_address, 0);
- 		local_irq_enable();
- 		break;
--	case KVM_PV_REASON_PAGE_READY:
--		vcpu->arch.apf.host_apf_reason = 0;
--		local_irq_disable();
--		kvm_async_pf_task_wake(fault_address);
--		local_irq_enable();
--		break;
-+	default:
-+		WARN_ON_ONCE(1);
- 	}
- 	return r;
- }
+ static void restore_exec_to_jmpbuf(void)
+ {
+diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+index f01ad9b..f032523 100644
+--- a/lib/x86/usermode.c
++++ b/lib/x86/usermode.c
+@@ -14,7 +14,7 @@
+ #define USERMODE_STACK_SIZE	0x2000
+ #define RET_TO_KERNEL_IRQ	0x20
+ 
+-jmp_buf jmpbuf;
++static jmp_buf jmpbuf;
+ 
+ static void restore_exec_to_jmpbuf(void)
+ {
 -- 
-2.25.4
+2.25.2
 
