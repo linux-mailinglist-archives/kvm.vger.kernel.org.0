@@ -2,224 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB92C1CD282
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 09:23:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F18F1CD454
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 11:00:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728649AbgEKHWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 03:22:55 -0400
-Received: from mga09.intel.com ([134.134.136.24]:47789 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725790AbgEKHWy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 03:22:54 -0400
-IronPort-SDR: BI9hI/3MW6a27ZB11cjbKBadyspLaOyCfDUYCd2ZfbNkns44tkie5Y7AIIq5Kt5eEUPOusMVAW
- PFFsHcwFVLDA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 00:22:54 -0700
-IronPort-SDR: O46fw8gdu1vnp0OfkTQA5RLAW6uGPfxssD+DnyEYWYEHV4PUgk9zzwLbmFNdDI5H/osLoDmXGt
- 9t4moQ5nMhOQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,378,1583222400"; 
-   d="scan'208";a="463290725"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.105])
-  by fmsmga006.fm.intel.com with ESMTP; 11 May 2020 00:22:49 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        jasowang@redhat.com
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH] ifcvf: move IRQ request/free to status change handlers
-Date:   Mon, 11 May 2020 15:19:23 +0800
-Message-Id: <1589181563-38400-1-git-send-email-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1728260AbgEKJA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 05:00:26 -0400
+Received: from sonic301-2.consmr.mail.bf2.yahoo.com ([74.6.129.41]:39419 "EHLO
+        sonic301-2.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725790AbgEKJAZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 05:00:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1589187624; bh=SnohaWCihTHtX2WADwWUldF3lvCDQyg/hKd3r7Maw3k=; h=Date:From:Reply-To:Subject:References:From:Subject; b=Lk7f7OOKkACrMkyypcbant/aBabRb+5L0ezghiRqUG+PFFfablKukn9wRGbqxWflUOq3AxVJffjfa0Wyp3Et7NlpvA2GvLfYEMe4iJeyU3hlOUINNUJfDvyuNvPjxHefyM2xT9SxpHZI0RfV956fL39WqCP8c2Zfe3uyRlqK9XlMxosYPmwtwCpziGHiMq8lwqGFavZ5d9SM8NgrJit5JjXoKGpfCK92U1TCfwQ0NmnMV1zYRT8SZtWt9q6riQfkbYw9q62NORUzIiYlgXJZ8B4bf7Oh9QpoNagRFDBL2x0Beq8bNIL1WO1dvFKcl8XaBxMtjz5wZnnqdS1CcE5d1w==
+X-YMail-OSG: 3xOnYiAVM1l3koaBsOdOHky3CwFD7nZf4cntDMJ4MsB5RzGlcsiej5h8pwHszuG
+ 7syF0sbtSUqK6H6hSIO19p2OKx16D0gEluSc_3zgmQnmQu1M0F6hu8AeXUXRJoiBo4xUsWdzcyxm
+ c2pY0kwtYxxyIgVJSV7rT4IVdA0gXMmwnuy6.lrS79jQi4j3itt0h6JtBjU0p02e.kjmchKUB6.P
+ 0WYQR0L2EQnPlW3mMbjKKKKVqu.JqAzBRH.M_tqe4lO4WdPAyfFTOAm71gyHJki9wZlGmrojOo_y
+ 3L8CUes0sfRGIkbVf7d5lUogVSwGLgGWt4e6p3uW3AD3Qz1XxxGy6Et154M02mdppvE6YDxV2qu5
+ 1NH8MFz7lksvoX5O5aHdxuk5kIyitnJ0iJ3.rHli7yyugXWgFh4.HQlZF8gsxGUzoJRysbPsUqJL
+ mEuKb3H2IlnN8vWzHM5qfGzynDofFDZ0CZ93H37CiRmfVGREP5wc985fQ_.zZ3Pb0Gm3XEo3oX_6
+ qYZ_6gz6w0_NTy3Mta.9BL6Z6kSx7F8LJO0Q5Jdtc532W9OpOcfAFE230KTgyitG27KzhyByg2Qa
+ W4tdjh.E3WFYqJL_66OOw2F99tJFKOQCm8rmWVpY0NmXac5JcsGCFKmMdr5i7_97.8puURtFhdre
+ fFcTJ5FAS96ag7B52t8Wcy35fQ36TDt_x.F8kMxi1GQ_PS79gWwmh.MwHFRYCf9MnLXFtAdOgxCn
+ fCQGsnIyOYtw4v9rVn6tQxiZqYByO3lVtvWkxs2CCSVFEvmxsVnd7.qy5xOWbI3ahmUBZnV.5Y4t
+ sGx37wDb78HJ6VBRpY9yldXZytnqT0FBXOfpIurlGd37QeqhPrVzpoCCqCFctuRTyiiDFC9RvGtU
+ wyipS5sGaOvW6pINhKwrXY4xigub92gSYvtITceJPdw_pEQ5ch2nDYwXAsFs490BuODeGXaD9Ph4
+ SjX8bNlUzuxd5btkIP9YRCdFqoi.1h6jicUFii_Pje.kVEC_rrNEuPEb7jUuNc2q_oyYI9yt75sz
+ R5P_XUl_GuqPUDgpk11RlXBJG4u_0ka3r5CCZNZpDIZa9T8rc9WYJe7637fguB2fEXYouZYuR5EY
+ oK8Ka9dYx_6tkLSMezmkKaxDYdc0EcA7uZRV.ILvvVqdz6OUo_b3BpnQ5CiNbAa4qKKBX.hq_75W
+ lCTvZ0gKsm58LidxeTK3xx5hfb9PHuPb8Hd5zWCuvj47MSQRJuMCI2JTFG53r9foPswqIMtpcrVM
+ dYPNDJ9axZ.bOVRUXqSTRSx3Vbtsd71lNQaWNTAAJuzWF8b9pic7HPzB8uW36C44v97n9HFRD1tV
+ MgA9ndjTdQ1iJGmlBc3V2T3aY2._ZVzFWs6zV
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.bf2.yahoo.com with HTTP; Mon, 11 May 2020 09:00:24 +0000
+Date:   Mon, 11 May 2020 09:00:23 +0000 (UTC)
+From:   "Mr.Solomon Omar" <mr.solomonomar776@gmail.com>
+Reply-To: mr.solomonomar00@gmail.com
+Message-ID: <116129701.511812.1589187623869@mail.yahoo.com>
+Subject: Hello dear,
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+References: <116129701.511812.1589187623869.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.15904 YMailNodin Mozilla/5.0 (Windows NT 6.1; rv:76.0) Gecko/20100101 Firefox/76.0
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit move IRQ request and free operations from probe()
-to VIRTIO status change handler to comply with VIRTIO spec.
 
-VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
-The device MUST NOT consume buffers or send any used buffer
-notifications to the driver before DRIVER_OK.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vdpa/ifcvf/ifcvf_main.c | 119 ++++++++++++++++++++++++----------------
- 1 file changed, 73 insertions(+), 46 deletions(-)
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index abf6a061..4d58bf2 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -28,6 +28,60 @@ static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
- 	return IRQ_HANDLED;
- }
- 
-+static void ifcvf_free_irq_vectors(void *data)
-+{
-+	pci_free_irq_vectors(data);
-+}
-+
-+static void ifcvf_free_irq(struct ifcvf_adapter *adapter, int queues)
-+{
-+	struct pci_dev *pdev = adapter->pdev;
-+	struct ifcvf_hw *vf = &adapter->vf;
-+	int i;
-+
-+
-+	for (i = 0; i < queues; i++)
-+		devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
-+
-+	ifcvf_free_irq_vectors(pdev);
-+}
-+
-+static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
-+{
-+	struct pci_dev *pdev = adapter->pdev;
-+	struct ifcvf_hw *vf = &adapter->vf;
-+	int vector, i, ret, irq;
-+
-+	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
-+				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
-+	if (ret < 0) {
-+		IFCVF_ERR(pdev, "Failed to alloc IRQ vectors\n");
-+		return ret;
-+	}
-+
-+	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
-+			 pci_name(pdev), i);
-+		vector = i + IFCVF_MSI_QUEUE_OFF;
-+		irq = pci_irq_vector(pdev, vector);
-+		ret = devm_request_irq(&pdev->dev, irq,
-+				       ifcvf_intr_handler, 0,
-+				       vf->vring[i].msix_name,
-+				       &vf->vring[i]);
-+		if (ret) {
-+			IFCVF_ERR(pdev,
-+				  "Failed to request irq for vq %d\n", i);
-+			ifcvf_free_irq(adapter, i);
-+
-+			return ret;
-+		}
-+
-+		vf->vring[i].irq = irq;
-+	}
-+
-+	return 0;
-+}
-+
- static int ifcvf_start_datapath(void *private)
- {
- 	struct ifcvf_hw *vf = ifcvf_private_to_vf(private);
-@@ -118,9 +172,12 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
- {
- 	struct ifcvf_adapter *adapter;
- 	struct ifcvf_hw *vf;
-+	u8 status_old;
-+	int ret;
- 
- 	vf  = vdpa_to_vf(vdpa_dev);
- 	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
-+	status_old = ifcvf_get_status(vf);
- 
- 	if (status == 0) {
- 		ifcvf_stop_datapath(adapter);
-@@ -128,7 +185,22 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
- 		return;
- 	}
- 
--	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-+	if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) &&
-+	    !(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+		ifcvf_stop_datapath(adapter);
-+		ifcvf_free_irq(adapter, IFCVF_MAX_QUEUE_PAIRS * 2);
-+	}
-+
-+	if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
-+	    !(status_old & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+		ret = ifcvf_request_irq(adapter);
-+		if (ret) {
-+			status = ifcvf_get_status(vf);
-+			status |= VIRTIO_CONFIG_S_FAILED;
-+			ifcvf_set_status(vf, status);
-+			return;
-+		}
-+
- 		if (ifcvf_start_datapath(adapter) < 0)
- 			IFCVF_ERR(adapter->pdev,
- 				  "Failed to set ifcvf vdpa  status %u\n",
-@@ -284,38 +356,6 @@ static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
- 	.set_config_cb  = ifcvf_vdpa_set_config_cb,
- };
- 
--static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
--{
--	struct pci_dev *pdev = adapter->pdev;
--	struct ifcvf_hw *vf = &adapter->vf;
--	int vector, i, ret, irq;
--
--
--	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
--		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
--			 pci_name(pdev), i);
--		vector = i + IFCVF_MSI_QUEUE_OFF;
--		irq = pci_irq_vector(pdev, vector);
--		ret = devm_request_irq(&pdev->dev, irq,
--				       ifcvf_intr_handler, 0,
--				       vf->vring[i].msix_name,
--				       &vf->vring[i]);
--		if (ret) {
--			IFCVF_ERR(pdev,
--				  "Failed to request irq for vq %d\n", i);
--			return ret;
--		}
--		vf->vring[i].irq = irq;
--	}
--
--	return 0;
--}
--
--static void ifcvf_free_irq_vectors(void *data)
--{
--	pci_free_irq_vectors(data);
--}
--
- static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct device *dev = &pdev->dev;
-@@ -349,13 +389,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return ret;
- 	}
- 
--	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
--				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
--	if (ret < 0) {
--		IFCVF_ERR(pdev, "Failed to alloc irq vectors\n");
--		return ret;
--	}
--
- 	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
- 	if (ret) {
- 		IFCVF_ERR(pdev,
-@@ -379,12 +412,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	adapter->pdev = pdev;
- 	adapter->vdpa.dma_dev = &pdev->dev;
- 
--	ret = ifcvf_request_irq(adapter);
--	if (ret) {
--		IFCVF_ERR(pdev, "Failed to request MSI-X irq\n");
--		goto err;
--	}
--
- 	ret = ifcvf_init_hw(vf, pdev);
- 	if (ret) {
- 		IFCVF_ERR(pdev, "Failed to init IFCVF hw\n");
--- 
-1.8.3.1
+Hello dear,
+
+I'm working with Bank International in Ouagadougou the capital city
+of Burkina Faso.
+=20
+I'm one of the senior director of the bank, I=E2=80=99m writing you this me=
+mo
+because I have this urgent deal/business proposal that will benefit me
+and you. Please write me on my personal email for more detail
+information concerning the issue at hand
+
+Email:  mr.solomonomar00@gmail.com
+
+Thanks,
+
+Mr.Solomon Omar
+
+
+
+
+
 
