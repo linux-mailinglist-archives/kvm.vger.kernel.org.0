@@ -2,56 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EBC361CE7E0
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 00:00:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFFEF1CE7E8
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 00:05:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727898AbgEKWAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 18:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53646 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725860AbgEKWAv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 18:00:51 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C710EC061A0C
-        for <kvm@vger.kernel.org>; Mon, 11 May 2020 15:00:51 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id r10so4684987pgv.8
-        for <kvm@vger.kernel.org>; Mon, 11 May 2020 15:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=yUQSZ/QJsH+GnnKfGI0/uIF5VRRwzEYlI439G/kMBbE=;
-        b=JGRQh414yNTT6zgAi7akMzr1Dii+BpmM0aB73XtfMhXynkm+p3olpVtU7IJPbF7tzV
-         bZpgxEuPgiHkwQjxiT4Lnb7vZ3swLCdrMKPn8Qe4lSQxUyLx1ztYmIkUQBqF8w4M1l5r
-         xhvXlZoP9wRxENUOPIOGxDL9nVE86TBvyCCmI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=yUQSZ/QJsH+GnnKfGI0/uIF5VRRwzEYlI439G/kMBbE=;
-        b=Psbtt4h56M3Dbljqy+nLwl4dFLOrmTupzA4kYYxyS6T1KjTYt67b5grMiLlBJ/Oirv
-         kmoCpr8HvgAIjHbN/KfAjusRPTi5V0dOiuz0KBQjYeFVWEu3/hdao9w2n646QNR82s45
-         oO1Z/aTk+MQk6L0W05vl2w63AmMFieyIaUBtVJATW4pLcyjnvWxwnWUqngTpXmQhEIb6
-         m1paIqmieZoTBimG09KcBtZgsnEVF1/KfGZJkO636Hb8yAcryOnza+8b7dctkXW+09N2
-         2PbSubPYnn8lv82LqzPIkA6rGagMKqrZ/P6+myHsR4E1AaPgPsjmACC2RGlCIXeENasv
-         fsWg==
-X-Gm-Message-State: AGi0PuaUgbU11JYbOy5ezOUYvM0YzExEuyJs27XFQD16J+Nu4x0szrgN
-        iOIDMZNGngHq/0+ioXxhxNfoKqWT+/4=
-X-Google-Smtp-Source: APiQypL/DZRhoFoQ9pDr9BCiPLTpc/QN90GBu/zct7XP3cRTfRzIAiu+yKL6qnuLqz0o4IbE054wYA==
-X-Received: by 2002:a63:a101:: with SMTP id b1mr16669217pgf.292.1589234450511;
-        Mon, 11 May 2020 15:00:50 -0700 (PDT)
-Received: from localhost ([2620:15c:202:200:c921:befc:7379:cdab])
-        by smtp.gmail.com with ESMTPSA id a129sm10230283pfb.102.2020.05.11.15.00.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 15:00:49 -0700 (PDT)
-From:   Micah Morton <mortonm@chromium.org>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        alex.williamson@redhat.com, jmattson@google.com
-Cc:     Micah Morton <mortonm@chromium.org>
-Subject: [RFC PATCH] KVM: Add module for IRQ forwarding
-Date:   Mon, 11 May 2020 15:00:46 -0700
-Message-Id: <20200511220046.120206-1-mortonm@chromium.org>
-X-Mailer: git-send-email 2.26.2.645.ge9eca65c58-goog
+        id S1727125AbgEKWFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 18:05:33 -0400
+Received: from mga05.intel.com ([192.55.52.43]:22436 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725860AbgEKWFc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 18:05:32 -0400
+IronPort-SDR: zLkLsT+bWY49JnWP2W73+wJYuJXRdEQhaQrEb3BBEKAMe5kIGdIr7a+loPLVyGzRpSlMWmFeOd
+ 4/Z7OWYtlv1w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 15:05:31 -0700
+IronPort-SDR: kHqOJzJSe172729f+kh6nTCkRXgHWriwhyIPr/rKS9zHYCgli/BmF1N7ZEQmyrxM5Q82p0as6J
+ sjJtVqAq/LQg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,381,1583222400"; 
+   d="scan'208";a="251276107"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by fmsmga007.fm.intel.com with ESMTP; 11 May 2020 15:05:30 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3] KVM: nVMX: Tweak handling of failure code for nested VM-Enter failure
+Date:   Mon, 11 May 2020 15:05:29 -0700
+Message-Id: <20200511220529.11402-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -59,631 +43,241 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Relevant KVM maintainers:
-I'm looking for comments on the feasibility of adding a module like
-this in KVM for solving the problem described below:
+Use an enum for passing around the failure code for a failed VM-Enter
+that results in VM-Exit to provide a level of indirection from the final
+resting place of the failure code, vmcs.EXIT_QUALIFICATION.  The exit
+qualification field is an unsigned long, e.g. passing around
+'u32 exit_qual' throws up red flags as it suggests KVM may be dropping
+bits when reporting errors to L1.  This is a red herring because the
+only defined failure codes are 0, 2, 3, and 4, i.e. don't come remotely
+close to overflowing a u32.
 
+Setting vmcs.EXIT_QUALIFICATION on entry failure is further complicated
+by the MSR load list, which returns the (1-based) entry that failed, and
+the number of MSRs to load is a 32-bit VMCS field.  At first blush, it
+would appear that overflowing a u32 is possible, but the number of MSRs
+that can be loaded is hardcapped at 4096 (limited by MSR_IA32_VMX_MISC).
 
-Currently, KVM/VFIO offers no way to forward interrupts into a guest
-from devices that are implicitly assigned to the VM by nature of being
-downstream from a bus controller PCI device (e.g. I2C controller) that
-gets explicitly assigned to the VM. This module allows for forwarding
-arbitrary interrupts on the host system into the guest, supporting this
-platform-device-behind-PCI-controller scenario.
+In other words, there are two completely disparate types of data that
+eventually get stuffed into vmcs.EXIT_QUALIFICATION, neither of which is
+an 'unsigned long' in nature.  This was presumably the reasoning for
+switching to 'u32' when the related code was refactored in commit
+ca0bde28f2ed6 ("kvm: nVMX: Split VMCS checks from nested_vmx_run()").
 
-This code is mostly inspired/taken from the equivalent code in VFIO. It
-is not a finished product, but I wanted to check in with the KVM mailing
-list in order to assess feasibility before doing any more work on it.
+Using an enum for the failure code addresses the technically-possible-
+but-will-never-happen scenario where Intel defines a failure code that
+doesn't fit in a 32-bit integer.  The enum variables and values will
+either be automatically sized (gcc 5.4 behavior) or be subjected to some
+combination of truncation.  The former case will simply work, while the
+latter will trigger a compile-time warning unless the compiler is being
+particularly unhelpful.
 
-One obvious question would be why not just add this support to VFIO?
-See https://www.redhat.com/archives/vfio-users/2019-December/msg00008.html
-and the encompassing thread for a discussion as to why this probably
-isn't the way to go.
+Separating the failure code from the failed MSR entry allows for
+disassociating both from vmcs.EXIT_QUALIFICATION, which avoids the
+conundrum where KVM has to choose between 'u32 exit_qual' and tracking
+values as 'unsigned long' that have no business being tracked as such.
+To cement the split, set vmcs12->exit_qualification directly from the
+entry error code or failed MSR index instead of bouncing through a local
+variable.
 
-Forwarding arbitrary IRQs to a guest VM does require the VMM to "tell"
-the guest about the interrupt (e.g. through ACPI), since such info is
-not discoverable by the guest like it is for PCI devices. So separate
-logic is needed in the VMM to set this up -- this isn't something done
-by the module shared here.
+Opportunistically rename the variables in load_vmcs12_host_state() and
+vmx_set_nested_state() to call out that they're ignored, set exit_reason
+on demand on nested VM-Enter failure, and add a comment in
+nested_vmx_load_msr() to call out that returning 'i + 1' can't wrap.
 
-Forwarding platform IRQs can have a big payoff for getting platform
-devices to work in a guest, especially when the platform devices sit
-behind a PCI bus controller that can be easily passed through to the
-guest. On an Intel device I'm using for development, this module allowed
-me to get multiple devices (keyboard, touchscreen, touchpad) working in
-a VM guest on the device that wouldn't have worked otherwise -- straight
-out of the box after passing through the PCI bus controller with
-vfio-pci (plus constructing some AML for the guest in the VMM).
+No functional change intended.
 
-NOTE: This code works for forwarding IRQs to a guest (with the VMM
-calling the appropriate ioctls with the appropriate args), although it's
-missing some code and testing related to shutdown/irq disable/reboot.
-Works well enough to demonstrate the feasibility though.
-
-Developed on top of v5.7-rc4.
-
-Signed-off-by: Micah Morton <mortonm@chromium.org>
+Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Jim Mattson <jmattson@google.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- include/linux/irqfd.h           |  22 +++
- include/linux/miscdevice.h      |   1 +
- include/uapi/linux/irqforward.h |  55 ++++++
- virt/lib/Kconfig                |   3 +
- virt/lib/Makefile               |   1 +
- virt/lib/irqfd.c                | 146 ++++++++++++++++
- virt/lib/irqforward.c           | 289 ++++++++++++++++++++++++++++++++
- 7 files changed, 517 insertions(+)
- create mode 100644 include/linux/irqfd.h
- create mode 100644 include/uapi/linux/irqforward.h
- create mode 100644 virt/lib/irqfd.c
- create mode 100644 virt/lib/irqforward.c
 
-diff --git a/include/linux/irqfd.h b/include/linux/irqfd.h
-new file mode 100644
-index 000000000000..79d2a8c779e1
---- /dev/null
-+++ b/include/linux/irqfd.h
-@@ -0,0 +1,22 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+#ifndef IRQFD_H
-+#define IRQFD_H
-+
-+#include <linux/poll.h>
-+
-+struct irq_forward_irqfd {
-+	struct eventfd_ctx	*eventfd;
-+	int			(*handler)(void *, void *);
-+	void			*data;
-+	wait_queue_entry_t	wait;
-+	poll_table		pt;
-+	struct work_struct	shutdown;
-+	struct irq_forward_irqfd		**pirqfd;
+v3:
+  - Set exit qual and reason in prepare_vmcs02() failure path. [kernel
+    test robot]
+
+v2:
+  - Set vmcs12->exit_qualification directly to avoid writing the failed
+    MSR index (a u32) to the entry_failure_code enum. [Jim]
+  - Set exit_reason on demand since the "goto vm_exit" paths need to set
+    vmcs12->exit_qualification anyways, i.e. already have curly braces.
+
+ arch/x86/include/asm/vmx.h | 10 ++++----
+ arch/x86/kvm/vmx/nested.c  | 47 +++++++++++++++++++++++---------------
+ 2 files changed, 34 insertions(+), 23 deletions(-)
+
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 5e090d1f03f8d..cd7de4b401fee 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -527,10 +527,12 @@ struct vmx_msr_entry {
+ /*
+  * Exit Qualifications for entry failure during or after loading guest state
+  */
+-#define ENTRY_FAIL_DEFAULT		0
+-#define ENTRY_FAIL_PDPTE		2
+-#define ENTRY_FAIL_NMI			3
+-#define ENTRY_FAIL_VMCS_LINK_PTR	4
++enum vm_entry_failure_code {
++	ENTRY_FAIL_DEFAULT		= 0,
++	ENTRY_FAIL_PDPTE		= 2,
++	ENTRY_FAIL_NMI			= 3,
++	ENTRY_FAIL_VMCS_LINK_PTR	= 4,
 +};
-+
-+int irq_forward_irqfd_enable(int (*handler)(void *, void *), void *data, struct irq_forward_irqfd **pirqfd, int fd);
-+#endif /* IRQFD_H */
-diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
-index c7a93002a3c1..f17b37fb8264 100644
---- a/include/linux/miscdevice.h
-+++ b/include/linux/miscdevice.h
-@@ -50,6 +50,7 @@
- #define D7S_MINOR		193
- #define VFIO_MINOR		196
- #define PXA3XX_GCU_MINOR	197
-+#define IRQ_FORWARD_MINOR       198
- #define TUN_MINOR		200
- #define CUSE_MINOR		203
- #define MWAVE_MINOR		219	/* ACP/Mwave Modem */
-diff --git a/include/uapi/linux/irqforward.h b/include/uapi/linux/irqforward.h
-new file mode 100644
-index 000000000000..a77aaa4841b5
---- /dev/null
-+++ b/include/uapi/linux/irqforward.h
-@@ -0,0 +1,55 @@
-+/*
-+ * API definition for IRQ Forwarding to KVM guests
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+#ifndef _UAPIIRQFORWARD_H
-+#define _UAPIIRQFORWARD_H
-+
-+#include <linux/ioctl.h>
-+
-+#define IRQ_FORWARD_API_VERSION	0
-+
-+#define IRQ_FORWARD_TYPE       (';')
-+#define IRQ_FORWARD_BASE       100
-+
-+struct irq_forward_edge_triggered {
-+	struct eventfd_ctx *trigger;
-+	uint32_t irq_num;
-+	struct list_head list;
-+};
-+
-+struct irq_forward_level_triggered {
-+	struct eventfd_ctx *trigger;
-+	struct irq_forward_irqfd *unmask;
-+	bool is_masked;
-+	spinlock_t spinlock;
-+	uint32_t irq_num;
-+	struct list_head list;
-+};
-+
-+/**
-+ *
-+ * Set masking and unmasking of interrupts.  Caller provides
-+ * struct irq_forward_set with all fields set.
-+ *
-+ */
-+struct irq_forward_set {
-+	__u32	argsz;
-+	__u32	action_flags;
-+#define IRQ_FORWARD_SET_LEVEL_TRIGGER_EVENTFD	(1 << 0)
-+#define IRQ_FORWARD_SET_LEVEL_UNMASK_EVENTFD	(1 << 1)
-+#define IRQ_FORWARD_SET_EDGE_TRIGGER		(1 << 2)
-+	__u32	irq_number_host;
-+	__u32	count;
-+	__u8	eventfd[];
-+};
-+
-+/* ---- IOCTLs for IRQ Forwarding fd (/dev/irq-forward) ---- */
-+#define IRQ_FORWARD_SET _IO(IRQ_FORWARD_TYPE, IRQ_FORWARD_BASE + 0)
-+
-+/* *********************************************************************** */
-+
-+#endif /* _UAPIIRQFORWARD_H */
-diff --git a/virt/lib/Kconfig b/virt/lib/Kconfig
-index 2d9523b7155e..847b06a95c14 100644
---- a/virt/lib/Kconfig
-+++ b/virt/lib/Kconfig
-@@ -1,3 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config IRQ_BYPASS_MANAGER
- 	tristate
-+
-+config IRQ_FORWARD
-+	tristate "Enable forwarding arbitrary IRQs to guest in KVM"
-diff --git a/virt/lib/Makefile b/virt/lib/Makefile
-index bd7f9a78bb6b..bd46aad8d426 100644
---- a/virt/lib/Makefile
-+++ b/virt/lib/Makefile
-@@ -1,2 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0-only
- obj-$(CONFIG_IRQ_BYPASS_MANAGER) += irqbypass.o
-+obj-$(CONFIG_IRQ_FORWARD) += irqforward.o irqfd.o
-diff --git a/virt/lib/irqfd.c b/virt/lib/irqfd.c
-new file mode 100644
-index 000000000000..4eb47a1c1e6f
---- /dev/null
-+++ b/virt/lib/irqfd.c
-@@ -0,0 +1,146 @@
-+#include <linux/file.h>
-+#include <linux/vfio.h>
-+#include <linux/eventfd.h>
-+#include <linux/slab.h>
-+#include <uapi/linux/irqforward.h>
-+#include <linux/irqfd.h>
-+
-+static struct workqueue_struct *irqfd_cleanup_wq;
-+static DEFINE_SPINLOCK(irqfd_lock);
-+
-+static void irqfd_deactivate(struct irq_forward_irqfd *irqfd)
-+{
-+        queue_work(irqfd_cleanup_wq, &irqfd->shutdown);
-+}
-+
-+static int irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
-+{
-+        struct irq_forward_irqfd *irqfd = container_of(wait, struct irq_forward_irqfd, wait);
-+        __poll_t flags = key_to_poll(key);
-+
-+        if (flags & EPOLLIN) {
-+                /* An event has been signaled, call function */
-+                if (!irqfd->handler ||
-+                     irqfd->handler(NULL, irqfd->data))
-+                        printk(KERN_EMERG "handler failed\n");
-+        }
-+
-+        if (flags & EPOLLHUP) {
-+                unsigned long flags;
-+                spin_lock_irqsave(&irqfd_lock, flags);
-+
-+                /*
-+                 * The eventfd is closing, if the irqfd has not yet been
-+                 * queued for release, as determined by testing whether the
-+                 * irqfd pointer to it is still valid, queue it now.  As
-+                 * with kvm irqfds, we know we won't race against the irqfd
-+                 * going away because we hold the lock to get here.
-+                 */
-+                if (*(irqfd->pirqfd) == irqfd) {
-+                        *(irqfd->pirqfd) = NULL;
-+                        irqfd_deactivate(irqfd);
-+                }
-+
-+                spin_unlock_irqrestore(&irqfd_lock, flags);
-+        }
-+
-+        return 0;
-+}
-+
-+
-+static void irqfd_ptable_queue_proc(struct file *file,
-+                                     wait_queue_head_t *wqh, poll_table *pt)
-+{
-+        struct irq_forward_irqfd *irqfd = container_of(pt, struct irq_forward_irqfd, pt);
-+        add_wait_queue(wqh, &irqfd->wait);
-+}
-+
-+static void irqfd_shutdown(struct work_struct *work)
-+{
-+        struct irq_forward_irqfd *irqfd = container_of(work, struct irq_forward_irqfd, shutdown);
-+        u64 cnt;
-+
-+        eventfd_ctx_remove_wait_queue(irqfd->eventfd, &irqfd->wait, &cnt);
-+        eventfd_ctx_put(irqfd->eventfd);
-+
-+        kfree(irqfd);
-+}
-+
-+int irq_forward_irqfd_enable(int (*handler)(void *, void *), void *data, struct irq_forward_irqfd **pirqfd, int fd)
-+{
-+        struct fd irqfd;
-+        struct eventfd_ctx *ctx;
-+        struct irq_forward_irqfd *irqfd_struct;
-+        int ret = 0;
-+        unsigned int events;
-+
-+        irqfd_struct = kzalloc(sizeof(*irqfd_struct), GFP_KERNEL);
-+        if (!irqfd_struct)
-+                return -ENOMEM;
-+
-+        irqfd_struct->pirqfd = pirqfd;
-+        irqfd_struct->handler = handler;
-+        irqfd_struct->data = data;
-+
-+        // shutdown causes crash
-+        INIT_WORK(&irqfd_struct->shutdown, irqfd_shutdown);
-+
-+        irqfd = fdget(fd);
-+        if (!irqfd.file) {
-+                ret = -EBADF;
-+                goto err_fd;
-+        }
-+
-+        ctx = eventfd_ctx_fileget(irqfd.file);
-+        if (IS_ERR(ctx)) {
-+                ret = PTR_ERR(ctx);
-+                goto err_ctx;
-+        }
-+
-+        irqfd_struct->eventfd = ctx;
-+
-+         // irqfds can be released by closing the eventfd or directly
-+         // through ioctl.  These are both done through a workqueue, so
-+         // we update the pointer to the irqfd under lock to avoid
-+         // pushing multiple jobs to release the same irqfd.
-+        spin_lock_irq(&irqfd_lock);
-+
-+        if (*pirqfd) {
-+                printk(KERN_EMERG "pirqfd should be NULL. BUG!\n");
-+                spin_unlock_irq(&irqfd_lock);
-+                ret = -EBUSY;
-+                goto err_busy;
-+        }
-+        *pirqfd = irqfd_struct;
-+
-+        spin_unlock_irq(&irqfd_lock);
-+
-+         // Install our own custom wake-up handling so we are notified via
-+         // a callback whenever someone signals the underlying eventfd.
-+        init_waitqueue_func_entry(&irqfd_struct->wait, irqfd_wakeup);
-+        init_poll_funcptr(&irqfd_struct->pt, irqfd_ptable_queue_proc);
-+
-+        events = irqfd.file->f_op->poll(irqfd.file, &irqfd_struct->pt);
-+
-+         // Check if there was an event already pending on the eventfd
-+         // before we registered and trigger it as if we didn't miss it.
-+        if (events & POLLIN) {
-+                if (!handler || handler(NULL, data))
-+                        printk(KERN_EMERG "handler failed\n");
-+        }
-+
-+         // Do not drop the file until the irqfd is fully initialized,
-+         // otherwise we might race against the POLLHUP.
-+        fdput(irqfd);
-+
-+        return 0;
-+err_busy:
-+        eventfd_ctx_put(ctx);
-+err_ctx:
-+        fdput(irqfd);
-+err_fd:
-+        kfree(irqfd_struct);
-+
-+        return ret;
-+}
-+EXPORT_SYMBOL_GPL(irq_forward_irqfd_enable);
-diff --git a/virt/lib/irqforward.c b/virt/lib/irqforward.c
-new file mode 100644
-index 000000000000..1d5030d347aa
---- /dev/null
-+++ b/virt/lib/irqforward.c
-@@ -0,0 +1,289 @@
-+#include <linux/cdev.h>
-+#include <linux/compat.h>
-+#include <linux/file.h>
-+#include <linux/fs.h>
-+#include <linux/miscdevice.h>
-+#include <linux/module.h>
-+#include <linux/pci.h>
-+#include <linux/sched.h>
-+//#include <linux/vfio.h>
-+#include <linux/eventfd.h>
-+#include <linux/delay.h>
-+#include <uapi/linux/irqforward.h>
-+#include <linux/irqfd.h>
-+
-+#define VERSION	"0.1"
-+#define AUTHOR	"Micah Morton <mortonm@chromium.org>"
-+#define DESC	"IRQ Forwarding"
-+
-+MODULE_VERSION(VERSION);
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR(AUTHOR);
-+MODULE_DESCRIPTION(DESC);
-+MODULE_ALIAS_MISCDEV(IRQ_FORWARD_MINOR);
-+MODULE_ALIAS("devname:irq-forward");
-+
-+static LIST_HEAD(level_triggered_irqs);
-+static LIST_HEAD(edge_triggered_irqs);
-+
-+
-+static int irq_forward_unmask_handler_level(void *opaque, void *level)
-+{
-+	unsigned long flags;
-+	struct irq_forward_level_triggered *l = (struct irq_forward_level_triggered *) level;
-+
-+	spin_lock_irqsave(&(l->spinlock), flags);
-+	if (l->is_masked) {
-+		enable_irq(l->irq_num);
-+		l->is_masked = false;
+ 
+ /*
+  * Exit Qualifications for EPT Violations
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 2c36f3f531088..8f1b41599f58d 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -922,6 +922,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
+ 	}
+ 	return 0;
+ fail:
++	/* Note, max_msr_list_size is at most 4096, i.e. this can't wrap. */
+ 	return i + 1;
+ }
+ 
+@@ -1117,7 +1118,7 @@ static bool nested_vmx_transition_mmu_sync(struct kvm_vcpu *vcpu)
+  * @entry_failure_code.
+  */
+ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool nested_ept,
+-			       u32 *entry_failure_code)
++			       enum vm_entry_failure_code *entry_failure_code)
+ {
+ 	if (cr3 != kvm_read_cr3(vcpu) || (!nested_ept && pdptrs_changed(vcpu))) {
+ 		if (CC(!nested_cr3_valid(vcpu, cr3))) {
+@@ -2470,7 +2471,7 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+  * is assigned to entry_failure_code on failure.
+  */
+ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+-			  u32 *entry_failure_code)
++			  enum vm_entry_failure_code *entry_failure_code)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct hv_enlightened_vmcs *hv_evmcs = vmx->nested.hv_evmcs;
+@@ -2930,11 +2931,11 @@ static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
+ 
+ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 					struct vmcs12 *vmcs12,
+-					u32 *exit_qual)
++					enum vm_entry_failure_code *entry_failure_code)
+ {
+ 	bool ia32e;
+ 
+-	*exit_qual = ENTRY_FAIL_DEFAULT;
++	*entry_failure_code = ENTRY_FAIL_DEFAULT;
+ 
+ 	if (CC(!nested_guest_cr0_valid(vcpu, vmcs12->guest_cr0)) ||
+ 	    CC(!nested_guest_cr4_valid(vcpu, vmcs12->guest_cr4)))
+@@ -2949,7 +2950,7 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 
+ 	if (nested_vmx_check_vmcs_link_ptr(vcpu, vmcs12)) {
+-		*exit_qual = ENTRY_FAIL_VMCS_LINK_PTR;
++		*entry_failure_code = ENTRY_FAIL_VMCS_LINK_PTR;
+ 		return -EINVAL;
+ 	}
+ 
+@@ -3241,9 +3242,9 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++	enum vm_entry_failure_code entry_failure_code;
+ 	bool evaluate_pending_interrupts;
+-	u32 exit_reason = EXIT_REASON_INVALID_STATE;
+-	u32 exit_qual;
++	u32 exit_reason, failed_index;
+ 
+ 	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+ 		kvm_vcpu_flush_tlb_current(vcpu);
+@@ -3291,24 +3292,33 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ 			return NVMX_VMENTRY_VMFAIL;
+ 		}
+ 
+-		if (nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
++		if (nested_vmx_check_guest_state(vcpu, vmcs12,
++						 &entry_failure_code)) {
++			exit_reason = EXIT_REASON_INVALID_STATE;
++			vmcs12->exit_qualification = entry_failure_code;
+ 			goto vmentry_fail_vmexit;
++		}
+ 	}
+ 
+ 	enter_guest_mode(vcpu);
+ 	if (vmcs12->cpu_based_vm_exec_control & CPU_BASED_USE_TSC_OFFSETTING)
+ 		vcpu->arch.tsc_offset += vmcs12->tsc_offset;
+ 
+-	if (prepare_vmcs02(vcpu, vmcs12, &exit_qual))
++	if (prepare_vmcs02(vcpu, vmcs12, &entry_failure_code)) {
++		exit_reason = EXIT_REASON_INVALID_STATE;
++		vmcs12->exit_qualification = entry_failure_code;
+ 		goto vmentry_fail_vmexit_guest_mode;
 +	}
-+	spin_unlock_irqrestore(&(l->spinlock), flags);
-+	return 0;
-+}
-+
-+
-+static irqreturn_t irq_forward_handler_level(int irq, void *level)
-+{
-+	unsigned long flags;
-+	int ret = IRQ_NONE;
-+	struct irq_forward_level_triggered *l = (struct irq_forward_level_triggered *) level;
-+	spin_lock_irqsave(&(l->spinlock), flags);
-+
-+	disable_irq_nosync(irq);
-+	l->is_masked = true;
-+	ret = IRQ_HANDLED;
-+
-+	spin_unlock_irqrestore(&(l->spinlock), flags);
-+
-+	if (ret == IRQ_HANDLED)
-+	        eventfd_signal(l->trigger, 1);
-+
-+	return ret;
-+}
-+
-+static irqreturn_t irq_forward_handler_edge(int irq, void *edge)
-+{
-+        eventfd_signal(((struct irq_forward_edge_triggered*)edge)->trigger, 1);
-+
-+        return IRQ_HANDLED;
-+}
-+
-+static int irq_forward_set_level_trigger(void *data, uint32_t irq_number_host, struct irq_forward_level_triggered *level)
-+{
-+	int32_t fd;
-+	struct eventfd_ctx *trigger;
-+	int ret;
-+
-+	fd = *(int32_t *)data;
-+
-+	if (fd < 0) /* Disable only */
-+	        return 0;
-+
-+	trigger = eventfd_ctx_fdget(fd);
-+	if (IS_ERR(trigger)) {
-+	        return PTR_ERR(trigger);
-+	}
-+
-+	level->trigger = trigger;
-+	spin_lock_init(&(level->spinlock));
-+
-+	ret = request_irq(irq_number_host, irq_forward_handler_level, 0, "level-triggered-irq", level);
-+	if (ret) {
-+	        level->trigger = NULL;
-+	        eventfd_ctx_put(trigger);
-+	        return ret;
-+	}
-+
-+	return 0;
-+
-+}
-+
-+static int irq_forward_set_level_unmask(void *data, struct irq_forward_level_triggered *level)
-+{
-+	int32_t fd;
-+	fd = *(int32_t *)data;
-+
-+	if (fd >= 0)
-+	        return irq_forward_irqfd_enable(irq_forward_unmask_handler_level, level, &(level->unmask), fd);
-+	return -1;
-+}
-+
-+static int irq_forward_set_edge_trigger(void *data, uint32_t irq_number_host, struct irq_forward_edge_triggered *edge)
-+{
-+	struct eventfd_ctx *trigger;
-+    int ret;
-+	int32_t fd;
-+	fd = *(int32_t *)data;
-+
-+	if (fd < 0) /* Disable only */
-+                return 0;
-+
-+        trigger = eventfd_ctx_fdget(fd);
-+        if (IS_ERR(trigger)) {
-+                return PTR_ERR(trigger);
-+        }
-+
-+        edge->trigger = trigger;
-+
-+        ret = request_irq(irq_number_host, irq_forward_handler_edge, IRQF_SHARED, "edge-triggered-irq", edge);
-+        if (ret) {
-+                edge->trigger = NULL;
-+                eventfd_ctx_put(trigger);
-+                return ret;
-+        }
-+
-+        return 0;
-+}
-+
-+
-+int set_irqs_ioctl_level_trigger(uint32_t irq_number_host, void *data) {
-+
-+        struct irq_forward_level_triggered *level_irq = kzalloc(sizeof(struct irq_forward_level_triggered), GFP_KERNEL);
-+        if (!level_irq)
-+                return -ENOMEM;
-+        level_irq->trigger = NULL;
-+        level_irq->irq_num = irq_number_host;
-+        level_irq->unmask = NULL;
-+        level_irq->is_masked = true;
-+        list_add(&(level_irq->list), &level_triggered_irqs);
-+
-+        return irq_forward_set_level_trigger(data, irq_number_host, level_irq);
-+}
-+
-+int set_irqs_ioctl_level_unmask(uint32_t irq_number_host, void *data) {
-+
-+        struct list_head* position = NULL;
-+        struct irq_forward_level_triggered *level_irq = NULL;
-+        // We must already have a trigger for the IRQ before we add an unmask
-+        list_for_each(position, &level_triggered_irqs) {
-+                level_irq = list_entry(position, struct irq_forward_level_triggered, list);
-+                if (level_irq->irq_num == irq_number_host)
-+                        return irq_forward_set_level_unmask(data, level_irq);
-+        }
-+
-+        return -1;
-+}
-+
-+int set_irqs_ioctl_edge_trigger(uint32_t irq_number_host, void *data) {
-+
-+        struct irq_forward_edge_triggered *edge_irq = kzalloc(sizeof(struct irq_forward_edge_triggered), GFP_KERNEL);
-+        if (!edge_irq)
-+                return -ENOMEM;
-+        edge_irq->trigger = NULL;
-+        edge_irq->irq_num = irq_number_host;
-+        list_add(&(edge_irq->list), &edge_triggered_irqs);
-+
-+        return irq_forward_set_edge_trigger(data, irq_number_host, edge_irq);
-+}
-+
-+int irq_forward_ioctl(void *device_data, unsigned long arg)
-+{
-+	u8 *data = NULL;
-+	unsigned long minsz;
-+	struct irq_forward_set hdr;
-+
-+
-+	minsz = offsetofend(struct irq_forward_set, count);
-+
-+	if (copy_from_user(&hdr, (void __user *)arg, minsz))
-+                return -EFAULT;
-+
-+	data = memdup_user((void __user *)(arg + minsz), sizeof(int32_t));
-+	if (IS_ERR(data))
-+	        return PTR_ERR(data);
-+
-+    switch (hdr.action_flags)
-+    {
-+        case IRQ_FORWARD_SET_LEVEL_TRIGGER_EVENTFD:
-+            return set_irqs_ioctl_level_trigger(hdr.irq_number_host, data);
-+        case IRQ_FORWARD_SET_LEVEL_UNMASK_EVENTFD:
-+            return set_irqs_ioctl_level_unmask(hdr.irq_number_host, data);
-+        case IRQ_FORWARD_SET_EDGE_TRIGGER:
-+            return set_irqs_ioctl_edge_trigger(hdr.irq_number_host, data);
-+        default:
-+            return -EINVAL;
-+    }
-+
-+	kfree(data);
-+	return 0;
-+}
-+
-+/**
-+ * IRQ Forwarding fd, /dev/irq-forward
-+ */
-+static long irq_forward_fops_unl_ioctl(struct file *filep,
-+				unsigned int cmd, unsigned long arg)
-+{
-+	long ret = -EINVAL;
-+
-+	switch (cmd) {
-+	case IRQ_FORWARD_SET:
-+		ret = (long) irq_forward_ioctl(filep, arg);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+	}
-+
-+	return ret;
-+}
-+
-+#ifdef CONFIG_COMPAT
-+static long irq_forward_fops_compat_ioctl(struct file *filep,
-+				   unsigned int cmd, unsigned long arg)
-+{
-+	arg = (unsigned long)compat_ptr(arg);
-+	return irq_forward_fops_unl_ioctl(filep, cmd, arg);
-+}
-+#endif	/* CONFIG_COMPAT */
-+
-+static int irq_forward_fops_open(struct inode *inode, struct file *filep)
-+{
-+	return 0;
-+}
-+
-+static int irq_forward_fops_release(struct inode *inode, struct file *filep)
-+{
-+	return 0;
-+}
-+
-+static const struct file_operations irq_forward_fops = {
-+	.owner		= THIS_MODULE,
-+	.open		= irq_forward_fops_open,
-+	.release	= irq_forward_fops_release,
-+	.unlocked_ioctl	= irq_forward_fops_unl_ioctl,
-+#ifdef CONFIG_COMPAT
-+	.compat_ioctl	= irq_forward_fops_compat_ioctl,
-+#endif
-+};
-+
-+static struct miscdevice irq_forward_dev = {
-+	.minor = IRQ_FORWARD_MINOR,
-+	.name = "irq-forward",
-+	.fops = &irq_forward_fops,
-+	.nodename = "irq-forward",
-+	.mode = S_IRUGO | S_IWUGO,
-+};
-+
-+static int __init irq_forward_init(void)
-+{
-+	int ret;
-+
-+	ret = misc_register(&irq_forward_dev);
-+	if (ret) {
-+		pr_err("irq-forward: misc device register failed\n");
-+		return ret;
-+	}
-+
-+	pr_info(DESC " version: " VERSION "\n");
-+
-+	return 0;
-+}
-+
-+// TODO: cleanup/free/disconnect stuff
-+static void __exit irq_forward_cleanup(void)
-+{
-+	misc_deregister(&irq_forward_dev);
-+}
-+
-+module_init(irq_forward_init);
-+module_exit(irq_forward_cleanup);
+ 
+ 	if (from_vmentry) {
+-		exit_reason = EXIT_REASON_MSR_LOAD_FAIL;
+-		exit_qual = nested_vmx_load_msr(vcpu,
+-						vmcs12->vm_entry_msr_load_addr,
+-						vmcs12->vm_entry_msr_load_count);
+-		if (exit_qual)
++		failed_index = nested_vmx_load_msr(vcpu,
++						   vmcs12->vm_entry_msr_load_addr,
++						   vmcs12->vm_entry_msr_load_count);
++		if (failed_index) {
++			exit_reason = EXIT_REASON_MSR_LOAD_FAIL;
++			vmcs12->exit_qualification = failed_index;
+ 			goto vmentry_fail_vmexit_guest_mode;
++		}
+ 	} else {
+ 		/*
+ 		 * The MMU is not initialized to point at the right entities yet and
+@@ -3372,7 +3382,6 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ 
+ 	load_vmcs12_host_state(vcpu, vmcs12);
+ 	vmcs12->vm_exit_reason = exit_reason | VMX_EXIT_REASONS_FAILED_VMENTRY;
+-	vmcs12->exit_qualification = exit_qual;
+ 	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
+ 		vmx->nested.need_vmcs12_to_shadow_sync = true;
+ 	return NVMX_VMENTRY_VMEXIT;
+@@ -4066,8 +4075,8 @@ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 				   struct vmcs12 *vmcs12)
+ {
++	enum vm_entry_failure_code ignored;
+ 	struct kvm_segment seg;
+-	u32 entry_failure_code;
+ 
+ 	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_EFER)
+ 		vcpu->arch.efer = vmcs12->host_ia32_efer;
+@@ -4102,7 +4111,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 	 * Only PDPTE load can fail as the value of cr3 was checked on entry and
+ 	 * couldn't have changed.
+ 	 */
+-	if (nested_vmx_load_cr3(vcpu, vmcs12->host_cr3, false, &entry_failure_code))
++	if (nested_vmx_load_cr3(vcpu, vmcs12->host_cr3, false, &ignored))
+ 		nested_vmx_abort(vcpu, VMX_ABORT_LOAD_HOST_PDPTE_FAIL);
+ 
+ 	if (!enable_ept)
+@@ -6002,7 +6011,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct vmcs12 *vmcs12;
+-	u32 exit_qual;
++	enum vm_entry_failure_code ignored;
+ 	struct kvm_vmx_nested_state_data __user *user_vmx_nested_state =
+ 		&user_kvm_nested_state->data.vmx[0];
+ 	int ret;
+@@ -6143,7 +6152,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 
+ 	if (nested_vmx_check_controls(vcpu, vmcs12) ||
+ 	    nested_vmx_check_host_state(vcpu, vmcs12) ||
+-	    nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
++	    nested_vmx_check_guest_state(vcpu, vmcs12, &ignored))
+ 		goto error_guest_mode;
+ 
+ 	vmx->nested.dirty_vmcs12 = true;
 -- 
-2.26.2.645.ge9eca65c58-goog
+2.26.0
 
