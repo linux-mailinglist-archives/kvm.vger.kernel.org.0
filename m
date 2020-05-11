@@ -2,118 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DF1B1CE132
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 19:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D41AA1CE145
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 19:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730840AbgEKREn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 13:04:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730731AbgEKREn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 13:04:43 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE570C061A0E
-        for <kvm@vger.kernel.org>; Mon, 11 May 2020 10:04:42 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id f18so10325875lja.13
-        for <kvm@vger.kernel.org>; Mon, 11 May 2020 10:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=/mo0sXYy7ZUcg8/iVmBIYTh3WKI/O9UKGDKgE3MM9OU=;
-        b=hXA4IfAyZ9uCnsRj1IlyziglyHt+A5cuk0JFQeVBiCHd9zjCrgOVMcKJF9i9K0lFkZ
-         2C0EBsUocyE95044XVsYOj08QZufGfYjnK/suq9vFsO1TFNcA80W1xcerX5ScCEXy/Nd
-         rED/AjvLfeVqsG+lg/Wk/5lSefhgNEdmBo3xyC6+sfroM2hkmWMdZ5kWIcqa3QKqvpaB
-         Aa7BOzwQIgN+bIV4VaIc6ltfDuEXR2FcLFZUJ/Ae8f349zSm2WFwFKOcEEsr/MHkGwZY
-         v6Rqq7VlvrVt08JcUojJNTr2VpUFyNe8xJNCHsV3y/TTNw6ahQimGkRuXPJ+YIhcFJBf
-         EKwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=/mo0sXYy7ZUcg8/iVmBIYTh3WKI/O9UKGDKgE3MM9OU=;
-        b=EQt7dQ3TmFO18eTaeVul3KF5txZphX/YlKxRFceNb/EAkrMO7ueOGwF3yZ5to9+ziM
-         CtX+wJxBD0E6+vHIjaA/dpqX/6QJzTuEL77TSutkDVCbTo4uiJgM0CPK2bCPBELnf3DF
-         vcNgWXxcrrL3NKUJn8iz03dHOfS+VPk7V4mHzIbojXrl/uiEk66NCJLg+1w5n8002wQ/
-         ILDPN/gtmLTLpS7DN6P6GhWr4g37sVGi8Ccop4E65sHyW4W9XY8bM/8qT1q7KX7mhJI2
-         I3UmQYQ6UOnfLH//Jb7aKQOGPNC18OLJRJp9bbT7fo9Bu9ZNl+LIuiwBPtoW2G+qzK+v
-         vdOQ==
-X-Gm-Message-State: AOAM530g4a0W1C4LwwqKYOk6ngbSXqCMhL51Xs6eFd0BVgeMDjJUYqJK
-        ck6OR2mUcVefHxvF9wZ7a79gx9pJ5eFX7IWPSCR+CA==
-X-Google-Smtp-Source: ABdhPJxgwHFVl1+McnRhXd3Gy7veJhg91K1rAcv5lPJNNEQ7CZDXxXmFozw0EfVRJSC/ejsFw2RnmMAQ5ErFRX3x/s8=
-X-Received: by 2002:a2e:b0e3:: with SMTP id h3mr10987519ljl.69.1589216680793;
- Mon, 11 May 2020 10:04:40 -0700 (PDT)
+        id S1730884AbgEKRIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 13:08:25 -0400
+Received: from mga18.intel.com ([134.134.136.126]:5185 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729731AbgEKRIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 13:08:25 -0400
+IronPort-SDR: uQgXUmqme2/AxKgrrbGSLEkYzfMSSOhWpxkuy/UvQAXZNOo2Q2e+8CIOkXSF4bNOaurI/YZsvM
+ QUN7wr51qSOg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 10:08:24 -0700
+IronPort-SDR: d7h2ysoQZV089QoNfOjaWz0naRqulVdSZtsKSpObhZ/KtQSpTLcFWoxTXUfJ9jDEM64Lgd4ihC
+ SOB/8Ui41iDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,380,1583222400"; 
+   d="scan'208";a="286343373"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga004.fm.intel.com with ESMTP; 11 May 2020 10:08:23 -0700
+Date:   Mon, 11 May 2020 10:08:23 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: VMX: Invoke kvm_exit tracepoint on VM-Exit due
+ to failed VM-Enter
+Message-ID: <20200511170823.GD24052@linux.intel.com>
+References: <20200508235348.19427-1-sean.j.christopherson@intel.com>
+ <20200508235348.19427-2-sean.j.christopherson@intel.com>
+ <551ed3f8-8e6c-adbd-67ff-babd39b7597f@redhat.com>
 MIME-Version: 1.0
-References: <20200504190526.84456-1-peterx@redhat.com> <20200505013929.GA17225@linux.intel.com>
- <20200505141245.GH6299@xz-x1> <20200511160537.GC24052@linux.intel.com>
-In-Reply-To: <20200511160537.GC24052@linux.intel.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Mon, 11 May 2020 10:04:29 -0700
-Message-ID: <CAOQ_Qsi-50zLtq8nKeUN8wYKkiq9TkX9fcNHwzZ_F5JX0qJp-g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Fix a warning in __kvm_gfn_to_hva_cache_init()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Tony Cook <tony-cook@bigpond.com>, zoran.davidovac@gmail.com,
-        euloanty@live.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <551ed3f8-8e6c-adbd-67ff-babd39b7597f@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 11, 2020 at 9:05 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> +cc a few other people that have reported this at one time or another.
->
-> On Tue, May 05, 2020 at 10:12:45AM -0400, Peter Xu wrote:
-> > On Mon, May 04, 2020 at 06:39:29PM -0700, Sean Christopherson wrote:
-> > > On Mon, May 04, 2020 at 03:05:26PM -0400, Peter Xu wrote:
-> > > > GCC 10.0.1 gives me this warning when building KVM:
-> > > >
-> > > >   warning: =E2=80=98nr_pages_avail=E2=80=99 may be used uninitializ=
-ed in this function [-Wmaybe-uninitialized]
-> > > >   2442 |  for ( ; start_gfn <=3D end_gfn; start_gfn +=3D nr_pages_a=
-vail) {
-> > > >
-> > > > It should not happen, but silent it.
-> > >
-> > > Heh, third times a charm?  This has been reported and proposed twice
-> > > before[1][2].  Are you using any custom compiler flags?  E.g. -O3 is =
-known
-> > > to cause false positives with -Wmaybe-uninitialized.
-> >
-> > No, what I did was only upgrading to Fedora 32 (which will auto-upgrade=
- GCC),
-> > so it should be using the default params of whatever provided.
-> >
-> > >
-> > > If we do end up killing this warning, I'd still prefer to use
-> > > uninitialized_var() over zero-initializing the variable.
-> > >
-> > > [1] https://lkml.kernel.org/r/20200218184756.242904-1-oupton@google.c=
-om
-> > > [2] https://bugzilla.kernel.org/show_bug.cgi?id=3D207173
-> >
-> > OK, I didn't know this is a known problem and discussions going on.  Bu=
-t I
-> > guess it would be good to address this sooner because it could become a=
- common
-> > warning very soon after people upgrades gcc.
->
-> Ya, others are hitting this as well.  It's especially painful with the
-> existence of KVM_WERROR.
->
-> Paolo, any preference on how to resolve this?  It would appear GCC 10 got
-> "smarter".
+On Sat, May 09, 2020 at 02:54:42PM +0200, Paolo Bonzini wrote:
+> On 09/05/20 01:53, Sean Christopherson wrote:
+> > Restore the pre-fastpath behavior of tracing all VM-Exits, including
+> > those due to failed VM-Enter.
+> > 
+> > Fixes: 032e5dcbcb443 ("KVM: VMX: Introduce generic fastpath handler")
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> Squashed, thanks.  Though is it really the right "Fixes"?
 
-Seems that doing absolutely nothing was the fix here :) See:
-
-78a5255ffb6a ("Stop the ad-hoc games with -Wno-maybe-initialized")
-
---
-Thanks,
-Oliver
+Pretty sure, that's the commit that moved trace_kvm_exit() from
+vmx_handle_exit() to vmx_vcpu_run().  Prior to that, all fastpaths still
+flowed through vmx_handle_exit().
