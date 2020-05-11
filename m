@@ -2,54 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9B4F1CE932
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 01:33:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB35E1CE949
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 01:44:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728332AbgEKXd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 19:33:28 -0400
-Received: from mail-eopbgr760071.outbound.protection.outlook.com ([40.107.76.71]:28677
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728261AbgEKXdX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 19:33:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lmpiUN8TOjyVVaQC2/9tucfFiS+aCn5Lf3pL8VPs50N6V9EkXwq8OPTSJSB8SRIWd5GOnZEjdH5iVtJYjJwd6fyfCx8ZqZiRr45zuctFw/RYlalyf18o6BLCuEK3G0eku0pNcut0mpHuhHWIAlJDTtqnJmkLFtEoL1/Sn7YOlp7/yyF3yrnOy8ow/2VALo+LdhgTAPU9YEfxfoZlDpWazx5xZfL/AUPDVY1XqJsFSl4Ha+cIQUGKdIiEOvYDKrlnrKqv9REpZ6FC7XNzl3sKSGKYDN/uX14h7W6TNiCHs41XiDIbemtM3hQpLC5gXuvkePZJp0/F8din4rn+5UCEAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nqilRk99qOMYfRRW+I52uP2RhGJQb5USNbXwMyNhXao=;
- b=auSiidjsJM32KiX7QnZ+DCEVl736SZAFGojDc/KiZBccFOVyHCpOLEWWZSQJDlrOeIickLpih6HzfbsnCRzfWj5n78742MxtD2oh+GMdNRtr/8OYFPUv2SSv0QAs9GVbtWSH4LCSwE+Z476Rod93YQcF2128W2NSxSZrfA8q5za4/HiAWstLJLCtVX/NxxYc6NLckVxIpge9YqBktwYbKzrYnR0uodJeFhFBHWytbMl0h6Et96hVwyBOr2qkc+WCsiqK8QJCguuzVI62H14dNgH0rC9gwdioh6SpwxthFEIe+qQ9azpujKn305K/Z7X5yvj05dQ9+JDzzleGKNU0cg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nqilRk99qOMYfRRW+I52uP2RhGJQb5USNbXwMyNhXao=;
- b=SoskrIKb5cKOTTfiSsqxiDvfZiI8UT0Hi6TFPSgZ/qO7DxiuIN65gBQOaUWGCamL5SwcCKUilD6Vtwc0XrWvWLqwGhmDB+bbztiqzTzKy0xZhlcQBUpbAi4rVdZ1++yXdS8SiY/cq4dkBdkLBlhn/8F1WOxQLfUnSyzpBpFbjMI=
-Authentication-Results: tencent.com; dkim=none (message not signed)
- header.d=none;tencent.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2478.namprd12.prod.outlook.com (2603:10b6:802:23::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28; Mon, 11 May
- 2020 23:33:19 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2979.033; Mon, 11 May 2020
- 23:33:19 +0000
-Subject: [PATCH v3 3/3] KVM: x86: Move MPK feature detection to common code
-From:   Babu Moger <babu.moger@amd.com>
-To:     corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        hpa@zytor.com, pbonzini@redhat.com, sean.j.christopherson@intel.com
+        id S1726908AbgEKXoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 19:44:17 -0400
+Received: from mga12.intel.com ([192.55.52.136]:31878 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725854AbgEKXoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 19:44:16 -0400
+IronPort-SDR: ZV6kH7rHHc0V7ZNBj2xkjIetKeBo+ZPXObEakGE4RWfXaKkQKkfpowroZxrY4ysGHtm7Ge5v9T
+ SVZ6mr31k74g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 16:44:14 -0700
+IronPort-SDR: IlzjwgVcRN8w8KjpMWXPQFlZgjhoMvhZOzRg0HF/aSBLH7Xhr4d8Bub5s0UyJmwvSqnRl80Js4
+ iX8vGqenE2qg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,381,1583222400"; 
+   d="scan'208";a="265323025"
+Received: from tmeseri-mobl.ger.corp.intel.com (HELO [10.254.97.79]) ([10.254.97.79])
+  by orsmga006.jf.intel.com with ESMTP; 11 May 2020 16:44:13 -0700
+Subject: Re: [PATCH v3 1/3] arch/x86: Rename config
+ X86_INTEL_MEMORY_PROTECTION_KEYS to generic x86
+To:     Babu Moger <babu.moger@amd.com>, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com
 Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
         jmattson@google.com, joro@8bytes.org, dave.hansen@linux.intel.com,
         luto@kernel.org, peterz@infradead.org, mchehab+samsung@kernel.org,
-        babu.moger@amd.com, changbin.du@intel.com, namit@vmware.com,
-        bigeasy@linutronix.de, yang.shi@linux.alibaba.com,
-        asteinhauser@google.com, anshuman.khandual@arm.com,
-        jan.kiszka@siemens.com, akpm@linux-foundation.org,
-        steven.price@arm.com, rppt@linux.vnet.ibm.com, peterx@redhat.com,
+        changbin.du@intel.com, namit@vmware.com, bigeasy@linutronix.de,
+        yang.shi@linux.alibaba.com, asteinhauser@google.com,
+        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
+        akpm@linux-foundation.org, steven.price@arm.com,
+        rppt@linux.vnet.ibm.com, peterx@redhat.com,
         dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
         thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
         robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
@@ -58,92 +45,100 @@ Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
         vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
         sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Mon, 11 May 2020 18:33:14 -0500
-Message-ID: <158923999440.20128.4859351750654993810.stgit@naples-babu.amd.com>
-In-Reply-To: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
 References: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
-User-Agent: StGit/unknown-version
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR18CA0055.namprd18.prod.outlook.com
- (2603:10b6:3:22::17) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ <158923997443.20128.16545619590919566266.stgit@naples-babu.amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <a92f3247-4b1e-0ff2-c1c7-68c149c0142c@intel.com>
+Date:   Mon, 11 May 2020 16:44:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from naples-babu.amd.com (165.204.78.2) by DM5PR18CA0055.namprd18.prod.outlook.com (2603:10b6:3:22::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26 via Frontend Transport; Mon, 11 May 2020 23:33:15 +0000
-X-Originating-IP: [165.204.78.2]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 17e3548f-d64b-4b4b-b811-08d7f603af88
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2478:|SN1PR12MB2478:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2478FC72FAB45AF0F43E22AC95A10@SN1PR12MB2478.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-Forefront-PRVS: 04004D94E2
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Lp07EaxNHX/7UDrHydmFbTYgzFZ0Zz7eRxSo8b3Z9IlhAdMGlVzAjgz8uMbUfUj0RKxL4syQlWQtLss+dNV5TIdPtJJFyw2D8DCsCc50kOaHTEN1cH33rM7e2hsWhi8KLUIhxDPrFztyqFnnBngeDFq3MGpaIYe7+bADFz93JS9jDmBVvL13dxWNSsec98gMVAPaZ2WRAU+fJNHMkB5CTeLOjAr79gqe3YwDVAFrbh/syAAlJnOPLj6BU9/MAGdAkEZtd8wIWyM6N4WtBH5Z9imrRM3jC06a9B+B2Dj1jLR2i8jx3d/MLeIpNtG3du3zwP0iNOvD3sWaF4hZV01UC62BzdqgmYhzPu95NqNgDfvvY4iWBh3YyDcswTgUdUnWbDxu0iXls+ZClsS3AxDtTrJTeQwnElokiywnjBKLoYKxyl/yYfmsoMvmdElGXkcfeg8MhlDHYhbFEUHKq/z1q1Jck/uLd9wnJ+NDXDR3ENsz0Ik1AyNsr88Pxt8JRmNV9NZAwb4LepCm24uOo6LQ8w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(376002)(396003)(136003)(39860400002)(366004)(33430700001)(8676002)(2906002)(478600001)(4326008)(8936002)(186003)(26005)(7406005)(16526019)(5660300002)(7416002)(44832011)(86362001)(316002)(103116003)(956004)(33440700001)(55016002)(66946007)(52116002)(7696005)(66476007)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: PDTczmJ3m/hcF6x/S3Wo6YXKY5N52wztI/VHD78AuumaQ001Vv52lOWW1ccQgXnO19C8xLdgfsyEOd1IxJavGA1eKg9UE6kUM47tJBdCgL7M52OulIhCX6GquILf/BLekYetcvH+lZXVNBTr1Nw96uuLUZdtv4wiWISXM0JojcXDW38w6sCWvllNNiyB9Hq8kzo7pJhVena2VJ5tkcubszWUdXMFrTUXn2yiR4wlBjJ3vv6krmg936BnsAuHzoSVJTfU4+V093eNr0MYIRYvXe8pUxndKZmlhguN40O8xbogTG5HTynDlF4NwlI3/oKo25/yQKt4RGYP2nX11guXkWJcgI4K7s/XP9LOdN1ERe59apgQzxXVTEYcq+wWyBzkiMXSo87LXcEzumHsMDOnlhFggz6VKgiH0DHBSRB7Q9Y11HEOswTtNl+2XrIPKG28Qaqfkib74seTadMmYYKy3Tn0CUB7I6rM6VwZExaMTdw=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 17e3548f-d64b-4b4b-b811-08d7f603af88
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 23:33:19.0719
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qGON+zFMhVGFkbIStjochE+orrsYkDCkTm8PMduUPnYpgc4C3eu6edxW5O+MeLgc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2478
+In-Reply-To: <158923997443.20128.16545619590919566266.stgit@naples-babu.amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Both Intel and AMD support (MPK) Memory Protection Key feature.
-Move the feature detection from VMX to the common code. It should
-work for both the platforms now.
+On 5/11/20 4:32 PM, Babu Moger wrote:
+> AMD's next generation of EPYC processors support the MPK (Memory
+> Protection Keys) feature.
+> 
+> So, rename X86_INTEL_MEMORY_PROTECTION_KEYS to X86_MEMORY_PROTECTION_KEYS.
+> 
+> No functional changes.
+> 
+> AMD documentation for MPK feature is available at "AMD64 Architecture
+> Programmer’s Manual Volume 2: System Programming, Pub. 24593 Rev. 3.34,
+> Section 5.6.6 Memory Protection Keys (MPK) Bit". Documentation can be
+> obtained at the link below.
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
----
- arch/x86/kvm/cpuid.c   |    4 +++-
- arch/x86/kvm/vmx/vmx.c |    4 ----
- 2 files changed, 3 insertions(+), 5 deletions(-)
+I was hoping to see at least *some* justification in this changelog.  Do
+you think having "INTEL_" will confuse users?  Is there some technical
+merit to this change?
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 901cd1fdecd9..3da7d6ea7574 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -278,6 +278,8 @@ void kvm_set_cpu_caps(void)
- #ifdef CONFIG_X86_64
- 	unsigned int f_gbpages = F(GBPAGES);
- 	unsigned int f_lm = F(LM);
-+	/* PKU is not yet implemented for shadow paging. */
-+	unsigned int f_pku = tdp_enabled ? F(PKU) : 0;
- #else
- 	unsigned int f_gbpages = 0;
- 	unsigned int f_lm = 0;
-@@ -326,7 +328,7 @@ void kvm_set_cpu_caps(void)
- 	);
- 
- 	kvm_cpu_cap_mask(CPUID_7_ECX,
--		F(AVX512VBMI) | F(LA57) | 0 /*PKU*/ | 0 /*OSPKE*/ | F(RDPID) |
-+		F(AVX512VBMI) | F(LA57) | f_pku | 0 /*OSPKE*/ | F(RDPID) |
- 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
- 		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
- 		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 46898a476ba7..d153732ed88f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7136,10 +7136,6 @@ static __init void vmx_set_cpu_caps(void)
- 	if (vmx_pt_mode_is_host_guest())
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
- 
--	/* PKU is not yet implemented for shadow paging. */
--	if (enable_ept && boot_cpu_has(X86_FEATURE_OSPKE))
--		kvm_cpu_cap_check_and_set(X86_FEATURE_PKU);
--
- 	if (vmx_umip_emulated())
- 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
- 
+The naming churn is an obviously bad, not technically necessary change.
 
+> +config X86_MEMORY_PROTECTION_KEYS
+> +	# Note: This is an intermediate change to avoid config prompt to
+> +	# the users. Eventually, the option X86_INTEL_MEMORY_PROTECTION_KEYS
+> +	# should be changed to X86_MEMORY_PROTECTION_KEYS permanently after
+> +	# few kernel revisions.
+> +	def_bool X86_INTEL_MEMORY_PROTECTION_KEYS
+
+"after a few kernel revisions" is code for "never". :)
+
+Could we put an explicit date on this, please?  One year seems roughly
+right.  Or, maybe "after the v5.10" release, so that this will approach
+will make into at least one LTS kernel.
+
+Maybe:
+
+# Set the "INTEL_"-free option whenever the "INTEL_" one is set.
+# The "INTEL_" one should be removed and replaced by this option after
+# 5.10.  This avoids exposing most 'oldconfig' users to this churn.
