@@ -2,36 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 025381CE0DF
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 18:48:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46A591CE0E1
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 18:48:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730635AbgEKQsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 12:48:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38860 "EHLO
+        id S1730730AbgEKQsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 12:48:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52086 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730561AbgEKQsB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 12:48:01 -0400
+        with ESMTP id S1729613AbgEKQsN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 12:48:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589215680;
+        s=mimecast20190719; t=1589215692;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=iI35m1Q2pEPIu1XMN3gYwH8xjnbhhmQn5yUKJEAaaGY=;
-        b=JY3+JDkjEKFVO559Ashqc5JtPf/22qBd4ISadbMG0zIpwwkej9iQr8CsGY/oDKivPlERUn
-        wewgUJqG2C03MggNmMN0KT1lO6YNF7FV2cR+ADhW5lYmNQ8/AF6MY1qXJqBovHaNC7Kn74
-        RvpxoGst0WNNVXlM3dFCqEYV5TP9ghk=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HhwY47nxj1UdfQsjm+9VtE1yq6uitrdcNiNFnzaGmSs=;
+        b=APxScxYUnyiPa8iq3DXwIRzVQL0EBUy3akyKB530FfpvwmW3Mt3cAjz6nlvanEG4TTWAZT
+        kcl2LIWxk5EsU3nFPal+hv9F3yF6Yo+E61lij1AenVO9U6ZHTjdofiBCR71XzAUPvprOhK
+        nqzjtLRXE5UEWRBJfeg3dHgWdUaOpc4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-Dnascdt-PiKmtD8rXmkjvQ-1; Mon, 11 May 2020 12:47:58 -0400
-X-MC-Unique: Dnascdt-PiKmtD8rXmkjvQ-1
+ us-mta-123-i1Ob4udyNbKM9TEIVonvRw-1; Mon, 11 May 2020 12:48:07 -0400
+X-MC-Unique: i1Ob4udyNbKM9TEIVonvRw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F338E100CCC1;
-        Mon, 11 May 2020 16:47:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAA87100CCC0;
+        Mon, 11 May 2020 16:48:00 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DDF59196AE;
-        Mon, 11 May 2020 16:47:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FA44341FF;
+        Mon, 11 May 2020 16:47:57 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, x86@kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -45,9 +46,11 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vivek Goyal <vgoyal@redhat.com>, Gavin Shan <gshan@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 0/8] KVM: x86: Interrupt-based mechanism for async_pf 'page present' notifications
-Date:   Mon, 11 May 2020 18:47:44 +0200
-Message-Id: <20200511164752.2158645-1-vkuznets@redhat.com>
+Subject: [PATCH 1/8] Revert "KVM: async_pf: Fix #DF due to inject "Page not Present" and "Page Ready" exceptions simultaneously"
+Date:   Mon, 11 May 2020 18:47:45 +0200
+Message-Id: <20200511164752.2158645-2-vkuznets@redhat.com>
+In-Reply-To: <20200511164752.2158645-1-vkuznets@redhat.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
@@ -56,56 +59,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Concerns were expressed around (ab)using #PF for KVM's async_pf mechanism,
-it seems that re-using #PF exception for a PV mechanism wasn't a great
-idea after all. The Grand Plan is to switch to using e.g. #VE for 'page
-not present' events and normal APIC interrupts for 'page ready' events.
-This series does the later.
+Commit 9a6e7c39810e (""KVM: async_pf: Fix #DF due to inject "Page not
+Present" and "Page Ready" exceptions simultaneously") added a protection
+against 'page ready' notification coming before 'page not ready' is
+delivered. This situation seems to be impossible since commit 2a266f23550b
+("KVM MMU: check pending exception before injecting APF) which added
+'vcpu->arch.exception.pending' check to kvm_can_do_async_pf.
 
-Changes since RFC:
-- Using #PF for 'page ready' is deprecated and removed [Paolo Bonzini]
-- 'reason' field in 'struct kvm_vcpu_pv_apf_data' is not used for 'page ready'
-  notifications and 'pageready_token' is not used for 'page not present' events
-  [Paolo Bonzini]
-- Renamed MSR_KVM_ASYNC_PF2 -> MSR_KVM_ASYNC_PF_INT [Peter Xu]
-- Drop 'enabled' field from MSR_KVM_ASYNC_PF_INT [Peter Xu]
-- Other minor changes supporting the above.
+On x86, kvm_arch_async_page_present() has only one call site:
+kvm_check_async_pf_completion() loop and we only enter the loop when
+kvm_arch_can_inject_async_page_present(vcpu) which when async pf msr
+is enabled, translates into kvm_can_do_async_pf().
 
-Vitaly Kuznetsov (8):
-  Revert "KVM: async_pf: Fix #DF due to inject "Page not Present" and
-    "Page Ready" exceptions simultaneously"
-  KVM: x86: extend struct kvm_vcpu_pv_apf_data with token info
-  KVM: introduce kvm_read_guest_offset_cached()
-  KVM: x86: interrupt based APF page-ready event delivery
-  KVM: x86: acknowledgment mechanism for async pf page ready
-    notifications
-  KVM: x86: announce KVM_FEATURE_ASYNC_PF_INT
-  KVM: x86: Switch KVM guest to using interrupts for page ready APF
-    delivery
-  KVM: x86: drop KVM_PV_REASON_PAGE_READY case from
-    kvm_handle_page_fault()
+There is also one problem with the cancellation mechanism. We don't seem
+to check that the 'page not ready' notification we're canceling matches
+the 'page ready' notification so in theory, we may erroneously drop two
+valid events.
 
- Documentation/virt/kvm/cpuid.rst     |   6 ++
- Documentation/virt/kvm/msr.rst       | 106 ++++++++++++++------
- arch/s390/include/asm/kvm_host.h     |   2 +
- arch/x86/entry/entry_32.S            |   5 +
- arch/x86/entry/entry_64.S            |   5 +
- arch/x86/include/asm/hardirq.h       |   3 +
- arch/x86/include/asm/irq_vectors.h   |   6 +-
- arch/x86/include/asm/kvm_host.h      |   7 +-
- arch/x86/include/asm/kvm_para.h      |   6 ++
- arch/x86/include/uapi/asm/kvm_para.h |  11 ++-
- arch/x86/kernel/irq.c                |   9 ++
- arch/x86/kernel/kvm.c                |  42 ++++++--
- arch/x86/kvm/cpuid.c                 |   3 +-
- arch/x86/kvm/mmu/mmu.c               |  10 +-
- arch/x86/kvm/x86.c                   | 142 ++++++++++++++++++---------
- include/linux/kvm_host.h             |   3 +
- include/uapi/linux/kvm.h             |   1 +
- virt/kvm/async_pf.c                  |  10 ++
- virt/kvm/kvm_main.c                  |  19 +++-
- 19 files changed, 295 insertions(+), 101 deletions(-)
+Revert the commit.
 
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/x86.c | 23 +----------------------
+ 1 file changed, 1 insertion(+), 22 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c5835f9cb9ad..edd4a6415b92 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10359,13 +10359,6 @@ static int apf_put_user(struct kvm_vcpu *vcpu, u32 val)
+ 				      sizeof(val));
+ }
+ 
+-static int apf_get_user(struct kvm_vcpu *vcpu, u32 *val)
+-{
+-
+-	return kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.apf.data, val,
+-				      sizeof(u32));
+-}
+-
+ static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
+ {
+ 	if (!vcpu->arch.apf.delivery_as_pf_vmexit && is_guest_mode(vcpu))
+@@ -10430,7 +10423,6 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+ 				 struct kvm_async_pf *work)
+ {
+ 	struct x86_exception fault;
+-	u32 val;
+ 
+ 	if (work->wakeup_all)
+ 		work->arch.token = ~0; /* broadcast wakeup */
+@@ -10439,19 +10431,7 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+ 	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
+ 
+ 	if (vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED &&
+-	    !apf_get_user(vcpu, &val)) {
+-		if (val == KVM_PV_REASON_PAGE_NOT_PRESENT &&
+-		    vcpu->arch.exception.pending &&
+-		    vcpu->arch.exception.nr == PF_VECTOR &&
+-		    !apf_put_user(vcpu, 0)) {
+-			vcpu->arch.exception.injected = false;
+-			vcpu->arch.exception.pending = false;
+-			vcpu->arch.exception.nr = 0;
+-			vcpu->arch.exception.has_error_code = false;
+-			vcpu->arch.exception.error_code = 0;
+-			vcpu->arch.exception.has_payload = false;
+-			vcpu->arch.exception.payload = 0;
+-		} else if (!apf_put_user(vcpu, KVM_PV_REASON_PAGE_READY)) {
++	    !apf_put_user(vcpu, KVM_PV_REASON_PAGE_READY)) {
+ 			fault.vector = PF_VECTOR;
+ 			fault.error_code_valid = true;
+ 			fault.error_code = 0;
+@@ -10459,7 +10439,6 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+ 			fault.address = work->arch.token;
+ 			fault.async_page_fault = true;
+ 			kvm_inject_page_fault(vcpu, &fault);
+-		}
+ 	}
+ 	vcpu->arch.apf.halted = false;
+ 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
 -- 
 2.25.4
 
