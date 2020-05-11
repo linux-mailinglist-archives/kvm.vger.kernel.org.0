@@ -2,74 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F18F1CD454
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 11:00:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65BB31CD4DC
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 11:27:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728260AbgEKJA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 05:00:26 -0400
-Received: from sonic301-2.consmr.mail.bf2.yahoo.com ([74.6.129.41]:39419 "EHLO
-        sonic301-2.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725790AbgEKJAZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 05:00:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1589187624; bh=SnohaWCihTHtX2WADwWUldF3lvCDQyg/hKd3r7Maw3k=; h=Date:From:Reply-To:Subject:References:From:Subject; b=Lk7f7OOKkACrMkyypcbant/aBabRb+5L0ezghiRqUG+PFFfablKukn9wRGbqxWflUOq3AxVJffjfa0Wyp3Et7NlpvA2GvLfYEMe4iJeyU3hlOUINNUJfDvyuNvPjxHefyM2xT9SxpHZI0RfV956fL39WqCP8c2Zfe3uyRlqK9XlMxosYPmwtwCpziGHiMq8lwqGFavZ5d9SM8NgrJit5JjXoKGpfCK92U1TCfwQ0NmnMV1zYRT8SZtWt9q6riQfkbYw9q62NORUzIiYlgXJZ8B4bf7Oh9QpoNagRFDBL2x0Beq8bNIL1WO1dvFKcl8XaBxMtjz5wZnnqdS1CcE5d1w==
-X-YMail-OSG: 3xOnYiAVM1l3koaBsOdOHky3CwFD7nZf4cntDMJ4MsB5RzGlcsiej5h8pwHszuG
- 7syF0sbtSUqK6H6hSIO19p2OKx16D0gEluSc_3zgmQnmQu1M0F6hu8AeXUXRJoiBo4xUsWdzcyxm
- c2pY0kwtYxxyIgVJSV7rT4IVdA0gXMmwnuy6.lrS79jQi4j3itt0h6JtBjU0p02e.kjmchKUB6.P
- 0WYQR0L2EQnPlW3mMbjKKKKVqu.JqAzBRH.M_tqe4lO4WdPAyfFTOAm71gyHJki9wZlGmrojOo_y
- 3L8CUes0sfRGIkbVf7d5lUogVSwGLgGWt4e6p3uW3AD3Qz1XxxGy6Et154M02mdppvE6YDxV2qu5
- 1NH8MFz7lksvoX5O5aHdxuk5kIyitnJ0iJ3.rHli7yyugXWgFh4.HQlZF8gsxGUzoJRysbPsUqJL
- mEuKb3H2IlnN8vWzHM5qfGzynDofFDZ0CZ93H37CiRmfVGREP5wc985fQ_.zZ3Pb0Gm3XEo3oX_6
- qYZ_6gz6w0_NTy3Mta.9BL6Z6kSx7F8LJO0Q5Jdtc532W9OpOcfAFE230KTgyitG27KzhyByg2Qa
- W4tdjh.E3WFYqJL_66OOw2F99tJFKOQCm8rmWVpY0NmXac5JcsGCFKmMdr5i7_97.8puURtFhdre
- fFcTJ5FAS96ag7B52t8Wcy35fQ36TDt_x.F8kMxi1GQ_PS79gWwmh.MwHFRYCf9MnLXFtAdOgxCn
- fCQGsnIyOYtw4v9rVn6tQxiZqYByO3lVtvWkxs2CCSVFEvmxsVnd7.qy5xOWbI3ahmUBZnV.5Y4t
- sGx37wDb78HJ6VBRpY9yldXZytnqT0FBXOfpIurlGd37QeqhPrVzpoCCqCFctuRTyiiDFC9RvGtU
- wyipS5sGaOvW6pINhKwrXY4xigub92gSYvtITceJPdw_pEQ5ch2nDYwXAsFs490BuODeGXaD9Ph4
- SjX8bNlUzuxd5btkIP9YRCdFqoi.1h6jicUFii_Pje.kVEC_rrNEuPEb7jUuNc2q_oyYI9yt75sz
- R5P_XUl_GuqPUDgpk11RlXBJG4u_0ka3r5CCZNZpDIZa9T8rc9WYJe7637fguB2fEXYouZYuR5EY
- oK8Ka9dYx_6tkLSMezmkKaxDYdc0EcA7uZRV.ILvvVqdz6OUo_b3BpnQ5CiNbAa4qKKBX.hq_75W
- lCTvZ0gKsm58LidxeTK3xx5hfb9PHuPb8Hd5zWCuvj47MSQRJuMCI2JTFG53r9foPswqIMtpcrVM
- dYPNDJ9axZ.bOVRUXqSTRSx3Vbtsd71lNQaWNTAAJuzWF8b9pic7HPzB8uW36C44v97n9HFRD1tV
- MgA9ndjTdQ1iJGmlBc3V2T3aY2._ZVzFWs6zV
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.bf2.yahoo.com with HTTP; Mon, 11 May 2020 09:00:24 +0000
-Date:   Mon, 11 May 2020 09:00:23 +0000 (UTC)
-From:   "Mr.Solomon Omar" <mr.solomonomar776@gmail.com>
-Reply-To: mr.solomonomar00@gmail.com
-Message-ID: <116129701.511812.1589187623869@mail.yahoo.com>
-Subject: Hello dear,
+        id S1729348AbgEKJ1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 05:27:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22801 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725993AbgEKJ1F (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 05:27:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589189222;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=13BAfE/1sRi/J98yTfEpMD1AFwnvSYNGHAmPHqQf/Xs=;
+        b=bAq1Ws61NhzVkyb0RcrYAxrhfqPtdsI7iAKXrbkB1lnfx73drcBWNI5VjchcAlZRpXCXE4
+        M6hZrxTpgHmHIWYyzbJ06b9QzVBkjSranz3OKOUmcJconl13L50yPM3zINe2HlS8uL40aW
+        bNG1fQZRsL1JUheJDc2bIu1hREZjD6Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-422-054MV0GAOBWYzkGne0pEFA-1; Mon, 11 May 2020 05:27:01 -0400
+X-MC-Unique: 054MV0GAOBWYzkGne0pEFA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C06AA18CA274;
+        Mon, 11 May 2020 09:26:59 +0000 (UTC)
+Received: from [10.72.12.137] (ovpn-12-137.pek2.redhat.com [10.72.12.137])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2670C165F6;
+        Mon, 11 May 2020 09:26:50 +0000 (UTC)
+Subject: Re: [PATCH] ifcvf: move IRQ request/free to status change handlers
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
+References: <1589181563-38400-1-git-send-email-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <22d9dcdb-e790-0a68-ba41-b9530b2bf9fd@redhat.com>
+Date:   Mon, 11 May 2020 17:26:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-References: <116129701.511812.1589187623869.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.15904 YMailNodin Mozilla/5.0 (Windows NT 6.1; rv:76.0) Gecko/20100101 Firefox/76.0
-To:     unlisted-recipients:; (no To-header on input)
+In-Reply-To: <1589181563-38400-1-git-send-email-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 2020/5/11 下午3:19, Zhu Lingshan wrote:
+> This commit move IRQ request and free operations from probe()
+> to VIRTIO status change handler to comply with VIRTIO spec.
+>
+> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
+> The device MUST NOT consume buffers or send any used buffer
+> notifications to the driver before DRIVER_OK.
 
 
-Hello dear,
+My previous explanation might be wrong here. It depends on how you 
+implement your hardware, if you hardware guarantee that no interrupt 
+will be triggered before DRIVER_OK, then it's fine.
 
-I'm working with Bank International in Ouagadougou the capital city
-of Burkina Faso.
-=20
-I'm one of the senior director of the bank, I=E2=80=99m writing you this me=
-mo
-because I have this urgent deal/business proposal that will benefit me
-and you. Please write me on my personal email for more detail
-information concerning the issue at hand
-
-Email:  mr.solomonomar00@gmail.com
-
-Thanks,
-
-Mr.Solomon Omar
+And the main goal for this patch is to allocate the interrupt on demand.
 
 
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 119 ++++++++++++++++++++++++----------------
+>   1 file changed, 73 insertions(+), 46 deletions(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index abf6a061..4d58bf2 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -28,6 +28,60 @@ static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
+>   	return IRQ_HANDLED;
+>   }
+>   
+> +static void ifcvf_free_irq_vectors(void *data)
+> +{
+> +	pci_free_irq_vectors(data);
+> +}
+> +
+> +static void ifcvf_free_irq(struct ifcvf_adapter *adapter, int queues)
+> +{
+> +	struct pci_dev *pdev = adapter->pdev;
+> +	struct ifcvf_hw *vf = &adapter->vf;
+> +	int i;
+> +
+> +
+> +	for (i = 0; i < queues; i++)
+> +		devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
+> +
+> +	ifcvf_free_irq_vectors(pdev);
+> +}
+> +
+> +static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
+> +{
+> +	struct pci_dev *pdev = adapter->pdev;
+> +	struct ifcvf_hw *vf = &adapter->vf;
+> +	int vector, i, ret, irq;
+> +
+> +	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
+> +				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
+> +	if (ret < 0) {
+> +		IFCVF_ERR(pdev, "Failed to alloc IRQ vectors\n");
+> +		return ret;
+> +	}
+> +
+> +	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> +		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+> +			 pci_name(pdev), i);
+> +		vector = i + IFCVF_MSI_QUEUE_OFF;
+> +		irq = pci_irq_vector(pdev, vector);
+> +		ret = devm_request_irq(&pdev->dev, irq,
+> +				       ifcvf_intr_handler, 0,
+> +				       vf->vring[i].msix_name,
+> +				       &vf->vring[i]);
+> +		if (ret) {
+> +			IFCVF_ERR(pdev,
+> +				  "Failed to request irq for vq %d\n", i);
+> +			ifcvf_free_irq(adapter, i);
+
+
+I'm not sure this unwind is correct. It looks like we should loop and 
+call devm_free_irq() for virtqueue [0, i);
 
 
 
+> +
+> +			return ret;
+> +		}
+> +
+> +		vf->vring[i].irq = irq;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   static int ifcvf_start_datapath(void *private)
+>   {
+>   	struct ifcvf_hw *vf = ifcvf_private_to_vf(private);
+> @@ -118,9 +172,12 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
+>   {
+>   	struct ifcvf_adapter *adapter;
+>   	struct ifcvf_hw *vf;
+> +	u8 status_old;
+> +	int ret;
+>   
+>   	vf  = vdpa_to_vf(vdpa_dev);
+>   	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
+> +	status_old = ifcvf_get_status(vf);
+>   
+>   	if (status == 0) {
+>   		ifcvf_stop_datapath(adapter);
+> @@ -128,7 +185,22 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
+>   		return;
+>   	}
+>   
+> -	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
+> +	if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) &&
+> +	    !(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+> +		ifcvf_stop_datapath(adapter);
+> +		ifcvf_free_irq(adapter, IFCVF_MAX_QUEUE_PAIRS * 2);
+> +	}
+> +
+> +	if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
+> +	    !(status_old & VIRTIO_CONFIG_S_DRIVER_OK)) {
+> +		ret = ifcvf_request_irq(adapter);
+> +		if (ret) {
+> +			status = ifcvf_get_status(vf);
+> +			status |= VIRTIO_CONFIG_S_FAILED;
+> +			ifcvf_set_status(vf, status);
+> +			return;
+> +		}
+> +
+
+
+Have a hard though on the logic here.
+
+This depends on the status setting from guest or userspace. Which means 
+it can not deal with e.g when qemu or userspace is crashed? Do we need 
+to care this or it's a over engineering?
+
+Thanks
+
+
+>   		if (ifcvf_start_datapath(adapter) < 0)
+>   			IFCVF_ERR(adapter->pdev,
+>   				  "Failed to set ifcvf vdpa  status %u\n",
+> @@ -284,38 +356,6 @@ static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
+>   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
+>   };
+>   
+> -static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
+> -{
+> -	struct pci_dev *pdev = adapter->pdev;
+> -	struct ifcvf_hw *vf = &adapter->vf;
+> -	int vector, i, ret, irq;
+> -
+> -
+> -	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> -		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+> -			 pci_name(pdev), i);
+> -		vector = i + IFCVF_MSI_QUEUE_OFF;
+> -		irq = pci_irq_vector(pdev, vector);
+> -		ret = devm_request_irq(&pdev->dev, irq,
+> -				       ifcvf_intr_handler, 0,
+> -				       vf->vring[i].msix_name,
+> -				       &vf->vring[i]);
+> -		if (ret) {
+> -			IFCVF_ERR(pdev,
+> -				  "Failed to request irq for vq %d\n", i);
+> -			return ret;
+> -		}
+> -		vf->vring[i].irq = irq;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+> -static void ifcvf_free_irq_vectors(void *data)
+> -{
+> -	pci_free_irq_vectors(data);
+> -}
+> -
+>   static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   {
+>   	struct device *dev = &pdev->dev;
+> @@ -349,13 +389,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   		return ret;
+>   	}
+>   
+> -	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
+> -				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
+> -	if (ret < 0) {
+> -		IFCVF_ERR(pdev, "Failed to alloc irq vectors\n");
+> -		return ret;
+> -	}
+> -
+>   	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
+>   	if (ret) {
+>   		IFCVF_ERR(pdev,
+> @@ -379,12 +412,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   	adapter->pdev = pdev;
+>   	adapter->vdpa.dma_dev = &pdev->dev;
+>   
+> -	ret = ifcvf_request_irq(adapter);
+> -	if (ret) {
+> -		IFCVF_ERR(pdev, "Failed to request MSI-X irq\n");
+> -		goto err;
+> -	}
+> -
+>   	ret = ifcvf_init_hw(vf, pdev);
+>   	if (ret) {
+>   		IFCVF_ERR(pdev, "Failed to init IFCVF hw\n");
 
