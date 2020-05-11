@@ -2,158 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A6541CD652
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 12:19:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F169D1CD6DD
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 12:50:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729135AbgEKKSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 06:18:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725983AbgEKKSd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 06:18:33 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E622C061A0C;
-        Mon, 11 May 2020 03:18:33 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id e16so10212315wra.7;
-        Mon, 11 May 2020 03:18:33 -0700 (PDT)
+        id S1729534AbgEKKuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 06:50:12 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:5354 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728209AbgEKKuM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 06:50:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=t71zh83koaUlMEdc7vfVoBfDMjb5NGvXpFftlY+VFEU=;
-        b=GzmoexfentuFiJhpxa0AY3I29IYA4NPCLrltTQHXNc773O58YyH10MAd7DpCgHRha/
-         m5OoZXIqKWYswiwlCKjxP3BMEnE09rnweSZZ3GHbQCuV1W48QfP7mmNinlnmBmFApsGF
-         J3a/jZ3n0ldXcD2CWNo/LI0YKVDH0qHDDuCnc19hE13R/bdyBNF5A8koDDZltnKAJWxy
-         uBq5yQtt58gn/XOHOzx9OXxB12cXxocyAmHVHynvHBjqv0RaATgLyMZOYEf4JgkSywHL
-         te/llctpmZBlgMten/xYkhH8KOBRsj5t172THUo4UiG+RiK+UPjTFZFIHmtBb8jYMyTj
-         czdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=t71zh83koaUlMEdc7vfVoBfDMjb5NGvXpFftlY+VFEU=;
-        b=aa9c4cu6Jr6z3fAJ9406mGX/v5eozdLiaJFG0lW9/Cwcol2HS6xyqJPinKA/4kebFm
-         mXLipP6XGJKrxRNx6Y9buBgTys0lCm4i8b+JrPLk5BTnzCyAsI9IG9gZaibM28XUdD2W
-         tsPVFto+MevkWrWyBNFB9FEDFNch0F92rfqX+bJYlNY8118ENu6eUxlerYGoeFFjGoGS
-         iY7mqWudN/W4PtQ7p1mJELYNFCWcrAu6J7wpHt+6bPeZ6zyRBhx3TXhYwzENxx+NB3S0
-         NJRZ71SDvl03N+TbR8RfPOKXsVKeHdJzpGPeZC6QH8GyoktlUNKQMRU1j3bUtUI38S8Q
-         VMYA==
-X-Gm-Message-State: AGi0PuaX1nNMTzMfYxkaaS4pxJ3IQL3q7R3sHiOnUR6bGMiVqJ1Jaj2W
-        cCtHTuGe+L8Zgny+ytrDd9FisCTtKfM=
-X-Google-Smtp-Source: APiQypIboAu9feHJkwkFIZ2bcGWSedLd1dnr/EpITbayJXobdaCRSvrm4FPmdCITJOCvVweGNUu/5Q==
-X-Received: by 2002:adf:fd46:: with SMTP id h6mr18866359wrs.90.1589192311855;
-        Mon, 11 May 2020 03:18:31 -0700 (PDT)
-Received: from [192.168.1.94] (93-41-244-45.ip84.fastwebnet.it. [93.41.244.45])
-        by smtp.gmail.com with ESMTPSA id d126sm6449472wmd.32.2020.05.11.03.18.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 May 2020 03:18:31 -0700 (PDT)
-Subject: Re: [PATCH] ifcvf: move IRQ request/free to status change handlers
-To:     Jason Wang <jasowang@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
-References: <1589181563-38400-1-git-send-email-lingshan.zhu@intel.com>
- <22d9dcdb-e790-0a68-ba41-b9530b2bf9fd@redhat.com>
-From:   Francesco Lavra <francescolavra.fl@gmail.com>
-Message-ID: <c1da2054-eb4c-d7dd-ca83-29e85e5cfe90@gmail.com>
-Date:   Mon, 11 May 2020 12:18:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1589194210; x=1620730210;
+  h=to:cc:references:from:message-id:date:mime-version:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=4Rs67otuHSyZgWCuCm/tZfvOeyzNXjzdxJiMJID6UVA=;
+  b=tTg8uY6Jh89M/oztm/NaYhawllF8D4iQAaKh2soCuIajS2TpWIEvAx3E
+   mMG/pBU49trXTj1jvCEl8b+UgkDJvyq61TH/cbBio9QqEssD6200LKWHN
+   knUwR0uzevv4LnyLOvAIhE/JxZjWzQPcTx1phsEXUMtNPpnfxObE5eKxH
+   I=;
+IronPort-SDR: yi9TmisoyeY6FqZAi/aBjzUKyEas8kTR5TbH2noyurxJXxhzWeSaesGp48qnXnoB7bjG6Mw4z1
+ 1JFDPXOODOyw==
+X-IronPort-AV: E=Sophos;i="5.73,379,1583193600"; 
+   d="scan'208";a="29779422"
+Subject: Re: [PATCH v1 00/15] Add support for Nitro Enclaves
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-69849ee2.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 11 May 2020 10:49:57 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-69849ee2.us-west-2.amazon.com (Postfix) with ESMTPS id B17C9A21BA;
+        Mon, 11 May 2020 10:49:55 +0000 (UTC)
+Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 11 May 2020 10:49:55 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 11 May 2020 10:49:47 +0000
+To:     "Herrenschmidt, Benjamin" <benh@amazon.com>,
+        "pavel@ucw.cz" <pavel@ucw.cz>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "Liguori, Anthony" <aliguori@amazon.com>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "ne-devel-upstream@amazon.com" <ne-devel-upstream@amazon.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "van der Linden, Frank" <fllinden@amazon.com>,
+        "Smith, Stewart" <trawets@amazon.com>,
+        "Pohlack, Martin" <mpohlack@amazon.de>,
+        "Wilson, Matt" <msw@amazon.com>, "Dannowski, Uwe" <uwed@amazon.de>,
+        "Doebel, Bjoern" <doebel@amazon.de>
+References: <20200421184150.68011-1-andraprs@amazon.com>
+ <18406322-dc58-9b59-3f94-88e6b638fe65@redhat.com>
+ <ff65b1ed-a980-9ddc-ebae-996869e87308@amazon.com>
+ <2a4a15c5-7adb-c574-d558-7540b95e2139@redhat.com> <20200507174438.GB1216@bug>
+ <620bf5ae-eade-37da-670d-a8704d9b4397@amazon.com> <20200509192125.GA1597@bug>
+ <1b00857202884c2a27d0e381d6de312201d17868.camel@amazon.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <ac1026ba-6d29-2e28-e889-84ce2ab7e6ff@amazon.com>
+Date:   Mon, 11 May 2020 13:49:37 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <22d9dcdb-e790-0a68-ba41-b9530b2bf9fd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1b00857202884c2a27d0e381d6de312201d17868.camel@amazon.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.43.160.90]
+X-ClientProxiedBy: EX13D40UWA001.ant.amazon.com (10.43.160.53) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/11/20 11:26 AM, Jason Wang wrote:
-> 
-> On 2020/5/11 下午3:19, Zhu Lingshan wrote:
->> This commit move IRQ request and free operations from probe()
->> to VIRTIO status change handler to comply with VIRTIO spec.
->>
->> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
->> The device MUST NOT consume buffers or send any used buffer
->> notifications to the driver before DRIVER_OK.
-> 
-> 
-> My previous explanation might be wrong here. It depends on how you 
-> implement your hardware, if you hardware guarantee that no interrupt 
-> will be triggered before DRIVER_OK, then it's fine.
-> 
-> And the main goal for this patch is to allocate the interrupt on demand.
-> 
-> 
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->> ---
->>   drivers/vdpa/ifcvf/ifcvf_main.c | 119 
->> ++++++++++++++++++++++++----------------
->>   1 file changed, 73 insertions(+), 46 deletions(-)
->>
->> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->> b/drivers/vdpa/ifcvf/ifcvf_main.c
->> index abf6a061..4d58bf2 100644
->> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->> @@ -28,6 +28,60 @@ static irqreturn_t ifcvf_intr_handler(int irq, void 
->> *arg)
->>       return IRQ_HANDLED;
->>   }
->> +static void ifcvf_free_irq_vectors(void *data)
->> +{
->> +    pci_free_irq_vectors(data);
->> +}
->> +
->> +static void ifcvf_free_irq(struct ifcvf_adapter *adapter, int queues)
->> +{
->> +    struct pci_dev *pdev = adapter->pdev;
->> +    struct ifcvf_hw *vf = &adapter->vf;
->> +    int i;
->> +
->> +
->> +    for (i = 0; i < queues; i++)
->> +        devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
->> +
->> +    ifcvf_free_irq_vectors(pdev);
->> +}
->> +
->> +static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
->> +{
->> +    struct pci_dev *pdev = adapter->pdev;
->> +    struct ifcvf_hw *vf = &adapter->vf;
->> +    int vector, i, ret, irq;
->> +
->> +    ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
->> +                    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
->> +    if (ret < 0) {
->> +        IFCVF_ERR(pdev, "Failed to alloc IRQ vectors\n");
->> +        return ret;
->> +    }
->> +
->> +    for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
->> +        snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
->> +             pci_name(pdev), i);
->> +        vector = i + IFCVF_MSI_QUEUE_OFF;
->> +        irq = pci_irq_vector(pdev, vector);
->> +        ret = devm_request_irq(&pdev->dev, irq,
->> +                       ifcvf_intr_handler, 0,
->> +                       vf->vring[i].msix_name,
->> +                       &vf->vring[i]);
->> +        if (ret) {
->> +            IFCVF_ERR(pdev,
->> +                  "Failed to request irq for vq %d\n", i);
->> +            ifcvf_free_irq(adapter, i);
-> 
-> 
-> I'm not sure this unwind is correct. It looks like we should loop and 
-> call devm_free_irq() for virtqueue [0, i);
+CgpPbiAxMC8wNS8yMDIwIDE0OjAyLCBIZXJyZW5zY2htaWR0LCBCZW5qYW1pbiB3cm90ZToKPiBP
+biBTYXQsIDIwMjAtMDUtMDkgYXQgMjE6MjEgKzAyMDAsIFBhdmVsIE1hY2hlayB3cm90ZToKPj4g
+T24gRnJpIDIwMjAtMDUtMDggMTA6MDA6MjcsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6
+Cj4+Pgo+Pj4gT24gMDcvMDUvMjAyMCAyMDo0NCwgUGF2ZWwgTWFjaGVrIHdyb3RlOgo+Pj4+IEhp
+IQo+Pj4+Cj4+Pj4+PiBpdCB1c2VzIGl0cyBvd24gbWVtb3J5IGFuZCBDUFVzICsgaXRzIHZpcnRp
+by12c29jayBlbXVsYXRlZCBkZXZpY2UgZm9yCj4+Pj4+PiBjb21tdW5pY2F0aW9uIHdpdGggdGhl
+IHByaW1hcnkgVk0uCj4+Pj4+Pgo+Pj4+Pj4gVGhlIG1lbW9yeSBhbmQgQ1BVcyBhcmUgY2FydmVk
+IG91dCBvZiB0aGUgcHJpbWFyeSBWTSwgdGhleSBhcmUgZGVkaWNhdGVkCj4+Pj4+PiBmb3IgdGhl
+IGVuY2xhdmUuIFRoZSBOaXRybyBoeXBlcnZpc29yIHJ1bm5pbmcgb24gdGhlIGhvc3QgZW5zdXJl
+cyBtZW1vcnkKPj4+Pj4+IGFuZCBDUFUgaXNvbGF0aW9uIGJldHdlZW4gdGhlIHByaW1hcnkgVk0g
+YW5kIHRoZSBlbmNsYXZlIFZNLgo+Pj4+Pj4KPj4+Pj4+IFRoZXNlIHR3byBjb21wb25lbnRzIG5l
+ZWQgdG8gcmVmbGVjdCB0aGUgc2FtZSBzdGF0ZSBlLmcuIHdoZW4gdGhlCj4+Pj4+PiBlbmNsYXZl
+IGFic3RyYWN0aW9uIHByb2Nlc3MgKDEpIGlzIHRlcm1pbmF0ZWQsIHRoZSBlbmNsYXZlIFZNICgy
+KSBpcwo+Pj4+Pj4gdGVybWluYXRlZCBhcyB3ZWxsLgo+Pj4+Pj4KPj4+Pj4+IFdpdGggcmVnYXJk
+IHRvIHRoZSBjb21tdW5pY2F0aW9uIGNoYW5uZWwsIHRoZSBwcmltYXJ5IFZNIGhhcyBpdHMgb3du
+Cj4+Pj4+PiBlbXVsYXRlZCB2aXJ0aW8tdnNvY2sgUENJIGRldmljZS4gVGhlIGVuY2xhdmUgVk0g
+aGFzIGl0cyBvd24gZW11bGF0ZWQKPj4+Pj4+IHZpcnRpby12c29jayBkZXZpY2UgYXMgd2VsbC4g
+VGhpcyBjaGFubmVsIGlzIHVzZWQsIGZvciBleGFtcGxlLCB0byBmZXRjaAo+Pj4+Pj4gZGF0YSBp
+biB0aGUgZW5jbGF2ZSBhbmQgdGhlbiBwcm9jZXNzIGl0LiBBbiBhcHBsaWNhdGlvbiB0aGF0IHNl
+dHMgdXAgdGhlCj4+Pj4+PiB2c29jayBzb2NrZXQgYW5kIGNvbm5lY3RzIG9yIGxpc3RlbnMsIGRl
+cGVuZGluZyBvbiB0aGUgdXNlIGNhc2UsIGlzIHRoZW4KPj4+Pj4+IGRldmVsb3BlZCB0byB1c2Ug
+dGhpcyBjaGFubmVsOyB0aGlzIGhhcHBlbnMgb24gYm90aCBlbmRzIC0gcHJpbWFyeSBWTQo+Pj4+
+Pj4gYW5kIGVuY2xhdmUgVk0uCj4+Pj4+Pgo+Pj4+Pj4gTGV0IG1lIGtub3cgaWYgZnVydGhlciBj
+bGFyaWZpY2F0aW9ucyBhcmUgbmVlZGVkLgo+Pj4+PiBUaGFua3MsIHRoaXMgaXMgYWxsIHVzZWZ1
+bC4gIEhvd2V2ZXIgY2FuIHlvdSBwbGVhc2UgY2xhcmlmeSB0aGUKPj4+Pj4gbG93LWxldmVsIGRl
+dGFpbHMgaGVyZT8KPj4+PiBJcyB0aGUgdmlydHVhbCBtYWNoaW5lIG1hbmFnZXIgb3Blbi1zb3Vy
+Y2U/IElmIHNvLCBJIGd1ZXNzIHBvaW50ZXIgZm9yIHNvdXJjZXMKPj4+PiB3b3VsZCBiZSB1c2Vm
+dWwuCj4+PiBIaSBQYXZlbCwKPj4+Cj4+PiBUaGFua3MgZm9yIHJlYWNoaW5nIG91dC4KPj4+Cj4+
+PiBUaGUgVk1NIHRoYXQgaXMgdXNlZCBmb3IgdGhlIHByaW1hcnkgLyBwYXJlbnQgVk0gaXMgbm90
+IG9wZW4gc291cmNlLgo+PiBEbyB3ZSB3YW50IHRvIG1lcmdlIGNvZGUgdGhhdCBvcGVuc291cmNl
+IGNvbW11bml0eSBjYW4gbm90IHRlc3Q/Cj4gSGVoZS4uIHRoaXMgaXNuJ3QgcXVpdGUgdGhlIHN0
+b3J5IFBhdmVsIDopCj4KPiBXZSBtZXJnZSBzdXBwb3J0IGZvciBwcm9wcmlldGFyeSBoeXBlcnZp
+c29ycywgdGhpcyBpcyBubyBkaWZmZXJlbnQuIFlvdQo+IGNhbiB0ZXN0IGl0LCB3ZWxsIGF0IGxl
+YXN0IHlvdSdsbCBiZSBhYmxlIHRvIC4uLiB3aGVuIEFXUyBkZXBsb3lzIHRoZQo+IGZ1bmN0aW9u
+YWxpdHkuIFlvdSBkb24ndCBuZWVkIHRoZSBoeXBlcnZpc29yIGl0c2VsZiB0byBiZSBvcGVuIHNv
+dXJjZS4KPgo+IEluIGZhY3QsIGluIHRoaXMgY2FzZSwgaXQncyBub3QgZXZlbiBsb3cgbGV2ZWwg
+aW52YXNpdmUgYXJjaCBjb2RlIGxpa2UKPiBzb21lIG9mIHRoZSBhYm92ZSBjYW4gYmUuIEl0J3Mg
+YSBkcml2ZXIgZm9yIGEgUENJIGRldmljZSA6LSkgR3JhbnRlZCBhCj4gdmlydHVhbCBvbmUuIFdl
+IG1lcmdlIGRyaXZlcnMgZm9yIFBDSSBkZXZpY2VzIHJvdXRpbmVseSB3aXRob3V0IHRoZSBSVEwK
+PiBvciBmaXJtd2FyZSBvZiB0aG9zZSBkZXZpY2VzIGJlaW5nIG9wZW4gc291cmNlLgo+Cj4gU28g
+eWVzLCB3ZSBwcm9iYWJseSB3YW50IHRoaXMgaWYgaXQncyBnb2luZyB0byBiZSBhIHVzZWZ1bCBm
+ZWF0dXJlcyB0bwo+IHVzZXJzIHdoZW4gcnVubmluZyBvbiBBV1MgRUMyLiAoRGlzY2xhaW1lcjog
+SSB3b3JrIGZvciBBV1MgdGhlc2UgZGF5cykuCgpJbmRlZWQsIGl0IHdpbGwgYXZhaWxhYmxlIGZv
+ciBjaGVja2luZyBvdXQgaG93IGl0IHdvcmtzLgoKVGhlIGRpc2N1c3Npb25zIGFyZSBvbmdvaW5n
+IGhlcmUgb24gdGhlIExLTUwgLSB1bmRlcnN0YW5kaW5nIHRoZSAKY29udGV4dCwgY2xhcmlmeWlu
+ZyBpdGVtcywgc2hhcmluZyBmZWVkYmFjayBhbmQgY29taW5nIHdpdGggY29kZWJhc2UgCnVwZGF0
+ZXMgYW5kIGJhc2ljIGV4YW1wbGUgZmxvdyBvZiB0aGUgaW9jdGwgaW50ZXJmYWNlIHVzYWdlLiBU
+aGlzIGFsbCAKaGVscHMgd2l0aCB0aGUgcGF0aCB0b3dhcmRzIG1lcmdpbmcuCgpUaGFua3MsIEJl
+biwgZm9yIHRoZSBmb2xsb3ctdXAuCgpBbmRyYQoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRl
+ciAoUm9tYW5pYSkgUy5SLkwuIHJlZ2lzdGVyZWQgb2ZmaWNlOiAyN0EgU2YuIExhemFyIFN0cmVl
+dCwgVUJDNSwgZmxvb3IgMiwgSWFzaSwgSWFzaSBDb3VudHksIDcwMDA0NSwgUm9tYW5pYS4gUmVn
+aXN0ZXJlZCBpbiBSb21hbmlhLiBSZWdpc3RyYXRpb24gbnVtYmVyIEoyMi8yNjIxLzIwMDUuCg==
 
-That's exactly what the code does: ifcvf_free_irq() contains a (i = 0; i 
-< queues; i++) loop, and here the function is called with the `queues` 
-argument set to `i`.
