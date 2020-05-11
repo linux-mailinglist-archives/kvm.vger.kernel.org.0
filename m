@@ -2,119 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 508A41CD0D9
-	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 06:35:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 873C11CD1E8
+	for <lists+kvm@lfdr.de>; Mon, 11 May 2020 08:36:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726528AbgEKEfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 00:35:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59966 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725854AbgEKEfB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 00:35:01 -0400
-Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF92C061A0E
-        for <kvm@vger.kernel.org>; Sun, 10 May 2020 21:35:01 -0700 (PDT)
-Received: by mail-qv1-xf43.google.com with SMTP id fb4so3791498qvb.7
-        for <kvm@vger.kernel.org>; Sun, 10 May 2020 21:35:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lca.pw; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=eAd4gbb0pcNnApGm6Og5wCWvp0yRJHJXtLCgR/gxdK4=;
-        b=KAW6y7vm9lCjNEy0YAU6G7q+RuEfJEjJ0WGtTcfF5+EDnb0VUdt+EuDEMmnxAU8uuI
-         6Vg7JkVSpSPv1CCUzufDIZVzUXHtCFf1UHZ45JvPn8T8NOs84T++3dXQkIG0VtvW9mAY
-         2oiemNvUY9qm/uOTIy3Kg7w1rraNMNR8GsEVXJEnFU0g6iK2ov0qr8ILjlfx1jrGXavX
-         PYqT/1iOUrnXjiTtFVU+eziz5YUmPIUOaXDIlyUAy+GxwFrI6rCeuun67mfiqth3ixx8
-         xc1mqCVnn1+SD2CTriYUIJFRsYVJ6fCEp0wdh+uytF8zDHHLgHUv6oJx3qm1JFVJwxCZ
-         v3Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=eAd4gbb0pcNnApGm6Og5wCWvp0yRJHJXtLCgR/gxdK4=;
-        b=iXdvuLyworDtwaBx/4qI9JQc3RLntjZTHLA2VmCZGtMsqQf12gxAlpmlNq0ELGLZq/
-         S3bTQNTN0YC6veYbiimQDq0X1pok1NSmqn01fYiA39Fn3GsHXVneNEBDJVlU53SfZdQK
-         aEIv1tZGkelqe7d84IdUDuz5UJYmPFy+uNnFBvwerQmUKw/czlLjzUTy2bAprRjYYImt
-         ueawUc9xMTfDf0X25xNLzBqcFG4gKBYjFfGkiP6rgKWm7jElNSpA7h45uDJMqs8DwYtf
-         6HDudnN3pR/gn3wCdy8Mzpa80nLZ2hWFDEanvWOHg1nI8/4WOsozIiO0eYn5O0LKc2MB
-         VFlw==
-X-Gm-Message-State: AGi0PuaeGOMCl0EC+EiaPiCNBqWvVzq4+AJpyKAneg3Z2bQ+ZFa2xtKQ
-        AqvK0juaj8EcN+ignezn5eQs5g==
-X-Google-Smtp-Source: APiQypLFNnKP7c/SRXW2/x9gJo9sMJpGIWsLIMrsDdA2a1mki4zFpL/KN4MNfuGlgTnwSxSkYBzbJA==
-X-Received: by 2002:a0c:f70c:: with SMTP id w12mr13674265qvn.28.1589171699967;
-        Sun, 10 May 2020 21:34:59 -0700 (PDT)
-Received: from ovpn-112-210.rdu2.redhat.com (pool-71-184-117-43.bstnma.fios.verizon.net. [71.184.117.43])
-        by smtp.gmail.com with ESMTPSA id e16sm8384451qtc.92.2020.05.10.21.34.58
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 10 May 2020 21:34:59 -0700 (PDT)
-From:   Qian Cai <cai@lca.pw>
-To:     alex.williamson@redhat.com
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Qian Cai <cai@lca.pw>
-Subject: [PATCH] vfio/pci: fix memory leaks of eventfd ctx
-Date:   Mon, 11 May 2020 00:34:50 -0400
-Message-Id: <20200511043450.2718-1-cai@lca.pw>
-X-Mailer: git-send-email 2.21.0 (Apple Git-122.2)
+        id S1728283AbgEKGga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 02:36:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32412 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725863AbgEKGg3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 May 2020 02:36:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589178988;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ncGeH5ZKVwCdh5E0XvEmoml51kA2FhsNgAa3Rpsy93w=;
+        b=fn5AxNTGNtOH+QRKToE59YvI1dQBQ6mRY8kFmnbgYkYaIS5x0tlbFm5ISXplT/wcXrjxfv
+        Ibbp7bZk3BJ73bK4bVsIArKItMGdwp9Wbl3AD81RSAh1mgSdkGelaWvovfzXyfhmraPBLo
+        ZQZmcTyOY8ygwt9PCkab9vSVWzPZ9Pg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-HiHDwdZgPKaiPonLkIwVrA-1; Mon, 11 May 2020 02:35:55 -0400
+X-MC-Unique: HiHDwdZgPKaiPonLkIwVrA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE07F107ACCA;
+        Mon, 11 May 2020 06:35:54 +0000 (UTC)
+Received: from gondolin (ovpn-112-254.ams2.redhat.com [10.36.112.254])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD81360CD1;
+        Mon, 11 May 2020 06:35:50 +0000 (UTC)
+Date:   Mon, 11 May 2020 08:35:47 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Qian Cai <cai@lca.pw>
+Cc:     alex.williamson@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio/pci: fix memory leaks in alloc_perm_bits()
+Message-ID: <20200511083547.24718bcc.cohuck@redhat.com>
+In-Reply-To: <20200510161656.1415-1-cai@lca.pw>
+References: <20200510161656.1415-1-cai@lca.pw>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Finished a qemu-kvm (-device vfio-pci,host=0001:01:00.0) triggers a few
-memory leaks after a while because vfio_pci_set_ctx_trigger_single()
-calls eventfd_ctx_fdget() without the matching eventfd_ctx_put() later.
-Fix it by calling eventfd_ctx_put() for those memory in
-vfio_pci_release() before vfio_device_release().
+On Sun, 10 May 2020 12:16:56 -0400
+Qian Cai <cai@lca.pw> wrote:
 
-unreferenced object 0xebff008981cc2b00 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994816 (age 9796.310s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
-  backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
-unreferenced object 0x29ff008981cc4180 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994818 (age 9796.290s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
-  backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
+> vfio_pci_disable() calls vfio_config_free() but forgets to call
+> free_perm_bits() resulting in memory leaks,
+> 
+> unreferenced object 0xc000000c4db2dee0 (size 16):
+>   comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
+>   hex dump (first 16 bytes):
+>     00 00 ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
+>   backtrace:
+>     [<00000000a6a4552d>] alloc_perm_bits+0x58/0xe0 [vfio_pci]
+>     [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
+>     init_pci_cap_msi_perm at drivers/vfio/pci/vfio_pci_config.c:1125
+>     (inlined by) vfio_msi_cap_len at drivers/vfio/pci/vfio_pci_config.c:1180
+>     (inlined by) vfio_cap_len at drivers/vfio/pci/vfio_pci_config.c:1241
+>     (inlined by) vfio_cap_init at drivers/vfio/pci/vfio_pci_config.c:1468
+>     (inlined by) vfio_config_init at drivers/vfio/pci/vfio_pci_config.c:1707
+>     [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
+>     [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
+>     [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
+>     [<000000006577923d>] sys_ioctl+0x28/0x40
+>     [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
+>     [<0000000008ea7dd5>] system_call_common+0xf0/0x278
+> unreferenced object 0xc000000c4db2e330 (size 16):
+>   comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
+>   hex dump (first 16 bytes):
+>     00 ff ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
+>   backtrace:
+>     [<000000004c71914f>] alloc_perm_bits+0x44/0xe0 [vfio_pci]
+>     [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
+>     [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
+>     [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
+>     [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
+>     [<000000006577923d>] sys_ioctl+0x28/0x40
+>     [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
+>     [<0000000008ea7dd5>] system_call_common+0xf0/0x278
+> 
+> Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
+> Signed-off-by: Qian Cai <cai@lca.pw>
+> ---
+>  drivers/vfio/pci/vfio_pci_config.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index 90c0b80f8acf..f9fdc72a5f4e 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1728,6 +1728,7 @@ void vfio_config_free(struct vfio_pci_device *vdev)
+>  	vdev->vconfig = NULL;
+>  	kfree(vdev->pci_config_map);
+>  	vdev->pci_config_map = NULL;
+> +	free_perm_bits(vdev->msi_perm);
+>  	kfree(vdev->msi_perm);
+>  	vdev->msi_perm = NULL;
+>  }
 
-Signed-off-by: Qian Cai <cai@lca.pw>
----
- drivers/vfio/pci/vfio_pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Seems to be the only perm bits that were missed.
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 6c6b37b5c04e..080e6608f297 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -519,6 +519,10 @@ static void vfio_pci_release(void *device_data)
- 		vfio_pci_vf_token_user_add(vdev, -1);
- 		vfio_spapr_pci_eeh_release(vdev->pdev);
- 		vfio_pci_disable(vdev);
-+		if (vdev->err_trigger)
-+			eventfd_ctx_put(vdev->err_trigger);
-+		if (vdev->req_trigger)
-+			eventfd_ctx_put(vdev->req_trigger);
- 	}
- 
- 	mutex_unlock(&vdev->reflck->lock);
--- 
-2.21.0 (Apple Git-122.2)
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
