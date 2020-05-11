@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6974C1CE92F
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 01:33:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9B4F1CE932
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 01:33:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728304AbgEKXdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 May 2020 19:33:16 -0400
-Received: from mail-eopbgr760047.outbound.protection.outlook.com ([40.107.76.47]:6090
+        id S1728332AbgEKXd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 May 2020 19:33:28 -0400
+Received: from mail-eopbgr760071.outbound.protection.outlook.com ([40.107.76.71]:28677
         "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728267AbgEKXdM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 May 2020 19:33:12 -0400
+        id S1728261AbgEKXdX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 May 2020 19:33:23 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RnvHdXSBs/2fay9xnaROdRH5qnQ0xnqsSV65tAyM1lzpth37IVe+KcH5u2oPENA+OHTHbdy48ubIjM02gmNe8vCjEE+B9grtwDJZ9uz/ObgYd4tu+4gsjx8bUcChOwBAdCLWXbSCjWl0KVJEMRwn12mKRijvbmXbCJ1dBBTHFwg/rBcRm1DMNciOEOMfjuE1gL77BsdYEWdec/5eZM+BIImXokD+D10IwX4FzSjSQ3IbgUA80YootZ2gEoSL4X+ecCgm4HJ+yoykW6LWp2DpbZLGhEGjJlvhFM5vOnTHMwWdvcshF8z1OxV2BRWk1E6PP8OuGJoHep3UINrzO7ToKg==
+ b=lmpiUN8TOjyVVaQC2/9tucfFiS+aCn5Lf3pL8VPs50N6V9EkXwq8OPTSJSB8SRIWd5GOnZEjdH5iVtJYjJwd6fyfCx8ZqZiRr45zuctFw/RYlalyf18o6BLCuEK3G0eku0pNcut0mpHuhHWIAlJDTtqnJmkLFtEoL1/Sn7YOlp7/yyF3yrnOy8ow/2VALo+LdhgTAPU9YEfxfoZlDpWazx5xZfL/AUPDVY1XqJsFSl4Ha+cIQUGKdIiEOvYDKrlnrKqv9REpZ6FC7XNzl3sKSGKYDN/uX14h7W6TNiCHs41XiDIbemtM3hQpLC5gXuvkePZJp0/F8din4rn+5UCEAQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=znldyMC6F1kTbKS1KKqAHBggcCg8jmIa+CEice6T2E0=;
- b=ClHNUqwZJ0TsnV9pn+TcSzD3H9E+jQ88zc9vBOwmJAhEALeu/LLwa4CLKpWtHW3ChrXrb4EnYeLpQPyOXyan3ZnD4KVEf6+BIdiSSkMMKET1li6gGnljCA64oqXAkByM2a+dUTSL54Sc7mNwHDa9vymfqGjMg/VjjyHhNtET0DkdcCrqobxCOxZu8+6YscsNtgJ+9T0mHanGDlvllChh2UnL3vZwmgSxx/MhvmCcd4C8n4INjg4zCIYqU0vZHhIqDMchNYX9aqDW010ml+Sgq2VuxPyl9UBURB0IkYtP5nw6455KO2172kcQx5lXWdNtve/g/RRcrK437keSOtDyyQ==
+ bh=nqilRk99qOMYfRRW+I52uP2RhGJQb5USNbXwMyNhXao=;
+ b=auSiidjsJM32KiX7QnZ+DCEVl736SZAFGojDc/KiZBccFOVyHCpOLEWWZSQJDlrOeIickLpih6HzfbsnCRzfWj5n78742MxtD2oh+GMdNRtr/8OYFPUv2SSv0QAs9GVbtWSH4LCSwE+Z476Rod93YQcF2128W2NSxSZrfA8q5za4/HiAWstLJLCtVX/NxxYc6NLckVxIpge9YqBktwYbKzrYnR0uodJeFhFBHWytbMl0h6Et96hVwyBOr2qkc+WCsiqK8QJCguuzVI62H14dNgH0rC9gwdioh6SpwxthFEIe+qQ9azpujKn305K/Z7X5yvj05dQ9+JDzzleGKNU0cg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=znldyMC6F1kTbKS1KKqAHBggcCg8jmIa+CEice6T2E0=;
- b=uywgBhIkia3beR/rYCbc8v5Vmd2WcoJg7SZCeqdi2oN0VtOEXulDZ8m7mck9n66zzjaZhrnPbHBY27R6ldTtqjwX648JgUfNbXF3zzpfmr9tuIX7+npdYEceQqcBJA2OOTozenWC6lue3UvOHqCuLwbLhZSd01mFLNQOSP+gBmg=
+ bh=nqilRk99qOMYfRRW+I52uP2RhGJQb5USNbXwMyNhXao=;
+ b=SoskrIKb5cKOTTfiSsqxiDvfZiI8UT0Hi6TFPSgZ/qO7DxiuIN65gBQOaUWGCamL5SwcCKUilD6Vtwc0XrWvWLqwGhmDB+bbztiqzTzKy0xZhlcQBUpbAi4rVdZ1++yXdS8SiY/cq4dkBdkLBlhn/8F1WOxQLfUnSyzpBpFbjMI=
 Authentication-Results: tencent.com; dkim=none (message not signed)
  header.d=none;tencent.com; dmarc=none action=none header.from=amd.com;
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
  by SN1PR12MB2478.namprd12.prod.outlook.com (2603:10b6:802:23::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28; Mon, 11 May
- 2020 23:33:09 +0000
+ 2020 23:33:19 +0000
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2979.033; Mon, 11 May 2020
- 23:33:08 +0000
-Subject: [PATCH v3 2/3] KVM: x86: Move pkru save/restore to x86.c
+ 23:33:19 +0000
+Subject: [PATCH v3 3/3] KVM: x86: Move MPK feature detection to common code
 From:   Babu Moger <babu.moger@amd.com>
 To:     corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         hpa@zytor.com, pbonzini@redhat.com, sean.j.christopherson@intel.com
@@ -58,161 +58,92 @@ Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
         vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
         sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Mon, 11 May 2020 18:33:04 -0500
-Message-ID: <158923998430.20128.2992701977443921714.stgit@naples-babu.amd.com>
+Date:   Mon, 11 May 2020 18:33:14 -0500
+Message-ID: <158923999440.20128.4859351750654993810.stgit@naples-babu.amd.com>
 In-Reply-To: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
 References: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
 User-Agent: StGit/unknown-version
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR15CA0064.namprd15.prod.outlook.com
- (2603:10b6:3:ae::26) To SN1PR12MB2560.namprd12.prod.outlook.com
+X-ClientProxiedBy: DM5PR18CA0055.namprd18.prod.outlook.com
+ (2603:10b6:3:22::17) To SN1PR12MB2560.namprd12.prod.outlook.com
  (2603:10b6:802:26::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from naples-babu.amd.com (165.204.78.2) by DM5PR15CA0064.namprd15.prod.outlook.com (2603:10b6:3:ae::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28 via Frontend Transport; Mon, 11 May 2020 23:33:05 +0000
+Received: from naples-babu.amd.com (165.204.78.2) by DM5PR18CA0055.namprd18.prod.outlook.com (2603:10b6:3:22::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26 via Frontend Transport; Mon, 11 May 2020 23:33:15 +0000
 X-Originating-IP: [165.204.78.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 45225a86-f351-45bc-7698-08d7f603a947
+X-MS-Office365-Filtering-Correlation-Id: 17e3548f-d64b-4b4b-b811-08d7f603af88
 X-MS-TrafficTypeDiagnostic: SN1PR12MB2478:|SN1PR12MB2478:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB24784803F6534E7C4D39B07795A10@SN1PR12MB2478.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2478FC72FAB45AF0F43E22AC95A10@SN1PR12MB2478.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
 X-Forefront-PRVS: 04004D94E2
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jh5Sc/mlN5vHsM5SkosuD8/ihHhgrFCIPElU1ptPtMUkCcudglh5sUWEsQ043VMU6cWujUwjmo2ivi2CPDVrcUyJ7l51clqLiknqDOwHY2gGTJPoXuXWva/5ew/yfH441gz6ztkHQyyYk71F9TZ/AueYznMJQ4uK05p3wmzgfx4SSM5rZzNj7DVTn8B3cK939fsvFX5NoKrNkPibDvz19DBrS9e+FQTDf8+wfZtickP4mx/toX5n8NL+MU/6RrGN0hMMHJGYq1OS5PZPOLHR++Ogmu/iI1Dx1lUCglVr5gx6LvHcfYg/ztToUT5yMIAaub6lFJ2cFu6xRzXqjDWLSmrmqIlxdWsMeezaqKQpc9w+2A31jjx6uyXiXjRO4JhSkq3+gX9s65aO+DdUC+X+YrwYSdWGcR3Sy8A5vRxuFY6MtQtU3oyy+89ZJoCOMNbDm/JCenJagwF8SdPN1Afs/mirKUTBFZtHMqlzxbA1+nvFf5HpL9TNkXn87pu7vfVqi1Yful7PDz13mQNg4DmJVA==
+X-Microsoft-Antispam-Message-Info: Lp07EaxNHX/7UDrHydmFbTYgzFZ0Zz7eRxSo8b3Z9IlhAdMGlVzAjgz8uMbUfUj0RKxL4syQlWQtLss+dNV5TIdPtJJFyw2D8DCsCc50kOaHTEN1cH33rM7e2hsWhi8KLUIhxDPrFztyqFnnBngeDFq3MGpaIYe7+bADFz93JS9jDmBVvL13dxWNSsec98gMVAPaZ2WRAU+fJNHMkB5CTeLOjAr79gqe3YwDVAFrbh/syAAlJnOPLj6BU9/MAGdAkEZtd8wIWyM6N4WtBH5Z9imrRM3jC06a9B+B2Dj1jLR2i8jx3d/MLeIpNtG3du3zwP0iNOvD3sWaF4hZV01UC62BzdqgmYhzPu95NqNgDfvvY4iWBh3YyDcswTgUdUnWbDxu0iXls+ZClsS3AxDtTrJTeQwnElokiywnjBKLoYKxyl/yYfmsoMvmdElGXkcfeg8MhlDHYhbFEUHKq/z1q1Jck/uLd9wnJ+NDXDR3ENsz0Ik1AyNsr88Pxt8JRmNV9NZAwb4LepCm24uOo6LQ8w==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(376002)(396003)(136003)(39860400002)(366004)(33430700001)(8676002)(2906002)(478600001)(4326008)(8936002)(186003)(26005)(7406005)(16526019)(5660300002)(7416002)(44832011)(86362001)(316002)(103116003)(956004)(33440700001)(55016002)(66946007)(52116002)(7696005)(66476007)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: 33g4s4KUlCQIRCcxfu/As5VONlBUKQQUY2CD6bciH8DiH3CO3an0lWEgE5Kp2+bYY+nhiRJw0shHrwRrHdVMU5SPcgrrNlo3QJkvLyH2KFCON76cgzEcQuAuHJUZs2RdZQOFt4z55vjO6sX3Z55b0F2oca861VkrBjilGTGq23pgWfjwPoEb7/KAno/377rR9fML3HvQBdLgXXYET9+fy+i4lh3xMh4FdSMX+CCnXV7rphjml+l46QW+vhpbUwkDVmom6UmkmXni4GP1DcEcm/XViPBbaNQY+gma+GOUGaRtfnvkX7F2zbhMfgTziyTptFkoAr79HH3vGRiOEFcCw6RfoyXK8aMibwkNB+Y8GLcHQlOt7Qs+uosl59q9YjjUNA6PHn5tVZz12PoufjaiRE2Wt62mTDmIUTQhEdP5pZ05JnLqSiAL68T1N5J/ngUZcR2jUumo89rMFoz/VWxA60FdrUl8il8uj2ANTreUQVc=
+X-MS-Exchange-AntiSpam-MessageData: PDTczmJ3m/hcF6x/S3Wo6YXKY5N52wztI/VHD78AuumaQ001Vv52lOWW1ccQgXnO19C8xLdgfsyEOd1IxJavGA1eKg9UE6kUM47tJBdCgL7M52OulIhCX6GquILf/BLekYetcvH+lZXVNBTr1Nw96uuLUZdtv4wiWISXM0JojcXDW38w6sCWvllNNiyB9Hq8kzo7pJhVena2VJ5tkcubszWUdXMFrTUXn2yiR4wlBjJ3vv6krmg936BnsAuHzoSVJTfU4+V093eNr0MYIRYvXe8pUxndKZmlhguN40O8xbogTG5HTynDlF4NwlI3/oKo25/yQKt4RGYP2nX11guXkWJcgI4K7s/XP9LOdN1ERe59apgQzxXVTEYcq+wWyBzkiMXSo87LXcEzumHsMDOnlhFggz6VKgiH0DHBSRB7Q9Y11HEOswTtNl+2XrIPKG28Qaqfkib74seTadMmYYKy3Tn0CUB7I6rM6VwZExaMTdw=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45225a86-f351-45bc-7698-08d7f603a947
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 23:33:08.5979
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17e3548f-d64b-4b4b-b811-08d7f603af88
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 23:33:19.0719
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TMSqZQTJ+fsRuIrStgm4e/SulLzLcRhSh2svgdypAqYr7OssZsUT45g2Uts2RQ78
+X-MS-Exchange-CrossTenant-UserPrincipalName: qGON+zFMhVGFkbIStjochE+orrsYkDCkTm8PMduUPnYpgc4C3eu6edxW5O+MeLgc
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2478
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-MPK feature is supported by both VMX and SVM. So we can
-safely move pkru state save/restore to common code. Also
-move all the pkru data structure to kvm_vcpu_arch.
-
-Also fixes the problem Jim Mattson pointed and suggested below.
-
-"Though rdpkru and wrpkru are contingent upon CR4.PKE, the PKRU
-resource isn't. It can be read with XSAVE and written with XRSTOR.
-So, if we don't set the guest PKRU value here(kvm_load_guest_xsave_state),
-the guest can read the host value.
-
-In case of kvm_load_host_xsave_state, guest with CR4.PKE clear could
-potentially use XRSTOR to change the host PKRU value"
+Both Intel and AMD support (MPK) Memory Protection Key feature.
+Move the feature detection from VMX to the common code. It should
+work for both the platforms now.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 ---
- arch/x86/include/asm/kvm_host.h |    1 +
- arch/x86/kvm/vmx/vmx.c          |   18 ------------------
- arch/x86/kvm/x86.c              |   17 +++++++++++++++++
- 3 files changed, 18 insertions(+), 18 deletions(-)
+ arch/x86/kvm/cpuid.c   |    4 +++-
+ arch/x86/kvm/vmx/vmx.c |    4 ----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 42a2d0d3984a..afd8f3780ae0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -578,6 +578,7 @@ struct kvm_vcpu_arch {
- 	unsigned long cr4;
- 	unsigned long cr4_guest_owned_bits;
- 	unsigned long cr8;
-+	u32 host_pkru;
- 	u32 pkru;
- 	u32 hflags;
- 	u64 efer;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 901cd1fdecd9..3da7d6ea7574 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -278,6 +278,8 @@ void kvm_set_cpu_caps(void)
+ #ifdef CONFIG_X86_64
+ 	unsigned int f_gbpages = F(GBPAGES);
+ 	unsigned int f_lm = F(LM);
++	/* PKU is not yet implemented for shadow paging. */
++	unsigned int f_pku = tdp_enabled ? F(PKU) : 0;
+ #else
+ 	unsigned int f_gbpages = 0;
+ 	unsigned int f_lm = 0;
+@@ -326,7 +328,7 @@ void kvm_set_cpu_caps(void)
+ 	);
+ 
+ 	kvm_cpu_cap_mask(CPUID_7_ECX,
+-		F(AVX512VBMI) | F(LA57) | 0 /*PKU*/ | 0 /*OSPKE*/ | F(RDPID) |
++		F(AVX512VBMI) | F(LA57) | f_pku | 0 /*OSPKE*/ | F(RDPID) |
+ 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+ 		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+ 		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c2c6335a998c..46898a476ba7 100644
+index 46898a476ba7..d153732ed88f 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1372,7 +1372,6 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+@@ -7136,10 +7136,6 @@ static __init void vmx_set_cpu_caps(void)
+ 	if (vmx_pt_mode_is_host_guest())
+ 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
  
- 	vmx_vcpu_pi_load(vcpu, cpu);
- 
--	vmx->host_pkru = read_pkru();
- 	vmx->host_debugctlmsr = get_debugctlmsr();
- }
- 
-@@ -6577,11 +6576,6 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	kvm_load_guest_xsave_state(vcpu);
- 
--	if (static_cpu_has(X86_FEATURE_PKU) &&
--	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
--	    vcpu->arch.pkru != vmx->host_pkru)
--		__write_pkru(vcpu->arch.pkru);
+-	/* PKU is not yet implemented for shadow paging. */
+-	if (enable_ept && boot_cpu_has(X86_FEATURE_OSPKE))
+-		kvm_cpu_cap_check_and_set(X86_FEATURE_PKU);
 -
- 	pt_guest_enter(vmx);
+ 	if (vmx_umip_emulated())
+ 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
  
- 	if (vcpu_to_pmu(vcpu)->version)
-@@ -6671,18 +6665,6 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	pt_guest_exit(vmx);
- 
--	/*
--	 * eager fpu is enabled if PKEY is supported and CR4 is switched
--	 * back on host, so it is safe to read guest PKRU from current
--	 * XSAVE.
--	 */
--	if (static_cpu_has(X86_FEATURE_PKU) &&
--	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE)) {
--		vcpu->arch.pkru = rdpkru();
--		if (vcpu->arch.pkru != vmx->host_pkru)
--			__write_pkru(vmx->host_pkru);
--	}
--
- 	kvm_load_host_xsave_state(vcpu);
- 
- 	vmx->nested.nested_run_pending = 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c5835f9cb9ad..98baeb74452c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -836,11 +836,25 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
- 		    vcpu->arch.ia32_xss != host_xss)
- 			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
- 	}
-+
-+	if (static_cpu_has(X86_FEATURE_PKU) &&
-+	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
-+	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)) &&
-+	    vcpu->arch.pkru != vcpu->arch.host_pkru)
-+		__write_pkru(vcpu->arch.pkru);
- }
- EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
- 
- void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
- {
-+	if (static_cpu_has(X86_FEATURE_PKU) &&
-+	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
-+	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU))) {
-+		vcpu->arch.pkru = rdpkru();
-+		if (vcpu->arch.pkru != vcpu->arch.host_pkru)
-+			__write_pkru(vcpu->arch.host_pkru);
-+	}
-+
- 	if (kvm_read_cr4_bits(vcpu, X86_CR4_OSXSAVE)) {
- 
- 		if (vcpu->arch.xcr0 != host_xcr0)
-@@ -3570,6 +3584,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- 	kvm_x86_ops.vcpu_load(vcpu, cpu);
- 
-+	/* Save host pkru register if supported */
-+	vcpu->arch.host_pkru = read_pkru();
-+
- 	/* Apply any externally detected TSC adjustments (due to suspend) */
- 	if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
- 		adjust_tsc_offset_host(vcpu, vcpu->arch.tsc_offset_adjustment);
 
