@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D7641CF2A2
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 12:35:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 271531CF2A6
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 12:35:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729564AbgELKfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 06:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58170 "EHLO
+        id S1729512AbgELKfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 06:35:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729460AbgELKff (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 May 2020 06:35:35 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB477C061A0C;
-        Tue, 12 May 2020 03:35:35 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id b190so411026pfg.6;
-        Tue, 12 May 2020 03:35:35 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1729243AbgELKfv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 May 2020 06:35:51 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004D9C061A0C;
+        Tue, 12 May 2020 03:35:50 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id n11so5952386pgl.9;
+        Tue, 12 May 2020 03:35:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=/FsgQMYPiOvkPGeoQgPkHu3YzEw2KTntrhFCKqR7dUA=;
-        b=vRlPNn9F/bG2X9XpWHZvnLEIJwRvOmghCuEUEbDZBnHJ0VIHJwrzF8uXnSmWOvhLus
-         aDoCRebSpy5nyeQwPmb0C13C0is+AwiBD6oonkJfERj1GJpKH23kPG+1zqG1jKbVt5ro
-         m4LtF4psUS/6v3LOci+75eQBehYhqEppY+vCUPUPhypliueCdQjVHNvXb/nM1+086jbh
-         RIjZLvlq5jF6psN5ZZePY/MLrfEGI7ElrUmV4HwK+s5KwcCNea+8iWkGxptYvenb8d87
-         eRISe4LlkPfOZdD88yJ42OCvn84LsaAM3VcAXucabWEPTUZ4ufssH8J/WCsdpLDgh/Fg
-         NwEg==
+        bh=lRlL7hUdT7kP4UQ1xme441+QcsJMa7l8fgBJA8DHdlI=;
+        b=BMgbnKU4aaiijev5yQc+nLqAZ7P91SDi+QQSa/R0GYpZQWrL82aisgQ6YHpvvkPEgb
+         svOhV26sXLUsKbnWmxHlW8yUlW81LJv+QaBJNEOHmeJguUdqkbK5YINvXaNULthZVHKA
+         hKqsnztjLRE1gJOJe/KH+fS6h6erEkVV6naPPkca30o2f0jqFFoj627UlspyDo0YwetG
+         4/FYd7Mxk2YX8PHuja+cMLcQ0EtJLlNOl7DljiObN8nwyY4eNtFttY5+iFKiErJbG3Vo
+         KbZQMFcjoOYIHCjwuTbxsL7w4KycUiOUq9dC8avG3/npbmxBqz3GwyiU4iyMVyg1XfHR
+         nF1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=/FsgQMYPiOvkPGeoQgPkHu3YzEw2KTntrhFCKqR7dUA=;
-        b=WeO7Hh6S5rKga9S8riFV3spTOJy0r3ezzuNNrUkreKsXu2P1g2kMGsd+JpZsGT5Vjd
-         Qa8gFB0kU+ifW8YS/XtD+3jlwJldx/QsCDwk3yfEZNsY0G3I2g9ehWDCygABX6D9LvDl
-         6/3OGs6G7YlI0xba7JjOoOw9t7a5m1ZZ7kZXP2+Cfp3aKM6uKgUCxu5Pe5XfPFj/NccR
-         qzX/1szCazRxhErZf9stswlZ4et1fpmLcUAxVow8rJCQPU17+7ETjHtgYWG3sfDqAVqh
-         LK3SNZIW3VpQl+z7+ETwHM+ukLGXdldQUXMSPohRtyv6B3CvV6NLFlIQl1is83n/IdJ5
-         nGtg==
-X-Gm-Message-State: AOAM533Hdgk69PkKkyu0/DsK4lDY3VD1FQdk7mEoDxuiEAaiudu0BNm5
-        lItDok7kbLCktLxiXf/usjI=
-X-Google-Smtp-Source: ABdhPJzSzUGyqo1k3Xw1ZvzHMyvsOytpxoYA1JInS7hrGeYb2qy8NeV4kCwhRoaXvwSLaHafFXE2uQ==
-X-Received: by 2002:a63:7b4b:: with SMTP id k11mr10829379pgn.411.1589279735204;
-        Tue, 12 May 2020 03:35:35 -0700 (PDT)
+        bh=lRlL7hUdT7kP4UQ1xme441+QcsJMa7l8fgBJA8DHdlI=;
+        b=sf/Eeuo7RozbT/Um/07r6kC7QZyExJiEpLdWimMOlcGpRSIOV1rANsaluu5WFLtvZA
+         zhAwlwbydGFVfLp1d6S2TBa5JOmcshaFJNMafUqs2RAhvTOK873YygdSgdNLX/SEYYeW
+         8moQVeqkTzvs53jlJGJE/QTKmU+tb9fxdORAAnq2AK/AUT7LtYcW8VAcC47bUcDf8k6P
+         O2kNYpIog2GdtqWLAzWr+KL+API/Y7kJKF/UXCTdS4wXeOMNtWVgsozmpwjVa8IqyJho
+         FpanaD74wIeI3t24fCHL8WBpnQxkq1hRtwRwMcXBZFHUcN+yJUVAuJlW/q5PBRiDh806
+         vJEw==
+X-Gm-Message-State: AGi0PuaQNoY7ZIH6zLKVunPqUdQCcsf/5c8GyV4h966+mLPC9ftCO8RO
+        PNd6n7GlI5I57117/R3th7n8ddoMbmQ=
+X-Google-Smtp-Source: APiQypJEGwtn7iGe2nQGtFx7Nuay7ZpRyiz2rMkUDp21zM24ct31Peqiim+p/da3zG11Kz5B4AKFng==
+X-Received: by 2002:a63:f157:: with SMTP id o23mr19288090pgk.15.1589279750308;
+        Tue, 12 May 2020 03:35:50 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com. [34.92.144.28])
-        by smtp.gmail.com with ESMTPSA id q11sm11617094pfl.97.2020.05.12.03.35.32
+        by smtp.gmail.com with ESMTPSA id q11sm11617094pfl.97.2020.05.12.03.35.47
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 May 2020 03:35:34 -0700 (PDT)
+        Tue, 12 May 2020 03:35:49 -0700 (PDT)
 From:   Huacai Chen <chenhc@lemote.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
@@ -55,9 +55,9 @@ Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
         Huacai Chen <chenhuacai@gmail.com>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Huacai Chen <chenhc@lemote.com>
-Subject: [PATCH V4 12/14] KVM: MIPS: Add CONFIG6 and DIAG registers emulation
-Date:   Tue, 12 May 2020 18:31:18 +0800
-Message-Id: <1589279480-27722-13-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V4 13/14] KVM: MIPS: Add more MMIO load/store instructions emulation
+Date:   Tue, 12 May 2020 18:31:19 +0800
+Message-Id: <1589279480-27722-14-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1589279480-27722-1-git-send-email-chenhc@lemote.com>
 References: <1589279480-27722-1-git-send-email-chenhc@lemote.com>
@@ -66,271 +66,551 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Loongson-3 has CONFIG6 and DIAG registers which need to be emulate.
-CONFIG6 is mostly used to enable/disable FTLB and SFB, while DIAG is
-mostly used to flush BTB, ITLB, DTLB, VTLB and FTLB.
+This patch add more MMIO load/store instructions emulation, which can
+be observed in QXL and some other device drivers:
 
+1, LWL, LWR, LDW, LDR, SWL, SWR, SDL and SDR for all MIPS;
+2, GSLBX, GSLHX, GSLWX, GSLDX, GSSBX, GSSHX, GSSWX and GSSDX for
+   Loongson-3.
+
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/include/asm/kvm_host.h |  7 +++++
- arch/mips/include/asm/mipsregs.h |  7 +++++
- arch/mips/kvm/tlb.c              | 41 ++++++++++++++++++++++++++
- arch/mips/kvm/vz.c               | 62 +++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 116 insertions(+), 1 deletion(-)
+ arch/mips/kvm/emulate.c | 480 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 470 insertions(+), 10 deletions(-)
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 3fd2f1c..30b5e33 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -68,9 +68,11 @@
- #define KVM_REG_MIPS_CP0_CONFIG3	MIPS_CP0_32(16, 3)
- #define KVM_REG_MIPS_CP0_CONFIG4	MIPS_CP0_32(16, 4)
- #define KVM_REG_MIPS_CP0_CONFIG5	MIPS_CP0_32(16, 5)
-+#define KVM_REG_MIPS_CP0_CONFIG6	MIPS_CP0_32(16, 6)
- #define KVM_REG_MIPS_CP0_CONFIG7	MIPS_CP0_32(16, 7)
- #define KVM_REG_MIPS_CP0_MAARI		MIPS_CP0_64(17, 2)
- #define KVM_REG_MIPS_CP0_XCONTEXT	MIPS_CP0_64(20, 0)
-+#define KVM_REG_MIPS_CP0_DIAG		MIPS_CP0_32(22, 0)
- #define KVM_REG_MIPS_CP0_ERROREPC	MIPS_CP0_64(30, 0)
- #define KVM_REG_MIPS_CP0_KSCRATCH1	MIPS_CP0_64(31, 2)
- #define KVM_REG_MIPS_CP0_KSCRATCH2	MIPS_CP0_64(31, 3)
-@@ -256,6 +258,7 @@ struct mips_coproc {
- #define MIPS_CP0_WATCH_LO	18
- #define MIPS_CP0_WATCH_HI	19
- #define MIPS_CP0_TLB_XCONTEXT	20
-+#define MIPS_CP0_DIAG		22
- #define MIPS_CP0_ECC		26
- #define MIPS_CP0_CACHE_ERR	27
- #define MIPS_CP0_TAG_LO		28
-@@ -927,6 +930,10 @@ void kvm_vz_save_guesttlb(struct kvm_mips_tlb *buf, unsigned int index,
- 			  unsigned int count);
- void kvm_vz_load_guesttlb(const struct kvm_mips_tlb *buf, unsigned int index,
- 			  unsigned int count);
-+#ifdef CONFIG_CPU_LOONGSON64
-+void kvm_loongson_clear_guest_vtlb(void);
-+void kvm_loongson_clear_guest_ftlb(void);
-+#endif
- #endif
+diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
+index 3946499..71316fa 100644
+--- a/arch/mips/kvm/emulate.c
++++ b/arch/mips/kvm/emulate.c
+@@ -1604,6 +1604,7 @@ enum emulation_result kvm_mips_emulate_store(union mips_instruction inst,
+ 	enum emulation_result er;
+ 	u32 rt;
+ 	void *data = run->mmio.data;
++	unsigned int imme;
+ 	unsigned long curr_pc;
  
- void kvm_mips_suspend_mm(int cpu);
-diff --git a/arch/mips/include/asm/mipsregs.h b/arch/mips/include/asm/mipsregs.h
-index 796fe47..ce40fbf 100644
---- a/arch/mips/include/asm/mipsregs.h
-+++ b/arch/mips/include/asm/mipsregs.h
-@@ -674,6 +674,9 @@
- #define MIPS_CONF5_CV		(_ULCAST_(1) << 29)
- #define MIPS_CONF5_K		(_ULCAST_(1) << 30)
- 
-+#define MIPS_CONF6_INTIMER	(_ULCAST_(1) << 6)
-+#define MIPS_CONF6_EXTIMER	(_ULCAST_(1) << 7)
-+#define MIPS_CONF6_SFBEN	(_ULCAST_(1) << 8)
- #define MIPS_CONF6_SYND		(_ULCAST_(1) << 13)
- /* proAptiv FTLB on/off bit */
- #define MIPS_CONF6_FTLBEN	(_ULCAST_(1) << 15)
-@@ -993,6 +996,8 @@
- /* Disable Branch Return Cache */
- #define R10K_DIAG_D_BRC		(_ULCAST_(1) << 22)
- 
-+/* Flush BTB */
-+#define LOONGSON_DIAG_BTB	(_ULCAST_(1) << 1)
- /* Flush ITLB */
- #define LOONGSON_DIAG_ITLB	(_ULCAST_(1) << 2)
- /* Flush DTLB */
-@@ -2825,7 +2830,9 @@ __BUILD_SET_C0(status)
- __BUILD_SET_C0(cause)
- __BUILD_SET_C0(config)
- __BUILD_SET_C0(config5)
-+__BUILD_SET_C0(config6)
- __BUILD_SET_C0(config7)
-+__BUILD_SET_C0(diag)
- __BUILD_SET_C0(intcontrol)
- __BUILD_SET_C0(intctl)
- __BUILD_SET_C0(srsmap)
-diff --git a/arch/mips/kvm/tlb.c b/arch/mips/kvm/tlb.c
-index 7cd9216..1418715 100644
---- a/arch/mips/kvm/tlb.c
-+++ b/arch/mips/kvm/tlb.c
-@@ -20,6 +20,7 @@
- 
- #include <asm/cpu.h>
- #include <asm/bootinfo.h>
-+#include <asm/mipsregs.h>
- #include <asm/mmu_context.h>
- #include <asm/pgtable.h>
- #include <asm/cacheflush.h>
-@@ -622,6 +623,46 @@ void kvm_vz_load_guesttlb(const struct kvm_mips_tlb *buf, unsigned int index,
- }
- EXPORT_SYMBOL_GPL(kvm_vz_load_guesttlb);
- 
-+#ifdef CONFIG_CPU_LOONGSON64
-+void kvm_loongson_clear_guest_vtlb(void)
-+{
-+	int idx = read_gc0_index();
-+
-+	/* Set root GuestID for root probe and write of guest TLB entry */
-+	set_root_gid_to_guest_gid();
-+
-+	write_gc0_index(0);
-+	guest_tlbinvf();
-+	write_gc0_index(idx);
-+
-+	clear_root_gid();
-+	set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-+}
-+EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_vtlb);
-+
-+void kvm_loongson_clear_guest_ftlb(void)
-+{
-+	int i;
-+	int idx = read_gc0_index();
-+
-+	/* Set root GuestID for root probe and write of guest TLB entry */
-+	set_root_gid_to_guest_gid();
-+
-+	for (i = current_cpu_data.tlbsizevtlb;
-+	     i < (current_cpu_data.tlbsizevtlb +
-+		     current_cpu_data.tlbsizeftlbsets);
-+	     i++) {
-+		write_gc0_index(i);
-+		guest_tlbinvf();
-+	}
-+	write_gc0_index(idx);
-+
-+	clear_root_gid();
-+	set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-+}
-+EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_ftlb);
-+#endif
-+
- #endif
- 
- /**
-diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-index e5c751b..fc0f8d5 100644
---- a/arch/mips/kvm/vz.c
-+++ b/arch/mips/kvm/vz.c
-@@ -127,6 +127,11 @@ static inline unsigned int kvm_vz_config5_guest_wrmask(struct kvm_vcpu *vcpu)
- 	return mask;
- }
- 
-+static inline unsigned int kvm_vz_config6_guest_wrmask(struct kvm_vcpu *vcpu)
-+{
-+	return MIPS_CONF6_INTIMER | MIPS_CONF6_EXTIMER | MIPS_CONF6_SYND;
-+}
-+
- /*
-  * VZ optionally allows these additional Config bits to be written by root:
-  * Config:	M, [MT]
-@@ -181,6 +186,12 @@ static inline unsigned int kvm_vz_config5_user_wrmask(struct kvm_vcpu *vcpu)
- 	return kvm_vz_config5_guest_wrmask(vcpu) | MIPS_CONF5_MRP;
- }
- 
-+static inline unsigned int kvm_vz_config6_user_wrmask(struct kvm_vcpu *vcpu)
-+{
-+	return kvm_vz_config6_guest_wrmask(vcpu) |
-+		MIPS_CONF6_SFBEN | MIPS_CONF6_FTLBEN | MIPS_CONF6_FTLBDIS;
-+}
-+
- static gpa_t kvm_vz_gva_to_gpa_cb(gva_t gva)
- {
- 	/* VZ guest has already converted gva to gpa */
-@@ -930,7 +941,8 @@ static enum emulation_result kvm_vz_gpsi_cop0(union mips_instruction inst,
- 				    (sel == 2 ||	/* SRSCtl */
- 				     sel == 3)) ||	/* SRSMap */
- 				   (rd == MIPS_CP0_CONFIG &&
--				    (sel == 7)) ||	/* Config7 */
-+				    (sel == 6 ||	/* Config6 */
-+				     sel == 7)) ||	/* Config7 */
- 				   (rd == MIPS_CP0_LLADDR &&
- 				    (sel == 2) &&	/* MAARI */
- 				    cpu_guest_has_maar &&
-@@ -938,6 +950,11 @@ static enum emulation_result kvm_vz_gpsi_cop0(union mips_instruction inst,
- 				   (rd == MIPS_CP0_ERRCTL &&
- 				    (sel == 0))) {	/* ErrCtl */
- 				val = cop0->reg[rd][sel];
-+#ifdef CONFIG_CPU_LOONGSON64
-+			} else if (rd == MIPS_CP0_DIAG &&
-+				   (sel == 0)) {	/* Diag */
-+				val = cop0->reg[rd][sel];
-+#endif
- 			} else {
- 				val = 0;
- 				er = EMULATE_FAIL;
-@@ -1000,9 +1017,40 @@ static enum emulation_result kvm_vz_gpsi_cop0(union mips_instruction inst,
- 				   cpu_guest_has_maar &&
- 				   !cpu_guest_has_dyn_maar) {
- 				kvm_write_maari(vcpu, val);
-+			} else if (rd == MIPS_CP0_CONFIG &&
-+				   (sel == 6)) {
-+				cop0->reg[rd][sel] = (int)val;
- 			} else if (rd == MIPS_CP0_ERRCTL &&
- 				   (sel == 0)) {	/* ErrCtl */
- 				/* ignore the written value */
-+#ifdef CONFIG_CPU_LOONGSON64
-+			} else if (rd == MIPS_CP0_DIAG &&
-+				   (sel == 0)) {	/* Diag */
-+				unsigned long flags;
-+
-+				local_irq_save(flags);
-+				if (val & LOONGSON_DIAG_BTB) {
-+					/* Flush BTB */
-+					set_c0_diag(LOONGSON_DIAG_BTB);
-+				}
-+				if (val & LOONGSON_DIAG_ITLB) {
-+					/* Flush ITLB */
-+					set_c0_diag(LOONGSON_DIAG_ITLB);
-+				}
-+				if (val & LOONGSON_DIAG_DTLB) {
-+					/* Flush DTLB */
-+					set_c0_diag(LOONGSON_DIAG_DTLB);
-+				}
-+				if (val & LOONGSON_DIAG_VTLB) {
-+					/* Flush VTLB */
-+					kvm_loongson_clear_guest_vtlb();
-+				}
-+				if (val & LOONGSON_DIAG_FTLB) {
-+					/* Flush FTLB */
-+					kvm_loongson_clear_guest_ftlb();
-+				}
-+				local_irq_restore(flags);
-+#endif
- 			} else {
- 				er = EMULATE_FAIL;
- 			}
-@@ -1690,6 +1738,7 @@ static u64 kvm_vz_get_one_regs[] = {
- 	KVM_REG_MIPS_CP0_CONFIG3,
- 	KVM_REG_MIPS_CP0_CONFIG4,
- 	KVM_REG_MIPS_CP0_CONFIG5,
-+	KVM_REG_MIPS_CP0_CONFIG6,
- #ifdef CONFIG_64BIT
- 	KVM_REG_MIPS_CP0_XCONTEXT,
- #endif
-@@ -2017,6 +2066,9 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *vcpu,
- 			return -EINVAL;
- 		*v = read_gc0_config5();
+ 	/*
+@@ -1661,6 +1662,211 @@ enum emulation_result kvm_mips_emulate_store(union mips_instruction inst,
+ 			  vcpu->arch.gprs[rt], *(u8 *)data);
  		break;
-+	case KVM_REG_MIPS_CP0_CONFIG6:
-+		*v = kvm_read_sw_gc0_config6(cop0);
+ 
++	case swl_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x3);
++		run->mmio.len = 4;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x3;
++		switch (imme) {
++		case 0:
++			*(u32 *)data = ((*(u32 *)data) & 0xffffff00) |
++					(vcpu->arch.gprs[rt] >> 24);
++			break;
++		case 1:
++			*(u32 *)data = ((*(u32 *)data) & 0xffff0000) |
++					(vcpu->arch.gprs[rt] >> 16);
++			break;
++		case 2:
++			*(u32 *)data = ((*(u32 *)data) & 0xff000000) |
++					(vcpu->arch.gprs[rt] >> 8);
++			break;
++		case 3:
++			*(u32 *)data = vcpu->arch.gprs[rt];
++			break;
++		default:
++			break;
++		}
++
++		kvm_debug("[%#lx] OP_SWL: eaddr: %#lx, gpr: %#lx, data: %#x\n",
++			  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++			  vcpu->arch.gprs[rt], *(u32 *)data);
 +		break;
- 	case KVM_REG_MIPS_CP0_MAAR(0) ... KVM_REG_MIPS_CP0_MAAR(0x3f):
- 		if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
- 			return -EINVAL;
-@@ -2286,6 +2338,14 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu *vcpu,
- 			write_gc0_config5(v);
- 		}
- 		break;
-+	case KVM_REG_MIPS_CP0_CONFIG6:
-+		cur = kvm_read_sw_gc0_config6(cop0);
-+		change = (cur ^ v) & kvm_vz_config6_user_wrmask(vcpu);
-+		if (change) {
-+			v = cur ^ change;
-+			kvm_write_sw_gc0_config6(cop0, (int)v);
++
++	case swr_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x3);
++		run->mmio.len = 4;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x3;
++		switch (imme) {
++		case 0:
++			*(u32 *)data = vcpu->arch.gprs[rt];
++			break;
++		case 1:
++			*(u32 *)data = ((*(u32 *)data) & 0xff) |
++					(vcpu->arch.gprs[rt] << 8);
++			break;
++		case 2:
++			*(u32 *)data = ((*(u32 *)data) & 0xffff) |
++					(vcpu->arch.gprs[rt] << 16);
++			break;
++		case 3:
++			*(u32 *)data = ((*(u32 *)data) & 0xffffff) |
++					(vcpu->arch.gprs[rt] << 24);
++			break;
++		default:
++			break;
++		}
++
++		kvm_debug("[%#lx] OP_SWR: eaddr: %#lx, gpr: %#lx, data: %#x\n",
++			  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++			  vcpu->arch.gprs[rt], *(u32 *)data);
++		break;
++
++	case sdl_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x7);
++
++		run->mmio.len = 8;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x7;
++		switch (imme) {
++		case 0:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffffffffff00) |
++					((vcpu->arch.gprs[rt] >> 56) & 0xff);
++			break;
++		case 1:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffffffff0000) |
++					((vcpu->arch.gprs[rt] >> 48) & 0xffff);
++			break;
++		case 2:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffffff000000) |
++					((vcpu->arch.gprs[rt] >> 40) & 0xffffff);
++			break;
++		case 3:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffff00000000) |
++					((vcpu->arch.gprs[rt] >> 32) & 0xffffffff);
++			break;
++		case 4:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffff0000000000) |
++					((vcpu->arch.gprs[rt] >> 24) & 0xffffffffff);
++			break;
++		case 5:
++			*(u64 *)data = ((*(u64 *)data) & 0xffff000000000000) |
++					((vcpu->arch.gprs[rt] >> 16) & 0xffffffffffff);
++			break;
++		case 6:
++			*(u64 *)data = ((*(u64 *)data) & 0xff00000000000000) |
++					((vcpu->arch.gprs[rt] >> 8) & 0xffffffffffffff);
++			break;
++		case 7:
++			*(u64 *)data = vcpu->arch.gprs[rt];
++			break;
++		default:
++			break;
++		}
++
++		kvm_debug("[%#lx] OP_SDL: eaddr: %#lx, gpr: %#lx, data: %llx\n",
++			  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++			  vcpu->arch.gprs[rt], *(u64 *)data);
++		break;
++
++	case sdr_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x7);
++
++		run->mmio.len = 8;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x7;
++		switch (imme) {
++		case 0:
++			*(u64 *)data = vcpu->arch.gprs[rt];
++			break;
++		case 1:
++			*(u64 *)data = ((*(u64 *)data) & 0xff) |
++					(vcpu->arch.gprs[rt] << 8);
++			break;
++		case 2:
++			*(u64 *)data = ((*(u64 *)data) & 0xffff) |
++					(vcpu->arch.gprs[rt] << 16);
++			break;
++		case 3:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffff) |
++					(vcpu->arch.gprs[rt] << 24);
++			break;
++		case 4:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffff) |
++					(vcpu->arch.gprs[rt] << 32);
++			break;
++		case 5:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffffff) |
++					(vcpu->arch.gprs[rt] << 40);
++			break;
++		case 6:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffffffff) |
++					(vcpu->arch.gprs[rt] << 48);
++			break;
++		case 7:
++			*(u64 *)data = ((*(u64 *)data) & 0xffffffffffffff) |
++					(vcpu->arch.gprs[rt] << 56);
++			break;
++		default:
++			break;
++		}
++
++		kvm_debug("[%#lx] OP_SDR: eaddr: %#lx, gpr: %#lx, data: %llx\n",
++			  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++			  vcpu->arch.gprs[rt], *(u64 *)data);
++		break;
++
++#ifdef CONFIG_CPU_LOONGSON64
++	case sdc2_op:
++		rt = inst.loongson3_lsdc2_format.rt;
++		switch (inst.loongson3_lsdc2_format.opcode1) {
++		/*
++		 * Loongson-3 overridden sdc2 instructions.
++		 * opcode1              instruction
++		 *   0x0          gssbx: store 1 bytes from GPR
++		 *   0x1          gsshx: store 2 bytes from GPR
++		 *   0x2          gsswx: store 4 bytes from GPR
++		 *   0x3          gssdx: store 8 bytes from GPR
++		 */
++		case 0x0:
++			run->mmio.len = 1;
++			*(u8 *)data = vcpu->arch.gprs[rt];
++
++			kvm_debug("[%#lx] OP_GSSBX: eaddr: %#lx, gpr: %#lx, data: %#x\n",
++				  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++				  vcpu->arch.gprs[rt], *(u8 *)data);
++			break;
++		case 0x1:
++			run->mmio.len = 2;
++			*(u16 *)data = vcpu->arch.gprs[rt];
++
++			kvm_debug("[%#lx] OP_GSSSHX: eaddr: %#lx, gpr: %#lx, data: %#x\n",
++				  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++				  vcpu->arch.gprs[rt], *(u16 *)data);
++			break;
++		case 0x2:
++			run->mmio.len = 4;
++			*(u32 *)data = vcpu->arch.gprs[rt];
++
++			kvm_debug("[%#lx] OP_GSSWX: eaddr: %#lx, gpr: %#lx, data: %#x\n",
++				  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++				  vcpu->arch.gprs[rt], *(u32 *)data);
++			break;
++		case 0x3:
++			run->mmio.len = 8;
++			*(u64 *)data = vcpu->arch.gprs[rt];
++
++			kvm_debug("[%#lx] OP_GSSDX: eaddr: %#lx, gpr: %#lx, data: %#llx\n",
++				  vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
++				  vcpu->arch.gprs[rt], *(u64 *)data);
++			break;
++		default:
++			kvm_err("Godson Exteneded GS-Store not yet supported (inst=0x%08x)\n",
++				inst.word);
++			break;
 +		}
 +		break;
- 	case KVM_REG_MIPS_CP0_MAAR(0) ... KVM_REG_MIPS_CP0_MAAR(0x3f):
- 		if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
- 			return -EINVAL;
++#endif
+ 	default:
+ 		kvm_err("Store not yet supported (inst=0x%08x)\n",
+ 			inst.word);
+@@ -1695,6 +1901,7 @@ enum emulation_result kvm_mips_emulate_load(union mips_instruction inst,
+ 	enum emulation_result er;
+ 	unsigned long curr_pc;
+ 	u32 op, rt;
++	unsigned int imme;
+ 
+ 	rt = inst.i_format.rt;
+ 	op = inst.i_format.opcode;
+@@ -1747,6 +1954,162 @@ enum emulation_result kvm_mips_emulate_load(union mips_instruction inst,
+ 		run->mmio.len = 1;
+ 		break;
+ 
++	case lwl_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x3);
++
++		run->mmio.len = 4;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x3;
++		switch (imme) {
++		case 0:
++			vcpu->mmio_needed = 3;	/* 1 byte */
++			break;
++		case 1:
++			vcpu->mmio_needed = 4;	/* 2 bytes */
++			break;
++		case 2:
++			vcpu->mmio_needed = 5;	/* 3 bytes */
++			break;
++		case 3:
++			vcpu->mmio_needed = 6;	/* 4 bytes */
++			break;
++		default:
++			break;
++		}
++		break;
++
++	case lwr_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x3);
++
++		run->mmio.len = 4;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x3;
++		switch (imme) {
++		case 0:
++			vcpu->mmio_needed = 7;	/* 4 bytes */
++			break;
++		case 1:
++			vcpu->mmio_needed = 8;	/* 3 bytes */
++			break;
++		case 2:
++			vcpu->mmio_needed = 9;	/* 2 bytes */
++			break;
++		case 3:
++			vcpu->mmio_needed = 10;	/* 1 byte */
++			break;
++		default:
++			break;
++		}
++		break;
++
++	case ldl_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x7);
++
++		run->mmio.len = 8;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x7;
++		switch (imme) {
++		case 0:
++			vcpu->mmio_needed = 11;	/* 1 byte */
++			break;
++		case 1:
++			vcpu->mmio_needed = 12;	/* 2 bytes */
++			break;
++		case 2:
++			vcpu->mmio_needed = 13;	/* 3 bytes */
++			break;
++		case 3:
++			vcpu->mmio_needed = 14;	/* 4 bytes */
++			break;
++		case 4:
++			vcpu->mmio_needed = 15;	/* 5 bytes */
++			break;
++		case 5:
++			vcpu->mmio_needed = 16;	/* 6 bytes */
++			break;
++		case 6:
++			vcpu->mmio_needed = 17;	/* 7 bytes */
++			break;
++		case 7:
++			vcpu->mmio_needed = 18;	/* 8 bytes */
++			break;
++		default:
++			break;
++		}
++		break;
++
++	case ldr_op:
++		run->mmio.phys_addr = kvm_mips_callbacks->gva_to_gpa(
++					vcpu->arch.host_cp0_badvaddr) & (~0x7);
++
++		run->mmio.len = 8;
++		imme = vcpu->arch.host_cp0_badvaddr & 0x7;
++		switch (imme) {
++		case 0:
++			vcpu->mmio_needed = 19;	/* 8 bytes */
++			break;
++		case 1:
++			vcpu->mmio_needed = 20;	/* 7 bytes */
++			break;
++		case 2:
++			vcpu->mmio_needed = 21;	/* 6 bytes */
++			break;
++		case 3:
++			vcpu->mmio_needed = 22;	/* 5 bytes */
++			break;
++		case 4:
++			vcpu->mmio_needed = 23;	/* 4 bytes */
++			break;
++		case 5:
++			vcpu->mmio_needed = 24;	/* 3 bytes */
++			break;
++		case 6:
++			vcpu->mmio_needed = 25;	/* 2 bytes */
++			break;
++		case 7:
++			vcpu->mmio_needed = 26;	/* 1 byte */
++			break;
++		default:
++			break;
++		}
++		break;
++
++#ifdef CONFIG_CPU_LOONGSON64
++	case ldc2_op:
++		rt = inst.loongson3_lsdc2_format.rt;
++		switch (inst.loongson3_lsdc2_format.opcode1) {
++		/*
++		 * Loongson-3 overridden ldc2 instructions.
++		 * opcode1              instruction
++		 *   0x0          gslbx: store 1 bytes from GPR
++		 *   0x1          gslhx: store 2 bytes from GPR
++		 *   0x2          gslwx: store 4 bytes from GPR
++		 *   0x3          gsldx: store 8 bytes from GPR
++		 */
++		case 0x0:
++			run->mmio.len = 1;
++			vcpu->mmio_needed = 27;	/* signed */
++			break;
++		case 0x1:
++			run->mmio.len = 2;
++			vcpu->mmio_needed = 28;	/* signed */
++			break;
++		case 0x2:
++			run->mmio.len = 4;
++			vcpu->mmio_needed = 29;	/* signed */
++			break;
++		case 0x3:
++			run->mmio.len = 8;
++			vcpu->mmio_needed = 30;	/* signed */
++			break;
++		default:
++			kvm_err("Godson Exteneded GS-Load for float not yet supported (inst=0x%08x)\n",
++				inst.word);
++			break;
++		}
++		break;
++#endif
++
+ 	default:
+ 		kvm_err("Load not yet supported (inst=0x%08x)\n",
+ 			inst.word);
+@@ -2612,28 +2975,125 @@ enum emulation_result kvm_mips_complete_mmio_load(struct kvm_vcpu *vcpu,
+ 
+ 	switch (run->mmio.len) {
+ 	case 8:
+-		*gpr = *(s64 *)run->mmio.data;
++		switch (vcpu->mmio_needed) {
++		case 11:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffffffffff) |
++				(((*(s64 *)run->mmio.data) & 0xff) << 56);
++			break;
++		case 12:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffffffff) |
++				(((*(s64 *)run->mmio.data) & 0xffff) << 48);
++			break;
++		case 13:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffffff) |
++				(((*(s64 *)run->mmio.data) & 0xffffff) << 40);
++			break;
++		case 14:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffff) |
++				(((*(s64 *)run->mmio.data) & 0xffffffff) << 32);
++			break;
++		case 15:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffff) |
++				(((*(s64 *)run->mmio.data) & 0xffffffffff) << 24);
++			break;
++		case 16:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffff) |
++				(((*(s64 *)run->mmio.data) & 0xffffffffffff) << 16);
++			break;
++		case 17:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xff) |
++				(((*(s64 *)run->mmio.data) & 0xffffffffffffff) << 8);
++			break;
++		case 18:
++		case 19:
++			*gpr = *(s64 *)run->mmio.data;
++			break;
++		case 20:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xff00000000000000) |
++				((((*(s64 *)run->mmio.data)) >> 8) & 0xffffffffffffff);
++			break;
++		case 21:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffff000000000000) |
++				((((*(s64 *)run->mmio.data)) >> 16) & 0xffffffffffff);
++			break;
++		case 22:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffff0000000000) |
++				((((*(s64 *)run->mmio.data)) >> 24) & 0xffffffffff);
++			break;
++		case 23:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffff00000000) |
++				((((*(s64 *)run->mmio.data)) >> 32) & 0xffffffff);
++			break;
++		case 24:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffffff000000) |
++				((((*(s64 *)run->mmio.data)) >> 40) & 0xffffff);
++			break;
++		case 25:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffffffff0000) |
++				((((*(s64 *)run->mmio.data)) >> 48) & 0xffff);
++			break;
++		case 26:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffffffffffff00) |
++				((((*(s64 *)run->mmio.data)) >> 56) & 0xff);
++			break;
++		default:
++			*gpr = *(s64 *)run->mmio.data;
++		}
+ 		break;
+ 
+ 	case 4:
+-		if (vcpu->mmio_needed == 2)
+-			*gpr = *(s32 *)run->mmio.data;
+-		else
++		switch (vcpu->mmio_needed) {
++		case 1:
+ 			*gpr = *(u32 *)run->mmio.data;
++			break;
++		case 2:
++			*gpr = *(s32 *)run->mmio.data;
++			break;
++		case 3:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffff) |
++				(((*(s32 *)run->mmio.data) & 0xff) << 24);
++			break;
++		case 4:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffff) |
++				(((*(s32 *)run->mmio.data) & 0xffff) << 16);
++			break;
++		case 5:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xff) |
++				(((*(s32 *)run->mmio.data) & 0xffffff) << 8);
++			break;
++		case 6:
++		case 7:
++			*gpr = *(s32 *)run->mmio.data;
++			break;
++		case 8:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xff000000) |
++				((((*(s32 *)run->mmio.data)) >> 8) & 0xffffff);
++			break;
++		case 9:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffff0000) |
++				((((*(s32 *)run->mmio.data)) >> 16) & 0xffff);
++			break;
++		case 10:
++			*gpr = (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0xffffff00) |
++				((((*(s32 *)run->mmio.data)) >> 24) & 0xff);
++			break;
++		default:
++			*gpr = *(s32 *)run->mmio.data;
++		}
+ 		break;
+ 
+ 	case 2:
+-		if (vcpu->mmio_needed == 2)
+-			*gpr = *(s16 *) run->mmio.data;
+-		else
++		if (vcpu->mmio_needed == 1)
+ 			*gpr = *(u16 *)run->mmio.data;
++		else
++			*gpr = *(s16 *)run->mmio.data;
+ 
+ 		break;
+ 	case 1:
+-		if (vcpu->mmio_needed == 2)
+-			*gpr = *(s8 *) run->mmio.data;
++		if (vcpu->mmio_needed == 1)
++			*gpr = *(u8 *)run->mmio.data;
+ 		else
+-			*gpr = *(u8 *) run->mmio.data;
++			*gpr = *(s8 *)run->mmio.data;
+ 		break;
+ 	}
+ 
 -- 
 2.7.0
 
