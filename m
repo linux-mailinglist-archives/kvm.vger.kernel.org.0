@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDEB31CF297
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 12:35:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4AA01CF29F
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 12:35:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729471AbgELKfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 06:35:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58080 "EHLO
+        id S1729505AbgELKfZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 06:35:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729457AbgELKfF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 May 2020 06:35:05 -0400
-Received: from mail-pl1-x644.google.com (mail-pl1-x644.google.com [IPv6:2607:f8b0:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E6F1C061A0C;
-        Tue, 12 May 2020 03:35:05 -0700 (PDT)
-Received: by mail-pl1-x644.google.com with SMTP id s20so5203701plp.6;
-        Tue, 12 May 2020 03:35:05 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1729436AbgELKfZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 May 2020 06:35:25 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1D2C061A0C;
+        Tue, 12 May 2020 03:35:25 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id x2so6167497pfx.7;
+        Tue, 12 May 2020 03:35:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=lEbO6lSkeCi0LXhzhaNn5OBl06Oi0O+wB0rMncLiL6M=;
-        b=KvLJ4puljqanJGxl4W5aV9bqD40SvHC+rhrt3rE92RpiRjboBPWeRVex81ImrU7hzU
-         6AzC4qPNsxm0sV4bH0lyLrQTUavn7gT5VCec6nXXWQ3IW2n9MSIf1+gTohIuvgWrh7Om
-         X7quAe1QjsAHcJQOM/5pYSyIej8igdmXjrFUR+8YnBeePffe+D+x9cMAw5oMrTOaA+RY
-         XAhuoO0UUCjbQYMc/a/kUJkh2wbHpayVSEpwvOYNvYiQc6uF/4ig6aB01QEXU3RJ7Naj
-         ozC0M9aUc0mYounWGoREms+mgnls2/1vDn9eLnsHrjWDV2SOUa+4b03W6zjRQoANdvEY
-         tchA==
+        bh=HjD3k8mpcSLCDKuz+YE4mXs+5+Bcc7Oe/yzZDiJx1vM=;
+        b=iNN1uKHoW55cr2mxmQq3t0YDkDklBOJJ47STuWIbD9V3hEqpX5gof+Cyep+WMeaj42
+         X5q2q+i2SAn6N7Qe7fHYn88p3qgzCck1Va8450llrP4a56j6engwp2TrK3oEaxEkpf9/
+         UU7+AF/l085atkUAdo5pVOfAC+Q+FTSHpKidC6fWGlOuT1VO/bdR9AbGXDsqnZ2txwrp
+         ej5KpAgsfjtqh5ZLYPk3TZb9rybQsFvR/WRSeDvf/ghWgm9BONLz2UJacsUXEVk5lei6
+         jKgu8ZRB2fRD5W7WLxQT1yKKmW7BGka5XOQcx/TwdfudU6nsl/6OTnbRoc1C4Lvds4in
+         9QbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=lEbO6lSkeCi0LXhzhaNn5OBl06Oi0O+wB0rMncLiL6M=;
-        b=nTpLKZ8oEMhdzC4h9qu85i4iw7qS65A+39zUXnPzJhXylhHyUqkhscfiIY9N2urebe
-         VuCgIWio56m2mezdy6KBwZfMdHTcGR7i/E3tZjnqPbed9FqypGvk0V8G4kok7p6vkmqq
-         a4QxgoGbzcxuzyqNDJdT8m+jpRNnp+gI2dui5qxBXH30nWaFxUoh03Rsqm7J/+ImRzJC
-         D+glFGw1ZrL717TwW52zUVKqLRnrtGi5HXU9mCYXtnptfXNAQrSnFXluh1Q2YMo0vbgj
-         +hmDnJSH1z5wLLWysqjfMLzE4eTKFsp9PPD4b/CfEoCUuHNxl+H2D0xWOC74TfJwChHm
-         WseA==
-X-Gm-Message-State: AGi0PuaHsnr2wCPcVnSkRNE+KxWJT3dg/Dml6b8r/m0b5i6c3H52XTFx
-        v8a4ON2/+A6O3BjVTGfr654=
-X-Google-Smtp-Source: APiQypKWGaPqvWDNk7lmbuB2EBMg0u818zr8xSx3ImwkZQUriIcI6MLCbQKl5K9qmMTI7xtPMAnu1A==
-X-Received: by 2002:a17:90a:fc89:: with SMTP id ci9mr27487480pjb.140.1589279704981;
-        Tue, 12 May 2020 03:35:04 -0700 (PDT)
+        bh=HjD3k8mpcSLCDKuz+YE4mXs+5+Bcc7Oe/yzZDiJx1vM=;
+        b=f0QNJioOib6mo+xqn/UZPy8ARY9DPE2CjzZWil0OiT4rcUaLTvLrbn/lrALTcw+ga+
+         Rjg9ZLN2/FvYIpIJVsJnGecyX9+BbW3fiN+MrZDqqVMhKmQnfkGUTmmblz+sPsUUcMfr
+         NVxVlJt/v7e2x1vcVqm73huMqn4yv07FJKm4sNSm6fg3j4aQkt45AjYlPFAXNnBQmvrT
+         6QYNu2O469r3059oOdhrbBUCb4ZqgXpYGDxbP8FKtq4Xo3O5O/5Na9UxbdKynR3WHTKC
+         dYa7yglOUX61Cy2IK6ugLnqMhYhdJZAOz/Cp4GzBXCO6aY8IQ9S7sUq1LuJxG9QmDZ1w
+         D6vg==
+X-Gm-Message-State: AGi0PuZRNT2ohqVeytWLWeZPknPNLsl7a3HB2XnMfNGt4aikY8hQiKd7
+        YhCNdoF/euWtLWZmMpe3lhI=
+X-Google-Smtp-Source: APiQypL5TrZeCgDTGMhS4zVDLKRzr6iS20Nlcix01PoessCY0Gokt86IimC6MKqifrhSWgsoY0DQZg==
+X-Received: by 2002:aa7:8dd2:: with SMTP id j18mr19950308pfr.74.1589279724495;
+        Tue, 12 May 2020 03:35:24 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com. [34.92.144.28])
-        by smtp.gmail.com with ESMTPSA id q11sm11617094pfl.97.2020.05.12.03.35.02
+        by smtp.gmail.com with ESMTPSA id q11sm11617094pfl.97.2020.05.12.03.35.21
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 May 2020 03:35:04 -0700 (PDT)
+        Tue, 12 May 2020 03:35:23 -0700 (PDT)
 From:   Huacai Chen <chenhc@lemote.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
@@ -55,9 +55,9 @@ Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
         Huacai Chen <chenhuacai@gmail.com>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Huacai Chen <chenhc@lemote.com>
-Subject: [PATCH V4 10/14] KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
-Date:   Tue, 12 May 2020 18:31:16 +0800
-Message-Id: <1589279480-27722-11-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V4 11/14] KVM: MIPS: Add CPUCFG emulation for Loongson-3
+Date:   Tue, 12 May 2020 18:31:17 +0800
+Message-Id: <1589279480-27722-12-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1589279480-27722-1-git-send-email-chenhc@lemote.com>
 References: <1589279480-27722-1-git-send-email-chenhc@lemote.com>
@@ -66,403 +66,201 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch add Loongson-3 Virtual IPI interrupt support in the kernel.
-The current implementation of IPI emulation in QEMU is based on GIC for
-MIPS, but Loongson-3 doesn't use GIC. Furthermore, IPI emulation in QEMU
-is too expensive for performance (because of too many context switches
-between Host and Guest). With current solution, the IPI delay may even
-cause RCU stall warnings in a multi-core Guest. So, we design a faster
-solution that emulate IPI interrupt in kernel (only used by Loongson-3
-now).
+Loongson-3 overrides lwc2 instructions to implement CPUCFG and CSR
+read/write functions. These instructions all cause guest exit so CSR
+doesn't benifit KVM guest (and there are always legacy methods to
+provide the same functions as CSR). So, we only emulate CPUCFG and let
+it return a reduced feature list (which means the virtual CPU doesn't
+have any other advanced features, including CSR) in KVM.
 
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/include/asm/kvm_host.h |  32 ++++++
- arch/mips/kvm/Makefile           |   3 +
- arch/mips/kvm/emulate.c          |  23 ++++-
- arch/mips/kvm/loongson_ipi.c     | 214 +++++++++++++++++++++++++++++++++++++++
- arch/mips/kvm/mips.c             |   6 ++
- 5 files changed, 277 insertions(+), 1 deletion(-)
- create mode 100644 arch/mips/kvm/loongson_ipi.c
+ arch/mips/include/asm/kvm_host.h  |  3 ++
+ arch/mips/include/uapi/asm/inst.h | 11 ++++++
+ arch/mips/kvm/mips.c              |  3 ++
+ arch/mips/kvm/vz.c                | 75 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 92 insertions(+)
 
 diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index a7758c0..f165902 100644
+index f165902..3fd2f1c 100644
 --- a/arch/mips/include/asm/kvm_host.h
 +++ b/arch/mips/include/asm/kvm_host.h
-@@ -23,6 +23,8 @@
- #include <asm/inst.h>
- #include <asm/mipsregs.h>
- 
-+#include <kvm/iodev.h>
-+
- /* MIPS KVM register ids */
- #define MIPS_CP0_32(_R, _S)					\
- 	(KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
-@@ -181,11 +183,39 @@ struct kvm_vcpu_stat {
- struct kvm_arch_memory_slot {
+@@ -173,6 +173,9 @@ struct kvm_vcpu_stat {
+ 	u64 vz_ghfc_exits;
+ 	u64 vz_gpa_exits;
+ 	u64 vz_resvd_exits;
++#ifdef CONFIG_CPU_LOONGSON64
++	u64 vz_cpucfg_exits;
++#endif
+ #endif
+ 	u64 halt_successful_poll;
+ 	u64 halt_attempted_poll;
+diff --git a/arch/mips/include/uapi/asm/inst.h b/arch/mips/include/uapi/asm/inst.h
+index 98f97c8..43d1faa 100644
+--- a/arch/mips/include/uapi/asm/inst.h
++++ b/arch/mips/include/uapi/asm/inst.h
+@@ -1012,6 +1012,16 @@ struct loongson3_lsdc2_format {	/* Loongson-3 overridden ldc2/sdc2 Load/Store fo
+ 	;))))))
  };
  
-+#ifdef CONFIG_CPU_LOONGSON64
-+struct ipi_state {
-+	uint32_t status;
-+	uint32_t en;
-+	uint32_t set;
-+	uint32_t clear;
-+	uint64_t buf[4];
++struct loongson3_lscsr_format {	/* Loongson-3 CPUCFG&CSR read/write format */
++	__BITFIELD_FIELD(unsigned int opcode : 6,
++	__BITFIELD_FIELD(unsigned int rs : 5,
++	__BITFIELD_FIELD(unsigned int fr : 5,
++	__BITFIELD_FIELD(unsigned int rd : 5,
++	__BITFIELD_FIELD(unsigned int fd : 5,
++	__BITFIELD_FIELD(unsigned int func : 6,
++	;))))))
 +};
 +
-+struct loongson_kvm_ipi;
-+
-+struct ipi_io_device {
-+	int node_id;
-+	struct loongson_kvm_ipi *ipi;
-+	struct kvm_io_device device;
-+};
-+
-+struct loongson_kvm_ipi {
-+	spinlock_t lock;
-+	struct kvm *kvm;
-+	struct ipi_state ipistate[16];
-+	struct ipi_io_device dev_ipi[4];
-+};
-+#endif
-+
- struct kvm_arch {
- 	/* Guest physical mm */
- 	struct mm_struct gpa_mm;
- 	/* Mask of CPUs needing GPA ASID flush */
- 	cpumask_t asid_flush_mask;
-+#ifdef CONFIG_CPU_LOONGSON64
-+	struct loongson_kvm_ipi ipi;
-+#endif
+ /*
+  * MIPS16e instruction formats (16-bit length)
+  */
+@@ -1114,6 +1124,7 @@ union mips_instruction {
+ 	struct mm16_r5_format mm16_r5_format;
+ 	struct loongson3_lswc2_format loongson3_lswc2_format;
+ 	struct loongson3_lsdc2_format loongson3_lsdc2_format;
++	struct loongson3_lscsr_format loongson3_lscsr_format;
  };
  
- #define N_MIPS_COPROC_REGS	32
-@@ -1133,6 +1163,8 @@ extern int kvm_mips_trans_mtc0(union mips_instruction inst, u32 *opc,
- /* Misc */
- extern void kvm_mips_dump_stats(struct kvm_vcpu *vcpu);
- extern unsigned long kvm_mips_get_ramsize(struct kvm *kvm);
-+extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
-+			     struct kvm_mips_interrupt *irq);
+ union mips16e_instruction {
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index ed989ef..9362769 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -68,6 +68,9 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "vz_ghfc",	  VCPU_STAT(vz_ghfc_exits),	 KVM_STAT_VCPU },
+ 	{ "vz_gpa",	  VCPU_STAT(vz_gpa_exits),	 KVM_STAT_VCPU },
+ 	{ "vz_resvd",	  VCPU_STAT(vz_resvd_exits),	 KVM_STAT_VCPU },
++#ifdef CONFIG_CPU_LOONGSON64
++	{ "vz_cpucfg",	  VCPU_STAT(vz_cpucfg_exits),	 KVM_STAT_VCPU },
++#endif
+ #endif
+ 	{ "halt_successful_poll", VCPU_STAT(halt_successful_poll), KVM_STAT_VCPU },
+ 	{ "halt_attempted_poll", VCPU_STAT(halt_attempted_poll), KVM_STAT_VCPU },
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index 63d5b35..e5c751b 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -29,6 +29,7 @@
+ #include <linux/kvm_host.h>
  
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-diff --git a/arch/mips/kvm/Makefile b/arch/mips/kvm/Makefile
-index 0a3cef6..506c4ac 100644
---- a/arch/mips/kvm/Makefile
-+++ b/arch/mips/kvm/Makefile
-@@ -13,6 +13,9 @@ kvm-objs := $(common-objs-y) mips.o emulate.o entry.o \
- 	    fpu.o
- kvm-objs += hypcall.o
- kvm-objs += mmu.o
-+ifdef CONFIG_CPU_LOONGSON64
-+kvm-objs += loongson_ipi.o
-+endif
+ #include "interrupt.h"
++#include "loongson_regs.h"
  
- ifdef CONFIG_KVM_MIPS_VZ
- kvm-objs		+= vz.o
-diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
-index 754094b..3946499 100644
---- a/arch/mips/kvm/emulate.c
-+++ b/arch/mips/kvm/emulate.c
-@@ -1600,6 +1600,7 @@ enum emulation_result kvm_mips_emulate_store(union mips_instruction inst,
- 					     struct kvm_run *run,
- 					     struct kvm_vcpu *vcpu)
- {
-+	int r;
- 	enum emulation_result er;
- 	u32 rt;
- 	void *data = run->mmio.data;
-@@ -1666,9 +1667,18 @@ enum emulation_result kvm_mips_emulate_store(union mips_instruction inst,
- 		goto out_fail;
- 	}
+ #include "trace.h"
  
--	run->mmio.is_write = 1;
- 	vcpu->mmio_needed = 1;
-+	run->mmio.is_write = 1;
- 	vcpu->mmio_is_write = 1;
-+
-+	r = kvm_io_bus_write(vcpu, KVM_MMIO_BUS,
-+			run->mmio.phys_addr, run->mmio.len, data);
-+
-+	if (!r) {
-+		vcpu->mmio_needed = 0;
-+		return EMULATE_DONE;
-+	}
-+
- 	return EMULATE_DO_MMIO;
- 
- out_fail:
-@@ -1681,6 +1691,7 @@ enum emulation_result kvm_mips_emulate_load(union mips_instruction inst,
- 					    u32 cause, struct kvm_run *run,
- 					    struct kvm_vcpu *vcpu)
- {
-+	int r;
- 	enum emulation_result er;
- 	unsigned long curr_pc;
- 	u32 op, rt;
-@@ -1745,6 +1756,16 @@ enum emulation_result kvm_mips_emulate_load(union mips_instruction inst,
- 
- 	run->mmio.is_write = 0;
- 	vcpu->mmio_is_write = 0;
-+
-+	r = kvm_io_bus_read(vcpu, KVM_MMIO_BUS,
-+			run->mmio.phys_addr, run->mmio.len, run->mmio.data);
-+
-+	if (!r) {
-+		kvm_mips_complete_mmio_load(vcpu, run);
-+		vcpu->mmio_needed = 0;
-+		return EMULATE_DONE;
-+	}
-+
- 	return EMULATE_DO_MMIO;
+@@ -1092,6 +1093,75 @@ static enum emulation_result kvm_vz_gpsi_cache(union mips_instruction inst,
+ 	return EMULATE_FAIL;
  }
  
-diff --git a/arch/mips/kvm/loongson_ipi.c b/arch/mips/kvm/loongson_ipi.c
-new file mode 100644
-index 00000000..3681fc8
---- /dev/null
-+++ b/arch/mips/kvm/loongson_ipi.c
-@@ -0,0 +1,214 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Loongson-3 Virtual IPI interrupt support.
-+ *
-+ * Copyright (C) 2019  Loongson Technologies, Inc.  All rights reserved.
-+ *
-+ * Authors: Chen Zhu <zhuchen@loongson.cn>
-+ * Authors: Huacai Chen <chenhc@lemote.com>
-+ */
-+
-+#include <linux/kvm_host.h>
-+
-+#define IPI_BASE            0x3ff01000ULL
-+
-+#define CORE0_STATUS_OFF       0x000
-+#define CORE0_EN_OFF           0x004
-+#define CORE0_SET_OFF          0x008
-+#define CORE0_CLEAR_OFF        0x00c
-+#define CORE0_BUF_20           0x020
-+#define CORE0_BUF_28           0x028
-+#define CORE0_BUF_30           0x030
-+#define CORE0_BUF_38           0x038
-+
-+#define CORE1_STATUS_OFF       0x100
-+#define CORE1_EN_OFF           0x104
-+#define CORE1_SET_OFF          0x108
-+#define CORE1_CLEAR_OFF        0x10c
-+#define CORE1_BUF_20           0x120
-+#define CORE1_BUF_28           0x128
-+#define CORE1_BUF_30           0x130
-+#define CORE1_BUF_38           0x138
-+
-+#define CORE2_STATUS_OFF       0x200
-+#define CORE2_EN_OFF           0x204
-+#define CORE2_SET_OFF          0x208
-+#define CORE2_CLEAR_OFF        0x20c
-+#define CORE2_BUF_20           0x220
-+#define CORE2_BUF_28           0x228
-+#define CORE2_BUF_30           0x230
-+#define CORE2_BUF_38           0x238
-+
-+#define CORE3_STATUS_OFF       0x300
-+#define CORE3_EN_OFF           0x304
-+#define CORE3_SET_OFF          0x308
-+#define CORE3_CLEAR_OFF        0x30c
-+#define CORE3_BUF_20           0x320
-+#define CORE3_BUF_28           0x328
-+#define CORE3_BUF_30           0x330
-+#define CORE3_BUF_38           0x338
-+
-+static int loongson_vipi_read(struct loongson_kvm_ipi *ipi,
-+				gpa_t addr, int len, void *val)
++#ifdef CONFIG_CPU_LOONGSON64
++static enum emulation_result kvm_vz_gpsi_lwc2(union mips_instruction inst,
++					      u32 *opc, u32 cause,
++					      struct kvm_run *run,
++					      struct kvm_vcpu *vcpu)
 +{
-+	uint32_t core = (addr >> 8) & 3;
-+	uint32_t node = (addr >> 44) & 3;
-+	uint32_t id = core + node * 4;
-+	uint64_t offset = addr & 0xff;
-+	void *pbuf;
-+	struct ipi_state *s = &(ipi->ipistate[id]);
++	unsigned int rs, rd;
++	unsigned int hostcfg;
++	unsigned long curr_pc;
++	enum emulation_result er = EMULATE_DONE;
 +
-+	BUG_ON(offset & (len - 1));
++	/*
++	 * Update PC and hold onto current PC in case there is
++	 * an error and we want to rollback the PC
++	 */
++	curr_pc = vcpu->arch.pc;
++	er = update_pc(vcpu, cause);
++	if (er == EMULATE_FAIL)
++		return er;
 +
-+	switch (offset) {
-+	case CORE0_STATUS_OFF:
-+		*(uint64_t *)val = s->status;
-+		break;
++	rs = inst.loongson3_lscsr_format.rs;
++	rd = inst.loongson3_lscsr_format.rd;
++	switch (inst.loongson3_lscsr_format.fr) {
++	case 0x8:  /* Read CPUCFG */
++		++vcpu->stat.vz_cpucfg_exits;
++		hostcfg = read_cpucfg(vcpu->arch.gprs[rs]);
 +
-+	case CORE0_EN_OFF:
-+		*(uint64_t *)val = s->en;
-+		break;
-+
-+	case CORE0_SET_OFF:
-+		*(uint64_t *)val = 0;
-+		break;
-+
-+	case CORE0_CLEAR_OFF:
-+		*(uint64_t *)val = 0;
-+		break;
-+
-+	case CORE0_BUF_20 ... CORE0_BUF_38:
-+		pbuf = (void *)s->buf + (offset - 0x20);
-+		if (len == 8)
-+			*(uint64_t *)val = *(uint64_t *)pbuf;
-+		else /* Assume len == 4 */
-+			*(uint32_t *)val = *(uint32_t *)pbuf;
-+		break;
-+
-+	default:
-+		pr_notice("%s with unknown addr %llx\n", __func__, addr);
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int loongson_vipi_write(struct loongson_kvm_ipi *ipi,
-+				gpa_t addr, int len, const void *val)
-+{
-+	uint32_t core = (addr >> 8) & 3;
-+	uint32_t node = (addr >> 44) & 3;
-+	uint32_t id = core + node * 4;
-+	uint64_t data, offset = addr & 0xff;
-+	void *pbuf;
-+	struct kvm *kvm = ipi->kvm;
-+	struct kvm_mips_interrupt irq;
-+	struct ipi_state *s = &(ipi->ipistate[id]);
-+
-+	data = *(uint64_t *)val;
-+	BUG_ON(offset & (len - 1));
-+
-+	switch (offset) {
-+	case CORE0_STATUS_OFF:
-+		break;
-+
-+	case CORE0_EN_OFF:
-+		s->en = data;
-+		break;
-+
-+	case CORE0_SET_OFF:
-+		s->status |= data;
-+		irq.cpu = id;
-+		irq.irq = 6;
-+		kvm_vcpu_ioctl_interrupt(kvm->vcpus[id], &irq);
-+		break;
-+
-+	case CORE0_CLEAR_OFF:
-+		s->status &= ~data;
-+		if (!s->status) {
-+			irq.cpu = id;
-+			irq.irq = -6;
-+			kvm_vcpu_ioctl_interrupt(kvm->vcpus[id], &irq);
++		switch (vcpu->arch.gprs[rs]) {
++		case LOONGSON_CFG1:
++			hostcfg &= (LOONGSON_CFG1_FP | LOONGSON_CFG1_MMI |
++				    LOONGSON_CFG1_MSA1 | LOONGSON_CFG1_MSA2 |
++				    LOONGSON_CFG1_SFBP);
++			vcpu->arch.gprs[rd] = hostcfg;
++			break;
++		case LOONGSON_CFG2:
++			hostcfg &= (LOONGSON_CFG2_LEXT1 | LOONGSON_CFG2_LEXT2 |
++				    LOONGSON_CFG2_LEXT3 | LOONGSON_CFG2_LSPW);
++			vcpu->arch.gprs[rd] = hostcfg;
++			break;
++		case LOONGSON_CFG3:
++			hostcfg &= LOONGSON_CFG3_LCAMP;
++			vcpu->arch.gprs[rd] = hostcfg;
++			break;
++		default:
++			/* Don't export any other advanced features to guest */
++			vcpu->arch.gprs[rd] = 0;
++			break;
 +		}
 +		break;
 +
-+	case CORE0_BUF_20 ... CORE0_BUF_38:
-+		pbuf = (void *)s->buf + (offset - 0x20);
-+		if (len == 8)
-+			*(uint64_t *)pbuf = (uint64_t)data;
-+		else /* Assume len == 4 */
-+			*(uint32_t *)pbuf = (uint32_t)data;
-+		break;
-+
 +	default:
-+		pr_notice("%s with unknown addr %llx\n", __func__, addr);
++		kvm_err("lwc2 emulate not impl %d rs %lx @%lx\n",
++			inst.loongson3_lscsr_format.fr, vcpu->arch.gprs[rs], curr_pc);
++		er = EMULATE_FAIL;
 +		break;
 +	}
 +
-+	return 0;
-+}
++	/* Rollback PC only if emulation was unsuccessful */
++	if (er == EMULATE_FAIL) {
++		kvm_err("[%#lx]%s: unsupported lwc2 instruction 0x%08x 0x%08x\n",
++			curr_pc, __func__, inst.word, inst.loongson3_lscsr_format.fr);
 +
-+static int kvm_ipi_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-+			gpa_t addr, int len, void *val)
-+{
-+	unsigned long flags;
-+	struct loongson_kvm_ipi *ipi;
-+	struct ipi_io_device *ipi_device;
-+
-+	ipi_device = container_of(dev, struct ipi_io_device, device);
-+	ipi = ipi_device->ipi;
-+
-+	spin_lock_irqsave(&ipi->lock, flags);
-+	loongson_vipi_read(ipi, addr, len, val);
-+	spin_unlock_irqrestore(&ipi->lock, flags);
-+
-+	return 0;
-+}
-+
-+static int kvm_ipi_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-+			gpa_t addr, int len, const void *val)
-+{
-+	unsigned long flags;
-+	struct loongson_kvm_ipi *ipi;
-+	struct ipi_io_device *ipi_device;
-+
-+	ipi_device = container_of(dev, struct ipi_io_device, device);
-+	ipi = ipi_device->ipi;
-+
-+	spin_lock_irqsave(&ipi->lock, flags);
-+	loongson_vipi_write(ipi, addr, len, val);
-+	spin_unlock_irqrestore(&ipi->lock, flags);
-+
-+	return 0;
-+}
-+
-+static const struct kvm_io_device_ops kvm_ipi_ops = {
-+	.read     = kvm_ipi_read,
-+	.write    = kvm_ipi_write,
-+};
-+
-+void kvm_init_loongson_ipi(struct kvm *kvm)
-+{
-+	int i;
-+	unsigned long addr;
-+	struct loongson_kvm_ipi *s;
-+	struct kvm_io_device *device;
-+
-+	s = &kvm->arch.ipi;
-+	s->kvm = kvm;
-+	spin_lock_init(&s->lock);
-+
-+	/*
-+	 * Initialize IPI device
-+	 */
-+	for (i = 0; i < 4; i++) {
-+		device = &s->dev_ipi[i].device;
-+		kvm_iodevice_init(device, &kvm_ipi_ops);
-+		addr = (((unsigned long)i) << 44) + IPI_BASE;
-+		mutex_lock(&kvm->slots_lock);
-+		kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, addr, 0x400, device);
-+		mutex_unlock(&kvm->slots_lock);
-+		s->dev_ipi[i].ipi = s;
-+		s->dev_ipi[i].node_id = i;
++		vcpu->arch.pc = curr_pc;
 +	}
-+}
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 5ca122c..ed989ef 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -128,6 +128,8 @@ int kvm_arch_check_processor_compat(void *opaque)
- 	return 0;
- }
- 
-+extern void kvm_init_loongson_ipi(struct kvm *kvm);
 +
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	switch (type) {
-@@ -147,6 +149,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (!kvm->arch.gpa_mm.pgd)
- 		return -ENOMEM;
- 
-+#ifdef CONFIG_CPU_LOONGSON64
-+	kvm_init_loongson_ipi(kvm);
++	return er;
++}
 +#endif
 +
- 	return 0;
- }
- 
+ static enum emulation_result kvm_trap_vz_handle_gpsi(u32 cause, u32 *opc,
+ 						     struct kvm_vcpu *vcpu)
+ {
+@@ -1121,6 +1191,11 @@ static enum emulation_result kvm_trap_vz_handle_gpsi(u32 cause, u32 *opc,
+ 		er = kvm_vz_gpsi_cache(inst, opc, cause, run, vcpu);
+ 		break;
+ #endif
++#ifdef CONFIG_CPU_LOONGSON64
++	case lwc2_op:
++		er = kvm_vz_gpsi_lwc2(inst, opc, cause, run, vcpu);
++		break;
++#endif
+ 	case spec3_op:
+ 		switch (inst.spec3_format.func) {
+ #ifdef CONFIG_CPU_MIPSR6
 -- 
 2.7.0
 
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index ac46840..dc753d0 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -1169,6 +1169,9 @@ static enum emulation_result kvm_vz_gpsi_lwc2(union mips_instruction inst,
+ 		hostcfg = read_cpucfg(vcpu->arch.gprs[rs]);
+ 
+ 		switch (vcpu->arch.gprs[rs]) {
++		case LOONGSON_CFG0:
++			vcpu->arch.gprs[rd] = 0x14c000;
++			break;
+ 		case LOONGSON_CFG1:
+ 			hostcfg &= (LOONGSON_CFG1_FP | LOONGSON_CFG1_MMI |
+ 				    LOONGSON_CFG1_MSA1 | LOONGSON_CFG1_MSA2 |
+@@ -1181,7 +1184,6 @@ static enum emulation_result kvm_vz_gpsi_lwc2(union mips_instruction inst,
+ 			vcpu->arch.gprs[rd] = hostcfg;
+ 			break;
+ 		case LOONGSON_CFG3:
+-			hostcfg &= LOONGSON_CFG3_LCAMP;
+ 			vcpu->arch.gprs[rd] = hostcfg;
+ 			break;
+ 		default:
