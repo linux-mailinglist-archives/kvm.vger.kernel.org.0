@@ -2,135 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A29DC1CEC39
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 06:58:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4867E1CEC8A
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 07:51:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728568AbgELE6w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 00:58:52 -0400
-Received: from mga11.intel.com ([192.55.52.93]:11099 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725868AbgELE6w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 00:58:52 -0400
-IronPort-SDR: xqxKEFYtPAKOLXCgSCBLXlLCVROlXgXhgKjY7wDcwOLp8yFoGbZ5EkMzWLPhyZtVk3kBhV52jn
- kP6bzRKFGBKw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2020 21:58:52 -0700
-IronPort-SDR: 5EJmq3tbR/B4coRN78BIC3r1y2gMm90yEVNXU5ahNh29m1gJFyxO5YFeCXgQ7I8rI+0Sm4pkBA
- YVTcgWpVUdVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,382,1583222400"; 
-   d="scan'208";a="286511600"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.141]) ([10.238.4.141])
-  by fmsmga004.fm.intel.com with ESMTP; 11 May 2020 21:58:49 -0700
-Reply-To: like.xu@intel.com
-Subject: Re: [PATCH v10 08/11] KVM: x86/pmu: Add LBR feature emulation via
- guest LBR event
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, wei.w.wang@intel.com,
-        ak@linux.intel.com
-References: <20200423081412.164863-1-like.xu@linux.intel.com>
- <20200423081412.164863-9-like.xu@linux.intel.com>
- <20200424121626.GB20730@hirez.programming.kicks-ass.net>
- <87abf620-d292-d997-c9be-9a5d2544f3fa@linux.intel.com>
- <20200508130931.GE5298@hirez.programming.kicks-ass.net>
-From:   "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <43e093a5-61fc-815e-bec8-2a11c27d08d1@intel.com>
-Date:   Tue, 12 May 2020 12:58:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1728139AbgELFvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 01:51:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48489 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725776AbgELFvj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 01:51:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589262696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x/cVjxQ0JMstZElAHAVEHp9fs0uKy63dNO0knF8a+TY=;
+        b=c0e0gszTmEAGy9E/JO03kcAqQNvZ6w+JfvAfp7ganW9HFo304AMijRcVLjT5zec41M61kf
+        W2rLV4otmtCCzUCP5abhWe7BFfC33jYydUVU+gzqbpGilcQ5+NE0LPdpBRHXRo4XNFKLo4
+        ZFX/vuPTWKqs358vDhCQBER8Ak6IrwU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-zRaLtNK4OEuDBvfkmqU5wg-1; Tue, 12 May 2020 01:51:34 -0400
+X-MC-Unique: zRaLtNK4OEuDBvfkmqU5wg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62D808005B7;
+        Tue, 12 May 2020 05:51:33 +0000 (UTC)
+Received: from [10.72.13.96] (ovpn-13-96.pek2.redhat.com [10.72.13.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2838738F;
+        Tue, 12 May 2020 05:51:26 +0000 (UTC)
+Subject: Re: [PATCH] ifcvf: move IRQ request/free to status change handlers
+From:   Jason Wang <jasowang@redhat.com>
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
+References: <1589181563-38400-1-git-send-email-lingshan.zhu@intel.com>
+ <22d9dcdb-e790-0a68-ba41-b9530b2bf9fd@redhat.com>
+ <0f822630-14ad-e0cd-4171-6213c30f0799@intel.com>
+ <24d5875e-6f44-ce43-74f0-e641e02f8f42@redhat.com>
+Message-ID: <47713210-e9d9-d185-6e2e-433e2c436de9@redhat.com>
+Date:   Tue, 12 May 2020 13:51:25 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200508130931.GE5298@hirez.programming.kicks-ass.net>
+In-Reply-To: <24d5875e-6f44-ce43-74f0-e641e02f8f42@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/5/8 21:09, Peter Zijlstra wrote:
-> On Mon, Apr 27, 2020 at 11:16:40AM +0800, Like Xu wrote:
->> On 2020/4/24 20:16, Peter Zijlstra wrote:
->>> And I suppose that is why you need that horrible:
->>> needs_guest_lbr_without_counter() thing to begin with.
->> Do you suggest to use event->attr.config check to replace
->> "needs_branch_stack(event) && is_kernel_event(event) &&
->> event->attr.exclude_host" check for guest LBR event ?
-> That's what the BTS thing does.
-Thanks, I'll apply it.
->
->>> Please allocate yourself an event from the pseudo event range:
->>> event==0x00. Currently we only have umask==3 for Fixed2 and umask==4
->>> for Fixed3, given you claim 58, which is effectively Fixed25,
->>> umask==0x1a might be appropriate.
->> OK, I assume that adding one more field ".config = 0x1a00" is
->> efficient enough for perf_event_attr to allocate guest LBR events.
-> Uh what? The code is already setting .config. You just have to change it
-> do another value.
-Thanks, I'll apply it.
->
->>> Also, I suppose we need to claim 0x0000 as an error, so that other
->>> people won't try this again.
->> Does the following fix address your concern on this ?
->>
->> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
->> index 2405926e2dba..32d2a3f8c51f 100644
->> --- a/arch/x86/events/core.c
->> +++ b/arch/x86/events/core.c
->> @@ -498,6 +498,9 @@ int x86_pmu_max_precise(void)
->>
->>   int x86_pmu_hw_config(struct perf_event *event)
->>   {
->> +       if (!unlikely(event->attr.config & X86_ARCH_EVENT_MASK))
->> +               return -EINVAL;
->> +
->>          if (event->attr.precise_ip) {
->>                  int precise = x86_pmu_max_precise();
-> That wouldn't work right for AMD. But yes, something like that.
-Sure, I may figure it out and leave it in another thread.
->
->>> Also, what happens if you fail programming due to a conflicting cpu
->>> event? That pinned doesn't guarantee you'll get the event, it just means
->>> you'll error instead of getting RR.
->>>
->>> I didn't find any code checking the event state.
->>>
->> Error instead of RR is expected.
->>
->> If the KVM fails programming due to a conflicting cpu event
->> the LBR registers will not be passthrough to the guest,
->> and KVM would return zero for any guest LBR records accesses
->> until the next attempt to program the guest LBR event.
->>
->> Every time before cpu enters the non-root mode where irq is
->> disabled, the "event-> oncpu! =-1" check will be applied.
->> (more details in the comment around intel_pmu_availability_check())
->>
->> The guests administer is supposed to know the result of guest
->> LBR records is inaccurate if someone is using LBR to record
->> guest or hypervisor on the host side.
->>
->> Is this acceptable to you？
->>
->> If there is anything needs to be improved, please let me know.
-> It might be nice to emit a pr_warn() or something on the host when this
-> happens. Then at least the host admin can know he wrecked things for
-> which guest.
-Sure, I will use pr_warn () and indicate which guest it is.
 
-If you have more comments on the patchset, please let me know.
-If not, I'll spin the next version based on your current feedback.
+On 2020/5/12 上午11:38, Jason Wang wrote:
+>>>>
+>>>>   static int ifcvf_start_datapath(void *private)
+>>>>   {
+>>>>       struct ifcvf_hw *vf = ifcvf_private_to_vf(private);
+>>>> @@ -118,9 +172,12 @@ static void ifcvf_vdpa_set_status(struct 
+>>>> vdpa_device *vdpa_dev, u8 status)
+>>>>   {
+>>>>       struct ifcvf_adapter *adapter;
+>>>>       struct ifcvf_hw *vf;
+>>>> +    u8 status_old;
+>>>> +    int ret;
+>>>>         vf  = vdpa_to_vf(vdpa_dev);
+>>>>       adapter = dev_get_drvdata(vdpa_dev->dev.parent);
+>>>> +    status_old = ifcvf_get_status(vf);
+>>>>         if (status == 0) {
+>>>>           ifcvf_stop_datapath(adapter);
+>>>> @@ -128,7 +185,22 @@ static void ifcvf_vdpa_set_status(struct 
+>>>> vdpa_device *vdpa_dev, u8 status)
+>>>>           return;
+>>>>       }
+>>>>   -    if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
+>>>> +    if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) &&
+>>>> +        !(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+>>>> +        ifcvf_stop_datapath(adapter);
+>>>> +        ifcvf_free_irq(adapter, IFCVF_MAX_QUEUE_PAIRS * 2);
+>>>> +    }
+>>>> +
+>>>> +    if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
+>>>> +        !(status_old & VIRTIO_CONFIG_S_DRIVER_OK)) {
+>>>> +        ret = ifcvf_request_irq(adapter);
+>>>> +        if (ret) {
+>>>> +            status = ifcvf_get_status(vf);
+>>>> +            status |= VIRTIO_CONFIG_S_FAILED;
+>>>> +            ifcvf_set_status(vf, status);
+>>>> +            return;
+>>>> +        }
+>>>> +
+>>>
+>>>
+>>> Have a hard though on the logic here.
+>>>
+>>> This depends on the status setting from guest or userspace. Which 
+>>> means it can not deal with e.g when qemu or userspace is crashed? Do 
+>>> we need to care this or it's a over engineering?
+>>>
+>>> Thanks
+>> If qemu crash, I guess users may re-run qmeu / re-initialize the 
+>> device, according to the spec, there should be a reset routine.
+>> This code piece handles status change on DRIVER_OK flipping. I am not 
+>> sure I get your point, mind to give more hints?
+>
+>
+> The problem is if we don't launch new qemu instance, the interrupt 
+> will be still there?
 
-Thanks,
-Like Xu
+
+Ok, we reset on vhost_vdpa_release() so the following is suspicious:
+
+With the patch, we do:
+
+static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
+{
+         struct ifcvf_adapter *adapter;
+         struct ifcvf_hw *vf;
+         u8 status_old;
+         int ret;
+
+         vf  = vdpa_to_vf(vdpa_dev);
+         adapter = dev_get_drvdata(vdpa_dev->dev.parent);
+         status_old = ifcvf_get_status(vf);
+
+         if (status == 0) {
+                 ifcvf_stop_datapath(adapter);
+                 ifcvf_reset_vring(adapter);
+                 return;
+         }
+
+         if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) &&
+             !(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+                 ifcvf_stop_datapath(adapter);
+                 ifcvf_free_irq(adapter, IFCVF_MAX_QUEUE_PAIRS * 2);
+         }
+
+...
+
+So the handling of status == 0 looks wrong.
+
+The OK -> !OK check should already cover the datapath stopping and irq 
+stuffs.
+
+We only need to deal with vring reset and only need to do it after we 
+stop the datapath/irq stuffs.
+
+Thanks
+
+
+
+>
+> Thanks 
 
