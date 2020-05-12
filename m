@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAB491CF27C
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 12:32:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48A921CF27F
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 12:32:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729473AbgELKco (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 06:32:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51715 "EHLO
+        id S1729529AbgELKcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 06:32:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34903 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726193AbgELKco (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 06:32:44 -0400
+        with ESMTP id S1729429AbgELKcu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 06:32:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589279563;
+        s=mimecast20190719; t=1589279569;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=D3s9LSGcZEYro7u0ScBs6UfFzzI5QWTXiQteI6q/kVs=;
-        b=gkdEYPljLbIXjZB/mHM/jy/VOCCrIIx+EQunKCKmz2TdOSbu8dEL9+AXfQzyXolUrghG0S
-        OMybZTnygD1fbsDvdAG4imduq0BQZ2iE1kotqoaYxo95kkDgJCkrzE/EcBxdPv4uBKWIqB
-        NpkIQu1P7/1SQorDUMIst6as8hCB5tM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-_f5wCXaaMPGSQyguSSqBaw-1; Tue, 12 May 2020 06:32:41 -0400
-X-MC-Unique: _f5wCXaaMPGSQyguSSqBaw-1
-Received: by mail-wr1-f70.google.com with SMTP id g10so6724412wrr.10
-        for <kvm@vger.kernel.org>; Tue, 12 May 2020 03:32:41 -0700 (PDT)
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o+SFxNiQTSKSfzcy81S2xitOyf6spOQEd9fCWLhnCeY=;
+        b=YTX1vGjcF6s24R7sSz0yGitSRFfWV6lJFWD7VA0ILNRdtZJVYnpcYAb63Bwpqe0ooJpjwJ
+        9yFuWJ9lS4ywgqj+sV1msAbaTf/DsBqeI7M2evwYYWuWTQYrgNH7K5G/DTUoTjp0DYKVXj
+        LTvCIQUWjsn/Icl4+tdjFI/4pAQbvuA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-MgccDOUEOceGvkulRkuBgg-1; Tue, 12 May 2020 06:32:48 -0400
+X-MC-Unique: MgccDOUEOceGvkulRkuBgg-1
+Received: by mail-wm1-f71.google.com with SMTP id e15so935652wme.1
+        for <kvm@vger.kernel.org>; Tue, 12 May 2020 03:32:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=D3s9LSGcZEYro7u0ScBs6UfFzzI5QWTXiQteI6q/kVs=;
-        b=abYUbWCnqIslqqmg7vqBYEsTzyHpJwWuqU43X26li4H9rqXjoc9sDbOccCdUlu1BSR
-         YrYAG9ynGxN0jSWSFw+S0F7J3OuTZ2+OdAsUeCB1SbihPOePAR7YSSVcLGXUqvaVAsz6
-         LvtuYZ5RzHlnQgPFpYPTSc6pdz9OFQ7VUVQmeKDD0O7jGWYejLrmTPxj0NDB2AaRd/0e
-         JrRicIndewGF85cFcv1o2EJ9QqwgMHCP64+RfZggpsMWqA303297gkNQWQiWMhKTYWpE
-         lhIWOWNfdd/ZxkaFgjG24MocDleiPDvRKkE8WZBILwRtzn92IOzbF5NCBMCckmwzYAC8
-         h8EA==
-X-Gm-Message-State: AGi0PuYtSi50HsyvivLwT/guFV+jD3WWnb2yuzrOYH+NCVa6u5dvg6hx
-        rEB2SrQSAxoo6asGf9Tn/cw8/OrDGEt1WTL3VPxUU3XD0qkPF6aA/5ysnEJDnmB90vilpOZSRt3
-        oERfp60+QlulC
-X-Received: by 2002:a7b:c4da:: with SMTP id g26mr20748001wmk.3.1589279560327;
-        Tue, 12 May 2020 03:32:40 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI7UX/2eCYXEuygt24GZ0cIrBaT7G/B+iwW2cYEEuIZJysOnDbHZJBLcIIaLOSrWhvw7mpSHA==
-X-Received: by 2002:a7b:c4da:: with SMTP id g26mr20747977wmk.3.1589279560089;
-        Tue, 12 May 2020 03:32:40 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=o+SFxNiQTSKSfzcy81S2xitOyf6spOQEd9fCWLhnCeY=;
+        b=gm/gYdwMAhiOyAP8GaPYC80pouJUjd51ZlV7iF9ot7Yvz9+hDQ7+4LaSUrG5yu3Qt/
+         hrR3efkI9WjoPAI2XQc9bDeqIyfR1w7BZkrKTk2qAKzAoOvMKaCxE5c0XKfwISi/KdfH
+         QoGA4TddStjCsNuVsEUBl2hQi/tpzNw2nRmicqTMb2DSvmnesQ5Qw0Ic5O98PEM6Dov/
+         HVO1veenmRc9pRdEaMYP9KxbZRwYuV/WTno80mSeDWLKo5QrhPtBfXweNQD8e/CGUy8U
+         0LWZVt8b9g/uhGquA6mxMrAUWAKNXFX64c9/cDsgrV9TLV+MSgt8Eacz2l3ctewIqOV5
+         yHiA==
+X-Gm-Message-State: AGi0PuYVdB/vbf+b0WTzPsCBkh+aNwNoIDNnGC8U0cQvwCCDmPcO9iJL
+        dJND69jLCUCvoJrE3s3AuE7lpnMInhjWsvXSP9qUn1OXZJO3h3l/SGML37mpk4uXP+JGbTlNXoi
+        PdAS0DLoQQ0tJ
+X-Received: by 2002:adf:cc81:: with SMTP id p1mr23275929wrj.192.1589279565427;
+        Tue, 12 May 2020 03:32:45 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIdq6xklNhE6zF2ex6riiZ2WEeaRBZwdbLSVo8fxAyW06Ghhyjcwp0kiKh5i+SK1pgUYQQIhQ==
+X-Received: by 2002:adf:cc81:: with SMTP id p1mr23275905wrj.192.1589279565172;
+        Tue, 12 May 2020 03:32:45 -0700 (PDT)
 Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net. [88.21.202.17])
-        by smtp.gmail.com with ESMTPSA id x5sm23249077wro.12.2020.05.12.03.32.38
+        by smtp.gmail.com with ESMTPSA id u16sm21863464wrq.17.2020.05.12.03.32.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2020 03:32:39 -0700 (PDT)
+        Tue, 12 May 2020 03:32:44 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Markus Armbruster <armbru@redhat.com>,
@@ -61,11 +62,14 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        Fam Zheng <fam@euphon.net>
-Subject: [PATCH v4 0/6] scripts: More Python fixes
-Date:   Tue, 12 May 2020 12:32:32 +0200
-Message-Id: <20200512103238.7078-1-philmd@redhat.com>
+        Fam Zheng <fam@euphon.net>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: [PATCH v4 1/6] scripts/qemugdb: Remove shebang header
+Date:   Tue, 12 May 2020 12:32:33 +0200
+Message-Id: <20200512103238.7078-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200512103238.7078-1-philmd@redhat.com>
+References: <20200512103238.7078-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
@@ -75,49 +79,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Trivial Python3 fixes, again...
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Since v3:
-- Fixed missing scripts/qemugdb/timers.py (kwolf)
-- Cover more scripts
-- Check for __main__ in few scripts
+These scripts are loaded as plugin by GDB (and they don't
+have any __main__ entry point). Remove the shebang header.
 
-Since v2:
-- Remove patch updating MAINTAINERS
+Acked-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ scripts/qemugdb/__init__.py  | 3 +--
+ scripts/qemugdb/aio.py       | 3 +--
+ scripts/qemugdb/coroutine.py | 3 +--
+ scripts/qemugdb/mtree.py     | 4 +---
+ scripts/qemugdb/tcg.py       | 1 -
+ scripts/qemugdb/timers.py    | 1 -
+ 6 files changed, 4 insertions(+), 11 deletions(-)
 
-Since v1:
-- Added Alex Bennée A-b tags
-- Addressed John Snow review comments
-  - Use /usr/bin/env
-  - Do not modify os.path (dropped last patch)
-
-Philippe Mathieu-Daudé (6):
-  scripts/qemugdb: Remove shebang header
-  scripts/qemu-gdb: Use Python 3 interpreter
-  scripts/qmp: Use Python 3 interpreter
-  scripts/kvm/vmxcap: Use Python 3 interpreter and add pseudo-main()
-  scripts/modules/module_block: Use Python 3 interpreter & add
-    pseudo-main
-  tests/migration/guestperf: Use Python 3 interpreter
-
- scripts/kvm/vmxcap                 |  7 ++++---
- scripts/modules/module_block.py    | 31 +++++++++++++++---------------
- scripts/qemu-gdb.py                |  4 ++--
- scripts/qemugdb/__init__.py        |  3 +--
- scripts/qemugdb/aio.py             |  3 +--
- scripts/qemugdb/coroutine.py       |  3 +--
- scripts/qemugdb/mtree.py           |  4 +---
- scripts/qemugdb/tcg.py             |  1 -
- scripts/qemugdb/timers.py          |  1 -
- scripts/qmp/qom-get                |  2 +-
- scripts/qmp/qom-list               |  2 +-
- scripts/qmp/qom-set                |  2 +-
- scripts/qmp/qom-tree               |  2 +-
- tests/migration/guestperf-batch.py |  2 +-
- tests/migration/guestperf-plot.py  |  2 +-
- tests/migration/guestperf.py       |  2 +-
- 16 files changed, 33 insertions(+), 38 deletions(-)
-
+diff --git a/scripts/qemugdb/__init__.py b/scripts/qemugdb/__init__.py
+index 969f552b26..da8ff612e5 100644
+--- a/scripts/qemugdb/__init__.py
++++ b/scripts/qemugdb/__init__.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright (c) 2015 Linaro Ltd
+diff --git a/scripts/qemugdb/aio.py b/scripts/qemugdb/aio.py
+index 2ba00c4444..d7c1ba0c28 100644
+--- a/scripts/qemugdb/aio.py
++++ b/scripts/qemugdb/aio.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support: aio/iohandler debug
+ #
+ # Copyright (c) 2015 Red Hat, Inc.
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index 41e079d0e2..db61389022 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
+diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
+index 3030a60d3f..8fe42c3c12 100644
+--- a/scripts/qemugdb/mtree.py
++++ b/scripts/qemugdb/mtree.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
+@@ -84,4 +83,3 @@ def print_item(self, ptr, offset = gdb.Value(0), level = 0):
+         while not isnull(subregion):
+             self.print_item(subregion, addr, level)
+             subregion = subregion['subregions_link']['tqe_next']
+-
+diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
+index 18880fc9a7..16c03c06a9 100644
+--- a/scripts/qemugdb/tcg.py
++++ b/scripts/qemugdb/tcg.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/python
+ # -*- coding: utf-8 -*-
+ #
+ # GDB debugging support, TCG status
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+index f0e132d27a..46537b27cf 100644
+--- a/scripts/qemugdb/timers.py
++++ b/scripts/qemugdb/timers.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/python
+ # -*- coding: utf-8 -*-
+ # GDB debugging support
+ #
 -- 
 2.21.3
 
