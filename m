@@ -2,270 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30F101CF993
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 17:47:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16EF61CF9A8
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 17:51:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730611AbgELPrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 11:47:22 -0400
-Received: from foss.arm.com ([217.140.110.172]:57512 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726388AbgELPrV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 11:47:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7BA71FB;
-        Tue, 12 May 2020 08:47:20 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80A763F305;
-        Tue, 12 May 2020 08:47:18 -0700 (PDT)
-Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
- struct kvm
-To:     James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-4-maz@kernel.org>
- <a7c8207c-9061-ad0e-c9f8-64c995e928b6@arm.com>
- <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <5134e123-18ec-9b69-2e0a-b83798e01507@arm.com>
-Date:   Tue, 12 May 2020 16:47:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1730671AbgELPvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 11:51:04 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44426 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726388AbgELPvB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 May 2020 11:51:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589298658;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7gi6kZYZ50egtzLQVzSUEDOzwts0OWq/gx0o859o0Q4=;
+        b=cl5x0SwgTEI2SDeVnpLeWITv4zyIeuF9kHjIjPBnF4ffGVz7zehpLcA5TzEPQCAEEAG3IM
+        nKmeSN6Dlh/K/PnA//jhv4ICUpGG/vCjE0nmtiZha+vnWRnNMze+w3AECGSndUuIDmLpGG
+        84H1CNkXvUOWSHJ50WH1UjxbAby/63U=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-RUJ2hCzzNryaMIMHe3TC1g-1; Tue, 12 May 2020 11:50:57 -0400
+X-MC-Unique: RUJ2hCzzNryaMIMHe3TC1g-1
+Received: by mail-wm1-f69.google.com with SMTP id w2so10165881wmc.3
+        for <kvm@vger.kernel.org>; Tue, 12 May 2020 08:50:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=7gi6kZYZ50egtzLQVzSUEDOzwts0OWq/gx0o859o0Q4=;
+        b=OpTnAQ61YxyGRP6j24UJQblOziqTLIm3fD4t9lGiM6wRj2XZDFWOeuD4yTajt9oaOV
+         MP7eCbCn6ebR63QYAH6sY7ubD6qkBdb/FMctBXRs/MIngrtxjDoSyyJGMxvvUBx7n4XS
+         A2DQoVDER3IlQWRRXz2MSmo5qA4/8QLQb2gez19IwJ5Q7bQ0lS5A3umQg7BNj0dd17uo
+         UALAG+FEMeA03b8c6nAA65CKFlPAvhKAvlBFcCzOY0UT6GAWDKVnWrpkmPkqVJlaavqI
+         shmwK/WzCxw4dchbdiuI4Ya/e4yNP8CikeDJ/A8UhKpc/m2PWXJkp3eluJxdYB0mETDG
+         KMqg==
+X-Gm-Message-State: AGi0PubTcdageB2HkfKZyAAmOw/ihFM65d6Otl+eYBrSzdFV56Ko9e+R
+        Qbz2dA+kid+0TuipcPFerucmVoFktDq9kK7ird/9u8qeZtKUxX17qU5rxB3MYZEVTKpmsgFZZuA
+        xiF9JF5F8ETVk
+X-Received: by 2002:a05:600c:295a:: with SMTP id n26mr41423852wmd.16.1589298655631;
+        Tue, 12 May 2020 08:50:55 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIhzwxU3CV/9sraEUzM4doFL8eHcxeWmlWToHs5tCU62DHAcBRhJ5AeY7spSDkw2c2/FqGH8w==
+X-Received: by 2002:a05:600c:295a:: with SMTP id n26mr41423819wmd.16.1589298655232;
+        Tue, 12 May 2020 08:50:55 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id b23sm29453744wmb.26.2020.05.12.08.50.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2020 08:50:54 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/8] KVM: x86: interrupt based APF page-ready event delivery
+In-Reply-To: <20200512142411.GA138129@redhat.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com> <20200511164752.2158645-5-vkuznets@redhat.com> <20200512142411.GA138129@redhat.com>
+Date:   Tue, 12 May 2020 17:50:53 +0200
+Message-ID: <87lflxm9sy.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Vivek Goyal <vgoyal@redhat.com> writes:
 
-On 5/12/20 12:17 PM, James Morse wrote:
-> Hi Alex, Marc,
+> On Mon, May 11, 2020 at 06:47:48PM +0200, Vitaly Kuznetsov wrote:
+>> Concerns were expressed around APF delivery via synthetic #PF exception as
+>> in some cases such delivery may collide with real page fault. For type 2
+>> (page ready) notifications we can easily switch to using an interrupt
+>> instead. Introduce new MSR_KVM_ASYNC_PF_INT mechanism and deprecate the
+>> legacy one.
+>> 
+>> One notable difference between the two mechanisms is that interrupt may not
+>> get handled immediately so whenever we would like to deliver next event
+>> (regardless of its type) we must be sure the guest had read and cleared
+>> previous event in the slot.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  Documentation/virt/kvm/msr.rst       | 91 +++++++++++++++++---------
+>>  arch/x86/include/asm/kvm_host.h      |  4 +-
+>>  arch/x86/include/uapi/asm/kvm_para.h |  6 ++
+>>  arch/x86/kvm/x86.c                   | 95 ++++++++++++++++++++--------
+>>  4 files changed, 140 insertions(+), 56 deletions(-)
+>> 
+>> diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
+>> index 33892036672d..f988a36f226a 100644
+>> --- a/Documentation/virt/kvm/msr.rst
+>> +++ b/Documentation/virt/kvm/msr.rst
+>> @@ -190,35 +190,54 @@ MSR_KVM_ASYNC_PF_EN:
+>>  	0x4b564d02
+>>  
+>>  data:
+>> -	Bits 63-6 hold 64-byte aligned physical address of a
+>> -	64 byte memory area which must be in guest RAM and must be
+>> -	zeroed. Bits 5-3 are reserved and should be zero. Bit 0 is 1
+>> -	when asynchronous page faults are enabled on the vcpu 0 when
+>> -	disabled. Bit 1 is 1 if asynchronous page faults can be injected
+>> -	when vcpu is in cpl == 0. Bit 2 is 1 if asynchronous page faults
+>> -	are delivered to L1 as #PF vmexits.  Bit 2 can be set only if
+>> -	KVM_FEATURE_ASYNC_PF_VMEXIT is present in CPUID.
+>> -
+>> -	First 4 byte of 64 byte memory location will be written to by
+>> -	the hypervisor at the time of asynchronous page fault (APF)
+>> -	injection to indicate type of asynchronous page fault. Value
+>> -	of 1 means that the page referred to by the page fault is not
+>> -	present. Value 2 means that the page is now available. Disabling
+>> -	interrupt inhibits APFs. Guest must not enable interrupt
+>> -	before the reason is read, or it may be overwritten by another
+>> -	APF. Since APF uses the same exception vector as regular page
+>> -	fault guest must reset the reason to 0 before it does
+>> -	something that can generate normal page fault.  If during page
+>> -	fault APF reason is 0 it means that this is regular page
+>> -	fault.
+>> -
+>> -	During delivery of type 1 APF cr2 contains a token that will
+>> -	be used to notify a guest when missing page becomes
+>> -	available. When page becomes available type 2 APF is sent with
+>> -	cr2 set to the token associated with the page. There is special
+>> -	kind of token 0xffffffff which tells vcpu that it should wake
+>> -	up all processes waiting for APFs and no individual type 2 APFs
+>> -	will be sent.
+>> +	Asynchronous page fault (APF) control MSR.
+>> +
+>> +	Bits 63-6 hold 64-byte aligned physical address of a 64 byte memory area
+>> +	which must be in guest RAM and must be zeroed. This memory is expected
+>> +	to hold a copy of the following structure::
+>> +
+>> +	  struct kvm_vcpu_pv_apf_data {
+>> +		__u32 reason;
+>> +		__u32 pageready_token;
+>> +		__u8 pad[56];
+>> +		__u32 enabled;
+>> +	  };
+>> +
+>> +	Bits 5-4 of the MSR are reserved and should be zero. Bit 0 is set to 1
+>> +	when asynchronous page faults are enabled on the vcpu, 0 when disabled.
+>> +	Bit 1 is 1 if asynchronous page faults can be injected when vcpu is in
+>> +	cpl == 0. Bit 2 is 1 if asynchronous page faults are delivered to L1 as
+>> +	#PF vmexits.  Bit 2 can be set only if KVM_FEATURE_ASYNC_PF_VMEXIT is
+>> +	present in CPUID. Bit 3 enables interrupt based delivery of type 2
+>> +	(page present) events.
 >
-> (just on this last_vcpu_ran thing...)
+> Hi Vitaly,
 >
-> On 11/05/2020 17:38, Alexandru Elisei wrote:
->> On 4/22/20 1:00 PM, Marc Zyngier wrote:
->>> From: Christoffer Dall <christoffer.dall@arm.com>
->>>
->>> As we are about to reuse our stage 2 page table manipulation code for
->>> shadow stage 2 page tables in the context of nested virtualization, we
->>> are going to manage multiple stage 2 page tables for a single VM.
->>>
->>> This requires some pretty invasive changes to our data structures,
->>> which moves the vmid and pgd pointers into a separate structure and
->>> change pretty much all of our mmu code to operate on this structure
->>> instead.
->>>
->>> The new structure is called struct kvm_s2_mmu.
->>>
->>> There is no intended functional change by this patch alone.
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index 7dd8fefa6aecd..664a5d92ae9b8 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -63,19 +63,32 @@ struct kvm_vmid {
->>>  	u32    vmid;
->>>  };
->>>  
->>> -struct kvm_arch {
->>> +struct kvm_s2_mmu {
->>>  	struct kvm_vmid vmid;
->>>  
->>> -	/* stage2 entry level table */
->>> -	pgd_t *pgd;
->>> -	phys_addr_t pgd_phys;
->>> -
->>> -	/* VTCR_EL2 value for this VM */
->>> -	u64    vtcr;
->>> +	/*
->>> +	 * stage2 entry level table
->>> +	 *
->>> +	 * Two kvm_s2_mmu structures in the same VM can point to the same pgd
->>> +	 * here.  This happens when running a non-VHE guest hypervisor which
->>> +	 * uses the canonical stage 2 page table for both vEL2 and for vEL1/0
->>> +	 * with vHCR_EL2.VM == 0.
->> It makes more sense to me to say that a non-VHE guest hypervisor will use the
->> canonical stage *1* page table when running at EL2
-> Can KVM say anything about stage1? Its totally under the the guests control even at vEL2...
+> "Bit 3 enables interrupt based delivery of type 2 events". So one has to
+> opt in to enable it. If this bit is 0, we will continue to deliver
+> page ready events using #PF? This probably will be needed to ensure
+> backward compatibility also.
+>
 
-It is. My interpretation of the comment was that if the guest doesn't have virtual
-stage 2 enabled (we're not running a guest of the L1 hypervisor), then the L0 host
-can use the same L0 stage 2 tables because we're running the same guest (the L1
-VM), regardless of the actual exception level for the guest. If I remember
-correctly, KVM assigns different vmids for guests running at vEL1/0 and vEL2 with
-vHCR_EL2.VM == 0 because the translation regimes are different, but keeps the same
-translation tables.
+No, as Paolo suggested we don't enable the mechanism at all if bit3 is
+0. Legacy (unaware) guests will think that they've enabled the mechanism
+but it won't work, they won't see any APF notifications.
+
+>> +
+>> +	First 4 byte of 64 byte memory location ('reason') will be written to
+>> +	by the hypervisor at the time APF type 1 (page not present) injection.
+>> +	The only possible values are '0' and '1'.
+>
+> What do "reason" values "0" and "1" signify?
+>
+> Previously this value could be 1 for PAGE_NOT_PRESENT and 2 for
+> PAGE_READY. So looks like we took away reason "PAGE_READY" because it will
+> be delivered using interrupts.
+>
+> But that seems like an opt in. If that's the case, then we should still
+> retain PAGE_READY reason. If we are getting rid of page_ready using
+> #PF, then interrupt based deliver should not be optional. What am I
+> missing.
+
+It is not optional now :-)
 
 >
+> Also previous text had following line.
 >
->> (the "Non-secure EL2 translation regime" as ARM DDI 0487F.b calls it on page D5-2543).
->> I think that's
->> the only situation where vEL2 and vEL1&0 will use the same L0 stage 2 tables. It's
->> been quite some time since I reviewed the initial version of the NV patches, did I
->> get that wrong?
+> "Guest must not enable interrupt before the reason is read, or it may be
+>  overwritten by another APF".
 >
->>> +	 */
->>> +	pgd_t		*pgd;
->>> +	phys_addr_t	pgd_phys;
->>>  
->>>  	/* The last vcpu id that ran on each physical CPU */
->>>  	int __percpu *last_vcpu_ran;
->> It makes sense for the other fields to be part of kvm_s2_mmu, but I'm struggling
->> to figure out why last_vcpu_ran is here. Would you mind sharing the rationale? I
->> don't see this change in v1 or v2 of the NV series.
-> Marc may have a better rationale. My thinking was because kvm_vmid is in here too.
+> So this is not a requirement anymore?
 >
-> last_vcpu_ran exists to prevent KVM accidentally emulating CNP without the opt-in. (we
-> call it defacto CNP).
->
-> The guest may expect to be able to use asid-4 with different page tables on different
 
-I'm afraid I don't know what asid-4 is.
+It still stands for type 1 (page not present) events.
 
-> vCPUs, assuming the TLB isn't shared. But if KVM is switching between those vCPU on one
-> physical CPU, the TLB is shared, ... the VMID and ASID are the same, but the page tables
-> are not. Not fun to debug!
+>> Type 1 events are currently
+>> +	always delivered as synthetic #PF exception. During delivery of type 1
+>> +	APF CR2 register contains a token that will be used to notify the guest
+>> +	when missing page becomes available. Guest is supposed to write '0' to
+>> +	the location when it is done handling type 1 event so the next one can
+>> +	be delivered.
+>> +
+>> +	Note, since APF type 1 uses the same exception vector as regular page
+>> +	fault, guest must reset the reason to '0' before it does something that
+>> +	can generate normal page fault. If during a page fault APF reason is '0'
+>> +	it means that this is regular page fault.
+>> +
+>> +	Bytes 5-7 of 64 byte memory location ('pageready_token') will be written
+>> +	to by the hypervisor at the time of type 2 (page ready) event injection.
+>> +	The content of these bytes is a token which was previously delivered as
+>> +	type 1 event. The event indicates the page in now available. Guest is
+>> +	supposed to write '0' to the location when it is done handling type 2
+>> +	event so the next one can be delivered. MSR_KVM_ASYNC_PF_INT MSR
+>> +	specifying the interrupt vector for type 2 APF delivery needs to be
+>> +	written to before enabling APF mechanism in MSR_KVM_ASYNC_PF_EN.
 >
+> What is supposed to be value of "reason" field for type2 events. I
+> had liked previous values "KVM_PV_REASON_PAGE_READY" and
+> "KVM_PV_REASON_PAGE_NOT_PRESENT". Name itself made it plenty clear, what
+> it means. Also it allowed for easy extension where this protocol could
+> be extended to deliver other "reasons", like error.
 >
-> NV makes this problem per-stage2, because each stage2 has its own VMID, we need to track
-> the vcpu_id that last ran this stage2 on this physical CPU. If its not the same, we need
-> to blow away this VMIDs TLB entries.
->
-> The workaround lives in virt/kvm/arm/arm.c::kvm_arch_vcpu_load()
+> So if we are using a common structure "kvm_vcpu_pv_apf_data" to deliver
+> type1 and type2 events, to me it makes sense to retain existing
+> KVM_PV_REASON_PAGE_READY and KVM_PV_REASON_PAGE_NOT_PRESENT. Just that
+> in new scheme of things, KVM_PV_REASON_PAGE_NOT_PRESENT will be delivered
+> using #PF (and later possibly using #VE) and KVM_PV_REASON_PAGE_READY
+> will be delivered using interrupt.
 
-Makes sense, thank you for explaining that.
+We use different fields for page-not-present and page-ready events so
+there is no intersection. If we start setting KVM_PV_REASON_PAGE_READY
+to 'reason' we may accidentally destroy a 'page-not-present' event.
 
-Thanks,
-Alex
+With this patchset we have two completely separate channels:
+1) Page-not-present goes through #PF and 'reason' in struct
+kvm_vcpu_pv_apf_data.
+2) Page-ready goes through interrupt and 'pageready_token' in the same
+kvm_vcpu_pv_apf_data.
+
 >
+>> +
+>> +	Note, previously, type 2 (page present) events were delivered via the
+>> +	same #PF exception as type 1 (page not present) events but this is
+>> +	now deprecated.
 >
->> More below.
-> (lightly trimmed!)
+>> If bit 3 (interrupt based delivery) is not set APF events are not delivered.
 >
-> Thanks,
+> So all the old guests which were getting async pf will suddenly find
+> that async pf does not work anymore (after hypervisor update). And
+> some of them might report it as performance issue (if there were any
+> performance benefits to be had with async pf).
+
+We still do APF_HALT but generally yes, there might be some performance
+implications. My RFC was preserving #PF path but the suggestion was to
+retire it completely. (and I kinda like it because it makes a lot of
+code go away)
+
 >
-> James
->
->
->>>  
->>> +	struct kvm *kvm;
->>> +};
-> [...]
->
->>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->>> index 53b3ba9173ba7..03f01fcfa2bd5 100644
->>> --- a/virt/kvm/arm/arm.c
->>> +++ b/virt/kvm/arm/arm.c
->> There's a comment that still mentions arch.vmid that you missed in this file:
->>
->> static bool need_new_vmid_gen(struct kvm_vmid *vmid)
->> {
->>     u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
->>     smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
->>
 > [..]
+>>  
+>>  bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
+>>  {
+>> -	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
+>> +	if (!kvm_pv_async_pf_enabled(vcpu))
+>>  		return true;
 >
->>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->>> index e3b9ee268823b..2f99749048285 100644
->>> --- a/virt/kvm/arm/mmu.c
->>> +++ b/virt/kvm/arm/mmu.c
->>> @@ -886,21 +898,23 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->>>  }
->>>  
->>>  /**
->>> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
->>> - * @kvm:	The KVM struct pointer for the VM.
->>> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
->>> + * @kvm:	The pointer to the KVM structure
->>> + * @mmu:	The pointer to the s2 MMU structure
->>>   *
->>>   * Allocates only the stage-2 HW PGD level table(s) of size defined by
->>> - * stage2_pgd_size(kvm).
->>> + * stage2_pgd_size(mmu->kvm).
->>>   *
->>>   * Note we don't need locking here as this is only called when the VM is
->>>   * created, which can only be done once.
->>>   */
->>> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
->>> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->>>  {
->>>  	phys_addr_t pgd_phys;
->>>  	pgd_t *pgd;
->>> +	int cpu;
->>>  
->>> -	if (kvm->arch.pgd != NULL) {
->>> +	if (mmu->pgd != NULL) {
->>>  		kvm_err("kvm_arch already initialized?\n");
->>>  		return -EINVAL;
->>>  	}
->>> @@ -914,8 +928,20 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
->>>  	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
->> We don't free the pgd here, but we do free it if alloc_percpu fails. Is that
->> intentional?
->
->>>  		return -EINVAL;
->>>  
->>> -	kvm->arch.pgd = pgd;
->>> -	kvm->arch.pgd_phys = pgd_phys;
->>> +	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
->>> +	if (!mmu->last_vcpu_ran) {
->>> +		free_pages_exact(pgd, stage2_pgd_size(kvm));
->>> +		return -ENOMEM;
->>> +	}
->>> +
->>> +	for_each_possible_cpu(cpu)
->>> +		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
->>> +
->>> +	mmu->kvm = kvm;
->>> +	mmu->pgd = pgd;
->>> +	mmu->pgd_phys = pgd_phys;
->>> +	mmu->vmid.vmid_gen = 0;
->>> +
->>>  	return 0;
->>>  }
->>>  
->>> @@ -986,39 +1012,34 @@ void stage2_unmap_vm(struct kvm *kvm)
->>>  	srcu_read_unlock(&kvm->srcu, idx);
->>>  }
->>>  
->>> -/**
->>> - * kvm_free_stage2_pgd - free all stage-2 tables
->>> - * @kvm:	The KVM struct pointer for the VM.
->>> - *
->>> - * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
->>> - * underlying level-2 and level-3 tables before freeing the actual level-1 table
->>> - * and setting the struct pointer to NULL.
->>> - */
->>> -void kvm_free_stage2_pgd(struct kvm *kvm)
->>> +void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->>>  {
->>> +	struct kvm *kvm = mmu->kvm;
->>>  	void *pgd = NULL;
->>>  
->>>  	spin_lock(&kvm->mmu_lock);
->>> -	if (kvm->arch.pgd) {
->>> -		unmap_stage2_range(kvm, 0, kvm_phys_size(kvm));
->>> -		pgd = READ_ONCE(kvm->arch.pgd);
->>> -		kvm->arch.pgd = NULL;
->>> -		kvm->arch.pgd_phys = 0;
->>> +	if (mmu->pgd) {
->>> +		unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
->>> +		pgd = READ_ONCE(mmu->pgd);
->>> +		mmu->pgd = NULL;
->> The kvm->arch.pgd_phys = 0 instruction seems to have been dropped here. Is that
->> intentional?
+> What does above mean. If async pf is not enabled, then it returns true,
+> implying one can inject async page present. But if async pf is not
+> enabled, there is no need to inject these events.
+
+AFAIU this is a protection agains guest suddenly disabling APF
+mechanism. What do we do with all the 'page ready' events after, we
+can't deliver them anymore. So we just eat them (hoping guest will
+unfreeze all processes on its own before disabling the mechanism).
+
+It is the existing logic, my patch doesn't change it.
+
+Thanks for the review!
+
+-- 
+Vitaly
+
