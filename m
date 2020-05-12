@@ -2,234 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8875E1CFCE9
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 20:12:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38C6E1CFEE4
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 22:05:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730610AbgELSME (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 14:12:04 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:49754 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726300AbgELSMD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 14:12:03 -0400
-Received: from zn.tnic (p200300EC2F0A9D0078F56FA374005E53.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:9d00:78f5:6fa3:7400:5e53])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CFE771EC0103;
-        Tue, 12 May 2020 20:12:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1589307122;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=n06HkraspKjUYFH+gKoPebqkaQ8Z/x23WE/L9W2ArvQ=;
-        b=JNNu10YPtjFu/VVc212xf7QxTlLs+MZAbdqCSoX8g20Tu0FKcIuFtgffY4hzflLvmWuLPA
-        M3J+77wtqImyqZ1srxYpVtviMu9tPFZdZk4CfnaTZi6FNvprR/upzHkEf5Fx+fCnzfd/Kp
-        AKsWTgYnpfq0TG8sscy1JWXmai+V9rU=
-Date:   Tue, 12 May 2020 20:11:57 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        id S1730210AbgELUE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 16:04:58 -0400
+Received: from mail-bn8nam11on2082.outbound.protection.outlook.com ([40.107.236.82]:12177
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725938AbgELUE5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 16:04:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T8YjTLwMongEuNJ2XCAJeERQqLhPVj7Q0PVYtVoWhCNTtegstJJyMXP9eE/8hePKfZhID4GiWCEkc6oXb1i5KRem9UpU6xkkUuhdJXssRz9XhIz68aThAk35CvXy136kXcc5IZ2PSZgNcJjE3QiU8u27xtnIpsKIyDU51HsjyPbOFd1k8D9opqWPY57ueuRzWtK6HBvOqvNH2MTi6vzEpAJCek+ybLVhuqlQlKhglZfvH5PTBpbrtqj+kOtoL4DJoum0uVpJZ704+9fwCQDivmQnDUPJEgrtKWsHiDpnof9YhMjXaHcJuXK/gFUsiUXzdfvvDuemwaKkqIFWGQ/UyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C4p2zMGTGdHA0f4iwmc1hdiNbVT7RdFEKHFtr9hn2K0=;
+ b=cpLs8UGspfVx6TVxpMM9skZq4DD44m30oTRX/MsCm4xy/lRLpK4qhLS3HQw2Hx+nydUYNhR5PMpI8up2t0Q49JRm6K9A4IYY3/zr7h8BxFqF9b711Qig8ppZK7eVZsHmCl4QT9P1mlSahJB2zGLWqwknHNQoL1ziVawhgctQNmLgC9yIibYPFpi+bfeL1wEXApZxucaUwt+Y8E5j75e2I8/REzf0BWe4ZxQ/UZJV2Mo65HAwZK+fE9Mj/HWUBeHtjtg/DKpw/JEn4L4bLmYc7AyYoiAnlB8QZzBYAwzsNWopgRZYoDTufHf0Qmiid84Ls3FZ5xe0SvdwUXvSIPqTpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C4p2zMGTGdHA0f4iwmc1hdiNbVT7RdFEKHFtr9hn2K0=;
+ b=Mg45D18rP+YuBGnK46H6rlxVwWGq7SmR0JMGLQS8OuJuynErp5HOo8N63SsfvNk205F7PuWb0Ojnt8KCriJluX/Aow10l/0TznZy0HTDGbg4fRt+qZDr0YV6SL2l4oXivJO6ciHTGs91MSot1qcjpsLVWydukHNucTbM1IFv/ck=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2398.namprd12.prod.outlook.com (2603:10b6:802:26::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26; Tue, 12 May
+ 2020 20:04:52 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2979.033; Tue, 12 May 2020
+ 20:04:52 +0000
+Subject: Re: [PATCH v3 3/3] KVM: x86: Move MPK feature detection to common
+ code
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
+        mchehab+samsung@kernel.org, changbin.du@intel.com,
+        Nadav Amit <namit@vmware.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        yang.shi@linux.alibaba.com,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        anshuman.khandual@arm.com, Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        steven.price@arm.com, rppt@linux.vnet.ibm.com, peterx@redhat.com,
         Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
+        Arjun Roy <arjunroy@google.com>, logang@deltatee.com,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, justin.he@arm.com,
+        robin.murphy@arm.com, ira.weiny@intel.com,
         Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 23/75] x86/boot/compressed/64: Setup GHCB Based VC
- Exception handler
-Message-ID: <20200512181157.GD6859@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-24-joro@8bytes.org>
-MIME-Version: 1.0
+        Juergen Gross <jgross@suse.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        pawan.kumar.gupta@linux.intel.com,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
+        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
+References: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
+ <158923999440.20128.4859351750654993810.stgit@naples-babu.amd.com>
+ <CALMp9eTs4hYpDK+KzXEzaAptcfor+9f7cM9Yd9kvd5v27sdFRw@mail.gmail.com>
+ <2fb5fd86-5202-f61b-fd55-b3554c5826da@amd.com>
+ <CALMp9eRT69LWGE8dZVuLv2mxgc_R3W1SnPswHkhS8K0ZUX_B-Q@mail.gmail.com>
+ <20200512172800.GB12100@linux.intel.com>
+From:   Babu Moger <babu.moger@amd.com>
+Message-ID: <4a9cc633-f530-8d43-3b8c-b83822597506@amd.com>
+Date:   Tue, 12 May 2020 15:04:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+In-Reply-To: <20200512172800.GB12100@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-24-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0201CA0014.namprd02.prod.outlook.com
+ (2603:10b6:803:2b::24) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by SN4PR0201CA0014.namprd02.prod.outlook.com (2603:10b6:803:2b::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28 via Frontend Transport; Tue, 12 May 2020 20:04:50 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 23731e78-bc0a-4012-af9d-08d7f6afbb7c
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2398:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB23981299CB204F6A85710F2995BE0@SN1PR12MB2398.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0401647B7F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oNCRuVFqUc7U3Hmgnp0O4UOdj0SdVqPSKjFe1kTUDkapnKvZeIL/rfsKeDxXjwAGAVYf8+sPCFENQBLCc8skQVK03hF6CzV5NUwPsYe1Pu5uHv1+PmMcAUBIV0p1/nG/iolPW8zBV47R5mUcQz08CbIhf+z2dzp5ZIM4vHLei/Q06/PmYY7mhME9EFNLNY/cBbnAkJ/F5GHWXGH1RwuperowMshgvZYFzSTXQzxnT0uYMwAGcrQKdNODSUMKGeaOV/yovd/A/y4Uabp74B7f5CYRymuvWuXWdzsviSywR7izTAzU+IOiEaz4x1p29M5HvgmAUm7Uh6+mFaENaUlxmWseZ33MvSNBno2F5Ipx810p7tgbkpu81gk6rfJX7t4XSMIiBWSolXL7IHF4Qaeh5JRnQvazAjuxrmwAdj3Psm38vXZJl054qEtC2Ey7u5HTVO2vE68PpJoP15orWjDst+74cA0sR4NXlP2XrKwoEuJL1Di0Rq3ABy8fkKPu3OWCBijJsbhP3+1Rc81jk1H+CFG4b5x/XftnQP3zlKfQX/OyT61Ij5gRjrtuPVSkunVm
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(376002)(366004)(346002)(136003)(33430700001)(8676002)(44832011)(8936002)(86362001)(5660300002)(7406005)(478600001)(31696002)(52116002)(66476007)(66946007)(16526019)(4326008)(7416002)(53546011)(26005)(186003)(66556008)(6486002)(956004)(31686004)(2616005)(54906003)(316002)(2906002)(16576012)(33440700001)(110136005)(36756003)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: FrhxmY84Y9q5lU/xp8KHpZxOnz2prdXLXOA46M29fGYCRljMH8zwqudzW3dlreIGMWE2K/BH0Vl/+ddefjJ1lYHlSuayHhf8Jk3DwslmfLpncA2tAe7RpuUqDSXBCrF1ZkkXxTFyu5n6SJ+OniB9UbBqZDSwcurmQyShqud4yXs8jOX2yQ3VNTM7JOWyUXII2dAFjMfMdD5JwI+akyflF0rAtMPl+tJQogRC+fH4t6jNDNF9L+0nW/qZTPL+KNRypj+mxf9WJcRku12MEvn8yBjSAmAcvRrT2Mgy2v7cLCjaIUV5cATOXz8SaHnmV06ARXyv0Rd/EVImzm2L0hQK1rACvQqU3eK51QilpyoXe+npBTROirXhe8wvN7d9pwP6JeDRUVIp1353kJYkEGmIoVWo66BHq6upfmGyKWYgO2ql0b3tsASTqH1wdNpoDCjg/cTOM9U19MEsA65v2xwxAvOcZbMCpdQHQyIjAFk8ciI=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23731e78-bc0a-4012-af9d-08d7f6afbb7c
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2020 20:04:52.6612
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hoVZTVZ5kv+BjKxtelWChQd/WawNonz08dED1SR4WhG+hr6kjqfMI2iT26NqU+CD
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2398
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:16:33PM +0200, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
+
+
+On 5/12/20 12:28 PM, Sean Christopherson wrote:
+> On Tue, May 12, 2020 at 09:58:19AM -0700, Jim Mattson wrote:
+>> On Tue, May 12, 2020 at 8:12 AM Babu Moger <babu.moger@amd.com> wrote:
+>>>
+>>>
+>>>
+>>> On 5/11/20 6:51 PM, Jim Mattson wrote:
+>>>> On Mon, May 11, 2020 at 4:33 PM Babu Moger <babu.moger@amd.com> wrote:
+>>>>>
+>>>>> Both Intel and AMD support (MPK) Memory Protection Key feature.
+>>>>> Move the feature detection from VMX to the common code. It should
+>>>>> work for both the platforms now.
+>>>>>
+>>>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+>>>>> ---
+>>>>>  arch/x86/kvm/cpuid.c   |    4 +++-
+>>>>>  arch/x86/kvm/vmx/vmx.c |    4 ----
+>>>>>  2 files changed, 3 insertions(+), 5 deletions(-)
+>>>>>
+>>>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>>>> index 901cd1fdecd9..3da7d6ea7574 100644
+>>>>> --- a/arch/x86/kvm/cpuid.c
+>>>>> +++ b/arch/x86/kvm/cpuid.c
+>>>>> @@ -278,6 +278,8 @@ void kvm_set_cpu_caps(void)
+>>>>>  #ifdef CONFIG_X86_64
+>>>>>         unsigned int f_gbpages = F(GBPAGES);
+>>>>>         unsigned int f_lm = F(LM);
+>>>>> +       /* PKU is not yet implemented for shadow paging. */
+>>>>> +       unsigned int f_pku = tdp_enabled ? F(PKU) : 0;
+>>>>
+>>>> I think we still want to require that OSPKE be set on the host before
+>>>> exposing PKU to the guest.
+>>>>
+>>>
+>>> Ok I can add this check.
+>>>
+>>> +       unsigned int f_pku = tdp_enabled && F(OSPKE)? F(PKU) : 0;
+>>
+>> That doesn't do what you think it does. F(OSPKE) is a non-zero
+>> constant, so that conjunct is always true.
 > 
-> Install an exception handler for #VC exception that uses a GHCB. Also
-> add the infrastructure for handling different exit-codes by decoding
-> the instruction that caused the exception and error handling.
+> My vote would be to omit f_pku and adjust the cap directly, e.g.
+
+Sure. I am fine with this. Thanks
+
 > 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/Kconfig                           |   1 +
->  arch/x86/boot/compressed/Makefile          |   3 +
->  arch/x86/boot/compressed/idt_64.c          |   4 +
->  arch/x86/boot/compressed/idt_handlers_64.S |   3 +-
->  arch/x86/boot/compressed/misc.c            |   7 +
->  arch/x86/boot/compressed/misc.h            |   7 +
->  arch/x86/boot/compressed/sev-es.c          | 110 +++++++++++++++
->  arch/x86/include/asm/sev-es.h              |  39 ++++++
->  arch/x86/include/uapi/asm/svm.h            |   1 +
->  arch/x86/kernel/sev-es-shared.c            | 154 +++++++++++++++++++++
->  10 files changed, 328 insertions(+), 1 deletion(-)
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 6828be99b9083..998c902df9e57 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -326,7 +326,7 @@ void kvm_set_cpu_caps(void)
+>         );
 > 
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 1197b5596d5a..2ba5f74f186d 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -1523,6 +1523,7 @@ config AMD_MEM_ENCRYPT
->  	select DYNAMIC_PHYSICAL_MASK
->  	select ARCH_USE_MEMREMAP_PROT
->  	select ARCH_HAS_FORCE_DMA_UNENCRYPTED
-> +	select INSTRUCTION_DECODER
->  	---help---
->  	  Say yes to enable support for the encryption of system memory.
->  	  This requires an AMD processor that supports Secure Memory
-> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> index a7847a1ef63a..8372b85c9c0e 100644
-> --- a/arch/x86/boot/compressed/Makefile
-> +++ b/arch/x86/boot/compressed/Makefile
-> @@ -41,6 +41,9 @@ KBUILD_CFLAGS += -Wno-pointer-sign
->  KBUILD_CFLAGS += $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
->  KBUILD_CFLAGS += -fno-asynchronous-unwind-tables
->  
-> +# sev-es.c inludes generated $(objtree)/arch/x86/lib/inat-tables.c
-
-	      "includes"
-
-> +CFLAGS_sev-es.o += -I$(objtree)/arch/x86/lib/
-
-Does it?
-
-I see
-
-#include "../../lib/inat.c"
-#include "../../lib/insn.c"
-
-only and with the above CFLAGS-line removed, it builds still.
-
-Leftover from earlier?
-
-> +
->  KBUILD_AFLAGS  := $(KBUILD_CFLAGS) -D__ASSEMBLY__
->  GCOV_PROFILE := n
->  UBSAN_SANITIZE :=n
-> diff --git a/arch/x86/boot/compressed/idt_64.c b/arch/x86/boot/compressed/idt_64.c
-> index f8295d68b3e1..44d20c4f47c9 100644
-> --- a/arch/x86/boot/compressed/idt_64.c
-> +++ b/arch/x86/boot/compressed/idt_64.c
-> @@ -45,5 +45,9 @@ void load_stage2_idt(void)
->  
->  	set_idt_entry(X86_TRAP_PF, boot_page_fault);
->  
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +	set_idt_entry(X86_TRAP_VC, boot_stage2_vc);
-> +#endif
-
-if IS_ENABLED()...
-
-...
-
-> +static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
-> +{
-> +	char buffer[MAX_INSN_SIZE];
-> +	enum es_result ret;
-> +
-> +	memcpy(buffer, (unsigned char *)ctxt->regs->ip, MAX_INSN_SIZE);
-> +
-> +	insn_init(&ctxt->insn, buffer, MAX_INSN_SIZE, 1);
-> +	insn_get_length(&ctxt->insn);
-> +
-> +	ret = ctxt->insn.immediate.got ? ES_OK : ES_DECODE_FAILED;
-
-Why are we checking whether the immediate? insn_get_length() sets
-insn->length unconditionally while insn_get_immediate() can error out
-and not set ->got... ?
-
-> +
-> +	return ret;
-> +}
-
-...
-
-> +static bool sev_es_setup_ghcb(void)
-> +{
-> +	if (!sev_es_negotiate_protocol())
-> +		sev_es_terminate(GHCB_SEV_ES_REASON_PROTOCOL_UNSUPPORTED);
-> +
-> +	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
-> +		return false;
-> +
-> +	/* Page is now mapped decrypted, clear it */
-> +	memset(&boot_ghcb_page, 0, sizeof(boot_ghcb_page));
-> +
-> +	boot_ghcb = &boot_ghcb_page;
-> +
-> +	/* Initialize lookup tables for the instruction decoder */
-> +	inat_init_tables();
-
-Yeah, that call doesn't logically belong in this function AFAICT as this
-function should setup the GHCB only. You can move it to the caller.
-
-> +
-> +	return true;
-> +}
-> +
-> +void sev_es_shutdown_ghcb(void)
-> +{
-> +	if (!boot_ghcb)
-> +		return;
-> +
-> +	/*
-> +	 * GHCB Page must be flushed from the cache and mapped encrypted again.
-> +	 * Otherwise the running kernel will see strange cache effects when
-> +	 * trying to use that page.
-> +	 */
-> +	if (set_page_encrypted((unsigned long)&boot_ghcb_page))
-> +		error("Can't map GHCB page encrypted");
-
-Is that error() call enough?
-
-Shouldn't we BUG_ON() here or mark that page Reserved or so, so that
-nothing uses it during the system lifetime and thus avoid the strange
-cache effects?
-
-...
-
-> +static enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
-> +					  struct es_em_ctxt *ctxt,
-> +					  u64 exit_code, u64 exit_info_1,
-> +					  u64 exit_info_2)
-> +{
-> +	enum es_result ret;
-> +
-> +	/* Fill in protocol and format specifiers */
-> +	ghcb->protocol_version = GHCB_PROTOCOL_MAX;
-> +	ghcb->ghcb_usage       = GHCB_DEFAULT_USAGE;
-> +
-> +	ghcb_set_sw_exit_code(ghcb, exit_code);
-> +	ghcb_set_sw_exit_info_1(ghcb, exit_info_1);
-> +	ghcb_set_sw_exit_info_2(ghcb, exit_info_2);
-> +
-> +	sev_es_wr_ghcb_msr(__pa(ghcb));
-> +	VMGEXIT();
-> +
-> +	if ((ghcb->save.sw_exit_info_1 & 0xffffffff) == 1) {
-					^^^^^^^^^^^
-
-(1UL << 32) - 1
-
-I guess.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+>         kvm_cpu_cap_mask(CPUID_7_ECX,
+> -               F(AVX512VBMI) | F(LA57) | 0 /*PKU*/ | 0 /*OSPKE*/ | F(RDPID) |
+> +               F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
+>                 F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+>                 F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+>                 F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/
+> @@ -334,6 +334,8 @@ void kvm_set_cpu_caps(void)
+>         /* Set LA57 based on hardware capability. */
+>         if (cpuid_ecx(7) & F(LA57))
+>                 kvm_cpu_cap_set(X86_FEATURE_LA57);
+> +       if (!tdp_enabled || !boot_cpu_has(OSPKE))
+> +               kvm_cpu_cap_clear(X86_FEATURE_PKU);
+> 
+>         kvm_cpu_cap_mask(CPUID_7_EDX,
+>                 F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
+> 
