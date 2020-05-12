@@ -2,134 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74C701CF9D7
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 17:53:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D647C1CFA08
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 18:02:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730628AbgELPxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 11:53:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48281 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727847AbgELPxp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 11:53:45 -0400
+        id S1728485AbgELQCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 12:02:01 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44281 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726889AbgELQCB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 May 2020 12:02:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589298823;
+        s=mimecast20190719; t=1589299320;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=12YTEk/sqwvmTK3Y5qvGAKQ+4UZ0obOPFvJEZJMJP34=;
-        b=ej0onNXxsEFbKOSprWI2tLzMz4K3Jz84+Mj1j99oAM8BFLQRPxK12uiAuUH8Sh4dqQC0YG
-        o3hEMKNCCUwGO6Y049COn3q3ghfwM5A/bx4UdofgnHfhY/P6tPHiZg93cF2jd9Rm2bDpwB
-        lqOPgTrv1dVUFLWsJx1U20KLmc0+CXE=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=nL6n0gs44aSe+c4xP2RS6AmyhHuCE1lHHuLbFzSoNGo=;
+        b=FacGXlpVTipMCzw5E65rtqe8Cs412aCVT9+1x6ZyhwGaeF4J+CDpxmQpYFhDUGd5KTAnmd
+        M7lADnX1RG9DtF0el8rPIdqJ6xIDmLaye3K9L7AaQuFTHtEoR9Y3EeNM+RwP2D7za5xayx
+        lvG2pcaNoGBCzswl7E6E9o+xGs4h2rk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-WzQueWbcNdqkDSzcwG8RIg-1; Tue, 12 May 2020 11:53:42 -0400
-X-MC-Unique: WzQueWbcNdqkDSzcwG8RIg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-428-yGbGbgOGNEWr2HXPNBc0CA-1; Tue, 12 May 2020 12:01:58 -0400
+X-MC-Unique: yGbGbgOGNEWr2HXPNBc0CA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C038107ACF2;
-        Tue, 12 May 2020 15:53:40 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-116-85.rdu2.redhat.com [10.10.116.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E7F885C1B2;
-        Tue, 12 May 2020 15:53:39 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 76964220C05; Tue, 12 May 2020 11:53:39 -0400 (EDT)
-Date:   Tue, 12 May 2020 11:53:39 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with
- token info
-Message-ID: <20200512155339.GD138129@redhat.com>
-References: <20200511164752.2158645-1-vkuznets@redhat.com>
- <20200511164752.2158645-3-vkuznets@redhat.com>
- <20200512152709.GB138129@redhat.com>
- <87o8qtmaat.fsf@vitty.brq.redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09855800687;
+        Tue, 12 May 2020 16:01:57 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A42EE60C05;
+        Tue, 12 May 2020 16:01:54 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     linux-hyperv@vger.kernel.org
+Cc:     Wei Liu <wei.liu@kernel.org>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Michael Kelley <mikelley@microsoft.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>
+Subject: [PATCH] x86/hyperv: Properly suspend/resume reenlightenment notifications
+Date:   Tue, 12 May 2020 18:01:53 +0200
+Message-Id: <20200512160153.134467-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o8qtmaat.fsf@vitty.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 12, 2020 at 05:40:10PM +0200, Vitaly Kuznetsov wrote:
-> Vivek Goyal <vgoyal@redhat.com> writes:
-> 
-> > On Mon, May 11, 2020 at 06:47:46PM +0200, Vitaly Kuznetsov wrote:
-> >> Currently, APF mechanism relies on the #PF abuse where the token is being
-> >> passed through CR2. If we switch to using interrupts to deliver page-ready
-> >> notifications we need a different way to pass the data. Extent the existing
-> >> 'struct kvm_vcpu_pv_apf_data' with token information for page-ready
-> >> notifications.
-> >> 
-> >> The newly introduced apf_put_user_ready() temporary puts both reason
-> >> and token information, this will be changed to put token only when we
-> >> switch to interrupt based notifications.
-> >> 
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> ---
-> >>  arch/x86/include/uapi/asm/kvm_para.h |  3 ++-
-> >>  arch/x86/kvm/x86.c                   | 17 +++++++++++++----
-> >>  2 files changed, 15 insertions(+), 5 deletions(-)
-> >> 
-> >> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> >> index 2a8e0b6b9805..e3602a1de136 100644
-> >> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> >> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> >> @@ -113,7 +113,8 @@ struct kvm_mmu_op_release_pt {
-> >>  
-> >>  struct kvm_vcpu_pv_apf_data {
-> >>  	__u32 reason;
-> >> -	__u8 pad[60];
-> >> +	__u32 pageready_token;
-> >
-> > How about naming this just "token". That will allow me to deliver error
-> > as well. pageready_token name seems to imply that this will always be
-> > successful with page being ready.
-> >
-> > And reason will tell whether page could successfully be ready or
-> > it was an error. And token will help us identify the task which
-> > is waiting for the event.
-> 
-> I added 'pageready_' prefix to make it clear this is not used for 'page
-> not present' notifications where we pass token through CR2. (BTW
-> 'reason' also becomes a misnomer because we can only see
-> 'KVM_PV_REASON_PAGE_NOT_PRESENT' there.)
+Errors during hibernation with reenlightenment notifications enabled were
+reported:
 
-Sure. I am just trying to keep names in such a way so that we could
-deliver more events and not keep it too tightly coupled with only
-two events (page not present, page ready).
+ [   51.730435] PM: hibernation entry
+ [   51.737435] PM: Syncing filesystems ...
+ ...
+ [   54.102216] Disabling non-boot CPUs ...
+ [   54.106633] smpboot: CPU 1 is now offline
+ [   54.110006] unchecked MSR access error: WRMSR to 0x40000106 (tried to
+     write 0x47c72780000100ee) at rIP: 0xffffffff90062f24
+     native_write_msr+0x4/0x20)
+ [   54.110006] Call Trace:
+ [   54.110006]  hv_cpu_die+0xd9/0xf0
+ ...
 
-> 
-> I have no strong opinion, can definitely rename this to 'token' and add
-> a line to the documentation to re-state that this is not used for type 1
-> events.
+Normally, hv_cpu_die() just reassigns reenlightenment notifications to some
+other CPU when the CPU receiving them goes offline. Upon hibernation, there
+is no other CPU which is still online so cpumask_any_but(cpu_online_mask)
+returns >= nr_cpu_ids and using it as hv_vp_index index is incorrect.
+Disable the feature when cpumask_any_but() fails.
 
-I don't even know why are we calling "type 1" and "type 2" event. Calling
-it KVM_PV_REASON_PAGE_NOT_PRESENT  and KVM_PV_REASON_PAGE_READY event
-is much more intuitive. If somebody is confused about how event will
-be delivered, that could be part of documentation. And "type1" and "type2"
-does not say anything about delivery method anyway.
+Also, as we now disable reenlightenment notifications upon hibernation we
+need to restore them on resume. Check if hv_reenlightenment_cb was
+previously set and restore from hv_resume().
 
-Also, type of event should not necessarily be tied to delivery method.
-For example if we end up introducing say, "KVM_PV_REASON_PAGE_ERROR", then
-I would think that event can be injected both using exception (#PF or #VE)
-as well as interrupt (depending on state of system).
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/hyperv/hv_init.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-Thanks
-Vivek
+diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+index fd51bac11b46..acf76b466db6 100644
+--- a/arch/x86/hyperv/hv_init.c
++++ b/arch/x86/hyperv/hv_init.c
+@@ -226,10 +226,18 @@ static int hv_cpu_die(unsigned int cpu)
+ 
+ 	rdmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
+ 	if (re_ctrl.target_vp == hv_vp_index[cpu]) {
+-		/* Reassign to some other online CPU */
++		/*
++		 * Reassign reenlightenment notifications to some other online
++		 * CPU or just disable the feature if there are no online CPUs
++		 * left (happens on hibernation).
++		 */
+ 		new_cpu = cpumask_any_but(cpu_online_mask, cpu);
+ 
+-		re_ctrl.target_vp = hv_vp_index[new_cpu];
++		if (new_cpu < nr_cpu_ids)
++			re_ctrl.target_vp = hv_vp_index[new_cpu];
++		else
++			re_ctrl.enabled = 0;
++
+ 		wrmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
+ 	}
+ 
+@@ -293,6 +301,13 @@ static void hv_resume(void)
+ 
+ 	hv_hypercall_pg = hv_hypercall_pg_saved;
+ 	hv_hypercall_pg_saved = NULL;
++
++	/*
++	 * Reenlightenment notifications are disabled by hv_cpu_die(0),
++	 * reenable them here if hv_reenlightenment_cb was previously set.
++	 */
++	if (hv_reenlightenment_cb)
++		set_hv_tscchange_cb(hv_reenlightenment_cb);
+ }
+ 
+ /* Note: when the ops are called, only CPU0 is online and IRQs are disabled. */
+-- 
+2.25.4
 
