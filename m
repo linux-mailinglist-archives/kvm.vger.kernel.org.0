@@ -2,136 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33ED31CF988
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 17:45:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30F101CF993
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 17:47:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727869AbgELPpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 11:45:21 -0400
-Received: from mail-dm6nam12on2086.outbound.protection.outlook.com ([40.107.243.86]:52833
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726465AbgELPpV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 11:45:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nWdTI+c39W7VBIvPzLEXtHT6DE6CunTsB3myduoAd9Bl4jnf2xBXlEYPJtHcz7zA+V3pishKmsK62atIv0UMvnrtx52tnPqQ5sNOf/jnvJ00AKC4jvL4CA6d9ggRchmv+uA7V/8i72tGD68adGATFvuSHc/nC20kKen2brfmTJNSF7Mq76B3hm9vZWaLEwuXuOFZQTAJEn0LIbXyGMC6LmQTREZ2/rKEv5Tj/q1D4UADCKsDXNprsPkL0cyPY8ZaGqounEv/ropp38g28SsR73VPyW7XA6FefiMpuszhAEq25tDPzSTJ+LyCf4WmohvoVvLQDCDiL27B80CkxNOkxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NcSef509fKbyFUVk59pAIdfbEmfGiVhViUBhVFwPUOs=;
- b=dakpq8oIC1JfXMOgktDTxL774yxexNePE8p9u3icQGp9DFpeQaAqAy2fiKClZlhEWknncBMImZLjNxoE+xNuNzLeG1GB0iRYoWqJC0lBy0zBh7AzCA6cENianTweaJrJuD79y2cKiIpjYZUK8wu9HhzcxvUZW/tpG67pQY2i/ARuk97EsTJ/OBKhaa7X54R+8GySz3nxAvz4rghXJNXE7pPcejg2pSwYFWwNJMqlroZn/mNonJrUq7XBR1mlr5T6RwOxhoWuA/XSykFOCyqiNlO+T3pYoEn9rjlout8ZO2BPqVCpHgv26BsvzpNoVq19BWYn2mqo4UbmJ4chAhJviA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NcSef509fKbyFUVk59pAIdfbEmfGiVhViUBhVFwPUOs=;
- b=4NKot90jXlpx+r87Q4mVY7fpKmSBXPCPib4RKbEMRwVW3IuZZt93wMQuIB4fL7oOCpDZO4jg5mzEKveQLPyK3bT6T/5bwZ045e/Ek/Cl5ycfvuzqFYHZ37NLNIM1jf2g8onxXp4dJhYgu+x7UVvRtZz8AvisUZ5eWZneLStKFX4=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2576.namprd12.prod.outlook.com (2603:10b6:802:22::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.33; Tue, 12 May
- 2020 15:45:17 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::c0f:2938:784f:ed8d%7]) with mapi id 15.20.2979.033; Tue, 12 May 2020
- 15:45:17 +0000
-Subject: Re: [PATCH v3 1/3] arch/x86: Rename config
- X86_INTEL_MEMORY_PROTECTION_KEYS to generic x86
-To:     Dave Hansen <dave.hansen@intel.com>, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com
-Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, dave.hansen@linux.intel.com,
-        luto@kernel.org, peterz@infradead.org, mchehab+samsung@kernel.org,
-        changbin.du@intel.com, namit@vmware.com, bigeasy@linutronix.de,
-        yang.shi@linux.alibaba.com, asteinhauser@google.com,
-        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
-        akpm@linux-foundation.org, steven.price@arm.com,
-        rppt@linux.vnet.ibm.com, peterx@redhat.com,
-        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
-        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
-        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
-        jgross@suse.com, andrew.cooper3@citrix.com,
-        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
-        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
-        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
- <158923997443.20128.16545619590919566266.stgit@naples-babu.amd.com>
- <a92f3247-4b1e-0ff2-c1c7-68c149c0142c@intel.com>
- <4984c0af-c20b-7084-9bca-5cb6bf385180@amd.com>
- <1f4fa674-5709-ad88-c7ae-1bf5584a5b82@intel.com>
-From:   Babu Moger <babu.moger@amd.com>
-Message-ID: <a77cbb76-8a68-59a6-942b-08b27f86fc04@amd.com>
-Date:   Tue, 12 May 2020 10:45:14 -0500
+        id S1730611AbgELPrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 11:47:22 -0400
+Received: from foss.arm.com ([217.140.110.172]:57512 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726388AbgELPrV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 11:47:21 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7BA71FB;
+        Tue, 12 May 2020 08:47:20 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80A763F305;
+        Tue, 12 May 2020 08:47:18 -0700 (PDT)
+Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
+ struct kvm
+To:     James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-4-maz@kernel.org>
+ <a7c8207c-9061-ad0e-c9f8-64c995e928b6@arm.com>
+ <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <5134e123-18ec-9b69-2e0a-b83798e01507@arm.com>
+Date:   Tue, 12 May 2020 16:47:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-In-Reply-To: <1f4fa674-5709-ad88-c7ae-1bf5584a5b82@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0046.namprd12.prod.outlook.com
- (2603:10b6:802:20::17) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.87] (165.204.77.1) by SN1PR12CA0046.namprd12.prod.outlook.com (2603:10b6:802:20::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.27 via Frontend Transport; Tue, 12 May 2020 15:45:15 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 89347c56-43f3-4b08-f22c-08d7f68b77c9
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2576:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB25761F487C9F75B7A12F902F95BE0@SN1PR12MB2576.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 0401647B7F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fqzZMoQVuac/TQKNQCBgflzcbZ5rIlTZrnxraf4Yx61o28AaeJkcd3QRh4Tecr5dQvUUvhX9zSK2U4xMhY+KvELISr96LWd4LrYvqcgpF0n5+g5Qk/FjmzbmntmqUj7EBocEzI+X9XOJTAEwgPOM5ZRshxqvD83rB02X+tME6ydnGLjh6vjgP+xc7udfi+yuXxk7dqndybOdNhe9iGTErWGdKqI/IBdTOrrLmJwXrzIoUvTq9hPYl07IfAB3vbX3RIQCRmtqHir3AEpOMwnvcK+HJpMn5OqLhUAAuOkwPeJfkg+xmcJoY5x5mVwF2SjCmVy4xB38EI+avhNqnwU02agxsuOnQBg0muSyzr1Alfp3jjTBi8aM122jngddkvDA4QogvTXO/kGo4iU2AUN+dqCqI85b8zE4VPnCUUr5RphoJ3S9JdpdHE8CtONquxFePZswyda/Y0KWlCllyNOXUzEF76rSs0g/q2sjyCtHByBpQpH87jg+5A9p5gefG7lXVlledatQSpLSsWHz+WvX2BZD4yu7JgcYW+o1yGp0F3rxqI8c9aZ8kimID0Kz3qEmoVzM8A7pmfK/XQnP01YwiA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(136003)(396003)(39860400002)(376002)(346002)(33430700001)(7416002)(16576012)(8936002)(2616005)(956004)(4326008)(2906002)(31696002)(52116002)(86362001)(26005)(316002)(66476007)(44832011)(16526019)(8676002)(66556008)(5660300002)(66946007)(6486002)(31686004)(36756003)(478600001)(33440700001)(7406005)(53546011)(186003)(41533002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: wM/uGjswwTSvaNZVX7IuITWBd5SVXOzXGzDBg2+q3Oo1SmzLBDJmTvu8eNBfbwk0IeN7vQ4U2RpF/znHuVDyqdUvnzYzwAvf0s6UeuJQlmGLdCdLbBrztuGvRq/LGZtj9JjLglBpvBK8B1D1B1q4spZojChjPoHvz9yGFTwxlArTAN2M4r85Qp5wLzy63Vas9KbeDYLTT7Co98ZMhpNZgq001qgpv7kbSOSRy9VHfx1wbDzt/Oh1aUTxwhnpEEOb4jEqVhPfl7OR6IjCBwVAXvr3v41LsEytcS9AQQMdQYKxdEnG2J0OtLnYkV/NFiguTPvRQyiRI+rPFpZqWvSBxpMrQe3Q1CkSh8+Koki+O9hDd+hROnBoJi0HIiZnpD2hnK5m0VFVat8+atpTxfUiZowNguXl/e6rPCuq9bc0OUGC2H8fqvwXjkQAvaTflP1/9YjMEshPCgeMJ2MKO5PauO3IoVcQiV+pE3bC1Ck9yAM=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89347c56-43f3-4b08-f22c-08d7f68b77c9
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2020 15:45:16.9983
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qvfcxAxnlB4nGCi3dLfrXYqBWQ4QooAOG3t86wt521XmFPu08QRb7GJe7cWcCHUr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2576
+In-Reply-To: <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-
-On 5/12/20 10:19 AM, Dave Hansen wrote:
-> On 5/12/20 7:57 AM, Babu Moger wrote:
->>> I was hoping to see at least *some* justification in this changelog.  Do
->>> you think having "INTEL_" will confuse users?  Is there some technical
->>> merit to this change?
+On 5/12/20 12:17 PM, James Morse wrote:
+> Hi Alex, Marc,
+>
+> (just on this last_vcpu_ran thing...)
+>
+> On 11/05/2020 17:38, Alexandru Elisei wrote:
+>> On 4/22/20 1:00 PM, Marc Zyngier wrote:
+>>> From: Christoffer Dall <christoffer.dall@arm.com>
 >>>
->>> The naming churn is an obviously bad, not technically necessary change.
->> Yes. Technically not necessary. But can cause some confusion on non-intel
->> platforms.
-> 
-> Seriously, guys, this is buried deep in kernel code.  Who is this confusing?
-> 
-> To me, this is like anything else we rename in the kernel.  It causes
-> churn, which makes patches harder to backport for instance.  That's why
-> we don't rename things willy-nilly when we just don't like the names.
-> 
-> The naming has to cause some practical, real-world problem that we *FIX*
-> with the rename.
-> 
-> I'm just asking for a concrete, practical problem statement in the
-> changelog.  If there isn't one, then please don't do the rename.  The
-> Kconfig magic is still fine since it fixes a practical problem for end
-> users.
-> 
+>>> As we are about to reuse our stage 2 page table manipulation code for
+>>> shadow stage 2 page tables in the context of nested virtualization, we
+>>> are going to manage multiple stage 2 page tables for a single VM.
+>>>
+>>> This requires some pretty invasive changes to our data structures,
+>>> which moves the vmid and pgd pointers into a separate structure and
+>>> change pretty much all of our mmu code to operate on this structure
+>>> instead.
+>>>
+>>> The new structure is called struct kvm_s2_mmu.
+>>>
+>>> There is no intended functional change by this patch alone.
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 7dd8fefa6aecd..664a5d92ae9b8 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -63,19 +63,32 @@ struct kvm_vmid {
+>>>  	u32    vmid;
+>>>  };
+>>>  
+>>> -struct kvm_arch {
+>>> +struct kvm_s2_mmu {
+>>>  	struct kvm_vmid vmid;
+>>>  
+>>> -	/* stage2 entry level table */
+>>> -	pgd_t *pgd;
+>>> -	phys_addr_t pgd_phys;
+>>> -
+>>> -	/* VTCR_EL2 value for this VM */
+>>> -	u64    vtcr;
+>>> +	/*
+>>> +	 * stage2 entry level table
+>>> +	 *
+>>> +	 * Two kvm_s2_mmu structures in the same VM can point to the same pgd
+>>> +	 * here.  This happens when running a non-VHE guest hypervisor which
+>>> +	 * uses the canonical stage 2 page table for both vEL2 and for vEL1/0
+>>> +	 * with vHCR_EL2.VM == 0.
+>> It makes more sense to me to say that a non-VHE guest hypervisor will use the
+>> canonical stage *1* page table when running at EL2
+> Can KVM say anything about stage1? Its totally under the the guests control even at vEL2...
 
-Alright. Alright. I will just keep Kconfig magic and update the
-documentation(protection-keys.rst). Thanks
+It is. My interpretation of the comment was that if the guest doesn't have virtual
+stage 2 enabled (we're not running a guest of the L1 hypervisor), then the L0 host
+can use the same L0 stage 2 tables because we're running the same guest (the L1
+VM), regardless of the actual exception level for the guest. If I remember
+correctly, KVM assigns different vmids for guests running at vEL1/0 and vEL2 with
+vHCR_EL2.VM == 0 because the translation regimes are different, but keeps the same
+translation tables.
+
+>
+>
+>> (the "Non-secure EL2 translation regime" as ARM DDI 0487F.b calls it on page D5-2543).
+>> I think that's
+>> the only situation where vEL2 and vEL1&0 will use the same L0 stage 2 tables. It's
+>> been quite some time since I reviewed the initial version of the NV patches, did I
+>> get that wrong?
+>
+>>> +	 */
+>>> +	pgd_t		*pgd;
+>>> +	phys_addr_t	pgd_phys;
+>>>  
+>>>  	/* The last vcpu id that ran on each physical CPU */
+>>>  	int __percpu *last_vcpu_ran;
+>> It makes sense for the other fields to be part of kvm_s2_mmu, but I'm struggling
+>> to figure out why last_vcpu_ran is here. Would you mind sharing the rationale? I
+>> don't see this change in v1 or v2 of the NV series.
+> Marc may have a better rationale. My thinking was because kvm_vmid is in here too.
+>
+> last_vcpu_ran exists to prevent KVM accidentally emulating CNP without the opt-in. (we
+> call it defacto CNP).
+>
+> The guest may expect to be able to use asid-4 with different page tables on different
+
+I'm afraid I don't know what asid-4 is.
+
+> vCPUs, assuming the TLB isn't shared. But if KVM is switching between those vCPU on one
+> physical CPU, the TLB is shared, ... the VMID and ASID are the same, but the page tables
+> are not. Not fun to debug!
+>
+>
+> NV makes this problem per-stage2, because each stage2 has its own VMID, we need to track
+> the vcpu_id that last ran this stage2 on this physical CPU. If its not the same, we need
+> to blow away this VMIDs TLB entries.
+>
+> The workaround lives in virt/kvm/arm/arm.c::kvm_arch_vcpu_load()
+
+Makes sense, thank you for explaining that.
+
+Thanks,
+Alex
+>
+>
+>> More below.
+> (lightly trimmed!)
+>
+> Thanks,
+>
+> James
+>
+>
+>>>  
+>>> +	struct kvm *kvm;
+>>> +};
+> [...]
+>
+>>> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+>>> index 53b3ba9173ba7..03f01fcfa2bd5 100644
+>>> --- a/virt/kvm/arm/arm.c
+>>> +++ b/virt/kvm/arm/arm.c
+>> There's a comment that still mentions arch.vmid that you missed in this file:
+>>
+>> static bool need_new_vmid_gen(struct kvm_vmid *vmid)
+>> {
+>>     u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
+>>     smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
+>>
+> [..]
+>
+>>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>>> index e3b9ee268823b..2f99749048285 100644
+>>> --- a/virt/kvm/arm/mmu.c
+>>> +++ b/virt/kvm/arm/mmu.c
+>>> @@ -886,21 +898,23 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>>>  }
+>>>  
+>>>  /**
+>>> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
+>>> - * @kvm:	The KVM struct pointer for the VM.
+>>> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
+>>> + * @kvm:	The pointer to the KVM structure
+>>> + * @mmu:	The pointer to the s2 MMU structure
+>>>   *
+>>>   * Allocates only the stage-2 HW PGD level table(s) of size defined by
+>>> - * stage2_pgd_size(kvm).
+>>> + * stage2_pgd_size(mmu->kvm).
+>>>   *
+>>>   * Note we don't need locking here as this is only called when the VM is
+>>>   * created, which can only be done once.
+>>>   */
+>>> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+>>>  {
+>>>  	phys_addr_t pgd_phys;
+>>>  	pgd_t *pgd;
+>>> +	int cpu;
+>>>  
+>>> -	if (kvm->arch.pgd != NULL) {
+>>> +	if (mmu->pgd != NULL) {
+>>>  		kvm_err("kvm_arch already initialized?\n");
+>>>  		return -EINVAL;
+>>>  	}
+>>> @@ -914,8 +928,20 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>>  	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
+>> We don't free the pgd here, but we do free it if alloc_percpu fails. Is that
+>> intentional?
+>
+>>>  		return -EINVAL;
+>>>  
+>>> -	kvm->arch.pgd = pgd;
+>>> -	kvm->arch.pgd_phys = pgd_phys;
+>>> +	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
+>>> +	if (!mmu->last_vcpu_ran) {
+>>> +		free_pages_exact(pgd, stage2_pgd_size(kvm));
+>>> +		return -ENOMEM;
+>>> +	}
+>>> +
+>>> +	for_each_possible_cpu(cpu)
+>>> +		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+>>> +
+>>> +	mmu->kvm = kvm;
+>>> +	mmu->pgd = pgd;
+>>> +	mmu->pgd_phys = pgd_phys;
+>>> +	mmu->vmid.vmid_gen = 0;
+>>> +
+>>>  	return 0;
+>>>  }
+>>>  
+>>> @@ -986,39 +1012,34 @@ void stage2_unmap_vm(struct kvm *kvm)
+>>>  	srcu_read_unlock(&kvm->srcu, idx);
+>>>  }
+>>>  
+>>> -/**
+>>> - * kvm_free_stage2_pgd - free all stage-2 tables
+>>> - * @kvm:	The KVM struct pointer for the VM.
+>>> - *
+>>> - * Walks the level-1 page table pointed to by kvm->arch.pgd and frees all
+>>> - * underlying level-2 and level-3 tables before freeing the actual level-1 table
+>>> - * and setting the struct pointer to NULL.
+>>> - */
+>>> -void kvm_free_stage2_pgd(struct kvm *kvm)
+>>> +void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>>>  {
+>>> +	struct kvm *kvm = mmu->kvm;
+>>>  	void *pgd = NULL;
+>>>  
+>>>  	spin_lock(&kvm->mmu_lock);
+>>> -	if (kvm->arch.pgd) {
+>>> -		unmap_stage2_range(kvm, 0, kvm_phys_size(kvm));
+>>> -		pgd = READ_ONCE(kvm->arch.pgd);
+>>> -		kvm->arch.pgd = NULL;
+>>> -		kvm->arch.pgd_phys = 0;
+>>> +	if (mmu->pgd) {
+>>> +		unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
+>>> +		pgd = READ_ONCE(mmu->pgd);
+>>> +		mmu->pgd = NULL;
+>> The kvm->arch.pgd_phys = 0 instruction seems to have been dropped here. Is that
+>> intentional?
