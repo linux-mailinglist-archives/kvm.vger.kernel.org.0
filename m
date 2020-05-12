@@ -2,332 +2,499 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 360111CF680
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 16:09:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0658A1CF6E1
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 16:18:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729583AbgELOJv convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 12 May 2020 10:09:51 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:32880 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727859AbgELOJu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 10:09:50 -0400
-Received: by mail-io1-f65.google.com with SMTP id k18so5010226ion.0;
-        Tue, 12 May 2020 07:09:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=YiiAP5eMlVtu3jXnsWZF91SS+/FwgUT5cEsW2W6GWDw=;
-        b=a89gfxC+pKpstIJcHD+RCDAD/UhgZ+3H0Av54VT6B2Q8iNf7jFUCSibNE94hH7OD6o
-         Bn42KyFnouPw3/5KfxunvkrocywTY71NGZxE5uNuuE9IW5+jXxoD7OGPaavIrjNuQvrX
-         yrEHxNrVO2xsrAB3nSAR+Eu3Hj4weHGCoFamhTqD7duQmSXD7xgeQZvsCDFFuNEq35vS
-         cQtMcNlqptQBIkTE5FBNbvOZPK7pN4Ra4YUUoBSboYb0ARSyFIjsXWB7MdkflDEgzlyq
-         Tt1df8eOmK1a6S+SicdufnuhzQ0bA+zw72bWUNRnzGsRugkxP5OnZKy2LS9EpuSqJHCu
-         ma2g==
-X-Gm-Message-State: AGi0PuZMZSbXPF/lSvoVZi4w9B2osrNLzmjkkkGEMHJCZ/8ipZyhKex1
-        jEvaidQkng3IFpA5KWC0PkayzGh5AbpeZw6G4Nptrto9
-X-Google-Smtp-Source: APiQypKlzhFnYfYNv00VoT7EqT0+W+hAqC5EEoT1hQarw8O/o80ie5CEZdgHJIOxjdAPZPuNMHjoj2CuKsq4fZyXNN0=
-X-Received: by 2002:a02:966a:: with SMTP id c97mr21107704jai.106.1589292588005;
- Tue, 12 May 2020 07:09:48 -0700 (PDT)
+        id S1729750AbgELOSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 10:18:22 -0400
+Received: from foss.arm.com ([217.140.110.172]:55966 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728283AbgELOSW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 10:18:22 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 338EB30E;
+        Tue, 12 May 2020 07:18:20 -0700 (PDT)
+Received: from [192.168.2.22] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3379A3F71E;
+        Tue, 12 May 2020 07:18:19 -0700 (PDT)
+Subject: Re: [PATCH v3 kvmtool 32/32] arm/arm64: Add PCI Express 1.1 support
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com
+References: <20200326152438.6218-1-alexandru.elisei@arm.com>
+ <20200326152438.6218-33-alexandru.elisei@arm.com>
+ <2b963524-3153-fc95-7bf2-b60852ea2f22@arm.com>
+ <f1e6746f-6196-a687-f3c5-78a08df31205@arm.com>
+From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ i4aIXCH3Wv6K
+Organization: ARM Ltd.
+Message-ID: <d1e018e7-f443-2710-a00d-e570652d569a@arm.com>
+Date:   Tue, 12 May 2020 15:17:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <1589279480-27722-1-git-send-email-chenhc@lemote.com>
- <1589279480-27722-13-git-send-email-chenhc@lemote.com> <CAHiYmc6yi8Db6QYwNzHzo4rOuuDdt1FRKX+2kowBTfen7Ksadw@mail.gmail.com>
-In-Reply-To: <CAHiYmc6yi8Db6QYwNzHzo4rOuuDdt1FRKX+2kowBTfen7Ksadw@mail.gmail.com>
-From:   Huacai Chen <chenhc@lemote.com>
-Date:   Tue, 12 May 2020 22:17:31 +0800
-Message-ID: <CAAhV-H434OoW+GcLQM66GBu6zzC4w_6swq3d2pTJHQvsjqZKyA@mail.gmail.com>
-Subject: Re: [PATCH V4 12/14] KVM: MIPS: Add CONFIG6 and DIAG registers emulation
-To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <f1e6746f-6196-a687-f3c5-78a08df31205@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Aleksandar,
+On 06/05/2020 14:51, Alexandru Elisei wrote:
 
-On Tue, May 12, 2020 at 8:08 PM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
-> уто, 12. мај 2020. у 12:35 Huacai Chen <chenhc@lemote.com> је написао/ла:
-> >
-> > Loongson-3 has CONFIG6 and DIAG registers which need to be emulate.
->
-> Please just correct the typo: emulate -> emulated.
-Thank you, I'll be correct in V5.
+Hi,
 
-Huacai
-> > CONFIG6 is mostly used to enable/disable FTLB and SFB, while DIAG is
-> > mostly used to flush BTB, ITLB, DTLB, VTLB and FTLB.
-> >
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > ---
-> >  arch/mips/include/asm/kvm_host.h |  7 +++++
-> >  arch/mips/include/asm/mipsregs.h |  7 +++++
-> >  arch/mips/kvm/tlb.c              | 41 ++++++++++++++++++++++++++
-> >  arch/mips/kvm/vz.c               | 62 +++++++++++++++++++++++++++++++++++++++-
-> >  4 files changed, 116 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> > index 3fd2f1c..30b5e33 100644
-> > --- a/arch/mips/include/asm/kvm_host.h
-> > +++ b/arch/mips/include/asm/kvm_host.h
-> > @@ -68,9 +68,11 @@
-> >  #define KVM_REG_MIPS_CP0_CONFIG3       MIPS_CP0_32(16, 3)
-> >  #define KVM_REG_MIPS_CP0_CONFIG4       MIPS_CP0_32(16, 4)
-> >  #define KVM_REG_MIPS_CP0_CONFIG5       MIPS_CP0_32(16, 5)
-> > +#define KVM_REG_MIPS_CP0_CONFIG6       MIPS_CP0_32(16, 6)
-> >  #define KVM_REG_MIPS_CP0_CONFIG7       MIPS_CP0_32(16, 7)
-> >  #define KVM_REG_MIPS_CP0_MAARI         MIPS_CP0_64(17, 2)
-> >  #define KVM_REG_MIPS_CP0_XCONTEXT      MIPS_CP0_64(20, 0)
-> > +#define KVM_REG_MIPS_CP0_DIAG          MIPS_CP0_32(22, 0)
-> >  #define KVM_REG_MIPS_CP0_ERROREPC      MIPS_CP0_64(30, 0)
-> >  #define KVM_REG_MIPS_CP0_KSCRATCH1     MIPS_CP0_64(31, 2)
-> >  #define KVM_REG_MIPS_CP0_KSCRATCH2     MIPS_CP0_64(31, 3)
-> > @@ -256,6 +258,7 @@ struct mips_coproc {
-> >  #define MIPS_CP0_WATCH_LO      18
-> >  #define MIPS_CP0_WATCH_HI      19
-> >  #define MIPS_CP0_TLB_XCONTEXT  20
-> > +#define MIPS_CP0_DIAG          22
-> >  #define MIPS_CP0_ECC           26
-> >  #define MIPS_CP0_CACHE_ERR     27
-> >  #define MIPS_CP0_TAG_LO                28
-> > @@ -927,6 +930,10 @@ void kvm_vz_save_guesttlb(struct kvm_mips_tlb *buf, unsigned int index,
-> >                           unsigned int count);
-> >  void kvm_vz_load_guesttlb(const struct kvm_mips_tlb *buf, unsigned int index,
-> >                           unsigned int count);
-> > +#ifdef CONFIG_CPU_LOONGSON64
-> > +void kvm_loongson_clear_guest_vtlb(void);
-> > +void kvm_loongson_clear_guest_ftlb(void);
-> > +#endif
-> >  #endif
-> >
-> >  void kvm_mips_suspend_mm(int cpu);
-> > diff --git a/arch/mips/include/asm/mipsregs.h b/arch/mips/include/asm/mipsregs.h
-> > index 796fe47..ce40fbf 100644
-> > --- a/arch/mips/include/asm/mipsregs.h
-> > +++ b/arch/mips/include/asm/mipsregs.h
-> > @@ -674,6 +674,9 @@
-> >  #define MIPS_CONF5_CV          (_ULCAST_(1) << 29)
-> >  #define MIPS_CONF5_K           (_ULCAST_(1) << 30)
-> >
-> > +#define MIPS_CONF6_INTIMER     (_ULCAST_(1) << 6)
-> > +#define MIPS_CONF6_EXTIMER     (_ULCAST_(1) << 7)
-> > +#define MIPS_CONF6_SFBEN       (_ULCAST_(1) << 8)
-> >  #define MIPS_CONF6_SYND                (_ULCAST_(1) << 13)
-> >  /* proAptiv FTLB on/off bit */
-> >  #define MIPS_CONF6_FTLBEN      (_ULCAST_(1) << 15)
-> > @@ -993,6 +996,8 @@
-> >  /* Disable Branch Return Cache */
-> >  #define R10K_DIAG_D_BRC                (_ULCAST_(1) << 22)
-> >
-> > +/* Flush BTB */
-> > +#define LOONGSON_DIAG_BTB      (_ULCAST_(1) << 1)
-> >  /* Flush ITLB */
-> >  #define LOONGSON_DIAG_ITLB     (_ULCAST_(1) << 2)
-> >  /* Flush DTLB */
-> > @@ -2825,7 +2830,9 @@ __BUILD_SET_C0(status)
-> >  __BUILD_SET_C0(cause)
-> >  __BUILD_SET_C0(config)
-> >  __BUILD_SET_C0(config5)
-> > +__BUILD_SET_C0(config6)
-> >  __BUILD_SET_C0(config7)
-> > +__BUILD_SET_C0(diag)
-> >  __BUILD_SET_C0(intcontrol)
-> >  __BUILD_SET_C0(intctl)
-> >  __BUILD_SET_C0(srsmap)
-> > diff --git a/arch/mips/kvm/tlb.c b/arch/mips/kvm/tlb.c
-> > index 7cd9216..1418715 100644
-> > --- a/arch/mips/kvm/tlb.c
-> > +++ b/arch/mips/kvm/tlb.c
-> > @@ -20,6 +20,7 @@
-> >
-> >  #include <asm/cpu.h>
-> >  #include <asm/bootinfo.h>
-> > +#include <asm/mipsregs.h>
-> >  #include <asm/mmu_context.h>
-> >  #include <asm/pgtable.h>
-> >  #include <asm/cacheflush.h>
-> > @@ -622,6 +623,46 @@ void kvm_vz_load_guesttlb(const struct kvm_mips_tlb *buf, unsigned int index,
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_vz_load_guesttlb);
-> >
-> > +#ifdef CONFIG_CPU_LOONGSON64
-> > +void kvm_loongson_clear_guest_vtlb(void)
-> > +{
-> > +       int idx = read_gc0_index();
-> > +
-> > +       /* Set root GuestID for root probe and write of guest TLB entry */
-> > +       set_root_gid_to_guest_gid();
-> > +
-> > +       write_gc0_index(0);
-> > +       guest_tlbinvf();
-> > +       write_gc0_index(idx);
-> > +
-> > +       clear_root_gid();
-> > +       set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_vtlb);
-> > +
-> > +void kvm_loongson_clear_guest_ftlb(void)
-> > +{
-> > +       int i;
-> > +       int idx = read_gc0_index();
-> > +
-> > +       /* Set root GuestID for root probe and write of guest TLB entry */
-> > +       set_root_gid_to_guest_gid();
-> > +
-> > +       for (i = current_cpu_data.tlbsizevtlb;
-> > +            i < (current_cpu_data.tlbsizevtlb +
-> > +                    current_cpu_data.tlbsizeftlbsets);
-> > +            i++) {
-> > +               write_gc0_index(i);
-> > +               guest_tlbinvf();
-> > +       }
-> > +       write_gc0_index(idx);
-> > +
-> > +       clear_root_gid();
-> > +       set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_ftlb);
-> > +#endif
-> > +
-> >  #endif
-> >
-> >  /**
-> > diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-> > index e5c751b..fc0f8d5 100644
-> > --- a/arch/mips/kvm/vz.c
-> > +++ b/arch/mips/kvm/vz.c
-> > @@ -127,6 +127,11 @@ static inline unsigned int kvm_vz_config5_guest_wrmask(struct kvm_vcpu *vcpu)
-> >         return mask;
-> >  }
-> >
-> > +static inline unsigned int kvm_vz_config6_guest_wrmask(struct kvm_vcpu *vcpu)
-> > +{
-> > +       return MIPS_CONF6_INTIMER | MIPS_CONF6_EXTIMER | MIPS_CONF6_SYND;
-> > +}
-> > +
-> >  /*
-> >   * VZ optionally allows these additional Config bits to be written by root:
-> >   * Config:     M, [MT]
-> > @@ -181,6 +186,12 @@ static inline unsigned int kvm_vz_config5_user_wrmask(struct kvm_vcpu *vcpu)
-> >         return kvm_vz_config5_guest_wrmask(vcpu) | MIPS_CONF5_MRP;
-> >  }
-> >
-> > +static inline unsigned int kvm_vz_config6_user_wrmask(struct kvm_vcpu *vcpu)
-> > +{
-> > +       return kvm_vz_config6_guest_wrmask(vcpu) |
-> > +               MIPS_CONF6_SFBEN | MIPS_CONF6_FTLBEN | MIPS_CONF6_FTLBDIS;
-> > +}
-> > +
-> >  static gpa_t kvm_vz_gva_to_gpa_cb(gva_t gva)
-> >  {
-> >         /* VZ guest has already converted gva to gpa */
-> > @@ -930,7 +941,8 @@ static enum emulation_result kvm_vz_gpsi_cop0(union mips_instruction inst,
-> >                                     (sel == 2 ||        /* SRSCtl */
-> >                                      sel == 3)) ||      /* SRSMap */
-> >                                    (rd == MIPS_CP0_CONFIG &&
-> > -                                   (sel == 7)) ||      /* Config7 */
-> > +                                   (sel == 6 ||        /* Config6 */
-> > +                                    sel == 7)) ||      /* Config7 */
-> >                                    (rd == MIPS_CP0_LLADDR &&
-> >                                     (sel == 2) &&       /* MAARI */
-> >                                     cpu_guest_has_maar &&
-> > @@ -938,6 +950,11 @@ static enum emulation_result kvm_vz_gpsi_cop0(union mips_instruction inst,
-> >                                    (rd == MIPS_CP0_ERRCTL &&
-> >                                     (sel == 0))) {      /* ErrCtl */
-> >                                 val = cop0->reg[rd][sel];
-> > +#ifdef CONFIG_CPU_LOONGSON64
-> > +                       } else if (rd == MIPS_CP0_DIAG &&
-> > +                                  (sel == 0)) {        /* Diag */
-> > +                               val = cop0->reg[rd][sel];
-> > +#endif
-> >                         } else {
-> >                                 val = 0;
-> >                                 er = EMULATE_FAIL;
-> > @@ -1000,9 +1017,40 @@ static enum emulation_result kvm_vz_gpsi_cop0(union mips_instruction inst,
-> >                                    cpu_guest_has_maar &&
-> >                                    !cpu_guest_has_dyn_maar) {
-> >                                 kvm_write_maari(vcpu, val);
-> > +                       } else if (rd == MIPS_CP0_CONFIG &&
-> > +                                  (sel == 6)) {
-> > +                               cop0->reg[rd][sel] = (int)val;
-> >                         } else if (rd == MIPS_CP0_ERRCTL &&
-> >                                    (sel == 0)) {        /* ErrCtl */
-> >                                 /* ignore the written value */
-> > +#ifdef CONFIG_CPU_LOONGSON64
-> > +                       } else if (rd == MIPS_CP0_DIAG &&
-> > +                                  (sel == 0)) {        /* Diag */
-> > +                               unsigned long flags;
-> > +
-> > +                               local_irq_save(flags);
-> > +                               if (val & LOONGSON_DIAG_BTB) {
-> > +                                       /* Flush BTB */
-> > +                                       set_c0_diag(LOONGSON_DIAG_BTB);
-> > +                               }
-> > +                               if (val & LOONGSON_DIAG_ITLB) {
-> > +                                       /* Flush ITLB */
-> > +                                       set_c0_diag(LOONGSON_DIAG_ITLB);
-> > +                               }
-> > +                               if (val & LOONGSON_DIAG_DTLB) {
-> > +                                       /* Flush DTLB */
-> > +                                       set_c0_diag(LOONGSON_DIAG_DTLB);
-> > +                               }
-> > +                               if (val & LOONGSON_DIAG_VTLB) {
-> > +                                       /* Flush VTLB */
-> > +                                       kvm_loongson_clear_guest_vtlb();
-> > +                               }
-> > +                               if (val & LOONGSON_DIAG_FTLB) {
-> > +                                       /* Flush FTLB */
-> > +                                       kvm_loongson_clear_guest_ftlb();
-> > +                               }
-> > +                               local_irq_restore(flags);
-> > +#endif
-> >                         } else {
-> >                                 er = EMULATE_FAIL;
-> >                         }
-> > @@ -1690,6 +1738,7 @@ static u64 kvm_vz_get_one_regs[] = {
-> >         KVM_REG_MIPS_CP0_CONFIG3,
-> >         KVM_REG_MIPS_CP0_CONFIG4,
-> >         KVM_REG_MIPS_CP0_CONFIG5,
-> > +       KVM_REG_MIPS_CP0_CONFIG6,
-> >  #ifdef CONFIG_64BIT
-> >         KVM_REG_MIPS_CP0_XCONTEXT,
-> >  #endif
-> > @@ -2017,6 +2066,9 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *vcpu,
-> >                         return -EINVAL;
-> >                 *v = read_gc0_config5();
-> >                 break;
-> > +       case KVM_REG_MIPS_CP0_CONFIG6:
-> > +               *v = kvm_read_sw_gc0_config6(cop0);
-> > +               break;
-> >         case KVM_REG_MIPS_CP0_MAAR(0) ... KVM_REG_MIPS_CP0_MAAR(0x3f):
-> >                 if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
-> >                         return -EINVAL;
-> > @@ -2286,6 +2338,14 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu *vcpu,
-> >                         write_gc0_config5(v);
-> >                 }
-> >                 break;
-> > +       case KVM_REG_MIPS_CP0_CONFIG6:
-> > +               cur = kvm_read_sw_gc0_config6(cop0);
-> > +               change = (cur ^ v) & kvm_vz_config6_user_wrmask(vcpu);
-> > +               if (change) {
-> > +                       v = cur ^ change;
-> > +                       kvm_write_sw_gc0_config6(cop0, (int)v);
-> > +               }
-> > +               break;
-> >         case KVM_REG_MIPS_CP0_MAAR(0) ... KVM_REG_MIPS_CP0_MAAR(0x3f):
-> >                 if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
-> >                         return -EINVAL;
-> > --
-> > 2.7.0
-> >
+> On 4/6/20 3:06 PM, André Przywara wrote:
+>> On 26/03/2020 15:24, Alexandru Elisei wrote:
+>>> PCI Express comes with an extended addressing scheme, which directly
+>>> translated into a bigger device configuration space (256->4096 bytes)
+>>> and bigger PCI configuration space (16->256 MB), as well as mandatory
+>>> capabilities (power management [1] and PCI Express capability [2]).
+>>>
+>>> However, our virtio PCI implementation implements version 0.9 of the
+>>> protocol and it still uses transitional PCI device ID's, so we have
+>>> opted to omit the mandatory PCI Express capabilities.For VFIO, the power
+>>> management and PCI Express capability are left for a subsequent patch.
+>>>
+>>> [1] PCI Express Base Specification Revision 1.1, section 7.6
+>>> [2] PCI Express Base Specification Revision 1.1, section 7.8
+>>>
+>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>> ---
+>>>  arm/include/arm-common/kvm-arch.h |  4 +-
+>>>  arm/pci.c                         |  2 +-
+>>>  builtin-run.c                     |  1 +
+>>>  include/kvm/kvm-config.h          |  2 +-
+>>>  include/kvm/pci.h                 | 76 ++++++++++++++++++++++++++++---
+>>>  pci.c                             |  5 +-
+>>>  vfio/pci.c                        | 26 +++++++----
+>>>  7 files changed, 96 insertions(+), 20 deletions(-)
+>>>
+>>> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+>>> index b9d486d5eac2..13c55fa3dc29 100644
+>>> --- a/arm/include/arm-common/kvm-arch.h
+>>> +++ b/arm/include/arm-common/kvm-arch.h
+>>> @@ -23,7 +23,7 @@
+>>>  
+>>>  #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
+>>>  #define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
+>>> -#define ARM_PCI_CFG_SIZE	(1ULL << 24)
+>>> +#define ARM_PCI_CFG_SIZE	(1ULL << 28)
+>> The existence of this symbol seems somewhat odd, there should be no ARM
+>> specific version of the config space size.
+> 
+> The existence of the symbol is required because at the moment PCI Express support
+> is not available for all architecture, and this file needs to be included in
+> pci.h, not the other way around. I agree it's not ideal, but that's the way it is
+> right now.
+> 
+>> Do you know why we don't use the generic PCI_CFG_SIZE here?
+>> At the very least I would expect something like:
+>> #define ARM_PCI_CFG_SIZE	PCI_EXP_CFG_SIZE
+> 
+> We don't use PCI_EXP_CFG_SIZE because it might not be available for all
+> architectures. It is possible it's not there on x86, like the error you have
+> encountered showed, so instead of waiting for someone to report a compilation
+> failure, I would rather use a number from the start.
+
+Ah, OK, fair enough then.
+I just wanted to avoid the impression that this is something
+architecture specific.
+
+>>
+>>>  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
+>>>  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+>>>  
+>>> @@ -50,6 +50,8 @@
+>>>  
+>>>  #define VIRTIO_RING_ENDIAN	(VIRTIO_ENDIAN_LE | VIRTIO_ENDIAN_BE)
+>>>  
+>>> +#define ARCH_HAS_PCI_EXP	1
+>>> +
+>>>  static inline bool arm_addr_in_ioport_region(u64 phys_addr)
+>>>  {
+>>>  	u64 limit = KVM_IOPORT_AREA + ARM_IOPORT_SIZE;
+>>> diff --git a/arm/pci.c b/arm/pci.c
+>>> index ed325fa4a811..2251f627d8b5 100644
+>>> --- a/arm/pci.c
+>>> +++ b/arm/pci.c
+>>> @@ -62,7 +62,7 @@ void pci__generate_fdt_nodes(void *fdt)
+>>>  	_FDT(fdt_property_cell(fdt, "#address-cells", 0x3));
+>>>  	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
+>>>  	_FDT(fdt_property_cell(fdt, "#interrupt-cells", 0x1));
+>>> -	_FDT(fdt_property_string(fdt, "compatible", "pci-host-cam-generic"));
+>>> +	_FDT(fdt_property_string(fdt, "compatible", "pci-host-ecam-generic"));
+>>>  	_FDT(fdt_property(fdt, "dma-coherent", NULL, 0));
+>>>  
+>>>  	_FDT(fdt_property(fdt, "bus-range", bus_range, sizeof(bus_range)));
+>>> diff --git a/builtin-run.c b/builtin-run.c
+>>> index 9cb8c75300eb..def8a1f803ad 100644
+>>> --- a/builtin-run.c
+>>> +++ b/builtin-run.c
+>>> @@ -27,6 +27,7 @@
+>>>  #include "kvm/irq.h"
+>>>  #include "kvm/kvm.h"
+>>>  #include "kvm/pci.h"
+>>> +#include "kvm/vfio.h"
+>>>  #include "kvm/rtc.h"
+>>>  #include "kvm/sdl.h"
+>>>  #include "kvm/vnc.h"
+>>> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+>>> index a052b0bc7582..a1012c57b7a7 100644
+>>> --- a/include/kvm/kvm-config.h
+>>> +++ b/include/kvm/kvm-config.h
+>>> @@ -2,7 +2,6 @@
+>>>  #define KVM_CONFIG_H_
+>>>  
+>>>  #include "kvm/disk-image.h"
+>>> -#include "kvm/vfio.h"
+>>>  #include "kvm/kvm-config-arch.h"
+>>>  
+>>>  #define DEFAULT_KVM_DEV		"/dev/kvm"
+>>> @@ -18,6 +17,7 @@
+>>>  #define MIN_RAM_SIZE_MB		(64ULL)
+>>>  #define MIN_RAM_SIZE_BYTE	(MIN_RAM_SIZE_MB << MB_SHIFT)
+>>>  
+>>> +struct vfio_device_params;
+>>>  struct kvm_config {
+>>>  	struct kvm_config_arch arch;
+>>>  	struct disk_image_params disk_image[MAX_DISK_IMAGES];
+>>> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
+>>> index be75f77fd2cb..71ee9d8cb01f 100644
+>>> --- a/include/kvm/pci.h
+>>> +++ b/include/kvm/pci.h
+>>> @@ -10,6 +10,7 @@
+>>>  #include "kvm/devices.h"
+>>>  #include "kvm/msi.h"
+>>>  #include "kvm/fdt.h"
+>>> +#include "kvm.h"
+>>>  
+>>>  #define pci_dev_err(pci_hdr, fmt, ...) \
+>>>  	pr_err("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
+>>> @@ -32,9 +33,41 @@
+>>>  #define PCI_CONFIG_BUS_FORWARD	0xcfa
+>>>  #define PCI_IO_SIZE		0x100
+>>>  #define PCI_IOPORT_START	0x6200
+>>> -#define PCI_CFG_SIZE		(1ULL << 24)
+>>>  
+>>> -struct kvm;
+>>> +#define PCIE_CAP_REG_VER	0x1
+>>> +#define PCIE_CAP_REG_DEV_LEGACY	(1 << 4)
+>>> +#define PM_CAP_VER		0x3
+>>> +
+>>> +#ifdef ARCH_HAS_PCI_EXP
+>>> +#define PCI_CFG_SIZE		(1ULL << 28)
+>>> +#define PCI_DEV_CFG_SIZE	4096
+>> Maybe use PCI_CFG_SPACE_EXP_SIZE from pci_regs.h?
+> 
+> I cannot do that because it's not available on all distros. I used
+> PCI_CFG_SPACE_EXP_SIZE in the previous iteration, but I changed it when Sami
+> reported a compilation failure on his particular setup (it's mentioned in the
+> changelog).
+
+OK.
+
+>>
+>>> +
+>>> +union pci_config_address {
+>>> +	struct {
+>>> +#if __BYTE_ORDER == __LITTLE_ENDIAN
+>>> +		unsigned	reg_offset	: 2;		/* 1  .. 0  */
+>>> +		unsigned	register_number	: 10;		/* 11 .. 2  */
+>>> +		unsigned	function_number	: 3;		/* 14 .. 12 */
+>>> +		unsigned	device_number	: 5;		/* 19 .. 15 */
+>>> +		unsigned	bus_number	: 8;		/* 27 .. 20 */
+>>> +		unsigned	reserved	: 3;		/* 30 .. 28 */
+>>> +		unsigned	enable_bit	: 1;		/* 31       */
+>>> +#else
+>>> +		unsigned	enable_bit	: 1;		/* 31       */
+>>> +		unsigned	reserved	: 3;		/* 30 .. 28 */
+>>> +		unsigned	bus_number	: 8;		/* 27 .. 20 */
+>>> +		unsigned	device_number	: 5;		/* 19 .. 15 */
+>>> +		unsigned	function_number	: 3;		/* 14 .. 12 */
+>>> +		unsigned	register_number	: 10;		/* 11 .. 2  */
+>>> +		unsigned	reg_offset	: 2;		/* 1  .. 0  */
+>>> +#endif
+>> Just for the records:
+>> I think we agreed on this before, but using a C bitfield to model
+>> hardware defined bits is broken, because the C standard doesn't
+>> guarantee those bits to be consecutive and layed out like we hope it would.
+>> But since we have this issue already with the legacy config space, and
+>> it seems to work (TM), we can fix this later.
+> 
+> Still on the record, it's broken for big endian because only the byte order is
+> different, not the individual bits. But there are other things that are broken for
+> big endian, so not a big deal.
+> 
+>>
+>>> +	};
+>>> +	u32 w;
+>>> +};
+>>> +
+>>> +#else
+>>> +#define PCI_CFG_SIZE		(1ULL << 24)
+>>> +#define PCI_DEV_CFG_SIZE	256
+>> Shall we use PCI_CFG_SPACE_SIZE from the kernel headers here?
+> 
+> I would rather not, for the reasons explained above.
+> 
+>>
+>>>  
+>>>  union pci_config_address {
+>>>  	struct {
+>>> @@ -58,6 +91,8 @@ union pci_config_address {
+>>>  	};
+>>>  	u32 w;
+>>>  };
+>>> +#endif
+>>> +#define PCI_DEV_CFG_MASK	(PCI_DEV_CFG_SIZE - 1)
+>>>  
+>>>  struct msix_table {
+>>>  	struct msi_msg msg;
+>>> @@ -100,6 +135,33 @@ struct pci_cap_hdr {
+>>>  	u8	next;
+>>>  };
+>>>  
+>>> +struct pcie_cap {
+>> I guess this is meant to map to the PCI Express Capability Structure as
+>> described in the PCIe spec?
+>> We would need to add the "packed" attribute then. But actually I am not
+>> a fan of using C language constructs to model specified register
+>> arrangements, the kernel tries to avoid this as well.
+> 
+> I'm not sure what you are suggesting. Should we rewrite the entire PCI emulation
+> code in kvmtool then?
+
+At least not add more of that problematic code, especially if we don't
+need it. Maybe there is a better solution for the operations we will
+need (byte array?), that's hard to say without seeing the code.
+
+>> Actually, looking closer: why do we need this in the first place? I
+>> removed this and struct pm_cap, and it still compiles.
+>> So can we lose those two structures at all? And move the discussion and
+>> implementation (for VirtIO 1.0?) to a later series?
+> 
+> I've answered both points in v2 of the series [1].
+> 
+> [1] https://www.spinics.net/lists/kvm/msg209601.html:
+
+From there:
+>> But more importantly: Do we actually need those definitions? We
+>> don't seem to use them, do we?
+>> And the u8 __pad[PCI_DEV_CFG_SIZE] below should provide the extended
+>> storage space a guest would expect?
+>
+> Yes, we don't use them for the reasons I explained in the commit
+> message. I would rather keep them, because they are required by the
+> PCIE spec.
+
+I don't get the point of adding code / data structures that we don't
+need, especially if it has issues. I understand it's mandatory as per
+the spec, but just adding a struct here doesn't fix this or makes this
+better.
+
+Cheers,
+Andre
+
+> 
+>>
+>>> +	u8 cap;
+>>> +	u8 next;
+>>> +	u16 cap_reg;
+>>> +	u32 dev_cap;
+>>> +	u16 dev_ctrl;
+>>> +	u16 dev_status;
+>>> +	u32 link_cap;
+>>> +	u16 link_ctrl;
+>>> +	u16 link_status;
+>>> +	u32 slot_cap;
+>>> +	u16 slot_ctrl;
+>>> +	u16 slot_status;
+>>> +	u16 root_ctrl;
+>>> +	u16 root_cap;
+>>> +	u32 root_status;
+>>> +};
+>>> +
+>>> +struct pm_cap {
+>>> +	u8 cap;
+>>> +	u8 next;
+>>> +	u16 pmc;
+>>> +	u16 pmcsr;
+>>> +	u8 pmcsr_bse;
+>>> +	u8 data;
+>>> +};
+>>> +
+>>>  struct pci_device_header;
+>>>  
+>>>  typedef int (*bar_activate_fn_t)(struct kvm *kvm,
+>>> @@ -110,14 +172,12 @@ typedef int (*bar_deactivate_fn_t)(struct kvm *kvm,
+>>>  				   int bar_num, void *data);
+>>>  
+>>>  #define PCI_BAR_OFFSET(b)	(offsetof(struct pci_device_header, bar[b]))
+>>> -#define PCI_DEV_CFG_SIZE	256
+>>> -#define PCI_DEV_CFG_MASK	(PCI_DEV_CFG_SIZE - 1)
+>>>  
+>>>  struct pci_config_operations {
+>>>  	void (*write)(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>>> -		      u8 offset, void *data, int sz);
+>>> +		      u16 offset, void *data, int sz);
+>>>  	void (*read)(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>>> -		     u8 offset, void *data, int sz);
+>>> +		     u16 offset, void *data, int sz);
+>>>  };
+>>>  
+>>>  struct pci_device_header {
+>>> @@ -147,6 +207,10 @@ struct pci_device_header {
+>>>  			u8		min_gnt;
+>>>  			u8		max_lat;
+>>>  			struct msix_cap msix;
+>>> +#ifdef ARCH_HAS_PCI_EXP
+>>> +			struct pm_cap pm;
+>>> +			struct pcie_cap pcie;
+>>> +#endif
+>>>  		} __attribute__((packed));
+>>>  		/* Pad to PCI config space size */
+>>>  		u8	__pad[PCI_DEV_CFG_SIZE];
+>>> diff --git a/pci.c b/pci.c
+>>> index 68ece65441a6..b471209a6efc 100644
+>>> --- a/pci.c
+>>> +++ b/pci.c
+>>> @@ -400,7 +400,8 @@ static void pci_config_bar_wr(struct kvm *kvm,
+>>>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
+>>>  {
+>>>  	void *base;
+>>> -	u8 bar, offset;
+>>> +	u8 bar;
+>>> +	u16 offset;
+>>>  	struct pci_device_header *pci_hdr;
+>>>  	u8 dev_num = addr.device_number;
+>>>  	u32 value = 0;
+>>> @@ -439,7 +440,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+>>>  
+>>>  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size)
+>>>  {
+>>> -	u8 offset;
+>>> +	u16 offset;
+>>>  	struct pci_device_header *pci_hdr;
+>>>  	u8 dev_num = addr.device_number;
+>>>  
+>>> diff --git a/vfio/pci.c b/vfio/pci.c
+>>> index 2b891496547d..6b8726227ea0 100644
+>>> --- a/vfio/pci.c
+>>> +++ b/vfio/pci.c
+>>> @@ -311,7 +311,7 @@ out_unlock:
+>>>  }
+>>>  
+>>>  static void vfio_pci_msix_cap_write(struct kvm *kvm,
+>>> -				    struct vfio_device *vdev, u8 off,
+>>> +				    struct vfio_device *vdev, u16 off,
+>>>  				    void *data, int sz)
+>>>  {
+>>>  	struct vfio_pci_device *pdev = &vdev->pci;
+>>> @@ -343,7 +343,7 @@ static void vfio_pci_msix_cap_write(struct kvm *kvm,
+>>>  }
+>>>  
+>>>  static int vfio_pci_msi_vector_write(struct kvm *kvm, struct vfio_device *vdev,
+>>> -				     u8 off, u8 *data, u32 sz)
+>>> +				     u16 off, u8 *data, u32 sz)
+>>>  {
+>>>  	size_t i;
+>>>  	u32 mask = 0;
+>>> @@ -391,7 +391,7 @@ static int vfio_pci_msi_vector_write(struct kvm *kvm, struct vfio_device *vdev,
+>>>  }
+>>>  
+>>>  static void vfio_pci_msi_cap_write(struct kvm *kvm, struct vfio_device *vdev,
+>>> -				   u8 off, u8 *data, u32 sz)
+>>> +				   u16 off, u8 *data, u32 sz)
+>>>  {
+>>>  	u8 ctrl;
+>>>  	struct msi_msg msg;
+>>> @@ -536,7 +536,7 @@ out:
+>>>  }
+>>>  
+>>>  static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>>> -			      u8 offset, void *data, int sz)
+>>> +			      u16 offset, void *data, int sz)
+>>>  {
+>>>  	struct vfio_region_info *info;
+>>>  	struct vfio_pci_device *pdev;
+>>> @@ -554,7 +554,7 @@ static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr
+>>>  }
+>>>  
+>>>  static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hdr,
+>>> -			       u8 offset, void *data, int sz)
+>>> +			       u16 offset, void *data, int sz)
+>>>  {
+>>>  	struct vfio_region_info *info;
+>>>  	struct vfio_pci_device *pdev;
+>>> @@ -638,15 +638,17 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
+>>>  {
+>>>  	int ret;
+>>>  	size_t size;
+>>> -	u8 pos, next;
+>>> +	u16 pos, next;
+>>>  	struct pci_cap_hdr *cap;
+>>> -	u8 virt_hdr[PCI_DEV_CFG_SIZE];
+>>> +	u8 *virt_hdr;
+>>>  	struct vfio_pci_device *pdev = &vdev->pci;
+>>>  
+>>>  	if (!(pdev->hdr.status & PCI_STATUS_CAP_LIST))
+>>>  		return 0;
+>>>  
+>>> -	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE);
+>>> +	virt_hdr = calloc(1, PCI_DEV_CFG_SIZE);
+>>> +	if (!virt_hdr)
+>>> +		return -errno;
+>> There are two places where we return in this function, we don't seem to
+>> free virt_hdr in those cases. Looks like a job for your beloved goto ;-)
+>>
+> Indeed, I'll do that.
+> 
+> Thanks,
+> Alex
+> 
+
