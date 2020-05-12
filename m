@@ -2,114 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E55F61CFB07
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 18:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFD781CFB58
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 18:53:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727889AbgELQj6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 12:39:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727120AbgELQj6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 12:39:58 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E89C061A0C
-        for <kvm@vger.kernel.org>; Tue, 12 May 2020 09:39:58 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id f3so14692211ioj.1
-        for <kvm@vger.kernel.org>; Tue, 12 May 2020 09:39:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tP/faLZShTgp+fPnBxemdUnPXhPkkCPH8J5S52+7MLU=;
-        b=ASZGgjTaWCMSfoQTN/jSdtkLyIHDiydjcLiip00K/ZanY8QgGXMuSEQxFzRkc6xg22
-         vN10lF1UkQ3xHNxWZE+x4wCFZSfqSwDDQX40gypYG7ydUN9XOkkv5YOx12ejP4TKnBKd
-         trbq9MJ+Gl/yyePs9oOHruIE6iRqZ7oYeboL6eA/Nk+5y8KxH+lxM9Gs51rikD7jTi/R
-         IWy8qOaZYt9oGkITDvyTPw7TiDSAq7Hgh7+Ey2aihIbGZMcro93gz20zlzz/uCwmuczl
-         Cjirkxj+RQgxmijs12eWPK+JnAEtKjolgIzcUf8ariiLeULaCscg+STnJn9w+w3oiXqY
-         zB4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tP/faLZShTgp+fPnBxemdUnPXhPkkCPH8J5S52+7MLU=;
-        b=HofyvALr7YGUodsVpxgv76yW84N2XVdOGo15kWQR5pNQA09CP67mKTAbjNUY9MhV6s
-         8dLLkYd8tXunYGrDLkpKlcp6Jsa9udXIAznkj1ixv/T4aviIFQwcADZ8aIaNfsFCCkt7
-         Fd7D4rTmJ039zwC07EzJrd4qkqQB24i5PhfOoSJOtMSb6+8BbiH7nQW9PSkYkJEVYI6G
-         yAlllCBC4a71oB9RZ3pNyS+jMGRwzPPs7S65cz4TSfpWuFLrtMegf+1wcjeQF0WT6+Tb
-         gLvtGvrXkgssbkfmwf4pCTAQsnXkMeIx/BjaKbH9oYCVq9Lt6zVcMhPqGJN43c0HSHX3
-         i5GA==
-X-Gm-Message-State: AGi0PuYb3smxciRqzPuJTzfwo2Mgl0TN2lVKFmUfaDc/KwxLQqb9puKE
-        /bpk2pqOvIEppYefqHVejmTv/LZ4HbJbAjaw0UMg4g==
-X-Google-Smtp-Source: APiQypJ4SiTUd1EPl8BSHjrzsB/uekp7Rpjwcdx9bsqge9HnpqrfDoFAJtY3wySPH0ydPFr8uOgKqSjXeUI/bxAolpo=
-X-Received: by 2002:a6b:1cc:: with SMTP id 195mr9820714iob.177.1589301596233;
- Tue, 12 May 2020 09:39:56 -0700 (PDT)
+        id S1727099AbgELQxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 12:53:22 -0400
+Received: from foss.arm.com ([217.140.110.172]:58652 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725987AbgELQxW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 12:53:22 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5104B1FB;
+        Tue, 12 May 2020 09:53:21 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A5E93F305;
+        Tue, 12 May 2020 09:53:19 -0700 (PDT)
+Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
+ struct kvm
+To:     James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-4-maz@kernel.org>
+ <a7c8207c-9061-ad0e-c9f8-64c995e928b6@arm.com>
+ <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <6518439c-65b7-1e87-a21d-a053d75c0514@arm.com>
+Date:   Tue, 12 May 2020 17:53:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
- <158923998430.20128.2992701977443921714.stgit@naples-babu.amd.com>
-In-Reply-To: <158923998430.20128.2992701977443921714.stgit@naples-babu.amd.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 12 May 2020 09:39:44 -0700
-Message-ID: <CALMp9eSAnkrUaBgtDAu7CDM=-vh3Cb9fVikrfOt30K1EXCqmBw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] KVM: x86: Move pkru save/restore to x86.c
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        mchehab+samsung@kernel.org, changbin.du@intel.com,
-        Nadav Amit <namit@vmware.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        yang.shi@linux.alibaba.com,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        anshuman.khandual@arm.com, Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        steven.price@arm.com, rppt@linux.vnet.ibm.com, peterx@redhat.com,
-        Dan Williams <dan.j.williams@intel.com>,
-        Arjun Roy <arjunroy@google.com>, logang@deltatee.com,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, justin.he@arm.com,
-        robin.murphy@arm.com, ira.weiny@intel.com,
-        Kees Cook <keescook@chromium.org>,
-        Juergen Gross <jgross@suse.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        pawan.kumar.gupta@linux.intel.com,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
-        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 11, 2020 at 4:33 PM Babu Moger <babu.moger@amd.com> wrote:
->
-> MPK feature is supported by both VMX and SVM. So we can
-> safely move pkru state save/restore to common code. Also
-> move all the pkru data structure to kvm_vcpu_arch.
->
-> Also fixes the problem Jim Mattson pointed and suggested below.
->
-> "Though rdpkru and wrpkru are contingent upon CR4.PKE, the PKRU
-> resource isn't. It can be read with XSAVE and written with XRSTOR.
-> So, if we don't set the guest PKRU value here(kvm_load_guest_xsave_state),
-> the guest can read the host value.
->
-> In case of kvm_load_host_xsave_state, guest with CR4.PKE clear could
-> potentially use XRSTOR to change the host PKRU value"
->
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+Hi,
 
-I would do the bugfix as a separate commit, to ease backporting it to
-the stable branches.
+On 5/12/20 12:17 PM, James Morse wrote:
+> Hi Alex, Marc,
+>
+> (just on this last_vcpu_ran thing...)
+>
+> On 11/05/2020 17:38, Alexandru Elisei wrote:
+>> On 4/22/20 1:00 PM, Marc Zyngier wrote:
+>>> From: Christoffer Dall <christoffer.dall@arm.com>
+>>>
+>>> As we are about to reuse our stage 2 page table manipulation code for
+>>> shadow stage 2 page tables in the context of nested virtualization, we
+>>> are going to manage multiple stage 2 page tables for a single VM.
+>>>
+>>> This requires some pretty invasive changes to our data structures,
+>>> which moves the vmid and pgd pointers into a separate structure and
+>>> change pretty much all of our mmu code to operate on this structure
+>>> instead.
+>>>
+>>> The new structure is called struct kvm_s2_mmu.
+>>>
+>>> There is no intended functional change by this patch alone.
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 7dd8fefa6aecd..664a5d92ae9b8 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -63,19 +63,32 @@ struct kvm_vmid {
+>>>  	u32    vmid;
+>>>  };
+>>>  
+>>> -struct kvm_arch {
+>>> +struct kvm_s2_mmu {
+>>>  	struct kvm_vmid vmid;
+>>>  
+>>> -	/* stage2 entry level table */
+>>> -	pgd_t *pgd;
+>>> -	phys_addr_t pgd_phys;
+>>> -
+>>> -	/* VTCR_EL2 value for this VM */
+>>> -	u64    vtcr;
+>>> +	/*
+>>> +	 * stage2 entry level table
+>>> +	 *
+>>> +	 * Two kvm_s2_mmu structures in the same VM can point to the same pgd
+>>> +	 * here.  This happens when running a non-VHE guest hypervisor which
+>>> +	 * uses the canonical stage 2 page table for both vEL2 and for vEL1/0
+>>> +	 * with vHCR_EL2.VM == 0.
+>> It makes more sense to me to say that a non-VHE guest hypervisor will use the
+>> canonical stage *1* page table when running at EL2
+> Can KVM say anything about stage1? Its totally under the the guests control even at vEL2...
+
+It just occurred to me that "canonical stage 2 page table" refers to the L0
+hypervisor stage 2, not to the L1 hypervisor stage 2. If you don't mind my
+suggestion, perhaps the comment can be slightly improved to avoid any confusion?
+Maybe something along the lines of "[..] This happens when running a non-VHE guest
+hypervisor, in which case we use the canonical stage 2 page table for both vEL2
+and for vEL1/0 with vHCR_EL2.VM == 0".
+
+Thanks,
+Alex
