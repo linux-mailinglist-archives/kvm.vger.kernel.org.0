@@ -2,332 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 166B31CFCD4
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 20:07:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8875E1CFCE9
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 20:12:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730763AbgELSHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 14:07:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30969 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726465AbgELSHM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 May 2020 14:07:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589306830;
+        id S1730610AbgELSME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 14:12:04 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:49754 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726300AbgELSMD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 14:12:03 -0400
+Received: from zn.tnic (p200300EC2F0A9D0078F56FA374005E53.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:9d00:78f5:6fa3:7400:5e53])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CFE771EC0103;
+        Tue, 12 May 2020 20:12:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1589307122;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EiXzHCHsEp9QkdzpBux6/llPUJHd2DVaMn3hAkzR5d8=;
-        b=hfGHLWHMfU5bHV8k9iOiG7J7ycetYEKt546rjlZ3d0CkcwD+/+FG7lBXYUAORuATA282Kw
-        5Muj8t+sQn9KrzsztbvliKggDKwtuK6kRuAAm7uPGixEOqcMByoQ451HjFl6al95qCe75E
-        fIMX1h1VS+TsyhZkriJz/WljVlDsHLo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-93Uyic9fO2Wz9SFRYWk_YQ-1; Tue, 12 May 2020 14:07:07 -0400
-X-MC-Unique: 93Uyic9fO2Wz9SFRYWk_YQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6903872FE0;
-        Tue, 12 May 2020 18:07:05 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-116-85.rdu2.redhat.com [10.10.116.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2475938E;
-        Tue, 12 May 2020 18:07:05 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 9D350220C05; Tue, 12 May 2020 14:07:04 -0400 (EDT)
-Date:   Tue, 12 May 2020 14:07:04 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=n06HkraspKjUYFH+gKoPebqkaQ8Z/x23WE/L9W2ArvQ=;
+        b=JNNu10YPtjFu/VVc212xf7QxTlLs+MZAbdqCSoX8g20Tu0FKcIuFtgffY4hzflLvmWuLPA
+        M3J+77wtqImyqZ1srxYpVtviMu9tPFZdZk4CfnaTZi6FNvprR/upzHkEf5Fx+fCnzfd/Kp
+        AKsWTgYnpfq0TG8sscy1JWXmai+V9rU=
+Date:   Tue, 12 May 2020 20:11:57 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/8] KVM: x86: interrupt based APF page-ready event
- delivery
-Message-ID: <20200512180704.GE138129@redhat.com>
-References: <20200511164752.2158645-1-vkuznets@redhat.com>
- <20200511164752.2158645-5-vkuznets@redhat.com>
- <20200512142411.GA138129@redhat.com>
- <87lflxm9sy.fsf@vitty.brq.redhat.com>
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 23/75] x86/boot/compressed/64: Setup GHCB Based VC
+ Exception handler
+Message-ID: <20200512181157.GD6859@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-24-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87lflxm9sy.fsf@vitty.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200428151725.31091-24-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 12, 2020 at 05:50:53PM +0200, Vitaly Kuznetsov wrote:
-> Vivek Goyal <vgoyal@redhat.com> writes:
+On Tue, Apr 28, 2020 at 05:16:33PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
-> > On Mon, May 11, 2020 at 06:47:48PM +0200, Vitaly Kuznetsov wrote:
-> >> Concerns were expressed around APF delivery via synthetic #PF exception as
-> >> in some cases such delivery may collide with real page fault. For type 2
-> >> (page ready) notifications we can easily switch to using an interrupt
-> >> instead. Introduce new MSR_KVM_ASYNC_PF_INT mechanism and deprecate the
-> >> legacy one.
-> >> 
-> >> One notable difference between the two mechanisms is that interrupt may not
-> >> get handled immediately so whenever we would like to deliver next event
-> >> (regardless of its type) we must be sure the guest had read and cleared
-> >> previous event in the slot.
-> >> 
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> ---
-> >>  Documentation/virt/kvm/msr.rst       | 91 +++++++++++++++++---------
-> >>  arch/x86/include/asm/kvm_host.h      |  4 +-
-> >>  arch/x86/include/uapi/asm/kvm_para.h |  6 ++
-> >>  arch/x86/kvm/x86.c                   | 95 ++++++++++++++++++++--------
-> >>  4 files changed, 140 insertions(+), 56 deletions(-)
-> >> 
-> >> diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
-> >> index 33892036672d..f988a36f226a 100644
-> >> --- a/Documentation/virt/kvm/msr.rst
-> >> +++ b/Documentation/virt/kvm/msr.rst
-> >> @@ -190,35 +190,54 @@ MSR_KVM_ASYNC_PF_EN:
-> >>  	0x4b564d02
-> >>  
-> >>  data:
-> >> -	Bits 63-6 hold 64-byte aligned physical address of a
-> >> -	64 byte memory area which must be in guest RAM and must be
-> >> -	zeroed. Bits 5-3 are reserved and should be zero. Bit 0 is 1
-> >> -	when asynchronous page faults are enabled on the vcpu 0 when
-> >> -	disabled. Bit 1 is 1 if asynchronous page faults can be injected
-> >> -	when vcpu is in cpl == 0. Bit 2 is 1 if asynchronous page faults
-> >> -	are delivered to L1 as #PF vmexits.  Bit 2 can be set only if
-> >> -	KVM_FEATURE_ASYNC_PF_VMEXIT is present in CPUID.
-> >> -
-> >> -	First 4 byte of 64 byte memory location will be written to by
-> >> -	the hypervisor at the time of asynchronous page fault (APF)
-> >> -	injection to indicate type of asynchronous page fault. Value
-> >> -	of 1 means that the page referred to by the page fault is not
-> >> -	present. Value 2 means that the page is now available. Disabling
-> >> -	interrupt inhibits APFs. Guest must not enable interrupt
-> >> -	before the reason is read, or it may be overwritten by another
-> >> -	APF. Since APF uses the same exception vector as regular page
-> >> -	fault guest must reset the reason to 0 before it does
-> >> -	something that can generate normal page fault.  If during page
-> >> -	fault APF reason is 0 it means that this is regular page
-> >> -	fault.
-> >> -
-> >> -	During delivery of type 1 APF cr2 contains a token that will
-> >> -	be used to notify a guest when missing page becomes
-> >> -	available. When page becomes available type 2 APF is sent with
-> >> -	cr2 set to the token associated with the page. There is special
-> >> -	kind of token 0xffffffff which tells vcpu that it should wake
-> >> -	up all processes waiting for APFs and no individual type 2 APFs
-> >> -	will be sent.
-> >> +	Asynchronous page fault (APF) control MSR.
-> >> +
-> >> +	Bits 63-6 hold 64-byte aligned physical address of a 64 byte memory area
-> >> +	which must be in guest RAM and must be zeroed. This memory is expected
-> >> +	to hold a copy of the following structure::
-> >> +
-> >> +	  struct kvm_vcpu_pv_apf_data {
-> >> +		__u32 reason;
-> >> +		__u32 pageready_token;
-> >> +		__u8 pad[56];
-> >> +		__u32 enabled;
-> >> +	  };
-> >> +
-> >> +	Bits 5-4 of the MSR are reserved and should be zero. Bit 0 is set to 1
-> >> +	when asynchronous page faults are enabled on the vcpu, 0 when disabled.
-> >> +	Bit 1 is 1 if asynchronous page faults can be injected when vcpu is in
-> >> +	cpl == 0. Bit 2 is 1 if asynchronous page faults are delivered to L1 as
-> >> +	#PF vmexits.  Bit 2 can be set only if KVM_FEATURE_ASYNC_PF_VMEXIT is
-> >> +	present in CPUID. Bit 3 enables interrupt based delivery of type 2
-> >> +	(page present) events.
-> >
-> > Hi Vitaly,
-> >
-> > "Bit 3 enables interrupt based delivery of type 2 events". So one has to
-> > opt in to enable it. If this bit is 0, we will continue to deliver
-> > page ready events using #PF? This probably will be needed to ensure
-> > backward compatibility also.
-> >
+> Install an exception handler for #VC exception that uses a GHCB. Also
+> add the infrastructure for handling different exit-codes by decoding
+> the instruction that caused the exception and error handling.
 > 
-> No, as Paolo suggested we don't enable the mechanism at all if bit3 is
-> 0. Legacy (unaware) guests will think that they've enabled the mechanism
-> but it won't work, they won't see any APF notifications.
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/Kconfig                           |   1 +
+>  arch/x86/boot/compressed/Makefile          |   3 +
+>  arch/x86/boot/compressed/idt_64.c          |   4 +
+>  arch/x86/boot/compressed/idt_handlers_64.S |   3 +-
+>  arch/x86/boot/compressed/misc.c            |   7 +
+>  arch/x86/boot/compressed/misc.h            |   7 +
+>  arch/x86/boot/compressed/sev-es.c          | 110 +++++++++++++++
+>  arch/x86/include/asm/sev-es.h              |  39 ++++++
+>  arch/x86/include/uapi/asm/svm.h            |   1 +
+>  arch/x86/kernel/sev-es-shared.c            | 154 +++++++++++++++++++++
+>  10 files changed, 328 insertions(+), 1 deletion(-)
 > 
-> >> +
-> >> +	First 4 byte of 64 byte memory location ('reason') will be written to
-> >> +	by the hypervisor at the time APF type 1 (page not present) injection.
-> >> +	The only possible values are '0' and '1'.
-> >
-> > What do "reason" values "0" and "1" signify?
-> >
-> > Previously this value could be 1 for PAGE_NOT_PRESENT and 2 for
-> > PAGE_READY. So looks like we took away reason "PAGE_READY" because it will
-> > be delivered using interrupts.
-> >
-> > But that seems like an opt in. If that's the case, then we should still
-> > retain PAGE_READY reason. If we are getting rid of page_ready using
-> > #PF, then interrupt based deliver should not be optional. What am I
-> > missing.
-> 
-> It is not optional now :-)
-> 
-> >
-> > Also previous text had following line.
-> >
-> > "Guest must not enable interrupt before the reason is read, or it may be
-> >  overwritten by another APF".
-> >
-> > So this is not a requirement anymore?
-> >
-> 
-> It still stands for type 1 (page not present) events.
-> 
-> >> Type 1 events are currently
-> >> +	always delivered as synthetic #PF exception. During delivery of type 1
-> >> +	APF CR2 register contains a token that will be used to notify the guest
-> >> +	when missing page becomes available. Guest is supposed to write '0' to
-> >> +	the location when it is done handling type 1 event so the next one can
-> >> +	be delivered.
-> >> +
-> >> +	Note, since APF type 1 uses the same exception vector as regular page
-> >> +	fault, guest must reset the reason to '0' before it does something that
-> >> +	can generate normal page fault. If during a page fault APF reason is '0'
-> >> +	it means that this is regular page fault.
-> >> +
-> >> +	Bytes 5-7 of 64 byte memory location ('pageready_token') will be written
-> >> +	to by the hypervisor at the time of type 2 (page ready) event injection.
-> >> +	The content of these bytes is a token which was previously delivered as
-> >> +	type 1 event. The event indicates the page in now available. Guest is
-> >> +	supposed to write '0' to the location when it is done handling type 2
-> >> +	event so the next one can be delivered. MSR_KVM_ASYNC_PF_INT MSR
-> >> +	specifying the interrupt vector for type 2 APF delivery needs to be
-> >> +	written to before enabling APF mechanism in MSR_KVM_ASYNC_PF_EN.
-> >
-> > What is supposed to be value of "reason" field for type2 events. I
-> > had liked previous values "KVM_PV_REASON_PAGE_READY" and
-> > "KVM_PV_REASON_PAGE_NOT_PRESENT". Name itself made it plenty clear, what
-> > it means. Also it allowed for easy extension where this protocol could
-> > be extended to deliver other "reasons", like error.
-> >
-> > So if we are using a common structure "kvm_vcpu_pv_apf_data" to deliver
-> > type1 and type2 events, to me it makes sense to retain existing
-> > KVM_PV_REASON_PAGE_READY and KVM_PV_REASON_PAGE_NOT_PRESENT. Just that
-> > in new scheme of things, KVM_PV_REASON_PAGE_NOT_PRESENT will be delivered
-> > using #PF (and later possibly using #VE) and KVM_PV_REASON_PAGE_READY
-> > will be delivered using interrupt.
-> 
-> We use different fields for page-not-present and page-ready events so
-> there is no intersection. If we start setting KVM_PV_REASON_PAGE_READY
-> to 'reason' we may accidentally destroy a 'page-not-present' event.
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 1197b5596d5a..2ba5f74f186d 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -1523,6 +1523,7 @@ config AMD_MEM_ENCRYPT
+>  	select DYNAMIC_PHYSICAL_MASK
+>  	select ARCH_USE_MEMREMAP_PROT
+>  	select ARCH_HAS_FORCE_DMA_UNENCRYPTED
+> +	select INSTRUCTION_DECODER
+>  	---help---
+>  	  Say yes to enable support for the encryption of system memory.
+>  	  This requires an AMD processor that supports Secure Memory
+> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+> index a7847a1ef63a..8372b85c9c0e 100644
+> --- a/arch/x86/boot/compressed/Makefile
+> +++ b/arch/x86/boot/compressed/Makefile
+> @@ -41,6 +41,9 @@ KBUILD_CFLAGS += -Wno-pointer-sign
+>  KBUILD_CFLAGS += $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
+>  KBUILD_CFLAGS += -fno-asynchronous-unwind-tables
+>  
+> +# sev-es.c inludes generated $(objtree)/arch/x86/lib/inat-tables.c
 
-This is confusing. So you mean at one point of time we might be using
-same shared data structure for two events.
+	      "includes"
 
-- ->reason will be set to 1 and you will inject page_not_present
-  execption.
+> +CFLAGS_sev-es.o += -I$(objtree)/arch/x86/lib/
 
-- If some page gets ready, you will now set ->token and queue 
-  page ready exception. 
+Does it?
 
-Its very confusing. Can't we serialize the delivery of these events. So
-that only one is in progress so that this structure is used by one event
-at a time.
+I see
 
-Also how do I extend it now to do error delivery. Please keep that in
-mind. We don't want to be redesigning this stuff again. Its already
-very complicated.
+#include "../../lib/inat.c"
+#include "../../lib/insn.c"
 
-I really need ->reason field to be usable in both the paths so that
-error can be delivered.
+only and with the above CFLAGS-line removed, it builds still.
 
-And this notion of same structure being shared across multiple events
-at the same time is just going to create more confusion, IMHO. If we
-can decouple it by serializing it, that definitely feels simpler to
-understand.
+Leftover from earlier?
 
-> 
-> With this patchset we have two completely separate channels:
-> 1) Page-not-present goes through #PF and 'reason' in struct
-> kvm_vcpu_pv_apf_data.
-> 2) Page-ready goes through interrupt and 'pageready_token' in the same
-> kvm_vcpu_pv_apf_data.
-> 
-> >
-> >> +
-> >> +	Note, previously, type 2 (page present) events were delivered via the
-> >> +	same #PF exception as type 1 (page not present) events but this is
-> >> +	now deprecated.
-> >
-> >> If bit 3 (interrupt based delivery) is not set APF events are not delivered.
-> >
-> > So all the old guests which were getting async pf will suddenly find
-> > that async pf does not work anymore (after hypervisor update). And
-> > some of them might report it as performance issue (if there were any
-> > performance benefits to be had with async pf).
-> 
-> We still do APF_HALT but generally yes, there might be some performance
-> implications. My RFC was preserving #PF path but the suggestion was to
-> retire it completely. (and I kinda like it because it makes a lot of
-> code go away)
+> +
+>  KBUILD_AFLAGS  := $(KBUILD_CFLAGS) -D__ASSEMBLY__
+>  GCOV_PROFILE := n
+>  UBSAN_SANITIZE :=n
+> diff --git a/arch/x86/boot/compressed/idt_64.c b/arch/x86/boot/compressed/idt_64.c
+> index f8295d68b3e1..44d20c4f47c9 100644
+> --- a/arch/x86/boot/compressed/idt_64.c
+> +++ b/arch/x86/boot/compressed/idt_64.c
+> @@ -45,5 +45,9 @@ void load_stage2_idt(void)
+>  
+>  	set_idt_entry(X86_TRAP_PF, boot_page_fault);
+>  
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +	set_idt_entry(X86_TRAP_VC, boot_stage2_vc);
+> +#endif
 
-Ok. I don't have strong opinion here. If paolo likes it this way, so be
-it. :-)
+if IS_ENABLED()...
 
-> 
-> >
-> > [..]
-> >>  
-> >>  bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
-> >>  {
-> >> -	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
-> >> +	if (!kvm_pv_async_pf_enabled(vcpu))
-> >>  		return true;
-> >
-> > What does above mean. If async pf is not enabled, then it returns true,
-> > implying one can inject async page present. But if async pf is not
-> > enabled, there is no need to inject these events.
-> 
-> AFAIU this is a protection agains guest suddenly disabling APF
-> mechanism.
+...
 
-Can we provide that protection in MSR implementation. That is once APF
-is enabled, it can't be disabled. Or it is a feature that we allow
-guest to disable APF and want it that way?
+> +static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
+> +{
+> +	char buffer[MAX_INSN_SIZE];
+> +	enum es_result ret;
+> +
+> +	memcpy(buffer, (unsigned char *)ctxt->regs->ip, MAX_INSN_SIZE);
+> +
+> +	insn_init(&ctxt->insn, buffer, MAX_INSN_SIZE, 1);
+> +	insn_get_length(&ctxt->insn);
+> +
+> +	ret = ctxt->insn.immediate.got ? ES_OK : ES_DECODE_FAILED;
 
-> What do we do with all the 'page ready' events after, we
-> can't deliver them anymore. So we just eat them (hoping guest will
-> unfreeze all processes on its own before disabling the mechanism).
-> 
-> It is the existing logic, my patch doesn't change it.
+Why are we checking whether the immediate? insn_get_length() sets
+insn->length unconditionally while insn_get_immediate() can error out
+and not set ->got... ?
 
-I see its existing logic. Just it is very confusing and will be good
-if we can atleast explain it with some comments.
+> +
+> +	return ret;
+> +}
 
-I don't know what to make out of this.
+...
 
-bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
-{
-        if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
-                return true;
-        else
-                return kvm_can_do_async_pf(vcpu);
-}
+> +static bool sev_es_setup_ghcb(void)
+> +{
+> +	if (!sev_es_negotiate_protocol())
+> +		sev_es_terminate(GHCB_SEV_ES_REASON_PROTOCOL_UNSUPPORTED);
+> +
+> +	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
+> +		return false;
+> +
+> +	/* Page is now mapped decrypted, clear it */
+> +	memset(&boot_ghcb_page, 0, sizeof(boot_ghcb_page));
+> +
+> +	boot_ghcb = &boot_ghcb_page;
+> +
+> +	/* Initialize lookup tables for the instruction decoder */
+> +	inat_init_tables();
 
-If feature is disabled, then do inject async pf page present. If feature
-is enabled and check whether we can inject async pf right now or not.
+Yeah, that call doesn't logically belong in this function AFAICT as this
+function should setup the GHCB only. You can move it to the caller.
 
-It probably will help if this check if feature being enabled/disabled
-is outside kvm_arch_can_inject_async_page_present() at the callsite
-of kvm_arch_can_inject_async_page_present() and there we explain that
-why it is important to inject page ready events despite the fact
-that feature is disabled.
+> +
+> +	return true;
+> +}
+> +
+> +void sev_es_shutdown_ghcb(void)
+> +{
+> +	if (!boot_ghcb)
+> +		return;
+> +
+> +	/*
+> +	 * GHCB Page must be flushed from the cache and mapped encrypted again.
+> +	 * Otherwise the running kernel will see strange cache effects when
+> +	 * trying to use that page.
+> +	 */
+> +	if (set_page_encrypted((unsigned long)&boot_ghcb_page))
+> +		error("Can't map GHCB page encrypted");
 
-Thanks
-Vivek
+Is that error() call enough?
 
+Shouldn't we BUG_ON() here or mark that page Reserved or so, so that
+nothing uses it during the system lifetime and thus avoid the strange
+cache effects?
+
+...
+
+> +static enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
+> +					  struct es_em_ctxt *ctxt,
+> +					  u64 exit_code, u64 exit_info_1,
+> +					  u64 exit_info_2)
+> +{
+> +	enum es_result ret;
+> +
+> +	/* Fill in protocol and format specifiers */
+> +	ghcb->protocol_version = GHCB_PROTOCOL_MAX;
+> +	ghcb->ghcb_usage       = GHCB_DEFAULT_USAGE;
+> +
+> +	ghcb_set_sw_exit_code(ghcb, exit_code);
+> +	ghcb_set_sw_exit_info_1(ghcb, exit_info_1);
+> +	ghcb_set_sw_exit_info_2(ghcb, exit_info_2);
+> +
+> +	sev_es_wr_ghcb_msr(__pa(ghcb));
+> +	VMGEXIT();
+> +
+> +	if ((ghcb->save.sw_exit_info_1 & 0xffffffff) == 1) {
+					^^^^^^^^^^^
+
+(1UL << 32) - 1
+
+I guess.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
