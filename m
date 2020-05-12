@@ -2,227 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8E841CFF43
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 22:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1FAA1D000F
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 23:03:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730642AbgELUbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 16:31:05 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:16168 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725938AbgELUbF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 16:31:05 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ebb077c0000>; Tue, 12 May 2020 13:30:52 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 12 May 2020 13:31:04 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 12 May 2020 13:31:04 -0700
-Received: from [10.40.103.94] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 May
- 2020 20:30:58 +0000
-Subject: Re: [PATCH Kernel v18 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
- <1588607939-26441-6-git-send-email-kwankhede@nvidia.com>
- <20200506162511.032bb1e6@w520.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <e4a5cb87-3bc3-ff1b-9ffb-479a4d418922@nvidia.com>
-Date:   Wed, 13 May 2020 02:00:54 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200506162511.032bb1e6@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+        id S1731250AbgELVDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 17:03:42 -0400
+Received: from mail-eopbgr1300129.outbound.protection.outlook.com ([40.107.130.129]:35042
+        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725938AbgELVDl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 17:03:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gH2n90+8hxdotGqT36V3NEzZz6vPEN21xyV1y8O95HMwiNZ6RBl7lIKP9TKwwMzii02+UQehi9h8H9fWcT1i9MklCqJdse8Dn4iFWwLFhXXZvpsfDm763GAmdAf/LyQzhfDIMPiGW1MkzIFSFi+6Tj82QSnO7fqOzkf2GNQYH6kPfLPBcUwq4MCpIWCeKYRThqcEzso7IthYdV5BO7iOpbESIjC2TEtZNUQZCvHjKz1QJ6GlrA0xtnDl668LpUriZvpFrGY7qmfbcagjA8VDtCgKx+S+V9XDlBU1lsKK5M89iILIiI0BqhynWm7R8v2d44QoBqMQJKXMG2owBRHXAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+oJSCPvOq9QL4A1kYIj9y06go+U5ucYIDKVkRD7vESc=;
+ b=F6D+vhoaTJ0OSjcrvOvYwZS/i7q+1sAbbQ9qm9sSBn4B9IaUZC7ph07DcyYrtk7Ok50wdZAZCkm9QFpQrzPcfqRYLnJ0q2NOccSoQF0mMglzFlw33rvVFjLRr5d5LivayUsG6Hld1q0adHFDKOAxiljuUslkn/sD26sFGPpYdCJaybiSFh/lh8/SjRqvc/9PzhauUgfsabc7bS49mT4PGYgM9c6Ca6CTKJLj04h+VfhD3UrpWvj7CprC2IhMiI2HHaM+NZLylQfNWlaYl1y8oe1leUHg9ESlqq+UXVO48EIbKI7eUKriizMnjXv3s4C1wKDoA3N1pkqOgfHUMGBSCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+oJSCPvOq9QL4A1kYIj9y06go+U5ucYIDKVkRD7vESc=;
+ b=H95z3pKOMq3YG9ISf0GjLhZwn4Rqxzfgh+UC2gk+1soJVgBSzZ+oXggljE5UlxfhN0MbSQflsqrCVYmAdgEIPF7iS/UvAUXi11rP0SPULLPCD3qI8YWexg2/4kKsAT4/uHBGKJ0eF8X53oRUsEW7EPlv5e200Xa9u07CRqXwImo=
+Received: from HK0P153MB0164.APCP153.PROD.OUTLOOK.COM (2603:1096:203:1a::15)
+ by HK0P153MB0273.APCP153.PROD.OUTLOOK.COM (2603:1096:203:b2::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.2; Tue, 12 May
+ 2020 21:03:37 +0000
+Received: from HK0P153MB0164.APCP153.PROD.OUTLOOK.COM
+ ([fe80::60ed:b6e0:c811:9634]) by HK0P153MB0164.APCP153.PROD.OUTLOOK.COM
+ ([fe80::60ed:b6e0:c811:9634%8]) with mapi id 15.20.3021.002; Tue, 12 May 2020
+ 21:03:37 +0000
+From:   Dexuan Cui <decui@microsoft.com>
+To:     vkuznets <vkuznets@redhat.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+CC:     Wei Liu <wei.liu@kernel.org>, "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>
+Subject: RE: [PATCH] x86/hyperv: Properly suspend/resume reenlightenment
+ notifications
+Thread-Topic: [PATCH] x86/hyperv: Properly suspend/resume reenlightenment
+ notifications
+Thread-Index: AQHWKHatlCMp6vU74EexUlvyfeW2+6ik8Hgw
+Date:   Tue, 12 May 2020 21:03:36 +0000
+Message-ID: <HK0P153MB016460EAB0E994FFD0653EB2BFBE0@HK0P153MB0164.APCP153.PROD.OUTLOOK.COM>
+References: <20200512160153.134467-1-vkuznets@redhat.com>
+In-Reply-To: <20200512160153.134467-1-vkuznets@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1589315452; bh=SQJfdynECYAMsVxHU87JBCN1XEH3W8wqr29LA9gwC/Q=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=eNJvT0uKj+2qTv91QGkttQ2w17yFaiVHIx2xiHNV0zs9WzwZ+6TQ8Uwer2EjsDliw
-         Ge7WjsKkdXCeNTADsEqE4DNz+szD7wvzVBBc01kYlHot7Jah84yqw5e2m6O4XKtsCB
-         cvgTwrbizTOqIcKKnY5NP9+ErSrrEBoj2Z8LtA3TZf+vMJxSZvm9IE1KGuC2vNMYV8
-         4cEw1gIjydr1RG1kZo8DvTJyuxH9Grx2+tIFrvk77gaQKivlo0gDbBcAzRDgNCs7Mr
-         /WJo2kzIAL3tEj+6yZrm6KoWo5qXB+WalAKsED2OLdI/LpoDsWh2EFDAnMltsOqC4X
-         l9xXE8VR1H/MA==
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-05-12T21:03:33Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=262abad1-c2d7-486d-844b-5a81b319464e;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=microsoft.com;
+x-originating-ip: [2601:600:a280:7f70:8539:bb09:8e8:c1d3]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 8c71f8fb-6fbe-4e61-8ec5-08d7f6b7f07e
+x-ms-traffictypediagnostic: HK0P153MB0273:
+x-ms-exchange-transport-forked: True
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-microsoft-antispam-prvs: <HK0P153MB027371F208695B74381160B6BFBE0@HK0P153MB0273.APCP153.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0401647B7F
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: zSH+1QpPZlpXAs51cjhBUJVgYR1FppiDIiC17kergt4b5xTeFRAOcqbT6PvDJfLFKJKkksRYWAWL0SKLah5VD+8o6i1tnj/FpB45RIjbtjZcS/tXR185pvGdGy5RJs5ecXJri0aI/nTaOviwhYoXAgzkWjKjPo8SQH6h/0GxEC63SR3TQ0i8lRfK2EyCicG3tywtuF1WzqZ2V6g0oyShykAZCobKgcIqWSwZhuQ7K1pGbD5d7CPXkyUmxTb5oGJ3hQzGEsV2JMiV/uARbgSKm+cGSrctRQlDT1MwLcfhuock0bY9pD/8mQ07kklNKNfooomEB0889ZKJ48Ah4g9uqnK/JLvWrShJj9to2ONGG1qbaj8NLI8txrOxkdPbu1Uq8c/cuLEATjCenpzv0QqOt8xlybjEBWZ/pTrDUrmJABg=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HK0P153MB0164.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(39860400002)(366004)(346002)(396003)(33430700001)(2906002)(5660300002)(52536014)(54906003)(76116006)(82950400001)(110136005)(82960400001)(4326008)(478600001)(55016002)(107886003)(33656002)(9686003)(316002)(33440700001)(186003)(8990500004)(15650500001)(10290500003)(64756008)(8936002)(7696005)(66946007)(66556008)(86362001)(71200400001)(66476007)(8676002)(53546011)(66446008)(6506007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: 0foHeggjQw+6YwCt6WiRC1nBv+RFoka3hBAIY/a8Fb4iTw/LFTj3r4qRlUbP3YK+NjGYL6qBs37QEpDqyhFfNrf3JWMTvJhQlzQ3B+OqItX6pHCF94BoQLKGQPvkcrkSRA4OWU36TA4YYL97/GQiGgWMMYUCECaaeyYqtJ2DSjM0//fAj4Pm9lNGqE6fyBLyyWqTBT3LuUFInEZ3RVsRiSm/eGz+pGtk25TytbkanmFUvEl71+Ie15DRFPFqAU8YNJT/aIj5lxSwy2kkwfl5xujvou0xhkiA4wI8g0NF+UvH2gxl/XeoU18pQgn5Tf6gtimtHfenfobHwj/6PO6xjwrGLRu5kGB4+vv1wT5bS9iKT+YKXK2on2jzRRP0dJInk278QGmEwvK9yh4o3KoVE8wdcsDgiwemuFywggKoygDiWDldJflHeZHwCcF+6ksJYS3v23KoNbVwxooKkBQOU49RFTy53BMloj2Xn+7V20CH+I+yNHGEzb842fU8bBjm9Hwdc3FCuQOnNcu42mINZlpQfeCepfQsPqqPXdlBdrw=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c71f8fb-6fbe-4e61-8ec5-08d7f6b7f07e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 May 2020 21:03:36.6221
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1P8APOZiG0vewToBQPnHh+kznhCxK4MNyb4B35DhUVER4ZegLk1LQWUdCrNb/w4UE21A99fZ+DRUqSCeeF2qVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HK0P153MB0273
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Sent: Tuesday, May 12, 2020 9:02 AM
+> To: linux-hyperv@vger.kernel.org
+> Cc: Wei Liu <wei.liu@kernel.org>; x86@kernel.org;
+> linux-kernel@vger.kernel.org; kvm@vger.kernel.org; Michael Kelley
+> <mikelley@microsoft.com>; Dexuan Cui <decui@microsoft.com>; Tianyu Lan
+> <Tianyu.Lan@microsoft.com>
+> Subject: [PATCH] x86/hyperv: Properly suspend/resume reenlightenment
+> notifications
+>=20
+> Errors during hibernation with reenlightenment notifications enabled were
+> reported:
+>=20
+>  [   51.730435] PM: hibernation entry
+>  [   51.737435] PM: Syncing filesystems ...
+>  ...
+>  [   54.102216] Disabling non-boot CPUs ...
+>  [   54.106633] smpboot: CPU 1 is now offline
+>  [   54.110006] unchecked MSR access error: WRMSR to 0x40000106 (tried
+> to
+>      write 0x47c72780000100ee) at rIP: 0xffffffff90062f24
+>      native_write_msr+0x4/0x20)
+>  [   54.110006] Call Trace:
+>  [   54.110006]  hv_cpu_die+0xd9/0xf0
+>  ...
+>=20
+> Normally, hv_cpu_die() just reassigns reenlightenment notifications to so=
+me
+> other CPU when the CPU receiving them goes offline. Upon hibernation, the=
+re
+> is no other CPU which is still online so cpumask_any_but(cpu_online_mask)
+> returns >=3D nr_cpu_ids and using it as hv_vp_index index is incorrect.
+> Disable the feature when cpumask_any_but() fails.
+>=20
+> Also, as we now disable reenlightenment notifications upon hibernation we
+> need to restore them on resume. Check if hv_reenlightenment_cb was
+> previously set and restore from hv_resume().
+>=20
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
 
+Looks good to me. Thanks!
 
-On 5/7/2020 3:55 AM, Alex Williamson wrote:
-> On Mon, 4 May 2020 21:28:57 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> DMA mapped pages, including those pinned by mdev vendor drivers, might
->> get unpinned and unmapped while migration is active and device is still
->> running. For example, in pre-copy phase while guest driver could access
->> those pages, host device or vendor driver can dirty these mapped pages.
->> Such pages should be marked dirty so as to maintain memory consistency
->> for a user making use of dirty page tracking.
->>
->> To get bitmap during unmap, user should allocate memory for bitmap, set
->> size of allocated memory, set page size to be considered for bitmap and
->> set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 84 +++++++++++++++++++++++++++++++++++++++--
->>   include/uapi/linux/vfio.h       | 10 +++++
->>   2 files changed, 90 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 01dcb417836f..8b27faf1ec38 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -983,12 +983,14 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
->>   }
->>   
->>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->> -			     struct vfio_iommu_type1_dma_unmap *unmap)
->> +			     struct vfio_iommu_type1_dma_unmap *unmap,
->> +			     struct vfio_bitmap *bitmap)
->>   {
->>   	uint64_t mask;
->>   	struct vfio_dma *dma, *dma_last = NULL;
->>   	size_t unmapped = 0;
->>   	int ret = 0, retries = 0;
->> +	unsigned long *final_bitmap = NULL, *temp_bitmap = NULL;
->>   
->>   	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
->>   
->> @@ -1041,6 +1043,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   			ret = -EINVAL;
->>   			goto unlock;
->>   		}
->> +
->>   		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
->>   		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
->>   			ret = -EINVAL;
->> @@ -1048,6 +1051,22 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   		}
->>   	}
->>   
->> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
->> +	     iommu->dirty_page_tracking) {
-> 
-> Why do we even accept VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP when not
-> dirty page tracking rather than returning -EINVAL?  It would simplify
-> things here to reject it at the ioctl and silently ignoring a flag is
-> rarely if ever the right approach.
-> 
->> +		final_bitmap = kvzalloc(bitmap->size, GFP_KERNEL);
->> +		if (!final_bitmap) {
->> +			ret = -ENOMEM;
->> +			goto unlock;
->> +		}
->> +
->> +		temp_bitmap = kvzalloc(bitmap->size, GFP_KERNEL);
->> +		if (!temp_bitmap) {
->> +			ret = -ENOMEM;
->> +			kfree(final_bitmap);
->> +			goto unlock;
->> +		}
-> 
-> YIKES!  So the user can instantly trigger the kernel to internally
-> allocate 2 x 256MB, regardless of how much they can actually map.
-> 
+Reviewed-by: Dexuan Cui <decui@microsoft.com>
 
-That is worst case senario. I don't think ideally that will ever hit. 
-More comment below regarding this.
-
->> +	}
->> +
->>   	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
->>   		if (!iommu->v2 && unmap->iova > dma->iova)
->>   			break;
->> @@ -1058,6 +1077,24 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   		if (dma->task->mm != current->mm)
->>   			break;
->>   
->> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
->> +		     iommu->dirty_page_tracking) {
->> +			unsigned long pgshift = __ffs(bitmap->pgsize);
->> +			unsigned int npages = dma->size >> pgshift;
->> +			unsigned int shift;
->> +
->> +			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
->> +					bitmap->pgsize, (u64 *)temp_bitmap);
-> 
-> vfio_iova_dirty_bitmap() takes a __user bitmap, we're doing
-> copy_to_user() on a kernel allocated buffer???
-> 
-
-Actually, there is no need to call vfio_iova_dirty_bitmap(), dma pointer 
-is known here and since its getting unmapped, there is no need to 
-repopulate bitmap. Removing vfio_iova_dirty_bitmap() and changing it as 
-below:
-
-if (unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-     unsigned long pgshift = __ffs(bitmap->pgsize);
-     unsigned int npages = dma->size >> pgshift;
-     unsigned int bitmap_size = DIRTY_BITMAP_BYTES(npages);
-     unsigned int shift = (dma->iova - unmap->iova) >>
-                                             pgshift;
-     /*
-      * mark all pages dirty if all pages are pinned and
-      * mapped.
-      */
-     if (dma->iommu_mapped)
-         bitmap_set(temp_bitmap, 0, npages);
-     else
-         memcpy(temp_bitmap, dma->bitmap, bitmap_size);
-
-     if (shift)
-         bitmap_shift_left(temp_bitmap, temp_bitmap,
-                           shift, npages);
-     bitmap_or(final_bitmap, final_bitmap, temp_bitmap,
-               shift + npages);
-     memset(temp_bitmap, 0, bitmap->size);
-}
-
->> +
->> +			shift = (dma->iova - unmap->iova) >> pgshift;
->> +			if (shift)
->> +				bitmap_shift_left(temp_bitmap, temp_bitmap,
->> +						  shift, npages);
->> +			bitmap_or(final_bitmap, final_bitmap, temp_bitmap,
->> +				  shift + npages);
->> +			memset(temp_bitmap, 0, bitmap->size);
->> +		}
-> 
-> It seems like if the per vfio_dma dirty bitmap was oversized by a long
-> that we could shift it in place, then we'd only need one working bitmap
-> buffer and we could size that to fit the vfio_dma (or the largest
-> vfio_dma if we don't want to free and re-alloc for each vfio_dma).
-> We'd need to do more copy_to/from_user()s, but we'd also avoid copying
-> between sparse mappings (user zero'd bitmap required) and we'd have a
-> far more reasonable memory usage.  Thanks,
->
-
-I thought about it, but couldn't optimize to use one bitmap buffer.
-This case will only hit during migration with vIOMMU enabled.
-Can we keep these 2 bitmap buffers for now and optimize it later?
-
-Thanks,
-Kirti
