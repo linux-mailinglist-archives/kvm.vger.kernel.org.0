@@ -2,77 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B3FBC1CEEBA
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 10:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AABF1CEED9
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 10:09:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729148AbgELIDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 04:03:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23982 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729144AbgELIDf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 04:03:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589270614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=R/i2icQan6hYxTGbHp9N0BGqJR9rk1WOFisiWB6DJKY=;
-        b=RCgUa86Rgfrc0ZoUo+nuzVWnyi7xlJfu2uqwd5C5PsSbo8ob8dAt2VEb0rPhORpyGZXezH
-        Alr9sqNRV6uMHUTd0zIYH3mGfHr8F+YWCDdDPrhgFslsnG0SP0dpq8QlOv1REqIOnZMlM3
-        bEIW4PIguS/1nemXhxjU1n1SxtEp+U4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-pddSvpVwMRKyL2rKjWD2GQ-1; Tue, 12 May 2020 04:03:30 -0400
-X-MC-Unique: pddSvpVwMRKyL2rKjWD2GQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D768513F8
-        for <kvm@vger.kernel.org>; Tue, 12 May 2020 08:03:29 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-112.ams2.redhat.com [10.36.112.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 59E065C1BB;
-        Tue, 12 May 2020 08:03:28 +0000 (UTC)
-Subject: Re: [PATCH kvm-unit-tests] Fix out-of-tree builds
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-References: <20200511070641.23492-1-drjones@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <0aef504d-5870-ba88-a85e-3fea676e16eb@redhat.com>
-Date:   Tue, 12 May 2020 10:03:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728977AbgELIJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 04:09:53 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:60430 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726067AbgELIJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 04:09:53 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id C059A7B10AE9D45F0431;
+        Tue, 12 May 2020 16:09:49 +0800 (CST)
+Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server (TLS) id 14.3.487.0; Tue, 12 May
+ 2020 16:09:44 +0800
+Subject: Re: [PATCH] i386/kvm: fix a use-after-free when vcpu plug/unplug
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        <pbonzini@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+        <mtosatti@redhat.com>
+CC:     <euler.robot@huawei.com>, <qemu-devel@nongnu.org>,
+        <kvm@vger.kernel.org>, <zhang.zhanghailiang@huawei.com>
+References: <20200512133933.8696-1-pannengyuan@huawei.com>
+ <eab55b02-d51b-96c6-3c03-eb69964f162d@redhat.com>
+From:   Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <35cb4db2-f7f2-4cfb-aa8d-1c27887cdbfa@huawei.com>
+Date:   Tue, 12 May 2020 16:09:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200511070641.23492-1-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <eab55b02-d51b-96c6-3c03-eb69964f162d@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/05/2020 09.06, Andrew Jones wrote:
-> Since b16df9ee5f3b out-of-tree builds have been broken because we
-> started validating the newly user-configurable $erratatxt file
-> before linking it into the build dir. We fix this not by moving
-> the validation, but by removing the linking and instead using the
-> full path of the $erratatxt file. This allows one to keep that file
-> separate from the src and build dirs.
+
+
+On 5/12/2020 3:54 PM, Philippe Mathieu-Daudé wrote:
+> On 5/12/20 3:39 PM, Pan Nengyuan wrote:
+>> When we hotplug vcpus, cpu_update_state is added to vm_change_state_head
+>> in kvm_arch_init_vcpu(). But it forgot to delete in kvm_arch_destroy_vcpu() after
+>> unplug. Then it will cause a use-after-free access. This patch delete it in
+>> kvm_arch_destroy_vcpu() to fix that.
+>>
+>> Reproducer:
+>>      virsh setvcpus vm1 4 --live
+>>      virsh setvcpus vm1 2 --live
+>>      virsh suspend vm1
+>>      virsh resume vm1
+>>
+>> The UAF stack:
+>> ==qemu-system-x86_64==28233==ERROR: AddressSanitizer: heap-use-after-free on address 0x62e00002e798 at pc 0x5573c6917d9e bp 0x7fff07139e50 sp 0x7fff07139e40
+>> WRITE of size 1 at 0x62e00002e798 thread T0
+>>      #0 0x5573c6917d9d in cpu_update_state /mnt/sdb/qemu/target/i386/kvm.c:742
+>>      #1 0x5573c699121a in vm_state_notify /mnt/sdb/qemu/vl.c:1290
+>>      #2 0x5573c636287e in vm_prepare_start /mnt/sdb/qemu/cpus.c:2144
+>>      #3 0x5573c6362927 in vm_start /mnt/sdb/qemu/cpus.c:2150
+>>      #4 0x5573c71e8304 in qmp_cont /mnt/sdb/qemu/monitor/qmp-cmds.c:173
+>>      #5 0x5573c727cb1e in qmp_marshal_cont qapi/qapi-commands-misc.c:835
+>>      #6 0x5573c7694c7a in do_qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:132
+>>      #7 0x5573c7694c7a in qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:175
+>>      #8 0x5573c71d9110 in monitor_qmp_dispatch /mnt/sdb/qemu/monitor/qmp.c:145
+>>      #9 0x5573c71dad4f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu/monitor/qmp.c:234
+>>
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>>   target/i386/cpu.h | 1 +
+>>   target/i386/kvm.c | 5 ++++-
+>>   2 files changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index e818fc712a..afbd11b7a3 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -1631,6 +1631,7 @@ struct X86CPU {
+>>         CPUNegativeOffsetState neg;
+>>       CPUX86State env;
+>> +    VMChangeStateEntry *vmsentry;
+>>         uint64_t ucode_rev;
+>>   diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index 4901c6dd74..ff2848357e 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -1770,7 +1770,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>           }
+>>       }
+>>   -    qemu_add_vm_change_state_handler(cpu_update_state, env);
+>> +    cpu->vmsentry = qemu_add_vm_change_state_handler(cpu_update_state, env);
+>>         c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+>>       if (c) {
+>> @@ -1883,6 +1883,9 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+>>           env->nested_state = NULL;
+>>       }
+>>   +    qemu_del_vm_change_state_handler(cpu->vmsentry);
+>> +    cpu->vmsentry = NULL;
 > 
-> Fixes: b16df9ee5f3b ("arch-run: Add reserved variables to the default environ")
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  configure | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+> Why set it to NULL? there is no non-NULL check.
+> 
+> Anyway if it matters to you, why not do it in qemu_del_vm_change_state_handler()?
 
-Thanks, this seems to fix the issue:
+Yes, there is no non-NULL check and it will not be NULL at all.
 
- https://travis-ci.com/github/huth/kvm-unit-tests/jobs/332339909
+Actually it doesn't matters to me, just habitually set to null after free.
 
-Thus:
-Tested-by: Thomas Huth <thuth@redhat.com>
+I will remove it.
 
+Thanks.
+
+> 
+> Otherwise:
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+>> +
+>>       return 0;
+>>   }
+>>  
+> 
+> .
