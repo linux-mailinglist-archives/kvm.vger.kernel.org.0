@@ -2,228 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F1491CEEBE
-	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 10:04:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3FBC1CEEBA
+	for <lists+kvm@lfdr.de>; Tue, 12 May 2020 10:03:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729172AbgELIE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 04:04:28 -0400
-Received: from mga09.intel.com ([134.134.136.24]:16642 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725889AbgELIE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 04:04:28 -0400
-IronPort-SDR: R5SmQ3kmTPq6HPPgtP2oO9PIyWC4dIGuFOk5vjf2nlX7XbwizYxIMoY+5K0xXPqIa0tgMno0Pu
- y+fAsEzkExug==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2020 01:04:27 -0700
-IronPort-SDR: j2VzWrkRB3i7RK2vI6S/dogEsgbXubtrfoZ0GW9bCf5uuIeUBkwMutmeeCOX9hckYFWHZd8zvI
- tFt2Tv4mP3uA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,383,1583222400"; 
-   d="scan'208";a="371486433"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.105])
-  by fmsmga001.fm.intel.com with ESMTP; 12 May 2020 01:04:24 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        jasowang@redhat.com
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V2] ifcvf: move IRQ request/free to status change handlers
-Date:   Tue, 12 May 2020 16:00:44 +0800
-Message-Id: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1729148AbgELIDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 May 2020 04:03:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23982 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729144AbgELIDf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 May 2020 04:03:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589270614;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=R/i2icQan6hYxTGbHp9N0BGqJR9rk1WOFisiWB6DJKY=;
+        b=RCgUa86Rgfrc0ZoUo+nuzVWnyi7xlJfu2uqwd5C5PsSbo8ob8dAt2VEb0rPhORpyGZXezH
+        Alr9sqNRV6uMHUTd0zIYH3mGfHr8F+YWCDdDPrhgFslsnG0SP0dpq8QlOv1REqIOnZMlM3
+        bEIW4PIguS/1nemXhxjU1n1SxtEp+U4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-pddSvpVwMRKyL2rKjWD2GQ-1; Tue, 12 May 2020 04:03:30 -0400
+X-MC-Unique: pddSvpVwMRKyL2rKjWD2GQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D768513F8
+        for <kvm@vger.kernel.org>; Tue, 12 May 2020 08:03:29 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-112.ams2.redhat.com [10.36.112.112])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 59E065C1BB;
+        Tue, 12 May 2020 08:03:28 +0000 (UTC)
+Subject: Re: [PATCH kvm-unit-tests] Fix out-of-tree builds
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+References: <20200511070641.23492-1-drjones@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <0aef504d-5870-ba88-a85e-3fea676e16eb@redhat.com>
+Date:   Tue, 12 May 2020 10:03:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200511070641.23492-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit move IRQ request and free operations from probe()
-to VIRTIO status change handler to comply with VIRTIO spec.
+On 11/05/2020 09.06, Andrew Jones wrote:
+> Since b16df9ee5f3b out-of-tree builds have been broken because we
+> started validating the newly user-configurable $erratatxt file
+> before linking it into the build dir. We fix this not by moving
+> the validation, but by removing the linking and instead using the
+> full path of the $erratatxt file. This allows one to keep that file
+> separate from the src and build dirs.
+> 
+> Fixes: b16df9ee5f3b ("arch-run: Add reserved variables to the default environ")
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  configure | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 
-VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
-The device MUST NOT consume buffers or send any used buffer
-notifications to the driver before DRIVER_OK.
+Thanks, this seems to fix the issue:
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
-changes from V1:
-remove ifcvf_stop_datapath() in status == 0 handler, we don't need to do this
-twice; handle status == 0 after DRIVER_OK -> !DRIVER_OK handler (Jason Wang)
+ https://travis-ci.com/github/huth/kvm-unit-tests/jobs/332339909
 
- drivers/vdpa/ifcvf/ifcvf_main.c | 120 ++++++++++++++++++++++++----------------
- 1 file changed, 73 insertions(+), 47 deletions(-)
-
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index abf6a061..d529ed6 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -28,6 +28,60 @@ static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
- 	return IRQ_HANDLED;
- }
- 
-+static void ifcvf_free_irq_vectors(void *data)
-+{
-+	pci_free_irq_vectors(data);
-+}
-+
-+static void ifcvf_free_irq(struct ifcvf_adapter *adapter, int queues)
-+{
-+	struct pci_dev *pdev = adapter->pdev;
-+	struct ifcvf_hw *vf = &adapter->vf;
-+	int i;
-+
-+
-+	for (i = 0; i < queues; i++)
-+		devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
-+
-+	ifcvf_free_irq_vectors(pdev);
-+}
-+
-+static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
-+{
-+	struct pci_dev *pdev = adapter->pdev;
-+	struct ifcvf_hw *vf = &adapter->vf;
-+	int vector, i, ret, irq;
-+
-+	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
-+				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
-+	if (ret < 0) {
-+		IFCVF_ERR(pdev, "Failed to alloc IRQ vectors\n");
-+		return ret;
-+	}
-+
-+	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
-+			 pci_name(pdev), i);
-+		vector = i + IFCVF_MSI_QUEUE_OFF;
-+		irq = pci_irq_vector(pdev, vector);
-+		ret = devm_request_irq(&pdev->dev, irq,
-+				       ifcvf_intr_handler, 0,
-+				       vf->vring[i].msix_name,
-+				       &vf->vring[i]);
-+		if (ret) {
-+			IFCVF_ERR(pdev,
-+				  "Failed to request irq for vq %d\n", i);
-+			ifcvf_free_irq(adapter, i);
-+
-+			return ret;
-+		}
-+
-+		vf->vring[i].irq = irq;
-+	}
-+
-+	return 0;
-+}
-+
- static int ifcvf_start_datapath(void *private)
- {
- 	struct ifcvf_hw *vf = ifcvf_private_to_vf(private);
-@@ -118,17 +172,34 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
- {
- 	struct ifcvf_adapter *adapter;
- 	struct ifcvf_hw *vf;
-+	u8 status_old;
-+	int ret;
- 
- 	vf  = vdpa_to_vf(vdpa_dev);
- 	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
-+	status_old = ifcvf_get_status(vf);
- 
--	if (status == 0) {
-+	if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) &&
-+	    !(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
- 		ifcvf_stop_datapath(adapter);
-+		ifcvf_free_irq(adapter, IFCVF_MAX_QUEUE_PAIRS * 2);
-+	}
-+
-+	if (status == 0) {
- 		ifcvf_reset_vring(adapter);
- 		return;
- 	}
- 
--	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-+	if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
-+	    !(status_old & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+		ret = ifcvf_request_irq(adapter);
-+		if (ret) {
-+			status = ifcvf_get_status(vf);
-+			status |= VIRTIO_CONFIG_S_FAILED;
-+			ifcvf_set_status(vf, status);
-+			return;
-+		}
-+
- 		if (ifcvf_start_datapath(adapter) < 0)
- 			IFCVF_ERR(adapter->pdev,
- 				  "Failed to set ifcvf vdpa  status %u\n",
-@@ -284,38 +355,6 @@ static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
- 	.set_config_cb  = ifcvf_vdpa_set_config_cb,
- };
- 
--static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
--{
--	struct pci_dev *pdev = adapter->pdev;
--	struct ifcvf_hw *vf = &adapter->vf;
--	int vector, i, ret, irq;
--
--
--	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
--		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
--			 pci_name(pdev), i);
--		vector = i + IFCVF_MSI_QUEUE_OFF;
--		irq = pci_irq_vector(pdev, vector);
--		ret = devm_request_irq(&pdev->dev, irq,
--				       ifcvf_intr_handler, 0,
--				       vf->vring[i].msix_name,
--				       &vf->vring[i]);
--		if (ret) {
--			IFCVF_ERR(pdev,
--				  "Failed to request irq for vq %d\n", i);
--			return ret;
--		}
--		vf->vring[i].irq = irq;
--	}
--
--	return 0;
--}
--
--static void ifcvf_free_irq_vectors(void *data)
--{
--	pci_free_irq_vectors(data);
--}
--
- static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct device *dev = &pdev->dev;
-@@ -349,13 +388,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return ret;
- 	}
- 
--	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
--				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
--	if (ret < 0) {
--		IFCVF_ERR(pdev, "Failed to alloc irq vectors\n");
--		return ret;
--	}
--
- 	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
- 	if (ret) {
- 		IFCVF_ERR(pdev,
-@@ -379,12 +411,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	adapter->pdev = pdev;
- 	adapter->vdpa.dma_dev = &pdev->dev;
- 
--	ret = ifcvf_request_irq(adapter);
--	if (ret) {
--		IFCVF_ERR(pdev, "Failed to request MSI-X irq\n");
--		goto err;
--	}
--
- 	ret = ifcvf_init_hw(vf, pdev);
- 	if (ret) {
- 		IFCVF_ERR(pdev, "Failed to init IFCVF hw\n");
--- 
-1.8.3.1
+Thus:
+Tested-by: Thomas Huth <thuth@redhat.com>
 
