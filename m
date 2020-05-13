@@ -2,110 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CCC91D0964
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 09:02:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32A831D14E3
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 15:29:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729578AbgEMHCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 03:02:21 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:37986 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726020AbgEMHCV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 03:02:21 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id D2CC1BA2BD7B96820548;
-        Wed, 13 May 2020 15:02:15 +0800 (CST)
-Received: from opensource.huawei.com (10.175.100.98) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 13 May 2020 15:02:05 +0800
-From:   Pan Nengyuan <pannengyuan@huawei.com>
-To:     <pbonzini@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <mtosatti@redhat.com>
-CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <zhang.zhanghailiang@huawei.com>, <euler.robot@huawei.com>,
-        Pan Nengyuan <pannengyuan@huawei.com>
-Subject: [PATCH v2] i386/kvm: fix a use-after-free when vcpu plug/unplug
-Date:   Wed, 13 May 2020 09:26:30 -0400
-Message-ID: <20200513132630.13412-1-pannengyuan@huawei.com>
-X-Mailer: git-send-email 2.18.2
+        id S2387629AbgEMN3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 09:29:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27327 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729309AbgEMN3F (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 09:29:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589376543;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KoV5Wqms5AH46esJ6zYoKxLFFe0Vww3N0l8ERghmRN4=;
+        b=RcTjyLBnCN8cwUOlTOor2lVXEpwVNshjO4b2+gSQU0hh4fIU54DPQ1j88OI7MeuGTVs0hf
+        eyroIJPyYMQ7yHH3pDkSByAhbkKCtgYP8T4DIZOjv31b+F8M3AHaZeSTWPXe0kdvNK3dyL
+        4Nv0/W1w59IqMEwopIqREGf/kwRL2vg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-HnptDom5NM2MsQHnVL9a5Q-1; Wed, 13 May 2020 09:28:58 -0400
+X-MC-Unique: HnptDom5NM2MsQHnVL9a5Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DEED80183C;
+        Wed, 13 May 2020 13:28:56 +0000 (UTC)
+Received: from [10.36.112.22] (ovpn-112-22.ams2.redhat.com [10.36.112.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 94BE910013BD;
+        Wed, 13 May 2020 13:28:45 +0000 (UTC)
+Subject: Re: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        Zhangfei Gao <zhangfei.gao@linaro.org>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Cc:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "tn@semihalf.com" <tn@semihalf.com>,
+        "bbhushan2@marvell.com" <bbhushan2@marvell.com>
+References: <20200414150607.28488-1-eric.auger@redhat.com>
+ <eb27f625-ad7a-fcb5-2185-5471e4666f09@linaro.org>
+ <06fe02f7-2556-8986-2f1e-dcdf59773b8c@redhat.com>
+ <c7786a2a314e4c4ab37ef157ddfa23af@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <3858dd8c-ee55-b0d7-96cc-3c047ba8f652@redhat.com>
+Date:   Wed, 13 May 2020 15:28:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <c7786a2a314e4c4ab37ef157ddfa23af@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.175.100.98]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we hotplug vcpus, cpu_update_state is added to vm_change_state_head
-in kvm_arch_init_vcpu(). But it forgot to delete in kvm_arch_destroy_vcpu() after
-unplug. Then it will cause a use-after-free access. This patch delete it in
-kvm_arch_destroy_vcpu() to fix that.
+Hi Shameer,
 
-Reproducer:
-    virsh setvcpus vm1 4 --live
-    virsh setvcpus vm1 2 --live
-    virsh suspend vm1
-    virsh resume vm1
+On 5/7/20 8:59 AM, Shameerali Kolothum Thodi wrote:
+> Hi Eric,
+> 
+>> -----Original Message-----
+>> From: Shameerali Kolothum Thodi
+>> Sent: 30 April 2020 10:38
+>> To: 'Auger Eric' <eric.auger@redhat.com>; Zhangfei Gao
+>> <zhangfei.gao@linaro.org>; eric.auger.pro@gmail.com;
+>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+>> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com
+>> Cc: jean-philippe@linaro.org; alex.williamson@redhat.com;
+>> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; peter.maydell@linaro.org;
+>> tn@semihalf.com; bbhushan2@marvell.com
+>> Subject: RE: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+>>
+>> Hi Eric,
+>>
+>>> -----Original Message-----
+>>> From: Auger Eric [mailto:eric.auger@redhat.com]
+>>> Sent: 16 April 2020 08:45
+>>> To: Zhangfei Gao <zhangfei.gao@linaro.org>; eric.auger.pro@gmail.com;
+>>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+>>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+>>> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com
+>>> Cc: jean-philippe@linaro.org; Shameerali Kolothum Thodi
+>>> <shameerali.kolothum.thodi@huawei.com>; alex.williamson@redhat.com;
+>>> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; peter.maydell@linaro.org;
+>>> tn@semihalf.com; bbhushan2@marvell.com
+>>> Subject: Re: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+>>>
+>>> Hi Zhangfei,
+>>>
+>>> On 4/16/20 6:25 AM, Zhangfei Gao wrote:
+>>>>
+>>>>
+>>>> On 2020/4/14 下午11:05, Eric Auger wrote:
+>>>>> This version fixes an issue observed by Shameer on an SMMU 3.2,
+>>>>> when moving from dual stage config to stage 1 only config.
+>>>>> The 2 high 64b of the STE now get reset. Otherwise, leaving the
+>>>>> S2TTB set may cause a C_BAD_STE error.
+>>>>>
+>>>>> This series can be found at:
+>>>>> https://github.com/eauger/linux/tree/v5.6-2stage-v11_10.1
+>>>>> (including the VFIO part)
+>>>>> The QEMU fellow series still can be found at:
+>>>>> https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
+>>>>>
+>>>>> Users have expressed interest in that work and tested v9/v10:
+>>>>> - https://patchwork.kernel.org/cover/11039995/#23012381
+>>>>> - https://patchwork.kernel.org/cover/11039995/#23197235
+>>>>>
+>>>>> Background:
+>>>>>
+>>>>> This series brings the IOMMU part of HW nested paging support
+>>>>> in the SMMUv3. The VFIO part is submitted separately.
+>>>>>
+>>>>> The IOMMU API is extended to support 2 new API functionalities:
+>>>>> 1) pass the guest stage 1 configuration
+>>>>> 2) pass stage 1 MSI bindings
+>>>>>
+>>>>> Then those capabilities gets implemented in the SMMUv3 driver.
+>>>>>
+>>>>> The virtualizer passes information through the VFIO user API
+>>>>> which cascades them to the iommu subsystem. This allows the guest
+>>>>> to own stage 1 tables and context descriptors (so-called PASID
+>>>>> table) while the host owns stage 2 tables and main configuration
+>>>>> structures (STE).
+>>>>>
+>>>>>
+>>>>
+>>>> Thanks Eric
+>>>>
+>>>> Tested v11 on Hisilicon kunpeng920 board via hardware zip accelerator.
+>>>> 1. no-sva works, where guest app directly use physical address via ioctl.
+>>> Thank you for the testing. Glad it works for you.
+>>>> 2. vSVA still not work, same as v10,
+>>> Yes that's normal this series is not meant to support vSVM at this stage.
+>>>
+>>> I intend to add the missing pieces during the next weeks.
+>>
+>> Thanks for that. I have made an attempt to add the vSVA based on
+>> your v10 + JPBs sva patches. The host kernel and Qemu changes can
+>> be found here[1][2].
+>>
+>> This basically adds multiple pasid support on top of your changes.
+>> I have done some basic sanity testing and we have some initial success
+>> with the zip vf dev on our D06 platform. Please note that the STALL event is
+>> not yet supported though, but works fine if we mlock() guest usr mem.
+> 
+> I have added STALL support for our vSVA prototype and it seems to be
+> working(on our hardware). I have updated the kernel and qemu branches with
+> the same[1][2]. I should warn you though that these are prototype code and I am pretty
+> much re-using the VFIO_IOMMU_SET_PASID_TABLE interface for almost everything.
+> But thought of sharing, in case if it is useful somehow!.
 
-The UAF stack:
-==qemu-system-x86_64==28233==ERROR: AddressSanitizer: heap-use-after-free on address 0x62e00002e798 at pc 0x5573c6917d9e bp 0x7fff07139e50 sp 0x7fff07139e40
-WRITE of size 1 at 0x62e00002e798 thread T0
-    #0 0x5573c6917d9d in cpu_update_state /mnt/sdb/qemu/target/i386/kvm.c:742
-    #1 0x5573c699121a in vm_state_notify /mnt/sdb/qemu/vl.c:1290
-    #2 0x5573c636287e in vm_prepare_start /mnt/sdb/qemu/cpus.c:2144
-    #3 0x5573c6362927 in vm_start /mnt/sdb/qemu/cpus.c:2150
-    #4 0x5573c71e8304 in qmp_cont /mnt/sdb/qemu/monitor/qmp-cmds.c:173
-    #5 0x5573c727cb1e in qmp_marshal_cont qapi/qapi-commands-misc.c:835
-    #6 0x5573c7694c7a in do_qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:132
-    #7 0x5573c7694c7a in qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:175
-    #8 0x5573c71d9110 in monitor_qmp_dispatch /mnt/sdb/qemu/monitor/qmp.c:145
-    #9 0x5573c71dad4f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu/monitor/qmp.c:234
+Thank you again for sharing the POC. I looked at the kernel and QEMU
+branches.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-- v2: remove unnecessary set vmsentry to null(there is no non-null check).
----
- target/i386/cpu.h | 1 +
- target/i386/kvm.c | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+Here are some preliminary comments:
+- "arm-smmu-v3: Reset S2TTB while switching back from nested stage":  as
+you mentionned S2TTB reset now is featured in v11
+- "arm-smmu-v3: Add support for multiple pasid in nested mode": I could
+easily integrate this into my series. Update the iommu api first and
+pass multiple CD info in a separate patch
+- "arm-smmu-v3: Add support to Invalidate CD": CD invalidation should be
+cascaded to host through the PASID cache invalidation uapi (no pb you
+warned us for the POC you simply used VFIO_IOMMU_SET_PASID_TABLE). I
+think I should add this support in my original series although it does
+not seem to trigger any issue up to now.
+- "arm-smmu-v3: Remove duplication of fault propagation". I understand
+the transcode is done somewhere else with SVA but we still need to do it
+if a single CD is used, right? I will review the SVA code to better
+understand.
+- for the STALL response injection I would tend to use a new VFIO region
+for responses. At the moment there is a single VFIO region for reporting
+the fault.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index e818fc712a..afbd11b7a3 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1631,6 +1631,7 @@ struct X86CPU {
- 
-     CPUNegativeOffsetState neg;
-     CPUX86State env;
-+    VMChangeStateEntry *vmsentry;
- 
-     uint64_t ucode_rev;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 4901c6dd74..0a4eca5a85 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1770,7 +1770,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-     }
- 
--    qemu_add_vm_change_state_handler(cpu_update_state, env);
-+    cpu->vmsentry = qemu_add_vm_change_state_handler(cpu_update_state, env);
- 
-     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
-     if (c) {
-@@ -1883,6 +1883,8 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
-         env->nested_state = NULL;
-     }
- 
-+    qemu_del_vm_change_state_handler(cpu->vmsentry);
-+
-     return 0;
- }
- 
--- 
-2.18.2
+On QEMU side:
+- I am currently working on 3.2 range invalidation support which is
+needed for DPDK/VFIO
+- While at it I will look at how to incrementally introduce some of the
+features you need in this series.
+
+Thanks
+
+Eric
+
+
+
+> 
+> Thanks,
+> Shameer
+> 
+> [1]https://github.com/hisilicon/kernel-dev/commits/vsva-prototype-host-v1
+> 
+> [2]https://github.com/hisilicon/qemu/tree/v4.2.0-2stage-rfcv6-vsva-prototype-v1
+> 
 
