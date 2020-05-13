@@ -2,104 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C96B81D193E
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 17:23:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C7BF1D1985
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 17:35:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730465AbgEMPX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 11:23:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36279 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729153AbgEMPXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 11:23:25 -0400
+        id S1731638AbgEMPfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 11:35:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40279 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728678AbgEMPfR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 11:35:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589383404;
+        s=mimecast20190719; t=1589384116;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UehQAJSU4mDjbWE9zipTIpV0MCGuiC5EOgpt98xl5b0=;
-        b=ho9p7wXKA0iV+iIUcNXUxXXezSl4AyL5kzb5IBBQHYrnhqPrN6jLdTDw8SHFCU6VXokcel
-        PXnqVA/pWpy8UXJ17amTG+Co3+JvUymwlV00cqR6ARd6xX1dzl8wSkUEuQpU+ynjYmuxC2
-        Y0+/B4rqEAVzy10qVeVi9TiqJcsQVlI=
+        bh=xlSz7XzVoxz8t9/FxrVpi2jDEt51rDwF9jzT8629/kg=;
+        b=I8xcWBewLA6hEGTacNvm8EkxQI9NOePLLZ042O3hjwMc9o7ra8xAalMRwT+yCllWQBE1yC
+        gglv9zKzqUxRk/gqWJh8/CcPFINTXS8VVEpacXJKxOqb2Tq3cbgohKWKeWK01yx4t+PUFo
+        bW7upd0o1WEfL2xab5nhqmfbp0j+1i8=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-88kem2QAMumRzRVkF_wWHQ-1; Wed, 13 May 2020 11:23:22 -0400
-X-MC-Unique: 88kem2QAMumRzRVkF_wWHQ-1
-Received: by mail-wr1-f72.google.com with SMTP id e14so8783733wrv.11
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 08:23:22 -0700 (PDT)
+ us-mta-328-938T_bndO8qT8cKumQcP2w-1; Wed, 13 May 2020 11:35:14 -0400
+X-MC-Unique: 938T_bndO8qT8cKumQcP2w-1
+Received: by mail-wr1-f72.google.com with SMTP id z10so4848110wrs.2
+        for <kvm@vger.kernel.org>; Wed, 13 May 2020 08:35:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=UehQAJSU4mDjbWE9zipTIpV0MCGuiC5EOgpt98xl5b0=;
-        b=r6k3PH1EqQT9vmS2x7Nosn/upBUbu+sK/BgQ1f5vXQavhT1Eo2Ldgszfwh40qIWByp
-         arx6UbW8Z/R08EhrP63oQzlgTNiTThaQjvwOAMt6DdKcZJefx4uiRtPt7p1HA2oQs/N1
-         edof+f+uNYBlXACeXjj6m8p3aMkSS2t8nifjG9LA4KN+WKBvvYf5YuW8zOW206lFr9Lc
-         3ptjWM/LtJ4EjK395E7bZ1vJvIkAQOsore6fIWBMOndwxp8vjPARTmCQQ52Z3Owa3/9t
-         98WdLuLY+GU39R+sBM438Z3tyJvQauRTVVTLz4zTrvCqJJx5woA7gCNwSd5Rfc2rxklA
-         ymMg==
-X-Gm-Message-State: AGi0PuZUwNCqC5TlHkV/Cb5nfrYRQjwJK771jVUGbhExGRk5F8ILDWcM
-        fYYAa1hjemJW2RmcvyuI34RsB25jbh7/ti5dWAQnuAh36dtWKlsn+dhyp1/LgYzCS9Ml2qG+McN
-        C/3z2w53LtTGM
-X-Received: by 2002:a1c:7513:: with SMTP id o19mr40802375wmc.9.1589383401114;
-        Wed, 13 May 2020 08:23:21 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJnNsE4lazcED4ZrZTKZxFXKV+qBuOssabzx51M4Ar3pCWjJ4eHyqC4bHBx59/+xF2KfaTbyw==
-X-Received: by 2002:a1c:7513:: with SMTP id o19mr40802358wmc.9.1589383400867;
-        Wed, 13 May 2020 08:23:20 -0700 (PDT)
+        bh=xlSz7XzVoxz8t9/FxrVpi2jDEt51rDwF9jzT8629/kg=;
+        b=SaUq+7sQlaKbFT4bNrn+/tslRWkg64B90CbXkvtLwDoe9OaVGnsLBiRGJBh8ItJZAF
+         NAsMzU2uB4Pswbf4EmhCH4KJzIYFuft/pe32RTFCGf5ALLawsSXLRd+T5F04w0Gqow8F
+         3S11i08bbP1Zw7uR5HOO+k97shHlQV7EaKjMnnUTgWznKqD2ddJJT6xM9xje926xgMqg
+         rhZ+L/q8b3sa9hj+kwUuXe1tLcB0n46WzAGZWwgJaE04kVgYs1xTs39dIXV1QW+qZWNw
+         WxeEiwLFoz8z5hIXSqt7NyTxblBOVgf/VpD96xAGyNsZzyqGDdRkSDjMsOLclja5uHhw
+         YypA==
+X-Gm-Message-State: AGi0PubDZm2NjeyuwsmqOcDmq8FsN0f2fqcg87lpuiuQ4yr5KaRpIZ1M
+        rM7r3g//c2y1r2Qwx/s0L/tbyMkDAtsZAKmPL3DbWYUzubBDRNXyV1TxdUDus9ROy5XQ9AHfP0A
+        LJdslbvMK0Lvo
+X-Received: by 2002:adf:a285:: with SMTP id s5mr34674043wra.60.1589384113323;
+        Wed, 13 May 2020 08:35:13 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIA84YuCLMye/q5eJye3p3ezHVL2W4N4sgoCRYfBUJD2arrSnmJhUj2IXdzTelP3klz+QGLcg==
+X-Received: by 2002:adf:a285:: with SMTP id s5mr34673990wra.60.1589384113097;
+        Wed, 13 May 2020 08:35:13 -0700 (PDT)
 Received: from [192.168.178.58] ([151.30.85.171])
-        by smtp.gmail.com with ESMTPSA id 37sm2024303wrk.61.2020.05.13.08.23.20
+        by smtp.gmail.com with ESMTPSA id b23sm33621926wmb.26.2020.05.13.08.35.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 May 2020 08:23:20 -0700 (PDT)
-Subject: Re: [RFC PATCH] KVM: Add module for IRQ forwarding
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Micah Morton <mortonm@chromium.org>, kvm@vger.kernel.org,
-        jmattson@google.com
-References: <20200511220046.120206-1-mortonm@chromium.org>
- <20200512111440.15caaca2@w520.home>
- <92fd66eb-68e7-596f-7dd1-f1c190833be4@redhat.com>
- <20200513083401.11e761a7@x1.home>
+        Wed, 13 May 2020 08:35:12 -0700 (PDT)
+Subject: Re: [PATCH v4 0/3] arch/x86: Enable MPK feature on AMD
+To:     Babu Moger <babu.moger@amd.com>, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com
+Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, dave.hansen@linux.intel.com,
+        luto@kernel.org, peterz@infradead.org, mchehab+samsung@kernel.org,
+        changbin.du@intel.com, namit@vmware.com, bigeasy@linutronix.de,
+        yang.shi@linux.alibaba.com, asteinhauser@google.com,
+        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
+        akpm@linux-foundation.org, steven.price@arm.com,
+        rppt@linux.vnet.ibm.com, peterx@redhat.com,
+        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
+        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
+        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
+        jgross@suse.com, andrew.cooper3@citrix.com,
+        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
+        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
+        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <158932780954.44260.4292038705292213548.stgit@naples-babu.amd.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c0bfeb7-0d08-db74-3a23-7a850f301a2a@redhat.com>
-Date:   Wed, 13 May 2020 17:23:19 +0200
+Message-ID: <8cef30e5-5bb5-d3e2-3e0c-d30ec98818da@redhat.com>
+Date:   Wed, 13 May 2020 17:35:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200513083401.11e761a7@x1.home>
+In-Reply-To: <158932780954.44260.4292038705292213548.stgit@naples-babu.amd.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/05/20 16:34, Alex Williamson wrote:
->> Alternatively, if you assign the i2c controller, I don't understand why
->> the guest doesn't discover interrupts on its own.  Of course you need to
->> tell the guest about the devices in the ACPI tables, but why is this new
->> concept necessary?
->
-> the interrupt for this sub-device is unrelated to the PCI
-> controller device, it's an entirely arbitrary (from our perspective)
-> relationship described via ACPI.
+On 13/05/20 01:58, Babu Moger wrote:
+> AMD's next generation of EPYC processors support the MPK (Memory
+> Protection Keys) feature.
+> 
+> This series enables the feature on AMD and updates config parameters
+> and documentation to reflect the MPK support on x86 platforms.
+> 
+> AMD documentation for MPK feature is available at "AMD64 Architecture
+> Programmer’s Manual Volume 2: System Programming, Pub. 24593 Rev. 3.34,
+> Section 5.6.6 Memory Protection Keys (MPK) Bit".
+> 
+> The documentation can be obtained at the link below:
+> https://bugzilla.kernel.org/show_bug.cgi?id=206537
 
-Ok, that's what I was missing.
-
-> We could potentially use device specific interrupts to expose this via
-> the controller device, but then vfio-pci needs to learn how to
-> essentially become an i2c controller to enumerate the sub-devices and
-> collect external dependencies.  This is not an approach I've embraced
-> versus the alternative of the host i2c driver claiming the PCI
-> controller, enumerating the sub-devices, and binding the resulting
-> device, complete with built-in interrupt support via vfio-platform.
-
-I agree that's the way to go.
-
-Perhaps adding arbitrary non-PCI interrupts, i.e. neither INTX nor
-MSI(-X), to vfio-pci could be acceptable.  However, the device claim
-must claim them, and that seems hard to do when you rebind the PCI
-device to pci-stub.
+I'm queuing patches 2 and 3, since they are do not need any support in
+common code.
 
 Paolo
 
