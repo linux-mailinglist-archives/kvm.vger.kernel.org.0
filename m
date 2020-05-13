@@ -2,140 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C3B51D0FB4
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 12:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A42A1D0FF8
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 12:38:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728606AbgEMK3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 06:29:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46021 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727794AbgEMK3C (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 06:29:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589365740;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kcmT/ox8AHLX/QMTCJPzRwt3hsJ5CzQByK8qyk+UAh8=;
-        b=XFQh3s3+BqgZf/oeqbAkce3N8p1GHCw+DmgJLAFJuQuxEMESIWpX7MaGiBvuzLIDlmjaeA
-        KL6OWyzRHXYOJiflsuFIvSY59RSvIt42ScTO7u9yLDJmuhhg1DUrppRB23utWs0/mEhti8
-        yWTm2w4UOuIgdxr3gPX6bpVm7yM09Jc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-xqI8SoykMmaPbd2Rkkxylw-1; Wed, 13 May 2020 06:28:59 -0400
-X-MC-Unique: xqI8SoykMmaPbd2Rkkxylw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1730564AbgEMKie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 06:38:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55580 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727812AbgEMKid (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 06:38:33 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B59F835B46;
-        Wed, 13 May 2020 10:28:57 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D57247D94A;
-        Wed, 13 May 2020 10:28:49 +0000 (UTC)
-Date:   Wed, 13 May 2020 12:28:47 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Pan Nengyuan <pannengyuan@huawei.com>
-Cc:     <pbonzini@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <mtosatti@redhat.com>, euler.robot@huawei.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        zhang.zhanghailiang@huawei.com
-Subject: Re: [PATCH v2] i386/kvm: fix a use-after-free when vcpu plug/unplug
-Message-ID: <20200513122847.10dbc3c0@redhat.com>
-In-Reply-To: <20200513132630.13412-1-pannengyuan@huawei.com>
-References: <20200513132630.13412-1-pannengyuan@huawei.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 63E1B20673;
+        Wed, 13 May 2020 10:38:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589366313;
+        bh=cdyohDfzAVPN7ZxH8h6kx+enid172A/O+6QoKrrtYpc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=RbMjCO9SXAqknjxiUGZwh8QO3U0+rOXlcjUgomVg6pkSSuRp8vMEuijB++gkwTiQm
+         iUL8RdibNcRr/qeWWNALIs8RCT7HI6RFzeUdUhZPmllkrIjeux51bpCmNUXwdOGT3w
+         y2ImlUqdypdvejXUQgWygyNP0o/w63XtgrmpBNIE=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jYomV-00BwQw-Kz; Wed, 13 May 2020 11:38:31 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        dbrazdil@google.com
+Subject: [PATCH] KVM: arm64: Use cpus_have_final_cap for has_vhe()
+Date:   Wed, 13 May 2020 11:38:28 +0100
+Message-Id: <20200513103828.74580-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, dbrazdil@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 May 2020 09:26:30 -0400
-Pan Nengyuan <pannengyuan@huawei.com> wrote:
+By the time we start using the has_vhe() helper, we have long
+discovered whether we are running VHE or not. It thus makes
+sense to use cpus_have_final_cap() instead of cpus_have_const_cap(),
+which leads to a small text size reduction.
 
-> When we hotplug vcpus, cpu_update_state is added to vm_change_state_head
-> in kvm_arch_init_vcpu(). But it forgot to delete in kvm_arch_destroy_vcpu=
-() after
-> unplug. Then it will cause a use-after-free access. This patch delete it =
-in
-> kvm_arch_destroy_vcpu() to fix that.
->=20
-> Reproducer:
->     virsh setvcpus vm1 4 --live
->     virsh setvcpus vm1 2 --live
->     virsh suspend vm1
->     virsh resume vm1
->=20
-> The UAF stack:
-> =3D=3Dqemu-system-x86_64=3D=3D28233=3D=3DERROR: AddressSanitizer: heap-us=
-e-after-free on address 0x62e00002e798 at pc 0x5573c6917d9e bp 0x7fff07139e=
-50 sp 0x7fff07139e40
-> WRITE of size 1 at 0x62e00002e798 thread T0
->     #0 0x5573c6917d9d in cpu_update_state /mnt/sdb/qemu/target/i386/kvm.c=
-:742
->     #1 0x5573c699121a in vm_state_notify /mnt/sdb/qemu/vl.c:1290
->     #2 0x5573c636287e in vm_prepare_start /mnt/sdb/qemu/cpus.c:2144
->     #3 0x5573c6362927 in vm_start /mnt/sdb/qemu/cpus.c:2150
->     #4 0x5573c71e8304 in qmp_cont /mnt/sdb/qemu/monitor/qmp-cmds.c:173
->     #5 0x5573c727cb1e in qmp_marshal_cont qapi/qapi-commands-misc.c:835
->     #6 0x5573c7694c7a in do_qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.=
-c:132
->     #7 0x5573c7694c7a in qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:1=
-75
->     #8 0x5573c71d9110 in monitor_qmp_dispatch /mnt/sdb/qemu/monitor/qmp.c=
-:145
->     #9 0x5573c71dad4f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu/monitor/=
-qmp.c:234
->=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/virt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
-> - v2: remove unnecessary set vmsentry to null(there is no non-null check).
-> ---
->  target/i386/cpu.h | 1 +
->  target/i386/kvm.c | 4 +++-
->  2 files changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index e818fc712a..afbd11b7a3 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1631,6 +1631,7 @@ struct X86CPU {
-> =20
->      CPUNegativeOffsetState neg;
->      CPUX86State env;
-> +    VMChangeStateEntry *vmsentry;
-> =20
->      uint64_t ucode_rev;
-> =20
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 4901c6dd74..0a4eca5a85 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1770,7 +1770,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          }
->      }
-> =20
-> -    qemu_add_vm_change_state_handler(cpu_update_state, env);
-> +    cpu->vmsentry =3D qemu_add_vm_change_state_handler(cpu_update_state,=
- env);
-> =20
->      c =3D cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
->      if (c) {
-> @@ -1883,6 +1883,8 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
->          env->nested_state =3D NULL;
->      }
-> =20
-> +    qemu_del_vm_change_state_handler(cpu->vmsentry);
-> +
->      return 0;
->  }
-> =20
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 61fd26752adc..5051b388c654 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -85,7 +85,7 @@ static inline bool is_kernel_in_hyp_mode(void)
+ 
+ static __always_inline bool has_vhe(void)
+ {
+-	if (cpus_have_const_cap(ARM64_HAS_VIRT_HOST_EXTN))
++	if (cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN))
+ 		return true;
+ 
+ 	return false;
+-- 
+2.20.1
 
