@@ -2,102 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D856A1D06C9
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 07:57:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C3271D08E3
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 08:47:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729372AbgEMF5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 01:57:49 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42549 "EHLO
+        id S1729247AbgEMGrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 02:47:15 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60442 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729161AbgEMF5e (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 01:57:34 -0400
+        by vger.kernel.org with ESMTP id S1728101AbgEMGrP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 02:47:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589349453;
+        s=mimecast20190719; t=1589352433;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oS9s06FImqWmW3Ha3Sx3lNv173yHCer4HwNEWY7z8Lw=;
-        b=A65PPSpXo6wkymPTMbSzVCOjkTAScE3Kn/2REO4bEmbMLEGQrDgTJve5g8wavyIAveswuH
-        1W04B/NDyavO76cPeGkzmnJf/AWb3HyEDK78eW/z/N34fmx5W0SIcSLyXp3CFaRjtY25F/
-        bQgmj3tybBafmhCypbMAxxJrzjxhQYc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-pMwZ543xOua3WL8Aq33VRw-1; Wed, 13 May 2020 01:57:29 -0400
-X-MC-Unique: pMwZ543xOua3WL8Aq33VRw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90DC21841931;
-        Wed, 13 May 2020 05:57:28 +0000 (UTC)
-Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E36F05D9E8;
-        Wed, 13 May 2020 05:57:20 +0000 (UTC)
-Subject: Re: [PATCH V2] ifcvf: move IRQ request/free to status change handlers
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
-References: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
- <8aca85c3-3bf6-a1ec-7009-cd9a635647d7@redhat.com>
- <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <f7485579-834f-1770-1622-e6df1b2f3e81@redhat.com>
-Date:   Wed, 13 May 2020 13:57:19 +0800
+        bh=AdFMrhhIoANCzu/7dse+27HGCF0LIUSWgnhbm4IqTpY=;
+        b=hC+54WZsyA82zWdaUkFkCKkbXa3zVp30n8Gt7xrmok9md28Vf/hZHmoS5hiJ+8IdgoZ72X
+        /1ICiCJJq+Ishv/ynNL8fpvDVRJlME7v4829FQ4jOSd5n7jqIxm4jDXtka5tAJHn5dZU6H
+        RKHeV8u72u1JOBM/t/Ldo7vfl59d2cc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-yktXWEV0NGaIngJ-Ov-fJw-1; Wed, 13 May 2020 02:47:11 -0400
+X-MC-Unique: yktXWEV0NGaIngJ-Ov-fJw-1
+Received: by mail-wr1-f69.google.com with SMTP id z8so8127739wrp.7
+        for <kvm@vger.kernel.org>; Tue, 12 May 2020 23:47:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AdFMrhhIoANCzu/7dse+27HGCF0LIUSWgnhbm4IqTpY=;
+        b=Uoj+GoSEfnU8qCAams1uRS+ygbb9CFhX8JalGkfj0IB0B+M0w9hOxUHxeX+iXdmGjK
+         X1XY8Bgbecd1b9iIfVpld4emI+kEOj5BkiN4d7v8j48GOVqyN6y0I8Z6G/5GM63igMfM
+         YNSmK/CfNiS8vV0D7hYwRrUHR3DUORX0fUBZlEMawD4WAkzY2eyV38kaEgrLFaWWYdGU
+         2CPKvDKFpw28ZpMmYvZ/6qwdoXQEhC7Puy/j1xLx5+rdQFF6iRqJg9su8HQT/WwRjJsR
+         41nFTxrzf0fES2v8Ej5CIJ8Nhrnj0Ba05qi1PTaXGvXFkIGC+18CmyMtpq+hRf6wXU5H
+         crRw==
+X-Gm-Message-State: AGi0PuaBv37VacP9S4FWf4/LGiJFc3eBeoAt4zcWhLaZBJTeYeYWgIwq
+        nsy/Ud58jv5pm41eAHA9h/HWeAZoJ93AkmGLO5oomTfON/AWXhhufSNjXk/1XDFQ1FgVscCKpV2
+        HM0YXSIt1sXNB
+X-Received: by 2002:a1c:a3c5:: with SMTP id m188mr20233382wme.160.1589352430275;
+        Tue, 12 May 2020 23:47:10 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJKd5qCQY6u5EUoGGL4m4WiqTUjq2cnRZ3DkU0F5sqPvQ/ZGnXVq3J14vWgf3ZM9BN5qZGbXA==
+X-Received: by 2002:a1c:a3c5:: with SMTP id m188mr20233342wme.160.1589352430066;
+        Tue, 12 May 2020 23:47:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:6ced:5227:72a1:6b78? ([2001:b07:6468:f312:6ced:5227:72a1:6b78])
+        by smtp.gmail.com with ESMTPSA id s11sm25480042wrp.79.2020.05.12.23.47.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 May 2020 23:47:09 -0700 (PDT)
+Subject: Re: [PATCH v3 2/3] KVM: x86: Move pkru save/restore to x86.c
+To:     Babu Moger <babu.moger@amd.com>, Jim Mattson <jmattson@google.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        mchehab+samsung@kernel.org, changbin.du@intel.com,
+        Nadav Amit <namit@vmware.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        yang.shi@linux.alibaba.com,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        anshuman.khandual@arm.com, Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        steven.price@arm.com, rppt@linux.vnet.ibm.com, peterx@redhat.com,
+        Dan Williams <dan.j.williams@intel.com>,
+        Arjun Roy <arjunroy@google.com>, logang@deltatee.com,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, justin.he@arm.com,
+        robin.murphy@arm.com, ira.weiny@intel.com,
+        Kees Cook <keescook@chromium.org>,
+        Juergen Gross <jgross@suse.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        pawan.kumar.gupta@linux.intel.com,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
+        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
+References: <158923982830.20128.14580309786525588408.stgit@naples-babu.amd.com>
+ <158923998430.20128.2992701977443921714.stgit@naples-babu.amd.com>
+ <CALMp9eSAnkrUaBgtDAu7CDM=-vh3Cb9fVikrfOt30K1EXCqmBw@mail.gmail.com>
+ <e84b15c2-ec9d-8063-4cf4-42106116fdd9@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6982aaa9-d1ee-db8a-2eeb-6063c9bc342c@redhat.com>
+Date:   Wed, 13 May 2020 08:47:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <e84b15c2-ec9d-8063-4cf4-42106116fdd9@amd.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/5/13 下午12:42, Zhu, Lingshan wrote:
->
->
-> On 5/13/2020 12:12 PM, Jason Wang wrote:
->>
->> On 2020/5/12 下午4:00, Zhu Lingshan wrote:
->>> This commit move IRQ request and free operations from probe()
->>> to VIRTIO status change handler to comply with VIRTIO spec.
+On 12/05/20 19:17, Babu Moger wrote:
+> 
+> On 5/12/20 11:39 AM, Jim Mattson wrote:
+>> On Mon, May 11, 2020 at 4:33 PM Babu Moger <babu.moger@amd.com> wrote:
+>>> MPK feature is supported by both VMX and SVM. So we can
+>>> safely move pkru state save/restore to common code. Also
+>>> move all the pkru data structure to kvm_vcpu_arch.
 >>>
->>> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
->>> The device MUST NOT consume buffers or send any used buffer
->>> notifications to the driver before DRIVER_OK.
->>
->>
->> This comment needs to be checked as I said previously. It's only 
->> needed if we're sure ifcvf can generate interrupt before DRIVER_OK.
->>
->>
+>>> Also fixes the problem Jim Mattson pointed and suggested below.
 >>>
->>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>> ---
->>> changes from V1:
->>> remove ifcvf_stop_datapath() in status == 0 handler, we don't need 
->>> to do this
->>> twice; handle status == 0 after DRIVER_OK -> !DRIVER_OK handler 
->>> (Jason Wang)
->>
->>
->> Patch looks good to me, but with this patch ping cannot work on my 
->> machine. (It works without this patch).
->>
->> Thanks
-> This is strange, it works on my machines, let's have a check offline.
->
-> Thanks,
-> BR
-> Zhu Lingshan
+>>> "Though rdpkru and wrpkru are contingent upon CR4.PKE, the PKRU
+>>> resource isn't. It can be read with XSAVE and written with XRSTOR.
+>>> So, if we don't set the guest PKRU value here(kvm_load_guest_xsave_state),
+>>> the guest can read the host value.
+>>>
+>>> In case of kvm_load_host_xsave_state, guest with CR4.PKE clear could
+>>> potentially use XRSTOR to change the host PKRU value"
+>>>
+>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+>> I would do the bugfix as a separate commit, to ease backporting it to
+>> the stable branches.
+> Ok. Sure.
 
+I will take care of this for v4 (pick this patch up and put it in
+5.7-rc, package everything as a topic branch, merge it to kvm/next).
 
-Note that I tested the patch with vhost-vpda.
-
-Thanks.
+Paolo
 
