@@ -2,127 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC1E51D0B7C
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 11:06:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EE961D0B81
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 11:09:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730661AbgEMJG5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 05:06:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42548 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730334AbgEMJG5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 05:06:57 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3BBC061A0C
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 02:06:55 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id e16so19892096wra.7
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 02:06:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sAz22Qf5FRJKdunB6aL5p2mmvJR5GBHWvdnGZkiVqTA=;
-        b=NSVYfRzXzR7uUhwc5wpgdH4cy/nHDWl6Ycsvjllye+7k2RoNJaAbfSrhysBV3nQRFR
-         Vv4hrCsx4XjIKsglu2ZKqe3WGYeQaI5yNPPde4hZU2ifJH4BlNEgtApcgN4fF8H4/jSQ
-         a9LrjX5AAQFngrJM2YsZ79hofUuj3XXNEgAq+8wy+3WTfxSi+cByUp+9Bb6lGiq6kMZq
-         E+tc9ZgM3iV6L9DmlObACm3hAUWvXh6ZQismk2m8LLAEX5OtD6Vqj4thsx+AWW+QXD4t
-         Ot0diSIBEoeSy8j8NW+A2nDtCSWBGN/uPZM4o5K6GjnS8sZ0zcCbWseZ8BV1wW3VeztU
-         0XnA==
+        id S1732416AbgEMJJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 05:09:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27993 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730677AbgEMJJb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 05:09:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589360970;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LkQRKl9tLygDVkb/DJW18fHZ9G4cW+Tv9HaEWtJVlFg=;
+        b=S7zM8ArUeuJk+7MoaMAW0vq/F1073CDQGNpEQAQkVgEEUtwK7kYTx6FzYFvt6IZMvZRGB+
+        +oaL4fgt5jcLf08LVxyJcAFKwtegF8bXbyikpcJW6zD792Oi03MnoRwm1JJaN2QlStl7it
+        4Ckm8TdUtV46EfyF5YVV4y9wk/pUyDE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-RjFx8uD0NZaWEjlhnImaew-1; Wed, 13 May 2020 05:09:26 -0400
+X-MC-Unique: RjFx8uD0NZaWEjlhnImaew-1
+Received: by mail-wm1-f71.google.com with SMTP id h6so11357143wmi.7
+        for <kvm@vger.kernel.org>; Wed, 13 May 2020 02:09:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sAz22Qf5FRJKdunB6aL5p2mmvJR5GBHWvdnGZkiVqTA=;
-        b=SBe4l57rW8D7vOejm80uO4BDGC5QUGIo6ZWDtTlE9mn+dCjcJaX83oEKzXc3sh6nOw
-         nmQ3QCMJFnpz815LJs9Mtm7rHqqwsEjtnbxAl1KIMXcYSuqXAWtcKvKSu0XmfIcpv1uB
-         guKnAl4GcOhnv83B5QliZrGcYQ9ATCVbBDLh/Ij8DSachvRFZusEPMfbZvTQwCAAVT/R
-         E/Cm3glzGHFaxra5bxXHgmvHiO3A2efnBjDINGTcle5AQHYZ8ZiaA8pYvm4vlmWkpkKK
-         I7SDQBH3Ocm5+eC8CHswpYlr1JCLnKhWwIFx7yqkfb+eubJP5NfcK6vtdMQTtRCo45BU
-         qRPA==
-X-Gm-Message-State: AGi0PuZvFm2aO+NVhgUu68v2YbxoX5y14G6MXIaT9z1vbiBe6REX0Ktt
-        b6LnCT+8D6mN+fTQHaEw15nIGw==
-X-Google-Smtp-Source: APiQypIIFOViZHe/I++TwFOrfnuWl7zhlP4ZWLO5ZAjebaUXaOhLLT0nrmxPGsJEtdQd9W5w4E+DNQ==
-X-Received: by 2002:a5d:4dc9:: with SMTP id f9mr20206671wru.407.1589360813739;
-        Wed, 13 May 2020 02:06:53 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
-        by smtp.gmail.com with ESMTPSA id w18sm27011053wro.33.2020.05.13.02.06.52
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=LkQRKl9tLygDVkb/DJW18fHZ9G4cW+Tv9HaEWtJVlFg=;
+        b=kze9j9gmRFN9jFud9sOdVxhr4SJxbAU2q/aZMkOgB8XQe8R4f//Gv7yTX7K+gw94Xb
+         akXrq3RRhRMeGCbS3OG4hHt6/YzKjstkGsh/Kvpme+5nKZWvJ24FYdZ9fllcD2LTaVwG
+         TyhB/2I1RPO5IeOrWtcZotipmAEhVG6IrTTaUyAxG1ivOIRjmmiV+FWfj8Z6QAyJb8R9
+         hgOQ8pm2ciciHhSSx+hjZNrFG2XTPz5sKdQ1i+IOEquasaSWal/z1FpMBmgHLZx3h3Nx
+         t9db1JgnBwAIiReoMT14Q/RJFOfZ8N02UJMGxd/a7BY77Qp9736zKLxd0KzCzQJLiDPr
+         rp4A==
+X-Gm-Message-State: AGi0PuaH92HmfTTTtwdcm9mVKE7BhOZSRbwFa2R+aRyzgFxHs3jRP8fi
+        qRoz1HqVpf8R1jEj5ClmPiDymI9QqAuc9XNOqsF8Gy5j+VBvkZLFwo0NNXOu3qIC2yhtPwjUfGA
+        IVJBQU+uH0q1P
+X-Received: by 2002:a1c:99d3:: with SMTP id b202mr43420408wme.126.1589360965710;
+        Wed, 13 May 2020 02:09:25 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIjv23QQ+2IFmFvDYhwD6Weh2biJtnHzNX52SF/bAHYC2OofdpyPGHaYJrzuFQpZNuwDeYLdw==
+X-Received: by 2002:a1c:99d3:: with SMTP id b202mr43420381wme.126.1589360965486;
+        Wed, 13 May 2020 02:09:25 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id b145sm13059757wme.41.2020.05.13.02.09.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2020 02:06:53 -0700 (PDT)
-Date:   Wed, 13 May 2020 10:06:48 +0100
-From:   Andrew Scull <ascull@google.com>
-To:     James Morse <james.morse@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        Andre Przywara <andre.przywara@arm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Dave Martin <Dave.Martin@arm.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 08/26] KVM: arm64: Use TTL hint in when invalidating
- stage-2 translations
-Message-ID: <20200513090648.GA193035@google.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-9-maz@kernel.org>
- <20200507151321.GH237572@google.com>
- <63e16fdd-fe1b-07d3-23b7-cd99170fdd59@arm.com>
+        Wed, 13 May 2020 02:09:24 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vivek Goyal <vgoyal@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with token info
+In-Reply-To: <20200512175017.GC12100@linux.intel.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com> <20200511164752.2158645-3-vkuznets@redhat.com> <20200512152709.GB138129@redhat.com> <87o8qtmaat.fsf@vitty.brq.redhat.com> <20200512155339.GD138129@redhat.com> <20200512175017.GC12100@linux.intel.com>
+Date:   Wed, 13 May 2020 11:09:23 +0200
+Message-ID: <874kskmcak.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <63e16fdd-fe1b-07d3-23b7-cd99170fdd59@arm.com>
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 12, 2020 at 01:04:31PM +0100, James Morse wrote:
-> Hi Andrew,
-> 
-> On 07/05/2020 16:13, Andrew Scull wrote:
-> >> @@ -176,7 +177,7 @@ static void clear_stage2_pud_entry(struct kvm_s2_mmu *mmu, pud_t *pud, phys_addr
-> >>  	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(kvm, pud, 0);
-> >>  	VM_BUG_ON(stage2_pud_huge(kvm, *pud));
-> >>  	stage2_pud_clear(kvm, pud);
-> >> -	kvm_tlb_flush_vmid_ipa(mmu, addr);
-> >> +	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
-> >>  	stage2_pmd_free(kvm, pmd_table);
-> >>  	put_page(virt_to_page(pud));
-> >>  }
-> >> @@ -186,7 +187,7 @@ static void clear_stage2_pmd_entry(struct kvm_s2_mmu *mmu, pmd_t *pmd, phys_addr
-> >>  	pte_t *pte_table = pte_offset_kernel(pmd, 0);
-> >>  	VM_BUG_ON(pmd_thp_or_huge(*pmd));
-> >>  	pmd_clear(pmd);
-> >> -	kvm_tlb_flush_vmid_ipa(mmu, addr);
-> >> +	kvm_tlb_flush_vmid_ipa(mmu, addr, S2_NO_LEVEL_HINT);
-> >>  	free_page((unsigned long)pte_table);
-> >>  	put_page(virt_to_page(pmd));
-> >>  }
-> > 
-> > Going by the names, is it possible to give a better level hint for these
-> > cases?
-> 
-> There is no leaf entry being invalidated here. After clearing the range, we found we'd
-> emptied (and invalidated) a whole page of mappings:
-> |	if (stage2_pmd_table_empty(kvm, start_pmd))
-> |		clear_stage2_pud_entry(mmu, pud, start_addr);
-> 
-> Now we want to remove the link to the empty page so we can free it. We are changing the
-> structure of the tables, not what gets mapped.
-> 
-> I think this is why we need the un-hinted behaviour, to invalidate "any level of the
-> translation table walk required to translate the specified IPA". Otherwise the hardware
-> can look for a leaf at the indicated level, find none, and do nothing.
-> 
-> 
-> This is sufficiently horrible, its possible I've got it completely wrong! (does it make
-> sense?)
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Ok. `addr` is an IPA, that IPA is now omitted from the map so doesn't
-appear in any entry of the table, least of all a leaf entry. That makes
-sense.
+>
+> Why bother preserving backwards compatibility?  AIUI, both KVM and guest
+> will support async #PF iff interrupt delivery is enabled.  Why not make
+> the interrupt delivery approach KVM_ASYNC_PF_V2 and completely redefine the
+> ABI?  E.g. to make it compatible with reflecting !PRESENT faults without a
+> VM-Exit via Intel's EPT Violation #VE?
+>
 
-Is there a convention to distinguish IPA and PA similar to the
-distinction for VA or does kvmarm just use phys_addr_t all round?
+That's the plan, actually. 'page not present' becomes #VE and 'page
+present' becomes an interrupt (we don't need to inject them
+synchronously). These two parts are fairly independent but can be merged
+to reuse the same new capability/CPUID.
 
-It seems like the TTL patches are failry self contained if it would be
-easier to serparate them out from these larger series?
+-- 
+Vitaly
+
