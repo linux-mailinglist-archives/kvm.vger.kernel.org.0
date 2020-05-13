@@ -2,151 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 714B81D12E1
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 14:37:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0A901D12E7
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 14:39:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731993AbgEMMho (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 08:37:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47184 "EHLO
+        id S1730062AbgEMMja (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 08:39:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731709AbgEMMhn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 08:37:43 -0400
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 121F7C061A0C;
-        Wed, 13 May 2020 05:37:43 -0700 (PDT)
-Received: by mail-wr1-x441.google.com with SMTP id 50so20157478wrc.11;
-        Wed, 13 May 2020 05:37:43 -0700 (PDT)
+        with ESMTP id S1726081AbgEMMj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 08:39:29 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E3BC061A0C;
+        Wed, 13 May 2020 05:39:29 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id g12so28305496wmh.3;
+        Wed, 13 May 2020 05:39:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=RugSmt8EF7xoG6N6QG3k7oUUaKf1LBbQK6iqg3uhGVc=;
-        b=qiEe/AP6Y7hTMs8NMLImXg2L/Phr4eeIxHDRhD785laWQqbfL9ya9SdFimerZsS7e5
-         EZz6fLOS6GRM1Dkm/WocGcAFDtxJ5qny46T/4laIXT7VFBF/KD/6/w3ZMvYuiYYHoE0H
-         t3Ac7YS6NbOMeU2F8v99xtd51Dm6dOr1t+kWYrhZQCo9EHPhSZsl+sMV38GEvYcgnGM+
-         9XIJdVQ/YGKMpuwoDi9QUZOVSreSmPdgylX+wP8QFq+FCNF0GzJ0FBA604V2ljhreUsK
-         4qZIaygdkTGGlpEp/y7BBXtr7VUKw+UbQeJVaD26gvUYbJqPcNuWhXpa81Eq90VVy6sB
-         t/6g==
+        bh=YAMZzYHc3BSk60ZKYMuYkolep9zJ19WbVFd5/fzkGEw=;
+        b=aSzmnjkt1nm4KVfoFZngKWLTaJohY2jch1RA49NsrBpP1BwpDWVbD5AxELhA8WqDtn
+         +1xoBJzIoJyWGmLf3QREao+xAe5bBjibNkoRM+rAgl6jHAD6qR4AlZwxANDR8vy/7asO
+         QXQ6+zQ5c4AQ1JWd3TRihXc6+5M9G/K6GCbO0PVowdDOgeC+5gps8hlLp8U2Kocg6ffl
+         7kGk0buPEVVG9hHvO3H99p/UtDWfC38IGncNKCaXn/HKV81spp3alP3zSsccmYLBljfB
+         ZjdDhce1gchcWhAVlgKh9eaUarx3Rhbdrk8m4DbU11/+wo4u/mZ29qiJgnZuWI48sWz6
+         0b7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=RugSmt8EF7xoG6N6QG3k7oUUaKf1LBbQK6iqg3uhGVc=;
-        b=QRgnYd39446SmCi4Gs2Cce+hhCLx1EePhDFBW/ZaTKcvVH68/TikZYoJ6K+oDjDttw
-         Xp2Ankx3YAmXi+SO1kWkWq8grbduDQZcr+v02T4pNkWcHh8E/IZncs7hbGc82D8pcrW4
-         a3GK1etZbqReYy3q+feNh8DZjKKca9r6JIzr4LJxsm5QgzQMDHq0KZcaKPN+S8mB+HsQ
-         o4DvpwpaWjJsDytIrTSwAb4SW2uZkUPCXPvu626oNww3QXOdOMdE+qwTrZeVDEVmWqIL
-         nY5CAlR9LZC19lSfBUIXey/qD3jtKCeG+WwF7tUmwglhZeR0R4q1RpS+OesMfGvseUX8
-         JgdQ==
-X-Gm-Message-State: AGi0PuYUF8hQQih0uWCn5q94/KszxKyFed4EmcLdyKyT+OVOt8l1XjaA
-        k3r/bOU3ogjveOYVCSgY4GBpaweIA/0=
-X-Google-Smtp-Source: APiQypIuZgHeW59b+htFw4Jnpdw5Sl6YGiRwJ7ShlCMxkzwiZVpwnj41JMjaTpW96gZejYjXP59wHA==
-X-Received: by 2002:a5d:6750:: with SMTP id l16mr11615310wrw.295.1589373461755;
-        Wed, 13 May 2020 05:37:41 -0700 (PDT)
+        bh=YAMZzYHc3BSk60ZKYMuYkolep9zJ19WbVFd5/fzkGEw=;
+        b=Gra76264y0YUNN8UTSwpuv/Wu7Kl8zvYH76MvenLxgWjwX+Hp+tbjXrQ/F+qJIYX5w
+         MnE2di8ROZ1G9MEkcs9ThtkFe24OO/tUpOdRYHPCBXcg4pCF1SxNEBk2J/pkDclMle/S
+         2it3MBrm9+3zGPnYJxXRPfM+PKGDuPtt6nQ57wjrfh9WzHChRNRHC+YZWR2ALg6waJFr
+         hH6HF2kiSlB0Oicoh9NlmoszOLPDQBYZ7Jdynz7V2h5qSwORanK5XrZJi3H1R55ovj0l
+         5GsXV7W4jm+Yf+CwhyrydCFoji/m2fF678ItcLfu0LZTGX9lhpqZatUzLzgJddA0EcB6
+         QV7g==
+X-Gm-Message-State: AGi0Pub+7VNVyluLM+f7eTe4XtHqMT7mAWVdPNdsCqNDMQsy7l47oHkb
+        44lanuxjevD3ono/YGvi4kE=
+X-Google-Smtp-Source: APiQypKUSNj6yHRllppCwr6DtXaxXqekJe3s/XyxB4rcNCM8c2WTYaTwb/m2P0/HIkltXrZs3+vHZQ==
+X-Received: by 2002:a7b:c253:: with SMTP id b19mr22490141wmj.110.1589373567857;
+        Wed, 13 May 2020 05:39:27 -0700 (PDT)
 Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
-        by smtp.gmail.com with ESMTPSA id d126sm16529520wmd.32.2020.05.13.05.37.40
+        by smtp.gmail.com with ESMTPSA id b23sm33041658wmb.26.2020.05.13.05.39.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2020 05:37:41 -0700 (PDT)
-Date:   Wed, 13 May 2020 15:37:39 +0300
+        Wed, 13 May 2020 05:39:27 -0700 (PDT)
+Date:   Wed, 13 May 2020 15:39:26 +0300
 From:   Jon Doron <arilou@gmail.com>
 To:     Roman Kagan <rvkagan@yandex-team.ru>, kvm@vger.kernel.org,
         linux-hyperv@vger.kernel.org, vkuznets@redhat.com
-Subject: Re: [PATCH v11 5/7] x86/kvm/hyper-v: enable hypercalls without
- hypercall page with syndbg
-Message-ID: <20200513123739.GK2862@jondnuc>
+Subject: Re: [PATCH v11 6/7] x86/kvm/hyper-v: Add support for synthetic
+ debugger via hypercalls
+Message-ID: <20200513123926.GL2862@jondnuc>
 References: <20200424113746.3473563-1-arilou@gmail.com>
- <20200424113746.3473563-6-arilou@gmail.com>
- <20200513095738.GC29650@rvkaganb.lan>
+ <20200424113746.3473563-7-arilou@gmail.com>
+ <20200512153353.GB9944@rvkaganb.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20200513095738.GC29650@rvkaganb.lan>
+In-Reply-To: <20200512153353.GB9944@rvkaganb.lan>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/05/2020, Roman Kagan wrote:
->On Fri, Apr 24, 2020 at 02:37:44PM +0300, Jon Doron wrote:
->> Microsoft's kdvm.dll dbgtransport module does not respect the hypercall
->> page and simply identifies the CPU being used (AMD/Intel) and according
->> to it simply makes hypercalls with the relevant instruction
->> (vmmcall/vmcall respectively).
+On 12/05/2020, Roman Kagan wrote:
+>On Fri, Apr 24, 2020 at 02:37:45PM +0300, Jon Doron wrote:
+>> There is another mode for the synthetic debugger which uses hypercalls
+>> to send/recv network data instead of the MSR interface.
 >>
->> The relevant function in kdvm is KdHvConnectHypervisor which first checks
->> if the hypercall page has been enabled via HV_X64_MSR_HYPERCALL_ENABLE,
->> and in case it was not it simply sets the HV_X64_MSR_GUEST_OS_ID to
->> 0x1000101010001 which means:
->> build_number = 0x0001
->> service_version = 0x01
->> minor_version = 0x01
->> major_version = 0x01
->> os_id = 0x00 (Undefined)
->> vendor_id = 1 (Microsoft)
->> os_type = 0 (A value of 0 indicates a proprietary, closed source OS)
->>
->> and starts issuing the hypercall without setting the hypercall page.
->
->I guess this is to avoid interfering with the OS being debugged
->requesting its own hypercall page at a different address.
->
->> To resolve this issue simply enable hypercalls also if the guest_os_id
->> is not 0 and the syndbg feature is enabled.
+>> This interface is much slower and less recommended since you might get
+>> a lot of VMExits while KDVM polling for new packets to recv, rather
+>> than simply checking the pending page to see if there is data avialble
+>> and then request.
 >>
 >> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 >> Signed-off-by: Jon Doron <arilou@gmail.com>
 >> ---
->>  arch/x86/kvm/hyperv.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>  arch/x86/kvm/hyperv.c | 28 ++++++++++++++++++++++++++++
+>>  1 file changed, 28 insertions(+)
 >>
 >> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
->> index 435516595090..524b5466a515 100644
+>> index 524b5466a515..744bcef88c70 100644
 >> --- a/arch/x86/kvm/hyperv.c
 >> +++ b/arch/x86/kvm/hyperv.c
->> @@ -1650,7 +1650,10 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *current_vcpu, u64 ingpa, u64 outgpa,
->>
->>  bool kvm_hv_hypercall_enabled(struct kvm *kvm)
->>  {
->> -	return READ_ONCE(kvm->arch.hyperv.hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE;
->> +	struct kvm_hv *hv = &kvm->arch.hyperv;
+>> @@ -1832,6 +1832,34 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>>  		}
+>>  		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
+>>  		break;
+>> +	case HVCALL_POST_DEBUG_DATA:
+>> +	case HVCALL_RETRIEVE_DEBUG_DATA:
+>> +		if (unlikely(fast)) {
+>> +			ret = HV_STATUS_INVALID_PARAMETER;
+>> +			break;
+>> +		}
+>> +		fallthrough;
+>> +	case HVCALL_RESET_DEBUG_SESSION: {
+>> +		struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
 >> +
->> +	return READ_ONCE(hv->hv_hypercall) & HV_X64_MSR_HYPERCALL_ENABLE ||
->> +	       (hv->hv_syndbg.active && READ_ONCE(hv->hv_guest_os_id) != 0);
+>> +		if (!syndbg->active) {
+>> +			ret = HV_STATUS_INVALID_HYPERCALL_CODE;
+>> +			break;
+>> +		}
+>> +
+>> +		if (!(syndbg->options & HV_X64_SYNDBG_OPTION_USE_HCALLS)) {
+>> +			ret = HV_STATUS_OPERATION_DENIED;
+>> +			break;
+>> +		}
+>> +		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
+>> +		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
+>> +		vcpu->run->hyperv.u.hcall.input = param;
+>> +		vcpu->run->hyperv.u.hcall.params[0] = ingpa;
+>> +		vcpu->run->hyperv.u.hcall.params[1] = outgpa;
+>> +		vcpu->arch.complete_userspace_io =
+>> +				kvm_hv_hypercall_complete_userspace;
+>> +		return 0;
+>> +	}
 >
->This function is meant to tell if the hypercall should be interpreted as
->following KVM or HyperV conventions.  Quoting from the spec
+>I'd personally just push every hyperv hypercall not recognized by the
+>kernel to userspace.  Smth like this:
 >
->  3.5 Legal Hypercall Environments
+>diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>index bcefa9d4e57e..f0404df0f488 100644
+>--- a/arch/x86/kvm/hyperv.c
+>+++ b/arch/x86/kvm/hyperv.c
+>@@ -1644,6 +1644,48 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> 		}
+> 		kvm_vcpu_on_spin(vcpu, true);
+> 		break;
+>+	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST:
+>+		if (unlikely(fast || !rep_cnt || rep_idx)) {
+>+			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>+			break;
+>+		}
+>+		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, false);
+>+		break;
+>+	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE:
+>+		if (unlikely(fast || rep)) {
+>+			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>+			break;
+>+		}
+>+		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, false);
+>+		break;
+>+	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX:
+>+		if (unlikely(fast || !rep_cnt || rep_idx)) {
+>+			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>+			break;
+>+		}
+>+		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, true);
+>+		break;
+>+	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX:
+>+		if (unlikely(fast || rep)) {
+>+			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>+			break;
+>+		}
+>+		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, true);
+>+		break;
+>+	case HVCALL_SEND_IPI:
+>+		if (unlikely(rep)) {
+>+			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>+			break;
+>+		}
+>+		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, false, fast);
+>+		break;
+>+	case HVCALL_SEND_IPI_EX:
+>+		if (unlikely(fast || rep)) {
+>+			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>+			break;
+>+		}
+>+		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
+>+		break;
+> 	case HVCALL_SIGNAL_EVENT:
+> 		if (unlikely(rep)) {
+> 			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>@@ -1653,12 +1695,8 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> 		if (ret != HV_STATUS_INVALID_PORT_ID)
+> 			break;
+> 		/* fall through - maybe userspace knows this conn_id. */
+>-	case HVCALL_POST_MESSAGE:
+>-		/* don't bother userspace if it has no way to handle it */
+>-		if (unlikely(rep || !vcpu_to_synic(vcpu)->active)) {
+>-			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>-			break;
+>-		}
+>+	default:
+>+		/* forward unrecognized hypercalls to userspace */
+> 		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
+> 		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
+> 		vcpu->run->hyperv.u.hcall.input = param;
+>@@ -1667,51 +1705,6 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> 		vcpu->arch.complete_userspace_io =
+> 				kvm_hv_hypercall_complete_userspace;
+> 		return 0;
+>-	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST:
+>-		if (unlikely(fast || !rep_cnt || rep_idx)) {
+>-			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>-			break;
+>-		}
+>-		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, false);
+>-		break;
+>-	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE:
+>-		if (unlikely(fast || rep)) {
+>-			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>-			break;
+>-		}
+>-		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, false);
+>-		break;
+>-	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX:
+>-		if (unlikely(fast || !rep_cnt || rep_idx)) {
+>-			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>-			break;
+>-		}
+>-		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, true);
+>-		break;
+>-	case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX:
+>-		if (unlikely(fast || rep)) {
+>-			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>-			break;
+>-		}
+>-		ret = kvm_hv_flush_tlb(vcpu, ingpa, rep_cnt, true);
+>-		break;
+>-	case HVCALL_SEND_IPI:
+>-		if (unlikely(rep)) {
+>-			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>-			break;
+>-		}
+>-		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, false, fast);
+>-		break;
+>-	case HVCALL_SEND_IPI_EX:
+>-		if (unlikely(fast || rep)) {
+>-			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+>-			break;
+>-		}
+>-		ret = kvm_hv_send_ipi(vcpu, ingpa, outgpa, true, false);
+>-		break;
+>-	default:
+>-		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
+>-		break;
+> 	}
 >
->  ...
->  All hypercalls should be invoked through the architecturally-defined
->  hypercall interface. (See the following sections for instructions on
->  discovering and establishing this interface.) An attempt to invoke a
->  hypercall by any other means (for example, copying the code from the
->  hypercall code page to an alternate location and executing it from
->  there) might result in an undefined operation (#UD) exception.  The
->  hypervisor is not guaranteed to deliver this exception.
+> 	return kvm_hv_hypercall_complete(vcpu, ret);
 >
->so I think we can simply test for hv_guest_os_id != 0 and ignore
->HV_X64_MSR_HYPERCALL_ENABLE (it's about hypercall page being enabled,
->not the hypercalls per se).
+>(would also need a kvm cap for that)
 >
->Thanks,
 >Roman.
->
->>  }
->>
->>  static void kvm_hv_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
->> --
->> 2.24.1
->>
 
-Hi Roman,
+This looks like a good idea, but I think it should be part of another 
+patchset, I could revise one once this is in and expose a new CAP, and 
+we need to make sure QEMU can handle this and wont just crash getting 
+these additional exits.
 
-I agree this was the original implementation of this patchset (see v1) I 
-will send a v12 with the suggested change, but I would prefer that you 
-will review the mailing list previous comments which caused to this 
-specific behaviour.
-
-Thanks,
 -- Jon.
