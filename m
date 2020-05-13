@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 059011D2083
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 23:00:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 236E31D209C
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 23:05:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726050AbgEMVAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 17:00:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31439 "EHLO
+        id S1726076AbgEMVFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 17:05:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46196 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725977AbgEMVAg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 17:00:36 -0400
+        with ESMTP id S1725952AbgEMVFT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 17:05:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589403634;
+        s=mimecast20190719; t=1589403916;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=53fd68m5UCLTEoHNKadETXWFfovquJWPxe7ozpnkvxk=;
-        b=ZJ1UwMGzCISHGcg3OjPJPTTuR+f4bV3v7JiBxyKbvyMETcBvMnfFdYVCOWHqb4u/Ix7atl
-        zpbr1He3uH59jNnPPffoXq96g5MpyQe1ysFc+IjX2ucPv79oXkColPdiEqHNTlcFIGI9R1
-        ukSYs6P8OrukVyXBcVzSkc0jb+sRfG4=
+        bh=q3W2xP0844oCj8zSGxKzca5TJrXDwMbrvAADeOVg3Gg=;
+        b=Oo3X1jxuTl1YS2SMBRM1Ba3a7x6kb3tt/J1Q9FHdjYNkDNvOqkqLoXI592pAt8pVKsVmG6
+        h1ES2t0q2pulIoTYYv9YChRC1aqLtVVlI7HBOzTaZT2sF/odTC6SLWbO4urK79UqTN9rXD
+        lJrGbvAqXnI9orm/++JXBkPY6oLrA/A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-5Ju5undXOcylp5pCvJRYaQ-1; Wed, 13 May 2020 17:00:32 -0400
-X-MC-Unique: 5Ju5undXOcylp5pCvJRYaQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-179-fjUU9vT7MLuJxUl2h18TZg-1; Wed, 13 May 2020 17:05:14 -0400
+X-MC-Unique: fjUU9vT7MLuJxUl2h18TZg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58859801503;
-        Wed, 13 May 2020 21:00:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 755428014D7;
+        Wed, 13 May 2020 21:05:13 +0000 (UTC)
 Received: from [10.10.113.80] (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 172E86A94A;
-        Wed, 13 May 2020 21:00:26 +0000 (UTC)
-Subject: Re: [PATCH v4 4/6] scripts/kvm/vmxcap: Use Python 3 interpreter and
- add pseudo-main()
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 31ECD60CD3;
+        Wed, 13 May 2020 21:05:00 +0000 (UTC)
+Subject: Re: [PATCH v4 5/6] scripts/modules/module_block: Use Python 3
+ interpreter & add pseudo-main
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     Markus Armbruster <armbru@redhat.com>,
@@ -46,7 +46,7 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Fam Zheng <fam@euphon.net>
 References: <20200512103238.7078-1-philmd@redhat.com>
- <20200512103238.7078-5-philmd@redhat.com>
+ <20200512103238.7078-6-philmd@redhat.com>
 From:   John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,16 +122,16 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <6859ece7-540d-25d3-a634-2443ded694a0@redhat.com>
-Date:   Wed, 13 May 2020 17:00:26 -0400
+Message-ID: <fdae1c32-5f22-543d-6bef-412cde4d0b8a@redhat.com>
+Date:   Wed, 13 May 2020 17:04:59 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200512103238.7078-5-philmd@redhat.com>
+In-Reply-To: <20200512103238.7078-6-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -142,31 +142,77 @@ X-Mailing-List: kvm@vger.kernel.org
 On 5/12/20 6:32 AM, Philippe Mathieu-Daudé wrote:
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  scripts/kvm/vmxcap | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  scripts/modules/module_block.py | 31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
 > 
-> diff --git a/scripts/kvm/vmxcap b/scripts/kvm/vmxcap
-> index 971ed0e721..6fe66d5f57 100755
-> --- a/scripts/kvm/vmxcap
-> +++ b/scripts/kvm/vmxcap
+> diff --git a/scripts/modules/module_block.py b/scripts/modules/module_block.py
+> index f23191fac1..2e7021b952 100644
+> --- a/scripts/modules/module_block.py
+> +++ b/scripts/modules/module_block.py
 > @@ -1,4 +1,4 @@
 > -#!/usr/bin/python
 > +#!/usr/bin/env python3
 >  #
->  # tool for querying VMX capabilities
+>  # Module information generator
 >  #
-> @@ -275,5 +275,6 @@ controls = [
->          ),
->      ]
+> @@ -10,7 +10,6 @@
+>  # This work is licensed under the terms of the GNU GPL, version 2.
+>  # See the COPYING file in the top-level directory.
 >  
-> -for c in controls:
-> -    c.show()
+> -import sys
+>  import os
+>  
+>  def get_string_struct(line):
+> @@ -80,19 +79,21 @@ def print_bottom(fheader):
+>  #endif
+>  ''')
+>  
+> -# First argument: output file
+> -# All other arguments: modules source files (.c)
+> -output_file = sys.argv[1]
+> -with open(output_file, 'w') as fheader:
+> -    print_top(fheader)
 > +if __name__ == '__main__':
-> +    for c in controls:
-> +        c.show()
+> +    import sys
+
+You can keep the imports at the top of the file.
+
+If you want to split apart the code such that the core import doesn't
+import it, you can create a "core module" containing the classes and
+routines, and a separate script entrypoint, which imports arg parsers,
+sys.argv, etc.
+
+For this, for now, it's okay to just leave it at the top of the file.
+
+> +    # First argument: output file
+> +    # All other arguments: modules source files (.c)
+> +    output_file = sys.argv[1]
+> +    with open(output_file, 'w') as fheader:
+> +        print_top(fheader)
+>  
+> -    for filename in sys.argv[2:]:
+> -        if os.path.isfile(filename):
+> -            process_file(fheader, filename)
+> -        else:
+> -            print("File " + filename + " does not exist.", file=sys.stderr)
+> -            sys.exit(1)
+> +        for filename in sys.argv[2:]:
+> +            if os.path.isfile(filename):
+> +                process_file(fheader, filename)
+> +            else:
+> +                print("File " + filename + " does not exist.", file=sys.stderr)
+> +                sys.exit(1)
+>  
+> -    print_bottom(fheader)
+> +        print_bottom(fheader)
+>  
+> -sys.exit(0)
+> +    sys.exit(0)
 > 
 
-yay
+But, well. It's nitpicky and I'm not sure it matters just yet. It might,
+as we start to expand pylint to more places, but we're not being
+rigorous about that just yet. So either way, I know this works:
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
