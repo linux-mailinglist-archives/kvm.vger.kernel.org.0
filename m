@@ -2,114 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38E331D05DF
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 06:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D856A1D06C9
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 07:57:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbgEMEVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 00:21:17 -0400
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:1480 "EHLO
-        mx0a-002c1b01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725909AbgEMEVQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 00:21:16 -0400
-Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
-        by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04D4IV6I024396;
-        Tue, 12 May 2020 21:21:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : subject
- : date : message-id : content-type : content-id :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=Mk/GhjcQEUv8RUInyp5LDgolKmm9jNh7XGOIwWSNKvo=;
- b=fT6L5UyW3AlpNlI9SXkLsd/ADeJXbtnAUUBwqY8k/YZM3eUZGZmru2UnTedRGcc1mJny
- vMrTrcoZZf9xtXc1pHb5SWX40urZkZuUDlVxvbVfnntmwMlwn/KKJxkdQ2h5LZK2mI5/
- HHaGpHQ5xrdFPoQn8BkM6NRMVQj6brCDG8nJoZi0gk2DxFn9Vg83Gcfx+849yR5WOiLW
- qbNMtt/MpMSiOMDjK/oeWXmc5DNVLgxmiA5ZvN5Aat+jgucGEkDcPBfkY566OJdMIbfs
- ku0+G7Z1a2QjyqJtQg54iqJSGQeQdewtFGMAnKlmfRIVlFl6sxEVBmHmUMwsoTcEcdpD tA== 
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2105.outbound.protection.outlook.com [104.47.55.105])
-        by mx0a-002c1b01.pphosted.com with ESMTP id 3100yn8x1j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 May 2020 21:21:15 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XYzVNgrQK4sq4QUooAWK9ZT3ImWgTX+kY+SnTulZ/W9eT6GyY75BuHwJVM51IlMRxp1rKkUk89YAlquiq069gv6jC1VbIffi72pXG9+7ESafUvbRt5+wdIJmRK3GFuUMVTF3iJOlTSVnwTvZ3SmaDHGd78n/cLht9aCq2FVD1mbGIPEB8GH35V3mdWiKgcpI5PJOeXZBBC2MxTPfjpaFM55I9Ef0JOqbnSGZM2jxhmH4TWpoutsNJgHak7gJQZbwcoKTBZ/Qlfmx8fbTJOngb60nAluslqGs9kd2HHwxSUOZY297mbHCgNHZQST4Dt4F2ZKpSVCuAKXqtVsczNYAzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mk/GhjcQEUv8RUInyp5LDgolKmm9jNh7XGOIwWSNKvo=;
- b=KUz6f8BNpNYGGciRtFpO80KmzS6/ZSget/k4yo4uN4lpj4E56Fd7qTzbEmPJyvtOMHQKj2PgBFTVTdg2WbxaHa9QhJDpYB8led6EiR901n9eXTwLXAWhWW14jovLtIhQS+7Vxq9KnE/xnVNklqzMMG8AVkK1Ca67RqHo3T4jL58CvSOTZ8jRe/zKyfpaPJVRkVv6WLuN3futlmkiHgTEc1ACoNAGdf69Z3YA6L6sA/7bBtsaWND2Lsw6TIFToOGjjPifRdjnzD9ATWJawyWVgVDMQQLV0cmlqSKq95JlfPaI1XUhWHzjexUH8fULqZNgJECJnG90AYp+T+DF1V9O3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from BYAPR02MB5735.namprd02.prod.outlook.com (2603:10b6:a03:128::30)
- by BYAPR02MB5413.namprd02.prod.outlook.com (2603:10b6:a03:99::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.33; Wed, 13 May
- 2020 04:21:13 +0000
-Received: from BYAPR02MB5735.namprd02.prod.outlook.com
- ([fe80::b1a7:d1d2:ec70:66e]) by BYAPR02MB5735.namprd02.prod.outlook.com
- ([fe80::b1a7:d1d2:ec70:66e%5]) with mapi id 15.20.2979.033; Wed, 13 May 2020
- 04:21:13 +0000
-From:   Suresh Gumpula <suresh.gumpula@nutanix.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Virtual LAPIC page corruption
-Thread-Topic: Virtual LAPIC page corruption
-Thread-Index: AQHWKN3voVV18REUfU2qO8eUl1dg+A==
-Date:   Wed, 13 May 2020 04:21:12 +0000
-Message-ID: <67D1E884-FE2C-44C3-8214-75958A9D445A@nutanix.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none
- header.from=nutanix.com;
-x-originating-ip: [192.146.154.3]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4e030f5b-0378-4724-d86e-08d7f6f5124f
-x-ms-traffictypediagnostic: BYAPR02MB5413:
-x-microsoft-antispam-prvs: <BYAPR02MB54133CC0DA0A7E5B94875F4997BF0@BYAPR02MB5413.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0402872DA1
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1jmMUSgfMGH9fqhelk/10EjQDnzw6B6lj/JC7avJzptJD7EeyJklXFtWNXjKgSzFpn80tv8fKmr4D/rLKfREglm92Mis0vYWOKgXCQeuhJMeHGzhjfvMubiYpsD1MlEyncOGclqAmiGtdHRonddt6fSt70zEProh3MMtm/5JVJZaKwIhhL3K6na+F21JqbUWNSIbg1DvgIvxnZGFitIHFG+JH5SxgYS1Mf648ltcCs/6hexWgUt8fQiJ/0R9qiLkIvfQNUGUAyu6VO7R2K1vH0cyirKBXFeJpq+vVyVGlx92VxgX7ij+QudaFe2fv3RuQDeJP33CfvIq/29bz2R/sIcKqJwu37cHwQjKPFRfzgzurji+arH5BtyShqdd2E+DI93Pwp+p1gtA/WChLWcUlbEniMm07RXy3KSh7nUtdTjlr7wq4VelVwOUmLhPeEf+A2C9ZJ35G7NQ/vaO4oedJ80325hN6pNiqVqEQcEcdFgrAbUu5F1Hv6G9hp1U5hu26NocYnSG/lRy22/4fUu+SD5J0J2F4rmx1tmLSRXsIsZER3uF4OrfcYiHMKP8bzjHWlzLnCC1Nr2PjeJQHNrhF3V2OvfPPA75b4DEvGRWg6kFPsOpiUejZ4ZBxXsWF6uWuoWbP2qXZMsrNvgpvbGJdw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR02MB5735.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(346002)(376002)(39860400002)(366004)(396003)(136003)(33430700001)(64756008)(478600001)(33440700001)(2906002)(26005)(316002)(966005)(8936002)(71200400001)(186003)(36756003)(450100002)(6512007)(6506007)(3480700007)(66476007)(66556008)(66946007)(66446008)(5660300002)(6486002)(86362001)(110136005)(76116006)(8676002)(33656002)(2616005)(4744005)(44832011)(489414009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: Ipa7b/uL6qHGA1WiiNbLl8ghbs4hPRTTxw3wnNHzcNt8BDwZk0vD/+Q/zdjcDD0tNHeuxH5QpSq+P60qK/way+AXcCCbjnGwahzTD13kJCf4TNnL09VxQNuVYm4o+k9KyUkBs+FImyrcUBTTKuFsLIsTMyEh3JFnd759rXcWDQxmpOOj1cuktStRynEa8JK4kAiZjaOZSW4oRtAeE7tUZG2P+SxzcHkIW4TOukHxNL34nUbcnt48vuNhtnQg/BUa3IvIJIb0MLYoNZf6ASjDPbBr25U8+UcVUz3AgebJfJGKfjtu5KL6p/fSWEdT5mjgE/3EZZCR0oXjpQDwgkT09A4QtwYAYUK9+kHJuAg52U1gpoXE7gLuiBmdK4Un5c6Dat3enZaxqowdeUuH3rQfjzOOpshBKbYVCPb2fV1ywv8Q0F7G4SdVIMM6Kif2oZHcxxZdjJJA7YUOr4iha0uHWD5B3jGm5i2T6myH2DU2WrM=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F4EB724E62F2454EA82648C11ED84283@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1729372AbgEMF5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 01:57:49 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42549 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729161AbgEMF5e (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 01:57:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589349453;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oS9s06FImqWmW3Ha3Sx3lNv173yHCer4HwNEWY7z8Lw=;
+        b=A65PPSpXo6wkymPTMbSzVCOjkTAScE3Kn/2REO4bEmbMLEGQrDgTJve5g8wavyIAveswuH
+        1W04B/NDyavO76cPeGkzmnJf/AWb3HyEDK78eW/z/N34fmx5W0SIcSLyXp3CFaRjtY25F/
+        bQgmj3tybBafmhCypbMAxxJrzjxhQYc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-pMwZ543xOua3WL8Aq33VRw-1; Wed, 13 May 2020 01:57:29 -0400
+X-MC-Unique: pMwZ543xOua3WL8Aq33VRw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90DC21841931;
+        Wed, 13 May 2020 05:57:28 +0000 (UTC)
+Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E36F05D9E8;
+        Wed, 13 May 2020 05:57:20 +0000 (UTC)
+Subject: Re: [PATCH V2] ifcvf: move IRQ request/free to status change handlers
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
+References: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
+ <8aca85c3-3bf6-a1ec-7009-cd9a635647d7@redhat.com>
+ <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <f7485579-834f-1770-1622-e6df1b2f3e81@redhat.com>
+Date:   Wed, 13 May 2020 13:57:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e030f5b-0378-4724-d86e-08d7f6f5124f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2020 04:21:12.9678
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1DzgaR09AliXktagaTQKie+y/wcJ73d+jnCRcQC1nOcWcFMTm4bxbLSfSVboISlRocYU6nOHojbg8DQp5AdML/SXJO0GUvH5NyFnI9e6ZC0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5413
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-13_01:2020-05-11,2020-05-13 signatures=0
-X-Proofpoint-Spam-Reason: safe
+In-Reply-To: <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGksDQoNCldlIGFyZSBhIHNlZWluZyBhIHByb2JsZW0gd2l0aCB3aW5kb3dzIGd1ZXN0cygyMDE2
-LzIwMTJSMikgd2hlcmUgZ3Vlc3QgY3Jhc2hlcyB3aXRoIA0KVmlydHVhbCBBUElDIHBhZ2UgY29y
-cnVwdGlvbiBzaW1pbGFyIHRvIHRoZSBmb2xsb3dpbmcgcmVkaGF0IHRpY2tldC4NCmh0dHBzOi8v
-YnVnemlsbGEucmVkaGF0LmNvbS9zaG93X2J1Zy5jZ2k/aWQ9MTc1MTAxNw0KDQo+IEFyZzQ6IDAw
-MDAwMDAwMDAwMDAwMTcsIFR5cGUgb2YgY29ycnVwdGVkIHJlZ2lvbiwgY2FuIGJlDQoJMTYgIDog
-Q3JpdGljYWwgZmxvYXRpbmcgcG9pbnQgY29udHJvbCByZWdpc3RlciBtb2RpZmljYXRpb24NCgkx
-NyAgOiBMb2NhbCBBUElDIG1vZGlmaWNhdGlvbg0KDQpIZXJlLCB3ZSBhcmUgc2VlaW5nIHRoZSBj
-b3JydXB0aW9uIExBUElDIHBhZ2UgYW5kIGd1ZXN0IGlzIEJTT0QnaW5nLg0KTG9va2luZyBhdCB0
-aGUgZ3Vlc3Qgd2luZG93cyBkdW1wLCB3ZSBzZWUgdGhlIGZ1bGwgcGFnZSBpcyB6ZXJvZWQuIEFu
-ZCBpdCBzZWVtcyB0aGUgDQpHdWVzdCB3aW5kb3dzIGtlcm5lbCBwYXRjaGd1YXJkIGlzIGRldGVj
-dGluZyB0aGlzIGNhc2UgYW5kIHJlc2V0dGluZyB0aGUgVk0uDQoNCklzIGl0IHBvc3NpYmxlIHRo
-YXQgS1ZNLCBzb21laG93IGNvcnJ1cHRlZCB0aGUgdmlydHVhbCBMQVBJQyBwYWdlPyAgV2hpbGUg
-dGhlIGd1ZXN0IGlzIHJ1bm5pbmcNCnRoZSBLVk0gaXMgbm90IHN1cHBvc2VkIHRvIHRvdWNoIHRo
-YXQgdmNwdSBsYXBpYyBwYWdlPw0KDQpDb3VsZCB5b3UgcGxlYXNlIGdpdmUgdXMgc29tZSBwb2lu
-dGVycyBvbiB3aGF0IGNvdWxkIHdyb25nIGhlcmUuIElzIGl0IGEga25vd24gaXNzdWUgaW4gdGhl
-IGt2bT8NCldlIGFyZSB1c2luZyB0aGUgaG9zdCBrZXJuZWwgNC4xOSBhbmQgcWVtdSAyLjEyIGFu
-ZCB3aW5kb3dzIGd1ZXN0cygyMDE2LzIwMTIpDQoNCg0KVGhhbmtzLA0KU3VyZXNoDQoNCg0KDQo=
+
+On 2020/5/13 下午12:42, Zhu, Lingshan wrote:
+>
+>
+> On 5/13/2020 12:12 PM, Jason Wang wrote:
+>>
+>> On 2020/5/12 下午4:00, Zhu Lingshan wrote:
+>>> This commit move IRQ request and free operations from probe()
+>>> to VIRTIO status change handler to comply with VIRTIO spec.
+>>>
+>>> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
+>>> The device MUST NOT consume buffers or send any used buffer
+>>> notifications to the driver before DRIVER_OK.
+>>
+>>
+>> This comment needs to be checked as I said previously. It's only 
+>> needed if we're sure ifcvf can generate interrupt before DRIVER_OK.
+>>
+>>
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> ---
+>>> changes from V1:
+>>> remove ifcvf_stop_datapath() in status == 0 handler, we don't need 
+>>> to do this
+>>> twice; handle status == 0 after DRIVER_OK -> !DRIVER_OK handler 
+>>> (Jason Wang)
+>>
+>>
+>> Patch looks good to me, but with this patch ping cannot work on my 
+>> machine. (It works without this patch).
+>>
+>> Thanks
+> This is strange, it works on my machines, let's have a check offline.
+>
+> Thanks,
+> BR
+> Zhu Lingshan
+
+
+Note that I tested the patch with vhost-vpda.
+
+Thanks.
+
