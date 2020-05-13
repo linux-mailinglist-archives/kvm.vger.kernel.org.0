@@ -2,204 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F4591D1CBA
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 19:59:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E26D81D1DD8
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 20:46:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389963AbgEMR7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 13:59:05 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:35028 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733070AbgEMR7F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 13:59:05 -0400
-Received: from zn.tnic (p200300EC2F0AC30000E7FCC03D02E6FD.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:c300:e7:fcc0:3d02:e6fd])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 761AF1EC02CF;
-        Wed, 13 May 2020 19:59:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1589392743;
+        id S2390174AbgEMSqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 14:46:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30913 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389392AbgEMSqs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 14:46:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589395607;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=qly6k0bS0jaJ4vTsa92+67UL4fjNB6/GPr5KzlthQcQ=;
-        b=b2fmu6R5CwARmJ82Ii9IC4F9SFQKrbd7AAjpxwuLzTkb3nJ8H5eHCkXglWJfVEmuzz1jNh
-        9wHKVT/EDt0M7zvbjvUm7GvesRGaJySqfhPmu0WwV2QzoIoZN1Ajk2fV8n3IJK02XlJ4/A
-        Q9vkNh6Mw13MDMQwarcjHK4wXrl4eA8=
-Date:   Wed, 13 May 2020 19:58:59 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
+         in-reply-to:in-reply-to:references:references;
+        bh=kmVswhhUfzJrVfazGuns3TDSU4rliVl1t7Fe7MJ2Xjk=;
+        b=QNUHh62X6Hxqex+YARrTp8r+Ig6ceH3+SubSKZvACJ18Wg/J9nIfDxNP6pGYO6Q5e5CN23
+        +4W+soCAzrbMY0coGS+gpm6JDX1/iBYWEHtK+YL6xLp0lRgWfJkzPhvdBGme6rUEq0XaDY
+        sx313dtW/8NhG7jEVxl6zGuLipsDjn0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-3FG-WDhRPhC2M-vzl3GMaQ-1; Wed, 13 May 2020 14:46:45 -0400
+X-MC-Unique: 3FG-WDhRPhC2M-vzl3GMaQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4480F474;
+        Wed, 13 May 2020 18:46:43 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-240.rdu2.redhat.com [10.10.115.240])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5DC75196AE;
+        Wed, 13 May 2020 18:46:41 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 79601220206; Wed, 13 May 2020 14:46:41 -0400 (EDT)
+Date:   Wed, 13 May 2020 14:46:41 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
- exceptions
-Message-ID: <20200513175859.GF4025@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-26-joro@8bytes.org>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/8] KVM: x86: interrupt based APF page-ready event
+ delivery
+Message-ID: <20200513184641.GF173965@redhat.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com>
+ <20200511164752.2158645-5-vkuznets@redhat.com>
+ <20200512142411.GA138129@redhat.com>
+ <87lflxm9sy.fsf@vitty.brq.redhat.com>
+ <20200512180704.GE138129@redhat.com>
+ <877dxgmcjv.fsf@vitty.brq.redhat.com>
+ <20200513135350.GB173965@redhat.com>
+ <87ftc3lxqc.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-26-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <87ftc3lxqc.fsf@vitty.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:16:35PM +0200, Joerg Roedel wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
+On Wed, May 13, 2020 at 04:23:55PM +0200, Vitaly Kuznetsov wrote:
+
+[..]
+> >> Also,
+> >> kdump kernel may not even support APF so it will get very confused when
+> >> APF events get delivered.
+> >
+> > New kernel can just ignore these events if it does not support async
+> > pf? 
+> >
+> > This is somewhat similar to devices still doing interrupts in new
+> > kernel. And solution for that seemed to be doing a "reset" of devices
+> > in new kernel. We probably need similar logic where in new kernel
+> > we simply disable "async pf" so that we don't get new notifications.
 > 
-> Add support for decoding and handling #VC exceptions for IOIO events.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> [ jroedel@suse.de: Adapted code to #VC handling framework ]
-> Co-developed-by: Joerg Roedel <jroedel@suse.de>
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/boot/compressed/sev-es.c |  32 +++++
->  arch/x86/kernel/sev-es-shared.c   | 202 ++++++++++++++++++++++++++++++
->  2 files changed, 234 insertions(+)
+> Right and that's what we're doing - just disabling new notifications.
 
-Just nitpicks and some more commenting needed:
+Nice.
 
-> +static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
-> +{
-> +	struct pt_regs *regs = ctxt->regs;
-> +	u64 exit_info_1, exit_info_2;
-> +	enum es_result ret;
-> +
-> +	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-> +	if (ret != ES_OK)
-> +		return ret;
-> +
-> +	if (exit_info_1 & IOIO_TYPE_STR) {
-> +		int df = (regs->flags & X86_EFLAGS_DF) ? -1 : 1;
-> +		unsigned int io_bytes, exit_bytes;
-> +		unsigned int ghcb_count, op_count;
-> +		unsigned long es_base;
-> +		u64 sw_scratch;
-> +
-> +		/*
-> +		 * For the string variants with rep prefix the amount of in/out
-> +		 * operations per #VC exception is limited so that the kernel
-> +		 * has a chance to take interrupts an re-schedule while the
-						   ^
-						   and
+So why there is a need to deliver "page ready" notifications
+to guest after guest has disabled async pf. Atleast kdump does not
+seem to need it. It will boot into second kernel anyway, irrespective
+of the fact whether it receives page ready or not.
 
-> +		 * instruction is emulated.
-> +		 */
-> +		io_bytes   = (exit_info_1 >> 4) & 0x7;
-> +		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
-> +
-> +		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
-> +		exit_info_2 = min(op_count, ghcb_count);
-> +		exit_bytes  = exit_info_2 * io_bytes;
-> +
-> +		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
+Thanks
+Vivek
 
-In general, I could use some commenting here to find my way around it:
-
-		/* Read bytes of OUTS into the shared buffer */
-
-> +
-> +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-> +			ret = vc_insn_string_read(ctxt,
-> +					       (void *)(es_base + regs->si),
-> +					       ghcb->shared_buffer, io_bytes,
-> +					       exit_info_2, df);
-> +			if (ret)
-> +				return ret;
-> +		}
-
-		/*
-		 * Issue an VMGEXIT to the HV to consume the bytes from the
-		 * shared buffer or to have it write them into the shared buffer
-		 * depending on the instruction: OUTS or INS.
-		 */
-
-> +
-> +		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
-> +		ghcb_set_sw_scratch(ghcb, sw_scratch);
-> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
-> +				   exit_info_1, exit_info_2);
-
-Align arguments on the opening brace.
-
-> +		if (ret != ES_OK)
-> +			return ret;
-> +
-> +		/* Everything went well, write back results */
-
-		/* Read bytes from shared buffer into the guest's destination. */
-
-> +		if (exit_info_1 & IOIO_TYPE_IN) {
-> +			ret = vc_insn_string_write(ctxt,
-> +						(void *)(es_base + regs->di),
-> +						ghcb->shared_buffer, io_bytes,
-> +						exit_info_2, df);
-> +			if (ret)
-> +				return ret;
-> +
-> +			if (df)
-> +				regs->di -= exit_bytes;
-> +			else
-> +				regs->di += exit_bytes;
-> +		} else {
-> +			if (df)
-> +				regs->si -= exit_bytes;
-> +			else
-> +				regs->si += exit_bytes;
-> +		}
-> +
-> +		if (exit_info_1 & IOIO_REP)
-> +			regs->cx -= exit_info_2;
-> +
-> +		ret = regs->cx ? ES_RETRY : ES_OK;
-> +
-> +	} else {
-
-		/* IN/OUT into/from rAX */
-
-> +		int bits = (exit_info_1 & 0x70) >> 1;
-> +		u64 rax = 0;
-> +
-> +		if (!(exit_info_1 & IOIO_TYPE_IN))
-> +			rax = lower_bits(regs->ax, bits);
-> +
-> +		ghcb_set_rax(ghcb, rax);
-> +
-> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
-> +		if (ret != ES_OK)
-> +			return ret;
-> +
-> +		if (exit_info_1 & IOIO_TYPE_IN) {
-> +			if (!ghcb_is_valid_rax(ghcb))
-> +				return ES_VMM_ERROR;
-> +			regs->ax = lower_bits(ghcb->save.rax, bits);
-> +		}
-> +	}
-> +
-> +	return ret;
-> +}
-> -- 
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
