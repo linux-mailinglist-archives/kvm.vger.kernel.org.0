@@ -2,83 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00E101D11B5
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 13:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FB131D126C
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 14:15:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729307AbgEMLqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 07:46:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39224 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725982AbgEMLqj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 07:46:39 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505A8C061A0C;
-        Wed, 13 May 2020 04:46:39 -0700 (PDT)
-Received: from zn.tnic (p200300EC2F0AC300A0B029A08DBD019D.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:c300:a0b0:29a0:8dbd:19d])
+        id S1731762AbgEMMPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 08:15:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55658 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726020AbgEMMPn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 08:15:43 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 473AC1EC0330;
-        Wed, 13 May 2020 13:46:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1589370397;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=euj2zi24Uj3leIrpx0insV4176ao8ao6nc3wRKwDosc=;
-        b=ArE0U+8MeibbTsaC8/2kOx7cnQiO9Cv2Cp0QzXJfoHMCFkiSp0a15+38EqiJNMgzw11Xn0
-        y+D7M3OHFL/8Jbj9aVmU6vvmkxeCEOXoViqE54KJI3pHn8sctpNby9E8L//MUXeh/7MgyI
-        PmlIWGJtrSTKzuvUhODOpsyRRMUzaRc=
-Date:   Wed, 13 May 2020 13:46:33 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 24/75] x86/boot/compressed/64: Unmap GHCB page before
- booting the kernel
-Message-ID: <20200513114633.GE4025@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-25-joro@8bytes.org>
- <20200513111340.GD4025@zn.tnic>
- <20200513113011.GG18353@8bytes.org>
+        by mail.kernel.org (Postfix) with ESMTPSA id 06B57206D6;
+        Wed, 13 May 2020 12:15:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589372143;
+        bh=OFXMCfgg4QqvOju+IW8sguzu0zPnRXnwQP6ptWcD06o=;
+        h=From:To:Cc:Subject:Date:From;
+        b=V7AbQPKgWJK6PakqeqU1LoITqszt4ASQ0z0pTXUY0NNsOaMoL9t0daWUpgx4oLM0Y
+         2ht5Hbpe+SAGdYjs1pamcS00ro46OAHdHHR0JUoJe1EmRtvmlrhAYJYvBroFwq2sIl
+         c2rj3Urk/Mqqdmgzmt2UAuD0Kjsmsplvns3EUbJM=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jYqIX-00BxoR-Df; Wed, 13 May 2020 13:15:41 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH] KVM: arm64: Simplify __kvm_timer_set_cntvoff implementation
+Date:   Wed, 13 May 2020 13:15:37 +0100
+Message-Id: <20200513121537.77546-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200513113011.GG18353@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 13, 2020 at 01:30:11PM +0200, Joerg Roedel wrote:
-> Yeah, I had this this way in v2, but changed it upon you request[1] :)
+Now that this function isn't constrained by the 32bit PCS,
+let's simplify it by taking a single 64bit offset instead
+of two 32bit parameters.
 
-Yeah, I was wondering why this isn't a separate function - you like them
-so much. :-P
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_asm.h |  2 +-
+ virt/kvm/arm/arch_timer.c        | 12 +-----------
+ virt/kvm/arm/hyp/timer-sr.c      |  3 +--
+ 3 files changed, 3 insertions(+), 14 deletions(-)
 
-> [1] https://lore.kernel.org/lkml/20200402114941.GA9352@zn.tnic/
-
-But that one didn't have the ghcb_fault check. Maybe it was being added
-later... :)
-
-Thx.
-
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 7c7eeeaab9fa..59e314f38e43 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -64,7 +64,7 @@ extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+ extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
+ 
+-extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
++extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+ 
+ extern int kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu);
+ 
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 93bd59b46848..487eba9f87cd 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -451,17 +451,7 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+ 
+ static void set_cntvoff(u64 cntvoff)
+ {
+-	u32 low = lower_32_bits(cntvoff);
+-	u32 high = upper_32_bits(cntvoff);
+-
+-	/*
+-	 * Since kvm_call_hyp doesn't fully support the ARM PCS especially on
+-	 * 32-bit systems, but rather passes register by register shifted one
+-	 * place (we put the function address in r0/x0), we cannot simply pass
+-	 * a 64-bit value as an argument, but have to split the value in two
+-	 * 32-bit halves.
+-	 */
+-	kvm_call_hyp(__kvm_timer_set_cntvoff, low, high);
++	kvm_call_hyp(__kvm_timer_set_cntvoff, cntvoff);
+ }
+ 
+ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, bool active)
+diff --git a/virt/kvm/arm/hyp/timer-sr.c b/virt/kvm/arm/hyp/timer-sr.c
+index ff76e6845fe4..fb5c0be33223 100644
+--- a/virt/kvm/arm/hyp/timer-sr.c
++++ b/virt/kvm/arm/hyp/timer-sr.c
+@@ -10,9 +10,8 @@
+ 
+ #include <asm/kvm_hyp.h>
+ 
+-void __hyp_text __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high)
++void __hyp_text __kvm_timer_set_cntvoff(u64 cntvoff)
+ {
+-	u64 cntvoff = (u64)cntvoff_high << 32 | cntvoff_low;
+ 	write_sysreg(cntvoff, cntvoff_el2);
+ }
+ 
 -- 
-Regards/Gruss,
-    Boris.
+2.20.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
