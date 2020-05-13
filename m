@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC8ED1D2076
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 22:58:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF3211D2077
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 22:58:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726190AbgEMU6Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 16:58:25 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39911 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726032AbgEMU6Y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 16:58:24 -0400
+        id S1726051AbgEMU6u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 16:58:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36499 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726024AbgEMU6u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 16:58:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589403502;
+        s=mimecast20190719; t=1589403528;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=8wLUdnFT09GDL04b6CqFzsLR99c0+umfo+U+BpFvMQk=;
-        b=ZJNhzIQHK9By6ZSvluRVPSKPinQAmNwD3mGOJYG1yxYP8/8ZZgvXswhgPNEd37CA95x+o5
-        bOUyZozu0aUUTRdxrhsDvWkJbtuODzBtkMjE9vggTO00mfcnM2TeLyFckWhDGuKeVVWAPR
-        uvZia+stps/WIiIdye9Nq9IgvqwJSvg=
+        bh=3S+XiYEU0Qy7gvXO6xV0YhD9LowZaw7admNaj9kvec0=;
+        b=ZUlC192MC5USX/fcWDiIHckrv2CHsVfdrMbYk4silSQKMdINIcDDaPjXqa7t+qwI6p/OFA
+        mPOD90enlicufhZ7kSLdTOEoOkyJEhfp6LwstLWn4pChRFEQhfkZ1xVKo38qYScdVMOCUV
+        uzspD4XJwphFrVKnJqWQESnPVhxmcPk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-YZBuYDFdNvmjWrusuW7G8Q-1; Wed, 13 May 2020 16:58:19 -0400
-X-MC-Unique: YZBuYDFdNvmjWrusuW7G8Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-360-GYi5p3VONKG_gV_lbF5tyQ-1; Wed, 13 May 2020 16:58:45 -0400
+X-MC-Unique: GYi5p3VONKG_gV_lbF5tyQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD9ED1009443;
-        Wed, 13 May 2020 20:58:17 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C19A380B70D;
+        Wed, 13 May 2020 20:58:43 +0000 (UTC)
 Received: from [10.10.113.80] (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 92ADA6A94A;
-        Wed, 13 May 2020 20:58:13 +0000 (UTC)
-Subject: Re: [PATCH v4 1/6] scripts/qemugdb: Remove shebang header
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F01C75297;
+        Wed, 13 May 2020 20:58:39 +0000 (UTC)
+Subject: Re: [PATCH v4 2/6] scripts/qemu-gdb: Use Python 3 interpreter
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     Markus Armbruster <armbru@redhat.com>,
@@ -46,7 +46,7 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Fam Zheng <fam@euphon.net>,
         =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 References: <20200512103238.7078-1-philmd@redhat.com>
- <20200512103238.7078-2-philmd@redhat.com>
+ <20200512103238.7078-3-philmd@redhat.com>
 From:   John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,33 +122,26 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <2178978e-5d14-3a94-d65c-f4d849e153ba@redhat.com>
-Date:   Wed, 13 May 2020 16:58:13 -0400
+Message-ID: <ea78edf3-3ac0-8125-62c2-d1a8f41fb790@redhat.com>
+Date:   Wed, 13 May 2020 16:58:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200512103238.7078-2-philmd@redhat.com>
+In-Reply-To: <20200512103238.7078-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-
 On 5/12/20 6:32 AM, Philippe Mathieu-Daudé wrote:
 > From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > 
-> These scripts are loaded as plugin by GDB (and they don't
-> have any __main__ entry point). Remove the shebang header.
-> 
-> Acked-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org
-(The A-B should come below the S-O-B unless you do mean to indicate
-you've since made changes that AB didn't acknowledge, I think.)
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
