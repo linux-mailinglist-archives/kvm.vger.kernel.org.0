@@ -2,164 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1B911D156F
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 15:34:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CC5C1D159B
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 15:36:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388310AbgEMNd5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 09:33:57 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:59085 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388038AbgEMNdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 09:33:25 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20200513133324euoutp01614e9121a5c5d73849f95cf3e1ad86bf~Omcho7YXF2196121961euoutp01-
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 13:33:24 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20200513133324euoutp01614e9121a5c5d73849f95cf3e1ad86bf~Omcho7YXF2196121961euoutp01-
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1589376804;
-        bh=4Z3VX9b95pVvmo5Br0ewCVmZiro3PYcbGcBRCw5/dy0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cYmrTQQOJQJYIxLbJOjPRjT9kBusZQNHJQBiSPgPHs/jpKQUf8agJzNoBWzwpY1IY
-         fC4VkozQemM4WeoUyvG1roOv2ofSd5giJkVaW6SmMFPnBp+B/1X0Oq4yiffK9UfGYa
-         /JbRDd0MyqdQQCzALACo3pidCdqOFiFtqAm7zPW4=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20200513133324eucas1p142c8a86befd97cefee286cdf022951dc~OmchRgFjH0785407854eucas1p1H;
-        Wed, 13 May 2020 13:33:24 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id FB.D5.61286.427FBBE5; Wed, 13
-        May 2020 14:33:24 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7~OmchAzpyr2351423514eucas1p1e;
-        Wed, 13 May 2020 13:33:23 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20200513133323eusmtrp10172f55b09fa88e4e962360e4035a246~OmchAHACf1050610506eusmtrp1h;
-        Wed, 13 May 2020 13:33:23 +0000 (GMT)
-X-AuditID: cbfec7f2-f0bff7000001ef66-89-5ebbf724c6de
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id BF.47.07950.327FBBE5; Wed, 13
-        May 2020 14:33:23 +0100 (BST)
-Received: from AMDC2765.digital.local (unknown [106.120.51.73]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20200513133323eusmtip16dd11117bccd96d7b870b4e361de6129~OmcgSp9Av0693306933eusmtip1N;
-        Wed, 13 May 2020 13:33:23 +0000 (GMT)
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
-To:     dri-devel@lists.freedesktop.org, iommu@lists.linux-foundation.org,
-        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org
-Cc:     Marek Szyprowski <m.szyprowski@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-arm-kernel@lists.infradead.org,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
-Subject: [PATCH v5 36/38] samples: vfio-mdev/mbochs: fix common struct
- sg_table related issues
-Date:   Wed, 13 May 2020 15:32:43 +0200
-Message-Id: <20200513133245.6408-36-m.szyprowski@samsung.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200513133245.6408-1-m.szyprowski@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA0WSa0hTYRzGeXcuOy5Pnabgi0XS0MgolxR6RMtCPxxSog+BEKWuPKjpvOw4
-        TSFamRVTlyahmZqYoum8tmZoeSudpZmpmddqaBcFzbxikbbtaH37vc//eXj+78tLIGIdZk+E
-        R8WxiihZpAQXofqO1Z4DjiuNgQfrnwnp9J5XAro2pxqj1/WZCD2w9AOnH1W0C+jCZk86724s
-        revKB/TigFFA100MYnR/Qx5OV74cF9Ktc5PYMZLRFmgB83y5EGXqlz9jzKdUg4B5XHyFGV2b
-        QJisoVLANA6rcCY9eRZnNLpywCzU7Tq15YzIK4SNDI9nFdKjwaKwOVUHHmMUX2pSr2AqMLRN
-        DawISB2GbzsaUDUQEWKqDEDN12HAHxYBbJyoxs0uMbUA4Id7bpuJd92ZQt5UCuCgdgHhTaZE
-        WruPmXHKFapn1JawLZUCYGe6tTmAUIMCOPNnFjMPbKhg2F3ZLjQzSjlBo0FrYZI6Aq+maIR8
-        mwOsqGmxFFiZ9OmxZpTXm4Sw8D7Jsy+8XXsT49kGTht0G9mdsCsrzXI3SCUDaOypFPKHNAD7
-        r+UA3uUJx3p+mVYlTOs5w+oGKS8fh9/XZ1GzDKmtcGhmu1lGTHhHn43wMglv3RDz7j0w11D1
-        r7a1tw/hmYFF+qmNx3oBYElOAZIBHHL/lxUCUA7sWCUnD2U51yg2wYWTyTllVKjLhWh5HTD9
-        pa41w/xTsNR3vg1QBJBYk/RIY6AYk8VzifI2AAlEYkuerDZJZIgsMYlVRAcplJEs1wZ2EKjE
-        jjxUNHVOTIXK4tgIlo1hFZtTAWFlrwJ2MSspfWpdgPe2Ip94Zzf6Y2cpuBjB/Xbxl/bimQEt
-        vW7eSbspqV/o5GvdqKEk/qej/k1lnWeNJtVPOuK/JBStFjx0yC/2SKqNPZu57p4aNMoNP/AY
-        VZ52KXNwytqvRqtOXM4p8bV9r1//In8yn6Fq+TaeUER2el3P7l1yd98rQbkwmes+RMHJ/gIq
-        KpNhRwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOIsWRmVeSWpSXmKPExsVy+t/xu7rK33fHGUyYq2fRe+4kk8XGGetZ
-        Lf5vm8hsceXrezaLlauPMlks2G9tMWdqocWW03MZLb5cechksenxNVaLy7vmsFmsPXKX3eLg
-        hyesDrwea+atYfTY+20Bi8f2bw9YPe53H2fy2Lyk3uP2v8fMHpNvLGf02H2zgc2jt/kdm0ff
-        llWMHp83yQVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZpKTmZJal
-        FunbJehlfGg4xlbwUKhiX9d31gbGG/xdjJwcEgImEhfPTGTvYuTiEBJYyihxas4EVoiEjMTJ
-        aQ1QtrDEn2tdbBBFnxglNp1+xQ6SYBMwlOh6C5EQEehklJjW/REswSxwj0li7zo/EFtYIE7i
-        0K0+JhCbRUBV4uHxNWA1vAK2Eo2tfewQG+QlVm84wAxicwLFX93ZzwJiCwnkS+xdvI9tAiPf
-        AkaGVYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmbGIGRsu3Yzy07GLveBR9iFOBgVOLhtbi1O06I
-        NbGsuDL3EKMEB7OSCK/feqAQb0piZVVqUX58UWlOavEhRlOgoyYyS4km5wOjOK8k3tDU0NzC
-        0tDc2NzYzEJJnLdD4GCMkEB6YklqdmpqQWoRTB8TB6dUA+M0pa8bnhzbMbOm4AFTgdZ+9dam
-        VLsem4M/q0U/OCiZTbbPm3K+yuCF3cyoZqFv/b//PK3LcP6hlGVSHplUPnFPgwOv6pK9KYIv
-        WPWyLmU4ikxd6vRWQSE2mvWbWmLkhLhb+2xkA1+mrcuTYxXZzJ+1VPbT4mUtL47FSu85cUho
-        WcNFjktNXkosxRmJhlrMRcWJAIhhNxSqAgAA
-X-CMS-MailID: 20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7
-References: <20200513132114.6046-1-m.szyprowski@samsung.com>
-        <20200513133245.6408-1-m.szyprowski@samsung.com>
-        <CGME20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7@eucas1p1.samsung.com>
+        id S2388635AbgEMNfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 09:35:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387927AbgEMNfb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 09:35:31 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B6CC061A0C;
+        Wed, 13 May 2020 06:35:30 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id u10so6830376pls.8;
+        Wed, 13 May 2020 06:35:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0BGOGNqih27OV/hxwThO6MefRy8fXlj0Bh5UXUHoSvM=;
+        b=RDEBDtHUoB1XiuAgWSyUddc44FRdseR2E78Z2zPCqCd8Z18kCEdZEGX8U2vpI0yzzA
+         u2yPqNpHUZtsoZpZmOjFllF1DBlsIz5XDxmvPXLVmQVKCvvwifTfdv2vhxD1NgzQMmnz
+         N1T/Czl/NCNGfDgTC4rx1m6afLlOJBLwgGkiPiQdaV0BM/6IUr7WpfXp65yBUaCwb2ET
+         dx8UCWSsBCyEVu7hIoYFsdvu7x+zpnp3t7U8kws9RKec49ogUfYr6QiV1kaS9G+CSQjS
+         Ao0jU/DLcKfDuCB9R7JGFBPoV5YU98EC03q4FXf01dcm6m24eDSmLsg95KzXWHPIeGJm
+         jwcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0BGOGNqih27OV/hxwThO6MefRy8fXlj0Bh5UXUHoSvM=;
+        b=IZBC0RCc0eim7ct/DWqhTa4twr5i6pWQheMKg7J/e4fgs1WK9Ws86VrqY3TugHMQA3
+         U+D7PrkbDnKc6emwCRAL3XVYBQhNLEw8x5ikjfKqEZdWcS1+NOLET2g38+Jf3TmpDt40
+         gOVvcFqfEtdWSuu+ggdI4IFXva8qO2uUiyjwEvb9879aOArPO1RkwQODeXcCjxfzHgM7
+         Tnhv+l79grrHGDi1GNQg9CXdn3TVSsgo4g8H0P35EOyKgmLcbHTCHfeNJ2b6gXVcw5aG
+         2/8U5aW7guZyY+0msxXYSr3Yom58uG6i4T6kVzTtWy7nhZy8UpSGwsFybjdDMND+E8kA
+         fHoQ==
+X-Gm-Message-State: AOAM531HWIVdkRcNth2Ab/UZj8ryNo9SxiqR5m+GjQ0FzXZSN3/tiBND
+        i2RfEfqwaeSbAUJXJLnglT8=
+X-Google-Smtp-Source: ABdhPJxHvVgkgDedkqYMSZJj59AIFKH74OH/HffWU0Oj7KNku+s6st0bccLkx8cK0rvdzp2DPZN+dw==
+X-Received: by 2002:a17:90a:7ace:: with SMTP id b14mr2252495pjl.116.1589376930438;
+        Wed, 13 May 2020 06:35:30 -0700 (PDT)
+Received: from ?IPv6:2404:f801:0:6:8000::a31c? ([2404:f801:9000:18:efed::a31c])
+        by smtp.gmail.com with ESMTPSA id g9sm13207294pgj.89.2020.05.13.06.35.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 May 2020 06:35:30 -0700 (PDT)
+Subject: Re: [PATCH] x86/hyperv: Properly suspend/resume reenlightenment
+ notifications
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-hyperv@vger.kernel.org
+Cc:     Wei Liu <wei.liu@kernel.org>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Michael Kelley <mikelley@microsoft.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>
+References: <20200512160153.134467-1-vkuznets@redhat.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+Message-ID: <3507d1b3-8d90-8d0e-c20f-a75f9f280230@gmail.com>
+Date:   Wed, 13 May 2020 21:35:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <20200512160153.134467-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Documentation/DMA-API-HOWTO.txt states that the dma_map_sg() function
-returns the number of the created entries in the DMA address space.
-However the subsequent calls to the dma_sync_sg_for_{device,cpu}() and
-dma_unmap_sg must be called with the original number of the entries
-passed to the dma_map_sg().
+On 5/13/2020 12:01 AM, Vitaly Kuznetsov wrote:
+> Errors during hibernation with reenlightenment notifications enabled were
+> reported:
+> 
+>   [   51.730435] PM: hibernation entry
+>   [   51.737435] PM: Syncing filesystems ...
+>   ...
+>   [   54.102216] Disabling non-boot CPUs ...
+>   [   54.106633] smpboot: CPU 1 is now offline
+>   [   54.110006] unchecked MSR access error: WRMSR to 0x40000106 (tried to
+>       write 0x47c72780000100ee) at rIP: 0xffffffff90062f24
+>       native_write_msr+0x4/0x20)
+>   [   54.110006] Call Trace:
+>   [   54.110006]  hv_cpu_die+0xd9/0xf0
+>   ...
+> 
+> Normally, hv_cpu_die() just reassigns reenlightenment notifications to some
+> other CPU when the CPU receiving them goes offline. Upon hibernation, there
+> is no other CPU which is still online so cpumask_any_but(cpu_online_mask)
+> returns >= nr_cpu_ids and using it as hv_vp_index index is incorrect.
+> Disable the feature when cpumask_any_but() fails.
+> 
+> Also, as we now disable reenlightenment notifications upon hibernation we
+> need to restore them on resume. Check if hv_reenlightenment_cb was
+> previously set and restore from hv_resume().
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>   arch/x86/hyperv/hv_init.c | 19 +++++++++++++++++--
+>   1 file changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+> index fd51bac11b46..acf76b466db6 100644
+> --- a/arch/x86/hyperv/hv_init.c
+> +++ b/arch/x86/hyperv/hv_init.c
+> @@ -226,10 +226,18 @@ static int hv_cpu_die(unsigned int cpu)
+>   
+>   	rdmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
+>   	if (re_ctrl.target_vp == hv_vp_index[cpu]) {
+> -		/* Reassign to some other online CPU */
+> +		/*
+> +		 * Reassign reenlightenment notifications to some other online
+> +		 * CPU or just disable the feature if there are no online CPUs
+> +		 * left (happens on hibernation).
+> +		 */
+>   		new_cpu = cpumask_any_but(cpu_online_mask, cpu);
+>   
+> -		re_ctrl.target_vp = hv_vp_index[new_cpu];
+> +		if (new_cpu < nr_cpu_ids)
+> +			re_ctrl.target_vp = hv_vp_index[new_cpu];
+> +		else
+> +			re_ctrl.enabled = 0;
+> +
+>   		wrmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
+>   	}
+>   
+> @@ -293,6 +301,13 @@ static void hv_resume(void)
+>   
+>   	hv_hypercall_pg = hv_hypercall_pg_saved;
+>   	hv_hypercall_pg_saved = NULL;
+> +
+> +	/*
+> +	 * Reenlightenment notifications are disabled by hv_cpu_die(0),
+> +	 * reenable them here if hv_reenlightenment_cb was previously set.
+> +	 */
+> +	if (hv_reenlightenment_cb)
+> +		set_hv_tscchange_cb(hv_reenlightenment_cb);
+>   }
+>   
+>   /* Note: when the ops are called, only CPU0 is online and IRQs are disabled. */
+> 
 
-struct sg_table is a common structure used for describing a non-contiguous
-memory buffer, used commonly in the DRM and graphics subsystems. It
-consists of a scatterlist with memory pages and DMA addresses (sgl entry),
-as well as the number of scatterlist entries: CPU pages (orig_nents entry)
-and DMA mapped pages (nents entry).
-
-It turned out that it was a common mistake to misuse nents and orig_nents
-entries, calling DMA-mapping functions with a wrong number of entries or
-ignoring the number of mapped entries returned by the dma_map_sg()
-function.
-
-To avoid such issues, lets use a common dma-mapping wrappers operating
-directly on the struct sg_table objects and use scatterlist page
-iterators where possible. This, almost always, hides references to the
-nents and orig_nents entries, making the code robust, easier to follow
-and copy/paste safe.
-
-While touching this code, also add missing call to dma_unmap_sgtable.
-
-Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
----
-For more information, see '[PATCH v5 00/38] DRM: fix struct sg_table nents
-vs. orig_nents misuse' thread:
-https://lore.kernel.org/linux-iommu/20200513132114.6046-1-m.szyprowski@samsung.com/T/
----
- samples/vfio-mdev/mbochs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-index 3cc5e59..e030689 100644
---- a/samples/vfio-mdev/mbochs.c
-+++ b/samples/vfio-mdev/mbochs.c
-@@ -846,7 +846,7 @@ static struct sg_table *mbochs_map_dmabuf(struct dma_buf_attachment *at,
- 	if (sg_alloc_table_from_pages(sg, dmabuf->pages, dmabuf->pagecount,
- 				      0, dmabuf->mode.size, GFP_KERNEL) < 0)
- 		goto err2;
--	if (!dma_map_sg(at->dev, sg->sgl, sg->nents, direction))
-+	if (dma_map_sgtable(at->dev, sg, direction, 0))
- 		goto err3;
- 
- 	return sg;
-@@ -868,6 +868,7 @@ static void mbochs_unmap_dmabuf(struct dma_buf_attachment *at,
- 
- 	dev_dbg(dev, "%s: %d\n", __func__, dmabuf->id);
- 
-+	dma_unmap_sgtable(at->dev, sg, direction, 0);
- 	sg_free_table(sg);
- 	kfree(sg);
- }
--- 
-1.9.1
-
+Reviewed-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
