@@ -2,97 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD4F71D0965
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 09:02:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10E2B1D09C6
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 09:18:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729752AbgEMHCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 03:02:23 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24324 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726020AbgEMHCX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 03:02:23 -0400
+        id S1730332AbgEMHSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 03:18:36 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22692 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726020AbgEMHSf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 03:18:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589353341;
+        s=mimecast20190719; t=1589354314;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=J7KRmwRXIbgjEW7YYzqTesjvyTFc2bLYn5qkibqp0SQ=;
-        b=aAL+KSyNclzye2m/IAZf3/WhzFjefnpLOB/CR9TcBDtp5RAxfQ4ZR7A1UMlq3fPJg09uYC
-        GPOEqZCdMPPYtGqJY9h4JmEtkE96+1XXkAB3Yrgx1y+cjKl96LqWdReGlkLc3oOeYlu/DO
-        6zbIzqJdIi7OAEfyTLgY1po9R/6+JaU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-GNunHl55ND6JNnK-ZUgNiw-1; Wed, 13 May 2020 03:02:19 -0400
-X-MC-Unique: GNunHl55ND6JNnK-ZUgNiw-1
-Received: by mail-wr1-f71.google.com with SMTP id 90so8105046wrg.23
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 00:02:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=J7KRmwRXIbgjEW7YYzqTesjvyTFc2bLYn5qkibqp0SQ=;
-        b=U55OdzSs+dS2MUMqmK65BZDKkNpgXvb/x3dDPjWaxYrPB8HEe6+D7/hTayyDWZRwPG
-         EfBteEM2fVHtSHQ66AXu4XLQqxbGMIIRoTrArKiM5KgUQ9SA6MGmVxIrJ41nkEGIrU+/
-         9bupzqWaLZkZZWo1+V1ThOw+kEeiA7ikypEjJHX8OBa/eNzBYllqstjl3l0ZA9DjVOcG
-         BCrOPvhhsh/K3TMrvgCNMmbiFHAW2W+6+PxGNU4gJ2iO+T55/kJ85yUPAiCj+XTw8+5D
-         rk45euriZ1D7pUg2c7o7ZNFsPPO5Cl+Ib0IynrQptTdzrpT4w9ah66GnWnS5Kf+f88aU
-         eMQQ==
-X-Gm-Message-State: AGi0PuaCissB/tx3bV25mzv7ytsNhRb61JNFPmTtxT4jYbs+ucENCZrB
-        2lCULMA+RdnC6lVu7nlLh3nCuYLLmT34TapOkN+oHPwzCq4LEB3MS5oqNPBUWNxcb5TE5YXCS/Q
-        umarnDK2w8dzr
-X-Received: by 2002:a05:6000:1105:: with SMTP id z5mr29744520wrw.208.1589353338075;
-        Wed, 13 May 2020 00:02:18 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJtT0Yn7zIjIaBr1dfYuf9o2ntG3X2Z9YB/iU+MY4Bn8o/7ChhIfw7X2yPFvSYYRrbB5lt5tw==
-X-Received: by 2002:a05:6000:1105:: with SMTP id z5mr29744501wrw.208.1589353337822;
-        Wed, 13 May 2020 00:02:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:6ced:5227:72a1:6b78? ([2001:b07:6468:f312:6ced:5227:72a1:6b78])
-        by smtp.gmail.com with ESMTPSA id n9sm19173402wru.90.2020.05.13.00.02.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 May 2020 00:02:17 -0700 (PDT)
-Subject: Re: [RFC PATCH] KVM: Add module for IRQ forwarding
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Micah Morton <mortonm@chromium.org>
-Cc:     kvm@vger.kernel.org, jmattson@google.com
-References: <20200511220046.120206-1-mortonm@chromium.org>
- <20200512111440.15caaca2@w520.home>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <92fd66eb-68e7-596f-7dd1-f1c190833be4@redhat.com>
-Date:   Wed, 13 May 2020 09:02:16 +0200
+        bh=PsFr5VgA/I8bgRAUPFXVC7Lw5/2KGXHzA0YOGHShMaY=;
+        b=FT0qn+z28zv/g4ABSCMbmgDZD4h/lkHIiRMZnm3WHQ6SyI7Tww/yyNSJiN3eMtuS7R0vz8
+        ZoXILxxGJsk8l371YJlLb7y2TiJDqk0boVzCDMtzJOEuzG9uKVfg0jHUFvPs0giGLLg56+
+        eGxJ58fKut4htT0KM1hcYS2KyGuNSRQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-83QqhuSGMea6fVHJPVVfYg-1; Wed, 13 May 2020 03:18:30 -0400
+X-MC-Unique: 83QqhuSGMea6fVHJPVVfYg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AEDD8014D5;
+        Wed, 13 May 2020 07:18:29 +0000 (UTC)
+Received: from [10.72.12.209] (ovpn-12-209.pek2.redhat.com [10.72.12.209])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C4E546E6E0;
+        Wed, 13 May 2020 07:18:22 +0000 (UTC)
+Subject: Re: [PATCH V2] ifcvf: move IRQ request/free to status change handlers
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
+References: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
+ <8aca85c3-3bf6-a1ec-7009-cd9a635647d7@redhat.com>
+ <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <572ed6af-7a04-730e-c803-a41868091e88@redhat.com>
+Date:   Wed, 13 May 2020 15:18:21 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200512111440.15caaca2@w520.home>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/05/20 19:14, Alex Williamson wrote:
-> But why not assign the individual platform devices via vfio-platform
-> rather than assign the i2c controller via vfio-pci and then assembling
-> the interrupts from those sub-devices with this ad-hoc interface?  An
-> emulated i2c controller in the guest could provide the same discovery
-> mechanism as is available in the host.
 
-I agree.  I read the whole discussion, but I still don't understand why
-this is not using vfio-platform.
+On 2020/5/13 下午12:42, Zhu, Lingshan wrote:
+>
+>
+> On 5/13/2020 12:12 PM, Jason Wang wrote:
+>>
+>> On 2020/5/12 下午4:00, Zhu Lingshan wrote:
+>>> This commit move IRQ request and free operations from probe()
+>>> to VIRTIO status change handler to comply with VIRTIO spec.
+>>>
+>>> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
+>>> The device MUST NOT consume buffers or send any used buffer
+>>> notifications to the driver before DRIVER_OK.
+>>
+>>
+>> This comment needs to be checked as I said previously. It's only 
+>> needed if we're sure ifcvf can generate interrupt before DRIVER_OK.
+>>
+>>
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> ---
+>>> changes from V1:
+>>> remove ifcvf_stop_datapath() in status == 0 handler, we don't need 
+>>> to do this
+>>> twice; handle status == 0 after DRIVER_OK -> !DRIVER_OK handler 
+>>> (Jason Wang)
+>>
+>>
+>> Patch looks good to me, but with this patch ping cannot work on my 
+>> machine. (It works without this patch).
+>>
+>> Thanks
+> This is strange, it works on my machines, let's have a check offline.
+>
+> Thanks,
+> BR
+> Zhu Lingshan
 
-Alternatively, if you assign the i2c controller, I don't understand why
-the guest doesn't discover interrupts on its own.  Of course you need to
-tell the guest about the devices in the ACPI tables, but why is this new
-concept necessary?
 
-(Finally, in the past we were doing device assignment tasks within KVM
-and it was a bad idea.  Anything you want to do within KVM with respect
-to device assignment, someone else will want to do it from bare metal.
-virt/lib/irqbypass.c is a special case because it's an IOMMU feature
-that is designed to work in concert with VMX posted interrupts and SVM
-AVIC, so in guest mode only).
+I give it a try with virito-vpda and a tiny userspace. Either works.
 
-Paolo
+So it could be an issue of qemu codes.
+
+Let's wait for Cindy to test if it really works.
+
+Thanks
+
 
