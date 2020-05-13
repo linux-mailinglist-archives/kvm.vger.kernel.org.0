@@ -2,81 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 578A01D04E1
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 04:30:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19C541D05D2
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 06:12:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728441AbgEMCaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 May 2020 22:30:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40567 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727082AbgEMCaB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 May 2020 22:30:01 -0400
+        id S1726232AbgEMEMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 00:12:15 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20983 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726046AbgEMEMO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 00:12:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589337000;
+        s=mimecast20190719; t=1589343133;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iT2hW+HYXkczOFTWfJmASn4ajF5YSjXsGJSRKP6B8QY=;
-        b=CVOy29ssTBBUdBgXdE6VGpH7W+32DF86LhZcriuK6XUqjTXm0lLcpqLBfKGRGVxanBDBAP
-        M5xKKo6ucy8eMs3JiMePsGcmTRrOSBGCn9EY1prNu/9QwebPIFPE4I8JLIGRmWp0sC8DnO
-        AQGFIpIvZSkhqW9DlvuDICG8SwBEf8g=
+        bh=TFMNhtVPuv906gLl9sa3StnSPuNaMYBoacPzdy9DO50=;
+        b=HQtUF7mUVkkzXAB4oPbO5cIFOTtkqjmUqGhKw18rVd70GwdlbI/Kt+Vie0yx0R53R0lxHC
+        e/hQBqCYvWAa9gXDQ3uzr4aMObQLAfyYnc7j89xr8Y6d8V+zzMWk4BP16v5f0joReM6Gcl
+        gEQCc6Kj+wGzKFU8L3mejTThy2CfTfA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-EmZXlPFvPpqAhwBszIdqLA-1; Tue, 12 May 2020 22:29:56 -0400
-X-MC-Unique: EmZXlPFvPpqAhwBszIdqLA-1
+ us-mta-339-trGUjsymPEWOpe8TrPlrpg-1; Wed, 13 May 2020 00:12:09 -0400
+X-MC-Unique: trGUjsymPEWOpe8TrPlrpg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18B981005510;
-        Wed, 13 May 2020 02:29:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E22E2BFC1;
+        Wed, 13 May 2020 04:12:07 +0000 (UTC)
 Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 189CC60BF1;
-        Wed, 13 May 2020 02:29:32 +0000 (UTC)
-Subject: Re: [PATCH RFC 00/15] Add VFIO mediated device support and IMS
- support for the idxd driver.
-To:     Jason Gunthorpe <jgg@mellanox.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "megha.dey@linux.intel.com" <megha.dey@linux.intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Lu, Baolu" <baolu.lu@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Lin, Jing" <jing.lin@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D19D8C5486@SHSMSX104.ccr.corp.intel.com>
- <20200426191357.GB13640@mellanox.com> <20200426214355.29e19d33@x1.home>
- <20200427115818.GE13640@mellanox.com> <20200427071939.06aa300e@x1.home>
- <20200427132218.GG13640@mellanox.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D8E34AA@SHSMSX104.ccr.corp.intel.com>
- <20200508204710.GA78778@otc-nc-03> <20200508231610.GO19158@mellanox.com>
- <20200509000909.GA79981@otc-nc-03> <20200509122113.GP19158@mellanox.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E996160C47;
+        Wed, 13 May 2020 04:12:01 +0000 (UTC)
+Subject: Re: [PATCH V2] ifcvf: move IRQ request/free to status change handlers
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com
+References: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <196b23b9-12f7-2fc2-5efb-22e0642c456a@redhat.com>
-Date:   Wed, 13 May 2020 10:29:31 +0800
+Message-ID: <8aca85c3-3bf6-a1ec-7009-cd9a635647d7@redhat.com>
+Date:   Wed, 13 May 2020 12:12:00 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200509122113.GP19158@mellanox.com>
+In-Reply-To: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -87,53 +56,203 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2020/5/9 下午8:21, Jason Gunthorpe wrote:
-> On Fri, May 08, 2020 at 05:09:09PM -0700, Raj, Ashok wrote:
->> Hi Jason
->>
->> On Fri, May 08, 2020 at 08:16:10PM -0300, Jason Gunthorpe wrote:
->>> On Fri, May 08, 2020 at 01:47:10PM -0700, Raj, Ashok wrote:
->>>
->>>> Even when uaccel was under development, one of the options
->>>> was to use VFIO as the transport, goal was the same i.e to keep
->>>> the user space have one interface.
->>> I feel a bit out of the loop here, uaccel isn't in today's kernel is
->>> it? I've heard about it for a while, it sounds very similar to RDMA,
->>> so I hope they took some of my advice...
->> I think since 5.7 maybe? drivers/misc/uacce. I don't think this is like
->> RDMA, its just a plain accelerator. There is no connection management,
->> memory registration or other things.. IB was my first job at Intel,
->> but saying that i would be giving my age away:)
-> rdma was the first thing to do kernel bypass, all this stuff is like
-> rdma at some level.. I see this looks like the 'warp driver' stuff
-> redone
+On 2020/5/12 下午4:00, Zhu Lingshan wrote:
+> This commit move IRQ request and free operations from probe()
+> to VIRTIO status change handler to comply with VIRTIO spec.
 >
-> Wow, lots wrong here. Oh well.
->
->>> putting emulation code back into them, except in a more dangerous
->>> kernel location. This does not seem like a net win to me.
->> Its not a whole lot of emulation right? mdev are soft partitioned. There is
->> just a single PF, but we can create a separate partition for the guest using
->> PASID along with the normal BDF (RID). And exposing a consistent PCI like
->> interface to user space you get everything else for free.
->>
->> Yes, its not SRIOV, but giving that interface to user space via VFIO, we get
->> all of that functionality without having to reinvent a different way to do it.
->>
->> vDPA went the other way, IRC, they went and put a HW implementation of what
->> virtio is in hardware. So they sort of fit the model. Here the instance
->> looks and feels like real hardware for the setup and control aspect.
-> VDPA and this are very similar, of course it depends on the exact HW
-> implementation.
->
-> Jason
+> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
+> The device MUST NOT consume buffers or send any used buffer
+> notifications to the driver before DRIVER_OK.
 
 
-Actually this is not a must. Technically we can do ring/descriptor 
-translation in the vDPA driver as what zerocopy AF_XDP did.
+This comment needs to be checked as I said previously. It's only needed 
+if we're sure ifcvf can generate interrupt before DRIVER_OK.
+
+
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+> changes from V1:
+> remove ifcvf_stop_datapath() in status == 0 handler, we don't need to do this
+> twice; handle status == 0 after DRIVER_OK -> !DRIVER_OK handler (Jason Wang)
+
+
+Patch looks good to me, but with this patch ping cannot work on my 
+machine. (It works without this patch).
 
 Thanks
 
 
 >
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 120 ++++++++++++++++++++++++----------------
+>   1 file changed, 73 insertions(+), 47 deletions(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index abf6a061..d529ed6 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -28,6 +28,60 @@ static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
+>   	return IRQ_HANDLED;
+>   }
+>   
+> +static void ifcvf_free_irq_vectors(void *data)
+> +{
+> +	pci_free_irq_vectors(data);
+> +}
+> +
+> +static void ifcvf_free_irq(struct ifcvf_adapter *adapter, int queues)
+> +{
+> +	struct pci_dev *pdev = adapter->pdev;
+> +	struct ifcvf_hw *vf = &adapter->vf;
+> +	int i;
+> +
+> +
+> +	for (i = 0; i < queues; i++)
+> +		devm_free_irq(&pdev->dev, vf->vring[i].irq, &vf->vring[i]);
+> +
+> +	ifcvf_free_irq_vectors(pdev);
+> +}
+> +
+> +static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
+> +{
+> +	struct pci_dev *pdev = adapter->pdev;
+> +	struct ifcvf_hw *vf = &adapter->vf;
+> +	int vector, i, ret, irq;
+> +
+> +	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
+> +				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
+> +	if (ret < 0) {
+> +		IFCVF_ERR(pdev, "Failed to alloc IRQ vectors\n");
+> +		return ret;
+> +	}
+> +
+> +	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> +		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+> +			 pci_name(pdev), i);
+> +		vector = i + IFCVF_MSI_QUEUE_OFF;
+> +		irq = pci_irq_vector(pdev, vector);
+> +		ret = devm_request_irq(&pdev->dev, irq,
+> +				       ifcvf_intr_handler, 0,
+> +				       vf->vring[i].msix_name,
+> +				       &vf->vring[i]);
+> +		if (ret) {
+> +			IFCVF_ERR(pdev,
+> +				  "Failed to request irq for vq %d\n", i);
+> +			ifcvf_free_irq(adapter, i);
+> +
+> +			return ret;
+> +		}
+> +
+> +		vf->vring[i].irq = irq;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   static int ifcvf_start_datapath(void *private)
+>   {
+>   	struct ifcvf_hw *vf = ifcvf_private_to_vf(private);
+> @@ -118,17 +172,34 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
+>   {
+>   	struct ifcvf_adapter *adapter;
+>   	struct ifcvf_hw *vf;
+> +	u8 status_old;
+> +	int ret;
+>   
+>   	vf  = vdpa_to_vf(vdpa_dev);
+>   	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
+> +	status_old = ifcvf_get_status(vf);
+>   
+> -	if (status == 0) {
+> +	if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) &&
+> +	    !(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+>   		ifcvf_stop_datapath(adapter);
+> +		ifcvf_free_irq(adapter, IFCVF_MAX_QUEUE_PAIRS * 2);
+> +	}
+> +
+> +	if (status == 0) {
+>   		ifcvf_reset_vring(adapter);
+>   		return;
+>   	}
+>   
+> -	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
+> +	if ((status & VIRTIO_CONFIG_S_DRIVER_OK) &&
+> +	    !(status_old & VIRTIO_CONFIG_S_DRIVER_OK)) {
+> +		ret = ifcvf_request_irq(adapter);
+> +		if (ret) {
+> +			status = ifcvf_get_status(vf);
+> +			status |= VIRTIO_CONFIG_S_FAILED;
+> +			ifcvf_set_status(vf, status);
+> +			return;
+> +		}
+> +
+>   		if (ifcvf_start_datapath(adapter) < 0)
+>   			IFCVF_ERR(adapter->pdev,
+>   				  "Failed to set ifcvf vdpa  status %u\n",
+> @@ -284,38 +355,6 @@ static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
+>   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
+>   };
+>   
+> -static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
+> -{
+> -	struct pci_dev *pdev = adapter->pdev;
+> -	struct ifcvf_hw *vf = &adapter->vf;
+> -	int vector, i, ret, irq;
+> -
+> -
+> -	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> -		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+> -			 pci_name(pdev), i);
+> -		vector = i + IFCVF_MSI_QUEUE_OFF;
+> -		irq = pci_irq_vector(pdev, vector);
+> -		ret = devm_request_irq(&pdev->dev, irq,
+> -				       ifcvf_intr_handler, 0,
+> -				       vf->vring[i].msix_name,
+> -				       &vf->vring[i]);
+> -		if (ret) {
+> -			IFCVF_ERR(pdev,
+> -				  "Failed to request irq for vq %d\n", i);
+> -			return ret;
+> -		}
+> -		vf->vring[i].irq = irq;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+> -static void ifcvf_free_irq_vectors(void *data)
+> -{
+> -	pci_free_irq_vectors(data);
+> -}
+> -
+>   static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   {
+>   	struct device *dev = &pdev->dev;
+> @@ -349,13 +388,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   		return ret;
+>   	}
+>   
+> -	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
+> -				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
+> -	if (ret < 0) {
+> -		IFCVF_ERR(pdev, "Failed to alloc irq vectors\n");
+> -		return ret;
+> -	}
+> -
+>   	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
+>   	if (ret) {
+>   		IFCVF_ERR(pdev,
+> @@ -379,12 +411,6 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   	adapter->pdev = pdev;
+>   	adapter->vdpa.dma_dev = &pdev->dev;
+>   
+> -	ret = ifcvf_request_irq(adapter);
+> -	if (ret) {
+> -		IFCVF_ERR(pdev, "Failed to request MSI-X irq\n");
+> -		goto err;
+> -	}
+> -
+>   	ret = ifcvf_init_hw(vf, pdev);
+>   	if (ret) {
+>   		IFCVF_ERR(pdev, "Failed to init IFCVF hw\n");
 
