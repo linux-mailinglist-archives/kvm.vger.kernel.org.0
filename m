@@ -2,214 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32A831D14E3
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 15:29:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1B911D156F
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 15:34:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387629AbgEMN3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 09:29:05 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27327 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729309AbgEMN3F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 09:29:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589376543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KoV5Wqms5AH46esJ6zYoKxLFFe0Vww3N0l8ERghmRN4=;
-        b=RcTjyLBnCN8cwUOlTOor2lVXEpwVNshjO4b2+gSQU0hh4fIU54DPQ1j88OI7MeuGTVs0hf
-        eyroIJPyYMQ7yHH3pDkSByAhbkKCtgYP8T4DIZOjv31b+F8M3AHaZeSTWPXe0kdvNK3dyL
-        4Nv0/W1w59IqMEwopIqREGf/kwRL2vg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-HnptDom5NM2MsQHnVL9a5Q-1; Wed, 13 May 2020 09:28:58 -0400
-X-MC-Unique: HnptDom5NM2MsQHnVL9a5Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DEED80183C;
-        Wed, 13 May 2020 13:28:56 +0000 (UTC)
-Received: from [10.36.112.22] (ovpn-112-22.ams2.redhat.com [10.36.112.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 94BE910013BD;
-        Wed, 13 May 2020 13:28:45 +0000 (UTC)
-Subject: Re: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Zhangfei Gao <zhangfei.gao@linaro.org>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Cc:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "tn@semihalf.com" <tn@semihalf.com>,
-        "bbhushan2@marvell.com" <bbhushan2@marvell.com>
-References: <20200414150607.28488-1-eric.auger@redhat.com>
- <eb27f625-ad7a-fcb5-2185-5471e4666f09@linaro.org>
- <06fe02f7-2556-8986-2f1e-dcdf59773b8c@redhat.com>
- <c7786a2a314e4c4ab37ef157ddfa23af@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <3858dd8c-ee55-b0d7-96cc-3c047ba8f652@redhat.com>
-Date:   Wed, 13 May 2020 15:28:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <c7786a2a314e4c4ab37ef157ddfa23af@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S2388310AbgEMNd5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 09:33:57 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:59085 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388038AbgEMNdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 09:33:25 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20200513133324euoutp01614e9121a5c5d73849f95cf3e1ad86bf~Omcho7YXF2196121961euoutp01-
+        for <kvm@vger.kernel.org>; Wed, 13 May 2020 13:33:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20200513133324euoutp01614e9121a5c5d73849f95cf3e1ad86bf~Omcho7YXF2196121961euoutp01-
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1589376804;
+        bh=4Z3VX9b95pVvmo5Br0ewCVmZiro3PYcbGcBRCw5/dy0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=cYmrTQQOJQJYIxLbJOjPRjT9kBusZQNHJQBiSPgPHs/jpKQUf8agJzNoBWzwpY1IY
+         fC4VkozQemM4WeoUyvG1roOv2ofSd5giJkVaW6SmMFPnBp+B/1X0Oq4yiffK9UfGYa
+         /JbRDd0MyqdQQCzALACo3pidCdqOFiFtqAm7zPW4=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200513133324eucas1p142c8a86befd97cefee286cdf022951dc~OmchRgFjH0785407854eucas1p1H;
+        Wed, 13 May 2020 13:33:24 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id FB.D5.61286.427FBBE5; Wed, 13
+        May 2020 14:33:24 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7~OmchAzpyr2351423514eucas1p1e;
+        Wed, 13 May 2020 13:33:23 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200513133323eusmtrp10172f55b09fa88e4e962360e4035a246~OmchAHACf1050610506eusmtrp1h;
+        Wed, 13 May 2020 13:33:23 +0000 (GMT)
+X-AuditID: cbfec7f2-f0bff7000001ef66-89-5ebbf724c6de
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id BF.47.07950.327FBBE5; Wed, 13
+        May 2020 14:33:23 +0100 (BST)
+Received: from AMDC2765.digital.local (unknown [106.120.51.73]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200513133323eusmtip16dd11117bccd96d7b870b4e361de6129~OmcgSp9Av0693306933eusmtip1N;
+        Wed, 13 May 2020 13:33:23 +0000 (GMT)
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+To:     dri-devel@lists.freedesktop.org, iommu@lists.linux-foundation.org,
+        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org
+Cc:     Marek Szyprowski <m.szyprowski@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-arm-kernel@lists.infradead.org,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: [PATCH v5 36/38] samples: vfio-mdev/mbochs: fix common struct
+ sg_table related issues
+Date:   Wed, 13 May 2020 15:32:43 +0200
+Message-Id: <20200513133245.6408-36-m.szyprowski@samsung.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200513133245.6408-1-m.szyprowski@samsung.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA0WSa0hTYRzGeXcuOy5Pnabgi0XS0MgolxR6RMtCPxxSog+BEKWuPKjpvOw4
+        TSFamRVTlyahmZqYoum8tmZoeSudpZmpmddqaBcFzbxikbbtaH37vc//eXj+78tLIGIdZk+E
+        R8WxiihZpAQXofqO1Z4DjiuNgQfrnwnp9J5XAro2pxqj1/WZCD2w9AOnH1W0C+jCZk86724s
+        revKB/TigFFA100MYnR/Qx5OV74cF9Ktc5PYMZLRFmgB83y5EGXqlz9jzKdUg4B5XHyFGV2b
+        QJisoVLANA6rcCY9eRZnNLpywCzU7Tq15YzIK4SNDI9nFdKjwaKwOVUHHmMUX2pSr2AqMLRN
+        DawISB2GbzsaUDUQEWKqDEDN12HAHxYBbJyoxs0uMbUA4Id7bpuJd92ZQt5UCuCgdgHhTaZE
+        WruPmXHKFapn1JawLZUCYGe6tTmAUIMCOPNnFjMPbKhg2F3ZLjQzSjlBo0FrYZI6Aq+maIR8
+        mwOsqGmxFFiZ9OmxZpTXm4Sw8D7Jsy+8XXsT49kGTht0G9mdsCsrzXI3SCUDaOypFPKHNAD7
+        r+UA3uUJx3p+mVYlTOs5w+oGKS8fh9/XZ1GzDKmtcGhmu1lGTHhHn43wMglv3RDz7j0w11D1
+        r7a1tw/hmYFF+qmNx3oBYElOAZIBHHL/lxUCUA7sWCUnD2U51yg2wYWTyTllVKjLhWh5HTD9
+        pa41w/xTsNR3vg1QBJBYk/RIY6AYk8VzifI2AAlEYkuerDZJZIgsMYlVRAcplJEs1wZ2EKjE
+        jjxUNHVOTIXK4tgIlo1hFZtTAWFlrwJ2MSspfWpdgPe2Ip94Zzf6Y2cpuBjB/Xbxl/bimQEt
+        vW7eSbspqV/o5GvdqKEk/qej/k1lnWeNJtVPOuK/JBStFjx0yC/2SKqNPZu57p4aNMoNP/AY
+        VZ52KXNwytqvRqtOXM4p8bV9r1//In8yn6Fq+TaeUER2el3P7l1yd98rQbkwmes+RMHJ/gIq
+        KpNhRwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOIsWRmVeSWpSXmKPExsVy+t/xu7rK33fHGUyYq2fRe+4kk8XGGetZ
+        Lf5vm8hsceXrezaLlauPMlks2G9tMWdqocWW03MZLb5cechksenxNVaLy7vmsFmsPXKX3eLg
+        hyesDrwea+atYfTY+20Bi8f2bw9YPe53H2fy2Lyk3uP2v8fMHpNvLGf02H2zgc2jt/kdm0ff
+        llWMHp83yQVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZpKTmZJal
+        FunbJehlfGg4xlbwUKhiX9d31gbGG/xdjJwcEgImEhfPTGTvYuTiEBJYyihxas4EVoiEjMTJ
+        aQ1QtrDEn2tdbBBFnxglNp1+xQ6SYBMwlOh6C5EQEehklJjW/REswSxwj0li7zo/EFtYIE7i
+        0K0+JhCbRUBV4uHxNWA1vAK2Eo2tfewQG+QlVm84wAxicwLFX93ZzwJiCwnkS+xdvI9tAiPf
+        AkaGVYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmbGIGRsu3Yzy07GLveBR9iFOBgVOLhtbi1O06I
+        NbGsuDL3EKMEB7OSCK/feqAQb0piZVVqUX58UWlOavEhRlOgoyYyS4km5wOjOK8k3tDU0NzC
+        0tDc2NzYzEJJnLdD4GCMkEB6YklqdmpqQWoRTB8TB6dUA+M0pa8bnhzbMbOm4AFTgdZ+9dam
+        VLsem4M/q0U/OCiZTbbPm3K+yuCF3cyoZqFv/b//PK3LcP6hlGVSHplUPnFPgwOv6pK9KYIv
+        WPWyLmU4ikxd6vRWQSE2mvWbWmLkhLhb+2xkA1+mrcuTYxXZzJ+1VPbT4mUtL47FSu85cUho
+        WcNFjktNXkosxRmJhlrMRcWJAIhhNxSqAgAA
+X-CMS-MailID: 20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7
+References: <20200513132114.6046-1-m.szyprowski@samsung.com>
+        <20200513133245.6408-1-m.szyprowski@samsung.com>
+        <CGME20200513133323eucas1p1519f5901d2a4ee85b781fcc36e9601f7@eucas1p1.samsung.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shameer,
+The Documentation/DMA-API-HOWTO.txt states that the dma_map_sg() function
+returns the number of the created entries in the DMA address space.
+However the subsequent calls to the dma_sync_sg_for_{device,cpu}() and
+dma_unmap_sg must be called with the original number of the entries
+passed to the dma_map_sg().
 
-On 5/7/20 8:59 AM, Shameerali Kolothum Thodi wrote:
-> Hi Eric,
-> 
->> -----Original Message-----
->> From: Shameerali Kolothum Thodi
->> Sent: 30 April 2020 10:38
->> To: 'Auger Eric' <eric.auger@redhat.com>; Zhangfei Gao
->> <zhangfei.gao@linaro.org>; eric.auger.pro@gmail.com;
->> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
->> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
->> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com
->> Cc: jean-philippe@linaro.org; alex.williamson@redhat.com;
->> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; peter.maydell@linaro.org;
->> tn@semihalf.com; bbhushan2@marvell.com
->> Subject: RE: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
->>
->> Hi Eric,
->>
->>> -----Original Message-----
->>> From: Auger Eric [mailto:eric.auger@redhat.com]
->>> Sent: 16 April 2020 08:45
->>> To: Zhangfei Gao <zhangfei.gao@linaro.org>; eric.auger.pro@gmail.com;
->>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
->>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
->>> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com
->>> Cc: jean-philippe@linaro.org; Shameerali Kolothum Thodi
->>> <shameerali.kolothum.thodi@huawei.com>; alex.williamson@redhat.com;
->>> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; peter.maydell@linaro.org;
->>> tn@semihalf.com; bbhushan2@marvell.com
->>> Subject: Re: [PATCH v11 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
->>>
->>> Hi Zhangfei,
->>>
->>> On 4/16/20 6:25 AM, Zhangfei Gao wrote:
->>>>
->>>>
->>>> On 2020/4/14 下午11:05, Eric Auger wrote:
->>>>> This version fixes an issue observed by Shameer on an SMMU 3.2,
->>>>> when moving from dual stage config to stage 1 only config.
->>>>> The 2 high 64b of the STE now get reset. Otherwise, leaving the
->>>>> S2TTB set may cause a C_BAD_STE error.
->>>>>
->>>>> This series can be found at:
->>>>> https://github.com/eauger/linux/tree/v5.6-2stage-v11_10.1
->>>>> (including the VFIO part)
->>>>> The QEMU fellow series still can be found at:
->>>>> https://github.com/eauger/qemu/tree/v4.2.0-2stage-rfcv6
->>>>>
->>>>> Users have expressed interest in that work and tested v9/v10:
->>>>> - https://patchwork.kernel.org/cover/11039995/#23012381
->>>>> - https://patchwork.kernel.org/cover/11039995/#23197235
->>>>>
->>>>> Background:
->>>>>
->>>>> This series brings the IOMMU part of HW nested paging support
->>>>> in the SMMUv3. The VFIO part is submitted separately.
->>>>>
->>>>> The IOMMU API is extended to support 2 new API functionalities:
->>>>> 1) pass the guest stage 1 configuration
->>>>> 2) pass stage 1 MSI bindings
->>>>>
->>>>> Then those capabilities gets implemented in the SMMUv3 driver.
->>>>>
->>>>> The virtualizer passes information through the VFIO user API
->>>>> which cascades them to the iommu subsystem. This allows the guest
->>>>> to own stage 1 tables and context descriptors (so-called PASID
->>>>> table) while the host owns stage 2 tables and main configuration
->>>>> structures (STE).
->>>>>
->>>>>
->>>>
->>>> Thanks Eric
->>>>
->>>> Tested v11 on Hisilicon kunpeng920 board via hardware zip accelerator.
->>>> 1. no-sva works, where guest app directly use physical address via ioctl.
->>> Thank you for the testing. Glad it works for you.
->>>> 2. vSVA still not work, same as v10,
->>> Yes that's normal this series is not meant to support vSVM at this stage.
->>>
->>> I intend to add the missing pieces during the next weeks.
->>
->> Thanks for that. I have made an attempt to add the vSVA based on
->> your v10 + JPBs sva patches. The host kernel and Qemu changes can
->> be found here[1][2].
->>
->> This basically adds multiple pasid support on top of your changes.
->> I have done some basic sanity testing and we have some initial success
->> with the zip vf dev on our D06 platform. Please note that the STALL event is
->> not yet supported though, but works fine if we mlock() guest usr mem.
-> 
-> I have added STALL support for our vSVA prototype and it seems to be
-> working(on our hardware). I have updated the kernel and qemu branches with
-> the same[1][2]. I should warn you though that these are prototype code and I am pretty
-> much re-using the VFIO_IOMMU_SET_PASID_TABLE interface for almost everything.
-> But thought of sharing, in case if it is useful somehow!.
+struct sg_table is a common structure used for describing a non-contiguous
+memory buffer, used commonly in the DRM and graphics subsystems. It
+consists of a scatterlist with memory pages and DMA addresses (sgl entry),
+as well as the number of scatterlist entries: CPU pages (orig_nents entry)
+and DMA mapped pages (nents entry).
 
-Thank you again for sharing the POC. I looked at the kernel and QEMU
-branches.
+It turned out that it was a common mistake to misuse nents and orig_nents
+entries, calling DMA-mapping functions with a wrong number of entries or
+ignoring the number of mapped entries returned by the dma_map_sg()
+function.
 
-Here are some preliminary comments:
-- "arm-smmu-v3: Reset S2TTB while switching back from nested stage":  as
-you mentionned S2TTB reset now is featured in v11
-- "arm-smmu-v3: Add support for multiple pasid in nested mode": I could
-easily integrate this into my series. Update the iommu api first and
-pass multiple CD info in a separate patch
-- "arm-smmu-v3: Add support to Invalidate CD": CD invalidation should be
-cascaded to host through the PASID cache invalidation uapi (no pb you
-warned us for the POC you simply used VFIO_IOMMU_SET_PASID_TABLE). I
-think I should add this support in my original series although it does
-not seem to trigger any issue up to now.
-- "arm-smmu-v3: Remove duplication of fault propagation". I understand
-the transcode is done somewhere else with SVA but we still need to do it
-if a single CD is used, right? I will review the SVA code to better
-understand.
-- for the STALL response injection I would tend to use a new VFIO region
-for responses. At the moment there is a single VFIO region for reporting
-the fault.
+To avoid such issues, lets use a common dma-mapping wrappers operating
+directly on the struct sg_table objects and use scatterlist page
+iterators where possible. This, almost always, hides references to the
+nents and orig_nents entries, making the code robust, easier to follow
+and copy/paste safe.
 
-On QEMU side:
-- I am currently working on 3.2 range invalidation support which is
-needed for DPDK/VFIO
-- While at it I will look at how to incrementally introduce some of the
-features you need in this series.
+While touching this code, also add missing call to dma_unmap_sgtable.
 
-Thanks
+Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
+---
+For more information, see '[PATCH v5 00/38] DRM: fix struct sg_table nents
+vs. orig_nents misuse' thread:
+https://lore.kernel.org/linux-iommu/20200513132114.6046-1-m.szyprowski@samsung.com/T/
+---
+ samples/vfio-mdev/mbochs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Eric
-
-
-
-> 
-> Thanks,
-> Shameer
-> 
-> [1]https://github.com/hisilicon/kernel-dev/commits/vsva-prototype-host-v1
-> 
-> [2]https://github.com/hisilicon/qemu/tree/v4.2.0-2stage-rfcv6-vsva-prototype-v1
-> 
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index 3cc5e59..e030689 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -846,7 +846,7 @@ static struct sg_table *mbochs_map_dmabuf(struct dma_buf_attachment *at,
+ 	if (sg_alloc_table_from_pages(sg, dmabuf->pages, dmabuf->pagecount,
+ 				      0, dmabuf->mode.size, GFP_KERNEL) < 0)
+ 		goto err2;
+-	if (!dma_map_sg(at->dev, sg->sgl, sg->nents, direction))
++	if (dma_map_sgtable(at->dev, sg, direction, 0))
+ 		goto err3;
+ 
+ 	return sg;
+@@ -868,6 +868,7 @@ static void mbochs_unmap_dmabuf(struct dma_buf_attachment *at,
+ 
+ 	dev_dbg(dev, "%s: %d\n", __func__, dmabuf->id);
+ 
++	dma_unmap_sgtable(at->dev, sg, direction, 0);
+ 	sg_free_table(sg);
+ 	kfree(sg);
+ }
+-- 
+1.9.1
 
