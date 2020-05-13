@@ -2,94 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EE961D0B81
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 11:09:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FC941D0C06
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 11:24:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732416AbgEMJJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 05:09:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27993 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730677AbgEMJJb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 05:09:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589360970;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LkQRKl9tLygDVkb/DJW18fHZ9G4cW+Tv9HaEWtJVlFg=;
-        b=S7zM8ArUeuJk+7MoaMAW0vq/F1073CDQGNpEQAQkVgEEUtwK7kYTx6FzYFvt6IZMvZRGB+
-        +oaL4fgt5jcLf08LVxyJcAFKwtegF8bXbyikpcJW6zD792Oi03MnoRwm1JJaN2QlStl7it
-        4Ckm8TdUtV46EfyF5YVV4y9wk/pUyDE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-RjFx8uD0NZaWEjlhnImaew-1; Wed, 13 May 2020 05:09:26 -0400
-X-MC-Unique: RjFx8uD0NZaWEjlhnImaew-1
-Received: by mail-wm1-f71.google.com with SMTP id h6so11357143wmi.7
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 02:09:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=LkQRKl9tLygDVkb/DJW18fHZ9G4cW+Tv9HaEWtJVlFg=;
-        b=kze9j9gmRFN9jFud9sOdVxhr4SJxbAU2q/aZMkOgB8XQe8R4f//Gv7yTX7K+gw94Xb
-         akXrq3RRhRMeGCbS3OG4hHt6/YzKjstkGsh/Kvpme+5nKZWvJ24FYdZ9fllcD2LTaVwG
-         TyhB/2I1RPO5IeOrWtcZotipmAEhVG6IrTTaUyAxG1ivOIRjmmiV+FWfj8Z6QAyJb8R9
-         hgOQ8pm2ciciHhSSx+hjZNrFG2XTPz5sKdQ1i+IOEquasaSWal/z1FpMBmgHLZx3h3Nx
-         t9db1JgnBwAIiReoMT14Q/RJFOfZ8N02UJMGxd/a7BY77Qp9736zKLxd0KzCzQJLiDPr
-         rp4A==
-X-Gm-Message-State: AGi0PuaH92HmfTTTtwdcm9mVKE7BhOZSRbwFa2R+aRyzgFxHs3jRP8fi
-        qRoz1HqVpf8R1jEj5ClmPiDymI9QqAuc9XNOqsF8Gy5j+VBvkZLFwo0NNXOu3qIC2yhtPwjUfGA
-        IVJBQU+uH0q1P
-X-Received: by 2002:a1c:99d3:: with SMTP id b202mr43420408wme.126.1589360965710;
-        Wed, 13 May 2020 02:09:25 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIjv23QQ+2IFmFvDYhwD6Weh2biJtnHzNX52SF/bAHYC2OofdpyPGHaYJrzuFQpZNuwDeYLdw==
-X-Received: by 2002:a1c:99d3:: with SMTP id b202mr43420381wme.126.1589360965486;
-        Wed, 13 May 2020 02:09:25 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id b145sm13059757wme.41.2020.05.13.02.09.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 May 2020 02:09:24 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vivek Goyal <vgoyal@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with token info
-In-Reply-To: <20200512175017.GC12100@linux.intel.com>
-References: <20200511164752.2158645-1-vkuznets@redhat.com> <20200511164752.2158645-3-vkuznets@redhat.com> <20200512152709.GB138129@redhat.com> <87o8qtmaat.fsf@vitty.brq.redhat.com> <20200512155339.GD138129@redhat.com> <20200512175017.GC12100@linux.intel.com>
-Date:   Wed, 13 May 2020 11:09:23 +0200
-Message-ID: <874kskmcak.fsf@vitty.brq.redhat.com>
+        id S1732467AbgEMJYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 05:24:12 -0400
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:57756 "EHLO
+        forwardcorp1j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728224AbgEMJYM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 05:24:12 -0400
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net [IPv6:2a02:6b8:0:1619::119])
+        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id BED4A2E151A;
+        Wed, 13 May 2020 12:24:08 +0300 (MSK)
+Received: from iva8-88b7aa9dc799.qloud-c.yandex.net (iva8-88b7aa9dc799.qloud-c.yandex.net [2a02:6b8:c0c:77a0:0:640:88b7:aa9d])
+        by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id gMz7KUcFuC-O5oO2V9K;
+        Wed, 13 May 2020 12:24:08 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
+        t=1589361848; bh=PpfB+ATh0dUjhkQFoWNNsq69AtPWNpiiGZAi5l8NWMU=;
+        h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+        b=kV2yWTOKwEjkxPnietQjwptUb8gE4qZWMztmKOwNtz9NsWxdccVMyQ7govd3WTVXJ
+         lHEsEFqp3FbpqJlsMxuXtcnDhWgrjyZgE2xotPjNE8M0G/e6Y3xX/c4QyHxT+Y4u6d
+         xgTzXIHH0c8VVSXCH68bzcE9+zCWCkDXZmu1gTgU=
+Authentication-Results: mxbackcorp2j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-iva.dhcp.yndx.net (dynamic-iva.dhcp.yndx.net [2a02:6b8:b080:9009::1:1])
+        by iva8-88b7aa9dc799.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id ZRgRUqyTun-O5XaL2sR;
+        Wed, 13 May 2020 12:24:05 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Date:   Wed, 13 May 2020 12:24:04 +0300
+From:   Roman Kagan <rvkagan@yandex-team.ru>
+To:     Jon Doron <arilou@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        vkuznets@redhat.com
+Subject: Re: [PATCH v11 2/7] x86/kvm/hyper-v: Simplify addition for custom
+ cpuid leafs
+Message-ID: <20200513092404.GB29650@rvkaganb.lan>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+        Jon Doron <arilou@gmail.com>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, vkuznets@redhat.com
+References: <20200424113746.3473563-1-arilou@gmail.com>
+ <20200424113746.3473563-3-arilou@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200424113746.3473563-3-arilou@gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Fri, Apr 24, 2020 at 02:37:41PM +0300, Jon Doron wrote:
+> Simlify the code to define a new cpuid leaf group by enabled feature.
+> 
+> This also fixes a bug in which the max cpuid leaf was always set to
+> HYPERV_CPUID_NESTED_FEATURES regardless if nesting is supported or not.
 
->
-> Why bother preserving backwards compatibility?  AIUI, both KVM and guest
-> will support async #PF iff interrupt delivery is enabled.  Why not make
-> the interrupt delivery approach KVM_ASYNC_PF_V2 and completely redefine the
-> ABI?  E.g. to make it compatible with reflecting !PRESENT faults without a
-> VM-Exit via Intel's EPT Violation #VE?
->
+I'm not sure the bug is there.  My understanding is that
+HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS is supposed to provide the range
+of leaves that return meaningful information.
+HYPERV_CPUID_NESTED_FEATURES *can* return meaningful information
+regardless of whether nested virt is active.
 
-That's the plan, actually. 'page not present' becomes #VE and 'page
-present' becomes an interrupt (we don't need to inject them
-synchronously). These two parts are fairly independent but can be merged
-to reuse the same new capability/CPUID.
+So I'd rather skip reducing the returned set if !evmcs_ver.  The
+returned set is sparse in .function anyway; anything that isn't there
+will just return zeros to the guest.
 
--- 
-Vitaly
+Changing the cpuid is also guest-visible so care must be taken with
+this.
 
+> Any new CPUID group needs to consider the max leaf and be added in the
+> correct order, in this method there are two rules:
+> 1. Each cpuid leaf group must be order in an ascending order
+> 2. The appending for the cpuid leafs by features also needs to happen by
+>    ascending order.
+
+It looks like unnecessary complication.  I think all you need to do to
+simplify adding new leaves is to add a macro to hyperv-tlfs.h, say,
+HYPERV_CPUID_MAX_PRESENT_LEAF, define it to
+HYPERV_CPUID_NESTED_FEATURES, and redefine once another leaf is added
+(compat may need to be taken care of).
+
+Thanks,
+Roman.
+
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+> ---
+>  arch/x86/kvm/hyperv.c | 46 ++++++++++++++++++++++++++++++-------------
+>  1 file changed, 32 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index bcefa9d4e57e..ab3e9dbcabbe 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1785,27 +1785,45 @@ int kvm_vm_ioctl_hv_eventfd(struct kvm *kvm, struct kvm_hyperv_eventfd *args)
+>  	return kvm_hv_eventfd_assign(kvm, args->conn_id, args->fd);
+>  }
+>  
+> +/* Must be sorted in ascending order by function */
+> +static struct kvm_cpuid_entry2 core_cpuid_entries[] = {
+> +	{ .function = HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS },
+> +	{ .function = HYPERV_CPUID_INTERFACE },
+> +	{ .function = HYPERV_CPUID_VERSION },
+> +	{ .function = HYPERV_CPUID_FEATURES },
+> +	{ .function = HYPERV_CPUID_ENLIGHTMENT_INFO },
+> +	{ .function = HYPERV_CPUID_IMPLEMENT_LIMITS },
+> +};
+> +
+> +static struct kvm_cpuid_entry2 evmcs_cpuid_entries[] = {
+> +	{ .function = HYPERV_CPUID_NESTED_FEATURES },
+> +};
+> +
+> +#define HV_MAX_CPUID_ENTRIES \
+> +	(ARRAY_SIZE(core_cpuid_entries) +\
+> +	 ARRAY_SIZE(evmcs_cpuid_entries))
+> +
+>  int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+>  				struct kvm_cpuid_entry2 __user *entries)
+>  {
+>  	uint16_t evmcs_ver = 0;
+> -	struct kvm_cpuid_entry2 cpuid_entries[] = {
+> -		{ .function = HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS },
+> -		{ .function = HYPERV_CPUID_INTERFACE },
+> -		{ .function = HYPERV_CPUID_VERSION },
+> -		{ .function = HYPERV_CPUID_FEATURES },
+> -		{ .function = HYPERV_CPUID_ENLIGHTMENT_INFO },
+> -		{ .function = HYPERV_CPUID_IMPLEMENT_LIMITS },
+> -		{ .function = HYPERV_CPUID_NESTED_FEATURES },
+> -	};
+> -	int i, nent = ARRAY_SIZE(cpuid_entries);
+> +	struct kvm_cpuid_entry2 cpuid_entries[HV_MAX_CPUID_ENTRIES];
+> +	int i, nent = 0;
+> +
+> +	/* Set the core cpuid entries required for Hyper-V */
+> +	memcpy(&cpuid_entries[nent], &core_cpuid_entries,
+> +	       sizeof(core_cpuid_entries));
+> +	nent = ARRAY_SIZE(core_cpuid_entries);
+>  
+>  	if (kvm_x86_ops.nested_get_evmcs_version)
+>  		evmcs_ver = kvm_x86_ops.nested_get_evmcs_version(vcpu);
+>  
+> -	/* Skip NESTED_FEATURES if eVMCS is not supported */
+> -	if (!evmcs_ver)
+> -		--nent;
+> +	if (evmcs_ver) {
+> +		/* EVMCS is enabled, add the required EVMCS CPUID leafs */
+> +		memcpy(&cpuid_entries[nent], &evmcs_cpuid_entries,
+> +		       sizeof(evmcs_cpuid_entries));
+> +		nent += ARRAY_SIZE(evmcs_cpuid_entries);
+> +	}
+>  
+>  	if (cpuid->nent < nent)
+>  		return -E2BIG;
+> @@ -1821,7 +1839,7 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+>  		case HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS:
+>  			memcpy(signature, "Linux KVM Hv", 12);
+>  
+> -			ent->eax = HYPERV_CPUID_NESTED_FEATURES;
+> +			ent->eax = cpuid_entries[nent - 1].function;
+>  			ent->ebx = signature[0];
+>  			ent->ecx = signature[1];
+>  			ent->edx = signature[2];
+> -- 
+> 2.24.1
+> 
