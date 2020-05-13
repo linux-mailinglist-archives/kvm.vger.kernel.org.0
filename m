@@ -2,120 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77CDB1D21B1
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 00:05:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71B321D21D9
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 00:17:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730124AbgEMWFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 18:05:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44407 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730064AbgEMWFd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 18:05:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589407532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pudxRAJGPX6gmBUPiP6A4BRweE0G4VayWPL9/a26Po4=;
-        b=QKh/jrZIMX5fqA2g3GUBNVr5/Y4Kta+BEcvg4i28cghuFnETh+Kk3A2A1Gzu+qPUJkcZyI
-        HxVGhEWugzmRd3F1C+wvrmE77Ak+TqtBEo76qTnwBtwUBn++b+poF+UknRvYPi+YlmwOpx
-        /RbBNQgKt0rmBCdqitU3H6mVMZUvD9E=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-1GbfhlhoNtqozmED3m_Ysg-1; Wed, 13 May 2020 18:05:26 -0400
-X-MC-Unique: 1GbfhlhoNtqozmED3m_Ysg-1
-Received: by mail-wm1-f70.google.com with SMTP id a67so6188893wme.6
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 15:05:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pudxRAJGPX6gmBUPiP6A4BRweE0G4VayWPL9/a26Po4=;
-        b=e1sAoIpDkdoIYwmd7Sl/0vIIDMKVom1CYQXefqXGaQTnok5232VY0F/04g5+A+YLwy
-         NiJxXU2F4V3PkmqUI9yrbojU2tnFK32mK1607xb6rE5T1/xgqSrudYWO3LYli7mpIktC
-         +qOGcYkOda3FyOE59C1tbjd0Q2hQQYdDOoT6tIAMpQjrzp8A+wRq8mHVot4ZbV+vY+R6
-         o/PjvEQTnk+eP/DbgOgBB4QZxr7Uzikamj9XRGc1OgbeYqNBaqpmZ8XFMiXEvXOpzmG3
-         1n4s5Gnrgs/+B1lqrkEbQQaOpvxPM8Pq9LuiE26o6ju2kVT1XDpt0Kco/tQCut58wHdg
-         CYLA==
-X-Gm-Message-State: AOAM530ERDeS/B40X1Gk91eLQjzCzkJyEGWTVRcLoDqmTAVdAG299jJH
-        jZj7vc5Ox/6ghli+X27pbTW2P9B/ofShzQC0qfTuHtD5HSWC6WKFizkYSwklIWWOUeRUgbVPXwP
-        0F9aWdMkt2M5F
-X-Received: by 2002:adf:ed8d:: with SMTP id c13mr1661568wro.154.1589407525526;
-        Wed, 13 May 2020 15:05:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxWP7EaC2p0c0AIm6fYnEKM1JvyywpgfkI/IAPJxHvXme5J70f9z9fhiuiKRXBZqyW6eCYSCA==
-X-Received: by 2002:adf:ed8d:: with SMTP id c13mr1661548wro.154.1589407525207;
-        Wed, 13 May 2020 15:05:25 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:fc:9bb8:fff5:45b2? ([2001:b07:6468:f312:fc:9bb8:fff5:45b2])
-        by smtp.gmail.com with ESMTPSA id d13sm37213488wmb.39.2020.05.13.15.05.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 May 2020 15:05:24 -0700 (PDT)
-Subject: Re: [RFC PATCH] KVM: Add module for IRQ forwarding
-To:     Micah Morton <mortonm@chromium.org>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        jmattson@google.com
-References: <20200511220046.120206-1-mortonm@chromium.org>
- <20200512111440.15caaca2@w520.home>
- <92fd66eb-68e7-596f-7dd1-f1c190833be4@redhat.com>
- <20200513083401.11e761a7@x1.home>
- <8c0bfeb7-0d08-db74-3a23-7a850f301a2a@redhat.com>
- <CAJ-EccPjU0Lh5gEnr0L9AhuuJTad1yHX-BzzWq21m+e-vY-ELA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0fdb5d54-e4d6-8f2f-69fe-1b157999d6cd@redhat.com>
-Date:   Thu, 14 May 2020 00:05:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1731016AbgEMWRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 18:17:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25416 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730276AbgEMWRU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 18:17:20 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04DM2tHW020466;
+        Wed, 13 May 2020 18:17:19 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31016mafm5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 May 2020 18:17:19 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04DM3r0n026330;
+        Wed, 13 May 2020 18:17:19 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31016mafkw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 May 2020 18:17:19 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04DMEtqP002407;
+        Wed, 13 May 2020 22:17:18 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma02dal.us.ibm.com with ESMTP id 3100uc4fjn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 May 2020 22:17:18 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04DMHFlZ40239508
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 May 2020 22:17:15 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9FA59AC059;
+        Wed, 13 May 2020 22:17:15 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 76974AC05B;
+        Wed, 13 May 2020 22:17:15 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.196.213])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 13 May 2020 22:17:15 +0000 (GMT)
+From:   Collin Walling <walling@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+Subject: [PATCH v6 0/2] Use DIAG318 to set Control Program Name & Version Codes
+Date:   Wed, 13 May 2020 18:15:55 -0400
+Message-Id: <20200513221557.14366-1-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <CAJ-EccPjU0Lh5gEnr0L9AhuuJTad1yHX-BzzWq21m+e-vY-ELA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-13_09:2020-05-13,2020-05-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ malwarescore=0 adultscore=0 spamscore=0 clxscore=1011 impostorscore=0
+ cotscore=-2147483648 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005130188
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/05/20 21:10, Micah Morton wrote:
-> * If we only care about the bus controller existing (in an emulated
-> fashion) enough for the guest to discover the device in question, this
-> could work. I’m concerned that power management could be an issue here
-> however. For instance, I have a touchscreen device assigned to the
-> guest (irq forwarding done with this module) that in response to the
-> screen being touched prepares the i2c controller for a transaction by
-> calling into the PM system which end up writing to the PCI config
-> space** (here https://elixir.bootlin.com/linux/v5.6.12/source/drivers/i2c/busses/i2c-designware-master.c#L435).
-> It seems like this kind of scenario expands the scope of what would
-> need to be supported by the emulated i2c controller, which is less
-> ideal. The way I have it currently working, vfio-pci emulates the PCI
-> config space so the guest can do power management by accessing that
-> space.
+Changelog:
 
-This wouldn't be a problem.  When the emulated i2c controller starts a
-transaction on th edevice, it will be performed by the host i2c
-controller and this will lead to the same config space write.
+    v6
+	- KVM disables diag318 get/set by default
+	- added new IOCTL to tell KVM to enable diag318
+	- removed VCPU event message in favor of VM_EVENT only
 
-I have another question: would it be possible to expose this IRQ through
-/dev/i2c-* instead of messing with VFIO?
+    v5
+        - s/cpc/diag318_info in order to make the relevant data more clear
+        - removed mutex locks for diag318_info get/set
 
-In fact, adding support for /dev/i2c passthrough to QEMU has long been a
-pet idea of mine (my usecase was different though: the idea was to write
-programs for a microcontroller on an ARM single board computer and run
-them under QEMU in emulation mode).  It's not trivial, because there
-could be some impedence mismatch between the guest (which might be
-programmed against a low-level controller or might even do bit banging)
-and the i2c-dev interface which is more high level.  Also QEMU cannot do
-clock stretching right now.  However, it's certainly doable.
+    v4
+        - removed setup.c changes introduced in bullet 1 of v3
+        - kept diag318_info struct cleanup
+        - analogous QEMU patches:
+            https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00164.html
 
->> (Finally, in the past we were doing device assignment tasks within KVM
->> and it was a bad idea.  Anything you want to do within KVM with respect
->> to device assignment, someone else will want to do it from bare metal.
-> 
-> Are you saying people would want to use this in non-virtualized
-> scenarios like running drivers in userspace without any VMM/guest? And
-> they could do that if this was part of VFIO and not part of KVM?
+    v3
+        - kernel patch for diag 0x318 instruction call fixup [removed in v4]
+        - removed CPU model code
+        - cleaned up diag318_info struct
+        - cpnc is no longer unshadowed as it was not needed
+        - rebased on 5.1.0-rc3
 
-Yes, see above for an example.
+This instruction call is executed once-and-only-once during Kernel setup.
+The availability of this instruction depends on Read Info byte 134, bit 0.
 
-Paolo
+DIAG 318's functionality is also emulated by KVM, which means we can enable 
+this feature for a guest even if the host kernel cannot support it. This
+feature is made available starting with the zEC12-full model (see analogous
+QEMU patches).
+
+The diag318_info is composed of a Control Program Name Code (CPNC) and a
+Control Program Version Code (CPVC). These values are used for problem 
+diagnosis and allows IBM to identify control program information by answering 
+the following question:
+
+    "What environment is this guest running in?" (CPNC)
+    "What are more details regarding the OS?" (CPVC)
+
+In the future, we will implement the CPVC to convey more information about the 
+OS. For now, we set this field to 0 until we come up with a solid plan.
+
+Collin Walling (2):
+  s390/setup: diag318: refactor struct
+  s390/kvm: diagnose 318 handling
+
+ Documentation/virt/kvm/devices/vm.rst | 29 +++++++++
+ arch/s390/include/asm/diag.h          |  6 +-
+ arch/s390/include/asm/kvm_host.h      |  6 +-
+ arch/s390/include/uapi/asm/kvm.h      |  5 ++
+ arch/s390/kernel/setup.c              |  3 +-
+ arch/s390/kvm/diag.c                  | 20 ++++++
+ arch/s390/kvm/kvm-s390.c              | 89 +++++++++++++++++++++++++++
+ arch/s390/kvm/kvm-s390.h              |  1 +
+ arch/s390/kvm/vsie.c                  |  2 +
+ 9 files changed, 154 insertions(+), 7 deletions(-)
+
+-- 
+2.21.3
 
