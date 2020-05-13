@@ -2,91 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58D121D0F6D
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 12:11:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C3B51D0FB4
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 12:29:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732972AbgEMKLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 06:11:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24044 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732382AbgEMKLq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 06:11:46 -0400
+        id S1728606AbgEMK3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 06:29:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46021 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727794AbgEMK3C (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 May 2020 06:29:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589364704;
+        s=mimecast20190719; t=1589365740;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=oXYc2UsolkTtCHbD9NEB9wSlqyw3jDJxCDg4nrdXm3w=;
-        b=QZw0elh8y8t5sF+T73rMzmIGjdxMGJ/AjfkERNDmlxYhbGtw11pzXbD4RVhNxgW0LcJGpw
-        elkmmf57eTa3iFu56fbAmWqH+JsR/aUWdjkG+TdXiW7DDhQbwmdDbW/wpoRQdeiOLlBfg/
-        pVHFHmKVtJ7L3VQlSyamyLXUWb//nNs=
+         in-reply-to:in-reply-to:references:references;
+        bh=kcmT/ox8AHLX/QMTCJPzRwt3hsJ5CzQByK8qyk+UAh8=;
+        b=XFQh3s3+BqgZf/oeqbAkce3N8p1GHCw+DmgJLAFJuQuxEMESIWpX7MaGiBvuzLIDlmjaeA
+        KL6OWyzRHXYOJiflsuFIvSY59RSvIt42ScTO7u9yLDJmuhhg1DUrppRB23utWs0/mEhti8
+        yWTm2w4UOuIgdxr3gPX6bpVm7yM09Jc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-AQOHtbnMM8ijAEMwRPGzAw-1; Wed, 13 May 2020 06:11:42 -0400
-X-MC-Unique: AQOHtbnMM8ijAEMwRPGzAw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-283-xqI8SoykMmaPbd2Rkkxylw-1; Wed, 13 May 2020 06:28:59 -0400
+X-MC-Unique: xqI8SoykMmaPbd2Rkkxylw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13633835BE1
-        for <kvm@vger.kernel.org>; Wed, 13 May 2020 10:11:42 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-100.ams2.redhat.com [10.36.114.100])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB1E45C1C3;
-        Wed, 13 May 2020 10:11:40 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] Always compile the kvm-unit-tests with
- -fno-common
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     dgilbert@redhat.com
-References: <20200512095546.25602-1-thuth@redhat.com>
- <a87824f4-354a-3fb8-f91d-501e2fc5ece4@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <d1fa1aae-f648-f734-e7e4-82deb8a60db6@redhat.com>
-Date:   Wed, 13 May 2020 12:11:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B59F835B46;
+        Wed, 13 May 2020 10:28:57 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.69])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D57247D94A;
+        Wed, 13 May 2020 10:28:49 +0000 (UTC)
+Date:   Wed, 13 May 2020 12:28:47 +0200
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Pan Nengyuan <pannengyuan@huawei.com>
+Cc:     <pbonzini@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+        <mtosatti@redhat.com>, euler.robot@huawei.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        zhang.zhanghailiang@huawei.com
+Subject: Re: [PATCH v2] i386/kvm: fix a use-after-free when vcpu plug/unplug
+Message-ID: <20200513122847.10dbc3c0@redhat.com>
+In-Reply-To: <20200513132630.13412-1-pannengyuan@huawei.com>
+References: <20200513132630.13412-1-pannengyuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <a87824f4-354a-3fb8-f91d-501e2fc5ece4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/05/2020 12.05, Thomas Huth wrote:
-> On 12/05/2020 11.55, Thomas Huth wrote:
->> The new GCC v10 uses -fno-common by default. To avoid that we commit
->> code that declares global variables twice and thus fails to link with
->> the latest version, we should also compile with -fno-common when using
->> older versions of the compiler.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  Makefile | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/Makefile b/Makefile
->> index 754ed65..3ff2f91 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -49,7 +49,7 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
->>  cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
->>                > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
->>  
->> -COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing
->> +COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
-> 
-> Oh, wait, this breaks the non-x86 builds due to "extern-less" struct
-> auxinfo auxinfo in libauxinfo.h !
-> Drew, why isn't this declared in auxinfo.c instead?
+On Wed, 13 May 2020 09:26:30 -0400
+Pan Nengyuan <pannengyuan@huawei.com> wrote:
 
-Oh well, it's there ... so we're playing tricks with the linker here? I
-guess adding a "__attribute__((common, weak))" to auxinfo.h will be ok
-to fix this issue?
+> When we hotplug vcpus, cpu_update_state is added to vm_change_state_head
+> in kvm_arch_init_vcpu(). But it forgot to delete in kvm_arch_destroy_vcpu=
+() after
+> unplug. Then it will cause a use-after-free access. This patch delete it =
+in
+> kvm_arch_destroy_vcpu() to fix that.
+>=20
+> Reproducer:
+>     virsh setvcpus vm1 4 --live
+>     virsh setvcpus vm1 2 --live
+>     virsh suspend vm1
+>     virsh resume vm1
+>=20
+> The UAF stack:
+> =3D=3Dqemu-system-x86_64=3D=3D28233=3D=3DERROR: AddressSanitizer: heap-us=
+e-after-free on address 0x62e00002e798 at pc 0x5573c6917d9e bp 0x7fff07139e=
+50 sp 0x7fff07139e40
+> WRITE of size 1 at 0x62e00002e798 thread T0
+>     #0 0x5573c6917d9d in cpu_update_state /mnt/sdb/qemu/target/i386/kvm.c=
+:742
+>     #1 0x5573c699121a in vm_state_notify /mnt/sdb/qemu/vl.c:1290
+>     #2 0x5573c636287e in vm_prepare_start /mnt/sdb/qemu/cpus.c:2144
+>     #3 0x5573c6362927 in vm_start /mnt/sdb/qemu/cpus.c:2150
+>     #4 0x5573c71e8304 in qmp_cont /mnt/sdb/qemu/monitor/qmp-cmds.c:173
+>     #5 0x5573c727cb1e in qmp_marshal_cont qapi/qapi-commands-misc.c:835
+>     #6 0x5573c7694c7a in do_qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.=
+c:132
+>     #7 0x5573c7694c7a in qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:1=
+75
+>     #8 0x5573c71d9110 in monitor_qmp_dispatch /mnt/sdb/qemu/monitor/qmp.c=
+:145
+>     #9 0x5573c71dad4f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu/monitor/=
+qmp.c:234
+>=20
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
- Thomas
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+> - v2: remove unnecessary set vmsentry to null(there is no non-null check).
+> ---
+>  target/i386/cpu.h | 1 +
+>  target/i386/kvm.c | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index e818fc712a..afbd11b7a3 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1631,6 +1631,7 @@ struct X86CPU {
+> =20
+>      CPUNegativeOffsetState neg;
+>      CPUX86State env;
+> +    VMChangeStateEntry *vmsentry;
+> =20
+>      uint64_t ucode_rev;
+> =20
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 4901c6dd74..0a4eca5a85 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1770,7 +1770,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          }
+>      }
+> =20
+> -    qemu_add_vm_change_state_handler(cpu_update_state, env);
+> +    cpu->vmsentry =3D qemu_add_vm_change_state_handler(cpu_update_state,=
+ env);
+> =20
+>      c =3D cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+>      if (c) {
+> @@ -1883,6 +1883,8 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+>          env->nested_state =3D NULL;
+>      }
+> =20
+> +    qemu_del_vm_change_state_handler(cpu->vmsentry);
+> +
+>      return 0;
+>  }
+> =20
 
