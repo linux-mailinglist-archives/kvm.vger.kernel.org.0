@@ -2,147 +2,335 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CC5C1D159B
-	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 15:36:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79A8A1D1680
+	for <lists+kvm@lfdr.de>; Wed, 13 May 2020 15:54:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388635AbgEMNfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 May 2020 09:35:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387927AbgEMNfb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 May 2020 09:35:31 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B6CC061A0C;
-        Wed, 13 May 2020 06:35:30 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id u10so6830376pls.8;
-        Wed, 13 May 2020 06:35:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0BGOGNqih27OV/hxwThO6MefRy8fXlj0Bh5UXUHoSvM=;
-        b=RDEBDtHUoB1XiuAgWSyUddc44FRdseR2E78Z2zPCqCd8Z18kCEdZEGX8U2vpI0yzzA
-         u2yPqNpHUZtsoZpZmOjFllF1DBlsIz5XDxmvPXLVmQVKCvvwifTfdv2vhxD1NgzQMmnz
-         N1T/Czl/NCNGfDgTC4rx1m6afLlOJBLwgGkiPiQdaV0BM/6IUr7WpfXp65yBUaCwb2ET
-         dx8UCWSsBCyEVu7hIoYFsdvu7x+zpnp3t7U8kws9RKec49ogUfYr6QiV1kaS9G+CSQjS
-         Ao0jU/DLcKfDuCB9R7JGFBPoV5YU98EC03q4FXf01dcm6m24eDSmLsg95KzXWHPIeGJm
-         jwcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0BGOGNqih27OV/hxwThO6MefRy8fXlj0Bh5UXUHoSvM=;
-        b=IZBC0RCc0eim7ct/DWqhTa4twr5i6pWQheMKg7J/e4fgs1WK9Ws86VrqY3TugHMQA3
-         U+D7PrkbDnKc6emwCRAL3XVYBQhNLEw8x5ikjfKqEZdWcS1+NOLET2g38+Jf3TmpDt40
-         gOVvcFqfEtdWSuu+ggdI4IFXva8qO2uUiyjwEvb9879aOArPO1RkwQODeXcCjxfzHgM7
-         Tnhv+l79grrHGDi1GNQg9CXdn3TVSsgo4g8H0P35EOyKgmLcbHTCHfeNJ2b6gXVcw5aG
-         2/8U5aW7guZyY+0msxXYSr3Yom58uG6i4T6kVzTtWy7nhZy8UpSGwsFybjdDMND+E8kA
-         fHoQ==
-X-Gm-Message-State: AOAM531HWIVdkRcNth2Ab/UZj8ryNo9SxiqR5m+GjQ0FzXZSN3/tiBND
-        i2RfEfqwaeSbAUJXJLnglT8=
-X-Google-Smtp-Source: ABdhPJxHvVgkgDedkqYMSZJj59AIFKH74OH/HffWU0Oj7KNku+s6st0bccLkx8cK0rvdzp2DPZN+dw==
-X-Received: by 2002:a17:90a:7ace:: with SMTP id b14mr2252495pjl.116.1589376930438;
-        Wed, 13 May 2020 06:35:30 -0700 (PDT)
-Received: from ?IPv6:2404:f801:0:6:8000::a31c? ([2404:f801:9000:18:efed::a31c])
-        by smtp.gmail.com with ESMTPSA id g9sm13207294pgj.89.2020.05.13.06.35.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 May 2020 06:35:30 -0700 (PDT)
-Subject: Re: [PATCH] x86/hyperv: Properly suspend/resume reenlightenment
- notifications
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-hyperv@vger.kernel.org
-Cc:     Wei Liu <wei.liu@kernel.org>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Michael Kelley <mikelley@microsoft.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>
-References: <20200512160153.134467-1-vkuznets@redhat.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-Message-ID: <3507d1b3-8d90-8d0e-c20f-a75f9f280230@gmail.com>
-Date:   Wed, 13 May 2020 21:35:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S2388124AbgEMNyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 May 2020 09:54:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40494 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2387957AbgEMNyC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 May 2020 09:54:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589378040;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8VyzwBR4wa2QYjZUTcxf4SIZORc0YQ7fb9mYJjbY3M0=;
+        b=Dkc3N4OnXM8w+lncfLsbCb76efJ5hdaVsjRIGSoDt2O7EhMiiOksu3G+j9OEpT7SFhSPRS
+        K9ppuZ3Rx2ZYMcYU1xy48HNKPiX1DM0iDXnzADaUfTuFuZcsH9Vgh7XBlQTLx/yEecJB5R
+        PehtzcOlzJlxoUbBE3yvHkKV/hUc6dY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-j37hWPm4ON2icYrHoh4maQ-1; Wed, 13 May 2020 09:53:56 -0400
+X-MC-Unique: j37hWPm4ON2icYrHoh4maQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55F0C8014C0;
+        Wed, 13 May 2020 13:53:53 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-240.rdu2.redhat.com [10.10.115.240])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B5536116F;
+        Wed, 13 May 2020 13:53:51 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id C0579220206; Wed, 13 May 2020 09:53:50 -0400 (EDT)
+Date:   Wed, 13 May 2020 09:53:50 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/8] KVM: x86: interrupt based APF page-ready event
+ delivery
+Message-ID: <20200513135350.GB173965@redhat.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com>
+ <20200511164752.2158645-5-vkuznets@redhat.com>
+ <20200512142411.GA138129@redhat.com>
+ <87lflxm9sy.fsf@vitty.brq.redhat.com>
+ <20200512180704.GE138129@redhat.com>
+ <877dxgmcjv.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200512160153.134467-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877dxgmcjv.fsf@vitty.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/13/2020 12:01 AM, Vitaly Kuznetsov wrote:
-> Errors during hibernation with reenlightenment notifications enabled were
-> reported:
+On Wed, May 13, 2020 at 11:03:48AM +0200, Vitaly Kuznetsov wrote:
+> Vivek Goyal <vgoyal@redhat.com> writes:
 > 
->   [   51.730435] PM: hibernation entry
->   [   51.737435] PM: Syncing filesystems ...
->   ...
->   [   54.102216] Disabling non-boot CPUs ...
->   [   54.106633] smpboot: CPU 1 is now offline
->   [   54.110006] unchecked MSR access error: WRMSR to 0x40000106 (tried to
->       write 0x47c72780000100ee) at rIP: 0xffffffff90062f24
->       native_write_msr+0x4/0x20)
->   [   54.110006] Call Trace:
->   [   54.110006]  hv_cpu_die+0xd9/0xf0
->   ...
+> > On Tue, May 12, 2020 at 05:50:53PM +0200, Vitaly Kuznetsov wrote:
+> >> Vivek Goyal <vgoyal@redhat.com> writes:
+> >> 
+> >> >
+> >> > So if we are using a common structure "kvm_vcpu_pv_apf_data" to deliver
+> >> > type1 and type2 events, to me it makes sense to retain existing
+> >> > KVM_PV_REASON_PAGE_READY and KVM_PV_REASON_PAGE_NOT_PRESENT. Just that
+> >> > in new scheme of things, KVM_PV_REASON_PAGE_NOT_PRESENT will be delivered
+> >> > using #PF (and later possibly using #VE) and KVM_PV_REASON_PAGE_READY
+> >> > will be delivered using interrupt.
+> >> 
+> >> We use different fields for page-not-present and page-ready events so
+> >> there is no intersection. If we start setting KVM_PV_REASON_PAGE_READY
+> >> to 'reason' we may accidentally destroy a 'page-not-present' event.
+> >
+> > This is confusing. So you mean at one point of time we might be using
+> > same shared data structure for two events.
+> >
+> > - ->reason will be set to 1 and you will inject page_not_present
+> >   execption.
+> >
+> > - If some page gets ready, you will now set ->token and queue 
+> >   page ready exception. 
+> >
+> > Its very confusing. Can't we serialize the delivery of these events. So
+> > that only one is in progress so that this structure is used by one event
+> > at a time.
 > 
-> Normally, hv_cpu_die() just reassigns reenlightenment notifications to some
-> other CPU when the CPU receiving them goes offline. Upon hibernation, there
-> is no other CPU which is still online so cpumask_any_but(cpu_online_mask)
-> returns >= nr_cpu_ids and using it as hv_vp_index index is incorrect.
-> Disable the feature when cpumask_any_but() fails.
+> This is not how the mechanism (currently) works:
+> - A process accesses a page which is swapped out
 > 
-> Also, as we now disable reenlightenment notifications upon hibernation we
-> need to restore them on resume. Check if hv_reenlightenment_cb was
-> previously set and restore from hv_resume().
+> - We deliver synchronious APF (#PF) to the guest, it freezes the process
+> and switches to another one.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->   arch/x86/hyperv/hv_init.c | 19 +++++++++++++++++--
->   1 file changed, 17 insertions(+), 2 deletions(-)
+> - Another process accesses a swapped out page, APF is delivered and it
+> also got frozen
 > 
-> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-> index fd51bac11b46..acf76b466db6 100644
-> --- a/arch/x86/hyperv/hv_init.c
-> +++ b/arch/x86/hyperv/hv_init.c
-> @@ -226,10 +226,18 @@ static int hv_cpu_die(unsigned int cpu)
->   
->   	rdmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
->   	if (re_ctrl.target_vp == hv_vp_index[cpu]) {
-> -		/* Reassign to some other online CPU */
-> +		/*
-> +		 * Reassign reenlightenment notifications to some other online
-> +		 * CPU or just disable the feature if there are no online CPUs
-> +		 * left (happens on hibernation).
-> +		 */
->   		new_cpu = cpumask_any_but(cpu_online_mask, cpu);
->   
-> -		re_ctrl.target_vp = hv_vp_index[new_cpu];
-> +		if (new_cpu < nr_cpu_ids)
-> +			re_ctrl.target_vp = hv_vp_index[new_cpu];
-> +		else
-> +			re_ctrl.enabled = 0;
-> +
->   		wrmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
->   	}
->   
-> @@ -293,6 +301,13 @@ static void hv_resume(void)
->   
->   	hv_hypercall_pg = hv_hypercall_pg_saved;
->   	hv_hypercall_pg_saved = NULL;
-> +
-> +	/*
-> +	 * Reenlightenment notifications are disabled by hv_cpu_die(0),
-> +	 * reenable them here if hv_reenlightenment_cb was previously set.
-> +	 */
-> +	if (hv_reenlightenment_cb)
-> +		set_hv_tscchange_cb(hv_reenlightenment_cb);
->   }
->   
->   /* Note: when the ops are called, only CPU0 is online and IRQs are disabled. */
+> ...
 > 
+> - At some point one of the previously unavailable pages become available
+> (not necessarily the last or the first one) and we deliver this info via
+> asynchronous APF (now interrupt).
+> 
+> - Note, after we deliver the interrupt and before it is actually
+> consumed we may have another synchronous APF (#PF) event.
+> 
+> So we really need to separate memory locations for synchronous (type-1,
+> #PF,...) and asynchronous (type-2, interrupt, ...) data.
+> 
+> The naming is unfortunate and misleading, I agree. What is currently
+> named 'reason' should be something like 'apf_flag_for_pf' and it just
+> means to distinguish real #PF from APF. This is going away in the
+> future, we won't be abusing #PF anymore so I'd keep it as it is now,
+> maybe add another comment somewhere.
 
-Reviewed-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+Shouldn't we do #VE changes also at the same time. Otherwise we are
+again creating this intermediate mode where synchronous notifications
+happen using #PF. Once we move to #VE, old guests will again stop
+getting async #PF? 
+
+Also there is this issue of who is using this common shared area
+between host and guest (struct kvm_vcpu_pv_apf_data) and how to 
+use fields in this struct without breaking existing guests.
+
+For now I see you have modified meaning of fields of this structure
+(->reason) beacuse you are not concerned about older guets because
+they will not receive async pf to begin with. If that's the case,
+renaming even reason makes sense. Havind said that, as we are
+planning to not use this data structure for synchronous notifications,
+creating this intermediate mode is just going to create more
+confusion. So in new ABI, we should not even try to make use of
+->reason and design #VE changes at the same time. Core problem with
+current ABI is racy access to ->reason and this patch set does not
+get rid of that race anyway.
+
+> The other location is
+> 'pageready_token' and it actually contains the token. This is to stay
+> long term so any suggestions for better naming are welcome.
+
+pageready_token makes sense if this structure is being used both
+types of notifications otherwise just ->token might be enough.
+
+> 
+> We could've separated these two memory locations completely and
+> e.g. used the remaining 56 bits of MSR_KVM_ASYNC_PF_INT as the new
+> location information. Maybe we should do that just to avoid the
+> confusion.
+
+If this is V2 of ABI, why not do "struct struct kvm_vcpu_pv_apf_data_v2"
+instead? Only reason you seem to be sticking to existing structure and
+->reason fields because of #PF based sync notifications which is planned
+to go away soon. So if we do both the changes together, there is no
+need to keep this confusion w.r.t ->reason and existing structure.
+
+> 
+> >
+> > Also how do I extend it now to do error delivery. Please keep that in
+> > mind. We don't want to be redesigning this stuff again. Its already
+> > very complicated.
+> >
+> > I really need ->reason field to be usable in both the paths so that
+> > error can be delivered.
+> 
+> If we want to use 'reason' for both we'll get into a weird scenario when
+> exception is blocking interrupt and, what's more confusing, vice
+> versa. I'd like to avoid this complexity in KVM code. My suggestion
+> would be to rename 'reason' to something like 'pf_abuse_flag' so it
+> doesn't cause the confusion and add new 'reason' after 'token'.
+> 
+> >
+> > And this notion of same structure being shared across multiple events
+> > at the same time is just going to create more confusion, IMHO. If we
+> > can decouple it by serializing it, that definitely feels simpler to
+> > understand.
+> 
+> What if we just add sub-structures to the structure, e.g. 
+> 
+> struct kvm_vcpu_pv_apf_data {
+>         struct {
+>             __u32 apf_flag;
+>         } legacy_apf_data;
+>         struct {
+>             __u32 token;
+>         } apf_interrupt_data;
+>         ....
+>         __u8 pad[56];                                                                                  |
+>         __u32 enabled;                                                                                 |
+> };    
+> 
+> would it make it more obvious?
+
+To me this seems like an improvement. Just looking at it, it is clear
+to me who is using what. But soon legacy_apf_data will be unused. Its
+not clear to me when will be able to get rid of apf_flag and reuse it
+for something else without having to worry about older guests.
+
+This will be second best option, if for some reason we don't want to
+do #VE changes at the same time. To make new design cleaner and more
+understandable, doing #VE changes at the same time will be good.
+
+> 
+> >
+> >> 
+> >> With this patchset we have two completely separate channels:
+> >> 1) Page-not-present goes through #PF and 'reason' in struct
+> >> kvm_vcpu_pv_apf_data.
+> >> 2) Page-ready goes through interrupt and 'pageready_token' in the same
+> >> kvm_vcpu_pv_apf_data.
+> >> 
+> >> >
+> >> >> +
+> >> >> +	Note, previously, type 2 (page present) events were delivered via the
+> >> >> +	same #PF exception as type 1 (page not present) events but this is
+> >> >> +	now deprecated.
+> >> >
+> >> >> If bit 3 (interrupt based delivery) is not set APF events are not delivered.
+> >> >
+> >> > So all the old guests which were getting async pf will suddenly find
+> >> > that async pf does not work anymore (after hypervisor update). And
+> >> > some of them might report it as performance issue (if there were any
+> >> > performance benefits to be had with async pf).
+> >> 
+> >> We still do APF_HALT but generally yes, there might be some performance
+> >> implications. My RFC was preserving #PF path but the suggestion was to
+> >> retire it completely. (and I kinda like it because it makes a lot of
+> >> code go away)
+> >
+> > Ok. I don't have strong opinion here. If paolo likes it this way, so be
+> > it. :-)
+> 
+> APF is a slowpath for overcommited scenarios and when we switch to
+> APF_HALT we allow the host to run some other guest while PF is
+> processed. This is not the same from guest's perspective but from host's
+> we're fine as we're not wasting cycles.
+> 
+> >
+> >> 
+> >> >
+> >> > [..]
+> >> >>  
+> >> >>  bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
+> >> >>  {
+> >> >> -	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
+> >> >> +	if (!kvm_pv_async_pf_enabled(vcpu))
+> >> >>  		return true;
+> >> >
+> >> > What does above mean. If async pf is not enabled, then it returns true,
+> >> > implying one can inject async page present. But if async pf is not
+> >> > enabled, there is no need to inject these events.
+> >> 
+> >> AFAIU this is a protection agains guest suddenly disabling APF
+> >> mechanism.
+> >
+> > Can we provide that protection in MSR implementation. That is once APF
+> > is enabled, it can't be disabled. Or it is a feature that we allow
+> > guest to disable APF and want it that way?
+> 
+> We need to allow to disable the feature. E.g. think about kdump
+> scenario, for example. Before we switch to kdump kernel we need to make
+> sure there's no more 'magic' memory which can suggenly change.
+
+So are we waiting to receive all page ready events before we switch
+to kdump kernel? If yes, that's not good. Existing kernel is corrupted
+and nothing meaningful can be done. So we should switch to next
+kernel asap. Previous kernel is dying anyway, so we don't care to
+receive page ready events.
+
+> Also,
+> kdump kernel may not even support APF so it will get very confused when
+> APF events get delivered.
+
+New kernel can just ignore these events if it does not support async
+pf? 
+
+This is somewhat similar to devices still doing interrupts in new
+kernel. And solution for that seemed to be doing a "reset" of devices
+in new kernel. We probably need similar logic where in new kernel
+we simply disable "async pf" so that we don't get new notifications.
+
+IOW, waiting in crashed kernel for all page ready events does not
+sound like a good option. It reduces the reliability of kdump
+operation. 
+
+> 
+> >
+> >> What do we do with all the 'page ready' events after, we
+> >> can't deliver them anymore. So we just eat them (hoping guest will
+> >> unfreeze all processes on its own before disabling the mechanism).
+> >> 
+> >> It is the existing logic, my patch doesn't change it.
+> >
+> > I see its existing logic. Just it is very confusing and will be good
+> > if we can atleast explain it with some comments.
+> >
+> > I don't know what to make out of this.
+> >
+> > bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
+> > {
+> >         if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
+> >                 return true;
+> >         else
+> >                 return kvm_can_do_async_pf(vcpu);
+> > }
+> >
+> > If feature is disabled, then do inject async pf page present. If feature
+> > is enabled and check whether we can inject async pf right now or not.
+> >
+> > It probably will help if this check if feature being enabled/disabled
+> > is outside kvm_arch_can_inject_async_page_present() at the callsite
+> > of kvm_arch_can_inject_async_page_present() and there we explain that
+> > why it is important to inject page ready events despite the fact
+> > that feature is disabled.
+> 
+> This code would definitely love some comments added, will do in the next
+> version. And I'll also think how to improve the readability, thanks for
+> the feedback!
+
+It definitely needs a comment (if it makes sense to still send page
+ready events to guest).
+
+Thanks
+Vivek
+
