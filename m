@@ -2,192 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFDA01D37A5
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 19:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A0021D37E7
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 19:21:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726161AbgENRKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 13:10:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55241 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726035AbgENRKB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 13:10:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589476199;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KFZ5AjD6loXJYHYKzj8B/hbMmtmyXauXAqQ50TBn0l4=;
-        b=PYpUoAevaKyen6xiLC1uHIHG7+6ODtkXNlihtIWW89A2687wPf0EUhXh4hEquWeBvK59mY
-        fFULCTjp4oeBo6IhlhM8xDmvedzErnSGk+Zx2QE9IKCKhNZuaHZdbBqLKqJLkqaAP3YbTz
-        Mip/kYLN3hAwDEjZkRkB1dJbaPiRpdA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-JjzPKOULPFSVs6x4uzB1PQ-1; Thu, 14 May 2020 13:09:55 -0400
-X-MC-Unique: JjzPKOULPFSVs6x4uzB1PQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03AFD108ED68;
-        Thu, 14 May 2020 17:09:54 +0000 (UTC)
-Received: from work-vm (ovpn-114-247.ams2.redhat.com [10.36.114.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D362F1C933;
-        Thu, 14 May 2020 17:09:48 +0000 (UTC)
-Date:   Thu, 14 May 2020 18:09:46 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     frankja@linux.ibm.com, qemu-devel@nongnu.org,
-        brijesh.singh@amd.com, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
-        Richard Henderson <rth@twiddle.net>, cohuck@redhat.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        mdroth@linux.vnet.ibm.com
-Subject: Re: [RFC 16/18] use errp for gmpo kvm_init
-Message-ID: <20200514170808.GS2787@work-vm>
-References: <20200514064120.449050-1-david@gibson.dropbear.id.au>
- <20200514064120.449050-17-david@gibson.dropbear.id.au>
+        id S1726122AbgENRVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 13:21:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48306 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725975AbgENRVD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 13:21:03 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04EH2Pmn066830;
+        Thu, 14 May 2020 13:21:03 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3111w8tcrr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 May 2020 13:21:02 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04EH3VRI072520;
+        Thu, 14 May 2020 13:21:02 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3111w8tcre-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 May 2020 13:21:02 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04EHCmOS018153;
+        Thu, 14 May 2020 17:21:01 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma02dal.us.ibm.com with ESMTP id 3100uccdu6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 May 2020 17:21:01 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04EHKvhx60162510
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 May 2020 17:20:57 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65782C605F;
+        Thu, 14 May 2020 17:20:57 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 851A7C6057;
+        Thu, 14 May 2020 17:20:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.130.116])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Thu, 14 May 2020 17:20:56 +0000 (GMT)
+Subject: Re: [PATCH v6 2/2] s390/kvm: diagnose 318 handling
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com
+References: <20200513221557.14366-1-walling@linux.ibm.com>
+ <20200513221557.14366-3-walling@linux.ibm.com>
+ <d4320d09-7b3a-ac13-77be-02397f4ccc83@redhat.com>
+ <de4e4416-5158-b60f-e2a8-fb6d3d48d516@linux.ibm.com>
+ <88d27a61-b55b-ee68-f7f9-85ce7fcefd64@redhat.com>
+ <e7691d9a-a446-17db-320e-a2348e0eb057@linux.ibm.com>
+ <516405b3-67c4-aa12-1fa5-772e401e4403@redhat.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <2aa0d573-b9d4-8022-9ec5-79f7156d1bcb@linux.ibm.com>
+Date:   Thu, 14 May 2020 13:20:55 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200514064120.449050-17-david@gibson.dropbear.id.au>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <516405b3-67c4-aa12-1fa5-772e401e4403@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-14_05:2020-05-14,2020-05-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 spamscore=0 priorityscore=1501 impostorscore=0
+ cotscore=-2147483648 clxscore=1015 mlxscore=0 malwarescore=0
+ mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005140147
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dave:
-  You've got some screwy mail headers here, the qemu-devel@nongnu.-rg is
-the best one anmd the pair@us.redhat.com is weird as well.
+On 5/14/20 5:53 AM, David Hildenbrand wrote:
+> On 14.05.20 11:49, Janosch Frank wrote:
+>> On 5/14/20 11:37 AM, David Hildenbrand wrote:
+>>> On 14.05.20 10:52, Janosch Frank wrote:
+>>>> On 5/14/20 9:53 AM, Thomas Huth wrote:
+>>>>> On 14/05/2020 00.15, Collin Walling wrote:
+>>>>>> DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
+>>>>>> be intercepted by SIE and handled via KVM. Let's introduce some
+>>>>>> functions to communicate between userspace and KVM via ioctls. These
+>>>>>> will be used to get/set the diag318 related information, as well as
+>>>>>> check the system if KVM supports handling this instruction.
+>>>>>>
+>>>>>> This information can help with diagnosing the environment the VM is
+>>>>>> running in (Linux, z/VM, etc) if the OS calls this instruction.
+>>>>>>
+>>>>>> By default, this feature is disabled and can only be enabled if a
+>>>>>> user space program (such as QEMU) explicitly requests it.
+>>>>>>
+>>>>>> The Control Program Name Code (CPNC) is stored in the SIE block
+>>>>>> and a copy is retained in each VCPU. The Control Program Version
+>>>>>> Code (CPVC) is not designed to be stored in the SIE block, so we
+>>>>>> retain a copy in each VCPU next to the CPNC.
+>>>>>>
+>>>>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>>>>>> ---
+>>>>>>  Documentation/virt/kvm/devices/vm.rst | 29 +++++++++
+>>>>>>  arch/s390/include/asm/kvm_host.h      |  6 +-
+>>>>>>  arch/s390/include/uapi/asm/kvm.h      |  5 ++
+>>>>>>  arch/s390/kvm/diag.c                  | 20 ++++++
+>>>>>>  arch/s390/kvm/kvm-s390.c              | 89 +++++++++++++++++++++++++++
+>>>>>>  arch/s390/kvm/kvm-s390.h              |  1 +
+>>>>>>  arch/s390/kvm/vsie.c                  |  2 +
+>>>>>>  7 files changed, 151 insertions(+), 1 deletion(-)
+>>>>> [...]
+>>>>>> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
+>>>>>> index 563429dece03..3caed4b880c8 100644
+>>>>>> --- a/arch/s390/kvm/diag.c
+>>>>>> +++ b/arch/s390/kvm/diag.c
+>>>>>> @@ -253,6 +253,24 @@ static int __diag_virtio_hypercall(struct kvm_vcpu *vcpu)
+>>>>>>  	return ret < 0 ? ret : 0;
+>>>>>>  }
+>>>>>>  
+>>>>>> +static int __diag_set_diag318_info(struct kvm_vcpu *vcpu)
+>>>>>> +{
+>>>>>> +	unsigned int reg = (vcpu->arch.sie_block->ipa & 0xf0) >> 4;
+>>>>>> +	u64 info = vcpu->run->s.regs.gprs[reg];
+>>>>>> +
+>>>>>> +	if (!vcpu->kvm->arch.use_diag318)
+>>>>>> +		return -EOPNOTSUPP;
+>>>>>> +
+>>>>>> +	vcpu->stat.diagnose_318++;
+>>>>>> +	kvm_s390_set_diag318_info(vcpu->kvm, info);
+>>>>>> +
+>>>>>> +	VCPU_EVENT(vcpu, 3, "diag 0x318 cpnc: 0x%x cpvc: 0x%llx",
+>>>>>> +		   vcpu->kvm->arch.diag318_info.cpnc,
+>>>>>> +		   (u64)vcpu->kvm->arch.diag318_info.cpvc);
 
-* David Gibson (david@gibson.dropbear.id.au) wrote:
-> ---
->  accel/kvm/kvm-all.c                    |  4 +++-
->  include/exec/guest-memory-protection.h |  2 +-
->  target/i386/sev.c                      | 32 +++++++++++++-------------
->  3 files changed, 20 insertions(+), 18 deletions(-)
+Errr.. thought I dropped this message. We favored just using the
+VM_EVENT from last time.
+
+>>>>>> +
+>>>>>> +	return 0;
+>>>>>> +}
+>>>>>> +
+>>>>>>  int kvm_s390_handle_diag(struct kvm_vcpu *vcpu)
+>>>>>>  {
+>>>>>>  	int code = kvm_s390_get_base_disp_rs(vcpu, NULL) & 0xffff;
+>>>>>> @@ -272,6 +290,8 @@ int kvm_s390_handle_diag(struct kvm_vcpu *vcpu)
+>>>>>>  		return __diag_page_ref_service(vcpu);
+>>>>>>  	case 0x308:
+>>>>>>  		return __diag_ipl_functions(vcpu);
+>>>>>> +	case 0x318:
+>>>>>> +		return __diag_set_diag318_info(vcpu);
+>>>>>>  	case 0x500:
+>>>>>>  		return __diag_virtio_hypercall(vcpu);
+>>>>>
+>>>>> I wonder whether it would make more sense to simply drop to userspace
+>>>>> and handle the diag 318 call there? That way the userspace would always
+>>>>> be up-to-date, and as we've seen in the past (e.g. with the various SIGP
+>>>>> handling), it's better if the userspace is in control... e.g. userspace
+>>>>> could also decide to only use KVM_S390_VM_MISC_ENABLE_DIAG318 if the
+>>>>> guest just executed the diag 318 instruction.
+>>>>>
+>>>>> And you need the kvm_s390_vm_get/set_misc functions anyway, so these
+>>>>> could also be simply used by the diag 318 handler in userspace?
+
+Pardon my ignorance, but I do not think I fully understand what exactly
+should be dropped in favor of doing things in userspace.
+
+My assumption: if a diag handler is not found in KVM, then we
+fallthrough to userspace handling?
+
+>>>>>
+>>>>>>  	default:
+>>>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>>>> index d05bb040fd42..c3eee468815f 100644
+>>>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>>>> @@ -159,6 +159,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+>>>>>>  	{ "diag_9c_ignored", VCPU_STAT(diagnose_9c_ignored) },
+>>>>>>  	{ "instruction_diag_258", VCPU_STAT(diagnose_258) },
+>>>>>>  	{ "instruction_diag_308", VCPU_STAT(diagnose_308) },
+>>>>>> +	{ "instruction_diag_318", VCPU_STAT(diagnose_318) },
+>>>>>>  	{ "instruction_diag_500", VCPU_STAT(diagnose_500) },
+>>>>>>  	{ "instruction_diag_other", VCPU_STAT(diagnose_other) },
+>>>>>>  	{ NULL }
+>>>>>> @@ -1243,6 +1244,76 @@ static int kvm_s390_get_tod(struct kvm *kvm, struct kvm_device_attr *attr)
+>>>>>>  	return ret;
+>>>>>>  }
+>>>>>>  
+>>>>>> +void kvm_s390_set_diag318_info(struct kvm *kvm, u64 info)
+>>>>>> +{
+>>>>>> +	struct kvm_vcpu *vcpu;
+>>>>>> +	int i;
+>>>>>> +
+>>>>>> +	kvm->arch.diag318_info.val = info;
+>>>>>> +
+>>>>>> +	VM_EVENT(kvm, 3, "SET: CPNC: 0x%x CPVC: 0x%llx",
+>>>>>> +		 kvm->arch.diag318_info.cpnc, kvm->arch.diag318_info.cpvc);
+>>>>>> +
+>>>>>> +	if (sclp.has_diag318) {
+>>>>>> +		kvm_for_each_vcpu(i, vcpu, kvm) {
+>>>>>> +			vcpu->arch.sie_block->cpnc = kvm->arch.diag318_info.cpnc;
+>>>>>> +		}
+>>>>>> +	}
+>>>>>> +}
+>>>>>> +
+>>>>>> +static int kvm_s390_vm_set_misc(struct kvm *kvm, struct kvm_device_attr *attr)
+>>>>>> +{
+>>>>>> +	int ret;
+>>>>>> +	u64 diag318_info;
+>>>>>> +
+>>>>>> +	switch (attr->attr) {
+>>>>>> +	case KVM_S390_VM_MISC_ENABLE_DIAG318:
+>>>>>> +		kvm->arch.use_diag318 = 1;
+>>>>>> +		ret = 0;
+>>>>>> +		break;
+>>>>>
+>>>>> Would it make sense to set kvm->arch.use_diag318 = 1 during the first
+>>>>> execution of KVM_S390_VM_MISC_DIAG318 instead, so that we could get
+>>>>> along without the KVM_S390_VM_MISC_ENABLE_DIAG318 ?
+>>>>
+
+Hmmm... is your thought set the flag in the diag handler in KVM? That
+way the get/set functions are only enabled if the instruction was
+actually called? I like that, actually. I think that makes more sense.
+
+>>>> I'm not an expert in feature negotiation, but why isn't this a cpu
+>>>> feature like sief2 instead of a attribute?
+>>>>
+>>>> @David?
+>>>
+>>> In the end you want to have it somehow in the CPU model I guess. You
+>>> cannot glue it to QEMU machines, because availability depends on HW+KVM
+>>> support.
+>>>
+>>> How does the guest detect that it can use diag318? I assume/hope via a a
+>>> STFLE feature.
+>>>
+>> SCLP
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 5451728425..392ab02867 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2045,9 +2045,11 @@ static int kvm_init(MachineState *ms)
->      if (ms->gmpo) {
->          GuestMemoryProtectionClass *gmpc =
->              GUEST_MEMORY_PROTECTION_GET_CLASS(ms->gmpo);
-> +        Error *local_err = NULL;
->  
-> -        ret = gmpc->kvm_init(ms->gmpo);
-> +        ret = gmpc->kvm_init(ms->gmpo, &local_err);
->          if (ret < 0) {
-> +            error_report_err(local_err);
->              goto err;
->          }
->      }
-> diff --git a/include/exec/guest-memory-protection.h b/include/exec/guest-memory-protection.h
-> index 7d959b4910..2a88475136 100644
-> --- a/include/exec/guest-memory-protection.h
-> +++ b/include/exec/guest-memory-protection.h
-> @@ -32,7 +32,7 @@ typedef struct GuestMemoryProtection GuestMemoryProtection;
->  typedef struct GuestMemoryProtectionClass {
->      InterfaceClass parent;
->  
-> -    int (*kvm_init)(GuestMemoryProtection *);
-> +    int (*kvm_init)(GuestMemoryProtection *, Error **);
->      int (*encrypt_data)(GuestMemoryProtection *, uint8_t *, uint64_t);
->  } GuestMemoryProtectionClass;
->  
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 2051fae0c1..82f16b2f3b 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -617,7 +617,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
->      }
->  }
->  
-> -static int sev_kvm_init(GuestMemoryProtection *gmpo)
-> +static int sev_kvm_init(GuestMemoryProtection *gmpo, Error **errp)
->  {
->      SevGuestState *sev = SEV_GUEST(gmpo);
->      char *devname;
-> @@ -633,14 +633,14 @@ static int sev_kvm_init(GuestMemoryProtection *gmpo)
->      host_cbitpos = ebx & 0x3f;
->  
->      if (host_cbitpos != sev->cbitpos) {
-> -        error_report("%s: cbitpos check failed, host '%d' requested '%d'",
-> -                     __func__, host_cbitpos, sev->cbitpos);
-> +        error_setg(errp, "%s: cbitpos check failed, host '%d' requested '%d'",
-> +                   __func__, host_cbitpos, sev->cbitpos);
->          goto err;
->      }
->  
->      if (sev->reduced_phys_bits < 1) {
-> -        error_report("%s: reduced_phys_bits check failed, it should be >=1,"
-> -                     " requested '%d'", __func__, sev->reduced_phys_bits);
-> +        error_setg(errp, "%s: reduced_phys_bits check failed, it should be >=1,"
-> +                   " requested '%d'", __func__, sev->reduced_phys_bits);
->          goto err;
->      }
->  
-> @@ -649,20 +649,20 @@ static int sev_kvm_init(GuestMemoryProtection *gmpo)
->      devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
->      sev->sev_fd = open(devname, O_RDWR);
->      if (sev->sev_fd < 0) {
-> -        error_report("%s: Failed to open %s '%s'", __func__,
-> -                     devname, strerror(errno));
-> -    }
-> -    g_free(devname);
-> -    if (sev->sev_fd < 0) {
-> +        g_free(devname);
-> +        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
-> +                   devname, strerror(errno));
-> +        g_free(devname);
-
-You seem to have double free'd devname - would g_autofree work here?
-
-other than that, looks OK to me.
-
-Dave
-
->          goto err;
->      }
-> +    g_free(devname);
->  
->      ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
->                               &fw_error);
->      if (ret) {
-> -        error_report("%s: failed to get platform status ret=%d "
-> -                     "fw_error='%d: %s'", __func__, ret, fw_error,
-> -                     fw_error_to_str(fw_error));
-> +        error_setg(errp, "%s: failed to get platform status ret=%d "
-> +                   "fw_error='%d: %s'", __func__, ret, fw_error,
-> +                   fw_error_to_str(fw_error));
->          goto err;
->      }
->      sev->build_id = status.build;
-> @@ -672,14 +672,14 @@ static int sev_kvm_init(GuestMemoryProtection *gmpo)
->      trace_kvm_sev_init();
->      ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
->      if (ret) {
-> -        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
-> -                     __func__, ret, fw_error, fw_error_to_str(fw_error));
-> +        error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
-> +                   __func__, ret, fw_error, fw_error_to_str(fw_error));
->          goto err;
->      }
->  
->      ret = sev_launch_start(sev);
->      if (ret) {
-> -        error_report("%s: failed to create encryption context", __func__);
-> +        error_setg(errp, "%s: failed to create encryption context", __func__);
->          goto err;
->      }
->  
-> -- 
-> 2.26.2
+> Okay, so just another feature flag, which implies it belongs into the
+> CPU model. How we communicate support from kvm to QEMU can be done via
+> features, bot also via attributes. Important part is that we can
+> sense/enable/disable.
 > 
+> 
+
+Right. KVM for instruction handling and for get/setting (setting also
+handles setting the name code in the SIE block), and QEMU for migration
+/ resetting.
+
+There are a lot of moving parts for a simple 8-byte string of data, but
+its very useful for giving us more information regarding the OS during
+firmware / service events.
+
+-- 
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Collin
 
+Stay safe and stay healthy
