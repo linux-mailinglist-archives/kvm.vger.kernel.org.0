@@ -2,98 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C18B1D3FF4
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 23:25:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACB731D407A
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 00:05:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727867AbgENVZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 17:25:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22580 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726201AbgENVZp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 17:25:45 -0400
+        id S1728039AbgENWF2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 18:05:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45530 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726084AbgENWF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 18:05:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589491544;
+        s=mimecast20190719; t=1589493926;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=UMjf23zFxOglYOyxZxoYs74d6iz4BTimsqthHh9qfeo=;
-        b=ULaTm6JvxlkqIAq+9VaZucu7t95MKMWbdA1ZXyu5CVMSbc6MG/9RBG2B2Pw4+MI1witUGq
-        nW+XmRrXE0qnQGvO3iqB5p+cKR5JdXW6w8jSJIVM24MgdrU5j9dAHk+rsFEjlxA5ZN5Xv/
-        605wSpNS4tuCWRISXZThwZXHCRGe/iY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-Q_fyCUyiOeSl9HzrSadRjA-1; Thu, 14 May 2020 17:25:42 -0400
-X-MC-Unique: Q_fyCUyiOeSl9HzrSadRjA-1
-Received: by mail-qk1-f198.google.com with SMTP id i10so4433975qkm.23
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 14:25:42 -0700 (PDT)
+        bh=WbD5g5bGH+nPMmGQ14q3KYBCwhmBSOIy/E7pqLF8qco=;
+        b=HgmWWKpP7fjRMrxT2DGzUivS9oD8pwkg5U4SezAOD9nbWE06CIFBuxs4WxLvhsueKkSAy/
+        dbxI84PLlLlho7UmJPXPASonF8xC88GeZZsfOpUg3vrhH60fiCLD+B491h6r+37SNu9XWw
+        rvCpliYZ8Duciu3lTimvQ/vJzO3vTIc=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-02n3hhRjO--NfV9S_8EtcQ-1; Thu, 14 May 2020 18:05:24 -0400
+X-MC-Unique: 02n3hhRjO--NfV9S_8EtcQ-1
+Received: by mail-qv1-f72.google.com with SMTP id o11so467672qve.21
+        for <kvm@vger.kernel.org>; Thu, 14 May 2020 15:05:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=UMjf23zFxOglYOyxZxoYs74d6iz4BTimsqthHh9qfeo=;
-        b=DjH3Ty/DlnA/sFKNMELZ5t7UVriTNBI5RPYBA8hOoqvRH3N8PUv9iF0HX3TUtPgAb7
-         8C/4CoA+fMSEmF8BkKnrZiw/phomGZ5kyTNmCxNVk8PmEVz265ASZfnFSwfRlG9KgZpZ
-         GqucZYAZUbF/ExFMtUwVYTCTNEY/OyuvqzB1riWbsk7eyIqhtzo4+7uhxwUfEVP5nkaf
-         NJgfLGqA/GiEfahxXkwAstmkr4Ry2EoRbnNovCpf9eNy0yUoX6c3DL9M4wYYvnJvf06g
-         auniDQVLz6hbGRLCK2cfDhr1cbzGs1Hf2qsoTIv3yBpt75tnJGxrkyAD+XlWgFzTbybR
-         ua4w==
-X-Gm-Message-State: AOAM533bvETET7KjWJGxEeCborBkX28gghpuTBNNDh/JTi3OKidJfzM/
-        hCbuDBhCC+gLRKgvt4Jcqu3beH0KDXz+0q20KaABos5cm1d5g2QLizQv1/C6ziZZvblAklCnzoi
-        69MGspg5ZJ9KJ
-X-Received: by 2002:a37:9a95:: with SMTP id c143mr336814qke.201.1589491541748;
-        Thu, 14 May 2020 14:25:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwiNs/Iz+y1EJvRQqDBIFBJ9ciXXLpzG5kxc5nWqOibFPZOFtWmZWw9dt+cyJR7ZguLOk4Vbg==
-X-Received: by 2002:a37:9a95:: with SMTP id c143mr336788qke.201.1589491541421;
-        Thu, 14 May 2020 14:25:41 -0700 (PDT)
+        bh=WbD5g5bGH+nPMmGQ14q3KYBCwhmBSOIy/E7pqLF8qco=;
+        b=KDwh9N4LJtoZri2qg63UaUPdxLh4/oZVBZtD7I5chzcgPdMWSG5tlMA0QF7UJB2vNZ
+         MFddFd+c0p+35OEJ5zpyYWqERFymBEgma4juArGCHpDqU5j3vuVrPae27nFlZLgI0Mo7
+         oUxWDHFnBOtgf645WTJJfroGXxMDO9yY/WVYm0803YTpj7a69uCxi4L4yxa7fIegwyFV
+         q6rUcR3YEzZSSa814UAfWr8NnYR4w6vjG0kdbleY9ilnsL25Z4+MS6aMXfkSebhb6AVm
+         AznhwXqr6Ze+DdM4+04VBsFrEwFn1YUlyLJ4dQ7AzJdrG9ZiAeebZTqfSK6smdPjnf9I
+         Zv9g==
+X-Gm-Message-State: AOAM531sVgJOSh5LREkMx//dBu2yNA92bskpaubLgYZZwxi0aRwnn5sW
+        wFR8LtqPhUWZ5I8ccUN65nAUhuUfoAyIjWDEVASPmwNmALp+rsGaY2Pq+I8moP73NpsN2gV86TG
+        h/1fG93h2xTKZ
+X-Received: by 2002:a37:a687:: with SMTP id p129mr551126qke.45.1589493924463;
+        Thu, 14 May 2020 15:05:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwh13mhxrDmHNJ8hptY5k7/JfPCSEmEv15VKAaaUnkUI+iGTOJzFoJ4FomI5IJPGc2XiaiEog==
+X-Received: by 2002:a37:a687:: with SMTP id p129mr551104qke.45.1589493924227;
+        Thu, 14 May 2020 15:05:24 -0700 (PDT)
 Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id v82sm75173qkb.102.2020.05.14.14.25.39
+        by smtp.gmail.com with ESMTPSA id y28sm373922qtc.62.2020.05.14.15.05.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 May 2020 14:25:40 -0700 (PDT)
-Date:   Thu, 14 May 2020 17:25:38 -0400
+        Thu, 14 May 2020 15:05:23 -0700 (PDT)
+Date:   Thu, 14 May 2020 18:05:16 -0400
 From:   Peter Xu <peterx@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, jgg@ziepe.ca
-Subject: Re: [PATCH 0/2] vfio/type1/pci: IOMMU PFNMAP invalidation
-Message-ID: <20200514212538.GB449815@xz-x1>
-References: <158947414729.12590.4345248265094886807.stgit@gimli.home>
+        Michael Tsirkin <mst@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org
+Subject: Re: [PATCH RFC 0/5] KVM: x86: KVM_MEM_ALLONES memory
+Message-ID: <20200514220516.GC449815@xz-x1>
+References: <20200514180540.52407-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <158947414729.12590.4345248265094886807.stgit@gimli.home>
+In-Reply-To: <20200514180540.52407-1-vkuznets@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 14, 2020 at 10:51:46AM -0600, Alex Williamson wrote:
-> This is a follow-on series to "vfio-pci: Block user access to disabled
-> device MMIO"[1], which extends user access blocking of disabled MMIO
-> ranges to include unmapping the ranges from the IOMMU.  The first patch
-> adds an invalidation callback path, allowing vfio bus drivers to signal
-> the IOMMU backend to unmap ranges with vma level granularity.  This
-> signaling is done both when the MMIO range becomes inaccessible due to
-> memory disabling, as well as when a vma is closed, making up for the
-> lack of tracking or pinning for non-page backed vmas.  The second
-> patch adds registration and testing interfaces such that the IOMMU
-> backend driver can test whether a given PFNMAP vma is provided by a
-> vfio bus driver supporting invalidation.  We can then implement more
-> restricted semantics to only allow PFNMAP DMA mappings when we have
-> such support, which becomes the new default.
+On Thu, May 14, 2020 at 08:05:35PM +0200, Vitaly Kuznetsov wrote:
+> The idea of the patchset was suggested by Michael S. Tsirkin.
+> 
+> PCIe config space can (depending on the configuration) be quite big but
+> usually is sparsely populated. Guest may scan it by accessing individual
+> device's page which, when device is missing, is supposed to have 'pci
+> holes' semantics: reads return '0xff' and writes get discarded. Currently,
+> userspace has to allocate real memory for these holes and fill them with
+> '0xff'. Moreover, different VMs usually require different memory.
+> 
+> The idea behind the feature introduced by this patch is: let's have a
+> single read-only page filled with '0xff' in KVM and map it to all such
+> PCI holes in all VMs. This will free userspace of obligation to allocate
+> real memory and also allow us to speed up access to these holes as we
+> can aggressively map the whole slot upon first fault.
+> 
+> RFC. I've only tested the feature with the selftest (PATCH5) on Intel/AMD
+> with and wiuthout EPT/NPT. I haven't tested memslot modifications yet.
+> 
+> Patches are against kvm/next.
 
-Hi, Alex,
+Hi, Vitaly,
 
-IIUC we'll directly tearing down the IOMMU page table without telling the
-userspace for those PFNMAP pages.  I'm thinking whether there be any side
-effect on the userspace side when userspace cached these mapping information
-somehow.  E.g., is there a way for userspace to know this event?
+Could this be done in userspace with existing techniques?
 
-Currently, QEMU VT-d will maintain all the IOVA mappings for each assigned
-device when used with vfio-pci.  In this case, QEMU will probably need to
-depend some invalidations sent from the guest (either userspace or kernel)
-device drivers to invalidate such IOVA mappings after they got removed from the
-hardware IOMMU page table underneath.  I haven't thought deeper on what would
-happen if the vIOMMU has got an inconsistent mapping of the real device.
+E.g., shm_open() with a handle and fill one 0xff page, then remap it to
+anywhere needed in QEMU?
 
 Thanks,
 
