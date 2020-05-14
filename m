@@ -2,531 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C3741D3723
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 18:57:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFDA01D37A5
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 19:10:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbgENQ50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 12:57:26 -0400
-Received: from foss.arm.com ([217.140.110.172]:40634 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726191AbgENQ5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 12:57:25 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F1DC1042;
-        Thu, 14 May 2020 09:57:24 -0700 (PDT)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A5913F71E;
-        Thu, 14 May 2020 09:57:23 -0700 (PDT)
-Subject: Re: [PATCH v4 kvmtool 10/12] pci: Implement reassignable BARs
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <1589470709-4104-1-git-send-email-alexandru.elisei@arm.com>
- <1589470709-4104-11-git-send-email-alexandru.elisei@arm.com>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- xsFNBFNPCKMBEAC+6GVcuP9ri8r+gg2fHZDedOmFRZPtcrMMF2Cx6KrTUT0YEISsqPoJTKld
- tPfEG0KnRL9CWvftyHseWTnU2Gi7hKNwhRkC0oBL5Er2hhNpoi8x4VcsxQ6bHG5/dA7ctvL6
- kYvKAZw4X2Y3GTbAZIOLf+leNPiF9175S8pvqMPi0qu67RWZD5H/uT/TfLpvmmOlRzNiXMBm
- kGvewkBpL3R2clHquv7pB6KLoY3uvjFhZfEedqSqTwBVu/JVZZO7tvYCJPfyY5JG9+BjPmr+
- REe2gS6w/4DJ4D8oMWKoY3r6ZpHx3YS2hWZFUYiCYovPxfj5+bOr78sg3JleEd0OB0yYtzTT
- esiNlQpCo0oOevwHR+jUiaZevM4xCyt23L2G+euzdRsUZcK/M6qYf41Dy6Afqa+PxgMEiDto
- ITEH3Dv+zfzwdeqCuNU0VOGrQZs/vrKOUmU/QDlYL7G8OIg5Ekheq4N+Ay+3EYCROXkstQnf
- YYxRn5F1oeVeqoh1LgGH7YN9H9LeIajwBD8OgiZDVsmb67DdF6EQtklH0ycBcVodG1zTCfqM
- AavYMfhldNMBg4vaLh0cJ/3ZXZNIyDlV372GmxSJJiidxDm7E1PkgdfCnHk+pD8YeITmSNyb
- 7qeU08Hqqh4ui8SSeUp7+yie9zBhJB5vVBJoO5D0MikZAODIDwARAQABzS1BbmRyZSBQcnp5
- d2FyYSAoQVJNKSA8YW5kcmUucHJ6eXdhcmFAYXJtLmNvbT7CwXsEEwECACUCGwMGCwkIBwMC
- BhUIAgkKCwQWAgMBAh4BAheABQJTWSV8AhkBAAoJEAL1yD+ydue63REP/1tPqTo/f6StS00g
- NTUpjgVqxgsPWYWwSLkgkaUZn2z9Edv86BLpqTY8OBQZ19EUwfNehcnvR+Olw+7wxNnatyxo
- D2FG0paTia1SjxaJ8Nx3e85jy6l7N2AQrTCFCtFN9lp8Pc0LVBpSbjmP+Peh5Mi7gtCBNkpz
- KShEaJE25a/+rnIrIXzJHrsbC2GwcssAF3bd03iU41J1gMTalB6HCtQUwgqSsbG8MsR/IwHW
- XruOnVp0GQRJwlw07e9T3PKTLj3LWsAPe0LHm5W1Q+euoCLsZfYwr7phQ19HAxSCu8hzp43u
- zSw0+sEQsO+9wz2nGDgQCGepCcJR1lygVn2zwRTQKbq7Hjs+IWZ0gN2nDajScuR1RsxTE4WR
- lj0+Ne6VrAmPiW6QqRhliDO+e82riI75ywSWrJb9TQw0+UkIQ2DlNr0u0TwCUTcQNN6aKnru
- ouVt3qoRlcD5MuRhLH+ttAcmNITMg7GQ6RQajWrSKuKFrt6iuDbjgO2cnaTrLbNBBKPTG4oF
- D6kX8Zea0KvVBagBsaC1CDTDQQMxYBPDBSlqYCb/b2x7KHTvTAHUBSsBRL6MKz8wwruDodTM
- 4E4ToV9URl4aE/msBZ4GLTtEmUHBh4/AYwk6ACYByYKyx5r3PDG0iHnJ8bV0OeyQ9ujfgBBP
- B2t4oASNnIOeGEEcQ2rjzsFNBFNPCKMBEACm7Xqafb1Dp1nDl06aw/3O9ixWsGMv1Uhfd2B6
- it6wh1HDCn9HpekgouR2HLMvdd3Y//GG89irEasjzENZPsK82PS0bvkxxIHRFm0pikF4ljIb
- 6tca2sxFr/H7CCtWYZjZzPgnOPtnagN0qVVyEM7L5f7KjGb1/o5EDkVR2SVSSjrlmNdTL2Rd
- zaPqrBoxuR/y/n856deWqS1ZssOpqwKhxT1IVlF6S47CjFJ3+fiHNjkljLfxzDyQXwXCNoZn
- BKcW9PvAMf6W1DGASoXtsMg4HHzZ5fW+vnjzvWiC4pXrcP7Ivfxx5pB+nGiOfOY+/VSUlW/9
- GdzPlOIc1bGyKc6tGREH5lErmeoJZ5k7E9cMJx+xzuDItvnZbf6RuH5fg3QsljQy8jLlr4S6
- 8YwxlObySJ5K+suPRzZOG2+kq77RJVqAgZXp3Zdvdaov4a5J3H8pxzjj0yZ2JZlndM4X7Msr
- P5tfxy1WvV4Km6QeFAsjcF5gM+wWl+mf2qrlp3dRwniG1vkLsnQugQ4oNUrx0ahwOSm9p6kM
- CIiTITo+W7O9KEE9XCb4vV0ejmLlgdDV8ASVUekeTJkmRIBnz0fa4pa1vbtZoi6/LlIdAEEt
- PY6p3hgkLLtr2GRodOW/Y3vPRd9+rJHq/tLIfwc58ZhQKmRcgrhtlnuTGTmyUqGSiMNfpwAR
- AQABwsFfBBgBAgAJBQJTTwijAhsMAAoJEAL1yD+ydue64BgP/33QKczgAvSdj9XTC14wZCGE
- U8ygZwkkyNf021iNMj+o0dpLU48PIhHIMTXlM2aiiZlPWgKVlDRjlYuc9EZqGgbOOuR/pNYA
- JX9vaqszyE34JzXBL9DBKUuAui8z8GcxRcz49/xtzzP0kH3OQbBIqZWuMRxKEpRptRT0wzBL
- O31ygf4FRxs68jvPCuZjTGKELIo656/Hmk17cmjoBAJK7JHfqdGkDXk5tneeHCkB411p9WJU
- vMO2EqsHjobjuFm89hI0pSxlUoiTL0Nuk9Edemjw70W4anGNyaQtBq+qu1RdjUPBvoJec7y/
- EXJtoGxq9Y+tmm22xwApSiIOyMwUi9A1iLjQLmngLeUdsHyrEWTbEYHd2sAM2sqKoZRyBDSv
- ejRvZD6zwkY/9nRqXt02H1quVOP42xlkwOQU6gxm93o/bxd7S5tEA359Sli5gZRaucpNQkwd
- KLQdCvFdksD270r4jU/rwR2R/Ubi+txfy0dk2wGBjl1xpSf0Lbl/KMR5TQntELfLR4etizLq
- Xpd2byn96Ivi8C8u9zJruXTueHH8vt7gJ1oax3yKRGU5o2eipCRiKZ0s/T7fvkdq+8beg9ku
- fDO4SAgJMIl6H5awliCY2zQvLHysS/Wb8QuB09hmhLZ4AifdHyF1J5qeePEhgTA+BaUbiUZf
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <bab4ac87-7436-0446-b902-72232d7c1876@arm.com>
-Date:   Thu, 14 May 2020 17:56:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726161AbgENRKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 13:10:01 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55241 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726035AbgENRKB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 13:10:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589476199;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KFZ5AjD6loXJYHYKzj8B/hbMmtmyXauXAqQ50TBn0l4=;
+        b=PYpUoAevaKyen6xiLC1uHIHG7+6ODtkXNlihtIWW89A2687wPf0EUhXh4hEquWeBvK59mY
+        fFULCTjp4oeBo6IhlhM8xDmvedzErnSGk+Zx2QE9IKCKhNZuaHZdbBqLKqJLkqaAP3YbTz
+        Mip/kYLN3hAwDEjZkRkB1dJbaPiRpdA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-JjzPKOULPFSVs6x4uzB1PQ-1; Thu, 14 May 2020 13:09:55 -0400
+X-MC-Unique: JjzPKOULPFSVs6x4uzB1PQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03AFD108ED68;
+        Thu, 14 May 2020 17:09:54 +0000 (UTC)
+Received: from work-vm (ovpn-114-247.ams2.redhat.com [10.36.114.247])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D362F1C933;
+        Thu, 14 May 2020 17:09:48 +0000 (UTC)
+Date:   Thu, 14 May 2020 18:09:46 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     frankja@linux.ibm.com, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
+        Richard Henderson <rth@twiddle.net>, cohuck@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        mdroth@linux.vnet.ibm.com
+Subject: Re: [RFC 16/18] use errp for gmpo kvm_init
+Message-ID: <20200514170808.GS2787@work-vm>
+References: <20200514064120.449050-1-david@gibson.dropbear.id.au>
+ <20200514064120.449050-17-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <1589470709-4104-11-git-send-email-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200514064120.449050-17-david@gibson.dropbear.id.au>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/05/2020 16:38, Alexandru Elisei wrote:
+Dave:
+  You've got some screwy mail headers here, the qemu-devel@nongnu.-rg is
+the best one anmd the pair@us.redhat.com is weird as well.
 
-Hi,
-
-> BARs are used by the guest to configure the access to the PCI device by
-> writing the address to which the device will respond. The basic idea for
-> adding support for reassignable BARs is straightforward: deactivate
-> emulation for the memory region described by the old BAR value, and
-> activate emulation for the new region.
-> 
-> BAR reassignment can be done while device access is enabled and memory
-> regions for different devices can overlap as long as no access is made to
-> the overlapping memory regions. This means that it is legal for the BARs of
-> two distinct devices to point to an overlapping memory region, and indeed,
-> this is how Linux does resource assignment at boot. To account for this
-> situation, the simple algorithm described above is enhanced to scan for all
-> devices and:
-> 
-> - Deactivate emulation for any BARs that might overlap with the new BAR
->   value.
-> 
-> - Enable emulation for any BARs that were overlapping with the old value
->   after the BAR has been updated.
-> 
-> Activating/deactivating emulation of a memory region has side effects.  In
-> order to prevent the execution of the same callback twice we now keep track
-> of the state of the region emulation. For example, this can happen if we
-> program a BAR with an address that overlaps a second BAR, thus deactivating
-> emulation for the second BAR, and then we disable all region accesses to
-> the second BAR by writing to the command register.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Many thanks for the changes and the added comments!
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-
-One minor hint below, but that's not critical.
-
+* David Gibson (david@gibson.dropbear.id.au) wrote:
 > ---
->  include/kvm/pci.h |  14 ++-
->  pci.c             | 250 +++++++++++++++++++++++++++++++++++++++++++-----------
->  vfio/pci.c        |  12 +++
->  3 files changed, 227 insertions(+), 49 deletions(-)
+>  accel/kvm/kvm-all.c                    |  4 +++-
+>  include/exec/guest-memory-protection.h |  2 +-
+>  target/i386/sev.c                      | 32 +++++++++++++-------------
+>  3 files changed, 20 insertions(+), 18 deletions(-)
 > 
-> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-> index 73e06d76d244..bf81323d83b7 100644
-> --- a/include/kvm/pci.h
-> +++ b/include/kvm/pci.h
-> @@ -11,6 +11,17 @@
->  #include "kvm/msi.h"
->  #include "kvm/fdt.h"
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 5451728425..392ab02867 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2045,9 +2045,11 @@ static int kvm_init(MachineState *ms)
+>      if (ms->gmpo) {
+>          GuestMemoryProtectionClass *gmpc =
+>              GUEST_MEMORY_PROTECTION_GET_CLASS(ms->gmpo);
+> +        Error *local_err = NULL;
 >  
-> +#define pci_dev_err(pci_hdr, fmt, ...) \
-> +	pr_err("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
-> +#define pci_dev_warn(pci_hdr, fmt, ...) \
-> +	pr_warning("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
-> +#define pci_dev_info(pci_hdr, fmt, ...) \
-> +	pr_info("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
-> +#define pci_dev_dbg(pci_hdr, fmt, ...) \
-> +	pr_debug("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
-> +#define pci_dev_die(pci_hdr, fmt, ...) \
-> +	die("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
-> +
->  /*
->   * PCI Configuration Mechanism #1 I/O ports. See Section 3.7.4.1.
->   * ("Configuration Mechanism #1") of the PCI Local Bus Specification 2.1 for
-> @@ -142,7 +153,8 @@ struct pci_device_header {
->  	};
+> -        ret = gmpc->kvm_init(ms->gmpo);
+> +        ret = gmpc->kvm_init(ms->gmpo, &local_err);
+>          if (ret < 0) {
+> +            error_report_err(local_err);
+>              goto err;
+>          }
+>      }
+> diff --git a/include/exec/guest-memory-protection.h b/include/exec/guest-memory-protection.h
+> index 7d959b4910..2a88475136 100644
+> --- a/include/exec/guest-memory-protection.h
+> +++ b/include/exec/guest-memory-protection.h
+> @@ -32,7 +32,7 @@ typedef struct GuestMemoryProtection GuestMemoryProtection;
+>  typedef struct GuestMemoryProtectionClass {
+>      InterfaceClass parent;
 >  
->  	/* Private to lkvm */
-> -	u32		bar_size[6];
-> +	u32			bar_size[6];
-> +	bool			bar_active[6];
->  	bar_activate_fn_t	bar_activate_fn;
->  	bar_deactivate_fn_t	bar_deactivate_fn;
->  	void *data;
-> diff --git a/pci.c b/pci.c
-> index 96239160110c..2e2c0270a166 100644
-> --- a/pci.c
-> +++ b/pci.c
-> @@ -71,6 +71,11 @@ static bool pci_bar_is_implemented(struct pci_device_header *pci_hdr, int bar_nu
->  	return pci__bar_size(pci_hdr, bar_num);
+> -    int (*kvm_init)(GuestMemoryProtection *);
+> +    int (*kvm_init)(GuestMemoryProtection *, Error **);
+>      int (*encrypt_data)(GuestMemoryProtection *, uint8_t *, uint64_t);
+>  } GuestMemoryProtectionClass;
+>  
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 2051fae0c1..82f16b2f3b 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -617,7 +617,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
+>      }
 >  }
 >  
-> +static bool pci_bar_is_active(struct pci_device_header *pci_hdr, int bar_num)
-> +{
-> +	return  pci_hdr->bar_active[bar_num];
-> +}
-> +
->  static void *pci_config_address_ptr(u16 port)
+> -static int sev_kvm_init(GuestMemoryProtection *gmpo)
+> +static int sev_kvm_init(GuestMemoryProtection *gmpo, Error **errp)
 >  {
->  	unsigned long offset;
-> @@ -163,6 +168,46 @@ static struct ioport_operations pci_config_data_ops = {
->  	.io_out	= pci_config_data_out,
->  };
+>      SevGuestState *sev = SEV_GUEST(gmpo);
+>      char *devname;
+> @@ -633,14 +633,14 @@ static int sev_kvm_init(GuestMemoryProtection *gmpo)
+>      host_cbitpos = ebx & 0x3f;
 >  
-> +static int pci_activate_bar(struct kvm *kvm, struct pci_device_header *pci_hdr,
-> +			    int bar_num)
-> +{
-> +	int r = 0;
-> +
-> +	if (pci_bar_is_active(pci_hdr, bar_num))
-> +		goto out;
-> +
-> +	r = pci_hdr->bar_activate_fn(kvm, pci_hdr, bar_num, pci_hdr->data);
-> +	if (r < 0) {
-> +		pci_dev_warn(pci_hdr, "Error activating emulation for BAR %d",
-> +			     bar_num);
-> +		goto out;
-> +	}
-> +	pci_hdr->bar_active[bar_num] = true;
-> +
-> +out:
-> +	return r;
-> +}
-> +
-> +static int pci_deactivate_bar(struct kvm *kvm, struct pci_device_header *pci_hdr,
-> +			      int bar_num)
-> +{
-> +	int r = 0;
-> +
-> +	if (!pci_bar_is_active(pci_hdr, bar_num))
-> +		goto out;
-> +
-> +	r = pci_hdr->bar_deactivate_fn(kvm, pci_hdr, bar_num, pci_hdr->data);
-> +	if (r < 0) {
-> +		pci_dev_warn(pci_hdr, "Error deactivating emulation for BAR %d",
-> +			     bar_num);
-> +		goto out;
-> +	}
-> +	pci_hdr->bar_active[bar_num] = false;
-> +
-> +out:
-> +	return r;
-> +}
-> +
->  static void pci_config_command_wr(struct kvm *kvm,
->  				  struct pci_device_header *pci_hdr,
->  				  u16 new_command)
-> @@ -179,26 +224,167 @@ static void pci_config_command_wr(struct kvm *kvm,
+>      if (host_cbitpos != sev->cbitpos) {
+> -        error_report("%s: cbitpos check failed, host '%d' requested '%d'",
+> -                     __func__, host_cbitpos, sev->cbitpos);
+> +        error_setg(errp, "%s: cbitpos check failed, host '%d' requested '%d'",
+> +                   __func__, host_cbitpos, sev->cbitpos);
+>          goto err;
+>      }
 >  
->  		if (toggle_io && pci__bar_is_io(pci_hdr, i)) {
->  			if (__pci__io_space_enabled(new_command))
-> -				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
-> -							 pci_hdr->data);
-> +				pci_activate_bar(kvm, pci_hdr, i);
->  			else
-> -				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
-> -							   pci_hdr->data);
-> +				pci_deactivate_bar(kvm, pci_hdr, i);
->  		}
+>      if (sev->reduced_phys_bits < 1) {
+> -        error_report("%s: reduced_phys_bits check failed, it should be >=1,"
+> -                     " requested '%d'", __func__, sev->reduced_phys_bits);
+> +        error_setg(errp, "%s: reduced_phys_bits check failed, it should be >=1,"
+> +                   " requested '%d'", __func__, sev->reduced_phys_bits);
+>          goto err;
+>      }
 >  
->  		if (toggle_mem && pci__bar_is_memory(pci_hdr, i)) {
->  			if (__pci__memory_space_enabled(new_command))
-> -				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
-> -							 pci_hdr->data);
-> +				pci_activate_bar(kvm, pci_hdr, i);
->  			else
-> -				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
-> -							   pci_hdr->data);
-> +				pci_deactivate_bar(kvm, pci_hdr, i);
->  		}
->  	}
->  
->  	pci_hdr->command = new_command;
->  }
->  
-> +static int pci_toggle_bar_regions(bool activate, struct kvm *kvm, u32 start, u32 size)
-> +{
-> +	struct device_header *dev_hdr;
-> +	struct pci_device_header *tmp_hdr;
-> +	u32 tmp_start, tmp_size;
-> +	int i, r;
-> +
-> +	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
-> +	while (dev_hdr) {
-> +		tmp_hdr = dev_hdr->data;
-> +		for (i = 0; i < 6; i++) {
-> +			if (!pci_bar_is_implemented(tmp_hdr, i))
-> +				continue;
-> +
-> +			tmp_start = pci__bar_address(tmp_hdr, i);
-> +			tmp_size = pci__bar_size(tmp_hdr, i);
-> +			if (tmp_start + tmp_size <= start ||
-> +			    tmp_start >= start + size)
-> +				continue;
-> +
-> +			if (activate)
-> +				r = pci_activate_bar(kvm, tmp_hdr, i);
-> +			else
-> +				r = pci_deactivate_bar(kvm, tmp_hdr, i);
-> +			if (r < 0)
-> +				return r;
-> +		}
-> +		dev_hdr = device__next_dev(dev_hdr);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static inline int pci_activate_bar_regions(struct kvm *kvm, u32 start, u32 size)
+> @@ -649,20 +649,20 @@ static int sev_kvm_init(GuestMemoryProtection *gmpo)
+>      devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
+>      sev->sev_fd = open(devname, O_RDWR);
+>      if (sev->sev_fd < 0) {
+> -        error_report("%s: Failed to open %s '%s'", __func__,
+> -                     devname, strerror(errno));
+> -    }
+> -    g_free(devname);
+> -    if (sev->sev_fd < 0) {
+> +        g_free(devname);
+> +        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
+> +                   devname, strerror(errno));
+> +        g_free(devname);
 
-This inline is not needed. It's a hint anyway, the compiler may or may
-not observe it. It knows best anyway, if it doesn't inline it, then for
-a reason.
+You seem to have double free'd devname - would g_autofree work here?
 
-There is a cause for "static inline" in *header files*, because it
-prevents warnings about unused functions.
+other than that, looks OK to me.
 
-Cheers,
-Anre.
+Dave
 
-> +{
-> +	return pci_toggle_bar_regions(true, kvm, start, size);
-> +}
-> +
-> +static inline int pci_deactivate_bar_regions(struct kvm *kvm, u32 start, u32 size)
-> +{
-> +	return pci_toggle_bar_regions(false, kvm, start, size);
-> +}
-> +
-> +static void pci_config_bar_wr(struct kvm *kvm,
-> +			      struct pci_device_header *pci_hdr, int bar_num,
-> +			      u32 value)
-> +{
-> +	u32 old_addr, new_addr, bar_size;
-> +	u32 mask;
-> +	int r;
-> +
-> +	if (pci__bar_is_io(pci_hdr, bar_num))
-> +		mask = (u32)PCI_BASE_ADDRESS_IO_MASK;
-> +	else
-> +		mask = (u32)PCI_BASE_ADDRESS_MEM_MASK;
-> +
-> +	/*
-> +	 * If the kernel masks the BAR, it will expect to find the size of the
-> +	 * BAR there next time it reads from it. After the kernel reads the
-> +	 * size, it will write the address back.
-> +	 *
-> +	 * According to the PCI local bus specification REV 3.0: The number of
-> +	 * upper bits that a device actually implements depends on how much of
-> +	 * the address space the device will respond to. A device that wants a 1
-> +	 * MB memory address space (using a 32-bit base address register) would
-> +	 * build the top 12 bits of the address register, hardwiring the other
-> +	 * bits to 0.
-> +	 *
-> +	 * Furthermore, software can determine how much address space the device
-> +	 * requires by writing a value of all 1's to the register and then
-> +	 * reading the value back. The device will return 0's in all don't-care
-> +	 * address bits, effectively specifying the address space required.
-> +	 *
-> +	 * Software computes the size of the address space with the formula
-> +	 * S =  ~B + 1, where S is the memory size and B is the value read from
-> +	 * the BAR. This means that the BAR value that kvmtool should return is
-> +	 * B = ~(S - 1).
-> +	 */
-> +	if (value == 0xffffffff) {
-> +		value = ~(pci__bar_size(pci_hdr, bar_num) - 1);
-> +		/* Preserve the special bits. */
-> +		value = (value & mask) | (pci_hdr->bar[bar_num] & ~mask);
-> +		pci_hdr->bar[bar_num] = value;
-> +		return;
-> +	}
-> +
-> +	value = (value & mask) | (pci_hdr->bar[bar_num] & ~mask);
-> +
-> +	/* Don't toggle emulation when region type access is disbled. */
-> +	if (pci__bar_is_io(pci_hdr, bar_num) &&
-> +	    !pci__io_space_enabled(pci_hdr)) {
-> +		pci_hdr->bar[bar_num] = value;
-> +		return;
-> +	}
-> +
-> +	if (pci__bar_is_memory(pci_hdr, bar_num) &&
-> +	    !pci__memory_space_enabled(pci_hdr)) {
-> +		pci_hdr->bar[bar_num] = value;
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * BAR reassignment can be done while device access is enabled and
-> +	 * memory regions for different devices can overlap as long as no access
-> +	 * is made to the overlapping memory regions. To implement BAR
-> +	 * reasignment, we deactivate emulation for the region described by the
-> +	 * BAR value that the guest is changing, we disable emulation for the
-> +	 * regions that overlap with the new one (by scanning through all PCI
-> +	 * devices), we enable emulation for the new BAR value and finally we
-> +	 * enable emulation for all device regions that were overlapping with
-> +	 * the old value.
-> +	 */
-> +	old_addr = pci__bar_address(pci_hdr, bar_num);
-> +	new_addr = __pci__bar_address(value);
-> +	bar_size = pci__bar_size(pci_hdr, bar_num);
-> +
-> +	r = pci_deactivate_bar(kvm, pci_hdr, bar_num);
-> +	if (r < 0)
-> +		return;
-> +
-> +	r = pci_deactivate_bar_regions(kvm, new_addr, bar_size);
-> +	if (r < 0) {
-> +		/*
-> +		 * We cannot update the BAR because of an overlapping region
-> +		 * that failed to deactivate emulation, so keep the old BAR
-> +		 * value and re-activate emulation for it.
-> +		 */
-> +		pci_activate_bar(kvm, pci_hdr, bar_num);
-> +		return;
-> +	}
-> +
-> +	pci_hdr->bar[bar_num] = value;
-> +	r = pci_activate_bar(kvm, pci_hdr, bar_num);
-> +	if (r < 0) {
-> +		/*
-> +		 * New region cannot be emulated, re-enable the regions that
-> +		 * were overlapping.
-> +		 */
-> +		pci_activate_bar_regions(kvm, new_addr, bar_size);
-> +		return;
-> +	}
-> +
-> +	pci_activate_bar_regions(kvm, old_addr, bar_size);
-> +}
-> +
->  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
->  {
->  	void *base;
-> @@ -206,7 +392,6 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->  	struct pci_device_header *pci_hdr;
->  	u8 dev_num = addr.device_number;
->  	u32 value = 0;
-> -	u32 mask;
+>          goto err;
+>      }
+> +    g_free(devname);
 >  
->  	if (!pci_device_exists(addr.bus_number, dev_num, 0))
->  		return;
-> @@ -231,46 +416,13 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->  	}
+>      ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
+>                               &fw_error);
+>      if (ret) {
+> -        error_report("%s: failed to get platform status ret=%d "
+> -                     "fw_error='%d: %s'", __func__, ret, fw_error,
+> -                     fw_error_to_str(fw_error));
+> +        error_setg(errp, "%s: failed to get platform status ret=%d "
+> +                   "fw_error='%d: %s'", __func__, ret, fw_error,
+> +                   fw_error_to_str(fw_error));
+>          goto err;
+>      }
+>      sev->build_id = status.build;
+> @@ -672,14 +672,14 @@ static int sev_kvm_init(GuestMemoryProtection *gmpo)
+>      trace_kvm_sev_init();
+>      ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
+>      if (ret) {
+> -        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+> -                     __func__, ret, fw_error, fw_error_to_str(fw_error));
+> +        error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
+> +                   __func__, ret, fw_error, fw_error_to_str(fw_error));
+>          goto err;
+>      }
 >  
->  	bar = (offset - PCI_BAR_OFFSET(0)) / sizeof(u32);
-> -
-> -	/*
-> -	 * If the kernel masks the BAR, it will expect to find the size of the
-> -	 * BAR there next time it reads from it. After the kernel reads the
-> -	 * size, it will write the address back.
-> -	 */
->  	if (bar < 6) {
-> -		if (pci__bar_is_io(pci_hdr, bar))
-> -			mask = (u32)PCI_BASE_ADDRESS_IO_MASK;
-> -		else
-> -			mask = (u32)PCI_BASE_ADDRESS_MEM_MASK;
-> -		/*
-> -		 * According to the PCI local bus specification REV 3.0:
-> -		 * The number of upper bits that a device actually implements
-> -		 * depends on how much of the address space the device will
-> -		 * respond to. A device that wants a 1 MB memory address space
-> -		 * (using a 32-bit base address register) would build the top
-> -		 * 12 bits of the address register, hardwiring the other bits
-> -		 * to 0.
-> -		 *
-> -		 * Furthermore, software can determine how much address space
-> -		 * the device requires by writing a value of all 1's to the
-> -		 * register and then reading the value back. The device will
-> -		 * return 0's in all don't-care address bits, effectively
-> -		 * specifying the address space required.
-> -		 *
-> -		 * Software computes the size of the address space with the
-> -		 * formula S = ~B + 1, where S is the memory size and B is the
-> -		 * value read from the BAR. This means that the BAR value that
-> -		 * kvmtool should return is B = ~(S - 1).
-> -		 */
->  		memcpy(&value, data, size);
-> -		if (value == 0xffffffff)
-> -			value = ~(pci__bar_size(pci_hdr, bar) - 1);
-> -		/* Preserve the special bits. */
-> -		value = (value & mask) | (pci_hdr->bar[bar] & ~mask);
-> -		memcpy(base + offset, &value, size);
-> -	} else {
-> -		memcpy(base + offset, data, size);
-> +		pci_config_bar_wr(kvm, pci_hdr, bar, value);
-> +		return;
->  	}
-> +
-> +	memcpy(base + offset, data, size);
->  }
+>      ret = sev_launch_start(sev);
+>      if (ret) {
+> -        error_report("%s: failed to create encryption context", __func__);
+> +        error_setg(errp, "%s: failed to create encryption context", __func__);
+>          goto err;
+>      }
 >  
->  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size)
-> @@ -336,16 +488,18 @@ int pci__register_bar_regions(struct kvm *kvm, struct pci_device_header *pci_hdr
->  		if (!pci_bar_is_implemented(pci_hdr, i))
->  			continue;
->  
-> +		assert(!pci_bar_is_active(pci_hdr, i));
-> +
->  		if (pci__bar_is_io(pci_hdr, i) &&
->  		    pci__io_space_enabled(pci_hdr)) {
-> -			r = bar_activate_fn(kvm, pci_hdr, i, data);
-> +			r = pci_activate_bar(kvm, pci_hdr, i);
->  			if (r < 0)
->  				return r;
->  		}
->  
->  		if (pci__bar_is_memory(pci_hdr, i) &&
->  		    pci__memory_space_enabled(pci_hdr)) {
-> -			r = bar_activate_fn(kvm, pci_hdr, i, data);
-> +			r = pci_activate_bar(kvm, pci_hdr, i);
->  			if (r < 0)
->  				return r;
->  		}
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index 34f19792765e..49ecd12a38cd 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -467,6 +467,7 @@ static int vfio_pci_bar_activate(struct kvm *kvm,
->  	struct vfio_pci_msix_pba *pba = &pdev->msix_pba;
->  	struct vfio_pci_msix_table *table = &pdev->msix_table;
->  	struct vfio_region *region;
-> +	u32 bar_addr;
->  	bool has_msix;
->  	int ret;
->  
-> @@ -475,7 +476,14 @@ static int vfio_pci_bar_activate(struct kvm *kvm,
->  	region = &vdev->regions[bar_num];
->  	has_msix = pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX;
->  
-> +	bar_addr = pci__bar_address(pci_hdr, bar_num);
-> +	if (pci__bar_is_io(pci_hdr, bar_num))
-> +		region->port_base = bar_addr;
-> +	else
-> +		region->guest_phys_addr = bar_addr;
-> +
->  	if (has_msix && (u32)bar_num == table->bar) {
-> +		table->guest_phys_addr = region->guest_phys_addr;
->  		ret = kvm__register_mmio(kvm, table->guest_phys_addr,
->  					 table->size, false,
->  					 vfio_pci_msix_table_access, pdev);
-> @@ -490,6 +498,10 @@ static int vfio_pci_bar_activate(struct kvm *kvm,
->  	}
->  
->  	if (has_msix && (u32)bar_num == pba->bar) {
-> +		if (pba->bar == table->bar)
-> +			pba->guest_phys_addr = table->guest_phys_addr + table->size;
-> +		else
-> +			pba->guest_phys_addr = region->guest_phys_addr;
->  		ret = kvm__register_mmio(kvm, pba->guest_phys_addr,
->  					 pba->size, false,
->  					 vfio_pci_msix_pba_access, pdev);
+> -- 
+> 2.26.2
 > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
