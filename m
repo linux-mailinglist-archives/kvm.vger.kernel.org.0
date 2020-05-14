@@ -2,184 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1858A1D34FE
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 17:24:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08E3E1D3543
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 17:38:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726088AbgENPY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 11:24:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11924 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726056AbgENPY4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 11:24:56 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04EF5R9W055716;
-        Thu, 14 May 2020 11:24:55 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 310tjpa97e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 May 2020 11:24:55 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04EF5Ukt056083;
-        Thu, 14 May 2020 11:24:54 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 310tjpa96r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 May 2020 11:24:54 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04EFLp5h026527;
-        Thu, 14 May 2020 15:24:53 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma01wdc.us.ibm.com with ESMTP id 3100ubfme8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 May 2020 15:24:53 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04EFOmH98454502
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 May 2020 15:24:48 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 65E5FC605B;
-        Thu, 14 May 2020 15:24:49 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C7579C605A;
-        Thu, 14 May 2020 15:24:48 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.130.116])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Thu, 14 May 2020 15:24:48 +0000 (GMT)
-Subject: Re: [PATCH v6 2/2] s390/kvm: diagnose 318 handling
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-References: <20200513221557.14366-1-walling@linux.ibm.com>
- <20200513221557.14366-3-walling@linux.ibm.com>
- <20200514110544.147a63f8.cohuck@redhat.com>
-From:   Collin Walling <walling@linux.ibm.com>
-Message-ID: <d4cfe6dc-4ce6-b588-88fd-9e0bc6684e8a@linux.ibm.com>
-Date:   Thu, 14 May 2020 11:24:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200514110544.147a63f8.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-14_05:2020-05-14,2020-05-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 spamscore=0 clxscore=1015
- suspectscore=0 phishscore=0 adultscore=0 priorityscore=1501
- cotscore=-2147483648 malwarescore=0 mlxscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005140133
+        id S1727033AbgENPik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 11:38:40 -0400
+Received: from foss.arm.com ([217.140.110.172]:39136 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726056AbgENPik (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 11:38:40 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 71B891FB;
+        Thu, 14 May 2020 08:38:39 -0700 (PDT)
+Received: from e121566-lin.arm.com (unknown [10.57.31.200])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B4E93F71E;
+        Thu, 14 May 2020 08:38:38 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     kvm@vger.kernel.org
+Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        andre.przywara@arm.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org
+Subject: [PATCH v4 kvmtool 00/12] Add reassignable BARs
+Date:   Thu, 14 May 2020 16:38:17 +0100
+Message-Id: <1589470709-4104-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/14/20 5:05 AM, Cornelia Huck wrote:
-> On Wed, 13 May 2020 18:15:57 -0400
-> Collin Walling <walling@linux.ibm.com> wrote:
-> 
->> DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
->> be intercepted by SIE and handled via KVM. Let's introduce some
->> functions to communicate between userspace and KVM via ioctls. These
->> will be used to get/set the diag318 related information, as well as
->> check the system if KVM supports handling this instruction.
->>
->> This information can help with diagnosing the environment the VM is
->> running in (Linux, z/VM, etc) if the OS calls this instruction.
->>
->> By default, this feature is disabled and can only be enabled if a
->> user space program (such as QEMU) explicitly requests it.
->>
->> The Control Program Name Code (CPNC) is stored in the SIE block
->> and a copy is retained in each VCPU. The Control Program Version
->> Code (CPVC) is not designed to be stored in the SIE block, so we
->> retain a copy in each VCPU next to the CPNC.
->>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> ---
->>  Documentation/virt/kvm/devices/vm.rst | 29 +++++++++
->>  arch/s390/include/asm/kvm_host.h      |  6 +-
->>  arch/s390/include/uapi/asm/kvm.h      |  5 ++
->>  arch/s390/kvm/diag.c                  | 20 ++++++
->>  arch/s390/kvm/kvm-s390.c              | 89 +++++++++++++++++++++++++++
->>  arch/s390/kvm/kvm-s390.h              |  1 +
->>  arch/s390/kvm/vsie.c                  |  2 +
->>  7 files changed, 151 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
->> index 0aa5b1cfd700..9344d45ace6d 100644
->> --- a/Documentation/virt/kvm/devices/vm.rst
->> +++ b/Documentation/virt/kvm/devices/vm.rst
->> @@ -314,3 +314,32 @@ Allows userspace to query the status of migration mode.
->>  	     if it is enabled
->>  :Returns:   -EFAULT if the given address is not accessible from kernel space;
->>  	    0 in case of success.
->> +
->> +6. GROUP: KVM_S390_VM_MISC
-> 
-> This needs to be rstyfied, matching the remainder of the file.
-> 
->> +Architectures: s390
->> +
->> + 6.1. KVM_S390_VM_MISC_ENABLE_DIAG318
->> +
->> + Allows userspace to enable the DIAGNOSE 0x318 instruction call for a
->> + guest OS. By default, KVM will not allow this instruction to be executed
->> + by a guest, even if support is in place. Userspace must explicitly enable
->> + the instruction handling for DIAGNOSE 0x318 via this call.
->> +
->> + Parameters: none
->> + Returns:    0 after setting a flag telling KVM to enable this feature
->> +
->> + 6.2. KVM_S390_VM_MISC_DIAG318 (r/w)
->> +
->> + Allows userspace to retrieve and set the DIAGNOSE 0x318 information,
->> + which consists of a 1-byte "Control Program Name Code" and a 7-byte
->> + "Control Program Version Code" (a 64 bit value all in all). This
->> + information is set by the guest (usually during IPL). This interface is
->> + intended to allow retrieving and setting it during migration; while no
->> + real harm is done if the information is changed outside of migration,
->> + it is strongly discouraged.
-> 
-> (Sorry if we discussed that already, but that was some time ago and the
-> info has dropped out of my cache...)
-> 
-> Had we considered doing this in userspace only? If QEMU wanted to
-> emulate diag 318 in tcg, it would basically need to mirror what KVM
-> does; diag 318 does not seem like something where we want to optimize
-> for performance, so dropping to userspace seems feasible? We'd just
-> need an interface for userspace to forward anything set by the guest.
-> 
+kvmtool uses the Linux-only dt property 'linux,pci-probe-only' to prevent
+it from trying to reassign the BARs. Let's make the BARs reassignable so we
+can get rid of this band-aid.
 
-My reservation with respect to handling this in userspace only is that
-the data set by the instruction call is relevant to both host-level and
-guest-level kernels. That data is set during kernel setup.
+During device configuration, Linux can assign a region resource to a BAR
+that temporarily overlaps with another device. This means that the code
+that emulates BAR reassignment must be aware of all the registered PCI
+devices. Because of this, and to avoid re-implementing the same code for
+each emulated device, the algorithm for activating/deactivating emulation
+as BAR addresses change lives completely inside the PCI code. Each device
+registers two callback functions which are called when device emulation is
+activated (for example, to activate emulation for a newly assigned BAR
+address), respectively, when device emulation is deactivated (a previous
+BAR address is changed, and emulation for that region must be deactivated).
 
-Right now, the instruction call is used to set a hard-coded "name code"
-value, but later we want to use this instruction to also set some sort
-of unique version code. The format of the version code is not yet
-determined.
+Two important changes this iteration: the first 18 patches and patch 22
+from v3 have been merged and I have dropped the last patch, the patch that
+adds support for PCI Express 1.1 (hence the subject change). The CFI
+patches have been merged and EDK2 can run right now under kvmtool with
+virtio-mmio, and PCI Express breaks that. EDK2 doesn't have support for
+legacy PCI, so when running under kvmtool, the PCI bus doesn't exist as far
+as EDK2 is concerned. As soon as we add support for PCI Express, EDK2 will
+run into the bug that I described in v3 [1]. I'll resent that patch along
+with the fixes that make EDK2 work with PCI Express.
 
-If guest support is handled in userspace only, then we'll have to update
-the version codes in both the Linux kernel /and/ QEMU, which might be a
-bit messy if things go out of sync.
+Like before, I have tested the patches on an x86_64 and arm64 machine:
 
->> +
->> + Parameters: address of a buffer in user space (u64), where the
->> +	     information is read from or stored into
->> + Returns:    -EFAULT if the given address is not accessible from kernel space;
->> +	     -EOPNOTSUPP if feature has not been requested to be enabled first;
->> +	     0 in case of success
-> 
+1. On AMD Seattle. Tried PCI passthrough using two different guests in each
+case; one with 4k pages, and one with 64k pages (the CPU doesn't have
+support for 16k pages):
+- Intel 82574L Gigabit Ethernet card
+- Samsung 970 Pro NVME (controller registers are in the same BAR region as the
+  MSIX table and PBA, I wrote a nasty hack to make it work, will try to upstream
+  something after this series)
+- Realtek 8168 Gigabit Ethernet card
+- NVIDIA Quadro P400 (nouveau probe fails because expansion ROM emulation not
+  implemented in kvmtool, I will write a fix for that)
+- AMD Firepro W2100 (amdgpu driver probe fails just like on the NVIDIA card)
+- Seagate Barracuda 1000GB drive and Crucial MX500 SSD attached to a PCIE to
+  SATA card.
 
+I wrote a kvm-unit-tests test that stresses the MMIO emulation locking
+scheme that I implemented by spawning 4 vcpus (the Seattle machine has 8
+physical CPUs) that toggle memory, and another 4 vcpus that read from the
+memory region described by a BAR. I ran this under valgrind, and no
+deadlocks or use-after-free errors were detected.
+
+I've also installed an official debian iso in a virtual machine by using
+the EDK2 binary that Ard posted [2] and virtio-mmio.
+
+2. Ryzen 3900x + Gigabyte x570 Aorus Master (bios F10). Tried PCI passthrough
+with a Realtek 8168 and Intel 82574L Gigabit Ethernet cards at the same time,
+plus running with --sdl enabled to test VESA device emulation at the same time.
+I also managed to get the guest to do bar reassignment for one device by using
+the kernel command line parameter pci.resource_alignment=16@pci:10ec:8168.
+
+Changes in v4:
+* Patches 1-18 and 22 have been merged.
+* Gathered Reviewed-by tags. Thank you!
+* Patch #1 (was #19): added comments explaining why refcount starts at 0
+  and we use a separate variable for deletion; minor changes to
+  ioport__unregister to make it more similar to kvm__deregister_mmio.
+* Patch #6 (was #25): assert that size is less than or equal to 4 to
+  prevent any stack overruns.
+* Patch #7 (was #26): rewrote it, now we prohibit the user from requesting
+  more than one of --gtk, --vnc and --sdl.
+* Patch #8 (was #27): fixed coding style issues, added a comment explaining
+  the the MSIX table and PBA structure can share the same BAR and removed
+  the assert from pci__register_bar_regions.
+* Patch #10 (was #29): removed unused parameter from the functions that
+  activate/deactivate BAR emulation and consolidated them into one
+  function; added a comment summarizing the algorithm for BAR reassignment.
+* Dropped patch #13 (was #32) for the reasons explained above.
+
+Changes in v3:
+* Patches 18, 24 and 26 are new.
+* Dropped #9 "arm/pci: Fix PCI IO region" for reasons explained above.
+* Reworded commit message for #12 "vfio/pci: Ignore expansion ROM BAR
+  writes" to make it clear that kvmtool's implementation of VFIO doesn't
+  support expansion BAR emulation.
+* Moved variable declaration at the start of the function for #13
+  "vfio/pci: Don't access unallocated regions".
+* Patch #15 "Don't ignore errors registering a device, ioport or mmio
+  emulation" uses ioport__remove consistenly.
+* Reworked error cleanup for #16 "hw/vesa: Don't ignore fatal errors".
+* Reworded commit message for #17 "hw/vesa: Set the size for BAR 0".
+* Reworked #19 "ioport: mmio: Use a mutex and reference counting for
+  locking" to also use reference counting to prevent races (and updated the
+  commit message in the process).
+* Added the function pci__bar_size to #20 "pci: Add helpers for BAR values
+  and memory/IO space access".
+* Protect mem_banks list with a mutex in #22 "vfio: Destroy memslot when
+  unmapping the associated VAs"; also moved the munmap after the slot is
+  destroyed, as per the KVM api.
+* Dropped the rework of the vesa device in patch #27 "pci: Implement
+  callbacks for toggling BAR emulation". Also added a few assert statements
+  in some callbacks to make sure that they don't get called with an
+  unxpected BAR number (which can only result from a coding error). Also
+  return -ENOENT when kvm__deregister_mmio fails, to match ioport behavior
+  and for better diagnostics.
+* Dropped the PCI configuration write callback from the vesa device in #28
+  "pci: Toggle BAR I/O and memory space emulation". Apparently, if we don't
+  allow the guest kernel to disable BAR access, it treats the VESA device
+  as a VGA boot device, instead of a regular VGA device, and Xorg cannot
+  use it.
+* Droped struct bar_info from #29 "pci: Implement reassignable BARs". Also
+  changed pci_dev_err to pci_dev_warn in pci_{activate,deactivate}_bar,
+  because the errors can be benign (they can happen because two vcpus race
+  against each other to deactivate memory or I/O access, for example).
+* Replaced the PCI device configuration space define with the actual
+  number in #32 "arm/arm64: Add PCI Express 1.1 support". On some distros
+  the defines weren't present in /usr/include/linux/pci_regs.h.
+* Implemented other minor review comments.
+* Gathered Reviewed-by tags.
+
+Changes in v2:
+* Patches 2, 11-18, 20, 22-27, 29 are new.
+* Patches 11, 13, and 14 have been dropped.
+* Reworked the way BAR reassignment is implemented.
+* The patch "Add PCI Express 1.1 support" has been reworked to apply only
+  to arm64. For x86 we would need ACPI support in order to advertise the
+  location of the ECAM space.
+* Gathered Reviewed-by tags.
+* Implemented review comments.
+
+[1] https://www.spinics.net/lists/kvm/msg211272.html
+[2] https://www.spinics.net/lists/kvm/msg213842.html
+
+
+Alexandru Elisei (11):
+  ioport: mmio: Use a mutex and reference counting for locking
+  pci: Add helpers for BAR values and memory/IO space access
+  virtio/pci: Get emulated region address from BARs
+  vfio: Reserve ioports when configuring the BAR
+  pci: Limit configuration transaction size to 32 bits
+  vfio/pci: Don't write configuration value twice
+  Don't allow more than one framebuffers
+  pci: Implement callbacks for toggling BAR emulation
+  pci: Toggle BAR I/O and memory space emulation
+  pci: Implement reassignable BARs
+  vfio: Trap MMIO access to BAR addresses which aren't page aligned
+
+Julien Thierry (1):
+  arm/fdt: Remove 'linux,pci-probe-only' property
+
+ arm/fdt.c                     |   1 -
+ builtin-run.c                 |   5 +
+ hw/vesa.c                     |  72 +++++---
+ include/kvm/ioport.h          |   2 +
+ include/kvm/pci.h             |  85 ++++++++-
+ include/kvm/rbtree-interval.h |   4 +-
+ include/kvm/virtio-pci.h      |   3 -
+ ioport.c                      |  85 ++++++---
+ mmio.c                        | 107 +++++++++---
+ pci.c                         | 320 ++++++++++++++++++++++++++++++----
+ powerpc/spapr_pci.c           |   2 +-
+ vfio/core.c                   |  18 +-
+ vfio/pci.c                    | 132 ++++++++++++--
+ virtio/pci.c                  | 158 ++++++++++++-----
+ 14 files changed, 794 insertions(+), 200 deletions(-)
 
 -- 
---
-Regards,
-Collin
+2.26.2
 
-Stay safe and stay healthy
