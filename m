@@ -2,100 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 02C9A1D3FD7
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 23:17:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C18B1D3FF4
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 23:25:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727777AbgENVRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 17:17:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46865 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726027AbgENVRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 17:17:35 -0400
+        id S1727867AbgENVZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 17:25:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22580 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726201AbgENVZp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 17:25:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589491053;
+        s=mimecast20190719; t=1589491544;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rTyJ9EfkIQ5Fgx9dMoJiOVLyFSNRnN5iUonulkVQTmQ=;
-        b=dLNqHXhAPQWY8LHoBjCU4jmouwpmFUTFgIJRq3Aac2wo6LmU5IA6eXmRUUTShpkGl/pwpy
-        bdcIxuvJKuPahdmzS+2025btHnhsvp0R7a7Vc8frKyRvb9V9v1ODMkFDm66eta0Uivu4I0
-        NqPccDl/2XtmzBesJ/a4OCD8AExres0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-G4yM1MFsNVm7KtUAC1NgzA-1; Thu, 14 May 2020 17:17:32 -0400
-X-MC-Unique: G4yM1MFsNVm7KtUAC1NgzA-1
-Received: by mail-wr1-f69.google.com with SMTP id 90so41440wrg.23
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 14:17:32 -0700 (PDT)
+        bh=UMjf23zFxOglYOyxZxoYs74d6iz4BTimsqthHh9qfeo=;
+        b=ULaTm6JvxlkqIAq+9VaZucu7t95MKMWbdA1ZXyu5CVMSbc6MG/9RBG2B2Pw4+MI1witUGq
+        nW+XmRrXE0qnQGvO3iqB5p+cKR5JdXW6w8jSJIVM24MgdrU5j9dAHk+rsFEjlxA5ZN5Xv/
+        605wSpNS4tuCWRISXZThwZXHCRGe/iY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-Q_fyCUyiOeSl9HzrSadRjA-1; Thu, 14 May 2020 17:25:42 -0400
+X-MC-Unique: Q_fyCUyiOeSl9HzrSadRjA-1
+Received: by mail-qk1-f198.google.com with SMTP id i10so4433975qkm.23
+        for <kvm@vger.kernel.org>; Thu, 14 May 2020 14:25:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rTyJ9EfkIQ5Fgx9dMoJiOVLyFSNRnN5iUonulkVQTmQ=;
-        b=tAtbyoxhS6FqXMstNKx6bR1hTew35t2ssy4ejMniiWuJZV0QFNNpqm+6LXpwq22/ZK
-         rSvwFlIvHPn+MpwM6e3ovwMrcNU0moy4JNRZ9ib2eEdluZ3whb3Hqmgrj22kivHjuQog
-         OJMpOu4GLcgyjjJqopEKpvcxsv9zIuofz6gNEusC4WXZmf7gDk9t+nZnHhvbpxUr3VLu
-         Qbm4YHHKCo1BB5NdSpY49OM/l1SsY4QwyeXRsuJNGxonPsUHLu8VMJt5LUQYKWiYrL3H
-         GT4V1N40b16wpjdycWhlkTKPnhJkGV4zbEnlgdXhSMZK/T4D6r1XukB6IZVg+0My1dc1
-         VRpQ==
-X-Gm-Message-State: AOAM533oFahkqBXmqxWs2hqD2YOVP2oLs4kMRBgLznwBBoRVhTpImXio
-        TmlbPhqnbQ57FYuhtelyr2aIcoeJwSTXyuIMBmqX9ZHglpTjOr4ehP+elSFS3lD2Hi4wvKDobiz
-        TCPvYfrV1PuWQ
-X-Received: by 2002:adf:82c1:: with SMTP id 59mr355460wrc.377.1589491050989;
-        Thu, 14 May 2020 14:17:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxi0teq9r39kCA3vrZqGGaNR8WRAo0xPpomi+j9opFrTWhGhKrVSrcgRhHupp/F8cV+SmHIBg==
-X-Received: by 2002:adf:82c1:: with SMTP id 59mr355438wrc.377.1589491050754;
-        Thu, 14 May 2020 14:17:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bdd8:ac77:1ff4:62c6? ([2001:b07:6468:f312:bdd8:ac77:1ff4:62c6])
-        by smtp.gmail.com with ESMTPSA id y3sm266623wrt.87.2020.05.14.14.17.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 May 2020 14:17:30 -0700 (PDT)
-Subject: Re: [RFC PATCH] KVM: Add module for IRQ forwarding
-To:     Micah Morton <mortonm@chromium.org>,
-        Auger Eric <eric.auger@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        jmattson@google.com
-References: <20200511220046.120206-1-mortonm@chromium.org>
- <20200512111440.15caaca2@w520.home>
- <92fd66eb-68e7-596f-7dd1-f1c190833be4@redhat.com>
- <20200513083401.11e761a7@x1.home>
- <8c0bfeb7-0d08-db74-3a23-7a850f301a2a@redhat.com>
- <CAJ-EccPjU0Lh5gEnr0L9AhuuJTad1yHX-BzzWq21m+e-vY-ELA@mail.gmail.com>
- <0fdb5d54-e4d6-8f2f-69fe-1b157999d6cd@redhat.com>
- <CAJ-EccP6GNmyCGJZFfXUo2_8KEN_sJZ3=88f+3E-8SJ=JT8Pcg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9d5d7eec-77dd-bca9-949f-8f39fcd7d8d7@redhat.com>
-Date:   Thu, 14 May 2020 23:17:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UMjf23zFxOglYOyxZxoYs74d6iz4BTimsqthHh9qfeo=;
+        b=DjH3Ty/DlnA/sFKNMELZ5t7UVriTNBI5RPYBA8hOoqvRH3N8PUv9iF0HX3TUtPgAb7
+         8C/4CoA+fMSEmF8BkKnrZiw/phomGZ5kyTNmCxNVk8PmEVz265ASZfnFSwfRlG9KgZpZ
+         GqucZYAZUbF/ExFMtUwVYTCTNEY/OyuvqzB1riWbsk7eyIqhtzo4+7uhxwUfEVP5nkaf
+         NJgfLGqA/GiEfahxXkwAstmkr4Ry2EoRbnNovCpf9eNy0yUoX6c3DL9M4wYYvnJvf06g
+         auniDQVLz6hbGRLCK2cfDhr1cbzGs1Hf2qsoTIv3yBpt75tnJGxrkyAD+XlWgFzTbybR
+         ua4w==
+X-Gm-Message-State: AOAM533bvETET7KjWJGxEeCborBkX28gghpuTBNNDh/JTi3OKidJfzM/
+        hCbuDBhCC+gLRKgvt4Jcqu3beH0KDXz+0q20KaABos5cm1d5g2QLizQv1/C6ziZZvblAklCnzoi
+        69MGspg5ZJ9KJ
+X-Received: by 2002:a37:9a95:: with SMTP id c143mr336814qke.201.1589491541748;
+        Thu, 14 May 2020 14:25:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwiNs/Iz+y1EJvRQqDBIFBJ9ciXXLpzG5kxc5nWqOibFPZOFtWmZWw9dt+cyJR7ZguLOk4Vbg==
+X-Received: by 2002:a37:9a95:: with SMTP id c143mr336788qke.201.1589491541421;
+        Thu, 14 May 2020 14:25:41 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id v82sm75173qkb.102.2020.05.14.14.25.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2020 14:25:40 -0700 (PDT)
+Date:   Thu, 14 May 2020 17:25:38 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, jgg@ziepe.ca
+Subject: Re: [PATCH 0/2] vfio/type1/pci: IOMMU PFNMAP invalidation
+Message-ID: <20200514212538.GB449815@xz-x1>
+References: <158947414729.12590.4345248265094886807.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <CAJ-EccP6GNmyCGJZFfXUo2_8KEN_sJZ3=88f+3E-8SJ=JT8Pcg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <158947414729.12590.4345248265094886807.stgit@gimli.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/05/20 19:44, Micah Morton wrote:
-> I realize this may seem like an over-use of VFIO, but I'm actually
-> coming from the angle of wanting to assign _most_ of the important
-> hardware on my device to a VM guest, and I'm looking to avoid
-> emulation wherever possible. Of course there will be devices like the
-> IOAPIC for which emulation is unavoidable, but I think emulation is
-> avoidable here for the busses we've mentioned if there is a way to
-> forward arbitrary interrupts into the guest.
-> 
-> Since all these use cases are so close to working with vfio-pci right
-> out of the box, I was really hoping to come up with a simple and
-> generic solution to the arbitrary interrupt problem that can be used
-> for multiple bus types.
+On Thu, May 14, 2020 at 10:51:46AM -0600, Alex Williamson wrote:
+> This is a follow-on series to "vfio-pci: Block user access to disabled
+> device MMIO"[1], which extends user access blocking of disabled MMIO
+> ranges to include unmapping the ranges from the IOMMU.  The first patch
+> adds an invalidation callback path, allowing vfio bus drivers to signal
+> the IOMMU backend to unmap ranges with vma level granularity.  This
+> signaling is done both when the MMIO range becomes inaccessible due to
+> memory disabling, as well as when a vma is closed, making up for the
+> lack of tracking or pinning for non-page backed vmas.  The second
+> patch adds registration and testing interfaces such that the IOMMU
+> backend driver can test whether a given PFNMAP vma is provided by a
+> vfio bus driver supporting invalidation.  We can then implement more
+> restricted semantics to only allow PFNMAP DMA mappings when we have
+> such support, which becomes the new default.
 
-I shall defer to Alex on this, but I think the main issue here is that
-these interrupts are not visible to Linux as pertaining to the pci-stub
-device.  Is this correct?
+Hi, Alex,
 
-Paolo
+IIUC we'll directly tearing down the IOMMU page table without telling the
+userspace for those PFNMAP pages.  I'm thinking whether there be any side
+effect on the userspace side when userspace cached these mapping information
+somehow.  E.g., is there a way for userspace to know this event?
+
+Currently, QEMU VT-d will maintain all the IOVA mappings for each assigned
+device when used with vfio-pci.  In this case, QEMU will probably need to
+depend some invalidations sent from the guest (either userspace or kernel)
+device drivers to invalidate such IOVA mappings after they got removed from the
+hardware IOMMU page table underneath.  I haven't thought deeper on what would
+happen if the vIOMMU has got an inconsistent mapping of the real device.
+
+Thanks,
+
+-- 
+Peter Xu
 
