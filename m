@@ -2,267 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A0021D37E7
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 19:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D5971D386B
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 19:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726122AbgENRVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 13:21:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48306 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725975AbgENRVD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 13:21:03 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04EH2Pmn066830;
-        Thu, 14 May 2020 13:21:03 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3111w8tcrr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 May 2020 13:21:02 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04EH3VRI072520;
-        Thu, 14 May 2020 13:21:02 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3111w8tcre-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 May 2020 13:21:02 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04EHCmOS018153;
-        Thu, 14 May 2020 17:21:01 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma02dal.us.ibm.com with ESMTP id 3100uccdu6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 May 2020 17:21:01 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04EHKvhx60162510
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 May 2020 17:20:57 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 65782C605F;
-        Thu, 14 May 2020 17:20:57 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 851A7C6057;
-        Thu, 14 May 2020 17:20:56 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.130.116])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Thu, 14 May 2020 17:20:56 +0000 (GMT)
-Subject: Re: [PATCH v6 2/2] s390/kvm: diagnose 318 handling
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com
-References: <20200513221557.14366-1-walling@linux.ibm.com>
- <20200513221557.14366-3-walling@linux.ibm.com>
- <d4320d09-7b3a-ac13-77be-02397f4ccc83@redhat.com>
- <de4e4416-5158-b60f-e2a8-fb6d3d48d516@linux.ibm.com>
- <88d27a61-b55b-ee68-f7f9-85ce7fcefd64@redhat.com>
- <e7691d9a-a446-17db-320e-a2348e0eb057@linux.ibm.com>
- <516405b3-67c4-aa12-1fa5-772e401e4403@redhat.com>
-From:   Collin Walling <walling@linux.ibm.com>
-Message-ID: <2aa0d573-b9d4-8022-9ec5-79f7156d1bcb@linux.ibm.com>
-Date:   Thu, 14 May 2020 13:20:55 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1726161AbgENRgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 13:36:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36482 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725975AbgENRgN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 13:36:13 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D64FC061A0E
+        for <kvm@vger.kernel.org>; Thu, 14 May 2020 10:36:13 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id t12so2049063ile.9
+        for <kvm@vger.kernel.org>; Thu, 14 May 2020 10:36:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=laayNMnmOVsy26th4W6U6fTp63iOfmzV8Vb77JU5OjI=;
+        b=mPqdiSifcuRBMG5EPyS7l9qsCIzwPKTczEG9bPI/UiTe4KjZsr4TADsF5d4qN1I1+b
+         UfC2tsMTtkz5tmVqI35Wx7fsq4ykek5JDOB/S27rZXnr77VBWjBaW2LPOGc3uxHaj59w
+         xKPZFquBPsORRYOCxrZi72WmXGJVEJw95smneUGO0yc11Atjg5j6uWGpcQFiyBqwDWvc
+         kApY9nSz0fg6GONFTPMTXBezB5H3IebBMs8n2/7xOyq4nhd8a+KkQOsedcSxmsgKqPb3
+         9/V6g72Jvw6Me4QKQZq9eWjrpZRKoK6iCygdJcgPyyrI2XIJ8EQUjPYoUS2eh9LWNR/o
+         aObQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=laayNMnmOVsy26th4W6U6fTp63iOfmzV8Vb77JU5OjI=;
+        b=q4OUNC2EScm0DJL8cCdiEW34GygW1nAvoa99lZ6h9hOKAFV5auJow8/DHW8vecqru9
+         cP5UI2GfynGQJZsAEGiF8RXMHQfUjoY/cULpULgET/lN6EusDrhIDOKbQgUEL/HC9Cm0
+         hil8r7DDfIYxE9mV2AlUXa6IYElkgmnqANytjwOiLZGw7CB77TlK/ZdTKt/zD63XzchX
+         EPTPp1PQh+CArI+xHJu1WVs+cmNc7DWxGw7/ASkbAacdjxQ//KV5t2Kct/+5FC6FK3Ip
+         BV20r4CYuvff6r7/KmQy2LtOmpyd50eY9+DYjGI/glfTHPB1ODxUr/Zybv42fRI1zd46
+         LkOg==
+X-Gm-Message-State: AOAM530pfpYMs+4xdXRzxVk3u4G6ykClkUlbnceo42JhGSPIJzN1T77Z
+        /DoUu9mHLNkT71abML+rszC4q73eyqzDfq5c9ZA6Io6bCA==
+X-Google-Smtp-Source: ABdhPJz0ppakynZnDNr1oGJklp9r+6+UsPiLnLzitHvsOzAq27IiH+96KfmBDqX4cg4cxp48dbrbcuA9lHjM0QZWX7k=
+X-Received: by 2002:a92:4a0d:: with SMTP id m13mr5529000ilf.98.1589477772346;
+ Thu, 14 May 2020 10:36:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <516405b3-67c4-aa12-1fa5-772e401e4403@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-14_05:2020-05-14,2020-05-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 priorityscore=1501 impostorscore=0
- cotscore=-2147483648 clxscore=1015 mlxscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005140147
+References: <20200504110344.17560-1-eesposit@redhat.com> <CA+VK+GN=iDhDV2ZDJbBsxrjZ3Qoyotk_L0DvsbwDVvqrpFZ8fQ@mail.gmail.com>
+ <29982969-92f6-b6d0-aeae-22edb401e3ac@redhat.com> <CA+VK+GOccmwVov9Fx1eMZkzivBduWRuoyAuCRtjMfM4LemRkgw@mail.gmail.com>
+ <fe21094c-bdb0-b802-482e-72bc17e5232a@redhat.com>
+In-Reply-To: <fe21094c-bdb0-b802-482e-72bc17e5232a@redhat.com>
+From:   Jonathan Adams <jwadams@google.com>
+Date:   Thu, 14 May 2020 10:35:35 -0700
+Message-ID: <CA+VK+GOnVK23X+J-VVWUK6VVpkeVOvsmQAw=HAf89h_ksYM9Rg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] Statsfs: a new ram-based file sytem for Linux
+ kernel statistics
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/14/20 5:53 AM, David Hildenbrand wrote:
-> On 14.05.20 11:49, Janosch Frank wrote:
->> On 5/14/20 11:37 AM, David Hildenbrand wrote:
->>> On 14.05.20 10:52, Janosch Frank wrote:
->>>> On 5/14/20 9:53 AM, Thomas Huth wrote:
->>>>> On 14/05/2020 00.15, Collin Walling wrote:
->>>>>> DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
->>>>>> be intercepted by SIE and handled via KVM. Let's introduce some
->>>>>> functions to communicate between userspace and KVM via ioctls. These
->>>>>> will be used to get/set the diag318 related information, as well as
->>>>>> check the system if KVM supports handling this instruction.
->>>>>>
->>>>>> This information can help with diagnosing the environment the VM is
->>>>>> running in (Linux, z/VM, etc) if the OS calls this instruction.
->>>>>>
->>>>>> By default, this feature is disabled and can only be enabled if a
->>>>>> user space program (such as QEMU) explicitly requests it.
->>>>>>
->>>>>> The Control Program Name Code (CPNC) is stored in the SIE block
->>>>>> and a copy is retained in each VCPU. The Control Program Version
->>>>>> Code (CPVC) is not designed to be stored in the SIE block, so we
->>>>>> retain a copy in each VCPU next to the CPNC.
->>>>>>
->>>>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->>>>>> ---
->>>>>>  Documentation/virt/kvm/devices/vm.rst | 29 +++++++++
->>>>>>  arch/s390/include/asm/kvm_host.h      |  6 +-
->>>>>>  arch/s390/include/uapi/asm/kvm.h      |  5 ++
->>>>>>  arch/s390/kvm/diag.c                  | 20 ++++++
->>>>>>  arch/s390/kvm/kvm-s390.c              | 89 +++++++++++++++++++++++++++
->>>>>>  arch/s390/kvm/kvm-s390.h              |  1 +
->>>>>>  arch/s390/kvm/vsie.c                  |  2 +
->>>>>>  7 files changed, 151 insertions(+), 1 deletion(-)
->>>>> [...]
->>>>>> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
->>>>>> index 563429dece03..3caed4b880c8 100644
->>>>>> --- a/arch/s390/kvm/diag.c
->>>>>> +++ b/arch/s390/kvm/diag.c
->>>>>> @@ -253,6 +253,24 @@ static int __diag_virtio_hypercall(struct kvm_vcpu *vcpu)
->>>>>>  	return ret < 0 ? ret : 0;
->>>>>>  }
->>>>>>  
->>>>>> +static int __diag_set_diag318_info(struct kvm_vcpu *vcpu)
->>>>>> +{
->>>>>> +	unsigned int reg = (vcpu->arch.sie_block->ipa & 0xf0) >> 4;
->>>>>> +	u64 info = vcpu->run->s.regs.gprs[reg];
->>>>>> +
->>>>>> +	if (!vcpu->kvm->arch.use_diag318)
->>>>>> +		return -EOPNOTSUPP;
->>>>>> +
->>>>>> +	vcpu->stat.diagnose_318++;
->>>>>> +	kvm_s390_set_diag318_info(vcpu->kvm, info);
->>>>>> +
->>>>>> +	VCPU_EVENT(vcpu, 3, "diag 0x318 cpnc: 0x%x cpvc: 0x%llx",
->>>>>> +		   vcpu->kvm->arch.diag318_info.cpnc,
->>>>>> +		   (u64)vcpu->kvm->arch.diag318_info.cpvc);
+On Mon, May 11, 2020 at 10:34 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Hi Jonathan, I think the remaining sticky point is this one:
 
-Errr.. thought I dropped this message. We favored just using the
-VM_EVENT from last time.
+Apologies it took a couple days for me to respond; I wanted to finish
+evaluating our current usage to make sure I had a full picture; I'll
+summarize our state at the bottom.
 
->>>>>> +
->>>>>> +	return 0;
->>>>>> +}
->>>>>> +
->>>>>>  int kvm_s390_handle_diag(struct kvm_vcpu *vcpu)
->>>>>>  {
->>>>>>  	int code = kvm_s390_get_base_disp_rs(vcpu, NULL) & 0xffff;
->>>>>> @@ -272,6 +290,8 @@ int kvm_s390_handle_diag(struct kvm_vcpu *vcpu)
->>>>>>  		return __diag_page_ref_service(vcpu);
->>>>>>  	case 0x308:
->>>>>>  		return __diag_ipl_functions(vcpu);
->>>>>> +	case 0x318:
->>>>>> +		return __diag_set_diag318_info(vcpu);
->>>>>>  	case 0x500:
->>>>>>  		return __diag_virtio_hypercall(vcpu);
->>>>>
->>>>> I wonder whether it would make more sense to simply drop to userspace
->>>>> and handle the diag 318 call there? That way the userspace would always
->>>>> be up-to-date, and as we've seen in the past (e.g. with the various SIGP
->>>>> handling), it's better if the userspace is in control... e.g. userspace
->>>>> could also decide to only use KVM_S390_VM_MISC_ENABLE_DIAG318 if the
->>>>> guest just executed the diag 318 instruction.
->>>>>
->>>>> And you need the kvm_s390_vm_get/set_misc functions anyway, so these
->>>>> could also be simply used by the diag 318 handler in userspace?
+> On 11/05/20 19:02, Jonathan Adams wrote:
+> > I think I'd characterize this slightly differently; we have a set of
+> > statistics which are essentially "in parallel":
+> >
+> >   - a variety of statistics, N CPUs they're available for, or
+> >   - a variety of statistics, N interfaces they're available for.
+> >   - a variety of statistics, N kvm object they're available for.
+> >
+> > Recreating a parallel hierarchy of statistics any time we add/subtract
+> > a CPU or interface seems like a lot of overhead.  Perhaps a better
+> > model would be some sort of "parameter enumn" (naming is hard;
+> > parameter set?), so when a CPU/network interface/etc is added you'd
+> > add its ID to the "CPUs" we know about, and at removal time you'd
+> > take it out; it would have an associated cbarg for the value getting
+> > callback.
+> >
+> >> Yep, the above "not create a dentry" flag would handle the case where
+> >> you sum things up in the kernel because the more fine grained counters
+> >> would be overwhelming.
+> >
+> > nodnod; or the callback could handle the sum itself.
+>
+> In general for statsfs we took a more explicit approach where each
+> addend in a sum is a separate stats_fs_source.  In this version of the
+> patches it's also a directory, but we'll take your feedback and add both
+> the ability to hide directories (first) and to list values (second).
+>
+> So, in the cases of interfaces and KVM objects I would prefer to keep
+> each addend separate.
 
-Pardon my ignorance, but I do not think I fully understand what exactly
-should be dropped in favor of doing things in userspace.
+This just feels like a lot of churn just to add a statistic or object;
+in your model, every time a KVM or VCPU is created, you create the N
+statistics, leading to N*M total objects.  As I was imagining it,
+you'd have:
 
-My assumption: if a diag handler is not found in KVM, then we
-fallthrough to userspace handling?
+    A 'parameter enum' which maps names to object pointers and
+    A set of statistics which map a statfs path to {callback, cbarg,
+zero or more parameter enums}
 
->>>>>
->>>>>>  	default:
->>>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>>>>> index d05bb040fd42..c3eee468815f 100644
->>>>>> --- a/arch/s390/kvm/kvm-s390.c
->>>>>> +++ b/arch/s390/kvm/kvm-s390.c
->>>>>> @@ -159,6 +159,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
->>>>>>  	{ "diag_9c_ignored", VCPU_STAT(diagnose_9c_ignored) },
->>>>>>  	{ "instruction_diag_258", VCPU_STAT(diagnose_258) },
->>>>>>  	{ "instruction_diag_308", VCPU_STAT(diagnose_308) },
->>>>>> +	{ "instruction_diag_318", VCPU_STAT(diagnose_318) },
->>>>>>  	{ "instruction_diag_500", VCPU_STAT(diagnose_500) },
->>>>>>  	{ "instruction_diag_other", VCPU_STAT(diagnose_other) },
->>>>>>  	{ NULL }
->>>>>> @@ -1243,6 +1244,76 @@ static int kvm_s390_get_tod(struct kvm *kvm, struct kvm_device_attr *attr)
->>>>>>  	return ret;
->>>>>>  }
->>>>>>  
->>>>>> +void kvm_s390_set_diag318_info(struct kvm *kvm, u64 info)
->>>>>> +{
->>>>>> +	struct kvm_vcpu *vcpu;
->>>>>> +	int i;
->>>>>> +
->>>>>> +	kvm->arch.diag318_info.val = info;
->>>>>> +
->>>>>> +	VM_EVENT(kvm, 3, "SET: CPNC: 0x%x CPVC: 0x%llx",
->>>>>> +		 kvm->arch.diag318_info.cpnc, kvm->arch.diag318_info.cpvc);
->>>>>> +
->>>>>> +	if (sclp.has_diag318) {
->>>>>> +		kvm_for_each_vcpu(i, vcpu, kvm) {
->>>>>> +			vcpu->arch.sie_block->cpnc = kvm->arch.diag318_info.cpnc;
->>>>>> +		}
->>>>>> +	}
->>>>>> +}
->>>>>> +
->>>>>> +static int kvm_s390_vm_set_misc(struct kvm *kvm, struct kvm_device_attr *attr)
->>>>>> +{
->>>>>> +	int ret;
->>>>>> +	u64 diag318_info;
->>>>>> +
->>>>>> +	switch (attr->attr) {
->>>>>> +	case KVM_S390_VM_MISC_ENABLE_DIAG318:
->>>>>> +		kvm->arch.use_diag318 = 1;
->>>>>> +		ret = 0;
->>>>>> +		break;
->>>>>
->>>>> Would it make sense to set kvm->arch.use_diag318 = 1 during the first
->>>>> execution of KVM_S390_VM_MISC_DIAG318 instead, so that we could get
->>>>> along without the KVM_S390_VM_MISC_ENABLE_DIAG318 ?
->>>>
+So adding a new KVM VCPU would just be "add an object to the KVM's
+VCPU parameter enum", and removing it would be the opposite, and a
+couple callbacks could handle basically all of the stats.   The only
+tricky part would be making sure the parameter enum value
+create/destroy and the callback calls are coordinated correctly.
 
-Hmmm... is your thought set the flag in the diag handler in KVM? That
-way the get/set functions are only enabled if the instruction was
-actually called? I like that, actually. I think that makes more sense.
+If you wanted stats for a particular VCPU, we could mark the overall
+directory as "include subdirs for VCPU parameter", and you'd
+automatically get one directory per VCPU, with the same set of stats
+in it, constrained to the single VCPU.  I could also imagine having an
+".agg_sum/{stata,statb,...}" to report using the aggregations you
+have, or a mode to say "stats in this directory are sums over the
+following VCPU parameter".
 
->>>> I'm not an expert in feature negotiation, but why isn't this a cpu
->>>> feature like sief2 instead of a attribute?
->>>>
->>>> @David?
->>>
->>> In the end you want to have it somehow in the CPU model I guess. You
->>> cannot glue it to QEMU machines, because availability depends on HW+KVM
->>> support.
->>>
->>> How does the guest detect that it can use diag318? I assume/hope via a a
->>> STFLE feature.
->>>
->> SCLP
-> 
-> Okay, so just another feature flag, which implies it belongs into the
-> CPU model. How we communicate support from kvm to QEMU can be done via
-> features, bot also via attributes. Important part is that we can
-> sense/enable/disable.
-> 
-> 
+> For CPUs that however would be pretty bad.  Many subsystems might
+> accumulate stats percpu for performance reason, which would then be
+> exposed as the sum (usually).  So yeah, native handling of percpu values
+> makes sense.  I think it should fit naturally into the same custom
+> aggregation framework as hash table keys, we'll see if there's any devil
+> in the details.
+>
+> Core kernel stats such as /proc/interrupts or /proc/stat are the
+> exception here, since individual per-CPU values can be vital for
+> debugging.  For those, creating a source per stat, possibly on-the-fly
+> at hotplug/hot-unplug time because NR_CPUS can be huge, would still be
+> my preferred way to do it.
 
-Right. KVM for instruction handling and for get/setting (setting also
-handles setting the name code in the SIE block), and QEMU for migration
-/ resetting.
+Our metricfs has basically two modes: report all per-CPU values (for
+the IPI counts etc; you pass a callback which takes a 'int cpu'
+argument) or a callback that sums over CPUs and reports the full
+value.  It also seems hard to have any subsystem with a per-CPU stat
+having to install a hotplug callback to add/remove statistics.
 
-There are a lot of moving parts for a simple 8-byte string of data, but
-its very useful for giving us more information regarding the OS during
-firmware / service events.
+In my model, a "CPU" parameter enum which is automatically kept
+up-to-date is probably sufficient for the "report all per-CPU values".
 
--- 
---
-Regards,
-Collin
+Does this make sense to you?  I realize that this is a significant
+change to the model y'all are starting with; I'm willing to do the
+work to flesh it out.
 
-Stay safe and stay healthy
+Thanks for your time,
+- Jonathan
+
+P.S.  Here's a summary of the types of statistics we use in metricfs
+in google, to give a little context:
+
+- integer values (single value per stat, source also a single value);
+a couple of these are boolean values exported as '0' or '1'.
+- per-CPU integer values, reported as a <cpuid, value> table
+- per-CPU integer values, summed and reported as an aggregate
+- single-value values, keys related to objects:
+    - many per-device (disk, network, etc) integer stats
+    - some per-device string data (version strings, UUIDs, and
+occasional statuses.)
+- a few histograms (usually counts by duration ranges)
+- the "function name" to count for the WARN statistic I mentioned.
+- A single statistic with two keys (for livepatch statistics; the
+value is the livepatch status as a string)
+
+Most of the stats with keys are "complete" (every key has a value),
+but there are several examples of statistics where only some of the
+possible keys have values, or (e.g. for networking statistics) only
+the keys visible to the reading process (e.g. in its namespaces) are
+included.
