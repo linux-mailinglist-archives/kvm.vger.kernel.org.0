@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 907DE1D2A2B
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:33:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 984511D2A23
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:31:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726225AbgENIbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 04:31:24 -0400
+        id S1726374AbgENIb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 04:31:29 -0400
 Received: from mga18.intel.com ([134.134.136.126]:12089 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726184AbgENIbX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 04:31:23 -0400
-IronPort-SDR: NOCT9Ix1cmtiGFN7BMH2ErFTTtsspIHovv/JYksSh5hTVkfLRyfTUzj0HwxqEeSWiVRBUAY+Wr
- F0G+VE//oYYA==
+        id S1725970AbgENIb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 04:31:28 -0400
+IronPort-SDR: ApFl5oTnSLQtVVGrnoV0a6G2r3Ncqs8PoBys6VfYGrD/DMgnyW5TuLw1Hk4/APtl0FPvctdeyY
+ ZPvq+bDUXVCA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:22 -0700
-IronPort-SDR: Ox397vVNy8HAkIYHQRZ1Ofs2gGmD6NCWn3uCPgBNajFHD5ZQz2lLrg2ansqzL+3KjeVoAMTuZb
- pE1ggiMwd9xQ==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:27 -0700
+IronPort-SDR: Yy5f+09HqVcYBzklsHZ+VH23XQzVL9jta9UM8SqQwCRi24dlzc5Nhjk1aC0KZU16vOPPyQt9NP
+ Jy4R7e27UyTQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,390,1583222400"; 
-   d="scan'208";a="341539958"
+   d="scan'208";a="341539971"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:19 -0700
+  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:23 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -35,159 +35,159 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
         wei.w.wang@intel.com, Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v11 04/11] perf/x86: Add constraint to create guest LBR event without hw counter
-Date:   Thu, 14 May 2020 16:30:47 +0800
-Message-Id: <20200514083054.62538-5-like.xu@linux.intel.com>
+Subject: [PATCH v11 05/11] perf/x86: Keep LBR stack unchanged in host context for guest LBR event
+Date:   Thu, 14 May 2020 16:30:48 +0800
+Message-Id: <20200514083054.62538-6-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200514083054.62538-1-like.xu@linux.intel.com>
 References: <20200514083054.62538-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The hypervisor may request the perf subsystem to schedule a time window
-to directly access the LBR stack msrs for its own use. Normally, it would
-create a guest LBR event with callstack mode enabled, which is scheduled
-along with other ordinary LBR events on the host but in an exclusive way.
+When a guest wants to use the LBR stack, its hypervisor creates a guest
+LBR event and let host perf schedules it. A new 'int guest_lbr_enabled'
+field in the 'struct cpu_hw_events', is marked as true when perf adds
+a guest LBR event and marked as false on deletion.
 
-To avoid wasting a counter for the guest LBR event, the perf tracks it via
-needs_guest_lbr_without_counter() and assigns it with a fake VLBR counter
-with the help of new lbr_without_counter_constraint. As with the BTS event,
-there is actually no hardware counter assigned for the guest LBR event.
+The LBR stack msrs are accessible to the guest when its guest LBR event
+is scheduled in by the perf subsystem. Before scheduling this event out,
+we should avoid host changes on IA32_DEBUGCTLMSR or LBR_SELECT.
+Otherwise, some unexpected branch operations may interfere with guest
+behavior, pollute LBR records, and even cause host branch data leakage.
+In addition, the intel_pmu_lbr_read() on the host is also avoidable.
+
+To ensure that guest LBR records are not lost during the context switch,
+the BRANCH_CALL_STACK flag should be configured in the 'branch_sample_type'
+for any guest LBR event because the callstack mode could save/restore guest
+unread LBR records with the help of intel_pmu_lbr_sched_task() naturally.
+
+However, the regular host LBR perf event doesn't save/restore LBR_SELECT,
+because it's configured in the LBR_enable() based on branch_sample_type.
+So when a guest LBR is running, the guest LBR_SELECT may changes for its
+own use and we have to support LBR_SELECT save/restore to ensure what the
+guest LBR_SELECT value doesn't get lost during the context switching.
 
 Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
+Co-developed-by: Wei Wang <wei.w.wang@intel.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/events/core.c            |  1 +
- arch/x86/events/intel/core.c      | 20 ++++++++++++++++++++
- arch/x86/events/intel/lbr.c       |  3 +++
- arch/x86/events/perf_event.h      |  6 ++++++
- arch/x86/include/asm/perf_event.h | 22 +++++++++++++++++++++-
- 5 files changed, 51 insertions(+), 1 deletion(-)
+ arch/x86/events/intel/lbr.c  | 33 ++++++++++++++++++++++++++++++---
+ arch/x86/events/perf_event.h |  2 ++
+ 2 files changed, 32 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index f7a259dcbb06..2405926e2dba 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -1104,6 +1104,7 @@ static inline void x86_assign_hw_event(struct perf_event *event,
- 
- 	switch (hwc->idx) {
- 	case INTEL_PMC_IDX_FIXED_BTS:
-+	case INTEL_PMC_IDX_FIXED_VLBR:
- 		hwc->config_base = 0;
- 		hwc->event_base	= 0;
- 		break;
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index f1439acbf7e6..112bc8367d5b 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -2621,6 +2621,22 @@ intel_bts_constraints(struct perf_event *event)
- 	return NULL;
- }
- 
-+/*
-+ * Note, the event that satisfies this constraint will not be assigned
-+ * with a normal hardware counter but a fake one like BTS event.
-+ *
-+ * The guest LBR event uses it in the __intel_get_event_constraints()
-+ * to make sure LBR registers to be used exclusively for guest.
-+ */
-+static struct event_constraint *
-+intel_guest_lbr_constraints(struct perf_event *event)
-+{
-+	if (unlikely(is_guest_lbr_event(event)))
-+		return &guest_lbr_constraint;
-+
-+	return NULL;
-+}
-+
- static int intel_alt_er(int idx, u64 config)
- {
- 	int alt_idx = idx;
-@@ -2811,6 +2827,10 @@ __intel_get_event_constraints(struct cpu_hw_events *cpuc, int idx,
- {
- 	struct event_constraint *c;
- 
-+	c = intel_guest_lbr_constraints(event);
-+	if (c)
-+		return c;
-+
- 	c = intel_bts_constraints(event);
- 	if (c)
- 		return c;
 diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-index 6c60dcaaaf69..0a91cbe3a7c7 100644
+index 0a91cbe3a7c7..ff8d0433837d 100644
 --- a/arch/x86/events/intel/lbr.c
 +++ b/arch/x86/events/intel/lbr.c
-@@ -1363,3 +1363,6 @@ int x86_perf_get_lbr(struct x86_pmu_lbr *stack)
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(x86_perf_get_lbr);
+@@ -383,6 +383,15 @@ static void __intel_pmu_lbr_restore(struct x86_perf_task_context *task_ctx)
+ 
+ 	wrmsrl(x86_pmu.lbr_tos, tos);
+ 	task_ctx->lbr_stack_state = LBR_NONE;
 +
-+struct event_constraint guest_lbr_constraint =
-+	EVENT_CONSTRAINT(0, 1ULL << INTEL_PMC_IDX_FIXED_VLBR, 0);
++	/*
++	 * When the LBR hardware is scheduled for a guest LBR event,
++	 * the guest lbr_sel is likely different from event->hw.branch_reg.
++	 * Therefore, it’s necessary to save/restore MSR_LBR_SELECT written
++	 * by the guest so that it's not lost during the context switch.
++	 */
++	if (cpuc->guest_lbr_enabled)
++		wrmsrl(MSR_LBR_SELECT, task_ctx->lbr_sel);
+ }
+ 
+ static void __intel_pmu_lbr_save(struct x86_perf_task_context *task_ctx)
+@@ -415,6 +424,9 @@ static void __intel_pmu_lbr_save(struct x86_perf_task_context *task_ctx)
+ 
+ 	cpuc->last_task_ctx = task_ctx;
+ 	cpuc->last_log_id = ++task_ctx->log_id;
++
++	if (cpuc->guest_lbr_enabled)
++		rdmsrl(MSR_LBR_SELECT, task_ctx->lbr_sel);
+ }
+ 
+ void intel_pmu_lbr_swap_task_ctx(struct perf_event_context *prev,
+@@ -485,6 +497,9 @@ void intel_pmu_lbr_add(struct perf_event *event)
+ 	if (!x86_pmu.lbr_nr)
+ 		return;
+ 
++	if (is_guest_lbr_event(event))
++		cpuc->guest_lbr_enabled = 1;
++
+ 	cpuc->br_sel = event->hw.branch_reg.reg;
+ 
+ 	if (branch_user_callstack(cpuc->br_sel) && event->ctx->task_ctx_data) {
+@@ -532,6 +547,9 @@ void intel_pmu_lbr_del(struct perf_event *event)
+ 		task_ctx->lbr_callstack_users--;
+ 	}
+ 
++	if (is_guest_lbr_event(event))
++		cpuc->guest_lbr_enabled = 0;
++
+ 	if (x86_pmu.intel_cap.pebs_baseline && event->attr.precise_ip > 0)
+ 		cpuc->lbr_pebs_users--;
+ 	cpuc->lbr_users--;
+@@ -544,7 +562,12 @@ void intel_pmu_lbr_enable_all(bool pmi)
+ {
+ 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+ 
+-	if (cpuc->lbr_users)
++	/*
++	 * When the LBR hardware is scheduled for a guest LBR event,
++	 * the guest will dis/enables LBR itself at the appropriate time,
++	 * including configuring MSR_LBR_SELECT.
++	 */
++	if (cpuc->lbr_users && !cpuc->guest_lbr_enabled)
+ 		__intel_pmu_lbr_enable(pmi);
+ }
+ 
+@@ -552,7 +575,7 @@ void intel_pmu_lbr_disable_all(void)
+ {
+ 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+ 
+-	if (cpuc->lbr_users)
++	if (cpuc->lbr_users && !cpuc->guest_lbr_enabled)
+ 		__intel_pmu_lbr_disable();
+ }
+ 
+@@ -693,8 +716,12 @@ void intel_pmu_lbr_read(void)
+ 	 *
+ 	 * This could be smarter and actually check the event,
+ 	 * but this simple approach seems to work for now.
++	 *
++	 * And there is no need to read LBR record here if a guest LBR
++	 * event is using it, because the guest will read them on its own.
+ 	 */
+-	if (!cpuc->lbr_users || cpuc->lbr_users == cpuc->lbr_pebs_users)
++	if (!cpuc->lbr_users || cpuc->guest_lbr_enabled ||
++	    cpuc->lbr_users == cpuc->lbr_pebs_users)
+ 		return;
+ 
+ 	if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_32)
 diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
-index 1025bc6eb04f..34d76a2f5ebd 100644
+index 34d76a2f5ebd..8d322b0204c8 100644
 --- a/arch/x86/events/perf_event.h
 +++ b/arch/x86/events/perf_event.h
-@@ -969,6 +969,11 @@ static inline bool intel_pmu_has_bts(struct perf_event *event)
- 	return intel_pmu_has_bts_period(event, hwc->sample_period);
- }
+@@ -237,6 +237,7 @@ struct cpu_hw_events {
+ 	u64				br_sel;
+ 	struct x86_perf_task_context	*last_task_ctx;
+ 	int				last_log_id;
++	int				guest_lbr_enabled;
  
-+static inline bool is_guest_lbr_event(struct perf_event *event)
-+{
-+	return event->attr.config == INTEL_FIXED_VLBR_EVENT;
-+}
-+
- int intel_pmu_save_and_restart(struct perf_event *event);
- 
- struct event_constraint *
-@@ -989,6 +994,7 @@ void release_ds_buffers(void);
- void reserve_ds_buffers(void);
- 
- extern struct event_constraint bts_constraint;
-+extern struct event_constraint guest_lbr_constraint;
- 
- void intel_pmu_enable_bts(u64 config);
- 
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 5071515f6b0f..d1938484854d 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -192,9 +192,29 @@ struct x86_pmu_capability {
- #define GLOBAL_STATUS_UNC_OVF				BIT_ULL(61)
- #define GLOBAL_STATUS_ASIF				BIT_ULL(60)
- #define GLOBAL_STATUS_COUNTERS_FROZEN			BIT_ULL(59)
--#define GLOBAL_STATUS_LBRS_FROZEN			BIT_ULL(58)
-+#define GLOBAL_STATUS_LBRS_FROZEN_BIT			58
-+#define GLOBAL_STATUS_LBRS_FROZEN			BIT_ULL(GLOBAL_STATUS_LBRS_FROZEN_BIT)
- #define GLOBAL_STATUS_TRACE_TOPAPMI			BIT_ULL(55)
- 
-+/*
-+ * We model guest LBR event tracing as another fixed-mode PMC like BTS.
-+ *
-+ * We choose bit 58 because it's used to indicate LBR stack frozen state
-+ * for architectural perfmon v4, also we unconditionally mask that bit in
-+ * the handle_pmi_common(), so it'll never be set in the overflow handling.
-+ *
-+ * With this fake counter assigned, the guest LBR event user (such as KVM),
-+ * can program the LBR registers on its own, and we don't actually do anything
-+ * with then in the host context.
-+ */
-+#define INTEL_PMC_IDX_FIXED_VLBR	GLOBAL_STATUS_LBRS_FROZEN_BIT
-+
-+/*
-+ * Pseudo-encoding the guest LBR event as event=0x00,umask=0x1a,
-+ * since it would claim bit 58 which is effectively Fixed25.
-+ */
-+#define INTEL_FIXED_VLBR_EVENT	0x1a00
-+
- /*
-  * Adaptive PEBS v4
-  */
+ 	/*
+ 	 * Intel host/guest exclude bits
+@@ -721,6 +722,7 @@ struct x86_perf_task_context {
+ 	u64 lbr_from[MAX_LBR_ENTRIES];
+ 	u64 lbr_to[MAX_LBR_ENTRIES];
+ 	u64 lbr_info[MAX_LBR_ENTRIES];
++	u64 lbr_sel;
+ 	int tos;
+ 	int valid_lbrs;
+ 	int lbr_callstack_users;
 -- 
 2.21.3
 
