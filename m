@@ -2,103 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1DC81D40E1
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 00:24:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E9B31D4141
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 00:43:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728482AbgENWYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 18:24:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53342 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728466AbgENWYR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 18:24:17 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B863C061A0C
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 15:24:17 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id 190so624412qki.1
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 15:24:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=p6gJR0Sy3H0/XrBYi8uAvN59tWwDOSIM+GynOKet6WU=;
-        b=JHUqTEYZp+HqW1JBxgtnjxP4djlGHQPkmUyH2Wjj5jM9ZprnKhIN8x0G1Kdrwwyfy3
-         1PyW+F6sVeccUBertkUhBvYIgiiX/XngYQ6SzG+6abkuBE7xoaxU1ZpC0sKKDYo0YV8W
-         orOdC1CexbE0pS1bb4xNIbVLo3LEnrFrRF2NYGCVkA4oKOds5T/k2sIfbf9tAelRhVzS
-         vLsDrzLAD2u39msc3xMftQVshOM3NFpcmFH1pryFpeaaQg4wVVLXPMA5KqrLaVSpBv3G
-         /F2+NulO0IAFnv4LRNcljRsce4ozcOy5up8dE4Pi3ok4Hnk6pWgKSmq833UfRxpsgUZr
-         Agjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=p6gJR0Sy3H0/XrBYi8uAvN59tWwDOSIM+GynOKet6WU=;
-        b=rR1VAdZeUIGE2hpAHvOE0uSjObQTXBwUvrX7flEJp2ASocCcroHJrG/I3fPgj7mAc4
-         ZZ116ruOZNDGU+8v8SaqVcjlPNCeboqr7eFzMplJSwKIvafKf/+N/yR4pkXGcgvRGlGp
-         VOmWV6uDNLIHICFMHiuZzUK8ccLwDCkkb/pei0U+v41Tx6bPHHsa/ioybGL1sDauUUiw
-         3S+9eH305gVmTEP6C+nkU5ThuiroGU7oJ+ZTN7VIi81shy1irxlg+pcycMW+GJ3d6Ixf
-         IHr4os+QFkD08HBucaHh/ESl0maYYD9h91DA0uUSdXEO53vTLxY5Lhe43UawUF/96mTd
-         QiFw==
-X-Gm-Message-State: AOAM531jbVtDgXWsyQ1fpr0vgq4EPiNmplmhTTX/Znm6/ZJEZgw373cb
-        hl+PCokdnGn1c9yGnE60ZvBS22ZJt0M=
-X-Google-Smtp-Source: ABdhPJwsz6wMRxc1JF8iiotnhQJugDFi5kwnJZK7l9SB8eVt2lnxnmiiN6ML2U+E04O+xdaryGmPuA==
-X-Received: by 2002:a37:8d3:: with SMTP id 202mr594916qki.237.1589495056702;
-        Thu, 14 May 2020 15:24:16 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id g66sm173662qkb.122.2020.05.14.15.24.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 14 May 2020 15:24:16 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jZMH1-0006WK-Mo; Thu, 14 May 2020 19:24:15 -0300
-Date:   Thu, 14 May 2020 19:24:15 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cohuck@redhat.com
-Subject: Re: [PATCH 0/2] vfio/type1/pci: IOMMU PFNMAP invalidation
-Message-ID: <20200514222415.GA24575@ziepe.ca>
-References: <158947414729.12590.4345248265094886807.stgit@gimli.home>
- <20200514212538.GB449815@xz-x1>
- <20200514161712.14b34984@w520.home>
+        id S1728777AbgENWng (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 18:43:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49518 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728229AbgENWng (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 18:43:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589496215;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EuByLHu0fVVYt80Znm7O1SLfFlYE97ZCfHsTDGMqNd0=;
+        b=AHDQYtyrABbpNYj++hdR8pRzkFuDQPzHEgnQg1fPDfCkPyoi+ASWHXhK1pbtHyllkYrwh+
+        Bl/hCJ4V8SHO4OBVwrPC+Oh+BhhBDFdw7W7HTU9xThIzenHBzPvUVCnvXwsLSFZMPfkqe9
+        D5BauyPrzFp5Ujf9jvt221Cp996cgN4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-512-k1tougtUNyKRQqEM0CMInQ-1; Thu, 14 May 2020 18:43:33 -0400
+X-MC-Unique: k1tougtUNyKRQqEM0CMInQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C6FA107B265;
+        Thu, 14 May 2020 22:43:32 +0000 (UTC)
+Received: from w520.home (ovpn-113-111.phx2.redhat.com [10.3.113.111])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E8FC75D714;
+        Thu, 14 May 2020 22:43:27 +0000 (UTC)
+Date:   Thu, 14 May 2020 16:43:27 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Micah Morton <mortonm@chromium.org>,
+        Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        jmattson@google.com
+Subject: Re: [RFC PATCH] KVM: Add module for IRQ forwarding
+Message-ID: <20200514164327.72734a77@w520.home>
+In-Reply-To: <9d5d7eec-77dd-bca9-949f-8f39fcd7d8d7@redhat.com>
+References: <20200511220046.120206-1-mortonm@chromium.org>
+        <20200512111440.15caaca2@w520.home>
+        <92fd66eb-68e7-596f-7dd1-f1c190833be4@redhat.com>
+        <20200513083401.11e761a7@x1.home>
+        <8c0bfeb7-0d08-db74-3a23-7a850f301a2a@redhat.com>
+        <CAJ-EccPjU0Lh5gEnr0L9AhuuJTad1yHX-BzzWq21m+e-vY-ELA@mail.gmail.com>
+        <0fdb5d54-e4d6-8f2f-69fe-1b157999d6cd@redhat.com>
+        <CAJ-EccP6GNmyCGJZFfXUo2_8KEN_sJZ3=88f+3E-8SJ=JT8Pcg@mail.gmail.com>
+        <9d5d7eec-77dd-bca9-949f-8f39fcd7d8d7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200514161712.14b34984@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 14, 2020 at 04:17:12PM -0600, Alex Williamson wrote:
+On Thu, 14 May 2020 23:17:29 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> that much.  I think this would also address Jason's primary concern.
-> It's better to get an IOMMU fault from the user trying to access those
-> mappings than it is to leave them in place.
+> On 14/05/20 19:44, Micah Morton wrote:
+> > I realize this may seem like an over-use of VFIO, but I'm actually
+> > coming from the angle of wanting to assign _most_ of the important
+> > hardware on my device to a VM guest, and I'm looking to avoid
+> > emulation wherever possible. Of course there will be devices like the
+> > IOAPIC for which emulation is unavoidable, but I think emulation is
+> > avoidable here for the busses we've mentioned if there is a way to
+> > forward arbitrary interrupts into the guest.
+> > 
+> > Since all these use cases are so close to working with vfio-pci right
+> > out of the box, I was really hoping to come up with a simple and
+> > generic solution to the arbitrary interrupt problem that can be used
+> > for multiple bus types.  
+> 
+> I shall defer to Alex on this, but I think the main issue here is that
+> these interrupts are not visible to Linux as pertaining to the pci-stub
+> device.  Is this correct?
 
-Yes, there are few options here - if the pages are available for use
-by the IOMMU and *asynchronously* someone else revokes them, then the
-only way to protect the kernel is to block them from the IOMMUU.
+Yes.  Allowing a user to grant themselves access to an arbitrary
+interrupt is a non-starter, vfio-pci needs to somehow know that the
+user is entitled to that interrupt.  If we could do that, then we could
+just add it as a device specific interrupt.  But how do we do that?
 
-For this to be sane the revokation must be under complete control of
-the VFIO user. ie if a user decides to disable MMIO traffic then of
-course the IOMMU should block P2P transfer to the MMIO bar. It is user
-error to have not disabled those transfers in the first place.
+The quirk method to this might be to key off of the PCI vendor and
+device ID of the PCI i2c controller, lookup DMI information to know if
+we're on the platform that has this fixed association, and setup the
+extra interrupt.  The more extensible, but potentially bloated solution
+might be for vfio-pci to recognize the class code for a i2c controller
+and implement a very simple bus walk at device probe time that collects
+external dependencies.  I don't really know how the jump is made from
+that bus walk to digging the interrupt resource out of ACPI though or
+how many LoC would be required to perform the minimum possible
+discovery to collect this association.
 
-When this is all done inside a guest the whole logic applies. On bare
-metal you might get some AER or crash or MCE. In virtualization you'll
-get an IOMMU fault.
+I notice in this RFC patch that you're using an exclusive interrupt for
+level triggered interrupts and therefore masking at the APIC.
+Requiring an exclusive interrupt is often a usability issue for PCI
+devices that don't support DisINTx and obviously we don't have that for
+non-PCI sub-devices.  What type of interrupt do you actually need for
+this device?  Thanks,
 
-> due to the memory enable bit.  If we could remap the range to a kernel
-> page we could maybe avoid the IOMMU fault and maybe even have a crude
-> test for whether any data was written to the page while that mapping
-> was in place (ie. simulating more restricted error handling, though
-> more asynchronous than done at the platform level).  
+Alex
 
-I'm not if this makes sense, can't we arrange to directly trap the
-IOMMU failure and route it into qemu if that is what is desired?
-
-I'll try to look at this next week, swamped right now
-
-Thanks,
-Jason
