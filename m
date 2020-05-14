@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 090241D2A2C
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:33:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE7441D2A26
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:31:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgENIbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 04:31:33 -0400
+        id S1726778AbgENIbg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 04:31:36 -0400
 Received: from mga18.intel.com ([134.134.136.126]:12089 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726347AbgENIbb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 04:31:31 -0400
-IronPort-SDR: Vfr9RHmiN2w9l1zTu2XOR0V37ZXcbyFcc65tKwvm5npyDjr4ev3YYUszcR6FJJ265oqSonICUx
- O6tgiVcO4Hig==
+        id S1726347AbgENIbf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 04:31:35 -0400
+IronPort-SDR: wTQiUBhBLvOyFJBrrJkXT8A0ajBdublVakAKTQNRxuJQWEgTBlYmNz5KXi9CYloYlvgBwEpe/r
+ G+Hr336krtsg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:31 -0700
-IronPort-SDR: a3J8g7jeDDrKX+ntlRdHKVcC1zXQx09IGfJ/qBrcaZWw0take9wzdvM7TIg4L2N7VLwRyFSFno
- 6PBdajgEnqfw==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:34 -0700
+IronPort-SDR: AF5F1wOXH7YgJZ6pUeAOHhl3zP65NnhTkSMjvHwLwjQDB/dSCqWi1md6n3HACXv3B6PdvB0y2H
+ V3PzvzDt5QKA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,390,1583222400"; 
-   d="scan'208";a="341539981"
+   d="scan'208";a="341539991"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:27 -0700
+  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:31 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -34,10 +34,10 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
-        wei.w.wang@intel.com
-Subject: [PATCH v11 06/11] KVM: x86/pmu: Tweak kvm_pmu_get_msr to pass 'struct msr_data' in
-Date:   Thu, 14 May 2020 16:30:49 +0800
-Message-Id: <20200514083054.62538-7-like.xu@linux.intel.com>
+        wei.w.wang@intel.com, Like Xu <like.xu@linux.intel.com>
+Subject: [PATCH v11 07/11] KVM: x86: Expose MSR_IA32_PERF_CAPABILITIES for LBR record format
+Date:   Thu, 14 May 2020 16:30:50 +0800
+Message-Id: <20200514083054.62538-8-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200514083054.62538-1-like.xu@linux.intel.com>
 References: <20200514083054.62538-1-like.xu@linux.intel.com>
@@ -48,162 +48,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wei Wang <wei.w.wang@intel.com>
+The MSR_IA32_PERF_CAPABILITIES is a read only MSR that enumerates the
+existence of performance monitoring features and KVM would always set
+F(PDCM) since worst case it will just be zero.
 
-Change kvm_pmu_get_msr() to get the msr_data struct, as the host_initiated
-field from the struct could be used by get_msr. This also makes this API
-consistent with kvm_pmu_set_msr. No functional changes.
+The bits [0, 5] of MSR_IA32_PERF_CAPABILITIES tells about the LBR format
+of the branch record addresses stored in the LBR stack. User space could
+enable guest LBR by setting the exactly supported LBR format bits for this
+msr_based_feature.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/kvm/pmu.c           |  4 ++--
- arch/x86/kvm/pmu.h           |  4 ++--
- arch/x86/kvm/svm/pmu.c       |  7 ++++---
- arch/x86/kvm/vmx/pmu_intel.c | 19 +++++++++++--------
- arch/x86/kvm/x86.c           |  4 ++--
- 5 files changed, 21 insertions(+), 17 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            |  2 +-
+ arch/x86/kvm/vmx/capabilities.h | 15 +++++++++++++++
+ arch/x86/kvm/vmx/pmu_intel.c    | 23 +++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c          |  3 +++
+ arch/x86/kvm/x86.c              |  1 +
+ 6 files changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index a5078841bdac..b86346903f2e 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -397,9 +397,9 @@ static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
- 		__set_bit(pmc->idx, pmu->pmc_in_use);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 35a915787559..8c3ae83f63d9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -599,6 +599,7 @@ struct kvm_vcpu_arch {
+ 	u64 ia32_xss;
+ 	u64 microcode_version;
+ 	u64 arch_capabilities;
++	u64 perf_capabilities;
+ 
+ 	/*
+ 	 * Paging state of the vcpu
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 35845704cf57..411ce1b58341 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -294,7 +294,7 @@ void kvm_set_cpu_caps(void)
+ 		F(XMM3) | F(PCLMULQDQ) | 0 /* DTES64, MONITOR */ |
+ 		0 /* DS-CPL, VMX, SMX, EST */ |
+ 		0 /* TM2 */ | F(SSSE3) | 0 /* CNXT-ID */ | 0 /* Reserved */ |
+-		F(FMA) | F(CX16) | 0 /* xTPR Update, PDCM */ |
++		F(FMA) | F(CX16) | 0 /* xTPR Update */ | F(PDCM) |
+ 		F(PCID) | 0 /* Reserved, DCA */ | F(XMM4_1) |
+ 		F(XMM4_2) | F(X2APIC) | F(MOVBE) | F(POPCNT) |
+ 		0 /* Reserved*/ | F(AES) | F(XSAVE) | 0 /* OSXSAVE */ | F(AVX) |
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 8903475f751e..27a66795665b 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -18,6 +18,8 @@ extern int __read_mostly pt_mode;
+ #define PT_MODE_SYSTEM		0
+ #define PT_MODE_HOST_GUEST	1
+ 
++#define PERF_CAP_LBR_FMT			0x3f
++
+ struct nested_vmx_msrs {
+ 	/*
+ 	 * We only store the "true" versions of the VMX capability MSRs. We
+@@ -367,4 +369,17 @@ static inline bool vmx_pt_mode_is_host_guest(void)
+ 	return pt_mode == PT_MODE_HOST_GUEST;
  }
  
--int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
-+int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
--	return kvm_x86_ops.pmu_ops->get_msr(vcpu, msr, data);
-+	return kvm_x86_ops.pmu_ops->get_msr(vcpu, msr_info);
- }
- 
- int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index a6c78a797cb1..ab85eed8a6cc 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -32,7 +32,7 @@ struct kvm_pmu_ops {
- 	struct kvm_pmc *(*msr_idx_to_pmc)(struct kvm_vcpu *vcpu, u32 msr);
- 	int (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
- 	bool (*is_valid_msr)(struct kvm_vcpu *vcpu, u32 msr);
--	int (*get_msr)(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
-+	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- 	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- 	void (*refresh)(struct kvm_vcpu *vcpu);
- 	void (*init)(struct kvm_vcpu *vcpu);
-@@ -147,7 +147,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
- int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
- int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
- bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
--int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
-+int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- void kvm_pmu_refresh(struct kvm_vcpu *vcpu);
- void kvm_pmu_reset(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index ce0b10fe5e2b..035da07500e8 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -215,21 +215,22 @@ static struct kvm_pmc *amd_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
- 	return pmc;
- }
- 
--static int amd_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
-+static int amd_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct kvm_pmc *pmc;
-+	u32 msr = msr_info->index;
- 
- 	/* MSR_PERFCTRn */
- 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
- 	if (pmc) {
--		*data = pmc_read_counter(pmc);
-+		msr_info->data = pmc_read_counter(pmc);
- 		return 0;
- 	}
- 	/* MSR_EVNTSELn */
- 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_EVNTSEL);
- 	if (pmc) {
--		*data = pmc->eventsel;
-+		msr_info->data = pmc->eventsel;
- 		return 0;
- 	}
- 
++static inline u64 vmx_get_perf_capabilities(void)
++{
++	u64 perf_cap = 0;
++
++	if (boot_cpu_has(X86_FEATURE_PDCM))
++		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
++
++	/* Currently, KVM only supports LBR.  */
++	perf_cap &= PERF_CAP_LBR_FMT;
++
++	return perf_cap;
++}
++
+ #endif /* __KVM_X86_VMX_CAPS_H */
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 7c857737b438..e1a303fefc16 100644
+index e1a303fefc16..79e5bf36ffc8 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -184,35 +184,38 @@ static struct kvm_pmc *intel_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
- 	return pmc;
- }
- 
--static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
-+static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct kvm_pmc *pmc;
-+	u32 msr = msr_info->index;
- 
- 	switch (msr) {
- 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
--		*data = pmu->fixed_ctr_ctrl;
-+		msr_info->data = pmu->fixed_ctr_ctrl;
- 		return 0;
- 	case MSR_CORE_PERF_GLOBAL_STATUS:
--		*data = pmu->global_status;
-+		msr_info->data = pmu->global_status;
- 		return 0;
- 	case MSR_CORE_PERF_GLOBAL_CTRL:
--		*data = pmu->global_ctrl;
-+		msr_info->data = pmu->global_ctrl;
- 		return 0;
+@@ -162,6 +162,9 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
  	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
--		*data = pmu->global_ovf_ctrl;
-+		msr_info->data = pmu->global_ovf_ctrl;
+ 		ret = pmu->version > 1;
+ 		break;
++	case MSR_IA32_PERF_CAPABILITIES:
++		ret = guest_cpuid_has(vcpu, X86_FEATURE_PDCM);
++		break;
+ 	default:
+ 		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
+ 			get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0) ||
+@@ -203,6 +206,12 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+ 		msr_info->data = pmu->global_ovf_ctrl;
  		return 0;
++	case MSR_IA32_PERF_CAPABILITIES:
++		if (!msr_info->host_initiated &&
++			!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++			return 1;
++		msr_info->data = vcpu->arch.perf_capabilities;
++		return 0;
  	default:
  		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
  			u64 val = pmc_read_counter(pmc);
--			*data = val & pmu->counter_bitmask[KVM_PMC_GP];
-+			msr_info->data =
-+				val & pmu->counter_bitmask[KVM_PMC_GP];
- 			return 0;
- 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
- 			u64 val = pmc_read_counter(pmc);
--			*data = val & pmu->counter_bitmask[KVM_PMC_FIXED];
-+			msr_info->data =
-+				val & pmu->counter_bitmask[KVM_PMC_FIXED];
- 			return 0;
- 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
--			*data = pmc->eventsel;
-+			msr_info->data = pmc->eventsel;
+@@ -261,6 +270,16 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
  			return 0;
  		}
+ 		break;
++	case MSR_IA32_PERF_CAPABILITIES:
++		if (!msr_info->host_initiated ||
++			!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++			return 1;
++		if (!(data & ~vmx_get_perf_capabilities()))
++			return 1;
++		if ((data ^ vmx_get_perf_capabilities()) & PERF_CAP_LBR_FMT)
++			return 1;
++		vcpu->arch.perf_capabilities = data;
++		return 0;
+ 	default:
+ 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
+ 			if (!msr_info->host_initiated)
+@@ -315,6 +334,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	perf_get_x86_pmu_capability(&x86_pmu);
++	if (!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++		vcpu->arch.perf_capabilities = 0;
+ 
+ 	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+ 					 x86_pmu.num_counters_gp);
+@@ -374,6 +395,8 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
+ 		pmu->fixed_counters[i].idx = i + INTEL_PMC_IDX_FIXED;
+ 		pmu->fixed_counters[i].current_config = 0;
+ 	}
++
++	vcpu->arch.perf_capabilities = vmx_get_perf_capabilities();
+ }
+ 
+ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index bc5e5cf1d4cc..ee94d94e855a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1789,6 +1789,9 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+ 		if (!nested)
+ 			return 1;
+ 		return vmx_get_vmx_msr(&vmcs_config.nested, msr->index, &msr->data);
++	case MSR_IA32_PERF_CAPABILITIES:
++		msr->data = vmx_get_perf_capabilities();
++		return 0;
+ 	default:
+ 		return 1;
  	}
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7e46027f405a..23fe511c6ba0 100644
+index 23fe511c6ba0..b577fadffb1d 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -3106,7 +3106,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
- 	case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
- 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
--			return kvm_pmu_get_msr(vcpu, msr_info->index, &msr_info->data);
-+			return kvm_pmu_get_msr(vcpu, msr_info);
- 		msr_info->data = 0;
- 		break;
- 	case MSR_IA32_UCODE_REV:
-@@ -3268,7 +3268,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	default:
- 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
--			return kvm_pmu_get_msr(vcpu, msr_info->index, &msr_info->data);
-+			return kvm_pmu_get_msr(vcpu, msr_info);
- 		if (!ignore_msrs) {
- 			vcpu_debug_ratelimited(vcpu, "unhandled rdmsr: 0x%x\n",
- 					       msr_info->index);
+@@ -1323,6 +1323,7 @@ static const u32 msr_based_features_all[] = {
+ 	MSR_F10H_DECFG,
+ 	MSR_IA32_UCODE_REV,
+ 	MSR_IA32_ARCH_CAPABILITIES,
++	MSR_IA32_PERF_CAPABILITIES,
+ };
+ 
+ static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
 -- 
 2.21.3
 
