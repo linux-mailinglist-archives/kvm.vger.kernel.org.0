@@ -2,87 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E8D91D2DEE
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 13:12:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6E01D2DF2
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 13:13:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726465AbgENLMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 07:12:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60994 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbgENLMA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 07:12:00 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 584B7C061A0C
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 04:12:00 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id z25so1972863otq.13
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 04:12:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Kmgi+cXn2gA4xTq/eWQ2tj3BWMUlW5Uh0vA4ZY02OgQ=;
-        b=yOD9BEP+L4vp0L0QbU0583eI/64Vtdb+Vt8GUEIqlZjLC8UQDZhgu8acs5q0pZmY3R
-         o00lLwlujnB8dGEB7NYufCm/qVRyh3bBTKmFL6YAs6DfZWjM/RacaQTLetZ2d2iekcMh
-         2wpjzSe+4GJ3LYuag1nA+wWtaJoJR07cfnIvUkpUs5BPpQInS7+j5u99dKm6/cj4rr4V
-         86qn8/Ne8n7JS2qc9+6xJwquyiClpVEjianf1m5fU45slKhjr8pxYlZNUCNzD3rr7fIb
-         b3UB20VZ1tVEnjBF6i/bND/paxzBEFewoe71UUmQ5NCH65A/Qdh4zsyyxBVxwVIFZoDq
-         MYyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Kmgi+cXn2gA4xTq/eWQ2tj3BWMUlW5Uh0vA4ZY02OgQ=;
-        b=TFWGQKtUV2B/T+Y7l0xnXaQSZcsDgkYBj1sfXH/oSDS+7C5N+CNo1nghDe1YvMgpEi
-         S3uv0nfuQflwRDXqnKABqtDwi+u7JdvEduBU+zBTnU3LIuW/3NQJ2IGdZIW6/o4MuElI
-         Uu3dZyYfEM5ROsZBLqhf8TYVT92JdbS4Ykj7gZqhtDWiloofWfqMQNoiw7G91xJPjr/4
-         GVmSrW0iEkFOXi7f3BP3IGr+Lfe/fXXMWo24czdWCkFfuTrIw1m4MweijtBLl8VuDvDx
-         z1b+YctBgoEltiqM8g0njhayAnJkRZkukbyt/AxpfHDl9gaKsl748tfaZAOObfDWzcxO
-         0DPQ==
-X-Gm-Message-State: AOAM533WTPecQfW0jqqbhHNHKUtdp93TLLl6fykdfORyT9ONUVAk8Q1Y
-        c9hXylx1smETNUVhHADLmjIzk7pu6LIGEv0vqbVb2Q==
-X-Google-Smtp-Source: ABdhPJyIQwz7oPWt9b/QQJ2Z0yCWjuVRj+YVTalDvpNE9UmAW4Hm6eKvHRaDu2AANo9WPC8tNWM4a1x/NRCDr2QEFR8=
-X-Received: by 2002:a05:6830:1e4e:: with SMTP id e14mr3006788otj.91.1589454719798;
- Thu, 14 May 2020 04:11:59 -0700 (PDT)
+        id S1726160AbgENLNH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 07:13:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32077 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726015AbgENLNG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 07:13:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589454785;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7Meb6+1d0FRS6KJV3cDJSpJXxcFuAncnjzPlXxdAP00=;
+        b=ehmKY3z5d8hMUuK4OJh81JiRcDpPx7t92BPqR4mlF0rz6xLDu2KU81kFdWCH29Kg2M0Dvg
+        H4hz2Bj5UH8RmK/RFVQ7RtwdKQcVOu1vqdjSbkNgHJmmdoS7J76hqBucGMeLEb1plCiVYK
+        MS67RgTAlUHvNOTbT7v1fG2MakY/5Fg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-YTj-HW59OlSNdK2tbitWKA-1; Thu, 14 May 2020 07:13:03 -0400
+X-MC-Unique: YTj-HW59OlSNdK2tbitWKA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD74E474
+        for <kvm@vger.kernel.org>; Thu, 14 May 2020 11:13:02 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.110.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 731855C1BE;
+        Thu, 14 May 2020 11:13:02 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+        id 1DF6F3E048A; Thu, 14 May 2020 13:13:00 +0200 (CEST)
+Date:   Thu, 14 May 2020 13:13:00 +0200
+From:   Kashyap Chamarthy <kchamart@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, dgilbert@redhat.com, cohuck@redhat.com,
+        vkuznets@redhat.com
+Subject: Re: [PATCH v3] docs/virt/kvm: Document configuring and running
+ nested guests
+Message-ID: <20200514111300.GG17233@paraplu>
+References: <20200505112839.30534-1-kchamart@redhat.com>
+ <c8bb56a1-8556-a9ff-7b69-caf116729a23@redhat.com>
 MIME-Version: 1.0
-References: <20200512030609.19593-1-gengdongjiu@huawei.com> <20200512030609.19593-2-gengdongjiu@huawei.com>
-In-Reply-To: <20200512030609.19593-2-gengdongjiu@huawei.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 14 May 2020 12:11:48 +0100
-Message-ID: <CAFEAcA9RBWDM4gwputTLmePuL9FJ7Xv5x1uqyFHoru21S4GkeA@mail.gmail.com>
-Subject: Re: [PATCH v27 01/10] acpi: nvdimm: change NVDIMM_UUID_LE to a common macro
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     Igor Mammedov <imammedo@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Fam Zheng <fam@euphon.net>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-        Zheng Xiang <zhengxiang9@huawei.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Linuxarm <linuxarm@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c8bb56a1-8556-a9ff-7b69-caf116729a23@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 May 2020 at 04:03, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->
-> The little end UUID is used in many places, so make
-> NVDIMM_UUID_LE to a common macro to convert the UUID
-> to a little end array.
->
-> Reviewed-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
+On Tue, May 05, 2020 at 02:02:58PM +0200, Paolo Bonzini wrote:
+> On 05/05/20 13:28, Kashyap Chamarthy wrote:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[...]
 
-thanks
--- PMM
+> > +Migrating an L1 guest merely configured to support nesting, while not
+> > +actually running L2 guests, is expected to function normally.
+> > +Live-migrating an L2 guest from one L1 guest to another is also expected
+> > +to succeed.
+> > +
+> 
+> This is a bit optimistic, as AMD is not supported yet.  Please review
+> the following incremental patch:
+
+Hi, Paolo; it wasn't entirely clear what you meant by "incremental
+patch":
+
+  (a) You're going to squash it in the current commit, or 
+  (b) You're going to add it as a patch on top, or 
+  (c) I should send a v4 with your correction below 
+
+Which is it? :-)  (Only option-c has an action on me.)
+
+> diff --git a/Documentation/virt/kvm/running-nested-guests.rst b/Documentation/virt/kvm/running-nested-guests.rst
+> --- a/Documentation/virt/kvm/running-nested-guests.rst
+> +++ b/Documentation/virt/kvm/running-nested-guests.rst
+> @@ -182,11 +182,23 @@ Enabling "nested" (s390x)
+>  Live migration with nested KVM
+>  ------------------------------
+>  
+> -The below live migration scenarios should work as of Linux kernel 5.3
+> -and QEMU 4.2.0 for x86; for s390x, even older versions might work.
+> -In all the below cases, L1 exposes ``/dev/kvm`` in it, i.e. the L2 guest
+> -is a "KVM-accelerated guest", not a "plain emulated guest" (as done by
+> -QEMU's TCG).
+> +Migrating an L1 guest, with a  *live* nested guest in it, to another
+> +bare metal host, works as of Linux kernel 5.3 and QEMU 4.2.0 for
+> +Intel x86 systems, and even on older versions for s390x.
+> +
+> +On AMD systems, once an L1 guest has started an L2 guest, the L1 guest
+> +should no longer be migrated or saved (refer to QEMU documentation on
+> +"savevm"/"loadvm") until the L2 guest shuts down.  Attempting to migrate
+> +or save-and-load an L1 guest while an L2 guest is running will result in
+> +undefined behavior.  You might see a ``kernel BUG!`` entry in ``dmesg``, a
+> +kernel 'oops', or an outright kernel panic.  Such a migrated or loaded L1
+> +guest can no longer be considered stable or secure, and must be restarted.
+> +Migrating an L1 guest merely configured to support nesting, while not
+> +actually running L2 guests, is expected to function normally even on AMD
+> +systems but may fail once guests are started.
+> +
+> +Migrating an L2 guest is expected to succeed, so all the following
+> +scenarios should work even on AMD systems:
+>  
+>  - Migrating a nested guest (L2) to another L1 guest on the *same* bare
+>    metal host.
+> @@ -194,30 +206,7 @@ QEMU's TCG).
+>  - Migrating a nested guest (L2) to another L1 guest on a *different*
+>    bare metal host.
+>  
+> -- Migrating an L1 guest, with an *offline* nested guest in it, to
+> -  another bare metal host.
+> -
+> -- Migrating an L1 guest, with a  *live* nested guest in it, to another
+> -  bare metal host.
+> -
+> -Limitations on Linux kernel versions older than 5.3 (x86)
+> ----------------------------------------------------------
+> -
+> -On Linux kernel versions older than 5.3, once an L1 guest has started an
+> -L2 guest, the L1 guest would no longer capable of being migrated, saved,
+> -or loaded (refer to QEMU documentation on "save"/"load") until the L2
+> -guest shuts down.
+> -
+> -Attempting to migrate or save-and-load an L1 guest while an L2 guest is
+> -running will result in undefined behavior.  You might see a ``kernel
+> -BUG!`` entry in ``dmesg``, a kernel 'oops', or an outright kernel panic.
+> -Such a migrated or loaded L1 guest can no longer be considered stable or
+> -secure, and must be restarted.
+> -
+> -Migrating an L1 guest merely configured to support nesting, while not
+> -actually running L2 guests, is expected to function normally.
+> -Live-migrating an L2 guest from one L1 guest to another is also expected
+> -to succeed.
+> +- Migrating a nested guest (L2) to a bare metal host.
+>  
+>  Reporting bugs from nested setups
+>  -----------------------------------
+> 
+
+-- 
+/kashyap
+
