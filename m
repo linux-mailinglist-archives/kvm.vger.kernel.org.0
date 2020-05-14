@@ -2,227 +2,415 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A07E31D30BA
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 15:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D80A1D312A
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 15:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726087AbgENNMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 09:12:22 -0400
-Received: from foss.arm.com ([217.140.110.172]:36278 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726037AbgENNMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 09:12:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 77D4F1042;
-        Thu, 14 May 2020 06:12:20 -0700 (PDT)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B0B43F305;
-        Thu, 14 May 2020 06:12:19 -0700 (PDT)
-Subject: Re: [PATCH kvmtool] rtc: Generate fdt node for the real-time clock
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Sami Mujawar <sami.mujawar@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20200514094553.135663-1-andre.przywara@arm.com>
- <20200514121817.GA55448@C02TD0UTHF1T.local>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- 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
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <ab172c76-3b68-39aa-ddfd-e78b766403a3@arm.com>
-Date:   Thu, 14 May 2020 14:11:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726056AbgENNWZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 09:22:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39546 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726011AbgENNWZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 09:22:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589462542;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MdFatK4dMmg5r9h9ucfSIgBeMZlPxRK7IWuruD5QQV8=;
+        b=KaBsUi9/eQHRXsm8ARbH3A/aJn+DFWX7ny63q88jrFoB6cXtGNtI64myCe/XmMIA/hQLMV
+        m6L7f7uhsZcMwTnCkxfZqbJ2wrGrA6UQ+Q/PcTTlKiyIG897uXFyxHFLbfg+9nFoaCRvIS
+        zxCRzo6t1ERHIpDIEwq/M543sBYNFpY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-ZceqEK4cOhyUTgfFAGxufw-1; Thu, 14 May 2020 09:22:09 -0400
+X-MC-Unique: ZceqEK4cOhyUTgfFAGxufw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D3F4EC1A0;
+        Thu, 14 May 2020 13:22:07 +0000 (UTC)
+Received: from x1.home (ovpn-113-111.phx2.redhat.com [10.3.113.111])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 66DF781E0A;
+        Thu, 14 May 2020 13:22:04 +0000 (UTC)
+Date:   Thu, 14 May 2020 07:22:03 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH Kernel v19 6/8] vfio iommu: Update UNMAP_DMA ioctl to
+ get dirty bitmap before unmap
+Message-ID: <20200514072203.3aee3e89@x1.home>
+In-Reply-To: <65a90392-a140-6862-b7f2-2bddc6e71ba9@nvidia.com>
+References: <1589400279-28522-1-git-send-email-kwankhede@nvidia.com>
+        <1589400279-28522-7-git-send-email-kwankhede@nvidia.com>
+        <20200513230747.0d2f3bc3@x1.home>
+        <65a90392-a140-6862-b7f2-2bddc6e71ba9@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20200514121817.GA55448@C02TD0UTHF1T.local>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/05/2020 13:20, Mark Rutland wrote:
+On Thu, 14 May 2020 11:02:33 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Hi,
-
+> On 5/14/2020 10:37 AM, Alex Williamson wrote:
+> > On Thu, 14 May 2020 01:34:37 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> DMA mapped pages, including those pinned by mdev vendor drivers, might
+> >> get unpinned and unmapped while migration is active and device is still
+> >> running. For example, in pre-copy phase while guest driver could access
+> >> those pages, host device or vendor driver can dirty these mapped pages.
+> >> Such pages should be marked dirty so as to maintain memory consistency
+> >> for a user making use of dirty page tracking.
+> >>
+> >> To get bitmap during unmap, user should allocate memory for bitmap, set
+> >> size of allocated memory, set page size to be considered for bitmap and
+> >> set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> ---
+> >>   drivers/vfio/vfio_iommu_type1.c | 102 +++++++++++++++++++++++++++++++++++-----
+> >>   include/uapi/linux/vfio.h       |  10 ++++
+> >>   2 files changed, 99 insertions(+), 13 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index 469b09185b83..4358be26ff80 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -195,11 +195,15 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+> >>   static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
+> >>   {
+> >>   	uint64_t npages = dma->size / pgsize;
+> >> +	size_t bitmap_size;
+> >>   
+> >>   	if (npages > DIRTY_BITMAP_PAGES_MAX)
+> >>   		return -EINVAL;
+> >>   
+> >> -	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+> >> +	/* Allocate extra 64 bits which are used for bitmap manipulation */
+> >> +	bitmap_size = DIRTY_BITMAP_BYTES(npages) + sizeof(u64);
+> >> +
+> >> +	dma->bitmap = kvzalloc(bitmap_size, GFP_KERNEL);
+> >>   	if (!dma->bitmap)
+> >>   		return -ENOMEM;
+> >>   
+> >> @@ -979,23 +983,25 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> >>   }
+> >>   
+> >>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >> -			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >> +			     struct vfio_iommu_type1_dma_unmap *unmap,
+> >> +			     struct vfio_bitmap *bitmap)
+> >>   {
+> >> -	uint64_t mask;
+> >>   	struct vfio_dma *dma, *dma_last = NULL;
+> >> -	size_t unmapped = 0;
+> >> -	int ret = 0, retries = 0;
+> >> +	size_t unmapped = 0, pgsize;
+> >> +	int ret = 0, retries = 0, cnt = 0;
+> >> +	unsigned long pgshift, shift = 0, leftover;
+> >>   
+> >>   	mutex_lock(&iommu->lock);
+> >>   
+> >> -	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
+> >> +	pgshift = __ffs(iommu->pgsize_bitmap);
+> >> +	pgsize = (size_t)1 << pgshift;
+> >>   
+> >> -	if (unmap->iova & mask) {
+> >> +	if (unmap->iova & (pgsize - 1)) {
+> >>   		ret = -EINVAL;
+> >>   		goto unlock;
+> >>   	}
+> >>   
+> >> -	if (!unmap->size || unmap->size & mask) {
+> >> +	if (!unmap->size || unmap->size & (pgsize - 1)) {
+> >>   		ret = -EINVAL;
+> >>   		goto unlock;
+> >>   	}
+> >> @@ -1006,9 +1012,15 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>   		goto unlock;
+> >>   	}
+> >>   
+> >> -	WARN_ON(mask & PAGE_MASK);
+> >> -again:
+> >> +	/* When dirty tracking is enabled, allow only min supported pgsize */
+> >> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> >> +	    (!iommu->dirty_page_tracking || (bitmap->pgsize != pgsize))) {
+> >> +		ret = -EINVAL;
+> >> +		goto unlock;
+> >> +	}
+> >>   
+> >> +	WARN_ON((pgsize - 1) & PAGE_MASK);
+> >> +again:
+> >>   	/*
+> >>   	 * vfio-iommu-type1 (v1) - User mappings were coalesced together to
+> >>   	 * avoid tracking individual mappings.  This means that the granularity
+> >> @@ -1046,6 +1058,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>   			ret = -EINVAL;
+> >>   			goto unlock;
+> >>   		}
+> >> +
+> >>   		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+> >>   		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+> >>   			ret = -EINVAL;
+> >> @@ -1063,6 +1076,39 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>   		if (dma->task->mm != current->mm)
+> >>   			break;
+> >>   
+> >> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> >> +		    (dma_last != dma)) {
+> >> +			unsigned int nbits = dma->size >> pgshift;
+> >> +			int curr_lcnt = nbits / BITS_PER_LONG;
+> >> +
+> >> +			/*
+> >> +			 * mark all pages dirty if all pages are pinned and
+> >> +			 * mapped.
+> >> +			 */
+> >> +			if (dma->iommu_mapped)
+> >> +				bitmap_set(dma->bitmap, 0, nbits);
+> >> +
+> >> +			if (shift) {
+> >> +				bitmap_shift_left(dma->bitmap, dma->bitmap,
+> >> +						  shift, nbits + shift);
+> >> +				bitmap_or(dma->bitmap, dma->bitmap, &leftover,
+> >> +					  shift);
+> >> +				nbits += shift;
+> >> +				curr_lcnt = nbits / BITS_PER_LONG;
+> >> +			}
+> >> +
+> >> +			if (copy_to_user((void __user *)bitmap->data + cnt,
+> >> +				       dma->bitmap, curr_lcnt * sizeof(u64))) {
+> >> +				ret = -EFAULT;
+> >> +				break;
+> >> +			}
+> >> +
+> >> +			shift = nbits % BITS_PER_LONG;
+> >> +			if (shift)
+> >> +				leftover = *(u64 *)(dma->bitmap + curr_lcnt);
+> >> +			cnt += curr_lcnt;
+> >> +		}  
+> > 
+> > I don't think this works.  Let's say for example we have separate
+> > single page mappings at 4K and 12K (both dirty) and the user asked to
+> > unmap the range 0 - 16K.   
 > 
-> On Thu, May 14, 2020 at 10:45:53AM +0100, Andre Przywara wrote:
->> On arm and arm64 we expose the Motorola RTC emulation to the guest,
->> but never advertised this in the device tree.
->>
->> EDK-2 seems to rely on this device, but on its hardcoded address. To
->> make this more future-proof, add a DT node with the address in it.
->> EDK-2 can then read the proper address from there, and we can change
->> this address later (with the flexible memory layout).
->>
->> Please note that an arm64 Linux kernel is not ready to use this device,
->> there are some include files missing under arch/arm64 to compile the
->> driver. I hacked this up in the kernel, just to verify this DT snippet
->> is correct, but don't see much value in enabling this properly in
->> Linux.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Unmap range should include adjacent mapped ranges, right?
+
+Not required.
+
+> In your example, if user asks for range 0-16k but mapping at 0 wasn't 
+> done, then this unmap would fail before even reaching control here.
+
+Nope, that's supported.
+
+> There is a check which makes sure that mapping for start of range exist:
 > 
-> With EFI at least, the expectation is that the RTC is accesses via the
-> runtime EFI services. So as long as EFI knows about the RTC and the
-> kernel knows about EFI, the kernel can use the RTC that way.
+>          dma = vfio_find_dma(iommu, unmap->iova, 1);
+>          if (dma && dma->iova != unmap->iova) {
+>                  ret = -EINVAL;
+>                  goto unlock;
+>          }
 
-Yes, this is how it works at the moment.
+	if (dma && ...
 
-> It would be
-> problematic were the kernel to mess with the RTC behind the back of EFI
-> or vice-versa, so it doesn't make sense to expose voth view to the
-> kernel simultaneously.
+> There is a check which makes sure that mapping for last address of range 
+> exist:
+>          dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+>          if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+>                 ret = -EINVAL;
+>                 goto unlock;
+>          }
 
-Agreed.
+	if (dma && ...
 
-> I don't think it makes sense to expose this in the DT unless EFI were
-> also clearing this from the DT before handing that on to Linux. If we
-> have that, I think it'd be fine, but on its own this patch introduces a
-> potnetial problem that I think we should avoid.
+These are the tests that require an unmap request not _bisect_ a
+mapping, both tests are preceded by a check of if we found a mapping at
+that address, not a requirement that there be a mapping at that
+address, nor a requirement that mappings are consecutive across the
+unmap range.  A user can absolutely call unmap with iova = 0, size =
+S64_MAX to clear a massive chunk of the address space.
 
-Yes, removing or at least disabling the node was the plan, but first we
-need to convince EDK-2 to actually use it first ;-)
+> Then current implementation should work.
 
-At the moment the addresses are hardcoded, and things look fine, but we
-want (and need to) become more flexible with the memory map, so just
-relying on 0x70/0x71 doesn't have a future. Especially this low memory
-areas already has problems.
+Even if I change my example that the user requested an unmap of 4K-16K
+with 4K mappings at 4K and 12K, the bitmap returned would have bits
+0 & 1 set rather than bits 0 & 2, which is still incorrect.  Thanks,
 
-From a kvmtool's perspective this "two users problem" shouldn't matter,
-though, that's a problem that EDK-2 needs to solve, if it chooses to use
-the RTC in its runtime.
-
-And as mentioned: right now Linux can't use the Motorola RTC driver on
-arm64, so there is no danger atm that the kernel picks the device up and
-uses it.
-
-But I would rather sooner than later let EDK-2 use the DT address,
-before this hardcoded address usage becomes to widespread to be ignored.
-And yes, I will push for disabling the DT node then in EDK-2.
-
-Cheers,
-Andre.
-
->> ---
->>  hw/rtc.c | 44 ++++++++++++++++++++++++++++++++++++++------
->>  1 file changed, 38 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/rtc.c b/hw/rtc.c
->> index c1fa72f2..5483879f 100644
->> --- a/hw/rtc.c
->> +++ b/hw/rtc.c
->> @@ -130,24 +130,56 @@ static struct ioport_operations cmos_ram_index_ioport_ops = {
->>  	.io_out		= cmos_ram_index_out,
->>  };
->>  
->> +#ifdef CONFIG_HAS_LIBFDT
->> +static void generate_rtc_fdt_node(void *fdt,
->> +				  struct device_header *dev_hdr,
->> +				  void (*generate_irq_prop)(void *fdt,
->> +							    u8 irq,
->> +							    enum irq_type))
->> +{
->> +	u64 reg_prop[2] = { cpu_to_fdt64(0x70), cpu_to_fdt64(2) };
->> +
->> +	_FDT(fdt_begin_node(fdt, "rtc"));
->> +	_FDT(fdt_property_string(fdt, "compatible", "motorola,mc146818"));
->> +	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
->> +	_FDT(fdt_end_node(fdt));
->> +}
->> +#else
->> +#define generate_rtc_fdt_node NULL
->> +#endif
->> +
->> +struct device_header rtc_dev_hdr = {
->> +	.bus_type = DEVICE_BUS_IOPORT,
->> +	.data = generate_rtc_fdt_node,
->> +};
->> +
->>  int rtc__init(struct kvm *kvm)
->>  {
->> -	int r = 0;
->> +	int r;
->> +
->> +	r = device__register(&rtc_dev_hdr);
->> +	if (r < 0)
->> +		return r;
->>  
->>  	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
->>  	r = ioport__register(kvm, 0x0070, &cmos_ram_index_ioport_ops, 1, NULL);
->>  	if (r < 0)
->> -		return r;
->> +		goto out_device;
->>  
->>  	r = ioport__register(kvm, 0x0071, &cmos_ram_data_ioport_ops, 1, NULL);
->> -	if (r < 0) {
->> -		ioport__unregister(kvm, 0x0071);
->> -		return r;
->> -	}
->> +	if (r < 0)
->> +		goto out_ioport;
->>  
->>  	/* Set the VRT bit in Register D to indicate valid RAM and time */
->>  	rtc.cmos_data[RTC_REG_D] = RTC_REG_D_VRT;
->>  
->> +	return r;
->> +
->> +out_ioport:
->> +	ioport__unregister(kvm, 0x0070);
->> +out_device:
->> +	device__unregister(&rtc_dev_hdr);
->> +
->>  	return r;
->>  }
->>  dev_init(rtc__init);
->> -- 
->> 2.17.1
->>
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Alex
+ 
+> > We find the mapping at 4K, shift is zero, cnt
+> > is zero, so we copy the bitmap with the zero bit set to the user
+> > buffer.  We're already wrong because we've just indicated the page at
+> > zero is dirty and there isn't a page at zero.  shift now becomes 1 and
+> > leftover is a bitmap with bit zero set.
+> > 
+> > We move on to the next page @12K.  We shift this bitmap by 1.  We OR in
+> > our leftover and again copy out to the user buffer.  We end up with a
+> > user bitmap with bits zero and one set, when we should have had bits 1
+> > and 3 set, we're essentially coalescing the mappings.
+> > 
+> > As I see it, shift needs to be calculated as the offset from the start
+> > of the user requested unmap buffer and I think an easier approach to
+> > handle the leftover bits preceding the shift is to copy it back out of
+> > the user buffer.
+> > 
+> > For example, shift should be:
+> > 
+> > ((dma->iova - unmap->iova) >> pgshift) % BITS_PER_LONG
+> > 
+> > This would give us a shift of 1 and 3 respectively for our mappings,
+> > which is correct.
+> > 
+> > Since our shifts are non-zero, we then need to collect the preceding
+> > leftovers, which is always going to be:
+> > 
+> > copy_from_user(&leftover, bitmap->data +
+> > 		((dma->iova - unmap->iova) >> pgshift) / BITS_PER_LONG,
+> > 		sizeof(leftover));
+> > 
+> > I don't think the curr_lcnt calculation for the copy-out is correct
+> > either, mappings are not required to be a multiple of BITS_PER_LONG
+> > pages, so we're truncating the size.
+> > 
+> > So we have:
+> > 
+> > bit_offset = (dma->iova - unmap->iova) >> pgshift;
+> > copy_offset = bit_offset / BITS_PER_LONG;
+> > shift = bit_offset % BITS_PER_LONG;
+> > 
+> > if (shift) {
+> > 	bitmap_shift_left(dma->bitmap, dma->bitmap, shift, nbits + shift);
+> > 	if (copy_from_user(&leftover, bitmap->data + copy_offset, sizeof(leftover))) {
+> > 		ret = -EFAULT;
+> > 		break;
+> > 	}
+> > 	bitmap_or(dma->bitmap, dma->bitmap, &leftover, shift);
+> > }
+> > 
+> > if (copy_to_user(bitmap->data + copy_offset, dma->bitmap,
+> > 		roundup(nbits + shift, BITS_PER_LONG)/BITS_PER_BYTE)) {
+> > 	ret = -EFAULT;
+> > 	break;
+> > }
+> > 
+> > Also this all needs to come after the below check of the pfn_list and
+> > call to the blocking notifier or else we're just wasting time because
+> > we'll need to do it all again anyway.
+> > 
+> >   
+> >> +
+> >>   		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+> >>   			struct vfio_iommu_type1_dma_unmap nb_unmap;
+> >>   
+> >> @@ -1093,6 +1139,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>   		vfio_remove_dma(iommu, dma);
+> >>   	}
+> >>   
+> >> +	if (!ret && (unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> >> +	    shift) {
+> >> +		if (copy_to_user((void __user *)bitmap->data + cnt, &leftover,
+> >> +				 sizeof(leftover)))
+> >> +			ret = -EFAULT;
+> >> +	}  
+> > 
+> > This is unnecessary with the algorithm I propose.
+> >   
+> >> +
+> >>   unlock:
+> >>   	mutex_unlock(&iommu->lock);
+> >>   
+> >> @@ -2426,17 +2479,40 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>   
+> >>   	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+> >>   		struct vfio_iommu_type1_dma_unmap unmap;
+> >> -		long ret;
+> >> +		struct vfio_bitmap bitmap = { 0 };
+> >> +		int ret;
+> >>   
+> >>   		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
+> >>   
+> >>   		if (copy_from_user(&unmap, (void __user *)arg, minsz))
+> >>   			return -EFAULT;
+> >>   
+> >> -		if (unmap.argsz < minsz || unmap.flags)
+> >> +		if (unmap.argsz < minsz ||
+> >> +		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
+> >>   			return -EINVAL;
+> >>   
+> >> -		ret = vfio_dma_do_unmap(iommu, &unmap);
+> >> +		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
+> >> +			unsigned long pgshift;
+> >> +
+> >> +			if (unmap.argsz < (minsz + sizeof(bitmap)))
+> >> +				return -EINVAL;
+> >> +
+> >> +			if (copy_from_user(&bitmap,
+> >> +					   (void __user *)(arg + minsz),
+> >> +					   sizeof(bitmap)))
+> >> +				return -EFAULT;
+> >> +
+> >> +			if (!access_ok((void __user *)bitmap.data, bitmap.size))
+> >> +				return -EINVAL;
+> >> +
+> >> +			pgshift = __ffs(bitmap.pgsize);
+> >> +			ret = verify_bitmap_size(unmap.size >> pgshift,
+> >> +						 bitmap.size);
+> >> +			if (ret)
+> >> +				return ret;
+> >> +		}
+> >> +
+> >> +		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
+> >>   		if (ret)
+> >>   			return ret;
+> >>   
+> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> >> index 5f359c63f5ef..e3cbf8b78623 100644
+> >> --- a/include/uapi/linux/vfio.h
+> >> +++ b/include/uapi/linux/vfio.h
+> >> @@ -1048,12 +1048,22 @@ struct vfio_bitmap {
+> >>    * field.  No guarantee is made to the user that arbitrary unmaps of iova
+> >>    * or size different from those used in the original mapping call will
+> >>    * succeed.
+> >> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
+> >> + * before unmapping IO virtual addresses. When this flag is set, user must
+> >> + * provide data[] as structure vfio_bitmap. User must allocate memory to get
+> >> + * bitmap and must set size of allocated memory in vfio_bitmap.size field.
+> >> + * A bit in bitmap represents one page of user provided page size in 'pgsize',
+> >> + * consecutively starting from iova offset. Bit set indicates page at that
+> >> + * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
+> >> + * returned in vfio_bitmap.data  
+> > 
+> > This needs to specify a user zero'd bitmap if we're only going to fill
+> > it sparsely.  Thanks,
+> > 
+> > Alex
+> >   
+> >>    */
+> >>   struct vfio_iommu_type1_dma_unmap {
+> >>   	__u32	argsz;
+> >>   	__u32	flags;
+> >> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+> >>   	__u64	iova;				/* IO virtual address */
+> >>   	__u64	size;				/* Size of mapping (bytes) */
+> >> +	__u8    data[];
+> >>   };
+> >>   
+> >>   #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)  
+> >   
+> 
 
