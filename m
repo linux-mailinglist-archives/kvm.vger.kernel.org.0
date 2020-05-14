@@ -2,107 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0D401D354F
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 17:39:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 560731D3590
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 17:50:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728078AbgENPjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 11:39:00 -0400
-Received: from foss.arm.com ([217.140.110.172]:39258 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728045AbgENPi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 11:38:59 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA5851FB;
-        Thu, 14 May 2020 08:38:58 -0700 (PDT)
-Received: from e121566-lin.arm.com (unknown [10.57.31.200])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F00043F71E;
-        Thu, 14 May 2020 08:38:56 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     kvm@vger.kernel.org
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        andre.przywara@arm.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-Subject: [PATCH v4 kvmtool 12/12] vfio: Trap MMIO access to BAR addresses which aren't page aligned
-Date:   Thu, 14 May 2020 16:38:29 +0100
-Message-Id: <1589470709-4104-13-git-send-email-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1589470709-4104-1-git-send-email-alexandru.elisei@arm.com>
-References: <1589470709-4104-1-git-send-email-alexandru.elisei@arm.com>
+        id S1726304AbgENPuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 11:50:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25626 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726146AbgENPuD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 11:50:03 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04EFXOoC143267;
+        Thu, 14 May 2020 11:50:02 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 310tcn2heh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 May 2020 11:50:02 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04EFY1BS146451;
+        Thu, 14 May 2020 11:50:02 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 310tcn2hdx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 May 2020 11:50:02 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04EFeKdM020333;
+        Thu, 14 May 2020 15:50:01 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma03wdc.us.ibm.com with ESMTP id 3100ubft7s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 May 2020 15:50:01 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04EFnvQx61473146
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 May 2020 15:49:57 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A0FD9C605A;
+        Thu, 14 May 2020 15:49:57 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F16D8C6055;
+        Thu, 14 May 2020 15:49:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.130.116])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Thu, 14 May 2020 15:49:56 +0000 (GMT)
+Subject: Re: [PATCH v6 2/2] s390/kvm: diagnose 318 handling
+From:   Collin Walling <walling@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+References: <20200513221557.14366-1-walling@linux.ibm.com>
+ <20200513221557.14366-3-walling@linux.ibm.com>
+ <20200514110544.147a63f8.cohuck@redhat.com>
+ <d4cfe6dc-4ce6-b588-88fd-9e0bc6684e8a@linux.ibm.com>
+Message-ID: <01c25df6-f2e8-18ee-9738-cd44c1177afd@linux.ibm.com>
+Date:   Thu, 14 May 2020 11:49:56 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <d4cfe6dc-4ce6-b588-88fd-9e0bc6684e8a@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-14_05:2020-05-14,2020-05-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 suspectscore=0 phishscore=0 clxscore=1015
+ impostorscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0 mlxscore=0
+ adultscore=0 bulkscore=0 cotscore=-2147483648 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005140137
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_SET_USER_MEMORY_REGION will fail if the guest physical address is
-not aligned to the page size. However, it is legal for a guest to
-program an address which isn't aligned to the page size. Trap and
-emulate MMIO accesses to the region when that happens.
+On 5/14/20 11:24 AM, Collin Walling wrote:
+> On 5/14/20 5:05 AM, Cornelia Huck wrote:
+>> On Wed, 13 May 2020 18:15:57 -0400
+>> Collin Walling <walling@linux.ibm.com> wrote:
+>>
+>>> DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
+>>> be intercepted by SIE and handled via KVM. Let's introduce some
+>>> functions to communicate between userspace and KVM via ioctls. These
+>>> will be used to get/set the diag318 related information, as well as
+>>> check the system if KVM supports handling this instruction.
+>>>
+>>> This information can help with diagnosing the environment the VM is
+>>> running in (Linux, z/VM, etc) if the OS calls this instruction.
+>>>
+>>> By default, this feature is disabled and can only be enabled if a
+>>> user space program (such as QEMU) explicitly requests it.
+>>>
+>>> The Control Program Name Code (CPNC) is stored in the SIE block
+>>> and a copy is retained in each VCPU. The Control Program Version
+>>> Code (CPVC) is not designed to be stored in the SIE block, so we
+>>> retain a copy in each VCPU next to the CPNC.
+>>>
+>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>>> ---
+>>>  Documentation/virt/kvm/devices/vm.rst | 29 +++++++++
+>>>  arch/s390/include/asm/kvm_host.h      |  6 +-
+>>>  arch/s390/include/uapi/asm/kvm.h      |  5 ++
+>>>  arch/s390/kvm/diag.c                  | 20 ++++++
+>>>  arch/s390/kvm/kvm-s390.c              | 89 +++++++++++++++++++++++++++
+>>>  arch/s390/kvm/kvm-s390.h              |  1 +
+>>>  arch/s390/kvm/vsie.c                  |  2 +
+>>>  7 files changed, 151 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
+>>> index 0aa5b1cfd700..9344d45ace6d 100644
+>>> --- a/Documentation/virt/kvm/devices/vm.rst
+>>> +++ b/Documentation/virt/kvm/devices/vm.rst
+>>> @@ -314,3 +314,32 @@ Allows userspace to query the status of migration mode.
+>>>  	     if it is enabled
+>>>  :Returns:   -EFAULT if the given address is not accessible from kernel space;
+>>>  	    0 in case of success.
+>>> +
+>>> +6. GROUP: KVM_S390_VM_MISC
+>>
+>> This needs to be rstyfied, matching the remainder of the file.
+>>
+>>> +Architectures: s390
+>>> +
+>>> + 6.1. KVM_S390_VM_MISC_ENABLE_DIAG318
+>>> +
+>>> + Allows userspace to enable the DIAGNOSE 0x318 instruction call for a
+>>> + guest OS. By default, KVM will not allow this instruction to be executed
+>>> + by a guest, even if support is in place. Userspace must explicitly enable
+>>> + the instruction handling for DIAGNOSE 0x318 via this call.
+>>> +
+>>> + Parameters: none
+>>> + Returns:    0 after setting a flag telling KVM to enable this feature
+>>> +
+>>> + 6.2. KVM_S390_VM_MISC_DIAG318 (r/w)
+>>> +
+>>> + Allows userspace to retrieve and set the DIAGNOSE 0x318 information,
+>>> + which consists of a 1-byte "Control Program Name Code" and a 7-byte
+>>> + "Control Program Version Code" (a 64 bit value all in all). This
+>>> + information is set by the guest (usually during IPL). This interface is
+>>> + intended to allow retrieving and setting it during migration; while no
+>>> + real harm is done if the information is changed outside of migration,
+>>> + it is strongly discouraged.
+>>
+>> (Sorry if we discussed that already, but that was some time ago and the
+>> info has dropped out of my cache...)
+>>
+>> Had we considered doing this in userspace only? If QEMU wanted to
+>> emulate diag 318 in tcg, it would basically need to mirror what KVM
+>> does; diag 318 does not seem like something where we want to optimize
+>> for performance, so dropping to userspace seems feasible? We'd just
+>> need an interface for userspace to forward anything set by the guest.
+>>
+> 
+> My reservation with respect to handling this in userspace only is that
+> the data set by the instruction call is relevant to both host-level and
+> guest-level kernels. That data is set during kernel setup.
+> 
+> Right now, the instruction call is used to set a hard-coded "name code"
+> value, but later we want to use this instruction to also set some sort
+> of unique version code. The format of the version code is not yet
+> determined.
+> 
+> If guest support is handled in userspace only, then we'll have to update
+> the version codes in both the Linux kernel /and/ QEMU, which might be a
+> bit messy if things go out of sync.
+> 
 
-Without this patch, when assigning a Seagate Barracude hard drive to a
-VM I was seeing these errors:
+In an attempt to clear up some fogginess with respect to "what" the
+version code may entail, we're thinking of some sort of 7-byte
+combination that denotes both the kernel version and a value that
+denotes the distro + release. We're not 100% solid on exactly what that
+format will look like just yet, but all of the discussions have revolved
+around that theme.
 
-[    0.286029] pci 0000:00:00.0: BAR 0: assigned [mem 0x41004600-0x4100467f]
-  Error: 0000:01:00.0: failed to register region with KVM
-  Error: [1095:3132] Error activating emulation for BAR 0
-[..]
-[   10.561794] irq 13: nobody cared (try booting with the "irqpoll" option)
-[   10.563122] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.4.0-seattle-00009-g909b20467ed1 #133
-[   10.563124] Hardware name: linux,dummy-virt (DT)
-[   10.563126] Call trace:
-[   10.563134]  dump_backtrace+0x0/0x140
-[   10.563137]  show_stack+0x14/0x20
-[   10.563141]  dump_stack+0xbc/0x100
-[   10.563146]  __report_bad_irq+0x48/0xd4
-[   10.563148]  note_interrupt+0x288/0x378
-[   10.563151]  handle_irq_event_percpu+0x80/0x88
-[   10.563153]  handle_irq_event+0x44/0xc8
-[   10.563155]  handle_fasteoi_irq+0xb4/0x160
-[   10.563157]  generic_handle_irq+0x24/0x38
-[   10.563159]  __handle_domain_irq+0x60/0xb8
-[   10.563162]  gic_handle_irq+0x50/0xa0
-[   10.563164]  el1_irq+0xb8/0x180
-[   10.563166]  arch_cpu_idle+0x10/0x18
-[   10.563170]  do_idle+0x204/0x290
-[   10.563172]  cpu_startup_entry+0x20/0x40
-[   10.563175]  rest_init+0xd4/0xe0
-[   10.563180]  arch_call_rest_init+0xc/0x14
-[   10.563182]  start_kernel+0x420/0x44c
-[   10.563183] handlers:
-[   10.563650] [<000000001e474803>] sil24_interrupt
-[   10.564559] Disabling IRQ #13
-[..]
-[   11.832916] ata1: spurious interrupt (slot_stat 0x0 active_tag -84148995 sactive 0x0)
-[   12.045444] ata_ratelimit: 1 callbacks suppressed
+>>> +
+>>> + Parameters: address of a buffer in user space (u64), where the
+>>> +	     information is read from or stored into
+>>> + Returns:    -EFAULT if the given address is not accessible from kernel space;
+>>> +	     -EOPNOTSUPP if feature has not been requested to be enabled first;
+>>> +	     0 in case of success
+>>
+> 
+> 
 
-With this patch, I don't see the errors and the device works as
-expected.
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- vfio/core.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/vfio/core.c b/vfio/core.c
-index bad3c7c8cd26..0b45e78b40b4 100644
---- a/vfio/core.c
-+++ b/vfio/core.c
-@@ -226,6 +226,15 @@ int vfio_map_region(struct kvm *kvm, struct vfio_device *vdev,
- 	if (!(region->info.flags & VFIO_REGION_INFO_FLAG_MMAP))
- 		return vfio_setup_trap_region(kvm, vdev, region);
- 
-+	/*
-+	 * KVM_SET_USER_MEMORY_REGION will fail because the guest physical
-+	 * address isn't page aligned, let's emulate the region ourselves.
-+	 */
-+	if (region->guest_phys_addr & (PAGE_SIZE - 1))
-+		return kvm__register_mmio(kvm, region->guest_phys_addr,
-+					  region->info.size, false,
-+					  vfio_mmio_access, region);
-+
- 	if (region->info.flags & VFIO_REGION_INFO_FLAG_READ)
- 		prot |= PROT_READ;
- 	if (region->info.flags & VFIO_REGION_INFO_FLAG_WRITE)
 -- 
-2.7.4
+--
+Regards,
+Collin
 
+Stay safe and stay healthy
