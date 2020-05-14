@@ -2,87 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 472E51D3D4B
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 21:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2C921D3D65
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 21:26:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728025AbgENTSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 15:18:25 -0400
-Received: from mga17.intel.com ([192.55.52.151]:45643 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727987AbgENTSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 15:18:25 -0400
-IronPort-SDR: deqYmsASqCuZvMMfkelDH4OQHH7fVRarDIV3hFkhS/CuaDIt1Mn5lA39jkp91FKZSUIKoEC4KR
- RiMVNCdeMafQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 12:18:24 -0700
-IronPort-SDR: otlr/Bc1J/OkMNQtp5Gh+hPnaeW8KpTJir4maVnHF3TwNk7grY8hXpwv1+vUYyEsRuNFaDzQE/
- j61nhipb+mIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,392,1583222400"; 
-   d="scan'208";a="341719749"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 12:18:24 -0700
-Date:   Thu, 14 May 2020 12:18:23 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michael Tsirkin <mst@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org
-Subject: Re: [PATCH RFC 2/5] KVM: x86: introduce KVM_MEM_ALLONES memory
-Message-ID: <20200514191823.GA15847@linux.intel.com>
-References: <20200514180540.52407-1-vkuznets@redhat.com>
- <20200514180540.52407-3-vkuznets@redhat.com>
+        id S1727840AbgENT0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 15:26:42 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54063 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727805AbgENT0m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 15:26:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589484400;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Ym4kZHOpu9FP2AlLtBKdZrfkBRnuiojLGkis8wXb9d0=;
+        b=TrE0kS6INIWiRwkYKYNsx0GQl3gyeRlUSVbJtWT6fCfOFOWxxCRcgPO5+6gvUxDk7r06IY
+        dSfDnGhAl8tD9QRe6T3ChnWsQz6UQeD7biSRERZetNFVnYHIYsn+/D1qP8aBVkJ42DsUcs
+        KTqwt2Nq7IotoAovjS65uJjse4Qmqm4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-NtkrUXSwPSqMuX1UHr2xjw-1; Thu, 14 May 2020 15:26:32 -0400
+X-MC-Unique: NtkrUXSwPSqMuX1UHr2xjw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B67658018A5;
+        Thu, 14 May 2020 19:26:31 +0000 (UTC)
+Received: from thuth.com (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD0965C254;
+        Thu, 14 May 2020 19:26:28 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Laurent Vivier <lvivier@redhat.com>,
+        Drew Jones <drjones@redhat.com>,
+        Bill Wendling <morbo@google.com>
+Subject: [kvm-unit-tests PATCH 00/11] Misc fixes and CI improvements
+Date:   Thu, 14 May 2020 21:26:15 +0200
+Message-Id: <20200514192626.9950-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200514180540.52407-3-vkuznets@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 14, 2020 at 08:05:37PM +0200, Vitaly Kuznetsov wrote:
-> PCIe config space can (depending on the configuration) be quite big but
-> usually is sparsely populated. Guest may scan it by accessing individual
-> device's page which, when device is missing, is supposed to have 'pci
-> holes' semantics: reads return '0xff' and writes get discarded. Currently,
-> userspace has to allocate real memory for these holes and fill them with
-> '0xff'. Moreover, different VMs usually require different memory.
-> 
-> The idea behind the feature introduced by this patch is: let's have a
-> single read-only page filled with '0xff' in KVM and map it to all such
-> PCI holes in all VMs. This will free userspace of obligation to allocate
-> real memory. Later, this will also allow us to speed up access to these
-> holes as we can aggressively map the whole slot upon first fault.
-> 
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  Documentation/virt/kvm/api.rst  | 22 ++++++---
->  arch/x86/include/uapi/asm/kvm.h |  1 +
->  arch/x86/kvm/x86.c              |  9 ++--
->  include/linux/kvm_host.h        | 15 ++++++-
->  include/uapi/linux/kvm.h        |  2 +
->  virt/kvm/kvm_main.c             | 79 +++++++++++++++++++++++++++++++--
->  6 files changed, 113 insertions(+), 15 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index d871dacb984e..2b87d588a7e0 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1236,7 +1236,8 @@ yet and must be cleared on entry.
->  
->    /* for kvm_memory_region::flags */
->    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-> -  #define KVM_MEM_READONLY	(1UL << 1)
-> +  #define KVM_MEM_READONLY		(1UL << 1)
-> +  #define KVM_MEM_ALLONES		(1UL << 2)
+Here's a set of accumulated patches that fix the various problems with
+our CI pipelines, and then update the Gitlab-CI to use Fedora 32 instead
+of 30. Additionally, the new version of Clang in Fedora 32 is finally
+also able to compile the kvm-unit-tests (with some small fixes included
+in this series), so we can now also add a CI test with this compiler, too.
 
-Why not call this KVM_MEM_PCI_HOLE or something else that better conveys
-that this is memslot is intended to emulate PCI master abort semantics?
+Andrew Jones (1):
+  Fix out-of-tree builds
+
+Bill Wendling (2):
+  x86: use a non-negative number in shift
+  x86: use inline asm to retrieve stack pointer
+
+Mohammed Gamal (1):
+  x86/access: Fix phys-bits parameter
+
+Paolo Bonzini (1):
+  x86: avoid multiply defined symbol
+
+Thomas Huth (6):
+  Fixes for the umip test
+  Always compile the kvm-unit-tests with -fno-common
+  Fix powerpc issue with the linker from Fedora 32
+  Update the gitlab-ci to Fedora 32
+  vmx_tests: Silence warning from Clang
+  Compile the kvm-unit-tests also with Clang
+
+ .gitlab-ci.yml       | 17 +++++++++++++++--
+ Makefile             |  2 +-
+ configure            |  8 +++-----
+ lib/auxinfo.h        |  3 +--
+ lib/x86/fault_test.c |  2 +-
+ lib/x86/usermode.c   |  2 +-
+ powerpc/flat.lds     | 19 ++++++++++++++++---
+ x86/Makefile.common  |  1 +
+ x86/svm_tests.c      |  2 +-
+ x86/umip.c           |  6 ++++--
+ x86/unittests.cfg    |  2 +-
+ x86/vmx_tests.c      | 10 +++++++---
+ 12 files changed, 52 insertions(+), 22 deletions(-)
+
+-- 
+2.18.1
+
