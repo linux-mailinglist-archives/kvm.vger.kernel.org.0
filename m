@@ -2,146 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E85D11D3892
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 19:44:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2A171D389F
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 19:47:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726132AbgENRoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 13:44:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37752 "EHLO
+        id S1726201AbgENRrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 13:47:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726037AbgENRoY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 13:44:24 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE4BC061A0C
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 10:44:23 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id nv1so3551565ejb.0
-        for <kvm@vger.kernel.org>; Thu, 14 May 2020 10:44:23 -0700 (PDT)
+        by vger.kernel.org with ESMTP id S1725965AbgENRrH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 May 2020 13:47:07 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24831C061A0C
+        for <kvm@vger.kernel.org>; Thu, 14 May 2020 10:47:07 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id 17so4215350ilj.3
+        for <kvm@vger.kernel.org>; Thu, 14 May 2020 10:47:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=dBNj399I9KBA4WQWKhfnOR9xwS6zN5XEq7yhXlug5ig=;
-        b=NWXMu1Dz0IcgSIR0o7dkU8t+f692j04TewEeKSNlmIIzdaX3T3ipuK25pj1H/3k3Ry
-         3pF5C82IJeYVbVx8qa7TgslPH1k84cCm84ZK0uc++QwoOHPnGtQjt40je2lVxCBkg5/d
-         XyQH7u3Ceu6D2Xa75f0VFgs/1AKCyU7GeOJeY=
+         :cc;
+        bh=hq9TTD9sv3H6E//fPojWMNxvG+QCBAqmIw81AfdjMYE=;
+        b=rmEYr5/5WsjGQ1GaWuJX+YnTiWiaHsCeJPXoomAc9zM8grJcXo8WhnmsEoQTo/o3zd
+         BfqFLxN9LzkS5HXzCC8NChrTsiZShUO2OtjKAmgI2fxI4I46MxY5vA6NxwdJ5R9u6yP7
+         winlASYBxvuCPafG9sYu7XguuLmzbjXaqt/YjMvZ7W/dMmWuMF3unHDocZ1gMf12HSMe
+         s5/BR7YhSr/15flbMKoKnjFNbN5Q4uCxm2f+deYGPw+NpaxSpU6HSeaADLf5sRS4zkuV
+         w73oIcr2skn4cjFz7gd8C1ieIwQAextIxpbTC3oXrayNauBJaMj7g6YflvXaKqYb0jSC
+         d6Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=dBNj399I9KBA4WQWKhfnOR9xwS6zN5XEq7yhXlug5ig=;
-        b=LBvKg35jhdSehowfHEEX263H1DiC4+s1yaMLY56x31Mu/EEh24tHgpxSh/G1EP3hpC
-         8zuxWzJMxZ3vEp9wJpfDDiRgHAihms3akAJXtAGF/X87gMq0HmJ20fT0Gaz0g+0Z91zX
-         SLIkFnbk8a4rjyiC75cCtohmc4Y+3z5jiALemts083oY1K/tSa9oxXyoPJeR1rJ9smLt
-         YCRAklfKTsqnzUp0LMQsv71cDhGI2tY0Enw3rNJi+YgHXRYJRLP1+WuuaUqfS3VW0JzP
-         vOrSKQfWkQ3Z4Rxnxs4CrYfRzlG23l2x+YoESOeDQvm815JJog0HJ/xe4G417/bEsyna
-         5DMA==
-X-Gm-Message-State: AOAM531wf3+74MZ/MpQbtstXpjknupf2gmUJD9F/MwKZCTQQJppEOn19
-        pAJyYpaeSc+XLKk7Ckp15y6aLke2P6xhgAmN4koOxg==
-X-Google-Smtp-Source: ABdhPJxnLKW/hGCva4OlwaSvXXMHPteSUoNrCrzwbh93u10H8Nxz8iSIT2dLVaSMcTSaufzkcc2US+DOJ27HdWfBPD4=
-X-Received: by 2002:a17:906:55c4:: with SMTP id z4mr4930727ejp.332.1589478260810;
- Thu, 14 May 2020 10:44:20 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=hq9TTD9sv3H6E//fPojWMNxvG+QCBAqmIw81AfdjMYE=;
+        b=M6c45C+whNvzHC566oCX3VvE5yDibR+PmKMKjNpq+laWXtkqriyoiIiPbvB0tPqw6x
+         iDaTFgUumW6oi18vjxn1/m+MfTm8CrlgqlJCOIK6UGC0u1HTHoRYM6S7bhUzKqEursT7
+         Hmd8/MdDzSchBS+/cflhx0QYDpql20vyxxtzNWPQYz+bI+6Yyexulm7jrZW4TOGtdN9f
+         BOyJm+KFJJM6c+17qm9zwkngE5YqrLkaN1elyZmfyczla1GQ9GPudXk17uSOiGTwzdtG
+         SHC27++mwb+WWcic6Cj5F10FEnxxzFQtMVZKVA/iM12Kb2J5BVC+Il9wHqePQryxlxBw
+         61qQ==
+X-Gm-Message-State: AOAM532/5lkXXPpmA6qN/n56cO5rf62WQKPwns+x+GjjlBTTfxZg3C0P
+        4c5n+ZYXwLIsrlihj0zS8jKD7xnwmscPBJ0qMThbEMFE
+X-Google-Smtp-Source: ABdhPJzFWGcXVn+VguWJeR0y1meSPEP0b2qH3MdWDDPkKoqfn81dZqmtECsA5qih6rzJXJFsH9ao+xAeD2IvWUJEGrk=
+X-Received: by 2002:a92:d8ca:: with SMTP id l10mr5822330ilo.118.1589478426006;
+ Thu, 14 May 2020 10:47:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200511220046.120206-1-mortonm@chromium.org> <20200512111440.15caaca2@w520.home>
- <92fd66eb-68e7-596f-7dd1-f1c190833be4@redhat.com> <20200513083401.11e761a7@x1.home>
- <8c0bfeb7-0d08-db74-3a23-7a850f301a2a@redhat.com> <CAJ-EccPjU0Lh5gEnr0L9AhuuJTad1yHX-BzzWq21m+e-vY-ELA@mail.gmail.com>
- <0fdb5d54-e4d6-8f2f-69fe-1b157999d6cd@redhat.com>
-In-Reply-To: <0fdb5d54-e4d6-8f2f-69fe-1b157999d6cd@redhat.com>
-From:   Micah Morton <mortonm@chromium.org>
-Date:   Thu, 14 May 2020 10:44:08 -0700
-Message-ID: <CAJ-EccP6GNmyCGJZFfXUo2_8KEN_sJZ3=88f+3E-8SJ=JT8Pcg@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: Add module for IRQ forwarding
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Auger Eric <eric.auger@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        jmattson@google.com
+References: <20200511225616.19557-1-jmattson@google.com>
+In-Reply-To: <20200511225616.19557-1-jmattson@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 14 May 2020 10:46:55 -0700
+Message-ID: <CALMp9eTibESYUA-2q2AtRES8b7AOEzZtda4g9r3OV8erbZ3TKg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Fix off-by-one error in kvm_vcpu_ioctl_x86_setup_mce
+To:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jue Wang <juew@google.com>, Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 13, 2020 at 3:05 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, May 11, 2020 at 3:56 PM Jim Mattson <jmattson@google.com> wrote:
 >
-> On 13/05/20 21:10, Micah Morton wrote:
-> > * If we only care about the bus controller existing (in an emulated
-> > fashion) enough for the guest to discover the device in question, this
-> > could work. I=E2=80=99m concerned that power management could be an iss=
-ue here
-> > however. For instance, I have a touchscreen device assigned to the
-> > guest (irq forwarding done with this module) that in response to the
-> > screen being touched prepares the i2c controller for a transaction by
-> > calling into the PM system which end up writing to the PCI config
-> > space** (here https://elixir.bootlin.com/linux/v5.6.12/source/drivers/i=
-2c/busses/i2c-designware-master.c#L435).
-> > It seems like this kind of scenario expands the scope of what would
-> > need to be supported by the emulated i2c controller, which is less
-> > ideal. The way I have it currently working, vfio-pci emulates the PCI
-> > config space so the guest can do power management by accessing that
-> > space.
+> Bank_num is a one-based count of banks, not a zero-based index. It
+> overflows the allocated space only when strictly greater than
+> KVM_MAX_MCE_BANKS.
 >
-> This wouldn't be a problem.  When the emulated i2c controller starts a
-> transaction on th edevice, it will be performed by the host i2c
-> controller and this will lead to the same config space write.
+> Fixes: a9e38c3e01ad ("KVM: x86: Catch potential overrun in MCE setup")
+> Signed-off-by: Jue Wang <juew@google.com>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d786c7d27ce5..5bf45c9aa8e5 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3751,7 +3751,7 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+>         unsigned bank_num = mcg_cap & 0xff, bank;
+>
+>         r = -EINVAL;
+> -       if (!bank_num || bank_num >= KVM_MAX_MCE_BANKS)
+> +       if (!bank_num || bank_num > KVM_MAX_MCE_BANKS)
+>                 goto out;
+>         if (mcg_cap & ~(kvm_mce_cap_supported | 0xff | 0xff0000))
+>                 goto out;
+> --
+> 2.26.2.645.ge9eca65c58-goog
+>
 
-I guess what you're saying is there would be an i2c controller
-(emulated PCI device) in the guest and the i2c device driver would
-still call i2c_dw_xfer as above and the execution in the guest would
-still continue all the way to pci_write_config_word(). Then when the
-guest executes the actual config write it would trap to the host,
-which would need to have the logic that the guest is trying to do
-runtime PM commands on an emulated PCI device so we need to step in
-and reset the actual PCI device on the host that backs that emulated
-device. Is this right?
-
-Again, this is assuming we have the infrastructure to pass platform
-devices on x86 to the guest with vfio-platform, which I don't think is
-the case. +Auger Eric (not sure why gmail puts your name backwards)
-would you be able to comment on this based on my previous message?
-
->
-> I have another question: would it be possible to expose this IRQ through
-> /dev/i2c-* instead of messing with VFIO?
->
-> In fact, adding support for /dev/i2c passthrough to QEMU has long been a
-> pet idea of mine (my usecase was different though: the idea was to write
-> programs for a microcontroller on an ARM single board computer and run
-> them under QEMU in emulation mode).  It's not trivial, because there
-> could be some impedence mismatch between the guest (which might be
-> programmed against a low-level controller or might even do bit banging)
-> and the i2c-dev interface which is more high level.  Also QEMU cannot do
-> clock stretching right now.  However, it's certainly doable.
-
-I agree that would be a cool thing to have in QEMU. Unfortunately I am
-interested in assigning other PCI bus controllers to a guest VM and
-(similar to the i2c example above) in some cases these busses (e.g.
-LPC, SPI) have devices with arbitrary interrupts that need to be
-forwarded into the guest for things to work.
-
-I realize this may seem like an over-use of VFIO, but I'm actually
-coming from the angle of wanting to assign _most_ of the important
-hardware on my device to a VM guest, and I'm looking to avoid
-emulation wherever possible. Of course there will be devices like the
-IOAPIC for which emulation is unavoidable, but I think emulation is
-avoidable here for the busses we've mentioned if there is a way to
-forward arbitrary interrupts into the guest.
-
-Since all these use cases are so close to working with vfio-pci right
-out of the box, I was really hoping to come up with a simple and
-generic solution to the arbitrary interrupt problem that can be used
-for multiple bus types.
-
->
-> >> (Finally, in the past we were doing device assignment tasks within KVM
-> >> and it was a bad idea.  Anything you want to do within KVM with respec=
-t
-> >> to device assignment, someone else will want to do it from bare metal.
-> >
-> > Are you saying people would want to use this in non-virtualized
-> > scenarios like running drivers in userspace without any VMM/guest? And
-> > they could do that if this was part of VFIO and not part of KVM?
->
-> Yes, see above for an example.
->
-> Paolo
->
+Ping?
