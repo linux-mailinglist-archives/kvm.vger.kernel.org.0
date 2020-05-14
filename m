@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 984511D2A23
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 090241D2A2C
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:33:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726374AbgENIb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 04:31:29 -0400
+        id S1726632AbgENIbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 04:31:33 -0400
 Received: from mga18.intel.com ([134.134.136.126]:12089 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725970AbgENIb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 04:31:28 -0400
-IronPort-SDR: ApFl5oTnSLQtVVGrnoV0a6G2r3Ncqs8PoBys6VfYGrD/DMgnyW5TuLw1Hk4/APtl0FPvctdeyY
- ZPvq+bDUXVCA==
+        id S1726347AbgENIbb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 04:31:31 -0400
+IronPort-SDR: Vfr9RHmiN2w9l1zTu2XOR0V37ZXcbyFcc65tKwvm5npyDjr4ev3YYUszcR6FJJ265oqSonICUx
+ O6tgiVcO4Hig==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:27 -0700
-IronPort-SDR: Yy5f+09HqVcYBzklsHZ+VH23XQzVL9jta9UM8SqQwCRi24dlzc5Nhjk1aC0KZU16vOPPyQt9NP
- Jy4R7e27UyTQ==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:31 -0700
+IronPort-SDR: a3J8g7jeDDrKX+ntlRdHKVcC1zXQx09IGfJ/qBrcaZWw0take9wzdvM7TIg4L2N7VLwRyFSFno
+ 6PBdajgEnqfw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,390,1583222400"; 
-   d="scan'208";a="341539971"
+   d="scan'208";a="341539981"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:23 -0700
+  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:27 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -34,160 +34,176 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
-        wei.w.wang@intel.com, Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v11 05/11] perf/x86: Keep LBR stack unchanged in host context for guest LBR event
-Date:   Thu, 14 May 2020 16:30:48 +0800
-Message-Id: <20200514083054.62538-6-like.xu@linux.intel.com>
+        wei.w.wang@intel.com
+Subject: [PATCH v11 06/11] KVM: x86/pmu: Tweak kvm_pmu_get_msr to pass 'struct msr_data' in
+Date:   Thu, 14 May 2020 16:30:49 +0800
+Message-Id: <20200514083054.62538-7-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200514083054.62538-1-like.xu@linux.intel.com>
 References: <20200514083054.62538-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a guest wants to use the LBR stack, its hypervisor creates a guest
-LBR event and let host perf schedules it. A new 'int guest_lbr_enabled'
-field in the 'struct cpu_hw_events', is marked as true when perf adds
-a guest LBR event and marked as false on deletion.
+From: Wei Wang <wei.w.wang@intel.com>
 
-The LBR stack msrs are accessible to the guest when its guest LBR event
-is scheduled in by the perf subsystem. Before scheduling this event out,
-we should avoid host changes on IA32_DEBUGCTLMSR or LBR_SELECT.
-Otherwise, some unexpected branch operations may interfere with guest
-behavior, pollute LBR records, and even cause host branch data leakage.
-In addition, the intel_pmu_lbr_read() on the host is also avoidable.
+Change kvm_pmu_get_msr() to get the msr_data struct, as the host_initiated
+field from the struct could be used by get_msr. This also makes this API
+consistent with kvm_pmu_set_msr. No functional changes.
 
-To ensure that guest LBR records are not lost during the context switch,
-the BRANCH_CALL_STACK flag should be configured in the 'branch_sample_type'
-for any guest LBR event because the callstack mode could save/restore guest
-unread LBR records with the help of intel_pmu_lbr_sched_task() naturally.
-
-However, the regular host LBR perf event doesn't save/restore LBR_SELECT,
-because it's configured in the LBR_enable() based on branch_sample_type.
-So when a guest LBR is running, the guest LBR_SELECT may changes for its
-own use and we have to support LBR_SELECT save/restore to ensure what the
-guest LBR_SELECT value doesn't get lost during the context switching.
-
-Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
-Co-developed-by: Wei Wang <wei.w.wang@intel.com>
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/events/intel/lbr.c  | 33 ++++++++++++++++++++++++++++++---
- arch/x86/events/perf_event.h |  2 ++
- 2 files changed, 32 insertions(+), 3 deletions(-)
+ arch/x86/kvm/pmu.c           |  4 ++--
+ arch/x86/kvm/pmu.h           |  4 ++--
+ arch/x86/kvm/svm/pmu.c       |  7 ++++---
+ arch/x86/kvm/vmx/pmu_intel.c | 19 +++++++++++--------
+ arch/x86/kvm/x86.c           |  4 ++--
+ 5 files changed, 21 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-index 0a91cbe3a7c7..ff8d0433837d 100644
---- a/arch/x86/events/intel/lbr.c
-+++ b/arch/x86/events/intel/lbr.c
-@@ -383,6 +383,15 @@ static void __intel_pmu_lbr_restore(struct x86_perf_task_context *task_ctx)
- 
- 	wrmsrl(x86_pmu.lbr_tos, tos);
- 	task_ctx->lbr_stack_state = LBR_NONE;
-+
-+	/*
-+	 * When the LBR hardware is scheduled for a guest LBR event,
-+	 * the guest lbr_sel is likely different from event->hw.branch_reg.
-+	 * Therefore, it’s necessary to save/restore MSR_LBR_SELECT written
-+	 * by the guest so that it's not lost during the context switch.
-+	 */
-+	if (cpuc->guest_lbr_enabled)
-+		wrmsrl(MSR_LBR_SELECT, task_ctx->lbr_sel);
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index a5078841bdac..b86346903f2e 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -397,9 +397,9 @@ static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
+ 		__set_bit(pmc->idx, pmu->pmc_in_use);
  }
  
- static void __intel_pmu_lbr_save(struct x86_perf_task_context *task_ctx)
-@@ -415,6 +424,9 @@ static void __intel_pmu_lbr_save(struct x86_perf_task_context *task_ctx)
- 
- 	cpuc->last_task_ctx = task_ctx;
- 	cpuc->last_log_id = ++task_ctx->log_id;
-+
-+	if (cpuc->guest_lbr_enabled)
-+		rdmsrl(MSR_LBR_SELECT, task_ctx->lbr_sel);
+-int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
++int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ {
+-	return kvm_x86_ops.pmu_ops->get_msr(vcpu, msr, data);
++	return kvm_x86_ops.pmu_ops->get_msr(vcpu, msr_info);
  }
  
- void intel_pmu_lbr_swap_task_ctx(struct perf_event_context *prev,
-@@ -485,6 +497,9 @@ void intel_pmu_lbr_add(struct perf_event *event)
- 	if (!x86_pmu.lbr_nr)
- 		return;
+ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index a6c78a797cb1..ab85eed8a6cc 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -32,7 +32,7 @@ struct kvm_pmu_ops {
+ 	struct kvm_pmc *(*msr_idx_to_pmc)(struct kvm_vcpu *vcpu, u32 msr);
+ 	int (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
+ 	bool (*is_valid_msr)(struct kvm_vcpu *vcpu, u32 msr);
+-	int (*get_msr)(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
++	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+ 	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+ 	void (*refresh)(struct kvm_vcpu *vcpu);
+ 	void (*init)(struct kvm_vcpu *vcpu);
+@@ -147,7 +147,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
+ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
+ int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
+ bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
+-int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
++int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+ void kvm_pmu_refresh(struct kvm_vcpu *vcpu);
+ void kvm_pmu_reset(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index ce0b10fe5e2b..035da07500e8 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -215,21 +215,22 @@ static struct kvm_pmc *amd_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
+ 	return pmc;
+ }
  
-+	if (is_guest_lbr_event(event))
-+		cpuc->guest_lbr_enabled = 1;
-+
- 	cpuc->br_sel = event->hw.branch_reg.reg;
+-static int amd_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
++static int amd_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 	struct kvm_pmc *pmc;
++	u32 msr = msr_info->index;
  
- 	if (branch_user_callstack(cpuc->br_sel) && event->ctx->task_ctx_data) {
-@@ -532,6 +547,9 @@ void intel_pmu_lbr_del(struct perf_event *event)
- 		task_ctx->lbr_callstack_users--;
+ 	/* MSR_PERFCTRn */
+ 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
+ 	if (pmc) {
+-		*data = pmc_read_counter(pmc);
++		msr_info->data = pmc_read_counter(pmc);
+ 		return 0;
+ 	}
+ 	/* MSR_EVNTSELn */
+ 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_EVNTSEL);
+ 	if (pmc) {
+-		*data = pmc->eventsel;
++		msr_info->data = pmc->eventsel;
+ 		return 0;
  	}
  
-+	if (is_guest_lbr_event(event))
-+		cpuc->guest_lbr_enabled = 0;
-+
- 	if (x86_pmu.intel_cap.pebs_baseline && event->attr.precise_ip > 0)
- 		cpuc->lbr_pebs_users--;
- 	cpuc->lbr_users--;
-@@ -544,7 +562,12 @@ void intel_pmu_lbr_enable_all(bool pmi)
- {
- 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
- 
--	if (cpuc->lbr_users)
-+	/*
-+	 * When the LBR hardware is scheduled for a guest LBR event,
-+	 * the guest will dis/enables LBR itself at the appropriate time,
-+	 * including configuring MSR_LBR_SELECT.
-+	 */
-+	if (cpuc->lbr_users && !cpuc->guest_lbr_enabled)
- 		__intel_pmu_lbr_enable(pmi);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 7c857737b438..e1a303fefc16 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -184,35 +184,38 @@ static struct kvm_pmc *intel_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
+ 	return pmc;
  }
  
-@@ -552,7 +575,7 @@ void intel_pmu_lbr_disable_all(void)
+-static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
++static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
  {
- 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 	struct kvm_pmc *pmc;
++	u32 msr = msr_info->index;
  
--	if (cpuc->lbr_users)
-+	if (cpuc->lbr_users && !cpuc->guest_lbr_enabled)
- 		__intel_pmu_lbr_disable();
- }
- 
-@@ -693,8 +716,12 @@ void intel_pmu_lbr_read(void)
- 	 *
- 	 * This could be smarter and actually check the event,
- 	 * but this simple approach seems to work for now.
-+	 *
-+	 * And there is no need to read LBR record here if a guest LBR
-+	 * event is using it, because the guest will read them on its own.
- 	 */
--	if (!cpuc->lbr_users || cpuc->lbr_users == cpuc->lbr_pebs_users)
-+	if (!cpuc->lbr_users || cpuc->guest_lbr_enabled ||
-+	    cpuc->lbr_users == cpuc->lbr_pebs_users)
- 		return;
- 
- 	if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_32)
-diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
-index 34d76a2f5ebd..8d322b0204c8 100644
---- a/arch/x86/events/perf_event.h
-+++ b/arch/x86/events/perf_event.h
-@@ -237,6 +237,7 @@ struct cpu_hw_events {
- 	u64				br_sel;
- 	struct x86_perf_task_context	*last_task_ctx;
- 	int				last_log_id;
-+	int				guest_lbr_enabled;
- 
- 	/*
- 	 * Intel host/guest exclude bits
-@@ -721,6 +722,7 @@ struct x86_perf_task_context {
- 	u64 lbr_from[MAX_LBR_ENTRIES];
- 	u64 lbr_to[MAX_LBR_ENTRIES];
- 	u64 lbr_info[MAX_LBR_ENTRIES];
-+	u64 lbr_sel;
- 	int tos;
- 	int valid_lbrs;
- 	int lbr_callstack_users;
+ 	switch (msr) {
+ 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
+-		*data = pmu->fixed_ctr_ctrl;
++		msr_info->data = pmu->fixed_ctr_ctrl;
+ 		return 0;
+ 	case MSR_CORE_PERF_GLOBAL_STATUS:
+-		*data = pmu->global_status;
++		msr_info->data = pmu->global_status;
+ 		return 0;
+ 	case MSR_CORE_PERF_GLOBAL_CTRL:
+-		*data = pmu->global_ctrl;
++		msr_info->data = pmu->global_ctrl;
+ 		return 0;
+ 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+-		*data = pmu->global_ovf_ctrl;
++		msr_info->data = pmu->global_ovf_ctrl;
+ 		return 0;
+ 	default:
+ 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
+ 			u64 val = pmc_read_counter(pmc);
+-			*data = val & pmu->counter_bitmask[KVM_PMC_GP];
++			msr_info->data =
++				val & pmu->counter_bitmask[KVM_PMC_GP];
+ 			return 0;
+ 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
+ 			u64 val = pmc_read_counter(pmc);
+-			*data = val & pmu->counter_bitmask[KVM_PMC_FIXED];
++			msr_info->data =
++				val & pmu->counter_bitmask[KVM_PMC_FIXED];
+ 			return 0;
+ 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
+-			*data = pmc->eventsel;
++			msr_info->data = pmc->eventsel;
+ 			return 0;
+ 		}
+ 	}
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7e46027f405a..23fe511c6ba0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3106,7 +3106,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
+ 	case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
+ 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+-			return kvm_pmu_get_msr(vcpu, msr_info->index, &msr_info->data);
++			return kvm_pmu_get_msr(vcpu, msr_info);
+ 		msr_info->data = 0;
+ 		break;
+ 	case MSR_IA32_UCODE_REV:
+@@ -3268,7 +3268,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	default:
+ 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+-			return kvm_pmu_get_msr(vcpu, msr_info->index, &msr_info->data);
++			return kvm_pmu_get_msr(vcpu, msr_info);
+ 		if (!ignore_msrs) {
+ 			vcpu_debug_ratelimited(vcpu, "unhandled rdmsr: 0x%x\n",
+ 					       msr_info->index);
 -- 
 2.21.3
 
