@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65E2C1D2A31
-	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4FA1D2A35
+	for <lists+kvm@lfdr.de>; Thu, 14 May 2020 10:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727098AbgENIbr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 May 2020 04:31:47 -0400
-Received: from mga18.intel.com ([134.134.136.126]:12089 "EHLO mga18.intel.com"
+        id S1727785AbgENIb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 May 2020 04:31:59 -0400
+Received: from mga18.intel.com ([134.134.136.126]:12116 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727050AbgENIbp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 May 2020 04:31:45 -0400
-IronPort-SDR: CybOFdpDg/q3KVVdWkAs9JoMpKoUNfTvip2jy772PjVK4r6l3bwTkIWBUwfmbmHpYPOeKIq7+E
- Nv7VJF9XY3iw==
+        id S1726170AbgENIb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 May 2020 04:31:58 -0400
+IronPort-SDR: tZ8rUyBH5JtvRGlCcggewRvjav/RWEMlBimSEkLx0428gDuqTVrna+VDQpr3YjXpv4Tog3siCi
+ Vm0N+YBIMWkg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:45 -0700
-IronPort-SDR: 1+ordkhGBNpAcHCPzkHvlYddkq04iMxDBIFq59y2JBiAQHfKAWxnDoFRnMplx05jUTosTgHiev
- PSZK1Fh2Lr6A==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2020 01:31:48 -0700
+IronPort-SDR: bIFdmafFsMjEa8hO3SPpcMFfY4ADcsoVaH6+a8TCzaMA/b+LX37aMRpsVnsMM61CUVePSMmSI3
+ WRG2qw8ZHC2Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,390,1583222400"; 
-   d="scan'208";a="341540032"
+   d="scan'208";a="341540043"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:42 -0700
+  by orsmga001.jf.intel.com with ESMTP; 14 May 2020 01:31:45 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -35,9 +35,9 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
         wei.w.wang@intel.com, Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v11 10/11] KVM: x86/pmu: Check guest LBR availability in case host reclaims them
-Date:   Thu, 14 May 2020 16:30:53 +0800
-Message-Id: <20200514083054.62538-11-like.xu@linux.intel.com>
+Subject: [PATCH v11 11/11] KVM: x86/pmu: Reduce the overhead of LBR passthrough or cancellation
+Date:   Thu, 14 May 2020 16:30:54 +0800
+Message-Id: <20200514083054.62538-12-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200514083054.62538-1-like.xu@linux.intel.com>
 References: <20200514083054.62538-1-like.xu@linux.intel.com>
@@ -48,107 +48,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the guest LBR event exists and the LBR stack is available (defined
-as 'event->oncpu != -1'), the LBR records msrs access would not be
-intercepted but passthrough to the vcpu before vm-entry. This kind
-of availability check is always performed before vm-entry, but as late
-as possible to avoid reclaiming resources from any higher priority event.
-A negative check result would bring the registers interception back, and
-it also prevents real registers accesses and potential data leakage.
+After passthrough the LBR msrs to the guest, there is no need to call
+intel_pmu_intercept_lbr_msrs() again and again, and vice versa.
 
-The KVM emits a pr_warn() on the host when the guest LBR is unavailable.
-The administer is supposed to reminder users that the guest result may be
-inaccurate if someone is using LBR to record hypervisor on the host side.
+If host reclaims the LBR between two availability checks, the interception
+state and LBR records can be safely preserved due to native save/restore
+support from guest LBR event.
 
-Suggested-by: Wei Wang <wei.w.wang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/kvm/pmu.h           |  1 +
- arch/x86/kvm/vmx/pmu_intel.c | 38 ++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c       |  4 +++-
- 3 files changed, 42 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h | 3 +++
+ arch/x86/kvm/pmu.c              | 1 +
+ arch/x86/kvm/vmx/pmu_intel.c    | 9 +++++++++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 78f0cfe1622f..bb3f3ef3386e 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -42,6 +42,7 @@ struct kvm_pmu_ops {
- 	void (*reset)(struct kvm_vcpu *vcpu);
- 	void (*deliver_pmi)(struct kvm_vcpu *vcpu);
- 	void (*lbr_cleanup)(struct kvm_vcpu *vcpu);
-+	void (*availability_check)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 57b281c4b196..dd51250c5688 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -511,6 +511,9 @@ struct kvm_pmu {
+ 	 * The records may be inaccurate if the host reclaims the LBR.
+ 	 */
+ 	struct perf_event *lbr_event;
++
++	/* A flag to reduce the overhead of LBR pass-through or cancellation. */
++	bool lbr_already_available;
  };
  
- static inline bool event_is_oncpu(struct perf_event *event)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index ea4faae56473..db185dca903d 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -646,6 +646,43 @@ static void intel_pmu_lbr_cleanup(struct kvm_vcpu *vcpu)
- 		intel_pmu_free_lbr_event(vcpu);
+ struct kvm_pmu_ops;
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index d0dece055605..583ecb5f5f7c 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -437,6 +437,7 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+ 	init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
+ 	pmu->event_count = 0;
+ 	pmu->need_cleanup = false;
++	pmu->lbr_already_available = false;
+ 	kvm_pmu_refresh(vcpu);
  }
  
-+static bool intel_pmu_lbr_is_availabile(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index db185dca903d..408d80c9418b 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -316,6 +316,7 @@ static void intel_pmu_free_lbr_event(struct kvm_vcpu *vcpu)
+ 
+ 	perf_event_release_kernel(event);
+ 	intel_pmu_intercept_lbr_msrs(vcpu, true);
++	pmu->lbr_already_available = false;
+ 	pmu->event_count--;
+ 	pmu->lbr_event = NULL;
+ }
+@@ -653,10 +654,18 @@ static bool intel_pmu_lbr_is_availabile(struct kvm_vcpu *vcpu)
+ 	if (!pmu->lbr_event)
+ 		return false;
+ 
++	if (pmu->lbr_already_available && event_is_oncpu(pmu->lbr_event))
++		return true;
 +
-+	if (!pmu->lbr_event)
++	if (!pmu->lbr_already_available && !event_is_oncpu(pmu->lbr_event))
 +		return false;
 +
-+	if (event_is_oncpu(pmu->lbr_event)) {
-+		intel_pmu_intercept_lbr_msrs(vcpu, false);
-+	} else {
-+		intel_pmu_intercept_lbr_msrs(vcpu, true);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+/*
-+ * Higher priority host perf events (e.g. cpu pinned) could reclaim the
-+ * pmu resources (e.g. LBR) that were assigned to the guest. This is
-+ * usually done via ipi calls (more details in perf_install_in_context).
-+ *
-+ * Before entering the non-root mode (with irq disabled here), double
-+ * confirm that the pmu features enabled to the guest are not reclaimed
-+ * by higher priority host events. Otherwise, disallow vcpu's access to
-+ * the reclaimed features.
-+ */
-+static void intel_pmu_availability_check(struct kvm_vcpu *vcpu)
-+{
-+	lockdep_assert_irqs_disabled();
-+
-+	if (lbr_is_enabled(vcpu) && !intel_pmu_lbr_is_availabile(vcpu) &&
-+		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
-+		pr_warn_ratelimited("kvm: vcpu-%d: LBR is temporarily unavailable.\n",
-+			vcpu->vcpu_id);
-+}
-+
- struct kvm_pmu_ops intel_pmu_ops = {
- 	.find_arch_event = intel_find_arch_event,
- 	.find_fixed_event = intel_find_fixed_event,
-@@ -662,4 +699,5 @@ struct kvm_pmu_ops intel_pmu_ops = {
- 	.reset = intel_pmu_reset,
- 	.deliver_pmi = intel_pmu_deliver_pmi,
- 	.lbr_cleanup = intel_pmu_lbr_cleanup,
-+	.availability_check = intel_pmu_availability_check,
- };
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9969d663826a..80d036c5f64a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6696,8 +6696,10 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	pt_guest_enter(vmx);
- 
--	if (vcpu_to_pmu(vcpu)->version)
-+	if (vcpu_to_pmu(vcpu)->version) {
- 		atomic_switch_perf_msrs(vmx);
-+		kvm_x86_ops.pmu_ops->availability_check(vcpu);
-+	}
- 
- 	atomic_switch_umwait_control_msr(vmx);
+ 	if (event_is_oncpu(pmu->lbr_event)) {
+ 		intel_pmu_intercept_lbr_msrs(vcpu, false);
++		pmu->lbr_already_available = true;
+ 	} else {
+ 		intel_pmu_intercept_lbr_msrs(vcpu, true);
++		pmu->lbr_already_available = false;
+ 		return false;
+ 	}
  
 -- 
 2.21.3
