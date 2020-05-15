@@ -2,124 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 270B71D480E
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 10:24:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BAEA1D4811
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 10:25:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbgEOIYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 04:24:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39162 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726723AbgEOIYw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 04:24:52 -0400
+        id S1727113AbgEOIZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 04:25:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25534 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726889AbgEOIZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 04:25:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589531091;
+        s=mimecast20190719; t=1589531157;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0DQftDX0379nFESU6WazrW1lD4fM3GC98zH3yfUsrwE=;
-        b=fW+S6noMl/RN6E5cblpWWIBnzXq49fKzCitKKW7l3n8kxactOAc1dcEOwafbuE8EfIwWH/
-        YkP40ext3c9e0HnIQumsAtjq4CE42I5tyZmJJeYi06bXk8CfKoWn/j/Tc0nkD7qU01NrNP
-        Etn5Q6FGSoxZMmgOt/KfHzatDd3+Fmw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-4xc6qsUNMNGZltHENYneHA-1; Fri, 15 May 2020 04:24:49 -0400
-X-MC-Unique: 4xc6qsUNMNGZltHENYneHA-1
-Received: by mail-wr1-f72.google.com with SMTP id y4so795527wrw.20
-        for <kvm@vger.kernel.org>; Fri, 15 May 2020 01:24:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=0DQftDX0379nFESU6WazrW1lD4fM3GC98zH3yfUsrwE=;
-        b=Iaw/R5zU8wm3Ihm3F2dxTvyzx9Btn2uQuEUwDofaM9uNl7i++pF2ZajpN3DAOh40NI
-         ZWRhJxJAl0p+GohBvyxMlHGPuE7CUgbP2lI569ZlXFF6pJpPiZp8LLL15ZdA1dp96XZI
-         U4Iq+OFoQxeoK5gATJYwRXdRLr13Uh6n2lFQKf+aIgkvk8fV6MD/1ctozmYPbCvejiwM
-         l5QYCvTUIWq0v5ppx0ggKY98loh+p+VXHGzDcA4ePVA4iBPKKsAIa8+BkMFJR4LFgQFS
-         fVXKQfxBVIqL7NZGAim/0z8qI3Wi4hGPB6k9wVWz/dCF8NDJeN7Ty1eOVErkiRBaljY9
-         WVtw==
-X-Gm-Message-State: AOAM530PH2b6UNiUuoQ5b4aq8oV5gzQl341ZzB6w34A8SnnAvSoDYyP3
-        AZCiNjexhPVsyaXzl+SPXk8KZ8tl8XODyd3DeMJYWEA+524I3VA6ZcT8jNJBgfu7bSeBMNUtUcg
-        ymyc5AQbtytzC
-X-Received: by 2002:a5d:62c7:: with SMTP id o7mr2914723wrv.212.1589531087918;
-        Fri, 15 May 2020 01:24:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWc8/zKYnO5ihSmyMO25yKM3a8VD+LjoaKKI+gb3ocgg3J9JGwXdm6ilapNMfvQgQoDQ4XVw==
-X-Received: by 2002:a5d:62c7:: with SMTP id o7mr2914689wrv.212.1589531087638;
-        Fri, 15 May 2020 01:24:47 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id r11sm2419027wrv.14.2020.05.15.01.24.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2020 01:24:46 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michael Tsirkin <mst@redhat.com>,
-        Julia Suvorova <jsuvorov@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org
-Subject: Re: [PATCH RFC 2/5] KVM: x86: introduce KVM_MEM_ALLONES memory
-In-Reply-To: <20200514191823.GA15847@linux.intel.com>
-References: <20200514180540.52407-1-vkuznets@redhat.com> <20200514180540.52407-3-vkuznets@redhat.com> <20200514191823.GA15847@linux.intel.com>
-Date:   Fri, 15 May 2020 10:24:45 +0200
-Message-ID: <87imgxwqpe.fsf@vitty.brq.redhat.com>
+        bh=L55+GN1/gJx1jYKQJAQTtWgFerTOfxxaSZD4uMmhl7Y=;
+        b=H8yWeMXiO3N+vjjbTVcH3JfuA+s7jeEZO9qeyV86555EnCtLYVvBdPJj3/NgORRipIsFp6
+        UMza5w86f0yibRn/aVLjDJth53Dkm5+RXIdMWdvAizoaePM/4EtVB5gaeViM5DtED1z0Wt
+        jyZ0m9o2+uJISzVzKdHc4r7MaQ417MQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-LXlIZ4rvMcutHye3iApaJQ-1; Fri, 15 May 2020 04:25:53 -0400
+X-MC-Unique: LXlIZ4rvMcutHye3iApaJQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 740E6107ACF9;
+        Fri, 15 May 2020 08:25:52 +0000 (UTC)
+Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1076334661;
+        Fri, 15 May 2020 08:25:50 +0000 (UTC)
+Date:   Fri, 15 May 2020 10:25:48 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v6 07/10] s390x: css: msch, enable test
+Message-ID: <20200515102548.0f43419d.cohuck@redhat.com>
+In-Reply-To: <de18eab3-4d0a-1b86-f6c4-27aaa7bba6bf@linux.ibm.com>
+References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
+        <1587725152-25569-8-git-send-email-pmorel@linux.ibm.com>
+        <cff917e0-f7e0-fd48-eda5-0cbe8173ae8a@linux.ibm.com>
+        <abafd691-d9ab-33b2-c522-d37fecc3e881@linux.ibm.com>
+        <20200514140808.269f6485.cohuck@redhat.com>
+        <de18eab3-4d0a-1b86-f6c4-27aaa7bba6bf@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Fri, 15 May 2020 09:11:52 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> On Thu, May 14, 2020 at 08:05:37PM +0200, Vitaly Kuznetsov wrote:
->> PCIe config space can (depending on the configuration) be quite big but
->> usually is sparsely populated. Guest may scan it by accessing individual
->> device's page which, when device is missing, is supposed to have 'pci
->> holes' semantics: reads return '0xff' and writes get discarded. Currently,
->> userspace has to allocate real memory for these holes and fill them with
->> '0xff'. Moreover, different VMs usually require different memory.
->> 
->> The idea behind the feature introduced by this patch is: let's have a
->> single read-only page filled with '0xff' in KVM and map it to all such
->> PCI holes in all VMs. This will free userspace of obligation to allocate
->> real memory. Later, this will also allow us to speed up access to these
->> holes as we can aggressively map the whole slot upon first fault.
->> 
->> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  Documentation/virt/kvm/api.rst  | 22 ++++++---
->>  arch/x86/include/uapi/asm/kvm.h |  1 +
->>  arch/x86/kvm/x86.c              |  9 ++--
->>  include/linux/kvm_host.h        | 15 ++++++-
->>  include/uapi/linux/kvm.h        |  2 +
->>  virt/kvm/kvm_main.c             | 79 +++++++++++++++++++++++++++++++--
->>  6 files changed, 113 insertions(+), 15 deletions(-)
->> 
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index d871dacb984e..2b87d588a7e0 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -1236,7 +1236,8 @@ yet and must be cleared on entry.
->>  
->>    /* for kvm_memory_region::flags */
->>    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
->> -  #define KVM_MEM_READONLY	(1UL << 1)
->> +  #define KVM_MEM_READONLY		(1UL << 1)
->> +  #define KVM_MEM_ALLONES		(1UL << 2)
->
-> Why not call this KVM_MEM_PCI_HOLE or something else that better conveys
-> that this is memslot is intended to emulate PCI master abort semantics?
->
+> On 2020-05-14 14:08, Cornelia Huck wrote:
+> > On Tue, 28 Apr 2020 10:27:36 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >   
+> >> On 2020-04-27 15:11, Janosch Frank wrote:  
+> >>> On 4/24/20 12:45 PM, Pierre Morel wrote:  
+> >   
+> >>>> This is NOT a routine to really enable the channel, no retry is done,
+> >>>> in case of error, a report is made.  
+> >>>
+> >>> Would we expect needing retries for the pong device?  
+> >>
+> >> Yes it can be that we need to retry some instructions if we want them to
+> >> succeed.
+> >> This is the case for example if we develop a driver for an operating system.
+> >> When working with firmware, sometime, things do not work at the first
+> >> time. Mostly due to races in silicium, firmware or hypervisor or between
+> >> them all.
+> >>
+> >> Since our purpose is to detect such problems we do not retry
+> >> instructions but report the error.
+> >>
+> >> If we detect such problem we may in the future enhance the tests.  
+> > 
+> > I think I've seen retries needed on z/VM in the past; do you know if
+> > that still happens?
+> >   
+> 
+> I did not try the tests under z/VM, nor direct on an LPAR, only under 
+> QEMU/KVM.
+> Under QEMU/KVM, I did not encounter any need for retry, 100% of the 
+> enabled succeeded on first try.
 
-Becuase there's always hope this can be usefult for something else but
-PCI? :-) Actually, I was thinking about generalizing this a little bit
-to something like KVM_MEM_CONSTANT with a way to set the pattern but I'm
-failing to see any need for anything but all-ones or all-zeroes. Maybe
-other-than-x86 architectures have some needs?
-
-I'm definitely fine with renaming this to KVM_MEM_PCI_HOLE.
-
--- 
-Vitaly
+Yep, QEMU/KVM should be fine. Do you plan to run this on anything else?
 
