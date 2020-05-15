@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B88B81D48A0
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 10:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4EC81D48B3
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 10:42:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727853AbgEOIg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 04:36:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49134 "EHLO
+        id S1727896AbgEOImT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 04:42:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48523 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726730AbgEOIgZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 04:36:25 -0400
+        by vger.kernel.org with ESMTP id S1727790AbgEOImT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 04:42:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589531784;
+        s=mimecast20190719; t=1589532137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=rnCzWC+hepdVJSXgaCkvxN/iLlC4gaqxnaWCmO0365Y=;
-        b=ewvuW+p5/0H3LvYLVeKhoLQrY/oTtqexLMSHCkAeKLYCKQesltMyW0l/cha7mzzbNkQ2yM
-        MkY4g8s/Ul+5tUV4m5hHd0zC0pDZuKwORziYUTIFLOnW3/mDd41JSmr4Qm8xi+3/Uf4tc2
-        Cp5SF/PXCVWIhSuDxZgLmC0u49eg1ec=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-gpeydxCsNDyHYmb7zbBEIQ-1; Fri, 15 May 2020 04:36:23 -0400
-X-MC-Unique: gpeydxCsNDyHYmb7zbBEIQ-1
-Received: by mail-wr1-f71.google.com with SMTP id z16so810609wrq.21
-        for <kvm@vger.kernel.org>; Fri, 15 May 2020 01:36:23 -0700 (PDT)
+        bh=DMIdxGLOvqxhE935UlZMgBbWMPbbsSeb1jl5FoZ23yY=;
+        b=EsEZnzaoAAGQJTlcoYjnYW1oxrOzw1GgmTxxu6J+xJ0sGHFM3TTa7r7DqzD1eLUL4/5zQO
+        wcegxtqdoCE8z5mrX1vuNpdUot2pPcLtVYEFNrzjkuTun/2wgrGlMUamaT8XtuVNsxDc3Q
+        OVzuqCq/C3/TN1JuNAaz9lK0nLqomMg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-ipTjqrGmOK6owIB2RgQCMQ-1; Fri, 15 May 2020 04:42:15 -0400
+X-MC-Unique: ipTjqrGmOK6owIB2RgQCMQ-1
+Received: by mail-wr1-f70.google.com with SMTP id d16so817002wrv.18
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 01:42:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=rnCzWC+hepdVJSXgaCkvxN/iLlC4gaqxnaWCmO0365Y=;
-        b=mLSZpi2VjPjf1Es506DeR21BdLz2diZXHmmM1t4a2LS3+hvn16hB2HKrSBsicqTq6B
-         STt6zAcbeipoG4/jxEXDmnB1d/jqsrtgDhe2NQ3WkbhrDlNyI3rKNZNsLCeilxT7I1sp
-         r5gYV/mhp2CHRHixFw8qKME1rvpjAz2u+3b1L1ulT5D46Wdj8oojBjSAjihr7/VZI2g3
-         p9VjoaezODaSMTiKwY7lbn92i+ovqt6V1t6PNlOzos+u19tK+vGzMTWaXnUbywCJqeSx
-         PphtoKMps40jCfTIdhFsvsR4025C+aZFEGvlmybKY6VGyjdZ1gb7uUIWJd8a08T1F0Th
-         ICAw==
-X-Gm-Message-State: AOAM532wQ7OUXJpS4tVF3jlY94RjXGcbJDsGuxaUzij3z0opI8B3PzBe
-        nJRvwf2T+3+B+pQCe/yeXRWkwxnU8Q+T48oE3i9WJuYMrWfTE8lfDnDAnqw+xn6fAKzcAgEvM58
-        pKsgbQ9O4pRC+
-X-Received: by 2002:adf:94c2:: with SMTP id 60mr2956823wrr.366.1589531781835;
-        Fri, 15 May 2020 01:36:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwliq3q2MSh4hgu9dzVJHOMoWpDZHdQyryAZ8K6gfNKKYlAhOV2RGpxC9VHi80inuvkjj1wgA==
-X-Received: by 2002:adf:94c2:: with SMTP id 60mr2956801wrr.366.1589531781585;
-        Fri, 15 May 2020 01:36:21 -0700 (PDT)
+        bh=DMIdxGLOvqxhE935UlZMgBbWMPbbsSeb1jl5FoZ23yY=;
+        b=SUl9pM4VEMSsH51I8nwF0wRLIWLLt7TITAcWtm84Z8m585WWTxjB7gqdSA2Gc3u8mD
+         pczKxZtPTTBrA+xWigbn9XzxePXnleIj0FOUVISE5fuksfak/tYTjhRs0M1DJLCU+joJ
+         d/tj/z6zL0Y26OYRby169kwA48t/t78JE+q0Dauo6PyLbJp1z4sORP2Vy99Xg93f4bBq
+         mDvQWioYZGYFKX+aRS9VIRc9yZJdQwI5LYhgaEJ4sR2kIIBwged29+rTDEcbReJIIrkI
+         HH1h3xKHFmq1dAYEHzD6NEWR1k57GqVYk/VutWU7O8C6g6zaRBAuUQj0vs1YhVYUvA6p
+         yW8w==
+X-Gm-Message-State: AOAM533hIn8hRh4ZPmW2e6I9I5Zj+KTmi6aSRHI0L9aYG0CUHdEyYH4Y
+        l2J3Br5kv9mFQViIIbNT20LYNcmHxJnSV/cNb8LR6H0Hgwu7443NmnvTU8tYnzvv1P/w/oBKkNx
+        UJw6ceX843mB5
+X-Received: by 2002:a7b:c201:: with SMTP id x1mr2761112wmi.14.1589532133995;
+        Fri, 15 May 2020 01:42:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxXwzFjPs3XiKuV9op5EMMlZoD4iPCHlEyVN7VtC9ByMmgj8DVBwmpAcO/Ol8/xLi0LrCKwhQ==
+X-Received: by 2002:a7b:c201:: with SMTP id x1mr2761095wmi.14.1589532133778;
+        Fri, 15 May 2020 01:42:13 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id b145sm2650206wme.41.2020.05.15.01.36.20
+        by smtp.gmail.com with ESMTPSA id t22sm2441900wmj.37.2020.05.15.01.42.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2020 01:36:20 -0700 (PDT)
+        Fri, 15 May 2020 01:42:13 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Xu <peterx@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Michael Tsirkin <mst@redhat.com>,
         Julia Suvorova <jsuvorov@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>, x86@kernel.org
-Subject: Re: [PATCH RFC 4/5] KVM: x86: aggressively map PTEs in KVM_MEM_ALLONES slots
-In-Reply-To: <20200514194624.GB15847@linux.intel.com>
-References: <20200514180540.52407-1-vkuznets@redhat.com> <20200514180540.52407-5-vkuznets@redhat.com> <20200514194624.GB15847@linux.intel.com>
-Date:   Fri, 15 May 2020 10:36:19 +0200
-Message-ID: <87ftc1wq64.fsf@vitty.brq.redhat.com>
+Subject: Re: [PATCH RFC 0/5] KVM: x86: KVM_MEM_ALLONES memory
+In-Reply-To: <20200514233208.GI15847@linux.intel.com>
+References: <20200514180540.52407-1-vkuznets@redhat.com> <20200514220516.GC449815@xz-x1> <20200514225623.GF15847@linux.intel.com> <20200514232250.GA479802@xz-x1> <20200514233208.GI15847@linux.intel.com>
+Date:   Fri, 15 May 2020 10:42:12 +0200
+Message-ID: <87d075wpwb.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
@@ -71,92 +72,40 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> On Thu, May 14, 2020 at 08:05:39PM +0200, Vitaly Kuznetsov wrote:
->> All PTEs in KVM_MEM_ALLONES slots point to the same read-only page
->> in KVM so instead of mapping each page upon first access we can map
->> everything aggressively.
+> On Thu, May 14, 2020 at 07:22:50PM -0400, Peter Xu wrote:
+>> On Thu, May 14, 2020 at 03:56:24PM -0700, Sean Christopherson wrote:
+>> > On Thu, May 14, 2020 at 06:05:16PM -0400, Peter Xu wrote:
+>> > > E.g., shm_open() with a handle and fill one 0xff page, then remap it to
+>> > > anywhere needed in QEMU?
+>> > 
+>> > Mapping that 4k page over and over is going to get expensive, e.g. each
+>> > duplicate will need a VMA and a memslot, plus any PTE overhead.  If the
+>> > total sum of the holes is >2mb it'll even overflow the mumber of allowed
+>> > memslots.
 >> 
->> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/mmu/mmu.c         | 20 ++++++++++++++++++--
->>  arch/x86/kvm/mmu/paging_tmpl.h | 23 +++++++++++++++++++++--
->>  2 files changed, 39 insertions(+), 4 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index 3db499df2dfc..e92ca9ed3ff5 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -4154,8 +4154,24 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->>  		goto out_unlock;
->>  	if (make_mmu_pages_available(vcpu) < 0)
->>  		goto out_unlock;
->> -	r = __direct_map(vcpu, gpa, write, map_writable, max_level, pfn,
->> -			 prefault, is_tdp && lpage_disallowed);
->> +
->> +	if (likely(!(slot->flags & KVM_MEM_ALLONES) || write)) {
+>> What's the PTE overhead you mentioned?  We need to fill PTEs one by one on
+>> fault even if the page is allocated in the kernel, am I right?
 >
-> The 'write' check is wrong.  More specifically, patch 2/5 is missing code
-> to add KVM_MEM_ALLONES to memslot_is_readonly().  If we end up going with
-> an actual kvm_allones_pg backing, writes to an ALLONES memslots should be
-> handled same as writes to RO memslots; MMIO occurs but no MMIO spte is
-> created.
+> It won't require host PTEs for every page if it's a kernel page.  I doubt
+> PTEs are a significant overhead, especially compared to memslots, but it's
+> still worth considering.
+>
+> My thought was to skimp on both host PTEs _and_ KVM SPTEs by always sending
+> the PCI hole accesses down the slow MMIO path[*].
+>
+> [*] https://lkml.kernel.org/r/20200514194624.GB15847@linux.intel.com
 >
 
-Missed that, thanks!
+If we drop 'aggressive' patch from this patchset we can probably get
+away with KVM_MEM_READONLY and userspace VMAs but this will only help us
+to save some memory, it won't speed things up.
 
->> +		r = __direct_map(vcpu, gpa, write, map_writable, max_level, pfn,
->> +				 prefault, is_tdp && lpage_disallowed);
->> +	} else {
->> +		/*
->> +		 * KVM_MEM_ALLONES are 4k only slots fully mapped to the same
->> +		 * readonly 'allones' page, map all PTEs aggressively here.
->> +		 */
->> +		for (gfn = slot->base_gfn; gfn < slot->base_gfn + slot->npages;
->> +		     gfn++) {
->> +			r = __direct_map(vcpu, gfn << PAGE_SHIFT, write,
->> +					 map_writable, max_level, pfn, prefault,
->> +					 is_tdp && lpage_disallowed);
->
-> IMO this is a waste of memory and TLB entries.  Why not treat the access as
-> the MMIO it is and emulate the access with a 0xff return value?  I think
-> it'd be a simple change to have __kvm_read_guest_page() stuff 0xff, i.e. a
-> kvm_allones_pg wouldn't be needed.  I would even vote to never create an
-> MMIO SPTE.  The guest has bigger issues if reading from a PCI hole is
-> performance sensitive.
+>> 4K is only an example - we can also use more pages as the template.  However I
+>> guess the kvm memslot count could be a limit..  Could I ask what's the normal
+>> size of this 0xff region, and its distribution?
 
-You're trying to defeat the sole purpose of the feature :-) I also saw
-the option you suggest but Michael convinced me we should go further.
-
-The idea (besides memory waste) was that the time we spend on PCI scan
-during boot is significant. Unfortunatelly, I don't have any numbers but
-we can certainly try to get them. With this feature (AFAIU) we're not
-aiming at 'classic' long-living VMs but rather at something like Kata
-containers/FaaS/... where boot time is crucial.
-
->
-> Regarding memory, looping wantonly on __direct_map() will eventually trigger
-> the BUG_ON() in mmu_memory_cache_alloc().  mmu_topup_memory_caches() only
-> ensures there are enough objects available to map a single translation, i.e.
-> one entry per level, sans the root[*].
->
-> [*] The gorilla math in mmu_topup_memory_caches() is horrendously misleading,
->     e.g. the '8' pages is really 2*(ROOT_LEVEL - 1), but the 2x part has been
->     obsolete for the better part of a decade, and the '- 1' wasn't actually
->     originally intended or needed, but is now required because of 5-level
->     paging.  I have the beginning of a series to clean up that mess; it was
->     low on my todo list because I didn't expect anyone to be mucking with
->     related code :-)
-
-I missed that too but oh well, this is famous KVM MMU, I should't feel
-that bad about it :-) Thanks for your review!
-
->
->> +			if (r)
->> +				break;
->> +		}
->> +	}
->
+Julia/Michael, could you please provide some 'normal' configuration for
+a Q35 machine and its PCIe config space?
 
 -- 
 Vitaly
