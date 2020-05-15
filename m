@@ -2,112 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38ECB1D5560
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 18:00:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12F171D55AA
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 18:15:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726643AbgEOP7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 11:59:50 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50576 "EHLO
+        id S1726179AbgEOQPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 12:15:36 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33462 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726293AbgEOP7u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 11:59:50 -0400
+        by vger.kernel.org with ESMTP id S1726144AbgEOQPg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 12:15:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589558388;
+        s=mimecast20190719; t=1589559333;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iGZXFwumSbdNNYAeiggV8U4re8SO4/3betnreXnOP68=;
-        b=Yp2WmewfAw9QVLo5XbPRAbeoiAw66yszHg5nywd18NHEUpk4cAW5opYG16VZPqOxTOSqTM
-        bmuqt0v0y1GMna3N2hUmJKZlBchSEqjYYM/XXc7PST8ZKz1YTylVSVkUutbSromJdHzSF+
-        WJty/5CbViq/YvhSFyNysdpbZZmF33s=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-h4b4876HOuO9aCqCiKqesA-1; Fri, 15 May 2020 11:59:46 -0400
-X-MC-Unique: h4b4876HOuO9aCqCiKqesA-1
-Received: by mail-wm1-f71.google.com with SMTP id g10so1391125wme.0
-        for <kvm@vger.kernel.org>; Fri, 15 May 2020 08:59:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=iGZXFwumSbdNNYAeiggV8U4re8SO4/3betnreXnOP68=;
-        b=BmwzswEmH4C9hToQDXN1CJgqmQUmFjSf0kdRjld/9pgleo/7uVIMTmGJKEfi5cemmj
-         eMMRLRWqmBQTCQ5q2F9rA7OP5ChX8qsdDoQbKZL1fLdEUq10i8/ys9T1Dckf9+CQwJrg
-         EBBnccfo+STxVDgG1U9tdzGADBmwHXGCVFwzDXsiopK0DRq7kn5elYuydGjepCS5p4qj
-         xrY0igtGGiGQHNXrNr/W/jfntQkbLF9hFrkiCQgGfCUjnCyGKN7NgWAnEJauvAGkBjJ1
-         UbVI51RkPOlSYzTq6Tr4OP3Tj/qeO6Ss1RWmDRnNmEUjbh2sB+BEULVXUuE5pjG8N0ff
-         TA/A==
-X-Gm-Message-State: AOAM530nULaoK31h41LiESQm+vt8StZPrrniLUg5soRSWe9/YC9Pt54d
-        MbZ6s36ZOWOiJFYOmFDU46P/9aSQR8g1zJ8GXf1gHnsedTIHW3IWeccsYqjwzJh5acCeGIVq+MD
-        vTeKKoKB8EZUL
-X-Received: by 2002:adf:d841:: with SMTP id k1mr4873037wrl.129.1589558385457;
-        Fri, 15 May 2020 08:59:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSnUkPKjiUFYzyVHnxEbwzqPOvyHVqk4g3owBqQZqHtbskp7Ls7B+c3JLBHhLBGtvBBxcDeQ==
-X-Received: by 2002:adf:d841:: with SMTP id k1mr4873013wrl.129.1589558385172;
-        Fri, 15 May 2020 08:59:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:60bb:f5bd:83ff:ec47? ([2001:b07:6468:f312:60bb:f5bd:83ff:ec47])
-        by smtp.gmail.com with ESMTPSA id w12sm4196501wmk.12.2020.05.15.08.59.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 May 2020 08:59:44 -0700 (PDT)
-Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with
- token info
-To:     Vivek Goyal <vgoyal@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-References: <20200511164752.2158645-1-vkuznets@redhat.com>
- <20200511164752.2158645-3-vkuznets@redhat.com>
- <20200512152709.GB138129@redhat.com> <87o8qtmaat.fsf@vitty.brq.redhat.com>
- <20200512155339.GD138129@redhat.com> <20200512175017.GC12100@linux.intel.com>
- <20200513125241.GA173965@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0733213c-9514-4b04-6356-cf1087edd9cf@redhat.com>
-Date:   Fri, 15 May 2020 17:59:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        bh=w6Dw3im+AeacAMiZvf8yC0F13GvlTYhUl8LjrRcL1a8=;
+        b=ebzh8CDDHsQtcgrsIo82Nk4gRq3mxhLQPoXfNFMJ7HthA2tTDNzJn8Q9m86TtTrRXdZaDe
+        2D7XXWrwCzjDjMkEr+kbtM5t7BL4HOzgoYYZsl+DizxK+mm55NPJniEYQz9IMkIEq7iavB
+        XP6KLVtJDkbk8xbw/0eSYiNsi/Xjr3g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-kNmdEkAePo-izissdMEJ0g-1; Fri, 15 May 2020 12:15:32 -0400
+X-MC-Unique: kNmdEkAePo-izissdMEJ0g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1229F83DB37;
+        Fri, 15 May 2020 16:15:31 +0000 (UTC)
+Received: from work-vm (ovpn-114-149.ams2.redhat.com [10.36.114.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F91262491;
+        Fri, 15 May 2020 16:15:23 +0000 (UTC)
+Date:   Fri, 15 May 2020 17:15:21 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        Richard Henderson <rth@twiddle.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v1 01/17] exec: Introduce
+ ram_block_discard_set_(unreliable|required)()
+Message-ID: <20200515161521.GJ2954@work-vm>
+References: <20200506094948.76388-1-david@redhat.com>
+ <20200506094948.76388-2-david@redhat.com>
+ <8dc6cefb-63ee-9310-ce18-abf558a08b39@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200513125241.GA173965@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8dc6cefb-63ee-9310-ce18-abf558a08b39@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/05/20 14:52, Vivek Goyal wrote:
->>> Also, type of event should not necessarily be tied to delivery method.
->>> For example if we end up introducing say, "KVM_PV_REASON_PAGE_ERROR", then
->>> I would think that event can be injected both using exception (#PF or #VE)
->>> as well as interrupt (depending on state of system).
->> Why bother preserving backwards compatibility?
-> New machanism does not have to support old guests but old mechanism
-> should probably continue to work and deprecated slowly, IMHO. Otherwise
-> guests which were receiving async page faults will suddenly stop getting
-> it over hypervisor upgrade and possibly see drop in performance.
+* David Hildenbrand (david@redhat.com) wrote:
+> On 06.05.20 11:49, David Hildenbrand wrote:
+> > We want to replace qemu_balloon_inhibit() by something more generic.
+> > Especially, we want to make sure that technologies that really rely on
+> > RAM block discards to work reliably to run mutual exclusive with
+> > technologies that break it.
+> > 
+> > E.g., vfio will usually pin all guest memory, turning the virtio-balloon
+> > basically useless and make the VM consume more memory than reported via
+> > the balloon. While the balloon is special already (=> no guarantees, same
+> > behavior possible afer reboots and with huge pages), this will be
+> > different, especially, with virtio-mem.
+> > 
+> > Let's implement a way such that we can make both types of technology run
+> > mutually exclusive. We'll convert existing balloon inhibitors in successive
+> > patches and add some new ones. Add the check to
+> > qemu_balloon_is_inhibited() for now. We might want to make
+> > virtio-balloon an acutal inhibitor in the future - however, that
+> > requires more thought to not break existing setups.
+> > 
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Richard Henderson <rth@twiddle.net>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  balloon.c             |  3 ++-
+> >  exec.c                | 48 +++++++++++++++++++++++++++++++++++++++++++
+> >  include/exec/memory.h | 41 ++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 91 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/balloon.c b/balloon.c
+> > index f104b42961..c49f57c27b 100644
+> > --- a/balloon.c
+> > +++ b/balloon.c
+> > @@ -40,7 +40,8 @@ static int balloon_inhibit_count;
+> >  
+> >  bool qemu_balloon_is_inhibited(void)
+> >  {
+> > -    return atomic_read(&balloon_inhibit_count) > 0;
+> > +    return atomic_read(&balloon_inhibit_count) > 0 ||
+> > +           ram_block_discard_is_broken();
+> >  }
+> >  
+> >  void qemu_balloon_inhibit(bool state)
+> > diff --git a/exec.c b/exec.c
+> > index 2874bb5088..52a6e40e99 100644
+> > --- a/exec.c
+> > +++ b/exec.c
+> > @@ -4049,4 +4049,52 @@ void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
+> >      }
+> >  }
+> >  
+> > +static int ram_block_discard_broken;
+> > +
+> > +int ram_block_discard_set_broken(bool state)
+> > +{
+> > +    int old;
+> > +
+> > +    if (!state) {
+> > +        atomic_dec(&ram_block_discard_broken);
+> > +        return 0;
+> > +    }
+> > +
+> > +    do {
+> > +        old = atomic_read(&ram_block_discard_broken);
+> > +        if (old < 0) {
+> > +            return -EBUSY;
+> > +        }
+> > +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old + 1) != old);
+> > +    return 0;
+> > +}
+> > +
+> > +int ram_block_discard_set_required(bool state)
+> > +{
+> > +    int old;
+> > +
+> > +    if (!state) {
+> > +        atomic_inc(&ram_block_discard_broken);
+> > +        return 0;
+> > +    }
+> > +
+> > +    do {
+> > +        old = atomic_read(&ram_block_discard_broken);
+> > +        if (old > 0) {
+> > +            return -EBUSY;
+> > +        }
+> > +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old - 1) != old);
+> > +    return 0;
+> > +}
+> > +
+> > +bool ram_block_discard_is_broken(void)
+> > +{
+> > +    return atomic_read(&ram_block_discard_broken) > 0;
+> > +}
+> > +
+> > +bool ram_block_discard_is_required(void)
+> > +{
+> > +    return atomic_read(&ram_block_discard_broken) < 0;
+> > +}
+> > +
+> >  #endif
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index e000bd2f97..9bb5ced38d 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -2463,6 +2463,47 @@ static inline MemOp devend_memop(enum device_endian end)
+> >  }
+> >  #endif
+> >  
+> > +/*
+> > + * Inhibit technologies that rely on discarding of parts of RAM blocks to work
+> > + * reliably, e.g., to manage the actual amount of memory consumed by the VM
+> > + * (then, the memory provided by RAM blocks might be bigger than the desired
+> > + * memory consumption). This *must* be set if:
+> > + * - Discarding parts of a RAM blocks does not result in the change being
+> > + *   reflected in the VM and the pages getting freed.
+> > + * - All memory in RAM blocks is pinned or duplicated, invaldiating any previous
+> > + *   discards blindly.
+> > + * - Discarding parts of a RAM blocks will result in integrity issues (e.g.,
+> > + *   encrypted VMs).
+> > + * Technologies that only temporarily pin the current working set of a
+> > + * driver are fine, because we don't expect such pages to be discarded
+> > + * (esp. based on guest action like balloon inflation).
+> > + *
+> > + * This is *not* to be used to protect from concurrent discards (esp.,
+> > + * postcopy).
+> > + *
+> > + * Returns 0 if successful. Returns -EBUSY if a technology that relies on
+> > + * discards to work reliably is active.
+> > + */
+> > +int ram_block_discard_set_broken(bool state);
+> > +
+> > +/*
+> > + * Inhibit technologies that will break discarding of pages in RAM blocks.
+> > + *
+> > + * Returns 0 if successful. Returns -EBUSY if discards are already set to
+> > + * broken.
+> > + */
+> > +int ram_block_discard_set_required(bool state);
+> > +
+> > +/*
+> > + * Test if discarding of memory in ram blocks is broken.
+> > + */
+> > +bool ram_block_discard_is_broken(void);
+> > +
+> > +/*
+> > + * Test if discarding of memory in ram blocks is required to work reliably.
+> > + */
+> > +bool ram_block_discard_is_required(void);
+> > +
+> >  #endif
+> >  
+> >  #endif
+> > 
+> 
+> I'm wondering if I'll just call these functions
+> 
+> ram_block_discard_disable()
+> 
+> and
+> 
+> ram_block_discard_require()
 
-Unfortunately, the old mechanism was broken enough, and in enough
-different ways, that it's better to just drop it.
+Yeh I prefer that.
 
-The new one using #VE is not coming very soon (we need to emulate it for
-<Broadwell and AMD processors, so it's not entirely trivial) so we are
-going to keep "page not ready" delivery using #PF for some time or even
-forever.  However, page ready notification as #PF is going away for good.
+Dave
 
-That said, type1/type2 is quite bad. :)  Let's change that to page not
-present / page ready.
-
-Thanks,
-
-Paolo
+> -- 
+> Thanks,
+> 
+> David / dhildenb
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
