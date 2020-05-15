@@ -2,92 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4483F1D5B46
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 23:14:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D1B01D5B7B
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 23:30:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726553AbgEOVOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 17:14:09 -0400
-Received: from elvis.franken.de ([193.175.24.41]:54593 "EHLO elvis.franken.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726223AbgEOVOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 17:14:09 -0400
-Received: from uucp (helo=alpha)
-        by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
-        id 1jZheg-000560-01; Fri, 15 May 2020 23:14:06 +0200
-Received: by alpha.franken.de (Postfix, from userid 1000)
-        id A4250C04C5; Fri, 15 May 2020 23:13:53 +0200 (CEST)
-Date:   Fri, 15 May 2020 23:13:53 +0200
-From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To:     Huacai Chen <chenhc@lemote.com>
-Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>
-Subject: Re: [PATCH V5 15/15] MAINTAINERS: Update KVM/MIPS maintainers
-Message-ID: <20200515211353.GB22922@alpha.franken.de>
-References: <1589359366-1669-1-git-send-email-chenhc@lemote.com>
- <1589359366-1669-16-git-send-email-chenhc@lemote.com>
- <AC9338A0-F449-4DCA-A294-248C86D57877@flygoat.com>
- <CAAhV-H7OTeMy2Yp2PunD+2KVzzPDT+-xGGgbpRNzhb8C-p8-7g@mail.gmail.com>
+        id S1727844AbgEOV3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 17:29:00 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:58762 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727819AbgEOV26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 17:28:58 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04FLRJuQ182124
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 21:28:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
+ message-id : date : mime-version : content-type :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=jt3udJxC8DxjCXxxAtOBmPiJ0URnKQrv+3VVlQVU4tY=;
+ b=uaGxZqLzkSllaJl0RrK1N8r8G4Pbj6fq23xK2//KltRt+olz5r5716c+qkQ5i/tAl8Qo
+ KSrIbLqB6/wrGeVJN/9j0UXIKdqy+Hhvoy0x83psbZEf/HSozkPsO+vvOFlQg0gOKrxe
+ +o638ZZpHsZVOHlkfsVeGgFR/fQiKI0PwVoAjZkF4ozolbZd5J4DoReiaEpT0U23WLmw
+ hdygNdJWe+EZwan+uwofmp2UgSyr17JqDYMZJEVSBEs4STuDe2Be3ikZwW+Df8F7RcUU
+ zCIUFC7BGqiflYFpIlTfxSS7b4Z4/i1fYxykPaNHyrR+N4QopAED5ITrmuyigD8/+CZc ug== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 311nu5p22c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 21:28:57 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04FLSB8n141099
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 21:28:57 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 3100ykpca8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 21:28:57 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04FLSufn011184
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 21:28:56 GMT
+Received: from [10.154.119.223] (/10.154.119.223)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 15 May 2020 14:28:55 -0700
+From:   Anthony Yznaga <anthony.yznaga@oracle.com>
+Subject: question: KVM_MR_CREATE and kvm_mmu_slot_apply_flags()
+Organization: Oracle Corporation
+To:     kvm@vger.kernel.org
+Message-ID: <7796d7df-9c6b-7f34-6cf4-38607fcfd79b@oracle.com>
+Date:   Fri, 15 May 2020 14:28:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAhV-H7OTeMy2Yp2PunD+2KVzzPDT+-xGGgbpRNzhb8C-p8-7g@mail.gmail.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9622 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 bulkscore=0
+ phishscore=0 suspectscore=1 adultscore=0 mlxscore=0 mlxlogscore=771
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005150179
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9622 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0 mlxscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=816 impostorscore=0
+ suspectscore=1 spamscore=0 lowpriorityscore=0 cotscore=-2147483648
+ bulkscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2005150179
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 15, 2020 at 09:50:04AM +0800, Huacai Chen wrote:
-> On Thu, May 14, 2020 at 9:34 PM Jiaxun Yang <jiaxun.yang@flygoat.com> wrote:
-> > 于 2020年5月13日 GMT+08:00 下午4:42:46, Huacai Chen <chenhc@lemote.com> 写到:
-> > >James Hogan has become inactive for a long time and leaves KVM for MIPS
-> > >orphan. I'm working on KVM/Loongson and attempt to make it upstream both
-> > >in kernel and QEMU, while Aleksandar Markovic is already a maintainer of
-> > >QEMU/MIPS. We are both interested in QEMU/KVM/MIPS, and we have already
-> > >made some contributions in kernel and QEMU. If possible, we want to take
-> > >the KVM/MIPS maintainership.
-> > >
-> > >Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > >---
-> >
-> > Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> >
-> > Huacai is extremely experienced on virtualization,
-> > his PhD thesis is about virtualization too.
-> > He had been working on Loongson kernel for a long period.
-> >
-> > Alexander maintained QEMU/MIPS for some years, he is a expert on
-> > QEMU and MIPS architecture.
-> >
-> > I believe these guys can effectively bring MIPS/KVM support back to sea level again.
-> Thank you very much, and I think you won't be disappointed in us.
+Hi,
 
-I'm happy to see you taking care of the KVM part. So how is your plan
-to handle patches ? Do want to collect them and send pull requests to
-me ? Or should I just pick them up with your Acked-by ?
+I'm investigating optimizing qemu start time for large memory guests,
+and I'm trying to understand why kvm_mmu_slot_apply_flags() is called by
+kvm_arch_commit_memory_region() for KVM_MR_CREATE.  The comments in
+kvm_mmu_slot_apply_flags() imply it should be, but what I've observed is
+that the new slot will have no mappings resulting in slot_handle_level_range()
+walking the rmaps and doing nothing.  This can take a noticeable amount of
+time for very large ranges.  It doesn't look like there would ever be any
+mappings in a newly created slot.  Am I missing something?
 
-And could you do me a favour and check your mail setup. I always
-get failed deliveries:
-
-  chenhc@lemote.com
-    SMTP error from remote mailer after end of data:
-    host mxbiz1.qq.com [203.205.232.191]: 550 Mail content denied. http://servic
-e.exmail.qq.com/cgi-bin/help?subtype=1&&id=20022&&no=1000726
-
-or
-
-  chenhc@lemote.com
-    SMTP error from remote mailer after end of data:
-    host mxbiz1.qq.com [203.205.232.191]: 550 Ip frequency limited. http://servi
-ce.exmail.qq.com/cgi-bin/help?subtype=1&&id=20022&&no=1000725
-
-Thomas.
-
--- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+Thanks,
+Anthony
