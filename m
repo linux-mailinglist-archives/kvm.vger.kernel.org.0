@@ -2,133 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B09E41D46A6
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 09:05:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C53B1D46D0
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 09:11:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726708AbgEOHFR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 03:05:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28162 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726594AbgEOHFQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 03:05:16 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04F72edr149088;
-        Fri, 15 May 2020 03:05:16 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 310ua8teej-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 03:05:15 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04F72hhW149159;
-        Fri, 15 May 2020 03:05:14 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 310ua8tedv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 03:05:14 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04F7546u029027;
-        Fri, 15 May 2020 07:05:13 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3100ubd3sj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 07:05:12 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04F75AdT60358724
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 May 2020 07:05:10 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AA761A4062;
-        Fri, 15 May 2020 07:05:10 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6A543A4064;
-        Fri, 15 May 2020 07:05:10 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.33.185])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 May 2020 07:05:10 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v6 06/10] s390x: css: stsch, enumeration
- test
-To:     Cornelia Huck <cohuck@redhat.com>
+        id S1727083AbgEOHLk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 03:11:40 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42176 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726604AbgEOHLk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 03:11:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589526699;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Mc9kG8LAPsO0qKOlkofqgHjGFnV3phaduS+Q8YgAvZU=;
+        b=EPzupSIoceU+tZ1pE0f8Gw4nrm6l+Hg56h5/3bLebXGaLG8sVWseKFj211hX4ugA+uYjGY
+        W4TPW8GYRRERG1Wz1m/2VIkMz0yaA4FCuh1Fmkz+PEpuob7p4p9FoePwS8xUub7Lf9vDML
+        5dJRUOUTXlT1kwWNcA6cemce9hoNT2M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-Vtazt2_aOey4ZLdar6xjkA-1; Fri, 15 May 2020 03:11:35 -0400
+X-MC-Unique: Vtazt2_aOey4ZLdar6xjkA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE60A1899528;
+        Fri, 15 May 2020 07:11:33 +0000 (UTC)
+Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DCB1662474;
+        Fri, 15 May 2020 07:11:29 +0000 (UTC)
+Date:   Fri, 15 May 2020 09:11:27 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v6 05/10] s390x: Library resources for
+ CSS tests
+Message-ID: <20200515091127.3cd629d7.cohuck@redhat.com>
+In-Reply-To: <42beb241-8cc1-51a1-b374-3fb89968df36@linux.ibm.com>
 References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
- <1587725152-25569-7-git-send-email-pmorel@linux.ibm.com>
- <20200514140552.107abbde.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <f6143792-3f35-529e-6eea-b59fa8393c72@linux.ibm.com>
-Date:   Fri, 15 May 2020 09:05:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        <1587725152-25569-6-git-send-email-pmorel@linux.ibm.com>
+        <20200514140315.6077046b.cohuck@redhat.com>
+        <42beb241-8cc1-51a1-b374-3fb89968df36@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200514140552.107abbde.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-15_02:2020-05-14,2020-05-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 cotscore=-2147483648
- priorityscore=1501 suspectscore=0 clxscore=1015 lowpriorityscore=0
- adultscore=0 bulkscore=0 phishscore=0 mlxlogscore=999 impostorscore=0
- spamscore=0 mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005150056
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 15 May 2020 09:02:37 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
+> On 2020-05-14 14:03, Cornelia Huck wrote:
+> > On Fri, 24 Apr 2020 12:45:47 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-On 2020-05-14 14:05, Cornelia Huck wrote:
-> On Fri, 24 Apr 2020 12:45:48 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >> + * - IRB  : Interuption response Block, describes the result of an operation  
+> > 
+> > s/operation/operation;/  
 > 
->> First step for testing the channel subsystem is to enumerate the css and
->> retrieve the css devices.
->>
->> This tests the success of STSCH I/O instruction, we do not test the
-> 
-> s/of/of the/
+> ? I do not understand, do you want a ";" at the end of "operation"
 
-Yes, zhanks.
+Yes, I think that makes the description read more like a proper
+sentence (describe what its purpose is; describe its contents).
 
+> Isn't it a typo error?
 > 
->> reaction of the VM for an instruction with wrong parameters.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h     |  1 +
->>   s390x/Makefile      |  2 +
->>   s390x/css.c         | 92 +++++++++++++++++++++++++++++++++++++++++++++
->>   s390x/unittests.cfg |  4 ++
->>   4 files changed, 99 insertions(+)
->>   create mode 100644 s390x/css.c
->>
-> 
-> (...)
-> 
->> +static void test_enumerate(void)
->> +{
->> +	struct pmcw *pmcw = &schib.pmcw;
-...snip...
-			goto out;
->> +		default:	/* 1 or 2 should never happened for STSCH */
-> 
-> s/happened/happen/
+> >   
+> >> + *          holds a SCSW and model-dependent data.
 
-Yes, thanks.
-
-> 
->> +			report(0, "Unexpected cc=%d on subchannel number 0x%x",
->> +			       cc, scn);
->> +			return;
->> +		}
-> 
-
-Thanks,
-
-Regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
