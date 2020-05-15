@@ -2,262 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCA551D580B
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 19:35:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B73421D5839
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 19:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726227AbgEORfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 13:35:37 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:10522 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726023AbgEORfh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 13:35:37 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ebed25d0002>; Fri, 15 May 2020 10:33:18 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Fri, 15 May 2020 10:35:36 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Fri, 15 May 2020 10:35:36 -0700
-Received: from [10.40.103.94] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 15 May
- 2020 17:35:28 +0000
-Subject: Re: [PATCH Kernel v20 4/8] vfio iommu: Add ioctl definition for dirty
- pages tracking
+        id S1726946AbgEORmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 13:42:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14226 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726908AbgEORmc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 13:42:32 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04FH3rKZ110311;
+        Fri, 15 May 2020 13:42:29 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3119dc997v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 13:42:29 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04FH53Ct126350;
+        Fri, 15 May 2020 13:42:29 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3119dc996g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 13:42:29 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04FHPaKe012163;
+        Fri, 15 May 2020 17:42:27 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3100ube1dh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 17:42:26 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04FHgOOf61079588
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 May 2020 17:42:24 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B07A52051;
+        Fri, 15 May 2020 17:42:24 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.30.128])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AA3265204F;
+        Fri, 15 May 2020 17:42:23 +0000 (GMT)
+Date:   Fri, 15 May 2020 19:41:35 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
 To:     Cornelia Huck <cohuck@redhat.com>
-CC:     <alex.williamson@redhat.com>, <cjia@nvidia.com>,
-        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
- <1589488667-9683-5-git-send-email-kwankhede@nvidia.com>
- <20200515125916.78723321.cohuck@redhat.com>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <bdb9c1d3-e673-5bb1-aced-f7443f4dfe58@nvidia.com>
-Date:   Fri, 15 May 2020 23:05:24 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+Message-ID: <20200515194135.2fbac8a3.pasic@linux.ibm.com>
+In-Reply-To: <20200515175850.79e2ac74.cohuck@redhat.com>
+References: <20200513142934.28788-1-farman@linux.ibm.com>
+        <20200514154601.007ae46f.pasic@linux.ibm.com>
+        <4e00c83b-146f-9f1d-882b-a5378257f32c@linux.ibm.com>
+        <20200515165539.2e4a8485.pasic@linux.ibm.com>
+        <20200515175850.79e2ac74.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200515125916.78723321.cohuck@redhat.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1589563998; bh=ayKJyENVWVq+++eaQa/RNQ3Hiaj6T+Ugv63pCGUuAUE=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=dtlAvlT38WGDkPjIhiGYjrh5KgLWYJC+TPqVNjivA9id56PtMEKtLV31xSol22Jjw
-         A5Y1JwbXU1prlK1vZqwvKhu/dH2dPUFaMRJyvxpnxMKaRuX1kDDg6GfcNOk67lGDYh
-         XgnDFNC8Viw8PvVKEBMAMVPv1Ng/xeCiScx65T5ZuWnoTrMLnvtrIm27tHNHUqtkNL
-         /N8h5RQrI/FYWRimkDkJhwvbcB6DHU5Cd/tl9Ote37R3wNWdz7Yvqx3Jgjv5yRIlsu
-         scqteeHZd40SDRd9xUcrpXYXt7CQ6Du4CdQirzu+OwyFzFXnNDTCL6KOJ7Ni7qJbDc
-         0AZpFuStfaepA==
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-15_07:2020-05-15,2020-05-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ mlxlogscore=999 spamscore=0 impostorscore=0 bulkscore=0
+ cotscore=-2147483648 lowpriorityscore=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 adultscore=0 clxscore=1015 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005150145
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 15 May 2020 17:58:49 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
+> [only some very high-level comments; I have not had time for this yet
+> and it's late on a Friday]
+> 
+> On Fri, 15 May 2020 16:55:39 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+> > On Fri, 15 May 2020 09:09:47 -0400
+> > Eric Farman <farman@linux.ibm.com> wrote:
+> > 
+> > > 
+> > > 
+> > > On 5/14/20 9:46 AM, Halil Pasic wrote:  
+> > > > On Wed, 13 May 2020 16:29:30 +0200
+> > > > Eric Farman <farman@linux.ibm.com> wrote:
+> > > >   
+> > > >> Hi Conny,
+> > > >>
+> > > >> Back in January, I suggested a small patch [1] to try to clean up
+> > > >> the handling of HSCH/CSCH interrupts, especially as it relates to
+> > > >> concurrent SSCH interrupts. Here is a new attempt to address this.
+> > > >>
+> > > >> There was some suggestion earlier about locking the FSM, but I'm not
+> > > >> seeing any problems with that. Rather, what I'm noticing is that the
+> > > >> flow between a synchronous START and asynchronous HALT/CLEAR have
+> > > >> different impacts on the FSM state. Consider:
+> > > >>
+> > > >>     CPU 1                           CPU 2
+> > > >>
+> > > >>     SSCH (set state=CP_PENDING)
+> > > >>     INTERRUPT (set state=IDLE)
+> > > >>     CSCH (no change in state)
+> > > >>                                     SSCH (set state=CP_PENDING)
+> > > >>     INTERRUPT (set state=IDLE)
+> > > >>                                     INTERRUPT (set state=IDLE)  
+> > > > 
+> > > > How does the PoP view of the composite device look like 
+> > > > (where composite device = vfio-ccw + host device)?  
+> > > 
+> > > (Just want to be sure that "composite device" is a term that you're
+> > > creating, because it's not one I'm familiar with.)  
+> > 
+> > Yes I created this term because I'm unaware of an established one, and
+> > I could not come up with a better one. If you have something established
+> > or better please do tell, I will start using that.
+> 
+> I don't think "composite" is a term I would use; in the end, we are
+> talking about a vfio-ccw device that gets some of its state from the
+> host device. As such, I don't think there's really anything like a "PoP
+> view" of it; the part that should comply with what the PoP specifies is
+> what gets exposed to the guest.
 
-On 5/15/2020 4:29 PM, Cornelia Huck wrote:
-> On Fri, 15 May 2020 02:07:43 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
->> All pages pinned by vendor driver through this API should be considered as
->> dirty during migration. When container consists of IOMMU capable device and
->> all pages are pinned and mapped, then all pages are marked dirty.
->> Added support to start/stop dirtied pages tracking and to get bitmap of all
->> dirtied pages for requested IO virtual address range.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 55 insertions(+)
->>
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index ad9bb5af3463..123de3bc2dce 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -1033,6 +1033,12 @@ struct vfio_iommu_type1_dma_map {
->>   
->>   #define VFIO_IOMMU_MAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 13)
->>   
->> +struct vfio_bitmap {
->> +	__u64        pgsize;	/* page size for bitmap in bytes */
->> +	__u64        size;	/* in bytes */
->> +	__u64 __user *data;	/* one bit per page */
->> +};
->> +
->>   /**
->>    * VFIO_IOMMU_UNMAP_DMA - _IOWR(VFIO_TYPE, VFIO_BASE + 14,
->>    *							struct vfio_dma_unmap)
->> @@ -1059,6 +1065,55 @@ struct vfio_iommu_type1_dma_unmap {
->>   #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
->>   #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
->>   
->> +/**
->> + * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
->> + *                                     struct vfio_iommu_type1_dirty_bitmap)
->> + * IOCTL is used for dirty pages tracking.
->> + * Caller should set flag depending on which operation to perform, details as
->> + * below:
->> + *
->> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_START set, indicates
->> + * migration is active and IOMMU module should track pages which are dirtied or
->> + * potentially dirtied by device.
-> 
-> "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_START instructs the
-> IOMMU driver to track pages that are dirtied or potentially dirtied by
-> the device; designed to be used when a migration is in progress."
-> 
-> ?
-> 
+I agree, what matters is the architectural compliance of the device as
+exposed to the guest. I tried to refer the architectural view of the
+whole device as the PoP view. The diagram above is clearly operating
+on the vfio-ccw kernel module level as state=IDLE and state=CP_PENDING
+is stuff on that level.
 
-Ok, updating.
+What I tried to illuminate by using the word 'composite', is that what
+the guest sees is a superposition of what the QEMU code does, what the
+kernel module code does and what the host device does. And that the
+situation described should have been prevented prior the second
+SSCH hitting the kernel module (at least according to my understanding).
 
->> + * Dirty pages are tracked until tracking is stopped by user application by
->> + * setting VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
-> 
-> "...by calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP." ?
-> 
->> + *
->> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP set, indicates
->> + * IOMMU should stop tracking dirtied pages.
-> 
-> "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP instructs the
-> IOMMU driver to stop tracking dirtied pages."
-> 
-> ?
-> 
+Let us forget about the term composite. But we do have be aware of how
+things compose. ;)
 
-Ok.
-
->> + *
->> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
->> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
->> + * given IOVA range.
 > 
-> "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_GET_BITMAP returns the
-> dirty pages bitmap for the IOMMU container for a given IOVA range." ?
+> > 
+> > > 
+> > > In today's code, there isn't a "composite device" that contains
+> > > POPs-defined state information like we find in, for example, the host
+> > > SCHIB, but that incorporates vfio-ccw state. This series (in a far more
+> > > architecturally valid, non-RFC, form) would get us closer to that.
+> > >   
+> > 
+> > I think it is very important to start thinking about the ccw devices
+> > that are exposed to the guest as a "composite device" in a sense that
+> > the (passed-through) host ccw device is wrapped by vfio-ccw. For instance
+> > the guest sees the SCHIB exposed by the vfio-ccw wrapper (adaptation
+> > code in qemu and the kernel module), and not the SCHIB of the host
+> > device.
 > 
-> Q: How does this interact with the two other operations? I imagine
-> getting an empty bitmap before _START 
-
-No, if dirty page tracking is not started, get_bitmap IOCTL will fail 
-with -EINVAL.
-
-> and a bitmap-in-progress between
-> _START and _STOP. > After _STOP, will subsequent calls always give the
-> same bitmap?
+> See my comments on that above.
 >
 
-No, return -EINVAL.
+Sorry for muddying the water. :(
+ 
+> > 
+> > This series definitely has some progressive thoughts. It just that
+> > IMHO we sould to be more radical about this. And yes I'm a bit
+> > frustrated.
+> > 
+> > > > 
+> > > > I suppose at the moment where we accept the CSCH the FC bit
+> > > > indicated clear function (19) goes to set. When this happens
+> > > > there are 2 possibilities: either the start (17) bit is set,
+> > > > or it is not. You describe a scenario where the start bit is
+> > > > not set. In that case we don't have a channel program that
+> > > > is currently being processed, and any SSCH must bounce right
+> > > > off without doing anything (with cc 2) as long as FC clear
+> > > > is set. Please note that we are still talking about the composite
+> > > > device here.  
+> > > 
+> > > Correct. Though, whether the START function control bit is currently set
+> > > is immaterial to a CLEAR function; that's the biggest recovery action we
+> > > have at our disposal, and will always go through.
+> > > 
+> > > The point is that there is nothing to prevent the START on CPU 2 from
+> > > going through. The CLEAR does not affect the FSM today, and doesn't
+> > > record a FC CLEAR bit within vfio-ccw, and so we're only relying on the
+> > > return code from the SSCH instruction to give us cc0 vs cc2 (or
+> > > whatever). The actual results of that will depend, since the CPU may
+> > > have presented the interrupt for the CLEAR (via the .irq callback and
+> > > thus FSM VFIO_CCW_EVENT_INTERRUPT) and thus a new START is perfectly
+> > > legal from its point of view. Since vfio-ccw may not have unstacked the
+> > > work it placed to finish up that interrupt handler means we have a problem.
+> > >   
+> > > > 
+> > > > Thus in my reading CPU2 making the IDLE -> CP_PENDING transition
+> > > > happen is already wrong. We should have rejected to look at the
+> > > > channel program in the first place. Because as far as I can tell
+> > > > for the composite device the FC clear bit remains set until we
+> > > > process the last interrupt on the CPU 1 side in your scenario. Or
+> > > > am I wrong?  
+> > > 
+> > > You're not wrong. You're agreeing with everything I've described.  :)
+> > >   
+> > 
+> > I'm happy our understanding seems to converge! :)
+> > 
+> > My problem is that you tie the denial of SSCH to outstanding interrupts
+> > ("C) A SSCH cannot be issued while an interrupt is outstanding") while
+> > the PoP says "Condition code 2 is set, and no other action is
+> > taken, when a start, halt, or clear function is currently
+> > in progress at the subchannel (see “Function Control
+> > (FC)” on page 16-22)".
+> > 
+> > This may or man not be what you have actually implemented, but it is what
+> > you describe in this cover letter. Also patches 2 and 3 do the 
+> > serialization operate on activity controls instead of on the function
+> > controls (as described by the PoP).
+> 
+> I have not really had the cycles yet to look at this series in detail,
+> but should our goal really be to mimic what the PoP talks about in
+> vfio-ccw (both kernel and userspace parts)? IMO, the important part is
+> that the guest sees a device that acts *towards the guest* in a way
+> that is compliant with the PoP; we can take different paths inside
+> vfio-ccw.
 
+I agree with the principle, but I don't agree with some of the paths
+taken :)
 
->> User must provide data[] as the structure
->> + * vfio_iommu_type1_dirty_bitmap_get through which user provides IOVA range and
->> + * pgsize.
-> 
-> "The user must specify the IOVA range and the pgsize through the
-> vfio_iommu_type1_dirty_bitmap_get structure in the data[] portion."
-> 
-> ?
-> 
->> This interface supports to get bitmap of smallest supported pgsize
->> + * only and can be modified in future to get bitmap of specified pgsize.
-> 
-> That's a current restriction? How can the user find out whether it has
-> been lifted (or, more generally, find out which pgsize values are
-> supported)?
-
-Migration capability is added to IOMMU info chain. That gives supported 
-pgsize bitmap by IOMMU driver.
+Moreover, each time we decide to not take the path that maps the PoP
+in the most straightforward fashion, we better be very careful.
 
 > 
->> + * User must allocate memory for bitmap, zero the bitmap memory  and set size
->> + * of allocated memory in bitmap.size field.
+> (...)
 > 
-> "The user must provide a zeroed memory area for the bitmap memory and
-> specify its size in bitmap.size."
+> > BTW the whole notion of synchronous and asynchronous commands is IMHO
+> > broken. I tried to argue against it back then. If you read the PoP SSCH
+> > is asynchronous as well.
 > 
-> ?
-> 
->> One bit is used to represent one
->> + * page consecutively starting from iova offset. User should provide page size
->> + * in bitmap.pgsize field.
-> 
-> s/User/The user/
-> 
-> Is that the 'pgsize' the comment above talks about?
-> 
+> I don't see where we ever stated that SSCH was synchronous. That would
+> be silly. The async region is called the async region because it is
+> used for some async commands (HSCH/CSCH), not because it is the only
+> way to do async commands. (The original idea was to extend the I/O
+> region for HSCH/CSCH, but that turned out to be awkward.)
 
-By specifying pgsize here user can ask for bitmap of specific pgsize.
-
->> Bit set in bitmap indicates page at that offset from
->> + * iova is dirty.
-> 
-> "A bit set in the bitmap indicates that the page at that offset from
-> iova is dirty." ?
-> 
->> Caller must set argsz including size of structure
->> + * vfio_iommu_type1_dirty_bitmap_get.
-> 
-> s/Caller/The caller/
-> 
-> Does argz also include the size of the bitmap?
-
-No.
+What I don't understand is why are HALT and CLEAR async commands, and
+START a synchronous command, or a non-async command.
 
 > 
->> + *
->> + * Only one of the flags _START, STOP and _GET may be specified at a time.
+> (...)
 > 
-> s/STOP/_STOP/
+> I hope I can find more time to look at this next week, but as it will
+> be a short work week for me and I'm already swamped with various other
+> things, I fear that you should keep your expectations low.
 > 
-> (just to be consistent)
-> 
->> + *
->> + */
->> +struct vfio_iommu_type1_dirty_bitmap {
->> +	__u32        argsz;
->> +	__u32        flags;
->> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
->> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
->> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
->> +	__u8         data[];
->> +};
->> +
->> +struct vfio_iommu_type1_dirty_bitmap_get {
->> +	__u64              iova;	/* IO virtual address */
->> +	__u64              size;	/* Size of iova range */
->> +	struct vfio_bitmap bitmap;
->> +};
-> 
-> That's for type1 only, right?
->
 
-Yes.
+Thanks for chiming in. And please do complain when I talk silly.
+Unfortunately I'm no great communicator.
 
-Thanks,
-Kirti
+Regards,
+Halil
 
->> +
->> +#define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
->> +
->>   /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->>   
->>   /*
-> 
