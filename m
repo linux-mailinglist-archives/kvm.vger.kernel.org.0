@@ -2,501 +2,356 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 973A21D4F34
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 15:24:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84BCD1D4F47
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 15:31:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726250AbgEONYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 09:24:49 -0400
-Received: from foss.arm.com ([217.140.110.172]:56096 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726141AbgEONYs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 09:24:48 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 578821042;
-        Fri, 15 May 2020 06:24:47 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E6423F305;
-        Fri, 15 May 2020 06:24:46 -0700 (PDT)
-Subject: Re: [PATCH v4 kvmtool 10/12] pci: Implement reassignable BARs
-To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
-        kvm@vger.kernel.org
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <1589470709-4104-1-git-send-email-alexandru.elisei@arm.com>
- <1589470709-4104-11-git-send-email-alexandru.elisei@arm.com>
- <bab4ac87-7436-0446-b902-72232d7c1876@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <a3239b20-b621-336a-a5b2-02b4083e8965@arm.com>
-Date:   Fri, 15 May 2020 14:25:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726197AbgEONbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 09:31:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41876 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726160AbgEONbr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 09:31:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589549505;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tw6YcOdTb57tTJEpjUT4XTUayFnAW1S4FhIT3XPkFRo=;
+        b=GwdTQEjh0Twb1OtQSEToA2Sl7KYqm7imxTSHLOS1ZSIf5hcNtyfWFYin2p782QDaoxLcLB
+        w/nogAGUF7rW9t4u6dW9z6pkJUIDGCdJW8dOrr3NBHjtZfYzFHk+KuUNYxXbnTLuXgDjRr
+        F1eJ2SWm9KViW2cfHEiytKG1sOKpnjk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-bmGYwxU8O_aB9rsqs8KIYw-1; Fri, 15 May 2020 09:31:41 -0400
+X-MC-Unique: bmGYwxU8O_aB9rsqs8KIYw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8474E460;
+        Fri, 15 May 2020 13:31:38 +0000 (UTC)
+Received: from x1.home (ovpn-112-50.phx2.redhat.com [10.3.112.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D9095C254;
+        Fri, 15 May 2020 13:31:36 +0000 (UTC)
+Date:   Fri, 15 May 2020 07:31:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH Kernel v20 6/8] vfio iommu: Update UNMAP_DMA ioctl to
+ get dirty bitmap before unmap
+Message-ID: <20200515073135.2370a17d@x1.home>
+In-Reply-To: <268ec129-a1cb-530a-c9b2-7ec53ddf4d17@nvidia.com>
+References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
+        <1589488667-9683-7-git-send-email-kwankhede@nvidia.com>
+        <20200514212706.036a336a@x1.home>
+        <5256f488-2d11-eb0f-6980-eea23f4d3019@nvidia.com>
+        <20200514234726.03c2e345@x1.home>
+        <268ec129-a1cb-530a-c9b2-7ec53ddf4d17@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <bab4ac87-7436-0446-b902-72232d7c1876@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, 15 May 2020 12:17:03 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-On 5/14/20 5:56 PM, André Przywara wrote:
-> On 14/05/2020 16:38, Alexandru Elisei wrote:
->
-> Hi,
->
->> BARs are used by the guest to configure the access to the PCI device by
->> writing the address to which the device will respond. The basic idea for
->> adding support for reassignable BARs is straightforward: deactivate
->> emulation for the memory region described by the old BAR value, and
->> activate emulation for the new region.
->>
->> BAR reassignment can be done while device access is enabled and memory
->> regions for different devices can overlap as long as no access is made to
->> the overlapping memory regions. This means that it is legal for the BARs of
->> two distinct devices to point to an overlapping memory region, and indeed,
->> this is how Linux does resource assignment at boot. To account for this
->> situation, the simple algorithm described above is enhanced to scan for all
->> devices and:
->>
->> - Deactivate emulation for any BARs that might overlap with the new BAR
->>   value.
->>
->> - Enable emulation for any BARs that were overlapping with the old value
->>   after the BAR has been updated.
->>
->> Activating/deactivating emulation of a memory region has side effects.  In
->> order to prevent the execution of the same callback twice we now keep track
->> of the state of the region emulation. For example, this can happen if we
->> program a BAR with an address that overlaps a second BAR, thus deactivating
->> emulation for the second BAR, and then we disable all region accesses to
->> the second BAR by writing to the command register.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Many thanks for the changes and the added comments!
+> On 5/15/2020 11:17 AM, Alex Williamson wrote:
+> > On Fri, 15 May 2020 09:46:43 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 5/15/2020 8:57 AM, Alex Williamson wrote:  
+> >>> On Fri, 15 May 2020 02:07:45 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>      
+> >>>> DMA mapped pages, including those pinned by mdev vendor drivers, might
+> >>>> get unpinned and unmapped while migration is active and device is still
+> >>>> running. For example, in pre-copy phase while guest driver could access
+> >>>> those pages, host device or vendor driver can dirty these mapped pages.
+> >>>> Such pages should be marked dirty so as to maintain memory consistency
+> >>>> for a user making use of dirty page tracking.
+> >>>>
+> >>>> To get bitmap during unmap, user should allocate memory for bitmap, set
+> >>>> it all zeros, set size of allocated memory, set page size to be
+> >>>> considered for bitmap and set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+> >>>>
+> >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >>>> ---
+> >>>>    drivers/vfio/vfio_iommu_type1.c | 77 ++++++++++++++++++++++++++++++++++-------
+> >>>>    include/uapi/linux/vfio.h       | 10 ++++++
+> >>>>    2 files changed, 75 insertions(+), 12 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >>>> index b76d3b14abfd..a1dc57bcece5 100644
+> >>>> --- a/drivers/vfio/vfio_iommu_type1.c
+> >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >>>> @@ -195,11 +195,15 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+> >>>>    static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
+> >>>>    {
+> >>>>    	uint64_t npages = dma->size / pgsize;
+> >>>> +	size_t bitmap_size;
+> >>>>    
+> >>>>    	if (npages > DIRTY_BITMAP_PAGES_MAX)
+> >>>>    		return -EINVAL;
+> >>>>    
+> >>>> -	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+> >>>> +	/* Allocate extra 64 bits which are used for bitmap manipulation */
+> >>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages) + sizeof(u64);
+> >>>> +
+> >>>> +	dma->bitmap = kvzalloc(bitmap_size, GFP_KERNEL);
+> >>>>    	if (!dma->bitmap)
+> >>>>    		return -ENOMEM;
+> >>>>    
+> >>>> @@ -999,23 +1003,25 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> >>>>    }
+> >>>>    
+> >>>>    static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>> -			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >>>> +			     struct vfio_iommu_type1_dma_unmap *unmap,
+> >>>> +			     struct vfio_bitmap *bitmap)
+> >>>>    {
+> >>>> -	uint64_t mask;
+> >>>>    	struct vfio_dma *dma, *dma_last = NULL;
+> >>>> -	size_t unmapped = 0;
+> >>>> +	size_t unmapped = 0, pgsize;
+> >>>>    	int ret = 0, retries = 0;
+> >>>> +	unsigned long pgshift;
+> >>>>    
+> >>>>    	mutex_lock(&iommu->lock);
+> >>>>    
+> >>>> -	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
+> >>>> +	pgshift = __ffs(iommu->pgsize_bitmap);
+> >>>> +	pgsize = (size_t)1 << pgshift;
+> >>>>    
+> >>>> -	if (unmap->iova & mask) {
+> >>>> +	if (unmap->iova & (pgsize - 1)) {
+> >>>>    		ret = -EINVAL;
+> >>>>    		goto unlock;
+> >>>>    	}
+> >>>>    
+> >>>> -	if (!unmap->size || unmap->size & mask) {
+> >>>> +	if (!unmap->size || unmap->size & (pgsize - 1)) {
+> >>>>    		ret = -EINVAL;
+> >>>>    		goto unlock;
+> >>>>    	}
+> >>>> @@ -1026,9 +1032,15 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>    		goto unlock;
+> >>>>    	}
+> >>>>    
+> >>>> -	WARN_ON(mask & PAGE_MASK);
+> >>>> -again:
+> >>>> +	/* When dirty tracking is enabled, allow only min supported pgsize */
+> >>>> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> >>>> +	    (!iommu->dirty_page_tracking || (bitmap->pgsize != pgsize))) {
+> >>>> +		ret = -EINVAL;
+> >>>> +		goto unlock;
+> >>>> +	}
+> >>>>    
+> >>>> +	WARN_ON((pgsize - 1) & PAGE_MASK);
+> >>>> +again:
+> >>>>    	/*
+> >>>>    	 * vfio-iommu-type1 (v1) - User mappings were coalesced together to
+> >>>>    	 * avoid tracking individual mappings.  This means that the granularity
+> >>>> @@ -1066,6 +1078,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>    			ret = -EINVAL;
+> >>>>    			goto unlock;
+> >>>>    		}
+> >>>> +
+> >>>>    		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+> >>>>    		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+> >>>>    			ret = -EINVAL;
+> >>>> @@ -1083,6 +1096,23 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>    		if (dma->task->mm != current->mm)
+> >>>>    			break;
+> >>>>    
+> >>>> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> >>>> +		    (dma_last != dma)) {
+> >>>> +
+> >>>> +			/*
+> >>>> +			 * mark all pages dirty if all pages are pinned and
+> >>>> +			 * mapped
+> >>>> +			 */
+> >>>> +			if (dma->iommu_mapped)
+> >>>> +				bitmap_set(dma->bitmap, 0,
+> >>>> +					   dma->size >> pgshift);  
+> >>>
+> >>> Nit, all the callers of update_user_bitmap() precede the call with this
+> >>> identical operation, we should probably push it into the function to do
+> >>> it.
+> >>>      
+> >>>> +
+> >>>> +			ret = update_user_bitmap(bitmap->data, dma,
+> >>>> +						 unmap->iova, pgsize);
+> >>>> +			if (ret)
+> >>>> +				break;
+> >>>> +		}
+> >>>> +  
+> >>>
+> >>> As noted last time, the above is just busy work if pfn_list is not
+> >>> already empty.  The entire code block above should be moved to after
+> >>> the block below.  Thanks,
+> >>>      
+> >>
+> >> pfn_list will be empty for IOMMU backed devices where all pages are
+> >> pinned and mapped,  
+> > 
+> > Unless we're making use of the selective dirtying introduced in patch
+> > 8/8 or the container is shared with non-IOMMU backed mdevs.
+> >   
+> >> but those should be reported as dirty.  
+> > 
+> > I'm confused how that justifies or requires this ordering.
+> >   
+> 
+> 1. non IOMMU mdev device:
+> - vendor driver pins pages
+> - pfn_list is not empty
+> - device dma or write to pinned pages
+> 
+> 2. IOMMU backed mdev device or vfio device, but smart driver which pins 
+> required pages
+> - vendor driver pins pages
+> - pfn_list is not empty
+> - device dma or write to pinned pages
+> 
+> 3. IOMMU backed mdev device or vfio device, driver is not smart
+> - pages are pinned and mapped during attach
+> - pfn_list is empty
+> - device dma or write to any of pinned pages
+> 
+> For case 3, here this function does bitmap_set(dma->bitmap), that is 
+> mark all pages dirty and then accordingly copy bitmap to user buffer.
+> Copying dma->bitmap logic remains same.
 
-Thank you for the review! :D
+What dependency does case 3 have on pfn_list?  Why does it matter if
+that bitmap_set() occurs before or after we've drained pfn_list?  How
+do we know we're in case 3 before we've looked at pfn_list?
 
->
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
->
->
-> One minor hint below, but that's not critical.
->
->> ---
->>  include/kvm/pci.h |  14 ++-
->>  pci.c             | 250 +++++++++++++++++++++++++++++++++++++++++++-----------
->>  vfio/pci.c        |  12 +++
->>  3 files changed, 227 insertions(+), 49 deletions(-)
->>
->> diff --git a/include/kvm/pci.h b/include/kvm/pci.h
->> index 73e06d76d244..bf81323d83b7 100644
->> --- a/include/kvm/pci.h
->> +++ b/include/kvm/pci.h
->> @@ -11,6 +11,17 @@
->>  #include "kvm/msi.h"
->>  #include "kvm/fdt.h"
->>  
->> +#define pci_dev_err(pci_hdr, fmt, ...) \
->> +	pr_err("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
->> +#define pci_dev_warn(pci_hdr, fmt, ...) \
->> +	pr_warning("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
->> +#define pci_dev_info(pci_hdr, fmt, ...) \
->> +	pr_info("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
->> +#define pci_dev_dbg(pci_hdr, fmt, ...) \
->> +	pr_debug("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
->> +#define pci_dev_die(pci_hdr, fmt, ...) \
->> +	die("[%04x:%04x] " fmt, pci_hdr->vendor_id, pci_hdr->device_id, ##__VA_ARGS__)
->> +
->>  /*
->>   * PCI Configuration Mechanism #1 I/O ports. See Section 3.7.4.1.
->>   * ("Configuration Mechanism #1") of the PCI Local Bus Specification 2.1 for
->> @@ -142,7 +153,8 @@ struct pci_device_header {
->>  	};
->>  
->>  	/* Private to lkvm */
->> -	u32		bar_size[6];
->> +	u32			bar_size[6];
->> +	bool			bar_active[6];
->>  	bar_activate_fn_t	bar_activate_fn;
->>  	bar_deactivate_fn_t	bar_deactivate_fn;
->>  	void *data;
->> diff --git a/pci.c b/pci.c
->> index 96239160110c..2e2c0270a166 100644
->> --- a/pci.c
->> +++ b/pci.c
->> @@ -71,6 +71,11 @@ static bool pci_bar_is_implemented(struct pci_device_header *pci_hdr, int bar_nu
->>  	return pci__bar_size(pci_hdr, bar_num);
->>  }
->>  
->> +static bool pci_bar_is_active(struct pci_device_header *pci_hdr, int bar_num)
->> +{
->> +	return  pci_hdr->bar_active[bar_num];
->> +}
->> +
->>  static void *pci_config_address_ptr(u16 port)
->>  {
->>  	unsigned long offset;
->> @@ -163,6 +168,46 @@ static struct ioport_operations pci_config_data_ops = {
->>  	.io_out	= pci_config_data_out,
->>  };
->>  
->> +static int pci_activate_bar(struct kvm *kvm, struct pci_device_header *pci_hdr,
->> +			    int bar_num)
->> +{
->> +	int r = 0;
->> +
->> +	if (pci_bar_is_active(pci_hdr, bar_num))
->> +		goto out;
->> +
->> +	r = pci_hdr->bar_activate_fn(kvm, pci_hdr, bar_num, pci_hdr->data);
->> +	if (r < 0) {
->> +		pci_dev_warn(pci_hdr, "Error activating emulation for BAR %d",
->> +			     bar_num);
->> +		goto out;
->> +	}
->> +	pci_hdr->bar_active[bar_num] = true;
->> +
->> +out:
->> +	return r;
->> +}
->> +
->> +static int pci_deactivate_bar(struct kvm *kvm, struct pci_device_header *pci_hdr,
->> +			      int bar_num)
->> +{
->> +	int r = 0;
->> +
->> +	if (!pci_bar_is_active(pci_hdr, bar_num))
->> +		goto out;
->> +
->> +	r = pci_hdr->bar_deactivate_fn(kvm, pci_hdr, bar_num, pci_hdr->data);
->> +	if (r < 0) {
->> +		pci_dev_warn(pci_hdr, "Error deactivating emulation for BAR %d",
->> +			     bar_num);
->> +		goto out;
->> +	}
->> +	pci_hdr->bar_active[bar_num] = false;
->> +
->> +out:
->> +	return r;
->> +}
->> +
->>  static void pci_config_command_wr(struct kvm *kvm,
->>  				  struct pci_device_header *pci_hdr,
->>  				  u16 new_command)
->> @@ -179,26 +224,167 @@ static void pci_config_command_wr(struct kvm *kvm,
->>  
->>  		if (toggle_io && pci__bar_is_io(pci_hdr, i)) {
->>  			if (__pci__io_space_enabled(new_command))
->> -				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
->> -							 pci_hdr->data);
->> +				pci_activate_bar(kvm, pci_hdr, i);
->>  			else
->> -				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
->> -							   pci_hdr->data);
->> +				pci_deactivate_bar(kvm, pci_hdr, i);
->>  		}
->>  
->>  		if (toggle_mem && pci__bar_is_memory(pci_hdr, i)) {
->>  			if (__pci__memory_space_enabled(new_command))
->> -				pci_hdr->bar_activate_fn(kvm, pci_hdr, i,
->> -							 pci_hdr->data);
->> +				pci_activate_bar(kvm, pci_hdr, i);
->>  			else
->> -				pci_hdr->bar_deactivate_fn(kvm, pci_hdr, i,
->> -							   pci_hdr->data);
->> +				pci_deactivate_bar(kvm, pci_hdr, i);
->>  		}
->>  	}
->>  
->>  	pci_hdr->command = new_command;
->>  }
->>  
->> +static int pci_toggle_bar_regions(bool activate, struct kvm *kvm, u32 start, u32 size)
->> +{
->> +	struct device_header *dev_hdr;
->> +	struct pci_device_header *tmp_hdr;
->> +	u32 tmp_start, tmp_size;
->> +	int i, r;
->> +
->> +	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
->> +	while (dev_hdr) {
->> +		tmp_hdr = dev_hdr->data;
->> +		for (i = 0; i < 6; i++) {
->> +			if (!pci_bar_is_implemented(tmp_hdr, i))
->> +				continue;
->> +
->> +			tmp_start = pci__bar_address(tmp_hdr, i);
->> +			tmp_size = pci__bar_size(tmp_hdr, i);
->> +			if (tmp_start + tmp_size <= start ||
->> +			    tmp_start >= start + size)
->> +				continue;
->> +
->> +			if (activate)
->> +				r = pci_activate_bar(kvm, tmp_hdr, i);
->> +			else
->> +				r = pci_deactivate_bar(kvm, tmp_hdr, i);
->> +			if (r < 0)
->> +				return r;
->> +		}
->> +		dev_hdr = device__next_dev(dev_hdr);
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static inline int pci_activate_bar_regions(struct kvm *kvm, u32 start, u32 size)
-> This inline is not needed. It's a hint anyway, the compiler may or may
-> not observe it. It knows best anyway, if it doesn't inline it, then for
-> a reason.
->
-> There is a cause for "static inline" in *header files*, because it
-> prevents warnings about unused functions.
+> >> So moved it
+> >> back above empty pfn_list check.  
+> > 
+> > Sorry, it still doesn't make any sense to me, and with no discussion I
+> > can't differentiate ignored comments from discarded comments.
+> > 
+> > Pages in the pfn_list contribute to the dirty bitmap when they're
+> > pinned, we don't depend on pfn_list when reporting the dirty bitmap
+> > except for re-populating pfn_list dirtied pages after the bitmap has
+> > been cleared.  We're unmapping the dma, so that's not the case here.
+> > Also since update_user_bitmap() shifts the bitmap in place now, any
+> > repetitive calls will give us incorrect results.  
+> 
+> Right, but this is unmapping and freeing vfio_dma
+> 
+> >  Therefore, as I see
+> > it, we _can_ take the branch below and when we do any work we've done
+> > above is not only wasted but may lead to incorrect data copied to
+> > the user if we shift dma->bitmap in place more than once.  Please
+> > explain in more detail if you believe this is still correct.  Thanks,
+> >   
+> 
+> In this case also bitmap copy to user happens once, (dma_last != dma) 
+> takes care of making sure that its called only once.
 
-I wanted a higher chance to have the function inlined by the compiler to avoid the
-argument shuffling that would have to be done in this function ({x0..x2} ->
-{x1..x3}). That's probably a premature and pointless optimization, because the
-function is not in a fast path and "inline" doesn't guarantee inlining. I'm fine
-with dropping the attribute.
+I did miss the dma_last check, so that prevents us from repeating this
+path, BUT we release iommu->lock if we enter the pfn_list !empty path.
+The moment we do that, we might unblock a vendor driver trying to pin
+or rw more pages.  So the bitmap we've copied to the user might be stale
+and incorrect.  I don't see why this is so contentious, what is the
+actual disadvantage to moving this until after we've drained pfn_list?
+The risks seem abundant to me.  Thanks,
 
-Thanks,
 Alex
->
-> Cheers,
-> Anre.
->
->> +{
->> +	return pci_toggle_bar_regions(true, kvm, start, size);
->> +}
->> +
->> +static inline int pci_deactivate_bar_regions(struct kvm *kvm, u32 start, u32 size)
->> +{
->> +	return pci_toggle_bar_regions(false, kvm, start, size);
->> +}
->> +
->> +static void pci_config_bar_wr(struct kvm *kvm,
->> +			      struct pci_device_header *pci_hdr, int bar_num,
->> +			      u32 value)
->> +{
->> +	u32 old_addr, new_addr, bar_size;
->> +	u32 mask;
->> +	int r;
->> +
->> +	if (pci__bar_is_io(pci_hdr, bar_num))
->> +		mask = (u32)PCI_BASE_ADDRESS_IO_MASK;
->> +	else
->> +		mask = (u32)PCI_BASE_ADDRESS_MEM_MASK;
->> +
->> +	/*
->> +	 * If the kernel masks the BAR, it will expect to find the size of the
->> +	 * BAR there next time it reads from it. After the kernel reads the
->> +	 * size, it will write the address back.
->> +	 *
->> +	 * According to the PCI local bus specification REV 3.0: The number of
->> +	 * upper bits that a device actually implements depends on how much of
->> +	 * the address space the device will respond to. A device that wants a 1
->> +	 * MB memory address space (using a 32-bit base address register) would
->> +	 * build the top 12 bits of the address register, hardwiring the other
->> +	 * bits to 0.
->> +	 *
->> +	 * Furthermore, software can determine how much address space the device
->> +	 * requires by writing a value of all 1's to the register and then
->> +	 * reading the value back. The device will return 0's in all don't-care
->> +	 * address bits, effectively specifying the address space required.
->> +	 *
->> +	 * Software computes the size of the address space with the formula
->> +	 * S =  ~B + 1, where S is the memory size and B is the value read from
->> +	 * the BAR. This means that the BAR value that kvmtool should return is
->> +	 * B = ~(S - 1).
->> +	 */
->> +	if (value == 0xffffffff) {
->> +		value = ~(pci__bar_size(pci_hdr, bar_num) - 1);
->> +		/* Preserve the special bits. */
->> +		value = (value & mask) | (pci_hdr->bar[bar_num] & ~mask);
->> +		pci_hdr->bar[bar_num] = value;
->> +		return;
->> +	}
->> +
->> +	value = (value & mask) | (pci_hdr->bar[bar_num] & ~mask);
->> +
->> +	/* Don't toggle emulation when region type access is disbled. */
->> +	if (pci__bar_is_io(pci_hdr, bar_num) &&
->> +	    !pci__io_space_enabled(pci_hdr)) {
->> +		pci_hdr->bar[bar_num] = value;
->> +		return;
->> +	}
->> +
->> +	if (pci__bar_is_memory(pci_hdr, bar_num) &&
->> +	    !pci__memory_space_enabled(pci_hdr)) {
->> +		pci_hdr->bar[bar_num] = value;
->> +		return;
->> +	}
->> +
->> +	/*
->> +	 * BAR reassignment can be done while device access is enabled and
->> +	 * memory regions for different devices can overlap as long as no access
->> +	 * is made to the overlapping memory regions. To implement BAR
->> +	 * reasignment, we deactivate emulation for the region described by the
->> +	 * BAR value that the guest is changing, we disable emulation for the
->> +	 * regions that overlap with the new one (by scanning through all PCI
->> +	 * devices), we enable emulation for the new BAR value and finally we
->> +	 * enable emulation for all device regions that were overlapping with
->> +	 * the old value.
->> +	 */
->> +	old_addr = pci__bar_address(pci_hdr, bar_num);
->> +	new_addr = __pci__bar_address(value);
->> +	bar_size = pci__bar_size(pci_hdr, bar_num);
->> +
->> +	r = pci_deactivate_bar(kvm, pci_hdr, bar_num);
->> +	if (r < 0)
->> +		return;
->> +
->> +	r = pci_deactivate_bar_regions(kvm, new_addr, bar_size);
->> +	if (r < 0) {
->> +		/*
->> +		 * We cannot update the BAR because of an overlapping region
->> +		 * that failed to deactivate emulation, so keep the old BAR
->> +		 * value and re-activate emulation for it.
->> +		 */
->> +		pci_activate_bar(kvm, pci_hdr, bar_num);
->> +		return;
->> +	}
->> +
->> +	pci_hdr->bar[bar_num] = value;
->> +	r = pci_activate_bar(kvm, pci_hdr, bar_num);
->> +	if (r < 0) {
->> +		/*
->> +		 * New region cannot be emulated, re-enable the regions that
->> +		 * were overlapping.
->> +		 */
->> +		pci_activate_bar_regions(kvm, new_addr, bar_size);
->> +		return;
->> +	}
->> +
->> +	pci_activate_bar_regions(kvm, old_addr, bar_size);
->> +}
->> +
->>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
->>  {
->>  	void *base;
->> @@ -206,7 +392,6 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->>  	struct pci_device_header *pci_hdr;
->>  	u8 dev_num = addr.device_number;
->>  	u32 value = 0;
->> -	u32 mask;
->>  
->>  	if (!pci_device_exists(addr.bus_number, dev_num, 0))
->>  		return;
->> @@ -231,46 +416,13 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
->>  	}
->>  
->>  	bar = (offset - PCI_BAR_OFFSET(0)) / sizeof(u32);
->> -
->> -	/*
->> -	 * If the kernel masks the BAR, it will expect to find the size of the
->> -	 * BAR there next time it reads from it. After the kernel reads the
->> -	 * size, it will write the address back.
->> -	 */
->>  	if (bar < 6) {
->> -		if (pci__bar_is_io(pci_hdr, bar))
->> -			mask = (u32)PCI_BASE_ADDRESS_IO_MASK;
->> -		else
->> -			mask = (u32)PCI_BASE_ADDRESS_MEM_MASK;
->> -		/*
->> -		 * According to the PCI local bus specification REV 3.0:
->> -		 * The number of upper bits that a device actually implements
->> -		 * depends on how much of the address space the device will
->> -		 * respond to. A device that wants a 1 MB memory address space
->> -		 * (using a 32-bit base address register) would build the top
->> -		 * 12 bits of the address register, hardwiring the other bits
->> -		 * to 0.
->> -		 *
->> -		 * Furthermore, software can determine how much address space
->> -		 * the device requires by writing a value of all 1's to the
->> -		 * register and then reading the value back. The device will
->> -		 * return 0's in all don't-care address bits, effectively
->> -		 * specifying the address space required.
->> -		 *
->> -		 * Software computes the size of the address space with the
->> -		 * formula S = ~B + 1, where S is the memory size and B is the
->> -		 * value read from the BAR. This means that the BAR value that
->> -		 * kvmtool should return is B = ~(S - 1).
->> -		 */
->>  		memcpy(&value, data, size);
->> -		if (value == 0xffffffff)
->> -			value = ~(pci__bar_size(pci_hdr, bar) - 1);
->> -		/* Preserve the special bits. */
->> -		value = (value & mask) | (pci_hdr->bar[bar] & ~mask);
->> -		memcpy(base + offset, &value, size);
->> -	} else {
->> -		memcpy(base + offset, data, size);
->> +		pci_config_bar_wr(kvm, pci_hdr, bar, value);
->> +		return;
->>  	}
->> +
->> +	memcpy(base + offset, data, size);
->>  }
->>  
->>  void pci__config_rd(struct kvm *kvm, union pci_config_address addr, void *data, int size)
->> @@ -336,16 +488,18 @@ int pci__register_bar_regions(struct kvm *kvm, struct pci_device_header *pci_hdr
->>  		if (!pci_bar_is_implemented(pci_hdr, i))
->>  			continue;
->>  
->> +		assert(!pci_bar_is_active(pci_hdr, i));
->> +
->>  		if (pci__bar_is_io(pci_hdr, i) &&
->>  		    pci__io_space_enabled(pci_hdr)) {
->> -			r = bar_activate_fn(kvm, pci_hdr, i, data);
->> +			r = pci_activate_bar(kvm, pci_hdr, i);
->>  			if (r < 0)
->>  				return r;
->>  		}
->>  
->>  		if (pci__bar_is_memory(pci_hdr, i) &&
->>  		    pci__memory_space_enabled(pci_hdr)) {
->> -			r = bar_activate_fn(kvm, pci_hdr, i, data);
->> +			r = pci_activate_bar(kvm, pci_hdr, i);
->>  			if (r < 0)
->>  				return r;
->>  		}
->> diff --git a/vfio/pci.c b/vfio/pci.c
->> index 34f19792765e..49ecd12a38cd 100644
->> --- a/vfio/pci.c
->> +++ b/vfio/pci.c
->> @@ -467,6 +467,7 @@ static int vfio_pci_bar_activate(struct kvm *kvm,
->>  	struct vfio_pci_msix_pba *pba = &pdev->msix_pba;
->>  	struct vfio_pci_msix_table *table = &pdev->msix_table;
->>  	struct vfio_region *region;
->> +	u32 bar_addr;
->>  	bool has_msix;
->>  	int ret;
->>  
->> @@ -475,7 +476,14 @@ static int vfio_pci_bar_activate(struct kvm *kvm,
->>  	region = &vdev->regions[bar_num];
->>  	has_msix = pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX;
->>  
->> +	bar_addr = pci__bar_address(pci_hdr, bar_num);
->> +	if (pci__bar_is_io(pci_hdr, bar_num))
->> +		region->port_base = bar_addr;
->> +	else
->> +		region->guest_phys_addr = bar_addr;
->> +
->>  	if (has_msix && (u32)bar_num == table->bar) {
->> +		table->guest_phys_addr = region->guest_phys_addr;
->>  		ret = kvm__register_mmio(kvm, table->guest_phys_addr,
->>  					 table->size, false,
->>  					 vfio_pci_msix_table_access, pdev);
->> @@ -490,6 +498,10 @@ static int vfio_pci_bar_activate(struct kvm *kvm,
->>  	}
->>  
->>  	if (has_msix && (u32)bar_num == pba->bar) {
->> +		if (pba->bar == table->bar)
->> +			pba->guest_phys_addr = table->guest_phys_addr + table->size;
->> +		else
->> +			pba->guest_phys_addr = region->guest_phys_addr;
->>  		ret = kvm__register_mmio(kvm, pba->guest_phys_addr,
->>  					 pba->size, false,
->>  					 vfio_pci_msix_pba_access, pdev);
->>
+
+> >>>      
+> >>>>    		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+> >>>>    			struct vfio_iommu_type1_dma_unmap nb_unmap;
+> >>>>    
+> >>>> @@ -2447,17 +2477,40 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>>>    
+> >>>>    	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+> >>>>    		struct vfio_iommu_type1_dma_unmap unmap;
+> >>>> -		long ret;
+> >>>> +		struct vfio_bitmap bitmap = { 0 };
+> >>>> +		int ret;
+> >>>>    
+> >>>>    		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
+> >>>>    
+> >>>>    		if (copy_from_user(&unmap, (void __user *)arg, minsz))
+> >>>>    			return -EFAULT;
+> >>>>    
+> >>>> -		if (unmap.argsz < minsz || unmap.flags)
+> >>>> +		if (unmap.argsz < minsz ||
+> >>>> +		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
+> >>>>    			return -EINVAL;
+> >>>>    
+> >>>> -		ret = vfio_dma_do_unmap(iommu, &unmap);
+> >>>> +		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
+> >>>> +			unsigned long pgshift;
+> >>>> +
+> >>>> +			if (unmap.argsz < (minsz + sizeof(bitmap)))
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			if (copy_from_user(&bitmap,
+> >>>> +					   (void __user *)(arg + minsz),
+> >>>> +					   sizeof(bitmap)))
+> >>>> +				return -EFAULT;
+> >>>> +
+> >>>> +			if (!access_ok((void __user *)bitmap.data, bitmap.size))
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			pgshift = __ffs(bitmap.pgsize);
+> >>>> +			ret = verify_bitmap_size(unmap.size >> pgshift,
+> >>>> +						 bitmap.size);
+> >>>> +			if (ret)
+> >>>> +				return ret;
+> >>>> +		}
+> >>>> +
+> >>>> +		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
+> >>>>    		if (ret)
+> >>>>    			return ret;
+> >>>>    
+> >>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> >>>> index 123de3bc2dce..0a0c7315ddd6 100644
+> >>>> --- a/include/uapi/linux/vfio.h
+> >>>> +++ b/include/uapi/linux/vfio.h
+> >>>> @@ -1048,12 +1048,22 @@ struct vfio_bitmap {
+> >>>>     * field.  No guarantee is made to the user that arbitrary unmaps of iova
+> >>>>     * or size different from those used in the original mapping call will
+> >>>>     * succeed.
+> >>>> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
+> >>>> + * before unmapping IO virtual addresses. When this flag is set, user must
+> >>>> + * provide data[] as structure vfio_bitmap. User must allocate memory to get
+> >>>> + * bitmap, zero the bitmap memory and must set size of allocated memory in
+> >>>> + * vfio_bitmap.size field. A bit in bitmap represents one page of user provided
+> >>>> + * page size in 'pgsize', consecutively starting from iova offset. Bit set
+> >>>> + * indicates page at that offset from iova is dirty. Bitmap of pages in the
+> >>>> + * range of unmapped size is returned in vfio_bitmap.data
+> >>>>     */
+> >>>>    struct vfio_iommu_type1_dma_unmap {
+> >>>>    	__u32	argsz;
+> >>>>    	__u32	flags;
+> >>>> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+> >>>>    	__u64	iova;				/* IO virtual address */
+> >>>>    	__u64	size;				/* Size of mapping (bytes) */
+> >>>> +	__u8    data[];
+> >>>>    };
+> >>>>    
+> >>>>    #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)  
+> >>>      
+> >>  
+> >   
+> 
+
