@@ -2,138 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 667741D4CAC
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 13:35:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBD1F1D4D1A
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 13:57:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726087AbgEOLe7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 07:34:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4916 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726046AbgEOLe6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 07:34:58 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04FBW0a6037080;
-        Fri, 15 May 2020 07:34:57 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3119dgwxkg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 07:34:57 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04FBWLYf038326;
-        Fri, 15 May 2020 07:34:57 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3119dgwxjb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 07:34:56 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04FBP61i007132;
-        Fri, 15 May 2020 11:34:53 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3100ub282n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 11:34:53 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04FBYppl61538438
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 May 2020 11:34:51 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 787B4A405C;
-        Fri, 15 May 2020 11:34:51 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2CA30A405B;
-        Fri, 15 May 2020 11:34:51 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.33.185])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 May 2020 11:34:51 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v6 07/10] s390x: css: msch, enable test
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com
-References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
- <1587725152-25569-8-git-send-email-pmorel@linux.ibm.com>
- <cff917e0-f7e0-fd48-eda5-0cbe8173ae8a@linux.ibm.com>
- <abafd691-d9ab-33b2-c522-d37fecc3e881@linux.ibm.com>
- <20200514140808.269f6485.cohuck@redhat.com>
- <de18eab3-4d0a-1b86-f6c4-27aaa7bba6bf@linux.ibm.com>
- <20200515102548.0f43419d.cohuck@redhat.com>
- <e0d0d9f5-c780-404a-6cc8-31cbb077cf6f@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <50152768-f93e-90d2-379a-4b27c6669b5a@linux.ibm.com>
-Date:   Fri, 15 May 2020 13:34:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726097AbgEOL5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 07:57:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36389 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726047AbgEOL5d (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 07:57:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589543851;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aUH+TtwSJFbCU3USF38P3lC5oZW0dOM6MBq1iuuUyrA=;
+        b=DI1b97D1D7lcsF5uulhxYcLZvQHg2Qly6ldZwFHqBUz2S0sN0SwJ620gmHH9E4EJqfQC1S
+        pFU1g0UvieI2+yRPPT4oP7L9JzRY4HHXJfSkx28/4s5Fl3eb9ukAuYCWN1F+30oeHw/2UD
+        YcyRngQZMWjUp7KTgDJELrvA2Jp7c28=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-B_J2d5_RO2ig6l7tRXwB0w-1; Fri, 15 May 2020 07:57:29 -0400
+X-MC-Unique: B_J2d5_RO2ig6l7tRXwB0w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6BD7107ACCD;
+        Fri, 15 May 2020 11:57:28 +0000 (UTC)
+Received: from work-vm (ovpn-114-149.ams2.redhat.com [10.36.114.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C97D660F8D;
+        Fri, 15 May 2020 11:57:17 +0000 (UTC)
+Date:   Fri, 15 May 2020 12:57:14 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        Richard Henderson <rth@twiddle.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v1 03/17] accel/kvm: Convert to
+ ram_block_discard_set_broken()
+Message-ID: <20200515115714.GC2954@work-vm>
+References: <20200506094948.76388-1-david@redhat.com>
+ <20200506094948.76388-4-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e0d0d9f5-c780-404a-6cc8-31cbb077cf6f@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-15_04:2020-05-14,2020-05-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- mlxscore=0 spamscore=0 priorityscore=1501 cotscore=-2147483648
- adultscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 malwarescore=0 clxscore=1015 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005150097
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200506094948.76388-4-david@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020-05-15 10:53, Janosch Frank wrote:
-> On 5/15/20 10:25 AM, Cornelia Huck wrote:
->> On Fri, 15 May 2020 09:11:52 +0200
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
->>> On 2020-05-14 14:08, Cornelia Huck wrote:
->>>> On Tue, 28 Apr 2020 10:27:36 +0200
->>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>    
->>>>> On 2020-04-27 15:11, Janosch Frank wrote:
->>>>>> On 4/24/20 12:45 PM, Pierre Morel wrote:
->>>>    
->>>>>>> This is NOT a routine to really enable the channel, no retry is done,
->>>>>>> in case of error, a report is made.
->>>>>>
->>>>>> Would we expect needing retries for the pong device?
->>>>>
->>>>> Yes it can be that we need to retry some instructions if we want them to
->>>>> succeed.
->>>>> This is the case for example if we develop a driver for an operating system.
->>>>> When working with firmware, sometime, things do not work at the first
->>>>> time. Mostly due to races in silicium, firmware or hypervisor or between
->>>>> them all.
->>>>>
->>>>> Since our purpose is to detect such problems we do not retry
->>>>> instructions but report the error.
->>>>>
->>>>> If we detect such problem we may in the future enhance the tests.
->>>>
->>>> I think I've seen retries needed on z/VM in the past; do you know if
->>>> that still happens?
->>>>    
->>>
->>> I did not try the tests under z/VM, nor direct on an LPAR, only under
->>> QEMU/KVM.
->>> Under QEMU/KVM, I did not encounter any need for retry, 100% of the
->>> enabled succeeded on first try.
->>
->> Yep, QEMU/KVM should be fine. Do you plan to run this on anything else?
->>
+* David Hildenbrand (david@redhat.com) wrote:
+> Discarding memory does not work as expected. At the time this is called,
+> we cannot have anyone active that relies on discards to work properly.
 > 
-> I'd like to have it compatible with z/VM / LPAR as well if it isn't too
-> much work. You never know when you need it and having tests for all
-> hypervisors has been quite a help in the past.
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  accel/kvm/kvm-all.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 439a4efe52..33421184ac 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -40,7 +40,6 @@
+>  #include "trace.h"
+>  #include "hw/irq.h"
+>  #include "sysemu/sev.h"
+> -#include "sysemu/balloon.h"
+>  #include "qapi/visitor.h"
+>  #include "qapi/qapi-types-common.h"
+>  #include "qapi/qapi-visit-common.h"
+> @@ -2107,7 +2106,7 @@ static int kvm_init(MachineState *ms)
+>  
+>      s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
+>      if (!s->sync_mmu) {
+> -        qemu_balloon_inhibit(true);
+> +        g_assert(ram_block_discard_set_broken(true));
+>      }
+>  
+>      return 0;
+> -- 
+> 2.25.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-OK, then I can add some retries in prevision.
-
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
