@@ -2,181 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A4DF1D5CA6
-	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 01:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ED191D5CB4
+	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 01:17:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726367AbgEOXJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 19:09:52 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59620 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbgEOXJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 19:09:52 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04FN72jo007072;
-        Fri, 15 May 2020 23:09:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=tecV6clB8lrYmlHoyet0oiwXbUPJjtWy4RzwOYWDzXM=;
- b=BbZ8QJtFH3+KphS27u4rCHZOn05PVp9mEi5i5zLdJFVguwc+evd3MqaiFC7RZF40kXnZ
- uh4h5dOu5/j5LnvU6ETI8LJ4p282WE3ebZomfI86aConPSy0Db8IEIM8ZokLvmpQjKXj
- MXFwsfNqzeGBveuyX5OXQEhrdeUT+DUiz71ktMaesBWwXvVnYbjrPPLU8qokWmN2tJYQ
- evDJPzNQqxRxIw66uUB4ytkkhJD+UTYltUwWY9hblrlLoYijDWKJOFzmDPFCnLez26jQ
- Fkt+I45OB7ao+xURFy0J/VdN1S8O81Nhb3VlvC3FzSVjqALT9Ce0yIcjHHDFSm4AnNj+ qA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 3100yge7s7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 15 May 2020 23:09:46 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04FN8laX011481;
-        Fri, 15 May 2020 23:09:45 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 310vjxng1k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 May 2020 23:09:45 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04FN9iaU003274;
-        Fri, 15 May 2020 23:09:44 GMT
-Received: from localhost.localdomain (/10.159.240.167)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 15 May 2020 16:09:44 -0700
-Subject: Re: [PATCH 2/7] KVM: SVM: extract load_nested_vmcb_control
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Cathy Avery <cavery@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20200515174144.1727-1-pbonzini@redhat.com>
- <20200515174144.1727-3-pbonzini@redhat.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <73188a11-8208-cac6-4d30-4cf67a5d89bc@oracle.com>
-Date:   Fri, 15 May 2020 16:09:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726727AbgEOXRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 19:17:00 -0400
+Received: from mga02.intel.com ([134.134.136.20]:24010 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726183AbgEOXRA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 19:17:00 -0400
+IronPort-SDR: MnN96HectqR7Qc8tYZoXMOyIwn4jPHD//pLJC3Pwjnp3rmnx7NpX1imP2M+gLkwFdFJ2e7CD5J
+ PFcGmZqsDnWQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2020 16:16:59 -0700
+IronPort-SDR: PHU/VX9vgI/7VIW37J4x5i+7JOJ9G2tdqImmyZ5/EMGp3IeC6e/K7lE9ayaAny0Z+tF2Hvas1n
+ m+js3FvpH83A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,396,1583222400"; 
+   d="scan'208";a="263342711"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga003.jf.intel.com with ESMTP; 15 May 2020 16:16:59 -0700
+Date:   Fri, 15 May 2020 16:16:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vivek Goyal <vgoyal@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with
+ token info
+Message-ID: <20200515231659.GM17572@linux.intel.com>
+References: <20200512152709.GB138129@redhat.com>
+ <87o8qtmaat.fsf@vitty.brq.redhat.com>
+ <20200512155339.GD138129@redhat.com>
+ <20200512175017.GC12100@linux.intel.com>
+ <20200513125241.GA173965@redhat.com>
+ <0733213c-9514-4b04-6356-cf1087edd9cf@redhat.com>
+ <20200515184646.GD17572@linux.intel.com>
+ <d84b6436-9630-1474-52e5-ffcc4d2bd70a@redhat.com>
+ <20200515204341.GF17572@linux.intel.com>
+ <943cfc2f-5b18-e00a-f5a2-4577472a1ff5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200515174144.1727-3-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9622 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
- spamscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005150195
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9622 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 adultscore=0
- cotscore=-2147483648 mlxscore=0 suspectscore=0 spamscore=0 impostorscore=0
- mlxlogscore=999 malwarescore=0 clxscore=1011 phishscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005150195
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <943cfc2f-5b18-e00a-f5a2-4577472a1ff5@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, May 16, 2020 at 12:23:31AM +0200, Paolo Bonzini wrote:
+> On 15/05/20 22:43, Sean Christopherson wrote:
+> > On Fri, May 15, 2020 at 09:18:07PM +0200, Paolo Bonzini wrote:
+> >> On 15/05/20 20:46, Sean Christopherson wrote:
+> >>> Why even bother using 'struct kvm_vcpu_pv_apf_data' for the #PF case?  VMX
+> >>> only requires error_code[31:16]==0 and SVM doesn't vet it at all, i.e. we
+> >>> can (ab)use the error code to indicate an async #PF by setting it to an
+> >>> impossible value, e.g. 0xaaaa (a is for async!).  That partciular error code
+> >>> is even enforced by the SDM, which states:
+> >>
+> >> Possibly, but it's water under the bridge now.
+> > 
+> > Why is that?  I thought we were redoing the entire thing because the current
+> > ABI is unfixably broken?  In other words, since the guest needs to change,
+> > why are we keeping any of the current async #PF pieces?  E.g. why keep using
+> > #PF instead of usurping something like #NP?
+> 
+> Because that would be 3 ABIs to support instead of 2.  The #PF solution
+> is only broken as long as you allow async PF from ring 0 (which wasn't
+> even true except for preemptable kernels) _and_ have NMIs that can
+> generate page faults.  We also have the #PF vmexit part for nested
+> virtualization.  This adds up and makes a quick fix for 'page not ready'
+> notifications not that quick.
+> 
+> However, interrupts for 'page ready' do have a bunch of advantages (more
+> control on what can be preempted by the notification, a saner check for
+> new page faults which is effectively a bug fix) so it makes sense to get
+> them in more quickly (probably 5.9 at this point due to the massive
+> cleanups that are being done around interrupt vectors).
 
-On 5/15/20 10:41 AM, Paolo Bonzini wrote:
-> When restoring SVM nested state, the control state will be stored already
-> in svm->nested by KVM_SET_NESTED_STATE.  We will not need to fish it out of
-> L1's VMCB.  Pull everything into a separate function so that it is
-> documented which fields are needed.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   arch/x86/kvm/svm/nested.c | 45 ++++++++++++++++++++++-----------------
->   1 file changed, 25 insertions(+), 20 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 22f75f66084f..e79acc852000 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -225,6 +225,27 @@ static bool nested_vmcb_checks(struct vmcb *vmcb)
->   	return true;
->   }
->   
-> +static void load_nested_vmcb_control(struct vcpu_svm *svm, struct vmcb *nested_vmcb)
+Ah, so the plan is to fix 'page ready' for the current ABI, but keep the
+existing 'page not ready' part because it's not thaaaat broken.  Correct?
 
+In that case, is Andy's patch to kill KVM_ASYNC_PF_SEND_ALWAYS in the guest
+being picked up?
 
-This function only separates a subset of the controls. If the purpose of 
-the function is to separate only the controls that are related to 
-migration, should it be called something like 
-load_nested_state_vmcb_control or something like that ?
-
-> +{
-> +	if (kvm_get_rflags(&svm->vcpu) & X86_EFLAGS_IF)
-> +		svm->vcpu.arch.hflags |= HF_HIF_MASK;
-> +	else
-> +		svm->vcpu.arch.hflags &= ~HF_HIF_MASK;
-> +
-> +	svm->nested.nested_cr3 = nested_vmcb->control.nested_cr3;
-> +
-> +	svm->nested.vmcb_msrpm = nested_vmcb->control.msrpm_base_pa & ~0x0fffULL;
-> +	svm->nested.vmcb_iopm  = nested_vmcb->control.iopm_base_pa  & ~0x0fffULL;
-> +
-> +	/* cache intercepts */
-> +	svm->nested.intercept_cr         = nested_vmcb->control.intercept_cr;
-> +	svm->nested.intercept_dr         = nested_vmcb->control.intercept_dr;
-> +	svm->nested.intercept_exceptions = nested_vmcb->control.intercept_exceptions;
-> +	svm->nested.intercept            = nested_vmcb->control.intercept;
-> +
-> +	svm->vcpu.arch.tsc_offset += nested_vmcb->control.tsc_offset;
-> +}
-> +
->   void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
->   			  struct vmcb *nested_vmcb)
->   {
-> @@ -232,15 +253,11 @@ void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
->   		is_intercept(svm, INTERCEPT_VINTR) ||
->   		is_intercept(svm, INTERCEPT_IRET);
->   
-> -	if (kvm_get_rflags(&svm->vcpu) & X86_EFLAGS_IF)
-> -		svm->vcpu.arch.hflags |= HF_HIF_MASK;
-> -	else
-> -		svm->vcpu.arch.hflags &= ~HF_HIF_MASK;
-> +	svm->nested.vmcb = vmcb_gpa;
-> +	load_nested_vmcb_control(svm, nested_vmcb);
->   
-> -	if (nested_vmcb->control.nested_ctl & SVM_NESTED_CTL_NP_ENABLE) {
-> -		svm->nested.nested_cr3 = nested_vmcb->control.nested_cr3;
-> +	if (nested_vmcb->control.nested_ctl & SVM_NESTED_CTL_NP_ENABLE)
->   		nested_svm_init_mmu_context(&svm->vcpu);
-> -	}
->   
->   	/* Load the nested guest state */
->   	svm->vmcb->save.es = nested_vmcb->save.es;
-> @@ -275,25 +292,15 @@ void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
->   	svm->vcpu.arch.dr6  = nested_vmcb->save.dr6;
->   	svm->vmcb->save.cpl = nested_vmcb->save.cpl;
->   
-> -	svm->nested.vmcb_msrpm = nested_vmcb->control.msrpm_base_pa & ~0x0fffULL;
-> -	svm->nested.vmcb_iopm  = nested_vmcb->control.iopm_base_pa  & ~0x0fffULL;
-> -
-> -	/* cache intercepts */
-> -	svm->nested.intercept_cr         = nested_vmcb->control.intercept_cr;
-> -	svm->nested.intercept_dr         = nested_vmcb->control.intercept_dr;
-> -	svm->nested.intercept_exceptions = nested_vmcb->control.intercept_exceptions;
-> -	svm->nested.intercept            = nested_vmcb->control.intercept;
-> -
->   	svm_flush_tlb(&svm->vcpu);
-> -	svm->vmcb->control.int_ctl = nested_vmcb->control.int_ctl | V_INTR_MASKING_MASK;
->   	if (nested_vmcb->control.int_ctl & V_INTR_MASKING_MASK)
->   		svm->vcpu.arch.hflags |= HF_VINTR_MASK;
->   	else
->   		svm->vcpu.arch.hflags &= ~HF_VINTR_MASK;
->   
-> -	svm->vcpu.arch.tsc_offset += nested_vmcb->control.tsc_offset;
->   	svm->vmcb->control.tsc_offset = svm->vcpu.arch.tsc_offset;
->   
-> +	svm->vmcb->control.int_ctl = nested_vmcb->control.int_ctl | V_INTR_MASKING_MASK;
->   	svm->vmcb->control.virt_ext = nested_vmcb->control.virt_ext;
->   	svm->vmcb->control.int_vector = nested_vmcb->control.int_vector;
->   	svm->vmcb->control.int_state = nested_vmcb->control.int_state;
-> @@ -314,8 +321,6 @@ void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
->   	 */
->   	recalc_intercepts(svm);
->   
-> -	svm->nested.vmcb = vmcb_gpa;
-> -
->   	/*
->   	 * If L1 had a pending IRQ/NMI before executing VMRUN,
->   	 * which wasn't delivered because it was disallowed (e.g.
+I'll read through your #VE stuff on Monday :-).
