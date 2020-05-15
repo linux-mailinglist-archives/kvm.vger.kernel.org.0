@@ -2,211 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2FBE1D48DE
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 10:53:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A26921D4A00
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 11:54:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728047AbgEOIxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 04:53:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55954 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727116AbgEOIxW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 04:53:22 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04F8X1X3040450;
-        Fri, 15 May 2020 04:53:21 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3111w9ht2a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 04:53:21 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04F8XA6l041242;
-        Fri, 15 May 2020 04:53:20 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3111w9ht19-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 04:53:20 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04F8p1WJ005618;
-        Fri, 15 May 2020 08:53:18 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3100uba5wf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 08:53:18 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04F8q4gX65798480
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 May 2020 08:52:04 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0BD6542042;
-        Fri, 15 May 2020 08:53:16 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A907F4203F;
-        Fri, 15 May 2020 08:53:15 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.9.239])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 May 2020 08:53:15 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v6 07/10] s390x: css: msch, enable test
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com
-References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
- <1587725152-25569-8-git-send-email-pmorel@linux.ibm.com>
- <cff917e0-f7e0-fd48-eda5-0cbe8173ae8a@linux.ibm.com>
- <abafd691-d9ab-33b2-c522-d37fecc3e881@linux.ibm.com>
- <20200514140808.269f6485.cohuck@redhat.com>
- <de18eab3-4d0a-1b86-f6c4-27aaa7bba6bf@linux.ibm.com>
- <20200515102548.0f43419d.cohuck@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e0d0d9f5-c780-404a-6cc8-31cbb077cf6f@linux.ibm.com>
-Date:   Fri, 15 May 2020 10:53:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        id S1728032AbgEOJy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 05:54:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27028 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727927AbgEOJy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 05:54:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589536466;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=O4d8bHibmqIEO8x41FYpGTWQJyJG0PD4k6b9N7Y9Yrg=;
+        b=WnMfWPopAMIgxPKgOJ9CWzi8E42keqYq3G6dA6he0GdTuTDr8ZqwSiSgIZdUpxpnQbmAoq
+        tUFi7BGdIDiKk3aBT6DDo2cvOP62Wc3jQerNWddIynIhR6rIqTq4JQJn3WThwyz8Vo8JV5
+        46h2wfaX/QQpaLtkPM+X5ztjgklBloQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-9nLwRZUxPk6QUzYit4tRiA-1; Fri, 15 May 2020 05:54:24 -0400
+X-MC-Unique: 9nLwRZUxPk6QUzYit4tRiA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E23A107ACF9;
+        Fri, 15 May 2020 09:54:23 +0000 (UTC)
+Received: from work-vm (ovpn-114-149.ams2.redhat.com [10.36.114.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E238879B6;
+        Fri, 15 May 2020 09:54:15 +0000 (UTC)
+Date:   Fri, 15 May 2020 10:54:13 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        Richard Henderson <rth@twiddle.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v1 01/17] exec: Introduce
+ ram_block_discard_set_(unreliable|required)()
+Message-ID: <20200515095413.GB2954@work-vm>
+References: <20200506094948.76388-1-david@redhat.com>
+ <20200506094948.76388-2-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200515102548.0f43419d.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="TBPAekG58od7S0E9YdejM3MOwIQgWsSbz"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-15_02:2020-05-14,2020-05-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 priorityscore=1501 impostorscore=0
- cotscore=-2147483648 clxscore=1015 mlxscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005150071
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200506094948.76388-2-david@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TBPAekG58od7S0E9YdejM3MOwIQgWsSbz
-Content-Type: multipart/mixed; boundary="ulXHkJguE55szB728VdhNLGcWEQ1dkoyY"
+* David Hildenbrand (david@redhat.com) wrote:
+> We want to replace qemu_balloon_inhibit() by something more generic.
+> Especially, we want to make sure that technologies that really rely on
+> RAM block discards to work reliably to run mutual exclusive with
+> technologies that break it.
+> 
+> E.g., vfio will usually pin all guest memory, turning the virtio-balloon
+> basically useless and make the VM consume more memory than reported via
+> the balloon. While the balloon is special already (=> no guarantees, same
+> behavior possible afer reboots and with huge pages), this will be
+> different, especially, with virtio-mem.
+> 
+> Let's implement a way such that we can make both types of technology run
+> mutually exclusive. We'll convert existing balloon inhibitors in successive
+> patches and add some new ones. Add the check to
+> qemu_balloon_is_inhibited() for now. We might want to make
+> virtio-balloon an acutal inhibitor in the future - however, that
+> requires more thought to not break existing setups.
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  balloon.c             |  3 ++-
+>  exec.c                | 48 +++++++++++++++++++++++++++++++++++++++++++
+>  include/exec/memory.h | 41 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 91 insertions(+), 1 deletion(-)
+> 
+> diff --git a/balloon.c b/balloon.c
+> index f104b42961..c49f57c27b 100644
+> --- a/balloon.c
+> +++ b/balloon.c
+> @@ -40,7 +40,8 @@ static int balloon_inhibit_count;
+>  
+>  bool qemu_balloon_is_inhibited(void)
+>  {
+> -    return atomic_read(&balloon_inhibit_count) > 0;
+> +    return atomic_read(&balloon_inhibit_count) > 0 ||
+> +           ram_block_discard_is_broken();
+>  }
+>  
+>  void qemu_balloon_inhibit(bool state)
+> diff --git a/exec.c b/exec.c
+> index 2874bb5088..52a6e40e99 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -4049,4 +4049,52 @@ void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
+>      }
+>  }
+>  
+> +static int ram_block_discard_broken;
 
---ulXHkJguE55szB728VdhNLGcWEQ1dkoyY
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This could do with a comment; if I'm reading this right then
+  +ve means broken
+  -ve means required
 
-On 5/15/20 10:25 AM, Cornelia Huck wrote:
-> On Fri, 15 May 2020 09:11:52 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
->=20
->> On 2020-05-14 14:08, Cornelia Huck wrote:
->>> On Tue, 28 Apr 2020 10:27:36 +0200
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>  =20
->>>> On 2020-04-27 15:11, Janosch Frank wrote: =20
->>>>> On 4/24/20 12:45 PM, Pierre Morel wrote: =20
->>>  =20
->>>>>> This is NOT a routine to really enable the channel, no retry is do=
-ne,
->>>>>> in case of error, a report is made. =20
->>>>>
->>>>> Would we expect needing retries for the pong device? =20
->>>>
->>>> Yes it can be that we need to retry some instructions if we want the=
-m to
->>>> succeed.
->>>> This is the case for example if we develop a driver for an operating=
- system.
->>>> When working with firmware, sometime, things do not work at the firs=
-t
->>>> time. Mostly due to races in silicium, firmware or hypervisor or bet=
-ween
->>>> them all.
->>>>
->>>> Since our purpose is to detect such problems we do not retry
->>>> instructions but report the error.
->>>>
->>>> If we detect such problem we may in the future enhance the tests. =20
->>>
->>> I think I've seen retries needed on z/VM in the past; do you know if
->>> that still happens?
->>>  =20
->>
->> I did not try the tests under z/VM, nor direct on an LPAR, only under =
+> +int ram_block_discard_set_broken(bool state)
+> +{
+> +    int old;
+> +
+> +    if (!state) {
+> +        atomic_dec(&ram_block_discard_broken);
+> +        return 0;
+> +    }
+> +
+> +    do {
+> +        old = atomic_read(&ram_block_discard_broken);
+> +        if (old < 0) {
+               /* Currently required */
+> +            return -EBUSY;
+> +        }
+> +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old + 1) != old);
+> +    return 0;
+> +}
+> +
+> +int ram_block_discard_set_required(bool state)
+> +{
+> +    int old;
+> +
+> +    if (!state) {
+> +        atomic_inc(&ram_block_discard_broken);
+> +        return 0;
+> +    }
+> +
+> +    do {
+> +        old = atomic_read(&ram_block_discard_broken);
+> +        if (old > 0) {
+               /* Currently broken */
+> +            return -EBUSY;
+> +        }
+> +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old - 1) != old);
+> +    return 0;
+> +}
+> +
+> +bool ram_block_discard_is_broken(void)
+> +{
+> +    return atomic_read(&ram_block_discard_broken) > 0;
+> +}
+> +
+> +bool ram_block_discard_is_required(void)
+> +{
+> +    return atomic_read(&ram_block_discard_broken) < 0;
+> +}
+> +
+>  #endif
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index e000bd2f97..9bb5ced38d 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -2463,6 +2463,47 @@ static inline MemOp devend_memop(enum device_endian end)
+>  }
+>  #endif
+>  
+> +/*
+> + * Inhibit technologies that rely on discarding of parts of RAM blocks to work
+> + * reliably, e.g., to manage the actual amount of memory consumed by the VM
+> + * (then, the memory provided by RAM blocks might be bigger than the desired
+> + * memory consumption). This *must* be set if:
 
->> QEMU/KVM.
->> Under QEMU/KVM, I did not encounter any need for retry, 100% of the=20
->> enabled succeeded on first try.
->=20
-> Yep, QEMU/KVM should be fine. Do you plan to run this on anything else?=
+'technologies that rely on discarding of parts of RAM blocks to work
+reliably' is pretty long; I'm not sure of a better way of saying it
+though.
 
->=20
-
-I'd like to have it compatible with z/VM / LPAR as well if it isn't too
-much work. You never know when you need it and having tests for all
-hypervisors has been quite a help in the past.
+Other than the comments;
 
 
---ulXHkJguE55szB728VdhNLGcWEQ1dkoyY--
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
---TBPAekG58od7S0E9YdejM3MOwIQgWsSbz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6+WHsACgkQ41TmuOI4
-ufgRJg/9EJC83gtV3QKiqLQTcAo/mogQMOmZuYguxwXk3VZKFg+OdKZQuqq+plQR
-jUs2dhHfhUURDm38nSRStYgjsPsYAqAZvXGHMb2rPK4GX8jyrCtKOO7QhWvlthAv
-tQfusgPmSfpcL1p/L2dtIefOJ+5V4OVX9UmaWcjDZsusfB6ZHbnH7bcZMh4HRn7K
-JeN99Q46j9b8V4Uug/Jyk35AvqcWqQRnGJ7aVCcWGTEby6dU1I8Q9PV0aZpZt5kI
-URbqNHhION+fX9jEIhFFWGXlXA+wJVXifZn1vlL+gof31jbYAO7AWSAh1zdo3zMC
-U/qLtcVZkODpp70fN6bADcXs8OUVGf/eaAavH/CjUqcTJJTyhH7PeOSR5QI3I7aD
-7xyRqx789aAJMXmH/9YNK2qUNE/JOE3r06hi/mmnBwbrb1IynHRBB+I9uigB80ae
-iBBxa/3aBBuUBbyydodntFeArdziZJJuU/TXovbmSBs79qayi+HZN3hKMEvqx606
-y/oCDaVPRIoHbSuY2We5uU5I3GYgpWSooYjaKTLKo3m5UdNWPmQCxX/O9ipN+9zy
-mnz9S6LAAoN+P5Pzpy1y+6p5+PEkq8FDuBA41N1TcOfWkINmeTDWRJMMpV4FcKhl
-pN+MYffa98xgUadMNOCLyviZAXeT/7CDBDP764wHH7CscGt1Fp4=
-=m650
------END PGP SIGNATURE-----
-
---TBPAekG58od7S0E9YdejM3MOwIQgWsSbz--
+> + * - Discarding parts of a RAM blocks does not result in the change being
+> + *   reflected in the VM and the pages getting freed.
+> + * - All memory in RAM blocks is pinned or duplicated, invaldiating any previous
+> + *   discards blindly.
+> + * - Discarding parts of a RAM blocks will result in integrity issues (e.g.,
+> + *   encrypted VMs).
+> + * Technologies that only temporarily pin the current working set of a
+> + * driver are fine, because we don't expect such pages to be discarded
+> + * (esp. based on guest action like balloon inflation).
+> + *
+> + * This is *not* to be used to protect from concurrent discards (esp.,
+> + * postcopy).
+> + *
+> + * Returns 0 if successful. Returns -EBUSY if a technology that relies on
+> + * discards to work reliably is active.
+> + */
+> +int ram_block_discard_set_broken(bool state);
+> +
+> +/*
+> + * Inhibit technologies that will break discarding of pages in RAM blocks.
+> + *
+> + * Returns 0 if successful. Returns -EBUSY if discards are already set to
+> + * broken.
+> + */
+> +int ram_block_discard_set_required(bool state);
+> +
+> +/*
+> + * Test if discarding of memory in ram blocks is broken.
+> + */
+> +bool ram_block_discard_is_broken(void);
+> +
+> +/*
+> + * Test if discarding of memory in ram blocks is required to work reliably.
+> + */
+> +bool ram_block_discard_is_required(void);
+> +
+>  #endif
+>  
+>  #endif
+> -- 
+> 2.25.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
