@@ -2,99 +2,303 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C3CC1D54E3
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 17:39:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFB841D5512
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 17:48:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726245AbgEOPjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 11:39:42 -0400
-Received: from foss.arm.com ([217.140.110.172]:58326 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726228AbgEOPjl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 11:39:41 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B89402F;
-        Fri, 15 May 2020 08:39:40 -0700 (PDT)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 977083F71E;
-        Fri, 15 May 2020 08:39:39 -0700 (PDT)
-Subject: Re: [PATCH v4 kvmtool 00/12] Add reassignable BARs
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com, maz@kernel.org
-References: <1589470709-4104-1-git-send-email-alexandru.elisei@arm.com>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- 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
- i4aIXCH3Wv6K
-To:     will@kernel.org
-Organization: ARM Ltd.
-Message-ID: <37973480-bc9b-970d-6b8b-240862871934@arm.com>
-Date:   Fri, 15 May 2020 16:38:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726438AbgEOPsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 11:48:31 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59794 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726183AbgEOPsb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 11:48:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589557708;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jLy3MggFTUYiDsD6jQF0VKdzDmlUnQApL7rI5weuDj0=;
+        b=MdE8He2L6CZmmmxAKFW0oyrdb0gl0319UNfQDQYH7Rh77unhaqMXI2bdVyO9vJzbkAf13R
+        R5XLMzvI9HcfEZPnNJyYmbPR1GonjMrZ5bU0lr05zBbx+rxjA43ulYX0bOIP1dV96BqJmQ
+        oF2stjxfZtJ6I4nSCyPD5K9gmExUwgI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-C-1v2t1yMOCLnpy6UoyxUg-1; Fri, 15 May 2020 11:48:23 -0400
+X-MC-Unique: C-1v2t1yMOCLnpy6UoyxUg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B699107AFCC;
+        Fri, 15 May 2020 15:48:21 +0000 (UTC)
+Received: from w520.home (ovpn-112-50.phx2.redhat.com [10.3.112.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98BF812A4D;
+        Fri, 15 May 2020 15:48:19 +0000 (UTC)
+Date:   Fri, 15 May 2020 09:48:19 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH Kernel v20 6/8] vfio iommu: Update UNMAP_DMA ioctl to
+ get dirty bitmap before unmap
+Message-ID: <20200515094819.58ce1756@w520.home>
+In-Reply-To: <41c5c3aa-6c03-def5-41e4-2803d0aa825c@nvidia.com>
+References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
+        <1589488667-9683-7-git-send-email-kwankhede@nvidia.com>
+        <20200514212706.036a336a@x1.home>
+        <5256f488-2d11-eb0f-6980-eea23f4d3019@nvidia.com>
+        <20200514234726.03c2e345@x1.home>
+        <268ec129-a1cb-530a-c9b2-7ec53ddf4d17@nvidia.com>
+        <20200515073135.2370a17d@x1.home>
+        <41c5c3aa-6c03-def5-41e4-2803d0aa825c@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <1589470709-4104-1-git-send-email-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/05/2020 16:38, Alexandru Elisei wrote:
+On Fri, 15 May 2020 21:00:32 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Hi Will,
+> On 5/15/2020 7:01 PM, Alex Williamson wrote:
+> > On Fri, 15 May 2020 12:17:03 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 5/15/2020 11:17 AM, Alex Williamson wrote:  
+> >>> On Fri, 15 May 2020 09:46:43 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>      
+> >>>> On 5/15/2020 8:57 AM, Alex Williamson wrote:  
+> >>>>> On Fri, 15 May 2020 02:07:45 +0530
+> >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>>         
+> >>>>>> DMA mapped pages, including those pinned by mdev vendor drivers, might
+> >>>>>> get unpinned and unmapped while migration is active and device is still
+> >>>>>> running. For example, in pre-copy phase while guest driver could access
+> >>>>>> those pages, host device or vendor driver can dirty these mapped pages.
+> >>>>>> Such pages should be marked dirty so as to maintain memory consistency
+> >>>>>> for a user making use of dirty page tracking.
+> >>>>>>
+> >>>>>> To get bitmap during unmap, user should allocate memory for bitmap, set
+> >>>>>> it all zeros, set size of allocated memory, set page size to be
+> >>>>>> considered for bitmap and set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+> >>>>>>
+> >>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >>>>>> ---
+> >>>>>>     drivers/vfio/vfio_iommu_type1.c | 77 ++++++++++++++++++++++++++++++++++-------
+> >>>>>>     include/uapi/linux/vfio.h       | 10 ++++++
+> >>>>>>     2 files changed, 75 insertions(+), 12 deletions(-)
+> >>>>>>
+> >>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >>>>>> index b76d3b14abfd..a1dc57bcece5 100644
+> >>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+> >>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >>>>>> @@ -195,11 +195,15 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+> >>>>>>     static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
+> >>>>>>     {
+> >>>>>>     	uint64_t npages = dma->size / pgsize;
+> >>>>>> +	size_t bitmap_size;
+> >>>>>>     
+> >>>>>>     	if (npages > DIRTY_BITMAP_PAGES_MAX)
+> >>>>>>     		return -EINVAL;
+> >>>>>>     
+> >>>>>> -	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+> >>>>>> +	/* Allocate extra 64 bits which are used for bitmap manipulation */
+> >>>>>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages) + sizeof(u64);
+> >>>>>> +
+> >>>>>> +	dma->bitmap = kvzalloc(bitmap_size, GFP_KERNEL);
+> >>>>>>     	if (!dma->bitmap)
+> >>>>>>     		return -ENOMEM;
+> >>>>>>     
+> >>>>>> @@ -999,23 +1003,25 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> >>>>>>     }
+> >>>>>>     
+> >>>>>>     static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>>> -			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >>>>>> +			     struct vfio_iommu_type1_dma_unmap *unmap,
+> >>>>>> +			     struct vfio_bitmap *bitmap)
+> >>>>>>     {
+> >>>>>> -	uint64_t mask;
+> >>>>>>     	struct vfio_dma *dma, *dma_last = NULL;
+> >>>>>> -	size_t unmapped = 0;
+> >>>>>> +	size_t unmapped = 0, pgsize;
+> >>>>>>     	int ret = 0, retries = 0;
+> >>>>>> +	unsigned long pgshift;
+> >>>>>>     
+> >>>>>>     	mutex_lock(&iommu->lock);
+> >>>>>>     
+> >>>>>> -	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
+> >>>>>> +	pgshift = __ffs(iommu->pgsize_bitmap);
+> >>>>>> +	pgsize = (size_t)1 << pgshift;
+> >>>>>>     
+> >>>>>> -	if (unmap->iova & mask) {
+> >>>>>> +	if (unmap->iova & (pgsize - 1)) {
+> >>>>>>     		ret = -EINVAL;
+> >>>>>>     		goto unlock;
+> >>>>>>     	}
+> >>>>>>     
+> >>>>>> -	if (!unmap->size || unmap->size & mask) {
+> >>>>>> +	if (!unmap->size || unmap->size & (pgsize - 1)) {
+> >>>>>>     		ret = -EINVAL;
+> >>>>>>     		goto unlock;
+> >>>>>>     	}
+> >>>>>> @@ -1026,9 +1032,15 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>>>     		goto unlock;
+> >>>>>>     	}
+> >>>>>>     
+> >>>>>> -	WARN_ON(mask & PAGE_MASK);
+> >>>>>> -again:
+> >>>>>> +	/* When dirty tracking is enabled, allow only min supported pgsize */
+> >>>>>> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> >>>>>> +	    (!iommu->dirty_page_tracking || (bitmap->pgsize != pgsize))) {
+> >>>>>> +		ret = -EINVAL;
+> >>>>>> +		goto unlock;
+> >>>>>> +	}
+> >>>>>>     
+> >>>>>> +	WARN_ON((pgsize - 1) & PAGE_MASK);
+> >>>>>> +again:
+> >>>>>>     	/*
+> >>>>>>     	 * vfio-iommu-type1 (v1) - User mappings were coalesced together to
+> >>>>>>     	 * avoid tracking individual mappings.  This means that the granularity
+> >>>>>> @@ -1066,6 +1078,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>>>     			ret = -EINVAL;
+> >>>>>>     			goto unlock;
+> >>>>>>     		}
+> >>>>>> +
+> >>>>>>     		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+> >>>>>>     		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+> >>>>>>     			ret = -EINVAL;
+> >>>>>> @@ -1083,6 +1096,23 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>>>     		if (dma->task->mm != current->mm)
+> >>>>>>     			break;
+> >>>>>>     
+> >>>>>> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+> >>>>>> +		    (dma_last != dma)) {
+> >>>>>> +
+> >>>>>> +			/*
+> >>>>>> +			 * mark all pages dirty if all pages are pinned and
+> >>>>>> +			 * mapped
+> >>>>>> +			 */
+> >>>>>> +			if (dma->iommu_mapped)
+> >>>>>> +				bitmap_set(dma->bitmap, 0,
+> >>>>>> +					   dma->size >> pgshift);  
+> >>>>>
+> >>>>> Nit, all the callers of update_user_bitmap() precede the call with this
+> >>>>> identical operation, we should probably push it into the function to do
+> >>>>> it.
+> >>>>>         
+> >>>>>> +
+> >>>>>> +			ret = update_user_bitmap(bitmap->data, dma,
+> >>>>>> +						 unmap->iova, pgsize);
+> >>>>>> +			if (ret)
+> >>>>>> +				break;
+> >>>>>> +		}
+> >>>>>> +  
+> >>>>>
+> >>>>> As noted last time, the above is just busy work if pfn_list is not
+> >>>>> already empty.  The entire code block above should be moved to after
+> >>>>> the block below.  Thanks,
+> >>>>>         
+> >>>>
+> >>>> pfn_list will be empty for IOMMU backed devices where all pages are
+> >>>> pinned and mapped,  
+> >>>
+> >>> Unless we're making use of the selective dirtying introduced in patch
+> >>> 8/8 or the container is shared with non-IOMMU backed mdevs.
+> >>>      
+> >>>> but those should be reported as dirty.  
+> >>>
+> >>> I'm confused how that justifies or requires this ordering.
+> >>>      
+> >>
+> >> 1. non IOMMU mdev device:
+> >> - vendor driver pins pages
+> >> - pfn_list is not empty
+> >> - device dma or write to pinned pages
+> >>
+> >> 2. IOMMU backed mdev device or vfio device, but smart driver which pins
+> >> required pages
+> >> - vendor driver pins pages
+> >> - pfn_list is not empty
+> >> - device dma or write to pinned pages
+> >>
+> >> 3. IOMMU backed mdev device or vfio device, driver is not smart
+> >> - pages are pinned and mapped during attach
+> >> - pfn_list is empty
+> >> - device dma or write to any of pinned pages
+> >>
+> >> For case 3, here this function does bitmap_set(dma->bitmap), that is
+> >> mark all pages dirty and then accordingly copy bitmap to user buffer.
+> >> Copying dma->bitmap logic remains same.  
+> > 
+> > What dependency does case 3 have on pfn_list?  Why does it matter if
+> > that bitmap_set() occurs before or after we've drained pfn_list?  How
+> > do we know we're in case 3 before we've looked at pfn_list?
+> >   
+> 
+> If update_user_bitmap() is moved in if block like:
+> if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+> 	update_user_bitmap()
+> ...
+> }
+> 
+> then update_user_bitmap() would never get called for case 3.
+> 
+> >>>> So moved it
+> >>>> back above empty pfn_list check.  
+> >>>
+> >>> Sorry, it still doesn't make any sense to me, and with no discussion I
+> >>> can't differentiate ignored comments from discarded comments.
+> >>>
+> >>> Pages in the pfn_list contribute to the dirty bitmap when they're
+> >>> pinned, we don't depend on pfn_list when reporting the dirty bitmap
+> >>> except for re-populating pfn_list dirtied pages after the bitmap has
+> >>> been cleared.  We're unmapping the dma, so that's not the case here.
+> >>> Also since update_user_bitmap() shifts the bitmap in place now, any
+> >>> repetitive calls will give us incorrect results.  
+> >>
+> >> Right, but this is unmapping and freeing vfio_dma
+> >>  
+> >>>   Therefore, as I see
+> >>> it, we _can_ take the branch below and when we do any work we've done
+> >>> above is not only wasted but may lead to incorrect data copied to
+> >>> the user if we shift dma->bitmap in place more than once.  Please
+> >>> explain in more detail if you believe this is still correct.  Thanks,
+> >>>      
+> >>
+> >> In this case also bitmap copy to user happens once, (dma_last != dma)
+> >> takes care of making sure that its called only once.  
+> > 
+> > I did miss the dma_last check, so that prevents us from repeating this
+> > path, BUT we release iommu->lock if we enter the pfn_list !empty path.
+> > The moment we do that, we might unblock a vendor driver trying to pin
+> > or rw more pages.  So the bitmap we've copied to the user might be stale
+> > and incorrect.  I don't see why this is so contentious, what is the
+> > actual disadvantage to moving this until after we've drained pfn_list?
+> > The risks seem abundant to me.  Thanks,
+> >   
+> 
+> Sorry if I misinterpreted earlier, are you proposing to move 
+> update_user_bitmap() after this if block?
+> 
+> if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+> ...
+> }
+> 
+> I thought you are asking to move it in block.
+> That makes sense. I'll update the patch in send next version in some time.
 
-> kvmtool uses the Linux-only dt property 'linux,pci-probe-only' to prevent
-> it from trying to reassign the BARs. Let's make the BARs reassignable so we
-> can get rid of this band-aid.
+Yes, after not in.  Thanks,
 
-I have covered this series now, posting Reviewed-by: tags for the
-patches that were still missing it.
+Alex
 
-From my point of view this is good to go now. There is still work to do,
-but this needs to happen on top of this anyway.
-
-Thanks!
-Andre.
