@@ -2,151 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFDC11D4FAA
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 15:59:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E70181D4FA9
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 15:58:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726257AbgEON66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 09:58:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45777 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726255AbgEON66 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 09:58:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589551136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YC0+HeJZZLS3s6YpYlY6qQx+znWjeBMmEoJi+7Lxseo=;
-        b=E3PORlAF4d6NFs1gHhSHIasxHJs3LQ7HsNZWVnv6F+PRVK1hvx4eqmDQycyjk7DR2LkcCf
-        nMjpIxKKPtNOIpY3y5tvSm2icjuWGI5Khdgz7q/aNa6PJ6CYqM59AeKsWyMZKxVl7LbrtD
-        qr6a+JmugnGj7EluiJYYpthoCSjV9wo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-16WZiDSCP0-pzg4_PF_kQQ-1; Fri, 15 May 2020 09:58:55 -0400
-X-MC-Unique: 16WZiDSCP0-pzg4_PF_kQQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B46BE1005510;
-        Fri, 15 May 2020 13:58:53 +0000 (UTC)
-Received: from work-vm (ovpn-114-149.ams2.redhat.com [10.36.114.149])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 728C41943D;
-        Fri, 15 May 2020 13:58:43 +0000 (UTC)
-Date:   Fri, 15 May 2020 14:58:41 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
+        id S1726212AbgEON6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 09:58:46 -0400
+Received: from mga04.intel.com ([192.55.52.120]:61836 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726144AbgEON6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 09:58:46 -0400
+IronPort-SDR: OGq3IR8w+oHQPmGqtHzryXLJ7lwESgqHP/kiJWPockLbAGC2gYyHIov0P3ttCv6AtcCryzNbbS
+ vesz/c7mG9Lg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2020 06:58:45 -0700
+IronPort-SDR: 5CspN23vJPkJAkRJdOn6Fp6bPqUcYsQaebPcgSXOauBg4miAci3znvxckFSlo7lUiwu68zlwMb
+ EbSwGkxYn9Ww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,395,1583222400"; 
+   d="scan'208";a="464734082"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga005.fm.intel.com with ESMTP; 15 May 2020 06:58:45 -0700
+Date:   Fri, 15 May 2020 06:58:45 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michael Tsirkin <mst@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
-        Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v1 08/17] migration/colo: Use
- ram_block_discard_set_broken()
-Message-ID: <20200515135841.GF2954@work-vm>
-References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-9-david@redhat.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org
+Subject: Re: [PATCH RFC 4/5] KVM: x86: aggressively map PTEs in
+ KVM_MEM_ALLONES slots
+Message-ID: <20200515135845.GA17572@linux.intel.com>
+References: <20200514180540.52407-1-vkuznets@redhat.com>
+ <20200514180540.52407-5-vkuznets@redhat.com>
+ <20200514194624.GB15847@linux.intel.com>
+ <87ftc1wq64.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200506094948.76388-9-david@redhat.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <87ftc1wq64.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* David Hildenbrand (david@redhat.com) wrote:
-> COLO will copy all memory in a RAM block, mark discarding of RAM broken.
+On Fri, May 15, 2020 at 10:36:19AM +0200, Vitaly Kuznetsov wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> > IMO this is a waste of memory and TLB entries.  Why not treat the access as
+> > the MMIO it is and emulate the access with a 0xff return value?  I think
+> > it'd be a simple change to have __kvm_read_guest_page() stuff 0xff, i.e. a
+> > kvm_allones_pg wouldn't be needed.  I would even vote to never create an
+> > MMIO SPTE.  The guest has bigger issues if reading from a PCI hole is
+> > performance sensitive.
 > 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  include/migration/colo.h |  2 +-
->  migration/migration.c    |  8 +++++++-
->  migration/savevm.c       | 11 +++++++++--
->  3 files changed, 17 insertions(+), 4 deletions(-)
+> You're trying to defeat the sole purpose of the feature :-) I also saw
+> the option you suggest but Michael convinced me we should go further.
 > 
-> diff --git a/include/migration/colo.h b/include/migration/colo.h
-> index 1636e6f907..768e1f04c3 100644
-> --- a/include/migration/colo.h
-> +++ b/include/migration/colo.h
-> @@ -25,7 +25,7 @@ void migrate_start_colo_process(MigrationState *s);
->  bool migration_in_colo_state(void);
->  
->  /* loadvm */
-> -void migration_incoming_enable_colo(void);
-> +int migration_incoming_enable_colo(void);
->  void migration_incoming_disable_colo(void);
->  bool migration_incoming_colo_enabled(void);
->  void *colo_process_incoming_thread(void *opaque);
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 177cce9e95..f6830e4620 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -338,12 +338,18 @@ bool migration_incoming_colo_enabled(void)
->  
->  void migration_incoming_disable_colo(void)
->  {
-> +    ram_block_discard_set_broken(false);
->      migration_colo_enabled = false;
->  }
->  
-> -void migration_incoming_enable_colo(void)
-> +int migration_incoming_enable_colo(void)
->  {
-> +    if (ram_block_discard_set_broken(true)) {
-> +        error_report("COLO: cannot set discarding of RAM broken");
+> The idea (besides memory waste) was that the time we spend on PCI scan
+> during boot is significant.
 
-I'd prefer 'COLO: cannot disable RAM discard'
+Put that in the cover letter.  The impression I got from the current cover
+letter is that the focus was entirely on memory consumption.
 
-'broken' suggests the user has to go and fix something or report a bug
-or something.
+> Unfortunatelly, I don't have any numbers but we can certainly try to get
+> them.
 
-Other than that:
+Numbers are definitely required, otherwise we'll have no idea whether doing
+something like the agressive prefetch actually has a meaningful impact.
 
+> With this feature (AFAIU) we're not aiming at 'classic' long-living VMs but
+> rather at something like Kata containers/FaaS/... where boot time is crucial.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Dave
-
-> +        return -EBUSY;
-> +    }
->      migration_colo_enabled = true;
-> +    return 0;
->  }
->  
->  void migrate_add_address(SocketAddress *address)
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index c00a6807d9..19b4f9600d 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2111,8 +2111,15 @@ static int loadvm_handle_recv_bitmap(MigrationIncomingState *mis,
->  
->  static int loadvm_process_enable_colo(MigrationIncomingState *mis)
->  {
-> -    migration_incoming_enable_colo();
-> -    return colo_init_ram_cache();
-> +    int ret = migration_incoming_enable_colo();
-> +
-> +    if (!ret) {
-> +        ret = colo_init_ram_cache();
-> +        if (ret) {
-> +            migration_incoming_disable_colo();
-> +        }
-> +    }
-> +    return ret;
->  }
->  
->  /*
-> -- 
-> 2.25.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Isn't the guest kernel fully controlled by the VMM in those use cases?
+Why not enlighten the guest kernel in some way so that it doesn't have to
+spend time scanning PCI space in the first place?
