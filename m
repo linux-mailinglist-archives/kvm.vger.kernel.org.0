@@ -2,47 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 377481D51EA
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 16:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 148551D52A0
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 16:55:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbgEOOkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 10:40:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37155 "EHLO
+        id S1726188AbgEOOzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 10:55:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33931 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726188AbgEOOkN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 10:40:13 -0400
+        with ESMTP id S1726140AbgEOOzP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 10:55:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589553611;
+        s=mimecast20190719; t=1589554512;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=gCcCO079xMryFuDKjpYaCNNg877TKEY087TF8OPD3O4=;
-        b=W4zQ/hoBsocfcZwAxAO2BxtiZjmj3jZwpxDBAF2x+IZPYtNgn1DaXyg0ixLuAeFwEWGu0V
-        YLgf4j/klLvhuf2YpkJwjj+wkKr67Uu4LHaY6MMxjqeHEiMva0pxHY6q2tJVab1mtpuN9E
-        wBFL+rYv61H+XRdHMRNGnF2MQWp7QWo=
+        bh=x2C1LTXgRodL7MD8BAdmR4DJ7nYvn5rUoJyzNq68mBw=;
+        b=UNNMf+6MHHFK+5m/ZEgq2U67BQBA01AmJkABMhinZ19MhNXyvfIiJX5JddivvvqaZaP8Fa
+        VgEY9Gl2gew+ec1QAlFjtXU3b0t475AgR660gwnVqUZLD3ZUIoeodCa/ebIwhorzdReQNG
+        nVmeiMT28A3yvei25lb31O/y6C70NJQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-0-oKqv5hNaKsc2bPRhjVwQ-1; Fri, 15 May 2020 10:40:09 -0400
-X-MC-Unique: 0-oKqv5hNaKsc2bPRhjVwQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-101-kt-1HhUqOHyBMCgfx-YdpQ-1; Fri, 15 May 2020 10:55:10 -0400
+X-MC-Unique: kt-1HhUqOHyBMCgfx-YdpQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69052107B7CE;
-        Fri, 15 May 2020 14:40:08 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 571BAC7441;
+        Fri, 15 May 2020 14:55:09 +0000 (UTC)
 Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB00463B8B;
-        Fri, 15 May 2020 14:40:03 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A37EE6E9F0;
+        Fri, 15 May 2020 14:54:47 +0000 (UTC)
 Subject: Re: [PATCH v1 01/17] exec: Introduce
  ram_block_discard_set_(unreliable|required)()
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+To:     qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Richard Henderson <rth@twiddle.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>
 References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-2-david@redhat.com> <20200515095413.GB2954@work-vm>
+ <20200506094948.76388-2-david@redhat.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -88,104 +89,182 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <da581548-5ff8-eb59-15a1-02cd970788ab@redhat.com>
-Date:   Fri, 15 May 2020 16:40:03 +0200
+Message-ID: <8dc6cefb-63ee-9310-ce18-abf558a08b39@redhat.com>
+Date:   Fri, 15 May 2020 16:54:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200515095413.GB2954@work-vm>
+In-Reply-To: <20200506094948.76388-2-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.05.20 11:54, Dr. David Alan Gilbert wrote:
-> * David Hildenbrand (david@redhat.com) wrote:
->> We want to replace qemu_balloon_inhibit() by something more generic.
->> Especially, we want to make sure that technologies that really rely on
->> RAM block discards to work reliably to run mutual exclusive with
->> technologies that break it.
->>
->> E.g., vfio will usually pin all guest memory, turning the virtio-balloon
->> basically useless and make the VM consume more memory than reported via
->> the balloon. While the balloon is special already (=> no guarantees, same
->> behavior possible afer reboots and with huge pages), this will be
->> different, especially, with virtio-mem.
->>
->> Let's implement a way such that we can make both types of technology run
->> mutually exclusive. We'll convert existing balloon inhibitors in successive
->> patches and add some new ones. Add the check to
->> qemu_balloon_is_inhibited() for now. We might want to make
->> virtio-balloon an acutal inhibitor in the future - however, that
->> requires more thought to not break existing setups.
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  balloon.c             |  3 ++-
->>  exec.c                | 48 +++++++++++++++++++++++++++++++++++++++++++
->>  include/exec/memory.h | 41 ++++++++++++++++++++++++++++++++++++
->>  3 files changed, 91 insertions(+), 1 deletion(-)
->>
->> diff --git a/balloon.c b/balloon.c
->> index f104b42961..c49f57c27b 100644
->> --- a/balloon.c
->> +++ b/balloon.c
->> @@ -40,7 +40,8 @@ static int balloon_inhibit_count;
->>  
->>  bool qemu_balloon_is_inhibited(void)
->>  {
->> -    return atomic_read(&balloon_inhibit_count) > 0;
->> +    return atomic_read(&balloon_inhibit_count) > 0 ||
->> +           ram_block_discard_is_broken();
->>  }
->>  
->>  void qemu_balloon_inhibit(bool state)
->> diff --git a/exec.c b/exec.c
->> index 2874bb5088..52a6e40e99 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -4049,4 +4049,52 @@ void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
->>      }
->>  }
->>  
->> +static int ram_block_discard_broken;
+On 06.05.20 11:49, David Hildenbrand wrote:
+> We want to replace qemu_balloon_inhibit() by something more generic.
+> Especially, we want to make sure that technologies that really rely on
+> RAM block discards to work reliably to run mutual exclusive with
+> technologies that break it.
 > 
-> This could do with a comment; if I'm reading this right then
->   +ve means broken
->   -ve means required
+> E.g., vfio will usually pin all guest memory, turning the virtio-balloon
+> basically useless and make the VM consume more memory than reported via
+> the balloon. While the balloon is special already (=> no guarantees, same
+> behavior possible afer reboots and with huge pages), this will be
+> different, especially, with virtio-mem.
+> 
+> Let's implement a way such that we can make both types of technology run
+> mutually exclusive. We'll convert existing balloon inhibitors in successive
+> patches and add some new ones. Add the check to
+> qemu_balloon_is_inhibited() for now. We might want to make
+> virtio-balloon an acutal inhibitor in the future - however, that
+> requires more thought to not break existing setups.
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  balloon.c             |  3 ++-
+>  exec.c                | 48 +++++++++++++++++++++++++++++++++++++++++++
+>  include/exec/memory.h | 41 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 91 insertions(+), 1 deletion(-)
+> 
+> diff --git a/balloon.c b/balloon.c
+> index f104b42961..c49f57c27b 100644
+> --- a/balloon.c
+> +++ b/balloon.c
+> @@ -40,7 +40,8 @@ static int balloon_inhibit_count;
+>  
+>  bool qemu_balloon_is_inhibited(void)
+>  {
+> -    return atomic_read(&balloon_inhibit_count) > 0;
+> +    return atomic_read(&balloon_inhibit_count) > 0 ||
+> +           ram_block_discard_is_broken();
+>  }
+>  
+>  void qemu_balloon_inhibit(bool state)
+> diff --git a/exec.c b/exec.c
+> index 2874bb5088..52a6e40e99 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -4049,4 +4049,52 @@ void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
+>      }
+>  }
+>  
+> +static int ram_block_discard_broken;
+> +
+> +int ram_block_discard_set_broken(bool state)
+> +{
+> +    int old;
+> +
+> +    if (!state) {
+> +        atomic_dec(&ram_block_discard_broken);
+> +        return 0;
+> +    }
+> +
+> +    do {
+> +        old = atomic_read(&ram_block_discard_broken);
+> +        if (old < 0) {
+> +            return -EBUSY;
+> +        }
+> +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old + 1) != old);
+> +    return 0;
+> +}
+> +
+> +int ram_block_discard_set_required(bool state)
+> +{
+> +    int old;
+> +
+> +    if (!state) {
+> +        atomic_inc(&ram_block_discard_broken);
+> +        return 0;
+> +    }
+> +
+> +    do {
+> +        old = atomic_read(&ram_block_discard_broken);
+> +        if (old > 0) {
+> +            return -EBUSY;
+> +        }
+> +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old - 1) != old);
+> +    return 0;
+> +}
+> +
+> +bool ram_block_discard_is_broken(void)
+> +{
+> +    return atomic_read(&ram_block_discard_broken) > 0;
+> +}
+> +
+> +bool ram_block_discard_is_required(void)
+> +{
+> +    return atomic_read(&ram_block_discard_broken) < 0;
+> +}
+> +
+>  #endif
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index e000bd2f97..9bb5ced38d 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -2463,6 +2463,47 @@ static inline MemOp devend_memop(enum device_endian end)
+>  }
+>  #endif
+>  
+> +/*
+> + * Inhibit technologies that rely on discarding of parts of RAM blocks to work
+> + * reliably, e.g., to manage the actual amount of memory consumed by the VM
+> + * (then, the memory provided by RAM blocks might be bigger than the desired
+> + * memory consumption). This *must* be set if:
+> + * - Discarding parts of a RAM blocks does not result in the change being
+> + *   reflected in the VM and the pages getting freed.
+> + * - All memory in RAM blocks is pinned or duplicated, invaldiating any previous
+> + *   discards blindly.
+> + * - Discarding parts of a RAM blocks will result in integrity issues (e.g.,
+> + *   encrypted VMs).
+> + * Technologies that only temporarily pin the current working set of a
+> + * driver are fine, because we don't expect such pages to be discarded
+> + * (esp. based on guest action like balloon inflation).
+> + *
+> + * This is *not* to be used to protect from concurrent discards (esp.,
+> + * postcopy).
+> + *
+> + * Returns 0 if successful. Returns -EBUSY if a technology that relies on
+> + * discards to work reliably is active.
+> + */
+> +int ram_block_discard_set_broken(bool state);
+> +
+> +/*
+> + * Inhibit technologies that will break discarding of pages in RAM blocks.
+> + *
+> + * Returns 0 if successful. Returns -EBUSY if discards are already set to
+> + * broken.
+> + */
+> +int ram_block_discard_set_required(bool state);
+> +
+> +/*
+> + * Test if discarding of memory in ram blocks is broken.
+> + */
+> +bool ram_block_discard_is_broken(void);
+> +
+> +/*
+> + * Test if discarding of memory in ram blocks is required to work reliably.
+> + */
+> +bool ram_block_discard_is_required(void);
+> +
+>  #endif
+>  
+>  #endif
 > 
 
-I'll add to ram_block_discard_broken:
+I'm wondering if I'll just call these functions
 
-"If positive, discarding RAM is broken. If negative, discarding of RAM
-is required to work correctly."
+ram_block_discard_disable()
 
-[...]
+and
 
->>  
->> +/*
->> + * Inhibit technologies that rely on discarding of parts of RAM blocks to work
->> + * reliably, e.g., to manage the actual amount of memory consumed by the VM
->> + * (then, the memory provided by RAM blocks might be bigger than the desired
->> + * memory consumption). This *must* be set if:
-> 
-> 'technologies that rely on discarding of parts of RAM blocks to work
-> reliably' is pretty long; I'm not sure of a better way of saying it
-> though.
-
-Maybe simply
-
-"Inhibit technologies that rely on discarding of pages in RAM blocks to
-work"?
-
-?
+ram_block_discard_require()
 
 -- 
 Thanks,
