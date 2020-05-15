@@ -2,150 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84D1A1D477D
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 09:57:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 270B71D480E
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 10:24:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727803AbgEOH5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 03:57:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26859 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727012AbgEOH5o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 03:57:44 -0400
+        id S1726795AbgEOIYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 04:24:52 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39162 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726723AbgEOIYw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 04:24:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589529463;
+        s=mimecast20190719; t=1589531091;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=l4qbWpw0u3Jk9xC1GD5ofA7qlfmkk7w4KGam8b/awAA=;
-        b=SiX2FtDKo8268jWp8SXK6z6Uj7AH3TW5t3XOkKQwf82HGBafPRnNgYJAwTzXAbYMbTHQDV
-        PGWNvydi0cdsDxsrNL/E+LgIn/WfZBPKtd82I+ceHLc3c46A4trncGvfknYF4QktTHXGPs
-        ysPkFYdqHrdrF6iyepVjpsatyXf3bl8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-C9WBFaDPOWOnHisWUEFYJQ-1; Fri, 15 May 2020 03:57:40 -0400
-X-MC-Unique: C9WBFaDPOWOnHisWUEFYJQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00051100A632;
-        Fri, 15 May 2020 07:57:38 +0000 (UTC)
-Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F0E962B1E;
-        Fri, 15 May 2020 07:57:37 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v6 04/10] s390x: interrupt registration
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, thuth@redhat.com
-References: <1587725152-25569-1-git-send-email-pmorel@linux.ibm.com>
- <1587725152-25569-5-git-send-email-pmorel@linux.ibm.com>
- <20200514135805.77a7ae82.cohuck@redhat.com>
- <7da200e9-4cbe-0c77-833e-b4430cc2b80e@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <1ef24ac2-69c1-ce7e-2fba-a363093bba5c@redhat.com>
-Date:   Fri, 15 May 2020 09:57:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+         in-reply-to:in-reply-to:references:references;
+        bh=0DQftDX0379nFESU6WazrW1lD4fM3GC98zH3yfUsrwE=;
+        b=fW+S6noMl/RN6E5cblpWWIBnzXq49fKzCitKKW7l3n8kxactOAc1dcEOwafbuE8EfIwWH/
+        YkP40ext3c9e0HnIQumsAtjq4CE42I5tyZmJJeYi06bXk8CfKoWn/j/Tc0nkD7qU01NrNP
+        Etn5Q6FGSoxZMmgOt/KfHzatDd3+Fmw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-4xc6qsUNMNGZltHENYneHA-1; Fri, 15 May 2020 04:24:49 -0400
+X-MC-Unique: 4xc6qsUNMNGZltHENYneHA-1
+Received: by mail-wr1-f72.google.com with SMTP id y4so795527wrw.20
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 01:24:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=0DQftDX0379nFESU6WazrW1lD4fM3GC98zH3yfUsrwE=;
+        b=Iaw/R5zU8wm3Ihm3F2dxTvyzx9Btn2uQuEUwDofaM9uNl7i++pF2ZajpN3DAOh40NI
+         ZWRhJxJAl0p+GohBvyxMlHGPuE7CUgbP2lI569ZlXFF6pJpPiZp8LLL15ZdA1dp96XZI
+         U4Iq+OFoQxeoK5gATJYwRXdRLr13Uh6n2lFQKf+aIgkvk8fV6MD/1ctozmYPbCvejiwM
+         l5QYCvTUIWq0v5ppx0ggKY98loh+p+VXHGzDcA4ePVA4iBPKKsAIa8+BkMFJR4LFgQFS
+         fVXKQfxBVIqL7NZGAim/0z8qI3Wi4hGPB6k9wVWz/dCF8NDJeN7Ty1eOVErkiRBaljY9
+         WVtw==
+X-Gm-Message-State: AOAM530PH2b6UNiUuoQ5b4aq8oV5gzQl341ZzB6w34A8SnnAvSoDYyP3
+        AZCiNjexhPVsyaXzl+SPXk8KZ8tl8XODyd3DeMJYWEA+524I3VA6ZcT8jNJBgfu7bSeBMNUtUcg
+        ymyc5AQbtytzC
+X-Received: by 2002:a5d:62c7:: with SMTP id o7mr2914723wrv.212.1589531087918;
+        Fri, 15 May 2020 01:24:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwWc8/zKYnO5ihSmyMO25yKM3a8VD+LjoaKKI+gb3ocgg3J9JGwXdm6ilapNMfvQgQoDQ4XVw==
+X-Received: by 2002:a5d:62c7:: with SMTP id o7mr2914689wrv.212.1589531087638;
+        Fri, 15 May 2020 01:24:47 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id r11sm2419027wrv.14.2020.05.15.01.24.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2020 01:24:46 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michael Tsirkin <mst@redhat.com>,
+        Julia Suvorova <jsuvorov@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, x86@kernel.org
+Subject: Re: [PATCH RFC 2/5] KVM: x86: introduce KVM_MEM_ALLONES memory
+In-Reply-To: <20200514191823.GA15847@linux.intel.com>
+References: <20200514180540.52407-1-vkuznets@redhat.com> <20200514180540.52407-3-vkuznets@redhat.com> <20200514191823.GA15847@linux.intel.com>
+Date:   Fri, 15 May 2020 10:24:45 +0200
+Message-ID: <87imgxwqpe.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7da200e9-4cbe-0c77-833e-b4430cc2b80e@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.05.20 08:57, Pierre Morel wrote:
-> 
-> 
-> On 2020-05-14 13:58, Cornelia Huck wrote:
->> On Fri, 24 Apr 2020 12:45:46 +0200
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
->>> Let's make it possible to add and remove a custom io interrupt handler,
->>> that can be used instead of the normal one.
->>>
->>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>> Reviewed-by: David Hildenbrand <david@redhat.com>
->>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>   lib/s390x/interrupt.c | 23 ++++++++++++++++++++++-
->>>   lib/s390x/interrupt.h |  8 ++++++++
->>>   2 files changed, 30 insertions(+), 1 deletion(-)
->>>   create mode 100644 lib/s390x/interrupt.h
->>
->> As the "normal one" means "no handler, just abort", is there any reason
->> not simply to always provide one? What is the use case for multiple I/O
->> interrupt handlers?
->>
-> 
-> I can only agree, I proposed this initially.
-> David asked for a registration.
-> 
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-I don't understand "not simply to always provide one" or "multiple I/O
-interrupt handlers".
+> On Thu, May 14, 2020 at 08:05:37PM +0200, Vitaly Kuznetsov wrote:
+>> PCIe config space can (depending on the configuration) be quite big but
+>> usually is sparsely populated. Guest may scan it by accessing individual
+>> device's page which, when device is missing, is supposed to have 'pci
+>> holes' semantics: reads return '0xff' and writes get discarded. Currently,
+>> userspace has to allocate real memory for these holes and fill them with
+>> '0xff'. Moreover, different VMs usually require different memory.
+>> 
+>> The idea behind the feature introduced by this patch is: let's have a
+>> single read-only page filled with '0xff' in KVM and map it to all such
+>> PCI holes in all VMs. This will free userspace of obligation to allocate
+>> real memory. Later, this will also allow us to speed up access to these
+>> holes as we can aggressively map the whole slot upon first fault.
+>> 
+>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  Documentation/virt/kvm/api.rst  | 22 ++++++---
+>>  arch/x86/include/uapi/asm/kvm.h |  1 +
+>>  arch/x86/kvm/x86.c              |  9 ++--
+>>  include/linux/kvm_host.h        | 15 ++++++-
+>>  include/uapi/linux/kvm.h        |  2 +
+>>  virt/kvm/kvm_main.c             | 79 +++++++++++++++++++++++++++++++--
+>>  6 files changed, 113 insertions(+), 15 deletions(-)
+>> 
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index d871dacb984e..2b87d588a7e0 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -1236,7 +1236,8 @@ yet and must be cleared on entry.
+>>  
+>>    /* for kvm_memory_region::flags */
+>>    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+>> -  #define KVM_MEM_READONLY	(1UL << 1)
+>> +  #define KVM_MEM_READONLY		(1UL << 1)
+>> +  #define KVM_MEM_ALLONES		(1UL << 2)
+>
+> Why not call this KVM_MEM_PCI_HOLE or something else that better conveys
+> that this is memslot is intended to emulate PCI master abort semantics?
+>
 
-There is always exactly *one* handler
+Becuase there's always hope this can be usefult for something else but
+PCI? :-) Actually, I was thinking about generalizing this a little bit
+to something like KVM_MEM_CONSTANT with a way to set the pattern but I'm
+failing to see any need for anything but all-ones or all-zeroes. Maybe
+other-than-x86 architectures have some needs?
 
-void handle_io_int(void)
-{
-...
-}
-
-All we do here, is to allow to register a callback from the handler,
-e.g., to verify in a test case that a specific I/O interrupt was received.
+I'm definitely fine with renaming this to KVM_MEM_PCI_HOLE.
 
 -- 
-Thanks,
-
-David / dhildenb
+Vitaly
 
