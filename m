@@ -2,238 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F7DF1D5679
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 18:49:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCA551D580B
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 19:35:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726197AbgEOQtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 12:49:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38497 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726023AbgEOQtG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 12:49:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589561344;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=gUcBtj9uiIye+I3jHTYHTKq7LwrL3ktU6ZuHzxtZwZM=;
-        b=A9FH+Eqa9f3MP39dpSDvFzOMD3Tw/tDyztAbKCNJLeJIo0d0+k8y6LO8R5dYHWkQpwWho7
-        gJNc6IXZV7qK+frYTxUS+0Ft2UzdwuSa+adGE4AaIf+tCmK9sACRT4m9eKMorsDcztpZJh
-        VdHeb/FeNY00mI9vw5Hc9vAbGW7X2KQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-IbiU8CL6M4Wh7Tcfop4x0g-1; Fri, 15 May 2020 12:49:02 -0400
-X-MC-Unique: IbiU8CL6M4Wh7Tcfop4x0g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68020801504;
-        Fri, 15 May 2020 16:49:01 +0000 (UTC)
-Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 445B962496;
-        Fri, 15 May 2020 16:48:56 +0000 (UTC)
-Subject: Re: [PATCH v1 10/17] virtio-mem: Paravirtualized memory hot(un)plug
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>
-References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-11-david@redhat.com> <20200515153714.GG2954@work-vm>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <c782acd6-e282-fb33-863c-965d1e27d3b6@redhat.com>
-Date:   Fri, 15 May 2020 18:48:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726227AbgEORfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 13:35:37 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:10522 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726023AbgEORfh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 13:35:37 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5ebed25d0002>; Fri, 15 May 2020 10:33:18 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Fri, 15 May 2020 10:35:36 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Fri, 15 May 2020 10:35:36 -0700
+Received: from [10.40.103.94] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 15 May
+ 2020 17:35:28 +0000
+Subject: Re: [PATCH Kernel v20 4/8] vfio iommu: Add ioctl definition for dirty
+ pages tracking
+To:     Cornelia Huck <cohuck@redhat.com>
+CC:     <alex.williamson@redhat.com>, <cjia@nvidia.com>,
+        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
+ <1589488667-9683-5-git-send-email-kwankhede@nvidia.com>
+ <20200515125916.78723321.cohuck@redhat.com>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <bdb9c1d3-e673-5bb1-aced-f7443f4dfe58@nvidia.com>
+Date:   Fri, 15 May 2020 23:05:24 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200515153714.GG2954@work-vm>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200515125916.78723321.cohuck@redhat.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1589563998; bh=ayKJyENVWVq+++eaQa/RNQ3Hiaj6T+Ugv63pCGUuAUE=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=dtlAvlT38WGDkPjIhiGYjrh5KgLWYJC+TPqVNjivA9id56PtMEKtLV31xSol22Jjw
+         A5Y1JwbXU1prlK1vZqwvKhu/dH2dPUFaMRJyvxpnxMKaRuX1kDDg6GfcNOk67lGDYh
+         XgnDFNC8Viw8PvVKEBMAMVPv1Ng/xeCiScx65T5ZuWnoTrMLnvtrIm27tHNHUqtkNL
+         /N8h5RQrI/FYWRimkDkJhwvbcB6DHU5Cd/tl9Ote37R3wNWdz7Yvqx3Jgjv5yRIlsu
+         scqteeHZd40SDRd9xUcrpXYXt7CQ6Du4CdQirzu+OwyFzFXnNDTCL6KOJ7Ni7qJbDc
+         0AZpFuStfaepA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.05.20 17:37, Dr. David Alan Gilbert wrote:
-> I'm not sure if it's possible to split this up; it's a bit big.
 
-Functionality-wise, it's the bare minimum. I could split out handling of
-all 4 request types, but they are only ~150-200 LOC. Not sure if that is
-really worth the trouble. open for suggestions.
 
-> It could also do with a pile of trace_ entries to figure out what it's
-> doing.
-
-Good idea, will add that with a patch on top.
-
-[...]
-
->> +static int virtio_mem_set_block_state(VirtIOMEM *vmem, uint64_t start_gpa,
->> +                                      uint64_t size, bool plug)
->> +{
->> +    const uint64_t offset = start_gpa - vmem->addr;
->> +    int ret;
->> +
->> +    if (!plug) {
->> +        if (virtio_mem_discard_inhibited()) {
->> +            return -EBUSY;
->> +        }
->> +        /* Note: Discarding should never fail at this point. */
->> +        ret = ram_block_discard_range(vmem->memdev->mr.ram_block, offset, size);
->> +        if (ret) {
+On 5/15/2020 4:29 PM, Cornelia Huck wrote:
+> On Fri, 15 May 2020 02:07:43 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> error_report ?
-
-
-error_report("Unexpected error discarding RAM: %s",
-	     strerror(-ret));
-it is.
-
-[...]
-
->> +    ret = ram_block_discard_range(rb, 0, qemu_ram_get_used_length(rb));
->> +    if (ret) {
->> +        /* Note: Discarding should never fail at this point. */
+>> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
+>> All pages pinned by vendor driver through this API should be considered as
+>> dirty during migration. When container consists of IOMMU capable device and
+>> all pages are pinned and mapped, then all pages are marked dirty.
+>> Added support to start/stop dirtied pages tracking and to get bitmap of all
+>> dirtied pages for requested IO virtual address range.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>   include/uapi/linux/vfio.h | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 55 insertions(+)
+>>
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index ad9bb5af3463..123de3bc2dce 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -1033,6 +1033,12 @@ struct vfio_iommu_type1_dma_map {
+>>   
+>>   #define VFIO_IOMMU_MAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 13)
+>>   
+>> +struct vfio_bitmap {
+>> +	__u64        pgsize;	/* page size for bitmap in bytes */
+>> +	__u64        size;	/* in bytes */
+>> +	__u64 __user *data;	/* one bit per page */
+>> +};
+>> +
+>>   /**
+>>    * VFIO_IOMMU_UNMAP_DMA - _IOWR(VFIO_TYPE, VFIO_BASE + 14,
+>>    *							struct vfio_dma_unmap)
+>> @@ -1059,6 +1065,55 @@ struct vfio_iommu_type1_dma_unmap {
+>>   #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>>   #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+>>   
+>> +/**
+>> + * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
+>> + *                                     struct vfio_iommu_type1_dirty_bitmap)
+>> + * IOCTL is used for dirty pages tracking.
+>> + * Caller should set flag depending on which operation to perform, details as
+>> + * below:
+>> + *
+>> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_START set, indicates
+>> + * migration is active and IOMMU module should track pages which are dirtied or
+>> + * potentially dirtied by device.
 > 
-> error_report?
+> "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_START instructs the
+> IOMMU driver to track pages that are dirtied or potentially dirtied by
+> the device; designed to be used when a migration is in progress."
+> 
+> ?
+> 
 
-dito
+Ok, updating.
+
+>> + * Dirty pages are tracked until tracking is stopped by user application by
+>> + * setting VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
+> 
+> "...by calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP." ?
+> 
+>> + *
+>> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP set, indicates
+>> + * IOMMU should stop tracking dirtied pages.
+> 
+> "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP instructs the
+> IOMMU driver to stop tracking dirtied pages."
+> 
+> ?
+> 
+
+Ok.
+
+>> + *
+>> + * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
+>> + * IOCTL returns dirty pages bitmap for IOMMU container during migration for
+>> + * given IOVA range.
+> 
+> "Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_GET_BITMAP returns the
+> dirty pages bitmap for the IOMMU container for a given IOVA range." ?
+> 
+> Q: How does this interact with the two other operations? I imagine
+> getting an empty bitmap before _START 
+
+No, if dirty page tracking is not started, get_bitmap IOCTL will fail 
+with -EINVAL.
+
+> and a bitmap-in-progress between
+> _START and _STOP. > After _STOP, will subsequent calls always give the
+> same bitmap?
+>
+
+No, return -EINVAL.
+
+
+>> User must provide data[] as the structure
+>> + * vfio_iommu_type1_dirty_bitmap_get through which user provides IOVA range and
+>> + * pgsize.
+> 
+> "The user must specify the IOVA range and the pgsize through the
+> vfio_iommu_type1_dirty_bitmap_get structure in the data[] portion."
+> 
+> ?
+> 
+>> This interface supports to get bitmap of smallest supported pgsize
+>> + * only and can be modified in future to get bitmap of specified pgsize.
+> 
+> That's a current restriction? How can the user find out whether it has
+> been lifted (or, more generally, find out which pgsize values are
+> supported)?
+
+Migration capability is added to IOMMU info chain. That gives supported 
+pgsize bitmap by IOMMU driver.
 
 > 
->> +        return -EBUSY;
->> +    }
->> +    bitmap_clear(vmem->bitmap, 0, vmem->bitmap_size);
->> +    vmem->size = 0;
->> +
->> +    virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
->> +    return 0;
->> +}
-
-[...]
-
->> +static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
->> +{
->> +    const int len = sizeof(struct virtio_mem_req);
->> +    VirtIOMEM *vmem = VIRTIO_MEM(vdev);
->> +    VirtQueueElement *elem;
->> +    struct virtio_mem_req req;
->> +    uint64_t type;
->> +
->> +    while (true) {
->> +        elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
->> +        if (!elem) {
->> +            return;
->> +        }
->> +
->> +        if (iov_to_buf(elem->out_sg, elem->out_num, 0, &req, len) < len) {
->> +            virtio_mem_bad_request(vmem, "invalid request size");
+>> + * User must allocate memory for bitmap, zero the bitmap memory  and set size
+>> + * of allocated memory in bitmap.size field.
 > 
-> Print the size.
+> "The user must provide a zeroed memory area for the bitmap memory and
+> specify its size in bitmap.size."
+> 
+> ?
+> 
+>> One bit is used to represent one
+>> + * page consecutively starting from iova offset. User should provide page size
+>> + * in bitmap.pgsize field.
+> 
+> s/User/The user/
+> 
+> Is that the 'pgsize' the comment above talks about?
+> 
 
-Make sense, I'll probably get rid of virtio_mem_bad_request() and just
-do the virtio_error() directly with additional paramaters.
+By specifying pgsize here user can ask for bitmap of specific pgsize.
+
+>> Bit set in bitmap indicates page at that offset from
+>> + * iova is dirty.
+> 
+> "A bit set in the bitmap indicates that the page at that offset from
+> iova is dirty." ?
+> 
+>> Caller must set argsz including size of structure
+>> + * vfio_iommu_type1_dirty_bitmap_get.
+> 
+> s/Caller/The caller/
+> 
+> Does argz also include the size of the bitmap?
+
+No.
 
 > 
->> +            g_free(elem);
->> +            return;
->> +        }
->> +
->> +        if (iov_size(elem->in_sg, elem->in_num) <
->> +            sizeof(struct virtio_mem_resp)) {
->> +            virtio_mem_bad_request(vmem, "not enough space for response");
->> +            g_free(elem);
->> +            return;
->> +        }
->> +
->> +        type = le16_to_cpu(req.type);
->> +        switch (type) {
->> +        case VIRTIO_MEM_REQ_PLUG:
->> +            virtio_mem_plug_request(vmem, elem, &req);
->> +            break;
->> +        case VIRTIO_MEM_REQ_UNPLUG:
->> +            virtio_mem_unplug_request(vmem, elem, &req);
->> +            break;
->> +        case VIRTIO_MEM_REQ_UNPLUG_ALL:
->> +            virtio_mem_unplug_all_request(vmem, elem);
->> +            break;
->> +        case VIRTIO_MEM_REQ_STATE:
->> +            virtio_mem_state_request(vmem, elem, &req);
->> +            break;
->> +        default:
->> +            virtio_mem_bad_request(vmem, "unknown request type");
+>> + *
+>> + * Only one of the flags _START, STOP and _GET may be specified at a time.
 > 
-> Could include the type .
-
-Yes, will do!
-
-[...]
-
->> +
->> +static int virtio_mem_pre_save(void *opaque)
->> +{
->> +    VirtIOMEM *vmem = VIRTIO_MEM(opaque);
->> +
->> +    vmem->migration_addr = vmem->addr;
->> +    vmem->migration_block_size = vmem->block_size;
+> s/STOP/_STOP/
 > 
-> You might look at VMSTATE_WITH_TMP could avoid you having the dummy
-> fields.
+> (just to be consistent)
+> 
+>> + *
+>> + */
+>> +struct vfio_iommu_type1_dirty_bitmap {
+>> +	__u32        argsz;
+>> +	__u32        flags;
+>> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
+>> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
+>> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
+>> +	__u8         data[];
+>> +};
+>> +
+>> +struct vfio_iommu_type1_dirty_bitmap_get {
+>> +	__u64              iova;	/* IO virtual address */
+>> +	__u64              size;	/* Size of iova range */
+>> +	struct vfio_bitmap bitmap;
+>> +};
+> 
+> That's for type1 only, right?
+>
 
-Thanks, will have a look.
+Yes.
 
--- 
 Thanks,
+Kirti
 
-David / dhildenb
-
+>> +
+>> +#define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
+>> +
+>>   /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>>   
+>>   /*
+> 
