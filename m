@@ -2,308 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE2651D54C2
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 17:33:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B48CF1D54CE
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 17:34:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726293AbgEOPdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 11:33:13 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:15816 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbgEOPdN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 11:33:13 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ebeb62c0000>; Fri, 15 May 2020 08:33:00 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Fri, 15 May 2020 08:33:12 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Fri, 15 May 2020 08:33:12 -0700
-Received: from [10.40.103.94] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 15 May
- 2020 15:33:04 +0000
-Subject: Re: [PATCH Kernel v20 5/8] vfio iommu: Implementation of ioctl for
- dirty pages tracking
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Yan Zhao <yan.y.zhao@intel.com>, <cjia@nvidia.com>,
-        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>
-References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
- <1589488667-9683-6-git-send-email-kwankhede@nvidia.com>
- <20200515100553.GA5559@joy-OptiPlex-7040>
- <be9ff834-04b5-56c2-b103-44eff794bd3a@nvidia.com>
- <20200515091533.53259392@w520.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <8eb95e03-87f3-677a-698e-826ee0060deb@nvidia.com>
-Date:   Fri, 15 May 2020 21:03:00 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727076AbgEOPeA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 11:34:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21189 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726239AbgEOPd7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 11:33:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589556838;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=0q1Y8ePvKhM4R3+rVYPWm7Pu+FP0VGkrqM/os2Y0oAI=;
+        b=b9EMjRgTzPUFgG1eoXpAe/aO+zKGyB3oPvR18cCaFgx9QNB4lCBCQf57zudQIn0tddzsXp
+        dbO5892QRkwEqe2XIuc2wYbWlaApmNRyzyhFvHRY/LrVoiQetUB4tQXlVZHls86fKNkfl7
+        6uF4hofZfqeYDS1euZ9jMymztp0kaOA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-6dK4yNHzNU2i7PFZi5h6Ew-1; Fri, 15 May 2020 11:33:56 -0400
+X-MC-Unique: 6dK4yNHzNU2i7PFZi5h6Ew-1
+Received: by mail-wm1-f69.google.com with SMTP id v23so1164276wmj.0
+        for <kvm@vger.kernel.org>; Fri, 15 May 2020 08:33:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=0q1Y8ePvKhM4R3+rVYPWm7Pu+FP0VGkrqM/os2Y0oAI=;
+        b=bq/MfASSzMKj3oFf67+WBc5vnHJJVvuSkfDHhJYvD5/MJcDWtLk/X6aJ21zDQGZhex
+         zUxaqh96EHKYZJE29aqQUybXOCCkO0Bq0E8V6BB/WZHQdReb8Oy6Ua/nGBgu5yv1kVwr
+         LycJWs/5jWeCRri5MP5xDAMrty2KuvmruU/ksiDT1Nq7P7QtYvupR1QYyM+kHALmCKLe
+         SMGJd7ODVnvp9P1rrG7UKmrlaoSaL4u5sYDTSZdxlZ4idEfEOc/gvddM/sTWosS8sc3P
+         5XzznBPRjLUOvEVLjXaXRZ6xWKnhzAZtHl+bw+7X44vUDmeaa9H7RmxXPtk1CI0saIIC
+         y2xA==
+X-Gm-Message-State: AOAM530uNVA/7wQhXyMH0LiMVWhEOj76j+VEUBNTRXhywd1/kjRG9MfE
+        fBLxL4ITSxRrzLiNkFN4px8duHSisiBFSKFmNWqsf9lj0nrC3LdzkzWkg6ut2RG8LvXk4ItjXb+
+        W1iJhcVaJuS3T
+X-Received: by 2002:a1c:2087:: with SMTP id g129mr4503995wmg.126.1589556832765;
+        Fri, 15 May 2020 08:33:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwz/KlciQFx1rHU1J+UL9igbunQtTe0UZESWhBj7gKnvBR65GITM/RzOMxXTQwccrKqsnawtA==
+X-Received: by 2002:a1c:2087:: with SMTP id g129mr4503978wmg.126.1589556832581;
+        Fri, 15 May 2020 08:33:52 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-68-225.red.bezeqint.net. [79.179.68.225])
+        by smtp.gmail.com with ESMTPSA id c16sm4048373wrv.62.2020.05.15.08.33.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2020 08:33:51 -0700 (PDT)
+Date:   Fri, 15 May 2020 11:33:50 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kbuild test robot <lkp@intel.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH] vhost: missing __user tags
+Message-ID: <20200515153347.1092235-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200515091533.53259392@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1589556780; bh=sBb4QJGBqFoY/7NqZIfplcyZOFjamlsLitNHDE9hqCw=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=SNYMq6nnW7P5oF33pNTInNAff7nLFrD5i7WWwd5UMohg+YYQ8AQ2eUcGwcXWUaoLJ
-         VkgVvAVd+RcSSJ6lI/D2gU28UbEgBxf10zv/WiHDuyF0epnKUPd3Co5m7BaqQviON7
-         MkW2Y30G7sNm2ZzPYidxFkDme3KV4rXoQaFoJ5agLadTrEfah/1tphpti1jQbcyfOs
-         UYd4b8YiV9+/caD0z/hsO7s5sWyx6bGTtwwLpDF1NFiq3em9/4FKYQFmmbzMxgrRFs
-         rXoLEwByeN2A55/nqSwbLSMmWf/sKAbSUVYKKcjE/ueiK7HoTQSt1KFR0/GTJpGAcp
-         JsE/eESOdLATg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+sparse warns about converting void * to void __user *. This is not new
+but only got noticed now that vhost is built on more systems.
+This is just a question of __user tags missing in a couple of places,
+so fix it up.
 
+Fixes: f88949138058 ("vhost: introduce O(1) vq metadata cache")
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/vhost/vhost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 5/15/2020 8:45 PM, Alex Williamson wrote:
-> On Fri, 15 May 2020 16:44:38 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> On 5/15/2020 3:35 PM, Yan Zhao wrote:
->>> On Fri, May 15, 2020 at 02:07:44AM +0530, Kirti Wankhede wrote:
->>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
->>>> - Start dirty pages tracking while migration is active
->>>> - Stop dirty pages tracking.
->>>> - Get dirty pages bitmap. Its user space application's responsibility to
->>>>     copy content of dirty pages from source to destination during migration.
->>>>
->>>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
->>>> structure. Bitmap size is calculated considering smallest supported page
->>>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
->>>>
->>>> Bitmap is populated for already pinned pages when bitmap is allocated for
->>>> a vfio_dma with the smallest supported page size. Update bitmap from
->>>> pinning functions when tracking is enabled. When user application queries
->>>> bitmap, check if requested page size is same as page size used to
->>>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
->>>> error.
->>>>
->>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
->>>>
->>>> Fixed error reported by build bot by changing pgsize type from uint64_t
->>>> to size_t.
->>>> Reported-by: kbuild test robot <lkp@intel.com>
->>>> ---
->>>>    drivers/vfio/vfio_iommu_type1.c | 294 +++++++++++++++++++++++++++++++++++++++-
->>>>    1 file changed, 288 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->>>> index de17787ffece..b76d3b14abfd 100644
->>>> --- a/drivers/vfio/vfio_iommu_type1.c
->>>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>>> @@ -72,6 +72,7 @@ struct vfio_iommu {
->>>>    	uint64_t		pgsize_bitmap;
->>>>    	bool			v2;
->>>>    	bool			nesting;
->>>> +	bool			dirty_page_tracking;
->>>>    };
->>>>    
->>>>    struct vfio_domain {
->>>> @@ -92,6 +93,7 @@ struct vfio_dma {
->>>>    	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->>>>    	struct task_struct	*task;
->>>>    	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->>>> +	unsigned long		*bitmap;
->>>>    };
->>>>    
->>>>    struct vfio_group {
->>>> @@ -126,6 +128,19 @@ struct vfio_regions {
->>>>    #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->>>>    					(!list_empty(&iommu->domain_list))
->>>>    
->>>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
->>>> +
->>>> +/*
->>>> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
->>>> + * further casts to signed integer for unaligned multi-bit operation,
->>>> + * __bitmap_set().
->>>> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
->>>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
->>>> + * system.
->>>> + */
->>>> +#define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
->>>> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
->>>> +
->>>>    static int put_pfn(unsigned long pfn, int prot);
->>>>    
->>>>    /*
->>>> @@ -176,6 +191,74 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->>>>    	rb_erase(&old->node, &iommu->dma_list);
->>>>    }
->>>>    
->>>> +
->>>> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
->>>> +{
->>>> +	uint64_t npages = dma->size / pgsize;
->>>> +
->>>> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
->>>> +		return -EINVAL;
->>>> +
->>>> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
->>>> +	if (!dma->bitmap)
->>>> +		return -ENOMEM;
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
->>>> +{
->>>> +	kfree(dma->bitmap);
->>>> +	dma->bitmap = NULL;
->>>> +}
->>>> +
->>>> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
->>>> +{
->>>> +	struct rb_node *p;
->>>> +
->>>> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
->>>> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
->>>> +
->>>> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
->>>> +	}
->>>> +}
->>>> +
->>>> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
->>>> +{
->>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
->>>> +
->>>> +	for (; n; n = rb_next(n)) {
->>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->>>> +		int ret;
->>>> +
->>>> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
->>>> +		if (ret) {
->>>> +			struct rb_node *p = rb_prev(n);
->>>> +
->>>> +			for (; p; p = rb_prev(p)) {
->>>> +				struct vfio_dma *dma = rb_entry(n,
->>>> +							struct vfio_dma, node);
->>>> +
->>>> +				vfio_dma_bitmap_free(dma);
->>>> +			}
->>>> +			return ret;
->>>> +		}
->>>> +		vfio_dma_populate_bitmap(dma, pgsize);
->>>> +	}
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
->>>> +{
->>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
->>>> +
->>>> +	for (; n; n = rb_next(n)) {
->>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->>>> +
->>>> +		vfio_dma_bitmap_free(dma);
->>>> +	}
->>>> +}
->>>> +
->>>>    /*
->>>>     * Helper Functions for host iova-pfn list
->>>>     */
->>>> @@ -568,6 +651,17 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>>>    			vfio_unpin_page_external(dma, iova, do_accounting);
->>>>    			goto pin_unwind;
->>>>    		}
->>>> +
->>>> +		if (iommu->dirty_page_tracking) {
->>>> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
->>>> +
->>>> +			/*
->>>> +			 * Bitmap populated with the smallest supported page
->>>> +			 * size
->>>> +			 */
->>>> +			bitmap_set(dma->bitmap,
->>>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
->>>> +		}
->>>>    	}
->>>>    
->>>>    	ret = i;
->>>> @@ -802,6 +896,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->>>>    	vfio_unmap_unpin(iommu, dma, true);
->>>>    	vfio_unlink_dma(iommu, dma);
->>>>    	put_task_struct(dma->task);
->>>> +	vfio_dma_bitmap_free(dma);
->>>>    	kfree(dma);
->>>>    	iommu->dma_avail++;
->>>>    }
->>>> @@ -829,6 +924,80 @@ static void vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->>>>    	}
->>>>    }
->>>>    
->>>> +static int update_user_bitmap(u64 __user *bitmap, struct vfio_dma *dma,
->>>> +			      dma_addr_t base_iova, size_t pgsize)
->>>> +{
->>>> +	unsigned long pgshift = __ffs(pgsize);
->>>> +	unsigned long nbits = dma->size >> pgshift;
->>>> +	unsigned long bit_offset = (dma->iova - base_iova) >> pgshift;
->>>> +	unsigned long copy_offset = bit_offset / BITS_PER_LONG;
->>>> +	unsigned long shift = bit_offset % BITS_PER_LONG;
->>>> +	unsigned long leftover;
->>>> +
->>>> +	if (shift) {
->>>> +		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
->>>> +				  nbits + shift);
->>>> +
->>>> +		if (copy_from_user(&leftover, (u64 *)bitmap + copy_offset,
->>>> +				   sizeof(leftover)))
->>>> +			return -EFAULT;
->>>> +
->>>> +		bitmap_or(dma->bitmap, dma->bitmap, &leftover, shift);
->>>> +	}
->>>> +
->>>> +	if (copy_to_user((u64 *)bitmap + copy_offset, dma->bitmap,
->>>> +			 DIRTY_BITMAP_BYTES(nbits + shift)))
->>>> +		return -EFAULT;
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
->>>> +				  dma_addr_t iova, size_t size, size_t pgsize)
->>>> +{
->>>> +	struct vfio_dma *dma;
->>>> +	dma_addr_t i = iova, limit = iova + size;
->>>> +	unsigned long pgshift = __ffs(pgsize);
->>>> +	size_t sz = size;
->>>> +	int ret;
->>>> +
->>>> +	while ((dma = vfio_find_dma(iommu, i, sz))) {
->>> not quite get the logic here.
->>> if (i, i + size) is intersecting with (dma->iova, dma->iova + dma->size),
->>> and a dma is found here, why the whole bitmap is cleared and copied?
->>>    
->>
->> This works with multiple but full vfio_dma, not intersects of vfio_dma,
->> similar to unmap ioctl.
-> 
-> I don't see that the VFIO_IOMMU_DIRTY_PAGES ioctl validates that like
-> VFIO_IOMMU_UNMAP_DMA does though.  We should have the same test as
-> vfio_dma_do_unmap() to verify that they user range doesn't bisect a
-> mapping, otherwise Yan is right, it looks like we allow the user to
-> specify an arbitrary range that might bisect a bitmap, but we clear and
-> attempt to copy the entire bitmap to the user buffer regardless.
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index d450e16c5c25..21a59b598ed8 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -730,7 +730,7 @@ static inline void __user *vhost_vq_meta_fetch(struct vhost_virtqueue *vq,
+ 	if (!map)
+ 		return NULL;
+ 
+-	return (void *)(uintptr_t)(map->addr + addr - map->start);
++	return (void __user *)(uintptr_t)(map->addr + addr - map->start);
+ }
+ 
+ /* Can we switch to this memory table? */
+@@ -869,7 +869,7 @@ static void __user *__vhost_get_user_slow(struct vhost_virtqueue *vq,
+  * not happen in this case.
+  */
+ static inline void __user *__vhost_get_user(struct vhost_virtqueue *vq,
+-					    void *addr, unsigned int size,
++					    void __user *addr, unsigned int size,
+ 					    int type)
+ {
+ 	void __user *uaddr = vhost_vq_meta_fetch(vq,
+-- 
+MST
 
-Sure, updating patch. I'll send next version in some time.
-
-Thanks,
-Kirti
