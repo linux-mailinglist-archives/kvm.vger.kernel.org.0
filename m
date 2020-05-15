@@ -2,272 +2,402 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 148551D52A0
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 16:55:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F06EA1D52A7
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 16:56:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726188AbgEOOzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 10:55:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33931 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726140AbgEOOzP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 10:55:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589554512;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=x2C1LTXgRodL7MD8BAdmR4DJ7nYvn5rUoJyzNq68mBw=;
-        b=UNNMf+6MHHFK+5m/ZEgq2U67BQBA01AmJkABMhinZ19MhNXyvfIiJX5JddivvvqaZaP8Fa
-        VgEY9Gl2gew+ec1QAlFjtXU3b0t475AgR660gwnVqUZLD3ZUIoeodCa/ebIwhorzdReQNG
-        nVmeiMT28A3yvei25lb31O/y6C70NJQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-kt-1HhUqOHyBMCgfx-YdpQ-1; Fri, 15 May 2020 10:55:10 -0400
-X-MC-Unique: kt-1HhUqOHyBMCgfx-YdpQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 571BAC7441;
-        Fri, 15 May 2020 14:55:09 +0000 (UTC)
-Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A37EE6E9F0;
-        Fri, 15 May 2020 14:54:47 +0000 (UTC)
-Subject: Re: [PATCH v1 01/17] exec: Introduce
- ram_block_discard_set_(unreliable|required)()
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>
-References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-2-david@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <8dc6cefb-63ee-9310-ce18-abf558a08b39@redhat.com>
-Date:   Fri, 15 May 2020 16:54:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726283AbgEOO4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 10:56:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52464 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726213AbgEOO4I (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 10:56:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04FEY8oq017140;
+        Fri, 15 May 2020 10:56:07 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 310ub1caqn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 10:56:06 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04FEZZbp024706;
+        Fri, 15 May 2020 10:56:06 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 310ub1capr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 10:56:06 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04FEoefB032561;
+        Fri, 15 May 2020 14:56:03 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3100ubdt9u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 14:56:02 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04FEtxII62062774
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 May 2020 14:55:59 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C73654C04A;
+        Fri, 15 May 2020 14:55:59 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71CB14C044;
+        Fri, 15 May 2020 14:55:59 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.30.128])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 15 May 2020 14:55:59 +0000 (GMT)
+Date:   Fri, 15 May 2020 16:55:39 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+Message-ID: <20200515165539.2e4a8485.pasic@linux.ibm.com>
+In-Reply-To: <4e00c83b-146f-9f1d-882b-a5378257f32c@linux.ibm.com>
+References: <20200513142934.28788-1-farman@linux.ibm.com>
+        <20200514154601.007ae46f.pasic@linux.ibm.com>
+        <4e00c83b-146f-9f1d-882b-a5378257f32c@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200506094948.76388-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-15_06:2020-05-15,2020-05-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 suspectscore=2
+ lowpriorityscore=0 spamscore=0 clxscore=1015 cotscore=-2147483648
+ mlxlogscore=999 bulkscore=0 priorityscore=1501 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005150126
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.05.20 11:49, David Hildenbrand wrote:
-> We want to replace qemu_balloon_inhibit() by something more generic.
-> Especially, we want to make sure that technologies that really rely on
-> RAM block discards to work reliably to run mutual exclusive with
-> technologies that break it.
+On Fri, 15 May 2020 09:09:47 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
+
 > 
-> E.g., vfio will usually pin all guest memory, turning the virtio-balloon
-> basically useless and make the VM consume more memory than reported via
-> the balloon. While the balloon is special already (=> no guarantees, same
-> behavior possible afer reboots and with huge pages), this will be
-> different, especially, with virtio-mem.
 > 
-> Let's implement a way such that we can make both types of technology run
-> mutually exclusive. We'll convert existing balloon inhibitors in successive
-> patches and add some new ones. Add the check to
-> qemu_balloon_is_inhibited() for now. We might want to make
-> virtio-balloon an acutal inhibitor in the future - however, that
-> requires more thought to not break existing setups.
+> On 5/14/20 9:46 AM, Halil Pasic wrote:
+> > On Wed, 13 May 2020 16:29:30 +0200
+> > Eric Farman <farman@linux.ibm.com> wrote:
+> > 
+> >> Hi Conny,
+> >>
+> >> Back in January, I suggested a small patch [1] to try to clean up
+> >> the handling of HSCH/CSCH interrupts, especially as it relates to
+> >> concurrent SSCH interrupts. Here is a new attempt to address this.
+> >>
+> >> There was some suggestion earlier about locking the FSM, but I'm not
+> >> seeing any problems with that. Rather, what I'm noticing is that the
+> >> flow between a synchronous START and asynchronous HALT/CLEAR have
+> >> different impacts on the FSM state. Consider:
+> >>
+> >>     CPU 1                           CPU 2
+> >>
+> >>     SSCH (set state=CP_PENDING)
+> >>     INTERRUPT (set state=IDLE)
+> >>     CSCH (no change in state)
+> >>                                     SSCH (set state=CP_PENDING)
+> >>     INTERRUPT (set state=IDLE)
+> >>                                     INTERRUPT (set state=IDLE)
+> > 
+> > How does the PoP view of the composite device look like 
+> > (where composite device = vfio-ccw + host device)?
 > 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  balloon.c             |  3 ++-
->  exec.c                | 48 +++++++++++++++++++++++++++++++++++++++++++
->  include/exec/memory.h | 41 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 91 insertions(+), 1 deletion(-)
+> (Just want to be sure that "composite device" is a term that you're
+> creating, because it's not one I'm familiar with.)
+
+Yes I created this term because I'm unaware of an established one, and
+I could not come up with a better one. If you have something established
+or better please do tell, I will start using that.
+
 > 
-> diff --git a/balloon.c b/balloon.c
-> index f104b42961..c49f57c27b 100644
-> --- a/balloon.c
-> +++ b/balloon.c
-> @@ -40,7 +40,8 @@ static int balloon_inhibit_count;
->  
->  bool qemu_balloon_is_inhibited(void)
->  {
-> -    return atomic_read(&balloon_inhibit_count) > 0;
-> +    return atomic_read(&balloon_inhibit_count) > 0 ||
-> +           ram_block_discard_is_broken();
->  }
->  
->  void qemu_balloon_inhibit(bool state)
-> diff --git a/exec.c b/exec.c
-> index 2874bb5088..52a6e40e99 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -4049,4 +4049,52 @@ void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
->      }
->  }
->  
-> +static int ram_block_discard_broken;
-> +
-> +int ram_block_discard_set_broken(bool state)
-> +{
-> +    int old;
-> +
-> +    if (!state) {
-> +        atomic_dec(&ram_block_discard_broken);
-> +        return 0;
-> +    }
-> +
-> +    do {
-> +        old = atomic_read(&ram_block_discard_broken);
-> +        if (old < 0) {
-> +            return -EBUSY;
-> +        }
-> +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old + 1) != old);
-> +    return 0;
-> +}
-> +
-> +int ram_block_discard_set_required(bool state)
-> +{
-> +    int old;
-> +
-> +    if (!state) {
-> +        atomic_inc(&ram_block_discard_broken);
-> +        return 0;
-> +    }
-> +
-> +    do {
-> +        old = atomic_read(&ram_block_discard_broken);
-> +        if (old > 0) {
-> +            return -EBUSY;
-> +        }
-> +    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old - 1) != old);
-> +    return 0;
-> +}
-> +
-> +bool ram_block_discard_is_broken(void)
-> +{
-> +    return atomic_read(&ram_block_discard_broken) > 0;
-> +}
-> +
-> +bool ram_block_discard_is_required(void)
-> +{
-> +    return atomic_read(&ram_block_discard_broken) < 0;
-> +}
-> +
->  #endif
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index e000bd2f97..9bb5ced38d 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -2463,6 +2463,47 @@ static inline MemOp devend_memop(enum device_endian end)
->  }
->  #endif
->  
-> +/*
-> + * Inhibit technologies that rely on discarding of parts of RAM blocks to work
-> + * reliably, e.g., to manage the actual amount of memory consumed by the VM
-> + * (then, the memory provided by RAM blocks might be bigger than the desired
-> + * memory consumption). This *must* be set if:
-> + * - Discarding parts of a RAM blocks does not result in the change being
-> + *   reflected in the VM and the pages getting freed.
-> + * - All memory in RAM blocks is pinned or duplicated, invaldiating any previous
-> + *   discards blindly.
-> + * - Discarding parts of a RAM blocks will result in integrity issues (e.g.,
-> + *   encrypted VMs).
-> + * Technologies that only temporarily pin the current working set of a
-> + * driver are fine, because we don't expect such pages to be discarded
-> + * (esp. based on guest action like balloon inflation).
-> + *
-> + * This is *not* to be used to protect from concurrent discards (esp.,
-> + * postcopy).
-> + *
-> + * Returns 0 if successful. Returns -EBUSY if a technology that relies on
-> + * discards to work reliably is active.
-> + */
-> +int ram_block_discard_set_broken(bool state);
-> +
-> +/*
-> + * Inhibit technologies that will break discarding of pages in RAM blocks.
-> + *
-> + * Returns 0 if successful. Returns -EBUSY if discards are already set to
-> + * broken.
-> + */
-> +int ram_block_discard_set_required(bool state);
-> +
-> +/*
-> + * Test if discarding of memory in ram blocks is broken.
-> + */
-> +bool ram_block_discard_is_broken(void);
-> +
-> +/*
-> + * Test if discarding of memory in ram blocks is required to work reliably.
-> + */
-> +bool ram_block_discard_is_required(void);
-> +
->  #endif
->  
->  #endif
+> In today's code, there isn't a "composite device" that contains
+> POPs-defined state information like we find in, for example, the host
+> SCHIB, but that incorporates vfio-ccw state. This series (in a far more
+> architecturally valid, non-RFC, form) would get us closer to that.
 > 
 
-I'm wondering if I'll just call these functions
+I think it is very important to start thinking about the ccw devices
+that are exposed to the guest as a "composite device" in a sense that
+the (passed-through) host ccw device is wrapped by vfio-ccw. For instance
+the guest sees the SCHIB exposed by the vfio-ccw wrapper (adaptation
+code in qemu and the kernel module), and not the SCHIB of the host
+device.
 
-ram_block_discard_disable()
+This series definitely has some progressive thoughts. It just that
+IMHO we sould to be more radical about this. And yes I'm a bit
+frustrated.
 
-and
+> > 
+> > I suppose at the moment where we accept the CSCH the FC bit
+> > indicated clear function (19) goes to set. When this happens
+> > there are 2 possibilities: either the start (17) bit is set,
+> > or it is not. You describe a scenario where the start bit is
+> > not set. In that case we don't have a channel program that
+> > is currently being processed, and any SSCH must bounce right
+> > off without doing anything (with cc 2) as long as FC clear
+> > is set. Please note that we are still talking about the composite
+> > device here.
+> 
+> Correct. Though, whether the START function control bit is currently set
+> is immaterial to a CLEAR function; that's the biggest recovery action we
+> have at our disposal, and will always go through.
+> 
+> The point is that there is nothing to prevent the START on CPU 2 from
+> going through. The CLEAR does not affect the FSM today, and doesn't
+> record a FC CLEAR bit within vfio-ccw, and so we're only relying on the
+> return code from the SSCH instruction to give us cc0 vs cc2 (or
+> whatever). The actual results of that will depend, since the CPU may
+> have presented the interrupt for the CLEAR (via the .irq callback and
+> thus FSM VFIO_CCW_EVENT_INTERRUPT) and thus a new START is perfectly
+> legal from its point of view. Since vfio-ccw may not have unstacked the
+> work it placed to finish up that interrupt handler means we have a problem.
+> 
+> > 
+> > Thus in my reading CPU2 making the IDLE -> CP_PENDING transition
+> > happen is already wrong. We should have rejected to look at the
+> > channel program in the first place. Because as far as I can tell
+> > for the composite device the FC clear bit remains set until we
+> > process the last interrupt on the CPU 1 side in your scenario. Or
+> > am I wrong?
+> 
+> You're not wrong. You're agreeing with everything I've described.  :)
+> 
 
-ram_block_discard_require()
+I'm happy our understanding seems to converge! :)
 
--- 
-Thanks,
+My problem is that you tie the denial of SSCH to outstanding interrupts
+("C) A SSCH cannot be issued while an interrupt is outstanding") while
+the PoP says "Condition code 2 is set, and no other action is
+taken, when a start, halt, or clear function is currently
+in progress at the subchannel (see “Function Control
+(FC)” on page 16-22)".
 
-David / dhildenb
+This may or man not be what you have actually implemented, but it is what
+you describe in this cover letter. Also patches 2 and 3 do the 
+serialization operate on activity controls instead of on the function
+controls (as described by the PoP).
 
+> > 
+> > AFAIR I was preaching about this several times, but could never
+> > convince the people that 'let the host ccw device sort out
+> > concurrency' is not the way this should work.
+> 
+> I'm going to ignore this paragraph.
+> 
+
+;) Wise, was just frustration venting on my side.
+
+> > 
+> > Maybe I have got a hole in my argument somewhere. If my argument
+> > is wrong, please do point out why!
+> > 
+> >>
+> >> The second interrupt on CPU 1 will call cp_free() for the START
+> >> created by CPU 2, and our results will be, um, messy. This
+> >> suggests that three things must be true:
+> >>
+> >>  A) cp_free() must be called for either a final interrupt,
+> >> or a failure issuing a SSCH
+> >>  B) The FSM state must only be set to IDLE once cp_free()
+> >> has been called
+> >>  C) A SSCH cannot be issued while an interrupt is outstanding
+> > 
+> > So you propose to reject SSCH in the IDLE state (if an interrupt
+> > is outstanding)? That is one silly IDLE state and FSM for sure.
+> 
+> And sending a HSCH/CSCH without affecting the FSM or a POPs-valid
+> structure is not silly?
+> 
+
+It is silly! I'm frustrated because I could not convince my peers that
+it is silly.
+
+> > 
+> >>
+> >> It's not great that items B and C are separated in the interrupt
+> >> path by a mutex boundary where the copy into io_region occurs.
+> >> We could (and perhaps should) move them together, which would
+> >> improve things somewhat, but still doesn't address the scenario
+> >> laid out above. Even putting that work within the mutex window
+> >> during interrupt processing doesn't address things totally.
+> >>
+> >> So, the patches here do two things. One to handle unsolicited
+> >> interrupts [2], which I think is pretty straightforward. Though,
+> >> it does make me want to do a more drastic rearranging of the
+> >> affected function. :)
+> >>
+> >> The other warrants some discussion, since it's sort of weird.
+> >> Basically, recognize what commands we've issued, expect interrupts
+> >> for each, and prevent new SSCH's while asynchronous commands are
+> >> pending. It doesn't address interrupts from the HSCH/CSCH that
+> >> could be generated by the Channel Path Handling code [3] for an
+> >> offline CHPID yet, and it needs some TLC to make checkpatch happy.
+> >> But it's the best possibility I've seen thus far.
+> >>
+> >> I used private->scsw for this because it's barely used for anything
+> >> else; at one point I had been considering removing it outright because
+> >> we have entirely too many SCSW's in this code. :) I could implement
+> >> this as three small flags in private, to simplify the code and avoid
+> >> confusion with the different fctl/actl flags in private vs schib.
+> >>
+> > 
+> > Implementing the FSM described in the PoP (which in turn
+> > conceptually relies on atomic operations on the FC bits) is IMHO
+> > the way to go. But we can track that info in our FSM states. In
+> > fact our FSM states should just add sub-partitioning of states to
+> > those states (if necessary).
+> 
+> I'm not prepared to rule this out, as I originally stated, but I'm not
+> thrilled with this idea. Today, we have FSM events for an IO (START) and
+> asynchronous commands (HALT and CLEAR), and we have FSM states for the
+> different stages of a START operation. Making asynchronous commands
+> affect the FSM state isn't too big of a problem, but what happens if we
+> expand the asynchronous support to handle other commands, such as CANCEL
+> or RESUME? They don't have FC bits of their own to map into an FSM, and
+> (just like HALT/CLEAR) have some reliance on the fctl/actl/stctl bits of
+> the SCHIB.
+> 
+
+Well, fctl/actl/stctl can be seen as a possible representation of states
+and state transitions. For example for RESUME the PoP says
+"Condition code 2 is set, and no other action is
+taken, when the resume function is not applicable.
+The resume function is not applicable when the sub-
+channel (1) has any function other than the start
+function alone specified, (2) has no function speci-
+fied, (3) is resume pending, or (4) does not have sus-
+pend control specified for the start function in
+progress"
+
+What I'm trying to say is, there is a state machine described in the PoP,
+and there the state transitions are marked by interlocked updates of bits
+in fctl/actl/stctl. I don't know how many bits relevant for the state
+machine are, but I'm pretty confident they can be packaged up in a
+quadword. So if we want we can represent that stuff with a state variable
+of ours.
+
+BTW the whole notion of synchronous and asynchronous commands is IMHO
+broken. I tried to argue against it back then. If you read the PoP SSCH
+is asynchronous as well.
+
+> The fact that you're talking about sub-partitioning of states, as we
+> have with CP_PROCESSING and CP_PENDING in the context of a START,
+> suggest we'd drift farther from what one actually finds in POPs and make
+> it harder to decipher what vfio-ccw is actually up to.
+> 
+
+Yes. This may or may not be justified. Because we need to do that
+translation-prefetching and we need to do some cleanup that in a
+non-virtualized context isn't there additional states may be beneficial
+or even necessary. But if our state machine is interlacing with
+the PoP state machine something is very wrong.
+
+> > 
+> > 
+> >> It does make me wonder whether the CP_PENDING check before cp_free()
+> >> is still necessary, but that's a query for a later date.
+> >>
+> >> Also, perhaps this could be accomplished with two new FSM states,
+> >> one for a HALT and one for a CLEAR. I put it aside because the
+> >> interrupt handler got a little hairy with that, but I'm still looking
+> >> at it in parallel to this discussion.
+> >>
+> > 
+> > You don't necessarily need 2 new states. Just one that corresponds
+> > to FC clear function will do.
+> 
+> I don't think so. Maybe for my example above regarding a CSCH, but we
+> can issue a HSCH in the same way today, and a HALT should also get a cc2
+> if either a HALT or CLEAR command is already in progress. Just as a
+> START should get cc2 for a START, HALT, or CLEAR.
+> 
+
+Right. I was wrong. I misremembered something and mixed stuff up. We
+have separate FC bits for HALT and CLEAR in the PoP and that's for a
+good reason. Sorry for the noise.
+
+> > 
+> >> I look forward to hearing your thoughts...
+> > 
+> > Please see above ;)
+> > 
+> > Also why do we see the scenario you describe in the wild? I agree that
+> > this should be taken care of in the kernel as well, but according to my
+> > understanding QEMU is already supposed to reject the second SSCH (CPU 2)
+> > with cc 2 because it sees that FC clear function is set. Or?
+> 
+> Maybe for virtio, but for vfio this all gets passed through to the
+> kernel who makes that distinction. And as I've mentioned above, that's
+> not happening.
+
+Let's have a look at the following qemu functions. AFAIK it is
+common to vfio and virtio, or? Will prefix my inline 
+comments with ###
+
+
+IOInstEnding css_do_ssch(SubchDev *sch, ORB *orb)
+{   
+    SCHIB *schib = &sch->curr_status;
+
+    if (~(schib->pmcw.flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
+        return IOINST_CC_NOT_OPERATIONAL;
+    }
+    
+    if (schib->scsw.ctrl & SCSW_STCTL_STATUS_PEND) {
+        return IOINST_CC_STATUS_PRESENT;
+    }
+    
+    if (schib->scsw.ctrl & (SCSW_FCTL_START_FUNC |
+                   SCSW_FCTL_HALT_FUNC |
+                   SCSW_FCTL_CLEAR_FUNC)) {
+        return IOINST_CC_BUSY;
+### Here we check the FC values and give cc2 when we
+### need to.
+    }
+    
+    /* If monitoring is active, update counter. */
+    if (channel_subsys.chnmon_active) {
+        css_update_chnmon(sch);
+    }
+    sch->orb = *orb;
+    sch->channel_prog = orb->cpa;
+    /* Trigger the start function. */
+    schib->scsw.ctrl |= (SCSW_FCTL_START_FUNC | SCSW_ACTL_START_PEND);
+## Here we set the FC
+    schib->scsw.flags &= ~SCSW_FLAGS_MASK_PNO;
+
+    return do_subchannel_work(sch);
+}
+
+IOInstEnding css_do_csch(SubchDev *sch)
+{
+    SCHIB *schib = &sch->curr_status;
+
+    if (~(schib->pmcw.flags) & (PMCW_FLAGS_MASK_DNV | PMCW_FLAGS_MASK_ENA)) {
+        return IOINST_CC_NOT_OPERATIONAL;
+    }
+
+    /* Trigger the clear function. */
+    schib->scsw.ctrl &= ~(SCSW_CTRL_MASK_FCTL | SCSW_CTRL_MASK_ACTL);
+    schib->scsw.ctrl |= SCSW_FCTL_CLEAR_FUNC | SCSW_ACTL_CLEAR_PEND;
+### Here we set FC for the clear
+
+    return do_subchannel_work(sch);
+}
+
+So unless somebody (e.g. the kernel vfio-ccw) nukes the FC bits qemu
+should prevent the second SSCH from your example getting to the kernel,
+or?
+
+This is why I hold the notion of a "composite device" for
+important.
+
+Regards,
+Halil
