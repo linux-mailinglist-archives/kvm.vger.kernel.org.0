@@ -2,132 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 877A91D5AB3
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 22:31:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0548A1D5AC1
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 22:39:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726223AbgEOUa5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 16:30:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34986 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726179AbgEOUa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 16:30:57 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C39C061A0C
-        for <kvm@vger.kernel.org>; Fri, 15 May 2020 13:30:56 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id h15so3300385edv.2
-        for <kvm@vger.kernel.org>; Fri, 15 May 2020 13:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hUCVMuHXs0gz5/bBsK6N/3IhWm9s0JvgcPi6ACbO0XI=;
-        b=YLikBlNaBN75qIWlarSaxA8UqsDQlwX6b1YP+d64bWsW/TnwNaWR4y1xNDNxtwCWE/
-         cO6PxrQ/dxKvKf1e6SYFRvjjN51E0YdDO05PyCYXp4DDssN9I+wkKyWIyUH1FNYgNziN
-         vZXieDpw/ScutGgFV6lLn57QLceJjmDHJWjGk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hUCVMuHXs0gz5/bBsK6N/3IhWm9s0JvgcPi6ACbO0XI=;
-        b=p/I7tDuaP+50GaFQKcOK9stdsafXylw/ujWbS4vRn2azlxcokuWfD9Svr5CQaVZs8U
-         k0hJoXKGvmBD81iKgX96eaCr4m5JZgP9iNJAlHUJnCqqzJvuIeaBcdz9di2pP/FnscTj
-         VoSUF3jYe2RihJ2RZjDR/XCxhMlXJ+vwlK+uAbYb0/sIuWYfc546UCbTE5yKsORK0tdM
-         vpHObAwcZ9RQF+mFuihu/WphrsK3AQpnyMPzrCkIYqcUakm+frFbzGZByUHSRGSOzOXe
-         zmtpt4v7FdA+fdqZcSHNkiYMCmbHfmYwH5RKdLMMrPB3+WYexJf9jpVyTwgTOgHj8z8e
-         3rTg==
-X-Gm-Message-State: AOAM530UpvrqaB0cZTAB3UtfrYUgLE6RK6GCrkhDAXCCDHgLSIn/PLwh
-        xB++HldJZcE9Yk+jw/oT6M3oDj/RqwKyGzfTS2kdag==
-X-Google-Smtp-Source: ABdhPJx9/s7+9UIoNxTI9MKtsfxRtN5gkD3j3tqbr38FauP7wjlCecAfgC5CxYQIz0HnAh6baAhBD8w3oMumnocMGy0=
-X-Received: by 2002:aa7:dc49:: with SMTP id g9mr4578021edu.167.1589574655508;
- Fri, 15 May 2020 13:30:55 -0700 (PDT)
+        id S1726550AbgEOUd6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 16:33:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32654 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726247AbgEOUd6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 16:33:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589574836;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YepsSy2nLjL3UBd0hK7w9B2v+2qjHsLKYJjpSq7VWdI=;
+        b=YnXpcSYSI4+F6EqxUNRf5q5tr2HNAnkYwC07qCXu1g/sY52cEaWpC40NGvlhEoT0l9j5rS
+        u7j4/KscBWJTnxl7H7oYTLTlOP2yhbog5r1uaU8iN+C5gRi8FjBqFV0qJcYtzCOqvVZAF7
+        uzMgCPdnMkpKIGKcuJ0ZWnUBjT8jvlU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-77DuAAtVN5i8PC8RuTtcZA-1; Fri, 15 May 2020 16:33:55 -0400
+X-MC-Unique: 77DuAAtVN5i8PC8RuTtcZA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22339460;
+        Fri, 15 May 2020 20:33:53 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-114-113.rdu2.redhat.com [10.10.114.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 86A3A60C05;
+        Fri, 15 May 2020 20:33:52 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 1E9DD220206; Fri, 15 May 2020 16:33:52 -0400 (EDT)
+Date:   Fri, 15 May 2020 16:33:52 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with
+ token info
+Message-ID: <20200515203352.GC235744@redhat.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com>
+ <20200511164752.2158645-3-vkuznets@redhat.com>
+ <20200512152709.GB138129@redhat.com>
+ <87o8qtmaat.fsf@vitty.brq.redhat.com>
+ <20200512155339.GD138129@redhat.com>
+ <20200512175017.GC12100@linux.intel.com>
+ <20200513125241.GA173965@redhat.com>
+ <0733213c-9514-4b04-6356-cf1087edd9cf@redhat.com>
+ <20200515184646.GD17572@linux.intel.com>
+ <d84b6436-9630-1474-52e5-ffcc4d2bd70a@redhat.com>
 MIME-Version: 1.0
-References: <20200511220046.120206-1-mortonm@chromium.org> <20200512111440.15caaca2@w520.home>
- <92fd66eb-68e7-596f-7dd1-f1c190833be4@redhat.com> <20200513083401.11e761a7@x1.home>
- <8c0bfeb7-0d08-db74-3a23-7a850f301a2a@redhat.com> <CAJ-EccPjU0Lh5gEnr0L9AhuuJTad1yHX-BzzWq21m+e-vY-ELA@mail.gmail.com>
- <0fdb5d54-e4d6-8f2f-69fe-1b157999d6cd@redhat.com> <CAJ-EccP6GNmyCGJZFfXUo2_8KEN_sJZ3=88f+3E-8SJ=JT8Pcg@mail.gmail.com>
- <9d5d7eec-77dd-bca9-949f-8f39fcd7d8d7@redhat.com> <20200514164327.72734a77@w520.home>
-In-Reply-To: <20200514164327.72734a77@w520.home>
-From:   Micah Morton <mortonm@chromium.org>
-Date:   Fri, 15 May 2020 13:30:43 -0700
-Message-ID: <CAJ-EccPU8KpU96PM2PtroLjdNVDbvnxwKwWJr2B+RBKuXEr7Vw@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: Add module for IRQ forwarding
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        jmattson@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d84b6436-9630-1474-52e5-ffcc4d2bd70a@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 14, 2020 at 3:43 PM Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> On Thu, 14 May 2020 23:17:29 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> > On 14/05/20 19:44, Micah Morton wrote:
-> > > I realize this may seem like an over-use of VFIO, but I'm actually
-> > > coming from the angle of wanting to assign _most_ of the important
-> > > hardware on my device to a VM guest, and I'm looking to avoid
-> > > emulation wherever possible. Of course there will be devices like the
-> > > IOAPIC for which emulation is unavoidable, but I think emulation is
-> > > avoidable here for the busses we've mentioned if there is a way to
-> > > forward arbitrary interrupts into the guest.
-> > >
-> > > Since all these use cases are so close to working with vfio-pci right
-> > > out of the box, I was really hoping to come up with a simple and
-> > > generic solution to the arbitrary interrupt problem that can be used
-> > > for multiple bus types.
-> >
-> > I shall defer to Alex on this, but I think the main issue here is that
-> > these interrupts are not visible to Linux as pertaining to the pci-stub
-> > device.  Is this correct?
->
-> Yes.  Allowing a user to grant themselves access to an arbitrary
-> interrupt is a non-starter, vfio-pci needs to somehow know that the
-> user is entitled to that interrupt.  If we could do that, then we could
-> just add it as a device specific interrupt.  But how do we do that?
->
-> The quirk method to this might be to key off of the PCI vendor and
-> device ID of the PCI i2c controller, lookup DMI information to know if
-> we're on the platform that has this fixed association, and setup the
-> extra interrupt.  The more extensible, but potentially bloated solution
-> might be for vfio-pci to recognize the class code for a i2c controller
-> and implement a very simple bus walk at device probe time that collects
-> external dependencies.  I don't really know how the jump is made from
-> that bus walk to digging the interrupt resource out of ACPI though or
-> how many LoC would be required to perform the minimum possible
-> discovery to collect this association.
+On Fri, May 15, 2020 at 09:18:07PM +0200, Paolo Bonzini wrote:
+> On 15/05/20 20:46, Sean Christopherson wrote:
+> >> The new one using #VE is not coming very soon (we need to emulate it for
+> >> <Broadwell and AMD processors, so it's not entirely trivial) so we are
+> >> going to keep "page not ready" delivery using #PF for some time or even
+> >> forever.  However, page ready notification as #PF is going away for good.
+> > 
+> > And isn't hardware based EPT Violation #VE going to require a completely
+> > different protocol than what is implemented today?  For hardware based #VE,
+> > KVM won't intercept the fault, i.e. the guest will need to make an explicit
+> > hypercall to request the page.
+> 
+> Yes, but it's a fairly simple hypercall to implement.
+> 
+> >> That said, type1/type2 is quite bad. :)  Let's change that to page not
+> >> present / page ready.
+> > 
+> > Why even bother using 'struct kvm_vcpu_pv_apf_data' for the #PF case?  VMX
+> > only requires error_code[31:16]==0 and SVM doesn't vet it at all, i.e. we
+> > can (ab)use the error code to indicate an async #PF by setting it to an
+> > impossible value, e.g. 0xaaaa (a is for async!).  That partciular error code
+> > is even enforced by the SDM, which states:
+> 
+> Possibly, but it's water under the bridge now.
+> And the #PF mechanism also has the problem with NMIs that happen before
+> the error code is read
+> and page faults happening in the handler (you may connect some dots now).
 
-The quirk method is interesting. I wonder if we have a guarantee for a
-given platform and PCI vendor/device which IRQ number/type will be
-used. If so that might be an option.
+I understood that following was racy.
 
-Would you need to do a bus walk? I guess it would be possible to
-simply look at ACPI whenever you see a bus controller being assigned
-with VFIO. ACPI should tell you about all the sub-devices on that bus
-and their IRQ details. This is how vfio-platform (with DT, not ACPI)
-knows which IRQs to forward into the guest right? Is there a
-fundamental reason this is more difficult on x86 or is the code just
-not there since PCI generally precludes the need for this?
+do_async_page_fault <--- kvm injected async page fault
+  NMI happens (Before kvm_read_and_reset_pf_reason() is done)
+   ->do_async_page_fault() (This is regular page fault but it will read
+   			    reason from shared area and will treat itself
+			    as async page fault)
 
->
-> I notice in this RFC patch that you're using an exclusive interrupt for
-> level triggered interrupts and therefore masking at the APIC.
-> Requiring an exclusive interrupt is often a usability issue for PCI
-> devices that don't support DisINTx and obviously we don't have that for
-> non-PCI sub-devices.  What type of interrupt do you actually need for
-> this device?  Thanks,
+So this is racy.
 
-I don't have any reason to think the interrupts for sub-devices on the
-bus would be shared with any other PCI devices or platform devices.
-Are you asking if there's any chance the platform IRQs are shared
-rather than exclusive or are you saying there's some issue with
-presenting the exclusive IRQ to the guest as exclusive through PCI
-legacy-style interrupts?
+But if we get rid of the notion of reading from shared region in page
+fault handler, will we not get rid of this race.
 
->
-> Alex
->
+I am assuming that error_code is not racy as it is pushed on stack.
+What am I missing.
+
+Thanks
+Vivek
+
