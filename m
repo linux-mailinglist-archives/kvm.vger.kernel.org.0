@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AA3F1D4FF0
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 16:05:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C155E1D5008
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 16:09:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726257AbgEOOFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 10:05:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30775 "EHLO
+        id S1726188AbgEOOJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 10:09:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50699 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726204AbgEOOFw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 10:05:52 -0400
+        with ESMTP id S1726016AbgEOOJv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 10:09:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589551551;
+        s=mimecast20190719; t=1589551789;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=91p8Drd0kFpbtxKFOwPVtDo82KBQZkt5SLipVlwY5PM=;
-        b=C91xOVInF2CSEnXcBGv+6u6U97ShF4M3kGRQBaZ7V8DNhrOjYO2Zli6c3h/TS5jr6gFzSL
-        2Bg+MSFEHvYYr1F+2LcVsnyEw/vj14HCPzChpBPhwkqY0DS7n5qRv36HcjTB0zou0YhpLV
-        PQSC0OGXE6npNh9fBP6EQ/qLGzUc2Ho=
+        bh=KNmE/tIhTo2+OsvIBTtoffxhEzZgSD52Yrczlq+RTnw=;
+        b=fnMPrHpAJXs757mzTPX4i9u9ZE/FT71YKfersiFPYfD//HqhD9QyQGW+zFnZvfslYPM+HJ
+        kgF0V98Wa7rC1fDm9anOlyMa/40rHGPBjCzq1mYokj1u8OHIxb02ImNQvEEGSV2a2QpTQM
+        uyK+ot1rAVq/DvFeyFNqVIPO6lFwd/Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-hnMU9pWrPn6l1oD8WHgaOA-1; Fri, 15 May 2020 10:05:48 -0400
-X-MC-Unique: hnMU9pWrPn6l1oD8WHgaOA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-47-3oe0uVQxMM-Ucm79GBEmtA-1; Fri, 15 May 2020 10:09:45 -0400
+X-MC-Unique: 3oe0uVQxMM-Ucm79GBEmtA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 170C31800D4A;
-        Fri, 15 May 2020 14:05:47 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A90118730B1;
+        Fri, 15 May 2020 14:09:44 +0000 (UTC)
 Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1923E3A2;
-        Fri, 15 May 2020 14:05:41 +0000 (UTC)
-Subject: Re: [PATCH v1 08/17] migration/colo: Use
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A76162474;
+        Fri, 15 May 2020 14:09:40 +0000 (UTC)
+Subject: Re: [PATCH v1 07/17] migration/rdma: Use
  ram_block_discard_set_broken()
 To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -41,10 +41,9 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
-        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
         Juan Quintela <quintela@redhat.com>
 References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-9-david@redhat.com> <20200515135841.GF2954@work-vm>
+ <20200506094948.76388-8-david@redhat.com> <20200515124501.GE2954@work-vm>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -90,82 +89,40 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <fee1f122-a7df-3101-7a94-b88d123bedb8@redhat.com>
-Date:   Fri, 15 May 2020 16:05:41 +0200
+Message-ID: <96a58e88-2629-f2ee-5884-38d11e571548@redhat.com>
+Date:   Fri, 15 May 2020 16:09:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200515135841.GF2954@work-vm>
+In-Reply-To: <20200515124501.GE2954@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.05.20 15:58, Dr. David Alan Gilbert wrote:
+On 15.05.20 14:45, Dr. David Alan Gilbert wrote:
 > * David Hildenbrand (david@redhat.com) wrote:
->> COLO will copy all memory in a RAM block, mark discarding of RAM broken.
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
->> Cc: Juan Quintela <quintela@redhat.com>
->> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  include/migration/colo.h |  2 +-
->>  migration/migration.c    |  8 +++++++-
->>  migration/savevm.c       | 11 +++++++++--
->>  3 files changed, 17 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/migration/colo.h b/include/migration/colo.h
->> index 1636e6f907..768e1f04c3 100644
->> --- a/include/migration/colo.h
->> +++ b/include/migration/colo.h
->> @@ -25,7 +25,7 @@ void migrate_start_colo_process(MigrationState *s);
->>  bool migration_in_colo_state(void);
->>  
->>  /* loadvm */
->> -void migration_incoming_enable_colo(void);
->> +int migration_incoming_enable_colo(void);
->>  void migration_incoming_disable_colo(void);
->>  bool migration_incoming_colo_enabled(void);
->>  void *colo_process_incoming_thread(void *opaque);
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 177cce9e95..f6830e4620 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -338,12 +338,18 @@ bool migration_incoming_colo_enabled(void)
->>  
->>  void migration_incoming_disable_colo(void)
->>  {
->> +    ram_block_discard_set_broken(false);
->>      migration_colo_enabled = false;
->>  }
->>  
->> -void migration_incoming_enable_colo(void)
->> +int migration_incoming_enable_colo(void)
->>  {
->> +    if (ram_block_discard_set_broken(true)) {
->> +        error_report("COLO: cannot set discarding of RAM broken");
+>> RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
+>> to mark RAM block discards to be broken - however, to keep it simple
+>> use ram_block_discard_is_required() instead of inhibiting.
 > 
-> I'd prefer 'COLO: cannot disable RAM discard'
-> 
-> 'broken' suggests the user has to go and fix something or report a bug
-> or something.
+> Should this be dependent on whether rdma->pin_all is set?
+> Even with !pin_all some will be pinned at any given time
+> (when it's registered with the rdma stack).
 
-Sounds better, I'll adjust similar messages in the other patches. Thanks!
+Do you know how much memory this is? Is such memory only temporarily pinned?
 
-> 
-> Other than that:
-> 
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> Dave
+At least with special-cases of vfio, it's acceptable if some memory is
+temporarily pinned - we assume it's only the working set of the driver,
+which guests will not inflate as long as they don't want to shoot
+themselves in the foot.
 
+This here sounds like the guest does not know the pinned memory is
+special, right?
 
 -- 
 Thanks,
