@@ -2,135 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3E6E1D5923
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 20:38:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 361DD1D5965
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 20:46:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726302AbgEOSic (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 14:38:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30772 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726227AbgEOSib (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 14:38:31 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04FIWg4v016361;
-        Fri, 15 May 2020 14:38:30 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3119daj3cb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 14:38:30 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04FIWmEX017206;
-        Fri, 15 May 2020 14:38:30 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3119daj3bu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 14:38:29 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04FIUM31024250;
-        Fri, 15 May 2020 18:38:28 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3100ube3uq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 May 2020 18:38:28 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04FIcP9C55640528
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 May 2020 18:38:25 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 69413A405B;
-        Fri, 15 May 2020 18:38:25 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0490EA405F;
-        Fri, 15 May 2020 18:38:25 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.30.128])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 May 2020 18:38:24 +0000 (GMT)
-Date:   Fri, 15 May 2020 20:37:59 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v2 0/4] vfio-ccw: Fix interrupt handling for
- HALT/CLEAR
-Message-ID: <20200515203759.4ffc6f31.pasic@linux.ibm.com>
-In-Reply-To: <931b96fc-0bb5-cdc1-bb1c-102a96f346ea@linux.ibm.com>
-References: <20200513142934.28788-1-farman@linux.ibm.com>
-        <20200514154601.007ae46f.pasic@linux.ibm.com>
-        <4e00c83b-146f-9f1d-882b-a5378257f32c@linux.ibm.com>
-        <20200515165539.2e4a8485.pasic@linux.ibm.com>
-        <931b96fc-0bb5-cdc1-bb1c-102a96f346ea@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726374AbgEOSqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 14:46:47 -0400
+Received: from mga04.intel.com ([192.55.52.120]:21894 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726238AbgEOSqr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 May 2020 14:46:47 -0400
+IronPort-SDR: i3/ge2RAF+xNKhm6D8+xDGinQBkDxH/wavun5MkdP9n6FWxwyvo+1B9kRdpAw2nyiHl564Fut5
+ Bb68AbU72tOg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2020 11:46:46 -0700
+IronPort-SDR: 3nFF7Vdveb0kAvH6CP5v3LJy6xFk/DYCbDl/wBEvvs7oko3gF2NS+Wzm9kfH2kVBksHuuF94k0
+ dK+Lb67/9vQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,396,1583222400"; 
+   d="scan'208";a="299130175"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga008.jf.intel.com with ESMTP; 15 May 2020 11:46:46 -0700
+Date:   Fri, 15 May 2020 11:46:46 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vivek Goyal <vgoyal@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with
+ token info
+Message-ID: <20200515184646.GD17572@linux.intel.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com>
+ <20200511164752.2158645-3-vkuznets@redhat.com>
+ <20200512152709.GB138129@redhat.com>
+ <87o8qtmaat.fsf@vitty.brq.redhat.com>
+ <20200512155339.GD138129@redhat.com>
+ <20200512175017.GC12100@linux.intel.com>
+ <20200513125241.GA173965@redhat.com>
+ <0733213c-9514-4b04-6356-cf1087edd9cf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-15_07:2020-05-15,2020-05-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=979 spamscore=0
- priorityscore=1501 cotscore=-2147483648 phishscore=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 mlxscore=0 clxscore=1015 adultscore=0
- malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005150151
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0733213c-9514-4b04-6356-cf1087edd9cf@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 15 May 2020 14:12:05 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> >>> Also why do we see the scenario you describe in the wild? I agree that
-> >>> this should be taken care of in the kernel as well, but according to my
-> >>> understanding QEMU is already supposed to reject the second SSCH (CPU 2)
-> >>> with cc 2 because it sees that FC clear function is set. Or?  
-> >>
-> >> Maybe for virtio, but for vfio this all gets passed through to the
-> >> kernel who makes that distinction. And as I've mentioned above, that's
-> >> not happening.  
-> > 
-> > Let's have a look at the following qemu functions. AFAIK it is
-> > common to vfio and virtio, or? Will prefix my inline   
+On Fri, May 15, 2020 at 05:59:43PM +0200, Paolo Bonzini wrote:
+> On 13/05/20 14:52, Vivek Goyal wrote:
+> >>> Also, type of event should not necessarily be tied to delivery method.
+> >>> For example if we end up introducing say, "KVM_PV_REASON_PAGE_ERROR", then
+> >>> I would think that event can be injected both using exception (#PF or #VE)
+> >>> as well as interrupt (depending on state of system).
+> >> Why bother preserving backwards compatibility?
+> > New machanism does not have to support old guests but old mechanism
+> > should probably continue to work and deprecated slowly, IMHO. Otherwise
+> > guests which were receiving async page faults will suddenly stop getting
+> > it over hypervisor upgrade and possibly see drop in performance.
 > 
-> My mistake, I didn't look far enough up the callchain in my quick look
-> at the code.
+> Unfortunately, the old mechanism was broken enough, and in enough
+> different ways, that it's better to just drop it.
 > 
-> ...snip...
-> 
+> The new one using #VE is not coming very soon (we need to emulate it for
+> <Broadwell and AMD processors, so it's not entirely trivial) so we are
+> going to keep "page not ready" delivery using #PF for some time or even
+> forever.  However, page ready notification as #PF is going away for good.
 
-No problem. I'm glad I was at least little helpful.
+And isn't hardware based EPT Violation #VE going to require a completely
+different protocol than what is implemented today?  For hardware based #VE,
+KVM won't intercept the fault, i.e. the guest will need to make an explicit
+hypercall to request the page.  That seems like it'll be as time consuming
+to implement as emulating EPT Violation #VE in KVM.
 
-> > 
-> > So unless somebody (e.g. the kernel vfio-ccw) nukes the FC bits qemu
-> > should prevent the second SSCH from your example getting to the kernel,
-> > or?  
-> 
-> It's not so much something "nukes the FC bits" ... but rather that that
-> the data in the irb_area of the io_region is going to reflect what the
-> subchannel told us for the interrupt.
+> That said, type1/type2 is quite bad. :)  Let's change that to page not
+> present / page ready.
 
-This is why the word composition came into my mind. If the HW subchannel
-has FC clear, but QEMU subchannel does not the way things compose (or
-superpose) is fishy.
+Why even bother using 'struct kvm_vcpu_pv_apf_data' for the #PF case?  VMX
+only requires error_code[31:16]==0 and SVM doesn't vet it at all, i.e. we
+can (ab)use the error code to indicate an async #PF by setting it to an
+impossible value, e.g. 0xaaaa (a is for async!).  That partciular error code
+is even enforced by the SDM, which states:
 
-> 
-> Hrm... If something is polling on TSCH instead of waiting for a tap on
-> the shoulder, that's gonna act weird too. Maybe the bits need to be in
-> io_region.irb_area proper, rather than this weird private->scsw space.
+  [SGX] this flag is set only if the P flag (bit 0) is 1 and the RSVD flag
+  (bit 3) and the PK flag (bit 5) are both 0.
 
-Do we agree that the scenario you described with that diagram should not
-have hit kernel in the first place, because if things were correct QEMU
-should have fenced the second SSCH?
+I.e. we've got bigger problems if hardware generates a !PRESENT, WRITE, RSVD,
+PK, SGX page fault :-)
 
-I think you do, but want to be sure. If not, then we need to meditate
-some more on this.
+Then the page ready becomes the only guest-side consumer of the in-memory
+struct, e.g. it can be renamed to something like kvm_vcpu_pv_apf_ready and
+doesn't need a reason field (though it still needs a "busy" bit) as written.
+It'd also eliminate the apf_put_user() in kvm_arch_async_page_not_present().
 
-I do tend to think that the kernel part is not supposed to rely on
-userspace playing nice. Especially when it comes to integrity and
-correctness. I can't tell  just yet if this is something we must
-or just can catch in the kernel module. I'm for catching it regardless,
-but I'm even more for everything working as it is supposed. :)
-
-Regards,
-Halil
+I believe it would also allow implementing (in the future) "async #PF ready"
+as a ring buffer, i.e. allow kvm_check_async_pf_completion() to coalesce all
+ready pages into a single injected interrupt.
