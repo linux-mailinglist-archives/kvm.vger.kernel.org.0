@@ -2,116 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36C751D5921
-	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 20:37:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3E6E1D5923
+	for <lists+kvm@lfdr.de>; Fri, 15 May 2020 20:38:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbgEOShI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 14:37:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42145 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726227AbgEOShI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 14:37:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589567826;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iS2BZEZhYnHE5mi0Tf0cUE2Vbxbk8ajM07NE1jWnMoA=;
-        b=HG4DgOUIcBLWUcwjmssNuVyPsSwcepB0oWK4PhVdXwZyMbrSSKtpzCSiA4EFK5+ALHrZI9
-        zQQ9kY6p+UlHaLjRo72vi/3HJWWvkDp8leJqL4LioG6yi9G5qIl1Eks3LUdS+cRckv663a
-        vgc4H9vPChxswmC8Tlu667GqHf7PuFs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-Zy5vaWusMkeTl9eED5XF2g-1; Fri, 15 May 2020 14:37:04 -0400
-X-MC-Unique: Zy5vaWusMkeTl9eED5XF2g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B7B480B73A;
-        Fri, 15 May 2020 18:37:03 +0000 (UTC)
-Received: from work-vm (ovpn-114-149.ams2.redhat.com [10.36.114.149])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F3725C3E7;
-        Fri, 15 May 2020 18:36:54 +0000 (UTC)
-Date:   Fri, 15 May 2020 19:36:52 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v1 07/17] migration/rdma: Use
- ram_block_discard_set_broken()
-Message-ID: <20200515183652.GM2954@work-vm>
-References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-8-david@redhat.com>
- <20200515124501.GE2954@work-vm>
- <96a58e88-2629-f2ee-5884-38d11e571548@redhat.com>
- <20200515175105.GL2954@work-vm>
- <1cac6cb0-7804-bab2-4ecf-044c369c1135@redhat.com>
+        id S1726302AbgEOSic (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 May 2020 14:38:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30772 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726227AbgEOSib (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 May 2020 14:38:31 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04FIWg4v016361;
+        Fri, 15 May 2020 14:38:30 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3119daj3cb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 14:38:30 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04FIWmEX017206;
+        Fri, 15 May 2020 14:38:30 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3119daj3bu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 14:38:29 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04FIUM31024250;
+        Fri, 15 May 2020 18:38:28 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3100ube3uq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 May 2020 18:38:28 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04FIcP9C55640528
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 May 2020 18:38:25 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 69413A405B;
+        Fri, 15 May 2020 18:38:25 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0490EA405F;
+        Fri, 15 May 2020 18:38:25 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.30.128])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 15 May 2020 18:38:24 +0000 (GMT)
+Date:   Fri, 15 May 2020 20:37:59 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+Message-ID: <20200515203759.4ffc6f31.pasic@linux.ibm.com>
+In-Reply-To: <931b96fc-0bb5-cdc1-bb1c-102a96f346ea@linux.ibm.com>
+References: <20200513142934.28788-1-farman@linux.ibm.com>
+        <20200514154601.007ae46f.pasic@linux.ibm.com>
+        <4e00c83b-146f-9f1d-882b-a5378257f32c@linux.ibm.com>
+        <20200515165539.2e4a8485.pasic@linux.ibm.com>
+        <931b96fc-0bb5-cdc1-bb1c-102a96f346ea@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1cac6cb0-7804-bab2-4ecf-044c369c1135@redhat.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-15_07:2020-05-15,2020-05-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=979 spamscore=0
+ priorityscore=1501 cotscore=-2147483648 phishscore=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 mlxscore=0 clxscore=1015 adultscore=0
+ malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005150151
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* David Hildenbrand (david@redhat.com) wrote:
-> On 15.05.20 19:51, Dr. David Alan Gilbert wrote:
-> > * David Hildenbrand (david@redhat.com) wrote:
-> >> On 15.05.20 14:45, Dr. David Alan Gilbert wrote:
-> >>> * David Hildenbrand (david@redhat.com) wrote:
-> >>>> RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
-> >>>> to mark RAM block discards to be broken - however, to keep it simple
-> >>>> use ram_block_discard_is_required() instead of inhibiting.
-> >>>
-> >>> Should this be dependent on whether rdma->pin_all is set?
-> >>> Even with !pin_all some will be pinned at any given time
-> >>> (when it's registered with the rdma stack).
+On Fri, 15 May 2020 14:12:05 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> >>> Also why do we see the scenario you describe in the wild? I agree that
+> >>> this should be taken care of in the kernel as well, but according to my
+> >>> understanding QEMU is already supposed to reject the second SSCH (CPU 2)
+> >>> with cc 2 because it sees that FC clear function is set. Or?  
 > >>
-> >> Do you know how much memory this is? Is such memory only temporarily pinned?
+> >> Maybe for virtio, but for vfio this all gets passed through to the
+> >> kernel who makes that distinction. And as I've mentioned above, that's
+> >> not happening.  
 > > 
-> > With pin_all not set, only a subset of memory, I think multiple 1MB
-> > chunks, are pinned at any one time.
+> > Let's have a look at the following qemu functions. AFAIK it is
+> > common to vfio and virtio, or? Will prefix my inline   
+> 
+> My mistake, I didn't look far enough up the callchain in my quick look
+> at the code.
+> 
+> ...snip...
+> 
+
+No problem. I'm glad I was at least little helpful.
+
 > > 
-> >> At least with special-cases of vfio, it's acceptable if some memory is
-> >> temporarily pinned - we assume it's only the working set of the driver,
-> >> which guests will not inflate as long as they don't want to shoot
-> >> themselves in the foot.
-> >>
-> >> This here sounds like the guest does not know the pinned memory is
-> >> special, right?
-> > 
-> > Right - for RDMA it's all of memory that's being transferred, and the
-> > guest doesn't see when each part is transferred.
+> > So unless somebody (e.g. the kernel vfio-ccw) nukes the FC bits qemu
+> > should prevent the second SSCH from your example getting to the kernel,
+> > or?  
 > 
-> 
-> Okay, so all memory will eventually be pinned, just not at the same
-> time, correct?
-> 
-> I think this implies that any memory that was previously discarded will
-> be backed my new pages, meaning we will consume more memory than intended.
-> 
-> If so, always disabling discarding of RAM seems to be the right thing to do.
+> It's not so much something "nukes the FC bits" ... but rather that that
+> the data in the irb_area of the io_region is going to reflect what the
+> subchannel told us for the interrupt.
 
-Yeh that's probably true, although there's a check for 'buffer_is_zero'
-in the !rdma->pin_all case, if the entire area is zero (or probably if
-unmapped) then it sends a notification rather than registering; see
-qemu_rdma_write_one and search for 'This chunk has not yet been
-registered, so first check to see'
-
-Dave
+This is why the word composition came into my mind. If the HW subchannel
+has FC clear, but QEMU subchannel does not the way things compose (or
+superpose) is fishy.
 
 > 
-> -- 
-> Thanks,
-> 
-> David / dhildenb
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Hrm... If something is polling on TSCH instead of waiting for a tap on
+> the shoulder, that's gonna act weird too. Maybe the bits need to be in
+> io_region.irb_area proper, rather than this weird private->scsw space.
 
+Do we agree that the scenario you described with that diagram should not
+have hit kernel in the first place, because if things were correct QEMU
+should have fenced the second SSCH?
+
+I think you do, but want to be sure. If not, then we need to meditate
+some more on this.
+
+I do tend to think that the kernel part is not supposed to rely on
+userspace playing nice. Especially when it comes to integrity and
+correctness. I can't tell  just yet if this is something we must
+or just can catch in the kernel module. I'm for catching it regardless,
+but I'm even more for everything working as it is supposed. :)
+
+Regards,
+Halil
