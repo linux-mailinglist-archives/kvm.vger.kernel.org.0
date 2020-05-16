@@ -2,101 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BA371D609D
-	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 13:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F5841D60C5
+	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 14:24:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726250AbgEPLzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 May 2020 07:55:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37332 "EHLO
+        id S1726228AbgEPMYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 May 2020 08:24:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38880 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726244AbgEPLza (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 May 2020 07:55:30 -0400
+        with ESMTP id S1726219AbgEPMYS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 May 2020 08:24:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589630129;
+        s=mimecast20190719; t=1589631857;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=erfjzqOuUiVfB794M6kP1tZ4CPJtvAiKcW2ogPScaak=;
-        b=jTYHRMxFIq2yBoRO6FtoFww8h93Kl8HaIYX/0w1GSgnjmGhkgisQ63p7K3XBWNZvQMRKh5
-        1zDZ7lbGWrI2lX3NAu/Y4ZDwdMbzY7eX3egTXx7mSUTiZ3hQtOthBqu+H+KU4Ls2ZS+N5p
-        v2DtOo8PbUaGNYOFyzSCPyOcu588RG0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-gaMTHf4yNJqk8u74KM1q2Q-1; Sat, 16 May 2020 07:55:27 -0400
-X-MC-Unique: gaMTHf4yNJqk8u74KM1q2Q-1
-Received: by mail-wr1-f72.google.com with SMTP id i9so2618908wrx.0
-        for <kvm@vger.kernel.org>; Sat, 16 May 2020 04:55:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=erfjzqOuUiVfB794M6kP1tZ4CPJtvAiKcW2ogPScaak=;
-        b=WzkC6QmCggOTwb0lmqjqwiBgdlUhfJwUlifOiSShzZRaobbPEM3vQS0lRlXpKKXPPe
-         G2/Ete9rMTcpDzizjCVNwfY30b6Q50u+CveK0NP7d4krSoRJ73DxMUxPwRe5YWAmnQGS
-         KDf+Mmujkpun+WFxObqpuxu5SUnntgkAt7ujkMeU1vRGvEQVXgbKlNBvll8ySQIAQLJD
-         XW5gm5BWhdzkY2OX2xPf6NVxF1NtSedTys4UvsbrWOgajHl0HF4e3AKFLP4o96fPWndr
-         s3sAwBjZZzqH463DRbOatAl/n0mhGEatiBgGxqaQxboqRttsYKUeP6frbHCMmYePvl1d
-         rywA==
-X-Gm-Message-State: AOAM531zSy2ZoPO2ZIS78xcZFinF9fEO8ZLjx3J5NaN2BEcETli3f9L0
-        qON6DrK0scATYTn+AaHNJJiOaIcLAicm7LnxXi8MqUZsXUNCFWHSvJuuMz4V646Qbz6zSq7AgKI
-        rtOjK7LgXMv/0
-X-Received: by 2002:a7b:c193:: with SMTP id y19mr8936344wmi.158.1589630125826;
-        Sat, 16 May 2020 04:55:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyx0u3Wf3M+dvD4mI+q/+PzHBMijrTsiO0tpb+a082mvbkOA8Q+PkdCA/N1eOKSzvq67xudIw==
-X-Received: by 2002:a7b:c193:: with SMTP id y19mr8936328wmi.158.1589630125560;
-        Sat, 16 May 2020 04:55:25 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.132.248])
-        by smtp.gmail.com with ESMTPSA id u65sm3097357wmg.8.2020.05.16.04.55.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 May 2020 04:55:24 -0700 (PDT)
-Subject: Re: [PATCH V5 15/15] MAINTAINERS: Update KVM/MIPS maintainers
-To:     Huacai Chen <chenhc@lemote.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>
-References: <1589359366-1669-1-git-send-email-chenhc@lemote.com>
- <1589359366-1669-16-git-send-email-chenhc@lemote.com>
- <AC9338A0-F449-4DCA-A294-248C86D57877@flygoat.com>
- <CAAhV-H7OTeMy2Yp2PunD+2KVzzPDT+-xGGgbpRNzhb8C-p8-7g@mail.gmail.com>
- <20200515211353.GB22922@alpha.franken.de>
- <CAAhV-H58G7+se6VTBMo2R4joDXngF-c_W=fh8=zD8rVnono=gg@mail.gmail.com>
+         to:to:cc:cc; bh=8mmEst/G2NAr0kipPJrp+ihzAeJTb8tA3U7VWWeYgP4=;
+        b=Y6cEPyGbuao4T5tPmyiQU//Naac6HK79TMFp1jgKjqY5jxXFtHyEB64j2g1v42UpsQ34Wk
+        XBs3WKeiDtEc1H/p+RkHopSCKheGYM5F1BmQOf/9j0qreG5YVWh+N1pMJe47G9wNuvXPRl
+        uYUbfRW5qumSm2F3ayomQX0LHNV2XvY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-5Sf6BMQYMyelcSRVZ_uPWg-1; Sat, 16 May 2020 08:24:15 -0400
+X-MC-Unique: 5Sf6BMQYMyelcSRVZ_uPWg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BE5F1005510;
+        Sat, 16 May 2020 12:24:14 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F02032657D;
+        Sat, 16 May 2020 12:24:13 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1a22adb0-0b7a-24a3-e762-7b9919a70a8e@redhat.com>
-Date:   Sat, 16 May 2020 13:55:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <CAAhV-H58G7+se6VTBMo2R4joDXngF-c_W=fh8=zD8rVnono=gg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM changes for Linux 5.7-rc6
+Date:   Sat, 16 May 2020 08:24:13 -0400
+Message-Id: <20200516122413.693424-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/05/20 11:36, Huacai Chen wrote:
->> I'm happy to see you taking care of the KVM part. So how is your plan
->> to handle patches ? Do want to collect them and send pull requests to
->> me ? Or should I just pick them up with your Acked-by ?
-> I think we can only use the second method, because both Aleksandar and
-> me don't have a kernel tree in kernel.org now.
+Linus,
 
-If you don't mind, I generally prefer to have MIPS changs submitted
-through the KVM tree, because KVM patches rarely have intrusive changes
-in generic arch files.  It's more common to have generic KVM patches
-that require touching all architectures.
+The following changes since commit 2673cb6849722a4ffd74c27a9200a9ec43f64be3:
 
-For 5.8 I don't have anything planned that could cause conflicts, so
-this time it doesn't matter; but I can pick these up too if Thomas acks
-patches 6, 12 and 14.
+  Merge tag 'kvm-s390-master-5.7-3' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2020-05-06 08:09:17 -0400)
 
-Thanks,
+are available in the Git repository at:
 
-Paolo
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to c4e0e4ab4cf3ec2b3f0b628ead108d677644ebd9:
+
+  KVM: x86: Fix off-by-one error in kvm_vcpu_ioctl_x86_setup_mce (2020-05-15 13:48:56 -0400)
+
+----------------------------------------------------------------
+A new testcase for guest debugging (gdbstub) that exposed a bunch of
+bugs, mostly for AMD processors.  And a few other x86 fixes.
+
+----------------------------------------------------------------
+Babu Moger (1):
+      KVM: x86: Fix pkru save/restore when guest CR4.PKE=0, move it to x86.c
+
+Jim Mattson (1):
+      KVM: x86: Fix off-by-one error in kvm_vcpu_ioctl_x86_setup_mce
+
+Paolo Bonzini (6):
+      KVM: x86: fix DR6 delivery for various cases of #DB injection
+      KVM: nSVM: trap #DB and #BP to userspace if guest debugging is on
+      KVM: SVM: keep DR6 synchronized with vcpu->arch.dr6
+      KVM: x86, SVM: isolate vcpu->arch.dr6 from vmcb->save.dr6
+      KVM: VMX: pass correct DR6 for GD userspace exit
+      Merge branch 'kvm-amd-fixes' into HEAD
+
+Peter Xu (4):
+      KVM: X86: Declare KVM_CAP_SET_GUEST_DEBUG properly
+      KVM: X86: Set RTM for DB_VECTOR too for KVM_EXIT_DEBUG
+      KVM: X86: Fix single-step with KVM_SET_GUEST_DEBUG
+      KVM: selftests: Add KVM_SET_GUEST_DEBUG test
+
+Suravee Suthikulpanit (2):
+      KVM: Introduce kvm_make_all_cpus_request_except()
+      KVM: SVM: Disable AVIC before setting V_IRQ
+
+ arch/x86/include/asm/kvm_host.h                 |   4 +-
+ arch/x86/kvm/hyperv.c                           |   2 +-
+ arch/x86/kvm/svm/nested.c                       |  39 ++++-
+ arch/x86/kvm/svm/svm.c                          |  36 +++--
+ arch/x86/kvm/vmx/vmx.c                          |  41 +----
+ arch/x86/kvm/x86.c                              |  60 ++++---
+ include/linux/kvm_host.h                        |   3 +
+ tools/testing/selftests/kvm/Makefile            |   1 +
+ tools/testing/selftests/kvm/include/kvm_util.h  |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c      |   9 ++
+ tools/testing/selftests/kvm/x86_64/debug_regs.c | 202 ++++++++++++++++++++++++
+ virt/kvm/kvm_main.c                             |  14 +-
+ 12 files changed, 325 insertions(+), 88 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/debug_regs.c
 
