@@ -2,104 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 843581D5D60
-	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 02:48:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55D791D5F7F
+	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 09:57:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbgEPAsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 May 2020 20:48:25 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:38718 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726198AbgEPAsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 May 2020 20:48:25 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04G0bSnt159034;
-        Sat, 16 May 2020 00:48:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=HQwkaHXkXuZp0dlAvHdJkA0L8L3gGGQPv/vPCWSF5IU=;
- b=q7LxNEXW466wJuIvxCWLu2ceRw2FVBPZ2SZCfDTJZ/aYRvyHErrIsWcOoj9XhWcv3jkZ
- f4946/DE0VMLo8u5u1qlHy8Ch/xFrykUIp9/kjnJh2hkJfhilNLc4ng5PIgvInLSTF6y
- LTbfpEOOKZcfBUXVoz87sYttMxZeCih3ax8YraNgBbnbnu+2zwWFZT8RYDwWvFSkJCKz
- 9pZ+unBYuLcfAOxO+b+qkuI5yXnCbuCz/WslR+VjHx+apkWq3l1fPu7A79O8dSQiMMFZ
- Yg84OviCnULekRoPdb2rKho8DbfZnbkw366W/cu73T8tlZ42OjYn/KES0LSpmBq0HkID KA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 3100ygefpc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 16 May 2020 00:48:23 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04G0cG06156506;
-        Sat, 16 May 2020 00:48:22 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 31259qhdfx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 16 May 2020 00:48:22 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04G0mMR0002277;
-        Sat, 16 May 2020 00:48:22 GMT
-Received: from [10.154.119.223] (/10.154.119.223)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 15 May 2020 17:48:21 -0700
-Subject: Re: question: KVM_MR_CREATE and kvm_mmu_slot_apply_flags()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org
-References: <7796d7df-9c6b-7f34-6cf4-38607fcfd79b@oracle.com>
- <20200515234151.GN17572@linux.intel.com>
-From:   Anthony <anthony.yznaga@oracle.com>
-Message-ID: <4fd77a0d-e379-6aba-132a-0982020ac45b@oracle.com>
-Date:   Fri, 15 May 2020 17:48:20 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1726373AbgEPH5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 May 2020 03:57:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58706 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725934AbgEPH5W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 16 May 2020 03:57:22 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D04C061A0C;
+        Sat, 16 May 2020 00:57:21 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f1da500d98797498fd40989.dip0.t-ipconnect.de [IPv6:2003:ec:2f1d:a500:d987:9749:8fd4:989])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F0E061EC01AD;
+        Sat, 16 May 2020 09:57:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1589615838;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=24RneTj9R2ZSlUZur+Pk+5FsiNHOtsrzJY4lZuujwmM=;
+        b=PQd0i30ZxgXtw2HalvJJRnuottkKhoaIb3Vuk2WK3BZsDTMllJ9mG4IQbzL1Q8kU6XZvlY
+        O2BEqIiYhdkHHc/MZbbJDmGlNILUc7qYb7kwxsWgNq4q2Efl6ZTZNOWHoU36Lj/FyyL518
+        S9GBafEc+mNCN9NmKVzDlxjtWBYr8Wc=
+Date:   Sat, 16 May 2020 09:57:14 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
+ exceptions
+Message-ID: <20200516075714.GC25771@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-26-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <20200515234151.GN17572@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9622 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0
- adultscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005160003
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9622 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 adultscore=0
- cotscore=-2147483648 mlxscore=0 suspectscore=0 spamscore=0 impostorscore=0
- mlxlogscore=999 malwarescore=0 clxscore=1011 phishscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005160003
+Content-Disposition: inline
+In-Reply-To: <20200428151725.31091-26-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/15/20 4:41 PM, Sean Christopherson wrote:
-> On Fri, May 15, 2020 at 02:28:54PM -0700, Anthony Yznaga wrote:
->> Hi,
->>
->> I'm investigating optimizing qemu start time for large memory guests,
->> and I'm trying to understand why kvm_mmu_slot_apply_flags() is called by
->> kvm_arch_commit_memory_region() for KVM_MR_CREATE.  The comments in
->> kvm_mmu_slot_apply_flags() imply it should be, but what I've observed is
->> that the new slot will have no mappings resulting in slot_handle_level_range()
->> walking the rmaps and doing nothing.  This can take a noticeable amount of
->> time for very large ranges.  It doesn't look like there would ever be any
->> mappings in a newly created slot.  Am I missing something?
-> 
-> I don't think so.  I've stared at that call more than once trying to figure
-> out why it's there.  AFAICT, the original code was completely unoptimized,
-> then the DELETE check got added as the obvious "this is pointless" case.
-> Note, KVM_MR_MOVE is in the same boat as CREATE; it's basically DELETE+CREATE.
-> 
-> There can theoretically be rmaps for the new/moved memslot, but they should
-> already be up-to-date since they're consuming the new memslot's properties.
-> 
-> I've always been too scared to remove it and didn't have a strong argument
-> for doing so :-)
-> 
+Just a reminder so that this doesn't get lost:
 
+On Tue, Apr 28, 2020 at 05:16:35PM +0200, Joerg Roedel wrote:
+> +	if (exit_info_1 & IOIO_TYPE_STR) {
+> +		int df = (regs->flags & X86_EFLAGS_DF) ? -1 : 1;
 
-Thanks, Sean.  This is my first foray into kvm code so I'm still getting
-familiar with the code.  I haven't studied the KVM_MR_MOVE case yet, but it
-sounds like kvm_mmu_slot_apply_flags() may only do useful work for the
-KVM_MR_FLAGS_ONLY case.
+...
 
-Anthony
+> +
+> +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
+> +			ret = vc_insn_string_read(ctxt,
+> +					       (void *)(es_base + regs->si),
+> +					       ghcb->shared_buffer, io_bytes,
+> +					       exit_info_2, df);
+							   ^^^^
+
+> +
+> +		/* Everything went well, write back results */
+> +		if (exit_info_1 & IOIO_TYPE_IN) {
+> +			ret = vc_insn_string_write(ctxt,
+> +						(void *)(es_base + regs->di),
+> +						ghcb->shared_buffer, io_bytes,
+> +						exit_info_2, df);
+							    ^^^^
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
