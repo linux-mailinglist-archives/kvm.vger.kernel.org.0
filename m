@@ -2,59 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E44C1D6255
+	by mail.lfdr.de (Postfix) with ESMTP id D12B51D6257
 	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 17:38:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727944AbgEPPia (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 May 2020 11:38:30 -0400
-Received: from elvis.franken.de ([193.175.24.41]:55492 "EHLO elvis.franken.de"
+        id S1727964AbgEPPib (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 May 2020 11:38:31 -0400
+Received: from elvis.franken.de ([193.175.24.41]:55491 "EHLO elvis.franken.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727098AbgEPPia (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726984AbgEPPia (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 16 May 2020 11:38:30 -0400
 Received: from uucp (helo=alpha)
         by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
-        id 1jZytP-0004GR-02; Sat, 16 May 2020 17:38:27 +0200
+        id 1jZytP-0004GR-03; Sat, 16 May 2020 17:38:27 +0200
 Received: by alpha.franken.de (Postfix, from userid 1000)
-        id BA823C04D3; Sat, 16 May 2020 17:37:26 +0200 (CEST)
-Date:   Sat, 16 May 2020 17:37:26 +0200
+        id 15B63C04D3; Sat, 16 May 2020 17:38:04 +0200 (CEST)
+Date:   Sat, 16 May 2020 17:38:04 +0200
 From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To:     Huacai Chen <chenhc@lemote.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Huacai Chen <chenhc@lemote.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: Re: [PATCH V5 06/15] KVM: MIPS: Introduce and use cpu_guest_has_ldpte
-Message-ID: <20200516153726.GC3334@alpha.franken.de>
+        kvm <kvm@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Fuxin Zhang <zhangfx@lemote.com>
+Subject: Re: [PATCH V5 15/15] MAINTAINERS: Update KVM/MIPS maintainers
+Message-ID: <20200516153804.GD3334@alpha.franken.de>
 References: <1589359366-1669-1-git-send-email-chenhc@lemote.com>
- <1589359366-1669-7-git-send-email-chenhc@lemote.com>
+ <1589359366-1669-16-git-send-email-chenhc@lemote.com>
+ <AC9338A0-F449-4DCA-A294-248C86D57877@flygoat.com>
+ <CAAhV-H7OTeMy2Yp2PunD+2KVzzPDT+-xGGgbpRNzhb8C-p8-7g@mail.gmail.com>
+ <20200515211353.GB22922@alpha.franken.de>
+ <CAAhV-H58G7+se6VTBMo2R4joDXngF-c_W=fh8=zD8rVnono=gg@mail.gmail.com>
+ <1a22adb0-0b7a-24a3-e762-7b9919a70a8e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1589359366-1669-7-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1a22adb0-0b7a-24a3-e762-7b9919a70a8e@redhat.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 13, 2020 at 04:42:37PM +0800, Huacai Chen wrote:
-> Loongson-3 has lddir/ldpte instructions and their related CP0 registers
-> are the same as HTW. So we introduce a cpu_guest_has_ldpte flag and use
-> it to indicate whether we need to save/restore HTW related CP0 registers
-> (PWBase, PWSize, PWField and PWCtl).
+On Sat, May 16, 2020 at 01:55:23PM +0200, Paolo Bonzini wrote:
+> On 16/05/20 11:36, Huacai Chen wrote:
+> >> I'm happy to see you taking care of the KVM part. So how is your plan
+> >> to handle patches ? Do want to collect them and send pull requests to
+> >> me ? Or should I just pick them up with your Acked-by ?
+> > I think we can only use the second method, because both Aleksandar and
+> > me don't have a kernel tree in kernel.org now.
 > 
-> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> ---
->  arch/mips/include/asm/cpu-features.h |  3 +++
->  arch/mips/kernel/cpu-probe.c         |  1 +
->  arch/mips/kvm/vz.c                   | 26 +++++++++++++-------------
->  3 files changed, 17 insertions(+), 13 deletions(-)
+> If you don't mind, I generally prefer to have MIPS changs submitted
+> through the KVM tree, because KVM patches rarely have intrusive changes
+> in generic arch files.  It's more common to have generic KVM patches
+> that require touching all architectures.
 
-Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+works for me.
+
+> For 5.8 I don't have anything planned that could cause conflicts, so
+> this time it doesn't matter; but I can pick these up too if Thomas acks
+> patches 6, 12 and 14.
+
+I've acked all three pacthes
 
 Thomas.
 
