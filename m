@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D47A1D6172
-	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 15:54:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51BB51D6174
+	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 15:54:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbgEPNxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 May 2020 09:53:23 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52040 "EHLO
+        id S1726888AbgEPNxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 May 2020 09:53:24 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47176 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726715AbgEPNxW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 16 May 2020 09:53:22 -0400
+        by vger.kernel.org with ESMTP id S1726786AbgEPNxX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 16 May 2020 09:53:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589637201;
+        s=mimecast20190719; t=1589637202;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=PcB0rlTVKf82QCXQYfq37/1aCuUnjuKh5Ln3iuABjVM=;
-        b=Gyxbc8x/TCJglSaITphwhTGZia25V0E8rv239QxfDv/+eRLft9KcJjSxHeiAyKxOPtyXMI
-        DkoBJfIS35OjMjv85JP8xB4uwq3k6A1+DBg4Ub7m5ivLMPL5ksxmhl4tVvWTEKR/ly/r1w
-        tWRYFBgtUNpLvTM5Qbw0UQjdID05iJ4=
+        bh=epuIMlu/asRkDz/mw+U2Mz/nCSbM54XOWxXioecXjyE=;
+        b=GSkn/XeVCCs5YZrmZ7AEMR8FTKRUgY/ri9lq9CTqgmLoqSj8cWHdiZ34xygX3OkK1g1ESp
+        DHKZvRxR5YmMsErnsEbAOY0kRIAt7JaMRe+xDA0nVgPWhpGABCy7l2K4qGvxwI+KS9zWXy
+        f17CpSQcLUxPpLLoGqG1vkofnJZeefg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-na5FWGkNMYe39A-NEuAWGw-1; Sat, 16 May 2020 09:53:18 -0400
-X-MC-Unique: na5FWGkNMYe39A-NEuAWGw-1
+ us-mta-324-xj9ondSyMXSoRRfpylr1Hg-1; Sat, 16 May 2020 09:53:18 -0400
+X-MC-Unique: xj9ondSyMXSoRRfpylr1Hg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25787100A68D;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BADA8107ACCA;
         Sat, 16 May 2020 13:53:17 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AB4AE5D9D3;
-        Sat, 16 May 2020 13:53:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C8BB5D9D3;
+        Sat, 16 May 2020 13:53:17 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     peterx@redhat.com
-Subject: [PATCH 3/4] KVM: nSVM: remove exit_required
-Date:   Sat, 16 May 2020 09:53:10 -0400
-Message-Id: <20200516135311.704878-4-pbonzini@redhat.com>
+Subject: [PATCH 4/4] KVM: nSVM: correctly inject INIT vmexits
+Date:   Sat, 16 May 2020 09:53:11 -0400
+Message-Id: <20200516135311.704878-5-pbonzini@redhat.com>
 In-Reply-To: <20200516135311.704878-1-pbonzini@redhat.com>
 References: <20200516135311.704878-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
@@ -45,77 +45,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All events now inject vmexits before vmentry rather than after vmexit.  Therefore,
-exit_required is not set anymore and we can remove it.
+The usual drill at this point, except there is no code to remove because this
+case was not handled at all.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c |  3 +--
- arch/x86/kvm/svm/svm.c    | 14 --------------
- arch/x86/kvm/svm/svm.h    |  3 ---
- 3 files changed, 1 insertion(+), 19 deletions(-)
+ arch/x86/kvm/svm/nested.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 35ce3bef0a9a..c1d8a0be752b 100644
+index c1d8a0be752b..8a1e007b745d 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -794,8 +794,7 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+@@ -25,6 +25,7 @@
+ #include "trace.h"
+ #include "mmu.h"
+ #include "x86.h"
++#include "lapic.h"
+ #include "svm.h"
+ 
+ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
+@@ -790,11 +791,37 @@ static void nested_svm_intr(struct vcpu_svm *svm)
+ 	nested_svm_vmexit(svm);
+ }
+ 
++static inline bool nested_exit_on_init(struct vcpu_svm *svm)
++{
++	return (svm->nested.intercept & (1ULL << INTERCEPT_INIT));
++}
++
++static void nested_svm_init(struct vcpu_svm *svm)
++{
++	svm->vmcb->control.exit_code   = SVM_EXIT_INIT;
++	svm->vmcb->control.exit_info_1 = 0;
++	svm->vmcb->control.exit_info_2 = 0;
++
++	nested_svm_vmexit(svm);
++}
++
++
+ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
  {
  	struct vcpu_svm *svm = to_svm(vcpu);
  	bool block_nested_events =
--		kvm_event_needs_reinjection(vcpu) || svm->nested.exit_required ||
--		svm->nested.nested_run_pending;
-+		kvm_event_needs_reinjection(vcpu) || svm->nested.nested_run_pending;
+ 		kvm_event_needs_reinjection(vcpu) || svm->nested.nested_run_pending;
++	struct kvm_lapic *apic = vcpu->arch.apic;
++
++	if (lapic_in_kernel(vcpu) &&
++	    test_bit(KVM_APIC_INIT, &apic->pending_events)) {
++		if (block_nested_events)
++			return -EBUSY;
++		if (!nested_exit_on_init(svm))
++			return 0;
++		nested_svm_init(svm);
++		return 0;
++	}
  
  	if (vcpu->arch.exception.pending) {
  		if (block_nested_events)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 851484abafe6..63dd4cbaeafa 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2889,13 +2889,6 @@ static int handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	if (npt_enabled)
- 		vcpu->arch.cr3 = svm->vmcb->save.cr3;
- 
--	if (unlikely(svm->nested.exit_required)) {
--		nested_svm_vmexit(svm);
--		svm->nested.exit_required = false;
--
--		return 1;
--	}
--
- 	if (is_guest_mode(vcpu)) {
- 		int vmexit;
- 
-@@ -3327,13 +3320,6 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- 	svm->vmcb->save.rsp = vcpu->arch.regs[VCPU_REGS_RSP];
- 	svm->vmcb->save.rip = vcpu->arch.regs[VCPU_REGS_RIP];
- 
--	/*
--	 * A vmexit emulation is required before the vcpu can be executed
--	 * again.
--	 */
--	if (unlikely(svm->nested.exit_required))
--		return EXIT_FASTPATH_NONE;
--
- 	if (unlikely(svm->nested.nested_run_pending)) {
- 		/* After this vmentry, these fields will be used up.  */
- 		svm->nested.event_inj     = 0;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 1fb23a2cdf8b..0b2465a520a0 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -91,9 +91,6 @@ struct nested_state {
- 	/* These are the merged vectors */
- 	u32 *msrpm;
- 
--	/* A VMEXIT is required but not yet emulated */
--	bool exit_required;
--
- 	/* A VMRUN has started but has not yet been performed, so
- 	 * we cannot inject a nested vmexit yet.  */
- 	bool nested_run_pending;
 -- 
 2.18.2
-
 
