@@ -2,93 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55D791D5F7F
-	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 09:57:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6F7F1D5F9D
+	for <lists+kvm@lfdr.de>; Sat, 16 May 2020 10:23:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726373AbgEPH5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 May 2020 03:57:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725934AbgEPH5W (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 16 May 2020 03:57:22 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D04C061A0C;
-        Sat, 16 May 2020 00:57:21 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f1da500d98797498fd40989.dip0.t-ipconnect.de [IPv6:2003:ec:2f1d:a500:d987:9749:8fd4:989])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F0E061EC01AD;
-        Sat, 16 May 2020 09:57:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1589615838;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=24RneTj9R2ZSlUZur+Pk+5FsiNHOtsrzJY4lZuujwmM=;
-        b=PQd0i30ZxgXtw2HalvJJRnuottkKhoaIb3Vuk2WK3BZsDTMllJ9mG4IQbzL1Q8kU6XZvlY
-        O2BEqIiYhdkHHc/MZbbJDmGlNILUc7qYb7kwxsWgNq4q2Efl6ZTZNOWHoU36Lj/FyyL518
-        S9GBafEc+mNCN9NmKVzDlxjtWBYr8Wc=
-Date:   Sat, 16 May 2020 09:57:14 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
- exceptions
-Message-ID: <20200516075714.GC25771@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-26-joro@8bytes.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-26-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726399AbgEPIWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 May 2020 04:22:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34386 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbgEPIWj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 May 2020 04:22:39 -0400
+Received: from mail-pj1-x1044.google.com (mail-pj1-x1044.google.com [IPv6:2607:f8b0:4864:20::1044])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F44C061A0C;
+        Sat, 16 May 2020 01:22:39 -0700 (PDT)
+Received: by mail-pj1-x1044.google.com with SMTP id fu13so2110384pjb.5;
+        Sat, 16 May 2020 01:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=n8zeuSyWYmnUTCcGG4KcbVscwA04lg+t/YXhdGOdoRk=;
+        b=kSHTwd5eDGUl/K2MsusgZkFTMR3AophuUBe1kXDJlVfE5ua9O9OGjGOTYBUA3y5LCn
+         8hfYpuOH9CiRvEIBKKz0DdncM80p7x2LCzSJsHtx9GOPiVNuYor8fBKkYpooLG+K18tI
+         8c2l3vKaAQh3GcMZwwMvWipE1/aFXrVcw2aOz/ihBV690LmRmrcCqn4JXXF9u7tpAnRQ
+         ymfsLBjAXaAY2/IYj7vPtMnKY5CNAK5wHgJ846IwYx/qZmLwhq4NKXE0mqvPU0LgGQxw
+         YgOazcAPN8DRZkJWwS5Ds8FcdLH04a4/lCqZhFVRLctKTXmMN+hM+6Jb5xlsWjDkNWYd
+         sudg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=n8zeuSyWYmnUTCcGG4KcbVscwA04lg+t/YXhdGOdoRk=;
+        b=ZB79viSLq4sH6E9R2OfAZX+sXv20vMHAhBRN1KEcHy0lqX61n3eaDaT2e8PlP586ic
+         /RQV/Y/P6UShlsgQlFN+Ia2LH05DCTt7pvhorEZEDY+dVljlq0OIni6DLi98G3l6wSFq
+         T70fLxlpnXt9R3EKU3jW0UwZ4X2gqGsMEHbcoZdFOiG9oHOab43Qc+AzlEmNzJhvbyZW
+         GtxEqU1HTEFfDPTA8AXwDK7h1wQe74FtLoJ03UwQDpFwtmeiAOihfXY26VrsX+osLhYB
+         /GgrCy2m3lWMBfdmsEr8A8+SBRGYixP2f4MhfhWqq9Daa05C1CRUezVfS9W3FY6WcbD8
+         itug==
+X-Gm-Message-State: AOAM531pT426NTHMwnz7c8aDkkVlqKw35TmUUt/HwKVZtK2KLtzLy2j3
+        7612Q/Qxo2YMMJ0h+8Vujg==
+X-Google-Smtp-Source: ABdhPJy0lauqLn17lbGE3w8KJHGHD9NuhDV2LLqXRRaRQTMDJP5PCGFyuaHLhQCh2EmHugUqCHILZg==
+X-Received: by 2002:a17:90b:1492:: with SMTP id js18mr1459691pjb.212.1589617359233;
+        Sat, 16 May 2020 01:22:39 -0700 (PDT)
+Received: from localhost.localdomain ([2402:3a80:13a5:a61b:b5d4:b438:1bc1:57f3])
+        by smtp.gmail.com with ESMTPSA id j7sm3695288pfi.160.2020.05.16.01.22.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 May 2020 01:22:38 -0700 (PDT)
+From:   madhuparnabhowmik10@gmail.com
+To:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        tglx@linutronix.de, bp@alien8.de
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joel@joelfernandes.org, paulmck@kernel.org, frextrite@gmail.com,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+Subject: [PATCH v2] kvm: Fix false positive RCU usage warning
+Date:   Sat, 16 May 2020 13:52:27 +0530
+Message-Id: <20200516082227.22194-1-madhuparnabhowmik10@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just a reminder so that this doesn't get lost:
+From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 
-On Tue, Apr 28, 2020 at 05:16:35PM +0200, Joerg Roedel wrote:
-> +	if (exit_info_1 & IOIO_TYPE_STR) {
-> +		int df = (regs->flags & X86_EFLAGS_DF) ? -1 : 1;
+Fix the following false positive warnings:
 
-...
+[ 9403.765413][T61744] =============================
+[ 9403.786541][T61744] WARNING: suspicious RCU usage
+[ 9403.807865][T61744] 5.7.0-rc1-next-20200417 #4 Tainted: G             L
+[ 9403.838945][T61744] -----------------------------
+[ 9403.860099][T61744] arch/x86/kvm/mmu/page_track.c:257 RCU-list traversed in non-reader section!!
 
-> +
-> +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-> +			ret = vc_insn_string_read(ctxt,
-> +					       (void *)(es_base + regs->si),
-> +					       ghcb->shared_buffer, io_bytes,
-> +					       exit_info_2, df);
-							   ^^^^
+and
 
-> +
-> +		/* Everything went well, write back results */
-> +		if (exit_info_1 & IOIO_TYPE_IN) {
-> +			ret = vc_insn_string_write(ctxt,
-> +						(void *)(es_base + regs->di),
-> +						ghcb->shared_buffer, io_bytes,
-> +						exit_info_2, df);
-							    ^^^^
+[ 9405.859252][T61751] =============================
+[ 9405.859258][T61751] WARNING: suspicious RCU usage
+[ 9405.880867][T61755] -----------------------------
+[ 9405.911936][T61751] 5.7.0-rc1-next-20200417 #4 Tainted: G             L
+[ 9405.911942][T61751] -----------------------------
+[ 9405.911950][T61751] arch/x86/kvm/mmu/page_track.c:232 RCU-list traversed in non-reader section!!
 
+Since srcu read lock is held, these are false positive warnings.
+Therefore, pass condition srcu_read_lock_held() to
+list_for_each_entry_rcu().
+
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+---
+v2:
+-Rebase v5.7-rc5
+
+ arch/x86/kvm/mmu/page_track.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index ddc1ec3bdacd..1ad79c7aa05b 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -229,7 +229,8 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 		return;
+ 
+ 	idx = srcu_read_lock(&head->track_srcu);
+-	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
++	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
++				srcu_read_lock_held(&head->track_srcu))
+ 		if (n->track_write)
+ 			n->track_write(vcpu, gpa, new, bytes, n);
+ 	srcu_read_unlock(&head->track_srcu, idx);
+@@ -254,7 +255,8 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+ 		return;
+ 
+ 	idx = srcu_read_lock(&head->track_srcu);
+-	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
++	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
++				srcu_read_lock_held(&head->track_srcu))
+ 		if (n->track_flush_slot)
+ 			n->track_flush_slot(kvm, slot, n);
+ 	srcu_read_unlock(&head->track_srcu, idx);
 -- 
-Regards/Gruss,
-    Boris.
+2.17.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
