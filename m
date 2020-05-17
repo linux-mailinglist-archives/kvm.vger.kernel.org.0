@@ -2,184 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DEE71D674B
-	for <lists+kvm@lfdr.de>; Sun, 17 May 2020 12:11:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA8051D689B
+	for <lists+kvm@lfdr.de>; Sun, 17 May 2020 17:28:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727869AbgEQKL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 May 2020 06:11:27 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4803 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727832AbgEQKL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 May 2020 06:11:27 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 12990D04573930373B12;
-        Sun, 17 May 2020 18:11:24 +0800 (CST)
-Received: from DESKTOP-FPN2511.china.huawei.com (10.173.222.58) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Sun, 17 May 2020 18:11:17 +0800
-From:   Jingyi Wang <wangjingyi11@huawei.com>
-To:     <drjones@redhat.com>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <wangjingyi11@huawei.com>
-CC:     <maz@kernel.org>, <wanghaibin.wang@huawei.com>,
-        <yuzenghui@huawei.com>, <eric.auger@redhat.com>
-Subject: [kvm-unit-tests PATCH 6/6] arm64: microbench: Add vtimer latency test
-Date:   Sun, 17 May 2020 18:09:00 +0800
-Message-ID: <20200517100900.30792-7-wangjingyi11@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
-In-Reply-To: <20200517100900.30792-1-wangjingyi11@huawei.com>
-References: <20200517100900.30792-1-wangjingyi11@huawei.com>
+        id S1728046AbgEQP2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 May 2020 11:28:55 -0400
+Received: from foss.arm.com ([217.140.110.172]:55194 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727981AbgEQP2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 May 2020 11:28:55 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D00531B;
+        Sun, 17 May 2020 08:28:54 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.25])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF0E93F52E;
+        Sun, 17 May 2020 08:28:53 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+Subject: [PATCH kvmtool] net: uip: Fix GCC 10 warning about checksum calculation
+Date:   Sun, 17 May 2020 16:28:49 +0100
+Message-Id: <20200517152849.204717-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.222.58]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Triggers PPIs by setting up a 10msec timer and test the latency.
-For this test can be time consuming, we add time limit for loop_test
-to make sure each test should be done in a certain time(5 sec here).
+GCC 10.1 generates a warning in net/ip/csum.c about exceeding a buffer
+limit in a memcpy operation:
+------------------
+In function ‘memcpy’,
+    inlined from ‘uip_csum_udp’ at net/uip/csum.c:58:3:
+/usr/include/aarch64-linux-gnu/bits/string_fortified.h:34:10: error: writing 1 byte into a region of size 0 [-Werror=stringop-overflow=]
+   34 |   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from net/uip/csum.c:1:
+net/uip/csum.c: In function ‘uip_csum_udp’:
+include/kvm/uip.h:132:6: note: at offset 0 to object ‘sport’ with size 2 declared here
+  132 |  u16 sport;
+------------------
 
-Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+This warning originates from the code taking the address of the "sport"
+member, then using that with some pointer arithmetic in a memcpy call.
+GCC now sees that the object is only a u16, so copying 12 bytes into it
+cannot be any good.
+It's somewhat debatable whether this is a legitimate warning, as there
+is enough storage at that place, and we knowingly use the struct and
+its variabled-sized member at the end.
+
+However we can also rewrite the code, to not abuse the "&" operation of
+some *member*, but take the address of the struct itself.
+This makes the code less dodgy, and indeed appeases GCC 10.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/micro-bench.c | 81 ++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 70 insertions(+), 11 deletions(-)
+ net/uip/csum.c | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index 91af1f7..dbe8e54 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -23,6 +23,11 @@
- #include <asm/gic-v3-its.h>
+diff --git a/net/uip/csum.c b/net/uip/csum.c
+index 7ca8bada..607c9f1c 100644
+--- a/net/uip/csum.c
++++ b/net/uip/csum.c
+@@ -37,7 +37,7 @@ u16 uip_csum_udp(struct uip_udp *udp)
+ 	struct uip_pseudo_hdr hdr;
+ 	struct uip_ip *ip;
+ 	int udp_len;
+-	u8 *pad;
++	u8 *udp_hdr = (u8*)udp + offsetof(struct uip_udp, sport);
  
- #define NTIMES (1U << 16)
-+#define MAX_NS (5 * 1000 * 1000 * 1000UL)
-+
-+#define IRQ_VTIMER		27
-+#define ARCH_TIMER_CTL_ENABLE	(1 << 0)
-+#define ARCH_TIMER_CTL_IMASK	(1 << 1)
+ 	ip	  = &udp->ip;
  
- static u32 cntfrq;
+@@ -50,13 +50,12 @@ u16 uip_csum_udp(struct uip_udp *udp)
+ 	udp_len	  = uip_udp_len(udp);
  
-@@ -33,9 +38,16 @@ static bool ipi_hw;
- 
- static void gic_irq_handler(struct pt_regs *regs)
- {
-+	u32 irqstat = gic_read_iar();
- 	irq_ready = false;
- 	irq_received = true;
--	gic_write_eoir(gic_read_iar());
-+	gic_write_eoir(irqstat);
-+
-+	if (irqstat == IRQ_VTIMER) {
-+		write_sysreg((ARCH_TIMER_CTL_IMASK | ARCH_TIMER_CTL_ENABLE),
-+				cntv_ctl_el0);
-+		isb();
-+	}
- 	irq_ready = true;
- }
- 
-@@ -195,6 +207,47 @@ static void lpi_exec(void)
- 	assert_msg(irq_received, "failed to receive LPI in time, but received %d successfully\n", received);
- }
- 
-+static bool timer_prep(void)
-+{
-+	static void *gic_isenabler;
-+
-+	gic_enable_defaults();
-+	install_irq_handler(EL1H_IRQ, gic_irq_handler);
-+	local_irq_enable();
-+
-+	gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
-+	writel(1 << IRQ_VTIMER, gic_isenabler);
-+	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
-+	isb();
-+
-+	gic_prep_common();
-+	return true;
-+}
-+
-+static void timer_exec(void)
-+{
-+	u64 before_timer;
-+	u64 timer_10ms;
-+	unsigned tries = 1 << 28;
-+	static int received = 0;
-+
-+	irq_received = false;
-+
-+	before_timer = read_sysreg(cntvct_el0);
-+	timer_10ms = cntfrq / 100;
-+	write_sysreg(before_timer + timer_10ms, cntv_cval_el0);
-+	write_sysreg(ARCH_TIMER_CTL_ENABLE, cntv_ctl_el0);
-+	isb();
-+
-+	while (!irq_received && tries--)
-+		cpu_relax();
-+
-+	if (irq_received)
-+		++received;
-+
-+	assert_msg(irq_received, "failed to receive PPI in time, but received %d successfully\n", received);
-+}
-+
- static void hvc_exec(void)
- {
- 	asm volatile("mov w0, #0x4b000000; hvc #0" ::: "w0");
-@@ -241,6 +294,7 @@ static struct exit_test tests[] = {
- 	{"ipi",			ipi_prep,	ipi_exec,		true},
- 	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
- 	{"lpi",			lpi_prep,	lpi_exec,		true},
-+	{"timer_10ms",		timer_prep,	timer_exec,		true},
- };
- 
- struct ns_time {
-@@ -261,27 +315,32 @@ static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
- 
- static void loop_test(struct exit_test *test)
- {
--	uint64_t start, end, total_ticks, ntimes = NTIMES;
-+	uint64_t start, end, total_ticks, ntimes = 0;
- 	struct ns_time total_ns, avg_ns;
- 
-+	total_ticks = 0;
- 	if (test->prep) {
- 		if(!test->prep()) {
--
- 			printf("%s test skipped\n", test->name);
- 			return;
- 		}
+ 	if (udp_len % 2) {
+-		pad = (u8 *)&udp->sport + udp_len;
+-		*pad = 0;
+-		memcpy((u8 *)&udp->sport + udp_len + 1, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&udp->sport, udp_len + 1 + sizeof(hdr));
++		udp_hdr[udp_len] = 0;		/* zero padding */
++		memcpy(udp_hdr + udp_len + 1, &hdr, sizeof(hdr));
++		return uip_csum(0, udp_hdr, udp_len + 1 + sizeof(hdr));
+ 	} else {
+-		memcpy((u8 *)&udp->sport + udp_len, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&udp->sport, udp_len + sizeof(hdr));
++		memcpy(udp_hdr + udp_len, &hdr, sizeof(hdr));
++		return uip_csum(0, udp_hdr, udp_len + sizeof(hdr));
  	}
--	isb();
--	start = read_sysreg(cntpct_el0);
--	while (ntimes--)
-+
-+	while (ntimes < NTIMES && total_ns.ns < MAX_NS) {
-+		isb();
-+		start = read_sysreg(cntpct_el0);
- 		test->exec();
--	isb();
--	end = read_sysreg(cntpct_el0);
-+		isb();
-+		end = read_sysreg(cntpct_el0);
-+
-+		ntimes++;
-+		total_ticks += (end - start);
-+		ticks_to_ns_time(total_ticks, &total_ns);
-+	}
  
--	total_ticks = end - start;
- 	ticks_to_ns_time(total_ticks, &total_ns);
--	avg_ns.ns = total_ns.ns / NTIMES;
--	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
-+	avg_ns.ns = total_ns.ns / ntimes;
-+	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
+ }
+@@ -66,7 +65,7 @@ u16 uip_csum_tcp(struct uip_tcp *tcp)
+ 	struct uip_pseudo_hdr hdr;
+ 	struct uip_ip *ip;
+ 	u16 tcp_len;
+-	u8 *pad;
++	u8 *tcp_hdr = (u8*)tcp + offsetof(struct uip_tcp, sport);
  
- 	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
- 		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
+ 	ip	  = &tcp->ip;
+ 	tcp_len   = ntohs(ip->len) - uip_ip_hdrlen(ip);
+@@ -81,12 +80,11 @@ u16 uip_csum_tcp(struct uip_tcp *tcp)
+ 		pr_warning("tcp_len(%d) is too large", tcp_len);
+ 
+ 	if (tcp_len % 2) {
+-		pad = (u8 *)&tcp->sport + tcp_len;
+-		*pad = 0;
+-		memcpy((u8 *)&tcp->sport + tcp_len + 1, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&tcp->sport, tcp_len + 1 + sizeof(hdr));
++		tcp_hdr[tcp_len] = 0;		/* zero padding */
++		memcpy(tcp_hdr + tcp_len + 1, &hdr, sizeof(hdr));
++		return uip_csum(0, tcp_hdr, tcp_len + 1 + sizeof(hdr));
+ 	} else {
+-		memcpy((u8 *)&tcp->sport + tcp_len, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&tcp->sport, tcp_len + sizeof(hdr));
++		memcpy(tcp_hdr + tcp_len, &hdr, sizeof(hdr));
++		return uip_csum(0, tcp_hdr, tcp_len + sizeof(hdr));
+ 	}
+ }
 -- 
-2.19.1
-
+2.17.1
 
