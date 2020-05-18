@@ -2,72 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDE351D7542
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 12:33:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 964271D7571
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 12:45:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbgERKdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 06:33:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33992 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726270AbgERKdG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 06:33:06 -0400
+        id S1726522AbgERKpe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 06:45:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25164 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726274AbgERKpd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 06:45:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589797984;
+        s=mimecast20190719; t=1589798732;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fkZd+ATLBaLYev6yToKjV1ATICAP4OZcw+kqfR8rbuw=;
-        b=K6W8Z7f28YGkHY36qZ2Pa/64PH+Bsg6dUmSPk0YExsAlBQZ1yOhu3Oqe8NNgvMRntZxILi
-        NqX9CYQixFr7bDSgsfdBD5hdKkvzHfiMJ/2tkVR7lJf5Iype8Tie5AEzS376o3WinTsR6M
-        QvO3oW84ULmc4j8G7LmwEF3Q2thanPU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-LxUplNLINjaFU9my4-L1VQ-1; Mon, 18 May 2020 06:33:03 -0400
-X-MC-Unique: LxUplNLINjaFU9my4-L1VQ-1
-Received: by mail-wr1-f69.google.com with SMTP id l12so5476249wrw.9
-        for <kvm@vger.kernel.org>; Mon, 18 May 2020 03:33:03 -0700 (PDT)
+        bh=9AVgpVMcraOwUFv1UEKjf5OKjBzgFxVL20xBl8eYBW0=;
+        b=NbmwU+TIyoyURIAZBWG9Nsqo+hK9+5m6TSnQ2MqHyw9d9Fa7ZW3Hzttaf+3JBaK20s9/yY
+        /DjWQ004xlMl29cEVU/XkA1iwsbptS9PVt5Uf3lePpVZfOGhgLhojYXEVbtC7XofdS0wLC
+        q8mIISdeZAAXI/JyERPEy/3xyKjfQ08=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-tTHuHphcPJimDhI8OKJF3A-1; Mon, 18 May 2020 06:45:30 -0400
+X-MC-Unique: tTHuHphcPJimDhI8OKJF3A-1
+Received: by mail-wm1-f72.google.com with SMTP id p24so3977989wmc.5
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 03:45:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=fkZd+ATLBaLYev6yToKjV1ATICAP4OZcw+kqfR8rbuw=;
-        b=KB+NoOdGbghjVD1I5sCAnzmUjq3XQh1V5m2xFZtL48boZ0YX7hp36x4eQx0nuwloWf
-         vV2CTChb3mlv0Uos3mAp6rNxuSswz4ollWX5VENm86KbdH8A/sHocQz6VgDyB543XT05
-         NpD3N3QpzeYWIFu4q2+ToKkjKR9w1IPbZL+96LRnI0W8X6EMDR5rw50SpzWFvci4fL5V
-         QXdVNgIIhAZbq71+0QpaYTXCTk1YETYGaYj9InZkE6oYuiNHBS+pGa3xhb5cWOhG1rmo
-         F9sb5F0xSrsvAQGekIWUXFrVh3RHZ5Knc+o+AKToU1Vf4ZMSJJHWPkrT3cn0rwhYVxqm
-         7jRw==
-X-Gm-Message-State: AOAM5334YZ19SX8LWwhnlikF1XwRv+t4U9kCpzOs7wv/SPWJsPB6PTga
-        0Ahj1x8aSfxoPpQkTSj6bMRNH5F98Y7a9IMb/29J1wqfYrt1k9jjTJ9/g8MptJ5uCQFN+QHKbY1
-        ldhMMB3gluuHQ
-X-Received: by 2002:adf:e4c2:: with SMTP id v2mr18711369wrm.72.1589797981964;
-        Mon, 18 May 2020 03:33:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzxaKQWu7YzReGiltWAyRl2hw4+e2C71C62VqLQpl2ItwOW1BspXytcsAQK4cMdA6ayUoHJxw==
-X-Received: by 2002:adf:e4c2:: with SMTP id v2mr18711347wrm.72.1589797981753;
-        Mon, 18 May 2020 03:33:01 -0700 (PDT)
+        bh=9AVgpVMcraOwUFv1UEKjf5OKjBzgFxVL20xBl8eYBW0=;
+        b=uK7iC7WIF/cgvgDBFubZiAODnF9gU9DTh/4Vz3E9WOHbA/mcICX+yThg6hxPhQPMBe
+         RMSutqmzDE6KBPvB+QcrTMetXUVPq0qQ6vtSdjmB4BNzmNY2UaZ04TJvI37ygNXtCFRx
+         VrWRrRsTngaNLKmTCtPBfQqDj8rQ4DRbbhFpcVe6Mk2IFRQ2sFde4rOsULFRDpAFigSb
+         ZvavYVFOO56K7kWQE8UDARuJjXK70vdWYDb7xAemWWnkEKfaAQOmWji6A1jfeeZVmNcl
+         P4J1YFOAtrHN9J2NzTHP6YihLfZmEgVJTRB4ozepPhQ5Q1CUP3VC1CsXMhNWRf9Hqi2d
+         4/3g==
+X-Gm-Message-State: AOAM533xX3Stno9ofAIPDPbl/AnMjFs9tl/7td2DeWYs744uFPmr1K8T
+        PA00i7DJ3wzl0PnviuYPqBwt40YMhwOkku45nqF81ncdQoR7qqfG5b7D97k/Fz1W3acTa5iZnFT
+        uLxZtoqFUQi/X
+X-Received: by 2002:a1c:2302:: with SMTP id j2mr18425618wmj.18.1589798729431;
+        Mon, 18 May 2020 03:45:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzGk/xypKDxWUoutE/dClx2MBwlj5we5zBso3NzS2NUVIVx1m9Poou5+UBeQN1BBbHjWpEq6A==
+X-Received: by 2002:a1c:2302:: with SMTP id j2mr18425589wmj.18.1589798729147;
+        Mon, 18 May 2020 03:45:29 -0700 (PDT)
 Received: from [192.168.178.58] ([151.30.90.67])
-        by smtp.gmail.com with ESMTPSA id e21sm15457996wme.34.2020.05.18.03.33.00
+        by smtp.gmail.com with ESMTPSA id f5sm16143455wrp.70.2020.05.18.03.45.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2020 03:33:01 -0700 (PDT)
-Subject: Re: [PATCH 4/5] rcuwait: Introduce rcuwait_active()
-To:     Davidlohr Bueso <dave@stgolabs.net>, tglx@linutronix.de
-Cc:     peterz@infradead.org, maz@kernel.org, bigeasy@linutronix.de,
-        rostedt@goodmis.org, torvalds@linux-foundation.org,
-        will@kernel.org, joel@joelfernandes.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Davidlohr Bueso <dbueso@suse.de>
-References: <20200424054837.5138-1-dave@stgolabs.net>
- <20200424054837.5138-5-dave@stgolabs.net>
+        Mon, 18 May 2020 03:45:28 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: realmode: Test interrupt delivery
+ after STI
+To:     Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org
+Cc:     Cameron Esfahani <dirty@apple.com>
+References: <20200329071125.79253-1-r.bolshakov@yadro.com>
+ <20200516211917.GA75422@SPB-NB-133.local>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <57309494-58bf-a11e-e4ac-e669e6af22f2@redhat.com>
-Date:   Mon, 18 May 2020 12:33:00 +0200
+Message-ID: <9be03165-5167-d1b5-12d7-c5aec666d257@redhat.com>
+Date:   Mon, 18 May 2020 12:45:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200424054837.5138-5-dave@stgolabs.net>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20200516211917.GA75422@SPB-NB-133.local>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -75,47 +72,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/04/20 07:48, Davidlohr Bueso wrote:
-> +/*
-> + * Note: this provides no serialization and, just as with waitqueues,
-> + * requires care to estimate as to whether or not the wait is active.
-> + */
-> +static inline int rcuwait_active(struct rcuwait *w)
-> +{
-> +	return !!rcu_dereference(w->task);
-> +}
+On 16/05/20 23:19, Roman Bolshakov wrote:
+> n Sun, Mar 29, 2020 at 10:11:25AM +0300, Roman Bolshakov wrote:
+>> If interrupts are disabled, STI is inhibiting interrupts for the
+>> instruction following it. If STI is followed by HLT, the CPU is going to
+>> handle all pending or new interrupts as soon as HLT is executed.
+>>
+>> Test if emulator properly clears inhibition state and allows the
+>> scenario outlined above.
+>>
+>> Cc: Cameron Esfahani <dirty@apple.com>
+>> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+>> ---
+>>  x86/realmode.c | 21 +++++++++++++++++++++
+>>  1 file changed, 21 insertions(+)
+>>
+>> diff --git a/x86/realmode.c b/x86/realmode.c
+>> index 31f84d0..3518224 100644
+>> --- a/x86/realmode.c
+>> +++ b/x86/realmode.c
+>> @@ -814,6 +814,26 @@ static void test_int(void)
+>>  	report("int 1", 0, 1);
+>>  }
+>>  
+>> +static void test_sti_inhibit(void)
+>> +{
+>> +	init_inregs(NULL);
+>> +
+>> +	*(u32 *)(0x73 * 4) = 0x1000; /* Store IRQ 11 handler in the IDT */
+>> +	*(u8 *)(0x1000) = 0xcf; /* 0x1000 contains an IRET instruction */
+>> +
+>> +	MK_INSN(sti_inhibit, "cli\n\t"
+>> +			     "movw $0x200b, %dx\n\t"
+>> +			     "movl $1, %eax\n\t"
+>> +			     "outl %eax, %dx\n\t" /* Set IRQ11 */
+>> +			     "movl $0, %eax\n\t"
+>> +			     "outl %eax, %dx\n\t" /* Clear IRQ11 */
+>> +			     "sti\n\t"
+>> +			     "hlt\n\t");
+>> +	exec_in_big_real_mode(&insn_sti_inhibit);
+>> +
+>> +	report("sti inhibit", ~0, 1);
+>> +}
+>> +
+>>  static void test_imul(void)
+>>  {
+>>  	MK_INSN(imul8_1, "mov $2, %al\n\t"
+>> @@ -1739,6 +1759,7 @@ void realmode_start(void)
+>>  	test_xchg();
+>>  	test_iret();
+>>  	test_int();
+>> +	test_sti_inhibit();
+>>  	test_imul();
+>>  	test_mul();
+>>  	test_div();
+>> -- 
+>> 2.24.1
+>>
+> 
+> Hi,
+> 
+> Should I resend the patch?
+> And this one: https://patchwork.kernel.org/cover/11449525/ ?
+> 
+> Thanks,
+> Roman
+> 
 
-This needs to be changed to rcu_access_pointer:
-
-
---------------- 8< -----------------
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] rcuwait: avoid lockdep splats from rcuwait_active()
-
-rcuwait_active only returns whether w->task is not NULL.  This is 
-exactly one of the usecases that are mentioned in the documentation
-for rcu_access_pointer() where it is correct to bypass lockdep checks.
-
-This avoids a splat from kvm_vcpu_on_spin().
-
-Reported-by: Wanpeng Li <kernellwp@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-diff --git a/include/linux/rcuwait.h b/include/linux/rcuwait.h
-index c1414ce44abc..61c56cca95c4 100644
---- a/include/linux/rcuwait.h
-+++ b/include/linux/rcuwait.h
-@@ -31,7 +31,7 @@ static inline void rcuwait_init(struct rcuwait *w)
-  */
- static inline int rcuwait_active(struct rcuwait *w)
- {
--	return !!rcu_dereference(w->task);
-+	return !!rcu_access_pointer(w->task);
- }
- 
- extern int rcuwait_wake_up(struct rcuwait *w);
-
+Queued both, thanks.
 
 Paolo
 
