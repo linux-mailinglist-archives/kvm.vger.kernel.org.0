@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A4BC1D7103
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 08:31:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14F781D7104
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 08:31:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726729AbgERGaE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 02:30:04 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:16066 "EHLO
+        id S1726828AbgERGaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 02:30:11 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:16103 "EHLO
         hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726489AbgERGaE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 02:30:04 -0400
+        with ESMTP id S1726474AbgERGaL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 02:30:11 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ec22ade0003>; Sun, 17 May 2020 23:27:42 -0700
+        id <B5ec22ae50000>; Sun, 17 May 2020 23:27:49 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate101.nvidia.com (PGP Universal service);
-  Sun, 17 May 2020 23:30:03 -0700
+  Sun, 17 May 2020 23:30:10 -0700
 X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Sun, 17 May 2020 23:30:03 -0700
+        by hqpgpgate101.nvidia.com on Sun, 17 May 2020 23:30:10 -0700
 Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 18 May
- 2020 06:30:03 +0000
+ 2020 06:30:10 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 18 May 2020 06:29:57 +0000
+ Transport; Mon, 18 May 2020 06:30:03 +0000
 From:   Kirti Wankhede <kwankhede@nvidia.com>
 To:     <alex.williamson@redhat.com>, <cjia@nvidia.com>
 CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
@@ -36,9 +36,9 @@ CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
         <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
         <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
         "Kirti Wankhede" <kwankhede@nvidia.com>
-Subject: [PATCH Kernel v22 2/8] vfio iommu: Remove atomicity of ref_count of pinned pages
-Date:   Mon, 18 May 2020 11:26:31 +0530
-Message-ID: <1589781397-28368-3-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH Kernel v22 3/8] vfio iommu: Cache pgsize_bitmap in struct vfio_iommu
+Date:   Mon, 18 May 2020 11:26:32 +0530
+Message-ID: <1589781397-28368-4-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
 References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
@@ -46,73 +46,241 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1589783262; bh=uUgKJVCFdD4Zp7du3o0u/sQDLu1K2BjFd3xLP7hSugs=;
+        t=1589783269; bh=ZBRmkoeTJZ1FSdM0f83CcxykXlKpxr6CXlXwN8RMx60=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:X-NVConfidentiality:MIME-Version:
          Content-Type;
-        b=Lb6qHmfCoNzHh+Hb7jHTDDtUIpwA3zFAmUrLdgAWUxeGgXJyI/ehp3T/g9448AAtX
-         g1pqS93Ivh2BMuS/IWyk8M7QYh/cD61RN+kTU3XZAcdVVXCbKXTYEWZjV2Vdxa5xk9
-         hDB9GNo6i7xdsbCV9jlhwZ0o6e2/A4wVlpyToVLZxMybpO5oEV8JN4FPLIeM/mqZy7
-         AUMhQurJGmw8PkM6PUdafhKsJjTyjBPU9sEyr1MOOmOKutUnRQNy0vpaVeo97j2s91
-         esvMxvdczzpLuAxdcreE4OLiIm38G52GMiQhuv2i9WmSuBnsYoLcpRqlWyPL7Se4y7
-         /oaComXOb5V6g==
+        b=oNoBxkN2AYiOw8kiS0P7A9rTSbaT6v7YnEr34oQH1awveJB1HxoqMOX1XBlQ1rLhA
+         6DOCUvXNh/QUtj3Ag9B3nMzgrGRy5kW1PA9ZYBN+E8vJSS1IrSLBfTxZ+FnnVmTnVx
+         vSHly0x8SG6/vQJrImYc7BzwWQEIoTZDKbbBYie2ZYJi4hFgC9XXxISCi88/nY3IjV
+         SdXY5AGIG+tkqFSVN84jA3O4Ryd+FZlynpHjE75nySVsX7w5xE9nLWNZlyqtmeEop9
+         pfMPytSRUiVG20QgwUgDl/UMQ4IId0uygK0E47kvK7223WjTez2VbqCxWuAQZfh6GS
+         DutYvWNU74TiQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_pfn.ref_count is always updated while holding iommu->lock, using
-atomic variable is overkill.
+Calculate and cache pgsize_bitmap when iommu->domain_list is updated
+and iommu->external_domain is set for mdev device.
+Add iommu->lock protection when cached pgsize_bitmap is accessed.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 88 +++++++++++++++++++++++------------------
+ 1 file changed, 49 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index a0c60f895b24..fa735047b04d 100644
+index fa735047b04d..de17787ffece 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -112,7 +112,7 @@ struct vfio_pfn {
- 	struct rb_node		node;
- 	dma_addr_t		iova;		/* Device address */
- 	unsigned long		pfn;		/* Host pfn */
--	atomic_t		ref_count;
-+	unsigned int		ref_count;
+@@ -69,6 +69,7 @@ struct vfio_iommu {
+ 	struct rb_root		dma_list;
+ 	struct blocking_notifier_head notifier;
+ 	unsigned int		dma_avail;
++	uint64_t		pgsize_bitmap;
+ 	bool			v2;
+ 	bool			nesting;
  };
- 
- struct vfio_regions {
-@@ -233,7 +233,7 @@ static int vfio_add_to_pfn_list(struct vfio_dma *dma, dma_addr_t iova,
- 
- 	vpfn->iova = iova;
- 	vpfn->pfn = pfn;
--	atomic_set(&vpfn->ref_count, 1);
-+	vpfn->ref_count = 1;
- 	vfio_link_pfn(dma, vpfn);
- 	return 0;
- }
-@@ -251,7 +251,7 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
- 	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
- 
- 	if (vpfn)
--		atomic_inc(&vpfn->ref_count);
-+		vpfn->ref_count++;
- 	return vpfn;
+@@ -805,15 +806,14 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ 	iommu->dma_avail++;
  }
  
-@@ -259,7 +259,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+-static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
++static void vfio_pgsize_bitmap(struct vfio_iommu *iommu)
  {
- 	int ret = 0;
+ 	struct vfio_domain *domain;
+-	unsigned long bitmap = ULONG_MAX;
  
--	if (atomic_dec_and_test(&vpfn->ref_count)) {
-+	vpfn->ref_count--;
-+	if (!vpfn->ref_count) {
- 		ret = put_pfn(vpfn->pfn, dma->prot);
- 		vfio_remove_from_pfn_list(dma, vpfn);
+-	mutex_lock(&iommu->lock);
++	iommu->pgsize_bitmap = ULONG_MAX;
++
+ 	list_for_each_entry(domain, &iommu->domain_list, next)
+-		bitmap &= domain->domain->pgsize_bitmap;
+-	mutex_unlock(&iommu->lock);
++		iommu->pgsize_bitmap &= domain->domain->pgsize_bitmap;
+ 
+ 	/*
+ 	 * In case the IOMMU supports page sizes smaller than PAGE_SIZE
+@@ -823,12 +823,10 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+ 	 * granularity while iommu driver can use the sub-PAGE_SIZE size
+ 	 * to map the buffer.
+ 	 */
+-	if (bitmap & ~PAGE_MASK) {
+-		bitmap &= PAGE_MASK;
+-		bitmap |= PAGE_SIZE;
++	if (iommu->pgsize_bitmap & ~PAGE_MASK) {
++		iommu->pgsize_bitmap &= PAGE_MASK;
++		iommu->pgsize_bitmap |= PAGE_SIZE;
  	}
+-
+-	return bitmap;
+ }
+ 
+ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+@@ -839,19 +837,28 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 	size_t unmapped = 0;
+ 	int ret = 0, retries = 0;
+ 
+-	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
++	mutex_lock(&iommu->lock);
++
++	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
++
++	if (unmap->iova & mask) {
++		ret = -EINVAL;
++		goto unlock;
++	}
++
++	if (!unmap->size || unmap->size & mask) {
++		ret = -EINVAL;
++		goto unlock;
++	}
+ 
+-	if (unmap->iova & mask)
+-		return -EINVAL;
+-	if (!unmap->size || unmap->size & mask)
+-		return -EINVAL;
+ 	if (unmap->iova + unmap->size - 1 < unmap->iova ||
+-	    unmap->size > SIZE_MAX)
+-		return -EINVAL;
++	    unmap->size > SIZE_MAX) {
++		ret = -EINVAL;
++		goto unlock;
++	}
+ 
+ 	WARN_ON(mask & PAGE_MASK);
+ again:
+-	mutex_lock(&iommu->lock);
+ 
+ 	/*
+ 	 * vfio-iommu-type1 (v1) - User mappings were coalesced together to
+@@ -930,6 +937,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 			blocking_notifier_call_chain(&iommu->notifier,
+ 						    VFIO_IOMMU_NOTIFY_DMA_UNMAP,
+ 						    &nb_unmap);
++			mutex_lock(&iommu->lock);
+ 			goto again;
+ 		}
+ 		unmapped += dma->size;
+@@ -1045,24 +1053,28 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	if (map->size != size || map->vaddr != vaddr || map->iova != iova)
+ 		return -EINVAL;
+ 
+-	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+-
+-	WARN_ON(mask & PAGE_MASK);
+-
+ 	/* READ/WRITE from device perspective */
+ 	if (map->flags & VFIO_DMA_MAP_FLAG_WRITE)
+ 		prot |= IOMMU_WRITE;
+ 	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+ 		prot |= IOMMU_READ;
+ 
+-	if (!prot || !size || (size | iova | vaddr) & mask)
+-		return -EINVAL;
++	mutex_lock(&iommu->lock);
+ 
+-	/* Don't allow IOVA or virtual address wrap */
+-	if (iova + size - 1 < iova || vaddr + size - 1 < vaddr)
+-		return -EINVAL;
++	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
+ 
+-	mutex_lock(&iommu->lock);
++	WARN_ON(mask & PAGE_MASK);
++
++	if (!prot || !size || (size | iova | vaddr) & mask) {
++		ret = -EINVAL;
++		goto out_unlock;
++	}
++
++	/* Don't allow IOVA or virtual address wrap */
++	if (iova + size - 1 < iova || vaddr + size - 1 < vaddr) {
++		ret = -EINVAL;
++		goto out_unlock;
++	}
+ 
+ 	if (vfio_find_dma(iommu, iova, size)) {
+ 		ret = -EEXIST;
+@@ -1668,6 +1680,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 			if (!iommu->external_domain) {
+ 				INIT_LIST_HEAD(&domain->group_list);
+ 				iommu->external_domain = domain;
++				vfio_pgsize_bitmap(iommu);
+ 			} else {
+ 				kfree(domain);
+ 			}
+@@ -1793,6 +1806,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	}
+ 
+ 	list_add(&domain->next, &iommu->domain_list);
++	vfio_pgsize_bitmap(iommu);
+ done:
+ 	/* Delete the old one and insert new iova list */
+ 	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
+@@ -2004,6 +2018,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 			list_del(&domain->next);
+ 			kfree(domain);
+ 			vfio_iommu_aper_expand(iommu, &iova_copy);
++			vfio_pgsize_bitmap(iommu);
+ 		}
+ 		break;
+ 	}
+@@ -2136,8 +2151,6 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+ 	size_t size;
+ 	int iovas = 0, i = 0, ret;
+ 
+-	mutex_lock(&iommu->lock);
+-
+ 	list_for_each_entry(iova, &iommu->iova_list, list)
+ 		iovas++;
+ 
+@@ -2146,17 +2159,14 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+ 		 * Return 0 as a container with a single mdev device
+ 		 * will have an empty list
+ 		 */
+-		ret = 0;
+-		goto out_unlock;
++		return 0;
+ 	}
+ 
+ 	size = sizeof(*cap_iovas) + (iovas * sizeof(*cap_iovas->iova_ranges));
+ 
+ 	cap_iovas = kzalloc(size, GFP_KERNEL);
+-	if (!cap_iovas) {
+-		ret = -ENOMEM;
+-		goto out_unlock;
+-	}
++	if (!cap_iovas)
++		return -ENOMEM;
+ 
+ 	cap_iovas->nr_iovas = iovas;
+ 
+@@ -2169,8 +2179,6 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+ 	ret = vfio_iommu_iova_add_cap(caps, cap_iovas, size);
+ 
+ 	kfree(cap_iovas);
+-out_unlock:
+-	mutex_unlock(&iommu->lock);
+ 	return ret;
+ }
+ 
+@@ -2215,11 +2223,13 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 			info.cap_offset = 0; /* output, no-recopy necessary */
+ 		}
+ 
++		mutex_lock(&iommu->lock);
+ 		info.flags = VFIO_IOMMU_INFO_PGSIZES;
+ 
+-		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
++		info.iova_pgsizes = iommu->pgsize_bitmap;
+ 
+ 		ret = vfio_iommu_iova_build_caps(iommu, &caps);
++		mutex_unlock(&iommu->lock);
+ 		if (ret)
+ 			return ret;
+ 
 -- 
 2.7.0
 
