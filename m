@@ -2,61 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BE3C1D72E9
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 10:24:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AA051D7324
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 10:42:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727779AbgERIXm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 04:23:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56952 "EHLO
+        id S1726632AbgERImb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 04:42:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726053AbgERIXm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 04:23:42 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB2B0C061A0C;
-        Mon, 18 May 2020 01:23:41 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id d207so18837234wmd.0;
-        Mon, 18 May 2020 01:23:41 -0700 (PDT)
+        with ESMTP id S1726481AbgERIma (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 04:42:30 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15DEC061A0C;
+        Mon, 18 May 2020 01:42:30 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id u188so9298691wmu.1;
+        Mon, 18 May 2020 01:42:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=gZLQD0FEl5J6fjDPmseTi5EDE2CxTb3SUF6hUHkwd/I=;
-        b=i6CGj5/2/ufS2xoBjzJgZDnAH0qfi0gseS2gYe+RFuuxRkra67lYGep5dW7RIUAm19
-         L6Uay2n8WJXYB70WMy+ymeYAltJh734T1XF2PzXKUz6bGynqy2A7Y0AJ17e+3B4ddocL
-         BFKJu/yyLDqceGQ7fiLgdRwiULhZ9d8ByxCp5MAyd8d1ZnKZ/B/SUnMkZ/lQDIIV3xfX
-         21ixvcgsltQYtm5qKobBhGzzvLfDPNVevRZ2Rr6xmN6JEc0gQOVnFVDUeXy2tGrD8o4G
-         H0wSg539PWE3b2Mbyo8AMsHCJ4y61MtBQmUanJ8LMrHLZlvgbR5tCg2JoZTangyRDnwF
-         V6ew==
+        bh=6rCQDnpCBqEjecCnmIenSye1eK7mw1G0XLc59v/D478=;
+        b=u1ZHOQ7pY6BQXkcXjjTiCGQLgwtFQklx4tvb4P7KbjdRROcLtam5Ls9Huc9xXcsSAM
+         69++inp6nmAxDqqTVa8U4LMdSOF93DC9l6CBSh6yJgdc8P+ip2BpFxlFWWULKRE5rhnE
+         bhyKRAFTups7B+mXG5YdyttVSr/MsfemIUbb6xoqItdQViyhFzn6RfUxLCv6vbmI+9mP
+         wN/7zxRI9fKccZyf4puhJWOSWU3V3aUZR1wV+7AKIFFJyXCU3lTbJdDRoPPQP7We2Fkg
+         5SiClnlbBzffBq17zolAdasqt3gcnH9cpfhHmpG46biWl66980nvO6S6NYSaa0N64CIS
+         ybWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gZLQD0FEl5J6fjDPmseTi5EDE2CxTb3SUF6hUHkwd/I=;
-        b=Q2QtgocvaW8xYP3qBQ5uYeBdWdJVM1Xe2uX7Z7vtbHnqEf2g9RvljEObn9QnIuXWjr
-         p5YIgCjVL9av0uTkRRxoA3bK7/1D29sz1dBhROAXQbb+wDt7S2ubANVQu0y7DDSHoikt
-         COUL08eKRBQmXmesqB+c6Mirxflh3B1WXHwMSegV57sjliCkOxlVmjargOX+CrwycLWs
-         u1ZCu2CuITy92Olhjd2sTSYzlVtMLzrDm9lFgja8Zn+uZJHUE4DOhrJHA1lhEK3iiZcw
-         KUPQS/nM3Qr9mVS9BINvnRLWh4n1qo6XkVN/q2JCN8IUf0HfV7hoICutnDJnQthUkx3s
-         yaBQ==
-X-Gm-Message-State: AOAM5335yhjYhVxWVA1qzPuFHxj0OdbFaV4W0i4g41sMq5MnkwAjxSka
-        OTx04B5ow99nDdOFsLJ7MLmDl9XT1lBsUeY2DE0=
-X-Google-Smtp-Source: ABdhPJwerkDmdOWugeNcvH/q/IdYFuk0Qlbkv56alymGWRuXb3yMwse96SmCYb0VWoy2a+9I1UwcV/IRjRiT98GU0Os=
-X-Received: by 2002:a1c:9a09:: with SMTP id c9mr17503294wme.159.1589790220663;
- Mon, 18 May 2020 01:23:40 -0700 (PDT)
+        bh=6rCQDnpCBqEjecCnmIenSye1eK7mw1G0XLc59v/D478=;
+        b=l0NUyWH7aq/Z+JVo5jX61gc71hjFqswA7XRJ5t7IBkRFHGVubzEh0jRxerPPTvjfuY
+         nHTu1rdjyG0akQG3IxvO5TwOqJN/20GY2t5m4xsGCuWLVQ44hHZ4ZcoyqsUUGnOwS4+t
+         QeaQrdoTMg2VR6F1hsweByIKVo9cXiR73ztOKMHp4QsUZ/ISBwdfdU4cge/jro3rAl7h
+         Nfjro7v3WeHUpY+IKSjO9PAMrzjneDZ4Zcospb5syUIaldESPlpiuKbzH+zjjQArhuoy
+         3JsbeEeYclD8pNikhXVSlfzLB6SlV/SYQxUMdg9gUGAa/508K7OR5FA6mXhpHAkxoOyV
+         x+vA==
+X-Gm-Message-State: AOAM531NK8BoP4V/0te0sY+0zYIiUQXpxvDbJkadPcgDvwHAOdUcs41V
+        61V/qH44HMk5cMFNwyXWfTZoeQ9K/8uXSxHhNFc=
+X-Google-Smtp-Source: ABdhPJzDWqtnuBtqUKl/Y6GWfI1D6NhnXMkeyttrmUevve7IOOSi/uq/Uy1Bnp7nvHWI2GaLTUc5Ozrxk2ILqA9jbcs=
+X-Received: by 2002:a1c:2dc7:: with SMTP id t190mr17405239wmt.129.1589791349320;
+ Mon, 18 May 2020 01:42:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <1589688372-3098-1-git-send-email-chenhc@lemote.com>
- <1589688372-3098-16-git-send-email-chenhc@lemote.com> <20200517082242.GA3939@alpha.franken.de>
-In-Reply-To: <20200517082242.GA3939@alpha.franken.de>
+References: <1589359366-1669-1-git-send-email-chenhc@lemote.com>
+ <1589359366-1669-16-git-send-email-chenhc@lemote.com> <AC9338A0-F449-4DCA-A294-248C86D57877@flygoat.com>
+ <CAAhV-H7OTeMy2Yp2PunD+2KVzzPDT+-xGGgbpRNzhb8C-p8-7g@mail.gmail.com>
+ <20200515211353.GB22922@alpha.franken.de> <CAAhV-H58G7+se6VTBMo2R4joDXngF-c_W=fh8=zD8rVnono=gg@mail.gmail.com>
+ <1a22adb0-0b7a-24a3-e762-7b9919a70a8e@redhat.com>
+In-Reply-To: <1a22adb0-0b7a-24a3-e762-7b9919a70a8e@redhat.com>
 From:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date:   Mon, 18 May 2020 10:23:26 +0200
-Message-ID: <CAHiYmc5m+UhWv__F_FKqhiTkJxgqErmFn5K_DAW2y5Pp6_4dyA@mail.gmail.com>
-Subject: Re: [PATCH V6 15/15] MAINTAINERS: Update KVM/MIPS maintainers
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Date:   Mon, 18 May 2020 10:42:14 +0200
+Message-ID: <CAHiYmc6qnvEhgX8BOhuUkQcfnLzBf_1hqoW=GKGh26KpQU5HLQ@mail.gmail.com>
+Subject: Re: [PATCH V5 15/15] MAINTAINERS: Update KVM/MIPS maintainers
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Huacai Chen <chenhc@lemote.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-mips@vger.kernel.org, Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        kvm <kvm@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Fuxin Zhang <zhangfx@lemote.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
@@ -64,75 +68,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-=D0=BD=D0=B5=D0=B4, 17. =D0=BC=D0=B0=D1=98 2020. =D1=83 10:55 Thomas Bogend=
-oerfer
-<tsbogend@alpha.franken.de> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=
-=B0=D0=BE/=D0=BB=D0=B0:
+=D1=81=D1=83=D0=B1, 16. =D0=BC=D0=B0=D1=98 2020. =D1=83 13:55 Paolo Bonzini=
+ <pbonzini@redhat.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
+=BE/=D0=BB=D0=B0:
 >
-> On Sun, May 17, 2020 at 12:06:12PM +0800, Huacai Chen wrote:
-> > James Hogan has become inactive for a long time and leaves KVM for MIPS
-> > orphan. I'm working on KVM/Loongson and attempt to make it upstream bot=
-h
-> > in kernel and QEMU, while Aleksandar Markovic is already a maintainer o=
-f
-> > QEMU/MIPS. We are both interested in QEMU/KVM/MIPS, and we have already
-> > made some contributions in kernel and QEMU. If possible, we want to tak=
-e
-> > the KVM/MIPS maintainership.
-> >
-> > Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > ---
-> >  MAINTAINERS | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index e64e5db..59b3f43 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -9302,9 +9302,11 @@ F:     include/kvm/arm_*
-> >  F:   virt/kvm/arm/
-> >
-> >  KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)
-> > +M:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > +M:   Huacai Chen <chenhc@lemote.com>
+> On 16/05/20 11:36, Huacai Chen wrote:
+> >> I'm happy to see you taking care of the KVM part. So how is your plan
+> >> to handle patches ? Do want to collect them and send pull requests to
+> >> me ? Or should I just pick them up with your Acked-by ?
+> > I think we can only use the second method, because both Aleksandar and
+> > me don't have a kernel tree in kernel.org now.
 >
-> not sure, if other people see the same problem with this email address,
-> but wouldn't it be better to use your gmail address here ?
+> If you don't mind, I generally prefer to have MIPS changs submitted
+> through the KVM tree, because KVM patches rarely have intrusive changes
+> in generic arch files.  It's more common to have generic KVM patches
+> that require touching all architectures.
 >
 
-Huacai, Thomas,
+To me, Paolo's workflow seems reasonable and efficient from practical
+point of view. No unnecessary multitude of repeated series or pull sending,
+and no single person is burdened with majority of work being done just by
+himself for any given case of series like this one. Also, it looks to me it=
+ is
+quite efficient wrt possible conflict and rebase issues, that will be taken
+care by both KVM/MIPS and KVM/general submitters/maintainers.
 
-I personally and surprisingly do not have any technical difficulties
-communicating with Huacai using his lemote.com address.
+I suggest we keep Paolo's workflow plan for this series, but, more
+importantly, if you guys all agree, in future as well.
 
-However, I think Thomas observation makes sense. I was personally
-a victim of various corporate decisions regarding emails, policies
-around them, and similar. And - as you can see - I ended up switching
-to gmail.com account, getting really sick and tired of repeated
-unexpected and distracting problems using corporate email adresses.
-Sounds strange, but it is true.
-
-Huacei, my honest advice and recommendation to you is to accept
-Thomas' suggestion, and change your email address here to gmail.
-We all now you work for Lemote, and that your using gmail is just a
-matter of practicality. :)
-
-Please Huacei, do send v7 with such change, and perhaps some
-other minor changes that you may or may noticed in the last minutes.
-
-Many thanks to Thomas to noticing this that may save us from many
-really unnecessary troubles in future.
-
-Yours,
+Sincerely,
 Aleksandar
 
-
-> Thomas.
+> For 5.8 I don't have anything planned that could cause conflicts, so
+> this time it doesn't matter; but I can pick these up too if Thomas acks
+> patches 6, 12 and 14.
 >
-> --
-> Crap can work. Given enough thrust pigs will fly, but it's not necessaril=
-y a
-> good idea.                                                [ RFC1925, 2.3 =
-]
+> Thanks,
+>
+> Paolo
+>
