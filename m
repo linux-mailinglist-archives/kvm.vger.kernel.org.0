@@ -2,225 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66DBF1D792A
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 15:02:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E4151D79EE
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 15:34:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727857AbgERNCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 09:02:21 -0400
-Received: from foss.arm.com ([217.140.110.172]:40000 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726726AbgERNCU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 09:02:20 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE02B101E;
-        Mon, 18 May 2020 06:02:19 -0700 (PDT)
-Received: from [192.168.2.22] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 135263F305;
-        Mon, 18 May 2020 06:02:18 -0700 (PDT)
-Subject: Re: [PATCH kvmtool] net: uip: Fix GCC 10 warning about checksum
- calculation
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org
-References: <20200517152849.204717-1-andre.przywara@arm.com>
- <53980bb2-fb9b-886e-2a2a-c4301f50e4fe@arm.com>
-From:   =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
- 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
- i4aIXCH3Wv6K
-Organization: ARM Ltd.
-Message-ID: <ff1a0be5-dfa2-3702-a828-89de1d954f17@arm.com>
-Date:   Mon, 18 May 2020 14:01:30 +0100
+        id S1727777AbgERNeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 09:34:50 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23168 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726726AbgERNeu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 09:34:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589808888;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=/NxGz6kaCf/Cqma30BxcTaXpx7ky93/yOpxbaLsads0=;
+        b=gsCKgphkvX4UOJpGCkCJWl3K5U9EmYc8BJzkKRshTfEUCYYB+3rknvN//kpRFLDv93vIEi
+        1BM9aR0ZWq8nq9sFqi8P9SaFLuulAPvpe3DsISgowXT/1wp3whE80l0rvLdmPmCYu3e3Lw
+        OZk3hzLBQhe78Atw9n3YHUBiNyy4UWc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-j1Fims1iM0Wx30aTBLFsiQ-1; Mon, 18 May 2020 09:34:46 -0400
+X-MC-Unique: j1Fims1iM0Wx30aTBLFsiQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1189B107ACF3;
+        Mon, 18 May 2020 13:34:45 +0000 (UTC)
+Received: from [10.36.115.150] (ovpn-115-150.ams2.redhat.com [10.36.115.150])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 22A58100239A;
+        Mon, 18 May 2020 13:34:39 +0000 (UTC)
+Subject: Re: [PATCH v1 11/17] virtio-pci: Proxy for virtio-mem
+To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        Richard Henderson <rth@twiddle.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Igor Mammedov <imammedo@redhat.com>
+References: <20200506094948.76388-1-david@redhat.com>
+ <20200506094948.76388-12-david@redhat.com>
+ <CAM9Jb+g-mFxY+seJAPcpdavSW-_XicFbq+xfk6nis4otUQZ4VQ@mail.gmail.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <d8b3890d-4f35-0ac2-2349-5537841b6cee@redhat.com>
+Date:   Mon, 18 May 2020 15:34:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <53980bb2-fb9b-886e-2a2a-c4301f50e4fe@arm.com>
+In-Reply-To: <CAM9Jb+g-mFxY+seJAPcpdavSW-_XicFbq+xfk6nis4otUQZ4VQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/05/2020 12:29, Alexandru Elisei wrote:
-> Hi,
-> 
-> On 5/17/20 4:28 PM, Andre Przywara wrote:
->> GCC 10.1 generates a warning in net/ip/csum.c about exceeding a buffer
->> limit in a memcpy operation:
->> ------------------
->> In function ‘memcpy’,
->>     inlined from ‘uip_csum_udp’ at net/uip/csum.c:58:3:
->> /usr/include/aarch64-linux-gnu/bits/string_fortified.h:34:10: error: writing 1 byte into a region of size 0 [-Werror=stringop-overflow=]
->>    34 |   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
->>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> In file included from net/uip/csum.c:1:
->> net/uip/csum.c: In function ‘uip_csum_udp’:
->> include/kvm/uip.h:132:6: note: at offset 0 to object ‘sport’ with size 2 declared here
->>   132 |  u16 sport;
->> ------------------
-> 
-> When I apply this patch, I get unrecognized characters:
-> 
-> In function <E2><80><98>memcpy<E2><80><99>,
->         inlined from <E2><80><98>uip_csum_udp<E2><80><99> at net/uip/csum.c:58:3:
->     /usr/include/aarch64-linux-gnu/bits/string_fortified.h:34:10: error: writing 1
-> byte into a region of size 0 [-Werror=stringop-overflow=]
->        34 |   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
->           |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->     In file included from net/uip/csum.c:1:
->     net/uip/csum.c: In function <E2><80><98>uip_csum_udp<E2><80><99>:
->     include/kvm/uip.h:132:6: note: at offset 0 to object
-> <E2><80><98>sport<E2><80><99> with size 2 declared here
->       132 |  u16 sport;
-> 
-> I looked at the patch source, and they're there also
-
-Mmh, I see that GCC uses UTF-8 to render fancy ticks - for whatever
-reason ;-) Removed them to avoid issues.
-
-But where did you see those broken characters? Not sure if a non-UTF-8
-capable terminal is still considered a thing in 2020?
-I mean, even my Slackware is not ISO-8859-15 anymore ;-)
-
-Fixed the rest and sent a v2.
-
-Cheers,
-Andre
-
+On 06.05.20 20:57, Pankaj Gupta wrote:
+>> Let's add a proxy for virtio-mem, make it a memory device, and
+>> pass-through the properties.
 >>
->> This warning originates from the code taking the address of the "sport"
->> member, then using that with some pointer arithmetic in a memcpy call.
->> GCC now sees that the object is only a u16, so copying 12 bytes into it
->> cannot be any good.
->> It's somewhat debatable whether this is a legitimate warning, as there
->> is enough storage at that place, and we knowingly use the struct and
->> its variabled-sized member at the end.
->>
->> However we can also rewrite the code, to not abuse the "&" operation of
->> some *member*, but take the address of the struct itself.
->> This makes the code less dodgy, and indeed appeases GCC 10.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
-> I've tested the patch and the compile errors have gone away for x86 and arm64.
-> Tested virtio-net on both architectures and it works just like before:
-> 
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
 >> ---
->>  net/uip/csum.c | 26 ++++++++++++--------------
->>  1 file changed, 12 insertions(+), 14 deletions(-)
+>>  hw/virtio/Makefile.objs    |   1 +
+>>  hw/virtio/virtio-mem-pci.c | 131 +++++++++++++++++++++++++++++++++++++
+>>  hw/virtio/virtio-mem-pci.h |  33 ++++++++++
+>>  include/hw/pci/pci.h       |   1 +
+>>  4 files changed, 166 insertions(+)
+>>  create mode 100644 hw/virtio/virtio-mem-pci.c
+>>  create mode 100644 hw/virtio/virtio-mem-pci.h
 >>
->> diff --git a/net/uip/csum.c b/net/uip/csum.c
->> index 7ca8bada..607c9f1c 100644
->> --- a/net/uip/csum.c
->> +++ b/net/uip/csum.c
->> @@ -37,7 +37,7 @@ u16 uip_csum_udp(struct uip_udp *udp)
->>  	struct uip_pseudo_hdr hdr;
->>  	struct uip_ip *ip;
->>  	int udp_len;
->> -	u8 *pad;
->> +	u8 *udp_hdr = (u8*)udp + offsetof(struct uip_udp, sport);
+>> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+>> index 7df70e977e..b9661f9c01 100644
+>> --- a/hw/virtio/Makefile.objs
+>> +++ b/hw/virtio/Makefile.objs
+>> @@ -19,6 +19,7 @@ obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-p
+>>  obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
+>>  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+>>  obj-$(CONFIG_VIRTIO_MEM) += virtio-mem.o
+>> +common-obj-$(call land,$(CONFIG_VIRTIO_MEM),$(CONFIG_VIRTIO_PCI)) += virtio-mem-pci.o
+>>
+>>  ifeq ($(CONFIG_VIRTIO_PCI),y)
+>>  obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+>> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
+>> new file mode 100644
+>> index 0000000000..a47d21c81f
+>> --- /dev/null
+>> +++ b/hw/virtio/virtio-mem-pci.c
+>> @@ -0,0 +1,131 @@
+>> +/*
+>> + * Virtio MEM PCI device
+>> + *
+>> + * Copyright (C) 2020 Red Hat, Inc.
+>> + *
+>> + * Authors:
+>> + *  David Hildenbrand <david@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +
+> Don't think we need the blank line here.
 > 
-> Super minor nitpick: there should be a space between u8 and *.
+
+Right, thanks!
+
+[...]
+
+>> --
+>> 2.25.3
+> Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 > 
->>  
->>  	ip	  = &udp->ip;
->>  
->> @@ -50,13 +50,12 @@ u16 uip_csum_udp(struct uip_udp *udp)
->>  	udp_len	  = uip_udp_len(udp);
->>  
->>  	if (udp_len % 2) {
->> -		pad = (u8 *)&udp->sport + udp_len;
->> -		*pad = 0;
->> -		memcpy((u8 *)&udp->sport + udp_len + 1, &hdr, sizeof(hdr));
->> -		return uip_csum(0, (u8 *)&udp->sport, udp_len + 1 + sizeof(hdr));
->> +		udp_hdr[udp_len] = 0;		/* zero padding */
->> +		memcpy(udp_hdr + udp_len + 1, &hdr, sizeof(hdr));
->> +		return uip_csum(0, udp_hdr, udp_len + 1 + sizeof(hdr));
->>  	} else {
->> -		memcpy((u8 *)&udp->sport + udp_len, &hdr, sizeof(hdr));
->> -		return uip_csum(0, (u8 *)&udp->sport, udp_len + sizeof(hdr));
->> +		memcpy(udp_hdr + udp_len, &hdr, sizeof(hdr));
->> +		return uip_csum(0, udp_hdr, udp_len + sizeof(hdr));
->>  	}
->>  
->>  }
->> @@ -66,7 +65,7 @@ u16 uip_csum_tcp(struct uip_tcp *tcp)
->>  	struct uip_pseudo_hdr hdr;
->>  	struct uip_ip *ip;
->>  	u16 tcp_len;
->> -	u8 *pad;
->> +	u8 *tcp_hdr = (u8*)tcp + offsetof(struct uip_tcp, sport);
->>  
->>  	ip	  = &tcp->ip;
->>  	tcp_len   = ntohs(ip->len) - uip_ip_hdrlen(ip);
->> @@ -81,12 +80,11 @@ u16 uip_csum_tcp(struct uip_tcp *tcp)
->>  		pr_warning("tcp_len(%d) is too large", tcp_len);
->>  
->>  	if (tcp_len % 2) {
->> -		pad = (u8 *)&tcp->sport + tcp_len;
->> -		*pad = 0;
->> -		memcpy((u8 *)&tcp->sport + tcp_len + 1, &hdr, sizeof(hdr));
->> -		return uip_csum(0, (u8 *)&tcp->sport, tcp_len + 1 + sizeof(hdr));
->> +		tcp_hdr[tcp_len] = 0;		/* zero padding */
->> +		memcpy(tcp_hdr + tcp_len + 1, &hdr, sizeof(hdr));
->> +		return uip_csum(0, tcp_hdr, tcp_len + 1 + sizeof(hdr));
->>  	} else {
->> -		memcpy((u8 *)&tcp->sport + tcp_len, &hdr, sizeof(hdr));
->> -		return uip_csum(0, (u8 *)&tcp->sport, tcp_len + sizeof(hdr));
->> +		memcpy(tcp_hdr + tcp_len, &hdr, sizeof(hdr));
->> +		return uip_csum(0, tcp_hdr, tcp_len + sizeof(hdr));
->>  	}
->>  }
-> 
-> The patch looks functionally identical to the original version, and slightly
-> easier to understand:
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
+
+Thanks!
+
+-- 
+Thanks,
+
+David / dhildenb
 
