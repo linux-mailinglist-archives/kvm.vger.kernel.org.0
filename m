@@ -2,110 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AEAE21D759E
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 12:52:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 078AA1D75AC
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 12:55:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbgERKwx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 06:52:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35021 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726279AbgERKwx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 06:52:53 -0400
+        id S1726557AbgERKz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 06:55:58 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55636 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726270AbgERKz5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 06:55:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589799171;
+        s=mimecast20190719; t=1589799356;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7i73MdO6mSnLJfSeLQzf3Paj06/1AUhoEWhZbMxx9q4=;
-        b=Ze/27E1N0tXOoYYt7jyn6fXfvXyUBFidjZWIz3XP8DJxl+5jc1L6JCGHagplTDZV+D873g
-        tq73g8177GPGmvglYkIQPg51CYE3kYWifTSoAT6zYSpcFhxM+cLjwTRBJJlGX2kyq8iywi
-        M+a+s+Iuy5We0VqXA8A2HvrlYWzwVOo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-6iwQ_gLMP9G5NpJSvF41eQ-1; Mon, 18 May 2020 06:52:50 -0400
-X-MC-Unique: 6iwQ_gLMP9G5NpJSvF41eQ-1
-Received: by mail-wr1-f70.google.com with SMTP id z16so5480259wrq.21
-        for <kvm@vger.kernel.org>; Mon, 18 May 2020 03:52:50 -0700 (PDT)
+        bh=4qCPvl+Kzxwr6u2SnFhTAgqF+P+2b9DjFZ38t/g4QD4=;
+        b=P+oHmq9eLc3xlGGsiFlu6Lbbx2vl85GCJKXz4D7+IY9aPf1SXLf203a+hHFMu9bqWETF51
+        gC7xf3iGFdo26xdGRN4mcNgpDBNyKCjvN1MN6qVxVhDmQaxx+ig6erYsstFqKoijdOJklF
+        5yZ1vZcUlWOkKRSQ5Oc3tBHHAiUJiaQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-ru9daOfENT-t_sLpo-anRQ-1; Mon, 18 May 2020 06:55:54 -0400
+X-MC-Unique: ru9daOfENT-t_sLpo-anRQ-1
+Received: by mail-wm1-f71.google.com with SMTP id n66so5633526wme.4
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 03:55:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=7i73MdO6mSnLJfSeLQzf3Paj06/1AUhoEWhZbMxx9q4=;
-        b=dX6QXyKkjiXWp9/s8ZcFjpsHJ9xoEbk4j1AJ4pW54Oo1e6gvve+aO9eF8LwngTOAdN
-         r9tKKhoxEsE2e4mKmCsRtABR7BkE6q2pLScY+D5U3g53l5/1lrS1E1nlOEwywM2i5uu0
-         SdzlLqTUj/FPSudbI0N6PZrz/yyDpxGTj9dYJ/pVc1ilYuxyKkuU+7xeVbgl8uOIhtov
-         5xlpCaqOWJcJ4OV3mXvS5zvipKtU88ZhWJ+XWLwJO+JwVtej5k4w7FH4qVI0ccKkhLlj
-         vNR4yaN5GNWmQvmN/Ux+VbfUVMiSOkEnFvjyBt2vcSXoKt8yC7azkRqPAVDb6OxDEtz5
-         zqeg==
-X-Gm-Message-State: AOAM532Ns7NRep1ns7+pXWVeOIT7FmwDxUF8R5D4jPnAKjdnyPunIKkJ
-        x7WI2rjWrwsCgV7ZW4eScKIMw5f06m2sd7Ne5lTEzYXwLCLrLeHitg092r/B7QPlex81uRELoSK
-        3p8mT8h1WNpNB
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr13204926wmj.118.1589799169118;
-        Mon, 18 May 2020 03:52:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyb5bJSjhIwujoAPyEeSV2lEHQs6rr/TIG41qjwncep2S48dLrjzAAz5OSj0DtYMHlyn0kYKA==
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr13204900wmj.118.1589799168906;
-        Mon, 18 May 2020 03:52:48 -0700 (PDT)
+        bh=4qCPvl+Kzxwr6u2SnFhTAgqF+P+2b9DjFZ38t/g4QD4=;
+        b=mzfswK+zV+2PQz/A6VJb7UG5jf9L9dnmukW1wheeM1U3YRv60x9ayMqhynpB8gcEL/
+         fZqyB6nzgBLQxvrgpO4uyKuEEhxL+NFQeLCj+/c9eMeDXlQJpzr4zayscgceKlLbLYT9
+         c33DJcprxBBNWO8icjl9bmJLz9USg2Je8j4LoumQMwv9ByCudb3XI0XYzipV/Ix9OEnb
+         FBJX6Y4x1qJsuU3W2nT8Xnd+lXsgmFlLUxxUny5REwUPP6FCthD4EaNAdCEHaNSQojYH
+         1cWgTtY0CJE0yEkPKXKNV9zEe5ZXpCWxtWdqtMlf/4w2x1Nbu/rIyRY2VKhdBkBqPQGN
+         lf2Q==
+X-Gm-Message-State: AOAM532SwKYWlieZNX04DqgM0mpLj5i4uzNmE/lDyUud12SDK9tu3saa
+        CVX8Jf65YsAJUbO27CkXLVnu+1ZgH7VHAmuJz15G2nVMIPTDEYj0iakcT1OT0dK3HlYl9nPVf5W
+        HNqpOv/b1M+c2
+X-Received: by 2002:a1c:f312:: with SMTP id q18mr18869330wmq.175.1589799353627;
+        Mon, 18 May 2020 03:55:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwsnCM+6ovpWCbwXHDYfwN2IAiPYSCAAfCLhQaa+AbmlDlCkZMMg/BjMjagVdget3fEYHegKA==
+X-Received: by 2002:a1c:f312:: with SMTP id q18mr18869311wmq.175.1589799353431;
+        Mon, 18 May 2020 03:55:53 -0700 (PDT)
 Received: from [192.168.178.58] ([151.30.90.67])
-        by smtp.gmail.com with ESMTPSA id x17sm15630846wrp.71.2020.05.18.03.52.47
+        by smtp.gmail.com with ESMTPSA id r3sm15448334wmh.48.2020.05.18.03.55.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2020 03:52:48 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: VMX: replace "fall through" with "return" to
- indicate different case
-To:     linmiaohe <linmiaohe@huawei.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-References: <1582080348-20827-1-git-send-email-linmiaohe@huawei.com>
+        Mon, 18 May 2020 03:55:52 -0700 (PDT)
+Subject: Re: [PATCH] KVM: Fix the indentation to match coding style
+To:     Haiwei Li <lihaiwei.kernel@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>, wanpengli@tencent.com,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, hpa@zytor.com
+Cc:     "x86@kernel.org" <x86@kernel.org>, kvm@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <2f78457e-f3a7-3bc9-e237-3132ee87f71e@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <50b2bf9b-d4c3-e469-1ef9-3d58b44f4de8@redhat.com>
-Date:   Mon, 18 May 2020 12:52:47 +0200
+Message-ID: <b4443a42-bd06-4b67-64e6-6c636507713b@redhat.com>
+Date:   Mon, 18 May 2020 12:55:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <1582080348-20827-1-git-send-email-linmiaohe@huawei.com>
+In-Reply-To: <2f78457e-f3a7-3bc9-e237-3132ee87f71e@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/02/20 03:45, linmiaohe wrote:
-> From: Miaohe Lin <linmiaohe@huawei.com>
+On 18/05/20 03:31, Haiwei Li wrote:
+> From: Haiwei Li <lihaiwei@tencent.com>
 > 
-> The second "/* fall through */" in rmode_exception() makes code harder to
-> read. Replace it with "return" to indicate they are different cases, only
-> the #DB and #BP check vcpu->guest_debug, while others don't care. And this
-> also improves the readability.
+> There is a bad indentation in next&queue branch. The patch looks like
+> fixes nothing though it fixes the indentation.
 > 
-> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> Before fixing:
+> 
+>                 if (!handle_fastpath_set_x2apic_icr_irqoff(vcpu, data)) {
+>                         kvm_skip_emulated_instruction(vcpu);
+>                         ret = EXIT_FASTPATH_EXIT_HANDLED;
+>                }
+>                 break;
+>         case MSR_IA32_TSCDEADLINE:
+> 
+> After fixing:
+> 
+>                 if (!handle_fastpath_set_x2apic_icr_irqoff(vcpu, data)) {
+>                         kvm_skip_emulated_instruction(vcpu);
+>                         ret = EXIT_FASTPATH_EXIT_HANDLED;
+>                 }
+>                 break;
+>         case MSR_IA32_TSCDEADLINE:
+> 
+> 
+> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a13368b2719c..5b8f024f06c2 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4492,10 +4492,8 @@ static bool rmode_exception(struct kvm_vcpu *vcpu, int vec)
->  			return false;
->  		/* fall through */
->  	case DB_VECTOR:
-> -		if (vcpu->guest_debug &
-> -			(KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))
-> -			return false;
-> -		/* fall through */
-> +		return !(vcpu->guest_debug &
-> +			(KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP));
->  	case DE_VECTOR:
->  	case OF_VECTOR:
->  	case BR_VECTOR:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 471fccf..446f747 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1631,7 +1631,7 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct
+> kvm_vcpu *vcpu)
+>                 if (!handle_fastpath_set_x2apic_icr_irqoff(vcpu, data)) {
+>                         kvm_skip_emulated_instruction(vcpu);
+>                         ret = EXIT_FASTPATH_EXIT_HANDLED;
+> -               }
+> +               }
+>                 break;
+>         case MSR_IA32_TSCDEADLINE:
+>                 data = kvm_read_edx_eax(vcpu);
+> -- 
+> 1.8.3.1
 > 
 
 Queued, thanks.
