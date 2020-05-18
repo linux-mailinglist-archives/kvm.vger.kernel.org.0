@@ -2,116 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05B2C1D723C
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 09:50:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9C771D72E7
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 10:24:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727033AbgERHup (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 03:50:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33342 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726489AbgERHup (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 03:50:45 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        id S1727083AbgERIXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 04:23:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726053AbgERIXX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 04:23:23 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1096FC061A0C;
+        Mon, 18 May 2020 01:23:23 -0700 (PDT)
+Received: from zn.tnic (p200300EC2F06E800ECDCE19D4A51D977.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:e800:ecdc:e19d:4a51:d977])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E5D6C20787;
-        Mon, 18 May 2020 07:50:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589788245;
-        bh=lqHej4TeaH/h0N1U2FkK0BZnCpJw7cuBwYsE1+Z+y/U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LnqTXJ6Xz9beUnIik6bXpG/2hpaTRmYbocdh91cTI0NjQ6MO3VllE9fT0qW/g6uLS
-         xtGr1V+cqVk3tN/5qbWYSM6UOuOiSZ0xliYoUeLXOGX4VG3eSOVWBveH5ouY1UhxBF
-         6AgF/Wen5TNtdYHkLq6rn987ul1SmmgIrE4jCP0I=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jaaXr-00DBDP-48; Mon, 18 May 2020 08:50:43 +0100
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0AB141EC0295;
+        Mon, 18 May 2020 10:23:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1589790200;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=NRH8oUNhkxpcUz5rd9LcRTM109aECD+/gUl0zIMTl5w=;
+        b=EmRutMjnTt3s/OCgVTsnLs5lE1J795LjE9ueGF2jckGBoi40V3GjCQ465iK19AYHmDM2Ns
+        WS9YUgSW70oUTt9Jx7wyuf4vUyYmw5ddYxHDzc4pdOHplM0R13+b4syehDAXt8GPNlMRLR
+        nqaFEm49nhK7F0ahvS00kE5h7VwuMV4=
+Date:   Mon, 18 May 2020 10:23:13 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 31/75] x86/head/64: Install boot GDT
+Message-ID: <20200518082313.GA25034@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-32-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 18 May 2020 08:50:42 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Anastassios Nanos <ananos@nubificus.co.uk>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 0/2] Expose KVM API to Linux Kernel
-In-Reply-To: <cover.1589784221.git.ananos@nubificus.co.uk>
-References: <cover.1589784221.git.ananos@nubificus.co.uk>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <c1124c27293769f8e4836fb8fdbd5adf@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ananos@nubificus.co.uk, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200428151725.31091-32-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-05-18 07:58, Anastassios Nanos wrote:
-> To spawn KVM-enabled Virtual Machines on Linux systems, one has to use
-> QEMU, or some other kind of VM monitor in user-space to host the vCPU
-> threads, I/O threads and various other book-keeping/management 
-> mechanisms.
-> This is perfectly fine for a large number of reasons and use cases: for
-> instance, running generic VMs, running general purpose Operating 
-> systems
-> that need some kind of emulation for legacy boot/hardware etc.
-> 
-> What if we wanted to execute a small piece of code as a guest instance,
-> without the involvement of user-space? The KVM functions are already 
-> doing
-> what they should: VM and vCPU setup is already part of the kernel, the 
-> only
-> missing piece is memory handling.
-> 
-> With these series, (a) we expose to the Linux Kernel the bare minimum 
-> KVM
-> API functions in order to spawn a guest instance without the 
-> intervention
-> of user-space; and (b) we tweak the memory handling code of KVM-related
-> functions to account for another kind of guest, spawned in 
-> kernel-space.
-> 
-> PATCH #1 exposes the needed stub functions, whereas PATCH #2 introduces 
-> the
-> changes in the KVM memory handling code for x86_64 and aarch64.
-> 
-> An example of use is provided based on kvmtest.c
-> [https://lwn.net/Articles/658512/] at
-> https://github.com/cloudkernels/kvmmtest
+On Tue, Apr 28, 2020 at 05:16:41PM +0200, Joerg Roedel wrote:
+> @@ -480,6 +500,22 @@ SYM_DATA_LOCAL(early_gdt_descr_base,	.quad INIT_PER_CPU_VAR(gdt_page))
+>  SYM_DATA(phys_base, .quad 0x0)
+>  EXPORT_SYMBOL(phys_base)
+>
+> +/* Boot GDT used when kernel addresses are not mapped yet */
+> +SYM_DATA_LOCAL(boot_gdt_descr,		.word boot_gdt_end - boot_gdt)
+> +SYM_DATA_LOCAL(boot_gdt_base,		.quad 0)
+> +SYM_DATA_START(boot_gdt)
+> +	.quad	0
+> +	.quad   0x00cf9a000000ffff	/* __KERNEL32_CS */
+> +	.quad   0x00af9a000000ffff	/* __KERNEL_CS */
+> +	.quad   0x00cf92000000ffff	/* __KERNEL_DS */
+> +	.quad	0			/* __USER32_CS - unused */
+> +	.quad	0			/* __USER_DS   - unused */
+> +	.quad	0			/* __USER_CS   - unused */
+> +	.quad	0			/* unused */
+> +	.quad   0x0080890000000000	/* TSS descriptor */
+> +	.quad   0x0000000000000000	/* TSS continued */
 
-You don't explain *why* we would want this. What is the overhead of 
-having
-a userspace if your guest doesn't need any userspace handling? The 
-kvmtest
-example indeed shows that the KVM userspace API is usable  without any 
-form
-of emulation, hence has almost no cost.
+Any chance you could use macros ala GDT_ENTRY_INIT() for those instead
+of the naked values?
 
-Without a clear description of the advantages of your solution, as well
-as a full featured in-tree use case, I find it pretty hard to support 
-this.
-
-Thanks,
-
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
