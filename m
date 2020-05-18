@@ -2,106 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EEC71D78AA
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 14:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E250C1D790B
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 14:56:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbgERMcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 08:32:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40146 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726682AbgERMcA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 08:32:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589805118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JSwYOVViRmho7SQfsfACP8dXKwqAgv5XuIjfF821PSU=;
-        b=hoyvxbOlXky1wnDbrX6jMt2qm58vX5BLcULP2RfWStKOeG0/dfL7qENbYU8mo4hz1dVbk/
-        LC/Ki9w2zmitNlD9CfevHCXMxuzB7h6qbxDCmRMfJvReVZUkz7n1FmTQ0wjbo0IuFI51se
-        lK+5Ncs17vcJPS96t5RCTLin2q432jI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-yN9rH3jfOxWUS1KMd63KFg-1; Mon, 18 May 2020 08:31:57 -0400
-X-MC-Unique: yN9rH3jfOxWUS1KMd63KFg-1
-Received: by mail-wr1-f71.google.com with SMTP id h12so5574035wrr.19
-        for <kvm@vger.kernel.org>; Mon, 18 May 2020 05:31:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JSwYOVViRmho7SQfsfACP8dXKwqAgv5XuIjfF821PSU=;
-        b=E8lGmw1hsWpG8e8CP8qcZnGlUHkw0HtHOfJaO0PaMRR+MxIe8vbjKhOKR2wWKRHz02
-         L+dkjxxr1Jua1RmwrBw+V1ywcEVm5i24r685oTgz8tXihehOOacufbKkOt9WKBnQknVC
-         MfTh7uFnWuMRcKZwcQOI1yyv298hPEPKo6RY5zNqx4GCo2GDZI+dbQfiFafaIyNDOjOr
-         ZjZyPqxXtOR9A30NDbysV96Tecpgo12UGgMEG6PBABB72pmvTvDExuKE26t4QRD5Vr+0
-         0wuC9k98oij0Pw+VKzfENNVxU1W98l0KbGfl0Wu+kBK7ULqUrPka/doXyr/E+xoFDpbk
-         nJIg==
-X-Gm-Message-State: AOAM532h0uYD0F3FKQUhB5s4EnFVVzttETZhw66tYv+rBZkWgShSvg7u
-        82ssczZC4T8VU6/v0Bw9o8sBoWiwmFN+3qRoGACscNxe08zwSOc5cPItJ8MOdIBijteSSvi+1RL
-        9GN6b1sOgVwb4
-X-Received: by 2002:a1c:c2c6:: with SMTP id s189mr20300111wmf.25.1589805115984;
-        Mon, 18 May 2020 05:31:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxeeGxVDfzc+aC9AYtRchJxAqaRHN553hwC8AKlTRhhdZrmctqO5FrFE9595gxCNWK9MUNt4w==
-X-Received: by 2002:a1c:c2c6:: with SMTP id s189mr20300085wmf.25.1589805115732;
-        Mon, 18 May 2020 05:31:55 -0700 (PDT)
-Received: from [192.168.178.58] ([151.30.90.67])
-        by smtp.gmail.com with ESMTPSA id b12sm16992464wmj.0.2020.05.18.05.31.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2020 05:31:55 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: Use KVM CPU capabilities to determine CR4
- reserved bits
-To:     Xiaoyao Li <xiaoyao.li@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jmattson@google.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200506094436.3202-1-pbonzini@redhat.com>
- <6a4daca4-6034-901a-261f-215df7d606a6@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <09cb27f8-fa02-4b37-94de-1a4d86b9bdbd@redhat.com>
-Date:   Mon, 18 May 2020 14:31:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <6a4daca4-6034-901a-261f-215df7d606a6@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1726940AbgERM44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 08:56:56 -0400
+Received: from foss.arm.com ([217.140.110.172]:39934 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726709AbgERM44 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 08:56:56 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3985E101E;
+        Mon, 18 May 2020 05:56:55 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.25])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 676FB3F305;
+        Mon, 18 May 2020 05:56:54 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+Subject: [PATCH kvmtool v2] net: uip: Fix GCC 10 warning about checksum calculation
+Date:   Mon, 18 May 2020 13:56:49 +0100
+Message-Id: <20200518125649.216416-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/05/20 06:52, Xiaoyao Li wrote:
-> On 5/6/2020 5:44 PM, Paolo Bonzini wrote:
->> Using CPUID data can be useful for the processor compatibility
->> check, but that's it.  Using it to compute guest-reserved bits
->> can have both false positives (such as LA57 and UMIP which we
->> are already handling) and false negatives: 
-> 
->> in particular, with
->> this patch we don't allow anymore a KVM guest to set CR4.PKE
->> when CR4.PKE is clear on the host.
-> 
-> A common question about whether a feature can be exposed to guest:
-> 
-> Given a feature, there is a CPUID bit to enumerate it, and a CR4 bit to
-> turn it on/off. Whether the feature can be exposed to guest only depends
-> on host CR4 setting? I.e., if CPUID bit is not cleared in cpu_data in
-> host but host kernel doesn't set the corresponding CR4 bit to turn it
-> on, we cannot expose the feature to guest. right?
+GCC 10.1 generates a warning in net/ip/csum.c about exceeding a buffer
+limit in a memcpy operation:
+------------------
+In function 'memcpy',
+    inlined from 'uip_csum_udp' at net/uip/csum.c:58:3:
+/usr/include/aarch64-linux-gnu/bits/string_fortified.h:34:10: error: writing 1 byte into a region of size 0 [-Werror=stringop-overflow=]
+   34 |   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from net/uip/csum.c:1:
+net/uip/csum.c: In function 'uip_csum_udp':
+include/kvm/uip.h:132:6: note: at offset 0 to object 'sport' with size 2 declared here
+  132 |  u16 sport;
+------------------
 
-It depends.  The most obvious case is that the host kernel doesn't use
-CR4.PSE but we even use 4MB pages to emulate paging disabled mode when
-the processor doesn't support unrestricted guests.
+This warning originates from the code taking the address of the "sport"
+member, then using that with some pointer arithmetic in a memcpy call.
+GCC now sees that the object is only a u16, so copying 12 bytes into it
+cannot be any good.
+It's somewhat debatable whether this is a legitimate warning, as there
+is enough storage at that place, and we knowingly use the struct and
+its variabled-sized member at the end.
 
-Basically, the question is whether we are able to save/restore any
-processor state attached to the CR4 bit on vmexit/vmentry.  In this case
-there is no PKRU field in the VMCS and the RDPKRU/WRPKRU instructions
-require CR4.PKE=1; therefore, we cannot let the guest enable CR4.PKE
-unless it's also enabled on the host.
+However we can also rewrite the code, to not abuse the "&" operation of
+some *member*, but take the address of the struct itself.
+This makes the code less dodgy, and indeed appeases GCC 10.
 
-Paolo
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+Changes v1 ... v2:
+- add tags
+- remove Unicode from commit message
+- add space between type and pointer
+
+ net/uip/csum.c | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
+
+diff --git a/net/uip/csum.c b/net/uip/csum.c
+index 7ca8bada..6f5c4b39 100644
+--- a/net/uip/csum.c
++++ b/net/uip/csum.c
+@@ -37,7 +37,7 @@ u16 uip_csum_udp(struct uip_udp *udp)
+ 	struct uip_pseudo_hdr hdr;
+ 	struct uip_ip *ip;
+ 	int udp_len;
+-	u8 *pad;
++	u8 *udp_hdr = (u8 *)udp + offsetof(struct uip_udp, sport);
+ 
+ 	ip	  = &udp->ip;
+ 
+@@ -50,13 +50,12 @@ u16 uip_csum_udp(struct uip_udp *udp)
+ 	udp_len	  = uip_udp_len(udp);
+ 
+ 	if (udp_len % 2) {
+-		pad = (u8 *)&udp->sport + udp_len;
+-		*pad = 0;
+-		memcpy((u8 *)&udp->sport + udp_len + 1, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&udp->sport, udp_len + 1 + sizeof(hdr));
++		udp_hdr[udp_len] = 0;		/* zero padding */
++		memcpy(udp_hdr + udp_len + 1, &hdr, sizeof(hdr));
++		return uip_csum(0, udp_hdr, udp_len + 1 + sizeof(hdr));
+ 	} else {
+-		memcpy((u8 *)&udp->sport + udp_len, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&udp->sport, udp_len + sizeof(hdr));
++		memcpy(udp_hdr + udp_len, &hdr, sizeof(hdr));
++		return uip_csum(0, udp_hdr, udp_len + sizeof(hdr));
+ 	}
+ 
+ }
+@@ -66,7 +65,7 @@ u16 uip_csum_tcp(struct uip_tcp *tcp)
+ 	struct uip_pseudo_hdr hdr;
+ 	struct uip_ip *ip;
+ 	u16 tcp_len;
+-	u8 *pad;
++	u8 *tcp_hdr = (u8 *)tcp + offsetof(struct uip_tcp, sport);
+ 
+ 	ip	  = &tcp->ip;
+ 	tcp_len   = ntohs(ip->len) - uip_ip_hdrlen(ip);
+@@ -81,12 +80,11 @@ u16 uip_csum_tcp(struct uip_tcp *tcp)
+ 		pr_warning("tcp_len(%d) is too large", tcp_len);
+ 
+ 	if (tcp_len % 2) {
+-		pad = (u8 *)&tcp->sport + tcp_len;
+-		*pad = 0;
+-		memcpy((u8 *)&tcp->sport + tcp_len + 1, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&tcp->sport, tcp_len + 1 + sizeof(hdr));
++		tcp_hdr[tcp_len] = 0;		/* zero padding */
++		memcpy(tcp_hdr + tcp_len + 1, &hdr, sizeof(hdr));
++		return uip_csum(0, tcp_hdr, tcp_len + 1 + sizeof(hdr));
+ 	} else {
+-		memcpy((u8 *)&tcp->sport + tcp_len, &hdr, sizeof(hdr));
+-		return uip_csum(0, (u8 *)&tcp->sport, tcp_len + sizeof(hdr));
++		memcpy(tcp_hdr + tcp_len, &hdr, sizeof(hdr));
++		return uip_csum(0, tcp_hdr, tcp_len + sizeof(hdr));
+ 	}
+ }
+-- 
+2.17.1
 
