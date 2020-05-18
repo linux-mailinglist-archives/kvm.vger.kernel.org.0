@@ -2,457 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8B721D88F8
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 22:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 643411D898C
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 22:51:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726714AbgERUQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 16:16:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55850 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726386AbgERUQb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 16:16:31 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47168C061A0C
-        for <kvm@vger.kernel.org>; Mon, 18 May 2020 13:16:31 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id z5so13195379qtz.16
-        for <kvm@vger.kernel.org>; Mon, 18 May 2020 13:16:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=jGOiN29izshsfo5wC5UNUVjntga3yusW+0ovvRmky5o=;
-        b=tKFdfp9gUS6dhYAAM94B1xCHUx+YIq2qtrE20Z+5NUJvIsOifOJKfBY5Id7nvi/eaa
-         rw4d4YY18daee+bThgC1euXEaNPCxbGa/yEH5DMX2Za3SJE5NsVAHxm5mZPSIp55Ygh0
-         Tbb6cctfT6tEG4ZqppiIljbWFLe/SzF/2DW3p/sKuEKR1M/UQJHyvnpKKlqRqpve8uU2
-         5dgGXNSERfu8nuzh58cjVDeMnoOROC5MfLl2P83JJn15suCuw723qAN7+Vvp8B2m4chR
-         dVAzmnDv+UTvBOYqftMdWTAMCZPdSyDVyul1gwhe48Fd6JuJowoCrKMH95gtgmIYQps9
-         WwkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=jGOiN29izshsfo5wC5UNUVjntga3yusW+0ovvRmky5o=;
-        b=dXrNxVzByny9oLST1ugkGkO4iBX1BLyAjfQDKrFggzkKhscfsFGp804auzxvEzY5Hl
-         tFurSJm//t2RRSyokHr5Kk3Bn9SuwyL4qRjuEUA2pCq5VyeXyWjgwHK7H6spZKjgxCgP
-         nuDxnYSzG/gl0sWe0pC73w6C77UafPMQablfgnAPWEzubgu8JEJ4pa0c3fJ8HWip1Z6I
-         yL31iyttxo9lca3F3OLAT2+M6vwz6LGL+O06JGvRRRSJkHz9iqT2jfQKgvWT4hFjCuwh
-         smB7A6MIpnneyPHS2zjiyst/TSICUeHktt3qRgGIjOsJ63v1/1cGazk+u1g9XaZtdERf
-         X9LQ==
-X-Gm-Message-State: AOAM531X2hHlWBnCg+XEc6XZQ9HIoP2ijI1oIf3+MZlxMDaYxeJJBQvC
-        K6IOihVqPIgwQt4jXeOL9/8aOtvpq7imqcI9y4huZRGY2qbzkMs2+jYrBNqxo1UAy14u3b+T0B8
-        qOndBITg8dmOm5uyg4oB5dArIE8UNWnMAGATojwuVyVinTAxKpHEv1vp4R59/kqN9EMfnfUNUX3
-        9Pev4=
-X-Google-Smtp-Source: ABdhPJzbKXfDfNJiEzJOIUDBMvsFPO0j43k2ln0P82reS9J+kOFOSVLse7LAVNim325jj1xXM293CVTmO6uyx4OLozMSQA==
-X-Received: by 2002:ad4:53a2:: with SMTP id j2mr18195821qvv.159.1589832990316;
- Mon, 18 May 2020 13:16:30 -0700 (PDT)
-Date:   Mon, 18 May 2020 13:16:00 -0700
-In-Reply-To: <20200518201600.255669-1-makarandsonare@google.com>
-Message-Id: <20200518201600.255669-3-makarandsonare@google.com>
-Mime-Version: 1.0
-References: <20200518201600.255669-1-makarandsonare@google.com>
-X-Mailer: git-send-email 2.26.2.761.g0e0b3e54be-goog
-Subject: [PATCH  2/2] KVM: selftests: VMX preemption timer migration test
-From:   Makarand Sonare <makarandsonare@google.com>
-To:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
-Cc:     Makarand Sonare <makarandsonare@google.com>
+        id S1726999AbgERUpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 16:45:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33154 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726250AbgERUpo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 16:45:44 -0400
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2065F20849
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 20:45:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589834743;
+        bh=m0qDc2rqhbYfXzUhdgSURC1JfnDA7BV3Q1x+hiVOdJg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=bdXQSf2pAvowX+dXYkD1lb7HPOLv/PGjTl0dkf5fUSTOVJXEkCO9AMQXHani8vjaR
+         nVU5XE6shDDRqJb0YbpMoW1+HSwA52Qte+s5flOlZBv4ULrNbed159JOU5MqlZ+L++
+         qMZhvn3Sc/okuegyGXdi3yatOVuPsNFSihG38yAM=
+Received: by mail-wm1-f47.google.com with SMTP id z4so851729wmi.2
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 13:45:43 -0700 (PDT)
+X-Gm-Message-State: AOAM532cdwyWvqMYVk7JzUTJ4ZAr44AJkv6O6/yP0Fv3Dy99/2BPZMi9
+        bD6OYiMWDqkV65+Bl820bawOdX9oST+OePT19K99YQ==
+X-Google-Smtp-Source: ABdhPJx74MCALT/pra6bLUZ0ByZ9NJrr/WbfqwQKtkG5VsYQr7lPeTeDLdtzrMRIkUVLWmR0I2kPQpVXvHf7FyLTN/0=
+X-Received: by 2002:a1c:9989:: with SMTP id b131mr1256561wme.176.1589834741453;
+ Mon, 18 May 2020 13:45:41 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1589784221.git.ananos@nubificus.co.uk> <c1124c27293769f8e4836fb8fdbd5adf@kernel.org>
+ <CALRTab90UyMq2hMxCdCmC3GwPWFn2tK_uKMYQP2YBRcHwzkEUQ@mail.gmail.com>
+In-Reply-To: <CALRTab90UyMq2hMxCdCmC3GwPWFn2tK_uKMYQP2YBRcHwzkEUQ@mail.gmail.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 18 May 2020 13:45:29 -0700
+X-Gmail-Original-Message-ID: <CALCETrVKJK43jHhFyDqEeAczVDkNp5QpFFpsy8vE7VAhpAyXDA@mail.gmail.com>
+Message-ID: <CALCETrVKJK43jHhFyDqEeAczVDkNp5QpFFpsy8vE7VAhpAyXDA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Expose KVM API to Linux Kernel
+To:     Anastassios Nanos <ananos@nubificus.co.uk>
+Cc:     Marc Zyngier <maz@kernel.org>, kvm list <kvm@vger.kernel.org>,
+        kvmarm@lists.cs.columbia.edu, LKML <linux-kernel@vger.kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a nested VM with a VMX-preemption timer is migrated, verify that the
-nested VM and its parent VM observe the VMX-preemption timer exit close to
-the original expiration deadline.
+On Mon, May 18, 2020 at 1:50 AM Anastassios Nanos
+<ananos@nubificus.co.uk> wrote:
+>
+> On Mon, May 18, 2020 at 10:50 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On 2020-05-18 07:58, Anastassios Nanos wrote:
+> > > To spawn KVM-enabled Virtual Machines on Linux systems, one has to us=
+e
+> > > QEMU, or some other kind of VM monitor in user-space to host the vCPU
+> > > threads, I/O threads and various other book-keeping/management
+> > > mechanisms.
+> > > This is perfectly fine for a large number of reasons and use cases: f=
+or
+> > > instance, running generic VMs, running general purpose Operating
+> > > systems
+> > > that need some kind of emulation for legacy boot/hardware etc.
+> > >
+> > > What if we wanted to execute a small piece of code as a guest instanc=
+e,
+> > > without the involvement of user-space? The KVM functions are already
+> > > doing
+> > > what they should: VM and vCPU setup is already part of the kernel, th=
+e
+> > > only
+> > > missing piece is memory handling.
+> > >
+> > > With these series, (a) we expose to the Linux Kernel the bare minimum
+> > > KVM
+> > > API functions in order to spawn a guest instance without the
+> > > intervention
+> > > of user-space; and (b) we tweak the memory handling code of KVM-relat=
+ed
+> > > functions to account for another kind of guest, spawned in
+> > > kernel-space.
+> > >
+> > > PATCH #1 exposes the needed stub functions, whereas PATCH #2 introduc=
+es
+> > > the
+> > > changes in the KVM memory handling code for x86_64 and aarch64.
+> > >
+> > > An example of use is provided based on kvmtest.c
+> > > [http://email.nubificus.co.uk/c/eJwdzU0LgjAAxvFPo0eZm1t62MEkC0xQScJTu=
+BdfcGrpQuvTN4KHP7_bIygSDQfY7mkUXotbzQJQftIX7NI9EtEYofOW3eMJ6uTxTtIqz2B1LPhl=
+-w6nMrc8MNa9ctp_-TzaHWUekxwfSMCRIA3gLvFrQAiGDUNE-MxWtNP6uVootGBsprbJmaQ2Chf=
+dcyVXQ4J97EIDe6G7T8zRIJdJKmde2h_0WTe_] at
+> > > http://email.nubificus.co.uk/c/eJwljdsKgkAYhJ9GL2X9NQ8Xe2GSBSaoJOFVrO=
+t6QFdL17Sevq1gGPhmGKbERllRtFNb7Hvn9EIKF2Wv6AFNtPmlz33juMbXYAAR3pYwypMY8n1KT=
+-u7O2SJYiJO2l6rf05HrjbYsCihRUEp2DYCgmyH2TowGeiVCS6oPW6EuM-K4SkQSNWtaJbiu5ZA=
+-3EpOzYNrJ8ldk_OBZuFOuHNseTdv9LGqf4Apyg8eg
+>
+> Hi Marc,
+>
+> thanks for taking the time to check this!
+>
+> >
+> > You don't explain *why* we would want this. What is the overhead of
+> > having
+> > a userspace if your guest doesn't need any userspace handling? The
+> > kvmtest
+> > example indeed shows that the KVM userspace API is usable  without any
+> > form
+> > of emulation, hence has almost no cost.
+>
+> The rationale behind such an approach is two-fold:
+> (a) we are able to ditch any user-space involvement in the creation and
+> spawning of a KVM guest. This is particularly interesting in use-cases
+> where short-lived tasks are spawned on demand.  Think of a scenario where
+> an ABI compatible binary is loaded in memory.  Spawning it as a guest fro=
+m
+> userspace would incur a number of IOCTLs. Doing the same from the kernel
+> would be the same number of IOCTLs but now these are function calls;
+> additionally, memory handling is kind of simplified.
+>
+> (b) I agree that the userspace KVM API is usable without emulation for a
+> simple task, written in bytecode, adding two registers. But what about
+> something more complicated? something that needs I/O? for most use-cases,
+> I/O happens between the guest and some hardware device (network/storage
+> etc.). Being in the kernel saves us from doing unneccessary mode switches=
+.
+> Of course there are optimizations for handling I/O on QEMU/KVM VMs
+> (virtio/vhost), but essentially what happens is removing mode-switches (a=
+nd
+> exits) for I/O operations -- is there a good reason not to address that
+> directly? a guest running in the kernel exits because of an I/O request,
+> which gets processed and forwarded directly to the relevant subsystem *in=
+*
+> the kernel (net/block etc.).
+>
+> We work on both directions with a particular focus on (a) -- device I/O c=
+ould
+> be handled with other mechanisms as well (VFs for instance).
+>
+> > Without a clear description of the advantages of your solution, as well
+> > as a full featured in-tree use case, I find it pretty hard to support
+> > this.
+>
+> Totally understand that -- please keep in mind that this is a first (baby=
+)
+> step for what we call KVMM (kernel virtual machine monitor). We presented
+> the architecture at FOSDEM and some preliminary results regarding I/O. Of
+> course, this is WiP, and far from being upstreamable. Hence the kvmmtest
+> example showcasing the potential use-case.
+>
+> To be honest my main question is whether we are interested in such an
+> approach in the first place, and then try to work on any rough edges. As
+> far as I understand, you're not in favor of this approach.
 
-Signed-off-by: Makarand Sonare <makarandsonare@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Change-Id: Ia79337c682ee161399525edc34201fad473fc190
----
- tools/arch/x86/include/uapi/asm/kvm.h         |   1 +
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/include/kvm_util.h  |   2 +
- .../selftests/kvm/include/x86_64/processor.h  |  11 +-
- .../selftests/kvm/include/x86_64/vmx.h        |  27 ++
- .../kvm/x86_64/vmx_preemption_timer_test.c    | 256 ++++++++++++++++++
- 7 files changed, 295 insertions(+), 4 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
-
-diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-index 60701178b9cc1..13dca545554dc 100644
---- a/tools/arch/x86/include/uapi/asm/kvm.h
-+++ b/tools/arch/x86/include/uapi/asm/kvm.h
-@@ -402,6 +402,7 @@ struct kvm_sync_regs {
- struct kvm_vmx_nested_state_data {
- 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
- 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
-+	__u64 preemption_timer_deadline;
- };
- 
- struct kvm_vmx_nested_state_hdr {
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 222e50104296a..f159718f90c0a 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -10,6 +10,7 @@
- /x86_64/set_sregs_test
- /x86_64/smm_test
- /x86_64/state_test
-+/x86_64/vmx_preemption_timer_test
- /x86_64/svm_vmcall_test
- /x86_64/sync_regs_test
- /x86_64/vmx_close_while_nested_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c66f4eec34111..780f0c189a7bc 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -20,6 +20,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
-+TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
- TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index e244c6ecfc1d5..919e161dd2893 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -314,6 +314,8 @@ void ucall_uninit(struct kvm_vm *vm);
- void ucall(uint64_t cmd, int nargs, ...);
- uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
- 
-+#define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
-+				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
- #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
- #define GUEST_DONE()		ucall(UCALL_DONE, 0)
- #define __GUEST_ASSERT(_condition, _nargs, _args...) do {	\
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 7428513a4c687..7cb19eca6c72d 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -79,13 +79,16 @@ static inline uint64_t get_desc64_base(const struct desc64 *desc)
- static inline uint64_t rdtsc(void)
- {
- 	uint32_t eax, edx;
--
-+	uint32_t tsc_val;
- 	/*
- 	 * The lfence is to wait (on Intel CPUs) until all previous
--	 * instructions have been executed.
-+	 * instructions have been executed. If software requires RDTSC to be
-+	 * executed prior to execution of any subsequent instruction, it can
-+	 * execute LFENCE immediately after RDTSC
- 	 */
--	__asm__ __volatile__("lfence; rdtsc" : "=a"(eax), "=d"(edx));
--	return ((uint64_t)edx) << 32 | eax;
-+	__asm__ __volatile__("lfence; rdtsc; lfence" : "=a"(eax), "=d"(edx));
-+	tsc_val = ((uint64_t)edx) << 32 | eax;
-+	return tsc_val;
- }
- 
- static inline uint64_t rdtscp(uint32_t *aux)
-diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-index 3d27069b9ed9c..ccff3e6e27048 100644
---- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-@@ -575,6 +575,33 @@ struct vmx_pages {
- 	void *eptp;
- };
- 
-+union vmx_basic {
-+	u64 val;
-+	struct {
-+		u32 revision;
-+		u32	size:13,
-+			reserved1:3,
-+			width:1,
-+			dual:1,
-+			type:4,
-+			insouts:1,
-+			ctrl:1,
-+			vm_entry_exception_ctrl:1,
-+			reserved2:7;
-+	};
-+};
-+
-+union vmx_ctrl_msr {
-+	u64 val;
-+	struct {
-+		u32 set, clr;
-+	};
-+};
-+
-+union vmx_basic basic;
-+union vmx_ctrl_msr ctrl_pin_rev;
-+union vmx_ctrl_msr ctrl_exit_rev;
-+
- struct vmx_pages *vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva);
- bool prepare_for_vmx_operation(struct vmx_pages *vmx);
- void prepare_vmcs(struct vmx_pages *vmx, void *guest_rip, void *guest_rsp);
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
-new file mode 100644
-index 0000000000000..10893b11511be
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
-@@ -0,0 +1,256 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * VMX-preemption timer test
-+ *
-+ * Copyright (C) 2020, Google, LLC.
-+ *
-+ * Test to ensure the VM-Enter after migration doesn't
-+ * incorrectly restarts the timer with the full timer
-+ * value instead of partially decayed timer value
-+ *
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+#define VCPU_ID		5
-+#define PREEMPTION_TIMER_VALUE			100000000ull
-+#define PREEMPTION_TIMER_VALUE_THRESHOLD1	 80000000ull
-+
-+u32 vmx_pt_rate;
-+bool l2_save_restore_done;
-+static u64 l2_vmx_pt_start;
-+volatile u64 l2_vmx_pt_finish;
-+
-+void l2_guest_code(void)
-+{
-+	u64 vmx_pt_delta;
-+
-+	vmcall();
-+	l2_vmx_pt_start = (rdtsc() >> vmx_pt_rate) << vmx_pt_rate;
-+
-+	//
-+	// Wait until the 1st threshold has passed
-+	//
-+	do {
-+		l2_vmx_pt_finish = rdtsc();
-+		vmx_pt_delta = (l2_vmx_pt_finish - l2_vmx_pt_start) >>
-+				vmx_pt_rate;
-+	} while (vmx_pt_delta < PREEMPTION_TIMER_VALUE_THRESHOLD1);
-+
-+	//
-+	// Force L2 through Save and Restore cycle
-+	//
-+	GUEST_SYNC(1);
-+
-+	l2_save_restore_done = 1;
-+
-+	//
-+	// Now wait for the preemption timer to fire and
-+	// exit to L1
-+	//
-+	while ((l2_vmx_pt_finish = rdtsc()))
-+		;
-+}
-+
-+void l1_guest_code(struct vmx_pages *vmx_pages)
-+{
-+#define L2_GUEST_STACK_SIZE 64
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	u64 l1_vmx_pt_start;
-+	u64 l1_vmx_pt_finish;
-+	u64 l1_tsc_deadline, l2_tsc_deadline;
-+
-+	GUEST_ASSERT(vmx_pages->vmcs_gpa);
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+	GUEST_ASSERT(load_vmcs(vmx_pages));
-+	GUEST_ASSERT(vmptrstz() == vmx_pages->vmcs_gpa);
-+
-+	prepare_vmcs(vmx_pages, l2_guest_code,
-+		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-+	vmwrite(GUEST_RIP, vmreadz(GUEST_RIP) + 3);
-+
-+	//
-+	// Check for Preemption timer support and turn on PIN control
-+	//
-+	basic.val = rdmsr(MSR_IA32_VMX_BASIC);
-+	ctrl_pin_rev.val = rdmsr(basic.ctrl ? MSR_IA32_VMX_TRUE_PINBASED_CTLS
-+			: MSR_IA32_VMX_PINBASED_CTLS);
-+	ctrl_exit_rev.val = rdmsr(basic.ctrl ? MSR_IA32_VMX_TRUE_EXIT_CTLS
-+			: MSR_IA32_VMX_EXIT_CTLS);
-+
-+	if (!(ctrl_pin_rev.clr & PIN_BASED_VMX_PREEMPTION_TIMER) ||
-+	    !(ctrl_exit_rev.clr & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER))
-+		return;
-+
-+	GUEST_ASSERT(!vmwrite(PIN_BASED_VM_EXEC_CONTROL,
-+			      vmreadz(PIN_BASED_VM_EXEC_CONTROL) |
-+			      PIN_BASED_VMX_PREEMPTION_TIMER));
-+
-+	GUEST_ASSERT(!vmwrite(VMX_PREEMPTION_TIMER_VALUE,
-+			      PREEMPTION_TIMER_VALUE));
-+
-+	vmx_pt_rate = rdmsr(MSR_IA32_VMX_MISC) & 0x1F;
-+
-+	l2_save_restore_done = 0;
-+
-+	l1_vmx_pt_start = (rdtsc() >> vmx_pt_rate) << vmx_pt_rate;
-+
-+	GUEST_ASSERT(!vmresume());
-+
-+	l1_vmx_pt_finish = rdtsc();
-+
-+	//
-+	// Ensure exit from L2 happens after L2 goes through
-+	// save and restore
-+	GUEST_ASSERT(l2_save_restore_done);
-+
-+	//
-+	// Ensure the exit from L2 is due to preemption timer expiry
-+	//
-+	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_PREEMPTION_TIMER);
-+
-+	l1_tsc_deadline = l1_vmx_pt_start +
-+		(PREEMPTION_TIMER_VALUE << vmx_pt_rate);
-+
-+	l2_tsc_deadline = l2_vmx_pt_start +
-+		(PREEMPTION_TIMER_VALUE << vmx_pt_rate);
-+
-+	//
-+	// Sync with the host and pass the l1|l2 pt_expiry_finish times and
-+	// tsc deadlines so that host can verify they are as expected
-+	//
-+	GUEST_SYNC_ARGS(2, l1_vmx_pt_finish, l1_tsc_deadline,
-+		l2_vmx_pt_finish, l2_tsc_deadline);
-+}
-+
-+void guest_code(struct vmx_pages *vmx_pages)
-+{
-+	if (vmx_pages)
-+		l1_guest_code(vmx_pages);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t vmx_pages_gva = 0;
-+
-+	struct kvm_regs regs1, regs2;
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	struct kvm_x86_state *state;
-+	struct ucall uc;
-+	int stage;
-+
-+	/*
-+	 * AMD currently does not implement any VMX features, so for now we
-+	 * just early out.
-+	 */
-+	nested_vmx_check_supported();
-+
-+	/* Create VM */
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+	run = vcpu_state(vm, VCPU_ID);
-+
-+	vcpu_regs_get(vm, VCPU_ID, &regs1);
-+
-+	if (kvm_check_cap(KVM_CAP_NESTED_STATE)) {
-+		vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+		vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
-+	} else {
-+		pr_info("will skip nested state checks\n");
-+		goto done;
-+	}
-+
-+	for (stage = 1;; stage++) {
-+		_vcpu_run(vm, VCPU_ID);
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Stage %d: unexpected exit reason: %u (%s),\n",
-+			    stage, run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
-+				  __FILE__, uc.args[1]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+
-+		/* UCALL_SYNC is handled here.  */
-+		TEST_ASSERT(!strcmp((const char *)uc.args[0], "hello") &&
-+			    uc.args[1] == stage, "Stage %d: Unexpected register values vmexit, got %lx",
-+			    stage, (ulong)uc.args[1]);
-+		//
-+		// If this stage 2 then we should verify the vmx pt expiry
-+		// is as expected
-+		//
-+		if (stage == 2) {
-+
-+			pr_info("Stage %d: L1 PT expiry TSC (%lu) , L1 TSC deadline (%lu)\n",
-+				stage, uc.args[2], uc.args[3]);
-+
-+			pr_info("Stage %d: L2 PT expiry TSC (%lu) , L2 TSC deadline (%lu)\n",
-+				stage, uc.args[4], uc.args[5]);
-+
-+			//
-+			// From L1's perspective verify Preemption timer hasn't
-+			// expired too early
-+			//
-+
-+			TEST_ASSERT(uc.args[2] >= uc.args[3],
-+				"Stage %d: L1 PT expiry TSC (%lu) < L1 TSC deadline (%lu)",
-+				stage, uc.args[2], uc.args[3]);
-+
-+			//
-+			// From L2's perspective verify Preemption timer hasn't
-+			// expired too late
-+			//
-+			TEST_ASSERT(uc.args[4] < uc.args[5],
-+				"Stage %d: L2 PT expiry TSC (%lu) > L2 TSC deadline (%lu)",
-+				stage, uc.args[4], uc.args[5]);
-+		}
-+
-+		state = vcpu_save_state(vm, VCPU_ID);
-+		memset(&regs1, 0, sizeof(regs1));
-+		vcpu_regs_get(vm, VCPU_ID, &regs1);
-+
-+		kvm_vm_release(vm);
-+
-+		/* Restore state in a new VM.  */
-+		kvm_vm_restart(vm, O_RDWR);
-+		vm_vcpu_add(vm, VCPU_ID);
-+		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+		vcpu_load_state(vm, VCPU_ID, state);
-+		run = vcpu_state(vm, VCPU_ID);
-+		free(state);
-+
-+		memset(&regs2, 0, sizeof(regs2));
-+		vcpu_regs_get(vm, VCPU_ID, &regs2);
-+		TEST_ASSERT(!memcmp(&regs1, &regs2, sizeof(regs2)),
-+			    "Unexpected register values after vcpu_load_state; rdi: %lx rsi: %lx",
-+			    (ulong) regs2.rdi, (ulong) regs2.rsi);
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+}
--- 
-2.26.2.761.g0e0b3e54be-goog
-
+The usual answer here is that the kernel is not in favor of adding
+in-kernel functionality that is not used in the upstream kernel.  If
+you come up with a real use case, and that use case is GPL and has
+plans for upstreaming, and that use case has a real benefit
+(dramatically faster than user code could likely be, does something
+new and useful, etc), then it may well be mergeable.
