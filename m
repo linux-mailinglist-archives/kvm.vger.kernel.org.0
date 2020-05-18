@@ -2,54 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6813A1D7C4F
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 17:05:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 415D51D7D48
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 17:49:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727954AbgERPFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 11:05:05 -0400
-Received: from mga12.intel.com ([192.55.52.136]:22351 "EHLO mga12.intel.com"
+        id S1728369AbgERPtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 11:49:24 -0400
+Received: from mga18.intel.com ([134.134.136.126]:11281 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727036AbgERPFE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 11:05:04 -0400
-IronPort-SDR: 305zeS+kcWD0TMHLCckGhJi8fJLXR6N/ZiFMDyfjHG4qqmzqDRKrPDqQeu61s4SqbYcoX1vc6l
- vTe25RMSqHbA==
+        id S1727007AbgERPtY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 11:49:24 -0400
+IronPort-SDR: kp+h8Sb8My/UII/YXc4z9vv7QAXWISEr1LsOZcxVkrrrLaukiE/0XQQVhHQlkO8dEV96gEy0Us
+ 973A2z5NmDOQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 08:05:03 -0700
-IronPort-SDR: Vd9P702OhnTD65JgCyk6ybw/3fCd/mJxdm4xaT7hjG79UP3iByIu24MuLNT/WNYwW971Wpmo0Y
- KgJoXokK7tmA==
-X-ExtLoop1: 1
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 08:49:23 -0700
+IronPort-SDR: L6G04AIge5D55UrRgxPLrv4p4b0eq6pVar1+izTtqtjQ3SmrW/XACqXzn35bZ6qFbHNNydws0g
+ dKKn4R/QpTlA==
 X-IronPort-AV: E=Sophos;i="5.73,407,1583222400"; 
-   d="scan'208";a="252919967"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga007.jf.intel.com with ESMTP; 18 May 2020 08:05:01 -0700
-Date:   Mon, 18 May 2020 08:05:01 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        peterx@redhat.com
-Subject: Re: [PATCH 1/4] KVM: nSVM: fix condition for filtering async PF
-Message-ID: <20200518150501.GA3632@linux.intel.com>
-References: <20200516135311.704878-1-pbonzini@redhat.com>
- <20200516135311.704878-2-pbonzini@redhat.com>
+   d="scan'208";a="465801574"
+Received: from xiaoxuwa-mobl.ccr.corp.intel.com (HELO [10.255.28.12]) ([10.255.28.12])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 08:49:22 -0700
+Subject: Re: [PATCH] kvm: x86: Use KVM CPU capabilities to determine CR4
+ reserved bits
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jmattson@google.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20200506094436.3202-1-pbonzini@redhat.com>
+ <6a4daca4-6034-901a-261f-215df7d606a6@intel.com>
+ <09cb27f8-fa02-4b37-94de-1a4d86b9bdbd@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <3bf2e68f-9843-cfed-6520-54dbf4955fc8@intel.com>
+Date:   Mon, 18 May 2020 23:49:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200516135311.704878-2-pbonzini@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <09cb27f8-fa02-4b37-94de-1a4d86b9bdbd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 16, 2020 at 09:53:08AM -0400, Paolo Bonzini wrote:
-> Async page faults have to be trapped in the host (L1 in this
-> case), since the APC reason was passed from L0 to L1 and stored
-> in the L1 APF data page.  This was completely reversed, as the
-> page faults were passed to the guest (a L2 hypervisor).
+On 5/18/2020 8:31 PM, Paolo Bonzini wrote:
+> On 18/05/20 06:52, Xiaoyao Li wrote:
+>> On 5/6/2020 5:44 PM, Paolo Bonzini wrote:
+>>> Using CPUID data can be useful for the processor compatibility
+>>> check, but that's it.  Using it to compute guest-reserved bits
+>>> can have both false positives (such as LA57 and UMIP which we
+>>> are already handling) and false negatives:
+>>
+>>> in particular, with
+>>> this patch we don't allow anymore a KVM guest to set CR4.PKE
+>>> when CR4.PKE is clear on the host.
+>>
+>> A common question about whether a feature can be exposed to guest:
+>>
+>> Given a feature, there is a CPUID bit to enumerate it, and a CR4 bit to
+>> turn it on/off. Whether the feature can be exposed to guest only depends
+>> on host CR4 setting? I.e., if CPUID bit is not cleared in cpu_data in
+>> host but host kernel doesn't set the corresponding CR4 bit to turn it
+>> on, we cannot expose the feature to guest. right?
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+> It depends.  The most obvious case is that the host kernel doesn't use
+> CR4.PSE but we even use 4MB pages to emulate paging disabled mode when
+> the processor doesn't support unrestricted guests.
+> 
+> Basically, the question is whether we are able to save/restore any
+> processor state attached to the CR4 bit on vmexit/vmentry.  In this case
+> there is no PKRU field in the VMCS and the RDPKRU/WRPKRU instructions
+> require CR4.PKE=1; therefore, we cannot let the guest enable CR4.PKE
+> unless it's also enabled on the host.
+> 
 
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+aha! That's reason!
+Thanks for the clarification.
+
