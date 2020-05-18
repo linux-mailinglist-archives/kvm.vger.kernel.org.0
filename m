@@ -2,102 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 596201D88F1
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 22:15:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE1F01D88F6
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 22:16:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbgERUNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 16:13:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38968 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726250AbgERUNj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 16:13:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589832817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+FuqqfaCRxkXrkU1XoQZ3g0hbXKUiq+yLL3TVWqu58Q=;
-        b=f48qGWWxLuD97QvcgSgPGZBCd0+//O74YGsHA/4BEgG/qyJDn+xm4mCx/QDJs0nwJF6GiF
-        295PkirWZQFnITJKvJd9dEdn0V32MeKHRoA0gNT6/UrLLFIteikb9rqfhX9vX2mwlZAotr
-        v0unftTLBt5G7sFhI/8uTFyEbgGWUyA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-Z8477s4ZNsS4ftrsuvM3ow-1; Mon, 18 May 2020 16:13:33 -0400
-X-MC-Unique: Z8477s4ZNsS4ftrsuvM3ow-1
-Received: by mail-wm1-f70.google.com with SMTP id a206so202156wmh.6
-        for <kvm@vger.kernel.org>; Mon, 18 May 2020 13:13:33 -0700 (PDT)
+        id S1726378AbgERUQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 16:16:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55806 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726250AbgERUQR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 16:16:17 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9AD0C061A0C
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 13:16:17 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id o16so13250426qto.12
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 13:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=E/Lnnyqh/lIivI+1URST7q6N2yYOibnHjeOOhY+GB/M=;
+        b=PtcPYJSWjRgmemqaf9hq8pOmW726EE92vxW7O2VPll+hIdFZJmUcU0wKaEx7c/O8xG
+         rpW7rf/D7XLOXq9OT3kOZb5suGSrlzYRwNnz9qAkCO8C3zFjg+cMresPJE+7MQvj1Ky4
+         tb2zXw/dPCGjpArbWXdXeqpO6a0J86QANu+nhkRwHc8ApVJ6/L0dwr0PjO4xonQ1HzHn
+         w8OyimH8H+JdPNeEIK7VcALgT7SWQFLttW9f8UmhA5Eyt06+iiJGj2kZv8Lr9Zv6Kikf
+         7npoJFCKx02vxw8/jJ/BQ56s0zKY22sNf3qsGhqkeTT9qBjd75XPreCswLbXm9TqCoax
+         6zKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+FuqqfaCRxkXrkU1XoQZ3g0hbXKUiq+yLL3TVWqu58Q=;
-        b=tf+DSg642nyGIo3Mxxndl/fiA2gclV0ryBsI+gPrKdG1LPXP3J6sPHNZmUhgH+M5SN
-         c31wCCW2MKK78akJtfNtS7aodbJf4JiZWAG6wABy4Aiz/23sCIjFzRCCdVHqknBKP4sY
-         JpkoD8QL+dXn/Ln9/IlkaaO9Y+lHKl2ualePvfvZpK+/V6eIut7gILOwulMSkDl9Fbp/
-         9AioheOvWaC7yYtdYGMSq5vFhhiizKC4MooW3sc55bSX2gYxbR6ajliRoVrcYBsIVpgY
-         rXbcn9DCOgXZDvOQnEuJBDBBOVmLdDb6ZIYBBd6Ws8fIrlMimz1Wg/aammGImfa5lKjg
-         peNw==
-X-Gm-Message-State: AOAM532UcUysSQvVpIYQKw0uy5dbAPm4d3pkye7hitDD2ngRwC1mAOMw
-        Leh/dpoyZ7BB5PINOa61QvOwg4KHP3yKgUY8XhCbgte1b+DJu7uc/OXld9mWLsj4g3ylL6/DZb/
-        i+wnmtWJoPxEN
-X-Received: by 2002:a1c:1b4d:: with SMTP id b74mr1108150wmb.123.1589832812305;
-        Mon, 18 May 2020 13:13:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwUyDuJ6hpGGEfbOxOxaYcBTBkFm+hP/HaXtAGSHA1Y+klLKmw+76JaCIxqRMzLPb3V5yiySg==
-X-Received: by 2002:a1c:1b4d:: with SMTP id b74mr1108115wmb.123.1589832812024;
-        Mon, 18 May 2020 13:13:32 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id w82sm810750wmg.28.2020.05.18.13.13.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 May 2020 13:13:31 -0700 (PDT)
-Subject: Re: [PATCH 0/7] KVM: SVM: baby steps towards nested state migration
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Cathy Avery <cavery@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20200515174144.1727-1-pbonzini@redhat.com>
- <27c7526c-4d02-c9ba-7d3b-7416dbe4cdbb@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ff8ca8ca-bc2c-5188-7024-7d4a18b02759@redhat.com>
-Date:   Mon, 18 May 2020 22:11:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <27c7526c-4d02-c9ba-7d3b-7416dbe4cdbb@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=E/Lnnyqh/lIivI+1URST7q6N2yYOibnHjeOOhY+GB/M=;
+        b=ueqDiIcX6GFpXcctp3W46NzhajnzeLy7H+RliO8w7BSq9gD5cIcVdBfXjP/EHgKtUf
+         B3xgBiUcWEBtkRttPLeik1Dowezq1bZLxJXdgTUSNO6w9em5kBy5yjWQTDNd5yII6F1u
+         7Zwo+lJIYPnB+IWpeBRVejHnQsaxvaei5R6fwJYneQ0WpbJvxwh6BtxRbKV18UykQWQ2
+         puwjeMR8lwWdoS7ogpxWpnBAZ7Ukhgk05NlPm2lgiZOa26nslapnNdixklBVa41KBQH8
+         bWrMrLoOg+mvUGA1WtNY1u8VrAvurX2g2b1bCp7VbBMOUTvPIClsr5jZ0JbXAq52s0Bh
+         F7/Q==
+X-Gm-Message-State: AOAM530XMjeDSZTrYBVyCvd6dETkVHdzBNbLzG92iZku3L00lDwYdTQd
+        QeiBRx4MYjCgI8rwFFwo5bGvR+ppKdLQa4ssFbZ6n1MWxknjjW075Nf4EbuAyfuMefMgIGfbC1p
+        JM5J01yWD7Ngm7nCCUtnAzO1i8eEOpnrYWhILxdn4S40ESJzz6Z8jvrEkfSiHWzxsrZvT6JZFvF
+        BEZq8=
+X-Google-Smtp-Source: ABdhPJy691o5sLjc2nzmh9X7ocGJANa+iBKDwes9LiQsV058FJOvj21R96Dq4hERKutpZtjYsEgOz0FG574G6RctQNk6sg==
+X-Received: by 2002:a25:4cc4:: with SMTP id z187mr30161244yba.274.1589832976751;
+ Mon, 18 May 2020 13:16:16 -0700 (PDT)
+Date:   Mon, 18 May 2020 13:15:58 -0700
+Message-Id: <20200518201600.255669-1-makarandsonare@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.26.2.761.g0e0b3e54be-goog
+Subject: [PATCH  0/2] Fix VMX preemption timer migration
+From:   Makarand Sonare <makarandsonare@google.com>
+To:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
+Cc:     Makarand Sonare <makarandsonare@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/05/20 22:07, Krish Sadhukhan wrote:
->>
->>
->> Paolo Bonzini (7):
->>    KVM: SVM: move map argument out of enter_svm_guest_mode
->>    KVM: SVM: extract load_nested_vmcb_control
->>    KVM: SVM: extract preparation of VMCB for nested run
->>    KVM: SVM: save all control fields in svm->nested
->>    KVM: nSVM: remove HF_VINTR_MASK
->>    KVM: nSVM: do not reload pause filter fields from VMCB
->>    KVM: SVM: introduce data structures for nested virt state
->>
->>   arch/x86/include/asm/kvm_host.h |   1 -
->>   arch/x86/include/uapi/asm/kvm.h |  26 +++++++-
->>   arch/x86/kvm/svm/nested.c       | 115 +++++++++++++++++---------------
->>   arch/x86/kvm/svm/svm.c          |  11 ++-
->>   arch/x86/kvm/svm/svm.h          |  28 +++++---
->>   5 files changed, 116 insertions(+), 65 deletions(-)
->>
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Fix VMX preemption timer migration. Add a selftest to ensure post migration
+both L1 and L2 VM observe the VMX preemption timer exit close to the original
+expiration deadline.
 
-Thanks!  Note that (while these patches should be okay) they are not
-really ready to be committed because more cleanups and refactorings will
-become evident through the rest of the work.
+Makarand Sonare (1):
+  KVM: selftests: VMX preemption timer migration test
 
-Paolo
+Peter Shier (1):
+  KVM: nVMX: Fix VMX preemption timer migration
+
+ Documentation/virt/kvm/api.rst                |   4 +
+ arch/x86/include/uapi/asm/kvm.h               |   2 +
+ arch/x86/kvm/vmx/nested.c                     |  61 ++++-
+ arch/x86/kvm/vmx/vmx.h                        |   1 +
+ arch/x86/kvm/x86.c                            |   3 +-
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/arch/x86/include/uapi/asm/kvm.h         |   3 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   2 +
+ .../selftests/kvm/include/x86_64/processor.h  |  11 +-
+ .../selftests/kvm/include/x86_64/vmx.h        |  27 ++
+ .../kvm/x86_64/vmx_preemption_timer_test.c    | 256 ++++++++++++++++++
+ 13 files changed, 362 insertions(+), 11 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+
+--
+2.26.2.761.g0e0b3e54be-goog
 
