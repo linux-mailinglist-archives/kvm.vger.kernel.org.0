@@ -2,149 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86E511D7DD5
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 18:07:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBAF81D7DCB
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 18:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728326AbgERQHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 12:07:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18816 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728286AbgERQHk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 12:07:40 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04IG2Jsx113630;
-        Mon, 18 May 2020 12:07:40 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 312btuaueb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 May 2020 12:07:40 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04IG2Npx113874;
-        Mon, 18 May 2020 12:07:39 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 312btuauct-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 May 2020 12:07:39 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04IG6n7b002160;
-        Mon, 18 May 2020 16:07:36 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 313wf1g0cf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 May 2020 16:07:35 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04IG7X1Z9372150
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 May 2020 16:07:33 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5663B11C04C;
-        Mon, 18 May 2020 16:07:33 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 023DA11C052;
-        Mon, 18 May 2020 16:07:33 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.158.244])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 18 May 2020 16:07:32 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v7 01/12] s390x: saving regs for interrupts
-Date:   Mon, 18 May 2020 18:07:20 +0200
-Message-Id: <1589818051-20549-2-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
-References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-18_06:2020-05-15,2020-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=1 bulkscore=0
- priorityscore=1501 malwarescore=0 mlxscore=0 mlxlogscore=975
- impostorscore=0 spamscore=0 clxscore=1015 cotscore=-2147483648
- lowpriorityscore=0 adultscore=0 phishscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005180134
+        id S1728213AbgERQHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 12:07:21 -0400
+Received: from mga04.intel.com ([192.55.52.120]:39482 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727987AbgERQHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 12:07:21 -0400
+IronPort-SDR: bB2wZcfza31q8u/CKeuS/KjNfC7jvR/2IKCCW2s9bz1odqCqmkFDvqh0sffvaviomHJcC5tf1Z
+ w++NNwzTmZ/w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 09:07:20 -0700
+IronPort-SDR: ban6HNM1oWSr+nAEJvwkqVjMI2Hc53rxsTp5Fk6TWMpOVFWKkdcWGNPhSu6cHKo9XpClz7kWP8
+ sGzfOoPJ3sUw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,407,1583222400"; 
+   d="scan'208";a="254480084"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga008.fm.intel.com with ESMTP; 18 May 2020 09:07:20 -0700
+Date:   Mon, 18 May 2020 09:07:20 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: emulate reserved nops from 0f/18 to 0f/1f
+Message-ID: <20200518160720.GB3632@linux.intel.com>
+References: <20200515161919.29249-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200515161919.29249-1-pbonzini@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If we use multiple source of interrupts, for example, using SCLP
-console to print information while using I/O interrupts, we need
-to have a re-entrant register saving interruption handling.
+On Fri, May 15, 2020 at 12:19:19PM -0400, Paolo Bonzini wrote:
+> Instructions starting with 0f18 up to 0f1f are reserved nops, except those
+> that were assigned to MPX.
 
-Instead of saving at a static memory address, let's save the base
-registers, the floating point registers and the floating point
-control register on the stack in case of I/O interrupts
+Well, they're probably reserved NOPs again :-D.
 
-Note that we keep the static register saving to recover from the
-RESET tests.
+> These include the endbr markers used by CET.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- s390x/cstart64.S | 41 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+And RDSPP.  Wouldn't it make sense to treat RDSPP as a #UD even though it's
+a NOP if CET is disabled?  The logic being that a sane guest will execute
+RDSSP iff CET is enabled, and in that case it'd be better to inject a #UD
+than to silently break the guest.
 
-diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-index 9af6bb3..3c7d8a9 100644
---- a/s390x/cstart64.S
-+++ b/s390x/cstart64.S
-@@ -118,6 +118,43 @@ memsetxc:
- 	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
- 	.endm
- 
-+/* Save registers on the stack (r15), so we can have stacked interrupts. */
-+	.macro SAVE_REGS_STACK
-+	/* Allocate a stack frame for 15 general registers */
-+	slgfi   %r15, 15 * 8
-+	/* Store all registers from r0 to r14 on the stack */
-+	stmg    %r0, %r14, 0(%r15)
-+	/* Allocate a stack frame for 16 floating point registers */
-+	/* The size of a FP register is the size of an double word */
-+	slgfi   %r15, 16 * 8
-+	/* Save fp register on stack: offset to SP is multiple of reg number */
-+	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-+	std	\i, \i * 8(%r15)
-+	.endr
-+	/* Save fpc, but keep stack aligned on 64bits */
-+	slgfi   %r15, 8
-+	efpc	%r0
-+	stg	%r0, 0(%r15)
-+	.endm
-+
-+/* Restore the register in reverse order */
-+	.macro RESTORE_REGS_STACK
-+	/* Restore fpc */
-+	lfpc	0(%r15)
-+	algfi	%r15, 8
-+	/* Restore fp register from stack: SP still where it was left */
-+	/* and offset to SP is a multile of reg number */
-+	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-+	ld	\i, \i * 8(%r15)
-+	.endr
-+	/* Now it is done, rewind the stack pointer by 16 double word */
-+	algfi   %r15, 16 * 8
-+	/* Load the registers from stack */
-+	lmg     %r0, %r14, 0(%r15)
-+	/* Rewind the stack by 15 double word */
-+	algfi   %r15, 15 * 8
-+	.endm
-+
- .section .text
- /*
-  * load_reset calling convention:
-@@ -182,9 +219,9 @@ mcck_int:
- 	lpswe	GEN_LC_MCCK_OLD_PSW
- 
- io_int:
--	SAVE_REGS
-+	SAVE_REGS_STACK
- 	brasl	%r14, handle_io_int
--	RESTORE_REGS
-+	RESTORE_REGS_STACK
- 	lpswe	GEN_LC_IO_OLD_PSW
- 
- svc_int:
--- 
-2.25.1
+Extending that logic to future features, wouldn't it then make sense to
+keep the current #UD behavior for all opcodes to avoid silently breakage?
+I.e. change only the opcodes for endbr (which consume only 2 of 255 ModRMs
+for 0f 1e) to be NOPs.
 
+> List them correctly in the opcode table.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/emulate.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index de5476f8683e..d0e2825ae617 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -4800,8 +4800,12 @@ static const struct opcode twobyte_table[256] = {
+>  	GP(ModRM | DstReg | SrcMem | Mov | Sse, &pfx_0f_10_0f_11),
+>  	GP(ModRM | DstMem | SrcReg | Mov | Sse, &pfx_0f_10_0f_11),
+>  	N, N, N, N, N, N,
+> -	D(ImplicitOps | ModRM | SrcMem | NoAccess),
+> -	N, N, N, N, N, N, D(ImplicitOps | ModRM | SrcMem | NoAccess),
+> +	D(ImplicitOps | ModRM | SrcMem | NoAccess), /* 4 * prefetch + 4 * reserved NOP */
+> +	D(ImplicitOps | ModRM | SrcMem | NoAccess), N, N,
+> +	D(ImplicitOps | ModRM | SrcMem | NoAccess), /* 8 * reserved NOP */
+> +	D(ImplicitOps | ModRM | SrcMem | NoAccess), /* 8 * reserved NOP */
+> +	D(ImplicitOps | ModRM | SrcMem | NoAccess), /* 8 * reserved NOP */
+> +	D(ImplicitOps | ModRM | SrcMem | NoAccess), /* NOP + 7 * reserved NOP */
+>  	/* 0x20 - 0x2F */
+>  	DIP(ModRM | DstMem | Priv | Op3264 | NoMod, cr_read, check_cr_read),
+>  	DIP(ModRM | DstMem | Priv | Op3264 | NoMod, dr_read, check_dr_read),
+> -- 
+> 2.18.2
+> 
