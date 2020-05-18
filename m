@@ -2,53 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2BF41D7A72
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 15:53:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 706CF1D7B21
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 16:23:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727036AbgERNxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 09:53:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33060 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726800AbgERNxL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 09:53:11 -0400
+        id S1728137AbgEROXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 10:23:48 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25240 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727796AbgEROXs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 10:23:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589809989;
+        s=mimecast20190719; t=1589811826;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=19Ps4GIZsOFiyU6+cY5oakxcO3nMV3zIWZ+ubAYx8Ps=;
-        b=igPBUMuh8Qfj6VdbER1wjum4TnEEW0HlulOTMfaMTiT/AsDsx9Tg6cKPgxw0+qvcOj8fqL
-        iCsQ2mmmdjWBcCXnwQ6E5ybdoZn0QJi2VApz3+kuyt8zPB2z7pRdYd1d16hctGzU9srBda
-        g0KXR2pk+gki07f/yNsnekk4UXwsyxs=
+        bh=zG/pdTPIl0thVsg5cBJUuqqaoaidrjdYlobZqwqJn6Q=;
+        b=SmOGX2iXkAz7WML/Q83saMjh3YqcGi2ZTgamZTSTGzFe21hb90n4bKs2xVEhpb8Ofansbc
+        CrOJN0iIl9DAFBW/pybaeLRNLvOHOUMep8lphsTNfDKA0xKPYF5ANVPC0gEZedJ+y7thg2
+        bPEUSyUszhKWg518LYjvoWdJM8nP2bM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-VboD-6FSPXWZxxen75tUIg-1; Mon, 18 May 2020 09:53:05 -0400
-X-MC-Unique: VboD-6FSPXWZxxen75tUIg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-443-RpGz8YU4ONuaDyNR477x-w-1; Mon, 18 May 2020 10:23:18 -0400
+X-MC-Unique: RpGz8YU4ONuaDyNR477x-w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03ACD8015CF;
-        Mon, 18 May 2020 13:53:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B160C108BD13;
+        Mon, 18 May 2020 14:23:17 +0000 (UTC)
 Received: from [10.36.115.150] (ovpn-115-150.ams2.redhat.com [10.36.115.150])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 383725D9DC;
-        Mon, 18 May 2020 13:52:56 +0000 (UTC)
-Subject: Re: [PATCH v1 07/17] migration/rdma: Use
- ram_block_discard_set_broken()
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D87B66EA26;
+        Mon, 18 May 2020 14:23:10 +0000 (UTC)
+Subject: Re: [PATCH v1 10/17] virtio-mem: Paravirtualized memory hot(un)plug
+From:   David Hildenbrand <david@redhat.com>
 To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Richard Henderson <rth@twiddle.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
-        Juan Quintela <quintela@redhat.com>
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>
 References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-8-david@redhat.com> <20200515124501.GE2954@work-vm>
- <96a58e88-2629-f2ee-5884-38d11e571548@redhat.com>
- <20200515175105.GL2954@work-vm>
- <1cac6cb0-7804-bab2-4ecf-044c369c1135@redhat.com>
- <20200515183652.GM2954@work-vm>
-From:   David Hildenbrand <david@redhat.com>
+ <20200506094948.76388-11-david@redhat.com> <20200515153714.GG2954@work-vm>
+ <c782acd6-e282-fb33-863c-965d1e27d3b6@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -93,85 +91,38 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <f47032a1-7a44-cfc8-18ce-f0a9b4a010b6@redhat.com>
-Date:   Mon, 18 May 2020 15:52:55 +0200
+Message-ID: <42978cec-f162-f3e6-b016-313c41aa74ea@redhat.com>
+Date:   Mon, 18 May 2020 16:23:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200515183652.GM2954@work-vm>
+In-Reply-To: <c782acd6-e282-fb33-863c-965d1e27d3b6@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15.05.20 20:36, Dr. David Alan Gilbert wrote:
-> * David Hildenbrand (david@redhat.com) wrote:
->> On 15.05.20 19:51, Dr. David Alan Gilbert wrote:
->>> * David Hildenbrand (david@redhat.com) wrote:
->>>> On 15.05.20 14:45, Dr. David Alan Gilbert wrote:
->>>>> * David Hildenbrand (david@redhat.com) wrote:
->>>>>> RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
->>>>>> to mark RAM block discards to be broken - however, to keep it simple
->>>>>> use ram_block_discard_is_required() instead of inhibiting.
->>>>>
->>>>> Should this be dependent on whether rdma->pin_all is set?
->>>>> Even with !pin_all some will be pinned at any given time
->>>>> (when it's registered with the rdma stack).
->>>>
->>>> Do you know how much memory this is? Is such memory only temporarily pinned?
->>>
->>> With pin_all not set, only a subset of memory, I think multiple 1MB
->>> chunks, are pinned at any one time.
->>>
->>>> At least with special-cases of vfio, it's acceptable if some memory is
->>>> temporarily pinned - we assume it's only the working set of the driver,
->>>> which guests will not inflate as long as they don't want to shoot
->>>> themselves in the foot.
->>>>
->>>> This here sounds like the guest does not know the pinned memory is
->>>> special, right?
->>>
->>> Right - for RDMA it's all of memory that's being transferred, and the
->>> guest doesn't see when each part is transferred.
+>>> +
+>>> +static int virtio_mem_pre_save(void *opaque)
+>>> +{
+>>> +    VirtIOMEM *vmem = VIRTIO_MEM(opaque);
+>>> +
+>>> +    vmem->migration_addr = vmem->addr;
+>>> +    vmem->migration_block_size = vmem->block_size;
 >>
->>
->> Okay, so all memory will eventually be pinned, just not at the same
->> time, correct?
->>
->> I think this implies that any memory that was previously discarded will
->> be backed my new pages, meaning we will consume more memory than intended.
->>
->> If so, always disabling discarding of RAM seems to be the right thing to do.
+>> You might look at VMSTATE_WITH_TMP could avoid you having the dummy
+>> fields.
 > 
-> Yeh that's probably true, although there's a check for 'buffer_is_zero'
-> in the !rdma->pin_all case, if the entire area is zero (or probably if
-> unmapped) then it sends a notification rather than registering; see
-> qemu_rdma_write_one and search for 'This chunk has not yet been
-> registered, so first check to see'
+> Thanks, will have a look.
 
-Right, if the whole chunk is zero, it will send a "compressed" zero
-chunk to the target. That will result in a memset() in case the
-destination is not already zero. So, both the source and the destination
-will be at least be read.
+VMSTATE_WITH_TMP looks too complicated for this simple use case. I'll
+just drop these migration sanity checks for now.
 
-But this only works if a complete chunk (1MB) is zero IIUC. If only one
-page within a chunk is not zero (e.g., not inflated), the whole chunk
-will be pinned. Also, "disabled chunk registration" seems to be another
-case.
-
-https://wiki.qemu.org/Features/RDMALiveMigration
-
-"Finally, zero pages are only checked if a page has not yet been
-registered using chunk registration (or not checked at all and
-unconditionally written if chunk registration is disabled. This is
-accomplished using the "Compress" command listed above. If the page
-*has* been registered then we check the entire chunk for zero. Only if
-the entire chunk is zero, then we send a compress command to zap the
-page on the other side."
+Thanks!
 
 -- 
 Thanks,
