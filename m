@@ -2,82 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 415D51D7D48
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 17:49:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C11C41D7D6B
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 17:53:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728369AbgERPtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 11:49:24 -0400
-Received: from mga18.intel.com ([134.134.136.126]:11281 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727007AbgERPtY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 11:49:24 -0400
-IronPort-SDR: kp+h8Sb8My/UII/YXc4z9vv7QAXWISEr1LsOZcxVkrrrLaukiE/0XQQVhHQlkO8dEV96gEy0Us
- 973A2z5NmDOQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 08:49:23 -0700
-IronPort-SDR: L6G04AIge5D55UrRgxPLrv4p4b0eq6pVar1+izTtqtjQ3SmrW/XACqXzn35bZ6qFbHNNydws0g
- dKKn4R/QpTlA==
-X-IronPort-AV: E=Sophos;i="5.73,407,1583222400"; 
-   d="scan'208";a="465801574"
-Received: from xiaoxuwa-mobl.ccr.corp.intel.com (HELO [10.255.28.12]) ([10.255.28.12])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 08:49:22 -0700
-Subject: Re: [PATCH] kvm: x86: Use KVM CPU capabilities to determine CR4
- reserved bits
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jmattson@google.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200506094436.3202-1-pbonzini@redhat.com>
- <6a4daca4-6034-901a-261f-215df7d606a6@intel.com>
- <09cb27f8-fa02-4b37-94de-1a4d86b9bdbd@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <3bf2e68f-9843-cfed-6520-54dbf4955fc8@intel.com>
-Date:   Mon, 18 May 2020 23:49:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1728210AbgERPxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 11:53:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42532 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727050AbgERPxL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 11:53:11 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27674C061A0C
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 08:53:11 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id z72so32623wmc.2
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 08:53:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=W0NZH996mfqrH/xeDmImG2NwLarasbVlVoAElHsd8sQ=;
+        b=tLXmLd86dVALrDyfRBSDM7xGyBzx8PJJWlY3i38vW6q9/Pq2n5mt3ItbF9uZKtViWL
+         5wjAhT45r111vXSVIQUuwkb/+pC4BmSqWADibN6q3Locg2JVINUoZqSROZBnySBdcKu2
+         o7icrgMjNdj41GvG+1h7CXICRijZyk9PCqmL73xjibtIUlwr5m8fU954ESI+FigCiT6C
+         bs8ilZH4spkBeWmS9qFncwqfwwrAdAuMAk77e2TsE5z07YnW6/jjk8LqIzgX5aLh8Lf3
+         32nm7cFpyxPY9VYf1Y8EuTeXM0FeWyXQRN+cYia6fpPx0obBb5QsL6e2VcrOwfrxbO5A
+         rQTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=W0NZH996mfqrH/xeDmImG2NwLarasbVlVoAElHsd8sQ=;
+        b=cGNwaBONmF5FoTP5BpAY+ejnKL2dS3XoL/4EtY6D6qS1Zv7V3+mjW9cqceupD1TH0V
+         sx13L+WxrO22b1KFkfyxb4zk/nc4Qtz6PvfTMqkM+rmT2fbpu5WBSrD75rUFzbXZxTrB
+         Bo+vh1fyKkgqd44BBNELyZp282ZKuSs4Fjruf9/7IQGmo5cfx2nhKVpOcH59p9ZROYFC
+         I/IbMeUOZiCR/naENPIy7GqDlckAxVyufPPkn+by06xZcV6skmIcM9NE5YZM9IkdNH2U
+         KCqdKVZyz2s/Znf6YUMWdp5kurQqfNMRc83zDY/QIVW5Z1p8zOxlKUZytNYgaBVsVGw2
+         +Dkw==
+X-Gm-Message-State: AOAM530y64jPTVePt80POMU6WLkews+pAaa2mB033blNX8GApjvWbKhS
+        O3H/W6dmLwyGI10bocDEbEI=
+X-Google-Smtp-Source: ABdhPJwFfUufdYrC8E/cFB2xycdYjZB2Yu69MdjITV5JZ/mrnUeCukTsqIzH1kqKOnPbmTGUwxINOQ==
+X-Received: by 2002:a7b:c948:: with SMTP id i8mr41508wml.138.1589817189954;
+        Mon, 18 May 2020 08:53:09 -0700 (PDT)
+Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net. [88.21.202.17])
+        by smtp.gmail.com with ESMTPSA id 7sm17647462wra.50.2020.05.18.08.53.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2020 08:53:09 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To:     qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: [PATCH v2 0/7] exec/memory: Enforce checking MemTxResult values
+Date:   Mon, 18 May 2020 17:53:01 +0200
+Message-Id: <20200518155308.15851-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <09cb27f8-fa02-4b37-94de-1a4d86b9bdbd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/2020 8:31 PM, Paolo Bonzini wrote:
-> On 18/05/20 06:52, Xiaoyao Li wrote:
->> On 5/6/2020 5:44 PM, Paolo Bonzini wrote:
->>> Using CPUID data can be useful for the processor compatibility
->>> check, but that's it.  Using it to compute guest-reserved bits
->>> can have both false positives (such as LA57 and UMIP which we
->>> are already handling) and false negatives:
->>
->>> in particular, with
->>> this patch we don't allow anymore a KVM guest to set CR4.PKE
->>> when CR4.PKE is clear on the host.
->>
->> A common question about whether a feature can be exposed to guest:
->>
->> Given a feature, there is a CPUID bit to enumerate it, and a CR4 bit to
->> turn it on/off. Whether the feature can be exposed to guest only depends
->> on host CR4 setting? I.e., if CPUID bit is not cleared in cpu_data in
->> host but host kernel doesn't set the corresponding CR4 bit to turn it
->> on, we cannot expose the feature to guest. right?
-> 
-> It depends.  The most obvious case is that the host kernel doesn't use
-> CR4.PSE but we even use 4MB pages to emulate paging disabled mode when
-> the processor doesn't support unrestricted guests.
-> 
-> Basically, the question is whether we are able to save/restore any
-> processor state attached to the CR4 bit on vmexit/vmentry.  In this case
-> there is no PKRU field in the VMCS and the RDPKRU/WRPKRU instructions
-> require CR4.PKE=1; therefore, we cannot let the guest enable CR4.PKE
-> unless it's also enabled on the host.
-> 
+Various places ignore the MemTxResult indicator of
+transaction failed. Fix the easy places.
+The rest are the DMA devices, which require deeper
+analysis.
 
-aha! That's reason!
-Thanks for the clarification.
+Since v1:
+- Dropped "exec/memory: Emit warning when MemTxResult is ignored"
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg704180.html
+
+Philippe Mathieu-Daudé (7):
+  exec: Let address_space_read/write_cached() propagate MemTxResult
+  exec: Propagate cpu_memory_rw_debug() error
+  disas: Let disas::read_memory() handler return EIO on error
+  hw/elf_ops: Do not ignore write failures when loading ELF
+  hw/arm/boot: Abort if set_kernel_args() fails
+  accel/kvm: Let KVM_EXIT_MMIO return error
+  hw/core/loader: Assert loading ROM regions succeeds at reset
+
+ include/exec/cpu-all.h |  1 +
+ include/exec/memory.h  | 19 +++++++++++--------
+ include/hw/elf_ops.h   | 11 ++++++++---
+ accel/kvm/kvm-all.c    | 13 +++++++------
+ disas.c                | 13 ++++++++-----
+ exec.c                 | 28 ++++++++++++++++------------
+ hw/arm/boot.c          | 19 +++++++++++++------
+ hw/core/loader.c       |  8 ++++++--
+ 8 files changed, 70 insertions(+), 42 deletions(-)
+
+-- 
+2.21.3
 
