@@ -2,296 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D4941D6F40
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 05:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62C5D1D6F1B
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 04:50:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbgERDG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 May 2020 23:06:26 -0400
-Received: from mga06.intel.com ([134.134.136.31]:39772 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726639AbgERDG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 May 2020 23:06:26 -0400
-IronPort-SDR: bXB6AeMxhvwiK9dC5jY/JRLc3Z7xfq/fIcezBTm/K6dEsDpF9gr7VFae/p7Zp/loP/vNg3tBjc
- qpIEnAHcmFaw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2020 20:06:26 -0700
-IronPort-SDR: ZodtljUh9+7MSzGOSifcMary7mu0dRa+dQOFzSBH2T0ZlWSnK8HGJjF9JydYxVA7Q3evPo+gpa
- +Opeg/vPxmkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,405,1583222400"; 
-   d="scan'208";a="411106816"
-Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.16])
-  by orsmga004.jf.intel.com with ESMTP; 17 May 2020 20:06:22 -0700
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        kevin.tian@intel.com, shaopeng.he@intel.com, yi.l.liu@intel.com,
-        xin.zeng@intel.com, hang.yuan@intel.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [QEMU RFC PATCH v4] hw/vfio/pci: remap bar region irq
-Date:   Sun, 17 May 2020 22:56:18 -0400
-Message-Id: <20200518025618.14659-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200518025245.14425-1-yan.y.zhao@intel.com>
-References: <20200518025245.14425-1-yan.y.zhao@intel.com>
+        id S1726763AbgERCuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 May 2020 22:50:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33392 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726639AbgERCuu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 May 2020 22:50:50 -0400
+Received: from mail-oi1-x241.google.com (mail-oi1-x241.google.com [IPv6:2607:f8b0:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351D3C061A0C;
+        Sun, 17 May 2020 19:50:50 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id y85so3017030oie.11;
+        Sun, 17 May 2020 19:50:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+eK6VGuEuR0GRI5R9J65CKeVkPV8II1yka+J13as0Hc=;
+        b=nDZAJObBhop9kUEDGJbWMD/G7dZBMGOw6Ws+O6IBcDB8WVbVI7MNvMiKMO/2Vtohgf
+         /3S3gFg3lkP3NrNUWoOeZElhCdN7sXi/YlZ1cT0GDgGK/pUrxjckaR/58EIwEZmhx8vz
+         cmeeBQq1kcTcOch4fVxavwSX5sUV2Me23QWPCpaIGBXJCD5Ayrb++H+6bxiNPEPeZQ3y
+         X65P8HpSsYf6PvLEvJvzOMxautWfCTSDtKatcn4cwlFCpWbS0tkc2HFwr+73PUDFJxgr
+         AxbMFwqxtvvw2BCmhyceMWPyhAOsMLmb7o9iijlm4kYYT76pZdaTLRLT+UIybH18f7QV
+         vxRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+eK6VGuEuR0GRI5R9J65CKeVkPV8II1yka+J13as0Hc=;
+        b=krKZrLFYKu/8B3xFwpooJphFHNmm9KFuWaOA23L/9mW0IC5SWhbg2J9Jb73WFWmbz6
+         csIkaz2UgC1OgIdGD78tAz0h5RnTZ3+P88975uv4eNapWKe9mB9Jj2OGmgyxDEQCZGO3
+         v6Vmb9IFi2gmMS21p4HQI5/s9cFZdmbLzrm4nbIo7rcu3GY0ho0kUDpf9YjrNAXq056x
+         viPXOrZnqKkQMt7OXZMVHCi7ClbE57ohVZizU8hXW5gYJvaTiiPbq0O1yBpAckH5mU8s
+         VEeKNIi7wIlqnaawOT6MkF7NoPuFn9fHnr7FB3qoStpmlVTSze8lTc+BdKoVPRt3YR4x
+         R+Fw==
+X-Gm-Message-State: AOAM532OFG/IWACkrX0ptf+oM6GMz6yh7b8gQjKCBb8FUeK2y9W463Fd
+        OkKqv0+skn5e4Yyur+8oB7SuNCt9ZmzZBhYc0iE=
+X-Google-Smtp-Source: ABdhPJzvu8D92gPrVWPjVyv/fmrqksDbDke11WkKE1DH2CwV2xK1nz09HbMjrMx/KpnC5QS6xEtvwD+ZaD7M8o8+X8I=
+X-Received: by 2002:aca:5296:: with SMTP id g144mr2472205oib.33.1589770249604;
+ Sun, 17 May 2020 19:50:49 -0700 (PDT)
+MIME-Version: 1.0
+References: <2f78457e-f3a7-3bc9-e237-3132ee87f71e@gmail.com>
+In-Reply-To: <2f78457e-f3a7-3bc9-e237-3132ee87f71e@gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 18 May 2020 11:00:52 +0800
+Message-ID: <CANRm+CyEfmmVHLWnkJ1YHX5r5bNd+QjPQWyr+pmVWM5a6CXorQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Fix the indentation to match coding style
+To:     Haiwei Li <lihaiwei.kernel@gmail.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
+        "x86@kernel.org" <x86@kernel.org>, kvm <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Added an irq type VFIO_IRQ_TYPE_REMAP_BAR_REGION to
-dynamically query and remap BAR regions.
+On Mon, 18 May 2020 at 09:32, Haiwei Li <lihaiwei.kernel@gmail.com> wrote:
+>
+> From: Haiwei Li <lihaiwei@tencent.com>
+>
+> There is a bad indentation in next&queue branch. The patch looks like
+> fixes nothing though it fixes the indentation.
+>
+> Before fixing:
+>
+>                  if (!handle_fastpath_set_x2apic_icr_irqoff(vcpu, data)) {
+>                          kvm_skip_emulated_instruction(vcpu);
+>                          ret = EXIT_FASTPATH_EXIT_HANDLED;
+>                 }
+>                  break;
+>          case MSR_IA32_TSCDEADLINE:
+>
+> After fixing:
+>
+>                  if (!handle_fastpath_set_x2apic_icr_irqoff(vcpu, data)) {
+>                          kvm_skip_emulated_instruction(vcpu);
+>                          ret = EXIT_FASTPATH_EXIT_HANDLED;
+>                  }
+>                  break;
+>          case MSR_IA32_TSCDEADLINE:
+>
 
-QEMU decodes the index of the BARs by reading cnt of eventfd.
-If bit n is set, the corresponding BAR will be requeried and
-its subregions will be remapped according to the its new flags.
+Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
 
-rely on [1] "vfio: Add a funtion to return a specific irq capabilities"
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg621645.html
-
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- hw/vfio/common.c              | 50 ++++++++++++++++++++++++
- hw/vfio/pci.c                 | 90 +++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.h                 |  2 +
- include/hw/vfio/vfio-common.h |  2 +
- linux-headers/linux/vfio.h    | 11 ++++++
- 5 files changed, 155 insertions(+)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index a041c3b..cf24293 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1284,6 +1284,56 @@ void vfio_region_unmap(VFIORegion *region)
-     }
- }
- 
-+/*
-+ * re-query a region's flags,
-+ * and update its mmap'd subregions.
-+ * It does not support change a region's size.
-+ */
-+void vfio_region_reset_mmap(VFIODevice *vbasedev, VFIORegion *region, int index)
-+{
-+    struct vfio_region_info *new;
-+
-+    if (!region->mem) {
-+        return;
-+    }
-+
-+    if (vfio_get_region_info(vbasedev, index, &new)) {
-+        goto out;
-+    }
-+
-+    if (region->size != new->size) {
-+        error_report("vfio: resetting of region size is not supported");
-+        goto out;
-+    }
-+
-+    if (region->flags == new->flags) {
-+        goto out;
-+    }
-+
-+    /* ummap old mmap'd subregions, if any */
-+    vfio_region_unmap(region);
-+    region->nr_mmaps = 0;
-+    g_free(region->mmaps);
-+    region->mmaps = NULL;
-+
-+    /* setup new mmap'd subregions*/
-+    region->flags = new->flags;
-+    if (vbasedev->no_mmap ||
-+            !(region->flags & VFIO_REGION_INFO_FLAG_MMAP)) {
-+        goto out;
-+    }
-+
-+    if (vfio_setup_region_sparse_mmaps(region, new)) {
-+        region->nr_mmaps = 1;
-+        region->mmaps = g_new0(VFIOMmap, region->nr_mmaps);
-+        region->mmaps[0].offset = 0;
-+        region->mmaps[0].size = region->size;
-+    }
-+    vfio_region_mmap(region);
-+out:
-+    g_free(new);
-+}
-+
- void vfio_region_exit(VFIORegion *region)
- {
-     int i;
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index c70f153..12998c5 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2883,6 +2883,94 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
-     vdev->req_enabled = false;
- }
- 
-+static void vfio_remap_bar_notifier_handler(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    uint64_t bars;
-+    ssize_t ret;
-+    int i;
-+
-+    ret = read(vdev->remap_bar_notifier.rfd, &bars, sizeof(bars));
-+    if (ret != sizeof(bars)) {
-+            return;
-+    }
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        VFIORegion *region = &vdev->bars[i].region;
-+
-+        if (!test_bit(i, &bars)) {
-+            continue;
-+        }
-+
-+        vfio_region_reset_mmap(&vdev->vbasedev, region, i);
-+    }
-+
-+    /* write 0 to notify kernel that we're done */
-+    bars = 0;
-+    write(vdev->remap_bar_notifier.wfd, &bars, sizeof(bars));
-+}
-+
-+static void vfio_register_remap_bar_notifier(VFIOPCIDevice *vdev)
-+{
-+    int ret;
-+    struct vfio_irq_info *irq;
-+    Error *err = NULL;
-+    int32_t fd;
-+
-+    ret = vfio_get_dev_irq_info(&vdev->vbasedev,
-+                                VFIO_IRQ_TYPE_REMAP_BAR_REGION,
-+                                VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION,
-+                                &irq);
-+    if (ret) {
-+        return;
-+    }
-+    ret = event_notifier_init(&vdev->remap_bar_notifier, 0);
-+    if (ret) {
-+        error_report("vfio: Failed to init event notifier for remap bar irq");
-+        return;
-+    }
-+
-+    fd = event_notifier_get_fd(&vdev->remap_bar_notifier);
-+    qemu_set_fd_handler(fd, vfio_remap_bar_notifier_handler, NULL, vdev);
-+
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, irq->index, 0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+        qemu_set_fd_handler(fd, NULL, NULL, vdev);
-+        event_notifier_cleanup(&vdev->remap_bar_notifier);
-+    } else {
-+        vdev->remap_bar_enabled = true;
-+    }
-+};
-+
-+static void vfio_unregister_remap_bar_notifier(VFIOPCIDevice *vdev)
-+{
-+    struct vfio_irq_info *irq;
-+    Error *err = NULL;
-+    int ret;
-+
-+    if (!vdev->remap_bar_enabled) {
-+        return;
-+    }
-+
-+    ret = vfio_get_dev_irq_info(&vdev->vbasedev,
-+                                VFIO_IRQ_TYPE_REMAP_BAR_REGION,
-+                                VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION,
-+                                &irq);
-+    if (ret) {
-+        return;
-+    }
-+
-+    if (vfio_set_irq_signaling(&vdev->vbasedev, irq->index, 0,
-+                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-+    }
-+    qemu_set_fd_handler(event_notifier_get_fd(&vdev->remap_bar_notifier),
-+                        NULL, NULL, vdev);
-+    event_notifier_cleanup(&vdev->req_notifier);
-+
-+    vdev->remap_bar_enabled = false;
-+}
-+
- static void vfio_realize(PCIDevice *pdev, Error **errp)
- {
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-@@ -3194,6 +3282,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
- 
-     vfio_register_err_notifier(vdev);
-     vfio_register_req_notifier(vdev);
-+    vfio_register_remap_bar_notifier(vdev);
-     vfio_setup_resetfn_quirk(vdev);
- 
-     return;
-@@ -3235,6 +3324,7 @@ static void vfio_exitfn(PCIDevice *pdev)
- 
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-+    vfio_unregister_remap_bar_notifier(vdev);
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-     if (vdev->irqchip_change_notifier.notify) {
-         kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index b148c93..5a1e564 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -134,6 +134,7 @@ typedef struct VFIOPCIDevice {
-     PCIHostDeviceAddress host;
-     EventNotifier err_notifier;
-     EventNotifier req_notifier;
-+    EventNotifier remap_bar_notifier;
-     int (*resetfn)(struct VFIOPCIDevice *);
-     uint32_t vendor_id;
-     uint32_t device_id;
-@@ -157,6 +158,7 @@ typedef struct VFIOPCIDevice {
-     uint8_t nv_gpudirect_clique;
-     bool pci_aer;
-     bool req_enabled;
-+    bool remap_bar_enabled;
-     bool has_flr;
-     bool has_pm_reset;
-     bool rom_read_failed;
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index a6283b7..1c16790 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -188,6 +188,8 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
- int vfio_region_mmap(VFIORegion *region);
- void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
- void vfio_region_unmap(VFIORegion *region);
-+void vfio_region_reset_mmap(VFIODevice *vbasedev,
-+                            VFIORegion *region, int index);
- void vfio_region_exit(VFIORegion *region);
- void vfio_region_finalize(VFIORegion *region);
- void vfio_reset_handler(void *opaque);
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 2598a84..2344ca6 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -703,6 +703,17 @@ struct vfio_irq_info_cap_type {
- 	__u32 subtype;  /* type specific */
- };
- 
-+/* Bar Region Query IRQ TYPE */
-+#define VFIO_IRQ_TYPE_REMAP_BAR_REGION                 (1)
-+
-+/* sub-types for VFIO_IRQ_TYPE_REMAP_BAR_REGION */
-+/*
-+ * This irq notifies userspace to re-query BAR region and remaps the
-+ * subregions.
-+ */
-+#define VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION      (0)
-+
-+
- /**
-  * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
-  *
--- 
-2.7.4
-
+>
+> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+> ---
+>   arch/x86/kvm/x86.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 471fccf..446f747 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1631,7 +1631,7 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct
+> kvm_vcpu *vcpu)
+>                  if (!handle_fastpath_set_x2apic_icr_irqoff(vcpu, data)) {
+>                          kvm_skip_emulated_instruction(vcpu);
+>                          ret = EXIT_FASTPATH_EXIT_HANDLED;
+> -               }
+> +               }
+>                  break;
+>          case MSR_IA32_TSCDEADLINE:
+>                  data = kvm_read_edx_eax(vcpu);
+> --
+> 1.8.3.1
