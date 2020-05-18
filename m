@@ -2,108 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AA051D7324
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 10:42:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3B661D7327
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 10:43:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726632AbgERImb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 04:42:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59886 "EHLO
+        id S1726803AbgERImy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 04:42:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726481AbgERIma (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 May 2020 04:42:30 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15DEC061A0C;
-        Mon, 18 May 2020 01:42:30 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id u188so9298691wmu.1;
-        Mon, 18 May 2020 01:42:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=6rCQDnpCBqEjecCnmIenSye1eK7mw1G0XLc59v/D478=;
-        b=u1ZHOQ7pY6BQXkcXjjTiCGQLgwtFQklx4tvb4P7KbjdRROcLtam5Ls9Huc9xXcsSAM
-         69++inp6nmAxDqqTVa8U4LMdSOF93DC9l6CBSh6yJgdc8P+ip2BpFxlFWWULKRE5rhnE
-         bhyKRAFTups7B+mXG5YdyttVSr/MsfemIUbb6xoqItdQViyhFzn6RfUxLCv6vbmI+9mP
-         wN/7zxRI9fKccZyf4puhJWOSWU3V3aUZR1wV+7AKIFFJyXCU3lTbJdDRoPPQP7We2Fkg
-         5SiClnlbBzffBq17zolAdasqt3gcnH9cpfhHmpG46biWl66980nvO6S6NYSaa0N64CIS
-         ybWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=6rCQDnpCBqEjecCnmIenSye1eK7mw1G0XLc59v/D478=;
-        b=l0NUyWH7aq/Z+JVo5jX61gc71hjFqswA7XRJ5t7IBkRFHGVubzEh0jRxerPPTvjfuY
-         nHTu1rdjyG0akQG3IxvO5TwOqJN/20GY2t5m4xsGCuWLVQ44hHZ4ZcoyqsUUGnOwS4+t
-         QeaQrdoTMg2VR6F1hsweByIKVo9cXiR73ztOKMHp4QsUZ/ISBwdfdU4cge/jro3rAl7h
-         Nfjro7v3WeHUpY+IKSjO9PAMrzjneDZ4Zcospb5syUIaldESPlpiuKbzH+zjjQArhuoy
-         3JsbeEeYclD8pNikhXVSlfzLB6SlV/SYQxUMdg9gUGAa/508K7OR5FA6mXhpHAkxoOyV
-         x+vA==
-X-Gm-Message-State: AOAM531NK8BoP4V/0te0sY+0zYIiUQXpxvDbJkadPcgDvwHAOdUcs41V
-        61V/qH44HMk5cMFNwyXWfTZoeQ9K/8uXSxHhNFc=
-X-Google-Smtp-Source: ABdhPJzDWqtnuBtqUKl/Y6GWfI1D6NhnXMkeyttrmUevve7IOOSi/uq/Uy1Bnp7nvHWI2GaLTUc5Ozrxk2ILqA9jbcs=
-X-Received: by 2002:a1c:2dc7:: with SMTP id t190mr17405239wmt.129.1589791349320;
- Mon, 18 May 2020 01:42:29 -0700 (PDT)
+        with ESMTP id S1726640AbgERImy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 04:42:54 -0400
+Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F7CC061A0C;
+        Mon, 18 May 2020 01:42:54 -0700 (PDT)
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jabM0-0005IY-I1; Mon, 18 May 2020 10:42:32 +0200
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 026F6100606; Mon, 18 May 2020 10:42:31 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Anastassios Nanos <ananos@nubificus.co.uk>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 0/2] Expose KVM API to Linux Kernel
+In-Reply-To: <cover.1589784221.git.ananos@nubificus.co.uk>
+References: <cover.1589784221.git.ananos@nubificus.co.uk>
+Date:   Mon, 18 May 2020 10:42:31 +0200
+Message-ID: <87y2ppy6q0.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-References: <1589359366-1669-1-git-send-email-chenhc@lemote.com>
- <1589359366-1669-16-git-send-email-chenhc@lemote.com> <AC9338A0-F449-4DCA-A294-248C86D57877@flygoat.com>
- <CAAhV-H7OTeMy2Yp2PunD+2KVzzPDT+-xGGgbpRNzhb8C-p8-7g@mail.gmail.com>
- <20200515211353.GB22922@alpha.franken.de> <CAAhV-H58G7+se6VTBMo2R4joDXngF-c_W=fh8=zD8rVnono=gg@mail.gmail.com>
- <1a22adb0-0b7a-24a3-e762-7b9919a70a8e@redhat.com>
-In-Reply-To: <1a22adb0-0b7a-24a3-e762-7b9919a70a8e@redhat.com>
-From:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date:   Mon, 18 May 2020 10:42:14 +0200
-Message-ID: <CAHiYmc6qnvEhgX8BOhuUkQcfnLzBf_1hqoW=GKGh26KpQU5HLQ@mail.gmail.com>
-Subject: Re: [PATCH V5 15/15] MAINTAINERS: Update KVM/MIPS maintainers
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Huacai Chen <chenhc@lemote.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-=D1=81=D1=83=D0=B1, 16. =D0=BC=D0=B0=D1=98 2020. =D1=83 13:55 Paolo Bonzini=
- <pbonzini@redhat.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:
+Anastassios Nanos <ananos@nubificus.co.uk> writes:
+> To spawn KVM-enabled Virtual Machines on Linux systems, one has to use
+> QEMU, or some other kind of VM monitor in user-space to host the vCPU
+> threads, I/O threads and various other book-keeping/management mechanisms.
+> This is perfectly fine for a large number of reasons and use cases: for
+> instance, running generic VMs, running general purpose Operating systems
+> that need some kind of emulation for legacy boot/hardware etc.
 >
-> On 16/05/20 11:36, Huacai Chen wrote:
-> >> I'm happy to see you taking care of the KVM part. So how is your plan
-> >> to handle patches ? Do want to collect them and send pull requests to
-> >> me ? Or should I just pick them up with your Acked-by ?
-> > I think we can only use the second method, because both Aleksandar and
-> > me don't have a kernel tree in kernel.org now.
+> What if we wanted to execute a small piece of code as a guest instance,
+> without the involvement of user-space? The KVM functions are already doing
+> what they should: VM and vCPU setup is already part of the kernel, the only
+> missing piece is memory handling.
 >
-> If you don't mind, I generally prefer to have MIPS changs submitted
-> through the KVM tree, because KVM patches rarely have intrusive changes
-> in generic arch files.  It's more common to have generic KVM patches
-> that require touching all architectures.
+> With these series, (a) we expose to the Linux Kernel the bare minimum KVM
+> API functions in order to spawn a guest instance without the intervention
+> of user-space; and (b) we tweak the memory handling code of KVM-related
+> functions to account for another kind of guest, spawned in kernel-space.
 >
+> PATCH #1 exposes the needed stub functions, whereas PATCH #2 introduces the
+> changes in the KVM memory handling code for x86_64 and aarch64.
+>
+> An example of use is provided based on kvmtest.c
+> [https://lwn.net/Articles/658512/] at
 
-To me, Paolo's workflow seems reasonable and efficient from practical
-point of view. No unnecessary multitude of repeated series or pull sending,
-and no single person is burdened with majority of work being done just by
-himself for any given case of series like this one. Also, it looks to me it=
- is
-quite efficient wrt possible conflict and rebase issues, that will be taken
-care by both KVM/MIPS and KVM/general submitters/maintainers.
+And this shows clearly how simple the user space is which is required to
+do that. So why on earth would we want to have all of that in the
+kernel?
 
-I suggest we keep Paolo's workflow plan for this series, but, more
-importantly, if you guys all agree, in future as well.
+Thanks,
 
-Sincerely,
-Aleksandar
-
-> For 5.8 I don't have anything planned that could cause conflicts, so
-> this time it doesn't matter; but I can pick these up too if Thomas acks
-> patches 6, 12 and 14.
->
-> Thanks,
->
-> Paolo
->
+        tglx
