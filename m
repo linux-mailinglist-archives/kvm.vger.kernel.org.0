@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FC181D6F3E
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 05:04:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D4941D6F40
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 05:06:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727123AbgERDEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 May 2020 23:04:39 -0400
-Received: from mga03.intel.com ([134.134.136.65]:25715 "EHLO mga03.intel.com"
+        id S1726944AbgERDG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 May 2020 23:06:26 -0400
+Received: from mga06.intel.com ([134.134.136.31]:39772 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726720AbgERDEj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 May 2020 23:04:39 -0400
-IronPort-SDR: egluIFURTmoNkAcIJFaLKbYv/fLj1DeuA24/MvuwlwtBhmcBtLeRw3WGALJhV8+Yub7qOwgbyN
- pmuG9DlAiYXg==
+        id S1726639AbgERDG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 May 2020 23:06:26 -0400
+IronPort-SDR: bXB6AeMxhvwiK9dC5jY/JRLc3Z7xfq/fIcezBTm/K6dEsDpF9gr7VFae/p7Zp/loP/vNg3tBjc
+ qpIEnAHcmFaw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2020 20:04:37 -0700
-IronPort-SDR: Dc7ZD0Txewr9IXncTFuVfkfHwmH4yE52rq7GMqu7GdB9kXfQdTGHEJiDfzqXUA/gz6Qt5fSYhL
- FGEqfwinhJOw==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2020 20:06:26 -0700
+IronPort-SDR: ZodtljUh9+7MSzGOSifcMary7mu0dRa+dQOFzSBH2T0ZlWSnK8HGJjF9JydYxVA7Q3evPo+gpa
+ +Opeg/vPxmkQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,405,1583222400"; 
-   d="scan'208";a="411106449"
+   d="scan'208";a="411106816"
 Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.16])
-  by orsmga004.jf.intel.com with ESMTP; 17 May 2020 20:04:34 -0700
+  by orsmga004.jf.intel.com with ESMTP; 17 May 2020 20:06:22 -0700
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
@@ -31,533 +31,267 @@ Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
         kevin.tian@intel.com, shaopeng.he@intel.com, yi.l.liu@intel.com,
         xin.zeng@intel.com, hang.yuan@intel.com,
         Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH v4 10/10] i40e/vf_migration: vendor defined irq_type to support dynamic bar map
-Date:   Sun, 17 May 2020 22:54:41 -0400
-Message-Id: <20200518025441.14604-1-yan.y.zhao@intel.com>
+Subject: [QEMU RFC PATCH v4] hw/vfio/pci: remap bar region irq
+Date:   Sun, 17 May 2020 22:56:18 -0400
+Message-Id: <20200518025618.14659-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200518024202.13996-1-yan.y.zhao@intel.com>
-References: <20200518024202.13996-1-yan.y.zhao@intel.com>
+In-Reply-To: <20200518025245.14425-1-yan.y.zhao@intel.com>
+References: <20200518025245.14425-1-yan.y.zhao@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch gives an example implementation to support vendor defined
-irq_type.
+Added an irq type VFIO_IRQ_TYPE_REMAP_BAR_REGION to
+dynamically query and remap BAR regions.
 
-- on this vendor driver open, it registers an irq of type
-  VFIO_IRQ_TYPE_REMAP_BAR_REGION, and reports to driver vfio-pci there's
-  1 vendor irq.
+QEMU decodes the index of the BARs by reading cnt of eventfd.
+If bit n is set, the corresponding BAR will be requeried and
+its subregions will be remapped according to the its new flags.
 
-- after userspace detects and enables the irq of type
-  VFIO_IRQ_TYPE_REMAP_BAR_REGION, this vendor driver will setup a virqfd
-  to monitor file write to the fd of this irq.
+rely on [1] "vfio: Add a funtion to return a specific irq capabilities"
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg621645.html
 
-  (1) when migration starts
-  (the device state is set to _SAVING & _RUNNING),
-  a. this vendor driver will signal the irq VFIO_IRQ_TYPE_REMAP_BAR_REGION
-  to ask userspace to remap pci bars. It packs the target bar number in
-  the ctx count. i.e. 1 << bar_number. if there are multiple bars to remap,
-  the numbers are or'ed.
-
-  b. on receiving this eventfd signal, userspace will read the bar number,
-  re-query the bar flags (like READ/WRITE/MMAP/SPARSE ranges), and remap
-  the bar's subregions.
-
-  c. vendor driver reports bar 0 to be trapped (not MMAP'd).
-
-  d. after remapping completion, it writes 0 to the eventfd so that the
-  vendor driver waiting for it would complete too.
-
-  (2) as the bar 0 is remapped to be trapped, vendor driver is able to
-  start tracking dirty pages in software way.
-
-  (3) when migration stops, similar to what's done in migration start, the
-  vendor driver would signal to remap the bar back to un-trapped (MMAP'd),
-  but it would not wait for the userspace writing back for remapping
-  completion.
-
-- on releasing this vendor driver, it frees resources to vendor defined
-irqs.
-
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Shaopeng He <shaopeng.he@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- drivers/net/ethernet/intel/Kconfig            |   2 +-
- .../ethernet/intel/i40e/i40e_vf_migration.c   | 322 +++++++++++++++++-
- .../ethernet/intel/i40e/i40e_vf_migration.h   |  26 ++
- 3 files changed, 346 insertions(+), 4 deletions(-)
+ hw/vfio/common.c              | 50 ++++++++++++++++++++++++
+ hw/vfio/pci.c                 | 90 +++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.h                 |  2 +
+ include/hw/vfio/vfio-common.h |  2 +
+ linux-headers/linux/vfio.h    | 11 ++++++
+ 5 files changed, 155 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index 31780d9a59f1..6a52a197c4d8 100644
---- a/drivers/net/ethernet/intel/Kconfig
-+++ b/drivers/net/ethernet/intel/Kconfig
-@@ -266,7 +266,7 @@ config I40E_DCB
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index a041c3b..cf24293 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1284,6 +1284,56 @@ void vfio_region_unmap(VFIORegion *region)
+     }
+ }
  
- config I40E_VF_MIGRATION
- 	tristate "XL710 Family VF live migration support -- loadable modules only"
--	depends on I40E && VFIO_PCI && m
-+	depends on I40E && VFIO_PCI && VFIO_VIRQFD && m
- 	help
- 	  Say m if you want to enable live migration of
- 	  Virtual Functions of Intel(R) Ethernet Controller XL710
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_vf_migration.c b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
-index 107a291909b3..188829efaa19 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
-@@ -19,6 +19,266 @@
- #define DRIVER_AUTHOR   "Intel Corporation"
- #define TEST_DIRTY_IOVA_PFN 0
- 
-+static int i40e_vf_remap_bars(struct i40e_vf_migration *i40e_vf_dev, bool wait)
++/*
++ * re-query a region's flags,
++ * and update its mmap'd subregions.
++ * It does not support change a region's size.
++ */
++void vfio_region_reset_mmap(VFIODevice *vbasedev, VFIORegion *region, int index)
 +{
-+	int bar_num = 0;
++    struct vfio_region_info *new;
 +
-+	if (!i40e_vf_dev->remap_irq_ctx.init)
-+		return -ENODEV;
++    if (!region->mem) {
++        return;
++    }
 +
-+	/* set cnt to 2 as it will enter wait_handler too times.
-+	 * one from this eventfd_signal,
-+	 * one from userspace ack back
-+	 */
-+	atomic_set(&i40e_vf_dev->remap_irq_ctx.cnt, 2);
-+	eventfd_signal(i40e_vf_dev->remap_irq_ctx.trigger, 1 << bar_num);
++    if (vfio_get_region_info(vbasedev, index, &new)) {
++        goto out;
++    }
 +
-+	if (!wait)
-+		return 0;
++    if (region->size != new->size) {
++        error_report("vfio: resetting of region size is not supported");
++        goto out;
++    }
 +
-+	/* the wait cannot be executed in vcpu threads, as the eventfd write
-+	 * from userspace we are waiting for is waiting on the lock vcpu
-+	 * threads hold
-+	 */
-+	wait_event_killable(i40e_vf_dev->remap_irq_ctx.waitq,
-+			    !atomic_read(&i40e_vf_dev->remap_irq_ctx.cnt));
++    if (region->flags == new->flags) {
++        goto out;
++    }
 +
-+	return 0;
++    /* ummap old mmap'd subregions, if any */
++    vfio_region_unmap(region);
++    region->nr_mmaps = 0;
++    g_free(region->mmaps);
++    region->mmaps = NULL;
++
++    /* setup new mmap'd subregions*/
++    region->flags = new->flags;
++    if (vbasedev->no_mmap ||
++            !(region->flags & VFIO_REGION_INFO_FLAG_MMAP)) {
++        goto out;
++    }
++
++    if (vfio_setup_region_sparse_mmaps(region, new)) {
++        region->nr_mmaps = 1;
++        region->mmaps = g_new0(VFIOMmap, region->nr_mmaps);
++        region->mmaps[0].offset = 0;
++        region->mmaps[0].size = region->size;
++    }
++    vfio_region_mmap(region);
++out:
++    g_free(new);
 +}
 +
-+static int i40e_vf_remap_bar_wait_handler(void *opaque, void *unused)
-+{
-+	struct i40e_vf_migration *i40e_vf_dev = opaque;
-+
-+	atomic_dec_if_positive(&i40e_vf_dev->remap_irq_ctx.cnt);
-+	wake_up(&i40e_vf_dev->remap_irq_ctx.waitq);
-+	return 0;
-+}
-+
-+static void i40e_vf_disable_remap_bars_irq(struct i40e_vf_migration *vf_dev)
-+{
-+	if (!vf_dev->remap_irq_ctx.init)
-+		return;
-+
-+	if (vf_dev->remap_irq_ctx.sync)
-+		vfio_virqfd_disable(&vf_dev->remap_irq_ctx.sync);
-+
-+	atomic_set(&vf_dev->remap_irq_ctx.cnt, 0);
-+	wake_up(&vf_dev->remap_irq_ctx.waitq);
-+
-+	eventfd_ctx_put(vf_dev->remap_irq_ctx.trigger);
-+	vf_dev->remap_irq_ctx.trigger = NULL;
-+	vf_dev->remap_irq_ctx.init = false;
-+}
-+
-+static int i40e_vf_enable_remap_bars_irq(struct i40e_vf_migration *vf_dev,
-+					 struct eventfd_ctx *ctx, int32_t fd)
-+{
-+	int ret;
-+
-+	if (vf_dev->remap_irq_ctx.init)
-+		return -EEXIST;
-+
-+	ret = vfio_virqfd_enable((void *)vf_dev,
-+				 i40e_vf_remap_bar_wait_handler, NULL, ctx,
-+				 &vf_dev->remap_irq_ctx.sync, fd);
-+	if (ret) {
-+		eventfd_ctx_put(ctx);
-+		return ret;
-+	}
-+
-+	init_waitqueue_head(&vf_dev->remap_irq_ctx.waitq);
-+	atomic_set(&vf_dev->remap_irq_ctx.cnt, 0);
-+	vf_dev->remap_irq_ctx.init = true;
-+	vf_dev->remap_irq_ctx.trigger = ctx;
-+	return 0;
-+}
-+
-+static int i40e_vf_set_irq_remap_bars(struct i40e_vf_migration *i40e_vf_dev,
-+				      u32 flags, unsigned int index,
-+				      unsigned int start, unsigned int count,
-+				      void *data)
-+{
-+	switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-+	case VFIO_IRQ_SET_ACTION_MASK:
-+	case VFIO_IRQ_SET_ACTION_UNMASK:
-+		/* XXX Need masking support exported */
-+		return 0;
-+	case VFIO_IRQ_SET_ACTION_TRIGGER:
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	if (start != 0 || count > 1)
-+		return -EINVAL;
-+
-+	if (flags & VFIO_IRQ_SET_DATA_NONE) {
-+		if (!count) {
-+			i40e_vf_disable_remap_bars_irq(i40e_vf_dev);
-+			return 0;
-+		}
-+	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
-+		return -EINVAL;
-+	} else if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-+		int fd;
-+
-+		if (!count || !data)
-+			return -EINVAL;
-+
-+		fd = *(int32_t *)data;
-+		if (fd == -1) {
-+			i40e_vf_disable_remap_bars_irq(i40e_vf_dev);
-+		} else if (fd >= 0) {
-+			struct eventfd_ctx *efdctx;
-+
-+			efdctx = eventfd_ctx_fdget(fd);
-+			if (IS_ERR(efdctx))
-+				return PTR_ERR(efdctx);
-+
-+			i40e_vf_disable_remap_bars_irq(i40e_vf_dev);
-+
-+			return i40e_vf_enable_remap_bars_irq(i40e_vf_dev,
-+							     efdctx, fd);
-+		}
-+		return 0;
-+	}
-+	return -EINVAL;
-+}
-+
-+static const struct i40e_vf_irqops i40e_vf_irqops_remap_bars = {
-+	.set_irqs = i40e_vf_set_irq_remap_bars,
-+};
-+
-+static long i40e_vf_set_irqs(void *device_data,
-+			     unsigned int cmd, unsigned long arg)
-+{
-+	struct vfio_irq_set hdr;
-+	int index, ret;
-+	u8 *data = NULL;
-+	size_t data_size = 0;
-+	unsigned long minsz;
-+	struct i40e_vf_migration *i40e_vf_dev =
-+		vfio_pci_vendor_data(device_data);
-+
-+	minsz = offsetofend(struct vfio_irq_set, count);
-+	if (copy_from_user(&hdr, (void __user *)arg, minsz))
-+		return -EFAULT;
-+
-+	if (hdr.argsz < minsz ||
-+	    hdr.index >= VFIO_PCI_NUM_IRQS + i40e_vf_dev->num_irqs)
-+		return -EINVAL;
-+	if (hdr.index < VFIO_PCI_NUM_IRQS)
-+		goto default_handle;
-+
-+	index = hdr.index - VFIO_PCI_NUM_IRQS;
-+
-+	ret = vfio_set_irqs_validate_and_prepare(&hdr,
-+						 i40e_vf_dev->irqs[index].count,
-+						 VFIO_PCI_NUM_IRQS +
-+						 i40e_vf_dev->num_irqs,
-+						 &data_size);
-+	if (ret)
-+		return ret;
-+
-+	if (data_size) {
-+		data = memdup_user((void __user *)(arg + minsz), data_size);
-+		if (IS_ERR(data))
-+			return PTR_ERR(data);
-+	}
-+
-+	ret = i40e_vf_dev->irqs[index].ops->set_irqs(i40e_vf_dev,
-+						     hdr.flags, hdr.index,
-+						     hdr.start, hdr.count,
-+						     data);
-+	kfree(data);
-+	return ret;
-+
-+default_handle:
-+	return vfio_pci_ioctl(device_data, cmd, arg);
-+}
-+
-+static long i40e_vf_get_irq_info(void *device_data,
-+				 unsigned int cmd, unsigned long arg)
-+{
-+	struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
-+	struct vfio_irq_info info;
-+	int index, ret;
-+	unsigned long minsz;
-+	struct vfio_irq_info_cap_type cap_type = {
-+		.header.id = VFIO_IRQ_INFO_CAP_TYPE,
-+		.header.version = 1
-+	};
-+	struct i40e_vf_migration *i40e_vf_dev =
-+		vfio_pci_vendor_data(device_data);
-+
-+	minsz = offsetofend(struct vfio_irq_info, count);
-+	if (copy_from_user(&info, (void __user *)arg, minsz))
-+		return -EFAULT;
-+
-+	if (info.argsz < minsz ||
-+	    info.index >= VFIO_PCI_NUM_IRQS + i40e_vf_dev->num_irqs)
-+		return -EINVAL;
-+	if (info.index < VFIO_PCI_NUM_IRQS)
-+		goto default_handle;
-+
-+	index = info.index - VFIO_PCI_NUM_IRQS;
-+	info.flags = i40e_vf_dev->irqs[index].flags;
-+	cap_type.type = i40e_vf_dev->irqs[index].type;
-+	cap_type.subtype = i40e_vf_dev->irqs[index].subtype;
-+
-+	ret = vfio_info_add_capability(&caps, &cap_type.header,
-+				       sizeof(cap_type));
-+	if (ret)
-+		return ret;
-+
-+	if (caps.size) {
-+		info.flags |= VFIO_IRQ_INFO_FLAG_CAPS;
-+		if (info.argsz < sizeof(info) + caps.size) {
-+			info.argsz = sizeof(info) + caps.size;
-+			info.cap_offset = 0;
-+		} else {
-+			vfio_info_cap_shift(&caps, sizeof(info));
-+			if (copy_to_user((void __user *)arg + sizeof(info),
-+					 caps.buf, caps.size)) {
-+				kfree(caps.buf);
-+				return -EFAULT;
-+			}
-+			info.cap_offset = sizeof(info);
-+			if (offsetofend(struct vfio_irq_info, cap_offset) >
-+					minsz)
-+				minsz = offsetofend(struct vfio_irq_info,
-+						    cap_offset);
-+		}
-+		kfree(caps.buf);
-+	}
-+	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
-+
-+default_handle:
-+	return vfio_pci_ioctl(device_data, cmd, arg);
-+}
-+
-+static int i40e_vf_register_irq(struct i40e_vf_migration *i40e_vf_dev,
-+				unsigned int type, unsigned int subtype,
-+				u32 flags, const struct i40e_vf_irqops *ops)
-+{
-+	struct i40e_vf_irq *irqs;
-+
-+	irqs = krealloc(i40e_vf_dev->irqs,
-+			(i40e_vf_dev->num_irqs + 1) * sizeof(*irqs),
-+			GFP_KERNEL);
-+	if (!irqs)
-+		return -ENOMEM;
-+
-+	i40e_vf_dev->irqs = irqs;
-+	i40e_vf_dev->irqs[i40e_vf_dev->num_irqs].type = type;
-+	i40e_vf_dev->irqs[i40e_vf_dev->num_irqs].subtype = subtype;
-+	i40e_vf_dev->irqs[i40e_vf_dev->num_irqs].count = 1;
-+	i40e_vf_dev->irqs[i40e_vf_dev->num_irqs].flags = flags;
-+	i40e_vf_dev->irqs[i40e_vf_dev->num_irqs].ops = ops;
-+	i40e_vf_dev->num_irqs++;
-+	return 0;
-+}
- static int i40e_vf_iommu_notifier(struct notifier_block *nb,
- 				  unsigned long action, void *data)
+ void vfio_region_exit(VFIORegion *region)
  {
-@@ -100,6 +360,12 @@ static int i40e_vf_prepare_dirty_track(struct i40e_vf_migration *i40e_vf_dev)
- 		goto out_group;
- 	}
- 
-+	/* wait for bar 0 is remapped to read-write */
-+	ret = i40e_vf_remap_bars(i40e_vf_dev, true);
-+	if (ret) {
-+		pr_err("failed to remap BAR 0\n");
-+		goto out_group;
-+	}
- 	i40e_vf_dev->in_dirty_track = true;
- 	return 0;
- 
-@@ -121,6 +387,8 @@ static void i40e_vf_stop_dirty_track(struct i40e_vf_migration *i40e_vf_dev)
- 				 &i40e_vf_dev->iommu_notifier);
- 	vfio_group_put_external_user(i40e_vf_dev->vfio_group);
- 	i40e_vf_dev->in_dirty_track = false;
-+	/* just nottify userspace to remap bar0 without waiting */
-+	i40e_vf_remap_bars(i40e_vf_dev, false);
+     int i;
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c70f153..12998c5 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2883,6 +2883,94 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+     vdev->req_enabled = false;
  }
  
- static size_t i40e_vf_set_device_state(struct i40e_vf_migration *i40e_vf_dev,
-@@ -134,6 +402,8 @@ static size_t i40e_vf_set_device_state(struct i40e_vf_migration *i40e_vf_dev,
- 
- 	switch (state) {
- 	case VFIO_DEVICE_STATE_RUNNING:
-+		if (mig_ctl->device_state & VFIO_DEVICE_STATE_SAVING)
-+			i40e_vf_stop_dirty_track(i40e_vf_dev);
- 		break;
- 	case VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RUNNING:
- 		ret = i40e_vf_prepare_dirty_track(i40e_vf_dev);
-@@ -360,7 +630,25 @@ static long i40e_vf_get_region_info(void *device_data,
- 		-EFAULT : 0;
- 
- default_handle:
--	return vfio_pci_ioctl(device_data, cmd, arg);
-+	ret = vfio_pci_ioctl(device_data, cmd, arg);
-+	if (ret)
-+		return ret;
++static void vfio_remap_bar_notifier_handler(void *opaque)
++{
++    VFIOPCIDevice *vdev = opaque;
++    uint64_t bars;
++    ssize_t ret;
++    int i;
 +
-+	if (info.index == VFIO_PCI_BAR0_REGION_INDEX) {
-+		if (!i40e_vf_dev->in_dirty_track)
-+			return ret;
++    ret = read(vdev->remap_bar_notifier.rfd, &bars, sizeof(bars));
++    if (ret != sizeof(bars)) {
++            return;
++    }
++    for (i = 0; i < PCI_ROM_SLOT; i++) {
++        VFIORegion *region = &vdev->bars[i].region;
 +
-+		/* read default handler's data back*/
-+		if (copy_from_user(&info, (void __user *)arg, minsz))
-+			return -EFAULT;
++        if (!test_bit(i, &bars)) {
++            continue;
++        }
 +
-+		info.flags = VFIO_REGION_INFO_FLAG_READ |
-+					VFIO_REGION_INFO_FLAG_WRITE;
-+		/* update customized region info*/
-+		if (copy_to_user((void __user *)arg, &info, minsz))
-+			return -EFAULT;
-+	}
-+	return ret;
- }
- 
- static int i40e_vf_open(void *device_data)
-@@ -392,10 +680,20 @@ static int i40e_vf_open(void *device_data)
- 		if (ret)
- 			goto error;
- 
-+		ret = i40e_vf_register_irq(i40e_vf_dev,
-+					   VFIO_IRQ_TYPE_REMAP_BAR_REGION,
-+					   VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION,
-+					   VFIO_IRQ_INFO_MASKABLE |
-+					   VFIO_IRQ_INFO_EVENTFD,
-+					   &i40e_vf_irqops_remap_bars);
-+		if (ret)
-+			goto error;
++        vfio_region_reset_mmap(&vdev->vbasedev, region, i);
++    }
 +
- 		i40e_vf_dev->mig_ctl = mig_ctl;
- 		vfio_pci_set_vendor_regions(device_data,
- 					    i40e_vf_dev->num_regions);
--		vfio_pci_set_vendor_irqs(device_data, 0);
-+		vfio_pci_set_vendor_irqs(device_data,
-+					 i40e_vf_dev->num_irqs);
- 	}
- 
- 	ret = vfio_pci_open(device_data);
-@@ -413,6 +711,9 @@ static int i40e_vf_open(void *device_data)
- 		i40e_vf_dev->regions = NULL;
- 		vfio_pci_set_vendor_regions(device_data, 0);
- 		vfio_pci_set_vendor_irqs(device_data, 0);
-+		i40e_vf_dev->irqs = NULL;
-+		i40e_vf_dev->num_irqs = 0;
-+		kfree(i40e_vf_dev->irqs);
- 	}
- 	module_put(THIS_MODULE);
- 	mutex_unlock(&i40e_vf_dev->reflock);
-@@ -436,7 +737,16 @@ void i40e_vf_release(void *device_data)
- 		kfree(i40e_vf_dev->regions);
- 		i40e_vf_dev->regions = NULL;
- 		vfio_pci_set_vendor_regions(device_data, 0);
++    /* write 0 to notify kernel that we're done */
++    bars = 0;
++    write(vdev->remap_bar_notifier.wfd, &bars, sizeof(bars));
++}
 +
- 		vfio_pci_set_vendor_irqs(device_data, 0);
-+		for (i = 0; i < i40e_vf_dev->num_irqs; i++)
-+			i40e_vf_dev->irqs[i].ops->set_irqs(i40e_vf_dev,
-+					VFIO_IRQ_SET_DATA_NONE |
-+					VFIO_IRQ_SET_ACTION_TRIGGER,
-+					i, 0, 0, NULL);
-+		kfree(i40e_vf_dev->irqs);
-+		i40e_vf_dev->irqs = NULL;
-+		i40e_vf_dev->num_irqs = 0;
- 	}
- 	vfio_pci_release(device_data);
- 	mutex_unlock(&i40e_vf_dev->reflock);
-@@ -448,6 +758,10 @@ static long i40e_vf_ioctl(void *device_data,
++static void vfio_register_remap_bar_notifier(VFIOPCIDevice *vdev)
++{
++    int ret;
++    struct vfio_irq_info *irq;
++    Error *err = NULL;
++    int32_t fd;
++
++    ret = vfio_get_dev_irq_info(&vdev->vbasedev,
++                                VFIO_IRQ_TYPE_REMAP_BAR_REGION,
++                                VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION,
++                                &irq);
++    if (ret) {
++        return;
++    }
++    ret = event_notifier_init(&vdev->remap_bar_notifier, 0);
++    if (ret) {
++        error_report("vfio: Failed to init event notifier for remap bar irq");
++        return;
++    }
++
++    fd = event_notifier_get_fd(&vdev->remap_bar_notifier);
++    qemu_set_fd_handler(fd, vfio_remap_bar_notifier_handler, NULL, vdev);
++
++    if (vfio_set_irq_signaling(&vdev->vbasedev, irq->index, 0,
++                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
++        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
++        qemu_set_fd_handler(fd, NULL, NULL, vdev);
++        event_notifier_cleanup(&vdev->remap_bar_notifier);
++    } else {
++        vdev->remap_bar_enabled = true;
++    }
++};
++
++static void vfio_unregister_remap_bar_notifier(VFIOPCIDevice *vdev)
++{
++    struct vfio_irq_info *irq;
++    Error *err = NULL;
++    int ret;
++
++    if (!vdev->remap_bar_enabled) {
++        return;
++    }
++
++    ret = vfio_get_dev_irq_info(&vdev->vbasedev,
++                                VFIO_IRQ_TYPE_REMAP_BAR_REGION,
++                                VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION,
++                                &irq);
++    if (ret) {
++        return;
++    }
++
++    if (vfio_set_irq_signaling(&vdev->vbasedev, irq->index, 0,
++                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
++        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
++    }
++    qemu_set_fd_handler(event_notifier_get_fd(&vdev->remap_bar_notifier),
++                        NULL, NULL, vdev);
++    event_notifier_cleanup(&vdev->req_notifier);
++
++    vdev->remap_bar_enabled = false;
++}
++
+ static void vfio_realize(PCIDevice *pdev, Error **errp)
  {
- 	if (cmd == VFIO_DEVICE_GET_REGION_INFO)
- 		return i40e_vf_get_region_info(device_data, cmd, arg);
-+	else if (cmd == VFIO_DEVICE_GET_IRQ_INFO)
-+		return i40e_vf_get_irq_info(device_data, cmd, arg);
-+	else if (cmd == VFIO_DEVICE_SET_IRQS)
-+		return i40e_vf_set_irqs(device_data, cmd, arg);
+     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+@@ -3194,6 +3282,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
  
- 	return vfio_pci_ioctl(device_data, cmd, arg);
- }
-@@ -487,8 +801,10 @@ static ssize_t i40e_vf_write(void *device_data, const char __user *buf,
- 	int num_vdev_regions = vfio_pci_num_regions(device_data);
- 	int num_vendor_region = i40e_vf_dev->num_regions;
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
++    vfio_register_remap_bar_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
  
--	if (index == VFIO_PCI_BAR0_REGION_INDEX)
-+	if (index == VFIO_PCI_BAR0_REGION_INDEX) {
-+		pr_debug("vfio bar 0 write\n");
- 		;// scan dirty pages
-+	}
+     return;
+@@ -3235,6 +3324,7 @@ static void vfio_exitfn(PCIDevice *pdev)
  
- 	if (index < VFIO_PCI_NUM_REGIONS + num_vdev_regions)
- 		return vfio_pci_write(device_data, buf, count, ppos);
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
-index 918ba275d5b5..2c4d9ebee4ac 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
-@@ -46,6 +46,14 @@ struct pci_sriov {
- 	bool		drivers_autoprobe; /* Auto probing of VFs by driver */
+     vfio_unregister_req_notifier(vdev);
+     vfio_unregister_err_notifier(vdev);
++    vfio_unregister_remap_bar_notifier(vdev);
+     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+     if (vdev->irqchip_change_notifier.notify) {
+         kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index b148c93..5a1e564 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -134,6 +134,7 @@ typedef struct VFIOPCIDevice {
+     PCIHostDeviceAddress host;
+     EventNotifier err_notifier;
+     EventNotifier req_notifier;
++    EventNotifier remap_bar_notifier;
+     int (*resetfn)(struct VFIOPCIDevice *);
+     uint32_t vendor_id;
+     uint32_t device_id;
+@@ -157,6 +158,7 @@ typedef struct VFIOPCIDevice {
+     uint8_t nv_gpudirect_clique;
+     bool pci_aer;
+     bool req_enabled;
++    bool remap_bar_enabled;
+     bool has_flr;
+     bool has_pm_reset;
+     bool rom_read_failed;
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index a6283b7..1c16790 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -188,6 +188,8 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
+ int vfio_region_mmap(VFIORegion *region);
+ void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
+ void vfio_region_unmap(VFIORegion *region);
++void vfio_region_reset_mmap(VFIODevice *vbasedev,
++                            VFIORegion *region, int index);
+ void vfio_region_exit(VFIORegion *region);
+ void vfio_region_finalize(VFIORegion *region);
+ void vfio_reset_handler(void *opaque);
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 2598a84..2344ca6 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -703,6 +703,17 @@ struct vfio_irq_info_cap_type {
+ 	__u32 subtype;  /* type specific */
  };
  
-+struct i40e_vf_remap_irq_ctx {
-+	struct eventfd_ctx	*trigger;
-+	struct virqfd		*sync;
-+	atomic_t		cnt;
-+	wait_queue_head_t	waitq;
-+	bool			init;
-+};
++/* Bar Region Query IRQ TYPE */
++#define VFIO_IRQ_TYPE_REMAP_BAR_REGION                 (1)
 +
- struct i40e_vf_migration {
- 	__u32				vf_vendor;
- 	__u32				vf_device;
-@@ -58,11 +66,14 @@ struct i40e_vf_migration {
- 
- 	struct vfio_device_migration_info *mig_ctl;
- 	bool				in_dirty_track;
-+	struct i40e_vf_remap_irq_ctx  remap_irq_ctx;
- 
- 	struct i40e_vf_region		*regions;
- 	int				num_regions;
- 	struct notifier_block		iommu_notifier;
- 	struct vfio_group		*vfio_group;
-+	struct i40e_vf_irq		*irqs;
-+	int				num_irqs;
- 
- };
- 
-@@ -89,5 +100,20 @@ struct i40e_vf_region {
- 	void				*data;
- };
- 
-+struct i40e_vf_irqops {
-+	int (*set_irqs)(struct i40e_vf_migration *i40e_vf_dev,
-+			u32 flags, unsigned int index,
-+			unsigned int start, unsigned int count,
-+			void *data);
-+};
++/* sub-types for VFIO_IRQ_TYPE_REMAP_BAR_REGION */
++/*
++ * This irq notifies userspace to re-query BAR region and remaps the
++ * subregions.
++ */
++#define VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION      (0)
 +
-+struct i40e_vf_irq {
-+	u32	type;
-+	u32	subtype;
-+	u32	flags;
-+	u32	count;
-+	const struct i40e_vf_irqops *ops;
-+};
 +
- #endif /* I40E_MIG_H */
- 
+ /**
+  * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
+  *
 -- 
-2.17.1
+2.7.4
 
