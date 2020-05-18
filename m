@@ -2,162 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D2941D7DDA
-	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 18:07:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 044921D7DEB
+	for <lists+kvm@lfdr.de>; Mon, 18 May 2020 18:08:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728390AbgERQHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 12:07:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51754 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728347AbgERQHo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 12:07:44 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04IG1CXk067092;
-        Mon, 18 May 2020 12:07:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31293u2xmu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 May 2020 12:07:42 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04IG1TXe068489;
-        Mon, 18 May 2020 12:07:42 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31293u2xkv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 May 2020 12:07:42 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04IG5dBg016148;
-        Mon, 18 May 2020 16:07:40 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3127t5mf96-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 May 2020 16:07:40 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04IG7cSe65274094
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 May 2020 16:07:38 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5684F11C050;
-        Mon, 18 May 2020 16:07:38 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DF1FD11C052;
-        Mon, 18 May 2020 16:07:37 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.158.244])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 18 May 2020 16:07:37 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v7 12/12] s390x: css: ping pong
-Date:   Mon, 18 May 2020 18:07:31 +0200
-Message-Id: <1589818051-20549-13-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
-References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-18_06:2020-05-15,2020-05-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 suspectscore=1 adultscore=0 lowpriorityscore=0
- cotscore=-2147483648 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005180134
+        id S1728332AbgERQIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 12:08:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45078 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727050AbgERQIe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 12:08:34 -0400
+Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FC7DC061A0C
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 09:08:34 -0700 (PDT)
+Received: by mail-ot1-x341.google.com with SMTP id 72so8515151otu.1
+        for <kvm@vger.kernel.org>; Mon, 18 May 2020 09:08:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=aEvHPXNLYXl7vuRStaAwfAn8MfOBGgU0vV6HazBxAbQ=;
+        b=kZmaULcUCuC5rGz5m3brTjaDP9cEzdfKcaeMbPHGQi55NYO859kdMylN7xaj/ag/bv
+         SreSZqJEUMFVpQ4KJaDU7lvW3SbOr8FS0g1dYWTyRM8Hd/aQeQ4yLQLg3Z+PzBicRxuY
+         O2vLG7K+AfvV2wYisVqz3Mipw7AE+NdIxrQHSc9tQ6QYfdCcMgvONyfPTx/kbx6pk4rk
+         qxAMCyhbgvUu2To7RfjfpHc0yOm3/7CUHXjoLAzJ3SO0m1PIax1mk23pgxzuxEH1z/v2
+         1Ox09rG2WRS/gMxa23xMj7MEPuMCo1/LaeBAbqpWIEQ7kdhaU+LSQSfUXOoFhijijwXv
+         vNgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=aEvHPXNLYXl7vuRStaAwfAn8MfOBGgU0vV6HazBxAbQ=;
+        b=tbKL4wYU/oEsa5kVbCWQKhUm+ZSp4mXrCh1Q45RRhQuYCjaQiDx4jlSmiGHAVBrhp/
+         sD5cxXhVmC9Y2085RmY1PtqMfmiGDCj8VwBW5PZzZ9CLD3cGpM31rxVd2E6WxGnVhguj
+         Lx+f2yNDXMEu/Zuu8Oy9n9z1zmPuZRTGNq5qN9bT1NU1NCGg8L7zV9aV71iU5Wp5FTew
+         sd0gCze8qdRTsvDmmYpV+Svd651VABe7aUnNp3ykbdQqg/TqzLPdfKJPPNARdMCp7MaG
+         EvrMK1rVucEAn3hpnxsgjAc1sVfir9EbPi0eR7oKX7u8o7FicmvvopWrk7+Wlk1aXhdb
+         Yi6A==
+X-Gm-Message-State: AOAM533e6UQEgSbtWC4E7xFz7EmSMZ+CJR7YPdbdXor2d0EsoqfwSIuS
+        xBewirgjlVbeYdDXVk7Sg1FviviyS/ccCPeFS7Za8+75hso=
+X-Google-Smtp-Source: ABdhPJwo0upBYcPDEgUURdtzlsWlu2s/qUyQPm4kW0AOC8ogKFYxePsDhlyOFfo/jy+43bZTEUQWm2oqBZY0DQ5pv1w=
+X-Received: by 2002:a9d:b82:: with SMTP id 2mr12243999oth.221.1589818113522;
+ Mon, 18 May 2020 09:08:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200518155308.15851-1-f4bug@amsat.org> <20200518155308.15851-6-f4bug@amsat.org>
+In-Reply-To: <20200518155308.15851-6-f4bug@amsat.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 18 May 2020 17:08:22 +0100
+Message-ID: <CAFEAcA-rmLFZy5oKB_-Mg5MgWV+=V1rJJcLVi_Bp_jMbivcJxw@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] hw/arm/boot: Abort if set_kernel_args() fails
+To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+        Richard Henderson <rth@twiddle.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To test a write command with the SSCH instruction we need a QEMU device,
-with control unit type 0xC0CA. The PONG device is such a device.
+On Mon, 18 May 2020 at 16:53, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> If a address_space_write() fails while calling
+> set_kernel_args(), the guest kernel will boot
+> using crap data. Avoid that by aborting if this
+> ever occurs.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-This type of device responds to PONG_WRITE requests by incrementing an
-integer, stored as a string at offset 0 of the CCW data.
+I think it's reasonable to make these be fatal, but I think we
+shouldn't just assert() but instead make set_kernel_arg()
+and set_kernel_args_old() return a success/failure indication,
+and report failures to the user as fatal errors.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- s390x/css.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
-
-diff --git a/s390x/css.c b/s390x/css.c
-index c94a916..da80574 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -21,6 +21,12 @@
- #include <css.h>
- 
- #define PONG_CU_TYPE		0xc0ca
-+/* Channel Commands for PONG device */
-+#define PONG_WRITE	0x21 /* Write */
-+#define PONG_READ	0x22 /* Read buffer */
-+
-+#define BUFSZ	9
-+static char buffer[BUFSZ];
- 
- struct lowcore *lowcore = (void *)0x0;
- 
-@@ -274,6 +280,53 @@ unreg_cb:
- 	unregister_io_int_func(irq_io);
- }
- 
-+static void test_ping(void)
-+{
-+	int success, result;
-+	int cnt = 0, max = 4;
-+
-+	if (senseid.cu_type != PONG_CU) {
-+		report_skip("Device is not a pong device.");
-+		return;
-+	}
-+
-+	result = register_io_int_func(irq_io);
-+	if (result) {
-+		report(0, "Could not register IRQ handler");
-+		return;
-+	}
-+
-+	while (cnt++ < max) {
-+		snprintf(buffer, BUFSZ, "%08x\n", cnt);
-+		success = start_subchannel(PONG_WRITE, buffer, BUFSZ, 0);
-+		if (!success) {
-+			report(0, "start_subchannel failed");
-+			goto unreg_cb;
-+		}
-+
-+		wait_for_interrupt(PSW_MASK_IO);
-+
-+		success = start_subchannel(PONG_READ, buffer, BUFSZ, 0);
-+		if (!success) {
-+			report(0, "start_subchannel failed");
-+			goto unreg_cb;
-+		}
-+
-+		wait_for_interrupt(PSW_MASK_IO);
-+
-+		result = atol(buffer);
-+		if (result != (cnt + 1)) {
-+			report(0, "Bad answer from pong: %08x - %08x",
-+			       cnt, result);
-+			goto unreg_cb;
-+		}
-+	}
-+	report(1, "ping-pong count 0x%08x", cnt);
-+
-+unreg_cb:
-+	unregister_io_int_func(irq_io);
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
-@@ -281,6 +334,7 @@ static struct {
- 	{ "enumerate (stsch)", test_enumerate },
- 	{ "enable (msch)", test_enable },
- 	{ "sense (ssch/tsch)", test_sense },
-+	{ "ping-pong (ssch/tsch)", test_ping },
- 	{ NULL, NULL }
- };
- 
--- 
-2.25.1
-
+thanks
+-- PMM
