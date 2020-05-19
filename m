@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E6D521D961E
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 14:19:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 656581D9632
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 14:24:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728892AbgESMTe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 08:19:34 -0400
-Received: from mga18.intel.com ([134.134.136.126]:36945 "EHLO mga18.intel.com"
+        id S1728772AbgESMYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 08:24:43 -0400
+Received: from mga03.intel.com ([134.134.136.65]:25136 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728705AbgESMTd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 08:19:33 -0400
-IronPort-SDR: Gxym/W1Kj+m/3DJV9cA6o5QyEx9bnyGn2rC9Vs2sVszqBTHHZfVIIRNyXY1kritd/2gNpSLcJC
- TkIP2rlmtzxg==
+        id S1726196AbgESMYm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 08:24:42 -0400
+IronPort-SDR: 496qYSdewMGhLUJgzF22dMFgIYgDXyLavxGIjOPvu462z31+XdfR1qv5ovBQgLU4odrg7fLgO3
+ CtlKTN0X5LFQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2020 05:19:26 -0700
-IronPort-SDR: QfB7argupf+FUWa+bhIJr6fsy7smat1tPhaRmXGFHm1AobVRirjPuKwY/YuamwcgvFBPwIZNT5
- vFVSZI/1Ppqw==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2020 05:24:42 -0700
+IronPort-SDR: uXcqt5cgS8vziQXjvTsLjF60PBfq6Ka4H9MGh3uVo2aJdrct40suUlGS/XoeJbWge4pX/d/ycB
+ QBf/rUZ/rccQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,410,1583222400"; 
-   d="scan'208";a="288939620"
+   d="scan'208";a="288940600"
 Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.171.98]) ([10.249.171.98])
-  by fmsmga004.fm.intel.com with ESMTP; 19 May 2020 05:19:22 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 19 May 2020 05:24:38 -0700
 Reply-To: like.xu@intel.com
-Subject: Re: [PATCH v11 07/11] KVM: x86: Expose MSR_IA32_PERF_CAPABILITIES for
- LBR record format
+Subject: Re: [PATCH v11 08/11] KVM: x86/pmu: Emulate LBR feature via guest LBR
+ event
 To:     Peter Zijlstra <peterz@infradead.org>,
         Like Xu <like.xu@linux.intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
@@ -39,16 +39,16 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
         wei.w.wang@intel.com
 References: <20200514083054.62538-1-like.xu@linux.intel.com>
- <20200514083054.62538-8-like.xu@linux.intel.com>
- <20200519105335.GF279861@hirez.programming.kicks-ass.net>
+ <20200514083054.62538-9-like.xu@linux.intel.com>
+ <20200519110011.GG279861@hirez.programming.kicks-ass.net>
 From:   "Xu, Like" <like.xu@intel.com>
 Organization: Intel OTC
-Message-ID: <07806259-d9dd-53ec-1b63-84d8e081a296@intel.com>
-Date:   Tue, 19 May 2020 20:19:21 +0800
+Message-ID: <1fd08161-b3d2-1731-37c5-6c9fe0e06233@intel.com>
+Date:   Tue, 19 May 2020 20:24:38 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200519105335.GF279861@hirez.programming.kicks-ass.net>
+In-Reply-To: <20200519110011.GG279861@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -57,43 +57,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/5/19 18:53, Peter Zijlstra wrote:
-> On Thu, May 14, 2020 at 04:30:50PM +0800, Like Xu wrote:
->> @@ -203,6 +206,12 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
->>   		msr_info->data = pmu->global_ovf_ctrl;
->>   		return 0;
->> +	case MSR_IA32_PERF_CAPABILITIES:
->> +		if (!msr_info->host_initiated &&
->> +			!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
->> +			return 1;
-> I know this is KVM code, so maybe they feel differently, but I find the
-> above indentation massively confusing. Consider using: "set cino=:0(0"
-> if you're a vim user.
-Nice tip and I'll apply it. Thanks.
+On 2020/5/19 19:00, Peter Zijlstra wrote:
+> On Thu, May 14, 2020 at 04:30:51PM +0800, Like Xu wrote:
+>> +static inline bool event_is_oncpu(struct perf_event *event)
+>> +{
+>> +	return event && event->oncpu != -1;
+>> +}
 >
->> +		msr_info->data = vcpu->arch.perf_capabilities;
->> +		return 0;
->>   	default:
->>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
->>   			u64 val = pmc_read_counter(pmc);
->> @@ -261,6 +270,16 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   			return 0;
->>   		}
->>   		break;
->> +	case MSR_IA32_PERF_CAPABILITIES:
->> +		if (!msr_info->host_initiated ||
->> +			!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
->> +			return 1;
-> Idem.
+>> +/*
+>> + * It's safe to access LBR msrs from guest when they have not
+>> + * been passthrough since the host would help restore or reset
+>> + * the LBR msrs records when the guest LBR event is scheduled in.
+>> + */
+>> +static bool intel_pmu_access_lbr_msr(struct kvm_vcpu *vcpu,
+>> +				     struct msr_data *msr_info, bool read)
+>> +{
+>> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>> +	u32 index = msr_info->index;
+>> +
+>> +	if (!intel_is_valid_lbr_msr(vcpu, index))
+>> +		return false;
+>> +
+>> +	if (!msr_info->host_initiated && !pmu->lbr_event)
+>> +		intel_pmu_create_lbr_event(vcpu);
+>> +
+>> +	/*
+>> +	 * Disable irq to ensure the LBR feature doesn't get reclaimed by the
+>> +	 * host at the time the value is read from the msr, and this avoids the
+>> +	 * host LBR value to be leaked to the guest. If LBR has been reclaimed,
+>> +	 * return 0 on guest reads.
+>> +	 */
+>> +	local_irq_disable();
+>> +	if (event_is_oncpu(pmu->lbr_event)) {
+>> +		if (read)
+>> +			rdmsrl(index, msr_info->data);
+>> +		else
+>> +			wrmsrl(index, msr_info->data);
+>> +	} else if (read)
+>> +		msr_info->data = 0;
+>> +	local_irq_enable();
+>> +
+>> +	return true;
+>> +}
+> So this runs in the vCPU thread in host context to emulate the MSR
+> access, right?
+Yes, it's called to emulate MSR accesses when the guest LBR event is
+scheduled on while the LBR stack MSRs have not been passthrough to the vCPU.
+
+Thanks,
+Like Xu
 >
->> +		if (!(data & ~vmx_get_perf_capabilities()))
->> +			return 1;
->> +		if ((data ^ vmx_get_perf_capabilities()) & PERF_CAP_LBR_FMT)
->> +			return 1;
->> +		vcpu->arch.perf_capabilities = data;
->> +		return 0;
->>   	default:
->>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
->>   			if (!msr_info->host_initiated)
 
