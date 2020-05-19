@@ -2,114 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 907A61D93CD
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 11:50:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E84A1D948E
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 12:45:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728432AbgESJuR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 05:50:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44969 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726880AbgESJuQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 05:50:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589881815;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=SIVLP0DRrlKxQ6SwkqhvlChjQm02/QELWNEmHf7Q4zw=;
-        b=jAsSi/J64TVF9eNiiWu29MxFTeIptlj5yspD+8+J36ugs+Y2OS5/ljqwzSQKIesRR3mGeJ
-        l7nbUcEf2Eb9wX3j0H+oKFLVXZwPOpKFcZgLh40eE7Dzm46jnnrwFv+p1VzpJcIJev7loA
-        /ON5sQddP/ZSY6Ej4szv6moWaksmjCs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-CihpbDhtN7SvRQGJ7bl_JA-1; Tue, 19 May 2020 05:50:11 -0400
-X-MC-Unique: CihpbDhtN7SvRQGJ7bl_JA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E966B1800D42;
-        Tue, 19 May 2020 09:50:09 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1775710013D9;
-        Tue, 19 May 2020 09:50:08 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH] KVM: x86: only do L1TF workaround on affected processors
-Date:   Tue, 19 May 2020 05:50:08 -0400
-Message-Id: <20200519095008.1212-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+        id S1726508AbgESKpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 06:45:06 -0400
+Received: from foss.arm.com ([217.140.110.172]:58720 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726121AbgESKpG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 06:45:06 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A279A101E;
+        Tue, 19 May 2020 03:45:05 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.1.217])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5837B3F305;
+        Tue, 19 May 2020 03:45:02 -0700 (PDT)
+Date:   Tue, 19 May 2020 11:44:57 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a
+ target EL
+Message-ID: <20200519104457.GA19548@C02TD0UTHF1T.local>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-27-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422120050.3693593-27-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM stores the gfn in MMIO SPTEs as a caching optimization.  These are split
-in two parts, as in "[high 11111 low]", to thwart any attempt to use these bits
-in an L1TF attack.  This works as long as there are 5 free bits between
-MAXPHYADDR and bit 50 (inclusive), leaving bit 51 free so that the MMIO
-access triggers a reserved-bit-set page fault.
+On Wed, Apr 22, 2020 at 01:00:50PM +0100, Marc Zyngier wrote:
+> We currently assume that an exception is delivered to EL1, always.
+> Once we emulate EL2, this no longer will be the case. To prepare
+> for this, add a target_mode parameter.
+> 
+> While we're at it, merge the computing of the target PC and PSTATE in
+> a single function that updates both PC and CPSR after saving their
+> previous values in the corresponding ELR/SPSR. This ensures that they
+> are updated in the correct order (a pretty common source of bugs...).
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/inject_fault.c | 75 ++++++++++++++++++-----------------
+>  1 file changed, 38 insertions(+), 37 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index d3ebf8bca4b89..3dbcbc839b9c3 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -26,28 +26,12 @@ enum exception_type {
+>  	except_type_serror	= 0x180,
+>  };
+>  
+> -static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
+> -{
+> -	u64 exc_offset;
+> -
+> -	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
+> -	case PSR_MODE_EL1t:
+> -		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+> -		break;
+> -	case PSR_MODE_EL1h:
+> -		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+> -		break;
+> -	case PSR_MODE_EL0t:
+> -		exc_offset = LOWER_EL_AArch64_VECTOR;
+> -		break;
+> -	default:
+> -		exc_offset = LOWER_EL_AArch32_VECTOR;
+> -	}
+> -
+> -	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
+> -}
+> -
+>  /*
+> + * This performs the exception entry at a given EL (@target_mode), stashing PC
+> + * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
+> + * The EL passed to this function *must* be a non-secure, privileged mode with
+> + * bit 0 being set (PSTATE.SP == 1).
+> + *
+>   * When an exception is taken, most PSTATE fields are left unchanged in the
+>   * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
+>   * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
+> @@ -59,10 +43,35 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
+>   * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
+>   * MSB to LSB.
+>   */
+> -static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
+> +static void enter_exception(struct kvm_vcpu *vcpu, unsigned long target_mode,
+> +			    enum exception_type type)
 
-The bit positions however were computed wrongly for AMD processors that have
-encryption support.  In this case, x86_phys_bits is reduced (for example
-from 48 to 43, to account for the C bit at position 47 and four bits used
-internally to store the SEV ASID and other stuff) while x86_cache_bits in
-would remain set to 48, and _all_ bits between the reduced MAXPHYADDR
-and bit 51 are set.  Then low_phys_bits would also cover some of the
-bits that are set in the shadow_mmio_value, terribly confusing the gfn
-caching mechanism.
+Since this is all for an AArch64 target, could we keep `64` in the name,
+e.g enter_exception64? That'd mirror the callers below.
 
-To fix this, avoid splitting gfns as long as the processor does not have
-the L1TF bug (which includes all AMD processors).  When there is no
-splitting, low_phys_bits can be set to the reduced MAXPHYADDR removing
-the overlap.  This fixes "npt=0" operation on EPYC processors.
+>  {
+> -	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> -	unsigned long old, new;
+> +	unsigned long sctlr, vbar, old, new, mode;
+> +	u64 exc_offset;
+> +
+> +	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> +
+> +	if      (mode == target_mode)
+> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+> +	else if ((mode | 1) == target_mode)
+> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
 
-Thanks to Maxim Levitsky for bisecting this bug.
+It would be nice if we could add a mnemonic for the `1` here, e.g.
+PSR_MODE_SP0 or PSR_MODE_THREAD_BIT.
 
-Cc: stable@vger.kernel.org
-Fixes: 52918ed5fcf0 ("KVM: SVM: Override default MMIO mask if memory encryption is enabled")
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+> +	else if (!(mode & PSR_MODE32_BIT))
+> +		exc_offset = LOWER_EL_AArch64_VECTOR;
+> +	else
+> +		exc_offset = LOWER_EL_AArch32_VECTOR;
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8071952e9cf2..86619631ff6a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -335,6 +335,8 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_mask, u64 mmio_value, u64 access_mask)
- {
- 	BUG_ON((u64)(unsigned)access_mask != access_mask);
- 	BUG_ON((mmio_mask & mmio_value) != mmio_value);
-+	WARN_ON(mmio_value & (shadow_nonpresent_or_rsvd_mask << shadow_nonpresent_or_rsvd_mask_len));
-+	WARN_ON(mmio_value & shadow_nonpresent_or_rsvd_lower_gfn_mask);
- 	shadow_mmio_value = mmio_value | SPTE_MMIO_MASK;
- 	shadow_mmio_mask = mmio_mask | SPTE_SPECIAL_MASK;
- 	shadow_mmio_access_mask = access_mask;
-@@ -583,16 +585,15 @@ static void kvm_mmu_reset_all_pte_masks(void)
- 	 * the most significant bits of legal physical address space.
- 	 */
- 	shadow_nonpresent_or_rsvd_mask = 0;
--	low_phys_bits = boot_cpu_data.x86_cache_bits;
--	if (boot_cpu_data.x86_cache_bits <
--	    52 - shadow_nonpresent_or_rsvd_mask_len) {
-+	low_phys_bits = boot_cpu_data.x86_phys_bits;
-+	if (boot_cpu_has_bug(X86_BUG_L1TF) &&
-+	    !WARN_ON_ONCE(boot_cpu_data.x86_cache_bits >=
-+			  52 - shadow_nonpresent_or_rsvd_mask_len)) {
-+		low_phys_bits = boot_cpu_data.x86_cache_bits
-+			- shadow_nonpresent_or_rsvd_mask_len;
- 		shadow_nonpresent_or_rsvd_mask =
--			rsvd_bits(boot_cpu_data.x86_cache_bits -
--				  shadow_nonpresent_or_rsvd_mask_len,
--				  boot_cpu_data.x86_cache_bits - 1);
--		low_phys_bits -= shadow_nonpresent_or_rsvd_mask_len;
--	} else
--		WARN_ON_ONCE(boot_cpu_has_bug(X86_BUG_L1TF));
-+			rsvd_bits(low_phys_bits, boot_cpu_data.x86_cache_bits - 1);
-+	}
- 
- 	shadow_nonpresent_or_rsvd_lower_gfn_mask =
- 		GENMASK_ULL(low_phys_bits - 1, PAGE_SHIFT);
--- 
-2.18.2
+Other than the above, I couldn't think of a nicer way of writing thism
+and AFAICT this is correct.
 
+> +
+> +	switch (target_mode) {
+> +	case PSR_MODE_EL1h:
+> +		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
+> +		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> +		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
+> +		break;
+> +	default:
+> +		/* Don't do that */
+> +		BUG();
+> +	}
+> +
+> +	*vcpu_pc(vcpu) = vbar + exc_offset + type;
+>  
+>  	old = *vcpu_cpsr(vcpu);
+>  	new = 0;
+> @@ -105,9 +114,10 @@ static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
+>  	new |= PSR_I_BIT;
+>  	new |= PSR_F_BIT;
+>  
+> -	new |= PSR_MODE_EL1h;
+> +	new |= target_mode;
+
+As a heads-up, some of the other bits will need to change for an EL2
+target (e.g. SPAN will depend on HCR_EL2.E2H), but as-is this this is
+fine.
+
+Regardless of the above comments:
+
+Reviewed-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
