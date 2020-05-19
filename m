@@ -2,82 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B39781D91C7
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 10:11:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 773801D9310
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 11:15:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726860AbgESILX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 04:11:23 -0400
-Received: from o1.dev.nutanix.com ([198.21.4.205]:48131 "EHLO
-        o1.dev.nutanix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726595AbgESILX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 04:11:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.net;
-        h=from:subject:mime-version:to:cc:content-transfer-encoding:
-        content-type;
-        s=smtpapi; bh=FyetZpafM/v6XIJbkIYr2RB7YlhXywPDsBHNjztNYEU=;
-        b=jV9LilP4hIzcawYH20i8HqWNol8X/nZtdQwfcS/oscSi3owPPnqwiKr49kkuzPaKCyAl
-        Qt7tHLBnVADXBEpCwTdw6+jr8o3pU0IaUDhw1IYxojxhwivOl/vA2yAjZQL81tDKzs9/Fk
-        4CBYBxId495E61VR5bR7TsK71zYELPfAA=
-Received: by filterdrecv-p3iad2-8ddf98858-lwgxm with SMTP id filterdrecv-p3iad2-8ddf98858-lwgxm-19-5EC394AA-1D
-        2020-05-19 08:11:22.408630125 +0000 UTC m=+4691031.646325677
-Received: from debian.localdomain (unknown)
-        by ismtpd0008p1lon1.sendgrid.net (SG) with ESMTP
-        id 6UUgXTmQRF-ABD9SVFhCQg
-        Tue, 19 May 2020 08:11:22.067 +0000 (UTC)
-From:   Felipe Franciosi <felipe@nutanix.com>
-Subject: [PATCH v2] KVM: x86: respect singlestep when emulating instruction
-Date:   Tue, 19 May 2020 08:11:22 +0000 (UTC)
-Message-Id: <20200519081048.8204-1-felipe@nutanix.com>
-X-Mailer: git-send-email 2.20.1
+        id S1728502AbgESJPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 05:15:36 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:57080 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726818AbgESJPg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 05:15:36 -0400
+Received: from zn.tnic (p200300ec2f0b87003113f65f16dcf690.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:8700:3113:f65f:16dc:f690])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 99A811EC0322;
+        Tue, 19 May 2020 11:15:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1589879734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=3zIW0mscrSzBoJoj+N7Op6mZu6eLSey92yt+pTI7244=;
+        b=UCHDF2ZgyRLRTP7XNdnuIZv4h2qPUWVp7D7heCzAdEWdt15yHiKvQO71Kib2dI9IztD8je
+        0XrJlp8xpdDb5g8DZ7zW5IDgqVo7PX01g/D/UXElv00ZpVvJMc6eM9sQURxg+yMMLTb+Sd
+        4Qav+EDQoW5GfHKrvicE0mYg0jJJncI=
+Date:   Tue, 19 May 2020 11:15:26 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 35/75] x86/head/64: Build k/head64.c with
+ -fno-stack-protector
+Message-ID: <20200519091526.GB444@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-36-joro@8bytes.org>
 MIME-Version: 1.0
-X-SG-EID: =?us-ascii?Q?W9goRmNI2M6BaZDnSanVWLdj2DuGbkuGfTWZsqFIAk59ONbkkaLXMDCghpkcaI?=
- =?us-ascii?Q?PehS=2FLuf7=2F3t083SnZbMEjV=2FhVoVQYNCU8if+b2?=
- =?us-ascii?Q?hfP+MkdnLaAkF5irJPrTFAwszS9YEc5FrwmrAte?=
- =?us-ascii?Q?U06=2F=2FITgah6myXAmbMmxM6C+3EkrrrNN8umvDrK?=
- =?us-ascii?Q?pUsgqrf8itVNQP48k41wcQgCHneucsOgbtgR=2Flp?=
- =?us-ascii?Q?13n8xCFrqBMpg2A28H=2FG9RnojSy4A3oHkSdx8eY?=
- =?us-ascii?Q?CYCivB+U4YHqkLLebiBWg=3D=3D?=
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, stable@vger.kernel.org,
-        Felipe Franciosi <felipe@nutanix.com>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200428151725.31091-36-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When userspace configures KVM_GUESTDBG_SINGLESTEP, KVM will manage the
-presence of X86_EFLAGS_TF via kvm_set/get_rflags on vcpus. The actual
-rflag bit is therefore hidden from callers.
+On Tue, Apr 28, 2020 at 05:16:45PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> The code inserted by the stack protector does not work in the early
+> boot environment because it uses the GS segment, at least with memory
+> encryption enabled.
 
-That includes init_emulate_ctxt() which uses the value returned from
-kvm_get_flags() to set ctxt->tf. As a result, x86_emulate_instruction()
-will skip a single step, leaving singlestep_rip stale and not returning
-to userspace.
+Can you elaborate on why is that a problem?
 
-This resolves the issue by observing the vcpu guest_debug configuration
-alongside ctxt->tf in x86_emulate_instruction(), performing the single
-step if set.
+The stack cookie is not generated that early yet so it should be
+comparing %gs:40 to 0.
 
-Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
----
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Also, it generates the checking code here only with
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c17e6eb9ad43..64cb183636da 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6919,7 +6919,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		if (!ctxt->have_exception ||
- 		    exception_type(ctxt->exception.vector) == EXCPT_TRAP) {
- 			kvm_rip_write(vcpu, ctxt->eip);
--			if (r && ctxt->tf)
-+			if (r && (ctxt->tf || (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
- 				r = kvm_vcpu_do_singlestep(vcpu);
- 			if (kvm_x86_ops.update_emulated_instruction)
- 				kvm_x86_ops.update_emulated_instruction(vcpu);
+CONFIG_STACKPROTECTOR_STRONG=y
+
+> Make sure the early code is compiled without this feature enabled.
+
+If so, then this should be with CONFIG_AMD_MEM_ENCRYPT ifdeffery around
+it.
+
 -- 
-2.20.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
