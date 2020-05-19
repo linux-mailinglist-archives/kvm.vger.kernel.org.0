@@ -2,395 +2,350 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 357171D90B5
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 09:12:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93E291D90DA
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 09:21:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728439AbgESHLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 03:11:46 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13074 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726943AbgESHLp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 03:11:45 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ec386630000>; Tue, 19 May 2020 00:10:27 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Tue, 19 May 2020 00:11:45 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Tue, 19 May 2020 00:11:45 -0700
-Received: from [10.40.101.17] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 19 May
- 2020 07:11:37 +0000
-Subject: Re: [PATCH Kernel v22 5/8] vfio iommu: Implementation of ioctl for
- dirty pages tracking
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <1589781397-28368-6-git-send-email-kwankhede@nvidia.com>
- <20200518155342.4dd7df99@x1.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <17511c50-dc59-d9e9-10b6-54b16dec01c4@nvidia.com>
-Date:   Tue, 19 May 2020 12:41:32 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1728286AbgESHVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 03:21:04 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:46168 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726881AbgESHVE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 03:21:04 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04J7HMJ5088153;
+        Tue, 19 May 2020 07:21:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=NYMDiSRSRYoNMhQx39Ut1Yiw2fBFicwdmWSm0FHG770=;
+ b=PGrkrpKOidgkv29CAuwVtUnP6sR+AzPSr2NXCHWGFdhl2NHodW8f9NbjNR6rfLahzkcM
+ +IFTkDjwaumvQYEJfE86klo1BGbUCDpJbk5/bVpSWpUTb+hxEm9Rassi3cLZ50Tk9NmF
+ 9Eibr5Df6dU8osxo/EPQgNaBjVchBmDBh3OSyFn4e1N0F9YLqjNYf9icSocGDkXwjCRd
+ FPzK+MfahwSm2U7aGpJiFZ0KJMziuZK2Oe5s+13OpYQXkdSN7hN259pChHGtCJb48v7H
+ 4a+jB4t2KGympqkdrybSLTl0xaSWrJjtPMTh1ksM4C790kJPuj9GLXxFUGsDIkKJjBgx /w== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 3128tnbga2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 19 May 2020 07:21:00 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04J7D0Eh101724;
+        Tue, 19 May 2020 07:18:59 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 312t33emet-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 May 2020 07:18:59 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04J7Ixd2012091;
+        Tue, 19 May 2020 07:18:59 GMT
+Received: from localhost.localdomain (/10.159.253.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 19 May 2020 00:18:58 -0700
+Subject: Re: [PATCH 1/2] KVM: nVMX: Fix VMX preemption timer migration
+To:     Makarand Sonare <makarandsonare@google.com>, kvm@vger.kernel.org,
+        pshier@google.com, jmattson@google.com
+References: <20200518201600.255669-1-makarandsonare@google.com>
+ <20200518201600.255669-2-makarandsonare@google.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <7e7bcffa-7a97-1662-b2bb-05f9429e819a@oracle.com>
+Date:   Tue, 19 May 2020 00:18:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200518155342.4dd7df99@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200518201600.255669-2-makarandsonare@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1589872227; bh=uKmis0J14radJAZB+skg6Hn0gaJidhg8bebWeaZAg5k=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=PTekhjRYjQ09iPcxT2NxVVpdQuOhJLOMc3526p1A7AuUVOKR9s5K2MOnL04gzxSZD
-         ZMlhZtkCgQx7NKEgWRaVJFo9UoKu9KXp9okl6zQbgaT86OX+uPVjvq/LBeym8Zmfjj
-         JbsTeNdKcpZ9aXQo6Gbo1CInpKEWXRB6w8rALjaQ8K1GUyHcaG93Uv3pT1nLEU8yD1
-         4rIdUP2LY+2kbIyobBooMNa20wKd496akVFXy9LVu1cAEp8A2k3rnmlIBIJhKrHK0e
-         K1qMY40h1DOGAu17RUnwFHSg2uk/8Adkee1x/M7LRbTB3GROG3IfIcdmiD//EZKS9m
-         /CxtF+2yfCY/w==
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9625 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ phishscore=0 mlxscore=0 malwarescore=0 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005190064
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9625 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 cotscore=-2147483648 suspectscore=0 lowpriorityscore=0
+ adultscore=0 phishscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2005190064
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-
-On 5/19/2020 3:23 AM, Alex Williamson wrote:
-> On Mon, 18 May 2020 11:26:34 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
->> - Start dirty pages tracking while migration is active
->> - Stop dirty pages tracking.
->> - Get dirty pages bitmap. Its user space application's responsibility to
->>    copy content of dirty pages from source to destination during migration.
->>
->> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
->> structure. Bitmap size is calculated considering smallest supported page
->> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
->>
->> Bitmap is populated for already pinned pages when bitmap is allocated for
->> a vfio_dma with the smallest supported page size. Update bitmap from
->> pinning functions when tracking is enabled. When user application queries
->> bitmap, check if requested page size is same as page size used to
->> populated bitmap. If it is equal, copy bitmap, but if not equal, return
->> error.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->>
->> Fixed error reported by build bot by changing pgsize type from uint64_t
->> to size_t.
->> Reported-by: kbuild test robot <lkp@intel.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 313 +++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 307 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index de17787ffece..bf740fef196f 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -72,6 +72,7 @@ struct vfio_iommu {
->>   	uint64_t		pgsize_bitmap;
->>   	bool			v2;
->>   	bool			nesting;
->> +	bool			dirty_page_tracking;
->>   };
->>   
->>   struct vfio_domain {
->> @@ -92,6 +93,7 @@ struct vfio_dma {
->>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->>   	struct task_struct	*task;
->>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->> +	unsigned long		*bitmap;
->>   };
->>   
->>   struct vfio_group {
->> @@ -126,6 +128,19 @@ struct vfio_regions {
->>   #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->>   					(!list_empty(&iommu->domain_list))
->>   
->> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
->> +
->> +/*
->> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
->> + * further casts to signed integer for unaligned multi-bit operation,
->> + * __bitmap_set().
->> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
->> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
->> + * system.
->> + */
->> +#define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
->> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
->> +
->>   static int put_pfn(unsigned long pfn, int prot);
->>   
->>   /*
->> @@ -176,6 +191,74 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->>   	rb_erase(&old->node, &iommu->dma_list);
->>   }
->>   
->> +
->> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
->> +{
->> +	uint64_t npages = dma->size / pgsize;
->> +
->> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
->> +		return -EINVAL;
->> +
->> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
-> 
-> Curious that the extra 8-bytes are added in the next patch, but they're
-> just as necessary here.
+On 5/18/20 1:15 PM, Makarand Sonare wrote:
+> From: Peter Shier <pshier@google.com>
 >
+> Add new field to hold preemption timer expiration deadline
+> appended to struct kvm_vmx_nested_state_data. This is to prevent
+> the first VM-Enter after migration from incorrectly restarting the timer
+> with the full timer value instead of partially decayed timer value.
+> KVM_SET_NESTED_STATE restarts timer using migrated state regardless
+> of whether L1 sets VM_EXIT_SAVE_VMX_PREEMPTION_TIMER.
+>
+> Fixes: cf8b84f48a593 ("kvm: nVMX: Prepare for checkpointing L2 state")
+>
+> Signed-off-by: Peter Shier <pshier@google.com>
+> Signed-off-by: Makarand Sonare <makarandsonare@google.com>
+> Change-Id: I6446aba5a547afa667f0ef4620b1b76115bf3753
+> ---
+>   Documentation/virt/kvm/api.rst        |  4 ++
+>   arch/x86/include/uapi/asm/kvm.h       |  2 +
+>   arch/x86/kvm/vmx/nested.c             | 61 ++++++++++++++++++++++++---
+>   arch/x86/kvm/vmx/vmx.h                |  1 +
+>   arch/x86/kvm/x86.c                    |  3 +-
+>   include/uapi/linux/kvm.h              |  1 +
+>   tools/arch/x86/include/uapi/asm/kvm.h |  2 +
+>   7 files changed, 67 insertions(+), 7 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index d871dacb984e9..b410815772970 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -4326,6 +4326,9 @@ Errors:
+>     #define KVM_STATE_NESTED_RUN_PENDING		0x00000002
+>     #define KVM_STATE_NESTED_EVMCS		0x00000004
+>   
+> +  /* Available with KVM_CAP_NESTED_STATE_PREEMPTION_TIMER */
+> +  #define KVM_STATE_NESTED_PREEMPTION_TIMER	0x00000010
+> +
+>     #define KVM_STATE_NESTED_FORMAT_VMX		0
+>     #define KVM_STATE_NESTED_FORMAT_SVM		1
+>   
+> @@ -4346,6 +4349,7 @@ Errors:
+>     struct kvm_vmx_nested_state_data {
+>   	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+>   	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+> +	__u64 preemption_timer_deadline;
+>     };
+>   
+>   This ioctl copies the vcpu's nested virtualization state from the kernel to
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 3f3f780c8c650..20d5832bab215 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -391,6 +391,7 @@ struct kvm_sync_regs {
+>   #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
+>   #define KVM_STATE_NESTED_EVMCS		0x00000004
+>   #define KVM_STATE_NESTED_MTF_PENDING	0x00000008
+> +#define KVM_STATE_NESTED_PREEMPTION_TIMER	0x00000010
+>   
+>   #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
+>   #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
+> @@ -400,6 +401,7 @@ struct kvm_sync_regs {
+>   struct kvm_vmx_nested_state_data {
+>   	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+>   	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+> +	__u64 preemption_timer_deadline;
+>   };
+>   
+>   struct kvm_vmx_nested_state_hdr {
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 51ebb60e1533a..badb82a39ac04 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2092,9 +2092,9 @@ static enum hrtimer_restart vmx_preemption_timer_fn(struct hrtimer *timer)
+>   	return HRTIMER_NORESTART;
+>   }
+>   
+> -static void vmx_start_preemption_timer(struct kvm_vcpu *vcpu)
+> +static void vmx_start_preemption_timer(struct kvm_vcpu *vcpu,
+> +					u64 preemption_timeout)
+>   {
+> -	u64 preemption_timeout = get_vmcs12(vcpu)->vmx_preemption_timer_value;
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>   
+>   	/*
+> @@ -3353,8 +3353,24 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>   	 * the timer.
+>   	 */
+>   	vmx->nested.preemption_timer_expired = false;
+> -	if (nested_cpu_has_preemption_timer(vmcs12))
+> -		vmx_start_preemption_timer(vcpu);
+> +	if (nested_cpu_has_preemption_timer(vmcs12)) {
+> +		u64 timer_value;
+> +		u64 l1_tsc_value = kvm_read_l1_tsc(vcpu, rdtsc());
+> +
+> +		if (from_vmentry) {
+> +			timer_value = vmcs12->vmx_preemption_timer_value;
+> +			vmx->nested.preemption_timer_deadline = timer_value +
+> +				(l1_tsc_value >> VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE);
+> +		} else {
+> +			if ((l1_tsc_value >> VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE) >
+> +			    vmx->nested.preemption_timer_deadline)
+> +				timer_value = 0;
+> +			else
+> +				timer_value = vmx->nested.preemption_timer_deadline -
+> +					(l1_tsc_value >> VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE);
 
-Yes, moving it in this patch.
-While resolving patches, I had to update 6/8 and 8/8 patches also. So 
-updating 3 patches.
+A couple of code optimizations can be done here:
 
-> We also have the explanation above about why we have the signed int
-> size limitation, but we sort of ignore that when adding the bytes here.
-> That limitation is derived from __bitmap_set(), whereas we only need
-> these extra bits for bitmap_shift_left(), where I can't spot a signed
-> int limitation.  Do you come to the same conclusion?  
+1. The inside if-else can be simplified by initializing 'timer_value' at 
+the place where you have defined it:
 
-That's right.
+     } else {
++            if (!((l1_tsc_value >> 
+VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE) >
++                vmx->nested.preemption_timer_deadline))
++                    timer_value = vmx->nested.preemption_timer_deadline -
++                        (l1_tsc_value >> 
+VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE);
 
-> Maybe worth a
-> comment why we think we can exceed DIRTY_BITMAP_PAGES_MAX for that
-> extra padding.
-> 
++  }
 
-ok.
 
->> +	if (!dma->bitmap)
->> +		return -ENOMEM;
->> +
->> +	return 0;
->> +}
->> +
->> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
->> +{
->> +	kfree(dma->bitmap);
->> +	dma->bitmap = NULL;
->> +}
->> +
->> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
->> +{
->> +	struct rb_node *p;
->> +
->> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
->> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
->> +
->> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
->> +	}
->> +}
->> +
->> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
->> +{
->> +	struct rb_node *n = rb_first(&iommu->dma_list);
->> +
->> +	for (; n; n = rb_next(n)) {
-> 
-> Nit, the previous function above sets the initial value in the for()
-> statement, it looks like it would fit in 80 columns here too.  We have
-> examples either way in the code, so not a must fix.
-> 
->> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->> +		int ret;
->> +
->> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
->> +		if (ret) {
->> +			struct rb_node *p = rb_prev(n);
->> +
->> +			for (; p; p = rb_prev(p)) {
-> 
-> Same.
-> 
->> +				struct vfio_dma *dma = rb_entry(n,
->> +							struct vfio_dma, node);
->> +
->> +				vfio_dma_bitmap_free(dma);
->> +			}
->> +			return ret;
->> +		}
->> +		vfio_dma_populate_bitmap(dma, pgsize);
->> +	}
->> +	return 0;
->> +}
->> +
->> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
->> +{
->> +	struct rb_node *n = rb_first(&iommu->dma_list);
->> +
->> +	for (; n; n = rb_next(n)) {
-> 
-> And another.
-> 
->> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->> +
->> +		vfio_dma_bitmap_free(dma);
->> +	}
->> +}
->> +
->>   /*
->>    * Helper Functions for host iova-pfn list
->>    */
->> @@ -568,6 +651,17 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>   			vfio_unpin_page_external(dma, iova, do_accounting);
->>   			goto pin_unwind;
->>   		}
->> +
->> +		if (iommu->dirty_page_tracking) {
->> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
->> +
->> +			/*
->> +			 * Bitmap populated with the smallest supported page
->> +			 * size
->> +			 */
->> +			bitmap_set(dma->bitmap,
->> +				   (iova - dma->iova) >> pgshift, 1);
->> +		}
->>   	}
->>   
->>   	ret = i;
->> @@ -802,6 +896,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->>   	vfio_unmap_unpin(iommu, dma, true);
->>   	vfio_unlink_dma(iommu, dma);
->>   	put_task_struct(dma->task);
->> +	vfio_dma_bitmap_free(dma);
->>   	kfree(dma);
->>   	iommu->dma_avail++;
->>   }
->> @@ -829,6 +924,99 @@ static void vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->>   	}
->>   }
->>   
->> +static int update_user_bitmap(u64 __user *bitmap, struct vfio_dma *dma,
->> +			      dma_addr_t base_iova, size_t pgsize)
->> +{
->> +	unsigned long pgshift = __ffs(pgsize);
->> +	unsigned long nbits = dma->size >> pgshift;
->> +	unsigned long bit_offset = (dma->iova - base_iova) >> pgshift;
->> +	unsigned long copy_offset = bit_offset / BITS_PER_LONG;
->> +	unsigned long shift = bit_offset % BITS_PER_LONG;
->> +	unsigned long leftover;
->> +
->> +	/* mark all pages dirty if all pages are pinned and mapped. */
->> +	if (dma->iommu_mapped)
->> +		bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
-> 
-> We already calculated 'dma->size >> pgshift' as nbits above, we should
-> use nbits here.  I imagine the compiler will optimize this, so take it
-> as a nit.
-> 
->> +
->> +	if (shift) {
->> +		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
->> +				  nbits + shift);
->> +
->> +		if (copy_from_user(&leftover, (u64 *)bitmap + copy_offset,
->> +				   sizeof(leftover)))
->> +			return -EFAULT;
->> +
->> +		bitmap_or(dma->bitmap, dma->bitmap, &leftover, shift);
->> +	}
->> +
->> +	if (copy_to_user((u64 *)bitmap + copy_offset, dma->bitmap,
->> +			 DIRTY_BITMAP_BYTES(nbits + shift)))
->> +		return -EFAULT;
->> +
->> +	return 0;
->> +}
->> +
->> +static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
->> +				  dma_addr_t iova, size_t size, size_t pgsize)
->> +{
->> +	struct vfio_dma *dma;
->> +	struct rb_node *n;
->> +	unsigned long pgshift = __ffs(pgsize);
->> +	int ret;
->> +
->> +	/*
->> +	 * GET_BITMAP request must fully cover vfio_dma mappings.  Multiple
->> +	 * vfio_dma mappings may be clubbed by specifying large ranges, but
->> +	 * there must not be any previous mappings bisected by the range.
->> +	 * An error will be returned if these conditions are not met.
->> +	 */
->> +	dma = vfio_find_dma(iommu, iova, 1);
->> +	if (dma && dma->iova != iova)
->> +		return -EINVAL;
->> +
->> +	dma = vfio_find_dma(iommu, iova + size - 1, 0);
->> +	if (dma && dma->iova + dma->size != iova + size)
->> +		return -EINVAL;
->> +
->> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
->> +		struct vfio_dma *ldma = rb_entry(n, struct vfio_dma, node);
->> +
->> +		if (ldma->iova >= iova)
->> +			break;
->> +	}
->> +
->> +	dma = n ? rb_entry(n, struct vfio_dma, node) : NULL;
->> +
->> +	while (dma && (dma->iova >= iova) &&
-> 
-> 'dma->iova >= iova' is necessarily true per the above loop, right?
-> We'd have NULL if we never reach an iova within range.
-> 
->> +		(dma->iova + dma->size <= iova + size)) {
-> 
-> I think 'dma->iova < iova + size' is sufficient here, we've already
-> tested that there are no dmas overlapping the ends, they're all either
-> fully contained or fully outside.
-> 
->> +
-> 
-> The double loop here is a little unnecessary, we could combine them
-> into:
-> 
-> for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-> 	struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> 
-> 	if (dma->iova < iova)
-> 		continue;
-> 
-> 	if (dma->iova > iova + size)
-> 		break;
-> 
-> 	ret = update_user_bitmap(bitmap, dma, iova, pgsize);
-> 	if (ret)
-> 		return ret;
-> 
-> 	/*
-> 	 * Re-populate bitmap to include all pinned pages which are
-> 	 * considered as dirty but exclude pages which are unpinned and
-> 	 * pages which are marked dirty by vfio_dma_rw()
-> 	 */
-> 	bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
-> 	vfio_dma_populate_bitmap(dma, pgsize);
-> }
-> 
-> I think what you have works, but it's a little more complicated than it
-> needs to be.  Thanks,
-> 
+2. You can apply the right-shift operation on 'l1_tsc_value' right where 
+you have defined it:
 
-Ok. Chaning it.
+u64 l1_tsc_value = kvm_read_l1_tsc(vcpu, rdtsc()) >> 
+VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE
 
-Thanks,
-Kirti
+> +		}
+> +		vmx_start_preemption_timer(vcpu, timer_value);
+> +	}
+>   
+>   	/*
+>   	 * Note no nested_vmx_succeed or nested_vmx_fail here. At this point
+> @@ -3962,9 +3978,11 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+>   		vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
+>   
+>   	if (nested_cpu_has_preemption_timer(vmcs12) &&
+> -	    vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
+> +	    !vmx->nested.nested_run_pending) {
+> +		if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
+>   			vmcs12->vmx_preemption_timer_value =
+>   				vmx_get_preemption_timer_value(vcpu);
+> +	}
+>   
+>   	/*
+>   	 * In some cases (usually, nested EPT), L2 is allowed to change its
+> @@ -5939,6 +5957,13 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>   
+>   			if (vmx->nested.mtf_pending)
+>   				kvm_state.flags |= KVM_STATE_NESTED_MTF_PENDING;
+> +
+> +			if (nested_cpu_has_preemption_timer(vmcs12)) {
+> +				kvm_state.flags |=
+> +					KVM_STATE_NESTED_PREEMPTION_TIMER;
+> +				kvm_state.size = offsetof(struct kvm_nested_state, data.vmx) +
+
+
+'size' is reset here instead of accumulating all previous sizes. Is that 
+what is intended ?
+
+> +						 offsetofend(struct kvm_vmx_nested_state_data, preemption_timer_deadline);
+> +			}
+>   		}
+>   	}
+>   
+> @@ -5970,6 +5995,9 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>   
+>   	BUILD_BUG_ON(sizeof(user_vmx_nested_state->vmcs12) < VMCS12_SIZE);
+>   	BUILD_BUG_ON(sizeof(user_vmx_nested_state->shadow_vmcs12) < VMCS12_SIZE);
+> +	BUILD_BUG_ON(sizeof(user_vmx_nested_state->preemption_timer_deadline)
+> +		    != sizeof(vmx->nested.preemption_timer_deadline));
+> +
+>   
+>   	/*
+>   	 * Copy over the full allocated size of vmcs12 rather than just the size
+> @@ -5985,6 +6013,12 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>   			return -EFAULT;
+>   	}
+>   
+> +	if (kvm_state.flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
+> +		if (put_user(vmx->nested.preemption_timer_deadline,
+> +			     &user_vmx_nested_state->preemption_timer_deadline))
+> +			return -EFAULT;
+> +	}
+> +
+>   out:
+>   	return kvm_state.size;
+>   }
+> @@ -6056,7 +6090,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>   	 */
+>   	if (is_smm(vcpu) ?
+>   		(kvm_state->flags &
+> -		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING))
+> +		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING |
+> +		  KVM_STATE_NESTED_PREEMPTION_TIMER))
+>   		: kvm_state->hdr.vmx.smm.flags)
+>   		return -EINVAL;
+>   
+> @@ -6146,6 +6181,20 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>   			goto error_guest_mode;
+>   	}
+>   
+> +	if (kvm_state->flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
+> +
+> +		if (kvm_state->size <
+> +		    offsetof(struct kvm_nested_state, data.vmx) +
+> +		    offsetofend(struct kvm_vmx_nested_state_data, preemption_timer_deadline))
+> +			goto error_guest_mode;
+> +
+> +		if (get_user(vmx->nested.preemption_timer_deadline,
+> +			     &user_vmx_nested_state->preemption_timer_deadline)) {
+> +			ret = -EFAULT;
+> +			goto error_guest_mode;
+> +		}
+> +	}
+> +
+>   	if (nested_vmx_check_controls(vcpu, vmcs12) ||
+>   	    nested_vmx_check_host_state(vcpu, vmcs12) ||
+>   	    nested_vmx_check_guest_state(vcpu, vmcs12, &ignored))
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 298ddef79d009..db697400755fb 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -169,6 +169,7 @@ struct nested_vmx {
+>   	u16 posted_intr_nv;
+>   
+>   	struct hrtimer preemption_timer;
+> +	u64 preemption_timer_deadline;
+>   	bool preemption_timer_expired;
+>   
+>   	/* to migrate it to L2 if VM_ENTRY_LOAD_DEBUG_CONTROLS is off */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 471fccf7f8501..ba9e62ffbb4cd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3418,6 +3418,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_MSR_PLATFORM_INFO:
+>   	case KVM_CAP_EXCEPTION_PAYLOAD:
+>   	case KVM_CAP_SET_GUEST_DEBUG:
+> +	case KVM_CAP_NESTED_STATE_PREEMPTION_TIMER:
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_SYNC_REGS:
+> @@ -4626,7 +4627,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>   
+>   		if (kvm_state.flags &
+>   		    ~(KVM_STATE_NESTED_RUN_PENDING | KVM_STATE_NESTED_GUEST_MODE
+> -		      | KVM_STATE_NESTED_EVMCS))
+> +		      | KVM_STATE_NESTED_EVMCS | KVM_STATE_NESTED_PREEMPTION_TIMER))
+>   			break;
+>   
+>   		/* nested_run_pending implies guest_mode.  */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index ac9eba0289d1b..0868dce12a715 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1018,6 +1018,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_S390_PROTECTED 180
+>   #define KVM_CAP_PPC_SECURE_GUEST 181
+>   #define KVM_CAP_HALT_POLL 182
+> +#define KVM_CAP_NESTED_STATE_PREEMPTION_TIMER 183
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+> index 3f3f780c8c650..60701178b9cc1 100644
+> --- a/tools/arch/x86/include/uapi/asm/kvm.h
+> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
+> @@ -391,6 +391,8 @@ struct kvm_sync_regs {
+>   #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
+>   #define KVM_STATE_NESTED_EVMCS		0x00000004
+>   #define KVM_STATE_NESTED_MTF_PENDING	0x00000008
+> +/* Available with KVM_CAP_NESTED_STATE_PREEMPTION_TIMER */
+> +#define KVM_STATE_NESTED_PREEMPTION_TIMER	0x00000010
+>   
+>   #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
+>   #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
