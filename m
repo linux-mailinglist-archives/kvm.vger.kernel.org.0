@@ -2,168 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E84A1D948E
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 12:45:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 922B81D9492
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 12:45:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbgESKpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 06:45:06 -0400
-Received: from foss.arm.com ([217.140.110.172]:58720 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726121AbgESKpG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 06:45:06 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A279A101E;
-        Tue, 19 May 2020 03:45:05 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.1.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5837B3F305;
-        Tue, 19 May 2020 03:45:02 -0700 (PDT)
-Date:   Tue, 19 May 2020 11:44:57 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a
- target EL
-Message-ID: <20200519104457.GA19548@C02TD0UTHF1T.local>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-27-maz@kernel.org>
+        id S1728476AbgESKpf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 06:45:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49942 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726735AbgESKpf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 06:45:35 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 508B0C061A0C;
+        Tue, 19 May 2020 03:45:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pB5NRJiuRUwl08JuJrqjBdvxfdMkqgbTh44+AX2Pej4=; b=JM3gb/rwk7cxihpdlXrca4GnSh
+        +KvmhEWySmqxKBMY3vYlLXBmCoYc+OHTDmsKLPdQnumlYHB1kmX4/y838TAHRgESKpsYMQdVssDMn
+        YjqUsSQO7uigXSpqd/+Z0z/r050D6Pu4FMvM7anscLFMHNtAZutmrRgxuOOMTj//WYYIz8Hsk1W75
+        3GHqyedbNnLXF8BUNCKPJ0hmGO8ZkgJCO6qfZTCnEcgQk9Hu8qnKRlUbmAJS8NaDEeqVHSVoPGRZC
+        XSmSqp3NDgFaXAzDBBt9TWs6BHdR5cUnSc+yN4cdbT4H3ZI/d5huiC+ns0OoyHg00Mp1ZQrog83w3
+        5fjNukvA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jazkS-0004tF-BY; Tue, 19 May 2020 10:45:24 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id CAF1E30067C;
+        Tue, 19 May 2020 12:45:20 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id B72A52105F3B6; Tue, 19 May 2020 12:45:20 +0200 (CEST)
+Date:   Tue, 19 May 2020 12:45:20 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v11 05/11] perf/x86: Keep LBR stack unchanged in host
+ context for guest LBR event
+Message-ID: <20200519104520.GE279861@hirez.programming.kicks-ass.net>
+References: <20200514083054.62538-1-like.xu@linux.intel.com>
+ <20200514083054.62538-6-like.xu@linux.intel.com>
+ <20200518120205.GF277222@hirez.programming.kicks-ass.net>
+ <dd6b0ab0-0209-e1e5-550c-24e2ad101b15@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200422120050.3693593-27-maz@kernel.org>
+In-Reply-To: <dd6b0ab0-0209-e1e5-550c-24e2ad101b15@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 01:00:50PM +0100, Marc Zyngier wrote:
-> We currently assume that an exception is delivered to EL1, always.
-> Once we emulate EL2, this no longer will be the case. To prepare
-> for this, add a target_mode parameter.
-> 
-> While we're at it, merge the computing of the target PC and PSTATE in
-> a single function that updates both PC and CPSR after saving their
-> previous values in the corresponding ELR/SPSR. This ensures that they
-> are updated in the correct order (a pretty common source of bugs...).
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/inject_fault.c | 75 ++++++++++++++++++-----------------
->  1 file changed, 38 insertions(+), 37 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index d3ebf8bca4b89..3dbcbc839b9c3 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -26,28 +26,12 @@ enum exception_type {
->  	except_type_serror	= 0x180,
->  };
->  
-> -static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
-> -{
-> -	u64 exc_offset;
-> -
-> -	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
-> -	case PSR_MODE_EL1t:
-> -		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-> -		break;
-> -	case PSR_MODE_EL1h:
-> -		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-> -		break;
-> -	case PSR_MODE_EL0t:
-> -		exc_offset = LOWER_EL_AArch64_VECTOR;
-> -		break;
-> -	default:
-> -		exc_offset = LOWER_EL_AArch32_VECTOR;
-> -	}
-> -
-> -	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
-> -}
-> -
->  /*
-> + * This performs the exception entry at a given EL (@target_mode), stashing PC
-> + * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-> + * The EL passed to this function *must* be a non-secure, privileged mode with
-> + * bit 0 being set (PSTATE.SP == 1).
-> + *
->   * When an exception is taken, most PSTATE fields are left unchanged in the
->   * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
->   * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
-> @@ -59,10 +43,35 @@ static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
->   * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
->   * MSB to LSB.
->   */
-> -static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
-> +static void enter_exception(struct kvm_vcpu *vcpu, unsigned long target_mode,
-> +			    enum exception_type type)
+On Tue, May 19, 2020 at 11:08:41AM +0800, Like Xu wrote:
 
-Since this is all for an AArch64 target, could we keep `64` in the name,
-e.g enter_exception64? That'd mirror the callers below.
+> Sure, I could reuse cpuc->intel_ctrl_guest_mask to rewrite this part:
+> 
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index d788edb7c1f9..f1243e8211ca 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -2189,7 +2189,8 @@ static void intel_pmu_disable_event(struct perf_event
+> *event)
+>         } else if (idx == INTEL_PMC_IDX_FIXED_BTS) {
+>                 intel_pmu_disable_bts();
+>                 intel_pmu_drain_bts_buffer();
+> -       }
+> +       } else if (idx == INTEL_PMC_IDX_FIXED_VLBR)
+> +               intel_clear_masks(event, idx);
+> 
+>         /*
+>          * Needs to be called after x86_pmu_disable_event,
+> @@ -2271,7 +2272,8 @@ static void intel_pmu_enable_event(struct perf_event
+> *event)
+>                 if (!__this_cpu_read(cpu_hw_events.enabled))
+>                         return;
+>                 intel_pmu_enable_bts(hwc->config);
+> -       }
+> +       } else if (idx == INTEL_PMC_IDX_FIXED_VLBR)
+> +               intel_set_masks(event, idx);
+>  }
 
+This makes me wonder if we can pull intel_{set,clear}_masks() out of
+that if()-forest, but that's something for later...
+
+>  static void intel_pmu_add_event(struct perf_event *event)
+> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
+> index b8dabf1698d6..1b30c76815dd 100644
+> --- a/arch/x86/events/intel/lbr.c
+> +++ b/arch/x86/events/intel/lbr.c
+> @@ -552,11 +552,19 @@ void intel_pmu_lbr_del(struct perf_event *event)
+>         perf_sched_cb_dec(event->ctx->pmu);
+>  }
+> 
+> +static inline bool vlbr_is_enabled(void)
+> +{
+> +       struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+> +
+> +       return test_bit(INTEL_PMC_IDX_FIXED_VLBR,
+> +               (unsigned long *)&cpuc->intel_ctrl_guest_mask);
+> +}
+
+Maybe call this: vlbr_exclude_host() ?
+
+> +
+>  void intel_pmu_lbr_enable_all(bool pmi)
 >  {
-> -	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> -	unsigned long old, new;
-> +	unsigned long sctlr, vbar, old, new, mode;
-> +	u64 exc_offset;
-> +
-> +	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +
-> +	if      (mode == target_mode)
-> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-> +	else if ((mode | 1) == target_mode)
-> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+>         struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+> 
+> -       if (cpuc->lbr_users)
+> +       if (cpuc->lbr_users && !vlbr_is_enabled())
+>                 __intel_pmu_lbr_enable(pmi);
+>  }
+> 
+> @@ -564,7 +572,7 @@ void intel_pmu_lbr_disable_all(void)
+>  {
+>         struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+> 
+> -       if (cpuc->lbr_users)
+> +       if (cpuc->lbr_users && !vlbr_is_enabled())
+>                 __intel_pmu_lbr_disable();
+>  }
+> 
+> @@ -706,7 +714,8 @@ void intel_pmu_lbr_read(void)
+>          * This could be smarter and actually check the event,
+>          * but this simple approach seems to work for now.
+>          */
+> -       if (!cpuc->lbr_users || cpuc->lbr_users == cpuc->lbr_pebs_users)
+> +       if (!cpuc->lbr_users || vlbr_is_enabled() ||
+> +               cpuc->lbr_users == cpuc->lbr_pebs_users)
+>                 return;
+> 
+>         if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_32)
+> 
+> Is this acceptable to you ?
 
-It would be nice if we could add a mnemonic for the `1` here, e.g.
-PSR_MODE_SP0 or PSR_MODE_THREAD_BIT.
-
-> +	else if (!(mode & PSR_MODE32_BIT))
-> +		exc_offset = LOWER_EL_AArch64_VECTOR;
-> +	else
-> +		exc_offset = LOWER_EL_AArch32_VECTOR;
-
-Other than the above, I couldn't think of a nicer way of writing thism
-and AFAICT this is correct.
-
-> +
-> +	switch (target_mode) {
-> +	case PSR_MODE_EL1h:
-> +		vbar = vcpu_read_sys_reg(vcpu, VBAR_EL1);
-> +		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-> +		vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
-> +		break;
-> +	default:
-> +		/* Don't do that */
-> +		BUG();
-> +	}
-> +
-> +	*vcpu_pc(vcpu) = vbar + exc_offset + type;
->  
->  	old = *vcpu_cpsr(vcpu);
->  	new = 0;
-> @@ -105,9 +114,10 @@ static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
->  	new |= PSR_I_BIT;
->  	new |= PSR_F_BIT;
->  
-> -	new |= PSR_MODE_EL1h;
-> +	new |= target_mode;
-
-As a heads-up, some of the other bits will need to change for an EL2
-target (e.g. SPAN will depend on HCR_EL2.E2H), but as-is this this is
-fine.
-
-Regardless of the above comments:
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-
-Mark.
+Yeah, looks about right. Let me stare at the rest.
