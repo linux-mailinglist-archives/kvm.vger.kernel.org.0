@@ -2,125 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1E911D8F9B
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 07:53:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA0261D8FB4
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 08:02:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728352AbgESFwy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 01:52:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41189 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726554AbgESFwy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 May 2020 01:52:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589867573;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=F8sf/V9iwhvJqIQR3nLkO+0EgUVeCfEhuWkJ9NRPG2w=;
-        b=bwEorBm9EQw79eMp4qBihqEGeUvvnUi3QvH9qmcAs/TH/a+clVR0CzusFxs/EP93EHhd9M
-        sn3AHkwVJ1lGKYRlZR9/i5p6oMge5iaHzmRvJmAhDz2w4I/wXu3CWmobEzS+9qSGD8xWsh
-        hFAoAcsSZgcJP/h8A2k1iWJ3/2Ifylk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-nxLGNieMMVafcALNrIp15Q-1; Tue, 19 May 2020 01:52:51 -0400
-X-MC-Unique: nxLGNieMMVafcALNrIp15Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 083CB1005510;
-        Tue, 19 May 2020 05:52:45 +0000 (UTC)
-Received: from [10.72.13.247] (ovpn-13-247.pek2.redhat.com [10.72.13.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 804DD2BFCC;
-        Tue, 19 May 2020 05:52:39 +0000 (UTC)
-Subject: Re: [PATCH V2] ifcvf: move IRQ request/free to status change handlers
-To:     Cindy Lu <lulu@redhat.com>
-Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        Michael Tsirkin <mst@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        dan.daly@intel.com, "Liang, Cunming" <cunming.liang@intel.com>
-References: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
- <8aca85c3-3bf6-a1ec-7009-cd9a635647d7@redhat.com>
- <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
- <572ed6af-7a04-730e-c803-a41868091e88@redhat.com>
- <CACLfguXXPArd9UWX-HpfqNvgpWS=Nyt6SJ4kUkjjpVsVvVe9oA@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c927fcff-de09-d623-e119-4611ab65ff04@redhat.com>
-Date:   Tue, 19 May 2020 13:52:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1728216AbgESGCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 02:02:04 -0400
+Received: from mga05.intel.com ([192.55.52.43]:19593 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726841AbgESGCD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 02:02:03 -0400
+IronPort-SDR: +VQHXw3MQxxcOekyxDvTrVMh8bQypkW80gqq53SYLrdaoGDTjk2YEWSTblI3HFLbSMX3Kp2s85
+ dK1HO0rF+vIg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 23:02:03 -0700
+IronPort-SDR: y4lsW/PNAfbuy5Fag+JzJnFc/DGtPA/KTrEOkwzocyHtEIyk9G9qprvgxX/KjZ0ltkijiWVnzV
+ aFzBlgw6nUlA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,409,1583222400"; 
+   d="scan'208";a="282220610"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga002.jf.intel.com with ESMTP; 18 May 2020 23:02:02 -0700
+Date:   Mon, 18 May 2020 23:02:02 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: emulate reserved nops from 0f/18 to 0f/1f
+Message-ID: <20200519060156.GB4387@linux.intel.com>
+References: <20200515161919.29249-1-pbonzini@redhat.com>
+ <20200518160720.GB3632@linux.intel.com>
+ <57d9da9b-00ec-3fe0-c69a-f7f00c68a90d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CACLfguXXPArd9UWX-HpfqNvgpWS=Nyt6SJ4kUkjjpVsVvVe9oA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <57d9da9b-00ec-3fe0-c69a-f7f00c68a90d@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, May 18, 2020 at 07:37:08PM +0200, Paolo Bonzini wrote:
+> On 18/05/20 18:07, Sean Christopherson wrote:
+> > On Fri, May 15, 2020 at 12:19:19PM -0400, Paolo Bonzini wrote:
+> >> Instructions starting with 0f18 up to 0f1f are reserved nops, except those
+> >> that were assigned to MPX.
+> > Well, they're probably reserved NOPs again :-D.
+> 
+> So are you suggesting adding them back to the list as well?
 
-On 2020/5/19 上午9:51, Cindy Lu wrote:
-> Hi ,Jason
-> It works ok in the latest version of qemu vdpa code , So I think the
-> patch is ok.
-> Thanks
-> Cindy
+Doesn't KVM still support MPX?
 
+> >> These include the endbr markers used by CET.
+> > And RDSPP.  Wouldn't it make sense to treat RDSPP as a #UD even though it's
+> > a NOP if CET is disabled?  The logic being that a sane guest will execute
+> > RDSSP iff CET is enabled, and in that case it'd be better to inject a #UD
+> > than to silently break the guest.
+> 
+> We cannot assume that guests will bother checking CPUID before invoking
+> RDSPP.  This is especially true userspace, which needs to check if CET
+> is enable for itself and can only use RDSPP to do so.
 
-Thanks for the testing, (btw, we'd better not do top posting when 
-discuss in the community).
+Ugh, yeah, just read through the CET enabling thread that showed code snippets
+that do exactly this.
 
-So,
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
-
-> On Wed, May 13, 2020 at 3:18 PM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2020/5/13 下午12:42, Zhu, Lingshan wrote:
->>>
->>> On 5/13/2020 12:12 PM, Jason Wang wrote:
->>>> On 2020/5/12 下午4:00, Zhu Lingshan wrote:
->>>>> This commit move IRQ request and free operations from probe()
->>>>> to VIRTIO status change handler to comply with VIRTIO spec.
->>>>>
->>>>> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Field
->>>>> The device MUST NOT consume buffers or send any used buffer
->>>>> notifications to the driver before DRIVER_OK.
->>>>
->>>> This comment needs to be checked as I said previously. It's only
->>>> needed if we're sure ifcvf can generate interrupt before DRIVER_OK.
->>>>
->>>>
->>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>>> ---
->>>>> changes from V1:
->>>>> remove ifcvf_stop_datapath() in status == 0 handler, we don't need
->>>>> to do this
->>>>> twice; handle status == 0 after DRIVER_OK -> !DRIVER_OK handler
->>>>> (Jason Wang)
->>>>
->>>> Patch looks good to me, but with this patch ping cannot work on my
->>>> machine. (It works without this patch).
->>>>
->>>> Thanks
->>> This is strange, it works on my machines, let's have a check offline.
->>>
->>> Thanks,
->>> BR
->>> Zhu Lingshan
->>
->> I give it a try with virito-vpda and a tiny userspace. Either works.
->>
->> So it could be an issue of qemu codes.
->>
->> Let's wait for Cindy to test if it really works.
->>
->> Thanks
->>
->>
-
+I assume it would be best to make SHSTK dependent on unrestricted guest?
+Emulating RDSPP by reading vmcs.GUEST_SSP seems pointless as it will become
+statle apart on the first emulated CALL/RET.
