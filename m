@@ -2,90 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8ED71D9F9E
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 20:37:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD3971DA34C
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 23:14:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727922AbgESShv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 14:37:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39148 "EHLO
+        id S1726823AbgESVN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 17:13:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726489AbgESShu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 14:37:50 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF2DC08C5C2
-        for <kvm@vger.kernel.org>; Tue, 19 May 2020 11:37:49 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id w15so360044lfe.11
-        for <kvm@vger.kernel.org>; Tue, 19 May 2020 11:37:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ukq4U4bhaGx/BxEZICOHMgvvHCN7gRfX69OD8Ug5nJ8=;
-        b=hdoOvzQyr8p/pfR0tzbZhD8bTdnTt2VJ2wiF59WLjGel9YDl0tBbxVRNmo26mqAl8H
-         k3/jRCp08thphnuZ7k8Qjs1/bJstD78aUCPaIwHKLlbTCaSfOW0bU5d1I+toorKpe2VG
-         jFSrSspHLMGpRYjpqeQykoRqCQt/pEwLQ9a2NvFfh3zH44bU6EvXIv+MD7+oTHrHU5uN
-         +OZ3ZAR7bDB374NxNFM3tPhYEmzMj+sq9FWua3dciQZzrKgoWhYfUrlJVNfi1WjjFiH+
-         6og6li06vwaldl8PbxCLo/W0VxGttcxI6MCAjO1pVo2M7YKz3BLW+RCcFpQNY5i/iYpQ
-         biQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ukq4U4bhaGx/BxEZICOHMgvvHCN7gRfX69OD8Ug5nJ8=;
-        b=iughiukmBEir7CJj2C+imKtsTWz+O5eZTrYzloLcdcOzW5UA1qJgJR/a6dh5MZEjjc
-         ENRQb24SFFbHgFk8bao5jcD2qGLXHq45zYPx1Xf9qU2sbBRg3jslFCjwGKVGuCNy/3eg
-         asO1qYtfn7V5tfhUXKu3XEazINvItk+iyiF6i+4MKUNpXH8/WgZtSSTSssdEL30wiFTB
-         CS32uizNfJI2xA/CNXYPxcAc19XoJlMQ7P1YaaWeiYlNCPPkhi6SYBCk6Sh1Vzj4Cb2n
-         fBYzzQ2si/2CC4+deTVSle4FjQ2qlDnHliH1q6oXz3Hr0mIkTd5X8UmjgPkrxk0FvEIM
-         6Hgg==
-X-Gm-Message-State: AOAM532D8mTBH7Gq0tOEsF/J/KepCVBNhZNjWXP5yJn4IaiPQg/UKKkw
-        DFqzW6NqBSrt+oji1VQFY/sUvddmaSpgb3NgPryjDA==
-X-Google-Smtp-Source: ABdhPJzr9vyjWv7gfSfaxwWVJ2jAs3pdmlMuqe+6/DgxR/ifbfGj5DK9NaIwRduB9SggkajLVrwGSluKTmNHk1R/usQ=
-X-Received: by 2002:a19:ed17:: with SMTP id y23mr163055lfy.162.1589913467376;
- Tue, 19 May 2020 11:37:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200519180743.89974-1-pbonzini@redhat.com>
-In-Reply-To: <20200519180743.89974-1-pbonzini@redhat.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Tue, 19 May 2020 11:37:36 -0700
-Message-ID: <CAOQ_Qsi7EZ6CYOrbCgZLmBFBaBgXWEu=50RrUROg8x5pyTy-SA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: allow KVM_STATE_NESTED_MTF_PENDING in kvm_state flags
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S1725998AbgESVN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 17:13:28 -0400
+Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4412C08C5C0;
+        Tue, 19 May 2020 14:13:28 -0700 (PDT)
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jb9Y2-0001wp-Uy; Tue, 19 May 2020 23:13:15 +0200
+Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
+        by nanos.tec.linutronix.de (Postfix) with ESMTP id 75291100D00;
+        Tue, 19 May 2020 23:13:14 +0200 (CEST)
+Message-Id: <20200519203128.773151484@linutronix.de>
+User-Agent: quilt/0.65
+Date:   Tue, 19 May 2020 22:31:28 +0200
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juergen Gross <jgross@suse.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [patch 0/7] x86/KVM: Async #PF and instrumentation protection
+Content-transfer-encoding: 8-bit
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 19, 2020 at 11:07 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The migration functionality was left incomplete in commit 5ef8acbdd687
-> ("KVM: nVMX: Emulate MTF when performing instruction emulation", 2020-02-23),
-> fix it.
->
-> Fixes: 5ef8acbdd687 ("KVM: nVMX: Emulate MTF when performing instruction emulation")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/x86/kvm/x86.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4f55a44951c3..0001b2addc66 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4626,7 +4626,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->
->                 if (kvm_state.flags &
->                     ~(KVM_STATE_NESTED_RUN_PENDING | KVM_STATE_NESTED_GUEST_MODE
-> -                     | KVM_STATE_NESTED_EVMCS))
-> +                     | KVM_STATE_NESTED_EVMCS | KVM_STATE_NESTED_MTF_PENDING))
->                         break;
->
->                 /* nested_run_pending implies guest_mode.  */
-> --
-> 2.18.2
->
+Folks,
+
+this series is the KVM side of the ongoing quest to confine instrumentation
+to safe places and ensure that RCU and context tracking state is correct.
+
+The async #PF changes are in the tip tree already as they conflict with the
+entry code rework. The minimal set of commits to carry these have been
+isolated and tagged:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git noinstr-x86-kvm-2020-05-16
+
+Paolo, please pull this into your next branch to avoid conflicts in
+next. The prerequisites for the following KVM specific changes come with
+that tag so that you have no merge dependencies.
+
+The tag has also been merged into
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/entry
+
+where the x86 core #PF entry code changes will be queued soon as well.
+
+The KVM specific patches which deal with the RCU and context tracking state
+and the protection against instrumentation in sensitive places have been
+split out from the larger entry/noinstr series:
+
+  https://lore.kernel.org/r/20200505134112.272268764@linutronix.de
+
+The patches deal with:
+
+  - Placing the guest_enter/exit() calls at the correct place
+
+  - Moving the sensitive VMENTER/EXIT code into the non-instrumentable code
+    section.
+
+  - Fixup the tracing code to comply with the non-instrumentation rules
+
+  - Use native functions to access CR2 and the GS base MSR in the critical
+    code pathes to prevent them from being instrumented.
+
+The patches apply on top of
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/kvm/kvm.git next
+
+with the noinstr-x86-kvm-2020-05-16 tag from the tip tree merged in.
+
+For reference the whole lot is available from:
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git kvm/noinstr
+
+Thanks,
+
+	tglx
+
+---
+ include/asm/hardirq.h  |    4 +-
+ include/asm/kvm_host.h |    8 +++++
+ kvm/svm/svm.c          |   65 ++++++++++++++++++++++++++++++++++------
+ kvm/svm/vmenter.S      |    2 -
+ kvm/vmx/ops.h          |    4 ++
+ kvm/vmx/vmenter.S      |    5 ++-
+ kvm/vmx/vmx.c          |   78 ++++++++++++++++++++++++++++++++++++++-----------
+ kvm/x86.c              |    4 --
+ 8 files changed, 137 insertions(+), 33 deletions(-)
