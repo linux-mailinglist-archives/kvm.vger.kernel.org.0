@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51DC71DA349
+	by mail.lfdr.de (Postfix) with ESMTP id BE3431DA34A
 	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 23:14:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727070AbgESVN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727041AbgESVN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 19 May 2020 17:13:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35560 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726199AbgESVN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 17:13:29 -0400
+        with ESMTP id S1726178AbgESVN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 17:13:28 -0400
 Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF6A1C08C5C2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D14C08C5C1;
         Tue, 19 May 2020 14:13:28 -0700 (PDT)
 Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1jb9Y5-0001xZ-Cv; Tue, 19 May 2020 23:13:17 +0200
+        id 1jb9Y6-0001xv-Jy; Tue, 19 May 2020 23:13:18 +0200
 Received: from nanos.tec.linutronix.de (localhost [IPv6:::1])
-        by nanos.tec.linutronix.de (Postfix) with ESMTP id EA0AC100D00;
-        Tue, 19 May 2020 23:13:16 +0200 (CEST)
-Message-Id: <20200519211224.385187310@linutronix.de>
+        by nanos.tec.linutronix.de (Postfix) with ESMTP id 2BC6F100D00;
+        Tue, 19 May 2020 23:13:18 +0200 (CEST)
+Message-Id: <20200519211224.476627641@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Tue, 19 May 2020 22:31:30 +0200
+Date:   Tue, 19 May 2020 22:31:31 +0200
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -33,7 +33,7 @@ Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Juergen Gross <jgross@suse.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [patch 2/7] x86/kvm/vmx: Add hardirq tracing to guest enter/exit
+Subject: [patch 3/7] x86/kvm/svm: Add hardirq tracing on guest enter/exit
 References: <20200519203128.773151484@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -68,18 +68,21 @@ Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 Acked-by: Peter Zijlstra <peterz@infradead.org>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Link: https://lkml.kernel.org/r/20200505134341.471542318@linutronix.de
+Link: https://lkml.kernel.org/r/20200505134341.579034898@linutronix.de
 
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ad0159f68ce4..afdb6f489ab2 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6725,9 +6725,21 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 40242e0af20d..46d69567faab 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3390,12 +3390,21 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
  
  	/*
--	 * Tell context tracking that this CPU is about to enter guest mode.
+-	 * Tell context tracking that this CPU is about to enter guest
+-	 * mode. This has to be after x86_spec_ctrl_set_guest() because
+-	 * that can take locks (lockdep needs RCU) and calls into world and
+-	 * some more.
 +	 * VMENTER enables interrupts (host state), but the kernel state is
 +	 * interrupts disabled when this is invoked. Also tell RCU about
 +	 * it. This is the same logic as for exit_to_user_mode().
@@ -96,11 +99,13 @@ index ad0159f68ce4..afdb6f489ab2 100644
  	guest_enter_irqoff();
 +	lockdep_hardirqs_on(CALLER_ADDR0);
  
- 	/* L1D Flush includes CPU buffer clear to mitigate MDS */
- 	if (static_branch_unlikely(&vmx_l1d_should_flush))
-@@ -6744,9 +6756,20 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	vcpu->arch.cr2 = read_cr2();
+ 	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
  
+@@ -3407,14 +3416,22 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	loadsegment(gs, svm->host.gs);
+ #endif
+ #endif
++
  	/*
 -	 * Tell context tracking that this CPU is back.
 +	 * VMEXIT disables interrupts (host state), but tracing and lockdep
@@ -109,10 +114,10 @@ index ad0159f68ce4..afdb6f489ab2 100644
 +	 *
 +	 * guest_exit_irqoff() restores host context and reinstates RCU if
 +	 * enabled and required.
-+	 *
-+	 * This needs to be done before the below as native_read_msr()
-+	 * contains a tracepoint and x86_spec_ctrl_restore_host() calls
-+	 * into world and some more.
+ 	 *
+ 	 * This needs to be done before the below as native_read_msr()
+ 	 * contains a tracepoint and x86_spec_ctrl_restore_host() calls
+ 	 * into world and some more.
  	 */
 +	lockdep_hardirqs_off(CALLER_ADDR0);
  	guest_exit_irqoff();
