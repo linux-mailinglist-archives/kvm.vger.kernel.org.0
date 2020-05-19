@@ -2,128 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B0831D8D4A
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 03:51:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11E7F1D8E09
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 05:08:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727125AbgESBvm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 May 2020 21:51:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40939 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726285AbgESBvl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 May 2020 21:51:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589853100;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vKI9vt/QTluNPJ8hc9nIUhogs9tAXpOIFaP0BVZRQ90=;
-        b=AvPc6aBGLGRgo2Vemjzjr7H50EBVZtKOpF3uEOdGO0islBwgByjohpC05k/3WZyMbpojVP
-        RAfGjNfT21L+fTiP9e/lqpRORSI2qGm1GB3y13dJi8BIo5Nepg5JnMpygG7wh6xAqviM4c
-        8ev/MZyTfLKGsyuWnBHRuTQJZqGTQEI=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-w-u9JKnrP8KFYBDKi7xJww-1; Mon, 18 May 2020 21:51:38 -0400
-X-MC-Unique: w-u9JKnrP8KFYBDKi7xJww-1
-Received: by mail-pj1-f71.google.com with SMTP id z2so1217015pje.9
-        for <kvm@vger.kernel.org>; Mon, 18 May 2020 18:51:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vKI9vt/QTluNPJ8hc9nIUhogs9tAXpOIFaP0BVZRQ90=;
-        b=D5OspudGgpQRvYowj6SI2AvuYGGkes8j+u7DR+R3fuxcnbivgtD+gtQsoEQ5NtNz9l
-         0ZNxXbgrjE/ggsrX0EaZ2QRb5wma57U2LKFrC9YqVUgprt6WGwEyCAmFLZGJ3B1RQFKz
-         erx6DSB4dHDBfYDzPmAcOsg9g64j/b/kT5h274/U2IlSvhWow2/D1X8IGSUsvk/FbWvL
-         ESSaq3/ObWgGkFZQ9cZdcp+z4PPYOjKvQUhNLuAX0FpRFe94lquCKcB3ZOwDluZ4hhgo
-         qssNhLVA94E7mEwKxv0AKcNH1yJBqjGbRg06Ggxf7pa1/+lQBPAoo3Qb8qV1loImbsWR
-         un6w==
-X-Gm-Message-State: AOAM530K99zDIo9q+/GT8OUrVVW+qft6B1OWr6+Wa4WemKU0oV2aWgyr
-        HhR8Y04cu+/EWkE1dzvMOpZWayUXAisCLsBZpXUTgLhk+V8PlWvOj41dnngjL9ATNRf67jFbKZS
-        zSstkcZ672Hiww/uEmaUYjuV/ndfB
-X-Received: by 2002:a17:902:c403:: with SMTP id k3mr19203786plk.12.1589853097524;
-        Mon, 18 May 2020 18:51:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwHXsyF4vMl2D0/YLl4HH2hp198OK7gAVkb6GH7wVW6wevNEOxLfZAJ9FMoVgk9eTdkddxAEuudwhyxtl28U1w=
-X-Received: by 2002:a17:902:c403:: with SMTP id k3mr19203767plk.12.1589853097150;
- Mon, 18 May 2020 18:51:37 -0700 (PDT)
+        id S1726700AbgESDIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 May 2020 23:08:48 -0400
+Received: from mga12.intel.com ([192.55.52.136]:47219 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726293AbgESDIr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 May 2020 23:08:47 -0400
+IronPort-SDR: 8jSU3MrGz4qQdBslgq1HhH9Uyn5Eq8+GSqxh6PO04igOhxuDuxjt//dedSVDov8yq+yTlUfagS
+ NbPmXy99M8uw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 20:08:47 -0700
+IronPort-SDR: UNiJIVy9L3nV2FcocPuxfstsqx+jvmEZPZEtOpRSyRido8uPiQibjcdRaYo50vrue0pb82YSU7
+ 4O82+YOsRyoQ==
+X-IronPort-AV: E=Sophos;i="5.73,408,1583222400"; 
+   d="scan'208";a="439459187"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.141]) ([10.238.4.141])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2020 20:08:43 -0700
+Subject: Re: [PATCH v11 05/11] perf/x86: Keep LBR stack unchanged in host
+ context for guest LBR event
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
+        wei.w.wang@intel.com
+References: <20200514083054.62538-1-like.xu@linux.intel.com>
+ <20200514083054.62538-6-like.xu@linux.intel.com>
+ <20200518120205.GF277222@hirez.programming.kicks-ass.net>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <dd6b0ab0-0209-e1e5-550c-24e2ad101b15@linux.intel.com>
+Date:   Tue, 19 May 2020 11:08:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <1589270444-3669-1-git-send-email-lingshan.zhu@intel.com>
- <8aca85c3-3bf6-a1ec-7009-cd9a635647d7@redhat.com> <5bbe0c21-8638-45e4-04e8-02ad0df44b38@intel.com>
- <572ed6af-7a04-730e-c803-a41868091e88@redhat.com>
-In-Reply-To: <572ed6af-7a04-730e-c803-a41868091e88@redhat.com>
-From:   Cindy Lu <lulu@redhat.com>
-Date:   Tue, 19 May 2020 09:51:26 +0800
-Message-ID: <CACLfguXXPArd9UWX-HpfqNvgpWS=Nyt6SJ4kUkjjpVsVvVe9oA@mail.gmail.com>
-Subject: Re: [PATCH V2] ifcvf: move IRQ request/free to status change handlers
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        Michael Tsirkin <mst@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        dan.daly@intel.com, "Liang, Cunming" <cunming.liang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200518120205.GF277222@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi ,Jason
-It works ok in the latest version of qemu vdpa code , So I think the
-patch is ok.
-Thanks
-Cindy
-On Wed, May 13, 2020 at 3:18 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/5/13 =E4=B8=8B=E5=8D=8812:42, Zhu, Lingshan wrote:
-> >
-> >
-> > On 5/13/2020 12:12 PM, Jason Wang wrote:
-> >>
-> >> On 2020/5/12 =E4=B8=8B=E5=8D=884:00, Zhu Lingshan wrote:
-> >>> This commit move IRQ request and free operations from probe()
-> >>> to VIRTIO status change handler to comply with VIRTIO spec.
-> >>>
-> >>> VIRTIO spec 1.1, section 2.1.2 Device Requirements: Device Status Fie=
-ld
-> >>> The device MUST NOT consume buffers or send any used buffer
-> >>> notifications to the driver before DRIVER_OK.
-> >>
-> >>
-> >> This comment needs to be checked as I said previously. It's only
-> >> needed if we're sure ifcvf can generate interrupt before DRIVER_OK.
-> >>
-> >>
-> >>>
-> >>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> >>> ---
-> >>> changes from V1:
-> >>> remove ifcvf_stop_datapath() in status =3D=3D 0 handler, we don't nee=
-d
-> >>> to do this
-> >>> twice; handle status =3D=3D 0 after DRIVER_OK -> !DRIVER_OK handler
-> >>> (Jason Wang)
-> >>
-> >>
-> >> Patch looks good to me, but with this patch ping cannot work on my
-> >> machine. (It works without this patch).
-> >>
-> >> Thanks
-> > This is strange, it works on my machines, let's have a check offline.
-> >
-> > Thanks,
-> > BR
-> > Zhu Lingshan
->
->
-> I give it a try with virito-vpda and a tiny userspace. Either works.
->
-> So it could be an issue of qemu codes.
->
-> Let's wait for Cindy to test if it really works.
->
-> Thanks
->
->
+Hi Peter,
 
+Thanks for the clear attitude and code refinement.
+
+On 2020/5/18 20:02, Peter Zijlstra wrote:
+> On Thu, May 14, 2020 at 04:30:48PM +0800, Like Xu wrote:
+>> @@ -544,7 +562,12 @@ void intel_pmu_lbr_enable_all(bool pmi)
+>>   {
+>>   	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+>>   
+>> -	if (cpuc->lbr_users)
+>> +	/*
+>> +	 * When the LBR hardware is scheduled for a guest LBR event,
+>> +	 * the guest will dis/enables LBR itself at the appropriate time,
+>> +	 * including configuring MSR_LBR_SELECT.
+>> +	 */
+>> +	if (cpuc->lbr_users && !cpuc->guest_lbr_enabled)
+>>   		__intel_pmu_lbr_enable(pmi);
+>>   }
+> 
+> No!, that should be done through perf_event_attr::exclude_host, as I
+> believe all the other KVM event do it.
+> 
+
+Sure, I could reuse cpuc->intel_ctrl_guest_mask to rewrite this part:
+
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index d788edb7c1f9..f1243e8211ca 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -2189,7 +2189,8 @@ static void intel_pmu_disable_event(struct perf_event 
+*event)
+         } else if (idx == INTEL_PMC_IDX_FIXED_BTS) {
+                 intel_pmu_disable_bts();
+                 intel_pmu_drain_bts_buffer();
+-       }
++       } else if (idx == INTEL_PMC_IDX_FIXED_VLBR)
++               intel_clear_masks(event, idx);
+
+         /*
+          * Needs to be called after x86_pmu_disable_event,
+@@ -2271,7 +2272,8 @@ static void intel_pmu_enable_event(struct perf_event 
+*event)
+                 if (!__this_cpu_read(cpu_hw_events.enabled))
+                         return;
+                 intel_pmu_enable_bts(hwc->config);
+-       }
++       } else if (idx == INTEL_PMC_IDX_FIXED_VLBR)
++               intel_set_masks(event, idx);
+  }
+
+  static void intel_pmu_add_event(struct perf_event *event)
+diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
+index b8dabf1698d6..1b30c76815dd 100644
+--- a/arch/x86/events/intel/lbr.c
++++ b/arch/x86/events/intel/lbr.c
+@@ -552,11 +552,19 @@ void intel_pmu_lbr_del(struct perf_event *event)
+         perf_sched_cb_dec(event->ctx->pmu);
+  }
+
++static inline bool vlbr_is_enabled(void)
++{
++       struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
++
++       return test_bit(INTEL_PMC_IDX_FIXED_VLBR,
++               (unsigned long *)&cpuc->intel_ctrl_guest_mask);
++}
++
+  void intel_pmu_lbr_enable_all(bool pmi)
+  {
+         struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+
+-       if (cpuc->lbr_users)
++       if (cpuc->lbr_users && !vlbr_is_enabled())
+                 __intel_pmu_lbr_enable(pmi);
+  }
+
+@@ -564,7 +572,7 @@ void intel_pmu_lbr_disable_all(void)
+  {
+         struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+
+-       if (cpuc->lbr_users)
++       if (cpuc->lbr_users && !vlbr_is_enabled())
+                 __intel_pmu_lbr_disable();
+  }
+
+@@ -706,7 +714,8 @@ void intel_pmu_lbr_read(void)
+          * This could be smarter and actually check the event,
+          * but this simple approach seems to work for now.
+          */
+-       if (!cpuc->lbr_users || cpuc->lbr_users == cpuc->lbr_pebs_users)
++       if (!cpuc->lbr_users || vlbr_is_enabled() ||
++               cpuc->lbr_users == cpuc->lbr_pebs_users)
+                 return;
+
+         if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_32)
+
+Is this acceptable to you ?
+
+If you have more comments on the patchset, please let me know.
+
+Thanks,
+Like Xu
