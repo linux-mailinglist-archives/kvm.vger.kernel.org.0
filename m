@@ -2,87 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93D921D917A
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 09:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 757341D9181
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 09:58:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728277AbgESHzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 03:55:25 -0400
-Received: from mga02.intel.com ([134.134.136.20]:51506 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726943AbgESHzY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 03:55:24 -0400
-IronPort-SDR: Sl56r/PpV4pSU/3oXgnlalwgRc6EHu133qtrR8oEeQZPqZvgeICMQ++f2zIe7TVb9Fr8s5Bacx
- J+oayICN2BdA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2020 00:55:23 -0700
-IronPort-SDR: ZPnZTrVnX+qFuUg46YGTHf+UKbx3tiQbAgYuZOGjsrzojnHeBRtkS3NE/FlvszOg2Xzszuf2nK
- ioxOwnHJY+EQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,409,1583222400"; 
-   d="scan'208";a="254663872"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga008.fm.intel.com with ESMTP; 19 May 2020 00:55:23 -0700
-Date:   Tue, 19 May 2020 00:55:23 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: emulate reserved nops from 0f/18 to 0f/1f
-Message-ID: <20200519075523.GE5189@linux.intel.com>
-References: <20200515161919.29249-1-pbonzini@redhat.com>
- <20200518160720.GB3632@linux.intel.com>
- <57d9da9b-00ec-3fe0-c69a-f7f00c68a90d@redhat.com>
- <20200519060156.GB4387@linux.intel.com>
- <60c2c33c-a316-86d2-118a-96b9f4770559@redhat.com>
+        id S1728237AbgESH6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 03:58:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58483 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726943AbgESH6M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 03:58:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589875091;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a4VuYgpozh5k2UbrW8UQBTZQVsj6kKrTwTGf6FkRTGs=;
+        b=bbNGh2kgT189Adii9+5OQBE9tqQYhlnRDcgSY3YvOjlRjiclxklDymDilNWo3hRFlaeXy8
+        SXcPSZohWjcYB0lCxC32Cf00Zy50r0ugmmbTmi0Uv8ktZs8OLFnPraqsbClvyztXQ3ZiT1
+        hP9aEALyyrYhqTNrXyfW3J8TMpEif6w=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-WPHoRY7eNkq_rmM9tqZrUQ-1; Tue, 19 May 2020 03:58:09 -0400
+X-MC-Unique: WPHoRY7eNkq_rmM9tqZrUQ-1
+Received: by mail-wr1-f70.google.com with SMTP id 30so6885474wrq.15
+        for <kvm@vger.kernel.org>; Tue, 19 May 2020 00:58:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=a4VuYgpozh5k2UbrW8UQBTZQVsj6kKrTwTGf6FkRTGs=;
+        b=jcJ7LY/wVgFRoLtoe4OMRam3EzlNqDHIsnxinS02H9nE9Zer6nIqVOfkayU5yb3pCP
+         WfnwQNwmmRxGj+5ClIjYSdKgXo2gNERAn35lpZFvtI4t1Zh7KgSFjoeAaNycTLRuAaLb
+         5YYzlbcQfoivPfrwuIMNyOky7MFjc2/pb3IZHkoCV84z1o3IQiPJMKlbtvIXHN9rEBSD
+         PdubMT2WPB9PRvMvrxIKzFpwOcqzIAxqbFGVn94m1HCScrMRFB8EWlTxj8//lScXPm3b
+         SW5XfRVKgD+PuHuc7yIHRC+So40K5RcCB7omsRLlrxSY3w0UBXE5tVgdP4MT8Vu8Rpvx
+         kweQ==
+X-Gm-Message-State: AOAM532IuCIZ2YudJs+rP8TtJPVBC30aWIIz1vdd7tS1gnmuZtczOoSR
+        Jxy+imMfwcgNiDqvzP84odXZs3TxxCynNvh/OKvUe8I5rpZhPmpTFQL1ECEFAFX9sETgXcDYEVB
+        r3naaf6aVen7Y
+X-Received: by 2002:a1c:81d0:: with SMTP id c199mr3722633wmd.125.1589875088194;
+        Tue, 19 May 2020 00:58:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4zUWIr5Vf/tlEhDR0rq0R/jTKJhRvXHGdvGcm88dpkx7Sw27ojPyqT3C/AlRhCE4+C7dpxA==
+X-Received: by 2002:a1c:81d0:: with SMTP id c199mr3722606wmd.125.1589875087928;
+        Tue, 19 May 2020 00:58:07 -0700 (PDT)
+Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
+        by smtp.gmail.com with ESMTPSA id l19sm2876436wmj.14.2020.05.19.00.58.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 May 2020 00:58:07 -0700 (PDT)
+Date:   Tue, 19 May 2020 09:58:05 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH v2 4/7] hw/elf_ops: Do not ignore write failures when
+ loading ELF
+Message-ID: <20200519075805.tgrzbz2qscco5thh@steredhat>
+References: <20200518155308.15851-1-f4bug@amsat.org>
+ <20200518155308.15851-5-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <60c2c33c-a316-86d2-118a-96b9f4770559@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200518155308.15851-5-f4bug@amsat.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 19, 2020 at 09:43:23AM +0200, Paolo Bonzini wrote:
-> On 19/05/20 08:02, Sean Christopherson wrote:
-> > On Mon, May 18, 2020 at 07:37:08PM +0200, Paolo Bonzini wrote:
-> >> On 18/05/20 18:07, Sean Christopherson wrote:
-> >>> On Fri, May 15, 2020 at 12:19:19PM -0400, Paolo Bonzini wrote:
-> >>>> Instructions starting with 0f18 up to 0f1f are reserved nops, except those
-> >>>> that were assigned to MPX.
-> >>> Well, they're probably reserved NOPs again :-D.
-> >>
-> >> So are you suggesting adding them back to the list as well?
-> > 
-> > Doesn't KVM still support MPX?
-> > 
-> >>>> These include the endbr markers used by CET.
-> >>> And RDSPP.  Wouldn't it make sense to treat RDSPP as a #UD even though it's
-> >>> a NOP if CET is disabled?  The logic being that a sane guest will execute
-> >>> RDSSP iff CET is enabled, and in that case it'd be better to inject a #UD
-> >>> than to silently break the guest.
-> >>
-> >> We cannot assume that guests will bother checking CPUID before invoking
-> >> RDSPP.  This is especially true userspace, which needs to check if CET
-> >> is enable for itself and can only use RDSPP to do so.
-> > 
-> > Ugh, yeah, just read through the CET enabling thread that showed code snippets
-> > that do exactly this.
-> > 
-> > I assume it would be best to make SHSTK dependent on unrestricted guest?
-> > Emulating RDSPP by reading vmcs.GUEST_SSP seems pointless as it will become
-> > statle apart on the first emulated CALL/RET.
+On Mon, May 18, 2020 at 05:53:05PM +0200, Philippe Mathieu-Daudé wrote:
+> Do not ignore the MemTxResult error type returned by
+> address_space_write().
 > 
-> Running arbitrary code under the emulator is problematic anyway with
-> CET, since you won't be checking ENDBR markers or updating the state
-> machine.  So perhaps in addition to what you say we should have a mode
-> where, unless unrestricted guest is disabled, the emulator only accepts
-> I/O, MOV and ALU instructions.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/elf_ops.h | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 
-Doh, I forgot all about those pesky ENDBR markers.  I think a slimmed down
-emulator makes sense?
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Tangentially related, isn't the whole fastop thing doomed once CET kernel
-support lands?
+> 
+> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> index 398a4a2c85..6fdff3dced 100644
+> --- a/include/hw/elf_ops.h
+> +++ b/include/hw/elf_ops.h
+> @@ -553,9 +553,14 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+>                      rom_add_elf_program(label, mapped_file, data, file_size,
+>                                          mem_size, addr, as);
+>                  } else {
+> -                    address_space_write(as ? as : &address_space_memory,
+> -                                        addr, MEMTXATTRS_UNSPECIFIED,
+> -                                        data, file_size);
+> +                    MemTxResult res;
+> +
+> +                    res = address_space_write(as ? as : &address_space_memory,
+> +                                              addr, MEMTXATTRS_UNSPECIFIED,
+> +                                              data, file_size);
+> +                    if (res != MEMTX_OK) {
+> +                        goto fail;
+> +                    }
+>                  }
+>              }
+>  
+> -- 
+> 2.21.3
+> 
+
