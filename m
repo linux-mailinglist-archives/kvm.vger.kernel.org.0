@@ -2,86 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 773801D9310
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 11:15:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 907A61D93CD
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 11:50:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728502AbgESJPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 05:15:36 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:57080 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726818AbgESJPg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 05:15:36 -0400
-Received: from zn.tnic (p200300ec2f0b87003113f65f16dcf690.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:8700:3113:f65f:16dc:f690])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 99A811EC0322;
-        Tue, 19 May 2020 11:15:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1589879734;
+        id S1728432AbgESJuR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 05:50:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44969 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726880AbgESJuQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 05:50:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589881815;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=3zIW0mscrSzBoJoj+N7Op6mZu6eLSey92yt+pTI7244=;
-        b=UCHDF2ZgyRLRTP7XNdnuIZv4h2qPUWVp7D7heCzAdEWdt15yHiKvQO71Kib2dI9IztD8je
-        0XrJlp8xpdDb5g8DZ7zW5IDgqVo7PX01g/D/UXElv00ZpVvJMc6eM9sQURxg+yMMLTb+Sd
-        4Qav+EDQoW5GfHKrvicE0mYg0jJJncI=
-Date:   Tue, 19 May 2020 11:15:26 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 35/75] x86/head/64: Build k/head64.c with
- -fno-stack-protector
-Message-ID: <20200519091526.GB444@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-36-joro@8bytes.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-36-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+         to:to:cc:cc; bh=SIVLP0DRrlKxQ6SwkqhvlChjQm02/QELWNEmHf7Q4zw=;
+        b=jAsSi/J64TVF9eNiiWu29MxFTeIptlj5yspD+8+J36ugs+Y2OS5/ljqwzSQKIesRR3mGeJ
+        l7nbUcEf2Eb9wX3j0H+oKFLVXZwPOpKFcZgLh40eE7Dzm46jnnrwFv+p1VzpJcIJev7loA
+        /ON5sQddP/ZSY6Ej4szv6moWaksmjCs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-CihpbDhtN7SvRQGJ7bl_JA-1; Tue, 19 May 2020 05:50:11 -0400
+X-MC-Unique: CihpbDhtN7SvRQGJ7bl_JA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E966B1800D42;
+        Tue, 19 May 2020 09:50:09 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1775710013D9;
+        Tue, 19 May 2020 09:50:08 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, stable@vger.kernel.org
+Subject: [PATCH] KVM: x86: only do L1TF workaround on affected processors
+Date:   Tue, 19 May 2020 05:50:08 -0400
+Message-Id: <20200519095008.1212-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:16:45PM +0200, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> The code inserted by the stack protector does not work in the early
-> boot environment because it uses the GS segment, at least with memory
-> encryption enabled.
+KVM stores the gfn in MMIO SPTEs as a caching optimization.  These are split
+in two parts, as in "[high 11111 low]", to thwart any attempt to use these bits
+in an L1TF attack.  This works as long as there are 5 free bits between
+MAXPHYADDR and bit 50 (inclusive), leaving bit 51 free so that the MMIO
+access triggers a reserved-bit-set page fault.
 
-Can you elaborate on why is that a problem?
+The bit positions however were computed wrongly for AMD processors that have
+encryption support.  In this case, x86_phys_bits is reduced (for example
+from 48 to 43, to account for the C bit at position 47 and four bits used
+internally to store the SEV ASID and other stuff) while x86_cache_bits in
+would remain set to 48, and _all_ bits between the reduced MAXPHYADDR
+and bit 51 are set.  Then low_phys_bits would also cover some of the
+bits that are set in the shadow_mmio_value, terribly confusing the gfn
+caching mechanism.
 
-The stack cookie is not generated that early yet so it should be
-comparing %gs:40 to 0.
+To fix this, avoid splitting gfns as long as the processor does not have
+the L1TF bug (which includes all AMD processors).  When there is no
+splitting, low_phys_bits can be set to the reduced MAXPHYADDR removing
+the overlap.  This fixes "npt=0" operation on EPYC processors.
 
-Also, it generates the checking code here only with
+Thanks to Maxim Levitsky for bisecting this bug.
 
-CONFIG_STACKPROTECTOR_STRONG=y
+Cc: stable@vger.kernel.org
+Fixes: 52918ed5fcf0 ("KVM: SVM: Override default MMIO mask if memory encryption is enabled")
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-> Make sure the early code is compiled without this feature enabled.
-
-If so, then this should be with CONFIG_AMD_MEM_ENCRYPT ifdeffery around
-it.
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 8071952e9cf2..86619631ff6a 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -335,6 +335,8 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_mask, u64 mmio_value, u64 access_mask)
+ {
+ 	BUG_ON((u64)(unsigned)access_mask != access_mask);
+ 	BUG_ON((mmio_mask & mmio_value) != mmio_value);
++	WARN_ON(mmio_value & (shadow_nonpresent_or_rsvd_mask << shadow_nonpresent_or_rsvd_mask_len));
++	WARN_ON(mmio_value & shadow_nonpresent_or_rsvd_lower_gfn_mask);
+ 	shadow_mmio_value = mmio_value | SPTE_MMIO_MASK;
+ 	shadow_mmio_mask = mmio_mask | SPTE_SPECIAL_MASK;
+ 	shadow_mmio_access_mask = access_mask;
+@@ -583,16 +585,15 @@ static void kvm_mmu_reset_all_pte_masks(void)
+ 	 * the most significant bits of legal physical address space.
+ 	 */
+ 	shadow_nonpresent_or_rsvd_mask = 0;
+-	low_phys_bits = boot_cpu_data.x86_cache_bits;
+-	if (boot_cpu_data.x86_cache_bits <
+-	    52 - shadow_nonpresent_or_rsvd_mask_len) {
++	low_phys_bits = boot_cpu_data.x86_phys_bits;
++	if (boot_cpu_has_bug(X86_BUG_L1TF) &&
++	    !WARN_ON_ONCE(boot_cpu_data.x86_cache_bits >=
++			  52 - shadow_nonpresent_or_rsvd_mask_len)) {
++		low_phys_bits = boot_cpu_data.x86_cache_bits
++			- shadow_nonpresent_or_rsvd_mask_len;
+ 		shadow_nonpresent_or_rsvd_mask =
+-			rsvd_bits(boot_cpu_data.x86_cache_bits -
+-				  shadow_nonpresent_or_rsvd_mask_len,
+-				  boot_cpu_data.x86_cache_bits - 1);
+-		low_phys_bits -= shadow_nonpresent_or_rsvd_mask_len;
+-	} else
+-		WARN_ON_ONCE(boot_cpu_has_bug(X86_BUG_L1TF));
++			rsvd_bits(low_phys_bits, boot_cpu_data.x86_cache_bits - 1);
++	}
+ 
+ 	shadow_nonpresent_or_rsvd_lower_gfn_mask =
+ 		GENMASK_ULL(low_phys_bits - 1, PAGE_SHIFT);
 -- 
-Regards/Gruss,
-    Boris.
+2.18.2
 
-https://people.kernel.org/tglx/notes-about-netiquette
