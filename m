@@ -2,77 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85C241D95A2
-	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 13:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 730E51D95F5
+	for <lists+kvm@lfdr.de>; Tue, 19 May 2020 14:10:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728873AbgESLtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 07:49:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57834 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728626AbgESLtP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 07:49:15 -0400
-Received: from localhost (unknown [137.135.114.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B2A7420829;
-        Tue, 19 May 2020 11:49:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589888954;
-        bh=yEh+r5LMBWDn147exCmKd4fPSIN/zEvg174HOnJ3QjM=;
-        h=Date:From:To:To:To:To:Cc:Cc:Cc:Subject:In-Reply-To:References:
-         From;
-        b=kdrxQLNkiEq42DqMUwHUJTimOJ93XWK7I8fyjzBKeO8QccvSjBgIQPeWMqPvMnZQ9
-         GJYSK30hcVEGEnqJ2xIs0rYRfusN6HQTG2h5KMKuAhvFVhPoUYHx1O+LhSbyXfTcGi
-         Locz2w2O0DBUrC2kC8BKkBzT4IhEHbxj7TGgNKQA=
-Date:   Tue, 19 May 2020 11:49:13 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-To:     Huacai Chen <chenhc@lemote.com>
-To:     Xing Li <lixing@loongson.cn>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH V4 01/14] KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
-In-Reply-To: <1589279480-27722-2-git-send-email-chenhc@lemote.com>
-References: <1589279480-27722-2-git-send-email-chenhc@lemote.com>
-Message-Id: <20200519114914.B2A7420829@mail.kernel.org>
+        id S1728798AbgESMKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 08:10:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38662 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726196AbgESMKg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 May 2020 08:10:36 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04JC1QcY098858;
+        Tue, 19 May 2020 08:10:35 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 312c64cjjd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 May 2020 08:10:34 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04JC2BlM103630;
+        Tue, 19 May 2020 08:10:34 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 312c64cjhn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 May 2020 08:10:34 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04JC1GT7014184;
+        Tue, 19 May 2020 12:10:32 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma01fra.de.ibm.com with ESMTP id 313xcd0mrs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 May 2020 12:10:32 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04JC9Hgi63963604
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 May 2020 12:09:17 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C4DC34C040;
+        Tue, 19 May 2020 12:10:29 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6AB314C044;
+        Tue, 19 May 2020 12:10:29 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.145.73])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 19 May 2020 12:10:29 +0000 (GMT)
+Date:   Tue, 19 May 2020 14:10:26 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+Message-ID: <20200519141026.5f7aeafc.pasic@linux.ibm.com>
+In-Reply-To: <20200519133606.56e019b3.cohuck@redhat.com>
+References: <20200513142934.28788-1-farman@linux.ibm.com>
+        <20200518180903.7cb21dd8.cohuck@redhat.com>
+        <20200519000943.70098774.pasic@linux.ibm.com>
+        <20200519133606.56e019b3.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-19_03:2020-05-19,2020-05-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=823 cotscore=-2147483648
+ spamscore=0 priorityscore=1501 bulkscore=0 adultscore=0 phishscore=0
+ mlxscore=0 lowpriorityscore=0 clxscore=1015 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005190105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi
+On Tue, 19 May 2020 13:36:06 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-[This is an automated email]
+> On Tue, 19 May 2020 00:09:43 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+> > On Mon, 18 May 2020 18:09:03 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > > But taking a step back (and ignoring your series and the discussion,
+> > > sorry about that):
+> > > 
+> > > We need to do something (creating a local translation of the guest's
+> > > channel program) that does not have any relation to the process in the
+> > > architecture at all, but is only something that needs to be done
+> > > because of what vfio-ccw is trying to do (issuing a channel program on
+> > > behalf of another entity.)   
+> > 
+> > I violently disagree with this point. Looking at the whole vfio-ccw
+> > device the translation is part of the execution of the channel program,
+> > more specifically it fits in as prefetching. Thus it needs to happen
+> > with the FC start bit set. Before FC start is set the subchannel is
+> > not allowed to process (including look at) the channel program. At least
+> > that is what I remember.
+> 
+> I fear we really have to agree to disagree here. 
 
-This commit has been processed because it contains a -stable tag.
-The stable tag indicates that it's relevant for the following trees: all
+So you say the subchannel is allowed to poke around before FC start is
+set? I'm not sure what do you disagree with.
 
-The bot has tested the following trees: v5.6.13, v5.4.41, v4.19.123, v4.14.180, v4.9.223, v4.4.223.
+> The PoP describes how
+> a SSCH etc. has to be done and what reaction to expect. It does not
+> cover the 'SSCH on behalf of someone else' pattern: only what we can
+> expect from that second SSCH, and what the guest can expect from us.
 
-v5.6.13: Build OK!
-v5.4.41: Build OK!
-v4.19.123: Build OK!
-v4.14.180: Build OK!
-v4.9.223: Build OK!
-v4.4.223: Failed to apply! Possible dependencies:
-    029499b47738 ("KVM: x86: MMU: Make mmu_set_spte() return emulate value")
-    19d194c62b25 ("MIPS: KVM: Simplify TLB_* macros")
-    403015b323a2 ("MIPS: KVM: Move non-TLB handling code out of tlb.c")
-    7ee0e5b29d27 ("KVM: x86: MMU: Remove unused parameter of __direct_map()")
-    9fbfb06a4065 ("MIPS: KVM: Arrayify struct kvm_mips_tlb::tlb_lo*")
-    ba049e93aef7 ("kvm: rename pfn_t to kvm_pfn_t")
-    bdb7ed8608f8 ("MIPS: KVM: Convert headers to kernel sized types")
-    ca64c2beecd4 ("MIPS: KVM: Abstract guest ASID mask")
-    caa1faa7aba6 ("MIPS: KVM: Trivial whitespace and style fixes")
-    e6207bbea16c ("MIPS: KVM: Use MIPS_ENTRYLO_* defs from mipsregs.h")
+Yes. The PoP says that the guest can expect from us to not process the
+submitted channel program if the subchannel is already busy. For this
+whether the ccw device is fully emulated, or if it is a pass through
+with 'SSCH on behalf' it does not matter. From the guest perspective
+the 'SSCH on behalf' is just an implementation detail, right?
+
+> In
+> particular, the PoP does not specify anything about how a hypervisor is
+> supposed to handle I/O from its guests (and why should it?)
+>
+
+Except that the exposed interface (towards the guest OS) needs to conform
+to the pop. Including the point I cited.
+ 
+> > 
+> > > Trying to sort that out by poking at actl
+> > > and fctl bits does not seem like the best way; especially as keeping
+> > > the bits up-to-date via STSCH is an exercise in futility.  
+> > 
+> > I disagree. A single subchannel is processing at most one channel
+> > program at any given point in time. Or am I reading the PoP wrong?
+> 
+> The hypervisor cannot know the exact status of the subchannel. It only
+> knows the state of the subchannel at the time it issued its last STSCH.
+
+You didn't respond to 'one cp at any given time is in PoP'. Do we agree
+about that at least?
+
+What can the hypervisor know about the host subchannel and its status
+is a different issue. I would argue that it actually knows enough but
+we need to get the very basics straight first.
+
+But this point the hypervisor does not need to know about the exact
+state of the host subchannel, it needs to know about the state of the
+interface it is exposing (to the guest, or to the userspace).
+
+> Anything else it needs to track is the hypervisor's business, and
+> ideally, it should track that in its own control structures.
+
+We agree on this. And this is what I'm asking for, and also what Eric
+did. Although I don't agree with the details. He misused the actl bits.
+According to him these were unused and thus the hypervisor's own control
+structure. He himself stated that this may not be the best way to do it.
+
+> (I know we
+> muck around with the control bits today; but maybe that's not the best
+> idea.)
+> 
+
+What control bits do you mean?
+
+> > 
+> > > 
+> > > What about the following (and yes, I had suggested something vaguely in
+> > > that direction before):
+> > > 
+> > > - Detach the cp from the subchannel (or better, remove the 1:1
+> > >   relationship). By that I mean building the cp as a separately
+> > >   allocated structure (maybe embedding a kref, but that might not be
+> > >   needed), and appending it to a list after SSCH with cc=0. Discard it
+> > >   if cc!=0.
+> > > - Remove the CP_PENDING state. The state is either IDLE after any
+> > >   successful SSCH/HSCH/CSCH, or a new state in that case. But no
+> > >   special state for SSCH.
+> > > - A successful CSCH removes the first queued request, if any.
+> > > - A final interrupt removes the first queued request, if any.
+> > > 
+> > > Thoughts?
+> > >   
+> > 
+> > See above. IMHO the second SSCH is to be rejected by QEMU. I've
+> > explained this in more detail in my previous mail.
+> 
+> I don't think we should rely on whatever QEMU is or isn't doing. We
+> should not get all tangled up if userspace is doing weird stuff.
+
+I agree 100%. And I was a vocal advocate of this all the time. We
+need to avoid undefined behavior in the kernel regardless of what
+userspace is doing.
+
+But we can (and should) have expectations towards the userspace,
+and refuse to do any further work, if we detect that userspace is
+misbehaving.
+
+Regards,
+Halil
 
 
-NOTE: The patch will not be queued to stable trees until it is upstream.
+> 
 
-How should we proceed with this patch?
-
--- 
-Thanks
-Sasha
