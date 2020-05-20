@@ -2,115 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 797C61DA672
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 02:24:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDC871DA7A3
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 04:01:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728275AbgETAYc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 20:24:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37398 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726348AbgETAYb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 20:24:31 -0400
-Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86334C061A0E
-        for <kvm@vger.kernel.org>; Tue, 19 May 2020 17:24:31 -0700 (PDT)
-Received: by mail-qv1-xf44.google.com with SMTP id p4so542846qvr.10
-        for <kvm@vger.kernel.org>; Tue, 19 May 2020 17:24:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=+E0kIe70syNL6UAJLN3BrixhuqHouK19XEdYSaz4boc=;
-        b=Fy9UQtONhqqEyoT6JmaD8ZWUnGxG2gZuC2E3cEOWtLwNQF0SIgpqUFvE9KUjKC89q+
-         XtceAwte+1dGT/OhpeYI3ntI0RPTtUT+XfgXYR1NYWwCRXvCeRE+Ul9GyfDY/0qWXY46
-         A1GAG7bBwmxQ3451vi6Jsx9UNZ863wFu8CkooGlunMDGao0JPlGNXOVdDht0fZbVUpTB
-         cooBF8O4DF9LAX9OgBTVTHvmL8UuuAQoap8rR5QMGz08VZtBv526dmgst+bzuECwzHP2
-         rHyOGuKeLOrq1/ijJXLF6YBbA0oJXUTq01Z/kbX8jn8OpuXdfUSMsEjVCYlbxFYUIm+a
-         EfMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=+E0kIe70syNL6UAJLN3BrixhuqHouK19XEdYSaz4boc=;
-        b=KSKzQjDqWetn3mVWxcX+Z8gIRsyuhGGEjt1CUOOHI9YqWu47OoivoKoPCiTzZQZVWu
-         /Ns9K3nlSYisSopG2UIruKQIjYAWkchU9pSWl//EJ3ssxdW/9c4KU9z5vTuSPZNqnKAk
-         OC/MYEFXtgFflUWDPiKNuLf7nKWjt/1yECILo515vBSD6wINHWXqXVsc1dby8dLWm1wW
-         0wKfDoPHrZYX9MotL4pj7eMXrn34g/adYYtUOgQHr33RIssfQTvnupVwtwpaTVmiO5Df
-         Dpisa0LkYuDpHxlUIcnF8QgfdoD+7gJKOeG9+gqlQDO22KXH0DBhNGKpL6PB3aDVZg0K
-         veuA==
-X-Gm-Message-State: AOAM532CWbbgrlt1QzRN8lXlOLM6aUNeqrmcWFW2z9wkN6IFaR+HINLE
-        JHC+c60OrkW7j80WWARlD9e2Lw==
-X-Google-Smtp-Source: ABdhPJzepcju1X6ZbEK/rqZRJGs7XRG5GX9RZoCeTzWm53K2Qq7a4cM8kRPLEcG1JwR0CyqZG0/SmA==
-X-Received: by 2002:a0c:b992:: with SMTP id v18mr2366070qvf.223.1589934270821;
-        Tue, 19 May 2020 17:24:30 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id m59sm1124723qtd.46.2020.05.19.17.24.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 19 May 2020 17:24:30 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1jbCX8-0003W3-0k; Tue, 19 May 2020 21:24:30 -0300
-Date:   Tue, 19 May 2020 21:24:30 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cohuck@redhat.com
-Subject: Re: [PATCH 0/2] vfio/type1/pci: IOMMU PFNMAP invalidation
-Message-ID: <20200520002429.GE31189@ziepe.ca>
-References: <158947414729.12590.4345248265094886807.stgit@gimli.home>
- <20200514212538.GB449815@xz-x1>
- <20200514161712.14b34984@w520.home>
- <20200514222415.GA24575@ziepe.ca>
- <20200514165517.3df5a9ef@w520.home>
+        id S1728525AbgETCBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 22:01:54 -0400
+Received: from mga02.intel.com ([134.134.136.20]:11265 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726348AbgETCBy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 22:01:54 -0400
+IronPort-SDR: kTWqmYpW6EkOtejWN+oRs01tcIR6Ss/IGlDXzaKFATrJwlXUiOj5GIaxw3vPw9Lp9sBw19HZH5
+ /DXu7SkPoz8Q==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2020 19:01:53 -0700
+IronPort-SDR: Bx2MGVsoWwRD9snZ15HM/bJkxeVIqCjxfvW0LzfuaFFvtBEeXEa1nSYY5BtC/tDNhXcVOG5gvX
+ Qgk35wLCxytA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,412,1583222400"; 
+   d="scan'208";a="254893848"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.141]) ([10.238.4.141])
+  by fmsmga008.fm.intel.com with ESMTP; 19 May 2020 19:01:50 -0700
+Reply-To: like.xu@intel.com
+Subject: Re: [PATCH v11 10/11] KVM: x86/pmu: Check guest LBR availability in
+ case host reclaims them
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Like Xu <like.xu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
+        wei.w.wang@intel.com
+References: <20200514083054.62538-1-like.xu@linux.intel.com>
+ <20200514083054.62538-11-like.xu@linux.intel.com>
+ <20200519111559.GJ279861@hirez.programming.kicks-ass.net>
+ <3a234754-e103-907f-9b06-44b5e7ae12d3@intel.com>
+ <20200519145756.GC317569@hirez.programming.kicks-ass.net>
+From:   "Xu, Like" <like.xu@intel.com>
+Organization: Intel OTC
+Message-ID: <9577169d-62f4-0750-7054-5e842d5d2296@intel.com>
+Date:   Wed, 20 May 2020 10:01:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200514165517.3df5a9ef@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200519145756.GC317569@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 14, 2020 at 04:55:17PM -0600, Alex Williamson wrote:
-> On Thu, 14 May 2020 19:24:15 -0300
-> Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> 
-> > On Thu, May 14, 2020 at 04:17:12PM -0600, Alex Williamson wrote:
-> > 
-> > > that much.  I think this would also address Jason's primary concern.
-> > > It's better to get an IOMMU fault from the user trying to access those
-> > > mappings than it is to leave them in place.  
-> > 
-> > Yes, there are few options here - if the pages are available for use
-> > by the IOMMU and *asynchronously* someone else revokes them, then the
-> > only way to protect the kernel is to block them from the IOMMUU.
-> > 
-> > For this to be sane the revokation must be under complete control of
-> > the VFIO user. ie if a user decides to disable MMIO traffic then of
-> > course the IOMMU should block P2P transfer to the MMIO bar. It is user
-> > error to have not disabled those transfers in the first place.
-> > 
-> > When this is all done inside a guest the whole logic applies. On bare
-> > metal you might get some AER or crash or MCE. In virtualization you'll
-> > get an IOMMU fault.
-> > 
-> > > due to the memory enable bit.  If we could remap the range to a kernel
-> > > page we could maybe avoid the IOMMU fault and maybe even have a crude
-> > > test for whether any data was written to the page while that mapping
-> > > was in place (ie. simulating more restricted error handling, though
-> > > more asynchronous than done at the platform level).    
-> > 
-> > I'm not if this makes sense, can't we arrange to directly trap the
-> > IOMMU failure and route it into qemu if that is what is desired?
-> 
-> Can't guarantee it, some systems wire that directly into their
-> management processor so that they can "protect their users" regardless
-> of whether they want or need it.  Yay firmware first error handling,
-> *sigh*.  Thanks,
+On 2020/5/19 22:57, Peter Zijlstra wrote:
+> On Tue, May 19, 2020 at 09:10:58PM +0800, Xu, Like wrote:
+>> On 2020/5/19 19:15, Peter Zijlstra wrote:
+>>> On Thu, May 14, 2020 at 04:30:53PM +0800, Like Xu wrote:
+>>>
+>>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>>>> index ea4faae56473..db185dca903d 100644
+>>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>>>> @@ -646,6 +646,43 @@ static void intel_pmu_lbr_cleanup(struct kvm_vcpu *vcpu)
+>>>>    		intel_pmu_free_lbr_event(vcpu);
+>>>>    }
+>>>> +static bool intel_pmu_lbr_is_availabile(struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>>> +
+>>>> +	if (!pmu->lbr_event)
+>>>> +		return false;
+>>>> +
+>>>> +	if (event_is_oncpu(pmu->lbr_event)) {
+>>>> +		intel_pmu_intercept_lbr_msrs(vcpu, false);
+>>>> +	} else {
+>>>> +		intel_pmu_intercept_lbr_msrs(vcpu, true);
+>>>> +		return false;
+>>>> +	}
+>>>> +
+>>>> +	return true;
+>>>> +}
+>>> This is unreadable gunk, what?
+>> Abstractly, it is saying "KVM would passthrough the LBR satck MSRs if
+>> event_is_oncpu() is true, otherwise cancel the passthrough state if any."
+>>
+>> I'm using 'event->oncpu != -1' to represent the guest LBR event
+>> is scheduled on rather than 'event->state == PERF_EVENT_STATE_ERROR'.
+>>
+>> For intel_pmu_intercept_lbr_msrs(), false means to passthrough the LBR stack
+>> MSRs to the vCPU, and true means to cancel the passthrough state and make
+>> LBR MSR accesses trapped by the KVM.
+> To me it seems very weird to change state in a function that is supposed
+> to just query state.
+>
+> 'is_available' seems to suggest a simple: return 'lbr_event->state ==
+> PERF_EVENT_STATE_ACTIVE' or something.
+This clarification led me to reconsider the use of a more readable name here.
 
-I feel like those system should just loose the ability to reliably
-mirror IOMMU errors to their guests - trying to emulate it by scanning
-memory/etc sounds too horrible.
+Do you accept the check usage of "event->oncpu != -1" instead of
+'event->state == PERF_EVENT_STATE_ERROR' before KVM do passthrough ?
+>
+>>>> +static void intel_pmu_availability_check(struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +	lockdep_assert_irqs_disabled();
+>>>> +
+>>>> +	if (lbr_is_enabled(vcpu) && !intel_pmu_lbr_is_availabile(vcpu) &&
+>>>> +		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
+>>>> +		pr_warn_ratelimited("kvm: vcpu-%d: LBR is temporarily unavailable.\n",
+>>>> +			vcpu->vcpu_id);
+>>> More unreadable nonsense; when the events go into ERROR state, it's a
+>>> permanent fail, they'll not come back.
+>> It's not true.  The guest LBR event with 'ERROR state' or 'oncpu != -1'
+>> would be
+>> lazy released and re-created in the next time the
+>> intel_pmu_create_lbr_event() is
+>> called and it's supposed to be re-scheduled and re-do availability_check()
+>> as well.
+> Where? Also, wth would you need to destroy and re-create an event for
+> that?
+If the guest does not set the EN_LBR bit and did not touch any LBR-related 
+registers
+in the last time slice, KVM will destroy the guest LBR event in 
+kvm_pmu_cleanup()
+which is called once every time the vCPU thread is scheduled in.
 
-Jason
+The re-creation is not directly called after the destruction
+but is triggered by the next guest access to the LBR-related registers if any.
+
+ From the time when the guest LBR event enters the "oncpu! = -1" state
+to the next re-creation, the guest LBR is not available. After the re-creation,
+the guest LBR is hopefully available and if it's true, the LBR will be 
+passthrough
+and used by the guest normally.
+
+That's the reason for "LBR is temporarily unavailable"
+and please let me know if it doesn't make sense to you.
+
+>>>> @@ -6696,8 +6696,10 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>>>>    	pt_guest_enter(vmx);
+>>>> -	if (vcpu_to_pmu(vcpu)->version)
+>>>> +	if (vcpu_to_pmu(vcpu)->version) {
+>>>>    		atomic_switch_perf_msrs(vmx);
+>>>> +		kvm_x86_ops.pmu_ops->availability_check(vcpu);
+>>>> +	}
+>>> AFAICT you just did a call out to the kvm_pmu crud in
+>>> atomic_switch_perf_msrs(), why do another call?
+>> In fact, availability_check() is only called here for just one time.
+>>
+>> The callchain looks like:
+>> - vmx_vcpu_run()
+>>      - kvm_x86_ops.pmu_ops->availability_check();
+>>          - intel_pmu_availability_check()
+>>              - intel_pmu_lbr_is_availabile()
+>>                  - event_is_oncpu() ...
+>>
+> What I'm saying is that you just did a pmu_ops indirect call in
+> atomic_switch_perf_msrs(), why add another?
+Do you mean the indirect call:
+- atomic_switch_perf_msrs()
+     - perf_guest_get_msrs()
+         - x86_pmu.guest_get_msrs()
+?
+
+The two pmu_ops are quite different:
+- the first one in atomic_switch_perf_msrs() is defined in the host side;
+- the second one for availability_check() is defined in the KVM side;
+
+The availability_check() for guest LBR event and MSRs pass-through
+operations are definitely KVM context specific.
+
+Thanks,
+Like Xu
+
