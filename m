@@ -2,355 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7760B1DBB2F
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:22:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD8B31DBBAA
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728275AbgETRWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 13:22:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59714 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728250AbgETRWb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 13:22:31 -0400
+        id S1726818AbgETRjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 13:39:12 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26832 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726436AbgETRjM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 May 2020 13:39:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589995349;
+        s=mimecast20190719; t=1589996350;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=R+/Wgs4EpdRHJ+M//PKLQIAi6WzuAJ7i4HLViCKSV/E=;
-        b=UoMQXL03YeOLIUnnpMP8ZQAs21D+4s8JkzkXnVeLjs0Q4Y4TcMZ1PID/ApCHpIkMN7yKQ6
-        xQnW8/KDAfRhIObrYmI1CznMGD2d8eA99j8upKFMug0hW9sb2NktZH6bPrzAPLZpiGuX2I
-        Stjw6NlQc3sPxHp/J6700OjQ8l4EbMQ=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NInuWIKxvhv+pr0Of+enAgQVb1EI3zbw0YcjpeUMr/0=;
+        b=ecQ7aNc7cYhwB+k60TS5IHUVJkUpeEAAzgjKJY/8++wp1E3hZBBRpSmz7SCmgQmkTWxj+p
+        a6E+yMO4eAvC3HtFE4oxF6dl4GMoxFGA6GVCn3O8MeP9ohTxw0ALDFpkqjcj3z9HP2Lk3o
+        ekvUwD0WVhPWZkwoucxrnooOwMSa8cs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-9wcHcTE1NUifyILaOAfyZA-1; Wed, 20 May 2020 13:22:25 -0400
-X-MC-Unique: 9wcHcTE1NUifyILaOAfyZA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-470-2RLpIsTEPVGJjQ_3ZAVsPA-1; Wed, 20 May 2020 13:39:08 -0400
+X-MC-Unique: 2RLpIsTEPVGJjQ_3ZAVsPA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 770E788EF2B;
-        Wed, 20 May 2020 17:22:16 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0989E60554;
-        Wed, 20 May 2020 17:22:14 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 24/24] KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE
-Date:   Wed, 20 May 2020 13:21:45 -0400
-Message-Id: <20200520172145.23284-25-pbonzini@redhat.com>
-In-Reply-To: <20200520172145.23284-1-pbonzini@redhat.com>
-References: <20200520172145.23284-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 713198005AA;
+        Wed, 20 May 2020 17:39:07 +0000 (UTC)
+Received: from starship (unknown [10.35.207.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 275F648D6B;
+        Wed, 20 May 2020 17:39:05 +0000 (UTC)
+Message-ID: <45f5ed0e1bb89ac186ef0d7f79f4ec4be0be6403.camel@redhat.com>
+Subject: Re: [PATCH 2/2] kvm/x86: don't expose MSR_IA32_UMWAIT_CONTROL
+ unconditionally
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed, 20 May 2020 20:39:04 +0300
+In-Reply-To: <87sgfusf26.fsf@vitty.brq.redhat.com>
+References: <20200520160740.6144-1-mlevitsk@redhat.com>
+         <20200520160740.6144-3-mlevitsk@redhat.com>
+         <874ksatvkr.fsf@vitty.brq.redhat.com>
+         <0c1a0c81bbdcfaf4ae9af545f4a38439b1a56d11.camel@redhat.com>
+         <87sgfusf26.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Similar to VMX, the state that is captured through the currently available
-IOCTLs is a mix of L1 and L2 state, dependent on whether the L2 guest was
-running at the moment when the process was interrupted to save its state.
+On Wed, 2020-05-20 at 19:15 +0200, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> 
+> > On Wed, 2020-05-20 at 18:33 +0200, Vitaly Kuznetsov wrote:
+> > > Maxim Levitsky <mlevitsk@redhat.com> writes:
+> > > 
+> > > > This msr is only available when the host supports WAITPKG feature.
+> > > > 
+> > > > This breaks a nested guest, if the L1 hypervisor is set to ignore
+> > > > unknown msrs, because the only other safety check that the
+> > > > kernel does is that it attempts to read the msr and
+> > > > rejects it if it gets an exception.
+> > > > 
+> > > > Fixes: 6e3ba4abce KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+> > > > 
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > >  arch/x86/kvm/x86.c | 4 ++++
+> > > >  1 file changed, 4 insertions(+)
+> > > > 
+> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > > index fe3a24fd6b263..9c507b32b1b77 100644
+> > > > --- a/arch/x86/kvm/x86.c
+> > > > +++ b/arch/x86/kvm/x86.c
+> > > > @@ -5314,6 +5314,10 @@ static void kvm_init_msr_list(void)
+> > > >  			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
+> > > >  			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
+> > > >  				continue;
+> > > > +			break;
+> > > > +		case MSR_IA32_UMWAIT_CONTROL:
+> > > > +			if (!kvm_cpu_cap_has(X86_FEATURE_WAITPKG))
+> > > > +				continue;
+> > > 
+> > > I'm probably missing something but (if I understand correctly) the only
+> > > effect of dropping MSR_IA32_UMWAIT_CONTROL from msrs_to_save would be
+> > > that KVM userspace won't see it in e.g. KVM_GET_MSR_INDEX_LIST. But why
+> > > is this causing an issue? I see both vmx_get_msr()/vmx_set_msr() have
+> > > 'host_initiated' check:
+> > > 
+> > >        case MSR_IA32_UMWAIT_CONTROL:
+> > >                 if (!msr_info->host_initiated && !vmx_has_waitpkg(vmx))
+> > >                         return 1;
+> > 
+> > Here it fails like that:
+> > 
+> > 1. KVM_GET_MSR_INDEX_LIST returns this msrs, and qemu notes that
+> >    it is supported in 'has_msr_umwait' global var
+> > 
+> > 2. Qemu does kvm_arch_get/put_registers->kvm_get/put_msrs->ioctl(KVM_GET_MSRS)
+> >    and while doing this it adds MSR_IA32_UMWAIT_CONTROL to that msr list.
+> >    That reaches 'svm_get_msr', and this one knows nothing about MSR_IA32_UMWAIT_CONTROL.
+> > 
+> > So the difference here is that vmx_get_msr not called at all.
+> > I can add this msr to svm_get_msr instead but that feels wrong since this feature
+> > is not yet supported on AMD.
+> > When AMD adds support for this feature, then the VMX specific code can be moved to
+> > kvm_get_msr_common I guess.
+> > 
+> > 
+> 
+> Oh, SVM, I missed that completely) 
+> 
+> > > so KVM userspace should be able to read/write this MSR even when there's
+> > > no hardware support for it. Or who's trying to read/write it?
+> > > 
+> > > Also, kvm_cpu_cap_has() check is not equal to vmx_has_waitpkg() which
+> > > checks secondary execution controls.
+> > 
+> > I was afraid that something like that will happen, but in this particular
+> > case we can only check CPUID support and if supported, the then it means
+> > we are dealing with intel system and thus vmx_get_msr will be called and
+> > ignore that msr.
+> > 
+> > Calling vmx_has_waitpkg from the common code doesn't seem right, and besides,
+> > it checks the secondary controls which are set by the host and can change,
+> > at least in theory during runtime (I don't know if KVM does this).
+> > 
+> > Note that if I now understand correctly, the 'host_initiated' means
+> > that MSR read/write is done by the host itself and not on behalf of the guest.
+> 
+> Yes, it does that. 
+> 
+> We have kvm_x86_ops.has_emulated_msr() mechanism, can we use it here?
+> E.g. completely untested
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 38f6aeefeb55..c19a9542e6c3 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3471,6 +3471,8 @@ static bool svm_has_emulated_msr(int index)
+>         case MSR_IA32_MCG_EXT_CTL:
+>         case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
+>                 return false;
+> +       case MSR_IA32_UMWAIT_CONTROL:
+> +               return false;
+>         default:
+>                 break;
+>         }
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d786c7d27ce5..f45153ef3b81 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1183,7 +1183,6 @@ static const u32 msrs_to_save_all[] = {
+>         MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
+>         MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
+>         MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
+> -       MSR_IA32_UMWAIT_CONTROL,
+>  
+>         MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
+>         MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
+> @@ -1266,6 +1265,7 @@ static const u32 emulated_msrs_all[] = {
+>         MSR_IA32_VMX_PROCBASED_CTLS2,
+>         MSR_IA32_VMX_EPT_VPID_CAP,
+>         MSR_IA32_VMX_VMFUNC,
+> +       MSR_IA32_UMWAIT_CONTROL,
+>  
+>         MSR_K7_HWCR,
+>         MSR_KVM_POLL_CONTROL,
+> 
+I don't see any reason why the above won't work, and to be honest
+I also took a look at this but to me it wasn't clear what the purpose
+of the emulated msrs is, this is why I took the approach in the patch I had sent.
 
-In particular, the SVM-specific state for nested virtualization includes
-the L1 saved state (including the interrupt flag), the cached L2 controls,
-and the GIF.
+It 'seems' (although this is not enforced anywhere) that emulated msr list is
+intended for MSRs that are emulated by KVM, which means that KVM traps these msrs,
+and give guest arbitrary values it thinks that the guest should see.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/uapi/asm/kvm.h |  17 +++-
- arch/x86/kvm/cpuid.h            |   5 ++
- arch/x86/kvm/svm/nested.c       | 147 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c          |   1 +
- arch/x86/kvm/vmx/nested.c       |   5 --
- arch/x86/kvm/x86.c              |   3 +-
- 6 files changed, 171 insertions(+), 7 deletions(-)
+However MSR_IA32_UMWAIT_CONTROL appears to be exposed directly to the guest
+without any traps, with the virtualization done by cpu, and the only intervention
+we do is to set a value to be load when guest mode is entered and value to be
+loaded when guest mode is done (using VMX msr entry/exit msr lists),
+I see that done by atomic_switch_umwait_control_msr.
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 3f3f780c8c65..12075a9de1c1 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -385,18 +385,22 @@ struct kvm_sync_regs {
- #define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
- 
- #define KVM_STATE_NESTED_FORMAT_VMX	0
--#define KVM_STATE_NESTED_FORMAT_SVM	1	/* unused */
-+#define KVM_STATE_NESTED_FORMAT_SVM	1
- 
- #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
- #define KVM_STATE_NESTED_EVMCS		0x00000004
- #define KVM_STATE_NESTED_MTF_PENDING	0x00000008
-+#define KVM_STATE_NESTED_GIF_SET	0x00000100
- 
- #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
- 
- #define KVM_STATE_NESTED_VMX_VMCS_SIZE	0x1000
- 
-+#define KVM_STATE_NESTED_SVM_VMCB_SIZE	0x1000
-+
-+
- struct kvm_vmx_nested_state_data {
- 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
- 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
-@@ -411,6 +415,15 @@ struct kvm_vmx_nested_state_hdr {
- 	} smm;
- };
- 
-+struct kvm_svm_nested_state_data {
-+	/* Save area only used if KVM_STATE_NESTED_RUN_PENDING.  */
-+	__u8 vmcb12[KVM_STATE_NESTED_SVM_VMCB_SIZE];
-+};
-+
-+struct kvm_svm_nested_state_hdr {
-+	__u64 vmcb_pa;
-+};
-+
- /* for KVM_CAP_NESTED_STATE */
- struct kvm_nested_state {
- 	__u16 flags;
-@@ -419,6 +432,7 @@ struct kvm_nested_state {
- 
- 	union {
- 		struct kvm_vmx_nested_state_hdr vmx;
-+		struct kvm_svm_nested_state_hdr svm;
- 
- 		/* Pad the header to 128 bytes.  */
- 		__u8 pad[120];
-@@ -431,6 +445,7 @@ struct kvm_nested_state {
- 	 */
- 	union {
- 		struct kvm_vmx_nested_state_data vmx[0];
-+		struct kvm_svm_nested_state_data svm[0];
- 	} data;
- };
- 
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 63a70f6a3df3..05434cd9342f 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -303,4 +303,9 @@ static __always_inline void kvm_cpu_cap_check_and_set(unsigned int x86_feature)
- 		kvm_cpu_cap_set(x86_feature);
- }
- 
-+static inline bool page_address_valid(struct kvm_vcpu *vcpu, gpa_t gpa)
-+{
-+	return PAGE_ALIGNED(gpa) && !(gpa >> cpuid_maxphyaddr(vcpu));
-+}
-+
- #endif
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 087a04ae74e4..001d1f830076 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -25,6 +25,7 @@
- #include "trace.h"
- #include "mmu.h"
- #include "x86.h"
-+#include "cpuid.h"
- #include "lapic.h"
- #include "svm.h"
- 
-@@ -243,6 +244,8 @@ static void load_nested_vmcb_control(struct vcpu_svm *svm,
- {
- 	copy_vmcb_control_area(&svm->nested.ctl, control);
- 
-+	/* Copy it here because nested_svm_check_controls will check it.  */
-+	svm->nested.ctl.asid           = control->asid;
- 	svm->nested.ctl.msrpm_base_pa &= ~0x0fffULL;
- 	svm->nested.ctl.iopm_base_pa  &= ~0x0fffULL;
- }
-@@ -870,6 +873,150 @@ int nested_svm_exit_special(struct vcpu_svm *svm)
- 	return NESTED_EXIT_CONTINUE;
- }
- 
-+static int svm_get_nested_state(struct kvm_vcpu *vcpu,
-+				struct kvm_nested_state __user *user_kvm_nested_state,
-+				u32 user_data_size)
-+{
-+	struct vcpu_svm *svm;
-+	struct kvm_nested_state kvm_state = {
-+		.flags = 0,
-+		.format = KVM_STATE_NESTED_FORMAT_SVM,
-+		.size = sizeof(kvm_state),
-+	};
-+	struct vmcb __user *user_vmcb = (struct vmcb __user *)
-+		&user_kvm_nested_state->data.svm[0];
-+
-+	if (!vcpu)
-+		return kvm_state.size + KVM_STATE_NESTED_SVM_VMCB_SIZE;
-+
-+	svm = to_svm(vcpu);
-+
-+	if (user_data_size < kvm_state.size)
-+		goto out;
-+
-+	/* First fill in the header and copy it out.  */
-+	if (is_guest_mode(vcpu)) {
-+		kvm_state.hdr.svm.vmcb_pa = svm->nested.vmcb;
-+		kvm_state.size += KVM_STATE_NESTED_SVM_VMCB_SIZE;
-+		kvm_state.flags |= KVM_STATE_NESTED_GUEST_MODE;
-+
-+		if (svm->nested.nested_run_pending)
-+			kvm_state.flags |= KVM_STATE_NESTED_RUN_PENDING;
-+	}
-+
-+	if (gif_set(svm))
-+		kvm_state.flags |= KVM_STATE_NESTED_GIF_SET;
-+
-+	if (copy_to_user(user_kvm_nested_state, &kvm_state, sizeof(kvm_state)))
-+		return -EFAULT;
-+
-+	if (!is_guest_mode(vcpu))
-+		goto out;
-+
-+	/*
-+	 * Copy over the full size of the VMCB rather than just the size
-+	 * of the struct.
-+	 */
-+	if (memzero_user(user_vmcb, KVM_STATE_NESTED_SVM_VMCB_SIZE))
-+		return -EFAULT;
-+	if (copy_to_user(&user_vmcb->control, &svm->nested.ctl,
-+			 sizeof(user_vmcb->control)))
-+		return -EFAULT;
-+	if (copy_to_user(&user_vmcb->save, &svm->nested.hsave->save,
-+			 sizeof(user_vmcb->save)))
-+		return -EFAULT;
-+
-+out:
-+	return kvm_state.size;
-+}
-+
-+static int svm_set_nested_state(struct kvm_vcpu *vcpu,
-+				struct kvm_nested_state __user *user_kvm_nested_state,
-+				struct kvm_nested_state *kvm_state)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	struct vmcb *hsave = svm->nested.hsave;
-+	struct vmcb __user *user_vmcb = (struct vmcb __user *)
-+		&user_kvm_nested_state->data.svm[0];
-+	struct vmcb_control_area ctl;
-+	struct vmcb_save_area save;
-+	u32 cr0;
-+
-+	if (kvm_state->format != KVM_STATE_NESTED_FORMAT_SVM)
-+		return -EINVAL;
-+
-+	if (kvm_state->flags & ~(KVM_STATE_NESTED_GUEST_MODE |
-+				 KVM_STATE_NESTED_RUN_PENDING |
-+				 KVM_STATE_NESTED_GIF_SET))
-+		return -EINVAL;
-+
-+	/*
-+	 * If in guest mode, vcpu->arch.efer actually refers to the L2 guest's
-+	 * EFER.SVME, but EFER.SVME still has to be 1 for VMRUN to succeed.
-+	 */
-+	if (!(vcpu->arch.efer & EFER_SVME)) {
-+		/* GIF=1 and no guest mode are required if SVME=0.  */
-+		if (kvm_state->flags != KVM_STATE_NESTED_GIF_SET)
-+			return -EINVAL;
-+	}
-+
-+	/* SMM temporarily disables SVM, so we cannot be in guest mode.  */
-+	if (is_smm(vcpu) && (kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE))
-+		return -EINVAL;
-+
-+	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
-+		svm_leave_nested(svm);
-+		goto out_set_gif;
-+	}
-+
-+	if (!page_address_valid(vcpu, kvm_state->hdr.svm.vmcb_pa))
-+		return -EINVAL;
-+	if (kvm_state->size < sizeof(*kvm_state) + KVM_STATE_NESTED_SVM_VMCB_SIZE)
-+		return -EINVAL;
-+	if (copy_from_user(&ctl, &user_vmcb->control, sizeof(ctl)))
-+		return -EFAULT;
-+	if (copy_from_user(&save, &user_vmcb->save, sizeof(save)))
-+		return -EFAULT;
-+
-+	if (!nested_vmcb_check_controls(&ctl))
-+		return -EINVAL;
-+
-+	/*
-+	 * Processor state contains L2 state.  Check that it is
-+	 * valid for guest mode (see nested_vmcb_checks).
-+	 */
-+	cr0 = kvm_read_cr0(vcpu);
-+        if (((cr0 & X86_CR0_CD) == 0) && (cr0 & X86_CR0_NW))
-+                return -EINVAL;
-+
-+	/*
-+	 * Validate host state saved from before VMRUN (see
-+	 * nested_svm_check_permissions).
-+	 * TODO: validate reserved bits for all saved state.
-+	 */
-+	if (!(save.cr0 & X86_CR0_PG))
-+		return -EINVAL;
-+
-+	/*
-+	 * All checks done, we can enter guest mode.  L1 control fields
-+	 * come from the nested save state.  Guest state is already
-+	 * in the registers, the save area of the nested state instead
-+	 * contains saved L1 state.
-+	 */
-+	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
-+	hsave->save = save;
-+
-+	svm->nested.vmcb = kvm_state->hdr.svm.vmcb_pa;
-+	load_nested_vmcb_control(svm, &ctl);
-+	nested_prepare_vmcb_control(svm);
-+
-+out_set_gif:
-+	svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
-+	return 0;
-+}
-+
- struct kvm_x86_nested_ops svm_nested_ops = {
- 	.check_events = svm_check_nested_events,
-+	.get_state = svm_get_nested_state,
-+	.set_state = svm_set_nested_state,
- };
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 56be704ffe95..f64d071715d2 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1191,6 +1191,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 		svm->avic_is_running = true;
- 
- 	svm->nested.hsave = page_address(hsave_page);
-+	clear_page(svm->nested.hsave);
- 
- 	svm->msrpm = page_address(msrpm_pages);
- 	svm_vcpu_init_msrpm(svm->msrpm);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 51ebb60e1533..106fc6fceb97 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -437,11 +437,6 @@ static void vmx_inject_page_fault_nested(struct kvm_vcpu *vcpu,
- 	}
- }
- 
--static bool page_address_valid(struct kvm_vcpu *vcpu, gpa_t gpa)
--{
--	return PAGE_ALIGNED(gpa) && !(gpa >> cpuid_maxphyaddr(vcpu));
--}
--
- static int nested_vmx_check_io_bitmap_controls(struct kvm_vcpu *vcpu,
- 					       struct vmcs12 *vmcs12)
- {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0001b2addc66..3e9252737f9d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4626,7 +4626,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 
- 		if (kvm_state.flags &
- 		    ~(KVM_STATE_NESTED_RUN_PENDING | KVM_STATE_NESTED_GUEST_MODE
--		      | KVM_STATE_NESTED_EVMCS | KVM_STATE_NESTED_MTF_PENDING))
-+		      | KVM_STATE_NESTED_EVMCS | KVM_STATE_NESTED_MTF_PENDING
-+		      | KVM_STATE_NESTED_GIF_SET))
- 			break;
- 
- 		/* nested_run_pending implies guest_mode.  */
--- 
-2.18.2
+So I am not sure if we should add it to emulated_msrs_all list.
+
+Paulo, what do you think about this? I personally don't mind how to fix
+this as long as it works and everyone agrees on the patch.
+
+Best regards,
+	Maxim Levitsky
+
+
+
 
