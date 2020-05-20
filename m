@@ -2,141 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C42C21DBDF1
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 21:24:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 272551DBFF6
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 22:14:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbgETTYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 15:24:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20827 "EHLO
+        id S1727770AbgETUOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 16:14:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21628 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726560AbgETTYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 15:24:23 -0400
+        with ESMTP id S1726860AbgETUOx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 16:14:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590002661;
+        s=mimecast20190719; t=1590005692;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SHISqFlqCMxvBm5+qETPogyLCEcwxqXzDOwnrmZ88k0=;
-        b=hN1wHufP1oeRLChaUAKwA7l4OAiJsaSx4InVRcFAy166XOQPutWEoOj3oPm5+NZnt4CEWo
-        vS4k2V9MAzb6fFJdKSPovaP1QSWXTOwmIKGD+rTlKNt0sCB6ySwjHJyS8jQqbWapksfJ7Z
-        OV9N7Lm9eBtIMo6W08nrDEsYaumuYxc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-Sxjlh7nDMouZhFlG0GrY4w-1; Wed, 20 May 2020 15:24:19 -0400
-X-MC-Unique: Sxjlh7nDMouZhFlG0GrY4w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEA71A0C05;
-        Wed, 20 May 2020 19:24:18 +0000 (UTC)
-Received: from starship (unknown [10.35.206.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 596B85C1BE;
-        Wed, 20 May 2020 19:24:17 +0000 (UTC)
-Message-ID: <6b8674fa647d3b80125477dc344581ba7adfb931.camel@redhat.com>
-Subject: Re: [PATCH 00/24] KVM: nSVM: event fixes and migration support
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
-Date:   Wed, 20 May 2020 22:24:16 +0300
-In-Reply-To: <20200520172145.23284-1-pbonzini@redhat.com>
+        bh=TmIeOpvSLXXYOJ6jQiUjdVDS8jI79jLrqdKnHe80e6k=;
+        b=RU4s/erRaYX5Z2m/bWJjvPNmsj2frBTkT2mpESzTy6YuCuFjU7Dl5tnYP9gJ/r5q4GbVrz
+        3KjaCpG9cwezbdaXczyN86Z6vXZTVG6yp0HjavZZt0uwauzV7IcxPw9Kzs/ImC164pEgVh
+        4K5uY+0oEcXiA5D2olUVbDf8PbpQudo=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-60-PQhL-BdlMbqXNHJSLdZM7A-1; Wed, 20 May 2020 16:14:50 -0400
+X-MC-Unique: PQhL-BdlMbqXNHJSLdZM7A-1
+Received: by mail-ej1-f71.google.com with SMTP id lk22so1805407ejb.15
+        for <kvm@vger.kernel.org>; Wed, 20 May 2020 13:14:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TmIeOpvSLXXYOJ6jQiUjdVDS8jI79jLrqdKnHe80e6k=;
+        b=Bpm+l8L6GIvfw9d4COTavWUn3QyuRBmk5agXw83jcHHS09HbiJB8joHwgz55EE9i4S
+         m7U3QhPPGFdjGH0pSplOGYp6jonfFfyUpPN+p30GOcBP1Dd9XzI82aG9B7T1mB17vVJH
+         37BrOIto2M0vhiIPUS2ohpHuezAtz16T3whOns4lczmQr3Ae6F/5Jj/+NB60e2pWR1hP
+         KxYricu2BQtIxcxQPSPqBaF0GYLCS1Gt0Cuhzgt+tfm2PmvduETspk4IvnPc1imKV6BL
+         eWvokosxneEcCIkEDWg+XXC3WU5/vxbzB/Jh0+o0pMzpYsaud6TxsEtXfzInVZ+oqhjG
+         MJ9g==
+X-Gm-Message-State: AOAM533sUM9ENPd/sh0wTXHWCN8GN1OxGOJNekVpb9ksBl2+B1zppgdN
+        rV0pBbml2+cfRBIULIqDLggG4OnR+n3Md/9gYYcvDPcRV2phXd597vILiS+6usGJngVge6aAGII
+        hm2cLkNhCiIXm
+X-Received: by 2002:aa7:d312:: with SMTP id p18mr2277872edq.88.1590005689543;
+        Wed, 20 May 2020 13:14:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy9E4xDxfsyPrMh6r2RGpLUE9EPbfiGAvLfUmVbbGop5ohjJ6Ao+kQ7cZJbxuKy3kLG3IUc8A==
+X-Received: by 2002:aa7:d312:: with SMTP id p18mr2277856edq.88.1590005689332;
+        Wed, 20 May 2020 13:14:49 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:30f5:232:d7f0:1e71? ([2001:b07:6468:f312:30f5:232:d7f0:1e71])
+        by smtp.gmail.com with ESMTPSA id be12sm2584241edb.11.2020.05.20.13.14.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 May 2020 13:14:48 -0700 (PDT)
+Subject: Re: [PATCH 21/24] KVM: x86: always update CR3 in VMCB
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
 References: <20200520172145.23284-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+ <20200520172145.23284-22-pbonzini@redhat.com>
+ <20200520182202.GB18102@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d85c2e1d-93b3-186d-7df4-80ae6aa03618@redhat.com>
+Date:   Wed, 20 May 2020 22:14:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200520182202.GB18102@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2020-05-20 at 13:21 -0400, Paolo Bonzini wrote:
-> Large parts of this series were posted before (patches 1, 3-4-5 and
-> 6-7-8-12-13-14).  This is basically what I'd like to get into 5.8 as
-> far as nested SVM is concerned; the fix for exception vmexits is related
-> to migration support, because it gets rid of the exit_required flag
-> and therefore consolidates the SVM migration format.
+On 20/05/20 20:22, Sean Christopherson wrote:
+> As an alternative fix, what about marking VCPU_EXREG_CR3 dirty in
+> __set_sregs()?  E.g.
 > 
-> There are a couple more bugfixes (2 and 21), the latter of which actually
-> affects VMX as well.
+> 		/*
+> 		 * Loading vmcs02.GUEST_CR3 is handled by nested VM-Enter, but
+> 		 * it can be explicitly dirtied by KVM_SET_SREGS.
+> 		 */
+> 		if (is_guest_mode(vcpu) &&
+> 		    !test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_dirty))
 > 
-> The SVM migration data consists of:
-> 
-> - the GIF state
-> 
-> - the guest mode and nested-run-pending flags
-> 
-> - the host state from before VMRUN
-> 
-> - the nested VMCB control state
-> 
-> The last two items are conveniently packaged in VMCB format.  Compared
-> to the previous prototype, HF_HIF_MASK is removed since it is part of
-> "the host state from before VMRUN".
-> 
-> The patch has been tested with the QEMU changes after my signature,
-> where it also fixes system_reset while x86/svm.flat runs.
-> 
-> Paolo
-> 
-> Paolo Bonzini (24):
->   KVM: nSVM: fix condition for filtering async PF
->   KVM: nSVM: leave ASID aside in copy_vmcb_control_area
->   KVM: nSVM: inject exceptions via svm_check_nested_events
->   KVM: nSVM: remove exit_required
->   KVM: nSVM: correctly inject INIT vmexits
->   KVM: nSVM: move map argument out of enter_svm_guest_mode
->   KVM: nSVM: extract load_nested_vmcb_control
->   KVM: nSVM: extract preparation of VMCB for nested run
->   KVM: nSVM: clean up tsc_offset update
->   KVM: nSVM: pass vmcb_control_area to copy_vmcb_control_area
->   KVM: nSVM: remove trailing padding for struct vmcb_control_area
->   KVM: nSVM: save all control fields in svm->nested
->   KVM: nSVM: do not reload pause filter fields from VMCB
->   KVM: nSVM: remove HF_VINTR_MASK
->   KVM: nSVM: remove HF_HIF_MASK
->   KVM: nSVM: split nested_vmcb_check_controls
->   KVM: nSVM: do all MMU switch work in init/uninit functions
->   KVM: nSVM: leave guest mode when clearing EFER.SVME
->   KVM: nSVM: extract svm_set_gif
->   KVM: MMU: pass arbitrary CR0/CR4/EFER to kvm_init_shadow_mmu
->   KVM: x86: always update CR3 in VMCB
->   uaccess: add memzero_user
->   selftests: kvm: add a SVM version of state-test
->   KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE
-> 
->  arch/x86/include/asm/kvm_host.h               |   2 -
->  arch/x86/include/asm/svm.h                    |   9 +-
->  arch/x86/include/uapi/asm/kvm.h               |  17 +-
->  arch/x86/kvm/cpuid.h                          |   5 +
->  arch/x86/kvm/irq.c                            |   1 +
->  arch/x86/kvm/mmu.h                            |   2 +-
->  arch/x86/kvm/mmu/mmu.c                        |  14 +-
->  arch/x86/kvm/svm/nested.c                     | 525 +++++++++++-------
->  arch/x86/kvm/svm/svm.c                        | 107 ++--
->  arch/x86/kvm/svm/svm.h                        |  32 +-
->  arch/x86/kvm/vmx/nested.c                     |   5 -
->  arch/x86/kvm/vmx/vmx.c                        |   5 +-
->  arch/x86/kvm/x86.c                            |   3 +-
->  include/linux/uaccess.h                       |   1 +
->  lib/usercopy.c                                |  63 +++
->  .../testing/selftests/kvm/x86_64/state_test.c |  65 ++-
->  16 files changed, 549 insertions(+), 307 deletions(-)
-> 
+> There's already a dependency on __set_sregs() doing
+> kvm_register_mark_available() before kvm_mmu_reset_context(), i.e. the
+> code is already a bit kludgy.  The dirty check would make the kludge less
+> subtle and provide explicit documentation.
 
-I just smoke-tested this patch series on my system.
+A comment in __set_sregs is certainly a good idea.  But checking for
+dirty seems worse since the caching of CR3 is a bit special in this
+respect (it's never marked dirty).
 
-Patch 24 doesn't apply cleanly on top of kvm/queue, I appplied it manually,
-due to missing KVM_STATE_NESTED_MTF_PENDING bit
+This patch should probably be split too, so that the Fixes tags are
+separate for Intel and AMD.
 
-Also patch 22 needes ALIGN_UP which is not on mainline.
-Probably in linux-next?
+Paolo
 
-With these fixes, I don't see #DE exceptions on a nested guest I try to run
-however it still hangs, right around the time it tries to access PS/2 keyboard/mouse.
-
-Best regards,
-	Maxim Levitsky
+>>  			guest_cr3 = vcpu->arch.cr3;
+> 
+> The comment that's just below the context is now stale, e.g. replace
+> vmcs01.GUEST_CR3 with vmcs.GUEST_CR3.
+> 
+>> -- 
+>> 2.18.2
+>>
+>>
+> 
 
