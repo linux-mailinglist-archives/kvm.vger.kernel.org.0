@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0EDE1DBB3D
+	by mail.lfdr.de (Postfix) with ESMTP id 33D131DBB3C
 	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:23:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728284AbgETRWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 13:22:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31373 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728201AbgETRWZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 13:22:25 -0400
+        id S1728206AbgETRWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 13:22:49 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20122 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728213AbgETRW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 13:22:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589995343;
+        s=mimecast20190719; t=1589995344;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=sA7KU69CrSpCKwMi1qZQq/oq6j1VkGR88tbNNKk0nb4=;
-        b=hvhq1ZBFi1SZTsZmZcVlrX1i3lC2pmJp1wFJ4NyprIKCtB1KGfG09EFqSLO2rSQloVNQdO
-        A67PqpQ5W2UT9aD1fJy81orgPAUjPP9yuJSbM/NXJclVDnfGOHso/m7+bWC8ZPakW7apTv
-        Sy0fsIhkHN9IN0jlDiEObLIqQS2mcPo=
+        bh=yRQKE5e2wt/obw3+N38gkuEi0HDMFjMCRqa7dn5fQ8g=;
+        b=GFMuHPZv6PAx2oRyaC5PdAcXlR5fiFvETluInCWzA7bpfx6S+KIKzuoXwB8kaaF347muFA
+        W8KZHwtVz1bh0YT2DbvSQ7mnYpmEYUZAoRrzGx7wdQvl6QrFArQ0mvsHELxiDAlPIbL4Ix
+        MU7ZfFel7R2Uor/IWjTwADepBXFYNcw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-fKrAhJzsNRe3nmIDSTmG8Q-1; Wed, 20 May 2020 13:22:17 -0400
-X-MC-Unique: fKrAhJzsNRe3nmIDSTmG8Q-1
+ us-mta-18-cUNZzNMVNPm2llGsZ97AYQ-1; Wed, 20 May 2020 13:22:22 -0400
+X-MC-Unique: cUNZzNMVNPm2llGsZ97AYQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B50AA1009639;
-        Wed, 20 May 2020 17:22:12 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C617385B690;
+        Wed, 20 May 2020 17:22:13 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD66760554;
-        Wed, 20 May 2020 17:22:11 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA32C60554;
+        Wed, 20 May 2020 17:22:12 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 21/24] KVM: x86: always update CR3 in VMCB
-Date:   Wed, 20 May 2020 13:21:42 -0400
-Message-Id: <20200520172145.23284-22-pbonzini@redhat.com>
+Subject: [PATCH 22/24] uaccess: add memzero_user
+Date:   Wed, 20 May 2020 13:21:43 -0400
+Message-Id: <20200520172145.23284-23-pbonzini@redhat.com>
 In-Reply-To: <20200520172145.23284-1-pbonzini@redhat.com>
 References: <20200520172145.23284-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
@@ -45,94 +45,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vmx_load_mmu_pgd is delaying the write of GUEST_CR3 to prepare_vmcs02 as
-an optimization, but this is only correct before the nested vmentry.
-If userspace is modifying CR3 with KVM_SET_SREGS after the VM has
-already been put in guest mode, the value of CR3 will not be updated.
-Remove the optimization, which almost never triggers anyway.
+This will be used from KVM.  Add it to lib/ so that everyone can use it.
 
-This also applies to SVM, where the code was added in commit 689f3bf21628
-("KVM: x86: unify callbacks to load paging root", 2020-03-16) just to keep the
-two vendor-specific modules closer.
-
-Fixes: 04f11ef45810 ("KVM: nVMX: Always write vmcs02.GUEST_CR3 during nested VM-Enter")
-Fixes: 689f3bf21628 ("KVM: x86: unify callbacks to load paging root")
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c |  6 +-----
- arch/x86/kvm/svm/svm.c    | 16 +++++-----------
- arch/x86/kvm/vmx/vmx.c    |  5 +----
- 3 files changed, 7 insertions(+), 20 deletions(-)
+ include/linux/uaccess.h |  1 +
+ lib/usercopy.c          | 63 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 64 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 19b6a7c954e8..087a04ae74e4 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -260,11 +260,7 @@ static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_v
- 	svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
- 	svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
- 	svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
--	if (npt_enabled) {
--		svm->vmcb->save.cr3 = nested_vmcb->save.cr3;
--		svm->vcpu.arch.cr3 = nested_vmcb->save.cr3;
--	} else
--		(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
-+	(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
+diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
+index 67f016010aad..bd8c85b50e67 100644
+--- a/include/linux/uaccess.h
++++ b/include/linux/uaccess.h
+@@ -232,6 +232,7 @@ __copy_from_user_inatomic_nocache(void *to, const void __user *from,
+ #endif		/* ARCH_HAS_NOCACHE_UACCESS */
  
- 	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2 = nested_vmcb->save.cr2;
- 	kvm_rax_write(&svm->vcpu, nested_vmcb->save.rax);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d8187d25fe04..56be704ffe95 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3465,7 +3465,6 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	bool update_guest_cr3 = true;
- 	unsigned long cr3;
+ extern __must_check int check_zeroed_user(const void __user *from, size_t size);
++extern __must_check int memzero_user(void __user *from, size_t size);
  
- 	cr3 = __sme_set(root);
-@@ -3474,18 +3473,13 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root)
- 		mark_dirty(svm->vmcb, VMCB_NPT);
+ /**
+  * copy_struct_from_user: copy a struct from userspace
+diff --git a/lib/usercopy.c b/lib/usercopy.c
+index cbb4d9ec00f2..82997862bf02 100644
+--- a/lib/usercopy.c
++++ b/lib/usercopy.c
+@@ -33,6 +33,69 @@ unsigned long _copy_to_user(void __user *to, const void *from, unsigned long n)
+ EXPORT_SYMBOL(_copy_to_user);
+ #endif
  
- 		/* Loading L2's CR3 is handled by enter_svm_guest_mode.  */
--		if (is_guest_mode(vcpu))
--			update_guest_cr3 = false;
--		else if (test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
--			cr3 = vcpu->arch.cr3;
--		else /* CR3 is already up-to-date.  */
--			update_guest_cr3 = false;
-+		if (!test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
-+			return;
-+		cr3 = vcpu->arch.cr3;
- 	}
- 
--	if (update_guest_cr3) {
--		svm->vmcb->save.cr3 = cr3;
--		mark_dirty(svm->vmcb, VMCB_CR);
--	}
-+	svm->vmcb->save.cr3 = cr3;
-+	mark_dirty(svm->vmcb, VMCB_CR);
- }
- 
- static int is_disabled(void)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 55712dd86baf..7daf6a50e774 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3085,10 +3085,7 @@ void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long pgd)
- 			spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
- 		}
- 
--		/* Loading vmcs02.GUEST_CR3 is handled by nested VM-Enter. */
--		if (is_guest_mode(vcpu))
--			update_guest_cr3 = false;
--		else if (!enable_unrestricted_guest && !is_paging(vcpu))
-+		if (!enable_unrestricted_guest && !is_paging(vcpu))
- 			guest_cr3 = to_kvm_vmx(kvm)->ept_identity_map_addr;
- 		else if (test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
- 			guest_cr3 = vcpu->arch.cr3;
++/**
++ * memzero_user: write zero bytes to a userspace buffer
++ * @from: Source address, in userspace.
++ * @size: Size of buffer.
++ *
++ * This is effectively shorthand for "memset(from, 0, size)" for
++ * userspace addresses.
++ *
++ * Returns:
++ *  * 0: zeroes have been written to the buffer
++ *  * -EFAULT: access to userspace failed.
++ */
++int memzero_user(void __user *from, size_t size)
++{
++	unsigned long val = 0;
++	unsigned long mask = 0;
++	uintptr_t align = (uintptr_t) from % sizeof(unsigned long);
++
++	if (unlikely(size == 0))
++		return 0;
++
++	from -= align;
++	size += align;
++
++	if (!user_access_begin(from, ALIGN_UP(size, sizeof(unsigned long))))
++		return -EFAULT;
++
++	if (align) {
++		unsafe_get_user(val, (unsigned long __user *) from, err_fault);
++		/* Prepare a mask to keep the first "align" bytes.  */
++		mask = aligned_byte_mask(align);
++	}
++
++	if (size >= sizeof(unsigned long)) {
++		/* The mask only applies to the first full word.  */
++		val &= mask;
++		mask = 0;
++		do {
++			unsafe_put_user(val, (unsigned long __user *) from, err_fault);
++			from += sizeof(unsigned long);
++			size -= sizeof(unsigned long);
++			val = 0;
++		} while (size >= sizeof(unsigned long));
++
++		if (!size)
++			goto done;
++		unsafe_get_user(val, (unsigned long __user *) from, err_fault);
++	}
++
++	/* Bytes after the first "size" have to be kept too. */
++	mask |= ~aligned_byte_mask(size);
++	val &= mask;
++	unsafe_put_user(val, (unsigned long __user *) from, err_fault);
++
++done:
++	user_access_end();
++	return 0;
++err_fault:
++	user_access_end();
++	return -EFAULT;
++}
++EXPORT_SYMBOL(memzero_user);
++
+ /**
+  * check_zeroed_user: check if a userspace buffer only contains zero bytes
+  * @from: Source address, in userspace.
 -- 
 2.18.2
 
