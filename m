@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94ABE1DC2D4
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 01:22:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 394441DC2D5
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 01:22:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728833AbgETXWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 19:22:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55142 "EHLO
+        id S1728835AbgETXWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 19:22:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728824AbgETXWr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 19:22:47 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5FD4C061A0E
-        for <kvm@vger.kernel.org>; Wed, 20 May 2020 16:22:47 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id a7so5391359qvl.2
-        for <kvm@vger.kernel.org>; Wed, 20 May 2020 16:22:47 -0700 (PDT)
+        with ESMTP id S1728825AbgETXWw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 19:22:52 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12396C061A0E
+        for <kvm@vger.kernel.org>; Wed, 20 May 2020 16:22:51 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id v1so3399483ybo.23
+        for <kvm@vger.kernel.org>; Wed, 20 May 2020 16:22:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=VxsMS554JLWR89iPy9mpF/D/2CTXeEOUZcB+1twaBHo=;
-        b=Iewzmn0SR81kwOZRE+Dgxy5GnPrvcy4y65rSBjxfbMLAAfrdyXsty+wLiRFHP2C/6I
-         gzAyDyJeK5rL63PDEo7gTCRmEtj5NS8mvFfO7Gg5U/vDNLKBgOCeGzmLrPdXKnq1ryRZ
-         nCxYMWW0BjijXIxV98H1OCLrz2h/v/v9O1W2Qvk01STarNqNmfitifZln0bi8d8DPfgG
-         LlzLUZfK/FutKAduiKHumHBPAmbs513oJeblbCIAUEUEXYPvMEtUnStvBIsqWZ37PLxj
-         RA8f8fqcmusTFVU/aZ2qXoUHF3IJNsdYMgY9f1WqyI/5HKGZMgLbzpCx0Dpgglv+31Dm
-         uphQ==
+        bh=BxbU9eT8tkTtPjBTx42laENngVsHd4PbvwalITP0RgA=;
+        b=FgU0P9y2aEPAgUBIHMU5bNggxedfOIsQNo9LHSGWv9A7WYD3jp9+/bfNrzkrGP3dl9
+         OVP2xyov1oibp+Xpvc+BDv6v1im0DdDX142LuKwRk33b25voFU7ZCil7YvPol8G6E09S
+         REDUUOW26mWgEMT9f9lI1p2oIMCMIkFpNjbkmdb4fO86kbeqofYjHOXLuX1bfSXhwZKM
+         nqQer8xuX+8lVuXK7aJwI87PfeQpqgsni11dWaNkQEF7/KZvhRLMURmC1acSugb1P5ca
+         dQh0TzpEU06bVsYw448X3hVOfes1yFhPkcfmEkz/vz07PAY6jP8CSwth7xCC8s9Vy6QY
+         1I7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=VxsMS554JLWR89iPy9mpF/D/2CTXeEOUZcB+1twaBHo=;
-        b=KR2LBkf1fLDXEbUcqAxoEqiNzVXtDUYhYgA2EnQHUN67fsQAoVoTfczV+3nsTC6/9A
-         38IPMa33659nTNbs4bmyiZVCy6E2tBOKWfsMk8oRcIv5aUlzXTZcc462nZAB2KCRyk55
-         b+Pzf5D02O/o/EowoQMG3xyxcPX+H8L5B1zUcenaGUscWl1EczN7D6vjMDd1qONGNX1w
-         CjTgGyhwjaqzNQS8amWAPt8hBRKJP6uh8AA7ykX+hUlOkHjMv9EYkCob16TXdfMrycaF
-         PMypkkB8okYFVWddmjEu5ADUCFowYeGLyQ+OJjYpe7GKHegRqq6qibOENy5mV+Vc2MBR
-         2yUA==
-X-Gm-Message-State: AOAM532zX6Y8g1dTQ34aOatRXEiHSNo/h7uHUCVaqp11DEca5mHiNJIl
-        vN3DC2Ldm/3yx/8nDMmhfZGhfKAohUpa4zgcJF3o0SnpPlMl61gxTA+Y2cHBO8A4hTISWfLN+Cs
-        7IsZu79TuoZO605FFdte3l6lmVJAqlWhnddod5oKCp0cGeDYIpKd5ocV3wFeqwPWFPYqnoY3ZE1
-        mx3Ek=
-X-Google-Smtp-Source: ABdhPJz5IaSkJAWK30LmL8uVGDneH3BwDRjmYAI1MrV+IQ3U2TrKpwY2RyGzVCkDHk4WeOjKgxCbZyLlX9qREhE2GPsE1A==
-X-Received: by 2002:a0c:b2c5:: with SMTP id d5mr7492388qvf.36.1590016966853;
- Wed, 20 May 2020 16:22:46 -0700 (PDT)
-Date:   Wed, 20 May 2020 16:22:27 -0700
+        bh=BxbU9eT8tkTtPjBTx42laENngVsHd4PbvwalITP0RgA=;
+        b=cSgV0C2dkh/IDcHDeSGWOYr5Je0iVZEN6u+0JaZJwkdwkymWipRCX0c7A7FcBzD/Bo
+         gJmre5NAJ++Nzy+4pf/tjRLgy7FoOW4dQlGl+08YExEdPXDF0gaf/UqpB8UjcT+LdDqW
+         FnxmxJHKYr92gE9TBM0GBgcYrZ5l6lqDJVDGdHaoXlRDW1D+P/JvWsGwyNaRF/G2bXbw
+         6iEOy1xUD4C8F7elgRjANcr9vK/t9TfgEdADorC2P67JyZO/muktQzTR74rrdJQJ0twc
+         o+RFeo4acDIJbnJJM1M4O6aYIVGQIkYrf/cOM1fhHLH7ObhfBmo35t4Ippk/DfBHdR/m
+         QjAg==
+X-Gm-Message-State: AOAM531KvPDXGnT/eFKWSFKU/r6Dl8IZM8FGt+Dt4+QkNQvsI2hA/DzI
+        xauIU6fxRPIfud6RUEpnRbsmm3UvweNVOyj6qeXI7uxxTUEZv76EYCq4+3GNKv+XunMgu4RAG9P
+        EbUvTpmsnpde51HX1r6Q2/svwSUIn6SylARmD4PlVzLnwiKeNgqOzUtxpMGqZzUDND9d+gOyp5B
+        hOSlE=
+X-Google-Smtp-Source: ABdhPJyzpGIH5YvlCsv2KwG4OXmfEJ124CyhYtcfGbrPdcjvveFtqkeugKpRpXgj2sO6gShSfOtCkoa+KYgPv4sXtqVb2g==
+X-Received: by 2002:a25:c08b:: with SMTP id c133mr10899753ybf.286.1590016970239;
+ Wed, 20 May 2020 16:22:50 -0700 (PDT)
+Date:   Wed, 20 May 2020 16:22:28 -0700
 In-Reply-To: <20200520232228.55084-1-makarandsonare@google.com>
-Message-Id: <20200520232228.55084-2-makarandsonare@google.com>
+Message-Id: <20200520232228.55084-3-makarandsonare@google.com>
 Mime-Version: 1.0
 References: <20200520232228.55084-1-makarandsonare@google.com>
 X-Mailer: git-send-email 2.26.2.761.g0e0b3e54be-goog
-Subject: [PATCH  1/2 v3] KVM: nVMX: Fix VMX preemption timer migration
+Subject: [PATCH  2/2 v3] KVM: selftests: VMX preemption timer migration test
 From:   Makarand Sonare <makarandsonare@google.com>
 To:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
 Cc:     Makarand Sonare <makarandsonare@google.com>
@@ -61,233 +61,397 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Shier <pshier@google.com>
+When a nested VM with a VMX-preemption timer is migrated, verify that the
+nested VM and its parent VM observe the VMX-preemption timer exit close to
+the original expiration deadline.
 
-Add new field to hold preemption timer expiration deadline
-appended to struct kvm_vmx_nested_state_hdr. This is to prevent
-the first VM-Enter after migration from incorrectly restarting the timer
-with the full timer value instead of partially decayed timer value.
-KVM_SET_NESTED_STATE restarts timer using migrated state regardless
-of whether L1 sets VM_EXIT_SAVE_VMX_PREEMPTION_TIMER.
-
-Fixes: cf8b84f48a593 ("kvm: nVMX: Prepare for checkpointing L2 state")
-
-Signed-off-by: Peter Shier <pshier@google.com>
 Signed-off-by: Makarand Sonare <makarandsonare@google.com>
-Change-Id: I6446aba5a547afa667f0ef4620b1b76115bf3753
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Change-Id: Ia79337c682ee161399525edc34201fad473fc190
 ---
- Documentation/virt/kvm/api.rst  |  4 +++
- arch/x86/include/uapi/asm/kvm.h |  3 +++
- arch/x86/kvm/vmx/nested.c       | 45 ++++++++++++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.h          |  2 ++
- arch/x86/kvm/x86.c              |  3 ++-
- include/uapi/linux/kvm.h        |  1 +
- 6 files changed, 50 insertions(+), 8 deletions(-)
+ tools/arch/x86/include/uapi/asm/kvm.h         |   1 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   2 +
+ .../selftests/kvm/include/x86_64/processor.h  |  11 +-
+ .../selftests/kvm/include/x86_64/vmx.h        |  27 ++
+ .../kvm/x86_64/vmx_preemption_timer_test.c    | 255 ++++++++++++++++++
+ 7 files changed, 294 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index d871dacb984e9..d84364cdc66a9 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4326,6 +4326,9 @@ Errors:
-   #define KVM_STATE_NESTED_RUN_PENDING		0x00000002
-   #define KVM_STATE_NESTED_EVMCS		0x00000004
-
-+  /* Available with KVM_CAP_NESTED_STATE_PREEMPTION_TIMER */
-+  #define KVM_STATE_NESTED_PREEMPTION_TIMER	0x00000010
-+
-   #define KVM_STATE_NESTED_FORMAT_VMX		0
-   #define KVM_STATE_NESTED_FORMAT_SVM		1
-
-@@ -4337,6 +4340,7 @@ Errors:
-   struct kvm_vmx_nested_state_hdr {
- 	__u64 vmxon_pa;
- 	__u64 vmcs12_pa;
+diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+index 3f3f780c8c650..43e24903812c4 100644
+--- a/tools/arch/x86/include/uapi/asm/kvm.h
++++ b/tools/arch/x86/include/uapi/asm/kvm.h
+@@ -400,6 +400,7 @@ struct kvm_sync_regs {
+ struct kvm_vmx_nested_state_data {
+ 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+ 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
 +	__u64 preemption_timer_deadline;
+ };
 
- 	struct {
- 		__u16 flags;
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 3f3f780c8c650..3b651cd583c0c 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -391,6 +391,8 @@ struct kvm_sync_regs {
- #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
- #define KVM_STATE_NESTED_EVMCS		0x00000004
- #define KVM_STATE_NESTED_MTF_PENDING	0x00000008
-+/* Available with KVM_CAP_NESTED_STATE_PREEMPTION_TIMER */
-+#define KVM_STATE_NESTED_PREEMPTION_TIMER	0x00000010
-
- #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
-@@ -405,6 +407,7 @@ struct kvm_vmx_nested_state_data {
  struct kvm_vmx_nested_state_hdr {
- 	__u64 vmxon_pa;
- 	__u64 vmcs12_pa;
-+	__u64 preemption_timer_deadline;
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 222e50104296a..f159718f90c0a 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -10,6 +10,7 @@
+ /x86_64/set_sregs_test
+ /x86_64/smm_test
+ /x86_64/state_test
++/x86_64/vmx_preemption_timer_test
+ /x86_64/svm_vmcall_test
+ /x86_64/sync_regs_test
+ /x86_64/vmx_close_while_nested_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index c66f4eec34111..780f0c189a7bc 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -20,6 +20,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+ TEST_GEN_PROGS_x86_64 += x86_64/state_test
++TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
+ TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
+ TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index e244c6ecfc1d5..919e161dd2893 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -314,6 +314,8 @@ void ucall_uninit(struct kvm_vm *vm);
+ void ucall(uint64_t cmd, int nargs, ...);
+ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
 
- 	struct {
- 		__u16 flags;
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 51ebb60e1533a..46dc2ef731b37 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2092,9 +2092,9 @@ static enum hrtimer_restart vmx_preemption_timer_fn(struct hrtimer *timer)
- 	return HRTIMER_NORESTART;
- }
-
--static void vmx_start_preemption_timer(struct kvm_vcpu *vcpu)
-+static void vmx_start_preemption_timer(struct kvm_vcpu *vcpu,
-+					u64 preemption_timeout)
++#define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
++				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+ #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
+ #define GUEST_DONE()		ucall(UCALL_DONE, 0)
+ #define __GUEST_ASSERT(_condition, _nargs, _args...) do {	\
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 7428513a4c687..7cb19eca6c72d 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -79,13 +79,16 @@ static inline uint64_t get_desc64_base(const struct desc64 *desc)
+ static inline uint64_t rdtsc(void)
  {
--	u64 preemption_timeout = get_vmcs12(vcpu)->vmx_preemption_timer_value;
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-
- 	/*
-@@ -3353,8 +3353,21 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 	 * the timer.
- 	 */
- 	vmx->nested.preemption_timer_expired = false;
--	if (nested_cpu_has_preemption_timer(vmcs12))
--		vmx_start_preemption_timer(vcpu);
-+	if (nested_cpu_has_preemption_timer(vmcs12)) {
-+		u64 timer_value = 0;
-+		u64 l1_scaled_tsc_value = (kvm_read_l1_tsc(vcpu, rdtsc())
-+					   >> VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE);
-+
-+		if (!vmx->nested.has_preemption_timer_deadline) {
-+			timer_value = vmcs12->vmx_preemption_timer_value;
-+			vmx->nested.preemption_timer_deadline = timer_value +
-+								l1_scaled_tsc_value;
-+			vmx->nested.has_preemption_timer_deadline = true;
-+		} else if (l1_scaled_tsc_value <= vmx->nested.preemption_timer_deadline)
-+			timer_value = vmx->nested.preemption_timer_deadline -
-+				      l1_scaled_tsc_value;
-+		vmx_start_preemption_timer(vcpu, timer_value);
-+	}
-
- 	/*
- 	 * Note no nested_vmx_succeed or nested_vmx_fail here. At this point
-@@ -3462,6 +3475,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 	 * the nested entry.
- 	 */
- 	vmx->nested.nested_run_pending = 1;
-+	vmx->nested.has_preemption_timer_deadline = false;
- 	status = nested_vmx_enter_non_root_mode(vcpu, true);
- 	if (unlikely(status != NVMX_VMENTRY_SUCCESS))
- 		goto vmentry_failed;
-@@ -3962,9 +3976,11 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
- 		vmcs12->guest_activity_state = GUEST_ACTIVITY_ACTIVE;
-
- 	if (nested_cpu_has_preemption_timer(vmcs12) &&
--	    vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
-+	    !vmx->nested.nested_run_pending) {
-+		if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
- 			vmcs12->vmx_preemption_timer_value =
- 				vmx_get_preemption_timer_value(vcpu);
-+	}
-
- 	/*
- 	 * In some cases (usually, nested EPT), L2 is allowed to change its
-@@ -5898,6 +5914,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
- 		.size = sizeof(kvm_state),
- 		.hdr.vmx.vmxon_pa = -1ull,
- 		.hdr.vmx.vmcs12_pa = -1ull,
-+		.hdr.vmx.preemption_timer_deadline = 0,
- 	};
- 	struct kvm_vmx_nested_state_data __user *user_vmx_nested_state =
- 		&user_kvm_nested_state->data.vmx[0];
-@@ -5939,6 +5956,14 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
-
- 			if (vmx->nested.mtf_pending)
- 				kvm_state.flags |= KVM_STATE_NESTED_MTF_PENDING;
-+
-+			if (nested_cpu_has_preemption_timer(vmcs12) &&
-+			    vmx->nested.has_preemption_timer_deadline) {
-+				kvm_state.flags |=
-+					KVM_STATE_NESTED_PREEMPTION_TIMER;
-+				kvm_state.hdr.vmx.preemption_timer_deadline =
-+					vmx->nested.preemption_timer_deadline;
-+			}
- 		}
- 	}
-
-@@ -5984,7 +6009,6 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
- 				 get_shadow_vmcs12(vcpu), VMCS12_SIZE))
- 			return -EFAULT;
- 	}
+ 	uint32_t eax, edx;
 -
- out:
- 	return kvm_state.size;
- }
-@@ -6056,7 +6080,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
++	uint32_t tsc_val;
+ 	/*
+ 	 * The lfence is to wait (on Intel CPUs) until all previous
+-	 * instructions have been executed.
++	 * instructions have been executed. If software requires RDTSC to be
++	 * executed prior to execution of any subsequent instruction, it can
++	 * execute LFENCE immediately after RDTSC
  	 */
- 	if (is_smm(vcpu) ?
- 		(kvm_state->flags &
--		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING))
-+		 (KVM_STATE_NESTED_GUEST_MODE | KVM_STATE_NESTED_RUN_PENDING |
-+		  KVM_STATE_NESTED_PREEMPTION_TIMER))
- 		: kvm_state->hdr.vmx.smm.flags)
- 		return -EINVAL;
+-	__asm__ __volatile__("lfence; rdtsc" : "=a"(eax), "=d"(edx));
+-	return ((uint64_t)edx) << 32 | eax;
++	__asm__ __volatile__("lfence; rdtsc; lfence" : "=a"(eax), "=d"(edx));
++	tsc_val = ((uint64_t)edx) << 32 | eax;
++	return tsc_val;
+ }
 
-@@ -6146,6 +6171,12 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 			goto error_guest_mode;
- 	}
+ static inline uint64_t rdtscp(uint32_t *aux)
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index 3d27069b9ed9c..ccff3e6e27048 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -575,6 +575,33 @@ struct vmx_pages {
+ 	void *eptp;
+ };
 
-+	if (kvm_state->flags & KVM_STATE_NESTED_PREEMPTION_TIMER) {
-+		vmx->nested.has_preemption_timer_deadline = true;
-+		vmx->nested.preemption_timer_deadline =
-+			kvm_state->hdr.vmx.preemption_timer_deadline;
++union vmx_basic {
++	u64 val;
++	struct {
++		u32 revision;
++		u32	size:13,
++			reserved1:3,
++			width:1,
++			dual:1,
++			type:4,
++			insouts:1,
++			ctrl:1,
++			vm_entry_exception_ctrl:1,
++			reserved2:7;
++	};
++};
++
++union vmx_ctrl_msr {
++	u64 val;
++	struct {
++		u32 set, clr;
++	};
++};
++
++union vmx_basic basic;
++union vmx_ctrl_msr ctrl_pin_rev;
++union vmx_ctrl_msr ctrl_exit_rev;
++
+ struct vmx_pages *vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva);
+ bool prepare_for_vmx_operation(struct vmx_pages *vmx);
+ void prepare_vmcs(struct vmx_pages *vmx, void *guest_rip, void *guest_rsp);
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+new file mode 100644
+index 0000000000000..e2f5dccb4d5ba
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+@@ -0,0 +1,255 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * VMX-preemption timer test
++ *
++ * Copyright (C) 2020, Google, LLC.
++ *
++ * Test to ensure the VM-Enter after migration doesn't
++ * incorrectly restarts the timer with the full timer
++ * value instead of partially decayed timer value
++ *
++ */
++#define _GNU_SOURCE /* for program_invocation_short_name */
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
++
++#include "test_util.h"
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "vmx.h"
++
++#define VCPU_ID		5
++#define PREEMPTION_TIMER_VALUE			100000000ull
++#define PREEMPTION_TIMER_VALUE_THRESHOLD1	 80000000ull
++
++u32 vmx_pt_rate;
++bool l2_save_restore_done;
++static u64 l2_vmx_pt_start;
++volatile u64 l2_vmx_pt_finish;
++
++void l2_guest_code(void)
++{
++	u64 vmx_pt_delta;
++
++	vmcall();
++	l2_vmx_pt_start = (rdtsc() >> vmx_pt_rate) << vmx_pt_rate;
++
++	/*
++	 * Wait until the 1st threshold has passed
++	 */
++	do {
++		l2_vmx_pt_finish = rdtsc();
++		vmx_pt_delta = (l2_vmx_pt_finish - l2_vmx_pt_start) >>
++				vmx_pt_rate;
++	} while (vmx_pt_delta < PREEMPTION_TIMER_VALUE_THRESHOLD1);
++
++	/*
++	 * Force L2 through Save and Restore cycle
++	 */
++	GUEST_SYNC(1);
++
++	l2_save_restore_done = 1;
++
++	/*
++	 * Now wait for the preemption timer to fire and
++	 * exit to L1
++	 */
++	while ((l2_vmx_pt_finish = rdtsc()))
++		;
++}
++
++void l1_guest_code(struct vmx_pages *vmx_pages)
++{
++#define L2_GUEST_STACK_SIZE 64
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	u64 l1_vmx_pt_start;
++	u64 l1_vmx_pt_finish;
++	u64 l1_tsc_deadline, l2_tsc_deadline;
++
++	GUEST_ASSERT(vmx_pages->vmcs_gpa);
++	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
++	GUEST_ASSERT(load_vmcs(vmx_pages));
++	GUEST_ASSERT(vmptrstz() == vmx_pages->vmcs_gpa);
++
++	prepare_vmcs(vmx_pages, l2_guest_code,
++		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	/*
++	 * Check for Preemption timer support
++	 */
++	basic.val = rdmsr(MSR_IA32_VMX_BASIC);
++	ctrl_pin_rev.val = rdmsr(basic.ctrl ? MSR_IA32_VMX_TRUE_PINBASED_CTLS
++			: MSR_IA32_VMX_PINBASED_CTLS);
++	ctrl_exit_rev.val = rdmsr(basic.ctrl ? MSR_IA32_VMX_TRUE_EXIT_CTLS
++			: MSR_IA32_VMX_EXIT_CTLS);
++
++	if (!(ctrl_pin_rev.clr & PIN_BASED_VMX_PREEMPTION_TIMER) ||
++	    !(ctrl_exit_rev.clr & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER))
++		return;
++
++	GUEST_ASSERT(!vmlaunch());
++	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
++	vmwrite(GUEST_RIP, vmreadz(GUEST_RIP) + vmreadz(VM_EXIT_INSTRUCTION_LEN));
++
++	/*
++	 * Turn on PIN control and resume the guest
++	 */
++	GUEST_ASSERT(!vmwrite(PIN_BASED_VM_EXEC_CONTROL,
++			      vmreadz(PIN_BASED_VM_EXEC_CONTROL) |
++			      PIN_BASED_VMX_PREEMPTION_TIMER));
++
++	GUEST_ASSERT(!vmwrite(VMX_PREEMPTION_TIMER_VALUE,
++			      PREEMPTION_TIMER_VALUE));
++
++	vmx_pt_rate = rdmsr(MSR_IA32_VMX_MISC) & 0x1F;
++
++	l2_save_restore_done = 0;
++
++	l1_vmx_pt_start = (rdtsc() >> vmx_pt_rate) << vmx_pt_rate;
++
++	GUEST_ASSERT(!vmresume());
++
++	l1_vmx_pt_finish = rdtsc();
++
++	/*
++	 * Ensure exit from L2 happens after L2 goes through
++	 * save and restore
++	 */
++	GUEST_ASSERT(l2_save_restore_done);
++
++	/*
++	 * Ensure the exit from L2 is due to preemption timer expiry
++	 */
++	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_PREEMPTION_TIMER);
++
++	l1_tsc_deadline = l1_vmx_pt_start +
++		(PREEMPTION_TIMER_VALUE << vmx_pt_rate);
++
++	l2_tsc_deadline = l2_vmx_pt_start +
++		(PREEMPTION_TIMER_VALUE << vmx_pt_rate);
++
++	/*
++	 * Sync with the host and pass the l1|l2 pt_expiry_finish times and
++	 * tsc deadlines so that host can verify they are as expected
++	 */
++	GUEST_SYNC_ARGS(2, l1_vmx_pt_finish, l1_tsc_deadline,
++		l2_vmx_pt_finish, l2_tsc_deadline);
++}
++
++void guest_code(struct vmx_pages *vmx_pages)
++{
++	if (vmx_pages)
++		l1_guest_code(vmx_pages);
++
++	GUEST_DONE();
++}
++
++int main(int argc, char *argv[])
++{
++	vm_vaddr_t vmx_pages_gva = 0;
++
++	struct kvm_regs regs1, regs2;
++	struct kvm_vm *vm;
++	struct kvm_run *run;
++	struct kvm_x86_state *state;
++	struct ucall uc;
++	int stage;
++
++	/*
++	 * AMD currently does not implement any VMX features, so for now we
++	 * just early out.
++	 */
++	nested_vmx_check_supported();
++
++	/* Create VM */
++	vm = vm_create_default(VCPU_ID, 0, guest_code);
++	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
++	run = vcpu_state(vm, VCPU_ID);
++
++	vcpu_regs_get(vm, VCPU_ID, &regs1);
++
++	if (kvm_check_cap(KVM_CAP_NESTED_STATE_PREEMPTION_TIMER)) {
++		vcpu_alloc_vmx(vm, &vmx_pages_gva);
++		vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
++	} else {
++		pr_info("will skip vmx preemption timer checks\n");
++		goto done;
 +	}
 +
- 	if (nested_vmx_check_controls(vcpu, vmcs12) ||
- 	    nested_vmx_check_host_state(vcpu, vmcs12) ||
- 	    nested_vmx_check_guest_state(vcpu, vmcs12, &ignored))
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 298ddef79d009..672c28f17e497 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -169,6 +169,8 @@ struct nested_vmx {
- 	u16 posted_intr_nv;
-
- 	struct hrtimer preemption_timer;
-+	u64 preemption_timer_deadline;
-+	bool has_preemption_timer_deadline;
- 	bool preemption_timer_expired;
-
- 	/* to migrate it to L2 if VM_ENTRY_LOAD_DEBUG_CONTROLS is off */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 471fccf7f8501..ba9e62ffbb4cd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3418,6 +3418,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MSR_PLATFORM_INFO:
- 	case KVM_CAP_EXCEPTION_PAYLOAD:
- 	case KVM_CAP_SET_GUEST_DEBUG:
-+	case KVM_CAP_NESTED_STATE_PREEMPTION_TIMER:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -4626,7 +4627,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-
- 		if (kvm_state.flags &
- 		    ~(KVM_STATE_NESTED_RUN_PENDING | KVM_STATE_NESTED_GUEST_MODE
--		      | KVM_STATE_NESTED_EVMCS))
-+		      | KVM_STATE_NESTED_EVMCS | KVM_STATE_NESTED_PREEMPTION_TIMER))
- 			break;
-
- 		/* nested_run_pending implies guest_mode.  */
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index ac9eba0289d1b..0868dce12a715 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1018,6 +1018,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_PROTECTED 180
- #define KVM_CAP_PPC_SECURE_GUEST 181
- #define KVM_CAP_HALT_POLL 182
-+#define KVM_CAP_NESTED_STATE_PREEMPTION_TIMER 183
-
- #ifdef KVM_CAP_IRQ_ROUTING
-
++	for (stage = 1;; stage++) {
++		_vcpu_run(vm, VCPU_ID);
++		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++			    "Stage %d: unexpected exit reason: %u (%s),\n",
++			    stage, run->exit_reason,
++			    exit_reason_str(run->exit_reason));
++
++		switch (get_ucall(vm, VCPU_ID, &uc)) {
++		case UCALL_ABORT:
++			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
++				  __FILE__, uc.args[1]);
++			/* NOT REACHED */
++		case UCALL_SYNC:
++			break;
++		case UCALL_DONE:
++			goto done;
++		default:
++			TEST_FAIL("Unknown ucall %lu", uc.cmd);
++		}
++
++		/* UCALL_SYNC is handled here.  */
++		TEST_ASSERT(!strcmp((const char *)uc.args[0], "hello") &&
++			    uc.args[1] == stage, "Stage %d: Unexpected register values vmexit, got %lx",
++			    stage, (ulong)uc.args[1]);
++		/*
++		 * If this stage 2 then we should verify the vmx pt expiry
++		 * is as expected.
++		 * From L1's perspective verify Preemption timer hasn't
++		 * expired too early.
++		 * From L2's perspective verify Preemption timer hasn't
++		 * expired too late.
++		 */
++		if (stage == 2) {
++
++			pr_info("Stage %d: L1 PT expiry TSC (%lu) , L1 TSC deadline (%lu)\n",
++				stage, uc.args[2], uc.args[3]);
++
++			pr_info("Stage %d: L2 PT expiry TSC (%lu) , L2 TSC deadline (%lu)\n",
++				stage, uc.args[4], uc.args[5]);
++
++			TEST_ASSERT(uc.args[2] >= uc.args[3],
++				"Stage %d: L1 PT expiry TSC (%lu) < L1 TSC deadline (%lu)",
++				stage, uc.args[2], uc.args[3]);
++
++			TEST_ASSERT(uc.args[4] < uc.args[5],
++				"Stage %d: L2 PT expiry TSC (%lu) > L2 TSC deadline (%lu)",
++				stage, uc.args[4], uc.args[5]);
++		}
++
++		state = vcpu_save_state(vm, VCPU_ID);
++		memset(&regs1, 0, sizeof(regs1));
++		vcpu_regs_get(vm, VCPU_ID, &regs1);
++
++		kvm_vm_release(vm);
++
++		/* Restore state in a new VM.  */
++		kvm_vm_restart(vm, O_RDWR);
++		vm_vcpu_add(vm, VCPU_ID);
++		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
++		vcpu_load_state(vm, VCPU_ID, state);
++		run = vcpu_state(vm, VCPU_ID);
++		free(state);
++
++		memset(&regs2, 0, sizeof(regs2));
++		vcpu_regs_get(vm, VCPU_ID, &regs2);
++		TEST_ASSERT(!memcmp(&regs1, &regs2, sizeof(regs2)),
++			    "Unexpected register values after vcpu_load_state; rdi: %lx rsi: %lx",
++			    (ulong) regs2.rdi, (ulong) regs2.rsi);
++	}
++
++done:
++	kvm_vm_free(vm);
++}
 --
 2.26.2.761.g0e0b3e54be-goog
 
