@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D90BA1DB356
+	by mail.lfdr.de (Postfix) with ESMTP id 6C7531DB355
 	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 14:33:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726966AbgETMdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726938AbgETMdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 20 May 2020 08:33:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59647 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726932AbgETMdL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 08:33:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32425 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726954AbgETMdL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 May 2020 08:33:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1589977990;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G+Q/bCcGxu/TLcmT5kzaNkPfTkRtnf8A1jkEIipEur4=;
-        b=gPzN6UuVYZNt7TL0OO4lIatFxLheCrqVKU8lbJmtp1DoYwsD/uRn8uTma+nhK5SzFjmTar
-        H59Esmm6I1bBKus8LUfEFmdiFws7kEMbibwMa/YIWoIEFCj8Vee1HUDaNgNLrw6iMtQUWm
-        BxW/x8bULxviaVhfbBMs2LQcKEOPPY0=
+        bh=sdpjenewQz/H4V5/mqin3G1PK9j+2PZi+WLSTA5b8QE=;
+        b=VWdWly7S2z6gKLaWm8WBjiLrixD7QKhlqIEVUy/P14h57uXHbE9RjSMEsCwxG3EuKAeRsB
+        Hxqij/Mei2eOXXU7lzuKmeC1D6UcmN9gSq174w1VCzFjISDfUfJOHVxcB9xt1egvFg67+P
+        zFk9W2vbnpIrjfBtBln9TFkyC7WZ+Lg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-7z4W-O3_OOaLoEcdt-TCVw-1; Wed, 20 May 2020 08:33:06 -0400
-X-MC-Unique: 7z4W-O3_OOaLoEcdt-TCVw-1
+ us-mta-305-5gXcNDydMGi75JluHA8qeg-1; Wed, 20 May 2020 08:33:08 -0400
+X-MC-Unique: 5gXcNDydMGi75JluHA8qeg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 261831800D42;
-        Wed, 20 May 2020 12:33:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82B0D18FE860;
+        Wed, 20 May 2020 12:33:07 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-76.ams2.redhat.com [10.36.113.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BC0961547;
-        Wed, 20 May 2020 12:33:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 747F46E9EA;
+        Wed, 20 May 2020 12:33:05 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -42,13 +42,10 @@ Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         David Hildenbrand <david@redhat.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH v2 15/19] pc: Support for virtio-mem-pci
-Date:   Wed, 20 May 2020 14:31:48 +0200
-Message-Id: <20200520123152.60527-16-david@redhat.com>
+        Igor Mammedov <imammedo@redhat.com>
+Subject: [PATCH v2 16/19] virtio-mem: Allow notifiers for size changes
+Date:   Wed, 20 May 2020 14:31:49 +0200
+Message-Id: <20200520123152.60527-17-david@redhat.com>
 In-Reply-To: <20200520123152.60527-1-david@redhat.com>
 References: <20200520123152.60527-1-david@redhat.com>
 MIME-Version: 1.0
@@ -59,162 +56,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's wire it up similar to virtio-pmem. Also disallow unplug, so it's
-harder for users to shoot themselves into the foot.
+We want to send qapi events in case the size of a virtio-mem device
+changes. This allows upper layers to always know how much memory is
+actually currently consumed via a virtio-mem device.
 
-Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Unfortuantely, we have to report the id of our proxy device. Let's provide
+an easy way for our proxy device to register, so it can send the qapi
+events. Piggy-backing on the notifier infrastructure (although we'll
+only ever have one notifier registered) seems to be an easy way.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/i386/Kconfig |  1 +
- hw/i386/pc.c    | 49 ++++++++++++++++++++++++++++---------------------
- 2 files changed, 29 insertions(+), 21 deletions(-)
+ hw/virtio/virtio-mem.c         | 21 ++++++++++++++++++++-
+ include/hw/virtio/virtio-mem.h |  5 +++++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index c93f32f657..03e347b207 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -35,6 +35,7 @@ config PC
-     select ACPI_PCI
-     select ACPI_VMGENID
-     select VIRTIO_PMEM_SUPPORTED
-+    select VIRTIO_MEM_SUPPORTED
- 
- config PC_PCI
-     bool
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2128f3d6fe..f071b6f63c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -86,6 +86,7 @@
- #include "hw/net/ne2000-isa.h"
- #include "standard-headers/asm-x86/bootparam.h"
- #include "hw/virtio/virtio-pmem-pci.h"
-+#include "hw/virtio/virtio-mem-pci.h"
- #include "hw/mem/memory-device.h"
- #include "sysemu/replay.h"
- #include "qapi/qmp/qerror.h"
-@@ -1657,8 +1658,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     numa_cpu_pre_plug(cpu_slot, dev, errp);
- }
- 
--static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
--                                        DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_pre_plug(HotplugHandler *hotplug_dev,
-+                                      DeviceState *dev, Error **errp)
- {
-     HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-     Error *local_err = NULL;
-@@ -1669,7 +1670,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
-          * order. This should never be the case on x86, however better add
-          * a safety net.
-          */
--        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
-+        error_setg(errp,
-+                   "virtio based memory devices not supported on this bus.");
-         return;
-     }
-     /*
-@@ -1684,8 +1686,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
-     error_propagate(errp, local_err);
- }
- 
--static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
--                                    DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_plug(HotplugHandler *hotplug_dev,
-+                                  DeviceState *dev, Error **errp)
- {
-     HotplugHandler *hotplug_dev2 = qdev_get_bus_hotplug_handler(dev);
-     Error *local_err = NULL;
-@@ -1703,17 +1705,17 @@ static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
-     error_propagate(errp, local_err);
- }
- 
--static void pc_virtio_pmem_pci_unplug_request(HotplugHandler *hotplug_dev,
--                                              DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_unplug_request(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **errp)
- {
--    /* We don't support virtio pmem hot unplug */
--    error_setg(errp, "virtio pmem device unplug not supported.");
-+    /* We don't support hot unplug of virtio based memory devices */
-+    error_setg(errp, "virtio based memory devices cannot be unplugged.");
- }
- 
--static void pc_virtio_pmem_pci_unplug(HotplugHandler *hotplug_dev,
--                                      DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_unplug(HotplugHandler *hotplug_dev,
-+                                    DeviceState *dev, Error **errp)
- {
--    /* We don't support virtio pmem hot unplug */
-+    /* We don't support hot unplug of virtio based memory devices */
- }
- 
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-@@ -1723,8 +1725,9 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-         pc_memory_pre_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_pre_plug(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_pre_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_pre_plug(hotplug_dev, dev, errp);
-     }
- }
- 
-@@ -1735,8 +1738,9 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-         pc_memory_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_plug(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_plug(hotplug_dev, dev, errp);
-     }
- }
- 
-@@ -1747,8 +1751,9 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-         pc_memory_unplug_request(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_unplug_request(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_unplug_request(hotplug_dev, dev, errp);
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index a7b5a02dac..11c500960c 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -177,6 +177,7 @@ static int virtio_mem_state_change_request(VirtIOMEM *vmem, uint64_t gpa,
      } else {
-         error_setg(errp, "acpi: device unplug request for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -1762,8 +1767,9 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-         pc_memory_unplug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_cb(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_unplug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_unplug(hotplug_dev, dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -1775,7 +1781,8 @@ static HotplugHandler *pc_get_hotplug_handler(MachineState *machine,
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
-         object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
--        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-         return HOTPLUG_HANDLER(machine);
+         vmem->size -= size;
      }
++    notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
+     return VIRTIO_MEM_RESP_ACK;
+ }
  
+@@ -232,7 +233,10 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+         return -EBUSY;
+     }
+     bitmap_clear(vmem->bitmap, 0, vmem->bitmap_size);
+-    vmem->size = 0;
++    if (vmem->size) {
++        vmem->size = 0;
++        notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
++    }
+ 
+     virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
+     return 0;
+@@ -553,6 +557,18 @@ static MemoryRegion *virtio_mem_get_memory_region(VirtIOMEM *vmem, Error **errp)
+     return &vmem->memdev->mr;
+ }
+ 
++static void virtio_mem_add_size_change_notifier(VirtIOMEM *vmem,
++                                                Notifier *notifier)
++{
++    notifier_list_add(&vmem->size_change_notifiers, notifier);
++}
++
++static void virtio_mem_remove_size_change_notifier(VirtIOMEM *vmem,
++                                                   Notifier *notifier)
++{
++    notifier_remove(notifier);
++}
++
+ static void virtio_mem_get_size(Object *obj, Visitor *v, const char *name,
+                                 void *opaque, Error **errp)
+ {
+@@ -664,6 +680,7 @@ static void virtio_mem_instance_init(Object *obj)
+     VirtIOMEM *vmem = VIRTIO_MEM(obj);
+ 
+     vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
++    notifier_list_init(&vmem->size_change_notifiers);
+ 
+     object_property_add(obj, VIRTIO_MEM_SIZE_PROP, "size", virtio_mem_get_size,
+                         NULL, NULL, NULL);
+@@ -701,6 +718,8 @@ static void virtio_mem_class_init(ObjectClass *klass, void *data)
+ 
+     vmc->fill_device_info = virtio_mem_fill_device_info;
+     vmc->get_memory_region = virtio_mem_get_memory_region;
++    vmc->add_size_change_notifier = virtio_mem_add_size_change_notifier;
++    vmc->remove_size_change_notifier = virtio_mem_remove_size_change_notifier;
+ }
+ 
+ static const TypeInfo virtio_mem_info = {
+diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
+index 26b90e8f3e..408a6ede50 100644
+--- a/include/hw/virtio/virtio-mem.h
++++ b/include/hw/virtio/virtio-mem.h
+@@ -64,6 +64,9 @@ typedef struct VirtIOMEM {
+ 
+     /* block size and alignment */
+     uint32_t block_size;
++
++    /* notifiers to notify when "size" changes */
++    NotifierList size_change_notifiers;
+ } VirtIOMEM;
+ 
+ typedef struct VirtIOMEMClass {
+@@ -73,6 +76,8 @@ typedef struct VirtIOMEMClass {
+     /* public */
+     void (*fill_device_info)(const VirtIOMEM *vmen, VirtioMEMDeviceInfo *vi);
+     MemoryRegion *(*get_memory_region)(VirtIOMEM *vmem, Error **errp);
++    void (*add_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
++    void (*remove_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
+ } VirtIOMEMClass;
+ 
+ #endif
 -- 
 2.25.4
 
