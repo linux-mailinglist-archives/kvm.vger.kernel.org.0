@@ -2,69 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7B911DC11D
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 23:14:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 823351DC12C
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 23:16:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728374AbgETVNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 17:13:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47257 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727018AbgETVNn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 17:13:43 -0400
+        id S1728037AbgETVP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 17:15:57 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57282 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727897AbgETVP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 17:15:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590009222;
+        s=mimecast20190719; t=1590009355;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9q+MVTxOqNCDfm1aFUF9Xo/SKnt2cacs55IlEoGNHvA=;
-        b=BxCzdY+3MbA1RUT5qin0HMzJCjVDoKY1np0AuXMNEOEajskwKVXo3wD9aGivEgX30qsIHR
-        GyvNkXpxOcVIJxsuNRKuhVakEggnC82tnc3Rb4oNfWg4Uzw1dbXAw9iHos9zSThdiuBo06
-        FXkAe+TnPqXay7+xZ3L+EKxr89esOaM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-4trkXZHsP0mRT_0ub-M1wQ-1; Wed, 20 May 2020 17:13:38 -0400
-X-MC-Unique: 4trkXZHsP0mRT_0ub-M1wQ-1
-Received: by mail-ed1-f71.google.com with SMTP id x11so1795809edj.21
-        for <kvm@vger.kernel.org>; Wed, 20 May 2020 14:13:38 -0700 (PDT)
+        bh=nn5uBihfGYPam0z7Bth4Bg/2LeoczkcBonH1Rf5fkTY=;
+        b=C+Kat4jSu/ByOMLoiVlwfmz4kYR4LVhM0FEntwGPSV/2zMyoCq5Uj6qE5Vu+z8KBRVyQai
+        ltUMDCGPJdlFC9K9d/3fnoSG7CGAN1PdPSwn0SPW7XH2CnNfvclbtkYHuC5oDVulsVvY6S
+        vIzTgKS+zFMu2VULivJIQ9qWM8+qk2Y=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-0EwtpRNxMmGLd_Zx5T0Ppg-1; Wed, 20 May 2020 17:15:53 -0400
+X-MC-Unique: 0EwtpRNxMmGLd_Zx5T0Ppg-1
+Received: by mail-ej1-f69.google.com with SMTP id t26so1866491ejs.19
+        for <kvm@vger.kernel.org>; Wed, 20 May 2020 14:15:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=9q+MVTxOqNCDfm1aFUF9Xo/SKnt2cacs55IlEoGNHvA=;
-        b=VkGXdSifb+YVt/4sRQYkfI3/d/IEsCjJ2Nb+YWHnKxEa3dxhXkA3nT8eNqJCgrap2s
-         546Yh+lcaexqKJ5DseKXgXOW1EOsA49dMk2IldBKXw3F3K61/SKB45kPf+kQUD1KhSeb
-         afhr7kS+oFh+zOFkywnX8BiboSJcANJoUyXrDiNPFR6xeXdLjf2exnoOUpTgJfCjeGfQ
-         04RZIz6cGhVMYuUuraeO8lW0qFtNg129l6+1uJOA5iAci7QytJFMcblybNO/tv1ZYRmB
-         NaFjunn72cHLmrKVLq9deW251s7fsQGSI2NnqcZWA0MS5ZcYGsBRuWkQGVC7LXG73t5r
-         v1wA==
-X-Gm-Message-State: AOAM531DCwIzuuTdYSmULI7zAmtn0BsCgliLlzXLta9opkKLm/qFxePm
-        Z7Ilj2nZhLmYzj75aALwnKWZge1HTIDf4e1XgZrdVenr4h9kDtODaYMmvotBJiZ8uKKEqTjbDFN
-        0IC9DRd5Wt6Aq
-X-Received: by 2002:a17:906:4886:: with SMTP id v6mr932539ejq.11.1590009217557;
-        Wed, 20 May 2020 14:13:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzQQ/ymyohkomsuFQ61gv/edSNt58FILtFnlIurwiVtnbBAEtNk/6YFqAQpcZtu96ld+iDlDQ==
-X-Received: by 2002:a17:906:4886:: with SMTP id v6mr932525ejq.11.1590009217375;
-        Wed, 20 May 2020 14:13:37 -0700 (PDT)
+        bh=nn5uBihfGYPam0z7Bth4Bg/2LeoczkcBonH1Rf5fkTY=;
+        b=Xp5DmbWrKb1u2aHHsi3vI3sud/G9wDHhWVbZ2FLs3ckymdhxOqUAxIONa0fuarV2PH
+         mhmciwrCGYARa/d3IdbF6Y/tzCn5nB5iqkUIWp6oI5tIaqJPeKBsFUZ90XgGYdDNhT3N
+         WtRR7UAesWvPJRhwD/sfywyl6MeEevEWOcFt/Y8gDv8B6JgnxnokWk2wiRe8CkoKZSqf
+         mNt0CQsxzQeOTnGag/fPLRYuqW2CBcLEWVpIz3l1B5ZJCqIq0Y0ov3a/HsW8RaA6x4ql
+         oqml8vN+XyYYGMrKhJRScyitHWpJsVzcPv23OlEBhjW3jWENMHhOqXpWhCLgKyX3VJzY
+         uTkQ==
+X-Gm-Message-State: AOAM5318JD5uSGbKmLc5rkp6Dxy4TI5rrhKOsLAIyWhFtGuHMTlS5uEz
+        jI6A8Oe6mhcFqM8wM8DN64Lqw6Dd7Qe5WDgQuGch41O2xmX35/uscwgS2BROkfU2EF6nUIdWpNm
+        7fzUT/Yr6YZr1
+X-Received: by 2002:a17:906:298a:: with SMTP id x10mr893229eje.238.1590009351884;
+        Wed, 20 May 2020 14:15:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyP+T4UQY4+ZFFK7rI3puH/bbF9P484sU4hk3mzrt0kP4DghamnJ1GKfP2P9zAY21b+8eR5zA==
+X-Received: by 2002:a17:906:298a:: with SMTP id x10mr893215eje.238.1590009351702;
+        Wed, 20 May 2020 14:15:51 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:1c48:1dd8:fe63:e3da? ([2001:b07:6468:f312:1c48:1dd8:fe63:e3da])
-        by smtp.gmail.com with ESMTPSA id g20sm2820206edp.31.2020.05.20.14.13.36
+        by smtp.gmail.com with ESMTPSA id 89sm2898493edr.12.2020.05.20.14.15.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 May 2020 14:13:36 -0700 (PDT)
-Subject: Re: [PATCH 22/24] uaccess: add memzero_user
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
+        Wed, 20 May 2020 14:15:51 -0700 (PDT)
+Subject: Re: [PATCH 00/24] KVM: nSVM: event fixes and migration support
+To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
 References: <20200520172145.23284-1-pbonzini@redhat.com>
- <20200520172145.23284-23-pbonzini@redhat.com>
- <20200520204036.GA1335@infradead.org>
+ <6b8674fa647d3b80125477dc344581ba7adfb931.camel@redhat.com>
+ <cecf6c64-6828-5a3f-642a-11aac4cefa75@redhat.com>
+ <2401913621cc7686d71f491ef55f30f78ebbb2eb.camel@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e2e23a99-f682-1556-dad0-408e78233eb6@redhat.com>
-Date:   Wed, 20 May 2020 23:13:36 +0200
+Message-ID: <81f6d5ce-b412-31f8-e750-67d4a06a5357@redhat.com>
+Date:   Wed, 20 May 2020 23:15:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200520204036.GA1335@infradead.org>
+In-Reply-To: <2401913621cc7686d71f491ef55f30f78ebbb2eb.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,15 +74,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/05/20 22:40, Christoph Hellwig wrote:
-> On Wed, May 20, 2020 at 01:21:43PM -0400, Paolo Bonzini wrote:
->> +			unsafe_put_user(val, (unsigned long __user *) from, err_fault);
-> This adds a way too long line.  In many ways it would be much nicer if
-> you used an unsigned long __user * variable internally, a that would
-> remove all these crazy casts and actually make the code readable.
-> 
+On 20/05/20 23:08, Maxim Levitsky wrote:
+>> IIRC you said that the bug appeared with the vintr rework, and then went
+>> from hang to #DE and now back to hang?  And the hang is reported by L2,
+>> not L1?
+> Yes, and now the hang appears to be deterministic.
 
-Good idea, thanks.
+Ok, that's actually progress.  Also because we can write a testcase.
 
 Paolo
 
