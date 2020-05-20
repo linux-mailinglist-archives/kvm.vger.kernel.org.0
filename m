@@ -2,201 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD8B31DBBAA
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:39:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B845C1DBD11
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 20:41:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726818AbgETRjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 13:39:12 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26832 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726436AbgETRjM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 May 2020 13:39:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589996350;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NInuWIKxvhv+pr0Of+enAgQVb1EI3zbw0YcjpeUMr/0=;
-        b=ecQ7aNc7cYhwB+k60TS5IHUVJkUpeEAAzgjKJY/8++wp1E3hZBBRpSmz7SCmgQmkTWxj+p
-        a6E+yMO4eAvC3HtFE4oxF6dl4GMoxFGA6GVCn3O8MeP9ohTxw0ALDFpkqjcj3z9HP2Lk3o
-        ekvUwD0WVhPWZkwoucxrnooOwMSa8cs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-2RLpIsTEPVGJjQ_3ZAVsPA-1; Wed, 20 May 2020 13:39:08 -0400
-X-MC-Unique: 2RLpIsTEPVGJjQ_3ZAVsPA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 713198005AA;
-        Wed, 20 May 2020 17:39:07 +0000 (UTC)
-Received: from starship (unknown [10.35.207.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 275F648D6B;
-        Wed, 20 May 2020 17:39:05 +0000 (UTC)
-Message-ID: <45f5ed0e1bb89ac186ef0d7f79f4ec4be0be6403.camel@redhat.com>
-Subject: Re: [PATCH 2/2] kvm/x86: don't expose MSR_IA32_UMWAIT_CONTROL
- unconditionally
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 20 May 2020 20:39:04 +0300
-In-Reply-To: <87sgfusf26.fsf@vitty.brq.redhat.com>
-References: <20200520160740.6144-1-mlevitsk@redhat.com>
-         <20200520160740.6144-3-mlevitsk@redhat.com>
-         <874ksatvkr.fsf@vitty.brq.redhat.com>
-         <0c1a0c81bbdcfaf4ae9af545f4a38439b1a56d11.camel@redhat.com>
-         <87sgfusf26.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+        id S1726826AbgETSlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 14:41:20 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13557 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbgETSlT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 14:41:19 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5ec579800000>; Wed, 20 May 2020 11:40:00 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Wed, 20 May 2020 11:41:19 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Wed, 20 May 2020 11:41:19 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 20 May
+ 2020 18:41:19 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Wed, 20 May 2020 18:41:12 +0000
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+To:     <alex.williamson@redhat.com>, <cjia@nvidia.com>
+CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>
+Subject: [PATCH Kernel v23 0/8] Add UAPIs to support migration for VFIO devices
+Date:   Wed, 20 May 2020 23:38:00 +0530
+Message-ID: <1589998088-3250-1-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+X-NVConfidentiality: public
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1590000000; bh=AM3IVEduZ9Pu1HzFHKiWqLkCNZyHWg2iLI5sdDAJEvU=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         X-NVConfidentiality:MIME-Version:Content-Type;
+        b=Ixg93cC+dk969QKdj9nRaEaYdzT1IeCngIBEb21tOcNtjygLMK6RJNapRR9UpoIqm
+         zih33Pd5CS88neUYLx6jIajWdxBTV9Cy3X5qHB2yjJKVTK3+aW3NoIx6GAUe0g2Yq/
+         Fwxly15hRbaBGmi0Obam2+xiKM+ADoQD1JBMKBFhkDKD9QqcI8e+8wz1hecXWdSxYY
+         7BJDSgyFV6JAh/Mvvi3SOA3U2ky1Dy05Lb0Y+xs4X5MMbsDazs5wsJ14ZKEZfvbTnH
+         KcW+3krAnlA5dULoQ56apHjnDuRp9UxymKkZy4XP3PJpEA4zKW8DPlOIATTyT/7anN
+         +eUR8mdTVNMQw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2020-05-20 at 19:15 +0200, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > On Wed, 2020-05-20 at 18:33 +0200, Vitaly Kuznetsov wrote:
-> > > Maxim Levitsky <mlevitsk@redhat.com> writes:
-> > > 
-> > > > This msr is only available when the host supports WAITPKG feature.
-> > > > 
-> > > > This breaks a nested guest, if the L1 hypervisor is set to ignore
-> > > > unknown msrs, because the only other safety check that the
-> > > > kernel does is that it attempts to read the msr and
-> > > > rejects it if it gets an exception.
-> > > > 
-> > > > Fixes: 6e3ba4abce KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
-> > > > 
-> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > ---
-> > > >  arch/x86/kvm/x86.c | 4 ++++
-> > > >  1 file changed, 4 insertions(+)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > index fe3a24fd6b263..9c507b32b1b77 100644
-> > > > --- a/arch/x86/kvm/x86.c
-> > > > +++ b/arch/x86/kvm/x86.c
-> > > > @@ -5314,6 +5314,10 @@ static void kvm_init_msr_list(void)
-> > > >  			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
-> > > >  			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
-> > > >  				continue;
-> > > > +			break;
-> > > > +		case MSR_IA32_UMWAIT_CONTROL:
-> > > > +			if (!kvm_cpu_cap_has(X86_FEATURE_WAITPKG))
-> > > > +				continue;
-> > > 
-> > > I'm probably missing something but (if I understand correctly) the only
-> > > effect of dropping MSR_IA32_UMWAIT_CONTROL from msrs_to_save would be
-> > > that KVM userspace won't see it in e.g. KVM_GET_MSR_INDEX_LIST. But why
-> > > is this causing an issue? I see both vmx_get_msr()/vmx_set_msr() have
-> > > 'host_initiated' check:
-> > > 
-> > >        case MSR_IA32_UMWAIT_CONTROL:
-> > >                 if (!msr_info->host_initiated && !vmx_has_waitpkg(vmx))
-> > >                         return 1;
-> > 
-> > Here it fails like that:
-> > 
-> > 1. KVM_GET_MSR_INDEX_LIST returns this msrs, and qemu notes that
-> >    it is supported in 'has_msr_umwait' global var
-> > 
-> > 2. Qemu does kvm_arch_get/put_registers->kvm_get/put_msrs->ioctl(KVM_GET_MSRS)
-> >    and while doing this it adds MSR_IA32_UMWAIT_CONTROL to that msr list.
-> >    That reaches 'svm_get_msr', and this one knows nothing about MSR_IA32_UMWAIT_CONTROL.
-> > 
-> > So the difference here is that vmx_get_msr not called at all.
-> > I can add this msr to svm_get_msr instead but that feels wrong since this feature
-> > is not yet supported on AMD.
-> > When AMD adds support for this feature, then the VMX specific code can be moved to
-> > kvm_get_msr_common I guess.
-> > 
-> > 
-> 
-> Oh, SVM, I missed that completely) 
-> 
-> > > so KVM userspace should be able to read/write this MSR even when there's
-> > > no hardware support for it. Or who's trying to read/write it?
-> > > 
-> > > Also, kvm_cpu_cap_has() check is not equal to vmx_has_waitpkg() which
-> > > checks secondary execution controls.
-> > 
-> > I was afraid that something like that will happen, but in this particular
-> > case we can only check CPUID support and if supported, the then it means
-> > we are dealing with intel system and thus vmx_get_msr will be called and
-> > ignore that msr.
-> > 
-> > Calling vmx_has_waitpkg from the common code doesn't seem right, and besides,
-> > it checks the secondary controls which are set by the host and can change,
-> > at least in theory during runtime (I don't know if KVM does this).
-> > 
-> > Note that if I now understand correctly, the 'host_initiated' means
-> > that MSR read/write is done by the host itself and not on behalf of the guest.
-> 
-> Yes, it does that. 
-> 
-> We have kvm_x86_ops.has_emulated_msr() mechanism, can we use it here?
-> E.g. completely untested
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 38f6aeefeb55..c19a9542e6c3 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3471,6 +3471,8 @@ static bool svm_has_emulated_msr(int index)
->         case MSR_IA32_MCG_EXT_CTL:
->         case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
->                 return false;
-> +       case MSR_IA32_UMWAIT_CONTROL:
-> +               return false;
->         default:
->                 break;
->         }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d786c7d27ce5..f45153ef3b81 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1183,7 +1183,6 @@ static const u32 msrs_to_save_all[] = {
->         MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
->         MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
->         MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
-> -       MSR_IA32_UMWAIT_CONTROL,
->  
->         MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
->         MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
-> @@ -1266,6 +1265,7 @@ static const u32 emulated_msrs_all[] = {
->         MSR_IA32_VMX_PROCBASED_CTLS2,
->         MSR_IA32_VMX_EPT_VPID_CAP,
->         MSR_IA32_VMX_VMFUNC,
-> +       MSR_IA32_UMWAIT_CONTROL,
->  
->         MSR_K7_HWCR,
->         MSR_KVM_POLL_CONTROL,
-> 
-I don't see any reason why the above won't work, and to be honest
-I also took a look at this but to me it wasn't clear what the purpose
-of the emulated msrs is, this is why I took the approach in the patch I had sent.
+Hi,
 
-It 'seems' (although this is not enforced anywhere) that emulated msr list is
-intended for MSRs that are emulated by KVM, which means that KVM traps these msrs,
-and give guest arbitrary values it thinks that the guest should see.
+This patch set adds:
+* IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+  respect to IOMMU container rather than per device. All pages pinned by
+  vendor driver through vfio_pin_pages external API has to be marked as
+  dirty during  migration. When IOMMU capable device is present in the
+  container and all pages are pinned and mapped, then all pages are marked
+  dirty.
+  When there are CPU writes, CPU dirty page tracking can identify dirtied
+  pages, but any page pinned by vendor driver can also be written by
+  device. As of now there is no device which has hardware support for
+  dirty page tracking. So all pages which are pinned should be considered
+  as dirty.
+  This ioctl is also used to start/stop dirty pages tracking for pinned and
+  unpinned pages while migration is active.
 
-However MSR_IA32_UMWAIT_CONTROL appears to be exposed directly to the guest
-without any traps, with the virtualization done by cpu, and the only intervention
-we do is to set a value to be load when guest mode is entered and value to be
-loaded when guest mode is done (using VMX msr entry/exit msr lists),
-I see that done by atomic_switch_umwait_control_msr.
+* Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
+  unmapping IO virtual address range.
+  With vIOMMU, during pre-copy phase of migration, while CPUs are still
+  running, IO virtual address unmap can happen while device still keeping
+  reference of guest pfns. Those pages should be reported as dirty before
+  unmap, so that VFIO user space application can copy content of those
+  pages from source to destination.
 
-So I am not sure if we should add it to emulated_msrs_all list.
-
-Paulo, what do you think about this? I personally don't mind how to fix
-this as long as it works and everyone agrees on the patch.
-
-Best regards,
-	Maxim Levitsky
+* Patch 8 detect if IOMMU capable device driver is smart to report pages
+  to be marked dirty by pinning pages using vfio_pin_pages() API.
 
 
+Yet TODO:
+Since there is no device which has hardware support for system memmory
+dirty bitmap tracking, right now there is no other API from vendor driver
+to VFIO IOMMU module to report dirty pages. In future, when such hardware
+support will be implemented, an API will be required such that vendor
+driver could report dirty pages to VFIO module during migration phases.
 
+v22 -> v23
+- Fixed issue reported by Yan
+https://lore.kernel.org/kvm/97977ede-3c5b-c5a5-7858-7eecd7dd531c@nvidia.com/
+- Fixed nit picks suggested by Cornelia
+
+v21 -> v22
+- Fixed issue raised by Alex :
+https://lore.kernel.org/kvm/20200515163307.72951dd2@w520.home/
+
+v20 -> v21
+- Added checkin for GET_BITMAP ioctl for vfio_dma boundaries.
+- Updated unmap ioctl function - as suggested by Alex.
+- Updated comments in DIRTY_TRACKING ioctl definition - as suggested by
+  Cornelia.
+
+v19 -> v20
+- Fixed ioctl to get dirty bitmap to get bitmap of multiple vfio_dmas
+- Fixed unmap ioctl to get dirty bitmap of multiple vfio_dmas.
+- Removed flag definition from migration capability.
+
+v18 -> v19
+- Updated migration capability with supported page sizes bitmap for dirty
+  page tracking and  maximum bitmap size supported by kernel module.
+- Added patch to calculate and cache pgsize_bitmap when iommu->domain_list
+  is updated.
+- Removed extra buffers added in previous version for bitmap manipulation
+  and optimised the code.
+
+v17 -> v18
+- Add migration capability to the capability chain for VFIO_IOMMU_GET_INFO
+  ioctl
+- Updated UMAP_DMA ioctl to return bitmap of multiple vfio_dma
+
+v16 -> v17
+- Fixed errors reported by kbuild test robot <lkp@intel.com> on i386
+
+v15 -> v16
+- Minor edits and nit picks (Auger Eric)
+- On copying bitmap to user, re-populated bitmap only for pinned pages,
+  excluding unmapped pages and CPU dirtied pages.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
+
+v14 -> v15
+- Minor edits and nit picks.
+- In the verification of user allocated bitmap memory, added check of
+   maximum size.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
+
+v13 -> v14
+- Added struct vfio_bitmap to kabi. updated structure
+  vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
+- All small changes suggested by Alex.
+- Patches are on tag: next-20200318 and 1-3 patches from Yan's series
+  https://lkml.org/lkml/2020/3/12/1255
+
+v12 -> v13
+- Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
+- Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
+- Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
+  field.
+
+v11 -> v12
+- Changed bitmap allocation in vfio_iommu_type1.
+- Remove atomicity of ref_count.
+- Updated comments for migration device state structure about error
+  reporting.
+- Nit picks from v11 reviews
+
+v10 -> v11
+- Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
+- Added proposal to detect if IOMMU capable device calls external pin pages
+  API to mark pages dirty.
+- Nit picks from v10 reviews
+
+v9 -> v10:
+- Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
+  during unmap while migration is active
+- Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
+  tracking.
+- If iommu_mapped, mark all pages dirty.
+- Added unpinned pages tracking while migration is active.
+- Updated comments for migration device state structure with bit
+  combination table and state transition details.
+
+v8 -> v9:
+- Split patch set in 2 sets, Kernel and QEMU.
+- Dirty pages bitmap is queried from IOMMU container rather than from
+  vendor driver for per device. Added 2 ioctls to achieve this.
+
+v7 -> v8:
+- Updated comments for KABI
+- Added BAR address validation check during PCI device's config space load
+  as suggested by Dr. David Alan Gilbert.
+- Changed vfio_migration_set_state() to set or clear device state flags.
+- Some nit fixes.
+
+v6 -> v7:
+- Fix build failures.
+
+v5 -> v6:
+- Fix build failure.
+
+v4 -> v5:
+- Added decriptive comment about the sequence of access of members of
+  structure vfio_device_migration_info to be followed based on Alex's
+  suggestion
+- Updated get dirty pages sequence.
+- As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+  get_object, save_config and load_config.
+- Fixed multiple nit picks.
+- Tested live migration with multiple vfio device assigned to a VM.
+
+v3 -> v4:
+- Added one more bit for _RESUMING flag to be set explicitly.
+- data_offset field is read-only for user space application.
+- data_size is read for every iteration before reading data from migration,
+  that is removed assumption that data will be till end of migration
+  region.
+- If vendor driver supports mappable sparsed region, map those region
+  during setup state of save/load, similarly unmap those from cleanup
+  routines.
+- Handles race condition that causes data corruption in migration region
+  during save device state by adding mutex and serialiaing save_buffer and
+  get_dirty_pages routines.
+- Skip called get_dirty_pages routine for mapped MMIO region of device.
+- Added trace events.
+- Split into multiple functional patches.
+
+v2 -> v3:
+- Removed enum of VFIO device states. Defined VFIO device state with 2
+  bits.
+- Re-structured vfio_device_migration_info to keep it minimal and defined
+  action on read and write access on its members.
+
+v1 -> v2:
+- Defined MIGRATION region type and sub-type which should be used with
+  region type capability.
+- Re-structured vfio_device_migration_info. This structure will be placed
+  at 0th offset of migration region.
+- Replaced ioctl with read/write for trapped part of migration region.
+- Added both type of access support, trapped or mmapped, for data section
+  of the region.
+- Moved PCI device functions to pci file.
+- Added iteration to get dirty page bitmap until bitmap for all requested
+  pages are copied.
+
+Thanks,
+Kirti
+
+
+Kirti Wankhede (8):
+  vfio: UAPI for migration interface for device state
+  vfio iommu: Remove atomicity of ref_count of pinned pages
+  vfio iommu: Cache pgsize_bitmap in struct vfio_iommu
+  vfio iommu: Add ioctl definition for dirty pages tracking
+  vfio iommu: Implementation of ioctl for dirty pages tracking
+  vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
+  vfio iommu: Add migration capability to report supported features
+  vfio: Selective dirty page tracking if IOMMU backed device pins pages
+
+ drivers/vfio/vfio.c             |  13 +-
+ drivers/vfio/vfio_iommu_type1.c | 571 ++++++++++++++++++++++++++++++++++++----
+ include/linux/vfio.h            |   4 +-
+ include/uapi/linux/vfio.h       | 318 ++++++++++++++++++++++
+ 4 files changed, 847 insertions(+), 59 deletions(-)
+
+-- 
+2.7.0
 
