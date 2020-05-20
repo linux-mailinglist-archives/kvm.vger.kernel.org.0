@@ -2,119 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 868BD1DAE71
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 11:14:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 028A21DAFB7
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 12:08:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726833AbgETJOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 05:14:24 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:43102 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726224AbgETJOX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 05:14:23 -0400
-Received: from zn.tnic (p200300ec2f0bab00d907527c3c1e360d.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:ab00:d907:527c:3c1e:360d])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 47C811EC032C;
-        Wed, 20 May 2020 11:14:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1589966062;
+        id S1726596AbgETKIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 06:08:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58186 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726224AbgETKIm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 06:08:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589969320;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=LiDZJ/nDDOx6HNQyMN6etFUDBDZ4zUzKnqjvmtstft0=;
-        b=NAfDGZuYM1NLD2lCZ1oQZIZ7UGOSHsSZ0Zu/lgomzdOS6sf36E9Rj79WbRNcWpl86KpX+L
-        zvCKYyoH/HH8DbtCZKcEsv40un5TfHc0NyTxCuLOPjo0ovPggkKuqcLUUbHTcKokbQ/mS0
-        o0l9nWvwsPxoFmCz1B3jcXZp80MWqlM=
-Date:   Wed, 20 May 2020 11:14:15 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 40/75] x86/sev-es: Compile early handler code into
- kernel image
-Message-ID: <20200520091415.GC1457@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-41-joro@8bytes.org>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UcWON8E7vVA9RaONAcWnZZZmaga+7CkifeGerQ7VIUg=;
+        b=gBuavHpcr8jPu41MKP+Si673j0aAg8cOwedOX8abR/oCg1tlC7/+vYkHlBy6qtfhbbPwzm
+        Lfa418f5yfygiybP6uCRbNt+XjaFP9qaxC5AJ6aiQmZy3DOlQk2z6iSJ3vkuCCTVyb5jqf
+        Ro5aqYBED5+jx2dS9eXgyrrgc9lEO3M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-CQeOVtbiMc2dbdFNIFsnPQ-1; Wed, 20 May 2020 06:08:39 -0400
+X-MC-Unique: CQeOVtbiMc2dbdFNIFsnPQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C41A6800688;
+        Wed, 20 May 2020 10:08:35 +0000 (UTC)
+Received: from gondolin (ovpn-113-5.ams2.redhat.com [10.36.113.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D6091943D;
+        Wed, 20 May 2020 10:08:28 +0000 (UTC)
+Date:   Wed, 20 May 2020 12:08:25 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <alex.williamson@redhat.com>, <cjia@nvidia.com>,
+        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH Kernel v22 3/8] vfio iommu: Cache pgsize_bitmap in
+ struct vfio_iommu
+Message-ID: <20200520120825.7d8144ba.cohuck@redhat.com>
+In-Reply-To: <1589781397-28368-4-git-send-email-kwankhede@nvidia.com>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+        <1589781397-28368-4-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-41-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:16:50PM +0200, Joerg Roedel wrote:
-> +static inline u64 sev_es_rd_ghcb_msr(void)
-> +{
-> +	return native_read_msr(MSR_AMD64_SEV_ES_GHCB);
-> +}
+On Mon, 18 May 2020 11:26:32 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> Calculate and cache pgsize_bitmap when iommu->domain_list is updated
+> and iommu->external_domain is set for mdev device.
+> Add iommu->lock protection when cached pgsize_bitmap is accessed.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 88 +++++++++++++++++++++++------------------
+>  1 file changed, 49 insertions(+), 39 deletions(-)
+> 
+
+(...)
+
+> @@ -805,15 +806,14 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>  	iommu->dma_avail++;
+>  }
+>  
+> -static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+> +static void vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+
+Minor nit: I'd have renamed this function to
+vfio_update_pgsize_bitmap().
+
+>  {
+>  	struct vfio_domain *domain;
+> -	unsigned long bitmap = ULONG_MAX;
+>  
+> -	mutex_lock(&iommu->lock);
+> +	iommu->pgsize_bitmap = ULONG_MAX;
 > +
-> +static inline void sev_es_wr_ghcb_msr(u64 val)
-> +{
-> +	u32 low, high;
-> +
-> +	low  = (u32)(val);
-> +	high = (u32)(val >> 32);
-> +
-> +	native_write_msr(MSR_AMD64_SEV_ES_GHCB, low, high);
-> +}
+>  	list_for_each_entry(domain, &iommu->domain_list, next)
+> -		bitmap &= domain->domain->pgsize_bitmap;
+> -	mutex_unlock(&iommu->lock);
+> +		iommu->pgsize_bitmap &= domain->domain->pgsize_bitmap;
+>  
+>  	/*
+>  	 * In case the IOMMU supports page sizes smaller than PAGE_SIZE
 
-Instead of duplicating those two, you can lift the ones in the
-compressed image into sev-es.h and use them here. I don't care one bit
-about the MSR tracepoints in native_*_msr().
+(...)
 
-> +static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
-> +				   char *dst, char *buf, size_t size)
-> +{
-> +	unsigned long error_code = X86_PF_PROT | X86_PF_WRITE;
-> +	char __user *target = (char __user *)dst;
-> +	u64 d8;
-> +	u32 d4;
-> +	u16 d2;
-> +	u8  d1;
-> +
-> +	switch (size) {
-> +	case 1:
-> +		memcpy(&d1, buf, 1);
-> +		if (put_user(d1, target))
-> +			goto fault;
-> +		break;
-> +	case 2:
-> +		memcpy(&d2, buf, 2);
-> +		if (put_user(d2, target))
-> +			goto fault;
-> +		break;
-> +	case 4:
-> +		memcpy(&d4, buf, 4);
-> +		if (put_user(d4, target))
-> +			goto fault;
-> +		break;
-> +	case 8:
-> +		memcpy(&d8, buf, 8);
-> +		if (put_user(d8, target))
-> +			goto fault;
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Ok, those (and below) memcpys get nicely optimized to MOVs by the
-compiler here.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
