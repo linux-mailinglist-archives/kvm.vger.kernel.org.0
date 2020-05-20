@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9176F1DB34F
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 14:32:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EACB1DB352
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 14:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726920AbgETMc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 08:32:58 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42143 "EHLO
+        id S1726939AbgETMdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 08:33:03 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37829 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726907AbgETMc5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 May 2020 08:32:57 -0400
+        by vger.kernel.org with ESMTP id S1726486AbgETMdD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 May 2020 08:33:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589977976;
+        s=mimecast20190719; t=1589977982;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lDiuwDqJnS96xDfKVe4/y86Yoj2I7jgowZlCJpHbR+Y=;
-        b=MKxZ/CPfmEKuCPbIryPNyowKSJCkci0fYhe/AqyXkpsuRzCitHvr6iA/uJspB7tcDacpxE
-        fh1TIupgQqJhcK2bx00J3hdD/fYDvPKTOp9+MdrtM0BUL0WjaewTmc7GAgkQ/ziwZDHA/w
-        mBYTGIfsCL5Pal2NF+Gcqpy8LftCbz0=
+        bh=FoqG/7LlE0aGkoDnmNDY3ApCiNG/45FhuQTIXGIJ13U=;
+        b=CkCdYnFv9s1RXcKuNVGpdnxsNhmQk6yiE/IcEiKROWNRCnpiEFsO04VB6kNjIzlUiaMVyq
+        Kd05giRYqvch48F+MVAczFlFGTuq3v2fXBoJunsBWSPQNJ+r/mYbCBCDB1ZrluDBwzQ1EG
+        nREa0gyi9xPBHVP7eSHwiVKJjMmlkyY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-IWi9rG4yNZ-BenjV0VrW3A-1; Wed, 20 May 2020 08:32:53 -0400
-X-MC-Unique: IWi9rG4yNZ-BenjV0VrW3A-1
+ us-mta-313-ULeDmb9XNHSQOhE4S5Jlrw-1; Wed, 20 May 2020 08:33:00 -0400
+X-MC-Unique: ULeDmb9XNHSQOhE4S5Jlrw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5DBC8014D7;
-        Wed, 20 May 2020 12:32:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA52D461;
+        Wed, 20 May 2020 12:32:59 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-76.ams2.redhat.com [10.36.113.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9F10161547;
-        Wed, 20 May 2020 12:32:49 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 363C46AD00;
+        Wed, 20 May 2020 12:32:52 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -41,12 +41,10 @@ Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH v2 12/19] MAINTAINERS: Add myself as virtio-mem maintainer
-Date:   Wed, 20 May 2020 14:31:45 +0200
-Message-Id: <20200520123152.60527-13-david@redhat.com>
+        David Hildenbrand <david@redhat.com>
+Subject: [PATCH v2 13/19] hmp: Handle virtio-mem when printing memory device info
+Date:   Wed, 20 May 2020 14:31:46 +0200
+Message-Id: <20200520123152.60527-14-david@redhat.com>
 In-Reply-To: <20200520123152.60527-1-david@redhat.com>
 References: <20200520123152.60527-1-david@redhat.com>
 MIME-Version: 1.0
@@ -57,35 +55,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's make sure patches/bug reports find the right person.
+Print the memory device info just like for other memory devices.
 
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ monitor/hmp-cmds.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 47ef3139e6..91c2791679 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1744,6 +1744,14 @@ F: hw/virtio/virtio-crypto.c
- F: hw/virtio/virtio-crypto-pci.c
- F: include/hw/virtio/virtio-crypto.h
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 9c61e769ca..afc9a28069 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -1818,6 +1818,7 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+     MemoryDeviceInfoList *info_list = qmp_query_memory_devices(&err);
+     MemoryDeviceInfoList *info;
+     VirtioPMEMDeviceInfo *vpi;
++    VirtioMEMDeviceInfo *vmi;
+     MemoryDeviceInfo *value;
+     PCDIMMDeviceInfo *di;
  
-+virtio-mem
-+M: David Hildenbrand <david@redhat.com>
-+S: Supported
-+F: hw/virtio/virtio-mem.c
-+F: hw/virtio/virtio-mem-pci.h
-+F: hw/virtio/virtio-mem-pci.c
-+F: include/hw/virtio/virtio-mem.h
-+
- nvme
- M: Keith Busch <kbusch@kernel.org>
- L: qemu-block@nongnu.org
+@@ -1852,6 +1853,21 @@ void hmp_info_memory_devices(Monitor *mon, const QDict *qdict)
+                 monitor_printf(mon, "  size: %" PRIu64 "\n", vpi->size);
+                 monitor_printf(mon, "  memdev: %s\n", vpi->memdev);
+                 break;
++            case MEMORY_DEVICE_INFO_KIND_VIRTIO_MEM:
++                vmi = value->u.virtio_mem.data;
++                monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
++                               MemoryDeviceInfoKind_str(value->type),
++                               vmi->id ? vmi->id : "");
++                monitor_printf(mon, "  memaddr: 0x%" PRIx64 "\n", vmi->memaddr);
++                monitor_printf(mon, "  node: %" PRId64 "\n", vmi->node);
++                monitor_printf(mon, "  requested-size: %" PRIu64 "\n",
++                               vmi->requested_size);
++                monitor_printf(mon, "  size: %" PRIu64 "\n", vmi->size);
++                monitor_printf(mon, "  max-size: %" PRIu64 "\n", vmi->max_size);
++                monitor_printf(mon, "  block-size: %" PRIu64 "\n",
++                               vmi->block_size);
++                monitor_printf(mon, "  memdev: %s\n", vmi->memdev);
++                break;
+             default:
+                 g_assert_not_reached();
+             }
 -- 
 2.25.4
 
