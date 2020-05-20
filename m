@@ -2,173 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C493B1DBDEC
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 21:22:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C42C21DBDF1
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 21:24:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727070AbgETTWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 15:22:39 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:36860 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726560AbgETTWi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 15:22:38 -0400
-Received: from zn.tnic (p200300ec2f0bab0028d24a65f02999fe.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:ab00:28d2:4a65:f029:99fe])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 729681EC0350;
-        Wed, 20 May 2020 21:22:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1590002556;
+        id S1726803AbgETTYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 15:24:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20827 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726560AbgETTYX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 15:24:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590002661;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=YoNcQo6x1W8TxzWUCk2SRnUEN6+ujdV8K1zMMMM7K9w=;
-        b=QnDgj2c7erKXF3m48N2kXaCZYdPDB5MWID4LlHGbzp/0OLMhpPWVLM4Ckuu+4FzqSymM2b
-        Tn1sEI7aI7cqIuJQ5hI/AOTJELuDaDwk+EATRLjvONMnutf0FLFVVYGLQ8g9ONbAl0jE49
-        jCzdAiOusfz1gfqvMpn9h0w2u4PG2Po=
-Date:   Wed, 20 May 2020 21:22:30 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 42/75] x86/sev-es: Setup GHCB based boot #VC handler
-Message-ID: <20200520192230.GK1457@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-43-joro@8bytes.org>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SHISqFlqCMxvBm5+qETPogyLCEcwxqXzDOwnrmZ88k0=;
+        b=hN1wHufP1oeRLChaUAKwA7l4OAiJsaSx4InVRcFAy166XOQPutWEoOj3oPm5+NZnt4CEWo
+        vS4k2V9MAzb6fFJdKSPovaP1QSWXTOwmIKGD+rTlKNt0sCB6ySwjHJyS8jQqbWapksfJ7Z
+        OV9N7Lm9eBtIMo6W08nrDEsYaumuYxc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-292-Sxjlh7nDMouZhFlG0GrY4w-1; Wed, 20 May 2020 15:24:19 -0400
+X-MC-Unique: Sxjlh7nDMouZhFlG0GrY4w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEA71A0C05;
+        Wed, 20 May 2020 19:24:18 +0000 (UTC)
+Received: from starship (unknown [10.35.206.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 596B85C1BE;
+        Wed, 20 May 2020 19:24:17 +0000 (UTC)
+Message-ID: <6b8674fa647d3b80125477dc344581ba7adfb931.camel@redhat.com>
+Subject: Re: [PATCH 00/24] KVM: nSVM: event fixes and migration support
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
+Date:   Wed, 20 May 2020 22:24:16 +0300
+In-Reply-To: <20200520172145.23284-1-pbonzini@redhat.com>
+References: <20200520172145.23284-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-43-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:16:52PM +0200, Joerg Roedel wrote:
-> diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev-es.h
-> index b2cbcd40b52e..e1ed963a57ec 100644
-> --- a/arch/x86/include/asm/sev-es.h
-> +++ b/arch/x86/include/asm/sev-es.h
-> @@ -74,5 +74,6 @@ static inline u64 lower_bits(u64 val, unsigned int bits)
->  }
->  
->  extern void vc_no_ghcb(void);
-> +extern bool vc_boot_ghcb(struct pt_regs *regs);
+On Wed, 2020-05-20 at 13:21 -0400, Paolo Bonzini wrote:
+> Large parts of this series were posted before (patches 1, 3-4-5 and
+> 6-7-8-12-13-14).  This is basically what I'd like to get into 5.8 as
+> far as nested SVM is concerned; the fix for exception vmexits is related
+> to migration support, because it gets rid of the exit_required flag
+> and therefore consolidates the SVM migration format.
+> 
+> There are a couple more bugfixes (2 and 21), the latter of which actually
+> affects VMX as well.
+> 
+> The SVM migration data consists of:
+> 
+> - the GIF state
+> 
+> - the guest mode and nested-run-pending flags
+> 
+> - the host state from before VMRUN
+> 
+> - the nested VMCB control state
+> 
+> The last two items are conveniently packaged in VMCB format.  Compared
+> to the previous prototype, HF_HIF_MASK is removed since it is part of
+> "the host state from before VMRUN".
+> 
+> The patch has been tested with the QEMU changes after my signature,
+> where it also fixes system_reset while x86/svm.flat runs.
+> 
+> Paolo
+> 
+> Paolo Bonzini (24):
+>   KVM: nSVM: fix condition for filtering async PF
+>   KVM: nSVM: leave ASID aside in copy_vmcb_control_area
+>   KVM: nSVM: inject exceptions via svm_check_nested_events
+>   KVM: nSVM: remove exit_required
+>   KVM: nSVM: correctly inject INIT vmexits
+>   KVM: nSVM: move map argument out of enter_svm_guest_mode
+>   KVM: nSVM: extract load_nested_vmcb_control
+>   KVM: nSVM: extract preparation of VMCB for nested run
+>   KVM: nSVM: clean up tsc_offset update
+>   KVM: nSVM: pass vmcb_control_area to copy_vmcb_control_area
+>   KVM: nSVM: remove trailing padding for struct vmcb_control_area
+>   KVM: nSVM: save all control fields in svm->nested
+>   KVM: nSVM: do not reload pause filter fields from VMCB
+>   KVM: nSVM: remove HF_VINTR_MASK
+>   KVM: nSVM: remove HF_HIF_MASK
+>   KVM: nSVM: split nested_vmcb_check_controls
+>   KVM: nSVM: do all MMU switch work in init/uninit functions
+>   KVM: nSVM: leave guest mode when clearing EFER.SVME
+>   KVM: nSVM: extract svm_set_gif
+>   KVM: MMU: pass arbitrary CR0/CR4/EFER to kvm_init_shadow_mmu
+>   KVM: x86: always update CR3 in VMCB
+>   uaccess: add memzero_user
+>   selftests: kvm: add a SVM version of state-test
+>   KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE
+> 
+>  arch/x86/include/asm/kvm_host.h               |   2 -
+>  arch/x86/include/asm/svm.h                    |   9 +-
+>  arch/x86/include/uapi/asm/kvm.h               |  17 +-
+>  arch/x86/kvm/cpuid.h                          |   5 +
+>  arch/x86/kvm/irq.c                            |   1 +
+>  arch/x86/kvm/mmu.h                            |   2 +-
+>  arch/x86/kvm/mmu/mmu.c                        |  14 +-
+>  arch/x86/kvm/svm/nested.c                     | 525 +++++++++++-------
+>  arch/x86/kvm/svm/svm.c                        | 107 ++--
+>  arch/x86/kvm/svm/svm.h                        |  32 +-
+>  arch/x86/kvm/vmx/nested.c                     |   5 -
+>  arch/x86/kvm/vmx/vmx.c                        |   5 +-
+>  arch/x86/kvm/x86.c                            |   3 +-
+>  include/linux/uaccess.h                       |   1 +
+>  lib/usercopy.c                                |  63 +++
+>  .../testing/selftests/kvm/x86_64/state_test.c |  65 ++-
+>  16 files changed, 549 insertions(+), 307 deletions(-)
+> 
 
-Those function names need verbs:
+I just smoke-tested this patch series on my system.
 
-	handle_vc_no_ghcb
-	handle_vc_boot_ghcb
+Patch 24 doesn't apply cleanly on top of kvm/queue, I appplied it manually,
+due to missing KVM_STATE_NESTED_MTF_PENDING bit
 
-> @@ -161,3 +176,104 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->  
->  /* Include code shared with pre-decompression boot stage */
->  #include "sev-es-shared.c"
-> +
-> +/*
-> + * This function runs on the first #VC exception after the kernel
-> + * switched to virtual addresses.
-> + */
-> +static bool __init sev_es_setup_ghcb(void)
+Also patch 22 needes ALIGN_UP which is not on mainline.
+Probably in linux-next?
 
-There's already another sev_es_setup_ghcb() in compressed/. All those
-functions with the same name are just confusion waiting to happen. Let's
-prepend the ones in compressed/ with "early_" or so, so that their names
-are at least different even if they're in two different files with the
-same name.
+With these fixes, I don't see #DE exceptions on a nested guest I try to run
+however it still hangs, right around the time it tries to access PS/2 keyboard/mouse.
 
-This way you know at least which function is used in which boot stages.
+Best regards,
+	Maxim Levitsky
 
-> +{
-> +	/* First make sure the hypervisor talks a supported protocol. */
-> +	if (!sev_es_negotiate_protocol())
-> +		return false;
-
-<---- newline here.
-
-> +	/*
-> +	 * Clear the boot_ghcb. The first exception comes in before the bss
-> +	 * section is cleared.
-> +	 */
-> +	memset(&boot_ghcb_page, 0, PAGE_SIZE);
-> +
-> +	/* Alright - Make the boot-ghcb public */
-> +	boot_ghcb = &boot_ghcb_page;
-> +
-> +	return true;
-> +}
-> +
-> +static void __init vc_early_vc_forward_exception(struct es_em_ctxt *ctxt)
-
-That second "vc" looks redundant.
-
-> +{
-> +	int trapnr = ctxt->fi.vector;
-> +
-> +	if (trapnr == X86_TRAP_PF)
-> +		native_write_cr2(ctxt->fi.cr2);
-> +
-> +	ctxt->regs->orig_ax = ctxt->fi.error_code;
-> +	do_early_exception(ctxt->regs, trapnr);
-> +}
-> +
-> +static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
-> +					 struct ghcb *ghcb,
-> +					 unsigned long exit_code)
-> +{
-> +	enum es_result result;
-> +
-> +	switch (exit_code) {
-> +	default:
-> +		/*
-> +		 * Unexpected #VC exception
-> +		 */
-> +		result = ES_UNSUPPORTED;
-> +	}
-> +
-> +	return result;
-> +}
-> +
-> +bool __init vc_boot_ghcb(struct pt_regs *regs)
-> +{
-> +	unsigned long exit_code = regs->orig_ax;
-> +	struct es_em_ctxt ctxt;
-> +	enum es_result result;
-> +
-> +	/* Do initial setup or terminate the guest */
-> +	if (unlikely(boot_ghcb == NULL && !sev_es_setup_ghcb()))
-> +		sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-> +
-> +	vc_ghcb_invalidate(boot_ghcb);
-
-Newline here...
-
-> +	result = vc_init_em_ctxt(&ctxt, regs, exit_code);
-> +
-
-... remove that one here.
-
-> +	if (result == ES_OK)
-> +		result = vc_handle_exitcode(&ctxt, boot_ghcb, exit_code);
-
-...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
