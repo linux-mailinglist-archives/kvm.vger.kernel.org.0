@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33D131DBB3C
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:23:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 831171DBB2B
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:22:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728206AbgETRWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 13:22:49 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20122 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728213AbgETRW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 13:22:26 -0400
+        id S1728178AbgETRWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 13:22:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46267 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728053AbgETRWV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 13:22:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589995344;
+        s=mimecast20190719; t=1589995339;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=yRQKE5e2wt/obw3+N38gkuEi0HDMFjMCRqa7dn5fQ8g=;
-        b=GFMuHPZv6PAx2oRyaC5PdAcXlR5fiFvETluInCWzA7bpfx6S+KIKzuoXwB8kaaF347muFA
-        W8KZHwtVz1bh0YT2DbvSQ7mnYpmEYUZAoRrzGx7wdQvl6QrFArQ0mvsHELxiDAlPIbL4Ix
-        MU7ZfFel7R2Uor/IWjTwADepBXFYNcw=
+        bh=TsINEXVSee1HllxBF910DzUXLat9UmMiPsxx+GcKTio=;
+        b=f7lF5HkZVUgrQDw4cNPXqu818trWYzB8x0NZGQ77re8ccQ+c/lyAPtNMjU/QhnBO9YQOYO
+        03tiyntjRF7HRuL2Aj83YygefK6e++0krJ3r3b5iumHPZZawAbsUl1XCrpev86zmrdTxLR
+        S5mCjz2Kza9vUdat0D5UFrEGONen12s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-cUNZzNMVNPm2llGsZ97AYQ-1; Wed, 20 May 2020 13:22:22 -0400
-X-MC-Unique: cUNZzNMVNPm2llGsZ97AYQ-1
+ us-mta-42-jFi2HqyUNf-Oqde49Zk62w-1; Wed, 20 May 2020 13:22:15 -0400
+X-MC-Unique: jFi2HqyUNf-Oqde49Zk62w-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C617385B690;
-        Wed, 20 May 2020 17:22:13 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7080107BEF5;
+        Wed, 20 May 2020 17:22:14 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DA32C60554;
-        Wed, 20 May 2020 17:22:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EAE4C60554;
+        Wed, 20 May 2020 17:22:13 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 22/24] uaccess: add memzero_user
-Date:   Wed, 20 May 2020 13:21:43 -0400
-Message-Id: <20200520172145.23284-23-pbonzini@redhat.com>
+Subject: [PATCH 23/24] selftests: kvm: add a SVM version of state-test
+Date:   Wed, 20 May 2020 13:21:44 -0400
+Message-Id: <20200520172145.23284-24-pbonzini@redhat.com>
 In-Reply-To: <20200520172145.23284-1-pbonzini@redhat.com>
 References: <20200520172145.23284-1-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
@@ -45,100 +45,139 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This will be used from KVM.  Add it to lib/ so that everyone can use it.
+The test is similar to the existing one for VMX, but simpler because we
+don't have to test shadow VMCS or vmptrld/vmptrst/vmclear.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/linux/uaccess.h |  1 +
- lib/usercopy.c          | 63 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 64 insertions(+)
+ .../testing/selftests/kvm/x86_64/state_test.c | 69 +++++++++++++++----
+ 1 file changed, 57 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/uaccess.h b/include/linux/uaccess.h
-index 67f016010aad..bd8c85b50e67 100644
---- a/include/linux/uaccess.h
-+++ b/include/linux/uaccess.h
-@@ -232,6 +232,7 @@ __copy_from_user_inatomic_nocache(void *to, const void __user *from,
- #endif		/* ARCH_HAS_NOCACHE_UACCESS */
+diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+index 5b1a016edf55..af8b6df6a13e 100644
+--- a/tools/testing/selftests/kvm/x86_64/state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+@@ -18,14 +18,46 @@
+ #include "kvm_util.h"
+ #include "processor.h"
+ #include "vmx.h"
++#include "svm_util.h"
  
- extern __must_check int check_zeroed_user(const void __user *from, size_t size);
-+extern __must_check int memzero_user(void __user *from, size_t size);
+ #define VCPU_ID		5
++#define L2_GUEST_STACK_SIZE 256
  
- /**
-  * copy_struct_from_user: copy a struct from userspace
-diff --git a/lib/usercopy.c b/lib/usercopy.c
-index cbb4d9ec00f2..82997862bf02 100644
---- a/lib/usercopy.c
-+++ b/lib/usercopy.c
-@@ -33,6 +33,69 @@ unsigned long _copy_to_user(void __user *to, const void *from, unsigned long n)
- EXPORT_SYMBOL(_copy_to_user);
- #endif
- 
-+/**
-+ * memzero_user: write zero bytes to a userspace buffer
-+ * @from: Source address, in userspace.
-+ * @size: Size of buffer.
-+ *
-+ * This is effectively shorthand for "memset(from, 0, size)" for
-+ * userspace addresses.
-+ *
-+ * Returns:
-+ *  * 0: zeroes have been written to the buffer
-+ *  * -EFAULT: access to userspace failed.
-+ */
-+int memzero_user(void __user *from, size_t size)
+-void l2_guest_code(void)
++void svm_l2_guest_code(void)
 +{
-+	unsigned long val = 0;
-+	unsigned long mask = 0;
-+	uintptr_t align = (uintptr_t) from % sizeof(unsigned long);
-+
-+	if (unlikely(size == 0))
-+		return 0;
-+
-+	from -= align;
-+	size += align;
-+
-+	if (!user_access_begin(from, ALIGN_UP(size, sizeof(unsigned long))))
-+		return -EFAULT;
-+
-+	if (align) {
-+		unsafe_get_user(val, (unsigned long __user *) from, err_fault);
-+		/* Prepare a mask to keep the first "align" bytes.  */
-+		mask = aligned_byte_mask(align);
-+	}
-+
-+	if (size >= sizeof(unsigned long)) {
-+		/* The mask only applies to the first full word.  */
-+		val &= mask;
-+		mask = 0;
-+		do {
-+			unsafe_put_user(val, (unsigned long __user *) from, err_fault);
-+			from += sizeof(unsigned long);
-+			size -= sizeof(unsigned long);
-+			val = 0;
-+		} while (size >= sizeof(unsigned long));
-+
-+		if (!size)
-+			goto done;
-+		unsafe_get_user(val, (unsigned long __user *) from, err_fault);
-+	}
-+
-+	/* Bytes after the first "size" have to be kept too. */
-+	mask |= ~aligned_byte_mask(size);
-+	val &= mask;
-+	unsafe_put_user(val, (unsigned long __user *) from, err_fault);
-+
-+done:
-+	user_access_end();
-+	return 0;
-+err_fault:
-+	user_access_end();
-+	return -EFAULT;
++	GUEST_SYNC(4);
++	/* Exit to L1 */
++	vmcall();
++	GUEST_SYNC(6);
++	/* Done, exit to L1 and never come back.  */
++	vmcall();
 +}
-+EXPORT_SYMBOL(memzero_user);
 +
- /**
-  * check_zeroed_user: check if a userspace buffer only contains zero bytes
-  * @from: Source address, in userspace.
++static void svm_l1_guest_code(struct svm_test_data *svm)
++{
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	struct vmcb *vmcb = svm->vmcb;
++
++	GUEST_ASSERT(svm->vmcb_gpa);
++	/* Prepare for L2 execution. */
++	generic_svm_setup(svm, svm_l2_guest_code,
++			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	GUEST_SYNC(3);
++	run_guest(vmcb, svm->vmcb_gpa);
++	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
++	GUEST_SYNC(5);
++	vmcb->save.rip += 3;
++	run_guest(vmcb, svm->vmcb_gpa);
++	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
++	GUEST_SYNC(7);
++}
++
++void vmx_l2_guest_code(void)
+ {
+ 	GUEST_SYNC(6);
+ 
+-        /* Exit to L1 */
++	/* Exit to L1 */
+ 	vmcall();
+ 
+ 	/* L1 has now set up a shadow VMCS for us.  */
+@@ -42,10 +74,9 @@ void l2_guest_code(void)
+ 	vmcall();
+ }
+ 
+-void l1_guest_code(struct vmx_pages *vmx_pages)
++static void vmx_l1_guest_code(struct vmx_pages *vmx_pages)
+ {
+-#define L2_GUEST_STACK_SIZE 64
+-        unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+ 
+ 	GUEST_ASSERT(vmx_pages->vmcs_gpa);
+ 	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
+@@ -56,7 +87,7 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_SYNC(4);
+ 	GUEST_ASSERT(vmptrstz() == vmx_pages->vmcs_gpa);
+ 
+-	prepare_vmcs(vmx_pages, l2_guest_code,
++	prepare_vmcs(vmx_pages, vmx_l2_guest_code,
+ 		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+ 
+ 	GUEST_SYNC(5);
+@@ -106,20 +137,31 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_ASSERT(vmresume());
+ }
+ 
+-void guest_code(struct vmx_pages *vmx_pages)
++static u32 cpuid_ecx(u32 eax)
++{
++	u32 ecx;
++	asm volatile("cpuid" : "=a" (eax), "=c" (ecx) : "0" (eax) : "ebx", "edx");
++	return ecx;
++}
++
++static void __attribute__((__flatten__)) guest_code(void *arg)
+ {
+ 	GUEST_SYNC(1);
+ 	GUEST_SYNC(2);
+ 
+-	if (vmx_pages)
+-		l1_guest_code(vmx_pages);
++	if (arg) {
++		if (cpuid_ecx(0x80000001) & CPUID_SVM)
++			svm_l1_guest_code(arg);
++		else
++			vmx_l1_guest_code(arg);
++	}
+ 
+ 	GUEST_DONE();
+ }
+ 
+ int main(int argc, char *argv[])
+ {
+-	vm_vaddr_t vmx_pages_gva = 0;
++	vm_vaddr_t nested_gva = 0;
+ 
+ 	struct kvm_regs regs1, regs2;
+ 	struct kvm_vm *vm;
+@@ -136,8 +178,11 @@ int main(int argc, char *argv[])
+ 	vcpu_regs_get(vm, VCPU_ID, &regs1);
+ 
+ 	if (kvm_check_cap(KVM_CAP_NESTED_STATE)) {
+-		vcpu_alloc_vmx(vm, &vmx_pages_gva);
+-		vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
++		if (kvm_get_supported_cpuid_entry(0x80000001)->ecx & CPUID_SVM)
++			vcpu_alloc_svm(vm, &nested_gva);
++		else
++			vcpu_alloc_vmx(vm, &nested_gva);
++		vcpu_args_set(vm, VCPU_ID, 1, nested_gva);
+ 	} else {
+ 		pr_info("will skip nested state checks\n");
+ 		vcpu_args_set(vm, VCPU_ID, 1, 0);
 -- 
 2.18.2
 
