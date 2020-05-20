@@ -2,143 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 675C51DA9D9
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 07:25:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E8FD1DAA8B
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 08:21:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726837AbgETFZi convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 20 May 2020 01:25:38 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:56870 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726503AbgETFZi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 May 2020 01:25:38 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01419;MF=teawaterz@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0Tz4XaVs_1589952329;
-Received: from 30.30.208.9(mailfrom:teawaterz@linux.alibaba.com fp:SMTPD_---0Tz4XaVs_1589952329)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 20 May 2020 13:25:31 +0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v4 00/15] virtio-mem: paravirtualized memory
-From:   teawater <teawaterz@linux.alibaba.com>
-In-Reply-To: <20200507140139.17083-1-david@redhat.com>
-Date:   Wed, 20 May 2020 13:25:29 +0800
-Cc:     LKML <linux-kernel@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        virtio-dev@lists.oasis-open.org,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        kvm@vger.kernel.org, Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Potapenko <glider@google.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
+        id S1726556AbgETGU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 02:20:56 -0400
+Received: from mga03.intel.com ([134.134.136.65]:46235 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726369AbgETGU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 02:20:56 -0400
+IronPort-SDR: 3WGr83E05yR+PXCRzPI4nvXNPZba6LsfkqgUG2vOWpFpeCmpS3l7mmm5Iv8N3iR04E+mbQVKxB
+ 1YS9f5qvDWRw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2020 23:20:56 -0700
+IronPort-SDR: x2Fdt2xSOHw7YfPmhCxnMFRGeCK3edMifCh80yTjNtpGNXLXkte9VzyvKxcs266zgc0cA436t1
+ U8J5oTH25sTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,413,1583222400"; 
+   d="scan'208";a="373977914"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga001.fm.intel.com with ESMTP; 19 May 2020 23:20:55 -0700
+Date:   Tue, 19 May 2020 23:20:55 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
         Dan Williams <dan.j.williams@intel.com>,
-        Dave Young <dyoung@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Len Brown <lenb@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Pingfan Liu <kernelfans@gmail.com>, Qian Cai <cai@lca.pw>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Wei Yang <richard.weiyang@gmail.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <2603F9B2-17D0-4A05-A82B-2D3B9671A96E@linux.alibaba.com>
-References: <20200507140139.17083-1-david@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
+ exceptions
+Message-ID: <20200520062055.GA17090@linux.intel.com>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-26-joro@8bytes.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200428151725.31091-26-joro@8bytes.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+On Tue, Apr 28, 2020 at 05:16:35PM +0200, Joerg Roedel wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Add support for decoding and handling #VC exceptions for IOIO events.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> [ jroedel@suse.de: Adapted code to #VC handling framework ]
+> Co-developed-by: Joerg Roedel <jroedel@suse.de>
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/boot/compressed/sev-es.c |  32 +++++
+>  arch/x86/kernel/sev-es-shared.c   | 202 ++++++++++++++++++++++++++++++
+>  2 files changed, 234 insertions(+)
+> 
+> diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
+> index 1241697dd156..17765e471e28 100644
+> --- a/arch/x86/boot/compressed/sev-es.c
+> +++ b/arch/x86/boot/compressed/sev-es.c
+> @@ -23,6 +23,35 @@
 
-Thanks for your work.
-I tried this version with cloud-hypervisor master.  It worked very well.
+...
 
-Best,
-Hui
+> +static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+> +{
+> +	struct pt_regs *regs = ctxt->regs;
+> +	u64 exit_info_1, exit_info_2;
+> +	enum es_result ret;
+> +
+> +	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
+> +	if (ret != ES_OK)
+> +		return ret;
+> +
+> +	if (exit_info_1 & IOIO_TYPE_STR) {
+> +		int df = (regs->flags & X86_EFLAGS_DF) ? -1 : 1;
+> +		unsigned int io_bytes, exit_bytes;
+> +		unsigned int ghcb_count, op_count;
+> +		unsigned long es_base;
+> +		u64 sw_scratch;
+> +
+> +		/*
+> +		 * For the string variants with rep prefix the amount of in/out
+> +		 * operations per #VC exception is limited so that the kernel
+> +		 * has a chance to take interrupts an re-schedule while the
+> +		 * instruction is emulated.
 
-> 2020年5月7日 22:01，David Hildenbrand <david@redhat.com> 写道：
-> 
-> This series is based on v5.7-rc4. The patches are located at:
->    https://github.com/davidhildenbrand/linux.git virtio-mem-v4
-> 
-> This is basically a resend of v3 [1], now based on v5.7-rc4 and restested.
-> One patch was reshuffled and two ACKs I missed to add were added. The
-> rebase did not require any modifications to patches.
-> 
-> Details about virtio-mem can be found in the cover letter of v2 [2]. A
-> basic QEMU implementation was posted yesterday [3].
-> 
-> [1] https://lkml.kernel.org/r/20200507103119.11219-1-david@redhat.com
-> [2] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
-> [3] https://lkml.kernel.org/r/20200506094948.76388-1-david@redhat.com
-> 
-> v3 -> v4:
-> - Move "MAINTAINERS: Add myself as virtio-mem maintainer" to #2
-> - Add two ACKs from Andrew (in reply to v2)
-> -- "mm: Allow to offline unmovable PageOffline() pages via ..."
-> -- "mm/memory_hotplug: Introduce offline_and_remove_memory()"
-> 
-> v2 -> v3:
-> - "virtio-mem: Paravirtualized memory hotplug"
-> -- Include "linux/slab.h" to fix build issues
-> -- Remember the "region_size", helpful for patch #11
-> -- Minor simplifaction in virtio_mem_overlaps_range()
-> -- Use notifier_from_errno() instead of notifier_to_errno() in notifier
-> -- More reliable check for added memory when unloading the driver
-> - "virtio-mem: Allow to specify an ACPI PXM as nid"
-> -- Also print the nid
-> - Added patch #11-#15
-> 
-> David Hildenbrand (15):
->  virtio-mem: Paravirtualized memory hotplug
->  MAINTAINERS: Add myself as virtio-mem maintainer
->  virtio-mem: Allow to specify an ACPI PXM as nid
->  virtio-mem: Paravirtualized memory hotunplug part 1
->  virtio-mem: Paravirtualized memory hotunplug part 2
->  mm: Allow to offline unmovable PageOffline() pages via
->    MEM_GOING_OFFLINE
->  virtio-mem: Allow to offline partially unplugged memory blocks
->  mm/memory_hotplug: Introduce offline_and_remove_memory()
->  virtio-mem: Offline and remove completely unplugged memory blocks
->  virtio-mem: Better retry handling
->  virtio-mem: Add parent resource for all added "System RAM"
->  virtio-mem: Drop manual check for already present memory
->  virtio-mem: Unplug subblocks right-to-left
->  virtio-mem: Use -ETXTBSY as error code if the device is busy
->  virtio-mem: Try to unplug the complete online memory block first
-> 
-> MAINTAINERS                     |    7 +
-> drivers/acpi/numa/srat.c        |    1 +
-> drivers/virtio/Kconfig          |   17 +
-> drivers/virtio/Makefile         |    1 +
-> drivers/virtio/virtio_mem.c     | 1962 +++++++++++++++++++++++++++++++
-> include/linux/memory_hotplug.h  |    1 +
-> include/linux/page-flags.h      |   10 +
-> include/uapi/linux/virtio_ids.h |    1 +
-> include/uapi/linux/virtio_mem.h |  208 ++++
-> mm/memory_hotplug.c             |   81 +-
-> mm/page_alloc.c                 |   26 +
-> mm/page_isolation.c             |    9 +
-> 12 files changed, 2314 insertions(+), 10 deletions(-)
-> create mode 100644 drivers/virtio/virtio_mem.c
-> create mode 100644 include/uapi/linux/virtio_mem.h
-> 
+Doesn't this also suppress single-step #DBs?
+
+> +		 */
+> +		io_bytes   = (exit_info_1 >> 4) & 0x7;
+> +		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
+> +
+> +		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
+> +		exit_info_2 = min(op_count, ghcb_count);
+> +		exit_bytes  = exit_info_2 * io_bytes;
+> +
+> +		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
+> +
+> +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
+> +			ret = vc_insn_string_read(ctxt,
+> +					       (void *)(es_base + regs->si),
+
+SEV(-ES) is 64-bit only, why bother with the es_base charade?
+
+> +					       ghcb->shared_buffer, io_bytes,
+> +					       exit_info_2, df);
+
+df handling is busted, it's aways non-zero.  Same goes for the SI/DI
+adjustments below.
+
+> +			if (ret)
+> +				return ret;
+> +		}
+> +
+> +		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
+> +		ghcb_set_sw_scratch(ghcb, sw_scratch);
+> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
+> +				   exit_info_1, exit_info_2);
+> +		if (ret != ES_OK)
+> +			return ret;
+
+Batching the memory accesses and I/O accesses separately is technically
+wrong, e.g. a #DB on a memory access will result in bogus data being shown
+in the debugger.  In practice it seems unlikely to matter, but I'm curious
+as to why string I/O is supported in the first place.  I didn't think there
+was that much string I/O in the kernel?
+
+> +
+> +		/* Everything went well, write back results */
+> +		if (exit_info_1 & IOIO_TYPE_IN) {
+> +			ret = vc_insn_string_write(ctxt,
+> +						(void *)(es_base + regs->di),
+> +						ghcb->shared_buffer, io_bytes,
+> +						exit_info_2, df);
+> +			if (ret)
+> +				return ret;
+> +
+> +			if (df)
+> +				regs->di -= exit_bytes;
+> +			else
+> +				regs->di += exit_bytes;
+> +		} else {
+> +			if (df)
+> +				regs->si -= exit_bytes;
+> +			else
+> +				regs->si += exit_bytes;
+> +		}
+> +
+> +		if (exit_info_1 & IOIO_REP)
+> +			regs->cx -= exit_info_2;
+> +
+> +		ret = regs->cx ? ES_RETRY : ES_OK;
+> +
+> +	} else {
+> +		int bits = (exit_info_1 & 0x70) >> 1;
+> +		u64 rax = 0;
+> +
+> +		if (!(exit_info_1 & IOIO_TYPE_IN))
+> +			rax = lower_bits(regs->ax, bits);
+> +
+> +		ghcb_set_rax(ghcb, rax);
+> +
+> +		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
+> +		if (ret != ES_OK)
+> +			return ret;
+> +
+> +		if (exit_info_1 & IOIO_TYPE_IN) {
+> +			if (!ghcb_is_valid_rax(ghcb))
+> +				return ES_VMM_ERROR;
+> +			regs->ax = lower_bits(ghcb->save.rax, bits);
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
 > -- 
-> 2.25.3
-
+> 2.17.1
+> 
