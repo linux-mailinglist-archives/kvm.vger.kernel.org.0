@@ -2,96 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04FC11DA657
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 02:19:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F2A31DA65D
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 02:21:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728149AbgETATN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 May 2020 20:19:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36554 "EHLO
+        id S1727941AbgETAU6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 May 2020 20:20:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728085AbgETATN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 May 2020 20:19:13 -0400
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB4DC061A0E
-        for <kvm@vger.kernel.org>; Tue, 19 May 2020 17:19:13 -0700 (PDT)
-Received: by mail-qk1-x742.google.com with SMTP id f83so1842302qke.13
-        for <kvm@vger.kernel.org>; Tue, 19 May 2020 17:19:13 -0700 (PDT)
+        with ESMTP id S1725998AbgETAU5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 May 2020 20:20:57 -0400
+Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D62C061A0E
+        for <kvm@vger.kernel.org>; Tue, 19 May 2020 17:20:57 -0700 (PDT)
+Received: by mail-qv1-xf41.google.com with SMTP id l3so547970qvo.7
+        for <kvm@vger.kernel.org>; Tue, 19 May 2020 17:20:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=n9JZJWROso+hIIbOh+CMhqw39lf86JMdF2gn9eh+UIg=;
-        b=cxXI8ZM+8T9le0aatEoMGIohiGVbDAITFaJWkTHxe3g2ofpzbaO9x4T6fnmFbxG/cb
-         NdEKIhHtK0tIYKs70+I/ZKc6qSI6ASf5rMn7f5DYCJc7CAGQ3JxhLPErSSzyoNJeqzQK
-         qBOBIvPwrg5KEdYmZD1McXOeQFpYaECFemwsbSp8BkxkAAKCu2qu8L92/wAkNwMOLcIW
-         Gbfpaq4t25k4uxdiETzWNQP1F3+v4zLWt+U6nNthcU6/k4ervgWeT3IoBERMb1mqAIqm
-         dGSMky7SEpb6RbeWy6x7V4FBvZNzEhznlbLKVCug0r8MkL4pCPL637n44PvE5LY1UAlT
-         Lm8g==
+        bh=LBB46rtW2d9K5WUtTRAG4fGkmmxRO4txDBDNhv1nb3I=;
+        b=aufPXHafyAKGS85jzWFQOmgEWdqs2c3vqfnjP5CTdSPYXzcd9jfZDjoFw7/fNhSpkq
+         IEZvwy3nKg/7g5wAsBDxBkWyxPLi0cj4q3usRy4fSHicFZVt61hbduN29GYLULTU3gPr
+         Q7V7t+NzRRNytV7oV32b0dXWPTuzrqLtQT5r6hIF73tiiSOpCL7QS877pdVlaLjAS6N7
+         UBfvfG4X9vrVciR1zgfzlhvxP9ALidemtfWxUeq9f3OWI2jyqIvHIHbU5TEQLYHeFsSS
+         MMrEe9j7jF8ybu7VVS564vbdG9pPvCrzDHDqF1D3h/arpm778fP207M1EnuLnsBaOaqN
+         NlPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=n9JZJWROso+hIIbOh+CMhqw39lf86JMdF2gn9eh+UIg=;
-        b=JD02dEQURXEeVAoQ4EyZWEQW6TuyMFrI/thtX1MOHZYrIwfsyOnfDAa16KzkRQ5dd/
-         ueUf3RVIAonciUeKXGfn78Jz1QG8OvO/0TpfNQIrNtbu0zc2legIKjuAJ6fRVKZvpOYc
-         qH8fhQiFrM5EDEXl4iI25QTdZT5h5ox+V6dLeuFySqKQLF3Pi6TSHzwxkJf8Wf7jimaH
-         i2IakQ76KXjAmr8D8weA1sj+QuxCHbajC5bVSVSi7mI2IuV9ALiD0ah9JoBpkRXg28Z3
-         3KldYDZCuorZOHYf1mf5r3trDsvQO/3XNklVF064p3IIzrlSqwr2RmPddhH27LDZSica
-         S8Hg==
-X-Gm-Message-State: AOAM533MQ4qCXFhQnUte9XzteUFjaQ6wOznnxF041NdXJLALbd0mMJ0e
-        HAYhM0qa4g7kK7rTikzsJNNmWQ==
-X-Google-Smtp-Source: ABdhPJykcLtUdmf7WILmMYLNeoLOKQpyRW8G8FAVJII8fSZoCGX0L7PdXcMd+AvHVtJOxkvhP5FhYA==
-X-Received: by 2002:a37:8302:: with SMTP id f2mr2093454qkd.220.1589933952324;
-        Tue, 19 May 2020 17:19:12 -0700 (PDT)
+        bh=LBB46rtW2d9K5WUtTRAG4fGkmmxRO4txDBDNhv1nb3I=;
+        b=rEL3DzDq8mER7UmviDApfJHjV/0/hp8aLQiy086sIv6CUdT7FCEY8CnApeWr9aDKUa
+         tHaHky1W7EPyYG/04sxK2bDMU5rqfEDs3o8Xh8n/EKVbRDMMae2ymTjE4x+El8YLuOtw
+         8yZ7/VBf7r3RUfa4LYyGRXZfss3xZ73N/uKh7ujezxc8gSkNFrRfuthCElummCtSzeyq
+         z2RVlX0bxWbMQJ980JkJklSt8uomrtSrEBVY2cbxytZga6bGFJOD9K0xX6fOzw+0EOHY
+         inCGzMr0w2MGPM8i9Ua8HIAzJfAMigy6gwaXT252dxDSQEGZoZCU6cXfl3y4w/ddvhMn
+         GUyw==
+X-Gm-Message-State: AOAM533MSSpIFrGmDeZ88dYnbOlZ4KN3wJ8GJSkMgJl/XlGvH1wS1Gmw
+        JFTlghRcp34o9lTEMlG/DTqDES/j0UM=
+X-Google-Smtp-Source: ABdhPJzUB+q2wwwWl7HLqKjiszG5tdFF+m444eib+1trXjL6fLEd1NOT5DuZ5jvnviZDurr8gfCNzw==
+X-Received: by 2002:ad4:4a8b:: with SMTP id h11mr2482355qvx.232.1589934056694;
+        Tue, 19 May 2020 17:20:56 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
-        by smtp.gmail.com with ESMTPSA id s55sm1154161qtb.92.2020.05.19.17.19.11
+        by smtp.gmail.com with ESMTPSA id y66sm769077qka.24.2020.05.19.17.20.56
         (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 19 May 2020 17:19:11 -0700 (PDT)
+        Tue, 19 May 2020 17:20:56 -0700 (PDT)
 Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
         (envelope-from <jgg@ziepe.ca>)
-        id 1jbCRz-0003QX-AW; Tue, 19 May 2020 21:19:11 -0300
-Date:   Tue, 19 May 2020 21:19:11 -0300
+        id 1jbCTf-0003SK-R4; Tue, 19 May 2020 21:20:55 -0300
+Date:   Tue, 19 May 2020 21:20:55 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         cohuck@redhat.com, peterx@redhat.com
-Subject: Re: [PATCH 1/2] vfio: Introduce bus driver to IOMMU invalidation
- interface
-Message-ID: <20200520001911.GB31189@ziepe.ca>
+Subject: Re: [PATCH 2/2] vfio: Introduce strict PFNMAP mappings
+Message-ID: <20200520002055.GC31189@ziepe.ca>
 References: <158947414729.12590.4345248265094886807.stgit@gimli.home>
- <158947511830.12590.15083888449284990563.stgit@gimli.home>
+ <158947512947.12590.4756232870747830161.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <158947511830.12590.15083888449284990563.stgit@gimli.home>
+In-Reply-To: <158947512947.12590.4756232870747830161.stgit@gimli.home>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 14, 2020 at 10:51:58AM -0600, Alex Williamson wrote:
-> @@ -1450,6 +1467,10 @@ static int vfio_pci_zap_and_vma_lock(struct vfio_pci_device *vdev, bool try)
->  
->  				zap_vma_ptes(vma, vma->vm_start,
->  					     vma->vm_end - vma->vm_start);
-> +				mutex_unlock(&vdev->vma_lock);
-> +				up_read(&mm->mmap_sem);
-> +				vfio_invalidate_pfnmap_vma(vdev->group, vma);
-> +				goto again;
-
-The vma pointer can't leave the read side of the mmap_sem
-
+On Thu, May 14, 2020 at 10:52:09AM -0600, Alex Williamson wrote:
+>  	vfio_unregister_iommu_driver(&vfio_noiommu_ops);
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 4a4cb7cd86b2..62ba6bd8a486 100644
+> index 62ba6bd8a486..8d6286d89230 100644
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -91,6 +91,7 @@ struct vfio_dma {
->  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->  	struct task_struct	*task;
->  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> +	struct vm_area_struct	*pfnmap_vma;
+> @@ -61,6 +61,11 @@ module_param_named(dma_entry_limit, dma_entry_limit, uint, 0644);
+>  MODULE_PARM_DESC(dma_entry_limit,
+>  		 "Maximum number of user DMA mappings per container (65535).");
+>  
+> +static bool strict_mmio_maps = true;
+> +module_param_named(strict_mmio_maps, strict_mmio_maps, bool, 0644);
+> +MODULE_PARM_DESC(strict_mmio_maps,
+> +		 "Restrict DMA mappings of MMIO to those provided by vfio bus drivers supporting invalidation (true).");
+> +
 
-This is also confusing, how does it prevent pfnmap_vma from becoming
-freed?
+This should probably explain that 'false' allows some kind of security
+issue and maybe taint the kernel?
+
+Do you think there is a reason to have this anyhow?
 
 Jason
