@@ -2,91 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1FE41DBB4B
-	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:23:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2A991DBB46
+	for <lists+kvm@lfdr.de>; Wed, 20 May 2020 19:23:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727966AbgETRWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 13:22:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25643 "EHLO
+        id S1728316AbgETRX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 13:23:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41194 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728007AbgETRWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 13:22:07 -0400
+        with ESMTP id S1728088AbgETRWP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 13:22:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1589995326;
+        s=mimecast20190719; t=1589995334;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=Jil/RFj0RTK+aVNqnSvLRnL3kfX+SWb+xHtGZMZ+Xnk=;
-        b=B+YdVMjsAGav5bo3WwIEkM0QPR3R8FsFuNoK4hKzC55nm4JgHJRIzB6OoqYjDMRKSb2uxp
-        aea8bhkmD6A+gbTu0MhXdjP8O5/+9YTdM6nR/JN7fKmgFlVJGomADnOxRRGdDV0Rkm/9nA
-        Mk9KGBZ0YNPe+mUpa93RZeNB9PTeGOI=
+        bh=kz4tq35xt3C9g7L/W0gZ+sTXPcxeT9hQCry1awKznYk=;
+        b=LhZnCDQ0rS+MYEubeJ7ljtVKn2fMVuACn3gbGPpw0HsmkvnYHttuEIfu/tP99exFZ5B4fb
+        UMlxVHxYD7ODEI06966t7ZRmLib0xYDlp3JL4Pv1qvjZJZZCMyTwkWXuIwSiHnGGKWZlmA
+        Hm7Z0XT5L3Hhty2zsBjDl1O0eY6zHUE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-jDjkQTl3OHaL_WsEyO9qWQ-1; Wed, 20 May 2020 13:22:04 -0400
-X-MC-Unique: jDjkQTl3OHaL_WsEyO9qWQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-333-ruZB3uBTOGegCc9Ea_tGXQ-1; Wed, 20 May 2020 13:22:08 -0400
+X-MC-Unique: ruZB3uBTOGegCc9Ea_tGXQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8ABF106B21C;
-        Wed, 20 May 2020 17:21:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DADF8B5E70;
+        Wed, 20 May 2020 17:21:59 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 606B160610;
-        Wed, 20 May 2020 17:21:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98C9479C3F;
+        Wed, 20 May 2020 17:21:58 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 09/24] KVM: nSVM: clean up tsc_offset update
-Date:   Wed, 20 May 2020 13:21:30 -0400
-Message-Id: <20200520172145.23284-10-pbonzini@redhat.com>
+Subject: [PATCH 10/24] KVM: nSVM: pass vmcb_control_area to copy_vmcb_control_area
+Date:   Wed, 20 May 2020 13:21:31 -0400
+Message-Id: <20200520172145.23284-11-pbonzini@redhat.com>
 In-Reply-To: <20200520172145.23284-1-pbonzini@redhat.com>
 References: <20200520172145.23284-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use l1_tsc_offset to compute svm->vcpu.arch.tsc_offset and
-svm->vmcb->control.tsc_offset, instead of relying on hsave.
+This will come in handy when we put a struct vmcb_control_area in
+svm->nested.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/nested.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 4f81c2196bf6..2aaa539482ae 100644
+index 2aaa539482ae..c759124ed6af 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -241,8 +241,6 @@ static void load_nested_vmcb_control(struct vcpu_svm *svm,
- 	svm->nested.intercept_dr         = control->intercept_dr;
- 	svm->nested.intercept_exceptions = control->intercept_exceptions;
- 	svm->nested.intercept            = control->intercept;
--
--	svm->vcpu.arch.tsc_offset += control->tsc_offset;
+@@ -141,11 +141,9 @@ void recalc_intercepts(struct vcpu_svm *svm)
+ 	c->intercept |= g->intercept;
  }
  
- static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_vmcb)
-@@ -292,7 +290,8 @@ static void nested_prepare_vmcb_control(struct vcpu_svm *svm, struct vmcb *neste
+-static void copy_vmcb_control_area(struct vmcb *dst_vmcb, struct vmcb *from_vmcb)
++static void copy_vmcb_control_area(struct vmcb_control_area *dst,
++				   struct vmcb_control_area *from)
+ {
+-	struct vmcb_control_area *dst  = &dst_vmcb->control;
+-	struct vmcb_control_area *from = &from_vmcb->control;
+-
+ 	dst->intercept_cr         = from->intercept_cr;
+ 	dst->intercept_dr         = from->intercept_dr;
+ 	dst->intercept_exceptions = from->intercept_exceptions;
+@@ -423,7 +421,7 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
  	else
- 		svm->vcpu.arch.hflags &= ~HF_VINTR_MASK;
+ 		hsave->save.cr3    = kvm_read_cr3(&svm->vcpu);
  
--	svm->vmcb->control.tsc_offset = svm->vcpu.arch.tsc_offset;
-+	svm->vmcb->control.tsc_offset = svm->vcpu.arch.tsc_offset =
-+		svm->vcpu.arch.l1_tsc_offset + nested_vmcb->control.tsc_offset;
+-	copy_vmcb_control_area(hsave, vmcb);
++	copy_vmcb_control_area(&hsave->control, &vmcb->control);
  
- 	svm->vmcb->control.int_ctl = nested_vmcb->control.int_ctl | V_INTR_MASKING_MASK;
- 	svm->vmcb->control.virt_ext = nested_vmcb->control.virt_ext;
-@@ -557,7 +556,9 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 	svm->nested.nested_run_pending = 1;
+ 	enter_svm_guest_mode(svm, vmcb_gpa, nested_vmcb);
+@@ -554,7 +552,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 		nested_vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
+ 
  	/* Restore the original control entries */
- 	copy_vmcb_control_area(vmcb, hsave);
+-	copy_vmcb_control_area(vmcb, hsave);
++	copy_vmcb_control_area(&vmcb->control, &hsave->control);
  
--	svm->vcpu.arch.tsc_offset = svm->vmcb->control.tsc_offset;
-+	svm->vmcb->control.tsc_offset = svm->vcpu.arch.tsc_offset =
-+		svm->vcpu.arch.l1_tsc_offset;
-+
- 	kvm_clear_exception_queue(&svm->vcpu);
- 	kvm_clear_interrupt_queue(&svm->vcpu);
- 
+ 	svm->vmcb->control.tsc_offset = svm->vcpu.arch.tsc_offset =
+ 		svm->vcpu.arch.l1_tsc_offset;
 -- 
 2.18.2
 
