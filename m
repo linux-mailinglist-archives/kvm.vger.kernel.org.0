@@ -2,91 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DE8B1DD21D
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 17:40:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A53B11DD220
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 17:40:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730023AbgEUPj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 11:39:57 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32595 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727030AbgEUPj5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 May 2020 11:39:57 -0400
+        id S1729786AbgEUPkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 11:40:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38791 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728267AbgEUPkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 May 2020 11:40:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590075596;
+        s=mimecast20190719; t=1590075614;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TLBmkzvqLo/2xqTgB3wKYah0MktTnKkMGLnj++PbV5c=;
-        b=etIi9N75CEkd9r1HInm7mOHOSJgdhpu/PdWMCQbxz/RlIq9jWjXcymp4Z/mJNQQnECFQGD
-        kETEkfHj7NLSrNGEJa4o8M1mO8SxBS+zieO95aKUFCQaivL4gLAjTDbLKRFqhoRd7NGrlr
-        /KCL0p6yRk71ZRwdf4SUJ8xji78A+9k=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-D9yu5iGHP3mF74Z0XcecwA-1; Thu, 21 May 2020 11:39:54 -0400
-X-MC-Unique: D9yu5iGHP3mF74Z0XcecwA-1
-Received: by mail-wr1-f70.google.com with SMTP id n9so3055760wru.20
-        for <kvm@vger.kernel.org>; Thu, 21 May 2020 08:39:54 -0700 (PDT)
+        bh=kenpgJBk4auwpqa56sHWeaXAdh8oFne+jS5kW7dDT3Q=;
+        b=aA6nrH98tbB8DmLvjITj9G3b+pz+kXrhGXJ2y7ExdS+K2nUO3mnooKDwSOpEEzLWM6VVzh
+        gYPl/kw7qlE2LrUZ6JimwzUgH3nR02qUrzJgZOkmCN1lXqtSLvIlr/AOA9xix48tqktOqE
+        8TcgeZcR5LjCG1v3Jntb2FI6/7Gn8u8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-dlcgbeTKPtehoqhw7hX0zg-1; Thu, 21 May 2020 11:40:07 -0400
+X-MC-Unique: dlcgbeTKPtehoqhw7hX0zg-1
+Received: by mail-wr1-f72.google.com with SMTP id e1so586892wrm.3
+        for <kvm@vger.kernel.org>; Thu, 21 May 2020 08:40:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=TLBmkzvqLo/2xqTgB3wKYah0MktTnKkMGLnj++PbV5c=;
-        b=cUHpWwWYusTLi1oqs8dmjoDJk9xR2QDXYRusd25oZ243QjmBuD2TwZAxU+vmck9eLH
-         l/mVBYPBntFRA88B+foV4ppZre5/uWcBWI+D76dZ2GVLYLXr0mJHwMb29i7o8phzlQ5M
-         k1zGzUzRghqLEOakKlWWuP1gpIc/GncGjJi10zoRxhKbklwYLshYw5EBM98VuiNh+8IV
-         3g0v3DamtaQ/TeREEb1kpRv1UD1E9PbcDy5KJWQvCK1ytq/sWjzx6XondKGoMsNGt2J9
-         WZrYC+gurIW1UiDIiIs2xwOWZEy4FXYzsKjF8Xo5Vp2fF8wIvzX/Hgu0hGmp4xq98BIZ
-         lKQQ==
-X-Gm-Message-State: AOAM531SchsZ+wvGWWAurQyXzdKEgqV6xv+ZhsrF+FLzhbvEU8xPXghv
-        xyNw85y2OPuwQndYbytlUcn67jAKmCtnbJHCD4ScvjQUqSNtLHJWOm5JFiQ7ltoj4n1VWqA5ZfX
-        fL/wXvVry3dxm
-X-Received: by 2002:a1c:5fd4:: with SMTP id t203mr9952477wmb.175.1590075593000;
-        Thu, 21 May 2020 08:39:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfVFA16Vk7DH3k5Gli/MWqVyNwVg5WtcQ3TOTHXqa1Cxgchjm6mOUYuBDf5kB3v7fVX8NKYQ==
-X-Received: by 2002:a1c:5fd4:: with SMTP id t203mr9952456wmb.175.1590075592732;
-        Thu, 21 May 2020 08:39:52 -0700 (PDT)
+        bh=kenpgJBk4auwpqa56sHWeaXAdh8oFne+jS5kW7dDT3Q=;
+        b=RGhCVDO5XqWd4fj9a9SAHV25Ru2ZbtaNjPbSFQSHHAb7dBOUd+cq5SKIjv1JnwrXBd
+         l6edQMOST+GWgWNXLTx1H/mSJUeD+9a97Gc7XrlQ5BnSPJpMu8TCSAEAYLmgMTr/N9XE
+         iY+FAV/RenE5+08R6CfHgAcZMPf57GBpyus72VJhMFyJ+gLz5C/8e0SSETzZVzg+MWYu
+         D+pKT5WWg7gu7xTO7TS+HRZCMEWleTmy7vTFIV/3CfvKIi7CJACQIAriQzaK+JQVsK/T
+         kKbRQWWoi9xS3KLzpzfv83Vwwgp/6nK9rgbf27Ax/w+Emnz5YsdJIoSDofXpwq+O9PP5
+         BU4w==
+X-Gm-Message-State: AOAM533js+OCu+fHrwdzIsExS9OLgbtz02lNYGTQamQ5HntEA2Gpytrq
+        YPaDHhyG+2e2xkgaHkACOUgeh+KYJpNZ++BzqE9g79aLJxnj8r0q3tAa6ykJF4Kj4kKjDvCUhMN
+        XVHXIaxK//eGr
+X-Received: by 2002:adf:eb08:: with SMTP id s8mr4857962wrn.361.1590075606569;
+        Thu, 21 May 2020 08:40:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwjLbdazE1MurwXiqGxMChHJ6avy7iQksM+O+Le37BmWF/JoDDdLxLXN9DoW1cPErnwFF5huA==
+X-Received: by 2002:adf:eb08:: with SMTP id s8mr4857943wrn.361.1590075606355;
+        Thu, 21 May 2020 08:40:06 -0700 (PDT)
 Received: from [192.168.178.58] ([151.21.160.154])
-        by smtp.gmail.com with ESMTPSA id v19sm6410774wml.43.2020.05.21.08.39.51
+        by smtp.gmail.com with ESMTPSA id a17sm2925213wmm.23.2020.05.21.08.40.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2020 08:39:52 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 6/7] accel/kvm: Let KVM_EXIT_MMIO return error
-To:     Peter Maydell <peter.maydell@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
-        Richard Henderson <rth@twiddle.net>
+        Thu, 21 May 2020 08:40:05 -0700 (PDT)
+Subject: Re: [PATCH v2 0/7] exec/memory: Enforce checking MemTxResult values
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
 References: <20200518155308.15851-1-f4bug@amsat.org>
- <20200518155308.15851-7-f4bug@amsat.org>
- <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c0cbdc0-a809-b80b-ade3-9bdc6f95b1a8@redhat.com>
-Date:   Thu, 21 May 2020 17:39:51 +0200
+Message-ID: <97559075-f7f3-3b18-a34d-3e7a419817ab@redhat.com>
+Date:   Thu, 21 May 2020 17:40:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com>
+In-Reply-To: <20200518155308.15851-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/05/20 18:01, Peter Maydell wrote:
-> The "right" answer is that the kernel should enhance the KVM_EXIT_MMIO
-> API to allow userspace to say "sorry, you got a bus error on that
-> memory access the guest just tried" (which the kernel then has to
-> turn into an appropriate guest exception, or ignore, depending on
-> what the architecture requires.) You don't want to set ret to
-> non-zero here, because that will cause us to VM_STOP, and I
-> suspect that x86 at least is relying on the implict RAZ/WI
-> behaviour it currently gets.
+On 18/05/20 17:53, Philippe Mathieu-Daudé wrote:
+> Various places ignore the MemTxResult indicator of
+> transaction failed. Fix the easy places.
+> The rest are the DMA devices, which require deeper
+> analysis.
+> 
+> Since v1:
+> - Dropped "exec/memory: Emit warning when MemTxResult is ignored"
+>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg704180.html
+> 
+> Philippe Mathieu-Daudé (7):
+>   exec: Let address_space_read/write_cached() propagate MemTxResult
+>   exec: Propagate cpu_memory_rw_debug() error
+>   disas: Let disas::read_memory() handler return EIO on error
+>   hw/elf_ops: Do not ignore write failures when loading ELF
+>   hw/arm/boot: Abort if set_kernel_args() fails
+>   accel/kvm: Let KVM_EXIT_MMIO return error
+>   hw/core/loader: Assert loading ROM regions succeeds at reset
+> 
+>  include/exec/cpu-all.h |  1 +
+>  include/exec/memory.h  | 19 +++++++++++--------
+>  include/hw/elf_ops.h   | 11 ++++++++---
+>  accel/kvm/kvm-all.c    | 13 +++++++------
+>  disas.c                | 13 ++++++++-----
+>  exec.c                 | 28 ++++++++++++++++------------
+>  hw/arm/boot.c          | 19 +++++++++++++------
+>  hw/core/loader.c       |  8 ++++++--
+>  8 files changed, 70 insertions(+), 42 deletions(-)
+> 
 
-Yes, it is.  It may even be already possible to inject the right
-exception (on ARM) through KVM_SET_VCPU_EVENTS or something like that, too.
+Queued patches 1-4, thanks.
 
 Paolo
 
