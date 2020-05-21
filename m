@@ -2,44 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB8B01DC82D
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 10:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C99711DC871
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 10:24:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728521AbgEUIDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 04:03:12 -0400
-Received: from mga12.intel.com ([192.55.52.136]:28815 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726208AbgEUIDL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 04:03:11 -0400
-IronPort-SDR: xQeBQhK3A+gGS6Pc8JQnynuhDZqd9dkP982zUL3PgrEL36LCdzuwJzRZwJMiifMgdQw5Ic/Ptu
- C2wC17KSescg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2020 01:03:11 -0700
-IronPort-SDR: mdzcInu+nHsVQ4gPEiQktmNc+k7tQTG45ABEezbov/pH+l/dqt+52wfsKxEk+ChpVmvmCzvpUu
- E2rh4t+IddYA==
-X-IronPort-AV: E=Sophos;i="5.73,417,1583222400"; 
-   d="scan'208";a="440355710"
-Received: from unknown (HELO [10.239.13.122]) ([10.239.13.122])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2020 01:03:09 -0700
+        id S1728595AbgEUIY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 04:24:29 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22746 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728481AbgEUIY2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 May 2020 04:24:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590049467;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UgPlPKwQ78SmEvwlM+tSnD4eOCAOdkr7Ntl2fCb3Qdo=;
+        b=KiS63N3Cn7Czi5DVNZGyjNaxec7dLbyPv4piB4gVvc776I0UdY/hFDUKDkwLBrApkfuT/U
+        3FB8opFdS3gpc9WHzuLuJqx+ltoawgPsWDMFqvEQc0uWHdRK70kjlzGu8njB9Rfu59nSYt
+        ggQAeYpz9afFTmSC+O3b2rdqJjCxkzo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-eSQqsfquMReWVVIMDKDYqg-1; Thu, 21 May 2020 04:24:25 -0400
+X-MC-Unique: eSQqsfquMReWVVIMDKDYqg-1
+Received: by mail-ej1-f72.google.com with SMTP id by8so2472107ejb.13
+        for <kvm@vger.kernel.org>; Thu, 21 May 2020 01:24:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UgPlPKwQ78SmEvwlM+tSnD4eOCAOdkr7Ntl2fCb3Qdo=;
+        b=No1vcist89ybYMagneKAnnayJ3KbkCaqiPxkNZT3O0qEKiymX7+iNGWz+MdwL31LYH
+         zPykcLyvQz8n6w1KltEKgwLvqA+6Yh0a6cavoSyFFkcqLLy4SF3kioHk10bJOj9BIU3O
+         0Ku4Q1+Rk+uOwGQMExXRk+kseysWQVPmRjF9jToWmT+zkf4LBE5CGoV4X25f/+sL08k4
+         67WwHvkOP86/A/ErOB2DsfUPWuwBVYNP4E5cmgWALq/W24zQYLO1ChrtFR0upCJiL1eo
+         K9DMwE6D1bVx8Ln0Pm7flMiBqUp7npvUoQ2ZuzqIZJjXCc+sUS7KNcO9feE4HCu8SYMa
+         TXlA==
+X-Gm-Message-State: AOAM533ES5t+nIiMAIzLt8B1/seCxkhFbBj+wi2t9aaxP5tKxEnZlXAV
+        umOyr4UUb0jByI5jZvea5C2eJHezfZq3GB92vvRViVuFxuPHaqEyXaH+O3EkZIVQfrTqnL5mfLx
+        ebD/gNPf3v4kt
+X-Received: by 2002:a17:907:9d5:: with SMTP id bx21mr2366552ejc.510.1590049464360;
+        Thu, 21 May 2020 01:24:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyoFKBT/y+lQ+LBEKa1W8bfwlzO4IvlNszMAjhIGGbGZEJr2l2PRpnaSFM+8x03wohqDEKpng==
+X-Received: by 2002:a17:907:9d5:: with SMTP id bx21mr2366545ejc.510.1590049464136;
+        Thu, 21 May 2020 01:24:24 -0700 (PDT)
+Received: from [192.168.178.58] ([151.30.94.134])
+        by smtp.gmail.com with ESMTPSA id s20sm4204784eju.96.2020.05.21.01.24.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 May 2020 01:24:23 -0700 (PDT)
 Subject: Re: [PATCH 2/2] kvm/x86: don't expose MSR_IA32_UMWAIT_CONTROL
  unconditionally
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Tao Xu <tao3.xu@intel.com>
 Cc:     linux-kernel@vger.kernel.org
 References: <20200520160740.6144-1-mlevitsk@redhat.com>
  <20200520160740.6144-3-mlevitsk@redhat.com>
- <874ksatvkr.fsf@vitty.brq.redhat.com>
- <0c1a0c81bbdcfaf4ae9af545f4a38439b1a56d11.camel@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <d22e9a18-14eb-8214-976a-72b76edb0dc3@intel.com>
-Date:   Thu, 21 May 2020 16:03:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ <b8ca9ea1-2958-3ab4-2e86-2edbee1ca9d9@redhat.com>
+ <81228a0e-7797-4f34-3d6d-5b0550c10a8f@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <13f16f34-ce01-4207-1d1d-775b15a1e0f7@redhat.com>
+Date:   Thu, 21 May 2020 10:24:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <0c1a0c81bbdcfaf4ae9af545f4a38439b1a56d11.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <81228a0e-7797-4f34-3d6d-5b0550c10a8f@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -47,56 +76,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/21/2020 12:56 AM, Maxim Levitsky wrote:
-> On Wed, 2020-05-20 at 18:33 +0200, Vitaly Kuznetsov wrote:
->> Maxim Levitsky <mlevitsk@redhat.com> writes:
->>
->>> This msr is only available when the host supports WAITPKG feature.
->>>
->>> This breaks a nested guest, if the L1 hypervisor is set to ignore
->>> unknown msrs, because the only other safety check that the
->>> kernel does is that it attempts to read the msr and
->>> rejects it if it gets an exception.
->>>
->>> Fixes: 6e3ba4abce KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
->>>
->>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->>> ---
->>>   arch/x86/kvm/x86.c | 4 ++++
->>>   1 file changed, 4 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index fe3a24fd6b263..9c507b32b1b77 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -5314,6 +5314,10 @@ static void kvm_init_msr_list(void)
->>>   			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
->>>   			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
->>>   				continue;
->>> +			break;
->>> +		case MSR_IA32_UMWAIT_CONTROL:
->>> +			if (!kvm_cpu_cap_has(X86_FEATURE_WAITPKG))
->>> +				continue;
->>
->> I'm probably missing something but (if I understand correctly) the only
->> effect of dropping MSR_IA32_UMWAIT_CONTROL from msrs_to_save would be
->> that KVM userspace won't see it in e.g. KVM_GET_MSR_INDEX_LIST. But why
->> is this causing an issue? I see both vmx_get_msr()/vmx_set_msr() have
->> 'host_initiated' check:
->>
->>         case MSR_IA32_UMWAIT_CONTROL:
->>                  if (!msr_info->host_initiated && !vmx_has_waitpkg(vmx))
->>                          return 1;
-> 
-> Here it fails like that:
-> 
-> 1. KVM_GET_MSR_INDEX_LIST returns this msrs, and qemu notes that
->     it is supported in 'has_msr_umwait' global var
+On 21/05/20 06:33, Xiaoyao Li wrote:
+> I remember there is certainly some reason why we don't expose WAITPKG to
+> guest by default.
 
-In general, KVM_GET_MSR_INDEX_LIST won't return MSR_IA32_UMWAIT_CONTROL 
-if KVM cannot read this MSR, see kvm_init_msr_list().
+That's a userspace policy decision.  KVM_GET_SUPPORTED_CPUID should
+still tell userspace that it's supported.
 
-You hit issue because you used "ignore_msrs".
+Paolo
 
-
+> Tao, please help clarify it.
 
