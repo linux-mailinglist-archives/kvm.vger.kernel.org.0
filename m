@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 617111DC7AD
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 09:29:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44D741DC7BA
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 09:33:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728486AbgEUH3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 03:29:02 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:4073 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728272AbgEUH3B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 03:29:01 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ec62d2d0000>; Thu, 21 May 2020 00:26:37 -0700
+        id S1728359AbgEUHdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 03:33:01 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:19307 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728245AbgEUHdB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 May 2020 03:33:01 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5ec62ea00002>; Thu, 21 May 2020 00:32:48 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 21 May 2020 00:29:01 -0700
+  Thu, 21 May 2020 00:33:01 -0700
 X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 21 May 2020 00:29:01 -0700
+        by hqpgpgate101.nvidia.com on Thu, 21 May 2020 00:33:01 -0700
 Received: from [10.40.103.233] (10.124.1.5) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 21 May
- 2020 07:28:52 +0000
+ 2020 07:32:50 +0000
 Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
  devices
 To:     Yan Zhao <yan.y.zhao@intel.com>
@@ -44,8 +44,8 @@ References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
  <20200521070403.GD10369@joy-OptiPlex-7040>
 X-Nvconfidentiality: public
 From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <5abfe792-bbec-eee5-a74a-ed7d6a49653e@nvidia.com>
-Date:   Thu, 21 May 2020 12:58:49 +0530
+Message-ID: <5c43346d-fb68-3c04-3286-4003eb8ad1d6@nvidia.com>
+Date:   Thu, 21 May 2020 13:02:47 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
@@ -57,17 +57,17 @@ Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1590045997; bh=mpo21otSi1tZh6ONw5H5d/kZJAZTsRBL+p0/QMKVSms=;
+        t=1590046369; bh=18dun8khhYkUCAfLtt2+tdmtlzURCTX7XuUVjgIOmvc=;
         h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
          Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
          X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
          Content-Transfer-Encoding;
-        b=MCrNkSrxAmEk5NBe+qu9O7/AK13L0Ry2OWj4Jo8WckPkEaTRy8K4PEnQH3IouEJsq
-         8PSyEx7yc17XFsn4o4VQ2oAjmw1wHHpRR0Vd3BxxfJiLApT6g/txiEjJAyohm+m+cz
-         WIQDwnZ+JltrE4zqIHtOftXCwEpPlluHlBKDeaMSjYejAn9/RMHX6jQf9ixwOUQNJx
-         B8PJyJ7kSm8oo/JIqDE2RQT+JVDIKE0thoDFZJXfI7Lvs2NV8HpHGEaPclSv7sbbWP
-         2FFdRtHHnNaoU1CNS3IMNxbsTguMdHIR7ogNabRUVqrBliOQTPDQvhuL+BmWkO/PMm
-         BxoUbU+C4q9+Q==
+        b=ISSFlE6MKBm5Nj4QRLtXhSmP0PrXJAveZ6fNYCBsmp1T86n/4WauTjA0k83m+yx1z
+         s84pUT1/07xE3sTVAltdsGj2ox+fx0rX1UXxK9nDYrDGUAoP9ONgp6BhhRvniCzWFI
+         x7zS6q/Nr72Z9FyM3il+qMRqVmtP2dNdzj+8q3zavDP6m5vmEnhiO7nKKtyMImfBMS
+         ZecgXuKxHESkHr4Ashh0gbuE7Fuyg4lNsnMb7eKjcQYvFFcmqb2t2sxOLpQ92v1Asg
+         NoTdQ6VJw+JheoC6Z/aF2Io/vCrO/0E+2LNVuUhAzJaUmD4kDdh0mC8Sk8+caMFxLW
+         Hubbltprb4MpA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -193,8 +193,12 @@ On 5/21/2020 12:34 PM, Yan Zhao wrote:
 > FYI.
 > 
 
-Probably you will have to figure out why g_try_malloc0() is failing. 
-what is data_size when it fails?
+Traces are added in migration code so enabling vfio_* traces at source 
+and destination qemu commandline helps to debug and analyze any 
+migration related errors.
 
 Thanks,
 Kirti
+
+
+
