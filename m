@@ -2,149 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1979E1DD1E7
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 17:33:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DE8B1DD21D
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 17:40:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729825AbgEUPbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 11:31:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35780 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729598AbgEUPbF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 11:31:05 -0400
+        id S1730023AbgEUPj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 11:39:57 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32595 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727030AbgEUPj5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 May 2020 11:39:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590075063;
+        s=mimecast20190719; t=1590075596;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NiBbFfqpWGfaX7br4oQd1Sf0u6bMIADYOp/o0kJpbao=;
-        b=b3Ea99Pt802PKQzW4nUWd0+XptQsmfqsAUAKfMvp6C9xuU0RKtwACeLnQadcChcmjv62hj
-        JkZdJy/zcUYRo5eFV/NE4nOaEJVdbhu2WbTpHfQra8LuWUgfeJd4iE5tmj7i/CVVbXy8u5
-        +OOcvpn7Bmrn6Bz6DgU0QX9+5iKcwcM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-8yJcSXQiPYaOHqB9vxPyzA-1; Thu, 21 May 2020 11:31:01 -0400
-X-MC-Unique: 8yJcSXQiPYaOHqB9vxPyzA-1
-Received: by mail-wr1-f69.google.com with SMTP id p8so3069364wrj.5
-        for <kvm@vger.kernel.org>; Thu, 21 May 2020 08:31:01 -0700 (PDT)
+        bh=TLBmkzvqLo/2xqTgB3wKYah0MktTnKkMGLnj++PbV5c=;
+        b=etIi9N75CEkd9r1HInm7mOHOSJgdhpu/PdWMCQbxz/RlIq9jWjXcymp4Z/mJNQQnECFQGD
+        kETEkfHj7NLSrNGEJa4o8M1mO8SxBS+zieO95aKUFCQaivL4gLAjTDbLKRFqhoRd7NGrlr
+        /KCL0p6yRk71ZRwdf4SUJ8xji78A+9k=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-D9yu5iGHP3mF74Z0XcecwA-1; Thu, 21 May 2020 11:39:54 -0400
+X-MC-Unique: D9yu5iGHP3mF74Z0XcecwA-1
+Received: by mail-wr1-f70.google.com with SMTP id n9so3055760wru.20
+        for <kvm@vger.kernel.org>; Thu, 21 May 2020 08:39:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=NiBbFfqpWGfaX7br4oQd1Sf0u6bMIADYOp/o0kJpbao=;
-        b=KQQt2vH3sfGd5yuH1GrAsVVUs6MMlW3AyKOGmLicU7/umYVsbsapG5wQbrAj2iFEeI
-         8WOYZ8OWxtKbGUwzZCTPRO4tDUd4f5qXCUj9VvFkVV87REhUoFiVhdffGLg+CK4um+7F
-         heratThW3heI/w5dSWkoGsxxw27UtpEt2Gn9NZE3wpeTK9WvfEmuN9IquaLwaklNSdEh
-         rq/hAuiwzOx2ora8NhS9qGKDID7SQfOpAjFLIr7ITvE+2yPCFXSGgag14W8K1MrpZ9l+
-         GbMO5UVFHYkRBCqps4h4HDn0PBJbeq04aG7usuydXqzQRN4MRWwhaEhV1UWhxAZbRIGo
-         cFiw==
-X-Gm-Message-State: AOAM531Br8SfmtXgAW4QbUKTwQEVN0yStikmtu3jp9ys/QvHpJfsnyUY
-        0bimpKwHzVQExyn3a/McwLstfRpRkvFIf1Tzc+r6qYZP20LYYWsIF7VgnzzAERxhc3r9CB9LS+k
-        cAUGSi5hLa0io
-X-Received: by 2002:adf:e951:: with SMTP id m17mr9117306wrn.352.1590075059863;
-        Thu, 21 May 2020 08:30:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx9XzQHYSb3oj7OXmZwI4SsOv4c8F+v4kCsqF4Ze+XpP0U9yag65LbK5doHRKdxJY5/WD7+mw==
-X-Received: by 2002:adf:e951:: with SMTP id m17mr9117283wrn.352.1590075059632;
-        Thu, 21 May 2020 08:30:59 -0700 (PDT)
+        bh=TLBmkzvqLo/2xqTgB3wKYah0MktTnKkMGLnj++PbV5c=;
+        b=cUHpWwWYusTLi1oqs8dmjoDJk9xR2QDXYRusd25oZ243QjmBuD2TwZAxU+vmck9eLH
+         l/mVBYPBntFRA88B+foV4ppZre5/uWcBWI+D76dZ2GVLYLXr0mJHwMb29i7o8phzlQ5M
+         k1zGzUzRghqLEOakKlWWuP1gpIc/GncGjJi10zoRxhKbklwYLshYw5EBM98VuiNh+8IV
+         3g0v3DamtaQ/TeREEb1kpRv1UD1E9PbcDy5KJWQvCK1ytq/sWjzx6XondKGoMsNGt2J9
+         WZrYC+gurIW1UiDIiIs2xwOWZEy4FXYzsKjF8Xo5Vp2fF8wIvzX/Hgu0hGmp4xq98BIZ
+         lKQQ==
+X-Gm-Message-State: AOAM531SchsZ+wvGWWAurQyXzdKEgqV6xv+ZhsrF+FLzhbvEU8xPXghv
+        xyNw85y2OPuwQndYbytlUcn67jAKmCtnbJHCD4ScvjQUqSNtLHJWOm5JFiQ7ltoj4n1VWqA5ZfX
+        fL/wXvVry3dxm
+X-Received: by 2002:a1c:5fd4:: with SMTP id t203mr9952477wmb.175.1590075593000;
+        Thu, 21 May 2020 08:39:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfVFA16Vk7DH3k5Gli/MWqVyNwVg5WtcQ3TOTHXqa1Cxgchjm6mOUYuBDf5kB3v7fVX8NKYQ==
+X-Received: by 2002:a1c:5fd4:: with SMTP id t203mr9952456wmb.175.1590075592732;
+        Thu, 21 May 2020 08:39:52 -0700 (PDT)
 Received: from [192.168.178.58] ([151.21.160.154])
-        by smtp.gmail.com with ESMTPSA id m7sm6922422wmc.40.2020.05.21.08.30.58
+        by smtp.gmail.com with ESMTPSA id v19sm6410774wml.43.2020.05.21.08.39.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2020 08:30:59 -0700 (PDT)
-Subject: Re: [PATCH v2] i386/kvm: fix a use-after-free when vcpu plug/unplug
-To:     Pan Nengyuan <pannengyuan@huawei.com>, rth@twiddle.net,
-        ehabkost@redhat.com, mtosatti@redhat.com
-Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        zhang.zhanghailiang@huawei.com, euler.robot@huawei.com
-References: <20200513132630.13412-1-pannengyuan@huawei.com>
+        Thu, 21 May 2020 08:39:52 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 6/7] accel/kvm: Let KVM_EXIT_MMIO return error
+To:     Peter Maydell <peter.maydell@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200518155308.15851-1-f4bug@amsat.org>
+ <20200518155308.15851-7-f4bug@amsat.org>
+ <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2bbaf097-69ab-3afb-d081-56eb76f633d5@redhat.com>
-Date:   Thu, 21 May 2020 17:30:58 +0200
+Message-ID: <0c0cbdc0-a809-b80b-ade3-9bdc6f95b1a8@redhat.com>
+Date:   Thu, 21 May 2020 17:39:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200513132630.13412-1-pannengyuan@huawei.com>
+In-Reply-To: <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/05/20 15:26, Pan Nengyuan wrote:
-> When we hotplug vcpus, cpu_update_state is added to vm_change_state_head
-> in kvm_arch_init_vcpu(). But it forgot to delete in kvm_arch_destroy_vcpu() after
-> unplug. Then it will cause a use-after-free access. This patch delete it in
-> kvm_arch_destroy_vcpu() to fix that.
-> 
-> Reproducer:
->     virsh setvcpus vm1 4 --live
->     virsh setvcpus vm1 2 --live
->     virsh suspend vm1
->     virsh resume vm1
-> 
-> The UAF stack:
-> ==qemu-system-x86_64==28233==ERROR: AddressSanitizer: heap-use-after-free on address 0x62e00002e798 at pc 0x5573c6917d9e bp 0x7fff07139e50 sp 0x7fff07139e40
-> WRITE of size 1 at 0x62e00002e798 thread T0
->     #0 0x5573c6917d9d in cpu_update_state /mnt/sdb/qemu/target/i386/kvm.c:742
->     #1 0x5573c699121a in vm_state_notify /mnt/sdb/qemu/vl.c:1290
->     #2 0x5573c636287e in vm_prepare_start /mnt/sdb/qemu/cpus.c:2144
->     #3 0x5573c6362927 in vm_start /mnt/sdb/qemu/cpus.c:2150
->     #4 0x5573c71e8304 in qmp_cont /mnt/sdb/qemu/monitor/qmp-cmds.c:173
->     #5 0x5573c727cb1e in qmp_marshal_cont qapi/qapi-commands-misc.c:835
->     #6 0x5573c7694c7a in do_qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:132
->     #7 0x5573c7694c7a in qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:175
->     #8 0x5573c71d9110 in monitor_qmp_dispatch /mnt/sdb/qemu/monitor/qmp.c:145
->     #9 0x5573c71dad4f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu/monitor/qmp.c:234
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> - v2: remove unnecessary set vmsentry to null(there is no non-null check).
-> ---
->  target/i386/cpu.h | 1 +
->  target/i386/kvm.c | 4 +++-
->  2 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index e818fc712a..afbd11b7a3 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1631,6 +1631,7 @@ struct X86CPU {
->  
->      CPUNegativeOffsetState neg;
->      CPUX86State env;
-> +    VMChangeStateEntry *vmsentry;
->  
->      uint64_t ucode_rev;
->  
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 4901c6dd74..0a4eca5a85 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1770,7 +1770,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          }
->      }
->  
-> -    qemu_add_vm_change_state_handler(cpu_update_state, env);
-> +    cpu->vmsentry = qemu_add_vm_change_state_handler(cpu_update_state, env);
->  
->      c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
->      if (c) {
-> @@ -1883,6 +1883,8 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
->          env->nested_state = NULL;
->      }
->  
-> +    qemu_del_vm_change_state_handler(cpu->vmsentry);
-> +
->      return 0;
->  }
->  
-> 
+On 18/05/20 18:01, Peter Maydell wrote:
+> The "right" answer is that the kernel should enhance the KVM_EXIT_MMIO
+> API to allow userspace to say "sorry, you got a bus error on that
+> memory access the guest just tried" (which the kernel then has to
+> turn into an appropriate guest exception, or ignore, depending on
+> what the architecture requires.) You don't want to set ret to
+> non-zero here, because that will cause us to VM_STOP, and I
+> suspect that x86 at least is relying on the implict RAZ/WI
+> behaviour it currently gets.
 
-Queued, thanks.
+Yes, it is.  It may even be already possible to inject the right
+exception (on ARM) through KVM_SET_VCPU_EVENTS or something like that, too.
 
 Paolo
 
