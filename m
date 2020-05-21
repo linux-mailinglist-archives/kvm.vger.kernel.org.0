@@ -2,97 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E429D1DCB9C
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 13:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2E531DCD43
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 14:51:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728575AbgEULFM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 07:05:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51292 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728348AbgEULFL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 07:05:11 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34019C061A0E;
-        Thu, 21 May 2020 04:05:10 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id l18so6247294wrn.6;
-        Thu, 21 May 2020 04:05:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0kOWfagYaxm33AGZcA1CpvfNn7HWE5+JvpuvxfP/z54=;
-        b=eoqCHD/0uMiOw3qgaN7N4QZPdhvb/P2BiPUskhLmWsGZK66FilVFjjUhf0q3VF0dY8
-         aS+Xg9hy81A6LfdW207F3V9eDhFWayFXbWSLKyEk1B+5mzPDMUe0RverKiLSTvsvUPKy
-         hECRT0UhKwWWATTnX26xGHqY/k+iO0Jn8wnfgqDTzMlxN23FHuJQzJ48dp8zh1mkXEmy
-         oekBNs5wSPrtaQBQiaNwjE66lRczYOzGNqrtN8dhfoXhOVqRjJmhREd7reCw/o5HLU7l
-         a2ypqQuGrwZAN3RIg9oOyiW4cUurSxmg/+FX4JPEWc7VY0L1fxRlISQu16UREduYbu96
-         /r2A==
+        id S1729367AbgEUMvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 08:51:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27350 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729054AbgEUMvF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 May 2020 08:51:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590065464;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=I8r9b3WKmFH8x00N7WEjSsV4mj5QT0SricNOgzeLgeo=;
+        b=e8/fgY66vaz+DkaPoKJXi5L5cskbw1K0JVRmOIVZJv8ISLqZIUavn/BMQWnZnsXha4grqf
+        xzrG2AKqISWDJrOOLC4TZjAn+dAP9/MTvHXj0kSDcWYLd5FaibZJSvqBPDt47MPt9FtDCi
+        votedtwRHNDINzbmtB+MHPvOIwb1UEU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-235-tS6g-31COVqHvhYFgiKviw-1; Thu, 21 May 2020 08:51:00 -0400
+X-MC-Unique: tS6g-31COVqHvhYFgiKviw-1
+Received: by mail-ej1-f71.google.com with SMTP id c25so2848935eja.4
+        for <kvm@vger.kernel.org>; Thu, 21 May 2020 05:51:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0kOWfagYaxm33AGZcA1CpvfNn7HWE5+JvpuvxfP/z54=;
-        b=bQFAQjKOhfJcaWJPBIyXCjjI0Bu98Doqp0MNaKMrXliC5SfjdT6jsNpoE6nF5BMwrA
-         /UY5BDzGICyb348h4b4whbw/rTQOfFIK2hXSaCzRBknll+LcoL064vzlnTXpLNB5Qd1Y
-         DoEPo8/EqiJv5wWJInWrva3KFtlJDorLhc5XbSgvKuOagy2lW7dQhWdhP8HsHYQAT9ex
-         0y8SPUzpFSK4AsDo478YQ4BWkk0u8hNgG3Drt/eQH1ettdxyZ6hhysrSRCXQadPgMi9u
-         hqEiNFB6APXSttj1KDWIa3UQPrPFRaG+5KoyIIim+1V0Sys+3JzkFeNRg5ebKgB1knfI
-         h7mQ==
-X-Gm-Message-State: AOAM5321dOunzO/c9Rjyfjp1DRrYX3LIAXLCUy5Nns7sR8P4m+gxpwlz
-        Xnfs24Yy296/wCdfHuZ3VNJEmpRWU84HvuI8Wck=
-X-Google-Smtp-Source: ABdhPJxmDJFt2wt5d0VyfLFJJKwwRxN/ZxsaG5OeRNUHphLk+LjBf5oyUeS2ljeHjl50kWsRDkXvvFetScmDdEqT+J0=
-X-Received: by 2002:adf:dc50:: with SMTP id m16mr8092867wrj.329.1590059108830;
- Thu, 21 May 2020 04:05:08 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=I8r9b3WKmFH8x00N7WEjSsV4mj5QT0SricNOgzeLgeo=;
+        b=OdEHAWhrtFp2M4mFZu/FMSB2Lhmu+rAVIWdmhoezLgRJfIwYhuWYpMtJ2yP/mCAUxZ
+         6SL9m4PUn5BOIMEXvCK77JUGcF4GPfVfjnVGDRBiTuyor/Rg4k8/myyFaTyek/ziEYtu
+         Pa+xguP5uolVNYPERE7ehem9Ib6RRCz1y92nQ+TzBiB/8ThqgDt/1a5lz1vmN5CndmNN
+         CR/p/at/djwSxw1lGIgInXSjFtzw5Ob0ClbF7w1qA98spRAvd5wEe3rGR2RElnnawqo7
+         CFcBvFRC/mW5EZyaug4cNin/Y3bJ9Iu5Cim1DWEp6+8Tv5dScXmgxZlz0O/AK6aEz9I7
+         P1pA==
+X-Gm-Message-State: AOAM532JFhEYld0Dzm729545wUzMYx284VoRrg03h+xkyoOf1+QGswB/
+        GB5TcuNtORHD0VM8GC+I5eis8tS+gLshlxPQpB2pb2eRxOqdL0yvpbmui5/rJ9pHFWYAK8oTFQy
+        k73JJ0JLAz7QU
+X-Received: by 2002:a50:9a86:: with SMTP id p6mr7633387edb.153.1590065459325;
+        Thu, 21 May 2020 05:50:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxXrIhCP1DTKfr0JnNOc4ivRO8cZw1JfFcEy/90FjXovtXUz6eXY3PV1UDasKGJ7973lC0o3g==
+X-Received: by 2002:a50:9a86:: with SMTP id p6mr7633376edb.153.1590065459007;
+        Thu, 21 May 2020 05:50:59 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id c15sm4736175ejx.62.2020.05.21.05.50.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2020 05:50:58 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     wei.huang2@amd.com, cavery@redhat.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 03/22] KVM: SVM: immediately inject INTR vmexit
+In-Reply-To: <20200424172416.243870-4-pbonzini@redhat.com>
+References: <20200424172416.243870-1-pbonzini@redhat.com> <20200424172416.243870-4-pbonzini@redhat.com>
+Date:   Thu, 21 May 2020 14:50:57 +0200
+Message-ID: <87blmhsb7y.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <1589688372-3098-1-git-send-email-chenhc@lemote.com>
- <1589688372-3098-16-git-send-email-chenhc@lemote.com> <20200517082242.GA3939@alpha.franken.de>
- <CAHiYmc5m+UhWv__F_FKqhiTkJxgqErmFn5K_DAW2y5Pp6_4dyA@mail.gmail.com>
- <CAHiYmc4m7uxYU0coRGJS8ou=KyjC=DYs506NyXyw_-eKmPVJRQ@mail.gmail.com> <CAAhV-H4SspEUMLDTSZH3YmNbd+cRx3JK+mtsGo6cJ2NLKHPkKQ@mail.gmail.com>
-In-Reply-To: <CAAhV-H4SspEUMLDTSZH3YmNbd+cRx3JK+mtsGo6cJ2NLKHPkKQ@mail.gmail.com>
-From:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date:   Thu, 21 May 2020 13:04:54 +0200
-Message-ID: <CAHiYmc7ykeeF_w25785yiDjJf3AwOzfJybiS=LxfjYizn_2zEQ@mail.gmail.com>
-Subject: Re: [PATCH V6 15/15] MAINTAINERS: Update KVM/MIPS maintainers
-To:     Huacai Chen <chenhuacai@gmail.com>
-Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> I'm sorry for the late response. These days I'm attempting to collect
-> some maintainers' PGP signatures, in order to get a kernel.org
-> account. So, I think we can keep the lemote.com address in MAINTAINERS
-> now, and update to the kernel.org address when I succeed.
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> We can immediately leave SVM guest mode in svm_check_nested_events
+> now that we have the nested_run_pending mechanism.  This makes
+> things easier because we can run the rest of inject_pending_event
+> with GIF=0, and KVM will naturally end up requesting the next
+> interrupt window.
 >
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/svm/nested.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index e69e60ac1370..266fde240493 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -778,13 +778,13 @@ int nested_svm_check_exception(struct vcpu_svm *svm, unsigned nr,
+>  
+>  static void nested_svm_intr(struct vcpu_svm *svm)
+>  {
+> +	trace_kvm_nested_intr_vmexit(svm->vmcb->save.rip);
+> +
+>  	svm->vmcb->control.exit_code   = SVM_EXIT_INTR;
+>  	svm->vmcb->control.exit_info_1 = 0;
+>  	svm->vmcb->control.exit_info_2 = 0;
+>  
+> -	/* nested_svm_vmexit this gets called afterwards from handle_exit */
+> -	svm->nested.exit_required = true;
+> -	trace_kvm_nested_intr_vmexit(svm->vmcb->save.rip);
+> +	nested_svm_vmexit(svm);
+>  }
+>  
+>  static bool nested_exit_on_intr(struct vcpu_svm *svm)
 
-I agree. E-mail address can be easily changed later.
+Sorry for reporting this late but I just found out that this commit
+breaks Hyper-V 2016 on KVM on SVM completely (always hangs on boot). I
+haven't investigated it yet (well, this is Windows, you know...) but
+what's usually different about Hyper-V is that unlike KVM/Linux it has
+handlers for some hardware interrupts in the guest and not in the
+hypervisor.
 
-I think it is reasonable that minor email tech problems should not stop
-this series.
+-- 
+Vitaly
 
-I gather that at least approximate consensus is that v6 is "good to go".
-
-While I am at this series, I just want to let everybody that there is a
-long-standing practice in QEMU for MIPS that we don't upstream
-changes that depend on kernel support that is not yet upstreamed
-in kernel - and I want to keep that practice in future (and not limited
-to KVM, but for all kernel/QEMU interdependant code).
-
-In other words, corresponding Huacai's changes in QEMU will be
-kept on hold as long as this series is still not upstreamed in kernel.
-But, that was the original Huacai's plan anyway.
-
-Many thanks to everyone involved!
-
-Aleksandar
-
-
-
-> Regards,
-> Huacai
