@@ -2,87 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74B321DD241
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 17:45:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADB791DD271
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 17:56:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728316AbgEUPpz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 11:45:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38680 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727973AbgEUPpz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 11:45:55 -0400
-Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F14C7C061A0E
-        for <kvm@vger.kernel.org>; Thu, 21 May 2020 08:45:54 -0700 (PDT)
-Received: by mail-oo1-xc44.google.com with SMTP id p123so1522766oop.12
-        for <kvm@vger.kernel.org>; Thu, 21 May 2020 08:45:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8h1ZPoBxJvuQvx2ziXpdx/NQiUgWmqZ1hoQbkwoXnSQ=;
-        b=SlQZLiB4OFUSMtrURCnULNta22198oi+Z5RQAyBqo38LQk9Wha8N10/YPkuBWPYcSV
-         v0dSGU9HBPNNIrm+eyaZTbxOTlAN/5UVuXo/cRYgucmP/HGV5nChW+Q00R9WpbIoCX6x
-         PnDtVFdl4tD0EDId0iZ4Y8lp9MVazgA3g1/JGyZzN5QoT2KYF2uaj3bXRr4B5IhSI9Ix
-         A+ZRl1caqAKOoRzSsN2cMlYXlQA5F+VlGNFj5+2ufUKqgS/NXx0aew8IzlZBikCPtrD5
-         bMgxLoeMq5bcK8G35nZBb9ubrSzNanS+gwpQBB9ZWi77//UAfqBJZd82VOxRt5ykYr9O
-         2Ozg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8h1ZPoBxJvuQvx2ziXpdx/NQiUgWmqZ1hoQbkwoXnSQ=;
-        b=Km85YAtIGK5lxf81rCBs+ejWMZRz2SnGJtYzoxnw68QMZ8+tYfA9vmeOtaEZrZblcx
-         94xwb4nXVsNQ5h4RHPin0gusf1E0kj0peKX1lhlo/uN+hmKYB1FQ23Ut5wOvYfwBSfJo
-         SZoLuHQIbbdPUrGRpSzakzehJkbIG/cJAFrbPksIVmWK2m2XhiXAl2NBoLQUOFhF3fkx
-         xQReVyPx4I4RZikncYVOmoujtoNrUhHtYNchXwBO3jjCOezxSMMYrn1HFmtAluiaXNZI
-         8Opi7IH97L3JnBJl4cGUWzVmFdH6BCcO0kf/Zb/Bx7XmQSqetAKt5ExfG5w64atghNug
-         nbmg==
-X-Gm-Message-State: AOAM532bfOhBxUao/u6fIwFzLClsw1iOQwJNRY2dcSXdsvJmb27Qp29i
-        gjaSiHjE9zET0jw14Nm7aLgRWJxCCnCPg9ZcfbcdFQ==
-X-Google-Smtp-Source: ABdhPJw5xr8eYxO7RpfOFZCX1bJlGCyf6NovnXN5CNJ3JraeuvE/zpszL7WYd8lUI2xweMQ38hKNv6LHhQvcl3d9SF0=
-X-Received: by 2002:a4a:8253:: with SMTP id t19mr7809624oog.69.1590075954348;
- Thu, 21 May 2020 08:45:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200518155308.15851-1-f4bug@amsat.org> <20200518155308.15851-7-f4bug@amsat.org>
- <CAFEAcA8tGgyYgHXT5LVGz675JMq6VWR56H++XO5gtTrcaZiDQQ@mail.gmail.com> <0c0cbdc0-a809-b80b-ade3-9bdc6f95b1a8@redhat.com>
-In-Reply-To: <0c0cbdc0-a809-b80b-ade3-9bdc6f95b1a8@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 21 May 2020 16:45:43 +0100
-Message-ID: <CAFEAcA_WOEeV53yr7SmWqyOnbfWYg3COr-C+mjaCuAPw=refcQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 6/7] accel/kvm: Let KVM_EXIT_MMIO return error
+        id S1728731AbgEUPzl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 11:55:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34690 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728342AbgEUPzl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 May 2020 11:55:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590076539;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RP0V13tfcBHFjiQL2Hum0eIuWeC/sr9fMRiGZyHGqdo=;
+        b=I4HMlbuX2+9nInF5sVw6w04DiUnYErHb4t70XhhLUArTqi9pajqlBlg8FV+DEtOeQT67Aw
+        7pyc7zStI28Z2bezXkZ3Pd1XTZamgaLC7insBysKBah9ye4tartXeJkYirFEKHDrJOJ5/C
+        hv7JYvT3jmHRTskVh9ABHANwpHmMxag=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-xpwtyieaP4mfkdsladJA_w-1; Thu, 21 May 2020 11:55:38 -0400
+X-MC-Unique: xpwtyieaP4mfkdsladJA_w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04D52107ACCD;
+        Thu, 21 May 2020 15:55:37 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-233.rdu2.redhat.com [10.10.116.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D40A95C1B0;
+        Thu, 21 May 2020 15:55:36 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 4354822036E; Thu, 21 May 2020 11:55:36 -0400 (EDT)
+Date:   Thu, 21 May 2020 11:55:36 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Andy Lutomirski <luto@amacapital.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, stable <stable@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/kvm: Disable KVM_ASYNC_PF_SEND_ALWAYS
+Message-ID: <20200521155536.GA38602@redhat.com>
+References: <87eeszjbe6.fsf@nanos.tec.linutronix.de>
+ <B85606B0-71B5-4B7D-A892-293CB9C1B434@amacapital.net>
+ <2776fced-54c2-40eb-7921-1c68236c7f70@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2776fced-54c2-40eb-7921-1c68236c7f70@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 May 2020 at 16:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 18/05/20 18:01, Peter Maydell wrote:
-> > The "right" answer is that the kernel should enhance the KVM_EXIT_MMIO
-> > API to allow userspace to say "sorry, you got a bus error on that
-> > memory access the guest just tried" (which the kernel then has to
-> > turn into an appropriate guest exception, or ignore, depending on
-> > what the architecture requires.) You don't want to set ret to
-> > non-zero here, because that will cause us to VM_STOP, and I
-> > suspect that x86 at least is relying on the implict RAZ/WI
-> > behaviour it currently gets.
->
-> Yes, it is.  It may even be already possible to inject the right
-> exception (on ARM) through KVM_SET_VCPU_EVENTS or something like that, too.
+On Wed, Apr 08, 2020 at 12:07:22AM +0200, Paolo Bonzini wrote:
+> On 07/04/20 23:41, Andy Lutomirski wrote:
+> > 2. Access to bad memory results in #MC.  Sure, #MC is a turd, but
+> > it’s an *architectural* turd. By all means, have a nice simple PV
+> > mechanism to tell the #MC code exactly what went wrong, but keep the
+> > overall flow the same as in the native case.
+> > 
+> > I think I like #2 much better. It has another nice effect: a good
+> > implementation will serve as a way to exercise the #MC code without
+> > needing to muck with EINJ or with whatever magic Tony uses. The
+> > average kernel developer does not have access to a box with testable
+> > memory failure reporting.
+> 
+> I prefer #VE, but I can see how #MC has some appeal. 
 
-Yeah, in theory we could deliver an exception from userspace
-by updating all the register state, but I think the kernel really
-ought to do it both (a) because it's just a neater API to do it
-that way round and (b) because the kernel is the one that has
-the info about the faulting insn that it might need for things
-like setting up a syndrome register value.
+I have spent some time looking at #MC and trying to figure out if we
+can use it. I have encountered couple of issues.
 
-thanks
--- PMM
+- Uncorrected Action required machine checks are generated when poison
+  is consumed. So typically all kernel code and exception handling is
+  assuming MCE can be encoutered synchronously only on load and not
+  store. stores don't generate MCE (atleast not AR one, IIUC). If we were
+  to use #MC, we will need to generate it on store as well and then that
+  requires changing assumptions in kernel which assumes stores can't
+  generate #MC (Change all copy_to_user()/copy_from_user() and friends)
+
+- Machine check is generated for poisoned memory. And in this it is not
+  exaclty poisoning. It feels like as if memory has gone missing. And
+  failure might be temporary that is if file is truncated again to extend,
+  then next load/store to same memory location will work just fine. My
+  understanding is that sending #MC will mark that page poisoned and
+  it will sort of become permanent failure. 
+
+I am less concerned about point 2, but not sure how to get past the
+first issue.
+
+Thanks
+Vivek
+
