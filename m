@@ -2,93 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0797F1DCF0E
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 16:09:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 978621DD09A
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 16:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729843AbgEUOIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 10:08:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56614 "EHLO
+        id S1729633AbgEUO7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 10:59:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26594 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729810AbgEUOId (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 10:08:33 -0400
+        with ESMTP id S1728136AbgEUO7i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 May 2020 10:59:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590070112;
+        s=mimecast20190719; t=1590073176;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KYPruZ8qzCyc8Zuc6WzgrqHrImI6iIZQ3tFwxDcY6eQ=;
-        b=WxnF8KBGBcrKr+ZP6/55jsOICaV7MSdgVrywBtIxXkd6Oe/HNj8SFmz9LR3ViZqXevgyTq
-        A11iXGIEroZTTMmv8836AR0rCqLXhuW58baccSjgwXd6D7MsTQ9GbOEW6//fQZ//iejB19
-        ZG62JpwXU65TRPd/o+7HsYK6kic4gbE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-Y2ams0TDMiqCMfuuWMzfbA-1; Thu, 21 May 2020 10:08:22 -0400
-X-MC-Unique: Y2ams0TDMiqCMfuuWMzfbA-1
-Received: by mail-wr1-f69.google.com with SMTP id z8so2961384wrp.7
-        for <kvm@vger.kernel.org>; Thu, 21 May 2020 07:08:22 -0700 (PDT)
+        bh=75FPnYIg4487ji/STTwVV18+TkDRf4bIG3MW4+gphww=;
+        b=FQFXCtc/fwGu8F47kSztAG3Jghv3NZ+016ffw7+W+fNP745StGXjiMDOjAPKM63ogOyCKH
+        Ufy1CKrioloTUKFhqi4U7HO25Ajd2gAmrpLLS9cHGCYpFistLnaiPEHA+ClSapiBuZpD4+
+        OY9lMeQV5FuGpLM1JKLUxRV/AK8qHpA=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-dw3zsrrjMcix-MkOk4ozcg-1; Thu, 21 May 2020 10:59:32 -0400
+X-MC-Unique: dw3zsrrjMcix-MkOk4ozcg-1
+Received: by mail-ej1-f69.google.com with SMTP id g9so2280930ejs.20
+        for <kvm@vger.kernel.org>; Thu, 21 May 2020 07:59:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KYPruZ8qzCyc8Zuc6WzgrqHrImI6iIZQ3tFwxDcY6eQ=;
-        b=MqrqD+MFj9KTPfqhP9yVhiF7Mk3YSsU6SNFUwSqERNuw1g5AyFAyzQzvShHsbwDVcP
-         gKnB9wFmYDE4bcMjvrBC8hwXJMV8V9tNatFslSqWUUJv+OWi/9pIA9KXPrlLahDociKy
-         C2mpfi9D+DxlC0ZvawqMkTxwkbP9TLNzfoGyM7zCh88ZaI1ner3sRExdjUHwY8B7PzKF
-         vwbExj9Fj5EAQ9oqhuM9ciQhaL/dE3SiP7r7hQfFJm6pGbdvqbpiP9jUTAedQjY+OTRc
-         XDdXkAQfToskYjZiSmxsUMvsqYkgWgPamL1PYwI1tCewVH8nHqP/I+ZG4F7zM04CE4Ao
-         IC1w==
-X-Gm-Message-State: AOAM531N+0a8IohpUcAuI0HYXKEjf93zC2zPLx/zEGJLFTGitIdFNHmd
-        jhJ2vAhnvqN0u93HMFrwf6MBv2NPNsOeFJCjGcB0ubCfvSPWua5SPNl5qZbee3hP8C9j+FdB51Z
-        DafZHEdlA3Ly4
-X-Received: by 2002:a1c:7c0b:: with SMTP id x11mr9419091wmc.149.1590070101175;
-        Thu, 21 May 2020 07:08:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxeqE8s6kqITQ5zRCGAR7thbTgJ+XBuN/t8JKtVxsAPKAeoBu546k0CmcwDaZnB6+qd45/Ykw==
-X-Received: by 2002:a1c:7c0b:: with SMTP id x11mr9419073wmc.149.1590070100967;
-        Thu, 21 May 2020 07:08:20 -0700 (PDT)
-Received: from [192.168.178.58] ([151.30.94.134])
-        by smtp.gmail.com with ESMTPSA id q144sm7012698wme.0.2020.05.21.07.08.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2020 07:08:20 -0700 (PDT)
-Subject: Re: [PATCH v2 03/22] KVM: SVM: immediately inject INTR vmexit
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     wei.huang2@amd.com, cavery@redhat.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Oliver Upton <oupton@google.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=75FPnYIg4487ji/STTwVV18+TkDRf4bIG3MW4+gphww=;
+        b=M3oN5itjWH2ID9IbIa/UBt3DlqyMNIeLpDNLNckpG+A64b1voLVSvbOuifo71eIGYk
+         wvb7v9rEBJXpuvm6+g67ygdd5RQV4e/+mw6u3P0f2Z31VKof+ZZ3xeDfZhgaYUPE/kF0
+         N3Np/HpHXelW0q/ZwG3uhqSAvMK0nRbquzopk+B42zYoksVNOXGSk+MQSzdDiCqOeW3/
+         /IwxsNd30LGBJpQ64c+d9z6oTXyDS6gRQsT74UkAb9IXji2jEQZibFdtIO2Nfwb7tZ1O
+         vCQPtX1cfVJNf7NhFtPAhWtLGPp76KcL0P5Ghv3EfAGzSgJpn6TVO5gLxNd4j/v7Zgzc
+         WMyg==
+X-Gm-Message-State: AOAM530P8bCj0xdMAGZFKsFagNrp7xW3FB/JCXNQjVGRiErdBlsb0lKi
+        2uwNkKFHGhepBmiW3td1pis4OrBZrr0MlXAg/XYKNOx87296ccEnBH8TtmIq5f0YsxaYayKncVg
+        MTe7OiLMc4ush
+X-Received: by 2002:aa7:cad3:: with SMTP id l19mr8148097edt.335.1590073171484;
+        Thu, 21 May 2020 07:59:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxRmjc9KoFWYCB9UJuoPDyXwo3I7zGXEs/M6DBOpaO4a224WEnAMH71JGQVoMcFiFr19StZig==
+X-Received: by 2002:aa7:cad3:: with SMTP id l19mr8148065edt.335.1590073171184;
+        Thu, 21 May 2020 07:59:31 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id cz9sm4771599edb.18.2020.05.21.07.59.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 May 2020 07:59:30 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vivek Goyal <vgoyal@redhat.com>, kvm@vger.kernel.org,
+        x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20200424172416.243870-1-pbonzini@redhat.com>
- <20200424172416.243870-4-pbonzini@redhat.com>
- <87blmhsb7y.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8bc4c38a-1717-1e4f-b322-fdd51f614717@redhat.com>
-Date:   Thu, 21 May 2020 16:08:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with token info
+In-Reply-To: <943cfc2f-5b18-e00a-f5a2-4577472a1ff5@redhat.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com> <20200511164752.2158645-3-vkuznets@redhat.com> <20200512152709.GB138129@redhat.com> <87o8qtmaat.fsf@vitty.brq.redhat.com> <20200512155339.GD138129@redhat.com> <20200512175017.GC12100@linux.intel.com> <20200513125241.GA173965@redhat.com> <0733213c-9514-4b04-6356-cf1087edd9cf@redhat.com> <20200515184646.GD17572@linux.intel.com> <d84b6436-9630-1474-52e5-ffcc4d2bd70a@redhat.com> <20200515204341.GF17572@linux.intel.com> <943cfc2f-5b18-e00a-f5a2-4577472a1ff5@redhat.com>
+Date:   Thu, 21 May 2020 16:59:29 +0200
+Message-ID: <87y2plqqpa.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87blmhsb7y.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/05/20 14:50, Vitaly Kuznetsov wrote:
-> Sorry for reporting this late but I just found out that this commit
-> breaks Hyper-V 2016 on KVM on SVM completely (always hangs on boot). I
-> haven't investigated it yet (well, this is Windows, you know...) but
-> what's usually different about Hyper-V is that unlike KVM/Linux it has
-> handlers for some hardware interrupts in the guest and not in the
-> hypervisor.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-"Always hangs on boot" is easy. :)  At this point I think it's easiest
-to debug it on top of the whole pending SVM patches that remove
-exit_required completely (and exit_required is not coming back anyway).
+> However, interrupts for 'page ready' do have a bunch of advantages (more
+> control on what can be preempted by the notification, a saner check for
+> new page faults which is effectively a bug fix) so it makes sense to get
+> them in more quickly (probably 5.9 at this point due to the massive
+> cleanups that are being done around interrupt vectors).
+>
 
-Can you get a trace and send it to me?
+Actually, I have almost no feedback to address in v2 :-) Almost all
+discussion are happening around #VE. Don't mean to rush or anything but
+if the 'cleanups' are finalized I can hopefully rebase and retest very
+quickly as it's only the KVM guest part which intersects with them, the
+rest should be KVM-only. But 5.9 is good too)
 
-Paolo
+-- 
+Vitaly
 
