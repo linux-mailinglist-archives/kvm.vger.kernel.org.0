@@ -2,219 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1EBB1DC9FE
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 11:27:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36E731DCA61
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 11:45:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728887AbgEUJ1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 05:27:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27191 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728686AbgEUJ1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 05:27:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590053266;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=quQuJBMGTdzqpuGt7zo1zAzJESra8VWBn2to1tNTbPo=;
-        b=dpbcq2d1ASBwyu9G4HX5j+c1R/mUjGulvkw98Yw5G55+gmv1PPRslWTIFaQYPEZ//NZeFi
-        UPAe+KUtuwExLhQie2PMjjSK87E9J3px5tdNxigA9cBEdLqOuOS7tKA8SGNUEuKUR06aRn
-        nwMPs5VtnZo+g/i1XsDdsWHMoZ4kfao=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-dfYLe2rYOxy3QsicfUXF-w-1; Thu, 21 May 2020 05:27:43 -0400
-X-MC-Unique: dfYLe2rYOxy3QsicfUXF-w-1
-Received: by mail-ej1-f71.google.com with SMTP id c9so2526757ejr.16
-        for <kvm@vger.kernel.org>; Thu, 21 May 2020 02:27:43 -0700 (PDT)
+        id S1728839AbgEUJpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 05:45:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38956 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728789AbgEUJpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 May 2020 05:45:50 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4246CC061A0E;
+        Thu, 21 May 2020 02:45:50 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id a14so6472506ilk.2;
+        Thu, 21 May 2020 02:45:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=tkFgekeOU6U+z1MPjwzv8/IuksMHV7TUWnEMBAkfYLs=;
+        b=XaMwdJ+0/ZEfkEyCDVx4AE3HQBJSyI1/htTin8HlTpqTWzL6165QkWZS02VQqZQ5TS
+         rdHYL47EDbOA98dfzpU4GPEhGcYKtOjkMcKYcojqbVAvHev/U6CjtPzapJSHEYPOqKyh
+         4meX+K43HM79ktenq8AkKjrY69curKfnb+tXRTmjprJ9p9vLfUW8HP/U5Hik4MtfSbJ9
+         mW9gIGN2iYmSz521a2U50BsRmemGnFn8N7U1nCgsqj9quz1D1kDjeQKBW4CreSCbJqFy
+         iOIJk3lmAIAJZ8+1ZeaTSyPucgljTUnkpuuSioVkp0AIrE8v0jWq7bsH8USGF7yVurpV
+         +mgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=quQuJBMGTdzqpuGt7zo1zAzJESra8VWBn2to1tNTbPo=;
-        b=YPgIQDsx7NpkjToUP6FOWRTdJr6fsW3TaFgNNQpsE8DBYxOLJ3YNRM/I88PANF4Zbx
-         oPanM2vW7VO+gSz79f56FZc+YQinal8GVvgYMkczKyYCcFxQPxXX68s2alN6XHb1ZgXg
-         rqMSlvkntzET5khXIG4H2R/DKtuPg0u1rFAs3mrYlsagZjBzGnb9d60vqWtSAscaSQD5
-         S4O4hDMEqx3Pbytz8Z7WvUwCTngnRy23kIUtOFyUETDXMLMmdes9xXgs4SlYL2EtnSSa
-         HiicPWenZ+qHWGqXAwX3dH0kSVFYbf4lFWqK6s2rQ8XeUUehJd+W9W5BXVwvn4wb8XXm
-         /Hvg==
-X-Gm-Message-State: AOAM53264766jsnD40eO5b/ZqXP/127Jkw9NEqsDZ/alq/FIbTYqkjEw
-        wRhys9vP3mfrXLoPfqRShjJzuGnExmYH20z/Vr0AsseaTFcFlhsYdDG1bFJa2MEJEW0GgNfOQXP
-        A69DU4n/j9kvL
-X-Received: by 2002:a17:907:1199:: with SMTP id uz25mr2867005ejb.24.1590053262459;
-        Thu, 21 May 2020 02:27:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxu3tvSOXBKIaoKCExELL7QWl8a/0QYfX9s5r0nE2gAfdwL6HfdVLGHlArhNH733Qdd+RR40w==
-X-Received: by 2002:a17:907:1199:: with SMTP id uz25mr2866989ejb.24.1590053262172;
-        Thu, 21 May 2020 02:27:42 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id k9sm4639051edf.26.2020.05.21.02.27.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2020 02:27:41 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     =?utf-8?B?5b2t5rWpKFJpY2hhcmQp?= <richard.peng@oppo.com>
-Cc:     "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3] kvm/x86 : Remove redundant function implement
-In-Reply-To: <HKAPR02MB4291D5926EA10B8BFE9EA0D3E0B70@HKAPR02MB4291.apcprd02.prod.outlook.com>
-References: <HKAPR02MB4291D5926EA10B8BFE9EA0D3E0B70@HKAPR02MB4291.apcprd02.prod.outlook.com>
-Date:   Thu, 21 May 2020 11:27:40 +0200
-Message-ID: <87h7w9skmr.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=tkFgekeOU6U+z1MPjwzv8/IuksMHV7TUWnEMBAkfYLs=;
+        b=g4vkN+eEgDUDgukSoIZXBIkLQwX2zcoxaPxdAZbfAFsdNr5GFEFsovl7cxH5g4XdT1
+         Ed8gKuwcytuR7StLBp5gzQPhJH+OtjyG18gYqFc4gF25zZvZOKGe1F+ayJv6HHGub/K4
+         Soop1tmHJx6+HghhgaGcT5Z4kS2vi5m5uQZYX47CMgFQP6byO8FGPJKyv9CTrPCPSRPU
+         ARA38uDPvNKuV20CbBelwAC3GH3pSW63wLr8ew80N4SJbWF4VubQgrnTXLZAS8VwkBP6
+         rTDgdd6AeyX+agCliRRt6mGTWOmZGKjhHS2nbp2dOlke/80psyuuuPUMNPG9XKzrPF0E
+         b58w==
+X-Gm-Message-State: AOAM531r5J5bXAaxt1zO2m9vJyEwWfjOWULXVgBktwirZ9Cqw1mOoKzR
+        th+4iSjFLTIBy3qj1Q+ou4rCgx1/09JvIL7sPVw=
+X-Google-Smtp-Source: ABdhPJwLkGADJqr2QOW/Mx0qiNiCb3thBooEzb1RO9W+P8yjnozC8V55Si068q1qJR1ZCj318iWEIOIO/MRZpSJIF9M=
+X-Received: by 2002:a05:6e02:503:: with SMTP id d3mr7823719ils.208.1590054349634;
+ Thu, 21 May 2020 02:45:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <1589688372-3098-1-git-send-email-chenhc@lemote.com>
+ <1589688372-3098-16-git-send-email-chenhc@lemote.com> <20200517082242.GA3939@alpha.franken.de>
+ <CAHiYmc5m+UhWv__F_FKqhiTkJxgqErmFn5K_DAW2y5Pp6_4dyA@mail.gmail.com> <CAHiYmc4m7uxYU0coRGJS8ou=KyjC=DYs506NyXyw_-eKmPVJRQ@mail.gmail.com>
+In-Reply-To: <CAHiYmc4m7uxYU0coRGJS8ou=KyjC=DYs506NyXyw_-eKmPVJRQ@mail.gmail.com>
+From:   Huacai Chen <chenhuacai@gmail.com>
+Date:   Thu, 21 May 2020 17:45:38 +0800
+Message-ID: <CAAhV-H4SspEUMLDTSZH3YmNbd+cRx3JK+mtsGo6cJ2NLKHPkKQ@mail.gmail.com>
+Subject: Re: [PATCH V6 15/15] MAINTAINERS: Update KVM/MIPS maintainers
+To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-=E5=BD=AD=E6=B5=A9(Richard) <richard.peng@oppo.com> writes:
+Hi, Aleksandar,
 
-> pic_in_kernel(),ioapic_in_kernel() and irqchip_kernel() have the
-> same implementation.
+On Thu, May 21, 2020 at 5:23 PM Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
+>
+> =D0=BF=D0=BE=D0=BD, 18. =D0=BC=D0=B0=D1=98 2020. =D1=83 10:23 Aleksandar =
+Markovic
+> <aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=
+=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > =D0=BD=D0=B5=D0=B4, 17. =D0=BC=D0=B0=D1=98 2020. =D1=83 10:55 Thomas Bo=
+gendoerfer
+> > <tsbogend@alpha.franken.de> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
+=D0=B0=D0=BE/=D0=BB=D0=B0:
+> > >
+> > > On Sun, May 17, 2020 at 12:06:12PM +0800, Huacai Chen wrote:
+> > > > James Hogan has become inactive for a long time and leaves KVM for =
+MIPS
+> > > > orphan. I'm working on KVM/Loongson and attempt to make it upstream=
+ both
+> > > > in kernel and QEMU, while Aleksandar Markovic is already a maintain=
+er of
+> > > > QEMU/MIPS. We are both interested in QEMU/KVM/MIPS, and we have alr=
+eady
+> > > > made some contributions in kernel and QEMU. If possible, we want to=
+ take
+> > > > the KVM/MIPS maintainership.
+> > > >
+> > > > Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > > > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> > > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > > > ---
+> > > >  MAINTAINERS | 4 +++-
+> > > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > > index e64e5db..59b3f43 100644
+> > > > --- a/MAINTAINERS
+> > > > +++ b/MAINTAINERS
+> > > > @@ -9302,9 +9302,11 @@ F:     include/kvm/arm_*
+> > > >  F:   virt/kvm/arm/
+> > > >
+> > > >  KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)
+> > > > +M:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> > > > +M:   Huacai Chen <chenhc@lemote.com>
+> > >
+> > > not sure, if other people see the same problem with this email addres=
+s,
+> > > but wouldn't it be better to use your gmail address here ?
+> > >
+> >
+> > Huacai, Thomas,
+> >
+> > I personally and surprisingly do not have any technical difficulties
+> > communicating with Huacai using his lemote.com address.
+> >
+> > However, I think Thomas observation makes sense. I was personally
+> > a victim of various corporate decisions regarding emails, policies
+> > around them, and similar. And - as you can see - I ended up switching
+> > to gmail.com account, getting really sick and tired of repeated
+> > unexpected and distracting problems using corporate email adresses.
+> > Sounds strange, but it is true.
+> >
+> > Huacei, my honest advice and recommendation to you is to accept
+> > Thomas' suggestion, and change your email address here to gmail.
+> > We all now you work for Lemote, and that your using gmail is just a
+> > matter of practicality. :)
+> >
+> > Please Huacei, do send v7 with such change, and perhaps some
+> > other minor changes that you may or may noticed in the last minutes.
+> >
+>
+> But, Huacai, please do not misunderstand me. I am perfectly fine with
+> your lemote.com address, and do not have even the slightest technical
+> problem using (sending/receiving messages) it.
+>
+> So, I was not requesting v7 - I just wanted to help eliminate that ridicu=
+lous
+> technical detail stopping this patch series, I am absolutely fine and eve=
+n
+> strongly support v6 in its entire intact form.
+>
+> Best Regards,
+> Aleksandar
+I'm sorry for the late response. These days I'm attempting to collect
+some maintainers' PGP signatures, in order to get a kernel.org
+account. So, I think we can keep the lemote.com address in MAINTAINERS
+now, and update to the kernel.org address when I succeed.
 
-'pic_in_kernel()' name is misleading, one may think this is about lapic
-and it's not. Also, ioapic_in_kernel() doesn't have that many users, can
-we maybe converge on using irqchip_*() functions everywhere?
-
+Regards,
+Huacai
 >
-> Signed-off-by: Peng Hao <richard.peng@oppo.com>
-> ---
->  arch/x86/kvm/ioapic.h  |  8 ++------
->  arch/x86/kvm/irq.h     | 14 ++++----------
->  arch/x86/kvm/lapic.c   |  1 +
->  arch/x86/kvm/mmu/mmu.c |  1 +
->  arch/x86/kvm/x86.c     |  1 +
->  5 files changed, 9 insertions(+), 16 deletions(-)
 >
-> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
-> index 2fb2e3c..7a3c53b 100644
-> --- a/arch/x86/kvm/ioapic.h
-> +++ b/arch/x86/kvm/ioapic.h
-> @@ -5,7 +5,7 @@
->  #include <linux/kvm_host.h>
 >
->  #include <kvm/iodev.h>
-> -
-> +#include "irq.h"
->  struct kvm;
->  struct kvm_vcpu;
->
-> @@ -108,11 +108,7 @@ do {\
->
->  static inline int ioapic_in_kernel(struct kvm *kvm)
->  {
-> -int mode =3D kvm->arch.irqchip_mode;
-> -
-> -/* Matches smp_wmb() when setting irqchip_mode */
-> -smp_rmb();
-> -return mode =3D=3D KVM_IRQCHIP_KERNEL;
-> +return irqchip_kernel(kvm);
->  }
->
->  void kvm_rtc_eoi_tracking_restore_one(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
-> index f173ab6..e133c1a 100644
-> --- a/arch/x86/kvm/irq.h
-> +++ b/arch/x86/kvm/irq.h
-> @@ -16,7 +16,6 @@
->  #include <linux/spinlock.h>
->
->  #include <kvm/iodev.h>
-> -#include "ioapic.h"
->  #include "lapic.h"
->
->  #define PIC_NUM_PINS 16
-> @@ -66,15 +65,6 @@ void kvm_pic_destroy(struct kvm *kvm);
->  int kvm_pic_read_irq(struct kvm *kvm);
->  void kvm_pic_update_irq(struct kvm_pic *s);
->
-> -static inline int pic_in_kernel(struct kvm *kvm)
-> -{
-> -int mode =3D kvm->arch.irqchip_mode;
-> -
-> -/* Matches smp_wmb() when setting irqchip_mode */
-> -smp_rmb();
-> -return mode =3D=3D KVM_IRQCHIP_KERNEL;
-> -}
-> -
->  static inline int irqchip_split(struct kvm *kvm)
->  {
->  int mode =3D kvm->arch.irqchip_mode;
-> @@ -93,6 +83,10 @@ static inline int irqchip_kernel(struct kvm *kvm)
->  return mode =3D=3D KVM_IRQCHIP_KERNEL;
->  }
->
-> +static inline int pic_in_kernel(struct kvm *kvm)
-> +{
-> +return irqchip_kernel(kvm);
-> +}
->  static inline int irqchip_in_kernel(struct kvm *kvm)
->  {
->  int mode =3D kvm->arch.irqchip_mode;
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 9af25c9..de4d046 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -36,6 +36,7 @@
->  #include <linux/jump_label.h>
->  #include "kvm_cache_regs.h"
->  #include "irq.h"
-> +#include "ioapic.h"
->  #include "trace.h"
->  #include "x86.h"
->  #include "cpuid.h"
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 8071952..6133f69 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -16,6 +16,7 @@
->   */
->
->  #include "irq.h"
-> +#include "ioapic.h"
->  #include "mmu.h"
->  #include "x86.h"
->  #include "kvm_cache_regs.h"
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d786c7d..c8b62ac 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -18,6 +18,7 @@
->
->  #include <linux/kvm_host.h>
->  #include "irq.h"
-> +#include "ioapic.h"
->  #include "mmu.h"
->  #include "i8254.h"
->  #include "tss.h"
-> --
-> 2.7.4
->
-> ________________________________
-> OPPO
->
-> =E6=9C=AC=E7=94=B5=E5=AD=90=E9=82=AE=E4=BB=B6=E5=8F=8A=E5=85=B6=E9=99=84=
-=E4=BB=B6=E5=90=AB=E6=9C=89OPPO=E5=85=AC=E5=8F=B8=E7=9A=84=E4=BF=9D=E5=AF=
-=86=E4=BF=A1=E6=81=AF=EF=BC=8C=E4=BB=85=E9=99=90=E4=BA=8E=E9=82=AE=E4=BB=B6=
-=E6=8C=87=E6=98=8E=E7=9A=84=E6=94=B6=E4=BB=B6=E4=BA=BA=E4=BD=BF=E7=94=A8=EF=
-=BC=88=E5=8C=85=E5=90=AB=E4=B8=AA=E4=BA=BA=E5=8F=8A=E7=BE=A4=E7=BB=84=EF=BC=
-=89=E3=80=82=E7=A6=81=E6=AD=A2=E4=BB=BB=E4=BD=95=E4=BA=BA=E5=9C=A8=E6=9C=AA=
-=E7=BB=8F=E6=8E=88=E6=9D=83=E7=9A=84=E6=83=85=E5=86=B5=E4=B8=8B=E4=BB=A5=E4=
-=BB=BB=E4=BD=95=E5=BD=A2=E5=BC=8F=E4=BD=BF=E7=94=A8=E3=80=82=E5=A6=82=E6=9E=
-=9C=E6=82=A8=E9=94=99=E6=94=B6=E4=BA=86=E6=9C=AC=E9=82=AE=E4=BB=B6=EF=BC=8C=
-=E8=AF=B7=E7=AB=8B=E5=8D=B3=E4=BB=A5=E7=94=B5=E5=AD=90=E9=82=AE=E4=BB=B6=E9=
-=80=9A=E7=9F=A5=E5=8F=91=E4=BB=B6=E4=BA=BA=E5=B9=B6=E5=88=A0=E9=99=A4=E6=9C=
-=AC=E9=82=AE=E4=BB=B6=E5=8F=8A=E5=85=B6=E9=99=84=E4=BB=B6=E3=80=82
->
-> This e-mail and its attachments contain confidential information from OPP=
-O, which is intended only for the person or entity whose address is listed =
-above. Any use of the information contained herein in any way (including, b=
-ut not limited to, total or partial disclosure, reproduction, or disseminat=
-ion) by persons other than the intended recipient(s) is prohibited. If you =
-receive this e-mail in error, please notify the sender by phone or email im=
-mediately and delete it!
-
---=20
-Vitaly
-
+> > Many thanks to Thomas to noticing this that may save us from many
+> > really unnecessary troubles in future.
+> >
+> > Yours,
+> > Aleksandar
+> >
+> >
+> > > Thomas.
+> > >
+> > > --
+> > > Crap can work. Given enough thrust pigs will fly, but it's not necess=
+arily a
+> > > good idea.                                                [ RFC1925, =
+2.3 ]
