@@ -2,456 +2,867 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 394441DC2D5
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 01:22:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEDC41DC3C2
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 02:36:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728835AbgETXWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 May 2020 19:22:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55154 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728825AbgETXWw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 May 2020 19:22:52 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12396C061A0E
-        for <kvm@vger.kernel.org>; Wed, 20 May 2020 16:22:51 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id v1so3399483ybo.23
-        for <kvm@vger.kernel.org>; Wed, 20 May 2020 16:22:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=BxbU9eT8tkTtPjBTx42laENngVsHd4PbvwalITP0RgA=;
-        b=FgU0P9y2aEPAgUBIHMU5bNggxedfOIsQNo9LHSGWv9A7WYD3jp9+/bfNrzkrGP3dl9
-         OVP2xyov1oibp+Xpvc+BDv6v1im0DdDX142LuKwRk33b25voFU7ZCil7YvPol8G6E09S
-         REDUUOW26mWgEMT9f9lI1p2oIMCMIkFpNjbkmdb4fO86kbeqofYjHOXLuX1bfSXhwZKM
-         nqQer8xuX+8lVuXK7aJwI87PfeQpqgsni11dWaNkQEF7/KZvhRLMURmC1acSugb1P5ca
-         dQh0TzpEU06bVsYw448X3hVOfes1yFhPkcfmEkz/vz07PAY6jP8CSwth7xCC8s9Vy6QY
-         1I7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=BxbU9eT8tkTtPjBTx42laENngVsHd4PbvwalITP0RgA=;
-        b=cSgV0C2dkh/IDcHDeSGWOYr5Je0iVZEN6u+0JaZJwkdwkymWipRCX0c7A7FcBzD/Bo
-         gJmre5NAJ++Nzy+4pf/tjRLgy7FoOW4dQlGl+08YExEdPXDF0gaf/UqpB8UjcT+LdDqW
-         FnxmxJHKYr92gE9TBM0GBgcYrZ5l6lqDJVDGdHaoXlRDW1D+P/JvWsGwyNaRF/G2bXbw
-         6iEOy1xUD4C8F7elgRjANcr9vK/t9TfgEdADorC2P67JyZO/muktQzTR74rrdJQJ0twc
-         o+RFeo4acDIJbnJJM1M4O6aYIVGQIkYrf/cOM1fhHLH7ObhfBmo35t4Ippk/DfBHdR/m
-         QjAg==
-X-Gm-Message-State: AOAM531KvPDXGnT/eFKWSFKU/r6Dl8IZM8FGt+Dt4+QkNQvsI2hA/DzI
-        xauIU6fxRPIfud6RUEpnRbsmm3UvweNVOyj6qeXI7uxxTUEZv76EYCq4+3GNKv+XunMgu4RAG9P
-        EbUvTpmsnpde51HX1r6Q2/svwSUIn6SylARmD4PlVzLnwiKeNgqOzUtxpMGqZzUDND9d+gOyp5B
-        hOSlE=
-X-Google-Smtp-Source: ABdhPJyzpGIH5YvlCsv2KwG4OXmfEJ124CyhYtcfGbrPdcjvveFtqkeugKpRpXgj2sO6gShSfOtCkoa+KYgPv4sXtqVb2g==
-X-Received: by 2002:a25:c08b:: with SMTP id c133mr10899753ybf.286.1590016970239;
- Wed, 20 May 2020 16:22:50 -0700 (PDT)
-Date:   Wed, 20 May 2020 16:22:28 -0700
-In-Reply-To: <20200520232228.55084-1-makarandsonare@google.com>
-Message-Id: <20200520232228.55084-3-makarandsonare@google.com>
-Mime-Version: 1.0
-References: <20200520232228.55084-1-makarandsonare@google.com>
-X-Mailer: git-send-email 2.26.2.761.g0e0b3e54be-goog
-Subject: [PATCH  2/2 v3] KVM: selftests: VMX preemption timer migration test
-From:   Makarand Sonare <makarandsonare@google.com>
-To:     kvm@vger.kernel.org, pshier@google.com, jmattson@google.com
-Cc:     Makarand Sonare <makarandsonare@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727055AbgEUAf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 May 2020 20:35:26 -0400
+Received: from mail.baikalelectronics.com ([87.245.175.226]:32940 "EHLO
+        mail.baikalelectronics.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726819AbgEUAfY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 May 2020 20:35:24 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mail.baikalelectronics.ru (Postfix) with ESMTP id 9836180307C7;
+        Thu, 21 May 2020 00:35:15 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at baikalelectronics.ru
+Received: from mail.baikalelectronics.ru ([127.0.0.1])
+        by localhost (mail.baikalelectronics.ru [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id QoM91emHazri; Thu, 21 May 2020 03:35:13 +0300 (MSK)
+From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Serge Semin <fancer.lancer@gmail.com>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Paul Burton <paulburton@kernel.org>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Rob Herring <robh+dt@kernel.org>, <devicetree@vger.kernel.org>,
+        Thomas Bogendoerfer <tbogendoerfer@suse.de>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Alexander Lobakin <alobakin@dlink.ru>,
+        Huacai Chen <chenhc@lemote.com>,
+        Daniel Silsby <dansilsby@gmail.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Cedric Hombourger <Cedric_Hombourger@mentor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Paul Cercueil <paul@crapouillou.net>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Zhou Yanjie <zhouyanjie@zoho.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Allison Randal <allison@lohutok.net>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        =?UTF-8?q?=E5=91=A8=E7=90=B0=E6=9D=B0=20=28Zhou=20Yanjie=29?= 
+        <zhouyanjie@wanyeetech.com>, YunQiang Su <syq@debian.org>,
+        Oleksij Rempel <linux@rempel-privat.de>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        <linux-mips@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: [PATCH v3 03/14] mips: Add MIPS Release 5 support
+Date:   Thu, 21 May 2020 03:34:32 +0300
+Message-ID: <20200521003443.11385-4-Sergey.Semin@baikalelectronics.ru>
+In-Reply-To: <20200521003443.11385-1-Sergey.Semin@baikalelectronics.ru>
+References: <20200521003443.11385-1-Sergey.Semin@baikalelectronics.ru>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a nested VM with a VMX-preemption timer is migrated, verify that the
-nested VM and its parent VM observe the VMX-preemption timer exit close to
-the original expiration deadline.
+There are five MIPS32/64 architecture releases currently available:
+from 1 to 6 except fourth one, which was intentionally skipped.
+Three of them can be called as major: 1st, 2nd and 6th, that not only
+have some system level alterations, but also introduced significant
+core/ISA level updates. The rest of the MIPS architecture releases are
+minor.
 
-Signed-off-by: Makarand Sonare <makarandsonare@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Change-Id: Ia79337c682ee161399525edc34201fad473fc190
+Even though they don't have as much ISA/system/core level changes
+as the major ones with respect to the previous releases, they still
+provide a set of updates (I'd say they were intended to be the
+intermediate releases before a major one) that might be useful for the
+kernel and user-level code, when activated by the kernel or compiler.
+In particular the following features were introduced or ended up being
+available at/after MIPS32/64 Release 5 architecture:
++ the last release of the misaligned memory access instructions,
++ virtualisation - VZ ASE - is optional component of the arch,
++ SIMD - MSA ASE - is optional component of the arch,
++ DSP ASE is optional component of the arch,
++ CP0.Status.FR=1 for CP1.FIR.F64=1 (pure 64-bit FPU general registers)
+  must be available if FPU is implemented,
++ CP1.FIR.Has2008 support is required so CP1.FCSR.{ABS2008,NAN2008} bits
+  are available.
++ UFR/UNFR aliases to access CP0.Status.FR from user-space by means of
+  ctc1/cfc1 instructions (enabled by CP0.Config5.UFR),
++ CP0.COnfig5.LLB=1 and eretnc instruction are implemented to without
+  accidentally clearing LL-bit when returning from an interrupt,
+  exception, or error trap,
++ XPA feature together with extended versions of CPx registers is
+  introduced, which needs to have mfhc0/mthc0 instructions available.
+
+So due to these changes GNU GCC provides an extended instructions set
+support for MIPS32/64 Release 5 by default like eretnc/mfhc0/mthc0. Even
+though the architecture alteration isn't that big, it still worth to be
+taken into account by the kernel software. Finally we can't deny that
+some optimization/limitations might be found in future and implemented
+on some level in kernel or compiler. In this case having even
+intermediate MIPS architecture releases support would be more than
+useful.
+
+So the most of the changes provided by this commit can be split into
+either compile- or runtime configs related. The compile-time related
+changes are caused by adding the new CONFIG_CPU_MIPS32_R5/CONFIG_CPU_MIPSR5
+configs and concern the code activating MIPSR2 or MIPSR6 already
+implemented features (like eretnc/LLbit, mthc0/mfhc0). In addition
+CPU_HAS_MSA can be now freely enabled for MIPS32/64 release 5 based
+platforms as this is done for CPU_MIPS32_R6 CPUs. The runtime changes
+concerns the features which are handled with respect to the MIPS ISA
+revision detected at run-time by means of CP0.Config.{AT,AR} bits. Alas
+these fields can be used to detect either r1 or r2 or r6 releases.
+But since we know which CPUs in fact support the R5 arch, we can manually
+set MIPS_CPU_ISA_M32R5/MIPS_CPU_ISA_M64R5 bit of c->isa_level and then
+use cpu_has_mips32r5/cpu_has_mips64r5 where it's appropriate.
+
+Since XPA/EVA provide too complex alterationss and to have them used with
+MIPS32 Release 2 charged kernels (for compatibility with current platform
+configs) they are left to be setup as a separate kernel configs.
+
+Co-developed-by: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
+Signed-off-by: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
+Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Paul Burton <paulburton@kernel.org>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Rob Herring <robh+dt@kernel.org>
+Cc: devicetree@vger.kernel.org
+
 ---
- tools/arch/x86/include/uapi/asm/kvm.h         |   1 +
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/include/kvm_util.h  |   2 +
- .../selftests/kvm/include/x86_64/processor.h  |  11 +-
- .../selftests/kvm/include/x86_64/vmx.h        |  27 ++
- .../kvm/x86_64/vmx_preemption_timer_test.c    | 255 ++++++++++++++++++
- 7 files changed, 294 insertions(+), 4 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
 
-diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-index 3f3f780c8c650..43e24903812c4 100644
---- a/tools/arch/x86/include/uapi/asm/kvm.h
-+++ b/tools/arch/x86/include/uapi/asm/kvm.h
-@@ -400,6 +400,7 @@ struct kvm_sync_regs {
- struct kvm_vmx_nested_state_data {
- 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
- 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
-+	__u64 preemption_timer_deadline;
- };
+Changelog v3:
+- Together with MIPS32 add MIPS64 Release 5 support.
+---
+ arch/mips/Kconfig                    | 56 +++++++++++++++++++++++++---
+ arch/mips/Makefile                   |  2 +
+ arch/mips/include/asm/asmmacro.h     | 18 +++++----
+ arch/mips/include/asm/compiler.h     |  5 +++
+ arch/mips/include/asm/cpu-features.h | 27 ++++++++++----
+ arch/mips/include/asm/cpu-info.h     |  2 +-
+ arch/mips/include/asm/cpu-type.h     |  7 +++-
+ arch/mips/include/asm/cpu.h          | 10 +++--
+ arch/mips/include/asm/fpu.h          |  4 +-
+ arch/mips/include/asm/hazards.h      |  8 ++--
+ arch/mips/include/asm/stackframe.h   |  2 +-
+ arch/mips/include/asm/switch_to.h    |  8 ++--
+ arch/mips/include/asm/vermagic.h     |  4 ++
+ arch/mips/kernel/cpu-probe.c         | 17 +++++++++
+ arch/mips/kernel/entry.S             |  6 +--
+ arch/mips/kernel/proc.c              |  4 ++
+ arch/mips/kernel/r4k_fpu.S           | 14 +++----
+ arch/mips/kvm/vz.c                   |  6 +--
+ arch/mips/lib/csum_partial.S         |  6 ++-
+ arch/mips/mm/c-r4k.c                 |  7 ++--
+ arch/mips/mm/sc-mips.c               |  7 ++--
+ 21 files changed, 163 insertions(+), 57 deletions(-)
 
- struct kvm_vmx_nested_state_hdr {
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 222e50104296a..f159718f90c0a 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -10,6 +10,7 @@
- /x86_64/set_sregs_test
- /x86_64/smm_test
- /x86_64/state_test
-+/x86_64/vmx_preemption_timer_test
- /x86_64/svm_vmcall_test
- /x86_64/sync_regs_test
- /x86_64/vmx_close_while_nested_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c66f4eec34111..780f0c189a7bc 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -20,6 +20,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
-+TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
- TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
- TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index e244c6ecfc1d5..919e161dd2893 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -314,6 +314,8 @@ void ucall_uninit(struct kvm_vm *vm);
- void ucall(uint64_t cmd, int nargs, ...);
- uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
-
-+#define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
-+				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
- #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
- #define GUEST_DONE()		ucall(UCALL_DONE, 0)
- #define __GUEST_ASSERT(_condition, _nargs, _args...) do {	\
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 7428513a4c687..7cb19eca6c72d 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -79,13 +79,16 @@ static inline uint64_t get_desc64_base(const struct desc64 *desc)
- static inline uint64_t rdtsc(void)
+diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
+index 690718b3701a..ec3cd300981b 100644
+--- a/arch/mips/Kconfig
++++ b/arch/mips/Kconfig
+@@ -1580,6 +1580,21 @@ config CPU_MIPS32_R2
+ 	  specific type of processor in your system, choose those that one
+ 	  otherwise CPU_MIPS32_R1 is a safe bet for any MIPS32 system.
+ 
++config CPU_MIPS32_R5
++	bool "MIPS32 Release 5"
++	depends on SYS_HAS_CPU_MIPS32_R5
++	select CPU_HAS_PREFETCH
++	select CPU_SUPPORTS_32BIT_KERNEL
++	select CPU_SUPPORTS_HIGHMEM
++	select CPU_SUPPORTS_MSA
++	select HAVE_KVM
++	select MIPS_O32_FP64_SUPPORT
++	help
++	  Choose this option to build a kernel for release 5 or later of the
++	  MIPS32 architecture.  New MIPS processors, starting with the Warrior
++	  family, are based on a MIPS32r5 processor. If you own an older
++	  processor, you probably need to select MIPS32r1 or MIPS32r2 instead.
++
+ config CPU_MIPS32_R6
+ 	bool "MIPS32 Release 6"
+ 	depends on SYS_HAS_CPU_MIPS32_R6
+@@ -1632,6 +1647,23 @@ config CPU_MIPS64_R2
+ 	  specific type of processor in your system, choose those that one
+ 	  otherwise CPU_MIPS64_R1 is a safe bet for any MIPS64 system.
+ 
++config CPU_MIPS64_R5
++	bool "MIPS64 Release 5"
++	depends on SYS_HAS_CPU_MIPS64_R5
++	select CPU_HAS_PREFETCH
++	select CPU_SUPPORTS_32BIT_KERNEL
++	select CPU_SUPPORTS_64BIT_KERNEL
++	select CPU_SUPPORTS_HIGHMEM
++	select CPU_SUPPORTS_HUGEPAGES
++	select CPU_SUPPORTS_MSA
++	select MIPS_O32_FP64_SUPPORT if 32BIT || MIPS32_O32
++	select HAVE_KVM
++	help
++	  Choose this option to build a kernel for release 5 or later of the
++	  MIPS64 architecture.  This is a intermediate MIPS architecture
++	  release partly implementing release 6 features. Though there is no
++	  any hardware known to be based on this release.
++
+ config CPU_MIPS64_R6
+ 	bool "MIPS64 Release 6"
+ 	depends on SYS_HAS_CPU_MIPS64_R6
+@@ -1826,7 +1858,7 @@ endchoice
+ config CPU_MIPS32_3_5_FEATURES
+ 	bool "MIPS32 Release 3.5 Features"
+ 	depends on SYS_HAS_CPU_MIPS32_R3_5
+-	depends on CPU_MIPS32_R2 || CPU_MIPS32_R6
++	depends on CPU_MIPS32_R2 || CPU_MIPS32_R5 || CPU_MIPS32_R6
+ 	help
+ 	  Choose this option to build a kernel for release 2 or later of the
+ 	  MIPS32 architecture including features from the 3.5 release such as
+@@ -1846,7 +1878,7 @@ config CPU_MIPS32_3_5_EVA
+ config CPU_MIPS32_R5_FEATURES
+ 	bool "MIPS32 Release 5 Features"
+ 	depends on SYS_HAS_CPU_MIPS32_R5
+-	depends on CPU_MIPS32_R2
++	depends on CPU_MIPS32_R2 || CPU_MIPS32_R5
+ 	help
+ 	  Choose this option to build a kernel for release 2 or later of the
+ 	  MIPS32 architecture including features from release 5 such as
+@@ -2084,11 +2116,13 @@ endmenu
+ #
+ config CPU_MIPS32
+ 	bool
+-	default y if CPU_MIPS32_R1 || CPU_MIPS32_R2 || CPU_MIPS32_R6
++	default y if CPU_MIPS32_R1 || CPU_MIPS32_R2 || CPU_MIPS32_R5 || \
++		     CPU_MIPS32_R6
+ 
+ config CPU_MIPS64
+ 	bool
+-	default y if CPU_MIPS64_R1 || CPU_MIPS64_R2 || CPU_MIPS64_R6
++	default y if CPU_MIPS64_R1 || CPU_MIPS64_R2 || CPU_MIPS64_R5 || \
++		     CPU_MIPS64_R6
+ 
+ #
+ # These indicate the revision of the architecture
+@@ -2104,6 +2138,13 @@ config CPU_MIPSR2
+ 	select CPU_HAS_DIEI if !CPU_DIEI_BROKEN
+ 	select MIPS_SPRAM
+ 
++config CPU_MIPSR5
++	bool
++	default y if CPU_MIPS32_R5 || CPU_MIPS64_R5
++	select CPU_HAS_RIXI
++	select CPU_HAS_DIEI if !CPU_DIEI_BROKEN
++	select MIPS_SPRAM
++
+ config CPU_MIPSR6
+ 	bool
+ 	default y if CPU_MIPS32_R6 || CPU_MIPS64_R6
+@@ -2118,6 +2159,7 @@ config TARGET_ISA_REV
+ 	int
+ 	default 1 if CPU_MIPSR1
+ 	default 2 if CPU_MIPSR2
++	default 5 if CPU_MIPSR5
+ 	default 6 if CPU_MIPSR6
+ 	default 0
+ 	help
+@@ -2707,7 +2749,11 @@ config NEED_PER_CPU_EMBED_FIRST_CHUNK
+ 
+ config RELOCATABLE
+ 	bool "Relocatable kernel"
+-	depends on SYS_SUPPORTS_RELOCATABLE && (CPU_MIPS32_R2 || CPU_MIPS64_R2 || CPU_MIPS32_R6 || CPU_MIPS64_R6 || CAVIUM_OCTEON_SOC)
++	depends on SYS_SUPPORTS_RELOCATABLE
++	depends on CPU_MIPS32_R2 || CPU_MIPS64_R2 || \
++		   CPU_MIPS32_R5 || CPU_MIPS64_R5 || \
++		   CPU_MIPS32_R6 || CPU_MIPS64_R6 || \
++		   CAVIUM_OCTEON_SOC
+ 	help
+ 	  This builds a kernel image that retains relocation information
+ 	  so it can be loaded someplace besides the default 1MB.
+diff --git a/arch/mips/Makefile b/arch/mips/Makefile
+index e1c44aed8156..08c8d93d61ba 100644
+--- a/arch/mips/Makefile
++++ b/arch/mips/Makefile
+@@ -171,9 +171,11 @@ cflags-$(CONFIG_CPU_R4X00)	+= -march=r4600 -Wa,--trap
+ cflags-$(CONFIG_CPU_TX49XX)	+= -march=r4600 -Wa,--trap
+ cflags-$(CONFIG_CPU_MIPS32_R1)	+= -march=mips32 -Wa,--trap
+ cflags-$(CONFIG_CPU_MIPS32_R2)	+= -march=mips32r2 -Wa,--trap
++cflags-$(CONFIG_CPU_MIPS32_R5)	+= -march=mips32r5 -Wa,--trap -modd-spreg
+ cflags-$(CONFIG_CPU_MIPS32_R6)	+= -march=mips32r6 -Wa,--trap -modd-spreg
+ cflags-$(CONFIG_CPU_MIPS64_R1)	+= -march=mips64 -Wa,--trap
+ cflags-$(CONFIG_CPU_MIPS64_R2)	+= -march=mips64r2 -Wa,--trap
++cflags-$(CONFIG_CPU_MIPS64_R5)	+= -march=mips64r5 -Wa,--trap
+ cflags-$(CONFIG_CPU_MIPS64_R6)	+= -march=mips64r6 -Wa,--trap
+ cflags-$(CONFIG_CPU_R5000)	+= -march=r5000 -Wa,--trap
+ cflags-$(CONFIG_CPU_R5500)	+= $(call cc-option,-march=r5500,-march=r5000) \
+diff --git a/arch/mips/include/asm/asmmacro.h b/arch/mips/include/asm/asmmacro.h
+index 655f40ddb6d1..86f2323ebe6b 100644
+--- a/arch/mips/include/asm/asmmacro.h
++++ b/arch/mips/include/asm/asmmacro.h
+@@ -44,7 +44,8 @@
+ 	.endm
+ #endif
+ 
+-#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR6)
++#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++    defined(CONFIG_CPU_MIPSR6)
+ 	.macro	local_irq_enable reg=t0
+ 	ei
+ 	irq_enable_hazard
+@@ -54,7 +55,7 @@
+ 	di
+ 	irq_disable_hazard
+ 	.endm
+-#else
++#else /* !CONFIG_CPU_MIPSR2 && !CONFIG_CPU_MIPSR5 && !CONFIG_CPU_MIPSR6 */
+ 	.macro	local_irq_enable reg=t0
+ 	mfc0	\reg, CP0_STATUS
+ 	ori	\reg, \reg, 1
+@@ -79,7 +80,7 @@
+ 	sw      \reg, TI_PRE_COUNT($28)
+ #endif
+ 	.endm
+-#endif /* CONFIG_CPU_MIPSR2 */
++#endif  /* !CONFIG_CPU_MIPSR2 && !CONFIG_CPU_MIPSR5 && !CONFIG_CPU_MIPSR6 */
+ 
+ 	.macro	fpu_save_16even thread tmp=t0
+ 	.set	push
+@@ -131,7 +132,7 @@
+ 
+ 	.macro	fpu_save_double thread status tmp
+ #if defined(CONFIG_64BIT) || defined(CONFIG_CPU_MIPSR2) || \
+-		defined(CONFIG_CPU_MIPSR6)
++    defined(CONFIG_CPU_MIPSR5) || defined(CONFIG_CPU_MIPSR6)
+ 	sll	\tmp, \status, 5
+ 	bgez	\tmp, 10f
+ 	fpu_save_16odd \thread
+@@ -190,7 +191,7 @@
+ 
+ 	.macro	fpu_restore_double thread status tmp
+ #if defined(CONFIG_64BIT) || defined(CONFIG_CPU_MIPSR2) || \
+-		defined(CONFIG_CPU_MIPSR6)
++    defined(CONFIG_CPU_MIPSR5) || defined(CONFIG_CPU_MIPSR6)
+ 	sll	\tmp, \status, 5
+ 	bgez	\tmp, 10f				# 16 register mode?
+ 
+@@ -200,16 +201,17 @@
+ 	fpu_restore_16even \thread \tmp
+ 	.endm
+ 
+-#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR6)
++#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++    defined(CONFIG_CPU_MIPSR6)
+ 	.macro	_EXT	rd, rs, p, s
+ 	ext	\rd, \rs, \p, \s
+ 	.endm
+-#else /* !CONFIG_CPU_MIPSR2 || !CONFIG_CPU_MIPSR6 */
++#else /* !CONFIG_CPU_MIPSR2 && !CONFIG_CPU_MIPSR5 && !CONFIG_CPU_MIPSR6 */
+ 	.macro	_EXT	rd, rs, p, s
+ 	srl	\rd, \rs, \p
+ 	andi	\rd, \rd, (1 << \s) - 1
+ 	.endm
+-#endif /* !CONFIG_CPU_MIPSR2 || !CONFIG_CPU_MIPSR6 */
++#endif /* !CONFIG_CPU_MIPSR2 && !CONFIG_CPU_MIPSR5 && !CONFIG_CPU_MIPSR6 */
+ 
+ /*
+  * Temporary until all gas have MT ASE support
+diff --git a/arch/mips/include/asm/compiler.h b/arch/mips/include/asm/compiler.h
+index f77e99f1722e..a2cb2d2b1c07 100644
+--- a/arch/mips/include/asm/compiler.h
++++ b/arch/mips/include/asm/compiler.h
+@@ -57,6 +57,11 @@
+ #define MIPS_ISA_ARCH_LEVEL MIPS_ISA_LEVEL
+ #define MIPS_ISA_LEVEL_RAW mips64r6
+ #define MIPS_ISA_ARCH_LEVEL_RAW MIPS_ISA_LEVEL_RAW
++#elif defined(CONFIG_CPU_MIPSR5)
++#define MIPS_ISA_LEVEL "mips64r5"
++#define MIPS_ISA_ARCH_LEVEL MIPS_ISA_LEVEL
++#define MIPS_ISA_LEVEL_RAW mips64r5
++#define MIPS_ISA_ARCH_LEVEL_RAW MIPS_ISA_LEVEL_RAW
+ #else
+ /* MIPS64 is a superset of MIPS32 */
+ #define MIPS_ISA_LEVEL "mips64r2"
+diff --git a/arch/mips/include/asm/cpu-features.h b/arch/mips/include/asm/cpu-features.h
+index de44c92b1c1f..8ecd13e3c9c2 100644
+--- a/arch/mips/include/asm/cpu-features.h
++++ b/arch/mips/include/asm/cpu-features.h
+@@ -284,6 +284,9 @@
+ #ifndef cpu_has_mips32r2
+ # define cpu_has_mips32r2	__isa_range_or_flag(2, 6, MIPS_CPU_ISA_M32R2)
+ #endif
++#ifndef cpu_has_mips32r5
++# define cpu_has_mips32r5	__isa_range_or_flag(5, 6, MIPS_CPU_ISA_M32R5)
++#endif
+ #ifndef cpu_has_mips32r6
+ # define cpu_has_mips32r6	__isa_ge_or_flag(6, MIPS_CPU_ISA_M32R6)
+ #endif
+@@ -293,6 +296,10 @@
+ #ifndef cpu_has_mips64r2
+ # define cpu_has_mips64r2	__isa_range_or_flag(2, 6, MIPS_CPU_ISA_M64R2)
+ #endif
++#ifndef cpu_has_mips64r5
++# define cpu_has_mips64r5	(cpu_has_64bits && \
++				 __isa_range_or_flag(5, 6, MIPS_CPU_ISA_M64R5))
++#endif
+ #ifndef cpu_has_mips64r6
+ # define cpu_has_mips64r6	__isa_ge_and_flag(6, MIPS_CPU_ISA_M64R6)
+ #endif
+@@ -313,19 +320,25 @@
+ 				(cpu_has_mips_3 | cpu_has_mips_4_5_64_r2_r6)
+ #define cpu_has_mips_4_5_64_r2_r6					\
+ 				(cpu_has_mips_4_5 | cpu_has_mips64r1 |	\
+-				 cpu_has_mips_r2 | cpu_has_mips_r6)
++				 cpu_has_mips_r2 | cpu_has_mips_r5 | \
++				 cpu_has_mips_r6)
+ 
+-#define cpu_has_mips32	(cpu_has_mips32r1 | cpu_has_mips32r2 | cpu_has_mips32r6)
+-#define cpu_has_mips64	(cpu_has_mips64r1 | cpu_has_mips64r2 | cpu_has_mips64r6)
++#define cpu_has_mips32	(cpu_has_mips32r1 | cpu_has_mips32r2 | \
++			 cpu_has_mips32r5 | cpu_has_mips32r6)
++#define cpu_has_mips64	(cpu_has_mips64r1 | cpu_has_mips64r2 | \
++			 cpu_has_mips64r5 | cpu_has_mips64r6)
+ #define cpu_has_mips_r1 (cpu_has_mips32r1 | cpu_has_mips64r1)
+ #define cpu_has_mips_r2 (cpu_has_mips32r2 | cpu_has_mips64r2)
++#define cpu_has_mips_r5	(cpu_has_mips32r5 | cpu_has_mips64r5)
+ #define cpu_has_mips_r6	(cpu_has_mips32r6 | cpu_has_mips64r6)
+ #define cpu_has_mips_r	(cpu_has_mips32r1 | cpu_has_mips32r2 | \
+-			 cpu_has_mips32r6 | cpu_has_mips64r1 | \
+-			 cpu_has_mips64r2 | cpu_has_mips64r6)
++			 cpu_has_mips32r5 | cpu_has_mips32r6 | \
++			 cpu_has_mips64r1 | cpu_has_mips64r2 | \
++			 cpu_has_mips64r5 | cpu_has_mips64r6)
+ 
+-/* MIPSR2 and MIPSR6 have a lot of similarities */
+-#define cpu_has_mips_r2_r6	(cpu_has_mips_r2 | cpu_has_mips_r6)
++/* MIPSR2 - MIPSR6 have a lot of similarities */
++#define cpu_has_mips_r2_r6	(cpu_has_mips_r2 | cpu_has_mips_r5 | \
++				 cpu_has_mips_r6)
+ 
+ /*
+  * cpu_has_mips_r2_exec_hazard - return if IHB is required on current processor
+diff --git a/arch/mips/include/asm/cpu-info.h b/arch/mips/include/asm/cpu-info.h
+index ed7ffe4e63a3..bce3ea7fff7c 100644
+--- a/arch/mips/include/asm/cpu-info.h
++++ b/arch/mips/include/asm/cpu-info.h
+@@ -142,7 +142,7 @@ struct proc_cpuinfo_notifier_args {
+ static inline unsigned int cpu_cluster(struct cpuinfo_mips *cpuinfo)
  {
- 	uint32_t eax, edx;
--
-+	uint32_t tsc_val;
- 	/*
- 	 * The lfence is to wait (on Intel CPUs) until all previous
--	 * instructions have been executed.
-+	 * instructions have been executed. If software requires RDTSC to be
-+	 * executed prior to execution of any subsequent instruction, it can
-+	 * execute LFENCE immediately after RDTSC
+ 	/* Optimisation for systems where multiple clusters aren't used */
+-	if (!IS_ENABLED(CONFIG_CPU_MIPSR6))
++	if (!IS_ENABLED(CONFIG_CPU_MIPSR5) && !IS_ENABLED(CONFIG_CPU_MIPSR6))
+ 		return 0;
+ 
+ 	return (cpuinfo->globalnumber & MIPS_GLOBALNUMBER_CLUSTER) >>
+diff --git a/arch/mips/include/asm/cpu-type.h b/arch/mips/include/asm/cpu-type.h
+index 49f0061a6051..75a7a382da09 100644
+--- a/arch/mips/include/asm/cpu-type.h
++++ b/arch/mips/include/asm/cpu-type.h
+@@ -51,13 +51,18 @@ static inline int __pure __get_cpu_type(const int cpu_type)
+ 	case CPU_M14KEC:
+ 	case CPU_INTERAPTIV:
+ 	case CPU_PROAPTIV:
+-	case CPU_P5600:
++#endif
++
++#ifdef CONFIG_SYS_HAS_CPU_MIPS32_R5
+ 	case CPU_M5150:
++	case CPU_P5600:
+ #endif
+ 
+ #if defined(CONFIG_SYS_HAS_CPU_MIPS32_R2) || \
++    defined(CONFIG_SYS_HAS_CPU_MIPS32_R5) || \
+     defined(CONFIG_SYS_HAS_CPU_MIPS32_R6) || \
+     defined(CONFIG_SYS_HAS_CPU_MIPS64_R2) || \
++    defined(CONFIG_SYS_HAS_CPU_MIPS64_R5) || \
+     defined(CONFIG_SYS_HAS_CPU_MIPS64_R6)
+ 	case CPU_QEMU_GENERIC:
+ #endif
+diff --git a/arch/mips/include/asm/cpu.h b/arch/mips/include/asm/cpu.h
+index 216a22916740..2e2035a13a55 100644
+--- a/arch/mips/include/asm/cpu.h
++++ b/arch/mips/include/asm/cpu.h
+@@ -343,14 +343,16 @@ enum cpu_type_enum {
+ #define MIPS_CPU_ISA_M32R2	0x00000020
+ #define MIPS_CPU_ISA_M64R1	0x00000040
+ #define MIPS_CPU_ISA_M64R2	0x00000080
+-#define MIPS_CPU_ISA_M32R6	0x00000100
+-#define MIPS_CPU_ISA_M64R6	0x00000200
++#define MIPS_CPU_ISA_M32R5	0x00000100
++#define MIPS_CPU_ISA_M64R5	0x00000200
++#define MIPS_CPU_ISA_M32R6	0x00000400
++#define MIPS_CPU_ISA_M64R6	0x00000800
+ 
+ #define MIPS_CPU_ISA_32BIT (MIPS_CPU_ISA_II | MIPS_CPU_ISA_M32R1 | \
+-	MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M32R6)
++	MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M32R6)
+ #define MIPS_CPU_ISA_64BIT (MIPS_CPU_ISA_III | MIPS_CPU_ISA_IV | \
+ 	MIPS_CPU_ISA_V | MIPS_CPU_ISA_M64R1 | MIPS_CPU_ISA_M64R2 | \
+-	MIPS_CPU_ISA_M64R6)
++	MIPS_CPU_ISA_M64R5 | MIPS_CPU_ISA_M64R6)
+ 
+ /*
+  * CPU Option encodings
+diff --git a/arch/mips/include/asm/fpu.h b/arch/mips/include/asm/fpu.h
+index 9476e0498d59..f0b37663fade 100644
+--- a/arch/mips/include/asm/fpu.h
++++ b/arch/mips/include/asm/fpu.h
+@@ -71,8 +71,8 @@ static inline int __enable_fpu(enum fpu_mode mode)
+ 		goto fr_common;
+ 
+ 	case FPU_64BIT:
+-#if !(defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR6) \
+-      || defined(CONFIG_64BIT))
++#if !(defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++      defined(CONFIG_CPU_MIPSR6) || defined(CONFIG_64BIT))
+ 		/* we only have a 32-bit FPU */
+ 		return SIGFPE;
+ #endif
+diff --git a/arch/mips/include/asm/hazards.h b/arch/mips/include/asm/hazards.h
+index a0b92205f933..f855478d12fa 100644
+--- a/arch/mips/include/asm/hazards.h
++++ b/arch/mips/include/asm/hazards.h
+@@ -22,8 +22,9 @@
+ /*
+  * TLB hazards
+  */
+-#if (defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR6)) && \
+-	!defined(CONFIG_CPU_CAVIUM_OCTEON) && !defined(CONFIG_CPU_LOONGSON64)
++#if (defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++     defined(CONFIG_CPU_MIPSR6)) && \
++    !defined(CONFIG_CPU_CAVIUM_OCTEON) && !defined(CONFIG_CPU_LOONGSON64)
+ 
+ /*
+  * MIPSR2 defines ehb for hazard avoidance
+@@ -278,7 +279,8 @@ do {									\
+ 
+ #define __disable_fpu_hazard
+ 
+-#elif defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR6)
++#elif defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++      defined(CONFIG_CPU_MIPSR6)
+ 
+ #define __enable_fpu_hazard						\
+ 	___ehb
+diff --git a/arch/mips/include/asm/stackframe.h b/arch/mips/include/asm/stackframe.h
+index 4d6ad907ae54..3e8d2aaf96af 100644
+--- a/arch/mips/include/asm/stackframe.h
++++ b/arch/mips/include/asm/stackframe.h
+@@ -424,7 +424,7 @@
+ 
+ 		.macro	RESTORE_SP_AND_RET docfi=0
+ 		RESTORE_SP \docfi
+-#ifdef CONFIG_CPU_MIPSR6
++#if defined(CONFIG_CPU_MIPSR5) || defined(CONFIG_CPU_MIPSR6)
+ 		eretnc
+ #else
+ 		.set	push
+diff --git a/arch/mips/include/asm/switch_to.h b/arch/mips/include/asm/switch_to.h
+index 09cbe9042828..0b0a93bf83cd 100644
+--- a/arch/mips/include/asm/switch_to.h
++++ b/arch/mips/include/asm/switch_to.h
+@@ -67,11 +67,11 @@ do {									\
+ #endif
+ 
+ /*
+- * Clear LLBit during context switches on MIPSr6 such that eretnc can be used
++ * Clear LLBit during context switches on MIPSr5+ such that eretnc can be used
+  * unconditionally when returning to userland in entry.S.
+  */
+-#define __clear_r6_hw_ll_bit() do {					\
+-	if (cpu_has_mips_r6)						\
++#define __clear_r5_hw_ll_bit() do {					\
++	if (cpu_has_mips_r5 || cpu_has_mips_r6)				\
+ 		write_c0_lladdr(0);					\
+ } while (0)
+ 
+@@ -129,7 +129,7 @@ do {									\
+ 		}							\
+ 		clear_c0_status(ST0_CU2);				\
+ 	}								\
+-	__clear_r6_hw_ll_bit();						\
++	__clear_r5_hw_ll_bit();						\
+ 	__clear_software_ll_bit();					\
+ 	if (cpu_has_userlocal)						\
+ 		write_c0_userlocal(task_thread_info(next)->tp_value);	\
+diff --git a/arch/mips/include/asm/vermagic.h b/arch/mips/include/asm/vermagic.h
+index 24dc3d35161c..01d0ea9e9e23 100644
+--- a/arch/mips/include/asm/vermagic.h
++++ b/arch/mips/include/asm/vermagic.h
+@@ -8,12 +8,16 @@
+ #define MODULE_PROC_FAMILY "MIPS32_R1 "
+ #elif defined CONFIG_CPU_MIPS32_R2
+ #define MODULE_PROC_FAMILY "MIPS32_R2 "
++#elif defined CONFIG_CPU_MIPS32_R5
++#define MODULE_PROC_FAMILY "MIPS32_R5 "
+ #elif defined CONFIG_CPU_MIPS32_R6
+ #define MODULE_PROC_FAMILY "MIPS32_R6 "
+ #elif defined CONFIG_CPU_MIPS64_R1
+ #define MODULE_PROC_FAMILY "MIPS64_R1 "
+ #elif defined CONFIG_CPU_MIPS64_R2
+ #define MODULE_PROC_FAMILY "MIPS64_R2 "
++#elif defined CONFIG_CPU_MIPS64_R5
++#define MODULE_PROC_FAMILY "MIPS64_R5 "
+ #elif defined CONFIG_CPU_MIPS64_R6
+ #define MODULE_PROC_FAMILY "MIPS64_R6 "
+ #elif defined CONFIG_CPU_R3000
+diff --git a/arch/mips/kernel/cpu-probe.c b/arch/mips/kernel/cpu-probe.c
+index f21a2304401f..cd4776faa9a5 100644
+--- a/arch/mips/kernel/cpu-probe.c
++++ b/arch/mips/kernel/cpu-probe.c
+@@ -92,6 +92,7 @@ static void cpu_set_fpu_2008(struct cpuinfo_mips *c)
+ {
+ 	if (c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M64R1 |
+ 			    MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2 |
++			    MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5 |
+ 			    MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R6)) {
+ 		unsigned long sr, fir, fcsr, fcsr0, fcsr1;
+ 
+@@ -172,6 +173,7 @@ static void cpu_set_nofpu_2008(struct cpuinfo_mips *c)
+ 	case STRICT:
+ 		if (c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M64R1 |
+ 				    MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2 |
++				    MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5 |
+ 				    MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R6)) {
+ 			c->options |= MIPS_CPU_NAN_2008 | MIPS_CPU_NAN_LEGACY;
+ 		} else {
+@@ -263,9 +265,11 @@ static void cpu_set_nofpu_id(struct cpuinfo_mips *c)
+ 	value = 0;
+ 	if (c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M64R1 |
+ 			    MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2 |
++			    MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5 |
+ 			    MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R6))
+ 		value |= MIPS_FPIR_D | MIPS_FPIR_S;
+ 	if (c->isa_level & (MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2 |
++			    MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5 |
+ 			    MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R6))
+ 		value |= MIPS_FPIR_F64 | MIPS_FPIR_L | MIPS_FPIR_W;
+ 	if (c->options & MIPS_CPU_NAN_2008)
+@@ -286,6 +290,7 @@ static void cpu_set_fpu_opts(struct cpuinfo_mips *c)
+ 
+ 	if (c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M64R1 |
+ 			    MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2 |
++			    MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5 |
+ 			    MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R6)) {
+ 		if (c->fpu_id & MIPS_FPIR_3D)
+ 			c->ases |= MIPS_ASE_MIPS3D;
+@@ -532,6 +537,10 @@ static inline void cpu_probe_vmbits(struct cpuinfo_mips *c)
+ static void set_isa(struct cpuinfo_mips *c, unsigned int isa)
+ {
+ 	switch (isa) {
++	case MIPS_CPU_ISA_M64R5:
++		c->isa_level |= MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5;
++		set_elf_base_platform("mips64r5");
++		/* fall through */
+ 	case MIPS_CPU_ISA_M64R2:
+ 		c->isa_level |= MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2;
+ 		set_elf_base_platform("mips64r2");
+@@ -563,6 +572,10 @@ static void set_isa(struct cpuinfo_mips *c, unsigned int isa)
+ 		set_elf_base_platform("mips32r6");
+ 		/* Break here so we don't add incompatible ISAs */
+ 		break;
++	case MIPS_CPU_ISA_M32R5:
++		c->isa_level |= MIPS_CPU_ISA_M32R5;
++		set_elf_base_platform("mips32r5");
++		/* fall through */
+ 	case MIPS_CPU_ISA_M32R2:
+ 		c->isa_level |= MIPS_CPU_ISA_M32R2;
+ 		set_elf_base_platform("mips32r2");
+@@ -1751,6 +1764,10 @@ static inline void cpu_probe_mips(struct cpuinfo_mips *c, unsigned int cpu)
+ 	spram_config();
+ 
+ 	switch (__get_cpu_type(c->cputype)) {
++	case CPU_M5150:
++	case CPU_P5600:
++		set_isa(c, MIPS_CPU_ISA_M32R5);
++		break;
+ 	case CPU_I6500:
+ 		c->options |= MIPS_CPU_SHARED_FTLB_ENTRIES;
+ 		/* fall-through */
+diff --git a/arch/mips/kernel/entry.S b/arch/mips/kernel/entry.S
+index 4849a48afc0f..4b896f5023ff 100644
+--- a/arch/mips/kernel/entry.S
++++ b/arch/mips/kernel/entry.S
+@@ -169,8 +169,8 @@ syscall_exit_work:
+ 	jal	syscall_trace_leave
+ 	b	resume_userspace
+ 
+-#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR6) || \
+-    defined(CONFIG_MIPS_MT)
++#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++    defined(CONFIG_CPU_MIPSR6) || defined(CONFIG_MIPS_MT)
+ 
+ /*
+  * MIPS32R2 Instruction Hazard Barrier - must be called
+@@ -183,4 +183,4 @@ LEAF(mips_ihb)
+ 	nop
+ 	END(mips_ihb)
+ 
+-#endif /* CONFIG_CPU_MIPSR2 or CONFIG_CPU_MIPSR6 or CONFIG_MIPS_MT */
++#endif /* CONFIG_CPU_MIPSR2 - CONFIG_CPU_MIPSR6 or CONFIG_MIPS_MT */
+diff --git a/arch/mips/kernel/proc.c b/arch/mips/kernel/proc.c
+index f8d36710cd58..4184d641f05e 100644
+--- a/arch/mips/kernel/proc.c
++++ b/arch/mips/kernel/proc.c
+@@ -98,12 +98,16 @@ static int show_cpuinfo(struct seq_file *m, void *v)
+ 		seq_printf(m, "%s", " mips32r1");
+ 	if (cpu_has_mips32r2)
+ 		seq_printf(m, "%s", " mips32r2");
++	if (cpu_has_mips32r5)
++		seq_printf(m, "%s", " mips32r5");
+ 	if (cpu_has_mips32r6)
+ 		seq_printf(m, "%s", " mips32r6");
+ 	if (cpu_has_mips64r1)
+ 		seq_printf(m, "%s", " mips64r1");
+ 	if (cpu_has_mips64r2)
+ 		seq_printf(m, "%s", " mips64r2");
++	if (cpu_has_mips64r5)
++		seq_printf(m, "%s", " mips64r5");
+ 	if (cpu_has_mips64r6)
+ 		seq_printf(m, "%s", " mips64r6");
+ 	seq_printf(m, "\n");
+diff --git a/arch/mips/kernel/r4k_fpu.S b/arch/mips/kernel/r4k_fpu.S
+index 59be5c812aa2..b91e91106475 100644
+--- a/arch/mips/kernel/r4k_fpu.S
++++ b/arch/mips/kernel/r4k_fpu.S
+@@ -41,7 +41,7 @@
+ LEAF(_save_fp)
+ EXPORT_SYMBOL(_save_fp)
+ #if defined(CONFIG_64BIT) || defined(CONFIG_CPU_MIPSR2) || \
+-		defined(CONFIG_CPU_MIPSR6)
++    defined(CONFIG_CPU_MIPSR5) || defined(CONFIG_CPU_MIPSR6)
+ 	mfc0	t0, CP0_STATUS
+ #endif
+ 	fpu_save_double a0 t0 t1		# clobbers t1
+@@ -53,7 +53,7 @@ EXPORT_SYMBOL(_save_fp)
+  */
+ LEAF(_restore_fp)
+ #if defined(CONFIG_64BIT) || defined(CONFIG_CPU_MIPSR2) || \
+-		defined(CONFIG_CPU_MIPSR6)
++    defined(CONFIG_CPU_MIPSR5) || defined(CONFIG_CPU_MIPSR6)
+ 	mfc0	t0, CP0_STATUS
+ #endif
+ 	fpu_restore_double a0 t0 t1		# clobbers t1
+@@ -103,10 +103,10 @@ LEAF(_save_fp_context)
+ 	.set	pop
+ 
+ #if defined(CONFIG_64BIT) || defined(CONFIG_CPU_MIPSR2) || \
+-		defined(CONFIG_CPU_MIPSR6)
++    defined(CONFIG_CPU_MIPSR5) || defined(CONFIG_CPU_MIPSR6)
+ 	.set	push
+ 	SET_HARDFLOAT
+-#ifdef CONFIG_CPU_MIPSR2
++#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5)
+ 	.set	mips32r2
+ 	.set	fp=64
+ 	mfc0	t0, CP0_STATUS
+@@ -170,11 +170,11 @@ LEAF(_save_fp_context)
+ LEAF(_restore_fp_context)
+ 	EX	lw t1, 0(a1)
+ 
+-#if defined(CONFIG_64BIT) || defined(CONFIG_CPU_MIPSR2)  || \
+-		defined(CONFIG_CPU_MIPSR6)
++#if defined(CONFIG_64BIT) || defined(CONFIG_CPU_MIPSR2) || \
++    defined(CONFIG_CPU_MIPSR5) || defined(CONFIG_CPU_MIPSR6)
+ 	.set	push
+ 	SET_HARDFLOAT
+-#ifdef CONFIG_CPU_MIPSR2
++#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5)
+ 	.set	mips32r2
+ 	.set	fp=64
+ 	mfc0	t0, CP0_STATUS
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index dde20887a70d..66432b5ab229 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -2980,7 +2980,7 @@ static int kvm_vz_vcpu_setup(struct kvm_vcpu *vcpu)
  	 */
--	__asm__ __volatile__("lfence; rdtsc" : "=a"(eax), "=d"(edx));
--	return ((uint64_t)edx) << 32 | eax;
-+	__asm__ __volatile__("lfence; rdtsc; lfence" : "=a"(eax), "=d"(edx));
-+	tsc_val = ((uint64_t)edx) << 32 | eax;
-+	return tsc_val;
- }
-
- static inline uint64_t rdtscp(uint32_t *aux)
-diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-index 3d27069b9ed9c..ccff3e6e27048 100644
---- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
-@@ -575,6 +575,33 @@ struct vmx_pages {
- 	void *eptp;
- };
-
-+union vmx_basic {
-+	u64 val;
-+	struct {
-+		u32 revision;
-+		u32	size:13,
-+			reserved1:3,
-+			width:1,
-+			dual:1,
-+			type:4,
-+			insouts:1,
-+			ctrl:1,
-+			vm_entry_exception_ctrl:1,
-+			reserved2:7;
-+	};
-+};
-+
-+union vmx_ctrl_msr {
-+	u64 val;
-+	struct {
-+		u32 set, clr;
-+	};
-+};
-+
-+union vmx_basic basic;
-+union vmx_ctrl_msr ctrl_pin_rev;
-+union vmx_ctrl_msr ctrl_exit_rev;
-+
- struct vmx_pages *vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva);
- bool prepare_for_vmx_operation(struct vmx_pages *vmx);
- void prepare_vmcs(struct vmx_pages *vmx, void *guest_rip, void *guest_rsp);
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
-new file mode 100644
-index 0000000000000..e2f5dccb4d5ba
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
-@@ -0,0 +1,255 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * VMX-preemption timer test
-+ *
-+ * Copyright (C) 2020, Google, LLC.
-+ *
-+ * Test to ensure the VM-Enter after migration doesn't
-+ * incorrectly restarts the timer with the full timer
-+ * value instead of partially decayed timer value
-+ *
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+#define VCPU_ID		5
-+#define PREEMPTION_TIMER_VALUE			100000000ull
-+#define PREEMPTION_TIMER_VALUE_THRESHOLD1	 80000000ull
-+
-+u32 vmx_pt_rate;
-+bool l2_save_restore_done;
-+static u64 l2_vmx_pt_start;
-+volatile u64 l2_vmx_pt_finish;
-+
-+void l2_guest_code(void)
-+{
-+	u64 vmx_pt_delta;
-+
-+	vmcall();
-+	l2_vmx_pt_start = (rdtsc() >> vmx_pt_rate) << vmx_pt_rate;
-+
-+	/*
-+	 * Wait until the 1st threshold has passed
-+	 */
-+	do {
-+		l2_vmx_pt_finish = rdtsc();
-+		vmx_pt_delta = (l2_vmx_pt_finish - l2_vmx_pt_start) >>
-+				vmx_pt_rate;
-+	} while (vmx_pt_delta < PREEMPTION_TIMER_VALUE_THRESHOLD1);
-+
-+	/*
-+	 * Force L2 through Save and Restore cycle
-+	 */
-+	GUEST_SYNC(1);
-+
-+	l2_save_restore_done = 1;
-+
-+	/*
-+	 * Now wait for the preemption timer to fire and
-+	 * exit to L1
-+	 */
-+	while ((l2_vmx_pt_finish = rdtsc()))
-+		;
-+}
-+
-+void l1_guest_code(struct vmx_pages *vmx_pages)
-+{
-+#define L2_GUEST_STACK_SIZE 64
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	u64 l1_vmx_pt_start;
-+	u64 l1_vmx_pt_finish;
-+	u64 l1_tsc_deadline, l2_tsc_deadline;
-+
-+	GUEST_ASSERT(vmx_pages->vmcs_gpa);
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+	GUEST_ASSERT(load_vmcs(vmx_pages));
-+	GUEST_ASSERT(vmptrstz() == vmx_pages->vmcs_gpa);
-+
-+	prepare_vmcs(vmx_pages, l2_guest_code,
-+		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	/*
-+	 * Check for Preemption timer support
-+	 */
-+	basic.val = rdmsr(MSR_IA32_VMX_BASIC);
-+	ctrl_pin_rev.val = rdmsr(basic.ctrl ? MSR_IA32_VMX_TRUE_PINBASED_CTLS
-+			: MSR_IA32_VMX_PINBASED_CTLS);
-+	ctrl_exit_rev.val = rdmsr(basic.ctrl ? MSR_IA32_VMX_TRUE_EXIT_CTLS
-+			: MSR_IA32_VMX_EXIT_CTLS);
-+
-+	if (!(ctrl_pin_rev.clr & PIN_BASED_VMX_PREEMPTION_TIMER) ||
-+	    !(ctrl_exit_rev.clr & VM_EXIT_SAVE_VMX_PREEMPTION_TIMER))
-+		return;
-+
-+	GUEST_ASSERT(!vmlaunch());
-+	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-+	vmwrite(GUEST_RIP, vmreadz(GUEST_RIP) + vmreadz(VM_EXIT_INSTRUCTION_LEN));
-+
-+	/*
-+	 * Turn on PIN control and resume the guest
-+	 */
-+	GUEST_ASSERT(!vmwrite(PIN_BASED_VM_EXEC_CONTROL,
-+			      vmreadz(PIN_BASED_VM_EXEC_CONTROL) |
-+			      PIN_BASED_VMX_PREEMPTION_TIMER));
-+
-+	GUEST_ASSERT(!vmwrite(VMX_PREEMPTION_TIMER_VALUE,
-+			      PREEMPTION_TIMER_VALUE));
-+
-+	vmx_pt_rate = rdmsr(MSR_IA32_VMX_MISC) & 0x1F;
-+
-+	l2_save_restore_done = 0;
-+
-+	l1_vmx_pt_start = (rdtsc() >> vmx_pt_rate) << vmx_pt_rate;
-+
-+	GUEST_ASSERT(!vmresume());
-+
-+	l1_vmx_pt_finish = rdtsc();
-+
-+	/*
-+	 * Ensure exit from L2 happens after L2 goes through
-+	 * save and restore
-+	 */
-+	GUEST_ASSERT(l2_save_restore_done);
-+
-+	/*
-+	 * Ensure the exit from L2 is due to preemption timer expiry
-+	 */
-+	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_PREEMPTION_TIMER);
-+
-+	l1_tsc_deadline = l1_vmx_pt_start +
-+		(PREEMPTION_TIMER_VALUE << vmx_pt_rate);
-+
-+	l2_tsc_deadline = l2_vmx_pt_start +
-+		(PREEMPTION_TIMER_VALUE << vmx_pt_rate);
-+
-+	/*
-+	 * Sync with the host and pass the l1|l2 pt_expiry_finish times and
-+	 * tsc deadlines so that host can verify they are as expected
-+	 */
-+	GUEST_SYNC_ARGS(2, l1_vmx_pt_finish, l1_tsc_deadline,
-+		l2_vmx_pt_finish, l2_tsc_deadline);
-+}
-+
-+void guest_code(struct vmx_pages *vmx_pages)
-+{
-+	if (vmx_pages)
-+		l1_guest_code(vmx_pages);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t vmx_pages_gva = 0;
-+
-+	struct kvm_regs regs1, regs2;
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	struct kvm_x86_state *state;
-+	struct ucall uc;
-+	int stage;
-+
-+	/*
-+	 * AMD currently does not implement any VMX features, so for now we
-+	 * just early out.
-+	 */
-+	nested_vmx_check_supported();
-+
-+	/* Create VM */
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+	run = vcpu_state(vm, VCPU_ID);
-+
-+	vcpu_regs_get(vm, VCPU_ID, &regs1);
-+
-+	if (kvm_check_cap(KVM_CAP_NESTED_STATE_PREEMPTION_TIMER)) {
-+		vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+		vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
-+	} else {
-+		pr_info("will skip vmx preemption timer checks\n");
-+		goto done;
-+	}
-+
-+	for (stage = 1;; stage++) {
-+		_vcpu_run(vm, VCPU_ID);
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Stage %d: unexpected exit reason: %u (%s),\n",
-+			    stage, run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
-+				  __FILE__, uc.args[1]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+
-+		/* UCALL_SYNC is handled here.  */
-+		TEST_ASSERT(!strcmp((const char *)uc.args[0], "hello") &&
-+			    uc.args[1] == stage, "Stage %d: Unexpected register values vmexit, got %lx",
-+			    stage, (ulong)uc.args[1]);
-+		/*
-+		 * If this stage 2 then we should verify the vmx pt expiry
-+		 * is as expected.
-+		 * From L1's perspective verify Preemption timer hasn't
-+		 * expired too early.
-+		 * From L2's perspective verify Preemption timer hasn't
-+		 * expired too late.
-+		 */
-+		if (stage == 2) {
-+
-+			pr_info("Stage %d: L1 PT expiry TSC (%lu) , L1 TSC deadline (%lu)\n",
-+				stage, uc.args[2], uc.args[3]);
-+
-+			pr_info("Stage %d: L2 PT expiry TSC (%lu) , L2 TSC deadline (%lu)\n",
-+				stage, uc.args[4], uc.args[5]);
-+
-+			TEST_ASSERT(uc.args[2] >= uc.args[3],
-+				"Stage %d: L1 PT expiry TSC (%lu) < L1 TSC deadline (%lu)",
-+				stage, uc.args[2], uc.args[3]);
-+
-+			TEST_ASSERT(uc.args[4] < uc.args[5],
-+				"Stage %d: L2 PT expiry TSC (%lu) > L2 TSC deadline (%lu)",
-+				stage, uc.args[4], uc.args[5]);
-+		}
-+
-+		state = vcpu_save_state(vm, VCPU_ID);
-+		memset(&regs1, 0, sizeof(regs1));
-+		vcpu_regs_get(vm, VCPU_ID, &regs1);
-+
-+		kvm_vm_release(vm);
-+
-+		/* Restore state in a new VM.  */
-+		kvm_vm_restart(vm, O_RDWR);
-+		vm_vcpu_add(vm, VCPU_ID);
-+		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+		vcpu_load_state(vm, VCPU_ID, state);
-+		run = vcpu_state(vm, VCPU_ID);
-+		free(state);
-+
-+		memset(&regs2, 0, sizeof(regs2));
-+		vcpu_regs_get(vm, VCPU_ID, &regs2);
-+		TEST_ASSERT(!memcmp(&regs1, &regs2, sizeof(regs2)),
-+			    "Unexpected register values after vcpu_load_state; rdi: %lx rsi: %lx",
-+			    (ulong) regs2.rdi, (ulong) regs2.rsi);
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+}
---
-2.26.2.761.g0e0b3e54be-goog
+ 
+ 	/* PageGrain */
+-	if (cpu_has_mips_r6)
++	if (cpu_has_mips_r5 || cpu_has_mips_r6)
+ 		kvm_write_sw_gc0_pagegrain(cop0, PG_RIE | PG_XIE | PG_IEC);
+ 	/* Wired */
+ 	if (cpu_has_mips_r6)
+@@ -2988,7 +2988,7 @@ static int kvm_vz_vcpu_setup(struct kvm_vcpu *vcpu)
+ 				       read_gc0_wired() & MIPSR6_WIRED_LIMIT);
+ 	/* Status */
+ 	kvm_write_sw_gc0_status(cop0, ST0_BEV | ST0_ERL);
+-	if (cpu_has_mips_r6)
++	if (cpu_has_mips_r5 || cpu_has_mips_r6)
+ 		kvm_change_sw_gc0_status(cop0, ST0_FR, read_gc0_status());
+ 	/* IntCtl */
+ 	kvm_write_sw_gc0_intctl(cop0, read_gc0_intctl() &
+@@ -3086,7 +3086,7 @@ static int kvm_vz_vcpu_setup(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	/* reset HTW registers */
+-	if (cpu_guest_has_htw && cpu_has_mips_r6) {
++	if (cpu_guest_has_htw && (cpu_has_mips_r5 || cpu_has_mips_r6)) {
+ 		/* PWField */
+ 		kvm_write_sw_gc0_pwfield(cop0, 0x0c30c302);
+ 		/* PWSize */
+diff --git a/arch/mips/lib/csum_partial.S b/arch/mips/lib/csum_partial.S
+index fda7b57b826e..87fda0713b84 100644
+--- a/arch/mips/lib/csum_partial.S
++++ b/arch/mips/lib/csum_partial.S
+@@ -279,7 +279,8 @@ EXPORT_SYMBOL(csum_partial)
+ #endif
+ 
+ 	/* odd buffer alignment? */
+-#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_LOONGSON64)
++#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++    defined(CONFIG_CPU_LOONGSON64)
+ 	.set	push
+ 	.set	arch=mips32r2
+ 	wsbh	v1, sum
+@@ -732,7 +733,8 @@ EXPORT_SYMBOL(csum_partial)
+ 	addu	sum, v1
+ #endif
+ 
+-#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_LOONGSON64)
++#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_CPU_MIPSR5) || \
++    defined(CONFIG_CPU_LOONGSON64)
+ 	.set	push
+ 	.set	arch=mips32r2
+ 	wsbh	v1, sum
+diff --git a/arch/mips/mm/c-r4k.c b/arch/mips/mm/c-r4k.c
+index 36a311348739..558b6fbbb6e8 100644
+--- a/arch/mips/mm/c-r4k.c
++++ b/arch/mips/mm/c-r4k.c
+@@ -1703,9 +1703,10 @@ static void setup_scache(void)
+ 		return;
+ 
+ 	default:
+-		if (c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M32R2 |
+-				    MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R1 |
+-				    MIPS_CPU_ISA_M64R2 | MIPS_CPU_ISA_M64R6)) {
++		if (c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M64R1 |
++				    MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2 |
++				    MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5 |
++				    MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R6)) {
+ #ifdef CONFIG_MIPS_CPU_SCACHE
+ 			if (mips_sc_init ()) {
+ 				scache_size = c->scache.ways * c->scache.sets * c->scache.linesz;
+diff --git a/arch/mips/mm/sc-mips.c b/arch/mips/mm/sc-mips.c
+index dbdbfe5d8408..eedad47df24f 100644
+--- a/arch/mips/mm/sc-mips.c
++++ b/arch/mips/mm/sc-mips.c
+@@ -194,9 +194,10 @@ static inline int __init mips_sc_probe(void)
+ 		return mips_sc_probe_cm3();
+ 
+ 	/* Ignore anything but MIPSxx processors */
+-	if (!(c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M32R2 |
+-			      MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R1 |
+-			      MIPS_CPU_ISA_M64R2 | MIPS_CPU_ISA_M64R6)))
++	if (!(c->isa_level & (MIPS_CPU_ISA_M32R1 | MIPS_CPU_ISA_M64R1 |
++			      MIPS_CPU_ISA_M32R2 | MIPS_CPU_ISA_M64R2 |
++			      MIPS_CPU_ISA_M32R5 | MIPS_CPU_ISA_M64R5 |
++			      MIPS_CPU_ISA_M32R6 | MIPS_CPU_ISA_M64R6)))
+ 		return 0;
+ 
+ 	/* Does this MIPS32/MIPS64 CPU have a config2 register? */
+-- 
+2.25.1
 
