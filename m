@@ -2,97 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B463A1DD5B3
-	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 20:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E327C1DD61F
+	for <lists+kvm@lfdr.de>; Thu, 21 May 2020 20:38:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729382AbgEUSIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 14:08:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24329 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728455AbgEUSIq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 14:08:46 -0400
+        id S1729756AbgEUSij (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 14:38:39 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39383 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729726AbgEUSij (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 May 2020 14:38:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590084524;
+        s=mimecast20190719; t=1590086318;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=CSwVUGMdm1SF/JKvVgrgcJwpikT7dcnsVODRPnenSIQ=;
-        b=AwaSGcsE7chVA8hMIziG7fqggYULAnw5C+/8wc4ozWIMOrCSmlOQxM8hW3fBzoNxHtUQFk
-        HgT1+YRKn3ZJFgAhhwzW1tvN0kIYNc9n4gMYwas2wYFNHjlBLWuiWdumx9p1kdkT43jeg2
-        1ZuAHCDko7riyCWMjUB0L/kef77eRJI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-DWmaO1oqPBCXHcY75imMGg-1; Thu, 21 May 2020 14:08:42 -0400
-X-MC-Unique: DWmaO1oqPBCXHcY75imMGg-1
-Received: by mail-wr1-f70.google.com with SMTP id h12so3235010wrr.19
-        for <kvm@vger.kernel.org>; Thu, 21 May 2020 11:08:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=CSwVUGMdm1SF/JKvVgrgcJwpikT7dcnsVODRPnenSIQ=;
-        b=lJyE+qs+Vg1npAQaXUyxlsIg1af4xMHq6kN17nAo9UV9r7aSLAyDWk267lUKM+kds2
-         d7nlOaVgNXIZ2lf51sbb+pPBhDuSwNeldsjHNA6BWAMql1vJObhr2s0uIRdTqVrkhgg3
-         5IzRKx7abTNmiIi+yXbF3b1FSgnZSmkKwFOh7G2ltsaNVkPIGVSJKF3PJqsJ6Ewe3r3L
-         X6aa+i9vEbcTGPHV+k/ebs9SPDrGsQtlNaDDHF82V6XMUT37W9S4p13kkgiKKVJ7OIxR
-         B3VKBt2gnb6AkGvpESxW6GHqQBtAi3J/nxMiRw6eNPznrXvw+EoH8lWjk6QCawyTE+OZ
-         nCRA==
-X-Gm-Message-State: AOAM532OSQu72E4Bb/1LGMJYMbqmbaxM/SQQ1ovpToxTJg7HOs7DnyRR
-        OsrMBu/9ojXerI1d5Kn43uaR7Ed9H66EZe/kOvyBMpUwMFa/lVg2vNm0u64BKeOIowzJLUj3L1B
-        IToYY3S1x4owX
-X-Received: by 2002:a5d:6087:: with SMTP id w7mr10437015wrt.158.1590084518725;
-        Thu, 21 May 2020 11:08:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxZ9o08gBH7tx0yYBsN8onaJW/OLPfFqqFDCwm2ORoSsfevxSpfrqifuC4Sj9PcOKKkhR/Jqg==
-X-Received: by 2002:a5d:6087:: with SMTP id w7mr10436991wrt.158.1590084518323;
-        Thu, 21 May 2020 11:08:38 -0700 (PDT)
-Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
-        by smtp.gmail.com with ESMTPSA id j1sm7269700wrm.40.2020.05.21.11.08.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 May 2020 11:08:37 -0700 (PDT)
-Date:   Thu, 21 May 2020 14:08:35 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jasowang@redhat.com, lkp@intel.com, mst@redhat.com,
-        yuehaibing@huawei.com
-Subject: [GIT PULL] vhost/vdpa: minor fixes
-Message-ID: <20200521140835-mutt-send-email-mst@kernel.org>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6xn++Cf4HTyCSbGYh8HNPobkxrKx2sAl2lxN9hs9ouI=;
+        b=gAwKnG+nz8HdKvQts9dsB0Zrpfz4FyRMpy/oH7YrGLyGKf46RCxfEGanyA0I4UpC3BNMtl
+        E0A5gf+H8PggEMbEhvIci8hkQSa8+1342zwh68jvIQNz59u3ciHFC8AMjLsNzHQEB255OM
+        IBKfrw/WxCq4x6cuoeQ1OXgdQ/G60Qo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-5bnbrclkMYKsSWfsdSTzWw-1; Thu, 21 May 2020 14:38:35 -0400
+X-MC-Unique: 5bnbrclkMYKsSWfsdSTzWw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF6E6EC1B2;
+        Thu, 21 May 2020 18:38:32 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-233.rdu2.redhat.com [10.10.116.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 96E7212A4D;
+        Thu, 21 May 2020 18:38:32 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 0D80322036E; Thu, 21 May 2020 14:38:32 -0400 (EDT)
+Date:   Thu, 21 May 2020 14:38:32 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with
+ token info
+Message-ID: <20200521183832.GB46035@redhat.com>
+References: <20200511164752.2158645-1-vkuznets@redhat.com>
+ <20200511164752.2158645-3-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mutt-Fcc: =sent
+In-Reply-To: <20200511164752.2158645-3-vkuznets@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 0b841030625cde5f784dd62aec72d6a766faae70:
+On Mon, May 11, 2020 at 06:47:46PM +0200, Vitaly Kuznetsov wrote:
+> Currently, APF mechanism relies on the #PF abuse where the token is being
+> passed through CR2. If we switch to using interrupts to deliver page-ready
+> notifications we need a different way to pass the data. Extent the existing
+> 'struct kvm_vcpu_pv_apf_data' with token information for page-ready
+> notifications.
+> 
+> The newly introduced apf_put_user_ready() temporary puts both reason
+> and token information, this will be changed to put token only when we
+> switch to interrupt based notifications.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/include/uapi/asm/kvm_para.h |  3 ++-
+>  arch/x86/kvm/x86.c                   | 17 +++++++++++++----
+>  2 files changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index 2a8e0b6b9805..e3602a1de136 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -113,7 +113,8 @@ struct kvm_mmu_op_release_pt {
+>  
+>  struct kvm_vcpu_pv_apf_data {
+>  	__u32 reason;
 
-  vhost: vsock: kick send_pkt worker once device is started (2020-05-02 10:28:21 -0400)
+Hi Vitaly,
 
-are available in the Git repository at:
+Given we are redoing it, can we convert "reason" into a flag instead
+and use bit 0 for signalling "page not present" Then rest of the 31
+bits can be used for other purposes. I potentially want to use one bit to
+signal error (if it is known at the time of injecting #PF).
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> -	__u8 pad[60];
+> +	__u32 pageready_token;
+> +	__u8 pad[56];
 
-for you to fetch changes up to 1b0be99f1a426d9f17ced95c4118c6641a2ff13d:
+Given token is 32 bit, for returning error in "page ready" type messages,
+I will probably use padding bytes and create pagready_flag and use one
+of the bits to signal error.
 
-  vhost: missing __user tags (2020-05-15 11:36:31 -0400)
-
-----------------------------------------------------------------
-virtio: build warning fixes
-
-Fix a couple of build warnings.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Michael S. Tsirkin (1):
-      vhost: missing __user tags
-
-YueHaibing (1):
-      vdpasim: remove unused variable 'ret'
-
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 15 +++++++--------
- drivers/vhost/vhost.c            |  4 ++--
- 2 files changed, 9 insertions(+), 10 deletions(-)
+Thanks
+Vivek
 
