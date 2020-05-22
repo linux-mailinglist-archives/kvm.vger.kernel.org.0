@@ -2,102 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 174111DDCB1
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 03:33:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1997B1DDD2D
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 04:32:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726979AbgEVBdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 May 2020 21:33:23 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:23722 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726335AbgEVBdX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 May 2020 21:33:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1590111220; x=1621647220;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=/dhekmzFTgIlB9T7AkbhzCg/aXbY4QZ8mH7f4WQrVIg=;
-  b=qxEbZjwDV6w9K18SlDaXOrg+oKVWXcePbZHxMDSIDOW7QC177K9sMmqt
-   YdDiBfNO88i3odj9YoujyWErpDf/kRkQRjw1ku8NdFFL3mTY5VQMsB5PM
-   HFRNTv2ye+MtngOAJ8so22kMxk12DZB5kD2OV72jvmeJLqIOdvBThjMd1
-   76s0OWynezJvPDK0FoLh6T4EpFZu87tjNrD1qQTeT3i06XrLyEj6DxxbU
-   2P91SkhiNdw61DHFW97LVNAYRdHY2dZkBGCPXp64bzmZkszMw0QsqEZB6
-   DZHj/dQAoY/NcE6JyP8ibl9pV1ywbqcTDojsl4cJYi03XcK1t+lrnw+oQ
-   Q==;
-IronPort-SDR: J6Xz4/qxf4I7aVBBAIcg9A8Lt+ZLaPJ3PxMsL2Hvm7G1ifuza39JWmmspJhRd7/s6Dml1J9BT8
- Eyi0N3B9/ZAJrIA1b5CbUbpfUEHoiHVdDW6Bu5RkhOWXvaTjgAQEHh6g3+k3AqIh7ZxTVWnXoJ
- judEFufj9c3noMzonBzQGr9TyRyQjxQyRD+9bSbhKeKrM+WD6fx+0JMJ1uxpm9ZOs7Exnydhr4
- 21jWZ0kuBcN7pEDja7/zd0HxGwK9+ZMMm3yPdTr/hpzc1Q11i7hZXNr/yfNCOhGFvKAIDDOH9V
- GHM=
-X-IronPort-AV: E=Sophos;i="5.73,419,1583164800"; 
-   d="scan'208";a="241031113"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 22 May 2020 09:33:39 +0800
-IronPort-SDR: WMhJcEL+sj7MtQb9zsB1cxp5O4rQVIzAU1vdo4jHkf/fKCASSq3bwwJ4xSuFouRuvZxWM96Yvl
- 4lb3xmkJ02T4SXreVT9fZ0bSUIpE2nZwk=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2020 18:22:49 -0700
-IronPort-SDR: tHTLxVk1/JY8zWtT8+eTjABPWjnVNE3nlfSZOV7gSmosL80R+z4ScVeJSLBf9hYi5hRU5PeOBk
- rMUVcST+XS0A==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun52) ([10.149.66.28])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2020 18:33:17 -0700
-Date:   Fri, 22 May 2020 02:33:12 +0100 (BST)
-From:   "Maciej W. Rozycki" <macro@wdc.com>
-To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>
-cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Serge Semin <fancer.lancer@gmail.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Paul Burton <paulburton@kernel.org>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Alexander Lobakin <alobakin@dlink.ru>,
-        Huacai Chen <chenhc@lemote.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Cedric Hombourger <Cedric_Hombourger@mentor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Paul Cercueil <paul@crapouillou.net>,
-        Zhou Yanjie <zhouyanjie@zoho.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Allison Randal <allison@lohutok.net>,
-        Liangliang Huang <huanglllzu@gmail.com>,
-        =?UTF-8?Q?=E5=91=A8=E7=90=B0=E6=9D=B0_=28Zhou_Yanjie=29?= 
-        <zhouyanjie@wanyeetech.com>, YunQiang Su <syq@debian.org>,
-        Zou Wei <zou_wei@huawei.com>,
-        Oleksij Rempel <linux@rempel-privat.de>,
-        Kamal Dasu <kdasu.kdev@gmail.com>, linux-mips@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Maciej W. Rozycki" <macro@linux-mips.org>
-Subject: Re: [PATCH v4 03/13] mips: Add MIPS Release 5 support
-In-Reply-To: <20200521140725.29571-4-Sergey.Semin@baikalelectronics.ru>
-Message-ID: <alpine.LFD.2.21.2005220228310.21168@redsun52.ssa.fujisawa.hgst.com>
-References: <20200521140725.29571-1-Sergey.Semin@baikalelectronics.ru> <20200521140725.29571-4-Sergey.Semin@baikalelectronics.ru>
-User-Agent: Alpine 2.21 (LFD 202 2017-01-01)
+        id S1727020AbgEVCcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 May 2020 22:32:45 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44046 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726925AbgEVCcp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 May 2020 22:32:45 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 52FBB1F03C6E47C4B648;
+        Fri, 22 May 2020 10:32:43 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.58) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Fri, 22 May 2020
+ 10:32:37 +0800
+Subject: Re: [kvm-unit-tests PATCH 1/6] arm64: microbench: get correct ipi
+ recieved num
+To:     Zenghui Yu <yuzenghui@huawei.com>, <drjones@redhat.com>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>
+CC:     <maz@kernel.org>, <wanghaibin.wang@huawei.com>,
+        <eric.auger@redhat.com>
+References: <20200517100900.30792-1-wangjingyi11@huawei.com>
+ <20200517100900.30792-2-wangjingyi11@huawei.com>
+ <8e011659-4e4d-7312-4466-5ed3ea54cc9b@huawei.com>
+From:   Jingyi Wang <wangjingyi11@huawei.com>
+Message-ID: <8b9d51f2-3906-9e0a-38ae-564424c38ff5@huawei.com>
+Date:   Fri, 22 May 2020 10:32:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <8e011659-4e4d-7312-4466-5ed3ea54cc9b@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.222.58]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 May 2020, Serge Semin wrote:
 
-> There are five MIPS32/64 architecture releases currently available:
-> from 1 to 6 except fourth one, which was intentionally skipped.
-> Three of them can be called as major: 1st, 2nd and 6th, that not only
-> have some system level alterations, but also introduced significant
-> core/ISA level updates. The rest of the MIPS architecture releases are
-> minor.
+On 5/21/2020 10:00 PM, Zenghui Yu wrote:
+> On 2020/5/17 18:08, Jingyi Wang wrote:
+>> If ipi_exec() fails because of timeout, we shouldn't increase
+>> the number of ipi received.
+>>
+>> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+>> ---
+>>   arm/micro-bench.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+>> index 4612f41..ca022d9 100644
+>> --- a/arm/micro-bench.c
+>> +++ b/arm/micro-bench.c
+>> @@ -103,7 +103,9 @@ static void ipi_exec(void)
+>>       while (!ipi_received && tries--)
+>>           cpu_relax();
+>> -    ++received;
+>> +    if (ipi_recieved)
+> 
+> I think you may want *ipi_received* ;-) Otherwise it can not even
+> compile!
+> 
+>> +        ++received;
+>> +
+>>       assert_msg(ipi_received, "failed to receive IPI in time, but 
+>> received %d successfully\n", received);
+>>   }
+> 
+> With this fixed, this looks good to me,
+> 
+> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> 
+> 
+> Thanks.
+> 
+> .
+This variable name is modified in the next patch, so I ignored that
+mistake, thanks.
 
- Well, strictly speaking R3 added microMIPS support, which was all but
-minor (of course there were minor updates too, such as 2008-NaN support).
+Thanks,
+Jingyi
 
-  Maciej
