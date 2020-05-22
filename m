@@ -2,88 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0ACF1DF2AC
-	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 01:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E579A1DF1CD
+	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 00:25:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731337AbgEVXEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 19:04:38 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45008 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731172AbgEVXEh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 19:04:37 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04MMvx3D177773;
-        Fri, 22 May 2020 23:04:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=OacTk3r9hmxNzNfmRFSATxh7r2LDYUwIyj2RDQYLVlg=;
- b=k/opxC14IPIfKy4odBnX6mVMUg3CuKe+kpUOo8gg/2+tqlBHAwfQUi0pU7mj1+P9/LYp
- k1EqfEhR2ZZNcWckaCywf88qP1OpjLnwtnAiNIJwpHlA1zSyDy8Cz/8gMItxCcvCNfhy
- ppUQJXQeP8Zvl+Iwe78Mdxkjl2zSvEU/CAyFApo4SegpXDjKfdDFLIkUpHNa7DJXRsej
- XGSbm3q7bDr9RxdI3iC3ENH7NxrBXEbGmGr389YI6Ls1E3MV5vjiOwo5O8tTzbSbp2/m
- o4ng2fLJacYFKDaTnUnR/k6rlFM3A+sbPkbSo6HD3QLWDC5EL03EawFoddor9YPOMD3q OQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 3127krr3e8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 22 May 2020 23:04:34 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04MMx2AO104014;
-        Fri, 22 May 2020 23:02:34 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 313gj8a0av-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 May 2020 23:02:34 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04MN2Xv1015974;
-        Fri, 22 May 2020 23:02:33 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 22 May 2020 16:02:32 -0700
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-Subject: [PATCH 4/4] kvm-unit-tests: x86: Remove duplicate instance of 'vmcb'
-Date:   Fri, 22 May 2020 18:19:54 -0400
-Message-Id: <20200522221954.32131-5-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200522221954.32131-1-krish.sadhukhan@oracle.com>
-References: <20200522221954.32131-1-krish.sadhukhan@oracle.com>
+        id S1731142AbgEVWZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 18:25:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32705 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731111AbgEVWZz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 18:25:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590186354;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RE13U10VZKBg+i9d80FBqzbnGRh0EIeAg1GDlPx5sdM=;
+        b=Om0I0XPAi+ZPAtTMbjsOpsygYXZ2xovnR7V/kOIs7j8f+z3p7+IpeT9sBbTVJAMGW6318j
+        9LIchdcGB2x2RcyiAXjsx0jQ/Q8Y/4dWew8U1eYfzGtlvc6in7YJcROmXNrpCaqPgyHQxA
+        0VVYnWwv3FbtBCZl+8+2VjrbkDHgal0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-6-QiEK-lMru0oEIMPGdXPw-1; Fri, 22 May 2020 18:25:52 -0400
+X-MC-Unique: 6-QiEK-lMru0oEIMPGdXPw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 189C88005AA;
+        Fri, 22 May 2020 22:25:51 +0000 (UTC)
+Received: from x1.home (ovpn-114-203.phx2.redhat.com [10.3.114.203])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9894F1059138;
+        Fri, 22 May 2020 22:25:47 +0000 (UTC)
+Date:   Fri, 22 May 2020 16:25:45 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Qian Cai <cai@lca.pw>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, jgg@ziepe.ca, peterx@redhat.com
+Subject: Re: [PATCH v3 0/3] vfio-pci: Block user access to disabled device
+ MMIO
+Message-ID: <20200522162545.28bb7db4@x1.home>
+In-Reply-To: <20200522220858.GE1337@Qians-MacBook-Air.local>
+References: <159017449210.18853.15037950701494323009.stgit@gimli.home>
+        <20200522220858.GE1337@Qians-MacBook-Air.local>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9629 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
- mlxscore=0 adultscore=0 bulkscore=0 suspectscore=13 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005220179
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9629 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
- bulkscore=0 clxscore=1015 priorityscore=1501 mlxscore=0 impostorscore=0
- suspectscore=13 mlxlogscore=999 malwarescore=0 cotscore=-2147483648
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005220179
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- x86/svm.c | 1 -
- 1 file changed, 1 deletion(-)
+On Fri, 22 May 2020 18:08:58 -0400
+Qian Cai <cai@lca.pw> wrote:
 
-diff --git a/x86/svm.c b/x86/svm.c
-index 41685bf..f984a60 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -201,7 +201,6 @@ struct regs get_regs(void)
- #define LOAD_GPR_C      SAVE_GPR_C
- 
- struct svm_test *v2_test;
--struct vmcb *vmcb;
- 
- #define ASM_VMRUN_CMD                           \
-                 "vmload %%rax\n\t"              \
--- 
-1.8.3.1
+> On Fri, May 22, 2020 at 01:17:09PM -0600, Alex Williamson wrote:
+> > v3:
+> > 
+> > The memory_lock semaphore is only held in the MSI-X path for callouts
+> > to functions that may access MSI-X MMIO space of the device, this
+> > should resolve the circular locking dependency reported by Qian
+> > (re-testing very much appreciated).  I've also incorporated the
+> > pci_map_rom() and pci_unmap_rom() calls under the memory_lock.  Commit
+> > 0cfd027be1d6 ("vfio_pci: Enable memory accesses before calling
+> > pci_map_rom") made sure memory was enabled on the info path, but did
+> > not provide locking to protect that state.  The r/w path of the BAR
+> > access is expanded to include ROM mapping/unmapping.  Unless there
+> > are objections, I'll plan to drop v2 from my next branch and replace
+> > it with this.  Thanks,  
+> 
+> FYI, the lockdep warning is gone.
+> 
+
+Thank you for testing!
+
+Alex
 
