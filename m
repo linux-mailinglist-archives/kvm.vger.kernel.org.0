@@ -2,76 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67A831DE0AA
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 09:11:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD8071DE0BA
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 09:19:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728318AbgEVHL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 03:11:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36510 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726578AbgEVHL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 03:11:27 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C23632072C;
-        Fri, 22 May 2020 07:11:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590131487;
-        bh=RK0sDSR+/5X7EHAHMKlK+l1aCrRrHSUPw39hiJQ067c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=o/dLCgIDjw9BFbgWVW+8EJNf783rEnWRBPkvWRwWKY8qQPq4GAvaGXPZxynng9EXd
-         CtJgC54G304K3qGYtmvZAhhPV4B87Nd+v2G6VB7GpzU9RP9s9Se/RJU6VWKZxRYZNL
-         mgQu/fPX+glM8Qhai5jkXE399sqeQxZ5K0bfQc6s=
-Date:   Fri, 22 May 2020 09:11:23 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Andra Paraschiv <andraprs@amazon.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-Subject: Re: [PATCH v2 16/18] nitro_enclaves: Add sample for ioctl interface
- usage
-Message-ID: <20200522071123.GI771317@kroah.com>
-References: <20200522062946.28973-1-andraprs@amazon.com>
- <20200522062946.28973-17-andraprs@amazon.com>
+        id S1728495AbgEVHTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 03:19:16 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37580 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728312AbgEVHTQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 May 2020 03:19:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590131954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3eRhZPgzwHlAVBaV96QAFjAli90Hc9dV0FWyT4T3VPM=;
+        b=fXLGgslKYLT9/fYeiI8PJjH41YuUo5gmDLUCs7QYWMBxRKaTIX0v6ER/TZydEyhlMDOwYH
+        yKT0rNXahyGWb5VOESboxGkpe1D/Br9JbjWXoyzfin61HJT7TVfK16b0vjlMjDUtXxKk2k
+        HOytBtm1I+EeQ64u+gVS2OWlKLZ7cEg=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-94-hSa7YSJAMNauJqw5-j86kA-1; Fri, 22 May 2020 03:19:12 -0400
+X-MC-Unique: hSa7YSJAMNauJqw5-j86kA-1
+Received: by mail-ej1-f71.google.com with SMTP id f17so4178963ejc.7
+        for <kvm@vger.kernel.org>; Fri, 22 May 2020 00:19:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3eRhZPgzwHlAVBaV96QAFjAli90Hc9dV0FWyT4T3VPM=;
+        b=OTVszk7Fa1VWAgjxCwofvyePENMJPWryeyy8JbUWz3f282wq4X8eMP5wwLRQ+wWJal
+         syrVtJKHrHGh9RvEzxBz7L3B7il5HyscTSmWi648U47lKhpHWIHSasQBnR/tVGAHj5NM
+         qpQTXYjz8hcrSpe4CrZ8eJGhAbZ4WRfM/5649uQfY1g8ukMmh8mxdx1sQtWaq6SnqquF
+         nfCJJLR00euwzEyfvvqxUr/9OQBvIyYXfdyUX5aRQY/uWypI1BQglaubsu3rK/BzHmoB
+         k9v8NsbUDz/y44o706ptJK0ii47hgiJI9B7Gn9cq890afuLb3nDKFnho40066uKzYHa7
+         uZ1w==
+X-Gm-Message-State: AOAM533I44/IUPGqmfn69Przfvb2YI0yemzdDpQsM8OfA/p9p9Eg3m9X
+        wzuj6BmK7xOexwwICOp5XG4o56NHbhPd7YNktFaWBtFKzesHj8MQY7Mc6cNqT08sowkKGKKsXUJ
+        r2jxp+R3gXGSV
+X-Received: by 2002:a17:906:c108:: with SMTP id do8mr7314540ejc.134.1590131950881;
+        Fri, 22 May 2020 00:19:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqpaPg/j+E91dKDaUWaayxxQK1GpnPNN5A2mvKJxcgYV+KAVe637E2EplXz9PWs8Axj30QHQ==
+X-Received: by 2002:a17:906:c108:: with SMTP id do8mr7314529ejc.134.1590131950652;
+        Fri, 22 May 2020 00:19:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:71e6:9616:7fe3:7a17? ([2001:b07:6468:f312:71e6:9616:7fe3:7a17])
+        by smtp.gmail.com with ESMTPSA id i9sm6382245edr.40.2020.05.22.00.19.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 May 2020 00:19:09 -0700 (PDT)
+Subject: Re: [PATCH 1/2 v4] KVM: nVMX: Fix VMX preemption timer migration
+To:     Makarand Sonare <makarandsonare@google.com>, kvm@vger.kernel.org,
+        pshier@google.com, jmattson@google.com
+References: <20200522043634.79779-1-makarandsonare@google.com>
+ <20200522043634.79779-2-makarandsonare@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e8ddc9b2-dd17-aace-7c69-69401d511e1b@redhat.com>
+Date:   Fri, 22 May 2020 09:19:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200522062946.28973-17-andraprs@amazon.com>
+In-Reply-To: <20200522043634.79779-2-makarandsonare@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 22, 2020 at 09:29:44AM +0300, Andra Paraschiv wrote:
-> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
-> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+On 22/05/20 06:36, Makarand Sonare wrote:
+>    #define KVM_STATE_NESTED_RUN_PENDING		0x00000002
+>    #define KVM_STATE_NESTED_EVMCS		0x00000004
 
-No changelog?
+> +  /* Available with KVM_CAP_NESTED_STATE_PREEMPTION_TIMER */
+> +  #define KVM_STATE_NESTED_PREEMPTION_TIMER	0x00000010
 
-> ---
->  samples/nitro_enclaves/.gitignore             |   2 +
->  samples/nitro_enclaves/Makefile               |  28 +
->  .../include/linux/nitro_enclaves.h            |  23 +
->  .../include/uapi/linux/nitro_enclaves.h       |  77 +++
+Putting this here is confusing, please rename it to
+KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE and number it 0x1.  Also, I
+think the capability is not needed since userspace can expect the flags
+to be 0 on older kernels.
 
-Why are you not using the uapi files from the kernel itself?  How are
-you going to keep these in sync?
+Paolo
 
-thanks,
-
-greg k-h
