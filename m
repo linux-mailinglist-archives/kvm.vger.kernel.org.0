@@ -2,176 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9754C1DE7D8
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 15:15:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF3191DE89D
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 16:18:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729846AbgEVNPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 09:15:36 -0400
-Received: from mail.baikalelectronics.com ([87.245.175.226]:44684 "EHLO
-        mail.baikalelectronics.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729334AbgEVNPf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 09:15:35 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mail.baikalelectronics.ru (Postfix) with ESMTP id 5A558803087B;
-        Fri, 22 May 2020 13:15:31 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at baikalelectronics.ru
-Received: from mail.baikalelectronics.ru ([127.0.0.1])
-        by localhost (mail.baikalelectronics.ru [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 2SinbSvoL-v6; Fri, 22 May 2020 16:15:30 +0300 (MSK)
-Date:   Fri, 22 May 2020 16:15:26 +0300
-From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-CC:     Serge Semin <fancer.lancer@gmail.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Paul Burton <paulburton@kernel.org>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Rob Herring <robh+dt@kernel.org>, <devicetree@vger.kernel.org>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Alexander Lobakin <alobakin@dlink.ru>,
-        Huacai Chen <chenhc@lemote.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Cedric Hombourger <Cedric_Hombourger@mentor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Paul Cercueil <paul@crapouillou.net>,
-        Zhou Yanjie <zhouyanjie@zoho.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Allison Randal <allison@lohutok.net>,
-        Liangliang Huang <huanglllzu@gmail.com>,
-        =?utf-8?B?5ZGo55Cw5p2wIChaaG91IFlhbmppZSk=?= 
-        <zhouyanjie@wanyeetech.com>, YunQiang Su <syq@debian.org>,
-        Zou Wei <zou_wei@huawei.com>,
-        Oleksij Rempel <linux@rempel-privat.de>,
-        Kamal Dasu <kdasu.kdev@gmail.com>,
-        <linux-mips@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 03/13] mips: Add MIPS Release 5 support
-Message-ID: <20200522131526.pmqtpmreq6ly3kou@mobilestation>
-References: <20200521140725.29571-1-Sergey.Semin@baikalelectronics.ru>
- <20200521140725.29571-4-Sergey.Semin@baikalelectronics.ru>
- <20200522072743.GA7331@alpha.franken.de>
+        id S1729961AbgEVOSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 10:18:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:36348 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729399AbgEVOSb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 10:18:31 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD068D6E;
+        Fri, 22 May 2020 07:18:30 -0700 (PDT)
+Received: from [192.168.1.84] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05A2A3F68F;
+        Fri, 22 May 2020 07:18:27 -0700 (PDT)
+Subject: Re: [RFC PATCH v12 07/11] psci: Add hypercall service for kvm ptp.
+To:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
+        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
+        will@kernel.org, suzuki.poulose@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        Wei.Chen@arm.com, nd@arm.com
+References: <20200522083724.38182-1-jianyong.wu@arm.com>
+ <20200522083724.38182-8-jianyong.wu@arm.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <87fce07b-d0f5-47b0-05ce-dd664ce53eec@arm.com>
+Date:   Fri, 22 May 2020 15:18:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200522072743.GA7331@alpha.franken.de>
-X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
+In-Reply-To: <20200522083724.38182-8-jianyong.wu@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 22, 2020 at 09:27:43AM +0200, Thomas Bogendoerfer wrote:
-> On Thu, May 21, 2020 at 05:07:14PM +0300, Serge Semin wrote:
-> > There are five MIPS32/64 architecture releases currently available:
-> > from 1 to 6 except fourth one, which was intentionally skipped.
-> > Three of them can be called as major: 1st, 2nd and 6th, that not only
-> > have some system level alterations, but also introduced significant
-> > core/ISA level updates. The rest of the MIPS architecture releases are
-> > minor.
-> > 
-> > Even though they don't have as much ISA/system/core level changes
-> > as the major ones with respect to the previous releases, they still
-> > provide a set of updates (I'd say they were intended to be the
-> > intermediate releases before a major one) that might be useful for the
-> > kernel and user-level code, when activated by the kernel or compiler.
-> > In particular the following features were introduced or ended up being
-> > available at/after MIPS32/64 Release 5 architecture:
-> > + the last release of the misaligned memory access instructions,
-> > + virtualisation - VZ ASE - is optional component of the arch,
-> > + SIMD - MSA ASE - is optional component of the arch,
-> > + DSP ASE is optional component of the arch,
-> > + CP0.Status.FR=1 for CP1.FIR.F64=1 (pure 64-bit FPU general registers)
-> >   must be available if FPU is implemented,
-> > + CP1.FIR.Has2008 support is required so CP1.FCSR.{ABS2008,NAN2008} bits
-> >   are available.
-> > + UFR/UNFR aliases to access CP0.Status.FR from user-space by means of
-> >   ctc1/cfc1 instructions (enabled by CP0.Config5.UFR),
-> > + CP0.COnfig5.LLB=1 and eretnc instruction are implemented to without
-> >   accidentally clearing LL-bit when returning from an interrupt,
-> >   exception, or error trap,
-> > + XPA feature together with extended versions of CPx registers is
-> >   introduced, which needs to have mfhc0/mthc0 instructions available.
-> > 
-> > So due to these changes GNU GCC provides an extended instructions set
-> > support for MIPS32/64 Release 5 by default like eretnc/mfhc0/mthc0. Even
-> > though the architecture alteration isn't that big, it still worth to be
-> > taken into account by the kernel software. Finally we can't deny that
-> > some optimization/limitations might be found in future and implemented
-> > on some level in kernel or compiler. In this case having even
-> > intermediate MIPS architecture releases support would be more than
-> > useful.
-> > 
-> > So the most of the changes provided by this commit can be split into
-> > either compile- or runtime configs related. The compile-time related
-> > changes are caused by adding the new CONFIG_CPU_MIPS32_R5/CONFIG_CPU_MIPSR5
-> > configs and concern the code activating MIPSR2 or MIPSR6 already
-> > implemented features (like eretnc/LLbit, mthc0/mfhc0). In addition
-> > CPU_HAS_MSA can be now freely enabled for MIPS32/64 release 5 based
-> > platforms as this is done for CPU_MIPS32_R6 CPUs. The runtime changes
-> > concerns the features which are handled with respect to the MIPS ISA
-> > revision detected at run-time by means of CP0.Config.{AT,AR} bits. Alas
-> > these fields can be used to detect either r1 or r2 or r6 releases.
-> > But since we know which CPUs in fact support the R5 arch, we can manually
-> > set MIPS_CPU_ISA_M32R5/MIPS_CPU_ISA_M64R5 bit of c->isa_level and then
-> > use cpu_has_mips32r5/cpu_has_mips64r5 where it's appropriate.
-> > 
-> > Since XPA/EVA provide too complex alterationss and to have them used with
-> > MIPS32 Release 2 charged kernels (for compatibility with current platform
-> > configs) they are left to be setup as a separate kernel configs.
-> > 
-> > Co-developed-by: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
-> > Signed-off-by: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
-> > Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
-> > Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-> > Cc: Paul Burton <paulburton@kernel.org>
-> > Cc: Ralf Baechle <ralf@linux-mips.org>
-> > Cc: Arnd Bergmann <arnd@arndb.de>
-> > Cc: Rob Herring <robh+dt@kernel.org>
-> > Cc: devicetree@vger.kernel.org
-> > ---
-> >  arch/mips/Kconfig                    | 56 +++++++++++++++++++++++++---
-> >  arch/mips/Makefile                   |  2 +
-> >  arch/mips/include/asm/asmmacro.h     | 18 +++++----
-> >  arch/mips/include/asm/compiler.h     |  5 +++
-> >  arch/mips/include/asm/cpu-features.h | 27 ++++++++++----
-> >  arch/mips/include/asm/cpu-info.h     |  2 +-
-> >  arch/mips/include/asm/cpu-type.h     |  7 +++-
-> >  arch/mips/include/asm/cpu.h          | 10 +++--
-> >  arch/mips/include/asm/fpu.h          |  4 +-
-> >  arch/mips/include/asm/hazards.h      |  8 ++--
-> >  arch/mips/include/asm/module.h       |  4 ++
-> >  arch/mips/include/asm/stackframe.h   |  2 +-
-> >  arch/mips/include/asm/switch_to.h    |  8 ++--
-> >  arch/mips/kernel/cpu-probe.c         | 17 +++++++++
-> >  arch/mips/kernel/entry.S             |  6 +--
-> >  arch/mips/kernel/proc.c              |  4 ++
-> >  arch/mips/kernel/r4k_fpu.S           | 14 +++----
-> >  arch/mips/kvm/vz.c                   |  6 +--
-> >  arch/mips/lib/csum_partial.S         |  6 ++-
-> >  arch/mips/mm/c-r4k.c                 |  7 ++--
-> >  arch/mips/mm/sc-mips.c               |  7 ++--
-> >  21 files changed, 163 insertions(+), 57 deletions(-)
+On 22/05/2020 09:37, Jianyong Wu wrote:
+> ptp_kvm modules will get this service through smccc call.
+> The service offers real time and counter cycle of host for guest.
+> Also let caller determine which cycle of virtual counter or physical counter
+> to return.
 > 
-> applied to mips-next. I've changed the two /* fall through */ by fallthrough;
-> while appliny. Running checkpatch would have caught that ;-)
-
-Good. Thanks. Actually I've seen that warning, but just didn't know what way to
-choose.) So I've decided to leave the comment-based Fall-through fixup seeing
-the rest of the file is using the older way. By doing so I've kept the locally
-implemented coding style. Though I've heard the explicit attribute "fallthrough;"
-utilization is a preferred way of marking combined case statements.
-
--Sergey
-
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>   include/linux/arm-smccc.h | 14 ++++++++++++
+>   virt/kvm/Kconfig          |  4 ++++
+>   virt/kvm/arm/hypercalls.c | 47 +++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 65 insertions(+)
 > 
-> Thomas.
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index bdc0124a064a..badadc390809 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -94,6 +94,8 @@
+>   
+>   /* KVM "vendor specific" services */
+>   #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
+> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY		2
+>   #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+>   #define ARM_SMCCC_KVM_NUM_FUNCS			128
+>   
+> @@ -103,6 +105,18 @@
+>   			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+>   			   ARM_SMCCC_KVM_FUNC_FEATURES)
+>   
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
+> +
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_32,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY)
+> +
+>   #ifndef __ASSEMBLY__
+>   
+>   #include <linux/linkage.h>
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index aad9284c043a..bf820811e815 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -60,3 +60,7 @@ config HAVE_KVM_VCPU_RUN_PID_CHANGE
+>   
+>   config HAVE_KVM_NO_POLL
+>          bool
+> +
+> +config ARM64_KVM_PTP_HOST
+> +       def_bool y
+> +       depends on ARM64 && KVM
+> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
+> index db6dce3d0e23..c964122f8dae 100644
+> --- a/virt/kvm/arm/hypercalls.c
+> +++ b/virt/kvm/arm/hypercalls.c
+> @@ -3,6 +3,7 @@
+>   
+>   #include <linux/arm-smccc.h>
+>   #include <linux/kvm_host.h>
+> +#include <linux/clocksource_ids.h>
+>   
+>   #include <asm/kvm_emulate.h>
+>   
+> @@ -11,6 +12,10 @@
+>   
+>   int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>   {
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +	struct system_time_snapshot systime_snapshot;
+> +	u64 cycles;
+> +#endif
+>   	u32 func_id = smccc_get_function(vcpu);
+>   	u32 val[4] = {SMCCC_RET_NOT_SUPPORTED};
+>   	u32 feature;
+> @@ -70,7 +75,49 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>   		break;
+>   	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>   		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> +
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP);
+> +#endif
+>   		break;
+> +
+> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
+> +	/*
+> +	 * This serves virtual kvm_ptp.
+> +	 * Four values will be passed back.
+> +	 * reg0 stores high 32-bit host ktime;
+> +	 * reg1 stores low 32-bit host ktime;
+> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
+> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
+> +	 */
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> +		/*
+> +		 * system time and counter value must captured in the same
+> +		 * time to keep consistency and precision.
+> +		 */
+> +		ktime_get_snapshot(&systime_snapshot);
+> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
+> +			break;
+> +		val[0] = upper_32_bits(systime_snapshot.real);
+> +		val[1] = lower_32_bits(systime_snapshot.real);
+> +		/*
+> +		 * which of virtual counter or physical counter being
+> +		 * asked for is decided by the first argument.
+> +		 */
+> +		feature = smccc_get_arg1(vcpu);
+> +		switch (feature) {
+> +		case ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID:
+> +			cycles = systime_snapshot.cycles;
+> +			break;
+> +		default:
+
+There's something a bit odd here.
+
+ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID and
+ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID look like they should be names 
+of separate (top-level) functions, but actually the _PHY_ one is a 
+parameter for the first. If the intention is to have a parameter then it 
+would be better to pick a better name for the _PHY_ define and not 
+define it using ARM_SMCCC_CALL_VAL.
+
+Second the use of "default:" means that there's no possibility to later 
+extend this interface for more clocks if needed in the future.
+
+Alternatively you could indeed implement as two top-level functions and 
+change this to a...
+
+	switch (func_id)
+
+... along with multiple case labels as the functions would obviously be 
+mostly the same.
+
+Also a minor style issue - you might want to consider splitting this 
+into it's own function.
+
+Finally I do think it would be useful to add some documentation of the 
+new SMC calls. It would be easier to review the interface based on that 
+documentation rather than trying to reverse-engineer the interface from 
+the code.
+
+Steve
+
+> +			cycles = systime_snapshot.cycles -
+> +				 vcpu_vtimer(vcpu)->cntvoff;
+> +		}
+> +		val[2] = upper_32_bits(cycles);
+> +		val[3] = lower_32_bits(cycles);
+> +		break;
+> +#endif
+> +
+>   	default:
+>   		return kvm_psci_call(vcpu);
+>   	}
 > 
-> -- 
-> Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-> good idea.                                                [ RFC1925, 2.3 ]
+
