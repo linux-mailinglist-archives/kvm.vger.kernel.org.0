@@ -2,76 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 273551DE7C4
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 15:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9754C1DE7D8
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 15:15:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729715AbgEVNMR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 09:12:17 -0400
-Received: from foss.arm.com ([217.140.110.172]:35444 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729365AbgEVNMR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 09:12:17 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86F36D6E;
-        Fri, 22 May 2020 06:12:16 -0700 (PDT)
-Received: from bogus (unknown [10.37.12.95])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C23A03F68F;
-        Fri, 22 May 2020 06:12:12 -0700 (PDT)
-Date:   Fri, 22 May 2020 14:12:06 +0100
-From:   Sudeep Holla <sudeep.holla@arm.com>
-To:     Jianyong Wu <jianyong.wu@arm.com>
-Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, steven.price@arm.com, justin.he@arm.com,
-        Wei.Chen@arm.com, kvm@vger.kernel.org, Steve.Capper@arm.com,
-        linux-kernel@vger.kernel.org, Kaly.Xin@arm.com, nd@arm.com,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH v12 03/11] psci: export smccc conduit get helper.
-Message-ID: <20200522131206.GA15171@bogus>
-References: <20200522083724.38182-1-jianyong.wu@arm.com>
- <20200522083724.38182-4-jianyong.wu@arm.com>
+        id S1729846AbgEVNPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 09:15:36 -0400
+Received: from mail.baikalelectronics.com ([87.245.175.226]:44684 "EHLO
+        mail.baikalelectronics.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729334AbgEVNPf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 09:15:35 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mail.baikalelectronics.ru (Postfix) with ESMTP id 5A558803087B;
+        Fri, 22 May 2020 13:15:31 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at baikalelectronics.ru
+Received: from mail.baikalelectronics.ru ([127.0.0.1])
+        by localhost (mail.baikalelectronics.ru [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 2SinbSvoL-v6; Fri, 22 May 2020 16:15:30 +0300 (MSK)
+Date:   Fri, 22 May 2020 16:15:26 +0300
+From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+CC:     Serge Semin <fancer.lancer@gmail.com>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Paul Burton <paulburton@kernel.org>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Rob Herring <robh+dt@kernel.org>, <devicetree@vger.kernel.org>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Alexander Lobakin <alobakin@dlink.ru>,
+        Huacai Chen <chenhc@lemote.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Cedric Hombourger <Cedric_Hombourger@mentor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Paul Cercueil <paul@crapouillou.net>,
+        Zhou Yanjie <zhouyanjie@zoho.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Allison Randal <allison@lohutok.net>,
+        Liangliang Huang <huanglllzu@gmail.com>,
+        =?utf-8?B?5ZGo55Cw5p2wIChaaG91IFlhbmppZSk=?= 
+        <zhouyanjie@wanyeetech.com>, YunQiang Su <syq@debian.org>,
+        Zou Wei <zou_wei@huawei.com>,
+        Oleksij Rempel <linux@rempel-privat.de>,
+        Kamal Dasu <kdasu.kdev@gmail.com>,
+        <linux-mips@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 03/13] mips: Add MIPS Release 5 support
+Message-ID: <20200522131526.pmqtpmreq6ly3kou@mobilestation>
+References: <20200521140725.29571-1-Sergey.Semin@baikalelectronics.ru>
+ <20200521140725.29571-4-Sergey.Semin@baikalelectronics.ru>
+ <20200522072743.GA7331@alpha.franken.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20200522083724.38182-4-jianyong.wu@arm.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200522072743.GA7331@alpha.franken.de>
+X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 22, 2020 at 04:37:16PM +0800, Jianyong Wu wrote:
-> Export arm_smccc_1_1_get_conduit then modules can use smccc helper which
-> adopts it.
->
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->  drivers/firmware/psci/psci.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-> index 2937d44b5df4..fd3c88f21b6a 100644
-> --- a/drivers/firmware/psci/psci.c
-> +++ b/drivers/firmware/psci/psci.c
-> @@ -64,6 +64,7 @@ enum arm_smccc_conduit arm_smccc_1_1_get_conduit(void)
->
->  	return psci_ops.conduit;
->  }
-> +EXPORT_SYMBOL(arm_smccc_1_1_get_conduit);
->
+On Fri, May 22, 2020 at 09:27:43AM +0200, Thomas Bogendoerfer wrote:
+> On Thu, May 21, 2020 at 05:07:14PM +0300, Serge Semin wrote:
+> > There are five MIPS32/64 architecture releases currently available:
+> > from 1 to 6 except fourth one, which was intentionally skipped.
+> > Three of them can be called as major: 1st, 2nd and 6th, that not only
+> > have some system level alterations, but also introduced significant
+> > core/ISA level updates. The rest of the MIPS architecture releases are
+> > minor.
+> > 
+> > Even though they don't have as much ISA/system/core level changes
+> > as the major ones with respect to the previous releases, they still
+> > provide a set of updates (I'd say they were intended to be the
+> > intermediate releases before a major one) that might be useful for the
+> > kernel and user-level code, when activated by the kernel or compiler.
+> > In particular the following features were introduced or ended up being
+> > available at/after MIPS32/64 Release 5 architecture:
+> > + the last release of the misaligned memory access instructions,
+> > + virtualisation - VZ ASE - is optional component of the arch,
+> > + SIMD - MSA ASE - is optional component of the arch,
+> > + DSP ASE is optional component of the arch,
+> > + CP0.Status.FR=1 for CP1.FIR.F64=1 (pure 64-bit FPU general registers)
+> >   must be available if FPU is implemented,
+> > + CP1.FIR.Has2008 support is required so CP1.FCSR.{ABS2008,NAN2008} bits
+> >   are available.
+> > + UFR/UNFR aliases to access CP0.Status.FR from user-space by means of
+> >   ctc1/cfc1 instructions (enabled by CP0.Config5.UFR),
+> > + CP0.COnfig5.LLB=1 and eretnc instruction are implemented to without
+> >   accidentally clearing LL-bit when returning from an interrupt,
+> >   exception, or error trap,
+> > + XPA feature together with extended versions of CPx registers is
+> >   introduced, which needs to have mfhc0/mthc0 instructions available.
+> > 
+> > So due to these changes GNU GCC provides an extended instructions set
+> > support for MIPS32/64 Release 5 by default like eretnc/mfhc0/mthc0. Even
+> > though the architecture alteration isn't that big, it still worth to be
+> > taken into account by the kernel software. Finally we can't deny that
+> > some optimization/limitations might be found in future and implemented
+> > on some level in kernel or compiler. In this case having even
+> > intermediate MIPS architecture releases support would be more than
+> > useful.
+> > 
+> > So the most of the changes provided by this commit can be split into
+> > either compile- or runtime configs related. The compile-time related
+> > changes are caused by adding the new CONFIG_CPU_MIPS32_R5/CONFIG_CPU_MIPSR5
+> > configs and concern the code activating MIPSR2 or MIPSR6 already
+> > implemented features (like eretnc/LLbit, mthc0/mfhc0). In addition
+> > CPU_HAS_MSA can be now freely enabled for MIPS32/64 release 5 based
+> > platforms as this is done for CPU_MIPS32_R6 CPUs. The runtime changes
+> > concerns the features which are handled with respect to the MIPS ISA
+> > revision detected at run-time by means of CP0.Config.{AT,AR} bits. Alas
+> > these fields can be used to detect either r1 or r2 or r6 releases.
+> > But since we know which CPUs in fact support the R5 arch, we can manually
+> > set MIPS_CPU_ISA_M32R5/MIPS_CPU_ISA_M64R5 bit of c->isa_level and then
+> > use cpu_has_mips32r5/cpu_has_mips64r5 where it's appropriate.
+> > 
+> > Since XPA/EVA provide too complex alterationss and to have them used with
+> > MIPS32 Release 2 charged kernels (for compatibility with current platform
+> > configs) they are left to be setup as a separate kernel configs.
+> > 
+> > Co-developed-by: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
+> > Signed-off-by: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
+> > Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
+> > Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> > Cc: Paul Burton <paulburton@kernel.org>
+> > Cc: Ralf Baechle <ralf@linux-mips.org>
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Rob Herring <robh+dt@kernel.org>
+> > Cc: devicetree@vger.kernel.org
+> > ---
+> >  arch/mips/Kconfig                    | 56 +++++++++++++++++++++++++---
+> >  arch/mips/Makefile                   |  2 +
+> >  arch/mips/include/asm/asmmacro.h     | 18 +++++----
+> >  arch/mips/include/asm/compiler.h     |  5 +++
+> >  arch/mips/include/asm/cpu-features.h | 27 ++++++++++----
+> >  arch/mips/include/asm/cpu-info.h     |  2 +-
+> >  arch/mips/include/asm/cpu-type.h     |  7 +++-
+> >  arch/mips/include/asm/cpu.h          | 10 +++--
+> >  arch/mips/include/asm/fpu.h          |  4 +-
+> >  arch/mips/include/asm/hazards.h      |  8 ++--
+> >  arch/mips/include/asm/module.h       |  4 ++
+> >  arch/mips/include/asm/stackframe.h   |  2 +-
+> >  arch/mips/include/asm/switch_to.h    |  8 ++--
+> >  arch/mips/kernel/cpu-probe.c         | 17 +++++++++
+> >  arch/mips/kernel/entry.S             |  6 +--
+> >  arch/mips/kernel/proc.c              |  4 ++
+> >  arch/mips/kernel/r4k_fpu.S           | 14 +++----
+> >  arch/mips/kvm/vz.c                   |  6 +--
+> >  arch/mips/lib/csum_partial.S         |  6 ++-
+> >  arch/mips/mm/c-r4k.c                 |  7 ++--
+> >  arch/mips/mm/sc-mips.c               |  7 ++--
+> >  21 files changed, 163 insertions(+), 57 deletions(-)
+> 
+> applied to mips-next. I've changed the two /* fall through */ by fallthrough;
+> while appliny. Running checkpatch would have caught that ;-)
 
-I have moved this into drivers/firmware/smccc/smccc.c [1]
-Please update this accordingly.
+Good. Thanks. Actually I've seen that warning, but just didn't know what way to
+choose.) So I've decided to leave the comment-based Fall-through fixup seeing
+the rest of the file is using the older way. By doing so I've kept the locally
+implemented coding style. Though I've heard the explicit attribute "fallthrough;"
+utilization is a preferred way of marking combined case statements.
 
-Also this series is floating on the list for a while now, it is time to
-drop "RFC" unless anyone has strong objection to the idea here.
+-Sergey
 
---
-Regards,
-Sudeep
-
-[1] https://git.kernel.org/arm64/c/f2ae97062a48
+> 
+> Thomas.
+> 
+> -- 
+> Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+> good idea.                                                [ RFC1925, 2.3 ]
