@@ -2,103 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FB4E1DDF68
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 07:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B11D31DDF69
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 07:34:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbgEVFeO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 01:34:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725894AbgEVFeO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 01:34:14 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76736C061A0E;
-        Thu, 21 May 2020 22:34:13 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id n11so9594080ilj.4;
-        Thu, 21 May 2020 22:34:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QVPd+V02lgzjKws7NT4xHmcTymSXtHJ7wzEyWcOO8YE=;
-        b=PKaMBQNM9SpJ/HstjpcQRIL/YaYHjj6X5IeZtF4DdYph5WZPAP0CC0oXUNUGQr+svX
-         JSGJS/UWUQgjQ4Khun2Nc5EaDyHTxNIcfc6+dMAlrZKXd5reVTe8AtQ9QDJeEYoeLP/N
-         roI3U+RS7SsBXSm0gJI84zx0nuze4hMfl3mvAhXxLcjBZSroZS1hL4vYEovNhFyqvfhl
-         Wa8v3gzl9FW4FUmGov46/cVZR1qo+qgI56Liz6rhpjWeEiGwnisL+fu862ThW6Y1EVWG
-         27/vHr7ttHTDCiaBq+z1j9+zJwjaiwzb6cYUZaoNdo2XJ40j/VxGYSauXr+7j3JKccbt
-         eSiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QVPd+V02lgzjKws7NT4xHmcTymSXtHJ7wzEyWcOO8YE=;
-        b=Pym8Wtgm1k/IMPxZmVbZEU5kBPOuEyPEraJA4aRPFw1A1cQsB84CcJYeFk/Rd1ET25
-         Cko4JEYbqk0QQ2i8itKfRBf9dZulBUGt0Jf+TIc8HJ4SfRykhnHQa231Fx4DZ5Bsdw0k
-         xXPWmVWbDIxuVlGJCXe6C8VrnAtxNWIN0j9sbtst0Sxh5oHUZRBp23/o3rc0Du3SKdjA
-         IHn/XO9waOlvrwnpB/hsMEpm0nOKREZ9k9ACAeomvvGZzf+PARE8f06fSuVRzIuy14rK
-         ba8fD1Sa5bWsfjpYxer9bdHgZlxrk5EYZr0zYKv1lO85GcgFCgI7IGEM2FJz78+c+6CW
-         9+ig==
-X-Gm-Message-State: AOAM530Eqo4sSKr6r/Hbib51p1pw9rvBW9nLG0yphVSH//afRDdk7vVC
-        u2Hl9zWefzlbJbad7JIrq2nlA7pJ+yL7escbxEA=
-X-Google-Smtp-Source: ABdhPJwCegLUC/45CNBdiF9mtDb1KtgsONcIHPS4z+kPELIlNxqLzCfHHCDrZD0S1oFsV89R2S/ivLYKoZgpsZqbwfk=
-X-Received: by 2002:a92:980f:: with SMTP id l15mr11614373ili.251.1590125652851;
- Thu, 21 May 2020 22:34:12 -0700 (PDT)
+        id S1727781AbgEVFel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 01:34:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54901 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725894AbgEVFel (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 01:34:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590125678;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dnQ0nMFf0h8WwglXkeiu5R/EKl0trwSByG4G+2rCYaE=;
+        b=dPPRdln3FqEm+T6OxykFW8fr83H33F2+oeLfK782L+4mwKWnszXKx22d8jood+Ylml+56X
+        5cF+gnpydMOs3DRMwW5kUk3lN/GTm1Rm/gWcDp+mM4ekCX8VCzl+QJNqg9F26w4hhUHmHB
+        W4SOwL5xJT2GzxAwgEUWGqzZT31jCGU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-V2GasK5KMByUJGyOtwaR9g-1; Fri, 22 May 2020 01:34:36 -0400
+X-MC-Unique: V2GasK5KMByUJGyOtwaR9g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06A131005510;
+        Fri, 22 May 2020 05:34:35 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 58C605D9CD;
+        Fri, 22 May 2020 05:34:27 +0000 (UTC)
+Date:   Fri, 22 May 2020 07:34:23 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Jingyi Wang <wangjingyi11@huawei.com>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+        wanghaibin.wang@huawei.com, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 1/6] arm64: microbench: get correct ipi
+ recieved num
+Message-ID: <20200522053423.cus3pnhmp4p4t3ck@kamzik.brq.redhat.com>
+References: <20200517100900.30792-1-wangjingyi11@huawei.com>
+ <20200517100900.30792-2-wangjingyi11@huawei.com>
+ <8e011659-4e4d-7312-4466-5ed3ea54cc9b@huawei.com>
+ <8b9d51f2-3906-9e0a-38ae-564424c38ff5@huawei.com>
 MIME-Version: 1.0
-References: <1589688372-3098-1-git-send-email-chenhc@lemote.com>
- <1589688372-3098-16-git-send-email-chenhc@lemote.com> <20200517082242.GA3939@alpha.franken.de>
- <CAHiYmc5m+UhWv__F_FKqhiTkJxgqErmFn5K_DAW2y5Pp6_4dyA@mail.gmail.com>
- <CAHiYmc4m7uxYU0coRGJS8ou=KyjC=DYs506NyXyw_-eKmPVJRQ@mail.gmail.com>
- <CAAhV-H4SspEUMLDTSZH3YmNbd+cRx3JK+mtsGo6cJ2NLKHPkKQ@mail.gmail.com>
- <CAHiYmc7ykeeF_w25785yiDjJf3AwOzfJybiS=LxfjYizn_2zEQ@mail.gmail.com> <23cbe8a9-21a9-93a3-79aa-8ab17818a585@redhat.com>
-In-Reply-To: <23cbe8a9-21a9-93a3-79aa-8ab17818a585@redhat.com>
-From:   Huacai Chen <chenhuacai@gmail.com>
-Date:   Fri, 22 May 2020 13:34:01 +0800
-Message-ID: <CAAhV-H6aGkxV41ymu+HPxiSBq9uw-QhmaxFxnZYJTfUay946cg@mail.gmail.com>
-Subject: Re: [PATCH V6 15/15] MAINTAINERS: Update KVM/MIPS maintainers
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8b9d51f2-3906-9e0a-38ae-564424c38ff5@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Paolo,
+On Fri, May 22, 2020 at 10:32:25AM +0800, Jingyi Wang wrote:
+> 
+> On 5/21/2020 10:00 PM, Zenghui Yu wrote:
+> > On 2020/5/17 18:08, Jingyi Wang wrote:
+> > > If ipi_exec() fails because of timeout, we shouldn't increase
+> > > the number of ipi received.
+> > > 
+> > > Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+> > > ---
+> > >   arm/micro-bench.c | 4 +++-
+> > >   1 file changed, 3 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> > > index 4612f41..ca022d9 100644
+> > > --- a/arm/micro-bench.c
+> > > +++ b/arm/micro-bench.c
+> > > @@ -103,7 +103,9 @@ static void ipi_exec(void)
+> > >       while (!ipi_received && tries--)
+> > >           cpu_relax();
+> > > -    ++received;
+> > > +    if (ipi_recieved)
+> > 
+> > I think you may want *ipi_received* ;-) Otherwise it can not even
+> > compile!
+> > 
+> > > +        ++received;
+> > > +
+> > >       assert_msg(ipi_received, "failed to receive IPI in time, but
+> > > received %d successfully\n", received);
+> > >   }
+> > 
+> > With this fixed, this looks good to me,
+> > 
+> > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> > 
+> > 
+> > Thanks.
+> > 
+> > .
+> This variable name is modified in the next patch, so I ignored that
+> mistake, thanks.
+>
 
-On Thu, May 21, 2020 at 10:05 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 21/05/20 13:04, Aleksandar Markovic wrote:
-> > I agree. E-mail address can be easily changed later.
-> >
-> > I think it is reasonable that minor email tech problems should not stop
-> > this series.
-> >
-> > I gather that at least approximate consensus is that v6 is "good to go".
-> >
-> > While I am at this series, I just want to let everybody that there is a
-> > long-standing practice in QEMU for MIPS that we don't upstream
-> > changes that depend on kernel support that is not yet upstreamed
-> > in kernel - and I want to keep that practice in future (and not limited
-> > to KVM, but for all kernel/QEMU interdependant code).
-> >
-> > In other words, corresponding Huacai's changes in QEMU will be
-> > kept on hold as long as this series is still not upstreamed in kernel.
-> > But, that was the original Huacai's plan anyway.
->
-> I am going to queue them for 5.8.
-Thank you for your help. But this series depends on an early patch
-from Jiaxun Yang ("MIPS: Loongson64: Probe CPU features via CPUCFG")
-which seems only in MIPS tree now. So, maybe this series is better be
-queued in Thomas's tree?
+kvm-unit-tests build and run fast enough that you can do something like
 
->
-> Thanks,
->
-> Paolo
->
-Huacai
+  git rebase -i -x 'make clean && make && arm/run arm/micro-bench'
+
+to test your series before posting.
+
+Thanks,
+drew
+
