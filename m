@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8986E1DE751
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 14:54:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44EB61DE74C
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 14:53:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730333AbgEVMx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 08:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38580 "EHLO
+        id S1730255AbgEVMxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 08:53:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729846AbgEVMwW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 08:52:22 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16031C08C5C1
-        for <kvm@vger.kernel.org>; Fri, 22 May 2020 05:52:22 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id z18so12439340lji.12
-        for <kvm@vger.kernel.org>; Fri, 22 May 2020 05:52:22 -0700 (PDT)
+        with ESMTP id S1729855AbgEVMwY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 08:52:24 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB0DAC08C5C0
+        for <kvm@vger.kernel.org>; Fri, 22 May 2020 05:52:23 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id e125so6472914lfd.1
+        for <kvm@vger.kernel.org>; Fri, 22 May 2020 05:52:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=YfqDw99wlD4f4u2TbTJ6qHze4NSI0wbOg8F4/7GJtp0=;
-        b=0fINIB2q2FFPAT+xSTZ65uNII/27pj5fJVYLosTwProbYATdYgQuDBG3a2I8I3nFzi
-         LWQCOlA7QXSD6k9T6ZSf+p2nLXjsX7MhLfwOiouiIs8DzcihJv8k0oB8V6USr19PlxaN
-         9TP2nKUTAvfDOhaMkXa6cbW3bC25fYtZje89nBuKcTfHA1uwShTP7dn/JbwrieClk6Oj
-         lDRid2YBwhyiKH3rY0plHD3x66DuxS2/uPUjrPP3CQ9ZguxuqBjXuiQYHPK/JRVHrItW
-         Mptrk8PiJhWHrslmXiyyTVgpNiU4biVgczasRq833LYThCovuhuF9lwnSNRieapCjAaN
-         P7HQ==
+        bh=OC110xasR+GTk4uxI41+0arGy8rv1X+JHVBAtK64k7Q=;
+        b=DINCmV2aZlY4JnnPCopM4LgQCUWBheVG7kwiY1wVek04AAz6tE+2VQMpV7bu6lmZqF
+         0jh3mFvw0V7/oxUHvVwm/T6VOC0xmMbvGcg90XXh+J4zuYyWOqQxFAggr5YLDELpvvXx
+         UrVe1p9EpqMd5uoiOA4U7S73PN7iZ0i29Tahu4ktBsbkFkiLShZ3UzAMG/Slnu8VVW+V
+         SWH92LSWWdocDdDjrE7Rw7qJde4opaiV2xmFBHM1cYM3aCXnsJvU6fX8a84z3k0bBTlF
+         L6geZ1hV7k8f/H80wvI+b+bxthM5QDsSWl1c1ikg+E9FBlRqF9A50NARmUYmW8Ibnomm
+         eyvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=YfqDw99wlD4f4u2TbTJ6qHze4NSI0wbOg8F4/7GJtp0=;
-        b=LRUWi4eQjv3lB5WN7gKqAmDHVcqqr46iH4M0lelu9fx6s1QhVhXvuaookwtzFAWQPB
-         AO+cHZdy78cL3P7Ydwy1QjtngglQ7cpXYD2Kcu1BaLMoIfFNdf2ESi1CBJxKamv0hgG+
-         ynKWAioZDILJ77W4lxhEjqO3yuMf8JA2gN3yiP4u6axyMPDaJByb3m6y1Dd/Q0Q7yOn6
-         jp+klS9lz0lciGr9o592okcP/dokMJxsFkzx5hkuaHozuFCw8Zfsi7OpiIPMEhjoy0Ld
-         PXyMvUS6nr6E3Fwwl5qNcLMvasSO8BmoERAtnX+PCQYPXFZBjJ6wD+oSWNUQrSI3NS/x
-         83Eg==
-X-Gm-Message-State: AOAM533NPT+P9tjwrXfvRej55uKkalrxzOXtcDp0q2VynTASxU4giIHz
-        R7vIr9e281QHUOT118fN+Qw4mw==
-X-Google-Smtp-Source: ABdhPJzUQtdSq+up9u40Vs7gZXaMufhhVUg0JUUDOWbSlD4zO7U6sTxMHmCVlgCqI/FGQiCPCeitTw==
-X-Received: by 2002:a2e:97c3:: with SMTP id m3mr6974669ljj.23.1590151940561;
-        Fri, 22 May 2020 05:52:20 -0700 (PDT)
+        bh=OC110xasR+GTk4uxI41+0arGy8rv1X+JHVBAtK64k7Q=;
+        b=Ze9Wk07NaR61UNw4yVSAUAGcfXMC3Qu4qrR+lLBTNZEnXhwDSv/dWS3RE392ARZTZA
+         zfFuYch94l9Zi6++JY8hCYAkO61Wcg468oXcSKsg8BSRlrYJesBp/8U9upWFvAne/QO6
+         ZbO7646JkMcQafALKE3JWTHN4B8EwvwCjQmjgihsLzSlxffO8y17zAkvufHyH7Eruij/
+         pOETt+e74vE7BSGXDNQMU8CXo05kEk7CkcFfeoJqFkg64Yy5LhAcHwl0dcAqerrzkiSP
+         H1tPJPQhINtrvdFUXLe9j6sLL3O5ZahmqP9Ns3I0qHQ2EHGGmA+TOf6EGFt4x9x2q8ad
+         mSug==
+X-Gm-Message-State: AOAM533/3orOK7U1k9xe5NnwrYiOIznH3zL2ZBSqfE3jC051iOWJnxTx
+        jhUb+PYk07CTjmnQrWA8CalYYA==
+X-Google-Smtp-Source: ABdhPJzP9UaxWq9turrXCg6xZaiwqG/RivqdrtCbCfxbVzjv8F2JanBpprUM2BRBlHfmWRoh2x4YkQ==
+X-Received: by 2002:a19:3855:: with SMTP id d21mr7581245lfj.156.1590151942236;
+        Fri, 22 May 2020 05:52:22 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id s8sm2406642lfd.61.2020.05.22.05.52.19
+        by smtp.gmail.com with ESMTPSA id m4sm2307279ljb.46.2020.05.22.05.52.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 22 May 2020 05:52:20 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id C8F18102054; Fri, 22 May 2020 15:52:19 +0300 (+03)
+        id D0C22102055; Fri, 22 May 2020 15:52:19 +0300 (+03)
 To:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -69,9 +69,9 @@ Cc:     David Rientjes <rientjes@google.com>,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFC 06/16] KVM: Use GUP instead of copy_from/to_user() to access guest memory
-Date:   Fri, 22 May 2020 15:52:04 +0300
-Message-Id: <20200522125214.31348-7-kirill.shutemov@linux.intel.com>
+Subject: [RFC 07/16] KVM: mm: Introduce VM_KVM_PROTECTED
+Date:   Fri, 22 May 2020 15:52:05 +0300
+Message-Id: <20200522125214.31348-8-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
 References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
@@ -82,190 +82,232 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-New helpers copy_from_guest()/copy_to_guest() to be used if KVM memory
-protection feature is enabled.
+The new VMA flag that indicate a VMA that is not accessible to userspace
+but usable by kernel with GUP if FOLL_KVM is specified.
+
+The FOLL_KVM is only used in the KVM code. The code has to know how to
+deal with such pages.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/kvm_host.h |  4 +++
- virt/kvm/kvm_main.c      | 78 ++++++++++++++++++++++++++++++++++------
- 2 files changed, 72 insertions(+), 10 deletions(-)
+ include/linux/mm.h  |  8 ++++++++
+ mm/gup.c            | 20 ++++++++++++++++----
+ mm/huge_memory.c    | 20 ++++++++++++++++----
+ mm/memory.c         |  3 +++
+ mm/mmap.c           |  3 +++
+ virt/kvm/async_pf.c |  4 ++--
+ virt/kvm/kvm_main.c |  9 +++++----
+ 7 files changed, 53 insertions(+), 14 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 131cc1527d68..bd0bb600f610 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -503,6 +503,7 @@ struct kvm {
- 	struct srcu_struct srcu;
- 	struct srcu_struct irq_srcu;
- 	pid_t userspace_pid;
-+	bool mem_protected;
- };
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index e1882eec1752..4f7195365cc0 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -329,6 +329,8 @@ extern unsigned int kobjsize(const void *objp);
+ # define VM_MAPPED_COPY	VM_ARCH_1	/* T if mapped copy of data (nommu mmap) */
+ #endif
  
- #define kvm_err(fmt, ...) \
-@@ -727,6 +728,9 @@ void kvm_set_pfn_dirty(kvm_pfn_t pfn);
- void kvm_set_pfn_accessed(kvm_pfn_t pfn);
- void kvm_get_pfn(kvm_pfn_t pfn);
- 
-+int copy_from_guest(void *data, unsigned long hva, int len);
-+int copy_to_guest(unsigned long hva, const void *data, int len);
++#define VM_KVM_PROTECTED 0
 +
- void kvm_release_pfn(kvm_pfn_t pfn, bool dirty, struct gfn_to_pfn_cache *cache);
- int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
- 			int len);
+ #ifndef VM_GROWSUP
+ # define VM_GROWSUP	VM_NONE
+ #endif
+@@ -646,6 +648,11 @@ static inline bool vma_is_accessible(struct vm_area_struct *vma)
+ 	return vma->vm_flags & VM_ACCESS_FLAGS;
+ }
+ 
++static inline bool vma_is_kvm_protected(struct vm_area_struct *vma)
++{
++	return vma->vm_flags & VM_KVM_PROTECTED;
++}
++
+ #ifdef CONFIG_SHMEM
+ /*
+  * The vma_is_shmem is not inline because it is used only by slow
+@@ -2773,6 +2780,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+ #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below */
+ #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
+ #define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
++#define FOLL_KVM	0x80000 /* access to VM_KVM_PROTECTED VMAs */
+ 
+ /*
+  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with each
+diff --git a/mm/gup.c b/mm/gup.c
+index 87a6a59fe667..bd7b9484b35a 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -385,10 +385,19 @@ static int follow_pfn_pte(struct vm_area_struct *vma, unsigned long address,
+  * FOLL_FORCE can write to even unwritable pte's, but only
+  * after we've gone through a COW cycle and they are dirty.
+  */
+-static inline bool can_follow_write_pte(pte_t pte, unsigned int flags)
++static inline bool can_follow_write_pte(struct vm_area_struct *vma,
++					pte_t pte, unsigned int flags)
+ {
+-	return pte_write(pte) ||
+-		((flags & FOLL_FORCE) && (flags & FOLL_COW) && pte_dirty(pte));
++	if (pte_write(pte))
++		return true;
++
++	if ((flags & FOLL_FORCE) && (flags & FOLL_COW) && pte_dirty(pte))
++		return true;
++
++	if (!vma_is_kvm_protected(vma) || !(vma->vm_flags & VM_WRITE))
++		return false;
++
++	return (vma->vm_flags & VM_SHARED) || page_mapcount(pte_page(pte)) == 1;
+ }
+ 
+ static struct page *follow_page_pte(struct vm_area_struct *vma,
+@@ -431,7 +440,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 	}
+ 	if ((flags & FOLL_NUMA) && pte_protnone(pte))
+ 		goto no_page;
+-	if ((flags & FOLL_WRITE) && !can_follow_write_pte(pte, flags)) {
++	if ((flags & FOLL_WRITE) && !can_follow_write_pte(vma, pte, flags)) {
+ 		pte_unmap_unlock(ptep, ptl);
+ 		return NULL;
+ 	}
+@@ -751,6 +760,9 @@ static struct page *follow_page_mask(struct vm_area_struct *vma,
+ 
+ 	ctx->page_mask = 0;
+ 
++	if (vma_is_kvm_protected(vma) && (flags & FOLL_KVM))
++		flags &= ~FOLL_NUMA;
++
+ 	/* make this handle hugepd */
+ 	page = follow_huge_addr(mm, address, flags & FOLL_WRITE);
+ 	if (!IS_ERR(page)) {
+diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+index 6ecd1045113b..c3562648a4ef 100644
+--- a/mm/huge_memory.c
++++ b/mm/huge_memory.c
+@@ -1518,10 +1518,19 @@ vm_fault_t do_huge_pmd_wp_page(struct vm_fault *vmf, pmd_t orig_pmd)
+  * FOLL_FORCE can write to even unwritable pmd's, but only
+  * after we've gone through a COW cycle and they are dirty.
+  */
+-static inline bool can_follow_write_pmd(pmd_t pmd, unsigned int flags)
++static inline bool can_follow_write_pmd(struct vm_area_struct *vma,
++					pmd_t pmd, unsigned int flags)
+ {
+-	return pmd_write(pmd) ||
+-	       ((flags & FOLL_FORCE) && (flags & FOLL_COW) && pmd_dirty(pmd));
++	if (pmd_write(pmd))
++		return true;
++
++	if ((flags & FOLL_FORCE) && (flags & FOLL_COW) && pmd_dirty(pmd))
++		return true;
++
++	if (!vma_is_kvm_protected(vma) || !(vma->vm_flags & VM_WRITE))
++		return false;
++
++	return (vma->vm_flags & VM_SHARED) || page_mapcount(pmd_page(pmd)) == 1;
+ }
+ 
+ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
+@@ -1534,7 +1543,7 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
+ 
+ 	assert_spin_locked(pmd_lockptr(mm, pmd));
+ 
+-	if (flags & FOLL_WRITE && !can_follow_write_pmd(*pmd, flags))
++	if (flags & FOLL_WRITE && !can_follow_write_pmd(vma, *pmd, flags))
+ 		goto out;
+ 
+ 	/* Avoid dumping huge zero page */
+@@ -1609,6 +1618,9 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf, pmd_t pmd)
+ 	bool was_writable;
+ 	int flags = 0;
+ 
++	if (vma_is_kvm_protected(vma))
++		return VM_FAULT_SIGBUS;
++
+ 	vmf->ptl = pmd_lock(vma->vm_mm, vmf->pmd);
+ 	if (unlikely(!pmd_same(pmd, *vmf->pmd)))
+ 		goto out_unlock;
+diff --git a/mm/memory.c b/mm/memory.c
+index f703fe8c8346..d7228db6e4bf 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -4013,6 +4013,9 @@ static vm_fault_t do_numa_page(struct vm_fault *vmf)
+ 	bool was_writable = pte_savedwrite(vmf->orig_pte);
+ 	int flags = 0;
+ 
++	if (vma_is_kvm_protected(vma))
++		return VM_FAULT_SIGBUS;
++
+ 	/*
+ 	 * The "pte" at this point cannot be used safely without
+ 	 * validation through pte_unmap_same(). It's of NUMA type but
+diff --git a/mm/mmap.c b/mm/mmap.c
+index f609e9ec4a25..d56c3f6efc99 100644
+--- a/mm/mmap.c
++++ b/mm/mmap.c
+@@ -112,6 +112,9 @@ pgprot_t vm_get_page_prot(unsigned long vm_flags)
+ 				(VM_READ|VM_WRITE|VM_EXEC|VM_SHARED)]) |
+ 			pgprot_val(arch_vm_get_page_prot(vm_flags)));
+ 
++	if (vm_flags & VM_KVM_PROTECTED)
++		ret = PAGE_NONE;
++
+ 	return arch_filter_pgprot(ret);
+ }
+ EXPORT_SYMBOL(vm_get_page_prot);
+diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+index 15e5b037f92d..7663e962510a 100644
+--- a/virt/kvm/async_pf.c
++++ b/virt/kvm/async_pf.c
+@@ -60,8 +60,8 @@ static void async_pf_execute(struct work_struct *work)
+ 	 * access remotely.
+ 	 */
+ 	down_read(&mm->mmap_sem);
+-	get_user_pages_remote(NULL, mm, addr, 1, FOLL_WRITE, NULL, NULL,
+-			&locked);
++	get_user_pages_remote(NULL, mm, addr, 1, FOLL_WRITE | FOLL_KVM, NULL,
++			      NULL, &locked);
+ 	if (locked)
+ 		up_read(&mm->mmap_sem);
+ 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 731c1e517716..033471f71dae 100644
+index 033471f71dae..530af95efdf3 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -2248,8 +2248,48 @@ static int next_segment(unsigned long len, int offset)
- 		return len;
- }
+@@ -1727,7 +1727,7 @@ unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *w
  
-+int copy_from_guest(void *data, unsigned long hva, int len)
-+{
-+	int offset = offset_in_page(hva);
-+	struct page *page;
-+	int npages, seg;
-+
-+	while ((seg = next_segment(len, offset)) != 0) {
-+		npages = get_user_pages_unlocked(hva, 1, &page, 0);
-+		if (npages != 1)
-+			return -EFAULT;
-+		memcpy(data, page_address(page) + offset, seg);
-+		put_page(page);
-+		len -= seg;
-+		hva += seg;
-+		offset = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+int copy_to_guest(unsigned long hva, const void *data, int len)
-+{
-+	int offset = offset_in_page(hva);
-+	struct page *page;
-+	int npages, seg;
-+
-+	while ((seg = next_segment(len, offset)) != 0) {
-+		npages = get_user_pages_unlocked(hva, 1, &page, FOLL_WRITE);
-+		if (npages != 1)
-+			return -EFAULT;
-+		memcpy(page_address(page) + offset, data, seg);
-+		put_page(page);
-+		len -= seg;
-+		hva += seg;
-+		offset = 0;
-+	}
-+	return 0;
-+}
-+
- static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
--				 void *data, int offset, int len)
-+				 void *data, int offset, int len,
-+				 bool protected)
+ static inline int check_user_page_hwpoison(unsigned long addr)
  {
- 	int r;
- 	unsigned long addr;
-@@ -2257,7 +2297,10 @@ static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
- 	addr = gfn_to_hva_memslot_prot(slot, gfn, NULL);
- 	if (kvm_is_error_hva(addr))
- 		return -EFAULT;
--	r = __copy_from_user(data, (void __user *)addr + offset, len);
-+	if (protected)
-+		r = copy_from_guest(data, addr + offset, len);
-+	else
-+		r = __copy_from_user(data, (void __user *)addr + offset, len);
- 	if (r)
- 		return -EFAULT;
- 	return 0;
-@@ -2268,7 +2311,8 @@ int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
+-	int rc, flags = FOLL_HWPOISON | FOLL_WRITE;
++	int rc, flags = FOLL_HWPOISON | FOLL_WRITE | FOLL_KVM;
+ 
+ 	rc = get_user_pages(addr, 1, flags, NULL, NULL);
+ 	return rc == -EHWPOISON;
+@@ -1771,7 +1771,7 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+ 			   bool *writable, kvm_pfn_t *pfn)
  {
- 	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
+-	unsigned int flags = FOLL_HWPOISON;
++	unsigned int flags = FOLL_HWPOISON | FOLL_KVM;
+ 	struct page *page;
+ 	int npages = 0;
  
--	return __kvm_read_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_read_guest_page(slot, gfn, data, offset, len,
-+				     kvm->mem_protected);
- }
- EXPORT_SYMBOL_GPL(kvm_read_guest_page);
+@@ -2255,7 +2255,7 @@ int copy_from_guest(void *data, unsigned long hva, int len)
+ 	int npages, seg;
  
-@@ -2277,7 +2321,8 @@ int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data,
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+ 	while ((seg = next_segment(len, offset)) != 0) {
+-		npages = get_user_pages_unlocked(hva, 1, &page, 0);
++		npages = get_user_pages_unlocked(hva, 1, &page, FOLL_KVM);
+ 		if (npages != 1)
+ 			return -EFAULT;
+ 		memcpy(data, page_address(page) + offset, seg);
+@@ -2275,7 +2275,8 @@ int copy_to_guest(unsigned long hva, const void *data, int len)
+ 	int npages, seg;
  
--	return __kvm_read_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_read_guest_page(slot, gfn, data, offset, len,
-+				     vcpu->kvm->mem_protected);
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_page);
- 
-@@ -2350,7 +2395,8 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
- 
- static int __kvm_write_guest_page(struct kvm_memory_slot *memslot, gfn_t gfn,
--			          const void *data, int offset, int len)
-+			          const void *data, int offset, int len,
-+				  bool protected)
- {
- 	int r;
- 	unsigned long addr;
-@@ -2358,7 +2404,11 @@ static int __kvm_write_guest_page(struct kvm_memory_slot *memslot, gfn_t gfn,
- 	addr = gfn_to_hva_memslot(memslot, gfn);
- 	if (kvm_is_error_hva(addr))
- 		return -EFAULT;
--	r = __copy_to_user((void __user *)addr + offset, data, len);
-+
-+	if (protected)
-+		r = copy_to_guest(addr + offset, data, len);
-+	else
-+		r = __copy_to_user((void __user *)addr + offset, data, len);
- 	if (r)
- 		return -EFAULT;
- 	mark_page_dirty_in_slot(memslot, gfn);
-@@ -2370,7 +2420,8 @@ int kvm_write_guest_page(struct kvm *kvm, gfn_t gfn,
- {
- 	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
- 
--	return __kvm_write_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_write_guest_page(slot, gfn, data, offset, len,
-+				      kvm->mem_protected);
- }
- EXPORT_SYMBOL_GPL(kvm_write_guest_page);
- 
-@@ -2379,7 +2430,8 @@ int kvm_vcpu_write_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn,
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 
--	return __kvm_write_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_write_guest_page(slot, gfn, data, offset, len,
-+				      vcpu->kvm->mem_protected);
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_write_guest_page);
- 
-@@ -2495,7 +2547,10 @@ int kvm_write_guest_offset_cached(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
- 	if (unlikely(!ghc->memslot))
- 		return kvm_write_guest(kvm, gpa, data, len);
- 
--	r = __copy_to_user((void __user *)ghc->hva + offset, data, len);
-+	if (kvm->mem_protected)
-+		r = copy_to_guest(ghc->hva + offset, data, len);
-+	else
-+		r = __copy_to_user((void __user *)ghc->hva + offset, data, len);
- 	if (r)
- 		return -EFAULT;
- 	mark_page_dirty_in_slot(ghc->memslot, gpa >> PAGE_SHIFT);
-@@ -2530,7 +2585,10 @@ int kvm_read_guest_cached(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
- 	if (unlikely(!ghc->memslot))
- 		return kvm_read_guest(kvm, ghc->gpa, data, len);
- 
--	r = __copy_from_user(data, (void __user *)ghc->hva, len);
-+	if (kvm->mem_protected)
-+		r = copy_from_guest(data, ghc->hva, len);
-+	else
-+		r = __copy_from_user(data, (void __user *)ghc->hva, len);
- 	if (r)
- 		return -EFAULT;
- 
+ 	while ((seg = next_segment(len, offset)) != 0) {
+-		npages = get_user_pages_unlocked(hva, 1, &page, FOLL_WRITE);
++		npages = get_user_pages_unlocked(hva, 1, &page,
++						 FOLL_WRITE | FOLL_KVM);
+ 		if (npages != 1)
+ 			return -EFAULT;
+ 		memcpy(page_address(page) + offset, data, seg);
 -- 
 2.26.2
 
