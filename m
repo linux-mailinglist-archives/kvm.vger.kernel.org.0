@@ -2,100 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B24611DE1B7
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 10:21:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B861DE1ED
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 10:33:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729312AbgEVIVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 04:21:02 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:29413 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728976AbgEVIVB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 04:21:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590135661; x=1621671661;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=LWu6AqypUnxnEO7+yo7F6s9apxZuEsZjVsJR8ns2boc=;
-  b=N0ytCQTlcVTHflQOtvMzmqs3mCoO3ndirLHWcWipIFCebMoiXG70l/2m
-   jAu+r45XQ7WrpntgD5PPtSmFRVWxNFNpFXqrbEXtZIRr1ntZW+KGe8znI
-   zYvt+PhIyvnoeZMJr8mgcEEczcMQ+Q6FYf7BvNHiHYnSXrEsZIJrQRs/Z
-   g=;
-IronPort-SDR: d+GIndiAjtTYBqBbiFIYH6KqsOmMn/3NmsdYWLx39MLy7UEpIKRzK4YGhWoCo7TcdUmqF21o6a
- 4EXKGWGETOGg==
-X-IronPort-AV: E=Sophos;i="5.73,420,1583193600"; 
-   d="scan'208";a="31787155"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 22 May 2020 08:21:00 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id B0E1CA17B7;
-        Fri, 22 May 2020 08:20:58 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 22 May 2020 08:20:58 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.175) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 22 May 2020 08:20:49 +0000
-Subject: Re: [PATCH v2 18/18] MAINTAINERS: Add entry for the Nitro Enclaves
- driver
-To:     Joe Perches <joe@perches.com>, <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Bjoern Doebel" <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        "Martin Pohlack" <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200522062946.28973-1-andraprs@amazon.com>
- <20200522062946.28973-19-andraprs@amazon.com>
- <e4847d1f25a1fd29ea3f8f8930ba5ae5ccc41f30.camel@perches.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <52fcc55d-4007-03e1-2af0-c4d8dd210b22@amazon.com>
-Date:   Fri, 22 May 2020 11:20:45 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
+        id S1729408AbgEVIdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 04:33:35 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:38344 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729382AbgEVIdd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 04:33:33 -0400
+Received: from zn.tnic (p200300ec2f0d4900b115cc0add6835a7.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:4900:b115:cc0a:dd68:35a7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AA2481EC02B3;
+        Fri, 22 May 2020 10:33:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1590136411;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=MWGiXlMNmCUQrdL2VMbcT6Bsa2l19TPcZCK5SYOHTQo=;
+        b=O9AFrS5SFc4FVW5LZq+2OvQsE8crvfBABJ6KpFEy5z3reuvsHKsaxuPdeTSNV1SR9Tpc8K
+        8JMk0rMt3O+4UuTn07lpAK8mVm4KNWW57XrXVQNzFsFoxwcCmjNHfhZCOrBpkQWXNqQWHb
+        DOaEnO50y9eDEQvBB3+TP2+26IxN5AM=
+Date:   Fri, 22 May 2020 10:33:21 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 43/75] x86/sev-es: Setup per-cpu GHCBs for the runtime
+ handler
+Message-ID: <20200522083321.GA28750@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-44-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <e4847d1f25a1fd29ea3f8f8930ba5ae5ccc41f30.camel@perches.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.175]
-X-ClientProxiedBy: EX13D03UWC002.ant.amazon.com (10.43.162.160) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200428151725.31091-44-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyMi8wNS8yMDIwIDEwOjAzLCBKb2UgUGVyY2hlcyB3cm90ZToKPiBPbiBGcmksIDIwMjAt
-MDUtMjIgYXQgMDk6MjkgKzAzMDAsIEFuZHJhIFBhcmFzY2hpdiB3cm90ZToKPgo+IHRyaXZpYToK
-Pgo+PiBkaWZmIC0tZ2l0IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUwo+IFtdCj4+IEBAIC0x
-MTk1Niw2ICsxMTk1NiwxOSBAQCBTOglNYWludGFpbmVkCj4+ICAgVDoJZ2l0IGdpdDovL2dpdC5r
-ZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9sZnRhbi9uaW9zMi5naXQKPj4gICBG
-OglhcmNoL25pb3MyLwo+PiAgIAo+PiArTklUUk8gRU5DTEFWRVMgKE5FKQo+PiArTToJQW5kcmEg
-UGFyYXNjaGl2IDxhbmRyYXByc0BhbWF6b24uY29tPgo+PiArTToJQWxleGFuZHJ1IFZhc2lsZSA8
-bGV4bnZAYW1hem9uLmNvbT4KPj4gK006CUFsZXhhbmRydSBDaW9ib3RhcnUgPGFsY2lvYUBhbWF6
-b24uY29tPgo+PiArTDoJbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZwo+PiArUzoJU3VwcG9y
-dGVkCj4+ICtXOglodHRwczovL2F3cy5hbWF6b24uY29tL2VjMi9uaXRyby9uaXRyby1lbmNsYXZl
-cy8KPj4gK0Y6CWluY2x1ZGUvbGludXgvbml0cm9fZW5jbGF2ZXMuaAo+PiArRjoJaW5jbHVkZS91
-YXBpL2xpbnV4L25pdHJvX2VuY2xhdmVzLmgKPj4gK0Y6CWRyaXZlcnMvdmlydC9uaXRyb19lbmNs
-YXZlcy8KPj4gK0Y6CXNhbXBsZXMvbml0cm9fZW5jbGF2ZXMvCj4+ICtGOglEb2N1bWVudGF0aW9u
-L25pdHJvX2VuY2xhdmVzLwo+IFBsZWFzZSBrZWVwIHRoZSBGOiBlbnRyaWVzIGluIGNhc2Ugc2Vu
-c2l0aXZlIGFscGhhYmV0aWMgb3JkZXIKPgo+IEY6CURvY3VtZW50YXRpb24vbml0cm9fZW5jbGF2
-ZXMvCj4gRjoJZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzLwo+IEY6CWluY2x1ZGUvbGludXgv
-bml0cm9fZW5jbGF2ZXMuaAo+IEY6CWluY2x1ZGUvdWFwaS9saW51eC9uaXRyb19lbmNsYXZlcy5o
-Cj4gRjoJc2FtcGxlcy9uaXRyb19lbmNsYXZlcy8KCkRvbmUsIEkgdXBkYXRlZCB0aGUgZW50cnkg
-aW4gdjMuCgpUaGFuayB5b3UsIEpvZS4KCkFuZHJhCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50
-ZXIgKFJvbWFuaWEpIFMuUi5MLiByZWdpc3RlcmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJl
-ZXQsIFVCQzUsIGZsb29yIDIsIElhc2ksIElhc2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJl
-Z2lzdGVyZWQgaW4gUm9tYW5pYS4gUmVnaXN0cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
+On Tue, Apr 28, 2020 at 05:16:53PM +0200, Joerg Roedel wrote:
+> @@ -198,6 +210,48 @@ static bool __init sev_es_setup_ghcb(void)
+>  	return true;
+>  }
+>  
+> +static void __init sev_es_alloc_runtime_data(int cpu)
+> +{
+> +	struct sev_es_runtime_data *data;
+> +
+> +	data = memblock_alloc(sizeof(*data), PAGE_SIZE);
+> +	if (!data)
+> +		panic("Can't allocate SEV-ES runtime data");
+> +
+> +	per_cpu(runtime_data, cpu) = data;
+> +}
+> +
+> +static void __init sev_es_init_ghcb(int cpu)
 
+Since those are static functions, I'd drop the "sev_es_" prefix from the
+name for better readability. Because otherwise the whole file is a sea
+of "sev_es_"-prefixed identifiers which you need to read until the end
+to know what they are.
+
+> +{
+> +	struct sev_es_runtime_data *data;
+> +	int err;
+> +
+> +	data = per_cpu(runtime_data, cpu);
+> +
+> +	err = early_set_memory_decrypted((unsigned long)&data->ghcb_page,
+> +					 sizeof(data->ghcb_page));
+> +	if (err)
+> +		panic("Can not map GHCBs unencrypted");
+
+			"Error mapping ..."
+
+> +
+> +	memset(&data->ghcb_page, 0, sizeof(data->ghcb_page));
+> +}
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
