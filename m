@@ -2,208 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3191DE89D
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 16:18:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8F4F1DED4F
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 18:33:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729961AbgEVOSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 10:18:31 -0400
-Received: from foss.arm.com ([217.140.110.172]:36348 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729399AbgEVOSb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 10:18:31 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD068D6E;
-        Fri, 22 May 2020 07:18:30 -0700 (PDT)
-Received: from [192.168.1.84] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05A2A3F68F;
-        Fri, 22 May 2020 07:18:27 -0700 (PDT)
-Subject: Re: [RFC PATCH v12 07/11] psci: Add hypercall service for kvm ptp.
-To:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
-        will@kernel.org, suzuki.poulose@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        Wei.Chen@arm.com, nd@arm.com
-References: <20200522083724.38182-1-jianyong.wu@arm.com>
- <20200522083724.38182-8-jianyong.wu@arm.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <87fce07b-d0f5-47b0-05ce-dd664ce53eec@arm.com>
-Date:   Fri, 22 May 2020 15:18:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200522083724.38182-8-jianyong.wu@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+        id S1730418AbgEVQdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 12:33:03 -0400
+Received: from mail-bn7nam10on2072.outbound.protection.outlook.com ([40.107.92.72]:47456
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730031AbgEVQdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 12:33:02 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GO3WlcQUgEXP+Zybk5jBdzIBBpRv0QHPCqRKYKrMB5yAAhn/93hhb3IoOaDGRWZP46qH4sXVQarDKkNDzfTsyC6U/mZ+MeiJdvM+1j4mgtiUCOkbVeJrJxjY/6Qw7hv5CoS1CcVnnkJSWSD6qISpaSLPbGw7a1LXuQHr6EXHIVV2qUj+Xs74ssO4k5u/YlrmgvXhN2YzCQXeEMnltbyrrzNCFyBksh9OYSwTvTIbt9biUkEf3PcpUICGvhc1/B9rgLGHXtD6pzjiFAbiDESEcN499S8FKJmKy2U/P5aerxN8AegqeS9eW9bOFl1PUYdXcJ1rlK3ntTBFhnQKsJwuyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pXU7h/0RNXm1sb70l2WU2N9hVmCYNfDmauZJI4fYCEc=;
+ b=doBWJTdp9IalmMES5XHULfhbfNfuZYEhZF+1+G6aBz3dBwPOF07DZ24awU/P/XcEqrDELBD7lLfk46dRdZW4Uwf5CysYp9DsIiPSMDQi9CbkGp+dkxtDRb4YunZUTUifYVywg103WT5TRAKAIhxN8B2hhhF8mspmV4W44WUaT4hi8nK78zAExe7C4uY2mtVO8Lz++i4njR3lkCiEcDLKpV/SnpjAXKXErU2THMq+zWJna2t5h/M89Fs0XKkGpc6ye2+rAX3XZY8598ON8M79M0Pd8IfBFRDtWYpXVElXbO/czNCsm/zNixatXoNOLKQ708WTXV+cOqeDa3PHPQ+BrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pXU7h/0RNXm1sb70l2WU2N9hVmCYNfDmauZJI4fYCEc=;
+ b=djaBFkywiOGUH0svx0wofWyV9jvToFHRnC57MAS2gYSaAIzKtFyIBsHNb32jPTs0aGKVx/7I4LjYNrIV3OIggcv3nfUvAVMzY67LgGyfG3rOM3YyHlxjDSPqngPP8GpMxNATOrbXNtOkAA9Fq8/0ov+MxvIdwrEODvTBfW0kDKs=
+Authentication-Results: tencent.com; dkim=none (message not signed)
+ header.d=none;tencent.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2366.namprd12.prod.outlook.com (2603:10b6:802:25::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.24; Fri, 22 May
+ 2020 16:32:54 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2102:cc6b:b2db:4c2]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2102:cc6b:b2db:4c2%3]) with mapi id 15.20.3021.027; Fri, 22 May 2020
+ 16:32:54 +0000
+Subject: [PATCH 5.4] KVM: x86: Fix pkru save/restore when guest CR4.PKE=0,
+ move it to x86.c
+From:   Babu Moger <babu.moger@amd.com>
+To:     corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        hpa@zytor.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, stable@vger.kernel.org
+Cc:     x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, dave.hansen@linux.intel.com,
+        luto@kernel.org, peterz@infradead.org, mchehab+samsung@kernel.org,
+        babu.moger@amd.com, changbin.du@intel.com, namit@vmware.com,
+        bigeasy@linutronix.de, yang.shi@linux.alibaba.com,
+        asteinhauser@google.com, anshuman.khandual@arm.com,
+        jan.kiszka@siemens.com, akpm@linux-foundation.org,
+        steven.price@arm.com, rppt@linux.vnet.ibm.com, peterx@redhat.com,
+        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
+        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
+        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
+        jgross@suse.com, andrew.cooper3@citrix.com,
+        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
+        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
+        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Fri, 22 May 2020 11:32:49 -0500
+Message-ID: <159016509437.3131.17229420966309596602.stgit@naples-babu.amd.com>
+User-Agent: StGit/unknown-version
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR13CA0065.namprd13.prod.outlook.com
+ (2603:10b6:5:134::42) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from naples-babu.amd.com (165.204.78.2) by DM6PR13CA0065.namprd13.prod.outlook.com (2603:10b6:5:134::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.9 via Frontend Transport; Fri, 22 May 2020 16:32:50 +0000
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 33e0d2c9-1994-4c9a-9ac1-08d7fe6dc6c2
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2366:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2366DCE6A9337E7F1D4AC31595B40@SN1PR12MB2366.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:813;
+X-Forefront-PRVS: 04111BAC64
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wyp04LGzt/v+ReVTpUAT2app6aQDr8LnOWqotDMdHARQ9DbLh4XusPCWlmaBX2Oean/ll/+LMsl4C/1/o52T0W3W22/6r9Dh095UCKH5BLUzS92mDCGGMqOeTzPWePqNbYa2UXUL/0gotrBi30/h7LaF7+QQOXdaQ/RIrqMFMApVZO7WOufGoyZx08/AW5fzKVPe0U21wgDAGEmra08uOAaNumca947KttzYEEwHnw3j43Vfur04FIJlND55PZCt3ySTwRW/mdIBRdpGm+zpDq+0iP7e6l+q7DyQMC6E6tb2HldyC+t0g9Mgh9hK3Aai
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(39860400002)(136003)(346002)(376002)(396003)(2906002)(86362001)(316002)(5660300002)(7696005)(52116002)(478600001)(26005)(186003)(16526019)(44832011)(956004)(8936002)(7406005)(7416002)(103116003)(8676002)(66556008)(4326008)(66946007)(66476007)(55016002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: vJCxThuWP/3c1zkz/nezUhfsPVxx+LSaZeciTUXOEJNGiJSFkEOMAwc7ZZYDPqcGL75bYpBlJhoHUG4y+Po6cgEXXlcfJMVTV7h72gVkUEnQWJq7SJBKDaDSkqy1gOb/yxKdb+d8lGfV0Tnl2GtNlZ1AY9JtzFbhbgYgLkM4Blaxpf98cnW0ySjTxt2WadNunM+QsFFq8t90GcGCC/G/RDWQTJbM6T2NQZWwQM6CXIMwVtAL1zPtfI/I+LhR/8vYw5OiY2mOWCy4c8Z7Q7M0pPvWqAocYZxyrs1Znv1OkiBsrBp02gKeiHNg97Ahp3AKCdZ7Ttx7BrQH/oWaCOqNqe5qzeRN4lSQy8vM5hV3sDy2UcOJsKv1WqSd36wzVXzp/c6NgKnKrJKNxjptutvToRJIQIilKOX8BfPQqdIdo77vhR8Di2moaXi6+B0Fl575yAPWr4Y08jmOBaFhRBm2enccoohuBv5GUXW+YovHmkQ=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33e0d2c9-1994-4c9a-9ac1-08d7fe6dc6c2
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2020 16:32:54.1743
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: L46eZjuPr2z0hr7XyaY1PW2rY7HJEz13dN77eK6DwXjw1urKafu5FDX/d3khCTqQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2366
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/05/2020 09:37, Jianyong Wu wrote:
-> ptp_kvm modules will get this service through smccc call.
-> The service offers real time and counter cycle of host for guest.
-> Also let caller determine which cycle of virtual counter or physical counter
-> to return.
-> 
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->   include/linux/arm-smccc.h | 14 ++++++++++++
->   virt/kvm/Kconfig          |  4 ++++
->   virt/kvm/arm/hypercalls.c | 47 +++++++++++++++++++++++++++++++++++++++
->   3 files changed, 65 insertions(+)
-> 
-> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-> index bdc0124a064a..badadc390809 100644
-> --- a/include/linux/arm-smccc.h
-> +++ b/include/linux/arm-smccc.h
-> @@ -94,6 +94,8 @@
->   
->   /* KVM "vendor specific" services */
->   #define ARM_SMCCC_KVM_FUNC_FEATURES		0
-> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
-> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY		2
->   #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
->   #define ARM_SMCCC_KVM_NUM_FUNCS			128
->   
-> @@ -103,6 +105,18 @@
->   			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
->   			   ARM_SMCCC_KVM_FUNC_FEATURES)
->   
-> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
-> +
-> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID			\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY)
-> +
->   #ifndef __ASSEMBLY__
->   
->   #include <linux/linkage.h>
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index aad9284c043a..bf820811e815 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -60,3 +60,7 @@ config HAVE_KVM_VCPU_RUN_PID_CHANGE
->   
->   config HAVE_KVM_NO_POLL
->          bool
-> +
-> +config ARM64_KVM_PTP_HOST
-> +       def_bool y
-> +       depends on ARM64 && KVM
-> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-> index db6dce3d0e23..c964122f8dae 100644
-> --- a/virt/kvm/arm/hypercalls.c
-> +++ b/virt/kvm/arm/hypercalls.c
-> @@ -3,6 +3,7 @@
->   
->   #include <linux/arm-smccc.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/clocksource_ids.h>
->   
->   #include <asm/kvm_emulate.h>
->   
-> @@ -11,6 +12,10 @@
->   
->   int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->   {
-> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
-> +	struct system_time_snapshot systime_snapshot;
-> +	u64 cycles;
-> +#endif
->   	u32 func_id = smccc_get_function(vcpu);
->   	u32 val[4] = {SMCCC_RET_NOT_SUPPORTED};
->   	u32 feature;
-> @@ -70,7 +75,49 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->   		break;
->   	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
->   		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-> +
-> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
-> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP);
-> +#endif
->   		break;
-> +
-> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
-> +	/*
-> +	 * This serves virtual kvm_ptp.
-> +	 * Four values will be passed back.
-> +	 * reg0 stores high 32-bit host ktime;
-> +	 * reg1 stores low 32-bit host ktime;
-> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
-> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
-> +	 */
-> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> +		/*
-> +		 * system time and counter value must captured in the same
-> +		 * time to keep consistency and precision.
-> +		 */
-> +		ktime_get_snapshot(&systime_snapshot);
-> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
-> +			break;
-> +		val[0] = upper_32_bits(systime_snapshot.real);
-> +		val[1] = lower_32_bits(systime_snapshot.real);
-> +		/*
-> +		 * which of virtual counter or physical counter being
-> +		 * asked for is decided by the first argument.
-> +		 */
-> +		feature = smccc_get_arg1(vcpu);
-> +		switch (feature) {
-> +		case ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID:
-> +			cycles = systime_snapshot.cycles;
-> +			break;
-> +		default:
+[Backported upstream commit 37486135d3a7b03acc7755b63627a130437f066a]
 
-There's something a bit odd here.
+Though rdpkru and wrpkru are contingent upon CR4.PKE, the PKRU
+resource isn't. It can be read with XSAVE and written with XRSTOR.
+So, if we don't set the guest PKRU value here(kvm_load_guest_xsave_state),
+the guest can read the host value.
 
-ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID and
-ARM_SMCCC_VENDOR_HYP_KVM_PTP_PHY_FUNC_ID look like they should be names 
-of separate (top-level) functions, but actually the _PHY_ one is a 
-parameter for the first. If the intention is to have a parameter then it 
-would be better to pick a better name for the _PHY_ define and not 
-define it using ARM_SMCCC_CALL_VAL.
+In case of kvm_load_host_xsave_state, guest with CR4.PKE clear could
+potentially use XRSTOR to change the host PKRU value.
 
-Second the use of "default:" means that there's no possibility to later 
-extend this interface for more clocks if needed in the future.
+While at it, move pkru state save/restore to common code and the
+host_pkru field to kvm_vcpu_arch.  This will let SVM support protection keys.
 
-Alternatively you could indeed implement as two top-level functions and 
-change this to a...
+Cc: stable@vger.kernel.org
+Reported-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/include/asm/kvm_host.h |    1 +
+ arch/x86/kvm/vmx/vmx.c          |   18 ------------------
+ arch/x86/kvm/x86.c              |   17 +++++++++++++++++
+ 3 files changed, 18 insertions(+), 18 deletions(-)
 
-	switch (func_id)
-
-... along with multiple case labels as the functions would obviously be 
-mostly the same.
-
-Also a minor style issue - you might want to consider splitting this 
-into it's own function.
-
-Finally I do think it would be useful to add some documentation of the 
-new SMC calls. It would be easier to review the interface based on that 
-documentation rather than trying to reverse-engineer the interface from 
-the code.
-
-Steve
-
-> +			cycles = systime_snapshot.cycles -
-> +				 vcpu_vtimer(vcpu)->cntvoff;
-> +		}
-> +		val[2] = upper_32_bits(cycles);
-> +		val[3] = lower_32_bits(cycles);
-> +		break;
-> +#endif
-> +
->   	default:
->   		return kvm_psci_call(vcpu);
->   	}
-> 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 4fc61483919a..e204c43ed4b0 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -550,6 +550,7 @@ struct kvm_vcpu_arch {
+ 	unsigned long cr4;
+ 	unsigned long cr4_guest_owned_bits;
+ 	unsigned long cr8;
++	u32 host_pkru;
+ 	u32 pkru;
+ 	u32 hflags;
+ 	u64 efer;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 04a8212704c1..728758880cb6 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1384,7 +1384,6 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	vmx_vcpu_pi_load(vcpu, cpu);
+ 
+-	vmx->host_pkru = read_pkru();
+ 	vmx->host_debugctlmsr = get_debugctlmsr();
+ }
+ 
+@@ -6541,11 +6540,6 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_load_guest_xcr0(vcpu);
+ 
+-	if (static_cpu_has(X86_FEATURE_PKU) &&
+-	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
+-	    vcpu->arch.pkru != vmx->host_pkru)
+-		__write_pkru(vcpu->arch.pkru);
+-
+ 	pt_guest_enter(vmx);
+ 
+ 	atomic_switch_perf_msrs(vmx);
+@@ -6634,18 +6628,6 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	pt_guest_exit(vmx);
+ 
+-	/*
+-	 * eager fpu is enabled if PKEY is supported and CR4 is switched
+-	 * back on host, so it is safe to read guest PKRU from current
+-	 * XSAVE.
+-	 */
+-	if (static_cpu_has(X86_FEATURE_PKU) &&
+-	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE)) {
+-		vcpu->arch.pkru = rdpkru();
+-		if (vcpu->arch.pkru != vmx->host_pkru)
+-			__write_pkru(vmx->host_pkru);
+-	}
+-
+ 	kvm_put_guest_xcr0(vcpu);
+ 
+ 	vmx->nested.nested_run_pending = 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5d530521f11d..502a23313e7b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -821,11 +821,25 @@ void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu)
+ 			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
+ 		vcpu->guest_xcr0_loaded = 1;
+ 	}
++
++	if (static_cpu_has(X86_FEATURE_PKU) &&
++	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
++	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)) &&
++	    vcpu->arch.pkru != vcpu->arch.host_pkru)
++		__write_pkru(vcpu->arch.pkru);
+ }
+ EXPORT_SYMBOL_GPL(kvm_load_guest_xcr0);
+ 
+ void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu)
+ {
++	if (static_cpu_has(X86_FEATURE_PKU) &&
++	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
++	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU))) {
++		vcpu->arch.pkru = rdpkru();
++		if (vcpu->arch.pkru != vcpu->arch.host_pkru)
++			__write_pkru(vcpu->arch.host_pkru);
++	}
++
+ 	if (vcpu->guest_xcr0_loaded) {
+ 		if (vcpu->arch.xcr0 != host_xcr0)
+ 			xsetbv(XCR_XFEATURE_ENABLED_MASK, host_xcr0);
+@@ -3437,6 +3451,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	kvm_x86_ops->vcpu_load(vcpu, cpu);
+ 
++	/* Save host pkru register if supported */
++	vcpu->arch.host_pkru = read_pkru();
++
+ 	fpregs_assert_state_consistent();
+ 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+ 		switch_fpu_return();
 
