@@ -2,177 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 062DE1DE37C
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 11:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6E461DE68F
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 14:16:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728318AbgEVJtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 05:49:13 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:49090 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728249AbgEVJtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 05:49:13 -0400
-Received: from zn.tnic (p200300ec2f0d490039ac3da161697ee8.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:4900:39ac:3da1:6169:7ee8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4835B1EC02B3;
-        Fri, 22 May 2020 11:49:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1590140951;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=YorJd/UW8za62EgPzsjhTpQQFYtsUWpCAha43MJPlmY=;
-        b=OQ8IdOxfgaN59mWcAQ2EW+kyXp9W7iNleMbU9QRcSczAwRB4AoYt9bsh9oiD+jA1E5C4d7
-        qcDbGLG84wTar1XjR7laE98dvyeQ+ot7gGFjwmOumjn076xMDKLuBSpcKtbWTMdVmrD8G3
-        A3yC791s6qaS+v1C64KCSVJ4ZYb5nNE=
-Date:   Fri, 22 May 2020 11:49:04 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 44/75] x86/sev-es: Allocate and Map IST stacks for #VC
- handler
-Message-ID: <20200522094904.GB28750@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-45-joro@8bytes.org>
+        id S1728812AbgEVMQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 08:16:44 -0400
+Received: from mail.loongson.cn ([114.242.206.163]:53530 "EHLO loongson.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728475AbgEVMQo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 08:16:44 -0400
+Received: by ajax-webmail-mail.loongson.cn (Coremail) ; Fri, 22 May 2020
+ 20:16:33 +0800 (GMT+08:00)
+X-Originating-IP: [106.39.149.52]
+Date:   Fri, 22 May 2020 20:16:33 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   =?UTF-8?B?5q+b56Kn5rOi?= <maobibo@loongson.cn>
+To:     "Paolo Bonzini" <pbonzini@redhat.com>
+Cc:     "Huacai Chen" <chenhuacai@gmail.com>,
+        "Aleksandar Markovic" <aleksandar.qemu.devel@gmail.com>,
+        "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+        kvm <kvm@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        "Fuxin Zhang" <zhangfx@lemote.com>,
+        "Jiaxun Yang" <jiaxun.yang@flygoat.com>
+Subject: Re: Re: [PATCH V6 15/15] MAINTAINERS: Update KVM/MIPS maintainers
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.10a build 20191018(4c4f6d15)
+ Copyright (c) 2002-2020 www.mailtech.cn .loongson.cn
+In-Reply-To: <3269366b-7239-bb06-0bc6-cb661b9e5206@redhat.com>
+References: <1589688372-3098-1-git-send-email-chenhc@lemote.com>
+ <1589688372-3098-16-git-send-email-chenhc@lemote.com>
+ <20200517082242.GA3939@alpha.franken.de>
+ <CAHiYmc5m+UhWv__F_FKqhiTkJxgqErmFn5K_DAW2y5Pp6_4dyA@mail.gmail.com>
+ <CAHiYmc4m7uxYU0coRGJS8ou=KyjC=DYs506NyXyw_-eKmPVJRQ@mail.gmail.com>
+ <CAAhV-H4SspEUMLDTSZH3YmNbd+cRx3JK+mtsGo6cJ2NLKHPkKQ@mail.gmail.com>
+ <CAHiYmc7ykeeF_w25785yiDjJf3AwOzfJybiS=LxfjYizn_2zEQ@mail.gmail.com>
+ <23cbe8a9-21a9-93a3-79aa-8ab17818a585@redhat.com>
+ <CAAhV-H6aGkxV41ymu+HPxiSBq9uw-QhmaxFxnZYJTfUay946cg@mail.gmail.com>
+ <3269366b-7239-bb06-0bc6-cb661b9e5206@redhat.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-45-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Message-ID: <36c31c9.f74c.1723c504640.Coremail.maobibo@loongson.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: AQAAf9Axtumiwsde3dc3AA--.15581W
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/1tbiAQAECV3QvLuL-QAAsw
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dropping thellstrom@vmware.com from Cc from now on because of some
-microsloth mail rule not delivering my mails.
-
-On Tue, Apr 28, 2020 at 05:16:54PM +0200, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> Allocate and map enough stacks for the #VC handler to support sufficient
-> levels of nesting and the NMI-in-#VC scenario.
-> 
-> Also setup the IST entrys for the #VC handler on all CPUs because #VC
-
-		"entries"
-
-> needs to work before cpu_init() has set up the per-cpu TSS.
-
-Add a sentence to the commit message pointing to that "VC Handler IST
-Stacks" comment in the code explaining the justification for the need
-for IST stacks and the nesting.
-
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/include/asm/cpu_entry_area.h | 61 +++++++++++++++++++++++++++
->  arch/x86/include/asm/page_64_types.h  |  1 +
->  arch/x86/kernel/cpu/common.c          |  1 +
->  arch/x86/kernel/sev-es.c              | 40 ++++++++++++++++++
->  4 files changed, 103 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/cpu_entry_area.h b/arch/x86/include/asm/cpu_entry_area.h
-> index 02c0078d3787..85aac6c63653 100644
-> --- a/arch/x86/include/asm/cpu_entry_area.h
-> +++ b/arch/x86/include/asm/cpu_entry_area.h
-> @@ -64,6 +64,61 @@ enum exception_stack_ordering {
->  #define CEA_ESTACK_PAGES					\
->  	(sizeof(struct cea_exception_stacks) / PAGE_SIZE)
->  
-> +/*
-> + * VC Handler IST Stacks
-> + *
-> + * The IST stacks for the #VC handler are only allocated when SEV-ES is active,
-> + * so they are not part of 'struct exception_stacks'.
-> + *
-> + * The VC handler uses shift_ist so that #VC can be nested. Nesting happens for
-> + * example when the #VC handler has to call printk in the case of and error or
-
-								     "an"
-
-> + * when emulating 'movs' instructions.
-> + *
-> + * NMIs are another special case which can cause nesting of #VC handlers. The
-> + * do_nmi() code path can cause #VC, e.g. for RDPMC. An NMI can also hit in
-> + * the time window when the #VC handler is raised but before it has shifted its
-> + * IST entry. To make sure any #VC raised from the NMI code path uses a new
-> + * stack, the NMI handler unconditionally shifts the #VC handlers IST entry.
-> + * This can cause one IST stack for #VC to be omitted.
-> + *
-> + * To support sufficient levels of nesting for the #VC handler, make the number
-> + * of nesting levels configurable. It is currently set to 5 to support this
-> + * scenario:
-> + *
-> + * #VC - IST stack 4, IST entry already shifted to 3
-> + *
-> + *     -> NMI - shifts #VC IST entry to 2
-> + *
-> + *     -> #VC(RDPMC) - shifts #VC IST to 1, something goes wrong, print
-> + *                     an error message
-> + *
-> + *     -> #VC(printk) - shifts #VC IST entry to 0, output driver
-> + *                      uses 'movs'
-> + *
-> + *     -> #VC(movs) - shifts IST to unmapped stack, further #VCs will
-> + *                    cause #DF
-> + *
-> + */
-> +#define N_VC_STACKS		5
-> +
-> +#define VC_STACK_MEMBERS(guardsize, holesize)			\
-> +	char	hole[holesize];					\
-> +	struct {						\
-> +		char guard[guardsize];				\
-> +		char stack[EXCEPTION_STKSZ];			\
-> +	} stacks[N_VC_STACKS];					\
-> +	char top_guard[guardsize];				\
-> +
-> +/* Physical storage */
-> +struct vmm_exception_stacks {
-> +	VC_STACK_MEMBERS(0, 0)
-> +};
-> +
-> +/* Mapping in cpu_entry_area */
-> +struct cea_vmm_exception_stacks {
-> +	VC_STACK_MEMBERS(PAGE_SIZE, EXCEPTION_STKSZ)
-> +};
-
-All those things should be under an CONFIG_AMD_MEM_ENCRYPT ifdeffery.
-
-> +
->  #endif
->  
->  #ifdef CONFIG_X86_32
-> @@ -110,6 +165,12 @@ struct cpu_entry_area {
->  	 * Exception stacks used for IST entries with guard pages.
->  	 */
->  	struct cea_exception_stacks estacks;
-> +
-> +	/*
-> +	 * IST Exception stacks for VC handler - Only allocated and mapped when
-> +	 * SEV-ES is active.
-> +	 */
-> +	struct cea_vmm_exception_stacks vc_stacks;
-
-Ditto.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+dGhhbmsgaHVhY2FpIGZvciB0aGUgZWZmb3J0cywga3ZtIG1pcHMgaXMgY29taW5nIGJhY2sgOikK
+CgomZ3Q7IC0tLS0t5Y6f5aeL6YKu5Lu2LS0tLS0KJmd0OyDlj5Hku7bkuro6ICJQYW9sbyBCb256
+aW5pIiA8cGJvbnppbmlAcmVkaGF0LmNvbT4KJmd0OyDlj5HpgIHml7bpl7Q6IDIwMjAtMDUtMjIg
+MTU6MjQ6NDIgKOaYn+acn+S6lCkKJmd0OyDmlLbku7bkuro6ICJIdWFjYWkgQ2hlbiIgPGNoZW5o
+dWFjYWlAZ21haWwuY29tPgomZ3Q7IOaKhOmAgTogIkFsZWtzYW5kYXIgTWFya292aWMiIDxhbGVr
+c2FuZGFyLnFlbXUuZGV2ZWxAZ21haWwuY29tPiwgIlRob21hcyBCb2dlbmRvZXJmZXIiIDx0c2Jv
+Z2VuZEBhbHBoYS5mcmFua2VuLmRlPiwga3ZtIDxrdm1Admdlci5rZXJuZWwub3JnPiwgIm9wZW4g
+bGlzdDpNSVBTIiA8bGludXgtbWlwc0B2Z2VyLmtlcm5lbC5vcmc+LCAiRnV4aW4gWmhhbmciIDx6
+aGFuZ2Z4QGxlbW90ZS5jb20+LCAiSmlheHVuIFlhbmciIDxqaWF4dW4ueWFuZ0BmbHlnb2F0LmNv
+bT4KJmd0OyDkuLvpopg6IFJlOiBbUEFUQ0ggVjYgMTUvMTVdIE1BSU5UQUlORVJTOiBVcGRhdGUg
+S1ZNL01JUFMgbWFpbnRhaW5lcnMKJmd0OyAKJmd0OyBPbiAyMi8wNS8yMCAwNzozNCwgSHVhY2Fp
+IENoZW4gd3JvdGU6CiZndDsgJmd0OyZndDsgSSBhbSBnb2luZyB0byBxdWV1ZSB0aGVtIGZvciA1
+LjguCiZndDsgJmd0OyBUaGFuayB5b3UgZm9yIHlvdXIgaGVscC4gQnV0IHRoaXMgc2VyaWVzIGRl
+cGVuZHMgb24gYW4gZWFybHkgcGF0Y2gKJmd0OyAmZ3Q7IGZyb20gSmlheHVuIFlhbmcgKCJNSVBT
+OiBMb29uZ3NvbjY0OiBQcm9iZSBDUFUgZmVhdHVyZXMgdmlhIENQVUNGRyIpCiZndDsgJmd0OyB3
+aGljaCBzZWVtcyBvbmx5IGluIE1JUFMgdHJlZSBub3cuIFNvLCBtYXliZSB0aGlzIHNlcmllcyBp
+cyBiZXR0ZXIgYmUKJmd0OyAmZ3Q7IHF1ZXVlZCBpbiBUaG9tYXMncyB0cmVlPwomZ3Q7ICZndDsg
+CiZndDsgCiZndDsgVGhhdCdzIG5vdCBhIHByb2JsZW0sIEkgY2FuIGhhbmRsZSBpdCBkdXJpbmcg
+dGhlIG1lcmdlIHdpbmRvdy4gIEluIHRoZQomZ3Q7IGZ1dHVyZSBJJ2QgYXNrIGZvciBhIHRvcGlj
+IGJyYW5jaCBvciBzb21ldGhpbmcgbGlrZSB0aGF0LgomZ3Q7IAomZ3Q7IFRoYW5rcyBmb3IgYnJp
+bmdpbmcgS1ZNL01JUFMgYmFjayB0byBsaWZlLiA6KQomZ3Q7IAomZ3Q7IFBhb2xvCjwvamlheHVu
+LnlhbmdAZmx5Z29hdC5jb20+PC96aGFuZ2Z4QGxlbW90ZS5jb20+PC9saW51eC1taXBzQHZnZXIu
+a2VybmVsLm9yZz48L2t2bUB2Z2VyLmtlcm5lbC5vcmc+PC90c2JvZ2VuZEBhbHBoYS5mcmFua2Vu
+LmRlPjwvYWxla3NhbmRhci5xZW11LmRldmVsQGdtYWlsLmNvbT48L2NoZW5odWFjYWlAZ21haWwu
+Y29tPjwvcGJvbnppbmlAcmVkaGF0LmNvbT4=
