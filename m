@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C39651DDFE6
-	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 08:31:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 318411DDFEA
+	for <lists+kvm@lfdr.de>; Fri, 22 May 2020 08:31:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728636AbgEVGbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 May 2020 02:31:44 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:33810 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728371AbgEVGbo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 May 2020 02:31:44 -0400
+        id S1728667AbgEVGby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 May 2020 02:31:54 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:20749 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728593AbgEVGby (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 May 2020 02:31:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590129104; x=1621665104;
+  t=1590129112; x=1621665112;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rJzeHtcicxOU0HUoPr5xYwGnt2a0NWxVxt6g39XUl0w=;
-  b=c6EYPwLwQqZveFYxqgD+l0SmKcDZM8xMq50Yh2CB3huuZRQjGiejfCIj
-   r34UJo9TFdAJw+MW33RW7Lqyf+nZPWfmhW/Y2PtdyAPmGdBPDgo1kHEEL
-   ykFfCqz4HWvkt+m0mLFk+2p5USD47AXJhO1lM9Z5qAsj0sSOSwLkA5UJX
-   M=;
-IronPort-SDR: 6QSeRXkxjIg1mY5B2lTZcHSl4+0sPQlPsUYV0coQvY2i9k1b9auDyXyo9tzxXtchqk4lgQuZWr
- Rwq83ZnYOzEw==
+  bh=Eh/w7fDQ/t+3heysDB45hgJsudaZbKHb1B4FFyT3Zhg=;
+  b=shbGxIFeEEdvFzbC2n/0HyzNsqdfzc1a2DGOrTy0tS2Qca4RYh7HV5+8
+   Df5555fppNjrGYVODsVxnDMuStnVJ71dQZhumBK5mma9ZC3mhzsgni0Gj
+   DK6kkWNJfPuzer9tcpNcsMCC1Fn7tQOxRlF7YSO0irF2s5hqw7+M1+XmC
+   A=;
+IronPort-SDR: 8aunz0jmc81HQlFOfh6ASnGvzm/UCtnhSZ+HPYIBkRCPrXfwF4ENwawF0TtCILGUfBCI8RJcqL
+ atSYFoKHsypA==
 X-IronPort-AV: E=Sophos;i="5.73,420,1583193600"; 
-   d="scan'208";a="36944429"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-17c49630.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 22 May 2020 06:31:43 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-17c49630.us-east-1.amazon.com (Postfix) with ESMTPS id 2E52EA067A;
-        Fri, 22 May 2020 06:31:41 +0000 (UTC)
+   d="scan'208";a="31775489"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 22 May 2020 06:31:51 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id 8AABA284788;
+        Fri, 22 May 2020 06:31:49 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 22 May 2020 06:31:40 +0000
+ id 15.0.1497.2; Fri, 22 May 2020 06:31:49 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.175) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 22 May 2020 06:31:31 +0000
+ id 15.0.1497.2; Fri, 22 May 2020 06:31:40 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -55,9 +55,9 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
         <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v2 10/18] nitro_enclaves: Add logic for enclave image load metadata
-Date:   Fri, 22 May 2020 09:29:38 +0300
-Message-ID: <20200522062946.28973-11-andraprs@amazon.com>
+Subject: [PATCH v2 11/18] nitro_enclaves: Add logic for enclave memory region set
+Date:   Fri, 22 May 2020 09:29:39 +0300
+Message-ID: <20200522062946.28973-12-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200522062946.28973-1-andraprs@amazon.com>
 References: <20200522062946.28973-1-andraprs@amazon.com>
@@ -72,49 +72,292 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before setting the memory regions for the enclave, the enclave image
-needs to be placed in memory. After the memory regions are set, this
-memory cannot be used anymore by the VM, being carved out.
+Another resource that is being set for an enclave is memory. User space
+memory regions, that need to be backed by contiguous memory regions,
+are associated with the enclave.
 
-Add ioctl command logic to get the offset in enclave memory where to
-place the enclave image. Then the user space tooling copies the enclave
-image in the memory using the giveni memory offset.
+One solution for allocating / reserving contiguous memory regions, that
+is used for integration, is hugetlbfs. The user space process that is
+associated with the enclave passes to the driver these memory regions.
 
+Add ioctl command logic for setting user space memory region for an
+enclave.
+
+Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
- drivers/virt/nitro_enclaves/ne_misc_dev.c | 24 +++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ drivers/virt/nitro_enclaves/ne_misc_dev.c | 256 ++++++++++++++++++++++
+ 1 file changed, 256 insertions(+)
 
 diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-index 8cf262ac1bbc..936c9ce19213 100644
+index 936c9ce19213..a5c6185613b9 100644
 --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
 +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-@@ -295,6 +295,30 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
- 		return rc;
+@@ -240,6 +240,234 @@ static int ne_create_vcpu_ioctl(struct ne_enclave *ne_enclave, u32 vcpu_id)
+ 	return rc;
+ }
+ 
++/**
++ * ne_sanity_check_user_mem_region - Sanity check the userspace memory
++ * region received during the set user memory region ioctl call.
++ *
++ * This function gets called with the ne_enclave mutex held.
++ *
++ * @ne_enclave: private data associated with the current enclave.
++ * @mem_region: user space memory region to be sanity checked.
++ *
++ * @returns: 0 on success, negative return value on failure.
++ */
++static int ne_sanity_check_user_mem_region(struct ne_enclave *ne_enclave,
++	struct kvm_userspace_memory_region *mem_region)
++{
++	if (WARN_ON(!ne_enclave))
++		return -EINVAL;
++
++	if (!mem_region)
++		return -EINVAL;
++
++	if ((mem_region->memory_size % MIN_MEM_REGION_SIZE) != 0) {
++		pr_err_ratelimited(NE "Mem size not multiple of 2 MiB\n");
++
++		return -EINVAL;
++	}
++
++	if ((mem_region->userspace_addr & (MIN_MEM_REGION_SIZE - 1)) ||
++	    !access_ok((void __user *)(unsigned long)mem_region->userspace_addr,
++		       mem_region->memory_size)) {
++		pr_err_ratelimited(NE "Invalid user space addr range\n");
++
++		return -EINVAL;
++	}
++
++	if ((mem_region->guest_phys_addr + mem_region->memory_size) <
++	    mem_region->guest_phys_addr) {
++		pr_err_ratelimited(NE "Invalid guest phys addr range\n");
++
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++/**
++ * ne_set_user_memory_region_ioctl - Add user space memory region to the slot
++ * associated with the current enclave.
++ *
++ * This function gets called with the ne_enclave mutex held.
++ *
++ * @ne_enclave: private data associated with the current enclave.
++ * @mem_region: user space memory region to be associated with the given slot.
++ *
++ * @returns: 0 on success, negative return value on failure.
++ */
++static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
++	struct kvm_userspace_memory_region *mem_region)
++{
++	struct ne_pci_dev_cmd_reply cmd_reply = {};
++	long gup_rc = 0;
++	unsigned long i = 0;
++	struct ne_mem_region *ne_mem_region = NULL;
++	unsigned long nr_phys_contig_mem_regions = 0;
++	unsigned long nr_pinned_pages = 0;
++	struct page **phys_contig_mem_regions = NULL;
++	int rc = -EINVAL;
++	struct slot_add_mem_req slot_add_mem_req = {};
++
++	if (WARN_ON(!ne_enclave) || WARN_ON(!ne_enclave->pdev))
++		return -EINVAL;
++
++	if (!mem_region)
++		return -EINVAL;
++
++	if (ne_enclave->mm != current->mm)
++		return -EIO;
++
++	rc = ne_sanity_check_user_mem_region(ne_enclave, mem_region);
++	if (rc < 0)
++		return rc;
++
++	ne_mem_region = kzalloc(sizeof(*ne_mem_region), GFP_KERNEL);
++	if (!ne_mem_region)
++		return -ENOMEM;
++
++	/*
++	 * TODO: Update nr_pages value to handle contiguous virtual address
++	 * ranges mapped to non-contiguous physical regions. Hugetlbfs can give
++	 * 2 MiB / 1 GiB contiguous physical regions.
++	 */
++	ne_mem_region->nr_pages = mem_region->memory_size / MIN_MEM_REGION_SIZE;
++
++	ne_mem_region->pages = kcalloc(ne_mem_region->nr_pages,
++				       sizeof(*ne_mem_region->pages),
++				       GFP_KERNEL);
++	if (!ne_mem_region->pages) {
++		kzfree(ne_mem_region);
++
++		return -ENOMEM;
++	}
++
++	phys_contig_mem_regions = kcalloc(ne_mem_region->nr_pages,
++					  sizeof(*phys_contig_mem_regions),
++					  GFP_KERNEL);
++	if (!phys_contig_mem_regions) {
++		kzfree(ne_mem_region->pages);
++		kzfree(ne_mem_region);
++
++		return -ENOMEM;
++	}
++
++	/*
++	 * TODO: Handle non-contiguous memory regions received from user space.
++	 * Hugetlbfs can give 2 MiB / 1 GiB contiguous physical regions. The
++	 * virtual address space can be seen as contiguous, although it is
++	 * mapped underneath to 2 MiB / 1 GiB physical regions e.g. 8 MiB
++	 * virtual address space mapped to 4 physically contiguous regions of 2
++	 * MiB.
++	 */
++	do {
++		unsigned long tmp_nr_pages = ne_mem_region->nr_pages -
++			nr_pinned_pages;
++		struct page **tmp_pages = ne_mem_region->pages +
++			nr_pinned_pages;
++		u64 tmp_userspace_addr = mem_region->userspace_addr +
++			nr_pinned_pages * MIN_MEM_REGION_SIZE;
++
++		gup_rc = get_user_pages(tmp_userspace_addr, tmp_nr_pages,
++					FOLL_GET, tmp_pages, NULL);
++		if (gup_rc < 0) {
++			rc = gup_rc;
++
++			pr_err_ratelimited(NE "Error in gup [rc=%d]\n", rc);
++
++			unpin_user_pages(ne_mem_region->pages, nr_pinned_pages);
++
++			goto free_mem_region;
++		}
++
++		nr_pinned_pages += gup_rc;
++
++	} while (nr_pinned_pages < ne_mem_region->nr_pages);
++
++	/*
++	 * TODO: Update checks once physically contiguous regions are collected
++	 * based on the user space address and get_user_pages() results.
++	 */
++	for (i = 0; i < ne_mem_region->nr_pages; i++) {
++		if (!PageHuge(ne_mem_region->pages[i])) {
++			pr_err_ratelimited(NE "Not a hugetlbfs page\n");
++
++			goto unpin_pages;
++		}
++
++		if (huge_page_size(page_hstate(ne_mem_region->pages[i])) !=
++		    MIN_MEM_REGION_SIZE) {
++			pr_err_ratelimited(NE "The page size isn't 2 MiB\n");
++
++			goto unpin_pages;
++		}
++
++		/*
++		 * TODO: Update once handled non-contiguous memory regions
++		 * received from user space.
++		 */
++		phys_contig_mem_regions[i] = ne_mem_region->pages[i];
++	}
++
++	/*
++	 * TODO: Update once handled non-contiguous memory regions received
++	 * from user space.
++	 */
++	nr_phys_contig_mem_regions = ne_mem_region->nr_pages;
++
++	if ((ne_enclave->nr_mem_regions + nr_phys_contig_mem_regions) >
++	    ne_enclave->max_mem_regions) {
++		pr_err_ratelimited(NE "Reached max memory regions %lld\n",
++				   ne_enclave->max_mem_regions);
++
++		goto unpin_pages;
++	}
++
++	for (i = 0; i < nr_phys_contig_mem_regions; i++) {
++		u64 phys_addr = page_to_phys(phys_contig_mem_regions[i]);
++
++		slot_add_mem_req.slot_uid = ne_enclave->slot_uid;
++		slot_add_mem_req.paddr = phys_addr;
++		/*
++		 * TODO: Update memory size of physical contiguous memory
++		 * region, in case of non-contiguous memory regions received
++		 * from user space.
++		 */
++		slot_add_mem_req.size = MIN_MEM_REGION_SIZE;
++
++		rc = ne_do_request(ne_enclave->pdev, SLOT_ADD_MEM,
++				   &slot_add_mem_req, sizeof(slot_add_mem_req),
++				   &cmd_reply, sizeof(cmd_reply));
++		if (rc < 0) {
++			pr_err_ratelimited(NE "Error in slot add mem [rc=%d]\n",
++					   rc);
++
++			/* TODO: Only unpin memory regions not added. */
++			goto unpin_pages;
++		}
++
++		ne_enclave->nr_mem_regions++;
++
++		memset(&slot_add_mem_req, 0, sizeof(slot_add_mem_req));
++		memset(&cmd_reply, 0, sizeof(cmd_reply));
++	}
++
++	list_add(&ne_mem_region->mem_region_list_entry,
++		 &ne_enclave->mem_regions_list);
++
++	kzfree(phys_contig_mem_regions);
++
++	return 0;
++
++unpin_pages:
++	unpin_user_pages(ne_mem_region->pages, ne_mem_region->nr_pages);
++free_mem_region:
++	kzfree(phys_contig_mem_regions);
++	kzfree(ne_mem_region->pages);
++	kzfree(ne_mem_region);
++
++	return rc;
++}
++
+ static int ne_enclave_open(struct inode *node, struct file *file)
+ {
+ 	return 0;
+@@ -319,6 +547,34 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
+ 		return 0;
  	}
  
-+	case NE_GET_IMAGE_LOAD_METADATA: {
-+		struct image_load_metadata image_load_metadata = {};
++	case KVM_SET_USER_MEMORY_REGION: {
++		struct kvm_userspace_memory_region mem_region = {};
++		int rc = -EINVAL;
 +
-+		if (copy_from_user(&image_load_metadata, (void *)arg,
-+				   sizeof(image_load_metadata))) {
++		if (copy_from_user(&mem_region, (void *)arg,
++				   sizeof(mem_region))) {
 +			pr_err_ratelimited(NE "Error in copy from user\n");
 +
 +			return -EFAULT;
 +		}
 +
-+		/* TODO: Check flags before setting the memory offset. */
++		mutex_lock(&ne_enclave->enclave_info_mutex);
 +
-+		image_load_metadata.memory_offset = NE_IMAGE_LOAD_OFFSET;
++		if (ne_enclave->state != NE_STATE_INIT) {
++			pr_err_ratelimited(NE "Enclave isn't in init state\n");
 +
-+		if (copy_to_user((void *)arg, &image_load_metadata,
-+				 sizeof(image_load_metadata))) {
-+			pr_err_ratelimited(NE "Error in copy to user\n");
++			mutex_unlock(&ne_enclave->enclave_info_mutex);
 +
-+			return -EFAULT;
++			return -EINVAL;
 +		}
 +
-+		return 0;
++		rc = ne_set_user_memory_region_ioctl(ne_enclave, &mem_region);
++
++		mutex_unlock(&ne_enclave->enclave_info_mutex);
++
++		return rc;
 +	}
 +
  	default:
