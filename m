@@ -2,95 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E34CF1DF94F
-	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 19:25:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39CF31DFAB7
+	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 21:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388232AbgEWRZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 May 2020 13:25:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50296 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387507AbgEWRZg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 May 2020 13:25:36 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85409C061A0E;
-        Sat, 23 May 2020 10:25:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CVNRhNLnfmlc2qa/qQiHI89PDUvBGY/AKeK4xvPMuyA=; b=UCHXLaK1YXp36y/WDD9cfsgfbN
-        q54HO+/Y1Gem3JnXF8A7Qw33ZANMQEd4bL344Y8D2kBovzFVSHBVrajRPNX1KprdiEPCXgjvMujSH
-        +E4gYyfQ1olJkeMcGn1BCieZSHDIGpcBU02O+4+VWWiKGGdGQHhQifrU4wb4PR3Rp4KevpLdNl4/b
-        q4tpWZBFoEtKcjmRvPyBjQXe0C292c7A6fBUDivplEOpxv5wr464i6p5pepBW8XFCjTeDUx7BoiJ0
-        qDBwA+/cZrAFMOVCIE8YsMVccyXo2Vr0MeMI2zR76BC1CtRI7Z8J0t2Ba+9HltIw5oNOgC4VbsCsx
-        QwNAlymw==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jcXtf-0000Up-7w; Sat, 23 May 2020 17:25:19 +0000
-Date:   Sat, 23 May 2020 10:25:19 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Souptick Joarder <jrdr.linux@gmail.com>
-Cc:     paulus@ozlabs.org, mpe@ellerman.id.au, benh@kernel.crashing.org,
-        akpm@linux-foundation.org, peterz@infradead.org, mingo@redhat.com,
-        acme@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, namhyung@kernel.org,
-        pbonzini@redhat.com, sfr@canb.auug.org.au, rppt@linux.ibm.com,
-        msuchanek@suse.de, aneesh.kumar@linux.ibm.com,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        kvm@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [linux-next RFC] mm/gup.c: Convert to use
- get_user_pages_fast_only()
-Message-ID: <20200523172519.GA17206@bombadil.infradead.org>
-References: <1590252072-2793-1-git-send-email-jrdr.linux@gmail.com>
+        id S2387580AbgEWTeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 May 2020 15:34:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32388 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727962AbgEWTeY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 May 2020 15:34:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590262462;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZwVeospWQzWBd2Ckz6qsa+cBIBayXfsa3U5rcqOkNSc=;
+        b=hGBvsA05+/RATfO0md7Bm9LDTyR3azhsdHRSQPMlBDjP1KkcoNzoUNg/0P9TDANFqOkvzk
+        aXhY4rlqE7Tr9+2q/8U/ZupVNt7+tIIy8AIj86waJjniBDGF1Vl4AzRq+RnUGYm0Idg1TJ
+        iIfkZtPQAYsZDG/0AhSHno/fikS/gok=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-KV9JyzhaP62NWxxCLe-NoA-1; Sat, 23 May 2020 15:34:20 -0400
+X-MC-Unique: KV9JyzhaP62NWxxCLe-NoA-1
+Received: by mail-qk1-f197.google.com with SMTP id p5so9375409qkg.12
+        for <kvm@vger.kernel.org>; Sat, 23 May 2020 12:34:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ZwVeospWQzWBd2Ckz6qsa+cBIBayXfsa3U5rcqOkNSc=;
+        b=SdtTnYRZCPTpPR5rWjr0+pcp9O3Jp/OgIdG5M1cRs5eCKtLIuT1uCJ40ycvwPvz4lz
+         RxKEJ86Orxhl95+4ASVAbmnSP1gjaptr6fQT2P/b9hcw3m75nx1ZlMpwtRUPs/MPXG+F
+         0AYdOQ+USi4Z0tJBs7inY5ajxZJRJyxzE9Dv0mUaioY9ptvJOKj0wL4c1ldQr0zxhGd+
+         YsgPrAhUJWrAdistYfc58aIgvoLQVKMqORwzbBeis/+hSS/vDKndeY3fgZ9wvlDxA8Sx
+         xYA8NF01tEpzo+yB9N7365W8pboPQFo3CuvR4BOP2AL4Yu9sZa7gZPrVrEZnoEK62Plp
+         Qgaw==
+X-Gm-Message-State: AOAM530ZgvMIlFh7zPXR/nz73Z9V3rdnSyXmPbZSwKCNMwqZ0Qiv2PXx
+        hq5NKwLCK9kL2D/avQOkT6tZPXkMWiirGbV+NZLhTN2zb/hxYk80U/6SFXGtlNS17lUbU0EbyAc
+        eWADVWbabsq0/
+X-Received: by 2002:a37:490:: with SMTP id 138mr20187713qke.199.1590262460143;
+        Sat, 23 May 2020 12:34:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwXoWZIY0o5CFf8fx4b1C6Zs4/6XKmwWKD3ydRMLJhK+DLPOyxQZBXyhKbfchOrVAsReukLiA==
+X-Received: by 2002:a37:490:: with SMTP id 138mr20187698qke.199.1590262459865;
+        Sat, 23 May 2020 12:34:19 -0700 (PDT)
+Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
+        by smtp.gmail.com with ESMTPSA id s45sm725970qte.26.2020.05.23.12.34.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 May 2020 12:34:18 -0700 (PDT)
+Date:   Sat, 23 May 2020 15:34:17 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, jgg@ziepe.ca, cai@lca.pw
+Subject: Re: [PATCH v3 3/3] vfio-pci: Invalidate mmaps and block MMIO access
+ on disabled memory
+Message-ID: <20200523193417.GI766834@xz-x1>
+References: <159017449210.18853.15037950701494323009.stgit@gimli.home>
+ <159017506369.18853.17306023099999811263.stgit@gimli.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1590252072-2793-1-git-send-email-jrdr.linux@gmail.com>
+In-Reply-To: <159017506369.18853.17306023099999811263.stgit@gimli.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 23, 2020 at 10:11:12PM +0530, Souptick Joarder wrote:
-> Renaming the API __get_user_pages_fast() to get_user_pages_
-> fast_only() to align with pin_user_pages_fast_only().
+Hi, Alex,
 
-Please don't split a function name across lines.  That messes
-up people who are grepping for the function name in the changelog.
+On Fri, May 22, 2020 at 01:17:43PM -0600, Alex Williamson wrote:
+> @@ -1346,15 +1526,32 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+>  {
+>  	struct vm_area_struct *vma = vmf->vma;
+>  	struct vfio_pci_device *vdev = vma->vm_private_data;
+> +	vm_fault_t ret = VM_FAULT_NOPAGE;
+> +
+> +	mutex_lock(&vdev->vma_lock);
+> +	down_read(&vdev->memory_lock);
 
-> As part of this we will get rid of write parameter.
-> Instead caller will pass FOLL_WRITE to get_user_pages_fast_only().
-> This will not change any existing functionality of the API.
-> 
-> All the callers are changed to pass FOLL_WRITE.
-> 
-> Updated the documentation of the API.
+I remembered to have seen the fault() handling FAULT_FLAG_RETRY_NOWAIT at least
+in the very first version, but it's not here any more...  Could I ask what's
+the reason behind?  I probably have missed something along with the versions,
+I'm just not sure whether e.g. this would potentially block a GUP caller even
+if it's with FOLL_NOWAIT.
 
-Everything you have done here is an improvement, and I'd be happy to
-see it go in (after fixing the bug I note below).
+Side note: Another thing I thought about when reading this patch - there seems
+to have quite some possibility that the VFIO_DEVICE_PCI_HOT_RESET ioctl will
+start to return -EBUSY now.  Not a problem for this series, but maybe we should
+rememeber to let the userspace handle -EBUSY properly as follow up too, since I
+saw QEMU seemed to not handle -EBUSY for host reset path right now.
 
-But in reading through it, I noticed almost every user ...
+Thanks,
 
-> -	if (__get_user_pages_fast(hva, 1, 1, &page) == 1) {
-> +	if (get_user_pages_fast_only(hva, 1, FOLL_WRITE, &page) == 1) {
-
-passes '1' as the second parameter.  So do we want to add:
-
-static inline bool get_user_page_fast_only(unsigned long addr,
-		unsigned int gup_flags, struct page **pagep)
-{
-	return get_user_pages_fast_only(addr, 1, gup_flags, pagep) == 1;
-}
-
-> @@ -2797,10 +2803,7 @@ int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
->  	 * FOLL_FAST_ONLY is required in order to match the API description of
->  	 * this routine: no fall back to regular ("slow") GUP.
->  	 */
-> -	unsigned int gup_flags = FOLL_GET | FOLL_FAST_ONLY;
-> -
-> -	if (write)
-> -		gup_flags |= FOLL_WRITE;
-> +	gup_flags = FOLL_GET | FOLL_FAST_ONLY;
-
-Er ... gup_flags |=, surely?
+-- 
+Peter Xu
 
