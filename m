@@ -2,91 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F0421DF563
-	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 09:07:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D06A41DF5C3
+	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 09:49:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387667AbgEWHHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 May 2020 03:07:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22945 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2387661AbgEWHHu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 May 2020 03:07:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590217668;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=70hlERzGDZeQinZgjimkVAxNg2FOuupLb6i0Dut22jk=;
-        b=Gm7+ligHjUkTyq2y/ZVtyDE61d1ls8OyVaPPUYk6/RL3JmOpHSGSnjcCAt19Luzxt3Mv6Y
-        WkZUbjnp9i1OOboqXqyAZY0C0AeU9eL9nzSzwuO6wTGS7I/7o+6wKV7e7Yu1sOvzgSWPFB
-        R0HlZG5g8TuAsjgzzXgXk9U8ehdoUWQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-ev-hIIXgMaKzd-a5Nc2xQQ-1; Sat, 23 May 2020 03:07:46 -0400
-X-MC-Unique: ev-hIIXgMaKzd-a5Nc2xQQ-1
-Received: by mail-ed1-f71.google.com with SMTP id df5so4587578edb.0
-        for <kvm@vger.kernel.org>; Sat, 23 May 2020 00:07:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=70hlERzGDZeQinZgjimkVAxNg2FOuupLb6i0Dut22jk=;
-        b=fSI8fWNruD8vUpSV/INBtIzAS86/DrY9n7UNwNGqb8b4dyihGC4fj3obyQrYxj9qL7
-         XzlSoPSxWASytDI0iiaE+1tb9ybCJRlQy8hTDMIoEONC1xiqoIszyhMpgMFkk9g5V1qc
-         NN/+mY1U9lAuEEK1th1pRkpSUEgyBQhUsAbwEs+v+hF8JML0iT9xyG6xapg8WUa/5rfP
-         i/cWXaMZCsmzSQrJNWu7/02TcTvrdyE8Jb6owm6Am4xxlolNqy+O3gtIL8E8jWtSdwno
-         WMRlDEo1TwiQp9DWjo1E9MJBcG1rP8CQrkM4qM096RVkdqJUAdZsKk8N0q3dhJi6/Dxp
-         XsUA==
-X-Gm-Message-State: AOAM531OHbsQAQov/kbF/Y4YG5CeuWlDXzs+8ZBbvJXk9Ta9x1V/Pp9r
-        Kq+6tHLoczZGvRIa2Xjg7L1N4kM8GoDqi2rdTwzDxl0ifcFSHtu4+/5Ux8LoRojOmvTnXfCF6MU
-        Io2F8JQi7sG7E
-X-Received: by 2002:a17:906:81c6:: with SMTP id e6mr10809922ejx.241.1590217665095;
-        Sat, 23 May 2020 00:07:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyK4WzufDbtJf0j428CvNaKQEncvtUDgK8bDXpnzoSoQlHZuzzWxyPxlBZ5a9UE6y9mz/wF1Q==
-X-Received: by 2002:a17:906:81c6:: with SMTP id e6mr10809903ejx.241.1590217664779;
-        Sat, 23 May 2020 00:07:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:803:ce64:3f04:d540? ([2001:b07:6468:f312:803:ce64:3f04:d540])
-        by smtp.gmail.com with ESMTPSA id s17sm9575061edr.84.2020.05.23.00.07.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 23 May 2020 00:07:44 -0700 (PDT)
-Subject: Re: [PATCH 21/24] KVM: x86: always update CR3 in VMCB
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, Joerg Roedel <jroedel@suse.de>
-References: <20200520172145.23284-1-pbonzini@redhat.com>
- <20200520172145.23284-22-pbonzini@redhat.com>
- <20200520182202.GB18102@linux.intel.com>
- <d85c2e1d-93b3-186d-7df4-80ae6aa03618@redhat.com>
- <20200522224711.GF25128@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <31e88353-e073-83b3-2e56-6a8e85746d7c@redhat.com>
-Date:   Sat, 23 May 2020 09:07:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S2387723AbgEWHtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 May 2020 03:49:17 -0400
+Received: from new4-smtp.messagingengine.com ([66.111.4.230]:49965 "EHLO
+        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387500AbgEWHtR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 23 May 2020 03:49:17 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 9E9535800E8;
+        Sat, 23 May 2020 03:49:15 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Sat, 23 May 2020 03:49:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=HYzvmvyhCdDCgy2Up0L8kyIQNh0
+        GHJNZlq1iXsF1dWk=; b=naczRbjRRQYoLQwrtOlHT4O/toqGfVrcKqQ+mrDqEX1
+        A3bZsj6fd7/9bZH6tHoMVzUleCUxr4qAVQU994l+tHR2H7EqOrpBQog0Lkuk09pH
+        rxjGk5JLBLiA/ZXd6SVbzUNaF6OGHRltWaxoi4ayjKDvmhcnjOb6T6B79XDGD1Yp
+        c4KrQb/hBB6BXI+bmjegSmZf5+d/h92AFsQkX1o4Cwy+oVMvsg99XDHEaPLPGbKN
+        BcsFvHZ01RBalHLVxrCZlnFUGBjKHEuGYG1gOXm+eX4T+f/dGBA8EO4Keato214D
+        QYGxK92x1rGodA+OgEGkNeOQcK9e+X6slCK851PWgig==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=HYzvmv
+        yhCdDCgy2Up0L8kyIQNh0GHJNZlq1iXsF1dWk=; b=a1JDGcSIF60I70XD+vtvfN
+        M0XoiqqFIjOLkTIBpuwuiFOVtN3A66HN8vDd8LrYNGxj8Mp6CuPPudBPLnWz19hr
+        mCK+onEVk2UCfKYCGntHRrh5UZpOGuDWu+cyMKdaQCJHfzWdHmL6cqokfZeEKU5H
+        0C/S4BNR0hZHbMMTSDykfxW1TGVJ6aBAWKwwDtBAW2T0r3ioUImNBWA7VkaSJTB2
+        vO7RD3eHSKdn/FKiJ6MN+LOpOe9X3+u+lo/Z7OeTNzI1FzxwA+gWfe7Qr58yPWhN
+        B+2PIAURvIxaxu56bG8nJo7Cp4u5eap/iO+XHl1QFfDljozyNO6YIcZXM2juw/3Q
+        ==
+X-ME-Sender: <xms:dtXIXkkUQwLyf7bLgRPA2mYvGdXHW2muFPf7U0Lls3RoVj5YzanFoQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedruddugedguddvtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
+    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuhe
+    ejgfffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecukfhppeek
+    fedrkeeirdekledruddtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
+X-ME-Proxy: <xmx:dtXIXj1VC4RADb62e_BokGosqZPXVmkrpX1zHvEuf7K88SPn1-N08g>
+    <xmx:dtXIXipxBNnQQaoYtMTHHVIifjmYyu1_8hE7aMLU7AAZ_nuoCVHppA>
+    <xmx:dtXIXglXK2j5Nw8E2d2C9xcQ-o1N4uwgFY-APhmsr9UWQsNMDsjRfA>
+    <xmx:e9XIXvAhgaFwAyW2LMzLbyZzJdDDO6J7ctdmt5Np1E6vAH_sgxgFxA>
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 9563B328005A;
+        Sat, 23 May 2020 03:49:09 -0400 (EDT)
+Date:   Sat, 23 May 2020 09:49:08 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        hpa@zytor.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, stable@vger.kernel.org,
+        x86@kernel.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, dave.hansen@linux.intel.com,
+        luto@kernel.org, peterz@infradead.org, mchehab+samsung@kernel.org,
+        changbin.du@intel.com, namit@vmware.com, bigeasy@linutronix.de,
+        yang.shi@linux.alibaba.com, asteinhauser@google.com,
+        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
+        akpm@linux-foundation.org, steven.price@arm.com,
+        rppt@linux.vnet.ibm.com, peterx@redhat.com,
+        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
+        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
+        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
+        jgross@suse.com, andrew.cooper3@citrix.com,
+        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
+        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
+        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 5.4] KVM: x86: Fix pkru save/restore when guest
+ CR4.PKE=0, move it to x86.c
+Message-ID: <20200523074908.GA3285051@kroah.com>
+References: <159016509437.3131.17229420966309596602.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20200522224711.GF25128@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <159016509437.3131.17229420966309596602.stgit@naples-babu.amd.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/05/20 00:47, Sean Christopherson wrote:
-> On Wed, May 20, 2020 at 10:14:47PM +0200, Paolo Bonzini wrote:
->> This patch should probably be split too, so that the Fixes tags are
->> separate for Intel and AMD.
+On Fri, May 22, 2020 at 11:32:49AM -0500, Babu Moger wrote:
+> [Backported upstream commit 37486135d3a7b03acc7755b63627a130437f066a]
 > 
-> That would be nice.
+> Though rdpkru and wrpkru are contingent upon CR4.PKE, the PKRU
+> resource isn't. It can be read with XSAVE and written with XRSTOR.
+> So, if we don't set the guest PKRU value here(kvm_load_guest_xsave_state),
+> the guest can read the host value.
+> 
+> In case of kvm_load_host_xsave_state, guest with CR4.PKE clear could
+> potentially use XRSTOR to change the host PKRU value.
+> 
+> While at it, move pkru state save/restore to common code and the
+> host_pkru field to kvm_vcpu_arch.  This will let SVM support protection keys.
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Will do.  Anyway this series will be quite different in v2, and there
-will be a couple more changes to common code to avoid repeated calls to
-kvm_cpu_has_injectable_intr (because on AMD I'd like to avoid
-unnecessary calls to enable_irq_window, it is already complicated enough
-without those).
+Now applied, thanks.
 
-Paolo
-
+greg k-h
