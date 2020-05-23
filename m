@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6D6C1DF5D0
-	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 09:58:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 423891DF5D8
+	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 09:59:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387690AbgEWH67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 May 2020 03:58:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46950 "EHLO
+        id S2387761AbgEWH7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 May 2020 03:59:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387498AbgEWH66 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 May 2020 03:58:58 -0400
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5766CC061A0E;
-        Sat, 23 May 2020 00:58:58 -0700 (PDT)
-Received: by mail-pg1-x541.google.com with SMTP id f6so6100906pgm.1;
-        Sat, 23 May 2020 00:58:58 -0700 (PDT)
+        with ESMTP id S2387757AbgEWH7f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 May 2020 03:59:35 -0400
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2701DC061A0E;
+        Sat, 23 May 2020 00:59:35 -0700 (PDT)
+Received: by mail-pg1-x542.google.com with SMTP id r10so6073746pgv.8;
+        Sat, 23 May 2020 00:59:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=f7usDonl/A5hTv3suUOh3tWmU05gvgnEmUa40fjrCvs=;
-        b=Uph2LgoHB1cXB/WhCHVwFu8A7WUEzzlelXQTXXM0hUTIA0SPMgboZ43xKE0dRMR/yl
-         PZT8eZrChZxp8yrag9eta1RsR25P9IpNw/gPXKH73HvI+mwFlajrLuqJZ493jHuapog4
-         kmafZ48sSlnGb+Q3yWoDeO+4VSHU8+mR36Y3t6+1g7+1+hVISSSpv8yPI0IVPhOg7zGg
-         vniMaGsMfRQPldlMsq6muQP+RN0sWlIcBITPHaqtNJHQwneDwNTdL4/kJ9M4LGy6bWwQ
-         WnxXuRabArkV1hbw95Gu+H0j6cOUvZG9NaLQavdZYHQeKU4JqZey/acVRXOmemA4cY8S
-         za0A==
+        bh=G0AgtVhRiXtYv7GiuMfsQdi40RXSl8uWCB+fvVpYccA=;
+        b=p/3vzLeD1Eq6+PCWIoaBLN9WHs//yRmi84gC7OqorDbVlURYuprWvgEVs4B1jeQ+i1
+         pnfJa9S1UqrOM/XZVeEU/yloRbyfRpGlZTaUhDst7IcxRl5VxpJWuPGt/R9lgsytJ4Ao
+         Ic5n0EKUBRR1LQSb42qMHPZ6IouwN1QGM2j1MjfUQ39oVFt+Hahc9V9hF45FnYHOLE1r
+         UtwibU8qgVQ2/JaZq+hd+N0F9DO9g/tksF5hQzEUD4mT0hoVAQ4mGEfj6GfCU9kaMMBA
+         OOpLdbTocuvp4eAATjMaB4uXsaVmLWCSqkqjSpfKNEcN7swBykt0VWJHBzlqHtRyzlSg
+         8Bug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=f7usDonl/A5hTv3suUOh3tWmU05gvgnEmUa40fjrCvs=;
-        b=Rf/AWp/FczBKo0+zmsRyDa/3hVlokTdMuxoHgEG7ye/rlqp6GYZilH/a19uzaXzs/H
-         aVp2PwwHTvipkzGb5yLVUSgt6YgE60KtS07BzzskA8/HitMdkrFv0RMMGv/3pqZaIK2D
-         nxUWSbfPKDx0FYdGVABVz6J4Sx67dTiIidkRbVB5Fk26ZNjyIZ8L73HwGokC33tsHF46
-         T/ti1qYkEvNgL1wD+sJrhkuEfsIqHN/JbcMVpBJdG4GJYCEGxxcgG4xHJfIgERC7gq2G
-         DX9oTLr1YeyzjkGbrTXvubwX9VIpJioZKJIKlRTCi1zIcOBEF1bi/1x/mkJkQl+Oy9nq
-         6FLg==
-X-Gm-Message-State: AOAM532nCcatxYhsbQ0kAV5aR0VyikH2IQyAcJugNBvF7tALn6Q3Lgxy
-        RKOkjD0fbYITGjrZ0okcfBE=
-X-Google-Smtp-Source: ABdhPJylAvBCwBzjO61OAlyLaKhgpUctSmazm0GF9zxWlwr6mwBApGf+CQOCoWzq6oRvftpnsewdgA==
-X-Received: by 2002:a65:51c7:: with SMTP id i7mr17440612pgq.382.1590220737933;
-        Sat, 23 May 2020 00:58:57 -0700 (PDT)
+        bh=G0AgtVhRiXtYv7GiuMfsQdi40RXSl8uWCB+fvVpYccA=;
+        b=aLYvMo2dw8KrCzilEhEE3UkCFKnUZ2HE3ps9bOeScZ1IH4u7sJ2VwGagcMe+zyv3ud
+         5c7yCfVlJDpdjgFblBqhAC8hoimqv3g139WSVrdGBr/b47DVBE9oVRCWNd+btO4ZtGhy
+         DIQRNx8AUovrxftySe+MBB9PrPJlJbVBZRBmLPycJblL7DSsNaK6BcqKBsWSeiWDvjsp
+         mXCCbsnwvxic/U1K1A7OnmYUvjWlTTMngH+MT/VVsu4PCCXqQKnm3WCqKXtCCUjdeADF
+         5C3060G9cEknpHBMXgV6MQoeOYM8m2UoWJmzs5sxAwwLkGO+vhGtdHj+VNjhSWf7BUk8
+         DP5Q==
+X-Gm-Message-State: AOAM531AwiXpuXwFNoG4B5WLmPiMG7m8NcLUgQlTHecBX7NbR1CWpAeJ
+        H6sUrCjwCsO65DLkmhXa+hw=
+X-Google-Smtp-Source: ABdhPJxxrgkHUeTcV7mcDYrRSwHeV9p5YanRsNfT41AqEAxpZ9S5pc0uYxtf71V0SNxUMb4Z1WkZ7w==
+X-Received: by 2002:a63:5fc8:: with SMTP id t191mr17162323pgb.185.1590220774766;
+        Sat, 23 May 2020 00:59:34 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com. [34.92.144.28])
-        by smtp.gmail.com with ESMTPSA id w7sm678491pfu.117.2020.05.23.00.58.55
+        by smtp.gmail.com with ESMTPSA id w7sm678491pfu.117.2020.05.23.00.59.32
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 23 May 2020 00:58:57 -0700 (PDT)
+        Sat, 23 May 2020 00:59:34 -0700 (PDT)
 From:   Huacai Chen <chenhc@lemote.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
@@ -55,9 +55,9 @@ Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
         Huacai Chen <chenhuacai@gmail.com>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
         Huacai Chen <chenhc@lemote.com>
-Subject: [PATCH V7 04/15] KVM: MIPS: Add EVENTFD support which is needed by VHOST
-Date:   Sat, 23 May 2020 15:56:31 +0800
-Message-Id: <1590220602-3547-5-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V7 05/15] KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
+Date:   Sat, 23 May 2020 15:56:32 +0800
+Message-Id: <1590220602-3547-6-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1590220602-3547-1-git-send-email-chenhc@lemote.com>
 References: <1590220602-3547-1-git-send-email-chenhc@lemote.com>
@@ -66,72 +66,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add EVENTFD support for KVM/MIPS, which is needed by VHOST. Tested on
-Loongson-3 platform.
+Loongson-3 can use lddir/ldpte instuctions to accelerate page table
+walking, so use them to lookup gpa_mm.pgd.
 
 Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/kvm/Kconfig     | 1 +
- arch/mips/kvm/Makefile    | 2 +-
- arch/mips/kvm/trap_emul.c | 3 +++
- arch/mips/kvm/vz.c        | 3 +++
- 4 files changed, 8 insertions(+), 1 deletion(-)
+ arch/mips/kvm/entry.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
-index b91d145..d697752 100644
---- a/arch/mips/kvm/Kconfig
-+++ b/arch/mips/kvm/Kconfig
-@@ -22,6 +22,7 @@ config KVM
- 	select EXPORT_UASM
- 	select PREEMPT_NOTIFIERS
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-+	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
- 	select KVM_MMIO
- 	select MMU_NOTIFIER
-diff --git a/arch/mips/kvm/Makefile b/arch/mips/kvm/Makefile
-index 01affc1..0a3cef6 100644
---- a/arch/mips/kvm/Makefile
-+++ b/arch/mips/kvm/Makefile
-@@ -2,7 +2,7 @@
- # Makefile for KVM support for MIPS
- #
+diff --git a/arch/mips/kvm/entry.c b/arch/mips/kvm/entry.c
+index 16e1c93..fd71694 100644
+--- a/arch/mips/kvm/entry.c
++++ b/arch/mips/kvm/entry.c
+@@ -56,6 +56,7 @@
+ #define C0_BADVADDR	8, 0
+ #define C0_BADINSTR	8, 1
+ #define C0_BADINSTRP	8, 2
++#define C0_PGD		9, 7
+ #define C0_ENTRYHI	10, 0
+ #define C0_GUESTCTL1	10, 4
+ #define C0_STATUS	12, 0
+@@ -307,7 +308,10 @@ static void *kvm_mips_build_enter_guest(void *addr)
  
--common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
-+common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o eventfd.o)
+ #ifdef CONFIG_KVM_MIPS_VZ
+ 	/* Save normal linux process pgd (VZ guarantees pgd_reg is set) */
+-	UASM_i_MFC0(&p, K0, c0_kscratch(), pgd_reg);
++	if (cpu_has_ldpte)
++		UASM_i_MFC0(&p, K0, C0_PWBASE);
++	else
++		UASM_i_MFC0(&p, K0, c0_kscratch(), pgd_reg);
+ 	UASM_i_SW(&p, K0, offsetof(struct kvm_vcpu_arch, host_pgd), K1);
  
- EXTRA_CFLAGS += -Ivirt/kvm -Iarch/mips/kvm
+ 	/*
+@@ -469,8 +473,10 @@ void *kvm_mips_build_tlb_refill_exception(void *addr, void *handler)
+ 	u32 *p = addr;
+ 	struct uasm_label labels[2];
+ 	struct uasm_reloc relocs[2];
++#ifndef CONFIG_CPU_LOONGSON64
+ 	struct uasm_label *l = labels;
+ 	struct uasm_reloc *r = relocs;
++#endif
  
-diff --git a/arch/mips/kvm/trap_emul.c b/arch/mips/kvm/trap_emul.c
-index 5a11e83..f464506b 100644
---- a/arch/mips/kvm/trap_emul.c
-+++ b/arch/mips/kvm/trap_emul.c
-@@ -529,6 +529,9 @@ static int kvm_trap_emul_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MIPS_TE:
- 		r = 1;
- 		break;
-+	case KVM_CAP_IOEVENTFD:
-+		r = 1;
-+		break;
- 	default:
- 		r = 0;
- 		break;
-diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-index dde2088..17932ab 100644
---- a/arch/mips/kvm/vz.c
-+++ b/arch/mips/kvm/vz.c
-@@ -2927,6 +2927,9 @@ static int kvm_vz_check_extension(struct kvm *kvm, long ext)
- 		r = 2;
- 		break;
- #endif
-+	case KVM_CAP_IOEVENTFD:
-+		r = 1;
-+		break;
- 	default:
- 		r = 0;
- 		break;
+ 	memset(labels, 0, sizeof(labels));
+ 	memset(relocs, 0, sizeof(relocs));
+@@ -490,6 +496,16 @@ void *kvm_mips_build_tlb_refill_exception(void *addr, void *handler)
+ 	 */
+ 	preempt_disable();
+ 
++#ifdef CONFIG_CPU_LOONGSON64
++	UASM_i_MFC0(&p, K1, C0_PGD);
++	uasm_i_lddir(&p, K0, K1, 3);  /* global page dir */
++#ifndef __PAGETABLE_PMD_FOLDED
++	uasm_i_lddir(&p, K1, K0, 1);  /* middle page dir */
++#endif
++	uasm_i_ldpte(&p, K1, 0);      /* even */
++	uasm_i_ldpte(&p, K1, 1);      /* odd */
++	uasm_i_tlbwr(&p);
++#else
+ 	/*
+ 	 * Now for the actual refill bit. A lot of this can be common with the
+ 	 * Linux TLB refill handler, however we don't need to handle so many
+@@ -512,6 +528,7 @@ void *kvm_mips_build_tlb_refill_exception(void *addr, void *handler)
+ 	build_get_ptep(&p, K0, K1);
+ 	build_update_entries(&p, K0, K1);
+ 	build_tlb_write_entry(&p, &l, &r, tlb_random);
++#endif
+ 
+ 	preempt_enable();
+ 
 -- 
 2.7.0
 
