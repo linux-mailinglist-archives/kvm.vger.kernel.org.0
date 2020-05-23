@@ -2,116 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EB651DF5D6
-	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 09:59:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F3AE1DF601
+	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 10:20:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387748AbgEWH7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 May 2020 03:59:32 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:57804 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387627AbgEWH7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 May 2020 03:59:31 -0400
-Received: from zn.tnic (p200300ec2f1b96004c59f332ede330a0.dip0.t-ipconnect.de [IPv6:2003:ec:2f1b:9600:4c59:f332:ede3:30a0])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 215841EC0338;
-        Sat, 23 May 2020 09:59:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1590220770;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=PIo+t2JcI6yVRedmlgz10X421O+M066c0hltaVL112k=;
-        b=ZLEXWPqMrm4G0DwJpbs8Xgi9xF4kgV5KjgjmvT9VK9gOBCLZtVjao6/GkCbl6+4X+V5fwU
-        RC9EWJFZV06I1nR899eptspZxrdViE5apbzfahsF0PgTl3LX1V8HCCJUtgslfPsCUj9YUS
-        /PGarM2WPPCDvyJoyVnqQyWd5w4+ROU=
-Date:   Sat, 23 May 2020 09:59:24 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 47/75] x86/sev-es: Add Runtime #VC Exception Handler
-Message-ID: <20200523075924.GB27431@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-48-joro@8bytes.org>
+        id S2387498AbgEWIUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 May 2020 04:20:22 -0400
+Received: from sonic305-1.consmr.mail.bf2.yahoo.com ([74.6.133.40]:43434 "EHLO
+        sonic305-1.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387471AbgEWIUV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 23 May 2020 04:20:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1590222020; bh=0kmsqXm9K+DyM/96L3DJNmWOe4qYy8f9mpn5lMuhelM=; h=Date:From:Reply-To:Subject:References:From:Subject; b=adc9omJJvak4rJeuKAd/rumUfBEcJTp2UoasSTkMpnn3kWJafSxCvDliqxR+X6Z36tf+HfZEEWuks0Uh75HxqbGxOp4cFPgqYOZJPfCfXeZJbHuacMqd3ypOuSlS9QvcKwKNof/XypGg0adys0TkJje2tDWstJJhhyFjnbtnx8ln1DYVAFF24t3rNefpiEy9BEO7dZmPVxEfwOnxT4kwD1qg/YLn1re9zQLJcvgJ6urBf3ROEoSt+BYeLAsxSa2eWmQHGntfxMhCWmliYpajW3mbQpiByA4Inv7MyQZRBf7gmpNnfgvI6Qacd+8u8eX/ck1l3vM3NLXf9VV4XkNp2A==
+X-YMail-OSG: 5HXfBkgVM1lddSPXBjMiVqtZJEPUQXWGEPPmBJPtf7vMvvNcGLmCTMBBSwrW454
+ jgA0pb0n4jIrD1uFidcohXuKh9DYS7smcTkrmRpKziZckD2f0YPsytNy8XRCa.4QOyg5sW2sgI67
+ RhJjqUL8PCF2PV1O8FsYnfJX2hyaZpfC_3E1_CWr6eG8JNUkFpW_7hD0IvnyU_P_aKeZ0klVRD7d
+ NuXIdayu_cC0jx3WeWVW00q9A2FvcMgb4Gb5cahpx5k9TGtKGIDebz.CJ.S.HjS_Mov1uxM5xkF1
+ E7itNUo6CdqakY4gyWTYKoh2nBuikL9xV6AQqGoWBMdi9VgFG4Sv3q2CELl4d_dwIZwQeMMFs0Jd
+ UmfDrNgGliKu96Vr3BhSic8eSb1r6uaqapGuzbnHImd086RGbdy3MfTDTAL3Dc54CgZBKcnY6b4Z
+ kKChFZyCuK3c5ZnUMeYP0nZZPjXNa8zLOrsa_fzJWtSfU8Eo5SPzi3LwxfSBMfZqKtHaeU4TsXW5
+ qVl9aHYFju.BrHlEAdSb7FIvTeFJcu94Be22Yk8ZTTCJQ1FKh5gOLK2EmbpIOLOyix27gIRBf.cI
+ sYMVhsAP20hT4.CYXzPD9P57EcsBJCNE1TAGj2fpbSqXKVxW4v_JnQXJX4PKuk8D2vDyyGWzMzpj
+ buHkYzoA_AyhckY1CIz1TuRPwjT4B5jvbygLw7.cLaverNouX61ba_IH1j4sQ.2yEW_z2KqPjdr.
+ zRLxJlwZNXmJwaZ_O49q8Rw1ZFjc758rkuJMVJq67gJPOj309l8btDXlfa2SF6YedKGkGHs8T1kZ
+ fYy73bOXwfBEqzREL9iutFp0VTGcktavQt21kvxomV5CzQstLeMm31eAhjbqia9LOZLO29HbNhxx
+ qj_mPk5YUm6oC9VNdDjmVslC6itrh6NXIYhs3n0E0yS4W_iD7QjEH3UBdf3e8O0dhFngWMJqiJ60
+ JO1sEO5eC2vux_Kl1SoHG3M7jG5qUiSAlbouQiNky3MgtAc1WMJCSoHeGGj7Bn3TJQbExj6feYta
+ dsIF2SNE8dMv2x.hGyrNvidXpO0LA7xPOwNRToKbyIv7sZLTMVtUasS8cMPOh7pXRrRH3cfxM1C5
+ 9NgxkI4IdyuJrvKHaN1OU2E3SSh7d9L9pLoFZwoQqnjmydnb5sJv_JURwfe_VLEQKfZ_3micuWxW
+ tuzrKcFHIwxere1Oiida1ZxtODsgHsN2rD6ZC8F4nY9Q4on3hxnrvWldBUvHuG589Z7jbEuDaKFE
+ 1uCAClKvJjdyu0j5iiEAPxs7LkEAJL.ufMiOndnecABDzkVqmv80wCVKE8tx.My8A8LXCXbsbnUQ
+ Iu_MH0ZmtZ.ShozGsT7SI1DrD3nAhOL3fLnRy6_Gjl74QsU.tcOKbRM7NzzPiADiZgRL4kA--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic305.consmr.mail.bf2.yahoo.com with HTTP; Sat, 23 May 2020 08:20:20 +0000
+Date:   Sat, 23 May 2020 08:20:19 +0000 (UTC)
+From:   Mrs Doris Laboso <mrabraham.abrahim@gmail.com>
+Reply-To: mrsdoris.laboso1@gmail.com
+Message-ID: <218752893.2520168.1590222019676@mail.yahoo.com>
+Subject: Good day
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-48-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+References: <218752893.2520168.1590222019676.ref@mail.yahoo.com>
+X-Mailer: WebService/1.1.15960 YMailNodin Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:16:57PM +0200, Joerg Roedel wrote:
-> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-> index a4fa7f351bf2..bc3a58427028 100644
-> --- a/arch/x86/kernel/sev-es.c
-> +++ b/arch/x86/kernel/sev-es.c
-> @@ -10,6 +10,7 @@
->  #include <linux/sched/debug.h>	/* For show_regs() */
->  #include <linux/percpu-defs.h>
->  #include <linux/mem_encrypt.h>
-> +#include <linux/lockdep.h>
->  #include <linux/printk.h>
->  #include <linux/mm_types.h>
->  #include <linux/set_memory.h>
-> @@ -25,7 +26,7 @@
->  #include <asm/insn-eval.h>
->  #include <asm/fpu/internal.h>
->  #include <asm/processor.h>
-> -#include <asm/trap_defs.h>
-> +#include <asm/traps.h>
->  #include <asm/svm.h>
->  
->  /* For early boot hypervisor communication in SEV-ES enabled guests */
-> @@ -46,10 +47,26 @@ struct sev_es_runtime_data {
->  
->  	/* Physical storage for the per-cpu IST stacks of the #VC handler */
->  	struct vmm_exception_stacks vc_stacks __aligned(PAGE_SIZE);
-> +
-> +	/* Reserve on page per CPU as backup storage for the unencrypted GHCB */
+Good day and God bless you as you read this massage, I am by name Doris  La=
+boso am 27 years old girl from Kenya, yes my Mother was Late Mrs. Lorna Lab=
+oso the former Kenyan Assistant Minister of Home and affairs who was among =
+the plan that crash on board in the remote area of Kalong=E2=80=99s western=
+ Kenya Read more about the crash with the below web site
 
-		  one
+http://edition.cnn.com/2008/WORLD/africa/06/10/kenya.crash/index.html I am =
+constrained to contact you because of the maltreatment I am receiving from =
+my step mother. She planned to take away all my late mothers treasury and p=
+roperties from me since the unexpected death of my beloved mother. One day =
+I opened my mother brave case and secretly found out that my mother deposit=
+ed the sum of $ 27.5 million in BOA bank Burkina Faso with my name as the n=
+ext of kin, then I visited Burkina Faso to withdraw the money and take care=
+ of myself and start a new life, on my arrival the Bank Director whom I mee=
+t in person Mr. Batish Zongo told me that my mother left an instruction to =
+the bank, that the money should be release to me only when I am married or =
+I present a trustee who will help me and invest the money overseas.
 
-> +	struct ghcb backup_ghcb;
+That is the reason why I am in search of a honest and reliable person who w=
+ill help me and stand as my trustee for the Bank to transfer the money to h=
+is account for me to come over and join you. It will be my great pleasure t=
+o compensate you with 30% of the money for your help and the balance shall =
+be my capital with your kind idea for me to invest under your control over =
+there in your country.
 
-I could use some text explaining what those backups are for?
+As soon as I receive your positive response showing your interest I will se=
+nd you my picture's in my next mail and death certificate of my Mon and how=
+ you will receive the money in your account.
 
-> +	/*
-> +	 * Mark the per-cpu GHCBs as in-use to detect nested #VC exceptions.
-> +	 * There is no need for it to be atomic, because nothing is written to
-> +	 * the GHCB between the read and the write of ghcb_active. So it is safe
-> +	 * to use it when a nested #VC exception happens before the write.
-> +	 */
-
-Looks liks that is that text... support for nested #VC exceptions.
-I'm sure this has come up already but why do we even want to support
-nested #VCs? IOW, can we do without them first or are they absolutely
-necessary?
-
-I'm guessing VC exceptions inside the VC handler but what are the
-sensible use cases?
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks and God bless you
+Sincerely Doris Laboso =20
