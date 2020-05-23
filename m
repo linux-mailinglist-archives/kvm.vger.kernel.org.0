@@ -2,36 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2331D1DF826
-	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 18:15:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3F971DF829
+	for <lists+kvm@lfdr.de>; Sat, 23 May 2020 18:15:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbgEWQPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 May 2020 12:15:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51487 "EHLO
+        id S1728137AbgEWQPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 May 2020 12:15:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47355 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726338AbgEWQPG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 May 2020 12:15:06 -0400
+        with ESMTP id S1728025AbgEWQPW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 May 2020 12:15:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590250505;
+        s=mimecast20190719; t=1590250521;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=L8j7T0o/S5OaFe2c9p53BQS8VJwyJfs8YmL4K/O2KYU=;
-        b=F2sZjVZiCp7J+ruyAvDDd34owqxa5j/L1vk+2aAOwS/+QTO0bSuqn+RX/GZNt1IjzZ3JxR
-        eFU16FVv0R5LKHl9fd2eVWRWKSlNbWfQxKsCGPu+V8DqsR57+sOxMiYV+4sZUvPmmIUyck
-        SAA0dC9i/Z3DGi+dymvI+18vLcffOHk=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ytf9W2kex3b56H4BEKOUukloGENtrEZz4KuH9AmMNpQ=;
+        b=g+cyEwquQ4ytNWuON3C3BagDVPR1LyAEYlnBJBg5tR8fo9+8F69pmhuu6BiaH4Im7RIW6c
+        mXgpwhfYeWkaJRLzK4QVuoqPiSeMC6w49sQBszRTYtWI2LNAH3SlXi/tdHMSYoy9YPSZlB
+        uop49GSr00Kuwl3njyfgPsdBZJbfp9E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-WRTp-SYzNFCw-fza1ty5uA-1; Sat, 23 May 2020 12:15:03 -0400
-X-MC-Unique: WRTp-SYzNFCw-fza1ty5uA-1
+ us-mta-85-3rESmGjfPumnQqjegbACfQ-1; Sat, 23 May 2020 12:15:17 -0400
+X-MC-Unique: 3rESmGjfPumnQqjegbACfQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AFFB107ACCD;
-        Sat, 23 May 2020 16:15:01 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EBCF107ACCA;
+        Sat, 23 May 2020 16:15:15 +0000 (UTC)
 Received: from starship.f32vm (unknown [10.35.206.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DC61F6E716;
-        Sat, 23 May 2020 16:14:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2DD6B600E5;
+        Sat, 23 May 2020 16:15:01 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -47,51 +48,49 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jingqi Liu <jingqi.liu@intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 0/2] Fix issue with not starting nesting guests on my system
-Date:   Sat, 23 May 2020 19:14:53 +0300
-Message-Id: <20200523161455.3940-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH 1/2] kvm/x86/vmx: enable X86_FEATURE_WAITPKG in KVM capabilities
+Date:   Sat, 23 May 2020 19:14:54 +0300
+Message-Id: <20200523161455.3940-2-mlevitsk@redhat.com>
+In-Reply-To: <20200523161455.3940-1-mlevitsk@redhat.com>
+References: <20200523161455.3940-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On my AMD machine I noticed that I can't start any nested guests,=0D
-because nested KVM (everything from master git branches) complains=0D
-that it can't find msr MSR_IA32_UMWAIT_CONTROL which my system doesn't supp=
-ort=0D
-at all anyway.=0D
-=0D
-I traced it to the recently added UMWAIT support to qemu and kvm.=0D
-The kvm portion exposed the new MSR in KVM_GET_MSR_INDEX_LIST without=0D
-checking that it the underlying feature is supported in CPUID.=0D
-It happened to work when non nested because as a precation kvm,=0D
-tries to read each MSR on host before adding it to that list,=0D
-and when read gets a #GP it ignores it.=0D
-=0D
-When running nested, the L1 hypervisor can be set to ignore unknown=0D
-msr read/writes (I need this for some other guests), thus this safety=0D
-check doesn't work anymore.=0D
-=0D
-V2: * added a patch to setup correctly the X86_FEATURE_WAITPKG kvm capabili=
-ty=0D
-    * dropped the cosmetic fix patch as it is now fixed in kvm/queue=0D
-=0D
-Best regards,=0D
-	Maxim Levitsky=0D
-=0D
-Maxim Levitsky (2):=0D
-  kvm/x86/vmx: enable X86_FEATURE_WAITPKG in KVM capabilities=0D
-  kvm/x86: don't expose MSR_IA32_UMWAIT_CONTROL unconditionally=0D
-=0D
- arch/x86/kvm/vmx/vmx.c | 3 +++=0D
- arch/x86/kvm/x86.c     | 4 ++++=0D
- 2 files changed, 7 insertions(+)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+Even though we might not allow the guest to use
+WAITPKG's new instructions, we should tell KVM
+that the feature is supported by the host CPU.
+
+Note that vmx_waitpkg_supported checks that WAITPKG
+_can_ be set in secondary execution controls as specified
+by VMX capability MSR, rather that we actually enable it for a guest.
+
+Fixes: e69e72faa3a0 KVM: x86: Add support for user wait instructions
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 55712dd86bafa..fca493d4517c5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7298,6 +7298,9 @@ static __init void vmx_set_cpu_caps(void)
+ 	/* CPUID 0x80000001 */
+ 	if (!cpu_has_vmx_rdtscp())
+ 		kvm_cpu_cap_clear(X86_FEATURE_RDTSCP);
++
++	if (vmx_waitpkg_supported())
++		kvm_cpu_cap_check_and_set(X86_FEATURE_WAITPKG);
+ }
+ 
+ static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
+-- 
+2.26.2
 
