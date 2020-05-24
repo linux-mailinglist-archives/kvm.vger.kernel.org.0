@@ -2,125 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E7381DFD4E
-	for <lists+kvm@lfdr.de>; Sun, 24 May 2020 07:17:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CA441DFD75
+	for <lists+kvm@lfdr.de>; Sun, 24 May 2020 08:42:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726014AbgEXFRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 May 2020 01:17:44 -0400
-Received: from ns3.fnarfbargle.com ([103.4.19.87]:52660 "EHLO
-        ns3.fnarfbargle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbgEXFRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 May 2020 01:17:43 -0400
-X-Greylist: delayed 1578 seconds by postgrey-1.27 at vger.kernel.org; Sun, 24 May 2020 01:17:41 EDT
-Received: from srv.home ([10.8.0.1] ident=heh12491)
-        by ns3.fnarfbargle.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.84_2)
-        (envelope-from <lists2009@fnarfbargle.com>)
-        id 1jciaX-0005sw-GZ; Sun, 24 May 2020 12:50:17 +0800
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=fnarfbargle.com; s=mail;
-        h=Content-Transfer-Encoding:Content-Type:MIME-Version:Date:Message-ID:Subject:From:To; bh=OdOLP0WvRHgcmPIHB1HDDaR0+7pMLS8Inh/6tqYLjpM=;
-        b=b227SeaIBIC7nDb5U/miwFBGJZSRWhHlcUKvs5fefVuKTlaqZ0Mfw5k+gzxhk/vFTX+qfDO+y99yzV8iWSB+XyRH+9Diw265kvtAP5ks9OC1jBINVMzaEXBj1Auv+8oHLldt6mRXnIrYazayndC7YrXJBEAUIrwI6oIbm7M+k48=;
-To:     kvm@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-From:   Brad Campbell <lists2009@fnarfbargle.com>
-Subject: KVM broken after suspend in most recent kernels.
-Message-ID: <1f7a85cc-38a6-2a2e-cbe3-a5b9970b7b92@fnarfbargle.com>
-Date:   Sun, 24 May 2020 12:50:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726935AbgEXGmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 May 2020 02:42:03 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:50613 "EHLO
+        wnew4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726331AbgEXGmD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 24 May 2020 02:42:03 -0400
+X-Greylist: delayed 587 seconds by postgrey-1.27 at vger.kernel.org; Sun, 24 May 2020 02:42:03 EDT
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.west.internal (Postfix) with ESMTP id 283E2A54;
+        Sun, 24 May 2020 02:32:15 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Sun, 24 May 2020 02:32:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=+9HzwLQSbQfYn3g9WBAL+QyA/zS
+        EfIyEySNaCOOLJtQ=; b=DSE8S2urYUF3yKuGMCVBRHZnmBO3fLOW58BIbytOY9g
+        dxEjWsEHkFuvDT5JhGyzzbFxQP0Twr9YGFR2kMGlRWiyrqUv70f0ESdlDMjzh4KE
+        yzHvj+Cjhfmw1bnznaJGkq+4RrjUnBADlgoT8NZAWu6ypSH9LVV7h4wzWaQleDgC
+        rpwQtUqaEcXCBt8lI2kywDY0sY4dt1rvUQeMw2Vbvie3CzFnkYOUk3WfDvGwDQ1p
+        X9E/2hIr6QJmaR0HjFVAI6y+HCjxtNEhGrXkhUsW7LniXZ2ueND616AGhJ5K+cL6
+        Y7zi/Tw1LaIuQr9jNzt3OYGCuYYR23Qakl3/h0D3W6A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=+9HzwL
+        QSbQfYn3g9WBAL+QyA/zSEfIyEySNaCOOLJtQ=; b=yele04aEwz9btCbpulaeeW
+        WXfjh5wU9s7y+4+Fknuw5veAfmbbn0X/vJMKGk433LjLvOLZO875cAYMVkDAk6ZW
+        rRVsqpxhVbijBxi4ERFBZVl11gzjo1mN7T5A+tmW1ptL6nMF3bnRegJLS48yg4Bh
+        CUZwRcTR7JjMRF6t+sqgBiTdjeEJIkgwWYXguwh6pSoWVRRlJ14Wwu8dGDvoG4WL
+        aW/OO2KQhIbFHBiOVuHcCH8LoVNGWcdlxP4m8+3MN8F9pVTiRuEwuWLEyRBRZx1O
+        ZMFX5U+Izg9cxQWzX8P/GnpX+me3aIcK7jSiUg3GVQUsqoUVNP49Wa5Q4Js24qUg
+        ==
+X-ME-Sender: <xms:7hTKXlxAVDK5bF3MvIkv7iSxjRAbQ6jbBR4KGMGwblTahGaDhra_Dw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedruddujedgudefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeevueehje
+    fgfffgiedvudekvdektdelleelgefhleejieeugeegveeuuddukedvteenucfkphepkeef
+    rdekiedrkeelrddutdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:7hTKXlQreIS6z1gUEM3WqNS3XadRWNXTjDSSm1JT47KUes_d1XUU0g>
+    <xmx:7hTKXvVC6B5XKX7BYbuIM5XaFER0dmk2nW8RZnCT7h6fl4B_hn1qUA>
+    <xmx:7hTKXngMzElnSVcKdDrrqvE4KE5LY-3bZWK-nrp9ca8OHsWqkInaww>
+    <xmx:7hTKXpQAzwRPw_n7ZO_26S_Wq1DOQe2sGLmVLT8Qm8sMzCGjkcrgG8582_M>
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 104F930664F8;
+        Sun, 24 May 2020 02:32:14 -0400 (EDT)
+Date:   Sun, 24 May 2020 08:32:10 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Alexander Graf <graf@amazon.de>
+Cc:     Andra Paraschiv <andraprs@amazon.com>,
+        linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+Subject: Re: [PATCH v2 04/18] nitro_enclaves: Init PCI device driver
+Message-ID: <20200524063210.GA1369260@kroah.com>
+References: <20200522062946.28973-1-andraprs@amazon.com>
+ <20200522062946.28973-5-andraprs@amazon.com>
+ <20200522070414.GB771317@kroah.com>
+ <68b86d32-1255-f9ce-4366-12219ce07ba6@amazon.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68b86d32-1255-f9ce-4366-12219ce07ba6@amazon.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-G'day all.
+On Sat, May 23, 2020 at 10:25:25PM +0200, Alexander Graf wrote:
+> Hey Greg,
+> 
+> On 22.05.20 09:04, Greg KH wrote:
+> > 
+> > On Fri, May 22, 2020 at 09:29:32AM +0300, Andra Paraschiv wrote:
+> > > +/**
+> > > + * ne_setup_msix - Setup MSI-X vectors for the PCI device.
+> > > + *
+> > > + * @pdev: PCI device to setup the MSI-X for.
+> > > + *
+> > > + * @returns: 0 on success, negative return value on failure.
+> > > + */
+> > > +static int ne_setup_msix(struct pci_dev *pdev)
+> > > +{
+> > > +     struct ne_pci_dev *ne_pci_dev = NULL;
+> > > +     int nr_vecs = 0;
+> > > +     int rc = -EINVAL;
+> > > +
+> > > +     if (WARN_ON(!pdev))
+> > > +             return -EINVAL;
+> > 
+> > How can this ever happen?  If it can not, don't test for it.  If it can,
+> > don't warn for it as that will crash systems that do panic-on-warn, just
+> > test and return an error.
+> 
+> I think the point here is to catch situations that should never happen, but
+> keep a sanity check in in case they do happen. This would've usually been a
+> BUG_ON, but people tend to dislike those these days because they can bring
+> down your system ...
 
-Machine is a Macbook Pro Retina ~ 2014. Kernels are always vanilla kernel and compiled on the machine. No additional patches.
+Same for WARN_ON when you run with panic-on-warn enabled :(
 
-vendor_id	: GenuineIntel
-cpu family	: 6
-model		: 69
-model name	: Intel(R) Core(TM) i5-4278U CPU @ 2.60GHz
-stepping	: 1
-microcode	: 0x25
-cpu MHz		: 2795.034
-cache size	: 3072 KB
-physical id	: 0
-siblings	: 4
-core id		: 1
-cpu cores	: 2
-apicid		: 3
-initial apicid	: 3
-fpu		: yes
-fpu_exception	: yes
-cpuid level	: 13
-wp		: yes
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm cpuid_fault epb invpcid_single ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid xsaveopt dtherm ida arat pln pts md_clear flush_l1d
-vmx flags	: vnmi preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offset vtpr mtf vapic ept vpid unrestricted_guest ple
-bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs itlb_multihit
-bogomips	: 5199.87
-clflush size	: 64
-cache_alignment	: 64
-address sizes	: 39 bits physical, 48 bits virtual
+> So in this particular case here I agree that it's a bit silly to check
+> whether pdev is != NULL. In other device code internal APIs though it's not
+> quite as clear of a cut. I by far prefer code that tells me it's broken over
+> reverse engineering stray pointer accesses ...
 
+For static calls where you control the callers, don't do checks like
+this.  Otherwise the kernel would just be full of these all over the
+place and things would slow down.  It's just not needed.
 
-KVM worked fine in kernels somewhere prior to 5.4-5.5.
+> > > +     ne_pci_dev = pci_get_drvdata(pdev);
+> > > +     if (WARN_ON(!ne_pci_dev))
+> > > +             return -EINVAL;
+> > 
+> > Same here, don't use WARN_ON if at all possible.
+> > 
+> > > +
+> > > +     nr_vecs = pci_msix_vec_count(pdev);
+> > > +     if (nr_vecs < 0) {
+> > > +             rc = nr_vecs;
+> > > +
+> > > +             dev_err_ratelimited(&pdev->dev,
+> > > +                                 NE "Error in getting vec count [rc=%d]\n",
+> > > +                                 rc);
+> > > +
+> > 
+> > Why ratelimited, can this happen over and over and over?
+> 
+> In this particular function, no, so here it really should just be dev_err.
+> Other functions are implicitly callable from user space through an ioctl,
+> which means they really need to stay rate limited.
 
-KVM works fine in later kernels up to and including 5.7.0-rc6 after a clean boot. It does not work after a suspend.
+Think through these as the driver seems to ONLY use these ratelimited
+calls right now, which is not correct.
 
-I can't actually bisect this because there is a bug in earlier kernels that breaks the suspend method used which requires manual patching to work around.
+Also, if a user can create a printk, that almost always is not a good
+idea.  But yes, those should be ratelimited.
 
-This is using qemu version 5.0.0, but also happens with 4.2.0.
+thanks,
 
-In kernels earlier than 5.7 it results in either an immediate hard lock, or a GPF that results in progressive system freeze until a hard reboot is required (won't flush to disk so no logs get recorded and I have no serial or netconsole ability). In 5.7-rc6 it results in the following trace and thankfully no further issues (so I can get the logs and report it).
-
-I can and will perform any required testing and debugging, but this machine suspends with pm-utils s2both, and that is broken between about 5.4 & 5.6 due to swapfile locking issues, which makes actual bisection very, very difficult as it *requires* a suspend/resume to trigger the bug.
-
-[  227.715173] ------------[ cut here ]------------
-[  227.715176] VMXON faulted, MSR_IA32_FEAT_CTL (0x3a) = 0x4
-[  227.715194] WARNING: CPU: 0 PID: 5502 at arch/x86/kvm/vmx/vmx.c:2239 hardware_enable+0x167/0x180 [kvm_intel]
-[  227.715195] Modules linked in: brcmfmac xhci_pci xhci_hcd cmac bnep iptable_nat xt_MASQUERADE nf_nat nf_conntrack nf_defrag_ipv4 ip_tables x_tables nfsd bridge stp llc appletouch brcmutil snd_hda_codec_hdmi sha256_ssse3 snd_hda_codec_cirrus snd_hda_codec_generic sha256_generic libsha256 x86_pkg_temp_thermal coretemp btusb kvm_intel btrtl kvm btbcm btintel irqbypass bluetooth cfg80211 snd_hda_intel ecdh_generic ecc snd_intel_dspcfg bcm5974 rfkill snd_hda_codec snd_hwdep snd_hda_core snd_pcm_oss snd_pcm snd_seq_midi snd_seq_midi_event snd_rawmidi i915 snd_seq snd_seq_device snd_timer i2c_algo_bit iosf_mbi drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops snd drm intel_gtt agpgart evdev apple_bl video soundcore hid_apple usb_storage hid_generic usbhid hid dm_crypt dm_mod i2c_i801 i2c_core sg usbcore usb_common [last unloaded: xhci_hcd]
-[  227.715221] CPU: 0 PID: 5502 Comm: qemu Not tainted 5.7.0-rc6+ #15
-[  227.715222] Hardware name: Apple Inc. MacBookPro11,1/Mac-189A3D4F975D5FFC, BIOS 159.0.0.0.0 02/05/2020
-[  227.715225] RIP: 0010:hardware_enable+0x167/0x180 [kvm_intel]
-[  227.715227] Code: 01 00 01 b9 3a 00 00 00 0f 32 31 c9 48 c1 e2 20 be ef be ad de 48 c7 c7 68 fd bb c0 48 09 c2 85 c9 48 0f 44 f2 e8 43 78 4f dc <0f> 0b eb 8a 48 8b 15 ce 89 06 dd e9 c7 fe ff ff 66 0f 1f 84 00 00
-[  227.715228] RSP: 0018:ffff97091d873df8 EFLAGS: 00010092
-[  227.715229] RAX: 000000000000002d RBX: 0000000000000046 RCX: 0000000000000007
-[  227.715230] RDX: 0000000000000007 RSI: 0000000000000082 RDI: ffff97091f2187a0
-[  227.715231] RBP: ffff97091d873e10 R08: 0000000000000008 R09: 0000000000000495
-[  227.715232] R10: 0000000000000010 R11: ffff97091d873c6d R12: 0000000000000000
-[  227.715233] R13: 0000000000000286 R14: ffffb5d08015e010 R15: 0000000000000000
-[  227.715234] FS:  00007f1468fd33c0(0000) GS:ffff97091f200000(0000) knlGS:0000000000000000
-[  227.715235] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  227.715236] CR2: 0000563b54c7201d CR3: 000000043f43f001 CR4: 00000000001626f0
-[  227.715237] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  227.715238] DR3: 0000000000000080 DR6: 00000000ffff0ff0 DR7: 0000000020000400
-[  227.715238] Call Trace:
-[  227.715251]  kvm_arch_hardware_enable+0x65/0x230 [kvm]
-[  227.715257]  hardware_enable_nolock+0x2f/0x60 [kvm]
-[  227.715262]  ? __kvm_write_guest_page+0x60/0x60 [kvm]
-[  227.715266]  on_each_cpu+0x34/0x40
-[  227.715271]  kvm_dev_ioctl+0x63a/0x6c0 [kvm]
-[  227.715275]  ? do_sys_openat2+0x1a7/0x2d0
-[  227.715277]  ksys_ioctl+0x70/0xb0
-[  227.715279]  ? vtime_user_exit+0x1b/0x60
-[  227.715280]  __x64_sys_ioctl+0x15/0x20
-[  227.715282]  do_syscall_64+0x4f/0x190
-[  227.715284]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[  227.715285] RIP: 0033:0x7f146ba30427
-[  227.715287] Code: 00 00 90 48 8b 05 69 aa 0c 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 39 aa 0c 00 f7 d8 64 89 01 48
-[  227.715288] RSP: 002b:00007fff63e4e898 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[  227.715290] RAX: ffffffffffffffda RBX: 000000000000ae01 RCX: 00007f146ba30427
-[  227.715292] RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 000000000000000c
-[  227.715293] RBP: 0000000000000000 R08: 0000563b55030de0 R09: 0000000000000001
-[  227.715294] R10: 0000563b54da1010 R11: 0000000000000246 R12: 0000563b55081d60
-[  227.715295] R13: 000000000000000c R14: 0000000000000000 R15: 00007fff63e4ea80
-[  227.715297] ---[ end trace 0ce5d8cb29fff4bc ]---
-[  227.715299] kvm: enabling virtualization on CPU0 failed
-
-Regards,
-Brad
+greg k-h
