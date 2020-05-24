@@ -2,406 +2,313 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 233E11DFC93
-	for <lists+kvm@lfdr.de>; Sun, 24 May 2020 04:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AAFC1DFCC6
+	for <lists+kvm@lfdr.de>; Sun, 24 May 2020 06:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388271AbgEXCpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 May 2020 22:45:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52332 "EHLO
+        id S1725821AbgEXETU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 May 2020 00:19:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388250AbgEXCpd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 May 2020 22:45:33 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABB94C061A0E;
-        Sat, 23 May 2020 19:45:31 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id j2so14562587ilr.5;
-        Sat, 23 May 2020 19:45:31 -0700 (PDT)
+        with ESMTP id S1725300AbgEXETS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 May 2020 00:19:18 -0400
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8078CC061A0E;
+        Sat, 23 May 2020 21:19:18 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id n18so7180501pfa.2;
+        Sat, 23 May 2020 21:19:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=sPIpS7o+v+dd68E0lXRCwMzyADINEPr31caprUJMgMI=;
-        b=X763fNTdFkbB7EHWL0zmKDkl0wHjeoXGPNsP0jqw4nqHaJL6LnxlqRDhPxGI8DIfbF
-         OFca2mpQHhwcNGnL9Y09W1yQ7dcEd3ugLjXPxrZKIAzyOmFSTdDV53STxiIO7rLXUipL
-         PBfNzz+kbQ3PTIgzUlqKGOFu/x795f1JtpE9HryDX4UWlm0jYvuy9PkhNa1tATZzIXwt
-         UB2YK/4ymWT2BGLUnAehmlhaYQVW6XfWmVxxlyBt0Fiq7WAIlBKGECJhBeb9KLhFzF9C
-         boLdQJXt5IGH3s7QME1/Wee59VAgn5IVzT6XVtyOwGGrfGvgxbJ4aafmhvHRqG86KRoS
-         9eSQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=nI7E7mDYIZ61oHLf9W/arr0PR7H6a7nLS1eN6Z5GiPg=;
+        b=SKwou8TE1YQ+4ESVLgMDigH9YD5+f2R5IBahu2GmE4moAfHfdvADANaFTY7lOCaD6k
+         heHfbWB3VQzbQc4u8GE09NfCAOAxh6x/bFPMhkwMh4hriLnlv3xMg/dqD2EFwtgqi5a+
+         5k5bSw+qfEUQ+V2qw2lktSJLUjzR66s14480r3A7GyvgjCWyJWd1KgoOcq9b5ARCaFTi
+         0pg/6XdKUL0cT5CLfUNebadHwNfJjcUiEkpLdv5jYZRwpW3Jn+0i8TWXmepa5rFQQMNW
+         HBlue3L/mbfsuRVCPA9/MPMfsK/HlZ0m2hKLVN/vsgo0nZlERPQYK7Nv5MUGmauMTyRR
+         RJkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=sPIpS7o+v+dd68E0lXRCwMzyADINEPr31caprUJMgMI=;
-        b=ZIaLNXh3TXIdqFWTKz9j+kD9gJ435pY+h5KsmsjPziZV8SEgMw5t29wiAePda6mk02
-         G3Ayq0JiZlsNfnfQh4qnJOYQEgrSTUzc1rxQry2OVZCr2Wbi7b/FbSu2vzP4QJltmvg1
-         xCykc4ovZ7SZHR0FYp/aas4gJN3Hx8mINsI9yvYYVQDdt2Yq/ZR8kTd0nxPwkMgmBkya
-         22ERXcb4kW6tqzEmsvPEaM09iODxvbG3EIegSQWbRJTCQkrggjMxMqRUdg6S5qZbJi2G
-         /R7mKRmLRCzALKy40dPb2/1TTkr9hUtKMF5u/98YD0+FJj8d2GPuuJoawzSvHAqQpI2n
-         Sx3A==
-X-Gm-Message-State: AOAM532ZDyP+PNKd2tRblYmvJZADIc5BNjyyHaH2jxCwOqpYbeGpiZu4
-        B7FVgyVGCKj81Tw7Lo/PS64gYbDV+6psyFBZs8A=
-X-Google-Smtp-Source: ABdhPJyXp/52Vs6QaZ8JwyNh3fuzLRWdAqjapa/7cCZ9rXYC5mSqXzvUJ3nVdoFG60eKsHkZvhAyFvm43F7Jw5B00X8=
-X-Received: by 2002:a92:980f:: with SMTP id l15mr19343146ili.251.1590288329769;
- Sat, 23 May 2020 19:45:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <1590220602-3547-1-git-send-email-chenhc@lemote.com>
- <1590220602-3547-13-git-send-email-chenhc@lemote.com> <a52129ed-80ff-304a-59d6-f132c7553646@xen0n.name>
- <CAHiYmc6YDw7=mqXfMdgSfeR-HVd2Ec+sQVquM=Z6jLke2s-VEw@mail.gmail.com>
-In-Reply-To: <CAHiYmc6YDw7=mqXfMdgSfeR-HVd2Ec+sQVquM=Z6jLke2s-VEw@mail.gmail.com>
-From:   Huacai Chen <chenhuacai@gmail.com>
-Date:   Sun, 24 May 2020 10:45:18 +0800
-Message-ID: <CAAhV-H400FyhpmWutr7=g0AF2BVn7kJ=b89KapYs-nU2fuwaZQ@mail.gmail.com>
-Subject: Re: [PATCH V7 12/15] KVM: MIPS: Add CONFIG6 and DIAG registers emulation
-To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Cc:     WANG Xuerui <kernel@xen0n.name>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=nI7E7mDYIZ61oHLf9W/arr0PR7H6a7nLS1eN6Z5GiPg=;
+        b=nIAtw58CTsZ9sJvpduitzbhQzTGUbSYvHiGQoJ5FYohF2meEtV04t1scFNo+n2y/kk
+         0NU/IPLJB3xLRHZYiGdl+onTwbFGdyvJ9BWIijt0n7UaglTuMxpCSdUzDAQyMzLp2TbP
+         Q/n594a2Usb5nc0/tX6aHt1tb6hPw3SEBbTFnYcIOw4J3s4Xu8/CjiKAiBGFqcz33PbM
+         Oj+5PBWyLxKeISf7+Dbwf53SGxW5o5kmr2d0Q4VMRR+XYNDDlr1A10opOnGEFckySFVg
+         +Z8VlOmhV4mnK3Q4B+9T+23glw7Siw6yAxvsy1hfAqSWSProEUagyqnQRC4YNcpw6/8V
+         L++A==
+X-Gm-Message-State: AOAM530S7/HZoYRDEygfGGLxbyR9hrg3qPR1Fe2hawY0waplehgabdFe
+        6wqiw/yrt5PEdO1lHaVDaU59wke4
+X-Google-Smtp-Source: ABdhPJx76K603I8mK1DZzCQ6qFXjZ45wWgT8uW3UzUi5xHivw3zZc4RuAAi69DNQPRBXz6t6UrZ4OQ==
+X-Received: by 2002:aa7:9f5a:: with SMTP id h26mr10894617pfr.51.1590293957683;
+        Sat, 23 May 2020 21:19:17 -0700 (PDT)
+Received: from jordon-HP-15-Notebook-PC.domain.name ([122.167.154.105])
+        by smtp.gmail.com with ESMTPSA id z16sm9540613pfq.125.2020.05.23.21.19.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 23 May 2020 21:19:16 -0700 (PDT)
+From:   Souptick Joarder <jrdr.linux@gmail.com>
+To:     paulus@ozlabs.org, mpe@ellerman.id.au, benh@kernel.crashing.org,
+        akpm@linux-foundation.org, peterz@infradead.org, mingo@redhat.com,
+        acme@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@redhat.com,
+        namhyung@kernel.org, pbonzini@redhat.com, sfr@canb.auug.org.au,
+        rppt@linux.ibm.com, aneesh.kumar@linux.ibm.com, msuchanek@suse.de
+Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        kvm@vger.kernel.org, Souptick Joarder <jrdr.linux@gmail.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: [linux-next RFC v2] mm/gup.c: Convert to use get_user_{page|pages}_fast_only()
+Date:   Sun, 24 May 2020 09:57:14 +0530
+Message-Id: <1590294434-19125-1-git-send-email-jrdr.linux@gmail.com>
+X-Mailer: git-send-email 1.9.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Aleksandar
+API __get_user_pages_fast() renamed to get_user_pages_fast_only()
+to align with pin_user_pages_fast_only().
 
+As part of this we will get rid of write parameter. Instead caller
+will pass FOLL_WRITE to get_user_pages_fast_only(). This will not
+change any existing functionality of the API.
 
-On Sat, May 23, 2020 at 9:59 PM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
->  you sh
->
-> =D1=81=D1=83=D0=B1, 23. =D0=BC=D0=B0=D1=98 2020. =D1=83 15:27 WANG Xuerui=
- <kernel@xen0n.name> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:
-> >
-> > Hi Huacai,
-> >
-> > On 5/23/20 3:56 PM, Huacai Chen wrote:
-> >
-> > > Loongson-3 has CONFIG6 and DIAG registers which need to be emulated.
-> > > CONFIG6 is mostly used to enable/disable FTLB and SFB, while DIAG is
-> > > mostly used to flush BTB, ITLB, DTLB, VTLB and FTLB.
-> > >
-> > > Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-> > > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > > ---
-> > >   arch/mips/include/asm/kvm_host.h |  7 +++++
-> > >   arch/mips/include/asm/mipsregs.h |  7 +++++
-> > >   arch/mips/kvm/tlb.c              | 41 ++++++++++++++++++++++++++
-> > >   arch/mips/kvm/vz.c               | 62 +++++++++++++++++++++++++++++=
-++++++++++-
-> > >   4 files changed, 116 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm=
-/kvm_host.h
-> > > index 3fd2f1c..30b5e33 100644
-> > > --- a/arch/mips/include/asm/kvm_host.h
-> > > +++ b/arch/mips/include/asm/kvm_host.h
-> > > @@ -68,9 +68,11 @@
-> > >   #define KVM_REG_MIPS_CP0_CONFIG3    MIPS_CP0_32(16, 3)
-> > >   #define KVM_REG_MIPS_CP0_CONFIG4    MIPS_CP0_32(16, 4)
-> > >   #define KVM_REG_MIPS_CP0_CONFIG5    MIPS_CP0_32(16, 5)
-> > > +#define KVM_REG_MIPS_CP0_CONFIG6     MIPS_CP0_32(16, 6)
-> > >   #define KVM_REG_MIPS_CP0_CONFIG7    MIPS_CP0_32(16, 7)
-> > >   #define KVM_REG_MIPS_CP0_MAARI              MIPS_CP0_64(17, 2)
-> > >   #define KVM_REG_MIPS_CP0_XCONTEXT   MIPS_CP0_64(20, 0)
-> > > +#define KVM_REG_MIPS_CP0_DIAG                MIPS_CP0_32(22, 0)
-> > >   #define KVM_REG_MIPS_CP0_ERROREPC   MIPS_CP0_64(30, 0)
-> > >   #define KVM_REG_MIPS_CP0_KSCRATCH1  MIPS_CP0_64(31, 2)
-> > >   #define KVM_REG_MIPS_CP0_KSCRATCH2  MIPS_CP0_64(31, 3)
-> > > @@ -256,6 +258,7 @@ struct mips_coproc {
-> > >   #define MIPS_CP0_WATCH_LO   18
-> > >   #define MIPS_CP0_WATCH_HI   19
-> > >   #define MIPS_CP0_TLB_XCONTEXT       20
-> > > +#define MIPS_CP0_DIAG                22
-> > >   #define MIPS_CP0_ECC                26
-> > >   #define MIPS_CP0_CACHE_ERR  27
-> > >   #define MIPS_CP0_TAG_LO             28
-> > > @@ -927,6 +930,10 @@ void kvm_vz_save_guesttlb(struct kvm_mips_tlb *b=
-uf, unsigned int index,
-> > >                         unsigned int count);
-> > >   void kvm_vz_load_guesttlb(const struct kvm_mips_tlb *buf, unsigned =
-int index,
-> > >                         unsigned int count);
-> > > +#ifdef CONFIG_CPU_LOONGSON64
-> > > +void kvm_loongson_clear_guest_vtlb(void);
-> > > +void kvm_loongson_clear_guest_ftlb(void);
-> > > +#endif
-> > >   #endif
-> > >
-> > >   void kvm_mips_suspend_mm(int cpu);
-> > > diff --git a/arch/mips/include/asm/mipsregs.h b/arch/mips/include/asm=
-/mipsregs.h
-> > > index 796fe47..ce40fbf 100644
-> > > --- a/arch/mips/include/asm/mipsregs.h
-> > > +++ b/arch/mips/include/asm/mipsregs.h
-> > > @@ -993,6 +996,8 @@
-> > >   /* Disable Branch Return Cache */
-> > >   #define R10K_DIAG_D_BRC             (_ULCAST_(1) << 22)
-> > >
-> > > +/* Flush BTB */
-> > > +#define LOONGSON_DIAG_BTB    (_ULCAST_(1) << 1)
-> > >   /* Flush ITLB */
-> > >   #define LOONGSON_DIAG_ITLB  (_ULCAST_(1) << 2)
-> > >   /* Flush DTLB */
-> > > @@ -2825,7 +2830,9 @@ __BUILD_SET_C0(status)
-> > >   __BUILD_SET_C0(cause)
-> > >   __BUILD_SET_C0(config)
-> > >   __BUILD_SET_C0(config5)
-> > > +__BUILD_SET_C0(config6)
-> > >   __BUILD_SET_C0(config7)
-> > > +__BUILD_SET_C0(diag)
-> > >   __BUILD_SET_C0(intcontrol)
-> > >   __BUILD_SET_C0(intctl)
-> > >   __BUILD_SET_C0(srsmap)
-> > > diff --git a/arch/mips/kvm/tlb.c b/arch/mips/kvm/tlb.c
-> > > index 7cd9216..1418715 100644
-> > > --- a/arch/mips/kvm/tlb.c
-> > > +++ b/arch/mips/kvm/tlb.c
-> > > @@ -20,6 +20,7 @@
-> > >
-> > >   #include <asm/cpu.h>
-> > >   #include <asm/bootinfo.h>
-> > > +#include <asm/mipsregs.h>
-> > >   #include <asm/mmu_context.h>
-> > >   #include <asm/pgtable.h>
-> > >   #include <asm/cacheflush.h>
-> > > @@ -622,6 +623,46 @@ void kvm_vz_load_guesttlb(const struct kvm_mips_=
-tlb *buf, unsigned int index,
-> > >   }
-> > >   EXPORT_SYMBOL_GPL(kvm_vz_load_guesttlb);
-> > >
-> > > +#ifdef CONFIG_CPU_LOONGSON64
-> > > +void kvm_loongson_clear_guest_vtlb(void)
-> > > +{
-> > > +     int idx =3D read_gc0_index();
-> > > +
-> > > +     /* Set root GuestID for root probe and write of guest TLB entry=
- */
-> > > +     set_root_gid_to_guest_gid();
-> > > +
-> > > +     write_gc0_index(0);
-> > > +     guest_tlbinvf();
-> > > +     write_gc0_index(idx);
-> > > +
-> > > +     clear_root_gid();
-> > > +     set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_vtlb);
-> > > +
-> > > +void kvm_loongson_clear_guest_ftlb(void)
-> > > +{
-> > > +     int i;
-> > > +     int idx =3D read_gc0_index();
-> > > +
-> > > +     /* Set root GuestID for root probe and write of guest TLB entry=
- */
-> > > +     set_root_gid_to_guest_gid();
-> > > +
-> > > +     for (i =3D current_cpu_data.tlbsizevtlb;
-> > > +          i < (current_cpu_data.tlbsizevtlb +
-> > > +                  current_cpu_data.tlbsizeftlbsets);
-> > > +          i++) {
-> > > +             write_gc0_index(i);
-> > > +             guest_tlbinvf();
-> > > +     }
-> > > +     write_gc0_index(idx);
-> > > +
-> > > +     clear_root_gid();
-> > > +     set_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB);
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(kvm_loongson_clear_guest_ftlb);
-> > > +#endif
-> > > +
-> > >   #endif
-> > >
-> > >   /**
-> > > diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-> > > index 72a62f1..73701c3 100644
-> > > --- a/arch/mips/kvm/vz.c
-> > > +++ b/arch/mips/kvm/vz.c
-> > > @@ -127,6 +127,11 @@ static inline unsigned int kvm_vz_config5_guest_=
-wrmask(struct kvm_vcpu *vcpu)
-> > >       return mask;
-> > >   }
-> > >
-> > > +static inline unsigned int kvm_vz_config6_guest_wrmask(struct kvm_vc=
-pu *vcpu)
-> > > +{
-> > > +     return MIPS_CONF6_LOONGSON_INTIMER | MIPS_CONF6_LOONGSON_EXTIME=
-R;
-> >
-> > This depends on the "MIPS: Tidy up CP0.Config6 bits definition" patch
-> > which is not yet upstream.
-> >
-> > I'd suggest backing this change out to prioritize upstreaming of v6.
-> > Cleanups can always come later. It's not like this kind of minor
-> > cleanups should block progress of greater things...
-> >
->
-> Hi, Huacai,
->
-> I must agree with Wang, You started complicating thing, and exactly at th=
-e moment we reached consensus on v6. Either accept Wang;s advice, or make t=
-hat "MIPS: Tidy up CP0.Config6 bits definition" patch part of your series a=
-nd send v8.
->
-> And your series should be made as if it should be applied to kernel upstr=
-eam, not linux-mips. That will make Paolo's life easier. Please try to simp=
-lify things for other participants, not mix some minor thing from different=
- trees etc., or now deal with your pgp keys, or other currently unimportant=
- things, instead tryto  focus on the cleanness of the series. Paolo will su=
-bmit pull request, and we should be thankful to him for doing this, trust m=
-e, submitting pull requests is not fun at all.
-I will send a V8 series which can be applied on the linux-next branch
-at https://git.kernel.org/pub/scm/virt/kvm/kvm.git/, I think this is
-the best way for Paolo.
+All the callers are changed to pass FOLL_WRITE.
 
-Huacai
->
-> Yours,
-> Aleksandar
->
->
-> > > +}
-> > > +
-> > >   /*
-> > >    * VZ optionally allows these additional Config bits to be written =
-by root:
-> > >    * Config:  M, [MT]
-> > > @@ -181,6 +186,12 @@ static inline unsigned int kvm_vz_config5_user_w=
-rmask(struct kvm_vcpu *vcpu)
-> > >       return kvm_vz_config5_guest_wrmask(vcpu) | MIPS_CONF5_MRP;
-> > >   }
-> > >
-> > > +static inline unsigned int kvm_vz_config6_user_wrmask(struct kvm_vcp=
-u *vcpu)
-> > > +{
-> > > +     return kvm_vz_config6_guest_wrmask(vcpu) |
-> > > +             MIPS_CONF6_LOONGSON_SFBEN | MIPS_CONF6_LOONGSON_FTLBDIS=
-;
-> > > +}
-> > > +
-> > >   static gpa_t kvm_vz_gva_to_gpa_cb(gva_t gva)
-> > >   {
-> > >       /* VZ guest has already converted gva to gpa */
-> > > @@ -930,7 +941,8 @@ static enum emulation_result kvm_vz_gpsi_cop0(uni=
-on mips_instruction inst,
-> > >                                   (sel =3D=3D 2 ||        /* SRSCtl *=
-/
-> > >                                    sel =3D=3D 3)) ||      /* SRSMap *=
-/
-> > >                                  (rd =3D=3D MIPS_CP0_CONFIG &&
-> > > -                                 (sel =3D=3D 7)) ||      /* Config7 =
-*/
-> > > +                                 (sel =3D=3D 6 ||        /* Config6 =
-*/
-> > > +                                  sel =3D=3D 7)) ||      /* Config7 =
-*/
-> > >                                  (rd =3D=3D MIPS_CP0_LLADDR &&
-> > >                                   (sel =3D=3D 2) &&       /* MAARI */
-> > >                                   cpu_guest_has_maar &&
-> > > @@ -938,6 +950,11 @@ static enum emulation_result kvm_vz_gpsi_cop0(un=
-ion mips_instruction inst,
-> > >                                  (rd =3D=3D MIPS_CP0_ERRCTL &&
-> > >                                   (sel =3D=3D 0))) {      /* ErrCtl *=
-/
-> > >                               val =3D cop0->reg[rd][sel];
-> > > +#ifdef CONFIG_CPU_LOONGSON64
-> > > +                     } else if (rd =3D=3D MIPS_CP0_DIAG &&
-> > > +                                (sel =3D=3D 0)) {        /* Diag */
-> > > +                             val =3D cop0->reg[rd][sel];
-> > > +#endif
-> > >                       } else {
-> > >                               val =3D 0;
-> > >                               er =3D EMULATE_FAIL;
-> > > @@ -1000,9 +1017,40 @@ static enum emulation_result kvm_vz_gpsi_cop0(=
-union mips_instruction inst,
-> > >                                  cpu_guest_has_maar &&
-> > >                                  !cpu_guest_has_dyn_maar) {
-> > >                               kvm_write_maari(vcpu, val);
-> > > +                     } else if (rd =3D=3D MIPS_CP0_CONFIG &&
-> > > +                                (sel =3D=3D 6)) {
-> > > +                             cop0->reg[rd][sel] =3D (int)val;
-> > >                       } else if (rd =3D=3D MIPS_CP0_ERRCTL &&
-> > >                                  (sel =3D=3D 0)) {        /* ErrCtl *=
-/
-> > >                               /* ignore the written value */
-> > > +#ifdef CONFIG_CPU_LOONGSON64
-> > > +                     } else if (rd =3D=3D MIPS_CP0_DIAG &&
-> > > +                                (sel =3D=3D 0)) {        /* Diag */
-> > > +                             unsigned long flags;
-> > > +
-> > > +                             local_irq_save(flags);
-> > > +                             if (val & LOONGSON_DIAG_BTB) {
-> > > +                                     /* Flush BTB */
-> > > +                                     set_c0_diag(LOONGSON_DIAG_BTB);
-> > > +                             }
-> > > +                             if (val & LOONGSON_DIAG_ITLB) {
-> > > +                                     /* Flush ITLB */
-> > > +                                     set_c0_diag(LOONGSON_DIAG_ITLB)=
-;
-> > > +                             }
-> > > +                             if (val & LOONGSON_DIAG_DTLB) {
-> > > +                                     /* Flush DTLB */
-> > > +                                     set_c0_diag(LOONGSON_DIAG_DTLB)=
-;
-> > > +                             }
-> > > +                             if (val & LOONGSON_DIAG_VTLB) {
-> > > +                                     /* Flush VTLB */
-> > > +                                     kvm_loongson_clear_guest_vtlb()=
-;
-> > > +                             }
-> > > +                             if (val & LOONGSON_DIAG_FTLB) {
-> > > +                                     /* Flush FTLB */
-> > > +                                     kvm_loongson_clear_guest_ftlb()=
-;
-> > > +                             }
-> > > +                             local_irq_restore(flags);
-> > > +#endif
-> > >                       } else {
-> > >                               er =3D EMULATE_FAIL;
-> > >                       }
-> > > @@ -1692,6 +1740,7 @@ static u64 kvm_vz_get_one_regs[] =3D {
-> > >       KVM_REG_MIPS_CP0_CONFIG3,
-> > >       KVM_REG_MIPS_CP0_CONFIG4,
-> > >       KVM_REG_MIPS_CP0_CONFIG5,
-> > > +     KVM_REG_MIPS_CP0_CONFIG6,
-> > >   #ifdef CONFIG_64BIT
-> > >       KVM_REG_MIPS_CP0_XCONTEXT,
-> > >   #endif
-> > > @@ -2019,6 +2068,9 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *=
-vcpu,
-> > >                       return -EINVAL;
-> > >               *v =3D read_gc0_config5();
-> > >               break;
-> > > +     case KVM_REG_MIPS_CP0_CONFIG6:
-> > > +             *v =3D kvm_read_sw_gc0_config6(cop0);
-> > > +             break;
-> > >       case KVM_REG_MIPS_CP0_MAAR(0) ... KVM_REG_MIPS_CP0_MAAR(0x3f):
-> > >               if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
-> > >                       return -EINVAL;
-> > > @@ -2288,6 +2340,14 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu =
-*vcpu,
-> > >                       write_gc0_config5(v);
-> > >               }
-> > >               break;
-> > > +     case KVM_REG_MIPS_CP0_CONFIG6:
-> > > +             cur =3D kvm_read_sw_gc0_config6(cop0);
-> > > +             change =3D (cur ^ v) & kvm_vz_config6_user_wrmask(vcpu)=
-;
-> > > +             if (change) {
-> > > +                     v =3D cur ^ change;
-> > > +                     kvm_write_sw_gc0_config6(cop0, (int)v);
-> > > +             }
-> > > +             break;
-> > >       case KVM_REG_MIPS_CP0_MAAR(0) ... KVM_REG_MIPS_CP0_MAAR(0x3f):
-> > >               if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
-> > >                       return -EINVAL;
+There are few places where 1 is passed to 2nd parameter of
+__get_user_pages_fast() and return value is checked for 1
+like [1]. Those are replaced with new inline
+get_user_page_fast_only().
+
+[1] if (__get_user_pages_fast(hva, 1, 1, &page) == 1)
+
+Updated the documentation of the API.
+
+Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+---
+v2:
+	Updated the subject line and change log.
+	Address Matthew's comment to fix a bug and added
+	new inline get_user_page_fast_only().
+
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+ arch/powerpc/perf/callchain_64.c       |  4 +---
+ include/linux/mm.h                     | 10 ++++++++--
+ kernel/events/core.c                   |  4 ++--
+ mm/gup.c                               | 29 ++++++++++++++++-------------
+ virt/kvm/kvm_main.c                    |  8 +++-----
+ 7 files changed, 32 insertions(+), 27 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 18aed97..ddfc4c9 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -581,7 +581,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_run *run, struct kvm_vcpu *vcpu,
+ 	 * We always ask for write permission since the common case
+ 	 * is that the page is writable.
+ 	 */
+-	if (__get_user_pages_fast(hva, 1, 1, &page) == 1) {
++	if (get_user_page_fast_only(hva, FOLL_WRITE, &page)) {
+ 		write_ok = true;
+ 	} else {
+ 		/* Call KVM generic code to do the slow-path check */
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 3248f78..5d4c087 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -795,7 +795,7 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
+ 	 * is that the page is writable.
+ 	 */
+ 	hva = gfn_to_hva_memslot(memslot, gfn);
+-	if (!kvm_ro && __get_user_pages_fast(hva, 1, 1, &page) == 1) {
++	if (!kvm_ro && get_user_page_fast_only(hva, FOLL_WRITE, &page)) {
+ 		upgrade_write = true;
+ 	} else {
+ 		unsigned long pfn;
+diff --git a/arch/powerpc/perf/callchain_64.c b/arch/powerpc/perf/callchain_64.c
+index 1bff896d..814d1c2 100644
+--- a/arch/powerpc/perf/callchain_64.c
++++ b/arch/powerpc/perf/callchain_64.c
+@@ -29,11 +29,9 @@ int read_user_stack_slow(void __user *ptr, void *buf, int nb)
+ 	unsigned long addr = (unsigned long) ptr;
+ 	unsigned long offset;
+ 	struct page *page;
+-	int nrpages;
+ 	void *kaddr;
+ 
+-	nrpages = __get_user_pages_fast(addr, 1, 1, &page);
+-	if (nrpages == 1) {
++	if (get_user_page_fast_only(addr, FOLL_WRITE, &page)) {
+ 		kaddr = page_address(page);
+ 
+ 		/* align address to page boundary */
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 93d93bd..8d4597f 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1817,10 +1817,16 @@ extern int mprotect_fixup(struct vm_area_struct *vma,
+ /*
+  * doesn't attempt to fault and will return short.
+  */
+-int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+-			  struct page **pages);
++int get_user_pages_fast_only(unsigned long start, int nr_pages,
++			unsigned int gup_flags, struct page **pages);
+ int pin_user_pages_fast_only(unsigned long start, int nr_pages,
+ 			     unsigned int gup_flags, struct page **pages);
++
++static inline bool get_user_page_fast_only(unsigned long addr,
++			unsigned int gup_flags, struct page **pagep)
++{
++	return get_user_pages_fast_only(addr, 1, gup_flags, pagep) == 1;
++}
+ /*
+  * per-process(per-mm_struct) statistics.
+  */
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index c94eb27..856d98c 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -6934,12 +6934,12 @@ static u64 perf_virt_to_phys(u64 virt)
+ 		 * Walking the pages tables for user address.
+ 		 * Interrupts are disabled, so it prevents any tear down
+ 		 * of the page tables.
+-		 * Try IRQ-safe __get_user_pages_fast first.
++		 * Try IRQ-safe get_user_page_fast_only first.
+ 		 * If failed, leave phys_addr as 0.
+ 		 */
+ 		if (current->mm != NULL) {
+ 			pagefault_disable();
+-			if (__get_user_pages_fast(virt, 1, 0, &p) == 1)
++			if (get_user_page_fast_only(virt, 0, &p))
+ 				phys_addr = page_to_phys(p) + virt % PAGE_SIZE;
+ 			pagefault_enable();
+ 		}
+diff --git a/mm/gup.c b/mm/gup.c
+index 80f51a36..bb59f5c 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -2278,7 +2278,7 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+  * to be special.
+  *
+  * For a futex to be placed on a THP tail page, get_futex_key requires a
+- * __get_user_pages_fast implementation that can pin pages. Thus it's still
++ * get_user_pages_fast_only implementation that can pin pages. Thus it's still
+  * useful to have gup_huge_pmd even if we can't operate on ptes.
+  */
+ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+@@ -2683,7 +2683,7 @@ static inline void gup_pgd_range(unsigned long addr, unsigned long end,
+ 
+ #ifndef gup_fast_permitted
+ /*
+- * Check if it's allowed to use __get_user_pages_fast() for the range, or
++ * Check if it's allowed to use get_user_pages_fast_only() for the range, or
+  * we need to fall back to the slow version:
+  */
+ static bool gup_fast_permitted(unsigned long start, unsigned long end)
+@@ -2776,8 +2776,14 @@ static int internal_get_user_pages_fast(unsigned long start, int nr_pages,
+ 
+ 	return ret;
+ }
+-
+-/*
++/**
++ * get_user_pages_fast_only() - pin user pages in memory
++ * @start:      starting user address
++ * @nr_pages:   number of pages from start to pin
++ * @gup_flags:  flags modifying pin behaviour
++ * @pages:      array that receives pointers to the pages pinned.
++ *              Should be at least nr_pages long.
++ *
+  * Like get_user_pages_fast() except it's IRQ-safe in that it won't fall back to
+  * the regular GUP.
+  * Note a difference with get_user_pages_fast: this always returns the
+@@ -2786,8 +2792,8 @@ static int internal_get_user_pages_fast(unsigned long start, int nr_pages,
+  * If the architecture does not support this function, simply return with no
+  * pages pinned.
+  */
+-int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+-			  struct page **pages)
++int get_user_pages_fast_only(unsigned long start, int nr_pages,
++			unsigned int gup_flags, struct page **pages)
+ {
+ 	int nr_pinned;
+ 	/*
+@@ -2797,10 +2803,7 @@ int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+ 	 * FOLL_FAST_ONLY is required in order to match the API description of
+ 	 * this routine: no fall back to regular ("slow") GUP.
+ 	 */
+-	unsigned int gup_flags = FOLL_GET | FOLL_FAST_ONLY;
+-
+-	if (write)
+-		gup_flags |= FOLL_WRITE;
++	gup_flags |= FOLL_GET | FOLL_FAST_ONLY;
+ 
+ 	nr_pinned = internal_get_user_pages_fast(start, nr_pages, gup_flags,
+ 						 pages);
+@@ -2815,7 +2818,7 @@ int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
+ 
+ 	return nr_pinned;
+ }
+-EXPORT_SYMBOL_GPL(__get_user_pages_fast);
++EXPORT_SYMBOL_GPL(get_user_pages_fast_only);
+ 
+ /**
+  * get_user_pages_fast() - pin user pages in memory
+@@ -2886,8 +2889,8 @@ int pin_user_pages_fast(unsigned long start, int nr_pages,
+ EXPORT_SYMBOL_GPL(pin_user_pages_fast);
+ 
+ /*
+- * This is the FOLL_PIN equivalent of __get_user_pages_fast(). Behavior is the
+- * same, except that this one sets FOLL_PIN instead of FOLL_GET.
++ * This is the FOLL_PIN equivalent of get_user_pages_fast_only(). Behavior
++ * is the same, except that this one sets FOLL_PIN instead of FOLL_GET.
+  *
+  * The API rules are the same, too: no negative values may be returned.
+  */
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fc38d63..b62ea62 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1740,7 +1740,6 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+ 			    bool *writable, kvm_pfn_t *pfn)
+ {
+ 	struct page *page[1];
+-	int npages;
+ 
+ 	/*
+ 	 * Fast pin a writable pfn only if it is a write fault request
+@@ -1750,8 +1749,7 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+ 	if (!(write_fault || writable))
+ 		return false;
+ 
+-	npages = __get_user_pages_fast(addr, 1, 1, page);
+-	if (npages == 1) {
++	if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
+ 		*pfn = page_to_pfn(page[0]);
+ 
+ 		if (writable)
+@@ -1791,7 +1789,7 @@ static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+ 	if (unlikely(!write_fault) && writable) {
+ 		struct page *wpage;
+ 
+-		if (__get_user_pages_fast(addr, 1, 1, &wpage) == 1) {
++		if (get_user_page_fast_only(addr, FOLL_WRITE, &wpage)) {
+ 			*writable = true;
+ 			put_page(page);
+ 			page = wpage;
+@@ -1998,7 +1996,7 @@ int gfn_to_page_many_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
+ 	if (entry < nr_pages)
+ 		return 0;
+ 
+-	return __get_user_pages_fast(addr, nr_pages, 1, pages);
++	return get_user_pages_fast_only(addr, nr_pages, FOLL_WRITE, pages);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_page_many_atomic);
+ 
+-- 
+1.9.1
+
