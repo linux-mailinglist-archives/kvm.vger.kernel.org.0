@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0365E1DFE7C
-	for <lists+kvm@lfdr.de>; Sun, 24 May 2020 13:13:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC87A1DFE80
+	for <lists+kvm@lfdr.de>; Sun, 24 May 2020 13:15:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728217AbgEXLNt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 May 2020 07:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45878 "EHLO
+        id S1728092AbgEXLPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 May 2020 07:15:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727101AbgEXLNs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 May 2020 07:13:48 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB3BEC061A0E;
-        Sun, 24 May 2020 04:13:48 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id q8so7554946pfu.5;
-        Sun, 24 May 2020 04:13:48 -0700 (PDT)
+        with ESMTP id S1726735AbgEXLPo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 May 2020 07:15:44 -0400
+Received: from mail-pj1-x1042.google.com (mail-pj1-x1042.google.com [IPv6:2607:f8b0:4864:20::1042])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F364C061A0E;
+        Sun, 24 May 2020 04:15:44 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id a5so7243497pjh.2;
+        Sun, 24 May 2020 04:15:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=4SWwTIKbVIQ/Euyx0ClXTgcjt078nGlfq9rzX2kAtFs=;
-        b=JX6r/7SkdpVN8pAm4Y7uYm90bezy5agmvHhfyiaO19BW1Aw+chOEYxVPEkl0cExUUc
-         OwErkAh/Sq4FokF9OwddUUN9NelhWIiRqgT88cm5GN0AstXQaSZ2pMJKjzeZEqDChD4T
-         i0s9uknCAq7KBUaQ5Tupwu8wKRGIrLq4tOWZ9u2RmJ5WVVh/+m0rzgLbq/GHtuTazP8X
-         prWQwZaRqeqoM1vwVqcJ9SUZ/p9v+BGNVfC0+HtGGhPmfoevwmCWrLc36X/3mnhKmPu4
-         +u/4rIhdstQ/XvF0t/giFMXDIw6AUmXnd9dCNB6Ih9/jQQ1coX2wzfGjI7jrTEz++axB
-         OkMw==
+        bh=bj0wooED+Wjyt9Sr8B5IGNuRbFEUUY0ybuUX3ztY4HQ=;
+        b=GtWTkARt/DtMby30Vwg0O4lZidcpPSu/cAWdYQvhHSyhntXjbfm64U60aGd37HNR1M
+         anL6SfEEFFsDQkQYixuVSf+rWAXztcVrwSHMNShw7BOM1bgFtmYRY7j5z1LDE+OjoIJ3
+         or1GEeD6BP7+/F1/1oYgHR/dM+zSR3uriyGH4LjZ5Z7+3rtd2mbmKehA9Ka+TIuRy82B
+         977bU+UiuhGH2MSWC9LgvNmTfawVi36o+Ew3DT866hnO1/izCbDrv2z3hB4qaN7C8aQ0
+         fLm+v+Cozj+Scw6P10GchScq/Dv5Ci+WI0+w/Zb8sG3uuJjfg0wFXgVK/oD+3bwnXvLy
+         jDdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=4SWwTIKbVIQ/Euyx0ClXTgcjt078nGlfq9rzX2kAtFs=;
-        b=ClpSoKpByZIrpmKafu2706npeOt0Xmd7kCarcdlar5ePYcrEA124hBlFS+AxztsDaB
-         D53LeVNydN1k+XDUEJa2WQFOMnVFXPNADOvdx+S3SFOcvsjH8V4juf/NWWOqEa/pT6Tx
-         HTub38YqLYUI4irxUhgTA1yjRPZI2HudcScBJWoNqw4S5cz9zluPAQD9BZi+Ma4ZXUZA
-         K0Uq1wEhWmIVjhtW62vUMsCTGHjVi7PEHjeFaLAq7E9GFJ9j8nYoN1ulfJ5llRx1Sl4Y
-         k7fMfav+gjAMzikrvoPMvMd152QrtOi5DmbMq1J1mF44LZRFizCf8RHgwtcVejmdVR8z
-         ybKg==
-X-Gm-Message-State: AOAM532XFVlCWh7+s1i1y4ZFeaFdXt9ArFYuiiPi/8DPRI/YIzFJjISU
-        3I0wRSMvv6EWiAyZWlfkUuY=
-X-Google-Smtp-Source: ABdhPJy7r6RAIENvEuj+J/Qex1tDgsb5Gz6FVG+v7Uznk5tJg8GzQlRT90SnwelwGq+mfdIRZr8GVg==
-X-Received: by 2002:a63:b64e:: with SMTP id v14mr22465248pgt.164.1590318828296;
-        Sun, 24 May 2020 04:13:48 -0700 (PDT)
+        bh=bj0wooED+Wjyt9Sr8B5IGNuRbFEUUY0ybuUX3ztY4HQ=;
+        b=LoRV1bApUL4w7RZ1bH2V8pGDgTy9a7TwrLZoGImXlPoTZWRkdDVuKRdtBvhc1DD4Cn
+         zInc/f0bsweUocZbZDDi52f2BSOnzr8dvCHEyR/ZaEihxvlghi2t5vb9mppGvzUxJhUM
+         6Zp9F0GLn6sEUKILyFzB74xHKUE+yNP/4+87yNzkw/zIpRbmBymWhzbGecu2D8OdABP/
+         osz/VvaOC97ycmiqzqlGVqcR0ZSxcGjQSew3w/THkEQvuM/Ah99t2xdohaW1ddyG1TRX
+         txxrTXYe/iSQySDfdjsaxJLypBcwcRIMyCV96bKilzTOL3NdaHDY2rr0Nug7CoXHXSte
+         40tw==
+X-Gm-Message-State: AOAM532j2ZWTLIisumef+9lmQ/ov6P//Da/JtjSe8xmA3o8MZFDMziHs
+        WiWlKUKoeMsxaPySrZld2mU=
+X-Google-Smtp-Source: ABdhPJyk5c984oRn9AWljnmxMLpu4b2eoViSNXcne6XXAGz40MxZETWg3vM96PxZ4ZR5SbqX7JHS/g==
+X-Received: by 2002:a17:90a:a43:: with SMTP id o61mr15135044pjo.179.1590318943673;
+        Sun, 24 May 2020 04:15:43 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com. [34.92.144.28])
-        by smtp.gmail.com with ESMTPSA id 192sm1971719pfu.202.2020.05.24.04.13.45
+        by smtp.gmail.com with ESMTPSA id 192sm1971719pfu.202.2020.05.24.04.15.41
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 24 May 2020 04:13:47 -0700 (PDT)
+        Sun, 24 May 2020 04:15:43 -0700 (PDT)
 From:   Huacai Chen <chenhc@lemote.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
@@ -54,11 +54,10 @@ Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
         Fuxin Zhang <zhangfx@lemote.com>,
         Huacai Chen <chenhuacai@gmail.com>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Xing Li <lixing@loongson.cn>, Stable <stable@vger.kernel.org>,
         Huacai Chen <chenhc@lemote.com>
-Subject: [PATCH V8 02/15] KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
-Date:   Sun, 24 May 2020 19:13:26 +0800
-Message-Id: <1590318819-24520-3-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V8 03/15] KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
+Date:   Sun, 24 May 2020 19:13:27 +0800
+Message-Id: <1590318819-24520-4-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1590318819-24520-1-git-send-email-chenhc@lemote.com>
 References: <1590318819-24520-1-git-send-email-chenhc@lemote.com>
@@ -67,40 +66,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Xing Li <lixing@loongson.cn>
+Loongson-3 based machines can have as many as 16 CPUs, and so does
+memory slots, so increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16.
 
-If a CPU support more than 32bit vmbits (which is true for 64bit CPUs),
-VPN2_MASK set to fixed 0xffffe000 will lead to a wrong EntryHi in some
-functions such as _kvm_mips_host_tlb_inv().
-
-The cpu_vmbits definition of 32bit CPU in cpu-features.h is 31, so we
-still use the old definition.
-
-Cc: Stable <stable@vger.kernel.org>
 Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Signed-off-by: Xing Li <lixing@loongson.cn>
-[Huacai: Improve commit messages]
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/include/asm/kvm_host.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/mips/include/asm/kvm_host.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 609fdcd..31c84d8 100644
+index 31c84d8..bee9619 100644
 --- a/arch/mips/include/asm/kvm_host.h
 +++ b/arch/mips/include/asm/kvm_host.h
-@@ -276,7 +276,11 @@ enum emulation_result {
- #define MIPS3_PG_SHIFT		6
- #define MIPS3_PG_FRAME		0x3fffffc0
+@@ -78,8 +78,8 @@
+ #define KVM_REG_MIPS_CP0_KSCRATCH6	MIPS_CP0_64(31, 7)
  
-+#if defined(CONFIG_64BIT)
-+#define VPN2_MASK		GENMASK(cpu_vmbits - 1, 13)
-+#else
- #define VPN2_MASK		0xffffe000
-+#endif
- #define KVM_ENTRYHI_ASID	cpu_asid_mask(&boot_cpu_data)
- #define TLB_IS_GLOBAL(x)	((x).tlb_lo[0] & (x).tlb_lo[1] & ENTRYLO_G)
- #define TLB_VPN2(x)		((x).tlb_hi & VPN2_MASK)
+ 
+-#define KVM_MAX_VCPUS		8
+-#define KVM_USER_MEM_SLOTS	8
++#define KVM_MAX_VCPUS		16
++#define KVM_USER_MEM_SLOTS	16
+ /* memory slots that does not exposed to userspace */
+ #define KVM_PRIVATE_MEM_SLOTS	0
+ 
 -- 
 2.7.0
 
