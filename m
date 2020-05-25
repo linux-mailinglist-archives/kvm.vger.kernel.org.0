@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 373291E1176
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 17:15:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD2351E1181
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 17:18:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391065AbgEYPP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 11:15:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53662 "EHLO
+        id S2404057AbgEYPR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 11:17:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390911AbgEYPP1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 11:15:27 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC71EC05BD43
-        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:15:26 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id x22so10687543lfd.4
-        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:15:26 -0700 (PDT)
+        with ESMTP id S2404018AbgEYPR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 11:17:57 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3720CC061A0E
+        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:17:57 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id v16so21157443ljc.8
+        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:17:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=kYBoEhN96Rd2bTOOCtpwhH5a3zXfbXb8vg+QY2lOxCg=;
-        b=kOFxbK1SPD4S5SY6soHeM+HeZetfnuSzhji+qxwHWT0CnYGiTqbZyd5Pheqma0e875
-         +MeqLFtQktc2cDAhBp28exGqp9SwAbHfgwh33X7Te8RypMFK9HWnQkL2MrzsNAqCScK6
-         JNLnQru0CXvZL1fQ60ltcd37sXmyjoIIwuA3QVgq6EEAGQFDP28U90KbysSCsAeJrZU+
-         l4sNaJTOLAogUGRzOYArKj/L5yRHfKyz6aiMa9ry//yHODMO8hQzJ+4yZO8KA70LH7Du
-         MKZy5UHT00e34txu1vJGIP8KP5A9zj1TgpxR4Y3ffECpWvGwe+FB9ovaeS2dyXSdWvZK
-         Ptqw==
+        bh=KmCwnA7a5dVJlIQoJdDfHmomwFfTjqYUrhRIWlT2Nyk=;
+        b=WuGyrHUzog4bt26/4hOGUWDImSEp43kS8zG/1GJTSqmzUyTPyXIuKgZFMo4Sp080SY
+         fX35jcmj9TBOukdtUSSzCyyweXoAU+OtgxRlhrX18a6u2IIdlI0HWc0YD/uihmNkARC6
+         FFTTZ7e093d3qTTm3OghNQHI7gph1gQ7tvOAVxA5OQVWY0+BuWHpdmk5bkRwE7Qayxz6
+         GQGEVgrMr1mFs+J5zx84vFQaUUig81891dMsKvu23wBViUbwF3eCeU9rY3q1ED2q6i/7
+         znqGwrvifOcSNfzyygJK1Vecby2bQR340gP0iACEkEq+9faR2GYQ964je3o/conEY8DO
+         lcRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=kYBoEhN96Rd2bTOOCtpwhH5a3zXfbXb8vg+QY2lOxCg=;
-        b=kwfvUelu7svtXgh8TlcRUjC6YTuQeQRduqdYL90SqATBO6i6kYEK/cWBKOwvSorAXv
-         mBKZTaeMTzKh3Rxfq86SVixAZ1Ri3oVsENwDq4r9NZ7sCan91epg6rLuyhJZGYeQUdNh
-         PyWOhMfEXaTKh2MSg+zcWuytMmFieDHQalLi56Yu7GafZdfcaRhjjrFWyHO6zC6s8eDd
-         t09f6lJRkMZ0QslhV1T5FbRMNAsVE1LfeyxhrrEBrY7mu+mNgNtSCpBwRa5P1M25MGU+
-         NfKqUwYCb5qaF5AR7OUTUtmZ1hkHk4b20WUidZ2TfMRicc0AOyKU8IxrsJ6eq0wIYuuy
-         Swew==
-X-Gm-Message-State: AOAM530Q7qSiwuPXZ/GwwTh6Z0y1XyBXE0H/oKPm0cw9xPOpkTV25eQH
-        aUvsEstmZP9zxuOlvUc4d+UXgw==
-X-Google-Smtp-Source: ABdhPJzXLUWIYgQQ8mQTCK0ROPNDbamXhbZpVXtVtJCcCUP29y0cVktOsqQ6gbXEx34Ez3amGKFUwA==
-X-Received: by 2002:a19:c505:: with SMTP id w5mr2287001lfe.201.1590419725196;
-        Mon, 25 May 2020 08:15:25 -0700 (PDT)
+        bh=KmCwnA7a5dVJlIQoJdDfHmomwFfTjqYUrhRIWlT2Nyk=;
+        b=FhFNe9T0/M+nn1YqV1QchD98ED/YhiwwBnUqB+GtVczR6nmxAZXWBKYpVwu3Tr8af1
+         0c8EbzpaCnsQjmOrX3Vqj3aacnIFrbFoXuD+NrjhzmpiykXG6thPqGHGe951kb654u7J
+         23w1qzCU6MVhHIE64LVh98LkIZ5wTmF1dve/OiA1Ngovtn7Y5TV60WP5w8EaMjHoHEtu
+         Zx8RO58IYRNPQyxaFEfJgj7yDspH+31y68PE2LI1Z5YpN6+zjRaRvlq4EsPiIaD7Mphv
+         qHNXVtdKM1e2xh3VGdn1KCkyNhNgq7p7vcs7ogILO6n8uexRWeJqwEbnfRzX7UhNKbkP
+         z1gg==
+X-Gm-Message-State: AOAM533g0V3Gdpo9AfdtEugvOOsXbKDaQpVB7nLJFq0fcDkqi9XFL0y9
+        yGwneTACzgd2AbUgdsL4hci/7A==
+X-Google-Smtp-Source: ABdhPJz4Z11nGMXKBdzLwDq5RYdn3XVkZC6lsZEQkZwhYr4AviDn5phADtHDSbzOkyRQItFlkiSDBQ==
+X-Received: by 2002:a2e:8e91:: with SMTP id z17mr11191455ljk.144.1590419875635;
+        Mon, 25 May 2020 08:17:55 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id f6sm4673999ljn.91.2020.05.25.08.15.24
+        by smtp.gmail.com with ESMTPSA id k27sm4373301lfe.88.2020.05.25.08.17.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2020 08:15:24 -0700 (PDT)
+        Mon, 25 May 2020 08:17:55 -0700 (PDT)
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 79D1410230F; Mon, 25 May 2020 18:15:25 +0300 (+03)
-Date:   Mon, 25 May 2020 18:15:25 +0300
+        id 0498010230F; Mon, 25 May 2020 18:17:56 +0300 (+03)
+Date:   Mon, 25 May 2020 18:17:55 +0300
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     David Rientjes <rientjes@google.com>,
@@ -69,152 +69,224 @@ Cc:     David Rientjes <rientjes@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: Re: [RFC 02/16] x86/kvm: Introduce KVM memory protection feature
-Message-ID: <20200525151525.qmfvzxbl7sq46cdq@box>
+Subject: Re: [RFC 06/16] KVM: Use GUP instead of copy_from/to_user() to
+ access guest memory
+Message-ID: <20200525151755.yzbmemtrii455s6k@box>
 References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <20200522125214.31348-3-kirill.shutemov@linux.intel.com>
- <87d06s83is.fsf@vitty.brq.redhat.com>
+ <20200522125214.31348-7-kirill.shutemov@linux.intel.com>
+ <87a71w832c.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87d06s83is.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87a71w832c.fsf@vitty.brq.redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 25, 2020 at 04:58:51PM +0200, Vitaly Kuznetsov wrote:
+On Mon, May 25, 2020 at 05:08:43PM +0200, Vitaly Kuznetsov wrote:
 > "Kirill A. Shutemov" <kirill@shutemov.name> writes:
 > 
-> > Provide basic helpers, KVM_FEATURE and a hypercall.
-> >
-> > Host side doesn't provide the feature yet, so it is a dead code for now.
+> > New helpers copy_from_guest()/copy_to_guest() to be used if KVM memory
+> > protection feature is enabled.
 > >
 > > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 > > ---
-> >  arch/x86/include/asm/kvm_para.h      |  5 +++++
-> >  arch/x86/include/uapi/asm/kvm_para.h |  3 ++-
-> >  arch/x86/kernel/kvm.c                | 16 ++++++++++++++++
-> >  include/uapi/linux/kvm_para.h        |  3 ++-
-> >  4 files changed, 25 insertions(+), 2 deletions(-)
+> >  include/linux/kvm_host.h |  4 +++
+> >  virt/kvm/kvm_main.c      | 78 ++++++++++++++++++++++++++++++++++------
+> >  2 files changed, 72 insertions(+), 10 deletions(-)
 > >
-> > diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-> > index 9b4df6eaa11a..3ce84fc07144 100644
-> > --- a/arch/x86/include/asm/kvm_para.h
-> > +++ b/arch/x86/include/asm/kvm_para.h
-> > @@ -10,11 +10,16 @@ extern void kvmclock_init(void);
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 131cc1527d68..bd0bb600f610 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -503,6 +503,7 @@ struct kvm {
+> >  	struct srcu_struct srcu;
+> >  	struct srcu_struct irq_srcu;
+> >  	pid_t userspace_pid;
+> > +	bool mem_protected;
+> >  };
 > >  
-> >  #ifdef CONFIG_KVM_GUEST
-> >  bool kvm_check_and_clear_guest_paused(void);
-> > +bool kvm_mem_protected(void);
-> >  #else
-> >  static inline bool kvm_check_and_clear_guest_paused(void)
-> >  {
-> >  	return false;
+> >  #define kvm_err(fmt, ...) \
+> > @@ -727,6 +728,9 @@ void kvm_set_pfn_dirty(kvm_pfn_t pfn);
+> >  void kvm_set_pfn_accessed(kvm_pfn_t pfn);
+> >  void kvm_get_pfn(kvm_pfn_t pfn);
+> >  
+> > +int copy_from_guest(void *data, unsigned long hva, int len);
+> > +int copy_to_guest(unsigned long hva, const void *data, int len);
+> > +
+> >  void kvm_release_pfn(kvm_pfn_t pfn, bool dirty, struct gfn_to_pfn_cache *cache);
+> >  int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
+> >  			int len);
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 731c1e517716..033471f71dae 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -2248,8 +2248,48 @@ static int next_segment(unsigned long len, int offset)
+> >  		return len;
 > >  }
-> > +static inline bool kvm_mem_protected(void)
+> >  
+> > +int copy_from_guest(void *data, unsigned long hva, int len)
 > > +{
-> > +	return false;
-> > +}
-> >  #endif /* CONFIG_KVM_GUEST */
-> >  
-> >  #define KVM_HYPERCALL \
-> > diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> > index 2a8e0b6b9805..c3b499acc98f 100644
-> > --- a/arch/x86/include/uapi/asm/kvm_para.h
-> > +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> > @@ -28,9 +28,10 @@
-> >  #define KVM_FEATURE_PV_UNHALT		7
-> >  #define KVM_FEATURE_PV_TLB_FLUSH	9
-> >  #define KVM_FEATURE_ASYNC_PF_VMEXIT	10
-> > -#define KVM_FEATURE_PV_SEND_IPI	11
-> > +#define KVM_FEATURE_PV_SEND_IPI		11
-> 
-> Nit: spurrious change
-> 
-
-I fixed indentation while there. (Look at the file, not the diff to see
-what I mean).
-
-> >  #define KVM_FEATURE_POLL_CONTROL	12
-> >  #define KVM_FEATURE_PV_SCHED_YIELD	13
-> > +#define KVM_FEATURE_MEM_PROTECTED	14
-> >  
-> >  #define KVM_HINTS_REALTIME      0
-> >  
-> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> > index 6efe0410fb72..bda761ca0d26 100644
-> > --- a/arch/x86/kernel/kvm.c
-> > +++ b/arch/x86/kernel/kvm.c
-> > @@ -35,6 +35,13 @@
-> >  #include <asm/tlb.h>
-> >  #include <asm/cpuidle_haltpoll.h>
-> >  
-> > +static bool mem_protected;
+> > +	int offset = offset_in_page(hva);
+> > +	struct page *page;
+> > +	int npages, seg;
 > > +
-> > +bool kvm_mem_protected(void)
-> > +{
-> > +	return mem_protected;
-> > +}
-> > +
-> 
-> Honestly, I don't see a need for kvm_mem_protected(), just rename the
-> bool if you need kvm_ prefix :-)
-
-For !CONFIG_KVM_GUEST it would not be a variable. We may want to change it
-to static branch or something in the future.
-
-> >  static int kvmapf = 1;
-> >  
-> >  static int __init parse_no_kvmapf(char *arg)
-> > @@ -727,6 +734,15 @@ static void __init kvm_init_platform(void)
-> >  {
-> >  	kvmclock_init();
-> >  	x86_platform.apic_post_init = kvm_apic_init;
-> > +
-> > +	if (kvm_para_has_feature(KVM_FEATURE_MEM_PROTECTED)) {
-> > +		if (kvm_hypercall0(KVM_HC_ENABLE_MEM_PROTECTED)) {
-> > +			pr_err("Failed to enable KVM memory protection\n");
-> > +			return;
-> > +		}
-> > +
-> > +		mem_protected = true;
+> > +	while ((seg = next_segment(len, offset)) != 0) {
+> > +		npages = get_user_pages_unlocked(hva, 1, &page, 0);
+> > +		if (npages != 1)
+> > +			return -EFAULT;
+> > +		memcpy(data, page_address(page) + offset, seg);
+> > +		put_page(page);
+> > +		len -= seg;
+> > +		hva += seg;
+> > +		offset = 0;
 > > +	}
-> >  }
-> 
-> Personally, I'd prefer to do this via setting a bit in a KVM-specific
-> MSR instead. The benefit is that the guest doesn't need to remember if
-> it enabled the feature or not, it can always read the config msr. May
-> come handy for e.g. kexec/kdump.
-
-I think we would need to remember it anyway. Accessing MSR is somewhat
-expensive. But, okay, I can rework it MSR if needed.
-
-Note, that we can avoid the enabling algother, if we modify BIOS to deal
-with private/shared memory. Currently BIOS get system crash if we enable
-the feature from time zero.
-
-> >  const __initconst struct hypervisor_x86 x86_hyper_kvm = {
-> > diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
-> > index 8b86609849b9..1a216f32e572 100644
-> > --- a/include/uapi/linux/kvm_para.h
-> > +++ b/include/uapi/linux/kvm_para.h
-> > @@ -27,8 +27,9 @@
-> >  #define KVM_HC_MIPS_EXIT_VM		7
-> >  #define KVM_HC_MIPS_CONSOLE_OUTPUT	8
-> >  #define KVM_HC_CLOCK_PAIRING		9
-> > -#define KVM_HC_SEND_IPI		10
-> > +#define KVM_HC_SEND_IPI			10
-> 
-> Same spurrious change detected.
-
-The same justification :)
-
-> >  #define KVM_HC_SCHED_YIELD		11
-> > +#define KVM_HC_ENABLE_MEM_PROTECTED	12
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +int copy_to_guest(unsigned long hva, const void *data, int len)
+> > +{
+> > +	int offset = offset_in_page(hva);
+> > +	struct page *page;
+> > +	int npages, seg;
+> > +
+> > +	while ((seg = next_segment(len, offset)) != 0) {
+> > +		npages = get_user_pages_unlocked(hva, 1, &page, FOLL_WRITE);
+> > +		if (npages != 1)
+> > +			return -EFAULT;
+> > +		memcpy(page_address(page) + offset, data, seg);
+> > +		put_page(page);
+> > +		len -= seg;
+> > +		hva += seg;
+> > +		offset = 0;
+> > +	}
+> > +	return 0;
+> > +}
+> > +
+> >  static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+> > -				 void *data, int offset, int len)
+> > +				 void *data, int offset, int len,
+> > +				 bool protected)
+> >  {
+> >  	int r;
+> >  	unsigned long addr;
+> > @@ -2257,7 +2297,10 @@ static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+> >  	addr = gfn_to_hva_memslot_prot(slot, gfn, NULL);
+> >  	if (kvm_is_error_hva(addr))
+> >  		return -EFAULT;
+> > -	r = __copy_from_user(data, (void __user *)addr + offset, len);
+> > +	if (protected)
+> > +		r = copy_from_guest(data, addr + offset, len);
+> > +	else
+> > +		r = __copy_from_user(data, (void __user *)addr + offset, len);
+> >  	if (r)
+> >  		return -EFAULT;
+> >  	return 0;
+> > @@ -2268,7 +2311,8 @@ int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
+> >  {
+> >  	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
 > >  
-> >  /*
-> >   * hypercalls use architecture specific
+> > -	return __kvm_read_guest_page(slot, gfn, data, offset, len);
+> > +	return __kvm_read_guest_page(slot, gfn, data, offset, len,
+> > +				     kvm->mem_protected);
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_read_guest_page);
+> >  
+> > @@ -2277,7 +2321,8 @@ int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data,
+> >  {
+> >  	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> >  
+> > -	return __kvm_read_guest_page(slot, gfn, data, offset, len);
+> > +	return __kvm_read_guest_page(slot, gfn, data, offset, len,
+> > +				     vcpu->kvm->mem_protected);
+> 
+> Personally, I would've just added 'struct kvm' pointer to 'struct
+> kvm_memory_slot' to be able to extract 'mem_protected' info when
+> needed. This will make the patch much smaller.
+
+Okay, can do.
+
+Other thing I tried is to have per-slot flag to indicate that it's
+protected. But Sean pointed that it's all-or-nothing feature and having
+the flag in the slot would be misleading.
+
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_page);
+> >  
+> > @@ -2350,7 +2395,8 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
+> >  EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+> >  
+> >  static int __kvm_write_guest_page(struct kvm_memory_slot *memslot, gfn_t gfn,
+> > -			          const void *data, int offset, int len)
+> > +			          const void *data, int offset, int len,
+> > +				  bool protected)
+> >  {
+> >  	int r;
+> >  	unsigned long addr;
+> > @@ -2358,7 +2404,11 @@ static int __kvm_write_guest_page(struct kvm_memory_slot *memslot, gfn_t gfn,
+> >  	addr = gfn_to_hva_memslot(memslot, gfn);
+> >  	if (kvm_is_error_hva(addr))
+> >  		return -EFAULT;
+> > -	r = __copy_to_user((void __user *)addr + offset, data, len);
+> > +
+> > +	if (protected)
+> > +		r = copy_to_guest(addr + offset, data, len);
+> > +	else
+> > +		r = __copy_to_user((void __user *)addr + offset, data, len);
+> 
+> All users of copy_to_guest() will have to have the same 'if (protected)'
+> check, right? Why not move the check to copy_to/from_guest() then?
+
+Good point.
+
+> >  	if (r)
+> >  		return -EFAULT;
+> >  	mark_page_dirty_in_slot(memslot, gfn);
+> > @@ -2370,7 +2420,8 @@ int kvm_write_guest_page(struct kvm *kvm, gfn_t gfn,
+> >  {
+> >  	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
+> >  
+> > -	return __kvm_write_guest_page(slot, gfn, data, offset, len);
+> > +	return __kvm_write_guest_page(slot, gfn, data, offset, len,
+> > +				      kvm->mem_protected);
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_write_guest_page);
+> >  
+> > @@ -2379,7 +2430,8 @@ int kvm_vcpu_write_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+> >  {
+> >  	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> >  
+> > -	return __kvm_write_guest_page(slot, gfn, data, offset, len);
+> > +	return __kvm_write_guest_page(slot, gfn, data, offset, len,
+> > +				      vcpu->kvm->mem_protected);
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_vcpu_write_guest_page);
+> >  
+> > @@ -2495,7 +2547,10 @@ int kvm_write_guest_offset_cached(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
+> >  	if (unlikely(!ghc->memslot))
+> >  		return kvm_write_guest(kvm, gpa, data, len);
+> >  
+> > -	r = __copy_to_user((void __user *)ghc->hva + offset, data, len);
+> > +	if (kvm->mem_protected)
+> > +		r = copy_to_guest(ghc->hva + offset, data, len);
+> > +	else
+> > +		r = __copy_to_user((void __user *)ghc->hva + offset, data, len);
+> >  	if (r)
+> >  		return -EFAULT;
+> >  	mark_page_dirty_in_slot(ghc->memslot, gpa >> PAGE_SHIFT);
+> > @@ -2530,7 +2585,10 @@ int kvm_read_guest_cached(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
+> >  	if (unlikely(!ghc->memslot))
+> >  		return kvm_read_guest(kvm, ghc->gpa, data, len);
+> >  
+> > -	r = __copy_from_user(data, (void __user *)ghc->hva, len);
+> > +	if (kvm->mem_protected)
+> > +		r = copy_from_guest(data, ghc->hva, len);
+> > +	else
+> > +		r = __copy_from_user(data, (void __user *)ghc->hva, len);
+> >  	if (r)
+> >  		return -EFAULT;
 > 
 > -- 
 > Vitaly
