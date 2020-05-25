@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AC5C1E17A1
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 00:14:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D4431E17A0
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 00:14:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388054AbgEYWOI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 18:14:08 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:59587 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729798AbgEYWOH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 18:14:07 -0400
+        id S1731235AbgEYWOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 18:14:05 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:8233 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729589AbgEYWOE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 18:14:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590444845; x=1621980845;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Gqa9yJh460SEbEt/xbCMTARTLbZRW5tfuDBAX1ji5js=;
-  b=uHCsLfmJw2Y0lmQgkF7FrGJE9dlNSmNpVuX8uvIJUaS0SATkX3YucP66
-   yC3QCT0EqZ2MgI1B33OBGpFrHEM7uitUrS30BLmXe+bFSK6bNTmgQSuAk
-   8GbxcgpWfwjO81PgXKYSiS3FfzcaCFfMNEsnEocqp1wo6yCvJBrm+lTDY
-   I=;
-IronPort-SDR: g5ZR5/3J/0v+QciLqZL5v8DICl6PbqTJCIGWsqualwoAJcKoTvwblaoBTcB4vmKg6ky+DNqz7g
- ZVV2qVitGyxw==
+  t=1590444842; x=1621980842;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=J+W1uF/+pHzCPt7+R5eOTYXFdxlNyATSaaicqu0ygi4=;
+  b=DV/WS2SEsl6SN7mojgkKHKccRJXPIQQYjY7shJa+vE+S+cX1aC53pA6K
+   C91u0weH7SxRkcT8iLVXYqyR4K99jIyO1FMpmBccSc2WXGszsX6YIuJH6
+   LsizebSBWExKRHFqKOJGcbEeKPKi5O+EvsxUelnwGNDFq+DlGIlIkErQc
+   M=;
+IronPort-SDR: ufGBgo4KxIqswKpBp10OaHci71Oh2zVMMMtxLHse5CRqI8VsWAEmGO9NwwFAnlutgpp/CTWwuS
+ 1aWhJXJcC2Ag==
 X-IronPort-AV: E=Sophos;i="5.73,435,1583193600"; 
-   d="scan'208";a="32053488"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-715bee71.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 25 May 2020 22:13:52 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1a-715bee71.us-east-1.amazon.com (Postfix) with ESMTPS id AC177A2439;
-        Mon, 25 May 2020 22:13:50 +0000 (UTC)
+   d="scan'208";a="32159712"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-27fb8269.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 25 May 2020 22:14:01 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1e-27fb8269.us-east-1.amazon.com (Postfix) with ESMTPS id 33E3CA1B68;
+        Mon, 25 May 2020 22:14:00 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 25 May 2020 22:13:50 +0000
+ id 15.0.1497.2; Mon, 25 May 2020 22:13:59 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 25 May 2020 22:13:40 +0000
+ id 15.0.1497.2; Mon, 25 May 2020 22:13:49 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -55,10 +55,12 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
         <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v3 00/18] Add support for Nitro Enclaves
-Date:   Tue, 26 May 2020 01:13:16 +0300
-Message-ID: <20200525221334.62966-1-andraprs@amazon.com>
+Subject: [PATCH v3 01/18] nitro_enclaves: Add ioctl interface definition
+Date:   Tue, 26 May 2020 01:13:17 +0300
+Message-ID: <20200525221334.62966-2-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
+In-Reply-To: <20200525221334.62966-1-andraprs@amazon.com>
+References: <20200525221334.62966-1-andraprs@amazon.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.43.160.90]
 X-ClientProxiedBy: EX13D12UWC004.ant.amazon.com (10.43.162.182) To
@@ -70,175 +72,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nitro Enclaves (NE) is a new Amazon Elastic Compute Cloud (EC2) capability
-that allows customers to carve out isolated compute environments within EC2
-instances [1].
+The Nitro Enclaves driver handles the enclave lifetime management. This
+includes enclave creation, termination and setting up its resources such
+as memory and CPU.
 
-For example, an application that processes sensitive data and runs in a VM,
-can be separated from other applications running in the same VM. This
-application then runs in a separate VM than the primary VM, namely an enclave.
+An enclave runs alongside the VM that spawned it. It is abstracted as a
+process running in the VM that launched it. The process interacts with
+the NE driver, that exposes an ioctl interface for creating an enclave
+and setting up its resources.
 
-An enclave runs alongside the VM that spawned it. This setup matches low latency
-applications needs. The resources that are allocated for the enclave, such as
-memory and CPU, are carved out of the primary VM. Each enclave is mapped to a
-process running in the primary VM, that communicates with the NE driver via an
-ioctl interface.
+Include part of the KVM ioctls in the provided ioctl interface, with
+additional NE ioctl commands that e.g. triggers the enclave run.
 
-In this sense, there are two components:
-
-1. An enclave abstraction process - a user space process running in the primary
-VM guest  that uses the provided ioctl interface of the NE driver to spawn an
-enclave VM (that's 2 below).
-
-How does all gets to an enclave VM running on the host?
-
-There is a NE emulated PCI device exposed to the primary VM. The driver for this
-new PCI device is included in the current patch series.
-
-The ioctl logic is mapped to PCI device commands e.g. the NE_START_ENCLAVE ioctl
-maps to an enclave start PCI command or the KVM_SET_USER_MEMORY_REGION maps to
-an add memory PCI command. The PCI device commands are then translated into
-actions taken on the hypervisor side; that's the Nitro hypervisor running on the
-host where the primary VM is running. The Nitro hypervisor is based on core KVM
-technology.
-
-2. The enclave itself - a VM running on the same host as the primary VM that
-spawned it. Memory and CPUs are carved out of the primary VM and are dedicated
-for the enclave VM. An enclave does not have persistent storage attached.
-
-An enclave communicates with the primary VM via a local communication channel,
-using virtio-vsock [2]. The primary VM has virtio-pci vsock emulated device,
-while the enclave VM has a virtio-mmio vsock emulated device. The vsock device
-uses eventfd for signaling. The enclave VM sees the usual interfaces - local
-APIC and IOAPIC - to get interrupts from virtio-vsock device. The virtio-mmio
-device is placed in memory below the typical 4 GiB.
-
-The application that runs in the enclave needs to be packaged in an enclave
-image together with the OS ( e.g. kernel, ramdisk, init ) that will run in the
-enclave VM. The enclave VM has its own kernel and follows the standard Linux
-boot protocol.
-
-The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
-Enclave Image Format (EIF); plus an EIF header including metadata such as magic
-number, eif version, image size and CRC. We've also considered FIT image format
-[3] as an option for the enclave image.
-
-Hash values are computed for the entire enclave image (EIF), the kernel and
-ramdisk(s). That's used, for example, to check that the enclave image that is
-loaded in the enclave VM is the one that was intended to be run.
-
-These crypto measurements are included in a signed attestation document
-generated by the Nitro Hypervisor and further used to prove the identity of the
-enclave; KMS is an example of service that NE is integrated with and that checks
-the attestation doc.
-
-The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB. The
-init process in the enclave connects to the vsock CID of the primary VM and a
-predefined port - 9000 - to send a heartbeat value - 0xb7. This mechanism is
-used to check in the primary VM that the enclave has booted.
-
-If the enclave VM crashes or gracefully exits, an interrupt event is received by
-the NE driver. This event is sent further to the user space enclave process
-running in the primary VM via a poll notification mechanism. Then the user space
-enclave process can exit.
-
-The following patch series covers the NE driver for enclave lifetime management.
-It provides an ioctl interface to the user space and includes the NE PCI device
-driver that is the means of communication with the hypervisor running on the
-host where the primary VM and the enclave are launched.
-
-The proposed solution is following the KVM model and uses KVM ioctls to be able
-to create and set resources for enclaves. Additional NE ioctl commands, besides
-the ones provided by KVM, are used to start an enclave and get memory offset for
-in-memory enclave image loading.
-
-Thank you.
-
-Andra
-
-[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
-[2] http://man7.org/linux/man-pages/man7/vsock.7.html
-[3] https://github.com/u-boot/u-boot/tree/master/doc/uImage.FIT
-
+Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
-
-Patch Series Changelog
-
-The patch series is built on top of v5.7-rc7.
+Changelog
 
 v2 -> v3
 
-* Rebase on top of v5.7-rc7.
-* Add changelog to each patch in the series.
-* Remove "ratelimited" from the logs that are not in the ioctl call paths.
-* Update static calls sanity checks.
-* Remove file ops that do nothing for now.
-* Remove GPL additional wording as SPDX-License-Identifier is already in place.
-* v2: https://lore.kernel.org/lkml/20200522062946.28973-1-andraprs@amazon.com/
+* Remove the GPL additional wording as SPDX-License-Identifier is already in
+place.
 
 v1 -> v2
 
-* Rebase on top of v5.7-rc6.
-* Adapt codebase based on feedback from v1.
-* Update ioctl number definition - major and minor.
-* Add sample / documentation for the ioctl interface basic flow usage.
-* Update cover letter to include more context on the NE overall.
-* Add fix for the enclave / vcpu fd creation error cleanup path.
-* Add fix reported by kbuild test robot <lkp@intel.com>.
-* v1: https://lore.kernel.org/lkml/20200421184150.68011-1-andraprs@amazon.com/
-
+* Add ioctl for getting enclave image load metadata.
+* Update NE_ENCLAVE_START ioctl name to NE_START_ENCLAVE. 
+* Add entry in Documentation/userspace-api/ioctl/ioctl-number.rst for NE ioctls.
+* Update NE ioctls definition based on the updated ioctl range for major and
+minor.
 ---
-
-Andra Paraschiv (18):
-  nitro_enclaves: Add ioctl interface definition
-  nitro_enclaves: Define the PCI device interface
-  nitro_enclaves: Define enclave info for internal bookkeeping
-  nitro_enclaves: Init PCI device driver
-  nitro_enclaves: Handle PCI device command requests
-  nitro_enclaves: Handle out-of-band PCI device events
-  nitro_enclaves: Init misc device providing the ioctl interface
-  nitro_enclaves: Add logic for enclave vm creation
-  nitro_enclaves: Add logic for enclave vcpu creation
-  nitro_enclaves: Add logic for enclave image load metadata
-  nitro_enclaves: Add logic for enclave memory region set
-  nitro_enclaves: Add logic for enclave start
-  nitro_enclaves: Add logic for enclave termination
-  nitro_enclaves: Add Kconfig for the Nitro Enclaves driver
-  nitro_enclaves: Add Makefile for the Nitro Enclaves driver
-  nitro_enclaves: Add sample for ioctl interface usage
-  nitro_enclaves: Add overview documentation
-  MAINTAINERS: Add entry for the Nitro Enclaves driver
-
- Documentation/nitro_enclaves/ne_overview.txt  |   86 ++
- .../userspace-api/ioctl/ioctl-number.rst      |    5 +-
- MAINTAINERS                                   |   13 +
- drivers/virt/Kconfig                          |    2 +
- drivers/virt/Makefile                         |    2 +
- drivers/virt/nitro_enclaves/Kconfig           |   16 +
- drivers/virt/nitro_enclaves/Makefile          |   11 +
- drivers/virt/nitro_enclaves/ne_misc_dev.c     | 1052 +++++++++++++++++
- drivers/virt/nitro_enclaves/ne_misc_dev.h     |  109 ++
- drivers/virt/nitro_enclaves/ne_pci_dev.c      |  606 ++++++++++
- drivers/virt/nitro_enclaves/ne_pci_dev.h      |  254 ++++
- include/linux/nitro_enclaves.h                |   11 +
- include/uapi/linux/nitro_enclaves.h           |   65 +
- samples/nitro_enclaves/.gitignore             |    2 +
- samples/nitro_enclaves/Makefile               |   16 +
- samples/nitro_enclaves/ne_ioctl_sample.c      |  490 ++++++++
- 16 files changed, 2739 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/nitro_enclaves/ne_overview.txt
- create mode 100644 drivers/virt/nitro_enclaves/Kconfig
- create mode 100644 drivers/virt/nitro_enclaves/Makefile
- create mode 100644 drivers/virt/nitro_enclaves/ne_misc_dev.c
- create mode 100644 drivers/virt/nitro_enclaves/ne_misc_dev.h
- create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.c
- create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.h
+ .../userspace-api/ioctl/ioctl-number.rst      |  5 +-
+ include/linux/nitro_enclaves.h                | 11 ++++
+ include/uapi/linux/nitro_enclaves.h           | 65 +++++++++++++++++++
+ 3 files changed, 80 insertions(+), 1 deletion(-)
  create mode 100644 include/linux/nitro_enclaves.h
  create mode 100644 include/uapi/linux/nitro_enclaves.h
- create mode 100644 samples/nitro_enclaves/.gitignore
- create mode 100644 samples/nitro_enclaves/Makefile
- create mode 100644 samples/nitro_enclaves/ne_ioctl_sample.c
 
+diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
+index f759edafd938..8a19b5e871d3 100644
+--- a/Documentation/userspace-api/ioctl/ioctl-number.rst
++++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+@@ -325,8 +325,11 @@ Code  Seq#    Include File                                           Comments
+ 0xAC  00-1F  linux/raw.h
+ 0xAD  00                                                             Netfilter device in development:
+                                                                      <mailto:rusty@rustcorp.com.au>
+-0xAE  all    linux/kvm.h                                             Kernel-based Virtual Machine
++0xAE  00-1F  linux/kvm.h                                             Kernel-based Virtual Machine
+                                                                      <mailto:kvm@vger.kernel.org>
++0xAE  40-FF  linux/kvm.h                                             Kernel-based Virtual Machine
++                                                                     <mailto:kvm@vger.kernel.org>
++0xAE  20-3F  linux/nitro_enclaves.h                                  Nitro Enclaves
+ 0xAF  00-1F  linux/fsl_hypervisor.h                                  Freescale hypervisor
+ 0xB0  all                                                            RATIO devices in development:
+                                                                      <mailto:vgo@ratio.de>
+diff --git a/include/linux/nitro_enclaves.h b/include/linux/nitro_enclaves.h
+new file mode 100644
+index 000000000000..d91ef2bfdf47
+--- /dev/null
++++ b/include/linux/nitro_enclaves.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ */
++
++#ifndef _LINUX_NITRO_ENCLAVES_H_
++#define _LINUX_NITRO_ENCLAVES_H_
++
++#include <uapi/linux/nitro_enclaves.h>
++
++#endif /* _LINUX_NITRO_ENCLAVES_H_ */
+diff --git a/include/uapi/linux/nitro_enclaves.h b/include/uapi/linux/nitro_enclaves.h
+new file mode 100644
+index 000000000000..3413352baf32
+--- /dev/null
++++ b/include/uapi/linux/nitro_enclaves.h
+@@ -0,0 +1,65 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
++ */
++
++#ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
++#define _UAPI_LINUX_NITRO_ENCLAVES_H_
++
++#include <linux/kvm.h>
++#include <linux/types.h>
++
++/* Nitro Enclaves (NE) Kernel Driver Interface */
++
++/**
++ * The command is used to get information needed for in-memory enclave image
++ * loading e.g. offset in enclave memory to start placing the enclave image.
++ *
++ * The image load metadata is an in / out data structure. It includes info
++ * provided by the caller - flags - and returns the offset in enclave memory
++ * where to start placing the enclave image.
++ */
++#define NE_GET_IMAGE_LOAD_METADATA _IOWR(0xAE, 0x20, struct image_load_metadata)
++
++/**
++ * The command is used to trigger enclave start after the enclave resources,
++ * such as memory and CPU, have been set.
++ *
++ * The enclave start metadata is an in / out data structure. It includes info
++ * provided by the caller - enclave cid and flags - and returns the slot uid
++ * and the cid (if input cid is 0).
++ */
++#define NE_START_ENCLAVE _IOWR(0xAE, 0x21, struct enclave_start_metadata)
++
++/* Metadata necessary for in-memory enclave image loading. */
++struct image_load_metadata {
++	/**
++	 * Flags to determine the enclave image type e.g. Enclave Image Format
++	 * (EIF) (in).
++	 */
++	__u64 flags;
++
++	/**
++	 * Offset in enclave memory where to start placing the enclave image
++	 * (out).
++	 */
++	__u64 memory_offset;
++};
++
++/* Setup metadata necessary for enclave start. */
++struct enclave_start_metadata {
++	/* Flags for the enclave to start with (e.g. debug mode) (in). */
++	__u64 flags;
++
++	/**
++	 * Context ID (CID) for the enclave vsock device. If 0 as input, the
++	 * CID is autogenerated by the hypervisor and returned back as output
++	 * by the driver (in/out).
++	 */
++	__u64 enclave_cid;
++
++	/* Slot unique id mapped to the enclave to start (out). */
++	__u64 slot_uid;
++};
++
++#endif /* _UAPI_LINUX_NITRO_ENCLAVES_H_ */
 -- 
 2.20.1 (Apple Git-117)
 
