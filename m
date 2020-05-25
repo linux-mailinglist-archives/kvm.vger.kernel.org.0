@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB3FF1E0AD7
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 11:41:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC4671E0AD8
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 11:41:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389640AbgEYJlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 05:41:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27874 "EHLO
+        id S2389643AbgEYJlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 05:41:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58091 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2389621AbgEYJlf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 05:41:35 -0400
+        with ESMTP id S2389581AbgEYJlj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 05:41:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590399694;
+        s=mimecast20190719; t=1590399698;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ty3Zy3HVUpbIRq8mB7Pi9NIOj6Gaawv8XKOFmSlnN68=;
-        b=YvGqCbOWYIfr7vvksMmQ5i3Tt6A2aqqzGZ0mMcKQlvP8KtSeWbd8McHH53ztmQzoLo5wqE
-        XuFZB2m0OxC9m6S50Dq6th6dArZHCvjnsefv6BCQQzfWftElS1r/IqYdi8R11WTkI3rZU/
-        rNn+kbSxYHb4VqPHBxQIjI6GRucBCec=
+        bh=GwAQWjknu5aqoj+9iR6IdbLB0DqmhZ9ytf1Doe/RLuA=;
+        b=h5wYo54fFUd1cPK3VH3ARcztSM5LTT5gVDQnwgffoJUbQMHOmh+Z4dP8E33dYEmeusSj/j
+        cQO819+cg5/NT4i+HoCXSZDdCkZh93CzN0QLAP7Dr7ZOA9fp0uqSLSfmiRKQ7h0XTuuKO0
+        cIeTE1y7uNfLywD3meSzKKeYDb9qRUQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-512-3jBDDgGYMtOQyhCQt-oUjQ-1; Mon, 25 May 2020 05:41:31 -0400
-X-MC-Unique: 3jBDDgGYMtOQyhCQt-oUjQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-416-J4onAdIJMXyCcU4v8NIJMg-1; Mon, 25 May 2020 05:41:35 -0400
+X-MC-Unique: J4onAdIJMXyCcU4v8NIJMg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4ADED846376;
-        Mon, 25 May 2020 09:41:30 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6146C86ABD5;
+        Mon, 25 May 2020 09:41:34 +0000 (UTC)
 Received: from localhost (ovpn-112-215.ams2.redhat.com [10.36.112.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A65EF74EA9;
-        Mon, 25 May 2020 09:41:28 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2318A5C1C5;
+        Mon, 25 May 2020 09:41:31 +0000 (UTC)
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
@@ -41,14 +41,14 @@ Cc:     Eric Farman <farman@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>
-Subject: [PULL 03/10] vfio-ccw: Introduce new helper functions to free/destroy regions
-Date:   Mon, 25 May 2020 11:41:08 +0200
-Message-Id: <20200525094115.222299-4-cohuck@redhat.com>
+Subject: [PULL 04/10] vfio-ccw: Register a chp_event callback for vfio-ccw
+Date:   Mon, 25 May 2020 11:41:09 +0200
+Message-Id: <20200525094115.222299-5-cohuck@redhat.com>
 In-Reply-To: <20200525094115.222299-1-cohuck@redhat.com>
 References: <20200525094115.222299-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -56,92 +56,90 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Farhan Ali <alifm@linux.ibm.com>
 
-Consolidate some of the cleanup code for the regions, so that
-as more are added we reduce code duplication.
+Register the chp_event callback to receive channel path related
+events for the subchannels managed by vfio-ccw.
 
 Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20200505122745.53208-2-farman@linux.ibm.com>
+Message-Id: <20200505122745.53208-3-farman@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- drivers/s390/cio/vfio_ccw_drv.c | 28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ drivers/s390/cio/vfio_ccw_drv.c | 47 +++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
 diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 339a6bc0339b..8715c1c2f1e1 100644
+index 8715c1c2f1e1..fb1275a7d1f5 100644
 --- a/drivers/s390/cio/vfio_ccw_drv.c
 +++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -116,6 +116,14 @@ static void vfio_ccw_sch_irq(struct subchannel *sch)
- 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_INTERRUPT);
+@@ -19,6 +19,7 @@
+ 
+ #include <asm/isc.h>
+ 
++#include "chp.h"
+ #include "ioasm.h"
+ #include "css.h"
+ #include "vfio_ccw_private.h"
+@@ -262,6 +263,51 @@ static int vfio_ccw_sch_event(struct subchannel *sch, int process)
+ 	return rc;
  }
  
-+static void vfio_ccw_free_regions(struct vfio_ccw_private *private)
++static int vfio_ccw_chp_event(struct subchannel *sch,
++			      struct chp_link *link, int event)
 +{
-+	if (private->cmd_region)
-+		kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
-+	if (private->io_region)
-+		kmem_cache_free(vfio_ccw_io_region, private->io_region);
++	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
++	int mask = chp_ssd_get_mask(&sch->ssd_info, link);
++	int retry = 255;
++
++	if (!private || !mask)
++		return 0;
++
++	VFIO_CCW_MSG_EVENT(2, "%pUl (%x.%x.%04x): mask=0x%x event=%d\n",
++			   mdev_uuid(private->mdev), sch->schid.cssid,
++			   sch->schid.ssid, sch->schid.sch_no,
++			   mask, event);
++
++	if (cio_update_schib(sch))
++		return -ENODEV;
++
++	switch (event) {
++	case CHP_VARY_OFF:
++		/* Path logically turned off */
++		sch->opm &= ~mask;
++		sch->lpm &= ~mask;
++		if (sch->schib.pmcw.lpum & mask)
++			cio_cancel_halt_clear(sch, &retry);
++		break;
++	case CHP_OFFLINE:
++		/* Path is gone */
++		if (sch->schib.pmcw.lpum & mask)
++			cio_cancel_halt_clear(sch, &retry);
++		break;
++	case CHP_VARY_ON:
++		/* Path logically turned on */
++		sch->opm |= mask;
++		sch->lpm |= mask;
++		break;
++	case CHP_ONLINE:
++		/* Path became available */
++		sch->lpm |= mask & sch->opm;
++		break;
++	}
++
++	return 0;
 +}
 +
- static int vfio_ccw_sch_probe(struct subchannel *sch)
- {
- 	struct pmcw *pmcw = &sch->schib.pmcw;
-@@ -181,10 +189,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
- 	cio_disable_subchannel(sch);
- out_free:
- 	dev_set_drvdata(&sch->dev, NULL);
--	if (private->cmd_region)
--		kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
--	if (private->io_region)
--		kmem_cache_free(vfio_ccw_io_region, private->io_region);
-+	vfio_ccw_free_regions(private);
- 	kfree(private->cp.guest_cp);
- 	kfree(private);
- 	return ret;
-@@ -200,8 +205,7 @@ static int vfio_ccw_sch_remove(struct subchannel *sch)
+ static struct css_device_id vfio_ccw_sch_ids[] = {
+ 	{ .match_flags = 0x1, .type = SUBCHANNEL_TYPE_IO, },
+ 	{ /* end of list */ },
+@@ -279,6 +325,7 @@ static struct css_driver vfio_ccw_sch_driver = {
+ 	.remove = vfio_ccw_sch_remove,
+ 	.shutdown = vfio_ccw_sch_shutdown,
+ 	.sch_event = vfio_ccw_sch_event,
++	.chp_event = vfio_ccw_chp_event,
+ };
  
- 	dev_set_drvdata(&sch->dev, NULL);
- 
--	kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
--	kmem_cache_free(vfio_ccw_io_region, private->io_region);
-+	vfio_ccw_free_regions(private);
- 	kfree(private->cp.guest_cp);
- 	kfree(private);
- 
-@@ -304,6 +308,12 @@ static void vfio_ccw_debug_exit(void)
- 	debug_unregister(vfio_ccw_debug_trace_id);
- }
- 
-+static void vfio_ccw_destroy_regions(void)
-+{
-+	kmem_cache_destroy(vfio_ccw_cmd_region);
-+	kmem_cache_destroy(vfio_ccw_io_region);
-+}
-+
- static int __init vfio_ccw_sch_init(void)
- {
- 	int ret;
-@@ -346,8 +356,7 @@ static int __init vfio_ccw_sch_init(void)
- 	return ret;
- 
- out_err:
--	kmem_cache_destroy(vfio_ccw_cmd_region);
--	kmem_cache_destroy(vfio_ccw_io_region);
-+	vfio_ccw_destroy_regions();
- 	destroy_workqueue(vfio_ccw_work_q);
- 	vfio_ccw_debug_exit();
- 	return ret;
-@@ -357,8 +366,7 @@ static void __exit vfio_ccw_sch_exit(void)
- {
- 	css_driver_unregister(&vfio_ccw_sch_driver);
- 	isc_unregister(VFIO_CCW_ISC);
--	kmem_cache_destroy(vfio_ccw_io_region);
--	kmem_cache_destroy(vfio_ccw_cmd_region);
-+	vfio_ccw_destroy_regions();
- 	destroy_workqueue(vfio_ccw_work_q);
- 	vfio_ccw_debug_exit();
- }
+ static int __init vfio_ccw_debug_init(void)
 -- 
 2.25.4
 
