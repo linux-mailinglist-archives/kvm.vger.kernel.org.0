@@ -2,133 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCA071E10B4
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 16:41:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFD291E10BB
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 16:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390935AbgEYOlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 10:41:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46551 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2390928AbgEYOlf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 10:41:35 -0400
+        id S2403981AbgEYOlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 10:41:47 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30176 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2403961AbgEYOlq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 May 2020 10:41:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590417694;
+        s=mimecast20190719; t=1590417704;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sqkg1jDCwm+p6v+Tu6WyELF7ni9j35HF99yDHkpEXsw=;
-        b=hkZdjVffJr4y4sHihbL87sTZzG9+J27GK8v4Oa59mBAFQevjQro8e1MiGr/t/j8IJk2VPc
-        epbSFlCUgbtcOHyYI9KWkJGjSe4Cbag5O7GTSU1lGgov1tqZUNCepsHjIrDl+6tWVN0AnR
-        5/vyMZCciANSnovLp/OXsFn7b4UaHG8=
+        bh=BxYHU4B93upixhtR586I0fhW0D+AACY6i9PRAg0XSJU=;
+        b=hD+lRAnEbPlnswVgWNylooqvTMiZK+AjBryMEsLYKqtBbNiNV07m8cVDN3qmoPeUn2Gu/m
+        heji8UGsgukX1Us5pE87c81A97DC9EMRxyQ7ZBID7D2EhYSbrxpDQ72aPVhrVjBTH6d6u7
+        pRCl1YPp10+Ohx4zZzWx23I7Ur767t4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-zHspUxfPMe23EkzGUFNbPQ-1; Mon, 25 May 2020 10:41:31 -0400
-X-MC-Unique: zHspUxfPMe23EkzGUFNbPQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-366-RoEQmXqwOvqi3QuMBTNJzw-1; Mon, 25 May 2020 10:41:43 -0400
+X-MC-Unique: RoEQmXqwOvqi3QuMBTNJzw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 856F0800688;
-        Mon, 25 May 2020 14:41:28 +0000 (UTC)
-Received: from gondolin (ovpn-112-215.ams2.redhat.com [10.36.112.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E12B6ED99;
-        Mon, 25 May 2020 14:41:21 +0000 (UTC)
-Date:   Mon, 25 May 2020 16:41:17 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <alex.williamson@redhat.com>, <cjia@nvidia.com>,
-        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH Kernel v23 4/8] vfio iommu: Add ioctl definition for
- dirty pages tracking
-Message-ID: <20200525164117.7d078845.cohuck@redhat.com>
-In-Reply-To: <1589998088-3250-5-git-send-email-kwankhede@nvidia.com>
-References: <1589998088-3250-1-git-send-email-kwankhede@nvidia.com>
-        <1589998088-3250-5-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A0D9107B467;
+        Mon, 25 May 2020 14:41:41 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D1ADE5D9C5;
+        Mon, 25 May 2020 14:41:37 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, x86@kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vivek Goyal <vgoyal@redhat.com>, Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 03/10] KVM: rename kvm_arch_can_inject_async_page_present() to kvm_arch_can_dequeue_async_page_present()
+Date:   Mon, 25 May 2020 16:41:18 +0200
+Message-Id: <20200525144125.143875-4-vkuznets@redhat.com>
+In-Reply-To: <20200525144125.143875-1-vkuznets@redhat.com>
+References: <20200525144125.143875-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 May 2020 23:38:04 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+An innocent reader of the following x86 KVM code:
 
-> IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
-> All pages pinned by vendor driver through this API should be considered as
-> dirty during migration. When container consists of IOMMU capable device and
-> all pages are pinned and mapped, then all pages are marked dirty.
-> Added support to start/stop dirtied pages tracking and to get bitmap of all
-> dirtied pages for requested IO virtual address range.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  include/uapi/linux/vfio.h | 56 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 56 insertions(+)
+bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
+{
+        if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
+                return true;
+...
 
-(...)
+may get very confused: if APF mechanism is not enabled, why do we report
+that we 'can inject async page present'? In reality, upon injection
+kvm_arch_async_page_present() will check the same condition again and,
+in case APF is disabled, will just drop the item. This is fine as the
+guest which deliberately disabled APF doesn't expect to get any APF
+notifications.
 
-> +/**
-> + * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
-> + *                                     struct vfio_iommu_type1_dirty_bitmap)
-> + * IOCTL is used for dirty pages logging.
-> + * Caller should set flag depending on which operation to perform, details as
-> + * below:
-> + *
-> + * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_START flag set, instructs
-> + * the IOMMU driver to log pages that are dirtied or potentially dirtied by
-> + * device; designed to be used when a migration is in progress. Dirty pages are
+Rename kvm_arch_can_inject_async_page_present() to
+kvm_arch_can_dequeue_async_page_present() to make it clear what we are
+checking: if the item can be dequeued (meaning either injected or just
+dropped).
 
-s/device/the device/
+On s390 kvm_arch_can_inject_async_page_present() always returns 'true' so
+the rename doesn't matter much.
 
-> + * loggeded until logging is disabled by user application by calling the IOCTL
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/s390/include/asm/kvm_host.h | 2 +-
+ arch/s390/kvm/kvm-s390.c         | 2 +-
+ arch/x86/include/asm/kvm_host.h  | 2 +-
+ arch/x86/kvm/x86.c               | 2 +-
+ virt/kvm/async_pf.c              | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-s/loggeded/logged/
-
-> + * with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
-> + *
-> + * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag set, instructs
-> + * the IOMMU driver to stop logging dirtied pages.
-> + *
-> + * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set
-> + * returns the dirty pages bitmap for IOMMU container for a given IOVA range.
-> + * User must specify the IOVA range and the pgsize through the structure
-
-s/User/The user/
-
-> + * vfio_iommu_type1_dirty_bitmap_get in the data[] portion. This interface
-> + * supports to get bitmap of smallest supported pgsize only and can be modified
-
-s/to get/getting a/
-
-s/smallest/the smallest/
-
-> + * in future to get bitmap of specified pgsize. The user must provide a zeroed
-
-"a bitmap of any specified supported pgsize" ?
-
-> + * memory area for the bitmap memory and specify its size in bitmap.size.
-> + * One bit is used to represent one page consecutively starting from iova
-> + * offset. The user should provide page size in bitmap.pgsize field. A bit set
-> + * in the bitmap indicates that the page at that offset from iova is dirty.
-> + * The caller must set argsz to a value including the size of structure
-> + * vfio_iommu_type1_dirty_bitmap_get, but excluding the size of the actual
-> + * bitmap. If dirty pages logging is not enabled, an error will be returned.
-
-(...)
-
-With the nits fixed,
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index d6bcd34f3ec3..5ba9968c3436 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -971,7 +971,7 @@ struct kvm_arch_async_pf {
+ 	unsigned long pfault_token;
+ };
+ 
+-bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu);
++bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
+ 
+ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
+ 			       struct kvm_async_pf *work);
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index d05bb040fd42..64128a336c24 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3944,7 +3944,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
+ 	/* s390 will always inject the page directly */
+ }
+ 
+-bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
++bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+ 	 * s390 will always inject the page directly,
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index c195f63c1086..459dc824b10b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1641,7 +1641,7 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+ 				 struct kvm_async_pf *work);
+ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
+ 			       struct kvm_async_pf *work);
+-bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu);
++bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
+ extern bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ 
+ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a3102406102c..bfa7e07fd6fd 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10458,7 +10458,7 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+ 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+ }
+ 
+-bool kvm_arch_can_inject_async_page_present(struct kvm_vcpu *vcpu)
++bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu)
+ {
+ 	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED))
+ 		return true;
+diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+index 15e5b037f92d..8a8770c7c889 100644
+--- a/virt/kvm/async_pf.c
++++ b/virt/kvm/async_pf.c
+@@ -135,7 +135,7 @@ void kvm_check_async_pf_completion(struct kvm_vcpu *vcpu)
+ 	struct kvm_async_pf *work;
+ 
+ 	while (!list_empty_careful(&vcpu->async_pf.done) &&
+-	      kvm_arch_can_inject_async_page_present(vcpu)) {
++	      kvm_arch_can_dequeue_async_page_present(vcpu)) {
+ 		spin_lock(&vcpu->async_pf.lock);
+ 		work = list_first_entry(&vcpu->async_pf.done, typeof(*work),
+ 					      link);
+-- 
+2.25.4
 
