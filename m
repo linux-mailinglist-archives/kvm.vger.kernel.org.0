@@ -2,119 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E31E1E0A01
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 11:17:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE66C1E0AD1
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 11:41:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389474AbgEYJRW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 05:17:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38290 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389454AbgEYJRV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 05:17:21 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S2389619AbgEYJl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 05:41:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41482 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388182AbgEYJl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 05:41:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590399685;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JwjWmEOBpRQtZ8phDKRgWl2KRxszcpdW2e3E8rqI/3E=;
+        b=dhCCnSgI8gwkSMFCV2Lam2IXtd2KFzqzmIktOZCmKUEaa5H6vN/aGt3BfwyDSHjADI16l4
+        JtWScRLqaqSS1szzp2x5tKTmYGwXoCHphaQcxHMlySv9d0oEx5pfWx2jtr/n22O+DgCefU
+        AmrNDvQ1RVaaVhZqHazNa0upyk5K5cg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-115-QFw6Q0ZtP-CEmUV1fPFVhA-1; Mon, 25 May 2020 05:41:21 -0400
+X-MC-Unique: QFw6Q0ZtP-CEmUV1fPFVhA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 01ED020787;
-        Mon, 25 May 2020 09:17:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590398241;
-        bh=dvoIblhrB6r6q1w4YgHnKBzB3u8MDjy2EHOsa4SWZok=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=tXnRIYphXASv22/CWUBMA4CPRNsDbUMhgCnKjxTTC6dq9DDNazs1+GztuGsokQpEJ
-         72QM5aF0JoA15SMnoO0AX6SPOL6GCj0SXNeERYxlYPaPRT7hQ4f+IaxJUF+lIYihOX
-         pyq7Ce4X2AFg/w1e44/Sm5YB7VXDDhAc7W7i/lfo=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jd9EU-00F730-Ux; Mon, 25 May 2020 10:17:19 +0100
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C29BB1009624;
+        Mon, 25 May 2020 09:41:19 +0000 (UTC)
+Received: from localhost (ovpn-112-215.ams2.redhat.com [10.36.112.215])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A6C310027A6;
+        Mon, 25 May 2020 09:41:19 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
+Subject: [PULL 00/10] vfio-ccw patches for 5.8
+Date:   Mon, 25 May 2020 11:41:05 +0200
+Message-Id: <20200525094115.222299-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 25 May 2020 10:17:18 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Richard Cochran <richardcochran@gmail.com>,
-        Jianyong Wu <jianyong.wu@arm.com>
-Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, Mark.Rutland@arm.com,
-        will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        Wei.Chen@arm.com, nd@arm.com
-Subject: Re: [RFC PATCH v12 10/11] arm64: add mechanism to let user choose
- which counter to return
-In-Reply-To: <20200524021106.GC335@localhost>
-References: <20200522083724.38182-1-jianyong.wu@arm.com>
- <20200522083724.38182-11-jianyong.wu@arm.com>
- <20200524021106.GC335@localhost>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <306951e4945b9e486dc98818ba24466d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: richardcochran@gmail.com, jianyong.wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, steven.price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com, Wei.Chen@arm.com, nd@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-05-24 03:11, Richard Cochran wrote:
-> On Fri, May 22, 2020 at 04:37:23PM +0800, Jianyong Wu wrote:
->> In general, vm inside will use virtual counter compered with host use
->> phyical counter. But in some special scenarios, like nested
->> virtualization, phyical counter maybe used by vm. A interface added in
->> ptp_kvm driver to offer a mechanism to let user choose which counter
->> should be return from host.
-> 
-> Sounds like you have two time sources, one for normal guest, and one
-> for nested.  Why not simply offer the correct one to user space
-> automatically?  If that cannot be done, then just offer two PHC
-> devices with descriptive names.
+The following changes since commit 6a8b55ed4056ea5559ebe4f6a4b247f627870d4c:
 
-There is no such thing as a distinction between nested or non-nested.
-Both counters are available to the guest at all times, and said guest
-can choose whichever it wants to use. So the hypervisor (KVM) has to
-support both counters as a reference.
+  Linux 5.7-rc3 (2020-04-26 13:51:02 -0700)
 
-For a Linux guest, we always know which reference we're using (the
-virtual counter). So it is pointless to expose the choice to userspace
-at all.
+are available in the Git repository at:
 
-> 
->> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
->> index fef72f29f3c8..8b0a7b328bcd 100644
->> --- a/drivers/ptp/ptp_chardev.c
->> +++ b/drivers/ptp/ptp_chardev.c
->> @@ -123,6 +123,9 @@ long ptp_ioctl(struct posix_clock *pc, unsigned 
->> int cmd, unsigned long arg)
->>  	struct timespec64 ts;
->>  	int enable, err = 0;
->> 
->> +#ifdef CONFIG_ARM64
->> +	static long flag;
-> 
-> static?  This is not going to fly.
-> 
->> +		 * In most cases, we just need virtual counter from host and
->> +		 * there is limited scenario using this to get physical counter
->> +		 * in guest.
->> +		 * Be careful to use this as there is no way to set it back
->> +		 * unless you reinstall the module.
-> 
-> How on earth is the user supposed to know this?
-> 
-> From your description, this "flag" really should be a module
-> parameter.
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw tags/vfio-ccw-20200525
 
-Not even that. If anything, the driver can obtain full knowledge of 
-which
-counter is in use without any help. And the hard truth is that it is
-*always* the virtual counter as far as Linux is concerned.
+for you to fetch changes up to 40b4240eed2f2de57775b996a0b38d412e570086:
 
-         M.
+  vfio-ccw: Add trace for CRW event (2020-05-18 11:46:33 +0200)
+
+----------------------------------------------------------------
+vfio-ccw updates:
+- accept requests without the prefetch bit set
+- enable path handling via two new regions
+
+----------------------------------------------------------------
+Cornelia Huck (1):
+      vfio-ccw: document possible errors
+
+Eric Farman (3):
+      vfio-ccw: Refactor the unregister of the async regions
+      vfio-ccw: Refactor IRQ handlers
+      vfio-ccw: Add trace for CRW event
+
+Farhan Ali (5):
+      vfio-ccw: Introduce new helper functions to free/destroy regions
+      vfio-ccw: Register a chp_event callback for vfio-ccw
+      vfio-ccw: Introduce a new schib region
+      vfio-ccw: Introduce a new CRW region
+      vfio-ccw: Wire up the CRW irq and CRW region
+
+Jared Rossi (1):
+      vfio-ccw: Enable transparent CCW IPL from DASD
+
+ Documentation/s390/vfio-ccw.rst     |  99 +++++++++++++++++++++-
+ drivers/s390/cio/Makefile           |   2 +-
+ drivers/s390/cio/vfio_ccw_chp.c     | 148 ++++++++++++++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_cp.c      |  19 +++--
+ drivers/s390/cio/vfio_ccw_drv.c     | 165 +++++++++++++++++++++++++++++++++---
+ drivers/s390/cio/vfio_ccw_ops.c     |  65 ++++++++++----
+ drivers/s390/cio/vfio_ccw_private.h |  16 ++++
+ drivers/s390/cio/vfio_ccw_trace.c   |   1 +
+ drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++++
+ include/uapi/linux/vfio.h           |   3 +
+ include/uapi/linux/vfio_ccw.h       |  18 ++++
+ 11 files changed, 529 insertions(+), 37 deletions(-)
+ create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
+
+Cornelia Huck (1):
+  vfio-ccw: document possible errors
+
+Eric Farman (3):
+  vfio-ccw: Refactor the unregister of the async regions
+  vfio-ccw: Refactor IRQ handlers
+  vfio-ccw: Add trace for CRW event
+
+Farhan Ali (5):
+  vfio-ccw: Introduce new helper functions to free/destroy regions
+  vfio-ccw: Register a chp_event callback for vfio-ccw
+  vfio-ccw: Introduce a new schib region
+  vfio-ccw: Introduce a new CRW region
+  vfio-ccw: Wire up the CRW irq and CRW region
+
+Jared Rossi (1):
+  vfio-ccw: Enable transparent CCW IPL from DASD
+
+ Documentation/s390/vfio-ccw.rst     |  99 ++++++++++++++++-
+ drivers/s390/cio/Makefile           |   2 +-
+ drivers/s390/cio/vfio_ccw_chp.c     | 148 +++++++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_cp.c      |  19 ++--
+ drivers/s390/cio/vfio_ccw_drv.c     | 165 ++++++++++++++++++++++++++--
+ drivers/s390/cio/vfio_ccw_ops.c     |  65 ++++++++---
+ drivers/s390/cio/vfio_ccw_private.h |  16 +++
+ drivers/s390/cio/vfio_ccw_trace.c   |   1 +
+ drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++
+ include/uapi/linux/vfio.h           |   3 +
+ include/uapi/linux/vfio_ccw.h       |  18 +++
+ 11 files changed, 529 insertions(+), 37 deletions(-)
+ create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.25.4
+
