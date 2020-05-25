@@ -2,62 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FE111E11A7
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 17:25:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FEF61E11AD
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 17:26:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404132AbgEYPZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 11:25:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55230 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403996AbgEYPZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 11:25:28 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 730CEC061A0E
-        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:25:28 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id z6so21110038ljm.13
-        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:25:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8td81KCvxI/2OEeh9Ticm0bkE2svquaArM6q3f8IXmc=;
-        b=XKLT64/LoBo+2JIIl8QkJUlGd+R1rZ4tPpmndC6EsNsrmAYZkJme9ja7XOzbKQuAjI
-         DtpeLj7Uwu2ur5UuVF0+qw0Hzyrm6BStK7r5dhGafeH+m6ie5MbyhPzq8bbRlSx/Zrs9
-         XM91Q282XZynEXJH8uxRSKIjefQa6CinKOcSygOpjeU+MSKFjjsZCfG2ZxZeKG+y7A2g
-         hqhzE/+9gzLMwa/uTH3Z6o6JyDar/fj9L9QqWRe1fu1vZgd3rnzddgVk7ShggIBN5o0B
-         px2nWL7O1qPc7ug9j389cU1DPjCFFVctI3emZkhkLWmm5h/xEbjFPxgNy7P+KXtiquUF
-         QlDQ==
+        id S2404158AbgEYP0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 11:26:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26759 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2404026AbgEYP0o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 11:26:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590420401;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yHBg6PnKp6Y7ewCGnEB0X1+EHg5beHaOZcwWTbgUPq8=;
+        b=THfCDMr618lBMB0T/iHrBLKkZG293w76vm5X+HJJEWNE5++7wn+vbBnSL0RzSjfDfccD8q
+        LFPs4JfWrQW8ZGKHJzcom7ZSrXNjq/6TbzfNmJ6yyAZzJ5UX4E3EVdfgdRKZFF+NjysQOP
+        QXtAKTnB9gfz9C19ehUKVYe9weCUvGA=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-ev3OOTp-PHKpvMl5Sjtyiw-1; Mon, 25 May 2020 11:26:40 -0400
+X-MC-Unique: ev3OOTp-PHKpvMl5Sjtyiw-1
+Received: by mail-ed1-f70.google.com with SMTP id f18so7603837eds.6
+        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:26:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8td81KCvxI/2OEeh9Ticm0bkE2svquaArM6q3f8IXmc=;
-        b=p5wNtHwT6k9WxfL6H98FHRCbkjnE8tbA5FwHrgWal1EPTTqCJ70ZJlh0OikufJaHS5
-         C7nujzyXXRWfyUSVpmrpWJU2HVlCEKN2hpwmnDvYzxe69OCkRt7USvWBcHKjozSpW8jN
-         MSAurEYy9RRabsOUOybGwq7RwauWpS4181cOf9LwTFzHw7/eTT0G301LSKy+GPyn1Hcw
-         ucb7EfSvyVRthSD2piCZ2xbm4uGOwrbJ4eNzV2rp4WQJH+MSU2Votb6Z4EsrSbmpZhPo
-         T4K1erN+5QgKtCpMVLC5pycg3kHysAA3OJjtN7DgYwTLv/sXiVWNw5mWaiYxYwMypOpO
-         /+xg==
-X-Gm-Message-State: AOAM533ORWZqktIlRcNTG/PS0PEjwxkIOwuJq0H6vtO3fEpGkrDfIePJ
-        3oUlh6FJTw3kWUBe2GPrZpGNUA==
-X-Google-Smtp-Source: ABdhPJzf6qWm+gQ1VnQeyksSzu7xA/fy4Zz0Mxz50VNuHIpl3XYpEr226uIZ1ropjN/mf8I4AeBFKg==
-X-Received: by 2002:a05:651c:2c6:: with SMTP id f6mr11628565ljo.371.1590420326879;
-        Mon, 25 May 2020 08:25:26 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id i8sm5664708lfl.72.2020.05.25.08.25.26
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=yHBg6PnKp6Y7ewCGnEB0X1+EHg5beHaOZcwWTbgUPq8=;
+        b=pZ/AtHnBzhqNRlEW1FoXJeCF8GhFZfFj+V+kxb3tm8IasEi3ecntronjKCwRlYAeTn
+         nI1Udie/taLpsoSz4KpIrv4RY0sxpCxMbmV65lk7+khlULA6TEsmfLUmHCRgmszXIZUA
+         z3s7Ok72x3A2Yly7FNZnw7KiU6xend9SukqzQVvXewKfCEAdBIRQHa7IW9AgomSoipRu
+         44tKtMeyqZd3v38giIJyi6dvCeGMvdl1hLXS0i73sRmBsQlcVfnwkmUbrMJygtm1yOeM
+         IHxgg9Xe2lRvaE4Twddptn8Zal4XqvxQpZnD5pkjVBjvfUFshie1ZmDlHbrW54FMchJB
+         wPvg==
+X-Gm-Message-State: AOAM533qVIEDt1RB2fclLwCtUoNzutj8gIuPVDEtlPQuIiGpPd/rXBVY
+        DANtEXE6ckIwlTeteRVn1bhfBpZRQ0oAE1RGER+UTWGTxDDS6R6Yy7NqYkPmT55R4Axk23hpn57
+        eWuMn0KyVWwOg
+X-Received: by 2002:a05:6402:3128:: with SMTP id dd8mr16160577edb.156.1590420399248;
+        Mon, 25 May 2020 08:26:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMIBGAc1SAeKf2++4kxqc7BH4t4BCDYHtSX1TDVqPtr5J+1qipzK2jRTRUwbqNP6YFuh1ftg==
+X-Received: by 2002:a05:6402:3128:: with SMTP id dd8mr16160552edb.156.1590420398965;
+        Mon, 25 May 2020 08:26:38 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id p5sm16523979edi.82.2020.05.25.08.26.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 May 2020 08:25:26 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 6C23C10230F; Mon, 25 May 2020 18:25:27 +0300 (+03)
-Date:   Mon, 25 May 2020 18:25:27 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+        Mon, 25 May 2020 08:26:38 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
 Cc:     David Rientjes <rientjes@google.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Kees Cook <keescook@chromium.org>,
         Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>, x86@kernel.org,
+        "Edgecombe\, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen\, Andi" <andi.kleen@intel.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
@@ -69,63 +68,223 @@ Cc:     David Rientjes <rientjes@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>
-Subject: Re: [RFC 13/16] x86/kvmclock: Share hvclock memory with the host
-Message-ID: <20200525152527.7g57us6imlh62x7i@box>
-References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <20200522125214.31348-14-kirill.shutemov@linux.intel.com>
- <875zck82fx.fsf@vitty.brq.redhat.com>
+Subject: Re: [RFC 09/16] KVM: Protected memory extension
+In-Reply-To: <20200522125214.31348-10-kirill.shutemov@linux.intel.com>
+References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com> <20200522125214.31348-10-kirill.shutemov@linux.intel.com>
+Date:   Mon, 25 May 2020 17:26:37 +0200
+Message-ID: <87367o828i.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875zck82fx.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 25, 2020 at 05:22:10PM +0200, Vitaly Kuznetsov wrote:
-> "Kirill A. Shutemov" <kirill@shutemov.name> writes:
-> 
-> > hvclock is shared between the guest and the hypervisor. It has to be
-> > accessible by host.
-> >
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> > ---
-> >  arch/x86/kernel/kvmclock.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> > index 34b18f6eeb2c..ac6c2abe0d0f 100644
-> > --- a/arch/x86/kernel/kvmclock.c
-> > +++ b/arch/x86/kernel/kvmclock.c
-> > @@ -253,7 +253,7 @@ static void __init kvmclock_init_mem(void)
-> >  	 * hvclock is shared between the guest and the hypervisor, must
-> >  	 * be mapped decrypted.
-> >  	 */
-> > -	if (sev_active()) {
-> > +	if (sev_active() || kvm_mem_protected()) {
-> >  		r = set_memory_decrypted((unsigned long) hvclock_mem,
-> >  					 1UL << order);
-> >  		if (r) {
-> 
-> Sorry if I missed something but we have other structures which KVM guest
-> share with the host,
-> 
-> sev_map_percpu_data():
-> ...
-> 	for_each_possible_cpu(cpu) {
-> 		__set_percpu_decrypted(&per_cpu(apf_reason, cpu), sizeof(apf_reason));
-> 		__set_percpu_decrypted(&per_cpu(steal_time, cpu), sizeof(steal_time));
-> 		__set_percpu_decrypted(&per_cpu(kvm_apic_eoi, cpu), sizeof(kvm_apic_eoi));
-> 	}
-> ...
-> 
-> Do you handle them somehow in the patchset? (I'm probably just blind
-> failing to see how 'early_set_memory_decrypted()' is wired up)
+"Kirill A. Shutemov" <kirill@shutemov.name> writes:
 
-I don't handle them yet: I've seen the function, but have not modified it.
-I want to understand first why it doesn't blow up for me without the
-change. Any clues?
+> Add infrastructure that handles protected memory extension.
+>
+> Arch-specific code has to provide hypercalls and define non-zero
+> VM_KVM_PROTECTED.
+>
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> ---
+>  include/linux/kvm_host.h |   4 ++
+>  mm/mprotect.c            |   1 +
+>  virt/kvm/kvm_main.c      | 131 +++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 136 insertions(+)
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index bd0bb600f610..d7072f6d6aa0 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -700,6 +700,10 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm);
+>  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>  				   struct kvm_memory_slot *slot);
+>  
+> +int kvm_protect_all_memory(struct kvm *kvm);
+> +int kvm_protect_memory(struct kvm *kvm,
+> +		       unsigned long gfn, unsigned long npages, bool protect);
+> +
+>  int gfn_to_page_many_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
+>  			    struct page **pages, int nr_pages);
+>  
+> diff --git a/mm/mprotect.c b/mm/mprotect.c
+> index 494192ca954b..552be3b4c80a 100644
+> --- a/mm/mprotect.c
+> +++ b/mm/mprotect.c
+> @@ -505,6 +505,7 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
+>  	vm_unacct_memory(charged);
+>  	return error;
+>  }
+> +EXPORT_SYMBOL_GPL(mprotect_fixup);
+>  
+>  /*
+>   * pkey==-1 when doing a legacy mprotect()
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 530af95efdf3..07d45da5d2aa 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -155,6 +155,8 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm);
+>  static unsigned long long kvm_createvm_count;
+>  static unsigned long long kvm_active_vms;
+>  
+> +static int protect_memory(unsigned long start, unsigned long end, bool protect);
+> +
+>  __weak int kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+>  		unsigned long start, unsigned long end, bool blockable)
+>  {
+> @@ -1309,6 +1311,14 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  	if (r)
+>  		goto out_bitmap;
+>  
+> +	if (mem->memory_size && kvm->mem_protected) {
+> +		r = protect_memory(new.userspace_addr,
+> +				   new.userspace_addr + new.npages * PAGE_SIZE,
+> +				   true);
+> +		if (r)
+> +			goto out_bitmap;
+> +	}
+> +
+>  	if (old.dirty_bitmap && !new.dirty_bitmap)
+>  		kvm_destroy_dirty_bitmap(&old);
+>  	return 0;
+> @@ -2652,6 +2662,127 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_vcpu_mark_page_dirty);
+>  
+> +static int protect_memory(unsigned long start, unsigned long end, bool protect)
+> +{
+> +	struct mm_struct *mm = current->mm;
+> +	struct vm_area_struct *vma, *prev;
+> +	int ret;
+> +
+> +	if (down_write_killable(&mm->mmap_sem))
+> +		return -EINTR;
+> +
+> +	ret = -ENOMEM;
+> +	vma = find_vma(current->mm, start);
+> +	if (!vma)
+> +		goto out;
+> +
+> +	ret = -EINVAL;
+> +	if (vma->vm_start > start)
+> +		goto out;
+> +
+> +	if (start > vma->vm_start)
+> +		prev = vma;
+> +	else
+> +		prev = vma->vm_prev;
+> +
+> +	ret = 0;
+> +	while (true) {
+> +		unsigned long newflags, tmp;
+> +
+> +		tmp = vma->vm_end;
+> +		if (tmp > end)
+> +			tmp = end;
+> +
+> +		newflags = vma->vm_flags;
+> +		if (protect)
+> +			newflags |= VM_KVM_PROTECTED;
+> +		else
+> +			newflags &= ~VM_KVM_PROTECTED;
+> +
+> +		/* The VMA has been handled as part of other memslot */
+> +		if (newflags == vma->vm_flags)
+> +			goto next;
+> +
+> +		ret = mprotect_fixup(vma, &prev, start, tmp, newflags);
+> +		if (ret)
+> +			goto out;
+> +
+> +next:
+> +		start = tmp;
+> +		if (start < prev->vm_end)
+> +			start = prev->vm_end;
+> +
+> +		if (start >= end)
+> +			goto out;
+> +
+> +		vma = prev->vm_next;
+> +		if (!vma || vma->vm_start != start) {
+> +			ret = -ENOMEM;
+> +			goto out;
+> +		}
+> +	}
+> +out:
+> +	up_write(&mm->mmap_sem);
+> +	return ret;
+> +}
+> +
+> +int kvm_protect_memory(struct kvm *kvm,
+> +		       unsigned long gfn, unsigned long npages, bool protect)
+> +{
+> +	struct kvm_memory_slot *memslot;
+> +	unsigned long start, end;
+> +	gfn_t numpages;
+> +
+> +	if (!VM_KVM_PROTECTED)
+> +		return -KVM_ENOSYS;
+> +
+> +	if (!npages)
+> +		return 0;
+> +
+> +	memslot = gfn_to_memslot(kvm, gfn);
+> +	/* Not backed by memory. It's okay. */
+> +	if (!memslot)
+> +		return 0;
+> +
+> +	start = gfn_to_hva_many(memslot, gfn, &numpages);
+> +	end = start + npages * PAGE_SIZE;
+> +
+> +	/* XXX: Share range across memory slots? */
+> +	if (WARN_ON(numpages < npages))
+> +		return -EINVAL;
+> +
+> +	return protect_memory(start, end, protect);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_protect_memory);
+> +
+> +int kvm_protect_all_memory(struct kvm *kvm)
+> +{
+> +	struct kvm_memslots *slots;
+> +	struct kvm_memory_slot *memslot;
+> +	unsigned long start, end;
+> +	int i, ret = 0;;
+> +
+> +	if (!VM_KVM_PROTECTED)
+> +		return -KVM_ENOSYS;
+> +
+> +	mutex_lock(&kvm->slots_lock);
+> +	kvm->mem_protected = true;
+
+What will happen upon guest reboot? Do we need to unprotect everything
+to make sure we'll be able to boot? Also, after the reboot how will the
+guest know that it is protected and needs to unprotect things? -> see my
+idea about converting KVM_HC_ENABLE_MEM_PROTECTED to a stateful MSR (but
+we'll likely have to reset it upon reboot anyway).
+
+> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> +		slots = __kvm_memslots(kvm, i);
+> +		kvm_for_each_memslot(memslot, slots) {
+> +			start = memslot->userspace_addr;
+> +			end = start + memslot->npages * PAGE_SIZE;
+> +			ret = protect_memory(start, end, true);
+> +			if (ret)
+> +				goto out;
+> +		}
+> +	}
+> +out:
+> +	mutex_unlock(&kvm->slots_lock);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_protect_all_memory);
+> +
+>  void kvm_sigset_activate(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!vcpu->sigset_active)
 
 -- 
- Kirill A. Shutemov
+Vitaly
+
