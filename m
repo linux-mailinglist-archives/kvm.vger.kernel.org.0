@@ -2,154 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAEF81E0F4D
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 15:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D52A1E0FCE
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 15:49:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403835AbgEYNVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 09:21:09 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4709 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403805AbgEYNVI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 09:21:08 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ecbc6370000>; Mon, 25 May 2020 06:20:55 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 25 May 2020 06:21:07 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 25 May 2020 06:21:07 -0700
-Received: from [10.40.102.2] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 25 May
- 2020 13:20:58 +0000
-Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
- devices
-To:     Yan Zhao <yan.y.zhao@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <20200519105804.02f3cae8@x1.home> <20200525065925.GA698@joy-OptiPlex-7040>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
-Date:   Mon, 25 May 2020 18:50:54 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S2403874AbgEYNtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 09:49:22 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:50374 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403812AbgEYNtV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 09:49:21 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04PDgGit014534;
+        Mon, 25 May 2020 13:47:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=s7KIET0nPuMkj+HSRLz0InJT7D6cWyb2Hd4U4WhRrRo=;
+ b=fF8ehDGeJ1pY/y1tbaYEKRs8k4Rl9Ajo2W/mUo+bdWKISsF7qGp3nSW3SBiEuqdHiDYt
+ OGxfQfD7s0eZpnamHRNIUYBBA/jjA5NzHk9H+VFWfvlgEdHyOjriy12LgUUxRT4Be6vv
+ f/bFTF/OemjmL3KzEqA2aj44BCW6LPjwkc6XwdOamxqmtFRrHupYJ4dXOmSUkV+H6K8p
+ rugrka68HBDEbuF34WAnpk4sitU40JVDEW6156dH2eCkpqeFA/hmM32ix4Yzix/Rftke
+ k6FR+kVq+Z9mFU8VbxM3kyhOQWR3T6DtGg3ydwrjpkbej99S/ctk/RcJ+wJF7AfKDpVa XQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 316usknndc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 25 May 2020 13:47:28 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04PDguJs002776;
+        Mon, 25 May 2020 13:47:28 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 317ddm9gsk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 May 2020 13:47:28 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04PDlOPf004311;
+        Mon, 25 May 2020 13:47:24 GMT
+Received: from [192.168.14.112] (/79.178.199.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 25 May 2020 06:47:24 -0700
+Subject: Re: [RFC 00/16] KVM protected memory extension
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
+From:   Liran Alon <liran.alon@oracle.com>
+Message-ID: <42685c32-a7a9-b971-0cf4-e8af8d9a40c6@oracle.com>
+Date:   Mon, 25 May 2020 16:47:18 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200525065925.GA698@joy-OptiPlex-7040>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1590412855; bh=rfvzQ1dHfzD4GOc0GVDetG93nM12lVwp2xFrbbE4mrM=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=obFiMWLGm5rnR3RXAScvd/qKPQwMDIkOvlO/mrMnXbqKVmsRgT7mOw4OABMA8/fpa
-         dxtZPIEmSYHo1rXH4y48NhxvMm2VOmvIIEp/ldTNClwSG6gFB0qo0G1+sleIvtne9S
-         bIQhKlPwCKOlhfc8jLbCi+9CduGga+wUraCF7u8viKR1MCQ6NW8OkU975m3bKUC0Hx
-         bNLivELzZ2daRgcDOHgRrcjs/l3DesT3hUNBpmnzaBmPtlSK+FdJGH0Fld6eve22cu
-         Pl2XfwTbsh1StUr5ck+rpzWgkhORa4sFZoF6ZwOmud4Wl4m6MVw2XH/cBB5z96uEdK
-         b3ffEN2fiUbZA==
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9631 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ phishscore=0 adultscore=0 suspectscore=0 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005250106
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9631 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 lowpriorityscore=0
+ suspectscore=0 spamscore=0 priorityscore=1501 clxscore=1011
+ impostorscore=0 bulkscore=0 mlxlogscore=999 phishscore=0
+ cotscore=-2147483648 adultscore=0 mlxscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005250106
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 22/05/2020 15:51, Kirill A. Shutemov wrote:
+> == Background / Problem ==
+>
+> There are a number of hardware features (MKTME, SEV) which protect guest
+> memory from some unauthorized host access. The patchset proposes a purely
+> software feature that mitigates some of the same host-side read-only
+> attacks.
+>
+>
+> == What does this set mitigate? ==
+>
+>   - Host kernel ”accidental” access to guest data (think speculation)
 
-On 5/25/2020 12:29 PM, Yan Zhao wrote:
-> On Tue, May 19, 2020 at 10:58:04AM -0600, Alex Williamson wrote:
->> Hi folks,
->>
->> My impression is that we're getting pretty close to a workable
->> implementation here with v22 plus respins of patches 5, 6, and 8.  We
->> also have a matching QEMU series and a proposal for a new i40e
->> consumer, as well as I assume GVT-g updates happening internally at
->> Intel.  I expect all of the latter needs further review and discussion,
->> but we should be at the point where we can validate these proposed
->> kernel interfaces.  Therefore I'd like to make a call for reviews so
->> that we can get this wrapped up for the v5.8 merge window.  I know
->> Connie has some outstanding documentation comments and I'd like to make
->> sure everyone has an opportunity to check that their comments have been
->> addressed and we don't discover any new blocking issues.  Please send
->> your Acked-by/Reviewed-by/Tested-by tags if you're satisfied with this
->> interface and implementation.  Thanks!
->>
-> hi Alex
-> after porting gvt/i40e vf migration code to kernel/qemu v23, we spoted
-> two bugs.
-> 1. "Failed to get dirty bitmap for iova: 0xfe011000 size: 0x3fb0 err: 22"
->     This is a qemu bug that the dirty bitmap query range is not the same
->     as the dma map range. It can be fixed in qemu. and I just have a little
->     concern for kernel to have this restriction.
-> 
+Just to clarify: This is any host kernel memory info-leak vulnerability. 
+Not just speculative execution memory info-leaks. Also architectural ones.
 
-I never saw this unaligned size in my testing. In this case if you can 
-provide vfio_* event traces, that will helpful.
+In addition, note that removing guest data from host kernel VA space 
+also makes guest<->host memory exploits more difficult.
+E.g. Guest cannot use already available memory buffer in kernel VA space 
+for ROP or placing valuable guest-controlled code/data in general.
 
-> 2. migration abortion, reporting
-> "qemu-system-x86_64-lm: vfio_load_state: Error allocating buffer
-> qemu-system-x86_64-lm: error while loading state section id 49(vfio)
-> qemu-system-x86_64-lm: load of migration failed: Cannot allocate memory"
-> 
-> It's still a qemu bug and we can fixed it by
-> "
-> if (migration->pending_bytes == 0) {
-> +            qemu_put_be64(f, 0);
-> +            qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> "
+>
+>   - Host kernel induced access to guest data (write(fd, &guest_data_ptr, len))
+>
+>   - Host userspace access to guest data (compromised qemu)
 
-In which function in QEMU do you have to add this?
+I don't quite understand what is the benefit of preventing userspace VMM 
+access to guest data while the host kernel can still access it.
 
-> and actually there are some extra concerns about this part, as reported in
-> [1][2].
-> 
-> [1] data_size should be read ahead of data_offset
-> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02795.html.
-> [2] should not repeatedly update pending_bytes in vfio_save_iterate()
-> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02796.html.
-> 
-> but as those errors are all in qemu, and we have finished basic tests in
-> both gvt & i40e, we're fine with the kernel part interface in general now.
-> (except for my concern [1], which needs to update kernel patch 1)
-> 
+QEMU is more easily compromised than the host kernel because it's 
+guest<->host attack surface is larger (E.g. Various device emulation).
+But this compromise comes from the guest itself. Not other guests. In 
+contrast to host kernel attack surface, which an info-leak there can
+be exploited from one guest to leak another guest data.
+>
+> == What does this set NOT mitigate? ==
+>
+>   - Full host kernel compromise.  Kernel will just map the pages again.
+>
+>   - Hardware attacks
+>
+>
+> The patchset is RFC-quality: it works but has known issues that must be
+> addressed before it can be considered for applying.
+>
+> We are looking for high-level feedback on the concept.  Some open
+> questions:
+>
+>   - This protects from some kernel and host userspace read-only attacks,
+>     but does not place the host kernel outside the trust boundary. Is it
+>     still valuable?
+I don't currently see a good argument for preventing host userspace 
+access to guest data while host kernel can still access it.
+But there is definitely strong benefit of mitigating kernel info-leaks 
+exploitable from one guest to leak another guest data.
+>
+>   - Can this approach be used to avoid cache-coherency problems with
+>     hardware encryption schemes that repurpose physical bits?
+>
+>   - The guest kernel must be modified for this to work.  Is that a deal
+>     breaker, especially for public clouds?
+>
+>   - Are the costs of removing pages from the direct map too high to be
+>     feasible?
 
- >> what if pending_bytes is not 0, but vendor driver just does not want  to
- >> send data in this iteration? isn't it right to get data_size first 
-before
- >> getting data_offset?
+If I remember correctly, this perf cost was too high when considering 
+XPFO (eXclusive Page Frame Ownership) patch-series.
+This created two major perf costs:
+1) Removing pages from direct-map prevented direct-map from simply be 
+entirely mapped as 1GB huge-pages.
+2) Frequent allocation/free of userspace pages resulted in frequent TLB 
+invalidations.
 
-If vendor driver doesn't want to send data but still has data in staging 
-buffer, vendor driver still can control to send pending_bytes for this 
-iteration as 0 as this is a trap field.
+Having said that, (1) can be mitigated in case guest data is completely 
+allocated from 1GB hugetlbfs to guarantee it will not
+create smaller holes in direct-map. And (2) is not relevant for QEMU/KVM 
+use-case.
 
-I would defer this to Alex.
+This makes me wonder:
+XPFO patch-series, applied to the context of QEMU/KVM, seems to provide 
+exactly the functionality of this patch-series,
+with the exception of the additional "feature" of preventing guest data 
+from also being accessible to host userspace VMM.
+i.e. XPFO will unmap guest pages from host kernel direct-map while still 
+keeping them mapped in host userspace VMM page-tables.
 
-> so I wonder which way in your mind is better, to give our reviewed-by to
-> the kernel part now, or hold until next qemu fixes?
-> and as performance data from gvt is requested from your previous mail, is
-> that still required before the code is accepted?
-> 
-> BTW, we have also conducted some basic tests when viommu is on, and found out
-> errors like
-> "qemu-system-x86_64-dt: vtd_iova_to_slpte: detected slpte permission error (iova=0x0, level=0x3, slpte=0x0, write=1)
-> qemu-system-x86_64-dt: vtd_iommu_translate: detected translation failure (dev=00:03:00, iova=0x0)
-> qemu-system-x86_64-dt: New fault is not recorded due to compression of faults".
-> 
+If I understand correctly, this "feature" is what brings most of the 
+extra complexity of this patch-series compared to XPFO.
+It requires guest modification to explicitly specify to host which pages 
+can be accessed by userspace VMM, it requires
+changes to add new VM_KVM_PROTECTED VMA flag & FOLL_KVM for GUP, and it 
+creates issues with Live-Migration support.
 
-I saw these errors, I'm looking into it.
+So if there is no strong convincing argument for the motivation to 
+prevent userspace VMM access to guest data *while host kernel
+can still access guest data*, I don't see a good reason for using this 
+approach.
 
-Thanks,
-Kirti
+Furthermore, I would like to point out that just unmapping guest data 
+from kernel direct-map is not sufficient to prevent all
+guest-to-guest info-leaks via a kernel memory info-leak vulnerability. 
+This is because host kernel VA space have other regions
+which contains guest sensitive data. For example, KVM per-vCPU struct 
+(which holds vCPU state) is allocated on slab and therefore
+still leakable.
+
+I recommend you will have a look at my (and Alexandre Charte) KVM Forum 
+2019 talk on KVM ASI which provides extensive background
+on the various attempts done by the community for mitigating host kernel 
+memory info-leaks exploitable by guest to leak other guests data:
+https://static.sched.com/hosted_files/kvmforum2019/34/KVM%20Forum%202019%20KVM%20ASI.pdf
+
+>
+> == Series Overview ==
+>
+> The hardware features protect guest data by encrypting it and then
+> ensuring that only the right guest can decrypt it.  This has the
+> side-effect of making the kernel direct map and userspace mapping
+> (QEMU et al) useless.  But, this teaches us something very useful:
+> neither the kernel or userspace mappings are really necessary for normal
+> guest operations.
+>
+> Instead of using encryption, this series simply unmaps the memory. One
+> advantage compared to allowing access to ciphertext is that it allows bad
+> accesses to be caught instead of simply reading garbage.
+>
+> Protection from physical attacks needs to be provided by some other means.
+> On Intel platforms, (single-key) Total Memory Encryption (TME) provides
+> mitigation against physical attacks, such as DIMM interposers sniffing
+> memory bus traffic.
+>
+> The patchset modifies both host and guest kernel. The guest OS must enable
+> the feature via hypercall and mark any memory range that has to be shared
+> with the host: DMA regions, bounce buffers, etc. SEV does this marking via a
+> bit in the guest’s page table while this approach uses a hypercall.
+>
+> For removing the userspace mapping, use a trick similar to what NUMA
+> balancing does: convert memory that belongs to KVM memory slots to
+> PROT_NONE: all existing entries converted to PROT_NONE with mprotect() and
+> the newly faulted in pages get PROT_NONE from the updated vm_page_prot.
+> The new VMA flag -- VM_KVM_PROTECTED -- indicates that the pages in the
+> VMA must be treated in a special way in the GUP and fault paths. The flag
+> allows GUP to return the page even though it is mapped with PROT_NONE, but
+> only if the new GUP flag -- FOLL_KVM -- is specified. Any userspace access
+> to the memory would result in SIGBUS. Any GUP access without FOLL_KVM
+> would result in -EFAULT.
+>
+> Any anonymous page faulted into the VM_KVM_PROTECTED VMA gets removed from
+> the direct mapping with kernel_map_pages(). Note that kernel_map_pages() only
+> flushes local TLB. I think it's a reasonable compromise between security and
+> perfromance.
+>
+> Zapping the PTE would bring the page back to the direct mapping after clearing.
+> At least for now, we don't remove file-backed pages from the direct mapping.
+> File-backed pages could be accessed via read/write syscalls. It adds
+> complexity.
+>
+> Occasionally, host kernel has to access guest memory that was not made
+> shared by the guest. For instance, it happens for instruction emulation.
+> Normally, it's done via copy_to/from_user() which would fail with -EFAULT
+> now. We introduced a new pair of helpers: copy_to/from_guest(). The new
+> helpers acquire the page via GUP, map it into kernel address space with
+> kmap_atomic()-style mechanism and only then copy the data.
+>
+> For some instruction emulation copying is not good enough: cmpxchg
+> emulation has to have direct access to the guest memory. __kvm_map_gfn()
+> is modified to accommodate the case.
+>
+> The patchset is on top of v5.7-rc6 plus this patch:
+>
+> https://urldefense.com/v3/__https://lkml.kernel.org/r/20200402172507.2786-1-jimmyassarsson@gmail.com__;!!GqivPVa7Brio!MSTb9DzpOUJMLMaMq-J7QOkopsKIlAYXpIxiu5FwFYfRctwIyNi8zBJWvlt89j8$
+>
+> == Open Issues ==
+>
+> Unmapping the pages from direct mapping bring a few of issues that have
+> not rectified yet:
+>
+>   - Touching direct mapping leads to fragmentation. We need to be able to
+>     recover from it. I have a buggy patch that aims at recovering 2M/1G page.
+>     It has to be fixed and tested properly
+As I've mentioned above, not mapping all guest memory from 1GB hugetlbfs 
+will lead to holes in kernel direct-map which force it to not be mapped 
+anymore as a series of 1GB huge-pages.
+This have non-trivial performance cost. Thus, I am not sure addressing 
+this use-case is valuable.
+>
+>   - Page migration and KSM is not supported yet.
+>
+>   - Live migration of a guest would require a new flow. Not sure yet how it
+>     would look like.
+
+Note that Live-Migration issue is a result of not making guest data 
+accessible to host userspace VMM.
+
+-Liran
+
+>
+>   - The feature interfere with NUMA balancing. Not sure yet if it's
+>     possible to make them work together.
+>
+>   - Guests have no mechanism to ensure that even a well-behaving host has
+>     unmapped its private data.  With SEV, for instance, the guest only has
+>     to trust the hardware to encrypt a page after the C bit is set in a
+>     guest PTE.  A mechanism for a guest to query the host mapping state, or
+>     to constantly assert the intent for a page to be Private would be
+>     valuable.
