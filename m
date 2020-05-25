@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42E8E1E17B2
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 00:15:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD7161E17B4
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 00:15:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389100AbgEYWPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 18:15:23 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:13641 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388907AbgEYWPX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 18:15:23 -0400
+        id S2389149AbgEYWPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 18:15:37 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:7279 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388337AbgEYWPh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 18:15:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590444921; x=1621980921;
+  t=1590444937; x=1621980937;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=duiSm3PLJzCNi2ELPnGHe45HGFCXUZb2/4P9jGgzUZc=;
-  b=M1EXUoGoWT2OfUk5wL0GhDJ4J6aMTkzo2Ew9avJbajGwEF7zibYt4gzr
-   7gG1USUhyGgXnfSFCwRXfyUufFQs5i1eof3mhg2mQK4DCe9iZ4U7xMzjb
-   +MJa32bkBiBBCKj8K/+oaoX0cNjBPO20t0YzH1s5UcndU1O35mWpphNVh
-   8=;
-IronPort-SDR: 6FwFrnoS+aeNopxtWLi2rauM8O21ZwXceRaX6xh5jpR4AmKrjSxgaZZDoCEtwg2TUO90FYSC3o
- 8fGa6hnWsp/w==
+  bh=/J3EvMWZsx0yMGadkcF2kk7XEzEeoJYwxkSsDWCkFuk=;
+  b=wIzqBBQTrtiJd20JuI2uKs5fdYyzVh9VC62y8hajW6O6pNGUWwlxfywa
+   ru8jcsZQMu5zGWhtwHKbPw6n33S3rBwo4XW6RnTAxFHoTee0rVHDHOgHi
+   X5WnNWZoB8NVJpoFtXmtSmfVnnhxn+BQ0UriiMrjeiQbO5MPl8hi4uVi5
+   w=;
+IronPort-SDR: XG5lAVIf6l7YNccJv6vFbulLnXb7GZ7AwvPGIi0i4KhFEY4E25NFtTN18a7V5qI07MmfnpEpbC
+ zMnAkJKerVtw==
 X-IronPort-AV: E=Sophos;i="5.73,435,1583193600"; 
-   d="scan'208";a="32053554"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 25 May 2020 22:15:21 +0000
+   d="scan'208";a="37543859"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-27fb8269.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 25 May 2020 22:15:36 +0000
 Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com (Postfix) with ESMTPS id 9E5D9A1E72;
-        Mon, 25 May 2020 22:15:19 +0000 (UTC)
+        by email-inbound-relay-1e-27fb8269.us-east-1.amazon.com (Postfix) with ESMTPS id 49DE8A1F41;
+        Mon, 25 May 2020 22:15:34 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 25 May 2020 22:15:19 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
+ id 15.0.1497.2; Mon, 25 May 2020 22:15:33 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.50) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 25 May 2020 22:15:09 +0000
+ id 15.0.1497.2; Mon, 25 May 2020 22:15:24 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -55,15 +55,15 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
         <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v3 09/18] nitro_enclaves: Add logic for enclave vcpu creation
-Date:   Tue, 26 May 2020 01:13:25 +0300
-Message-ID: <20200525221334.62966-10-andraprs@amazon.com>
+Subject: [PATCH v3 10/18] nitro_enclaves: Add logic for enclave image load metadata
+Date:   Tue, 26 May 2020 01:13:26 +0300
+Message-ID: <20200525221334.62966-11-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200525221334.62966-1-andraprs@amazon.com>
 References: <20200525221334.62966-1-andraprs@amazon.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.43.160.90]
-X-ClientProxiedBy: EX13D14UWC002.ant.amazon.com (10.43.162.214) To
+X-Originating-IP: [10.43.162.50]
+X-ClientProxiedBy: EX13D06UWA002.ant.amazon.com (10.43.160.143) To
  EX13D16EUB003.ant.amazon.com (10.43.166.99)
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -72,234 +72,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-An enclave, before being started, has its resources set. One of its
-resources is CPU.
+Before setting the memory regions for the enclave, the enclave image
+needs to be placed in memory. After the memory regions are set, this
+memory cannot be used anymore by the VM, being carved out.
 
-Add ioctl command logic for enclave vCPU creation. Return as result a
-file descriptor that is associated with the enclave vCPU.
+Add ioctl command logic to get the offset in enclave memory where to
+place the enclave image. Then the user space tooling copies the enclave
+image in the memory using the giveni memory offset.
 
-Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
 Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 ---
 Changelog
 
 v2 -> v3
 
-* Remove the WARN_ON calls.
-* Update static calls sanity checks.
-* Update kzfree() calls to kfree().
-* Remove file ops that do nothing for now - open, ioctl and release.
+* No changes.
 
 v1 -> v2
 
-* Add log pattern for NE.
-* Update goto labels to match their purpose.
-* Remove the BUG_ON calls.
-* Check if enclave state is init when setting enclave vcpu.
+* New in v2.
 ---
- drivers/virt/nitro_enclaves/ne_misc_dev.c | 190 ++++++++++++++++++++++
- 1 file changed, 190 insertions(+)
+ drivers/virt/nitro_enclaves/ne_misc_dev.c | 24 +++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-index 8cf1c4ee1812..6db88e128d1f 100644
+index 6db88e128d1f..143259847f71 100644
 --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
 +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
-@@ -49,10 +49,200 @@ struct ne_cpu_pool {
+@@ -243,6 +243,30 @@ static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
+ 		return rc;
+ 	}
  
- static struct ne_cpu_pool ne_cpu_pool;
- 
-+static const struct file_operations ne_enclave_vcpu_fops = {
-+	.owner		= THIS_MODULE,
-+	.llseek		= noop_llseek,
-+};
++	case NE_GET_IMAGE_LOAD_METADATA: {
++		struct image_load_metadata image_load_metadata = {};
 +
-+/**
-+ * ne_get_cpu_from_cpu_pool - Get a CPU from the CPU pool, if it is set.
-+ *
-+ * This function gets called with the ne_enclave mutex held.
-+ *
-+ * @ne_enclave: private data associated with the current enclave.
-+ * @vcpu_id: id of the CPU to be associated with the given slot, apic id on x86.
-+ *
-+ * @returns: 0 on success, negative return value on failure.
-+ */
-+static int ne_get_cpu_from_cpu_pool(struct ne_enclave *ne_enclave, u32 *vcpu_id)
-+{
-+	unsigned int cpu = 0;
-+	unsigned int cpu_sibling = 0;
-+
-+	/* There are CPU siblings available to choose from. */
-+	cpu = cpumask_any(ne_enclave->cpu_siblings);
-+	if (cpu < nr_cpu_ids) {
-+		cpumask_clear_cpu(cpu, ne_enclave->cpu_siblings);
-+
-+		*vcpu_id = cpu;
-+
-+		return 0;
-+	}
-+
-+	mutex_lock(&ne_cpu_pool.mutex);
-+
-+	/* Choose any CPU from the available CPU pool. */
-+	cpu = cpumask_any(ne_cpu_pool.avail);
-+	if (cpu >= nr_cpu_ids) {
-+		pr_err_ratelimited(NE "No CPUs available in CPU pool\n");
-+
-+		mutex_unlock(&ne_cpu_pool.mutex);
-+
-+		return -EINVAL;
-+	}
-+
-+	cpumask_clear_cpu(cpu, ne_cpu_pool.avail);
-+
-+	/*
-+	 * Make sure the CPU siblings are not marked as
-+	 * available anymore.
-+	 */
-+	for_each_cpu(cpu_sibling, topology_sibling_cpumask(cpu)) {
-+		if (cpu_sibling != cpu) {
-+			cpumask_clear_cpu(cpu_sibling, ne_cpu_pool.avail);
-+
-+			cpumask_set_cpu(cpu_sibling, ne_enclave->cpu_siblings);
-+		}
-+	}
-+
-+	mutex_unlock(&ne_cpu_pool.mutex);
-+
-+	*vcpu_id = cpu;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ne_create_vcpu_ioctl - Add vCPU to the slot associated with the current
-+ * enclave. Create vCPU file descriptor to be further used for CPU handling.
-+ *
-+ * This function gets called with the ne_enclave mutex held.
-+ *
-+ * @ne_enclave: private data associated with the current enclave.
-+ * @vcpu_id: id of the CPU to be associated with the given slot, apic id on x86.
-+ *
-+ * @returns: vCPU fd on success, negative return value on failure.
-+ */
-+static int ne_create_vcpu_ioctl(struct ne_enclave *ne_enclave, u32 vcpu_id)
-+{
-+	struct ne_pci_dev_cmd_reply cmd_reply = {};
-+	int fd = 0;
-+	struct file *file = NULL;
-+	struct ne_vcpu_id *ne_vcpu_id = NULL;
-+	int rc = -EINVAL;
-+	struct slot_add_vcpu_req slot_add_vcpu_req = {};
-+
-+	if (ne_enclave->mm != current->mm)
-+		return -EIO;
-+
-+	ne_vcpu_id = kzalloc(sizeof(*ne_vcpu_id), GFP_KERNEL);
-+	if (!ne_vcpu_id)
-+		return -ENOMEM;
-+
-+	fd = get_unused_fd_flags(O_CLOEXEC);
-+	if (fd < 0) {
-+		rc = fd;
-+
-+		pr_err_ratelimited(NE "Error in getting unused fd [rc=%d]\n",
-+				   rc);
-+
-+		goto free_ne_vcpu_id;
-+	}
-+
-+	/* TODO: Include (vcpu) id in the ne-vm-vcpu naming. */
-+	file = anon_inode_getfile("ne-vm-vcpu", &ne_enclave_vcpu_fops,
-+				  ne_enclave, O_RDWR);
-+	if (IS_ERR(file)) {
-+		rc = PTR_ERR(file);
-+
-+		pr_err_ratelimited(NE "Error in anon inode get file [rc=%d]\n",
-+				   rc);
-+
-+		goto put_fd;
-+	}
-+
-+	slot_add_vcpu_req.slot_uid = ne_enclave->slot_uid;
-+	slot_add_vcpu_req.vcpu_id = vcpu_id;
-+
-+	rc = ne_do_request(ne_enclave->pdev, SLOT_ADD_VCPU, &slot_add_vcpu_req,
-+			   sizeof(slot_add_vcpu_req), &cmd_reply,
-+			   sizeof(cmd_reply));
-+	if (rc < 0) {
-+		pr_err_ratelimited(NE "Error in slot add vcpu [rc=%d]\n", rc);
-+
-+		goto put_file;
-+	}
-+
-+	ne_vcpu_id->vcpu_id = vcpu_id;
-+
-+	list_add(&ne_vcpu_id->vcpu_id_list_entry, &ne_enclave->vcpu_ids_list);
-+
-+	ne_enclave->nr_vcpus++;
-+
-+	fd_install(fd, file);
-+
-+	return fd;
-+
-+put_file:
-+	fput(file);
-+put_fd:
-+	put_unused_fd(fd);
-+free_ne_vcpu_id:
-+	kfree(ne_vcpu_id);
-+
-+	return rc;
-+}
-+
- static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
- 			     unsigned long arg)
- {
-+	struct ne_enclave *ne_enclave = file->private_data;
-+
-+	if (!ne_enclave || !ne_enclave->pdev)
-+		return -EINVAL;
-+
- 	switch (cmd) {
-+	case KVM_CREATE_VCPU: {
-+		int rc = -EINVAL;
-+		u32 vcpu_id = 0;
-+
-+		if (copy_from_user(&vcpu_id, (void *)arg, sizeof(vcpu_id))) {
++		if (copy_from_user(&image_load_metadata, (void *)arg,
++				   sizeof(image_load_metadata))) {
 +			pr_err_ratelimited(NE "Error in copy from user\n");
 +
 +			return -EFAULT;
 +		}
 +
-+		mutex_lock(&ne_enclave->enclave_info_mutex);
++		/* TODO: Check flags before setting the memory offset. */
 +
-+		if (ne_enclave->state != NE_STATE_INIT) {
-+			pr_err_ratelimited(NE "Enclave isn't in init state\n");
++		image_load_metadata.memory_offset = NE_IMAGE_LOAD_OFFSET;
 +
-+			mutex_unlock(&ne_enclave->enclave_info_mutex);
++		if (copy_to_user((void *)arg, &image_load_metadata,
++				 sizeof(image_load_metadata))) {
++			pr_err_ratelimited(NE "Error in copy to user\n");
 +
-+			return -EINVAL;
++			return -EFAULT;
 +		}
 +
-+		/* Use the CPU pool for choosing a CPU for the enclave. */
-+		rc = ne_get_cpu_from_cpu_pool(ne_enclave, &vcpu_id);
-+		if (rc < 0) {
-+			pr_err_ratelimited(NE "Error in get CPU from pool\n");
-+
-+			mutex_unlock(&ne_enclave->enclave_info_mutex);
-+
-+			return -EINVAL;
-+		}
-+
-+		rc = ne_create_vcpu_ioctl(ne_enclave, vcpu_id);
-+
-+		/* Put back the CPU in enclave cpu pool, if add vcpu error. */
-+		if (rc < 0)
-+			cpumask_set_cpu(vcpu_id, ne_enclave->cpu_siblings);
-+
-+		mutex_unlock(&ne_enclave->enclave_info_mutex);
-+
-+		return rc;
++		return 0;
 +	}
 +
  	default:
