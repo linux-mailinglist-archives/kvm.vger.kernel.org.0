@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 236231E17C5
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 00:17:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ADE31E17C7
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 00:17:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389346AbgEYWRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 18:17:17 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:7471 "EHLO
+        id S2389393AbgEYWRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 18:17:23 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:7486 "EHLO
         smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389308AbgEYWRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 18:17:17 -0400
+        with ESMTP id S2389376AbgEYWRX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 18:17:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590445036; x=1621981036;
+  t=1590445043; x=1621981043;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=28gS8mTYtoEqtoFUF3v35g3PMZAH4CEOENs+U25Nol4=;
-  b=MkcFaIzecIAX2Bm7yO7ot3mGdy4EXDIDuCLLK60kr0PxLTiC0SUvzsov
-   MLuPJoDyZFPeB0OqEcuwaoMreM2FriYKt61edP3eHQ3qLeTz2ncTkLneW
-   X2SBRjjVnF1f709mmdbINEkbmMVdVx4LQII8ocsbqMY1awzrLEdz/PCCx
-   k=;
-IronPort-SDR: 0Kfcl8jis/JVv9j+A1BRJpnmBySKYXdG/RcNewK2bSA40K/mVU1Gbo+EmshAMRS8mhJCGtP2MA
- QFZhUYhGb/hg==
+  bh=ZQUhc74BQTGillYV7hEL4Stk3r93yA62SoASB/NP6x8=;
+  b=saZ/kSuQAveETVnULCKw3YSYx8Swdiq+b0O2fymYIuYn1zLuekzGN7KF
+   6/nCH5EYv1R2sj/cj8ayVepP+ezRsKugnkt6R82Y26V0uZru+4rFNYlRm
+   1ccKiXtlyrgwHO8XmIzOPiyUtKmMRx1xgLIGe6kUXRaTraNTfGdzD5rE3
+   w=;
+IronPort-SDR: OKcNlkJP0J1PEykixyWOMhbc/vce3A7yVFl3zCcVTXZh1QXO0f3NW2OGezw6vy4X2Ay4VuE2tC
+ HqYs1GRIe0iA==
 X-IronPort-AV: E=Sophos;i="5.73,435,1583193600"; 
-   d="scan'208";a="37543972"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-98acfc19.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 25 May 2020 22:17:14 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-98acfc19.us-east-1.amazon.com (Postfix) with ESMTPS id 7EBBEA2065;
-        Mon, 25 May 2020 22:17:12 +0000 (UTC)
+   d="scan'208";a="37543980"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 25 May 2020 22:17:22 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com (Postfix) with ESMTPS id 74A98C0B70;
+        Mon, 25 May 2020 22:17:20 +0000 (UTC)
 Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 25 May 2020 22:17:11 +0000
+ id 15.0.1497.2; Mon, 25 May 2020 22:17:19 +0000
 Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
  EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 25 May 2020 22:17:03 +0000
+ id 15.0.1497.2; Mon, 25 May 2020 22:17:11 +0000
 From:   Andra Paraschiv <andraprs@amazon.com>
 To:     <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -55,9 +55,9 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
         <ne-devel-upstream@amazon.com>,
         Andra Paraschiv <andraprs@amazon.com>
-Subject: [PATCH v3 17/18] nitro_enclaves: Add overview documentation
-Date:   Tue, 26 May 2020 01:13:33 +0300
-Message-ID: <20200525221334.62966-18-andraprs@amazon.com>
+Subject: [PATCH v3 18/18] MAINTAINERS: Add entry for the Nitro Enclaves driver
+Date:   Tue, 26 May 2020 01:13:34 +0300
+Message-ID: <20200525221334.62966-19-andraprs@amazon.com>
 X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 In-Reply-To: <20200525221334.62966-1-andraprs@amazon.com>
 References: <20200525221334.62966-1-andraprs@amazon.com>
@@ -78,108 +78,39 @@ Changelog
 
 v2 -> v3
 
-* No changes.
+* Update file entries to be in alphabetical order.
 
 v1 -> v2
 
-* New in v2.
+* No changes.
 ---
- Documentation/nitro_enclaves/ne_overview.txt | 86 ++++++++++++++++++++
- 1 file changed, 86 insertions(+)
- create mode 100644 Documentation/nitro_enclaves/ne_overview.txt
+ MAINTAINERS | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/Documentation/nitro_enclaves/ne_overview.txt b/Documentation/nitro_enclaves/ne_overview.txt
-new file mode 100644
-index 000000000000..be8bb3d84132
---- /dev/null
-+++ b/Documentation/nitro_enclaves/ne_overview.txt
-@@ -0,0 +1,86 @@
-+Nitro Enclaves
-+==============
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 50659d76976b..56d529256ba4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11968,6 +11968,19 @@ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lftan/nios2.git
+ F:	arch/nios2/
+ 
++NITRO ENCLAVES (NE)
++M:	Andra Paraschiv <andraprs@amazon.com>
++M:	Alexandru Vasile <lexnv@amazon.com>
++M:	Alexandru Ciobotaru <alcioa@amazon.com>
++L:	linux-kernel@vger.kernel.org
++S:	Supported
++W:	https://aws.amazon.com/ec2/nitro/nitro-enclaves/
++F:	Documentation/nitro_enclaves/
++F:	drivers/virt/nitro_enclaves/
++F:	include/linux/nitro_enclaves.h
++F:	include/uapi/linux/nitro_enclaves.h
++F:	samples/nitro_enclaves/
 +
-+Nitro Enclaves (NE) is a new Amazon Elastic Compute Cloud (EC2) capability
-+that allows customers to carve out isolated compute environments within EC2
-+instances [1].
-+
-+For example, an application that processes sensitive data and runs in a VM,
-+can be separated from other applications running in the same VM. This
-+application then runs in a separate VM than the primary VM, namely an enclave.
-+
-+An enclave runs alongside the VM that spawned it. This setup matches low latency
-+applications needs. The resources that are allocated for the enclave, such as
-+memory and CPU, are carved out of the primary VM. Each enclave is mapped to a
-+process running in the primary VM, that communicates with the NE driver via an
-+ioctl interface.
-+
-+In this sense, there are two components:
-+
-+1. An enclave abstraction process - a user space process running in the primary
-+VM guest  that uses the provided ioctl interface of the NE driver to spawn an
-+enclave VM (that's 2 below).
-+
-+How does all gets to an enclave VM running on the host?
-+
-+There is a NE emulated PCI device exposed to the primary VM. The driver for this
-+new PCI device is included in the NE driver.
-+
-+The ioctl logic is mapped to PCI device commands e.g. the NE_START_ENCLAVE ioctl
-+maps to an enclave start PCI command or the KVM_SET_USER_MEMORY_REGION maps to
-+an add memory PCI command. The PCI device commands are then translated into
-+actions taken on the hypervisor side; that's the Nitro hypervisor running on the
-+host where the primary VM is running. The Nitro hypervisor is based on core KVM
-+technology.
-+
-+2. The enclave itself - a VM running on the same host as the primary VM that
-+spawned it. Memory and CPUs are carved out of the primary VM and are dedicated
-+for the enclave VM. An enclave does not have persistent storage attached.
-+
-+An enclave communicates with the primary VM via a local communication channel,
-+using virtio-vsock [2]. The primary VM has virtio-pci vsock emulated device,
-+while the enclave VM has a virtio-mmio vsock emulated device. The vsock device
-+uses eventfd for signaling. The enclave VM sees the usual interfaces - local
-+APIC and IOAPIC - to get interrupts from virtio-vsock device. The virtio-mmio
-+device is placed in memory below the typical 4 GiB.
-+
-+The application that runs in the enclave needs to be packaged in an enclave
-+image together with the OS ( e.g. kernel, ramdisk, init ) that will run in the
-+enclave VM. The enclave VM has its own kernel and follows the standard Linux
-+boot protocol.
-+
-+The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
-+Enclave Image Format (EIF); plus an EIF header including metadata such as magic
-+number, eif version, image size and CRC.
-+
-+Hash values are computed for the entire enclave image (EIF), the kernel and
-+ramdisk(s). That's used, for example, to check that the enclave image that is
-+loaded in the enclave VM is the one that was intended to be run.
-+
-+These crypto measurements are included in a signed attestation document
-+generated by the Nitro Hypervisor and further used to prove the identity of the
-+enclave; KMS is an example of service that NE is integrated with and that checks
-+the attestation doc.
-+
-+The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB. The
-+init process in the enclave connects to the vsock CID of the primary VM and a
-+predefined port - 9000 - to send a heartbeat value - 0xb7. This mechanism is
-+used to check in the primary VM that the enclave has booted.
-+
-+If the enclave VM crashes or gracefully exits, an interrupt event is received by
-+the NE driver. This event is sent further to the user space enclave process
-+running in the primary VM via a poll notification mechanism. Then the user space
-+enclave process can exit.
-+
-+The NE driver for enclave lifetime management provides an ioctl interface to the
-+user space. It includes the NE PCI device driver that is the means of
-+communication with the hypervisor running on the host where the primary VM and
-+the enclave are launched.
-+
-+The proposed solution is following the KVM model and uses KVM ioctls to be able
-+to create and set resources for enclaves. Additional NE ioctl commands, besides
-+the ones provided by KVM, are used to start an enclave and get memory offset for
-+in-memory enclave image loading.
-+
-+[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
-+[2] http://man7.org/linux/man-pages/man7/vsock.7.html
+ NOHZ, DYNTICKS SUPPORT
+ M:	Frederic Weisbecker <fweisbec@gmail.com>
+ M:	Thomas Gleixner <tglx@linutronix.de>
 -- 
 2.20.1 (Apple Git-117)
 
