@@ -2,99 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E9661E045A
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 03:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 648D61E0475
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 03:38:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388330AbgEYBX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 May 2020 21:23:56 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:33127 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388104AbgEYBXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 May 2020 21:23:55 -0400
-Received: by mail-io1-f66.google.com with SMTP id k18so17289463ion.0;
-        Sun, 24 May 2020 18:23:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zCFEPEQJSVR+2frxcrHLzNcELHQb8FtRYHK8V6RTIVw=;
-        b=ogAIPpZEzfhTyhN+DEzwjF6FzubL7cKNOOtDy9PLBjy3E6Bb48/ksU+9TZ94wvv0LO
-         OrQalTPBj3IA5rtd6d1mcDgC+/M838wwlQz9Em6hqyTBUqHOHh8wLcQqGVUcjq6NUMdY
-         tyaJoyt3vqFW+YohpiqpDIuKAfOzrXKPpk0+qhLZVSn1d3GZrhSBd+DBshdSVkaTC9GO
-         AR+zeIp8jCMueZcc0r0C8nQXbZdnc1W9wxmf1b/kpEym2C+8hPDPolp1ZplrZPX+3OLE
-         oLp2jbKo3PWKfR5b6tC+S09898F1Vo5DAtTz7NmnSzTs1iAv9xYngT3rBojrUNzmjFqm
-         ZmhA==
-X-Gm-Message-State: AOAM533/dODWw8OtIVp/J+GRoN0pbs2H8mCOAOFXVWAv9gRKlnCwNfUk
-        gDlQHh2+tj67Az13KR/QXW9u/HXwvaT+QbKwmiU=
-X-Google-Smtp-Source: ABdhPJwWIU91/gftTyHKWrKsP3bcniFoxRfxoCmW6g9p0EIkrMLlFvDwQG3k8xB9cAEYu99NvX0aRnM3iL3u/kMhPxE=
-X-Received: by 2002:a02:942a:: with SMTP id a39mr17334476jai.50.1590369833541;
- Sun, 24 May 2020 18:23:53 -0700 (PDT)
+        id S2388400AbgEYBiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 May 2020 21:38:15 -0400
+Received: from mail-eopbgr00053.outbound.protection.outlook.com ([40.107.0.53]:33024
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728324AbgEYBiO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 May 2020 21:38:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xKpqPWiXwX1s9oHxaslGI9pPpxzD4WzD+JjXBLEXAPk=;
+ b=mPlvlPpsypkcTTy3bE5rLRARa6PKR2zVzdFADqh58TmohK8o9DcaXE1kyN5ZvVFWfieg39PiyRIyCSxMO21gf+bav+Kx+MXWqUa1ja7UUP31rXAxqhZ5X7ZtokpAsH1sfkYO5s58Jhqg+J4bKeu49/z/iJd4ZVowfFYs8dj58YA=
+Received: from DB6PR0802CA0045.eurprd08.prod.outlook.com (2603:10a6:4:a3::31)
+ by VI1PR08MB5374.eurprd08.prod.outlook.com (2603:10a6:803:12f::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.26; Mon, 25 May
+ 2020 01:38:07 +0000
+Received: from DB5EUR03FT064.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:4:a3:cafe::29) by DB6PR0802CA0045.outlook.office365.com
+ (2603:10a6:4:a3::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23 via Frontend
+ Transport; Mon, 25 May 2020 01:38:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=bestguesspass
+ action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DB5EUR03FT064.mail.protection.outlook.com (10.152.21.199) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.23 via Frontend Transport; Mon, 25 May 2020 01:38:06 +0000
+Received: ("Tessian outbound 14e212f6ce41:v57"); Mon, 25 May 2020 01:38:06 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from c2b5a79ceaa6.3
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 693EC451-4575-4919-98F1-8F17DF37F683.1;
+        Mon, 25 May 2020 01:38:01 +0000
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id c2b5a79ceaa6.3
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Mon, 25 May 2020 01:38:01 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=h6jCtbtPIBNyIY40zKtu/lhZsWJPyOGCDI2BTGWq75zPYGVrsU+sVv62vf2lnJW/PgT5yjTN/8fERaLFo8G9noE5D5rmPKCoWCe3EaRmS03RQ2A/rMsAKf2BRkVLieuEAa6TrYFxGkdHlhQlcNKS+XH4wrHuuEow3B40Wl2QsFLZkpgwj7ZdXwJHOKcWrlxfupENOg+30X4qaioBKyiYiesf4moouRQkeaNolZvI0p+7sETVuILxbi0aOT5KdxpnIWhB34HJvLBG3Z0mn7tvdpCEf5IZJFUHnZJxu+fYbVxXMFQrXNpC2yBs5wTC2Fz76Oo9Zc2jo9UsQmTx6Vybww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xKpqPWiXwX1s9oHxaslGI9pPpxzD4WzD+JjXBLEXAPk=;
+ b=hmih+ze/ueyMQMevSSm2Sd41Ujcu4RjeiWJt0hEmZRZcvLihyN61eXROvx+PSCY1gZZdIcby6FYDKmhICCf48PNSryvHk67zDuYskxm5jtmEJS+xRPXtesZIY2jCHqlTES7jmke7leYyC9RYCoFaEnyd9pb755hhll/6nXaml5Wi/vE6QUJ0xHDcvHpCcc+3U1ZzmB9O4dwdESmQijdFmOxuUzdMtSONjryYfMllN57vsln1gpQEvVnI1anHNoCkTHOTzKvoRwOKKObbDep/q7up+fHQDjCpY52MdQpSHkdS3xydDtm+177aUfAxQs7Ppl7Ic04SWtywhZxqfJW7ag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xKpqPWiXwX1s9oHxaslGI9pPpxzD4WzD+JjXBLEXAPk=;
+ b=mPlvlPpsypkcTTy3bE5rLRARa6PKR2zVzdFADqh58TmohK8o9DcaXE1kyN5ZvVFWfieg39PiyRIyCSxMO21gf+bav+Kx+MXWqUa1ja7UUP31rXAxqhZ5X7ZtokpAsH1sfkYO5s58Jhqg+J4bKeu49/z/iJd4ZVowfFYs8dj58YA=
+Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com (2603:10a6:3:e0::7)
+ by HE1PR0802MB2571.eurprd08.prod.outlook.com (2603:10a6:3:e2::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Mon, 25 May
+ 2020 01:37:56 +0000
+Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com
+ ([fe80::b1eb:9515:4851:8be]) by HE1PR0802MB2555.eurprd08.prod.outlook.com
+ ([fe80::b1eb:9515:4851:8be%6]) with mapi id 15.20.3021.029; Mon, 25 May 2020
+ 01:37:56 +0000
+From:   Jianyong Wu <Jianyong.Wu@arm.com>
+To:     Sudeep Holla <Sudeep.Holla@arm.com>
+CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>,
+        Steven Price <Steven.Price@arm.com>,
+        Justin He <Justin.He@arm.com>, Wei Chen <Wei.Chen@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Kaly Xin <Kaly.Xin@arm.com>, nd <nd@arm.com>,
+        Sudeep Holla <Sudeep.Holla@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Subject: RE: [RFC PATCH v12 03/11] psci: export smccc conduit get helper.
+Thread-Topic: [RFC PATCH v12 03/11] psci: export smccc conduit get helper.
+Thread-Index: AQHWMBRUBAdOXBezXUymOTKynRIElai0FQYAgAP0TiA=
+Date:   Mon, 25 May 2020 01:37:56 +0000
+Message-ID: <HE1PR0802MB255537CD21C5E7F7F4A899A2F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+References: <20200522083724.38182-1-jianyong.wu@arm.com>
+ <20200522083724.38182-4-jianyong.wu@arm.com> <20200522131206.GA15171@bogus>
+In-Reply-To: <20200522131206.GA15171@bogus>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ts-tracking-id: aa67b612-5610-41a8-b27b-75dee5aeebf7.1
+x-checkrecipientchecked: true
+Authentication-Results-Original: arm.com; dkim=none (message not signed)
+ header.d=none;arm.com; dmarc=none action=none header.from=arm.com;
+x-originating-ip: [203.126.0.111]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: e09abb7b-5dd2-4e6b-92d1-08d8004c4649
+x-ms-traffictypediagnostic: HE1PR0802MB2571:|VI1PR08MB5374:
+x-ms-exchange-transport-forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR08MB53748069697CAB9430528A72F4B30@VI1PR08MB5374.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+nodisclaimer: true
+x-ms-oob-tlc-oobclassifiers: OLM:8882;OLM:8882;
+x-forefront-prvs: 0414DF926F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: He+6Q0V00nxFHrY1xEK0fd8S4PAkqovfrtOloOzV0luMwAELHPf4X6nPfCL9SVzUvdWgvdb3vNTOJzHLHDYwSnKaJKTiwCVVdSZXmo5Dvkrq4sWWXuEyFRxchgXXJLAIojvYiq4EgqSOL8wm+IBhmhyJCj/6adMhpou3Ku2qoLMsoYVRZYD3zav/TiLqwvvn3E5ts/0f8tIjuGPIRVAIFbeAVX0G3OFwDbHRXiBBK48+mGhZV6Mbx6cGH1rZv+k8rcH3k+4sR1IqhPEzeRtnEOrueuuwy/UAObe4RZ0J92RMqA2zxNCZ7V89+poUATqhYs7GWwdO6kzKo8zO+vIrbH1+WCVOunexMFwIx9SFwXOHghxtL1K7LPjvGkHk4uxKAdovr28V3XJ4n3wLuSc7rg==
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0802MB2555.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(39850400004)(376002)(396003)(366004)(346002)(66946007)(7696005)(186003)(4326008)(6862004)(316002)(26005)(71200400001)(966005)(478600001)(6506007)(66556008)(76116006)(64756008)(66476007)(53546011)(66446008)(2906002)(6636002)(8676002)(52536014)(5660300002)(33656002)(8936002)(86362001)(7416002)(55016002)(9686003)(54906003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: IX4exGaJJO0u81zqwTPgVsxsRWpw8zIg7OH2kYV02gHPbNmdRp3/+eqer3cVv0ux1Eyha29s+giRxo2AFA0b2ZkslOygM0Exu+8Mf5om+aREiwzzOm8cUvo9TUeoHbQpQ66TKV5wIG51/bABpbI6TT1cOiwts28uKhc2yRICVUJRhru7K7kYBMYuhsMnFtVFkB+m7zWcFI9rKZdgdY+kHiFN6J9U00OQkhXCjEyRZoCalO5EqD5eOtYNvwchRDBUT1zjMOh0Sids2Dbbun6oqA2lGM/HxZp2umqKimwxJhS2ITT+jcFzoHQs2ng7B84RXI+FMwPjFhVaat0LFVcLlSCdeUCkGjto1cXsYmWXTdD63/z1nqdizl7psZ95qoJhG+yCb57QEzn7dGFqiIK/PS9IWduFADyMuboLdgGvmvaM1VdtPtjcS2qH17LRnSuIbLGK7K/EMQ5rwl76LcQhJwY6KjGXrVYPXGvjtHWzrpw=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <1590318819-24520-1-git-send-email-chenhc@lemote.com> <CAHiYmc7sBuG8p2cZ_28UH8kSPpBLe5dj9fDWo45NZWLGcBvhpg@mail.gmail.com>
-In-Reply-To: <CAHiYmc7sBuG8p2cZ_28UH8kSPpBLe5dj9fDWo45NZWLGcBvhpg@mail.gmail.com>
-From:   Huacai Chen <chenhc@lemote.com>
-Date:   Mon, 25 May 2020 09:23:41 +0800
-Message-ID: <CAAhV-H56E2LLHM-0UPLeR0vKDw=qJaRU9QYbxzNc=St_QK9oOA@mail.gmail.com>
-Subject: Re: [PATCH V8 00/15] KVM: MIPS: Add Loongson-3 support (Host Side)
-To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2571
+Original-Authentication-Results: arm.com; dkim=none (message not signed)
+ header.d=none;arm.com; dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT064.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFTY:;SFS:(4636009)(376002)(39850400004)(396003)(346002)(136003)(46966005)(33656002)(86362001)(8676002)(9686003)(54906003)(478600001)(336012)(186003)(8936002)(82310400002)(356005)(52536014)(6636002)(55016002)(107886003)(26005)(81166007)(6862004)(47076004)(4326008)(7696005)(2906002)(82740400003)(5660300002)(70586007)(450100002)(53546011)(316002)(6506007)(966005)(70206006);DIR:OUT;SFP:1101;
+X-MS-Office365-Filtering-Correlation-Id-Prvs: d651fffb-09ca-4a5c-058f-08d8004c4036
+X-Forefront-PRVS: 0414DF926F
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WTyctWUDk2F9PCS6MYNfoxw5WTalp9lLgHP6ZSs6fAx3O98Ol/KxymDaCN/G7+4tjtjKgQiY29s+9/aLqXuqn5hLqnqLz+yIavbOI0XaeXju/Y+qKcgdJjK6uuH+93VNEKA3lmu+MUteSMqm22vIhXm9nRYmyp1qU6CF4+n1+4dVuWjTsrbl3HjQ3Qjwvx976+FQO5oRhMWXvbZrQEfK05gs2ZG1VufUAz6qOqlugd1AAxHribAu/e9oc30MKVOjbOu0Q23+yRJHIONcgGDBQFX5HM87l0zyXHM0G2JHZhOHhzCI5NxawwxSv5TZbFFSLIQbBpqnK6k0Gg/V8Jtuug6+ZNfO1bj/ERY/ATPNO0crTPPfTOpkTsBip0HhLZJp1zsG13AxW1qrGxexTOmdl9JxoOzK792RfIwaAxHbBuf8J3aILIOrC6yVnDHfBh/zJFI3M2gWmgQkQvi93yQkwvwR4piiwL9IqlnB5CPfEb8=
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2020 01:38:06.9246
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e09abb7b-5dd2-4e6b-92d1-08d8004c4649
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB5374
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Aleksandar,
+Hi Sudeep,
 
-On Mon, May 25, 2020 at 8:26 AM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
-> > V7 -> V8:
-> > 1, Rebase to be applied on kvm tree, i.e., the linux-next branch of
-> >    https://git.kernel.org/pub/scm/virt/kvm/kvm.git/. Building KVM/MIPS
-> >    need commit 3fbfb4585bfd4ff34e ("mips: define pud_index() regardless
-> >    of page table folding"), which has already been in mips tree but not
-> >    in kvm tree.
+> -----Original Message-----
+> From: Sudeep Holla <sudeep.holla@arm.com>
+> Sent: Friday, May 22, 2020 9:12 PM
+> To: Jianyong Wu <Jianyong.Wu@arm.com>
+> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
+> maz@kernel.org; richardcochran@gmail.com; Mark Rutland
+> <Mark.Rutland@arm.com>; will@kernel.org; Suzuki Poulose
+> <Suzuki.Poulose@arm.com>; Steven Price <Steven.Price@arm.com>; Justin
+> He <Justin.He@arm.com>; Wei Chen <Wei.Chen@arm.com>;
+> kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; linux-
+> kernel@vger.kernel.org; Kaly Xin <Kaly.Xin@arm.com>; nd <nd@arm.com>;
+> Sudeep Holla <Sudeep.Holla@arm.com>; kvmarm@lists.cs.columbia.edu;
+> linux-arm-kernel@lists.infradead.org
+> Subject: Re: [RFC PATCH v12 03/11] psci: export smccc conduit get helper.
+>=20
+> On Fri, May 22, 2020 at 04:37:16PM +0800, Jianyong Wu wrote:
+> > Export arm_smccc_1_1_get_conduit then modules can use smccc helper
+> > which adopts it.
 > >
->
-> Huacai,
->
-> I do support and salute the series (as I always did), as I see it as a
-> giant step forward for KVM for MIPS.
->
-> However, in general, I think any series should not depend on "pick
-> that patch from another tree", and should be a stand-alone unit that
-> yields to successful build and desired functionality. If there is a
-> dependency like you described, the patch in question, in my opinion,
-> should be integrated into the series in question. Git is even smart
-> enough that it recognizes the same patch has been applied before, so
-> integration of another tree would not be exposed to problems.
->
-> From the point of view of synchronizing with QEMU part, and the timing
-> issues wrt kernel and QEMU releases, I want to stress that it is
-> better that this series is integrated sooner rather than later. In
-> other words, I think that potential Paolo's KVM pull request should
-> happen before Thomas' mips-next pull request (Paolo could include
-> "mips: define pud_index() regardless of page table folding", and
-> Thomas could simply omit it).
->
-> But, that said, I don't feel I should impose my opinion to others
-> here. Take my statements just as advises. I defer the decision on how
-> to proceed with the integration of this series entirely to Paolo and
-> Thomas.
-I think I lack some experience of cross-subsystem development, so in
-V8 I only adjust the context of my own patches to let the series be
-applied on kvm tree, but didn't consider patches already in other
-trees (Moreover, that patch is not mine). So, should I send a V9 that
-take commit 3fbfb4585bfd4ff3 together?
+> > Acked-by: Mark Rutland <mark.rutland@arm.com>
+> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> > ---
+> >  drivers/firmware/psci/psci.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/firmware/psci/psci.c
+> > b/drivers/firmware/psci/psci.c index 2937d44b5df4..fd3c88f21b6a 100644
+> > --- a/drivers/firmware/psci/psci.c
+> > +++ b/drivers/firmware/psci/psci.c
+> > @@ -64,6 +64,7 @@ enum arm_smccc_conduit
+> > arm_smccc_1_1_get_conduit(void)
+> >
+> >  	return psci_ops.conduit;
+> >  }
+> > +EXPORT_SYMBOL(arm_smccc_1_1_get_conduit);
+> >
+>=20
+> I have moved this into drivers/firmware/smccc/smccc.c [1] Please update
+> this accordingly.
 
-Thanks,
-Huacai
->
-> Yours,
-> Aleksandar
+Ok, I will remove this patch next version.
+>=20
+> Also this series is floating on the list for a while now, it is time to d=
+rop "RFC"
+> unless anyone has strong objection to the idea here.
+Yeah.
+>=20
+Thanks
+Jianyong=20
+> --
+> Regards,
+> Sudeep
+>=20
+> [1] https://git.kernel.org/arm64/c/f2ae97062a48
