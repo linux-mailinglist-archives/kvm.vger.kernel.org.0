@@ -2,111 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B92041E0C56
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 12:59:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36BAA1E1108
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 16:53:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389932AbgEYK7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 06:59:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41478 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389484AbgEYK7n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 06:59:43 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B765C061A0E;
-        Mon, 25 May 2020 03:59:43 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f06f3002884bb6a9703d441.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:f300:2884:bb6a:9703:d441])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BF2A61EC01E0;
-        Mon, 25 May 2020 12:59:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1590404381;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=BjuXSESQj06++1FVczfy6FPyMVhHDlsVpK90rZ0EYqU=;
-        b=HJA9f4y3T8PN5nUEk1pZ8uRkMTTM3Rf089DcwCcMSLgS8ImdyeWEAv8P0TP8gZdv80RS1x
-        8riSP7CGgsZfc4RE1b8xT2EYlmG7e7GD1zMM4O44byf2wekd9uH1EIzWMxI6C8VG61nAM2
-        OAbaJ3Se1DYjOQ30eg1u9Dd/MxWs0Kg=
-Date:   Mon, 25 May 2020 12:59:35 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 54/75] x86/sev-es: Handle DR7 read/write events
-Message-ID: <20200525105935.GH25636@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-55-joro@8bytes.org>
+        id S2403997AbgEYOxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 10:53:40 -0400
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:55196 "EHLO
+        4.mo68.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390911AbgEYOxk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 10:53:40 -0400
+X-Greylist: delayed 10800 seconds by postgrey-1.27 at vger.kernel.org; Mon, 25 May 2020 10:53:38 EDT
+Received: from player694.ha.ovh.net (unknown [10.108.35.12])
+        by mo68.mail-out.ovh.net (Postfix) with ESMTP id 8ADC316B39F
+        for <kvm@vger.kernel.org>; Mon, 25 May 2020 13:14:54 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player694.ha.ovh.net (Postfix) with ESMTPSA id B1FED129773D0;
+        Mon, 25 May 2020 11:14:33 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass (GARM-97G0027a4b149b-0bfb-403d-8187-646cad0b4dc9,22A89661A4361147AF88D80C9EA00EFFECB1F326) smtp.auth=groug@kaod.org
+Date:   Mon, 25 May 2020 13:14:31 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+        mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [RFC v2 17/18] spapr: Added PEF based guest memory protection
+Message-ID: <20200525131431.329f39f5@bahia.lan>
+In-Reply-To: <20200521034304.340040-18-david@gibson.dropbear.id.au>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+        <20200521034304.340040-18-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-55-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 12154652446889843174
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedruddvtddgfeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:17:04PM +0200, Joerg Roedel wrote:
-> +static enum es_result vc_handle_dr7_write(struct ghcb *ghcb,
-> +					  struct es_em_ctxt *ctxt)
+On Thu, 21 May 2020 13:43:03 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> Some upcoming POWER machines have a system called PEF (Protected
+> Execution Framework) which uses a small ultravisor to allow guests to
+
+s/Framework/Facility
+
+> run in a way that they can't be eavesdropped by the hypervisor.  The
+> effect is roughly similar to AMD SEV, although the mechanisms are
+> quite different.
+> 
+> Most of the work of this is done between the guest, KVM and the
+> ultravisor, with little need for involvement by qemu.  However qemu
+> does need to tell KVM to allow secure VMs.
+> 
+> Because the availability of secure mode is a guest visible difference
+> which depends on havint the right hardware and firmware, we don't
+
+s/havint/having
+
+> enable this by default.  In order to run a secure guest you need to
+> create a "pef-guest" object and set the guest-memory-protection machine property to point to it.
+> 
+
+Wrap line after "machine" maybe ?
+
+> Note that this just *allows* secure guests, the architecture of PEF is
+> such that the guest still needs to talk to the ultravisor to enter
+> secure mode, so we can't know if the guest actually is secure until
+> well after machine creation time.
+> 
+
+Maybe worth mentioning that this is for KVM only. Also, this is
+silently ignored with TCG since pef_kvm_init() isn't called in
+this case. Would it make sense to print some warning like we
+do for these spapr caps that we don't support with TCG ?
+
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  target/ppc/Makefile.objs |  2 +-
+>  target/ppc/pef.c         | 81 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 82 insertions(+), 1 deletion(-)
+>  create mode 100644 target/ppc/pef.c
+> 
+> diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+> index e8fa18ce13..ac93b9700e 100644
+> --- a/target/ppc/Makefile.objs
+> +++ b/target/ppc/Makefile.objs
+> @@ -6,7 +6,7 @@ obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o arch_dump.o
+>  obj-$(TARGET_PPC64) += mmu-hash64.o mmu-book3s-v3.o compat.o
+>  obj-$(TARGET_PPC64) += mmu-radix64.o
+>  endif
+> -obj-$(CONFIG_KVM) += kvm.o
+> +obj-$(CONFIG_KVM) += kvm.o pef.o
+>  obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+>  obj-y += dfp_helper.o
+>  obj-y += excp_helper.o
+> diff --git a/target/ppc/pef.c b/target/ppc/pef.c
+> new file mode 100644
+> index 0000000000..823daf3e9c
+> --- /dev/null
+> +++ b/target/ppc/pef.c
+> @@ -0,0 +1,81 @@
+> +/*
+> + * PEF (Protected Execution Framework) for POWER support
+
+s/Framework/Facility
+
+> + *
+> + * Copyright David Gibson, Redhat Inc. 2020
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+
+I had to include some more headers to build this.
+
+#include "exec/guest-memory-protection.h"
+#include "qapi/error.h"
+#include "qom/object_interfaces.h"
+#include "sysemu/kvm.h"
+
+> +#define TYPE_PEF_GUEST "pef-guest"
+> +#define PEF_GUEST(obj)                                  \
+> +    OBJECT_CHECK(PefGuestState, (obj), TYPE_SEV_GUEST)
+
+s/TYPE_SEV_GUEST/TYPE_PEF_GUEST
+
+> +
+> +typedef struct PefGuestState PefGuestState;
+> +
+> +/**
+> + * PefGuestState:
+> + *
+> + * The PefGuestState object is used for creating and managing a PEF
+> + * guest.
+> + *
+> + * # $QEMU \
+> + *         -object pef-guest,id=pef0 \
+> + *         -machine ...,guest-memory-protection=pef0
+> + */
+> +struct PefGuestState {
+> +    Object parent_obj;
+> +};
+> +
+> +static Error *pef_mig_blocker;
+
+Unused.
+
+> +
+> +static int pef_kvm_init(GuestMemoryProtection *gmpo, Error **errp)
 > +{
-> +	struct sev_es_runtime_data *data = this_cpu_read(runtime_data);
-> +	long val, *reg = vc_insn_get_rm(ctxt);
-> +	enum es_result ret;
-> +
-> +	if (!reg)
-> +		return ES_DECODE_FAILED;
-> +
-> +	val = *reg;
-> +
-> +	/* Upper 32 bits must be written as zeroes */
-> +	if (val >> 32) {
-> +		ctxt->fi.vector = X86_TRAP_GP;
-> +		ctxt->fi.error_code = 0;
-> +		return ES_EXCEPTION;
-> +	}
-> +
-> +	/* Clear out other reservered bits and set bit 10 */
+> +    PefGuestState *pef = PEF_GUEST(gmpo);
 
-"reserved"
-
-> +	val = (val & 0xffff23ffL) | BIT(10);
-> +
-> +	/* Early non-zero writes to DR7 are not supported */
-> +	if (!data && (val & ~DR7_RESET_VALUE))
-> +		return ES_UNSUPPORTED;
-> +
-> +	/* Using a value of 0 for ExitInfo1 means RAX holds the value */
-> +	ghcb_set_rax(ghcb, val);
-> +	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_WRITE_DR7, 0, 0);
-> +	if (ret != ES_OK)
-> +		return ret;
-> +
-> +	if (data)
-> +		data->dr7 = val;
-
-Are we still returning ES_OK if !data?
+Unused.
 
 > +
-> +	return ES_OK;
+> +    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
+> +        error_setg(errp,
+> +                   "KVM implementation does not support Secure VMs (is an ultravisor running?)");
+> +        return -1;
+> +    } else {
+> +        int ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GUEST, 0, 1);
+> +
+> +        if (ret < 0) {
+> +            error_setg(errp,
+> +                       "Error enabling PEF with KVM");
+> +            return -1;
+> +        }
+> +    }
+> +
+> +    return 0;
 > +}
+> +
+> +static void pef_guest_class_init(ObjectClass *oc, void *data)
+> +{
+> +    GuestMemoryProtectionClass *gmpc = GUEST_MEMORY_PROTECTION_CLASS(oc);
+> +
+> +    gmpc->kvm_init = pef_kvm_init;
+> +}
+> +
+> +static const TypeInfo pef_guest_info = {
+> +    .parent = TYPE_OBJECT,
+> +    .name = TYPE_PEF_GUEST,
+> +    .instance_size = sizeof(PefGuestState),
+> +    .class_init = pef_guest_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_GUEST_MEMORY_PROTECTION },
+> +        { TYPE_USER_CREATABLE },
+> +        { }
+> +    }
+> +};
+> +
+> +static void
+> +pef_register_types(void)
+> +{
+> +    type_register_static(&pef_guest_info);
+> +}
+> +
+> +type_init(pef_register_types);
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
