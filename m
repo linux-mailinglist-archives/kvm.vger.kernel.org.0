@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F4081E10DC
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 16:45:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F7101E10DE
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 16:45:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390992AbgEYOpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 10:45:06 -0400
+        id S2391004AbgEYOpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 10:45:08 -0400
 Received: from mga04.intel.com ([192.55.52.120]:34251 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388687AbgEYOpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 10:45:05 -0400
-IronPort-SDR: Bmo5vKki7nsXC8+8CfFruKuVs+SOW0nk9i2DtYF9+3p6W/MNCkD+Z7CIknsSt/AXsfwuFo1Yza
- QK5SA7vd7eEw==
+        id S2388687AbgEYOpI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 10:45:08 -0400
+IronPort-SDR: aSj6qCMU6QpAaizEQvm4856oAvM5tyujC3/OskY3R+gFxordj4SUU5gjdImhNt/+7EPUpO31Py
+ UAPT2edmxJqw==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2020 07:45:05 -0700
-IronPort-SDR: ZARH7TqTOXBIcr+UZK902lPAlXXpqow1iZGtYTLq/gULvQT3CpFEc0h4G1Cl9XllPA056+uEUx
- UDdP3ZSLQoXA==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2020 07:45:07 -0700
+IronPort-SDR: 6ypkmFTWcIKAHA7Hm8v6dsnGPsORA/xeJdhKTTgXdl/gCm1i5k/AgukMh9D5rTCMzS3x7tNX+b
+ YZI4MuMO41nw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,433,1583222400"; 
-   d="scan'208";a="266165828"
+   d="scan'208";a="266165840"
 Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu.ger.corp.intel.com) ([10.249.41.109])
-  by orsmga003.jf.intel.com with ESMTP; 25 May 2020 07:45:02 -0700
+  by orsmga003.jf.intel.com with ESMTP; 25 May 2020 07:45:05 -0700
 From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-remoteproc@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc:     linux-remoteproc@vger.kernel.org,
         Jason Wang <jasowang@redhat.com>,
         Ohad Ben-Cohen <ohad@wizery.com>,
         Bjorn Andersson <bjorn.andersson@linaro.org>
-Subject: [PATCH v2 1/5] vhost: convert VHOST_VSOCK_SET_RUNNING to a generic ioctl
-Date:   Mon, 25 May 2020 16:44:54 +0200
-Message-Id: <20200525144458.8413-2-guennadi.liakhovetski@linux.intel.com>
+Subject: [PATCH v2 2/5] vhost: (cosmetic) remove a superfluous variable initialisation
+Date:   Mon, 25 May 2020 16:44:55 +0200
+Message-Id: <20200525144458.8413-3-guennadi.liakhovetski@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200525144458.8413-1-guennadi.liakhovetski@linux.intel.com>
 References: <20200525144458.8413-1-guennadi.liakhovetski@linux.intel.com>
@@ -48,41 +48,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VHOST_VSOCK_SET_RUNNING is used by the vhost vsock driver to perform
-crucial VirtQueue initialisation, like assigning .private fields and
-calling vhost_vq_init_access(), and clean up. However, this ioctl is
-actually extremely useful for any vhost driver, that doesn't have a
-side channel to inform it of a status change, e.g. upon a guest
-reboot. This patch makes that ioctl generic, while preserving its
-numeric value and also keeping the original alias.
+Even the compiler is able to figure out that in this case the
+initialisation is superfluous.
 
 Signed-off-by: Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
 ---
- include/uapi/linux/vhost.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/vhost/vhost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-index 9fe72e4..b54af9d 100644
---- a/include/uapi/linux/vhost.h
-+++ b/include/uapi/linux/vhost.h
-@@ -93,6 +93,8 @@
- #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
- #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 2f4383bb..2b9ad8a 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -895,7 +895,7 @@ static inline void __user *__vhost_get_user(struct vhost_virtqueue *vq,
  
-+#define VHOST_SET_RUNNING _IOW(VHOST_VIRTIO, 0x61, int)
-+
- /* VHOST_NET specific defines */
- 
- /* Attach virtio net ring to a raw socket, or tap device.
-@@ -114,7 +116,7 @@
- /* VHOST_VSOCK specific defines */
- 
- #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
--#define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
-+#define VHOST_VSOCK_SET_RUNNING		VHOST_SET_RUNNING
- 
- /* VHOST_VDPA specific defines */
- 
+ #define vhost_put_user(vq, x, ptr)		\
+ ({ \
+-	int ret = -EFAULT; \
++	int ret; \
+ 	if (!vq->iotlb) { \
+ 		ret = __put_user(x, ptr); \
+ 	} else { \
 -- 
 1.9.3
 
