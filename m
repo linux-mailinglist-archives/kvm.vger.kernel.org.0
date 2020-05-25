@@ -2,131 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07C431E11B6
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 17:28:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FBFD1E11D6
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 17:34:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404110AbgEYP2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 11:28:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51378 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2403999AbgEYP2Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 11:28:24 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B44D92071A;
-        Mon, 25 May 2020 15:28:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590420503;
-        bh=3X4sQ7kcpAcBdWmFPLh2z6FUnu+whu05DPLM1j+9VQY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=0bBuzBY5wC1xcpMo04SVEVYyNO8F3N5GWqP7oDFDTbPCo3EUisqzVks3B99I4/hdY
-         /iEgGaONpIC9cmuYkN8WpvOyZ6fzMILw87y7sn4R0VuCPQebUSBI+bsP0/+gZVHcVq
-         /FsxUauOXD8YIvXLhbH0AjW3jJDp8Sul7gdt/vF0=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jdF1Z-00FC3W-Mv; Mon, 25 May 2020 16:28:21 +0100
+        id S2404216AbgEYPeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 11:34:10 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60248 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2404066AbgEYPeI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 May 2020 11:34:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590420846;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o1s5zuPCbjv4W1F4qB4hsqDOidZ/dEXbHAB3GqNTJXQ=;
+        b=V25+vmvqzl8gty1xG37hc4yU8HeOdHIKwEj4+03qtW/v3Vl7S52cNqo/bLS9BUOWJLUoKM
+        Sx+ssOiRCiYtSpMqgxgmMVOa1YA+mtIZgJrdm6EuRrwb98rznmDwx9VI2+xzAm8pWpVn9F
+        kgAwRL+jWq4+KAsF+FBHypJEMprwKxA=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-j75taoWnNwSXLGptWmdAMg-1; Mon, 25 May 2020 11:33:52 -0400
+X-MC-Unique: j75taoWnNwSXLGptWmdAMg-1
+Received: by mail-qt1-f197.google.com with SMTP id p20so6953224qtq.13
+        for <kvm@vger.kernel.org>; Mon, 25 May 2020 08:33:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=o1s5zuPCbjv4W1F4qB4hsqDOidZ/dEXbHAB3GqNTJXQ=;
+        b=IRGS4LXym7MzN7Ipb+LGUnYnLx9pM5PbE7M/0YQVOIfiS591x93fZFI+wLuBGzOSc8
+         Zg2z3gEflq+U3SKX5zNN8WXJpd3Npk9mbGl2nVHQUus8eCk3ysOHUmc7K7x23qkkJqH6
+         /SIAcahIRxpap78MUIkRYPc4rdS7LB/MoxZLrrDyQRFw4gGCQLGtqGqg46pLH92h3uIP
+         egLjWBIMoPIN/cfZSXZ+ZjdTe5ihV33BcUIvt0YTAWy+87aynn2irPR9HaMxMxBGFPXP
+         Q+berbgMIQ9nbiZltrE0CjlVIaxNzp9Wai2Ok3h5nUURJ+k3A1pT/VloTPZ/0zYBurgy
+         x45Q==
+X-Gm-Message-State: AOAM532sIFKzLtBUjr90dv9o0chm7sVXJTPywV8r7+ieWwF4rtllN9aZ
+        1Lx1DOdT+AAYH6Aqup6/30xH2wAMS/oniYWzASkaeVTtEaDoWUevqYQdq5BqHNb4tn+laV6VyaQ
+        7nAbZHifyd+2d
+X-Received: by 2002:a37:7143:: with SMTP id m64mr26064114qkc.27.1590420831691;
+        Mon, 25 May 2020 08:33:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMgbQT9zZHhsACJ6JIUxvphkrjM3Sc4JuKOREGxqwcWEftYz9SdklT7uY+WRjYzsggI7Jw5g==
+X-Received: by 2002:a37:7143:: with SMTP id m64mr26064085qkc.27.1590420831299;
+        Mon, 25 May 2020 08:33:51 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id p11sm3160489qtq.75.2020.05.25.08.33.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 May 2020 08:33:50 -0700 (PDT)
+Date:   Mon, 25 May 2020 11:33:47 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     kbuild test robot <lkp@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kbuild-all@lists.01.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>
+Subject: Re: [PATCH v9 05/14] KVM: X86: Implement ring-based dirty memory
+ tracking
+Message-ID: <20200525153347.GG1058657@xz-x1>
+References: <20200523225659.1027044-6-peterx@redhat.com>
+ <202005252245.ZeOB8qNJ%lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 25 May 2020 16:28:21 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Jianyong Wu <Jianyong.Wu@arm.com>
-Cc:     Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        Mark Rutland <Mark.Rutland@arm.com>, will@kernel.org,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>,
-        Steven Price <Steven.Price@arm.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve Capper <Steve.Capper@arm.com>,
-        Kaly Xin <Kaly.Xin@arm.com>, Justin He <Justin.He@arm.com>,
-        Wei Chen <Wei.Chen@arm.com>, nd <nd@arm.com>
-Subject: Re: [RFC PATCH v12 10/11] arm64: add mechanism to let user choose
- which counter to return
-In-Reply-To: <HE1PR0802MB2555E64BD5C076E5AF08E644F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
-References: <20200522083724.38182-1-jianyong.wu@arm.com>
- <20200522083724.38182-11-jianyong.wu@arm.com>
- <20200524021106.GC335@localhost>
- <306951e4945b9e486dc98818ba24466d@kernel.org>
- <HE1PR0802MB2555E64BD5C076E5AF08E644F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <b5b4266f6bdac6c4921ab1a577b8e343@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: Jianyong.Wu@arm.com, richardcochran@gmail.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com, Mark.Rutland@arm.com, will@kernel.org, Suzuki.Poulose@arm.com, Steven.Price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com, Justin.He@arm.com, Wei.Chen@arm.com, nd@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <202005252245.ZeOB8qNJ%lkp@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-05-25 15:18, Jianyong Wu wrote:
-> Hi Marc,
+On Mon, May 25, 2020 at 10:54:58PM +0800, kbuild test robot wrote:
+> Hi Peter,
 > 
->> -----Original Message-----
->> From: Marc Zyngier <maz@kernel.org>
->> Sent: Monday, May 25, 2020 5:17 PM
->> To: Richard Cochran <richardcochran@gmail.com>; Jianyong Wu
->> <Jianyong.Wu@arm.com>
->> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
->> tglx@linutronix.de; pbonzini@redhat.com; 
->> sean.j.christopherson@intel.com;
->> Mark Rutland <Mark.Rutland@arm.com>; will@kernel.org; Suzuki Poulose
->> <Suzuki.Poulose@arm.com>; Steven Price <Steven.Price@arm.com>; linux-
->> kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
->> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; Steve Capper
->> <Steve.Capper@arm.com>; Kaly Xin <Kaly.Xin@arm.com>; Justin He
->> <Justin.He@arm.com>; Wei Chen <Wei.Chen@arm.com>; nd <nd@arm.com>
->> Subject: Re: [RFC PATCH v12 10/11] arm64: add mechanism to let user
->> choose which counter to return
->> 
->> On 2020-05-24 03:11, Richard Cochran wrote:
->> > On Fri, May 22, 2020 at 04:37:23PM +0800, Jianyong Wu wrote:
->> >> In general, vm inside will use virtual counter compered with host use
->> >> phyical counter. But in some special scenarios, like nested
->> >> virtualization, phyical counter maybe used by vm. A interface added
->> >> in ptp_kvm driver to offer a mechanism to let user choose which
->> >> counter should be return from host.
->> >
->> > Sounds like you have two time sources, one for normal guest, and one
->> > for nested.  Why not simply offer the correct one to user space
->> > automatically?  If that cannot be done, then just offer two PHC
->> > devices with descriptive names.
->> 
->> There is no such thing as a distinction between nested or non-nested.
->> Both counters are available to the guest at all times, and said guest 
->> can
->> choose whichever it wants to use. So the hypervisor (KVM) has to 
->> support
->> both counters as a reference.
->> 
-> It's great that we can decide which counter to return in guest kernel.
-> So we can abandon these code, including patch 9/11 and 10/11, that
-> expose the interface to userspace to do the decision.
+> Thank you for the patch! Perhaps something to improve:
 > 
->> For a Linux guest, we always know which reference we're using (the 
->> virtual
->> counter). So it is pointless to expose the choice to userspace at all.
->> 
-> So, we should throw these code of deciding counter type in linux
-> driver away and just keep the hypercall service of providing both
-> virtual counter and physical counter in linux to server non-linux
-> guest.
-> Am I right?
+> [auto build test WARNING on vhost/linux-next]
+> [also build test WARNING on linus/master v5.7-rc7]
+> [cannot apply to kvm/linux-next tip/auto-latest linux/master next-20200522]
+> [if your patch is applied to the wrong git tree, please drop us a note to help
+> improve the system. BTW, we also suggest to use '--base' option to specify the
+> base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Peter-Xu/KVM-Dirty-ring-interface/20200524-070926
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+> config: x86_64-allyesconfig (attached as .config)
+> compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+> reproduce (this is a W=1 build):
+>         # save the attached .config to linux build tree
+>         make W=1 ARCH=x86_64 
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>, old ones prefixed by <<):
+> 
+> >> arch/x86/kvm/../../../virt/kvm/dirty_ring.c:33:6: warning: no previous prototype for 'kvm_dirty_ring_full' [-Wmissing-prototypes]
+> bool kvm_dirty_ring_full(struct kvm_dirty_ring *ring)
+> ^~~~~~~~~~~~~~~~~~~
 
-Exactly. We control Linux, and so far nothing is using the physical
-counter directly. It is only using the virtual counter.
-On the other side, this is *only* Linux. Other operating systems
-will need to pick the reference clock that matches their own.
-If one day we change Linux to use the physical counter, we'll
-have to do the same thing.
+I'll add a "static" to quiesce this..
 
-         M.
+> --
+> arch/x86/kvm/vmx/vmx.c: In function 'init_rmode_identity_map':
+> >> arch/x86/kvm/vmx/vmx.c:3472:12: warning: variable 'identity_map_pfn' set but not used [-Wunused-but-set-variable]
+> kvm_pfn_t identity_map_pfn;
+> ^~~~~~~~~~~~~~~~
+
+Hmm, this seems to be true but not related to this series afaict...  but sure I
+can add another patch to remove it.
+
+> 
+> vim +/kvm_dirty_ring_full +33 arch/x86/kvm/../../../virt/kvm/dirty_ring.c
+> 
+>     32	
+>   > 33	bool kvm_dirty_ring_full(struct kvm_dirty_ring *ring)
+>     34	{
+>     35		return kvm_dirty_ring_used(ring) >= ring->size;
+>     36	}
+>     37	
+> 
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+
+
+
 -- 
-Jazz is not dead. It just smells funny...
+Peter Xu
+
