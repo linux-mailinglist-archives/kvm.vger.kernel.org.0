@@ -2,118 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2FAB1E077E
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 09:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D880D1E085C
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 10:02:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388961AbgEYHJY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 03:09:24 -0400
-Received: from mga03.intel.com ([134.134.136.65]:64294 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388904AbgEYHJY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 03:09:24 -0400
-IronPort-SDR: 7jNqmsmbAEYTlZCrgKC1V5LK5PxQRnugwkyWSPBNHbEyKbxDKBKlhKVJS+EFIYdRG0auex3/tF
- CRTYwqVDhjoA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2020 00:09:23 -0700
-IronPort-SDR: GTy/UgBSgNKAfK/Tie1LHQ85jj5tejRIkftRgh2WdVz7izBcCGWlnMKgGnNHVAAx3c9NP3mR+F
- JbT1DM0Am4Mw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,432,1583222400"; 
-   d="scan'208";a="413427539"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga004.jf.intel.com with ESMTP; 25 May 2020 00:09:18 -0700
-Date:   Mon, 25 May 2020 02:59:26 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
-        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
-        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
-        cohuck@redhat.com, dgilbert@redhat.com,
-        jonathan.davies@nutanix.com, eauger@redhat.com, aik@ozlabs.ru,
-        pasic@linux.ibm.com, felipe@nutanix.com,
-        Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-        Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
- devices
-Message-ID: <20200525065925.GA698@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <20200519105804.02f3cae8@x1.home>
+        id S1729660AbgEYICf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 04:02:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42042 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725809AbgEYICf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 04:02:35 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62738C061A0E;
+        Mon, 25 May 2020 01:02:35 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f06f3004418adec9d2f63e2.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:f300:4418:adec:9d2f:63e2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 514AC1EC0116;
+        Mon, 25 May 2020 10:02:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1590393752;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=HbItycmNHopexuynDp8v3E/cG41XLiYYR0XUaufHcT4=;
+        b=RmXdg7Qxfd5JvK24kf//ZDbwbxh9yQ5WD9aNGgVJpTGZHMBxdRlxPXD/+P3C9pxjmN05Qr
+        5k/sXpwDV7HfYvnPa5HDdxDwTKYlbnKTymFHiUjx9bi13AXJXs4jZcYgeAQv5CG+57bxS3
+        17uS9WxUnIQaMuJTnaWakP3wDY6lsTk=
+Date:   Mon, 25 May 2020 10:02:26 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 51/75] x86/sev-es: Handle MMIO events
+Message-ID: <20200525080226.GB25636@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-52-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200519105804.02f3cae8@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200428151725.31091-52-joro@8bytes.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 19, 2020 at 10:58:04AM -0600, Alex Williamson wrote:
-> Hi folks,
-> 
-> My impression is that we're getting pretty close to a workable
-> implementation here with v22 plus respins of patches 5, 6, and 8.  We
-> also have a matching QEMU series and a proposal for a new i40e
-> consumer, as well as I assume GVT-g updates happening internally at
-> Intel.  I expect all of the latter needs further review and discussion,
-> but we should be at the point where we can validate these proposed
-> kernel interfaces.  Therefore I'd like to make a call for reviews so
-> that we can get this wrapped up for the v5.8 merge window.  I know
-> Connie has some outstanding documentation comments and I'd like to make
-> sure everyone has an opportunity to check that their comments have been
-> addressed and we don't discover any new blocking issues.  Please send
-> your Acked-by/Reviewed-by/Tested-by tags if you're satisfied with this
-> interface and implementation.  Thanks!
->
-hi Alex
-after porting gvt/i40e vf migration code to kernel/qemu v23, we spoted
-two bugs.
-1. "Failed to get dirty bitmap for iova: 0xfe011000 size: 0x3fb0 err: 22"
-   This is a qemu bug that the dirty bitmap query range is not the same
-   as the dma map range. It can be fixed in qemu. and I just have a little
-   concern for kernel to have this restriction.
+On Tue, Apr 28, 2020 at 05:17:01PM +0200, Joerg Roedel wrote:
+> +static enum es_result vc_do_mmio(struct ghcb *ghcb, struct es_em_ctxt *ctxt,
+> +				 unsigned int bytes, bool read)
+> +{
+> +	u64 exit_code, exit_info_1, exit_info_2;
+> +	unsigned long ghcb_pa = __pa(ghcb);
+> +	void __user *ref;
+> +
+> +	ref = insn_get_addr_ref(&ctxt->insn, ctxt->regs);
+> +	if (ref == (void __user *)-1L)
+> +		return ES_UNSUPPORTED;
+> +
+> +	exit_code = read ? SVM_VMGEXIT_MMIO_READ : SVM_VMGEXIT_MMIO_WRITE;
+> +
+> +	exit_info_1 = vc_slow_virt_to_phys(ghcb, (unsigned long)ref);
+> +	exit_info_2 = bytes;    /* Can never be greater than 8 */
 
-2. migration abortion, reporting
-"qemu-system-x86_64-lm: vfio_load_state: Error allocating buffer
-qemu-system-x86_64-lm: error while loading state section id 49(vfio)
-qemu-system-x86_64-lm: load of migration failed: Cannot allocate memory"
+No trailing comments pls - put them over the line.
 
-It's still a qemu bug and we can fixed it by
-"
-if (migration->pending_bytes == 0) {
-+            qemu_put_be64(f, 0);
-+            qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-"
-and actually there are some extra concerns about this part, as reported in
-[1][2].
+> +	ghcb->save.sw_scratch = ghcb_pa + offsetof(struct ghcb, shared_buffer);
+> +
+> +	return sev_es_ghcb_hv_call(ghcb, ctxt, exit_code, exit_info_1, exit_info_2);
+> +}
+> +
+> +static enum es_result vc_handle_mmio_twobyte_ops(struct ghcb *ghcb,
+> +						 struct es_em_ctxt *ctxt)
+> +{
+> +	struct insn *insn = &ctxt->insn;
+> +	unsigned int bytes = 0;
+> +	enum es_result ret;
+> +	int sign_byte;
+> +	long *reg_data;
+> +
+> +	switch (insn->opcode.bytes[1]) {
+> +		/* MMIO Read w/ zero-extension */
+> +	case 0xb6:
+> +		bytes = 1;
+> +		/* Fallthrough */
 
-[1] data_size should be read ahead of data_offset
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02795.html.
-[2] should not repeatedly update pending_bytes in vfio_save_iterate()
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02796.html.
+I'm guessing we're supposed to annotate it this way now:
 
-but as those errors are all in qemu, and we have finished basic tests in
-both gvt & i40e, we're fine with the kernel part interface in general now.
-(except for my concern [1], which needs to update kernel patch 1)
-
-so I wonder which way in your mind is better, to give our reviewed-by to
-the kernel part now, or hold until next qemu fixes?
-and as performance data from gvt is requested from your previous mail, is
-that still required before the code is accepted?
-
-BTW, we have also conducted some basic tests when viommu is on, and found out
-errors like 
-"qemu-system-x86_64-dt: vtd_iova_to_slpte: detected slpte permission error (iova=0x0, level=0x3, slpte=0x0, write=1)
-qemu-system-x86_64-dt: vtd_iommu_translate: detected translation failure (dev=00:03:00, iova=0x0)
-qemu-system-x86_64-dt: New fault is not recorded due to compression of faults".
-
-Thanks
-Yan
+WARNING: Prefer 'fallthrough;' over fallthrough comment
+#139: FILE: arch/x86/kernel/sev-es.c:504:
++               /* Fallthrough */
 
 
+> +	case 0xb7:
+> +		if (!bytes)
+> +			bytes = 2;
+> +
+> +		ret = vc_do_mmio(ghcb, ctxt, bytes, true);
+> +		if (ret)
+> +			break;
+> +
+> +		/* Zero extend based on operand size */
+> +		reg_data = vc_insn_get_reg(ctxt);
 
+That function can return NULL - you need to test reg_data. Ditto for all
+its invocations.
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
