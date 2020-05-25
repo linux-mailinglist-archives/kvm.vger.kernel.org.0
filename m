@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2E1F1E0CD0
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 13:25:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEC761E0CDA
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 13:25:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388753AbgEYLZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 07:25:23 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:47114 "EHLO huawei.com"
+        id S2390182AbgEYLZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 07:25:32 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:47048 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2390173AbgEYLZR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S2390174AbgEYLZR (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 25 May 2020 07:25:17 -0400
 Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 9506F6CC1EAF105C267D;
+        by Forcepoint Email with ESMTP id 8459C6C346A43648B102;
         Mon, 25 May 2020 19:25:14 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
@@ -33,10 +33,11 @@ CC:     Catalin Marinas <catalin.marinas@arm.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Alexios Zavras <alexios.zavras@intel.com>,
         <wanghaibin.wang@huawei.com>, <zhengxiang9@huawei.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Subject: [RFC PATCH 6/7] kvm: arm64: Save stage2 PTE dirty info if it is coverred
-Date:   Mon, 25 May 2020 19:24:05 +0800
-Message-ID: <20200525112406.28224-7-zhukeqian1@huawei.com>
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Peng Liang <liangpeng10@huawei.com>
+Subject: [RFC PATCH 7/7] KVM: arm64: Enable stage2 hardware DBM
+Date:   Mon, 25 May 2020 19:24:06 +0800
+Message-ID: <20200525112406.28224-8-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20200525112406.28224-1-zhukeqian1@huawei.com>
 References: <20200525112406.28224-1-zhukeqian1@huawei.com>
@@ -49,91 +50,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_set_pte is called to replace a target PTE with a desired one.
-We always replace it, but if hw DBM is enalbled and dirty info is
-coverred, should let caller know it. Caller can decide to whether
-save the dirty info.
-
-kvm_set_pmd and kvm_set_pud is not modified, because we only use
-DBM in PTEs for now.
+We are ready to support hw management of dirty state, enable it if
+hardware support it.
 
 Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Signed-off-by: Peng Liang <liangpeng10@huawei.com>
 ---
- virt/kvm/arm/mmu.c | 39 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 2 ++
+ arch/arm64/kvm/reset.c          | 9 ++++++++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index e1d9e4b98cb6..43d89c6333f0 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -185,10 +185,34 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
- 	put_page(virt_to_page(pmd));
- }
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index ebc622432831..371ea6d65c16 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -721,6 +721,8 @@
+ #define ID_AA64MMFR1_VMIDBITS_8		0
+ #define ID_AA64MMFR1_VMIDBITS_16	2
  
--static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
-+/*
-+ * @ret: true if dirty info is coverred.
-+ */
-+static inline bool kvm_set_pte(pte_t *ptep, pte_t new_pte)
++#define ID_AA64MMFR1_HADBS_DBS		2
++
+ /* id_aa64mmfr2 */
+ #define ID_AA64MMFR2_E0PD_SHIFT		60
+ #define ID_AA64MMFR2_FWB_SHIFT		40
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 30b7ea680f66..cb727e1fb581 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -392,7 +392,7 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
  {
+ 	u64 vtcr = VTCR_EL2_FLAGS;
+ 	u32 parange, phys_shift;
+-	u8 lvls;
++	u8 lvls, hadbs;
+ 
+ 	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+ 		return -EINVAL;
+@@ -428,6 +428,13 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+ 	 */
+ 	vtcr |= VTCR_EL2_HA;
+ 
++	hadbs = (read_sysreg(id_aa64mmfr1_el1) >>
++			ID_AA64MMFR1_HADBS_SHIFT) & 0xf;
 +#ifdef CONFIG_ARM64_HW_AFDBM
-+	pteval_t old_pteval, new_pteval, pteval;
-+
-+	if (!kvm_hw_dbm_enabled() || pte_none(*ptep) ||
-+	    !kvm_s2pte_readonly(&new_pte)) {
-+		WRITE_ONCE(*ptep, new_pte);
-+		dsb(ishst);
-+		return false;
-+	}
-+
-+	new_pteval = pte_val(new_pte);
-+	pteval = READ_ONCE(pte_val(*ptep));
-+	do {
-+		old_pteval = pteval;
-+		pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval, new_pteval);
-+	} while (pteval != old_pteval);
-+
-+	return !kvm_s2pte_readonly((pte_t *)&pteval);
-+#else
- 	WRITE_ONCE(*ptep, new_pte);
- 	dsb(ishst);
-+	return false;
++	if (hadbs == ID_AA64MMFR1_HADBS_DBS)
++		vtcr |= VTCR_EL2_HD;
 +#endif
- }
- 
- static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
-@@ -249,7 +273,10 @@ static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
- 		if (!pte_none(*pte)) {
- 			pte_t old_pte = *pte;
- 
--			kvm_set_pte(pte, __pte(0));
-+			if (kvm_set_pte(pte, __pte(0))) {
-+				mark_page_dirty(kvm, addr >> PAGE_SHIFT);
-+			}
 +
- 			kvm_tlb_flush_vmid_ipa(kvm, addr);
- 
- 			/* No need to invalidate the cache for device mappings */
-@@ -1291,13 +1318,17 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
- 		if (pte_val(old_pte) == pte_val(*new_pte))
- 			return 0;
- 
--		kvm_set_pte(pte, __pte(0));
-+		if (kvm_set_pte(pte, __pte(0))) {
-+			mark_page_dirty(kvm, addr >> PAGE_SHIFT);
-+		}
- 		kvm_tlb_flush_vmid_ipa(kvm, addr);
- 	} else {
- 		get_page(virt_to_page(pte));
- 	}
- 
--	kvm_set_pte(pte, *new_pte);
-+	if (kvm_set_pte(pte, *new_pte)) {
-+		mark_page_dirty(kvm, addr >> PAGE_SHIFT);
-+	}
- 	return 0;
- }
- 
+ 	/* Set the vmid bits */
+ 	vtcr |= (kvm_get_vmid_bits() == 16) ?
+ 		VTCR_EL2_VS_16BIT :
 -- 
 2.19.1
 
