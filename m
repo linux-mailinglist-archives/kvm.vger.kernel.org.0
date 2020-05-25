@@ -2,185 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 361E21E1240
-	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 18:00:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3BD01E12E2
+	for <lists+kvm@lfdr.de>; Mon, 25 May 2020 18:45:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391128AbgEYQAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 May 2020 12:00:45 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:47206 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391039AbgEYQAn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 May 2020 12:00:43 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04PFwghJ129757;
-        Mon, 25 May 2020 15:59:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=Y0KNdejFsfkVxkixHd4qUi3/9lIVbUPFXxLx2tMB3mo=;
- b=ktt0B1DHcMRPvUUhQIHh+XEmZH4NOxqhRe6nehGlGe6jWE0wP/BKZz6JEMgAEzDgr4Wt
- Iyw2VMRvZgMlAMUPTq1xWQNlvHNIQS9Hk3zTqSdffRXf5mV7hA6z5WHxk6GB/6HyB/zQ
- 51jwLGiQCLXMbGUesZSNUg71QQxsrm082PQgdMQkm+jHvJ5iwhpa4nL7UvoNyapqmpQW
- g7iyh42jaEG3tha5rot3T7+WEyCSd7fsSajvSIfQKeIQe0mEQ6IoQXkD4BNCMPKkSjC4
- hISIz4pP5LzYrh0UZJHOsSXum9iprA2Sk1BD+A4AkSaZD/Phl7WyugXVyCvpQ+/wSsGS nw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 316vfn6096-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 25 May 2020 15:59:13 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04PFrU0i025028;
-        Mon, 25 May 2020 15:57:13 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 317j5jjg0w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 May 2020 15:57:12 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04PFv3EO022146;
-        Mon, 25 May 2020 15:57:08 GMT
-Received: from [192.168.14.112] (/79.178.199.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 25 May 2020 08:57:03 -0700
-Subject: Re: [RFC 00/16] KVM protected memory extension
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <42685c32-a7a9-b971-0cf4-e8af8d9a40c6@oracle.com>
- <20200525144656.phfxjp2qip6736fj@box>
-From:   Liran Alon <liran.alon@oracle.com>
-Message-ID: <29c62691-0d50-8a02-5f43-761fa56ab551@oracle.com>
-Date:   Mon, 25 May 2020 18:56:57 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
+        id S2389087AbgEYQpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 May 2020 12:45:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58369 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2387766AbgEYQpK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 May 2020 12:45:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590425107;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OPs8IJfxt9IIGMMe9Npa9waPsMBNELWLmsbx6KFSrGA=;
+        b=L6W1uSf8mZaeh/onuz1PpFuKQ/awPAaZi7l4OoKVgFK5nlE6GCQSz4Z6rlcphVWpNWII4F
+        /il6cRWkZToEQUao+bQBoU4KfiNF7/RnXpwCl/S4U6NJWmMsibPfV1PNwQn8iIwf4CgHFa
+        FqBkYthwXBviDlpNAntIzoho00cSSJw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-c65NxUciOBagfpECqMc1BQ-1; Mon, 25 May 2020 12:45:06 -0400
+X-MC-Unique: c65NxUciOBagfpECqMc1BQ-1
+Received: by mail-wr1-f71.google.com with SMTP id n6so667327wrv.6
+        for <kvm@vger.kernel.org>; Mon, 25 May 2020 09:45:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OPs8IJfxt9IIGMMe9Npa9waPsMBNELWLmsbx6KFSrGA=;
+        b=Y+7E2B9OJEDAIgDWLDePqxzrQNsfEl4IROkhKcv74P2njUh93tIrtfp6DCM1FBdRKk
+         dULu8K5fMuDOEKVQYQ5OrmMWw1mkeECQSV9/bk9maOGjbeVVVdzK02oMRjnKI+qk3WvJ
+         ResURyRKo92HTtMjwmRmnfTAsUfOS4gOKnoiNZ+LxVeIggZ8hZh/oSzH2Oyf7ynOiux6
+         EBc/ooxfaskT9wPwl4KRMBmTXHhSNK4ADlv2hXn1mNQyBtKS2Xblu9icHUpVxwLqhz0R
+         P2M3Tzzhj8XkAjSJyuvAqoqOugNCiijuq7Rp5UWgdsQwikN0d8QzyfsOuUCKIdP4FasO
+         CZiQ==
+X-Gm-Message-State: AOAM531zLNZ4MTKKLPdKgNgsbo5odQz4tqR+qtZZttJV9baNJ7Hp5IQX
+        bUh9/wg8tDcYnAp/dgPWr0GShj1zON6owUg8iP2HaeTVkFzDqihow/Kc3SU0pa3dVqqxBIi4QPS
+        IYbWDkPrV/ABK
+X-Received: by 2002:a5d:5106:: with SMTP id s6mr15471983wrt.267.1590425103999;
+        Mon, 25 May 2020 09:45:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxAIu7R/ZZNNHoXpBfB18tsKZoGb8gQR6MxKBLhAlE9XoQVh89SsbBLVY3YEXg/GqZm871f0Q==
+X-Received: by 2002:a5d:5106:: with SMTP id s6mr15471950wrt.267.1590425103643;
+        Mon, 25 May 2020 09:45:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8? ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
+        by smtp.gmail.com with ESMTPSA id y7sm2202233wmg.26.2020.05.25.09.45.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 May 2020 09:45:03 -0700 (PDT)
+Subject: Re: #DE
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <0fa0acac-f3b6-96c0-6ac8-18ec4d573aab@redhat.com>
+ <233a810765c8b026778e76e9f8828a9ad0b3716d.camel@redhat.com>
+ <b58b5d08-97a6-1e64-d8db-7ce74084553a@redhat.com>
+ <3957e9600ae84bf8548d05ab8fbeb343d0239843.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <deb611de-76a9-b0b4-751b-8ef91d5f8902@redhat.com>
+Date:   Mon, 25 May 2020 18:45:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200525144656.phfxjp2qip6736fj@box>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <3957e9600ae84bf8548d05ab8fbeb343d0239843.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9632 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 suspectscore=0
- mlxlogscore=804 mlxscore=0 adultscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005250124
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9632 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 malwarescore=0 spamscore=0 impostorscore=0
- mlxlogscore=835 lowpriorityscore=0 bulkscore=0 adultscore=0 suspectscore=0
- cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005250125
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 25/05/20 17:13, Maxim Levitsky wrote:
+> With all this said, this is what is happening:
+> 
+> 1. The host sets interrupt window. It needs interrupts window because (I guess) that guest
+> disabled interrupts and it waits till interrupts are enabled to inject the interrupt.
+> 
+> To be honest this is VMX limitation, and in SVM (I think according to the spec) you can inject
+> interrupts whenever you want and if the guest can't accept then interrupt, the vector written to EVENTINJ field,
+> will be moved to V_INTR_VECTOR and V_INTR flag will be set,
 
-On 25/05/2020 17:46, Kirill A. Shutemov wrote:
-> On Mon, May 25, 2020 at 04:47:18PM +0300, Liran Alon wrote:
->> On 22/05/2020 15:51, Kirill A. Shutemov wrote:
->>> == Background / Problem ==
->>>
->>> There are a number of hardware features (MKTME, SEV) which protect guest
->>> memory from some unauthorized host access. The patchset proposes a purely
->>> software feature that mitigates some of the same host-side read-only
->>> attacks.
->>>
->>>
->>> == What does this set mitigate? ==
->>>
->>>    - Host kernel ”accidental” access to guest data (think speculation)
->> Just to clarify: This is any host kernel memory info-leak vulnerability. Not
->> just speculative execution memory info-leaks. Also architectural ones.
->>
->> In addition, note that removing guest data from host kernel VA space also
->> makes guest<->host memory exploits more difficult.
->> E.g. Guest cannot use already available memory buffer in kernel VA space for
->> ROP or placing valuable guest-controlled code/data in general.
->>
->>>    - Host kernel induced access to guest data (write(fd, &guest_data_ptr, len))
->>>
->>>    - Host userspace access to guest data (compromised qemu)
->> I don't quite understand what is the benefit of preventing userspace VMM
->> access to guest data while the host kernel can still access it.
-> Let me clarify: the guest memory mapped into host userspace is not
-> accessible by both host kernel and userspace. Host still has way to access
-> it via a new interface: GUP(FOLL_KVM). The GUP will give you struct page
-> that kernel has to map (temporarily) if need to access the data. So only
-> blessed codepaths would know how to deal with the memory.
-Yes, I understood that. I meant explicit host kernel access.
->
-> It can help preventing some host->guest attack on the compromised host.
-> Like if an VM has successfully attacked the host it cannot attack other
-> VMs as easy.
+Not exactly, EVENTINJ ignores the interrupt flag and everything else.  
+But yes, you can inject the interrupt any time you want using V_IRQ + 
+V_INTR_VECTOR and it will be injected by the processor.  This is a 
+very interesting feature but it doesn't fit very well in the KVM
+architecture so we're not using it.  Hyper-V does (and it is also
+why it broke mercilessly).
 
-We have mechanisms to sandbox the userspace VMM process for that.
+> 2. Since SVM doesn't really have a concept of interrupt window 
+> intercept, this is faked by setting V_INTR, as if injected (or as
+> they call it virtual) interrupt is pending, together with intercept
+> of virtual interrupts,
+Correct.
 
-You need to be more specific on what is the attack scenario you attempt 
-to address
-here that is not covered by existing mechanisms. i.e. Be crystal clear 
-on the extra value
-of the feature of not exposing guest data to userspace VMM.
+> 4. After we enter the nested guest, we eventually get an VMexit due
+> to unrelated reason and we sync the V_INTR that *we* set
+> to the nested vmcs, since in theory that flag could have beeing set
+> by the CPU itself, if the guest itself used EVENTINJ to inject
+> an event to its nested guest while the nested guest didn't have
+> interrupts enabled (KVM doesn't do this, but we can't assume that)
 
->
-> It would also help to protect against guest->host attack by removing one
-> more places where the guest's data is mapped on the host.
-Because guest have explicit interface to request which guest pages can 
-be mapped in userspace VMM, the value of this is very small.
+I suppose you mean in sync_nested_vmcb_control.  Here, in the latest version,
+we have:
 
-Guest already have ability to map guest controlled code/data in 
-userspace VMM either via this interface or via forcing userspace VMM
-to create various objects during device emulation handling. The only 
-extra property this patch-series provides, is that only a
-small portion of guest pages will be mapped to host userspace instead of 
-all of it. Resulting in smaller regions for exploits that require
-guessing a virtual address. But: (a) Userspace VMM device emulation may 
-still allow guest to spray userspace heap with objects containing
-guest controlled data. (b) How is userspace VMM suppose to limit which 
-guest pages should not be mapped to userspace VMM even though guest have
-explicitly requested them to be mapped? (E.g. Because they are valid DMA 
-sources/targets for virtual devices or because it's vGPU frame-buffer).
->> QEMU is more easily compromised than the host kernel because it's
->> guest<->host attack surface is larger (E.g. Various device emulation).
->> But this compromise comes from the guest itself. Not other guests. In
->> contrast to host kernel attack surface, which an info-leak there can
->> be exploited from one guest to leak another guest data.
-> Consider the case when unprivileged guest user exploits bug in a QEMU
-> device emulation to gain access to data it cannot normally have access
-> within the guest. With the feature it would able to see only other shared
-> regions of guest memory such as DMA and IO buffers, but not the rest.
-This is a scenario where an unpriviledged guest userspace have direct 
-access to a virtual device
-and is able to exploit a bug in device emulation handling such that it 
-will allow it to compromise
-the security *inside* the guest. i.e. Leak guest kernel data or other 
-guest userspace processes data.
+        mask = V_IRQ_MASK | V_TPR_MASK;
+        if (!(svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK) &&
+            is_intercept(svm, SVM_EXIT_VINTR)) {
+                /*
+                 * In order to request an interrupt window, L0 is usurping
+                 * svm->vmcb->control.int_ctl and possibly setting V_IRQ
+                 * even if it was clear in L1's VMCB.  Restoring it would be
+                 * wrong.  However, in this case V_IRQ will remain true until
+                 * interrupt_window_interception calls svm_clear_vintr and
+                 * restores int_ctl.  We can just leave it aside.
+                 */
+                mask &= ~V_IRQ_MASK;
+        }
 
-That's true. Good point. This is a very important missing argument from 
-the cover-letter.
+and svm_clear_vintr will copy V_IRQ, V_INTR_VECTOR, etc. back from the nested_vmcb
+into svm->vmcb.  Is that enough to fix the bug?
 
-Now it's crystal clear on the trade-off considered here:
-Is the extra complication and perf cost provided by the mechanism of 
-this patch-series worth
-to protect against the scenario of a userspace VMM vulnerability that 
-may be accessible to unpriviledged
-guest userspace process to leak other *in-guest* data that is not 
-otherwise accessible to that process?
+> 5. At that point the bomb is ticking. Once the guest ends dealing
+> with the nested guest VMexit, and executes VMRUN, we enter the nested
+> guest with V_INTR enabled. V_INTER intercept is disabled since we
+> disabled our interrupt window long ago, guest is also currently
+> doesn't enable any interrupt window, so we basically injecting to the
+> guest whatever is there in V_INTR_VECTOR in the nested guest's VMCB.
 
--Liran
+Yep, this sounds correct.  The question is whether it can still happen
+in the latest version of the code, where I tried to think more about who
+owns which int_ctl bits when.
 
+> Now that I am thinking about this the issue is deeper that I thought
+> and it stems from the abuse of the V_INTR on AMD. IMHO the best
+> solution is to avoid interrupt windows on AMD unless really needed
+> (like with level-triggered interrupts or so)
+
+Yes, that is the root cause.  However I'm not sure it would be that
+much simpler if we didn't abuse VINTR like that, because INT_CTL is a
+very complicated field.
+
+> Now the problem is that it is next to impossible to know the source
+> of the VINTR pending flag. Even if we remember that host is currently
+> setup an interrupt window, the guest afterwards could have used
+> EVENTINJ + interrupt disabled nested guest, to raise that flag as
+> well, and might need to know about it.
+
+Actually it is possible!  is_intercept tests L0's VINTR intercept
+(see get_host_vmcb in svm.h), and that will be true if and only if
+we are abusing the V_IRQ/V_INTR_PRIO/V_INTR_VECTOR fields.
+
+Furthermore, L0 should not use VINTR during nested VMRUN only if both
+the following conditions are true:
+
+- L1 is not using V_INTR_MASKING
+
+- L0 has a pending interrupt (of course)
+
+This is because when virtual interrupts are in use, you can inject
+physical interrupts into L1 at any time by taking an EXIT_INTR vmexit.
+
+My theory as to why the bug could happen involved a race between
+the call to kvm_x86_ops.interrupt_allowed(vcpu, true) in
+inject_pending_event and the call to kvm_cpu_has_injectable_intr
+in vcpu_enter_guest.  Again, that one should be fixed in the
+latest version on the branch, but there could be more than one bug!
+
+> I have an idea on how to fix this, which is about 99% correct and will only fail if the guest attempt something that
+> is undefined anyway.
+> 
+> Lets set the vector of the fake VINTR to some reserved exception value, rather that 0 (which the guest is not supposed to inject ever to the nested guest),
+> so then we will know if the VINTR is from our fake injection or from the guest itself.
+> If it is our VINTR then we will not sync it to the guest.
+> In theory it can be even 0, since exceptions should never be injected as interrupts anyway, this is also reserved operation.
+
+Unfortunately these are interrupts, not exceptions.  You _can_ configure
+the PIC (or probably the IOAPIC too) to inject vectors in the 0-31 range.
+Are you old enough to remember INT 8 as the timer interrupt? :)
+
+Thanks very much for the detective work though!  You made a good walkthrough
+overall so you definitely understood good parts of the code.
+
+Paolo
 
