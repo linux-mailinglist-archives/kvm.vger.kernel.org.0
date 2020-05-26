@@ -2,127 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E1481E2587
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 17:33:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F2DC1E25DA
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 17:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729528AbgEZPdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 11:33:47 -0400
-Received: from mga05.intel.com ([192.55.52.43]:13369 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727898AbgEZPdq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 11:33:46 -0400
-IronPort-SDR: hzG5JAQAcnX16NXrlVBVUYrMGunCsg3k/g4g7/kscG23i7uVb3gjFMewyI1RLJVwALABzvX4c6
- tjqcrEhbaDgw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2020 08:33:45 -0700
-IronPort-SDR: nRnoLIoNHfPkKLn4f9P3ixflHY/LfK8O2t0bt5XrmJ3yMKcapWyMAQzjd5MjHsxypE/CTaz6dh
- qtXgDIX5nIwg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,437,1583222400"; 
-   d="scan'208";a="270112433"
-Received: from mashaikh-mobl1.amr.corp.intel.com (HELO [10.255.1.194]) ([10.255.1.194])
-  by orsmga006.jf.intel.com with ESMTP; 26 May 2020 08:33:36 -0700
-Subject: Re: [PATCH v5] arch/x86: Update config and kernel doc for MPK feature
- on AMD
-To:     Borislav Petkov <bp@alien8.de>, Babu Moger <babu.moger@amd.com>
-Cc:     corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, x86@kernel.org,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, dave.hansen@linux.intel.com, luto@kernel.org,
-        peterz@infradead.org, mchehab+samsung@kernel.org,
-        changbin.du@intel.com, namit@vmware.com, bigeasy@linutronix.de,
-        yang.shi@linux.alibaba.com, asteinhauser@google.com,
-        anshuman.khandual@arm.com, jan.kiszka@siemens.com,
-        akpm@linux-foundation.org, steven.price@arm.com,
-        rppt@linux.vnet.ibm.com, peterx@redhat.com,
-        dan.j.williams@intel.com, arjunroy@google.com, logang@deltatee.com,
-        thellstrom@vmware.com, aarcange@redhat.com, justin.he@arm.com,
-        robin.murphy@arm.com, ira.weiny@intel.com, keescook@chromium.org,
-        jgross@suse.com, andrew.cooper3@citrix.com,
-        pawan.kumar.gupta@linux.intel.com, fenghua.yu@intel.com,
-        vineela.tummalapalli@intel.com, yamada.masahiro@socionext.com,
-        sam@ravnborg.org, acme@redhat.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <158940940570.47998.17107695356894054769.stgit@naples-babu.amd.com>
- <20200523122149.GF27431@zn.tnic>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <23ee5cfa-22ec-a367-04f2-4bca8edcfa9e@intel.com>
-Date:   Tue, 26 May 2020 08:33:36 -0700
+        id S1729867AbgEZPpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 11:45:25 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34667 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728138AbgEZPpY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 11:45:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590507922;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dt6LQHnd8XQKjoczzuKu5+J73yx/PTFTJmXrE029Qj0=;
+        b=MuDE1EeNGCQ7ZtyasjHIeRquVoyGlw4ms/cF48n+wazvpvZJXtfMaHWohfbEpb6eu/b5pd
+        cagcXwYz82p5Nr22SwvYHKapCY9bDujsdyxeL5jbNE0kD6wB2awofKGhTvYwW4Qc8IF3qm
+        sR+IEuKfj/j1E+CuQh5LmGbRLqBM3+E=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-ltlK_XybOBiHi2HD3Pbj-A-1; Tue, 26 May 2020 11:45:20 -0400
+X-MC-Unique: ltlK_XybOBiHi2HD3Pbj-A-1
+Received: by mail-wr1-f72.google.com with SMTP id f4so7293375wrp.21
+        for <kvm@vger.kernel.org>; Tue, 26 May 2020 08:45:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Dt6LQHnd8XQKjoczzuKu5+J73yx/PTFTJmXrE029Qj0=;
+        b=qvIYFxJayzuBrxAaSy6dBgAIkYr8Dn3S7IADd4BaCcHp0QzwAmlCdoFenZypZpFRw6
+         BvoXYyNIpMrmIdR1pnZRtAgokytAxvvFB9Pzb33W2Xt/BcY9DEvQ0wGM3v+cWTsGmkFO
+         A+7JM6CzXoHRNJcX8b9eObE5JJLj9d7eTR2utd21ibE62OV4Yxej1J306Ic55yUpfMGS
+         JmFGMPPHQr4EKT5QAfJ1ygOi4z5bgaMn8bD0HBL8K8S/mF+G5iR7y7pCLmlPphhJRkIZ
+         C9Fzq4LTO8CUDcUTAQwbUGxTkZJ0wRTNlKEIhN0pDC06EZTSNLROtNS6jDPDd9YTd3r2
+         Iopw==
+X-Gm-Message-State: AOAM530VWiD+XFJU51yseR/fJCE2KxbcGRMxC6P2NtF6Rkn+LKO0wGnC
+        DGqX3HMIMGz9s1BAiLk74cOL7gzUMm6Yvv64zO6rrKwcDJ8abAnTDYq3X6MqfqT79D9pNimwYya
+        C28AdKMVqHO72
+X-Received: by 2002:a05:6000:1202:: with SMTP id e2mr2590867wrx.231.1590507919725;
+        Tue, 26 May 2020 08:45:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5If1uNgTKWEisUAJowYTPwcuzMOOow4nahat1ESbDjPkHGjhZwTTbQrIPi02UQ5LtAAq4hw==
+X-Received: by 2002:a05:6000:1202:: with SMTP id e2mr2590848wrx.231.1590507919516;
+        Tue, 26 May 2020 08:45:19 -0700 (PDT)
+Received: from localhost.localdomain ([194.230.155.118])
+        by smtp.gmail.com with ESMTPSA id u10sm32544wmc.31.2020.05.26.08.45.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 May 2020 08:45:18 -0700 (PDT)
+Subject: Re: [PATCH v3 7/7] [not for merge] netstats: example use of stats_fs
+ API
+To:     Andrew Lunn <andrew@lunn.ch>
+Cc:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        David Rientjes <rientjes@google.com>,
+        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org
+References: <20200526110318.69006-1-eesposit@redhat.com>
+ <20200526110318.69006-8-eesposit@redhat.com>
+ <20200526141605.GJ768009@lunn.ch>
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Message-ID: <99217496-929f-ed3b-8e9e-bbd26d06e234@redhat.com>
+Date:   Tue, 26 May 2020 17:45:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200523122149.GF27431@zn.tnic>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200526141605.GJ768009@lunn.ch>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/23/20 5:21 AM, Borislav Petkov wrote:
->> +config X86_MEMORY_PROTECTION_KEYS
->> +	# Set the "INTEL_"-free option whenever the "INTEL_" one is set.
->> +	# The "INTEL_" one should be removed and replaced by this option
->> +	# after 5.10. This avoids exposing most 'oldconfig' users to this
->> +	# churn.
->> +	def_bool X86_INTEL_MEMORY_PROTECTION_KEYS
-> I only picked up the discussion from the sidelines but why do we need
-> this at all? If we don't want to have churn, then we can leave it be
-> called X86_INTEL_MEMORY_PROTECTION_KEYS, not change the manpage and
-> have this depend on CPU_SUP_AMD too so that people can select it on AMD
-> machines, and get on with our lives.
+
+Hi Andrew
+
+> How do you atomically get and display a group of statistics?
 > 
-> So what's up?
+> If you look at how the netlink socket works, you will see code like:
+> 
+>                  do {
+>                          start = u64_stats_fetch_begin_irq(&cpu_stats->syncp);
+>                          rx_packets = cpu_stats->rx_packets;
+>                          rx_bytes = cpu_stats->rx_bytes;
+> 			....
+>                  } while (u64_stats_fetch_retry_irq(&cpu_stats->syncp, start));
+> 
+> It will ensure that rx_packets and rx_bytes are consistent with each
+> other. If the value of the sequence counter changes while inside the
+> loop, the loop so repeated until it does not change.
+> 
+> In general, hardware counters in NICs are the same.  You tell it to
+> take a snapshot of the statistics counters, and then read them all
+> back, to give a consistent view across all the statistics.
+> 
+> I've not looked at this new code in detail, but it looks like you have
+> one file per statistic, and assume each statistic is independent of
+> every other statistic. This independence can limit how you use the
+> values, particularly when debugging. The netlink interface we use does
+> not have this limitation.
 
-Thanks for pointing that out.  I think this ended up mixing together the
-two alternative, which doesn't make much sense.
+You're right, statistics are treated independently so what you describe 
+is currently not supported.
 
-Babu, let's just leave the config option _naming_ entirely in place.
-The only change should be to the dependencies and the description text.
+In KVM the utilization is more qualitative, so there isn't such problem.
+But as long as the interface is based on file access, the possibility of 
+snapshotting might not be useful; however, it could still be considered 
+to be added later together with the binary access.
+
+Jonathan, how is your metricfs handling this case?
+
+Thank you,
+Emanuele
+
