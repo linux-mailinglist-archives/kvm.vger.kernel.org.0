@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5320E1E1FF2
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 12:41:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DAC81E1FF6
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 12:42:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731927AbgEZKlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 06:41:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5474 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728259AbgEZKlL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 06:41:11 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04QAXFrv118911;
-        Tue, 26 May 2020 06:41:09 -0400
+        id S1731894AbgEZKmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 06:42:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31932 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731859AbgEZKmU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 06:42:20 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04QAXsHR053810;
+        Tue, 26 May 2020 06:42:18 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 317hehm7mw-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 316yygqacs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 06:41:08 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04QAXPZd119158;
-        Tue, 26 May 2020 06:41:08 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 317hehm7m1-1
+        Tue, 26 May 2020 06:42:18 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04QAY08G054494;
+        Tue, 26 May 2020 06:42:18 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 316yygqacb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 06:41:08 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04QAeMeR005257;
-        Tue, 26 May 2020 10:41:06 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 316uf82abk-1
+        Tue, 26 May 2020 06:42:18 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04QAfHHD002784;
+        Tue, 26 May 2020 10:42:16 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 316uf8wrbh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 10:41:06 +0000
+        Tue, 26 May 2020 10:42:16 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04QAf3YB62390658
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04QAf04g53805398
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 May 2020 10:41:04 GMT
+        Tue, 26 May 2020 10:41:00 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D595611C058;
-        Tue, 26 May 2020 10:41:03 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0F6E411C052;
+        Tue, 26 May 2020 10:42:14 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 839F611C06C;
-        Tue, 26 May 2020 10:41:03 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id A86AE11C050;
+        Tue, 26 May 2020 10:42:13 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.159.105])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 26 May 2020 10:41:03 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v7 08/12] s390x: css: stsch, enumeration
- test
-To:     Thomas Huth <thuth@redhat.com>,
-        Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, cohuck@redhat.com
+        Tue, 26 May 2020 10:42:13 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v7 10/12] s390x: define function to wait
+ for interrupt
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com
 References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
- <1589818051-20549-9-git-send-email-pmorel@linux.ibm.com>
- <da731645-c408-2e79-4c78-a55b5f0d477b@redhat.com>
+ <1589818051-20549-11-git-send-email-pmorel@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -96,113 +95,115 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Message-ID: <e87b8573-f227-6e28-9e53-3188b0374754@linux.ibm.com>
-Date:   Tue, 26 May 2020 12:41:02 +0200
+Message-ID: <23933f4c-490c-0c16-c8b6-84a7630130f7@linux.ibm.com>
+Date:   Tue, 26 May 2020 12:42:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <da731645-c408-2e79-4c78-a55b5f0d477b@redhat.com>
+In-Reply-To: <1589818051-20549-11-git-send-email-pmorel@linux.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="TtCelGI5WCStgWiYky1TzlW76fe5OEYsB"
+ boundary="yK5YDiyeqFmfuidpbCvDtZAseF9L2xpDw"
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-05-26_01:2020-05-26,2020-05-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 spamscore=0 cotscore=-2147483648 bulkscore=0 mlxscore=0
- suspectscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015 adultscore=0
- phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005260080
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 cotscore=-2147483648 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 spamscore=0 suspectscore=0 bulkscore=0 adultscore=0
+ phishscore=0 clxscore=1015 mlxlogscore=969 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005260076
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TtCelGI5WCStgWiYky1TzlW76fe5OEYsB
-Content-Type: multipart/mixed; boundary="WQYpljlZjM5NnYVSdR25ZqrkZiPOuGvTg"
+--yK5YDiyeqFmfuidpbCvDtZAseF9L2xpDw
+Content-Type: multipart/mixed; boundary="bqJW5babBlSQOyVbsnwE1GuFSqghh2302"
 
---WQYpljlZjM5NnYVSdR25ZqrkZiPOuGvTg
+--bqJW5babBlSQOyVbsnwE1GuFSqghh2302
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 5/25/20 9:12 PM, Thomas Huth wrote:
-> On 18/05/2020 18.07, Pierre Morel wrote:
->> First step for testing the channel subsystem is to enumerate the css a=
-nd
->> retrieve the css devices.
->>
->> This tests the success of STSCH I/O instruction, we do not test the
->> reaction of the VM for an instruction with wrong parameters.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>  s390x/Makefile      |  1 +
->>  s390x/css.c         | 89 ++++++++++++++++++++++++++++++++++++++++++++=
-+
->>  s390x/unittests.cfg |  4 ++
->>  3 files changed, 94 insertions(+)
->>  create mode 100644 s390x/css.c
-> [...]
->> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
->> index 07013b2..a436ec0 100644
->> --- a/s390x/unittests.cfg
->> +++ b/s390x/unittests.cfg
->> @@ -83,3 +83,7 @@ extra_params =3D -m 1G
->>  [sclp-3g]
->>  file =3D sclp.elf
->>  extra_params =3D -m 3G
->> +
->> +[css]
->> +file =3D css.elf
->> +extra_params =3D-device ccw-pong
+On 5/18/20 6:07 PM, Pierre Morel wrote:
+> Allow the program to wait for an interrupt.
 >=20
-> I gave your patch series a try on a normal upstream QEMU (that does not=
-
-> have the ccw-pong device yet), and the css test of course fails there,
-> since QEMU bails out with:
+> The interrupt handler is in charge to remove the WAIT bit
+> when it finished handling the interrupt.
 >=20
->  -device ccw-pong: 'ccw-pong' is not a valid device model name
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>  lib/s390x/asm/arch_def.h | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 >=20
-> This is unfortunate - I think we likely have to deal with QEMUs for
-> quite a while that do not have this device enabled. Could you maybe add=
-
-> some kind of check to the kvm-unit-tests scripts that only run a test i=
-f
-> a given device is available, and skip the test otherwise?
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 54ffd0b..f200e28 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -10,9 +10,11 @@
+>  #ifndef _ASM_S390X_ARCH_DEF_H_
+>  #define _ASM_S390X_ARCH_DEF_H_
+> =20
+> +#define PSW_MASK_IO			0x0200000000000000UL
+>  #define PSW_MASK_EXT			0x0100000000000000UL
+>  #define PSW_MASK_DAT			0x0400000000000000UL
+>  #define PSW_MASK_SHORT_PSW		0x0008000000000000UL
+> +#define PSW_MASK_WAIT			0x0002000000000000UL
+>  #define PSW_MASK_PSTATE			0x0001000000000000UL
+>  #define PSW_MASK_BA			0x0000000080000000UL
+>  #define PSW_MASK_EA			0x0000000100000000UL
+> @@ -253,6 +255,18 @@ static inline void load_psw_mask(uint64_t mask)
+>  		: "+r" (tmp) :  "a" (&psw) : "memory", "cc" );
+>  }
+> =20
+> +static inline void wait_for_interrupt(uint64_t irq_mask)
+> +{
+> +	uint64_t psw_mask =3D extract_psw_mask();
+> +
+> +	load_psw_mask(psw_mask | irq_mask | PSW_MASK_WAIT);
+> +	/*
+> +	 * After being woken and having processed the interrupt, let's restor=
+e
+> +	 * the PSW mask.
+> +	 */
+> +	load_psw_mask(psw_mask);
+> +}
+> +
+>  static inline void enter_pstate(void)
+>  {
+>  	uint64_t mask;
 >=20
->  Thomas
->=20
-
-Could we for now remove it from unittests.cfg and let Pierre come up
-with a solution without delaying this whole series? I expect changes to
-run_tests.sh to attract a rather long discussion...
 
 
---WQYpljlZjM5NnYVSdR25ZqrkZiPOuGvTg--
 
---TtCelGI5WCStgWiYky1TzlW76fe5OEYsB
+--bqJW5babBlSQOyVbsnwE1GuFSqghh2302--
+
+--yK5YDiyeqFmfuidpbCvDtZAseF9L2xpDw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl7M8j8ACgkQ41TmuOI4
-ufgTYg//VZvMEphzs5HRSEDYnCOOoc4OGRuAoSIkjjuDxPVsVtJHOBT6X+PVYsBZ
-9Vu78UBNYn1nv/j6KuAnYgpJjl4a2dc65GDuNPTk3DPFPPle7W23zNhhI2KALIM9
-bvTpv9R6polrON5HyrAVmMIzSePSePruoUuqxINtvp/tufqtuzljMSDQduwnNg/U
-0PMLg1pcHdN7QtzOeCURKmdCCgGYBlKos4j5vRgfxR4V73p7Qc0DGMr3DEfzad2Y
-UWbKdwQ8eH0IJO52/ZIhbGJf27DjGJHaDk6kwDCNl9keEzC9KhM35Y9UXUiJyxj7
-FXax0n2jfZ+FK1eX6isPcd3FSteuG4F0JN8E6e7HkBpeJff24CvH0lY54CLASPTd
-xWQ3TSwKhzQAUmfbKAj6z5QZYSpWx+f4zIC44d7cWzMg1J9N6KATJICQcEn8UFeL
-B5guGMcza5VhmyqSuebELV+AdIpQQiplAzr69hQugmNOXGJMwZR1r1ZOFgrkxb/b
-pn+CfHtCJESLWzYGvfKYnjcvfimC0ZTi8ubZ8FpM4UPDk1IBoSWk0mo46lPl75HA
-snFTRnV1BiQ9/SKeL5h71vqoYEy7aALcv/tf9725tGlesurJ3fm+Y40HaG/gtLFU
-japZ7sUF2X7wA0/yb3XC79BbwtKI27ddZL7CahETMc7U+45RHnQ=
-=Olt8
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl7M8oUACgkQ41TmuOI4
+ufgOmg//XuStg+2IytwlY4I/rasxInlO8iF6gqiHLHGeDyJyjijXiwLgxJrpz1hA
+vDf7nTw36HvJ4IpQNQJ1hGYptgyKQqMgYNRck+rFmV2cd/BVkdNUBSUG0YUqUqDU
+How62G8/oexYRFp/E7t1Zt1APgV+l95i/gQVCuBgjiO7RmFDfAZT8c0kxxLngBWr
+vhf1TMXzCgNRNroxv/xdA8MbRlYi84SjEvFDaWfiYZp2Fe++gwsKvuy0BFNbKR9C
+DBenIKYBD3mPBR+McUpyX36cuKvr7sdcqah8vgVkuArqvcBHxmBXnCfw0QEtrcKX
+3LBOgDENLsu6GXZ8TRCNeTyWHKPYB2Rk3r+fnzer9JDekY+UquiXqFJgaZgznCk5
+VpILTE0T8KlUj/lpq/myBez2iS2L0uAj8maGGJu5bvFBHWudC+Qzstmtoxmea9ZW
+chQ5aM2vmMI2/WF3TQyDH5WAgiA8bTr5/CkrrE+YrjSu1BkjUWfONH0Yku1d71PF
+N75GU2ANdVLrtPTdCpit7RiZoAB2gVf2U3xmUzi8vjCDU0okL/5VYdDKW98fdUHu
+oduUP6OkK+85riRwcoF7JUlcgXRDnsgwBwG5BnNOxzd7WTQp3+0TfH8QTADGw5AD
+faJD7uA0O6REKqZeYCD4fYgI0nm3WdWdHYagFxUbVDAf56hFHJM=
+=AKtk
 -----END PGP SIGNATURE-----
 
---TtCelGI5WCStgWiYky1TzlW76fe5OEYsB--
+--yK5YDiyeqFmfuidpbCvDtZAseF9L2xpDw--
 
