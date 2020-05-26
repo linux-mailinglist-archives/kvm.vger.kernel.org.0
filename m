@@ -2,127 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 223001E223F
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 14:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B45151E22D5
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 15:17:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729123AbgEZMuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 08:50:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27721 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728412AbgEZMuf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 08:50:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590497433;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MJSM3PD7cXbri59EHpWEca36HJ8EesRGj50MuybBvxc=;
-        b=TFaO+/3Vu3SKfbYNBG6sNzw83S/luUq9uqmjqaa5Uo9gQrWc0DF+Ht7oyc4gVyUfpLYS/X
-        yyg348EOtJVTMG0SZtYXpK2yWURcaI9yBVkKOThqQXD4bG1Rd8AmvMpn/m7I2qC6eVF8u/
-        hFGbQ+itEdYrk4fwJKtK3nlYgBidSLU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-Q4pwPJCCOcmmRT7We-A9mg-1; Tue, 26 May 2020 08:50:31 -0400
-X-MC-Unique: Q4pwPJCCOcmmRT7We-A9mg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729079AbgEZNRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 09:17:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59010 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727009AbgEZNRM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 09:17:12 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD18D461;
-        Tue, 26 May 2020 12:50:29 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-102.rdu2.redhat.com [10.10.115.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C94D10013DB;
-        Tue, 26 May 2020 12:50:29 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 0988E22036E; Tue, 26 May 2020 08:50:29 -0400 (EDT)
-Date:   Tue, 26 May 2020 08:50:28 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        by mail.kernel.org (Postfix) with ESMTPSA id ACFA42084C;
+        Tue, 26 May 2020 13:17:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590499031;
+        bh=egI/LvLS2AXB3+lf2+0PQAeIwQPh1OllZaCbHGvcvDU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RSR614FCRHoFfDR65URe9ilJwa4jTUBvqwrElqhm1tALkKH0XLyolqxid1Ya6lIqe
+         FywkMzprZJtWrBDKwkIhL9ImnNUFTSTMeMZ+4tAzwY4qICHDh3ML+srhaibw6pJo+H
+         j8eyoEFK9WFns94nrlaRP3+Wy3XzptIwtxvAkDjY=
+Date:   Tue, 26 May 2020 15:17:08 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Alexander Graf <graf@amazon.de>
+Cc:     Andra Paraschiv <andraprs@amazon.com>,
+        linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/8] KVM: x86: extend struct kvm_vcpu_pv_apf_data with
- token info
-Message-ID: <20200526125028.GB108774@redhat.com>
-References: <20200511164752.2158645-1-vkuznets@redhat.com>
- <20200511164752.2158645-3-vkuznets@redhat.com>
- <20200521183832.GB46035@redhat.com>
- <87sgfq8vau.fsf@vitty.brq.redhat.com>
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+Subject: Re: [PATCH v3 07/18] nitro_enclaves: Init misc device providing the
+ ioctl interface
+Message-ID: <20200526131708.GA9296@kroah.com>
+References: <20200525221334.62966-1-andraprs@amazon.com>
+ <20200525221334.62966-8-andraprs@amazon.com>
+ <20200526065133.GD2580530@kroah.com>
+ <72647fa4-79d9-7754-9843-a254487703ea@amazon.de>
+ <20200526123300.GA2798@kroah.com>
+ <59007eb9-fad3-9655-a856-f5989fa9fdb3@amazon.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87sgfq8vau.fsf@vitty.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <59007eb9-fad3-9655-a856-f5989fa9fdb3@amazon.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 23, 2020 at 06:34:17PM +0200, Vitaly Kuznetsov wrote:
-> Vivek Goyal <vgoyal@redhat.com> writes:
+On Tue, May 26, 2020 at 02:44:18PM +0200, Alexander Graf wrote:
 > 
-> > On Mon, May 11, 2020 at 06:47:46PM +0200, Vitaly Kuznetsov wrote:
-> >> Currently, APF mechanism relies on the #PF abuse where the token is being
-> >> passed through CR2. If we switch to using interrupts to deliver page-ready
-> >> notifications we need a different way to pass the data. Extent the existing
-> >> 'struct kvm_vcpu_pv_apf_data' with token information for page-ready
-> >> notifications.
-> >> 
-> >> The newly introduced apf_put_user_ready() temporary puts both reason
-> >> and token information, this will be changed to put token only when we
-> >> switch to interrupt based notifications.
-> >> 
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> ---
-> >>  arch/x86/include/uapi/asm/kvm_para.h |  3 ++-
-> >>  arch/x86/kvm/x86.c                   | 17 +++++++++++++----
-> >>  2 files changed, 15 insertions(+), 5 deletions(-)
-> >> 
-> >> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> >> index 2a8e0b6b9805..e3602a1de136 100644
-> >> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> >> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> >> @@ -113,7 +113,8 @@ struct kvm_mmu_op_release_pt {
-> >>  
-> >>  struct kvm_vcpu_pv_apf_data {
-> >>  	__u32 reason;
-> >
-> > Hi Vitaly,
-> >
-> > Given we are redoing it, can we convert "reason" into a flag instead
-> > and use bit 0 for signalling "page not present" Then rest of the 31
-> > bits can be used for other purposes. I potentially want to use one bit to
-> > signal error (if it is known at the time of injecting #PF).
 > 
-> Yes, I think we can do that. The existing KVM_PV_REASON_PAGE_READY and
-> KVM_PV_REASON_PAGE_NOT_PRESENT are mutually exclusive and can be
-> converted to flags (we'll only have KVM_PV_REASON_PAGE_NOT_PRESENT in
-> use when this series is merged).
+> On 26.05.20 14:33, Greg KH wrote:
+> > 
+> > On Tue, May 26, 2020 at 01:42:41PM +0200, Alexander Graf wrote:
+> > > 
+> > > 
+> > > On 26.05.20 08:51, Greg KH wrote:
+> > > > 
+> > > > On Tue, May 26, 2020 at 01:13:23AM +0300, Andra Paraschiv wrote:
+> > > > > +#define NE "nitro_enclaves: "
+> > > > 
+> > > > Again, no need for this.
+> > > > 
+> > > > > +#define NE_DEV_NAME "nitro_enclaves"
+> > > > 
+> > > > KBUILD_MODNAME?
+> > > > 
+> > > > > +#define NE_IMAGE_LOAD_OFFSET (8 * 1024UL * 1024UL)
+> > > > > +
+> > > > > +static char *ne_cpus;
+> > > > > +module_param(ne_cpus, charp, 0644);
+> > > > > +MODULE_PARM_DESC(ne_cpus, "<cpu-list> - CPU pool used for Nitro Enclaves");
+> > > > 
+> > > > Again, please do not do this.
+> > > 
+> > > I actually asked her to put this one in specifically.
+> > > 
+> > > The concept of this parameter is very similar to isolcpus= and maxcpus= in
+> > > that it takes CPUs away from Linux and instead donates them to the
+> > > underlying hypervisor, so that it can spawn enclaves using them.
+> > > 
+> > >  From an admin's point of view, this is a setting I would like to keep
+> > > persisted across reboots. How would this work with sysfs?
+> > 
+> > How about just as the "initial" ioctl command to set things up?  Don't
+> > grab any cpu pools until asked to.  Otherwise, what happens when you
+> > load this module on a system that can't support it?
 > 
-> >
-> >> -	__u8 pad[60];
-> >> +	__u32 pageready_token;
-> >> +	__u8 pad[56];
-> >
-> > Given token is 32 bit, for returning error in "page ready" type messages,
-> > I will probably use padding bytes and create pagready_flag and use one
-> > of the bits to signal error.
-> 
-> In case we're intended to pass more data in synchronous notifications,
-> shall we leave some blank space after 'flags' ('reason' previously) and
-> before 'token'?
+> That would give any user with access to the enclave device the ability to
+> remove CPUs from the system. That's clearly a CAP_ADMIN task in my book.
 
-Given you are planning to move away from using kvm_vcpu_pv_apf_data
-for synchronous notifications, I will not be too concerned about it.
+Ok, what's wrong with that?
 
-Thanks
-Vivek
+> Hence this whole split: The admin defines the CPU Pool, users can safely
+> consume this pool to spawn enclaves from it.
 
+But having the admin define that at module load / boot time, is a major
+pain.  What tools do they have that allow them to do that easily?
+
+> So I really don't think an ioctl would be a great user experience. Same for
+> a sysfs file - although that's probably slightly better than the ioctl.
+
+You already are using ioctls to control this thing, right?  What's wrong
+with "one more"? :)
+
+> Other options I can think of:
+> 
+>   * sysctl (for modules?)
+
+Ick.
+
+>   * module parameter (as implemented here)
+
+Ick.
+
+>   * proc file (deprecated FWIW)
+
+Ick.
+
+> The key is the tenant split: Admin sets the pool up, user consumes. This
+> setup should happen (early) on boot, so that system services can spawn
+> enclaves.
+
+But it takes more than jus this initial "split up" to set the pool up,
+right?  Why not make this part of that initial process?  What makes this
+so special you have to do this at module load time only?
+
+thanks,
+
+greg k-h
