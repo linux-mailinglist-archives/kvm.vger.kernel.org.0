@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3682F1E289D
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 19:24:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A6101E289B
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 19:24:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389371AbgEZRYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 13:24:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58971 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2389354AbgEZRX7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 13:23:59 -0400
+        id S2388845AbgEZRYQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 13:24:16 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32165 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389371AbgEZRYA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 13:24:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590513837;
+        s=mimecast20190719; t=1590513838;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t0i45HR53GHJBPiV9ZMKrYpIjTwg8e0xme5Ids+GP08=;
-        b=DrQLkAl6ogfW9xkwBk17FKzzsy5CF8404721ThrUJiUMDeqrthnfRE+mVH99pc6olmbN3v
-        iAeCygIN4H18pq4YNPaxesdl79Yg8kq1vzsdfgi9xOzNlhZw7URaI7EQznm4oJTobuj7LX
-        AUvXAhFrXKsuwuGCey35ib3vKWEp+J0=
+        bh=3PQLQ1HOSiMqraoWAtMOlxFwElh6NwQpX/PUsGYxfKs=;
+        b=M5i4NpTbXtBicqzfjWGK84JpsMIvX/b/Ltvec3pJs90Ze1hfzyWr6ZH99h15UlKC0npkdU
+        2DQnASsyXqhdOYHlIk7ep8ehcx4XCvtW8us3e5ymWIieudG21Ika0uw6iciNoY5HaplKMl
+        c6SjhjvHdz4fhdNWsvm4YPN/1914a6o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-kvC8sjECMN2maULTRHfVLA-1; Tue, 26 May 2020 13:23:56 -0400
-X-MC-Unique: kvC8sjECMN2maULTRHfVLA-1
+ us-mta-25-C1XUDu1ZOQOguvyjM9x2Bw-1; Tue, 26 May 2020 13:23:57 -0400
+X-MC-Unique: C1XUDu1ZOQOguvyjM9x2Bw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD011107ACCD;
-        Tue, 26 May 2020 17:23:54 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE5E4100CCC1;
+        Tue, 26 May 2020 17:23:55 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2CD9F5D9E7;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0FD025D9E7;
         Tue, 26 May 2020 17:23:54 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     vkuznets@redhat.com, mlevitsk@redhat.com,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>
-Subject: [PATCH 26/28] KVM: MMU: pass arbitrary CR0/CR4/EFER to kvm_init_shadow_mmu
-Date:   Tue, 26 May 2020 13:23:06 -0400
-Message-Id: <20200526172308.111575-27-pbonzini@redhat.com>
+Subject: [PATCH 27/28] selftests: kvm: add a SVM version of state-test
+Date:   Tue, 26 May 2020 13:23:07 -0400
+Message-Id: <20200526172308.111575-28-pbonzini@redhat.com>
 In-Reply-To: <20200526172308.111575-1-pbonzini@redhat.com>
 References: <20200526172308.111575-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -51,91 +51,139 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows fetching the registers from the hsave area when setting
-up the NPT shadow MMU, and is needed for KVM_SET_NESTED_STATE (which
-runs long after the CR0, CR4 and EFER values in vcpu have been switched
-to hold L2 guest state).
+The test is similar to the existing one for VMX, but simpler because we
+don't have to test shadow VMCS or vmptrld/vmptrst/vmclear.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu.h        |  2 +-
- arch/x86/kvm/mmu/mmu.c    | 14 +++++++++-----
- arch/x86/kvm/svm/nested.c |  5 ++++-
- 3 files changed, 14 insertions(+), 7 deletions(-)
+ .../testing/selftests/kvm/x86_64/state_test.c | 69 +++++++++++++++----
+ 1 file changed, 57 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 8a3b1bce722a..45c1ae872a34 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -57,7 +57,7 @@ void
- reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context);
+diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+index 5b1a016edf55..af8b6df6a13e 100644
+--- a/tools/testing/selftests/kvm/x86_64/state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+@@ -18,14 +18,46 @@
+ #include "kvm_util.h"
+ #include "processor.h"
+ #include "vmx.h"
++#include "svm_util.h"
  
- void kvm_init_mmu(struct kvm_vcpu *vcpu, bool reset_roots);
--void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu);
-+void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer);
- void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
- 			     bool accessed_dirty, gpa_t new_eptp);
- bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2df0f347655a..fbc061df57ab 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4956,7 +4956,7 @@ kvm_calc_shadow_mmu_root_page_role(struct kvm_vcpu *vcpu, bool base_only)
- 	return role;
+ #define VCPU_ID		5
++#define L2_GUEST_STACK_SIZE 256
+ 
+-void l2_guest_code(void)
++void svm_l2_guest_code(void)
++{
++	GUEST_SYNC(4);
++	/* Exit to L1 */
++	vmcall();
++	GUEST_SYNC(6);
++	/* Done, exit to L1 and never come back.  */
++	vmcall();
++}
++
++static void svm_l1_guest_code(struct svm_test_data *svm)
++{
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	struct vmcb *vmcb = svm->vmcb;
++
++	GUEST_ASSERT(svm->vmcb_gpa);
++	/* Prepare for L2 execution. */
++	generic_svm_setup(svm, svm_l2_guest_code,
++			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	GUEST_SYNC(3);
++	run_guest(vmcb, svm->vmcb_gpa);
++	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
++	GUEST_SYNC(5);
++	vmcb->save.rip += 3;
++	run_guest(vmcb, svm->vmcb_gpa);
++	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
++	GUEST_SYNC(7);
++}
++
++void vmx_l2_guest_code(void)
+ {
+ 	GUEST_SYNC(6);
+ 
+-        /* Exit to L1 */
++	/* Exit to L1 */
+ 	vmcall();
+ 
+ 	/* L1 has now set up a shadow VMCS for us.  */
+@@ -42,10 +74,9 @@ void l2_guest_code(void)
+ 	vmcall();
  }
  
--void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu)
-+void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu, u32 cr0, u32 cr4, u32 efer)
+-void l1_guest_code(struct vmx_pages *vmx_pages)
++static void vmx_l1_guest_code(struct vmx_pages *vmx_pages)
  {
- 	struct kvm_mmu *context = vcpu->arch.mmu;
- 	union kvm_mmu_role new_role =
-@@ -4965,11 +4965,11 @@ void kvm_init_shadow_mmu(struct kvm_vcpu *vcpu)
- 	if (new_role.as_u64 == context->mmu_role.as_u64)
- 		return;
+-#define L2_GUEST_STACK_SIZE 64
+-        unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
  
--	if (!is_paging(vcpu))
-+	if (!(cr0 & X86_CR0_PG))
- 		nonpaging_init_context(vcpu, context);
--	else if (is_long_mode(vcpu))
-+	else if (efer & EFER_LMA)
- 		paging64_init_context(vcpu, context);
--	else if (is_pae(vcpu))
-+	else if (cr4 & X86_CR4_PAE)
- 		paging32E_init_context(vcpu, context);
- 	else
- 		paging32_init_context(vcpu, context);
-@@ -5047,7 +5047,11 @@ static void init_kvm_softmmu(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu *context = vcpu->arch.mmu;
+ 	GUEST_ASSERT(vmx_pages->vmcs_gpa);
+ 	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
+@@ -56,7 +87,7 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_SYNC(4);
+ 	GUEST_ASSERT(vmptrstz() == vmx_pages->vmcs_gpa);
  
--	kvm_init_shadow_mmu(vcpu);
-+	kvm_init_shadow_mmu(vcpu,
-+			    kvm_read_cr0_bits(vcpu, X86_CR0_PG),
-+			    kvm_read_cr4_bits(vcpu, X86_CR4_PAE),
-+			    vcpu->arch.efer);
+-	prepare_vmcs(vmx_pages, l2_guest_code,
++	prepare_vmcs(vmx_pages, vmx_l2_guest_code,
+ 		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+ 
+ 	GUEST_SYNC(5);
+@@ -106,20 +137,31 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_ASSERT(vmresume());
+ }
+ 
+-void guest_code(struct vmx_pages *vmx_pages)
++static u32 cpuid_ecx(u32 eax)
++{
++	u32 ecx;
++	asm volatile("cpuid" : "=a" (eax), "=c" (ecx) : "0" (eax) : "ebx", "edx");
++	return ecx;
++}
 +
- 	context->get_guest_pgd     = get_cr3;
- 	context->get_pdptr         = kvm_pdptr_read;
- 	context->inject_page_fault = kvm_inject_page_fault;
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index e63e62d12acd..840662e66976 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -80,10 +80,13 @@ static unsigned long nested_svm_get_tdp_cr3(struct kvm_vcpu *vcpu)
- 
- static void nested_svm_init_mmu_context(struct kvm_vcpu *vcpu)
++static void __attribute__((__flatten__)) guest_code(void *arg)
  {
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	struct vmcb *hsave = svm->nested.hsave;
-+
- 	WARN_ON(mmu_is_nested(vcpu));
+ 	GUEST_SYNC(1);
+ 	GUEST_SYNC(2);
  
- 	vcpu->arch.mmu = &vcpu->arch.guest_mmu;
--	kvm_init_shadow_mmu(vcpu);
-+	kvm_init_shadow_mmu(vcpu, X86_CR0_PG, hsave->save.cr4, hsave->save.efer);
- 	vcpu->arch.mmu->get_guest_pgd     = nested_svm_get_tdp_cr3;
- 	vcpu->arch.mmu->get_pdptr         = nested_svm_get_tdp_pdptr;
- 	vcpu->arch.mmu->inject_page_fault = nested_svm_inject_npf_exit;
+-	if (vmx_pages)
+-		l1_guest_code(vmx_pages);
++	if (arg) {
++		if (cpuid_ecx(0x80000001) & CPUID_SVM)
++			svm_l1_guest_code(arg);
++		else
++			vmx_l1_guest_code(arg);
++	}
+ 
+ 	GUEST_DONE();
+ }
+ 
+ int main(int argc, char *argv[])
+ {
+-	vm_vaddr_t vmx_pages_gva = 0;
++	vm_vaddr_t nested_gva = 0;
+ 
+ 	struct kvm_regs regs1, regs2;
+ 	struct kvm_vm *vm;
+@@ -136,8 +178,11 @@ int main(int argc, char *argv[])
+ 	vcpu_regs_get(vm, VCPU_ID, &regs1);
+ 
+ 	if (kvm_check_cap(KVM_CAP_NESTED_STATE)) {
+-		vcpu_alloc_vmx(vm, &vmx_pages_gva);
+-		vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
++		if (kvm_get_supported_cpuid_entry(0x80000001)->ecx & CPUID_SVM)
++			vcpu_alloc_svm(vm, &nested_gva);
++		else
++			vcpu_alloc_vmx(vm, &nested_gva);
++		vcpu_args_set(vm, VCPU_ID, 1, nested_gva);
+ 	} else {
+ 		pr_info("will skip nested state checks\n");
+ 		vcpu_args_set(vm, VCPU_ID, 1, 0);
 -- 
 2.26.2
 
