@@ -2,90 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A08E31E1B75
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 453531E1B79
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:41:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728078AbgEZGkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 02:40:03 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:14762 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgEZGkD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 02:40:03 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5eccb96a0002>; Mon, 25 May 2020 23:38:34 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 25 May 2020 23:40:02 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 25 May 2020 23:40:02 -0700
-Received: from [10.2.58.199] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 26 May
- 2020 06:40:02 +0000
-Subject: Re: [RFC 07/16] KVM: mm: Introduce VM_KVM_PROTECTED
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
+        id S1728949AbgEZGlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 02:41:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36820 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727075AbgEZGlU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 02:41:20 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8F8B6207D8;
+        Tue, 26 May 2020 06:41:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590475280;
+        bh=/KcQnFwdAJ+sIoMb98uWlc+grDXqP2E+CmLa0QPSHPM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=F197jqM5OaWsMIlwvEbirUAhp9rsbtmvqcMePf30YkfCebmnOXYlkYcK/LbELm/fg
+         KeBPi9R5tPZzCcjOVGC1Gb0e0OGZUQs1XnwJPhlcQ10IaphtZQZDCv72moDTVGgJ5v
+         P71z9djerfbdHPEqXca7Pli5XOhotuDN0T/3VT2w=
+Date:   Tue, 26 May 2020 08:41:18 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-CC:     David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>, <x86@kernel.org>,
-        <kvm@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-kernel@vger.kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <20200522125214.31348-8-kirill.shutemov@linux.intel.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <29a1d089-ab37-321c-0a01-11801a16a742@nvidia.com>
-Date:   Mon, 25 May 2020 23:40:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+Subject: Re: [PATCH v2 16/18] nitro_enclaves: Add sample for ioctl interface
+ usage
+Message-ID: <20200526064118.GA2580410@kroah.com>
+References: <20200522062946.28973-1-andraprs@amazon.com>
+ <20200522062946.28973-17-andraprs@amazon.com>
+ <20200522070853.GE771317@kroah.com>
+ <09c68ec6-f0fd-e400-1ff2-681ac51c568c@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20200522125214.31348-8-kirill.shutemov@linux.intel.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1590475114; bh=g/4IAy2uMJlh4KcPaPM3wTx3s9c3edZLBVBevRBpy5g=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=ieiogTJmT7OD2KrJ54E1e+hMqFWNUcQJHEuLSx9iORtOMEa5DJuAkKC82OoqDK/N9
-         Z+kkYDd4JWywiQaUWZKhEuISDGME1ftbzsbIcaVdmEQIrS2TUgIRB5OxSPoR3R92Tt
-         jnBzX8r8IBgby3fhpEva9vuLWhaTbFQSJqyrzyvvfA9Dn0EBcg1yefSpYw7SEIOcku
-         rSizgc+dOr48WxFQZCagQj69j/oJRl6J/hi++W8wMvAG7ZQZ/kKsJpSl/PhfVjzOYD
-         e3jpCHn7iaiyEF/xVkgMX+hYNUCBlu4gWmyTs4WtrXyBtUJxvJJs3wgxYomhlwoGvf
-         KM/O8NJAlDMKA==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09c68ec6-f0fd-e400-1ff2-681ac51c568c@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-05-22 05:52, Kirill A. Shutemov wrote:
-...
-> @@ -2773,6 +2780,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
->   #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below */
->   #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
->   #define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
-> +#define FOLL_KVM	0x80000 /* access to VM_KVM_PROTECTED VMAs */
->   
+On Mon, May 25, 2020 at 11:57:26PM +0300, Paraschiv, Andra-Irina wrote:
+> 
+> 
+> On 22/05/2020 10:08, Greg KH wrote:
+> > On Fri, May 22, 2020 at 09:29:44AM +0300, Andra Paraschiv wrote:
+> > > Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+> > > Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> > I know I don't take commits with no changelog text :(
+> 
+> Included in v3 the changelog for each patch in the series, in addition to
+> the one in the cover letter; where no changes, I just mentioned that. :)
 
-I grabbed 0x80000 already, for FOLL_FAST_ONLY. :)
+But you didn't cc: me on that version :(
 
-thanks,
--- 
-John Hubbard
-NVIDIA
