@@ -2,90 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7820E1E1B21
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:17:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39D1B1E1B24
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:19:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729956AbgEZGRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 02:17:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:32870 "EHLO mail.kernel.org"
+        id S1726926AbgEZGTg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 02:19:36 -0400
+Received: from mga07.intel.com ([134.134.136.100]:20138 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726746AbgEZGRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 02:17:35 -0400
-Received: from kernel.org (unknown [87.70.212.59])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 35DCB207CB;
-        Tue, 26 May 2020 06:17:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590473855;
-        bh=mialz6+4JExXiplq4nSrBLYzTjZOqrM1xhFXpnEOLgc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xEQnl9quZ9K04sqX5aILNnhy4om7uaT4xNs8TjpQH8TUR9KN3E3yxcAJNvX/uG07T
-         CdBG05n9SnX45opvfvn4Yr1hTS2GDC6g8fqiXMpisVFocklxDZj3pHqQgeqKEhsipU
-         A/b525HTRdHf10ZM/LvBwefG6D27z5bGPfzDjNag=
-Date:   Tue, 26 May 2020 09:17:21 +0300
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC 00/16] KVM protected memory extension
-Message-ID: <20200526061721.GB48741@kernel.org>
-References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <42685c32-a7a9-b971-0cf4-e8af8d9a40c6@oracle.com>
+        id S1726746AbgEZGTg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 02:19:36 -0400
+IronPort-SDR: JfwWV1tovY89ASKwzuc6fDYYu35r+3zRgoRGPlJF5dJDbmr/vaw2dl0QYx/b05zNPGedAFtwMn
+ ZMxGbXdGaXaQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2020 23:19:36 -0700
+IronPort-SDR: qXOnqWJvVvKcb/iGAXTmUtWtdmcxyX4LrERJxa+q5mfb+YCjavf2Tg8NzCIQWKL4F8c3/dJuDB
+ OKhp/l5FMyJw==
+X-IronPort-AV: E=Sophos;i="5.73,436,1583222400"; 
+   d="scan'208";a="441964147"
+Received: from unknown (HELO [10.239.13.122]) ([10.239.13.122])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2020 23:19:33 -0700
+Subject: Re: [PATCH v9 0/8] KVM: Add virtualization support of split lock
+ detection
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>, peterz@infradead.org,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Tony Luck <tony.luck@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>
+References: <20200509110542.8159-1-xiaoyao.li@intel.com>
+ <98c5ccc7-30bb-bed2-2065-59f7b7b09fbc@intel.com>
+Message-ID: <d336bc4d-55fb-d397-0a99-33d86d704f51@intel.com>
+Date:   Tue, 26 May 2020 14:19:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42685c32-a7a9-b971-0cf4-e8af8d9a40c6@oracle.com>
+In-Reply-To: <98c5ccc7-30bb-bed2-2065-59f7b7b09fbc@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 25, 2020 at 04:47:18PM +0300, Liran Alon wrote:
+Hi Thomas,
+
+On 5/18/2020 9:27 AM, Xiaoyao Li wrote:
+> On 5/9/2020 7:05 PM, Xiaoyao Li wrote:
+>> This series aims to add the virtualization of split lock detection in
+>> KVM.
+>>
+>> Due to the fact that split lock detection is tightly coupled with CPU
+>> model and CPU model is configurable by host VMM, we elect to use
+>> paravirt method to expose and enumerate it for guest.
 > 
-> On 22/05/2020 15:51, Kirill A. Shutemov wrote:
+> Thomas and Paolo,
 > 
-> Furthermore, I would like to point out that just unmapping guest data from
-> kernel direct-map is not sufficient to prevent all
-> guest-to-guest info-leaks via a kernel memory info-leak vulnerability. This
-> is because host kernel VA space have other regions
-> which contains guest sensitive data. For example, KVM per-vCPU struct (which
-> holds vCPU state) is allocated on slab and therefore
-> still leakable.
+> Do you have time to have a look at this version?
 
-Objects allocated from slab use the direct map, vmalloc() is another story.
+Does this series have any chance to meet 5.8?
 
-> >   - Touching direct mapping leads to fragmentation. We need to be able to
-> >     recover from it. I have a buggy patch that aims at recovering 2M/1G page.
-> >     It has to be fixed and tested properly
->
-> As I've mentioned above, not mapping all guest memory from 1GB hugetlbfs
-> will lead to holes in kernel direct-map which force it to not be mapped
-> anymore as a series of 1GB huge-pages.
-> This have non-trivial performance cost. Thus, I am not sure addressing this
-> use-case is valuable.
+If not, do you plan to take a look at it after merge window?
 
-Out of curiosity, do we actually have some numbers for the "non-trivial
-performance cost"? For instance for KVM usecase?
-
-
--- 
-Sincerely yours,
-Mike.
+Thanks,
+-Xiaoyao
