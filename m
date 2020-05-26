@@ -2,69 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78ACA1E1CB8
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 09:59:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29E961E1CE9
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 10:07:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731728AbgEZH7O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 03:59:14 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:35505 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726971AbgEZH7O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 03:59:14 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 49WRDv3x0gz9sSs; Tue, 26 May 2020 17:59:11 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1590479951; bh=y9Dh8QD2sldowdau5z37SlPA9CE0uXq3c+Lcs+yQous=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qKvFKOr4bi6PBmH5CPpjSHqLaLsfjMJlHFldlHQBVeS+7XcOjYOfYTH4di0pdc7Hi
-         FVViWy67aZlWPBRAQGPlYeSxhJYnxAMg6tUrxM7ujmP2xoQhgf6Mx0UN0vM1hJeY7t
-         JvM8uJJGbFh2/CAEX/ygfnuoL2sIBrm+X2QAxmHRutXk9tH3mjlx6udhTPxaPT9II6
-         VPTxAVMeS3Kg+Ml9CWLC5I2cKQR8ZvZT9IzeTqwbN1e+m7RnnK2SqRIwmruJYzVQ3a
-         qOnWFZnPedUSiv7IL6wWd3+Wx1GF6WRLG0IndceBboMAoFmwEvQbSFUs7V1n+5okLr
-         6ncWU8VKADeHA==
-Date:   Tue, 26 May 2020 17:59:04 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Souptick Joarder <jrdr.linux@gmail.com>
-Cc:     mpe@ellerman.id.au, benh@kernel.crashing.org,
-        akpm@linux-foundation.org, peterz@infradead.org, mingo@redhat.com,
-        acme@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@redhat.com,
-        namhyung@kernel.org, pbonzini@redhat.com, sfr@canb.auug.org.au,
-        rppt@linux.ibm.com, aneesh.kumar@linux.ibm.com, msuchanek@suse.de,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        kvm@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [linux-next PATCH] mm/gup.c: Convert to use
- get_user_{page|pages}_fast_only()
-Message-ID: <20200526075904.GE282305@thinks.paulus.ozlabs.org>
-References: <1590396812-31277-1-git-send-email-jrdr.linux@gmail.com>
+        id S1728380AbgEZIHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 04:07:21 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:47947 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726926AbgEZIHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 04:07:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1590480441; x=1622016441;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=UjkBL4IyFRcZnIBW+9GI3K0GuOJ5B4jSDRBwvVKtrso=;
+  b=jD+E6mGw3VQmPyNd5vxavAXeeE01ZGKjVHWdcjYUuEl9MhlQxqbMjaFW
+   ++XVbFv7rGBxvSpBXtbRPJI4zXQPsaDLr5KqHCn1ZU43RGushwtDnjYPi
+   DZst74gtQyq2Q/4YB9dxdvt3U2BZCDw7dQaavfX2mHgne9DMNReCcM4BR
+   0=;
+IronPort-SDR: eOP+c+rZVu9A1XBly4jinEMvP9i74ohQUKKqsFC462Z6fufwFKqnaf7jvVgM5mRjiN4/G4u2LF
+ xSQAj45LYrBg==
+X-IronPort-AV: E=Sophos;i="5.73,436,1583193600"; 
+   d="scan'208";a="32214342"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-821c648d.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 26 May 2020 08:07:08 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-821c648d.us-east-1.amazon.com (Postfix) with ESMTPS id 17F60A23A9;
+        Tue, 26 May 2020 08:07:06 +0000 (UTC)
+Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 26 May 2020 08:07:05 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.26) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 26 May 2020 08:06:57 +0000
+Subject: Re: [PATCH v2 16/18] nitro_enclaves: Add sample for ioctl interface
+ usage
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        "Alexander Graf" <graf@amazon.de>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200522062946.28973-1-andraprs@amazon.com>
+ <20200522062946.28973-17-andraprs@amazon.com>
+ <20200522070853.GE771317@kroah.com>
+ <09c68ec6-f0fd-e400-1ff2-681ac51c568c@amazon.com>
+ <20200526064118.GA2580410@kroah.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <2b0a2fe9-444d-110f-97b5-127637e60009@amazon.com>
+Date:   Tue, 26 May 2020 11:06:46 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1590396812-31277-1-git-send-email-jrdr.linux@gmail.com>
+In-Reply-To: <20200526064118.GA2580410@kroah.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.26]
+X-ClientProxiedBy: EX13D11UWB001.ant.amazon.com (10.43.161.53) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 25, 2020 at 02:23:32PM +0530, Souptick Joarder wrote:
-> API __get_user_pages_fast() renamed to get_user_pages_fast_only()
-> to align with pin_user_pages_fast_only().
-> 
-> As part of this we will get rid of write parameter.
-> Instead caller will pass FOLL_WRITE to get_user_pages_fast_only().
-> This will not change any existing functionality of the API.
-> 
-> All the callers are changed to pass FOLL_WRITE.
-> 
-> Also introduce get_user_page_fast_only(), and use it in a few
-> places that hard-code nr_pages to 1.
-> 
-> Updated the documentation of the API.
-> 
-> Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
+CgpPbiAyNi8wNS8yMDIwIDA5OjQxLCBHcmVnIEtIIHdyb3RlOgo+IE9uIE1vbiwgTWF5IDI1LCAy
+MDIwIGF0IDExOjU3OjI2UE0gKzAzMDAsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6Cj4+
+Cj4+IE9uIDIyLzA1LzIwMjAgMTA6MDgsIEdyZWcgS0ggd3JvdGU6Cj4+PiBPbiBGcmksIE1heSAy
+MiwgMjAyMCBhdCAwOToyOTo0NEFNICswMzAwLCBBbmRyYSBQYXJhc2NoaXYgd3JvdGU6Cj4+Pj4g
+U2lnbmVkLW9mZi1ieTogQWxleGFuZHJ1IFZhc2lsZSA8bGV4bnZAYW1hem9uLmNvbT4KPj4+PiBT
+aWduZWQtb2ZmLWJ5OiBBbmRyYSBQYXJhc2NoaXYgPGFuZHJhcHJzQGFtYXpvbi5jb20+Cj4+PiBJ
+IGtub3cgSSBkb24ndCB0YWtlIGNvbW1pdHMgd2l0aCBubyBjaGFuZ2Vsb2cgdGV4dCA6KAo+PiBJ
+bmNsdWRlZCBpbiB2MyB0aGUgY2hhbmdlbG9nIGZvciBlYWNoIHBhdGNoIGluIHRoZSBzZXJpZXMs
+IGluIGFkZGl0aW9uIHRvCj4+IHRoZSBvbmUgaW4gdGhlIGNvdmVyIGxldHRlcjsgd2hlcmUgbm8g
+Y2hhbmdlcywgSSBqdXN0IG1lbnRpb25lZCB0aGF0LiA6KQo+IEJ1dCB5b3UgZGlkbid0IGNjOiBt
+ZSBvbiB0aGF0IHZlcnNpb24gOigKCkkganVzdCBhZGRlZCB5b3Ugb24gdGhlIENDIGxpc3QsIGZy
+b20gdjQgZ29pbmcgb24gc2hvdWxkIGJlIGFsbCBnb29kIHdydCAKdGhpcy4KClRoYW5rcywKQW5k
+cmEKCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiByZWdpc3Rl
+cmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElhc2ksIElh
+c2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4gUmVnaXN0
+cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
 
-The arch/powerpc/kvm bits look reasonable.
-
-Reviewed-by: Paul Mackerras <paulus@ozlabs.org>
