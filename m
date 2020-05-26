@@ -2,58 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A15D1E1B87
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:46:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 639B01E1B89
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:48:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727957AbgEZGqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 02:46:07 -0400
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:38203 "EHLO
-        wnew1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725783AbgEZGqH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 02:46:07 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.west.internal (Postfix) with ESMTP id 23110972;
-        Tue, 26 May 2020 02:46:05 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Tue, 26 May 2020 02:46:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=5RYRLhyLsMnW5/cobsL2Hqy7R67
-        BSPcGYQeOH6J+GMs=; b=cRxQJrFoaymwwcyEAfUp0pX8PLnfnsJ5xPQgBcnSMoc
-        j1JKjHjJKGGR1U/tgoRcISR85Hgz5h1YqFMKqn/gnU67SKST1jhvUvCI3rHeot8V
-        rpQ9k8BWRTP0qWcJlRlD8UwZvP8fxJEs9aNiQYsOBN3TSphjKcCRrIBGSpv5ZF14
-        IN4wI8VgF1ZxKsLsno7FswJzL0FP+u2yfGhNcKymfHmmYx1wQiCJMdKzzLHn/7ua
-        uyr5sTlfKBe7gXAOhEvU+yb1S+KMgl3spboyFzLcEtgAuPOZEzo3Om/cJDWiMjaD
-        55E4UFOGIYaDV3xbMG0SshjuwP1UI5n2tHdRlsjijRg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=5RYRLh
-        yLsMnW5/cobsL2Hqy7R67BSPcGYQeOH6J+GMs=; b=wKA3jowSlyXRdNPIOtvTwO
-        0jn4TPD61XyP6+PzPK9yAA9SZlEu4V80tbqI/dU5cXKAmlSPSzGf+8xRXeVEmxjH
-        RsHWwllbqfOrThRITPR10RpxK/JqpnUx0RAfLFAjNjgpa8n0xQNkwLnTSMy8WAq8
-        t5kWnGv4O+h4iEECMifmwcpclAEaQmW0CT7gd2grLwGzQcXMLcslif7sHFpf59Jh
-        FxyS83zrgmZkGzHSKHipn151m3bM+TW+n4fdouGLXNEe1vSyuX1e47FmAxczGJZY
-        TsLuuRTjZt0Jo15I/9NCTDNIdGx4f7eABGVC/VzKJpTChghYkGMbzEEzsv5e8j7w
-        ==
-X-ME-Sender: <xms:LLvMXm6fr36o8K1J7iw_69HcKT_GyGt_vV8dftNx6JJdrbxyyHmeBQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedruddvuddguddtkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
-    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuhe
-    ejgfffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecukfhppeek
-    fedrkeeirdekledruddtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomh
-X-ME-Proxy: <xmx:LLvMXv7RYV96OrDSMZ-CDDP3JcZ3i0pDRbRQQZtAKZBezD3d-EoSNA>
-    <xmx:LLvMXlf12FBix7QpKjMYARSzhBehzCbyMzJ_0tKg8kBBxuI-ovMGhQ>
-    <xmx:LLvMXjIM5Dthu45Nia7gr-CugCMe9Td4cJyed788S_ea61QAjSwdJQ>
-    <xmx:LLvMXv5gMxsDMnGbNe-4C5Iv7LVmGuJ8gmnjQwTJ6rz0fztmz3W8vYGoXEk>
+        id S1728148AbgEZGsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 02:48:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37622 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726921AbgEZGsW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 02:48:22 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        by mail.messagingengine.com (Postfix) with ESMTPA id EEEA93280065;
-        Tue, 26 May 2020 02:46:03 -0400 (EDT)
-Date:   Tue, 26 May 2020 08:46:01 +0200
-From:   Greg KH <greg@kroah.com>
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 651BA207D8;
+        Tue, 26 May 2020 06:48:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590475701;
+        bh=KB2ZEvmVzYY93muPmZUfwEbvx2qqohH1HVtTZyR6awQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LO3HdrUXEDbWzDjjfHIa/ja3MnPXUxBXLDUL/htS/xtBbpMoBurXScP6wjQBDWXwX
+         WQV4nWS6m0POKAA277sCm1D3HcV1EkaF2cSqu47Q1YtQureNkFS8g/ZKQ4HhqXnnA6
+         4FlaFJZz/M/W2AgKpwbRUZRVogqtw1stXAzATJG0=
+Date:   Tue, 26 May 2020 08:48:19 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
 To:     Andra Paraschiv <andraprs@amazon.com>
 Cc:     linux-kernel@vger.kernel.org,
         Anthony Liguori <aliguori@amazon.com>,
@@ -72,29 +43,90 @@ Cc:     linux-kernel@vger.kernel.org,
         Stewart Smith <trawets@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
         ne-devel-upstream@amazon.com
-Subject: Re: [PATCH v3 03/18] nitro_enclaves: Define enclave info for
- internal bookkeeping
-Message-ID: <20200526064601.GB2580530@kroah.com>
+Subject: Re: [PATCH v3 04/18] nitro_enclaves: Init PCI device driver
+Message-ID: <20200526064819.GC2580530@kroah.com>
 References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-4-andraprs@amazon.com>
+ <20200525221334.62966-5-andraprs@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200525221334.62966-4-andraprs@amazon.com>
+In-Reply-To: <20200525221334.62966-5-andraprs@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 26, 2020 at 01:13:19AM +0300, Andra Paraschiv wrote:
-> +/* Nitro Enclaves (NE) misc device */
-> +extern struct miscdevice ne_miscdevice;
+On Tue, May 26, 2020 at 01:13:20AM +0300, Andra Paraschiv wrote:
+> The Nitro Enclaves PCI device is used by the kernel driver as a means of
+> communication with the hypervisor on the host where the primary VM and
+> the enclaves run. It handles requests with regard to enclave lifetime.
+> 
+> Setup the PCI device driver and add support for MSI-X interrupts.
+> 
+> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
+> Signed-off-by: Alexandru Ciobotaru <alcioa@amazon.com>
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> ---
+> Changelog
+> 
+> v2 -> v3
+> 
+> * Remove the GPL additional wording as SPDX-License-Identifier is already in
+> place.
+> * Remove the WARN_ON calls.
+> * Remove linux/bug include that is not needed.
+> * Update static calls sanity checks.
+> * Remove "ratelimited" from the logs that are not in the ioctl call paths.
+> * Update kzfree() calls to kfree().
+> 
+> v1 -> v2
+> 
+> * Add log pattern for NE.
+> * Update PCI device setup functions to receive PCI device data structure and
+> then get private data from it inside the functions logic.
+> * Remove the BUG_ON calls.
+> * Add teardown function for MSI-X setup.
+> * Update goto labels to match their purpose.
+> * Implement TODO for NE PCI device disable state check.
+> * Update function name for NE PCI device probe / remove.
+> ---
+>  drivers/virt/nitro_enclaves/ne_pci_dev.c | 252 +++++++++++++++++++++++
+>  1 file changed, 252 insertions(+)
+>  create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.c
+> 
+> diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+> new file mode 100644
+> index 000000000000..0b66166787b6
+> --- /dev/null
+> +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+> @@ -0,0 +1,252 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+> + */
+> +
+> +/* Nitro Enclaves (NE) PCI device driver. */
+> +
+> +#include <linux/delay.h>
+> +#include <linux/device.h>
+> +#include <linux/list.h>
+> +#include <linux/mutex.h>
+> +#include <linux/module.h>
+> +#include <linux/nitro_enclaves.h>
+> +#include <linux/pci.h>
+> +#include <linux/types.h>
+> +#include <linux/wait.h>
+> +
+> +#include "ne_misc_dev.h"
+> +#include "ne_pci_dev.h"
+> +
+> +#define DEFAULT_TIMEOUT_MSECS (120000) /* 120 sec */
+> +
+> +#define NE "nitro_enclaves: "
 
-Why does your misc device need to be in a .h file?
-
-Having the patch series like this (add random .h files, and then start
-to use them), is hard to review.  Would you want to try to review a
-series written in this way?
+Why is this needed?  The dev_* functions should give you all the
+information that you need to properly describe the driver and device in
+question.  No extra "prefixes" should be needed at all.
 
 thanks,
 
