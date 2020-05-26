@@ -2,74 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39D1B1E1B24
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:19:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5048B1E1B29
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 08:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726926AbgEZGTg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 02:19:36 -0400
-Received: from mga07.intel.com ([134.134.136.100]:20138 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726746AbgEZGTg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 02:19:36 -0400
-IronPort-SDR: JfwWV1tovY89ASKwzuc6fDYYu35r+3zRgoRGPlJF5dJDbmr/vaw2dl0QYx/b05zNPGedAFtwMn
- ZMxGbXdGaXaQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2020 23:19:36 -0700
-IronPort-SDR: qXOnqWJvVvKcb/iGAXTmUtWtdmcxyX4LrERJxa+q5mfb+YCjavf2Tg8NzCIQWKL4F8c3/dJuDB
- OKhp/l5FMyJw==
-X-IronPort-AV: E=Sophos;i="5.73,436,1583222400"; 
-   d="scan'208";a="441964147"
-Received: from unknown (HELO [10.239.13.122]) ([10.239.13.122])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2020 23:19:33 -0700
-Subject: Re: [PATCH v9 0/8] KVM: Add virtualization support of split lock
- detection
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
+        id S1729605AbgEZGWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 02:22:14 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13895 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728138AbgEZGWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 02:22:13 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5eccb53a0000>; Mon, 25 May 2020 23:20:42 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 25 May 2020 23:22:10 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 25 May 2020 23:22:10 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 26 May
+ 2020 06:22:10 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Tue, 26 May 2020 06:22:10 +0000
+Received: from sandstorm.nvidia.com (Not Verified[10.2.58.199]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5eccb5920000>; Mon, 25 May 2020 23:22:10 -0700
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     LKML <linux-kernel@vger.kernel.org>
+CC:     Souptick Joarder <jrdr.linux@gmail.com>,
+        John Hubbard <jhubbard@nvidia.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Andy Lutomirski <luto@kernel.org>, peterz@infradead.org,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Tony Luck <tony.luck@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>
-References: <20200509110542.8159-1-xiaoyao.li@intel.com>
- <98c5ccc7-30bb-bed2-2065-59f7b7b09fbc@intel.com>
-Message-ID: <d336bc4d-55fb-d397-0a99-33d86d704f51@intel.com>
-Date:   Tue, 26 May 2020 14:19:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, <x86@kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: [PATCH 0/2] KVM: SVM: convert get_user_pages() --> pin_user_pages(), bug fixes
+Date:   Mon, 25 May 2020 23:22:05 -0700
+Message-ID: <20200526062207.1360225-1-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <98c5ccc7-30bb-bed2-2065-59f7b7b09fbc@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-NVConfidentiality: public
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1590474042; bh=xyHCUTas3F16ZK+n98+gQf/X3rsWdl0q0EXVHn6zcqQ=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Transfer-Encoding:
+         Content-Type;
+        b=ey7+nu0R2FPsgmiBmHjb7F5Y0ADHbPJ0yum97UBILsXbjXAtn3kOVKjSj1QKjVnQm
+         iQXdYCvx0qaJZMEFGKZahaThMMdnDvoi6FGdpvhkLJCRheWBG1apBurFlPNiNnCKLM
+         wz8F5ThCruyg7jUyt+7loyRsDSmanTCg3FWFjg/nebLBDK7jP6oIIkBJAFm8czFw8R
+         IEbOP4U79X767fLsRqt1lJ3/9zlzV7i1G7spOHS9QkTfDsfkEjuouu35pZxYx03obh
+         u3YgPJ1iyu2URs8jIBpx57ojeauDJfPbINW/655wqs/ISdDx1fkppwOom9ADXqy5J3
+         UKwU1YIayHCOA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Thomas,
+Hi,
 
-On 5/18/2020 9:27 AM, Xiaoyao Li wrote:
-> On 5/9/2020 7:05 PM, Xiaoyao Li wrote:
->> This series aims to add the virtualization of split lock detection in
->> KVM.
->>
->> Due to the fact that split lock detection is tightly coupled with CPU
->> model and CPU model is configurable by host VMM, we elect to use
->> paravirt method to expose and enumerate it for guest.
-> 
-> Thomas and Paolo,
-> 
-> Do you have time to have a look at this version?
+This is just for the SEV (Secure Encrypted Virtualization) part of KVM.
+It converts the get_user_pages_fast() call, after fixing a couple of
+small bugs in the vicinity.
 
-Does this series have any chance to meet 5.8?
+Note that I have only compile-tested these two patches, so any run-time
+testing coverage would be greatly appreciated.
 
-If not, do you plan to take a look at it after merge window?
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: x86@kernel.org
+Cc: kvm@vger.kernel.org
 
-Thanks,
--Xiaoyao
+
+John Hubbard (2):
+  KVM: SVM: fix svn_pin_memory()'s use of get_user_pages_fast()
+  KVM: SVM: convert get_user_pages() --> pin_user_pages()
+
+ arch/x86/kvm/svm/sev.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+
+base-commit: 9cb1fd0efd195590b828b9b865421ad345a4a145
+--=20
+2.26.2
+
