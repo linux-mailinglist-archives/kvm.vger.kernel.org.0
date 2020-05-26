@@ -2,114 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 695FE1E1EA2
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 11:33:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 249E11E1EB1
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 11:36:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731710AbgEZJd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 05:33:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14480 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731703AbgEZJd1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 05:33:27 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04Q9XCUJ008272;
-        Tue, 26 May 2020 05:33:23 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3170b7wver-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 05:33:23 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04Q9XMdn009325;
-        Tue, 26 May 2020 05:33:22 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3170b7wvc9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 05:33:22 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04Q9VE6p022068;
-        Tue, 26 May 2020 09:33:19 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 316uf8wmkf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 May 2020 09:33:18 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04Q9XGhu4129276
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 May 2020 09:33:16 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2EE93AE053;
-        Tue, 26 May 2020 09:33:16 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1AD55AE04D;
-        Tue, 26 May 2020 09:33:16 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 26 May 2020 09:33:16 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id C8A20E024B; Tue, 26 May 2020 11:33:15 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Jason Yan <yanaijie@huawei.com>, Hulk Robot <hulkci@huawei.com>
-Subject: [GIT PULL 3/3] KVM: s390: remove unneeded semicolon in gisa_vcpu_kicker()
-Date:   Tue, 26 May 2020 11:33:13 +0200
-Message-Id: <20200526093313.77976-4-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20200526093313.77976-1-borntraeger@de.ibm.com>
-References: <20200526093313.77976-1-borntraeger@de.ibm.com>
-X-TM-AS-GCONF: 00
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S1728750AbgEZJgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 05:36:38 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30416 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728746AbgEZJgh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 05:36:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590485796;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=N9CrJGv37BpytimFY2SmZJooBun68CG0VTdXjYuGNU0=;
+        b=PWR7Cth9u07JrBgfSp56LV8VnaHP7N0mMke59WoSm7H16g3T8NJJlZgJcVELktaM9iIpmQ
+        gInkGf/Pi55RaK6Oxy3TK4cdcwc2rf7QzfXtUM30Y3ee6jAMjG2Z2VpGnuOFiO4aMs3dmG
+        SYWoMWDt5iOks2ltqcL55g8xKO6g5lo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-LiCUBOrPOJ2m6HPSepfNzQ-1; Tue, 26 May 2020 05:36:34 -0400
+X-MC-Unique: LiCUBOrPOJ2m6HPSepfNzQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46F80100A8F2;
+        Tue, 26 May 2020 09:36:33 +0000 (UTC)
+Received: from localhost (ovpn-113-77.ams2.redhat.com [10.36.113.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D96596EF8C;
+        Tue, 26 May 2020 09:36:32 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH] s390/virtio: remove unused pm callbacks
+Date:   Tue, 26 May 2020 11:36:29 +0200
+Message-Id: <20200526093629.257649-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-05-25_12:2020-05-25,2020-05-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- cotscore=-2147483648 malwarescore=0 priorityscore=1501 clxscore=1011
- impostorscore=0 mlxlogscore=999 spamscore=0 adultscore=0 mlxscore=0
- phishscore=0 bulkscore=0 suspectscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005260073
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jason Yan <yanaijie@huawei.com>
+Support for hibernation on s390 has been recently been removed with
+commit 394216275c7d ("s390: remove broken hibernate / power management
+support"), no need to keep unused code around.
 
-Fix the following coccicheck warning:
-
-arch/s390/kvm/interrupt.c:3085:2-3: Unneeded semicolon
-
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Jason Yan <yanaijie@huawei.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Link: https://lore.kernel.org/r/20200418081926.41666-1-yanaijie@huawei.com
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- arch/s390/kvm/interrupt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/s390/virtio/virtio_ccw.c | 26 --------------------------
+ 1 file changed, 26 deletions(-)
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index bfb481134994..a4d4ca2769bd 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -3082,7 +3082,7 @@ static enum hrtimer_restart gisa_vcpu_kicker(struct hrtimer *timer)
- 		__airqs_kick_single_vcpu(kvm, pending_mask);
- 		hrtimer_forward_now(timer, ns_to_ktime(gi->expires));
- 		return HRTIMER_RESTART;
--	};
-+	}
+diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+index 957889a42d2e..5730572b52cd 100644
+--- a/drivers/s390/virtio/virtio_ccw.c
++++ b/drivers/s390/virtio/virtio_ccw.c
+@@ -1372,27 +1372,6 @@ static struct ccw_device_id virtio_ids[] = {
+ 	{},
+ };
  
- 	return HRTIMER_NORESTART;
- }
+-#ifdef CONFIG_PM_SLEEP
+-static int virtio_ccw_freeze(struct ccw_device *cdev)
+-{
+-	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
+-
+-	return virtio_device_freeze(&vcdev->vdev);
+-}
+-
+-static int virtio_ccw_restore(struct ccw_device *cdev)
+-{
+-	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
+-	int ret;
+-
+-	ret = virtio_ccw_set_transport_rev(vcdev);
+-	if (ret)
+-		return ret;
+-
+-	return virtio_device_restore(&vcdev->vdev);
+-}
+-#endif
+-
+ static struct ccw_driver virtio_ccw_driver = {
+ 	.driver = {
+ 		.owner = THIS_MODULE,
+@@ -1405,11 +1384,6 @@ static struct ccw_driver virtio_ccw_driver = {
+ 	.set_online = virtio_ccw_online,
+ 	.notify = virtio_ccw_cio_notify,
+ 	.int_class = IRQIO_VIR,
+-#ifdef CONFIG_PM_SLEEP
+-	.freeze = virtio_ccw_freeze,
+-	.thaw = virtio_ccw_restore,
+-	.restore = virtio_ccw_restore,
+-#endif
+ };
+ 
+ static int __init pure_hex(char **cp, unsigned int *val, int min_digit,
 -- 
 2.25.4
 
