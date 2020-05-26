@@ -2,126 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F2DC1E25DA
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 17:45:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 826D21E2615
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 17:53:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729867AbgEZPpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 11:45:25 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34667 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728138AbgEZPpY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 11:45:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590507922;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Dt6LQHnd8XQKjoczzuKu5+J73yx/PTFTJmXrE029Qj0=;
-        b=MuDE1EeNGCQ7ZtyasjHIeRquVoyGlw4ms/cF48n+wazvpvZJXtfMaHWohfbEpb6eu/b5pd
-        cagcXwYz82p5Nr22SwvYHKapCY9bDujsdyxeL5jbNE0kD6wB2awofKGhTvYwW4Qc8IF3qm
-        sR+IEuKfj/j1E+CuQh5LmGbRLqBM3+E=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-ltlK_XybOBiHi2HD3Pbj-A-1; Tue, 26 May 2020 11:45:20 -0400
-X-MC-Unique: ltlK_XybOBiHi2HD3Pbj-A-1
-Received: by mail-wr1-f72.google.com with SMTP id f4so7293375wrp.21
-        for <kvm@vger.kernel.org>; Tue, 26 May 2020 08:45:20 -0700 (PDT)
+        id S1731245AbgEZPxe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 11:53:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59612 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729710AbgEZPxd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 11:53:33 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824FAC03E96E
+        for <kvm@vger.kernel.org>; Tue, 26 May 2020 08:53:33 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id v15so9653091qvr.8
+        for <kvm@vger.kernel.org>; Tue, 26 May 2020 08:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=jlzpUqOYdHV1vxWH1ghpZ5NGGPs3KIgh2WBW3uooNyo=;
+        b=aOxeeiHs3Gji6/AEWR2ZvosQKYQBQENiEkhQwl1NKLn2O8TIhxXA5l5jX4IwCXpTNy
+         LCe/8dGn9TpuIppdW2DyEuF5xO3Wu5PyEoimljK59a1Nm+wbIDPvNiMeQ0rIB6VR0L0A
+         7vUw+l9TFFsVgnqBLpm+GQ/e+z2ikDYnGqFOzDtizixstcS8d0h9wKJuxDvLw7z2t5CF
+         oM8HEcXf1ctNDH75ArYQ7Z86jPiVZ02Yz21UTZJ3wr6V4lfkUIUVGNBRuYHGVmL3yVSb
+         q+IGL1+xtTMNSaJ3RzXqImGG3L8SG2cTydkGE/F1hqcrWzaqZvkYG/8WqhlVZTEjV1BF
+         AZGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Dt6LQHnd8XQKjoczzuKu5+J73yx/PTFTJmXrE029Qj0=;
-        b=qvIYFxJayzuBrxAaSy6dBgAIkYr8Dn3S7IADd4BaCcHp0QzwAmlCdoFenZypZpFRw6
-         BvoXYyNIpMrmIdR1pnZRtAgokytAxvvFB9Pzb33W2Xt/BcY9DEvQ0wGM3v+cWTsGmkFO
-         A+7JM6CzXoHRNJcX8b9eObE5JJLj9d7eTR2utd21ibE62OV4Yxej1J306Ic55yUpfMGS
-         JmFGMPPHQr4EKT5QAfJ1ygOi4z5bgaMn8bD0HBL8K8S/mF+G5iR7y7pCLmlPphhJRkIZ
-         C9Fzq4LTO8CUDcUTAQwbUGxTkZJ0wRTNlKEIhN0pDC06EZTSNLROtNS6jDPDd9YTd3r2
-         Iopw==
-X-Gm-Message-State: AOAM530VWiD+XFJU51yseR/fJCE2KxbcGRMxC6P2NtF6Rkn+LKO0wGnC
-        DGqX3HMIMGz9s1BAiLk74cOL7gzUMm6Yvv64zO6rrKwcDJ8abAnTDYq3X6MqfqT79D9pNimwYya
-        C28AdKMVqHO72
-X-Received: by 2002:a05:6000:1202:: with SMTP id e2mr2590867wrx.231.1590507919725;
-        Tue, 26 May 2020 08:45:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw5If1uNgTKWEisUAJowYTPwcuzMOOow4nahat1ESbDjPkHGjhZwTTbQrIPi02UQ5LtAAq4hw==
-X-Received: by 2002:a05:6000:1202:: with SMTP id e2mr2590848wrx.231.1590507919516;
-        Tue, 26 May 2020 08:45:19 -0700 (PDT)
-Received: from localhost.localdomain ([194.230.155.118])
-        by smtp.gmail.com with ESMTPSA id u10sm32544wmc.31.2020.05.26.08.45.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 May 2020 08:45:18 -0700 (PDT)
-Subject: Re: [PATCH v3 7/7] [not for merge] netstats: example use of stats_fs
- API
-To:     Andrew Lunn <andrew@lunn.ch>
-Cc:     kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        David Rientjes <rientjes@google.com>,
-        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org
-References: <20200526110318.69006-1-eesposit@redhat.com>
- <20200526110318.69006-8-eesposit@redhat.com>
- <20200526141605.GJ768009@lunn.ch>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Message-ID: <99217496-929f-ed3b-8e9e-bbd26d06e234@redhat.com>
-Date:   Tue, 26 May 2020 17:45:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=jlzpUqOYdHV1vxWH1ghpZ5NGGPs3KIgh2WBW3uooNyo=;
+        b=ZUes7Zsewv/AwvYPHx0ubil9KPWhtInS7biUNCpXO6gV5IURIi+J6HbxKO3udjRvsW
+         QnHBU+B56ZcbXLZ1ZmYBYuoQGCNzxd5e2Uz+l4LKr0xgE3UbvSZ0hwZ7L2MtLfaauugV
+         fojMNwKl6xaO6gmEcDgT94E1lDHnqNfIuU13Bkjk26oq4nByJFkYeezLwLqITgEoppvG
+         82z7f+wpQLJuaHNHb0E7IIB0trmlK56/TXBcTdJSvUg7UTZHskL/Ptz633zzZPUp1ZfP
+         n08TvB9EOPcEkdFvBcGiQXW//dQjJ+cjyN6wJgC35dt0EcR5sPsZ8pMaD2POLgA5PS0Z
+         ysJw==
+X-Gm-Message-State: AOAM533WAunaWyFkJyROrLTiaYJnQXfbCG7myVBZk8DhYvH4IhaCN7ve
+        /b26KvuLg3pHG/cCCEmZ56Zh0zoIRWs=
+X-Google-Smtp-Source: ABdhPJzonweq5dYvv3Hmq6kHR/xpDqKc1wJWZ6DuU5wFcA1lHqG8wEGPtzkZiqfBxBTQ/1rffOABUQ==
+X-Received: by 2002:a0c:ee25:: with SMTP id l5mr19982495qvs.5.1590508412775;
+        Tue, 26 May 2020 08:53:32 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-48-30.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.48.30])
+        by smtp.gmail.com with ESMTPSA id v1sm21344qkb.19.2020.05.26.08.53.32
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 26 May 2020 08:53:32 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1jdbtT-00012F-Km; Tue, 26 May 2020 12:53:31 -0300
+Date:   Tue, 26 May 2020 12:53:31 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, John Hubbard <jhubbard@nvidia.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, cai@lca.pw,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [PATCH v3 3/3] vfio-pci: Invalidate mmaps and block MMIO access
+ on disabled memory
+Message-ID: <20200526155331.GN744@ziepe.ca>
+References: <20200523235257.GC939059@xz-x1>
+ <20200525122607.GC744@ziepe.ca>
+ <20200525142806.GC1058657@xz-x1>
+ <20200525144651.GE744@ziepe.ca>
+ <20200525151142.GE1058657@xz-x1>
+ <20200525165637.GG744@ziepe.ca>
+ <3d9c1c8b-5278-1c4d-0e9c-e6f8fdb75853@nvidia.com>
+ <20200526003705.GK744@ziepe.ca>
+ <20200526134954.GA1125781@xz-x1>
+ <20200526083218.40402f01@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <20200526141605.GJ768009@lunn.ch>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200526083218.40402f01@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-Hi Andrew
-
-> How do you atomically get and display a group of statistics?
+On Tue, May 26, 2020 at 08:32:18AM -0600, Alex Williamson wrote:
+> > > Certainly there is no reason to optimize the fringe case of vfio
+> > > sleeping if there is and incorrect concurrnent attempt to disable the
+> > > a BAR.  
+> > 
+> > If fixup_user_fault() (which is always with ALLOW_RETRY && !RETRY_NOWAIT) is
+> > the only path for the new fault(), then current way seems ok.  Not sure whether
+> > this would worth a WARN_ON_ONCE(RETRY_NOWAIT) in the fault() to be clear of
+> > that fact.
 > 
-> If you look at how the netlink socket works, you will see code like:
+> Thanks for the discussion over the weekend folks.  Peter, I take it
+> you'd be satisfied if this patch were updated as:
 > 
->                  do {
->                          start = u64_stats_fetch_begin_irq(&cpu_stats->syncp);
->                          rx_packets = cpu_stats->rx_packets;
->                          rx_bytes = cpu_stats->rx_bytes;
-> 			....
->                  } while (u64_stats_fetch_retry_irq(&cpu_stats->syncp, start));
-> 
-> It will ensure that rx_packets and rx_bytes are consistent with each
-> other. If the value of the sequence counter changes while inside the
-> loop, the loop so repeated until it does not change.
-> 
-> In general, hardware counters in NICs are the same.  You tell it to
-> take a snapshot of the statistics counters, and then read them all
-> back, to give a consistent view across all the statistics.
-> 
-> I've not looked at this new code in detail, but it looks like you have
-> one file per statistic, and assume each statistic is independent of
-> every other statistic. This independence can limit how you use the
-> values, particularly when debugging. The netlink interface we use does
-> not have this limitation.
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index aabba6439a5b..35bd7cd4e268 100644
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1528,6 +1528,13 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+>  	struct vfio_pci_device *vdev = vma->vm_private_data;
+>  	vm_fault_t ret = VM_FAULT_NOPAGE;
+>  
+> +	/*
+> +	 * We don't expect to be called with NOWAIT and there are conflicting
+> +	 * opinions on whether NOWAIT suggests we shouldn't wait for locks or
+> +	 * just shouldn't wait for I/O.
+> +	 */
+> +	WARN_ON_ONCE(vmf->flags & FAULT_FLAG_RETRY_NOWAIT);
 
-You're right, statistics are treated independently so what you describe 
-is currently not supported.
+I don't think this is right, this implies there is some reason this
+code fails with FAULT_FLAG_RETRY_NOWAIT - but it is fine as written,
+AFAICT
 
-In KVM the utilization is more qualitative, so there isn't such problem.
-But as long as the interface is based on file access, the possibility of 
-snapshotting might not be useful; however, it could still be considered 
-to be added later together with the binary access.
-
-Jonathan, how is your metricfs handling this case?
-
-Thank you,
-Emanuele
-
+Jason
