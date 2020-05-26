@@ -2,153 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD50D1E2118
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 13:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD1791E2122
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 13:44:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731825AbgEZLmw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 07:42:52 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:60545 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728148AbgEZLmv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 07:42:51 -0400
+        id S2388926AbgEZLoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 07:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388510AbgEZLoh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 07:44:37 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD4EC03E97E;
+        Tue, 26 May 2020 04:44:37 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id u13so2824343wml.1;
+        Tue, 26 May 2020 04:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1590493371; x=1622029371;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=KEjAiSa+WOkQ6WGzU97fQPGqxmN27eW/zY/rZIJWqOU=;
-  b=szIeJgjxtNJwpDV+PlThFb5gHtySFVhCxfAV09cGx0twXRpX73n2ZLOq
-   csKcAcp/gJWEd08XeJkd1odx6C2myHrg/0nsRmRvOQ+BSS7KcNIAGUsmL
-   +1Iktqk6M2GTk5mP6zQq3qwbdbDfLr8BaBPlfLctrVCn13EPr2LLbj5sZ
-   U=;
-IronPort-SDR: sGY4wPEFRJdJ3Rx9HVKOkZi7xkWA5BtVegJtZem8fnWVPwzelFMoqaGo4eMS15Vqdsj/0JuW83
- w5PV68vIFxyQ==
-X-IronPort-AV: E=Sophos;i="5.73,437,1583193600"; 
-   d="scan'208";a="37665411"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-53356bf6.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 26 May 2020 11:42:49 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-53356bf6.us-west-2.amazon.com (Postfix) with ESMTPS id 92942A1C66;
-        Tue, 26 May 2020 11:42:48 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 26 May 2020 11:42:47 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.162.140) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 26 May 2020 11:42:43 +0000
-Subject: Re: [PATCH v3 07/18] nitro_enclaves: Init misc device providing the
- ioctl interface
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        Andra Paraschiv <andraprs@amazon.com>
-CC:     <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        "Martin Pohlack" <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-8-andraprs@amazon.com>
- <20200526065133.GD2580530@kroah.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <72647fa4-79d9-7754-9843-a254487703ea@amazon.de>
-Date:   Tue, 26 May 2020 13:42:41 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Tuci6Ki33qECsPRDTgQQcFkNzETOo6zqEjq9SgRJP20=;
+        b=jkoXQdoHdiuYV8cl7WE30oReSifwn9FQIyL7+JcLlJV/YBEyZrxS2TSHXtzq0Nifou
+         hqJy4r1LyRYWkFMqG0X5dtKA3xNU8ncoPiziNyS2KEgQXjNZFu759qg0nDNVqYaPblXb
+         8CYtPtmwfDUVOMS++bwfqFV1IkL5G4/Tl7aEdegP3gpYFn6RpgecG5f/Qb5OD/FP8Q+L
+         gYrNC8XbtDg5gFknnftU+tc5Lll2XKqvs29CE2ckppfy7phURSShsq6NlXVXB2q8R1CT
+         TzifCVof9EQh3xdyvDcHIFYgUkMwpuFRJFFoXwRjkEHsyMyCm/h9Oz9dGJFrFfc81Vhl
+         LLYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Tuci6Ki33qECsPRDTgQQcFkNzETOo6zqEjq9SgRJP20=;
+        b=qUEaLqYR29uGSZqFqoY9SVBWwxol86w9nmwS0vaahNd5IzYoUT5tldf5cL/SqsMttP
+         I0A+hQ/TXbp3UzUQTdR8Ktv10ZaBN/AEb/JStDQ6eDZvs0xqhiH83gdPHKbAV9/R13DO
+         +KIEthFkwXTnornb8/Q7AHIzNyviWdx0nc3oKmdiumG0BNtGRV9Jhas6+kfkqYhoHWId
+         u+FfgvJlPmS1Crl7/RYMVvIPQo2cUTtoqoS1uaFUhukLQ4agkjQ1cIAA2W6xm561+Emb
+         5gWulG+hK1uHt2Z3ch1wuZAVzyQmhVpUO2VUO8j2l4vYERCOO1U8p5vBljsrtgWHBAu7
+         GFUQ==
+X-Gm-Message-State: AOAM531+PBB4HIuL04ek90IpIe96Ac1QVFKHh61qbMubZnDDOEWrEZmq
+        Ea2T/xyGaZiCoWgh2YjbqPD2+3CT6v5rweaZyWE=
+X-Google-Smtp-Source: ABdhPJx5iKrhCguzpaHI4W8nHmnCBx58prhKRACDP+KrIpJI1NZrfLV/wozE1qdTpd41iUI+vjvCJSpnLW+4kCaWU44=
+X-Received: by 2002:a1c:46c3:: with SMTP id t186mr1025743wma.36.1590493475727;
+ Tue, 26 May 2020 04:44:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200526065133.GD2580530@kroah.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.140]
-X-ClientProxiedBy: EX13d09UWC004.ant.amazon.com (10.43.162.114) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
+References: <1590318819-24520-1-git-send-email-chenhc@lemote.com>
+ <CAHiYmc7sBuG8p2cZ_28UH8kSPpBLe5dj9fDWo45NZWLGcBvhpg@mail.gmail.com>
+ <CAAhV-H56E2LLHM-0UPLeR0vKDw=qJaRU9QYbxzNc=St_QK9oOA@mail.gmail.com> <CAHiYmc5m9if5fraMumTTikdO=xLit1w-_FK6pR9ejpYYrimvyQ@mail.gmail.com>
+In-Reply-To: <CAHiYmc5m9if5fraMumTTikdO=xLit1w-_FK6pR9ejpYYrimvyQ@mail.gmail.com>
+From:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date:   Tue, 26 May 2020 13:44:22 +0200
+Message-ID: <CAHiYmc7FzEQ-8L0W696AMThecB2UijLbfNbMi=DbYNp3Wt847g@mail.gmail.com>
+Subject: Re: [PATCH V8 00/15] KVM: MIPS: Add Loongson-3 support (Host Side)
+To:     Huacai Chen <chenhc@lemote.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        kvm <kvm@vger.kernel.org>,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+=D0=BF=D0=BE=D0=BD, 25. =D0=BC=D0=B0=D1=98 2020. =D1=83 08:37 Aleksandar Ma=
+rkovic
+<aleksandar.qemu.devel@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> =D0=BF=D0=BE=D0=BD, 25. =D0=BC=D0=B0=D1=98 2020. =D1=83 03:23 Huacai Chen=
+ <chenhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
+=BE/=D0=BB=D0=B0:
+> >
+> > Hi, Aleksandar,
+> >
+> > On Mon, May 25, 2020 at 8:26 AM Aleksandar Markovic
+> > <aleksandar.qemu.devel@gmail.com> wrote:
+> > >
+> > > > V7 -> V8:
+> > > > 1, Rebase to be applied on kvm tree, i.e., the linux-next branch of
+> > > >    https://git.kernel.org/pub/scm/virt/kvm/kvm.git/. Building KVM/M=
+IPS
+> > > >    need commit 3fbfb4585bfd4ff34e ("mips: define pud_index() regard=
+less
+> > > >    of page table folding"), which has already been in mips tree but=
+ not
+> > > >    in kvm tree.
+> > > >
+> > >
+> > > Huacai,
+> > >
+> > > I do support and salute the series (as I always did), as I see it as =
+a
+> > > giant step forward for KVM for MIPS.
+> > >
+> > > However, in general, I think any series should not depend on "pick
+> > > that patch from another tree", and should be a stand-alone unit that
+> > > yields to successful build and desired functionality. If there is a
+> > > dependency like you described, the patch in question, in my opinion,
+> > > should be integrated into the series in question. Git is even smart
+> > > enough that it recognizes the same patch has been applied before, so
+> > > integration of another tree would not be exposed to problems.
+> > >
+> > > From the point of view of synchronizing with QEMU part, and the timin=
+g
+> > > issues wrt kernel and QEMU releases, I want to stress that it is
+> > > better that this series is integrated sooner rather than later. In
+> > > other words, I think that potential Paolo's KVM pull request should
+> > > happen before Thomas' mips-next pull request (Paolo could include
+> > > "mips: define pud_index() regardless of page table folding", and
+> > > Thomas could simply omit it).
+> > >
+> > > But, that said, I don't feel I should impose my opinion to others
+> > > here. Take my statements just as advises. I defer the decision on how
+> > > to proceed with the integration of this series entirely to Paolo and
+> > > Thomas.
+> > I think I lack some experience of cross-subsystem development, so in
+> > V8 I only adjust the context of my own patches to let the series be
+> > applied on kvm tree, but didn't consider patches already in other
+> > trees (Moreover, that patch is not mine). So, should I send a V9 that
+> > take commit 3fbfb4585bfd4ff3 together?
+> >
+>
+> No, I think we should wait for Paolo's feedback.
+>
+
+Paolo, can you please give us some guidance on integration of this
+series, and on future workflow?
+
+Since, the reality is, you are the most experienced between us on
+these topics, so you know what is the optimal organization. I gather,
+it is very important for us in KVM/MIPS to adopt the efficient and
+no-nonsens practices, that you know how to choose the best.
+
+I truly appreciate any future response of yours!
+
+Aleksandar
 
 
-On 26.05.20 08:51, Greg KH wrote:
-> =
 
-> On Tue, May 26, 2020 at 01:13:23AM +0300, Andra Paraschiv wrote:
->> +#define NE "nitro_enclaves: "
-> =
-
-> Again, no need for this.
-> =
-
->> +#define NE_DEV_NAME "nitro_enclaves"
-> =
-
-> KBUILD_MODNAME?
-> =
-
->> +#define NE_IMAGE_LOAD_OFFSET (8 * 1024UL * 1024UL)
->> +
->> +static char *ne_cpus;
->> +module_param(ne_cpus, charp, 0644);
->> +MODULE_PARM_DESC(ne_cpus, "<cpu-list> - CPU pool used for Nitro Enclave=
-s");
-> =
-
-> Again, please do not do this.
-
-I actually asked her to put this one in specifically.
-
-The concept of this parameter is very similar to isolcpus=3D and maxcpus=3D =
-
-in that it takes CPUs away from Linux and instead donates them to the =
-
-underlying hypervisor, so that it can spawn enclaves using them.
-
- From an admin's point of view, this is a setting I would like to keep =
-
-persisted across reboots. How would this work with sysfs?
-
-> Can you get the other amazon.com developers on the cc: list to review
-> this before you send it out again?  I feel like I am doing basic review
-> of things that should be easily caught by them before you ask the
-> community to review your code.
-
-Again, my fault :). We did a good number of internal review rounds, but =
-
-I guess I didn't catch the bits you pointed out.
-
-So yes, let's give everyone in CC the change to review v3 properly first =
-
-before v4 goes out.
-
-> And get them to sign off on it too, showing they agree with the design
-> decisions here :)
-
-I would expect a Reviewed-by tag as a result from the above would =
-
-satisfy this? :)
-
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+> > Thanks,
+> > Huacai
+> > >
+> > > Yours,
+> > > Aleksandar
