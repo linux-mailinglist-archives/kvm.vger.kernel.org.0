@@ -2,99 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C7C51E287B
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 19:21:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7B281E2882
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 19:23:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389149AbgEZRU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 13:20:57 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:35254 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388061AbgEZRU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 13:20:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590513656; x=1622049656;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=SuRy4tavgBldQyqB1OdrVDKPEKHaP40bur786DRkLGI=;
-  b=aZP0WA1NcqTI3gMKPb38MdYdfgLVYs8QMEz0y4/NqEDQQne/gB5As9EC
-   F7Ok4GJVBxgXea+K97u9e1kfj6/qex/BUOxzanju11WxC06fNXsyYMn6N
-   8rKb3wNiVGnDlWeVx/JzYUaagJYQEaFhHRpddTi3Nv8yoEwVDgnTFj0qJ
-   8=;
-IronPort-SDR: vJG6PgGh8Agtr/CuoHTmeJWRy+SNtfwxtlp638MAvHfGQ/s7GwBIZURSgc22qGTliFuyV9idUM
- UjbtLEQAhalw==
-X-IronPort-AV: E=Sophos;i="5.73,437,1583193600"; 
-   d="scan'208";a="46057669"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 26 May 2020 17:20:54 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com (Postfix) with ESMTPS id 12FEEA2291;
-        Tue, 26 May 2020 17:20:54 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 26 May 2020 17:20:53 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 26 May 2020 17:20:43 +0000
-Subject: Re: [PATCH v3 03/18] nitro_enclaves: Define enclave info for internal
- bookkeeping
-To:     Greg KH <greg@kroah.com>
-CC:     <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        "Alexander Graf" <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-4-andraprs@amazon.com>
- <20200526064601.GB2580530@kroah.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <b5cc525a-aeea-74ec-06fc-e9992077ba65@amazon.com>
-Date:   Tue, 26 May 2020 20:20:38 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.1
+        id S2388896AbgEZRXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 13:23:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34437 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388740AbgEZRXO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 13:23:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590513792;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=PT+9sIc45kDpdRXOEm8Xg9MAFO/U8LI2utirVVEKJpA=;
+        b=UtbtMzCf/GlpWZvKAeIx2YBa/y6AOO88GH/AsSKC6al5qgINlkBYl2HhyU+YEv/eF3FUqN
+        d0kNPD+SbfEwDTn4q3GYdUwoPpPhixNtPnYmCscgm5+rrbuc4vjj2psxUOaqhQW1FlaYKR
+        NFEZBmM592Bpow2omBRwYgoJlrMY44A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-235-lZL-I7WRM1i5yn5yU8gw6w-1; Tue, 26 May 2020 13:23:11 -0400
+X-MC-Unique: lZL-I7WRM1i5yn5yU8gw6w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82845108BD0B;
+        Tue, 26 May 2020 17:23:09 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E5C321001B07;
+        Tue, 26 May 2020 17:23:08 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, mlevitsk@redhat.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [PATCH v2 00/28] KVM: nSVM: event fixes and migration support
+Date:   Tue, 26 May 2020 13:22:40 -0400
+Message-Id: <20200526172308.111575-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200526064601.GB2580530@kroah.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.90]
-X-ClientProxiedBy: EX13D41UWC001.ant.amazon.com (10.43.162.107) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyNi8wNS8yMDIwIDA5OjQ2LCBHcmVnIEtIIHdyb3RlOgo+IE9uIFR1ZSwgTWF5IDI2LCAy
-MDIwIGF0IDAxOjEzOjE5QU0gKzAzMDAsIEFuZHJhIFBhcmFzY2hpdiB3cm90ZToKPj4gKy8qIE5p
-dHJvIEVuY2xhdmVzIChORSkgbWlzYyBkZXZpY2UgKi8KPj4gK2V4dGVybiBzdHJ1Y3QgbWlzY2Rl
-dmljZSBuZV9taXNjZGV2aWNlOwo+IFdoeSBkb2VzIHlvdXIgbWlzYyBkZXZpY2UgbmVlZCB0byBi
-ZSBpbiBhIC5oIGZpbGU/Cj4KPiBIYXZpbmcgdGhlIHBhdGNoIHNlcmllcyBsaWtlIHRoaXMgKGFk
-ZCByYW5kb20gLmggZmlsZXMsIGFuZCB0aGVuIHN0YXJ0Cj4gdG8gdXNlIHRoZW0pLCBpcyBoYXJk
-IHRvIHJldmlldy4gIFdvdWxkIHlvdSB3YW50IHRvIHRyeSB0byByZXZpZXcgYQo+IHNlcmllcyB3
-cml0dGVuIGluIHRoaXMgd2F5PwoKVGhlIG1pc2MgZGV2aWNlIGlzIHJlZ2lzdGVyZWQgLyB1bnJl
-Z2lzdGVyZWQgd2hpbGUgaGF2aW5nIHRoZSBORSBQQ0kgCmRldmljZSBwcm9iZSAvIHJlbW92ZSwg
-YXMgYSBkZXBlbmRlbmN5IHRvIGFjdHVhbGx5IGhhdmluZyBhIFBDSSBkZXZpY2UgCndvcmtpbmcg
-dG8gZXhwb3NlIGEgbWlzYyBkZXZpY2UuCgpUaGUgd2F5IHRoZSBjb2RlYmFzZSBpcyBzcGxpdCBp
-biBmaWxlcyBpcyBtYWlubHkgdGhlIGlvY3RsIGxvZ2ljIC8gbWlzYyAKZGV2aWNlIGluIG9uZSBm
-aWxlIGFuZCB0aGUgUENJIGRldmljZSBsb2dpYyBpbiBhbm90aGVyIGZpbGU7IHRodXMgbm90IApo
-YXZlIGFsbCB0aGUgY29kZWJhc2UgaW4gYSBzaW5nbGUgYmlnIGZpbGUuIEdpdmVuIHRoZSBtaXNj
-IGRldmljZSAKKHVuKXJlZ2lzdGVyIGxvZ2ljIGFib3ZlLCB0aGUgbWlzYyBkZXZpY2UgbmVlZHMg
-dG8gYmUgYXZhaWxhYmxlIHRvIHRoZSAKUENJIGRldmljZSBzZXR1cCBsb2dpYy4KCkFuZHJhCgoK
-CgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBv
-ZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENv
-dW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlv
-biBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
+Compared to v1, this fixes some incorrect injections of VINTR that happen
+on kvm/queue while running nested guests, and it clarifies the code
+that handles INT_CTL.  The most important part here is the first three
+patches, which further cleanup event injection and remove another race
+between inject_pending_event and kvm_cpu_has_injectable_intr.
+
+Two other important patches are "KVM: nSVM: restore clobbered INT_CTL
+fields after clearing VINTR" and "KVM: nSVM: synthesize correct EXITINTINFO
+on vmexit", which fix various hangs that were happening with v1.
+
+Nested Hyper-V is still broken with these patches; the bug is only
+marginally related to event injection and the fix is simple, so it can
+go into 5.7.  And it's Vitaly who heroically debugged it, so I'll leave
+it to him to post it.
+
+Paolo
+
+Paolo Bonzini (28):
+  KVM: x86: track manually whether an event has been injected
+  KVM: x86: enable event window in inject_pending_event
+  KVM: nSVM: inject exceptions via svm_check_nested_events
+  KVM: nSVM: remove exit_required
+  KVM: nSVM: correctly inject INIT vmexits
+  KVM: SVM: always update CR3 in VMCB
+  KVM: nVMX: always update CR3 in VMCS
+  KVM: nSVM: move map argument out of enter_svm_guest_mode
+  KVM: nSVM: extract load_nested_vmcb_control
+  KVM: nSVM: extract preparation of VMCB for nested run
+  KVM: nSVM: move MMU setup to nested_prepare_vmcb_control
+  KVM: nSVM: clean up tsc_offset update
+  KVM: nSVM: pass vmcb_control_area to copy_vmcb_control_area
+  KVM: nSVM: remove trailing padding for struct vmcb_control_area
+  KVM: nSVM: save all control fields in svm->nested
+  KVM: nSVM: restore clobbered INT_CTL fields after clearing VINTR
+  KVM: nSVM: synchronize VMCB controls updated by the processor on every
+    vmexit
+  KVM: nSVM: remove unnecessary if
+  KVM: nSVM: extract svm_set_gif
+  KVM: SVM: preserve VGIF across VMCB switch
+  KVM: nSVM: synthesize correct EXITINTINFO on vmexit
+  KVM: nSVM: remove HF_VINTR_MASK
+  KVM: nSVM: remove HF_HIF_MASK
+  KVM: nSVM: split nested_vmcb_check_controls
+  KVM: nSVM: leave guest mode when clearing EFER.SVME
+  KVM: MMU: pass arbitrary CR0/CR4/EFER to kvm_init_shadow_mmu
+  selftests: kvm: add a SVM version of state-test
+  KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE
+
+ arch/x86/include/asm/kvm_host.h               |  12 +-
+ arch/x86/include/asm/svm.h                    |   9 +-
+ arch/x86/include/uapi/asm/kvm.h               |  17 +-
+ arch/x86/kvm/cpuid.h                          |   5 +
+ arch/x86/kvm/irq.c                            |   1 +
+ arch/x86/kvm/mmu.h                            |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        |  14 +-
+ arch/x86/kvm/svm/nested.c                     | 624 ++++++++++++------
+ arch/x86/kvm/svm/svm.c                        | 154 ++---
+ arch/x86/kvm/svm/svm.h                        |  33 +-
+ arch/x86/kvm/vmx/nested.c                     |   5 -
+ arch/x86/kvm/vmx/vmx.c                        |  25 +-
+ arch/x86/kvm/x86.c                            | 141 ++--
+ .../testing/selftests/kvm/x86_64/state_test.c |  69 +-
+ 14 files changed, 687 insertions(+), 424 deletions(-)
+
+-- 
+2.26.2
 
