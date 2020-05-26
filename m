@@ -2,76 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E0851E1F2D
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 11:55:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 615CA1E1F67
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 12:10:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731735AbgEZJzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 05:55:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21560 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728746AbgEZJzu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 05:55:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590486949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+cQApP9aKEI0EAEIJXWQWFCwQQofjUokxLamDjDh03I=;
-        b=YnKRHgiyDLT7LfC9MAvJie8NceUM5ubHmFqQgXlhnmLexfvAMTHqx1SXB3p4Ay6h4UEG5G
-        38EA/MvuUlpufAmFBshmmeB5sLCqe6TiuMK+TMt+cwis2YFgIxplytRhQfo6kBd72jGqjw
-        EUaHpi1vtcyGyeQjEAPI6rZlqCdw+rM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-9HbLNGWxPI6ox2gEn9O8Vg-1; Tue, 26 May 2020 05:55:46 -0400
-X-MC-Unique: 9HbLNGWxPI6ox2gEn9O8Vg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AB651800D42;
-        Tue, 26 May 2020 09:55:45 +0000 (UTC)
-Received: from gondolin (ovpn-113-77.ams2.redhat.com [10.36.113.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D4D3110013D5;
-        Tue, 26 May 2020 09:55:43 +0000 (UTC)
-Date:   Tue, 26 May 2020 11:55:41 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Jared Rossi <jrossi@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v2 0/4] vfio-ccw: Fix interrupt handling for
- HALT/CLEAR
-Message-ID: <20200526115541.4a11accc.cohuck@redhat.com>
-In-Reply-To: <20200513142934.28788-1-farman@linux.ibm.com>
-References: <20200513142934.28788-1-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1731872AbgEZKK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 06:10:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:48548 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731716AbgEZKK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 06:10:27 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F6941FB;
+        Tue, 26 May 2020 03:10:26 -0700 (PDT)
+Received: from bogus (unknown [10.37.8.209])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 56E413F52E;
+        Tue, 26 May 2020 03:10:22 -0700 (PDT)
+Date:   Tue, 26 May 2020 11:10:19 +0100
+From:   Sudeep Holla <sudeep.holla@arm.com>
+To:     Jianyong Wu <Jianyong.Wu@arm.com>
+Cc:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>,
+        Steven Price <Steven.Price@arm.com>,
+        Justin He <Justin.He@arm.com>, Wei Chen <Wei.Chen@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Kaly Xin <Kaly.Xin@arm.com>, nd <nd@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [RFC PATCH v12 03/11] psci: export smccc conduit get helper.
+Message-ID: <20200526101019.GB11414@bogus>
+References: <20200522083724.38182-1-jianyong.wu@arm.com>
+ <20200522083724.38182-4-jianyong.wu@arm.com>
+ <20200522131206.GA15171@bogus>
+ <HE1PR0802MB255537CD21C5E7F7F4A899A2F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <HE1PR0802MB255537CD21C5E7F7F4A899A2F4B30@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 May 2020 16:29:30 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> There was some suggestion earlier about locking the FSM, but I'm not
-> seeing any problems with that. Rather, what I'm noticing is that the
-> flow between a synchronous START and asynchronous HALT/CLEAR have
-> different impacts on the FSM state. Consider:
+On Mon, May 25, 2020 at 01:37:56AM +0000, Jianyong Wu wrote:
+> Hi Sudeep,
 > 
->     CPU 1                           CPU 2
+> > -----Original Message-----
+> > From: Sudeep Holla <sudeep.holla@arm.com>
+> > Sent: Friday, May 22, 2020 9:12 PM
+> > To: Jianyong Wu <Jianyong.Wu@arm.com>
+> > Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> > tglx@linutronix.de; pbonzini@redhat.com; sean.j.christopherson@intel.com;
+> > maz@kernel.org; richardcochran@gmail.com; Mark Rutland
+> > <Mark.Rutland@arm.com>; will@kernel.org; Suzuki Poulose
+> > <Suzuki.Poulose@arm.com>; Steven Price <Steven.Price@arm.com>; Justin
+> > He <Justin.He@arm.com>; Wei Chen <Wei.Chen@arm.com>;
+> > kvm@vger.kernel.org; Steve Capper <Steve.Capper@arm.com>; linux-
+> > kernel@vger.kernel.org; Kaly Xin <Kaly.Xin@arm.com>; nd <nd@arm.com>;
+> > Sudeep Holla <Sudeep.Holla@arm.com>; kvmarm@lists.cs.columbia.edu;
+> > linux-arm-kernel@lists.infradead.org
+> > Subject: Re: [RFC PATCH v12 03/11] psci: export smccc conduit get helper.
+> > 
+> > On Fri, May 22, 2020 at 04:37:16PM +0800, Jianyong Wu wrote:
+> > > Export arm_smccc_1_1_get_conduit then modules can use smccc helper
+> > > which adopts it.
+> > >
+> > > Acked-by: Mark Rutland <mark.rutland@arm.com>
+> > > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> > > ---
+> > >  drivers/firmware/psci/psci.c | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/drivers/firmware/psci/psci.c
+> > > b/drivers/firmware/psci/psci.c index 2937d44b5df4..fd3c88f21b6a 100644
+> > > --- a/drivers/firmware/psci/psci.c
+> > > +++ b/drivers/firmware/psci/psci.c
+> > > @@ -64,6 +64,7 @@ enum arm_smccc_conduit
+> > > arm_smccc_1_1_get_conduit(void)
+> > >
+> > >  	return psci_ops.conduit;
+> > >  }
+> > > +EXPORT_SYMBOL(arm_smccc_1_1_get_conduit);
+> > >
+> > 
+> > I have moved this into drivers/firmware/smccc/smccc.c [1] Please update
+> > this accordingly.
 > 
->     SSCH (set state=CP_PENDING)
->     INTERRUPT (set state=IDLE)
->     CSCH (no change in state)
->                                     SSCH (set state=CP_PENDING)
->     INTERRUPT (set state=IDLE)
->                                     INTERRUPT (set state=IDLE)
+> Ok, I will remove this patch next version.
 
-A different question (not related to how we want to fix this): How
-easily can you trigger this bug? Is this during normal testing with a
-bit of I/O stress, or do you have a special test case?
+You may need it still, just that this patch won't apply as the function
+is moved to a new file.
 
+-- 
+Regards,
+Sudeep
