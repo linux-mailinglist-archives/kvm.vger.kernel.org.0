@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD1681E31F1
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 00:02:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 520291E31F8
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 00:04:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391771AbgEZWCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 18:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32950 "EHLO
+        id S2390956AbgEZWEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 18:04:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391342AbgEZWB5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 18:01:57 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9EEC03E96D
-        for <kvm@vger.kernel.org>; Tue, 26 May 2020 15:01:56 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id z6so26430956ljm.13
-        for <kvm@vger.kernel.org>; Tue, 26 May 2020 15:01:56 -0700 (PDT)
+        with ESMTP id S2389257AbgEZWEY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 18:04:24 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BCF0C03E96D
+        for <kvm@vger.kernel.org>; Tue, 26 May 2020 15:04:24 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id b6so26499909ljj.1
+        for <kvm@vger.kernel.org>; Tue, 26 May 2020 15:04:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=qag45C4jUwpmbt3GI6yD8VqouXjmVOjCWEB+Fx5ejgk=;
-        b=q55Stn1jyAS3ook2XuAjV3C7ys7h/UH0Bdx0mqbz3n/sefDwW58i2H5R6IxeleSN9h
-         ZyZtwrVOn8VcG206QOLk0EDadrDLSqPA6uFwLQMO/Eaumx2FOX8E93UNcryBanjKMezH
-         +1m+GF9eksL+eft3c9Xu8vKhCNWAZe8x8W7pDdh/r4qYoPf9/6hAYUwUuwOelmvytpbR
-         fTAVEDv2yxlKqnpN4nboyBngLxM4i4+KkyG1sk0w9Wor8begjAI4yLnWcbVUkcebm9Iv
-         Vg6oRcH8tpr6ce+ZU4WJZNL+CCVH926moZYffjZU+MzGVHkiLKV7uc6uJOdItvLaaUmg
-         oqog==
+        bh=EcBNTwy79MX3yH1H5a4QAnADWJ5Ti4Rl/SXJla0EyZ4=;
+        b=1VIxdJkHliis/HUn7kq316YUDLh4+Gax6mufwNHGCFT1G4llvRD+JlR+C1zPJAUgFn
+         Y84KKy5/naQ5pKU3rWyaP7bZBhhJg81lOYBD/edIYJjVlLOgu2R9SsPmTssYF4cpFHi1
+         9yOuSit53nlS4vB+++Wb0879nmskyRucpXpsLKqnrBUJJ5mPGoHHNokeqdqWBylfiAmX
+         svt6pUDPxlaBmafb7m7UTqFuO2amHz/cfyBELkKjWTb424FLyK5d4AQ/py2ymUcKXB7p
+         axMfzMjEc7Cnemv54hNJtEM2IhdI+1ev3f4755+YRqXZqFgdSAJ8hZIqLpeUpZ/z00GL
+         VNoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=qag45C4jUwpmbt3GI6yD8VqouXjmVOjCWEB+Fx5ejgk=;
-        b=ix4xzbgqUN3oPfgT9Dq8coLt3Dtfk8bsQcf4tSqDaUNmWHuv8p1s7DiYQNifFBUz0x
-         CahyGfJ4n8jUHCgotJJucTBOyzaKFSd25ntb3ma/pgKDEClKdo6Ff2Meo9G9Ut/Fk4ts
-         P1k/7FG+ryx9uMO2EbFX4lAJoDociEAxuh6uLGEVBEOUqEbhwD7mFQyPm7WnHmleOgge
-         pLRQSt6ergEZqQNg6DZ9G6EwTJULYXzVJFoO2UCWMdhpU0+ll38k9s3g6EPwWov6XFO+
-         5HhDWfOMukGjRz924IJXkAsprFp1JP7TyXlGaxEXHzWxmvgz2oLre2ZcbNA+ukg5kfhI
-         Rl9A==
-X-Gm-Message-State: AOAM530FvpySPd+OK/nu3xOcj/7h1rTrtD/oBy3ZT9qisvWw0uxbcj8/
-        J6FreRVym/cjWvHWVOCFrf2hjQ==
-X-Google-Smtp-Source: ABdhPJyYP9bBnWpXhfnB+k7sBQ1h7ulh57l600zRR2fE+qbCiK3i+MThs6w+YABeGChhe0iesQxifA==
-X-Received: by 2002:a2e:a58a:: with SMTP id m10mr1475050ljp.346.1590530514418;
-        Tue, 26 May 2020 15:01:54 -0700 (PDT)
+        bh=EcBNTwy79MX3yH1H5a4QAnADWJ5Ti4Rl/SXJla0EyZ4=;
+        b=nm/FzA9DUGWzfAzyW3YyE57Jw5tdGXhYqGFEp+MnOYUtLtErQE6kCwJX/eZ71+PXO4
+         RLoOrgDv65MkjyFBmJN7NLVAYeAlTyybCUXMcSrhtVuNrHuRE5e1yBv6k6x85TFZl3cJ
+         yvSGMhanwcVe9HyBxGZvYdAXsTMLHm4n3dqNg+ZaME1KRlgjISdO0nw2DbeiwlkgJdWE
+         8EscitXDpvAweBowO0VfBfNohCOzozJ8GbEtXc1wm9Iwme/RN1QRLqkhTW0k16tAXgL9
+         eRBpbbJwxNi+H62RdB6Xw8o+3wzgGxZftu7Zfn1DH3yqrudF+NX8FLEX+kQJW/RD3391
+         mKJg==
+X-Gm-Message-State: AOAM530IrHNRNp4swnU+bHb9F+sEuAgPGciNwyMVEeLQYjQvBY/etoR4
+        Me+jQKorp7C4q+JmOa0dqbtyfA==
+X-Google-Smtp-Source: ABdhPJx/pPxw53uxkq/nACPPwgXrmklmvJLs476FN9UQPOs4ivnqS7VxKZiRHA/3M8deVkMGW7Fcqw==
+X-Received: by 2002:a2e:3202:: with SMTP id y2mr1622059ljy.155.1590530662543;
+        Tue, 26 May 2020 15:04:22 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id f9sm253876ljf.99.2020.05.26.15.01.53
+        by smtp.gmail.com with ESMTPSA id 1sm269029lft.95.2020.05.26.15.04.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 May 2020 15:01:53 -0700 (PDT)
+        Tue, 26 May 2020 15:04:21 -0700 (PDT)
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 9B97F10230F; Wed, 27 May 2020 01:01:55 +0300 (+03)
-Date:   Wed, 27 May 2020 01:01:55 +0300
+        id 9594410230F; Wed, 27 May 2020 01:04:23 +0300 (+03)
+Date:   Wed, 27 May 2020 01:04:23 +0300
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Mike Rapoport <rppt@kernel.org>
+To:     John Hubbard <jhubbard@nvidia.com>
 Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -71,73 +71,31 @@ Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Subject: Re: [RFC 07/16] KVM: mm: Introduce VM_KVM_PROTECTED
-Message-ID: <20200526220155.34xmakrh7ipqynht@box>
+Message-ID: <20200526220423.7gkyam4tp67gdvp5@box>
 References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
  <20200522125214.31348-8-kirill.shutemov@linux.intel.com>
- <20200526061552.GD13247@kernel.org>
+ <29a1d089-ab37-321c-0a01-11801a16a742@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200526061552.GD13247@kernel.org>
+In-Reply-To: <29a1d089-ab37-321c-0a01-11801a16a742@nvidia.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 26, 2020 at 09:15:52AM +0300, Mike Rapoport wrote:
-> On Fri, May 22, 2020 at 03:52:05PM +0300, Kirill A. Shutemov wrote:
-> > The new VMA flag that indicate a VMA that is not accessible to userspace
-> > but usable by kernel with GUP if FOLL_KVM is specified.
-> > 
-> > The FOLL_KVM is only used in the KVM code. The code has to know how to
-> > deal with such pages.
-> > 
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> > ---
-> >  include/linux/mm.h  |  8 ++++++++
-> >  mm/gup.c            | 20 ++++++++++++++++----
-> >  mm/huge_memory.c    | 20 ++++++++++++++++----
-> >  mm/memory.c         |  3 +++
-> >  mm/mmap.c           |  3 +++
-> >  virt/kvm/async_pf.c |  4 ++--
-> >  virt/kvm/kvm_main.c |  9 +++++----
-> >  7 files changed, 53 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index e1882eec1752..4f7195365cc0 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -329,6 +329,8 @@ extern unsigned int kobjsize(const void *objp);
-> >  # define VM_MAPPED_COPY	VM_ARCH_1	/* T if mapped copy of data (nommu mmap) */
-> >  #endif
-> >  
-> > +#define VM_KVM_PROTECTED 0
+On Mon, May 25, 2020 at 11:40:01PM -0700, John Hubbard wrote:
+> On 2020-05-22 05:52, Kirill A. Shutemov wrote:
+> ...
+> > @@ -2773,6 +2780,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+> >   #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below */
+> >   #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
+> >   #define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
+> > +#define FOLL_KVM	0x80000 /* access to VM_KVM_PROTECTED VMAs */
 > 
-> With all the ideas about removing pages from the direct mapi floating
-> around I wouldn't limit this to KVM.
-> 
-> VM_NOT_IN_DIRECT_MAP would describe such areas better, but I realise
-> it's very far from perfect and nothing better does not comes to mind :)
+> I grabbed 0x80000 already, for FOLL_FAST_ONLY. :)
 
-I don't like VM_NOT_IN_DIRECT_MAP.
-
-It's not only about direct mapping, but about userspace mapping as well.
-For the same reason other naming proposals don't fit as well.
-
-> > diff --git a/mm/mmap.c b/mm/mmap.c
-> > index f609e9ec4a25..d56c3f6efc99 100644
-> > --- a/mm/mmap.c
-> > +++ b/mm/mmap.c
-> > @@ -112,6 +112,9 @@ pgprot_t vm_get_page_prot(unsigned long vm_flags)
-> >  				(VM_READ|VM_WRITE|VM_EXEC|VM_SHARED)]) |
-> >  			pgprot_val(arch_vm_get_page_prot(vm_flags)));
-> >  
-> > +	if (vm_flags & VM_KVM_PROTECTED)
-> > +		ret = PAGE_NONE;
-> 
-> Nit: vma_is_kvm_protected()?
-
-Which VMA? :P
+Let's see who getting upstream first :P (Spoiler: you)
 
 -- 
  Kirill A. Shutemov
