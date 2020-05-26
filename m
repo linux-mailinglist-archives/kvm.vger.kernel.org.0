@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFEBF1E28C7
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 19:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B58181E28AE
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 19:25:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388974AbgEZRZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 13:25:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30157 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2388967AbgEZRXR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 13:23:17 -0400
+        id S2389128AbgEZRXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 13:23:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45270 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388979AbgEZRXS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 13:23:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1590513796;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ulAk7D9K90ziZEa7pahAMfwIfO9l0RLz4413qge8DP0=;
-        b=Yfl024QV1o+H/5gW9eYIsNw6olpDvv9YLqWbRqYTaTBDSM3JF7kiM50JzZAN9SGbJkzqNv
-        XcEg3PdHotKcUnC8MkVLpvSXQrWHS4K7pv3ToWBM2v5Bp+NpE7mpO9kXinlvPe5Q76ROKB
-        uPr8LrPX6jskT/SV2aAuIy398vKKCMI=
+        bh=HyUo5osn8O60giU9X+BI43bKXabBUWmHM+tPt7Ss3Cs=;
+        b=BQFZW3GbIvAdbthhyuuc8oy7PJiZe1hrVpiOb871z4VlQJ618ELZvKzxPudHu1ch4fKYqC
+        8TJ1U5kpoWfJfP7PLTbqhrZOu4gJhhVjCBxX32rbhQk4oBQESM1KnFWikU9q1dVCUsz8np
+        QCWzTAvDjGk0MfGBOFzzltB8Id3LQtk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-t4OT0t03PGCtSw_HkZpiNg-1; Tue, 26 May 2020 13:23:14 -0400
-X-MC-Unique: t4OT0t03PGCtSw_HkZpiNg-1
+ us-mta-310-yT8TsOWuOcOqxk2CWRgDYA-1; Tue, 26 May 2020 13:23:14 -0400
+X-MC-Unique: yT8TsOWuOcOqxk2CWRgDYA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03FF78015D2;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A940C107ACF6;
         Tue, 26 May 2020 17:23:13 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F83010013DB;
-        Tue, 26 May 2020 17:23:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2076E10013DB;
+        Tue, 26 May 2020 17:23:13 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     vkuznets@redhat.com, mlevitsk@redhat.com,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>
-Subject: [PATCH 05/28] KVM: nSVM: correctly inject INIT vmexits
-Date:   Tue, 26 May 2020 13:22:45 -0400
-Message-Id: <20200526172308.111575-6-pbonzini@redhat.com>
+Subject: [PATCH 06/28] KVM: SVM: always update CR3 in VMCB
+Date:   Tue, 26 May 2020 13:22:46 -0400
+Message-Id: <20200526172308.111575-7-pbonzini@redhat.com>
 In-Reply-To: <20200526172308.111575-1-pbonzini@redhat.com>
 References: <20200526172308.111575-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -51,64 +51,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The usual drill at this point, except there is no code to remove because this
-case was not handled at all.
+svm_load_mmu_pgd is delaying the write of GUEST_CR3 to prepare_vmcs02 as
+an optimization, but this is only correct before the nested vmentry.
+If userspace is modifying CR3 with KVM_SET_SREGS after the VM has
+already been put in guest mode, the value of CR3 will not be updated.
+Remove the optimization, which almost never triggers anyway.
+This was was added in commit 689f3bf21628 ("KVM: x86: unify callbacks
+to load paging root", 2020-03-16) just to keep the two vendor-specific
+modules closer, but we'll fix VMX too.
 
+Fixes: 689f3bf21628 ("KVM: x86: unify callbacks to load paging root")
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ arch/x86/kvm/svm/nested.c |  6 +-----
+ arch/x86/kvm/svm/svm.c    | 16 +++++-----------
+ 2 files changed, 6 insertions(+), 16 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index bbf991cfe24b..166b88fc9509 100644
+index 166b88fc9509..81e0fbd5e267 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -25,6 +25,7 @@
- #include "trace.h"
- #include "mmu.h"
- #include "x86.h"
-+#include "lapic.h"
- #include "svm.h"
+@@ -256,11 +256,7 @@ void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
+ 	svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
+ 	svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
+ 	svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
+-	if (npt_enabled) {
+-		svm->vmcb->save.cr3 = nested_vmcb->save.cr3;
+-		svm->vcpu.arch.cr3 = nested_vmcb->save.cr3;
+-	} else
+-		(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
++	(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
  
- static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
-@@ -788,11 +789,37 @@ static void nested_svm_intr(struct vcpu_svm *svm)
- 	nested_svm_vmexit(svm);
- }
- 
-+static inline bool nested_exit_on_init(struct vcpu_svm *svm)
-+{
-+	return (svm->nested.intercept & (1ULL << INTERCEPT_INIT));
-+}
-+
-+static void nested_svm_init(struct vcpu_svm *svm)
-+{
-+	svm->vmcb->control.exit_code   = SVM_EXIT_INIT;
-+	svm->vmcb->control.exit_info_1 = 0;
-+	svm->vmcb->control.exit_info_2 = 0;
-+
-+	nested_svm_vmexit(svm);
-+}
-+
-+
- static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+ 	/* Guest paging mode is active - reset mmu */
+ 	kvm_mmu_reset_context(&svm->vcpu);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 270061fa6cfa..abe277a3216b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3447,7 +3447,6 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root)
  {
  	struct vcpu_svm *svm = to_svm(vcpu);
- 	bool block_nested_events =
- 		kvm_event_needs_reinjection(vcpu) || svm->nested.nested_run_pending;
-+	struct kvm_lapic *apic = vcpu->arch.apic;
-+
-+	if (lapic_in_kernel(vcpu) &&
-+	    test_bit(KVM_APIC_INIT, &apic->pending_events)) {
-+		if (block_nested_events)
-+			return -EBUSY;
-+		if (!nested_exit_on_init(svm))
-+			return 0;
-+		nested_svm_init(svm);
-+		return 0;
-+	}
+-	bool update_guest_cr3 = true;
+ 	unsigned long cr3;
  
- 	if (vcpu->arch.exception.pending) {
- 		if (block_nested_events)
+ 	cr3 = __sme_set(root);
+@@ -3456,18 +3455,13 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root)
+ 		mark_dirty(svm->vmcb, VMCB_NPT);
+ 
+ 		/* Loading L2's CR3 is handled by enter_svm_guest_mode.  */
+-		if (is_guest_mode(vcpu))
+-			update_guest_cr3 = false;
+-		else if (test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
+-			cr3 = vcpu->arch.cr3;
+-		else /* CR3 is already up-to-date.  */
+-			update_guest_cr3 = false;
++		if (!test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
++			return;
++		cr3 = vcpu->arch.cr3;
+ 	}
+ 
+-	if (update_guest_cr3) {
+-		svm->vmcb->save.cr3 = cr3;
+-		mark_dirty(svm->vmcb, VMCB_CR);
+-	}
++	svm->vmcb->save.cr3 = cr3;
++	mark_dirty(svm->vmcb, VMCB_CR);
+ }
+ 
+ static int is_disabled(void)
 -- 
 2.26.2
 
