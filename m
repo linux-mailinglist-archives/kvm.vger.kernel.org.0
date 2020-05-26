@@ -2,154 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 651391E2704
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 18:30:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 206501E2702
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 18:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388663AbgEZQaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 12:30:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42301 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2388659AbgEZQaT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 12:30:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590510618;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PFH+lO6ohBLSBU7ZKmdmDibYJAoqrjA+Qt35whMPcWw=;
-        b=EUZkshHKix5V8A8TVgiiQyEAnHam7R4/CUwI58JY22zn6URz62Cn6672aS2ryHSnZjb6kv
-        HfPtsZX6syJfbArFlF9uS28jtT4/EsgIAJID4eWMku+1pusGcRDqdbOBNLaB8lLWYXb4Ek
-        NGRihovDRBqHP5tWWnnm025cr7IGPk4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-gsgQ_yY5Oge-dN8-dIAyXQ-1; Tue, 26 May 2020 12:30:15 -0400
-X-MC-Unique: gsgQ_yY5Oge-dN8-dIAyXQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CAEC8018A7;
-        Tue, 26 May 2020 16:30:14 +0000 (UTC)
-Received: from gondolin (ovpn-113-77.ams2.redhat.com [10.36.113.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 225B95C1BB;
-        Tue, 26 May 2020 16:30:09 +0000 (UTC)
-Date:   Tue, 26 May 2020 18:30:05 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v7 07/12] s390x: Library resources for
- CSS tests
-Message-ID: <20200526183005.76fc9124.cohuck@redhat.com>
-In-Reply-To: <1589818051-20549-8-git-send-email-pmorel@linux.ibm.com>
-References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
-        <1589818051-20549-8-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S2388651AbgEZQaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 12:30:15 -0400
+Received: from foss.arm.com ([217.140.110.172]:53364 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388612AbgEZQaO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 12:30:14 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7189330E;
+        Tue, 26 May 2020 09:30:14 -0700 (PDT)
+Received: from [192.168.0.14] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C27C33F52E;
+        Tue, 26 May 2020 09:30:11 -0700 (PDT)
+From:   James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 22/26] KVM: arm64: Disintegrate SPSR array
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-23-maz@kernel.org>
+Message-ID: <24debc78-9de6-ac97-afbc-dbe366164e5e@arm.com>
+Date:   Tue, 26 May 2020 17:30:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200422120050.3693593-23-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 May 2020 18:07:26 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Hi Marc,
 
-> Provide some definitions and library routines that can be used by
-> tests targeting the channel subsystem.
-> 
-> Debug function can be activated by defining DEBUG_CSS before the
-> inclusion of the css.h header file.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/css.h      | 259 +++++++++++++++++++++++++++++++++++++++++++
->  lib/s390x/css_dump.c | 157 ++++++++++++++++++++++++++
->  s390x/Makefile       |   1 +
->  3 files changed, 417 insertions(+)
->  create mode 100644 lib/s390x/css.h
->  create mode 100644 lib/s390x/css_dump.c
-> 
+On 22/04/2020 13:00, Marc Zyngier wrote:
+> As we're about to move SPSR_EL1 into the VNCR page, we need to
+> disassociate it from the rest of the 32bit cruft. Let's break
+> the array into individual fields.
 
-(...)
+Reviewed-by: James Morse <james.morse@arm.com>
 
-> +struct ccw1 {
-> +	unsigned char code;
-> +	unsigned char flags;
-> +	unsigned short count;
 
-I'm wondering why you're using unsigned {char,short} here, instead of
-the uint*_t types everywhere else? It's not wrong, but probably better
-to be consistent?
+Thanks,
 
-> +	uint32_t data_address;
-> +} __attribute__ ((aligned(4)));
-> +
-> +#define SID_ONE		0x00010000
-> +
-
-I think it would be beneficial for the names to somewhat match the
-naming in Linux and/or QEMU -- or more speaking names (as you do for
-some), which is also good.
-
-> +#define ORB_M_KEY	0xf0000000
-> +#define ORB_F_SUSPEND	0x08000000
-> +#define ORB_F_STREAMING	0x04000000
-> +#define ORB_F_MODIFCTRL	0x02000000
-> +#define ORB_F_SYNC	0x01000000
-> +#define ORB_F_FORMAT	0x00800000
-> +#define ORB_F_PREFETCH	0x00400000
-> +#define ORB_F_INIT_IRQ	0x00200000
-
-ORB_F_ISIC? (As it does not refer to 'initialization', but 'initial'.)
-
-> +#define ORB_F_ADDRLIMIT	0x00100000
-> +#define ORB_F_SUSP_IRQ	0x00080000
-
-ORB_F_SSIC? (As it deals with suppression.)
-
-> +#define ORB_F_TRANSPORT	0x00040000
-> +#define ORB_F_IDAW2	0x00020000
-
-ORB_F_IDAW_FMT2?
-
-Or following Linux/QEMU, use ORB_F_C64 for a certain retro appeal :)
-
-> +#define ORB_F_IDAW_2K	0x00010000
-> +#define ORB_M_LPM	0x0000ff00
-> +#define ORB_F_LPM_DFLT	0x00008000
-
-That's a default lpm of 0x80, right? It's a bit buried between the orb
-definitions, and it also seems to be more of a implementation choice --
-move it out from the flags here?
-
-> +#define ORB_F_ILSM	0x00000080
-
-ORB_F_ILS?
-
-> +#define ORB_F_CCW_IND	0x00000040
-
-ORB_F_MIDAW? I had a hard time figuring out that one :)
-
-> +#define ORB_F_ORB_EXT	0x00000001
-
-(...)
-
-> +/*
-> + * Try o have a more human representation of the PMCW flags
-
-s/o/to/
-
-> + * each letter in the string represent the first
-
-s/represent/represents/
-
-> + * letter of the associated bit in the flag fields.
-> + */
-
-(...)
-
-Generally, looks good to me.
-
+James
