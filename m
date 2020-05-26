@@ -2,105 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 249E11E1EB1
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 11:36:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E0851E1F2D
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 11:55:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728750AbgEZJgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 05:36:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30416 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728746AbgEZJgh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 May 2020 05:36:37 -0400
+        id S1731735AbgEZJzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 05:55:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21560 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728746AbgEZJzu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 05:55:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590485796;
+        s=mimecast20190719; t=1590486949;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=N9CrJGv37BpytimFY2SmZJooBun68CG0VTdXjYuGNU0=;
-        b=PWR7Cth9u07JrBgfSp56LV8VnaHP7N0mMke59WoSm7H16g3T8NJJlZgJcVELktaM9iIpmQ
-        gInkGf/Pi55RaK6Oxy3TK4cdcwc2rf7QzfXtUM30Y3ee6jAMjG2Z2VpGnuOFiO4aMs3dmG
-        SYWoMWDt5iOks2ltqcL55g8xKO6g5lo=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+cQApP9aKEI0EAEIJXWQWFCwQQofjUokxLamDjDh03I=;
+        b=YnKRHgiyDLT7LfC9MAvJie8NceUM5ubHmFqQgXlhnmLexfvAMTHqx1SXB3p4Ay6h4UEG5G
+        38EA/MvuUlpufAmFBshmmeB5sLCqe6TiuMK+TMt+cwis2YFgIxplytRhQfo6kBd72jGqjw
+        EUaHpi1vtcyGyeQjEAPI6rZlqCdw+rM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-LiCUBOrPOJ2m6HPSepfNzQ-1; Tue, 26 May 2020 05:36:34 -0400
-X-MC-Unique: LiCUBOrPOJ2m6HPSepfNzQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-206-9HbLNGWxPI6ox2gEn9O8Vg-1; Tue, 26 May 2020 05:55:46 -0400
+X-MC-Unique: 9HbLNGWxPI6ox2gEn9O8Vg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46F80100A8F2;
-        Tue, 26 May 2020 09:36:33 +0000 (UTC)
-Received: from localhost (ovpn-113-77.ams2.redhat.com [10.36.113.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D96596EF8C;
-        Tue, 26 May 2020 09:36:32 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AB651800D42;
+        Tue, 26 May 2020 09:55:45 +0000 (UTC)
+Received: from gondolin (ovpn-113-77.ams2.redhat.com [10.36.113.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D4D3110013D5;
+        Tue, 26 May 2020 09:55:43 +0000 (UTC)
+Date:   Tue, 26 May 2020 11:55:41 +0200
 From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH] s390/virtio: remove unused pm callbacks
-Date:   Tue, 26 May 2020 11:36:29 +0200
-Message-Id: <20200526093629.257649-1-cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Jared Rossi <jrossi@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+Message-ID: <20200526115541.4a11accc.cohuck@redhat.com>
+In-Reply-To: <20200513142934.28788-1-farman@linux.ibm.com>
+References: <20200513142934.28788-1-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Support for hibernation on s390 has been recently been removed with
-commit 394216275c7d ("s390: remove broken hibernate / power management
-support"), no need to keep unused code around.
+On Wed, 13 May 2020 16:29:30 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- drivers/s390/virtio/virtio_ccw.c | 26 --------------------------
- 1 file changed, 26 deletions(-)
+> There was some suggestion earlier about locking the FSM, but I'm not
+> seeing any problems with that. Rather, what I'm noticing is that the
+> flow between a synchronous START and asynchronous HALT/CLEAR have
+> different impacts on the FSM state. Consider:
+> 
+>     CPU 1                           CPU 2
+> 
+>     SSCH (set state=CP_PENDING)
+>     INTERRUPT (set state=IDLE)
+>     CSCH (no change in state)
+>                                     SSCH (set state=CP_PENDING)
+>     INTERRUPT (set state=IDLE)
+>                                     INTERRUPT (set state=IDLE)
 
-diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-index 957889a42d2e..5730572b52cd 100644
---- a/drivers/s390/virtio/virtio_ccw.c
-+++ b/drivers/s390/virtio/virtio_ccw.c
-@@ -1372,27 +1372,6 @@ static struct ccw_device_id virtio_ids[] = {
- 	{},
- };
- 
--#ifdef CONFIG_PM_SLEEP
--static int virtio_ccw_freeze(struct ccw_device *cdev)
--{
--	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
--
--	return virtio_device_freeze(&vcdev->vdev);
--}
--
--static int virtio_ccw_restore(struct ccw_device *cdev)
--{
--	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
--	int ret;
--
--	ret = virtio_ccw_set_transport_rev(vcdev);
--	if (ret)
--		return ret;
--
--	return virtio_device_restore(&vcdev->vdev);
--}
--#endif
--
- static struct ccw_driver virtio_ccw_driver = {
- 	.driver = {
- 		.owner = THIS_MODULE,
-@@ -1405,11 +1384,6 @@ static struct ccw_driver virtio_ccw_driver = {
- 	.set_online = virtio_ccw_online,
- 	.notify = virtio_ccw_cio_notify,
- 	.int_class = IRQIO_VIR,
--#ifdef CONFIG_PM_SLEEP
--	.freeze = virtio_ccw_freeze,
--	.thaw = virtio_ccw_restore,
--	.restore = virtio_ccw_restore,
--#endif
- };
- 
- static int __init pure_hex(char **cp, unsigned int *val, int min_digit,
--- 
-2.25.4
+A different question (not related to how we want to fix this): How
+easily can you trigger this bug? Is this during normal testing with a
+bit of I/O stress, or do you have a special test case?
 
