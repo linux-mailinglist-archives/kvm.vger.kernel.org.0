@@ -2,132 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB4E1E2DD8
-	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 21:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C8BD1E2E45
+	for <lists+kvm@lfdr.de>; Tue, 26 May 2020 21:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392511AbgEZTYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 May 2020 15:24:51 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:24566 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403898AbgEZTHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 May 2020 15:07:21 -0400
+        id S2391275AbgEZT2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 May 2020 15:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391202AbgEZT2S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 May 2020 15:28:18 -0400
+Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73119C03E96D;
+        Tue, 26 May 2020 12:28:18 -0700 (PDT)
+Received: by mail-lf1-x142.google.com with SMTP id d7so1844518lfi.12;
+        Tue, 26 May 2020 12:28:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590520041; x=1622056041;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=YIt6AL12a3C5b+12pAPxl2an5c1FAkLevMmwCT632D0=;
-  b=Ctp/VWvopVWFTlX5iGXAjVDaShxtM64ozPoMV02DMbqNmmGrt2d5Ychs
-   atZG4UgLDp+t6Kcd/KG2DVNGX3cnBhf/som0O2padyWH0XzykwsWcxKP8
-   N0m+6+cc/cJ+DOX/jFH97p7NPviHEtkQWvgYgNaNWObY3g8za6oRFgmDv
-   U=;
-IronPort-SDR: KZ53qbEU54y20zeVN8G/Z3rMs2wmEyyu52wxzr0pjanhUchwX4iHFDsCXksnrj02AU19IRi8/J
- qrQeVSuChVQQ==
-X-IronPort-AV: E=Sophos;i="5.73,437,1583193600"; 
-   d="scan'208";a="32235504"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 26 May 2020 18:35:53 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com (Postfix) with ESMTPS id AE5F5A1D05;
-        Tue, 26 May 2020 18:35:51 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 26 May 2020 18:35:51 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.208) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 26 May 2020 18:35:41 +0000
-Subject: Re: [PATCH v3 04/18] nitro_enclaves: Init PCI device driver
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        "Alexander Graf" <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-5-andraprs@amazon.com>
- <20200526064819.GC2580530@kroah.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <b4bd54ca-8fe2-8ebd-f4fc-012ed2ac498a@amazon.com>
-Date:   Tue, 26 May 2020 21:35:33 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.1
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QrcGKTg+lKbJyhERjQv/zxn6Uu3KQSzIsUaJsnqYfyc=;
+        b=mTkq7n/TLagy92SuI0VEMoZ+njzOoBXS3XFdNx+YwnbU81pmdX2Ju15JrHVkneV9qx
+         qARhi4X9mjfzmHxel+9an7U36kJB3aTUiz3doUi+JtR4oz8L/f5yh9N2Y5MxNaeUCeCk
+         cXzBlrzk6+NqpPDzyavPqj+S86CYNetEb09h7uvzxyHA3eO7nB+nfAKE/IG5Gc9cJ9sG
+         Z/S78wDM29J2TUIWxlO2ErzKrn45YNlGTqK8p05LdbEHjDv7DBykL0s8Z7wCxG4gQSS1
+         /nWv9cjA4yhq49kCJrqc3LBQkw37at5A28Y3oA/Ozp2p/OsY9Ah8UVgomYWFzc4Znr3V
+         lp5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QrcGKTg+lKbJyhERjQv/zxn6Uu3KQSzIsUaJsnqYfyc=;
+        b=GvhYi3eSLClZQl5iCsItLdbaQD5Lvi3z1664T2bk1S6v7AxIBQKeYJXSzjjB/qGZdd
+         dWBErGDvC8qwikkpd7VRyO+qxHS9b+4ItfdUsUbLCXQ6k442TM08fQ1cbBjXoL/i6I00
+         R67Zv+SvWzQGQ5YAT7oBPA5zPp+ad9dPk0guUlmQCzcn4p+qNog8lmPYuLbsOLoCWR1l
+         U3Am+bgR1j1LdsJTWpv9MzNH1EVcgtH0yJGJXwoJh2hPbuOs3MD31ThGpl1INZZ2ifck
+         otVosijEOquYNUKlM09Bz87JrIdRS1oTI9BeZkPGuS4G13duv8HKweSq/WsIDyW0f2ld
+         pqbQ==
+X-Gm-Message-State: AOAM530vV2amv/VgqkHFO4WZkbiOpOxFzlqoFRD9YjwfAYNPpGzAQGAc
+        D6EJIbu5Ly9N7Q72XLKqPqAURVE0yaKWmSuGbBU=
+X-Google-Smtp-Source: ABdhPJzzgZIK9MYtnILHFWXqommHhyqNi1MobdmTz+W3sHVTlNfIdxpWNgsxv2PqOGLjN4V1MfBjjwFESNwU5fLaa+8=
+X-Received: by 2002:ac2:53a2:: with SMTP id j2mr1167787lfh.139.1590521296780;
+ Tue, 26 May 2020 12:28:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200526064819.GC2580530@kroah.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.208]
-X-ClientProxiedBy: EX13D29UWC003.ant.amazon.com (10.43.162.80) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+References: <20200523014347.193290-1-jhubbard@nvidia.com>
+In-Reply-To: <20200523014347.193290-1-jhubbard@nvidia.com>
+From:   Souptick Joarder <jrdr.linux@gmail.com>
+Date:   Wed, 27 May 2020 00:58:05 +0530
+Message-ID: <CAFqt6zYmYQ93jbKNAjDpiH7exjyGv8E-2xHW++yV5CiYMyL5ew@mail.gmail.com>
+Subject: Re: [PATCH 1/1] vfio/spapr_tce: convert get_user_pages() --> pin_user_pages()
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyNi8wNS8yMDIwIDA5OjQ4LCBHcmVnIEtIIHdyb3RlOgo+IE9uIFR1ZSwgTWF5IDI2LCAy
-MDIwIGF0IDAxOjEzOjIwQU0gKzAzMDAsIEFuZHJhIFBhcmFzY2hpdiB3cm90ZToKPj4gVGhlIE5p
-dHJvIEVuY2xhdmVzIFBDSSBkZXZpY2UgaXMgdXNlZCBieSB0aGUga2VybmVsIGRyaXZlciBhcyBh
-IG1lYW5zIG9mCj4+IGNvbW11bmljYXRpb24gd2l0aCB0aGUgaHlwZXJ2aXNvciBvbiB0aGUgaG9z
-dCB3aGVyZSB0aGUgcHJpbWFyeSBWTSBhbmQKPj4gdGhlIGVuY2xhdmVzIHJ1bi4gSXQgaGFuZGxl
-cyByZXF1ZXN0cyB3aXRoIHJlZ2FyZCB0byBlbmNsYXZlIGxpZmV0aW1lLgo+Pgo+PiBTZXR1cCB0
-aGUgUENJIGRldmljZSBkcml2ZXIgYW5kIGFkZCBzdXBwb3J0IGZvciBNU0ktWCBpbnRlcnJ1cHRz
-Lgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4YW5kcnUtQ2F0YWxpbiBWYXNpbGUgPGxleG52QGFt
-YXpvbi5jb20+Cj4+IFNpZ25lZC1vZmYtYnk6IEFsZXhhbmRydSBDaW9ib3RhcnUgPGFsY2lvYUBh
-bWF6b24uY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBBbmRyYSBQYXJhc2NoaXYgPGFuZHJhcHJzQGFt
-YXpvbi5jb20+Cj4+IC0tLQo+PiBDaGFuZ2Vsb2cKPj4KPj4gdjIgLT4gdjMKPj4KPj4gKiBSZW1v
-dmUgdGhlIEdQTCBhZGRpdGlvbmFsIHdvcmRpbmcgYXMgU1BEWC1MaWNlbnNlLUlkZW50aWZpZXIg
-aXMgYWxyZWFkeSBpbgo+PiBwbGFjZS4KPj4gKiBSZW1vdmUgdGhlIFdBUk5fT04gY2FsbHMuCj4+
-ICogUmVtb3ZlIGxpbnV4L2J1ZyBpbmNsdWRlIHRoYXQgaXMgbm90IG5lZWRlZC4KPj4gKiBVcGRh
-dGUgc3RhdGljIGNhbGxzIHNhbml0eSBjaGVja3MuCj4+ICogUmVtb3ZlICJyYXRlbGltaXRlZCIg
-ZnJvbSB0aGUgbG9ncyB0aGF0IGFyZSBub3QgaW4gdGhlIGlvY3RsIGNhbGwgcGF0aHMuCj4+ICog
-VXBkYXRlIGt6ZnJlZSgpIGNhbGxzIHRvIGtmcmVlKCkuCj4+Cj4+IHYxIC0+IHYyCj4+Cj4+ICog
-QWRkIGxvZyBwYXR0ZXJuIGZvciBORS4KPj4gKiBVcGRhdGUgUENJIGRldmljZSBzZXR1cCBmdW5j
-dGlvbnMgdG8gcmVjZWl2ZSBQQ0kgZGV2aWNlIGRhdGEgc3RydWN0dXJlIGFuZAo+PiB0aGVuIGdl
-dCBwcml2YXRlIGRhdGEgZnJvbSBpdCBpbnNpZGUgdGhlIGZ1bmN0aW9ucyBsb2dpYy4KPj4gKiBS
-ZW1vdmUgdGhlIEJVR19PTiBjYWxscy4KPj4gKiBBZGQgdGVhcmRvd24gZnVuY3Rpb24gZm9yIE1T
-SS1YIHNldHVwLgo+PiAqIFVwZGF0ZSBnb3RvIGxhYmVscyB0byBtYXRjaCB0aGVpciBwdXJwb3Nl
-Lgo+PiAqIEltcGxlbWVudCBUT0RPIGZvciBORSBQQ0kgZGV2aWNlIGRpc2FibGUgc3RhdGUgY2hl
-Y2suCj4+ICogVXBkYXRlIGZ1bmN0aW9uIG5hbWUgZm9yIE5FIFBDSSBkZXZpY2UgcHJvYmUgLyBy
-ZW1vdmUuCj4+IC0tLQo+PiAgIGRyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9uZV9wY2lfZGV2
-LmMgfCAyNTIgKysrKysrKysrKysrKysrKysrKysrKysKPj4gICAxIGZpbGUgY2hhbmdlZCwgMjUy
-IGluc2VydGlvbnMoKykKPj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy92aXJ0L25pdHJv
-X2VuY2xhdmVzL25lX3BjaV9kZXYuYwo+Pgo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92aXJ0L25p
-dHJvX2VuY2xhdmVzL25lX3BjaV9kZXYuYyBiL2RyaXZlcnMvdmlydC9uaXRyb19lbmNsYXZlcy9u
-ZV9wY2lfZGV2LmMKPj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQKPj4gaW5kZXggMDAwMDAwMDAwMDAw
-Li4wYjY2MTY2Nzg3YjYKPj4gLS0tIC9kZXYvbnVsbAo+PiArKysgYi9kcml2ZXJzL3ZpcnQvbml0
-cm9fZW5jbGF2ZXMvbmVfcGNpX2Rldi5jCj4+IEBAIC0wLDAgKzEsMjUyIEBACj4+ICsvLyBTUERY
-LUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+PiArLyoKPj4gKyAqIENvcHlyaWdodCAyMDIw
-IEFtYXpvbi5jb20sIEluYy4gb3IgaXRzIGFmZmlsaWF0ZXMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQu
-Cj4+ICsgKi8KPj4gKwo+PiArLyogTml0cm8gRW5jbGF2ZXMgKE5FKSBQQ0kgZGV2aWNlIGRyaXZl
-ci4gKi8KPj4gKwo+PiArI2luY2x1ZGUgPGxpbnV4L2RlbGF5Lmg+Cj4+ICsjaW5jbHVkZSA8bGlu
-dXgvZGV2aWNlLmg+Cj4+ICsjaW5jbHVkZSA8bGludXgvbGlzdC5oPgo+PiArI2luY2x1ZGUgPGxp
-bnV4L211dGV4Lmg+Cj4+ICsjaW5jbHVkZSA8bGludXgvbW9kdWxlLmg+Cj4+ICsjaW5jbHVkZSA8
-bGludXgvbml0cm9fZW5jbGF2ZXMuaD4KPj4gKyNpbmNsdWRlIDxsaW51eC9wY2kuaD4KPj4gKyNp
-bmNsdWRlIDxsaW51eC90eXBlcy5oPgo+PiArI2luY2x1ZGUgPGxpbnV4L3dhaXQuaD4KPj4gKwo+
-PiArI2luY2x1ZGUgIm5lX21pc2NfZGV2LmgiCj4+ICsjaW5jbHVkZSAibmVfcGNpX2Rldi5oIgo+
-PiArCj4+ICsjZGVmaW5lIERFRkFVTFRfVElNRU9VVF9NU0VDUyAoMTIwMDAwKSAvKiAxMjAgc2Vj
-ICovCj4+ICsKPj4gKyNkZWZpbmUgTkUgIm5pdHJvX2VuY2xhdmVzOiAiCj4gV2h5IGlzIHRoaXMg
-bmVlZGVkPyAgVGhlIGRldl8qIGZ1bmN0aW9ucyBzaG91bGQgZ2l2ZSB5b3UgYWxsIHRoZQo+IGlu
-Zm9ybWF0aW9uIHRoYXQgeW91IG5lZWQgdG8gcHJvcGVybHkgZGVzY3JpYmUgdGhlIGRyaXZlciBh
-bmQgZGV2aWNlIGluCj4gcXVlc3Rpb24uICBObyBleHRyYSAicHJlZml4ZXMiIHNob3VsZCBiZSBu
-ZWVkZWQgYXQgYWxsLgoKVGhpcyB3YXMgbmVlZGVkIHRvIGhhdmUgYW4gaWRlbnRpZmllciBmb3Ig
-dGhlIG92ZXJhbGwgTkUgbG9naWMgLSBQQ0kgCmRldiwgaW9jdGwgYW5kIG1pc2MgZGV2LgoKVGhl
-IGlvY3RsIGFuZCBtaXNjIGRldiBsb2dpYyBoYXMgcHJfKiBsb2dzLCBidXQgSSBjYW4gdXBkYXRl
-IHRoZW0gdG8gCmRldl8qIHdpdGggbWlzYyBkZXYsIHRoZW4gcmVtb3ZlIHRoaXMgcHJlZml4LgoK
-VGhhbmsgeW91LgoKQW5kcmEKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciAoUm9tYW5pYSkg
-Uy5SLkwuIHJlZ2lzdGVyZWQgb2ZmaWNlOiAyN0EgU2YuIExhemFyIFN0cmVldCwgVUJDNSwgZmxv
-b3IgMiwgSWFzaSwgSWFzaSBDb3VudHksIDcwMDA0NSwgUm9tYW5pYS4gUmVnaXN0ZXJlZCBpbiBS
-b21hbmlhLiBSZWdpc3RyYXRpb24gbnVtYmVyIEoyMi8yNjIxLzIwMDUuCg==
+Hi John,
 
+On Sat, May 23, 2020 at 7:13 AM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> This code was using get_user_pages*(), in a "Case 2" scenario
+> (DMA/RDMA), using the categorization from [1]. That means that it's
+> time to convert the get_user_pages*() + put_page() calls to
+> pin_user_pages*() + unpin_user_pages() calls.
+>
+> There is some helpful background in [2]: basically, this is a small
+> part of fixing a long-standing disconnect between pinning pages, and
+> file systems' use of those pages.
+>
+> [1] Documentation/core-api/pin_user_pages.rst
+>
+> [2] "Explicit pinning of user-space pages":
+>     https://lwn.net/Articles/807108/
+>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>
+> Hi,
+>
+> I'm compile-tested this, but am not able to run-time test, so any
+> testing help is much appreciated!
+>
+> thanks,
+> John Hubbard
+> NVIDIA
+>
+>  drivers/vfio/vfio_iommu_spapr_tce.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
+> index 16b3adc508db..fe888b5dcc00 100644
+> --- a/drivers/vfio/vfio_iommu_spapr_tce.c
+> +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
+> @@ -383,7 +383,7 @@ static void tce_iommu_unuse_page(struct tce_container *container,
+>         struct page *page;
+>
+>         page = pfn_to_page(hpa >> PAGE_SHIFT);
+> -       put_page(page);
+> +       unpin_user_page(page);
+>  }
+>
+>  static int tce_iommu_prereg_ua_to_hpa(struct tce_container *container,
+> @@ -486,7 +486,7 @@ static int tce_iommu_use_page(unsigned long tce, unsigned long *hpa)
+>         struct page *page = NULL;
+>         enum dma_data_direction direction = iommu_tce_direction(tce);
+>
+> -       if (get_user_pages_fast(tce & PAGE_MASK, 1,
+> +       if (pin_user_pages_fast(tce & PAGE_MASK, 1,
+>                         direction != DMA_TO_DEVICE ? FOLL_WRITE : 0,
+>                         &page) != 1)
+>                 return -EFAULT;
+
+There are few places where nr_pages is passed as 1 to get_user_pages_fast().
+With similar conversion those will be changed to pin_user_pages_fast().
+
+Does it make sense to add an inline like - pin_user_page_fast(), similar to
+get_user_page_fast_only() ( now merged in linux-next) ?
