@@ -2,148 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDAB21E50A3
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 23:45:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B8A01E50AF
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 23:48:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725940AbgE0Voz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 17:44:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37429 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725922AbgE0Voy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 17:44:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590615892;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fBvAWYmBdzgrA5U0LT3xtBczNhEDcnN6W5IKb+q9W/4=;
-        b=QEqoUDlIvmI2hBiD4wCZGEVXSoFKikYClEgisZAokONZIGycxBOUcu9FhKgkp0XiC4dDmA
-        +/5YHL25q8RLW57uN5cwLoa7ALTzjPHsZ8V2MygNEyWV73VLQc1JG3/gB058ZGMP6AkqPA
-        FJaPGnugxh9r1/I3f0eVuB7jOckuwHw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-YY0GM87yNSSaPTd_WfAsag-1; Wed, 27 May 2020 17:44:50 -0400
-X-MC-Unique: YY0GM87yNSSaPTd_WfAsag-1
-Received: by mail-wr1-f71.google.com with SMTP id c14so1914989wrw.11
-        for <kvm@vger.kernel.org>; Wed, 27 May 2020 14:44:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fBvAWYmBdzgrA5U0LT3xtBczNhEDcnN6W5IKb+q9W/4=;
-        b=K/YkwzX3B3Rl1fYODA1cQI5LF4/UWaz47BZ7UNafLgCtvd+O+o4W0qAYRl0vFR9XNY
-         vBYizqZT9sIeURDOUJTiWdGG5F7Jfcu4M0yNtV8hrLh1yyh++/SuN8A4Dq+lEBO8C5G7
-         D/MHHs0jKP9k3VRHv5T99RDjZ2mYKjsZdbDk83k6GfcNsVhYHCFoBbdc2dv0GBtM2zPw
-         vtEEbkWpJPJdO6f62y2+NBJ6ahzX0GQBoOyRYs3gvqhcKCs7+qFDKbyWyYUtTZFlUJmV
-         yepwBv+ihyNzThD0uVxwO8XcqSXfA7x/sg0H/zoNvzk2PFLVDFtMdjVcwWAG8tOpsgBr
-         QnIw==
-X-Gm-Message-State: AOAM5339kPLXJrPqJCG33LZ/zstuKMdrswO4t3QIGzsvUBRTDlylnx3Y
-        alY2rDQX5iPlPoBkbYBnqGm97cMjhU0KKhbfXokRLeRUUlELwqj/U3UCOvE4mEZrN0l7tGylhy9
-        bwqWKtpDCRM2M
-X-Received: by 2002:a1c:790a:: with SMTP id l10mr144587wme.80.1590615888698;
-        Wed, 27 May 2020 14:44:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3Af0J2CmuPpUG32rxwXfc1KYndN+k+SQB+Tn++8tDC1cfUbE9HPS7Kypz3xsxeZWawipQoA==
-X-Received: by 2002:a1c:790a:: with SMTP id l10mr144569wme.80.1590615888450;
-        Wed, 27 May 2020 14:44:48 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8? ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
-        by smtp.gmail.com with ESMTPSA id j135sm4749631wmj.43.2020.05.27.14.44.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 14:44:47 -0700 (PDT)
-Subject: Re: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux
- kernel statistics
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        David Rientjes <rientjes@google.com>,
-        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-        Andrew Lunn <andrew@lunn.ch>
-References: <20200526110318.69006-1-eesposit@redhat.com>
- <20200526153128.448bfb43@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
- <6a754b40-b148-867d-071d-8f31c5c0d172@redhat.com>
- <20200527132321.54bcdf04@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
- <af2ba926-73bc-26c3-7ce7-bd45f657fd85@redhat.com>
- <20200527142741.77e7de37@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <925502d6-875a-4d19-b574-1ffd47a9c2ce@redhat.com>
-Date:   Wed, 27 May 2020 23:44:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1727098AbgE0Vr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 17:47:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56432 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726393AbgE0Vrz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 17:47:55 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E84AC05BD1E;
+        Wed, 27 May 2020 14:47:55 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 49XPZb4z9Rz9sRK;
+        Thu, 28 May 2020 07:47:51 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1590616071;
+        bh=mXu9qxrrYhcMrslxtNTfDTi99hlgGhfPw1uSLhfYR00=;
+        h=Date:From:To:Cc:Subject:From;
+        b=K0O5AJ6mpaA0/hNQp3MM5lNC8locegVJUd0sBCWNx/eYI9gH1FkQncofC8loe8lbk
+         +xOy3F1UHC9HPmKcgvhV+HRwWPUPQ5xt4AsKZU8OFl5HSzgidg4fAfmDk3sjQJ1sXb
+         vAGkABj1iLPvUIgJEVUkHHTvkhTAFvFXtkbXqS8sNRCBMhGz8NMfAblZPwLOy9bufC
+         b15irLTRtrUSl7EFf5DaPokyu1dNWH2bmBE/CroMrueBnL7pzjZd6cA6kG81imsFZw
+         SHA+p8Sp4qGp1X9qJNeGHoEsCbP/tEnhE3Qd6gMEXmCwrnvsuMEO5XXejxIOJbnM2a
+         Z6qf9idIlGe3A==
+Date:   Thu, 28 May 2020 07:47:50 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
+Message-ID: <20200528074750.550f761b@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20200527142741.77e7de37@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/LyStz_oR44yVl+tok4Z2UQd";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/05/20 23:27, Jakub Kicinski wrote:
-> On Wed, 27 May 2020 23:07:53 +0200 Paolo Bonzini wrote:
->>> Again, I have little KVM knowledge, but BPF also uses a fd-based API,
->>> and carries stats over the same syscall interface.  
->>
->> Can BPF stats (for BPF scripts created by whatever process is running in
->> the system) be collected by an external daemon that does not have access
->> to the file descriptor?  For KVM it's of secondary importance to gather
->> stats in the program; it can be nice to have and we are thinking of a
->> way to export the stats over the fd-based API, but it's less useful than
->> system-wide monitoring.  Perhaps this is a difference between the two.
-> 
-> Yes, check out bpftool prog list (bpftool code is under tools/bpf/ in
-> the kernel tree). BPF statistics are under a static key, so you may not
-> see any on your system. My system shows e.g.:
-> 
-> 81: kprobe  name abc  tag cefaa9376bdaae75  gpl run_time_ns 80941 run_cnt 152
-> 	loaded_at 2020-05-26T13:00:24-0700  uid 0
-> 	xlated 512B  jited 307B  memlock 4096B  map_ids 66,64
-> 	btf_id 16
-> 
-> In this example run_time_ns and run_cnt are stats.
-> 
-> The first number on the left is the program ID. BPF has an IDA, and
-> each object gets an integer id. So admin (or CAP_BPF, I think) can
-> iterate over the ids and open fds to objects of interest.
+--Sig_/LyStz_oR44yVl+tok4Z2UQd
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Got it, thanks.  But then "I'd hope that whatever daemon collects [BPF]
-stats doesn't run as root". :)
+Hi all,
 
->> Another case where stats and configuration are separate is CPUs, where
->> CPU enumeration is done in sysfs but statistics are exposed in various
->> procfs files such as /proc/interrupts and /proc/stats.
-> 
-> True, but I'm guessing everyone is just okay living with the legacy
-> procfs format there. Otherwise I'd guess the stats would had been added
-> to sysfs. I'd be curious to hear the full story there.
+In commit
 
-Yeah, it's a chicken-and-egg problem in that there's no good place in
-sysfs to put statistics right now, which is part of what this filesystem
-is trying to solve (the other part is the API).
+  f4cfcd2d5aea ("KVM: x86: don't expose MSR_IA32_UMWAIT_CONTROL uncondition=
+ally")
 
-You can read more about Google's usecase at
-http://lkml.iu.edu/hypermail/linux/kernel/2005.0/08056.html, it does
-include both network and interrupt stats and it's something that they've
-been using in production for quite some time.  We'd like the statsfs API
-to be the basis for including something akin to that in Linux.
+Fixes tag
 
-To be honest, it's unlikely that Emanuele (who has just finished his
-internship at Red Hat) and I will pursue the networking stats further
-than the demo patch at the end of this series. However, we're trying to
-make sure that the API is at least ready for that, and to probe whether
-any developers from other subsystems would be interested in using
-statsfs.  So thanks for bringing your point of view!
+  Fixes: 6e3ba4abce ("KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL")
 
-Thanks,
+has these problem(s):
 
-Paolo
+  - SHA1 should be at least 12 digits long
+    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
+    or later) just making sure it is not set (or set to "auto").
 
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/LyStz_oR44yVl+tok4Z2UQd
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7O4AYACgkQAVBC80lX
+0GwUfAf/T8bYGS2CZ+9VIOkE6z9xJC/K1D3t7G1kCaYHfHgaSkul3vExAeJDghwn
+WVN+mOVwu2QFyEZ6PUqX/hjJHmMiQs1Lvv4vULMVi3QI7xK/KKuXnqfuOfjQLJhI
+UyZKaa5jxhO484FylcmkGk9QtC0HWxmAXluxWSlBAaoFZHsbDSHP0vHdQVA6WPBx
+Opwd0JA5U6drlQ8cZ6EhJvXfk+eW5QaIK5SPYl/fhH/F0SRCA4EtTCEIpaNVC59g
+2Jr4vLnCAeBu7a9qG1FsdzgJG/Cj8s7m+AfsLCPjnTlZpRUMJAJS5jo8vwU4NukN
+sWQuAKaYyfXycc2Zf0UX4RF8V2y+Eg==
+=idU4
+-----END PGP SIGNATURE-----
+
+--Sig_/LyStz_oR44yVl+tok4Z2UQd--
