@@ -2,114 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 080121E4FF5
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 23:17:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17EA01E5067
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 23:22:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728619AbgE0VRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 17:17:38 -0400
-Received: from vps0.lunn.ch ([185.16.172.187]:53148 "EHLO vps0.lunn.ch"
+        id S1727899AbgE0VWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 17:22:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41854 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726482AbgE0VRi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 17:17:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-        s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=e7tiZMIiYuTbb+03A1KtQnZH+j3s8ttBBXpLw45dAS0=; b=6LlhV+r1K7qAycippK72vCEiPn
-        c0NM4ZjQCpKRVzGcyTa9buhlm2plrnI2+LoPj8rGLnzkAaEhBdDOH6GhSkIyt4RSrRmo2k/KhZwHP
-        m6wfFs/dCwrLP9yBfZx7nVTzQ9gsQi2SPB1cmp4AI3lsnCf4AM+6SZ+A19c0HtPu+LYk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.93)
-        (envelope-from <andrew@lunn.ch>)
-        id 1je3QV-003SEI-M8; Wed, 27 May 2020 23:17:27 +0200
-Date:   Wed, 27 May 2020 23:17:27 +0200
-From:   Andrew Lunn <andrew@lunn.ch>
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Jonathan Adams <jwadams@google.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+        id S1726114AbgE0VWK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 17:22:10 -0400
+Received: from kernel.org (unknown [87.71.78.142])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 612E52078C;
+        Wed, 27 May 2020 21:22:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590614529;
+        bh=ZfN6TjCih4KRWkakKKG5b5uklqfy1UErCB1lMEJOcfo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=j2ZgK8EwwFrGozUSttXAmBtw0/ayQsFW5FCRyot+Db9RnnnICgh26zIKdwlOtXgep
+         2EUvcj6Zr4e0h0wGRqXx9com35n6GlA4rF8kTsDjfz5KwKqryTTeihjFRrSjvVfgCF
+         Q6EnS/w7tfSWhWnJJg4ICc5DWPCfTn2ITCaFND10=
+Date:   Thu, 28 May 2020 00:22:00 +0300
+From:   Mike Rapoport <rppt@kernel.org>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Liran Alon <liran.alon@oracle.com>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         David Rientjes <rientjes@google.com>,
-        linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux
- kernel statistics
-Message-ID: <20200527211727.GB818296@lunn.ch>
-References: <20200526110318.69006-1-eesposit@redhat.com>
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC 00/16] KVM protected memory extension
+Message-ID: <20200527212200.GH48741@kernel.org>
+References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
+ <42685c32-a7a9-b971-0cf4-e8af8d9a40c6@oracle.com>
+ <20200526061721.GB48741@kernel.org>
+ <8866ff79-e8fd-685d-9a1d-72acff5bf6bb@oracle.com>
+ <20200526113844.GC48741@kernel.org>
+ <b616bed6-9be2-0e79-86cc-0d571417bc71@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200526110318.69006-1-eesposit@redhat.com>
+In-Reply-To: <b616bed6-9be2-0e79-86cc-0d571417bc71@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 26, 2020 at 01:03:10PM +0200, Emanuele Giuseppe Esposito wrote:
-> There is currently no common way for Linux kernel subsystems to expose
-> statistics to userspace shared throughout the Linux kernel; subsystems have
-> to take care of gathering and displaying statistics by themselves, for
-> example in the form of files in debugfs. For example KVM has its own code
-> section that takes care of this in virt/kvm/kvm_main.c, where it sets up
-> debugfs handlers for displaying values and aggregating them from various
-> subfolders to obtain information about the system state (i.e. displaying
-> the total number of exits, calculated by summing all exits of all cpus of
-> all running virtual machines).
+On Wed, May 27, 2020 at 08:45:33AM -0700, Dave Hansen wrote:
+> On 5/26/20 4:38 AM, Mike Rapoport wrote:
+> > On Tue, May 26, 2020 at 01:16:14PM +0300, Liran Alon wrote:
+> >> On 26/05/2020 9:17, Mike Rapoport wrote:
+> >>> On Mon, May 25, 2020 at 04:47:18PM +0300, Liran Alon wrote:
+> >>>> On 22/05/2020 15:51, Kirill A. Shutemov wrote:
+> >>>>
+> >>> Out of curiosity, do we actually have some numbers for the "non-trivial
+> >>> performance cost"? For instance for KVM usecase?
+> >>>
+> >> Dig into XPFO mailing-list discussions to find out...
+> >> I just remember that this was one of the main concerns regarding XPFO.
+> >
+> > The XPFO benchmarks measure total XPFO cost, and huge share of it comes
+> > from TLB shootdowns.
 > 
-> Allowing each section of the kernel to do so has two disadvantages. First,
-> it will introduce redundant code. Second, debugfs is anyway not the right
-> place for statistics (for example it is affected by lockdown)
+> Yes, TLB shootdown when pages transition between owners is huge.  The
+> XPFO folks did a lot of work to try to optimize some of this overhead
+> away.  But, it's still a concern.
 > 
-> In this patch series I introduce statsfs, a synthetic ram-based virtual
-> filesystem that takes care of gathering and displaying statistics for the
-> Linux kernel subsystems.
+> The concern with XPFO was that it could affect *all* application page
+> allocation.  This approach cheats a bit and only goes after guest VM
+> pages.  It's significantly more work to allocate a page and map it into
+> a guest than it is to, for instance, allocate an anonymous user page.
+> That means that the *additional* overhead of things like this for guest
+> memory matter a lot less.
 > 
-> The file system is mounted on /sys/kernel/stats and would be already used
-> by kvm. Statsfs was initially introduced by Paolo Bonzini [1].
+> > It's not exactly measurement of the imapct of the direct map
+> > fragmentation to workload running inside a vitrual machine.
 > 
-> Statsfs offers a generic and stable API, allowing any kind of
-> directory/file organization and supporting multiple kind of aggregations
-> (not only sum, but also average, max, min and count_zero) and data types
-> (boolean, unsigned/signed and custom types). The implementation, which is
-> a generalization of KVM’s debugfs statistics code, takes care of gathering
-> and displaying information at run time; users only need to specify the
-> values to be included in each source.
+> While the VM *itself* is running, there is zero overhead.  The host
+> direct map is not used at *all*.  The guest and host TLB entries share
+> the same space in the TLB so there could be some increased pressure on
+> the TLB, but that's a really secondary effect.  It would also only occur
+> if the guest exits and the host runs and starts evicting TLB entries.
 > 
-> Statsfs would also be a different mountpoint from debugfs, and would not
-> suffer from limited access due to the security lock down patches. Its main
-> function is to display each statistics as a file in the desired folder
-> hierarchy defined through the API. Statsfs files can be read, and possibly
-> cleared if their file mode allows it.
+> The other effects I could think of would be when the guest exits and the
+> host is doing some work for the guest, like emulation or something.  The
+> host would see worse TLB behavior because the host is using the
+> (fragmented) direct map.
 > 
-> Statsfs has two main components: the public API defined by
-> include/linux/statsfs.h, and the virtual file system which should end up in
-> /sys/kernel/stats.
-> 
+> But, both of those things require VMEXITs.  The more exits, the more
+> overhead you _might_ observe.  What I've been hearing from KVM folks is
+> that exits are getting more and more rare and the hardware designers are
+> working hard to minimize them.
 
-Hi Emanuele
+Right, when guest stays in the guest mode, there is no overhead. But
+guests still exit sometimes and I was wondering if anybody had measured
+difference in the overhead with different page size used for the host's
+direct map. 
 
-> The API has two main elements, values and sources. Kernel subsystems like
-> KVM can use the API to create a source, add child sources/values/aggregates
-> and register it to the root source (that on the virtual fs would be
-> /sys/kernel/statsfs).
+My guesstimate is that the overhead will not differ much for most
+workloads. But still, it's still interesting to *know* what is it.
 
-Another issue i see with networking is that statistic counters can be
-dynamic. They can come and go. One of the drivers i work on has extra
-statistics available when a fibre interface is used, compared to a
-copper interface. And this happens at run time. The netlink API has no
-problems with this. It is a snapshot of what counters are currently
-available. There is no state in the API.
+> That's especially good news because it means that even if the
+> situation
+> isn't perfect, it's only bound to get *better* over time, not worse.
 
-In my humble opinion, networking is unlikely to adopt your approach.
-You probably want to look around for other subsystems which have
-statistics, and see if you can cover their requirements, and get them
-on board.
+The processors have been aggressively improving performance for decades
+and see where are we know because of it ;-)
 
-   Andrew
+-- 
+Sincerely yours,
+Mike.
