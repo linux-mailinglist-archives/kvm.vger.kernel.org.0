@@ -2,107 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F31E1E3F2F
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 12:36:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E6211E3F56
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 12:44:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729932AbgE0Kgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 06:36:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36770 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729354AbgE0Kgl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 06:36:41 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ADBF02073B;
-        Wed, 27 May 2020 10:36:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590575800;
-        bh=7S8+Z2WBgc1CxZauci2e0vIy7gbHb1PyiVeg2bPwpiA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=FOGli9qmkqQ4Ze0mRKWYbl6IppezOt2yoZUoMr7iHcex1obc03QQ3Py46tdbH8e1W
-         u7VuSQozk3bsiTyFdUIrNif5FMiHWV1omCJC97VbGRNSgbz+tL6s99Quqb6Phn4K6r
-         JljcMRM9wLQqsUP4A5SEMYqpI6ckO2wJduE72oKk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jdtQN-00FfU0-2j; Wed, 27 May 2020 11:36:39 +0100
+        id S1728337AbgE0Koe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 06:44:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3298 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726649AbgE0Kod (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 06:44:33 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04RAWAlF182318;
+        Wed, 27 May 2020 06:44:32 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 316ytunra1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 May 2020 06:44:32 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04RAWH26182642;
+        Wed, 27 May 2020 06:44:32 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 316ytunr9v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 May 2020 06:44:32 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04RAfJQk024307;
+        Wed, 27 May 2020 10:44:31 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01wdc.us.ibm.com with ESMTP id 316uf8pegd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 May 2020 10:44:31 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04RAiTVU31457642
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 May 2020 10:44:29 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CAFE96A047;
+        Wed, 27 May 2020 10:44:30 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D9B4F6A04F;
+        Wed, 27 May 2020 10:44:29 +0000 (GMT)
+Received: from [9.65.228.55] (unknown [9.65.228.55])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 27 May 2020 10:44:29 +0000 (GMT)
+Subject: Re: [PATCH] vfio-ccw: document possible errors
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200407111605.1795-1-cohuck@redhat.com>
+ <55932365-3d36-1629-5d65-06c71e8231f9@linux.ibm.com>
+ <20200508125541.72adc626.cohuck@redhat.com>
+ <ed9b7c9b-3dc7-e573-55a8-d52f28877da9@linux.ibm.com>
+ <20200527081934.2dceda89.cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <b9fe4698-c889-3480-9720-013c8af79c16@linux.ibm.com>
+Date:   Wed, 27 May 2020 06:44:29 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20200527081934.2dceda89.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Wed, 27 May 2020 11:36:39 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     James Morse <james.morse@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 20/26] KVM: arm64: Move ELR_EL1 to the system register
- array
-In-Reply-To: <b6a08ca6-1682-4fa6-e8f4-bb4adba5d19a@arm.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-21-maz@kernel.org>
- <b6a08ca6-1682-4fa6-e8f4-bb4adba5d19a@arm.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <d7cb5dc4656cab36db79b0eaf3737221@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-05-27_03:2020-05-27,2020-05-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1015 impostorscore=0 mlxlogscore=905 cotscore=-2147483648
+ spamscore=0 adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005270073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-05-26 17:29, James Morse wrote:
-> Hi Marc,
-> 
-> On 22/04/2020 13:00, Marc Zyngier wrote:
->> As ELR-EL1 is a VNCR-capable register with ARMv8.4-NV, let's move it 
->> to
->> the sys_regs array and repaint the accessors. While we're at it, let's
->> kill the now useless accessors used only on the fault injection path.
-> 
-> Reviewed-by: James Morse <james.morse@arm.com>
-> 
-> 
-> A curiosity:
-> 
->> diff --git a/arch/arm64/include/asm/kvm_host.h 
->> b/arch/arm64/include/asm/kvm_host.h
->> index 95977b80265ce..46949fce3e813 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -184,6 +184,8 @@ enum vcpu_sysreg {
-> 
-> Comment above the enum has some claims about the order, but its
-> already out of order with
-> __vcpu_read_sys_reg_from_cpu()... (PAR_EL1 being the culprit)
 
-This comment dates back from the original assembly implementation,
-where I was paranoid about accessing the sys_regs array in strict
-order to maximize the chances of the prefetcher doing the right thing.
 
-As always with premature optimization, it was worthless, and moving
-things to C forced us to do things differently anyway (not to mention
-VHE...).
+On 5/27/20 2:19 AM, Cornelia Huck wrote:
+> On Tue, 26 May 2020 15:39:22 -0400
+> Eric Farman <farman@linux.ibm.com> wrote:
+> 
+>> On 5/8/20 6:55 AM, Cornelia Huck wrote:
+>>> On Fri, 17 Apr 2020 12:33:18 -0400
+>>> Eric Farman <farman@linux.ibm.com> wrote:
+>>>   
+>>>> On 4/7/20 7:16 AM, Cornelia Huck wrote:  
+>>>>> Interacting with the I/O and the async regions can yield a number
+>>>>> of errors, which had been undocumented so far. These are part of
+>>>>> the api, so remedy that.    
+>>>>
+>>>> (Makes a note to myself, to do the same for the schib/crw regions we're
+>>>> adding for channel path handling.)  
+>>>
+>>> Yes, please :) I plan to merge this today, so you can add a patch on
+>>> top.  
+>>
+>> I finally picked this up and realized that the io and async regions both
+>> document the return codes that would be stored in a field within their
+>> respective regions. The schib/crw regions don't have any such field, so
+>> the only values to be documented are the ones that the .read callback
+>> itself returns. What obvious thing am I missing?
+> 
+> The fact that you are right :)
+> 
+> No need to do anything, I might have spread my own confusion here ;)
+> 
 
-I'll delete the comment in a separate patch.
+Oh, good. I was worried vacation was too long/short. :)
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks for confirming; will get back to the other things on the list
+instead.
