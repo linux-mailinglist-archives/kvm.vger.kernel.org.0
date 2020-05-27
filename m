@@ -2,236 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45A191E3EAE
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 12:09:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04B571E3EE1
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 12:23:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387763AbgE0KJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 06:09:19 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57345 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729766AbgE0KJR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 06:09:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590574156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9HaviUrTiAbs1UoheBfRsIoYcyxJMuV7YIs0k4bLVxk=;
-        b=h3dJzk4cS6N04zk3zbzAyh7neq3RjcfJcxabVJaEZm7SMnf3gl+0QTgrId3XP+g3oyki+z
-        K4wx2rKMYHcU/lYP8f4hdeEVqsoi4fBSYWTtVaTdOEGhkme2TutIhHhNFnBqT090uFqBHQ
-        KqsEBSZ3XUndX1qYtjmT5Ayvm6kmq90=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-6PY6oArxMIyrvaxnJJym5Q-1; Wed, 27 May 2020 06:09:13 -0400
-X-MC-Unique: 6PY6oArxMIyrvaxnJJym5Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729787AbgE0KXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 06:23:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59096 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729781AbgE0KW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 06:22:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC52A8014D4;
-        Wed, 27 May 2020 10:09:12 +0000 (UTC)
-Received: from gondolin (ovpn-112-223.ams2.redhat.com [10.36.112.223])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A9F7160C05;
-        Wed, 27 May 2020 10:09:08 +0000 (UTC)
-Date:   Wed, 27 May 2020 12:09:05 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v7 11/12] s390x: css: ssch/tsch with
- sense and interrupt
-Message-ID: <20200527120905.5fb20a4e.cohuck@redhat.com>
-In-Reply-To: <1589818051-20549-12-git-send-email-pmorel@linux.ibm.com>
-References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
-        <1589818051-20549-12-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mail.kernel.org (Postfix) with ESMTPSA id C1D99207CB;
+        Wed, 27 May 2020 10:22:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1590574978;
+        bh=A4o6AQ11xM15anYtwypBhO8P5vfetakTLxp99W90wuY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=H+Dno3NfR/xe7QlwfmZtVqOewiqZuMfqzkYeg2HKsHD5yaLjIA0pGWcPaFAbK0GCu
+         9ixtmldbrA9onTT7Xr+rexmfko5Ubp5dYvU8QreAd+rguINSFD7MnOg4bTKXOhvEAX
+         AkhphrVvfFfS5dbJsmyB1Z+eedNXsX37mvNbz64A=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jdtD7-00FfKg-6n; Wed, 27 May 2020 11:22:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Date:   Wed, 27 May 2020 11:22:57 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 19/26] KVM: arm64: Make struct kvm_regs userspace-only
+In-Reply-To: <0a38305f-77f8-11b0-cb74-2bec07ce0a0a@arm.com>
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-20-maz@kernel.org>
+ <0a38305f-77f8-11b0-cb74-2bec07ce0a0a@arm.com>
+User-Agent: Roundcube Webmail/1.4.4
+Message-ID: <8f1665abb0bd6f018cb8af53ec203b76@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 May 2020 18:07:30 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> We add a new css_lib file to contain the I/O functions we may
-> share with different tests.
-> First function is the subchannel_enable() function.
+On 2020-05-26 17:29, James Morse wrote:
+> Hi Marc,
 > 
-> When a channel is enabled we can start a SENSE_ID command using
-> the SSCH instruction to recognize the control unit and device.
+> On 22/04/2020 13:00, Marc Zyngier wrote:
+>> struct kvm_regs is used by userspace to indicate which register gets
+>> accessed by the {GET,SET}_ONE_REG API. But as we're about to refactor
+>> the layout of the in-kernel register structures, we need the kernel to
+>> move away from it.
+>> 
+>> Let's make kvm_regs userspace only, and let the kernel map it to its 
+>> own
+>> internal representation.
 > 
-> This tests the success of SSCH, the I/O interruption and the TSCH
-> instructions.
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index 23ebe51410f06..9fec9231b63e2 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -102,6 +102,55 @@ static int core_reg_size_from_offset(const struct 
+>> kvm_vcpu *vcpu, u64 off)
+>>  	return size;
+>>  }
+>> 
+>> +static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct 
+>> kvm_one_reg *reg)
+>> +{
+>> +	u64 off = core_reg_offset_from_id(reg->id);
+>> +
+>> +	switch (off) {
 > 
-> The test expects a device with a control unit type of 0xC0CA as the
-> first subchannel of the CSS.
+>> +	default:
+>> +		return NULL;
+> 
+> Doesn't this switch statement catch an out of range offset, and a
+> misaligned offset?
+> 
+> ... We still test for those explicitly in the caller. Better safe than 
+> implicit?
 
-It might make sense to extend this to be able to check for any expected
-type (e.g. 0x3832, should my suggestion to split css tests and css-pong
-tests make sense.)
+Indeed, this is not supposed to happen at all. Maybe I should just fold
+validate_core_offset offset there, and make this NULL value the error
+case.
 
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/css.h     |  20 ++++++
->  lib/s390x/css_lib.c |  55 +++++++++++++++++
->  s390x/Makefile      |   1 +
->  s390x/css.c         | 145 ++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 221 insertions(+)
->  create mode 100644 lib/s390x/css_lib.c
+>> +	}
+>> +}
+> 
+> With the reset thing reported by Zenghui and Zengtao on the previous
+> patch fixed:
+> Reviewed-by: James Morse <james.morse@arm.com>
+> 
+> (otherwise struct kvm_regs isn't userspace-only!)
 
-(...)
+Indeed!
 
-> +int enable_subchannel(unsigned int sid)
-> +{
-> +	struct schib schib;
-> +	struct pmcw *pmcw = &schib.pmcw;
-> +	int try_count = 5;
-> +	int cc;
-> +
-> +	if (!(sid & SID_ONE))
-> +		return -1;
+Thanks,
 
-Hm... this error is indistinguishable for the caller from a cc 1 for
-the msch. Use something else (as this is a coding error)?
-
-> +
-> +	cc = stsch(sid, &schib);
-> +	if (cc)
-> +		return -cc;
-> +
-> +	do {
-> +		pmcw->flags |= PMCW_ENABLE;
-> +
-> +		cc = msch(sid, &schib);
-> +		if (cc)
-> +			return -cc;
-> +
-> +		cc = stsch(sid, &schib);
-> +		if (cc)
-> +			return -cc;
-> +
-> +	} while (!(pmcw->flags & PMCW_ENABLE) && --try_count);
-> +
-> +	return try_count;
-
-How useful is that information for the caller? I don't see the code
-below making use of it.
-
-> +}
-> +
-> +int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
-> +{
-> +	struct orb orb;
-> +
-> +	orb.intparm = sid;
-
-Just an idea: If you use something else here (maybe the cpa), and set
-the intparm to the sid in msch, you can test something else: Does msch
-properly set the intparm, and is that intparm overwritten by a
-successful ssch, until the next ssch or msch comes around?
-
-> +	orb.ctrl = ORB_F_INIT_IRQ|ORB_F_FORMAT|ORB_F_LPM_DFLT;
-> +	orb.cpa = (unsigned int) (unsigned long)ccw;
-
-Use a struct initializer, so that unset fields are 0?
-
-> +
-> +	return ssch(sid, &orb);
-> +}
-
-(...)
-
-> +/*
-> + * test_sense
-> + * Pre-requisits:
-> + * - We need the QEMU PONG device as the first recognized
-> + *   device by the enumeration.
-> + * - ./s390x-run s390x/css.elf -device ccw-pong,cu_type=0xc0ca
-> + */
-> +static void test_sense(void)
-> +{
-> +	int ret;
-> +
-> +	if (!test_device_sid) {
-> +		report_skip("No device");
-> +		return;
-> +	}
-> +
-> +	ret = enable_subchannel(test_device_sid);
-> +	if (ret < 0) {
-> +		report(0,
-> +		       "Could not enable the subchannel: %08x",
-> +		       test_device_sid);
-> +		return;
-> +	}
-> +
-> +	ret = register_io_int_func(irq_io);
-> +	if (ret) {
-> +		report(0, "Could not register IRQ handler");
-> +		goto unreg_cb;
-> +	}
-> +
-> +	lowcore->io_int_param = 0;
-> +
-> +	ret = start_subchannel(CCW_CMD_SENSE_ID, &senseid, sizeof(senseid),
-> +			       CCW_F_SLI);
-
-Clear senseid, before actually sending the program?
-
-> +	if (!ret) {
-> +		report(0, "ssch failed for SENSE ID on sch %08x",
-> +		       test_device_sid);
-> +		goto unreg_cb;
-> +	}
-> +
-> +	wait_for_interrupt(PSW_MASK_IO);
-> +
-> +	if (lowcore->io_int_param != test_device_sid)
-> +		goto unreg_cb;
-> +
-> +	report_info("reserved %02x cu_type %04x cu_model %02x dev_type %04x dev_model %02x",
-> +		    senseid.reserved, senseid.cu_type, senseid.cu_model,
-> +		    senseid.dev_type, senseid.dev_model);
-> +
-
-I'd also recommend checking that senseid.reserved is indeed 0xff -- in
-combination with senseid clearing before the ssch, that ensures that
-the senseid structure has actually been written to and is not pure
-garbage. (It's also a cu type agnostic test :)
-
-It also might make sense to check how much data you actually got, as
-you set SLI.
-
-
-> +	report((senseid.cu_type == PONG_CU),
-> +	       "cu_type: expect 0x%04x got 0x%04x",
-> +	       PONG_CU_TYPE, senseid.cu_type);
-> +
-> +unreg_cb:
-> +	unregister_io_int_func(irq_io);
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
->  } tests[] = {
->  	{ "enumerate (stsch)", test_enumerate },
->  	{ "enable (msch)", test_enable },
-> +	{ "sense (ssch/tsch)", test_sense },
->  	{ NULL, NULL }
->  };
->  
-> @@ -145,6 +289,7 @@ int main(int argc, char *argv[])
->  	int i;
->  
->  	report_prefix_push("Channel Subsystem");
-> +	enable_io_isc();
->  	for (i = 0; tests[i].name; i++) {
->  		report_prefix_push(tests[i].name);
->  		tests[i].func();
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
