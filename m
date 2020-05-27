@@ -2,128 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17EA01E5067
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 23:22:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFE801E507F
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 23:27:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727899AbgE0VWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 17:22:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41854 "EHLO mail.kernel.org"
+        id S2387678AbgE0V1p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 17:27:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44994 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726114AbgE0VWK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 17:22:10 -0400
-Received: from kernel.org (unknown [87.71.78.142])
+        id S1726114AbgE0V1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 17:27:45 -0400
+Received: from kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net (unknown [163.114.132.1])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 612E52078C;
-        Wed, 27 May 2020 21:22:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9BB422078C;
+        Wed, 27 May 2020 21:27:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590614529;
-        bh=ZfN6TjCih4KRWkakKKG5b5uklqfy1UErCB1lMEJOcfo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=j2ZgK8EwwFrGozUSttXAmBtw0/ayQsFW5FCRyot+Db9RnnnICgh26zIKdwlOtXgep
-         2EUvcj6Zr4e0h0wGRqXx9com35n6GlA4rF8kTsDjfz5KwKqryTTeihjFRrSjvVfgCF
-         Q6EnS/w7tfSWhWnJJg4ICc5DWPCfTn2ITCaFND10=
-Date:   Thu, 28 May 2020 00:22:00 +0300
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Liran Alon <liran.alon@oracle.com>,
-        "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        s=default; t=1590614864;
+        bh=HUaCb3PCCc2Pw/hRjP9hPvQCIfIdC6bqDipqt+IXdOU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=e27RQsyjYiPcLJYK/eWYlxTA6Bn/y9CgNn3E+9GG9h7m/a5G1frb/+wAOfPx/3NE5
+         gAW7R0FZcXgWATLm2Kr9E7RUabkNwvrP/VCkwQjepQzJGb/QKMmOyRYKTiSGdUTuRr
+         2S31ZwxZjPaH1lEr34iVlwoqokOeCs+hilL79l5o=
+Date:   Wed, 27 May 2020 14:27:41 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
         David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC 00/16] KVM protected memory extension
-Message-ID: <20200527212200.GH48741@kernel.org>
-References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <42685c32-a7a9-b971-0cf4-e8af8d9a40c6@oracle.com>
- <20200526061721.GB48741@kernel.org>
- <8866ff79-e8fd-685d-9a1d-72acff5bf6bb@oracle.com>
- <20200526113844.GC48741@kernel.org>
- <b616bed6-9be2-0e79-86cc-0d571417bc71@intel.com>
+        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+        Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux
+ kernel statistics
+Message-ID: <20200527142741.77e7de37@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <af2ba926-73bc-26c3-7ce7-bd45f657fd85@redhat.com>
+References: <20200526110318.69006-1-eesposit@redhat.com>
+        <20200526153128.448bfb43@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+        <6a754b40-b148-867d-071d-8f31c5c0d172@redhat.com>
+        <20200527132321.54bcdf04@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+        <af2ba926-73bc-26c3-7ce7-bd45f657fd85@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b616bed6-9be2-0e79-86cc-0d571417bc71@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 27, 2020 at 08:45:33AM -0700, Dave Hansen wrote:
-> On 5/26/20 4:38 AM, Mike Rapoport wrote:
-> > On Tue, May 26, 2020 at 01:16:14PM +0300, Liran Alon wrote:
-> >> On 26/05/2020 9:17, Mike Rapoport wrote:
-> >>> On Mon, May 25, 2020 at 04:47:18PM +0300, Liran Alon wrote:
-> >>>> On 22/05/2020 15:51, Kirill A. Shutemov wrote:
-> >>>>
-> >>> Out of curiosity, do we actually have some numbers for the "non-trivial
-> >>> performance cost"? For instance for KVM usecase?
-> >>>
-> >> Dig into XPFO mailing-list discussions to find out...
-> >> I just remember that this was one of the main concerns regarding XPFO.
-> >
-> > The XPFO benchmarks measure total XPFO cost, and huge share of it comes
-> > from TLB shootdowns.
+On Wed, 27 May 2020 23:07:53 +0200 Paolo Bonzini wrote:
+> > Again, I have little KVM knowledge, but BPF also uses a fd-based API,
+> > and carries stats over the same syscall interface.  
 > 
-> Yes, TLB shootdown when pages transition between owners is huge.  The
-> XPFO folks did a lot of work to try to optimize some of this overhead
-> away.  But, it's still a concern.
-> 
-> The concern with XPFO was that it could affect *all* application page
-> allocation.  This approach cheats a bit and only goes after guest VM
-> pages.  It's significantly more work to allocate a page and map it into
-> a guest than it is to, for instance, allocate an anonymous user page.
-> That means that the *additional* overhead of things like this for guest
-> memory matter a lot less.
-> 
-> > It's not exactly measurement of the imapct of the direct map
-> > fragmentation to workload running inside a vitrual machine.
-> 
-> While the VM *itself* is running, there is zero overhead.  The host
-> direct map is not used at *all*.  The guest and host TLB entries share
-> the same space in the TLB so there could be some increased pressure on
-> the TLB, but that's a really secondary effect.  It would also only occur
-> if the guest exits and the host runs and starts evicting TLB entries.
-> 
-> The other effects I could think of would be when the guest exits and the
-> host is doing some work for the guest, like emulation or something.  The
-> host would see worse TLB behavior because the host is using the
-> (fragmented) direct map.
-> 
-> But, both of those things require VMEXITs.  The more exits, the more
-> overhead you _might_ observe.  What I've been hearing from KVM folks is
-> that exits are getting more and more rare and the hardware designers are
-> working hard to minimize them.
+> Can BPF stats (for BPF scripts created by whatever process is running in
+> the system) be collected by an external daemon that does not have access
+> to the file descriptor?  For KVM it's of secondary importance to gather
+> stats in the program; it can be nice to have and we are thinking of a
+> way to export the stats over the fd-based API, but it's less useful than
+> system-wide monitoring.  Perhaps this is a difference between the two.
 
-Right, when guest stays in the guest mode, there is no overhead. But
-guests still exit sometimes and I was wondering if anybody had measured
-difference in the overhead with different page size used for the host's
-direct map. 
+Yes, check out bpftool prog list (bpftool code is under tools/bpf/ in
+the kernel tree). BPF statistics are under a static key, so you may not
+see any on your system. My system shows e.g.:
 
-My guesstimate is that the overhead will not differ much for most
-workloads. But still, it's still interesting to *know* what is it.
+81: kprobe  name abc  tag cefaa9376bdaae75  gpl run_time_ns 80941 run_cnt 152
+	loaded_at 2020-05-26T13:00:24-0700  uid 0
+	xlated 512B  jited 307B  memlock 4096B  map_ids 66,64
+	btf_id 16
 
-> That's especially good news because it means that even if the
-> situation
-> isn't perfect, it's only bound to get *better* over time, not worse.
+In this example run_time_ns and run_cnt are stats.
 
-The processors have been aggressively improving performance for decades
-and see where are we know because of it ;-)
+The first number on the left is the program ID. BPF has an IDA, and
+each object gets an integer id. So admin (or CAP_BPF, I think) can
+iterate over the ids and open fds to objects of interest.
 
--- 
-Sincerely yours,
-Mike.
+> Another case where stats and configuration are separate is CPUs, where
+> CPU enumeration is done in sysfs but statistics are exposed in various
+> procfs files such as /proc/interrupts and /proc/stats.
+
+True, but I'm guessing everyone is just okay living with the legacy
+procfs format there. Otherwise I'd guess the stats would had been added
+to sysfs. I'd be curious to hear the full story there.
