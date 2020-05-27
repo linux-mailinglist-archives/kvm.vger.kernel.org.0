@@ -2,84 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 702AA1E38F6
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 08:20:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8379B1E390F
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 08:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728147AbgE0GTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 02:19:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44638 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727990AbgE0GTp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 02:19:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590560383;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uxfwzRNG95Oxyrb9f3NJd3/tCgACFOCY/En2PVe3ZWQ=;
-        b=CZbTdZ6NhUNzA2ektL7u11fQM/1WS8pWsm4RvaHOH+8vKr3RQOx+3zsQ2KEJJ0/RN5lIlo
-        AfcfpCXalTk8CAODz9eFf3/DCgjnjVp+VTskaRjL4qXFvCbk7mnrkb5xECwgHk3sTsHolG
-        q6WK+dB/kLE7eBP+zW6hWeF34jWOvMY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-483-OmxVI4bbM9WkoEHBo--1jQ-1; Wed, 27 May 2020 02:19:39 -0400
-X-MC-Unique: OmxVI4bbM9WkoEHBo--1jQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7265835B41;
-        Wed, 27 May 2020 06:19:37 +0000 (UTC)
-Received: from gondolin (ovpn-112-223.ams2.redhat.com [10.36.112.223])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CE3C11CA;
-        Wed, 27 May 2020 06:19:36 +0000 (UTC)
-Date:   Wed, 27 May 2020 08:19:34 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio-ccw: document possible errors
-Message-ID: <20200527081934.2dceda89.cohuck@redhat.com>
-In-Reply-To: <ed9b7c9b-3dc7-e573-55a8-d52f28877da9@linux.ibm.com>
-References: <20200407111605.1795-1-cohuck@redhat.com>
-        <55932365-3d36-1629-5d65-06c71e8231f9@linux.ibm.com>
-        <20200508125541.72adc626.cohuck@redhat.com>
-        <ed9b7c9b-3dc7-e573-55a8-d52f28877da9@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1728143AbgE0GYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 02:24:19 -0400
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:52965 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726337AbgE0GYT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 02:24:19 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R941e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07425;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0TzmW8ts_1590560648;
+Received: from 30.27.118.64(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TzmW8ts_1590560648)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 27 May 2020 14:24:10 +0800
+Subject: Re: [PATCH v4 6/7] KVM: MIPS: clean up redundant 'kvm_run' parameters
+To:     Huacai Chen <chenhuacai@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        paulus@ozlabs.org, mpe@ellerman.id.au,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        Thomas Gleixner <tglx@linutronix.de>, mingo@redhat.com,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org, hpa@zytor.com,
+        Marc Zyngier <maz@kernel.org>, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, Peter Xu <peterx@redhat.com>,
+        thuth@redhat.com, kvm@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu,
+        "open list:MIPS" <linux-mips@vger.kernel.org>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
+ <20200427043514.16144-7-tianjia.zhang@linux.alibaba.com>
+ <CAAhV-H7kpKUfQoWid6GSNL5+4hTTroGyL83EaW6yZwS2+Ti9kA@mail.gmail.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <37246a25-c4dc-7757-3f5c-d46870a4f186@linux.alibaba.com>
+Date:   Wed, 27 May 2020 14:24:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAAhV-H7kpKUfQoWid6GSNL5+4hTTroGyL83EaW6yZwS2+Ti9kA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 May 2020 15:39:22 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> On 5/8/20 6:55 AM, Cornelia Huck wrote:
-> > On Fri, 17 Apr 2020 12:33:18 -0400
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> >> On 4/7/20 7:16 AM, Cornelia Huck wrote:  
-> >>> Interacting with the I/O and the async regions can yield a number
-> >>> of errors, which had been undocumented so far. These are part of
-> >>> the api, so remedy that.    
-> >>
-> >> (Makes a note to myself, to do the same for the schib/crw regions we're
-> >> adding for channel path handling.)  
-> > 
-> > Yes, please :) I plan to merge this today, so you can add a patch on
-> > top.  
+
+On 2020/4/27 13:40, Huacai Chen wrote:
+> Reviewed-by: Huacai Chen <chenhc@lemote.com>
 > 
-> I finally picked this up and realized that the io and async regions both
-> document the return codes that would be stored in a field within their
-> respective regions. The schib/crw regions don't have any such field, so
-> the only values to be documented are the ones that the .read callback
-> itself returns. What obvious thing am I missing?
+> On Mon, Apr 27, 2020 at 12:35 PM Tianjia Zhang
+> <tianjia.zhang@linux.alibaba.com> wrote:
+>>
+>> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+>> structure. For historical reasons, many kvm-related function parameters
+>> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+>> patch does a unified cleanup of these remaining redundant parameters.
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   arch/mips/include/asm/kvm_host.h |  28 +-------
+>>   arch/mips/kvm/emulate.c          |  59 ++++++----------
+>>   arch/mips/kvm/mips.c             |  11 ++-
+>>   arch/mips/kvm/trap_emul.c        | 114 ++++++++++++++-----------------
+>>   arch/mips/kvm/vz.c               |  26 +++----
+>>   5 files changed, 87 insertions(+), 151 deletions(-)
+>>
 
-The fact that you are right :)
+Hi Huacai,
 
-No need to do anything, I might have spread my own confusion here ;)
+These two patches(6/7 and 7/7) should be merged into the tree of the 
+mips architecture separately. At present, there seems to be no good way 
+to merge the whole architecture patchs.
 
+For this series of patches, some architectures have been merged, some 
+need to update the patch.
+
+Thanks and best,
+Tianjia
