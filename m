@@ -2,108 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D26D1E46B3
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 17:00:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 049271E471D
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 17:17:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389497AbgE0PA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 11:00:56 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28402 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389421AbgE0PAu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 11:00:50 -0400
+        id S2389544AbgE0PRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 11:17:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46655 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389501AbgE0PQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 11:16:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590591649;
+        s=mimecast20190719; t=1590592618;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=S79dLGaDC34U88k/muBN2/cWWvIJSeZD2zX/jWO3DQQ=;
-        b=g2rrPUM75riI+DtvHnoF2WAwoBSONDpP+AtLrZcuUs1JNfZcqfBFhxH72/4KJowcc3Fq9d
-        HiWYmmiLxY94abgy4EmKJnTOqWMO3kX8KAQSHdZNsilBFmB848B/7rOZU2d+FIh9CD2UlQ
-        QU0UQbHwvwsJXnc0RWrjisGI+J75pk0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-DnGbAIzAODaQnakVDt-ZKw-1; Wed, 27 May 2020 11:00:47 -0400
-X-MC-Unique: DnGbAIzAODaQnakVDt-ZKw-1
-Received: by mail-ed1-f69.google.com with SMTP id df5so10263534edb.0
-        for <kvm@vger.kernel.org>; Wed, 27 May 2020 08:00:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=S79dLGaDC34U88k/muBN2/cWWvIJSeZD2zX/jWO3DQQ=;
-        b=nsMefGYdxq1nVba3kJSPbT7gSvKS9bBZFKts1MSvaIALasnrAZ3oOug5RD8Ztw9ez9
-         FBZ98OtZj6963GylVCG6wPl6Gmo0mq5yH+ZRaFWaS48Oefs0dB1gxXINAc2z65Ho2mNw
-         INrRMC1xR7YcI+mOQxsGcKt8yNEuvt/yFix6egOA5Ki6i7rFE0UlxlAje6WUHA1Mbf3I
-         iF7QHcXkAtiqDhV5OWaIWgYSryww/9hSw+0bU/c+9DtTcCUYqn6G0+ItfTm4AK8HFWby
-         /2oCNr9/KXlmbldptA0g1evQWiQB8GJYTgM4LaDSrqH0zi1MJy+J+dPGPDgIo/NCjOZR
-         60iQ==
-X-Gm-Message-State: AOAM532/iBAPU+poLuDuRkMuP1HjqhSx6piks8YhVTjJ2IDok5uuTFnF
-        2r1p5O9dU5RGkrWttgxMt8DxW3cyEVGYJdJtPy0lKJvw7sXSRp5tLAT4KTqkvyItNRtofyk5DGH
-        8GhTMhj9ihb5j
-X-Received: by 2002:a17:906:1442:: with SMTP id q2mr3491301ejc.33.1590591646063;
-        Wed, 27 May 2020 08:00:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzxzNY5UhO1mssuYEm2F2UYGESNfuhTc2d/FaV+VoTyW39e+803AKyGa34dCi6Lxc3HyJGruA==
-X-Received: by 2002:a17:906:1442:: with SMTP id q2mr3491234ejc.33.1590591645542;
-        Wed, 27 May 2020 08:00:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8? ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
-        by smtp.gmail.com with ESMTPSA id l1sm3053400ejd.114.2020.05.27.08.00.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 08:00:45 -0700 (PDT)
-Subject: Re: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux
- kernel statistics
-To:     Andrew Lunn <andrew@lunn.ch>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
+        bh=VVDQvFJrgkWSz8/ikl8zaz7psPPU6nwXpgVWbhjxY/A=;
+        b=QW+CYypiY6rpNEISyGoTqYN8+viS3sVz1WUgt5ED5jO3sDQgnpQWuysOG66T1rfgAeMGxY
+        7h2/+er8SSmGGOAKG5PxPXnynmHj6sNyntD8cknsVhtbYQgligtM+r3rspV8PqVq8pm1pn
+        k1bKJ7bxqgXWXKMKFgh10bc2zYRD0MA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-R7kKTjP5PX6oBfqiP1ZHrQ-1; Wed, 27 May 2020 11:16:54 -0400
+X-MC-Unique: R7kKTjP5PX6oBfqiP1ZHrQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1F6D107ACCD;
+        Wed, 27 May 2020 15:16:52 +0000 (UTC)
+Received: from starship (unknown [10.35.206.172])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F26519D82;
+        Wed, 27 May 2020 15:16:48 +0000 (UTC)
+Message-ID: <6d6d38a6f62e0d6d093713703e9f0e183c7eda13.camel@redhat.com>
+Subject: Re: [PATCH 1/2] kvm/x86/vmx: enable X86_FEATURE_WAITPKG in KVM
+ capabilities
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tao Xu <tao3.xu@intel.com>,
         Jim Mattson <jmattson@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
-        David Rientjes <rientjes@google.com>,
-        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org
-References: <20200526110318.69006-1-eesposit@redhat.com>
- <20200526153128.448bfb43@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
- <6a754b40-b148-867d-071d-8f31c5c0d172@redhat.com>
- <20200527133309.GC793752@lunn.ch>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b0d11337-3ea4-d874-6013-ff8c3e9d6f26@redhat.com>
-Date:   Wed, 27 May 2020 17:00:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        linux-kernel@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jingqi Liu <jingqi.liu@intel.com>
+Date:   Wed, 27 May 2020 18:16:47 +0300
+In-Reply-To: <20200527012039.GC31696@linux.intel.com>
+References: <20200523161455.3940-1-mlevitsk@redhat.com>
+         <20200523161455.3940-2-mlevitsk@redhat.com>
+         <20200527012039.GC31696@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20200527133309.GC793752@lunn.ch>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/05/20 15:33, Andrew Lunn wrote:
->> I don't really know a lot about the networking subsystem, and as it was
->> pointed out in another email on patch 7 by Andrew, networking needs to
->> atomically gather and display statistics in order to make them consistent,
->> and currently this is not supported by stats_fs but could be added in
->> future.
+On Tue, 2020-05-26 at 18:20 -0700, Sean Christopherson wrote:
+> On Sat, May 23, 2020 at 07:14:54PM +0300, Maxim Levitsky wrote:
+> > Even though we might not allow the guest to use
+> > WAITPKG's new instructions, we should tell KVM
+> > that the feature is supported by the host CPU.
+> > 
+> > Note that vmx_waitpkg_supported checks that WAITPKG
+> > _can_ be set in secondary execution controls as specified
+> > by VMX capability MSR, rather that we actually enable it for a
+> > guest.
 > 
-> Do you have any idea how you will support atomic access? It does not
-> seem easy to implement in a filesystem based model.
+> These line wraps are quite weird and inconsistent.
+Known issue for me, I usually don't have line wrapping enabled,
+and I wrap the lines a bit earlier that 72 character limit. 
+I'll re-formatted the commit message to be on 72 line format and I will
+try now to pay much more attention to that.
 
-Hi Andrew,
+> 
+> > Fixes: e69e72faa3a0 KVM: x86: Add support for user wait
+> > instructions
+> 
+> Checkpatch doesn't complain,  but the preferred Fixes format is
+> 
+>   Fixes: e69e72faa3a07 ("KVM: x86: Add support for user wait
+> instructions")
 
-there are plans to support binary access.  Emanuele and I don't really
-have a plan for how to implement it, but there are developers from
-Google that have ideas (because Google has a similar "metricfs" thing
-in-house).
 
-I think atomic access would use some kind of "source_ops" struct
-containing create_snapshot and release_snapshot function pointers.
+> 
+> e.g.
+> 
+>   git show -s --pretty='tformat:%h ("%s")'
 
-Paolo
+Got it, and added to git aliases :-)
+
+> 
+> For the code itself:
+> 
+> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Thank you!
+
+> 
+> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 55712dd86bafa..fca493d4517c5 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7298,6 +7298,9 @@ static __init void vmx_set_cpu_caps(void)
+> >  	/* CPUID 0x80000001 */
+> >  	if (!cpu_has_vmx_rdtscp())
+> >  		kvm_cpu_cap_clear(X86_FEATURE_RDTSCP);
+> > +
+> > +	if (vmx_waitpkg_supported())
+> > +		kvm_cpu_cap_check_and_set(X86_FEATURE_WAITPKG);
+> >  }
+> >  
+> >  static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
+> > -- 
+> > 2.26.2
+> > 
 
