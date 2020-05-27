@@ -2,136 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E3A71E3E8F
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 12:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45A191E3EAE
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 12:09:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728374AbgE0KHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 06:07:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50979 "EHLO
+        id S2387763AbgE0KJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 06:09:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57345 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725294AbgE0KHH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 06:07:07 -0400
+        by vger.kernel.org with ESMTP id S1729766AbgE0KJR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 06:09:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590574026;
+        s=mimecast20190719; t=1590574156;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XxzCdpe6pn5gC4pyxBkCeZjhm3W+/QqJpz6pNOd91FM=;
-        b=DI97Rr466ITJBOP9k9fKOuurDfG5mrn1/JEgkMF5E0W/Ke47s0pulHf4GzECMLohTT4Biu
-        McVZdc4Stmpty5QQyzkQYSGgMg/jSISyHuCEcp3XtvcgRLq2ypwyibbL070bEbx82Cc7yt
-        wzqXWvL4HY2AlbzCrUbsQIKYlQmSeGU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-nBFd8WU2M9Kf-NRqL3ftDA-1; Wed, 27 May 2020 06:07:04 -0400
-X-MC-Unique: nBFd8WU2M9Kf-NRqL3ftDA-1
-Received: by mail-ej1-f72.google.com with SMTP id h6so8631378ejb.17
-        for <kvm@vger.kernel.org>; Wed, 27 May 2020 03:07:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=XxzCdpe6pn5gC4pyxBkCeZjhm3W+/QqJpz6pNOd91FM=;
-        b=WxUHtII/uqcl5wGDKayrZYvYJhE7vy+A7M/oZb4rFEeSctyk1cw6tNr4W05nd721KR
-         eQmb/dVbDON0zh/2548hrkWBdqSBLFRQKpT9xiwnfRu8nGZnlQ+2Wz01z4SRrsA/vWeo
-         D/KY+CmcQ9l+l4ardCQTCPXJqZE9Nxz/fXhIB5g8q3UEVJUcRa9+CvUiQWtHOcnyc19K
-         2RPuSzWLHpea2WhRfZGkU8wqwvYlECllX4fAid4GhosUtg0GGfqT4SFBnL6R+MS7ItUk
-         1+7/UKg5xLRMjvRvahvWH39Ww1Z3uRTdbEChDoUMay7II4wkCr/lAvAnLRQKRIWS/MCo
-         gFDg==
-X-Gm-Message-State: AOAM530juaQNTL2vhnhMNtFp/HdpSGqgh8bXPNEfScIAYvx5RkGYVhLu
-        dsWsw9y0yZvtLfDI0cQKdrQR57SfXzZW5jEw6AIR9EcoLUj1KPmNjjnt8NaDOAt0G8WS//hrHkS
-        LFbUaeRvr+1cn
-X-Received: by 2002:a17:906:278e:: with SMTP id j14mr5125287ejc.270.1590574023109;
-        Wed, 27 May 2020 03:07:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwagjGJIW4hm5iAPguqRbQjGvtaTGt7NuXFde9thBIO8Xens6mtXRCLxBhn2D0X8jpEhyIhKg==
-X-Received: by 2002:a17:906:278e:: with SMTP id j14mr5125267ejc.270.1590574022888;
-        Wed, 27 May 2020 03:07:02 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id wr19sm2345602ejb.67.2020.05.27.03.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2020 03:07:02 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/mmu: Set mmio_value to '0' if reserved #PF can't be generated
-In-Reply-To: <20200527084909.23492-1-sean.j.christopherson@intel.com>
-References: <20200527084909.23492-1-sean.j.christopherson@intel.com>
-Date:   Wed, 27 May 2020 12:07:01 +0200
-Message-ID: <87367l669m.fsf@vitty.brq.redhat.com>
+        bh=9HaviUrTiAbs1UoheBfRsIoYcyxJMuV7YIs0k4bLVxk=;
+        b=h3dJzk4cS6N04zk3zbzAyh7neq3RjcfJcxabVJaEZm7SMnf3gl+0QTgrId3XP+g3oyki+z
+        K4wx2rKMYHcU/lYP8f4hdeEVqsoi4fBSYWTtVaTdOEGhkme2TutIhHhNFnBqT090uFqBHQ
+        KqsEBSZ3XUndX1qYtjmT5Ayvm6kmq90=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66-6PY6oArxMIyrvaxnJJym5Q-1; Wed, 27 May 2020 06:09:13 -0400
+X-MC-Unique: 6PY6oArxMIyrvaxnJJym5Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC52A8014D4;
+        Wed, 27 May 2020 10:09:12 +0000 (UTC)
+Received: from gondolin (ovpn-112-223.ams2.redhat.com [10.36.112.223])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A9F7160C05;
+        Wed, 27 May 2020 10:09:08 +0000 (UTC)
+Date:   Wed, 27 May 2020 12:09:05 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v7 11/12] s390x: css: ssch/tsch with
+ sense and interrupt
+Message-ID: <20200527120905.5fb20a4e.cohuck@redhat.com>
+In-Reply-To: <1589818051-20549-12-git-send-email-pmorel@linux.ibm.com>
+References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
+        <1589818051-20549-12-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Mon, 18 May 2020 18:07:30 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> Set the mmio_value to '0' instead of simply clearing the present bit to
-> squash a benign warning in kvm_mmu_set_mmio_spte_mask() that complains
-> about the mmio_value overlapping the lower GFN mask on systems with 52
-> bits of PA space.
->
-> Opportunistically clean up the code and comments.
->
-> Fixes: 608831174100 ("KVM: x86: only do L1TF workaround on affected processors")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> We add a new css_lib file to contain the I/O functions we may
+> share with different tests.
+> First function is the subchannel_enable() function.
+> 
+> When a channel is enabled we can start a SENSE_ID command using
+> the SSCH instruction to recognize the control unit and device.
+> 
+> This tests the success of SSCH, the I/O interruption and the TSCH
+> instructions.
+> 
+> The test expects a device with a control unit type of 0xC0CA as the
+> first subchannel of the CSS.
+
+It might make sense to extend this to be able to check for any expected
+type (e.g. 0x3832, should my suggestion to split css tests and css-pong
+tests make sense.)
+
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->
-> Thanks for the excuse to clean up kvm_set_mmio_spte_mask(), been wanting a
-> reason to fix that mess for a few months now :-).
->
->  arch/x86/kvm/mmu/mmu.c | 27 +++++++++------------------
->  1 file changed, 9 insertions(+), 18 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 2df0f347655a4..aab90f4079ea9 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -6136,25 +6136,16 @@ static void kvm_set_mmio_spte_mask(void)
->  	u64 mask;
+>  lib/s390x/css.h     |  20 ++++++
+>  lib/s390x/css_lib.c |  55 +++++++++++++++++
+>  s390x/Makefile      |   1 +
+>  s390x/css.c         | 145 ++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 221 insertions(+)
+>  create mode 100644 lib/s390x/css_lib.c
+
+(...)
+
+> +int enable_subchannel(unsigned int sid)
+> +{
+> +	struct schib schib;
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int try_count = 5;
+> +	int cc;
+> +
+> +	if (!(sid & SID_ONE))
+> +		return -1;
+
+Hm... this error is indistinguishable for the caller from a cc 1 for
+the msch. Use something else (as this is a coding error)?
+
+> +
+> +	cc = stsch(sid, &schib);
+> +	if (cc)
+> +		return -cc;
+> +
+> +	do {
+> +		pmcw->flags |= PMCW_ENABLE;
+> +
+> +		cc = msch(sid, &schib);
+> +		if (cc)
+> +			return -cc;
+> +
+> +		cc = stsch(sid, &schib);
+> +		if (cc)
+> +			return -cc;
+> +
+> +	} while (!(pmcw->flags & PMCW_ENABLE) && --try_count);
+> +
+> +	return try_count;
+
+How useful is that information for the caller? I don't see the code
+below making use of it.
+
+> +}
+> +
+> +int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
+> +{
+> +	struct orb orb;
+> +
+> +	orb.intparm = sid;
+
+Just an idea: If you use something else here (maybe the cpa), and set
+the intparm to the sid in msch, you can test something else: Does msch
+properly set the intparm, and is that intparm overwritten by a
+successful ssch, until the next ssch or msch comes around?
+
+> +	orb.ctrl = ORB_F_INIT_IRQ|ORB_F_FORMAT|ORB_F_LPM_DFLT;
+> +	orb.cpa = (unsigned int) (unsigned long)ccw;
+
+Use a struct initializer, so that unset fields are 0?
+
+> +
+> +	return ssch(sid, &orb);
+> +}
+
+(...)
+
+> +/*
+> + * test_sense
+> + * Pre-requisits:
+> + * - We need the QEMU PONG device as the first recognized
+> + *   device by the enumeration.
+> + * - ./s390x-run s390x/css.elf -device ccw-pong,cu_type=0xc0ca
+> + */
+> +static void test_sense(void)
+> +{
+> +	int ret;
+> +
+> +	if (!test_device_sid) {
+> +		report_skip("No device");
+> +		return;
+> +	}
+> +
+> +	ret = enable_subchannel(test_device_sid);
+> +	if (ret < 0) {
+> +		report(0,
+> +		       "Could not enable the subchannel: %08x",
+> +		       test_device_sid);
+> +		return;
+> +	}
+> +
+> +	ret = register_io_int_func(irq_io);
+> +	if (ret) {
+> +		report(0, "Could not register IRQ handler");
+> +		goto unreg_cb;
+> +	}
+> +
+> +	lowcore->io_int_param = 0;
+> +
+> +	ret = start_subchannel(CCW_CMD_SENSE_ID, &senseid, sizeof(senseid),
+> +			       CCW_F_SLI);
+
+Clear senseid, before actually sending the program?
+
+> +	if (!ret) {
+> +		report(0, "ssch failed for SENSE ID on sch %08x",
+> +		       test_device_sid);
+> +		goto unreg_cb;
+> +	}
+> +
+> +	wait_for_interrupt(PSW_MASK_IO);
+> +
+> +	if (lowcore->io_int_param != test_device_sid)
+> +		goto unreg_cb;
+> +
+> +	report_info("reserved %02x cu_type %04x cu_model %02x dev_type %04x dev_model %02x",
+> +		    senseid.reserved, senseid.cu_type, senseid.cu_model,
+> +		    senseid.dev_type, senseid.dev_model);
+> +
+
+I'd also recommend checking that senseid.reserved is indeed 0xff -- in
+combination with senseid clearing before the ssch, that ensures that
+the senseid structure has actually been written to and is not pure
+garbage. (It's also a cu type agnostic test :)
+
+It also might make sense to check how much data you actually got, as
+you set SLI.
+
+
+> +	report((senseid.cu_type == PONG_CU),
+> +	       "cu_type: expect 0x%04x got 0x%04x",
+> +	       PONG_CU_TYPE, senseid.cu_type);
+> +
+> +unreg_cb:
+> +	unregister_io_int_func(irq_io);
+> +}
+> +
+>  static struct {
+>  	const char *name;
+>  	void (*func)(void);
+>  } tests[] = {
+>  	{ "enumerate (stsch)", test_enumerate },
+>  	{ "enable (msch)", test_enable },
+> +	{ "sense (ssch/tsch)", test_sense },
+>  	{ NULL, NULL }
+>  };
 >  
->  	/*
-> -	 * Set the reserved bits and the present bit of an paging-structure
-> -	 * entry to generate page fault with PFER.RSV = 1.
-> +	 * Set a reserved PA bit in MMIO SPTEs to generate page faults with
-> +	 * PFEC.RSVD=1 on MMIO accesses.  64-bit PTEs (PAE, x86-64, and EPT
-> +	 * paging) support a maximum of 52 bits of PA, i.e. if the CPU supports
-> +	 * 52-bit physical addresses then there are no reserved PA bits in the
-> +	 * PTEs and so the reserved PA approach must be disabled.
->  	 */
-> -
-> -	/*
-> -	 * Mask the uppermost physical address bit, which would be reserved as
-> -	 * long as the supported physical address width is less than 52.
-> -	 */
-> -	mask = 1ull << 51;
-> -
-> -	/* Set the present bit. */
-> -	mask |= 1ull;
-> -
-> -	/*
-> -	 * If reserved bit is not supported, clear the present bit to disable
-> -	 * mmio page fault.
-> -	 */
-> -	if (shadow_phys_bits == 52)
-> -		mask &= ~1ull;
-> +	if (shadow_phys_bits < 52)
-> +		mask = BIT_ULL(51) | PT_PRESENT_MASK;
-> +	else
-> +		mask = 0;
+> @@ -145,6 +289,7 @@ int main(int argc, char *argv[])
+>  	int i;
 >  
->  	kvm_mmu_set_mmio_spte_mask(mask, mask, ACC_WRITE_MASK | ACC_USER_MASK);
->  }
-
-Nice cleanup,
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+>  	report_prefix_push("Channel Subsystem");
+> +	enable_io_isc();
+>  	for (i = 0; tests[i].name; i++) {
+>  		report_prefix_push(tests[i].name);
+>  		tests[i].func();
 
