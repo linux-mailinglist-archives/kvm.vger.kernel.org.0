@@ -2,114 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E6211E3F56
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 12:44:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E7471E4186
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 14:08:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728337AbgE0Koe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 06:44:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3298 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726649AbgE0Kod (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 06:44:33 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04RAWAlF182318;
-        Wed, 27 May 2020 06:44:32 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 316ytunra1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 May 2020 06:44:32 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04RAWH26182642;
-        Wed, 27 May 2020 06:44:32 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 316ytunr9v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 May 2020 06:44:32 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04RAfJQk024307;
-        Wed, 27 May 2020 10:44:31 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma01wdc.us.ibm.com with ESMTP id 316uf8pegd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 May 2020 10:44:31 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04RAiTVU31457642
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 May 2020 10:44:29 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CAFE96A047;
-        Wed, 27 May 2020 10:44:30 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D9B4F6A04F;
-        Wed, 27 May 2020 10:44:29 +0000 (GMT)
-Received: from [9.65.228.55] (unknown [9.65.228.55])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 27 May 2020 10:44:29 +0000 (GMT)
-Subject: Re: [PATCH] vfio-ccw: document possible errors
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200407111605.1795-1-cohuck@redhat.com>
- <55932365-3d36-1629-5d65-06c71e8231f9@linux.ibm.com>
- <20200508125541.72adc626.cohuck@redhat.com>
- <ed9b7c9b-3dc7-e573-55a8-d52f28877da9@linux.ibm.com>
- <20200527081934.2dceda89.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <b9fe4698-c889-3480-9720-013c8af79c16@linux.ibm.com>
-Date:   Wed, 27 May 2020 06:44:29 -0400
+        id S2387718AbgE0MIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 08:08:30 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43726 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728483AbgE0MH3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 08:07:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590581247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JAOHEe2wXSlGLrnZFjFSmf34no8sDZWkhmsgq7pa2Tg=;
+        b=J4eQtvbB3Xhn7/xzdQaxIOYIgtJxbkcX+I9w9bZ88xz36u2mbPyHYb+hjs1+BqxL1mpynq
+        G6JeYI6JgyF6pNtNSn5tNFakgfl9/i05XvKD1+8K1uUWHjFOZxMO30qu4jTpQK9CssYwpb
+        xQ26bfMy0j4vwJ5/1KYgS94e2sCvtgw=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-fCSY9s4PP7-aHbiNL5-8Mg-1; Wed, 27 May 2020 08:07:25 -0400
+X-MC-Unique: fCSY9s4PP7-aHbiNL5-8Mg-1
+Received: by mail-ej1-f71.google.com with SMTP id nw19so8827757ejb.10
+        for <kvm@vger.kernel.org>; Wed, 27 May 2020 05:07:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JAOHEe2wXSlGLrnZFjFSmf34no8sDZWkhmsgq7pa2Tg=;
+        b=nPeQldwZ0ju3M92B8MST1GPcHXLwQTQPlP9kF2WSpwm/zMGrLf/MiEHYhQyYZyxYjd
+         nvEdD5iOoqCJIJ3uOfuhkBRlOiupyNJ81wg8NDx7OYbn+/FPwVdTjSGDeiyALAE8RNsl
+         QLVxm3Pax3mb6yna6Naau0TSNR8XuIYcNQtedNXBQ4rc3DYKjxMQmtdhn3nhxh4vHmBE
+         lNUK3E7Ei0g/QSbsjEP2k77w3qn8PEcBXltiFetyz3h2A1/BR2WpeOfAInzKSB509j1p
+         M+2RBgqCVTYRT02aKCV4I3COa2cOr6nuLu9nWW+6mRf/jHO4j1qrI074hCC0xC2jQ7TS
+         1/vw==
+X-Gm-Message-State: AOAM531cQHHu3YcgA4vUHCR0HUuhixsqbt0+NAvqREKCjdGyswKRNQL7
+        Pgl9ERkNZORZV8e8J4ZEIbvmkOiYVdGgpvpiWJ2vcGaa7AO1wWOKg2gbNdEycnf1KsP7CqkE+ea
+        oA594SmqWx4hU
+X-Received: by 2002:aa7:c6d1:: with SMTP id b17mr6119039eds.39.1590581244296;
+        Wed, 27 May 2020 05:07:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPap1r2d6pve9ph5mq6UFpBkvveZ3/UVhwnGQUVfRWhjg9EfMvArNZv5Ea+DHovL+LUMT1dw==
+X-Received: by 2002:aa7:c6d1:: with SMTP id b17mr6119007eds.39.1590581243987;
+        Wed, 27 May 2020 05:07:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8? ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
+        by smtp.gmail.com with ESMTPSA id gl19sm2526817ejb.34.2020.05.27.05.07.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 May 2020 05:07:23 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/mmu: Set mmio_value to '0' if reserved #PF can't
+ be generated
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200527084909.23492-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f88b71bb-74aa-9ff1-7aab-918d9f0a4a82@redhat.com>
+Date:   Wed, 27 May 2020 14:07:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200527081934.2dceda89.cohuck@redhat.com>
+In-Reply-To: <20200527084909.23492-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-05-27_03:2020-05-27,2020-05-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- malwarescore=0 suspectscore=0 priorityscore=1501 lowpriorityscore=0
- clxscore=1015 impostorscore=0 mlxlogscore=905 cotscore=-2147483648
- spamscore=0 adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005270073
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 27/05/20 10:49, Sean Christopherson wrote:
+> Set the mmio_value to '0' instead of simply clearing the present bit to
+> squash a benign warning in kvm_mmu_set_mmio_spte_mask() that complains
+> about the mmio_value overlapping the lower GFN mask on systems with 52
+> bits of PA space.
+> 
+> Opportunistically clean up the code and comments.
+> 
+> Fixes: 608831174100 ("KVM: x86: only do L1TF workaround on affected processors")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+Queued, thanks (with Cc: to stable).
+
+Paolo
+
+> Thanks for the excuse to clean up kvm_set_mmio_spte_mask(), been wanting a
+> reason to fix that mess for a few months now :-).
+> 
+>  arch/x86/kvm/mmu/mmu.c | 27 +++++++++------------------
+>  1 file changed, 9 insertions(+), 18 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 2df0f347655a4..aab90f4079ea9 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6136,25 +6136,16 @@ static void kvm_set_mmio_spte_mask(void)
+>  	u64 mask;
+>  
+>  	/*
+> -	 * Set the reserved bits and the present bit of an paging-structure
+> -	 * entry to generate page fault with PFER.RSV = 1.
+> +	 * Set a reserved PA bit in MMIO SPTEs to generate page faults with
+> +	 * PFEC.RSVD=1 on MMIO accesses.  64-bit PTEs (PAE, x86-64, and EPT
+> +	 * paging) support a maximum of 52 bits of PA, i.e. if the CPU supports
+> +	 * 52-bit physical addresses then there are no reserved PA bits in the
+> +	 * PTEs and so the reserved PA approach must be disabled.
+>  	 */
+> -
+> -	/*
+> -	 * Mask the uppermost physical address bit, which would be reserved as
+> -	 * long as the supported physical address width is less than 52.
+> -	 */
+> -	mask = 1ull << 51;
+> -
+> -	/* Set the present bit. */
+> -	mask |= 1ull;
+> -
+> -	/*
+> -	 * If reserved bit is not supported, clear the present bit to disable
+> -	 * mmio page fault.
+> -	 */
+> -	if (shadow_phys_bits == 52)
+> -		mask &= ~1ull;
+> +	if (shadow_phys_bits < 52)
+> +		mask = BIT_ULL(51) | PT_PRESENT_MASK;
+> +	else
+> +		mask = 0;
+>  
+>  	kvm_mmu_set_mmio_spte_mask(mask, mask, ACC_WRITE_MASK | ACC_USER_MASK);
+>  }
 
 
-On 5/27/20 2:19 AM, Cornelia Huck wrote:
-> On Tue, 26 May 2020 15:39:22 -0400
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> On 5/8/20 6:55 AM, Cornelia Huck wrote:
->>> On Fri, 17 Apr 2020 12:33:18 -0400
->>> Eric Farman <farman@linux.ibm.com> wrote:
->>>   
->>>> On 4/7/20 7:16 AM, Cornelia Huck wrote:  
->>>>> Interacting with the I/O and the async regions can yield a number
->>>>> of errors, which had been undocumented so far. These are part of
->>>>> the api, so remedy that.    
->>>>
->>>> (Makes a note to myself, to do the same for the schib/crw regions we're
->>>> adding for channel path handling.)  
->>>
->>> Yes, please :) I plan to merge this today, so you can add a patch on
->>> top.  
->>
->> I finally picked this up and realized that the io and async regions both
->> document the return codes that would be stored in a field within their
->> respective regions. The schib/crw regions don't have any such field, so
->> the only values to be documented are the ones that the .read callback
->> itself returns. What obvious thing am I missing?
-> 
-> The fact that you are right :)
-> 
-> No need to do anything, I might have spread my own confusion here ;)
-> 
 
-Oh, good. I was worried vacation was too long/short. :)
-
-Thanks for confirming; will get back to the other things on the list
-instead.
