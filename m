@@ -2,69 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC5BC1E37CA
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 07:14:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3124F1E37CD
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 07:17:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728084AbgE0FN4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 01:13:56 -0400
-Received: from mga17.intel.com ([192.55.52.151]:3798 "EHLO mga17.intel.com"
+        id S1728314AbgE0FRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 01:17:20 -0400
+Received: from mga18.intel.com ([134.134.136.126]:57658 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725969AbgE0FNz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 01:13:55 -0400
-IronPort-SDR: IjcWlCbiqXgTJoKu0wf/KWar0x7tikALWGy4P1nB07KDFtxAd/zN0Z8vuoA5k7pA2Wgvf3//I7
- 34+If4jgvuXg==
+        id S1725948AbgE0FRU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 01:17:20 -0400
+IronPort-SDR: sQMDONUQJGVyT50eRmESRavrTKtgzjVbvLcoJidFTfsaIQ+qddUTLPvp8IABdVS4lwJz3WaIJN
+ 5KmBaNasRBnA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2020 22:13:55 -0700
-IronPort-SDR: EZaFWLbW8btGXcoTvzeyQT6xjFbceGOJPwKLW6J7q51OFBid7lzF/JjZ5tQm4V+nRUhHp7EQ/B
- axatwRgBhKxQ==
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2020 22:17:19 -0700
+IronPort-SDR: 5X3dWGjasYSWKRTKWOoZ7lKskkHS6V0V6sQ8plLRmjNJWuGdCOK/8GFlhaWgVuChPZSo2WoRLa
+ TF8xQvpXStfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,440,1583222400"; 
-   d="scan'208";a="414074697"
+   d="scan'208";a="266715387"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga004.jf.intel.com with ESMTP; 26 May 2020 22:13:55 -0700
-Date:   Tue, 26 May 2020 22:13:55 -0700
+  by orsmga003.jf.intel.com with ESMTP; 26 May 2020 22:17:19 -0700
+Date:   Tue, 26 May 2020 22:17:19 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Brad Campbell <lists2009@fnarfbargle.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: KVM broken after suspend in most recent kernels.
-Message-ID: <20200527051354.GL31696@linux.intel.com>
-References: <1f7a85cc-38a6-2a2e-cbe3-a5b9970b7b92@fnarfbargle.com>
- <f726be8c-c7ef-bf6a-f31e-394969d35045@fnarfbargle.com>
- <1f7b1c9a8d9cbb6f82e97f8ba7a13ce5b773e16f.camel@redhat.com>
- <a45bc9d7-ad0b-2ff0-edcc-5283f591bc10@fnarfbargle.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH 1/3] kvm-unit-tests: nVMX: Test GUEST_BASE_GDTR and
+ GUEST_BASE_IDTR on vmentry of nested guests
+Message-ID: <20200527051719.GM31696@linux.intel.com>
+References: <20200523002603.32450-1-krish.sadhukhan@oracle.com>
+ <20200523002603.32450-2-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a45bc9d7-ad0b-2ff0-edcc-5283f591bc10@fnarfbargle.com>
+In-Reply-To: <20200523002603.32450-2-krish.sadhukhan@oracle.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 25, 2020 at 09:15:57PM +0800, Brad Campbell wrote:
-> >When you mean that KVM is broken after suspend, you mean that you can't
-> >start new VMs after suspend, or do VMs that were running before suspend
-> >break?  I see the later on my machine. I have AMD system though, so most
-> >likely this is another bug.
-> >
-> >Looking at the commit, I suspect that we indeed should set the IA32_FEAT_CTL
-> >after resume from ram, since suspend to ram might count as a complete CPU
-> >reset.
-> >
+On Fri, May 22, 2020 at 08:26:01PM -0400, Krish Sadhukhan wrote:
+> According to section "Checks on Guest Descriptor-Table Registers" in Intel
+> SDM vol 3C, the following check is performed on the Guest Descriptor-Table
+> Registers on vmentry of nested guests:
 > 
-> One of those "I should have clarified that" moments immediately after I
-> pressed send.  I've not tried suspending with a VM running. It's "can't start
-> new VMs after suspend".
+>     - On processors that support Intel 64 architecture, the base-address
+>       fields must contain canonical addresses.
+> 
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+>  x86/vmx_tests.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 68f93d3..fa27d99 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -7827,6 +7827,11 @@ static void vmx_guest_state_area_test(void)
+>  	test_load_guest_perf_global_ctrl();
+>  	test_load_guest_bndcfgs();
+>  
+> +#ifdef __x86_64__
 
-Don't bother testing suspending with a VM, the only thing that will be
-different is that your system will hang on resume instead when running a
-VM.  If there are active VMs, KVM automatically re-enables VMX via VMXON
-after resume, and VMXON is what's faulting.
+Aren't the VMX tests 64-bit only?
 
-Odds are good the firmware simply isn't initializing IA32_FEAT_CTL, ever.
-The kernel handles the boot-time case, but I (obviously) didn't consider
-the suspend case.  I'll work on a patch.
+> +	test_canonical(GUEST_BASE_GDTR, "GUEST_BASE_GDTR", false);
+> +	test_canonical(GUEST_BASE_IDTR, "GUEST_BASE_IDTR", false);
+> +#endif
+> +
+>  	/*
+>  	 * Let the guest finish execution
+>  	 */
+> -- 
+> 1.8.3.1
+> 
