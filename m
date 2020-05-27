@@ -2,73 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AF831E4B24
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 18:56:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E95131E4B44
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 19:00:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387708AbgE0Q43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 12:56:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48626 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731072AbgE0Q42 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 12:56:28 -0400
+        id S1726978AbgE0RAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 13:00:20 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50029 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726964AbgE0RAU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 13:00:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590598587;
+        s=mimecast20190719; t=1590598818;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iV7PJ6499KBh2jHYA4ZAtJgeGbwihYkeZJNBRtXPRHU=;
-        b=M5TM6GBdLQBAkD6ZQB9Xy7MPB66mtSEj/aA6ZZlqI32lntz8MXeXjXyQyRgw+4bJav2pxV
-        FP1RV3pQMcLHkufX/fXuTcExG7WOnLOwX9AUNyiZhYYqFTpR+puLx91TeLLUAyhVeIROiK
-        4rGCUaJGlArdYuwWuqKCwc+dI2zhc8w=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-8HE5gsRENfanrqjvHzcogw-1; Wed, 27 May 2020 12:56:23 -0400
-X-MC-Unique: 8HE5gsRENfanrqjvHzcogw-1
-Received: by mail-wr1-f72.google.com with SMTP id w16so3264324wru.18
-        for <kvm@vger.kernel.org>; Wed, 27 May 2020 09:56:22 -0700 (PDT)
+        bh=19uN5uVqFPxYVimAYdibOEMC+SZq9IjB04cBBr/Z/FE=;
+        b=cxHPoLdTFMe3NpkJn57fS+25dIDbQyx28cc3oD281IAzxq9+hQ82FuywR9CIJoIYk+awHY
+        IWdhQZr+YmWL0nmjtDYNjxaDBZj0ZSETx8MAcKOpe04tvR+nso+r4QcefEgBGOlABgO5/S
+        6V1uBcb6ToSas1MuEybonPqLXWp2lhk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-507-yUzJfUKTP8q7LRu8wxpIZg-1; Wed, 27 May 2020 13:00:16 -0400
+X-MC-Unique: yUzJfUKTP8q7LRu8wxpIZg-1
+Received: by mail-wr1-f69.google.com with SMTP id z8so11413435wrp.7
+        for <kvm@vger.kernel.org>; Wed, 27 May 2020 10:00:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=iV7PJ6499KBh2jHYA4ZAtJgeGbwihYkeZJNBRtXPRHU=;
-        b=Vn/wb29BjZbTL8G3Wg6YypYRhAeGDk88zA2KyHSTPNMhiyQTo0Muu9JN29xPP7hDdq
-         01QlssUbW0eYfGBZUDkCvFwvp/QMA3P9EFVx9smgkoPa1N7LNSLPcj2ocDAxe9lkkSbu
-         D8ZvNjeSMTnQMeMhGbEACB6OS9cJ7pXu7wsfJRbXRE8IkvgDXCtaO5z2i14ZBb8PydS6
-         WloG49s3vi8C73+QPoGebokHKqDYAqYt5hRi3zPjPoE4UFK5qaTA5FaOaxjp/LbcHGN2
-         dx1I4MXXlGK4JL5K7dLsW+LuU/JRTABLkCgGI+BrDOuLVZA6M/Y0AWyppJdDxZU+IV3U
-         iYyw==
-X-Gm-Message-State: AOAM53316VnUl897zp0YiT4hSs7g//CiaF35tAY2oqUIHP2T7qnHnVgU
-        bGnki5YDy792f57sMcf1WBEwCLG8QB/4k1sZhpPkKASV1MLv7GuQ7u3i+wyC2yKDRRGOuiFI48u
-        DmzMVFNpZuuyl
-X-Received: by 2002:a05:600c:1008:: with SMTP id c8mr5127046wmc.95.1590598581817;
-        Wed, 27 May 2020 09:56:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWqtxWIpSj7lNv4aAoT7R1wHmHCL5CoZGek+Bmi7wvG2hiEcJDp9eWQVm/NvOtXtAmmI1Rhw==
-X-Received: by 2002:a05:600c:1008:: with SMTP id c8mr5127030wmc.95.1590598581595;
-        Wed, 27 May 2020 09:56:21 -0700 (PDT)
+        bh=19uN5uVqFPxYVimAYdibOEMC+SZq9IjB04cBBr/Z/FE=;
+        b=t9ej9fMM6AllC1ssgWT3IwpwHwFBII77p+JeP1x9Syc1urYzopWwzYqD9fabiHwNuJ
+         EvLaZ/Oeo/k2jEQJ7opfGJdgUn2Q+j0gjpU+gvhrlpZuIMx8nlQgCiMRB2dWIi4e8FVa
+         bimHMUrG14l+Bx5Okm6Im6dSH0yB/Bo57zzyYYx98kutUSCNut+NWpV2SQ9R2AR5ylsY
+         Ec3xwx/9uU2LOichdMhCLurpR4YnYpI8Cw82OyApo1OkEJ4M8F3i/hCbhBLIRYKD19zV
+         R/HVoR5Q8hMbFWZTlzKPK2deur2IYvQsQjX/uHPVEI7BpZJF9vdviGvuJw5i5T7lqGFr
+         77TQ==
+X-Gm-Message-State: AOAM532LorlywL4hrCHqYMNzBdJ5pCS+myg/cJp9t5oADhu/TBFFQe/F
+        LcmN7Cw2h/xhsXLfbdo9ogl6lBnZsplhm1VlP2XWzEqXDjfQJbY03jyJylS92mzjsW8EdTZpfb9
+        UrBAjL+q2zcrk
+X-Received: by 2002:adf:feca:: with SMTP id q10mr18966778wrs.380.1590598815731;
+        Wed, 27 May 2020 10:00:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxZsMcWkS3QYq92JA1gLacyexyY9OQ9Klpg3SI6agBShM60ySQO59nAhfrwJJyiTsfoOy/rdw==
+X-Received: by 2002:adf:feca:: with SMTP id q10mr18966738wrs.380.1590598815463;
+        Wed, 27 May 2020 10:00:15 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8? ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
-        by smtp.gmail.com with ESMTPSA id i21sm3504216wml.5.2020.05.27.09.56.20
+        by smtp.gmail.com with ESMTPSA id h15sm3219876wrt.73.2020.05.27.10.00.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 May 2020 09:56:21 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: Initialize tdp_level during vCPU creation
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Wed, 27 May 2020 10:00:14 -0700 (PDT)
+Subject: Re: [PATCH 0/2] Fix issue with not starting nesting guests on my
+ system
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, Tao Xu <tao3.xu@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+904752567107eefb728c@syzkaller.appspotmail.com
-References: <20200527085400.23759-1-sean.j.christopherson@intel.com>
- <40800163-2b28-9879-f21b-687f89070c91@redhat.com>
- <20200527162933.GE24461@linux.intel.com>
+        linux-kernel@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jingqi Liu <jingqi.liu@intel.com>
+References: <20200523161455.3940-1-mlevitsk@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <078365dd-64ff-4f3c-813c-3d9fc955ed1a@redhat.com>
-Date:   Wed, 27 May 2020 18:56:19 +0200
+Message-ID: <c12376a8-fc98-5785-e4b6-5c682afd3cd6@redhat.com>
+Date:   Wed, 27 May 2020 19:00:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200527162933.GE24461@linux.intel.com>
+In-Reply-To: <20200523161455.3940-1-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,41 +81,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/05/20 18:29, Sean Christopherson wrote:
-> On Wed, May 27, 2020 at 06:17:57PM +0200, Paolo Bonzini wrote:
->> On 27/05/20 10:54, Sean Christopherson wrote:
->>> Initialize vcpu->arch.tdp_level during vCPU creation to avoid consuming
->>> garbage if userspace calls KVM_RUN without first calling KVM_SET_CPUID.
->>>
->>> Fixes: e93fd3b3e89e9 ("KVM: x86/mmu: Capture TDP level when updating CPUID")
->>> Reported-by: syzbot+904752567107eefb728c@syzkaller.appspotmail.com
->>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->>> ---
->>>  arch/x86/kvm/x86.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index b226fb8abe41b..01a6304056197 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -9414,6 +9414,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>>  	fx_init(vcpu);
->>>  
->>>  	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
->>> +	vcpu->arch.tdp_level = kvm_x86_ops.get_tdp_level(vcpu);
->>>  
->>>  	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
->>
->> Queued, it is probably a good idea to add a selftests testcase for this
->> (it's even okay if it doesn't use the whole selftests infrastructure and
->> invokes KVM_CREATE_VM/KVM_CREATE_VCPU/KVM_RUN manually).
+On 23/05/20 18:14, Maxim Levitsky wrote:
+> On my AMD machine I noticed that I can't start any nested guests,
+> because nested KVM (everything from master git branches) complains
+> that it can't find msr MSR_IA32_UMWAIT_CONTROL which my system doesn't support
+> at all anyway.
 > 
-> Ya.  syzbot is hitting a #GP due to NULL pointer during debugfs on the exact
-> same sequence.  I haven't been able to reproduce that one (have yet to try
-> syzbot's exact config), but it's another example of a "dumb" test hitting
-> meaningful bugs.
+> I traced it to the recently added UMWAIT support to qemu and kvm.
+> The kvm portion exposed the new MSR in KVM_GET_MSR_INDEX_LIST without
+> checking that it the underlying feature is supported in CPUID.
+> It happened to work when non nested because as a precation kvm,
+> tries to read each MSR on host before adding it to that list,
+> and when read gets a #GP it ignores it.
+> 
+> When running nested, the L1 hypervisor can be set to ignore unknown
+> msr read/writes (I need this for some other guests), thus this safety
+> check doesn't work anymore.
+> 
+> V2: * added a patch to setup correctly the X86_FEATURE_WAITPKG kvm capability
+>     * dropped the cosmetic fix patch as it is now fixed in kvm/queue
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (2):
+>   kvm/x86/vmx: enable X86_FEATURE_WAITPKG in KVM capabilities
+>   kvm/x86: don't expose MSR_IA32_UMWAIT_CONTROL unconditionally
+> 
+>  arch/x86/kvm/vmx/vmx.c | 3 +++
+>  arch/x86/kvm/x86.c     | 4 ++++
+>  2 files changed, 7 insertions(+)
+> 
 
-Saw that, it's mine. :)
+Queued for 5.7, thanks (with cosmetic touches to the commit message, and
+moving the "case" earlier to avoid conflicts).
 
 Paolo
 
