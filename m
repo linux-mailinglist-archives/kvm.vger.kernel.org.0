@@ -2,44 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E91DC1E3C50
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:43:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96B4E1E3C6E
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:45:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388154AbgE0ImY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 04:42:24 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:47708 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387929AbgE0ImY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 04:42:24 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id BB54F1344ACB74EED863;
-        Wed, 27 May 2020 16:42:21 +0800 (CST)
-Received: from [10.173.222.27] (10.173.222.27) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 27 May 2020 16:42:14 +0800
-Subject: Re: [PATCH] KVM: arm64: Allow in-atomic injection of SPIs
+        id S2388248AbgE0IpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 04:45:03 -0400
+Received: from foss.arm.com ([217.140.110.172]:34092 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388211AbgE0IpC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 04:45:02 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F0CF30E;
+        Wed, 27 May 2020 01:45:02 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 21F9B3F6C4;
+        Wed, 27 May 2020 01:45:00 -0700 (PDT)
+Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
+ struct kvm
 To:     Marc Zyngier <maz@kernel.org>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        Eric Auger <eric.auger@redhat.com>, <kernel-team@android.com>,
-        James Morse <james.morse@arm.com>,
+Cc:     James Morse <james.morse@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200526161136.451312-1-maz@kernel.org>
- <47d6d521-f05e-86fe-4a94-ce21754100ae@huawei.com>
- <1d3658f4b92a690ba05367f2a22a7331@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <628e9f4b-0587-bde6-05f3-6877e37bd659@huawei.com>
-Date:   Wed, 27 May 2020 16:42:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+References: <20200422120050.3693593-1-maz@kernel.org>
+ <20200422120050.3693593-4-maz@kernel.org>
+ <a7c8207c-9061-ad0e-c9f8-64c995e928b6@arm.com>
+ <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
+ <6518439c-65b7-1e87-a21d-a053d75c0514@arm.com>
+ <ea603b3a7a51a597263e7c8152f4c795@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <91b6b062-e39d-a672-52e4-40532068a02e@arm.com>
+Date:   Wed, 27 May 2020 09:45:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-In-Reply-To: <1d3658f4b92a690ba05367f2a22a7331@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+In-Reply-To: <ea603b3a7a51a597263e7c8152f4c795@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -47,70 +56,86 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Marc,
 
-On 2020/5/27 15:55, Marc Zyngier wrote:
-> Hi Zenghui,
-> 
-> On 2020-05-27 08:41, Zenghui Yu wrote:
->> On 2020/5/27 0:11, Marc Zyngier wrote:
->>> On a system that uses SPIs to implement MSIs (as it would be
->>> the case on a GICv2 system exposing a GICv2m to its guests),
->>> we deny the possibility of injecting SPIs on the in-atomic
->>> fast-path.
->>>
->>> This results in a very large amount of context-switches
->>> (roughly equivalent to twice the interrupt rate) on the host,
->>> and suboptimal performance for the guest (as measured with
->>> a test workload involving a virtio interface backed by vhost-net).
->>> Given that GICv2 systems are usually on the low-end of the spectrum
->>> performance wise, they could do without the aggravation.
->>>
->>> We solved this for GICv3+ITS by having a translation cache. But
->>> SPIs do not need any extra infrastructure, and can be immediately
->>> injected in the virtual distributor as the locking is already
->>> heavy enough that we don't need to worry about anything.
->>>
->>> This halves the number of context switches for the same workload.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>   arch/arm64/kvm/vgic/vgic-irqfd.c | 20 ++++++++++++++++----
->>>   arch/arm64/kvm/vgic/vgic-its.c   |  3 +--
->>>   2 files changed, 17 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c 
->>> b/arch/arm64/kvm/vgic/vgic-irqfd.c
->>> index d8cdfea5cc96..11a9f81115ab 100644
->>> --- a/arch/arm64/kvm/vgic/vgic-irqfd.c
->>> +++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
->>> @@ -107,15 +107,27 @@ int kvm_arch_set_irq_inatomic(struct 
->>> kvm_kernel_irq_routing_entry *e,
->>>                     struct kvm *kvm, int irq_source_id, int level,
->>>                     bool line_status)
+On 5/27/20 9:41 AM, Marc Zyngier wrote:
+> Hi Alex,
+>
+> On 2020-05-12 17:53, Alexandru Elisei wrote:
+>> Hi,
 >>
->> ... and you may also need to update the comment on top of it to
->> reflect this change.
+>> On 5/12/20 12:17 PM, James Morse wrote:
+>>> Hi Alex, Marc,
+>>>
+>>> (just on this last_vcpu_ran thing...)
+>>>
+>>> On 11/05/2020 17:38, Alexandru Elisei wrote:
+>>>> On 4/22/20 1:00 PM, Marc Zyngier wrote:
+>>>>> From: Christoffer Dall <christoffer.dall@arm.com>
+>>>>>
+>>>>> As we are about to reuse our stage 2 page table manipulation code for
+>>>>> shadow stage 2 page tables in the context of nested virtualization, we
+>>>>> are going to manage multiple stage 2 page tables for a single VM.
+>>>>>
+>>>>> This requires some pretty invasive changes to our data structures,
+>>>>> which moves the vmid and pgd pointers into a separate structure and
+>>>>> change pretty much all of our mmu code to operate on this structure
+>>>>> instead.
+>>>>>
+>>>>> The new structure is called struct kvm_s2_mmu.
+>>>>>
+>>>>> There is no intended functional change by this patch alone.
+>>>>> diff --git a/arch/arm64/include/asm/kvm_host.h
+>>>>> b/arch/arm64/include/asm/kvm_host.h
+>>>>> index 7dd8fefa6aecd..664a5d92ae9b8 100644
+>>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>>> @@ -63,19 +63,32 @@ struct kvm_vmid {
+>>>>>      u32    vmid;
+>>>>>  };
+>>>>>
+>>>>> -struct kvm_arch {
+>>>>> +struct kvm_s2_mmu {
+>>>>>      struct kvm_vmid vmid;
+>>>>>
+>>>>> -    /* stage2 entry level table */
+>>>>> -    pgd_t *pgd;
+>>>>> -    phys_addr_t pgd_phys;
+>>>>> -
+>>>>> -    /* VTCR_EL2 value for this VM */
+>>>>> -    u64    vtcr;
+>>>>> +    /*
+>>>>> +     * stage2 entry level table
+>>>>> +     *
+>>>>> +     * Two kvm_s2_mmu structures in the same VM can point to the same pgd
+>>>>> +     * here.  This happens when running a non-VHE guest hypervisor which
+>>>>> +     * uses the canonical stage 2 page table for both vEL2 and for vEL1/0
+>>>>> +     * with vHCR_EL2.VM == 0.
+>>>> It makes more sense to me to say that a non-VHE guest hypervisor will use the
+>>>> canonical stage *1* page table when running at EL2
+>>> Can KVM say anything about stage1? Its totally under the the guests control
+>>> even at vEL2...
 >>
->> /**
->>  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
->>  *
->>  * Currently only direct MSI injection is supported.
->>  */
-> 
-> As far as I can tell, it is still valid (at least from the guest's
-> perspective). You could in practice use that to deal with level
-> interrupts, but we only inject the rising edge on this path, never
-> the falling edge. So effectively, this is limited to edge interrupts,
-> which is mostly MSIs.
+>> It just occurred to me that "canonical stage 2 page table" refers to the L0
+>> hypervisor stage 2, not to the L1 hypervisor stage 2. If you don't mind my
+>> suggestion, perhaps the comment can be slightly improved to avoid any confusion?
+>> Maybe something along the lines of "[..] This happens when running a
+>> non-VHE guest
+>> hypervisor, in which case we use the canonical stage 2 page table for both vEL2
+>> and for vEL1/0 with vHCR_EL2.VM == 0".
+>
+> If the confusion stems from the lack of guest stage-2, how about:
+>
+> "This happens when running a guest using a translation regime that isn't
+>  affected by its own stage-2 translation, such as a non-VHE hypervisor
+>  running at vEL2, or for vEL1/EL0 with vHCR_EL2.VM == 0. In that case,
+>  we use the canonical stage-2 page tables."
+>
+> instead? Does this lift the ambiguity?
 
-Oops... I had wrongly mixed MSI with the architecture-defined LPI, and
-was think that we should add something like "direct SPI injection is
-also supported now". Sorry.
-
-> 
-> Unless you are thinking of something else which I would have missed?
-
-No, please ignore the noisy.
-
+Yes, that's perfect.
 
 Thanks,
-Zenghui
+Alex
+>
+> Thanks,
+>
+>         M.
