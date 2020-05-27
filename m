@@ -2,89 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B8A01E50AF
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 23:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DB021E511D
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 00:22:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727098AbgE0Vr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 17:47:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56432 "EHLO
+        id S1725937AbgE0WWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 18:22:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbgE0Vrz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 17:47:55 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E84AC05BD1E;
-        Wed, 27 May 2020 14:47:55 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 49XPZb4z9Rz9sRK;
-        Thu, 28 May 2020 07:47:51 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1590616071;
-        bh=mXu9qxrrYhcMrslxtNTfDTi99hlgGhfPw1uSLhfYR00=;
-        h=Date:From:To:Cc:Subject:From;
-        b=K0O5AJ6mpaA0/hNQp3MM5lNC8locegVJUd0sBCWNx/eYI9gH1FkQncofC8loe8lbk
-         +xOy3F1UHC9HPmKcgvhV+HRwWPUPQ5xt4AsKZU8OFl5HSzgidg4fAfmDk3sjQJ1sXb
-         vAGkABj1iLPvUIgJEVUkHHTvkhTAFvFXtkbXqS8sNRCBMhGz8NMfAblZPwLOy9bufC
-         b15irLTRtrUSl7EFf5DaPokyu1dNWH2bmBE/CroMrueBnL7pzjZd6cA6kG81imsFZw
-         SHA+p8Sp4qGp1X9qJNeGHoEsCbP/tEnhE3Qd6gMEXmCwrnvsuMEO5XXejxIOJbnM2a
-         Z6qf9idIlGe3A==
-Date:   Thu, 28 May 2020 07:47:50 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
-Message-ID: <20200528074750.550f761b@canb.auug.org.au>
+        with ESMTP id S1725385AbgE0WWA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 18:22:00 -0400
+Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E60AC05BD1E;
+        Wed, 27 May 2020 15:21:59 -0700 (PDT)
+Received: by mail-qt1-x844.google.com with SMTP id g18so3764000qtu.13;
+        Wed, 27 May 2020 15:21:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=O0EZFokD4VETW8hilHGvqiWo+AY18MjoTOCmb0j2QP0=;
+        b=s2T8fMW9uZpIMjWGcD1ZLd6JVhc9lKb0qUFORy1p1/+usP51vVfE7imxKLhJ4zBXJL
+         X0mKKqb2aJCwjf5JmHRE1iXQ5HDbob9tUqqLNARkQ4SclF98OdsiSN0H9L7Jk7a0uncw
+         hkkYgpvz1WcPKKAIE5+ZaRlyLjX6J5dcqyx6Jy/iaBSWUW4u7GmrcX5FGeEQ7HFP7/to
+         Y3/evqAvP8745WekeffD2AUo5xLwINjsmVd9GSXBQoU8+b3mUNz7Y2lZUf15r70X16G7
+         pzzvqB9L/QSRoPPhm2dplOLBsn3NmgGCi0h/ITu1v08iISeTVI8BH0uIZYxV4HlMnPo9
+         yrWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=O0EZFokD4VETW8hilHGvqiWo+AY18MjoTOCmb0j2QP0=;
+        b=I0rhIIffJ1k5UhhrCmd00Q8uu+0FFACijdUQHhoFcJW8PXbxq+eYTBNVL7ACu2TKXd
+         DBa67UNzvureLWPODO/tVk/bREAezYpQTi1RR1TBKf3dH9+ucmKzqsi7Pfsc7kXHOsJv
+         8fDAWt7vDBMFHspQh68O5l1XBpS9vKqK0khpffX6Qi6/6HkbsYMXrGdGxVuj18Smrcib
+         uKerlLz94jQDwHrTJdxb/x9uU06HGhO4DplzLGJwqQxXDdsdU7Ibp3Nz0n9YUneCtGzF
+         KvpOG3KdtbcrVwZsRnwxSzp5LLCTpaRU6BJgJB1aHNaXZFkSkN9xoWCDg8Q829D/OgEQ
+         YYKg==
+X-Gm-Message-State: AOAM533pYVEpGrCqnJnCBJMyUL0o16x4B7Zca0faEFl74wTuASQvH+Jw
+        40QO0CqIYyYVmcPqlEWvuL0=
+X-Google-Smtp-Source: ABdhPJyOgdLDKEz0HQkCQmvOCQBIMuQEJnT24eYzL6cb96knhDKVZ2UOmt/SMnmijP1sKg5MpJ9iCQ==
+X-Received: by 2002:ac8:6cf:: with SMTP id j15mr107653qth.143.1590618118847;
+        Wed, 27 May 2020 15:21:58 -0700 (PDT)
+Received: from ?IPv6:2601:282:803:7700:2840:9137:669d:d1e7? ([2601:282:803:7700:2840:9137:669d:d1e7])
+        by smtp.googlemail.com with ESMTPSA id v14sm3909630qtj.31.2020.05.27.15.21.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 May 2020 15:21:58 -0700 (PDT)
+Subject: Re: [PATCH v3 0/7] Statsfs: a new ram-based file system for Linux
+ kernel statistics
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Jim Mattson <jmattson@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+        David Rientjes <rientjes@google.com>,
+        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+        Andrew Lunn <andrew@lunn.ch>
+References: <20200526110318.69006-1-eesposit@redhat.com>
+ <20200526153128.448bfb43@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+ <6a754b40-b148-867d-071d-8f31c5c0d172@redhat.com>
+ <20200527132321.54bcdf04@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+ <af2ba926-73bc-26c3-7ce7-bd45f657fd85@redhat.com>
+From:   David Ahern <dsahern@gmail.com>
+Message-ID: <b6fa4439-c6b8-63a4-84fd-fbac3d4f10fd@gmail.com>
+Date:   Wed, 27 May 2020 16:21:55 -0600
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/LyStz_oR44yVl+tok4Z2UQd";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <af2ba926-73bc-26c3-7ce7-bd45f657fd85@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/LyStz_oR44yVl+tok4Z2UQd
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 5/27/20 3:07 PM, Paolo Bonzini wrote:
+> I see what you meant now.  statsfs can also be used to enumerate objects
+> if one is so inclined (with the prototype in patch 7, for example, each
+> network interface becomes a directory).
 
-Hi all,
-
-In commit
-
-  f4cfcd2d5aea ("KVM: x86: don't expose MSR_IA32_UMWAIT_CONTROL uncondition=
-ally")
-
-Fixes tag
-
-  Fixes: 6e3ba4abce ("KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL")
-
-has these problem(s):
-
-  - SHA1 should be at least 12 digits long
-    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
-    or later) just making sure it is not set (or set to "auto").
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/LyStz_oR44yVl+tok4Z2UQd
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7O4AYACgkQAVBC80lX
-0GwUfAf/T8bYGS2CZ+9VIOkE6z9xJC/K1D3t7G1kCaYHfHgaSkul3vExAeJDghwn
-WVN+mOVwu2QFyEZ6PUqX/hjJHmMiQs1Lvv4vULMVi3QI7xK/KKuXnqfuOfjQLJhI
-UyZKaa5jxhO484FylcmkGk9QtC0HWxmAXluxWSlBAaoFZHsbDSHP0vHdQVA6WPBx
-Opwd0JA5U6drlQ8cZ6EhJvXfk+eW5QaIK5SPYl/fhH/F0SRCA4EtTCEIpaNVC59g
-2Jr4vLnCAeBu7a9qG1FsdzgJG/Cj8s7m+AfsLCPjnTlZpRUMJAJS5jo8vwU4NukN
-sWQuAKaYyfXycc2Zf0UX4RF8V2y+Eg==
-=idU4
------END PGP SIGNATURE-----
-
---Sig_/LyStz_oR44yVl+tok4Z2UQd--
+there are many use cases that have 100's to 1000's have network devices.
+Having a sysfs entry per device already bloats memory usage for these
+use cases; another filesystem with an entry per device makes that worse.
+Really the wrong direction for large scale systems.
