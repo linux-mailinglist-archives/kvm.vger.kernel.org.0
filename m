@@ -2,233 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 305CE1E3DA3
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 11:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26EA81E3DC4
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 11:42:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726761AbgE0JeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 05:34:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43158 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725882AbgE0JeM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 05:34:12 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728390AbgE0Jmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 05:42:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35349 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728033AbgE0Jmv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 05:42:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590572570;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f0puwwXNhKN7RSE2QI0t2f9CXt8LITwCnQss5WUrmJk=;
+        b=dri9J68mzN5V/NxhZGmQs3fXcQkHKwMgMaeFteDXKd9aR8EStEMBHUCTwZPPrNXAWCwEvI
+        s3XmnPgjtrEZiKorR71N7kj8j3OgRJT1J4bzTbY3qNhcJq1h5seGHF0mhpHdF9duWkW13g
+        1EGIeLHFVExHa6pdsUiseOU/BHr8NG8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-c5Fq9dKQNkOJWehSURcLyQ-1; Wed, 27 May 2020 05:42:47 -0400
+X-MC-Unique: c5Fq9dKQNkOJWehSURcLyQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 752EB20890;
-        Wed, 27 May 2020 09:34:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590572051;
-        bh=7Pi5My5nrzsGsUPwd6yUzD0/bg9Bh6OPCq4593K9TBk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=WAWjg7T60B2Gikan7es25KIN24d3UnYrPrk01hgFvSxnLQllWeL9RXVuAttD1WpsS
-         wQzw505kXGws+pWoXbpVW81ZKXZyfVbiakstUmqJzW3cBEs+GK3YgU9Q3ehbGfvlOM
-         3/fhysIll/R99br1U1BtzIKHaqrGiG4ZQlPQ09jA=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jdsRt-00Fejs-NL; Wed, 27 May 2020 10:34:09 +0100
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05F8C872FE0;
+        Wed, 27 May 2020 09:42:46 +0000 (UTC)
+Received: from gondolin (ovpn-112-223.ams2.redhat.com [10.36.112.223])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EE72F7D982;
+        Wed, 27 May 2020 09:42:41 +0000 (UTC)
+Date:   Wed, 27 May 2020 11:42:39 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v7 09/12] s390x: css: msch, enable test
+Message-ID: <20200527114239.65fa9473.cohuck@redhat.com>
+In-Reply-To: <1589818051-20549-10-git-send-email-pmorel@linux.ibm.com>
+References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
+        <1589818051-20549-10-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Date:   Wed, 27 May 2020 10:34:09 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 26/26] KVM: arm64: Parametrize exception entry with a
- target EL
-In-Reply-To: <20200519104457.GA19548@C02TD0UTHF1T.local>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-27-maz@kernel.org>
- <20200519104457.GA19548@C02TD0UTHF1T.local>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <db34b0fbd58275a0a2a0c9108b9507d6@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HI Mark,
+On Mon, 18 May 2020 18:07:28 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-On 2020-05-19 11:44, Mark Rutland wrote:
-> On Wed, Apr 22, 2020 at 01:00:50PM +0100, Marc Zyngier wrote:
->> We currently assume that an exception is delivered to EL1, always.
->> Once we emulate EL2, this no longer will be the case. To prepare
->> for this, add a target_mode parameter.
->> 
->> While we're at it, merge the computing of the target PC and PSTATE in
->> a single function that updates both PC and CPSR after saving their
->> previous values in the corresponding ELR/SPSR. This ensures that they
->> are updated in the correct order (a pretty common source of bugs...).
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/inject_fault.c | 75 
->> ++++++++++++++++++-----------------
->>  1 file changed, 38 insertions(+), 37 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/inject_fault.c 
->> b/arch/arm64/kvm/inject_fault.c
->> index d3ebf8bca4b89..3dbcbc839b9c3 100644
->> --- a/arch/arm64/kvm/inject_fault.c
->> +++ b/arch/arm64/kvm/inject_fault.c
->> @@ -26,28 +26,12 @@ enum exception_type {
->>  	except_type_serror	= 0x180,
->>  };
->> 
->> -static u64 get_except_vector(struct kvm_vcpu *vcpu, enum 
->> exception_type type)
->> -{
->> -	u64 exc_offset;
->> -
->> -	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
->> -	case PSR_MODE_EL1t:
->> -		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
->> -		break;
->> -	case PSR_MODE_EL1h:
->> -		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
->> -		break;
->> -	case PSR_MODE_EL0t:
->> -		exc_offset = LOWER_EL_AArch64_VECTOR;
->> -		break;
->> -	default:
->> -		exc_offset = LOWER_EL_AArch32_VECTOR;
->> -	}
->> -
->> -	return vcpu_read_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
->> -}
->> -
->>  /*
->> + * This performs the exception entry at a given EL (@target_mode), 
->> stashing PC
->> + * and PSTATE into ELR and SPSR respectively, and compute the new 
->> PC/PSTATE.
->> + * The EL passed to this function *must* be a non-secure, privileged 
->> mode with
->> + * bit 0 being set (PSTATE.SP == 1).
->> + *
->>   * When an exception is taken, most PSTATE fields are left unchanged 
->> in the
->>   * handler. However, some are explicitly overridden (e.g. M[4:0]). 
->> Luckily all
->>   * of the inherited bits have the same position in the 
->> AArch64/AArch32 SPSR_ELx
->> @@ -59,10 +43,35 @@ static u64 get_except_vector(struct kvm_vcpu 
->> *vcpu, enum exception_type type)
->>   * Here we manipulate the fields in order of the AArch64 SPSR_ELx 
->> layout, from
->>   * MSB to LSB.
->>   */
->> -static unsigned long get_except64_pstate(struct kvm_vcpu *vcpu)
->> +static void enter_exception(struct kvm_vcpu *vcpu, unsigned long 
->> target_mode,
->> +			    enum exception_type type)
+> A second step when testing the channel subsystem is to prepare a channel
+> for use.
+> This includes:
+> - Get the current subchannel Information Block (SCHIB) using STSCH
+> - Update it in memory to set the ENABLE bit
+> - Tell the CSS that the SCHIB has been modified using MSCH
+> - Get the SCHIB from the CSS again to verify that the subchannel is
+>   enabled.
+> - If the subchannel is not enabled retry a predefined retries count.
 > 
-> Since this is all for an AArch64 target, could we keep `64` in the 
-> name,
-> e.g enter_exception64? That'd mirror the callers below.
+> This tests the MSCH instruction to enable a channel succesfuly.
+> This is NOT a routine to really enable the channel, no retry is done,
+> in case of error, a report is made.
+
+Hm... so you retry if the subchannel is not enabled after cc 0, but you
+don't retry if the cc indicates busy/status pending? Makes sense, as we
+don't expect the subchannel to be busy, but a more precise note in the
+patch description would be good :)
+
 > 
->>  {
->> -	unsigned long sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
->> -	unsigned long old, new;
->> +	unsigned long sctlr, vbar, old, new, mode;
->> +	u64 exc_offset;
->> +
->> +	mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
->> +
->> +	if      (mode == target_mode)
->> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
->> +	else if ((mode | 1) == target_mode)
->> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  s390x/css.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 67 insertions(+)
 > 
-> It would be nice if we could add a mnemonic for the `1` here, e.g.
-> PSR_MODE_SP0 or PSR_MODE_THREAD_BIT.
+> diff --git a/s390x/css.c b/s390x/css.c
+> index d7989d8..1b60a47 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -16,6 +16,7 @@
+>  #include <string.h>
+>  #include <interrupt.h>
+>  #include <asm/arch_def.h>
+> +#include <asm/time.h>
+>  
+>  #include <css.h>
+>  
+> @@ -65,11 +66,77 @@ out:
+>  	       scn, scn_found, dev_found);
+>  }
+>  
+> +#define MAX_ENABLE_RETRIES	5
+> +static void test_enable(void)
+> +{
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int retry_count = 0;
+> +	int cc;
+> +
+> +	if (!test_device_sid) {
+> +		report_skip("No device");
+> +		return;
+> +	}
+> +
+> +	/* Read the SCHIB for this subchannel */
+> +	cc = stsch(test_device_sid, &schib);
+> +	if (cc) {
+> +		report(0, "stsch cc=%d", cc);
+> +		return;
+> +	}
+> +
+> +	if (pmcw->flags & PMCW_ENABLE) {
+> +		report(1, "stsch: sch %08x already enabled", test_device_sid);
+> +		return;
+> +	}
+> +
+> +retry:
+> +	/* Update the SCHIB to enable the channel */
+> +	pmcw->flags |= PMCW_ENABLE;
+> +
+> +	/* Tell the CSS we want to modify the subchannel */
+> +	cc = msch(test_device_sid, &schib);
+> +	if (cc) {
+> +		/*
+> +		 * If the subchannel is status pending or
+> +		 * if a function is in progress,
+> +		 * we consider both cases as errors.
 
-I've addressed both comments as follows:
+Could also be cc 3, but that would be even more weird. Just logging the
+cc seems fine, though.
 
-diff --git a/arch/arm64/include/asm/ptrace.h 
-b/arch/arm64/include/asm/ptrace.h
-index bf57308fcd63..953b6a1ce549 100644
---- a/arch/arm64/include/asm/ptrace.h
-+++ b/arch/arm64/include/asm/ptrace.h
-@@ -35,6 +35,7 @@
-  #define GIC_PRIO_PSR_I_SET		(1 << 4)
+> +		 */
+> +		report(0, "msch cc=%d", cc);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * Read the SCHIB again to verify the enablement
+> +	 */
+> +	cc = stsch(test_device_sid, &schib);
+> +	if (cc) {
+> +		report(0, "stsch cc=%d", cc);
+> +		return;
+> +	}
+> +
+> +	if (pmcw->flags & PMCW_ENABLE) {
+> +		report(1, "msch: sch %08x enabled after %d retries",
+> +		       test_device_sid, retry_count);
+> +		return;
+> +	}
+> +
+> +	if (retry_count++ < MAX_ENABLE_RETRIES) {
+> +		mdelay(10); /* the hardware was not ready, let it some time */
 
-  /* Additional SPSR bits not exposed in the UABI */
-+#define PSR_MODE_THREAD_BIT	(1 << 0)
-  #define PSR_IL_BIT		(1 << 20)
+s/let/give/
 
-  /* AArch32-specific ptrace requests */
-diff --git a/arch/arm64/kvm/inject_fault.c 
-b/arch/arm64/kvm/inject_fault.c
-index 3dbcbc839b9c..ebfdfc27b2bd 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -43,8 +43,8 @@ enum exception_type {
-   * Here we manipulate the fields in order of the AArch64 SPSR_ELx 
-layout, from
-   * MSB to LSB.
-   */
--static void enter_exception(struct kvm_vcpu *vcpu, unsigned long 
-target_mode,
--			    enum exception_type type)
-+static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long 
-target_mode,
-+			      enum exception_type type)
-  {
-  	unsigned long sctlr, vbar, old, new, mode;
-  	u64 exc_offset;
-@@ -53,7 +53,7 @@ static void enter_exception(struct kvm_vcpu *vcpu, 
-unsigned long target_mode,
+> +		goto retry;
+> +	}
+> +
+> +	report(0,
+> +	       "msch: enabling sch %08x failed after %d retries. pmcw: %x",
+> +	       test_device_sid, retry_count, pmcw->flags);
+> +}
+> +
+>  static struct {
+>  	const char *name;
+>  	void (*func)(void);
+>  } tests[] = {
+>  	{ "enumerate (stsch)", test_enumerate },
+> +	{ "enable (msch)", test_enable },
+>  	{ NULL, NULL }
+>  };
+>  
 
-  	if      (mode == target_mode)
-  		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
--	else if ((mode | 1) == target_mode)
-+	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
-  		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-  	else if (!(mode & PSR_MODE32_BIT))
-  		exc_offset = LOWER_EL_AArch64_VECTOR;
-@@ -126,7 +126,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool 
-is_iabt, unsigned long addr
-  	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
-  	u32 esr = 0;
+Otherwise,
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
--	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
-+	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-
-  	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
-
-@@ -156,7 +156,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
-  {
-  	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-
--	enter_exception(vcpu, PSR_MODE_EL1h, except_type_sync);
-+	enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
-
-  	/*
-  	 * Build an unknown exception, depending on the instruction
-
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
