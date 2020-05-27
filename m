@@ -2,123 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3058B1E3BED
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DCB21E3BF2
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:30:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729524AbgE0I2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 04:28:19 -0400
-Received: from mga14.intel.com ([192.55.52.115]:64097 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729349AbgE0I2S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 04:28:18 -0400
-IronPort-SDR: NHxQ3X4VTBwiGXTUPciSsudrAVti+de4L9IsrWWLPQUeTsZcJ6Mqe2Zgpm9M+n2xmZ8nmn7jHR
- AWpCag5Ho8eQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2020 01:28:18 -0700
-IronPort-SDR: BPuFDtUAXFOhySWlK+3vXLr86xoGMOJzINr6rvv+xvydIz+8LVAPPyR5NkGL22c9cp1p0NzCYZ
- z9iU6/C4GT/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,440,1583222400"; 
-   d="scan'208";a="302386909"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.141]) ([10.238.4.141])
-  by orsmga008.jf.intel.com with ESMTP; 27 May 2020 01:28:14 -0700
-Reply-To: like.xu@intel.com
-Subject: Re: [PATCH v11 00/11] Guest Last Branch Recording Enabling
-To:     Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S1729578AbgE0I3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 04:29:32 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59101 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729497AbgE0I3b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 04:29:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590568170;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8QOC8GoFKK5IDy7Fbg6T/1YhJRpFsrglY/dRIt6Yu28=;
+        b=Bxgki3ZpQ/qu8l1d7ix3l1JYyNPZ5hruJFsuUzKpiNLcFbARQ7hH8+/Abi2gsNOdatQNVM
+        huEIhJVtL9mEBQuJJJ4RK3Ux+hYGc/E9Wx6MckiN79FXMYBMg2EBMVT88+0wD7BaiHmpNQ
+        SpWxMTrWaHt4galD9Zqih1y3O7TYEgU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-5UPbVJK1OQ2nacCcycmRZQ-1; Wed, 27 May 2020 04:29:27 -0400
+X-MC-Unique: 5UPbVJK1OQ2nacCcycmRZQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0133A1005512;
+        Wed, 27 May 2020 08:29:26 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.192.209])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7FA8C5D9E5;
+        Wed, 27 May 2020 08:29:23 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>, ak@linux.intel.com,
-        wei.w.wang@intel.com
-References: <20200514083054.62538-1-like.xu@linux.intel.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <810b0c63-ee8f-169b-d2a3-85feca5a9f22@intel.com>
-Date:   Wed, 27 May 2020 16:28:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Cathy Avery <cavery@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH] KVM: nVMX: Preserve registers modifications done before nested_svm_vmexit()
+Date:   Wed, 27 May 2020 10:29:21 +0200
+Message-Id: <20200527082921.218601-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200514083054.62538-1-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+L2 guest hang is observed after 'exit_required' was dropped and nSVM
+switched to check_nested_events() completely. The hang is a busy loop when
+e.g. KVM is emulating an instruction (e.g. L2 is accessing MMIO space and
+we drop to userspace). After nested_svm_vmexit() and when L1 is doing VMRUN
+nested guest's RIP is not advanced so KVM goes into emulating the same
+instruction which cased nested_svm_vmexit() and the loop continues.
 
-On 2020/5/14 16:30, Like Xu wrote:
-> Hi Peter,
-> Would you mind acking the host perf patches if it looks good to you ?
->
-> Hi Paolo,
-> Please help review the KVM proposal changes in this stable version.
->
-> Now, we can use upstream QEMU w/ '-cpu host' to test this feature, and
-> disable it by clearing the LBR format bits in the IA32_PERF_CAPABILITIES.
->
-> v10->v11 Changelog:
-> - add '.config = INTEL_FIXED_VLBR_EVENT' to the guest LBR event config;
-> - rewrite is_guest_lbr_event() with 'config == INTEL_FIXED_VLBR_EVENT';
-> - emit pr_warn() on the host when guest LBR is temporarily unavailable;
-> - drop the KVM_CAP_X86_GUEST_LBR patch;
-> - rewrite MSR_IA32_PERF_CAPABILITIES patch LBR record format;
-> - split 'kvm_pmu->lbr_already_available' into a separate patch;
-> - split 'pmu_ops->availability_check' into a separate patch;
-> - comments and naming refinement, misc;
->
-> You may check more details in each commit.
->
-> Previous:
-> https://lore.kernel.org/kvm/20200423081412.164863-1-like.xu@linux.intel.com/
-...
->
-> Like Xu (9):
->    perf/x86/core: Refactor hw->idx checks and cleanup
->    perf/x86/lbr: Add interface to get basic information about LBR stack
->    perf/x86: Add constraint to create guest LBR event without hw counter
->    perf/x86: Keep LBR stack unchanged in host context for guest LBR event
-Do you have a moment to review the KVM changes in this version
-to enable guest LBR on most Intel platforms ?
+nested_svm_vmexit() is not new, however, with check_nested_events() we're
+now calling it later than before. In case by that time KVM has modified
+register state we may pick stale values from VMCS when trying to save
+nested guest state to nested VMCB.
 
-It would be great if I can address most of your comments in the next version.
+VMX code handles this case correctly: sync_vmcs02_to_vmcs12() called from
+nested_vmx_vmexit() does 'vmcs12->guest_rip = kvm_rip_read(vcpu)' and this
+ensures KVM-made modifications are preserved. Do the same for nVMX.
 
-Thanks,
-Like Xu
->    KVM: x86: Expose MSR_IA32_PERF_CAPABILITIES for LBR record format
->    KVM: x86/pmu: Emulate LBR feature via guest LBR event
->    KVM: x86/pmu: Release guest LBR event via vPMU lazy release mechanism
->    KVM: x86/pmu: Check guest LBR availability in case host reclaims them
->    KVM: x86/pmu: Reduce the overhead of LBR passthrough or cancellation
->
-> Wei Wang (2):
->    perf/x86: Fix variable types for LBR registers
->    KVM: x86/pmu: Tweak kvm_pmu_get_msr to pass 'struct msr_data' in
->
->   arch/x86/events/core.c            |  26 ++-
->   arch/x86/events/intel/core.c      | 105 ++++++----
->   arch/x86/events/intel/lbr.c       |  56 +++++-
->   arch/x86/events/perf_event.h      |  12 +-
->   arch/x86/include/asm/kvm_host.h   |  13 ++
->   arch/x86/include/asm/perf_event.h |  34 +++-
->   arch/x86/kvm/cpuid.c              |   2 +-
->   arch/x86/kvm/pmu.c                |  19 +-
->   arch/x86/kvm/pmu.h                |  15 +-
->   arch/x86/kvm/svm/pmu.c            |   7 +-
->   arch/x86/kvm/vmx/capabilities.h   |  15 ++
->   arch/x86/kvm/vmx/pmu_intel.c      | 320 +++++++++++++++++++++++++++++-
->   arch/x86/kvm/vmx/vmx.c            |  12 +-
->   arch/x86/kvm/vmx/vmx.h            |   2 +
->   arch/x86/kvm/x86.c                |  18 +-
->   15 files changed, 564 insertions(+), 92 deletions(-)
->
+Generally, nested_vmx_vmexit()/nested_svm_vmexit() need to pick up all
+nested guest state modifications done by KVM after vmexit. It would be
+great to find a way to express this in a way which would not require to
+manually track these changes, e.g. nested_{vmcb,vmcs}_get_field().
+
+Co-debugged-with: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+- To certain extent we're fixing currently-pending 'KVM: SVM: immediately
+ inject INTR vmexit' commit but I'm not certain about that. We had so many
+ problems with nested events before switching to check_nested_events() that
+ what worked before could just be treated as a miracle. Miracles tend to
+ appear and disappear all of a sudden.
+---
+ arch/x86/kvm/svm/nested.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 0f02521550b9..6b1049148c1b 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -537,9 +537,9 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 	nested_vmcb->save.cr2    = vmcb->save.cr2;
+ 	nested_vmcb->save.cr4    = svm->vcpu.arch.cr4;
+ 	nested_vmcb->save.rflags = kvm_get_rflags(&svm->vcpu);
+-	nested_vmcb->save.rip    = vmcb->save.rip;
+-	nested_vmcb->save.rsp    = vmcb->save.rsp;
+-	nested_vmcb->save.rax    = vmcb->save.rax;
++	nested_vmcb->save.rip    = kvm_rip_read(&svm->vcpu);
++	nested_vmcb->save.rsp    = kvm_rsp_read(&svm->vcpu);
++	nested_vmcb->save.rax    = kvm_rax_read(&svm->vcpu);
+ 	nested_vmcb->save.dr7    = vmcb->save.dr7;
+ 	nested_vmcb->save.dr6    = svm->vcpu.arch.dr6;
+ 	nested_vmcb->save.cpl    = vmcb->save.cpl;
+-- 
+2.25.4
 
