@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 049271E471D
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 17:17:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA7931E471E
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 17:17:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389544AbgE0PRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 11:17:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46655 "EHLO
+        id S2389568AbgE0PRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 11:17:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37307 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2389501AbgE0PQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 11:16:59 -0400
+        with ESMTP id S2389447AbgE0PRL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 11:17:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590592618;
+        s=mimecast20190719; t=1590592630;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VVDQvFJrgkWSz8/ikl8zaz7psPPU6nwXpgVWbhjxY/A=;
-        b=QW+CYypiY6rpNEISyGoTqYN8+viS3sVz1WUgt5ED5jO3sDQgnpQWuysOG66T1rfgAeMGxY
-        7h2/+er8SSmGGOAKG5PxPXnynmHj6sNyntD8cknsVhtbYQgligtM+r3rspV8PqVq8pm1pn
-        k1bKJ7bxqgXWXKMKFgh10bc2zYRD0MA=
+        bh=jxeEDhzgrLh/X883Y6dHJor3hgYqo4NWCe2gqfOAWXs=;
+        b=GSbA3bj3ud4HVU0ry0IYyBcjst9+CIRpyY5t4iTcJgp8e5l2u/6xmOUjeQ6zqj84WEx1s9
+        0mwiTWz0bvmnKaoYZP1v6M8UFWQOfhFAHbAh7/W5ERnD5BJM4bIwg+vrzZiSiqFIp39ohC
+        pX2T9Hb1wDt+i7WO62gseDnpS+AE+Vo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-R7kKTjP5PX6oBfqiP1ZHrQ-1; Wed, 27 May 2020 11:16:54 -0400
-X-MC-Unique: R7kKTjP5PX6oBfqiP1ZHrQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-77--3CiTK6XMtSG5BRCYO9Ubw-1; Wed, 27 May 2020 11:17:08 -0400
+X-MC-Unique: -3CiTK6XMtSG5BRCYO9Ubw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1F6D107ACCD;
-        Wed, 27 May 2020 15:16:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A137107ACF6;
+        Wed, 27 May 2020 15:17:06 +0000 (UTC)
 Received: from starship (unknown [10.35.206.172])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F26519D82;
-        Wed, 27 May 2020 15:16:48 +0000 (UTC)
-Message-ID: <6d6d38a6f62e0d6d093713703e9f0e183c7eda13.camel@redhat.com>
-Subject: Re: [PATCH 1/2] kvm/x86/vmx: enable X86_FEATURE_WAITPKG in KVM
- capabilities
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C0805D9E5;
+        Wed, 27 May 2020 15:17:01 +0000 (UTC)
+Message-ID: <69386188ba90a8852525f1c984d5df57c21ee2e7.camel@redhat.com>
+Subject: Re: [PATCH 2/2] kvm/x86: don't expose MSR_IA32_UMWAIT_CONTROL
+ unconditionally
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,82 +49,68 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jingqi Liu <jingqi.liu@intel.com>
-Date:   Wed, 27 May 2020 18:16:47 +0300
-In-Reply-To: <20200527012039.GC31696@linux.intel.com>
+Date:   Wed, 27 May 2020 18:17:00 +0300
+In-Reply-To: <20200527012140.GD31696@linux.intel.com>
 References: <20200523161455.3940-1-mlevitsk@redhat.com>
-         <20200523161455.3940-2-mlevitsk@redhat.com>
-         <20200527012039.GC31696@linux.intel.com>
+         <20200523161455.3940-3-mlevitsk@redhat.com>
+         <20200527012140.GD31696@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2020-05-26 at 18:20 -0700, Sean Christopherson wrote:
-> On Sat, May 23, 2020 at 07:14:54PM +0300, Maxim Levitsky wrote:
-> > Even though we might not allow the guest to use
-> > WAITPKG's new instructions, we should tell KVM
-> > that the feature is supported by the host CPU.
+On Tue, 2020-05-26 at 18:21 -0700, Sean Christopherson wrote:
+> On Sat, May 23, 2020 at 07:14:55PM +0300, Maxim Levitsky wrote:
+> > This msr is only available when the host supports WAITPKG feature.
 > > 
-> > Note that vmx_waitpkg_supported checks that WAITPKG
-> > _can_ be set in secondary execution controls as specified
-> > by VMX capability MSR, rather that we actually enable it for a
-> > guest.
+> > This breaks a nested guest, if the L1 hypervisor is set to ignore
+> > unknown msrs, because the only other safety check that the
+> > kernel does is that it attempts to read the msr and
+> > rejects it if it gets an exception.
+> > 
+> > Fixes: 6e3ba4abce KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
 > 
-> These line wraps are quite weird and inconsistent.
-Known issue for me, I usually don't have line wrapping enabled,
-and I wrap the lines a bit earlier that 72 character limit. 
-I'll re-formatted the commit message to be on 72 line format and I will
-try now to pay much more attention to that.
+> Same comments on the line wraps and Fixes tag.
+I rewrote the commit message and I hope that the new version
+is better. I fixed the 'fixes' message as well.
 
 > 
-> > Fixes: e69e72faa3a0 KVM: x86: Add support for user wait
-> > instructions
-> 
-> Checkpatch doesn't complain,  but the preferred Fixes format is
-> 
->   Fixes: e69e72faa3a07 ("KVM: x86: Add support for user wait
-> instructions")
-
-
-> 
-> e.g.
-> 
->   git show -s --pretty='tformat:%h ("%s")'
-
-Got it, and added to git aliases :-)
-
-> 
-> For the code itself:
+> For the code:
 > 
 > Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Thank you!
 
+Best regards,
+	Maxim Levitsky
+
+
 > 
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > > ---
-> >  arch/x86/kvm/vmx/vmx.c | 3 +++
-> >  1 file changed, 3 insertions(+)
+> >  arch/x86/kvm/x86.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
 > > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 55712dd86bafa..fca493d4517c5 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7298,6 +7298,9 @@ static __init void vmx_set_cpu_caps(void)
-> >  	/* CPUID 0x80000001 */
-> >  	if (!cpu_has_vmx_rdtscp())
-> >  		kvm_cpu_cap_clear(X86_FEATURE_RDTSCP);
-> > +
-> > +	if (vmx_waitpkg_supported())
-> > +		kvm_cpu_cap_check_and_set(X86_FEATURE_WAITPKG);
-> >  }
-> >  
-> >  static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index b226fb8abe41b..4752293312947 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -5316,6 +5316,10 @@ static void kvm_init_msr_list(void)
+> >  			    min(INTEL_PMC_MAX_GENERIC,
+> > x86_pmu.num_counters_gp))
+> >  				continue;
+> >  			break;
+> > +		case MSR_IA32_UMWAIT_CONTROL:
+> > +			if (!kvm_cpu_cap_has(X86_FEATURE_WAITPKG))
+> > +				continue;
+> > +			break;
+> >  		default:
+> >  			break;
+> >  		}
 > > -- 
 > > 2.26.2
 > > 
