@@ -2,84 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 187CC1E3D6D
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 11:17:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BCCC1E3D94
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 11:29:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728024AbgE0JRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 05:17:47 -0400
-Received: from mga12.intel.com ([192.55.52.136]:52630 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725820AbgE0JRr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 05:17:47 -0400
-IronPort-SDR: EPJim9tSr0LXmvlOxmZmWr+63LG0lBTy6x26zTWWoUioO5ZC7r6+uVzh1rAOnj047fct0ylO8Q
- NPZeVYCquLMg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2020 02:17:46 -0700
-IronPort-SDR: 40oXLoq2PILk5e50dpXaB6hUneU0F+HlXUvD3DxEWqiiKhfzcf7eE1X1PvDXbUadDuvii9iRTR
- PYV49oHaa5nA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,440,1583222400"; 
-   d="scan'208";a="414138598"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 27 May 2020 02:17:44 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1jdsBz-000Bjv-75; Wed, 27 May 2020 17:17:43 +0800
-Date:   Wed, 27 May 2020 17:16:46 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        jasowang@redhat.com
-Cc:     kbuild-all@lists.01.org, lulu@redhat.com, dan.daly@intel.com,
-        cunming.liang@intel.com, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [RFC PATCH] vdpa: vhost_vdpa_poll_stop() can be static
-Message-ID: <20200527091646.GA80910@369e1fe990b8>
-References: <1590471145-4436-1-git-send-email-lingshan.zhu@intel.com>
+        id S2387524AbgE0J3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 05:29:07 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5290 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726761AbgE0J3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 05:29:06 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 0B8E0E4858C83D8465D0;
+        Wed, 27 May 2020 17:28:58 +0800 (CST)
+Received: from [10.173.221.230] (10.173.221.230) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 27 May 2020 17:28:51 +0800
+Subject: Re: [RFC PATCH 2/7] KVM: arm64: Set DBM bit of PTEs if hw DBM enabled
+To:     Catalin Marinas <catalin.marinas@arm.com>
+References: <20200525112406.28224-1-zhukeqian1@huawei.com>
+ <20200525112406.28224-3-zhukeqian1@huawei.com> <20200526114926.GD17051@gaia>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "Sean Christopherson" <sean.j.christopherson@intel.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <zhengxiang9@huawei.com>,
+        Peng Liang <liangpeng10@huawei.com>
+From:   zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <01147c57-b45e-0a40-da9a-4a0e56aac78d@huawei.com>
+Date:   Wed, 27 May 2020 17:28:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1590471145-4436-1-git-send-email-lingshan.zhu@intel.com>
-X-Patchwork-Hint: ignore
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200526114926.GD17051@gaia>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Catalin,
 
-Signed-off-by: kbuild test robot <lkp@intel.com>
----
- vdpa.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On 2020/5/26 19:49, Catalin Marinas wrote:
+> On Mon, May 25, 2020 at 07:24:01PM +0800, Keqian Zhu wrote:
+>> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+>> index 1305e28225fc..f9910ba2afd8 100644
+>> --- a/arch/arm64/include/asm/pgtable-prot.h
+>> +++ b/arch/arm64/include/asm/pgtable-prot.h
+>> @@ -79,6 +79,7 @@ extern bool arm64_use_ng_mappings;
+>>  	})
+>>  
+>>  #define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
+>> +#define PAGE_S2_DBM		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN | PTE_DBM)
+> 
+> You don't need a new page permission (see below).
+> 
+>>  #define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
+>>  
+>>  #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index e3b9ee268823..dc97988eb2e0 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1426,6 +1426,10 @@ static void stage2_wp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
+>>  	pte = pte_offset_kernel(pmd, addr);
+>>  	do {
+>>  		if (!pte_none(*pte)) {
+>> +#ifdef CONFIG_ARM64_HW_AFDBM
+>> +			if (kvm_hw_dbm_enabled() && !kvm_s2pte_dbm(pte))
+>> +				kvm_set_s2pte_dbm(pte);
+>> +#endif
+>>  			if (!kvm_s2pte_readonly(pte))
+>>  				kvm_set_s2pte_readonly(pte);
+>>  		}
+> 
+> Setting the DBM bit is equivalent to marking the page writable. The
+> actual writable pte bit (S2AP[1] or HAP[2] as we call them in Linux for
+> legacy reasons) tells you whether the page has been dirtied but it is
+> still writable if you set DBM. Doing this in stage2_wp_ptes()
+> practically means that you no longer have read-only pages at S2. There
+> are several good reasons why you don't want to break this. For example,
+> the S2 pte may already be read-only for other reasons (CoW).
+> 
+Thanks, your comments help to solve the first problem in cover letter.
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index d3a2acafedecd4..5037ce7f48cd42 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -287,12 +287,12 @@ static long vhost_vdpa_get_vring_num(struct vhost_vdpa *v, u16 __user *argp)
- 
- 	return 0;
- }
--void vhost_vdpa_poll_stop(struct vhost_virtqueue *vq)
-+static void vhost_vdpa_poll_stop(struct vhost_virtqueue *vq)
- {
- 	vhost_poll_stop(&vq->poll);
- }
- 
--int vhost_vdpa_poll_start(struct vhost_virtqueue *vq)
-+static int vhost_vdpa_poll_start(struct vhost_virtqueue *vq)
- {
- 	struct vhost_poll *poll = &vq->poll;
- 	struct file *file = vq->kick;
-@@ -747,7 +747,7 @@ static int vhost_vdpa_poll_worker(wait_queue_entry_t *wait, unsigned int mode,
- 	return 0;
- }
- 
--void vhost_vdpa_poll_init(struct vhost_dev *dev)
-+static void vhost_vdpa_poll_init(struct vhost_dev *dev)
- {
- 	struct vhost_virtqueue *vq;
- 	struct vhost_poll *poll;
+> I think you should only set the DBM bit if the pte was previously
+> writable. In addition, any permission change to the S2 pte must take
+> into account the DBM bit and clear it while transferring the dirty
+> status to the underlying page. I'm not deeply familiar with all these
+> callbacks into KVM but two such paths are kvm_unmap_hva_range() and the
+> kvm_mmu_notifier_change_pte().
+Yes, I agree.
+> 
+> 
+>> @@ -1827,7 +1831,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>  
+>>  		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
+>>  	} else {
+>> -		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
+>> +		pte_t new_pte;
+>> +
+>> +#ifdef CONFIG_ARM64_HW_AFDBM
+>> +		if (kvm_hw_dbm_enabled() &&
+>> +		    pgprot_val(mem_type) == pgprot_val(PAGE_S2)) {
+>> +			mem_type = PAGE_S2_DBM;
+>> +		}
+>> +#endif
+>> +		new_pte = kvm_pfn_pte(pfn, mem_type);
+>>  
+>>  		if (writable) {
+>>  			new_pte = kvm_s2pte_mkwrite(new_pte);
+> 
+> That's wrong here. Basically for any fault you get, you just turn the S2
+> page writable. The point of DBM is that you don't get write faults at
+> all if you have a writable page. So, as I said above, only set the DBM
+> bit if you stored a writable S2 pte (kvm_s2pte_mkwrite()).
+Yeah, you are right. I will correct it in Patch v1.
+> 
+
+Thanks,
+Keqian
+
