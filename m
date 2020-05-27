@@ -2,105 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DCB21E3BF2
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:30:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 156391E3C3C
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:40:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729578AbgE0I3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 04:29:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59101 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729497AbgE0I3b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 04:29:31 -0400
+        id S2388165AbgE0Ijm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 04:39:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32646 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2387858AbgE0Ijk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 04:39:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590568170;
+        s=mimecast20190719; t=1590568779;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=8QOC8GoFKK5IDy7Fbg6T/1YhJRpFsrglY/dRIt6Yu28=;
-        b=Bxgki3ZpQ/qu8l1d7ix3l1JYyNPZ5hruJFsuUzKpiNLcFbARQ7hH8+/Abi2gsNOdatQNVM
-        huEIhJVtL9mEBQuJJJ4RK3Ux+hYGc/E9Wx6MckiN79FXMYBMg2EBMVT88+0wD7BaiHmpNQ
-        SpWxMTrWaHt4galD9Zqih1y3O7TYEgU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-5UPbVJK1OQ2nacCcycmRZQ-1; Wed, 27 May 2020 04:29:27 -0400
-X-MC-Unique: 5UPbVJK1OQ2nacCcycmRZQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0133A1005512;
-        Wed, 27 May 2020 08:29:26 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.192.209])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7FA8C5D9E5;
-        Wed, 27 May 2020 08:29:23 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5CtVNmzXXKb/GJnyK3cmtp2ErHYUKsptEP9TQUHQbxw=;
+        b=G6qMI0JXsaEA95oPVcjzNX79Go3SDGiFDpal7vxbO2y4h8ho3U/KFii69k6zYtjqj9VLdg
+        HnXc3RqgI2/u9p6fwj8gdtrYyxrK1ybmE9SZvFudCMKjaRVksrvo8A3SEl6mMIHNvDeU4H
+        NoEqqriNzM/HOfwc43jpJ0sAAofe5E8=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-352-__1FLqqZOHyotCzWkENa8g-1; Wed, 27 May 2020 04:39:37 -0400
+X-MC-Unique: __1FLqqZOHyotCzWkENa8g-1
+Received: by mail-ej1-f70.google.com with SMTP id ng1so8498846ejb.22
+        for <kvm@vger.kernel.org>; Wed, 27 May 2020 01:39:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=5CtVNmzXXKb/GJnyK3cmtp2ErHYUKsptEP9TQUHQbxw=;
+        b=o+/5yZXlEAEe2yxFeOIOMQQjQ9Tv1ErlA3w0HmvCOGSPPLugALKRrd4X1Dx4PXeqIS
+         +vZACq0ZShuvO7BFiM2Dz3W6u256+6RqkUBJu7pa5FdKCc25FegKdJDIQ4nAve7iwPeo
+         2gKIqyVrqpnJv24eNB3ikHxQ88PrtMdzfBq0XpIK3vk5LIdhhhF6lV+RNtR36+MNAOFv
+         5smtSjr5f4WH5dlWfKA8qVKzoiRXNgt80LhDam9ueICmEhYb/K2ZV8Vq18ygm/ZWMl/b
+         UcSNgabP/qsrQMPPPnPsy9PQItz5FAY/dQYGPJDrd2hy98yLZ2ZiLgoIq8Xi/riWWcvQ
+         BslA==
+X-Gm-Message-State: AOAM532Ry2RRvFBvs6xYnFKXF/3kn/X5Uf2YvgiB1hezAzGLCtcs0q4Y
+        4ISyUGUBqWwyvmn3wJHseRA3FUlMEYsKIuAAPlB+fh2pE7qyUkY6CHDeJf+KfQJ2QZNpccBi0pe
+        kWElAf30dG6BE
+X-Received: by 2002:a17:906:3b9a:: with SMTP id u26mr4827600ejf.456.1590568776132;
+        Wed, 27 May 2020 01:39:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwp2aIsA3XEwQ6IIPY4EvLkOvUOmXFr3P4IIB2DE6c8rBlbscdO/yOITd5hElHhUs1XcB7/yQ==
+X-Received: by 2002:a17:906:3b9a:: with SMTP id u26mr4827580ejf.456.1590568775832;
+        Wed, 27 May 2020 01:39:35 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id s19sm2124076eja.91.2020.05.27.01.39.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 May 2020 01:39:34 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe\, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen\, Andi" <andi.kleen@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Cathy Avery <cavery@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH] KVM: nVMX: Preserve registers modifications done before nested_svm_vmexit()
-Date:   Wed, 27 May 2020 10:29:21 +0200
-Message-Id: <20200527082921.218601-1-vkuznets@redhat.com>
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [RFC 02/16] x86/kvm: Introduce KVM memory protection feature
+In-Reply-To: <20200527050350.GK31696@linux.intel.com>
+References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com> <20200522125214.31348-3-kirill.shutemov@linux.intel.com> <87d06s83is.fsf@vitty.brq.redhat.com> <20200525151525.qmfvzxbl7sq46cdq@box> <20200527050350.GK31696@linux.intel.com>
+Date:   Wed, 27 May 2020 10:39:33 +0200
+Message-ID: <87eer56abe.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-L2 guest hang is observed after 'exit_required' was dropped and nSVM
-switched to check_nested_events() completely. The hang is a busy loop when
-e.g. KVM is emulating an instruction (e.g. L2 is accessing MMIO space and
-we drop to userspace). After nested_svm_vmexit() and when L1 is doing VMRUN
-nested guest's RIP is not advanced so KVM goes into emulating the same
-instruction which cased nested_svm_vmexit() and the loop continues.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-nested_svm_vmexit() is not new, however, with check_nested_events() we're
-now calling it later than before. In case by that time KVM has modified
-register state we may pick stale values from VMCS when trying to save
-nested guest state to nested VMCB.
+> On Mon, May 25, 2020 at 06:15:25PM +0300, Kirill A. Shutemov wrote:
+>> On Mon, May 25, 2020 at 04:58:51PM +0200, Vitaly Kuznetsov wrote:
+>> > > @@ -727,6 +734,15 @@ static void __init kvm_init_platform(void)
+>> > >  {
+>> > >  	kvmclock_init();
+>> > >  	x86_platform.apic_post_init = kvm_apic_init;
+>> > > +
+>> > > +	if (kvm_para_has_feature(KVM_FEATURE_MEM_PROTECTED)) {
+>> > > +		if (kvm_hypercall0(KVM_HC_ENABLE_MEM_PROTECTED)) {
+>> > > +			pr_err("Failed to enable KVM memory protection\n");
+>> > > +			return;
+>> > > +		}
+>> > > +
+>> > > +		mem_protected = true;
+>> > > +	}
+>> > >  }
+>> > 
+>> > Personally, I'd prefer to do this via setting a bit in a KVM-specific
+>> > MSR instead. The benefit is that the guest doesn't need to remember if
+>> > it enabled the feature or not, it can always read the config msr. May
+>> > come handy for e.g. kexec/kdump.
+>> 
+>> I think we would need to remember it anyway. Accessing MSR is somewhat
+>> expensive. But, okay, I can rework it MSR if needed.
+>
+> I think Vitaly is talking about the case where the kernel can't easily get
+> at its cached state, e.g. after booting into a new kernel.  The kernel would
+> still have an X86_FEATURE bit or whatever, providing a virtual MSR would be
+> purely for rare slow paths.
+>
+> That being said, a hypercall plus CPUID bit might be better, e.g. that'd
+> allow the guest to query the state without risking a #GP.
 
-VMX code handles this case correctly: sync_vmcs02_to_vmcs12() called from
-nested_vmx_vmexit() does 'vmcs12->guest_rip = kvm_rip_read(vcpu)' and this
-ensures KVM-made modifications are preserved. Do the same for nVMX.
+We have rdmsr_safe() for that! :-) MSR (and hypercall to that matter)
+should have an associated CPUID feature bit of course.
 
-Generally, nested_vmx_vmexit()/nested_svm_vmexit() need to pick up all
-nested guest state modifications done by KVM after vmexit. It would be
-great to find a way to express this in a way which would not require to
-manually track these changes, e.g. nested_{vmcb,vmcs}_get_field().
+Yes, hypercall + CPUID would do but normally we treat CPUID data as
+static and in this case we'll make it a dynamically flipping
+bit. Especially if we introduce 'KVM_HC_DISABLE_MEM_PROTECTED' later.
 
-Co-debugged-with: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
-- To certain extent we're fixing currently-pending 'KVM: SVM: immediately
- inject INTR vmexit' commit but I'm not certain about that. We had so many
- problems with nested events before switching to check_nested_events() that
- what worked before could just be treated as a miracle. Miracles tend to
- appear and disappear all of a sudden.
----
- arch/x86/kvm/svm/nested.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+>
+>> Note, that we can avoid the enabling algother, if we modify BIOS to deal
+>> with private/shared memory. Currently BIOS get system crash if we enable
+>> the feature from time zero.
+>
+> Which would mesh better with a CPUID feature bit.
+>
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 0f02521550b9..6b1049148c1b 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -537,9 +537,9 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 	nested_vmcb->save.cr2    = vmcb->save.cr2;
- 	nested_vmcb->save.cr4    = svm->vcpu.arch.cr4;
- 	nested_vmcb->save.rflags = kvm_get_rflags(&svm->vcpu);
--	nested_vmcb->save.rip    = vmcb->save.rip;
--	nested_vmcb->save.rsp    = vmcb->save.rsp;
--	nested_vmcb->save.rax    = vmcb->save.rax;
-+	nested_vmcb->save.rip    = kvm_rip_read(&svm->vcpu);
-+	nested_vmcb->save.rsp    = kvm_rsp_read(&svm->vcpu);
-+	nested_vmcb->save.rax    = kvm_rax_read(&svm->vcpu);
- 	nested_vmcb->save.dr7    = vmcb->save.dr7;
- 	nested_vmcb->save.dr6    = svm->vcpu.arch.dr6;
- 	nested_vmcb->save.cpl    = vmcb->save.cpl;
+And maybe even help us to resolve 'reboot' problem.
+
 -- 
-2.25.4
+Vitaly
 
