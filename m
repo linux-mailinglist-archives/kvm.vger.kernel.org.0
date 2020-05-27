@@ -2,140 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96B4E1E3C6E
-	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:45:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59FA81E3C8F
+	for <lists+kvm@lfdr.de>; Wed, 27 May 2020 10:49:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388248AbgE0IpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 04:45:03 -0400
-Received: from foss.arm.com ([217.140.110.172]:34092 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388211AbgE0IpC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 04:45:02 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F0CF30E;
-        Wed, 27 May 2020 01:45:02 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 21F9B3F6C4;
-        Wed, 27 May 2020 01:45:00 -0700 (PDT)
-Subject: Re: [PATCH 03/26] KVM: arm64: Factor out stage 2 page table data from
- struct kvm
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     James Morse <james.morse@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20200422120050.3693593-1-maz@kernel.org>
- <20200422120050.3693593-4-maz@kernel.org>
- <a7c8207c-9061-ad0e-c9f8-64c995e928b6@arm.com>
- <76d811eb-b304-c49f-1f21-fe9d95112a28@arm.com>
- <6518439c-65b7-1e87-a21d-a053d75c0514@arm.com>
- <ea603b3a7a51a597263e7c8152f4c795@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <91b6b062-e39d-a672-52e4-40532068a02e@arm.com>
-Date:   Wed, 27 May 2020 09:45:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S2388251AbgE0Iso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 04:48:44 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36503 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388140AbgE0Isn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 May 2020 04:48:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590569320;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0T7rmjvC6+RdYDSWsM9zFDoO3jG2AAbHjwTSfoD/mvY=;
+        b=MxhKDTUbvfg6SCznKwRCdTZc5aQiambdDJ5co5WiURPnXhLdRBtLVcI9QKM81sSwH6tzIE
+        RBntWyAO5329xm3g9AeZMHxkDxL5rjPxSgfY+dSRifm61xS/4Qie209uyB3GnXS9YPaEr0
+        hkiHPLgeB8l0PSs/C/kgqXaPA9YwajU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-lsstOR5BMjymMzMEOZtCeA-1; Wed, 27 May 2020 04:48:36 -0400
+X-MC-Unique: lsstOR5BMjymMzMEOZtCeA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8592C107ACCA;
+        Wed, 27 May 2020 08:48:33 +0000 (UTC)
+Received: from work-vm (ovpn-114-29.ams2.redhat.com [10.36.114.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CBF8D19D61;
+        Wed, 27 May 2020 08:48:24 +0000 (UTC)
+Date:   Wed, 27 May 2020 09:48:22 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
+        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
+        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
+        cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com,
+        aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com,
+        Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+        Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200527084822.GC3001@work-vm>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+ <20200519105804.02f3cae8@x1.home>
+ <20200525065925.GA698@joy-OptiPlex-7040>
+ <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
+ <20200526141939.2632f100@x1.home>
+ <20200527062358.GD19560@joy-OptiPlex-7040>
 MIME-Version: 1.0
-In-Reply-To: <ea603b3a7a51a597263e7c8152f4c795@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200527062358.GD19560@joy-OptiPlex-7040>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+* Yan Zhao (yan.y.zhao@intel.com) wrote:
+> On Tue, May 26, 2020 at 02:19:39PM -0600, Alex Williamson wrote:
+> > On Mon, 25 May 2020 18:50:54 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > 
+> > > On 5/25/2020 12:29 PM, Yan Zhao wrote:
+> > > > On Tue, May 19, 2020 at 10:58:04AM -0600, Alex Williamson wrote:  
+> > > >> Hi folks,
+> > > >>
+> > > >> My impression is that we're getting pretty close to a workable
+> > > >> implementation here with v22 plus respins of patches 5, 6, and 8.  We
+> > > >> also have a matching QEMU series and a proposal for a new i40e
+> > > >> consumer, as well as I assume GVT-g updates happening internally at
+> > > >> Intel.  I expect all of the latter needs further review and discussion,
+> > > >> but we should be at the point where we can validate these proposed
+> > > >> kernel interfaces.  Therefore I'd like to make a call for reviews so
+> > > >> that we can get this wrapped up for the v5.8 merge window.  I know
+> > > >> Connie has some outstanding documentation comments and I'd like to make
+> > > >> sure everyone has an opportunity to check that their comments have been
+> > > >> addressed and we don't discover any new blocking issues.  Please send
+> > > >> your Acked-by/Reviewed-by/Tested-by tags if you're satisfied with this
+> > > >> interface and implementation.  Thanks!
+> > > >>  
+> > > > hi Alex
+> > > > after porting gvt/i40e vf migration code to kernel/qemu v23, we spoted
+> > > > two bugs.
+> > > > 1. "Failed to get dirty bitmap for iova: 0xfe011000 size: 0x3fb0 err: 22"
+> > > >     This is a qemu bug that the dirty bitmap query range is not the same
+> > > >     as the dma map range. It can be fixed in qemu. and I just have a little
+> > > >     concern for kernel to have this restriction.
+> > > >   
+> > > 
+> > > I never saw this unaligned size in my testing. In this case if you can 
+> > > provide vfio_* event traces, that will helpful.
+> > 
+> > Yeah, I'm curious why we're hitting such a call path, I think we were
+> > designing this under the assumption we wouldn't see these.  I also
+> that's because the algorithm for getting dirty bitmap query range is still not exactly
+> matching to that for dma map range in vfio_dma_map().
+> 
+> 
+> > wonder if we really need to enforce the dma mapping range for getting
+> > the dirty bitmap with the current implementation (unmap+dirty obviously
+> > still has the restriction).  We do shift the bitmap in place for
+> > alignment, but I'm not sure why we couldn't shift it back and only
+> > clear the range that was reported.  Kirti, do you see other issues?  I
+> > think a patch to lift that restriction is something we could plan to
+> > include after the initial series is included and before we've committed
+> > to the uapi at the v5.8 release.
+> >  
+> > > > 2. migration abortion, reporting
+> > > > "qemu-system-x86_64-lm: vfio_load_state: Error allocating buffer
+> > > > qemu-system-x86_64-lm: error while loading state section id 49(vfio)
+> > > > qemu-system-x86_64-lm: load of migration failed: Cannot allocate memory"
+> > > > 
+> > > > It's still a qemu bug and we can fixed it by
+> > > > "
+> > > > if (migration->pending_bytes == 0) {
+> > > > +            qemu_put_be64(f, 0);
+> > > > +            qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
+> > > > "  
+> > > 
+> > > In which function in QEMU do you have to add this?
+> > 
+> > I think this is relative to QEMU path 09/ where Yan had the questions
+> > below on v16 and again tried to get answers to them on v22:
+> > 
+> > https://lore.kernel.org/qemu-devel/20200520031323.GB10369@joy-OptiPlex-7040/
+> > 
+> > Kirti, please address these questions.
+> > 
+> > > > and actually there are some extra concerns about this part, as reported in
+> > > > [1][2].
+> > > > 
+> > > > [1] data_size should be read ahead of data_offset
+> > > > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02795.html.
+> > > > [2] should not repeatedly update pending_bytes in vfio_save_iterate()
+> > > > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg02796.html.
+> > > > 
+> > > > but as those errors are all in qemu, and we have finished basic tests in
+> > > > both gvt & i40e, we're fine with the kernel part interface in general now.
+> > > > (except for my concern [1], which needs to update kernel patch 1)
+> > > >   
+> > > 
+> > >  >> what if pending_bytes is not 0, but vendor driver just does not want  to
+> > >  >> send data in this iteration? isn't it right to get data_size first   
+> > > before
+> > >  >> getting data_offset?  
+> > > 
+> > > If vendor driver doesn't want to send data but still has data in staging 
+> > > buffer, vendor driver still can control to send pending_bytes for this 
+> > > iteration as 0 as this is a trap field.
+> > > 
+> > > I would defer this to Alex.
+> > 
+> > This is my understanding of the protocol as well, when the device is
+> > running, pending_bytes might drop to zero if no internal state has
+> > changed and may be non-zero on the next iteration due to device
+> > activity.  When the device is not running, pending_bytes reporting zero
+> > indicates the device is done, there is no further state to transmit.
+> > Does that meet your need/expectation?
+> >
+> (1) on one side, as in vfio_save_pending(),
+> vfio_save_pending()
+> {
+>     ...
+>     ret = vfio_update_pending(vbasedev);
+>     ...
+>     *res_precopy_only += migration->pending_bytes;
+>     ...
+> }
+> the pending_bytes tells migration thread how much data is still hold in
+> device side.
+> the device data includes
+> device internal data + running device dirty data + device state.
+> 
+> so the pending_bytes should include device state as well, right?
+> if so, the pending_bytes should never reach 0 if there's any device
+> state to be sent after device is stopped.
 
-On 5/27/20 9:41 AM, Marc Zyngier wrote:
-> Hi Alex,
->
-> On 2020-05-12 17:53, Alexandru Elisei wrote:
->> Hi,
->>
->> On 5/12/20 12:17 PM, James Morse wrote:
->>> Hi Alex, Marc,
->>>
->>> (just on this last_vcpu_ran thing...)
->>>
->>> On 11/05/2020 17:38, Alexandru Elisei wrote:
->>>> On 4/22/20 1:00 PM, Marc Zyngier wrote:
->>>>> From: Christoffer Dall <christoffer.dall@arm.com>
->>>>>
->>>>> As we are about to reuse our stage 2 page table manipulation code for
->>>>> shadow stage 2 page tables in the context of nested virtualization, we
->>>>> are going to manage multiple stage 2 page tables for a single VM.
->>>>>
->>>>> This requires some pretty invasive changes to our data structures,
->>>>> which moves the vmid and pgd pointers into a separate structure and
->>>>> change pretty much all of our mmu code to operate on this structure
->>>>> instead.
->>>>>
->>>>> The new structure is called struct kvm_s2_mmu.
->>>>>
->>>>> There is no intended functional change by this patch alone.
->>>>> diff --git a/arch/arm64/include/asm/kvm_host.h
->>>>> b/arch/arm64/include/asm/kvm_host.h
->>>>> index 7dd8fefa6aecd..664a5d92ae9b8 100644
->>>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>>> @@ -63,19 +63,32 @@ struct kvm_vmid {
->>>>>      u32    vmid;
->>>>>  };
->>>>>
->>>>> -struct kvm_arch {
->>>>> +struct kvm_s2_mmu {
->>>>>      struct kvm_vmid vmid;
->>>>>
->>>>> -    /* stage2 entry level table */
->>>>> -    pgd_t *pgd;
->>>>> -    phys_addr_t pgd_phys;
->>>>> -
->>>>> -    /* VTCR_EL2 value for this VM */
->>>>> -    u64    vtcr;
->>>>> +    /*
->>>>> +     * stage2 entry level table
->>>>> +     *
->>>>> +     * Two kvm_s2_mmu structures in the same VM can point to the same pgd
->>>>> +     * here.  This happens when running a non-VHE guest hypervisor which
->>>>> +     * uses the canonical stage 2 page table for both vEL2 and for vEL1/0
->>>>> +     * with vHCR_EL2.VM == 0.
->>>> It makes more sense to me to say that a non-VHE guest hypervisor will use the
->>>> canonical stage *1* page table when running at EL2
->>> Can KVM say anything about stage1? Its totally under the the guests control
->>> even at vEL2...
->>
->> It just occurred to me that "canonical stage 2 page table" refers to the L0
->> hypervisor stage 2, not to the L1 hypervisor stage 2. If you don't mind my
->> suggestion, perhaps the comment can be slightly improved to avoid any confusion?
->> Maybe something along the lines of "[..] This happens when running a
->> non-VHE guest
->> hypervisor, in which case we use the canonical stage 2 page table for both vEL2
->> and for vEL1/0 with vHCR_EL2.VM == 0".
->
-> If the confusion stems from the lack of guest stage-2, how about:
->
-> "This happens when running a guest using a translation regime that isn't
->  affected by its own stage-2 translation, such as a non-VHE hypervisor
->  running at vEL2, or for vEL1/EL0 with vHCR_EL2.VM == 0. In that case,
->  we use the canonical stage-2 page tables."
->
-> instead? Does this lift the ambiguity?
+I hadn't expected the pending-bytes to include a fixed offset for device
+state (If you mean a few registers etc) - I'd expect pending to drop
+possibly to zero;  the heuristic as to when to switch from iteration to
+stop, is based on the total pending across all iterated devices; so it's
+got to be allowed to drop otherwise you'll never transition to stop.
 
-Yes, that's perfect.
+> (2) on the other side,
+> along side we updated the pending_bytes in vfio_save_pending() and
+> enter into the vfio_save_iterate(), if we repeatedly update
+> pending_bytes in vfio_save_iterate(), it would enter into a scenario
+> like
+> 
+> initially pending_bytes=500M.
+> vfio_save_iterate() -->
+>   round 1: transmitted 500M.
+>   round 2: update pending bytes, pending_bytes=50M (50M dirty data).
+>   round 3: update pending bytes, pending_bytes=50M.
+>   ...
+>   round N: update pending bytes, pending_bytes=50M.
+> 
+> If there're two vfio devices, the vfio_save_iterate() for the second device
+> may never get chance to be called because there's always pending_bytes
+> produced by the first device, even the size if small.
 
-Thanks,
-Alex
->
-> Thanks,
->
->         M.
+And between RAM and the vfio devices?
+
+> > > > so I wonder which way in your mind is better, to give our reviewed-by to
+> > > > the kernel part now, or hold until next qemu fixes?
+> > > > and as performance data from gvt is requested from your previous mail, is
+> > > > that still required before the code is accepted?
+> > 
+> > The QEMU series does not need to be perfect, I kind of expect we might
+> > see a few iterations of that beyond the kernel portion being accepted.
+> > We should have the QEMU series to the point that we've resolved any
+> > uapi issues though, which it seems like we're pretty close to having.
+> > Ideally I'd like to get the kernel series into my next branch before
+> > the merge window opens, where it seems like upstream is on schedule to
+> > have that happen this Sunday.  If you feel we're to the point were we
+> > can iron a couple details out during the v5.8 development cycle, then
+> > please provide your reviewed-by.  We haven't fully committed to a uapi
+> > until we've committed to it for a non-rc release.
+> > 
+> got it.
+> 
+> > I think the performance request was largely due to some conversations
+> > with Dave Gilbert wondering if all this actually works AND is practical
+> > for a LIVE migration.  I think we're all curious about things like how
+> > much data does a GPU have to transfer in each phase of migration, and
+> > particularly if the final phase is going to be a barrier to claiming
+> > the VM is actually sufficiently live.  I'm not sure we have many
+> > options if a device simply has a very large working set, but even
+> > anecdotal evidence that the stop-and-copy phase transfers abMB from the
+> > device while idle or xyzMB while active would give us some idea what to
+> for intel vGPU, the data is
+> single-round dirty query:
+> data to be transferred at stop-and-copy phase: 90MB+ ~ 900MB+, including
+> - device state: 9MB
+> - system dirty memory: 80MB+ ~ 900MB+ (depending on workload type)
+> 
+> multi-round dirty query :
+> -each iteration data: 60MB ~ 400MB
+> -data to be transferred at stop-and-copy phase: 70MB ~ 400MB
+> 
+> 
+> 
+> BTW, for viommu, the downtime data is as below. under the same network
+> condition and guest memory size, and no running dirty data/memory produced
+> by device.
+> (1) viommu off
+> single-round dirty query: downtime ~100ms 
+
+Fine.
+
+> (2) viommu on
+> single-round dirty query: downtime 58s 
+
+Youch.
+
+Dave
+
+> 
+> Thanks
+> Yan
+> > expect.  Kirti, have you done any of those sorts of tests for NVIDIA's
+> > driver?
+> > 
+> > > > BTW, we have also conducted some basic tests when viommu is on, and found out
+> > > > errors like
+> > > > "qemu-system-x86_64-dt: vtd_iova_to_slpte: detected slpte permission error (iova=0x0, level=0x3, slpte=0x0, write=1)
+> > > > qemu-system-x86_64-dt: vtd_iommu_translate: detected translation failure (dev=00:03:00, iova=0x0)
+> > > > qemu-system-x86_64-dt: New fault is not recorded due to compression of faults".
+> > > >   
+> > > 
+> > > I saw these errors, I'm looking into it.
+> > 
+> > Let's try to at least determine if this is a uapi issue or just a QEMU
+> > implementation bug for progressing the kernel series.  Thanks,
+> > 
+> > Alex
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
