@@ -2,115 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72BA41E5A6E
-	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 10:11:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C5B21E5B16
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 10:42:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726421AbgE1ILB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 May 2020 04:11:01 -0400
-Received: from mga03.intel.com ([134.134.136.65]:64047 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726080AbgE1ILB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 May 2020 04:11:01 -0400
-IronPort-SDR: O73HATl/osg7jC3XExCSGdXpLhsuQ3PzJZgboL7i7LVVHJYEWiR/jFa3EVshg1IVjld/PEbnZ/
- ifzOSxTFpO2Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2020 01:11:00 -0700
-IronPort-SDR: bRgydiOtZ9X+tvZBEcFWcYWu54Zt+rX1J2USsgGjc8eh1+jjQqAJPCDIfAEtsekT/rDVTO77Ok
- B1JIGWLyQ/RQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,444,1583222400"; 
-   d="scan'208";a="291916623"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga004.fm.intel.com with ESMTP; 28 May 2020 01:10:55 -0700
-Date:   Thu, 28 May 2020 04:01:02 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
-        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
-        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
-        cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com,
-        aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com,
-        Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-        Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
- devices
-Message-ID: <20200528080101.GD1378@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <20200519105804.02f3cae8@x1.home>
- <20200525065925.GA698@joy-OptiPlex-7040>
- <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
- <20200526141939.2632f100@x1.home>
- <20200527062358.GD19560@joy-OptiPlex-7040>
- <20200527084822.GC3001@work-vm>
+        id S1727816AbgE1Imr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 May 2020 04:42:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49801 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727088AbgE1Imq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 May 2020 04:42:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590655364;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fvx+64wD7VVw0aAEs3VYwAWqeGVZ/eQWc2QHhJjKSZs=;
+        b=WJeqb3VnoLXd5qJVHs5bLNqWPPAKb+CNf5rW5r1a2FYC1a6Dp5bjK2cIk6kYOI6xs56yuQ
+        Zjmqgz4udLHIgWe7viH1RCayXHVn50OM/hiTcaJ0npRuVL3n/ms0baHzu4WGfj3swajpHn
+        0vnMqnF6ELrxrSSH1NzCUATLpz5AYPw=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-TqK5uXvKNMG9sxJEWnq8Kg-1; Thu, 28 May 2020 04:42:43 -0400
+X-MC-Unique: TqK5uXvKNMG9sxJEWnq8Kg-1
+Received: by mail-ed1-f72.google.com with SMTP id w23so18424edt.18
+        for <kvm@vger.kernel.org>; Thu, 28 May 2020 01:42:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Fvx+64wD7VVw0aAEs3VYwAWqeGVZ/eQWc2QHhJjKSZs=;
+        b=Fg4HUoxNYnoH1sQ9TkX+P/wOwssf3co59zKGeA4kdgVEPOiBmIsbCNMROGhmKrJ20g
+         CTFnPVH8BApjpphpa6s7nWmE1ABguYI9/AFjqiW6yrP6C4Xby0H1V3P1hC11wYQBqoSW
+         Kupp4rrSEGU5/3b3QTru7O2x1jI6dfbr4VgW8WRQT6lunXaxovvp5OKPJlyBkuS9jdu+
+         mP/zQKDTNJ+LeCXJTXUQckXlB7Y/N9XHF0UXevxak5wM96xyyLW+npFx0lGttPyDDBB8
+         xnfjFPeIaZThT4UgyIWsDH2XG5sxi6AQM6ebM8PeRFBqPVYdnUUsYEMsi/h0ZEL/Z93O
+         fCzw==
+X-Gm-Message-State: AOAM5330TTOshm4HokE4kgDQ47IQsga8c3BYwESAlEshRpg8RWTebbYL
+        nWrZhEV+5kR7vu8DnVJHkzr6IhfH+QZkKU7Cmg3lddzhRcDJgkb3Dz9IuFDddYv0PBedjQqNJNP
+        n/3oRU9xy8vDP
+X-Received: by 2002:a05:6402:1434:: with SMTP id c20mr1863667edx.27.1590655360782;
+        Thu, 28 May 2020 01:42:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzmwuFe03uOkyVF7/OHMQGe1m9vs1yVv9lSdGU5anfJ+bfgT3LjEFTVBq0ghQke7oQvGAigYg==
+X-Received: by 2002:a05:6402:1434:: with SMTP id c20mr1863652edx.27.1590655360464;
+        Thu, 28 May 2020 01:42:40 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id b14sm394893ejq.105.2020.05.28.01.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 May 2020 01:42:39 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 02/10] KVM: x86: extend struct kvm_vcpu_pv_apf_data with token info
+In-Reply-To: <20200526182745.GA114395@redhat.com>
+References: <20200525144125.143875-1-vkuznets@redhat.com> <20200525144125.143875-3-vkuznets@redhat.com> <20200526182745.GA114395@redhat.com>
+Date:   Thu, 28 May 2020 10:42:38 +0200
+Message-ID: <875zcg4fi9.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200527084822.GC3001@work-vm>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > This is my understanding of the protocol as well, when the device is
-> > > running, pending_bytes might drop to zero if no internal state has
-> > > changed and may be non-zero on the next iteration due to device
-> > > activity.  When the device is not running, pending_bytes reporting zero
-> > > indicates the device is done, there is no further state to transmit.
-> > > Does that meet your need/expectation?
-> > >
-> > (1) on one side, as in vfio_save_pending(),
-> > vfio_save_pending()
-> > {
-> >     ...
-> >     ret = vfio_update_pending(vbasedev);
-> >     ...
-> >     *res_precopy_only += migration->pending_bytes;
-> >     ...
-> > }
-> > the pending_bytes tells migration thread how much data is still hold in
-> > device side.
-> > the device data includes
-> > device internal data + running device dirty data + device state.
-> > 
-> > so the pending_bytes should include device state as well, right?
-> > if so, the pending_bytes should never reach 0 if there's any device
-> > state to be sent after device is stopped.
-> 
-> I hadn't expected the pending-bytes to include a fixed offset for device
-> state (If you mean a few registers etc) - I'd expect pending to drop
-> possibly to zero;  the heuristic as to when to switch from iteration to
-> stop, is based on the total pending across all iterated devices; so it's
-> got to be allowed to drop otherwise you'll never transition to stop.
-> 
-ok. got it.
+Vivek Goyal <vgoyal@redhat.com> writes:
 
-> > (2) on the other side,
-> > along side we updated the pending_bytes in vfio_save_pending() and
-> > enter into the vfio_save_iterate(), if we repeatedly update
-> > pending_bytes in vfio_save_iterate(), it would enter into a scenario
-> > like
-> > 
-> > initially pending_bytes=500M.
-> > vfio_save_iterate() -->
-> >   round 1: transmitted 500M.
-> >   round 2: update pending bytes, pending_bytes=50M (50M dirty data).
-> >   round 3: update pending bytes, pending_bytes=50M.
-> >   ...
-> >   round N: update pending bytes, pending_bytes=50M.
-> > 
-> > If there're two vfio devices, the vfio_save_iterate() for the second device
-> > may never get chance to be called because there's always pending_bytes
-> > produced by the first device, even the size if small.
-> 
-> And between RAM and the vfio devices?
+> On Mon, May 25, 2020 at 04:41:17PM +0200, Vitaly Kuznetsov wrote:
+>> 
+>
+> [..]
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 0a6b35353fc7..c195f63c1086 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -767,7 +767,7 @@ struct kvm_vcpu_arch {
+>>  		u64 msr_val;
+>>  		u32 id;
+>>  		bool send_user_only;
+>> -		u32 host_apf_reason;
+>> +		u32 host_apf_flags;
+>
+> Hi Vitaly,
+>
+> What is host_apf_reason used for. Looks like it is somehow used in
+> context of nested guests. I hope by now you have been able to figure
+> it out.
+>
+> Is it somehow the case of that L2 guest takes a page fault exit
+> and then L0 injects this event in L1 using exception. I have been
+> trying to read this code but can't wrap my head around it.
+>
+> I am still concerned about the case of nested kvm. We have discussed
+> apf mechanism but never touched nested part of it. Given we are
+> touching code in nested kvm part, want to make sure it is not broken
+> in new design.
+>
 
-yes, is that right?
+Sorry I missed this.
 
-Thanks
-Yan
+I think we've touched nested topic a bit already:
+https://lore.kernel.org/kvm/87lfluwfi0.fsf@vitty.brq.redhat.com/
+
+But let me try to explain the whole thing and maybe someone will point
+out what I'm missing.
+
+The problem being solved: L2 guest is running and it is hitting a page
+which is not present *in L0* and instead of pausing *L1* vCPU completely
+we want to let L1 know about the problem so it can run something else
+(e.g. another guest or just another application).
+
+What's different between this and 'normal' APF case. When L2 guest is
+running, the CPU (physical) is in 'guest' mode so we can't inject #PF
+there. Actually, we can but L2 may get confused and we're not even sure
+it's L2's fault, that L2 supported APF and so on. We want to make L1
+deal with the issue.
+
+How does it work then. We inject #PF and L1 sees it as #PF VMEXIT. It
+needs to know about APF (thus KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT) but
+the handling is exactly the same as do_pagefault(): L1's
+kvm_handle_page_fault() checkes APF area (shared between L0 and L1) and
+either pauses a task or resumes a previously paused one. This can be a
+L2 guest or something else.
+
+What is 'host_apf_reason'. It is a copy of 'reason' field from 'struct
+kvm_vcpu_pv_apf_data' which we read upon #PF VMEXIT. It indicates that
+the #PF VMEXIT is synthetic.
+
+How does it work with the patchset: 'page not present' case remains the
+same. 'page ready' case now goes through interrupts so it may not get
+handled immediately. External interrupts will be handled by L0 in host
+mode (when L2 is not running). For the 'page ready' case L1 hypervisor
+doesn't need any special handling, kvm_async_pf_intr() irq handler will
+work correctly.
+
+I've smoke tested this with VMX and nothing immediately blew up.
+
+-- 
+Vitaly
+
