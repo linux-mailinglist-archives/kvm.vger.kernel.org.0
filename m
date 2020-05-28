@@ -2,192 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5EB01E58BD
-	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 09:36:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72BA41E5A6E
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 10:11:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725939AbgE1HgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 May 2020 03:36:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34296 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725601AbgE1HgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 May 2020 03:36:12 -0400
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF58C05BD1E;
-        Thu, 28 May 2020 00:36:12 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id x14so21429579wrp.2;
-        Thu, 28 May 2020 00:36:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=T8l9ZUxIOXsJeQU9fuugyzz0//RYyLlqRCwB65ghuSE=;
-        b=deb9hob6pj80MVXWoVPyZ8C/QckMbya8tmtIm+WfUcS77V8mHh9bKJuaVGOCey3wRy
-         GqfvQ3dz1zbg/LbOlAoP9i3xuZyOJQk4LDu5odAzx26hK8pzNG2+dowfP1md75LXHnEt
-         64T6ueicoEn8V4MGD5DcxA/qE/J34Rw4wQB4JaBBqfByzWbsLWkBhb6f05uR4H6ZM251
-         cyEcTrjIDtjYTox+ra/LIvawYTt5Z5SdONu4pv5IoY0Bw6wwtrRlKiRRwbt7mh6UepWO
-         XMfgmtTHgWU2U+/ElLkAl73or8QFMBsyfamfrDweoTUo/cjLrXoJxmDNJfaCAJ0ZaHPU
-         2sBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=T8l9ZUxIOXsJeQU9fuugyzz0//RYyLlqRCwB65ghuSE=;
-        b=qQXXsOY2TCj7057GjkcRNp/daf/mvkXzn+BD1J1wMfI7tBKqzwI1+QD5Tfd/p2QNdg
-         Un5FXaBk833TP3E2oF3M9nfAekFUPJltzeJ62WVTx7UoICd+tkVxsamSvfpLN7xMEzdE
-         Hg7FBjXDAA3evSrxFH0bHK9jI+5kPBmG7trVW/fP6chJViibxaHRgaoKisWEq/MRmdRN
-         Mii+s9N5nHjNmw3rTscpQ1ihhBZj/vic1wY7JNlxkQwOlmzJWeOcT7fW1E4gqznpVnW5
-         NU1oQYlIFsjc+dYfCuHJemGVsP1DKk6WLWtiOAOx/N9eDSFzEHDGxf9//bKHkPfXORlV
-         zqdA==
-X-Gm-Message-State: AOAM531Xqrkp4vXwJJ4Y8Fngiy9cLmWelf0ybjTn2bFZDwuOBQ9cxzlb
-        ZcAEy7Mu+iDNCbejYE7XUiV2aR0w+fFqwXIBOd4=
-X-Google-Smtp-Source: ABdhPJy7gL+Mp0mVGqHjv05fp1fiqbe1u7pVHix37JcsNca7ofRJ8Du/5GDLPee2w/BB2iFGI2h9m5/dDrBw74nl0AY=
-X-Received: by 2002:a5d:4385:: with SMTP id i5mr2142543wrq.420.1590651370875;
- Thu, 28 May 2020 00:36:10 -0700 (PDT)
+        id S1726421AbgE1ILB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 May 2020 04:11:01 -0400
+Received: from mga03.intel.com ([134.134.136.65]:64047 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726080AbgE1ILB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 May 2020 04:11:01 -0400
+IronPort-SDR: O73HATl/osg7jC3XExCSGdXpLhsuQ3PzJZgboL7i7LVVHJYEWiR/jFa3EVshg1IVjld/PEbnZ/
+ ifzOSxTFpO2Q==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2020 01:11:00 -0700
+IronPort-SDR: bRgydiOtZ9X+tvZBEcFWcYWu54Zt+rX1J2USsgGjc8eh1+jjQqAJPCDIfAEtsekT/rDVTO77Ok
+ B1JIGWLyQ/RQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,444,1583222400"; 
+   d="scan'208";a="291916623"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by fmsmga004.fm.intel.com with ESMTP; 28 May 2020 01:10:55 -0700
+Date:   Thu, 28 May 2020 04:01:02 -0400
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
+        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
+        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
+        cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com,
+        aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com,
+        Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+        Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
+ devices
+Message-ID: <20200528080101.GD1378@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
+ <20200519105804.02f3cae8@x1.home>
+ <20200525065925.GA698@joy-OptiPlex-7040>
+ <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
+ <20200526141939.2632f100@x1.home>
+ <20200527062358.GD19560@joy-OptiPlex-7040>
+ <20200527084822.GC3001@work-vm>
 MIME-Version: 1.0
-References: <1590318819-24520-1-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1590318819-24520-1-git-send-email-chenhc@lemote.com>
-From:   Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date:   Thu, 28 May 2020 09:35:57 +0200
-Message-ID: <CAHiYmc4uMSypSUafphc1bRu=voVj4Swvu=wEG8WNaszq34aNqQ@mail.gmail.com>
-Subject: Re: [PATCH V8 00/15] KVM: MIPS: Add Loongson-3 support (Host Side)
-To:     Huacai Chen <chenhc@lemote.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        kvm <kvm@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200527084822.GC3001@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-=D0=BD=D0=B5=D0=B4, 24. =D0=BC=D0=B0=D1=98 2020. =D1=83 13:13 Huacai Chen <=
-chenhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
-=D0=BB=D0=B0:
->
-> We are preparing to add KVM support for Loongson-3. VZ extension is
-> fully supported in Loongson-3A R4+, and we will not care about old CPUs
-> (at least now). We already have a full functional Linux kernel (based
-> on Linux-5.4.x LTS) and QEMU (based on 5.0.0) and their git repositories
-> are here:
->
-> QEMU: https://github.com/chenhuacai/qemu
-> Kernel: https://github.com/chenhuacai/linux
->
-> Of course these two repositories need to be rework and not suitable for
-> upstream (especially the commits need to be splitted). We show them here
-> is just to tell others what we have done, and how KVM/Loongson will look
-> like.
->
-> Our plan is make the KVM host side be upstream first, and after that,
-> we will make the KVM guest side and QEMU emulator be upstream.
->
+> > > This is my understanding of the protocol as well, when the device is
+> > > running, pending_bytes might drop to zero if no internal state has
+> > > changed and may be non-zero on the next iteration due to device
+> > > activity.  When the device is not running, pending_bytes reporting zero
+> > > indicates the device is done, there is no further state to transmit.
+> > > Does that meet your need/expectation?
+> > >
+> > (1) on one side, as in vfio_save_pending(),
+> > vfio_save_pending()
+> > {
+> >     ...
+> >     ret = vfio_update_pending(vbasedev);
+> >     ...
+> >     *res_precopy_only += migration->pending_bytes;
+> >     ...
+> > }
+> > the pending_bytes tells migration thread how much data is still hold in
+> > device side.
+> > the device data includes
+> > device internal data + running device dirty data + device state.
+> > 
+> > so the pending_bytes should include device state as well, right?
+> > if so, the pending_bytes should never reach 0 if there's any device
+> > state to be sent after device is stopped.
+> 
+> I hadn't expected the pending-bytes to include a fixed offset for device
+> state (If you mean a few registers etc) - I'd expect pending to drop
+> possibly to zero;  the heuristic as to when to switch from iteration to
+> stop, is based on the total pending across all iterated devices; so it's
+> got to be allowed to drop otherwise you'll never transition to stop.
+> 
+ok. got it.
 
-Huacai, Paolo, Thomas,
+> > (2) on the other side,
+> > along side we updated the pending_bytes in vfio_save_pending() and
+> > enter into the vfio_save_iterate(), if we repeatedly update
+> > pending_bytes in vfio_save_iterate(), it would enter into a scenario
+> > like
+> > 
+> > initially pending_bytes=500M.
+> > vfio_save_iterate() -->
+> >   round 1: transmitted 500M.
+> >   round 2: update pending bytes, pending_bytes=50M (50M dirty data).
+> >   round 3: update pending bytes, pending_bytes=50M.
+> >   ...
+> >   round N: update pending bytes, pending_bytes=50M.
+> > 
+> > If there're two vfio devices, the vfio_save_iterate() for the second device
+> > may never get chance to be called because there's always pending_bytes
+> > produced by the first device, even the size if small.
+> 
+> And between RAM and the vfio devices?
 
-As you know, there are number of Huacai's patches to QEMU, related
-to this series, actually we could call them counterparts to this series.
+yes, is that right?
 
-Regarding QEMU upstreaming, unless someone objects, I plan to send
-pull request that will include some of Huacai-s QEMU patches in next few
-days - those that are of general nature, do not rely on any kernel changes,
-and passed review process. The rest of Huacai's QEMU patches will wait
-for this series to be integrated in kernel upstream.
-
-Please give Huacai and myself some direction and path to go forward with
-this series. Please take into account that we inherit KVM for MIPS in an
-"orphaned" state, and do not know exactly all details how to "adopt" it.
-Forgive us if we made some missteps along the route.
-
-We would like to establish a long-lasting, and high-quality, workflow that
-will fit well to both KVM and MIPS kernel development.
-
-Please help us do it.
-
-Thanks in advance!
-
-Aleksandar
-
-
-
-> V1 -> V2:
-> 1, Remove "mips: define pud_index() regardless of page table folding"
->    because it has been applied.
-> 2, Make Loongson-specific code be guarded by CONFIG_CPU_LOONGSON64.
->
-> V2 -> V3:
-> 1, Emulate a reduced feature list of CPUCFG.
-> 2, Fix all possible checkpatch.pl errors and warnings.
->
-> V3 -> V4:
-> 1, Emulate LOONGSON_CFG0/LOONGSON_CFG3 in CPUCFG correctly.
-> 2, Update commit messages to explain Loongson-3 Virtual IPI.
-> 3, Add Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>=
-.
->
-> V4 -> V5:
-> 1, Fix a typo.
-> 2, Update MAINTAINERS.
->
-> V5 -> V6:
-> 1, Fix a mismatch during rebasing.
-> 2, Add Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>.
->
-> V6 -> V7:
-> 1, Rebase on latest mips-next (Config6 feature bits definition updated).
->
-> V7 -> V8:
-> 1, Rebase to be applied on kvm tree, i.e., the linux-next branch of
->    https://git.kernel.org/pub/scm/virt/kvm/kvm.git/. Building KVM/MIPS
->    need commit 3fbfb4585bfd4ff34e ("mips: define pud_index() regardless
->    of page table folding"), which has already been in mips tree but not
->    in kvm tree.
->
-> Xing Li(2):
->  KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
->  KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
->
-> Huacai Chen(13):
->  KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
->  KVM: MIPS: Add EVENTFD support which is needed by VHOST
->  KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
->  KVM: MIPS: Introduce and use cpu_guest_has_ldpte
->  KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
->  KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
->  KVM: MIPS: Add more types of virtual interrupts
->  KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
->  KVM: MIPS: Add CPUCFG emulation for Loongson-3
->  KVM: MIPS: Add CONFIG6 and DIAG registers emulation
->  KVM: MIPS: Add more MMIO load/store instructions emulation
->  KVM: MIPS: Enable KVM support for Loongson-3
->  MAINTAINERS: Update KVM/MIPS maintainers
->
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> ---
->  MAINTAINERS                          |   4 +-
->  arch/mips/Kconfig                    |   1 +
->  arch/mips/include/asm/cpu-features.h |   3 +
->  arch/mips/include/asm/kvm_host.h     |  52 +++-
->  arch/mips/include/asm/mipsregs.h     |   7 +
->  arch/mips/include/uapi/asm/inst.h    |  37 +++
->  arch/mips/kernel/cpu-probe.c         |   2 +
->  arch/mips/kvm/Kconfig                |   1 +
->  arch/mips/kvm/Makefile               |   5 +-
->  arch/mips/kvm/emulate.c              | 503 +++++++++++++++++++++++++++++=
-+++++-
->  arch/mips/kvm/entry.c                |  19 +-
->  arch/mips/kvm/interrupt.c            |  93 +------
->  arch/mips/kvm/interrupt.h            |  14 +-
->  arch/mips/kvm/loongson_ipi.c         | 214 +++++++++++++++
->  arch/mips/kvm/mips.c                 |  49 +++-
->  arch/mips/kvm/tlb.c                  |  41 +++
->  arch/mips/kvm/trap_emul.c            |   3 +
->  arch/mips/kvm/vz.c                   | 237 ++++++++++++-----
->  18 files changed, 1118 insertions(+), 167 deletions(-)
->  create mode 100644 arch/mips/kvm/loongson_ipi.c
-> --
-> 2.7.0
+Thanks
+Yan
