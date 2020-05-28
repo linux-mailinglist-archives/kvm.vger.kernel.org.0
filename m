@@ -2,107 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 605B31E6791
-	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 18:37:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 145231E67FB
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 19:00:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405136AbgE1Qh2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 May 2020 12:37:28 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:50124 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405088AbgE1QhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 May 2020 12:37:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590683844; x=1622219844;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=ShGieAlB1fCAj5Iy+xyLopAcjCT2+LXZg8SdNEj8Pr4=;
-  b=SD5A/8WF0V4ybajDogG+6hJQviXEYlDV5ReZ6zTKOUZxFexBXdPFmXS7
-   Ny2A4ng3syv4fb/2P2sNHEbJ6j0xGFr9L5GBgPAYB/6yvVc4dOqZvwqsh
-   WusFaoNL+m241zvUTi28nKVO4b0j7ibRU2io/vyEgApHUI5qJER3+lksb
-   8=;
-IronPort-SDR: PsJwySsBiy26uaimzxrZkePCCqn82LwyC71jWoND0Ky9jWeip0eRd/rTcTgRMrhi/C3npaeuQ5
- /eZ6bJ2TVRXg==
-X-IronPort-AV: E=Sophos;i="5.73,445,1583193600"; 
-   d="scan'208";a="38653622"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 28 May 2020 16:37:22 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-37fd6b3d.us-east-1.amazon.com (Postfix) with ESMTPS id CC9672835AF;
-        Thu, 28 May 2020 16:37:19 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 28 May 2020 16:37:19 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.34) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 28 May 2020 16:37:11 +0000
-Subject: Re: [PATCH v3 02/18] nitro_enclaves: Define the PCI device interface
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        "Alexander Graf" <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-3-andraprs@amazon.com>
- <20200526064455.GA2580530@kroah.com>
- <bd25183c-3b2d-7671-f699-78988a39a633@amazon.com>
- <20200526222109.GB179549@kroah.com>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <ceca466d-4c2e-8693-08c7-1fea5ab68cb7@amazon.com>
-Date:   Thu, 28 May 2020 19:37:06 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.1
+        id S2405221AbgE1Q76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 May 2020 12:59:58 -0400
+Received: from mga02.intel.com ([134.134.136.20]:7797 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405172AbgE1Q75 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 May 2020 12:59:57 -0400
+IronPort-SDR: VFl719Le3/YhyYKHTMmnWaBvNaSwjTN0lHPp8Gk8j+wcc9KhY7Bzugjq//MOp+3BotJcwK6n0i
+ T/XNviqU+44A==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2020 09:59:56 -0700
+IronPort-SDR: /SJhqbZYThfntgjSQvaZupZa5nrhFNdOhLATo7BmrAKyoxHMV6BL71I46xS//OFGhtL3pk1z3l
+ LkmLgy1iM/xw==
+X-IronPort-AV: E=Sophos;i="5.73,445,1583222400"; 
+   d="scan'208";a="267279706"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.174.96]) ([10.249.174.96])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2020 09:59:54 -0700
+Subject: Re: [PATCH] KVM: X86: Call kvm_x86_ops.cpuid_update() after CPUIDs
+ fully updated
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+References: <20200528151927.14346-1-xiaoyao.li@intel.com>
+ <b639a333-d7fe-74fd-ee11-6daede184676@redhat.com>
+ <1f45de43-af43-24da-b7d3-00b9d2bd517c@intel.com>
+ <5d8bc1da-f866-4741-7746-1fa2a3cfbafd@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <54497675-2b35-b351-4259-8eb819daca87@intel.com>
+Date:   Fri, 29 May 2020 00:59:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-In-Reply-To: <20200526222109.GB179549@kroah.com>
+In-Reply-To: <5d8bc1da-f866-4741-7746-1fa2a3cfbafd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.43.161.34]
-X-ClientProxiedBy: EX13D36UWB003.ant.amazon.com (10.43.161.118) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyNy8wNS8yMDIwIDAxOjIxLCBHcmVnIEtIIHdyb3RlOgo+IE9uIFR1ZSwgTWF5IDI2LCAy
-MDIwIGF0IDA4OjAxOjM2UE0gKzAzMDAsIFBhcmFzY2hpdiwgQW5kcmEtSXJpbmEgd3JvdGU6Cj4+
-Cj4+IE9uIDI2LzA1LzIwMjAgMDk6NDQsIEdyZWcgS0ggd3JvdGU6Cj4+PiBPbiBUdWUsIE1heSAy
-NiwgMjAyMCBhdCAwMToxMzoxOEFNICswMzAwLCBBbmRyYSBQYXJhc2NoaXYgd3JvdGU6Cj4+Pj4g
-K3N0cnVjdCBlbmNsYXZlX2dldF9zbG90X3JlcSB7Cj4+Pj4gKwkvKiBDb250ZXh0IElEIChDSUQp
-IGZvciB0aGUgZW5jbGF2ZSB2c29jayBkZXZpY2UuICovCj4+Pj4gKwl1NjQgZW5jbGF2ZV9jaWQ7
-Cj4+Pj4gK30gX19hdHRyaWJ1dGVfXyAoKF9fcGFja2VkX18pKTsKPj4+IENhbiB5b3UgcmVhbGx5
-ICJwYWNrIiBhIHNpbmdsZSBtZW1iZXIgc3RydWN0dXJlPwo+Pj4KPj4+IEFueXdheSwgd2UgaGF2
-ZSBiZXR0ZXIgd2F5cyB0byBzcGVjaWZ5IHRoaXMgaW5zdGVhZCBvZiB0aGUgInJhdyIKPj4+IF9f
-YXR0cmlidXRlX18gb3B0aW9uLiAgQnV0IGZpcnN0IHNlZSBpZiB5b3UgcmVhbGx5IG5lZWQgYW55
-IG9mIHRoZXNlLCBhdAo+Pj4gZmlyc3QgZ2xhbmNlLCBJIGRvIG5vdCB0aGluayB5b3UgZG8gYXQg
-YWxsLCBhbmQgdGhleSBjYW4gYWxsIGJlIHJlbW92ZWQuCj4+IFRoZXJlIGFyZSBhIGNvdXBsZSBv
-ZiBkYXRhIHN0cnVjdHVyZXMgd2l0aCBtb3JlIHRoYW4gb25lIG1lbWJlciBhbmQgbXVsdGlwbGUK
-Pj4gZmllbGQgc2l6ZXMuIEFuZCBmb3IgdGhlIG9uZXMgdGhhdCBhcmUgbm90LCBnYXRoZXJlZCBh
-cyBmZWVkYmFjayBmcm9tCj4+IHByZXZpb3VzIHJvdW5kcyBvZiByZXZpZXcgdGhhdCBzaG91bGQg
-Y29uc2lkZXIgYWRkaW5nIGEgImZsYWdzIiBmaWVsZCBpbgo+PiB0aGVyZSBmb3IgZnVydGhlciBl
-eHRlbnNpYmlsaXR5Lgo+IFBsZWFzZSBkbyBub3QgZG8gdGhhdCBpbiBpb2N0bHMuICBKdXN0IGNy
-ZWF0ZSBuZXcgY2FsbHMgaW5zdGVhZCBvZgo+IHRyeWluZyB0byAiZXh0ZW5kIiBleGlzdGluZyBv
-bmVzLiAgSXQncyBhbHdheXMgbXVjaCBlYXNpZXIuCj4KPj4gSSBjYW4gbW9kaWZ5IHRvIGhhdmUg
-Il9fcGFja2VkIiBpbnN0ZWFkIG9mIHRoZSBhdHRyaWJ1dGUgY2FsbG91dC4KPiBNYWtlIHN1cmUg
-eW91IGV2ZW4gbmVlZCB0aGF0LCBhcyBJIGRvbid0IHRoaW5rIHlvdSBkbyBmb3Igc3RydWN0dXJl
-cwo+IGxpa2UgdGhlIGFib3ZlIG9uZSwgcmlnaHQ/CgpGb3IgdGhlIG9uZXMgbGlrZSB0aGUgYWJv
-dmUsIG5vdCwgSSBqdXN0IGN1c3RvbWl6ZWQgdGhlIHVzYWdlIG9mICJfX3BhY2tlZCIuCgpUaGFu
-a3MsCkFuZHJhCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiBy
-ZWdpc3RlcmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElh
-c2ksIElhc2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4g
-UmVnaXN0cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
+On 5/29/2020 12:15 AM, Paolo Bonzini wrote:
+> On 28/05/20 17:40, Xiaoyao Li wrote:
+>>>
+>>>> kvm_x86_ops.cpuid_update() is used to update vmx/svm settings based on
+>>>> updated CPUID settings. So it's supposed to be called after CPUIDs are
+>>>> fully updated, not in the middle stage.
+>>>>
+>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>
+>>> Are you seeing anything bad happening from this?
+>>
+>> Not yet.
+>>
+>> IMO changing the order is more reasonable and less confusing.
+> 
+> Indeed, I just could not decide whether to include it in 5.7 or not.
+
+Maybe for 5.8
+
+I have a new idea to refactor a bit more that I find it does three 
+things in kvm_update_cpuid():
+- update cpuid;
+- update vcpu states, e.g., apic->lapic_timer.timer_mode_mask, 
+guest_supported_xcr0, maxphyaddr, ... etc,
+- cpuid check, for vaddr_bits
+
+I'm going to split it, and make the order as:
+1. kvm_check_cpuid(), if invalid value return error;
+2. kvm_update_cpuid();
+3. kvm_update_state_based_on_cpuid();
+    and kvm_x86_ops.kvm_x86_ops.cpuid_update() can be called inside it.
+
+If you feel OK, I'll do it tomorrow.
+
+-Xiaoyao
+
 
