@@ -2,82 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A14321E63BC
-	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 16:23:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0665D1E65D6
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 17:19:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391117AbgE1OXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 May 2020 10:23:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56257 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2391035AbgE1OWw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 May 2020 10:22:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590675771;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lJAE3W4i6ShVxeRfUH/bQwuRjs3nBOGoAWqm9myFCPw=;
-        b=dz6NPnhJPKteYo/RPAU4/5RHF+imHDWXnb+fIqvVw0ARkw9kW9bkuk7DaUpPAX5eeX9B+T
-        N2dRIOJnGQzL7H4+5Uob0hpsY8wlT55RqmmIQnz9FoBnqxqr4Ovvh3npRWuUKlRrtK37MM
-        r2ELxk1Z46YoDpnLKfsK6RStTiUDDQk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-Akt7k8GuMKaJnQE7t8yySw-1; Thu, 28 May 2020 10:22:49 -0400
-X-MC-Unique: Akt7k8GuMKaJnQE7t8yySw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0A2F1005512;
-        Thu, 28 May 2020 14:22:47 +0000 (UTC)
-Received: from gondolin (ovpn-113-28.ams2.redhat.com [10.36.113.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2132860C05;
-        Thu, 28 May 2020 14:22:45 +0000 (UTC)
-Date:   Thu, 28 May 2020 16:22:43 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Vasily Gorbik <gor@linux.ibm.com>
-Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        id S2404313AbgE1PTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 May 2020 11:19:42 -0400
+Received: from mga02.intel.com ([134.134.136.20]:64188 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404219AbgE1PTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 May 2020 11:19:41 -0400
+IronPort-SDR: kcd1/j7jzA7xbET44HnV5V8IPvDCH4kKnjisUW8iIzo7EUym2zw9RVHze1bmsOhs0/kPH8dxfn
+ AwGj0u1NQyjw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2020 08:19:32 -0700
+IronPort-SDR: PKpILhmpgWJ4LqD1TSyYiIUyogBt/I1Qqls+IXEYCQOudAO2v82YIWdazRGEUPJ3YlVKw1jWBs
+ bknPGleRqmQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,445,1583222400"; 
+   d="scan'208";a="292030776"
+Received: from lxy-dell.sh.intel.com ([10.239.159.21])
+  by fmsmga004.fm.intel.com with ESMTP; 28 May 2020 08:19:30 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         kvm@vger.kernel.org
-Subject: Re: [PULL 00/10] vfio-ccw patches for 5.8
-Message-ID: <20200528162243.7ee3a352.cohuck@redhat.com>
-In-Reply-To: <your-ad-here.call-01590669751-ext-3257@work.hours>
-References: <20200525094115.222299-1-cohuck@redhat.com>
-        <your-ad-here.call-01590669751-ext-3257@work.hours>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [PATCH] KVM: X86: Call kvm_x86_ops.cpuid_update() after CPUIDs fully updated
+Date:   Thu, 28 May 2020 23:19:27 +0800
+Message-Id: <20200528151927.14346-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.18.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 28 May 2020 14:42:31 +0200
-Vasily Gorbik <gor@linux.ibm.com> wrote:
+kvm_x86_ops.cpuid_update() is used to update vmx/svm settings based on
+updated CPUID settings. So it's supposed to be called after CPUIDs are
+fully updated, not in the middle stage.
 
-> On Mon, May 25, 2020 at 11:41:05AM +0200, Cornelia Huck wrote:
-> > The following changes since commit 6a8b55ed4056ea5559ebe4f6a4b247f627870d4c:
-> > 
-> >   Linux 5.7-rc3 (2020-04-26 13:51:02 -0700)
-> > 
-> > are available in the Git repository at:
-> > 
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw tags/vfio-ccw-20200525  
-> 
-> Hello Conny,
-> 
-> s390/features is based on v5.7-rc2 rather than on v5.7-rc3 as your
-> tags/vfio-ccw-20200525. Are there any pre-requisites in between for
-> vfio-ccw changes? It does cleanly rebase onto v5.7-rc2.
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+ arch/x86/kvm/cpuid.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-There shouldn't be anything.
-
-> 
-> Could you please rebase onto v5.7-rc2 or s390/features if that's possible?
-
-Ugh. Isn't there any way to avoid doing that?
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index cd708b0b460a..753739bc1bf0 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -208,8 +208,11 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+ 	vcpu->arch.cpuid_nent = cpuid->nent;
+ 	cpuid_fix_nx_cap(vcpu);
+ 	kvm_apic_set_version(vcpu);
+-	kvm_x86_ops.cpuid_update(vcpu);
+ 	r = kvm_update_cpuid(vcpu);
++	if (r)
++		goto out;
++
++	kvm_x86_ops.cpuid_update(vcpu);
+ 
+ out:
+ 	vfree(cpuid_entries);
+@@ -231,8 +234,11 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
+ 		goto out;
+ 	vcpu->arch.cpuid_nent = cpuid->nent;
+ 	kvm_apic_set_version(vcpu);
+-	kvm_x86_ops.cpuid_update(vcpu);
+ 	r = kvm_update_cpuid(vcpu);
++	if (r)
++		goto out;
++
++	kvm_x86_ops.cpuid_update(vcpu);
+ out:
+ 	return r;
+ }
+-- 
+2.18.2
 
