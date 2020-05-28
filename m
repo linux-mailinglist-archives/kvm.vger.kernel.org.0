@@ -2,67 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B2BB1E6046
-	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 14:09:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41CD71E6043
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 14:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388741AbgE1L42 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 May 2020 07:56:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33633 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2388724AbgE1L40 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 May 2020 07:56:26 -0400
+        id S2388754AbgE1MJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 May 2020 08:09:07 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30044 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388750AbgE1L4c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 May 2020 07:56:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590666985;
+        s=mimecast20190719; t=1590666990;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G6bfws9MwiCCMvZrWzAJyuiNns7YUWzpHu60JOrsU/o=;
-        b=IMOPZ6eejD1SSUWSCBkLRlPIKhhXcS+pf8e4CyMDtxm4amUehp4qHrKSSanNIBIg4btKSC
-        AoOpJN0QRYOIYMfeq1LPkWH1rXVg2fUrTGOr4FjVd9ocOaixdCtt/Kfcy4qF9VQgg6NRJc
-        fk7W5nkNPzelCRl1K13o1BFbDSnuVG4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-3knW8UOWNIyZE-9X8XXSFQ-1; Thu, 28 May 2020 07:56:22 -0400
-X-MC-Unique: 3knW8UOWNIyZE-9X8XXSFQ-1
-Received: by mail-wm1-f69.google.com with SMTP id z5so883061wml.6
-        for <kvm@vger.kernel.org>; Thu, 28 May 2020 04:56:22 -0700 (PDT)
+        bh=Yiz5dSOYdlV7/pPCeIEVuYRNWj51QSmz3pq/ju45gCA=;
+        b=AmEKr4AOy6SBsHOIfvGUroLhAqyXc0piACz7y0G6LoJihaZky311F5hjm+wJ94kPrp6e9W
+        fLC+iGarMMFCGLTEmls3zETQJNXed65sbC4/iTBKg+GYEzUYheNJaJFDf+4IyOyPYbeDvy
+        PetcSFYSdixlFQVp9ydQj/A4A1ezy/I=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-rdkIDvvoO3y551Wjy8nSZg-1; Thu, 28 May 2020 07:56:29 -0400
+X-MC-Unique: rdkIDvvoO3y551Wjy8nSZg-1
+Received: by mail-wr1-f70.google.com with SMTP id q24so7127741wra.14
+        for <kvm@vger.kernel.org>; Thu, 28 May 2020 04:56:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=G6bfws9MwiCCMvZrWzAJyuiNns7YUWzpHu60JOrsU/o=;
-        b=mjxqLaxObRk+w3mStnTiLp1MrEfxK8r3xo6etz3CXVPmxr1glqHQK1/LwTtbeC+E6A
-         +O3EgbaQHWlX8R/B+86vvV5UYJrRx+CzDhLDXu1II4HbacQQ7RxgqUIas7xCd7ICn/dQ
-         gwkx9ZiFCXLlZUJHM+1LwQUPzaNTLKb6mt2lr2XqNDaWyyTp3XbUsYSr1bD258lQWjsI
-         IURKsXK9lMrdUu2DhxVpS6eGF3cPeZRwFvkuivWvQmBadBcfWdt3RJneFGQYfabPqEBt
-         B/1mqX907uwckEUnIcL9nysTQze9+mwfc5vPqKmwGsi4Bk7nPhl8Qg8eRb/Ulkrkwp/T
-         uQ3g==
-X-Gm-Message-State: AOAM533uGL/A4qe1oSnh+7+/IWoAiiIJU4fjXgQQPuWdL884UU7NK2ZC
-        ANkkyV6Q39r6Q3m81F1pKpge7T0Ft+rXjbRC3PzI2cUQRuTTQCQ+Bq8M3KHa0KDbyfvi6QDD7QM
-        5QS3EYvqqDyX0
-X-Received: by 2002:a05:600c:146:: with SMTP id w6mr2984002wmm.97.1590666981590;
-        Thu, 28 May 2020 04:56:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJbHKuC/6XBtiV1KUuSLpUmiBDD5SLecdb26n6zIP6TbQf3zEubqSsXxt97G1Deyo1noUmFA==
-X-Received: by 2002:a05:600c:146:: with SMTP id w6mr2983988wmm.97.1590666981329;
-        Thu, 28 May 2020 04:56:21 -0700 (PDT)
+        bh=Yiz5dSOYdlV7/pPCeIEVuYRNWj51QSmz3pq/ju45gCA=;
+        b=EGpRlcSlXP5znstNp5XTCk6blz6mlroQwjVlhru+XdalHeDUBttKXhTytxhwfn+6N/
+         LphVmpLnDV6/X6sE43yYGys39kT81s9Xycjlmvxgu/F+LmdzHNYF0jnAEguHblbhEDAr
+         JhNaHqe94KOhW3/xGn5vgzxX2ypIGSyrCODcaMgA+FX+ifItFxOuNOwtaJEz9C/mnTgb
+         puQ5PEWLuFwvNnCdWHjmUNLJ3HUn7QtT2uFb8xdgFO5gInBSVmH5DmM0QdWlxfFU15vQ
+         en7y8AJpCKIyuFrC4OKpGHKdizCZyGJQmqUs7vHCr9MMDYXWOBLQPrXP7bzbbrEpscF0
+         sM6g==
+X-Gm-Message-State: AOAM532PVN/LG/iOHnueaXA7WXm+9wZEAN4j12GNbvpCJWbfrQvBOCzQ
+        6Y+AHRkfeW6HfRPT2gLoFqZUlaJ27bmE7EkmOFDi0iQFGYQR7Jl2dusAqeoM7UI3bXll6znNBCB
+        oHMgs17ntapyx
+X-Received: by 2002:a5d:4c45:: with SMTP id n5mr3231831wrt.341.1590666987859;
+        Thu, 28 May 2020 04:56:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKuPIf7B5Cz3iHbqwMVjcFt8fJUNDvvngaOdIAtByLGJ+sgSj7uK/BuNlur4kQQFO7KPpNXA==
+X-Received: by 2002:a5d:4c45:: with SMTP id n5mr3231809wrt.341.1590666987632;
+        Thu, 28 May 2020 04:56:27 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:3c1c:ffba:c624:29b8? ([2001:b07:6468:f312:3c1c:ffba:c624:29b8])
-        by smtp.gmail.com with ESMTPSA id h74sm5853862wrh.76.2020.05.28.04.56.20
+        by smtp.gmail.com with ESMTPSA id f2sm6023682wrg.17.2020.05.28.04.56.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 May 2020 04:56:20 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Add .gitignore entry for
- KVM_SET_GUEST_DEBUG test
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200528021624.28348-1-sean.j.christopherson@intel.com>
+        Thu, 28 May 2020 04:56:27 -0700 (PDT)
+Subject: Re: [PATCH] x86/kvm: Remove defunct KVM_DEBUG_FS Kconfig
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200528031121.28904-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ce6a5284-e09b-2f51-8cb6-baa29b3ac5c3@redhat.com>
-Date:   Thu, 28 May 2020 13:56:20 +0200
+Message-ID: <257b0ba7-84e2-89de-3708-1174f5d090be@redhat.com>
+Date:   Thu, 28 May 2020 13:56:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200528021624.28348-1-sean.j.christopherson@intel.com>
+In-Reply-To: <20200528031121.28904-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,27 +78,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/05/20 04:16, Sean Christopherson wrote:
-> Add the KVM_SET_GUEST_DEBUG test's output binary to .gitignore.
+On 28/05/20 05:11, Sean Christopherson wrote:
+> Remove KVM_DEBUG_FS, which can easily be misconstrued as controlling
+> KVM-as-a-host.  The sole user of CONFIG_KVM_DEBUG_FS was removed by
+> commit cfd8983f03c7b ("x86, locking/spinlocks: Remove ticket (spin)lock
+> implementation").
 > 
-> Fixes: 449aa906e67e ("KVM: selftests: Add KVM_SET_GUEST_DEBUG test")
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  tools/testing/selftests/kvm/.gitignore | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/x86/Kconfig      | 8 --------
+>  arch/x86/kernel/kvm.c | 1 -
+>  2 files changed, 9 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 222e50104296a..d0079fce1764f 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -3,6 +3,7 @@
->  /s390x/resets
->  /s390x/sync_regs_test
->  /x86_64/cr4_cpuid_sync_test
-> +/x86_64/debug_regs
->  /x86_64/evmcs_test
->  /x86_64/hyperv_cpuid
->  /x86_64/mmio_warning_test
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 1197b5596d5ad..0ccf4e76acfe8 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -818,14 +818,6 @@ config PVH
+>  	  This option enables the PVH entry point for guest virtual machines
+>  	  as specified in the x86/HVM direct boot ABI.
+>  
+> -config KVM_DEBUG_FS
+> -	bool "Enable debug information for KVM Guests in debugfs"
+> -	depends on KVM_GUEST && DEBUG_FS
+> -	---help---
+> -	  This option enables collection of various statistics for KVM guest.
+> -	  Statistics are displayed in debugfs filesystem. Enabling this option
+> -	  may incur significant overhead.
+> -
+>  config PARAVIRT_TIME_ACCOUNTING
+>  	bool "Paravirtual steal time accounting"
+>  	depends on PARAVIRT
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 6efe0410fb728..89ba09228eaf5 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -21,7 +21,6 @@
+>  #include <linux/sched.h>
+>  #include <linux/slab.h>
+>  #include <linux/kprobes.h>
+> -#include <linux/debugfs.h>
+>  #include <linux/nmi.h>
+>  #include <linux/swait.h>
+>  #include <asm/timer.h>
 > 
 
 Queued, thanks.
