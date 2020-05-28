@@ -2,108 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9324B1E5398
-	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 04:01:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FBE21E53C6
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 04:15:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726928AbgE1CBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 May 2020 22:01:21 -0400
-Received: from mta-p5.oit.umn.edu ([134.84.196.205]:42390 "EHLO
-        mta-p5.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726563AbgE1CBS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 May 2020 22:01:18 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mta-p5.oit.umn.edu (Postfix) with ESMTP id 49XWC12Mpkz9vYBT
-        for <kvm@vger.kernel.org>; Thu, 28 May 2020 02:01:17 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at umn.edu
-Received: from mta-p5.oit.umn.edu ([127.0.0.1])
-        by localhost (mta-p5.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id BYkVvTmJVylL for <kvm@vger.kernel.org>;
-        Wed, 27 May 2020 21:01:17 -0500 (CDT)
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mta-p5.oit.umn.edu (Postfix) with ESMTPS id 49XWC10fKwz9vFPQ
-        for <kvm@vger.kernel.org>; Wed, 27 May 2020 21:01:17 -0500 (CDT)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mta-p5.oit.umn.edu 49XWC10fKwz9vFPQ
-DKIM-Filter: OpenDKIM Filter v2.11.0 mta-p5.oit.umn.edu 49XWC10fKwz9vFPQ
-Received: by mail-io1-f69.google.com with SMTP id g3so6981624ioc.20
-        for <kvm@vger.kernel.org>; Wed, 27 May 2020 19:01:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umn.edu; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=BPs8LVcxoxf1YiKvvhf741vH5cSBxCq2p6KwCVlZJlU=;
-        b=FQLUT3B1eErsvZ0Ocp4xVAs2C/j0jxi7sjHyq2fkRKXxUD5n5X0POfT2PAglwf+v0w
-         F8TztGOERRorjskQK4YnoXOqcy7C2EBJ9tekEsCR0JWnPzY9v1QvriPPVUJL/I9BeHef
-         Hy690sImJpeFn/YpIhEaeHhPaNZq7lCq6qM0f8X0wo6Q/j8NPNRM+OJCbUVXs9a/j2P9
-         fXRb9V1JKefP3wwfANb+iq2lAfa/rdKKGKtR6P+c3vmdiAsVeD+4vhX5Bd+MxH6SsY2o
-         S1z/esmZIrHRqbThvG3XVWtAXZtT0ln+pqjjM1jvyX/g/BPXvrME6Y9G+FvmpQqlqrox
-         xx/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=BPs8LVcxoxf1YiKvvhf741vH5cSBxCq2p6KwCVlZJlU=;
-        b=pGyn1Quk+glBdFvm77g1Jv37P/p+Py0sntw+aEGbsR0ZOH/zPBJ5OdNYInNov+ygCT
-         VMKPq2fNW2SU3U5AYdu/tCLHSoCIY2XykuVUIDpGwunuFZrWqyoaWWmEBMXF1xiIYIks
-         ZjSZTq/5z2i2/s7bwynp6VyjpI1Pej4SxqsJp15lMRqxgo53LwGNisbOeJFuVr0ZVZ4T
-         G2yRdYyAOvy+pnMK/936SDQ8dPXhgKSs6P3sPDt6XcfyLxj5IZgI5cE0ZT8MWA2C6l+a
-         7CJPBkW9wEsit6hOVWiLFZsVbE38wXIOQU/OMGOV2iPez1KrVr3dfIG8cvYlXIsRD48T
-         Kmfg==
-X-Gm-Message-State: AOAM533hdmYUNvwi8mKxVe5kk9abL7Mijvx++CWFscsEkt7Y8+ptEmyt
-        iEd2qt09ce/L13eH02lmNWrrw/S1eNIWJtn/LGjeqDvlHJ3t9CR0JmdtvpakKLqN1ySys0IdZvc
-        C7jwvLEnd4GmZpXQ3
-X-Received: by 2002:a92:b001:: with SMTP id x1mr931331ilh.18.1590631276457;
-        Wed, 27 May 2020 19:01:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyzseNODZL7xc5OcagCl2EGQR0kxsq3pWzWLytnWDMqV+TXhfavKonxOJKsgZL6Q5ghdTnh/g==
-X-Received: by 2002:a92:b001:: with SMTP id x1mr931315ilh.18.1590631276118;
-        Wed, 27 May 2020 19:01:16 -0700 (PDT)
-Received: from qiushi.dtc.umn.edu (cs-kh5248-02-umh.cs.umn.edu. [128.101.106.4])
-        by smtp.gmail.com with ESMTPSA id z12sm1965088iol.15.2020.05.27.19.01.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 May 2020 19:01:15 -0700 (PDT)
-From:   wu000273@umn.edu
-To:     kjlu@umn.edu
-Cc:     wu000273@umn.edu, Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, Neo Jia <cjia@nvidia.com>,
-        Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>,
-        Jike Song <jike.song@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] vfio/mdev: Fix reference count leak in add_mdev_supported_type.
-Date:   Wed, 27 May 2020 21:01:09 -0500
-Message-Id: <20200528020109.31664-1-wu000273@umn.edu>
-X-Mailer: git-send-email 2.17.1
+        id S1726616AbgE1CPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 May 2020 22:15:33 -0400
+Received: from mga06.intel.com ([134.134.136.31]:22236 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725849AbgE1CPc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 May 2020 22:15:32 -0400
+IronPort-SDR: uchrLjJhGqkfY1psT2qsxRaS0/A9bwL5EfHY6aVSJQeeMO3P4wpVDQSbZHGASHQim7dzXuyB7X
+ aNIZFWw35ZVQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2020 19:15:31 -0700
+IronPort-SDR: ZsxugPmsaGgauJHajFMQGUnZ6XilY3GjFeF91lsi/lhAwQe6yrP2U+awZ3oR0Yq9oqUgvuwlpf
+ MliaLxRu/0YQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,443,1583222400"; 
+   d="scan'208";a="376218319"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by fmsmga001.fm.intel.com with ESMTP; 27 May 2020 19:15:31 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sergio Perez Gonzalez <sergio.perez.gonzalez@intel.com>,
+        Adriana Cervantes Jimenez <adriana.cervantes.jimenez@intel.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH] KVM: selftests: Ignore KVM 5-level paging support for VM_MODE_PXXV48_4K
+Date:   Wed, 27 May 2020 19:15:30 -0700
+Message-Id: <20200528021530.28091-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Qiushi Wu <wu000273@umn.edu>
+Explicitly set the VA width to 48 bits for the x86_64-only PXXV48_4K VM
+mode instead of asserting the guest VA width is 48 bits.  The fact that
+KVM supports 5-level paging is irrelevant unless the selftests opt-in to
+5-level paging by setting CR4.LA57 for the guest.  The overzealous
+assert prevents running the selftests on a kernel with 5-level paging
+enabled.
 
-kobject_init_and_add() takes reference even when it fails.
-If this function returns an error, kobject_put() must be called to
-properly clean up the memory associated with the object. Thus,
-replace kfree() by kobject_put() to fix this issue. Previous
-commit "b8eb718348b8" fixed a similar problem.
+Incorporate LA57 into the assert instead of removing the assert entirely
+as a sanity check of KVM's CPUID output.
 
-Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-Signed-off-by: Qiushi Wu <wu000273@umn.edu>
+Fixes: 567a9f1e9deb ("KVM: selftests: Introduce VM_MODE_PXXV48_4K")
+Reported-by: Sergio Perez Gonzalez <sergio.perez.gonzalez@intel.com>
+Cc: Adriana Cervantes Jimenez <adriana.cervantes.jimenez@intel.com>
+Cc: Peter Xu <peterx@redhat.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- drivers/vfio/mdev/mdev_sysfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/lib/kvm_util.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
-index 8ad14e5c02bf..917fd84c1c6f 100644
---- a/drivers/vfio/mdev/mdev_sysfs.c
-+++ b/drivers/vfio/mdev/mdev_sysfs.c
-@@ -110,7 +110,7 @@ static struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
- 				   "%s-%s", dev_driver_string(parent->dev),
- 				   group->name);
- 	if (ret) {
--		kfree(type);
-+		kobject_put(&type->kobj);
- 		return ERR_PTR(ret);
- 	}
- 
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index c9cede5c7d0de..74776ee228f2d 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -195,11 +195,18 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 	case VM_MODE_PXXV48_4K:
+ #ifdef __x86_64__
+ 		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
+-		TEST_ASSERT(vm->va_bits == 48, "Linear address width "
+-			    "(%d bits) not supported", vm->va_bits);
++		/*
++		 * Ignore KVM support for 5-level paging (vm->va_bits == 57),
++		 * it doesn't take effect unless a CR4.LA57 is set, which it
++		 * isn't for this VM_MODE.
++		 */
++		TEST_ASSERT(vm->va_bits == 48 || vm->va_bits == 57,
++			    "Linear address width (%d bits) not supported",
++			    vm->va_bits);
+ 		pr_debug("Guest physical address width detected: %d\n",
+ 			 vm->pa_bits);
+ 		vm->pgtable_levels = 4;
++		vm->va_bits = 48;
+ #else
+ 		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
+ #endif
 -- 
-2.17.1
+2.26.0
 
