@@ -2,75 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A93EF1E6114
-	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 14:39:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91C361E6128
+	for <lists+kvm@lfdr.de>; Thu, 28 May 2020 14:42:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389788AbgE1MjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 May 2020 08:39:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389734AbgE1Mit (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 May 2020 08:38:49 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9669C05BD1E;
-        Thu, 28 May 2020 05:38:49 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0be200b0299b2dfed8209e.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:e200:b029:9b2d:fed8:209e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 076D81EC02CF;
-        Thu, 28 May 2020 14:38:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1590669528;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=0opdngyx2K/yyYLMUGP93EKBwY9KCD9g0UxDDXfrvcQ=;
-        b=OTstkblyMvF224WY8T7jjseB4wM38dKW4H4F/RPxzwKpxlwqaUV8iXiCvcpbsYrOZlNn7p
-        063TkMHt3P+ev+xJU6BTFKFiV7r5lABDEarM088hPKFm2ruuj0wHKLlSV/6wSVcYKcB6nw
-        0T4+F+gnvXWLVPJcyikeGbz1M+l6ZTU=
-Date:   Thu, 28 May 2020 14:38:42 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        Doug Covelli <dcovelli@vmware.com>
-Subject: Re: [PATCH v3 67/75] x86/vmware: Add VMware specific handling for
- VMMCALL under SEV-ES
-Message-ID: <20200528123842.GA382@zn.tnic>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-68-joro@8bytes.org>
+        id S2389812AbgE1Mml (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 May 2020 08:42:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47492 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389746AbgE1Mmk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 May 2020 08:42:40 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04SCXaG6110428;
+        Thu, 28 May 2020 08:42:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=M0hfDGewQoQ31f3l+JSTrKuhyQz6otPKo5AUUBr9EGA=;
+ b=nzcQkiSwl0UiwxQ0wwKtcn0PzQ2XtYZTrWjqham5WsxYZn+f5FYq6BzhCVRgDB3eJ5SF
+ Vi3os5ezpfQSP4aUQKUDJ5F1ct6qEHPm/7ftYH4OOxg3WQZ6Y6wPaMg8y93oq1a3ArHA
+ 0+h4sEVZrmVrXubHWSAf/r24iBZKvfrJeUytxqqMIYxU2SAzkQYuVRAOV7i5zQkQ1wgV
+ qDHT7lb9Q9yREudw6NFihkEU8OcP1uiHRMZDbOv+7hwV7dBuDLjfRPuCFcvMJdnPy/ho
+ TJVHcytKzHr+eVCdpvm3KcTq+bit8uJSKYJ0nUG77hjC7q6Fda6N6RvIqMFg4Ow1/EQP AQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 319sqft542-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 May 2020 08:42:39 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04SCZ0SJ118055;
+        Thu, 28 May 2020 08:42:39 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 319sqft53e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 May 2020 08:42:38 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 04SCet6q018500;
+        Thu, 28 May 2020 12:42:36 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 316uf8m156-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 28 May 2020 12:42:36 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 04SCgX1R57409910
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 28 May 2020 12:42:33 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6226E11C050;
+        Thu, 28 May 2020 12:42:33 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0C2911C054;
+        Thu, 28 May 2020 12:42:32 +0000 (GMT)
+Received: from localhost (unknown [9.145.63.210])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 28 May 2020 12:42:32 +0000 (GMT)
+Date:   Thu, 28 May 2020 14:42:31 +0200
+From:   Vasily Gorbik <gor@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PULL 00/10] vfio-ccw patches for 5.8
+Message-ID: <your-ad-here.call-01590669751-ext-3257@work.hours>
+References: <20200525094115.222299-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200428151725.31091-68-joro@8bytes.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200525094115.222299-1-cohuck@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-05-28_03:2020-05-28,2020-05-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=909
+ suspectscore=0 bulkscore=0 phishscore=0 cotscore=-2147483648
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 clxscore=1015
+ malwarescore=0 adultscore=0 impostorscore=0 mlxscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005280086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 05:17:17PM +0200, Joerg Roedel wrote:
-> From: Doug Covelli <dcovelli@vmware.com>
+On Mon, May 25, 2020 at 11:41:05AM +0200, Cornelia Huck wrote:
+> The following changes since commit 6a8b55ed4056ea5559ebe4f6a4b247f627870d4c:
 > 
-> This change adds VMware specific handling for #VC faults caused by
+>   Linux 5.7-rc3 (2020-04-26 13:51:02 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw tags/vfio-ccw-20200525
 
-s/This change adds/Add/
+Hello Conny,
 
--- 
-Regards/Gruss,
-    Boris.
+s390/features is based on v5.7-rc2 rather than on v5.7-rc3 as your
+tags/vfio-ccw-20200525. Are there any pre-requisites in between for
+vfio-ccw changes? It does cleanly rebase onto v5.7-rc2.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Could you please rebase onto v5.7-rc2 or s390/features if that's possible?
+
+Thank you.
