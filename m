@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7AC21E82C0
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 18:01:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 329521E82C3
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 18:01:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727071AbgE2QBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727772AbgE2QBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 29 May 2020 12:01:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40296 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:40360 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726549AbgE2QBn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 12:01:43 -0400
+        id S1726974AbgE2QBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 12:01:44 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8A1B320814;
-        Fri, 29 May 2020 16:01:42 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 69AFF20C09;
+        Fri, 29 May 2020 16:01:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590768102;
-        bh=E/PuPpWmiPrQz16kOxC09voxVIFgWpR67AwcFCKj6rQ=;
+        s=default; t=1590768103;
+        bh=lBKNCDT+VQ6RenPcWHqIkWtmZULheGIxt+fd/AyAAAg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UylOJdpa2G1BF+AHK7NO2WL2jQiwDyDLUoEmpUqst5UC3OjK9JRO6kL5hSC1pyEns
-         SS2IMjCSwOpsHzkf79GE/Nrn36yTdzm2/AE+hI6AslyO+1FcFbIdRBI4O/OWYCKkq1
-         rtw26Zo64Px2CpAq+xE6hYEvF94pVpxF8My9c2Tc=
+        b=kwihRHxW6RxTpA9LITjh/ZujFbbAo+kV233sGkdT8br6Od77JXEySZ1xC84DOUPvp
+         iAKs2q6uu4Gb8LDhXi2o7Cr12w0oj5HsunvKGnmA0FvA0xWGtusk5itCAN8H+e1mav
+         4pQ5Jy8KFhoRWoQEh8cUgEbAM8h7Gk2mvxLN+Wgw=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jehS0-00GJKc-WB; Fri, 29 May 2020 17:01:41 +0100
+        id 1jehS1-00GJKc-RD; Fri, 29 May 2020 17:01:41 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -46,9 +46,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 02/24] KVM: arm64: Kill off CONFIG_KVM_ARM_HOST
-Date:   Fri, 29 May 2020 17:00:59 +0100
-Message-Id: <20200529160121.899083-3-maz@kernel.org>
+Subject: [PATCH 03/24] KVM: arm64: Update help text
+Date:   Fri, 29 May 2020 17:01:00 +0100
+Message-Id: <20200529160121.899083-4-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200529160121.899083-1-maz@kernel.org>
 References: <20200529160121.899083-1-maz@kernel.org>
@@ -65,182 +65,31 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Will Deacon <will@kernel.org>
 
-CONFIG_KVM_ARM_HOST is just a proxy for CONFIG_KVM, so remove it in favour
-of the latter.
+arm64 KVM supports 16k pages since 02e0b7600f83
+("arm64: kvm: Add support for 16K pages"), so update the Kconfig help
+text accordingly.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200505154520.194120-2-tabba@google.com
+Link: https://lore.kernel.org/r/20200505154520.194120-3-tabba@google.com
 ---
- arch/arm64/kernel/asm-offsets.c |  2 +-
- arch/arm64/kernel/cpu_errata.c  |  2 +-
- arch/arm64/kernel/smp.c         |  2 +-
- arch/arm64/kvm/Kconfig          |  6 ----
- arch/arm64/kvm/Makefile         | 52 ++++++++++++++++-----------------
- arch/arm64/kvm/hyp/Makefile     | 22 +++++++-------
- 6 files changed, 40 insertions(+), 46 deletions(-)
+ arch/arm64/kvm/Kconfig | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 9981a0a5a87f..a27e0cd731e9 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -96,7 +96,7 @@ int main(void)
-   DEFINE(CPU_BOOT_PTRAUTH_KEY,	offsetof(struct secondary_data, ptrauth_key));
- #endif
-   BLANK();
--#ifdef CONFIG_KVM_ARM_HOST
-+#ifdef CONFIG_KVM
-   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
-   DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index df56d2295d16..a102321fc8a2 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -234,7 +234,7 @@ static int detect_harden_bp_fw(void)
- 		smccc_end = NULL;
- 		break;
- 
--#if IS_ENABLED(CONFIG_KVM_ARM_HOST)
-+#if IS_ENABLED(CONFIG_KVM)
- 	case SMCCC_CONDUIT_SMC:
- 		cb = call_smc_arch_workaround_1;
- 		smccc_start = __smccc_workaround_1_smc;
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index 061f60fe452f..0a3045d9f33f 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -430,7 +430,7 @@ static void __init hyp_mode_check(void)
- 			   "CPU: CPUs started in inconsistent modes");
- 	else
- 		pr_info("CPU: All CPU(s) started at EL1\n");
--	if (IS_ENABLED(CONFIG_KVM_ARM_HOST))
-+	if (IS_ENABLED(CONFIG_KVM))
- 		kvm_compute_layout();
- }
- 
 diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 449386d76441..ce724e526689 100644
+index ce724e526689..d2cf4f099454 100644
 --- a/arch/arm64/kvm/Kconfig
 +++ b/arch/arm64/kvm/Kconfig
-@@ -28,7 +28,6 @@ config KVM
- 	select HAVE_KVM_CPU_RELAX_INTERCEPT
- 	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
- 	select KVM_MMIO
--	select KVM_ARM_HOST
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select SRCU
- 	select KVM_VFIO
-@@ -50,11 +49,6 @@ config KVM
+@@ -44,8 +44,6 @@ config KVM
+ 	select TASK_DELAY_ACCT
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+-	  We don't support KVM with 16K page tables yet, due to the multiple
+-	  levels of fake page tables.
  
  	  If unsure, say N.
  
--config KVM_ARM_HOST
--	bool
--	---help---
--	  Provides host support for ARM processors.
--
- config KVM_ARM_PMU
- 	bool
- 	---help---
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 7a3768538343..419696e615b3 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -7,33 +7,33 @@ ccflags-y += -I $(srctree)/$(src)
- 
- KVM=../../../virt/kvm
- 
--obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
--obj-$(CONFIG_KVM_ARM_HOST) += hyp/
-+obj-$(CONFIG_KVM) += kvm.o
-+obj-$(CONFIG_KVM) += hyp/
- 
--kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
--kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
--kvm-$(CONFIG_KVM_ARM_HOST) += arm.o mmu.o mmio.o
--kvm-$(CONFIG_KVM_ARM_HOST) += psci.o perf.o
--kvm-$(CONFIG_KVM_ARM_HOST) += hypercalls.o
--kvm-$(CONFIG_KVM_ARM_HOST) += pvtime.o
-+kvm-$(CONFIG_KVM) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
-+kvm-$(CONFIG_KVM) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
-+kvm-$(CONFIG_KVM) += arm.o mmu.o mmio.o
-+kvm-$(CONFIG_KVM) += psci.o perf.o
-+kvm-$(CONFIG_KVM) += hypercalls.o
-+kvm-$(CONFIG_KVM) += pvtime.o
- 
--kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
--kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
--kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic-sys-reg-v3.o fpsimd.o pmu.o
--kvm-$(CONFIG_KVM_ARM_HOST) += aarch32.o
--kvm-$(CONFIG_KVM_ARM_HOST) += arch_timer.o
-+kvm-$(CONFIG_KVM) += inject_fault.o regmap.o va_layout.o
-+kvm-$(CONFIG_KVM) += hyp.o hyp-init.o handle_exit.o
-+kvm-$(CONFIG_KVM) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
-+kvm-$(CONFIG_KVM) += vgic-sys-reg-v3.o fpsimd.o pmu.o
-+kvm-$(CONFIG_KVM) += aarch32.o
-+kvm-$(CONFIG_KVM) += arch_timer.o
- kvm-$(CONFIG_KVM_ARM_PMU)  += pmu-emul.o
- 
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-init.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-irqfd.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v2.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v3.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-v4.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio-v2.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-mmio-v3.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-kvm-device.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-its.o
--kvm-$(CONFIG_KVM_ARM_HOST) += vgic/vgic-debug.o
-+kvm-$(CONFIG_KVM) += vgic/vgic.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-init.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-irqfd.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-v2.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-v3.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-v4.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-mmio.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v2.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v3.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-kvm-device.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-its.o
-+kvm-$(CONFIG_KVM) += vgic/vgic-debug.o
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index dc18274a6826..8229e47ba870 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -6,17 +6,17 @@
- ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
- 		$(DISABLE_STACKLEAK_PLUGIN)
- 
--obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
--obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
--obj-$(CONFIG_KVM_ARM_HOST) += aarch32.o
--obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-cpuif-proxy.o
--obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
--obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
--obj-$(CONFIG_KVM_ARM_HOST) += entry.o
--obj-$(CONFIG_KVM_ARM_HOST) += switch.o
--obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
--obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
--obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
-+obj-$(CONFIG_KVM) += vgic-v3-sr.o
-+obj-$(CONFIG_KVM) += timer-sr.o
-+obj-$(CONFIG_KVM) += aarch32.o
-+obj-$(CONFIG_KVM) += vgic-v2-cpuif-proxy.o
-+obj-$(CONFIG_KVM) += sysreg-sr.o
-+obj-$(CONFIG_KVM) += debug-sr.o
-+obj-$(CONFIG_KVM) += entry.o
-+obj-$(CONFIG_KVM) += switch.o
-+obj-$(CONFIG_KVM) += fpsimd.o
-+obj-$(CONFIG_KVM) += tlb.o
-+obj-$(CONFIG_KVM) += hyp-entry.o
- 
- # KVM code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
 -- 
 2.26.2
 
