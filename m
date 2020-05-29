@@ -2,112 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA4901E7ECD
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 15:32:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E74F1E7F11
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 15:45:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727090AbgE2NcZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 09:32:25 -0400
-Received: from foss.arm.com ([217.140.110.172]:36640 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726549AbgE2NcY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 09:32:24 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C089A55D;
-        Fri, 29 May 2020 06:32:23 -0700 (PDT)
-Received: from localhost.localdomain (entos-thunderx2-02.shanghai.arm.com [10.169.138.74])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 66E103F305;
-        Fri, 29 May 2020 06:32:20 -0700 (PDT)
-From:   Jia He <justin.he@arm.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kaly Xin <Kaly.Xin@arm.com>,
-        Jia He <justin.he@arm.com>, stable@vger.kernel.org
-Subject: [PATCH] virtio_vsock: Fix race condition in virtio_transport_recv_pkt
-Date:   Fri, 29 May 2020 21:31:23 +0800
-Message-Id: <20200529133123.195610-1-justin.he@arm.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726943AbgE2Np6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 09:45:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33658 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726476AbgE2Np6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 09:45:58 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA10EC03E969;
+        Fri, 29 May 2020 06:45:57 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id f185so3626352wmf.3;
+        Fri, 29 May 2020 06:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Lt8GDMAcJKU5ya03CSoRbKBcFkXL1yVXIOxpta4MSb8=;
+        b=LVrxuwSZmt9IGUEYm/FhDtReg7fS7VlQC1m48P9ftkfwz0YB9ZSmw8NubX768fo6ZF
+         x94Dr4f9aTQzWsmxefJKzeL2GKHe0EAgxMkaqNJyyGxyMHNJGaV7NF+Su1IGtOPSAdrI
+         E95tQ7LdV7Ox+34FLaq1sxvFCsHxUVkTGdnJEwO4E5sLwEFmWO8WqnXn4IviY7ex0UpA
+         +62FzQzuHlQyEnWn37I6PtnIqORtiPDHvHH+jbE9QqW1fvzIQOTvFzixN+lsWQobwRTm
+         sW5iAYARcz8TsD1gpObS255gnkrnRHGhJzJKwyJQvSUeLkqoQavkdPENAWpNTDKKV8Qe
+         AGDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Lt8GDMAcJKU5ya03CSoRbKBcFkXL1yVXIOxpta4MSb8=;
+        b=b/3fh9l/fP4X9kJtncebsBj7NFLPQaFQXEKb0z50+gFtTnGXZd2vOzcXL2H4Th3pYw
+         IR2L/exSJaDZv1RTJ0nFGSyo7jsoOjIXF9vCOyVkYdDUHXEpDPU+XqE7ReI5ddR/2LUY
+         ZV9gJH3CvNe3b3/dXAfFEZmjV/X6nwAZ1C5pkN2Ra3JzkouSG6PDXpuaPiERW9lxifj8
+         Oc9eM4w+eDJix97AMFLPYc+zIv5RxT3jpEyj1nMtk+TJDJ0b4I/IpbK9lo1bknUnILJK
+         Mscsm6CN3m4QTZeHCdgWKIvvWKxfDKhk+y7VGUEjmuMMR99BtgMz0Q87JUkN0lUPYYQP
+         1KfQ==
+X-Gm-Message-State: AOAM5301N3YGea/y3nOJNZ1lOFEgm2b3x7JWnmlZR8pTd5fyZlLIy4pO
+        6JMzhFhKBCE4ETmhE0Mh3bBg3Q8g
+X-Google-Smtp-Source: ABdhPJyZGd1D68ogyDq+rAQAHt7NL0PRFJ25fZc7vLzDOHQq8zhKw3JzPTtp/nMfVS6pxIcpefvMSw==
+X-Received: by 2002:a05:600c:23ce:: with SMTP id p14mr8690786wmb.77.1590759956289;
+        Fri, 29 May 2020 06:45:56 -0700 (PDT)
+Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+        by smtp.gmail.com with ESMTPSA id y37sm12347263wrd.55.2020.05.29.06.45.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2020 06:45:55 -0700 (PDT)
+From:   Jon Doron <arilou@gmail.com>
+To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
+Cc:     vkuznets@redhat.com, pbonzini@redhat.com, rvkagan@yandex-team.ru,
+        Jon Doron <arilou@gmail.com>
+Subject: [PATCH v12 0/6] x86/kvm/hyper-v: add support for synthetic
+Date:   Fri, 29 May 2020 16:45:37 +0300
+Message-Id: <20200529134543.1127440-1-arilou@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When client tries to connect(SOCK_STREAM) the server in the guest with NONBLOCK
-mode, there will be a panic on a ThunderX2 (armv8a server):
-[  463.718844][ T5040] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-[  463.718848][ T5040] Mem abort info:
-[  463.718849][ T5040]   ESR = 0x96000044
-[  463.718852][ T5040]   EC = 0x25: DABT (current EL), IL = 32 bits
-[  463.718853][ T5040]   SET = 0, FnV = 0
-[  463.718854][ T5040]   EA = 0, S1PTW = 0
-[  463.718855][ T5040] Data abort info:
-[  463.718856][ T5040]   ISV = 0, ISS = 0x00000044
-[  463.718857][ T5040]   CM = 0, WnR = 1
-[  463.718859][ T5040] user pgtable: 4k pages, 48-bit VAs, pgdp=0000008f6f6e9000
-[  463.718861][ T5040] [0000000000000000] pgd=0000000000000000
-[  463.718866][ T5040] Internal error: Oops: 96000044 [#1] SMP
-[...]
-[  463.718977][ T5040] CPU: 213 PID: 5040 Comm: vhost-5032 Tainted: G           O      5.7.0-rc7+ #139
-[  463.718980][ T5040] Hardware name: GIGABYTE R281-T91-00/MT91-FS1-00, BIOS F06 09/25/2018
-[  463.718982][ T5040] pstate: 60400009 (nZCv daif +PAN -UAO)
-[  463.718995][ T5040] pc : virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
-[  463.718999][ T5040] lr : virtio_transport_recv_pkt+0x1fc/0xd40 [vmw_vsock_virtio_transport_common]
-[  463.719000][ T5040] sp : ffff80002dbe3c40
-[...]
-[  463.719025][ T5040] Call trace:
-[  463.719030][ T5040]  virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
-[  463.719034][ T5040]  vhost_vsock_handle_tx_kick+0x360/0x408 [vhost_vsock]
-[  463.719041][ T5040]  vhost_worker+0x100/0x1a0 [vhost]
-[  463.719048][ T5040]  kthread+0x128/0x130
-[  463.719052][ T5040]  ret_from_fork+0x10/0x18
+Add support for the synthetic debugger interface of hyper-v, the synthetic
+debugger has 2 modes.
+1. Use a set of MSRs to send/recv information (undocumented so it's not
+   going to the hyperv-tlfs.h)
+2. Use hypercalls
 
-The race condition as follows:
-Task1                            Task2
-=====                            =====
-__sock_release                   virtio_transport_recv_pkt
-  __vsock_release                  vsock_find_bound_socket (found)
-    lock_sock_nested
-    vsock_remove_sock
-    sock_orphan
-      sk_set_socket(sk, NULL)
-    ...
-    release_sock
-                                lock_sock
-                                   virtio_transport_recv_connecting
-                                     sk->sk_socket->state (panic)
+The first mode is based the following MSRs:
+1. Control/Status MSRs which either asks for a send/recv .
+2. Send/Recv MSRs each holds GPA where the send/recv buffers are.
+3. Pending MSR, holds a GPA to a PAGE that simply has a boolean that
+   indicates if there is data pending to issue a recv VMEXIT.
 
-This fixes it by checking vsk again whether it is in bound/connected table.
+The first mode implementation is to simply exit to user-space when
+either the control MSR or the pending MSR are being set.
+Then it's up-to userspace to implement the rest of the logic of sending/recving.
 
-Signed-off-by: Jia He <justin.he@arm.com>
-Cc: stable@vger.kernel.org
----
- net/vmw_vsock/virtio_transport_common.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+In the second mode instead of using MSRs KNet will simply issue
+Hypercalls with the information to send/recv, in this mode the data
+being transferred is UDP encapsulated, unlike in the previous mode in
+which you get just the data to send.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 69efc891885f..0dbd6a45f0ed 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -1132,6 +1132,17 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
- 
- 	lock_sock(sk);
- 
-+	/* Check it again if vsk is removed by vsock_remove_sock */
-+	spin_lock_bh(&vsock_table_lock);
-+	if (!__vsock_in_bound_table(vsk) && !__vsock_in_connected_table(vsk)) {
-+		spin_unlock_bh(&vsock_table_lock);
-+		(void)virtio_transport_reset_no_sock(t, pkt);
-+		release_sock(sk);
-+		sock_put(sk);
-+		goto free_pkt;
-+	}
-+	spin_unlock_bh(&vsock_table_lock);
-+
- 	/* Update CID in case it has changed after a transport reset event */
- 	vsk->local_addr.svm_cid = dst.svm_cid;
- 
+The new hypercalls will exit to userspace which will be incharge of
+re-encapsulating if needed the UDP packets to be sent.
+
+There is an issue though in which KDNet does not respect the hypercall
+page and simply issues vmcall/vmmcall instructions depending on the cpu
+type expecting them to be handled as it a real hypercall was issued.
+
+It's important to note that part of this feature has been subject to be
+removed in future versions of Windows, which is why some of the
+defintions will not be present the the TLFS but in the kvm hyperv header
+instead.
+
+v12:
+- Rebased on latest origin/master
+- Make the KVM_CAP_HYPERV_SYNDBG always enabled, in previous version
+  userspace was required to explicitly enable the syndbg capability just
+  like with the EVMCS feature.
+
+Jon Doron (5):
+  x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+  x86/hyper-v: Add synthetic debugger definitions
+  x86/kvm/hyper-v: Add support for synthetic debugger capability
+  x86/kvm/hyper-v: enable hypercalls regardless of hypercall page
+  x86/kvm/hyper-v: Add support for synthetic debugger via hypercalls
+
+Vitaly Kuznetsov (1):
+  KVM: selftests: update hyperv_cpuid with SynDBG tests
+
+ Documentation/virt/kvm/api.rst                |  18 ++
+ arch/x86/include/asm/hyperv-tlfs.h            |   6 +
+ arch/x86/include/asm/kvm_host.h               |  13 ++
+ arch/x86/kvm/hyperv.c                         | 180 +++++++++++++++++-
+ arch/x86/kvm/hyperv.h                         |  32 ++++
+ arch/x86/kvm/trace.h                          |  51 +++++
+ arch/x86/kvm/x86.c                            |   9 +
+ include/uapi/linux/kvm.h                      |  13 ++
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       | 103 +++++-----
+ 9 files changed, 374 insertions(+), 51 deletions(-)
+
 -- 
-2.17.1
+2.24.1
 
