@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18DF41E7908
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:09:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4B451E790E
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:11:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725936AbgE2JJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 05:09:51 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37456 "EHLO
+        id S1726446AbgE2JLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 05:11:41 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38649 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725795AbgE2JJv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 05:09:51 -0400
+        by vger.kernel.org with ESMTP id S1725710AbgE2JLk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 05:11:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590743388;
+        s=mimecast20190719; t=1590743499;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=t4DRoImSm+q05u3SsUfhH9lvKV/SISKBgFYCE8lzSa4=;
-        b=flnDPF1bd/xivagUsicsSWLfJShV814NF1xhwBNThlgsxhLLgYXO+1RSutbzKGs8lLJk5S
-        xui0PuVF4CyVpPF9zb5VicCWsKgN30gy95VAKFjS1uHvzn4ZYyxKDoKmvmfz0uzExZkicz
-        T0DimosD4NDoVTA1U1XPS6iLUWM6igI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-WCdrklM3OQaOMBvc1TOiKg-1; Fri, 29 May 2020 05:09:46 -0400
-X-MC-Unique: WCdrklM3OQaOMBvc1TOiKg-1
-Received: by mail-wr1-f71.google.com with SMTP id e7so284132wrp.14
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:09:45 -0700 (PDT)
+        bh=ZmladyTmooEwtW8t8Idh/cXKSlbG8JN1qRhfd3e4VjQ=;
+        b=IdJJw1uirXFll33PDqx17G2JxmDwIB4gxrahAVX7lAQ4AlLzRdZIP+7ZhL4Y8vVsrIJT5o
+        z6QpqhFvDjDT5dFZAQBR+325asQ6pZXGMJhR1kFS0lEs69xjEHF+datA0uaANZXgbuTVsz
+        gQ1iUP8kROk9IDm8RVaagSMEcq01bo0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-144-7a11FN4JOVag8HoVPN44Tg-1; Fri, 29 May 2020 05:11:37 -0400
+X-MC-Unique: 7a11FN4JOVag8HoVPN44Tg-1
+Received: by mail-wm1-f72.google.com with SMTP id k185so542663wme.8
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:11:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=t4DRoImSm+q05u3SsUfhH9lvKV/SISKBgFYCE8lzSa4=;
-        b=iGHLsQoWPE8iSKd993JnpmzJa08S5FO02wVL0akO4IEdt+zzzYwr2zpAwBLMIF9D/M
-         Qlqm1n3SnL59kZmt5R7rEeEwZ6izeaLk8f7k+5DzSg4Hc7t+WRugCNOzA5bwY5I1g96B
-         3IG2s1H36mTHjLpAC4DWKd6Pjx67VjtL47iSBL2934pSMBIX/uZhahu8DRX9XGGo0WOP
-         Qmb9M/P3DuplwCHGQllLuWkVEPLcwa+vAIyz2zuAZbJAaWqiUi4wzBZTBSxw3A0i0jfN
-         3YiIj/t06PxxICIwsk3NV3Ew0cigmucwCae3ZFdt+V352m5JUpWJcxytfqSHxCRJqW7q
-         QsoQ==
-X-Gm-Message-State: AOAM531DysHq9MaKowKRd6HV0dUO17SiGw8jy9exJVGRNKFJsj2F/8vS
-        gvOUzDH/AzDdVVIAY3pXQLdkEG07OXeMdsPxwkxzY70lBNaIgFcSAf7Nu0QOjm5rR1FV8jruq8+
-        tpPAdYurei092
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr7416719wro.145.1590743384563;
-        Fri, 29 May 2020 02:09:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4m/x86IIBlIaCYyPHB1jJDuzrdU88N3OPmtYpBreqcnUiaS8Mv9ye+80Za9sWBQq26EDGRg==
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr7416690wro.145.1590743384335;
-        Fri, 29 May 2020 02:09:44 -0700 (PDT)
+        bh=ZmladyTmooEwtW8t8Idh/cXKSlbG8JN1qRhfd3e4VjQ=;
+        b=ZZyqYjw1KILv6DZ4E8xg6WLFt5cetuPuvb6yHXb3lZBiZn2MZbwiWBPgmEkr2FM1Ry
+         DNpLmPx4NzBGw4Y098Sq1QJUp73nFKRjZtxdLS86Cn5l4nuZL2WgVrGmJtjx6mI/HxZW
+         9+q4ha8aUF/IAsfNDFw6aOMg7SP4p2NNOZ1K6zeZu8ccpy67FKzk9woYNVLVf1MJiSWB
+         REKZ9t1iaPG5t9Q4VOXEWJqklTuFv+V6DChbJ60hH3uL29bMYYgnwoCMl6Xt68K+hyww
+         cGpw2KRmKJpRo4Ocfk8UoSwp6YdhaIPO6RMzycf84WHavZgjoFOPGsy06OaN1Do4znvE
+         B2PQ==
+X-Gm-Message-State: AOAM532DGCGpfyFt/gP6HRvyS6TfCCJGcXvx5REL3RDWUtEbEDn3+q0V
+        /pDx+T98xu7607KlixXWcHBKQXySQhsriXQDFX4I8wfeYhDe9FqJTlWPjrAJrPyv/amNzaakiHr
+        jaHh+CpDSui5m
+X-Received: by 2002:a1c:6606:: with SMTP id a6mr7202255wmc.37.1590743496381;
+        Fri, 29 May 2020 02:11:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUsBBgQVLd416S+QKQrLChguP9FU4Shy/gp+IMLIfAeig10SQGLJJWs3mmfD5c7J93VI/mGw==
+X-Received: by 2002:a1c:6606:: with SMTP id a6mr7202224wmc.37.1590743496103;
+        Fri, 29 May 2020 02:11:36 -0700 (PDT)
 Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.43])
-        by smtp.gmail.com with ESMTPSA id u7sm9244509wrm.23.2020.05.29.02.09.42
+        by smtp.gmail.com with ESMTPSA id s72sm5953427wme.35.2020.05.29.02.11.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 02:09:43 -0700 (PDT)
-Subject: Re: [RFC v2 04/18] target/i386: sev: Embed SEVState in SevGuestState
+        Fri, 29 May 2020 02:11:35 -0700 (PDT)
+Subject: Re: [RFC v2 06/18] target/i386: sev: Remove redundant cbitpos and
+ reduced_phys_bits fields
 To:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
         brijesh.singh@amd.com, frankja@linux.ibm.com, dgilbert@redhat.com,
         pair@us.ibm.com
@@ -61,7 +62,7 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <rth@twiddle.net>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-5-david@gibson.dropbear.id.au>
+ <20200521034304.340040-7-david@gibson.dropbear.id.au>
 From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -86,12 +87,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f6c47bd0-0213-743a-801d-6f90c033854c@redhat.com>
-Date:   Fri, 29 May 2020 11:09:41 +0200
+Message-ID: <4c045f9e-9506-b33c-3fc6-0ed9ce118569@redhat.com>
+Date:   Fri, 29 May 2020 11:11:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200521034304.340040-5-david@gibson.dropbear.id.au>
+In-Reply-To: <20200521034304.340040-7-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -101,162 +102,15 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 5/21/20 5:42 AM, David Gibson wrote:
-> Currently SevGuestState contains only configuration information.  For
-> runtime state another non-QOM struct SEVState is allocated separately.
-> 
-> Simplify things by instead embedding the SEVState structure in
-> SevGuestState.
+> The SEVState structure has cbitpos and reduced_phys_bits fields which are
+> simply copied from the SevGuestState structure and never changed.  Now that
+> SEVState is embedded in SevGuestState we can just access the original copy
+> directly.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  target/i386/sev.c | 54 +++++++++++++++++++++++++----------------------
->  1 file changed, 29 insertions(+), 25 deletions(-)
-> 
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index b6ed719fb5..b4ab9720d6 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -35,6 +35,22 @@
->  
->  typedef struct SevGuestState SevGuestState;
->  
-> +struct SEVState {
-> +    uint8_t api_major;
-> +    uint8_t api_minor;
-> +    uint8_t build_id;
-> +    uint32_t policy;
-> +    uint64_t me_mask;
-> +    uint32_t cbitpos;
-> +    uint32_t reduced_phys_bits;
-> +    uint32_t handle;
-> +    int sev_fd;
-> +    SevState state;
-> +    gchar *measurement;
-> +};
-> +
-> +typedef struct SEVState SEVState;
-
-Maybe typedef & declaration altogether.
-
-> +
->  /**
->   * SevGuestState:
->   *
-> @@ -48,6 +64,7 @@ typedef struct SevGuestState SevGuestState;
->  struct SevGuestState {
->      Object parent_obj;
->  
-> +    /* configuration parameters */
->      char *sev_device;
->      uint32_t policy;
->      uint32_t handle;
-> @@ -55,25 +72,11 @@ struct SevGuestState {
->      char *session_file;
->      uint32_t cbitpos;
->      uint32_t reduced_phys_bits;
-> -};
->  
-> -struct SEVState {
-> -    SevGuestState *sev_info;
-> -    uint8_t api_major;
-> -    uint8_t api_minor;
-> -    uint8_t build_id;
-> -    uint32_t policy;
-> -    uint64_t me_mask;
-> -    uint32_t cbitpos;
-> -    uint32_t reduced_phys_bits;
-> -    uint32_t handle;
-> -    int sev_fd;
-> -    SevState state;
-> -    gchar *measurement;
-> +    /* runtime state */
-> +    SEVState state;
->  };
->  
-> -typedef struct SEVState SEVState;
-> -
->  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
->  #define DEFAULT_SEV_DEVICE      "/dev/sev"
->  
-> @@ -506,12 +509,12 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
->  }
->  
->  static int
-> -sev_launch_start(SEVState *s)
-> +sev_launch_start(SevGuestState *sev)
->  {
-> +    SEVState *s = &sev->state;
->      gsize sz;
->      int ret = 1;
->      int fw_error, rc;
-> -    SevGuestState *sev = s->sev_info;
->      struct kvm_sev_launch_start *start;
->      guchar *session = NULL, *dh_cert = NULL;
->  
-> @@ -686,6 +689,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
->  void *
->  sev_guest_init(const char *id)
->  {
-> +    SevGuestState *sev;
->      SEVState *s;
->      char *devname;
->      int ret, fw_error;
-> @@ -693,27 +697,27 @@ sev_guest_init(const char *id)
->      uint32_t host_cbitpos;
->      struct sev_user_data_status status = {};
->  
-> -    sev_state = s = g_new0(SEVState, 1);
-> -    s->sev_info = lookup_sev_guest_info(id);
-> -    if (!s->sev_info) {
-> +    sev = lookup_sev_guest_info(id);
-> +    if (!sev) {
->          error_report("%s: '%s' is not a valid '%s' object",
->                       __func__, id, TYPE_SEV_GUEST);
->          goto err;
->      }
->  
-> +    sev_state = s = &sev->state;
-
-I was going to suggest to clean that, but I see your next patch already
-does the cleanup :)
+>  target/i386/sev.c | 19 +++++++------------
+>  1 file changed, 7 insertions(+), 12 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
->      s->state = SEV_STATE_UNINIT;
->  
->      host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
->      host_cbitpos = ebx & 0x3f;
->  
-> -    s->cbitpos = object_property_get_int(OBJECT(s->sev_info), "cbitpos", NULL);
-> +    s->cbitpos = object_property_get_int(OBJECT(sev), "cbitpos", NULL);
->      if (host_cbitpos != s->cbitpos) {
->          error_report("%s: cbitpos check failed, host '%d' requested '%d'",
->                       __func__, host_cbitpos, s->cbitpos);
->          goto err;
->      }
->  
-> -    s->reduced_phys_bits = object_property_get_int(OBJECT(s->sev_info),
-> +    s->reduced_phys_bits = object_property_get_int(OBJECT(sev),
->                                          "reduced-phys-bits", NULL);
->      if (s->reduced_phys_bits < 1) {
->          error_report("%s: reduced_phys_bits check failed, it should be >=1,"
-> @@ -723,7 +727,7 @@ sev_guest_init(const char *id)
->  
->      s->me_mask = ~(1UL << s->cbitpos);
->  
-> -    devname = object_property_get_str(OBJECT(s->sev_info), "sev-device", NULL);
-> +    devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
->      s->sev_fd = open(devname, O_RDWR);
->      if (s->sev_fd < 0) {
->          error_report("%s: Failed to open %s '%s'", __func__,
-> @@ -754,7 +758,7 @@ sev_guest_init(const char *id)
->          goto err;
->      }
->  
-> -    ret = sev_launch_start(s);
-> +    ret = sev_launch_start(sev);
->      if (ret) {
->          error_report("%s: failed to create encryption context", __func__);
->          goto err;
-> 
 
