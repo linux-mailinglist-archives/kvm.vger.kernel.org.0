@@ -2,87 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 508D71E7D51
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 14:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45B531E7D7C
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 14:45:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726757AbgE2MeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 08:34:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        id S1726887AbgE2Mpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 08:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726459AbgE2MeI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 08:34:08 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E76AC03E969
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 05:34:07 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id s19so1576866edt.12
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 05:34:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cPeigCK2KYvMiq+sG6KOj8Q7ndlYO2BcnUQP68RJYdw=;
-        b=dYNCwrc6IlS6OKS+HOUMs4HsVIYIFLl3Gqz0TZPCqS9Ciejf3uEtVff4+mgBC61GXT
-         NJ/hJPkBr8k58Qzihx7KUMfArdD71UUqclR2W/iM9FLIOLjMEXLVyv6plFqv1dWzEWQ9
-         /hOfJz1qPlzSRqe7UWMHr1HOday4CmE9WpEpc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cPeigCK2KYvMiq+sG6KOj8Q7ndlYO2BcnUQP68RJYdw=;
-        b=gIsu6BG7KycR83DymBgJeib4bhNJYNzNt+bUzjJz9DYjpSh4J/nw0K1S/LPDOvJKDQ
-         lpIsvfhDPPoo5an2O0Um7Q+lMEvq7YYGJ3YfosmqJboeFsm6wLm9433LO024F9VowtQ9
-         FbLk2F38+yc26cxPTiPiqX3P+O8z3HotJ5lp4aV1CzRntDp2FzNbPsJsGbIiMPh/ppfH
-         agEx6BB1sSEk/w+EdZqtULLpM5HxASNJ1+adVHDOTSqfP6QMJ8mvvde/arHsLG6dEdzw
-         bXrpa+vW0uzVIjbhHXNaMVpbuUNd+BmoUVWU3vJup1If4m+MuDup5ygbUIdOI5jLBJsM
-         iC9Q==
-X-Gm-Message-State: AOAM530O1LLzQSfmYEOKF5B3J9jATn+rstjgxLrNSgYZ/3Q7R9ZZ2i/2
-        S9qUYG1bkUNBGvlBQCxxPr2uHHFnPnPYnvTWojwnxQ==
-X-Google-Smtp-Source: ABdhPJyUnTM45zN0/5rNoZumMBq2dmAT3t3ZWSRcUjdBPA2OW7R/LUnUGuKWy/5vRX1XdxS74d3SlLrqc3MOIkpgBnE=
-X-Received: by 2002:a05:6402:17f9:: with SMTP id t25mr8224125edy.134.1590755646368;
- Fri, 29 May 2020 05:34:06 -0700 (PDT)
+        with ESMTP id S1725901AbgE2Mpa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 08:45:30 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA9D5C03E969;
+        Fri, 29 May 2020 05:45:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=hWDpNSmqqL4jiVuIX8+MfcVSYKD0Sr0CkGGlOnTksS8=; b=Mw3cOcpwT75KMypA7DbQN76n3K
+        LmIujEvwcjqz8mB4DIQNPRDiJKYUham8VvC6rSnD6+3ba6I3VkRz3MaFsFNabdvTOT2j5AatU+Z7I
+        o2P6if4RDFm1y5wwdk2idNMSaFbHSv9nUDIt/4zeeljrafN3UYBqYE+KqfQCvuFK6OcWyAc+raczK
+        RK1oGDElglttDYT91kX4m02qQyIV6yN6hy+hALyRQRMTpe79Bv+Xx23bujAFJtHO/oMRx35Hz3zuD
+        lD4co5ouUY7qPRY4OdLY/2HO+5AIT+8BT8rZU73mdGN5IlVfIzk0ihyFqydTRs7blGIxekQ3JxAc7
+        R7D+WZjw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jeeO3-00062M-2L; Fri, 29 May 2020 12:45:23 +0000
+Date:   Fri, 29 May 2020 05:45:23 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Tom Murphy <murphyt7@tcd.ie>, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
+        dri-devel@lists.freedesktop.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Julien Grall <julien.grall@arm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        linux-s390@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-mediatek@lists.infradead.org,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        linux-tegra@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org,
+        Robin Murphy <robin.murphy@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Kukjin Kim <kgene@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+Subject: Re: [PATCH 0/8] Convert the intel iommu driver to the dma-iommu api
+Message-ID: <20200529124523.GA11817@infradead.org>
+References: <20191221150402.13868-1-murphyt7@tcd.ie>
+ <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
 MIME-Version: 1.0
-References: <CAJfpegstNYeseo_C4KOF9Y74qRxr78x2tK-9rTgmYM4CK30nRQ@mail.gmail.com>
- <875zcfoko9.fsf@nanos.tec.linutronix.de> <CAJfpegsjd+FJ0ZNHJ_qzJo0Dx22ZaWh-WZ48f94Z3AUXbJfYYQ@mail.gmail.com>
- <CAJfpegv0fNfHrkovSXCNq5Hk+yHP7usfMgr0qjPfwqiovKygDA@mail.gmail.com>
- <87r1v3lynm.fsf@nanos.tec.linutronix.de> <CAJfpegt6js2WK6SjSZHsz+fg7ZLU+AL6TzrsDYmRfp7vNrtXyw@mail.gmail.com>
-In-Reply-To: <CAJfpegt6js2WK6SjSZHsz+fg7ZLU+AL6TzrsDYmRfp7vNrtXyw@mail.gmail.com>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Fri, 29 May 2020 14:33:55 +0200
-Message-ID: <CAJfpegtH7C0cu2iPv8gLq5_+=U3-XWZ3XRsP64h6Gbx-qqyZTQ@mail.gmail.com>
-Subject: Re: system time goes weird in kvm guest after host suspend/resume
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 29, 2020 at 2:31 PM Miklos Szeredi <miklos@szeredi.hu> wrote:
+On Thu, May 28, 2020 at 06:00:44PM -0600, Logan Gunthorpe wrote:
+> > This issue is most likely in the i915 driver and is most likely caused by the driver not respecting the return value of the dma_map_ops::map_sg function. You can see the driver ignoring the return value here:
+> > https://github.com/torvalds/linux/blob/7e0165b2f1a912a06e381e91f0f4e495f4ac3736/drivers/gpu/drm/i915/gem/i915_gem_dmabuf.c#L51
+> > 
+> > Previously this didn’t cause issues because the intel map_sg always returned the same number of elements as the input scatter gather list but with the change to this dma-iommu api this is no longer the case. I wasn’t able to track the bug down to a specific line of code unfortunately.  
 
-> > Can you please describe the setup of this test?
-> >
-> >  - Host kernel version
+Mark did a big audit into the map_sg API abuse and initially had
+some i915 patches, but then gave up on them with this comment:
 
-5.5.16-100.fc30.x86_64
+"The biggest TODO is DRM/i915 driver and I don't feel brave enough to fix
+ it fully. The driver creatively uses sg_table->orig_nents to store the
+ size of the allocate scatterlist and ignores the number of the entries
+ returned by dma_map_sg function. In this patchset I only fixed the
+ sg_table objects exported by dmabuf related functions. I hope that I
+ didn't break anything there."
 
-> >  - Guest kernel version
-
-75caf310d16c ("Merge branch 'akpm' (patches from Andrew)")
-
-> >  - Is the revert done on the host or guest or both?
-
-Guest.
-
-> >  - Test flow is:
-> >
-> >    Boot host, start guest, suspend host, resume host, guest is screwed
-> >
-> >    correct?
->
-> Yep.
->
-> Thanks,
-> Miklos
+it would be really nice if the i915 maintainers could help with sorting
+that API abuse out.
