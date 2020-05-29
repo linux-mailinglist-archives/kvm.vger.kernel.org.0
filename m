@@ -2,203 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3BAA1E7921
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:16:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACD321E7923
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725833AbgE2JQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 05:16:10 -0400
-Received: from mail-eopbgr70041.outbound.protection.outlook.com ([40.107.7.41]:27243
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725562AbgE2JQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 05:16:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aKOQ+CC8af/L+FLM/sOupgZufl3sUGlyPbDJZ2B74SjcBuDSGp+6Y12wlJZnTs3ghl0JwxaTQLh6PemBI9NP+LPJaMIYDYx3Gr6vgaBCvKdcYWf/AdpTNABwWN0DFPJRoH6QUK+Qn30oUPzfCg5ErojjfB0W7tP7QdKvAbYYJKTWIxhvDH3FfuML+wqgsmcKO5t4ou2suyZlIZCJin0meuTSr+WVz5kBI6JbkfyPu+FfTTQuGMNqnxWAiNpVQ/Wx6C855ShG59SzO/SPM5G5Vz1XVzPRgFU26fvfJZtRcTdRcNDcpEVT8s2NrFIE9sW/x7VwBuutr36iX/3fZHHDkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HLf9Swylfaaq7EGhbgXAwGoTSyCkzx/5Q8ICEbEiyx0=;
- b=jnv1lpbODLA8AMbqp7I9g3x0397ce4LAgWiy3yNwvH9InvKFbA5lILWb/sszzXHbndmSsnOh9/7/HWv2V06rngYEj0gOMazsQETRCTNqqTFeNSPrcxIRH8mWIEc837UqCOWo+E6od6peprFHV1G9Uw07vezUb2Vb1aKUM/xII41+Nvuylg8oBM7I6fXfEDMJ4EsjMG+gvoZAOBxZYxcdXRuZxfTLQ80q/0YzJJ7N2mKEXKwnpCPIGadr80f3FKTF8N9C8pEwVJKEEZQQ+yjnHyfwbirhpruAzCuvsZ18xmCLfXs7u/MkfyF0MBN7T1dm2ihXEa5SIiGd/aLFXGsQLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nextfour.com; dmarc=pass action=none header.from=nextfour.com;
- dkim=pass header.d=nextfour.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=NextfourGroupOy.onmicrosoft.com;
- s=selector2-NextfourGroupOy-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HLf9Swylfaaq7EGhbgXAwGoTSyCkzx/5Q8ICEbEiyx0=;
- b=fSgeRBnRqBw6IPn5RwKOpuMWDKvrS+xgWDqy74G2hbovVxvNDUbCvoBq8e3kVo6P2+JvCSkSR+RF10I0vJ6HnyIkxtyoC2yi3GsUzf67lYTeRFx+d2zOAhP1JzWayUqIw4lSbdWUYObrfi1kdNBcnnJailedjWwPgfNun4fR7Bg=
-Authentication-Results: mellanox.com; dkim=none (message not signed)
- header.d=none;mellanox.com; dmarc=none action=none header.from=nextfour.com;
-Received: from HE1PR0302MB2682.eurprd03.prod.outlook.com (2603:10a6:3:f5::14)
- by HE1PR0302MB2649.eurprd03.prod.outlook.com (2603:10a6:3:ec::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.27; Fri, 29 May
- 2020 09:16:04 +0000
-Received: from HE1PR0302MB2682.eurprd03.prod.outlook.com
- ([fe80::b10a:8b9d:1a18:6b2]) by HE1PR0302MB2682.eurprd03.prod.outlook.com
- ([fe80::b10a:8b9d:1a18:6b2%9]) with mapi id 15.20.3045.018; Fri, 29 May 2020
- 09:16:04 +0000
-Subject: Re: [PATCH 4/6] vhost_vdpa: support doorbell mapping via mmap
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rob.miller@broadcom.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, shahafs@mellanox.com,
-        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
-        saugatm@xilinx.com, vmireyno@marvell.com,
-        zhangweining@ruijie.com.cn, eli@mellanox.com
-References: <20200529080303.15449-1-jasowang@redhat.com>
- <20200529080303.15449-5-jasowang@redhat.com>
-From:   =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>
-Message-ID: <bab90a3f-f0b3-37d3-89bc-cd17d33f3208@nextfour.com>
-Date:   Fri, 29 May 2020 12:16:02 +0300
+        id S1725961AbgE2JQX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 05:16:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59194 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726411AbgE2JQW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 05:16:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590743780;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Zl7ylGEHGJpPdoCTpkeGkwtQ16SJnH7ZIfyt/iYUhB4=;
+        b=HW4Xmfjmt60vFf2MjjhXNBcXAo4vTPrUd5qyKD6+OlrRSxtLGryVQ6ms0WKduDPv99z3GQ
+        lWo9FV9brLh8G4FR/bzpxePRA78V506zfUjRpFHnWW38ovp8R1+6aa/vwbyGf1duOYA+9Y
+        n93ga1vBWeg/43U7ruE0rVu39pLVxww=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-cqAyTv5-O3inh9lQKwPMbg-1; Fri, 29 May 2020 05:16:18 -0400
+X-MC-Unique: cqAyTv5-O3inh9lQKwPMbg-1
+Received: by mail-wr1-f69.google.com with SMTP id y7so787585wrd.12
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:16:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=Zl7ylGEHGJpPdoCTpkeGkwtQ16SJnH7ZIfyt/iYUhB4=;
+        b=GRYo2fiCv124f/cUj9po6pvcbDB+KX5tH9DTuAZhbWtNy6p4K+OvYtkip+85+XaCGb
+         oWK47Nf/inqtReF37ZQ8lmjd1ypf+DnvVJV3R+Iprlt7OjzRzffNDXFMtk27oID7n6rU
+         j0uRZ/f5LG37IFfrem0RWVf7Ew4cwOtJK13PZh+001l6WtbzCRRzS72Qy6J6rkDa+R51
+         TG/hOB/GnqBWswwmSjMLJVekTJ/pA+Xmb+AAcaz3wCiDVEYormGRtTre80m1UPwgy2+r
+         aXd6KjeKjyqRNZ/eY5d71SeLnxfgSh/xBHvptCsguZNPlXAd1RcDLa3w7VjW4p4L4h0f
+         FhAg==
+X-Gm-Message-State: AOAM5327BtfpRWL22wsr/CgEPy/L1fP9cfzvVqpS5hpkSYx7GnHr8Lpa
+        olJ+WwxCbmzIYnaHIfjWKArvfe42wjWWLc7wmWvDBdXnf9k1nky2g4TOrOaqQtxariicLq8gYRE
+        4xvRAHPEd+A/Y
+X-Received: by 2002:a1c:658a:: with SMTP id z132mr7444161wmb.20.1590743777163;
+        Fri, 29 May 2020 02:16:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy9w7FIhyxCBovRw0iYmyxT9IzKaR8QS4FOr6QWOageAxBoXA/I4KsyEwstnvIjl+gu/pQgpw==
+X-Received: by 2002:a1c:658a:: with SMTP id z132mr7444151wmb.20.1590743777015;
+        Fri, 29 May 2020 02:16:17 -0700 (PDT)
+Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.43])
+        by smtp.gmail.com with ESMTPSA id z6sm8972660wrh.79.2020.05.29.02.16.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 May 2020 02:16:16 -0700 (PDT)
+Subject: Re: [RFC v2 16/18] guest memory protection: Add Error ** to
+ GuestMemoryProtection::kvm_init
+To:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, dgilbert@redhat.com,
+        pair@us.ibm.com
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+        mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200521034304.340040-17-david@gibson.dropbear.id.au>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <6e52c2fe-ffb5-aa0e-d552-4fd922dc7c66@redhat.com>
+Date:   Fri, 29 May 2020 11:16:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200529080303.15449-5-jasowang@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: HE1PR0402CA0047.eurprd04.prod.outlook.com
- (2603:10a6:7:7c::36) To HE1PR0302MB2682.eurprd03.prod.outlook.com
- (2603:10a6:3:f5::14)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.10.99.2] (194.157.170.35) by HE1PR0402CA0047.eurprd04.prod.outlook.com (2603:10a6:7:7c::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17 via Frontend Transport; Fri, 29 May 2020 09:16:03 +0000
-X-Originating-IP: [194.157.170.35]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 57705d77-943b-47fb-42e8-08d803b0e9a6
-X-MS-TrafficTypeDiagnostic: HE1PR0302MB2649:
-X-Microsoft-Antispam-PRVS: <HE1PR0302MB2649058788C48E9CFA7FB57F838F0@HE1PR0302MB2649.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 04180B6720
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ldokIm4PXL8b9qF2egTn7hOdXceP+7SgM0E+8PIdfroYlgxR/MBiCG4j1OePiBHUq1MnSi/9FFht2TDmPnG/fKXjdfSXCjPnwilYnXME2lUBd8PQFkf2d0vlT82jLZ9oQE8HwpZrMPdreWJq7N9sURrZHw5agPeNsXq1ZlYGVH6HEYkKGAVeaJR9A1cPlDhr1aSAuAyylN5H6T260lcda0gy+G3DPkstyv1vA6I0TC99GKf72In763injMrxvrZ8BRNxFIOGLumibuRGAAwJOt/M+/XwCVkMqU8kdBXlB95PDNMgecqq7o970ZCXvRqpo2WxM4L6q2mguhfoBzLe90zgFp0xIUr6GXXHhHY+DZ+HolNGYjjSlnqaZHv7B67f
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0302MB2682.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(366004)(136003)(396003)(376002)(39830400003)(346002)(31686004)(36756003)(508600001)(4326008)(5660300002)(66946007)(186003)(956004)(2616005)(66556008)(16526019)(31696002)(66476007)(86362001)(2906002)(83380400001)(316002)(7416002)(8676002)(52116002)(26005)(6486002)(16576012)(8936002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: PsLvraN7sa1DZ0EoFDuMKswwmnayNDzf7UhC+chpbr6E2YsP4DRJNxBhAcKnos+B0Zza01XODSfW0om+Nd6aD6zNDAfFUhtZLT17KHEA19svzzRqsjbyeUnqWZhguJYAhlHqrCQfjJeTERmbVtc+8XrnPPhlASjZxxTSrOGNyRx3NP/N9VLjVeCmC9sYMomUrAYccucvGRmHNY7uUBoG+VVV1U7zjGvDeClBaTr4agr+dFmRHdGmuwvSapwSUzzgxvc3Q957ZJqrNjnWI6/thB66eDdZiFv7gTxs1q4VW/O3BV6k2NeDG4qRwVvVb6llfxqI6VjZzXn7Eg8kjhPPm5orxkqVv7dWlfZsbUYvJpQrErvQ9lifZZWydynbAIItg4d3rSwys1KAPVhPEGxRv0aSNB9bq+XaZEXh7g51q0UT6S7EVUrZO+HiccIGGjnNla550KQPJ4SJdy6k84KbEcnAgFiYACRLs2sHmJeynS6qvuydVOINQALAFU88LoUK
-X-OriginatorOrg: nextfour.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57705d77-943b-47fb-42e8-08d803b0e9a6
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2020 09:16:04.4768
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 972e95c2-9290-4a02-8705-4014700ea294
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nvtvJY442hddOrhGtxznYB038/qCKSRN/s3jnC/57MG9+bZOe4VDE2kVa1aBpP1mA+CJCgjqOINtFwrztEi/GcXhByZCsXb33dS0Tgz1RTU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0302MB2649
+In-Reply-To: <20200521034304.340040-17-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 29.5.2020 11.03, Jason Wang wrote:
-> Currently the doorbell is relayed via eventfd which may have
-> significant overhead because of the cost of vmexits or syscall. This
-> patch introduces mmap() based doorbell mapping which can eliminate the
-> overhead caused by vmexit or syscall.
-
-Just wondering. I know very little about vdpa. But how is such a "sw 
-doorbell" monitored or observed, if no fault or wmexit etc.
-Is there some kind of polling used?
-
-> To ease the userspace modeling of the doorbell layout (usually
-> virtio-pci), this patch starts from a doorbell per page
-> model. Vhost-vdpa only support the hardware doorbell that sit at the
-> boundary of a page and does not share the page with other registers.
->
-> Doorbell of each virtqueue must be mapped separately, pgoff is the
-> index of the virtqueue. This allows userspace to map a subset of the
-> doorbell which may be useful for the implementation of software
-> assisted virtqueue (control vq) in the future.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+On 5/21/20 5:43 AM, David Gibson wrote:
+> This allows failures to be reported richly and idiomatically.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->   drivers/vhost/vdpa.c | 59 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 59 insertions(+)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 6ff72289f488..bbe23cea139a 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -15,6 +15,7 @@
->   #include <linux/module.h>
->   #include <linux/cdev.h>
->   #include <linux/device.h>
-> +#include <linux/mm.h>
->   #include <linux/iommu.h>
->   #include <linux/uuid.h>
->   #include <linux/vdpa.h>
-> @@ -741,12 +742,70 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
->   	return 0;
->   }
->   
-> +static vm_fault_t vhost_vdpa_fault(struct vm_fault *vmf)
-> +{
-> +	struct vhost_vdpa *v = vmf->vma->vm_file->private_data;
-> +	struct vdpa_device *vdpa = v->vdpa;
-> +	const struct vdpa_config_ops *ops = vdpa->config;
-> +	struct vdpa_notification_area notify;
-> +	struct vm_area_struct *vma = vmf->vma;
-> +	u16 index = vma->vm_pgoff;
-> +
-> +	notify = ops->get_vq_notification(vdpa, index);
-> +
-> +	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> +	if (remap_pfn_range(vma, vmf->address & PAGE_MASK,
-> +			    notify.addr >> PAGE_SHIFT, PAGE_SIZE,
-> +			    vma->vm_page_prot))
-> +		return VM_FAULT_SIGBUS;
-> +
-> +	return VM_FAULT_NOPAGE;
-> +}
-> +
-> +static const struct vm_operations_struct vhost_vdpa_vm_ops = {
-> +	.fault = vhost_vdpa_fault,
-> +};
-> +
-> +static int vhost_vdpa_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +	struct vhost_vdpa *v = vma->vm_file->private_data;
-> +	struct vdpa_device *vdpa = v->vdpa;
-> +	const struct vdpa_config_ops *ops = vdpa->config;
-> +	struct vdpa_notification_area notify;
-> +	int index = vma->vm_pgoff;
-> +
-> +	if (vma->vm_end - vma->vm_start != PAGE_SIZE)
-> +		return -EINVAL;
-> +	if ((vma->vm_flags & VM_SHARED) == 0)
-> +		return -EINVAL;
-> +	if (vma->vm_flags & VM_READ)
-> +		return -EINVAL;
-> +	if (index > 65535)
-> +		return -EINVAL;
-> +	if (!ops->get_vq_notification)
-> +		return -ENOTSUPP;
-> +
-> +	/* To be safe and easily modelled by userspace, We only
-> +	 * support the doorbell which sits on the page boundary and
-> +	 * does not share the page with other registers.
-> +	 */
-> +	notify = ops->get_vq_notification(vdpa, index);
-> +	if (notify.addr & (PAGE_SIZE - 1))
-> +		return -EINVAL;
-> +	if (vma->vm_end - vma->vm_start != notify.size)
-> +		return -ENOTSUPP;
-> +
-> +	vma->vm_ops = &vhost_vdpa_vm_ops;
-> +	return 0;
-> +}
-> +
->   static const struct file_operations vhost_vdpa_fops = {
->   	.owner		= THIS_MODULE,
->   	.open		= vhost_vdpa_open,
->   	.release	= vhost_vdpa_release,
->   	.write_iter	= vhost_vdpa_chr_write_iter,
->   	.unlocked_ioctl	= vhost_vdpa_unlocked_ioctl,
-> +	.mmap		= vhost_vdpa_mmap,
->   	.compat_ioctl	= compat_ptr_ioctl,
->   };
->   
+>  accel/kvm/kvm-all.c                    |  4 +++-
+>  include/exec/guest-memory-protection.h |  2 +-
+>  target/i386/sev.c                      | 31 +++++++++++++-------------
+>  3 files changed, 19 insertions(+), 18 deletions(-)
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
