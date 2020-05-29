@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 858E41E82C7
+	by mail.lfdr.de (Postfix) with ESMTP id F228C1E82C8
 	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 18:01:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727830AbgE2QBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 12:01:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40296 "EHLO mail.kernel.org"
+        id S1727879AbgE2QBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 12:01:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40492 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727108AbgE2QBo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 12:01:44 -0400
+        id S1727802AbgE2QBq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 12:01:46 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5A0DC20897;
-        Fri, 29 May 2020 16:01:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 53661208B8;
+        Fri, 29 May 2020 16:01:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590768104;
-        bh=3zbLS5pfeT524Z366MfRgPxFm3lGCKRMk/h96+hQyQk=;
+        s=default; t=1590768105;
+        bh=LZ30L6JfHr68OqgXl/j/De7pkTJdoqp2orMzu9RwlW8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AuiVCoa/JCwDK4OTj6nj5AdD4sYjXgfoTlMp/jxJRG46GYpBqx9qtTgirmWkm3v8J
-         YUJIJO8tMdmkqHL02EfD47MwDNRZmY3b5O6MH+N+N3UFxN3c3yN6kan3VWXdUQ3XSf
-         LDLs7YnYvLHDRpq94bOM7MVVxjCU04j0hTleQe7M=
+        b=fpP1nSMqOUm1aBOcQsQHfU9QtUiBarRbXGHm1YHZYo93oGxjlPIcV+0NSTUcl/unn
+         3bD0sRibgWrrVVHSqk74YROKgQGnQcM4zQ7DgJrG8Trjc12/Q1hhSR0+25vdkfHron
+         u00q6GqnNJK04vXQ7vLiMAR4kB91GUqkiG7bTE6Y=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jehS2-00GJKc-OQ; Fri, 29 May 2020 17:01:42 +0100
+        id 1jehS3-00GJKc-PJ; Fri, 29 May 2020 17:01:43 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -46,9 +46,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 04/24] KVM: arm64: Change CONFIG_KVM to a menuconfig entry
-Date:   Fri, 29 May 2020 17:01:01 +0100
-Message-Id: <20200529160121.899083-5-maz@kernel.org>
+Subject: [PATCH 05/24] KVM: arm64: Clean up kvm makefiles
+Date:   Fri, 29 May 2020 17:01:02 +0100
+Message-Id: <20200529160121.899083-6-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200529160121.899083-1-maz@kernel.org>
 References: <20200529160121.899083-1-maz@kernel.org>
@@ -63,73 +63,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Will Deacon <will@kernel.org>
+From: Fuad Tabba <tabba@google.com>
 
-Changing CONFIG_KVM to be a 'menuconfig' entry in Kconfig mean that we
-can straightforwardly enumerate optional features, such as the virtual
-PMU device as dependent options.
+Consolidate references to the CONFIG_KVM configuration item to encompass
+entire folders rather than per line.
 
-Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200505154520.194120-4-tabba@google.com
+Acked-by: Will Deacon <will@kernel.org>
+Link: https://lore.kernel.org/r/20200505154520.194120-5-tabba@google.com
 ---
- arch/arm64/kvm/Kconfig | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/Makefile     | 38 +++++++++++++------------------------
+ arch/arm64/kvm/hyp/Makefile | 15 ++++-----------
+ 2 files changed, 17 insertions(+), 36 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index d2cf4f099454..f1c1f981482c 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -3,7 +3,6 @@
- # KVM configuration
- #
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 419696e615b3..8d3d9513cbfe 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -10,30 +10,18 @@ KVM=../../../virt/kvm
+ obj-$(CONFIG_KVM) += kvm.o
+ obj-$(CONFIG_KVM) += hyp/
  
--source "virt/kvm/Kconfig"
- source "virt/lib/Kconfig"
+-kvm-$(CONFIG_KVM) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+-kvm-$(CONFIG_KVM) += $(KVM)/eventfd.o $(KVM)/vfio.o $(KVM)/irqchip.o
+-kvm-$(CONFIG_KVM) += arm.o mmu.o mmio.o
+-kvm-$(CONFIG_KVM) += psci.o perf.o
+-kvm-$(CONFIG_KVM) += hypercalls.o
+-kvm-$(CONFIG_KVM) += pvtime.o
++kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
++	 $(KVM)/vfio.o $(KVM)/irqchip.o \
++	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
++	 inject_fault.o regmap.o va_layout.o hyp.o hyp-init.o handle_exit.o \
++	 guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o \
++	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
++	 aarch32.o arch_timer.o \
++	 vgic/vgic.o vgic/vgic-init.o \
++	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
++	 vgic/vgic-v3.o vgic/vgic-v4.o \
++	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
++	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
++	 vgic/vgic-its.o vgic/vgic-debug.o
  
- menuconfig VIRTUALIZATION
-@@ -18,7 +17,7 @@ menuconfig VIRTUALIZATION
+-kvm-$(CONFIG_KVM) += inject_fault.o regmap.o va_layout.o
+-kvm-$(CONFIG_KVM) += hyp.o hyp-init.o handle_exit.o
+-kvm-$(CONFIG_KVM) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+-kvm-$(CONFIG_KVM) += vgic-sys-reg-v3.o fpsimd.o pmu.o
+-kvm-$(CONFIG_KVM) += aarch32.o
+-kvm-$(CONFIG_KVM) += arch_timer.o
+ kvm-$(CONFIG_KVM_ARM_PMU)  += pmu-emul.o
+-
+-kvm-$(CONFIG_KVM) += vgic/vgic.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-init.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-irqfd.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-v2.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-v3.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-v4.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-mmio.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v2.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-mmio-v3.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-kvm-device.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-its.o
+-kvm-$(CONFIG_KVM) += vgic/vgic-debug.o
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 8229e47ba870..8c9880783839 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -6,17 +6,10 @@
+ ccflags-y += -fno-stack-protector -DDISABLE_BRANCH_PROFILING \
+ 		$(DISABLE_STACKLEAK_PLUGIN)
  
- if VIRTUALIZATION
- 
--config KVM
-+menuconfig KVM
- 	bool "Kernel-based Virtual Machine (KVM) support"
- 	depends on OF
- 	# for TASKSTATS/TASK_DELAY_ACCT:
-@@ -33,7 +32,6 @@ config KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
--	select KVM_ARM_PMU if HW_PERF_EVENTS
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
-@@ -47,13 +45,21 @@ config KVM
- 
- 	  If unsure, say N.
- 
-+if KVM
+-obj-$(CONFIG_KVM) += vgic-v3-sr.o
+-obj-$(CONFIG_KVM) += timer-sr.o
+-obj-$(CONFIG_KVM) += aarch32.o
+-obj-$(CONFIG_KVM) += vgic-v2-cpuif-proxy.o
+-obj-$(CONFIG_KVM) += sysreg-sr.o
+-obj-$(CONFIG_KVM) += debug-sr.o
+-obj-$(CONFIG_KVM) += entry.o
+-obj-$(CONFIG_KVM) += switch.o
+-obj-$(CONFIG_KVM) += fpsimd.o
+-obj-$(CONFIG_KVM) += tlb.o
+-obj-$(CONFIG_KVM) += hyp-entry.o
++obj-$(CONFIG_KVM) += hyp.o
 +
-+source "virt/kvm/Kconfig"
-+
- config KVM_ARM_PMU
--	bool
-+	bool "Virtual Performance Monitoring Unit (PMU) support"
-+	depends on HW_PERF_EVENTS
-+	default y
- 	---help---
- 	  Adds support for a virtual Performance Monitoring Unit (PMU) in
- 	  virtual machines.
++hyp-y := vgic-v3-sr.o timer-sr.o aarch32.o vgic-v2-cpuif-proxy.o sysreg-sr.o \
++	 debug-sr.o entry.o switch.o fpsimd.o tlb.o hyp-entry.o
  
- config KVM_INDIRECT_VECTORS
--       def_bool KVM && (HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS)
-+	def_bool HARDEN_BRANCH_PREDICTOR || HARDEN_EL2_VECTORS
-+
-+endif # KVM
- 
- endif # VIRTUALIZATION
+ # KVM code is run at a different exception code with a different map, so
+ # compiler instrumentation that inserts callbacks or checks into the code may
 -- 
 2.26.2
 
