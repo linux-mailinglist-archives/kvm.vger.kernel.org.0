@@ -2,125 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 961361E7145
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 02:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52A751E71E3
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 03:06:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438046AbgE2AY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 May 2020 20:24:29 -0400
-Received: from ts18-13.vcr.istar.ca ([204.191.154.188]:45220 "EHLO
-        ale.deltatee.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-        with ESMTP id S2437659AbgE2AY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 May 2020 20:24:27 -0400
-X-Greylist: delayed 1339 seconds by postgrey-1.27 at vger.kernel.org; Thu, 28 May 2020 20:24:25 EDT
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Sender:
-        Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-        :Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=SHO6IGYEd6YDcItDhjnlUPf5s8OIRwKvgFq6kM1/DP0=; b=r/axjxYlIiDMYaBSzOJcmN4D8z
-        5nhVyK5+jkTuLY9r/DkIPGDqA4zBXW2lnj24/75M8PApunP8NH63l8JZKK4zOM+RkgNUjkh8Zu7L0
-        uAWAMjn96WqKiZuaMyo8cBfMY0aRwfiPej4ElwlF0HqAS+905dMVMngwIHFwJNhllq+TXuBP3naK4
-        /r6v4D4I21bAG2X4/zOYuy5cJVYuMqe8ZbDWBeVK1iPsKmEydsM4SFCoqrouhRTbQELtOXUOa1f+x
-        r0Injuuidql/AmLXAXcQzgEff4xFuOZ6W7hJhBwZm1rFF3QVErdj3XcX2phEoDBlDrcVSy7R3MomJ
-        Ro1gd+aA==;
-Received: from s0106602ad0811846.cg.shawcable.net ([68.147.191.165] helo=[192.168.0.12])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1jeSSD-0001kd-5g; Thu, 28 May 2020 18:00:54 -0600
-To:     Tom Murphy <murphyt7@tcd.ie>, iommu@lists.linux-foundation.org
-Cc:     kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
-        dri-devel@lists.freedesktop.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        linux-tegra@vger.kernel.org, Julien Grall <julien.grall@arm.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        linux-samsung-soc@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        linux-rockchip@lists.infradead.org, Andy Gross <agross@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-mediatek@lists.infradead.org,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        virtualization@lists.linux-foundation.org,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Kukjin Kim <kgene@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-References: <20191221150402.13868-1-murphyt7@tcd.ie>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <465815ae-9292-f37a-59b9-03949cb68460@deltatee.com>
-Date:   Thu, 28 May 2020 18:00:44 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191221150402.13868-1-murphyt7@tcd.ie>
-Content-Type: text/plain; charset=utf-8
+        id S2438236AbgE2BFp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 May 2020 21:05:45 -0400
+Received: from mail-eopbgr60080.outbound.protection.outlook.com ([40.107.6.80]:1153
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2438195AbgE2BFn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 May 2020 21:05:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pqfAn/hkYxLJ73chCIBA+jSwpnTJdU9kUcXapgmiNjQ=;
+ b=wSY/XdxkANV8BCU06ky30C0tkv66kjT6tl5xrDcseVW9h09gNs/PbOGoLPRfzIpJSKM77x5rj1MUcCVwDC+l6xGf2RAdveCu8LL3NWysA59paAjJI0lCn3iTSHz1j+iuAPz5yrtY6nOi/lMo75Ndz9vzwCOyp80x+Uo+spm0Xow=
+Received: from DB6P192CA0001.EURP192.PROD.OUTLOOK.COM (2603:10a6:4:b8::11) by
+ VI1PR08MB3965.eurprd08.prod.outlook.com (2603:10a6:803:dd::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3045.17; Fri, 29 May 2020 01:05:38 +0000
+Received: from DB5EUR03FT009.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:4:b8:cafe::e9) by DB6P192CA0001.outlook.office365.com
+ (2603:10a6:4:b8::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.17 via Frontend
+ Transport; Fri, 29 May 2020 01:05:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=bestguesspass
+ action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DB5EUR03FT009.mail.protection.outlook.com (10.152.20.117) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3021.23 via Frontend Transport; Fri, 29 May 2020 01:05:38 +0000
+Received: ("Tessian outbound facc38080784:v57"); Fri, 29 May 2020 01:05:38 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from 590180419ac9.2
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id B785AFE7-ECD6-45F8-8CFD-3112B0A46193.1;
+        Fri, 29 May 2020 01:05:33 +0000
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 590180419ac9.2
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Fri, 29 May 2020 01:05:33 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hOU51j0uNdUr3rQqTUennZjvydsWCvjnVoiz+zmpMvY9B/KlxA/isWsF/k6uZmTI3QK98ZkC8VyER5IRiHPMXkTrQxfg/iZQWvFGfvXYJxUH4WtIg8WIySZnCksI5qhA29KjMhI+lGPoga2JNajR7GSgTra4j62U2G+auMtEMnT0Bhb28RMXCaSyvKiVz1vzHBNXzfwR7nk4lbsVkY+2HNnZKljm9nd5U3YLoeTc1tJ9D6ArSSCRd4/pYmXzDG/7ERPTvuZneuavRAOGjxZjALaKKK0JBeq4Ooxv9p6nQyjO4C6jrZlAAy4Z2rlBVuP6HAkqv0b62eMwBLCnnAXU5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pqfAn/hkYxLJ73chCIBA+jSwpnTJdU9kUcXapgmiNjQ=;
+ b=msPe4XJL+wTws6dJhh9wMHwtFQA/BoSsJfjADCzrQoRSGe8PQnMmQ8ixF316WlBC891tpJhHAjaNhrYXxpUWyIlNGcLG3xKtOp6N4OS3ThIBEJpZ0zJGfnU6Tx2iF/JK/ekpSECzl/pKCDWx3td2IDw0FYY1CH6fWtqesSM/ur+yHhU9M75UhtYU43qab/oitn0EBaw+bTvO5PrIbIfL4aq4NkETTMPTGeu6BhCWpTe4pJ14rLoTlQs7A17WMzX1aQZrfXK9DFNt3cNftnGMmDj6VfrBpqISc39M6dda7vHdyPbAf8bhNITgXQ7fkA1KMLd8cNKdLSzQuPYeTslDqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pqfAn/hkYxLJ73chCIBA+jSwpnTJdU9kUcXapgmiNjQ=;
+ b=wSY/XdxkANV8BCU06ky30C0tkv66kjT6tl5xrDcseVW9h09gNs/PbOGoLPRfzIpJSKM77x5rj1MUcCVwDC+l6xGf2RAdveCu8LL3NWysA59paAjJI0lCn3iTSHz1j+iuAPz5yrtY6nOi/lMo75Ndz9vzwCOyp80x+Uo+spm0Xow=
+Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com (2603:10a6:3:e0::7)
+ by HE1PR0802MB2491.eurprd08.prod.outlook.com (2603:10a6:3:de::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3045.21; Fri, 29 May
+ 2020 01:05:26 +0000
+Received: from HE1PR0802MB2555.eurprd08.prod.outlook.com
+ ([fe80::b1eb:9515:4851:8be]) by HE1PR0802MB2555.eurprd08.prod.outlook.com
+ ([fe80::b1eb:9515:4851:8be%6]) with mapi id 15.20.3021.030; Fri, 29 May 2020
+ 01:05:25 +0000
+From:   Jianyong Wu <Jianyong.Wu@arm.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>,
+        Steven Price <Steven.Price@arm.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        Kaly Xin <Kaly.Xin@arm.com>, Justin He <Justin.He@arm.com>,
+        Wei Chen <Wei.Chen@arm.com>, nd <nd@arm.com>
+Subject: RE: [RFC PATCH v12 05/11] time: Add mechanism to recognize
+ clocksource in time_get_snapshot
+Thread-Topic: [RFC PATCH v12 05/11] time: Add mechanism to recognize
+ clocksource in time_get_snapshot
+Thread-Index: AQHWMBRarnlKRx72O0Ohyt/gOs353ai9vAGAgACN4SA=
+Date:   Fri, 29 May 2020 01:05:25 +0000
+Message-ID: <HE1PR0802MB2555D67ACAF18A52DE8D9278F48F0@HE1PR0802MB2555.eurprd08.prod.outlook.com>
+References: <20200522083724.38182-1-jianyong.wu@arm.com>
+ <20200522083724.38182-6-jianyong.wu@arm.com>
+ <87tv00nhje.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <87tv00nhje.fsf@nanos.tec.linutronix.de>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 68.147.191.165
-X-SA-Exim-Rcpt-To: baolu.lu@linux.intel.com, robin.murphy@arm.com, kgene@kernel.org, linux-kernel@vger.kernel.org, cohuck@redhat.com, dwmw2@infradead.org, gerald.schaefer@de.ibm.com, virtualization@lists.linux-foundation.org, tglx@linutronix.de, matthias.bgg@gmail.com, rodrigo.vivi@intel.com, linux-mediatek@lists.infradead.org, alex.williamson@redhat.com, eric.auger@redhat.com, intel-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org, linux-s390@vger.kernel.org, linux-arm-kernel@lists.infradead.org, agross@kernel.org, linux-rockchip@lists.infradead.org, jonathanh@nvidia.com, krzk@kernel.org, maz@kernel.org, linux-samsung-soc@vger.kernel.org, jean-philippe@linaro.org, m.szyprowski@samsung.com, will@kernel.org, thierry.reding@gmail.com, julien.grall@arm.com, linux-tegra@vger.kernel.org, bjorn.andersson@linaro.org, dri-devel@lists.freedesktop.org, airlied@linux.ie, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, murphyt7@tcd.ie
-X-SA-Exim-Mail-From: logang@deltatee.com
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on ale.deltatee.com
-X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=5.0 tests=ALL_TRUSTED,BAYES_00,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.2
-Subject: Re: [PATCH 0/8] Convert the intel iommu driver to the dma-iommu api
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ts-tracking-id: 92c3abe8-9efe-4ce7-b3d6-85b06a5a27ff.1
+x-checkrecipientchecked: true
+Authentication-Results-Original: linutronix.de; dkim=none (message not signed)
+ header.d=none;linutronix.de; dmarc=none action=none header.from=arm.com;
+x-originating-ip: [203.126.0.111]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: fdbf23ba-fcc5-4ccd-8594-08d8036c6686
+x-ms-traffictypediagnostic: HE1PR0802MB2491:|VI1PR08MB3965:
+x-ms-exchange-transport-forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR08MB3965BBA9EA663B14C3518167F48F0@VI1PR08MB3965.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+nodisclaimer: true
+x-ms-oob-tlc-oobclassifiers: OLM:2958;OLM:2958;
+x-forefront-prvs: 04180B6720
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: 4TBFoddbFrAB1xW5jZi42UejDCCNh1LFQqupSblRlYWG3ANav5BlGwQy8WxKs73Aok251e8LTHGlq03fZjTLrW/Hp++6lZxNuvrP4trgg65PBxTBjknNOQO6qa6ujnXDHKm7DjVBWCvo/ZMERnsv1GswLMhdcx+syZErn8humW6wzlrG+I1WSvBv5T/WmYCX2n0BpGtt7V2DLZvW8ZyNfNQ3YFsapVilcSSge1zQVtIZtFww4p1tw4QajBbIXJHoTfBUPy4k6Kx4w2DlrdspTa4BZ2Yj5Y7GJlx44IiYRqY9CYOkwv+BO+IpjWW/q2dcYH4ohGQAEORlHihcVqSBvxA4GB8du2GTu3eWfSC1sB8cCyye8UrEaonaEXILdlWZ
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0802MB2555.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(39860400002)(366004)(136003)(376002)(346002)(7696005)(54906003)(316002)(110136005)(7416002)(2906002)(478600001)(86362001)(4326008)(76116006)(52536014)(66476007)(66556008)(64756008)(66446008)(66946007)(55016002)(53546011)(6506007)(71200400001)(186003)(26005)(33656002)(8936002)(9686003)(8676002)(6636002)(5660300002)(921003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: 3HipzhGdsSvBFlegJeI2GC8ZhhOdssEvYAMJikJhEmWGUnhrMKGn9sOPPmPbXxjvcwhO0mA/amkwpVIZU4pJji9fUVmSMJDpBrP7NDck6YuncSjXYj2MBViF9BBBbVpy6ukCWRFvOUwzLhHkaRTEoJj5PwRbTz2RgiJfjkKVHjTGNQ7zbWbLJ+h62Qhp0cLPppTuED0HsSgx5SYtDds6E6PhgDrXgbI62AeyUJhd7fHM+7GSg//V6czKOzfva9AhrbRLvfr/sjD/Zob6wqqOP/CvJxseh2YUmpXfxjPNsLRmjH2ZQErss5zlLh8DyfMgpSr0MKXLhBhsLnepPQ9OfCRaCi214qlumZd/qjkmoYuOMKg41bELcLLOSQYrJyXVSzCIa1FANR5on9mBwkxLyBWJJpVmdyN7wBYE/ADiYzm1KPPhC1MVVZBYGyWEkmcQVjeABh4o1lcvhl/3tqVmDFGbTMucBHl59fA9pHZqklg=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2491
+Original-Authentication-Results: linutronix.de; dkim=none (message not signed)
+ header.d=none;linutronix.de; dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT009.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFTY:;SFS:(4636009)(136003)(376002)(396003)(346002)(39860400002)(46966005)(450100002)(81166007)(86362001)(33656002)(83380400001)(82310400002)(6636002)(82740400003)(47076004)(356005)(316002)(2906002)(478600001)(4326008)(70206006)(8936002)(53546011)(6506007)(55016002)(54906003)(70586007)(52536014)(110136005)(8676002)(5660300002)(9686003)(186003)(7696005)(26005)(336012)(921003);DIR:OUT;SFP:1101;
+X-MS-Office365-Filtering-Correlation-Id-Prvs: cb2116b4-ebc1-45c8-649a-08d8036c5f0b
+X-Forefront-PRVS: 04180B6720
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lK89LDROjfk6F8ia/ZrhVgN7RAqQcbawHdL9dsR0STrf9RkKrQ3KLVZ9kQIh6xS3r3M65U6QHOAGBP6D+v1EGE4Qr3uogW5epg44tE5D+g5velwiH5cDCfQ0o95H2vPxPuC1wiAgzizoctNU1p0KWSEe6v6w9JeKvvfNuUEfWb9y8qxZL/LFyNheyoLe++/WlX2b+ORUGuLq+VQw799Fqs7n79yJwRsdWhgumfOvfepdR6k9rrkRUCzR+RMKB1S3sKqxTn+OY/Qq4UQSdkam8pSosdp58OMKX0Qld5eOusHeZOL84v9qSxrPNJOMJ5wXsc0s8xCGxx1/CsiSc0G7OAYHcGGBZS+dz2aXTyHqTr+KiVMuWH8qRRc2PvbTSRcDIuZJUSv1fsk+kezzj4iJm9Mm/B1ibQJALDZgiVkp20I=
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2020 01:05:38.4258
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fdbf23ba-fcc5-4ccd-8594-08d8036c6686
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3965
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Tom,
+Hi Thomas,
 
-On 2019-12-21 8:03 a.m., Tom Murphy wrote:
-> This patchset converts the intel iommu driver to the dma-iommu api.
+> -----Original Message-----
+> From: Thomas Gleixner <tglx@linutronix.de>
+> Sent: Friday, May 29, 2020 12:36 AM
+> To: Jianyong Wu <Jianyong.Wu@arm.com>; netdev@vger.kernel.org;
+> yangbo.lu@nxp.com; john.stultz@linaro.org; pbonzini@redhat.com;
+> sean.j.christopherson@intel.com; maz@kernel.org;
+> richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
+> will@kernel.org; Suzuki Poulose <Suzuki.Poulose@arm.com>; Steven Price
+> <Steven.Price@arm.com>
+> Cc: linux-kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
+> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; Steve Capper
+> <Steve.Capper@arm.com>; Kaly Xin <Kaly.Xin@arm.com>; Justin He
+> <Justin.He@arm.com>; Wei Chen <Wei.Chen@arm.com>; Jianyong Wu
+> <Jianyong.Wu@arm.com>; nd <nd@arm.com>
+> Subject: Re: [RFC PATCH v12 05/11] time: Add mechanism to recognize
+> clocksource in time_get_snapshot
+>=20
+> Jianyong Wu <jianyong.wu@arm.com> writes:
+> > From: Thomas Gleixner <tglx@linutronix.de> diff --git
+> > a/kernel/time/clocksource.c b/kernel/time/clocksource.c index
+> > 7cb09c4cf21c..a8f65b3e4ec8 100644
+> > --- a/kernel/time/clocksource.c
+> > +++ b/kernel/time/clocksource.c
+> > @@ -928,6 +928,9 @@ int __clocksource_register_scale(struct
+> > clocksource *cs, u32 scale, u32 freq)
+> >
+> >  	clocksource_arch_init(cs);
+> >
+> > +if (WARN_ON_ONCE((unsigned int)cs->id >=3D CSID_MAX))
+> > +		cs->id =3D CSID_GENERIC;
+> > +
+>=20
+> This is white space damaged and certainly not from me.
 
-Just wanted to note that I've rebased your series on recent kernels and
-have done some testing on my old Sandybridge machine (without the DO NOT
-MERGE patch) and have found no issues. I hope this can make progress
-soon and get merged soon. If you like you can add:
+Sorry, I will fix it.
 
-Tested-By: Logan Gunthorpe <logang@deltatee.com>
+Thanks
+Jianyong=20
 
-> While converting the driver I exposed a bug in the intel i915 driver which causes a huge amount of artifacts on the screen of my laptop. You can see a picture of it here:
-> https://github.com/pippy360/kernelPatches/blob/master/IMG_20191219_225922.jpg
-> 
-> This issue is most likely in the i915 driver and is most likely caused by the driver not respecting the return value of the dma_map_ops::map_sg function. You can see the driver ignoring the return value here:
-> https://github.com/torvalds/linux/blob/7e0165b2f1a912a06e381e91f0f4e495f4ac3736/drivers/gpu/drm/i915/gem/i915_gem_dmabuf.c#L51
-> 
-> Previously this didn’t cause issues because the intel map_sg always returned the same number of elements as the input scatter gather list but with the change to this dma-iommu api this is no longer the case. I wasn’t able to track the bug down to a specific line of code unfortunately.  
-
-I did some digging into this myself and while I don't have full patch, I
-think I traced it closer to the problem.
-
-Sadly, ignoring the number of nents returned by map_sg() is endemic to
-dma-buf users, but AMD's GPU driver seems to do the same thing,
-presumably without issues.
-
-Digging a bit further, I found that the i915 has an "innovative" way of
-iterating through SGLs, see [1]. I suspect if __sgt_iter is changed to
-increment with sg_dma_len() and return NULL when there is no length
-left, it may fix the issue.
-
-But, sorry, I don't really have the means or time to fix and test this
-myself.
-
-Thanks,
-
-Logan
-
-[1]
-https://elixir.bootlin.com/linux/v5.7-rc7/source/drivers/gpu/drm/i915/i915_scatterlist.h#L76
