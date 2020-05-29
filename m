@@ -2,170 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 424861E83C9
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 18:34:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDC4B1E857A
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 19:44:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbgE2QeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 12:34:23 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42058 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726974AbgE2QeU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 12:34:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590770059;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dZ3Au5FaNGsFuALhZak+xDg1jZacBxkv5pzIdzHUfKU=;
-        b=MAZPTIqdjBx4qOWxqDv23mK3HIx51kGXPrn5QLyM/s265yb/PFKzYB0egx9+kXia1+UDQ0
-        lIRrCAbJIxoCEaFfExHKslnO2aX6awMu5X8n7a691cGynI/gRbA77cmHgtSuqNnxTm3iL9
-        E2Uip4Br2SMtUCnMELP4q4h0fUob0aE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-_rygNnSMNraerpl8PCVBhQ-1; Fri, 29 May 2020 12:34:17 -0400
-X-MC-Unique: _rygNnSMNraerpl8PCVBhQ-1
-Received: by mail-wr1-f69.google.com with SMTP id p10so1251065wrn.19
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 09:34:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dZ3Au5FaNGsFuALhZak+xDg1jZacBxkv5pzIdzHUfKU=;
-        b=ZB6I8lVNrtD68KFNyZnnh0RmhSJEyDkY6QEm8Gy/vgCjmqjXxBi8H8eLAW8sSSWMnU
-         sfFIj6RSQ6/5ecsj/awcjr9eViR4k0gPa7XNHm0jieVoZqU/KDM+y8xXgA1cwP0e5u60
-         vm9dwMtsVFRXC7oPlCGTaz0xHL3yH6l1N1s6Wb4ui9prpywyI9i6tk8Wp3zS61pkyZs4
-         o2088rPZ31KfQ3MXlBVstVeIlqyVSY1/OII41UHcdheaQFPmmwK0ZyXbxLHEbaOpdrMK
-         txShVO3QaZeayGaThaw28iUDxPQ5/rkpooAdrxlgj6wzpM/RDNNzZyQvPvuAgAhhslAX
-         92bQ==
-X-Gm-Message-State: AOAM5336Q0aeMcWUZ2MCHJyD/Ybc+jxHksx6Ke7KTpP1eW4juglVEseb
-        f8KFQjv9ILJKZv4th7rVZFznQk5kY0c4NZg2lsCgmK1WJu8d7lPrISGPULiGquI+ZkD2SjESa7k
-        I4/rlEiugjEgY
-X-Received: by 2002:adf:dbc1:: with SMTP id e1mr2275431wrj.339.1590770055856;
-        Fri, 29 May 2020 09:34:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzZ889WcL2gc5cE15AzE4PQixcL+wfygpza9dr3frPSqYQSWVW6QADK+d89yCcehEvnie2qnA==
-X-Received: by 2002:adf:dbc1:: with SMTP id e1mr2275400wrj.339.1590770055587;
-        Fri, 29 May 2020 09:34:15 -0700 (PDT)
-Received: from steredhat (host108-207-dynamic.49-79-r.retail.telecomitalia.it. [79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id r6sm323841wmh.1.2020.05.29.09.34.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2020 09:34:15 -0700 (PDT)
-Date:   Fri, 29 May 2020 18:34:12 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jia He <justin.he@arm.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kaly Xin <Kaly.Xin@arm.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v2] virtio_vsock: Fix race condition in
- virtio_transport_recv_pkt
-Message-ID: <20200529163412.fqswshs65f53qgez@steredhat>
-References: <20200529152102.58397-1-justin.he@arm.com>
+        id S1727887AbgE2RoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 13:44:10 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:46978 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726555AbgE2RoK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 13:44:10 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04THRxjl063466;
+        Fri, 29 May 2020 17:44:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ygp+b2CwOObfl6QpIHhCnCkG/Gju2Rtfb6hrd2ha3sg=;
+ b=Fq39hMHMKgxlceUPXiFEHnDLCyvZK/4tu39RupcDX4FCyl+hCoTWt7PAIVY5ibil3hQ1
+ MjSl2F0Ji9dJAoJDetAbCAuPENOhZQPJhGjRG3qgJU7xPRAjfVsHESLajxGZrbAMCQaA
+ bpecJ92e2E+ZIiLceGnDgVkNXAUfK4k5HK+F6VvTYL5Dr53BuEMXkybXggKc2YwUZrn2
+ zqe9rg2/XC/5xqbHmW38NH0ulUM+m5OGi75Sk9M3c/hGY4+wlevbCcZNMTV5e7sN7h19
+ t+NcjMUH9LZYi6XFK6zTZuL+7t119/4Nd3GMSnx2ZVSuzFYIbI+p+QjpJbmKiyAedKCn 9w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 318xbkbq45-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 29 May 2020 17:44:07 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04THTAWj157566;
+        Fri, 29 May 2020 17:42:06 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 317ddur01p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 May 2020 17:42:06 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04THg5gD026971;
+        Fri, 29 May 2020 17:42:05 GMT
+Received: from localhost.localdomain (/10.159.246.35)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 29 May 2020 10:42:04 -0700
+Subject: Re: [PATCH 06/30] KVM: SVM: always update CR3 in VMCB
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200529153934.11694-1-pbonzini@redhat.com>
+ <20200529153934.11694-7-pbonzini@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <07139fc2-39bd-5bc5-ef23-a98681013665@oracle.com>
+Date:   Fri, 29 May 2020 10:41:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200529152102.58397-1-justin.he@arm.com>
+In-Reply-To: <20200529153934.11694-7-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ phishscore=0 adultscore=0 suspectscore=0 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005290133
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 cotscore=-2147483648
+ suspectscore=0 bulkscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2005290133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 29, 2020 at 11:21:02PM +0800, Jia He wrote:
-> When client tries to connect(SOCK_STREAM) the server in the guest with
-> NONBLOCK mode, there will be a panic on a ThunderX2 (armv8a server):
-> [  463.718844][ T5040] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-> [  463.718848][ T5040] Mem abort info:
-> [  463.718849][ T5040]   ESR = 0x96000044
-> [  463.718852][ T5040]   EC = 0x25: DABT (current EL), IL = 32 bits
-> [  463.718853][ T5040]   SET = 0, FnV = 0
-> [  463.718854][ T5040]   EA = 0, S1PTW = 0
-> [  463.718855][ T5040] Data abort info:
-> [  463.718856][ T5040]   ISV = 0, ISS = 0x00000044
-> [  463.718857][ T5040]   CM = 0, WnR = 1
-> [  463.718859][ T5040] user pgtable: 4k pages, 48-bit VAs, pgdp=0000008f6f6e9000
-> [  463.718861][ T5040] [0000000000000000] pgd=0000000000000000
-> [  463.718866][ T5040] Internal error: Oops: 96000044 [#1] SMP
-> [...]
-> [  463.718977][ T5040] CPU: 213 PID: 5040 Comm: vhost-5032 Tainted: G           O      5.7.0-rc7+ #139
-> [  463.718980][ T5040] Hardware name: GIGABYTE R281-T91-00/MT91-FS1-00, BIOS F06 09/25/2018
-> [  463.718982][ T5040] pstate: 60400009 (nZCv daif +PAN -UAO)
-> [  463.718995][ T5040] pc : virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
-> [  463.718999][ T5040] lr : virtio_transport_recv_pkt+0x1fc/0xd40 [vmw_vsock_virtio_transport_common]
-> [  463.719000][ T5040] sp : ffff80002dbe3c40
-> [...]
-> [  463.719025][ T5040] Call trace:
-> [  463.719030][ T5040]  virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
-> [  463.719034][ T5040]  vhost_vsock_handle_tx_kick+0x360/0x408 [vhost_vsock]
-> [  463.719041][ T5040]  vhost_worker+0x100/0x1a0 [vhost]
-> [  463.719048][ T5040]  kthread+0x128/0x130
-> [  463.719052][ T5040]  ret_from_fork+0x10/0x18
-         ^         ^
-Maybe we can remove these two columns from the commit message.
 
-> 
-> The race condition as follows:
-> Task1                            Task2
-> =====                            =====
-> __sock_release                   virtio_transport_recv_pkt
->   __vsock_release                  vsock_find_bound_socket (found)
->     lock_sock_nested
->     vsock_remove_sock
->     sock_orphan
->       sk_set_socket(sk, NULL)
+On 5/29/20 8:39 AM, Paolo Bonzini wrote:
+> svm_load_mmu_pgd is delaying the write of GUEST_CR3 to prepare_vmcs02
 
-Here we can add:
-      sk->sk_shutdown = SHUTDOWN_MASK;
-
->     ...
->     release_sock
->                                 lock_sock
->                                    virtio_transport_recv_connecting
->                                      sk->sk_socket->state (panic)
-> 
-> The root cause is that vsock_find_bound_socket can't hold the lock_sock,
-> so there is a small race window between vsock_find_bound_socket() and
-> lock_sock(). If there is __vsock_release() in another task, sk->sk_socket
-> will be set to NULL inadvertently.
-> 
-> This fixes it by checking sk->sk_shutdown.
-> 
-> Signed-off-by: Jia He <justin.he@arm.com>
-> Cc: stable@vger.kernel.org
-> Cc: Stefano Garzarella <sgarzare@redhat.com>
+Did you mean to say enter_svm_guest_mode here ?
+> as
+> an optimization, but this is only correct before the nested vmentry.
+> If userspace is modifying CR3 with KVM_SET_SREGS after the VM has
+> already been put in guest mode, the value of CR3 will not be updated.
+> Remove the optimization, which almost never triggers anyway.
+> This was was added in commit 689f3bf21628 ("KVM: x86: unify callbacks
+> to load paging root", 2020-03-16) just to keep the two vendor-specific
+> modules closer, but we'll fix VMX too.
+>
+> Fixes: 689f3bf21628 ("KVM: x86: unify callbacks to load paging root")
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
-> v2: use lightweight checking suggested by Stefano Garzarella
-> 
->  net/vmw_vsock/virtio_transport_common.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 69efc891885f..0edda1edf988 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -1132,6 +1132,14 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
->  
->  	lock_sock(sk);
->  
-> +	/* Check if sk has been released before lock_sock */
-> +	if (sk->sk_shutdown == SHUTDOWN_MASK) {
-> +		(void)virtio_transport_reset_no_sock(t, pkt);
-> +		release_sock(sk);
-> +		sock_put(sk);
-> +		goto free_pkt;
-> +	}
-> +
->  	/* Update CID in case it has changed after a transport reset event */
->  	vsk->local_addr.svm_cid = dst.svm_cid;
->  
-> -- 
-> 2.17.1
-> 
-
-Anyway, the patch LGTM, let see what David and other say.
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
-
+>   arch/x86/kvm/svm/nested.c |  6 +-----
+>   arch/x86/kvm/svm/svm.c    | 16 +++++-----------
+>   2 files changed, 6 insertions(+), 16 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index dcac4c3510ab..8756c9f463fd 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -256,11 +256,7 @@ void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
+>   	svm_set_efer(&svm->vcpu, nested_vmcb->save.efer);
+>   	svm_set_cr0(&svm->vcpu, nested_vmcb->save.cr0);
+>   	svm_set_cr4(&svm->vcpu, nested_vmcb->save.cr4);
+> -	if (npt_enabled) {
+> -		svm->vmcb->save.cr3 = nested_vmcb->save.cr3;
+> -		svm->vcpu.arch.cr3 = nested_vmcb->save.cr3;
+> -	} else
+> -		(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
+> +	(void)kvm_set_cr3(&svm->vcpu, nested_vmcb->save.cr3);
+>   
+>   	/* Guest paging mode is active - reset mmu */
+>   	kvm_mmu_reset_context(&svm->vcpu);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 545f63ebc720..feb96a410f2d 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3447,7 +3447,6 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+>   static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root)
+>   {
+>   	struct vcpu_svm *svm = to_svm(vcpu);
+> -	bool update_guest_cr3 = true;
+>   	unsigned long cr3;
+>   
+>   	cr3 = __sme_set(root);
+> @@ -3456,18 +3455,13 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root)
+>   		mark_dirty(svm->vmcb, VMCB_NPT);
+>   
+>   		/* Loading L2's CR3 is handled by enter_svm_guest_mode.  */
+> -		if (is_guest_mode(vcpu))
+> -			update_guest_cr3 = false;
+> -		else if (test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
+> -			cr3 = vcpu->arch.cr3;
+> -		else /* CR3 is already up-to-date.  */
+> -			update_guest_cr3 = false;
+> +		if (!test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
+> +			return;
+> +		cr3 = vcpu->arch.cr3;
+>   	}
+>   
+> -	if (update_guest_cr3) {
+> -		svm->vmcb->save.cr3 = cr3;
+> -		mark_dirty(svm->vmcb, VMCB_CR);
+> -	}
+> +	svm->vmcb->save.cr3 = cr3;
+> +	mark_dirty(svm->vmcb, VMCB_CR);
+>   }
+>   
+>   static int is_disabled(void)
