@@ -2,248 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 253B41E7F1D
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 15:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC6C11E7FC8
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 16:10:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727797AbgE2NqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 09:46:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727058AbgE2NqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 09:46:05 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8368AC03E969;
-        Fri, 29 May 2020 06:46:05 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id c3so3615072wru.12;
-        Fri, 29 May 2020 06:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=CRfyzalkQGPRIJenwdlYo1bAXA5Z5I+yDJzGJeC0D90=;
-        b=MXuZJPOV/iVCQa9nAp8mC/uuthnkol/KQBetYfpBArZo1btdaba7LLTTA2EI/LZa3r
-         tQKvbVL+3NKBBOlwnXUCONPEt1OX7SytpTtF3JM7QDCsPPX2BTySiy3KQ6SnJexYiCXQ
-         a4VP4K9u7WFm5/tlAP2dDbmIOXqteHj/W8uUWoHtdgH0cw8PfIEKOLUJqe3In5GN6Mv9
-         NFcz0nEy3XMti1wDWnOzjTXidC/C6JBnd5Lm8pb4zt7JvNu5Re1nr3rYVo6EFnEsU/HV
-         8n5wtJBqzjkT3AGy1wJZchyw+ocTizYHx/lpfzZrXHKUS/pMcH4ohbVF16+acNTBf/8o
-         5T7A==
+        id S1727030AbgE2OKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 10:10:48 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28878 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726988AbgE2OKr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 10:10:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590761445;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TErd239L9m87GMKq1OnfAdElyOZMwB2hfVFAiSe/inE=;
+        b=a3TiboFZOcaqg49C1CptcjK1NkstBNKG7No3vDdQZBQxpj0vS0UKzxVKNIvFExki40yfwV
+        cjeUZi6eY+i2FUlcokVnPo5R6uVnfW2SUI5s3XmgxPOGHgt/BV6YZarkH6YxBhwxVYmUJf
+        Je7x+IhUxmXsAt0fvLbUrz/CcYo+cYc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-CFv7pUJmOJSovnddUOngwg-1; Fri, 29 May 2020 10:10:39 -0400
+X-MC-Unique: CFv7pUJmOJSovnddUOngwg-1
+Received: by mail-wr1-f71.google.com with SMTP id z10so1112594wrs.2
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 07:10:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=CRfyzalkQGPRIJenwdlYo1bAXA5Z5I+yDJzGJeC0D90=;
-        b=Gr9qbEMwma3GvcF0whEIadHdZOvJCWVgpbS/mUuMbezZL5fSytSBz2j0S6t6T8HEK/
-         bpo1M9BvJJr4N+MDSTlETFoUSay4m0zxPOjIYnCdsmk+ivnj46k9woy8vkhVZDxdsxp8
-         u++JW/Skg/EveNlHwUD9L5e1/MBi6pRLvk8Se1RftkfUx0IKK6jmpNQ3XKJuxhVTisdC
-         60wtJhI0jLK/wQq+xT/gW5yuXRAK4BjHicGo8uWpGTOKzLPEWB4bEFeSVLVhF5rsLP56
-         TrlP4u22XosQ6sLaJoU8VnU+LXT70f3o7ofR3vAEvZjdMGfO9m1+iHl1lUwUEmO/vVtF
-         C3Tw==
-X-Gm-Message-State: AOAM532G6yrhxIPCWKj7lf4gM3zEYonz8d+W2iFxd6+S7TinfUn1IN1v
-        OC/TS150rdg/cQx4zNda4fOJ7pMM
-X-Google-Smtp-Source: ABdhPJwVc+Sx7yrs9LgiWwmssibea/sNFRd08M7kpxU/kaEUcEdjlVc4H4JV/SLTxIRJ+UVLT7thaQ==
-X-Received: by 2002:a05:6000:1042:: with SMTP id c2mr9458225wrx.351.1590759964039;
-        Fri, 29 May 2020 06:46:04 -0700 (PDT)
-Received: from jondnuc.lan (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
-        by smtp.gmail.com with ESMTPSA id y37sm12347263wrd.55.2020.05.29.06.46.02
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TErd239L9m87GMKq1OnfAdElyOZMwB2hfVFAiSe/inE=;
+        b=hROWAxEqO0uFj1Mo0Otzx7vSusx1fy5ktUq36OTQDQoe5YXbD2eq9XpIFO9Q7KSsp2
+         tR8D596Zh6L77qI6fCpAXF4lvmaB2IxJgt+BLo3G0UTjR1gZtfeFjOFhMJghver51pmg
+         rGvaxdictl8X8Cw/8T0d0a2yDP0BrtRzFz6UkpzIbaEFlys0u0Gww5dWbw8c9IVwcN8j
+         RoQDXXHKinn9foxk3EUTuJCwlSpERMfhvcKcPU96qKAQF5n521ZOVVaZk6P7Fwtmr5Br
+         karjVCxZEnVkzqMO7KtD2731CdtsaHApk9R17YjN2+IBE0QHQWb75yyM+F6zAIZSSiL8
+         Xh1g==
+X-Gm-Message-State: AOAM532oE08nAtPXHFgVhXreidSe8qL7NYLUqjqo/YixvDz0G1od6I2+
+        z+IlpLKoamWgaHrWLzg6pffYYDBn7EqcW14A5vp/lNu8BPnfoS+pYP2k0ltM+cEmBlDmwAgylG0
+        lSQEj5oHEW5zl
+X-Received: by 2002:adf:9c84:: with SMTP id d4mr8354239wre.327.1590761437218;
+        Fri, 29 May 2020 07:10:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyU77CJCETVAQ/MakEhpXlB82Ntk+mmoh9WlUWbgSUeZEVhUvd9NyaJdmipxrh62Yze6wV5Xg==
+X-Received: by 2002:adf:9c84:: with SMTP id d4mr8354212wre.327.1590761436822;
+        Fri, 29 May 2020 07:10:36 -0700 (PDT)
+Received: from steredhat ([79.49.207.108])
+        by smtp.gmail.com with ESMTPSA id u7sm10292389wrm.23.2020.05.29.07.10.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 May 2020 06:46:03 -0700 (PDT)
-From:   Jon Doron <arilou@gmail.com>
-To:     kvm@vger.kernel.org, linux-hyperv@vger.kernel.org
-Cc:     vkuznets@redhat.com, pbonzini@redhat.com, rvkagan@yandex-team.ru,
-        Jon Doron <arilou@gmail.com>
-Subject: [PATCH v12 6/6] KVM: selftests: update hyperv_cpuid with SynDBG tests
-Date:   Fri, 29 May 2020 16:45:43 +0300
-Message-Id: <20200529134543.1127440-7-arilou@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200529134543.1127440-1-arilou@gmail.com>
-References: <20200529134543.1127440-1-arilou@gmail.com>
+        Fri, 29 May 2020 07:10:36 -0700 (PDT)
+Date:   Fri, 29 May 2020 16:10:33 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jia He <justin.he@arm.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kaly Xin <Kaly.Xin@arm.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] virtio_vsock: Fix race condition in
+ virtio_transport_recv_pkt
+Message-ID: <20200529141033.iqtmu3giph6dekuj@steredhat>
+References: <20200529133123.195610-1-justin.he@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200529133123.195610-1-justin.he@arm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Hi Jia,
+thanks for the patch! I have some comments.
 
-Update tests to reflect new CPUID capabilities with SYNDBG.
-Check that we get the right number of entries and that
-0x40000000.EAX always returns the correct max leaf.
+On Fri, May 29, 2020 at 09:31:23PM +0800, Jia He wrote:
+> When client tries to connect(SOCK_STREAM) the server in the guest with NONBLOCK
+> mode, there will be a panic on a ThunderX2 (armv8a server):
+> [  463.718844][ T5040] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+> [  463.718848][ T5040] Mem abort info:
+> [  463.718849][ T5040]   ESR = 0x96000044
+> [  463.718852][ T5040]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [  463.718853][ T5040]   SET = 0, FnV = 0
+> [  463.718854][ T5040]   EA = 0, S1PTW = 0
+> [  463.718855][ T5040] Data abort info:
+> [  463.718856][ T5040]   ISV = 0, ISS = 0x00000044
+> [  463.718857][ T5040]   CM = 0, WnR = 1
+> [  463.718859][ T5040] user pgtable: 4k pages, 48-bit VAs, pgdp=0000008f6f6e9000
+> [  463.718861][ T5040] [0000000000000000] pgd=0000000000000000
+> [  463.718866][ T5040] Internal error: Oops: 96000044 [#1] SMP
+> [...]
+> [  463.718977][ T5040] CPU: 213 PID: 5040 Comm: vhost-5032 Tainted: G           O      5.7.0-rc7+ #139
+> [  463.718980][ T5040] Hardware name: GIGABYTE R281-T91-00/MT91-FS1-00, BIOS F06 09/25/2018
+> [  463.718982][ T5040] pstate: 60400009 (nZCv daif +PAN -UAO)
+> [  463.718995][ T5040] pc : virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
+> [  463.718999][ T5040] lr : virtio_transport_recv_pkt+0x1fc/0xd40 [vmw_vsock_virtio_transport_common]
+> [  463.719000][ T5040] sp : ffff80002dbe3c40
+> [...]
+> [  463.719025][ T5040] Call trace:
+> [  463.719030][ T5040]  virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
+> [  463.719034][ T5040]  vhost_vsock_handle_tx_kick+0x360/0x408 [vhost_vsock]
+> [  463.719041][ T5040]  vhost_worker+0x100/0x1a0 [vhost]
+> [  463.719048][ T5040]  kthread+0x128/0x130
+> [  463.719052][ T5040]  ret_from_fork+0x10/0x18
+> 
+> The race condition as follows:
+> Task1                            Task2
+> =====                            =====
+> __sock_release                   virtio_transport_recv_pkt
+>   __vsock_release                  vsock_find_bound_socket (found)
+>     lock_sock_nested
+>     vsock_remove_sock
+>     sock_orphan
+>       sk_set_socket(sk, NULL)
+>     ...
+>     release_sock
+>                                 lock_sock
+>                                    virtio_transport_recv_connecting
+>                                      sk->sk_socket->state (panic)
+> 
+> This fixes it by checking vsk again whether it is in bound/connected table.
+> 
+> Signed-off-by: Jia He <justin.he@arm.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 69efc891885f..0dbd6a45f0ed 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -1132,6 +1132,17 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+>  
+>  	lock_sock(sk);
+>  
+> +	/* Check it again if vsk is removed by vsock_remove_sock */
+> +	spin_lock_bh(&vsock_table_lock);
+> +	if (!__vsock_in_bound_table(vsk) && !__vsock_in_connected_table(vsk)) {
+> +		spin_unlock_bh(&vsock_table_lock);
+> +		(void)virtio_transport_reset_no_sock(t, pkt);
+> +		release_sock(sk);
+> +		sock_put(sk);
+> +		goto free_pkt;
+> +	}
+> +	spin_unlock_bh(&vsock_table_lock);
+> +
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- .../selftests/kvm/x86_64/hyperv_cpuid.c       | 103 ++++++++++--------
- 1 file changed, 56 insertions(+), 47 deletions(-)
+As an a simpler alternative, can we check the sk_shutdown or the socket
+state without check again both bound and connected tables?
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-index 83323f3d7ca0..4a7967cca281 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-@@ -26,18 +26,18 @@ static void guest_code(void)
- {
- }
- 
--static int smt_possible(void)
-+static bool smt_possible(void)
- {
- 	char buf[16];
- 	FILE *f;
--	bool res = 1;
-+	bool res = true;
- 
- 	f = fopen("/sys/devices/system/cpu/smt/control", "r");
- 	if (f) {
- 		if (fread(buf, sizeof(*buf), sizeof(buf), f) > 0) {
- 			if (!strncmp(buf, "forceoff", 8) ||
- 			    !strncmp(buf, "notsupported", 12))
--				res = 0;
-+				res = false;
- 		}
- 		fclose(f);
- 	}
-@@ -46,29 +46,31 @@ static int smt_possible(void)
- }
- 
- static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
--			  int evmcs_enabled)
-+			  bool evmcs_enabled)
- {
- 	int i;
-+	int nent = 9;
-+	u32 test_val;
- 
--	if (!evmcs_enabled)
--		TEST_ASSERT(hv_cpuid_entries->nent == 6,
--			    "KVM_GET_SUPPORTED_HV_CPUID should return 6 entries"
--			    " when Enlightened VMCS is disabled (returned %d)",
--			    hv_cpuid_entries->nent);
--	else
--		TEST_ASSERT(hv_cpuid_entries->nent == 7,
--			    "KVM_GET_SUPPORTED_HV_CPUID should return 7 entries"
--			    " when Enlightened VMCS is enabled (returned %d)",
--			    hv_cpuid_entries->nent);
-+	if (evmcs_enabled)
-+		nent += 1; /* 0x4000000A */
-+
-+	TEST_ASSERT(hv_cpuid_entries->nent == nent,
-+		    "KVM_GET_SUPPORTED_HV_CPUID should return %d entries"
-+		    " with evmcs=%d (returned %d)",
-+		    nent, evmcs_enabled, hv_cpuid_entries->nent);
- 
- 	for (i = 0; i < hv_cpuid_entries->nent; i++) {
- 		struct kvm_cpuid_entry2 *entry = &hv_cpuid_entries->entries[i];
- 
- 		TEST_ASSERT((entry->function >= 0x40000000) &&
--			    (entry->function <= 0x4000000A),
-+			    (entry->function <= 0x40000082),
- 			    "function %x is our of supported range",
- 			    entry->function);
- 
-+		TEST_ASSERT(evmcs_enabled || (entry->function != 0x4000000A),
-+			    "0x4000000A leaf should not be reported");
-+
- 		TEST_ASSERT(entry->index == 0,
- 			    ".index field should be zero");
- 
-@@ -78,12 +80,23 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
- 		TEST_ASSERT(!entry->padding[0] && !entry->padding[1] &&
- 			    !entry->padding[2], "padding should be zero");
- 
--		if (entry->function == 0x40000004) {
--			int nononarchcs = !!(entry->eax & (1UL << 18));
-+		switch (entry->function) {
-+		case 0x40000000:
-+			test_val = 0x40000082;
- 
--			TEST_ASSERT(nononarchcs == !smt_possible(),
-+			TEST_ASSERT(entry->eax == test_val,
-+				    "Wrong max leaf report in 0x40000000.EAX: %x"
-+				    " (evmcs=%d)",
-+				    entry->eax, evmcs_enabled
-+				);
-+			break;
-+		case 0x40000004:
-+			test_val = entry->eax & (1UL << 18);
-+
-+			TEST_ASSERT(!!test_val == !smt_possible(),
- 				    "NoNonArchitecturalCoreSharing bit"
- 				    " doesn't reflect SMT setting");
-+			break;
- 		}
- 
- 		/*
-@@ -133,8 +146,9 @@ struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(struct kvm_vm *vm)
- int main(int argc, char *argv[])
- {
- 	struct kvm_vm *vm;
--	int rv;
-+	int rv, stage;
- 	struct kvm_cpuid2 *hv_cpuid_entries;
-+	bool evmcs_enabled;
- 
- 	/* Tell stdout not to buffer its content */
- 	setbuf(stdout, NULL);
-@@ -145,36 +159,31 @@ int main(int argc, char *argv[])
- 		exit(KSFT_SKIP);
- 	}
- 
--	/* Create VM */
--	vm = vm_create_default(VCPU_ID, 0, guest_code);
--
--	test_hv_cpuid_e2big(vm);
--
--	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
--	if (!hv_cpuid_entries)
--		return 1;
--
--	test_hv_cpuid(hv_cpuid_entries, 0);
--
--	free(hv_cpuid_entries);
-+	for (stage = 0; stage < 3; stage++) {
-+		evmcs_enabled = false;
-+
-+		vm = vm_create_default(VCPU_ID, 0, guest_code);
-+		switch (stage) {
-+		case 0:
-+			test_hv_cpuid_e2big(vm);
-+			continue;
-+		case 1:
-+			break;
-+		case 2:
-+			if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
-+				print_skip("Enlightened VMCS is unsupported");
-+				continue;
-+			}
-+			vcpu_enable_evmcs(vm, VCPU_ID);
-+			evmcs_enabled = true;
-+			break;
-+		}
- 
--	if (!kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
--		print_skip("Enlightened VMCS is unsupported");
--		goto vm_free;
-+		hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
-+		test_hv_cpuid(hv_cpuid_entries, evmcs_enabled);
-+		free(hv_cpuid_entries);
-+		kvm_vm_free(vm);
- 	}
- 
--	vcpu_enable_evmcs(vm, VCPU_ID);
--
--	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
--	if (!hv_cpuid_entries)
--		return 1;
--
--	test_hv_cpuid(hv_cpuid_entries, 1);
--
--	free(hv_cpuid_entries);
--
--vm_free:
--	kvm_vm_free(vm);
--
- 	return 0;
- }
--- 
-2.24.1
+This is a data path, so we should take it faster.
+
+I mean something like this:
+
+	if (sk->sk_shutdown == SHUTDOWN_MASK) {
+		...
+	}
+
+or
+
+	if (sock_flag(sk, SOCK_DEAD)) {
+		...
+	}
+
+I prefer the first option, but I think also the second option should
+work.
+
+Thanks,
+Stefano
+
+>  	/* Update CID in case it has changed after a transport reset event */
+>  	vsk->local_addr.svm_cid = dst.svm_cid;
+>  
+> -- 
+> 2.17.1
+> 
 
