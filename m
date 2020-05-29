@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29ED71E78F8
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:03:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48CB61E7900
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:05:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbgE2JDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 05:03:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47186 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725790AbgE2JDw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 05:03:52 -0400
+        id S1726579AbgE2JFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 05:05:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25745 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725971AbgE2JFX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 05:05:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590743030;
+        s=mimecast20190719; t=1590743122;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=naQYmC0gxQ8OHJgIbB7LClKCK1MMSYkhwGitHp7AcpI=;
-        b=f6yFqG071E4j3qDWZKqz4EjX50tIqlwAfEn24PS2AX5mKDdr7mgBF7PYDu5Gwd0wDwYwbb
-        IJpHKijTaBDFVGdaBp2lpvVuO0Ym4rCBSrl8RB1EN12elMcz64PHEJ9JKXmqkYztKTg4oN
-        eXozfcJ83a6P6NWJKdE39Soug3sBv6w=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-un6fyTi5M2yZAB6k_uLOcA-1; Fri, 29 May 2020 05:03:48 -0400
-X-MC-Unique: un6fyTi5M2yZAB6k_uLOcA-1
-Received: by mail-wr1-f72.google.com with SMTP id 3so777993wrs.10
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:03:48 -0700 (PDT)
+        bh=24UnZud1dS9MlmJH790ihCYOiVC6o2UeJxwgc3IzbaU=;
+        b=Goccg8wCS2zNfIi9bzUR93GXkpCwf5fHQPOqXuRp3kpDhU6mxScru5EZEBFB+seoIEn28m
+        +pS+3lJEj3huBKIbubum0zkZBRz0E9cIpJ38F4iNgikrdZcHhYprxIneT3jDxV746TKGID
+        ARfvoN9dHkPfbP4Lji53tkosa2MBQwg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-bB1mT3c5MBiGQFDLupHkgA-1; Fri, 29 May 2020 05:05:20 -0400
+X-MC-Unique: bB1mT3c5MBiGQFDLupHkgA-1
+Received: by mail-wm1-f69.google.com with SMTP id u11so433563wmc.7
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:05:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=naQYmC0gxQ8OHJgIbB7LClKCK1MMSYkhwGitHp7AcpI=;
-        b=iloDfugU9nNif2SFx3kJPWrg2Q3VNqbPC7DuwuBVap7cV/p95/U6D7zcziA89rPci0
-         NEAaj2ZwY6XAXeQYStJyZFhQ6Z4ZcoAf8Z30LZ18AZq+tkFlaouFy2uqWpoDm3rb3cyk
-         /LMhG0jpQRai8S7PWyMVqbsv+DoXKaHXcZbfGXTPIJ7dFmHH0v/LMbWfMGYVpOdTyVV+
-         aYY5LY1H/QE4wcdtl/0Ax4s7Ty2e0TjWXzzqVer6mv+cisMg/JFX22Z8bST0/LNGqnmK
-         FBhZ0F/5hEl3xFskO9MEvnZ3nEFWoXv8V180goRL4E3kJVD7+sBNMUjdJ53R8XtfPHcg
-         aOEQ==
-X-Gm-Message-State: AOAM530W/drXdlVQrKw5o9R/5pLor6Pc6ldPsTfMF4df6foy9TeKug0M
-        layvAcqnAzgFBjKSytrtcELNxMJfeHcyiP6/D2VZOmhZxdEZO3Xlu8UXL/2GcvH+IwaOTGxcpGR
-        eCmLMyGvshGK0
-X-Received: by 2002:a5d:4008:: with SMTP id n8mr7492690wrp.82.1590743027321;
-        Fri, 29 May 2020 02:03:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx4/zoE02cbZMsJJWKYfDHXKSXsqs52R/ZdT34PIKamzk+2Jwo0OhPmf2WgXA9EvKx9PpA9Qg==
-X-Received: by 2002:a5d:4008:: with SMTP id n8mr7492676wrp.82.1590743027119;
-        Fri, 29 May 2020 02:03:47 -0700 (PDT)
+        bh=24UnZud1dS9MlmJH790ihCYOiVC6o2UeJxwgc3IzbaU=;
+        b=sO6sLimCmViIZXKfR8cRhOzyvxtXi05IT4yjJ6IHYBJ8TaP2rL7dX+gw3CramCRH/i
+         kGOI7Vb/Pd1NvNp7j7OclzoUEj7jWViAgQsgNEU8x5fmHnEJI7XMj/lFeRTZLmONI/UB
+         wwpGOqKO4R5HrrSdThIaKEq8G0bjckvDehj3/uWb96Ot0px0YG5A6mulAF82n815x0GP
+         9c8Myf17UYwSmKnA+2+aylq5HtrhOYzUMgWKvAj738J6yp3leFlVUKoxhPEPwyUPZgV8
+         zzC4L4McItjKybxmS598HCzrGSiJ4Fd67UqcIl2y6kP9vPfhXWVTxVN0ytkV54XB1i2E
+         mEcg==
+X-Gm-Message-State: AOAM533OIFkQnywr98ZqF0L+AEUGUNRiBNRRkDXCWLaH8i4QzDuDRR4Z
+        U5orAp2ab9Ip6PPC2bKxe+cxkcS/FZCTLI/5PzQWuqHPhCgWbPZNcbIyFk9hB52oBfNl18vuZSV
+        4ExLuFbk0ItBo
+X-Received: by 2002:a05:600c:2256:: with SMTP id a22mr7368926wmm.18.1590743118745;
+        Fri, 29 May 2020 02:05:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/9MCcpOwVWZqjJ374KFfRtwh7OtaAxvN47bAxtR3NW2kIykKHyL+5ppqNmSWlEn8VEbxQxA==
+X-Received: by 2002:a05:600c:2256:: with SMTP id a22mr7368916wmm.18.1590743118595;
+        Fri, 29 May 2020 02:05:18 -0700 (PDT)
 Received: from [192.168.1.34] (43.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.43])
-        by smtp.gmail.com with ESMTPSA id d17sm8606539wrg.75.2020.05.29.02.03.45
+        by smtp.gmail.com with ESMTPSA id 5sm9739133wmd.19.2020.05.29.02.05.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 02:03:46 -0700 (PDT)
-Subject: Re: [RFC v2 02/18] target/i386: sev: Move local structure definitions
- into .c file
+        Fri, 29 May 2020 02:05:18 -0700 (PDT)
+Subject: Re: [RFC v2 03/18] target/i386: sev: Rename QSevGuestInfo
 To:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
         brijesh.singh@amd.com, frankja@linux.ibm.com, dgilbert@redhat.com,
         pair@us.ibm.com
@@ -62,7 +61,7 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <rth@twiddle.net>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-3-david@gibson.dropbear.id.au>
+ <20200521034304.340040-4-david@gibson.dropbear.id.au>
 From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -87,12 +86,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <45133315-1e1e-e13c-a8df-6a9d972c90a1@redhat.com>
-Date:   Fri, 29 May 2020 11:03:44 +0200
+Message-ID: <7d230494-5f85-bc9a-739a-08eef2ec3a0a@redhat.com>
+Date:   Fri, 29 May 2020 11:05:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200521034304.340040-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20200521034304.340040-4-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -102,15 +101,17 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 5/21/20 5:42 AM, David Gibson wrote:
-> Neither QSevGuestInfo nor SEVState (not to be confused with SevState) is
-> used anywhere outside target/i386/sev.c, so they might as well live in
-> there rather than in a (somewhat) exposed header.
+> At the moment this is a purely passive object which is just a container for
+> information used elsewhere, hence the name.  I'm going to change that
+> though, so as a preliminary rename it to SevGuestState.
+> 
+> That name risks confusion with both SEVState and SevState, but I'll be
+> working on that in following patches.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  target/i386/sev.c      | 44 ++++++++++++++++++++++++++++++++++++++++++
->  target/i386/sev_i386.h | 44 ------------------------------------------
->  2 files changed, 44 insertions(+), 44 deletions(-)
+>  target/i386/sev.c | 87 ++++++++++++++++++++++++-----------------------
+>  1 file changed, 44 insertions(+), 43 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
