@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2A8E1E7755
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 09:45:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B6641E7758
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 09:45:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726495AbgE2Ho3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 03:44:29 -0400
+        id S1726788AbgE2Hof (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 03:44:35 -0400
 Received: from mga03.intel.com ([134.134.136.65]:51936 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725993AbgE2Ho1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 03:44:27 -0400
-IronPort-SDR: hvTpKnSu74pybBIp02AnPKKOmjqxfqhLHWdKDHH+Ly37CUYNsvjuzsfgLNcIxaKuPDbL7yS4Qo
- EwCSKDpDGo3A==
+        id S1726593AbgE2Hob (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 03:44:31 -0400
+IronPort-SDR: +80ku7H/44UC6FoYahamMgcy9OO7nS7NcKb8KspMvRI/3qsQpYmjiMnQN1pCh/RRarldNv9Uvi
+ 2cvxkAoVDZuA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2020 00:44:27 -0700
-IronPort-SDR: O8WseacqUy0Gp1w9+qH+MC0ZHhxoCfuwxus1BxVqNhkuy2tf0fBxNiazjqn35PlAIBQ/s5/s5/
- sbwzGkHTmAAA==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2020 00:44:29 -0700
+IronPort-SDR: kh8e1JaVGwo3U0lQvu22yLYJ6sIVTXL0BH5pKwMsSYsUcCgVzPRcNvw/e+sglNAjosJtqxSsfk
+ WQdMbHlb3wVA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,447,1583222400"; 
-   d="scan'208";a="302754543"
+   d="scan'208";a="302754553"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by fmsmga002.fm.intel.com with ESMTP; 29 May 2020 00:44:25 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 29 May 2020 00:44:27 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -32,237 +32,280 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH RESEND v4 2/2] KVM: x86/pmu: Support full width counting
-Date:   Fri, 29 May 2020 15:43:45 +0800
-Message-Id: <20200529074347.124619-3-like.xu@linux.intel.com>
+Subject: [kvm-unit-tests PATCH] x86: pmu: Test full-width counter writes support
+Date:   Fri, 29 May 2020 15:43:46 +0800
+Message-Id: <20200529074347.124619-4-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200529074347.124619-1-like.xu@linux.intel.com>
 References: <20200529074347.124619-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Intel CPUs have a new alternative MSR range (starting from MSR_IA32_PMC0)
-for GP counters that allows writing the full counter width. Enable this
-range from a new capability bit (IA32_PERF_CAPABILITIES.FW_WRITE[bit 13]).
-
-The guest would query CPUID to get the counter width, and sign extends
-the counter values as needed. The traditional MSRs always limit to 32bit,
-even though the counter internally is larger (48 or 57 bits).
-
-When the new capability is set, use the alternative range which do not
-have these restrictions. This lowers the overhead of perf stat slightly
-because it has to do less interrupts to accumulate the counter value.
+When the full-width writes capability is set, use the alternative MSR
+range to write larger sign counter values (up to GP counter width).
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/cpuid.c            |  2 +-
- arch/x86/kvm/vmx/capabilities.h | 11 +++++++
- arch/x86/kvm/vmx/pmu_intel.c    | 52 ++++++++++++++++++++++++++++++---
- arch/x86/kvm/vmx/vmx.c          |  3 ++
- arch/x86/kvm/x86.c              |  2 ++
- 6 files changed, 66 insertions(+), 5 deletions(-)
+ lib/x86/msr.h |   1 +
+ x86/pmu.c     | 125 ++++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 102 insertions(+), 24 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3485f8454088..452e1bfea4c1 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -600,6 +600,7 @@ struct kvm_vcpu_arch {
- 	u64 ia32_xss;
- 	u64 microcode_version;
- 	u64 arch_capabilities;
-+	u64 perf_capabilities;
+diff --git a/lib/x86/msr.h b/lib/x86/msr.h
+index 8dca964..6ef5502 100644
+--- a/lib/x86/msr.h
++++ b/lib/x86/msr.h
+@@ -35,6 +35,7 @@
+ #define MSR_IA32_SPEC_CTRL              0x00000048
+ #define MSR_IA32_PRED_CMD               0x00000049
  
- 	/*
- 	 * Paging state of the vcpu
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index cd708b0b460a..9d781308b872 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -296,7 +296,7 @@ void kvm_set_cpu_caps(void)
- 		F(XMM3) | F(PCLMULQDQ) | 0 /* DTES64, MONITOR */ |
- 		0 /* DS-CPL, VMX, SMX, EST */ |
- 		0 /* TM2 */ | F(SSSE3) | 0 /* CNXT-ID */ | 0 /* Reserved */ |
--		F(FMA) | F(CX16) | 0 /* xTPR Update, PDCM */ |
-+		F(FMA) | F(CX16) | 0 /* xTPR Update */ | F(PDCM) |
- 		F(PCID) | 0 /* Reserved, DCA */ | F(XMM4_1) |
- 		F(XMM4_2) | F(X2APIC) | F(MOVBE) | F(POPCNT) |
- 		0 /* Reserved*/ | F(AES) | F(XSAVE) | 0 /* OSXSAVE */ | F(AVX) |
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 8903475f751e..4bbd8b448d22 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -18,6 +18,8 @@ extern int __read_mostly pt_mode;
- #define PT_MODE_SYSTEM		0
- #define PT_MODE_HOST_GUEST	1
- 
-+#define PMU_CAP_FW_WRITES	(1ULL << 13)
-+
- struct nested_vmx_msrs {
- 	/*
- 	 * We only store the "true" versions of the VMX capability MSRs. We
-@@ -367,4 +369,13 @@ static inline bool vmx_pt_mode_is_host_guest(void)
- 	return pt_mode == PT_MODE_HOST_GUEST;
- }
- 
-+static inline u64 vmx_get_perf_capabilities(void)
-+{
-+	/*
-+	 * Since counters are virtualized, KVM would support full
-+	 * width counting unconditionally, even if the host lacks it.
-+	 */
-+	return PMU_CAP_FW_WRITES;
-+}
-+
- #endif /* __KVM_X86_VMX_CAPS_H */
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index e1a303fefc16..d33d890b605f 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -18,6 +18,8 @@
- #include "nested.h"
- #include "pmu.h"
- 
-+#define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
-+
- static struct kvm_event_hw_type_mapping intel_arch_events[] = {
- 	/* Index must match CPUID 0x0A.EBX bit vector */
- 	[0] = { 0x3c, 0x00, PERF_COUNT_HW_CPU_CYCLES },
-@@ -150,6 +152,22 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
- 	return &counters[array_index_nospec(idx, num_counters)];
- }
- 
-+static inline bool fw_writes_is_enabled(struct kvm_vcpu *vcpu)
-+{
-+	if (!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-+		return false;
-+
-+	return vcpu->arch.perf_capabilities & PMU_CAP_FW_WRITES;
-+}
-+
-+static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
-+{
-+	if (!fw_writes_is_enabled(pmu_to_vcpu(pmu)))
-+		return NULL;
-+
-+	return get_gp_pmc(pmu, msr, MSR_IA32_PMC0);
-+}
-+
- static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-@@ -162,10 +180,13 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
- 		ret = pmu->version > 1;
- 		break;
-+	case MSR_IA32_PERF_CAPABILITIES:
-+		ret = guest_cpuid_has(vcpu, X86_FEATURE_PDCM);
-+		break;
- 	default:
- 		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
- 			get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0) ||
--			get_fixed_pmc(pmu, msr);
-+			get_fixed_pmc(pmu, msr) || get_fw_gp_pmc(pmu, msr);
- 		break;
- 	}
- 
-@@ -203,8 +224,15 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
- 		msr_info->data = pmu->global_ovf_ctrl;
- 		return 0;
-+	case MSR_IA32_PERF_CAPABILITIES:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-+			return 1;
-+		msr_info->data = vcpu->arch.perf_capabilities;
-+		return 0;
- 	default:
--		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
-+		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
-+		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
- 			u64 val = pmc_read_counter(pmc);
- 			msr_info->data =
- 				val & pmu->counter_bitmask[KVM_PMC_GP];
-@@ -261,9 +289,22 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 0;
- 		}
- 		break;
-+	case MSR_IA32_PERF_CAPABILITIES:
-+		if (!msr_info->host_initiated)
-+			return 1;
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM) ?
-+			(data & ~vmx_get_perf_capabilities()) : data)
-+			return 1;
-+		vcpu->arch.perf_capabilities = data;
-+		return 0;
- 	default:
--		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
--			if (!msr_info->host_initiated)
-+		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
-+		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-+			if ((msr & MSR_PMC_FULL_WIDTH_BIT) &&
-+			    (data & ~pmu->counter_bitmask[KVM_PMC_GP]))
-+				return 1;
-+			if (!msr_info->host_initiated &&
-+			    !(msr & MSR_PMC_FULL_WIDTH_BIT))
- 				data = (s64)(s32)data;
- 			pmc->counter += data - pmc_read_counter(pmc);
- 			if (pmc->perf_event)
-@@ -303,6 +344,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
- 	pmu->version = 0;
- 	pmu->reserved_bits = 0xffffffff00200000ull;
-+	vcpu->arch.perf_capabilities = 0;
- 
- 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
- 	if (!entry)
-@@ -315,6 +357,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	perf_get_x86_pmu_capability(&x86_pmu);
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-+		vcpu->arch.perf_capabilities = vmx_get_perf_capabilities();
- 
- 	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
- 					 x86_pmu.num_counters_gp);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 7b55dc6230a9..d5b7c3b55ae4 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1788,6 +1788,9 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
- 		if (!nested)
- 			return 1;
- 		return vmx_get_vmx_msr(&vmcs_config.nested, msr->index, &msr->data);
-+	case MSR_IA32_PERF_CAPABILITIES:
-+		msr->data = vmx_get_perf_capabilities();
-+		return 0;
- 	default:
- 		return 1;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9f77776f1479..791d5955d1b8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1253,6 +1253,7 @@ static const u32 emulated_msrs_all[] = {
- 	MSR_IA32_TSC_ADJUST,
- 	MSR_IA32_TSCDEADLINE,
- 	MSR_IA32_ARCH_CAPABILITIES,
-+	MSR_IA32_PERF_CAPABILITIES,
- 	MSR_IA32_MISC_ENABLE,
- 	MSR_IA32_MCG_STATUS,
- 	MSR_IA32_MCG_CTL,
-@@ -1319,6 +1320,7 @@ static const u32 msr_based_features_all[] = {
- 	MSR_F10H_DECFG,
- 	MSR_IA32_UCODE_REV,
- 	MSR_IA32_ARCH_CAPABILITIES,
-+	MSR_IA32_PERF_CAPABILITIES,
++#define MSR_IA32_PMC0                  0x000004c1
+ #define MSR_IA32_PERFCTR0		0x000000c1
+ #define MSR_IA32_PERFCTR1		0x000000c2
+ #define MSR_FSB_FREQ			0x000000cd
+diff --git a/x86/pmu.c b/x86/pmu.c
+index f45621a..fb9bf0a 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -91,6 +91,9 @@ struct pmu_event {
+ 	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
  };
  
- static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
++#define PMU_CAP_FW_WRITES	(1ULL << 13)
++static u64 gp_counter_base = MSR_IA32_PERFCTR0;
++
+ static int num_counters;
+ 
+ char *buf;
+@@ -125,12 +128,13 @@ static bool check_irq(void)
+ 
+ static bool is_gp(pmu_counter_t *evt)
+ {
+-	return evt->ctr < MSR_CORE_PERF_FIXED_CTR0;
++	return evt->ctr < MSR_CORE_PERF_FIXED_CTR0 ||
++		evt->ctr >= MSR_IA32_PMC0;
+ }
+ 
+ static int event_to_global_idx(pmu_counter_t *cnt)
+ {
+-	return cnt->ctr - (is_gp(cnt) ? MSR_IA32_PERFCTR0 :
++	return cnt->ctr - (is_gp(cnt) ? gp_counter_base :
+ 		(MSR_CORE_PERF_FIXED_CTR0 - FIXED_CNT_INDEX));
+ }
+ 
+@@ -226,7 +230,7 @@ static bool verify_counter(pmu_counter_t *cnt)
+ static void check_gp_counter(struct pmu_event *evt)
+ {
+ 	pmu_counter_t cnt = {
+-		.ctr = MSR_IA32_PERFCTR0,
++		.ctr = gp_counter_base,
+ 		.config = EVNTSEL_OS | EVNTSEL_USR | evt->unit_sel,
+ 	};
+ 	int i;
+@@ -276,7 +280,7 @@ static void check_counters_many(void)
+ 			continue;
+ 
+ 		cnt[n].count = 0;
+-		cnt[n].ctr = MSR_IA32_PERFCTR0 + n;
++		cnt[n].ctr = gp_counter_base + n;
+ 		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR |
+ 			gp_events[i % ARRAY_SIZE(gp_events)].unit_sel;
+ 		n++;
+@@ -302,7 +306,7 @@ static void check_counter_overflow(void)
+ 	uint64_t count;
+ 	int i;
+ 	pmu_counter_t cnt = {
+-		.ctr = MSR_IA32_PERFCTR0,
++		.ctr = gp_counter_base,
+ 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
+ 		.count = 0,
+ 	};
+@@ -319,6 +323,8 @@ static void check_counter_overflow(void)
+ 		int idx;
+ 
+ 		cnt.count = 1 - count;
++		if (gp_counter_base == MSR_IA32_PMC0)
++			cnt.count &= (1ul << eax.split.bit_width) - 1;
+ 
+ 		if (i == num_counters) {
+ 			cnt.ctr = fixed_events[0].unit_sel;
+@@ -346,7 +352,7 @@ static void check_counter_overflow(void)
+ static void check_gp_counter_cmask(void)
+ {
+ 	pmu_counter_t cnt = {
+-		.ctr = MSR_IA32_PERFCTR0,
++		.ctr = gp_counter_base,
+ 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
+ 		.count = 0,
+ 	};
+@@ -369,7 +375,7 @@ static void do_rdpmc_fast(void *ptr)
+ 
+ static void check_rdpmc(void)
+ {
+-	uint64_t val = 0x1f3456789ull;
++	uint64_t val = 0xff0123456789ull;
+ 	bool exc;
+ 	int i;
+ 
+@@ -378,20 +384,23 @@ static void check_rdpmc(void)
+ 	for (i = 0; i < num_counters; i++) {
+ 		uint64_t x;
+ 		pmu_counter_t cnt = {
+-			.ctr = MSR_IA32_PERFCTR0 + i,
++			.ctr = gp_counter_base + i,
+ 			.idx = i
+ 		};
+ 
+-		/*
+-		 * Only the low 32 bits are writable, and the value is
+-		 * sign-extended.
+-		 */
+-		x = (uint64_t)(int64_t)(int32_t)val;
++	        /*
++	         * Without full-width writes, only the low 32 bits are writable,
++	         * and the value is sign-extended.
++	         */
++		if (gp_counter_base == MSR_IA32_PERFCTR0)
++			x = (uint64_t)(int64_t)(int32_t)val;
++		else
++			x = (uint64_t)(int64_t)val;
+ 
+ 		/* Mask according to the number of supported bits */
+ 		x &= (1ull << eax.split.bit_width) - 1;
+ 
+-		wrmsr(MSR_IA32_PERFCTR0 + i, val);
++		wrmsr(gp_counter_base + i, val);
+ 		report(rdpmc(i) == x, "cntr-%d", i);
+ 
+ 		exc = test_for_exception(GP_VECTOR, do_rdpmc_fast, &cnt);
+@@ -423,8 +432,9 @@ static void check_rdpmc(void)
+ static void check_running_counter_wrmsr(void)
+ {
+ 	uint64_t status;
++	uint64_t count;
+ 	pmu_counter_t evt = {
+-		.ctr = MSR_IA32_PERFCTR0,
++		.ctr = gp_counter_base,
+ 		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
+ 		.count = 0,
+ 	};
+@@ -433,7 +443,7 @@ static void check_running_counter_wrmsr(void)
+ 
+ 	start_event(&evt);
+ 	loop();
+-	wrmsr(MSR_IA32_PERFCTR0, 0);
++	wrmsr(gp_counter_base, 0);
+ 	stop_event(&evt);
+ 	report(evt.count < gp_events[1].min, "cntr");
+ 
+@@ -443,7 +453,13 @@ static void check_running_counter_wrmsr(void)
+ 
+ 	evt.count = 0;
+ 	start_event(&evt);
+-	wrmsr(MSR_IA32_PERFCTR0, -1);
++
++	count = -1;
++	if (gp_counter_base == MSR_IA32_PMC0)
++		count &= (1ul << eax.split.bit_width) - 1;
++
++	wrmsr(gp_counter_base, count);
++
+ 	loop();
+ 	stop_event(&evt);
+ 	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
+@@ -452,6 +468,66 @@ static void check_running_counter_wrmsr(void)
+ 	report_prefix_pop();
+ }
+ 
++static void check_counters(void)
++{
++	check_gp_counters();
++	check_fixed_counters();
++	check_rdpmc();
++	check_counters_many();
++	check_counter_overflow();
++	check_gp_counter_cmask();
++	check_running_counter_wrmsr();
++}
++
++static void do_unsupported_width_counter_write(void *index)
++{
++	wrmsr(MSR_IA32_PMC0 + *((int *) index), 0xffffff0123456789ull);
++}
++
++static void  check_gp_counters_write_width(void)
++{
++	u64 val_64 = 0xffffff0123456789ull;
++	u64 val_32 = val_64 & ((1ul << 32) - 1);
++	u64 val_max_width = val_64 & ((1ul << eax.split.bit_width) - 1);
++	int i;
++
++	/*
++	 * MSR_IA32_PERFCTRn supports 64-bit writes,
++	 * but only the lowest 32 bits are valid.
++	 */
++	for (i = 0; i < num_counters; i++) {
++		wrmsr(MSR_IA32_PERFCTR0 + i, val_32);
++		assert(rdmsr(MSR_IA32_PERFCTR0 + i) == val_32);
++		assert(rdmsr(MSR_IA32_PMC0 + i) == val_32);
++
++		wrmsr(MSR_IA32_PERFCTR0 + i, val_max_width);
++		assert(rdmsr(MSR_IA32_PERFCTR0 + i) == val_32);
++		assert(rdmsr(MSR_IA32_PMC0 + i) == val_32);
++
++		wrmsr(MSR_IA32_PERFCTR0 + i, val_64);
++		assert(rdmsr(MSR_IA32_PERFCTR0 + i) == val_32);
++		assert(rdmsr(MSR_IA32_PMC0 + i) == val_32);
++	}
++
++	/*
++	 * MSR_IA32_PMCn supports writing values â€‹â€‹up to GP counter width,
++	 * and only the lowest bits of GP counter width are valid.
++	 */
++	for (i = 0; i < num_counters; i++) {
++		wrmsr(MSR_IA32_PMC0 + i, val_32);
++		assert(rdmsr(MSR_IA32_PMC0 + i) == val_32);
++		assert(rdmsr(MSR_IA32_PERFCTR0 + i) == val_32);
++
++		wrmsr(MSR_IA32_PMC0 + i, val_max_width);
++		assert(rdmsr(MSR_IA32_PMC0 + i) == val_max_width);
++		assert(rdmsr(MSR_IA32_PERFCTR0 + i) == val_max_width);
++
++		report(test_for_exception(GP_VECTOR,
++			do_unsupported_width_counter_write, &i),
++		"writing unsupported width to MSR_IA32_PMC%d raises #GP", i);
++	}
++}
++
+ int main(int ac, char **av)
+ {
+ 	struct cpuid id = cpuid(10);
+@@ -480,13 +556,14 @@ int main(int ac, char **av)
+ 
+ 	apic_write(APIC_LVTPC, PC_VECTOR);
+ 
+-	check_gp_counters();
+-	check_fixed_counters();
+-	check_rdpmc();
+-	check_counters_many();
+-	check_counter_overflow();
+-	check_gp_counter_cmask();
+-	check_running_counter_wrmsr();
++	check_counters();
++
++	if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
++		gp_counter_base = MSR_IA32_PMC0;
++		report_prefix_push("full-width writes");
++		check_counters();
++		check_gp_counters_write_width();
++	}
+ 
+ 	return report_summary();
+ }
 -- 
 2.21.3
 
