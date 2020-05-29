@@ -2,111 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FBB21E79C0
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:48:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B59F51E79D7
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:50:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726812AbgE2JsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 05:48:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44248 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726793AbgE2JsU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 05:48:20 -0400
+        id S1725901AbgE2Ju3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 05:50:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52444 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725306AbgE2Ju2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 05:50:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590745698;
+        s=mimecast20190719; t=1590745827;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f6w/D95eveaUv1V0PC/H4Q2Slese/OFGRios5LqI3Lo=;
-        b=NNRa75Reo0T7n96yVI7Ok3mL2czI6H/WaO65i3c7Hs/IqF4hu+vcux7YQq8i2UZeTrqPSN
-        pE4AEGRULLd1W7LzhH5NR4Wy7/dY8dqCokBLFNTIzIaDPEakwm21vZX2gtb98FZx4MobdT
-        SC8vWa6WPCTVpXrVLL0jnNssyOr3UyM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-soPh1QOuMVaVxbw-W673OQ-1; Fri, 29 May 2020 05:48:17 -0400
-X-MC-Unique: soPh1QOuMVaVxbw-W673OQ-1
-Received: by mail-wm1-f72.google.com with SMTP id f62so580030wme.3
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:48:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=f6w/D95eveaUv1V0PC/H4Q2Slese/OFGRios5LqI3Lo=;
-        b=J39lG/JNYI9B3t5E6uSQnACyxvkf/oRKn3pSbOiHP6E1gyBCkkWYsURydUKFAiRAOw
-         KQdreOUyGHWhcD08QaBiG5m7EXa7phjGVls0s/6c2YnpkSWIk91wd19Sm2G+opZXytrd
-         p/UVO9Y25XA8saVaD+fnSGVZteQ2lxthxWCLtIbVDNL8ARjhU4ncoaz2bJXJ90wHyv1D
-         2o5qlpGM5iuR3UAvx4vn/Dnml587dwWyi+r1mt8xmrCgZNMNxnINzrTFqW+vrRR8EbvG
-         LI3SJAfXiGmv8XbfR9atWCHznEEOIuAYQFT8cII2DPLXMtb3gITt+ePsZ+m1eZkNBOWD
-         eEJQ==
-X-Gm-Message-State: AOAM5305qW2CiO8H5A8Lspk9yqZ6WG4B0eAV1ywBGDvrRuGiQhoc9xWy
-        QpxDgzPIxSBSq5SoUxAimRGuBc3qo4US5NtQtfX9Q235fEXWfxdZWu/4KKFYzuJMmNeLIyqHhx6
-        MEx2WJgQep7+k
-X-Received: by 2002:a05:6000:124e:: with SMTP id j14mr7990019wrx.154.1590745695768;
-        Fri, 29 May 2020 02:48:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwY5u800IehczM/cQdM/5qPUlY08WZ5sRKP7f3fL0jBY9tgOmWNoklBLDcXU/RONPfyNhc2eg==
-X-Received: by 2002:a05:6000:124e:: with SMTP id j14mr7990004wrx.154.1590745695574;
-        Fri, 29 May 2020 02:48:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b096:1b7:7695:e4f7? ([2001:b07:6468:f312:b096:1b7:7695:e4f7])
-        by smtp.gmail.com with ESMTPSA id k26sm10567358wmi.27.2020.05.29.02.48.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 02:48:15 -0700 (PDT)
-Subject: Re: [PATCH v4 6/7] KVM: MIPS: clean up redundant 'kvm_run' parameters
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Huacai Chen <chenhuacai@gmail.com>
-Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>, paulus@ozlabs.org,
-        mpe@ellerman.id.au,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        Thomas Gleixner <tglx@linutronix.de>, mingo@redhat.com,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org, hpa@zytor.com,
-        Marc Zyngier <maz@kernel.org>, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, Peter Xu <peterx@redhat.com>,
-        thuth@redhat.com, kvm@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
- <20200427043514.16144-7-tianjia.zhang@linux.alibaba.com>
- <CAAhV-H7kpKUfQoWid6GSNL5+4hTTroGyL83EaW6yZwS2+Ti9kA@mail.gmail.com>
- <37246a25-c4dc-7757-3f5c-d46870a4f186@linux.alibaba.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=BwHdRwrK0wPZyetUSej9ICz5eyB+NKkH6EpaQuUXYKw=;
+        b=Hw5+XGAs37wjDY5GX7JLQW7Hqv8Bx74RNHIZ6EpicC0k5wr9mZf9l/TFIX2lCDDwIOn64R
+        c3Zi3LeFqH5+gAbUf5odd413wP04NEnun4r/1tirsfbhef8OPig457qtzs1j4GeLnilHRX
+        zaObPgJtBxpqbtJmRCW/a5D+N7jMzh4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-0E_qsUF9PEGZuZMqI_yy7Q-1; Fri, 29 May 2020 05:50:25 -0400
+X-MC-Unique: 0E_qsUF9PEGZuZMqI_yy7Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFB681005512
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 09:50:24 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 664BE7A8D1;
+        Fri, 29 May 2020 09:50:24 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <30c2ac06-1a7e-2f85-fbe1-e9dc25bf2ae2@redhat.com>
-Date:   Fri, 29 May 2020 11:48:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+To:     kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH kvm-unit-tests v2] access: disable phys-bits=36 for now
+Date:   Fri, 29 May 2020 05:50:23 -0400
+Message-Id: <20200529095023.222232-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <37246a25-c4dc-7757-3f5c-d46870a4f186@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/05/20 08:24, Tianjia Zhang wrote:
->>>
->>>
-> 
-> Hi Huacai,
-> 
-> These two patches(6/7 and 7/7) should be merged into the tree of the
-> mips architecture separately. At present, there seems to be no good way
-> to merge the whole architecture patchs.
-> 
-> For this series of patches, some architectures have been merged, some
-> need to update the patch.
+Support for guest-MAXPHYADDR < host-MAXPHYADDR is not upstream yet,
+it should not be enabled.  Otherwise, all the pde.36 and pte.36
+fail and the test takes so long that it times out.
 
-Hi Tianjia, I will take care of this during the merge window.
+Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/unittests.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-
-Paolo
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index bf0d02e..504e04e 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -116,7 +116,7 @@ extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
+ [access]
+ file = access.flat
+ arch = x86_64
+-extra_params = -cpu host,phys-bits=36
++extra_params = -cpu host,host-phys-bits
+ 
+ [smap]
+ file = smap.flat
+-- 
+2.26.2
 
