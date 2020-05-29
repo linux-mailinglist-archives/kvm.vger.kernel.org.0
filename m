@@ -2,148 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64D751E81CC
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 17:28:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 961861E8249
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 17:42:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727053AbgE2P24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 11:28:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59833 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725901AbgE2P2z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 11:28:55 -0400
+        id S1727800AbgE2Pjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 11:39:40 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21780 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726838AbgE2Pjj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 11:39:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590766133;
+        s=mimecast20190719; t=1590766778;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=j3fj27W3uN/6I5026Um93rPcQiLMmVXJm0WFtCISxNo=;
-        b=Jscl4jNE3UVEn8gcB8Y+jpx8+L3FkV4ACc+kN+N29xivYK2acKuamXrh6U7favn3o7jRz7
-        Mi/iZ/pvC/AIpMxbQaxv1+x73tv3Em/H4odw/EWQG11zwuvoBhqYDgZkYYkXfa4BaRKeq1
-        9Nn9L8+ppQ7g2vAum4CEBh6V3VX/FjA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-lwjb6qLZNj2ucjXMm3jPLQ-1; Fri, 29 May 2020 11:28:52 -0400
-X-MC-Unique: lwjb6qLZNj2ucjXMm3jPLQ-1
-Received: by mail-wm1-f71.google.com with SMTP id s15so817996wmc.8
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 08:28:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j3fj27W3uN/6I5026Um93rPcQiLMmVXJm0WFtCISxNo=;
-        b=AO2gmpYZGmtRlBpUqPxYBq3S3mkvdwG4xYFsRWnIVWKyjJZorw+4NhksX6tiBKcgoH
-         TTzVXdP/3qgz815T0kTY1jskLYHp2WvbK4VhUGRJMTHuckMPS6uxEFf/izA6PpvpWw46
-         BnR5wb1WlyW4I+eT49znlXKd9F0vFI7mPseBbrcnTimlgG6hf++3jsBaNOd/+3wFuXAo
-         nGeAfhzKygPZoseS5EfvmdzqHJFkNs1+c5udLOi9CJqkk3bN0nrwqalP6MoF31Ii+QDr
-         sJ8VPnsLJm0Anv7ErGwNCmkFQ9RAEayCxBkJr4HKnU2lFzk8yxMfLsfF+5tt7U90RleD
-         T7Eg==
-X-Gm-Message-State: AOAM530rx1bKtt4yRveqKrVM4rLSCvrMfqcyh3KbN0t1GMk/dPEGrgUl
-        HavYT6u1WkuL1dGN9H1dDDTD0wVGCa66Fn8TI2KW8ehy/wQXtiJvDPzelYJpmBzNrUYkk9LhHx4
-        bG9ftD13n2U++
-X-Received: by 2002:a05:600c:2201:: with SMTP id z1mr8963610wml.70.1590766131255;
-        Fri, 29 May 2020 08:28:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnRui06oIE29aIFnuFue1mcO0Hf+Lm/Bg8BZRE5Ct4zWqlhVRIPkukT4yVFlsYfNImtzGcdQ==
-X-Received: by 2002:a05:600c:2201:: with SMTP id z1mr8963590wml.70.1590766130978;
-        Fri, 29 May 2020 08:28:50 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.160.89])
-        by smtp.gmail.com with ESMTPSA id 23sm10556087wmg.10.2020.05.29.08.28.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 08:28:50 -0700 (PDT)
-Subject: Re: [PATCH 2/2] selftests: kvm: fix smm test on SVM
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20200529130407.57176-1-vkuznets@redhat.com>
- <20200529130407.57176-2-vkuznets@redhat.com>
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Epmn3nYr/N8EeZcVRj2tMv+zsjPgz0Zj5jT0wPI9k18=;
+        b=OuzTJwLJ/gRUd+XXuuGOGOgWt+ARRTmzoGsWPIyVCtq/OA5P9N9jImDlomIwDvdGafo9ji
+        9XMoiru0UmjU4XHS0u+cBVvY4j+j0yDP4tMouF2/c6zNI3lrfmnn06V427r7eqipF/i8eb
+        JupSoSpxKM2T/Nrcl1fiJMxpvhzxd/U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-PRPaYUAxOfmdd1dwkdvrdA-1; Fri, 29 May 2020 11:39:36 -0400
+X-MC-Unique: PRPaYUAxOfmdd1dwkdvrdA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F031460;
+        Fri, 29 May 2020 15:39:35 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3622F5D9EF;
+        Fri, 29 May 2020 15:39:35 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d355ab9e-416f-582c-11e6-3fed437feca2@redhat.com>
-Date:   Fri, 29 May 2020 17:28:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH v3 00/28] KVM: nSVM: event fixes and migration support
+Date:   Fri, 29 May 2020 11:39:04 -0400
+Message-Id: <20200529153934.11694-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200529130407.57176-2-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/05/20 15:04, Vitaly Kuznetsov wrote:
-> KVM_CAP_NESTED_STATE is now supported for AMD too but smm test acts like
-> it is still Intel only.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/smm_test.c | 19 +++++++++++++------
->  1 file changed, 13 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
-> index 8230b6bc6b8f..6f8f478b3ceb 100644
-> --- a/tools/testing/selftests/kvm/x86_64/smm_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
-> @@ -17,6 +17,7 @@
->  #include "kvm_util.h"
->  
->  #include "vmx.h"
-> +#include "svm_util.h"
->  
->  #define VCPU_ID	      1
->  
-> @@ -58,7 +59,7 @@ void self_smi(void)
->  	      APIC_DEST_SELF | APIC_INT_ASSERT | APIC_DM_SMI);
->  }
->  
-> -void guest_code(struct vmx_pages *vmx_pages)
-> +void guest_code(void *arg)
->  {
->  	uint64_t apicbase = rdmsr(MSR_IA32_APICBASE);
->  
-> @@ -72,8 +73,11 @@ void guest_code(struct vmx_pages *vmx_pages)
->  
->  	sync_with_host(4);
->  
-> -	if (vmx_pages) {
-> -		GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-> +	if (arg) {
-> +		if (cpu_has_svm())
-> +			generic_svm_setup(arg, NULL, NULL);
-> +		else
-> +			GUEST_ASSERT(prepare_for_vmx_operation(arg));
->  
->  		sync_with_host(5);
->  
-> @@ -87,7 +91,7 @@ void guest_code(struct vmx_pages *vmx_pages)
->  
->  int main(int argc, char *argv[])
->  {
-> -	vm_vaddr_t vmx_pages_gva = 0;
-> +	vm_vaddr_t nested_gva = 0;
->  
->  	struct kvm_regs regs;
->  	struct kvm_vm *vm;
-> @@ -114,8 +118,11 @@ int main(int argc, char *argv[])
->  	vcpu_set_msr(vm, VCPU_ID, MSR_IA32_SMBASE, SMRAM_GPA);
->  
->  	if (kvm_check_cap(KVM_CAP_NESTED_STATE)) {
-> -		vcpu_alloc_vmx(vm, &vmx_pages_gva);
-> -		vcpu_args_set(vm, VCPU_ID, 1, vmx_pages_gva);
-> +		if (kvm_get_supported_cpuid_entry(0x80000001)->ecx & CPUID_SVM)
-> +			vcpu_alloc_svm(vm, &nested_gva);
-> +		else
-> +			vcpu_alloc_vmx(vm, &nested_gva);
-> +		vcpu_args_set(vm, VCPU_ID, 1, nested_gva);
->  	} else {
->  		pr_info("will skip SMM test with VMX enabled\n");
->  		vcpu_args_set(vm, VCPU_ID, 1, 0);
-> 
+This is basically the same as v2 except that it has a small fix to
+"KVM: x86: enable event window in inject_pending_event", where
+a second pending interrupt or NMI was not enabling the window-open
+vmexit (caught by apic.flat).  In addition I've renamed
+inject_pending_event to handle_processor_events.
 
-Thanks, I'll include this in v3 of the nSVM series.
+The series now passes kvm-unit-tests and various nested hypervisor tests
+so now it's *really* ready for review!  (Thanks Krish for looking at
+it so far).
+
+I'm quite pleased with the overall look of the code, though the
+INT_CTL arbitration is a bit ugly.  I have plans to implement nested
+vGIF and vLS, and then I will probably clean it up.
 
 Paolo
+
+Paolo Bonzini (28):
+  KVM: x86: track manually whether an event has been injected
+  KVM: x86: enable event window in inject_pending_event
+  KVM: nSVM: inject exceptions via svm_check_nested_events
+  KVM: nSVM: remove exit_required
+  KVM: nSVM: correctly inject INIT vmexits
+  KVM: SVM: always update CR3 in VMCB
+  KVM: nVMX: always update CR3 in VMCS
+  KVM: nSVM: move map argument out of enter_svm_guest_mode
+  KVM: nSVM: extract load_nested_vmcb_control
+  KVM: nSVM: extract preparation of VMCB for nested run
+  KVM: nSVM: move MMU setup to nested_prepare_vmcb_control
+  KVM: nSVM: clean up tsc_offset update
+  KVM: nSVM: pass vmcb_control_area to copy_vmcb_control_area
+  KVM: nSVM: remove trailing padding for struct vmcb_control_area
+  KVM: nSVM: save all control fields in svm->nested
+  KVM: nSVM: restore clobbered INT_CTL fields after clearing VINTR
+  KVM: nSVM: synchronize VMCB controls updated by the processor on every
+    vmexit
+  KVM: nSVM: remove unnecessary if
+  KVM: nSVM: extract svm_set_gif
+  KVM: SVM: preserve VGIF across VMCB switch
+  KVM: nSVM: synthesize correct EXITINTINFO on vmexit
+  KVM: nSVM: remove HF_VINTR_MASK
+  KVM: nSVM: remove HF_HIF_MASK
+  KVM: nSVM: split nested_vmcb_check_controls
+  KVM: nSVM: leave guest mode when clearing EFER.SVME
+  KVM: MMU: pass arbitrary CR0/CR4/EFER to kvm_init_shadow_mmu
+  selftests: kvm: add a SVM version of state-test
+  KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE
+
+Vitaly Kuznetsov (2):
+  selftests: kvm: introduce cpu_has_svm() check
+  selftests: kvm: fix smm test on SVM
+
+ arch/x86/include/asm/kvm_host.h               |  12 +-
+ arch/x86/include/asm/svm.h                    |   9 +-
+ arch/x86/include/uapi/asm/kvm.h               |  17 +-
+ arch/x86/kvm/cpuid.h                          |   5 +
+ arch/x86/kvm/irq.c                            |   1 +
+ arch/x86/kvm/mmu.h                            |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        |  14 +-
+ arch/x86/kvm/svm/nested.c                     | 624 ++++++++++++------
+ arch/x86/kvm/svm/svm.c                        | 154 ++---
+ arch/x86/kvm/svm/svm.h                        |  33 +-
+ arch/x86/kvm/vmx/nested.c                     |   5 -
+ arch/x86/kvm/vmx/vmx.c                        |  25 +-
+ arch/x86/kvm/x86.c                            | 146 ++--
+ .../selftests/kvm/include/x86_64/svm_util.h   |  10 +
+ tools/testing/selftests/kvm/x86_64/smm_test.c |  19 +-
+ .../testing/selftests/kvm/x86_64/state_test.c |  62 +-
+ 16 files changed, 708 insertions(+), 430 deletions(-)
+
+-- 
+2.26.2
 
