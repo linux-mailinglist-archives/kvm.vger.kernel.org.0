@@ -2,113 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 427E31E7622
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 08:46:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B33D41E7631
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 08:51:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbgE2GqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 02:46:18 -0400
-Received: from ozlabs.org ([203.11.71.1]:46139 "EHLO ozlabs.org"
+        id S1726350AbgE2Guz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 02:50:55 -0400
+Received: from mga09.intel.com ([134.134.136.24]:33424 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725681AbgE2GqS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 02:46:18 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 49YFTM68PYz9sSp;
-        Fri, 29 May 2020 16:46:15 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1590734776;
-        bh=l+Xvu2zy6hKZ6lhYjwD7Ye7643sbaA4BsCh6MX+Mf40=;
-        h=Date:From:To:Cc:Subject:From;
-        b=IJOIS0/Qce3klupjjUsZu7IruI9fPBWK5y71pBmirNG9rAJQmMgbg4Uh9ohw+i4iX
-         bLK1egBbnQevdcHNSGnio/XHHuSxJEjpyNhTJ7XFWKuNiKDGQW/nJszJG8F3vduH7/
-         44Dl0y+a17sN1CxqQAWeFnW8LB17zZe39l9MR8b3lcyjTIuPZ/nO17JYJF6IiqifD7
-         j9hh4xV/mhiD2RxOiHq0YjWLievOWaIBepZM47EsRnSmT6FZ2xqb478YDbmBLfqWR1
-         enZQziWeEWgq8OEfXko5eckwbMGOItE5YhuLymVw+o8+tN3NoO1cLwdr0vLf3U8Ppf
-         6GTrVTZ7T6Uyw==
-Date:   Fri, 29 May 2020 16:46:13 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: linux-next: manual merge of the kvm tree with the s390 tree
-Message-ID: <20200529164613.526f5865@canb.auug.org.au>
+        id S1725790AbgE2Guz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 02:50:55 -0400
+IronPort-SDR: pstLqwauhCETH+nbJgkKoGEXKQbeHVb/HXRYnOP+VWCHPq/G3SeJBQnsspvamkvcO6cIVO6mpE
+ renkntgHuzSA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2020 23:50:54 -0700
+IronPort-SDR: yua8XKtu+s8uTXp6lxQszfsrwln7XYIAU7mnjksTlB7iQQz8bVoYTbAJP7sqGlvdvjYac1kehL
+ 8t7+7He4uWGg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,447,1583222400"; 
+   d="scan'208";a="285434838"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.45.157])
+  by orsmga002.jf.intel.com with ESMTP; 28 May 2020 23:50:51 -0700
+Date:   Fri, 29 May 2020 08:50:51 +0200
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
+Message-ID: <20200529065050.GA6002@ubuntu>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <044a3b81-e0fd-5d96-80ff-b13e587f9d39@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Jb9VoBJqXmq2POSA2Qi8d./";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <044a3b81-e0fd-5d96-80ff-b13e587f9d39@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/Jb9VoBJqXmq2POSA2Qi8d./
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Jason,
 
-Hi all,
+On Fri, May 29, 2020 at 02:01:53PM +0800, Jason Wang wrote:
+> 
+> On 2020/5/28 上午2:05, Guennadi Liakhovetski wrote:
+> > v3:
+> > - address several checkpatch warnings
+> > - address comments from Mathieu Poirier
+> > 
+> > v2:
+> > - update patch #5 with a correct vhost_dev_init() prototype
+> > - drop patch #6 - it depends on a different patch, that is currently
+> >    an RFC
+> > - address comments from Pierre-Louis Bossart:
+> >    * remove "default n" from Kconfig
+> > 
+> > Linux supports RPMsg over VirtIO for "remote processor" /AMP use
+> > cases. It can however also be used for virtualisation scenarios,
+> > e.g. when using KVM to run Linux on both the host and the guests.
+> > This patch set adds a wrapper API to facilitate writing vhost
+> > drivers for such RPMsg-based solutions. The first use case is an
+> > audio DSP virtualisation project, currently under development, ready
+> > for review and submission, available at
+> > https://github.com/thesofproject/linux/pull/1501/commits
+> > A further patch for the ADSP vhost RPMsg driver will be sent
+> > separately for review only since it cannot be merged without audio
+> > patches being upstreamed first.
+> 
+> 
+> Hi:
+> 
+> It would be hard to evaluate this series without a real user. So if
+> possible, I suggest to post the actual user for vhost rpmsg API.
 
-Today's linux-next merge of the kvm tree got a conflict in:
+Sure, the whole series is available at 
+https://github.com/thesofproject/linux/pull/1501/commits or would you 
+prefer the missing patches posted to the lists too?
 
-  arch/s390/kvm/vsie.c
-
-between commit:
-
-  0b0ed657fe00 ("s390: remove critical section cleanup from entry.S")
-
-from the s390 tree and commit:
-
-  d075fc3154be ("KVM: s390: vsie: Move conditional reschedule")
-
-from the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/s390/kvm/vsie.c
-index 4fde24a1856e,ef05b4e167fb..000000000000
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@@ -1000,9 -1000,9 +1000,6 @@@ static int do_vsie_run(struct kvm_vcpu=20
- =20
-  	handle_last_fault(vcpu, vsie_page);
- =20
-- 	if (need_resched())
-- 		schedule();
- -	if (test_cpu_flag(CIF_MCCK_PENDING))
- -		s390_handle_mcck();
---
-  	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
- =20
-  	/* save current guest state of bp isolation override */
-
---Sig_/Jb9VoBJqXmq2POSA2Qi8d./
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7Qr7UACgkQAVBC80lX
-0GwjxQgAloXEB6ijQwPWPzPlo8/jBiG1eJJCES3TLkThdjLaW3jH/gWxSiLC7TOm
-X9wdNoExw2wa521d3LM+gKmEAXEBDW1mbJrX2pNV973+gOgv5nWnXJEk5ZrZ/3De
-Zu0G2YKsoKnJgtSwXN2ezAU+RkHs3jI4TFGUs3SDYwWUh3MPxXYOeGr7dudIcC4P
-8+fqSAEBnOf5CtsVf2eTx3k8bf0maPrpoUN28v1Qy8wh7L/caC7uUwSECxbTAkbK
-qIMngkOuvzm7MCsicnS2YS4tOKBo9YAnkYHHcpjOJ+zcooKkE5KVRoUQ7dNqapwE
-vlvFfUXwZsmok7FCHOT83nIKQRtB4g==
-=8zLf
------END PGP SIGNATURE-----
-
---Sig_/Jb9VoBJqXmq2POSA2Qi8d./--
+Thanks
+Guennadi
