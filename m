@@ -2,71 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2D001E78B0
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 10:47:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96CEF1E78B2
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 10:47:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726860AbgE2Irh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 04:47:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26749 "EHLO
+        id S1726519AbgE2Irz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 04:47:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58465 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725306AbgE2Irf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 04:47:35 -0400
+        with ESMTP id S1725821AbgE2Irz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 04:47:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590742052;
+        s=mimecast20190719; t=1590742074;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TC044dR3OSla2e2jOr1hQDaPo8ct77ckTcoEOVeGup0=;
-        b=CJYT857G9/uAraNWVtqDhmlqH9BXvruieAp9I7d9Lm+Mh4cwT1kUH625lwg9W2Qu/bHlg4
-        cxOuCAalYxAi5S+L91kgHs4CwS2KxOVIuyXwd3+Ez4XWoeyLRocq6yphZF3AE5uGfnzICr
-        /x8hWSjfTPsSVGtcNDOBI5oraE3iYPI=
+        bh=dMJc+r/r+0/7enCThmZTDSPXOVNgB1F7k3W87RQaDkY=;
+        b=K/LNz0MDnv2wmjjkd/T3Huvvq09h7gJ9sHnbsYXdj3iMznOUeukGlRNs7VCkCamyvWczEU
+        887ClHHusMY/GHq+ItjQ1Jkp6fI56nED77jCVT+jub9JrNg1npEyiQkUbgjAeeOEiKf+Ri
+        fsrFQQdp4MO1//42dW7NT9d9S4MCJAY=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-jYdTv1VlN76LjPtIumRg9Q-1; Fri, 29 May 2020 04:47:30 -0400
-X-MC-Unique: jYdTv1VlN76LjPtIumRg9Q-1
-Received: by mail-wr1-f70.google.com with SMTP id n6so762820wrv.6
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 01:47:29 -0700 (PDT)
+ us-mta-399-wojy-EQ5MPywavv7Md5Stw-1; Fri, 29 May 2020 04:47:52 -0400
+X-MC-Unique: wojy-EQ5MPywavv7Md5Stw-1
+Received: by mail-wr1-f70.google.com with SMTP id n6so763295wrv.6
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 01:47:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=TC044dR3OSla2e2jOr1hQDaPo8ct77ckTcoEOVeGup0=;
-        b=YR7xHvjLcKwF2BdEVSIIydZ39tQCBja6zRE5DQlyQ5DYPSl2FSsbAC/CWYpgd65j1A
-         U5i2W20F92bL8S/TW3qa3Jp2m+SHJSDAMH5N+VBL+ZiEa2LmHvPEJFAFkB48x01/6U2k
-         zIpq/cH1P0OYKmsLvyoayFImgb2d9kiYJXrS44Mc/WmKDoKg7i1VgjIouoj+h/Ost081
-         PlfxTiZ9XRugUp8v85kZWuHwfYNfK+9Gdc8JCiRaV3Fir4A/Xgye4ZqSMiVWi9Tk4l6H
-         clUmZavTvlmSmZXnjHGQhgnIPKOx4EpCKt2RBG2+Wa/XIFHeTGyV3TPme8U2seHJhnGd
-         rIRw==
-X-Gm-Message-State: AOAM530/SnzPKZHMpUaYsU7lcSn9k2ar5n/8PZZBO3icEq+2TD8NNcep
-        EipsbDFCQx6ASGACW57KvuyF8z73ZH17hulrfXr5u2uQZ+9wrgniHJ+J3lLqlZtBQOMRXRmm1I4
-        N6EUNCOCjv1tK
-X-Received: by 2002:adf:a55e:: with SMTP id j30mr8410866wrb.60.1590742048998;
-        Fri, 29 May 2020 01:47:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJymqvTlBW+7kW1wAuWaPZwjkZSe8LlrehYX8zniYkylzs7yqPj5Jm1359wcy8rb0GyyAgXDrw==
-X-Received: by 2002:adf:a55e:: with SMTP id j30mr8410839wrb.60.1590742048779;
-        Fri, 29 May 2020 01:47:28 -0700 (PDT)
+        bh=dMJc+r/r+0/7enCThmZTDSPXOVNgB1F7k3W87RQaDkY=;
+        b=iazAj2WoIdnB/JcKAeMo7HrdbUYX6rUEX7D0oa+OQLAvIoDuWl8NY+0kMZZySg1grT
+         xji988CLr0H4EggZbqLCB19jwCJ7RjctFSsPpuLT2A1bG/XqOMtmkNI0a/CHVdasPNQa
+         PXexYHjhZDW9ACXuS9ptr2uAKe/sSjlS5237BxuMG4UxfbeuGwUJabZcG5OWyBceq/0W
+         bwsLTuUy/qOn7dTVmVr/nnVZQTE7NGRVJmjSaYygZrKBT8O6uzfdLkmONhrVp/IRI/Ad
+         GoXy7/66G23yUJDSqUsxI8BcBT6G2fth0SdPcsKA2KVuvf34WJtEJ3pwEAHynSKp0C2O
+         XFzw==
+X-Gm-Message-State: AOAM530E6EwQEx85FaCGGQ/IZLzxRmefHHI3LiWSiJxBYVb44hBGygLp
+        TeIikvVOThkDhQ+PITJthXneDQzT4sCIts//rgMEtqjLa5VyzHaSuxYe/x1NrXoPxH1KsE3Su3S
+        arBKRMj8mgZf5
+X-Received: by 2002:a05:6000:100d:: with SMTP id a13mr7682061wrx.317.1590742071102;
+        Fri, 29 May 2020 01:47:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwtAKBA+DYtf8htNfnI9kbnY0IFz6CjGCCBOuaPsdJCF4MCwCL4AgBIy6MCwkP7CEX+VoOv8w==
+X-Received: by 2002:a05:6000:100d:: with SMTP id a13mr7682050wrx.317.1590742070904;
+        Fri, 29 May 2020 01:47:50 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:b096:1b7:7695:e4f7? ([2001:b07:6468:f312:b096:1b7:7695:e4f7])
-        by smtp.gmail.com with ESMTPSA id h137sm12589680wme.0.2020.05.29.01.47.27
+        by smtp.gmail.com with ESMTPSA id k21sm4729753wrd.24.2020.05.29.01.47.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 May 2020 01:47:28 -0700 (PDT)
-Subject: Re: [PATCH RESEND] Enable full width counting for KVM: x86/pmu
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200529074347.124619-1-like.xu@linux.intel.com>
+        Fri, 29 May 2020 01:47:50 -0700 (PDT)
+Subject: Re: [PATCH 05/28] KVM: nSVM: correctly inject INIT vmexits
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, mlevitsk@redhat.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20200526172308.111575-1-pbonzini@redhat.com>
+ <20200526172308.111575-6-pbonzini@redhat.com>
+ <a5331d80-b6ee-b111-c91b-a8723fd3da9b@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ff77a5b-21fd-31f0-b97c-d188ec776808@redhat.com>
-Date:   Fri, 29 May 2020 10:47:27 +0200
+Message-ID: <25c0ab83-f7d7-44f9-b00f-59ecee0256dc@redhat.com>
+Date:   Fri, 29 May 2020 10:47:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200529074347.124619-1-like.xu@linux.intel.com>
+In-Reply-To: <a5331d80-b6ee-b111-c91b-a8723fd3da9b@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,41 +75,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/05/20 09:43, Like Xu wrote:
-> Hi Paolo,
+On 29/05/20 08:46, Krish Sadhukhan wrote:
+>>
+>> +static void nested_svm_init(struct vcpu_svm *svm)
 > 
-> As you said, you will queue the v3 of KVM patch, but it looks like we
-> are missing that part at the top of the kvm/queue tree.
-> 
-> For your convenience, let me resend v4 so that we can upstream this
-> feature in the next merged window. Also this patch series includes
-> patches for qemu and kvm-unit-tests. Please help review.
-> 
-> Previous:
-> https://lore.kernel.org/kvm/f1c77c79-7ff8-c5f3-e011-9874a4336217@redhat.com/
-> 
-> Like Xu (1):
->   KVM: x86/pmu: Support full width counting
->   [kvm-unit-tests] x86: pmu: Test full-width counter writes 
->   [Qemu-devel] target/i386: define a new MSR based feature
->  word - FEAT_PERF_CAPABILITIES
-> 
-> Wei Wang (1):
->   KVM: x86/pmu: Tweak kvm_pmu_get_msr to pass 'struct msr_data' in
-> 
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/cpuid.c            |  2 +-
->  arch/x86/kvm/pmu.c              |  4 +-
->  arch/x86/kvm/pmu.h              |  4 +-
->  arch/x86/kvm/svm/pmu.c          |  7 ++--
->  arch/x86/kvm/vmx/capabilities.h | 11 +++++
->  arch/x86/kvm/vmx/pmu_intel.c    | 71 +++++++++++++++++++++++++++------
->  arch/x86/kvm/vmx/vmx.c          |  3 ++
->  arch/x86/kvm/x86.c              |  6 ++-
->  9 files changed, 87 insertions(+), 22 deletions(-)
-> 
+> Should this be named nested_svm_inject_init_vmexit in accordance with
+> nested_svm_inject_exception_vmexit that you did in patch# 3 ?
 
-Thanks, I was busy with AMD stuff as you saw. :)  I've queued it now.
+There's also nested_svm_intr and nested_svm_nmi.  I'll rename all of
+them, but it will be a follow up.
 
 Paolo
 
