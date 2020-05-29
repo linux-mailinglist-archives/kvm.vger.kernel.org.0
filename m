@@ -2,86 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B4D21E817E
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 17:18:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4D0B1E81B0
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 17:21:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726882AbgE2PSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 11:18:24 -0400
-Received: from mga17.intel.com ([192.55.52.151]:6947 "EHLO mga17.intel.com"
+        id S1727914AbgE2PVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 11:21:46 -0400
+Received: from foss.arm.com ([217.140.110.172]:37916 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725901AbgE2PSX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 11:18:23 -0400
-IronPort-SDR: 9WrHnicg8QL5vwd73JWnkksS0zy90kcNvx3pfmfCNWYmbjaEXzuYoaW2+Z2BrpL6N8wJa8roWm
- eGnB6RhATeMg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2020 08:18:23 -0700
-IronPort-SDR: OplPGLJByH3Z+2rL2t/q/aOVHNclPfjb0n2yzDOGYfTN2bI+FYBs4xTzC31bMAGIFWVkR1I8v+
- PmZ4bhdaOAgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,449,1583222400"; 
-   d="scan'208";a="303152952"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga008.jf.intel.com with ESMTP; 29 May 2020 08:18:22 -0700
-Date:   Fri, 29 May 2020 08:18:22 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 1/2] selftests: kvm: introduce cpu_has_svm() check
-Message-ID: <20200529151822.GB520@linux.intel.com>
-References: <20200529130407.57176-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200529130407.57176-1-vkuznets@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1726882AbgE2PVp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 11:21:45 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04C941045;
+        Fri, 29 May 2020 08:21:45 -0700 (PDT)
+Received: from localhost.localdomain (entos-thunderx2-02.shanghai.arm.com [10.169.138.74])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A0DC63F718;
+        Fri, 29 May 2020 08:21:41 -0700 (PDT)
+From:   Jia He <justin.he@arm.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kaly Xin <Kaly.Xin@arm.com>,
+        Jia He <justin.he@arm.com>, stable@vger.kernel.org
+Subject: [PATCH v2] virtio_vsock: Fix race condition in virtio_transport_recv_pkt
+Date:   Fri, 29 May 2020 23:21:02 +0800
+Message-Id: <20200529152102.58397-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 29, 2020 at 03:04:06PM +0200, Vitaly Kuznetsov wrote:
-> More tests may want to check if the CPU is Intel or AMD in
-> guest code, separate cpu_has_svm() and put it as static
-> inline to svm_util.h.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  tools/testing/selftests/kvm/include/x86_64/svm_util.h | 10 ++++++++++
->  tools/testing/selftests/kvm/x86_64/state_test.c       |  9 +--------
->  2 files changed, 11 insertions(+), 8 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/svm_util.h b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-> index cd037917fece..b1057773206a 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/svm_util.h
-> @@ -35,4 +35,14 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
->  void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa);
->  void nested_svm_check_supported(void);
->  
-> +static inline bool cpu_has_svm(void)
-> +{
-> +	u32 eax = 0x80000001, ecx;
-> +
-> +	asm volatile("cpuid" :
-> +		     "=a" (eax), "=c" (ecx) : "0" (eax) : "ebx", "edx");
+When client tries to connect(SOCK_STREAM) the server in the guest with
+NONBLOCK mode, there will be a panic on a ThunderX2 (armv8a server):
+[  463.718844][ T5040] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+[  463.718848][ T5040] Mem abort info:
+[  463.718849][ T5040]   ESR = 0x96000044
+[  463.718852][ T5040]   EC = 0x25: DABT (current EL), IL = 32 bits
+[  463.718853][ T5040]   SET = 0, FnV = 0
+[  463.718854][ T5040]   EA = 0, S1PTW = 0
+[  463.718855][ T5040] Data abort info:
+[  463.718856][ T5040]   ISV = 0, ISS = 0x00000044
+[  463.718857][ T5040]   CM = 0, WnR = 1
+[  463.718859][ T5040] user pgtable: 4k pages, 48-bit VAs, pgdp=0000008f6f6e9000
+[  463.718861][ T5040] [0000000000000000] pgd=0000000000000000
+[  463.718866][ T5040] Internal error: Oops: 96000044 [#1] SMP
+[...]
+[  463.718977][ T5040] CPU: 213 PID: 5040 Comm: vhost-5032 Tainted: G           O      5.7.0-rc7+ #139
+[  463.718980][ T5040] Hardware name: GIGABYTE R281-T91-00/MT91-FS1-00, BIOS F06 09/25/2018
+[  463.718982][ T5040] pstate: 60400009 (nZCv daif +PAN -UAO)
+[  463.718995][ T5040] pc : virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
+[  463.718999][ T5040] lr : virtio_transport_recv_pkt+0x1fc/0xd40 [vmw_vsock_virtio_transport_common]
+[  463.719000][ T5040] sp : ffff80002dbe3c40
+[...]
+[  463.719025][ T5040] Call trace:
+[  463.719030][ T5040]  virtio_transport_recv_pkt+0x4c8/0xd40 [vmw_vsock_virtio_transport_common]
+[  463.719034][ T5040]  vhost_vsock_handle_tx_kick+0x360/0x408 [vhost_vsock]
+[  463.719041][ T5040]  vhost_worker+0x100/0x1a0 [vhost]
+[  463.719048][ T5040]  kthread+0x128/0x130
+[  463.719052][ T5040]  ret_from_fork+0x10/0x18
 
-	u32 eax, ecx;
+The race condition as follows:
+Task1                            Task2
+=====                            =====
+__sock_release                   virtio_transport_recv_pkt
+  __vsock_release                  vsock_find_bound_socket (found)
+    lock_sock_nested
+    vsock_remove_sock
+    sock_orphan
+      sk_set_socket(sk, NULL)
+    ...
+    release_sock
+                                lock_sock
+                                   virtio_transport_recv_connecting
+                                     sk->sk_socket->state (panic)
 
-	asm("cpuid" : "=a" (eax), "=c" (ecx) : "a" (0x80000001) : "ebx", "edx");
+The root cause is that vsock_find_bound_socket can't hold the lock_sock,
+so there is a small race window between vsock_find_bound_socket() and
+lock_sock(). If there is __vsock_release() in another task, sk->sk_socket
+will be set to NULL inadvertently.
 
-The volatile shouldn't be needed, e.g. no one should be using this purely
-for its seralization properties, and I don't see any reason to put the leaf
-number into a variable.
+This fixes it by checking sk->sk_shutdown.
 
-Alternatively, adding a proper cpuid framework to processor.h would likely
-be useful in the long run.
+Signed-off-by: Jia He <justin.he@arm.com>
+Cc: stable@vger.kernel.org
+Cc: Stefano Garzarella <sgarzare@redhat.com>
+---
+v2: use lightweight checking suggested by Stefano Garzarella
 
-> +
-> +	return ecx & CPUID_SVM;
-> +}
-> +
+ net/vmw_vsock/virtio_transport_common.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 69efc891885f..0edda1edf988 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1132,6 +1132,14 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+ 
+ 	lock_sock(sk);
+ 
++	/* Check if sk has been released before lock_sock */
++	if (sk->sk_shutdown == SHUTDOWN_MASK) {
++		(void)virtio_transport_reset_no_sock(t, pkt);
++		release_sock(sk);
++		sock_put(sk);
++		goto free_pkt;
++	}
++
+ 	/* Update CID in case it has changed after a transport reset event */
+ 	vsk->local_addr.svm_cid = dst.svm_cid;
+ 
+-- 
+2.17.1
+
