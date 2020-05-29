@@ -2,73 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B59F51E79D7
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:50:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC1ED1E79DA
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 11:51:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725901AbgE2Ju3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 05:50:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52444 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725306AbgE2Ju2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 05:50:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590745827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=BwHdRwrK0wPZyetUSej9ICz5eyB+NKkH6EpaQuUXYKw=;
-        b=Hw5+XGAs37wjDY5GX7JLQW7Hqv8Bx74RNHIZ6EpicC0k5wr9mZf9l/TFIX2lCDDwIOn64R
-        c3Zi3LeFqH5+gAbUf5odd413wP04NEnun4r/1tirsfbhef8OPig457qtzs1j4GeLnilHRX
-        zaObPgJtBxpqbtJmRCW/a5D+N7jMzh4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-0E_qsUF9PEGZuZMqI_yy7Q-1; Fri, 29 May 2020 05:50:25 -0400
-X-MC-Unique: 0E_qsUF9PEGZuZMqI_yy7Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFB681005512
-        for <kvm@vger.kernel.org>; Fri, 29 May 2020 09:50:24 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 664BE7A8D1;
-        Fri, 29 May 2020 09:50:24 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH kvm-unit-tests v2] access: disable phys-bits=36 for now
-Date:   Fri, 29 May 2020 05:50:23 -0400
-Message-Id: <20200529095023.222232-1-pbonzini@redhat.com>
+        id S1725913AbgE2Jvn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 05:51:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53824 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725790AbgE2Jvm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 05:51:42 -0400
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F31BC08C5C6
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:51:42 -0700 (PDT)
+Received: by mail-ed1-x543.google.com with SMTP id k8so1263238edq.4
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 02:51:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=L3T/zrsuadN22N6xG3haLfTOv3GRzcC9OXLSwcS0asw=;
+        b=CUbh2O4u401oOyVmSr+UxiVM9YNSg49tSmupSq9vlnyzdXchtsnTFrDbOIxrDtUyGz
+         VSDVH7X6vU+ivzYL3XwvI7oK1CsC/TtUs62xkdxU3hZ2mfkBU782bT+WYaIVCq7vR0hR
+         w6aJo45B16uDl3czX6GaTTGMMzc/uWFng7RsY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L3T/zrsuadN22N6xG3haLfTOv3GRzcC9OXLSwcS0asw=;
+        b=uFGGgKICZMljJs5HPaaoLxL/dGXvNoTFJxpQIfLBRKRD6WPFUwjczm44acZ2NJSlXI
+         p4XMYZaPUGB54O4hVXgczoojoCOwLydZvRRnshVYCVi2uvl+doYr4pj0WwLpkdctDi1E
+         CfICQ/ORCPLcLM0GieaY8JJP/EirRh47qF7nIVljATj8J6VBnZVcU/WL2j0ytb/xUGds
+         rSgc4b8tEt5pXKOS0VnQ1tS3KPtpxaw7L3n3T+6HYZAcGER5FRxzPXCVtE7tDZ6IorPg
+         UPpHb3WCz7NjxGkux+2uNTw3mVjHG3k/kH+bfkdfsBFbJ1tSVBCv8g4r9KW741/qm/Le
+         lZQQ==
+X-Gm-Message-State: AOAM533iVeoYbClddF088UXOr4oOLLDYjmS/kGxSUaLo+KJFAEu8Eytp
+        vbQfHjNqQJ2OFs9usXuC0Ejlo6KZVbYE2qo4zNAo/w==
+X-Google-Smtp-Source: ABdhPJxafMjOQwHwV5y/xyLtDUSv1zADexNiJH4YkI0/GygZPk4DEmeSK0M/pVVPdm/cPxsKvpsHsZoiJOp5OSRliSw=
+X-Received: by 2002:a50:bb29:: with SMTP id y38mr7328686ede.358.1590745901171;
+ Fri, 29 May 2020 02:51:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <CAJfpegstNYeseo_C4KOF9Y74qRxr78x2tK-9rTgmYM4CK30nRQ@mail.gmail.com>
+ <875zcfoko9.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <875zcfoko9.fsf@nanos.tec.linutronix.de>
+From:   Miklos Szeredi <miklos@szeredi.hu>
+Date:   Fri, 29 May 2020 11:51:30 +0200
+Message-ID: <CAJfpegsjd+FJ0ZNHJ_qzJo0Dx22ZaWh-WZ48f94Z3AUXbJfYYQ@mail.gmail.com>
+Subject: Re: system time goes weird in kvm guest after host suspend/resume
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Support for guest-MAXPHYADDR < host-MAXPHYADDR is not upstream yet,
-it should not be enabled.  Otherwise, all the pde.36 and pte.36
-fail and the test takes so long that it times out.
+On Thu, May 28, 2020 at 10:43 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+> Miklos Szeredi <miklos@szeredi.hu> writes:
+> > Bisected it to:
+> >
+> > b95a8a27c300 ("x86/vdso: Use generic VDSO clock mode storage")
+> >
+> > The effect observed is that after the host is resumed, the clock in
+> > the guest is somewhat in the future and is stopped.  I.e. repeated
+> > date(1) invocations show the same time.
+>
+> TBH, the bisect does not make any sense at all. It's renaming the
+> constants and moving the storage space and I just read it line for line
+> again that the result is equivalent. I'll have a look once the merge
+> window dust settles a bit.
 
-Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/unittests.cfg | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yet, reverting just that single commit against latest linus tree fixes
+the issue.  Which I think is a pretty good indication that that commit
+*is* doing something.
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index bf0d02e..504e04e 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -116,7 +116,7 @@ extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
- [access]
- file = access.flat
- arch = x86_64
--extra_params = -cpu host,phys-bits=36
-+extra_params = -cpu host,host-phys-bits
- 
- [smap]
- file = smap.flat
--- 
-2.26.2
+The jump forward is around 35 minutes; that seems to be consistent as well.
 
+Thanks,
+Miklos
