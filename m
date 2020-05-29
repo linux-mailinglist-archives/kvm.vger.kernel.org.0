@@ -2,85 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7875E1E74CC
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 06:25:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C82551E75C2
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 08:02:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728443AbgE2EZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 00:25:21 -0400
-Received: from mga03.intel.com ([134.134.136.65]:39685 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727811AbgE2EZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 00:25:17 -0400
-IronPort-SDR: YnmGchEwzcww1ijJDYeAp9MxNeSlM9w2VOxQW2h1WWYiar7G/y8vE/xIeXoMWxjconti4Mao65
- bRwytFRGU3WA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2020 21:25:16 -0700
-IronPort-SDR: LbimR6ujBCgASJuPZXnR+I9UPBzufB/aMJUq2aUy/HaeKwBGRfuKRCo7pz21sinVhhdMj1UGnA
- IJvBOc/sk6OA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,447,1583222400"; 
-   d="scan'208";a="414847654"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga004.jf.intel.com with ESMTP; 28 May 2020 21:25:11 -0700
-Date:   Fri, 29 May 2020 00:15:17 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>, cjia@nvidia.com,
-        kevin.tian@intel.com, ziye.yang@intel.com, changpeng.liu@intel.com,
-        yi.l.liu@intel.com, mlevitsk@redhat.com, eskultet@redhat.com,
-        cohuck@redhat.com, jonathan.davies@nutanix.com, eauger@redhat.com,
-        aik@ozlabs.ru, pasic@linux.ibm.com, felipe@nutanix.com,
-        Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
-        Ken.Xue@amd.com, zhi.a.wang@intel.com, qemu-devel@nongnu.org,
+        id S1726106AbgE2GCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 02:02:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29499 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725939AbgE2GCJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 02:02:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590732127;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ffiZE6g18lngbbpjo1gUPeKuc7C2D+JU9iaxsPoeJj8=;
+        b=HP/Hr9Tazy/MZxV67qQr34JMcpq4erwjk+1a3j+sVgLTURXgdrZM4CecwiQUpLYDpvJ3DY
+        YRIxn7jnk5FvbIDPLPF7eFI2cShfREnBx1E02DTbTtQurfIrhl9/NkSkVK1re5yOpe9JQz
+        Eu0WeQQF4LpbmwUjkkL5rbq21J0FAU0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-6lfzZSWOMTejw0vtJNWU-w-1; Fri, 29 May 2020 02:02:03 -0400
+X-MC-Unique: 6lfzZSWOMTejw0vtJNWU-w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E2E9460;
+        Fri, 29 May 2020 06:02:02 +0000 (UTC)
+Received: from [10.72.13.231] (ovpn-13-231.pek2.redhat.com [10.72.13.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F68210013DB;
+        Fri, 29 May 2020 06:01:54 +0000 (UTC)
+Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>,
         kvm@vger.kernel.org
-Subject: Re: [PATCH Kernel v22 0/8] Add UAPIs to support migration for VFIO
- devices
-Message-ID: <20200529041516.GE1378@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1589781397-28368-1-git-send-email-kwankhede@nvidia.com>
- <20200519105804.02f3cae8@x1.home>
- <20200525065925.GA698@joy-OptiPlex-7040>
- <426a5314-6d67-7cbe-bad0-e32f11d304ea@nvidia.com>
- <20200526141939.2632f100@x1.home>
- <20200527062358.GD19560@joy-OptiPlex-7040>
- <20200527084822.GC3001@work-vm>
- <20200528165906.7d03f689@x1.home>
+Cc:     linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <044a3b81-e0fd-5d96-80ff-b13e587f9d39@redhat.com>
+Date:   Fri, 29 May 2020 14:01:53 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200528165906.7d03f689@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 28, 2020 at 04:59:06PM -0600, Alex Williamson wrote:
-> On Wed, 27 May 2020 09:48:22 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > > BTW, for viommu, the downtime data is as below. under the same network
-> > > condition and guest memory size, and no running dirty data/memory produced
-> > > by device.
-> > > (1) viommu off
-> > > single-round dirty query: downtime ~100ms   
-> > 
-> > Fine.
-> > 
-> > > (2) viommu on
-> > > single-round dirty query: downtime 58s   
-> > 
-> > Youch.
-> 
-> Double Youch!  But we believe this is because we're getting the dirty
-> bitmap one IOMMU leaf page at a time, right?  We've enable the kernel
-> to get a dirty bitmap across multiple mappings, but QEMU isn't yet
-> taking advantage of it.  Do I have this correct?  Thanks,
+
+On 2020/5/28 上午2:05, Guennadi Liakhovetski wrote:
+> v3:
+> - address several checkpatch warnings
+> - address comments from Mathieu Poirier
 >
-Yes, I think so, but I haven't looked into it yet.
+> v2:
+> - update patch #5 with a correct vhost_dev_init() prototype
+> - drop patch #6 - it depends on a different patch, that is currently
+>    an RFC
+> - address comments from Pierre-Louis Bossart:
+>    * remove "default n" from Kconfig
+>
+> Linux supports RPMsg over VirtIO for "remote processor" /AMP use
+> cases. It can however also be used for virtualisation scenarios,
+> e.g. when using KVM to run Linux on both the host and the guests.
+> This patch set adds a wrapper API to facilitate writing vhost
+> drivers for such RPMsg-based solutions. The first use case is an
+> audio DSP virtualisation project, currently under development, ready
+> for review and submission, available at
+> https://github.com/thesofproject/linux/pull/1501/commits
+> A further patch for the ADSP vhost RPMsg driver will be sent
+> separately for review only since it cannot be merged without audio
+> patches being upstreamed first.
+
+
+Hi:
+
+It would be hard to evaluate this series without a real user. So if 
+possible, I suggest to post the actual user for vhost rpmsg API.
 
 Thanks
-Yan
+
+
+>
+> Thanks
+> Guennadi
+
