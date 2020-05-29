@@ -2,205 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C83291E7759
-	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 09:45:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 349D81E7763
+	for <lists+kvm@lfdr.de>; Fri, 29 May 2020 09:46:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726793AbgE2Hoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 03:44:39 -0400
-Received: from mga03.intel.com ([134.134.136.65]:51954 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726451AbgE2Hod (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 03:44:33 -0400
-IronPort-SDR: nYWoR4NdbO41jNL4CFubbRPacvA+RiDE5leB4v8CiP2AGq+Nah2SL574rNcnvtLOpNnX26T66i
- TfZgx221iU0Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2020 00:44:32 -0700
-IronPort-SDR: pAtbK/ZL4wacXy7akSK8f7a0OgGWVX08DhI71Z2hZ3eKkQvYg35mTSDAggH76/oKq+wmzgFMJO
- u/2QKvbu0L7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,447,1583222400"; 
-   d="scan'208";a="302754570"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by fmsmga002.fm.intel.com with ESMTP; 29 May 2020 00:44:29 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1726712AbgE2HqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 03:46:20 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43645 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725939AbgE2HqT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 May 2020 03:46:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590738378;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7bp9K1xQDo+AhoH9e/7SQpViLsmuixXQeTMU/HkuiBc=;
+        b=FYNphAZ3oZFqHy1YK3xgCxCxRLonqdcqkNBxYTX8Hq6XQGadwc5EwNmS9nR4fpah+5dQ6s
+        h5vCHgPiWqDUEHKURdARCbCQtGGkAk4M2RHCYZFu+pUmWh9HfYcq0jHka1M1Sh58FotP2p
+        W8326zVXUr+Vj5GZ3cAk6uehM67fMVk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-TMw04soZO727ZTmLH4l6BA-1; Fri, 29 May 2020 03:46:16 -0400
+X-MC-Unique: TMw04soZO727ZTmLH4l6BA-1
+Received: by mail-wm1-f69.google.com with SMTP id l26so364517wmh.3
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 00:46:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=7bp9K1xQDo+AhoH9e/7SQpViLsmuixXQeTMU/HkuiBc=;
+        b=jj3W5yYAkhdLscq7O8mfTquSe7FQ2C8dE6GpWTVb9umsRrK3p5SHlVTeEcqRcD4015
+         3aozlZLr8HnBw4A+TbApL5GjphLmYpe4UW/4pLmZ/TRJmLP6yVgLeW3pOwt6sFK82088
+         7Rqqpuj2RwPuq5e55e/NiBWeejQtxphcgT50nNriGsz3E8ulwAGUdnD00rgylRvhJlT7
+         ak1DmNDGe2FTGBp5+6qMPKg+KskTBryFfjy/kC7y+crJ4KuLhYIJIAjBHhFkKrY0uWH6
+         BEl8CRvmTVOS2AipzRFp1LCEXsrwxX/ECGIzcb90xRpxopMVqIMv9x5+n0KeDkdZ5OA2
+         khMg==
+X-Gm-Message-State: AOAM5305Rzw3AZN8tkKCnr8sGtA2C+MXLmT36Vmbyc6IQUtEW5/IvsL5
+        uIow0CaJKpJIl899JLEwfcqZy1gVD7gCjMz8se3e5GOnqyjq2hCAX6VESci7lFecYgo8VzXAm1n
+        q2ipjJjmIfjum
+X-Received: by 2002:adf:e44c:: with SMTP id t12mr7073398wrm.181.1590738375682;
+        Fri, 29 May 2020 00:46:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyhI05ctvDPHmK0GSn7jXPozth0v0wonOshy3raxVwfo1HlERJb1RrSppYq/7L2egaQSMLAgw==
+X-Received: by 2002:adf:e44c:: with SMTP id t12mr7073381wrm.181.1590738375477;
+        Fri, 29 May 2020 00:46:15 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id u13sm8796062wrp.53.2020.05.29.00.46.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 May 2020 00:46:14 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
-Subject: [Qemu-devel PATCH] target/i386: define a new MSR based feature word - FEAT_PERF_CAPABILITIES
-Date:   Fri, 29 May 2020 15:43:47 +0800
-Message-Id: <20200529074347.124619-5-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200529074347.124619-1-like.xu@linux.intel.com>
-References: <20200529074347.124619-1-like.xu@linux.intel.com>
+        linux-kernel@vger.kernel.org,
+        syzbot+904752567107eefb728c@syzkaller.appspotmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Initialize tdp_level during vCPU creation
+In-Reply-To: <20200528194604.GE30353@linux.intel.com>
+References: <20200527085400.23759-1-sean.j.christopherson@intel.com> <40800163-2b28-9879-f21b-687f89070c91@redhat.com> <20200527162933.GE24461@linux.intel.com> <20200528194604.GE30353@linux.intel.com>
+Date:   Fri, 29 May 2020 09:46:13 +0200
+Message-ID: <871rn3ji9m.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Perfmon and Debug Capability MSR named IA32_PERF_CAPABILITIES is
-a feature-enumerating MSR, which only enumerates the feature full-width
-write (via bit 13) by now which indicates the processor supports IA32_A_PMCx
-interface for updating bits 32 and above of IA32_PMCx.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-The existence of MSR IA32_PERF_CAPABILITIES is enumerated by CPUID.1:ECX[15].
+> I'll looking into writing a script to run all selftests with a single
+> command, unless someone already has one laying around? 
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- target/i386/cpu.c | 29 +++++++++++++++++++++++++++++
- target/i386/cpu.h |  3 +++
- target/i386/kvm.c | 20 ++++++++++++++++++++
- 3 files changed, 52 insertions(+)
+Is 'make run_tests' in tools/testing/selftests/kvm/ what you're looking
+for?
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3733d9a279..be56966bb0 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1139,6 +1139,22 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             .index = MSR_IA32_CORE_CAPABILITY,
-         },
-     },
-+    [FEAT_PERF_CAPABILITIES] = {
-+        .type = MSR_FEATURE_WORD,
-+        .feat_names = {
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, "full-width-write", NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .msr = {
-+            .index = MSR_IA32_PERF_CAPABILITIES,
-+        },
-+    },
- 
-     [FEAT_VMX_PROCBASED_CTLS] = {
-         .type = MSR_FEATURE_WORD,
-@@ -1316,6 +1332,10 @@ static FeatureDep feature_dependencies[] = {
-         .from = { FEAT_7_0_EDX,             CPUID_7_0_EDX_CORE_CAPABILITY },
-         .to = { FEAT_CORE_CAPABILITY,       ~0ull },
-     },
-+    {
-+        .from = { FEAT_1_ECX,             CPUID_EXT_PDCM },
-+        .to = { FEAT_PERF_CAPABILITIES,       ~0ull },
-+    },
-     {
-         .from = { FEAT_1_ECX,               CPUID_EXT_VMX },
-         .to = { FEAT_VMX_PROCBASED_CTLS,    ~0ull },
-@@ -5488,6 +5508,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ebx |= (cs->nr_cores * cs->nr_threads) << 16;
-             *edx |= CPUID_HT;
-         }
-+        if (!cpu->enable_pmu) {
-+            *ecx &= ~CPUID_EXT_PDCM;
-+        }
-         break;
-     case 2:
-         /* cache info: needed for Pentium Pro compatibility */
-@@ -6505,6 +6528,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         }
-     }
- 
-+    if (kvm_enabled() && cpu->enable_pmu &&
-+        (kvm_arch_get_supported_cpuid(kvm_state, 1, 0, R_ECX) &
-+         CPUID_EXT_PDCM)) {
-+        env->features[FEAT_1_ECX] |= CPUID_EXT_PDCM;
-+    }
-+
-     if (cpu->ucode_rev == 0) {
-         /* The default is the same as KVM's.  */
-         if (IS_AMD_CPU(env)) {
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 408392dbf6..fad2f874bd 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -356,6 +356,8 @@ typedef enum X86Seg {
- #define MSR_IA32_ARCH_CAPABILITIES      0x10a
- #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
- 
-+#define MSR_IA32_PERF_CAPABILITIES      0x345
-+
- #define MSR_IA32_TSX_CTRL		0x122
- #define MSR_IA32_TSCDEADLINE            0x6e0
- 
-@@ -529,6 +531,7 @@ typedef enum FeatureWord {
-     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-     FEAT_ARCH_CAPABILITIES,
-     FEAT_CORE_CAPABILITY,
-+    FEAT_PERF_CAPABILITIES,
-     FEAT_VMX_PROCBASED_CTLS,
-     FEAT_VMX_SECONDARY_CTLS,
-     FEAT_VMX_PINBASED_CTLS,
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 34f838728d..9be6f76b2c 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -106,6 +106,7 @@ static bool has_msr_core_capabs;
- static bool has_msr_vmx_vmfunc;
- static bool has_msr_ucode_rev;
- static bool has_msr_vmx_procbased_ctls2;
-+static bool has_msr_perf_capabs;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -2027,6 +2028,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_CORE_CAPABILITY:
-                 has_msr_core_capabs = true;
-                 break;
-+            case MSR_IA32_PERF_CAPABILITIES:
-+                has_msr_perf_capabs = true;
-+                break;
-             case MSR_IA32_VMX_VMFUNC:
-                 has_msr_vmx_vmfunc = true;
-                 break;
-@@ -2643,6 +2647,18 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
-                       VMCS12_MAX_FIELD_INDEX << 1);
- }
- 
-+static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
-+{
-+    uint64_t kvm_perf_cap =
-+        kvm_arch_get_supported_msr_feature(kvm_state,
-+                                           MSR_IA32_PERF_CAPABILITIES);
-+
-+    if (kvm_perf_cap) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
-+                        kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
-+    }
-+}
-+
- static int kvm_buf_set_msrs(X86CPU *cpu)
- {
-     int ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MSRS, cpu->kvm_msr_buf);
-@@ -2675,6 +2691,10 @@ static void kvm_init_msrs(X86CPU *cpu)
-                           env->features[FEAT_CORE_CAPABILITY]);
-     }
- 
-+    if (has_msr_perf_capabs && cpu->enable_pmu) {
-+        kvm_msr_entry_add_perf(cpu, env->features);
-+    }
-+
-     if (has_msr_ucode_rev) {
-         kvm_msr_entry_add(cpu, MSR_IA32_UCODE_REV, cpu->ucode_rev);
-     }
 -- 
-2.21.3
+Vitaly
 
