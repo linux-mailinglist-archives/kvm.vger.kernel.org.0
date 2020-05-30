@@ -2,226 +2,310 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BFE41E8D08
-	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 04:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FC071E8D0D
+	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 04:06:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728713AbgE3CGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 May 2020 22:06:16 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:55054 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728675AbgE3CGP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 May 2020 22:06:15 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04U21v9G126685;
-        Sat, 30 May 2020 02:06:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
- references : message-id : date : mime-version : in-reply-to : content-type
- : content-transfer-encoding; s=corp-2020-01-29;
- bh=nXhrAs3diRrE7aeLNXynakoZoDvNIlA9UYWiqjDfFvE=;
- b=QtQOj8i87Sp7qNqCOJgPmQaO+/7ZZAbTuvijjTqKpCEc1kDnpwAYiRcQZupYUrh8balP
- y1NiKK1sOFC6GJELyOW5x+NIWm3sUCxzFJO/2sYJV3FCT03XxCcswlCZvGMeiXxIwwsb
- X/BhMtFMs71n9BPcZ/+O2ly6Z6XE8Bf06girVufI84rz/w4q9gkm6SkuFfcKfKYmHIDS
- bfH4/gKU0oKHZdZwtWg+DAJiHS7Fg8FzMybH6gEYvUR/Jb9802eecTJD1wbPkNo6S5Ap
- q8yU0Oaif0NdIhME746EeD1qLDPzLpTQ0aonMdF4h2rc6IEqkPYEvEvEPJYWPTZjGihx 9g== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 318xbkd839-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sat, 30 May 2020 02:06:12 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04U23nZk142472;
-        Sat, 30 May 2020 02:06:11 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 31a9kv3wqe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 30 May 2020 02:06:11 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04U26A3V021022;
-        Sat, 30 May 2020 02:06:10 GMT
-Received: from localhost.localdomain (/73.15.199.204)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 29 May 2020 19:06:10 -0700
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [PATCH 17/30] KVM: nSVM: synchronize VMCB controls updated by the
- processor on every vmexit
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200529153934.11694-1-pbonzini@redhat.com>
- <20200529153934.11694-18-pbonzini@redhat.com>
-Message-ID: <128fe186-219f-75d0-7ce2-9bb6317e1e7d@oracle.com>
-Date:   Fri, 29 May 2020 19:06:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1728753AbgE3CGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 May 2020 22:06:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36500 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728675AbgE3CGs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 May 2020 22:06:48 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 870CCC08C5C9
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 19:06:48 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id s18so1412520ioe.2
+        for <kvm@vger.kernel.org>; Fri, 29 May 2020 19:06:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ersu1mZ/1WuvaD6HFrhHHPAf97XG85DrOF7Hn6OZ+tQ=;
+        b=BdsJnM9HjseQdQC9SsuJV5ZrQ7JrYcjAVT+V9X0frMCJQgIgxEoD/hNHqE13V1wkOq
+         tDDW32l8or4sQCGPDjnX6KCJAMU3TcaquxFVWXq3CbhFQBSYN0ZrNMn816CFHeDGABWF
+         UMi9faKdDxpihoSfKZGsv7R6kyIaPl1HfWdad4D0/HpwpUzTFJiw6Odere/8GlXfQaEL
+         76CMJDKLe11Pa5DpxHHqtLrSdOJht52abSICqvKzURsH+wTIBe35zi/kGMfmhmRJdAHb
+         nIMiXkQAlwmsLhX5Q8rhOudv0YH2W0erv7Uhi9ZYKJ29VdXFSWtSMt27FBGZEGwMas3h
+         m1Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ersu1mZ/1WuvaD6HFrhHHPAf97XG85DrOF7Hn6OZ+tQ=;
+        b=EnNicbq6q03wqq3KQ9FutIxCr8guP5yLanP42PchFtJntSzmr9YLHy3MGhVRp0UwaZ
+         6+EQgp6Z9W4IaD4rwTm9AZBwqfPcr6135DfWjebyRefQSZG+kN0sq5CIljLOBwA7ch23
+         HgdzyRfZN0gfTGQFlTETi3obstLSrMwvivUBjoffzf/e5bA4jKsbp02iTgFYrDJCBlu9
+         QOg+9K46AGOURTKPPgvefmYlPPXGSltGFaEb2thjK60C0zvU69p7GHcMM8zTOnSNEt2y
+         KH0+n7Fs1DN0f+/1F79uguCHWOJRNLvjTroDEa0/Ffwm1pqET7S4F+qqNHSEjEV3BvkA
+         P/Yg==
+X-Gm-Message-State: AOAM531LNOM2JnSsXQJEcdcKSoLfhctpAUCaWT7rTJbI7EJqHd2RkSAA
+        hLR19tkoLibrb3dsXY+v0aSeZuNTzU13Ay4mKHUUpg==
+X-Google-Smtp-Source: ABdhPJzkCqLNyzENTjt5R/TF1WiMNGTAN8xygUYGv2tzhjPu35nGiVNLG0GOjZnOTZ6XRf3ba4wwoHUairCPcpybmAE=
+X-Received: by 2002:a02:cd2b:: with SMTP id h11mr3970089jaq.47.1590804407605;
+ Fri, 29 May 2020 19:06:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200529153934.11694-18-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 adultscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 bulkscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005300013
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9636 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0 mlxscore=0
- lowpriorityscore=0 priorityscore=1501 phishscore=0 cotscore=-2147483648
- suspectscore=0 bulkscore=0 clxscore=1015 impostorscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2005300013
+References: <cover.1588711355.git.ashish.kalra@amd.com> <40272f7b19bd179b094ac1305c787f7e5002c068.1588711355.git.ashish.kalra@amd.com>
+In-Reply-To: <40272f7b19bd179b094ac1305c787f7e5002c068.1588711355.git.ashish.kalra@amd.com>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Fri, 29 May 2020 19:06:11 -0700
+Message-ID: <CABayD+eWaTF+yekA8_PxN4OtEYDe_y87ohC=iKmkNvqKEuUiTw@mail.gmail.com>
+Subject: Re: [PATCH v8 10/18] mm: x86: Invoke hypercall when page encryption
+ status is changed
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 5/29/20 8:39 AM, Paolo Bonzini wrote:
-> The control state changes on every L2->L0 vmexit, and we will have to
-> serialize it in the nested state.  So keep it up to date in svm->nested.ctl
-> and just copy them back to the nested VMCB in nested_svm_vmexit.
+On Tue, May 5, 2020 at 2:18 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
 >
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> From: Brijesh Singh <Brijesh.Singh@amd.com>
+>
+> Invoke a hypercall when a memory region is changed from encrypted ->
+> decrypted and vice versa. Hypervisor needs to know the page encryption
+> status during the guest migration.
+>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Radim Kr=C4=8Dm=C3=A1=C5=99" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
->   arch/x86/kvm/svm/nested.c | 57 ++++++++++++++++++++++-----------------
->   arch/x86/kvm/svm/svm.c    |  5 +++-
->   arch/x86/kvm/svm/svm.h    |  1 +
->   3 files changed, 38 insertions(+), 25 deletions(-)
+>  arch/x86/include/asm/paravirt.h       | 10 +++++
+>  arch/x86/include/asm/paravirt_types.h |  2 +
+>  arch/x86/kernel/paravirt.c            |  1 +
+>  arch/x86/mm/mem_encrypt.c             | 57 ++++++++++++++++++++++++++-
+>  arch/x86/mm/pat/set_memory.c          |  7 ++++
+>  5 files changed, 76 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 1e5f460b5540..921466eba556 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -234,6 +234,34 @@ static void load_nested_vmcb_control(struct vcpu_svm *svm,
->   	svm->nested.ctl.iopm_base_pa  &= ~0x0fffULL;
->   }
->   
-> +/*
-> + * Synchronize fields that are written by the processor, so that
-> + * they can be copied back into the nested_vmcb.
-> + */
-> +void sync_nested_vmcb_control(struct vcpu_svm *svm)
+> diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/parav=
+irt.h
+> index 694d8daf4983..8127b9c141bf 100644
+> --- a/arch/x86/include/asm/paravirt.h
+> +++ b/arch/x86/include/asm/paravirt.h
+> @@ -78,6 +78,12 @@ static inline void paravirt_arch_exit_mmap(struct mm_s=
+truct *mm)
+>         PVOP_VCALL1(mmu.exit_mmap, mm);
+>  }
+>
+> +static inline void page_encryption_changed(unsigned long vaddr, int npag=
+es,
+> +                                               bool enc)
 > +{
-> +	u32 mask;
-> +	svm->nested.ctl.event_inj      = svm->vmcb->control.event_inj;
-> +	svm->nested.ctl.event_inj_err  = svm->vmcb->control.event_inj_err;
-> +
-> +	/* Only a few fields of int_ctl are written by the processor.  */
-> +	mask = V_IRQ_MASK | V_TPR_MASK;
-> +	if (!(svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK) &&
-> +	    is_intercept(svm, SVM_EXIT_VINTR)) {
-> +		/*
-> +		 * In order to request an interrupt window, L0 is usurping
-> +		 * svm->vmcb->control.int_ctl and possibly setting V_IRQ
-> +		 * even if it was clear in L1's VMCB.  Restoring it would be
-> +		 * wrong.  However, in this case V_IRQ will remain true until
-> +		 * interrupt_window_interception calls svm_clear_vintr and
-> +		 * restores int_ctl.  We can just leave it aside.
-> +		 */
-> +		mask &= ~V_IRQ_MASK;
-> +	}
-> +	svm->nested.ctl.int_ctl        &= ~mask;
-> +	svm->nested.ctl.int_ctl        |= svm->vmcb->control.int_ctl & mask;
+> +       PVOP_VCALL3(mmu.page_encryption_changed, vaddr, npages, enc);
 > +}
 > +
->   static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_vmcb)
->   {
->   	/* Load the nested guest state */
-> @@ -471,6 +499,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->   	/* Exit Guest-Mode */
->   	leave_guest_mode(&svm->vcpu);
->   	svm->nested.vmcb = 0;
-> +	WARN_ON_ONCE(svm->nested.nested_run_pending);
->   
->   	/* in case we halted in L2 */
->   	svm->vcpu.arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> @@ -497,8 +526,6 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->   	nested_vmcb->save.dr6    = svm->vcpu.arch.dr6;
->   	nested_vmcb->save.cpl    = vmcb->save.cpl;
->   
-> -	nested_vmcb->control.int_ctl           = vmcb->control.int_ctl;
-> -	nested_vmcb->control.int_vector        = vmcb->control.int_vector;
+>  #ifdef CONFIG_PARAVIRT_XXL
+>  static inline void load_sp0(unsigned long sp0)
+>  {
+> @@ -946,6 +952,10 @@ static inline void paravirt_arch_dup_mmap(struct mm_=
+struct *oldmm,
+>  static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
+>  {
+>  }
+> +
+> +static inline void page_encryption_changed(unsigned long vaddr, int npag=
+es, bool enc)
+> +{
+> +}
+>  #endif
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* _ASM_X86_PARAVIRT_H */
+> diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm=
+/paravirt_types.h
+> index 732f62e04ddb..03bfd515c59c 100644
+> --- a/arch/x86/include/asm/paravirt_types.h
+> +++ b/arch/x86/include/asm/paravirt_types.h
+> @@ -215,6 +215,8 @@ struct pv_mmu_ops {
+>
+>         /* Hook for intercepting the destruction of an mm_struct. */
+>         void (*exit_mmap)(struct mm_struct *mm);
+> +       void (*page_encryption_changed)(unsigned long vaddr, int npages,
+> +                                       bool enc);
+>
+>  #ifdef CONFIG_PARAVIRT_XXL
+>         struct paravirt_callee_save read_cr2;
+> diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+> index c131ba4e70ef..840c02b23aeb 100644
+> --- a/arch/x86/kernel/paravirt.c
+> +++ b/arch/x86/kernel/paravirt.c
+> @@ -367,6 +367,7 @@ struct paravirt_patch_template pv_ops =3D {
+>                         (void (*)(struct mmu_gather *, void *))tlb_remove=
+_page,
+>
+>         .mmu.exit_mmap          =3D paravirt_nop,
+> +       .mmu.page_encryption_changed    =3D paravirt_nop,
+>
+>  #ifdef CONFIG_PARAVIRT_XXL
+>         .mmu.read_cr2           =3D __PV_IS_CALLEE_SAVE(native_read_cr2),
+> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+> index f4bd4b431ba1..c9800fa811f6 100644
+> --- a/arch/x86/mm/mem_encrypt.c
+> +++ b/arch/x86/mm/mem_encrypt.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/bitops.h>
+>  #include <linux/dma-mapping.h>
+> +#include <linux/kvm_para.h>
+>
+>  #include <asm/tlbflush.h>
+>  #include <asm/fixmap.h>
+> @@ -29,6 +30,7 @@
+>  #include <asm/processor-flags.h>
+>  #include <asm/msr.h>
+>  #include <asm/cmdline.h>
+> +#include <asm/kvm_para.h>
+>
+>  #include "mm_internal.h"
+>
+> @@ -196,6 +198,47 @@ void __init sme_early_init(void)
+>                 swiotlb_force =3D SWIOTLB_FORCE;
+>  }
+>
+> +static void set_memory_enc_dec_hypercall(unsigned long vaddr, int npages=
+,
+> +                                       bool enc)
+> +{
+> +       unsigned long sz =3D npages << PAGE_SHIFT;
+> +       unsigned long vaddr_end, vaddr_next;
+> +
+> +       vaddr_end =3D vaddr + sz;
+> +
+> +       for (; vaddr < vaddr_end; vaddr =3D vaddr_next) {
+> +               int psize, pmask, level;
+> +               unsigned long pfn;
+> +               pte_t *kpte;
+> +
+> +               kpte =3D lookup_address(vaddr, &level);
+> +               if (!kpte || pte_none(*kpte))
+> +                       return;
+> +
+> +               switch (level) {
+> +               case PG_LEVEL_4K:
+> +                       pfn =3D pte_pfn(*kpte);
+> +                       break;
+> +               case PG_LEVEL_2M:
+> +                       pfn =3D pmd_pfn(*(pmd_t *)kpte);
+> +                       break;
+> +               case PG_LEVEL_1G:
+> +                       pfn =3D pud_pfn(*(pud_t *)kpte);
+> +                       break;
+> +               default:
+> +                       return;
+> +               }
+> +
+> +               psize =3D page_level_size(level);
+> +               pmask =3D page_level_mask(level);
+> +
+> +               kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
+> +                                  pfn << PAGE_SHIFT, psize >> PAGE_SHIFT=
+, enc);
+> +
+> +               vaddr_next =3D (vaddr & pmask) + psize;
+> +       }
+> +}
+> +
+>  static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
+>  {
+>         pgprot_t old_prot, new_prot;
+> @@ -253,12 +296,13 @@ static void __init __set_clr_pte_enc(pte_t *kpte, i=
+nt level, bool enc)
+>  static int __init early_set_memory_enc_dec(unsigned long vaddr,
+>                                            unsigned long size, bool enc)
+>  {
+> -       unsigned long vaddr_end, vaddr_next;
+> +       unsigned long vaddr_end, vaddr_next, start;
+>         unsigned long psize, pmask;
+>         int split_page_size_mask;
+>         int level, ret;
+>         pte_t *kpte;
+>
+> +       start =3D vaddr;
+>         vaddr_next =3D vaddr;
+>         vaddr_end =3D vaddr + size;
+>
+> @@ -313,6 +357,8 @@ static int __init early_set_memory_enc_dec(unsigned l=
+ong vaddr,
+>
+>         ret =3D 0;
+>
+> +       set_memory_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_SHIF=
+T,
+> +                                       enc);
+>  out:
+>         __flush_tlb_all();
+>         return ret;
+> @@ -451,6 +497,15 @@ void __init mem_encrypt_init(void)
+>         if (sev_active())
+>                 static_branch_enable(&sev_enable_key);
+>
+> +#ifdef CONFIG_PARAVIRT
+> +       /*
+> +        * With SEV, we need to make a hypercall when page encryption sta=
+te is
+> +        * changed.
+> +        */
+> +       if (sev_active())
+> +               pv_ops.mmu.page_encryption_changed =3D set_memory_enc_dec=
+_hypercall;
+> +#endif
+> +
+>         pr_info("AMD %s active\n",
+>                 sev_active() ? "Secure Encrypted Virtualization (SEV)"
+>                              : "Secure Memory Encryption (SME)");
+> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
+> index 59eca6a94ce7..9aaf1b6f5a1b 100644
+> --- a/arch/x86/mm/pat/set_memory.c
+> +++ b/arch/x86/mm/pat/set_memory.c
+> @@ -27,6 +27,7 @@
+>  #include <asm/proto.h>
+>  #include <asm/memtype.h>
+>  #include <asm/set_memory.h>
+> +#include <asm/paravirt.h>
+>
+>  #include "../mm_internal.h"
+>
+> @@ -2003,6 +2004,12 @@ static int __set_memory_enc_dec(unsigned long addr=
+, int numpages, bool enc)
+>          */
+>         cpa_flush(&cpa, 0);
+>
+> +       /* Notify hypervisor that a given memory range is mapped encrypte=
+d
+> +        * or decrypted. The hypervisor will use this information during =
+the
+> +        * VM migration.
+> +        */
+> +       page_encryption_changed(addr, numpages, enc);
+> +
+>         return ret;
+>  }
+>
+> --
+> 2.17.1
+>
 
 
-While it's not related to this patch, I am wondering if we need the 
-following line in enter_svm_guest_mode():
-
-     svm->vmcb->control.int_vector = nested_vmcb->control.int_vector;
-
-
-If int_vector is used only to trigger a #VMEXIT after we have decided to 
-inject a virtual interrupt, we probably don't the vector value from the 
-nested vmcb.
-
->   	nested_vmcb->control.int_state         = vmcb->control.int_state;
->   	nested_vmcb->control.exit_code         = vmcb->control.exit_code;
->   	nested_vmcb->control.exit_code_hi      = vmcb->control.exit_code_hi;
-> @@ -510,34 +537,16 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->   	if (svm->nrips_enabled)
->   		nested_vmcb->control.next_rip  = vmcb->control.next_rip;
->   
-> -	/*
-> -	 * If we emulate a VMRUN/#VMEXIT in the same host #vmexit cycle we have
-> -	 * to make sure that we do not lose injected events. So check event_inj
-> -	 * here and copy it to exit_int_info if it is valid.
-> -	 * Exit_int_info and event_inj can't be both valid because the case
-> -	 * below only happens on a VMRUN instruction intercept which has
-> -	 * no valid exit_int_info set.
-> -	 */
-> -	if (vmcb->control.event_inj & SVM_EVTINJ_VALID) {
-> -		struct vmcb_control_area *nc = &nested_vmcb->control;
-> -
-> -		nc->exit_int_info     = vmcb->control.event_inj;
-> -		nc->exit_int_info_err = vmcb->control.event_inj_err;
-> -	}
-> -
-> -	nested_vmcb->control.tlb_ctl           = 0;
-> -	nested_vmcb->control.event_inj         = 0;
-> -	nested_vmcb->control.event_inj_err     = 0;
-> +	nested_vmcb->control.int_ctl           = svm->nested.ctl.int_ctl;
-> +	nested_vmcb->control.tlb_ctl           = svm->nested.ctl.tlb_ctl;
-> +	nested_vmcb->control.event_inj         = svm->nested.ctl.event_inj;
-> +	nested_vmcb->control.event_inj_err     = svm->nested.ctl.event_inj_err;
->   
->   	nested_vmcb->control.pause_filter_count =
->   		svm->vmcb->control.pause_filter_count;
->   	nested_vmcb->control.pause_filter_thresh =
->   		svm->vmcb->control.pause_filter_thresh;
->   
-> -	/* We always set V_INTR_MASKING and remember the old value in hflags */
-> -	if (!(svm->vcpu.arch.hflags & HF_VINTR_MASK))
-> -		nested_vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
-> -
->   	/* Restore the original control entries */
->   	copy_vmcb_control_area(&vmcb->control, &hsave->control);
->   
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 4122ba86bac2..b710e62ace16 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3427,7 +3427,10 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->   	sync_cr8_to_lapic(vcpu);
->   
->   	svm->next_rip = 0;
-> -	svm->nested.nested_run_pending = 0;
-> +	if (is_guest_mode(&svm->vcpu)) {
-> +		sync_nested_vmcb_control(svm);
-> +		svm->nested.nested_run_pending = 0;
-
-
-I don't see any existence of nested_run_pending for nSVM either in Linus 
-tree or KVM tree. Is there a  patch that has this added but not pushed yet ?
-
-> +	}
->   
->   	svm->vmcb->control.tlb_ctl = TLB_CONTROL_DO_NOTHING;
->   
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index dd5418f20256..7e79f0af1204 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -394,6 +394,7 @@ int nested_svm_check_permissions(struct vcpu_svm *svm);
->   int nested_svm_check_exception(struct vcpu_svm *svm, unsigned nr,
->   			       bool has_error_code, u32 error_code);
->   int nested_svm_exit_special(struct vcpu_svm *svm);
-> +void sync_nested_vmcb_control(struct vcpu_svm *svm);
->   
->   extern struct kvm_x86_nested_ops svm_nested_ops;
->   
+Reviewed-by: Steve Rutherford <srutherford@google.com>
