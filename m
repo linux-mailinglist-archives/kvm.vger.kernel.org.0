@@ -2,116 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC6201E92F4
-	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 19:57:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9861F1E9321
+	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 20:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729083AbgE3R5q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 May 2020 13:57:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42846 "EHLO
+        id S1729295AbgE3SjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 May 2020 14:39:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728998AbgE3R5o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 May 2020 13:57:44 -0400
-Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37FD5C08C5CA
-        for <kvm@vger.kernel.org>; Sat, 30 May 2020 10:57:44 -0700 (PDT)
-Received: by mail-lj1-x244.google.com with SMTP id z13so3156139ljn.7
-        for <kvm@vger.kernel.org>; Sat, 30 May 2020 10:57:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oSw9tD6N6PkQVpqgffMdls3duXKGoPYgqTcZw/O/Ajs=;
-        b=Lrpv+rXNeI30WFwiZ3vG/HqSBj3X8LK4/226aM9DIBxsp+rGuUknOUrRMAKhbygxl4
-         2/b72LXeaiKacrNWcsuKU1yFVjfrDuO9n9ZrCDP6XoASr7ATsfi5/BJRKwLKcRRm019Y
-         q0vVl8iWNZpE3VHVrbGLWaJXKDmyB69Ejad/Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oSw9tD6N6PkQVpqgffMdls3duXKGoPYgqTcZw/O/Ajs=;
-        b=g4FwNLnvECPzfRB2nxPtH3OP1GB9XOs8Z5irWrV/KiK9NSrmEMh9xuu+j97FMhUcHx
-         mhX3OjrSg+rqVeWPErEaS9cWHcm3GH0ZSqTCwhbQvjOqEhnqo+ZnUWICGGzuiU4C6Qmw
-         Up2ytugsoT6AyE7iF33noR4XHjQTTSkqL7y8lIKcFD4MYqL2rrGU+GfoKir5n+G2s/t1
-         pZw7QWwlDKjl3IU/cRmFLi28EeOhp/cUnhnk/bCoal5YBihPj5jEH7vzghDSPR33TFQc
-         xikWuiTFmqcHojjY0ol9WfZtjOzZbpyA+ATWOAhq5VWudMCaiWiYGVex9MXq05phAgeN
-         aAWA==
-X-Gm-Message-State: AOAM531cVPOUNUAfoMT2/XAI9musOnub3IOEVrZqxFOqxm7ttdZqA2cq
-        G8Wi0tMJqFNkboyqq43LAcz6JAq4tYw=
-X-Google-Smtp-Source: ABdhPJyukJoxX5W11e2W3QTo3IMdJegBVXpKHZpVPeudhzoNvprMNkf9hBIQZSixnT9qRBZGWf8lgg==
-X-Received: by 2002:a2e:9087:: with SMTP id l7mr7116149ljg.430.1590861461965;
-        Sat, 30 May 2020 10:57:41 -0700 (PDT)
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com. [209.85.208.174])
-        by smtp.gmail.com with ESMTPSA id l16sm3146036lfg.2.2020.05.30.10.57.40
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 May 2020 10:57:40 -0700 (PDT)
-Received: by mail-lj1-f174.google.com with SMTP id b6so3202061ljj.1
-        for <kvm@vger.kernel.org>; Sat, 30 May 2020 10:57:40 -0700 (PDT)
-X-Received: by 2002:a2e:8897:: with SMTP id k23mr2590713lji.285.1590861460328;
- Sat, 30 May 2020 10:57:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200528234025.GT23230@ZenIV.linux.org.uk> <20200529232723.44942-1-viro@ZenIV.linux.org.uk>
- <20200529232723.44942-8-viro@ZenIV.linux.org.uk> <CAHk-=wgq2dzOdN4_=eY-XwxmcgyBM_esnPtXCvz1zStZKjiHKA@mail.gmail.com>
- <20200530143147.GN23230@ZenIV.linux.org.uk> <81563af6-6ea2-3e21-fe53-9955910e303a@redhat.com>
-In-Reply-To: <81563af6-6ea2-3e21-fe53-9955910e303a@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 30 May 2020 10:57:24 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiW=cKaMyBKgZMOOJQbpAyeRrz--o2H_7CdDpbn+az9vQ@mail.gmail.com>
-Message-ID: <CAHk-=wiW=cKaMyBKgZMOOJQbpAyeRrz--o2H_7CdDpbn+az9vQ@mail.gmail.com>
-Subject: Re: [PATCH 8/9] x86: kvm_hv_set_msr(): use __put_user() instead of
- 32bit __clear_user()
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        with ESMTP id S1729149AbgE3SjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 May 2020 14:39:04 -0400
+Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D386C03E969;
+        Sat, 30 May 2020 11:39:04 -0700 (PDT)
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.93 #3 (Red Hat Linux))
+        id 1jf6Nh-000XsX-Rs; Sat, 30 May 2020 18:38:53 +0000
+Date:   Sat, 30 May 2020 19:38:53 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         KVM list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 8/9] x86: kvm_hv_set_msr(): use __put_user() instead of
+ 32bit __clear_user()
+Message-ID: <20200530183853.GQ23230@ZenIV.linux.org.uk>
+References: <20200528234025.GT23230@ZenIV.linux.org.uk>
+ <20200529232723.44942-1-viro@ZenIV.linux.org.uk>
+ <20200529232723.44942-8-viro@ZenIV.linux.org.uk>
+ <CAHk-=wgq2dzOdN4_=eY-XwxmcgyBM_esnPtXCvz1zStZKjiHKA@mail.gmail.com>
+ <20200530143147.GN23230@ZenIV.linux.org.uk>
+ <81563af6-6ea2-3e21-fe53-9955910e303a@redhat.com>
+ <CAHk-=wiW=cKaMyBKgZMOOJQbpAyeRrz--o2H_7CdDpbn+az9vQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiW=cKaMyBKgZMOOJQbpAyeRrz--o2H_7CdDpbn+az9vQ@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 30, 2020 at 9:20 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Yes, the access_ok is done in __kvm_set_memory_region and gfn_to_hva()
-> returns a page-aligned address so it's obviously ok for a u32.
+On Sat, May 30, 2020 at 10:57:24AM -0700, Linus Torvalds wrote:
 
-It's not that it's "obviously ok for an u32".
+> So no. I disagree. There is absolutely nothing "obviously ok" about
+> any of that kvm code. Quite the reverse.
+> 
+> I'd argue that it's very much obviously *NOT* ok, even while it might
+> just happen to work.
 
-It is _not_ obviously ok for a user address. There's actually no
-access_ok() done in the lookup path at all, and what gfn_to_hva()
-actually ends up doing in the end is __gfn_to_hva_memslot(), which has
-zero overflow protection at all, and just does
+Actually, it's somewhat less brittle than you think (on non-mips, at least)
+and not due to those long-ago access_ok().
 
-        slot->userspace_addr + (gfn - slot->base_gfn) * PAGE_SIZE;
+> That double underscore needs to go away. It's either actively buggy
+> right now and I see no proof it isn't, or it's a bug just waiting to
+> happen in the future.
 
-without us having _ever_ checked that 'gfn' parameter.
+FWIW, the kvm side of things (vhost is yet another pile of fun) is
 
-Yes, at some point in the very very distant past,
-__kvm_set_memory_region() has validated
-mem->{userspace_addr,memory_size}.  But even that validation is
-actually very questionable, since it's not even done for all of the
-memory slots, only the "user" ones.
+[x86] kvm_hv_set_msr_pw():
+arch/x86/kvm/hyperv.c:1027:             if (__copy_to_user((void __user *)addr, instructions, 4))
+	HV_X64_MSR_HYPERCALL
+arch/x86/kvm/hyperv.c:1132:             if (__clear_user((void __user *)addr, sizeof(u32)))
+	HV_X64_MSR_VP_ASSIST_PAGE
+in both cases addr comes from
+                gfn = data >> HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_SHIFT;
+                addr = kvm_vcpu_gfn_to_hva(vcpu, gfn);
+                if (kvm_is_error_hva(addr))
+                        return 1;
 
-So if at any point we have a non-user slot, of it at any point the gfn
-thing was mis-calculated and {over,under}flows, there are no
-protections what-so-ever.
+[x86] FNAME(walk_addr_generic), very hot:
+arch/x86/kvm/mmu/paging_tmpl.h:403:             if (unlikely(__get_user(pte, ptep_user)))
+                index = PT_INDEX(addr, walker->level);
+                ...
+                offset    = index * sizeof(pt_element_t);
+		...
+                host_addr = kvm_vcpu_gfn_to_hva_prot(vcpu, real_gfn,
+                                            &walker->pte_writable[walker->level - 1]);
+                if (unlikely(kvm_is_error_hva(host_addr)))
+                        goto error;
+                ptep_user = (pt_element_t __user *)((void *)host_addr + offset);
 
-In other words, it really looks like kvm is entirely dependent on
-magic and luck and a desperate hope that there are no other bugs to
-keep the end result as a user address.
+__kvm_read_guest_page():
+virt/kvm/kvm_main.c:2252:       r = __copy_from_user(data, (void __user *)addr + offset, len);
+        addr = gfn_to_hva_memslot_prot(slot, gfn, NULL);
+        if (kvm_is_error_hva(addr))
+                return -EFAULT;
 
-Because if _any_ bug or oversight in that kvm_memory_slot handling
-ever happens, you end up with random crap.
+__kvm_read_guest_atomic():
+virt/kvm/kvm_main.c:2326:       r = __copy_from_user_inatomic(data, (void __user *)addr + offset, len);
+        addr = gfn_to_hva_memslot_prot(slot, gfn, NULL);
+        if (kvm_is_error_hva(addr))
+                return -EFAULT;
 
-So no. I disagree. There is absolutely nothing "obviously ok" about
-any of that kvm code. Quite the reverse.
+__kvm_write_guest_page():
+virt/kvm/kvm_main.c:2353:       r = __copy_to_user((void __user *)addr + offset, data, len);
+        addr = gfn_to_hva_memslot(memslot, gfn);
+        if (kvm_is_error_hva(addr))
+                return -EFAULT;
 
-I'd argue that it's very much obviously *NOT* ok, even while it might
-just happen to work.
+kvm_write_guest_offset_cached():
+virt/kvm/kvm_main.c:2490:       r = __copy_to_user((void __user *)ghc->hva + offset, data, len);
+        if (kvm_is_error_hva(ghc->hva))
+                return -EFAULT;
 
-That double underscore needs to go away. It's either actively buggy
-right now and I see no proof it isn't, or it's a bug just waiting to
-happen in the future.
+kvm_read_guest_cached():
+virt/kvm/kvm_main.c:2525:       r = __copy_from_user(data, (void __user *)ghc->hva, len);
+        if (kvm_is_error_hva(ghc->hva))
+                return -EFAULT;
 
-               Linus
+default kvm_is_error_hva() is addr >= PAGE_OFFSET; however, on mips and s390 it's
+IS_ERR_VALUE().
+
+Sure, we can use non-__ variants, but is access_ok() the right primitive here?
+We want userland memory, set_fs() be damned.  
