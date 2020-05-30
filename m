@@ -2,60 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C3981E9231
-	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 16:53:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 524A41E926B
+	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 17:58:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729125AbgE3Ow4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 May 2020 10:52:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42532 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728927AbgE3Ow4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 May 2020 10:52:56 -0400
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40954C03E969;
-        Sat, 30 May 2020 07:52:53 -0700 (PDT)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.93 #3 (Red Hat Linux))
-        id 1jf2qv-000U2Z-8N; Sat, 30 May 2020 14:52:49 +0000
-Date:   Sat, 30 May 2020 15:52:49 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 8/9] x86: kvm_hv_set_msr(): use __put_user() instead of
- 32bit __clear_user()
-Message-ID: <20200530145249.GO23230@ZenIV.linux.org.uk>
-References: <20200528234025.GT23230@ZenIV.linux.org.uk>
- <20200529232723.44942-1-viro@ZenIV.linux.org.uk>
- <20200529232723.44942-8-viro@ZenIV.linux.org.uk>
- <CAHk-=wgq2dzOdN4_=eY-XwxmcgyBM_esnPtXCvz1zStZKjiHKA@mail.gmail.com>
- <20200530143147.GN23230@ZenIV.linux.org.uk>
+        id S1729097AbgE3P6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 May 2020 11:58:31 -0400
+Received: from smtprelay0009.hostedemail.com ([216.40.44.9]:60224 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729029AbgE3P6a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 30 May 2020 11:58:30 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay02.hostedemail.com (Postfix) with ESMTP id 9CCB74DD8;
+        Sat, 30 May 2020 15:58:29 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Spam-Summary: 2,0,0,,d41d8cd98f00b204,joe@perches.com,,RULES_HIT:41:355:379:599:800:960:968:973:988:989:1260:1277:1311:1313:1314:1345:1359:1437:1515:1516:1518:1534:1541:1593:1594:1711:1730:1747:1777:1792:2393:2559:2562:2828:2894:3138:3139:3140:3141:3142:3352:3622:3865:3867:3870:3871:4321:4605:5007:7903:8603:10004:10400:10848:11026:11232:11658:11914:12043:12048:12296:12297:12438:12740:12760:12895:13069:13311:13357:13439:14096:14097:14181:14659:14721:21080:21627:30054:30091,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:3,LUA_SUMMARY:none
+X-HE-Tag: ink56_0c0299e26d6d
+X-Filterd-Recvd-Size: 2145
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf12.hostedemail.com (Postfix) with ESMTPA;
+        Sat, 30 May 2020 15:58:28 +0000 (UTC)
+Message-ID: <0c00d96c46d34d69f5f459baebf3c89a507730fc.camel@perches.com>
+Subject: Re: [PATCH] KVM: Use previously computed array_size()
+From:   Joe Perches <joe@perches.com>
+To:     Denis Efremov <efremov@linux.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Sat, 30 May 2020 08:58:26 -0700
+In-Reply-To: <20200530143558.321449-1-efremov@linux.com>
+References: <20200530143558.321449-1-efremov@linux.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.2-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200530143147.GN23230@ZenIV.linux.org.uk>
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 30, 2020 at 03:31:47PM +0100, Al Viro wrote:
+On Sat, 2020-05-30 at 17:35 +0300, Denis Efremov wrote:
+> array_size() is used in alloc calls to compute the allocation
+> size. Next, "raw" multiplication is used to compute the size
+> for copy_from_user(). The patch removes duplicated computation
+> by saving the size in a var. No security concerns, just a small
+> optimization.
+> 
+> Signed-off-by: Denis Efremov <efremov@linux.com>
 
-> It's a bit trickier than that, but I want to deal with that at the same
-> time as the rest of kvm/vhost stuff.  So for this series I just went
-> for minimal change.  There's quite a pile of vhost and kvm stuff,
-> but it's not ready yet - wait for the next cycle.
+Perhaps use vmemdup_user?
 
-BTW, regarding uaccess plans for the next cycle:
-	* regset mess (at least the ->get() side)
-	* killing more compat_alloc_user_space() call sites (_maybe_
-all of it, if we are lucky enough; v4l2 is a bitch in that respect,
-but I've some ideas on how to deal with that - need to discuss with
-mchehab)
-	* sorting the remaining (harder) parts of i915 out
-	* kvm/vhost
-	* fault_in_pages_...() series
-That should get rid of almost all __... ones outside of arch/*; might
-actually kill copy_in_user() off as well.
-	* finally lifting stac/clac out of raw_copy_{to,from}_user().
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+[]
+> @@ -184,14 +184,13 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+>  		goto out;
+>  	r = -ENOMEM;
+>  	if (cpuid->nent) {
+> -		cpuid_entries =
+> -			vmalloc(array_size(sizeof(struct kvm_cpuid_entry),
+> -					   cpuid->nent));
+> +		const size_t size = array_size(sizeof(struct kvm_cpuid_entry),
+> +					       cpuid->nent);
+> +		cpuid_entries = vmalloc(size);
+>  		if (!cpuid_entries)
+>  			goto out;
+>  		r = -EFAULT;
+> -		if (copy_from_user(cpuid_entries, entries,
+> -				   cpuid->nent * sizeof(struct kvm_cpuid_entry)))
+> +		if (copy_from_user(cpuid_entries, entries, size))
+
+		cpuid_entries = vmemdup_user(entries,
+					     array_size(sizeof(struct kvm_cpuid_entry), cpuid->nent));
+		if (IS_ERR(cpuid_entries))
+			...
+
+etc...
+
+
