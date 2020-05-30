@@ -2,76 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 012CB1E920F
-	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 16:31:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F48B1E921F
+	for <lists+kvm@lfdr.de>; Sat, 30 May 2020 16:36:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729096AbgE3Obw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 May 2020 10:31:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728927AbgE3Obw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 May 2020 10:31:52 -0400
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46D5DC03E969;
-        Sat, 30 May 2020 07:31:52 -0700 (PDT)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.93 #3 (Red Hat Linux))
-        id 1jf2WZ-000TFN-2S; Sat, 30 May 2020 14:31:47 +0000
-Date:   Sat, 30 May 2020 15:31:47 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 8/9] x86: kvm_hv_set_msr(): use __put_user() instead of
- 32bit __clear_user()
-Message-ID: <20200530143147.GN23230@ZenIV.linux.org.uk>
-References: <20200528234025.GT23230@ZenIV.linux.org.uk>
- <20200529232723.44942-1-viro@ZenIV.linux.org.uk>
- <20200529232723.44942-8-viro@ZenIV.linux.org.uk>
- <CAHk-=wgq2dzOdN4_=eY-XwxmcgyBM_esnPtXCvz1zStZKjiHKA@mail.gmail.com>
+        id S1729154AbgE3OgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 May 2020 10:36:16 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:34041 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729090AbgE3OgQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 May 2020 10:36:16 -0400
+Received: by mail-lj1-f193.google.com with SMTP id b6so2807469ljj.1;
+        Sat, 30 May 2020 07:36:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zcNfd/l9BFnlHabQoqPPfv442F/SopiWQUZyPNucIqI=;
+        b=tsKQApuqDOi18dN9MvPNC2VpTUX4+2k/gzk0DOuC+FY+NoeTD1UXy06FfkoVfiiJdl
+         gUl+RNqANhKyqA/ZFLQex9D1czvirt/FmBFaGudiiSCKAGNZmf6z3uNbiNqaZulsQpM4
+         FDgUBb6CYNorm9WUtnAZdycaTe8xz/QAegJXyZAx4Z7wdKUbTf1rNwJscXid2Df42+OB
+         9KBrLY6JZ3WSKKAad+Bmnr11ke/2b0j6EIUDYG0vKgASuOL5QM17214hsOk7dprdI+e8
+         Lhlb9qw9SRo2s2itKel8PakumQPgqYH0z2ofQ9XU+e72vXVxgTN/j81b5kbKM/6q4Nn7
+         KhJg==
+X-Gm-Message-State: AOAM533VYE63TJFi2PsRSp+HSlUnzl2rfYsshgyI01F46mEhAnLfXI7k
+        z5NyxjV6U7exMGNNLEcHPqQ=
+X-Google-Smtp-Source: ABdhPJxJJVDsE3UA3/u/pMgcLiK5Uceo5WYq0qc9mpMLE7pcXRdVy9+idpuUa8Ne4vCS6k4H/zYytw==
+X-Received: by 2002:a2e:9787:: with SMTP id y7mr6173028lji.107.1590849373877;
+        Sat, 30 May 2020 07:36:13 -0700 (PDT)
+Received: from localhost.localdomain ([213.87.139.175])
+        by smtp.googlemail.com with ESMTPSA id w10sm2859199lfq.14.2020.05.30.07.36.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 May 2020 07:36:13 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Denis Efremov <efremov@linux.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: Use previously computed array_size()
+Date:   Sat, 30 May 2020 17:35:58 +0300
+Message-Id: <20200530143558.321449-1-efremov@linux.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wgq2dzOdN4_=eY-XwxmcgyBM_esnPtXCvz1zStZKjiHKA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 29, 2020 at 04:52:59PM -0700, Linus Torvalds wrote:
-> On Fri, May 29, 2020 at 4:27 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
-> > a/arch/x86/kvm/hyperv.c
-> > -               if (__clear_user((void __user *)addr, sizeof(u32)))
-> > +               if (__put_user(0, (u32 __user *)addr))
-> 
-> I'm not doubting that this is a correct transformation and an
-> improvement, but why is it using that double-underscore version in the
-> first place?
-> 
-> There's a __copy_to_user() in kvm_hv_set_msr_pw() in addition to this
-> one in kvm_hv_set_msr(). Both go back to 2011 and commit 8b0cedff040b
-> ("KVM: use __copy_to_user/__clear_user to write guest page") and both
-> look purely like "pointlessly avoid the access_ok".
-> 
-> All these KVM "optimizations" seem entirely pointless, since
-> access_ok() isn't the problem. And the address _claims_ to be
-> verified, but I'm not seeing it. There is not a single 'access_ok()'
-> anywhere in arch/x86/kvm/ that I can see.
-> 
-> It looks like the argument for the address being validated is that it
-> comes from "gfn_to_hva()", which should only return
-> host-virtual-addresses. That may be true.
-> 
-> But "should" is not "does", and honestly, the cost of gfn_to_hva() is
-> high enough that then using that as an argument for removing
-> "access_ok()" smells.
-> 
-> So I would suggest just removing all these completely bogus
-> double-underscore versions. It's pointless, it's wrong, and it's
-> unsafe.
+array_size() is used in alloc calls to compute the allocation
+size. Next, "raw" multiplication is used to compute the size
+for copy_from_user(). The patch removes duplicated computation
+by saving the size in a var. No security concerns, just a small
+optimization.
 
-It's a bit trickier than that, but I want to deal with that at the same
-time as the rest of kvm/vhost stuff.  So for this series I just went
-for minimal change.  There's quite a pile of vhost and kvm stuff,
-but it's not ready yet - wait for the next cycle.
+Signed-off-by: Denis Efremov <efremov@linux.com>
+---
+ arch/x86/kvm/cpuid.c | 9 ++++-----
+ virt/kvm/kvm_main.c  | 8 ++++----
+ 2 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 901cd1fdecd9..3363b7531af1 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -184,14 +184,13 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+ 		goto out;
+ 	r = -ENOMEM;
+ 	if (cpuid->nent) {
+-		cpuid_entries =
+-			vmalloc(array_size(sizeof(struct kvm_cpuid_entry),
+-					   cpuid->nent));
++		const size_t size = array_size(sizeof(struct kvm_cpuid_entry),
++					       cpuid->nent);
++		cpuid_entries = vmalloc(size);
+ 		if (!cpuid_entries)
+ 			goto out;
+ 		r = -EFAULT;
+-		if (copy_from_user(cpuid_entries, entries,
+-				   cpuid->nent * sizeof(struct kvm_cpuid_entry)))
++		if (copy_from_user(cpuid_entries, entries, size))
+ 			goto out;
+ 	}
+ 	for (i = 0; i < cpuid->nent; i++) {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 731c1e517716..001e1929e01c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3722,15 +3722,15 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		if (routing.flags)
+ 			goto out;
+ 		if (routing.nr) {
++			const size_t size = array_size(sizeof(*entries),
++						       routing.nr);
+ 			r = -ENOMEM;
+-			entries = vmalloc(array_size(sizeof(*entries),
+-						     routing.nr));
++			entries = vmalloc(size);
+ 			if (!entries)
+ 				goto out;
+ 			r = -EFAULT;
+ 			urouting = argp;
+-			if (copy_from_user(entries, urouting->entries,
+-					   routing.nr * sizeof(*entries)))
++			if (copy_from_user(entries, urouting->entries, size))
+ 				goto out_free_irq_routing;
+ 		}
+ 		r = kvm_set_irq_routing(kvm, entries, routing.nr,
+-- 
+2.26.2
+
