@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B840A1E98F1
-	for <lists+kvm@lfdr.de>; Sun, 31 May 2020 18:39:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BF7A1E98F2
+	for <lists+kvm@lfdr.de>; Sun, 31 May 2020 18:40:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728351AbgEaQj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 May 2020 12:39:56 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49634 "EHLO
+        id S1728354AbgEaQkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 May 2020 12:40:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43160 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728341AbgEaQj4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 31 May 2020 12:39:56 -0400
+        by vger.kernel.org with ESMTP id S1728206AbgEaQkC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 31 May 2020 12:40:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590943194;
+        s=mimecast20190719; t=1590943200;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7aysy7LnzzU/PowJNv/vyjVqjvAz/h8eLbGuZ+OSeO4=;
-        b=JcPpYnCKTC9+VWDxGaupqHCriVeKb5/Oa0DNOWze9O2JLOiW59sUidonVSdYemEWVHwvLi
-        Hv2fE8I/Raexc9m5TNx/2M5H/TfizMXI6yTDwwhibfy+vNsw28ZnfJVP83rqc0aImsoFI5
-        CCXFIu+HYwhTkRdksmHUkaHhXdwCm/k=
+        bh=ZGJCD3WtpxESapRsldRYyPkWs2bF0ehM3T5fdkPvFFk=;
+        b=C45LUFNqJlE2qEv2/SDgWA2nPEvqetr/nSchzmK20grBNe3GbDEOUkxmOZjlz9xTseQkks
+        Y+1mSgLEhFGgSYSU0V1L5tgoEYOtbMNDyfUAL+mrmOk7Oejh08XtCiqzs+X8kBqA3JBsMR
+        1iDBhxsuEjnbSKd/Cm07fAdd2uPfCIs=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-3Qkw9K5uNJy3iDlkNjR_Ig-1; Sun, 31 May 2020 12:39:52 -0400
-X-MC-Unique: 3Qkw9K5uNJy3iDlkNjR_Ig-1
-Received: by mail-wr1-f71.google.com with SMTP id j16so3578968wre.22
-        for <kvm@vger.kernel.org>; Sun, 31 May 2020 09:39:52 -0700 (PDT)
+ us-mta-282-IBVCgHBlMcC19b_bCSGFjQ-1; Sun, 31 May 2020 12:39:57 -0400
+X-MC-Unique: IBVCgHBlMcC19b_bCSGFjQ-1
+Received: by mail-wr1-f71.google.com with SMTP id j16so3579026wre.22
+        for <kvm@vger.kernel.org>; Sun, 31 May 2020 09:39:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=7aysy7LnzzU/PowJNv/vyjVqjvAz/h8eLbGuZ+OSeO4=;
-        b=C2RO31AmsdbTMPrLIFSamHwLtgII5pcbRYwemwkg/awyokYDYe7/KFAvfLylGouDtU
-         6Z/joCLm4sR3C2c0ZRTddblpDNknDAUMUsfYBNCMWAqUISjGH1u36azcT9/csDuUu+Wm
-         qVC5zH7kkcUTkIcQDmiZBN95Q9LFLgVjP3c9PKiPw8BtoVFK86v22bAuyVgt1XER+uWi
-         3gxySuuWku2iiqgpjnrshkne09ronGHCv+HMWJZExa455dBXU921VXN2SrZmY+jOaYtb
-         Se3r4LenAEp1M/YXEjbbwSI5yCfv6W3zo3DPUmKknI1kML/bKg05RqmhEw5bTG7cQjgB
-         kaVQ==
-X-Gm-Message-State: AOAM533wSiizmPdEaw+2C/bbjJEQz3JMAyQpzpPt5PJAVrI91Kd9YqFd
-        7UFILQ6G3L4WWZZrkD1XSzkdVn2aXFEgovMENU8l3aFcO9C7w8ArPhCOsKCWxSVQkF6N0uObYOM
-        ALY8tEt9JjuU8
-X-Received: by 2002:a7b:cae2:: with SMTP id t2mr18047629wml.150.1590943190882;
-        Sun, 31 May 2020 09:39:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyk81obw3iwl5cmks4QKQu+FzG80vqvlMOpxZsa5rTowYPRYxGfXszL5E/IQCa/DUJwBl8aug==
-X-Received: by 2002:a7b:cae2:: with SMTP id t2mr18047608wml.150.1590943190702;
-        Sun, 31 May 2020 09:39:50 -0700 (PDT)
+        bh=ZGJCD3WtpxESapRsldRYyPkWs2bF0ehM3T5fdkPvFFk=;
+        b=VlmuqqUm6M+dD8SybecqoghetqRC+nGkKEYSU23yOV/VDS8fGxOAIiCKQvkjRKrLPe
+         cqkOdtn+isu4kKOVrXDJ51W98pJjIz3nOxz8C+ZQG7v549wYQcifOPUrT5K/CRNpjQL2
+         L1Wn17nEJf0iCnkFnEpyfQY04/YdHMDu4FYHukuGu91wQ9KK2qKPE9QDiQGgHQJhCrnD
+         7ZDdj4Q6W6QS6mg6WZ9A3+nhShl8tdWptMVowioMzHF25R17DM7I/3IswG2sqlRpUjWF
+         WCzUo28l3b/RBv+Md4KZhQKBTHYkgMMv3aOesP1OFjlFtSgrDiM3Bz5YKYoMSL9D/Jmy
+         bW4Q==
+X-Gm-Message-State: AOAM530WCxXUEp9QoEIlqMMSalEkUwg+GwtPmnjRMVpuGb9sgBPzWBYg
+        qo58G7LGaV4UGEdtlMXj2NqiVylgWbZOiII6YyPZVGdCV3uwNceYnWQVRJlViGkGQJl4o0DXVQw
+        L5B3uh2E2Zpzx
+X-Received: by 2002:a7b:c201:: with SMTP id x1mr17564251wmi.58.1590943195858;
+        Sun, 31 May 2020 09:39:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyOEXwNNL/vFr901ND3jDCNFYuC5Y9R8OiJUy3KhCsCICPZclc2nGHqbOnLRtzqs9ghv2iSEA==
+X-Received: by 2002:a7b:c201:: with SMTP id x1mr17564238wmi.58.1590943195679;
+        Sun, 31 May 2020 09:39:55 -0700 (PDT)
 Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.43])
-        by smtp.gmail.com with ESMTPSA id q1sm5415572wmc.15.2020.05.31.09.39.49
+        by smtp.gmail.com with ESMTPSA id d13sm8387945wmb.39.2020.05.31.09.39.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2020 09:39:50 -0700 (PDT)
+        Sun, 31 May 2020 09:39:55 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
@@ -64,9 +64,9 @@ Cc:     Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
         Markus Armbruster <armbru@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
         John Snow <jsnow@redhat.com>
-Subject: [PULL 12/25] python/qemu: remove Python2 style super() calls
-Date:   Sun, 31 May 2020 18:38:33 +0200
-Message-Id: <20200531163846.25363-13-philmd@redhat.com>
+Subject: [PULL 13/25] python/qemu: fix socket.makefile() typing
+Date:   Sun, 31 May 2020 18:38:34 +0200
+Message-Id: <20200531163846.25363-14-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200531163846.25363-1-philmd@redhat.com>
 References: <20200531163846.25363-1-philmd@redhat.com>
@@ -81,71 +81,121 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: John Snow <jsnow@redhat.com>
 
-Use the Python3 style instead.
+Note:
+
+A bug in typeshed (https://github.com/python/typeshed/issues/3977)
+misinterprets the type of makefile(). Work around this by explicitly
+stating that we are opening a text-mode file.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200514055403.18902-12-jsnow@redhat.com>
+Message-Id: <20200514055403.18902-13-jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- python/qemu/machine.py |  2 +-
- python/qemu/qtest.py   | 15 +++++++--------
- 2 files changed, 8 insertions(+), 9 deletions(-)
+ python/qemu/qmp.py   | 10 +++++++---
+ python/qemu/qtest.py | 12 ++++++++----
+ 2 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 187790ce9e..95a20a17f9 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -55,7 +55,7 @@ def __init__(self, reply):
-             desc = reply["error"]["desc"]
-         except KeyError:
-             desc = reply
--        super(MonitorResponseError, self).__init__(desc)
-+        super().__init__(desc)
-         self.reply = reply
+diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+index 6ae7693965..73d49050ed 100644
+--- a/python/qemu/qmp.py
++++ b/python/qemu/qmp.py
+@@ -11,6 +11,10 @@
+ import errno
+ import socket
+ import logging
++from typing import (
++    Optional,
++    TextIO,
++)
  
  
+ class QMPError(Exception):
+@@ -61,7 +65,7 @@ def __init__(self, address, server=False, nickname=None):
+         self.__events = []
+         self.__address = address
+         self.__sock = self.__get_sock()
+-        self.__sockfile = None
++        self.__sockfile: Optional[TextIO] = None
+         self._nickname = nickname
+         if self._nickname:
+             self.logger = logging.getLogger('QMP').getChild(self._nickname)
+@@ -157,7 +161,7 @@ def connect(self, negotiate=True):
+         @raise QMPCapabilitiesError if fails to negotiate capabilities
+         """
+         self.__sock.connect(self.__address)
+-        self.__sockfile = self.__sock.makefile()
++        self.__sockfile = self.__sock.makefile(mode='r')
+         if negotiate:
+             return self.__negotiate_capabilities()
+         return None
+@@ -180,7 +184,7 @@ def accept(self, timeout=15.0):
+         """
+         self.__sock.settimeout(timeout)
+         self.__sock, _ = self.__sock.accept()
+-        self.__sockfile = self.__sock.makefile()
++        self.__sockfile = self.__sock.makefile(mode='r')
+         return self.__negotiate_capabilities()
+ 
+     def cmd_obj(self, qmp_cmd):
 diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
-index 53d814c064..7943487c2b 100644
+index 7943487c2b..4c88590eb0 100644
 --- a/python/qemu/qtest.py
 +++ b/python/qemu/qtest.py
-@@ -101,29 +101,28 @@ def __init__(self, binary, args=None, name=None, test_dir="/var/tmp",
-             name = "qemu-%d" % os.getpid()
-         if sock_dir is None:
-             sock_dir = test_dir
--        super(QEMUQtestMachine,
--              self).__init__(binary, args, name=name, test_dir=test_dir,
--                             socket_scm_helper=socket_scm_helper,
--                             sock_dir=sock_dir)
-+        super().__init__(binary, args, name=name, test_dir=test_dir,
-+                         socket_scm_helper=socket_scm_helper,
-+                         sock_dir=sock_dir)
-         self._qtest = None
-         self._qtest_path = os.path.join(sock_dir, name + "-qtest.sock")
+@@ -19,6 +19,7 @@
  
-     def _base_args(self):
--        args = super(QEMUQtestMachine, self)._base_args()
-+        args = super()._base_args()
-         args.extend(['-qtest', 'unix:path=' + self._qtest_path,
-                      '-accel', 'qtest'])
-         return args
+ import socket
+ import os
++from typing import Optional, TextIO
  
-     def _pre_launch(self):
--        super(QEMUQtestMachine, self)._pre_launch()
-+        super()._pre_launch()
-         self._qtest = QEMUQtestProtocol(self._qtest_path, server=True)
+ from .machine import QEMUMachine
  
-     def _post_launch(self):
--        super(QEMUQtestMachine, self)._post_launch()
-+        super()._post_launch()
-         self._qtest.accept()
+@@ -40,7 +41,7 @@ class QEMUQtestProtocol:
+     def __init__(self, address, server=False):
+         self._address = address
+         self._sock = self._get_sock()
+-        self._sockfile = None
++        self._sockfile: Optional[TextIO] = None
+         if server:
+             self._sock.bind(self._address)
+             self._sock.listen(1)
+@@ -59,7 +60,7 @@ def connect(self):
+         @raise socket.error on socket connection errors
+         """
+         self._sock.connect(self._address)
+-        self._sockfile = self._sock.makefile()
++        self._sockfile = self._sock.makefile(mode='r')
  
-     def _post_shutdown(self):
--        super(QEMUQtestMachine, self)._post_shutdown()
-+        super()._post_shutdown()
-         self._remove_if_exists(self._qtest_path)
+     def accept(self):
+         """
+@@ -68,7 +69,7 @@ def accept(self):
+         @raise socket.error on socket connection errors
+         """
+         self._sock, _ = self._sock.accept()
+-        self._sockfile = self._sock.makefile()
++        self._sockfile = self._sock.makefile(mode='r')
  
-     def qtest(self, cmd):
+     def cmd(self, qtest_cmd):
+         """
+@@ -76,6 +77,7 @@ def cmd(self, qtest_cmd):
+ 
+         @param qtest_cmd: qtest command text to be sent
+         """
++        assert self._sockfile is not None
+         self._sock.sendall((qtest_cmd + "\n").encode('utf-8'))
+         resp = self._sockfile.readline()
+         return resp
+@@ -83,7 +85,9 @@ def cmd(self, qtest_cmd):
+     def close(self):
+         """Close this socket."""
+         self._sock.close()
+-        self._sockfile.close()
++        if self._sockfile:
++            self._sockfile.close()
++            self._sockfile = None
+ 
+     def settimeout(self, timeout):
+         """Set a timeout, in seconds."""
 -- 
 2.21.3
 
