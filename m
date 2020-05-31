@@ -2,181 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 512361E9901
-	for <lists+kvm@lfdr.de>; Sun, 31 May 2020 18:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D9031E9AC8
+	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 01:12:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728432AbgEaQlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 May 2020 12:41:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39854 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728394AbgEaQlD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 31 May 2020 12:41:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1590943261;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=j5BS+2d4i/ahG24dd/tHPN0fLUUFmd8jGntUYE3MrX0=;
-        b=DFymAV+QzviYD825qDTd1pRFR9GTyX61uN3hhaOt+T8dYlpS78LtsW9jHY189nu1cqBUSL
-        468WT3y/BA4lkNP9SRuhGZkvkXynvm0OTuj5RFlxIm9N16DW0MusTlQ2VIPbK8KiG4I1jL
-        3Q94h2QuIRKR9m4Acz9bAFr8scef2nY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-sNTjGaloPnajb6u4G0-rpg-1; Sun, 31 May 2020 12:40:58 -0400
-X-MC-Unique: sNTjGaloPnajb6u4G0-rpg-1
-Received: by mail-wr1-f70.google.com with SMTP id c14so3592484wrw.11
-        for <kvm@vger.kernel.org>; Sun, 31 May 2020 09:40:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=j5BS+2d4i/ahG24dd/tHPN0fLUUFmd8jGntUYE3MrX0=;
-        b=PFro2frEB2nnjaT+xNsK5Q3wdQWZ7twFJrLh38YxtkT74GK2enQ2y6cKAJ4WKcbql4
-         XFgbzOJc65VxFVzxWqG/LzCdQUZBw3GtcO3vwQY7aXXE/MlUw+SlozCg1Ng0ue41L+lm
-         Oen9YpYPDkXMj+GrXemGxCHwLDXsAHc44LdAmraivyg4LuSzIEL3X0j/g/Z5D6zEiXlj
-         S565ZTJqEjxm2VUId1PTSUxL+AcGLXiYipT+vXhBcDi3ohAT7G7wb/Di6RyuBUMBn5hk
-         mTgbR5F1OvyT3WrmC+NEdLZ7NbXP5mspGsVmXmYivcDnxX4Jc/mD4AA61E73J0H3GXiZ
-         y55Q==
-X-Gm-Message-State: AOAM530/d+gxkyyu45WsX3bs3M/I7hFqReMkycKLCzdvqNucmX1rHVgv
-        szLlJAAdD3qBpayLJOjZ4IO43p7TzdxZ+2Z0oREChcHUwHXqP4J+jrbDqCl7JU+tw/VCKCqmUvA
-        bsPBLFsdLGQLI
-X-Received: by 2002:adf:b354:: with SMTP id k20mr18137770wrd.412.1590943256926;
-        Sun, 31 May 2020 09:40:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx0HkzqO5UvunzkIevQCS8DP8RYc0sFupFoLUZyl6tgkem6GKu1Knj86ln8moQU3+6mIDc99g==
-X-Received: by 2002:adf:b354:: with SMTP id k20mr18137753wrd.412.1590943256749;
-        Sun, 31 May 2020 09:40:56 -0700 (PDT)
-Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.43])
-        by smtp.gmail.com with ESMTPSA id d15sm18060321wrq.30.2020.05.31.09.40.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 May 2020 09:40:56 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
-        kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>,
-        Fam Zheng <fam@euphon.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Max Reitz <mreitz@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
-        Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>,
-        Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Subject: [PULL 25/25] tests/acceptance: refactor boot_linux to allow code reuse
-Date:   Sun, 31 May 2020 18:38:46 +0200
-Message-Id: <20200531163846.25363-26-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200531163846.25363-1-philmd@redhat.com>
-References: <20200531163846.25363-1-philmd@redhat.com>
+        id S1728422AbgEaXLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 May 2020 19:11:52 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:37570 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728144AbgEaXLv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 May 2020 19:11:51 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04VN8xGT067038;
+        Sun, 31 May 2020 23:11:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=7K+5RZTJvU8hActXWFcbzBjQf7L+UbJE4A3LEr/mpiA=;
+ b=xz9EynM8sktijeVbC5JmeBLjQ4dfMlrvIQdYtPfaxuTEc3SXaQp9cij7GNNHiUn/wPVn
+ lill5K48Bnxdcke/vT8XU+Z7KeqiHfDji1cx6E4gm91T3w7N4dZ/OZGmZgWyKu5tnQUu
+ Syk5K0GeHZ4TLE55AyNOpYnDl2taHmFd/oksPaUm56S/hfg5cNmFuEYmr/TGMugIeZb8
+ R7ZzzMMp2gu7zQjcThIhpwwnSuxVYmVdX00IUl+olm3QJ2LiddG2PyUFf/Vm3TzShHEk
+ pn83wxTl6Aj4KKV7gUC1GvOlPPqm2cQqfsyBZMRxfvjmk6z6op30rgzCgdnTjpdqfCdS lw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 31bg4mv14q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Sun, 31 May 2020 23:11:47 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04VN7tM9115416;
+        Sun, 31 May 2020 23:11:46 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 31c25gvcf2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 31 May 2020 23:11:46 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04VNBiYo020139;
+        Sun, 31 May 2020 23:11:45 GMT
+Received: from localhost.localdomain (/10.159.229.17)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 31 May 2020 16:11:44 -0700
+Subject: Re: [PATCH 20/30] KVM: SVM: preserve VGIF across VMCB switch
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200529153934.11694-1-pbonzini@redhat.com>
+ <20200529153934.11694-21-pbonzini@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <db95e255-3f1d-4c19-028c-f23c7737e178@oracle.com>
+Date:   Sun, 31 May 2020 16:11:36 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200529153934.11694-21-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9638 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0 spamscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005310192
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9638 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 lowpriorityscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 priorityscore=1501 adultscore=0
+ mlxlogscore=999 cotscore=-2147483648 bulkscore=0 mlxscore=0
+ impostorscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005310192
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 
-This patch moves image downloading functions to the separate class to allow
-reusing them from record/replay tests.
+On 5/29/20 8:39 AM, Paolo Bonzini wrote:
+> There is only one GIF flag for the whole processor, so make sure it is not clobbered
+> when switching to L2 (in which case we also have to include the V_GIF_ENABLE_MASK,
+> lest we confuse enable_gif/disable_gif/gif_set).  When going back, L1 could in
+> theory have entered L2 without issuing a CLGI so make sure the svm_set_gif is
+> done last, after svm->vmcb->control.int_ctl has been copied back from hsave.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/svm/nested.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 7e4a506828c9..6c7f0bffdf01 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -293,6 +293,7 @@ static void nested_prepare_vmcb_save(struct vcpu_svm *svm, struct vmcb *nested_v
+>   
+>   static void nested_prepare_vmcb_control(struct vcpu_svm *svm)
+>   {
+> +	const u32 mask = V_INTR_MASKING_MASK | V_GIF_ENABLE_MASK | V_GIF_MASK;
+>   	if (svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE)
+>   		nested_svm_init_mmu_context(&svm->vcpu);
+>   
+> @@ -308,7 +309,10 @@ static void nested_prepare_vmcb_control(struct vcpu_svm *svm)
+>   	svm->vmcb->control.tsc_offset = svm->vcpu.arch.tsc_offset =
+>   		svm->vcpu.arch.l1_tsc_offset + svm->nested.ctl.tsc_offset;
+>   
+> -	svm->vmcb->control.int_ctl             = svm->nested.ctl.int_ctl | V_INTR_MASKING_MASK;
+> +	svm->vmcb->control.int_ctl             =
+> +		(svm->nested.ctl.int_ctl & ~mask) |
+> +		(svm->nested.hsave->control.int_ctl & mask);
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <159073593167.20809.17582679291556188984.stgit@pasha-ThinkPad-X280>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- tests/acceptance/boot_linux.py | 49 ++++++++++++++++++++--------------
- 1 file changed, 29 insertions(+), 20 deletions(-)
 
-diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
-index 075a386300..3aa57e88b0 100644
---- a/tests/acceptance/boot_linux.py
-+++ b/tests/acceptance/boot_linux.py
-@@ -26,22 +26,8 @@
- TCG_NOT_AVAILABLE = ACCEL_NOT_AVAILABLE_FMT % "TCG"
- 
- 
--class BootLinux(Test):
--    """
--    Boots a Linux system, checking for a successful initialization
--    """
--
--    timeout = 900
--    chksum = None
--
--    def setUp(self):
--        super(BootLinux, self).setUp()
--        self.vm.add_args('-smp', '2')
--        self.vm.add_args('-m', '1024')
--        self.prepare_boot()
--        self.prepare_cloudinit()
--
--    def prepare_boot(self):
-+class BootLinuxBase(Test):
-+    def download_boot(self):
-         self.log.debug('Looking for and selecting a qemu-img binary to be '
-                        'used to create the bootable snapshot image')
-         # If qemu-img has been built, use it, otherwise the system wide one
-@@ -60,17 +46,17 @@ def prepare_boot(self):
-         if image_arch == 'ppc64':
-             image_arch = 'ppc64le'
-         try:
--            self.boot = vmimage.get(
-+            boot = vmimage.get(
-                 'fedora', arch=image_arch, version='31',
-                 checksum=self.chksum,
-                 algorithm='sha256',
-                 cache_dir=self.cache_dirs[0],
-                 snapshot_dir=self.workdir)
--            self.vm.add_args('-drive', 'file=%s' % self.boot.path)
-         except:
-             self.cancel('Failed to download/prepare boot image')
-+        return boot.path
- 
--    def prepare_cloudinit(self):
-+    def download_cloudinit(self):
-         self.log.info('Preparing cloudinit image')
-         try:
-             cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
-@@ -81,9 +67,32 @@ def prepare_cloudinit(self):
-                           # QEMU's hard coded usermode router address
-                           phone_home_host='10.0.2.2',
-                           phone_home_port=self.phone_home_port)
--            self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
-         except Exception:
-             self.cancel('Failed to prepared cloudinit image')
-+        return cloudinit_iso
-+
-+class BootLinux(BootLinuxBase):
-+    """
-+    Boots a Linux system, checking for a successful initialization
-+    """
-+
-+    timeout = 900
-+    chksum = None
-+
-+    def setUp(self):
-+        super(BootLinux, self).setUp()
-+        self.vm.add_args('-smp', '2')
-+        self.vm.add_args('-m', '1024')
-+        self.prepare_boot()
-+        self.prepare_cloudinit()
-+
-+    def prepare_boot(self):
-+        path = self.download_boot()
-+        self.vm.add_args('-drive', 'file=%s' % path)
-+
-+    def prepare_cloudinit(self):
-+        cloudinit_iso = self.download_cloudinit()
-+        self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
- 
-     def launch_and_wait(self):
-         self.vm.set_console()
--- 
-2.21.3
+If this is the very first VMRUN, do we have any int_ctl saved in hsave ?
 
+> +
+>   	svm->vmcb->control.virt_ext            = svm->nested.ctl.virt_ext;
+>   	svm->vmcb->control.int_vector          = svm->nested.ctl.int_vector;
+>   	svm->vmcb->control.int_state           = svm->nested.ctl.int_state;
