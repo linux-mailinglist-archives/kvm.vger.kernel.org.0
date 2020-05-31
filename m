@@ -2,142 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DF6B1E9504
-	for <lists+kvm@lfdr.de>; Sun, 31 May 2020 04:35:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A765E1E95F5
+	for <lists+kvm@lfdr.de>; Sun, 31 May 2020 09:03:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729522AbgEaCfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 May 2020 22:35:14 -0400
-Received: from mga18.intel.com ([134.134.136.126]:7620 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728867AbgEaCfO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 May 2020 22:35:14 -0400
-IronPort-SDR: iPxGty4gnTrW/8QXIObF1KKfYlsBrHVOl2Y413xPSuysKAudmlw6oczm1mba3/JPA8Q/StDs65
- Nmn7hsoXuSBA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2020 19:35:13 -0700
-IronPort-SDR: DZNxe8pLkGVb6mjZO2e67FfDjThh81wnbJzcKqrkM4GkqH4lRFQUpXruDvCseti5oTRHSfth78
- PQl6DwB+atlg==
-X-IronPort-AV: E=Sophos;i="5.73,455,1583222400"; 
-   d="scan'208";a="443875232"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.175.168]) ([10.249.175.168])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2020 19:35:10 -0700
-Subject: =?UTF-8?B?UmU6IOetlOWkjTogW1BBVENIXVt2NV0gS1ZNOiBYODY6IHN1cHBvcnQg?=
- =?UTF-8?Q?APERF/MPERF_registers?=
-To:     "Li,Rongqing" <lirongqing@baidu.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wei.huang2@amd.com" <wei.huang2@amd.com>
-References: <1590813353-11775-1-git-send-email-lirongqing@baidu.com>
- <3f931ecf-7f1c-c178-d18c-46beadd1d313@intel.com>
- <e7ccee7dc30e4d1e8dcb8a002d6a6ed2@baidu.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <9c870a06-ee46-5c9d-11c0-602aeb18c83d@intel.com>
-Date:   Sun, 31 May 2020 10:35:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S1729650AbgEaHDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 May 2020 03:03:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51420 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726020AbgEaHDM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 May 2020 03:03:12 -0400
+Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907E5C05BD43;
+        Sun, 31 May 2020 00:03:12 -0700 (PDT)
+Received: by mail-lj1-x241.google.com with SMTP id b6so4267540ljj.1;
+        Sun, 31 May 2020 00:03:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=orX/y8KZmJNFBM29Gj7r/7pgbaU1Wmo90frTAFgI1II=;
+        b=HxqCyM1EcKPbKMqPglb23SznK7zXBoHpxAe9uB5JZW4tnTxun6GQOGDw+5tBcOaECm
+         suvkefwQ8xbLMfVC0td4JIZo/MMBvKSj6BexhDRnxlbkIPb/scSpoVVPe143s/vDo4EC
+         sP/LA3rn6FUKhnOs2cy+7Ln4pSfdQzUvT/GVMCO+HuBezDF+raa3MHX6WRGeIUKvbY0b
+         /rQt0v1xJO4cQB3MVfq6unPXq/6Y7qyuavQKhIX2u0UJKEr+1qoFR2p6oCwqk1XAj1SF
+         fukGMWUxvbvVYgv1Oau5RfuKCOLwZnXQ2O3IS8CFpnidpslrSl5qRmZuHTYhOE49Ep23
+         O3+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=orX/y8KZmJNFBM29Gj7r/7pgbaU1Wmo90frTAFgI1II=;
+        b=OMxo/P1Pea4s33P1mwMT7YtjItdM7NTWVbEPIAiThKlWIya8Np/FdkZOxb/IJT8IRG
+         T11iKLb6RAtoL4NblYt3MLR9Sol5AIoxOuTYPdztorIs/rArbvWkOtHSaIo8ZK0UFyKI
+         kRo2pKZ4WJCrWEE1888qsTxm04k7nlqbIirc0SUq9XIfQZ4Be4zH5NkxEUwM8EOfxxPC
+         uqZGBTh/6PDNgP0IcKphE63NvHjlXlP4cNm6MXUVjLU9LSXDluJQDjaUax+VC/sXqnJC
+         RBtaVUSSlC5OCOKPPpeFuTFx1gsJsU+asnDit9Spy0H+iCMNGwaE9ca3v3Y9bBszJatz
+         VsaQ==
+X-Gm-Message-State: AOAM530Aj4Ite11D3x8c0qOFVAV6WJPJTlag8hG34a3HTcv32Q484T2+
+        +3DeLqoaerQq/VgSvhAqbTjW7knmAGw1t1XX72U=
+X-Google-Smtp-Source: ABdhPJywHXsqBndX3laZcwix8rl6zEFIaUWSsfG6YMGcM9LSe//w5BtrRO/NuMPavCMahVKPqbWUuUk4ilCBWssYdFI=
+X-Received: by 2002:a2e:b5d7:: with SMTP id g23mr1384527ljn.70.1590908591076;
+ Sun, 31 May 2020 00:03:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e7ccee7dc30e4d1e8dcb8a002d6a6ed2@baidu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200529234309.484480-1-jhubbard@nvidia.com> <20200529234309.484480-2-jhubbard@nvidia.com>
+In-Reply-To: <20200529234309.484480-2-jhubbard@nvidia.com>
+From:   Souptick Joarder <jrdr.linux@gmail.com>
+Date:   Sun, 31 May 2020 12:41:19 +0530
+Message-ID: <CAFqt6zaCSngh7-N_qZ6-S3Cj8CHF8DTSPv8anP_oJg5E6UWu9g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] docs: mm/gup: pin_user_pages.rst: add a "case 5"
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Dave Chinner <david@fromorbit.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/31/2020 10:08 AM, Li,Rongqing wrote:
-> 
-> 
->> -----邮件原件-----
->> 发件人: Xiaoyao Li [mailto:xiaoyao.li@intel.com]
->> 发送时间: 2020年5月30日 18:40
->> 收件人: Li,Rongqing <lirongqing@baidu.com>; linux-kernel@vger.kernel.org;
->> kvm@vger.kernel.org; x86@kernel.org; hpa@zytor.com; bp@alien8.de;
->> mingo@redhat.com; tglx@linutronix.de; jmattson@google.com;
->> wanpengli@tencent.com; vkuznets@redhat.com;
->> sean.j.christopherson@intel.com; pbonzini@redhat.com;
->> wei.huang2@amd.com
->> 主题: Re: [PATCH][v5] KVM: X86: support APERF/MPERF registers
->>
->> On 5/30/2020 12:35 PM, Li RongQing wrote:
->>> Guest kernel reports a fixed cpu frequency in /proc/cpuinfo, this is
->>> confused to user when turbo is enable, and aperf/mperf can be used to
->>> show current cpu frequency after 7d5905dc14a
->>> "(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
->>> so guest should support aperf/mperf capability
->>>
->>> This patch implements aperf/mperf by three mode: none, software
->>> emulation, and pass-through
->>>
->>> None: default mode, guest does not support aperf/mperf
->>>
->>> Software emulation: the period of aperf/mperf in guest mode are
->>> accumulated as emulated value
->>>
->>> Pass-though: it is only suitable for KVM_HINTS_REALTIME, Because that
->>> hint guarantees we have a 1:1 vCPU:CPU binding and guaranteed no
->>> over-commit.
->>>
->>> And a per-VM capability is added to configure aperfmperf mode
->>>
->>
->> [...]
->>
->>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c index
->>> cd708b0b460a..c960dda4251b 100644
->>> --- a/arch/x86/kvm/cpuid.c
->>> +++ b/arch/x86/kvm/cpuid.c
->>> @@ -122,6 +122,14 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
->>>    					   MSR_IA32_MISC_ENABLE_MWAIT);
->>>    	}
->>>
->>> +	best = kvm_find_cpuid_entry(vcpu, 6, 0);
->>> +	if (best) {
->>> +		if (guest_has_aperfmperf(vcpu->kvm) &&
->>> +			boot_cpu_has(X86_FEATURE_APERFMPERF))
->>> +			best->ecx |= 1;
->>> +		else
->>> +			best->ecx &= ~1;
->>> +	}
->>
->> In my understanding, KVM allows userspace to set a CPUID feature bit for
->> guest even if hardware doesn't support the feature.
->>
->> So what makes X86_FEATURE_APERFMPERF different here? Is there any
->> concern I miss?
->>
->> -Xiaoyao
-> 
-> Whether software emulation for aperf/mperf or pass-through depends on host cpu aperf/mperf feature.
->   
-> Software emulation: the period of aperf/mperf in guest mode are accumulated as emulated value
-> 
+On Sat, May 30, 2020 at 5:13 AM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> There are four cases listed in pin_user_pages.rst. These are
+> intended to help developers figure out whether to use
+> get_user_pages*(), or pin_user_pages*(). However, the four cases
+> do not cover all the situations. For example, drivers/vhost/vhost.c
+> has a "pin, write to page, set page dirty, unpin" case.
+>
+> Add a fifth case, to help explain that there is a general pattern
+> that requires pin_user_pages*() API calls.
+>
+> Cc: Vlastimil Babka <vbabka@suse.cz>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> Cc: Dave Chinner <david@fromorbit.com>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-fsdevel@vger.kernel.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  Documentation/core-api/pin_user_pages.rst | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>
+> diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/co=
+re-api/pin_user_pages.rst
+> index 4675b04e8829..b9f2688a2c67 100644
+> --- a/Documentation/core-api/pin_user_pages.rst
+> +++ b/Documentation/core-api/pin_user_pages.rst
+> @@ -171,6 +171,26 @@ If only struct page data (as opposed to the actual m=
+emory contents that a page
+>  is tracking) is affected, then normal GUP calls are sufficient, and neit=
+her flag
+>  needs to be set.
+>
+> +CASE 5: Pinning in order to write to the data within the page
+> +-------------------------------------------------------------
+> +Even though neither DMA nor Direct IO is involved, just a simple case of=
+ "pin,
+> +access page's data, unpin" can cause a problem.
 
-I know it that you want to ensure the correctness of exposure of 
-aperf/mperf.
+Will it be, *"pin, access page's data, set page dirty, unpin" * ?
 
-But there are so many features other than aperf/mperf that KVM reports 
-the supported settings of them through KVM_GET_SUPPORTED_CPUID, but 
-doesn't check nor force the correctness of userspace input. i.e., KVM 
-allows userspace to set bogus CPUID settings as long as it doesn't break 
-KVM (host kernel).
-
-Indeed, bogus CPUID settings more than likely breaks the guest. But it's 
-not KVM's fault. KVM just do what userspace wants.
-
-IMO, If we really want to ensure the correctness of userspace provided 
-CPUID settings, we need to return ERROR to userspace instead of fixing 
-it siliently.
-
-- Xiaoyao
+Case 5 may be considered a
+> +superset of Case 1, plus Case 2, plus anything that invokes that pattern=
+. In
+> +other words, if the code is neither Case 1 nor Case 2, it may still requ=
+ire
+> +FOLL_PIN, for patterns like this:
+> +
+> +Correct (uses FOLL_PIN calls):
+> +    pin_user_pages()
+> +    access the data within the pages
+> +    set_page_dirty_lock()
+> +    unpin_user_pages()
+> +
+> +INCORRECT (uses FOLL_GET calls):
+> +    get_user_pages()
+> +    access the data within the pages
+> +    set_page_dirty_lock()
+> +    put_page()
+> +
+>  page_maybe_dma_pinned(): the whole point of pinning
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+>
+> --
+> 2.26.2
+>
