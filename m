@@ -2,139 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A765E1E95F5
-	for <lists+kvm@lfdr.de>; Sun, 31 May 2020 09:03:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B34301E98E0
+	for <lists+kvm@lfdr.de>; Sun, 31 May 2020 18:38:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729650AbgEaHDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 May 2020 03:03:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726020AbgEaHDM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 May 2020 03:03:12 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907E5C05BD43;
-        Sun, 31 May 2020 00:03:12 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id b6so4267540ljj.1;
-        Sun, 31 May 2020 00:03:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=orX/y8KZmJNFBM29Gj7r/7pgbaU1Wmo90frTAFgI1II=;
-        b=HxqCyM1EcKPbKMqPglb23SznK7zXBoHpxAe9uB5JZW4tnTxun6GQOGDw+5tBcOaECm
-         suvkefwQ8xbLMfVC0td4JIZo/MMBvKSj6BexhDRnxlbkIPb/scSpoVVPe143s/vDo4EC
-         sP/LA3rn6FUKhnOs2cy+7Ln4pSfdQzUvT/GVMCO+HuBezDF+raa3MHX6WRGeIUKvbY0b
-         /rQt0v1xJO4cQB3MVfq6unPXq/6Y7qyuavQKhIX2u0UJKEr+1qoFR2p6oCwqk1XAj1SF
-         fukGMWUxvbvVYgv1Oau5RfuKCOLwZnXQ2O3IS8CFpnidpslrSl5qRmZuHTYhOE49Ep23
-         O3+A==
+        id S1726193AbgEaQi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 May 2020 12:38:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45869 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725912AbgEaQi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 May 2020 12:38:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590943134;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Cqps2Xy/wDwgHeQZtBDDKwWdymxWmUMf4khG6NEjU0s=;
+        b=BYGVmiRaOznuTKgWAzaUi/N+rvV/HJj9JneDb++DVfHDn/XJYR7PDQNRq3UjJ+VfpmxqOl
+        MhwU6WhVmSBx6p/8E0BCsjO7WDvnqpKyS+mMTDPfeIAcvW34IfQSuphirbOXaG7XIBvdFw
+        ugmjBx9JhizzM8/on7WHvXkMtChf2Hk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-7C79Y5gHPS-YWEvMvNYdaA-1; Sun, 31 May 2020 12:38:51 -0400
+X-MC-Unique: 7C79Y5gHPS-YWEvMvNYdaA-1
+Received: by mail-wr1-f72.google.com with SMTP id e7so3138812wrp.14
+        for <kvm@vger.kernel.org>; Sun, 31 May 2020 09:38:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=orX/y8KZmJNFBM29Gj7r/7pgbaU1Wmo90frTAFgI1II=;
-        b=OMxo/P1Pea4s33P1mwMT7YtjItdM7NTWVbEPIAiThKlWIya8Np/FdkZOxb/IJT8IRG
-         T11iKLb6RAtoL4NblYt3MLR9Sol5AIoxOuTYPdztorIs/rArbvWkOtHSaIo8ZK0UFyKI
-         kRo2pKZ4WJCrWEE1888qsTxm04k7nlqbIirc0SUq9XIfQZ4Be4zH5NkxEUwM8EOfxxPC
-         uqZGBTh/6PDNgP0IcKphE63NvHjlXlP4cNm6MXUVjLU9LSXDluJQDjaUax+VC/sXqnJC
-         RBtaVUSSlC5OCOKPPpeFuTFx1gsJsU+asnDit9Spy0H+iCMNGwaE9ca3v3Y9bBszJatz
-         VsaQ==
-X-Gm-Message-State: AOAM530Aj4Ite11D3x8c0qOFVAV6WJPJTlag8hG34a3HTcv32Q484T2+
-        +3DeLqoaerQq/VgSvhAqbTjW7knmAGw1t1XX72U=
-X-Google-Smtp-Source: ABdhPJywHXsqBndX3laZcwix8rl6zEFIaUWSsfG6YMGcM9LSe//w5BtrRO/NuMPavCMahVKPqbWUuUk4ilCBWssYdFI=
-X-Received: by 2002:a2e:b5d7:: with SMTP id g23mr1384527ljn.70.1590908591076;
- Sun, 31 May 2020 00:03:11 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Cqps2Xy/wDwgHeQZtBDDKwWdymxWmUMf4khG6NEjU0s=;
+        b=MqJzkbsKGNv2mB7rUJbEvm6nEQtZECklFeer2hpXxk5iLdoSrMc4Et8VwSHO2IV2tN
+         7Qs7ExGcDoVBHMpj6mVnQ1RoXgsYMZKN35jwSVcOLmAwrxMk0EtXB/obblegplh0urK2
+         p8XZx64whRJohf7y3Z8Dx9ardrBOhAII7azgTZBkj9D4hohRwNH4fB7uwAE/FrDLvAap
+         GwWusIKCGMRlw6CELvdnhPitwmCt4wAUy0nS8zavCfmLMyN4ShCCfeBIGetb7uwd76f7
+         e7Z57SlAvnksT3RcFBeMheXjmMWrTeue01tM/OizVKTtdemhyqt32e//3nYnoPc7Zg3w
+         mm2g==
+X-Gm-Message-State: AOAM533lSneiIa7/KSe0G1VLAY9M0frrXOheeC6FJXfv2OTH03NPzLdj
+        EIhp7JcixBglzpsIcjPu8YQF6ghQSCKbqDwRp2d5KH+v2fC8C8K3HcfqrQNocL9Gx8x+fW4H3Kl
+        yKkl2dKUpJvp6
+X-Received: by 2002:a1c:e914:: with SMTP id q20mr3019033wmc.145.1590943129756;
+        Sun, 31 May 2020 09:38:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyD/VAdm6bALQItTxdHOkN9cmdqlhgWpmq4GftYVKQFfyiuufz0LwlGo+Qn5wNF96G2siY3sg==
+X-Received: by 2002:a1c:e914:: with SMTP id q20mr3019016wmc.145.1590943129519;
+        Sun, 31 May 2020 09:38:49 -0700 (PDT)
+Received: from localhost.localdomain (43.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.43])
+        by smtp.gmail.com with ESMTPSA id 5sm8192953wmd.19.2020.05.31.09.38.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 May 2020 09:38:48 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Cleber Rosa <crosa@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+        kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>,
+        Fam Zheng <fam@euphon.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Max Reitz <mreitz@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org
+Subject: [PULL 00/25] python-next patches for 2020-05-31
+Date:   Sun, 31 May 2020 18:38:21 +0200
+Message-Id: <20200531163846.25363-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <20200529234309.484480-1-jhubbard@nvidia.com> <20200529234309.484480-2-jhubbard@nvidia.com>
-In-Reply-To: <20200529234309.484480-2-jhubbard@nvidia.com>
-From:   Souptick Joarder <jrdr.linux@gmail.com>
-Date:   Sun, 31 May 2020 12:41:19 +0530
-Message-ID: <CAFqt6zaCSngh7-N_qZ6-S3Cj8CHF8DTSPv8anP_oJg5E6UWu9g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] docs: mm/gup: pin_user_pages.rst: add a "case 5"
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Dave Chinner <david@fromorbit.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 30, 2020 at 5:13 AM John Hubbard <jhubbard@nvidia.com> wrote:
->
-> There are four cases listed in pin_user_pages.rst. These are
-> intended to help developers figure out whether to use
-> get_user_pages*(), or pin_user_pages*(). However, the four cases
-> do not cover all the situations. For example, drivers/vhost/vhost.c
-> has a "pin, write to page, set page dirty, unpin" case.
->
-> Add a fifth case, to help explain that there is a general pattern
-> that requires pin_user_pages*() API calls.
->
-> Cc: Vlastimil Babka <vbabka@suse.cz>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-> Cc: Dave Chinner <david@fromorbit.com>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: linux-doc@vger.kernel.org
-> Cc: linux-fsdevel@vger.kernel.org
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  Documentation/core-api/pin_user_pages.rst | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->
-> diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/co=
-re-api/pin_user_pages.rst
-> index 4675b04e8829..b9f2688a2c67 100644
-> --- a/Documentation/core-api/pin_user_pages.rst
-> +++ b/Documentation/core-api/pin_user_pages.rst
-> @@ -171,6 +171,26 @@ If only struct page data (as opposed to the actual m=
-emory contents that a page
->  is tracking) is affected, then normal GUP calls are sufficient, and neit=
-her flag
->  needs to be set.
->
-> +CASE 5: Pinning in order to write to the data within the page
-> +-------------------------------------------------------------
-> +Even though neither DMA nor Direct IO is involved, just a simple case of=
- "pin,
-> +access page's data, unpin" can cause a problem.
+The following changes since commit c86274bc2e34295764fb44c2aef3cf29623f9b4b:
 
-Will it be, *"pin, access page's data, set page dirty, unpin" * ?
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-tcg-plugins=
+-270520-1' into staging (2020-05-29 17:41:45 +0100)
 
-Case 5 may be considered a
-> +superset of Case 1, plus Case 2, plus anything that invokes that pattern=
-. In
-> +other words, if the code is neither Case 1 nor Case 2, it may still requ=
-ire
-> +FOLL_PIN, for patterns like this:
-> +
-> +Correct (uses FOLL_PIN calls):
-> +    pin_user_pages()
-> +    access the data within the pages
-> +    set_page_dirty_lock()
-> +    unpin_user_pages()
-> +
-> +INCORRECT (uses FOLL_GET calls):
-> +    get_user_pages()
-> +    access the data within the pages
-> +    set_page_dirty_lock()
-> +    put_page()
-> +
->  page_maybe_dma_pinned(): the whole point of pinning
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->
-> --
-> 2.26.2
->
+are available in the Git repository at:
+
+  https://gitlab.com/philmd/qemu.git tags/python-next-20200531
+
+for you to fetch changes up to 1c80c87c8c2489e4318c93c844aa29bc1d014146:
+
+  tests/acceptance: refactor boot_linux to allow code reuse (2020-05-31 18:25=
+:31 +0200)
+
+----------------------------------------------------------------
+Python queue:
+
+* migration acceptance test fix
+* introduce pylintrc & flake8 config
+* various cleanups (Python3, style)
+* vm-test can set QEMU_LOCAL=3D1 to use locally built binaries
+* refactored BootLinuxBase & LinuxKernelTest acceptance classes
+
+https://gitlab.com/philmd/qemu/pipelines/151323210
+https://travis-ci.org/github/philmd/qemu/builds/693157969
+
+----------------------------------------------------------------
+
+Dr. David Alan Gilbert (1):
+  tests/acceptance/migration.py: Wait for both sides
+
+John Snow (11):
+  scripts/qmp: Fix shebang and imports
+  python: remove more instances of sys.version_info
+  python/qemu/machine: remove logging configuration
+  python/qemu: delint and add pylintrc
+  python/qemu: delint; add flake8 config
+  python/qemu: remove Python2 style super() calls
+  python/qemu: fix socket.makefile() typing
+  python/qemu: Adjust traceback typing
+  python/qemu/qmp: use True/False for non/blocking modes
+  python/qemu/qmp: assert sockfile is not None
+  python/qemu/qtest: Check before accessing _qtest
+
+Pavel Dovgaluk (3):
+  tests/acceptance: allow console interaction with specific VMs
+  tests/acceptance: refactor boot_linux_console test to allow code reuse
+  tests/acceptance: refactor boot_linux to allow code reuse
+
+Philippe Mathieu-Daud=C3=A9 (6):
+  scripts/qemugdb: Remove shebang header
+  scripts/qemu-gdb: Use Python 3 interpreter
+  scripts/qmp: Use Python 3 interpreter
+  scripts/kvm/vmxcap: Use Python 3 interpreter and add pseudo-main()
+  scripts/modules/module_block: Use Python 3 interpreter & add
+    pseudo-main
+  tests/migration/guestperf: Use Python 3 interpreter
+
+Robert Foley (3):
+  tests/vm: Pass --debug through for vm-boot-ssh
+  tests/vm: Add ability to select QEMU from current build
+  tests/vm: allow wait_ssh() to specify command
+
+Vladimir Sementsov-Ogievskiy (1):
+  python/qemu/machine: add kill() method
+
+ python/qemu/.flake8                       |  2 +
+ python/qemu/accel.py                      |  9 ++-
+ python/qemu/machine.py                    | 44 +++++++-----
+ python/qemu/pylintrc                      | 58 ++++++++++++++++
+ python/qemu/qmp.py                        | 29 +++++---
+ python/qemu/qtest.py                      | 83 +++++++++++++++--------
+ scripts/analyze-migration.py              |  5 --
+ scripts/decodetree.py                     | 25 +++----
+ scripts/kvm/vmxcap                        |  7 +-
+ scripts/modules/module_block.py           | 29 ++++----
+ scripts/qemu-gdb.py                       |  4 +-
+ scripts/qemugdb/__init__.py               |  3 +-
+ scripts/qemugdb/aio.py                    |  3 +-
+ scripts/qemugdb/coroutine.py              |  3 +-
+ scripts/qemugdb/mtree.py                  |  4 +-
+ scripts/qemugdb/tcg.py                    |  1 -
+ scripts/qemugdb/timers.py                 |  1 -
+ scripts/qmp/qmp                           |  4 +-
+ scripts/qmp/qmp-shell                     |  3 -
+ scripts/qmp/qom-fuse                      |  4 +-
+ scripts/qmp/qom-get                       |  6 +-
+ scripts/qmp/qom-list                      |  6 +-
+ scripts/qmp/qom-set                       |  6 +-
+ scripts/qmp/qom-tree                      |  6 +-
+ tests/acceptance/avocado_qemu/__init__.py | 13 ++--
+ tests/acceptance/boot_linux.py            | 49 +++++++------
+ tests/acceptance/boot_linux_console.py    | 21 +++---
+ tests/acceptance/migration.py             |  4 ++
+ tests/docker/docker.py                    |  5 +-
+ tests/migration/guestperf-batch.py        |  2 +-
+ tests/migration/guestperf-plot.py         |  2 +-
+ tests/migration/guestperf.py              |  2 +-
+ tests/qemu-iotests/nbd-fault-injector.py  |  5 +-
+ tests/vm/Makefile.include                 |  5 ++
+ tests/vm/basevm.py                        | 42 ++++++++----
+ 35 files changed, 317 insertions(+), 178 deletions(-)
+ create mode 100644 python/qemu/.flake8
+ create mode 100644 python/qemu/pylintrc
+
+--=20
+2.21.3
+
