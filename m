@@ -2,32 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C66391E9D7B
-	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 07:48:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E0B91E9E68
+	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 08:43:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727795AbgFAFsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jun 2020 01:48:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41874 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727100AbgFAFsU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jun 2020 01:48:20 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3779B20734;
-        Mon,  1 Jun 2020 05:48:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590990498;
-        bh=zbjGSKYrzzSB+sq/pQ8w3/Me0mvCvWVALBgOqEgSoOU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=n9+w3ogjHkAQbFyjqveufeMn6/PLEfDYCbfs68A4yz6Ds9G6eisfcf1VR9CB8V4nN
-         KN2apX9IiRFl4RiuwGz5BswT0oHCeWex/7DrjU7QiA5UM8i0lKYG2LlwOTs2ta+k91
-         x9MsR+eqf72WHY5yFZBzxJxLbkReLzLmUCm/vV0c=
-Date:   Mon, 1 Jun 2020 07:48:16 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc:     Andra Paraschiv <andraprs@amazon.com>,
-        linux-kernel@vger.kernel.org,
+        id S1727871AbgFAGnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jun 2020 02:43:00 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:13203 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726107AbgFAGnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jun 2020 02:43:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1590993780; x=1622529780;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=000o4dqQVLTRLnJFxiPKRxM6NO01qqe9oZA//aW5sZo=;
+  b=jRPWNC8sW3CY+JI8WRSpRnCyL6+faB9wPQahR6ueP3A16sew7RbkMbH7
+   9PMuEGS2rAi+uCVI8CMpacioibpIuR67DtvilCZhTjsNJJFyJ7WjTtiE/
+   xv+1y1m5+MMwVVGAY1ps94378S37aER7U4XjG67IEeBTzNF3ml3UQwVic
+   A=;
+IronPort-SDR: GYttp4Mwo1NhmCWAJV9M4ryKRvzmbh9G+ybTLmFQflyRsURm7N9LlQsuE9lsP1TQIAMY5JxFoH
+ duvQCG5itP5A==
+X-IronPort-AV: E=Sophos;i="5.73,459,1583193600"; 
+   d="scan'208";a="48565904"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-f14f4a47.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 01 Jun 2020 06:42:55 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-f14f4a47.us-west-2.amazon.com (Postfix) with ESMTPS id 872B1A2242;
+        Mon,  1 Jun 2020 06:42:54 +0000 (UTC)
+Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 1 Jun 2020 06:42:54 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.100) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 1 Jun 2020 06:42:44 +0000
+Subject: Re: [PATCH v3 04/18] nitro_enclaves: Init PCI device driver
+To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Greg KH <gregkh@linuxfoundation.org>
+CC:     <linux-kernel@vger.kernel.org>,
         Anthony Liguori <aliguori@amazon.com>,
         Colm MacCarthaigh <colmmacc@amazon.com>,
         Bjoern Doebel <doebel@amazon.de>,
@@ -41,40 +53,41 @@ Cc:     Andra Paraschiv <andraprs@amazon.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-Subject: Re: [PATCH v3 07/18] nitro_enclaves: Init misc device providing the
- ioctl interface
-Message-ID: <20200601054816.GB1444369@kroah.com>
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
 References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-8-andraprs@amazon.com>
- <20200526065133.GD2580530@kroah.com>
- <d1be2b61febf69af6d63f653ee02903fb2663eb2.camel@kernel.crashing.org>
+ <20200525221334.62966-5-andraprs@amazon.com>
+ <20200526064819.GC2580530@kroah.com>
+ <b4bd54ca-8fe2-8ebd-f4fc-012ed2ac498a@amazon.com>
+ <eb08c9ab66d1f9a8aa8732da693928d12ad613ec.camel@kernel.crashing.org>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <7b063909-cbd5-f02d-595a-10341d30dd49@amazon.com>
+Date:   Mon, 1 Jun 2020 09:42:34 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d1be2b61febf69af6d63f653ee02903fb2663eb2.camel@kernel.crashing.org>
+In-Reply-To: <eb08c9ab66d1f9a8aa8732da693928d12ad613ec.camel@kernel.crashing.org>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.100]
+X-ClientProxiedBy: EX13D24UWA004.ant.amazon.com (10.43.160.233) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 01, 2020 at 12:47:12PM +1000, Benjamin Herrenschmidt wrote:
-> On Tue, 2020-05-26 at 08:51 +0200, Greg KH wrote:
-> > 
-> > And get them to sign off on it too, showing they agree with the design
-> > decisions here :)
-> 
-> Isn't it generally frowned upon to publish a patch with internal sign-
-> off's on it already ?
+CgpPbiAwMS8wNi8yMDIwIDA1OjU1LCBCZW5qYW1pbiBIZXJyZW5zY2htaWR0IHdyb3RlOgo+IE9u
+IFR1ZSwgMjAyMC0wNS0yNiBhdCAyMTozNSArMDMwMCwgUGFyYXNjaGl2LCBBbmRyYS1JcmluYSB3
+cm90ZToKPj4gVGhpcyB3YXMgbmVlZGVkIHRvIGhhdmUgYW4gaWRlbnRpZmllciBmb3IgdGhlIG92
+ZXJhbGwgTkUgbG9naWMgLSBQQ0kKPj4gZGV2LCBpb2N0bCBhbmQgbWlzYyBkZXYuCj4+Cj4+IFRo
+ZSBpb2N0bCBhbmQgbWlzYyBkZXYgbG9naWMgaGFzIHByXyogbG9ncywgYnV0IEkgY2FuIHVwZGF0
+ZSB0aGVtIHRvCj4+IGRldl8qIHdpdGggbWlzYyBkZXYsIHRoZW4gcmVtb3ZlIHRoaXMgcHJlZml4
+Lgo+IE9yICNkZWZpbmUgcHJfZm10LCBidXQgZGV2XyBpcyBiZXR0ZXIuCgpZZXAsIHRoZSBjb2Rl
+YmFzZSBub3cgaW5jbHVkZXMgZGV2XyogdXNhZ2Ugb3ZlcmFsbC4KClRoYW5rcywKQW5kcmEKCgoK
+QW1hem9uIERldmVsb3BtZW50IENlbnRlciAoUm9tYW5pYSkgUy5SLkwuIHJlZ2lzdGVyZWQgb2Zm
+aWNlOiAyN0EgU2YuIExhemFyIFN0cmVldCwgVUJDNSwgZmxvb3IgMiwgSWFzaSwgSWFzaSBDb3Vu
+dHksIDcwMDA0NSwgUm9tYW5pYS4gUmVnaXN0ZXJlZCBpbiBSb21hbmlhLiBSZWdpc3RyYXRpb24g
+bnVtYmVyIEoyMi8yNjIxLzIwMDUuCg==
 
-Not at all.
-
-> Or do you mean for us to publicly sign off once we have reviewed ?
-
-Either is fine, as long as you do the public one "quickly" and don't
-rely on others to do the review first :)
-
-thanks,
-
-greg k-h
