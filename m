@@ -2,206 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EC9D1EA04C
-	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 10:47:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72C131EA0C1
+	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 11:17:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725952AbgFAIrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jun 2020 04:47:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43661 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725778AbgFAIrm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jun 2020 04:47:42 -0400
+        id S1727849AbgFAJQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jun 2020 05:16:37 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31599 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727013AbgFAJQf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Jun 2020 05:16:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591001261;
+        s=mimecast20190719; t=1591002993;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=tZ94LbPEcind1QrZo5LUsiK0o5q9EhNyzcaZ6eu8GiU=;
-        b=VQzaXfAKIpR7h7dt1vyY/3Zh+yuRygbtbadce/BgA8c45oFCHJKSJxvLGUl9JzRwXN5hE8
-        tbMoenyce5iqRKrn935567BKcGbn29t7YU7GOnXDZU4xPybHWK4VGwvcGm3R3UEU5PFEK7
-        YZjhREPFpeurjSEHlXv0y6Rp5B/fEIY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-sOkMLW7wM3O6hEIHm2jTwg-1; Mon, 01 Jun 2020 04:47:36 -0400
-X-MC-Unique: sOkMLW7wM3O6hEIHm2jTwg-1
-Received: by mail-wm1-f69.google.com with SMTP id l26so2421025wmh.3
-        for <kvm@vger.kernel.org>; Mon, 01 Jun 2020 01:47:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tZ94LbPEcind1QrZo5LUsiK0o5q9EhNyzcaZ6eu8GiU=;
-        b=JAnCdShmW9COMvUYkpp5eeU5Q9cbIj6qWgLKV/8tTbchTjwg+JUpgdqQxbUzjvmTY5
-         iVWimaZN0dJmIsm740yK0k+WsHZlI7TwWULOS76rxMyytfB10VCxAd7aNSH7UzXQhW79
-         oz5+LEGIMYr8Wub9hpUSrUTzHgbiKwpTjUZSSZJgrbH2TFEgYCry6T3P8uXslRCvBzME
-         xHOi4qoZLHm1L+7d1FnhJoN2pD4ZYggFF3bUYK5glo/cVFVQHkgaYiiRYvsd7ZfqECsm
-         v0JGKqF23PlPOU9GQOH82aSpXaRO7RDOWmZe3sSQEEbZAEBqfJDTf4aPP05F4sYlpgQa
-         4OZw==
-X-Gm-Message-State: AOAM5312SENkOXIeGrz78DtasSqZylZXACvlb7Mpg9oU9Iyoin3fZH0r
-        qdNEZZY4+S0Itnd+IQcK61BpMMVPqsLV0n8Z/f2Bei58ZJi9FyUIhk7i8tMslb0bjuPlQCU0EGH
-        3b4SUOO/qXW6C
-X-Received: by 2002:adf:e588:: with SMTP id l8mr22396453wrm.255.1591001255373;
-        Mon, 01 Jun 2020 01:47:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTicBdoQgfiOI9kBAQ9qEID/UAUfx22KjKKio/XR2fgR/M2neyvtj5xpheLlx38rvoTuw47Q==
-X-Received: by 2002:adf:e588:: with SMTP id l8mr22396431wrm.255.1591001255081;
-        Mon, 01 Jun 2020 01:47:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e044:3d2:1991:920c? ([2001:b07:6468:f312:e044:3d2:1991:920c])
-        by smtp.gmail.com with ESMTPSA id a81sm10450838wmd.25.2020.06.01.01.47.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2020 01:47:34 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] x86: realmode: Add suffixes for push, pop
- and iret
-To:     Roman Bolshakov <r.bolshakov@yadro.com>, kvm@vger.kernel.org
-References: <20200529212637.5034-1-r.bolshakov@yadro.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <28bfa900-ef1d-5363-dcfc-e78c7d9bd0b1@redhat.com>
-Date:   Mon, 1 Jun 2020 10:47:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        bh=0Wd9igXbzydG2FapnoJya+QCDVjj2Ujw2KrJzi5Gj9E=;
+        b=BcPY4l0DmJCRVSuEI5NzO5NYi7rub8uuNCbAmB2Y0BC9i6bqZH4u5Nw0DwVXuyu2lzCoRr
+        hsSWBGzDFSl4C8jQDooX84/+so8NYht5bS2OJzrri33KVpkx5PcuN4eWdIRC3JR56c54qP
+        9HsO25eZj6YP7SDx0U2j7ovGo8hqKBs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-DxNkUf26OiCA4Azbb0arTw-1; Mon, 01 Jun 2020 05:16:30 -0400
+X-MC-Unique: DxNkUf26OiCA4Azbb0arTw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33292800053;
+        Mon,  1 Jun 2020 09:16:27 +0000 (UTC)
+Received: from work-vm (ovpn-113-144.ams2.redhat.com [10.36.113.144])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D68E5C1B2;
+        Mon,  1 Jun 2020 09:16:20 +0000 (UTC)
+Date:   Mon, 1 Jun 2020 10:16:18 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, pair@us.ibm.com,
+        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
+        mdroth@linux.vnet.ibm.com, cohuck@redhat.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
+Message-ID: <20200601091618.GC2743@work-vm>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200529221926.GA3168@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200529212637.5034-1-r.bolshakov@yadro.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200529221926.GA3168@linux.intel.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/05/20 23:26, Roman Bolshakov wrote:
-> binutils 2.33 and 2.34 changed generation of PUSH and POP for segment
-> registers and IRET in '.code16gcc' [1][2][3][4]. gas also yields the
-> following warnings during the build of realmode.c:
+* Sean Christopherson (sean.j.christopherson@intel.com) wrote:
+> On Thu, May 21, 2020 at 01:42:46PM +1000, David Gibson wrote:
+> > A number of hardware platforms are implementing mechanisms whereby the
+> > hypervisor does not have unfettered access to guest memory, in order
+> > to mitigate the security impact of a compromised hypervisor.
+> > 
+> > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> > its own memory encryption mechanism.  POWER has an upcoming mechanism
+> > to accomplish this in a different way, using a new memory protection
+> > level plus a small trusted ultravisor.  s390 also has a protected
+> > execution environment.
+> > 
+> > The current code (committed or draft) for these features has each
+> > platform's version configured entirely differently.  That doesn't seem
+> > ideal for users, or particularly for management layers.
+> > 
+> > AMD SEV introduces a notionally generic machine option
+> > "machine-encryption", but it doesn't actually cover any cases other
+> > than SEV.
+> > 
+> > This series is a proposal to at least partially unify configuration
+> > for these mechanisms, by renaming and generalizing AMD's
+> > "memory-encryption" property.  It is replaced by a
+> > "guest-memory-protection" property pointing to a platform specific
+> > object which configures and manages the specific details.
+> > 
+> > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> > can be extended to cover the Intel and s390 mechanisms as well,
+> > though.
+> > 
+> > Note: I'm using the term "guest memory protection" throughout to refer
+> > to mechanisms like this.  I don't particular like the term, it's both
+> > long and not really precise.  If someone can think of a succinct way
+> > of saying "a means of protecting guest memory from a possibly
+> > compromised hypervisor", I'd be grateful for the suggestion.
 > 
-> snip.s: Assembler messages:
-> snip.s:2279: Warning: generating 32-bit `push', unlike earlier gas versions
-> snip.s:2296: Warning: generating 32-bit `pop', unlike earlier gas versions
-> snip.s:3633: Warning: generating 16-bit `iret' for .code16gcc directive
+> Many of the features are also going far beyond just protecting memory, so
+> even the "memory" part feels wrong.  Maybe something like protected-guest
+> or secure-guest?
 > 
-> This change fixes warnings and failures of the tests:
-> 
->   push/pop 3
->   push/pop 4
->   iret 1
->   iret 3
-> 
-> 1. https://sourceware.org/bugzilla/show_bug.cgi?id=24485
-> 2. https://sourceware.org/git/?p=binutils-gdb.git;h=7cb22ff84745
-> 3. https://sourceware.org/git/?p=binutils-gdb.git;h=06f74c5cb868
-> 4. https://sourceware.org/git/?p=binutils-gdb.git;h=13e600d0f560
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
->  x86/realmode.c | 32 ++++++++++++++++----------------
->  1 file changed, 16 insertions(+), 16 deletions(-)
-> 
-> diff --git a/x86/realmode.c b/x86/realmode.c
-> index 3518224..234d607 100644
-> --- a/x86/realmode.c
-> +++ b/x86/realmode.c
-> @@ -649,24 +649,24 @@ static void test_push_pop(void)
->  	MK_INSN(push_es, "mov $0x231, %bx\n\t" //Just write a dummy value to see if it gets overwritten
->  			 "mov $0x123, %ax\n\t"
->  			 "mov %ax, %es\n\t"
-> -			 "push %es\n\t"
-> +			 "pushw %es\n\t"
->  			 "pop %bx \n\t"
->  			 );
->  	MK_INSN(pop_es, "push %ax\n\t"
-> -			"pop %es\n\t"
-> +			"popw %es\n\t"
->  			"mov %es, %bx\n\t"
->  			);
-> -	MK_INSN(push_pop_ss, "push %ss\n\t"
-> +	MK_INSN(push_pop_ss, "pushw %ss\n\t"
->  			     "pushw %ax\n\t"
->  			     "popw %ss\n\t"
->  			     "mov %ss, %bx\n\t"
-> -			     "pop %ss\n\t"
-> +			     "popw %ss\n\t"
->  			);
-> -	MK_INSN(push_pop_fs, "push %fs\n\t"
-> +	MK_INSN(push_pop_fs, "pushl %fs\n\t"
->  			     "pushl %eax\n\t"
->  			     "popl %fs\n\t"
->  			     "mov %fs, %ebx\n\t"
-> -			     "pop %fs\n\t"
-> +			     "popl %fs\n\t"
->  			);
->  	MK_INSN(push_pop_high_esp_bits,
->  		"xor $0x12340000, %esp \n\t"
-> @@ -752,7 +752,7 @@ static void test_iret(void)
->  			"pushl %cs\n\t"
->  			"call 1f\n\t" /* a near call will push eip onto the stack */
->  			"jmp 2f\n\t"
-> -			"1: iret\n\t"
-> +			"1: iretl\n\t"
->  			"2:\n\t"
->  		     );
->  
-> @@ -771,7 +771,7 @@ static void test_iret(void)
->  			      "pushl %cs\n\t"
->  			      "call 1f\n\t"
->  			      "jmp 2f\n\t"
-> -			      "1: iret\n\t"
-> +			      "1: iretl\n\t"
->  			      "2:\n\t");
->  
->  	MK_INSN(iret_flags16, "pushfw\n\t"
-> @@ -1340,10 +1340,10 @@ static void test_lds_lss(void)
->  {
->  	init_inregs(&(struct regs){ .ebx = (unsigned long)&desc });
->  
-> -	MK_INSN(lds, "push %ds\n\t"
-> +	MK_INSN(lds, "pushl %ds\n\t"
->  		     "lds (%ebx), %eax\n\t"
->  		     "mov %ds, %ebx\n\t"
-> -		     "pop %ds\n\t");
-> +		     "popl %ds\n\t");
->  	exec_in_big_real_mode(&insn_lds);
->  	report("lds", R_AX | R_BX,
->  		outregs.eax == (unsigned long)desc.address &&
-> @@ -1356,28 +1356,28 @@ static void test_lds_lss(void)
->  		outregs.eax == (unsigned long)desc.address &&
->  		outregs.ebx == desc.sel);
->  
-> -	MK_INSN(lfs, "push %fs\n\t"
-> +	MK_INSN(lfs, "pushl %fs\n\t"
->  		     "lfs (%ebx), %eax\n\t"
->  		     "mov %fs, %ebx\n\t"
-> -		     "pop %fs\n\t");
-> +		     "popl %fs\n\t");
->  	exec_in_big_real_mode(&insn_lfs);
->  	report("lfs", R_AX | R_BX,
->  		outregs.eax == (unsigned long)desc.address &&
->  		outregs.ebx == desc.sel);
->  
-> -	MK_INSN(lgs, "push %gs\n\t"
-> +	MK_INSN(lgs, "pushl %gs\n\t"
->  		     "lgs (%ebx), %eax\n\t"
->  		     "mov %gs, %ebx\n\t"
-> -		     "pop %gs\n\t");
-> +		     "popl %gs\n\t");
->  	exec_in_big_real_mode(&insn_lgs);
->  	report("lgs", R_AX | R_BX,
->  		outregs.eax == (unsigned long)desc.address &&
->  		outregs.ebx == desc.sel);
->  
-> -	MK_INSN(lss, "push %ss\n\t"
-> +	MK_INSN(lss, "pushl %ss\n\t"
->  		     "lss (%ebx), %eax\n\t"
->  		     "mov %ss, %ebx\n\t"
-> -		     "pop %ss\n\t");
-> +		     "popl %ss\n\t");
->  	exec_in_big_real_mode(&insn_lss);
->  	report("lss", R_AX | R_BX,
->  		outregs.eax == (unsigned long)desc.address &&
-> 
+> A little imprecision isn't necessarily a bad thing, e.g. memory-encryption
+> is quite precise, but also wrong once it encompasses anything beyond plain
+> old encryption.
 
-Queued, thanks.
+The common thread I think is 'untrusted host' - but I don't know of a
+better way to describe that.
 
-Paolo
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
