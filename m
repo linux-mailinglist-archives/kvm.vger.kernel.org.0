@@ -2,84 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A67C41E9BF0
-	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 05:04:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A86781E9CF8
+	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 07:11:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727862AbgFADEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 May 2020 23:04:41 -0400
-Received: from kernel.crashing.org ([76.164.61.194]:53982 "EHLO
-        kernel.crashing.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726901AbgFADEl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 May 2020 23:04:41 -0400
-Received: from localhost (gate.crashing.org [63.228.1.57])
-        (authenticated bits=0)
-        by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 05134KVO003273
-        (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 31 May 2020 22:04:24 -0500
-Message-ID: <a37b0156c076d3875f906e970071cb230e526df1.camel@kernel.crashing.org>
-Subject: Re: [PATCH v3 07/18] nitro_enclaves: Init misc device providing the
- ioctl interface
-From:   Benjamin Herrenschmidt <benh@kernel.crashing.org>
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        Alexander Graf <graf@amazon.de>
-Cc:     Andra Paraschiv <andraprs@amazon.com>,
-        linux-kernel@vger.kernel.org,
-        Anthony Liguori <aliguori@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-Date:   Mon, 01 Jun 2020 13:04:19 +1000
-In-Reply-To: <20200528131259.GA3345766@kroah.com>
-References: <20200525221334.62966-1-andraprs@amazon.com>
-         <20200525221334.62966-8-andraprs@amazon.com>
-         <20200526065133.GD2580530@kroah.com>
-         <72647fa4-79d9-7754-9843-a254487703ea@amazon.de>
-         <20200526123300.GA2798@kroah.com>
-         <59007eb9-fad3-9655-a856-f5989fa9fdb3@amazon.de>
-         <20200526131708.GA9296@kroah.com>
-         <29ebdc29-2930-51af-8a54-279c1e449a48@amazon.de>
-         <20200526222402.GC179549@kroah.com>
-         <b4f17cbd-7471-fe61-6e7e-1399bd96e24e@amazon.de>
-         <20200528131259.GA3345766@kroah.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
+        id S1726072AbgFAFLu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jun 2020 01:11:50 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:12104 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725283AbgFAFLu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jun 2020 01:11:50 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5ed48dbf0000>; Sun, 31 May 2020 22:10:24 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Sun, 31 May 2020 22:11:50 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Sun, 31 May 2020 22:11:50 -0700
+Received: from [10.2.56.10] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 1 Jun
+ 2020 05:11:49 +0000
+From:   John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH 1/2] docs: mm/gup: pin_user_pages.rst: add a "case 5"
+To:     Souptick Joarder <jrdr.linux@gmail.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Dave Chinner <david@fromorbit.com>,
+        Jonathan Corbet <corbet@lwn.net>, <linux-doc@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>
+References: <20200529234309.484480-1-jhubbard@nvidia.com>
+ <20200529234309.484480-2-jhubbard@nvidia.com>
+ <CAFqt6zaCSngh7-N_qZ6-S3Cj8CHF8DTSPv8anP_oJg5E6UWu9g@mail.gmail.com>
+X-Nvconfidentiality: public
+Message-ID: <b8de5a5e-b53a-81e8-9165-405d203deb33@nvidia.com>
+Date:   Sun, 31 May 2020 22:11:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+MIME-Version: 1.0
+In-Reply-To: <CAFqt6zaCSngh7-N_qZ6-S3Cj8CHF8DTSPv8anP_oJg5E6UWu9g@mail.gmail.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1590988224; bh=9bFIJ1fdeUjA5o+dFxctvjpXw8nTkPS99fUnc8XcE0I=;
+        h=X-PGP-Universal:From:Subject:To:CC:References:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=QbVXe76ixZyU/4kNOFUP5irHut9M8oYwtRvqVPMBs8MwCPoBca+201MH6KAunI+hC
+         YI80foKFhnvqpOlbkPGohIsaFJrF/KNCZGr+3ThzCd3bCk1avxVy3WXxbF/4r2quEF
+         7yrNewG5QVpWJoVuLj1oHvaRgry+KxpeM1VOIv3nmyznPJUllYlOKwL+c7N4xh6Uz+
+         +qU9FTcgG6RIPcdtoZ+KUxCbcCvD5lTT2AvEWImzE7NSJc+NbL3ZKHm+rp245WmBsC
+         +sdrJvoCqXCZvICidj76kgi5z1yDjAHsgJtBx183NoBxycsge6pMGpAdd0nSqbWfbK
+         z4XykyLCQxZNg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-05-28 at 15:12 +0200, Greg KH wrote:
-> So at runtime, after all is booted and up and going, you just ripped
-> cores out from under someone's feet?  :)
+On 2020-05-31 00:11, Souptick Joarder wrote:
+...
+>> diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/core-api/pin_user_pages.rst
+>> index 4675b04e8829..b9f2688a2c67 100644
+>> --- a/Documentation/core-api/pin_user_pages.rst
+>> +++ b/Documentation/core-api/pin_user_pages.rst
+>> @@ -171,6 +171,26 @@ If only struct page data (as opposed to the actual memory contents that a page
+>>   is tracking) is affected, then normal GUP calls are sufficient, and neither flag
+>>   needs to be set.
+>>
+>> +CASE 5: Pinning in order to write to the data within the page
+>> +-------------------------------------------------------------
+>> +Even though neither DMA nor Direct IO is involved, just a simple case of "pin,
+>> +access page's data, unpin" can cause a problem.
 > 
-> And the code really handles writing to that value while the module is
-> already loaded and up and running?  At a quick glance, it didn't seem
-> like it would handle that very well as it only is checked at ne_init()
-> time.
+> Will it be, *"pin, access page's data, set page dirty, unpin" * ?
+
+Well...the problem can show up with just accessing (writing) the data.
+But it is true that this statement is a little different from the
+patterns below, which is confusing. I'll delete set_page_dirty() from each
+of them, in order to avoid confusing things. (Although each is correct.)
+And I'll also change the above to "pin, write to a page's data, upin".
+
+set_page_dirty() interactions are really just extra credit here. :) And
+fully read-only situations won't cause a problem.
+
 > 
-> Or am I missing something?
-> 
-> Anyway, yes, if you can dynamically do this at runtime, that's great,
-> but it feels ackward to me to rely on one configuration thing as a
-> module parameter, and everything else through the ioctl interface.
-> Unification would seem to be a good thing, right?
+> Case 5 may be considered a
+>> +superset of Case 1, plus Case 2, plus anything that invokes that pattern. In
+>> +other words, if the code is neither Case 1 nor Case 2, it may still require
+>> +FOLL_PIN, for patterns like this:
+>> +
+>> +Correct (uses FOLL_PIN calls):
+>> +    pin_user_pages()
+>> +    access the data within the pages
+>> +    set_page_dirty_lock()
+>> +    unpin_user_pages()
+>> +
+>> +INCORRECT (uses FOLL_GET calls):
+>> +    get_user_pages()
+>> +    access the data within the pages
+>> +    set_page_dirty_lock()
+>> +    put_page()
+>> +
 
-I personally still prefer a sysfs file :) I really don't like module
-parameters as a way to do such things.
+I'll send a v2 shortly.
 
-Cheers,
-Ben.
-
-
+thanks,
+-- 
+John Hubbard
+NVIDIA
