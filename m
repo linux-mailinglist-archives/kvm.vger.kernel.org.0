@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A91941EB1A9
-	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 00:25:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20A981EB1AA
+	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 00:25:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728825AbgFAWYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jun 2020 18:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50762 "EHLO
+        id S1728861AbgFAWYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jun 2020 18:24:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728216AbgFAWYk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jun 2020 18:24:40 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B65C061A0E
-        for <kvm@vger.kernel.org>; Mon,  1 Jun 2020 15:24:40 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id e192so12763610ybf.17
-        for <kvm@vger.kernel.org>; Mon, 01 Jun 2020 15:24:40 -0700 (PDT)
+        with ESMTP id S1728829AbgFAWYm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jun 2020 18:24:42 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AFCC061A0E
+        for <kvm@vger.kernel.org>; Mon,  1 Jun 2020 15:24:41 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id s20so1550787qvw.12
+        for <kvm@vger.kernel.org>; Mon, 01 Jun 2020 15:24:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=esuDLQ5YIiqnB7jmaMDCOvaz2pEkozZla8OGqrKe1Bg=;
-        b=cX/Y7aSSYGVar3zQ/yaxlnlBTSQeonQOF0rrTUMXf6R+3APe0xdO30EAvm40NHceDA
-         8GLkLDQN9Fd7luNM1yxJx3IvkMIiHxR9rrmb8Jn6c6R5j/QKxvp9E37nsKLJoBm5X+GW
-         ZSfC+ToubfdrLIJqet9X0fYZMh0Wo61gEoaS9bn13VCZOeQzIEjzxz5/wHO1WbEkQSad
-         pDSWplTnJ7avtOZKFJl54/TLv4Ud3LrZV+aO8eNv/GglvWp+dujm6Xe1u4CEqPGEMErD
-         Yl05N8DVHrBaQCY19D31b83zsodFxcLH/Pv7IXi10jnswFSPTX3iBqc8kJwaamRcsaSS
-         l9tA==
+        bh=w71DdQoWum2Kp6HNHDyrfluiKwehR5flNSkldp7Yl4Q=;
+        b=syFUZnRWEfAhTOeiMM2UmOa94rJraaS8S2V/4s+f3ryC8Szgv7pkdwhUTawue8wKd9
+         fnVvScoBeennLI0tfOSk+e66+zsAPTZlebqPo9vuJhW63dr6UJuJ6WBUMGqlFLZANZH6
+         fmB8DmSRYZ+Zjb7OjVWgESS6IGdn3ze6AfNgYkCuHL+pn0TcRBCzSmUsVOabTX7YuA0a
+         T52QpNWIgS/QQs57bkDQQEJD2bkrq6/eXFFL5LTgga0orvPu/b63zPFF8C1QnE4lcgoO
+         S4YXBSUL/AHkbIa9kL1Y/AnnAwzB+OuLjNdNf2sw6OC2S+4bo+RrWb3VXWcdPkjFSF3q
+         pHhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=esuDLQ5YIiqnB7jmaMDCOvaz2pEkozZla8OGqrKe1Bg=;
-        b=Mkz9V5ZagpjybPg8f0ufeMRpelPem9IC5fHFXvSTcSRDkOK63tiuGzqt5CfwaDP5zZ
-         UU1S2y4YMgPG0pKiePyfYnicZ20iKbKpY0SR/eGzXJJwNIZsT5RKavhrSxS4VwqljIBi
-         A/AHe2q0C+nKvNfBK9wr5xaLxCs/ZX+nK7uWXNlP9Q7/WunTagUayIT3miSgmHrVoca6
-         WTl8F42WI8BJ3hdobHourqhzQZVGPqIkReYt78vhL3uCQa0akD8MfsV5PJ0CNwQ2eWAT
-         xon/W+i6yr/FqaX/Aci764cCQrKQ2J32M6WL6rk2bV4r9IbY6CFHHcuYuwkUx5AGq6cO
-         S/oQ==
-X-Gm-Message-State: AOAM531kgmfFzwRB82Hi+blSBf5ppD/vBm9ubMFrsXbOmpnvgysQc36g
-        5HDh74+ahRSTYM0WVnbV6WrhJHfi4q0pU+aeO1xSI2U++cZ6UM/nytsiLsqKubluyikdFCFT3R3
-        yLoLWZTZwH0XyTc+wyjg3UnKysxrbt4Or0QyOUPbo1mzfV23Aq335ozGvnQGZo4c=
-X-Google-Smtp-Source: ABdhPJyvPtpTdwRYcC2FQBjYbvWLX3qfT2kg9ta3dTGop5pTXN+yBvW9CM7uBa6KT1QGKytyNejPjTvx/3Sgnw==
-X-Received: by 2002:a25:354:: with SMTP id 81mr39089015ybd.257.1591050279334;
- Mon, 01 Jun 2020 15:24:39 -0700 (PDT)
-Date:   Mon,  1 Jun 2020 15:24:14 -0700
+        bh=w71DdQoWum2Kp6HNHDyrfluiKwehR5flNSkldp7Yl4Q=;
+        b=lbbh1z8UHVh13orSunPQQeo18lsehypN+K4qDCwd/AeAJsmn+vUI2L/TjFCDOO6h8n
+         GBDuNR+exSJHvu7uft5xR3XbV2R7Md8WkgviCEMwHz8u8S0xn8TNqEvbTzZ4edUouvlC
+         SwBY6hmYHxv0NtOxIIQdJENBhHGTJ0B+Ot9Ikl+AYwn1VAwUy33BZmC5EG80vv++rY5H
+         rmrM0cuiUCnptZv68Rj14rShX+UfHc5hmyQzwBOpDn0XXYcX3dsGVHKeWQKvyESvBEFw
+         Lp8Q4mZ3TvMsPH1yZ7d5p5aDnRcw0qIw/+PNHzEaQdE/hNjxib8pwhnzFSRJydv/z3L6
+         KS8A==
+X-Gm-Message-State: AOAM532Rs2HuyYkrKB0z8kyJmnVGoaC/Tw0juwratTrmgzLMMRoL+NuP
+        GDQUIBl0Vcr2/EOkGFaOKNwmjby57EYE9J4MlRG+1ItVn96M15qlwLjdmDtgnttvEHuHaTSeS/B
+        faO1bGhCr1FpNo7GHQo1cgq2HtWtsSEPV5Izab8VBWncmAES2PTtSKFJki8Qa8q8=
+X-Google-Smtp-Source: ABdhPJzMQUW3JKYyhnldZa4MUjZO9LfwTQGgeRWfBFwulRuDoxg/UZ03Bbm0B350ww9DDFBfwlJgcrv+V4m++Q==
+X-Received: by 2002:a05:6214:6a1:: with SMTP id s1mr22730957qvz.46.1591050280897;
+ Mon, 01 Jun 2020 15:24:40 -0700 (PDT)
+Date:   Mon,  1 Jun 2020 15:24:15 -0700
 In-Reply-To: <20200601222416.71303-1-jmattson@google.com>
-Message-Id: <20200601222416.71303-3-jmattson@google.com>
+Message-Id: <20200601222416.71303-4-jmattson@google.com>
 Mime-Version: 1.0
 References: <20200601222416.71303-1-jmattson@google.com>
 X-Mailer: git-send-email 2.27.0.rc2.251.g90737beb825-goog
-Subject: [PATCH v3 2/4] kvm: svm: Always set svm->last_cpu on VMRUN
+Subject: [PATCH v3 3/4] kvm: vmx: Add last_cpu to struct vcpu_vmx
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Liran Alon <liran.alon@oracle.com>,
@@ -63,42 +63,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Previously, this field was only set when using SEV. Set it for all
-vCPU configurations, so that it can be communicated to userspace for
-diagnosing potential hardware errors.
+As we already do in svm, record the last logical processor on which a
+vCPU has run, so that it can be communicated to userspace for
+potential hardware errors.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 1 -
- arch/x86/kvm/svm/svm.c | 1 +
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 1 +
+ arch/x86/kvm/vmx/vmx.h | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 89f7f3aebd31..aa61d5d1e7f3 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1184,7 +1184,6 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
- 	    svm->last_cpu == cpu)
- 		return;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 170cc76a581f..42856970d3b8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6730,6 +6730,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.cr2 != read_cr2())
+ 		write_cr2(vcpu->arch.cr2);
  
--	svm->last_cpu = cpu;
- 	sd->sev_vmcbs[asid] = svm->vmcb;
- 	svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
- 	mark_dirty(svm->vmcb, VMCB_ASID);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f0dd481be435..442dbb763639 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3394,6 +3394,7 @@ static fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
++	vmx->last_cpu = vcpu->cpu;
+ 	vmx->fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
+ 				   vmx->loaded_vmcs->launched);
  
-+	svm->last_cpu = vcpu->cpu;
- 	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 672c28f17e49..8a1e833cf4fb 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -302,6 +302,9 @@ struct vcpu_vmx {
+ 	u64 ept_pointer;
  
- #ifdef CONFIG_X86_64
+ 	struct pt_desc pt_desc;
++
++	/* which host CPU was used for running this vcpu */
++	unsigned int last_cpu;
+ };
+ 
+ enum ept_pointers_status {
 -- 
 2.27.0.rc2.251.g90737beb825-goog
 
