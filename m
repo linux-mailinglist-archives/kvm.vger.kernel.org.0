@@ -2,102 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35F901E9EF7
-	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 09:20:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E18C1E9F37
+	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 09:28:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726152AbgFAHUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jun 2020 03:20:38 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:65023 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725283AbgFAHUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jun 2020 03:20:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1590996037; x=1622532037;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=hQASGLU2Qp68wJMFjT6/GjP8eU7Wfp1GPuYXep3bfpQ=;
-  b=P98YoLhUobHgnsIwDH/vBpTn8M1kiaQC67k82ba9kztPSs0uBfGzc6+M
-   xO2M8aWFwnQVEHpjXQHAsHgOEnbE9TUxfuFjpWvzLPT206sHI3YrUx4T6
-   ToziZ+Pgh0YIsqOsY3AVsMxqN2F7i0iHxqby+0h97/tiOwo7MCxM47wqu
-   U=;
-IronPort-SDR: YcOPAN0qfLaoBD+0f+iGEaNjFWuvytSoBhSirDa4zJeZ3pdbULkR9ZkBH5mTIW+GAax7jJbP64
- QEeAOMyZmJcA==
-X-IronPort-AV: E=Sophos;i="5.73,459,1583193600"; 
-   d="scan'208";a="40309876"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-f273de60.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 01 Jun 2020 07:20:35 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-f273de60.us-east-1.amazon.com (Postfix) with ESMTPS id 37D59A28A3;
-        Mon,  1 Jun 2020 07:20:32 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 1 Jun 2020 07:20:32 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.109) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 1 Jun 2020 07:20:23 +0000
-Subject: Re: [PATCH v3 01/18] nitro_enclaves: Add ioctl interface definition
-To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Stefan Hajnoczi <stefanha@gmail.com>
-CC:     <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-2-andraprs@amazon.com>
- <20200527084959.GA29137@stefanha-x1.localdomain>
- <a95de3ee4b722d418fd6cf662233cb024928804e.camel@kernel.crashing.org>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <d639afa5-cca6-3707-4c80-40ee1bf5bcb5@amazon.com>
-Date:   Mon, 1 Jun 2020 10:20:18 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.1
+        id S1726145AbgFAH2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jun 2020 03:28:13 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27583 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725972AbgFAH2M (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Jun 2020 03:28:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1590996491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rBGnBe9nAKzVkNp1oiiFdwiEMaoCXpO5GvmbNaHYZEA=;
+        b=TPAb6mEogHV8+LfFHYuWbjNvmV9d4ksqqjyF1uNY6Vc+nYTCls6/ZxjkZrxTxca6Grc45h
+        /D4ghTlq4i6YJTziyMKZX+yJ9t3hDXFST8D2MzGWBdLl7mBiCEAd3xL3Clmud5H7IGYpOa
+        bsPAUxMqb+vg2RZydnu3zkZTrOIJAJA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421-tvXL1-sSOhqxFpD14I1gjA-1; Mon, 01 Jun 2020 03:28:09 -0400
+X-MC-Unique: tvXL1-sSOhqxFpD14I1gjA-1
+Received: by mail-wm1-f71.google.com with SMTP id l26so2346616wmh.3
+        for <kvm@vger.kernel.org>; Mon, 01 Jun 2020 00:28:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rBGnBe9nAKzVkNp1oiiFdwiEMaoCXpO5GvmbNaHYZEA=;
+        b=OGoNhX2SHl6FuXagivMtG7VmQLl9cCxp7NdW8P2T/Ckc7Ez+9gt7SzNdHYRdOb65jV
+         ydQelbKkXlW9b5SU+i0fWyhv2JENgmA+1h5/mk49RbwBpeOSAFY4g4nugp4ohLoWlg4H
+         jJCaTNNeIzNke4sOPDn7M8Ik30q6Eic4+hmneLuTnMYhFbaZt5JF0KJJM7P2F+RQqwd6
+         co73FNV7s40T0JSImovBZba3SWWe6cWD/GokA67JycAXmhRG0uunYQSlsTLhT2DRO5IY
+         /QRGoAcFa7nFcs2BX3OM4RRyzEAuOOZEKLPu5mkUQej0WKghwI7wi6dhrrDUGQazDWYz
+         Pjpw==
+X-Gm-Message-State: AOAM533abwKYF7SGA4OsL2uhnE64c4Z+7ntwQkg10F3QPpkQbNtGqO9E
+        skXNYZOaFkg098UJntoVO8V3ETSgewgLfNx+e5YZyAp7rhCi0j/qPdlsSczQ+gVLnDqRmz4AmcC
+        cWp6Qc/meKpq1
+X-Received: by 2002:a05:600c:1:: with SMTP id g1mr19913784wmc.142.1590996488357;
+        Mon, 01 Jun 2020 00:28:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxyQPU8guSVwXTyixwCAix1YqbDNU3KwWv/HjBxt0m9SQOj/RtfZn4b9HR9UnvFILpXKqx3og==
+X-Received: by 2002:a05:600c:1:: with SMTP id g1mr19913773wmc.142.1590996488118;
+        Mon, 01 Jun 2020 00:28:08 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e044:3d2:1991:920c? ([2001:b07:6468:f312:e044:3d2:1991:920c])
+        by smtp.gmail.com with ESMTPSA id i74sm19645977wri.49.2020.06.01.00.28.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Jun 2020 00:28:07 -0700 (PDT)
+Subject: Re: [PATCH 25/30] KVM: nSVM: leave guest mode when clearing EFER.SVME
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20200529153934.11694-1-pbonzini@redhat.com>
+ <20200529153934.11694-26-pbonzini@redhat.com>
+ <da854e9e-b305-b938-68f6-995bcc80ffd1@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9319ccf9-c318-40e8-7d56-df0e32617430@redhat.com>
+Date:   Mon, 1 Jun 2020 09:28:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <a95de3ee4b722d418fd6cf662233cb024928804e.camel@kernel.crashing.org>
+In-Reply-To: <da854e9e-b305-b938-68f6-995bcc80ffd1@oracle.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Originating-IP: [10.43.162.109]
-X-ClientProxiedBy: EX13D42UWB001.ant.amazon.com (10.43.161.35) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAwMS8wNi8yMDIwIDA2OjAyLCBCZW5qYW1pbiBIZXJyZW5zY2htaWR0IHdyb3RlOgo+IE9u
-IFdlZCwgMjAyMC0wNS0yNyBhdCAwOTo0OSArMDEwMCwgU3RlZmFuIEhham5vY3ppIHdyb3RlOgo+
-PiBXaGF0IGFib3V0IGZlYXR1cmUgYml0cyBvciBhIEFQSSB2ZXJzaW9uIG51bWJlciBmaWVsZD8g
-SWYgeW91IGFkZAo+PiBmZWF0dXJlcyB0byB0aGUgTkUgZHJpdmVyLCBob3cgd2lsbCB1c2Vyc3Bh
-Y2UgZGV0ZWN0IHRoZW0/Cj4+Cj4+IEV2ZW4gaWYgeW91IGludGVuZCB0byBhbHdheXMgY29tcGls
-ZSB1c2Vyc3BhY2UgYWdhaW5zdCB0aGUgZXhhY3Qga2VybmVsCj4+IGhlYWRlcnMgdGhhdCB0aGUg
-cHJvZ3JhbSB3aWxsIHJ1biBvbiwgaXQgY2FuIHN0aWxsIGJlIHVzZWZ1bCB0byBoYXZlIGFuCj4+
-IEFQSSB2ZXJzaW9uIGZvciBpbmZvcm1hdGlvbmFsIHB1cnBvc2VzIGFuZCB0byBlYXNpbHkgcHJl
-dmVudCB1c2VyCj4+IGVycm9ycyAocnVubmluZyBhIG5ldyB1c2Vyc3BhY2UgYmluYXJ5IG9uIGFu
-IG9sZCBrZXJuZWwgd2hlcmUgdGhlIEFQSSBpcwo+PiBkaWZmZXJlbnQpLgo+Pgo+PiBGaW5hbGx5
-LCByZXNlcnZlZCBzdHJ1Y3QgZmllbGRzIG1heSBjb21lIGluIGhhbmR5IGluIHRoZSBmdXR1cmUu
-IFRoYXQKPj4gd2F5IHVzZXJzcGFjZSBhbmQgdGhlIGtlcm5lbCBkb24ndCBuZWVkIHRvIGV4cGxp
-Y2l0bHkgaGFuZGxlIG11bHRpcGxlCj4+IHN0cnVjdCBzaXplcy4KPiBCZXdhcmUsIEdyZWcgbWln
-aHQgZGlzYWdyZWUgOikKPgo+IFRoYXQgc2FpZCwgeWVzLCBhdCBsZWFzdCBhIHdheSB0byBxdWVy
-eSB0aGUgQVBJIHZlcnNpb24gd291bGQgYmUKPiB1c2VmdWwuCgpJIHNlZSB0aGVyZSBhcmUgc2V2
-ZXJhbCB0aG91Z2h0cyB3aXRoIHJlZ2FyZCB0byBleHRlbnNpb25zIHBvc3NpYmlsaXRpZXMuIDop
-CgpJIGFkZGVkIGFuIGlvY3RsIGZvciBnZXR0aW5nIHRoZSBBUEkgdmVyc2lvbiwgd2UgaGF2ZSBu
-b3cgYSB3YXkgdG8gcXVlcnkgCnRoYXQgaW5mby4gQWxzbywgSSB1cGRhdGVkIHRoZSBzYW1wbGUg
-aW4gdGhpcyBwYXRjaCBzZXJpZXMgdG8gY2hlY2sgZm9yIAp0aGUgQVBJIHZlcnNpb24uCgpUaGFu
-a3MsCkFuZHJhCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMuUi5MLiBy
-ZWdpc3RlcmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29yIDIsIElh
-c2ksIElhc2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9tYW5pYS4g
-UmVnaXN0cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
+On 01/06/20 04:26, Krish Sadhukhan wrote:
+> On 5/29/20 8:39 AM, Paolo Bonzini wrote:
+>> According to the AMD manual, the effect of turning off EFER.SVME while a
+>> guest is running is undefined.  We make it leave guest mode immediately,
+>> similar to the effect of clearing the VMX bit in MSR_IA32_FEAT_CTL.
+> 
+> I see that svm_set_efer() is called in enter_svm_guest_mode() and
+> nested_svm_vmexit(). In the VMRUN path, we have already checked
+> EFER.SVME in nested_vmcb_checks(). So if it was not set, we wouldn't
+> come to enter_svm_guest_mode(). Your fix is only for the #VMEXIT path
+> then ?
+
+No, it's for KVM_SET_MSR.
+
+Paolo
 
