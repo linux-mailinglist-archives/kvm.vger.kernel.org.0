@@ -2,32 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BA8C1E9BE0
-	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 04:59:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A7791E9BE4
+	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 05:02:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728160AbgFAC7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 May 2020 22:59:32 -0400
-Received: from kernel.crashing.org ([76.164.61.194]:53932 "EHLO
+        id S1727820AbgFADCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 May 2020 23:02:13 -0400
+Received: from kernel.crashing.org ([76.164.61.194]:53942 "EHLO
         kernel.crashing.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727820AbgFAC7c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 May 2020 22:59:32 -0400
+        with ESMTP id S1726555AbgFADCN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 May 2020 23:02:13 -0400
 Received: from localhost (gate.crashing.org [63.228.1.57])
         (authenticated bits=0)
-        by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 0512xBhh003181
+        by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 05131rec003219
         (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 31 May 2020 21:59:15 -0500
-Message-ID: <ea25810cbd43974b75934f9cfb6ca3f007339dce.camel@kernel.crashing.org>
-Subject: Re: [PATCH v3 02/18] nitro_enclaves: Define the PCI device interface
+        Sun, 31 May 2020 22:01:57 -0500
+Message-ID: <940c0e0575bec1cbbc015bbda5b7da7009cdc392.camel@kernel.crashing.org>
+Subject: Re: [PATCH v3 07/18] nitro_enclaves: Init misc device providing the
+ ioctl interface
 From:   Benjamin Herrenschmidt <benh@kernel.crashing.org>
 To:     Greg KH <gregkh@linuxfoundation.org>,
-        "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Cc:     linux-kernel@vger.kernel.org,
+        Alexander Graf <graf@amazon.de>
+Cc:     Andra Paraschiv <andraprs@amazon.com>,
+        linux-kernel@vger.kernel.org,
         Anthony Liguori <aliguori@amazon.com>,
         Colm MacCarthaigh <colmmacc@amazon.com>,
         Bjoern Doebel <doebel@amazon.de>,
         David Woodhouse <dwmw@amazon.co.uk>,
         Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
         Martin Pohlack <mpohlack@amazon.de>,
         Matt Wilson <msw@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -37,13 +38,17 @@ Cc:     linux-kernel@vger.kernel.org,
         Stewart Smith <trawets@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
         ne-devel-upstream@amazon.com
-Date:   Mon, 01 Jun 2020 12:59:10 +1000
-In-Reply-To: <20200526222109.GB179549@kroah.com>
+Date:   Mon, 01 Jun 2020 13:01:52 +1000
+In-Reply-To: <20200526222402.GC179549@kroah.com>
 References: <20200525221334.62966-1-andraprs@amazon.com>
-         <20200525221334.62966-3-andraprs@amazon.com>
-         <20200526064455.GA2580530@kroah.com>
-         <bd25183c-3b2d-7671-f699-78988a39a633@amazon.com>
-         <20200526222109.GB179549@kroah.com>
+         <20200525221334.62966-8-andraprs@amazon.com>
+         <20200526065133.GD2580530@kroah.com>
+         <72647fa4-79d9-7754-9843-a254487703ea@amazon.de>
+         <20200526123300.GA2798@kroah.com>
+         <59007eb9-fad3-9655-a856-f5989fa9fdb3@amazon.de>
+         <20200526131708.GA9296@kroah.com>
+         <29ebdc29-2930-51af-8a54-279c1e449a48@amazon.de>
+         <20200526222402.GC179549@kroah.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
@@ -53,28 +58,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2020-05-27 at 00:21 +0200, Greg KH wrote:
-> > There are a couple of data structures with more than one member and multiple
-> > field sizes. And for the ones that are not, gathered as feedback from
-> > previous rounds of review that should consider adding a "flags" field in
-> > there for further extensibility.
+On Wed, 2020-05-27 at 00:24 +0200, Greg KH wrote:
+> > Would you want random users to get the ability to hot unplug CPUs from your
+> > system? At unlimited quantity? I don't :).
 > 
-> Please do not do that in ioctls.  Just create new calls instead of
-> trying to "extend" existing ones.  It's always much easier.
-> 
-> > I can modify to have "__packed" instead of the attribute callout.
-> 
-> Make sure you even need that, as I don't think you do for structures
-> like the above one, right?
+> A random user, no, but one with admin rights, why not?  They can do that
+> already today on your system, this isn't new.
 
-Hrm, my impression (granted I only just started to look at this code)
-is that these are protocol messages with the PCI devices, not strictly
-just ioctl arguments (though they do get conveyed via such ioctls).
+So I agree with you that a module parameter sucks. I disagree on the
+ioctl :)
 
-Andra-Irina, did I get that right ? :-)
+This is the kind of setup task that will probably end up being done by
+some shell script at boot time based on some config file. Being able to
+echo something in a sysfs file which will parse the standard-format CPU
+list using the existing kernel functions to turn that into a cpu_mask
+makes a lot more sense than having a binary interface via an ioctl
+which will require an extra userspace program for use by the admin for
+that one single task.
 
-That said, I still think that by carefully ordering the fields and
-using explicit padding, we can avoid the need of the packed attributed.
+So sysfs is my preference here.
+
+Another approach would be configfs, which would provide a more flexible
+interface to potentially create multiple "CPU sets" that could be given
+to different users or classes of users etc... but that might be pushing
+it, I don't know.
 
 Cheers,
 Ben.
