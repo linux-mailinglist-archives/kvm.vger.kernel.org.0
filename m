@@ -2,211 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61F9C1E9EDC
+	by mail.lfdr.de (Postfix) with ESMTP id CD88F1E9EDD
 	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 09:07:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727828AbgFAHH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jun 2020 03:07:27 -0400
-Received: from mga04.intel.com ([192.55.52.120]:2159 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726142AbgFAHH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jun 2020 03:07:26 -0400
-IronPort-SDR: vB+CrvNFpPZVWdLcEM7K8fg9qQveLd5zUlJGVguKqc3g7Dl7LlzDpDOaCiqe0ble5EGu29ck2e
- P/seCS2ovSSA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2020 00:07:24 -0700
-IronPort-SDR: zcCluIYtSPT8CcjgyuJRrV45SlK49+qBGDDhY+zCfhWm0aszxImrNQa4U+GjBxDqA2M6x4dmno
- T9rgKhp83LiQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,459,1583222400"; 
-   d="scan'208";a="346947035"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by orsmga001.jf.intel.com with ESMTP; 01 Jun 2020 00:07:21 -0700
-Date:   Mon, 1 Jun 2020 02:57:26 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        kevin.tian@intel.com, shaopeng.he@intel.com, yi.l.liu@intel.com,
-        xin.zeng@intel.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH v4 07/10] vfio/pci: introduce a new irq type
- VFIO_IRQ_TYPE_REMAP_BAR_REGION
-Message-ID: <20200601065726.GA5906@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200518024202.13996-1-yan.y.zhao@intel.com>
- <20200518025245.14425-1-yan.y.zhao@intel.com>
- <20200529154547.19a6685f@x1.home>
+        id S1728232AbgFAHHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jun 2020 03:07:32 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:23392 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726142AbgFAHHa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jun 2020 03:07:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1590995249; x=1622531249;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=Pse7FjT1oSM7k6+12m27jATLc53uuNLdEozAkVeDTn0=;
+  b=mJdtsJ1rnhFIp68TI3RZpZx3G+funKyFaVjfq6Kd99St2+MURUUn92WC
+   NrPHlqw3TqPGdbXWsATfVwc0JLm+jlMX93292+XVkk0yi6feCKrklS1cr
+   46iQOi2A2SclbhC/IGHFJM2uTuRqntcSJFNE97qcCAL8LHmB2Xu0H0ak/
+   w=;
+IronPort-SDR: a2WV03LKoD4vqdEmaIJRDRVZLOgNnbMLs0A7Da1b7yWqMRSHvwswB8nDGlrpkRI9IWGorfUkOP
+ bNukS5fZ9czA==
+X-IronPort-AV: E=Sophos;i="5.73,459,1583193600"; 
+   d="scan'208";a="48575926"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-168cbb73.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 01 Jun 2020 07:07:26 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-168cbb73.us-west-2.amazon.com (Postfix) with ESMTPS id 3D6ACA1E65;
+        Mon,  1 Jun 2020 07:07:25 +0000 (UTC)
+Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 1 Jun 2020 07:07:24 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.53) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 1 Jun 2020 07:07:16 +0000
+Subject: Re: [PATCH v3 02/18] nitro_enclaves: Define the PCI device interface
+To:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Greg KH <gregkh@linuxfoundation.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200525221334.62966-1-andraprs@amazon.com>
+ <20200525221334.62966-3-andraprs@amazon.com>
+ <20200526064455.GA2580530@kroah.com>
+ <bd25183c-3b2d-7671-f699-78988a39a633@amazon.com>
+ <20200526222109.GB179549@kroah.com>
+ <ea25810cbd43974b75934f9cfb6ca3f007339dce.camel@kernel.crashing.org>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <1fbdc33c-8819-40b6-b0d3-5d64833c9932@amazon.com>
+Date:   Mon, 1 Jun 2020 10:07:11 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200529154547.19a6685f@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <ea25810cbd43974b75934f9cfb6ca3f007339dce.camel@kernel.crashing.org>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.53]
+X-ClientProxiedBy: EX13D20UWC002.ant.amazon.com (10.43.162.163) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 29, 2020 at 03:45:47PM -0600, Alex Williamson wrote:
-> On Sun, 17 May 2020 22:52:45 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > This is a virtual irq type.
-> > vendor driver triggers this irq when it wants to notify userspace to
-> > remap PCI BARs.
-> > 
-> > 1. vendor driver triggers this irq and packs the target bar number in
-> >    the ctx count. i.e. "1 << bar_number".
-> >    if a bit is set, the corresponding bar is to be remapped.
-> > 
-> > 2. userspace requery the specified PCI BAR from kernel and if flags of
-> > the bar regions are changed, it removes the old subregions and attaches
-> > subregions according to the new flags.
-> > 
-> > 3. userspace notifies back to kernel by writing one to the eventfd of
-> > this irq.
-> > 
-> > Please check the corresponding qemu implementation from the reply of this
-> > patch, and a sample usage in vendor driver in patch [10/10].
-> > 
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  include/uapi/linux/vfio.h | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 2d0d85c7c4d4..55895f75d720 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -704,6 +704,17 @@ struct vfio_irq_info_cap_type {
-> >  	__u32 subtype;  /* type specific */
-> >  };
-> >  
-> > +/* Bar Region Query IRQ TYPE */
-> > +#define VFIO_IRQ_TYPE_REMAP_BAR_REGION			(1)
-> > +
-> > +/* sub-types for VFIO_IRQ_TYPE_REMAP_BAR_REGION */
-> > +/*
-> > + * This irq notifies userspace to re-query BAR region and remaps the
-> > + * subregions.
-> > + */
-> > +#define VFIO_IRQ_SUBTYPE_REMAP_BAR_REGION	(0)
-> 
-> Hi Yan,
-> 
-> How do we do this in a way that's backwards compatible?  Or maybe, how
-> do we perform a handshake between the vendor driver and userspace to
-> indicate this support?
-hi Alex
-thank you for your thoughtful review!
+CgpPbiAwMS8wNi8yMDIwIDA1OjU5LCBCZW5qYW1pbiBIZXJyZW5zY2htaWR0IHdyb3RlOgo+IE9u
+IFdlZCwgMjAyMC0wNS0yNyBhdCAwMDoyMSArMDIwMCwgR3JlZyBLSCB3cm90ZToKPj4+IFRoZXJl
+IGFyZSBhIGNvdXBsZSBvZiBkYXRhIHN0cnVjdHVyZXMgd2l0aCBtb3JlIHRoYW4gb25lIG1lbWJl
+ciBhbmQgbXVsdGlwbGUKPj4+IGZpZWxkIHNpemVzLiBBbmQgZm9yIHRoZSBvbmVzIHRoYXQgYXJl
+IG5vdCwgZ2F0aGVyZWQgYXMgZmVlZGJhY2sgZnJvbQo+Pj4gcHJldmlvdXMgcm91bmRzIG9mIHJl
+dmlldyB0aGF0IHNob3VsZCBjb25zaWRlciBhZGRpbmcgYSAiZmxhZ3MiIGZpZWxkIGluCj4+PiB0
+aGVyZSBmb3IgZnVydGhlciBleHRlbnNpYmlsaXR5Lgo+PiBQbGVhc2UgZG8gbm90IGRvIHRoYXQg
+aW4gaW9jdGxzLiAgSnVzdCBjcmVhdGUgbmV3IGNhbGxzIGluc3RlYWQgb2YKPj4gdHJ5aW5nIHRv
+ICJleHRlbmQiIGV4aXN0aW5nIG9uZXMuICBJdCdzIGFsd2F5cyBtdWNoIGVhc2llci4KPj4KPj4+
+IEkgY2FuIG1vZGlmeSB0byBoYXZlICJfX3BhY2tlZCIgaW5zdGVhZCBvZiB0aGUgYXR0cmlidXRl
+IGNhbGxvdXQuCj4+IE1ha2Ugc3VyZSB5b3UgZXZlbiBuZWVkIHRoYXQsIGFzIEkgZG9uJ3QgdGhp
+bmsgeW91IGRvIGZvciBzdHJ1Y3R1cmVzCj4+IGxpa2UgdGhlIGFib3ZlIG9uZSwgcmlnaHQ/Cj4g
+SHJtLCBteSBpbXByZXNzaW9uIChncmFudGVkIEkgb25seSBqdXN0IHN0YXJ0ZWQgdG8gbG9vayBh
+dCB0aGlzIGNvZGUpCj4gaXMgdGhhdCB0aGVzZSBhcmUgcHJvdG9jb2wgbWVzc2FnZXMgd2l0aCB0
+aGUgUENJIGRldmljZXMsIG5vdCBzdHJpY3RseQo+IGp1c3QgaW9jdGwgYXJndW1lbnRzICh0aG91
+Z2ggdGhleSBkbyBnZXQgY29udmV5ZWQgdmlhIHN1Y2ggaW9jdGxzKS4KPgo+IEFuZHJhLUlyaW5h
+LCBkaWQgSSBnZXQgdGhhdCByaWdodCA/IDotKQoKQ29ycmVjdCwgdGhlc2UgZGF0YSBzdHJ1Y3R1
+cmVzIGhhdmluZyAiX19wYWNrZWQiIGF0dHJpYnV0ZSBtYXAgdGhlIAptZXNzYWdlcyAocmVxdWVz
+dHMgLyByZXBsaWVzKSBmb3IgdGhlIGNvbW11bmljYXRpb24gd2l0aCB0aGUgTkUgUENJIGRldmlj
+ZS4KClRoZSBkYXRhIHN0cnVjdHVyZXMgZnJvbSB0aGUgaW9jdGwgY29tbWFuZHMgYXJlIG5vdCBk
+aXJlY3RseSB1c2VkIGFzIApwYXJ0IG9mIHRoZSBjb21tdW5pY2F0aW9uIHdpdGggdGhlIE5FIFBD
+SSBkZXZpY2UsIGJ1dCBzZXZlcmFsIGZpZWxkcyBvZiAKdGhlbSBlLmcuIGVuY2xhdmUgc3RhcnQg
+ZmxhZ3MuIFNvbWUgb2YgdGhlIGZpZWxkcyBmcm9tIHRoZSBORSBQQ0kgZGV2aWNlIApkYXRhIHN0
+cnVjdHVyZXMgZS5nLiB0aGUgcGh5c2ljYWwgYWRkcmVzcyBvZiBhIG1lbW9yeSByZWdpb24gKGdw
+YSkgYXJlIApzZXQgYnkgdGhlIGludGVybmFsIGtlcm5lbCBsb2dpYy4KCj4KPiBUaGF0IHNhaWQs
+IEkgc3RpbGwgdGhpbmsgdGhhdCBieSBjYXJlZnVsbHkgb3JkZXJpbmcgdGhlIGZpZWxkcyBhbmQK
+PiB1c2luZyBleHBsaWNpdCBwYWRkaW5nLCB3ZSBjYW4gYXZvaWQgdGhlIG5lZWQgb2YgdGhlIHBh
+Y2tlZCBhdHRyaWJ1dGVkLgoKUmVnYXJkaW5nIHlvdXIgcXVlc3Rpb24gaW4gdGhlIHByZXZpb3Vz
+IG1haWwgZnJvbSB0aGlzIHRocmVhZCBhbmQgdGhlIAptZW50aW9uIGFib3ZlIG9uIHRoZSBzYW1l
+IHRvcGljLCB0aGF0IHNob3VsZCBiZSBwb3NzaWJsZS4gSUlSQywgdGhlcmUgCndlcmUgMiBkYXRh
+IHN0cnVjdHVyZXMgcmVtYWluaW5nIHdpdGggIl9fcGFja2VkIiBhdHRyaWJ1dGUuCgpUaGFuayB5
+b3UsIEJlbi4KCkFuZHJhCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgKFJvbWFuaWEpIFMu
+Ui5MLiByZWdpc3RlcmVkIG9mZmljZTogMjdBIFNmLiBMYXphciBTdHJlZXQsIFVCQzUsIGZsb29y
+IDIsIElhc2ksIElhc2kgQ291bnR5LCA3MDAwNDUsIFJvbWFuaWEuIFJlZ2lzdGVyZWQgaW4gUm9t
+YW5pYS4gUmVnaXN0cmF0aW9uIG51bWJlciBKMjIvMjYyMS8yMDA1Lgo=
 
-do you think below sequence can provide enough backwards compatibility?
-
-- on vendor driver opening, it registers an irq of type
-  VFIO_IRQ_TYPE_REMAP_BAR_REGION, and reports to driver vfio-pci there's
-  1 vendor irq.
-
-- after userspace detects the irq of type VFIO_IRQ_TYPE_REMAP_BAR_REGION
-  it enables it by signaling ACTION_TRIGGER.
-  
-- on receiving this ACTION_TRIGGER, vendor driver will try to setup a
-  virqfd to monitor file write to the fd of this irq, enable this irq
-  and return its enabling status to userspace.
-
-
-> Would the vendor driver refuse to change
-> device_state in the migration region if the user has not enabled this
-> IRQ?
-yes, vendor driver can refuse to change device_state if the irq
-VFIO_IRQ_TYPE_REMAP_BAR_REGION is not enabled.
-in my sample i40e_vf driver (patch 10/10), it implemented this logic
-like below:
-
-i40e_vf_set_device_state
-    |-> case VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RUNNING:
-    |          ret = i40e_vf_prepare_dirty_track(i40e_vf_dev);
-                              |->ret = i40e_vf_remap_bars(i40e_vf_dev, true);
-			                     |->if (!i40e_vf_dev->remap_irq_ctx.init)
-                                                    return -ENODEV;
-
-
-(i40e_vf_dev->remap_irq_ctx.init is set in below path)
-i40e_vf_ioctl(cmd==VFIO_DEVICE_SET_IRQS)
-    |->i40e_vf_set_irq_remap_bars
-       |->i40e_vf_enable_remap_bars_irq
-           |-> vf_dev->remap_irq_ctx.init = true;
-
-> 
-> Everything you've described in the commit log needs to be in this
-> header, we can't have the usage protocol buried in a commit log.  It
-got it! I'll move all descriptions in commit logs to this header so that
-readers can understand the whole picture here.
-
-> also seems like this is unnecessarily PCI specific.  Can't the count
-> bitmap simply indicate the region index to re-evaluate?  Maybe you were
-yes, it is possible. but what prevented me from doing it is that it's not
-easy to write an irq handler in qemu to remap other regions dynamically.
-
-for BAR regions, there're 3 layers as below.
-1. bar->mr  -->bottom layer
-2. bar->region.mem --> slow path
-3. bar->region->mmaps[i].mem  --> fast path
-so, bar remap irq handler can simply re-revaluate the region and
-remove/re-generate the layer 3 (fast path) without losing track of any
-guest accesses to the bar regions.
-
-actually so far, the bar remap irq handler in qemu only supports remap
-mmap'd subregions (layout of mmap'd subregions are re-queried) and
-not supports updating the whole bar region size.
-(do you think updating bar region size is a must?)
-
-however, there are no such fast path and slow path in other regions, so
-remap handlers for them are region specific.
-
-> worried about running out of bits in the ctx count?  An IRQ per region
-yes. that's also possible :) 
-but current ctx count is 64bit, so it can support regions of index up to 63.
-if we don't need to remap dev regions, seems it's enough?
-
-> could resolve that, but maybe we could also just add another IRQ for
-> the next bitmap of regions.  I assume that the bitmap can indicate
-> multiple regions to re-evaluate, but that should be documented.
-hmm. would you mind elaborating more about it?
-
-> 
-> Also, what sort of service requirements does this imply?  Would the
-> vendor driver send this IRQ when the user tries to set the device_state
-> to _SAVING and therefore we'd require the user to accept, implement the
-> mapping change, and acknowledge the IRQ all while waiting for the write
-> to device_state to return?  That implies quite a lot of asynchronous
-> support in the userspace driver.  Thanks,
-yes.
-(1) when user sets device_state to _SAVING, the vendor driver notifies this
-IRQ, waits until user IRQ ack is received.
-(2) in IRQ handler, user decodes and sends IRQ ack to vendor driver.
-
-if a wait is required in (1) returns, it demands the qemu_mutex_iothread is
-not locked in migration thread when device_state is set in (1), as before
-entering (2), acquiring of this mutex is required.
-
-Currently, this lock is not hold in vfio_migration_set_state() at
-save_setup stage but is hold in stop and copy stage. so we wait in
-kernel in save_setup stage and not wait in stop stage.
-it can be fixed by calling qemu_mutex_unlock_iothread() on entering
-vfio_migration_set_state() and qemu_mutex_lock_iothread() on leaving
-vfio_migration_set_state() in qemu.
-
-do you think it's acceptable?
-
-Thanks
-Yan
-> 
-> 
-> > +
-> > +
-> >  /**
-> >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
-> >   *
-> 
