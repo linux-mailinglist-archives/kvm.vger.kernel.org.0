@@ -2,32 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FC7B1E9BE9
-	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 05:03:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A67C41E9BF0
+	for <lists+kvm@lfdr.de>; Mon,  1 Jun 2020 05:04:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727863AbgFADD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 May 2020 23:03:26 -0400
-Received: from kernel.crashing.org ([76.164.61.194]:53958 "EHLO
+        id S1727862AbgFADEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 May 2020 23:04:41 -0400
+Received: from kernel.crashing.org ([76.164.61.194]:53982 "EHLO
         kernel.crashing.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726901AbgFADDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 May 2020 23:03:25 -0400
+        with ESMTP id S1726901AbgFADEl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 May 2020 23:04:41 -0400
 Received: from localhost (gate.crashing.org [63.228.1.57])
         (authenticated bits=0)
-        by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 051330TT003234
+        by kernel.crashing.org (8.14.7/8.14.7) with ESMTP id 05134KVO003273
         (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 31 May 2020 22:03:04 -0500
-Message-ID: <a95de3ee4b722d418fd6cf662233cb024928804e.camel@kernel.crashing.org>
-Subject: Re: [PATCH v3 01/18] nitro_enclaves: Add ioctl interface definition
+        Sun, 31 May 2020 22:04:24 -0500
+Message-ID: <a37b0156c076d3875f906e970071cb230e526df1.camel@kernel.crashing.org>
+Subject: Re: [PATCH v3 07/18] nitro_enclaves: Init misc device providing the
+ ioctl interface
 From:   Benjamin Herrenschmidt <benh@kernel.crashing.org>
-To:     Stefan Hajnoczi <stefanha@gmail.com>,
-        Andra Paraschiv <andraprs@amazon.com>
-Cc:     linux-kernel@vger.kernel.org,
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Alexander Graf <graf@amazon.de>
+Cc:     Andra Paraschiv <andraprs@amazon.com>,
+        linux-kernel@vger.kernel.org,
         Anthony Liguori <aliguori@amazon.com>,
         Colm MacCarthaigh <colmmacc@amazon.com>,
         Bjoern Doebel <doebel@amazon.de>,
         David Woodhouse <dwmw@amazon.co.uk>,
         Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
         Martin Pohlack <mpohlack@amazon.de>,
         Matt Wilson <msw@amazon.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -37,11 +38,19 @@ Cc:     linux-kernel@vger.kernel.org,
         Stewart Smith <trawets@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
         ne-devel-upstream@amazon.com
-Date:   Mon, 01 Jun 2020 13:02:59 +1000
-In-Reply-To: <20200527084959.GA29137@stefanha-x1.localdomain>
+Date:   Mon, 01 Jun 2020 13:04:19 +1000
+In-Reply-To: <20200528131259.GA3345766@kroah.com>
 References: <20200525221334.62966-1-andraprs@amazon.com>
-         <20200525221334.62966-2-andraprs@amazon.com>
-         <20200527084959.GA29137@stefanha-x1.localdomain>
+         <20200525221334.62966-8-andraprs@amazon.com>
+         <20200526065133.GD2580530@kroah.com>
+         <72647fa4-79d9-7754-9843-a254487703ea@amazon.de>
+         <20200526123300.GA2798@kroah.com>
+         <59007eb9-fad3-9655-a856-f5989fa9fdb3@amazon.de>
+         <20200526131708.GA9296@kroah.com>
+         <29ebdc29-2930-51af-8a54-279c1e449a48@amazon.de>
+         <20200526222402.GC179549@kroah.com>
+         <b4f17cbd-7471-fe61-6e7e-1399bd96e24e@amazon.de>
+         <20200528131259.GA3345766@kroah.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
@@ -51,25 +60,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2020-05-27 at 09:49 +0100, Stefan Hajnoczi wrote:
+On Thu, 2020-05-28 at 15:12 +0200, Greg KH wrote:
+> So at runtime, after all is booted and up and going, you just ripped
+> cores out from under someone's feet?  :)
 > 
-> What about feature bits or a API version number field? If you add
-> features to the NE driver, how will userspace detect them?
+> And the code really handles writing to that value while the module is
+> already loaded and up and running?  At a quick glance, it didn't seem
+> like it would handle that very well as it only is checked at ne_init()
+> time.
 > 
-> Even if you intend to always compile userspace against the exact kernel
-> headers that the program will run on, it can still be useful to have an
-> API version for informational purposes and to easily prevent user
-> errors (running a new userspace binary on an old kernel where the API is
-> different).
+> Or am I missing something?
 > 
-> Finally, reserved struct fields may come in handy in the future. That
-> way userspace and the kernel don't need to explicitly handle multiple
-> struct sizes.
+> Anyway, yes, if you can dynamically do this at runtime, that's great,
+> but it feels ackward to me to rely on one configuration thing as a
+> module parameter, and everything else through the ioctl interface.
+> Unification would seem to be a good thing, right?
 
-Beware, Greg might disagree :)
-
-That said, yes, at least a way to query the API version would be
-useful.
+I personally still prefer a sysfs file :) I really don't like module
+parameters as a way to do such things.
 
 Cheers,
 Ben.
