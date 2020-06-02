@@ -2,515 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D94521EC043
-	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 18:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 506DA1EC0FA
+	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 19:34:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726223AbgFBQoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jun 2020 12:44:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59189 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726037AbgFBQoS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jun 2020 12:44:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591116256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OykQTSme1DURd1XoRtz/wBvVe8UpxVS98+5LYsdTS/8=;
-        b=X6JTeGPOsHHskZTGppQA+i/OdTQBEN2kTgOagY/Q32wnyBshpG5Y0vw4sErHaNVmCcZudD
-        enhWI0KS5MDAJN3JVveD3gKSxKpaU1dA797dr/FmZi68Yh1UD1u7r6a6uIZbLU/hjKeo+D
-        oqHby/8BsuZUeiXbQuN2oTH46IZwZ8c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-3zHW-ekhPTi85CJ_BF1vZA-1; Tue, 02 Jun 2020 12:44:12 -0400
-X-MC-Unique: 3zHW-ekhPTi85CJ_BF1vZA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CC998014D4;
-        Tue,  2 Jun 2020 16:44:10 +0000 (UTC)
-Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 53BC17E7C0;
-        Tue,  2 Jun 2020 16:44:08 +0000 (UTC)
-Date:   Tue, 2 Jun 2020 10:44:07 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH Kernel v24 5/8] vfio iommu: Implementation of ioctl for
- dirty pages tracking
-Message-ID: <20200602104407.31e87e08@x1.home>
-In-Reply-To: <1591113090-23640-1-git-send-email-kwankhede@nvidia.com>
-References: <1590697854-21364-6-git-send-email-kwankhede@nvidia.com>
-        <1591113090-23640-1-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+        id S1726809AbgFBReE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jun 2020 13:34:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59556 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725969AbgFBReD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jun 2020 13:34:03 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFD9C05BD1E
+        for <kvm@vger.kernel.org>; Tue,  2 Jun 2020 10:34:03 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id p5so12621994ile.6
+        for <kvm@vger.kernel.org>; Tue, 02 Jun 2020 10:34:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=a7kbNdp9/+TTRsp34LdUnr9ANQb5YeqZ5qFrQUOBSSM=;
+        b=l1YjfjRDsCvg7vMJqjD4ww4Ar7Gbj/9EScwVL9TTSpChiR5lG3T7yW9nVyOP0eGj/L
+         OHvB6VsOAynd5W4A1fkWzTba0RKL8PU0M6xct0kQR6tYZs4VHn7boNtk5dtJbAqnbhIU
+         diIm+86/VYbqttYruwcM5+C7dcbcHLeIfp0tm9twGg3POuup4Zzj4tJroUJkD6AUgyac
+         uoPC+yxZzTpICsPW4dit+wxtvD5p00JxzCAiZDKkhum5tBe9QP9O2SC0DNwp8abuKb7t
+         Fovk3552LG/E4WkGjR6VIVcbQJh3czvNw4ZWatPK6+i37fy6qh8fZOJjg+B7LBl5hkWk
+         Ybhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=a7kbNdp9/+TTRsp34LdUnr9ANQb5YeqZ5qFrQUOBSSM=;
+        b=pj23dyRijwRlti1VUcla/JvUeu6PRSG6Z6bD7obxj9qOeGWppzTRkx440ZDPFTFnee
+         vKByEKltJn5jrBPsAsUhypxqWpooOJJBPdC4/JcZMq6e0IafOjd72ttvcHk/MK6kkh7Q
+         VHxlUPe26rHKvg566dBW/e9UQrHWlG1u35Y5UtQjeKTolHywRItRiBhSn+noJlaZ5Ahx
+         zUcrd+lvu1sqZWvtkNEj0BUoWP3pUvz7wPEfuuLkA7uitFH2zqtBlRCSj56YZT29gye+
+         De+TK6GQ7iaTbvQFHFDZn33O66xXjqKIVEYEOjq45+NyT0G0D1F7aWhnKqSR5O95hS3q
+         Icpw==
+X-Gm-Message-State: AOAM533ASfIOidnTVrgE+rAYrspqGUHYd62er/WvRSNax6c3cMPCq6r9
+        G0tjyE+vdcPZ84x+mgatz30ChdmzbVd747AW0TQ8hA3b
+X-Google-Smtp-Source: ABdhPJwmVukUnP3qOc+xdAikJVLlF9Pyg0SwrugRxdVE/bYMkwPYUONixhx1fX4uranO8KgNPx4bk2/y9KnCE/JX1yA=
+X-Received: by 2002:a92:5e4a:: with SMTP id s71mr421123ilb.119.1591119242474;
+ Tue, 02 Jun 2020 10:34:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20200601222416.71303-1-jmattson@google.com> <20200601222416.71303-4-jmattson@google.com>
+ <20200602012139.GF21661@linux.intel.com>
+In-Reply-To: <20200602012139.GF21661@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 2 Jun 2020 10:33:51 -0700
+Message-ID: <CALMp9eS3XEVdZ-_pRsevOiKRBSbCr96saicxC+stPfUqsM1u1A@mail.gmail.com>
+Subject: Re: [PATCH v3 3/4] kvm: vmx: Add last_cpu to struct vcpu_vmx
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2 Jun 2020 21:21:30 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Mon, Jun 1, 2020 at 6:21 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Mon, Jun 01, 2020 at 03:24:15PM -0700, Jim Mattson wrote:
+> > As we already do in svm, record the last logical processor on which a
+> > vCPU has run, so that it can be communicated to userspace for
+> > potential hardware errors.
+> >
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Reviewed-by: Oliver Upton <oupton@google.com>
+> > Reviewed-by: Peter Shier <pshier@google.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 1 +
+> >  arch/x86/kvm/vmx/vmx.h | 3 +++
+> >  2 files changed, 4 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 170cc76a581f..42856970d3b8 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -6730,6 +6730,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >       if (vcpu->arch.cr2 != read_cr2())
+> >               write_cr2(vcpu->arch.cr2);
+> >
+> > +     vmx->last_cpu = vcpu->cpu;
+>
+> This is redundant in the EXIT_FASTPATH_REENTER_GUEST case.  Setting it
+> before reenter_guest is technically wrong if emulation_required is true, but
+> that doesn't seem like it'd be an issue in practice.
 
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start dirty pages tracking while migration is active
-> - Stop dirty pages tracking.
-> - Get dirty pages bitmap. Its user space application's responsibility to
->   copy content of dirty pages from source to destination during migration.
-> 
-> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> structure. Bitmap size is calculated considering smallest supported page
-> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
-> 
-> Bitmap is populated for already pinned pages when bitmap is allocated for
-> a vfio_dma with the smallest supported page size. Update bitmap from
-> pinning functions when tracking is enabled. When user application queries
-> bitmap, check if requested page size is same as page size used to
-> populated bitmap. If it is equal, copy bitmap, but if not equal, return
-> error.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
-> 
-> Fixed error reported by build bot by changing pgsize type from uint64_t
-> to size_t.
-> Reported-by: kbuild test robot <lkp@intel.com>
-> ---
-> 
-> Fixed errors and sparse warnings reported by kbuild test robot
-> Reported-by: kbuild test robot <lkp@intel.com>
-> 
-> ld: drivers/vfio/vfio_iommu_type1.o: in function `vfio_dma_populate_bitmap':
-> >> vfio_iommu_type1.c:(.text+0x666): undefined reference to `__udivdi3'  
+I really would like to capture the last logical processor to execute
+VMLAUNCH/VMRESUME (or VMRUN on the AMD side) on behalf of this vCPU.
 
-Hi Kirti,
+> >       vmx->fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
+> >                                  vmx->loaded_vmcs->launched);
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index 672c28f17e49..8a1e833cf4fb 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -302,6 +302,9 @@ struct vcpu_vmx {
+> >       u64 ept_pointer;
+> >
+> >       struct pt_desc pt_desc;
+> > +
+> > +     /* which host CPU was used for running this vcpu */
+> > +     unsigned int last_cpu;
+>
+> Why not put this in struct kvm_vcpu_arch?  I'd also vote to name it
+> last_run_cpu, as last_cpu is super misleading.
 
-This is already in linux-next, could you please send just the
-incremental fix with a Fixes: tag?  Thanks,
+I think last_run_cpu may also be misleading, since in the cases of
+interest, nothing actually 'ran.' Maybe last_attempted_vmentry_cpu?
 
-Alex
+> And if it's in arch, what about setting it vcpu_enter_guest?
 
->  drivers/vfio/vfio_iommu_type1.c | 315 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 309 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 814c795a2543..8362a36c0de4 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -72,6 +72,7 @@ struct vfio_iommu {
->  	uint64_t		pgsize_bitmap;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -92,6 +93,7 @@ struct vfio_dma {
->  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->  	struct task_struct	*task;
->  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> +	unsigned long		*bitmap;
->  };
->  
->  struct vfio_group {
-> @@ -126,6 +128,19 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
-> +
-> +/*
-> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
-> + * further casts to signed integer for unaligned multi-bit operation,
-> + * __bitmap_set().
-> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
-> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
-> + * system.
-> + */
-> +#define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
-> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
-> +
->  static int put_pfn(unsigned long pfn, int prot);
->  
->  /*
-> @@ -176,6 +191,81 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
->  	rb_erase(&old->node, &iommu->dma_list);
->  }
->  
-> +
-> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
-> +{
-> +	uint64_t npages = dma->size / pgsize;
-> +
-> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Allocate extra 64 bits that are used to calculate shift required for
-> +	 * bitmap_shift_left() to manipulate and club unaligned number of pages
-> +	 * in adjacent vfio_dma ranges.
-> +	 */
-> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages) + sizeof(u64),
-> +			       GFP_KERNEL);
-> +	if (!dma->bitmap)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
-> +
-> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
-> +{
-> +	kfree(dma->bitmap);
-> +	dma->bitmap = NULL;
-> +}
-> +
-> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
-> +{
-> +	struct rb_node *p;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +
-> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
-> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
-> +
-> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) >> pgshift, 1);
-> +	}
-> +}
-> +
-> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
-> +{
-> +	struct rb_node *n;
-> +
-> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +		int ret;
-> +
-> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> +		if (ret) {
-> +			struct rb_node *p;
-> +
-> +			for (p = rb_prev(n); p; p = rb_prev(p)) {
-> +				struct vfio_dma *dma = rb_entry(n,
-> +							struct vfio_dma, node);
-> +
-> +				vfio_dma_bitmap_free(dma);
-> +			}
-> +			return ret;
-> +		}
-> +		vfio_dma_populate_bitmap(dma, pgsize);
-> +	}
-> +	return 0;
-> +}
-> +
-> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n;
-> +
-> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		vfio_dma_bitmap_free(dma);
-> +	}
-> +}
-> +
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> @@ -598,6 +688,17 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  			vfio_unpin_page_external(dma, iova, do_accounting);
->  			goto pin_unwind;
->  		}
-> +
-> +		if (iommu->dirty_page_tracking) {
-> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> +
-> +			/*
-> +			 * Bitmap populated with the smallest supported page
-> +			 * size
-> +			 */
-> +			bitmap_set(dma->bitmap,
-> +				   (iova - dma->iova) >> pgshift, 1);
-> +		}
->  	}
->  
->  	ret = i;
-> @@ -832,6 +933,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->  	vfio_unmap_unpin(iommu, dma, true);
->  	vfio_unlink_dma(iommu, dma);
->  	put_task_struct(dma->task);
-> +	vfio_dma_bitmap_free(dma);
->  	kfree(dma);
->  	iommu->dma_avail++;
->  }
-> @@ -859,6 +961,94 @@ static void vfio_update_pgsize_bitmap(struct vfio_iommu *iommu)
->  	}
->  }
->  
-> +static int update_user_bitmap(u64 __user *bitmap, struct vfio_dma *dma,
-> +			      dma_addr_t base_iova, size_t pgsize)
-> +{
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	unsigned long nbits = dma->size >> pgshift;
-> +	unsigned long bit_offset = (dma->iova - base_iova) >> pgshift;
-> +	unsigned long copy_offset = bit_offset / BITS_PER_LONG;
-> +	unsigned long shift = bit_offset % BITS_PER_LONG;
-> +	unsigned long leftover;
-> +
-> +	/* mark all pages dirty if all pages are pinned and mapped. */
-> +	if (dma->iommu_mapped)
-> +		bitmap_set(dma->bitmap, 0, nbits);
-> +
-> +	if (shift) {
-> +		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
-> +				  nbits + shift);
-> +
-> +		if (copy_from_user(&leftover,
-> +				   (void __user *)(bitmap + copy_offset),
-> +				   sizeof(leftover)))
-> +			return -EFAULT;
-> +
-> +		bitmap_or(dma->bitmap, dma->bitmap, &leftover, shift);
-> +	}
-> +
-> +	if (copy_to_user((void __user *)(bitmap + copy_offset), dma->bitmap,
-> +			 DIRTY_BITMAP_BYTES(nbits + shift)))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
-> +				  dma_addr_t iova, size_t size, size_t pgsize)
-> +{
-> +	struct vfio_dma *dma;
-> +	struct rb_node *n;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	int ret;
-> +
-> +	/*
-> +	 * GET_BITMAP request must fully cover vfio_dma mappings.  Multiple
-> +	 * vfio_dma mappings may be clubbed by specifying large ranges, but
-> +	 * there must not be any previous mappings bisected by the range.
-> +	 * An error will be returned if these conditions are not met.
-> +	 */
-> +	dma = vfio_find_dma(iommu, iova, 1);
-> +	if (dma && dma->iova != iova)
-> +		return -EINVAL;
-> +
-> +	dma = vfio_find_dma(iommu, iova + size - 1, 0);
-> +	if (dma && dma->iova + dma->size != iova + size)
-> +		return -EINVAL;
-> +
-> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		if (dma->iova < iova)
-> +			continue;
-> +
-> +		if (dma->iova > iova + size - 1)
-> +			break;
-> +
-> +		ret = update_user_bitmap(bitmap, dma, iova, pgsize);
-> +		if (ret)
-> +			return ret;
-> +
-> +		/*
-> +		 * Re-populate bitmap to include all pinned pages which are
-> +		 * considered as dirty but exclude pages which are unpinned and
-> +		 * pages which are marked dirty by vfio_dma_rw()
-> +		 */
-> +		bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
-> +		vfio_dma_populate_bitmap(dma, pgsize);
-> +	}
-> +	return 0;
-> +}
-> +
-> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
-> +{
-> +	if (!npages || !bitmap_size || (bitmap_size > DIRTY_BITMAP_SIZE_MAX) ||
-> +	    (bitmap_size < DIRTY_BITMAP_BYTES(npages)))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
-> @@ -1076,7 +1266,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  	unsigned long vaddr = map->vaddr;
->  	size_t size = map->size;
->  	int ret = 0, prot = 0;
-> -	uint64_t mask;
-> +	size_t pgsize;
->  	struct vfio_dma *dma;
->  
->  	/* Verify that none of our __u64 fields overflow */
-> @@ -1091,11 +1281,11 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  
->  	mutex_lock(&iommu->lock);
->  
-> -	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
-> +	pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
->  
-> -	WARN_ON(mask & PAGE_MASK);
-> +	WARN_ON((pgsize - 1) & PAGE_MASK);
->  
-> -	if (!prot || !size || (size | iova | vaddr) & mask) {
-> +	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1)) {
->  		ret = -EINVAL;
->  		goto out_unlock;
->  	}
-> @@ -1172,6 +1362,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->  	else
->  		ret = vfio_pin_map_dma(iommu, dma, size);
->  
-> +	if (!ret && iommu->dirty_page_tracking) {
-> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
-> +		if (ret)
-> +			vfio_remove_dma(iommu, dma);
-> +	}
-> +
->  out_unlock:
->  	mutex_unlock(&iommu->lock);
->  	return ret;
-> @@ -2318,6 +2514,104 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap dirty;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret = 0;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    flags);
-> +
-> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		/* only one flag should be set at a time */
-> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
-> +			return -EINVAL;
-> +
-> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			size_t pgsize;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			pgsize = 1 << __ffs(iommu->pgsize_bitmap);
-> +			if (!iommu->dirty_page_tracking) {
-> +				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
-> +				if (!ret)
-> +					iommu->dirty_page_tracking = true;
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return ret;
-> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			mutex_lock(&iommu->lock);
-> +			if (iommu->dirty_page_tracking) {
-> +				iommu->dirty_page_tracking = false;
-> +				vfio_dma_bitmap_free_all(iommu);
-> +			}
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +		} else if (dirty.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			struct vfio_iommu_type1_dirty_bitmap_get range;
-> +			unsigned long pgshift;
-> +			size_t data_size = dirty.argsz - minsz;
-> +			size_t iommu_pgsize;
-> +
-> +			if (!data_size || data_size < sizeof(range))
-> +				return -EINVAL;
-> +
-> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
-> +					   sizeof(range)))
-> +				return -EFAULT;
-> +
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)range.bitmap.data,
-> +				       range.bitmap.size))
-> +				return -EINVAL;
-> +
-> +			pgshift = __ffs(range.bitmap.pgsize);
-> +			ret = verify_bitmap_size(range.size >> pgshift,
-> +						 range.bitmap.size);
-> +			if (ret)
-> +				return ret;
-> +
-> +			mutex_lock(&iommu->lock);
-> +
-> +			iommu_pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
-> +
-> +			/* allow only smallest supported pgsize */
-> +			if (range.bitmap.pgsize != iommu_pgsize) {
-> +				ret = -EINVAL;
-> +				goto out_unlock;
-> +			}
-> +			if (range.iova & (iommu_pgsize - 1)) {
-> +				ret = -EINVAL;
-> +				goto out_unlock;
-> +			}
-> +			if (!range.size || range.size & (iommu_pgsize - 1)) {
-> +				ret = -EINVAL;
-> +				goto out_unlock;
-> +			}
-> +
-> +			if (iommu->dirty_page_tracking)
-> +				ret = vfio_iova_dirty_bitmap(range.bitmap.data,
-> +						iommu, range.iova, range.size,
-> +						range.bitmap.pgsize);
-> +			else
-> +				ret = -EINVAL;
-> +out_unlock:
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> @@ -2385,10 +2679,19 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->  
->  	vaddr = dma->vaddr + offset;
->  
-> -	if (write)
-> +	if (write) {
->  		*copied = copy_to_user((void __user *)vaddr, data,
->  					 count) ? 0 : count;
-> -	else
-> +		if (*copied && iommu->dirty_page_tracking) {
-> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> +			/*
-> +			 * Bitmap populated with the smallest supported page
-> +			 * size
-> +			 */
-> +			bitmap_set(dma->bitmap, offset >> pgshift,
-> +				   *copied >> pgshift);
-> +		}
-> +	} else
->  		*copied = copy_from_user(data, (void __user *)vaddr,
->  					   count) ? 0 : count;
->  	if (kthread)
+As you point out above, this isn't entirely accurate. (But that's the
+way we roll in kvm, isn't it? :-)
 
+> >  };
+> >
+> >  enum ept_pointers_status {
+> > --
+> > 2.27.0.rc2.251.g90737beb825-goog
+> >
