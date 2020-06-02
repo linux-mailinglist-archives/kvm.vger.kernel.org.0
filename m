@@ -2,86 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72E261EC348
-	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 21:56:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BF801EC37E
+	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 22:11:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727794AbgFBT4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jun 2020 15:56:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51116 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726373AbgFBT4P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jun 2020 15:56:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591127774;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ijUjB3nDcPzTThlkDRf6Xnf6Xz6m2xseyhEfJ9BQYz8=;
-        b=MI/TL1SJdcIogqFD3EbH8b53Lg8fbkEaBtlHPu4YX2kq69ZvUnqHaeVL1ralFLqTYlCr9f
-        ZhIQowO6Tj2CWxspRQQ393PbwVhRTCG0587PoWQqbOa1HF0Ud0o0mNjID/mlqDugaPb/0V
-        4iuV+U3Gv9BOmbnMfB593DFEqv0DSpU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-Vj0tOdP-OnWViWrY5MWubg-1; Tue, 02 Jun 2020 15:56:10 -0400
-X-MC-Unique: Vj0tOdP-OnWViWrY5MWubg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66A3E461;
-        Tue,  2 Jun 2020 19:56:09 +0000 (UTC)
-Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E06DB78EFE;
-        Tue,  2 Jun 2020 19:56:04 +0000 (UTC)
-Date:   Tue, 2 Jun 2020 13:56:04 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Randy Dunlap <rdunlap@infradead.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>, KVM <kvm@vger.kernel.org>
-Subject: Re: linux-next: Tree for Jun 2 (vfio)
-Message-ID: <20200602135604.21081784@x1.home>
-In-Reply-To: <20200602091615.145e6f09@x1.home>
-References: <20200602203737.6eec243f@canb.auug.org.au>
-        <96573328-d6d6-8da2-e388-f448d461abb3@infradead.org>
-        <20200602091615.145e6f09@x1.home>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1728313AbgFBUKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jun 2020 16:10:48 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:53716 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728101AbgFBUKr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jun 2020 16:10:47 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052JvxMj163024;
+        Tue, 2 Jun 2020 20:09:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=Zy+9hIUOD1wHoEjv0iqcOdN6XDgnng/gMIII196nKXk=;
+ b=z+tGXNWXcpe4kITTBT32god173s9pokQEK6VzOFsdQ3siX5keWyR1QMHN2W70Ff8C+B+
+ rxDToZRd+1zqTyC8u7HAggP6i0MWWS1eFES8BEs89ChlGn/sNu3YsWQNVQEBTjR3B12M
+ 42Cd8MmRWKocBTsEMS+W6DVOgSBuLlazO9u2LU9tXUA6uFuUodnU44Z/MNnxnPJJG7IC
+ F8Nc/DsSHdVA7XEEGea7sxqM8frdxX6LX63nW5EX5tCDlwm6Sv3WFfVwc/8E5sJevIzi
+ lV7fVZAsi9s3tlf7LNo/knOZz3+7H2bV0+pbbyAUJ6+zgfC+Lb9XkwWxVW5OOkteWklk jw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 31bewqwyhp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 02 Jun 2020 20:09:41 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052JxIK9135342;
+        Tue, 2 Jun 2020 20:07:41 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 31c1dxtrmr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 02 Jun 2020 20:07:41 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 052K7b5o013919;
+        Tue, 2 Jun 2020 20:07:37 GMT
+Received: from ayz-linux.us.oracle.com (/10.154.185.88)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 02 Jun 2020 13:07:36 -0700
+From:   Anthony Yznaga <anthony.yznaga@oracle.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        steven.sistare@oracle.com, anthony.yznaga@oracle.com
+Subject: [PATCH 0/3] avoid unnecessary memslot rmap walks
+Date:   Tue,  2 Jun 2020 13:07:27 -0700
+Message-Id: <1591128450-11977-1-git-send-email-anthony.yznaga@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
+ spamscore=0 bulkscore=0 adultscore=0 suspectscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006020146
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
+ phishscore=0 suspectscore=0 impostorscore=0 cotscore=-2147483648
+ lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=999
+ malwarescore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006020146
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2 Jun 2020 09:16:15 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+While investigating optimizing qemu start time for large memory guests
+I found that kvm_mmu_slot_apply_flags() is walking rmaps to update
+existing sptes when creating or moving a slot but that there won't be
+any existing sptes to update and any sptes inserted once the new memslot
+is visible won't need updating.  I can't find any reason for this not to
+be the case, but I've taken a more cautious approach to fixing this by
+dividing things into three patches.
 
-> On Tue, 2 Jun 2020 07:36:45 -0700
-> Randy Dunlap <rdunlap@infradead.org> wrote:
-> 
-> > On 6/2/20 3:37 AM, Stephen Rothwell wrote:  
-> > > Hi all,
-> > > 
-> > > News: The merge window has opened, so please do *not* add v5.9 material
-> > > to your linux-next included branches until after v5.8-rc1 has been
-> > > released.
-> > > 
-> > > Changes since 20200529:
-> > >     
-> > 
-> > on i386:
-> > 
-> > ld: drivers/vfio/vfio_iommu_type1.o: in function `vfio_dma_populate_bitmap':
-> > vfio_iommu_type1.c:(.text.unlikely+0x41): undefined reference to `__udivdi3'  
-> 
-> I think Kirti received a 0-day report on this.  Kirti, could you please
-> post the fix you identified?  Thanks,
+Anthony Yznaga (3):
+  KVM: x86: remove unnecessary rmap walk of read-only memslots
+  KVM: x86: avoid unnecessary rmap walks when creating/moving slots
+  KVM: x86: minor code refactor and comments fixup around dirty logging
 
-This should be resolved in the next refresh.  Thanks,
+ arch/x86/kvm/x86.c | 106 +++++++++++++++++++++++++----------------------------
+ 1 file changed, 49 insertions(+), 57 deletions(-)
 
-Alex
+-- 
+2.13.3
 
