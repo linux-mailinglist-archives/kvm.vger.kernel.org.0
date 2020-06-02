@@ -2,216 +2,290 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 982791EC37A
-	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 22:09:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAC9F1EC555
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 00:55:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728372AbgFBUJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jun 2020 16:09:04 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52364 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728304AbgFBUJD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jun 2020 16:09:03 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052Jw0Ew163040;
-        Tue, 2 Jun 2020 20:07:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=y/OdzxZwiVwo/FlqUUNmqvD8ltVeZT1qJE9sRiVtvAU=;
- b=ufhnpC2+71pmQ4EFvqye4K6P11PDUAWlochhay9WkjOLjPxix0MpMpLETPr15W9r0SSI
- /iMR1pc84O6ohAy5DGLSYgcqiZ1NUfX+1IDNWLfiyDlJKSp2LbcxSzr5B7st6YPGLlVl
- 2R6M8xWGtEbfZMKUwGZsqB6rmV1uF9lxBvnSDdNew329IGq2niFTH2BpYTg/xEIMFktV
- ZIJCtCxTkEXrXGNF1M85kEGDdpabnMXGdbb8xvFTnQ7WcMDkVmz9As3DfwFzbUvvmb+4
- a7SxIULE9bBQ0JBWBWczFbOA/03XJau/PMlK0QDO43jzQiOdTD6nMLMYdv+RPZxK7lEC Rg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 31bewqwy9y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 02 Jun 2020 20:07:42 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 052JxHKu135212;
-        Tue, 2 Jun 2020 20:07:42 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 31c1dxtrmv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 02 Jun 2020 20:07:42 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 052K7eql022850;
-        Tue, 2 Jun 2020 20:07:41 GMT
-Received: from ayz-linux.us.oracle.com (/10.154.185.88)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 02 Jun 2020 13:07:40 -0700
-From:   Anthony Yznaga <anthony.yznaga@oracle.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-        steven.sistare@oracle.com, anthony.yznaga@oracle.com
-Subject: [PATCH 3/3] KVM: x86: minor code refactor and comments fixup around dirty logging
-Date:   Tue,  2 Jun 2020 13:07:30 -0700
-Message-Id: <1591128450-11977-4-git-send-email-anthony.yznaga@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1591128450-11977-1-git-send-email-anthony.yznaga@oracle.com>
-References: <1591128450-11977-1-git-send-email-anthony.yznaga@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- spamscore=0 bulkscore=0 adultscore=0 suspectscore=2 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006020146
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
- phishscore=0 suspectscore=2 impostorscore=0 cotscore=-2147483648
- lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=999
- malwarescore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006020146
+        id S1728372AbgFBWzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jun 2020 18:55:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32270 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726174AbgFBWzt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Jun 2020 18:55:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591138546;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yOyWCqoM7bc+/Np1Rx4qM9Y9f+faU7CSLk9N7YSHCbw=;
+        b=E6DrvnpNahqWoUI4z2haNGClgN9IDPRI2OOBzhOrEWy3k6poUHzrF6jVLn5fUoHNJR8CWm
+        64auu6n1NIZET7RGgxlSrDDSD/r4a/Gv62TqR9PSC5vRqzeSG/oZW06dHmLK5XVMnfIpAn
+        mX0JwqXJAltLXngYLXf2S2tmPdPIXzA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-Hnyd_kPnPKm9vpQ5vn3iYA-1; Tue, 02 Jun 2020 18:55:42 -0400
+X-MC-Unique: Hnyd_kPnPKm9vpQ5vn3iYA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88AC680058E;
+        Tue,  2 Jun 2020 22:55:39 +0000 (UTC)
+Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F48A5D9CC;
+        Tue,  2 Jun 2020 22:55:28 +0000 (UTC)
+Date:   Tue, 2 Jun 2020 16:55:27 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Zeng, Xin" <xin.zeng@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200602165527.34137955@x1.home>
+In-Reply-To: <20200430003949.GN12879@joy-OptiPlex-7040>
+References: <20200422073628.GA12879@joy-OptiPlex-7040>
+        <20200424191049.GU3106@work-vm>
+        <20200426013628.GC12879@joy-OptiPlex-7040>
+        <20200427153743.GK2923@work-vm>
+        <20200428005429.GJ12879@joy-OptiPlex-7040>
+        <20200428141437.GG2794@work-vm>
+        <20200429072616.GL12879@joy-OptiPlex-7040>
+        <20200429082201.GA2834@work-vm>
+        <20200429093555.GM12879@joy-OptiPlex-7040>
+        <20200429094844.GE2834@work-vm>
+        <20200430003949.GN12879@joy-OptiPlex-7040>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Consolidate the code and correct the comments to show that the actions
-taken to update existing mappings to disable or enable dirty logging
-are not necessary when creating, moving, or deleting a memslot.
+On Wed, 29 Apr 2020 20:39:50 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Signed-off-by: Anthony Yznaga <anthony.yznaga@oracle.com>
----
- arch/x86/kvm/x86.c | 104 +++++++++++++++++++++++++----------------------------
- 1 file changed, 49 insertions(+), 55 deletions(-)
+> On Wed, Apr 29, 2020 at 05:48:44PM +0800, Dr. David Alan Gilbert wrote:
+> <snip>
+> > > > > > > > > > > > > > An mdev type is meant to define a software compatible interface, so in
+> > > > > > > > > > > > > > the case of mdev->mdev migration, doesn't migrating to a different type
+> > > > > > > > > > > > > > fail the most basic of compatibility tests that we expect userspace to
+> > > > > > > > > > > > > > perform?  IOW, if two mdev types are migration compatible, it seems a
+> > > > > > > > > > > > > > prerequisite to that is that they provide the same software interface,
+> > > > > > > > > > > > > > which means they should be the same mdev type.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > In the hybrid cases of mdev->phys or phys->mdev, how does a  
+> > > > > > > > > > > > > management  
+> > > > > > > > > > > > > > tool begin to even guess what might be compatible?  Are we expecting
+> > > > > > > > > > > > > > libvirt to probe ever device with this attribute in the system?  Is
+> > > > > > > > > > > > > > there going to be a new class hierarchy created to enumerate all
+> > > > > > > > > > > > > > possible migrate-able devices?
+> > > > > > > > > > > > > >  
+> > > > > > > > > > > > > yes, management tool needs to guess and test migration compatible
+> > > > > > > > > > > > > between two devices. But I think it's not the problem only for
+> > > > > > > > > > > > > mdev->phys or phys->mdev. even for mdev->mdev, management tool needs
+> > > > > > > > > > > > > to
+> > > > > > > > > > > > > first assume that the two mdevs have the same type of parent devices
+> > > > > > > > > > > > > (e.g.their pciids are equal). otherwise, it's still enumerating
+> > > > > > > > > > > > > possibilities.
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > on the other hand, for two mdevs,
+> > > > > > > > > > > > > mdev1 from pdev1, its mdev_type is 1/2 of pdev1;
+> > > > > > > > > > > > > mdev2 from pdev2, its mdev_type is 1/4 of pdev2;
+> > > > > > > > > > > > > if pdev2 is exactly 2 times of pdev1, why not allow migration between
+> > > > > > > > > > > > > mdev1 <-> mdev2.  
+> > > > > > > > > > > > 
+> > > > > > > > > > > > How could the manage tool figure out that 1/2 of pdev1 is equivalent 
+> > > > > > > > > > > > to 1/4 of pdev2? If we really want to allow such thing happen, the best
+> > > > > > > > > > > > choice is to report the same mdev type on both pdev1 and pdev2.  
+> > > > > > > > > > > I think that's exactly the value of this migration_version interface.
+> > > > > > > > > > > the management tool can take advantage of this interface to know if two
+> > > > > > > > > > > devices are migration compatible, no matter they are mdevs, non-mdevs,
+> > > > > > > > > > > or mix.
+> > > > > > > > > > > 
+> > > > > > > > > > > as I know, (please correct me if not right), current libvirt still
+> > > > > > > > > > > requires manually generating mdev devices, and it just duplicates src vm
+> > > > > > > > > > > configuration to the target vm.
+> > > > > > > > > > > for libvirt, currently it's always phys->phys and mdev->mdev (and of the
+> > > > > > > > > > > same mdev type).
+> > > > > > > > > > > But it does not justify that hybrid cases should not be allowed. otherwise,
+> > > > > > > > > > > why do we need to introduce this migration_version interface and leave
+> > > > > > > > > > > the judgement of migration compatibility to vendor driver? why not simply
+> > > > > > > > > > > set the criteria to something like "pciids of parent devices are equal,
+> > > > > > > > > > > and mdev types are equal" ?
+> > > > > > > > > > > 
+> > > > > > > > > > >   
+> > > > > > > > > > > > btw mdev<->phys just brings trouble to upper stack as Alex pointed out.   
+> > > > > > > > > > > could you help me understand why it will bring trouble to upper stack?
+> > > > > > > > > > > 
+> > > > > > > > > > > I think it just needs to read src migration_version under src dev node,
+> > > > > > > > > > > and test it in target migration version under target dev node. 
+> > > > > > > > > > > 
+> > > > > > > > > > > after all, through this interface we just help the upper layer
+> > > > > > > > > > > knowing available options through reading and testing, and they decide
+> > > > > > > > > > > to use it or not.
+> > > > > > > > > > >   
+> > > > > > > > > > > > Can we simplify the requirement by allowing only mdev<->mdev and 
+> > > > > > > > > > > > phys<->phys migration? If an customer does want to migrate between a 
+> > > > > > > > > > > > mdev and phys, he could wrap physical device into a wrapped mdev 
+> > > > > > > > > > > > instance (with the same type as the source mdev) instead of using vendor 
+> > > > > > > > > > > > ops. Doing so does add some burden but if mdev<->phys is not dominant 
+> > > > > > > > > > > > usage then such tradeoff might be worthywhile...
+> > > > > > > > > > > >  
+> > > > > > > > > > > If the interfaces for phys<->phys and mdev<->mdev are consistent, it makes no
+> > > > > > > > > > > difference to phys<->mdev, right?
+> > > > > > > > > > > I think the vendor string for a mdev device is something like:
+> > > > > > > > > > > "Parent PCIID + mdev type + software version", and
+> > > > > > > > > > > that for a phys device is something like:
+> > > > > > > > > > > "PCIID + software version".
+> > > > > > > > > > > as long as we don't migrate between devices from different vendors, it's
+> > > > > > > > > > > easy for vendor driver to tell if a phys device is migration compatible
+> > > > > > > > > > > to a mdev device according it supports it or not.  
+> > > > > > > > > > 
+> > > > > > > > > > It surprises me that the PCIID matching is a requirement; I'd assumed
+> > > > > > > > > > with this clever mdev name setup that you could migrate between two
+> > > > > > > > > > different models in a series, or to a newer model, as long as they
+> > > > > > > > > > both supported the same mdev view.
+> > > > > > > > > >   
+> > > > > > > > > hi Dave
+> > > > > > > > > the migration_version string is transparent to userspace, and is
+> > > > > > > > > completely defined by vendor driver.
+> > > > > > > > > I put it there just as an example of how vendor driver may implement it.
+> > > > > > > > > e.g.
+> > > > > > > > > the src migration_version string is "src PCIID + src software version", 
+> > > > > > > > > then when this string is write to target migration_version node,
+> > > > > > > > > the vendor driver in the target device will compare it with its own
+> > > > > > > > > device info and software version.
+> > > > > > > > > If different models are allowed, the write just succeeds even
+> > > > > > > > > PCIIDs in src and target are different.
+> > > > > > > > > 
+> > > > > > > > > so, it is the vendor driver to define whether two devices are able to
+> > > > > > > > > migrate, no matter their PCIIDs, mdev types, software versions..., which
+> > > > > > > > > provides vendor driver full flexibility.
+> > > > > > > > > 
+> > > > > > > > > do you think it's good?  
+> > > > > > > > 
+> > > > > > > > Yeh that's OK; I guess it's going to need to have a big table in their
+> > > > > > > > with all the PCIIDs in.
+> > > > > > > > The alternative would be to abstract it a little; e.g. to say it's
+> > > > > > > > an Intel-gpu-core-v4  and then it would be less worried about the exact
+> > > > > > > > clock speed etc - but yes you might be right htat PCIIDs might be best
+> > > > > > > > for checking for quirks.
+> > > > > > > >  
+> > > > > > > glad that you are agreed with it:)
+> > > > > > > I think the vendor driver still can choose a way to abstract a little
+> > > > > > > (e.g. Intel-gpu-core-v4...) if they think it's better. In that case, the
+> > > > > > > migration_string would be something like "Intel-gpu-core-v4 + instance
+> > > > > > > number + software version".
+> > > > > > > IOW, they can choose anything they think appropriate to identify migration
+> > > > > > > compatibility of a device.
+> > > > > > > But Alex is right, we have to prevent namespace overlapping. So I think
+> > > > > > > we need to ensure src and target devices are from the same vendors.
+> > > > > > > or, any other ideas?  
+> > > > > > 
+> > > > > > That's why I kept the 'Intel' in that example; or PCI vendor ID; I was  
+> > > > > Yes, it's a good idea!
+> > > > > could we add a line in the doc saying that
+> > > > > it is the vendor driver to add a unique string to avoid namespace
+> > > > > collision?  
+> > > > 
+> > > > So why don't we split the difference; lets say that it should start with
+> > > > the hex PCI Vendor ID.
+> > > >  
+> > > The problem is for mdev devices, if the parent devices are not PCI devices, 
+> > > they don't have PCI vendor IDs.  
+> > 
+> > Hmm it would be best not to invent a whole new way of giving unique
+> > idenitifiers for vendors if we can.
+> >   
+> what about leveraging the flags in vfio device info ?
+> 
+> #define VFIO_DEVICE_FLAGS_RESET (1 << 0)        /* Device supports reset */
+> #define VFIO_DEVICE_FLAGS_PCI   (1 << 1)        /* vfio-pci device */
+> #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)     /* vfio-platform device */
+> #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)        /* vfio-amba device */
+> #define VFIO_DEVICE_FLAGS_CCW   (1 << 4)        /* vfio-ccw device */
+> #define VFIO_DEVICE_FLAGS_AP    (1 << 5)        /* vfio-ap device */
+> 
+> Then for migration_version string,
+> The first 64 bits are for device type, the second 64 bits are for device id.
+> e.g.
+> for PCI devices, it could be
+> VFIO_DEVICE_FLAGS_PCI + PCI ID.
+> 
+> Currently in the doc, we only define PCI devices to use PCI ID as the second
+> 64 bits. In future, if other types of devices want to support migration,
+> they can define their own parts of device id. e.g. use ACPI ID as the
+> second 64-bit...
+> 
+> sounds good?
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d211c8ced6bb..1e70d188d83a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10036,41 +10036,65 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- }
- 
- static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
--				     struct kvm_memory_slot *new)
-+				     struct kvm_memory_slot *old,
-+				     struct kvm_memory_slot *new,
-+				     enum kvm_mr_change change)
- {
--	/* Nothing to do for RO slots */
--	if (new->flags & KVM_MEM_READONLY)
-+	/*
-+	 * Nothing to do for RO slots or CREATE/MOVE/DELETE of a slot.
-+	 * See comments below.
-+	 */
-+	if ((change != KVM_MR_FLAGS_ONLY) || (new->flags & KVM_MEM_READONLY))
- 		return;
- 
- 	/*
--	 * Call kvm_x86_ops dirty logging hooks when they are valid.
--	 *
--	 * kvm_x86_ops.slot_disable_log_dirty is called when:
--	 *
--	 *  - KVM_MR_CREATE with dirty logging is disabled
--	 *  - KVM_MR_FLAGS_ONLY with dirty logging is disabled in new flag
--	 *
--	 * The reason is, in case of PML, we need to set D-bit for any slots
--	 * with dirty logging disabled in order to eliminate unnecessary GPA
--	 * logging in PML buffer (and potential PML buffer full VMEXIT). This
--	 * guarantees leaving PML enabled during guest's lifetime won't have
--	 * any additional overhead from PML when guest is running with dirty
--	 * logging disabled for memory slots.
-+	 * Dirty logging tracks sptes in 4k granularity, meaning that large
-+	 * sptes have to be split.  If live migration is successful, the guest
-+	 * in the source machine will be destroyed and large sptes will be
-+	 * created in the destination. However, if the guest continues to run
-+	 * in the source machine (for example if live migration fails), small
-+	 * sptes will remain around and cause bad performance.
- 	 *
--	 * kvm_x86_ops.slot_enable_log_dirty is called when switching new slot
--	 * to dirty logging mode.
-+	 * Scan sptes if dirty logging has been stopped, dropping those
-+	 * which can be collapsed into a single large-page spte.  Later
-+	 * page faults will create the large-page sptes.
- 	 *
--	 * If kvm_x86_ops dirty logging hooks are invalid, use write protect.
-+	 * There is no need to do this in any of the following cases:
-+	 * CREATE:      No dirty mappings will already exist.
-+	 * MOVE/DELETE: The old mappings will already have been cleaned up by
-+	 *		kvm_arch_flush_shadow_memslot()
-+	 */
-+	if ((old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
-+	    !(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
-+		kvm_mmu_zap_collapsible_sptes(kvm, new);
-+
-+	/*
-+	 * Enable or disable dirty logging for the slot.
- 	 *
--	 * In case of write protect:
-+	 * For KVM_MR_DELETE and KVM_MR_MOVE, the shadow pages of the old
-+	 * slot have been zapped so no dirty logging updates are needed for
-+	 * the old slot.
-+	 * For KVM_MR_CREATE and KVM_MR_MOVE, once the new slot is visible
-+	 * any mappings that might be created in it will consume the
-+	 * properties of the new slot and do not need to be updated here.
- 	 *
--	 * Write protect all pages for dirty logging.
-+	 * When PML is enabled, the kvm_x86_ops dirty logging hooks are
-+	 * called to enable/disable dirty logging.
- 	 *
--	 * All the sptes including the large sptes which point to this
--	 * slot are set to readonly. We can not create any new large
--	 * spte on this slot until the end of the logging.
-+	 * When disabling dirty logging with PML enabled, the D-bit is set
-+	 * for sptes in the slot in order to prevent unnecessary GPA
-+	 * logging in the PML buffer (and potential PML buffer full VMEXIT).
-+	 * This guarantees leaving PML enabled for the guest's lifetime
-+	 * won't have any additional overhead from PML when the guest is
-+	 * running with dirty logging disabled.
- 	 *
-+	 * When enabling dirty logging, large sptes are write-protected
-+	 * so they can be split on first write.  New large sptes cannot
-+	 * be created for this slot until the end of the logging.
- 	 * See the comments in fast_page_fault().
-+	 * For small sptes, nothing is done if the dirty log is in the
-+	 * initial-all-set state.  Otherwise, depending on whether pml
-+	 * is enabled the D-bit or the W-bit will be cleared.
- 	 */
- 	if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
- 		if (kvm_x86_ops.slot_enable_log_dirty) {
-@@ -10107,39 +10131,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				kvm_mmu_calculate_default_mmu_pages(kvm));
- 
- 	/*
--	 * Dirty logging tracks sptes in 4k granularity, meaning that large
--	 * sptes have to be split.  If live migration is successful, the guest
--	 * in the source machine will be destroyed and large sptes will be
--	 * created in the destination. However, if the guest continues to run
--	 * in the source machine (for example if live migration fails), small
--	 * sptes will remain around and cause bad performance.
--	 *
--	 * Scan sptes if dirty logging has been stopped, dropping those
--	 * which can be collapsed into a single large-page spte.  Later
--	 * page faults will create the large-page sptes.
--	 *
--	 * There is no need to do this in any of the following cases:
--	 * CREATE:	No dirty mappings will already exist.
--	 * MOVE/DELETE:	The old mappings will already have been cleaned up by
--	 *		kvm_arch_flush_shadow_memslot()
--	 */
--	if (change == KVM_MR_FLAGS_ONLY &&
--		(old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
--		!(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
--		kvm_mmu_zap_collapsible_sptes(kvm, new);
--
--	/*
--	 * Set up write protection and/or dirty logging for the new slot.
--	 *
--	 * For KVM_MR_DELETE and KVM_MR_MOVE, the shadow pages of old slot have
--	 * been zapped so no dirty logging staff is needed for old slot. For
--	 * KVM_MR_FLAGS_ONLY, the old slot is essentially the same one as the
--	 * new and it's also covered when dealing with the new slot.
--	 *
- 	 * FIXME: const-ify all uses of struct kvm_memory_slot.
- 	 */
--	if (change == KVM_MR_FLAGS_ONLY)
--		kvm_mmu_slot_apply_flags(kvm, (struct kvm_memory_slot *) new);
-+	kvm_mmu_slot_apply_flags(kvm, old, (struct kvm_memory_slot *) new, change);
- 
- 	/* Free the arrays associated with the old memslot. */
- 	if (change == KVM_MR_MOVE)
--- 
-2.13.3
+[dead thread resurrection alert]
+
+Not really.  We're deep into territory that we were trying to avoid.
+We had previously defined the version string as opaque (not
+transparent) specifically because we did not want userspace to make
+assumptions about compatibility based on the content of the string.  It
+was 100% left to the vendor driver to determine compatibility.  The
+mdev type was the full extent of the first level filter that userspace
+could use to narrow the set of potentially compatible devices.  If we
+remove that due to physical device migration support, I'm not sure how
+we simplify the problem for userspace.
+
+We need to step away from PCI IDs and parent devices.  We're not
+designing a solution that only works for PCI, there's no guarantee that
+parent devices are similar or even from the same vendor.
+
+Does the mdev type sufficiently solve the problem for mdev devices?  If
+so, then what can we learn from it and how can we apply an equivalence
+to physical devices?  For example, should a vfio bus driver (vfio-pci
+or vfio-mdev) expose vfio_migration_type and vfio_migration_version
+attributes under the device in sysfs where the _type provides the first
+level, user transparent, matching string (ex. mdev type for mdev
+devices) while the _version provides the user opaque, vendor known
+compatibility test?
+
+This pushes the problem out to the drivers where we can perhaps
+incorporate the module name to avoid collisions.  For example Yan's
+vendor extension proposal makes use of vfio-pci with extension modules
+loaded via an alias incorporating the PCI vendor and device ID.  So
+vfio-pci might use a type of "vfio-pci:$ALIAS".
+
+It's still a bit messy that someone needs to go evaluate all these
+types between devices that exist and mdev devices that might exist if
+created, but I don't have any good ideas to resolve that (maybe a new
+class hierarchy?).  Thanks,
+
+Alex
 
