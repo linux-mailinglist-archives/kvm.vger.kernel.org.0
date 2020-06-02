@@ -2,156 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E7071EBA24
-	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 13:11:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 630A21EBC8F
+	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 15:09:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726380AbgFBLKx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jun 2020 07:10:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20017 "EHLO
+        id S1727921AbgFBNGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jun 2020 09:06:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30093 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725900AbgFBLKx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Jun 2020 07:10:53 -0400
+        by vger.kernel.org with ESMTP id S1726839AbgFBNGB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Jun 2020 09:06:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591096251;
+        s=mimecast20190719; t=1591103159;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=e1bN6BFwrFb8HaDkHCOaH4+Ma1lbuG7/W6ik/b1HbRs=;
-        b=B9IEMppMxroekJlIZoIy4zVaMvQVnEhSqo2IYoTdq8SkT417pbsjLv09IoQ73nEFKVXpd7
-        9MZgX/hzbd1IqrIhj3r4pL+jasgrYVWdoxspG5FdNbEYlrJDAfWTOmvJNDHBoTDdLufWoZ
-        MHubp9EDaYWMuAQROHqohWOVwIJw8aM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-peAYYSG6MtaV1fKxi7DMpw-1; Tue, 02 Jun 2020 07:10:49 -0400
-X-MC-Unique: peAYYSG6MtaV1fKxi7DMpw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDEAA1883607;
-        Tue,  2 Jun 2020 11:10:46 +0000 (UTC)
-Received: from [10.72.12.83] (ovpn-12-83.pek2.redhat.com [10.72.12.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A75B578EFB;
-        Tue,  2 Jun 2020 11:10:39 +0000 (UTC)
-Subject: Re: [PATCH] vdpa: bypass waking up vhost_woker for vdpa vq kick
-From:   Jason Wang <jasowang@redhat.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>, kbuild@lists.01.org,
-        Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc:     lkp@intel.com, kbuild-all@lists.01.org, lulu@redhat.com,
-        dan.daly@intel.com, cunming.liang@intel.com
-References: <20200602094203.GU30374@kadam>
- <b8ccbccf-f667-8d15-8de2-b87da5f51ec3@redhat.com>
-Message-ID: <c2f3cd6c-6f75-15db-080e-9895a35a0456@redhat.com>
-Date:   Tue, 2 Jun 2020 19:10:38 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=vdmj+Tg8SGx2NrYVAizct++/zxOMWuxvcR8U68lSB2Q=;
+        b=Xy2qJhbjXoyS70Z86Z5bNfgNPwUttpmJ6dVZ8IF+MteBfqU2aQFQQ0CmT3r5lESWZVB9kS
+        ckU6rnubx4qZkypXiWORAHNmc6sJAsrW5iE2s9x2NfVAX6EoVFSmK/zE2DaEGtlwxxUEbB
+        wA5CkJO02FJwjJ/AoS+nSmyK5ezmd80=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-hYdAybLvOyOb1FVWHJD7YA-1; Tue, 02 Jun 2020 09:05:58 -0400
+X-MC-Unique: hYdAybLvOyOb1FVWHJD7YA-1
+Received: by mail-wr1-f69.google.com with SMTP id w4so1378873wrl.13
+        for <kvm@vger.kernel.org>; Tue, 02 Jun 2020 06:05:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=vdmj+Tg8SGx2NrYVAizct++/zxOMWuxvcR8U68lSB2Q=;
+        b=rPqtLYLC4doIL0BCSCnrRp/KRqdmo4QG3K4Ms7QmLLNfCFa+b5/XRuWvtgCkKsTstV
+         WessR7Eup++tv6GNST8PjJQ95Lyy6RRC6NyfofoOzXgikN9prQSEOgHcEoC7hSd1Ie5p
+         fdLUPKWz0XrpGU+qhx29qqTplNkGnIscK2O/DLYNuwO91O5kyFBXw4unuMVEmXlS1/Ub
+         7Vz/PQc/TrHWlzq9EWzxibh4xRY6r4Tw0BSkvyhAkjKo9LGkPALqeNgxtkmGPaAQkszj
+         JvmuZNDLsHlc5iYHUKAq4klRx9IbqQYTyNokzqEfV4PRICrdTVgdVZeEYE8dd3bugkcQ
+         1Idg==
+X-Gm-Message-State: AOAM533zUGG83PQWKMf0enCVWPMIEhv9Jyc/KW2rxq9YWTBb2CCgFwO1
+        x6Ig/Sabtr056EcrTN3ZUQpv7QeV5YKuc19zQR+9E4b+KpWA7xu3VELsbRq0+rNT4w+fWhsLcWU
+        cx9xKptxOgFZj
+X-Received: by 2002:a1c:e355:: with SMTP id a82mr3952749wmh.1.1591103156750;
+        Tue, 02 Jun 2020 06:05:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxhvL+9CoWDlbet28l8cBoDZ1y4Jq12uY4hkhtEZgSR8vXHFkGEgf8rds3ZCLy2cNng3Lahg==
+X-Received: by 2002:a1c:e355:: with SMTP id a82mr3952727wmh.1.1591103156470;
+        Tue, 02 Jun 2020 06:05:56 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id 5sm3408485wmz.16.2020.06.02.06.05.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2020 06:05:55 -0700 (PDT)
+Date:   Tue, 2 Jun 2020 09:05:54 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH RFC 00/13] vhost: format independence
+Message-ID: <20200602130543.578420-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b8ccbccf-f667-8d15-8de2-b87da5f51ec3@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We let the specifics of the ring format seep through to vhost API
+callers - mostly because there was only one format so it was
+hard to imagine what an independent API would look like.
+Now that there's an alternative in form of the packed ring,
+it's easier to see the issues, and fixing them is perhaps
+the cleanest way to add support for more formats.
 
-On 2020/6/2 下午6:16, Jason Wang wrote:
->
-> On 2020/6/2 下午5:42, Dan Carpenter wrote:
->> Hi Zhu,
->>
->> url: 
->> https://github.com/0day-ci/linux/commits/Zhu-Lingshan/vdpa-bypass-waking-up-vhost_woker-for-vdpa-vq-kick/20200526-133819 
->>
->> base: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git 
->> linux-next
->> config: x86_64-randconfig-m001-20200529 (attached as .config)
->> compiler: gcc-9 (Debian 9.3.0-13) 9.3.0
->>
->> If you fix the issue, kindly add following tag as appropriate
->> Reported-by: kbuild test robot <lkp@intel.com>
->> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
->>
->> smatch warnings:
->> drivers/vhost/vdpa.c:348 vhost_vdpa_set_vring_kick() error: 
->> uninitialized symbol 'r'.
->>
->> # 
->> https://github.com/0day-ci/linux/commit/a84ddbf1ef29f18aafb2bb8a93bcedd4a29a967d 
->>
->> git remote add linux-review https://github.com/0day-ci/linux
->> git remote update linux-review
->> git checkout a84ddbf1ef29f18aafb2bb8a93bcedd4a29a967d
->> vim +/r +348 drivers/vhost/vdpa.c
->>
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  316  static long 
->> vhost_vdpa_set_vring_kick(struct vhost_virtqueue *vq,
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26 317                        
->> void __user *argp)
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  318  {
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  319      bool pollstart = 
->> false, pollstop = false;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  320      struct file 
->> *eventfp, *filep = NULL;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  321      struct 
->> vhost_vring_file f;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  322      long r;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  323
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  324      if 
->> (copy_from_user(&f, argp, sizeof(f)))
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  325          return -EFAULT;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  326
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  327      eventfp = f.fd == -1 
->> ? NULL : eventfd_fget(f.fd);
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  328      if (IS_ERR(eventfp)) {
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  329          r = 
->> PTR_ERR(eventfp);
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  330          return r;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  331      }
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  332
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  333      if (eventfp != 
->> vq->kick) {
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  334          pollstop = 
->> (filep = vq->kick) != NULL;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  335          pollstart = 
->> (vq->kick = eventfp) != NULL;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  336      } else
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  337          filep = eventfp;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  338
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  339      if (pollstop && 
->> vq->handle_kick)
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  340 vhost_vdpa_poll_stop(vq);
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  341
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  342      if (filep)
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  343 fput(filep);
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  344
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  345      if (pollstart && 
->> vq->handle_kick)
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  346          r = 
->> vhost_vdpa_poll_start(vq);
->>
->> "r" not initialized on else path.
->>
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  347
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26 @348      return r;
->> a84ddbf1ef29f1 Zhu Lingshan 2020-05-26  349  }
->
->
-> Will fix.
->
-> Thanks 
+This patchset does this by indtroducing two new structures: vhost_buf to
+represent a buffer and vhost_desc to represent a descriptor.
+Descriptors aren't normally of interest to devices but do occationally
+get exposed e.g. for logging.
 
+Perhaps surprisingly, the higher level API actually makes things a bit
+easier for callers, as well as allows more freedom for the vhost core.
+The end result is basically unchanged performance (based on preliminary
+testing) even though we are forced to go through a format conversion.
 
-Lingshan reminds me that we've posted V2 which reuses the vhost.c 
-implementation for polling.
+The conversion also exposed (more) bugs in vhost scsi - which isn't
+really surprising, that driver needs a lot more love than it's getting.
 
-So there's no need for the fix.
+Very lightly tested. Would appreciate feedback and testing.
 
-Thanks
+Michael S. Tsirkin (13):
+  vhost: option to fetch descriptors through an independent struct
+  vhost: use batched version by default
+  vhost: batching fetches
+  vhost: cleanup fetch_buf return code handling
+  vhost/net: pass net specific struct pointer
+  vhost: reorder functions
+  vhost: format-independent API for used buffers
+  vhost/net: convert to new API: heads->bufs
+  vhost/net: avoid iov length math
+  vhost/test: convert to the buf API
+  vhost/scsi: switch to buf APIs
+  vhost/vsock: switch to the buf API
+  vhost: drop head based APIs
 
+ drivers/vhost/net.c   | 173 +++++++++----------
+ drivers/vhost/scsi.c  |  73 ++++----
+ drivers/vhost/test.c  |  22 +--
+ drivers/vhost/vhost.c | 375 +++++++++++++++++++++++++++---------------
+ drivers/vhost/vhost.h |  46 ++++--
+ drivers/vhost/vsock.c |  30 ++--
+ 6 files changed, 436 insertions(+), 283 deletions(-)
 
+-- 
+MST
 
