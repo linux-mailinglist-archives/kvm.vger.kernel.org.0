@@ -2,90 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4C541EB42C
-	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 06:15:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD3961EB43C
+	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 06:22:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726037AbgFBEPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jun 2020 00:15:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48906 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725616AbgFBEPo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jun 2020 00:15:44 -0400
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4682C061A0E
-        for <kvm@vger.kernel.org>; Mon,  1 Jun 2020 21:15:44 -0700 (PDT)
-Received: by mail-pf1-x443.google.com with SMTP id h185so3453528pfg.2
-        for <kvm@vger.kernel.org>; Mon, 01 Jun 2020 21:15:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PXGJ4gt5oyH1UgM0SNXfgnxueAMm6B3WnIoe3BdHTxk=;
-        b=y2gESXYMO/iSq31PLf7FlD0APM8iB3f1Jx2LNbpvW5OoT1NmiTiBnMqjcY7ePtTwPU
-         lEu80E9sphH65CGomcMaCZiOqQhmjVsJaNBmzY3M5p65w7rljbjUMsLfxLPuXhur00ce
-         1qSPgG42ZpxSMY7k7qBVoFOf8M0qcUZ0xONET+la7mtID4gNfj4CXV4Py04/bBqRZBwy
-         7hv0YpB78hppAJn0H0qM0QWhNm6uAJ01gYLot0xpp4IO701XGfNqNvh3wLlg5tsdjpwT
-         j4tqNPLVHfMCM8M4TnWgETRFimEbNZzFVWnNBXH0ELeO7PSkWIC9l0ZfLSCXQYqjlncX
-         ZkPQ==
+        id S1726217AbgFBEWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jun 2020 00:22:39 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31611 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725966AbgFBEWh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Jun 2020 00:22:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591071755;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YDfsRlwfRR1nDcp4wd5hK1KujxFVRibBNSbBOaOrz2Q=;
+        b=X8FnC/x9SCa5vJY15Os/NgB6nawcFpKJaDXreIB8m84EPDlTy9XHLAWv/Zny3K0FHi4Nb3
+        8LdpUU/8m/eOLIxkEiiX9UFoTyhOTFaK/KJFTZMPWNZ3Let1L3FvT3iSJVQSnPTVqcc4R7
+        i1c1lgV4k52xxGtwe+/HGiSPJXPtk+c=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-GAMAqWUIOJ2ZOGti7m-JwA-1; Tue, 02 Jun 2020 00:22:30 -0400
+X-MC-Unique: GAMAqWUIOJ2ZOGti7m-JwA-1
+Received: by mail-wr1-f69.google.com with SMTP id f4so842868wrp.21
+        for <kvm@vger.kernel.org>; Mon, 01 Jun 2020 21:22:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PXGJ4gt5oyH1UgM0SNXfgnxueAMm6B3WnIoe3BdHTxk=;
-        b=Sl6QAaxcXQCfjv/fkvuQOLPuYXUiYpmPqZWQnYzqluFEduF30k9RzQEVYtp3DaYuPL
-         G4eq6tcLiRJojjJbOTpilZkOnofZQuPb7C+lcYyuzeSD9kiLS15Ac1rXSeUQPKWUitJs
-         gSnpPTzSeyZKfnolba/ZjoyV2+Whr8CDJFXiFJ3wWLQQ42Xw0i6Y3WF229cKQsqk9zMx
-         ynFiy/xqEoaD7fFto4XjWUFvxawazmvWSYIU/vIj2pAsW4ezBfMaLj7+FLawuxHjQxns
-         ln19qBvjAxsrU4oiXPKG6cCVv05CscVdNMIigDMp9OhAvtBii2M1pZk2Wwu0rN/vEKbd
-         5EAA==
-X-Gm-Message-State: AOAM530t0YcN5WoiH1eVjUg8iElgbZ2XT68tLkaadKghQ25GJ32C9/V/
-        7ipuZMOAz7PLeJA+L8H3+vQZ7A==
-X-Google-Smtp-Source: ABdhPJxLDfCnVA3/aAfcMXPKTFGbRAmuXfL/fQBrCvRzdKwgJzvl1sYbzaUp265Dyq7tZTS3wgHEyQ==
-X-Received: by 2002:a63:c846:: with SMTP id l6mr21787298pgi.197.1591071344366;
-        Mon, 01 Jun 2020 21:15:44 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
-        by smtp.gmail.com with ESMTPSA id c8sm877062pjn.16.2020.06.01.21.15.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Jun 2020 21:15:43 -0700 (PDT)
-Subject: Re: [RFC v2 16/18] guest memory protection: Add Error ** to
- GuestMemoryProtection::kvm_init
-To:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
-        brijesh.singh@amd.com, frankja@linux.ibm.com, dgilbert@redhat.com,
-        pair@us.ibm.com
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
-        mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-17-david@gibson.dropbear.id.au>
-From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4bba205c-00a7-d642-800c-a5ed8469836c@linaro.org>
-Date:   Mon, 1 Jun 2020 21:15:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YDfsRlwfRR1nDcp4wd5hK1KujxFVRibBNSbBOaOrz2Q=;
+        b=leuincjq8Uz7XWeabCv57nvzTr+iso8IHjinxVsRH2OH4YNHI+wPal3D7WH0q4qSCH
+         gViw6nIoQsHw4pDCbUk/cwxv0OZT9Msv9Cg6huM6082T/kq1VCrCqNu6BRR4RH36R4r0
+         qK33H3oQBKZEUG7+AAMWd4ghrJgLmC0ifE3NanYZzYZETFbpcwzo53jIdeAibkGQLKCy
+         QLAYwrh1Hdu/jD9LE8Le2YwHhhwycgKmonzRdeorsUV/VlZJpKUu5gCuHWsofwc8+mMa
+         wfauN5pcFZI6Pg3dAHKhALUaQsxfUEizU/HPYX8NY4TAntaHFJbhR9c8QP+mVRhoOFdO
+         pxNA==
+X-Gm-Message-State: AOAM533C4vUpxckxX+ETwpLT+HRASHvvj5B7Q+C/RRrFBSeA3ccHd1gS
+        NPiAeYd9uBwycqTey/wZ/dwQcXq7hlpR6EhDPz8nmusvmWxgfIyCnY5sjsXb/9kX28DaB5W/RJg
+        BPWxQSZLSlbf4
+X-Received: by 2002:a05:6000:1083:: with SMTP id y3mr23714180wrw.425.1591071749221;
+        Mon, 01 Jun 2020 21:22:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx2SKrCnIib4b4OHp9esqIfnn8bX4FrOHyf8lEFnkhypfH/4sW2rsrN9doierFMkcN8evfSkA==
+X-Received: by 2002:a05:6000:1083:: with SMTP id y3mr23714174wrw.425.1591071749030;
+        Mon, 01 Jun 2020 21:22:29 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id z2sm1731263wrs.87.2020.06.01.21.22.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2020 21:22:28 -0700 (PDT)
+Date:   Tue, 2 Jun 2020 00:22:25 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Dave Chinner <david@fromorbit.com>,
+        Souptick Joarder <jrdr.linux@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org
+Subject: Re: [PATCH 2/2] vhost: convert get_user_pages() --> pin_user_pages()
+Message-ID: <20200602002212-mutt-send-email-mst@kernel.org>
+References: <20200529234309.484480-1-jhubbard@nvidia.com>
+ <20200529234309.484480-3-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200521034304.340040-17-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200529234309.484480-3-jhubbard@nvidia.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/20/20 8:43 PM, David Gibson wrote:
-> This allows failures to be reported richly and idiomatically.
+On Fri, May 29, 2020 at 04:43:09PM -0700, John Hubbard wrote:
+> This code was using get_user_pages*(), in approximately a "Case 5"
+> scenario (accessing the data within a page), using the categorization
+> from [1]. That means that it's time to convert the get_user_pages*() +
+> put_page() calls to pin_user_pages*() + unpin_user_pages() calls.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> There is some helpful background in [2]: basically, this is a small
+> part of fixing a long-standing disconnect between pinning pages, and
+> file systems' use of those pages.
+> 
+> [1] Documentation/core-api/pin_user_pages.rst
+> 
+> [2] "Explicit pinning of user-space pages":
+>     https://lwn.net/Articles/807108/
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
 > ---
->  accel/kvm/kvm-all.c                    |  4 +++-
->  include/exec/guest-memory-protection.h |  2 +-
->  target/i386/sev.c                      | 31 +++++++++++++-------------
->  3 files changed, 19 insertions(+), 18 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
+>  drivers/vhost/vhost.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 21a59b598ed8..596132a96cd5 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1762,15 +1762,14 @@ static int set_bit_to_user(int nr, void __user *addr)
+>  	int bit = nr + (log % PAGE_SIZE) * 8;
+>  	int r;
+>  
+> -	r = get_user_pages_fast(log, 1, FOLL_WRITE, &page);
+> +	r = pin_user_pages_fast(log, 1, FOLL_WRITE, &page);
+>  	if (r < 0)
+>  		return r;
+>  	BUG_ON(r != 1);
+>  	base = kmap_atomic(page);
+>  	set_bit(bit, base);
+>  	kunmap_atomic(base);
+> -	set_page_dirty_lock(page);
+> -	put_page(page);
+> +	unpin_user_pages_dirty_lock(&page, 1, true);
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.26.2
 
