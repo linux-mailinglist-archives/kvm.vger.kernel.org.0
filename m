@@ -2,138 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C64E21EBCC2
-	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 15:13:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A39561EBD1B
+	for <lists+kvm@lfdr.de>; Tue,  2 Jun 2020 15:31:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726839AbgFBNNd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jun 2020 09:13:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58885 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726728AbgFBNNb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jun 2020 09:13:31 -0400
+        id S1726648AbgFBNbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jun 2020 09:31:35 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60194 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726130AbgFBNbf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jun 2020 09:31:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591103609;
+        s=mimecast20190719; t=1591104693;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=g4VeZ8yHTM87Vh2wY62LbEg+OLfuRTOCLtz4B9KtBSM=;
-        b=U83LbTLqRl1nQuNkWolzrJLm+c+qUcezmwyuAFNzFkzMFYWAIbQ5WezE+EQY6TqxqXfsyg
-        0MEBvKPwreh0k5a+BRjQcqnDj/PCk2WzcAEQOvUyK+gqOfgUKLnlyJ0/Db1PTpuO69evbP
-        vrNYi2dhN3fA3X2rvMZb2CQ3QfDHnSg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-ZiRtPK81MKepDUGaPq_sHw-1; Tue, 02 Jun 2020 09:13:19 -0400
-X-MC-Unique: ZiRtPK81MKepDUGaPq_sHw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6160E835B40;
-        Tue,  2 Jun 2020 13:13:18 +0000 (UTC)
-Received: from gondolin (ovpn-112-184.ams2.redhat.com [10.36.112.184])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ABFDD60F8D;
-        Tue,  2 Jun 2020 13:13:16 +0000 (UTC)
-Date:   Tue, 2 Jun 2020 15:13:13 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Farhan Ali <alifm@linux.ibm.com>
-Subject: Re: [PULL 08/10] vfio-ccw: Introduce a new CRW region
-Message-ID: <20200602151313.0e639b57.cohuck@redhat.com>
-In-Reply-To: <20200525094115.222299-9-cohuck@redhat.com>
-References: <20200525094115.222299-1-cohuck@redhat.com>
-        <20200525094115.222299-9-cohuck@redhat.com>
-Organization: Red Hat GmbH
+        bh=b3UuSFOoTLf1u64HrlCpEbdeT2AgnRILXvuyVUe6Wag=;
+        b=O/lPGxAVqryrY1cddeIh0gQ8Z25S7Po10omjMl7m+K4LDC9iTF5wZVGz13BUk/dDf2kal1
+        9h1yycWV8HSnmUzX/gP0vvLPWSpIx45RCxdom4zGwksmr8SQv3Jq+S5TMfCwOFr/ou7eXQ
+        qVVM96LYAdEzdwuzL7vDYnJLUFwZNOc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-XlBEyJINO4mJuPoI3P1Ftw-1; Tue, 02 Jun 2020 09:31:22 -0400
+X-MC-Unique: XlBEyJINO4mJuPoI3P1Ftw-1
+Received: by mail-wr1-f72.google.com with SMTP id l1so1399725wrc.8
+        for <kvm@vger.kernel.org>; Tue, 02 Jun 2020 06:31:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=b3UuSFOoTLf1u64HrlCpEbdeT2AgnRILXvuyVUe6Wag=;
+        b=bZ4J18VKA+2Gb+46qZfTOKsd3YgCG/z1/LRTrwuDvBCUgDR6fg8rDBDlwSP0uHmeLb
+         C9rea8ngt9wJPJkg8sWIomjCloIybdVkwP4Hy6hN2pdK5IsWx3iMO4LHxwaQP9DwQ2PO
+         b5OdWTbcLmJhglo0HLcFvZnXX1Yaa4b3tOnvYqsfbEDi5591vjHlz3CZHuVTr5Los9v+
+         426u6EG6uvhW+7gtGWTWzCzB4V6IaPC/f6urYJLOgmZymssfkek8qGPpEc7nmMcpb+CY
+         TSCTtww2fYN0RLUXl5VFMlr10nAsUWeRyGYnyaXF+vI0GEP8VEsrs3gazk1hckUwK24I
+         3ejA==
+X-Gm-Message-State: AOAM532SwVSavCsDblVGRe/RNrJrizWDxflYb2MAytj5M9nNVGZBVY6V
+        AdEgfV4onOztLTVQrj2bcYPimn7qzvY4s6fKtDYZTgdgQuZRN166aWHVVPLIvJa2rsZ8sZNTbHc
+        uOs5Zq6O7VVMw
+X-Received: by 2002:adf:ecce:: with SMTP id s14mr14789310wro.154.1591104680988;
+        Tue, 02 Jun 2020 06:31:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzhzCp7N+xdkukbytg74zX2M6EFznyG8/VyZ15EbaVCa6fcCkeslvcsieleP04VZHHIBXLV0w==
+X-Received: by 2002:adf:ecce:: with SMTP id s14mr14789293wro.154.1591104680670;
+        Tue, 02 Jun 2020 06:31:20 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id n204sm3972286wma.5.2020.06.02.06.31.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jun 2020 06:31:19 -0700 (PDT)
+Date:   Tue, 2 Jun 2020 09:31:16 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rob.miller@broadcom.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com
+Subject: Re: [PATCH 4/6] vhost_vdpa: support doorbell mapping via mmap
+Message-ID: <20200602093025-mutt-send-email-mst@kernel.org>
+References: <20200529080303.15449-5-jasowang@redhat.com>
+ <202006020308.kLXTHt4n%lkp@intel.com>
+ <20200602005007-mutt-send-email-mst@kernel.org>
+ <bd7dde11-b726-ee08-4e80-71fb784fa549@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bd7dde11-b726-ee08-4e80-71fb784fa549@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 May 2020 11:41:13 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> From: Farhan Ali <alifm@linux.ibm.com>
+On Tue, Jun 02, 2020 at 02:49:38PM +0800, Jason Wang wrote:
 > 
-> This region provides a mechanism to pass a Channel Report Word
-> that affect vfio-ccw devices, and needs to be passed to the guest
-> for its awareness and/or processing.
+> On 2020/6/2 下午12:56, Michael S. Tsirkin wrote:
+> > On Tue, Jun 02, 2020 at 03:22:49AM +0800, kbuild test robot wrote:
+> > > Hi Jason,
+> > > 
+> > > I love your patch! Yet something to improve:
+> > > 
+> > > [auto build test ERROR on vhost/linux-next]
+> > > [also build test ERROR on linus/master v5.7 next-20200529]
+> > > [if your patch is applied to the wrong git tree, please drop us a note to help
+> > > improve the system. BTW, we also suggest to use '--base' option to specify the
+> > > base tree in git format-patch, please seehttps://stackoverflow.com/a/37406982]
+> > > 
+> > > url:https://github.com/0day-ci/linux/commits/Jason-Wang/vDPA-doorbell-mapping/20200531-070834
+> > > base:https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git  linux-next
+> > > config: m68k-randconfig-r011-20200601 (attached as .config)
+> > > compiler: m68k-linux-gcc (GCC) 9.3.0
+> > > reproduce (this is a W=1 build):
+> > >          wgethttps://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross  -O ~/bin/make.cross
+> > >          chmod +x ~/bin/make.cross
+> > >          # save the attached .config to linux build tree
+> > >          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=m68k
+> > > 
+> > > If you fix the issue, kindly add following tag as appropriate
+> > > Reported-by: kbuild test robot<lkp@intel.com>
+> > > 
+> > > All errors (new ones prefixed by >>, old ones prefixed by <<):
+> > > 
+> > > drivers/vhost/vdpa.c: In function 'vhost_vdpa_fault':
+> > > > > drivers/vhost/vdpa.c:754:22: error: implicit declaration of function 'pgprot_noncached' [-Werror=implicit-function-declaration]
+> > > 754 |  vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > > |                      ^~~~~~~~~~~~~~~~
+> > > > > drivers/vhost/vdpa.c:754:22: error: incompatible types when assigning to type 'pgprot_t' {aka 'struct <anonymous>'} from type 'int'
+> > > cc1: some warnings being treated as errors
+> > > 
+> > > vim +/pgprot_noncached +754 drivers/vhost/vdpa.c
+> > > 
+> > >     742	
+> > >     743	static vm_fault_t vhost_vdpa_fault(struct vm_fault *vmf)
+> > >     744	{
+> > >     745		struct vhost_vdpa *v = vmf->vma->vm_file->private_data;
+> > >     746		struct vdpa_device *vdpa = v->vdpa;
+> > >     747		const struct vdpa_config_ops *ops = vdpa->config;
+> > >     748		struct vdpa_notification_area notify;
+> > >     749		struct vm_area_struct *vma = vmf->vma;
+> > >     750		u16 index = vma->vm_pgoff;
+> > >     751	
+> > >     752		notify = ops->get_vq_notification(vdpa, index);
+> > >     753	
+> > >   > 754		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > >     755		if (remap_pfn_range(vma, vmf->address & PAGE_MASK,
+> > >     756				    notify.addr >> PAGE_SHIFT, PAGE_SIZE,
+> > >     757				    vma->vm_page_prot))
+> > >     758			return VM_FAULT_SIGBUS;
+> > >     759	
+> > >     760		return VM_FAULT_NOPAGE;
+> > >     761	}
+> > >     762	
+> > Yes well, all this remapping clearly has no chance to work
+> > on systems without CONFIG_MMU.
 > 
-> The base driver (see crw_collect_info()) provides space for two
-> CRWs, as a subchannel event may have two CRWs chained together
-> (one for the ssid, one for the subchannel).  As vfio-ccw will
-> deal with everything at the subchannel level, provide space
-> for a single CRW to be transferred in one shot.
 > 
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Message-Id: <20200505122745.53208-7-farman@linux.ibm.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  Documentation/s390/vfio-ccw.rst     | 19 ++++++++++
->  drivers/s390/cio/vfio_ccw_chp.c     | 55 +++++++++++++++++++++++++++++
->  drivers/s390/cio/vfio_ccw_drv.c     | 20 +++++++++++
->  drivers/s390/cio/vfio_ccw_ops.c     |  8 +++++
->  drivers/s390/cio/vfio_ccw_private.h |  4 +++
->  include/uapi/linux/vfio.h           |  2 ++
->  include/uapi/linux/vfio_ccw.h       |  8 +++++
->  7 files changed, 116 insertions(+)
+> It looks to me mmap can work according to Documentation/nommu-mmap.txt. But
+> I'm not sure it's worth to bother.
 > 
+> Thanks
 
-(...)
 
-> @@ -413,6 +423,16 @@ static int __init vfio_ccw_sch_init(void)
->  		goto out_err;
->  	}
->  
-> +	vfio_ccw_crw_region = kmem_cache_create_usercopy("vfio_ccw_crw_region",
-> +					sizeof(struct ccw_crw_region), 0,
-> +					SLAB_ACCOUNT, 0,
-> +					sizeof(struct ccw_crw_region), NULL);
+Well
 
-Ugh, I just tested this rebased to the s390 features branch, and I must
-have used some different options, because I now get
+int remap_pfn_range(struct vm_area_struct *vma, unsigned long addr,
+                unsigned long pfn, unsigned long size, pgprot_t prot)
+{
+        if (addr != (pfn << PAGE_SHIFT))
+                return -EINVAL;
 
-   kmem_cache_create(vfio_ccw_crw_region) integrity check failed
+        vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
+        return 0;
+}
+EXPORT_SYMBOL(remap_pfn_range);
 
-presumably due to the size of the ccw_crw_region.
 
-We maybe need to pad it up (leave it unpacked)? Eric, what do you think?
+So things aren't going to work if you have a fixed PFN
+which is the case of the hardware device.
 
-> +
-> +	if (!vfio_ccw_crw_region) {
-> +		ret = -ENOMEM;
-> +		goto out_err;
-> +	}
-> +
->  	isc_register(VFIO_CCW_ISC);
->  	ret = css_driver_register(&vfio_ccw_sch_driver);
->  	if (ret) {
 
-(...)
-
-> diff --git a/include/uapi/linux/vfio_ccw.h b/include/uapi/linux/vfio_ccw.h
-> index 758bf214898d..cff5076586df 100644
-> --- a/include/uapi/linux/vfio_ccw.h
-> +++ b/include/uapi/linux/vfio_ccw.h
-> @@ -44,4 +44,12 @@ struct ccw_schib_region {
->  	__u8 schib_area[SCHIB_AREA_SIZE];
->  } __packed;
->  
-> +/*
-> + * Used for returning a Channel Report Word to userspace.
-> + * Note: this is controlled by a capability
-> + */
-> +struct ccw_crw_region {
-> +	__u32 crw;
-> +} __packed;
-> +
->  #endif
+> 
+> > 
+> > 
+> > 
 
