@@ -2,101 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 009561ED126
-	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 15:48:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71D621ED17D
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 15:53:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725904AbgFCNsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 09:48:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49982 "EHLO
+        id S1726054AbgFCNww (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 09:52:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725834AbgFCNsM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jun 2020 09:48:12 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC7CC08C5C1
-        for <kvm@vger.kernel.org>; Wed,  3 Jun 2020 06:48:10 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id z9so2766036ljh.13
-        for <kvm@vger.kernel.org>; Wed, 03 Jun 2020 06:48:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
-        bh=H8rDQEJouwBJIElP/Vpqq+PrvTZxQQy2H7A/MvyMMB0=;
-        b=fcNX/6Sjh7rU2O1UCOh4ihlg1W/5qFT7wWlqVV4Opr4jP3xjrSRb/ngX/d+kJhLtse
-         4TZP5y670shGLb0KkuCfd3AVFnRbT2Kp9VnzFXoyQEbfPZAnWM2XjzF/IoZLOme4TXAn
-         p2Rqy6hs1PflYjQmb9eOji5xJ8FR1zKe/9atsIHSg12ziXN/CLU5iYiLtUltk7388blA
-         aLeRMcuvUn3hoJx4QESnNWkoKg/5EeqR3ljSZ597Vd9rqeAB2Z9hRoTmjMY9RGaTXioi
-         hnc+UJF0jSABnkK1fLsHR0Ti7pwC6fEdf6+A1ZLdStwCCXMew8waD/a8FXN0G954JBXr
-         StnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to;
-        bh=H8rDQEJouwBJIElP/Vpqq+PrvTZxQQy2H7A/MvyMMB0=;
-        b=SnJ5E9nkdOTBKY8yAmvL+X7mNb79YlhYZ+1PaZ78F02wa+SMTDFUGmpcR39xEbB/2d
-         1g1rX6Zx6hiQohKRS1O08a4hg2vnmOwmTOr+jo/YtsSV0zH7E/Xi3TsneGWtEOXJizHQ
-         B6DzHFphQ0tznZ1sq+ewutQb00HcVC/ul7s4qKusiGYVpDFlxz+ytulyuEHG1KRcaSOc
-         3yV2qqU+kncbdhIKewwdMqBhxJV7EmxZ6WzaUlOB57WPvW6iG98pD1AARdyINwAKZvVj
-         TUtd9J5eN9s/c2bwysNEmtRcpBByNEi4k+e5YV5sK3t5hwC8aLjPUlYPGFKlldNOSfi9
-         5JYQ==
-X-Gm-Message-State: AOAM532aq9sTuCtAMX1eyqn22aJ5xe3z9olAKSY3XLQtoNte3eLeNeux
-        VPqGRBFowsbvD1aj1mH0F/IMkOKS9xDo8ppsKpY=
-X-Google-Smtp-Source: ABdhPJyRwX6SVTRhQyaIk7xhIxBFsD6OwK3M/xjeG9BB3QnMjdocaohPz5+FBeMcToQ9vWwyk6mmFnHMNsCaEowkqWM=
-X-Received: by 2002:a05:651c:338:: with SMTP id b24mr268281ljp.87.1591192088884;
- Wed, 03 Jun 2020 06:48:08 -0700 (PDT)
+        with ESMTP id S1725882AbgFCNww (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 09:52:52 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093A9C08C5C0;
+        Wed,  3 Jun 2020 06:52:52 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0b2300fc641046fe5d6605.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:2300:fc64:1046:fe5d:6605])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 564F01EC0391;
+        Wed,  3 Jun 2020 15:52:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1591192370;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=tupcOtxWYMxyJ3y62hq5YRNljYinVUxG6t+SPocYtUQ=;
+        b=bVSWSttxu5jfvdmiza7JUElW6ZgnEDEy503L18klnvJDHBqAFLRKLFLorzo3l9JD3hE/AG
+        JcBY5Xtx0hjaYuLe7GgEYnJBNH24lEGSm0BzmVbrGeL0PSW7+S9wgK6hN2JWEA0WFLJW+W
+        eMhJ0O4gIFfAOJ9bu9emst5EStRHHLE=
+Date:   Wed, 3 Jun 2020 15:52:44 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 75/75] x86/efi: Add GHCB mappings when SEV-ES is active
+Message-ID: <20200603135244.GD19711@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-76-joro@8bytes.org>
 MIME-Version: 1.0
-Reply-To: susanjones.wife@gmail.com
-Received: by 2002:a19:a405:0:0:0:0:0 with HTTP; Wed, 3 Jun 2020 06:48:08 -0700 (PDT)
-From:   "Mrs.Susan Jones" <joneswife.susan@gmail.com>
-Date:   Wed, 3 Jun 2020 14:48:08 +0100
-X-Google-Sender-Auth: iJVkikTeapv9R2l4KGAJ6MvicS8
-Message-ID: <CALBhdBcPuo6FTja=Wj1Yhm7vjwzrr+QQsd+dhTh3et9Ld6MR2A@mail.gmail.com>
-Subject: HELLO: I AM MRS SUSAN JONES
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200428151725.31091-76-joro@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Apr 28, 2020 at 05:17:25PM +0200, Joerg Roedel wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Calling down to EFI runtime services can result in the firmware performing
+> VMGEXIT calls. The firmware is likely to use the GHCB of the OS (e.g., for
+> setting EFI variables), so each GHCB in the system needs to be identity
+> mapped in the EFI page tables, as unencrypted, to avoid page faults.
+
+...
+
+> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
+> index eef6e2196ef4..3b62714723b5 100644
+> --- a/arch/x86/kernel/sev-es.c
+> +++ b/arch/x86/kernel/sev-es.c
+> @@ -422,6 +422,31 @@ int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
+>  	return 0;
+>  }
+>  
+
+Trusting the firmware is never a good decision but we've established on
+IRC that *this* firmware is in OVMF and is going to be part of the guest
+measurement so if there's trouble we can always fix it, as opposed to
+the actual firmware in the chip.
+
+Please add some blurb above this function about it so that it is clear
+what kind of EFI firmware it is about here.
+
+> +int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
+> +{
+> +	struct sev_es_runtime_data *data;
+> +	unsigned long address, pflags;
+> +	int cpu;
+> +	u64 pfn;
+> +
+> +	if (!sev_es_active())
+> +		return 0;
+> +
+> +	pflags = _PAGE_NX | _PAGE_RW;
+> +
+> +	for_each_possible_cpu(cpu) {
+> +		data = per_cpu(runtime_data, cpu);
+> +
+> +		address = __pa(&data->ghcb_page);
+> +		pfn = address >> PAGE_SHIFT;
+> +
+> +		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags))
+> +			return 1;
+> +	}
+> +
+> +	return 0;
+> +}
+
+Thx.
+
 -- 
-OUR GOLDEN OPPORTUNITY
+Regards/Gruss,
+    Boris.
 
-Hello Dear Friend,
-
-Complement of the day, i hope you are doing great today. However, I am
-Mrs.Susan Jones, an auditor with one of the new generation banks here
-in Burkina Faso.
-
-I am writing you this letter based on the latest development at my
-Department. i discovered some abandoned huge amount of money, Ten
-Million, Five hundred thousand  United States Dollars.($10.500.000).
-Now I am only contacting you as a foreigner because this money cannot
-be approved to a local bank account here, but can only be approved to
-any foreign account and foreign beneficiary because the money is in US
-dollars
-
-This will be  a legitimate transaction once you accept to build trust
-with me and follow simple instruction doing the transfer process,
-until the total sum transfer out of the bank here to your own bank
-account any where in the world, and I agreed to share the total money
-50/50 with you once you successful confirmed it in your bank account.
-But any expenses doing the transfer process will be deduct from the
-amount before sharing, If you are interested to work with me and
-provide a good receiving bank account, get back to me as soon as
-possible with the following details below.
-
-Your full name
-Your Profession
-Your direct mobile phone number
-Your Scanned International passport or any of your identity
-
-NOTE: PLEASE IT YOU ARE NOT INTERESTED DON'T BORDER TO RESPOND BACK TO
-AVOID TIME WASTED.
-
-As soon as I receive these data's, I will forward to you the
-application form which you will send to the bank for the claim and
-transfer of the fund into your bank account as the  new beneficial.
-
-I am waiting to hear from you soon
-
-Yours
-Mrs.Susan Jones
+https://people.kernel.org/tglx/notes-about-netiquette
