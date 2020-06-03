@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 619DA1ED287
-	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 16:51:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AF6B1ED289
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 16:51:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726558AbgFCOvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 10:51:02 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50280 "EHLO
+        id S1726771AbgFCOvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 10:51:06 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23141 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726636AbgFCOvB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Jun 2020 10:51:01 -0400
+        by vger.kernel.org with ESMTP id S1726636AbgFCOvE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Jun 2020 10:51:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591195860;
+        s=mimecast20190719; t=1591195862;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=x+fp0WxE0UpolDsMkUts/isrPy8C9jhd9TnRkt6Trl4=;
-        b=hpwQU3s+KsWGCdGCBq/LjE9lF/gOhcBgHRy6q5l9ipRou9L/QxmmbVaUyXqgBUMhl0x63E
-        /iZR3ENlT+2sw1HJlFvViPPyiDxpm+mIRVd6uPJ5IhGunJdFK2bpdRw4H+plHVfuD0/GI+
-        KtVerx8rTWM8Qu1C8kjD5D/xZwtVWSk=
+        bh=kBYEFdYdkABkg9+O7p8/xUrnUZ/fh19orpc9DCmzgVw=;
+        b=jB/b5egxJ8sGH+XRP1qT/7I3OpJMTVuvOPAGMcecBszcc0jwgU3+VRFAt5jJTy5WeWRAUC
+        9Ot0zEEJ1ZIW6kQ1tWWCs/5b5C7CpgAcNJHucb7vdyTSrAcMpuktHI8glCrSz/FVSrVEc9
+        54EN8YD95puSuNAKODksH0tn/Z55pf8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-9cNRuEqqNJyTeWRj5bPdhw-1; Wed, 03 Jun 2020 10:50:56 -0400
-X-MC-Unique: 9cNRuEqqNJyTeWRj5bPdhw-1
+ us-mta-348-W4LMdl8jM7GNXFt5acYupw-1; Wed, 03 Jun 2020 10:50:58 -0400
+X-MC-Unique: W4LMdl8jM7GNXFt5acYupw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E6C0461;
-        Wed,  3 Jun 2020 14:50:55 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 856BB835B41;
+        Wed,  3 Jun 2020 14:50:57 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-192.ams2.redhat.com [10.36.113.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 81EAC5D9CD;
-        Wed,  3 Jun 2020 14:50:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A907D5D9CD;
+        Wed,  3 Jun 2020 14:50:55 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -42,9 +42,9 @@ Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         David Hildenbrand <david@redhat.com>
-Subject: [PATCH v3 19/20] virtio-mem: Add trace events
-Date:   Wed,  3 Jun 2020 16:49:13 +0200
-Message-Id: <20200603144914.41645-20-david@redhat.com>
+Subject: [PATCH v3 20/20] virtio-mem: Exclude unplugged memory during migration
+Date:   Wed,  3 Jun 2020 16:49:14 +0200
+Message-Id: <20200603144914.41645-21-david@redhat.com>
 In-Reply-To: <20200603144914.41645-1-david@redhat.com>
 References: <20200603144914.41645-1-david@redhat.com>
 MIME-Version: 1.0
@@ -55,111 +55,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's add some trace events that might come in handy later.
+The content of unplugged memory is undefined and should not be migrated,
+ever. Exclude all unplugged memory during precopy using the precopy notifier
+infrastructure introduced for free page hinting in virtio-balloon.
+
+Unplugged memory is marked as "not dirty", meaning it won't be
+considered for migration.
 
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/trace-events | 10 ++++++++++
- hw/virtio/virtio-mem.c | 10 +++++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-mem.c         | 54 +++++++++++++++++++++++++++++++++-
+ include/hw/virtio/virtio-mem.h |  3 ++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index e83500bee9..c40ad5ea27 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -73,3 +73,13 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
- virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
-+
-+# virtio-mem.c
-+virtio_mem_send_response(uint16_t type) "type=%" PRIu16
-+virtio_mem_plug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
-+virtio_mem_unplug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
-+virtio_mem_unplugged_all(void) ""
-+virtio_mem_unplug_all_request(void) ""
-+virtio_mem_resized_usable_region(uint64_t old_size, uint64_t new_size) "old_size=0x%" PRIx64 "new_size=0x%" PRIx64
-+virtio_mem_state_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
-+virtio_mem_state_response(uint16_t state) "state=%" PRIu16
 diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index 158215613c..4d0a2e78c0 100644
+index 4d0a2e78c0..e278b213e2 100644
 --- a/hw/virtio/virtio-mem.c
 +++ b/hw/virtio/virtio-mem.c
-@@ -30,6 +30,7 @@
- #include "hw/boards.h"
- #include "hw/qdev-properties.h"
- #include "config-devices.h"
-+#include "trace.h"
- 
- /*
-  * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
-@@ -100,6 +101,7 @@ static void virtio_mem_send_response(VirtIOMEM *vmem, VirtQueueElement *elem,
-     VirtIODevice *vdev = VIRTIO_DEVICE(vmem);
-     VirtQueue *vq = vmem->vq;
- 
-+    trace_virtio_mem_send_response(le16_to_cpu(resp->type));
-     iov_from_buf(elem->in_sg, elem->in_num, 0, resp, sizeof(*resp));
- 
-     virtqueue_push(vq, elem, sizeof(*resp));
-@@ -195,6 +197,7 @@ static void virtio_mem_plug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-     const uint16_t nb_blocks = le16_to_cpu(req->u.plug.nb_blocks);
-     uint16_t type;
- 
-+    trace_virtio_mem_plug_request(gpa, nb_blocks);
-     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, true);
-     virtio_mem_send_response_simple(vmem, elem, type);
- }
-@@ -206,6 +209,7 @@ static void virtio_mem_unplug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-     const uint16_t nb_blocks = le16_to_cpu(req->u.unplug.nb_blocks);
-     uint16_t type;
- 
-+    trace_virtio_mem_unplug_request(gpa, nb_blocks);
-     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, false);
-     virtio_mem_send_response_simple(vmem, elem, type);
- }
-@@ -225,6 +229,7 @@ static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
-         return;
-     }
- 
-+    trace_virtio_mem_resized_usable_region(vmem->usable_region_size, newsize);
-     vmem->usable_region_size = newsize;
+@@ -62,8 +62,14 @@ static bool virtio_mem_is_busy(void)
+     /*
+      * Postcopy cannot handle concurrent discards and we don't want to migrate
+      * pages on-demand with stale content when plugging new blocks.
++     *
++     * For precopy, we don't want unplugged blocks in our migration stream, and
++     * when plugging new blocks, the page content might differ between source
++     * and destination (observable by the guest when not initializing pages
++     * after plugging them) until we're running on the destination (as we didn't
++     * migrate these blocks when they were unplugged).
+      */
+-    return migration_in_incoming_postcopy();
++    return migration_in_incoming_postcopy() || !migration_is_idle();
  }
  
-@@ -247,7 +252,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
-         vmem->size = 0;
-         notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
-     }
--
-+    trace_virtio_mem_unplugged_all();
-     virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
-     return 0;
+ static bool virtio_mem_test_bitmap(VirtIOMEM *vmem, uint64_t start_gpa,
+@@ -475,6 +481,7 @@ static void virtio_mem_device_realize(DeviceState *dev, Error **errp)
+     host_memory_backend_set_mapped(vmem->memdev, true);
+     vmstate_register_ram(&vmem->memdev->mr, DEVICE(vmem));
+     qemu_register_reset(virtio_mem_system_reset, vmem);
++    precopy_add_notifier(&vmem->precopy_notifier);
  }
-@@ -255,6 +260,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
- static void virtio_mem_unplug_all_request(VirtIOMEM *vmem,
-                                           VirtQueueElement *elem)
+ 
+ static void virtio_mem_device_unrealize(DeviceState *dev)
+@@ -482,6 +489,7 @@ static void virtio_mem_device_unrealize(DeviceState *dev)
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VirtIOMEM *vmem = VIRTIO_MEM(dev);
+ 
++    precopy_remove_notifier(&vmem->precopy_notifier);
+     qemu_unregister_reset(virtio_mem_system_reset, vmem);
+     vmstate_unregister_ram(&vmem->memdev->mr, DEVICE(vmem));
+     host_memory_backend_set_mapped(vmem->memdev, false);
+@@ -760,12 +768,56 @@ static void virtio_mem_set_block_size(Object *obj, Visitor *v, const char *name,
+     vmem->block_size = value;
+ }
+ 
++static void virtio_mem_precopy_exclude_unplugged(VirtIOMEM *vmem)
++{
++    void * const host = qemu_ram_get_host_addr(vmem->memdev->mr.ram_block);
++    unsigned long first_zero_bit, last_zero_bit;
++    uint64_t offset, length;
++
++    /*
++     * Find consecutive unplugged blocks and exclude them from migration.
++     *
++     * Note: Blocks cannot get (un)plugged during precopy, no locking needed.
++     */
++    first_zero_bit = find_first_zero_bit(vmem->bitmap, vmem->bitmap_size);
++    while (first_zero_bit < vmem->bitmap_size) {
++        offset = first_zero_bit * vmem->block_size;
++        last_zero_bit = find_next_bit(vmem->bitmap, vmem->bitmap_size,
++                                      first_zero_bit + 1) - 1;
++        length = (last_zero_bit - first_zero_bit + 1) * vmem->block_size;
++
++        qemu_guest_free_page_hint(host + offset, length);
++        first_zero_bit = find_next_zero_bit(vmem->bitmap, vmem->bitmap_size,
++                                            last_zero_bit + 2);
++    }
++}
++
++static int virtio_mem_precopy_notify(NotifierWithReturn *n, void *data)
++{
++    VirtIOMEM *vmem = container_of(n, VirtIOMEM, precopy_notifier);
++    PrecopyNotifyData *pnd = data;
++
++    switch (pnd->reason) {
++    case PRECOPY_NOTIFY_SETUP:
++        precopy_enable_free_page_optimization();
++        break;
++    case PRECOPY_NOTIFY_AFTER_BITMAP_SYNC:
++        virtio_mem_precopy_exclude_unplugged(vmem);
++        break;
++    default:
++        break;
++    }
++
++    return 0;
++}
++
+ static void virtio_mem_instance_init(Object *obj)
  {
-+    trace_virtio_mem_unplug_all_request();
-     if (virtio_mem_unplug_all(vmem)) {
-         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_BUSY);
-     } else {
-@@ -272,6 +278,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-         .type = cpu_to_le16(VIRTIO_MEM_RESP_ACK),
-     };
+     VirtIOMEM *vmem = VIRTIO_MEM(obj);
  
-+    trace_virtio_mem_state_request(gpa, nb_blocks);
-     if (!virtio_mem_valid_range(vmem, gpa, size)) {
-         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ERROR);
-         return;
-@@ -284,6 +291,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
-     } else {
-         resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_MIXED);
-     }
-+    trace_virtio_mem_state_response(le16_to_cpu(resp.u.state.state));
-     virtio_mem_send_response(vmem, elem, &resp);
- }
+     vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
+     notifier_list_init(&vmem->size_change_notifiers);
++    vmem->precopy_notifier.notify = virtio_mem_precopy_notify;
  
+     object_property_add(obj, VIRTIO_MEM_SIZE_PROP, "size", virtio_mem_get_size,
+                         NULL, NULL, NULL);
+diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
+index 408a6ede50..ddb3822375 100644
+--- a/include/hw/virtio/virtio-mem.h
++++ b/include/hw/virtio/virtio-mem.h
+@@ -67,6 +67,9 @@ typedef struct VirtIOMEM {
+ 
+     /* notifiers to notify when "size" changes */
+     NotifierList size_change_notifiers;
++
++    /* don't migrate unplugged memory */
++    NotifierWithReturn precopy_notifier;
+ } VirtIOMEM;
+ 
+ typedef struct VirtIOMEMClass {
 -- 
 2.25.4
 
