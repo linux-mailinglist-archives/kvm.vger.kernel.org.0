@@ -2,137 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F9271ECD39
-	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 12:11:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 536921ECDA9
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 12:36:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbgFCKK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 06:10:26 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:34841 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725881AbgFCKK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jun 2020 06:10:26 -0400
-Received: by mail-lf1-f65.google.com with SMTP id 82so956256lfh.2;
-        Wed, 03 Jun 2020 03:10:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=VJQBChCpqVmScxIVsRE/tzoYaBw5y+ElxuBAFpFZSx4=;
-        b=gOeRpZGYaA4iy2YeApF4AKUMhmEYQCHIUdxJVaBNm4vI04v8b9l/r4wQOFJNRLI+eT
-         meEivp30PWxYMup3xoELC3FEZX2MLQu7htyNtQnLowM5Z05rz1Sso0YYXrU6Z2nDAq5i
-         PdtE/JljFojeMxX+G+JzHdsi2zH8HSciRE9vFwydVjEg3VRovPwLr6uarsMhAxSptFfB
-         vOIycKfYcwA9R1h/LHKnYp8IPsJ5qLA8kG7mqv2LqToiWIXknVac45JMXmci8hSdKNg/
-         K9v/sJ1ULASmJRuXqt6prqk60ZhcIGKDaLNnnpFFAk/NyyCLGTlOyT2OqXkblaaw0S23
-         LDxA==
-X-Gm-Message-State: AOAM530vPHsFiGnkz3CZrbmni8KQfOraN8DoY7s599bWgvPKcyKyDkyj
-        k8wXk7Z/wspq4inF9/6hzs8=
-X-Google-Smtp-Source: ABdhPJzbHpX6SdFHdCuPksS1gYu3+YX8RbNf4MpiT/293QxC9qClinHQc5NeGx+pAE+5VR6t9NaeGQ==
-X-Received: by 2002:ac2:5604:: with SMTP id v4mr2125245lfd.124.1591179022502;
-        Wed, 03 Jun 2020 03:10:22 -0700 (PDT)
-Received: from localhost.localdomain (broadband-37-110-38-130.ip.moscow.rt.ru. [37.110.38.130])
-        by smtp.googlemail.com with ESMTPSA id c4sm346896lja.56.2020.06.03.03.10.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jun 2020 03:10:21 -0700 (PDT)
-From:   Denis Efremov <efremov@linux.com>
+        id S1725884AbgFCKgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 06:36:25 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:53306 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725836AbgFCKgY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 06:36:24 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 053AWuSj184485;
+        Wed, 3 Jun 2020 10:36:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=82u63JacQ047l8DYs93FI4u9B2eDvAWbxc7OeJ2RYgk=;
+ b=GDSlU/j9oaCG+Iso3O0iFDW6t6sz2lGLF9jCy0uHfDBn/K1cOrzILOtW3a0jyFEnALF0
+ 71lWUugENnfVKXONGHu3lr/0TY2x+9AP7e4u0Xo04GsxNN0TnJ+T2iJMSN+RtCx5gmIB
+ 4MFcvhre/0ZHv8h3+jyTc09on9TUR9pOULhHgeGfHiX0qMH8fH1Bxqtq1Z1rat/t8Ymq
+ nb4wReywCwIWTE3kCMlJmxhuD/V1ixi7WHuOczvyyyR7FmvtB663Zqtf6KOuLYfYwZnI
+ 4XebdBii3AZMrfa4MIuiSYizKOnFtyRVyaE9+RUUYyncBux26WfIpQDSSzOHCENws9DN sw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 31bewr0mc9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 03 Jun 2020 10:36:21 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 053AS2uL126793;
+        Wed, 3 Jun 2020 10:34:21 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 31c25rqy3q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 03 Jun 2020 10:34:21 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 053AYKBu018206;
+        Wed, 3 Jun 2020 10:34:20 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 03 Jun 2020 03:34:20 -0700
+Date:   Wed, 3 Jun 2020 13:34:15 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
 To:     pbonzini@redhat.com
-Cc:     Denis Efremov <efremov@linux.com>, joe@perches.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: Use vmemdup_user()
-Date:   Wed,  3 Jun 2020 13:11:31 +0300
-Message-Id: <20200603101131.2107303-1-efremov@linux.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <0c00d96c46d34d69f5f459baebf3c89a507730fc.camel@perches.com>
-References: <0c00d96c46d34d69f5f459baebf3c89a507730fc.camel@perches.com>
+Cc:     kvm@vger.kernel.org
+Subject: [bug report] KVM: x86: enable event window in inject_pending_event
+Message-ID: <20200603103415.GC1845750@mwanda>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=3 spamscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=806
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006030082
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9640 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 bulkscore=0
+ phishscore=0 suspectscore=3 impostorscore=0 cotscore=-2147483648
+ lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=840
+ malwarescore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006030082
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace opencoded alloc and copy with vmemdup_user().
+Hello Paolo Bonzini,
 
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
-Looks like these are the only places in KVM that are suitable for
-vmemdup_user().
+The patch c9d40913ac5a: "KVM: x86: enable event window in
+inject_pending_event" from May 22, 2020, leads to the following
+static checker warning:
 
- arch/x86/kvm/cpuid.c | 17 +++++++----------
- virt/kvm/kvm_main.c  | 19 ++++++++-----------
- 2 files changed, 15 insertions(+), 21 deletions(-)
+	arch/x86/kvm/x86.c:10530 kvm_can_do_async_pf()
+	warn: signedness bug returning '(-16)'
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 901cd1fdecd9..27438a2bdb62 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -182,17 +182,14 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
- 	r = -E2BIG;
- 	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
- 		goto out;
--	r = -ENOMEM;
- 	if (cpuid->nent) {
--		cpuid_entries =
--			vmalloc(array_size(sizeof(struct kvm_cpuid_entry),
--					   cpuid->nent));
--		if (!cpuid_entries)
--			goto out;
--		r = -EFAULT;
--		if (copy_from_user(cpuid_entries, entries,
--				   cpuid->nent * sizeof(struct kvm_cpuid_entry)))
-+		cpuid_entries = vmemdup_user(entries,
-+					     array_size(sizeof(struct kvm_cpuid_entry),
-+							cpuid->nent));
-+		if (IS_ERR(cpuid_entries)) {
-+			r = PTR_ERR(cpuid_entries);
- 			goto out;
-+		}
- 	}
- 	for (i = 0; i < cpuid->nent; i++) {
- 		vcpu->arch.cpuid_entries[i].function = cpuid_entries[i].function;
-@@ -212,8 +209,8 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
- 	kvm_x86_ops.cpuid_update(vcpu);
- 	r = kvm_update_cpuid(vcpu);
- 
-+	kvfree(cpuid_entries);
- out:
--	vfree(cpuid_entries);
- 	return r;
- }
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 731c1e517716..46a3743e95ff 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3722,21 +3722,18 @@ static long kvm_vm_ioctl(struct file *filp,
- 		if (routing.flags)
- 			goto out;
- 		if (routing.nr) {
--			r = -ENOMEM;
--			entries = vmalloc(array_size(sizeof(*entries),
--						     routing.nr));
--			if (!entries)
--				goto out;
--			r = -EFAULT;
- 			urouting = argp;
--			if (copy_from_user(entries, urouting->entries,
--					   routing.nr * sizeof(*entries)))
--				goto out_free_irq_routing;
-+			entries = vmemdup_user(urouting->entries,
-+					       array_size(sizeof(*entries),
-+							  routing.nr));
-+			if (IS_ERR(entries)) {
-+				r = PTR_ERR(entries);
-+				goto out;
-+			}
- 		}
- 		r = kvm_set_irq_routing(kvm, entries, routing.nr,
- 					routing.flags);
--out_free_irq_routing:
--		vfree(entries);
-+		kvfree(entries);
- 		break;
- 	}
- #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
--- 
-2.26.2
+arch/x86/kvm/x86.c
+ 10516  bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+ 10517  {
+ 10518          if (unlikely(!lapic_in_kernel(vcpu) ||
+ 10519                       kvm_event_needs_reinjection(vcpu) ||
+ 10520                       vcpu->arch.exception.pending))
+ 10521                  return false;
+ 10522  
+ 10523          if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
+ 10524                  return false;
+ 10525  
+ 10526          /*
+ 10527           * If interrupts are off we cannot even use an artificial
+ 10528           * halt state.
+ 10529           */
+ 10530          return kvm_arch_interrupt_allowed(vcpu);
+ 10531  }
 
+The svm_nmi_allowed() used to return false because interrupts aren't
+allowed but now it returns -EBUSY so it returns true/allowed.
+
+regards,
+dan carpenter
