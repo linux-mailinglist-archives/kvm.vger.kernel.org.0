@@ -2,113 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E80B11ED8F3
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 01:07:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E50D1ED9AB
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 01:57:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726239AbgFCXHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 19:07:17 -0400
-Received: from mga05.intel.com ([192.55.52.43]:57581 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725876AbgFCXHR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jun 2020 19:07:17 -0400
-IronPort-SDR: 7wrL/6neXPBUwswJEbQByCUAE6LfZEdks5kpP3/ut0OinZH2O1EtzUe9INiev1CWhbFsBQWe60
- U6sjKjx5rgmQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2020 16:07:16 -0700
-IronPort-SDR: 9vgjozx/oRvfwuPeSTLMZum356iRJhNe/DrZ/MBqnUU3vFsurtA0Q5wtboYcgXlyglaP+MZ8SD
- SBq1OTh5oacw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,470,1583222400"; 
-   d="scan'208";a="445286783"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga005.jf.intel.com with ESMTP; 03 Jun 2020 16:07:16 -0700
-Date:   Wed, 3 Jun 2020 16:07:16 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
- exceptions
-Message-ID: <20200603230716.GD25606@linux.intel.com>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-26-joro@8bytes.org>
- <20200520062055.GA17090@linux.intel.com>
- <20200603142325.GB23071@8bytes.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200603142325.GB23071@8bytes.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1726312AbgFCX4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 19:56:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59372 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725821AbgFCX4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 19:56:34 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D3B9C08C5C0
+        for <kvm@vger.kernel.org>; Wed,  3 Jun 2020 16:56:34 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id f1so5789838ybg.22
+        for <kvm@vger.kernel.org>; Wed, 03 Jun 2020 16:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=EsZQLrQJSyQkCuychfLvZShzcqdD0cO40o8NeAVTCg4=;
+        b=uwolmXfgFAS8XqOUCJRYeSP9tBcD28EZGy7cE87FemkA03JAewLvSs+O7ERJhNgV/i
+         ER/QP0m/V7fUbP1CeSoT40APWPH0VVBhpvM/00MoWlU+/sZHs97Rdhos0U0+MAKD2FZQ
+         eaeFbBfDV+ov2uhmYuAa3RC1KOQO10VK9Z2gSU/SM6715/5v74cymoNBGLu5MAxhT/pL
+         btGyxK1JOLPJBAIi9aNaRk84hsFB8ErULC6FoELzxdJBA8MjC/e2p44JTnB8Ugfrp0tU
+         3/ZBs1C9Vo89vxV7jkcpU0xkGS1BX1x0FdpdMqMmu7ZcuT036Um6yJbZBv7ZYs9uASIL
+         jS1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=EsZQLrQJSyQkCuychfLvZShzcqdD0cO40o8NeAVTCg4=;
+        b=fuere1eeHEuO49IsKgUjdnIq7hqn3fPhTWrPRYPy41tVnLucUccgPZ1r1vQOeFaiaE
+         o7Ix7QeyLpTKDacS1YmaUsesALuGkL4h2gwtiZ0L3374ml8zx4JBRgI2WmeyLWxpiY7l
+         ge9kULLM4S/Mwv4iqClILVvkEOLEp+VwNEdjHWYx++RPhwlYUoDUEYMd+AqYAIgJG7/U
+         r/x+wahuJQRJWD8qNxkOG0fEQxp8poAflPiHnjwOEttpRaxtBzGxId3jVxIndZXm3vuW
+         t5ZwX0d/Lr+o/kVkWX6YKdTPVPjSAI+jjwJ/RznitP3iM+MVrYHaQ0cl2ImC3hnfN81X
+         Q0ug==
+X-Gm-Message-State: AOAM532l/ex9wonVostK2fl2DFHj6aGJX5eT/K0yT9KWYxmvFEIetoLr
+        GykqEnrorxLJ7/fG3Oedy20dYZtq6214t0YR6yptOukn/OpcH+n7iYDghcwXnOFWwug4Syd+98R
+        kCSI8zJc/IPG7N0n3IqKvEWd+eI6vcFMC5AHaqa3Q/9+LwNP5i+SkK4FHlwibrbk=
+X-Google-Smtp-Source: ABdhPJxno+nOSexygeYoHCLZ4k6gWIvEg51BNYbMvry31Jignjp1TjgK1HkFAPJyFXj47wxAVi/xFKLoXXf8qA==
+X-Received: by 2002:a25:99c8:: with SMTP id q8mr3822487ybo.3.1591228593204;
+ Wed, 03 Jun 2020 16:56:33 -0700 (PDT)
+Date:   Wed,  3 Jun 2020 16:56:17 -0700
+Message-Id: <20200603235623.245638-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.rc2.251.g90737beb825-goog
+Subject: [PATCH v4 0/6] Add logical CPU to KVM_EXIT_FAIL_ENTRY info
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Liran Alon <liran.alon@oracle.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 04:23:25PM +0200, Joerg Roedel wrote:
-> > > +		 */
-> > > +		io_bytes   = (exit_info_1 >> 4) & 0x7;
-> > > +		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
-> > > +
-> > > +		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
-> > > +		exit_info_2 = min(op_count, ghcb_count);
-> > > +		exit_bytes  = exit_info_2 * io_bytes;
-> > > +
-> > > +		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
-> > > +
-> > > +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-> > > +			ret = vc_insn_string_read(ctxt,
-> > > +					       (void *)(es_base + regs->si),
-> > 
-> > SEV(-ES) is 64-bit only, why bother with the es_base charade?
-> 
-> User-space can also cause IOIO #VC exceptions, and user-space can be
-> 32-bit legacy code with segments, so es_base has to be taken into
-> account.
+It's been about 6 months since v2. Sorry for the delay. Initially, this
+was a single patch to add information to KVM_EXIT_FAIL_ENTRY to help
+identify a defective CPU. It has gotten a little more complicated,
+since Peter Shier pointed out that the vCPU thread may have migrated
+between the time of failure and the KVM exit. Fortunately, the SEV folks
+started to make the necessary information available with "last_cpu," but
+only on AMD and only with SEV. The current version expands upon that by
+making "last_cpu" available in all configurations on AMD and Intel.
 
-Is there actually a use case for this?  Exposing port IO to userspace
-doesn't exactly improve security.
+v2: Use vcpu->cpu rather than raw_smp_processor_id() (Liran).
+v3: Record the last logical processor to run the vCPU thread (Peter).
+    Add the "last CPU" information to KVM_EXIT_INTERNAL_ERROR exits as
+    well as KVM_EXIT_FAIL_ENTRY [except for "EMULATION" errors].
+    (Liran & Paolo).
+v4: Move last_cpu into kvm_vcpu_arch as last_vmentry_cpu, and set this
+    field in vcpu_enter_guest (Sean).
 
-Given that i386 ABI requires EFLAGS.DF=0 upon function entry/exit, i.e. is
-the de facto default, the DF bug implies this hasn't been tested.  And I
-don't see how this could possibly have worked for SEV given that the kernel
-unrolls string I/O because the VMM can't emulate string I/O.  Presumably
-someone would have complained if they "needed" to run legacy crud.  The
-host and guest obviously need major updates, so supporting e.g. DPDK with
-legacy virtio seems rather silly.
+Jim Mattson (6):
+  kvm: svm: Prefer vcpu->cpu to raw_smp_processor_id()
+  kvm: svm: Always set svm->last_cpu on VMRUN
+  kvm: vmx: Add last_cpu to struct vcpu_vmx
+  kvm: x86: Add "last CPU" to some KVM_EXIT information
+  kvm: x86: Move last_cpu into kvm_vcpu_arch as last_vmentry_cpu
+  kvm: x86: Set last_vmentry_cpu in vcpu_enter_guest
 
-> > > +					       ghcb->shared_buffer, io_bytes,
-> > > +					       exit_info_2, df);
-> > 
-> > df handling is busted, it's aways non-zero.  Same goes for the SI/DI
-> > adjustments below.
-> 
-> Right, this is fixed now.
-> 
-> > Batching the memory accesses and I/O accesses separately is technically
-> > wrong, e.g. a #DB on a memory access will result in bogus data being shown
-> > in the debugger.  In practice it seems unlikely to matter, but I'm curious
-> > as to why string I/O is supported in the first place.  I didn't think there
-> > was that much string I/O in the kernel?
-> 
-> True, #DBs won't be correct anymore. Currently debugging is not
-> supported in SEV-ES guests anyway, but if it is supported the #DB
-> exception would happen in the #VC handler and not on the original
-> instruction.
+ Documentation/virt/kvm/api.rst  |  1 +
+ arch/x86/include/asm/kvm_host.h |  3 +++
+ arch/x86/kvm/svm/sev.c          |  3 +--
+ arch/x86/kvm/svm/svm.c          | 13 ++++++-------
+ arch/x86/kvm/svm/svm.h          |  3 ---
+ arch/x86/kvm/vmx/vmx.c          | 10 ++++++++--
+ arch/x86/kvm/x86.c              |  2 ++
+ include/uapi/linux/kvm.h        |  2 ++
+ 8 files changed, 23 insertions(+), 14 deletions(-)
 
-As in, the guest can't debug itself?  Or the host can't debug the guest?
+-- 
+2.27.0.rc2.251.g90737beb825-goog
+
