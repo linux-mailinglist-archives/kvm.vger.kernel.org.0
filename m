@@ -2,137 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EE951ECE57
-	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 13:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29A3A1ECF6C
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 14:08:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726177AbgFCL1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 07:27:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32665 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726181AbgFCL1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jun 2020 07:27:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591183665;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L/lyKkxVC6Y8WKZnx/wmKwHiUDzCCUkkiJjqsKAZmq8=;
-        b=PG91vXAZS2ze0JlMp2IVyKtEDDTGzSJJXZ3hxWjjZ7KdQpKxrc+L1nAg2TSgOwWPXrxo46
-        1ZRwQI8jyRFe9GvjK9zDP1KHrGi5JKb6alcE09QzEZwzieq5HvRrXD0AIj+mIrEW+UHWO+
-        8YDD4wZcJyKPfxIkeMezxccYdMJ8Ta8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-k_ehfwm9NZCjfDIe3xqcdQ-1; Wed, 03 Jun 2020 07:27:43 -0400
-X-MC-Unique: k_ehfwm9NZCjfDIe3xqcdQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F106C461;
-        Wed,  3 Jun 2020 11:27:41 +0000 (UTC)
-Received: from localhost (ovpn-112-182.ams2.redhat.com [10.36.112.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 949DE579A3;
-        Wed,  3 Jun 2020 11:27:41 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-Subject: [PULL v2 10/10] vfio-ccw: Add trace for CRW event
-Date:   Wed,  3 Jun 2020 13:27:16 +0200
-Message-Id: <20200603112716.332801-11-cohuck@redhat.com>
-In-Reply-To: <20200603112716.332801-1-cohuck@redhat.com>
-References: <20200603112716.332801-1-cohuck@redhat.com>
+        id S1726072AbgFCMHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 08:07:50 -0400
+Received: from ozlabs.org ([203.11.71.1]:37985 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725855AbgFCMHu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 08:07:50 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 49cSN426Smz9sSc; Wed,  3 Jun 2020 22:07:48 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1591186068;
+        bh=/8OHMiJYf9fsWc/S8JvslYN4IuSO+nUpOmIPBciWWek=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=W4s6JcXcU7N66PtMVZVa79cn/fiI8+C+Sgd1/1mTXtHUBUDyWnWGeyHyhcol86/1w
+         xk50FEpRc77mxtIpTFfBKD2GmM/6G+z5VHq0d8VqroZwlTZZTYyFlnpcweHdOgCGCF
+         UYqzp8kUX+OY7xqhRhwckvcGqadancJGeyTbgnCQ=
+Date:   Wed, 3 Jun 2020 20:09:10 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+        mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [RFC v2 10/18] guest memory protection: Add guest memory
+ protection interface
+Message-ID: <20200603100910.GA11091@umbus.fritz.box>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200521034304.340040-11-david@gibson.dropbear.id.au>
+ <20200525122735.1d4a45c7@bahia.lan>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
+Content-Disposition: inline
+In-Reply-To: <20200525122735.1d4a45c7@bahia.lan>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Eric Farman <farman@linux.ibm.com>
 
-Since CRW events are (should be) rare, let's put a trace
-in that routine too.
+--HlL+5n6rz5pIUxbD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20200505122745.53208-9-farman@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- drivers/s390/cio/vfio_ccw_drv.c   |  1 +
- drivers/s390/cio/vfio_ccw_trace.c |  1 +
- drivers/s390/cio/vfio_ccw_trace.h | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 32 insertions(+)
+On Mon, May 25, 2020 at 12:27:35PM +0200, Greg Kurz wrote:
+> On Thu, 21 May 2020 13:42:56 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > Several architectures have mechanisms which are designed to protect gue=
+st
+> > memory from interference or eavesdropping by a compromised hypervisor. =
+ AMD
+> > SEV does this with in-chip memory encryption and Intel has a similar
+> > mechanism.  POWER's Protected Execution Framework (PEF) accomplishes a
+> > similar goal using an ultravisor and new memory protection features,
+> > instead of encryption.
+> >=20
+> > This introduces a new GuestMemoryProtection QOM interface which we'll u=
+se
+> > to (partially) unify handling of these various mechanisms.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  backends/Makefile.objs                 |  2 ++
+> >  backends/guest-memory-protection.c     | 29 +++++++++++++++++++++
+> >  include/exec/guest-memory-protection.h | 36 ++++++++++++++++++++++++++
+> >  3 files changed, 67 insertions(+)
+> >  create mode 100644 backends/guest-memory-protection.c
+> >  create mode 100644 include/exec/guest-memory-protection.h
+> >=20
+> > diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+> > index 28a847cd57..e4fb4f5280 100644
+> > --- a/backends/Makefile.objs
+> > +++ b/backends/Makefile.objs
+> > @@ -21,3 +21,5 @@ common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
+> >  common-obj-$(CONFIG_GIO) +=3D dbus-vmstate.o
+> >  dbus-vmstate.o-cflags =3D $(GIO_CFLAGS)
+> >  dbus-vmstate.o-libs =3D $(GIO_LIBS)
+> > +
+> > +common-obj-y +=3D guest-memory-protection.o
+> > diff --git a/backends/guest-memory-protection.c b/backends/guest-memory=
+-protection.c
+> > new file mode 100644
+> > index 0000000000..7e538214f7
+> > --- /dev/null
+> > +++ b/backends/guest-memory-protection.c
+> > @@ -0,0 +1,29 @@
+> > +#/*
+> > + * QEMU Guest Memory Protection interface
+> > + *
+> > + * Copyright: David Gibson, Red Hat Inc. 2020
+> > + *
+> > + * Authors:
+> > + *  David Gibson <david@gibson.dropbear.id.au>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * later.  See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "exec/guest-memory-protection.h"
+> > +
+> > +static const TypeInfo guest_memory_protection_info =3D {
+> > +    .name =3D TYPE_GUEST_MEMORY_PROTECTION,
+> > +    .parent =3D TYPE_INTERFACE,
+> > +    .class_size =3D sizeof(GuestMemoryProtectionClass),
+> > +};
+> > +
+> > +static void guest_memory_protection_register_types(void)
+> > +{
+> > +    type_register_static(&guest_memory_protection_info);
+> > +}
+> > +
+> > +type_init(guest_memory_protection_register_types)
+> > diff --git a/include/exec/guest-memory-protection.h b/include/exec/gues=
+t-memory-protection.h
+> > new file mode 100644
+> > index 0000000000..38e9b01667
+> > --- /dev/null
+> > +++ b/include/exec/guest-memory-protection.h
+> > @@ -0,0 +1,36 @@
+> > +#/*
+> > + * QEMU Guest Memory Protection interface
+> > + *
+> > + * Copyright: David Gibson, Red Hat Inc. 2020
+> > + *
+> > + * Authors:
+> > + *  David Gibson <david@gibson.dropbear.id.au>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * later.  See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +#ifndef QEMU_GUEST_MEMORY_PROTECTION_H
+> > +#define QEMU_GUEST_MEMORY_PROTECTION_H
+> > +
+> > +#include "qom/object.h"
+> > +
+> > +typedef struct GuestMemoryProtection GuestMemoryProtection;
+> > +
+> > +#define TYPE_GUEST_MEMORY_PROTECTION "guest-memory-protection"
+> > +#define GUEST_MEMORY_PROTECTION(obj)                                  =
+  \
+> > +    INTERFACE_CHECK(GuestMemoryProtection, (obj),                     =
+  \
+> > +                    TYPE_GUEST_MEMORY_PROTECTION)
+> > +#define GUEST_MEMORY_PROTECTION_CLASS(klass)                          =
+  \
+> > +    OBJECT_CLASS_CHECK(GuestMemoryProtectionClass, (klass),           =
+  \
+> > +                       TYPE_GUEST_MEMORY_PROTECTION)
+> > +#define GUEST_MEMORY_PROTECTION_GET_CLASS(obj)                        =
+  \
+> > +    OBJECT_GET_CLASS(GuestMemoryProtectionClass, (obj),               =
+  \
+> > +                     TYPE_GUEST_MEMORY_PROTECTION)
+> > +
+> > +typedef struct GuestMemoryProtectionClass {
+> > +    InterfaceClass parent;
+> > +} GuestMemoryProtectionClass;
+> > +
+> > +#endif /* QEMU_GUEST_MEMORY_PROTECTION_H */
+> > +
+>=20
+> Applying patch #1294935 using "git am -s -m"
+> Description: [RFC,v2,10/18] guest memory protection: Add guest memory pro=
+tection
+> Applying: guest memory protection: Add guest memory protection interface
+> .git/rebase-apply/patch:95: new blank line at EOF.
+> +
+> warning: 1 line adds whitespace errors.
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 9144360851ed..8c625b530035 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -336,6 +336,7 @@ static int vfio_ccw_chp_event(struct subchannel *sch,
- 	if (!private || !mask)
- 		return 0;
- 
-+	trace_vfio_ccw_chp_event(private->sch->schid, mask, event);
- 	VFIO_CCW_MSG_EVENT(2, "%pUl (%x.%x.%04x): mask=0x%x event=%d\n",
- 			   mdev_uuid(private->mdev), sch->schid.cssid,
- 			   sch->schid.ssid, sch->schid.sch_no,
-diff --git a/drivers/s390/cio/vfio_ccw_trace.c b/drivers/s390/cio/vfio_ccw_trace.c
-index 8c671d2519f6..4a0205905afc 100644
---- a/drivers/s390/cio/vfio_ccw_trace.c
-+++ b/drivers/s390/cio/vfio_ccw_trace.c
-@@ -9,6 +9,7 @@
- #define CREATE_TRACE_POINTS
- #include "vfio_ccw_trace.h"
- 
-+EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_chp_event);
- EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_async_request);
- EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_event);
- EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_io_request);
-diff --git a/drivers/s390/cio/vfio_ccw_trace.h b/drivers/s390/cio/vfio_ccw_trace.h
-index f5d31887d413..62fb30598d47 100644
---- a/drivers/s390/cio/vfio_ccw_trace.h
-+++ b/drivers/s390/cio/vfio_ccw_trace.h
-@@ -17,6 +17,36 @@
- 
- #include <linux/tracepoint.h>
- 
-+TRACE_EVENT(vfio_ccw_chp_event,
-+	TP_PROTO(struct subchannel_id schid,
-+		 int mask,
-+		 int event),
-+	TP_ARGS(schid, mask, event),
-+
-+	TP_STRUCT__entry(
-+		__field(u8, cssid)
-+		__field(u8, ssid)
-+		__field(u16, sch_no)
-+		__field(int, mask)
-+		__field(int, event)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->cssid = schid.cssid;
-+		__entry->ssid = schid.ssid;
-+		__entry->sch_no = schid.sch_no;
-+		__entry->mask = mask;
-+		__entry->event = event;
-+	),
-+
-+	TP_printk("schid=%x.%x.%04x mask=0x%x event=%d",
-+		  __entry->cssid,
-+		  __entry->ssid,
-+		  __entry->sch_no,
-+		  __entry->mask,
-+		  __entry->event)
-+);
-+
- TRACE_EVENT(vfio_ccw_fsm_async_request,
- 	TP_PROTO(struct subchannel_id schid,
- 		 int command,
--- 
-2.25.4
+Oops, fixed.
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--HlL+5n6rz5pIUxbD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7XdsMACgkQbDjKyiDZ
+s5K/hBAA1/nV1iP+BSJxo3zR4Q52aEImFYxuD6PEoIQ0BQczE0qNK6HW2Uqe4w0H
+PclvgiMHwprTIIiQVQo4vu98mQvhpHTnYVZbjH0ww+oIBponyDA/aHBSNsKvNF76
+ovkfC/nZ11GvHUA1FQzEKvnn4qiU2qv0N6aoKetxHmSUMSCUYomxdGKJOIVxa754
+TMJvR0DuxcmEnY5/1bXah0QN9c4luvP3k7HVOJq5xSvz/4pK47znpvVaT9ZtX+h0
+2Dq4vUWLlCgBKzOD859xLAdA8BdR0Ju8xpRmfdtkJSVQyb1rPprNRQWhi1YKO6SP
+4uRwgRmlynNpVj3/MoWnBYFrXRKTYuAboPZZPf2mCTuErLEv6M4b20ZNvtAt93u+
+4AFKYOweqivywCFdu6aDszC3ja2lwMxxlcc1TBYX/OVzjpPlzghpEEv4h79tgC6o
+cIqde6lNeUxZ1VPScsW7fHsopIOW6ZLZs1vcg2raqqC76zmSek/JltMOmRUabUAj
+7lUjIEgn9EGJZ3kc8KEXPl89H1rjmd4P4EmEkfNfasorEz7HCe6KtoSRCLBSblUx
+iZ30ECn3MMF+Ptu9j9xWr53+Du4ldLOsWQYQjd7e318rhp7XfGFHerLEQachMhoH
+ObHRq66/cP1XsRRcOEPYRxHZ+sFZJoJWDyCilG99tbokuT+OZtM=
+=6G9C
+-----END PGP SIGNATURE-----
+
+--HlL+5n6rz5pIUxbD--
