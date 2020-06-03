@@ -2,107 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F3331ECE40
-	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 13:26:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFA321ECE44
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 13:27:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726026AbgFCLZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 07:25:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29793 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725833AbgFCLZn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Jun 2020 07:25:43 -0400
+        id S1726084AbgFCL10 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 07:27:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45135 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725859AbgFCL1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 07:27:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591183541;
+        s=mimecast20190719; t=1591183643;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5hUqvEypAYJ+EhHqPgdxr7FIiIDs5UzhKV+cTFMQs/o=;
-        b=FVH3nLjmSbbd0HeRYtYW5UmX6HTZtJqYkxRT456IR5O2jPKdC79ofGgqQJyyxDuSpL/RMt
-        NWCw+KQDxd65fyeQdKB1n+50tBmKTzje1i++OuZywx3kr6gjebKRwNDChid00ZZEPdexd6
-        +AWzo5/qwxlQw0Es1aSXDa+mTzSa7Gc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-WE2jn6anPdKfVPNN5jwzTw-1; Wed, 03 Jun 2020 07:25:40 -0400
-X-MC-Unique: WE2jn6anPdKfVPNN5jwzTw-1
-Received: by mail-wm1-f69.google.com with SMTP id l26so760022wmh.3
-        for <kvm@vger.kernel.org>; Wed, 03 Jun 2020 04:25:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5hUqvEypAYJ+EhHqPgdxr7FIiIDs5UzhKV+cTFMQs/o=;
-        b=EZR5MGAur74K0jQrdIcgPgXxjSrAS1kgszgLMRcMky5arbZ0ODfKOK7txg6Zy02wOg
-         igyAP1vA74UvFl+aUCA2pGnGWie498aH97b/fyYGEh0zAaz8FSkUaAq8SHHEtVc2c6LR
-         pWK7Ls+Eog/yw3gGFrXldpD1IGQ9vrdOVzlJCn0FlTqY3Rb1AHlXCDveFcIQyGED53ls
-         Ws41d63/qvZHMuitbMAnBrcCIVzMZrluinf5sFKHdsCGnGsNOvdbMESMmGkl962oWs4o
-         euIEvSWhLyvdlMctfR3byjJKuD+4ypsm0iWVfTLcGZvN5L6dWyByzgn05t2O5X/B91ud
-         W6LQ==
-X-Gm-Message-State: AOAM530P31PlunrmGfwOxZ8g19E9eQxvnJlRP31VbSA6/pxOXX/t2K+a
-        xWfp1Oe2FGi5S44L2gWKeQVhvdFPV1YBoa9pNCKkQGSEV6aGwWEWtF/DqaZbo5weUhsnE+UNucJ
-        PTQIMpAunZIqW
-X-Received: by 2002:a1c:658a:: with SMTP id z132mr8202677wmb.20.1591183539002;
-        Wed, 03 Jun 2020 04:25:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx3aHDNoBHLnPkiU+YgTd1MbOmkx3c/fv7aHCE9L/C62XG6RF9FKzQTZ7qsio+lIYqpmoJeRg==
-X-Received: by 2002:a1c:658a:: with SMTP id z132mr8202664wmb.20.1591183538783;
-        Wed, 03 Jun 2020 04:25:38 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.243.176])
-        by smtp.gmail.com with ESMTPSA id t189sm2549806wma.4.2020.06.03.04.25.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Jun 2020 04:25:38 -0700 (PDT)
-Subject: Re: [bug report] KVM: x86: enable event window in
- inject_pending_event
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     kvm@vger.kernel.org
-References: <20200603103415.GC1845750@mwanda>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6c476bb5-cf85-ddb7-aaf1-0ac290bf9dfa@redhat.com>
-Date:   Wed, 3 Jun 2020 13:25:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0fTj5fQOdgWNycfPO0iTGPBBBLkg3emkFGsb1i6/ZK4=;
+        b=EP6CizpWW09/74EfkS4nN4LamR53jeyPN7STAgBKW/Vyn+BawktYniiWLp2hq8OU0/GLHJ
+        9dHMGMrJNXAKQ1RMKXofbJRsMaRoM8YK5ZU38gd8vkgeYkT1Rt8lJ/EeHiXTfWAsnqG3qS
+        YVglXB/vebOItrLWIZmqJa9eSxjUdnM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-H6ERAEeCNl2Vnse0jAZ4Sw-1; Wed, 03 Jun 2020 07:27:21 -0400
+X-MC-Unique: H6ERAEeCNl2Vnse0jAZ4Sw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F5991883604;
+        Wed,  3 Jun 2020 11:27:20 +0000 (UTC)
+Received: from localhost (ovpn-112-182.ams2.redhat.com [10.36.112.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 329D210016DA;
+        Wed,  3 Jun 2020 11:27:20 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
+Subject: [PULL v2 00/10] vfio-ccw patches for 5.8
+Date:   Wed,  3 Jun 2020 13:27:06 +0200
+Message-Id: <20200603112716.332801-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200603103415.GC1845750@mwanda>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/06/20 12:34, Dan Carpenter wrote:
-> Hello Paolo Bonzini,
-> 
-> The patch c9d40913ac5a: "KVM: x86: enable event window in
-> inject_pending_event" from May 22, 2020, leads to the following
-> static checker warning:
-> 
-> 	arch/x86/kvm/x86.c:10530 kvm_can_do_async_pf()
-> 	warn: signedness bug returning '(-16)'
-> 
-> arch/x86/kvm/x86.c
->  10516  bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
->  10517  {
->  10518          if (unlikely(!lapic_in_kernel(vcpu) ||
->  10519                       kvm_event_needs_reinjection(vcpu) ||
->  10520                       vcpu->arch.exception.pending))
->  10521                  return false;
->  10522  
->  10523          if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
->  10524                  return false;
->  10525  
->  10526          /*
->  10527           * If interrupts are off we cannot even use an artificial
->  10528           * halt state.
->  10529           */
->  10530          return kvm_arch_interrupt_allowed(vcpu);
->  10531  }
-> 
-> The svm_nmi_allowed() used to return false because interrupts aren't
-> allowed but now it returns -EBUSY so it returns true/allowed.
+The following changes since commit e1750a3d9abbea2ece29cac8dc5a6f5bc19c1492:
 
-This is intentional (i.e. not a bug) but it should have an explicit "!= 0".
+  s390/pci: Log new handle in clp_disable_fh() (2020-05-28 12:26:03 +0200)
 
-Paolo
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw tags/vfio-ccw-20200603-v2
+
+for you to fetch changes up to b2dd9a44a1098c96935c495570b663bd223a087e:
+
+  vfio-ccw: Add trace for CRW event (2020-06-03 11:28:19 +0200)
+
+----------------------------------------------------------------
+vfio-ccw updates:
+- accept requests without the prefetch bit set
+- enable path handling via two new regions
+
+----------------------------------------------------------------
+
+Changes v1->v2:
+- add padding to struct ccw_crw_region
+- rebase to s390 features branch
+
+Cornelia Huck (1):
+  vfio-ccw: document possible errors
+
+Eric Farman (3):
+  vfio-ccw: Refactor the unregister of the async regions
+  vfio-ccw: Refactor IRQ handlers
+  vfio-ccw: Add trace for CRW event
+
+Farhan Ali (5):
+  vfio-ccw: Introduce new helper functions to free/destroy regions
+  vfio-ccw: Register a chp_event callback for vfio-ccw
+  vfio-ccw: Introduce a new schib region
+  vfio-ccw: Introduce a new CRW region
+  vfio-ccw: Wire up the CRW irq and CRW region
+
+Jared Rossi (1):
+  vfio-ccw: Enable transparent CCW IPL from DASD
+
+ Documentation/s390/vfio-ccw.rst     | 100 ++++++++++++++++-
+ drivers/s390/cio/Makefile           |   2 +-
+ drivers/s390/cio/vfio_ccw_chp.c     | 148 +++++++++++++++++++++++++
+ drivers/s390/cio/vfio_ccw_cp.c      |  19 ++--
+ drivers/s390/cio/vfio_ccw_drv.c     | 165 ++++++++++++++++++++++++++--
+ drivers/s390/cio/vfio_ccw_ops.c     |  65 ++++++++---
+ drivers/s390/cio/vfio_ccw_private.h |  16 +++
+ drivers/s390/cio/vfio_ccw_trace.c   |   1 +
+ drivers/s390/cio/vfio_ccw_trace.h   |  30 +++++
+ include/uapi/linux/vfio.h           |   3 +
+ include/uapi/linux/vfio_ccw.h       |  19 ++++
+ 11 files changed, 531 insertions(+), 37 deletions(-)
+ create mode 100644 drivers/s390/cio/vfio_ccw_chp.c
+
+-- 
+2.25.4
 
