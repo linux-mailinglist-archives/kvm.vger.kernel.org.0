@@ -2,73 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47E941ECA90
-	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 09:29:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C93871ECAC4
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 09:44:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726213AbgFCH3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 03:29:17 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45010 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726171AbgFCH3R (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Jun 2020 03:29:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591169356;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XxS4hZGinRyO6v5MBswe9QYzQHzxWg+7TXgH/FRkvMM=;
-        b=H314MoYoYgO64S3YlUbMwm5ddU2OmGEKx9lJpf56xTZVwCQ4DqbznPn8YCd3H9fm6tWjAi
-        jJMGHSxFd7TKVffq5Y3N9LVdwWc9E8w0/MVVlEHQYGcjHYCqoyIk5Nz9aLc9BBC+O9L4xn
-        ec3h8JHwHifb2DTGZrAG9eeLrw0BiFY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-uTK2w6nSO0OwCHEMsepudw-1; Wed, 03 Jun 2020 03:29:14 -0400
-X-MC-Unique: uTK2w6nSO0OwCHEMsepudw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00C66BFC0;
-        Wed,  3 Jun 2020 07:29:13 +0000 (UTC)
-Received: from [10.72.12.214] (ovpn-12-214.pek2.redhat.com [10.72.12.214])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4273760C47;
-        Wed,  3 Jun 2020 07:29:03 +0000 (UTC)
-Subject: Re: [PATCH RFC 04/13] vhost: cleanup fetch_buf return code handling
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-References: <20200602130543.578420-1-mst@redhat.com>
- <20200602130543.578420-5-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <7221afa5-bafd-f19b-9cfd-cc51a8d3b321@redhat.com>
-Date:   Wed, 3 Jun 2020 15:29:02 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726206AbgFCHoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 03:44:44 -0400
+Received: from mga17.intel.com ([192.55.52.151]:47913 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725275AbgFCHon (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 03:44:43 -0400
+IronPort-SDR: lCKqzKguZ8/amiF4ER3VJEvMlX6hTDURzB5O25ystJ93NlfmzX3KUfBfbyLmEvd/nJdatn6DI8
+ CpPM6tk0I6Fw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2020 00:44:43 -0700
+IronPort-SDR: OaoTNCguD6VHZKwpsrKiPC2MBoAyk9VjE5N/uQievj7tI08znPL5Nu6zEZsZDcSuiOCk6XdfUV
+ jFnvU27Mdcdg==
+X-IronPort-AV: E=Sophos;i="5.73,467,1583222400"; 
+   d="scan'208";a="416470260"
+Received: from unknown (HELO [10.239.13.99]) ([10.239.13.99])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2020 00:44:40 -0700
+Subject: Re: [PATCH 4/6] KVM: X86: Split kvm_update_cpuid()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+References: <20200529085545.29242-1-xiaoyao.li@intel.com>
+ <20200529085545.29242-5-xiaoyao.li@intel.com>
+ <20200603011059.GB24169@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <5e5574d1-245d-ce57-d7aa-998eed2ca0b6@intel.com>
+Date:   Wed, 3 Jun 2020 15:44:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-In-Reply-To: <20200602130543.578420-5-mst@redhat.com>
+In-Reply-To: <20200603011059.GB24169@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 6/3/2020 9:10 AM, Sean Christopherson wrote:
+> On Fri, May 29, 2020 at 04:55:43PM +0800, Xiaoyao Li wrote:
+>> Split the part of updating KVM states from kvm_update_cpuid(), and put
+>> it into a new kvm_update_state_based_on_cpuid(). So it's clear that
+>> kvm_update_cpuid() is to update guest CPUID settings, while
+>> kvm_update_state_based_on_cpuid() is to update KVM states based on the
+>> updated CPUID settings.
+> 
+> What about kvm_update_vcpu_model()?  "state" isn't necessarily correct
+> either.
+> 
 
-On 2020/6/2 下午9:06, Michael S. Tsirkin wrote:
-> Return code of fetch_buf is confusing, so callers resort to
-> tricks to get to sane values. Let's switch to something standard:
-> 0 empty, >0 non-empty, <0 error.
->
-> Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
-> ---
->   drivers/vhost/vhost.c | 24 ++++++++++++++++--------
->   1 file changed, 16 insertions(+), 8 deletions(-)
-
-
-Why not squashing this into patch 2 or 3?
-
-Thanks
-
+yeah, it's better.
