@@ -2,112 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88D7C1ED8EB
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 01:05:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E80B11ED8F3
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 01:07:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726742AbgFCXE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 19:04:59 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46305 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725876AbgFCXE7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Jun 2020 19:04:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591225497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=c2487rGs+TC6tntrEqOtDUOH3rYGvUESRfM9RkW9d4E=;
-        b=KhCxPfmiLMwyUvAqnbvku6POO1q8qac54ZpK7Dx1XvwWZ2ccjItHStzuoERzG9GRVBhPY2
-        me49NBdgcYlwxcTLSo4/rSu1/V9JxEpbThu9/TAWW5WDqS7g58uFKpTrBDqoWSWT4U5bDk
-        HJMWDYs2Hsmj+/O2cV5jUyZPHP/u7es=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-GFLXoTvkOEe6eS8rzLIuTA-1; Wed, 03 Jun 2020 19:04:55 -0400
-X-MC-Unique: GFLXoTvkOEe6eS8rzLIuTA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34090800685;
-        Wed,  3 Jun 2020 23:04:54 +0000 (UTC)
-Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 56C657B5E1;
-        Wed,  3 Jun 2020 23:04:53 +0000 (UTC)
-Date:   Wed, 3 Jun 2020 17:04:52 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        kevin.tian@intel.com, shaopeng.he@intel.com, yi.l.liu@intel.com,
-        xin.zeng@intel.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH v4 07/10] vfio/pci: introduce a new irq type
- VFIO_IRQ_TYPE_REMAP_BAR_REGION
-Message-ID: <20200603170452.7f172baf@x1.home>
-In-Reply-To: <20200603014058.GA12300@joy-OptiPlex-7040>
-References: <20200518024202.13996-1-yan.y.zhao@intel.com>
-        <20200518025245.14425-1-yan.y.zhao@intel.com>
-        <20200529154547.19a6685f@x1.home>
-        <20200601065726.GA5906@joy-OptiPlex-7040>
-        <20200601104307.259b0fe1@x1.home>
-        <20200602082858.GA8915@joy-OptiPlex-7040>
-        <20200602133435.1ab650c5@x1.home>
-        <20200603014058.GA12300@joy-OptiPlex-7040>
-Organization: Red Hat
+        id S1726239AbgFCXHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 19:07:17 -0400
+Received: from mga05.intel.com ([192.55.52.43]:57581 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725876AbgFCXHR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 19:07:17 -0400
+IronPort-SDR: 7wrL/6neXPBUwswJEbQByCUAE6LfZEdks5kpP3/ut0OinZH2O1EtzUe9INiev1CWhbFsBQWe60
+ U6sjKjx5rgmQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2020 16:07:16 -0700
+IronPort-SDR: 9vgjozx/oRvfwuPeSTLMZum356iRJhNe/DrZ/MBqnUU3vFsurtA0Q5wtboYcgXlyglaP+MZ8SD
+ SBq1OTh5oacw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,470,1583222400"; 
+   d="scan'208";a="445286783"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga005.jf.intel.com with ESMTP; 03 Jun 2020 16:07:16 -0700
+Date:   Wed, 3 Jun 2020 16:07:16 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
+ exceptions
+Message-ID: <20200603230716.GD25606@linux.intel.com>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-26-joro@8bytes.org>
+ <20200520062055.GA17090@linux.intel.com>
+ <20200603142325.GB23071@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200603142325.GB23071@8bytes.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2 Jun 2020 21:40:58 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Wed, Jun 03, 2020 at 04:23:25PM +0200, Joerg Roedel wrote:
+> > > +		 */
+> > > +		io_bytes   = (exit_info_1 >> 4) & 0x7;
+> > > +		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
+> > > +
+> > > +		op_count    = (exit_info_1 & IOIO_REP) ? regs->cx : 1;
+> > > +		exit_info_2 = min(op_count, ghcb_count);
+> > > +		exit_bytes  = exit_info_2 * io_bytes;
+> > > +
+> > > +		es_base = insn_get_seg_base(ctxt->regs, INAT_SEG_REG_ES);
+> > > +
+> > > +		if (!(exit_info_1 & IOIO_TYPE_IN)) {
+> > > +			ret = vc_insn_string_read(ctxt,
+> > > +					       (void *)(es_base + regs->si),
+> > 
+> > SEV(-ES) is 64-bit only, why bother with the es_base charade?
+> 
+> User-space can also cause IOIO #VC exceptions, and user-space can be
+> 32-bit legacy code with segments, so es_base has to be taken into
+> account.
 
-> On Tue, Jun 02, 2020 at 01:34:35PM -0600, Alex Williamson wrote:
-> > I'm not at all happy with this.  Why do we need to hide the migration
-> > sparse mmap from the user until migration time?  What if instead we
-> > introduced a new VFIO_REGION_INFO_CAP_SPARSE_MMAP_SAVING capability
-> > where the existing capability is the normal runtime sparse setup and
-> > the user is required to use this new one prior to enabled device_state
-> > with _SAVING.  The vendor driver could then simply track mmap vmas to
-> > the region and refuse to change device_state if there are outstanding
-> > mmaps conflicting with the _SAVING sparse mmap layout.  No new IRQs
-> > required, no new irqfds, an incremental change to the protocol,
-> > backwards compatible to the extent that a vendor driver requiring this
-> > will automatically fail migration.
-> >   
-> right. looks we need to use this approach to solve the problem.
-> thanks for your guide.
-> so I'll abandon the current remap irq way for dirty tracking during live
-> migration.
-> but anyway, it demos how to customize irq_types in vendor drivers.
-> then, what do you think about patches 1-5?
+Is there actually a use case for this?  Exposing port IO to userspace
+doesn't exactly improve security.
 
-In broad strokes, I don't think we've found the right solution yet.  I
-really question whether it's supportable to parcel out vfio-pci like
-this and I don't know how I'd support unraveling whether we have a bug
-in vfio-pci, the vendor driver, or how the vendor driver is making use
-of vfio-pci.
+Given that i386 ABI requires EFLAGS.DF=0 upon function entry/exit, i.e. is
+the de facto default, the DF bug implies this hasn't been tested.  And I
+don't see how this could possibly have worked for SEV given that the kernel
+unrolls string I/O because the VMM can't emulate string I/O.  Presumably
+someone would have complained if they "needed" to run legacy crud.  The
+host and guest obviously need major updates, so supporting e.g. DPDK with
+legacy virtio seems rather silly.
 
-Let me also ask, why does any of this need to be in the kernel?  We
-spend 5 patches slicing up vfio-pci so that we can register a vendor
-driver and have that vendor driver call into vfio-pci as it sees fit.
-We have two patches creating device specific interrupts and a BAR
-remapping scheme that we've decided we don't need.  That brings us to
-the actual i40e vendor driver, where the first patch is simply making
-the vendor driver work like vfio-pci already does, the second patch is
-handling the migration region, and the third patch is implementing the
-BAR remapping IRQ that we decided we don't need.  It's difficult to
-actually find the small bit of code that's required to support
-migration outside of just dealing with the protocol we've defined to
-expose this from the kernel.  So why are we trying to do this in the
-kernel?  We have quirk support in QEMU, we can easily flip
-MemoryRegions on and off, etc.  What access to the device outside of
-what vfio-pci provides to the user, and therefore QEMU, is necessary to
-implement this migration support for i40e VFs?  Is this just an
-exercise in making use of the migration interface?  Thanks,
+> > > +					       ghcb->shared_buffer, io_bytes,
+> > > +					       exit_info_2, df);
+> > 
+> > df handling is busted, it's aways non-zero.  Same goes for the SI/DI
+> > adjustments below.
+> 
+> Right, this is fixed now.
+> 
+> > Batching the memory accesses and I/O accesses separately is technically
+> > wrong, e.g. a #DB on a memory access will result in bogus data being shown
+> > in the debugger.  In practice it seems unlikely to matter, but I'm curious
+> > as to why string I/O is supported in the first place.  I didn't think there
+> > was that much string I/O in the kernel?
+> 
+> True, #DBs won't be correct anymore. Currently debugging is not
+> supported in SEV-ES guests anyway, but if it is supported the #DB
+> exception would happen in the #VC handler and not on the original
+> instruction.
 
-Alex
-
+As in, the guest can't debug itself?  Or the host can't debug the guest?
