@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0B2F1ED28A
-	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 16:51:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDC901ED268
+	for <lists+kvm@lfdr.de>; Wed,  3 Jun 2020 16:50:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726226AbgFCOt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 10:49:59 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56808 "EHLO
+        id S1726281AbgFCOuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 10:50:06 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27883 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726210AbgFCOtz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Jun 2020 10:49:55 -0400
+        by vger.kernel.org with ESMTP id S1726181AbgFCOt7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Jun 2020 10:49:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591195794;
+        s=mimecast20190719; t=1591195797;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=x99DmWF3z8IQZtSAxCYmvGKbKwRwjaKEkyPdWwMZNhI=;
-        b=WtBUkSg55+2G5zUEv0vB9zo/o8OZ+nH8UtBYZqI96f9AYmW4StXdXzu1v118b99xdkBXgc
-        Ye6f7JwTaddeARgvISmqNGdQpcfnSuWihLr53AUyb5c+AxHYY/5oKyIpa0naYkSY9XzoBx
-        kv9re1imBVc2TPZcFuPcSq8bHah/4oI=
+        bh=0HnNbUz587KYkVSxRKtqIPjKQRI/SShbySmMvJK9Bwk=;
+        b=IYY1pPohIi4Ojcr6zfXrqMkgG4qUo9OdjJ6FFfSuimZ0oQ+cfLdefcrPGY2xx3HtkKYvP4
+        4U3hVImOYb2MT4YohJDAazCst+/ggwkZiX1jE1QBg74hnTtymvVli1ydQnFIvqASL16aNu
+        oJ7z6qCIVKoVJ+llP5hYyhcz1to0wZQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-FB3pGUkyPzWQeO8883Fu0g-1; Wed, 03 Jun 2020 10:49:50 -0400
-X-MC-Unique: FB3pGUkyPzWQeO8883Fu0g-1
+ us-mta-262-GdCDihBhM_27OfuQZzujJQ-1; Wed, 03 Jun 2020 10:49:52 -0400
+X-MC-Unique: GdCDihBhM_27OfuQZzujJQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C344835B42;
-        Wed,  3 Jun 2020 14:49:49 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A439B1005512;
+        Wed,  3 Jun 2020 14:49:51 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-192.ams2.redhat.com [10.36.113.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C24BB5D9CD;
-        Wed,  3 Jun 2020 14:49:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A21B5D9CD;
+        Wed,  3 Jun 2020 14:49:49 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -42,13 +42,10 @@ Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: [PATCH v3 04/20] s390x/pv: Convert to ram_block_discard_disable()
-Date:   Wed,  3 Jun 2020 16:48:58 +0200
-Message-Id: <20200603144914.41645-5-david@redhat.com>
+        Juan Quintela <quintela@redhat.com>
+Subject: [PATCH v3 05/20] virtio-balloon: Rip out qemu_balloon_inhibit()
+Date:   Wed,  3 Jun 2020 16:48:59 +0200
+Message-Id: <20200603144914.41645-6-david@redhat.com>
 In-Reply-To: <20200603144914.41645-1-david@redhat.com>
 References: <20200603144914.41645-1-david@redhat.com>
 MIME-Version: 1.0
@@ -59,80 +56,179 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Discarding RAM does not work as expected with protected VMs. Let's
-switch to ram_block_discard_disable() for now, as we want to get rid
-of qemu_balloon_inhibit(). Note that it will currently never fail, but
-might fail in the future with new technologies (e.g., virtio-mem).
+The only remaining special case is postcopy. It cannot handle
+concurrent discards yet, which would result in requesting already sent
+pages from the source. Special-case it in virtio-balloon instead.
 
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>
+Introduce migration_in_incoming_postcopy(), to find out if incoming
+postcopy is active.
+
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ balloon.c                  | 18 ------------------
+ hw/virtio/virtio-balloon.c |  8 +++++++-
+ include/migration/misc.h   |  2 ++
+ include/sysemu/balloon.h   |  2 --
+ migration/migration.c      |  7 +++++++
+ migration/postcopy-ram.c   | 23 -----------------------
+ 6 files changed, 16 insertions(+), 44 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 67ae2e02ff..e82129e874 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -43,7 +43,6 @@
- #include "hw/qdev-properties.h"
- #include "hw/s390x/tod.h"
- #include "sysemu/sysemu.h"
--#include "sysemu/balloon.h"
- #include "hw/s390x/pv.h"
- #include "migration/blocker.h"
+diff --git a/balloon.c b/balloon.c
+index 5fff79523a..354408c6ea 100644
+--- a/balloon.c
++++ b/balloon.c
+@@ -36,24 +36,6 @@
+ static QEMUBalloonEvent *balloon_event_fn;
+ static QEMUBalloonStatus *balloon_stat_fn;
+ static void *balloon_opaque;
+-static int balloon_inhibit_count;
+-
+-bool qemu_balloon_is_inhibited(void)
+-{
+-    return atomic_read(&balloon_inhibit_count) > 0 ||
+-           ram_block_discard_is_disabled();
+-}
+-
+-void qemu_balloon_inhibit(bool state)
+-{
+-    if (state) {
+-        atomic_inc(&balloon_inhibit_count);
+-    } else {
+-        atomic_dec(&balloon_inhibit_count);
+-    }
+-
+-    assert(atomic_read(&balloon_inhibit_count) >= 0);
+-}
  
-@@ -329,7 +328,7 @@ static void s390_machine_unprotect(S390CcwMachineState *ms)
-     ms->pv = false;
-     migrate_del_blocker(pv_mig_blocker);
-     error_free_or_abort(&pv_mig_blocker);
--    qemu_balloon_inhibit(false);
-+    ram_block_discard_disable(false);
+ static bool have_balloon(Error **errp)
+ {
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 065cd450f1..5ce2f956df 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -63,6 +63,12 @@ static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
+     return pbp->base_gpa == base_gpa;
  }
  
- static int s390_machine_protect(S390CcwMachineState *ms)
-@@ -338,17 +337,22 @@ static int s390_machine_protect(S390CcwMachineState *ms)
-     int rc;
- 
-    /*
--    * Ballooning on protected VMs needs support in the guest for
--    * sharing and unsharing balloon pages. Block ballooning for
--    * now, until we have a solution to make at least Linux guests
--    * either support it or fail gracefully.
-+    * Discarding of memory in RAM blocks does not work as expected with
-+    * protected VMs. Sharing and unsharing pages would be required. Disable
-+    * it for now, until until we have a solution to make at least Linux
-+    * guests either support it (e.g., virtio-balloon) or fail gracefully.
-     */
--    qemu_balloon_inhibit(true);
-+    rc = ram_block_discard_disable(true);
-+    if (rc) {
-+        error_report("protected VMs: cannot disable RAM discard");
-+        return rc;
-+    }
++static bool virtio_balloon_inhibited(void)
++{
++    /* Postcopy cannot deal with concurrent discards, so it's special. */
++    return ram_block_discard_is_disabled() || migration_in_incoming_postcopy();
++}
 +
-     error_setg(&pv_mig_blocker,
-                "protected VMs are currently not migrateable.");
-     rc = migrate_add_blocker(pv_mig_blocker, &local_err);
-     if (rc) {
--        qemu_balloon_inhibit(false);
-+        ram_block_discard_disable(false);
-         error_report_err(local_err);
-         error_free_or_abort(&pv_mig_blocker);
-         return rc;
-@@ -357,7 +361,7 @@ static int s390_machine_protect(S390CcwMachineState *ms)
-     /* Create SE VM */
-     rc = s390_pv_vm_enable();
-     if (rc) {
--        qemu_balloon_inhibit(false);
-+        ram_block_discard_disable(false);
-         migrate_del_blocker(pv_mig_blocker);
-         error_free_or_abort(&pv_mig_blocker);
-         return rc;
+ static void balloon_inflate_page(VirtIOBalloon *balloon,
+                                  MemoryRegion *mr, hwaddr mr_offset,
+                                  PartiallyBalloonedPage *pbp)
+@@ -360,7 +366,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+ 
+             trace_virtio_balloon_handle_output(memory_region_name(section.mr),
+                                                pa);
+-            if (!qemu_balloon_is_inhibited()) {
++            if (!virtio_balloon_inhibited()) {
+                 if (vq == s->ivq) {
+                     balloon_inflate_page(s, section.mr,
+                                          section.offset_within_region, &pbp);
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index d2762257aa..34e7d75713 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -69,6 +69,8 @@ bool migration_has_failed(MigrationState *);
+ /* ...and after the device transmission */
+ bool migration_in_postcopy_after_devices(MigrationState *);
+ void migration_global_dump(Monitor *mon);
++/* True if incomming migration entered POSTCOPY_INCOMING_DISCARD */
++bool migration_in_incoming_postcopy(void);
+ 
+ /* migration/block-dirty-bitmap.c */
+ void dirty_bitmap_mig_init(void);
+diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
+index aea0c44985..20a2defe3a 100644
+--- a/include/sysemu/balloon.h
++++ b/include/sysemu/balloon.h
+@@ -23,7 +23,5 @@ typedef void (QEMUBalloonStatus)(void *opaque, BalloonInfo *info);
+ int qemu_add_balloon_handler(QEMUBalloonEvent *event_func,
+                              QEMUBalloonStatus *stat_func, void *opaque);
+ void qemu_remove_balloon_handler(void *opaque);
+-bool qemu_balloon_is_inhibited(void);
+-void qemu_balloon_inhibit(bool state);
+ 
+ #endif
+diff --git a/migration/migration.c b/migration/migration.c
+index b63ad91d34..14856cc930 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1772,6 +1772,13 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
+     return migration_in_postcopy() && s->postcopy_after_devices;
+ }
+ 
++bool migration_in_incoming_postcopy(void)
++{
++    PostcopyState ps = postcopy_state_get();
++
++    return ps >= POSTCOPY_INCOMING_DISCARD && ps < POSTCOPY_INCOMING_END;
++}
++
+ bool migration_is_idle(void)
+ {
+     MigrationState *s = current_migration;
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a36402722b..b41a9fe2fd 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -27,7 +27,6 @@
+ #include "qemu/notify.h"
+ #include "qemu/rcu.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/balloon.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ #include "hw/boards.h"
+@@ -520,20 +519,6 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+     return 0;
+ }
+ 
+-/*
+- * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
+- * last caller wins.
+- */
+-static void postcopy_balloon_inhibit(bool state)
+-{
+-    static bool cur_state = false;
+-
+-    if (state != cur_state) {
+-        qemu_balloon_inhibit(state);
+-        cur_state = state;
+-    }
+-}
+-
+ /*
+  * At the end of a migration where postcopy_ram_incoming_init was called.
+  */
+@@ -565,8 +550,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+         mis->have_fault_thread = false;
+     }
+ 
+-    postcopy_balloon_inhibit(false);
+-
+     if (enable_mlock) {
+         if (os_mlock() < 0) {
+             error_report("mlock: %s", strerror(errno));
+@@ -1160,12 +1143,6 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
+     }
+     memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
+ 
+-    /*
+-     * Ballooning can mark pages as absent while we're postcopying
+-     * that would cause false userfaults.
+-     */
+-    postcopy_balloon_inhibit(true);
+-
+     trace_postcopy_ram_enable_notify();
+ 
+     return 0;
 -- 
 2.25.4
 
