@@ -2,79 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E35D1EE9E0
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 19:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 203E71EE9E5
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 19:57:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730291AbgFDR4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 13:56:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39044 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730008AbgFDR4o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 13:56:44 -0400
+        id S1730381AbgFDR5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 13:57:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41570 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730378AbgFDR5k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 13:57:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591293403;
+        s=mimecast20190719; t=1591293458;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YRb6tBftcN4ywgPXESWRYJJkk+CvsoyUYJ93rzfhMU4=;
-        b=Q7Qrz+BzDjgcfupD6vFknmrH1T/0Cn9EPtkcUSuVzNSDy4AfyoQrdjtWVDkoyt7mdY7YFj
-        6VV0yR06FhvRuUjbHu59rcrWcVFXHwV2MP7ST4eFeYmm44f4TI1AAJ6HBCW/JyMvB9TIG8
-        hTNWiXbC0xk7i4cG7UGJT1mfm7Ujm/0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-E5RWKCpbOoqX4tzr56DGQg-1; Thu, 04 Jun 2020 13:56:41 -0400
-X-MC-Unique: E5RWKCpbOoqX4tzr56DGQg-1
-Received: by mail-wr1-f71.google.com with SMTP id w4so2729462wrl.13
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 10:56:41 -0700 (PDT)
+        bh=FksnhBO6vS/Ap/hKpam5K+PoYAuOG4Rfq572TxOAyTg=;
+        b=U7A0TuTGRMwuZ/hmqIc+hLl3Uve0+rrJUCVNao+v1XX1b8Y3jdYT1hP56HTUdxbmkHgk8+
+        OXPuek3JgowzE63E12ob3JVoKDi0xqFRumHGFqfZta/Cw1+davI/fO8WMfFX2eKLnBChi6
+        Unda+Fh4Ntw2hujt43guSRvZykrBIy0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-W78oowmKOFyTplP9kiCh_Q-1; Thu, 04 Jun 2020 13:57:34 -0400
+X-MC-Unique: W78oowmKOFyTplP9kiCh_Q-1
+Received: by mail-wr1-f69.google.com with SMTP id l1so2717216wrc.8
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 10:57:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=YRb6tBftcN4ywgPXESWRYJJkk+CvsoyUYJ93rzfhMU4=;
-        b=QqZ8RpkPUy3ekFkt8tYP5MwF/INPyj5gRtiDjUkRCuss45+2Ia6BpoWZOdY+A4ILf2
-         y07brBF4fO7IcH55eaehs0tTe14ElI+VP+n/TFOwuS/wsYkUwQK9VnbpxnxKZARmIo8r
-         78MHZgQngxdULmrQaktTkahPqq7eojfB9y54Ugs5s7U8MEhSKEn45j1LaOfnJJuKA5Jo
-         epjsiGmu+TXAvQW2Rxz3W93uyfZ0TRRQL6It0YOpcdEoQTtzwqFixsh0fW9W8NVA380x
-         16aXnaOiP/CQEtt9XLjBHYWVOOD2V+JzcB1R6LSrCQUZVVm8v8cqqizOz451Ze3Ao//v
-         dYgw==
-X-Gm-Message-State: AOAM533e9LjTJ275o56VwVQKYY2SUH5dfdZk3PA3dkLG5Z8/VCm3VBuu
-        ncV5YRUjsjs7rP8tO660AfUWZvZianpU4ILpAEV1LnzgTfmvrh222dv4uoVdEcS/gsJkbIvcGg9
-        YCVAoMahbtXYq
-X-Received: by 2002:a5d:548c:: with SMTP id h12mr5492278wrv.120.1591293400613;
-        Thu, 04 Jun 2020 10:56:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwlNwMQCPzZScok4aBC3SMcPaIZjURMRw+b5itxwYHzx4gbOSCjJlzT3dBoJesPlCEZMtDUEg==
-X-Received: by 2002:a5d:548c:: with SMTP id h12mr5492252wrv.120.1591293400383;
-        Thu, 04 Jun 2020 10:56:40 -0700 (PDT)
+        bh=FksnhBO6vS/Ap/hKpam5K+PoYAuOG4Rfq572TxOAyTg=;
+        b=LUuRJfY0ANeBe8jh6NWTnm5Xfuvijk4TQDIl1mjjrtSPw5P3A08zfgGwBdu7N9wP8/
+         OWCrHQsh58kELziPHtIPLBNPlKgMwU4Yu6/ZQ+QDuKw+Nx8zkQWrucyd4n4GomRYfcfE
+         LyT18FKDIb9mQQH4AcW7jGrnjl0WeJjvh9dznq7ouxBFREzvMxwudAvmeXkVmsydUsFr
+         GrLmBeqzGhQdrqpaLxQnkiob16zE6qUpOhevY/TrjLeY8VWa3bJL4ugWnUbKwztc2+Yc
+         NE+FTJuGHNmeb01+zyT0YnqC854mhZs2dr+yWrcH/Od8gDSTmLdGvZ4sPtLi6NWmFTR9
+         DwCw==
+X-Gm-Message-State: AOAM53092L7xWZntwEVCqSOaD4cCikiMqF74KJFg5bTw94YYJo0HYYnn
+        Ml3fsr7TeZrHiGHmljc6NBBxOn7C06K7plIr0wA1OTL1mPlwW2JrKwDhWvqETkJpoFm19xwlYPm
+        CVRl72lGEOKld
+X-Received: by 2002:a05:600c:22c9:: with SMTP id 9mr5552332wmg.68.1591293453362;
+        Thu, 04 Jun 2020 10:57:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwOGKSvoIoXAWEbKHBYSbX8H32Swgs+id+2H5vtlJpeMc9ijfIwfsCbIQxP4TuqOuWT6aI2Bg==
+X-Received: by 2002:a05:600c:22c9:: with SMTP id 9mr5552320wmg.68.1591293453077;
+        Thu, 04 Jun 2020 10:57:33 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
-        by smtp.gmail.com with ESMTPSA id q13sm8582433wrn.84.2020.06.04.10.56.39
+        by smtp.gmail.com with ESMTPSA id n23sm8155508wmc.0.2020.06.04.10.57.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2020 10:56:39 -0700 (PDT)
-Subject: Re: [PATCH v2 00/10] KVM: x86: Interrupt-based mechanism for async_pf
- 'page present' notifications
-To:     Vivek Goyal <vgoyal@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        x86@kernel.org, Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-References: <20200525144125.143875-1-vkuznets@redhat.com>
- <3be1df67-2e39-c7b7-b666-66cd4fe61406@redhat.com>
- <20200604174534.GB99235@redhat.com>
+        Thu, 04 Jun 2020 10:57:32 -0700 (PDT)
+Subject: Re: [PATCH V7 00/15] KVM: MIPS: Add Loongson-3 support (Host Side)
+To:     Huacai Chen <chenhc@lemote.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        Fuxin Zhang <zhangfx@lemote.com>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+References: <1590220602-3547-1-git-send-email-chenhc@lemote.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <673d2612-53d2-4f86-1b88-dd9d8d974307@redhat.com>
-Date:   Thu, 4 Jun 2020 19:56:38 +0200
+Message-ID: <d702015b-ab5a-77ae-de24-e248c38030f7@redhat.com>
+Date:   Thu, 4 Jun 2020 19:57:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200604174534.GB99235@redhat.com>
+In-Reply-To: <1590220602-3547-1-git-send-email-chenhc@lemote.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -83,19 +75,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/06/20 19:45, Vivek Goyal wrote:
->> I'll do another round of review and queue patches 1-7; 8-9 will be
->> queued later and separately due to the conflicts with the interrupt
->> entry rework, but it's my job and you don't need to do anything else.
-> Hi Paolo,
+On 23/05/20 09:56, Huacai Chen wrote:
+> We are preparing to add KVM support for Loongson-3. VZ extension is
+> fully supported in Loongson-3A R4+, and we will not care about old CPUs
+> (at least now). We already have a full functional Linux kernel (based
+> on Linux-5.4.x LTS) and QEMU (based on 5.0.0) and their git repositories
+> are here:
 > 
-> I seee 1-7 got merged for 5.8. When you say patch 8-9 will be queue later,
-> you mean later in 5.8 or it will held till 5.9 merge window opens.
+> QEMU: https://github.com/chenhuacai/qemu
+> Kernel: https://github.com/chenhuacai/linux
+> 
+> Of course these two repositories need to be rework and not suitable for
+> upstream (especially the commits need to be splitted). We show them here
+> is just to tell others what we have done, and how KVM/Loongson will look
+> like.
+> 
+> Our plan is make the KVM host side be upstream first, and after that,
+> we will make the KVM guest side and QEMU emulator be upstream.
+> 
+> V1 -> V2:
+> 1, Remove "mips: define pud_index() regardless of page table folding"
+>    because it has been applied.
+> 2, Make Loongson-specific code be guarded by CONFIG_CPU_LOONGSON64.
+> 
+> V2 -> V3:
+> 1, Emulate a reduced feature list of CPUCFG.
+> 2, Fix all possible checkpatch.pl errors and warnings.
+> 
+> V3 -> V4:
+> 1, Emulate LOONGSON_CFG0/LOONGSON_CFG3 in CPUCFG correctly.
+> 2, Update commit messages to explain Loongson-3 Virtual IPI.
+> 3, Add Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>.
+> 
+> V4 -> V5:
+> 1, Fix a typo.
+> 2, Update MAINTAINERS.
+> 
+> V5 -> V6:
+> 1, Fix a mismatch during rebasing.
+> 2, Add Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>.
+> 
+> V6 -> V7:
+> 1, Rebase on latest mips-next (Config6 feature bits definition updated).
 
-I hope to get them in 5.8.  They have some pretty nasty conflicts that
-are too much for Linus to resolve.  So my plan is to put 8-9 in a topic
-branch and do the merge myself.  Whether this works out depends on the
-timing of the tip pull request.
+Queued, thanks.  Please check the queue branch of kvm.git.
 
 Paolo
+
+> Xing Li(2):
+>  KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
+>  KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
+> 
+> Huacai Chen(13):
+>  KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
+>  KVM: MIPS: Add EVENTFD support which is needed by VHOST
+>  KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
+>  KVM: MIPS: Introduce and use cpu_guest_has_ldpte
+>  KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
+>  KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
+>  KVM: MIPS: Add more types of virtual interrupts
+>  KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
+>  KVM: MIPS: Add CPUCFG emulation for Loongson-3
+>  KVM: MIPS: Add CONFIG6 and DIAG registers emulation
+>  KVM: MIPS: Add more MMIO load/store instructions emulation
+>  KVM: MIPS: Enable KVM support for Loongson-3
+>  MAINTAINERS: Update KVM/MIPS maintainers
+> 
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> ---
+>  MAINTAINERS                          |   4 +-
+>  arch/mips/Kconfig                    |   1 +
+>  arch/mips/include/asm/cpu-features.h |   3 +
+>  arch/mips/include/asm/kvm_host.h     |  52 +++-
+>  arch/mips/include/asm/mipsregs.h     |   7 +
+>  arch/mips/include/uapi/asm/inst.h    |  11 +
+>  arch/mips/kernel/cpu-probe.c         |   2 +
+>  arch/mips/kvm/Kconfig                |   1 +
+>  arch/mips/kvm/Makefile               |   5 +-
+>  arch/mips/kvm/emulate.c              | 503 ++++++++++++++++++++++++++++++++++-
+>  arch/mips/kvm/entry.c                |  19 +-
+>  arch/mips/kvm/interrupt.c            |  93 +------
+>  arch/mips/kvm/interrupt.h            |  14 +-
+>  arch/mips/kvm/loongson_ipi.c         | 214 +++++++++++++++
+>  arch/mips/kvm/mips.c                 |  49 +++-
+>  arch/mips/kvm/tlb.c                  |  41 +++
+>  arch/mips/kvm/trap_emul.c            |   3 +
+>  arch/mips/kvm/vz.c                   | 237 ++++++++++++-----
+>  18 files changed, 1092 insertions(+), 167 deletions(-)
+>  create mode 100644 arch/mips/kvm/loongson_ipi.c
+> --
+> 2.7.0
+> 
 
