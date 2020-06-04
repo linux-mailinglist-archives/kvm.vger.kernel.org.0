@@ -2,168 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17E2D1EE747
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:04:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA3F81EE770
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:12:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729348AbgFDPEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 11:04:42 -0400
-Received: from foss.arm.com ([217.140.110.172]:45508 "EHLO foss.arm.com"
+        id S1729291AbgFDPMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 11:12:34 -0400
+Received: from mga07.intel.com ([134.134.136.100]:52430 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729162AbgFDPEm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 11:04:42 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A52571FB;
-        Thu,  4 Jun 2020 08:04:41 -0700 (PDT)
-Received: from C02TD0UTHF1T.local (unknown [10.57.9.165])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BA053F305;
-        Thu,  4 Jun 2020 08:04:38 -0700 (PDT)
-Date:   Thu, 4 Jun 2020 16:04:36 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: arm64: Save the host's PtrAuth keys in
- non-preemptible context
-Message-ID: <20200604150436.GC75320@C02TD0UTHF1T.local>
-References: <20200604133354.1279412-1-maz@kernel.org>
- <20200604133354.1279412-2-maz@kernel.org>
+        id S1729170AbgFDPMe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 11:12:34 -0400
+IronPort-SDR: frujNjvOChJT6U5SDYK4x32C9NP9iD+6Ya2lsSR7wWJkp8jTfhJalcMvxWYnt9zxTgYyksmQVj
+ +JWed1BNQJ/A==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 08:12:33 -0700
+IronPort-SDR: OajrGnr5CSBpEfskgXPM/GYq0IN+aJoCCDiz+asYCfXVrUIiloBzNwlVPbD0JWRBz0P66bgpQX
+ DPJzhp2RvP6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,472,1583222400"; 
+   d="scan'208";a="269442517"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga003.jf.intel.com with ESMTP; 04 Jun 2020 08:12:33 -0700
+Date:   Thu, 4 Jun 2020 08:12:33 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     20200604024304.14643-1-xiaoyao.li@intel.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH v2] KVM: x86: Assign correct value to array.maxnent
+Message-ID: <20200604151233.GC30223@linux.intel.com>
+References: <20200604041636.1187-1-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200604133354.1279412-2-maz@kernel.org>
+In-Reply-To: <20200604041636.1187-1-xiaoyao.li@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 02:33:52PM +0100, Marc Zyngier wrote:
-> When using the PtrAuth feature in a guest, we need to save the host's
-> keys before allowing the guest to program them. For that, we dump
-> them in a per-CPU data structure (the so called host context).
+On Thu, Jun 04, 2020 at 12:16:36PM +0800, Xiaoyao Li wrote:
+> Delay the assignment of array.maxnent to use correct value for the case
+> cpuid->nent > KVM_MAX_CPUID_ENTRIES.
 > 
-> But both call sites that do this are in preemptible context,
-> which may end up in disaster should the vcpu thread get preempted
-> before reentering the guest.
-
-Yuck!
-
-> Instead, save the keys eagerly on each vcpu_load(). This has an
-> increased overhead, but is at least safe.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-This looks sound to me given kvm_arch_vcpu_load() is surrounded with
-get_cpu() .. put_cpu() and gets called when the thread is preempted.
-
-Reviewed-by: Mark Rutland <mark.rutland@arm.com>
-
-Thanks,
-Mark.
-
+> Fixes: e53c95e8d41e ("KVM: x86: Encapsulate CPUID entries and metadata in struct")
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h |  6 ------
->  arch/arm64/kvm/arm.c                 | 18 +++++++++++++++++-
->  arch/arm64/kvm/handle_exit.c         | 19 ++-----------------
->  3 files changed, 19 insertions(+), 24 deletions(-)
+> v2:
+>    - remove "const" of maxnent to fix build error.
+> ---
+>  arch/x86/kvm/cpuid.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index a30b4eec7cb4..977843e4d5fb 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -112,12 +112,6 @@ static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
->  	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
->  }
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 253b8e875ccd..3d88ddf781d0 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -426,7 +426,7 @@ EXPORT_SYMBOL_GPL(kvm_set_cpu_caps);
 >  
-> -static inline void vcpu_ptrauth_setup_lazy(struct kvm_vcpu *vcpu)
-> -{
-> -	if (vcpu_has_ptrauth(vcpu))
-> -		vcpu_ptrauth_disable(vcpu);
-> -}
-> -
->  static inline unsigned long vcpu_get_vsesr(struct kvm_vcpu *vcpu)
->  {
->  	return vcpu->arch.vsesr_el2;
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index d6988401c22a..152049c5055d 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -337,6 +337,12 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
->  	preempt_enable();
->  }
+>  struct kvm_cpuid_array {
+>  	struct kvm_cpuid_entry2 *entries;
+> -	const int maxnent;
+> +	int maxnent;
+>  	int nent;
+>  };
 >  
-> +#define __ptrauth_save_key(regs, key)						\
-> +({										\
-> +	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
-> +	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
-> +})
+> @@ -870,7 +870,6 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+>  
+>  	struct kvm_cpuid_array array = {
+>  		.nent = 0,
+> -		.maxnent = cpuid->nent,
+>  	};
+>  	int r, i;
+>  
+> @@ -887,6 +886,8 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+>  	if (!array.entries)
+>  		return -ENOMEM;
+>  
+> +	array.maxnent = cpuid->nent;
+
+Eh, I'd vote to just do:
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 253b8e875ccd..1e5b1ee75a76 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -870,7 +870,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+
+        struct kvm_cpuid_array array = {
+                .nent = 0,
+-               .maxnent = cpuid->nent,
++               .maxnent = min(cpuid->nent, (u32)KVM_MAX_CPUID_ENTRIES),
+        };
+        int r, i;
+
+
+
 > +
->  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  {
->  	int *last_ran;
-> @@ -370,7 +376,17 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	else
->  		vcpu_set_wfx_traps(vcpu);
->  
-> -	vcpu_ptrauth_setup_lazy(vcpu);
-> +	if (vcpu_has_ptrauth(vcpu)) {
-> +		struct kvm_cpu_context *ctxt = vcpu->arch.host_cpu_context;
-> +
-> +		__ptrauth_save_key(ctxt->sys_regs, APIA);
-> +		__ptrauth_save_key(ctxt->sys_regs, APIB);
-> +		__ptrauth_save_key(ctxt->sys_regs, APDA);
-> +		__ptrauth_save_key(ctxt->sys_regs, APDB);
-> +		__ptrauth_save_key(ctxt->sys_regs, APGA);
-> +
-> +		vcpu_ptrauth_disable(vcpu);
-> +	}
->  }
->  
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index eb194696ef62..065251efa2e6 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -162,31 +162,16 @@ static int handle_sve(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	return 1;
->  }
->  
-> -#define __ptrauth_save_key(regs, key)						\
-> -({										\
-> -	regs[key ## KEYLO_EL1] = read_sysreg_s(SYS_ ## key ## KEYLO_EL1);	\
-> -	regs[key ## KEYHI_EL1] = read_sysreg_s(SYS_ ## key ## KEYHI_EL1);	\
-> -})
-> -
->  /*
->   * Handle the guest trying to use a ptrauth instruction, or trying to access a
->   * ptrauth register.
->   */
->  void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_cpu_context *ctxt;
-> -
-> -	if (vcpu_has_ptrauth(vcpu)) {
-> +	if (vcpu_has_ptrauth(vcpu))
->  		vcpu_ptrauth_enable(vcpu);
-> -		ctxt = vcpu->arch.host_cpu_context;
-> -		__ptrauth_save_key(ctxt->sys_regs, APIA);
-> -		__ptrauth_save_key(ctxt->sys_regs, APIB);
-> -		__ptrauth_save_key(ctxt->sys_regs, APDA);
-> -		__ptrauth_save_key(ctxt->sys_regs, APDB);
-> -		__ptrauth_save_key(ctxt->sys_regs, APGA);
-> -	} else {
-> +	else
->  		kvm_inject_undefined(vcpu);
-> -	}
->  }
->  
->  /*
+>  	for (i = 0; i < ARRAY_SIZE(funcs); i++) {
+>  		r = get_cpuid_func(&array, funcs[i], type);
+>  		if (r)
 > -- 
-> 2.26.2
+> 2.18.2
 > 
