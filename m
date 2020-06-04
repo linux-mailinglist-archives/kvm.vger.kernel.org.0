@@ -2,105 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C3811EECC0
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 23:03:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C7851EED79
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 23:47:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726261AbgFDVD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 17:03:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726054AbgFDVDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 17:03:25 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7615BC08C5C1
-        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 14:03:24 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id p20so7906562iop.11
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 14:03:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=xVcHrfKW+EZLK5WlvWHRmcrAcLbjRGuWUSEv5Qrs1B4=;
-        b=SGe6Nt4I1FoJ2ANC8HuzMuezUuGCeu8KucBq8Rf8YAAzjJ4WCCfTCSJDkBTI5MPby7
-         olZ3xVaPwehMaSwNyhEU+fpeczpSyIA/hDSC4zLF4GWwLB3nX1siy6Wfqyd5oCZb4tex
-         /ziFT9YowW6F6ToyhHZje6eivMjWP1rVKYNzqA84rhlVKpwXUMNxWPgqCfoqSNITOn2i
-         0I9nKK0BsJ/fBdtLlHabEsaKunPvKpO8EMC4np1uz2KMOMhc2Rs+fke+5WTlS/fjh4sx
-         Mbdx3TTMQ0C+YfPvnrV8GrZ/GJyAoITjJ53BYhYBfzVa7qKrxy5vdZLXzA2PhbQkrv86
-         8vsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=xVcHrfKW+EZLK5WlvWHRmcrAcLbjRGuWUSEv5Qrs1B4=;
-        b=OSlYFQsN3RX//45Os3AB8dS+0fmsY/5n2eyeOcKTUnvSLP8WhJ62AY6+eqdx7is/ag
-         2WvK+i5jbmYW5qquAeb+OQxTolRyfLQjBKSu2NUkmNHO+AU0HgBZ7VvR+NKcXJN8ExZY
-         jqFWXzKZwcZNQJWdK9xmZI5dX4yPyQtigZVd9pVtbuiJuZ6PR++z/nSde7J+XAv2YPLy
-         RADYjqwNJgbU3fVR+YglGGRT4mu6DB4kspdB4OKJBup2iLdSZCDfAaSsdpiDtmiM1/Aa
-         8jelM1Xp/tPQUMg1P1xFRADdbejbAaS16MXK7TaDaF3lwHw6cfgfGbw4s3g614y8G8At
-         6iuQ==
-X-Gm-Message-State: AOAM532MPtUPu0CYNzVnUSq8StzejN18P2i5m+/ylSbIHBnnBnckUo4p
-        18lxNQOzD0yu0SF3NA62aB/mNTjP3dHYKRhS4A17Ng==
-X-Google-Smtp-Source: ABdhPJydaD55JsS0MoPoYnaMrMN3IUQdB136AuNz0druLAaVYc+jwbiq3WE0o9kEigoUYDae316q2Oi5uZR3js1Jn6s=
-X-Received: by 2002:a02:390b:: with SMTP id l11mr6074699jaa.54.1591304603645;
- Thu, 04 Jun 2020 14:03:23 -0700 (PDT)
+        id S1728124AbgFDVrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 17:47:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23162 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725943AbgFDVrQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 17:47:16 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 054L2h04055403;
+        Thu, 4 Jun 2020 17:47:14 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31ek4swnpt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Jun 2020 17:46:48 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 054LkirM164843;
+        Thu, 4 Jun 2020 17:46:44 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31ek4swncr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Jun 2020 17:46:44 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 054LUcLu030223;
+        Thu, 4 Jun 2020 21:44:31 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 31bf482suq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Jun 2020 21:44:31 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 054LiTen51511446
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 4 Jun 2020 21:44:29 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A23242042;
+        Thu,  4 Jun 2020 21:44:29 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 21BE74203F;
+        Thu,  4 Jun 2020 21:44:29 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.48.217])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  4 Jun 2020 21:44:29 +0000 (GMT)
+Date:   Thu, 4 Jun 2020 23:44:21 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] s390/virtio: remove unused pm callbacks
+Message-ID: <20200604234421.4ada966b.pasic@linux.ibm.com>
+In-Reply-To: <20200526093629.257649-1-cohuck@redhat.com>
+References: <20200526093629.257649-1-cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <20200604161523.39962919@why> <20200604154835.GE30223@linux.intel.com>
- <20200604163532.GE3650@willie-the-truck> <6DBAB6A4-A1F9-40E9-B81B-74182DDCF939@intel.com>
-In-Reply-To: <6DBAB6A4-A1F9-40E9-B81B-74182DDCF939@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 4 Jun 2020 14:03:12 -0700
-Message-ID: <CALMp9eRN-zkvmkYQ0a600SyLA_0ymznBG8jmriTsYMcXkK77Qg@mail.gmail.com>
-Subject: Re: [RFC 00/16] KVM protected memory extension
-To:     "Nakajima, Jun" <jun.nakajima@intel.com>
-Cc:     Will Deacon <will@kernel.org>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        Marc Zyngier <maz@kernel.org>,
-        "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        "kernel-team@android.com" <kernel-team@android.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-04_13:2020-06-04,2020-06-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ phishscore=0 suspectscore=0 spamscore=0 cotscore=-2147483648 clxscore=1011
+ bulkscore=0 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006040150
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 4, 2020 at 12:09 PM Nakajima, Jun <jun.nakajima@intel.com> wrot=
-e:
+On Tue, 26 May 2020 11:36:29 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> We (Intel virtualization team) are also working on a similar thing, proto=
-typing to meet such requirements, i..e "some level of confidentiality to gu=
-ests=E2=80=9D. Linux/KVM is the host, and the Kirill=E2=80=99s patches are =
-helpful when removing the mappings from the host to achieve memory isolatio=
-n of a guest. But, it=E2=80=99s not easy to prove there are no other mappin=
-gs.
->
-> To raise the level of security, our idea is to de-privilege the host kern=
-el just to enforce memory isolation using EPT (Extended Page Table) that vi=
-rtualizes guest (the host kernel in this case) physical memory; almost ever=
-ything is passthrough. And the EPT for the host kernel excludes the memory =
-for the guest(s) that has confidential info. So, the host kernel shouldn=E2=
-=80=99t cause VM exits as long as it=E2=80=99s behaving well (CPUID still c=
-auses a VM exit, though).
+> Support for hibernation on s390 has been recently been removed with
+> commit 394216275c7d ("s390: remove broken hibernate / power management
+> support"), no need to keep unused code around.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-You're Intel. Can't you just change the CPUID intercept from required
-to optional? It seems like this should be in the realm of a small
-microcode patch.
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+
+> ---
+>  drivers/s390/virtio/virtio_ccw.c | 26 --------------------------
+>  1 file changed, 26 deletions(-)
+> 
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 957889a42d2e..5730572b52cd 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -1372,27 +1372,6 @@ static struct ccw_device_id virtio_ids[] = {
+>  	{},
+>  };
+>  
+> -#ifdef CONFIG_PM_SLEEP
+> -static int virtio_ccw_freeze(struct ccw_device *cdev)
+> -{
+> -	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
+> -
+> -	return virtio_device_freeze(&vcdev->vdev);
+> -}
+> -
+> -static int virtio_ccw_restore(struct ccw_device *cdev)
+> -{
+> -	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
+> -	int ret;
+> -
+> -	ret = virtio_ccw_set_transport_rev(vcdev);
+> -	if (ret)
+> -		return ret;
+> -
+> -	return virtio_device_restore(&vcdev->vdev);
+> -}
+> -#endif
+> -
+>  static struct ccw_driver virtio_ccw_driver = {
+>  	.driver = {
+>  		.owner = THIS_MODULE,
+> @@ -1405,11 +1384,6 @@ static struct ccw_driver virtio_ccw_driver = {
+>  	.set_online = virtio_ccw_online,
+>  	.notify = virtio_ccw_cio_notify,
+>  	.int_class = IRQIO_VIR,
+> -#ifdef CONFIG_PM_SLEEP
+> -	.freeze = virtio_ccw_freeze,
+> -	.thaw = virtio_ccw_restore,
+> -	.restore = virtio_ccw_restore,
+> -#endif
+>  };
+>  
+>  static int __init pure_hex(char **cp, unsigned int *val, int min_digit,
+
