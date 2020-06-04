@@ -2,99 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E607E1EE784
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:16:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A0AB1EE78C
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:20:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729417AbgFDPQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 11:16:40 -0400
-Received: from mga05.intel.com ([192.55.52.43]:12085 "EHLO mga05.intel.com"
+        id S1729301AbgFDPUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 11:20:01 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:54012 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729215AbgFDPQj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 11:16:39 -0400
-IronPort-SDR: sV52ih0nEO33Ic+hcz1XCUEL/sm7frYGFlNfOhVUjQFQOySmmp/2Lm1DdRjklmmxs9Pkrpjg8B
- ztb2xQ5MmNQA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 08:16:39 -0700
-IronPort-SDR: 7rw/X5N9Mgd/AOw/kzPAHTsM03dD7lWqg3OO//GPB0QmEfXtCcVCYA3XI8b0hLyO9SKG869oLy
- wXQ2ogipqrJw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,472,1583222400"; 
-   d="scan'208";a="287403926"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga002.jf.intel.com with ESMTP; 04 Jun 2020 08:16:38 -0700
-Date:   Thu, 4 Jun 2020 08:16:38 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
-Subject: Re: [PATCH] KVM: VMX: Always treat MSR_IA32_PERF_CAPABILITIES as a
- valid PMU MSR
-Message-ID: <20200604151638.GD30223@linux.intel.com>
-References: <20200603203303.28545-1-sean.j.christopherson@intel.com>
- <46f57aa8-e278-b4fd-7ac8-523836308051@intel.com>
+        id S1729170AbgFDPUA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 11:20:00 -0400
+Received: from zn.tnic (p200300ec2f112d0035262982e5edc845.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:2d00:3526:2982:e5ed:c845])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6CEA41EC0118;
+        Thu,  4 Jun 2020 17:19:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1591283999;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=v9mztibqlfJ/JLIFyImy9Q9qLirhr2kGLDWk5NuYc4Q=;
+        b=GOHk7ZNT2JDKJZmzMCdd5ncsxdBtJ1WHI3JpBPGUDAkVXAd85NgVuWzqUzOfQmaZdUu940
+        a7IhnG5aPPNkpl1OkaM3bTFrDqJDi9bC3qCWYfBupJVuZh/oWYxRKXYVZ/z8vWsDn0Y9ax
+        RIzQH1SGrPjgRb2qcSl81uulBZZChEA=
+Date:   Thu, 4 Jun 2020 17:19:53 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 40/75] x86/sev-es: Compile early handler code into
+ kernel image
+Message-ID: <20200604151945.GB2246@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-41-joro@8bytes.org>
+ <20200520091415.GC1457@zn.tnic>
+ <20200604115413.GB30945@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <46f57aa8-e278-b4fd-7ac8-523836308051@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200604115413.GB30945@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 09:37:59AM +0800, Xu, Like wrote:
-> On 2020/6/4 4:33, Sean Christopherson wrote:
-> >Unconditionally return true when querying the validity of
-> >MSR_IA32_PERF_CAPABILITIES so as to defer the validity check to
-> >intel_pmu_{get,set}_msr(), which can properly give the MSR a pass when
-> >the access is initiated from host userspace.
-> Regardless of  the MSR is emulated or not, is it a really good assumption that
-> the guest cpuids are not properly ready when we do initialization from host
-> userspace
-> ?
+On Thu, Jun 04, 2020 at 01:54:13PM +0200, Joerg Roedel wrote:
+> It is not only the trace-point, this would also eliminate exception
+> handling in case the MSR access triggers a #GP. The "Unhandled MSR
+> read/write" messages would turn into a "General Protection Fault"
+> message.
 
-I don't know if I would call it a "good assumption" so much as a "necessary
-assumption".  KVM_{GET,SET}_MSRS are allowed, and must function correctly,
-if they're called prior to KVM_SET_CPUID{2}.
+But the early ones can trigger a #GP too. And there we can't handle
+those #GPs.
 
-> >The MSR is emulated so
-> >there is no underlying hardware dependency to worry about.
-> >
-> >Fixes: 27461da31089a ("KVM: x86/pmu: Support full width counting")
-> >Cc: Like Xu <like.xu@linux.intel.com>
-> >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> >---
-> >
-> >KVM selftests are completely hosed for me, everything fails on KVM_GET_MSRS.
-> At least I tried "make --silent -C tools/testing/selftests/kvm run_tests"
-> and how do I reproduce the "everything fails" for this issue ?
+Why would the late ones need exception handling all of a sudden? And
+for the GHCB MSR, of all MSRs which the SEV-ES guest has used so far to
+bootstrap?!
 
-Hmm, I did nothing more than run the tests on a HSW system.
+-- 
+Regards/Gruss,
+    Boris.
 
-> Thanks,
-> Like Xu
-> >
-> >  arch/x86/kvm/vmx/pmu_intel.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> >diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> >index d33d890b605f..bdcce65c7a1d 100644
-> >--- a/arch/x86/kvm/vmx/pmu_intel.c
-> >+++ b/arch/x86/kvm/vmx/pmu_intel.c
-> >@@ -181,7 +181,7 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
-> >  		ret = pmu->version > 1;
-> >  		break;
-> >  	case MSR_IA32_PERF_CAPABILITIES:
-> >-		ret = guest_cpuid_has(vcpu, X86_FEATURE_PDCM);
-> >+		ret = 1;
-> >  		break;
-> >  	default:
-> >  		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
-> 
+https://people.kernel.org/tglx/notes-about-netiquette
