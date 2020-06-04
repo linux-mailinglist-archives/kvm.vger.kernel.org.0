@@ -2,84 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92AA81EE890
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 18:28:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF9921EE8A4
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 18:33:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729582AbgFDQ2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 12:28:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43582 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729115AbgFDQ17 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 12:27:59 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9FEAC08C5C0
-        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 09:27:58 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id d1so6651475ila.8
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 09:27:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8SV0FtrMHcEVC0TjG1lIBMyklx/s99kl7ywIO23ZhMk=;
-        b=lsX7SRkn/58kMRS+GxvZjQ1F2T1zTLqcNYPLPjzqxYcEq3/rdEQ1PDHoI8s25jhaKF
-         i6R2yAAOM4ruXYCc74CjQSulrfgjKrectwnu2jZntPzkfezzeKYUXNmzBYFlNoYPJKwj
-         gANWWpzAxKwCkGb1wv4cfPVDP6Dg7hdTuWP/3IrvKe2jBG0seplny638FN3YJS/bmPCC
-         qwnqfF76UvF1EOL5CB+Wn0DdaINU1//sA2M56c0PBNB4tw/YvnxLZkMr49qB4vmDWcDg
-         R6PC7XpwseUn/XvM2PVM/RaMI0o561hsiNr1xDau9y5opoF0pHprCUUfhJ5diEZM5M/5
-         yABA==
+        id S1729678AbgFDQdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 12:33:40 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30751 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729641AbgFDQdk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 12:33:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591288419;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rS8D/JFOWrRwFrYArK0CJleHBlqLOjsoPyc8lfn6ZAc=;
+        b=P6M6uEQEzWS5cWoFZwAwnR51aCp3AAYeL4O7/xO72PIMm47XeIOveOSOM8EgvZfoV4UPsN
+        ZTeXWDD2lxNtH1nEOh1jXrO/LMKO3oEAVnG3syANMBmnb0fxJZ9tHv2Uwr/tReOd4XuSFB
+        /GjWci1a7MvHFG43UvEQZpJPsErLH+I=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-IYHLbv6VNSW5x-k7vhcwmg-1; Thu, 04 Jun 2020 12:33:37 -0400
+X-MC-Unique: IYHLbv6VNSW5x-k7vhcwmg-1
+Received: by mail-wr1-f70.google.com with SMTP id w4so2644860wrl.13
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 09:33:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8SV0FtrMHcEVC0TjG1lIBMyklx/s99kl7ywIO23ZhMk=;
-        b=AkBwbxsfI3tnLmghnqnb/RIu6Hkguzhnq3ZEtqfhQ7/tUV8PLZzEVqnp3LhyyNsqVL
-         kPhJ6/nFpFOfGe9ItQj4TdL66t6/ixly0jdOvF6rDmyVXEGfocbV+tj3R5k61xyuf5d9
-         yeVe4RRSvkzXvQWE/fcoIecG2GoF08xEJchhVrJuqFLnO9FoMHPJW9i6DoTbAllwPiwm
-         KVBGV5NrfTI6YAwGdxiVkK9S2Nfa+x1JxP3Xf+4E0Sf0omYsLQBKRJ1trl1dUJDMxdL8
-         a9Gl5a5Y/fvNxoFOv9NsiMfCg6j1qnpCvbC+eu3UsMuHRNHk3zhPFrlkLm9i76ylpL6D
-         KFYA==
-X-Gm-Message-State: AOAM530vO7puulB4cyqDnqmHgl9qCcinY6qsj9/FTzFdMVM2L+o0sfO+
-        AA3qFb29PiskeJBeStUi75bUJgkmhlM6Y9sCYMJRcIT1
-X-Google-Smtp-Source: ABdhPJxRbVJTskYAsmdKpu2pg4TINE2MruufkpwnEijmewcp0JnBYFK2jNyYBde6mk7i4x2dEuDjCSNqEH6iENKh6dA=
-X-Received: by 2002:a92:5f13:: with SMTP id t19mr4759363ilb.296.1591288077708;
- Thu, 04 Jun 2020 09:27:57 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rS8D/JFOWrRwFrYArK0CJleHBlqLOjsoPyc8lfn6ZAc=;
+        b=CasNmE9dy745TbXzLO1KNsVsRWcuTcuuI9vL5i299PKaKcsDUSIWK9uOQEmRMsmiXa
+         w5Bd+vYoRmmvsVNoot0z9Vojn9hoCi3yT99AXrn1weDTn4II29kolwky+ilx1ZMOiAea
+         6gV5fhRPfs2ZSXZ5ME1mBRVLrXE+N9ldsFY/NMfAefBMaaHogXB92iLdvt+UFIYnNSV/
+         gGq7132neRdlG/oB2Zm1wTNtMeA555mzXdojMXefzIvPlF7MfsJa2OJUSv6CTbKYUjFd
+         DDNOMCRbbQec21P3eHcZU5MbMM2FrUgCurJ3JarFIGwXBhnX7cvzpMSwsNK4Su3/GS4+
+         ho/Q==
+X-Gm-Message-State: AOAM533TExjUM7wRzUWyC1SuPtyfDUaoqw8MCuYo9JSTw4hCw+pUKzhq
+        L6WMAsYsLYeK220HeaS7cdnmDU6mILTRqjzPMB+kdxrreQCngdqiQ3PdoKSDFah/8wgpXHQf24D
+        eCcA2kAuj/Ym1
+X-Received: by 2002:a1c:2457:: with SMTP id k84mr4481317wmk.96.1591288416180;
+        Thu, 04 Jun 2020 09:33:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGLvx77NfrsgkT65LvDduqV0L/xtQtvXitGjis7X05sQbwKlDzt50915nPUtGkF1/DNBuxzQ==
+X-Received: by 2002:a1c:2457:: with SMTP id k84mr4481298wmk.96.1591288415922;
+        Thu, 04 Jun 2020 09:33:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
+        by smtp.gmail.com with ESMTPSA id v2sm8619411wrn.21.2020.06.04.09.33.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jun 2020 09:33:35 -0700 (PDT)
+Subject: Re: [GIT PULL] First batch of KVM changes for Linux 5.8
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Wei Liu <wei.liu@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+References: <20200603173857.1345-1-pbonzini@redhat.com>
+ <CAHk-=wjC21siUGvy9zpVOHfLRe4rwiT-ntqqj3zN73qtveKjpQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8ffbd4d8-5baf-c2ee-8728-cc73794ed863@redhat.com>
+Date:   Thu, 4 Jun 2020 18:33:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <CALMp9eS2UtMazBew2yndKVXC0QnnBW2bvbU_d+27Hp7Fw2NXFg@mail.gmail.com>
- <48454efb-455f-5505-f92c-7f78836d5b91@redhat.com>
-In-Reply-To: <48454efb-455f-5505-f92c-7f78836d5b91@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 4 Jun 2020 09:27:46 -0700
-Message-ID: <CALMp9eQ9Xit1oZ0gFmUwd4HwQ6mEMDMvF_ZRg60Ohtt9_nPQqw@mail.gmail.com>
-Subject: Re: PAE mode save/restore broken
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAHk-=wjC21siUGvy9zpVOHfLRe4rwiT-ntqqj3zN73qtveKjpQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 4, 2020 at 7:51 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 02/06/20 02:11, Jim Mattson wrote:
-> > I can only assume that no one cares that KVM_GET_SREGS/KVM_SET_SREGS
-> > is broken for PAE mode guests (i.e. KVM_GET_SREGS doesn't capture the
-> > PDPTRs and KVM_SET_SREGS re-reads them from memory).
-> >
-> > Presumably, since AMD's nested paging is broken for PAE mode guests,
-> > the kvm community has made the decision not to get things right for
-> > Intel either. Can anyone confirm? This was all before my time.
->
-> Yes, pretty much.  The PDPTRs are not part of the saved state, we just
-> treat them as a small third level in the radix tree.  Of course, for
-> nested VMX they are properly synced to the VMCS12 and serialized by
-> KVM_SET_NESTED_STATE.
->
-> Out of curiosity are there OSes that rely on the PDPTRs remaining cached
-> until the next CR3 load?
+On 04/06/20 00:17, Linus Torvalds wrote:
+> On Wed, Jun 3, 2020 at 10:39 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> There could be minor conflicts depending on the order you're processing 5.8
+>> pull requests.
+> It would have been good if you had actually pointed to the reports
+> from linux-next.
+> 
+> As it was, the hyper-v pull request did do that (thanks Wei Liu), so I
+> could verify my merge against what had been reported and this didn't
+> take me by surprise, but it would have good to see that kind of detail
+> from the kvm pull too..
 
-None that I know of.
+Ok, I'll keep it in mind.  Based on today's report from Stephen, you
+will get also a conflict with the s390 tree, and a semantic change
+(build failure) when Thomas sends his large IRQ rework, due to the
+removal of the second argument to do_machine_check.
 
-It's interesting that Intel has taken great pains to virtualize the
-architected behavior, but AMD just shrugged it off.
+Paolo
+
