@@ -2,125 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCD611EE702
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 16:54:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A38981EE721
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 16:59:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729141AbgFDOx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 10:53:58 -0400
-Received: from mga09.intel.com ([134.134.136.24]:7508 "EHLO mga09.intel.com"
+        id S1729188AbgFDO7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 10:59:36 -0400
+Received: from mga17.intel.com ([192.55.52.151]:10498 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729115AbgFDOx6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 10:53:58 -0400
-IronPort-SDR: 12LJ8/wV8Ft7m3YTxGepw3c8Yhy72NMhbO6OrV/5aRf6OVycD3H4u9pA2PgTP+51p2A89j2q3l
- BvJU3K3W8lMQ==
+        id S1729082AbgFDO7e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 10:59:34 -0400
+IronPort-SDR: Rxic9d6J17TQzhVOv3tuCH4XFnNGOtIhMPZ21FvhRT7AqCFpMQyuwDXi/4fJRugc4b6jg9Rkvg
+ VlwEClcd6VRQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 07:53:57 -0700
-IronPort-SDR: 8ETeAVtoSYMA43db23qetcezChvupW5d/MOYb+LcSrr6k/pIV2RwyqAHZSpqC3QdHWLcEvJAXD
- 0p5mi5Yv8yeg==
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 07:59:33 -0700
+IronPort-SDR: f8xpR6ftA8jWoGpYXfb75vNCZkc5KvD3ZQyaQg8TnxPYhjeRCt/F0z1Qf9QReeDzqvAytAOHpH
+ 64ZoJYMs7T6g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,472,1583222400"; 
-   d="scan'208";a="471444497"
+   d="scan'208";a="287397621"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga006.fm.intel.com with ESMTP; 04 Jun 2020 07:53:57 -0700
-Date:   Thu, 4 Jun 2020 07:53:57 -0700
+  by orsmga002.jf.intel.com with ESMTP; 04 Jun 2020 07:59:33 -0700
+Date:   Thu, 4 Jun 2020 07:59:33 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: Inject #GP when nested_vmx_get_vmptr() fails
- to read guest memory
-Message-ID: <20200604145357.GA30223@linux.intel.com>
-References: <20200604143158.484651-1-vkuznets@redhat.com>
- <da7acd6f-204d-70e2-52aa-915a4d9163ef@redhat.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
+ exceptions
+Message-ID: <20200604145932.GB30223@linux.intel.com>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-26-joro@8bytes.org>
+ <20200520062055.GA17090@linux.intel.com>
+ <20200603142325.GB23071@8bytes.org>
+ <20200603230716.GD25606@linux.intel.com>
+ <20200604101502.GA20739@8bytes.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <da7acd6f-204d-70e2-52aa-915a4d9163ef@redhat.com>
+In-Reply-To: <20200604101502.GA20739@8bytes.org>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 04:40:52PM +0200, Paolo Bonzini wrote:
-> On 04/06/20 16:31, Vitaly Kuznetsov wrote:
-
-...
-
-> > KVM could've handled the request correctly by going to userspace and
-> > performing I/O but there doesn't seem to be a good need for such requests
-> > in the first place. Sane guests should not call VMXON/VMPTRLD/VMCLEAR with
-> > anything but normal memory. Just inject #GP to find insane ones.
+On Thu, Jun 04, 2020 at 12:15:02PM +0200, Joerg Roedel wrote:
+> On Wed, Jun 03, 2020 at 04:07:16PM -0700, Sean Christopherson wrote:
+> > On Wed, Jun 03, 2020 at 04:23:25PM +0200, Joerg Roedel wrote:
+> > > User-space can also cause IOIO #VC exceptions, and user-space can be
+> > > 32-bit legacy code with segments, so es_base has to be taken into
+> > > account.
 > > 
-> > Reported-by: syzbot+2a7156e11dc199bdbd8a@syzkaller.appspotmail.com
-> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 19 +++++++++++++++++--
-> >  1 file changed, 17 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 9c74a732b08d..05d57c3cb1ce 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -4628,14 +4628,29 @@ static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer)
-> >  {
-> >  	gva_t gva;
-> >  	struct x86_exception e;
-> > +	int r;
-> >  
-> >  	if (get_vmx_mem_address(vcpu, vmx_get_exit_qual(vcpu),
-> >  				vmcs_read32(VMX_INSTRUCTION_INFO), false,
-> >  				sizeof(*vmpointer), &gva))
-> >  		return 1;
-> >  
-> > -	if (kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e)) {
-> > -		kvm_inject_emulated_page_fault(vcpu, &e);
-> > +	r = kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e);
-> > +	if (r != X86EMUL_CONTINUE) {
-> > +		if (r == X86EMUL_PROPAGATE_FAULT) {
-> > +			kvm_inject_emulated_page_fault(vcpu, &e);
-> > +		} else {
-> > +			/*
-> > +			 * X86EMUL_IO_NEEDED is returned when kvm_vcpu_read_guest_page()
-> > +			 * fails to read guest's memory (e.g. when 'gva' points to MMIO
-> > +			 * space). While KVM could've handled the request correctly by
-> > +			 * exiting to userspace and performing I/O, there doesn't seem
-> > +			 * to be a real use-case behind such requests, just inject #GP
-> > +			 * for now.
-> > +			 */
-> > +			kvm_inject_gp(vcpu, 0);
-> > +		}
-> > +
-> >  		return 1;
-> >  	}
-> >  
-> > 
+> > Is there actually a use case for this?  Exposing port IO to userspace
+> > doesn't exactly improve security.
 > 
-> Hi Vitaly,
-> 
-> looks good but we need to do the same in handle_vmread, handle_vmwrite,
-> handle_invept and handle_invvpid.  Which probably means adding something
-> like nested_inject_emulation_fault to commonize the inner "if".
+> Might be true, but Linux supports it and this patch-set is not the place
+> to challenge this feature.
 
-Can we just kill the guest already instead of throwing more hacks at this
-and hoping something sticks?  We already have one in
-kvm_write_guest_virt_system...
-
-  commit 541ab2aeb28251bf7135c7961f3a6080eebcc705
-  Author: Fuqian Huang <huangfq.daxian@gmail.com>
-  Date:   Thu Sep 12 12:18:17 2019 +0800
-
-    KVM: x86: work around leak of uninitialized stack contents
-
-    Emulation of VMPTRST can incorrectly inject a page fault
-    when passed an operand that points to an MMIO address.
-    The page fault will use uninitialized kernel stack memory
-    as the CR2 and error code.
-
-    The right behavior would be to abort the VM with a KVM_EXIT_INTERNAL_ERROR
-    exit to userspace; however, it is not an easy fix, so for now just ensure
-    that the error code and CR2 are zero.
-
+But SEV already broke it, no?
