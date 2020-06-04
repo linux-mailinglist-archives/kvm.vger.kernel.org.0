@@ -2,148 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F9861EE1B3
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 11:45:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B7931EE240
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 12:15:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728318AbgFDJp1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 05:45:27 -0400
-Received: from 13.mo3.mail-out.ovh.net ([188.165.33.202]:53544 "EHLO
-        13.mo3.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727888AbgFDJp1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 05:45:27 -0400
-X-Greylist: delayed 1797 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Jun 2020 05:45:24 EDT
-Received: from player711.ha.ovh.net (unknown [10.108.57.95])
-        by mo3.mail-out.ovh.net (Postfix) with ESMTP id C206C257A58
-        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 11:08:52 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player711.ha.ovh.net (Postfix) with ESMTPSA id 7121712DFA0B3;
-        Thu,  4 Jun 2020 09:08:31 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass (GARM-104R0053139fd52-1911-4642-b917-db792ecb09ea,0E78B47C015AB62E5F4E4B3B4EB6DB016BBCF3B5) smtp.auth=groug@kaod.org
-Date:   Thu, 4 Jun 2020 11:08:21 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     Thiago Jung Bauermann <bauerman@linux.ibm.com>, pair@us.ibm.com,
-        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
-        qemu-devel@nongnu.org, dgilbert@redhat.com, qemu-ppc@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory
- protection
-Message-ID: <20200604105228.2cb311d3@kaod.org>
-In-Reply-To: <20200604064414.GI228651@umbus.fritz.box>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
-        <87tuzr5ts5.fsf@morokweng.localdomain>
-        <20200604064414.GI228651@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1728338AbgFDKPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 06:15:09 -0400
+Received: from 8bytes.org ([81.169.241.247]:46204 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727850AbgFDKPF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 06:15:05 -0400
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id D9CA726F; Thu,  4 Jun 2020 12:15:03 +0200 (CEST)
+Date:   Thu, 4 Jun 2020 12:15:02 +0200
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
+ exceptions
+Message-ID: <20200604101502.GA20739@8bytes.org>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-26-joro@8bytes.org>
+ <20200520062055.GA17090@linux.intel.com>
+ <20200603142325.GB23071@8bytes.org>
+ <20200603230716.GD25606@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/T8M54mOA9k=ZBfZa=7RzYIy";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 13412845592681355750
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudeguddguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtsehgtderreertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeggfekuddvuddtgfekkeejleegjeffheduuefhledtteeftdfhffdtgfegiefhvdenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200603230716.GD25606@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/T8M54mOA9k=ZBfZa=7RzYIy
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jun 03, 2020 at 04:07:16PM -0700, Sean Christopherson wrote:
+> On Wed, Jun 03, 2020 at 04:23:25PM +0200, Joerg Roedel wrote:
+> > User-space can also cause IOIO #VC exceptions, and user-space can be
+> > 32-bit legacy code with segments, so es_base has to be taken into
+> > account.
+> 
+> Is there actually a use case for this?  Exposing port IO to userspace
+> doesn't exactly improve security.
 
-On Thu, 4 Jun 2020 16:44:14 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Might be true, but Linux supports it and this patch-set is not the place
+to challenge this feature.
 
-> On Thu, Jun 04, 2020 at 01:39:22AM -0300, Thiago Jung Bauermann wrote:
-> >=20
-> > Hello David,
-> >=20
-> > David Gibson <david@gibson.dropbear.id.au> writes:
-> >=20
-> > > A number of hardware platforms are implementing mechanisms whereby the
-> > > hypervisor does not have unfettered access to guest memory, in order
-> > > to mitigate the security impact of a compromised hypervisor.
-> > >
-> > > AMD's SEV implements this with in-cpu memory encryption, and Intel has
-> > > its own memory encryption mechanism.  POWER has an upcoming mechanism
-> > > to accomplish this in a different way, using a new memory protection
-> > > level plus a small trusted ultravisor.  s390 also has a protected
-> > > execution environment.
-> > >
-> > > The current code (committed or draft) for these features has each
-> > > platform's version configured entirely differently.  That doesn't seem
-> > > ideal for users, or particularly for management layers.
-> > >
-> > > AMD SEV introduces a notionally generic machine option
-> > > "machine-encryption", but it doesn't actually cover any cases other
-> > > than SEV.
-> > >
-> > > This series is a proposal to at least partially unify configuration
-> > > for these mechanisms, by renaming and generalizing AMD's
-> > > "memory-encryption" property.  It is replaced by a
-> > > "guest-memory-protection" property pointing to a platform specific
-> > > object which configures and manages the specific details.
-> > >
-> > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
-> >=20
-> > Thank you very much for this series! Using a machine property is a nice
-> > way of configuring this.
-> >=20
-> > >From an end-user perspective, `-M pseries,guest-memory-protection` in
-> > the command line already expresses everything that QEMU needs to know,
-> > so having to add `-object pef-guest,id=3Dpef0` seems a bit redundant. Is
-> > it possible to make QEMU create the pef-guest object behind the scenes
-> > when the guest-memory-protection property is specified?
-> >=20
-> > Regardless, I was able to successfuly launch POWER PEF guests using
-> > these patches:
-> >=20
-> > Tested-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-> >=20
-> > > can be extended to cover the Intel and s390 mechanisms as well,
-> > > though.
-> > >
-> > > Note: I'm using the term "guest memory protection" throughout to refer
-> > > to mechanisms like this.  I don't particular like the term, it's both
-> > > long and not really precise.  If someone can think of a succinct way
-> > > of saying "a means of protecting guest memory from a possibly
-> > > compromised hypervisor", I'd be grateful for the suggestion.
-> >=20
-> > Is "opaque guest memory" any better? It's slightly shorter, and slightly
-> > more precise about what the main characteristic this guest property con=
-veys.
->=20
-> That's not a bad one, but for now I'm going with "host trust
-> limitation", since this might end up covering things other than just
-> memory protection.
->=20
+> Given that i386 ABI requires EFLAGS.DF=0 upon function entry/exit, i.e. is
+> the de facto default, the DF bug implies this hasn't been tested.  And I
+> don't see how this could possibly have worked for SEV given that the kernel
+> unrolls string I/O because the VMM can't emulate string I/O.  Presumably
+> someone would have complained if they "needed" to run legacy crud.  The
+> host and guest obviously need major updates, so supporting e.g. DPDK with
+> legacy virtio seems rather silly.
 
-Any idea what these other things might be ? It seems a bit hard to
-decide of a proper name without a broader picture at this point.
+With SEV-ES and this unrolling of string-io doesn't need to happen
+anymore. It is on the list of things to improve, but this patch-set is
+already pretty big.
 
---Sig_/T8M54mOA9k=ZBfZa=7RzYIy
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> > True, #DBs won't be correct anymore. Currently debugging is not
+> > supported in SEV-ES guests anyway, but if it is supported the #DB
+> > exception would happen in the #VC handler and not on the original
+> > instruction.
+> 
+> As in, the guest can't debug itself?  Or the host can't debug the guest?
 
------BEGIN PGP SIGNATURE-----
+Both, the guest can't debug itself because writes to DR7 never make it
+to the hardware DR7 register. And the host obviously can't debug the
+guest because it has no access to its unencrypted memory and register
+state.
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl7YugUACgkQcdTV5YIv
-c9YaHRAAsCGaQhAxkJQswzk2fB4NUMaNIjaDUka+MU/TxbgZuYyMNrvklAyPjG/a
-Rzr281IzBU907eLOuP3KM0jf3enSdU3DpfD1fll2Dzw9eSgNphvMrCf4xkD4wcad
-rSkID8GRegn4KbK7GL4xCFdvPE1egiAwVRjPMkJi9yVDdPgRkhufIlswWoN5Mhx/
-ydKcdmjbP9fbKu5d9y6aa0D9Uw/lt1PpIbU8yHJnOuRz9HBROCx5CJ8mD9IgSgd8
-IWums28UJKvVwq+zJojQButne51nVkHjn9yY2VxW3WAj7JpjHBdm4o3VdbeNFUTm
-MXaYmCBMcuwTxMrqxXvR32byRhRCHw/2q6PkEAUkxa0SHBIsqjhmU+mUU0hgqrYt
-lPynCReqrJ2M0JabdYfrpXQvCTp6L7LmHBmzR/4wfMvF1PI1oKe4cp7uvDDpfXql
-NHfckWS5V+QQYq87YmriFP56aVxRNx6lmSGk3mXS6ohn01GJ9z2O3/LQY5pIFCxb
-fnTh58xb4y05+/+cQa85CWEa+HuGNxXA7p0DecHE5gEeG8imrNH7vu4SzSwcD5qO
-WmgGCNF1qftUZDOzWUQuj1mjwaaW0mnIYseqb41mFxpg6vvKeebmhbgObUx2N1by
-AkEqzB8IaCxO7/b7yYPyhv1R1aWIxEmBTQhJvr53nzWmAWSgupQ=
-=zeHm
------END PGP SIGNATURE-----
+Regards,
 
---Sig_/T8M54mOA9k=ZBfZa=7RzYIy--
+	Joerg
