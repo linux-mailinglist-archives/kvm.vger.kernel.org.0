@@ -2,187 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16F6D1EEA1A
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 20:10:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF3DB1EEA5F
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 20:38:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730303AbgFDSK2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 14:10:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59516 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730008AbgFDSK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 14:10:27 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2E1C08C5C0
-        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 11:10:27 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id r2so7411467ioo.4
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 11:10:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=L5HJjZvVskCO9kjKNvkZcNLT/6V6HfacHAsQohM4o8A=;
-        b=g4O8Y8vWSLLBwTDYrBoatp7v+icluogTw4q4TO+nSRvJZal3PlouWWR8NY953h6SjS
-         622XeB+/+4f+ZnlL+fg0NCAuV8WL9rMblXyECv2f9rnzIkpOez/T6M/ulGFN/MyjU1JM
-         o8rtPeT8x5IorIM7c56kH1koFAvJyL3pFCnu89Ap+FoOJuwcYhBNgahhX1oGfQYuuezI
-         V7Z0emze4MTyBj1/hrvqcah19ooLE17X7Yi4bwAYLgRRVMpTYBx6RhS1g/07YQLPA2/s
-         Ynxeo/+3wtBzyLlBxEIPhRfO5GAWwGaADxRQJ9ePEGGipKF8r5obBWoU31uhh9+exowc
-         Nzmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=L5HJjZvVskCO9kjKNvkZcNLT/6V6HfacHAsQohM4o8A=;
-        b=Q7YCCBDy5EwRlWAy609iCfrvsK30lWJtr/UEeoE8icA4v8bROlg6WjB0bxgTvuWmAt
-         c8PYzN2Tcx7ReGKMKnRZGbjbNVzX/W0VixWZvqkXBLTH9xVd/wpg/fiGOXceGj7XQcDj
-         C6TopMtFxQwrGS/46r++eQ+JIapMmSxXg4uXnLNrF45SdEoC6nQLjJ2BjdkKipWmqsSR
-         p1JxbklkdHcO5AWILPTwerB8JWD9sFHVqpK6415e4f0AlwtGMg8boWP+yTv7Ri+ff3/r
-         EhEpvCTF/tgdIuCsYMuivIhg+CGaoptnqv1FPKAknXRCkRcSpa0kB+XxHKTft1RIYa2/
-         LywQ==
-X-Gm-Message-State: AOAM5308gVZFuFSdWfRMTwnaNzWnEdqL9mOXAcj9b3Aad0jyJkANmo/y
-        TCdf511KZRqKm8+kU0K0AvB7S0NKOnzbwGuwu6CLSere
-X-Google-Smtp-Source: ABdhPJxZzhqyu7uAkbTXoK2fFclP6AQCk/C+V3OFQvfBf4LcIqUi+O7qB9Tv8XJWdc144vdHqMsG0NyKryfzt5uA79k=
-X-Received: by 2002:a6b:5c01:: with SMTP id z1mr5119461ioh.177.1591294225755;
- Thu, 04 Jun 2020 11:10:25 -0700 (PDT)
+        id S1726262AbgFDSiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 14:38:02 -0400
+Received: from mail-eopbgr70084.outbound.protection.outlook.com ([40.107.7.84]:26243
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725601AbgFDSiB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 14:38:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CimcsL8SYJzFIRLpKcFG6o0c+48M2oDV4INZJujYYfZ6E3IzaSWHMAytlpNfXJKzpWEpJZ09/4d6TFdFV4hI4XptfHpBqwwcJSy1pMjnI95NdJcr365JIlnDYlwJPmsNiluqvEGPOFVgUU8OdsHdLfAN5PRgw7KgzKbDhgeJHVDjz1tSRfZe+qGjGGu5uAJxioWF0yvwszYbY9lihRnYTFfDwRMMAJ/rCt/v2LjzlwUhXh4x2z9bY6Qf9okqxum6Ru5GRz15Ydz5zLlIDGLNMucVYeZ5sd8NdF2mXh/UVZxHJgvVhLNtz3IeROvypv0TvzLdks8tyM3yo1bLAPIwmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mvDYH/+M92ywXQXWmQCueCz2RHJfwc5cEsL97HtzUPs=;
+ b=OurfhXQfzISzsTwTExcOFuQcqAK9c8K4X8+Nl6iZ0gfVols3zGcV/Bxeh+hqPbxrKFIghvJMiqG+C7fV+sQMgIRbOlRIH8II8IIVJKfIulp2ZKgMdVAyKG7uA9KNN0mF5E4dhXATnkghSgm/WMBbtbCXIfY1r185TOiR36BDvnzUh+nANwtLwdO3Gnd8JtKHP77IWtk5ECQT3h2eVTkRMuw1kfnlFvmD6OovHtK96+lAImiMfCgS5IMcJebm3Eh99TgVWk1tr/YwIdMfjrHkdBrqSjkKep4rwBMUeApQA0d67PLyk1vRZqvbrC+gdcfgr4NvnyHiCo0fvLrIWlQQpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mvDYH/+M92ywXQXWmQCueCz2RHJfwc5cEsL97HtzUPs=;
+ b=NHIgPEGk9MTSDrk5skhF5yj8xRYMU4ev0A5O12ggHeIhLp0/dD3MLu2P0HY+6QAZCplDZujWkUlLcAswpZjJSSCHNEijhO4uZHfU1PRZl61oVieBBI3L1qw50vfAddSHM97rUjy2mxGymWsgpt5ezcu6fG+FUeWRUWMgu88yTbQ=
+Authentication-Results: nxp.com; dkim=none (message not signed)
+ header.d=none;nxp.com; dmarc=none action=none header.from=oss.nxp.com;
+Received: from HE1PR0402MB2809.eurprd04.prod.outlook.com (2603:10a6:3:da::17)
+ by HE1PR0402MB3580.eurprd04.prod.outlook.com (2603:10a6:7:87::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18; Thu, 4 Jun
+ 2020 18:37:55 +0000
+Received: from HE1PR0402MB2809.eurprd04.prod.outlook.com
+ ([fe80::c8b6:bdba:be68:289f]) by HE1PR0402MB2809.eurprd04.prod.outlook.com
+ ([fe80::c8b6:bdba:be68:289f%8]) with mapi id 15.20.3045.024; Thu, 4 Jun 2020
+ 18:37:55 +0000
+Subject: Re: [PATCH v2 4/9] vfio/fsl-mc: Implement VFIO_DEVICE_GET_REGION_INFO
+ ioctl call
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        laurentiu.tudor@nxp.com, bharatb.linux@gmail.com,
+        Bharat Bhushan <Bharat.Bhushan@nxp.com>
+References: <20200508072039.18146-1-diana.craciun@oss.nxp.com>
+ <20200508072039.18146-5-diana.craciun@oss.nxp.com>
+ <20200601221231.7527f50b@x1.home>
+From:   Diana Craciun OSS <diana.craciun@oss.nxp.com>
+Message-ID: <01c6c331-7ac3-f1b9-0b5a-98cee7ef7cc8@oss.nxp.com>
+Date:   Thu, 4 Jun 2020 21:37:38 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
+In-Reply-To: <20200601221231.7527f50b@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: AM0PR02CA0102.eurprd02.prod.outlook.com
+ (2603:10a6:208:154::43) To HE1PR0402MB2809.eurprd04.prod.outlook.com
+ (2603:10a6:3:da::17)
 MIME-Version: 1.0
-References: <20200604143158.484651-1-vkuznets@redhat.com> <da7acd6f-204d-70e2-52aa-915a4d9163ef@redhat.com>
- <20200604145357.GA30223@linux.intel.com> <87k10meth6.fsf@vitty.brq.redhat.com>
- <20200604160253.GF30223@linux.intel.com> <87h7vqeq8o.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87h7vqeq8o.fsf@vitty.brq.redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 4 Jun 2020 11:10:14 -0700
-Message-ID: <CALMp9eRO_hf78LP_SdKLmEGhVP7jsKotkTBPvLpexHO_of-=yw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Inject #GP when nested_vmx_get_vmptr() fails
- to read guest memory
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.122] (188.25.133.230) by AM0PR02CA0102.eurprd02.prod.outlook.com (2603:10a6:208:154::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3066.18 via Frontend Transport; Thu, 4 Jun 2020 18:37:54 +0000
+X-Originating-IP: [188.25.133.230]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: ef61c442-ad26-47db-2559-08d808b66572
+X-MS-TrafficTypeDiagnostic: HE1PR0402MB3580:
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <HE1PR0402MB3580BB5F6E1119196BFD7506BE890@HE1PR0402MB3580.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 04244E0DC5
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rgp3e/egFPW0rNqyQm2fUNmcJ3s/YOP2yq60d/mECyp6woOb+O2vHLHOha56BkOlRez8lx14apO9Zp8nIf2UL5jhlRbBNQMbrEVn2kVokVc+Lb7+Izbs+9G6H4PLsyOu0hMbBCe280Xj1he+8tODFNXuYth5sakCAotC8wbG9+AWChqz/euSBwRac0kFwrKATMvBqSne3QcVu4ACPmoZyMU6JtSxbb4I3/B745BpKDFU++FyUQ7dnTYqFiRJ91Px4ecdHIroLzPQNo+/x/enidxnFtPfsrkIYTV5qUnpPcQS3XNwqzVzVXOfb0b3EeoRHkCCOEDvxnO3FMs/eUAxIKA0OTBGf1rXfYl8fBfxBrRR54TCtvUa+3lEBO+UXy1a
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0402MB2809.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(136003)(396003)(376002)(366004)(346002)(39860400002)(31696002)(316002)(31686004)(6916009)(16576012)(956004)(26005)(6666004)(5660300002)(52116002)(86362001)(8936002)(2616005)(8676002)(53546011)(2906002)(66946007)(4326008)(478600001)(186003)(16526019)(83380400001)(66556008)(6486002)(66476007)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: 2ftjDA/E20cPagdZhP9XlqHi3b4mMI5vvnp0OEwl8ogNzLTNkqB0HvPscWUWxBgPUVTjYxowA7rPrkDHEjTlnREh7RF/p4/j/L1pRprVUd1iIg5SN0UsjCxrxNeTHsLqJTApMHuL0oELQJTDbN1xpeUTBm+HOpKLwIe7DliEkkneoXDKL6JZRuQgDJ/sZtQfJ2Rjmk8d/tfRuyoWJUNnisEEmqxRp8pGm/aLr1thU0PomjzPIPQGIOv9u0x9bKH5Q86Z4SasVk1U3EfFdCWupolXb3UY5bcooW9huMKownwa7OcmG1MEj0z3he55TKIwVllzmnQBfntVK+dygrfT4oBG0ln1DhLrgq8xdovbODcKSXsgvMBNyAzFIw5rIwWmt3WbXMf0OGPXpehhMb4cTja/DM+5oqcXHicAvssxCG/xPOZDsllCpVT8hN/ZK3xwSaMziGUdAO1INIXcRGi4e7rabeZ/WUOP21ZOiZj1CPuSgwGIJFIMazN7XSkb25Yz
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef61c442-ad26-47db-2559-08d808b66572
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2020 18:37:55.7402
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jFZ5luPvTsqABDt8cZYl4cyiMXEL68aZz45MuOdq6aquX1zxpnwO47Zt3u//xrpmXIuv8vM3xw72+85HXEbVaw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0402MB3580
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 4, 2020 at 9:43 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On 6/2/2020 7:12 AM, Alex Williamson wrote:
+> On Fri,  8 May 2020 10:20:34 +0300
+> Diana Craciun <diana.craciun@oss.nxp.com> wrote:
 >
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>> Expose to userspace information about the memory regions.
+>>
+>> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+>> Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
+>> ---
+>>   drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 77 ++++++++++++++++++++++-
+>>   drivers/vfio/fsl-mc/vfio_fsl_mc_private.h | 19 ++++++
+>>   2 files changed, 95 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+>> index 8a4d3203b176..c162fa27c02c 100644
+>> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+>> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+>> @@ -17,16 +17,72 @@
+>>   
+>>   static struct fsl_mc_driver vfio_fsl_mc_driver;
+>>   
+>> +static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
+>> +{
+>> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
+>> +	int count = mc_dev->obj_desc.region_count;
+>> +	int i;
+>> +
+>> +	vdev->regions = kcalloc(count, sizeof(struct vfio_fsl_mc_region),
+>> +				GFP_KERNEL);
+>> +	if (!vdev->regions)
+>> +		return -ENOMEM;
+>> +
+>> +	for (i = 0; i < count; i++) {
+>> +		struct resource *res = &mc_dev->regions[i];
+>> +
+>> +		vdev->regions[i].addr = res->start;
+>> +		vdev->regions[i].size = PAGE_ALIGN((resource_size(res)));
 >
-> > On Thu, Jun 04, 2020 at 05:33:25PM +0200, Vitaly Kuznetsov wrote:
-> >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> >>
-> >> > On Thu, Jun 04, 2020 at 04:40:52PM +0200, Paolo Bonzini wrote:
-> >> >> On 04/06/20 16:31, Vitaly Kuznetsov wrote:
-> >> >
-> >> > ...
-> >> >
-> >> >> > KVM could've handled the request correctly by going to userspace and
-> >> >> > performing I/O but there doesn't seem to be a good need for such requests
-> >> >> > in the first place. Sane guests should not call VMXON/VMPTRLD/VMCLEAR with
-> >> >> > anything but normal memory. Just inject #GP to find insane ones.
-> >> >> >
-> >>
-> >> ...
-> >>
-> >> >>
-> >> >> looks good but we need to do the same in handle_vmread, handle_vmwrite,
-> >> >> handle_invept and handle_invvpid.  Which probably means adding something
-> >> >> like nested_inject_emulation_fault to commonize the inner "if".
-> >> >
-> >> > Can we just kill the guest already instead of throwing more hacks at this
-> >> > and hoping something sticks?  We already have one in
-> >> > kvm_write_guest_virt_system...
-> >> >
-> >> >   commit 541ab2aeb28251bf7135c7961f3a6080eebcc705
-> >> >   Author: Fuqian Huang <huangfq.daxian@gmail.com>
-> >> >   Date:   Thu Sep 12 12:18:17 2019 +0800
-> >> >
-> >> >     KVM: x86: work around leak of uninitialized stack contents
-> >> >
-> >>
-> >> Oh I see...
-> >>
-> >> [...]
-> >>
-> >> Let's get back to 'vm_bugged' idea then?
-> >>
-> >> https://lore.kernel.org/kvm/87muadnn1t.fsf@vitty.brq.redhat.com/
-> >
-> > Hmm, I don't think we need to go that far.  The 'vm_bugged' idea was more
-> > to handle cases where KVM itself (or hardware) screwed something up and
-> > detects an issue deep in a call stack with no recourse for reporting the
-> > error up the stack.
-> >
-> > That isn't the case here.  Unless I'm mistaken, the end result is simliar
-> > to this patch, except that KVM would exit to userspace with
-> > KVM_INTERNAL_ERROR_EMULATION instead of injecting a #GP.  E.g.
->
-> I just wanted to resurrect that 'vm_bugged' idea but was waiting for a
-> good opportunity :-)
->
-> The advantage of KVM_EXIT_INTERNAL_ERROR is that we're not trying to
-> invent some behavior which is not in SDM and making it a bit more likely
-> that we get a bug report from an angry user.
+> Why do we need this page alignment to resource_size()?  It makes me
+> worry that we're actually giving the user access to an extended size
+> that might overlap another device or to MMIO that's not backed by any
+> device and might trigger a fault when accessed.  In vfio-pci we make
+> some effort to reserve resources when we want to allow mmap of sub-page
+> ranges.  Thanks,
 
-If KVM can't handle the emulation, KVM_EXIT_INTERNAL_ERROR is far
-better than cooking up fictional faults to deliver to the guest.
+OK, I will look into this. Theoretically it should work without the need 
+of alignment but currently I see an issue that I am investigating.
+Anyway the access is safe, the actual size of the device MMIO is page 
+aligned (aligned to 64K), just that part of it is reserved and the 
+firmware reports the the size that is actually used.
 
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 9c74a732b08d..e13d2c0014e2 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -4624,6 +4624,20 @@ void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
-> >         }
-> >  }
-> >
-> > +static int nested_vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int ret,
-> > +                                           struct x86_exception *e)
-> > +{
-> > +       if (r == X86EMUL_PROPAGATE_FAULT) {
-> > +               kvm_inject_emulated_page_fault(vcpu, &e);
-> > +               return 1;
-> > +       }
-> > +
-> > +       vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> > +       vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> > +       vcpu->run->internal.ndata = 0;
-> > +       return 0;
-> > +}
-> > +
-> >  static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer)
-> >  {
-> >         gva_t gva;
-> > @@ -4634,11 +4648,9 @@ static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer)
-> >                                 sizeof(*vmpointer), &gva))
-> >                 return 1;
-> >
-> > -       if (kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e)) {
-> > -               kvm_inject_emulated_page_fault(vcpu, &e);
-> > -               return 1;
-> > -       }
-> > -
-> > +       r kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e);
-> > +       if (r)
-> > +               return nested_vmx_handle_memory_failure(r, &e);
-> >         return 0;
-> >  }
-> >
+Thanks,
+Diana
+
 >
-> ... and the same for handle_vmread, handle_vmwrite, handle_invept and
-> handle_invvpid as suggested by Paolo. I'll be sending this as v2 with
-> your Suggested-by: shortly.
+> Alex
 >
-> >
-> >
-> > Side topic, I have some preliminary patches for the 'vm_bugged' idea.  I'll
-> > try to whip them into something that can be posted upstream in the next few
-> > weeks.
-> >
 >
-> Sounds great!
->
-> --
-> Vitaly
->
+>> +		vdev->regions[i].flags = 0;
+>> +	}
+>> +
+>> +	vdev->num_regions = mc_dev->obj_desc.region_count;
+>> +	return 0;
+>> +}
+>> +
+>> +static void vfio_fsl_mc_regions_cleanup(struct vfio_fsl_mc_device *vdev)
+>> +{
+>> +	vdev->num_regions = 0;
+>> +	kfree(vdev->regions);
+>> +}
+>> +
+>>   static int vfio_fsl_mc_open(void *device_data)
+>>   {
+>> +	struct vfio_fsl_mc_device *vdev = device_data;
+>> +	int ret;
+>> +
+>>   	if (!try_module_get(THIS_MODULE))
+>>   		return -ENODEV;
+>>   
+>> +	mutex_lock(&vdev->driver_lock);
+>> +	if (!vdev->refcnt) {
+>> +		ret = vfio_fsl_mc_regions_init(vdev);
+>> +		if (ret)
+>> +			goto err_reg_init;
+>> +	}
+>> +	vdev->refcnt++;
+>> +
+>> +	mutex_unlock(&vdev->driver_lock);
+>> +
+>>   	return 0;
+>> +
+>> +err_reg_init:
+>> +	mutex_unlock(&vdev->driver_lock);
+>> +	module_put(THIS_MODULE);
+>> +	return ret;
+>>   }
+>>   
+>>   static void vfio_fsl_mc_release(void *device_data)
+>>   {
+>> +	struct vfio_fsl_mc_device *vdev = device_data;
+>> +
+>> +	mutex_lock(&vdev->driver_lock);
+>> +
+>> +	if (!(--vdev->refcnt))
+>> +		vfio_fsl_mc_regions_cleanup(vdev);
+>> +
+>> +	mutex_unlock(&vdev->driver_lock);
+>> +
+>>   	module_put(THIS_MODULE);
+>>   }
+>>   
+>> @@ -59,7 +115,25 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
+>>   	}
+>>   	case VFIO_DEVICE_GET_REGION_INFO:
+>>   	{
+>> -		return -ENOTTY;
+>> +		struct vfio_region_info info;
+>> +
+>> +		minsz = offsetofend(struct vfio_region_info, offset);
+>> +
+>> +		if (copy_from_user(&info, (void __user *)arg, minsz))
+>> +			return -EFAULT;
+>> +
+>> +		if (info.argsz < minsz)
+>> +			return -EINVAL;
+>> +
+>> +		if (info.index >= vdev->num_regions)
+>> +			return -EINVAL;
+>> +
+>> +		/* map offset to the physical address  */
+>> +		info.offset = VFIO_FSL_MC_INDEX_TO_OFFSET(info.index);
+>> +		info.size = vdev->regions[info.index].size;
+>> +		info.flags = vdev->regions[info.index].flags;
+>> +
+>> +		return copy_to_user((void __user *)arg, &info, minsz);
+>>   	}
+>>   	case VFIO_DEVICE_GET_IRQ_INFO:
+>>   	{
+>> @@ -201,6 +275,7 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+>>   		vfio_iommu_group_put(group, dev);
+>>   		return ret;
+>>   	}
+>> +	mutex_init(&vdev->driver_lock);
+>>   
+>>   	return ret;
+>>   }
+>> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+>> index 37d61eaa58c8..818dfd3df4db 100644
+>> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+>> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+>> @@ -7,9 +7,28 @@
+>>   #ifndef VFIO_FSL_MC_PRIVATE_H
+>>   #define VFIO_FSL_MC_PRIVATE_H
+>>   
+>> +#define VFIO_FSL_MC_OFFSET_SHIFT    40
+>> +#define VFIO_FSL_MC_OFFSET_MASK (((u64)(1) << VFIO_FSL_MC_OFFSET_SHIFT) - 1)
+>> +
+>> +#define VFIO_FSL_MC_OFFSET_TO_INDEX(off) ((off) >> VFIO_FSL_MC_OFFSET_SHIFT)
+>> +
+>> +#define VFIO_FSL_MC_INDEX_TO_OFFSET(index)	\
+>> +	((u64)(index) << VFIO_FSL_MC_OFFSET_SHIFT)
+>> +
+>> +struct vfio_fsl_mc_region {
+>> +	u32			flags;
+>> +	u32			type;
+>> +	u64			addr;
+>> +	resource_size_t		size;
+>> +};
+>> +
+>>   struct vfio_fsl_mc_device {
+>>   	struct fsl_mc_device		*mc_dev;
+>>   	struct notifier_block        nb;
+>> +	int				refcnt;
+>> +	u32				num_regions;
+>> +	struct vfio_fsl_mc_region	*regions;
+>> +	struct mutex driver_lock;
+>>   };
+>>   
+>>   #endif /* VFIO_FSL_MC_PRIVATE_H */
+
