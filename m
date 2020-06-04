@@ -2,133 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C7851EED79
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 23:47:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE7F41EED8D
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 23:55:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728124AbgFDVrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 17:47:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23162 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725943AbgFDVrQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 17:47:16 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 054L2h04055403;
-        Thu, 4 Jun 2020 17:47:14 -0400
+        id S1726837AbgFDVzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 17:55:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56106 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726062AbgFDVzC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 17:55:02 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 054LXdn1100432;
+        Thu, 4 Jun 2020 17:54:52 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31ek4swnpt-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31f8yvgfww-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Jun 2020 17:46:48 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 054LkirM164843;
-        Thu, 4 Jun 2020 17:46:44 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31ek4swncr-1
+        Thu, 04 Jun 2020 17:54:51 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 054LXhoL100532;
+        Thu, 4 Jun 2020 17:54:51 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31f8yvgfwf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Jun 2020 17:46:44 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 054LUcLu030223;
-        Thu, 4 Jun 2020 21:44:31 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 31bf482suq-1
+        Thu, 04 Jun 2020 17:54:51 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 054Lo2XF030098;
+        Thu, 4 Jun 2020 21:54:50 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma04dal.us.ibm.com with ESMTP id 31bf4b2q8v-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Jun 2020 21:44:31 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 054LiTen51511446
+        Thu, 04 Jun 2020 21:54:49 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 054LskPr29622772
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Jun 2020 21:44:29 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6A23242042;
-        Thu,  4 Jun 2020 21:44:29 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 21BE74203F;
-        Thu,  4 Jun 2020 21:44:29 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.48.217])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  4 Jun 2020 21:44:29 +0000 (GMT)
-Date:   Thu, 4 Jun 2020 23:44:21 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] s390/virtio: remove unused pm callbacks
-Message-ID: <20200604234421.4ada966b.pasic@linux.ibm.com>
-In-Reply-To: <20200526093629.257649-1-cohuck@redhat.com>
-References: <20200526093629.257649-1-cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        Thu, 4 Jun 2020 21:54:46 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2961BC6057;
+        Thu,  4 Jun 2020 21:54:48 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 972BAC605A;
+        Thu,  4 Jun 2020 21:54:44 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.160.104.193])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Thu,  4 Jun 2020 21:54:44 +0000 (GMT)
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au> <87tuzr5ts5.fsf@morokweng.localdomain> <20200604062124.GG228651@umbus.fritz.box>
+User-agent: mu4e 1.2.0; emacs 26.3
+From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     qemu-ppc@nongnu.org, qemu-devel@nongnu.org, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+        mdroth@linux.vnet.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
+In-reply-to: <20200604062124.GG228651@umbus.fritz.box>
+Date:   Thu, 04 Jun 2020 18:54:40 -0300
+Message-ID: <87r1uu1opr.fsf@morokweng.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-06-04_13:2020-06-04,2020-06-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- phishscore=0 suspectscore=0 spamscore=0 cotscore=-2147483648 clxscore=1011
- bulkscore=0 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006040150
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 spamscore=0 adultscore=0
+ clxscore=1015 bulkscore=0 lowpriorityscore=0 impostorscore=0
+ cotscore=-2147483648 priorityscore=1501 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006040152
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 May 2020 11:36:29 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Support for hibernation on s390 has been recently been removed with
-> commit 394216275c7d ("s390: remove broken hibernate / power management
-> support"), no need to keep unused code around.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> On Thu, Jun 04, 2020 at 01:39:22AM -0300, Thiago Jung Bauermann wrote:
+>> 
+>> Hello David,
+>> 
+>> David Gibson <david@gibson.dropbear.id.au> writes:
+>> 
+>> > A number of hardware platforms are implementing mechanisms whereby the
+>> > hypervisor does not have unfettered access to guest memory, in order
+>> > to mitigate the security impact of a compromised hypervisor.
+>> >
+>> > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+>> > its own memory encryption mechanism.  POWER has an upcoming mechanism
+>> > to accomplish this in a different way, using a new memory protection
+>> > level plus a small trusted ultravisor.  s390 also has a protected
+>> > execution environment.
+>> >
+>> > The current code (committed or draft) for these features has each
+>> > platform's version configured entirely differently.  That doesn't seem
+>> > ideal for users, or particularly for management layers.
+>> >
+>> > AMD SEV introduces a notionally generic machine option
+>> > "machine-encryption", but it doesn't actually cover any cases other
+>> > than SEV.
+>> >
+>> > This series is a proposal to at least partially unify configuration
+>> > for these mechanisms, by renaming and generalizing AMD's
+>> > "memory-encryption" property.  It is replaced by a
+>> > "guest-memory-protection" property pointing to a platform specific
+>> > object which configures and manages the specific details.
+>> >
+>> > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+>> 
+>> Thank you very much for this series! Using a machine property is a nice
+>> way of configuring this.
+>> 
+>> >From an end-user perspective, `-M pseries,guest-memory-protection` in
+>> the command line already expresses everything that QEMU needs to know,
+>> so having to add `-object pef-guest,id=pef0` seems a bit redundant. Is
+>> it possible to make QEMU create the pef-guest object behind the scenes
+>> when the guest-memory-protection property is specified?
+>
+> Not exactly - the object needs to exist for the QOM core to resolve it
+> before we'd have a chance to look at the value to conditionally create
+> the object.
+>
+> What we could do, however, is always create a PEF object in the
+> machine, and it would just have no effect if the machine parameter
+> wasn't specified.
+>
+> I did consider that option, but left it this way for greater
+> consistency with AMD SEV - there the object can't be auto-created,
+> since it has mandatory parameters needed to configure the encryption.
+>
+> I'm open to persuasion about changing that, though.
 
-> ---
->  drivers/s390/virtio/virtio_ccw.c | 26 --------------------------
->  1 file changed, 26 deletions(-)
-> 
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 957889a42d2e..5730572b52cd 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -1372,27 +1372,6 @@ static struct ccw_device_id virtio_ids[] = {
->  	{},
->  };
->  
-> -#ifdef CONFIG_PM_SLEEP
-> -static int virtio_ccw_freeze(struct ccw_device *cdev)
-> -{
-> -	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
-> -
-> -	return virtio_device_freeze(&vcdev->vdev);
-> -}
-> -
-> -static int virtio_ccw_restore(struct ccw_device *cdev)
-> -{
-> -	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
-> -	int ret;
-> -
-> -	ret = virtio_ccw_set_transport_rev(vcdev);
-> -	if (ret)
-> -		return ret;
-> -
-> -	return virtio_device_restore(&vcdev->vdev);
-> -}
-> -#endif
-> -
->  static struct ccw_driver virtio_ccw_driver = {
->  	.driver = {
->  		.owner = THIS_MODULE,
-> @@ -1405,11 +1384,6 @@ static struct ccw_driver virtio_ccw_driver = {
->  	.set_online = virtio_ccw_online,
->  	.notify = virtio_ccw_cio_notify,
->  	.int_class = IRQIO_VIR,
-> -#ifdef CONFIG_PM_SLEEP
-> -	.freeze = virtio_ccw_freeze,
-> -	.thaw = virtio_ccw_restore,
-> -	.restore = virtio_ccw_restore,
-> -#endif
->  };
->  
->  static int __init pure_hex(char **cp, unsigned int *val, int min_digit,
+What about having it both ways?
 
+QEMU could always create a PEF object, and if the command line defines
+one, it will correspond to it. And if the command line doesn't define one,
+then it would also work because the PEF object is already there.
+
+That way, compatibility with AMD SEV is preserved but we also get
+command line simplicity where it is not needed.
+
+
+-- 
+Thiago Jung Bauermann
+IBM Linux Technology Center
