@@ -2,109 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F1B91EE7B0
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:25:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C0161EE7C5
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:30:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729500AbgFDPZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 11:25:31 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53735 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729035AbgFDPZb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 11:25:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591284330;
+        id S1729389AbgFDPaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 11:30:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729035AbgFDPaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 11:30:35 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D679BC08C5C0;
+        Thu,  4 Jun 2020 08:30:34 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f112d0035262982e5edc845.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:2d00:3526:2982:e5ed:c845])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3817D1EC0118;
+        Thu,  4 Jun 2020 17:30:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1591284633;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+QNtRZdQksHtLTAxFoyE3GgtLlyfez9R35g/z9pvVhk=;
-        b=eJ3nrJSxcZk3l0F4A/tQie7FfUQ+DPBoOj/tFpN3hMgZID26DoxYdu6JuGTybs5upM9oMS
-        39AbM8VmSP1HfZda5wR8dO8mHQxrZ+0+6I6NDPRaqi8BUOQp7O1lfCF7ndKl2BPsZr66F3
-        cGdsvFKv39D1NGp1pHFx7pSjISBF+Dk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-H6Yl6rxpPS2aoSTqNcEvog-1; Thu, 04 Jun 2020 11:25:25 -0400
-X-MC-Unique: H6Yl6rxpPS2aoSTqNcEvog-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9275C805489;
-        Thu,  4 Jun 2020 15:25:23 +0000 (UTC)
-Received: from gondolin (ovpn-112-76.ams2.redhat.com [10.36.112.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 882D67A8D2;
-        Thu,  4 Jun 2020 15:25:18 +0000 (UTC)
-Date:   Thu, 4 Jun 2020 17:25:15 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com, kevin.tian@intel.com, shaopeng.he@intel.com,
-        yi.l.liu@intel.com, xin.zeng@intel.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH v4 04/10] vfio/pci: let vfio_pci know number of
- vendor regions and vendor irqs
-Message-ID: <20200604172515.614e9864.cohuck@redhat.com>
-In-Reply-To: <20200518024944.14263-1-yan.y.zhao@intel.com>
-References: <20200518024202.13996-1-yan.y.zhao@intel.com>
-        <20200518024944.14263-1-yan.y.zhao@intel.com>
-Organization: Red Hat GmbH
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=dgOFdDW+wev1gcsAysq51nTpw31Zuln3/0Xnz7fwqtE=;
+        b=lY1y2A+1RzmtxBuefUaVNKu/Y1Wj+Nvw4Y9pBw79JG/+MQBzPlnZkr2uFIyLIkrGlRb4iB
+        eZMF4rQHg/FKxFGQd6yAn+xN5lvToN5VcyMpqXNH3MT4NvtumJjwozsbFNTSnB9ZJhLOnC
+        47J+naxjkG0RfuLl25dliKfHi+8JGD8=
+Date:   Thu, 4 Jun 2020 17:30:27 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 42/75] x86/sev-es: Setup GHCB based boot #VC handler
+Message-ID: <20200604153021.GC2246@zn.tnic>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-43-joro@8bytes.org>
+ <20200520192230.GK1457@zn.tnic>
+ <20200604120749.GC30945@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200604120749.GC30945@8bytes.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 17 May 2020 22:49:44 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Thu, Jun 04, 2020 at 02:07:49PM +0200, Joerg Roedel wrote:
+> This are IDT entry points and the names above follow the convention for
+> them, like e.g. 'page_fault', 'nmi' or 'general_protection'. Should I
+> still add the verbs or just add a comment explaining what those symbols
+> are?
 
-> This allows a simpler VFIO_DEVICE_GET_INFO ioctl in vendor driver
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c         | 23 +++++++++++++++++++++--
->  drivers/vfio/pci/vfio_pci_private.h |  2 ++
->  include/linux/vfio.h                |  3 +++
->  3 files changed, 26 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 290b7ab55ecf..30137c1c5308 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -105,6 +105,24 @@ void *vfio_pci_vendor_data(void *device_data)
->  }
->  EXPORT_SYMBOL_GPL(vfio_pci_vendor_data);
->  
-> +int vfio_pci_set_vendor_regions(void *device_data, int num_vendor_regions)
-> +{
-> +	struct vfio_pci_device *vdev = device_data;
-> +
-> +	vdev->num_vendor_regions = num_vendor_regions;
+Hmmkay, I see vc_no_ghcb doing
 
-Do we need any kind of sanity check here, in case this is called with a
-bogus value?
+call    do_vc_no_ghcb
 
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_pci_set_vendor_regions);
-> +
-> +
-> +int vfio_pci_set_vendor_irqs(void *device_data, int num_vendor_irqs)
-> +{
-> +	struct vfio_pci_device *vdev = device_data;
-> +
-> +	vdev->num_vendor_irqs = num_vendor_irqs;
+and that's setup in early_idt_setup().
 
-Here as well.
+vc_boot_ghcb(), OTOH, is called by do_early_exception() only so that one
+could be called handle_vc_boot_ghcb(), no? I.e., I don't see it being an
+IDT entry point.
 
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_pci_set_vendor_irqs);
->  /*
->   * Our VGA arbiter participation is limited since we don't know anything
->   * about the device itself.  However, if the device is the only VGA device
+-- 
+Regards/Gruss,
+    Boris.
 
-(...)
-
+https://people.kernel.org/tglx/notes-about-netiquette
