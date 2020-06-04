@@ -2,89 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B7931EE240
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 12:15:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDAA01EE249
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 12:17:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728338AbgFDKPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 06:15:09 -0400
-Received: from 8bytes.org ([81.169.241.247]:46204 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727850AbgFDKPF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 06:15:05 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id D9CA726F; Thu,  4 Jun 2020 12:15:03 +0200 (CEST)
-Date:   Thu, 4 Jun 2020 12:15:02 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 25/75] x86/sev-es: Add support for handling IOIO
- exceptions
-Message-ID: <20200604101502.GA20739@8bytes.org>
-References: <20200428151725.31091-1-joro@8bytes.org>
- <20200428151725.31091-26-joro@8bytes.org>
- <20200520062055.GA17090@linux.intel.com>
- <20200603142325.GB23071@8bytes.org>
- <20200603230716.GD25606@linux.intel.com>
+        id S1727921AbgFDKRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 06:17:42 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31345 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726735AbgFDKRm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 06:17:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591265860;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2AztqKvzgy7aFiXghmWU8gdfGqSDj8pW4Rz5e+UFG6I=;
+        b=ZHnhhjKCJ4kMWcm3yu2QJJ1MsUEzKnZmqaJULruTnWMxTeVcDJNncsaHfcfjUrqVKeY4E9
+        tgR74dNADfu9dzQzRS+irIONTE12pjpNeCxIbUM/yuA927uF7xbK/EPTDdfiy/dguQwArF
+        cWZ6ZtZjEZB0R1eOPcEjqj+ROZ04yqA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-PnlzWhaxMmyYmdM_3KX33Q-1; Thu, 04 Jun 2020 06:17:38 -0400
+X-MC-Unique: PnlzWhaxMmyYmdM_3KX33Q-1
+Received: by mail-wm1-f72.google.com with SMTP id j128so1817489wmj.6
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 03:17:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=2AztqKvzgy7aFiXghmWU8gdfGqSDj8pW4Rz5e+UFG6I=;
+        b=fxxcsbI6PnJSleBCd9fpfP1GEuqoG2F/CGoLSBGPTWs9m5P7qdTV/qNuFzbXiDyg1S
+         KOO7cteCWJ/KAMZ9Pu0tWowaZCFsfjuHIMn3gChQTJEFPyMxg0x58ckmxwmeDI2PlL0B
+         Ta+8u56t5a9VSOFIbaRF0BHRRa+mKv57ecYZhzmzcxdGn9zmjxqedKq8jH5b0DS+rSSX
+         rodYvv0KnakuzoDvNT6EJtgVX+xc7ppO2CfA6awFZUKHFS/c5SfwobYiT2T9qgkNN4zs
+         bMRsa4sOfnRaR0YUYmSidjAqOT6kaKUBTegfdpzhOzPMkcmggrqTRnlrebs0JeqiJKWB
+         pKJg==
+X-Gm-Message-State: AOAM530rPgCYh3rrgfNrJn84lI6hvR6a4GEmYSf8zebufoUacaK9ZENp
+        tE6WkQHAsVEYmTDkIdB2rv+2vCe9ohcGSZWR4jt+StdaTx15upsOl3Iqm6p5y2husxAOoite50S
+        fZVZPS6LVibln
+X-Received: by 2002:a1c:a3c1:: with SMTP id m184mr3568708wme.91.1591265857924;
+        Thu, 04 Jun 2020 03:17:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzJO213xAQF9M1ot7ZZba5ozFLdbD1Lq18fiEmWZFnyrw/++lJWGikXa82it32Q87Xgmp4QWw==
+X-Received: by 2002:a1c:a3c1:: with SMTP id m184mr3568671wme.91.1591265857625;
+        Thu, 04 Jun 2020 03:17:37 -0700 (PDT)
+Received: from redhat.com ([2a00:a040:185:f65:9a3b:8fff:fed3:ad8d])
+        by smtp.gmail.com with ESMTPSA id s8sm7754324wrg.50.2020.06.04.03.17.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jun 2020 03:17:37 -0700 (PDT)
+Date:   Thu, 4 Jun 2020 06:17:33 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 07/13] vhost: format-independent API for used buffers
+Message-ID: <20200604060732-mutt-send-email-mst@kernel.org>
+References: <20200602130543.578420-1-mst@redhat.com>
+ <20200602130543.578420-8-mst@redhat.com>
+ <6d98f2cc-2084-cde0-c938-4ca01692adf9@redhat.com>
+ <20200604050135-mutt-send-email-mst@kernel.org>
+ <b39e6fb8-a59a-2b3f-a1eb-1ccea2fe1b86@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200603230716.GD25606@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b39e6fb8-a59a-2b3f-a1eb-1ccea2fe1b86@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 03, 2020 at 04:07:16PM -0700, Sean Christopherson wrote:
-> On Wed, Jun 03, 2020 at 04:23:25PM +0200, Joerg Roedel wrote:
-> > User-space can also cause IOIO #VC exceptions, and user-space can be
-> > 32-bit legacy code with segments, so es_base has to be taken into
-> > account.
+On Thu, Jun 04, 2020 at 05:18:00PM +0800, Jason Wang wrote:
 > 
-> Is there actually a use case for this?  Exposing port IO to userspace
-> doesn't exactly improve security.
-
-Might be true, but Linux supports it and this patch-set is not the place
-to challenge this feature.
-
-> Given that i386 ABI requires EFLAGS.DF=0 upon function entry/exit, i.e. is
-> the de facto default, the DF bug implies this hasn't been tested.  And I
-> don't see how this could possibly have worked for SEV given that the kernel
-> unrolls string I/O because the VMM can't emulate string I/O.  Presumably
-> someone would have complained if they "needed" to run legacy crud.  The
-> host and guest obviously need major updates, so supporting e.g. DPDK with
-> legacy virtio seems rather silly.
-
-With SEV-ES and this unrolling of string-io doesn't need to happen
-anymore. It is on the list of things to improve, but this patch-set is
-already pretty big.
-
-> > True, #DBs won't be correct anymore. Currently debugging is not
-> > supported in SEV-ES guests anyway, but if it is supported the #DB
-> > exception would happen in the #VC handler and not on the original
-> > instruction.
+> On 2020/6/4 下午5:03, Michael S. Tsirkin wrote:
+> > > >    static bool vhost_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+> > > >    {
+> > > >    	__u16 old, new;
+> > > > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> > > > index a67bda9792ec..6c10e99ff334 100644
+> > > > --- a/drivers/vhost/vhost.h
+> > > > +++ b/drivers/vhost/vhost.h
+> > > > @@ -67,6 +67,13 @@ struct vhost_desc {
+> > > >    	u16 id;
+> > > >    };
+> > > > +struct vhost_buf {
+> > > > +	u32 out_len;
+> > > > +	u32 in_len;
+> > > > +	u16 descs;
+> > > > +	u16 id;
+> > > > +};
+> > > So it looks to me the struct vhost_buf can work for both split ring and
+> > > packed ring.
+> > > 
+> > > If this is true, we'd better make struct vhost_desc work for both.
+> > > 
+> > > Thanks
+> > Both vhost_desc and vhost_buf can work for split and packed.
+> > 
+> > Do you mean we should add packed ring support based on this?
+> > For sure, this is one of the motivators for the patchset.
+> > 
 > 
-> As in, the guest can't debug itself?  Or the host can't debug the guest?
+> Somehow. But the reason I ask is that I see "split" suffix is used in patch
+> 1 as:
+> 
+> peek_split_desc()
+> pop_split_desc()
+> push_split_desc()
+> 
+> But that suffix is not used for the new used ring API invented in this
+> patch.
+> 
+> Thanks
+> 
 
-Both, the guest can't debug itself because writes to DR7 never make it
-to the hardware DR7 register. And the host obviously can't debug the
-guest because it has no access to its unencrypted memory and register
-state.
+And that is intentional: split is *not* part of API. The whole idea is
+that ring APIs are format agnostic using "buffer" terminology from spec.
+The split things are all static within vhost.c
 
-Regards,
+OK so where I had to add a bunch of new format specific code, that was
+tagged as "split" to make it easier to spot that they only support a
+specific format.  At the same time, I did not rename existing code
+adding "split" in the name. I agree it's a useful additional step for
+packed ring format support, and it's fairly easy. I just didn't want
+to do it automatically.
 
-	Joerg
+
+
+-- 
+MST
+
