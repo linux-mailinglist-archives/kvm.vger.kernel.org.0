@@ -2,350 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A8FC1EDD01
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 08:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD1FB1EDCFF
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 08:12:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727105AbgFDGMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 02:12:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32802 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727046AbgFDGMb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 02:12:31 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4621C05BD43
-        for <kvm@vger.kernel.org>; Wed,  3 Jun 2020 23:12:31 -0700 (PDT)
+        id S1727061AbgFDGMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 02:12:33 -0400
+Received: from ozlabs.org ([203.11.71.1]:38493 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726762AbgFDGMc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 02:12:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 49cwRc61BPz9sSn; Thu,  4 Jun 2020 16:12:28 +1000 (AEST)
+        id 49cwRd0DKKz9sT9; Thu,  4 Jun 2020 16:12:28 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1591251148;
-        bh=4mNWXeeVJLVrbIApFBHif9Uyd9pGvH80LiEsHxKqPgg=;
+        d=gibson.dropbear.id.au; s=201602; t=1591251149;
+        bh=7Q9EoAEsm4CUyc+8kT1Oj2miaAQHPa+uszA858Mjx1w=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bX1JNvJIns8y/4pX9fXsAZ40jYzgTI7SVDtXXbtimebDad1WlJYbl6njjBNhZ0ckX
-         tjPi2UTLbdkAvRqN2ACWNd+p1qYp3htSLaezhwFAM5ZyirzRhl9onHj+X2TuV3y9ho
-         r00s8jeDFMO1RpzInRknVUurFfstf4QOpeCMHGvg=
-Date:   Thu, 4 Jun 2020 13:27:51 +1000
+        b=WD9NUZ52oeQ8n17L4mXKrNejWC2n+y38XCaoJVCv+edpMOijxtlOo0H13qsZu2BB2
+         Lsp//JH4CSj0sz1yEY0Bwt5dBvW6KyfF2emGW6c5hItI12qlQ6rPljuQ+L47txnBRO
+         xfNYyJXH22vSPvyepi+j0iP5H48w1g7MegT5j6cM=
+Date:   Thu, 4 Jun 2020 13:46:26 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Greg Kurz <groug@kaod.org>
+To:     Ram Pai <linuxram@us.ibm.com>
 Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com,
         frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
         Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
         "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
         mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <rth@twiddle.net>
-Subject: Re: [RFC v2 11/18] guest memory protection: Handle memory encrption
- via interface
-Message-ID: <20200604032751.GD228651@umbus.fritz.box>
+Subject: Re: [RFC v2 17/18] spapr: Added PEF based guest memory protection
+Message-ID: <20200604034626.GE228651@umbus.fritz.box>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-12-david@gibson.dropbear.id.au>
- <20200525122655.0488cc3d@bahia.lan>
+ <20200521034304.340040-18-david@gibson.dropbear.id.au>
+ <20200529075940.GA26785@oc0525413822.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="5gxpn/Q6ypwruk0T"
+        protocol="application/pgp-signature"; boundary="ILuaRSyQpoVaJ1HG"
 Content-Disposition: inline
-In-Reply-To: <20200525122655.0488cc3d@bahia.lan>
+In-Reply-To: <20200529075940.GA26785@oc0525413822.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---5gxpn/Q6ypwruk0T
-Content-Type: text/plain; charset=utf-8
+--ILuaRSyQpoVaJ1HG
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 25, 2020 at 12:26:55PM +0200, Greg Kurz wrote:
+On Fri, May 29, 2020 at 12:59:40AM -0700, Ram Pai wrote:
+> On Thu, May 21, 2020 at 01:43:03PM +1000, David Gibson wrote:
+> > Some upcoming POWER machines have a system called PEF (Protected
+> > Execution Framework) which uses a small ultravisor to allow guests to
 >=20
-> s/encrption/encryption
-
-Fixed.
-
-> On Thu, 21 May 2020 13:42:57 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+> Framework -> Facility
 >=20
-> > At the moment AMD SEV sets a special function pointer, plus an opaque
-> > handle in KVMState to let things know how to encrypt guest memory.
+> > run in a way that they can't be eavesdropped by the hypervisor.  The
+> > effect is roughly similar to AMD SEV, although the mechanisms are
+> > quite different.
 > >=20
-> > Now that we have a QOM interface for handling things related to guest
-> > memory protection, use a QOM method on that interface, rather than a ba=
-re
-> > function pointer for this.
+> > Most of the work of this is done between the guest, KVM and the
+> > ultravisor, with little need for involvement by qemu.  However qemu
+> > does need to tell KVM to allow secure VMs.
+> >=20
+> > Because the availability of secure mode is a guest visible difference
+> > which depends on havint the right hardware and firmware, we don't
+>=20
+> havint -> having
+>=20
+> > enable this by default.  In order to run a secure guest you need to
+> > create a "pef-guest" object and set the guest-memory-protection machine=
+ property to point to it.
+> >=20
+> > Note that this just *allows* secure guests, the architecture of PEF is
+> > such that the guest still needs to talk to the ultravisor to enter
+> > secure mode, so we can't know if the guest actually is secure until
+> > well after machine creation time.
+>=20
+> In fact, Qemu has no direct way of knowing if the guest has turned
+> secure or not, even after machine creation time. There are indirect ways
+> for Qemu to know that, but nothing informs Qemu explicitly about it.=20
+>=20
+> So maybe we should just say...
+>=20
+> "..
+>  such that the guest still needs to talk to the ultravisor to enter
+>  secure mode, so we can't directly know if the guest actually is secure."=
+=20
+>=20
+>=20
 > >=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > > ---
-> >  accel/kvm/kvm-all.c                    | 23 +++----
-> >  accel/kvm/sev-stub.c                   |  5 --
-> >  include/exec/guest-memory-protection.h |  2 +
-> >  include/sysemu/sev.h                   |  6 +-
-> >  target/i386/sev.c                      | 84 ++++++++++++++------------
-> >  5 files changed, 63 insertions(+), 57 deletions(-)
+> >  target/ppc/Makefile.objs |  2 +-
+> >  target/ppc/pef.c         | 81 ++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 82 insertions(+), 1 deletion(-)
+> >  create mode 100644 target/ppc/pef.c
 > >=20
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index d06cc04079..40997de38c 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -45,6 +45,7 @@
-> >  #include "qapi/qapi-types-common.h"
-> >  #include "qapi/qapi-visit-common.h"
-> >  #include "sysemu/reset.h"
-> > +#include "exec/guest-memory-protection.h"
-> > =20
-> >  #include "hw/boards.h"
-> > =20
-> > @@ -119,8 +120,7 @@ struct KVMState
-> >      QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
-> > =20
-> >      /* memory encryption */
-> > -    void *memcrypt_handle;
-> > -    int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t =
-len);
-> > +    GuestMemoryProtection *guest_memory_protection;
-> > =20
-> >      /* For "info mtree -f" to tell if an MR is registered in KVM */
-> >      int nr_as;
-> > @@ -172,7 +172,7 @@ int kvm_get_max_memslots(void)
-> > =20
-> >  bool kvm_memcrypt_enabled(void)
-> >  {
-> > -    if (kvm_state && kvm_state->memcrypt_handle) {
-> > +    if (kvm_state && kvm_state->guest_memory_protection) {
-> >          return true;
-> >      }
-> > =20
-> > @@ -181,10 +181,13 @@ bool kvm_memcrypt_enabled(void)
-> > =20
-> >  int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
-> >  {
-> > -    if (kvm_state->memcrypt_handle &&
-> > -        kvm_state->memcrypt_encrypt_data) {
-> > -        return kvm_state->memcrypt_encrypt_data(kvm_state->memcrypt_ha=
-ndle,
-> > -                                              ptr, len);
-> > +    GuestMemoryProtection *gmpo =3D kvm_state->guest_memory_protection;
+> > diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+> > index e8fa18ce13..ac93b9700e 100644
+> > --- a/target/ppc/Makefile.objs
+> > +++ b/target/ppc/Makefile.objs
+> > @@ -6,7 +6,7 @@ obj-y +=3D machine.o mmu_helper.o mmu-hash32.o monitor.=
+o arch_dump.o
+> >  obj-$(TARGET_PPC64) +=3D mmu-hash64.o mmu-book3s-v3.o compat.o
+> >  obj-$(TARGET_PPC64) +=3D mmu-radix64.o
+> >  endif
+> > -obj-$(CONFIG_KVM) +=3D kvm.o
+> > +obj-$(CONFIG_KVM) +=3D kvm.o pef.o
+> >  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
+> >  obj-y +=3D dfp_helper.o
+> >  obj-y +=3D excp_helper.o
+> > diff --git a/target/ppc/pef.c b/target/ppc/pef.c
+> > new file mode 100644
+> > index 0000000000..823daf3e9c
+> > --- /dev/null
+> > +++ b/target/ppc/pef.c
+> > @@ -0,0 +1,81 @@
+> > +/*
+> > + * PEF (Protected Execution Framework) for POWER support
+> > + *
+> > + * Copyright David Gibson, Redhat Inc. 2020
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + *
+> > + */
 > > +
-> > +    if (gmpo) {
-> > +        GuestMemoryProtectionClass *gmpc =3D
-> > +            GUEST_MEMORY_PROTECTION_GET_CLASS(gmpo);
+> > +#include "qemu/osdep.h"
 > > +
-> > +        return gmpc->encrypt_data(gmpo, ptr, len);
-> >      }
-> > =20
-> >      return 1;
-> > @@ -2101,13 +2104,11 @@ static int kvm_init(MachineState *ms)
-> >       * encryption context.
-> >       */
-> >      if (ms->memory_encryption) {
-> > -        kvm_state->memcrypt_handle =3D sev_guest_init(ms->memory_encry=
-ption);
-> > -        if (!kvm_state->memcrypt_handle) {
-> > +        kvm_state->guest_memory_protection =3D sev_guest_init(ms->memo=
-ry_encryption);
-> > +        if (!kvm_state->guest_memory_protection) {
-> >              ret =3D -1;
-> >              goto err;
-> >          }
-> > -
-> > -        kvm_state->memcrypt_encrypt_data =3D sev_encrypt_data;
-> >      }
-> > =20
-> >      ret =3D kvm_arch_init(ms, s);
-> > diff --git a/accel/kvm/sev-stub.c b/accel/kvm/sev-stub.c
-> > index 4f97452585..4a5cc5569e 100644
-> > --- a/accel/kvm/sev-stub.c
-> > +++ b/accel/kvm/sev-stub.c
-> > @@ -15,11 +15,6 @@
-> >  #include "qemu-common.h"
-> >  #include "sysemu/sev.h"
-> > =20
-> > -int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-> > -{
-> > -    abort();
-> > -}
-> > -
-> >  void *sev_guest_init(const char *id)
-> >  {
-> >      return NULL;
+> > +#define TYPE_PEF_GUEST "pef-guest"
+> > +#define PEF_GUEST(obj)                                  \
+> > +    OBJECT_CHECK(PefGuestState, (obj), TYPE_SEV_GUEST)
+> > +
+> > +typedef struct PefGuestState PefGuestState;
+> > +
+> > +/**
+> > + * PefGuestState:
+> > + *
+> > + * The PefGuestState object is used for creating and managing a PEF
+> > + * guest.
+> > + *
+> > + * # $QEMU \
+> > + *         -object pef-guest,id=3Dpef0 \
+> > + *         -machine ...,guest-memory-protection=3Dpef0
+> > + */
+> > +struct PefGuestState {
+> > +    Object parent_obj;
+> > +};
+> > +
+> > +static Error *pef_mig_blocker;
+> > +
+> > +static int pef_kvm_init(GuestMemoryProtection *gmpo, Error **errp)
+> > +{
+> > +    PefGuestState *pef =3D PEF_GUEST(gmpo);
+> > +
+> > +    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
+> > +        error_setg(errp,
+> > +                   "KVM implementation does not support Secure VMs (is=
+ an ultravisor running?)");
+> > +        return -1;
+> > +    } else {
+> > +        int ret =3D kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GU=
+EST, 0, 1);
+> > +
+> > +        if (ret < 0) {
+> > +            error_setg(errp,
+> > +                       "Error enabling PEF with KVM");
+> > +            return -1;
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+> > +}
 >=20
-> This requires some extra care:
+> This looks correct to me.
 >=20
-> accel/kvm/sev-stub.c:18:7: error: conflicting types for =E2=80=98sev_gues=
-t_init=E2=80=99
->  void *sev_guest_init(const char *id)
->        ^~~~~~~~~~~~~~
-> In file included from accel/kvm/sev-stub.c:16:0:
-> include/sysemu/sev.h:21:24: note: previous declaration of =E2=80=98sev_gu=
-est_init=E2=80=99 was here
->  GuestMemoryProtection *sev_guest_init(const char *id);
->                         ^~~~~~~~~~~~~~
-> rules.mak:69: recipe for target 'accel/kvm/sev-stub.o' failed
-
-Oops, that's embarrassing - I forgot to do a build on ppc.
-
-Fixed now.
-
-> > diff --git a/include/exec/guest-memory-protection.h b/include/exec/gues=
-t-memory-protection.h
-> > index 38e9b01667..eb712a5804 100644
-> > --- a/include/exec/guest-memory-protection.h
-> > +++ b/include/exec/guest-memory-protection.h
-> > @@ -30,6 +30,8 @@ typedef struct GuestMemoryProtection GuestMemoryProte=
-ction;
-> > =20
-> >  typedef struct GuestMemoryProtectionClass {
-> >      InterfaceClass parent;
 > > +
-> > +    int (*encrypt_data)(GuestMemoryProtection *, uint8_t *, uint64_t);
-> >  } GuestMemoryProtectionClass;
-> > =20
-> >  #endif /* QEMU_GUEST_MEMORY_PROTECTION_H */
-> > diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-> > index 98c1ec8d38..7735a7942e 100644
-> > --- a/include/sysemu/sev.h
-> > +++ b/include/sysemu/sev.h
-> > @@ -16,6 +16,8 @@
-> > =20
-> >  #include "sysemu/kvm.h"
-> > =20
-> > -void *sev_guest_init(const char *id);
-> > -int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
-> > +typedef struct GuestMemoryProtection GuestMemoryProtection;
-> > +
-> > +GuestMemoryProtection *sev_guest_init(const char *id);
-> > +
-> >  #endif
-> > diff --git a/target/i386/sev.c b/target/i386/sev.c
-> > index d273174ad3..986c2fee51 100644
-> > --- a/target/i386/sev.c
-> > +++ b/target/i386/sev.c
-> > @@ -28,6 +28,7 @@
-> >  #include "sysemu/runstate.h"
-> >  #include "trace.h"
-> >  #include "migration/blocker.h"
-> > +#include "exec/guest-memory-protection.h"
-> > =20
-> >  #define TYPE_SEV_GUEST "sev-guest"
-> >  #define SEV_GUEST(obj)                                          \
-> > @@ -281,26 +282,6 @@ sev_guest_set_sev_device(Object *obj, const char *=
-value, Error **errp)
-> >      sev->sev_device =3D g_strdup(value);
-> >  }
-> > =20
-> > -static void
-> > -sev_guest_class_init(ObjectClass *oc, void *data)
-> > -{
-> > -    object_class_property_add_str(oc, "sev-device",
-> > -                                  sev_guest_get_sev_device,
-> > -                                  sev_guest_set_sev_device);
-> > -    object_class_property_set_description(oc, "sev-device",
-> > -            "SEV device to use");
-> > -    object_class_property_add_str(oc, "dh-cert-file",
-> > -                                  sev_guest_get_dh_cert_file,
-> > -                                  sev_guest_set_dh_cert_file);
-> > -    object_class_property_set_description(oc, "dh-cert-file",
-> > -            "guest owners DH certificate (encoded with base64)");
-> > -    object_class_property_add_str(oc, "session-file",
-> > -                                  sev_guest_get_session_file,
-> > -                                  sev_guest_set_session_file);
-> > -    object_class_property_set_description(oc, "session-file",
-> > -            "guest owners session parameters (encoded with base64)");
-> > -}
-> > -
-> >  static void
-> >  sev_guest_instance_init(Object *obj)
-> >  {
-> > @@ -319,20 +300,6 @@ sev_guest_instance_init(Object *obj)
-> >                                     OBJ_PROP_FLAG_READWRITE);
-> >  }
-> > =20
-> > -/* sev guest info */
-> > -static const TypeInfo sev_guest_info =3D {
-> > -    .parent =3D TYPE_OBJECT,
-> > -    .name =3D TYPE_SEV_GUEST,
-> > -    .instance_size =3D sizeof(SevGuestState),
-> > -    .instance_finalize =3D sev_guest_finalize,
-> > -    .class_init =3D sev_guest_class_init,
-> > -    .instance_init =3D sev_guest_instance_init,
-> > -    .interfaces =3D (InterfaceInfo[]) {
-> > -        { TYPE_USER_CREATABLE },
-> > -        { }
-> > -    }
-> > -};
-> > -
-> >  static SevGuestState *
-> >  lookup_sev_guest_info(const char *id)
-> >  {
-> > @@ -670,7 +637,7 @@ sev_vm_state_change(void *opaque, int running, RunS=
-tate state)
-> >      }
-> >  }
-> > =20
-> > -void *
-> > +GuestMemoryProtection *
-> >  sev_guest_init(const char *id)
-> >  {
-> >      SevGuestState *sev;
-> > @@ -748,16 +715,16 @@ sev_guest_init(const char *id)
-> >      qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
-> >      qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
-> > =20
-> > -    return sev;
-> > +    return GUEST_MEMORY_PROTECTION(sev);
-> >  err:
-> >      sev_guest =3D NULL;
-> >      return NULL;
-> >  }
-> > =20
-> > -int
-> > -sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
-> > +static int
-> > +sev_encrypt_data(GuestMemoryProtection *opaque, uint8_t *ptr, uint64_t=
- len)
-> >  {
-> > -    SevGuestState *sev =3D handle;
-> > +    SevGuestState *sev =3D SEV_GUEST(opaque);
-> > =20
-> >      assert(sev);
-> > =20
-> > @@ -769,6 +736,45 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint6=
-4_t len)
-> >      return 0;
-> >  }
-> > =20
-> > +static void
-> > +sev_guest_class_init(ObjectClass *oc, void *data)
+> > +static void pef_guest_class_init(ObjectClass *oc, void *data)
 > > +{
 > > +    GuestMemoryProtectionClass *gmpc =3D GUEST_MEMORY_PROTECTION_CLASS=
 (oc);
 > > +
-> > +    object_class_property_add_str(oc, "sev-device",
-> > +                                  sev_guest_get_sev_device,
-> > +                                  sev_guest_set_sev_device);
-> > +    object_class_property_set_description(oc, "sev-device",
-> > +        "SEV device to use");
-> > +    object_class_property_add_str(oc, "dh-cert-file",
-> > +                                  sev_guest_get_dh_cert_file,
-> > +                                  sev_guest_set_dh_cert_file);
-> > +    object_class_property_set_description(oc, "dh-cert-file",
-> > +        "guest owners DH certificate (encoded with base64)");
-> > +    object_class_property_add_str(oc, "session-file",
-> > +                                  sev_guest_get_session_file,
-> > +                                  sev_guest_set_session_file);
-> > +    object_class_property_set_description(oc, "session-file",
-> > +        "guest owners session parameters (encoded with base64)");
-> > +
-> > +    gmpc->encrypt_data =3D sev_encrypt_data;
+> > +    gmpc->kvm_init =3D pef_kvm_init;
 > > +}
 > > +
-> > +/* sev guest info */
-> > +static const TypeInfo sev_guest_info =3D {
+> > +static const TypeInfo pef_guest_info =3D {
 > > +    .parent =3D TYPE_OBJECT,
-> > +    .name =3D TYPE_SEV_GUEST,
-> > +    .instance_size =3D sizeof(SevGuestState),
-> > +    .instance_finalize =3D sev_guest_finalize,
-> > +    .class_init =3D sev_guest_class_init,
-> > +    .instance_init =3D sev_guest_instance_init,
+> > +    .name =3D TYPE_PEF_GUEST,
+> > +    .instance_size =3D sizeof(PefGuestState),
+> > +    .class_init =3D pef_guest_class_init,
 > > +    .interfaces =3D (InterfaceInfo[]) {
 > > +        { TYPE_GUEST_MEMORY_PROTECTION },
 > > +        { TYPE_USER_CREATABLE },
@@ -353,10 +201,23 @@ tate state)
 > > +    }
 > > +};
 > > +
-> >  static void
-> >  sev_register_types(void)
-> >  {
+> > +static void
+> > +pef_register_types(void)
+> > +{
+> > +    type_register_static(&pef_guest_info);
+> > +}
+> > +
+> > +type_init(pef_register_types);
 >=20
+> Acked-by: Ram Pai <linuxram@us.ibm.com>
+>=20
+> Thanks for doing this!
+>=20
+> BTW: Will there be a new machine type defined for running secure VMs?
+
+I wasn't planning on it.  Part of the point of this unified
+configuration is that we can reasonably have libvirt and upper layers
+tell qemu to do this without needing specific machine type hacks.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -364,24 +225,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---5gxpn/Q6ypwruk0T
+--ILuaRSyQpoVaJ1HG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7YajQACgkQbDjKyiDZ
-s5LcVxAA3Fgzwvs7wQwUbjt6B+5U8qYfHBnYRsADRO/UVuOTJA/1pfPww4uElLIh
-nL2u3R7+lQ9i4K4zHc5IgMYZQgIZOPhvTd59DiW9uKq/OuTRXqEgi4u3s5dy741g
-BYGZaB7uVjA254RAEi1DJ1dXRpaZQZ4NFhySO0oq50WannYEKKR0NPIWgktexoCG
-3r7AGy9t1dClE1iEpFJCmw8ziu8ZIWLNzQBLK9dDi2tAnycqYnjIn+cG8seBeSXn
-U4exIFpYq4MbLPN/QbulFzZkUyZcN/t6U4zrEvjJ6JmZmqRuDJbmioWN3wr6evui
-DxRbTyUxAawyaiv0t7/mI5XdKncZ1FwKq+gwlAm9aa4RFMU0XyX6N0nhdGt66HYe
-KW6c70+ySDkYyokX9mGxl0+3gLE5RfjCWHyTzEzU/t0EeRoF5qcKNFIK0iaTvd/d
-Lr2dJHAMGBLXLKssp7+yTPjPxXJj6VKLqp0yrd2tCMK6t9KwsqLTlKAQsAU49Bdo
-SUDUrAVGl6bMAfuk6PAGw/WZvYHlhgOlXGt3pPh2o1SAUy9CXme9tlByVqIR6u4R
-Ci+M1SF4iVemcV7BPqDNtGN4SAJVE1AAJ9X8jOxGGbPlqcO+oUWpn86QzB3vYtB7
-FpW4Fj5Zj11ijUGr8FtL8lRwfISwwe599BmHW22rjO8eG3nhtJo=
-=6yZ0
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7Ybo8ACgkQbDjKyiDZ
+s5IVtxAAhNo7bcl3pRrGvxEkKahFwNKH21dvbdiXSoJIz/hPe5RU3kMfmG32b4Mg
+M/fXA1pquobNvst6ybx6goQ4ODKK41879HVP9p7zI81VSpqcgMcjWPzZ5YACU2nw
+B5+XP7yGWXKFYpEfNE1xgyM5hFVsJgrjw1G/7HCjFf+tj3nKoH3LgQms13w5+b21
+nG4DFnet97frK2OfUvBdxzZarYGj8Z7LXfyAM886HelQkl8eZ59nBguk+EolHrle
+RD0AJyWZkvspDNzyYa3w8+ApJ4fr35upOJPTG3GBHv0DP1nT8taBvSjq+mwPBGiL
++jR1u991VokJ2kPWi+tw8t2wIIiDVDYqQccU50KHwdAGGc8//uUz2kNdrf1Uu/G+
+u8qJJoyMt8XtVwhoMMqKnZCDoamb22pByKkUUPSwmISKDhBLiWc2ODPAZYtZvUcw
+S9RdN0t3QmW55ikZBIr0V/e9YRfxqAOZJLqIXeHwC0kbqZFn7r6trQnV8muhMTFj
+iQNw3557OYOoIXM3kwP7qfh8bAkb2qHv2nNQebT6AOxnB3hP98Gh+RMS8waiUqPP
+1AXQ5rFJ5TRytILzP4dxLPYUSXDoZQ3JEYboeVPLXis1+pSvzDFZmOwojqKnM2D1
+ddX6JvA8g8c2dyXShSVzlYLp/CMwJVaQ4EqlUK/IFFlZr67CycA=
+=l9xg
 -----END PGP SIGNATURE-----
 
---5gxpn/Q6ypwruk0T--
+--ILuaRSyQpoVaJ1HG--
