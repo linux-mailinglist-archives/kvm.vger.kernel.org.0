@@ -2,168 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 203E71EE9E5
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 19:57:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16F6D1EEA1A
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 20:10:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730381AbgFDR5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 13:57:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41570 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730378AbgFDR5k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 13:57:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591293458;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FksnhBO6vS/Ap/hKpam5K+PoYAuOG4Rfq572TxOAyTg=;
-        b=U7A0TuTGRMwuZ/hmqIc+hLl3Uve0+rrJUCVNao+v1XX1b8Y3jdYT1hP56HTUdxbmkHgk8+
-        OXPuek3JgowzE63E12ob3JVoKDi0xqFRumHGFqfZta/Cw1+davI/fO8WMfFX2eKLnBChi6
-        Unda+Fh4Ntw2hujt43guSRvZykrBIy0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-W78oowmKOFyTplP9kiCh_Q-1; Thu, 04 Jun 2020 13:57:34 -0400
-X-MC-Unique: W78oowmKOFyTplP9kiCh_Q-1
-Received: by mail-wr1-f69.google.com with SMTP id l1so2717216wrc.8
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 10:57:34 -0700 (PDT)
+        id S1730303AbgFDSK2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 14:10:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59516 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730008AbgFDSK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 14:10:27 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2E1C08C5C0
+        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 11:10:27 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id r2so7411467ioo.4
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 11:10:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=L5HJjZvVskCO9kjKNvkZcNLT/6V6HfacHAsQohM4o8A=;
+        b=g4O8Y8vWSLLBwTDYrBoatp7v+icluogTw4q4TO+nSRvJZal3PlouWWR8NY953h6SjS
+         622XeB+/+4f+ZnlL+fg0NCAuV8WL9rMblXyECv2f9rnzIkpOez/T6M/ulGFN/MyjU1JM
+         o8rtPeT8x5IorIM7c56kH1koFAvJyL3pFCnu89Ap+FoOJuwcYhBNgahhX1oGfQYuuezI
+         V7Z0emze4MTyBj1/hrvqcah19ooLE17X7Yi4bwAYLgRRVMpTYBx6RhS1g/07YQLPA2/s
+         Ynxeo/+3wtBzyLlBxEIPhRfO5GAWwGaADxRQJ9ePEGGipKF8r5obBWoU31uhh9+exowc
+         Nzmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FksnhBO6vS/Ap/hKpam5K+PoYAuOG4Rfq572TxOAyTg=;
-        b=LUuRJfY0ANeBe8jh6NWTnm5Xfuvijk4TQDIl1mjjrtSPw5P3A08zfgGwBdu7N9wP8/
-         OWCrHQsh58kELziPHtIPLBNPlKgMwU4Yu6/ZQ+QDuKw+Nx8zkQWrucyd4n4GomRYfcfE
-         LyT18FKDIb9mQQH4AcW7jGrnjl0WeJjvh9dznq7ouxBFREzvMxwudAvmeXkVmsydUsFr
-         GrLmBeqzGhQdrqpaLxQnkiob16zE6qUpOhevY/TrjLeY8VWa3bJL4ugWnUbKwztc2+Yc
-         NE+FTJuGHNmeb01+zyT0YnqC854mhZs2dr+yWrcH/Od8gDSTmLdGvZ4sPtLi6NWmFTR9
-         DwCw==
-X-Gm-Message-State: AOAM53092L7xWZntwEVCqSOaD4cCikiMqF74KJFg5bTw94YYJo0HYYnn
-        Ml3fsr7TeZrHiGHmljc6NBBxOn7C06K7plIr0wA1OTL1mPlwW2JrKwDhWvqETkJpoFm19xwlYPm
-        CVRl72lGEOKld
-X-Received: by 2002:a05:600c:22c9:: with SMTP id 9mr5552332wmg.68.1591293453362;
-        Thu, 04 Jun 2020 10:57:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwOGKSvoIoXAWEbKHBYSbX8H32Swgs+id+2H5vtlJpeMc9ijfIwfsCbIQxP4TuqOuWT6aI2Bg==
-X-Received: by 2002:a05:600c:22c9:: with SMTP id 9mr5552320wmg.68.1591293453077;
-        Thu, 04 Jun 2020 10:57:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
-        by smtp.gmail.com with ESMTPSA id n23sm8155508wmc.0.2020.06.04.10.57.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2020 10:57:32 -0700 (PDT)
-Subject: Re: [PATCH V7 00/15] KVM: MIPS: Add Loongson-3 support (Host Side)
-To:     Huacai Chen <chenhc@lemote.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        Fuxin Zhang <zhangfx@lemote.com>,
-        Huacai Chen <chenhuacai@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <1590220602-3547-1-git-send-email-chenhc@lemote.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d702015b-ab5a-77ae-de24-e248c38030f7@redhat.com>
-Date:   Thu, 4 Jun 2020 19:57:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L5HJjZvVskCO9kjKNvkZcNLT/6V6HfacHAsQohM4o8A=;
+        b=Q7YCCBDy5EwRlWAy609iCfrvsK30lWJtr/UEeoE8icA4v8bROlg6WjB0bxgTvuWmAt
+         c8PYzN2Tcx7ReGKMKnRZGbjbNVzX/W0VixWZvqkXBLTH9xVd/wpg/fiGOXceGj7XQcDj
+         C6TopMtFxQwrGS/46r++eQ+JIapMmSxXg4uXnLNrF45SdEoC6nQLjJ2BjdkKipWmqsSR
+         p1JxbklkdHcO5AWILPTwerB8JWD9sFHVqpK6415e4f0AlwtGMg8boWP+yTv7Ri+ff3/r
+         EhEpvCTF/tgdIuCsYMuivIhg+CGaoptnqv1FPKAknXRCkRcSpa0kB+XxHKTft1RIYa2/
+         LywQ==
+X-Gm-Message-State: AOAM5308gVZFuFSdWfRMTwnaNzWnEdqL9mOXAcj9b3Aad0jyJkANmo/y
+        TCdf511KZRqKm8+kU0K0AvB7S0NKOnzbwGuwu6CLSere
+X-Google-Smtp-Source: ABdhPJxZzhqyu7uAkbTXoK2fFclP6AQCk/C+V3OFQvfBf4LcIqUi+O7qB9Tv8XJWdc144vdHqMsG0NyKryfzt5uA79k=
+X-Received: by 2002:a6b:5c01:: with SMTP id z1mr5119461ioh.177.1591294225755;
+ Thu, 04 Jun 2020 11:10:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1590220602-3547-1-git-send-email-chenhc@lemote.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200604143158.484651-1-vkuznets@redhat.com> <da7acd6f-204d-70e2-52aa-915a4d9163ef@redhat.com>
+ <20200604145357.GA30223@linux.intel.com> <87k10meth6.fsf@vitty.brq.redhat.com>
+ <20200604160253.GF30223@linux.intel.com> <87h7vqeq8o.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87h7vqeq8o.fsf@vitty.brq.redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 4 Jun 2020 11:10:14 -0700
+Message-ID: <CALMp9eRO_hf78LP_SdKLmEGhVP7jsKotkTBPvLpexHO_of-=yw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: nVMX: Inject #GP when nested_vmx_get_vmptr() fails
+ to read guest memory
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/05/20 09:56, Huacai Chen wrote:
-> We are preparing to add KVM support for Loongson-3. VZ extension is
-> fully supported in Loongson-3A R4+, and we will not care about old CPUs
-> (at least now). We already have a full functional Linux kernel (based
-> on Linux-5.4.x LTS) and QEMU (based on 5.0.0) and their git repositories
-> are here:
-> 
-> QEMU: https://github.com/chenhuacai/qemu
-> Kernel: https://github.com/chenhuacai/linux
-> 
-> Of course these two repositories need to be rework and not suitable for
-> upstream (especially the commits need to be splitted). We show them here
-> is just to tell others what we have done, and how KVM/Loongson will look
-> like.
-> 
-> Our plan is make the KVM host side be upstream first, and after that,
-> we will make the KVM guest side and QEMU emulator be upstream.
-> 
-> V1 -> V2:
-> 1, Remove "mips: define pud_index() regardless of page table folding"
->    because it has been applied.
-> 2, Make Loongson-specific code be guarded by CONFIG_CPU_LOONGSON64.
-> 
-> V2 -> V3:
-> 1, Emulate a reduced feature list of CPUCFG.
-> 2, Fix all possible checkpatch.pl errors and warnings.
-> 
-> V3 -> V4:
-> 1, Emulate LOONGSON_CFG0/LOONGSON_CFG3 in CPUCFG correctly.
-> 2, Update commit messages to explain Loongson-3 Virtual IPI.
-> 3, Add Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>.
-> 
-> V4 -> V5:
-> 1, Fix a typo.
-> 2, Update MAINTAINERS.
-> 
-> V5 -> V6:
-> 1, Fix a mismatch during rebasing.
-> 2, Add Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>.
-> 
-> V6 -> V7:
-> 1, Rebase on latest mips-next (Config6 feature bits definition updated).
+On Thu, Jun 4, 2020 at 9:43 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>
+> > On Thu, Jun 04, 2020 at 05:33:25PM +0200, Vitaly Kuznetsov wrote:
+> >> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+> >>
+> >> > On Thu, Jun 04, 2020 at 04:40:52PM +0200, Paolo Bonzini wrote:
+> >> >> On 04/06/20 16:31, Vitaly Kuznetsov wrote:
+> >> >
+> >> > ...
+> >> >
+> >> >> > KVM could've handled the request correctly by going to userspace and
+> >> >> > performing I/O but there doesn't seem to be a good need for such requests
+> >> >> > in the first place. Sane guests should not call VMXON/VMPTRLD/VMCLEAR with
+> >> >> > anything but normal memory. Just inject #GP to find insane ones.
+> >> >> >
+> >>
+> >> ...
+> >>
+> >> >>
+> >> >> looks good but we need to do the same in handle_vmread, handle_vmwrite,
+> >> >> handle_invept and handle_invvpid.  Which probably means adding something
+> >> >> like nested_inject_emulation_fault to commonize the inner "if".
+> >> >
+> >> > Can we just kill the guest already instead of throwing more hacks at this
+> >> > and hoping something sticks?  We already have one in
+> >> > kvm_write_guest_virt_system...
+> >> >
+> >> >   commit 541ab2aeb28251bf7135c7961f3a6080eebcc705
+> >> >   Author: Fuqian Huang <huangfq.daxian@gmail.com>
+> >> >   Date:   Thu Sep 12 12:18:17 2019 +0800
+> >> >
+> >> >     KVM: x86: work around leak of uninitialized stack contents
+> >> >
+> >>
+> >> Oh I see...
+> >>
+> >> [...]
+> >>
+> >> Let's get back to 'vm_bugged' idea then?
+> >>
+> >> https://lore.kernel.org/kvm/87muadnn1t.fsf@vitty.brq.redhat.com/
+> >
+> > Hmm, I don't think we need to go that far.  The 'vm_bugged' idea was more
+> > to handle cases where KVM itself (or hardware) screwed something up and
+> > detects an issue deep in a call stack with no recourse for reporting the
+> > error up the stack.
+> >
+> > That isn't the case here.  Unless I'm mistaken, the end result is simliar
+> > to this patch, except that KVM would exit to userspace with
+> > KVM_INTERNAL_ERROR_EMULATION instead of injecting a #GP.  E.g.
+>
+> I just wanted to resurrect that 'vm_bugged' idea but was waiting for a
+> good opportunity :-)
+>
+> The advantage of KVM_EXIT_INTERNAL_ERROR is that we're not trying to
+> invent some behavior which is not in SDM and making it a bit more likely
+> that we get a bug report from an angry user.
 
-Queued, thanks.  Please check the queue branch of kvm.git.
+If KVM can't handle the emulation, KVM_EXIT_INTERNAL_ERROR is far
+better than cooking up fictional faults to deliver to the guest.
 
-Paolo
-
-> Xing Li(2):
->  KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
->  KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
-> 
-> Huacai Chen(13):
->  KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
->  KVM: MIPS: Add EVENTFD support which is needed by VHOST
->  KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
->  KVM: MIPS: Introduce and use cpu_guest_has_ldpte
->  KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
->  KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
->  KVM: MIPS: Add more types of virtual interrupts
->  KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
->  KVM: MIPS: Add CPUCFG emulation for Loongson-3
->  KVM: MIPS: Add CONFIG6 and DIAG registers emulation
->  KVM: MIPS: Add more MMIO load/store instructions emulation
->  KVM: MIPS: Enable KVM support for Loongson-3
->  MAINTAINERS: Update KVM/MIPS maintainers
-> 
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> ---
->  MAINTAINERS                          |   4 +-
->  arch/mips/Kconfig                    |   1 +
->  arch/mips/include/asm/cpu-features.h |   3 +
->  arch/mips/include/asm/kvm_host.h     |  52 +++-
->  arch/mips/include/asm/mipsregs.h     |   7 +
->  arch/mips/include/uapi/asm/inst.h    |  11 +
->  arch/mips/kernel/cpu-probe.c         |   2 +
->  arch/mips/kvm/Kconfig                |   1 +
->  arch/mips/kvm/Makefile               |   5 +-
->  arch/mips/kvm/emulate.c              | 503 ++++++++++++++++++++++++++++++++++-
->  arch/mips/kvm/entry.c                |  19 +-
->  arch/mips/kvm/interrupt.c            |  93 +------
->  arch/mips/kvm/interrupt.h            |  14 +-
->  arch/mips/kvm/loongson_ipi.c         | 214 +++++++++++++++
->  arch/mips/kvm/mips.c                 |  49 +++-
->  arch/mips/kvm/tlb.c                  |  41 +++
->  arch/mips/kvm/trap_emul.c            |   3 +
->  arch/mips/kvm/vz.c                   | 237 ++++++++++++-----
->  18 files changed, 1092 insertions(+), 167 deletions(-)
->  create mode 100644 arch/mips/kvm/loongson_ipi.c
+> >
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 9c74a732b08d..e13d2c0014e2 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -4624,6 +4624,20 @@ void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
+> >         }
+> >  }
+> >
+> > +static int nested_vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int ret,
+> > +                                           struct x86_exception *e)
+> > +{
+> > +       if (r == X86EMUL_PROPAGATE_FAULT) {
+> > +               kvm_inject_emulated_page_fault(vcpu, &e);
+> > +               return 1;
+> > +       }
+> > +
+> > +       vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> > +       vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+> > +       vcpu->run->internal.ndata = 0;
+> > +       return 0;
+> > +}
+> > +
+> >  static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer)
+> >  {
+> >         gva_t gva;
+> > @@ -4634,11 +4648,9 @@ static int nested_vmx_get_vmptr(struct kvm_vcpu *vcpu, gpa_t *vmpointer)
+> >                                 sizeof(*vmpointer), &gva))
+> >                 return 1;
+> >
+> > -       if (kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e)) {
+> > -               kvm_inject_emulated_page_fault(vcpu, &e);
+> > -               return 1;
+> > -       }
+> > -
+> > +       r kvm_read_guest_virt(vcpu, gva, vmpointer, sizeof(*vmpointer), &e);
+> > +       if (r)
+> > +               return nested_vmx_handle_memory_failure(r, &e);
+> >         return 0;
+> >  }
+> >
+>
+> ... and the same for handle_vmread, handle_vmwrite, handle_invept and
+> handle_invvpid as suggested by Paolo. I'll be sending this as v2 with
+> your Suggested-by: shortly.
+>
+> >
+> >
+> > Side topic, I have some preliminary patches for the 'vm_bugged' idea.  I'll
+> > try to whip them into something that can be posted upstream in the next few
+> > weeks.
+> >
+>
+> Sounds great!
+>
 > --
-> 2.7.0
-> 
-
+> Vitaly
+>
