@@ -2,67 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 191971EDCF0
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 08:09:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90F5A1EDD1B
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 08:19:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726704AbgFDGJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 02:09:44 -0400
-Received: from mx22.baidu.com ([220.181.50.185]:37906 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725959AbgFDGJo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 02:09:44 -0400
-Received: from BC-Mail-Ex16.internal.baidu.com (unknown [172.31.51.56])
-        by Forcepoint Email with ESMTPS id 07A3E72BA719D212B263;
-        Thu,  4 Jun 2020 14:09:31 +0800 (CST)
-Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
- BC-Mail-Ex16.internal.baidu.com (172.31.51.56) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1531.3; Thu, 4 Jun 2020 14:09:30 +0800
-Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
- BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
- 15.01.1713.004; Thu, 4 Jun 2020 14:09:25 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wei.huang2@amd.com" <wei.huang2@amd.com>
-Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFtQQVRDSF1bdjVdIEtWTTogWDg2OiBzdXBwb3J0?=
- =?utf-8?Q?_APERF/MPERF_registers?=
-Thread-Topic: =?utf-8?B?562U5aSNOiBbUEFUQ0hdW3Y1XSBLVk06IFg4Njogc3VwcG9ydCBBUEVSRi9N?=
- =?utf-8?Q?PERF_registers?=
-Thread-Index: AQHWNjvN8r9nufprD0OWRxID181WWai/6tGAgAGIe0D//4JRgIAHCw/A
-Date:   Thu, 4 Jun 2020 06:09:25 +0000
-Message-ID: <aa1bd610bf8d4bb5a626cd5dd6af17d3@baidu.com>
-References: <1590813353-11775-1-git-send-email-lirongqing@baidu.com>
- <3f931ecf-7f1c-c178-d18c-46beadd1d313@intel.com>
- <e7ccee7dc30e4d1e8dcb8a002d6a6ed2@baidu.com>
- <9c870a06-ee46-5c9d-11c0-602aeb18c83d@intel.com>
-In-Reply-To: <9c870a06-ee46-5c9d-11c0-602aeb18c83d@intel.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.198.10]
-x-baidu-bdmsfe-datecheck: 1_BC-Mail-Ex16_2020-06-04 14:09:30:838
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726668AbgFDGT4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 02:19:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47160 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725959AbgFDGT4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 02:19:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591251595;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=zpbcGVUCNteZ9/Y7kbTuY5UyfsuVP7suSkfOm4CTvbY=;
+        b=JrPmw2GZWD00nmQUSAXiYif5c2PW9I8Mk7MYFS9fQVicy4zp88gtXL8VeBsvPgBlCKURe5
+        vre7O8CW9yjNDQxuCFkRj9Q3DCnBJZareNwOZqBZojxn+v/a92IVSlwUQwP1r4k9a1sGZw
+        drYtnTMPG8h8fxZUA2tfzEyba79cYgA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331--DWPUyhSO5uo2Vlrk2ly3g-1; Thu, 04 Jun 2020 02:19:51 -0400
+X-MC-Unique: -DWPUyhSO5uo2Vlrk2ly3g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3CDD107ACCA;
+        Thu,  4 Jun 2020 06:19:49 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-105.ams2.redhat.com [10.36.112.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B275810013D7;
+        Thu,  4 Jun 2020 06:19:43 +0000 (UTC)
+Subject: Re: [RFC v2 14/18] guest memory protection: Rework the
+ "memory-encryption" property
+To:     David Gibson <david@gibson.dropbear.id.au>,
+        Richard Henderson <richard.henderson@linaro.org>
+Cc:     pair@us.ibm.com, brijesh.singh@amd.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+        qemu-devel@nongnu.org, dgilbert@redhat.com, qemu-ppc@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
+        frankja@linux.ibm.com
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200521034304.340040-15-david@gibson.dropbear.id.au>
+ <4061fcf0-ba76-5124-74eb-401a0b91d900@linaro.org>
+ <20200604055638.GF228651@umbus.fritz.box>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <18d57013-e17d-18c0-25b5-af2b2554f029@redhat.com>
+Date:   Thu, 4 Jun 2020 08:19:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200604055638.GF228651@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBJTU8sIElmIHdlIHJlYWxseSB3YW50IHRvIGVuc3VyZSB0aGUgY29ycmVjdG5lc3Mgb2YgdXNl
-cnNwYWNlIHByb3ZpZGVkIENQVUlEDQo+IHNldHRpbmdzLCB3ZSBuZWVkIHRvIHJldHVybiBFUlJP
-UiB0byB1c2Vyc3BhY2UgaW5zdGVhZCBvZiBmaXhpbmcgaXQgc2lsaWVudGx5Lg0KPiANCg0KT2sg
-LCBJIHdpbGwgbWFrZSBpdCByZXR1cm4gYSBlcnJvcg0KDQpUaGFua3MNCg0KLUxpDQoNCg0KPiAt
-IFhpYW95YW8NCg==
+On 04/06/2020 07.56, David Gibson wrote:
+> On Mon, Jun 01, 2020 at 08:54:42PM -0700, Richard Henderson wrote:
+>> On 5/20/20 8:43 PM, David Gibson wrote:
+>>> +++ b/include/hw/boards.h
+>>> @@ -12,6 +12,8 @@
+>>>  #include "qom/object.h"
+>>>  #include "hw/core/cpu.h"
+>>>  
+>>> +typedef struct GuestMemoryProtection GuestMemoryProtection;
+>>> +
+>>
+>> I think this needs to be in include/qemu/typedefs.h,
+>> and the other typedef in patch 10 needs to be moved there.
+>>
+>> IIRC, clang warns about duplicate typedefs.
+> 
+> Not, apparently, with the clang version I have, but I've made the
+> change anyway.
+
+FWIW, we got rid of that duplicated typedef problem in commit
+e6e90feedb706b1b92, no need to worry about that anymore.
+
+ Thomas
+
