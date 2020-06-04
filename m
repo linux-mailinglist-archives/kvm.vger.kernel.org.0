@@ -2,80 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CC4E1EDBF6
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 05:56:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C667C1EDBF9
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 05:57:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgFDDzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jun 2020 23:55:35 -0400
-Received: from mga01.intel.com ([192.55.52.88]:34717 "EHLO mga01.intel.com"
+        id S1727049AbgFDD4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jun 2020 23:56:42 -0400
+Received: from namei.org ([65.99.196.166]:40880 "EHLO namei.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725936AbgFDDzf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jun 2020 23:55:35 -0400
-IronPort-SDR: xWJKvnjjWtZ0NALSCQpfHO7XCHPmPy82xhGzFp9qCel4BH0/xbVy2Qhjcc3RG1x1TehI6bGx26
- +Dk+BjF7u/6Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2020 20:55:34 -0700
-IronPort-SDR: vsv62uYmJxsnpuJhSY9ikvOBFjgXEbIiyTOGu4Mh/HyK94t0GAM7DbTZZAdIQiRRoX/KuBbFy/
- 0qsct/Yd439w==
-X-IronPort-AV: E=Sophos;i="5.73,471,1583222400"; 
-   d="scan'208";a="445358915"
-Received: from unknown (HELO [10.239.13.99]) ([10.239.13.99])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2020 20:55:33 -0700
-Subject: Re: [PATCH] KVM: x86: Assign correct value to array.maxnent
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200604024304.14643-1-xiaoyao.li@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <95f888b8-eed5-cb31-57a4-148d7708b7cb@intel.com>
-Date:   Thu, 4 Jun 2020 11:55:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S1725936AbgFDD4m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jun 2020 23:56:42 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by namei.org (8.14.4/8.14.4) with ESMTP id 0543uU8b003176;
+        Thu, 4 Jun 2020 03:56:30 GMT
+Date:   Thu, 4 Jun 2020 13:56:30 +1000 (AEST)
+From:   James Morris <jmorris@namei.org>
+To:     Daniel Colascione <dancol@google.com>
+cc:     timmurray@google.com, selinux@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, viro@zeniv.linux.org.uk,
+        Paul Moore <paul@paul-moore.com>, nnk@google.com,
+        Stephen Smalley <sds@tycho.nsa.gov>, lokeshgidra@google.com,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v5 0/3] SELinux support for anonymous inodes and UFFD
+In-Reply-To: <20200401213903.182112-1-dancol@google.com>
+Message-ID: <alpine.LRH.2.21.2006041354381.1812@namei.org>
+References: <20200326200634.222009-1-dancol@google.com> <20200401213903.182112-1-dancol@google.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20200604024304.14643-1-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/4/2020 10:43 AM, Xiaoyao Li wrote:
-> Delay the assignment of array.maxnent to use correct value for the case
-> cpuid->nent > KVM_MAX_CPUID_ENTRIES.
-> 
-> Fixes: e53c95e8d41e ("KVM: x86: Encapsulate CPUID entries and metadata in struct")
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->   arch/x86/kvm/cpuid.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 253b8e875ccd..befff01d100c 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -870,7 +870,6 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->   
->   	struct kvm_cpuid_array array = {
->   		.nent = 0,
-> -		.maxnent = cpuid->nent,
->   	};
->   	int r, i;
->   
-> @@ -887,6 +886,8 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->   	if (!array.entries)
->   		return -ENOMEM;
->   
-> +	array.maxnent = cpuid->nent;
+On Wed, 1 Apr 2020, Daniel Colascione wrote:
 
-Miss the fact that maxnent is const, V2 is coming.
-
-> +
->   	for (i = 0; i < ARRAY_SIZE(funcs); i++) {
->   		r = get_cpuid_func(&array, funcs[i], type);
->   		if (r)
+> Daniel Colascione (3):
+>   Add a new LSM-supporting anonymous inode interface
+>   Teach SELinux about anonymous inodes
+>   Wire UFFD up to SELinux
 > 
+>  fs/anon_inodes.c                    | 191 ++++++++++++++++++++++------
+>  fs/userfaultfd.c                    |  30 ++++-
+>  include/linux/anon_inodes.h         |  13 ++
+>  include/linux/lsm_hooks.h           |  11 ++
+>  include/linux/security.h            |   3 +
+>  security/security.c                 |   9 ++
+>  security/selinux/hooks.c            |  53 ++++++++
+>  security/selinux/include/classmap.h |   2 +
+>  8 files changed, 267 insertions(+), 45 deletions(-)
+
+Applied to
+git://git.kernel.org/pub/scm/linux/kernel/git/jmorris/linux-security.git secure_uffd_v5.9
+and next-testing.
+
+This will provide test coverage in linux-next, as we aim to get this 
+upstream for v5.9.
+
+I had to make some minor fixups, please review.
+
+
+-- 
+James Morris
+<jmorris@namei.org>
 
