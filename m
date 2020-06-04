@@ -2,97 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 391BB1EEA6F
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 20:42:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F45F1EEA7D
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 20:47:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728476AbgFDSmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 14:42:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57065 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726262AbgFDSmz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 14:42:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591296173;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W7PupmSHGY+zNvP6Gsjnrcdsr5C4naMtTGEaoTGjHh8=;
-        b=ArI6kwJYWNAzl85zqrE9YDIe/XMRs6xiMHhXtJ9eRQn+dFNkaI2HXa1x/smhBXWM/f/j1U
-        mUbTz2R1tq/gRODq7rXJL1ghO2gNrnaACLcdnrc3GIuZy91FW+Tt08S3Yw7zukhU4Muf20
-        AsB7ycQT3DvwlHsgk1gPqNXi7ALvzaM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-U85juU9BNTiHrgKGNt1oDw-1; Thu, 04 Jun 2020 14:42:52 -0400
-X-MC-Unique: U85juU9BNTiHrgKGNt1oDw-1
-Received: by mail-wr1-f71.google.com with SMTP id f4so2765850wrp.21
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 11:42:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=W7PupmSHGY+zNvP6Gsjnrcdsr5C4naMtTGEaoTGjHh8=;
-        b=NJD0KIODckX14H2UCz1luZhvNMgsTwVNuf85Wz4ZfF2V4QEUMZ2resBUmZgWtNDU3d
-         /3GNoUjyIiTuswzRmsGLr0KngLHkR4JQvv0x9GXgl12NtKohyos/K8eHYjoigJ8szmwj
-         16wR0RphKD8aPFawrQT/Zeoyh6T/FqZ9IwDHOQiDlmg+6C2XfPSmE+nDX4VCaf3a9Qza
-         1qo1gnVtt3xYsZB61Crq74MAyiQVl9JDzLdSqOqvu5Cs1yuODOOB3EJ7BaQkuEZloH2V
-         y4Ue1NkX87h9SzezsftgM7sM58zN3dKWDcO5okBPPxXTPdA1sRWK8Oh/IPAAxrPDXyrM
-         ni4g==
-X-Gm-Message-State: AOAM530TqFMf61HISTik2LsyNGTG1orz7ZPcblGoih2gNp64f0jCuD/W
-        Dmc5N7n0J3qflmNKFIWUO3tOQDgVWTUSrsI9YzyYuXjevSb3MqdZ80/rHpOXL2cg7mGGOibIE2Q
-        ITd9vJPyblbuw
-X-Received: by 2002:adf:aa97:: with SMTP id h23mr6126374wrc.251.1591296171160;
-        Thu, 04 Jun 2020 11:42:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJznAX0ROdSeZrRHnaqmouzsaV5mjG/PqHDp86o5qQ8VbvXbtz0L3ZbFDZfNb08OYjvzvJAqpQ==
-X-Received: by 2002:adf:aa97:: with SMTP id h23mr6126361wrc.251.1591296170873;
-        Thu, 04 Jun 2020 11:42:50 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
-        by smtp.gmail.com with ESMTPSA id m129sm8974449wmf.2.2020.06.04.11.42.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2020 11:42:50 -0700 (PDT)
-Subject: Re: [PATCH 0/3] avoid unnecessary memslot rmap walks
-To:     Anthony Yznaga <anthony.yznaga@oracle.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, steven.sistare@oracle.com
-References: <1591128450-11977-1-git-send-email-anthony.yznaga@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d440118-4325-6f68-75e7-dd5a74c4a7eb@redhat.com>
-Date:   Thu, 4 Jun 2020 20:42:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728717AbgFDSq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 14:46:58 -0400
+Received: from mga11.intel.com ([192.55.52.93]:1948 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728124AbgFDSq5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 14:46:57 -0400
+IronPort-SDR: BsYdEb+Fr5SodmA73rAhjv3XxAnTH2Q1pgrQ56CH4XBz2bYLkpVIsFQCOcu5zHlL3jCL3OZOQ5
+ 4JFluUlroz8g==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 11:46:56 -0700
+IronPort-SDR: /gArhaqUypGol+jKBBMBqyblACXVdTLBDM0wJgkV0Fpby3X84m2tHCRTJS6C3ueBLU80taRi+6
+ CiKBsSfP991w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,472,1583222400"; 
+   d="scan'208";a="258441554"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga007.jf.intel.com with ESMTP; 04 Jun 2020 11:46:56 -0700
+Date:   Thu, 4 Jun 2020 11:46:56 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH v3 3/4] kvm: vmx: Add last_cpu to struct vcpu_vmx
+Message-ID: <20200604184656.GD30456@linux.intel.com>
+References: <20200601222416.71303-1-jmattson@google.com>
+ <20200601222416.71303-4-jmattson@google.com>
+ <20200602012139.GF21661@linux.intel.com>
+ <CALMp9eS3XEVdZ-_pRsevOiKRBSbCr96saicxC+stPfUqsM1u1A@mail.gmail.com>
+ <20200603022414.GA24364@linux.intel.com>
+ <CALMp9eSth924epmxS8-mMXopGMFfR_JK7Hm8tQXyeqGF3ebxcg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1591128450-11977-1-git-send-email-anthony.yznaga@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eSth924epmxS8-mMXopGMFfR_JK7Hm8tQXyeqGF3ebxcg@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/06/20 22:07, Anthony Yznaga wrote:
-> While investigating optimizing qemu start time for large memory guests
-> I found that kvm_mmu_slot_apply_flags() is walking rmaps to update
-> existing sptes when creating or moving a slot but that there won't be
-> any existing sptes to update and any sptes inserted once the new memslot
-> is visible won't need updating.  I can't find any reason for this not to
-> be the case, but I've taken a more cautious approach to fixing this by
-> dividing things into three patches.
+On Wed, Jun 03, 2020 at 01:18:31PM -0700, Jim Mattson wrote:
+> On Tue, Jun 2, 2020 at 7:24 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> > As an alternative to storing the last run/attempted CPU, what about moving
+> > the "bad VM-Exit" detection into handle_exit_irqoff, or maybe a new hook
+> > that is called after IRQs are enabled but before preemption is enabled, e.g.
+> > detect_bad_exit or something?  All of the paths in patch 4/4 can easily be
+> > moved out of handle_exit.  VMX would require a little bit of refacotring for
+> > it's "no handler" check, but that should be minor.
 > 
-> Anthony Yznaga (3):
->   KVM: x86: remove unnecessary rmap walk of read-only memslots
->   KVM: x86: avoid unnecessary rmap walks when creating/moving slots
->   KVM: x86: minor code refactor and comments fixup around dirty logging
-> 
->  arch/x86/kvm/x86.c | 106 +++++++++++++++++++++++++----------------------------
->  1 file changed, 49 insertions(+), 57 deletions(-)
-> 
+> Given the alternatives, I'm willing to compromise my principles wrt
+> emulation_required. :-) I'll send out v4 soon.
 
-Queued, thanks.
-
-Paolo
-
+What do you dislike about the alternative approach?
