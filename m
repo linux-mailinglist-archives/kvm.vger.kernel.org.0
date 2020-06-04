@@ -2,168 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED00C1EE3A6
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 13:45:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01B921EE3A9
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 13:48:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727944AbgFDLpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 07:45:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23379 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725601AbgFDLpw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 07:45:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591271150;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=mGdl0RSQZKhVpNjVS/OmBxoCGQnHWjmoW5V8/c58GU0=;
-        b=NaA0JNZZstMOF5oF2qC2XD4Nzirl/EkTZY3bPwxHGBpcbX4CjHIFk7Pzvg8lfGMrKZeMiS
-        IGjVUH3M3bJUbdmF5OdeeQPQ/u5D5MhvfFESYBGTSAw8eZ/DLFnfm5aZGUYFhzv38HNMJ6
-        4vT7UqTxAGNeWinAiM9ZFNyvKltVtzI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-dYWJrmMxO-2WQjRdYJkLBA-1; Thu, 04 Jun 2020 07:45:48 -0400
-X-MC-Unique: dYWJrmMxO-2WQjRdYJkLBA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C766A80058E;
-        Thu,  4 Jun 2020 11:45:47 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-105.ams2.redhat.com [10.36.112.105])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FF0710013D2;
-        Thu,  4 Jun 2020 11:45:43 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v7 08/12] s390x: css: stsch, enumeration
- test
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com
-References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
- <1589818051-20549-9-git-send-email-pmorel@linux.ibm.com>
- <20200527105501.53681762.cohuck@redhat.com>
- <d3890f6a-1c0e-b4cc-f958-6f33bdf75666@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8b8fff3f-4954-c51e-59a3-813cb5066e26@redhat.com>
-Date:   Thu, 4 Jun 2020 13:45:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727921AbgFDLs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 07:48:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56618 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbgFDLs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 07:48:26 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F07C03E96D;
+        Thu,  4 Jun 2020 04:48:26 -0700 (PDT)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 21C4126F; Thu,  4 Jun 2020 13:48:23 +0200 (CEST)
+Date:   Thu, 4 Jun 2020 13:48:21 +0200
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     x86@kernel.org, hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Joerg Roedel <jroedel@suse.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v3 31/75] x86/head/64: Install boot GDT
+Message-ID: <20200604114821.GA30945@8bytes.org>
+References: <20200428151725.31091-1-joro@8bytes.org>
+ <20200428151725.31091-32-joro@8bytes.org>
+ <20200518082313.GA25034@zn.tnic>
 MIME-Version: 1.0
-In-Reply-To: <d3890f6a-1c0e-b4cc-f958-6f33bdf75666@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200518082313.GA25034@zn.tnic>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/06/2020 13.35, Pierre Morel wrote:
+On Mon, May 18, 2020 at 10:23:13AM +0200, Borislav Petkov wrote:
+> On Tue, Apr 28, 2020 at 05:16:41PM +0200, Joerg Roedel wrote:
+> > @@ -480,6 +500,22 @@ SYM_DATA_LOCAL(early_gdt_descr_base,	.quad INIT_PER_CPU_VAR(gdt_page))
+> >  SYM_DATA(phys_base, .quad 0x0)
+> >  EXPORT_SYMBOL(phys_base)
+> >
+> > +/* Boot GDT used when kernel addresses are not mapped yet */
+> > +SYM_DATA_LOCAL(boot_gdt_descr,		.word boot_gdt_end - boot_gdt)
+> > +SYM_DATA_LOCAL(boot_gdt_base,		.quad 0)
+> > +SYM_DATA_START(boot_gdt)
+> > +	.quad	0
+> > +	.quad   0x00cf9a000000ffff	/* __KERNEL32_CS */
+> > +	.quad   0x00af9a000000ffff	/* __KERNEL_CS */
+> > +	.quad   0x00cf92000000ffff	/* __KERNEL_DS */
+> > +	.quad	0			/* __USER32_CS - unused */
+> > +	.quad	0			/* __USER_DS   - unused */
+> > +	.quad	0			/* __USER_CS   - unused */
+> > +	.quad	0			/* unused */
+> > +	.quad   0x0080890000000000	/* TSS descriptor */
+> > +	.quad   0x0000000000000000	/* TSS continued */
 > 
-> 
-> On 2020-05-27 10:55, Cornelia Huck wrote:
->> On Mon, 18 May 2020 18:07:27 +0200
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
->>> First step for testing the channel subsystem is to enumerate the css and
->>> retrieve the css devices.
->>>
->>> This tests the success of STSCH I/O instruction, we do not test the
->>> reaction of the VM for an instruction with wrong parameters.
->>>
->>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>> ---
->>>   s390x/Makefile      |  1 +
->>>   s390x/css.c         | 89 +++++++++++++++++++++++++++++++++++++++++++++
->>>   s390x/unittests.cfg |  4 ++
->>>   3 files changed, 94 insertions(+)
->>>   create mode 100644 s390x/css.c
->>
->> (...)
->>
->>> +static void test_enumerate(void)
->>> +{
->>> +    struct pmcw *pmcw = &schib.pmcw;
->>> +    int cc;
->>> +    int scn;
->>> +    int scn_found = 0;
->>> +    int dev_found = 0;
->>> +
->>> +    for (scn = 0; scn < 0xffff; scn++) {
->>> +        cc = stsch(scn|SID_ONE, &schib);
->>> +        switch (cc) {
->>> +        case 0:        /* 0 means SCHIB stored */
->>> +            break;
->>> +        case 3:        /* 3 means no more channels */
->>> +            goto out;
->>> +        default:    /* 1 or 2 should never happened for STSCH */
->>> +            report(0, "Unexpected cc=%d on subchannel number 0x%x",
->>> +                   cc, scn);
->>> +            return;
->>> +        }
->>> +
->>> +        /* We currently only support type 0, a.k.a. I/O channels */
->>> +        if (PMCW_CHANNEL_TYPE(pmcw) != 0)
->>> +            continue;
->>> +
->>> +        /* We ignore I/O channels without valid devices */
->>> +        scn_found++;
->>> +        if (!(pmcw->flags & PMCW_DNV))
->>> +            continue;
->>> +
->>> +        /* We keep track of the first device as our test device */
->>> +        if (!test_device_sid)
->>> +            test_device_sid = scn | SID_ONE;
->>> +
->>> +        dev_found++;
->>> +    }
->>> +
->>> +out:
->>> +    report(dev_found,
->>> +           "Tested subchannels: %d, I/O subchannels: %d, I/O
->>> devices: %d",
->>> +           scn, scn_found, dev_found);
->>
->> Just wondering: with the current invocation, you expect to find exactly
->> one subchannel with a valid device, right?
-> ...snip...
-> 
->>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
->>> index 07013b2..a436ec0 100644
->>> --- a/s390x/unittests.cfg
->>> +++ b/s390x/unittests.cfg
->>> @@ -83,3 +83,7 @@ extra_params = -m 1G
->>>   [sclp-3g]
->>>   file = sclp.elf
->>>   extra_params = -m 3G
->>> +
->>> +[css]
->>> +file = css.elf
->>> +extra_params =-device ccw-pong
->>
->> Hm... you could test enumeration even with a QEMU that does not include
->> support for the pong device, right? Would it be worthwhile to split out
->> a set of css tests that use e.g. a virtio-net-ccw device, and have a
->> css-pong set of tests that require the pong device?
->>
-> 
-> Yes, you are right, using a virtio-net-ccw will allow to keep this test
-> without waiting for the PONG device to exist.
-> 
-> @Thomas, what do you think? I will still have to figure something out
-> for PONG tests but here, it should be OK with virtio-net-ccw.
+> Any chance you could use macros ala GDT_ENTRY_INIT() for those instead
+> of the naked values?
 
-Sure, sounds good. We can go with -device virtio-net-ccw for now, and
-then later add an additional entry a la:
+Yeah, seems to work. Updated patch attached.
 
-[css-pong]
-file = css.elf
-device = ccw-pong
+From 1350746f9063147a33156c0b56a7b12b1794f555 Mon Sep 17 00:00:00 2001
+From: Joerg Roedel <jroedel@suse.de>
+Date: Fri, 15 Nov 2019 13:49:55 +0100
+Subject: [PATCH 31/74] x86/head/64: Install boot GDT
 
-... where the test scripts then check for the availability of the device
-first before starting the test?
+Handling exceptions during boot requires a working GDT. The kernel GDT
+is not yet ready for use, so install a temporary boot GDT.
 
- Thomas
+Signed-off-by: Joerg Roedel <jroedel@suse.de>
+---
+ arch/x86/kernel/head64.c  | 19 +++++++++++++++++++
+ arch/x86/kernel/head_64.S | 25 +++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index 206a4b6144c2..900c3372cc6a 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -61,6 +61,25 @@ unsigned long vmemmap_base __ro_after_init = __VMEMMAP_BASE_L4;
+ EXPORT_SYMBOL(vmemmap_base);
+ #endif
+ 
++/*
++ * GDT used before %gs is set up and the kernel can use gdt_page. Needed for
++ * early exception handling.
++ */
++struct desc_struct boot_gdt[GDT_ENTRIES] = {
++	[GDT_ENTRY_KERNEL32_CS]         = GDT_ENTRY_INIT(0xc09b, 0, 0xfffff),
++	[GDT_ENTRY_KERNEL_CS]           = GDT_ENTRY_INIT(0xa09b, 0, 0xfffff),
++	[GDT_ENTRY_KERNEL_DS]           = GDT_ENTRY_INIT(0xc093, 0, 0xfffff),
++};
++
++/*
++ * Address needs to be set at runtime because it references the boot_gdt while
++ * the kernel still uses a direct mapping.
++ */
++struct desc_ptr boot_gdt_descr = {
++	.size = sizeof(boot_gdt),
++	.address = 0,
++};
++
+ #define __head	__section(.head.text)
+ 
+ static void __head *fixup_pointer(void *ptr, unsigned long physaddr)
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 4bbc770af632..62513dd1e0e4 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -72,6 +72,26 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	/* Set up the stack for verify_cpu(), similar to initial_stack below */
+ 	leaq	(__end_init_task - SIZEOF_PTREGS)(%rip), %rsp
+ 
++	/* Setup boot GDT descriptor and load boot GDT */
++	leaq	boot_gdt(%rip), %rax
++	movq	%rax, boot_gdt_descr+2(%rip)
++	lgdt	boot_gdt_descr(%rip)
++
++	/* New GDT is live - reload data segment registers */
++	movl	$__KERNEL_DS, %eax
++	movl	%eax, %ds
++	movl	%eax, %ss
++	movl	%eax, %es
++
++	/* Now switch to __KERNEL_CS so IRET works reliably */
++	pushq	$__KERNEL_CS
++	leaq	.Lon_kernel_cs(%rip), %rax
++	pushq	%rax
++	lretq
++
++.Lon_kernel_cs:
++	UNWIND_HINT_EMPTY
++
+ 	/* Sanitize CPU configuration */
+ 	call verify_cpu
+ 
+@@ -143,6 +163,11 @@ SYM_CODE_START(secondary_startup_64)
+ 1:
+ 	UNWIND_HINT_EMPTY
+ 
++	/* Setup boot GDT descriptor and load boot GDT */
++	leaq	boot_gdt(%rip), %rax
++	movq	%rax, boot_gdt_descr+2(%rip)
++	lgdt	boot_gdt_descr(%rip)
++
+ 	/* Check if nx is implemented */
+ 	movl	$0x80000001, %eax
+ 	cpuid
+-- 
+2.26.2
 
