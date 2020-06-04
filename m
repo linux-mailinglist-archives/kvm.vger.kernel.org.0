@@ -2,151 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7C2E1EEC7A
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 22:54:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E6701EEC7B
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 22:54:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730042AbgFDUyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 16:54:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50413 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729582AbgFDUyO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 16:54:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591304052;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tnCgk4zuHWYJDP3RnNCax34/Masi6pk4ifg41i/aYfQ=;
-        b=UYy0IXJOcfyfH4D0kxq59XAKJCaFLNrho/nPoZVBqvj9BL39d0JtFCxbMGjLnQhY0VwQRF
-        OG4+KRYH8V58NCx2BPw+obRbySTi3ndCLBwLZwIND26VE9B4hPaZkYUzaY2SB1eRHfSwYb
-        3yAVJqCL3aBCv1HWHTeA5uNBq87F3FU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-ByKIoHGaMMaRSFkDcDjLDA-1; Thu, 04 Jun 2020 16:54:09 -0400
-X-MC-Unique: ByKIoHGaMMaRSFkDcDjLDA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFAAB464;
-        Thu,  4 Jun 2020 20:54:07 +0000 (UTC)
-Received: from localhost (ovpn-113-102.phx2.redhat.com [10.3.113.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F02A600FC;
-        Thu,  4 Jun 2020 20:54:01 +0000 (UTC)
-Date:   Thu, 4 Jun 2020 16:54:00 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
-        "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rth@twiddle.net" <rth@twiddle.net>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kash@tripleback.net" <kash@tripleback.net>,
-        "geoff@hostfission.com" <geoff@hostfission.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
-Message-ID: <20200604205400.GE2366737@habkost.net>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
- <1528498581-131037-2-git-send-email-babu.moger@amd.com>
- <20200602175212.GH577771@habkost.net>
- <b6e22360-5fa0-9ade-624d-9de1f76b360b@amd.com>
+        id S1730142AbgFDUyW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 16:54:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56734 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730102AbgFDUyW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 16:54:22 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25606C08C5C0
+        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 13:54:21 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id b5so7473430iln.5
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 13:54:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZKBf+/aAnIUAhu9efRbyqkKtVoY00YPeZOHPjPmkDUg=;
+        b=EXUGIsMpLq8D6GPhFSNjGxyNjmzEW+X5h5BClBRA+wde+3vdGOKrPiiKhLKpALSbKY
+         BIpW5abVqFGiWmqRwPI+r/0GYTqrHTmyFwVw+/iG6gsVyFaytrCfJv1H0ckslBp/ql6X
+         8c57Xb7v1+x66Ro0pbj62wq4vYxdBSUfTomxTStXzuloJQT9gjKcVyGewlXf0HybjFwe
+         Pws+ydXXqUzExwLwhQ+Qnto6duzAOijG6+9Z+QrQJTe0kS1h1lGU0brhwsKvkbBO7vve
+         ruMpP+cxyHHd0JRUTGEN3rEGTN4JkLCXTQTQFEu2weyZST4kk++gohlfpsr+0WMJZYo+
+         A5Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZKBf+/aAnIUAhu9efRbyqkKtVoY00YPeZOHPjPmkDUg=;
+        b=HCwpdK3LOKM21ycoUUOq4xBVlXGHPe+U2msHLNT477LxhMhnLoCsRGqNyYUUJAfExd
+         zHktllGs6BhWMCA1tJVaUHqeQNtjGqGYcz5JX35CiCrdpr8lPCOCkZB2LfgHE+Dte578
+         4u8mqLe2v30KMB6hei/RitodUWCBykNiCZve+UV1AS9ykNRV58mG/EZZVhwJooT1Okol
+         6PZMyQSL2aYrzKC7mcVN5mmlQ50b/hwRhpnsRhaEIRARH4SSwtddzdsTxObE2FqQvfXS
+         WW4o/+uNUAuEX3WK8IRc1bLCh+WMLKjeEetbLzjghuQn2JBsOP8vqa6vbYBQeXqwUSFl
+         kj+w==
+X-Gm-Message-State: AOAM5320Gbujhed5BVU2O16suRUoaG4v+zVfbigGNNaFNv2C23+r2411
+        RrDtG0Ykp3Vdt/dfDzefNVh2p8bJ7KoEMGDU4gZcuA==
+X-Google-Smtp-Source: ABdhPJxAll0OJ1/wMBDM6dQwfd3L2h7ZvXs8GHFGKi1xbeeodP385HcTEOp5gg/32CUyhzprg8JKpbn1NqX/MPasBRo=
+X-Received: by 2002:a92:bacb:: with SMTP id t72mr5906929ill.26.1591304060394;
+ Thu, 04 Jun 2020 13:54:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6e22360-5fa0-9ade-624d-9de1f76b360b@amd.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20200601222416.71303-1-jmattson@google.com> <20200601222416.71303-4-jmattson@google.com>
+ <20200602012139.GF21661@linux.intel.com> <CALMp9eS3XEVdZ-_pRsevOiKRBSbCr96saicxC+stPfUqsM1u1A@mail.gmail.com>
+ <20200603022414.GA24364@linux.intel.com> <CALMp9eSth924epmxS8-mMXopGMFfR_JK7Hm8tQXyeqGF3ebxcg@mail.gmail.com>
+ <20200604184656.GD30456@linux.intel.com> <CALMp9eR3c3wQ4YrP7O0UwP=B95XR_-rEpbjet1AgKVMYNEWskA@mail.gmail.com>
+ <20200604192622.GE30456@linux.intel.com>
+In-Reply-To: <20200604192622.GE30456@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 4 Jun 2020 13:54:08 -0700
+Message-ID: <CALMp9eTwExWy9f14D-P0jCfoXynk1BBL705wk4-UiBNcufAJSg@mail.gmail.com>
+Subject: Re: [PATCH v3 3/4] kvm: vmx: Add last_cpu to struct vcpu_vmx
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 09:06:27AM -0500, Babu Moger wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Eduardo Habkost <ehabkost@redhat.com>
-> > Sent: Tuesday, June 2, 2020 12:52 PM
-> > To: Moger, Babu <Babu.Moger@amd.com>
-> > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Dr. David
-> > Alan Gilbert <dgilbert@redhat.com>
-> > Subject: Re: [PATCH v13 1/5] i386: Add support for CPUID_8000_001E for AMD
-> > 
-> > On Fri, Jun 08, 2018 at 06:56:17PM -0400, Babu Moger wrote:
-> > > Add support for cpuid leaf CPUID_8000_001E. Build the config that closely
-> > > match the underlying hardware. Please refer to the Processor Programming
-> > > Reference (PPR) for AMD Family 17h Model for more details.
+On Thu, Jun 4, 2020 at 12:26 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Thu, Jun 04, 2020 at 12:00:33PM -0700, Jim Mattson wrote:
+> > On Thu, Jun 4, 2020 at 11:47 AM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
 > > >
-> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > [...]
-> > > +    case 0x8000001E:
-> > > +        assert(cpu->core_id <= 255);
-> > 
-> > It is possible to trigger this assert using:
-> > 
-> > $ qemu-system-x86_64 -machine q35,accel=kvm,kernel-irqchip=split -device
-> > intel-iommu,intremap=on,eim=on -smp
-> > 1,maxcpus=258,cores=258,threads=1,sockets=1 -cpu
-> > qemu64,xlevel=0x8000001e -device qemu64-x86_64-cpu,apic-id=257
-> > qemu-system-x86_64: warning: Number of hotpluggable cpus requested (258)
-> > exceeds the recommended cpus supported by KVM (240)
-> > qemu-system-x86_64:
-> > /home/ehabkost/rh/proj/virt/qemu/target/i386/cpu.c:5888: cpu_x86_cpuid:
-> > Assertion `cpu->core_id <= 255' failed.
-> > Aborted (core dumped)
-> > 
-> > See bug report and discussion at
-> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugzilla.
-> > redhat.com%2Fshow_bug.cgi%3Fid%3D1834200&amp;data=02%7C01%7Cbabu.
-> > moger%40amd.com%7C8a2724729b914bc9b53d08d8071db392%7C3dd8961fe4
-> > 884e608e11a82d994e183d%7C0%7C0%7C637267171438806408&amp;sdata=ib
-> > iGlF%2FF%2FVtYQLf7fe988kxFsLhj4GrRiTOq4LUuOT8%3D&amp;reserved=0
-> > 
-> > Also, it looks like encode_topo_cpuid8000001e() assumes core_id
-> > has only 3 bits, so the existing assert() is not even sufficient.
-> > We need to decide what to do if the user requests nr_cores > 8.
-> > 
-> > Probably omitting CPUID[0x8000001E] if the VCPU topology is
-> > incompatible with encode_topo_cpuid8000001e() (and printing a
-> > warning) is the safest thing to do right now.
-> 
-> Eduardo,  We need to generalize the encode_topo_cpuid8000001e decoding.
-> We will have to remove 3 bit limitation there. It will not scale with
-> latest configurations. I will take a look that.
-> 
-> For now, best option I think is to(like you mentioned in bug 1834200),
-> declaring nr_cores > 256 as never supported (or deprecated); and throw
-> warning.
-> 
-> What do you think?
-
-I believe we can declare nr_cores > 256 as never supported to
-address the assert failure.  Other CPUID functions also look
-broken when nr_cores is too large: encode_cache_cpuid4() seems to
-assume nr_cores is 128 or less.
-
-But we still need to make nr_cores > 8 safe while
-encode_topo_cpuid8000001e() is not generalized yet.
-
-> > 
-> > 
-> > 
-> > > +        encode_topo_cpuid8000001e(cs, cpu,
-> > > +                                  eax, ebx, ecx, edx);
-> > > +        break;
-> > >      case 0xC0000000:
-> > >          *eax = env->cpuid_xlevel2;
-> > >          *ebx = 0;
-> > > --
-> > > 1.8.3.1
+> > > On Wed, Jun 03, 2020 at 01:18:31PM -0700, Jim Mattson wrote:
+> > > > On Tue, Jun 2, 2020 at 7:24 PM Sean Christopherson
+> > > > <sean.j.christopherson@intel.com> wrote:
+> > > > > As an alternative to storing the last run/attempted CPU, what about moving
+> > > > > the "bad VM-Exit" detection into handle_exit_irqoff, or maybe a new hook
+> > > > > that is called after IRQs are enabled but before preemption is enabled, e.g.
+> > > > > detect_bad_exit or something?  All of the paths in patch 4/4 can easily be
+> > > > > moved out of handle_exit.  VMX would require a little bit of refacotring for
+> > > > > it's "no handler" check, but that should be minor.
+> > > >
+> > > > Given the alternatives, I'm willing to compromise my principles wrt
+> > > > emulation_required. :-) I'll send out v4 soon.
 > > >
-> > 
-> > --
-> > Eduardo
-> 
+> > > What do you dislike about the alternative approach?
+> >
+> > Mainly, I wanted to stash this in a common location so that I could
+> > print it out in our local version of dump_vmcs(). Ideally, we'd like
+> > to be able to identify the bad part(s) just from the kernel logs.
+>
+> But this would also move dump_vmcs() to before preemption is enabled, i.e.
+> your version could read the CPU directly.
 
--- 
-Eduardo
+If it backports easily. The bigger the change, the less likely that is.
 
+> And actually, if we're talking about ferreting out hardware issues, you
+> really do want this happening before preemption is enabled so that the VMCS
+> dump comes from the failing CPU.  If the vCPU is migrated, the VMCS will be
+> dumped after a VMCLEAR->VMPTRLD, i.e. will be written to memory and pulled
+> back into the VMCS cache on a different CPU, and will also have been written
+> to by the new CPU to update host state.  Odds are that wouldn't affect the
+> dump in a meaningful way, but never say never.
+
+True.
+
+> Tangentially related, what about adding an option to do VMCLEAR at the end
+> of dump_vmcs(), followed by a dump of raw memory?  It'd be useless for
+> debugging software issues, but might be potentially useful/interesting for
+> triaging hardware problems.
+
+Our dump_vmcs() dumps all vmreadable fields, which should be pretty
+close to what we can get from a raw memory dump. We do have additional
+instrumentation to aid in determining the layout of the VMCS in
+memory, but it is too stupid to figure out how access rights are
+stored. Maybe it could be beefed up a little, and we could at least
+verify that VMCLEAR dumps the same thing to physical memory that we
+get from the individual VMREADs.
+
+> > That, and I wouldn't have been as comfortable with the refactoring
+> > without a lot more testing.
