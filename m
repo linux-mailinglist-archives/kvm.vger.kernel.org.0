@@ -2,362 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4CE61EDD63
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 08:43:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E592B1EDD65
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 08:44:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbgFDGnu convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 4 Jun 2020 02:43:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39846 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726248AbgFDGnu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 02:43:50 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 208047] New: KVM - random guest hangs if dual channel memory
- enabled. (probably A.G.E.S.A. bug)
-Date:   Thu, 04 Jun 2020 06:43:47 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: itemcode@mail.ru
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-208047-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726956AbgFDGoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 02:44:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37718 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726890AbgFDGoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 02:44:25 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B6CC05BD1E
+        for <kvm@vger.kernel.org>; Wed,  3 Jun 2020 23:44:25 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 49cx8R3zJ9z9sV7; Thu,  4 Jun 2020 16:44:23 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1591253063;
+        bh=Mc7WOmLvkTipmSQpkZ8c85cerVEcMMCMxKm/JInS22I=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=pi+L8mEw94m1b47hZrrzhV01IO+Y9HKptc7fdjSGP32vaR08vYjAM784unywZb5Yh
+         897QuM226e7RaBg60WRl6vVguBmR246YCnS1sp8wRyJaEWQvhrHna3FHS5Lo0eg423
+         gayPUgNuJKVb8jAp6RBUplrx2tGVbHxJN6xeVu7g=
+Date:   Thu, 4 Jun 2020 16:44:14 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Cc:     qemu-ppc@nongnu.org, qemu-devel@nongnu.org, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+        mdroth@linux.vnet.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
+Message-ID: <20200604064414.GI228651@umbus.fritz.box>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <87tuzr5ts5.fsf@morokweng.localdomain>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="4BlIp4fARb6QCoOq"
+Content-Disposition: inline
+In-Reply-To: <87tuzr5ts5.fsf@morokweng.localdomain>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=208047
 
-            Bug ID: 208047
-           Summary: KVM - random guest hangs if dual channel memory
-                    enabled. (probably A.G.E.S.A. bug)
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.5.x (5.6.x)
-          Hardware: Other
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: itemcode@mail.ru
-        Regression: No
+--4BlIp4fARb6QCoOq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi. After my deep testing in various combinations of hardware, i can confirm
-that there is a bug, when using the dual-channel memory mode, which leads to
-guest (win10, win 8.1 in my case) freezes on systems with B350, B450 chipset.
-Tested on Gigabyte A320M-S2H, Gigabyte B450i AORUS Pro Wifi, Asus B450 Strix I
-Gaming with Ryzen 5 2400 (3400G) and Kingston, Corsair, Noname memory in
-various combinations. This problem solved by installing different memory
-modules of different sizes (8G+4G) and (or) modules with different timings
-(this disables dual channel mode)
+On Thu, Jun 04, 2020 at 01:39:22AM -0300, Thiago Jung Bauermann wrote:
+>=20
+> Hello David,
+>=20
+> David Gibson <david@gibson.dropbear.id.au> writes:
+>=20
+> > A number of hardware platforms are implementing mechanisms whereby the
+> > hypervisor does not have unfettered access to guest memory, in order
+> > to mitigate the security impact of a compromised hypervisor.
+> >
+> > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> > its own memory encryption mechanism.  POWER has an upcoming mechanism
+> > to accomplish this in a different way, using a new memory protection
+> > level plus a small trusted ultravisor.  s390 also has a protected
+> > execution environment.
+> >
+> > The current code (committed or draft) for these features has each
+> > platform's version configured entirely differently.  That doesn't seem
+> > ideal for users, or particularly for management layers.
+> >
+> > AMD SEV introduces a notionally generic machine option
+> > "machine-encryption", but it doesn't actually cover any cases other
+> > than SEV.
+> >
+> > This series is a proposal to at least partially unify configuration
+> > for these mechanisms, by renaming and generalizing AMD's
+> > "memory-encryption" property.  It is replaced by a
+> > "guest-memory-protection" property pointing to a platform specific
+> > object which configures and manages the specific details.
+> >
+> > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+>=20
+> Thank you very much for this series! Using a machine property is a nice
+> way of configuring this.
+>=20
+> >From an end-user perspective, `-M pseries,guest-memory-protection` in
+> the command line already expresses everything that QEMU needs to know,
+> so having to add `-object pef-guest,id=3Dpef0` seems a bit redundant. Is
+> it possible to make QEMU create the pef-guest object behind the scenes
+> when the guest-memory-protection property is specified?
+>=20
+> Regardless, I was able to successfuly launch POWER PEF guests using
+> these patches:
+>=20
+> Tested-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>=20
+> > can be extended to cover the Intel and s390 mechanisms as well,
+> > though.
+> >
+> > Note: I'm using the term "guest memory protection" throughout to refer
+> > to mechanisms like this.  I don't particular like the term, it's both
+> > long and not really precise.  If someone can think of a succinct way
+> > of saying "a means of protecting guest memory from a possibly
+> > compromised hypervisor", I'd be grateful for the suggestion.
+>=20
+> Is "opaque guest memory" any better? It's slightly shorter, and slightly
+> more precise about what the main characteristic this guest property conve=
+ys.
 
-And now... Steps to reproduce: 
+That's not a bad one, but for now I'm going with "host trust
+limitation", since this might end up covering things other than just
+memory protection.
 
-1. Check your memory worked in dual-channel mode.
-2. Install Ubuntu(20.04), ArchLinux (kernel 5.6.15 in my case, with ACS patch),
-Manjaro KDE (19.x), it does not matter...
-3. Install libvirt, qemu, ovmf and other virtualization stuff.
-4. Configure configs:
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-/etc/default/grub:
-GRUB_CMDLINE_LINUX_DEFAULT="audit=0 loglevel=3 quiet amd_iommu=on amd_iommu=pt
-pcie_acs_override=downstream,multifunction isolcpus=2,6,3,7
-default_hugepagesz=1G hugepagesz=1G hugepages=8"
+--4BlIp4fARb6QCoOq
+Content-Type: application/pgp-signature; name="signature.asc"
 
-/etc/modprobe.d/avic.conf:
-options kvm-amd nested=0 avic=1 npt=1
+-----BEGIN PGP SIGNATURE-----
 
-/etc/modprobe.d/kvm.conf:
-options kvm halt_poll_ns=0
-options kvm report_ignored_msrs=0
-options kvm ignore_msrs=1
-options vfio_iommu_type1 allow_unsafe_interrupts=1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7YmDwACgkQbDjKyiDZ
+s5I9XA/8Ch2ePqa6dC1C0UY+N36zI1Evzcryyl53MbEkYBAzCnNQWtbCUYy88uWI
+HWyaw6W/HcTcuHSh5bBPC+H7sKkHpUFguUCdp5uIzGdWr4Bm3uTp+lWvgxJQmnmh
+SopkxbIyASuNWLonBK6CaS/2p+60vwcIkWcrHccF1r6N11aPpUCuKQbkwOImnD1W
+JTgUWN0LPSI6qdBLA0wAL/3vtUVGSqDT8O2VxldJBQbeDOu0w8Vog4euO3RhEZEV
+85Of/utWgwKJScfNaXvOmiZ9cBMFs3Nu6pwQdVfOsFnOkGznaTDZIGd37/4CPFf8
+lKYdpaX0qaP4w2qThZLqi8asayZDmYfkarxaDlYBlGBsd9m0iwMXalvBzteoiNrz
+9FbObSoCIWbnhAoKsUuEbD/D+sGBMl1yIb5jwgiSTTYMaTM/9/Lwh2WKsG3LpS6I
+plxNdA5vzSOboff9IftBlcDfxjBZB+4/x6ULDfWBHyViCY9BLlvoBD8vKSDGok+d
+gVjXHR0Du3FcwZA3VVZuggO28zObVGx5d6i47zqwL0eo51XXrL3bCg/TytTrg4v0
+Uc0j6PeUlyeo6epdzjrXlwluaHJjm/39sKNb/YJlFEg8XywHTRd1/Va5c67SikLS
+USYa4hQqkTinT3yUsojh3p/5Nu+JqocYmpeqKyH6KJHVA1208Rg=
+=HHjA
+-----END PGP SIGNATURE-----
 
-/etc/modprobe.d/kvm.conf:
-softdep amdgpu pre: vfio-pci
-softdep snd_hda_intel pre: vfio-pci
-options vfio-pci ids=1002:67ff,1002:aae0,1022:15e0,1022:15e1
-options vfio-pci disable_vga=1
-
-/etc/libvirt/qemu/win10.xml
-<domain type='kvm'>
-  <name>win10</name>
-  <uuid>b33a0bec-cd23-4cfb-b4fe</uuid>
-  <memory unit='KiB'>8388608</memory>
-  <currentMemory unit='KiB'>8388608</currentMemory>
-  <memoryBacking>
-    <hugepages/>
-    <nosharepages/>
-    <locked/>
-    <allocation mode='immediate'/>
-    <discard/>
-  </memoryBacking>
-  <vcpu placement='static' cpuset='2,6,3,7'>4</vcpu>
-  <cputune>
-    <vcpupin vcpu='0' cpuset='2'/>
-    <vcpupin vcpu='1' cpuset='6'/>
-    <vcpupin vcpu='2' cpuset='3'/>
-    <vcpupin vcpu='3' cpuset='7'/>
-  </cputune>
-  <os>
-    <type arch='x86_64' machine='pc-q35-5.0'>hvm</type>
-    <loader readonly='yes'
-type='pflash'>/usr/share/ovmf/x64/OVMF_CODE-pure-efi.fd</loader>
-    <nvram>/usr/share/ovmf/x64/OVMF_VARS-pure-efi-1280x1024.fd</nvram>
-    <bootmenu enable='no'/>
-    <smbios mode='host'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic eoi="on"/>
-    <hap state="on"/>
-    <hyperv>
-      <relaxed state="on"/>
-      <vapic state="on"/>
-      <vpindex state="on"/>
-      <vendor_id state="on" value="err43fix"/>
-    </hyperv>
-    <kvm>
-      <hidden state="on"/>
-      <hint-dedicated state="on"/>
-    </kvm>
-    <ioapic driver="kvm"/>
-  </features>
-  <cpu mode="host-passthrough" check="none">
-    <topology sockets="1" cores="2" threads="2"/>
-    <cache mode="passthrough"/>
-    <feature policy="require" name="invtsc"/>
-    <feature policy="require" name="topoext"/>
-    <feature policy="disable" name="monitor"/>
-  </cpu>
-  <clock offset="utc">
-    <timer name="rtc" present="no" tickpolicy="catchup"/>
-    <timer name="pit" present="no" tickpolicy="discard"/>
-    <timer name="hpet" present="no"/>
-    <timer name="tsc" present="yes" mode="native"/>
-    <timer name="hypervclock" present="yes"/>
-  </clock>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>destroy</on_crash>
-  <pm>
-    <suspend-to-mem enabled='no'/>
-    <suspend-to-disk enabled='no'/>
-  </pm>
-  <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
-    <disk type='file' device='cdrom'>
-      <driver name='qemu' type='raw'/>
-      <target dev='sdb' bus='sata'/>
-      <readonly/>
-      <address type='drive' controller='0' bus='0' target='0' unit='1'/>
-    </disk>
-    <disk type='file' device='cdrom'>
-      <driver name='qemu' type='raw'/>
-      <target dev='sdd' bus='sata'/>
-      <readonly/>
-      <address type='drive' controller='0' bus='0' target='0' unit='3'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
-      <source
-dev='/dev/disk/by-id/ata-INTEL_SSDSC2KW512G8_PHLA91930167512DGN'/>
-      <target dev='sda' bus='scsi'/>
-      <boot order='1'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
-    </disk>
-    <controller type='usb' index='0' model='qemu-xhci' ports='15'>
-      <address type='pci' domain='0x0000' bus='0x02' slot='0x00'
-function='0x0'/>
-    </controller>
-    <controller type='sata' index='0'>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x1f'
-function='0x2'/>
-    </controller>
-    <controller type='pci' index='0' model='pcie-root'/>
-    <controller type='pci' index='1' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='1' port='0x10'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02' function='0x0'
-multifunction='on'/>
-    </controller>
-    <controller type='pci' index='2' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='2' port='0x11'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x1'/>
-    </controller>
-    <controller type='pci' index='3' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='3' port='0x12'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x2'/>
-    </controller>
-    <controller type='pci' index='4' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='4' port='0x13'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x3'/>
-    </controller>
-    <controller type='pci' index='5' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='5' port='0x14'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x4'/>
-    </controller>
-    <controller type='pci' index='6' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='6' port='0x15'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x5'/>
-    </controller>
-    <controller type='pci' index='7' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='7' port='0x16'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x6'/>
-    </controller>
-    <controller type='pci' index='8' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='8' port='0x17'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x7'/>
-    </controller>
-    <controller type='pci' index='9' model='pcie-to-pci-bridge'>
-      <model name='pcie-pci-bridge'/>
-      <address type='pci' domain='0x0000' bus='0x07' slot='0x00'
-function='0x0'/>
-    </controller>
-    <controller type='pci' index='10' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='10' port='0x18'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'
-multifunction='on'/>
-    </controller>
-    <controller type='pci' index='11' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='11' port='0x19'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x03'
-function='0x1'/>
-    </controller>
-    <controller type='pci' index='12' model='pcie-root-port'>
-      <model name='pcie-root-port'/>
-      <target chassis='12' port='0x1a'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x03'
-function='0x2'/>
-    </controller>
-    <controller type='virtio-serial' index='0'>
-      <address type='pci' domain='0x0000' bus='0x03' slot='0x00'
-function='0x0'/>
-    </controller>
-    <controller type='scsi' index='0' model='virtio-scsi'>
-      <address type='pci' domain='0x0000' bus='0x0a' slot='0x00'
-function='0x0'/>
-    </controller>
-    <interface type='bridge'>
-      <mac address='52:54:00:7e:27:af'/>
-      <source bridge='virbr0'/>
-      <model type='virtio'/>
-      <address type='pci' domain='0x0000' bus='0x01' slot='0x00'
-function='0x0'/>
-    </interface>
-    <channel type='spicevmc'>
-      <target type='virtio' name='com.redhat.spice.0'/>
-      <address type='virtio-serial' controller='0' bus='0' port='1'/>
-    </channel>
-    <channel type='unix'>
-      <source mode='bind' path='/tmp/win10.agent'/>
-      <target type='virtio' name='org.qemu.guest_agent.0'/>
-      <address type='virtio-serial' controller='0' bus='0' port='2'/>
-    </channel>
-    <input type='mouse' bus='ps2'/>
-    <input type='keyboard' bus='ps2'/>
-    <graphics type='spice' port='5910' autoport='no' listen='127.0.0.1'>
-      <listen type='address' address='127.0.0.1'/>
-      <image compression='off'/>
-    </graphics>
-    <video>
-      <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1'
-primary='yes'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x01'
-function='0x0'/>
-    </video>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <driver name='vfio'/>
-      <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
-      </source>
-      <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x05' slot='0x00'
-function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <source>
-        <address domain='0x0000' bus='0x08' slot='0x00' function='0x3'/>
-      </source>
-      <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x06' slot='0x00'
-function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <source>
-        <address domain='0x0000' bus='0x08' slot='0x00' function='0x4'/>
-      </source>
-      <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x08' slot='0x00'
-function='0x0'/>
-    </hostdev>
-    <memballoon model='virtio'>
-      <address type='pci' domain='0x0000' bus='0x04' slot='0x00'
-function='0x0'/>
-    </memballoon>
-    <shmem name='looking-glass'>
-      <model type='ivshmem-plain'/>
-      <size unit='M'>32</size>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x10'
-function='0x0'/>
-    </shmem>
-  </devices>
-</domain>
-
-5. Install Windows 10 (17763 build due to low latency), windows 8.1..., it does
-not matter...
-6. Install Steam or other game stuff. it does not matter... Play. Your system
-will certainly go to the black screen if you use AMD GPU (tested with RADEON
-RX560 2GB) or your drivers has been crashed if you use Nvidia GPU (1050Ti 4Gb)
-in my case.
-7. Turn off your PC, remove one memory module and install other memory module,
-with another timings, another capacity. This magic disables dual channel memory
-support.
-8. Turn on your PC, start yor Virtualized Game Machine and all worked without
-problem days and nights without reboots...
-
-I hope someone doesn't get past this problem. Thanks in advance.
-
-P.S.: Dual channel worked fine without problem on bare metal hardware.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+--4BlIp4fARb6QCoOq--
