@@ -2,146 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7158A1EE88D
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 18:27:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92AA81EE890
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 18:28:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729816AbgFDQ1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 12:27:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47596 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729540AbgFDQ1h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 12:27:37 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8494B206E6;
-        Thu,  4 Jun 2020 16:27:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591288056;
-        bh=S/InZdO6ZGDXoUUOdS8+reiil89ywTIZT3qwWyRGzdA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=MxtQ4iIJUJQsEL4elLYGFqRxB2hbDMaW0p6AfFk7rmu5mLrBe+x17urAdIhyJe7XR
-         dZ6pMY78PGmOHv7ZBPgDOY7IhlTHSPZGZ+jc3dmu2mDG9esPXot2mFXcP6Ga2usK/5
-         ZSNMQtXae0NVKUtMJm+rQ+sK3U4tFOnxhRw12fHA=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jgsiM-000IWN-U1; Thu, 04 Jun 2020 17:27:35 +0100
+        id S1729582AbgFDQ2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 12:28:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43582 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729115AbgFDQ17 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 12:27:59 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9FEAC08C5C0
+        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 09:27:58 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id d1so6651475ila.8
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 09:27:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8SV0FtrMHcEVC0TjG1lIBMyklx/s99kl7ywIO23ZhMk=;
+        b=lsX7SRkn/58kMRS+GxvZjQ1F2T1zTLqcNYPLPjzqxYcEq3/rdEQ1PDHoI8s25jhaKF
+         i6R2yAAOM4ruXYCc74CjQSulrfgjKrectwnu2jZntPzkfezzeKYUXNmzBYFlNoYPJKwj
+         gANWWpzAxKwCkGb1wv4cfPVDP6Dg7hdTuWP/3IrvKe2jBG0seplny638FN3YJS/bmPCC
+         qwnqfF76UvF1EOL5CB+Wn0DdaINU1//sA2M56c0PBNB4tw/YvnxLZkMr49qB4vmDWcDg
+         R6PC7XpwseUn/XvM2PVM/RaMI0o561hsiNr1xDau9y5opoF0pHprCUUfhJ5diEZM5M/5
+         yABA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8SV0FtrMHcEVC0TjG1lIBMyklx/s99kl7ywIO23ZhMk=;
+        b=AkBwbxsfI3tnLmghnqnb/RIu6Hkguzhnq3ZEtqfhQ7/tUV8PLZzEVqnp3LhyyNsqVL
+         kPhJ6/nFpFOfGe9ItQj4TdL66t6/ixly0jdOvF6rDmyVXEGfocbV+tj3R5k61xyuf5d9
+         yeVe4RRSvkzXvQWE/fcoIecG2GoF08xEJchhVrJuqFLnO9FoMHPJW9i6DoTbAllwPiwm
+         KVBGV5NrfTI6YAwGdxiVkK9S2Nfa+x1JxP3Xf+4E0Sf0omYsLQBKRJ1trl1dUJDMxdL8
+         a9Gl5a5Y/fvNxoFOv9NsiMfCg6j1qnpCvbC+eu3UsMuHRNHk3zhPFrlkLm9i76ylpL6D
+         KFYA==
+X-Gm-Message-State: AOAM530vO7puulB4cyqDnqmHgl9qCcinY6qsj9/FTzFdMVM2L+o0sfO+
+        AA3qFb29PiskeJBeStUi75bUJgkmhlM6Y9sCYMJRcIT1
+X-Google-Smtp-Source: ABdhPJxRbVJTskYAsmdKpu2pg4TINE2MruufkpwnEijmewcp0JnBYFK2jNyYBde6mk7i4x2dEuDjCSNqEH6iENKh6dA=
+X-Received: by 2002:a92:5f13:: with SMTP id t19mr4759363ilb.296.1591288077708;
+ Thu, 04 Jun 2020 09:27:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Thu, 04 Jun 2020 17:27:34 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Rientjes <rientjes@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Will Drewry <wad@chromium.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        kernel-team@android.com, will@kernel.org,
-        Jun Nakajima <jun.nakajima@intel.com>
-Subject: Re: [RFC 00/16] KVM protected memory extension
-In-Reply-To: <20200604154835.GE30223@linux.intel.com>
-References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
- <20200604161523.39962919@why> <20200604154835.GE30223@linux.intel.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <cd292393f8e45407b2754efbaf89aa70@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, kirill@shutemov.name, dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org, pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, rientjes@google.com, aarcange@redhat.com, keescook@chromium.org, wad@chromium.org, rick.p.edgecombe@intel.com, andi.kleen@intel.com, x86@kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, kirill.shutemov@linux.intel.com, kernel-team@android.com, will@kernel.org, jun.nakajima@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <CALMp9eS2UtMazBew2yndKVXC0QnnBW2bvbU_d+27Hp7Fw2NXFg@mail.gmail.com>
+ <48454efb-455f-5505-f92c-7f78836d5b91@redhat.com>
+In-Reply-To: <48454efb-455f-5505-f92c-7f78836d5b91@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 4 Jun 2020 09:27:46 -0700
+Message-ID: <CALMp9eQ9Xit1oZ0gFmUwd4HwQ6mEMDMvF_ZRg60Ohtt9_nPQqw@mail.gmail.com>
+Subject: Re: PAE mode save/restore broken
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Thu, Jun 4, 2020 at 7:51 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 02/06/20 02:11, Jim Mattson wrote:
+> > I can only assume that no one cares that KVM_GET_SREGS/KVM_SET_SREGS
+> > is broken for PAE mode guests (i.e. KVM_GET_SREGS doesn't capture the
+> > PDPTRs and KVM_SET_SREGS re-reads them from memory).
+> >
+> > Presumably, since AMD's nested paging is broken for PAE mode guests,
+> > the kvm community has made the decision not to get things right for
+> > Intel either. Can anyone confirm? This was all before my time.
+>
+> Yes, pretty much.  The PDPTRs are not part of the saved state, we just
+> treat them as a small third level in the radix tree.  Of course, for
+> nested VMX they are properly synced to the VMCS12 and serialized by
+> KVM_SET_NESTED_STATE.
+>
+> Out of curiosity are there OSes that rely on the PDPTRs remaining cached
+> until the next CR3 load?
 
-On 2020-06-04 16:48, Sean Christopherson wrote:
-> +Jun
-> 
-> On Thu, Jun 04, 2020 at 04:15:23PM +0100, Marc Zyngier wrote:
->> Hi Kirill,
->> 
->> Thanks for this.
->> 
->> On Fri, 22 May 2020 15:51:58 +0300
->> "Kirill A. Shutemov" <kirill@shutemov.name> wrote:
->> 
->> > == Background / Problem ==
->> >
->> > There are a number of hardware features (MKTME, SEV) which protect guest
->> > memory from some unauthorized host access. The patchset proposes a purely
->> > software feature that mitigates some of the same host-side read-only
->> > attacks.
->> >
->> >
->> > == What does this set mitigate? ==
->> >
->> >  - Host kernel ”accidental” access to guest data (think speculation)
->> >
->> >  - Host kernel induced access to guest data (write(fd, &guest_data_ptr, len))
->> >
->> >  - Host userspace access to guest data (compromised qemu)
->> >
->> > == What does this set NOT mitigate? ==
->> >
->> >  - Full host kernel compromise.  Kernel will just map the pages again.
->> >
->> >  - Hardware attacks
->> 
->> Just as a heads up, we (the Android kernel team) are currently
->> involved in something pretty similar for KVM/arm64 in order to bring
->> some level of confidentiality to guests.
->> 
->> The main idea is to de-privilege the host kernel by wrapping it in its
->> own nested set of page tables which allows us to remove memory
->> allocated to guests on a per-page basis. The core hypervisor runs more
->> or less independently at its own privilege level. It still is KVM
->> though, as we don't intend to reinvent the wheel.
->> 
->> Will has written a much more lingo-heavy description here:
->> https://lore.kernel.org/kvmarm/20200327165935.GA8048@willie-the-truck/
-> 
-> Pardon my arm64 ignorance...
-> 
-> IIUC, in this mode, the host kernel runs at EL1?  And to switch to a 
-> guest
-> it has to bounce through EL2, which is KVM, or at least a chunk of KVM?
-> I assume the EL1->EL2->EL1 switch is done by trapping an exception of 
-> some
-> form?
-> 
-> If all of the above are "yes", does KVM already have the necessary 
-> logic to
-> perform the EL1->EL2->EL1 switches, or is that being added as part of 
-> the
-> de-privileging effort?
+None that I know of.
 
-KVM already handles the EL1->EL2->EL1 madness, meaning that from
-an exception level perspective, the host kernel is already a guest.
-It's just that this guest can directly change the hypervisor's text,
-its page tables, and muck with about everything else.
-
-De-privileging the memory access to non host EL1 memory is where the
-ongoing effort is.
-
-          M.
--- 
-Jazz is not dead. It just smells funny...
+It's interesting that Intel has taken great pains to virtualize the
+architected behavior, but AMD just shrugged it off.
