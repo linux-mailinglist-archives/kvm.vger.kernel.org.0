@@ -2,123 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E6701EEC7B
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 22:54:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C3811EECC0
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 23:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730142AbgFDUyW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 16:54:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56734 "EHLO
+        id S1726261AbgFDVD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 17:03:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730102AbgFDUyW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 16:54:22 -0400
-Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25606C08C5C0
-        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 13:54:21 -0700 (PDT)
-Received: by mail-il1-x143.google.com with SMTP id b5so7473430iln.5
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 13:54:21 -0700 (PDT)
+        with ESMTP id S1726054AbgFDVDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 17:03:25 -0400
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7615BC08C5C1
+        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 14:03:24 -0700 (PDT)
+Received: by mail-io1-xd41.google.com with SMTP id p20so7906562iop.11
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 14:03:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZKBf+/aAnIUAhu9efRbyqkKtVoY00YPeZOHPjPmkDUg=;
-        b=EXUGIsMpLq8D6GPhFSNjGxyNjmzEW+X5h5BClBRA+wde+3vdGOKrPiiKhLKpALSbKY
-         BIpW5abVqFGiWmqRwPI+r/0GYTqrHTmyFwVw+/iG6gsVyFaytrCfJv1H0ckslBp/ql6X
-         8c57Xb7v1+x66Ro0pbj62wq4vYxdBSUfTomxTStXzuloJQT9gjKcVyGewlXf0HybjFwe
-         Pws+ydXXqUzExwLwhQ+Qnto6duzAOijG6+9Z+QrQJTe0kS1h1lGU0brhwsKvkbBO7vve
-         ruMpP+cxyHHd0JRUTGEN3rEGTN4JkLCXTQTQFEu2weyZST4kk++gohlfpsr+0WMJZYo+
-         A5Eg==
+         :cc:content-transfer-encoding;
+        bh=xVcHrfKW+EZLK5WlvWHRmcrAcLbjRGuWUSEv5Qrs1B4=;
+        b=SGe6Nt4I1FoJ2ANC8HuzMuezUuGCeu8KucBq8Rf8YAAzjJ4WCCfTCSJDkBTI5MPby7
+         olZ3xVaPwehMaSwNyhEU+fpeczpSyIA/hDSC4zLF4GWwLB3nX1siy6Wfqyd5oCZb4tex
+         /ziFT9YowW6F6ToyhHZje6eivMjWP1rVKYNzqA84rhlVKpwXUMNxWPgqCfoqSNITOn2i
+         0I9nKK0BsJ/fBdtLlHabEsaKunPvKpO8EMC4np1uz2KMOMhc2Rs+fke+5WTlS/fjh4sx
+         Mbdx3TTMQ0C+YfPvnrV8GrZ/GJyAoITjJ53BYhYBfzVa7qKrxy5vdZLXzA2PhbQkrv86
+         8vsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZKBf+/aAnIUAhu9efRbyqkKtVoY00YPeZOHPjPmkDUg=;
-        b=HCwpdK3LOKM21ycoUUOq4xBVlXGHPe+U2msHLNT477LxhMhnLoCsRGqNyYUUJAfExd
-         zHktllGs6BhWMCA1tJVaUHqeQNtjGqGYcz5JX35CiCrdpr8lPCOCkZB2LfgHE+Dte578
-         4u8mqLe2v30KMB6hei/RitodUWCBykNiCZve+UV1AS9ykNRV58mG/EZZVhwJooT1Okol
-         6PZMyQSL2aYrzKC7mcVN5mmlQ50b/hwRhpnsRhaEIRARH4SSwtddzdsTxObE2FqQvfXS
-         WW4o/+uNUAuEX3WK8IRc1bLCh+WMLKjeEetbLzjghuQn2JBsOP8vqa6vbYBQeXqwUSFl
-         kj+w==
-X-Gm-Message-State: AOAM5320Gbujhed5BVU2O16suRUoaG4v+zVfbigGNNaFNv2C23+r2411
-        RrDtG0Ykp3Vdt/dfDzefNVh2p8bJ7KoEMGDU4gZcuA==
-X-Google-Smtp-Source: ABdhPJxAll0OJ1/wMBDM6dQwfd3L2h7ZvXs8GHFGKi1xbeeodP385HcTEOp5gg/32CUyhzprg8JKpbn1NqX/MPasBRo=
-X-Received: by 2002:a92:bacb:: with SMTP id t72mr5906929ill.26.1591304060394;
- Thu, 04 Jun 2020 13:54:20 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=xVcHrfKW+EZLK5WlvWHRmcrAcLbjRGuWUSEv5Qrs1B4=;
+        b=OSlYFQsN3RX//45Os3AB8dS+0fmsY/5n2eyeOcKTUnvSLP8WhJ62AY6+eqdx7is/ag
+         2WvK+i5jbmYW5qquAeb+OQxTolRyfLQjBKSu2NUkmNHO+AU0HgBZ7VvR+NKcXJN8ExZY
+         jqFWXzKZwcZNQJWdK9xmZI5dX4yPyQtigZVd9pVtbuiJuZ6PR++z/nSde7J+XAv2YPLy
+         RADYjqwNJgbU3fVR+YglGGRT4mu6DB4kspdB4OKJBup2iLdSZCDfAaSsdpiDtmiM1/Aa
+         8jelM1Xp/tPQUMg1P1xFRADdbejbAaS16MXK7TaDaF3lwHw6cfgfGbw4s3g614y8G8At
+         6iuQ==
+X-Gm-Message-State: AOAM532MPtUPu0CYNzVnUSq8StzejN18P2i5m+/ylSbIHBnnBnckUo4p
+        18lxNQOzD0yu0SF3NA62aB/mNTjP3dHYKRhS4A17Ng==
+X-Google-Smtp-Source: ABdhPJydaD55JsS0MoPoYnaMrMN3IUQdB136AuNz0druLAaVYc+jwbiq3WE0o9kEigoUYDae316q2Oi5uZR3js1Jn6s=
+X-Received: by 2002:a02:390b:: with SMTP id l11mr6074699jaa.54.1591304603645;
+ Thu, 04 Jun 2020 14:03:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200601222416.71303-1-jmattson@google.com> <20200601222416.71303-4-jmattson@google.com>
- <20200602012139.GF21661@linux.intel.com> <CALMp9eS3XEVdZ-_pRsevOiKRBSbCr96saicxC+stPfUqsM1u1A@mail.gmail.com>
- <20200603022414.GA24364@linux.intel.com> <CALMp9eSth924epmxS8-mMXopGMFfR_JK7Hm8tQXyeqGF3ebxcg@mail.gmail.com>
- <20200604184656.GD30456@linux.intel.com> <CALMp9eR3c3wQ4YrP7O0UwP=B95XR_-rEpbjet1AgKVMYNEWskA@mail.gmail.com>
- <20200604192622.GE30456@linux.intel.com>
-In-Reply-To: <20200604192622.GE30456@linux.intel.com>
+References: <20200522125214.31348-1-kirill.shutemov@linux.intel.com>
+ <20200604161523.39962919@why> <20200604154835.GE30223@linux.intel.com>
+ <20200604163532.GE3650@willie-the-truck> <6DBAB6A4-A1F9-40E9-B81B-74182DDCF939@intel.com>
+In-Reply-To: <6DBAB6A4-A1F9-40E9-B81B-74182DDCF939@intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 4 Jun 2020 13:54:08 -0700
-Message-ID: <CALMp9eTwExWy9f14D-P0jCfoXynk1BBL705wk4-UiBNcufAJSg@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] kvm: vmx: Add last_cpu to struct vcpu_vmx
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
+Date:   Thu, 4 Jun 2020 14:03:12 -0700
+Message-ID: <CALMp9eRN-zkvmkYQ0a600SyLA_0ymznBG8jmriTsYMcXkK77Qg@mail.gmail.com>
+Subject: Re: [RFC 00/16] KVM protected memory extension
+To:     "Nakajima, Jun" <jun.nakajima@intel.com>
+Cc:     Will Deacon <will@kernel.org>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        Marc Zyngier <maz@kernel.org>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Rientjes <rientjes@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Will Drewry <wad@chromium.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "kernel-team@android.com" <kernel-team@android.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 4, 2020 at 12:26 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+On Thu, Jun 4, 2020 at 12:09 PM Nakajima, Jun <jun.nakajima@intel.com> wrot=
+e:
+
+> We (Intel virtualization team) are also working on a similar thing, proto=
+typing to meet such requirements, i..e "some level of confidentiality to gu=
+ests=E2=80=9D. Linux/KVM is the host, and the Kirill=E2=80=99s patches are =
+helpful when removing the mappings from the host to achieve memory isolatio=
+n of a guest. But, it=E2=80=99s not easy to prove there are no other mappin=
+gs.
 >
-> On Thu, Jun 04, 2020 at 12:00:33PM -0700, Jim Mattson wrote:
-> > On Thu, Jun 4, 2020 at 11:47 AM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > On Wed, Jun 03, 2020 at 01:18:31PM -0700, Jim Mattson wrote:
-> > > > On Tue, Jun 2, 2020 at 7:24 PM Sean Christopherson
-> > > > <sean.j.christopherson@intel.com> wrote:
-> > > > > As an alternative to storing the last run/attempted CPU, what about moving
-> > > > > the "bad VM-Exit" detection into handle_exit_irqoff, or maybe a new hook
-> > > > > that is called after IRQs are enabled but before preemption is enabled, e.g.
-> > > > > detect_bad_exit or something?  All of the paths in patch 4/4 can easily be
-> > > > > moved out of handle_exit.  VMX would require a little bit of refacotring for
-> > > > > it's "no handler" check, but that should be minor.
-> > > >
-> > > > Given the alternatives, I'm willing to compromise my principles wrt
-> > > > emulation_required. :-) I'll send out v4 soon.
-> > >
-> > > What do you dislike about the alternative approach?
-> >
-> > Mainly, I wanted to stash this in a common location so that I could
-> > print it out in our local version of dump_vmcs(). Ideally, we'd like
-> > to be able to identify the bad part(s) just from the kernel logs.
->
-> But this would also move dump_vmcs() to before preemption is enabled, i.e.
-> your version could read the CPU directly.
+> To raise the level of security, our idea is to de-privilege the host kern=
+el just to enforce memory isolation using EPT (Extended Page Table) that vi=
+rtualizes guest (the host kernel in this case) physical memory; almost ever=
+ything is passthrough. And the EPT for the host kernel excludes the memory =
+for the guest(s) that has confidential info. So, the host kernel shouldn=E2=
+=80=99t cause VM exits as long as it=E2=80=99s behaving well (CPUID still c=
+auses a VM exit, though).
 
-If it backports easily. The bigger the change, the less likely that is.
-
-> And actually, if we're talking about ferreting out hardware issues, you
-> really do want this happening before preemption is enabled so that the VMCS
-> dump comes from the failing CPU.  If the vCPU is migrated, the VMCS will be
-> dumped after a VMCLEAR->VMPTRLD, i.e. will be written to memory and pulled
-> back into the VMCS cache on a different CPU, and will also have been written
-> to by the new CPU to update host state.  Odds are that wouldn't affect the
-> dump in a meaningful way, but never say never.
-
-True.
-
-> Tangentially related, what about adding an option to do VMCLEAR at the end
-> of dump_vmcs(), followed by a dump of raw memory?  It'd be useless for
-> debugging software issues, but might be potentially useful/interesting for
-> triaging hardware problems.
-
-Our dump_vmcs() dumps all vmreadable fields, which should be pretty
-close to what we can get from a raw memory dump. We do have additional
-instrumentation to aid in determining the layout of the VMCS in
-memory, but it is too stupid to figure out how access rights are
-stored. Maybe it could be beefed up a little, and we could at least
-verify that VMCLEAR dumps the same thing to physical memory that we
-get from the individual VMREADs.
-
-> > That, and I wouldn't have been as comfortable with the refactoring
-> > without a lot more testing.
+You're Intel. Can't you just change the CPUID intercept from required
+to optional? It seems like this should be in the realm of a small
+microcode patch.
