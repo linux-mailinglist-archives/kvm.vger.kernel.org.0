@@ -2,109 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A68571EE7D4
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:33:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 084461EE7D9
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 17:34:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729561AbgFDPdd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 11:33:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60903 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729557AbgFDPdc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 11:33:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591284810;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EkTe6msyKKBujkL/w9LaHM/UruPUqU2iBowLUPq5X2I=;
-        b=Jc6HTWdiwzE/ayp56Kr0mS5XVW+WLZLBCHL0lE4HjkjHroyaPay8iKXOuPCMIG0gyWflJw
-        3GfQZ+FhFsuBLmST25tbaf9UCDkZ97LK6jVVql5NyXDu6kGC6/xbfEWbvhIQvZbVt1KNQi
-        VWFVu0OtUJZML3U67MhX4Wg5syTc+mE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-WVuphH4hOSe7bqhGkdhgZQ-1; Thu, 04 Jun 2020 11:33:28 -0400
-X-MC-Unique: WVuphH4hOSe7bqhGkdhgZQ-1
-Received: by mail-ed1-f72.google.com with SMTP id i93so2842856edi.4
-        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 08:33:28 -0700 (PDT)
+        id S1729571AbgFDPen (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 11:34:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35368 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729035AbgFDPem (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 11:34:42 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F96EC08C5C0;
+        Thu,  4 Jun 2020 08:34:42 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id p5so6586897wrw.9;
+        Thu, 04 Jun 2020 08:34:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=D3By0h98qnolfLM0+QRpl2dqCpgdvgnNY+OucjDnKDY=;
+        b=vZt0DMCfoJUEXzeTrBICKPyqGfuBe7vx1mxfTRfe7AMZfEO9MgZiR1mPQATjGg7sos
+         L2gEppsjZRToGPjruQDj6PgcZ9k1LIUGD0iWIyOtnINMSac6a+7rCj3z4QC4lrZCdKFE
+         k2yM8OXoWQeV2IMPxu2sJJA6xUKeMYmYvndml0HnOewX3ksq8F1r9goi9s79mQpwsSIb
+         c5mAXaNTKzUmdLKel6x7irCbEI4DTv2oXtv/qN7Oxn1zzp0W/r8QazRbJWdm+blAf/6N
+         mqCzGRjWNAgSpkjxibd5bm0M9tIZAW+bPd5JKLWcPAMtTD2J+9FPsJ68L+Qr8Bw98u2/
+         uiog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=EkTe6msyKKBujkL/w9LaHM/UruPUqU2iBowLUPq5X2I=;
-        b=FZZSokH8ItqeodDpr2xppPRrptbOml85wu/GhnTjlZzsRjjnBkwqMPJYeYWYefo3vg
-         JmFcObaygPk9pXbr7TU1y4dAPSHRQlbgaQuykRrBYXbsKogCoE3zqTezwkH8MnYCjfxJ
-         4+R9AIuSNIc/ITXB83C6hnv4FbLAOrO7eI8fi0iDKeXC8fDcjbMmPJhQk//P4Y3Wh7jq
-         ogpBEIyqYnx4rGRiJwv/qwiAQBjwHusFfksNXO08rXefNWUkPFhD6bRiAqrRclQovYoy
-         8eHg1of2ztUZSXMJawIlqPXDMePgakhNT/CRp9BObzoD5oLc7tRiUMSNKLAFnNiHEhnE
-         GcTA==
-X-Gm-Message-State: AOAM531CpAdz/OD6d7DjmmRTDMoiocvzBgn44E1nW/EIpmiUpxnwbBpR
-        bNL8B8qVAZLlij5bfyZVLMqLdlGwL4jvMXObHq8N3qYES5B6gBWknog+xYtTX+Ph6z8Z8twI8MM
-        jOomWJPlHxkZt
-X-Received: by 2002:a17:906:138b:: with SMTP id f11mr4304825ejc.288.1591284807155;
-        Thu, 04 Jun 2020 08:33:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz6a+lge9RsDBjzyDM13/1DPTnf2dnUi/mD38OThDFZofvrtupLARjTGRzd9kQr1Mej5yW71A==
-X-Received: by 2002:a17:906:138b:: with SMTP id f11mr4304812ejc.288.1591284806925;
-        Thu, 04 Jun 2020 08:33:26 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id b24sm2638918edw.70.2020.06.04.08.33.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jun 2020 08:33:25 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: Inject #GP when nested_vmx_get_vmptr() fails to read guest memory
-In-Reply-To: <20200604145357.GA30223@linux.intel.com>
-References: <20200604143158.484651-1-vkuznets@redhat.com> <da7acd6f-204d-70e2-52aa-915a4d9163ef@redhat.com> <20200604145357.GA30223@linux.intel.com>
-Date:   Thu, 04 Jun 2020 17:33:25 +0200
-Message-ID: <87k10meth6.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=D3By0h98qnolfLM0+QRpl2dqCpgdvgnNY+OucjDnKDY=;
+        b=JZ8eG8tE4Lrj45800Q9lSdVl1iphQ/O0A/WBiZSX/qfUZrp9kuz9mx7Aas4wk9Cz2t
+         YOyhEGAOox3UiNgIhxGiEAdmW7/I6HpNeqd3ac3pf7rNg0bQSMSYM2OoJx6UDo0UrMhT
+         IODk77ghGzgKxAftTjwQDWJZcTMSBxjDQtlOKmdYnIHBeNr7DuFOpkeRD5sNTnD7QDMW
+         c66hlInF0eD4sknRVCkMOquRbw11MXQ6XFqsX+FDPbfLLc9Ix6P21O0X9JkCpZuCNoQ8
+         cMzt5mI8yG+KHkq896a/kZcL3/uZ/Pf1OayiCs2sbzNkK7lddWbrIhuV6t1jFQ1bFWE7
+         GH+w==
+X-Gm-Message-State: AOAM531sL81mAp0DcxfV/kkabS5Uu5LKAFtK6gzhHQqXxIpKx19EmvSx
+        J6WaYub0DBy0Omn3nc9kPcKtaZmjiMY=
+X-Google-Smtp-Source: ABdhPJxfqtpJqbRTF++Qa4Ke2KxsNtWe0xpkNWVokflegjt7JKKLmL/tz6wJQHjKWgmRMZK5uAnt/Q==
+X-Received: by 2002:adf:f0d2:: with SMTP id x18mr4926753wro.250.1591284880431;
+        Thu, 04 Jun 2020 08:34:40 -0700 (PDT)
+Received: from [192.168.8.102] ([194.230.155.251])
+        by smtp.gmail.com with ESMTPSA id q1sm7431317wmc.12.2020.06.04.08.34.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jun 2020 08:34:39 -0700 (PDT)
+Subject: Re: [PATCH v3 2/7] documentation for stats_fs
+To:     Randy Dunlap <rdunlap@infradead.org>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        David Rientjes <rientjes@google.com>,
+        Jonathan Adams <jwadams@google.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org
+References: <20200526110318.69006-1-eesposit@redhat.com>
+ <20200526110318.69006-3-eesposit@redhat.com>
+ <c9ddaed1-0efc-650b-6a51-ad5fc431af69@infradead.org>
+From:   Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
+Message-ID: <dcaab39e-6cd3-c6cf-1515-7067a8b0ed9f@gmail.com>
+Date:   Thu, 4 Jun 2020 17:34:37 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <c9ddaed1-0efc-650b-6a51-ad5fc431af69@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Hi,
 
-> On Thu, Jun 04, 2020 at 04:40:52PM +0200, Paolo Bonzini wrote:
->> On 04/06/20 16:31, Vitaly Kuznetsov wrote:
->
-> ...
->
->> > KVM could've handled the request correctly by going to userspace and
->> > performing I/O but there doesn't seem to be a good need for such requests
->> > in the first place. Sane guests should not call VMXON/VMPTRLD/VMCLEAR with
->> > anything but normal memory. Just inject #GP to find insane ones.
->> > 
+>> +
+>> +The STATS_FS_HIDDEN attribute won't affect the aggregation, it will only
+>> +block the creation of the files.
+> 
+> Why does HIDDEN block the creation of files?  instead of their visibility?
 
-...
+The file itself is used to allow the user to view the content of a 
+value. In order to make it hidden, the framework just doesn't create the 
+file.
+The structure is still present and considered in statsfs, however.
 
->> 
->> looks good but we need to do the same in handle_vmread, handle_vmwrite,
->> handle_invept and handle_invvpid.  Which probably means adding something
->> like nested_inject_emulation_fault to commonize the inner "if".
->
-> Can we just kill the guest already instead of throwing more hacks at this
-> and hoping something sticks?  We already have one in
-> kvm_write_guest_virt_system...
->
->   commit 541ab2aeb28251bf7135c7961f3a6080eebcc705
->   Author: Fuqian Huang <huangfq.daxian@gmail.com>
->   Date:   Thu Sep 12 12:18:17 2019 +0800
->
->     KVM: x86: work around leak of uninitialized stack contents
->
+Hidden in this case means not visible at all thus not created, not the 
+hidden file concept of dotted files (".filename")
 
-Oh I see...
+> 
+>> +
+>> +Add values to parent and child (also here order doesn't matter)::
+>> +
+>> +        struct kvm *base_ptr = kmalloc(..., sizeof(struct kvm));
+>> +        ...
+>> +        stats_fs_source_add_values(child_source, kvm_stats, base_ptr, 0);
+>> +        stats_fs_source_add_values(parent_source, kvm_stats, NULL, STATS_FS_HIDDEN);
+>> +
+>> +``child_source`` will be a simple value, since it has a non-NULL base
+>> +pointer, while ``parent_source`` will be an aggregate. During the adding
+>> +phase, also values can optionally be marked as hidden, so that the folder
+>> +and other values can be still shown.
+>> +
+>> +Of course the same ``struct stats_fs_value`` array can be also passed with a
+>> +different base pointer, to represent the same value but in another instance
+>> +of the kvm struct.
+>> +
+>> +Search:
+>> +
+>> +Fetch a value from the child source, returning the value
+>> +pointed by ``(uint64_t *) base_ptr + kvm_stats[0].offset``::
+>> +
+>> +        uint64_t ret_child, ret_parent;
+>> +
+>> +        stats_fs_source_get_value(child_source, &kvm_stats[0], &ret_child);
+>> +
+>> +Fetch an aggregate value, searching all subsources of ``parent_source`` for
+>> +the specified ``struct stats_fs_value``::
+>> +
+>> +        stats_fs_source_get_value(parent_source, &kvm_stats[0], &ret_parent);
+>> +
+>> +        assert(ret_child == ret_parent); // check expected result
+>> +
+>> +To make it more interesting, add another child::
+>> +
+>> +        struct stats_fs_source child_source2 = stats_fs_source_create(0, "child2");
+>> +
+>> +        stats_fs_source_add_subordinate(parent_source, child_source2);
+>> +        // now  the structure is parent -> child1
+>> +        //                              -> child2
+> 
+> Is that the same as                 parent -> child1 -> child2
+> ?  It could almost be read as
+>                                      parent -> child1
+>                                      parent -> child2
 
-[...]
+No the example in the documentation shows the relationship
+parent -> child1 and
+parent -> child2.
+It's not the same as
+parent -> child1 -> child2.
+In order to do the latter, one would need to do:
 
-Let's get back to 'vm_bugged' idea then? 
+stats_fs_source_add_subordinate(parent_source, child_source1);
+stats_fs_source_add_subordinate(child_source1, child_source2);
 
-https://lore.kernel.org/kvm/87muadnn1t.fsf@vitty.brq.redhat.com/
+Hope that this clarifies it.
 
--- 
-Vitaly
+> 
+> Whichever it is, can you make it more explicit, please?
+> 
+> 
+>> +
+>> +        struct kvm *other_base_ptr = kmalloc(..., sizeof(struct kvm));
+>> +        ...
+>> +        stats_fs_source_add_values(child_source2, kvm_stats, other_base_ptr, 0);
+>> +
+>> +Note that other_base_ptr points to another instance of kvm, so the struct
+>> +stats_fs_value is the same but the address at which they point is not.
+>> +
+>> +Now get the aggregate value::
+>> +
+>> +        uint64_t ret_child, ret_child2, ret_parent;
+>> +
+>> +        stats_fs_source_get_value(child_source, &kvm_stats[0], &ret_child);
+>> +        stats_fs_source_get_value(parent_source, &kvm_stats[0], &ret_parent);
+>> +        stats_fs_source_get_value(child_source2, &kvm_stats[0], &ret_child2);
+>> +
+>> +        assert((ret_child + ret_child2) == ret_parent);
+>> +
+>> +Cleanup::
+>> +
+>> +        stats_fs_source_remove_subordinate(parent_source, child_source);
+>> +        stats_fs_source_revoke(child_source);
+>> +        stats_fs_source_put(child_source);
+>> +
+>> +        stats_fs_source_remove_subordinate(parent_source, child_source2);
+>> +        stats_fs_source_revoke(child_source2);
+>> +        stats_fs_source_put(child_source2);
+>> +
+>> +        stats_fs_source_put(parent_source);
+>> +        kfree(other_base_ptr);
+>> +        kfree(base_ptr);
+>> +
+>> +Calling stats_fs_source_revoke is very important, because it will ensure
+> 
+>             stats_fs_source_revoke()
+> 
+>> +that stats_fs will not access the data that were passed to
+>> +stats_fs_source_add_value for this source.
+>> +
+>> +Because open files increase the reference count for a stats_fs_source, the
+>> +source can end up living longer than the data that provides the values for
+>> +the source.  Calling stats_fs_source_revoke just before the backing data
+> 
+>                          stats_fs_source_revoke()
+> 
+>> +is freed avoids accesses to freed data structures. The sources will return
+>> +0.
+>> +
+>> +This is not needed for the parent_source, since it just contains
+>> +aggregates that would be 0 anyways if no matching child value exist.
+>> +
+>> +API Documentation
+>> +=================
+>> +
+>> +.. kernel-doc:: include/linux/stats_fs.h
+>> +   :export: fs/stats_fs/*.c
+>> \ No newline at end of file
+> 
+> Please fix that. ^^^^^
+> 
+> 
+> Thanks for the documentation.
+> 
 
+Thank you for the feedback,
+Emanuele
