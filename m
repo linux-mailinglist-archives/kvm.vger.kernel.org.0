@@ -2,94 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D914E1EEB1A
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 21:26:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAB8F1EEB1F
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 21:29:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729163AbgFDT00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 15:26:26 -0400
-Received: from mga14.intel.com ([192.55.52.115]:57917 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729016AbgFDT0Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 15:26:24 -0400
-IronPort-SDR: StJW+2JGnqqryjggKV4hgSZ5tWdMJswSXhpovEevadyDPmtE1dNcCxbL+3g6DB+8T3uSzM4Kuq
- QKHxfJsEwK2Q==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 12:26:22 -0700
-IronPort-SDR: CXA7BlGP+SOUE3ISA9bbvMmsKqwu5Vc3yMtFUHRpJyX95xm/jfyJSyfamIVo/wE9Y2j/GBCn9V
- 9NfwfW3YfFqA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,472,1583222400"; 
-   d="scan'208";a="445614131"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga005.jf.intel.com with ESMTP; 04 Jun 2020 12:26:22 -0700
-Date:   Thu, 4 Jun 2020 12:26:22 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Oliver Upton <oupton@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v3 3/4] kvm: vmx: Add last_cpu to struct vcpu_vmx
-Message-ID: <20200604192622.GE30456@linux.intel.com>
-References: <20200601222416.71303-1-jmattson@google.com>
- <20200601222416.71303-4-jmattson@google.com>
- <20200602012139.GF21661@linux.intel.com>
- <CALMp9eS3XEVdZ-_pRsevOiKRBSbCr96saicxC+stPfUqsM1u1A@mail.gmail.com>
- <20200603022414.GA24364@linux.intel.com>
- <CALMp9eSth924epmxS8-mMXopGMFfR_JK7Hm8tQXyeqGF3ebxcg@mail.gmail.com>
- <20200604184656.GD30456@linux.intel.com>
- <CALMp9eR3c3wQ4YrP7O0UwP=B95XR_-rEpbjet1AgKVMYNEWskA@mail.gmail.com>
+        id S1728374AbgFDT3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 15:29:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43374 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727091AbgFDT3K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jun 2020 15:29:10 -0400
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7D4C08C5C1
+        for <kvm@vger.kernel.org>; Thu,  4 Jun 2020 12:29:09 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id a25so7355131ejg.5
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 12:29:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=j6gkV1M6uV+OuuFK+qAzr87kpluSyFv5J8BZ8QElYLA=;
+        b=StfOJSo7NYLIluA/YDez5nMC1dIK8IG3hWcNjaw1BBW1jB0z7dbLt32PboLFh/6UID
+         o+zydnnIKt0/MDZUcCCOCO51H9nWoWCCO9a7unK573wtplklABGFqLV6cp9E8ez0CD3n
+         hU4LM/2JwJvwjrKXqi9KHdhD+zIieK6bDyVkg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=j6gkV1M6uV+OuuFK+qAzr87kpluSyFv5J8BZ8QElYLA=;
+        b=GtKz0NSVkx42HCrnKx5SUhVyp4vUf9d+IJr2QkKTFY5HzuR8vE7pVTgYGvR8jLk3Ic
+         UFkJINC2oHgFEy/MctUAt37mTgxqvnEM0qbVBOTmwUB6N9mXhbvN6ZU8jtLU33YQN4xH
+         KSnSzTU9rj3tY+oDKk+bTfpVm6f5EvdUxu6U3rioLCAJd3/sKJkaHySXnbOSRbTkIJDg
+         w+wK2mLNkXWaksjL+QN/hfJ427hoNzcS9FRViHvPrtidniX0ysXEZBokm8WY91DCs9uP
+         Zqy/VAJjumqVjl2phuFjyeaZRfFU7W6gw/rAL4mygvo5ce22U6AbHklYWgysO0ciPZs/
+         LF4Q==
+X-Gm-Message-State: AOAM531CwkOmaSkugzAA+jC/nQO/C9A86j41DEMeGWmeM1taM7V6jP79
+        YuLBPbb/g8EVvNdsDbR90xGXNPFdb2EN05sY+/KqRg==
+X-Google-Smtp-Source: ABdhPJw1ZDaeUGvDlk3zpLn20zmqANlllPdBvumUAZgVjw38FHbbwUHZTmBVJ0w+2d+aKUNJPm1OUHBHxYD49cYS2s8=
+X-Received: by 2002:a17:906:f0c3:: with SMTP id dk3mr5082727ejb.202.1591298948511;
+ Thu, 04 Jun 2020 12:29:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eR3c3wQ4YrP7O0UwP=B95XR_-rEpbjet1AgKVMYNEWskA@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <87pnagf912.fsf@nanos.tec.linutronix.de> <87367a91rn.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <87367a91rn.fsf@nanos.tec.linutronix.de>
+From:   Miklos Szeredi <miklos@szeredi.hu>
+Date:   Thu, 4 Jun 2020 21:28:57 +0200
+Message-ID: <CAJfpegvchB2H=NK3JU0BQS7h=kXyifgKD=JHjjT6vTYVMspY2A@mail.gmail.com>
+Subject: Re: system time goes weird in kvm guest after host suspend/resume
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 12:00:33PM -0700, Jim Mattson wrote:
-> On Thu, Jun 4, 2020 at 11:47 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
+On Thu, Jun 4, 2020 at 7:30 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+> Miklos,
+>
+> Thomas Gleixner <tglx@linutronix.de> writes:
+> >> Of course this does not reproduce here. What kind of host is this
+> >> running on? Can you provide a full demsg of the host please from boot to
+> >> post resume?
 > >
-> > On Wed, Jun 03, 2020 at 01:18:31PM -0700, Jim Mattson wrote:
-> > > On Tue, Jun 2, 2020 at 7:24 PM Sean Christopherson
-> > > <sean.j.christopherson@intel.com> wrote:
-> > > > As an alternative to storing the last run/attempted CPU, what about moving
-> > > > the "bad VM-Exit" detection into handle_exit_irqoff, or maybe a new hook
-> > > > that is called after IRQs are enabled but before preemption is enabled, e.g.
-> > > > detect_bad_exit or something?  All of the paths in patch 4/4 can easily be
-> > > > moved out of handle_exit.  VMX would require a little bit of refacotring for
-> > > > it's "no handler" check, but that should be minor.
-> > >
-> > > Given the alternatives, I'm willing to compromise my principles wrt
-> > > emulation_required. :-) I'll send out v4 soon.
-> >
-> > What do you dislike about the alternative approach?
-> 
-> Mainly, I wanted to stash this in a common location so that I could
-> print it out in our local version of dump_vmcs(). Ideally, we'd like
-> to be able to identify the bad part(s) just from the kernel logs.
+> > Plus /proc/cpuinfo please (one CPU is sufficient)
+>
+> thanks for providing the data. Unfortunately not really helpful. The
+> host has a non-stop TSC and the dmesg does not contain anything which
+> sheds light on this.
+>
+> I grabbed a similar machine, installed a guest with 5.7 kernel and I'm
+> still unable to reproduce. No idea yet how to get down to the real root
+> cause of this.
 
-But this would also move dump_vmcs() to before preemption is enabled, i.e.
-your version could read the CPU directly.
+Well, I have neither.  But more investigation turned up some interesting things.
 
-And actually, if we're talking about ferreting out hardware issues, you
-really do want this happening before preemption is enabled so that the VMCS
-dump comes from the failing CPU.  If the vCPU is migrated, the VMCS will be
-dumped after a VMCLEAR->VMPTRLD, i.e. will be written to memory and pulled
-back into the VMCS cache on a different CPU, and will also have been written
-to by the new CPU to update host state.  Odds are that wouldn't affect the
-dump in a meaningful way, but never say never.
+time(2) returns good time, while clock_gettime(2) returns bad time.
+Here's an example:
 
-Tangentially related, what about adding an option to do VMCLEAR at the end
-of dump_vmcs(), followed by a dump of raw memory?  It'd be useless for
-debugging software issues, but might be potentially useful/interesting for
-triaging hardware problems.
+time=1591298725 RT=1591300383 MONO=39582 MONO_RAW=39582 BOOT=39582
+time=1591298726 RT=1591300383 MONO=39582 MONO_RAW=39582 BOOT=39582
+time=1591298727 RT=1591300383 MONO=39582 MONO_RAW=39582 BOOT=39582
+time=1591298728 RT=1591300383 MONO=39582 MONO_RAW=39582 BOOT=39582
+time=1591298729 RT=1591300383 MONO=39582 MONO_RAW=39582 BOOT=39582
 
-> That, and I wouldn't have been as comfortable with the refactoring
-> without a lot more testing.
+As you can see, only time(2) is updated, the others remain the same.
+date(1) uses clock_gettime(CLOCK_REALTIME) so that shows the bad date.
+
+When the correct time reaches the value returned by CLOCK_REALTIME,
+the value jumps exactly 2199 seconds.
+
+Does that make any sense?
+
+Thanks,
+Miklos
