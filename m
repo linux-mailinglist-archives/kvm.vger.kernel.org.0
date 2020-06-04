@@ -2,86 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4C261EE874
-	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 18:20:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67E111EE877
+	for <lists+kvm@lfdr.de>; Thu,  4 Jun 2020 18:20:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729793AbgFDQUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 12:20:14 -0400
-Received: from mga02.intel.com ([134.134.136.20]:7979 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728740AbgFDQUO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 12:20:14 -0400
-IronPort-SDR: TJ4g35KO/D5ITUYBk1DtAhh99bai3V5Rvl9E+ThcYAq8U/8SwoErN0ZI/VoP4+oCNZ128sImI+
- KDMg0wodQLYg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 09:20:13 -0700
-IronPort-SDR: 0STHlrEs9f5V4unbDzgHVn1raqy2xRABHf/PWcn7KiK0SmxBBhUd0TkB/ahsSvElQ21AXW5beg
- 3r2QJS0aRH/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,472,1583222400"; 
-   d="scan'208";a="471584291"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga005.fm.intel.com with ESMTP; 04 Jun 2020 09:20:12 -0700
-Date:   Thu, 4 Jun 2020 09:20:12 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        qemu-devel@nongnu.org, brijesh.singh@amd.com,
-        frankja@linux.ibm.com, pair@us.ibm.com, qemu-ppc@nongnu.org,
-        kvm@vger.kernel.org, mdroth@linux.vnet.ibm.com, cohuck@redhat.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-Message-ID: <20200604162012.GA30456@linux.intel.com>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200529221926.GA3168@linux.intel.com>
- <20200601091618.GC2743@work-vm>
- <20200604031129.GB228651@umbus.fritz.box>
+        id S1729796AbgFDQUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 12:20:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38774 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728740AbgFDQUf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 12:20:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591287634;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=c0B1gOCQB3tsMAy6nQWjh9wldszMTnQJEuaouLyuBOY=;
+        b=NkmlohsQlfsbJ8hHTHYZ8kXQe/aggq074zd3ZZ1pDa6DAkfIAw0AN0+K4m/yO3mu1uPF0H
+        d1V4OQh00meymQR8jOYUGQQKHWuJSIWxpt23iPPdo5TW05tqL38I0yBNC5DrLyKXcj+Aax
+        aK1BOGxK2AcIVQF+OOlmQSXZBOqcQKY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-Q0CbadCFO0Gd4db2xhr63g-1; Thu, 04 Jun 2020 12:20:32 -0400
+X-MC-Unique: Q0CbadCFO0Gd4db2xhr63g-1
+Received: by mail-wr1-f72.google.com with SMTP id c14so2607796wrw.11
+        for <kvm@vger.kernel.org>; Thu, 04 Jun 2020 09:20:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=c0B1gOCQB3tsMAy6nQWjh9wldszMTnQJEuaouLyuBOY=;
+        b=M442rr52xYq63f0sqNNcUZNLQNwcekhdo2d31RuaKVe1fNM5FSgQgKzj9WhO+35bLt
+         +axlC1NS3qXEnfqxI8Zppf06VZScipboQuLrT3pstr+fFqSJHeQaxgj4aEBBjF+Osr/+
+         VzZO7XPYxQphgPuaCUPKiPGx3teON3Jf5TcziM4uYaDY76tQdzNJ/TncXYLO0ujwQPb0
+         CHXTACkG6keXU9Z843e1883NN5svb9do9lkW+GXkGPz9gFIOMu8DmAorsY86SLFjQm1r
+         NWZFoUWy6AsbyEOPX7Qf3UDOR6LSUXEyr9o8GTklaGavfO71E2d0vfUp7qxRidi6cN9J
+         M4aw==
+X-Gm-Message-State: AOAM532R8EdLXt3EHmFbpmP0Iz6PVK+2/H4FR8Ho20Iz4MHwl0DcyZn2
+        O++4ygv/A5FkEARzbqO8wa+zvqwyXEEXM11Emn258jUCqNql+0jT+hCV5utNmFCIDhYIpJ+a+kq
+        wmrnK84D/vxpw
+X-Received: by 2002:adf:e285:: with SMTP id v5mr5042138wri.129.1591287631529;
+        Thu, 04 Jun 2020 09:20:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz3W3/M9qQ/tUPpEsUkOe3S+h3yWEMQolGXs+VzVVX35oHJCG/g9ZFPQyKy/A/EqO1DNwfL/Q==
+X-Received: by 2002:adf:e285:: with SMTP id v5mr5042116wri.129.1591287631274;
+        Thu, 04 Jun 2020 09:20:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
+        by smtp.gmail.com with ESMTPSA id q1sm7570203wmc.12.2020.06.04.09.20.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jun 2020 09:20:30 -0700 (PDT)
+Subject: Re: [PATCH] KVM: VMX: Always treat MSR_IA32_PERF_CAPABILITIES as a
+ valid PMU MSR
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Xu, Like" <like.xu@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
+References: <20200603203303.28545-1-sean.j.christopherson@intel.com>
+ <46f57aa8-e278-b4fd-7ac8-523836308051@intel.com>
+ <20200604151638.GD30223@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f7a234a7-664b-9160-f467-48b807d47c8b@redhat.com>
+Date:   Thu, 4 Jun 2020 18:20:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200604031129.GB228651@umbus.fritz.box>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200604151638.GD30223@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 04, 2020 at 01:11:29PM +1000, David Gibson wrote:
-> On Mon, Jun 01, 2020 at 10:16:18AM +0100, Dr. David Alan Gilbert wrote:
-> > * Sean Christopherson (sean.j.christopherson@intel.com) wrote:
-> > > On Thu, May 21, 2020 at 01:42:46PM +1000, David Gibson wrote:
-> > > > Note: I'm using the term "guest memory protection" throughout to refer
-> > > > to mechanisms like this.  I don't particular like the term, it's both
-> > > > long and not really precise.  If someone can think of a succinct way
-> > > > of saying "a means of protecting guest memory from a possibly
-> > > > compromised hypervisor", I'd be grateful for the suggestion.
-> > > 
-> > > Many of the features are also going far beyond just protecting memory, so
-> > > even the "memory" part feels wrong.  Maybe something like protected-guest
-> > > or secure-guest?
-> > > 
-> > > A little imprecision isn't necessarily a bad thing, e.g. memory-encryption
-> > > is quite precise, but also wrong once it encompasses anything beyond plain
-> > > old encryption.
-> > 
-> > The common thread I think is 'untrusted host' - but I don't know of a
-> > better way to describe that.
-> 
-> Hrm..  UntrustedHost? CompromisedHostMitigation? HostTrustMitigation
-> (that way it has the same abbreviation as hardware transactional
-> memory for extra confusion)?  HypervisorPowerLimitation?
+On 04/06/20 17:16, Sean Christopherson wrote:
+> On Thu, Jun 04, 2020 at 09:37:59AM +0800, Xu, Like wrote:
+>> On 2020/6/4 4:33, Sean Christopherson wrote:
+>>> Unconditionally return true when querying the validity of
+>>> MSR_IA32_PERF_CAPABILITIES so as to defer the validity check to
+>>> intel_pmu_{get,set}_msr(), which can properly give the MSR a pass when
+>>> the access is initiated from host userspace.
+>> Regardless ofÃ‚Â  the MSR is emulated or not, is it a really good assumption that
+>> the guest cpuids are not properly ready when we do initialization from host
+>> userspace
+>> ?
+>
+> I don't know if I would call it a "good assumption" so much as a "necessary
+> assumption".  KVM_{GET,SET}_MSRS are allowed, and must function correctly,
+> if they're called prior to KVM_SET_CPUID{2}.
 
-GuestWithTrustIssues?  Then we can shorten it to InsecureGuest and cause all
-kinds of confusion :-D.
+Generally speaking this is not the case for the PMU; get_gp_pmc for
+example depends on pmu->nr_arch_gp_counters which is initialized based
+on CPUID leaf 0xA.
 
-> HostTrustLimitation? "HTL". That's not too bad, actually, I might go
-> with that unless someone suggests something better.
+The assumption that this patch fixes is that you can blindly take the
+output of KVM_GET_MSR_INDEX_LIST and pass it to KVM_{GET,SET}_MSRS.
 
-DePrivelegedHost?  "DPH".  The "de-privelege" phrase seems to be another
-recurring theme.
+Paolo
+
