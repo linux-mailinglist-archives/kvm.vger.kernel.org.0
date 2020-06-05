@@ -2,113 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E94DA1EF059
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 06:24:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C74D1EF09F
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 06:39:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726114AbgFEEYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 00:24:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56694 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726039AbgFEEYE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 00:24:04 -0400
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C98CA206E6;
-        Fri,  5 Jun 2020 04:24:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591331044;
-        bh=Ger2JKf4foukIoxJhsp2lpcdnsKngWBWA02v1OQp51Y=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0wRsVBPYDfhuBPXJhNEprgX7yrwQg0lkOBlGoz4O9jEC+lVNlLQWhfMSciuYkRSKF
-         tR2wZxyLj9N1kziXCwugwlLQRH47af8NFACLXOevvhB6Wi/eonfPM8oDsgehwYXdGg
-         XThOmBu1ey/i1g9+k9IDIgZUxKvQoijjfHVxPMfY=
-Date:   Thu, 4 Jun 2020 21:24:02 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     kvm@vger.kernel.org
-Cc:     syzbot <syzbot+f196caa45793d6374707@syzkaller.appspotmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Subject: Re: memory leak in do_eventfd
-Message-ID: <20200605042402.GO2667@sol.localdomain>
-References: <0000000000001daa8d05a61e3440@google.com>
+        id S1726156AbgFEEjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 00:39:44 -0400
+Received: from mx24.baidu.com ([111.206.215.185]:60194 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725968AbgFEEjo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 00:39:44 -0400
+X-Greylist: delayed 954 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Jun 2020 00:39:42 EDT
+Received: from BJHW-Mail-Ex14.internal.baidu.com (unknown [10.127.64.37])
+        by Forcepoint Email with ESMTPS id 5A5E9675E2089BB4C91E;
+        Fri,  5 Jun 2020 12:23:42 +0800 (CST)
+Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
+ BJHW-Mail-Ex14.internal.baidu.com (10.127.64.37) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Fri, 5 Jun 2020 12:23:41 +0800
+Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
+ BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
+ 15.01.1713.004; Fri, 5 Jun 2020 12:23:36 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     "like.xu@intel.com" <like.xu@intel.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "xiaoyao.li@intel.com" <xiaoyao.li@intel.com>,
+        "wei.huang2@amd.com" <wei.huang2@amd.com>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdW3Y2XSBLVk06IFg4Njogc3VwcG9ydCBBUEVSRi9N?=
+ =?utf-8?Q?PERF_registers?=
+Thread-Topic: [PATCH][v6] KVM: X86: support APERF/MPERF registers
+Thread-Index: AQHWOtrZ4X/t3pkmBEG7o3WCZUgoeKjIxz2AgAChEWA=
+Date:   Fri, 5 Jun 2020 04:23:36 +0000
+Message-ID: <c21c6ffa19b6483ea57feab3f98f279c@baidu.com>
+References: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
+ <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
+In-Reply-To: <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.198.27]
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex14_2020-06-05 12:23:42:248
+x-baidu-bdmsfe-viruscheck: BJHW-Mail-Ex14_GRAY_Inside_WithoutAtta_2020-06-05
+ 12:23:42:216
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000001daa8d05a61e3440@google.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[+Cc kvm mailing list]
-
-On Wed, May 20, 2020 at 06:12:17PM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following crash on:
-> 
-> HEAD commit:    5a9ffb95 Merge tag '5.7-rc5-smb3-fixes' of git://git.samba..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10b72a02100000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=f8295ae5b3f8268d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=f196caa45793d6374707
-> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17585b76100000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12500a02100000
-> 
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+f196caa45793d6374707@syzkaller.appspotmail.com
-> 
-> BUG: memory leak
-> unreferenced object 0xffff888117169ac0 (size 64):
->   comm "syz-executor012", pid 6609, jiffies 4294942172 (age 13.720s)
->   hex dump (first 32 bytes):
->     01 00 00 00 ff ff ff ff 00 00 00 00 00 c9 ff ff  ................
->     d0 9a 16 17 81 88 ff ff d0 9a 16 17 81 88 ff ff  ................
->   backtrace:
->     [<00000000351bb234>] kmalloc include/linux/slab.h:555 [inline]
->     [<00000000351bb234>] do_eventfd+0x35/0xf0 fs/eventfd.c:418
->     [<00000000c2f69a77>] __do_sys_eventfd fs/eventfd.c:443 [inline]
->     [<00000000c2f69a77>] __se_sys_eventfd fs/eventfd.c:441 [inline]
->     [<00000000c2f69a77>] __x64_sys_eventfd+0x14/0x20 fs/eventfd.c:441
->     [<0000000086d6f989>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
->     [<000000006c5bcb63>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 
-> BUG: memory leak
-> unreferenced object 0xffff888117169100 (size 64):
->   comm "syz-executor012", pid 6609, jiffies 4294942172 (age 13.720s)
->   hex dump (first 32 bytes):
->     e8 99 dd 00 00 c9 ff ff e8 99 dd 00 00 c9 ff ff  ................
->     00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00  ... ............
->   backtrace:
->     [<00000000436d2955>] kmalloc include/linux/slab.h:555 [inline]
->     [<00000000436d2955>] kzalloc include/linux/slab.h:669 [inline]
->     [<00000000436d2955>] kvm_assign_ioeventfd_idx+0x4f/0x270 arch/x86/kvm/../../../virt/kvm/eventfd.c:798
->     [<00000000e89390cc>] kvm_assign_ioeventfd arch/x86/kvm/../../../virt/kvm/eventfd.c:934 [inline]
->     [<00000000e89390cc>] kvm_ioeventfd+0xbb/0x194 arch/x86/kvm/../../../virt/kvm/eventfd.c:961
->     [<00000000ba9f6732>] kvm_vm_ioctl+0x1e6/0x1030 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3670
->     [<000000005da94937>] vfs_ioctl fs/ioctl.c:47 [inline]
->     [<000000005da94937>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:771
->     [<00000000a583d097>] __do_sys_ioctl fs/ioctl.c:780 [inline]
->     [<00000000a583d097>] __se_sys_ioctl fs/ioctl.c:778 [inline]
->     [<00000000a583d097>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:778
->     [<0000000086d6f989>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
->     [<000000006c5bcb63>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 
-> 
-> 
-> ---
-> This bug is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this bug report. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> syzbot can test patches for this bug, for details see:
-> https://goo.gl/tpsmEJ#testing-patches
-> 
-> -- 
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/0000000000001daa8d05a61e3440%40google.com.
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFh1LCBMaWtlIFttYWls
+dG86bGlrZS54dUBpbnRlbC5jb21dDQo+IOWPkemAgeaXtumXtDogMjAyMOW5tDbmnIg15pelIDEw
+OjMyDQo+IOaUtuS7tuS6ujogTGksUm9uZ3FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUuY29tPg0KPiDm
+ioTpgIE6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7
+IHg4NkBrZXJuZWwub3JnOw0KPiBocGFAenl0b3IuY29tOyBicEBhbGllbjguZGU7IG1pbmdvQHJl
+ZGhhdC5jb207IHRnbHhAbGludXRyb25peC5kZTsNCj4gam1hdHRzb25AZ29vZ2xlLmNvbTsgd2Fu
+cGVuZ2xpQHRlbmNlbnQuY29tOyB2a3V6bmV0c0ByZWRoYXQuY29tOw0KPiBzZWFuLmouY2hyaXN0
+b3BoZXJzb25AaW50ZWwuY29tOyBwYm9uemluaUByZWRoYXQuY29tOyB4aWFveWFvLmxpQGludGVs
+LmNvbTsNCj4gd2VpLmh1YW5nMkBhbWQuY29tDQo+IOS4u+mimDogUmU6IFtQQVRDSF1bdjZdIEtW
+TTogWDg2OiBzdXBwb3J0IEFQRVJGL01QRVJGIHJlZ2lzdGVycw0KPiANCj4gSGkgUm9uZ1Fpbmcs
+DQo+IA0KPiBPbiAyMDIwLzYvNSA5OjQ0LCBMaSBSb25nUWluZyB3cm90ZToNCj4gPiBHdWVzdCBr
+ZXJuZWwgcmVwb3J0cyBhIGZpeGVkIGNwdSBmcmVxdWVuY3kgaW4gL3Byb2MvY3B1aW5mbywgdGhp
+cyBpcw0KPiA+IGNvbmZ1c2VkIHRvIHVzZXIgd2hlbiB0dXJibyBpcyBlbmFibGUsIGFuZCBhcGVy
+Zi9tcGVyZiBjYW4gYmUgdXNlZCB0bw0KPiA+IHNob3cgY3VycmVudCBjcHUgZnJlcXVlbmN5IGFm
+dGVyIDdkNTkwNWRjMTRhDQo+ID4gIih4ODYgLyBDUFU6IEFsd2F5cyBzaG93IGN1cnJlbnQgQ1BV
+IGZyZXF1ZW5jeSBpbiAvcHJvYy9jcHVpbmZvKSINCj4gPiBzbyBndWVzdCBzaG91bGQgc3VwcG9y
+dCBhcGVyZi9tcGVyZiBjYXBhYmlsaXR5DQo+ID4NCj4gPiBUaGlzIHBhdGNoIGltcGxlbWVudHMg
+YXBlcmYvbXBlcmYgYnkgdGhyZWUgbW9kZTogbm9uZSwgc29mdHdhcmUNCj4gPiBlbXVsYXRpb24s
+IGFuZCBwYXNzLXRocm91Z2gNCj4gPg0KPiA+IE5vbmU6IGRlZmF1bHQgbW9kZSwgZ3Vlc3QgZG9l
+cyBub3Qgc3VwcG9ydCBhcGVyZi9tcGVyZg0KPiBzL05vbmUvTm90ZQ0KPiA+DQo+ID4gU29mdHdh
+cmUgZW11bGF0aW9uOiB0aGUgcGVyaW9kIG9mIGFwZXJmL21wZXJmIGluIGd1ZXN0IG1vZGUgYXJl
+DQo+ID4gYWNjdW11bGF0ZWQgYXMgZW11bGF0ZWQgdmFsdWUNCj4gPg0KPiA+IFBhc3MtdGhvdWdo
+OiBpdCBpcyBvbmx5IHN1aXRhYmxlIGZvciBLVk1fSElOVFNfUkVBTFRJTUUsIEJlY2F1c2UgdGhh
+dA0KPiA+IGhpbnQgZ3VhcmFudGVlcyB3ZSBoYXZlIGEgMToxIHZDUFU6Q1BVIGJpbmRpbmcgYW5k
+IGd1YXJhbnRlZWQgbm8NCj4gPiBvdmVyLWNvbW1pdC4NCj4gVGhlIGZsYWcgIktWTV9ISU5UU19S
+RUFMVElNRSAwIiAoaW4gdGhlIERvY3VtZW50YXRpb24vdmlydC9rdm0vY3B1aWQucnN0KQ0KPiBp
+cyBjbGFpbWVkIGFzICJndWVzdCBjaGVja3MgdGhpcyBmZWF0dXJlIGJpdCB0byBkZXRlcm1pbmUg
+dGhhdCB2Q1BVcyBhcmUgbmV2ZXINCj4gcHJlZW1wdGVkIGZvciBhbiB1bmxpbWl0ZWQgdGltZSBh
+bGxvd2luZyBvcHRpbWl6YXRpb25zIi4NCj4gDQo+IEkgY291bGRuJ3Qgc2VlIGl0cyByZWxhdGlv
+bnNoaXAgd2l0aCAiMToxIHZDUFU6IHBDUFUgYmluZGluZyIuDQo+IFRoZSBwYXRjaCBkb2Vzbid0
+IGNoZWNrIHRoaXMgZmxhZyBhcyB3ZWxsIGZvciB5b3VyIHBhc3MtdGhyb3VnaCBwdXJwb3NlLg0K
+PiANCj4gVGhhbmtzLA0KPiBMaWtlIFh1DQoNCg0KSSB0aGluayB0aGlzIGlzIHVzZXIgc3BhY2Ug
+am9icyB0byBiaW5kIEhJTlRfUkVBTFRJTUUgYW5kIG1wZXJmIHBhc3N0aHJvdWdoLCBLVk0ganVz
+dCBkbyB3aGF0IHVzZXJzcGFjZSB3YW50cy4NCg0KYW5kIHRoaXMgZ2l2ZXMgdXNlciBzcGFjZSBh
+IHBvc3NpYmlsaXR5LCBndWVzdCBoYXMgcGFzc3Rocm91Z2ggbXBlcmZhcGVyZiB3aXRob3V0IEhJ
+TlRfUkVBTFRJTUUsIGd1ZXN0IGNhbiBnZXQgY29hcnNlIGNwdSBmcmVxdWVuY3kgd2l0aG91dCBw
+ZXJmb3JtYW5jZSBlZmZlY3QgaWYgZ3Vlc3QgY2FuIGVuZHVyZSBlcnJvciBmcmVxdWVuY3kgb2Nj
+YXNpb25hbGx5DQoNCg0KLUxpIA0KDQo=
