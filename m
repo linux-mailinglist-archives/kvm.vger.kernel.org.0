@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A75A31F01E5
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 23:39:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 676181F0283
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 23:44:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728625AbgFEVjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 17:39:17 -0400
+        id S1729081AbgFEVnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 17:43:49 -0400
 Received: from mga17.intel.com ([192.55.52.151]:49307 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728433AbgFEVjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728491AbgFEVjK (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 5 Jun 2020 17:39:10 -0400
-IronPort-SDR: tfdsL5wGsfd0ykefP/3AJMafc7CEMNrZUit24gtTp+tEHtOIhcFZLh2xjBmhAzRfsuErzedR21
- 7ZehP2vUVCTA==
+IronPort-SDR: qXIFE9m/t4XB8u9xTeN+7KQUmdZz1KbjoeV3NJuHQ73pXqJrekjqQ92xHzQSjzUjv22FRBJ8a+
+ dAyHAxEbcetg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 14:39:08 -0700
-IronPort-SDR: Idi1IVMcTFydss692Nr+fYxQ9yvfSMWB6bKmY+OfZPOI8dSsDUPllwe6ya97uamInOkH2WtnY5
- pNdFXOfp+O3g==
+IronPort-SDR: XqKHcuabHK74BbG2b4w8feUvlGlhypfvZy/rS1JT1ziK1xvV2rFgi0aW811keyz+zG+1ymHY4P
+ o06uuWAI8aXg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; 
-   d="scan'208";a="287860883"
+   d="scan'208";a="287860886"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
   by orsmga002.jf.intel.com with ESMTP; 05 Jun 2020 14:39:08 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -48,9 +48,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Junaid Shahid <junaids@google.com>,
         Ben Gardon <bgardon@google.com>,
         Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 06/21] KVM: x86/mmu: Move fast_page_fault() call above mmu_topup_memory_caches()
-Date:   Fri,  5 Jun 2020 14:38:38 -0700
-Message-Id: <20200605213853.14959-7-sean.j.christopherson@intel.com>
+Subject: [PATCH 07/21] KVM: x86/mmu: Topup memory caches after walking GVA->GPA
+Date:   Fri,  5 Jun 2020 14:38:39 -0700
+Message-Id: <20200605213853.14959-8-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200605213853.14959-1-sean.j.christopherson@intel.com>
 References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
@@ -61,39 +61,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Avoid refilling the memory caches and potentially slow reclaim/swap when
-handling a fast page fault, which does not need to allocate any new
-objects.
+Topup memory caches after walking the GVA->GPA translation during a
+shadow page fault, there is no need to ensure the caches are full when
+walking the GVA.  As of commit f5a1e9f89504f ("KVM: MMU: remove call
+to kvm_mmu_pte_write from walk_addr"), the FNAME(walk_addr) flow no
+longer add rmaps via kvm_mmu_pte_write().
+
+This avoids allocating memory in the case that the GVA is unmapped in
+the guest, and also provides a paper trail of why/when the memory caches
+need to be filled.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu/paging_tmpl.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5e773564ab20..4b4c3234d623 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4095,6 +4095,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	if (page_fault_handle_page_track(vcpu, error_code, gfn))
- 		return RET_PF_EMULATE;
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 38c576495048..3de32122f601 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -791,10 +791,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
  
-+	if (fast_page_fault(vcpu, gpa, error_code))
-+		return RET_PF_RETRY;
-+
- 	r = mmu_topup_memory_caches(vcpu);
- 	if (r)
- 		return r;
-@@ -4102,9 +4105,6 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	if (lpage_disallowed)
- 		max_level = PG_LEVEL_4K;
+ 	pgprintk("%s: addr %lx err %x\n", __func__, addr, error_code);
  
--	if (fast_page_fault(vcpu, gpa, error_code))
--		return RET_PF_RETRY;
+-	r = mmu_topup_memory_caches(vcpu);
+-	if (r)
+-		return r;
 -
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	smp_rmb();
+ 	/*
+ 	 * If PFEC.RSVD is set, this is a shadow page fault.
+ 	 * The bit needs to be cleared before walking guest page tables.
+@@ -822,6 +818,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+ 		return RET_PF_EMULATE;
+ 	}
  
++	r = mmu_topup_memory_caches(vcpu);
++	if (r)
++		return r;
++
+ 	vcpu->arch.write_fault_to_shadow_pgtable = false;
+ 
+ 	is_self_change_mapping = FNAME(is_self_change_mapping)(vcpu,
 -- 
 2.26.0
 
