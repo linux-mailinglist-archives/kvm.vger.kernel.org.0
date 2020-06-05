@@ -2,132 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAEB21EF0E2
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 07:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6A5F1EF15F
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 08:34:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726027AbgFEF2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 01:28:37 -0400
-Received: from mga01.intel.com ([192.55.52.88]:53954 "EHLO mga01.intel.com"
+        id S1726068AbgFEGek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 02:34:40 -0400
+Received: from mga02.intel.com ([134.134.136.20]:22326 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725280AbgFEF2h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 01:28:37 -0400
-IronPort-SDR: 86Rdj9+9oNVf+GJ+pFlp4JwpuZw0icTrPgomEO4PKbvjb75aBKFGnc7tgqvg4Aqn2aVlguDVuT
- 0L3O9dOeQidg==
+        id S1725280AbgFEGek (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 02:34:40 -0400
+IronPort-SDR: d60ZgG6a65N67adv2HtVhbq11T8ieebP44jQRpbSzTLQRAAKF4JZzy+raOwvO43oL13wDHW+CS
+ LlwUxSpKbPIg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 22:28:36 -0700
-IronPort-SDR: pN9jXbrqreLPPzqVaq6579ivo3BNGw+0474VgHEZeNIqsBeMX6KQ+f/uT0VaZ1ySzQTmnWiJEz
- 5viEeRJqKQ7A==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 23:34:39 -0700
+IronPort-SDR: kTMuvXFItH6vpiu3L7XeH8Vu06/Bjtn6Mqhp3y+U5YP/cKgQ8iBsqNb1Gk9HzszTJGXI0BLwO9
+ 4OfmXzG8UdZg==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,475,1583222400"; 
-   d="scan'208";a="417160467"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.141]) ([10.238.4.141])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 22:28:32 -0700
-Subject: =?UTF-8?B?UmU6IOetlOWkjTogW1BBVENIXVt2Nl0gS1ZNOiBYODY6IHN1cHBvcnQg?=
- =?UTF-8?Q?APERF/MPERF_registers?=
-To:     "Li,Rongqing" <lirongqing@baidu.com>,
-        "like.xu@intel.com" <like.xu@intel.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "xiaoyao.li@intel.com" <xiaoyao.li@intel.com>,
-        "wei.huang2@amd.com" <wei.huang2@amd.com>
-References: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
- <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
- <c21c6ffa19b6483ea57feab3f98f279c@baidu.com>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <3a88bd63-ff51-ad70-d92e-893660c63bca@linux.intel.com>
-Date:   Fri, 5 Jun 2020 13:28:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+   d="scan'208";a="294589771"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.249.45.234])
+  by fmsmga004.fm.intel.com with ESMTP; 04 Jun 2020 23:34:37 -0700
+Date:   Fri, 5 Jun 2020 08:34:35 +0200
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
+Message-ID: <20200605063435.GA32302@ubuntu>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <20200604151917-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <c21c6ffa19b6483ea57feab3f98f279c@baidu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200604151917-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/6/5 12:23, Li,Rongqing wrote:
+Hi Michael,
+
+Thanks for your review.
+
+On Thu, Jun 04, 2020 at 03:23:37PM -0400, Michael S. Tsirkin wrote:
+> On Wed, May 27, 2020 at 08:05:36PM +0200, Guennadi Liakhovetski wrote:
+> > v3:
+> > - address several checkpatch warnings
+> > - address comments from Mathieu Poirier
+> > 
+> > v2:
+> > - update patch #5 with a correct vhost_dev_init() prototype
+> > - drop patch #6 - it depends on a different patch, that is currently
+> >   an RFC
+> > - address comments from Pierre-Louis Bossart:
+> >   * remove "default n" from Kconfig
+> > 
+> > Linux supports RPMsg over VirtIO for "remote processor" /AMP use
+> > cases. It can however also be used for virtualisation scenarios,
+> > e.g. when using KVM to run Linux on both the host and the guests.
+> > This patch set adds a wrapper API to facilitate writing vhost
+> > drivers for such RPMsg-based solutions. The first use case is an
+> > audio DSP virtualisation project, currently under development, ready
+> > for review and submission, available at
+> > https://github.com/thesofproject/linux/pull/1501/commits
+> > A further patch for the ADSP vhost RPMsg driver will be sent
+> > separately for review only since it cannot be merged without audio
+> > patches being upstreamed first.
 > 
 > 
->> -----邮件原件-----
->> 发件人: Xu, Like [mailto:like.xu@intel.com]
->> 发送时间: 2020年6月5日 10:32
->> 收件人: Li,Rongqing <lirongqing@baidu.com>
->> 抄送: linux-kernel@vger.kernel.org; kvm@vger.kernel.org; x86@kernel.org;
->> hpa@zytor.com; bp@alien8.de; mingo@redhat.com; tglx@linutronix.de;
->> jmattson@google.com; wanpengli@tencent.com; vkuznets@redhat.com;
->> sean.j.christopherson@intel.com; pbonzini@redhat.com; xiaoyao.li@intel.com;
->> wei.huang2@amd.com
->> 主题: Re: [PATCH][v6] KVM: X86: support APERF/MPERF registers
->>
->> Hi RongQing,
->>
->> On 2020/6/5 9:44, Li RongQing wrote:
->>> Guest kernel reports a fixed cpu frequency in /proc/cpuinfo, this is
->>> confused to user when turbo is enable, and aperf/mperf can be used to
->>> show current cpu frequency after 7d5905dc14a
->>> "(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
->>> so guest should support aperf/mperf capability
->>>
->>> This patch implements aperf/mperf by three mode: none, software
->>> emulation, and pass-through
->>>
->>> None: default mode, guest does not support aperf/mperf
->> s/None/Note
->>>
->>> Software emulation: the period of aperf/mperf in guest mode are
->>> accumulated as emulated value
->>>
->>> Pass-though: it is only suitable for KVM_HINTS_REALTIME, Because that
->>> hint guarantees we have a 1:1 vCPU:CPU binding and guaranteed no
->>> over-commit.
->> The flag "KVM_HINTS_REALTIME 0" (in the Documentation/virt/kvm/cpuid.rst)
->> is claimed as "guest checks this feature bit to determine that vCPUs are never
->> preempted for an unlimited time allowing optimizations".
->>
->> I couldn't see its relationship with "1:1 vCPU: pCPU binding".
->> The patch doesn't check this flag as well for your pass-through purpose.
->>
->> Thanks,
->> Like Xu
+> RPMsg over virtio has several problems. One is that it's
+> not specced at all. Before we add more stuff, I'd like so
+> see at least an attempt at describing what it's supposed to do.
+
+Sure, I can work on this with the original authors of the virtio-rpmsg 
+implementation.
+
+> Another it's out of line with 1.0 spec passing guest
+> endian data around. Won't work if host and guest
+> endian-ness do not match. Should pass eveything in LE and
+> convert.
+
+Yes, I have to fix this, thanks.
+
+> It's great to see it's seeing active development finally.
+> Do you think you will have time to address these?
+
+Sure, I'll try to take care of them.
+
+Thanks
+Guennadi
+
+> > Guennadi Liakhovetski (5):
+> >   vhost: convert VHOST_VSOCK_SET_RUNNING to a generic ioctl
+> >   vhost: (cosmetic) remove a superfluous variable initialisation
+> >   rpmsg: move common structures and defines to headers
+> >   rpmsg: update documentation
+> >   vhost: add an RPMsg API
+> > 
+> >  Documentation/rpmsg.txt          |   6 +-
+> >  drivers/rpmsg/virtio_rpmsg_bus.c |  78 +-------
+> >  drivers/vhost/Kconfig            |   7 +
+> >  drivers/vhost/Makefile           |   3 +
+> >  drivers/vhost/rpmsg.c            | 382 +++++++++++++++++++++++++++++++++++++++
+> >  drivers/vhost/vhost.c            |   2 +-
+> >  drivers/vhost/vhost_rpmsg.h      |  74 ++++++++
+> >  include/linux/virtio_rpmsg.h     |  81 +++++++++
+> >  include/uapi/linux/rpmsg.h       |   3 +
+> >  include/uapi/linux/vhost.h       |   4 +-
+> >  10 files changed, 559 insertions(+), 81 deletions(-)
+> >  create mode 100644 drivers/vhost/rpmsg.c
+> >  create mode 100644 drivers/vhost/vhost_rpmsg.h
+> >  create mode 100644 include/linux/virtio_rpmsg.h
+> > 
+> > -- 
+> > 1.9.3
 > 
-> 
-> I think this is user space jobs to bind HINT_REALTIME and mperf passthrough, KVM just do what userspace wants.
-> 
-
-That's fine for user space to bind HINT_REALTIME and mperf passthrough，
-But I was asking why HINT_REALTIME means "1:1 vCPU: pCPU binding".
-
-As you said, "Pass-though: it is only suitable for KVM_HINTS_REALTIME",
-which means, KVM needs to make sure the kvm->arch.aperfmperf_mode value
-could "only" be set to KVM_APERFMPERF_PT when the check
-kvm_para_has_hint(KVM_HINTS_REALTIME) is passed.
-
-Specifically, the KVM_HINTS_REALTIME is a per-kvm capability
-while the kvm_aperfmperf_mode is a per-vm capability. It's unresolved.
-
-KVM doesn't always do what userspace wants especially
-you're trying to expose some features about
-power and thermal management in the virtualization context.
-
-> and this gives user space a possibility, guest has passthrough mperfaperf without HINT_REALTIME, guest can get coarse cpu frequency without performance effect if guest can endure error frequency occasionally
-> 
-
-
-> 
-> -Li
-> 
-
