@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DBAA21F027E
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 23:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB5371F026E
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 23:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728703AbgFEVns (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 17:43:48 -0400
+        id S1728808AbgFEVnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 17:43:32 -0400
 Received: from mga02.intel.com ([134.134.136.20]:55947 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728452AbgFEVjK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 17:39:10 -0400
-IronPort-SDR: qZg3y4jJP/eRlzWNa1br6UGH1MVtKp2UBLDRtA4ihbTSjpVOxymrSihm2wh4zocysZxlTMGxQd
- raCPKElrgyVQ==
+        id S1728500AbgFEVjL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 17:39:11 -0400
+IronPort-SDR: 31qIKB3GfjvrTsWtZFSNi0LqCcGZiXk1i4E48PoHZ8nd44W8b5XQCnTfAL6VwObDN2mxqeHeId
+ cXzDTmWRoKnQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 14:39:08 -0700
-IronPort-SDR: I7BwiRnb6qWgFO7BpcC5Xe5lAqmxnRsI1qmZGEZxMZw6goAYfu74oYxKINf/llsyqxunF210uj
- a9IwlvttJxJQ==
+IronPort-SDR: ZZaZ6F/6BihmuvqApCfYZnPy0xhRSZJVb+TdFXwVrCd9yEoEPD+XPiqtGxrIPcIEmkPWmu+182
+ 4NUl5HJGXo4g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; 
-   d="scan'208";a="287860895"
+   d="scan'208";a="287860898"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
   by orsmga002.jf.intel.com with ESMTP; 05 Jun 2020 14:39:08 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -48,9 +48,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Junaid Shahid <junaids@google.com>,
         Ben Gardon <bgardon@google.com>,
         Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 10/21] KVM: x86/mmu: Make __GFP_ZERO a property of the memory cache
-Date:   Fri,  5 Jun 2020 14:38:42 -0700
-Message-Id: <20200605213853.14959-11-sean.j.christopherson@intel.com>
+Subject: [PATCH 11/21] KVM: x86/mmu: Zero allocate shadow pages (outside of mmu_lock)
+Date:   Fri,  5 Jun 2020 14:38:43 -0700
+Message-Id: <20200605213853.14959-12-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200605213853.14959-1-sean.j.christopherson@intel.com>
 References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
@@ -61,60 +61,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a gfp_zero flag to 'struct kvm_mmu_memory_cache' and use it to
-control __GFP_ZERO instead of hardcoding a call to kmem_cache_zalloc().
-A future patch needs such a flag for the __get_free_page() path, as
-gfn arrays do not need/want the allocator to zero the memory.  Convert
-the kmem_cache paths to __GFP_ZERO now so as to avoid a weird and
-inconsistent API in the future.
+Set __GFP_ZERO for the shadow page memory cache and drop the explicit
+clear_page() from kvm_mmu_get_page().  This moves the cost of zeroing a
+page to the allocation time of the physical page, i.e. when topping up
+the memory caches, and thus avoids having to zero out an entire page
+while holding mmu_lock.
 
-No functional change intended.
-
+Cc: Peter Feiner <pfeiner@google.com>
+Cc: Peter Shier <pshier@google.com>
+Cc: Junaid Shahid <junaids@google.com>
+Cc: Jim Mattson <jmattson@google.com>
+Suggested-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/mmu/mmu.c          | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e7a427547557..fb99e6776e27 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -251,6 +251,7 @@ struct kvm_kernel_irq_routing_entry;
-  */
- struct kvm_mmu_memory_cache {
- 	int nobjs;
-+	gfp_t gfp_zero;
- 	struct kmem_cache *kmem_cache;
- 	void *objects[KVM_NR_MEM_OBJS];
- };
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d245acece3cd..6b0ec9060786 100644
+index 6b0ec9060786..a8f8eebf67df 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1063,8 +1063,10 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
- static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
- 					       gfp_t gfp_flags)
- {
-+	gfp_flags |= mc->gfp_zero;
-+
- 	if (mc->kmem_cache)
--		return kmem_cache_zalloc(mc->kmem_cache, gfp_flags);
-+		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
- 	else
- 		return (void *)__get_free_page(gfp_flags);
- }
-@@ -5680,7 +5682,10 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 	int ret;
+@@ -2545,7 +2545,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 		if (level > PG_LEVEL_4K && need_sync)
+ 			flush |= kvm_sync_pages(vcpu, gfn, &invalid_list);
+ 	}
+-	clear_page(sp->spt);
+ 	trace_kvm_mmu_get_page(sp, true);
  
- 	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
-+	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
-+
+ 	kvm_mmu_flush_or_zap(vcpu, &invalid_list, false, flush);
+@@ -5687,6 +5686,8 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
  	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
-+	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+ 	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
  
++	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
++
  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
  	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+ 
 -- 
 2.26.0
 
