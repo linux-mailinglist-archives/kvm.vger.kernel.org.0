@@ -2,141 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6044B1EF569
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 12:31:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75AA31EF595
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 12:46:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbgFEKbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 06:31:22 -0400
-Received: from mga18.intel.com ([134.134.136.126]:57119 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726729AbgFEKbR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 06:31:17 -0400
-IronPort-SDR: sXaWKxSFYYfNT7jmkvjSDQ1pVRkH1t0Ol/nl9ELK0sxC5gKaqPqMqM2tC8j2C5aI9LlVTe9Teu
- 8uh/RM1ls4JQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 03:31:15 -0700
-IronPort-SDR: 0bnmV3ZfwMXxA2zLksdHpWARfLlbGjwdubLD8bLlPGSTLXWzssphfZ5b3Q4oRgssZCY8EbyV4l
- 28ztewRd4jMg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,476,1583222400"; 
-   d="scan'208";a="305024968"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.131])
-  by fmsmga002.fm.intel.com with ESMTP; 05 Jun 2020 03:31:13 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        jasowang@redhat.com
-Cc:     lulu@redhat.com, dan.daly@intel.com, cunming.liang@intel.com,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH RESEND 5/5] ifcvf: implement config interrupt in IFCVF
-Date:   Fri,  5 Jun 2020 18:27:15 +0800
-Message-Id: <1591352835-22441-6-git-send-email-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1591352835-22441-1-git-send-email-lingshan.zhu@intel.com>
-References: <1591352835-22441-1-git-send-email-lingshan.zhu@intel.com>
+        id S1726645AbgFEKp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 06:45:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26141 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726465AbgFEKpz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 06:45:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591353954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7hLX+smFqjRmInxpv6d4VgabW9wxZU/3OZ9hKNSHEAM=;
+        b=JvP6qJzLZjY4klJAUuq+oMrhnw0TxELDGTG+MqGzgVGx53mb9+xrXYCYQ0HtsdPi4gyxXZ
+        zhX5C4t23s4Quiyqb2HW9K6dzPl4hahUH5NDYLHij4tq+YCargOoG0Noy43kIleo3KUYrJ
+        DADE+QQJo6gEsF9QlXkLormg1yuKJBQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-89-jjy1j_gmMnG9cF878LPTDA-1; Fri, 05 Jun 2020 06:45:52 -0400
+X-MC-Unique: jjy1j_gmMnG9cF878LPTDA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38E8619057BA;
+        Fri,  5 Jun 2020 10:45:50 +0000 (UTC)
+Received: from gondolin (ovpn-113-2.ams2.redhat.com [10.36.113.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 453B95C661;
+        Fri,  5 Jun 2020 10:45:38 +0000 (UTC)
+Date:   Fri, 5 Jun 2020 12:45:35 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
+        mdroth@linux.vnet.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
+ properties for protected guests
+Message-ID: <20200605124535.12e8c96e.cohuck@redhat.com>
+In-Reply-To: <20200521034304.340040-19-david@gibson.dropbear.id.au>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+        <20200521034304.340040-19-david@gibson.dropbear.id.au>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implements config interrupt support
-in IFC VF
+On Thu, 21 May 2020 13:43:04 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vdpa/ifcvf/ifcvf_base.c |  3 +++
- drivers/vdpa/ifcvf/ifcvf_base.h |  4 ++++
- drivers/vdpa/ifcvf/ifcvf_main.c | 23 ++++++++++++++++++++++-
- 3 files changed, 29 insertions(+), 1 deletion(-)
+> The default behaviour for virtio devices is not to use the platforms normal
+> DMA paths, but instead to use the fact that it's running in a hypervisor
+> to directly access guest memory.  That doesn't work if the guest's memory
+> is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+> 
+> So, if a guest memory protection mechanism is enabled, then apply the
+> iommu_platform=on option so it will go through normal DMA mechanisms.
+> Those will presumably have some way of marking memory as shared with the
+> hypervisor or hardware so that DMA will work.
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
-index e24371d..94bf032 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-@@ -185,6 +185,9 @@ void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
- 
- void ifcvf_reset(struct ifcvf_hw *hw)
- {
-+	hw->config_cb.callback = NULL;
-+	hw->config_cb.private = NULL;
-+
- 	ifcvf_set_status(hw, 0);
- 	/* flush set_status, make sure VF is stopped, reset */
- 	ifcvf_get_status(hw);
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index e803070..f455441 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -27,6 +27,7 @@
- 		((1ULL << VIRTIO_NET_F_MAC)			| \
- 		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
- 		 (1ULL << VIRTIO_F_VERSION_1)			| \
-+		 (1ULL << VIRTIO_NET_F_STATUS)			| \
- 		 (1ULL << VIRTIO_F_ORDER_PLATFORM)		| \
- 		 (1ULL << VIRTIO_F_IOMMU_PLATFORM)		| \
- 		 (1ULL << VIRTIO_NET_F_MRG_RXBUF))
-@@ -81,6 +82,9 @@ struct ifcvf_hw {
- 	void __iomem *net_cfg;
- 	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
- 	void __iomem * const *base;
-+	char config_msix_name[256];
-+	struct vdpa_callback config_cb;
-+
- };
- 
- struct ifcvf_adapter {
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 63a6366..f5a60c1 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -18,6 +18,16 @@
- #define DRIVER_AUTHOR   "Intel Corporation"
- #define IFCVF_DRIVER_NAME       "ifcvf"
- 
-+static irqreturn_t ifcvf_config_changed(int irq, void *arg)
-+{
-+	struct ifcvf_hw *vf = arg;
-+
-+	if (vf->config_cb.callback)
-+		return vf->config_cb.callback(vf->config_cb.private);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
- {
- 	struct vring_info *vring = arg;
-@@ -59,6 +69,14 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
- 		return ret;
- 	}
- 
-+	snprintf(vf->config_msix_name, 256, "ifcvf[%s]-config\n",
-+		 pci_name(pdev));
-+	vector = 0;
-+	irq = pci_irq_vector(pdev, vector);
-+	ret = devm_request_irq(&pdev->dev, irq,
-+			       ifcvf_config_changed, 0,
-+			       vf->config_msix_name, vf);
-+
- 	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
- 		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
- 			 pci_name(pdev), i);
-@@ -328,7 +346,10 @@ static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
- static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
- 				     struct vdpa_callback *cb)
- {
--	/* We don't support config interrupt */
-+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-+
-+	vf->config_cb.callback = cb->callback;
-+	vf->config_cb.private = cb->private;
- }
- 
- /*
--- 
-1.8.3.1
+cc: Halil, who had been looking at the interaction of virtio-ccw
+devices and s390 protected virt.
+
+(IIRC, we wanted to try with a on/off/auto property for virtio-ccw?)
+
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/core/machine.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 88d699bceb..cb6580954e 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -28,6 +28,8 @@
+>  #include "hw/mem/nvdimm.h"
+>  #include "migration/vmstate.h"
+>  #include "exec/guest-memory-protection.h"
+> +#include "hw/virtio/virtio.h"
+> +#include "hw/virtio/virtio-pci.h"
+>  
+>  GlobalProperty hw_compat_5_0[] = {};
+>  const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+> @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *machine)
+>           * areas.
+>           */
+>          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
+> +
+> +        /*
+> +         * Virtio devices can't count on directly accessing guest
+> +         * memory, so they need iommu_platform=on to use normal DMA
+> +         * mechanisms.  That requires disabling legacy virtio support
+> +         * for virtio pci devices
+> +         */
+> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
+> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
+>      }
+>  
+>      machine_class->init(machine);
 
