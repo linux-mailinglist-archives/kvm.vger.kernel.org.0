@@ -2,129 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BAB11EF00D
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 05:40:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E94DA1EF059
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 06:24:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726324AbgFEDk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 23:40:28 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25677 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726311AbgFEDk2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 23:40:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591328426;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W+XRm7Fs7zNlH2EKv4SYh8NMSzGAObCRW7/zCrf8kTM=;
-        b=bMinaiappCB0rQc0Seywa3/cVkuzqVzgZOHZhSWQYCSkZ81iRslS8kNSRBSGKgQPcCx3Eu
-        gHHK9CiCuq2raB5URMZCpac6lqycim7AIT742YFDBVZhE+poHPc5vekg0QfB/DIc6sNCgl
-        vs8r/qfW+iKVf6IEabXSwJEbgFg5uds=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-WjnfLQgyPAadytx9KbfT2Q-1; Thu, 04 Jun 2020 23:40:24 -0400
-X-MC-Unique: WjnfLQgyPAadytx9KbfT2Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726114AbgFEEYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 00:24:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56694 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726039AbgFEEYE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 00:24:04 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD756100960F;
-        Fri,  5 Jun 2020 03:40:23 +0000 (UTC)
-Received: from [10.72.12.233] (ovpn-12-233.pek2.redhat.com [10.72.12.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D3AE45C290;
-        Fri,  5 Jun 2020 03:40:18 +0000 (UTC)
-Subject: Re: [PATCH RFC 03/13] vhost: batching fetches
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-References: <20200602130543.578420-1-mst@redhat.com>
- <20200602130543.578420-4-mst@redhat.com>
- <3323daa2-19ed-02de-0ff7-ab150f949fff@redhat.com>
- <20200604045830-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <6c2e6cc7-27c5-445b-f252-0356ff8a83f3@redhat.com>
-Date:   Fri, 5 Jun 2020 11:40:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        by mail.kernel.org (Postfix) with ESMTPSA id C98CA206E6;
+        Fri,  5 Jun 2020 04:24:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591331044;
+        bh=Ger2JKf4foukIoxJhsp2lpcdnsKngWBWA02v1OQp51Y=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0wRsVBPYDfhuBPXJhNEprgX7yrwQg0lkOBlGoz4O9jEC+lVNlLQWhfMSciuYkRSKF
+         tR2wZxyLj9N1kziXCwugwlLQRH47af8NFACLXOevvhB6Wi/eonfPM8oDsgehwYXdGg
+         XThOmBu1ey/i1g9+k9IDIgZUxKvQoijjfHVxPMfY=
+Date:   Thu, 4 Jun 2020 21:24:02 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     kvm@vger.kernel.org
+Cc:     syzbot <syzbot+f196caa45793d6374707@syzkaller.appspotmail.com>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Subject: Re: memory leak in do_eventfd
+Message-ID: <20200605042402.GO2667@sol.localdomain>
+References: <0000000000001daa8d05a61e3440@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20200604045830-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0000000000001daa8d05a61e3440@google.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+[+Cc kvm mailing list]
 
-On 2020/6/4 下午4:59, Michael S. Tsirkin wrote:
-> On Wed, Jun 03, 2020 at 03:27:39PM +0800, Jason Wang wrote:
->> On 2020/6/2 下午9:06, Michael S. Tsirkin wrote:
->>> With this patch applied, new and old code perform identically.
->>>
->>> Lots of extra optimizations are now possible, e.g.
->>> we can fetch multiple heads with copy_from/to_user now.
->>> We can get rid of maintaining the log array.  Etc etc.
->>>
->>> Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
->>> Signed-off-by: Eugenio Pérez<eperezma@redhat.com>
->>> Link:https://lore.kernel.org/r/20200401183118.8334-4-eperezma@redhat.com
->>> Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
->>> ---
->>>    drivers/vhost/test.c  |  2 +-
->>>    drivers/vhost/vhost.c | 47 ++++++++++++++++++++++++++++++++++++++-----
->>>    drivers/vhost/vhost.h |  5 ++++-
->>>    3 files changed, 47 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
->>> index 9a3a09005e03..02806d6f84ef 100644
->>> --- a/drivers/vhost/test.c
->>> +++ b/drivers/vhost/test.c
->>> @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
->>>    	dev = &n->dev;
->>>    	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
->>>    	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
->>> -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
->>> +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
->>>    		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
->>>    	f->private_data = n;
->>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->>> index 8f9a07282625..aca2a5b0d078 100644
->>> --- a/drivers/vhost/vhost.c
->>> +++ b/drivers/vhost/vhost.c
->>> @@ -299,6 +299,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
->>>    {
->>>    	vq->num = 1;
->>>    	vq->ndescs = 0;
->>> +	vq->first_desc = 0;
->>>    	vq->desc = NULL;
->>>    	vq->avail = NULL;
->>>    	vq->used = NULL;
->>> @@ -367,6 +368,11 @@ static int vhost_worker(void *data)
->>>    	return 0;
->>>    }
->>> +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
->>> +{
->>> +	return vq->max_descs - UIO_MAXIOV;
->>> +}
->> 1 descriptor does not mean 1 iov, e.g userspace may pass several 1 byte
->> length memory regions for us to translate.
->>
-> Yes but I don't see the relevance. This tells us how many descriptors to
-> batch, not how many IOVs.
-
-
-Yes, but questions are:
-
-- this introduce another obstacle to support more than 1K queue size
-- if we support 1K queue size, does it mean we need to cache 1K 
-descriptors, which seems a large stress on the cache
-
-Thanks
-
-
->
-
+On Wed, May 20, 2020 at 06:12:17PM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following crash on:
+> 
+> HEAD commit:    5a9ffb95 Merge tag '5.7-rc5-smb3-fixes' of git://git.samba..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10b72a02100000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=f8295ae5b3f8268d
+> dashboard link: https://syzkaller.appspot.com/bug?extid=f196caa45793d6374707
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17585b76100000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12500a02100000
+> 
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+f196caa45793d6374707@syzkaller.appspotmail.com
+> 
+> BUG: memory leak
+> unreferenced object 0xffff888117169ac0 (size 64):
+>   comm "syz-executor012", pid 6609, jiffies 4294942172 (age 13.720s)
+>   hex dump (first 32 bytes):
+>     01 00 00 00 ff ff ff ff 00 00 00 00 00 c9 ff ff  ................
+>     d0 9a 16 17 81 88 ff ff d0 9a 16 17 81 88 ff ff  ................
+>   backtrace:
+>     [<00000000351bb234>] kmalloc include/linux/slab.h:555 [inline]
+>     [<00000000351bb234>] do_eventfd+0x35/0xf0 fs/eventfd.c:418
+>     [<00000000c2f69a77>] __do_sys_eventfd fs/eventfd.c:443 [inline]
+>     [<00000000c2f69a77>] __se_sys_eventfd fs/eventfd.c:441 [inline]
+>     [<00000000c2f69a77>] __x64_sys_eventfd+0x14/0x20 fs/eventfd.c:441
+>     [<0000000086d6f989>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
+>     [<000000006c5bcb63>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> 
+> BUG: memory leak
+> unreferenced object 0xffff888117169100 (size 64):
+>   comm "syz-executor012", pid 6609, jiffies 4294942172 (age 13.720s)
+>   hex dump (first 32 bytes):
+>     e8 99 dd 00 00 c9 ff ff e8 99 dd 00 00 c9 ff ff  ................
+>     00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00  ... ............
+>   backtrace:
+>     [<00000000436d2955>] kmalloc include/linux/slab.h:555 [inline]
+>     [<00000000436d2955>] kzalloc include/linux/slab.h:669 [inline]
+>     [<00000000436d2955>] kvm_assign_ioeventfd_idx+0x4f/0x270 arch/x86/kvm/../../../virt/kvm/eventfd.c:798
+>     [<00000000e89390cc>] kvm_assign_ioeventfd arch/x86/kvm/../../../virt/kvm/eventfd.c:934 [inline]
+>     [<00000000e89390cc>] kvm_ioeventfd+0xbb/0x194 arch/x86/kvm/../../../virt/kvm/eventfd.c:961
+>     [<00000000ba9f6732>] kvm_vm_ioctl+0x1e6/0x1030 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3670
+>     [<000000005da94937>] vfs_ioctl fs/ioctl.c:47 [inline]
+>     [<000000005da94937>] ksys_ioctl+0xa6/0xd0 fs/ioctl.c:771
+>     [<00000000a583d097>] __do_sys_ioctl fs/ioctl.c:780 [inline]
+>     [<00000000a583d097>] __se_sys_ioctl fs/ioctl.c:778 [inline]
+>     [<00000000a583d097>] __x64_sys_ioctl+0x1a/0x20 fs/ioctl.c:778
+>     [<0000000086d6f989>] do_syscall_64+0x6e/0x220 arch/x86/entry/common.c:295
+>     [<000000006c5bcb63>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> 
+> 
+> 
+> ---
+> This bug is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> syzbot can test patches for this bug, for details see:
+> https://goo.gl/tpsmEJ#testing-patches
+> 
+> -- 
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/0000000000001daa8d05a61e3440%40google.com.
