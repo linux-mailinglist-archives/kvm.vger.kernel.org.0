@@ -2,113 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 535B91F00A9
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 22:01:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C4821F00B7
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 22:06:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727917AbgFEUBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 16:01:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41564 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727863AbgFEUBh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 16:01:37 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 055JWmKn030702;
-        Fri, 5 Jun 2020 16:01:16 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31fsnk56h3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 16:01:16 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 055K0Jas105241;
-        Fri, 5 Jun 2020 16:01:15 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31fsnk56gj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 16:01:15 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 055K0Wc2019631;
-        Fri, 5 Jun 2020 20:01:14 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma02wdc.us.ibm.com with ESMTP id 31f5mexufr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 20:01:14 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 055K1BLB31064452
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Jun 2020 20:01:11 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CFE6DBE054;
-        Fri,  5 Jun 2020 20:01:12 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 94E3DBE051;
-        Fri,  5 Jun 2020 20:01:09 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.211.135.208])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Fri,  5 Jun 2020 20:01:09 +0000 (GMT)
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au> <87tuzr5ts5.fsf@morokweng.localdomain> <20200604062124.GG228651@umbus.fritz.box> <87r1uu1opr.fsf@morokweng.localdomain> <dc56f533-f095-c0c0-0fc6-d4c5af5e51a7@redhat.com> <87pnae1k99.fsf@morokweng.localdomain> <ec71a816-b9e6-6f06-def6-73eb5164b0cc@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.3
-From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
-        qemu-devel@nongnu.org, brijesh.singh@amd.com,
-        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
-        mdroth@linux.vnet.ibm.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-Message-ID: <87sgf9i8sy.fsf@morokweng.localdomain>
-In-reply-to: <ec71a816-b9e6-6f06-def6-73eb5164b0cc@redhat.com>
-Date:   Fri, 05 Jun 2020 17:01:07 -0300
+        id S1728120AbgFEUGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 16:06:53 -0400
+Received: from mga14.intel.com ([192.55.52.115]:55629 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727863AbgFEUGw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 16:06:52 -0400
+IronPort-SDR: qLCGo+iyW5O1JSOnOSsv1dq/jtaV76EGpwu1yhLYo6KzJrHBQs6s73tcFkK7OSWlpGwHSIkg78
+ m/Mp3p4AXDUw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 13:06:52 -0700
+IronPort-SDR: vuidcrLsSHUvLnHM78ClpxSJeqGc1d3MaeNx3OBTZpmjtVUy5Y5t1NWeE+1lmsl8lGzaGx7iSI
+ EjIelMGv2OzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; 
+   d="scan'208";a="378839299"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga001.fm.intel.com with ESMTP; 05 Jun 2020 13:06:52 -0700
+Date:   Fri, 5 Jun 2020 13:06:51 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: nVMX: Properly handle
+ kvm_read/write_guest_virt*() result
+Message-ID: <20200605200651.GC11449@linux.intel.com>
+References: <20200605115906.532682-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-05_06:2020-06-04,2020-06-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- cotscore=-2147483648 phishscore=0 impostorscore=0 lowpriorityscore=0
- malwarescore=0 priorityscore=1501 bulkscore=0 clxscore=1015 suspectscore=0
- mlxlogscore=820 adultscore=0 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006050144
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200605115906.532682-1-vkuznets@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jun 05, 2020 at 01:59:05PM +0200, Vitaly Kuznetsov wrote:
+> Introduce vmx_handle_memory_failure() as an interim solution.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Heh, "interim".  I'll take the over on that :-D.
 
-> On 05/06/20 01:30, Thiago Jung Bauermann wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>> On 04/06/20 23:54, Thiago Jung Bauermann wrote:
->>>> QEMU could always create a PEF object, and if the command line defines
->>>> one, it will correspond to it. And if the command line doesn't define one,
->>>> then it would also work because the PEF object is already there.
->>>
->>> How would you start a non-protected VM?
->>> Currently it's the "-machine"
->>> property that decides that, and the argument requires an id
->>> corresponding to "-object".
->>
->> If there's only one object, there's no need to specify its id.
->
-> This answers my question.  However, the property is defined for all
-> machines (it's in the "machine" class), so if it takes the id for one
-> machine it does so for all of them.
+> Note, nested_vmx_get_vmptr() now has three possible outcomes: OK, PF,
+> KVM_EXIT_INTERNAL_ERROR and callers need to know if userspace exit is
+> needed (for KVM_EXIT_INTERNAL_ERROR) in case of failure. We don't seem
+> to have a good enum describing this tristate, just add "int *ret" to
+> nested_vmx_get_vmptr() interface to pass the information.
+> 
+> Reported-by: syzbot+2a7156e11dc199bdbd8a@syzkaller.appspotmail.com
+> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
 
-I don't understand much about QEMU internals, so perhaps it's not
-practical to implement but from an end-user perspective I think this
-logic can apply to all architectures (since my understanding is that all
-of them use only one object): make the id optional. If it's not
-specified, then there must be only one object, and the property will
-implicitly refer to it.
+...
 
-Then, if an architecture doesn't need to specify parameters at object
-creation time, it can be implicitly created and the user doesn't have to
-worry about this detail.
+> +/*
+> + * Handles kvm_read/write_guest_virt*() result and either injects #PF or returns
+> + * KVM_EXIT_INTERNAL_ERROR for cases not currently handled by KVM. Return value
+> + * indicates whether exit to userspace is needed.
+> + */
+> +int vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
+> +			      struct x86_exception *e)
+> +{
+> +	if (r == X86EMUL_PROPAGATE_FAULT) {
+> +		kvm_inject_emulated_page_fault(vcpu, e);
+> +		return 1;
+> +	}
+> +
+> +	/*
+> +	 * In case kvm_read/write_guest_virt*() failed with X86EMUL_IO_NEEDED
+> +	 * while handling a VMX instruction KVM could've handled the request
 
---
-Thiago Jung Bauermann
-IBM Linux Technology Center
+A nit similar to your observation on the shortlog, this isn't limited to VMX
+instructions.
+
+> +	 * correctly by exiting to userspace and performing I/O but there
+> +	 * doesn't seem to be a real use-case behind such requests, just return
+> +	 * KVM_EXIT_INTERNAL_ERROR for now.
+> +	 */
+> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> +	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+> +	vcpu->run->internal.ndata = 0;
+> +
+> +	return 0;
+> +}
