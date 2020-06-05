@@ -2,101 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C74D1EF09F
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 06:39:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FBBE1EF0C7
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 07:01:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726156AbgFEEjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 00:39:44 -0400
-Received: from mx24.baidu.com ([111.206.215.185]:60194 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725968AbgFEEjo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 00:39:44 -0400
-X-Greylist: delayed 954 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Jun 2020 00:39:42 EDT
-Received: from BJHW-Mail-Ex14.internal.baidu.com (unknown [10.127.64.37])
-        by Forcepoint Email with ESMTPS id 5A5E9675E2089BB4C91E;
-        Fri,  5 Jun 2020 12:23:42 +0800 (CST)
-Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
- BJHW-Mail-Ex14.internal.baidu.com (10.127.64.37) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Fri, 5 Jun 2020 12:23:41 +0800
-Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
- BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
- 15.01.1713.004; Fri, 5 Jun 2020 12:23:36 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     "like.xu@intel.com" <like.xu@intel.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "xiaoyao.li@intel.com" <xiaoyao.li@intel.com>,
-        "wei.huang2@amd.com" <wei.huang2@amd.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdW3Y2XSBLVk06IFg4Njogc3VwcG9ydCBBUEVSRi9N?=
- =?utf-8?Q?PERF_registers?=
-Thread-Topic: [PATCH][v6] KVM: X86: support APERF/MPERF registers
-Thread-Index: AQHWOtrZ4X/t3pkmBEG7o3WCZUgoeKjIxz2AgAChEWA=
-Date:   Fri, 5 Jun 2020 04:23:36 +0000
-Message-ID: <c21c6ffa19b6483ea57feab3f98f279c@baidu.com>
+        id S1726026AbgFEFA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 01:00:59 -0400
+Received: from mga04.intel.com ([192.55.52.120]:51777 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725280AbgFEFA7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 01:00:59 -0400
+IronPort-SDR: 6i/DvY34nhiow8PBjqidsyf4LC1He06SSXVlt6Vu6BwS32Tw2KBRn1oRwdhJfaMN/807d7Gm5g
+ lg5pF+/QWtYg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 22:00:58 -0700
+IronPort-SDR: KTmbzwYRqU1143COmUSMc9+OGMtwL3lsPG0+NcNGGyVs3xfGObUzjSMCKihL7MdI/OF0qBWxY8
+ ZaKijs/d9awA==
+X-IronPort-AV: E=Sophos;i="5.73,475,1583222400"; 
+   d="scan'208";a="471784741"
+Received: from unknown (HELO [10.239.13.99]) ([10.239.13.99])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 22:00:55 -0700
+Subject: Re: [PATCH][v6] KVM: X86: support APERF/MPERF registers
+To:     Li RongQing <lirongqing@baidu.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, hpa@zytor.com, bp@alien8.de,
+        mingo@redhat.com, tglx@linutronix.de, jmattson@google.com,
+        wanpengli@tencent.com, vkuznets@redhat.com,
+        sean.j.christopherson@intel.com, pbonzini@redhat.com,
+        wei.huang2@amd.com
 References: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
- <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
-In-Reply-To: <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.198.27]
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex14_2020-06-05 12:23:42:248
-x-baidu-bdmsfe-viruscheck: BJHW-Mail-Ex14_GRAY_Inside_WithoutAtta_2020-06-05
- 12:23:42:216
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <b70d03dd-947f-dee5-5499-3b381372497d@intel.com>
+Date:   Fri, 5 Jun 2020 13:00:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
+In-Reply-To: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFh1LCBMaWtlIFttYWls
-dG86bGlrZS54dUBpbnRlbC5jb21dDQo+IOWPkemAgeaXtumXtDogMjAyMOW5tDbmnIg15pelIDEw
-OjMyDQo+IOaUtuS7tuS6ujogTGksUm9uZ3FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUuY29tPg0KPiDm
-ioTpgIE6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7
-IHg4NkBrZXJuZWwub3JnOw0KPiBocGFAenl0b3IuY29tOyBicEBhbGllbjguZGU7IG1pbmdvQHJl
-ZGhhdC5jb207IHRnbHhAbGludXRyb25peC5kZTsNCj4gam1hdHRzb25AZ29vZ2xlLmNvbTsgd2Fu
-cGVuZ2xpQHRlbmNlbnQuY29tOyB2a3V6bmV0c0ByZWRoYXQuY29tOw0KPiBzZWFuLmouY2hyaXN0
-b3BoZXJzb25AaW50ZWwuY29tOyBwYm9uemluaUByZWRoYXQuY29tOyB4aWFveWFvLmxpQGludGVs
-LmNvbTsNCj4gd2VpLmh1YW5nMkBhbWQuY29tDQo+IOS4u+mimDogUmU6IFtQQVRDSF1bdjZdIEtW
-TTogWDg2OiBzdXBwb3J0IEFQRVJGL01QRVJGIHJlZ2lzdGVycw0KPiANCj4gSGkgUm9uZ1Fpbmcs
-DQo+IA0KPiBPbiAyMDIwLzYvNSA5OjQ0LCBMaSBSb25nUWluZyB3cm90ZToNCj4gPiBHdWVzdCBr
-ZXJuZWwgcmVwb3J0cyBhIGZpeGVkIGNwdSBmcmVxdWVuY3kgaW4gL3Byb2MvY3B1aW5mbywgdGhp
-cyBpcw0KPiA+IGNvbmZ1c2VkIHRvIHVzZXIgd2hlbiB0dXJibyBpcyBlbmFibGUsIGFuZCBhcGVy
-Zi9tcGVyZiBjYW4gYmUgdXNlZCB0bw0KPiA+IHNob3cgY3VycmVudCBjcHUgZnJlcXVlbmN5IGFm
-dGVyIDdkNTkwNWRjMTRhDQo+ID4gIih4ODYgLyBDUFU6IEFsd2F5cyBzaG93IGN1cnJlbnQgQ1BV
-IGZyZXF1ZW5jeSBpbiAvcHJvYy9jcHVpbmZvKSINCj4gPiBzbyBndWVzdCBzaG91bGQgc3VwcG9y
-dCBhcGVyZi9tcGVyZiBjYXBhYmlsaXR5DQo+ID4NCj4gPiBUaGlzIHBhdGNoIGltcGxlbWVudHMg
-YXBlcmYvbXBlcmYgYnkgdGhyZWUgbW9kZTogbm9uZSwgc29mdHdhcmUNCj4gPiBlbXVsYXRpb24s
-IGFuZCBwYXNzLXRocm91Z2gNCj4gPg0KPiA+IE5vbmU6IGRlZmF1bHQgbW9kZSwgZ3Vlc3QgZG9l
-cyBub3Qgc3VwcG9ydCBhcGVyZi9tcGVyZg0KPiBzL05vbmUvTm90ZQ0KPiA+DQo+ID4gU29mdHdh
-cmUgZW11bGF0aW9uOiB0aGUgcGVyaW9kIG9mIGFwZXJmL21wZXJmIGluIGd1ZXN0IG1vZGUgYXJl
-DQo+ID4gYWNjdW11bGF0ZWQgYXMgZW11bGF0ZWQgdmFsdWUNCj4gPg0KPiA+IFBhc3MtdGhvdWdo
-OiBpdCBpcyBvbmx5IHN1aXRhYmxlIGZvciBLVk1fSElOVFNfUkVBTFRJTUUsIEJlY2F1c2UgdGhh
-dA0KPiA+IGhpbnQgZ3VhcmFudGVlcyB3ZSBoYXZlIGEgMToxIHZDUFU6Q1BVIGJpbmRpbmcgYW5k
-IGd1YXJhbnRlZWQgbm8NCj4gPiBvdmVyLWNvbW1pdC4NCj4gVGhlIGZsYWcgIktWTV9ISU5UU19S
-RUFMVElNRSAwIiAoaW4gdGhlIERvY3VtZW50YXRpb24vdmlydC9rdm0vY3B1aWQucnN0KQ0KPiBp
-cyBjbGFpbWVkIGFzICJndWVzdCBjaGVja3MgdGhpcyBmZWF0dXJlIGJpdCB0byBkZXRlcm1pbmUg
-dGhhdCB2Q1BVcyBhcmUgbmV2ZXINCj4gcHJlZW1wdGVkIGZvciBhbiB1bmxpbWl0ZWQgdGltZSBh
-bGxvd2luZyBvcHRpbWl6YXRpb25zIi4NCj4gDQo+IEkgY291bGRuJ3Qgc2VlIGl0cyByZWxhdGlv
-bnNoaXAgd2l0aCAiMToxIHZDUFU6IHBDUFUgYmluZGluZyIuDQo+IFRoZSBwYXRjaCBkb2Vzbid0
-IGNoZWNrIHRoaXMgZmxhZyBhcyB3ZWxsIGZvciB5b3VyIHBhc3MtdGhyb3VnaCBwdXJwb3NlLg0K
-PiANCj4gVGhhbmtzLA0KPiBMaWtlIFh1DQoNCg0KSSB0aGluayB0aGlzIGlzIHVzZXIgc3BhY2Ug
-am9icyB0byBiaW5kIEhJTlRfUkVBTFRJTUUgYW5kIG1wZXJmIHBhc3N0aHJvdWdoLCBLVk0ganVz
-dCBkbyB3aGF0IHVzZXJzcGFjZSB3YW50cy4NCg0KYW5kIHRoaXMgZ2l2ZXMgdXNlciBzcGFjZSBh
-IHBvc3NpYmlsaXR5LCBndWVzdCBoYXMgcGFzc3Rocm91Z2ggbXBlcmZhcGVyZiB3aXRob3V0IEhJ
-TlRfUkVBTFRJTUUsIGd1ZXN0IGNhbiBnZXQgY29hcnNlIGNwdSBmcmVxdWVuY3kgd2l0aG91dCBw
-ZXJmb3JtYW5jZSBlZmZlY3QgaWYgZ3Vlc3QgY2FuIGVuZHVyZSBlcnJvciBmcmVxdWVuY3kgb2Nj
-YXNpb25hbGx5DQoNCg0KLUxpIA0KDQo=
+On 6/5/2020 9:44 AM, Li RongQing wrote:
+> Guest kernel reports a fixed cpu frequency in /proc/cpuinfo,
+> this is confused to user when turbo is enable, and aperf/mperf
+> can be used to show current cpu frequency after 7d5905dc14a
+> "(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
+> so guest should support aperf/mperf capability
+> 
+> This patch implements aperf/mperf by three mode: none, software
+> emulation, and pass-through
+> 
+> None: default mode, guest does not support aperf/mperf
+> 
+> Software emulation: the period of aperf/mperf in guest mode are
+> accumulated as emulated value
+> 
+> Pass-though: it is only suitable for KVM_HINTS_REALTIME, Because
+> that hint guarantees we have a 1:1 vCPU:CPU binding and guaranteed
+> no over-commit.
+> 
+> And a per-VM capability is added to configure aperfmperf mode
+> 
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> Signed-off-by: Chai Wen <chaiwen@baidu.com>
+> Signed-off-by: Jia Lina <jialina01@baidu.com>
+> ---
+> diff v5:
+> return error if guest is configured with mperf/aperf, but host cpu has not
+> 
+> diff v4:
+> fix maybe-uninitialized warning
+> 
+> diff v3:
+> fix interception of MSR_IA32_MPERF/APERF in svm
+> 
+> diff v2:
+> support aperfmperf pass though
+> move common codes to kvm_get_msr_common
+> 
+> diff v1:
+> 1. support AMD, but not test
+> 2. support per-vm capability to enable
+> 
+> 
+>   Documentation/virt/kvm/api.rst  | 10 ++++++++++
+>   arch/x86/include/asm/kvm_host.h | 11 +++++++++++
+>   arch/x86/kvm/cpuid.c            | 15 ++++++++++++++-
+>   arch/x86/kvm/svm/svm.c          |  8 ++++++++
+>   arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+>   arch/x86/kvm/x86.c              | 42 +++++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/x86.h              | 15 +++++++++++++++
+>   include/uapi/linux/kvm.h        |  1 +
+>   8 files changed, 107 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index d871dacb984e..f854f4da6fd8 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6126,3 +6126,13 @@ KVM can therefore start protected VMs.
+>   This capability governs the KVM_S390_PV_COMMAND ioctl and the
+>   KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
+>   guests when the state change is invalid.
+> +
+> +8.23 KVM_CAP_APERFMPERF
+> +----------------------------
+> +
+> +:Architectures: x86
+> +:Parameters: args[0] is aperfmperf mode;
+> +             0 for not support, 1 for software emulation, 2 for pass-through
+> +:Returns: 0 on success; -1 on error
+> +
+> +This capability indicates that KVM supports APERF and MPERF MSR registers
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index fd78bd44b2d6..14643f8af9c4 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -824,6 +824,9 @@ struct kvm_vcpu_arch {
+>   
+>   	/* AMD MSRC001_0015 Hardware Configuration */
+>   	u64 msr_hwcr;
+> +
+> +	u64 v_mperf;
+> +	u64 v_aperf;
+>   };
+>   
+>   struct kvm_lpage_info {
+> @@ -889,6 +892,12 @@ enum kvm_irqchip_mode {
+>   	KVM_IRQCHIP_SPLIT,        /* created with KVM_CAP_SPLIT_IRQCHIP */
+>   };
+>   
+> +enum kvm_aperfmperf_mode {
+> +	KVM_APERFMPERF_NONE,
+> +	KVM_APERFMPERF_SOFT,      /* software emulate aperfmperf */
+> +	KVM_APERFMPERF_PT,        /* pass-through aperfmperf to guest */
+> +};
+> +
+>   #define APICV_INHIBIT_REASON_DISABLE    0
+>   #define APICV_INHIBIT_REASON_HYPERV     1
+>   #define APICV_INHIBIT_REASON_NESTED     2
+> @@ -986,6 +995,8 @@ struct kvm_arch {
+>   
+>   	struct kvm_pmu_event_filter *pmu_event_filter;
+>   	struct task_struct *nx_lpage_recovery_thread;
+> +
+> +	enum kvm_aperfmperf_mode aperfmperf_mode;
+>   };
+>   
+>   struct kvm_vm_stat {
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index cd708b0b460a..80f18b29a845 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -122,6 +122,16 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+>   					   MSR_IA32_MISC_ENABLE_MWAIT);
+>   	}
+>   
+> +	best = kvm_find_cpuid_entry(vcpu, 6, 0);
+> +	if (best) {
+> +		if (guest_has_aperfmperf(vcpu->kvm)) {
+> +			if (!boot_cpu_has(X86_FEATURE_APERFMPERF))
+> +				return -EINVAL;
+
+kvm_vm_ioctl_enable_cap() ensures that guest_has_aperfmperf() always 
+aligns with boot_cpu_has(X86_FEATURE_APERFMPERF). So above is unnecessary.
+
+> +			best->ecx |= 1;
+> +		} else {
+> +			best->ecx &= ~1;
+> +		}
+> +	}
+
+you could do
+
+	bool guest_cpuid_aperfmperf = false;
+	if (best)
+		guest_cpuid_aperfmperf = !!(best->ecx & BIT(0));
+
+	if (guest_cpuid_aperfmerf != guest_has_aperfmperf(vcpu->kvm))
+		return -EINVAL;
+
+
+In fact, I think we can do nothing here. Leave it as what usersapce 
+wants just like how KVM treats other CPUID bits.
+
+Paolo,
+
+What's your point?
+
+>   	/* Note, maxphyaddr must be updated before tdp_level. */
+>   	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+>   	vcpu->arch.tdp_level = kvm_x86_ops.get_tdp_level(vcpu);
+
+[...]
+
+> @@ -4930,6 +4939,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   		kvm->arch.exception_payload_enabled = cap->args[0];
+>   		r = 0;
+>   		break;
+> +	case KVM_CAP_APERFMPERF:
+> +		kvm->arch.aperfmperf_mode =
+> +			boot_cpu_has(X86_FEATURE_APERFMPERF) ? cap->args[0] : 0;
+
+Shouldn't check whether cap->args[0] is a valid value?
+
+> +		r = 0;
+> +		break;
+>   	default:
+>   		r = -EINVAL;
+>   		break;
+
+
