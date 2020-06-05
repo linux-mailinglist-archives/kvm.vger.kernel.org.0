@@ -2,143 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC9191EF308
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 10:25:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04A9F1EF33A
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 10:36:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbgFEIZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 04:25:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:65174 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725986AbgFEIZD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 04:25:03 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 055820gT049467;
-        Fri, 5 Jun 2020 04:25:01 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31f9dex83b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 04:25:01 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05582VaS051887;
-        Fri, 5 Jun 2020 04:25:01 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31f9dex81r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 04:25:01 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0558KwII011853;
-        Fri, 5 Jun 2020 08:24:59 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 31end6h5vw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 08:24:59 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0558NfAH66781592
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Jun 2020 08:23:41 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9B874C04A;
-        Fri,  5 Jun 2020 08:24:56 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 741434C059;
-        Fri,  5 Jun 2020 08:24:56 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.68.25])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  5 Jun 2020 08:24:56 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v7 09/12] s390x: css: msch, enable test
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
- <1589818051-20549-10-git-send-email-pmorel@linux.ibm.com>
- <20200527114239.65fa9473.cohuck@redhat.com>
- <65501204-f6f3-7800-e382-63ccad77ca38@linux.ibm.com>
- <20200604152945.4cb433bd.cohuck@redhat.com>
- <ea12784c-df16-db4b-dd9c-b5b77bcbe9f9@linux.ibm.com>
-Message-ID: <3aaa9a99-6958-062d-14a7-fcf8d447ad19@linux.ibm.com>
-Date:   Fri, 5 Jun 2020 10:24:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726242AbgFEIgV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 04:36:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51594 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726062AbgFEIgV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 04:36:21 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E13C08C5C2;
+        Fri,  5 Jun 2020 01:36:20 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id c3so8811685wru.12;
+        Fri, 05 Jun 2020 01:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Dq3oPyfqozgQNVIyIv74mybfG/tMTEM6HNLPoiq4pKw=;
+        b=A4LMRLaae+oW4ofvbcr0vG+xLYd3wW/c/tZNs4zYNUsY2KdfkVkjco81/u5+zkqaYA
+         5ZFsk0kX/XNnx3J/rZR+Q6+T1QJbYbHk9l4wc9sV7lpSh8IKD81cXLxrt16H7KZES1AW
+         p1tWvEsGcmydNz6zRfdQJ9Lh4cCTh4gqVI4nMXlutJw6DoR01pWTFqCliysDRxZFyXHQ
+         oNa5pis/C+LHiI4IHs8MFEIy4xSziE8BtWvW+lcckJvqjqZ6Phb3egKj/lCIw2r0OXTf
+         J3/UbsfBK8Y3apbwhwGvmpSYTokD92yJ7hn3ElrnaNiJsnOq5cPqEvjNp63hl5619sKp
+         j+5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Dq3oPyfqozgQNVIyIv74mybfG/tMTEM6HNLPoiq4pKw=;
+        b=cE9EQnG/esfcbgrs5IxhCqpt0ydWV4h9oGrF9wLYBCHDVAkkd2nJ9oBrDatSOQwj3P
+         UUWLmBuuBi7S0qJohgtZXHcWl6Ub/IdSYS3QknLrvpvcIW/Vp2Bmvjb693aV8pn+ChH0
+         SM7vNY1abNCWp0ZYyJNwxntNJpIvK4AiaiU+BAqHcduZ7ZBlxZfhfh7vjZNZESWalDTL
+         bv6Swn4aLrOMmmah7hf+SSrns8ASZRer/qsjsC7IMZCnT3GRQ7qHLFiWD5VznI/PI0xK
+         32iiZSLB3IYb0xyRP2iO729UGvyTElmKhN6yAKP8Ums6l1Hef3BQBzSr3d9o4tXg2SOa
+         xUuA==
+X-Gm-Message-State: AOAM533FrP7Otr2rApQlrp6gmDOxMAoyySz+EoIjOlOEZpnVKv1vD/o2
+        V/IWIMQpEAhldGyU+4IqLNL01baIOFQ=
+X-Google-Smtp-Source: ABdhPJzYVycY3bZlLV6BrfEAJMimdCMCrmHbb+PtL0pnGXLNxfuetQ/tdoRiqKM0eEmwT7Y9paVK0Q==
+X-Received: by 2002:adf:feca:: with SMTP id q10mr7852058wrs.380.1591346178861;
+        Fri, 05 Jun 2020 01:36:18 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id c81sm10935509wmd.42.2020.06.05.01.36.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jun 2020 01:36:18 -0700 (PDT)
+Date:   Fri, 5 Jun 2020 09:36:16 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH RFC 11/13] vhost/scsi: switch to buf APIs
+Message-ID: <20200605083616.GB59410@stefanha-x1.localdomain>
+References: <20200602130543.578420-1-mst@redhat.com>
+ <20200602130543.578420-12-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ea12784c-df16-db4b-dd9c-b5b77bcbe9f9@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-05_01:2020-06-04,2020-06-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- adultscore=0 impostorscore=0 phishscore=0 malwarescore=0 clxscore=1015
- suspectscore=0 cotscore=-2147483648 priorityscore=1501 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006050058
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="WYTEVAkct0FjGQmd"
+Content-Disposition: inline
+In-Reply-To: <20200602130543.578420-12-mst@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Hi Connie,
+--WYTEVAkct0FjGQmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-for the next series, I will move more code of the css.c to the css_lib.c 
-to be able to reuse it for other tests.
-One of your suggestions IIRC.
-So I will not be able to keep your RB until you have a look at the changes.
-I will keep the same algorithms but still...
+On Tue, Jun 02, 2020 at 09:06:20AM -0400, Michael S. Tsirkin wrote:
+> Switch to buf APIs. Doing this exposes a spec violation in vhost scsi:
+> all used bufs are marked with length 0.
+> Fix that is left for another day.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/vhost/scsi.c | 73 ++++++++++++++++++++++++++------------------
+>  1 file changed, 44 insertions(+), 29 deletions(-)
+>=20
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index c39952243fd3..c426c4e899c7 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -71,8 +71,8 @@ struct vhost_scsi_inflight {
+>  };
+> =20
+>  struct vhost_scsi_cmd {
+> -	/* Descriptor from vhost_get_vq_desc() for virt_queue segment */
+> -	int tvc_vq_desc;
+> +	/* Descriptor from vhost_get_avail_buf() for virt_queue segment */
+> +	struct vhost_buf tvc_vq_desc;
+>  	/* virtio-scsi initiator task attribute */
+>  	int tvc_task_attr;
+>  	/* virtio-scsi response incoming iovecs */
+> @@ -213,7 +213,7 @@ struct vhost_scsi {
+>   * Context for processing request and control queue operations.
+>   */
+>  struct vhost_scsi_ctx {
+> -	int head;
+> +	struct vhost_buf buf;
+>  	unsigned int out, in;
+>  	size_t req_size, rsp_size;
+>  	size_t out_size, in_size;
+> @@ -443,6 +443,20 @@ static int vhost_scsi_check_stop_free(struct se_cmd =
+*se_cmd)
+>  	return target_put_sess_cmd(se_cmd);
+>  }
+> =20
+> +/* Signal to guest that request finished with no input buffer. */
+> +/* TODO calling this when writing into buffer and most likely a bug */
+> +static void vhost_scsi_signal_noinput(struct vhost_dev *vdev,
+> +				      struct vhost_virtqueue *vq,
+> +				      struct vhost_buf *bufp)
+> +{
+> +	struct vhost_buf buf =3D *bufp;
+> +
+> +	buf.in_len =3D 0;
+> +	vhost_put_used_buf(vq, &buf);
 
-regards,
-Pierre
+Yes, this behavior differs from the QEMU virtio-scsi device
+implementation. I think it's just a quirk that is probably my fault (I
+guess I thought the length information is already encoded in the payload
+SCSI headers so we have no use for the used descriptor length field).
 
-On 2020-06-05 09:37, Pierre Morel wrote:
-> 
-> 
-> On 2020-06-04 15:29, Cornelia Huck wrote:
->> On Thu, 4 Jun 2020 14:46:05 +0200
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
->>> On 2020-05-27 11:42, Cornelia Huck wrote:
->>>> On Mon, 18 May 2020 18:07:28 +0200
->>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>> A second step when testing the channel subsystem is to prepare a 
->>>>> channel
->>>>> for use.
->>>>> This includes:
->>>>> - Get the current subchannel Information Block (SCHIB) using STSCH
->>>>> - Update it in memory to set the ENABLE bit
->>>>> - Tell the CSS that the SCHIB has been modified using MSCH
->>>>> - Get the SCHIB from the CSS again to verify that the subchannel is
->>>>>     enabled.
->>>>> - If the subchannel is not enabled retry a predefined retries count.
->>>>>
->>>>> This tests the MSCH instruction to enable a channel succesfuly.
->>>>> This is NOT a routine to really enable the channel, no retry is done,
->>>>> in case of error, a report is made.
->>>>
->>>> Hm... so you retry if the subchannel is not enabled after cc 0, but you
->>>> don't retry if the cc indicates busy/status pending? Makes sense, as we
->>>> don't expect the subchannel to be busy, but a more precise note in the
->>>> patch description would be good :)
->>>
->>> OK, I add something like
->>> "
->>> - If the command succeed but subchannel is not enabled retry a
->>
->> s/succeed/succeeds/ :)
->>
->>>     predefined retries count.
->>> - If the command fails, report the failure and do not retry, even
->>>     if cc indicates a busy/status as we do not expect this.
->>
->> "indicates busy/status pending" ?
->>
->>> "
->>
-> done, thanks,
-> 
-> Pierre
-> 
+Whether it's worth changing now or is an interesting question. In theory
+it would make vhost-scsi more spec compliant and guest drivers might be
+happier (especially drivers for niche OSes that were only tested against
+QEMU's virtio-scsi). On the other hand, it's a guest-visible change that
+could break similar niche drivers that assume length is always 0.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+I'd leave it as-is unless people hit issues that justify the risk of
+changing it.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--WYTEVAkct0FjGQmd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7aBAAACgkQnKSrs4Gr
+c8hc2AgAhA2GdtNYe8p56IbAFfd8fkuwV0WVMyeBsCNkDsrJLQqfOtQ9EGUI3lir
+8Xfy6Gr4Swoy+7HIeicp4dmOCrY6J+gJx3ORqS1UncMUJghROp1Iucm/MK3VZq81
+bY9Xx07KuKFJHv6127fdnjw36uQdIJxRWMfYW1EeGLeLLWxzyYv6E1ajDo5USsrG
+/nlX5NHWdz1CZbQc8HZnuZ9dwTsMuLJYYyhQFUtaHm3UYQ+39XHFtk12dJiHhDvD
+2QdziP4TCejE+N4ICXV9M9uLRPAMFHbhAdMTbCGjwYpk01FxGIQ/hD87TtBMiyNB
+gINncRUX153Pu1g/rx/FGzPJ+rBTRQ==
+=9PYW
+-----END PGP SIGNATURE-----
+
+--WYTEVAkct0FjGQmd--
