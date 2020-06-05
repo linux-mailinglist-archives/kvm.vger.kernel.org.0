@@ -2,134 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AC011EF240
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 09:39:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E18B1EF2CC
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 10:09:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725280AbgFEHji (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 03:39:38 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31495 "EHLO
+        id S1726210AbgFEIJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 04:09:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58534 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725986AbgFEHji (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 03:39:38 -0400
+        by vger.kernel.org with ESMTP id S1725986AbgFEIJa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 04:09:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591342776;
+        s=mimecast20190719; t=1591344569;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HhMc+d91L3zYiW99EmslarMDb7Iy+cphIwMBvcR3gAk=;
-        b=YBgjJpjOWGCT0Owz3UB7/J615Wyx6tGhmrTopdIiK1ekbwmieDYxOxuBM8uAr74HOnb/S/
-        HvRp5Yg1CaDEZoQKTkCBjV36njkSUB4OrqC17fQRnB7MYPMvlkHXXtcGoHZGdQh3nHxzKA
-        4QTQT8yo//ki3OAOjEuqzle8QofAS28=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-MK3r3kGGPaK3OXCo4l8cfA-1; Fri, 05 Jun 2020 03:39:16 -0400
-X-MC-Unique: MK3r3kGGPaK3OXCo4l8cfA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 288031B18BC2;
-        Fri,  5 Jun 2020 07:39:15 +0000 (UTC)
-Received: from gondolin (ovpn-113-2.ams2.redhat.com [10.36.113.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A31007B5F2;
-        Fri,  5 Jun 2020 07:39:10 +0000 (UTC)
-Date:   Fri, 5 Jun 2020 09:39:07 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] s390/virtio: remove unused pm callbacks
-Message-ID: <20200605093907.4d4b3c2a.cohuck@redhat.com>
-In-Reply-To: <20200604234421.4ada966b.pasic@linux.ibm.com>
-References: <20200526093629.257649-1-cohuck@redhat.com>
-        <20200604234421.4ada966b.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=QrVbv0LAvfoDVrxdU1Wp4ZS7+oUmRvbMHHEQQfIJrYQ=;
+        b=d+3Jq24POlPaVoQ7KymsVIV/Rhuxw2/ApIfFv0S0ho4BUCb90ZTkrJX5AywNBgbdiJLDOn
+        cSj42Ww1KSVYkf59rYciRCENbkigy4JGN2LSskrarJfkyYdmyhxbINgvr32HY0sNP93Zg8
+        rA86o8ykPdPq/JZGFW19yxFmuI/nVY0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-Y3FdP5IeN3W0-WqGMniAkA-1; Fri, 05 Jun 2020 04:09:27 -0400
+X-MC-Unique: Y3FdP5IeN3W0-WqGMniAkA-1
+Received: by mail-wr1-f70.google.com with SMTP id z10so3476517wrs.2
+        for <kvm@vger.kernel.org>; Fri, 05 Jun 2020 01:09:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QrVbv0LAvfoDVrxdU1Wp4ZS7+oUmRvbMHHEQQfIJrYQ=;
+        b=Fr5ZeOCOfKnAurPPc9chIyHX3LmqHehgFeGX076QFi+f67O/7eZAZRZwncPfgto1hH
+         MCJX9LUepRoMEE8liExP2VadQVoGMUAq7OQraIDAY5dmyPU46foiyhEGQj31a7pXrCKs
+         DViCIessK1zFvT3Jmns9MwwXZ8UMviO87CrPfaRc0rsTCEy7HTRClBgdCgEPpBffWnG+
+         Wca/fsGa8QSH20U7iXC+uw983x9SwRvkdRMP8eoDpfipVDT3YvIW29bHpo9uGSMCfw8T
+         uUIz7xOaJGj0I6+2qTZDLm6pDib5pbZKYDzJ7Zmj7nyD7Fq+qfQeRFf07yUhxTfcx2+W
+         99+w==
+X-Gm-Message-State: AOAM530Vq3iDQRWTIy/DAEsl27Zpjt2Arqj+ehCVtbGrvW68Ed98uGqe
+        GDxd/3b/k2HaHSSqIm0xvqmKkf9ywZfJS8RP0R1ZuAvErqtGCDEzqVXbwMmB9vAOPzBtYHBFszi
+        vdK7Ha4jBS5Ym
+X-Received: by 2002:adf:910e:: with SMTP id j14mr3063155wrj.278.1591344566572;
+        Fri, 05 Jun 2020 01:09:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzIuVyoaDb2G7McATYKVs9RHDnOjJKTbctGFe7ylZ0JJN3Ab9BRicQxXsudMj+hwx2qABEvPw==
+X-Received: by 2002:adf:910e:: with SMTP id j14mr3063139wrj.278.1591344566346;
+        Fri, 05 Jun 2020 01:09:26 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
+        by smtp.gmail.com with ESMTPSA id l18sm9796731wmj.22.2020.06.05.01.09.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jun 2020 01:09:25 -0700 (PDT)
+Subject: Re: system time goes weird in kvm guest after host suspend/resume
+To:     Miklos Szeredi <miklos@szeredi.hu>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org
+References: <87pnagf912.fsf@nanos.tec.linutronix.de>
+ <87367a91rn.fsf@nanos.tec.linutronix.de>
+ <CAJfpegvchB2H=NK3JU0BQS7h=kXyifgKD=JHjjT6vTYVMspY2A@mail.gmail.com>
+ <1a1c32fe-d124-0e47-c9e4-695be7ea7567@redhat.com>
+ <CAJfpegvwBx49j9XwJZXcSUK=V9oHES31zB2sev0xwS4wfhah-g@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4c3c4a5a-e11b-1a27-0e25-9696e407bd0a@redhat.com>
+Date:   Fri, 5 Jun 2020 10:09:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAJfpegvwBx49j9XwJZXcSUK=V9oHES31zB2sev0xwS4wfhah-g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 4 Jun 2020 23:44:21 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On 05/06/20 09:35, Miklos Szeredi wrote:
+>> time(2) instead should actually be gettimeofday(2), which just returns
+>> tk->xtime_sec.  So the problem is the nanosecond part which is off by
+>> 2199*10^9 nanoseconds, and that is suspiciously close to 2^31...
+> Yep: looking at the nanosecond values as well, the difference is
+> exactly 2199023255552 which is 2^41.
 
-> On Tue, 26 May 2020 11:36:29 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > Support for hibernation on s390 has been recently been removed with
+Umpf, I was off by 3, it's not related to 2^31.  But yeah the cause of
+the bug seems to be the botched nanosecond part, which I'm sure is not
+supposed to be much bigger than 10^9.
 
-s/been recently been removed/recently been removed/
-
-> > commit 394216275c7d ("s390: remove broken hibernate / power management
-> > support"), no need to keep unused code around.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
-> 
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-
-Thanks!
-
-As this is only a single patch, I think a pull request is a bit
-overkill, so it would probably be best for someone to pick this
-directly.
-
-s390 arch maintainers? Michael?
-
-> 
-> > ---
-> >  drivers/s390/virtio/virtio_ccw.c | 26 --------------------------
-> >  1 file changed, 26 deletions(-)
-> > 
-> > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> > index 957889a42d2e..5730572b52cd 100644
-> > --- a/drivers/s390/virtio/virtio_ccw.c
-> > +++ b/drivers/s390/virtio/virtio_ccw.c
-> > @@ -1372,27 +1372,6 @@ static struct ccw_device_id virtio_ids[] = {
-> >  	{},
-> >  };
-> >  
-> > -#ifdef CONFIG_PM_SLEEP
-> > -static int virtio_ccw_freeze(struct ccw_device *cdev)
-> > -{
-> > -	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
-> > -
-> > -	return virtio_device_freeze(&vcdev->vdev);
-> > -}
-> > -
-> > -static int virtio_ccw_restore(struct ccw_device *cdev)
-> > -{
-> > -	struct virtio_ccw_device *vcdev = dev_get_drvdata(&cdev->dev);
-> > -	int ret;
-> > -
-> > -	ret = virtio_ccw_set_transport_rev(vcdev);
-> > -	if (ret)
-> > -		return ret;
-> > -
-> > -	return virtio_device_restore(&vcdev->vdev);
-> > -}
-> > -#endif
-> > -
-> >  static struct ccw_driver virtio_ccw_driver = {
-> >  	.driver = {
-> >  		.owner = THIS_MODULE,
-> > @@ -1405,11 +1384,6 @@ static struct ccw_driver virtio_ccw_driver = {
-> >  	.set_online = virtio_ccw_online,
-> >  	.notify = virtio_ccw_cio_notify,
-> >  	.int_class = IRQIO_VIR,
-> > -#ifdef CONFIG_PM_SLEEP
-> > -	.freeze = virtio_ccw_freeze,
-> > -	.thaw = virtio_ccw_restore,
-> > -	.restore = virtio_ccw_restore,
-> > -#endif
-> >  };
-> >  
-> >  static int __init pure_hex(char **cp, unsigned int *val, int min_digit,  
-> 
+Paolo
 
