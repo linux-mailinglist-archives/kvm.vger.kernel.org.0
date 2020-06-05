@@ -2,94 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EE581EF5FD
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 13:01:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 593301EF64D
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 13:16:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726964AbgFELBF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 07:01:05 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54398 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726954AbgFELBE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 07:01:04 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 055AwGRb161927;
-        Fri, 5 Jun 2020 11:00:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=dmqsTnpEMgvgWaF01TZp1obHH5FHCkwtMSTp+ECkeJw=;
- b=yieOJsHOmtFiDu5GpR2Lc6WmKnrXM/Hn0FVOBlUrZxeYaHy0vWGL4J0wZCgosqE9PfZc
- kiRxN75Lsw/hxUhoFYP7FHJ64RQQwD4a8Is23ZFFrEFDrxUQP17Ir80vdbozi0VYUl1j
- uvJ4JUAab7IGGBWIfRnKSRhBEU7dIDoD7sTDoPjfH3gZ1+E0A631qlh7S2o0c1qvGy3V
- EJWizOidaSMoU7pK4jl+To0yFij8NYVnhEBx8hVWDiKG+h5l3NuEDHzYIsCIJeEyFle+
- xBhOcSsGXxXkhnQsw6iakcRQYZ5eLam+fzolK7+T8Nn5IMQbhhf/iUa6DD0HTGEL7cLu KQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 31f92629uv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 05 Jun 2020 11:00:58 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 055AxRiC016464;
-        Fri, 5 Jun 2020 11:00:58 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 31f92skt9v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 05 Jun 2020 11:00:58 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 055B0tAu029723;
-        Fri, 5 Jun 2020 11:00:55 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 05 Jun 2020 04:00:55 -0700
-Date:   Fri, 5 Jun 2020 14:00:48 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>
-Cc:     Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: [PATCH] KVM: selftests: delete some dead code
-Message-ID: <20200605110048.GB978434@mwanda>
+        id S1726795AbgFELP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 07:15:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25254 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726782AbgFELP6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 07:15:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591355757;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I8a2f7F+3vcKM6ztM/s5dArCF02jWdgvQcQyvf03Ew0=;
+        b=It7x1aurSz7sqSBEFlTeOvv4g6OA/D+B1Oz5hIOro/lTp+uwYOCDZ4UeKJOUZ2EzEHLP+x
+        ZunuzfhzXqwVsR0SJva1SnmqNc+KTVIOUgxjhMGVT9+V9PFuihmVAu4tiwR435AcVayW+5
+        nhFYVp0J+NDYM+k2tWAE/dJa554WxMk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-35fq1nxMMOODF-vqnKjWtg-1; Fri, 05 Jun 2020 07:15:55 -0400
+X-MC-Unique: 35fq1nxMMOODF-vqnKjWtg-1
+Received: by mail-wm1-f70.google.com with SMTP id b63so3734322wme.1
+        for <kvm@vger.kernel.org>; Fri, 05 Jun 2020 04:15:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=I8a2f7F+3vcKM6ztM/s5dArCF02jWdgvQcQyvf03Ew0=;
+        b=owkX75tyv/WbVmBVYz8ToScoQY40KX3DH61bp0JiSbuzwRjZAWEgwuMtrFBqpZj274
+         MHR7FwzDaTXWIkmUSeOlWj/O5GAbpTqnSjBJQa1UOmXnEIbh4ZjD/skF5Z1grDaZNcFa
+         54U7CuyhCqJIgurD9B+OAWXSm6mukWoiZchXh8ZDzMSKvODVVPkLudhWeqwKq6l0mrGy
+         Kjo/+z2pXba7s+xoZbv9l72NxPtQ4rn93SQoga2zpY5+ggNx+juDMIxKHrI9TpG6qlTS
+         3+XYQqC1/jTCjJOSua9V27oFzGTPFJmUSgOYHH5asXjn/OfV2EyyCdXuI8gD0VM0osAh
+         y7Zw==
+X-Gm-Message-State: AOAM533WHCqd0JxoBabpumFql1S+dghRyLfd4f1YpaAgr+Mq+7ZrzeV8
+        Y1msQ7KLXfX+J4aFi/NH+n7ESMhX3Q4wPe+y9/XBHdJU2xCF0mhvI0sW1okjw9/6DPl1gO+EYBw
+        gbkX9XdZhSUSk
+X-Received: by 2002:a7b:c951:: with SMTP id i17mr2133194wml.44.1591355754775;
+        Fri, 05 Jun 2020 04:15:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzVGG6rFBv8a0ZRPRpzrY2u/qF8bg879nEI6FUkBwSoWqVtIk43Mjl/J9pn3/3MezPpMKQYiA==
+X-Received: by 2002:a7b:c951:: with SMTP id i17mr2133161wml.44.1591355754512;
+        Fri, 05 Jun 2020 04:15:54 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.243.176])
+        by smtp.gmail.com with ESMTPSA id q1sm10556883wmc.12.2020.06.05.04.15.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jun 2020 04:15:53 -0700 (PDT)
+Subject: =?UTF-8?B?UmU6IOetlOWkjTog562U5aSNOiBbUEFUQ0hdW3Y2XSBLVk06IFg4Njog?=
+ =?UTF-8?Q?support_APERF/MPERF_registers?=
+To:     "Li,Rongqing" <lirongqing@baidu.com>,
+        Like Xu <like.xu@linux.intel.com>,
+        "like.xu@intel.com" <like.xu@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "xiaoyao.li@intel.com" <xiaoyao.li@intel.com>,
+        "wei.huang2@amd.com" <wei.huang2@amd.com>
+References: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
+ <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
+ <c21c6ffa19b6483ea57feab3f98f279c@baidu.com>
+ <3a88bd63-ff51-ad70-d92e-893660c63bca@linux.intel.com>
+ <c67d15322f9942aa92b6cf57011c0abe@baidu.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d4edabf8-b8c6-e60b-1a78-6aaa9bb7b5e1@redhat.com>
+Date:   Fri, 5 Jun 2020 13:15:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9642 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
- malwarescore=0 spamscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006050084
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9642 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
- suspectscore=0 cotscore=-2147483648 bulkscore=0 clxscore=1011
- impostorscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=999
- spamscore=0 lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006050084
+In-Reply-To: <c67d15322f9942aa92b6cf57011c0abe@baidu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "uffd_delay" variable is unsigned so it's always going to be >= 0.
+On 05/06/20 11:41, Li,Rongqing wrote:
+>>
+>> As you said, "Pass-though: it is only suitable for KVM_HINTS_REALTIME", which
+>> means, KVM needs to make sure the kvm->arch.aperfmperf_mode value could
+>> "only" be set to KVM_APERFMPERF_PT when the check
+>> kvm_para_has_hint(KVM_HINTS_REALTIME) is passed.
+>>
+> pining vcpu can ensure that guest get correct mperf/aperf, but a user
+> has the choice to not pin, at that condition, do not think it is bug, this wants to say
 
-Fixes: 0119cb365c93 ("KVM: selftests: Add configurable demand paging delay")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- tools/testing/selftests/kvm/demand_paging_test.c | 2 --
- 1 file changed, 2 deletions(-)
+Also, userspace can also pin without exposing KVM_HINTS_REALTIME.  So
+it's better not to check.
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index 360cd3ea4cd67..4eb79621434e6 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -615,8 +615,6 @@ int main(int argc, char *argv[])
- 			break;
- 		case 'd':
- 			uffd_delay = strtoul(optarg, NULL, 0);
--			TEST_ASSERT(uffd_delay >= 0,
--				    "A negative UFFD delay is not supported.");
- 			break;
- 		case 'b':
- 			vcpu_memory_bytes = parse_size(optarg);
--- 
-2.26.2
+Paolo
 
