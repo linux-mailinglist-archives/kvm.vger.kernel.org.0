@@ -2,90 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E18B1EF2CC
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 10:09:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC5691EF2EB
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 10:15:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726210AbgFEIJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 04:09:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58534 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725986AbgFEIJa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 04:09:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591344569;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QrVbv0LAvfoDVrxdU1Wp4ZS7+oUmRvbMHHEQQfIJrYQ=;
-        b=d+3Jq24POlPaVoQ7KymsVIV/Rhuxw2/ApIfFv0S0ho4BUCb90ZTkrJX5AywNBgbdiJLDOn
-        cSj42Ww1KSVYkf59rYciRCENbkigy4JGN2LSskrarJfkyYdmyhxbINgvr32HY0sNP93Zg8
-        rA86o8ykPdPq/JZGFW19yxFmuI/nVY0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-Y3FdP5IeN3W0-WqGMniAkA-1; Fri, 05 Jun 2020 04:09:27 -0400
-X-MC-Unique: Y3FdP5IeN3W0-WqGMniAkA-1
-Received: by mail-wr1-f70.google.com with SMTP id z10so3476517wrs.2
-        for <kvm@vger.kernel.org>; Fri, 05 Jun 2020 01:09:27 -0700 (PDT)
+        id S1726205AbgFEIPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 04:15:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48334 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbgFEIPH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 04:15:07 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549FBC08C5C2;
+        Fri,  5 Jun 2020 01:15:07 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id v19so7584122wmj.0;
+        Fri, 05 Jun 2020 01:15:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dHbxfqZQs+MiEas28rc25pxvuy1zRUH+/v6FqkZZCBc=;
+        b=COqoOl3bjsflXq+RMWBGHc7/i6lzipaIgcF73oaMaMPfMOaZD5aiznG88QRq+baU8q
+         3LpbySylZGmMAMNY26TNJ3ud0fEKJ6Q6cczbAcjDXi/GkKQ/HMhDyvn+hq1E5XmDbIAM
+         jW41v/3M5J6wVWh+BkVRzJ9fMEnMZGzngdC32EAFfYJjLkcbBNKAd77/ppijjQbe1Mx9
+         nBMsyuiAvCwJh40l/vIbLMSxIdQmBTMXbydgt8jpplI6Vstiju4DpJ6ObuoshjXdFUx8
+         cD4UGI6Up7YctmeximHTjBi/xMz5srPUoIPNKPaOEeGvvrQ8kKV3ogbESKkaV5587M0u
+         u//Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QrVbv0LAvfoDVrxdU1Wp4ZS7+oUmRvbMHHEQQfIJrYQ=;
-        b=Fr5ZeOCOfKnAurPPc9chIyHX3LmqHehgFeGX076QFi+f67O/7eZAZRZwncPfgto1hH
-         MCJX9LUepRoMEE8liExP2VadQVoGMUAq7OQraIDAY5dmyPU46foiyhEGQj31a7pXrCKs
-         DViCIessK1zFvT3Jmns9MwwXZ8UMviO87CrPfaRc0rsTCEy7HTRClBgdCgEPpBffWnG+
-         Wca/fsGa8QSH20U7iXC+uw983x9SwRvkdRMP8eoDpfipVDT3YvIW29bHpo9uGSMCfw8T
-         uUIz7xOaJGj0I6+2qTZDLm6pDib5pbZKYDzJ7Zmj7nyD7Fq+qfQeRFf07yUhxTfcx2+W
-         99+w==
-X-Gm-Message-State: AOAM530Vq3iDQRWTIy/DAEsl27Zpjt2Arqj+ehCVtbGrvW68Ed98uGqe
-        GDxd/3b/k2HaHSSqIm0xvqmKkf9ywZfJS8RP0R1ZuAvErqtGCDEzqVXbwMmB9vAOPzBtYHBFszi
-        vdK7Ha4jBS5Ym
-X-Received: by 2002:adf:910e:: with SMTP id j14mr3063155wrj.278.1591344566572;
-        Fri, 05 Jun 2020 01:09:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzIuVyoaDb2G7McATYKVs9RHDnOjJKTbctGFe7ylZ0JJN3Ab9BRicQxXsudMj+hwx2qABEvPw==
-X-Received: by 2002:adf:910e:: with SMTP id j14mr3063139wrj.278.1591344566346;
-        Fri, 05 Jun 2020 01:09:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0c0:5d2e:1d35:17bb? ([2001:b07:6468:f312:a0c0:5d2e:1d35:17bb])
-        by smtp.gmail.com with ESMTPSA id l18sm9796731wmj.22.2020.06.05.01.09.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jun 2020 01:09:25 -0700 (PDT)
-Subject: Re: system time goes weird in kvm guest after host suspend/resume
-To:     Miklos Szeredi <miklos@szeredi.hu>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org
-References: <87pnagf912.fsf@nanos.tec.linutronix.de>
- <87367a91rn.fsf@nanos.tec.linutronix.de>
- <CAJfpegvchB2H=NK3JU0BQS7h=kXyifgKD=JHjjT6vTYVMspY2A@mail.gmail.com>
- <1a1c32fe-d124-0e47-c9e4-695be7ea7567@redhat.com>
- <CAJfpegvwBx49j9XwJZXcSUK=V9oHES31zB2sev0xwS4wfhah-g@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4c3c4a5a-e11b-1a27-0e25-9696e407bd0a@redhat.com>
-Date:   Fri, 5 Jun 2020 10:09:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dHbxfqZQs+MiEas28rc25pxvuy1zRUH+/v6FqkZZCBc=;
+        b=g2akr+HhhOx4rJVGRreKeKqC3kDCi3wopzGysvGLpU1XlyXgqm+mVIO95dKpxXhuTq
+         e5lGWzXi+Duo792krMmdUldW7gvyv53wHkovTx0UM+lxHzSICLoSQwMFjvsCps/WFs8p
+         aWDAvkXX6PvOYZ6+chwIiIqL6cVrppFaADTt3Iut8IlyHmqrC87K48pV0Xr3jsWBcd+X
+         q5+COEANtklp9D8uc8QZQDRYwui73yBUlHmbYu1A3N5UiAqNdRBBdnprGYXqjb2INfbY
+         y/va7rd+t89AG8oMhPq0eZtF+KfwVyDtyOJsOdbMjOR0vP07DPgw+zkW1O+JdoHPvW5I
+         k1Ww==
+X-Gm-Message-State: AOAM5333sMCJgl1N7HtnEUOpbvX4yLWavqDGSBAYc46DUoSttS2s9Kuq
+        Mf6u/DuHskUoKx34bLNOeMg=
+X-Google-Smtp-Source: ABdhPJyvKvwVasAsfTCkHvqXnqypvXaZ8wntEgi4xx4agE5ATp0lvGRT4jVb+YprnDTDar52zu5unw==
+X-Received: by 2002:a7b:c7d8:: with SMTP id z24mr1442139wmk.28.1591344906024;
+        Fri, 05 Jun 2020 01:15:06 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id q11sm10991924wrv.67.2020.06.05.01.15.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jun 2020 01:15:04 -0700 (PDT)
+Date:   Fri, 5 Jun 2020 09:15:03 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+Subject: Re: [PATCH v3 01/18] nitro_enclaves: Add ioctl interface definition
+Message-ID: <20200605081503.GA59410@stefanha-x1.localdomain>
+References: <20200525221334.62966-1-andraprs@amazon.com>
+ <20200525221334.62966-2-andraprs@amazon.com>
+ <20200527084959.GA29137@stefanha-x1.localdomain>
+ <a95de3ee4b722d418fd6cf662233cb024928804e.camel@kernel.crashing.org>
+ <d639afa5-cca6-3707-4c80-40ee1bf5bcb5@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJfpegvwBx49j9XwJZXcSUK=V9oHES31zB2sev0xwS4wfhah-g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="BXVAT5kNtrzKuDFl"
+Content-Disposition: inline
+In-Reply-To: <d639afa5-cca6-3707-4c80-40ee1bf5bcb5@amazon.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/06/20 09:35, Miklos Szeredi wrote:
->> time(2) instead should actually be gettimeofday(2), which just returns
->> tk->xtime_sec.  So the problem is the nanosecond part which is off by
->> 2199*10^9 nanoseconds, and that is suspiciously close to 2^31...
-> Yep: looking at the nanosecond values as well, the difference is
-> exactly 2199023255552 which is 2^41.
 
-Umpf, I was off by 3, it's not related to 2^31.  But yeah the cause of
-the bug seems to be the botched nanosecond part, which I'm sure is not
-supposed to be much bigger than 10^9.
+--BXVAT5kNtrzKuDFl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Mon, Jun 01, 2020 at 10:20:18AM +0300, Paraschiv, Andra-Irina wrote:
+>=20
+>=20
+> On 01/06/2020 06:02, Benjamin Herrenschmidt wrote:
+> > On Wed, 2020-05-27 at 09:49 +0100, Stefan Hajnoczi wrote:
+> > > What about feature bits or a API version number field? If you add
+> > > features to the NE driver, how will userspace detect them?
+> > >=20
+> > > Even if you intend to always compile userspace against the exact kern=
+el
+> > > headers that the program will run on, it can still be useful to have =
+an
+> > > API version for informational purposes and to easily prevent user
+> > > errors (running a new userspace binary on an old kernel where the API=
+ is
+> > > different).
+> > >=20
+> > > Finally, reserved struct fields may come in handy in the future. That
+> > > way userspace and the kernel don't need to explicitly handle multiple
+> > > struct sizes.
+> > Beware, Greg might disagree :)
+> >=20
+> > That said, yes, at least a way to query the API version would be
+> > useful.
+>=20
+> I see there are several thoughts with regard to extensions possibilities.=
+ :)
+>=20
+> I added an ioctl for getting the API version, we have now a way to query
+> that info. Also, I updated the sample in this patch series to check for t=
+he
+> API version.
 
+Great. The ideas are orthogonal and not all of them need to be used
+together. As long as their is a way of extending the API cleanly in the
+future then extensions can be made without breaking userspace.
+
+Stefan
+
+--BXVAT5kNtrzKuDFl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7Z/wcACgkQnKSrs4Gr
+c8ixagf9FLJp1V9BuzC0rZMPadtO77p0R7zJ3q/JbtZtO6VkFyiP1JuRRIE9QR7v
+gGacilPQPMMrAXoiRjMojNFWUmOgYbqA51PDjzeQmUIGfgWDdBF8c6toyq3zjpFb
+KP7GKrvVmKq2ZhvayPbS4lKK8PkFj3RUiHQ8AHxEw6EBb7OtuH2dg0IsXlDG4vv4
+NMoHRm6IJ7L2P5e1CEjAyFfVK3/ATw8T7o7xYyYFrvR5AIptV2VC65fbzq5qSYjM
++cMxLYVnoqIQmZ9JR/tqEJCH7kNN5/FaCaDcQQGOiv8gWW7YQpFaQZ/YGTYnSB00
+FCdtRZy4lkV5WYyK+E51CZ5e8Y5JKg==
+=haJB
+-----END PGP SIGNATURE-----
+
+--BXVAT5kNtrzKuDFl--
