@@ -2,127 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF17F1EFC51
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 17:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE78B1EFCA6
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 17:39:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728231AbgFEPPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 11:15:47 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47798 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726742AbgFEPPr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 11:15:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591370145;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2LZ042NKXuZSk37xPV2YBjm3wEqnukBdV4tzmVILjAs=;
-        b=eISPYu0MdZPmdmFuYB30WGby2lrEjqv+Y3UCCYadMJMWJ3Fp7xOiGJEYFr4xm/OmyRMgio
-        KQMX1psTP2bVgY6l9zsYHYi3wEIam7ZLiOuRHokJTNUmwCTSgNNIqfQrbKHjVow/KyN9IY
-        +dYtuIvRhILsCZg0o0D08f9R3rQRj3s=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-Ik3o4_DiOSGBjnAbMEY3Jg-1; Fri, 05 Jun 2020 11:15:44 -0400
-X-MC-Unique: Ik3o4_DiOSGBjnAbMEY3Jg-1
-Received: by mail-wr1-f70.google.com with SMTP id e7so3910736wrp.14
-        for <kvm@vger.kernel.org>; Fri, 05 Jun 2020 08:15:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2LZ042NKXuZSk37xPV2YBjm3wEqnukBdV4tzmVILjAs=;
-        b=Kq2HiBO1o5iwb9J381T6kBO17NT0vKXsGmrI8b4kdyqhA3kdA6Dc3kq2mI6E+4F8Nf
-         tp2zVxBmaweH1mQbcgbFSiwS4MAbbyvGPs2Ve3+S+YEsP4nkb8boqt0WP66AaDtH2kXq
-         l2xWfTYO36k+W1PDzLpuqjO0yVOFsYvfkT+Xn5CSDowgi6HKxeFzUySzFRJsfl/7beVm
-         VbM1Ubv8tJW3yE7/SsgSpqC4XduluH/ZXjhvb8qTcwpm7WdAwJ9pMd9GVAZcHOs/8yQ5
-         OPuk/6uYDW+bfNf2dHLZIbWFtoL3rD2yXzmYW+Dtoh33gl4AQJvb84PTE1Cm+UwD3/+/
-         SJ0Q==
-X-Gm-Message-State: AOAM532CjkXhq9ueTpRdF6GX736pxHkstQTDDFSaOWH9BThEDUMpZ7r1
-        r+PtzAnAQupocSEw2zshh5yoqT06XzrYciJ93IVdeDBGKoGx6KEHYN0NFrJUUkj3JS3OzmIpPyL
-        fUvDQBLDtmayx
-X-Received: by 2002:adf:f5ca:: with SMTP id k10mr9823888wrp.305.1591370143008;
-        Fri, 05 Jun 2020 08:15:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyXxwZl8T7LVrTQ8PhwkZAl8jHVWXIG49L1Dn2Zy1Lxyv0P2h706pufSNF6CZ9zbfegOCGfxw==
-X-Received: by 2002:adf:f5ca:: with SMTP id k10mr9823862wrp.305.1591370142776;
-        Fri, 05 Jun 2020 08:15:42 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.243.176])
-        by smtp.gmail.com with ESMTPSA id z25sm11517310wmf.10.2020.06.05.08.15.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Jun 2020 08:15:41 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Fix "make ARCH=x86_64" build with
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marcelo Bandeira Condotta <mcondotta@redhat.com>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org
-References: <20200605142028.550068-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3a229624-c452-c86d-395d-2baa7392cb62@redhat.com>
-Date:   Fri, 5 Jun 2020 17:15:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728090AbgFEPjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 11:39:39 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:37295 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726568AbgFEPji (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 11:39:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1591371578; x=1622907578;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=bpxi5R4bZVMT/3MFEoBfMtJ94Rym4esyRQkAw8vEPzE=;
+  b=rhWN8qCv7RMgVHc/VHcpY7aFwUQzLaqZttX6qEi0w38/cSUbFC4tO7Vc
+   dEUF9h3oZGR39lQZc0IkI6tKL8ury0zvAQ4oaAK8DNbKhR2QE6TP0hTqc
+   xZby2CrjxuRu4D6YWEyp58DkeYJmSCkhwCl9pt/qZuRlKjp8RYvN/oPYd
+   Y=;
+IronPort-SDR: 5oiTao/Y/+2/exBBlvBCg+94gByxVMIU/9O22P8t8Z8AeIwNGDtJumrAR2ISQ4Z93kHTD+Jt0A
+ ePERMDp7myjg==
+X-IronPort-AV: E=Sophos;i="5.73,476,1583193600"; 
+   d="scan'208";a="34687396"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 05 Jun 2020 15:39:36 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com (Postfix) with ESMTPS id EC151A1C39;
+        Fri,  5 Jun 2020 15:39:34 +0000 (UTC)
+Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 5 Jun 2020 15:39:34 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Fri, 5 Jun 2020 15:39:24 +0000
+Subject: Re: [PATCH v3 01/18] nitro_enclaves: Add ioctl interface definition
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+CC:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        "Colm MacCarthaigh" <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        "Matt Wilson" <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200525221334.62966-1-andraprs@amazon.com>
+ <20200525221334.62966-2-andraprs@amazon.com>
+ <20200527084959.GA29137@stefanha-x1.localdomain>
+ <a95de3ee4b722d418fd6cf662233cb024928804e.camel@kernel.crashing.org>
+ <d639afa5-cca6-3707-4c80-40ee1bf5bcb5@amazon.com>
+ <20200605081503.GA59410@stefanha-x1.localdomain>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <8dbf6822-d835-8c1f-64ff-3e07a77aa8f9@amazon.com>
+Date:   Fri, 5 Jun 2020 18:39:15 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.8.1
 MIME-Version: 1.0
-In-Reply-To: <20200605142028.550068-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200605081503.GA59410@stefanha-x1.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.43.160.90]
+X-ClientProxiedBy: EX13D05UWB003.ant.amazon.com (10.43.161.26) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/06/20 16:20, Vitaly Kuznetsov wrote:
-> Marcelo reports that kvm selftests fail to build with
-> "make ARCH=x86_64":
-> 
-> gcc -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99
->  -fno-stack-protector -fno-PIE -I../../../../tools/include
->  -I../../../../tools/arch/x86_64/include  -I../../../../usr/include/
->  -Iinclude -Ilib -Iinclude/x86_64 -I.. -c lib/kvm_util.c
->  -o /var/tmp/20200604202744-bin/lib/kvm_util.o
-> 
-> In file included from lib/kvm_util.c:11:
-> include/x86_64/processor.h:14:10: fatal error: asm/msr-index.h: No such
->  file or directory
-> 
->  #include <asm/msr-index.h>
->           ^~~~~~~~~~~~~~~~~
-> compilation terminated.
-> 
-> "make ARCH=x86", however, works. The problem is that arch specific headers
-> for x86_64 live in 'tools/arch/x86/include', not in
-> 'tools/arch/x86_64/include'.
-> 
-> Fixes: 66d69e081b52 ("selftests: fix kvm relocatable native/cross builds and installs")
-> Reported-by: Marcelo Bandeira Condotta <mcondotta@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  tools/testing/selftests/kvm/Makefile | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index b4ff112e5c7e..4a166588d99f 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -83,7 +83,11 @@ LIBKVM += $(LIBKVM_$(UNAME_M))
->  INSTALL_HDR_PATH = $(top_srcdir)/usr
->  LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
->  LINUX_TOOL_INCLUDE = $(top_srcdir)/tools/include
-> +ifeq ($(ARCH),x86_64)
-> +LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/x86/include
-> +else
->  LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
-> +endif
->  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
->  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
->  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-> 
 
-Queued, thanks.
 
-Paolo
+On 05/06/2020 11:15, Stefan Hajnoczi wrote:
+> On Mon, Jun 01, 2020 at 10:20:18AM +0300, Paraschiv, Andra-Irina wrote:
+>>
+>> On 01/06/2020 06:02, Benjamin Herrenschmidt wrote:
+>>> On Wed, 2020-05-27 at 09:49 +0100, Stefan Hajnoczi wrote:
+>>>> What about feature bits or a API version number field? If you add
+>>>> features to the NE driver, how will userspace detect them?
+>>>>
+>>>> Even if you intend to always compile userspace against the exact kernel
+>>>> headers that the program will run on, it can still be useful to have an
+>>>> API version for informational purposes and to easily prevent user
+>>>> errors (running a new userspace binary on an old kernel where the API =
+is
+>>>> different).
+>>>>
+>>>> Finally, reserved struct fields may come in handy in the future. That
+>>>> way userspace and the kernel don't need to explicitly handle multiple
+>>>> struct sizes.
+>>> Beware, Greg might disagree :)
+>>>
+>>> That said, yes, at least a way to query the API version would be
+>>> useful.
+>> I see there are several thoughts with regard to extensions possibilities=
+. :)
+>>
+>> I added an ioctl for getting the API version, we have now a way to query
+>> that info. Also, I updated the sample in this patch series to check for =
+the
+>> API version.
+> Great. The ideas are orthogonal and not all of them need to be used
+> together. As long as their is a way of extending the API cleanly in the
+> future then extensions can be made without breaking userspace.
+
+Agree, as we achieve the ultimate goal of having a stable interface, =
+
+open for extensions without breaking changes.
+
+Thanks,
+Andra
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
 
