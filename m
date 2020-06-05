@@ -2,141 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 673051F00A6
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 21:58:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 535B91F00A9
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 22:01:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728126AbgFET6W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 15:58:22 -0400
-Received: from mga06.intel.com ([134.134.136.31]:28831 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727863AbgFET6V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 15:58:21 -0400
-IronPort-SDR: XXxau54WxiSGvRwQsI0k066WSZ95czY2mDyrcVvg9nVLFtrCXWDRERBny2PbqkScF5aqVhJ8vt
- Z5o4JUAuOg7g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 12:58:21 -0700
-IronPort-SDR: vr4CS/RULSt0vKsP19ZcdnKZQLwixP9OFuv9mIbr5Qsf0/OwiDyhRt+zC5uF2DkKoVzH7Jd7hS
- MRBXJ2Eff9Ew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; 
-   d="scan'208";a="472021301"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga005.fm.intel.com with ESMTP; 05 Jun 2020 12:58:20 -0700
-Date:   Fri, 5 Jun 2020 12:58:20 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH 2/3 v2] kvm-unit-tests: nVMX: Optimize test_guest_dr7()
- by factoring out the loops into a macro
-Message-ID: <20200605195820.GB11449@linux.intel.com>
-References: <1591384822-71784-1-git-send-email-krish.sadhukhan@oracle.com>
- <1591384822-71784-3-git-send-email-krish.sadhukhan@oracle.com>
+        id S1727917AbgFEUBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 16:01:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41564 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727863AbgFEUBh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 16:01:37 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 055JWmKn030702;
+        Fri, 5 Jun 2020 16:01:16 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31fsnk56h3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 16:01:16 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 055K0Jas105241;
+        Fri, 5 Jun 2020 16:01:15 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31fsnk56gj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 16:01:15 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 055K0Wc2019631;
+        Fri, 5 Jun 2020 20:01:14 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma02wdc.us.ibm.com with ESMTP id 31f5mexufr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 20:01:14 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 055K1BLB31064452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 Jun 2020 20:01:11 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CFE6DBE054;
+        Fri,  5 Jun 2020 20:01:12 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94E3DBE051;
+        Fri,  5 Jun 2020 20:01:09 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.211.135.208])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Fri,  5 Jun 2020 20:01:09 +0000 (GMT)
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au> <87tuzr5ts5.fsf@morokweng.localdomain> <20200604062124.GG228651@umbus.fritz.box> <87r1uu1opr.fsf@morokweng.localdomain> <dc56f533-f095-c0c0-0fc6-d4c5af5e51a7@redhat.com> <87pnae1k99.fsf@morokweng.localdomain> <ec71a816-b9e6-6f06-def6-73eb5164b0cc@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.3
+From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+        qemu-devel@nongnu.org, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
+        mdroth@linux.vnet.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
+Message-ID: <87sgf9i8sy.fsf@morokweng.localdomain>
+In-reply-to: <ec71a816-b9e6-6f06-def6-73eb5164b0cc@redhat.com>
+Date:   Fri, 05 Jun 2020 17:01:07 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1591384822-71784-3-git-send-email-krish.sadhukhan@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-05_06:2020-06-04,2020-06-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ cotscore=-2147483648 phishscore=0 impostorscore=0 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 bulkscore=0 clxscore=1015 suspectscore=0
+ mlxlogscore=820 adultscore=0 mlxscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006050144
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I don't think "optimize" is the word you're looking for.  Moving code into
-a macro doesn't optimize anything, the only thing it does is consolidate
-code.
 
-On Fri, Jun 05, 2020 at 07:20:21PM +0000, Krish Sadhukhan wrote:
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> ---
->  x86/vmx_tests.c | 36 ++++++++++++++++++++----------------
->  1 file changed, 20 insertions(+), 16 deletions(-)
-> 
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 4308ef3..7dd8bfb 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -7704,6 +7704,19 @@ static void vmx_host_state_area_test(void)
->  	test_load_host_perf_global_ctrl();
->  }
->  
-> +#define TEST_GUEST_VMCS_FIELD_RESERVED_BITS(start, end, inc, fld, str_name,\
-> +					    val, msg, xfail)		\
-> +{									\
-> +	u64 tmp;							\
-> +	int i;								\
-> +									\
-> +	for (i = start; i <= end; i = i + inc) {			\
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-The "i = i + inc" is weird, not to mention a functional change as the callers
-are passing in '4', i.e. this only checks every fourth bit.
+> On 05/06/20 01:30, Thiago Jung Bauermann wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>> On 04/06/20 23:54, Thiago Jung Bauermann wrote:
+>>>> QEMU could always create a PEF object, and if the command line defines
+>>>> one, it will correspond to it. And if the command line doesn't define one,
+>>>> then it would also work because the PEF object is already there.
+>>>
+>>> How would you start a non-protected VM?
+>>> Currently it's the "-machine"
+>>> property that decides that, and the argument requires an id
+>>> corresponding to "-object".
+>>
+>> If there's only one object, there's no need to specify its id.
+>
+> This answers my question.  However, the property is defined for all
+> machines (it's in the "machine" class), so if it takes the id for one
+> machine it does so for all of them.
 
-IMO this whole macro is overkill and doesn't help readability in the callers,
-there are too many parameters to cross reference.  What about adding a more
-simple helper to iterate over every bit, e.g. 
+I don't understand much about QEMU internals, so perhaps it's not
+practical to implement but from an end-user perspective I think this
+logic can apply to all architectures (since my understanding is that all
+of them use only one object): make the id optional. If it's not
+specified, then there must be only one object, and the property will
+implicitly refer to it.
 
-	for_each_bit(0, 63, val) {
-		vmcs_write(GUEST_DR7, val);
-		test_guest_state("ENT_LOAD_DBGCTLS disabled", false,
-				 val, "GUEST_DR7");
-	}
+Then, if an architecture doesn't need to specify parameters at object
+creation time, it can be implicitly created and the user doesn't have to
+worry about this detail.
 
-and
-
-        for_each_bit(0, 63, val) {
-                vmcs_write(GUEST_DR7, val);
-                test_guest_state("ENT_LOAD_DBGCTLS enabled", val >> 32,
-                                 val, "GUEST_DR7");
-        }
-
-
-I'm guessing the for_each_bit() thing can be reused in other flows besides
-guest state checks.
-
-> +		tmp = val | (1ull << i);				\
-> +		vmcs_write(fld, tmp);					\
-> +		test_guest_state(msg, xfail, val, str_name);		\
-> +	}								\
-> +}
-> +
->  /*
->   * If the "load debug controls" VM-entry control is 1, bits 63:32 in
->   * the DR7 field must be 0.
-> @@ -7714,26 +7727,17 @@ static void test_guest_dr7(void)
->  {
->  	u32 ent_saved = vmcs_read(ENT_CONTROLS);
->  	u64 dr7_saved = vmcs_read(GUEST_DR7);
-> -	u64 val;
-> -	int i;
->  
->  	if (ctrl_enter_rev.set & ENT_LOAD_DBGCTLS) {
-> -		vmcs_clear_bits(ENT_CONTROLS, ENT_LOAD_DBGCTLS);
-> -		for (i = 0; i < 64; i++) {
-> -			val = 1ull << i;
-> -			vmcs_write(GUEST_DR7, val);
-> -			test_guest_state("ENT_LOAD_DBGCTLS disabled", false,
-> -					 val, "GUEST_DR7");
-> -		}
-> +		vmcs_write(ENT_CONTROLS, ent_saved & ~ENT_LOAD_DBGCTLS);
-> +		TEST_GUEST_VMCS_FIELD_RESERVED_BITS(0, 63, 4, GUEST_DR7,
-> +		    "GUEST_DR7", dr7_saved, "ENT_LOAD_DBGCTLS disabled", false);
->  	}
->  	if (ctrl_enter_rev.clr & ENT_LOAD_DBGCTLS) {
-> -		vmcs_set_bits(ENT_CONTROLS, ENT_LOAD_DBGCTLS);
-> -		for (i = 0; i < 64; i++) {
-> -			val = 1ull << i;
-> -			vmcs_write(GUEST_DR7, val);
-> -			test_guest_state("ENT_LOAD_DBGCTLS enabled", i >= 32,
-> -					 val, "GUEST_DR7");
-> -		}
-> +		vmcs_write(ENT_CONTROLS, ent_saved | ENT_LOAD_DBGCTLS);
-> +		TEST_GUEST_VMCS_FIELD_RESERVED_BITS(0, 63, 4, GUEST_DR7,
-> +		    "GUEST_DR7", dr7_saved, "ENT_LOAD_DBGCTLS enabled",
-> +		    i >= 32);
->  	}
->  	vmcs_write(GUEST_DR7, dr7_saved);
->  	vmcs_write(ENT_CONTROLS, ent_saved);
-> -- 
-> 1.8.3.1
-> 
+--
+Thiago Jung Bauermann
+IBM Linux Technology Center
