@@ -2,115 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D98C1EEF85
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 04:32:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BAB11EF00D
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 05:40:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726068AbgFECc3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jun 2020 22:32:29 -0400
-Received: from mga03.intel.com ([134.134.136.65]:49832 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725883AbgFECc2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jun 2020 22:32:28 -0400
-IronPort-SDR: Zz5tm6WpH3scY/quHL0PfDsaB+xCA05FidCGxV6F9KXU9PxUPL7OkKb1pwLX6/+3xqk5igBhQw
- sODVQzNf6tUg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2020 19:32:21 -0700
-IronPort-SDR: WobUmolIS7EeRo2skFMP8m8/Y/sJgss61yNsN0YN3mOJiaqoP7yByWQlnWM56W0XUNdVW4ZBB6
- 58yNl/qI4A3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,474,1583222400"; 
-   d="scan'208";a="294542056"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.141]) ([10.238.4.141])
-  by fmsmga004.fm.intel.com with ESMTP; 04 Jun 2020 19:32:18 -0700
-Reply-To: like.xu@intel.com
-Subject: Re: [PATCH][v6] KVM: X86: support APERF/MPERF registers
-To:     Li RongQing <lirongqing@baidu.com>
-References: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        hpa@zytor.com, bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
-        jmattson@google.com, wanpengli@tencent.com, vkuznets@redhat.com,
-        sean.j.christopherson@intel.com, pbonzini@redhat.com,
-        xiaoyao.li@intel.com, wei.huang2@amd.com
-From:   "Xu, Like" <like.xu@intel.com>
-Organization: Intel OTC
-Message-ID: <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
-Date:   Fri, 5 Jun 2020 10:32:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S1726324AbgFEDk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jun 2020 23:40:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25677 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726311AbgFEDk2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Jun 2020 23:40:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591328426;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=W+XRm7Fs7zNlH2EKv4SYh8NMSzGAObCRW7/zCrf8kTM=;
+        b=bMinaiappCB0rQc0Seywa3/cVkuzqVzgZOHZhSWQYCSkZ81iRslS8kNSRBSGKgQPcCx3Eu
+        gHHK9CiCuq2raB5URMZCpac6lqycim7AIT742YFDBVZhE+poHPc5vekg0QfB/DIc6sNCgl
+        vs8r/qfW+iKVf6IEabXSwJEbgFg5uds=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-WjnfLQgyPAadytx9KbfT2Q-1; Thu, 04 Jun 2020 23:40:24 -0400
+X-MC-Unique: WjnfLQgyPAadytx9KbfT2Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD756100960F;
+        Fri,  5 Jun 2020 03:40:23 +0000 (UTC)
+Received: from [10.72.12.233] (ovpn-12-233.pek2.redhat.com [10.72.12.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D3AE45C290;
+        Fri,  5 Jun 2020 03:40:18 +0000 (UTC)
+Subject: Re: [PATCH RFC 03/13] vhost: batching fetches
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+References: <20200602130543.578420-1-mst@redhat.com>
+ <20200602130543.578420-4-mst@redhat.com>
+ <3323daa2-19ed-02de-0ff7-ab150f949fff@redhat.com>
+ <20200604045830-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <6c2e6cc7-27c5-445b-f252-0356ff8a83f3@redhat.com>
+Date:   Fri, 5 Jun 2020 11:40:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
+In-Reply-To: <20200604045830-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi RongQing,
 
-On 2020/6/5 9:44, Li RongQing wrote:
-> Guest kernel reports a fixed cpu frequency in /proc/cpuinfo,
-> this is confused to user when turbo is enable, and aperf/mperf
-> can be used to show current cpu frequency after 7d5905dc14a
-> "(x86 / CPU: Always show current CPU frequency in /proc/cpuinfo)"
-> so guest should support aperf/mperf capability
->
-> This patch implements aperf/mperf by three mode: none, software
-> emulation, and pass-through
->
-> None: default mode, guest does not support aperf/mperf
-s/None/Note
->
-> Software emulation: the period of aperf/mperf in guest mode are
-> accumulated as emulated value
->
-> Pass-though: it is only suitable for KVM_HINTS_REALTIME, Because
-> that hint guarantees we have a 1:1 vCPU:CPU binding and guaranteed
-> no over-commit.
-The flag "KVM_HINTS_REALTIME 0" (in the Documentation/virt/kvm/cpuid.rst)
-is claimed as "guest checks this feature bit to determine that vCPUs are never
-preempted for an unlimited time allowing optimizations".
+On 2020/6/4 下午4:59, Michael S. Tsirkin wrote:
+> On Wed, Jun 03, 2020 at 03:27:39PM +0800, Jason Wang wrote:
+>> On 2020/6/2 下午9:06, Michael S. Tsirkin wrote:
+>>> With this patch applied, new and old code perform identically.
+>>>
+>>> Lots of extra optimizations are now possible, e.g.
+>>> we can fetch multiple heads with copy_from/to_user now.
+>>> We can get rid of maintaining the log array.  Etc etc.
+>>>
+>>> Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
+>>> Signed-off-by: Eugenio Pérez<eperezma@redhat.com>
+>>> Link:https://lore.kernel.org/r/20200401183118.8334-4-eperezma@redhat.com
+>>> Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
+>>> ---
+>>>    drivers/vhost/test.c  |  2 +-
+>>>    drivers/vhost/vhost.c | 47 ++++++++++++++++++++++++++++++++++++++-----
+>>>    drivers/vhost/vhost.h |  5 ++++-
+>>>    3 files changed, 47 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+>>> index 9a3a09005e03..02806d6f84ef 100644
+>>> --- a/drivers/vhost/test.c
+>>> +++ b/drivers/vhost/test.c
+>>> @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+>>>    	dev = &n->dev;
+>>>    	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+>>>    	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+>>> -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
+>>> +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
+>>>    		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
+>>>    	f->private_data = n;
+>>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>>> index 8f9a07282625..aca2a5b0d078 100644
+>>> --- a/drivers/vhost/vhost.c
+>>> +++ b/drivers/vhost/vhost.c
+>>> @@ -299,6 +299,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>>>    {
+>>>    	vq->num = 1;
+>>>    	vq->ndescs = 0;
+>>> +	vq->first_desc = 0;
+>>>    	vq->desc = NULL;
+>>>    	vq->avail = NULL;
+>>>    	vq->used = NULL;
+>>> @@ -367,6 +368,11 @@ static int vhost_worker(void *data)
+>>>    	return 0;
+>>>    }
+>>> +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
+>>> +{
+>>> +	return vq->max_descs - UIO_MAXIOV;
+>>> +}
+>> 1 descriptor does not mean 1 iov, e.g userspace may pass several 1 byte
+>> length memory regions for us to translate.
+>>
+> Yes but I don't see the relevance. This tells us how many descriptors to
+> batch, not how many IOVs.
 
-I couldn't see its relationship with "1:1 vCPU: pCPU binding".
-The patch doesn't check this flag as well for your pass-through purpose.
 
-Thanks,
-Like Xu
+Yes, but questions are:
+
+- this introduce another obstacle to support more than 1K queue size
+- if we support 1K queue size, does it mean we need to cache 1K 
+descriptors, which seems a large stress on the cache
+
+Thanks
+
+
 >
-> And a per-VM capability is added to configure aperfmperf mode
->
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> Signed-off-by: Chai Wen <chaiwen@baidu.com>
-> Signed-off-by: Jia Lina <jialina01@baidu.com>
-> ---
-> diff v5:
-> return error if guest is configured with mperf/aperf, but host cpu has not
->
-> diff v4:
-> fix maybe-uninitialized warning
->
-> diff v3:
-> fix interception of MSR_IA32_MPERF/APERF in svm
->
-> diff v2:
-> support aperfmperf pass though
-> move common codes to kvm_get_msr_common
->
-> diff v1:
-> 1. support AMD, but not test
-> 2. support per-vm capability to enable
->
->
->   Documentation/virt/kvm/api.rst  | 10 ++++++++++
->   arch/x86/include/asm/kvm_host.h | 11 +++++++++++
->   arch/x86/kvm/cpuid.c            | 15 ++++++++++++++-
->   arch/x86/kvm/svm/svm.c          |  8 ++++++++
->   arch/x86/kvm/vmx/vmx.c          |  6 ++++++
->   arch/x86/kvm/x86.c              | 42 +++++++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/x86.h              | 15 +++++++++++++++
->   include/uapi/linux/kvm.h        |  1 +
->   8 files changed, 107 insertions(+), 1 deletion(-)
 
