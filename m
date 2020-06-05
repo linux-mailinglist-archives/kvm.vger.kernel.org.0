@@ -2,187 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EB981EF454
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 11:36:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DDD51EF4C8
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 11:57:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726248AbgFEJgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 05:36:41 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20485 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726173AbgFEJgk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 05:36:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591349798;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=I0JPXvvyjHwlHo/P8tXwkt6RpqVHbKYFh4dsIvGoaAw=;
-        b=YWLmtTIsT0gWQP4HKPD2gC7MxQOIM1rzSGgrtKLSZWeobDdWM4FIy1Ay+RB2g6OJwHUjR3
-        SsJ0zZGeipuVIrmVwxUUDEhT/6IPPWlDAP5LTXB+fzKYQTimEeOI6wEN/b4z+GS6YMS3qZ
-        YCeJD3Ir5T/D6Na6kNTevx01JcghkVg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-iOftGIqLMJq5BEuk-iTKYw-1; Fri, 05 Jun 2020 05:36:34 -0400
-X-MC-Unique: iOftGIqLMJq5BEuk-iTKYw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5BAD800685;
-        Fri,  5 Jun 2020 09:36:30 +0000 (UTC)
-Received: from [10.36.114.72] (ovpn-114-72.ams2.redhat.com [10.36.114.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7187F5C541;
-        Fri,  5 Jun 2020 09:36:10 +0000 (UTC)
-Subject: Re: [PATCH RFC v4 00/13] virtio-mem: paravirtualized memory
-From:   David Hildenbrand <david@redhat.com>
-To:     Alex Shi <alex.shi@linux.alibaba.com>, linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        Samuel Ortiz <samuel.ortiz@intel.com>,
-        Robert Bradford <robert.bradford@intel.com>,
-        Luiz Capitulino <lcapitulino@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Potapenko <glider@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Young <dyoung@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Len Brown <lenb@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Pingfan Liu <kernelfans@gmail.com>, Qian Cai <cai@lca.pw>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Wei Yang <richard.weiyang@gmail.com>
-References: <20191212171137.13872-1-david@redhat.com>
- <9acc5d04-c8e9-ef53-85e4-709030997ca6@redhat.com>
- <1cfa9edb-47ea-1495-4e28-4cf391eab44c@linux.alibaba.com>
- <d6cd1870-1012-cb3d-7d29-8e5ad2703717@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <6b4724bf-84b5-9880-5464-1908425d106d@redhat.com>
-Date:   Fri, 5 Jun 2020 11:36:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726328AbgFEJ56 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 05:57:58 -0400
+Received: from mx20.baidu.com ([111.202.115.85]:41868 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725280AbgFEJ55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 05:57:57 -0400
+X-Greylist: delayed 958 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Jun 2020 05:57:55 EDT
+Received: from BJHW-Mail-Ex14.internal.baidu.com (unknown [10.127.64.37])
+        by Forcepoint Email with ESMTPS id 60E49480401D3B0008F9;
+        Fri,  5 Jun 2020 17:41:53 +0800 (CST)
+Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
+ BJHW-Mail-Ex14.internal.baidu.com (10.127.64.37) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Fri, 5 Jun 2020 17:41:52 +0800
+Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
+ BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
+ 15.01.1713.004; Fri, 5 Jun 2020 17:41:52 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Like Xu <like.xu@linux.intel.com>,
+        "like.xu@intel.com" <like.xu@intel.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "xiaoyao.li@intel.com" <xiaoyao.li@intel.com>,
+        "wei.huang2@amd.com" <wei.huang2@amd.com>
+Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFtQQVRDSF1bdjZdIEtWTTogWDg2OiBzdXBwb3J0?=
+ =?utf-8?Q?_APERF/MPERF_registers?=
+Thread-Topic: =?utf-8?B?562U5aSNOiBbUEFUQ0hdW3Y2XSBLVk06IFg4Njogc3VwcG9ydCBBUEVSRi9N?=
+ =?utf-8?Q?PERF_registers?=
+Thread-Index: AQHWOtrZ4X/t3pkmBEG7o3WCZUgoeKjIxz2AgAChEWD//5ArAIAAyszA
+Date:   Fri, 5 Jun 2020 09:41:52 +0000
+Message-ID: <c67d15322f9942aa92b6cf57011c0abe@baidu.com>
+References: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
+ <be39b88c-bfb7-0634-c53b-f00d8fde643c@intel.com>
+ <c21c6ffa19b6483ea57feab3f98f279c@baidu.com>
+ <3a88bd63-ff51-ad70-d92e-893660c63bca@linux.intel.com>
+In-Reply-To: <3a88bd63-ff51-ad70-d92e-893660c63bca@linux.intel.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.198.27]
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex14_2020-06-05 17:41:53:011
+x-baidu-bdmsfe-viruscheck: BJHW-Mail-Ex14_GRAY_Inside_WithoutAtta_2020-06-05
+ 17:41:52:917
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <d6cd1870-1012-cb3d-7d29-8e5ad2703717@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.06.20 11:08, David Hildenbrand wrote:
-> On 05.06.20 10:55, Alex Shi wrote:
->>
->>
->> 在 2020/1/9 下午9:48, David Hildenbrand 写道:
->>> Ping,
->>>
->>> I'd love to get some feedback on
->>>
->>> a) The remaining MM bits from MM folks (especially, patch #6 and #8).
->>> b) The general virtio infrastructure (esp. uapi in patch #2) from virtio
->>> folks.
->>>
->>> I'm planning to send a proper v1 (!RFC) once I have all necessary MM
->>> acks. In the meanwhile, I will do more testing and minor reworks (e.g.,
->>> fix !CONFIG_NUMA compilation).
->>
->>
->> Hi David,
->>
->> Thanks for your work!
->>
->> I am trying your https://github.com/davidhildenbrand/linux.git virtio-mem-v5
->> which works fine for me, but just a 'DMA error' happens when a vm start with
->> less than 2GB memory, Do I missed sth?
-> 
-> Please use the virtio-mem-v4 branch for now, v5 is still under
-> construction (and might be scrapped completely if v4 goes upstream as is).
-> 
-> Looks like a DMA issue. Your're hotplugging 1GB, which should not really
-> eat too much memory. There was a similar issue reported by Hui in [1],
-> which boiled down to wrong usage of the swiotlb parameter.
-> 
-> In such cases you should always try to reproduce with hotplug of a
-> sam-sized DIMM. E.g., hotplugging a 1GB DIMM should result in the same
-> issue.
-> 
-> What does your .config specify for CONFIG_MEMORY_HOTPLUG_DEFAULT_ONLINE?
-> 
-> I'll try to reproduce with v4 briefly.
-
-I guess I know what's happening here. In case we only have DMA memory
-when booting, we don't reserve swiotlb buffers. Once we hotplug memory
-and online ZONE_NORMAL, we don't have any swiotlb DMA bounce buffers to
-map such PFNs (total 0 (slots), used 0 (slots)).
-
-Can you try with "swiotlb=force" on the kernel cmdline?
-
--- 
-Thanks,
-
-David / dhildenb
-
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IExpa2UgWHUgW21haWx0
+bzpsaWtlLnh1QGxpbnV4LmludGVsLmNvbV0NCj4g5Y+R6YCB5pe26Ze0OiAyMDIw5bm0NuaciDXm
+l6UgMTM6MjkNCj4g5pS25Lu25Lq6OiBMaSxSb25ncWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+
+OyBsaWtlLnh1QGludGVsLmNvbQ0KPiDmioTpgIE6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5v
+cmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IHg4NkBrZXJuZWwub3JnOw0KPiBocGFAenl0b3IuY29t
+OyBicEBhbGllbjguZGU7IG1pbmdvQHJlZGhhdC5jb207IHRnbHhAbGludXRyb25peC5kZTsNCj4g
+am1hdHRzb25AZ29vZ2xlLmNvbTsgd2FucGVuZ2xpQHRlbmNlbnQuY29tOyB2a3V6bmV0c0ByZWRo
+YXQuY29tOw0KPiBzZWFuLmouY2hyaXN0b3BoZXJzb25AaW50ZWwuY29tOyBwYm9uemluaUByZWRo
+YXQuY29tOyB4aWFveWFvLmxpQGludGVsLmNvbTsNCj4gd2VpLmh1YW5nMkBhbWQuY29tDQo+IOS4
+u+mimDogUmU6IOetlOWkjTogW1BBVENIXVt2Nl0gS1ZNOiBYODY6IHN1cHBvcnQgQVBFUkYvTVBF
+UkYgcmVnaXN0ZXJzDQo+IA0KPiBPbiAyMDIwLzYvNSAxMjoyMywgTGksUm9uZ3Fpbmcgd3JvdGU6
+DQo+ID4NCj4gPg0KPiA+PiAtLS0tLemCruS7tuWOn+S7ti0tLS0tDQo+ID4+IOWPkeS7tuS6ujog
+WHUsIExpa2UgW21haWx0bzpsaWtlLnh1QGludGVsLmNvbV0NCj4gPj4g5Y+R6YCB5pe26Ze0OiAy
+MDIw5bm0NuaciDXml6UgMTA6MzINCj4gPj4g5pS25Lu25Lq6OiBMaSxSb25ncWluZyA8bGlyb25n
+cWluZ0BiYWlkdS5jb20+DQo+ID4+IOaKhOmAgTogbGludXgta2VybmVsQHZnZXIua2VybmVsLm9y
+Zzsga3ZtQHZnZXIua2VybmVsLm9yZzsNCj4gPj4geDg2QGtlcm5lbC5vcmc7IGhwYUB6eXRvci5j
+b207IGJwQGFsaWVuOC5kZTsgbWluZ29AcmVkaGF0LmNvbTsNCj4gPj4gdGdseEBsaW51dHJvbml4
+LmRlOyBqbWF0dHNvbkBnb29nbGUuY29tOyB3YW5wZW5nbGlAdGVuY2VudC5jb207DQo+ID4+IHZr
+dXpuZXRzQHJlZGhhdC5jb207IHNlYW4uai5jaHJpc3RvcGhlcnNvbkBpbnRlbC5jb207DQo+ID4+
+IHBib256aW5pQHJlZGhhdC5jb207IHhpYW95YW8ubGlAaW50ZWwuY29tOyB3ZWkuaHVhbmcyQGFt
+ZC5jb20NCj4gPj4g5Li76aKYOiBSZTogW1BBVENIXVt2Nl0gS1ZNOiBYODY6IHN1cHBvcnQgQVBF
+UkYvTVBFUkYgcmVnaXN0ZXJzDQo+ID4+DQo+ID4+IEhpIFJvbmdRaW5nLA0KPiA+Pg0KPiA+PiBP
+biAyMDIwLzYvNSA5OjQ0LCBMaSBSb25nUWluZyB3cm90ZToNCj4gPj4+IEd1ZXN0IGtlcm5lbCBy
+ZXBvcnRzIGEgZml4ZWQgY3B1IGZyZXF1ZW5jeSBpbiAvcHJvYy9jcHVpbmZvLCB0aGlzIGlzDQo+
+ID4+PiBjb25mdXNlZCB0byB1c2VyIHdoZW4gdHVyYm8gaXMgZW5hYmxlLCBhbmQgYXBlcmYvbXBl
+cmYgY2FuIGJlIHVzZWQNCj4gPj4+IHRvIHNob3cgY3VycmVudCBjcHUgZnJlcXVlbmN5IGFmdGVy
+IDdkNTkwNWRjMTRhDQo+ID4+PiAiKHg4NiAvIENQVTogQWx3YXlzIHNob3cgY3VycmVudCBDUFUg
+ZnJlcXVlbmN5IGluIC9wcm9jL2NwdWluZm8pIg0KPiA+Pj4gc28gZ3Vlc3Qgc2hvdWxkIHN1cHBv
+cnQgYXBlcmYvbXBlcmYgY2FwYWJpbGl0eQ0KPiA+Pj4NCj4gPj4+IFRoaXMgcGF0Y2ggaW1wbGVt
+ZW50cyBhcGVyZi9tcGVyZiBieSB0aHJlZSBtb2RlOiBub25lLCBzb2Z0d2FyZQ0KPiA+Pj4gZW11
+bGF0aW9uLCBhbmQgcGFzcy10aHJvdWdoDQo+ID4+Pg0KPiA+Pj4gTm9uZTogZGVmYXVsdCBtb2Rl
+LCBndWVzdCBkb2VzIG5vdCBzdXBwb3J0IGFwZXJmL21wZXJmDQo+ID4+IHMvTm9uZS9Ob3RlDQo+
+ID4+Pg0KPiA+Pj4gU29mdHdhcmUgZW11bGF0aW9uOiB0aGUgcGVyaW9kIG9mIGFwZXJmL21wZXJm
+IGluIGd1ZXN0IG1vZGUgYXJlDQo+ID4+PiBhY2N1bXVsYXRlZCBhcyBlbXVsYXRlZCB2YWx1ZQ0K
+PiA+Pj4NCj4gPj4+IFBhc3MtdGhvdWdoOiBpdCBpcyBvbmx5IHN1aXRhYmxlIGZvciBLVk1fSElO
+VFNfUkVBTFRJTUUsIEJlY2F1c2UNCj4gPj4+IHRoYXQgaGludCBndWFyYW50ZWVzIHdlIGhhdmUg
+YSAxOjEgdkNQVTpDUFUgYmluZGluZyBhbmQgZ3VhcmFudGVlZA0KPiA+Pj4gbm8gb3Zlci1jb21t
+aXQuDQo+ID4+IFRoZSBmbGFnICJLVk1fSElOVFNfUkVBTFRJTUUgMCIgKGluIHRoZQ0KPiA+PiBE
+b2N1bWVudGF0aW9uL3ZpcnQva3ZtL2NwdWlkLnJzdCkgaXMgY2xhaW1lZCBhcyAiZ3Vlc3QgY2hl
+Y2tzIHRoaXMNCj4gPj4gZmVhdHVyZSBiaXQgdG8gZGV0ZXJtaW5lIHRoYXQgdkNQVXMgYXJlIG5l
+dmVyIHByZWVtcHRlZCBmb3IgYW4gdW5saW1pdGVkDQo+IHRpbWUgYWxsb3dpbmcgb3B0aW1pemF0
+aW9ucyIuDQo+ID4+DQo+ID4+IEkgY291bGRuJ3Qgc2VlIGl0cyByZWxhdGlvbnNoaXAgd2l0aCAi
+MToxIHZDUFU6IHBDUFUgYmluZGluZyIuDQo+ID4+IFRoZSBwYXRjaCBkb2Vzbid0IGNoZWNrIHRo
+aXMgZmxhZyBhcyB3ZWxsIGZvciB5b3VyIHBhc3MtdGhyb3VnaCBwdXJwb3NlLg0KPiA+Pg0KPiA+
+PiBUaGFua3MsDQo+ID4+IExpa2UgWHUNCj4gPg0KPiA+DQo+ID4gSSB0aGluayB0aGlzIGlzIHVz
+ZXIgc3BhY2Ugam9icyB0byBiaW5kIEhJTlRfUkVBTFRJTUUgYW5kIG1wZXJmIHBhc3N0aHJvdWdo
+LA0KPiBLVk0ganVzdCBkbyB3aGF0IHVzZXJzcGFjZSB3YW50cy4NCj4gPg0KPiANCj4gVGhhdCdz
+IGZpbmUgZm9yIHVzZXIgc3BhY2UgdG8gYmluZCBISU5UX1JFQUxUSU1FIGFuZCBtcGVyZiBwYXNz
+dGhyb3VnaO+8jA0KPiBCdXQgSSB3YXMgYXNraW5nIHdoeSBISU5UX1JFQUxUSU1FIG1lYW5zICIx
+OjEgdkNQVTogcENQVSBiaW5kaW5nIi4NCj4gDQo+IEFzIHlvdSBzYWlkLCAiUGFzcy10aG91Z2g6
+IGl0IGlzIG9ubHkgc3VpdGFibGUgZm9yIEtWTV9ISU5UU19SRUFMVElNRSIsIHdoaWNoDQo+IG1l
+YW5zLCBLVk0gbmVlZHMgdG8gbWFrZSBzdXJlIHRoZSBrdm0tPmFyY2guYXBlcmZtcGVyZl9tb2Rl
+IHZhbHVlIGNvdWxkDQo+ICJvbmx5IiBiZSBzZXQgdG8gS1ZNX0FQRVJGTVBFUkZfUFQgd2hlbiB0
+aGUgY2hlY2sNCj4ga3ZtX3BhcmFfaGFzX2hpbnQoS1ZNX0hJTlRTX1JFQUxUSU1FKSBpcyBwYXNz
+ZWQuDQo+IA0KDQpwaW5pbmcgdmNwdSBjYW4gZW5zdXJlIHRoYXQgZ3Vlc3QgZ2V0IGNvcnJlY3Qg
+bXBlcmYvYXBlcmYsIGJ1dCBhIHVzZXINCmhhcyB0aGUgY2hvaWNlIHRvIG5vdCBwaW4sIGF0IHRo
+YXQgY29uZGl0aW9uLCBkbyBub3QgdGhpbmsgaXQgaXMgYnVnLCB0aGlzIHdhbnRzIHRvIHNheQ0K
+DQo+IFNwZWNpZmljYWxseSwgdGhlIEtWTV9ISU5UU19SRUFMVElNRSBpcyBhIHBlci1rdm0gY2Fw
+YWJpbGl0eSB3aGlsZSB0aGUNCj4ga3ZtX2FwZXJmbXBlcmZfbW9kZSBpcyBhIHBlci12bSBjYXBh
+YmlsaXR5LiBJdCdzIHVucmVzb2x2ZWQuDQo+IA0KDQpEbyB5b3UgaGF2ZSBhbnkgc29sdXRpb24/
+DQoNCi1Sb25ncWluZw0KDQo+IEtWTSBkb2Vzbid0IGFsd2F5cyBkbyB3aGF0IHVzZXJzcGFjZSB3
+YW50cyBlc3BlY2lhbGx5IHlvdSdyZSB0cnlpbmcgdG8NCj4gZXhwb3NlIHNvbWUgZmVhdHVyZXMg
+YWJvdXQgcG93ZXIgYW5kIHRoZXJtYWwgbWFuYWdlbWVudCBpbiB0aGUNCj4gdmlydHVhbGl6YXRp
+b24gY29udGV4dC4NCj4gDQo+ID4gYW5kIHRoaXMgZ2l2ZXMgdXNlciBzcGFjZSBhIHBvc3NpYmls
+aXR5LCBndWVzdCBoYXMgcGFzc3Rocm91Z2gNCj4gPiBtcGVyZmFwZXJmIHdpdGhvdXQgSElOVF9S
+RUFMVElNRSwgZ3Vlc3QgY2FuIGdldCBjb2Fyc2UgY3B1IGZyZXF1ZW5jeQ0KPiA+IHdpdGhvdXQg
+cGVyZm9ybWFuY2UgZWZmZWN0IGlmIGd1ZXN0IGNhbiBlbmR1cmUgZXJyb3IgZnJlcXVlbmN5DQo+
+ID4gb2NjYXNpb25hbGx5DQo+ID4NCj4gDQo+IA0KPiA+DQo+ID4gLUxpDQo+ID4NCg0K
