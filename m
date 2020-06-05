@@ -2,118 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE2401EF849
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 14:48:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C86941EF8FB
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 15:26:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726894AbgFEMsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 08:48:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50515 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726552AbgFEMsX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 08:48:23 -0400
+        id S1727013AbgFEN0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 09:26:48 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50295 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726711AbgFEN0r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 09:26:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591361301;
+        s=mimecast20190719; t=1591363606;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eO1D3JEFx3gMyiYe03xD1d+mWzCgrlVM6JLDMuUPpwI=;
-        b=HoHfI3/tB7+HeilpL1Jd+0KsMn5HCNh2ckp81PWMODwkEngcXQh5iuAmKiLQBfhhjZpVAE
-        3hHfCYLfMbVeOMIlEvohEOKD8nolBvu2uQfYFZU+gXCRzo66IqIvKbIpDI8fL9WIvD5A9D
-        AkuDjvQGANB4DjxzobJOhYCDzHjGjXg=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-yhxzd053PNWFy3AoTY_cjQ-1; Fri, 05 Jun 2020 08:48:20 -0400
-X-MC-Unique: yhxzd053PNWFy3AoTY_cjQ-1
-Received: by mail-qt1-f200.google.com with SMTP id p31so8368046qte.1
-        for <kvm@vger.kernel.org>; Fri, 05 Jun 2020 05:48:19 -0700 (PDT)
+        bh=Ma5m4eBugzAUFyTBU0r9XwTfnQoHVYy4LZfMChs09d4=;
+        b=EVuFUKg4mj7QDz6MtfCLaisIrhgXCf8iWMZoPjx9Taxz77zxOd1FUJCXpZ3CTnynXv8P1d
+        cYC4o3Z2kVbc/uWZAT8YyRDM9JvVb16iLsEOYfshUZQvdjeM7XrQhB+pFbaEtSNcV5dctQ
+        ARmwLHmk5CHukCAwx7IHsg6sYBl3cns=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-169-Qvt3TloDMV6YiWkDtJV1NA-1; Fri, 05 Jun 2020 09:26:43 -0400
+X-MC-Unique: Qvt3TloDMV6YiWkDtJV1NA-1
+Received: by mail-wr1-f70.google.com with SMTP id o1so3750531wrm.17
+        for <kvm@vger.kernel.org>; Fri, 05 Jun 2020 06:26:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eO1D3JEFx3gMyiYe03xD1d+mWzCgrlVM6JLDMuUPpwI=;
-        b=T3bbA3Sf1piXSijy/bV0W/LnGzICvvD0q71U3I4g5jBIrtIU54Em2SGZ3nZsq9rEOO
-         jObIftykEdGx+uzHrz23vZ7+sgCRRZF0ax+hNI+LvwAsv2UaVC9Q47C5ETkMi3Lgp6Gd
-         5h+7k32XqKgC0W89AqCacBUF3LuGWL12i9/7zHWE9otSck3i6geckC9hqseJXt7G7BQq
-         XWQS938boFh2ka5gwbdLn3Ajwl+LgFlEtke6rNiQZLZPBBlxem43RHfImlQqGbDdjCWe
-         hsN2nWSXtCn2ZTEedKEl2mJW8DilAiw60wiZK4wBhazg8j0KWqhtdvzvdBTSEaSkfnEz
-         h8DQ==
-X-Gm-Message-State: AOAM533dnfTkFG2KmMlMUvFqIwuQELpjiHqySLLin6ZqDT1lK7g+izwJ
-        kManx8IMiPHVYsemlC5Y0KcH8eX+p9nLiUUYdR1zGtwAuTD26rGNEaaNxhJtTIz+FUHc6LupRYj
-        EKqIQsBWR4dav
-X-Received: by 2002:aed:21af:: with SMTP id l44mr10019746qtc.124.1591361299525;
-        Fri, 05 Jun 2020 05:48:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKVSPnObIIx/lF3VrXTnCi0p2UjVU2aEXiipGyR5R5g+TcrRTsbvtNz/PEa3g8UQfd15ZLLQ==
-X-Received: by 2002:aed:21af:: with SMTP id l44mr10019726qtc.124.1591361299260;
-        Fri, 05 Jun 2020 05:48:19 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id j5sm7534542qtr.73.2020.06.05.05.48.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2020 05:48:18 -0700 (PDT)
-Date:   Fri, 5 Jun 2020 08:48:16 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ma5m4eBugzAUFyTBU0r9XwTfnQoHVYy4LZfMChs09d4=;
+        b=nNDysDSEJ+2Yrgkvr3qBbzgZYRw+ESKVPcQMkpz0mBFd0VjTgX2WPSXMibne5bA0i5
+         N6g5XFGa+3bJsQStASoTN5yiw8cDf5o8zCba3APVY2unR+XmnslNb1dA6SLSiYSmxjIk
+         +47UR1Umcrc1NXin4KYR2FrYWshoJYrU3Bnbx4EJeB/A7qClj2bUO5iVCVsdfr8BRzgE
+         hveeKva/frCPgmHSW4M5rgCHr/fHHe0WW2AeF1lM2lMvIWxvwQB6LusMOzvVPm45baHQ
+         AOJnVdbipItfIEn89xhtYwKd1XZlucB37sRUSJ7GM0JrF2JQxR4W2juXjsW9mQyhN0TO
+         Zd+w==
+X-Gm-Message-State: AOAM530nlwWp2KF8/Kin+WYV4dzSlK0RBbZ97ckfSzcJ7rhNUsvuNA75
+        nBU9uwQ7o5NTMVPkN9w4YfXnLvGBh9ceTEsmKbKm17Pdvn2Zb1laIQ9tuQsQjWWoZ7QbjBOlXr/
+        nIj28A6HSwmNx
+X-Received: by 2002:adf:e68a:: with SMTP id r10mr9488537wrm.384.1591363601935;
+        Fri, 05 Jun 2020 06:26:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzQv5AllPZVkRCl0tV0eLTawsBo4pIGSnRkC36iEv0AyEIWBrY46UyZcIOzVe74SuM/91keTQ==
+X-Received: by 2002:adf:e68a:: with SMTP id r10mr9488504wrm.384.1591363601629;
+        Fri, 05 Jun 2020 06:26:41 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.243.176])
+        by smtp.gmail.com with ESMTPSA id z2sm11769932wrs.87.2020.06.05.06.26.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Jun 2020 06:26:40 -0700 (PDT)
+Subject: Re: [PATCH] KVM: selftests: delete some dead code
+To:     Peter Xu <peterx@redhat.com>, Andrew Jones <drjones@redhat.com>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
         Ben Gardon <bgardon@google.com>, Shuah Khan <shuah@kernel.org>,
         kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
         kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: delete some dead code
-Message-ID: <20200605124816.GB55548@xz-x1>
 References: <20200605110048.GB978434@mwanda>
  <9f20e25d-599d-c203-e3d4-905b122ef5a3@redhat.com>
  <20200605115316.z5tavmf5rjobypve@kamzik.brq.redhat.com>
+ <20200605124816.GB55548@xz-x1>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <891e89c8-8467-eeb4-1b23-337b88a299dd@redhat.com>
+Date:   Fri, 5 Jun 2020 15:26:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200605124816.GB55548@xz-x1>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200605115316.z5tavmf5rjobypve@kamzik.brq.redhat.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 05, 2020 at 01:53:16PM +0200, Andrew Jones wrote:
-> On Fri, Jun 05, 2020 at 01:16:59PM +0200, Paolo Bonzini wrote:
-> > On 05/06/20 13:00, Dan Carpenter wrote:
-> > > The "uffd_delay" variable is unsigned so it's always going to be >= 0.
-> > > 
-> > > Fixes: 0119cb365c93 ("KVM: selftests: Add configurable demand paging delay")
-> > > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/demand_paging_test.c | 2 --
-> > >  1 file changed, 2 deletions(-)
-> > > 
-> > > diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> > > index 360cd3ea4cd67..4eb79621434e6 100644
-> > > --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> > > +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> > > @@ -615,8 +615,6 @@ int main(int argc, char *argv[])
-> > >  			break;
-> > >  		case 'd':
-> > >  			uffd_delay = strtoul(optarg, NULL, 0);
-> > > -			TEST_ASSERT(uffd_delay >= 0,
-> > > -				    "A negative UFFD delay is not supported.");
-> > >  			break;
-> > >  		case 'b':
-> > >  			vcpu_memory_bytes = parse_size(optarg);
-> > > 
-> > 
-> > The bug is that strtoul is "impossible" to use correctly.
+On 05/06/20 14:48, Peter Xu wrote:
+>>> The bug is that strtoul is "impossible" to use correctly.
+> Could I ask why?
 
-Could I ask why?
+To see see how annoying the situation is, check out utils/cutils.c in
+QEMU; basically, it is very hard to do error handling.  From the man page:
 
-> > The right fix
-> > would be to have a replacement for strtoul.
-> 
-> The test needs an upper limit. It obviously doesn't make sense to ever
-> want a ULONG_MAX usec delay. What's the maximum number of usecs we should
-> allow?
+       Since  strtoul() can legitimately return 0 or ULONG_MAX
+       (ULLONG_MAX for strtoull()) on both success and failure, the
+       calling program should set errno to 0 before the call, and then
+       determine if an error occurred by checking whether errno has
+       a nonzero value after the call.
 
-Maybe this test can also be used to emulate a hang-forever kvm mmu fault due to
-some reason we wanted, by specifying an extremely large value here?  From that
-POV, seems still ok to even keep it unbound as a test...
+and of course no one wants to write code for that every time they have
+to parse a number.
 
-Thanks,
+In addition, if the string is empty it returns 0, and of endptr is NULL
+it will accept something like "123abc" and return 123.
 
--- 
-Peter Xu
+So it is not literally impossible, but it is a poorly-designed interface
+which is a major source of bugs.  On Rusty's API design levels[1][2], I
+would put it at 3 if I'm feeling generous ("Read the documentation and
+you'll get it right"), and at -4 to -7 ("The obvious use is wrong") if
+it's been a bad day.
+
+Therefore it's quite common to have a wrapper like
+
+    int my_strtoul(char *p, char **endptr, unsigned long *result);
+
+The wrapper will:
+
+- check that the string is not empty
+
+- always return 0 or -1 because of the by-reference output argument "result"
+
+- take care of checking that the entire input string was parsed, for
+example by rejecting partial parsing of the string if endptr == NULL.
+
+This version gets a solid 7 ("The obvious use is probably the correct
+one"); possibly even 8 ("The compiler will warn if you get it wrong")
+because the output argument gives you better protection against overflow.
+
+Regarding overflow, there is a strtol but not a strtoi, so you need to
+have a temporary long and do range checking manually.  Again, you will
+most likely make mistakes if you use strtol, while my_strtol will merely
+make it annoying but it should be obvious that you're getting it wrong.
+
+Paolo
+
+[1] https://ozlabs.org/~rusty/index.cgi/tech/2008-03-30.html
+[2] https://ozlabs.org/~rusty/index.cgi/tech/2008-04-01.html
 
