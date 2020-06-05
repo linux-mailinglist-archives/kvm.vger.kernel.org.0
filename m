@@ -2,146 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC5691EF2EB
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 10:15:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC9191EF308
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 10:25:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726205AbgFEIPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 04:15:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48334 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726096AbgFEIPH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 04:15:07 -0400
-Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549FBC08C5C2;
-        Fri,  5 Jun 2020 01:15:07 -0700 (PDT)
-Received: by mail-wm1-x344.google.com with SMTP id v19so7584122wmj.0;
-        Fri, 05 Jun 2020 01:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dHbxfqZQs+MiEas28rc25pxvuy1zRUH+/v6FqkZZCBc=;
-        b=COqoOl3bjsflXq+RMWBGHc7/i6lzipaIgcF73oaMaMPfMOaZD5aiznG88QRq+baU8q
-         3LpbySylZGmMAMNY26TNJ3ud0fEKJ6Q6cczbAcjDXi/GkKQ/HMhDyvn+hq1E5XmDbIAM
-         jW41v/3M5J6wVWh+BkVRzJ9fMEnMZGzngdC32EAFfYJjLkcbBNKAd77/ppijjQbe1Mx9
-         nBMsyuiAvCwJh40l/vIbLMSxIdQmBTMXbydgt8jpplI6Vstiju4DpJ6ObuoshjXdFUx8
-         cD4UGI6Up7YctmeximHTjBi/xMz5srPUoIPNKPaOEeGvvrQ8kKV3ogbESKkaV5587M0u
-         u//Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dHbxfqZQs+MiEas28rc25pxvuy1zRUH+/v6FqkZZCBc=;
-        b=g2akr+HhhOx4rJVGRreKeKqC3kDCi3wopzGysvGLpU1XlyXgqm+mVIO95dKpxXhuTq
-         e5lGWzXi+Duo792krMmdUldW7gvyv53wHkovTx0UM+lxHzSICLoSQwMFjvsCps/WFs8p
-         aWDAvkXX6PvOYZ6+chwIiIqL6cVrppFaADTt3Iut8IlyHmqrC87K48pV0Xr3jsWBcd+X
-         q5+COEANtklp9D8uc8QZQDRYwui73yBUlHmbYu1A3N5UiAqNdRBBdnprGYXqjb2INfbY
-         y/va7rd+t89AG8oMhPq0eZtF+KfwVyDtyOJsOdbMjOR0vP07DPgw+zkW1O+JdoHPvW5I
-         k1Ww==
-X-Gm-Message-State: AOAM5333sMCJgl1N7HtnEUOpbvX4yLWavqDGSBAYc46DUoSttS2s9Kuq
-        Mf6u/DuHskUoKx34bLNOeMg=
-X-Google-Smtp-Source: ABdhPJyvKvwVasAsfTCkHvqXnqypvXaZ8wntEgi4xx4agE5ATp0lvGRT4jVb+YprnDTDar52zu5unw==
-X-Received: by 2002:a7b:c7d8:: with SMTP id z24mr1442139wmk.28.1591344906024;
-        Fri, 05 Jun 2020 01:15:06 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id q11sm10991924wrv.67.2020.06.05.01.15.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jun 2020 01:15:04 -0700 (PDT)
-Date:   Fri, 5 Jun 2020 09:15:03 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linux-kernel@vger.kernel.org,
-        Anthony Liguori <aliguori@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-Subject: Re: [PATCH v3 01/18] nitro_enclaves: Add ioctl interface definition
-Message-ID: <20200605081503.GA59410@stefanha-x1.localdomain>
-References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-2-andraprs@amazon.com>
- <20200527084959.GA29137@stefanha-x1.localdomain>
- <a95de3ee4b722d418fd6cf662233cb024928804e.camel@kernel.crashing.org>
- <d639afa5-cca6-3707-4c80-40ee1bf5bcb5@amazon.com>
+        id S1726112AbgFEIZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 04:25:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:65174 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725986AbgFEIZD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 04:25:03 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 055820gT049467;
+        Fri, 5 Jun 2020 04:25:01 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31f9dex83b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 04:25:01 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05582VaS051887;
+        Fri, 5 Jun 2020 04:25:01 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31f9dex81r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 04:25:01 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0558KwII011853;
+        Fri, 5 Jun 2020 08:24:59 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 31end6h5vw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 08:24:59 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0558NfAH66781592
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 Jun 2020 08:23:41 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9B874C04A;
+        Fri,  5 Jun 2020 08:24:56 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 741434C059;
+        Fri,  5 Jun 2020 08:24:56 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.68.25])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  5 Jun 2020 08:24:56 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v7 09/12] s390x: css: msch, enable test
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+References: <1589818051-20549-1-git-send-email-pmorel@linux.ibm.com>
+ <1589818051-20549-10-git-send-email-pmorel@linux.ibm.com>
+ <20200527114239.65fa9473.cohuck@redhat.com>
+ <65501204-f6f3-7800-e382-63ccad77ca38@linux.ibm.com>
+ <20200604152945.4cb433bd.cohuck@redhat.com>
+ <ea12784c-df16-db4b-dd9c-b5b77bcbe9f9@linux.ibm.com>
+Message-ID: <3aaa9a99-6958-062d-14a7-fcf8d447ad19@linux.ibm.com>
+Date:   Fri, 5 Jun 2020 10:24:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="BXVAT5kNtrzKuDFl"
-Content-Disposition: inline
-In-Reply-To: <d639afa5-cca6-3707-4c80-40ee1bf5bcb5@amazon.com>
+In-Reply-To: <ea12784c-df16-db4b-dd9c-b5b77bcbe9f9@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-05_01:2020-06-04,2020-06-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ adultscore=0 impostorscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ suspectscore=0 cotscore=-2147483648 priorityscore=1501 mlxlogscore=999
+ lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006050058
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---BXVAT5kNtrzKuDFl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Connie,
 
-On Mon, Jun 01, 2020 at 10:20:18AM +0300, Paraschiv, Andra-Irina wrote:
->=20
->=20
-> On 01/06/2020 06:02, Benjamin Herrenschmidt wrote:
-> > On Wed, 2020-05-27 at 09:49 +0100, Stefan Hajnoczi wrote:
-> > > What about feature bits or a API version number field? If you add
-> > > features to the NE driver, how will userspace detect them?
-> > >=20
-> > > Even if you intend to always compile userspace against the exact kern=
-el
-> > > headers that the program will run on, it can still be useful to have =
-an
-> > > API version for informational purposes and to easily prevent user
-> > > errors (running a new userspace binary on an old kernel where the API=
- is
-> > > different).
-> > >=20
-> > > Finally, reserved struct fields may come in handy in the future. That
-> > > way userspace and the kernel don't need to explicitly handle multiple
-> > > struct sizes.
-> > Beware, Greg might disagree :)
-> >=20
-> > That said, yes, at least a way to query the API version would be
-> > useful.
->=20
-> I see there are several thoughts with regard to extensions possibilities.=
- :)
->=20
-> I added an ioctl for getting the API version, we have now a way to query
-> that info. Also, I updated the sample in this patch series to check for t=
-he
-> API version.
+for the next series, I will move more code of the css.c to the css_lib.c 
+to be able to reuse it for other tests.
+One of your suggestions IIRC.
+So I will not be able to keep your RB until you have a look at the changes.
+I will keep the same algorithms but still...
 
-Great. The ideas are orthogonal and not all of them need to be used
-together. As long as their is a way of extending the API cleanly in the
-future then extensions can be made without breaking userspace.
+regards,
+Pierre
 
-Stefan
+On 2020-06-05 09:37, Pierre Morel wrote:
+> 
+> 
+> On 2020-06-04 15:29, Cornelia Huck wrote:
+>> On Thu, 4 Jun 2020 14:46:05 +0200
+>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>
+>>> On 2020-05-27 11:42, Cornelia Huck wrote:
+>>>> On Mon, 18 May 2020 18:07:28 +0200
+>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>>> A second step when testing the channel subsystem is to prepare a 
+>>>>> channel
+>>>>> for use.
+>>>>> This includes:
+>>>>> - Get the current subchannel Information Block (SCHIB) using STSCH
+>>>>> - Update it in memory to set the ENABLE bit
+>>>>> - Tell the CSS that the SCHIB has been modified using MSCH
+>>>>> - Get the SCHIB from the CSS again to verify that the subchannel is
+>>>>>     enabled.
+>>>>> - If the subchannel is not enabled retry a predefined retries count.
+>>>>>
+>>>>> This tests the MSCH instruction to enable a channel succesfuly.
+>>>>> This is NOT a routine to really enable the channel, no retry is done,
+>>>>> in case of error, a report is made.
+>>>>
+>>>> Hm... so you retry if the subchannel is not enabled after cc 0, but you
+>>>> don't retry if the cc indicates busy/status pending? Makes sense, as we
+>>>> don't expect the subchannel to be busy, but a more precise note in the
+>>>> patch description would be good :)
+>>>
+>>> OK, I add something like
+>>> "
+>>> - If the command succeed but subchannel is not enabled retry a
+>>
+>> s/succeed/succeeds/ :)
+>>
+>>>     predefined retries count.
+>>> - If the command fails, report the failure and do not retry, even
+>>>     if cc indicates a busy/status as we do not expect this.
+>>
+>> "indicates busy/status pending" ?
+>>
+>>> "
+>>
+> done, thanks,
+> 
+> Pierre
+> 
 
---BXVAT5kNtrzKuDFl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7Z/wcACgkQnKSrs4Gr
-c8ixagf9FLJp1V9BuzC0rZMPadtO77p0R7zJ3q/JbtZtO6VkFyiP1JuRRIE9QR7v
-gGacilPQPMMrAXoiRjMojNFWUmOgYbqA51PDjzeQmUIGfgWDdBF8c6toyq3zjpFb
-KP7GKrvVmKq2ZhvayPbS4lKK8PkFj3RUiHQ8AHxEw6EBb7OtuH2dg0IsXlDG4vv4
-NMoHRm6IJ7L2P5e1CEjAyFfVK3/ATw8T7o7xYyYFrvR5AIptV2VC65fbzq5qSYjM
-+cMxLYVnoqIQmZ9JR/tqEJCH7kNN5/FaCaDcQQGOiv8gWW7YQpFaQZ/YGTYnSB00
-FCdtRZy4lkV5WYyK+E51CZ5e8Y5JKg==
-=haJB
------END PGP SIGNATURE-----
-
---BXVAT5kNtrzKuDFl--
+-- 
+Pierre Morel
+IBM Lab Boeblingen
