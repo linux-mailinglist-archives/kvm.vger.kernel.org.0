@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 951F61F0290
+	by mail.lfdr.de (Postfix) with ESMTP id 28A831F028F
 	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 23:44:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728899AbgFEVoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 17:44:19 -0400
+        id S1728314AbgFEVjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 17:39:09 -0400
 Received: from mga17.intel.com ([192.55.52.151]:49307 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728252AbgFEVjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 17:39:09 -0400
-IronPort-SDR: 2Or+nb5QSrbNGG7DCqPdG+mjxgBds6PccMYmRydoM6QdEq5r5A7AZAe5Xii6uPgDU2uKU0h4OU
- cCuZTAzRZPEQ==
+        id S1728227AbgFEVjI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 17:39:08 -0400
+IronPort-SDR: QJudosyraLoQ2pgoGD3dtsMijyFPia44foxIrkje7YWrIsaCB1QDfK44F0TVo0lLJCX7xqORB2
+ mB4vtKXFJCng==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 14:39:07 -0700
-IronPort-SDR: 3kU6BlJ3ZElEdj1AHWXLHsdk52pJvqNGjfnKdDIaTU1hErrl7iwvq5Lps986iLm32Az8kC2WKh
- ius/kdGV8mzw==
+IronPort-SDR: kUB4EaD9pBY+TwwSYxybFG3rI29fqgwbISoJ3DAUxWFW4zz+0j67lNNk6bsc8yImoZHZt5pcsT
+ yNUu2OllTXSw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; 
-   d="scan'208";a="287860865"
+   d="scan'208";a="287860868"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
   by orsmga002.jf.intel.com with ESMTP; 05 Jun 2020 14:39:07 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -48,10 +48,12 @@ Cc:     James Morse <james.morse@arm.com>,
         Junaid Shahid <junaids@google.com>,
         Ben Gardon <bgardon@google.com>,
         Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 00/21] KVM: Cleanup and unify kvm_mmu_memory_cache usage
-Date:   Fri,  5 Jun 2020 14:38:32 -0700
-Message-Id: <20200605213853.14959-1-sean.j.christopherson@intel.com>
+Subject: [PATCH 01/21] KVM: x86/mmu: Track the associated kmem_cache in the MMU caches
+Date:   Fri,  5 Jun 2020 14:38:33 -0700
+Message-Id: <20200605213853.14959-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200605213853.14959-1-sean.j.christopherson@intel.com>
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -59,82 +61,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series resurrects Christoffer Dall's series[1] to provide a common
-MMU memory cache implementation that can be shared by x86, arm64 and MIPS.
+Track the kmem_cache used for non-page KVM MMU memory caches instead of
+passing in the associated kmem_cache when filling the cache.  This will
+allow consolidating code and other cleanups.
 
-It also picks up a suggested change from Ben Gardon[2] to clear shadow
-page tables during initial allocation so as to avoid clearing entire
-pages while holding mmu_lock.
+No functional change intended.
 
-The front half of the patches do house cleaning on x86's memory cache
-implementation in preparation for moving it to common code, along with a
-fair bit of cleanup on the usage.  The middle chunk moves the patches to
-common KVM, and the last two chunks convert arm64 and MIPS to the common
-implementation.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/mmu/mmu.c          | 24 +++++++++++-------------
+ 2 files changed, 12 insertions(+), 13 deletions(-)
 
-Cleanup aside, the notable difference from Christoffer and Ben's proposed
-patches is to make __GFP_ZERO optional, e.g. to allow x86 to skip zeroing
-for its gfns array and to provide line of sight for my
-cannot-yet-be-discussed-in-detail use case for non-zero initialized shadow
-page tables[3].
-
-Tested on x86 only, no testing whatsoever on arm64 or MIPS.
-
-[1] https://lkml.kernel.org/r/20191105110357.8607-1-christoffer.dall@arm.com
-[2] https://lkml.kernel.org/r/20190926231824.149014-4-bgardon@google.com
-[3] https://lkml.kernel.org/r/20191127180731.GC16845@linux.intel.com
-
-Sean Christopherson (21):
-  KVM: x86/mmu: Track the associated kmem_cache in the MMU caches
-  KVM: x86/mmu: Consolidate "page" variant of memory cache helpers
-  KVM: x86/mmu: Use consistent "mc" name for kvm_mmu_memory_cache locals
-  KVM: x86/mmu: Remove superfluous gotos from mmu_topup_memory_caches()
-  KVM: x86/mmu: Try to avoid crashing KVM if a MMU memory cache is empty
-  KVM: x86/mmu: Move fast_page_fault() call above
-    mmu_topup_memory_caches()
-  KVM: x86/mmu: Topup memory caches after walking GVA->GPA
-  KVM: x86/mmu: Clean up the gorilla math in mmu_topup_memory_caches()
-  KVM: x86/mmu: Separate the memory caches for shadow pages and gfn
-    arrays
-  KVM: x86/mmu: Make __GFP_ZERO a property of the memory cache
-  KVM: x86/mmu: Zero allocate shadow pages (outside of mmu_lock)
-  KVM: x86/mmu: Skip filling the gfn cache for guaranteed direct MMU
-    topups
-  KVM: x86/mmu: Prepend "kvm_" to memory cache helpers that will be
-    global
-  KVM: Move x86's version of struct kvm_mmu_memory_cache to common code
-  KVM: Move x86's MMU memory cache helpers to common KVM code
-  KVM: arm64: Drop @max param from mmu_topup_memory_cache()
-  KVM: arm64: Use common code's approach for __GFP_ZERO with memory
-    caches
-  KVM: arm64: Use common KVM implementation of MMU memory caches
-  KVM: MIPS: Drop @max param from mmu_topup_memory_cache()
-  KVM: MIPS: Account pages used for GPA page tables
-  KVM: MIPS: Use common KVM implementation of MMU memory caches
-
- arch/arm64/include/asm/kvm_host.h    |  11 ---
- arch/arm64/include/asm/kvm_types.h   |   8 ++
- arch/arm64/kvm/arm.c                 |   2 +
- arch/arm64/kvm/mmu.c                 |  54 +++--------
- arch/mips/include/asm/kvm_host.h     |  11 ---
- arch/mips/include/asm/kvm_types.h    |   7 ++
- arch/mips/kvm/mmu.c                  |  44 ++-------
- arch/powerpc/include/asm/kvm_types.h |   5 ++
- arch/s390/include/asm/kvm_types.h    |   5 ++
- arch/x86/include/asm/kvm_host.h      |  14 +--
- arch/x86/include/asm/kvm_types.h     |   7 ++
- arch/x86/kvm/mmu/mmu.c               | 129 +++++++++------------------
- arch/x86/kvm/mmu/paging_tmpl.h       |  10 +--
- include/linux/kvm_host.h             |   7 ++
- include/linux/kvm_types.h            |  19 ++++
- virt/kvm/kvm_main.c                  |  55 ++++++++++++
- 16 files changed, 178 insertions(+), 210 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_types.h
- create mode 100644 arch/mips/include/asm/kvm_types.h
- create mode 100644 arch/powerpc/include/asm/kvm_types.h
- create mode 100644 arch/s390/include/asm/kvm_types.h
- create mode 100644 arch/x86/include/asm/kvm_types.h
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1da5858501ca..16347b050754 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -251,6 +251,7 @@ struct kvm_kernel_irq_routing_entry;
+  */
+ struct kvm_mmu_memory_cache {
+ 	int nobjs;
++	struct kmem_cache *kmem_cache;
+ 	void *objects[KVM_NR_MEM_OBJS];
+ };
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index fdd05c233308..0830c195c9ed 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1060,15 +1060,14 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+ 	local_irq_enable();
+ }
+ 
+-static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+-				  struct kmem_cache *base_cache, int min)
++static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache, int min)
+ {
+ 	void *obj;
+ 
+ 	if (cache->nobjs >= min)
+ 		return 0;
+ 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+-		obj = kmem_cache_zalloc(base_cache, GFP_KERNEL_ACCOUNT);
++		obj = kmem_cache_zalloc(cache->kmem_cache, GFP_KERNEL_ACCOUNT);
+ 		if (!obj)
+ 			return cache->nobjs >= min ? 0 : -ENOMEM;
+ 		cache->objects[cache->nobjs++] = obj;
+@@ -1081,11 +1080,10 @@ static int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *cache)
+ 	return cache->nobjs;
+ }
+ 
+-static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc,
+-				  struct kmem_cache *cache)
++static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+ {
+ 	while (mc->nobjs)
+-		kmem_cache_free(cache, mc->objects[--mc->nobjs]);
++		kmem_cache_free(mc->kmem_cache, mc->objects[--mc->nobjs]);
+ }
+ 
+ static int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache,
+@@ -1115,25 +1113,22 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
+ 	int r;
+ 
+ 	r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+-				   pte_list_desc_cache, 8 + PTE_PREFETCH_NUM);
++				   8 + PTE_PREFETCH_NUM);
+ 	if (r)
+ 		goto out;
+ 	r = mmu_topup_memory_cache_page(&vcpu->arch.mmu_page_cache, 8);
+ 	if (r)
+ 		goto out;
+-	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
+-				   mmu_page_header_cache, 4);
++	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
+ out:
+ 	return r;
+ }
+ 
+ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+ {
+-	mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+-				pte_list_desc_cache);
++	mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+ 	mmu_free_memory_cache_page(&vcpu->arch.mmu_page_cache);
+-	mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache,
+-				mmu_page_header_cache);
++	mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+ }
+ 
+ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+@@ -5684,6 +5679,9 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 	uint i;
+ 	int ret;
+ 
++	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
++	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
++
+ 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+ 
 -- 
 2.26.0
 
