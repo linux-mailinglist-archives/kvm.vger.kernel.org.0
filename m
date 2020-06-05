@@ -2,162 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 207FD1F0068
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 21:26:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5973A1F0099
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 21:54:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727960AbgFET0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 15:26:09 -0400
-Received: from mga03.intel.com ([134.134.136.65]:18768 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726963AbgFET0I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 15:26:08 -0400
-IronPort-SDR: n3I0NnNI4r1LG2DD5PeoMLoXXrZssg+o73LbOn/XqoUXeGqMbpiFaT5j6DCGPPiy3UsCLAZErb
- 9vob7FAtucSg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2020 12:26:07 -0700
-IronPort-SDR: N8mvhEuF9Yca0EaUBhaf8fWySQ/j2CY/8kTmbLZhcDGBSiIsoZYSuPht8u0/Gm0igCQOpET3+p
- L2ywfryHylKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,477,1583222400"; 
-   d="scan'208";a="313279638"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
-  by FMSMGA003.fm.intel.com with ESMTP; 05 Jun 2020 12:26:07 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH] x86/split_lock: Don't write MSR_TEST_CTRL on CPUs that aren't whitelisted
-Date:   Fri,  5 Jun 2020 12:26:05 -0700
-Message-Id: <20200605192605.7439-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
+        id S1728067AbgFETy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 15:54:56 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:46810 "EHLO mta-01.yadro.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727868AbgFETyz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jun 2020 15:54:55 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id 7871D4C850;
+        Fri,  5 Jun 2020 19:54:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        content-type:content-type:content-transfer-encoding:mime-version
+        :x-mailer:message-id:date:date:subject:subject:from:from
+        :received:received:received; s=mta-01; t=1591386892; x=
+        1593201293; bh=BT7V5OPoBcBnhfBrfhmq0i+EDq9gDtiAbV9QTbz/h8U=; b=R
+        50Bb1VTZzycUjukTARC54JTmCSTL5oH8Q45PWrI2Wb/FSUmt8rEdMfs9D+5NW1b5
+        SjiPkzgw7C9qu6XSItai0oxK7dtl1jgNkVwHFHjHybfjIsvDSP4TgPB564Wgg7dA
+        qnZLxrXbUtNpIWtZf306zdWSdKOs26vrDTu/2XdKwA=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id xHMBA-P1y4mm; Fri,  5 Jun 2020 22:54:52 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com [172.17.10.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 0C0424B169;
+        Fri,  5 Jun 2020 22:54:52 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 5 Jun
+ 2020 22:54:51 +0300
+From:   Roman Bolshakov <r.bolshakov@yadro.com>
+To:     <kvm@vger.kernel.org>
+CC:     Roman Bolshakov <r.bolshakov@yadro.com>,
+        Nadav Amit <namit@vmware.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: [kvm-unit-tests PATCH] x86: realmode: Relax smsw test
+Date:   Fri, 5 Jun 2020 22:49:18 +0300
+Message-ID: <20200605194915.37330-1-r.bolshakov@yadro.com>
+X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Choo! Choo!  All aboard the Split Lock Express, with direct service to
-Wreckage!
+The test currently asserts a kind of undefined behaviour in SMSW per
+Intel SDM:
 
-Skip split_lock_verify_msr() if the CPU isn't whitelisted as a possible
-SLD-enabled CPU model to avoid writing MSR_TEST_CTRL.  MSR_TEST_CTRL
-exists, and is writable, on many generations of CPUs.  Writing the MSR,
-even with '0', can result in bizarre, undocumented behavior.
+  In non-64-bit modes, when the destination operand is a 32-bit register,
+  the low-order 16 bits of register CR0 are copied into the low-order 16
+  bits of the register and the high-order 16 bits are undefined.
 
-This fixes a crash on Haswell when resuming from suspend with a live KVM
-guest.  Because APs use the standard SMP boot flow for resume, they will
-go through split_lock_init() and the subsequent RDMSR/WRMSR sequence,
-which runs even when sld_state==sld_off to ensure SLD is disabled.  On
-Haswell (at least, my Haswell), writing MSR_TEST_CTRL with '0' will
-succeed and _may_ take the SMT _sibling_ out of VMX root mode.
+TCG doesn't write high-order 16 bits and the test fails for it. Instead
+of CR0.CD, set CR0.PE and check only if low-order bits match to avoid
+ambiguity with the undefined behaviour.
 
-When KVM has an active guest, KVM performs VMXON as part of CPU onlining
-(see kvm_starting_cpu()).  Because SMP boot is serialized, the resulting
-flow is effectively:
-
-  on_each_ap_cpu() {
-     WRMSR(MSR_TEST_CTRL, 0)
-     VMXON
-  }
-
-As a result, the WRMSR can disable VMX on a different CPU that has
-already done VMXON.  This ultimately results in a #UD on VMPTRLD when
-KVM regains control and attempt run its vCPUs.
-
-The above voodoo was confirmed by reworking KVM's VMXON flow to write
-MSR_TEST_CTRL prior to VMXON, and to serialize the sequence as above.
-Further verification of the insanity was done by redoing VMXON on all
-APs after the initial WRMSR->VMXON sequence.  The additional VMXON,
-which should VM-Fail, occasionally succeeded, and also eliminated the
-unexpected #UD on VMPTRLD.
-
-The damage done by writing MSR_TEST_CTRL doesn't appear to be limited
-to VMX, e.g. after suspend with an active KVM guest, subsequent reboots
-almost always hang (even when fudging VMXON), a #UD on a random Jcc was
-observed, suspend/resume stability is qualitatively poor, and so on and
-so forth.
-
-  kernel BUG at arch/x86/kvm/x86.c:386!
-  invalid opcode: 0000 [#7] SMP
-  CPU: 1 PID: 2592 Comm: CPU 6/KVM Tainted: G      D
-  Hardware name: ASUS Q87M-E/Q87M-E, BIOS 1102 03/03/2014
-  RIP: 0010:kvm_spurious_fault+0xf/0x20
-  Code: <0f> 0b 0f 1f 44 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00
-  RSP: 0018:ffffc0bcc1677b78 EFLAGS: 00010246
-  RAX: 0000617640000000 RBX: ffff9e8d01d80000 RCX: ffff9e8d4fa40000
-  RDX: ffff9e8d03360000 RSI: 00000003c3360000 RDI: ffff9e8d03360000
-  RBP: 0000000000000001 R08: ffff9e8d046d9d40 R09: 0000000000000018
-  R10: ffffc0bcc1677b80 R11: 0000000000000008 R12: 0000000000000006
-  R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-  FS:  00007fe16c9f9700(0000) GS:ffff9e8d4fa40000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000000d7a418 CR3: 00000003c47b1006 CR4: 00000000001626e0
-  Call Trace:
-   vmx_vcpu_load_vmcs+0x1fb/0x2b0
-   vmx_vcpu_load+0x3e/0x160
-   kvm_arch_vcpu_load+0x48/0x260
-   finish_task_switch+0x140/0x260
-   __schedule+0x460/0x720
-   _cond_resched+0x2d/0x40
-   kvm_arch_vcpu_ioctl_run+0x82e/0x1ca0
-   kvm_vcpu_ioctl+0x363/0x5c0
-   ksys_ioctl+0x88/0xa0
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x4c/0x170
-   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-Fixes: dbaba47085b0c ("x86/split_lock: Rework the initialization flow of split lock detection")
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Cc: Nadav Amit <namit@vmware.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- arch/x86/kernel/cpu/intel.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ x86/realmode.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index a19a680542ce..19b6c42739fc 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -48,6 +48,13 @@ enum split_lock_detect_state {
- static enum split_lock_detect_state sld_state __ro_after_init = sld_off;
- static u64 msr_test_ctrl_cache __ro_after_init;
- 
-+/*
-+ * With a name like MSR_TEST_CTL it should go without saying, but don't touch
-+ * MSR_TEST_CTL unless the CPU is one of the whitelisted models.  Writing it
-+ * on CPUs that do not support SLD can cause fireworks, even when writing '0'.
-+ */
-+static bool cpu_model_supports_sld __ro_after_init;
-+
- /*
-  * Processors which have self-snooping capability can handle conflicting
-  * memory type across CPUs by snooping its own cache. However, there exists
-@@ -1064,7 +1071,8 @@ static void sld_update_msr(bool on)
- 
- static void split_lock_init(void)
+An alternative would be to change the undefined behaviour of TCG itself:
+https://github.com/roolebo/qemu/commit/a5e5ee3a41c52031dfda3b1b903100bcb5639742
+
+diff --git a/x86/realmode.c b/x86/realmode.c
+index 3518224..700639a 100644
+--- a/x86/realmode.c
++++ b/x86/realmode.c
+@@ -1714,7 +1714,7 @@ static void test_smsw(void)
  {
--	split_lock_verify_msr(sld_state != sld_off);
-+	if (cpu_model_supports_sld)
-+		split_lock_verify_msr(sld_state != sld_off);
+ 	MK_INSN(smsw, "movl %cr0, %ebx\n\t"
+ 		      "movl %ebx, %ecx\n\t"
+-		      "or $0x40000000, %ebx\n\t"
++		      "or $0x00000001, %ebx\n\t"
+ 		      "movl %ebx, %cr0\n\t"
+ 		      "smswl %eax\n\t"
+ 		      "movl %ecx, %cr0\n\t");
+@@ -1722,7 +1722,9 @@ static void test_smsw(void)
+ 	init_inregs(&(struct regs){ .eax = 0x12345678 });
+ 
+ 	exec_in_big_real_mode(&insn_smsw);
+-	report("smsw", R_AX | R_BX | R_CX, outregs.eax == outregs.ebx);
++	report("smsw", R_AX | R_BX | R_CX,
++	       (outregs.eax & 0xffff) == (outregs.ebx & 0xffff) &&
++	       (outregs.eax & 0x1));
  }
  
- static void split_lock_warn(unsigned long ip)
-@@ -1167,5 +1175,6 @@ void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c)
- 		return;
- 	}
- 
-+	cpu_model_supports_sld = true;
- 	split_lock_setup();
- }
+ static void test_xadd(void)
 -- 
-2.26.0
+2.26.1
 
