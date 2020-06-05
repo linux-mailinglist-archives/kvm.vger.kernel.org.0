@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99EE31F022F
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 23:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF1951F022B
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 23:41:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728887AbgFEVlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 17:41:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34498 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729009AbgFEVlT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 17:41:19 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 055LVxYW083839;
-        Fri, 5 Jun 2020 17:41:18 -0400
+        id S1728948AbgFEVlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 17:41:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22460 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728876AbgFEVkW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 17:40:22 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 055LYiC1169308;
+        Fri, 5 Jun 2020 17:40:19 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31f9dgbjaa-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31fnwgqecv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 17:41:18 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 055LYnlj099159;
-        Fri, 5 Jun 2020 17:41:17 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31f9dgbja2-1
+        Fri, 05 Jun 2020 17:40:18 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 055LZNgm170962;
+        Fri, 5 Jun 2020 17:40:18 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31fnwgqecn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 17:41:17 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 055La7A2019775;
-        Fri, 5 Jun 2020 21:41:16 GMT
+        Fri, 05 Jun 2020 17:40:18 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 055LYdRb020860;
+        Fri, 5 Jun 2020 21:40:17 GMT
 Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma04dal.us.ibm.com with ESMTP id 31bf4bje21-1
+        by ppma01dal.us.ibm.com with ESMTP id 31bwg41m16-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Jun 2020 21:41:16 +0000
+        Fri, 05 Jun 2020 21:40:17 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 055LeFf249086960
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 055LeFiL54329772
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 5 Jun 2020 21:40:15 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07140AC059;
+        by IMSVA (Postfix) with ESMTP id 8998FAC059;
         Fri,  5 Jun 2020 21:40:15 +0000 (GMT)
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8EDFCAC069;
-        Fri,  5 Jun 2020 21:40:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 16400AC05B;
+        Fri,  5 Jun 2020 21:40:15 +0000 (GMT)
 Received: from cpe-172-100-175-116.stny.res.rr.com.com (unknown [9.85.146.208])
         by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  5 Jun 2020 21:40:14 +0000 (GMT)
+        Fri,  5 Jun 2020 21:40:15 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -52,9 +52,9 @@ Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
         mjrosato@linux.ibm.com, pasic@linux.ibm.com,
         alex.williamson@redhat.com, kwankhede@nvidia.com,
         fiuczy@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v8 11/16] s390/vfio-ap: allow configuration of matrix mdev in use by a KVM guest
-Date:   Fri,  5 Jun 2020 17:39:59 -0400
-Message-Id: <20200605214004.14270-12-akrowiak@linux.ibm.com>
+Subject: [PATCH v8 12/16] s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
+Date:   Fri,  5 Jun 2020 17:40:00 -0400
+Message-Id: <20200605214004.14270-13-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200605214004.14270-1-akrowiak@linux.ibm.com>
 References: <20200605214004.14270-1-akrowiak@linux.ibm.com>
@@ -63,98 +63,331 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-06-05_07:2020-06-04,2020-06-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- priorityscore=1501 suspectscore=3 bulkscore=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 mlxlogscore=999 spamscore=0 impostorscore=0
- malwarescore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006050157
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
+ adultscore=0 clxscore=1015 spamscore=0 cotscore=-2147483648
+ impostorscore=0 suspectscore=3 priorityscore=1501 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006050159
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The current support for pass-through crypto adapters does not allow
-configuration of a matrix mdev when it is in use by a KVM guest. Let's
-allow AP resources - i.e., adapters, domains and control domains - to be
-assigned to or unassigned from a matrix mdev while it is in use by a guest.
-This is in preparation for the introduction of support for dynamic
-configuration of the AP matrix for a running KVM guest.
+Let's hot plug/unplug adapters, domains and control domains assigned to or
+unassigned from an AP matrix mdev device while it is in use by a guest per
+the following:
+
+* When the APID of an adapter is assigned to a matrix mdev in use by a KVM
+  guest, the adapter will be hot plugged into the KVM guest as long as each
+  APQN derived from the Cartesian product of the APID being assigned and
+  the APQIs already assigned to the guest's CRYCB references a queue device
+  bound to the vfio_ap device driver.
+
+* When the APID of an adapter is unassigned from a matrix mdev in use by a
+  KVM guest, the adapter will be hot unplugged from the KVM guest.
+
+* When the APQI of a domain is assigned to a matrix mdev in use by a KVM
+  guest, the domain will be hot plugged into the KVM guest as long as each
+  APQN derived from the Cartesian product of the APQI being assigned and
+  the APIDs already assigned to the guest's CRYCB references a queue device
+  bound to the vfio_ap device driver.
+
+* When the APQI of a domain is unassigned from a matrix mdev in use by a
+  KVM guest, the domain will be hot unplugged from the KVM guest
+
+* When the domain number of a control domain is assigned to a matrix mdev
+  in use by a KVM guest, the control domain will be hot plugged into the
+  KVM guest.
+
+* When the domain number of a control domain is unassigned from a matrix
+  mdev in use by a KVM guest, the control domain will be hot unplugged
+  from the KVM guest.
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 ---
- drivers/s390/crypto/vfio_ap_ops.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+ drivers/s390/crypto/vfio_ap_ops.c | 196 ++++++++++++++++++++++++++++++
+ 1 file changed, 196 insertions(+)
 
 diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 68bdf80807c6..4f59f471b4d3 100644
+index 4f59f471b4d3..3df050eae112 100644
 --- a/drivers/s390/crypto/vfio_ap_ops.c
 +++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -773,10 +773,6 @@ static ssize_t assign_adapter_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+@@ -731,6 +731,56 @@ static void vfio_ap_mdev_link_queues(struct ap_matrix_mdev *matrix_mdev,
+ 	}
+ }
  
--	/* If the guest is running, disallow assignment of adapter */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &apid);
- 	if (ret)
- 		return ret;
-@@ -828,10 +824,6 @@ static ssize_t unassign_adapter_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
++static bool vfio_ap_mdev_assign_apqis_4_apid(struct ap_matrix_mdev *matrix_mdev,
++					     unsigned long apid)
++{
++	DECLARE_BITMAP(aqm, AP_DOMAINS);
++	unsigned long apqi, apqn;
++
++	bitmap_copy(aqm, matrix_mdev->matrix.aqm, AP_DOMAINS);
++
++	for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, AP_DOMAINS) {
++		if (!test_bit_inv(apqi,
++				  (unsigned long *) matrix_dev->info.aqm))
++			clear_bit_inv(apqi, aqm);
++
++		apqn = AP_MKQID(apid, apqi);
++		if (!vfio_ap_get_mdev_queue(matrix_mdev, apqn))
++			clear_bit_inv(apqi, aqm);
++	}
++
++	if (bitmap_empty(aqm, AP_DOMAINS))
++		return false;
++
++	set_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
++	bitmap_copy(matrix_mdev->shadow_apcb.aqm, aqm, AP_DOMAINS);
++
++	return true;
++}
++
++static bool vfio_ap_mdev_assign_guest_apid(struct ap_matrix_mdev *matrix_mdev,
++					   unsigned long apid)
++{
++	unsigned long apqi, apqn;
++
++	if (!vfio_ap_mdev_has_crycb(matrix_mdev) ||
++	    !test_bit_inv(apid, (unsigned long *)matrix_dev->info.apm))
++		return false;
++
++	if (bitmap_empty(matrix_mdev->shadow_apcb.aqm, AP_DOMAINS))
++		return vfio_ap_mdev_assign_apqis_4_apid(matrix_mdev, apid);
++
++	for_each_set_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm, AP_DOMAINS) {
++		apqn = AP_MKQID(apid, apqi);
++		if (!vfio_ap_get_mdev_queue(matrix_mdev, apqn))
++			return false;
++	}
++
++	set_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
++
++	return true;
++}
++
+ /**
+  * assign_adapter_store
+  *
+@@ -792,12 +842,42 @@ static ssize_t assign_adapter_store(struct device *dev,
+ 	}
+ 	set_bit_inv(apid, matrix_mdev->matrix.apm);
+ 	vfio_ap_mdev_link_queues(matrix_mdev, LINK_APID, apid);
++	if (vfio_ap_mdev_assign_guest_apid(matrix_mdev, apid))
++		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+ 	mutex_unlock(&matrix_dev->lock);
  
--	/* If the guest is running, disallow un-assignment of adapter */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &apid);
- 	if (ret)
- 		return ret;
-@@ -891,10 +883,6 @@ static ssize_t assign_domain_store(struct device *dev,
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
- 	unsigned long max_apqi = matrix_mdev->matrix.aqm_max;
+ 	return count;
+ }
+ static DEVICE_ATTR_WO(assign_adapter);
  
--	/* If the guest is running, disallow assignment of domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &apqi);
- 	if (ret)
- 		return ret;
-@@ -946,10 +934,6 @@ static ssize_t unassign_domain_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
++static bool vfio_ap_mdev_unassign_guest_apid(struct ap_matrix_mdev *matrix_mdev,
++					     unsigned long apid)
++{
++	if (vfio_ap_mdev_has_crycb(matrix_mdev)) {
++		if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm)) {
++			clear_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
++
++			/*
++			 * If there are no APIDs assigned to the guest, then
++			 * the guest will not have access to any queues, so
++			 * let's also go ahead and unassign the APQIs. Keeping
++			 * them around may yield unpredictable results during
++			 * a probe that is not related to a host AP
++			 * configuration change (i.e., an AP adapter is
++			 * configured online).
++			 */
++			if (bitmap_empty(matrix_mdev->shadow_apcb.apm,
++					 AP_DEVICES))
++				bitmap_clear(matrix_mdev->shadow_apcb.aqm, 0,
++					     AP_DOMAINS);
++
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ /**
+  * unassign_adapter_store
+  *
+@@ -834,12 +914,64 @@ static ssize_t unassign_adapter_store(struct device *dev,
+ 	mutex_lock(&matrix_dev->lock);
+ 	clear_bit_inv((unsigned long)apid, matrix_mdev->matrix.apm);
+ 	vfio_ap_mdev_link_queues(matrix_mdev, UNLINK_APID, apid);
++	if (vfio_ap_mdev_unassign_guest_apid(matrix_mdev, apid))
++		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+ 	mutex_unlock(&matrix_dev->lock);
  
--	/* If the guest is running, disallow un-assignment of domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &apqi);
- 	if (ret)
- 		return ret;
-@@ -991,10 +975,6 @@ static ssize_t assign_control_domain_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+ 	return count;
+ }
+ static DEVICE_ATTR_WO(unassign_adapter);
  
--	/* If the guest is running, disallow assignment of control domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &id);
- 	if (ret)
- 		return ret;
-@@ -1036,10 +1016,6 @@ static ssize_t unassign_control_domain_store(struct device *dev,
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
- 	unsigned long max_domid =  matrix_mdev->matrix.adm_max;
++static bool vfio_ap_mdev_assign_apids_4_apqi(struct ap_matrix_mdev *matrix_mdev,
++					     unsigned long apqi)
++{
++	DECLARE_BITMAP(apm, AP_DEVICES);
++	unsigned long apid, apqn;
++
++	bitmap_copy(apm, matrix_mdev->matrix.apm, AP_DEVICES);
++
++	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, AP_DEVICES) {
++		if (!test_bit_inv(apid,
++				  (unsigned long *) matrix_dev->info.apm))
++			clear_bit_inv(apqi, apm);
++
++		apqn = AP_MKQID(apid, apqi);
++		if (!vfio_ap_get_mdev_queue(matrix_mdev, apqn))
++			clear_bit_inv(apid, apm);
++	}
++
++	if (bitmap_empty(apm, AP_DEVICES))
++		return false;
++
++	set_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm);
++	bitmap_copy(matrix_mdev->shadow_apcb.apm, apm, AP_DEVICES);
++
++	return true;
++}
++
++static bool vfio_ap_mdev_assign_guest_apqi(struct ap_matrix_mdev *matrix_mdev,
++					   unsigned long apqi)
++{
++	unsigned long apid, apqn;
++
++	if (!vfio_ap_mdev_has_crycb(matrix_mdev) ||
++	    !test_bit_inv(apqi, (unsigned long *)matrix_dev->info.aqm))
++		return false;
++
++	if (bitmap_empty(matrix_mdev->shadow_apcb.apm, AP_DEVICES))
++		return vfio_ap_mdev_assign_apids_4_apqi(matrix_mdev, apqi);
++
++	for_each_set_bit_inv(apid, matrix_mdev->shadow_apcb.apm, AP_DEVICES) {
++		apqn = AP_MKQID(apid, apqi);
++		if (!vfio_ap_get_mdev_queue(matrix_mdev, apqn))
++			return false;
++	}
++
++	set_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm);
++
++	return true;
++}
++
+ /**
+  * assign_domain_store
+  *
+@@ -901,12 +1033,41 @@ static ssize_t assign_domain_store(struct device *dev,
+ 	}
+ 	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
+ 	vfio_ap_mdev_link_queues(matrix_mdev, LINK_APQI, apqi);
++	if (vfio_ap_mdev_assign_guest_apqi(matrix_mdev, apqi))
++		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+ 	mutex_unlock(&matrix_dev->lock);
  
--	/* If the guest is running, disallow un-assignment of control domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &domid);
- 	if (ret)
- 		return ret;
+ 	return count;
+ }
+ static DEVICE_ATTR_WO(assign_domain);
+ 
++static bool vfio_ap_mdev_unassign_guest_apqi(struct ap_matrix_mdev *matrix_mdev,
++					     unsigned long apqi)
++{
++	if (vfio_ap_mdev_has_crycb(matrix_mdev)) {
++		if (test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm)) {
++			clear_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm);
++
++			/*
++			 * If there are no APQIs assigned to the guest, then
++			 * the guest will not have access to any queues, so
++			 * let's also go ahead and unassign the APIDs. Keeping
++			 * them around may yield unpredictable results during
++			 * a probe that is not related to a host AP
++			 * configuration change (i.e., an AP adapter is
++			 * configured online).
++			 */
++			if (bitmap_empty(matrix_mdev->shadow_apcb.aqm,
++					 AP_DOMAINS))
++				bitmap_clear(matrix_mdev->shadow_apcb.apm, 0,
++					     AP_DEVICES);
++
++			return true;
++		}
++	}
++
++	return false;
++}
+ 
+ /**
+  * unassign_domain_store
+@@ -944,12 +1105,28 @@ static ssize_t unassign_domain_store(struct device *dev,
+ 	mutex_lock(&matrix_dev->lock);
+ 	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
+ 	vfio_ap_mdev_link_queues(matrix_mdev, UNLINK_APQI, apqi);
++	if (vfio_ap_mdev_unassign_guest_apqi(matrix_mdev, apqi))
++		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+ 	mutex_unlock(&matrix_dev->lock);
+ 
+ 	return count;
+ }
+ static DEVICE_ATTR_WO(unassign_domain);
+ 
++static bool vfio_ap_mdev_assign_guest_cdom(struct ap_matrix_mdev *matrix_mdev,
++					   unsigned long domid)
++{
++	if (vfio_ap_mdev_has_crycb(matrix_mdev)) {
++		if (!test_bit_inv(domid, matrix_mdev->shadow_apcb.adm)) {
++			set_bit_inv(domid, matrix_mdev->shadow_apcb.adm);
++
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ /**
+  * assign_control_domain_store
+  *
+@@ -984,12 +1161,29 @@ static ssize_t assign_control_domain_store(struct device *dev,
+ 
+ 	mutex_lock(&matrix_dev->lock);
+ 	set_bit_inv(id, matrix_mdev->matrix.adm);
++	if (vfio_ap_mdev_assign_guest_cdom(matrix_mdev, id))
++		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+ 	mutex_unlock(&matrix_dev->lock);
+ 
+ 	return count;
+ }
+ static DEVICE_ATTR_WO(assign_control_domain);
+ 
++static bool
++vfio_ap_mdev_unassign_guest_cdom(struct ap_matrix_mdev *matrix_mdev,
++				 unsigned long domid)
++{
++	if (vfio_ap_mdev_has_crycb(matrix_mdev)) {
++		if (test_bit_inv(domid, matrix_mdev->shadow_apcb.adm)) {
++			clear_bit_inv(domid, matrix_mdev->shadow_apcb.adm);
++
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ /**
+  * unassign_control_domain_store
+  *
+@@ -1024,6 +1218,8 @@ static ssize_t unassign_control_domain_store(struct device *dev,
+ 
+ 	mutex_lock(&matrix_dev->lock);
+ 	clear_bit_inv(domid, matrix_mdev->matrix.adm);
++	if (vfio_ap_mdev_unassign_guest_cdom(matrix_mdev, domid))
++		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+ 	mutex_unlock(&matrix_dev->lock);
+ 
+ 	return count;
 -- 
 2.21.1
 
