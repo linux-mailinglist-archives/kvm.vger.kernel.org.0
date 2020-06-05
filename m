@@ -2,128 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE78B1EFCA6
-	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 17:39:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BC391EFD36
+	for <lists+kvm@lfdr.de>; Fri,  5 Jun 2020 18:05:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728090AbgFEPjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jun 2020 11:39:39 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:37295 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726568AbgFEPji (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jun 2020 11:39:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1591371578; x=1622907578;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=bpxi5R4bZVMT/3MFEoBfMtJ94Rym4esyRQkAw8vEPzE=;
-  b=rhWN8qCv7RMgVHc/VHcpY7aFwUQzLaqZttX6qEi0w38/cSUbFC4tO7Vc
-   dEUF9h3oZGR39lQZc0IkI6tKL8ury0zvAQ4oaAK8DNbKhR2QE6TP0hTqc
-   xZby2CrjxuRu4D6YWEyp58DkeYJmSCkhwCl9pt/qZuRlKjp8RYvN/oPYd
-   Y=;
-IronPort-SDR: 5oiTao/Y/+2/exBBlvBCg+94gByxVMIU/9O22P8t8Z8AeIwNGDtJumrAR2ISQ4Z93kHTD+Jt0A
- ePERMDp7myjg==
-X-IronPort-AV: E=Sophos;i="5.73,476,1583193600"; 
-   d="scan'208";a="34687396"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 05 Jun 2020 15:39:36 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-4e24fd92.us-west-2.amazon.com (Postfix) with ESMTPS id EC151A1C39;
-        Fri,  5 Jun 2020 15:39:34 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 5 Jun 2020 15:39:34 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.90) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 5 Jun 2020 15:39:24 +0000
-Subject: Re: [PATCH v3 01/18] nitro_enclaves: Add ioctl interface definition
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-CC:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        "Colm MacCarthaigh" <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        "Matt Wilson" <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Stefan Hajnoczi" <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        "Uwe Dannowski" <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200525221334.62966-1-andraprs@amazon.com>
- <20200525221334.62966-2-andraprs@amazon.com>
- <20200527084959.GA29137@stefanha-x1.localdomain>
- <a95de3ee4b722d418fd6cf662233cb024928804e.camel@kernel.crashing.org>
- <d639afa5-cca6-3707-4c80-40ee1bf5bcb5@amazon.com>
- <20200605081503.GA59410@stefanha-x1.localdomain>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <8dbf6822-d835-8c1f-64ff-3e07a77aa8f9@amazon.com>
-Date:   Fri, 5 Jun 2020 18:39:15 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.1
+        id S1726077AbgFEQFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jun 2020 12:05:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41914 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725954AbgFEQFR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jun 2020 12:05:17 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 055G2K42069333;
+        Fri, 5 Jun 2020 12:05:06 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31fr7rj9w9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 12:05:06 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 055G30F3072434;
+        Fri, 5 Jun 2020 12:05:05 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31fr7rj9v0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 12:05:05 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 055G0uoi001764;
+        Fri, 5 Jun 2020 16:05:03 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 31end6hgyd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Jun 2020 16:05:03 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 055G50kh655828
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 Jun 2020 16:05:00 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6DD7A4040;
+        Fri,  5 Jun 2020 16:05:00 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 28265A404D;
+        Fri,  5 Jun 2020 16:05:00 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.61.106])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  5 Jun 2020 16:05:00 +0000 (GMT)
+Date:   Fri, 5 Jun 2020 18:04:58 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>, pair@us.ibm.com,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
+        qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>
+Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
+ properties for protected guests
+Message-ID: <20200605180458.7646070b.pasic@linux.ibm.com>
+In-Reply-To: <20200605124535.12e8c96e.cohuck@redhat.com>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+        <20200521034304.340040-19-david@gibson.dropbear.id.au>
+        <20200605124535.12e8c96e.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200605081503.GA59410@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.90]
-X-ClientProxiedBy: EX13D05UWB003.ant.amazon.com (10.43.161.26) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-05_04:2020-06-04,2020-06-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=876
+ clxscore=1011 phishscore=0 bulkscore=0 cotscore=-2147483648 suspectscore=0
+ spamscore=0 mlxscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006050116
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 5 Jun 2020 12:45:35 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
+> On Thu, 21 May 2020 13:43:04 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> 
+> > The default behaviour for virtio devices is not to use the platforms normal
+> > DMA paths, but instead to use the fact that it's running in a hypervisor
+> > to directly access guest memory.  That doesn't work if the guest's memory
+> > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+> > 
+> > So, if a guest memory protection mechanism is enabled, then apply the
+> > iommu_platform=on option so it will go through normal DMA mechanisms.
+> > Those will presumably have some way of marking memory as shared with the
+> > hypervisor or hardware so that DMA will work.
+> 
+> cc: Halil, who had been looking at the interaction of virtio-ccw
+> devices and s390 protected virt.
+> 
+> (IIRC, we wanted to try with a on/off/auto property for virtio-ccw?)
 
-On 05/06/2020 11:15, Stefan Hajnoczi wrote:
-> On Mon, Jun 01, 2020 at 10:20:18AM +0300, Paraschiv, Andra-Irina wrote:
->>
->> On 01/06/2020 06:02, Benjamin Herrenschmidt wrote:
->>> On Wed, 2020-05-27 at 09:49 +0100, Stefan Hajnoczi wrote:
->>>> What about feature bits or a API version number field? If you add
->>>> features to the NE driver, how will userspace detect them?
->>>>
->>>> Even if you intend to always compile userspace against the exact kernel
->>>> headers that the program will run on, it can still be useful to have an
->>>> API version for informational purposes and to easily prevent user
->>>> errors (running a new userspace binary on an old kernel where the API =
-is
->>>> different).
->>>>
->>>> Finally, reserved struct fields may come in handy in the future. That
->>>> way userspace and the kernel don't need to explicitly handle multiple
->>>> struct sizes.
->>> Beware, Greg might disagree :)
->>>
->>> That said, yes, at least a way to query the API version would be
->>> useful.
->> I see there are several thoughts with regard to extensions possibilities=
-. :)
->>
->> I added an ioctl for getting the API version, we have now a way to query
->> that info. Also, I updated the sample in this patch series to check for =
-the
->> API version.
-> Great. The ideas are orthogonal and not all of them need to be used
-> together. As long as their is a way of extending the API cleanly in the
-> future then extensions can be made without breaking userspace.
+Thanks Connie! I will definitely look into this. And regarding
+on/off/auto I will try to send out something today.
 
-Agree, as we achieve the ultimate goal of having a stable interface, =
-
-open for extensions without breaking changes.
-
-Thanks,
-Andra
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
-
+Regards,
+Halil
