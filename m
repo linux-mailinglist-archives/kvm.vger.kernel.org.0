@@ -2,165 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0F5B1F05D5
-	for <lists+kvm@lfdr.de>; Sat,  6 Jun 2020 10:46:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C30B91F0660
+	for <lists+kvm@lfdr.de>; Sat,  6 Jun 2020 13:53:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728639AbgFFIp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Jun 2020 04:45:58 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37943 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728609AbgFFIp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jun 2020 04:45:56 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 49fClj0HNYz9sSf; Sat,  6 Jun 2020 18:45:52 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1591433153;
-        bh=Sd1rxSYGaP/J1oZ2u/d2cFpFgkmQrMVEQoAFgYu76HU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YpAscJI43jEHPiq4ciauynv+Q5emKXaXV6ZFjtWi3vePEyjmZOZ/g5tYnNO/Kg88p
-         D/jhV+qnPMCZtin2mFPEfIPL/5RRyAtY96iVVWkDZIgz5IWrtmH+UlJ397hGAE8/oy
-         P35K7WaCEn+hhFeknkNhuXahEMd223UntiqSxOto=
-Date:   Sat, 6 Jun 2020 18:45:45 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     Thiago Jung Bauermann <bauerman@linux.ibm.com>, pair@us.ibm.com,
-        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, cohuck@redhat.com,
-        qemu-devel@nongnu.org, dgilbert@redhat.com, qemu-ppc@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-Message-ID: <20200606084545.GM228651@umbus.fritz.box>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <87tuzr5ts5.fsf@morokweng.localdomain>
- <20200604064414.GI228651@umbus.fritz.box>
- <20200604105228.2cb311d3@kaod.org>
+        id S1728732AbgFFLxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Jun 2020 07:53:42 -0400
+Received: from mx24.baidu.com ([111.206.215.185]:36350 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725831AbgFFLxl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Jun 2020 07:53:41 -0400
+Received: from BC-Mail-Ex14.internal.baidu.com (unknown [172.31.51.54])
+        by Forcepoint Email with ESMTPS id 48047EE440090CF01259;
+        Sat,  6 Jun 2020 19:53:30 +0800 (CST)
+Received: from BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) by
+ BC-Mail-Ex14.internal.baidu.com (172.31.51.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1531.3; Sat, 6 Jun 2020 19:53:29 +0800
+Received: from BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) by
+ BJHW-Mail-Ex13.internal.baidu.com ([100.100.100.36]) with mapi id
+ 15.01.1713.004; Sat, 6 Jun 2020 19:53:23 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+CC:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Sean Christopherson" <sean.j.christopherson@intel.com>,
+        "wei.huang2@amd.com" <wei.huang2@amd.com>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdW3Y2XSBLVk06IFg4Njogc3VwcG9ydCBBUEVSRi9N?=
+ =?utf-8?Q?PERF_registers?=
+Thread-Topic: [PATCH][v6] KVM: X86: support APERF/MPERF registers
+Thread-Index: AQHWOtrZ4X/t3pkmBEG7o3WCZUgoeKjI8MGAgAAac4CAALL6AIAAAaWAgAG8BDA=
+Date:   Sat, 6 Jun 2020 11:53:23 +0000
+Message-ID: <15a134b739614f8bbaf18ce40662f6b3@baidu.com>
+References: <1591321466-2046-1-git-send-email-lirongqing@baidu.com>
+ <b70d03dd-947f-dee5-5499-3b381372497d@intel.com>
+ <72a75924-c3cb-6b23-62bd-67b739dec166@redhat.com>
+ <CALMp9eSrDehftA5o6tU2sE_098F2ucztYtzhvgguYDnWqwHJaw@mail.gmail.com>
+ <a1aa9cc5-96c7-11fe-17e1-22fe46b940f3@redhat.com>
+In-Reply-To: <a1aa9cc5-96c7-11fe-17e1-22fe46b940f3@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.127.81.84]
+x-baidu-bdmsfe-datecheck: 1_BC-Mail-Ex14_2020-06-06 19:53:30:236
+x-baidu-bdmsfe-viruscheck: BC-Mail-Ex14_GRAY_Inside_WithoutAtta_2020-06-06
+ 19:53:30:173
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="egxrhndXibJAPJ54"
-Content-Disposition: inline
-In-Reply-To: <20200604105228.2cb311d3@kaod.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---egxrhndXibJAPJ54
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jun 04, 2020 at 11:08:21AM +0200, Greg Kurz wrote:
-> On Thu, 4 Jun 2020 16:44:14 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Thu, Jun 04, 2020 at 01:39:22AM -0300, Thiago Jung Bauermann wrote:
-> > >=20
-> > > Hello David,
-> > >=20
-> > > David Gibson <david@gibson.dropbear.id.au> writes:
-> > >=20
-> > > > A number of hardware platforms are implementing mechanisms whereby =
-the
-> > > > hypervisor does not have unfettered access to guest memory, in order
-> > > > to mitigate the security impact of a compromised hypervisor.
-> > > >
-> > > > AMD's SEV implements this with in-cpu memory encryption, and Intel =
-has
-> > > > its own memory encryption mechanism.  POWER has an upcoming mechani=
-sm
-> > > > to accomplish this in a different way, using a new memory protection
-> > > > level plus a small trusted ultravisor.  s390 also has a protected
-> > > > execution environment.
-> > > >
-> > > > The current code (committed or draft) for these features has each
-> > > > platform's version configured entirely differently.  That doesn't s=
-eem
-> > > > ideal for users, or particularly for management layers.
-> > > >
-> > > > AMD SEV introduces a notionally generic machine option
-> > > > "machine-encryption", but it doesn't actually cover any cases other
-> > > > than SEV.
-> > > >
-> > > > This series is a proposal to at least partially unify configuration
-> > > > for these mechanisms, by renaming and generalizing AMD's
-> > > > "memory-encryption" property.  It is replaced by a
-> > > > "guest-memory-protection" property pointing to a platform specific
-> > > > object which configures and manages the specific details.
-> > > >
-> > > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping =
-it
-> > >=20
-> > > Thank you very much for this series! Using a machine property is a ni=
-ce
-> > > way of configuring this.
-> > >=20
-> > > >From an end-user perspective, `-M pseries,guest-memory-protection` in
-> > > the command line already expresses everything that QEMU needs to know,
-> > > so having to add `-object pef-guest,id=3Dpef0` seems a bit redundant.=
- Is
-> > > it possible to make QEMU create the pef-guest object behind the scenes
-> > > when the guest-memory-protection property is specified?
-> > >=20
-> > > Regardless, I was able to successfuly launch POWER PEF guests using
-> > > these patches:
-> > >=20
-> > > Tested-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-> > >=20
-> > > > can be extended to cover the Intel and s390 mechanisms as well,
-> > > > though.
-> > > >
-> > > > Note: I'm using the term "guest memory protection" throughout to re=
-fer
-> > > > to mechanisms like this.  I don't particular like the term, it's bo=
-th
-> > > > long and not really precise.  If someone can think of a succinct way
-> > > > of saying "a means of protecting guest memory from a possibly
-> > > > compromised hypervisor", I'd be grateful for the suggestion.
-> > >=20
-> > > Is "opaque guest memory" any better? It's slightly shorter, and sligh=
-tly
-> > > more precise about what the main characteristic this guest property c=
-onveys.
-> >=20
-> > That's not a bad one, but for now I'm going with "host trust
-> > limitation", since this might end up covering things other than just
-> > memory protection.
->=20
-> Any idea what these other things might be ? It seems a bit hard to
-> decide of a proper name without a broader picture at this point.
-
-Well, at the very least there needs to be protection of the guest's
-register state from the hypervisor (which may be indirectly implied by
-protection of memory).
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---egxrhndXibJAPJ54
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7bV7kACgkQbDjKyiDZ
-s5LoOhAAzTkZg8vVkil2pKGjEcyQt9TxyqYc5VBTeUAd9jKS7wsD/03CgiFRu4iG
-fHf+0q0ric0CCUFs8U82v5mvAOZrcAmzGu1JgpPxa7qXWk/TBrd94jvTUgcX5lb9
-yJ4Mv5xLlFwaorVYywkKYP0Ry1VrQWQ0DbZ6T9wFTvjC49C0+quWb1IBJgyXR25j
-QZZV6RPGkW5WsEd/ixLXzNkU4DPIJlb8t+3RLe8EWCMZ1hExqTmHqsYMhzUJ3/or
-/DIyoLhrSyTQdIqIpgwH9BWJIK8/zpijho2wuVxzlh4EfGM6qLTVTapF1tW3OQBl
-QlPyYCl7wIOc0to+AuJgZgecm4f0m2JQdHj9h/hCrVgZr6SdLzfsCnhxnA1JaCkV
-j2cpyqNSeMcPr8ZHRAwsPZ4+DeP+fs1MBR/6cIzna8x1FUUekQP3xpHvAxYRjRUr
-iQ+i2BTf775684gk80bdbVf2JmhNt0DAdoSPtDQG0mkeDDNnvVexTeHY+DE7T0O4
-vjU8mjmhuWFnncOc2K6UpqE0iARBstto1QLgOdKM9jsPw2GzGyrNrbilDZrBciHY
-nvllZdfQlY9Rx8VTD625iMTSm/jKoEqu7VxeiyeyraZyqnBzTvIF7DWwJKRT8g+r
-75Uk6ebYh7TYPvKQOSa8bn4uqM2CYZJyu0LP73rQNIiJuoKGOyM=
-=0hIP
------END PGP SIGNATURE-----
-
---egxrhndXibJAPJ54--
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFBhb2xvIEJvbnppbmkg
+W21haWx0bzpwYm9uemluaUByZWRoYXQuY29tXQ0KPiDlj5HpgIHml7bpl7Q6IDIwMjDlubQ25pyI
+NuaXpSAxOjIyDQo+IOaUtuS7tuS6ujogSmltIE1hdHRzb24gPGptYXR0c29uQGdvb2dsZS5jb20+
+DQo+IOaKhOmAgTogWGlhb3lhbyBMaSA8eGlhb3lhby5saUBpbnRlbC5jb20+OyBMaSxSb25ncWlu
+ZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+Ow0KPiBMS01MIDxsaW51eC1rZXJuZWxAdmdlci5rZXJu
+ZWwub3JnPjsga3ZtIGxpc3QgPGt2bUB2Z2VyLmtlcm5lbC5vcmc+OyB0aGUNCj4gYXJjaC94ODYg
+bWFpbnRhaW5lcnMgPHg4NkBrZXJuZWwub3JnPjsgSCAuIFBldGVyIEFudmluIDxocGFAenl0b3Iu
+Y29tPjsNCj4gQm9yaXNsYXYgUGV0a292IDxicEBhbGllbjguZGU+OyBJbmdvIE1vbG5hciA8bWlu
+Z29AcmVkaGF0LmNvbT47IFRob21hcw0KPiBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPjsg
+V2FucGVuZyBMaSA8d2FucGVuZ2xpQHRlbmNlbnQuY29tPjsgVml0YWx5DQo+IEt1em5ldHNvdiA8
+dmt1em5ldHNAcmVkaGF0LmNvbT47IFNlYW4gQ2hyaXN0b3BoZXJzb24NCj4gPHNlYW4uai5jaHJp
+c3RvcGhlcnNvbkBpbnRlbC5jb20+OyB3ZWkuaHVhbmcyQGFtZC5jb20NCj4g5Li76aKYOiBSZTog
+W1BBVENIXVt2Nl0gS1ZNOiBYODY6IHN1cHBvcnQgQVBFUkYvTVBFUkYgcmVnaXN0ZXJzDQo+IA0K
+PiBPbiAwNS8wNi8yMCAxOToxNiwgSmltIE1hdHRzb24gd3JvdGU6DQo+ID4+Pj4gQEAgLTQ5MzAs
+NiArNDkzOSwxMSBAQCBpbnQga3ZtX3ZtX2lvY3RsX2VuYWJsZV9jYXAoc3RydWN0IGt2bQ0KPiAq
+a3ZtLA0KPiA+Pj4+ICAgICAgICAgICBrdm0tPmFyY2guZXhjZXB0aW9uX3BheWxvYWRfZW5hYmxl
+ZCA9IGNhcC0+YXJnc1swXTsNCj4gPj4+PiAgICAgICAgICAgciA9IDA7DQo+ID4+Pj4gICAgICAg
+ICAgIGJyZWFrOw0KPiA+Pj4+ICsgICAgY2FzZSBLVk1fQ0FQX0FQRVJGTVBFUkY6DQo+ID4+Pj4g
+KyAgICAgICAga3ZtLT5hcmNoLmFwZXJmbXBlcmZfbW9kZSA9DQo+ID4+Pj4gKyAgICAgICAgICAg
+IGJvb3RfY3B1X2hhcyhYODZfRkVBVFVSRV9BUEVSRk1QRVJGKSA/DQo+IGNhcC0+YXJnc1swXSA6
+DQo+ID4+Pj4gKyAwOw0KPiA+Pj4gU2hvdWxkbid0IGNoZWNrIHdoZXRoZXIgY2FwLT5hcmdzWzBd
+IGlzIGEgdmFsaWQgdmFsdWU/DQo+ID4+IFllcywgb25seSB2YWxpZCB2YWx1ZXMgc2hvdWxkIGJl
+IGFsbG93ZWQuDQo+ID4+DQo+ID4+IEFsc28sIGl0IHNob3VsZCBmYWlsIHdpdGggLUVJTlZBTCBp
+ZiB0aGUgaG9zdCBkb2VzIG5vdCBoYXZlDQo+ID4+IFg4Nl9GRUFUVVJFX0FQRVJGTVBFUkYuDQo+
+ID4gU2hvdWxkIGVuYWJsaW5nL2Rpc2FibGluZyB0aGlzIGNhcGFiaWxpdHkgYmUgZGlzYWxsb3dl
+ZCBvbmNlIHZDUFVzDQo+ID4gaGF2ZSBiZWVuIGNyZWF0ZWQ/DQo+ID4NCj4gDQo+IFRoYXQncyBh
+IGdvb2QgaWRlYSwgeWVzLg0KPiANCj4gUGFvbG8NCg0KDQpUaGFuayB5b3UgYWxsLCBJIHdpbGwg
+c2VuZCBhIG5ldyB2ZXJzaW9uDQoNCi1MaQ0K
