@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3753D1F0803
-	for <lists+kvm@lfdr.de>; Sat,  6 Jun 2020 19:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 857401F0809
+	for <lists+kvm@lfdr.de>; Sat,  6 Jun 2020 19:37:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728837AbgFFRQK convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 6 Jun 2020 13:16:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40016 "EHLO mail.kernel.org"
+        id S1728732AbgFFRhI convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 6 Jun 2020 13:37:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46056 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727847AbgFFRQK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jun 2020 13:16:10 -0400
+        id S1726389AbgFFRhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Jun 2020 13:37:07 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
 Subject: [Bug 208091] vcpu1, guest rIP offset ignored wrmsr or rdmsr
-Date:   Sat, 06 Jun 2020 17:16:09 +0000
+Date:   Sat, 06 Jun 2020 17:37:07 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -30,8 +30,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_file_loc
-Message-ID: <bug-208091-28872-frTyQnp1jc@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-208091-28872-lPWtjocG2H@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-208091-28872@https.bugzilla.kernel.org/>
 References: <bug-208091-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -46,12 +46,19 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=208091
 
-Joris L. (commandline@protonmail.com) changed:
+--- Comment #1 from Joris L. (commandline@protonmail.com) ---
+iommu ivhd0: AMD-Vi: Event logged [IOTLB_INV_TIMEOUT device=DD:00.0
+address=0x7fb99eeb0]
+iommu ivhd0: AMD-Vi: Event logged [IOTLB_INV_TIMEOUT device=DD:00.0
+address=0x7fb99ef10]
+iommu ivhd0: AMD-Vi: Event logged [IOTLB_INV_TIMEOUT device=DD:00.0
+address=0x7fb99ef50]
+iommu ivhd0: AMD-Vi: Event logged [IOTLB_INV_TIMEOUT device=DD:00.0
+address=0x7fb99ef70]
+vfio-pci 0000:28:00.0: timed out waiting for pending transaction; performing
+function level reset anyway
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                URL|                            |https://patchwork.kernel.or
-                   |                            |g/patch/7670771/
+device=DD < anonimised
 
 -- 
 You are receiving this mail because:
