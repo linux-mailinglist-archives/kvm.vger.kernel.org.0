@@ -2,117 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 178C61F085F
-	for <lists+kvm@lfdr.de>; Sat,  6 Jun 2020 21:35:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1DC81F0880
+	for <lists+kvm@lfdr.de>; Sat,  6 Jun 2020 22:21:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728883AbgFFTfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Jun 2020 15:35:01 -0400
-Received: from mout.web.de ([212.227.17.12]:58043 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728351AbgFFTfA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jun 2020 15:35:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1591472079;
-        bh=lKUg2PhSFx6sUFem2OVSuuT/pnnC9Z/U+JZQ9f2W1EY=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
-        b=JSjx9ofinJBv+SozHFfL4ZkwiOhDZ+taFFsMkB5z6y4OVKBC0Y7OjFEJqq/WHo0bG
-         bQXdHZtzTOhHh2RsxXB68bufGCwRKyhoVacORdj9gXbTHX8QRYJxhSCgXjkQbz7wY+
-         vcl9m58ZSTVEVfCAXYs7m3hZYgSEkQkA2+a7hcI4=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([87.123.206.73]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MPKB5-1jKDLv3JD3-00PpsX; Sat, 06
- Jun 2020 21:34:38 +0200
-Date:   Sat, 6 Jun 2020 21:34:35 +0200
-From:   Lukas Straub <lukasstraub2@web.de>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        kvm@vger.kernel.org, "Michael S . Tsirkin" <mst@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>, qemu-s390x@nongnu.org,
-        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+        id S1728876AbgFFUVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Jun 2020 16:21:39 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55477 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728350AbgFFUVj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 6 Jun 2020 16:21:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591474898;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o4jqwUMVsfsSvwCMKervPyctKjmw5vEX56fqpclyMnA=;
+        b=Hs0BuDV7J94R/R/Z5TPQQjiP/lZA8FWNhCF94XsGVd7eCDAUBfzrW3V4cQqJVIvW0mIvI3
+        rfHW4Ql9vUbgXDKQk0Qzx59BD/elJpO3Kp10eBcuHBDBnseJoN2U8VjOFQFgfUisq13OIv
+        qZFJyB20anH85pewvJahRzpR6CmsQoM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-NbQlkw-GOB-R_WvehTcjIA-1; Sat, 06 Jun 2020 16:21:36 -0400
+X-MC-Unique: NbQlkw-GOB-R_WvehTcjIA-1
+Received: by mail-wr1-f72.google.com with SMTP id p10so5368780wrn.19
+        for <kvm@vger.kernel.org>; Sat, 06 Jun 2020 13:21:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=o4jqwUMVsfsSvwCMKervPyctKjmw5vEX56fqpclyMnA=;
+        b=HBtpmI13ESClScI+YkRFOnMb345S1DORq3ZBAW7Oe3+FzGbH3Y+MQ9o2VUZhBLg35d
+         +iTc5w2ORuApUn0OxLUxRqzdy51OBDPgSIyhOkP4PupgP78rYPZFcxAjgNL6qAVnc64o
+         m3mNyqxXD1phCZlETR2UqPEovDueqe0706WkLGj7FdB1ZWAWWJu/fgvv6t3oTDoFukJ2
+         m7FqfKXZ/RIBNz4R8SSQL3dULjek92o4DsEwVBivef55oJzfa27uCHWbKNUzJJFKs3td
+         GdpEnk6R4oOlU2Scn4/ijLS48l05NrLHwXY8oKaFjSmXoXA151NvqvPFn6mRJ+sdn/UT
+         MaDg==
+X-Gm-Message-State: AOAM533PaOaypxtTwYvIDQx3lPXlkDQA5zje1BYVwMZmr3jnKlgkp+Pg
+        2sAL1+KH6LxaQbo/PQrI69j97DSKh4qTZO/djfALI9a7yzYIVBIntazD6/93EmZnsebeSrUORBz
+        GhHg6ZHcR/wDQ
+X-Received: by 2002:a1c:ab07:: with SMTP id u7mr8676866wme.130.1591474895285;
+        Sat, 06 Jun 2020 13:21:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxD8oca7c9F3z/cHyLGoqmFQRETj0bXMVLckH6LgfSMPy8x0Bsfwmowbutieyi6uCszvoqWhA==
+X-Received: by 2002:a1c:ab07:: with SMTP id u7mr8676852wme.130.1591474894974;
+        Sat, 06 Jun 2020 13:21:34 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id t189sm16775933wma.4.2020.06.06.13.21.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jun 2020 13:21:34 -0700 (PDT)
+Date:   Sat, 6 Jun 2020 16:21:31 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
+        mdroth@linux.vnet.ibm.com, cohuck@redhat.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v3 08/20] migration/colo: Use
- ram_block_discard_disable()
-Message-ID: <20200606213435.664ca5e4@luklap>
-In-Reply-To: <20200603144914.41645-9-david@redhat.com>
-References: <20200603144914.41645-1-david@redhat.com>
-        <20200603144914.41645-9-david@redhat.com>
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
+ properties for protected guests
+Message-ID: <20200606162014-mutt-send-email-mst@kernel.org>
+References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
+ <20200521034304.340040-19-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/LYHMMuSwfzP+qx4=p_ni+M6";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:6/EiRazrWk4aoVSSJLHR/x+lzc9SP4jIhe6OtRGTKIE2vIIS39u
- +9MU1wXuX5wMqOEr6M2hIwSDy5i5IOCKDIeu+A+Nj9tUGCoNZgcVl3jiNzI7Ferxjr8dOLk
- XB8AkKuoreoVIu+lev4ShwOdWY4S8hU6envKebReReOdULc7uR8igOgVjgVSLwTbmJOV4Zq
- KfCJkHVw+af7sX6qzECWQ==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NlkEyiKaNyw=:pIc6AxLTI8LTPkTs9aVvWs
- hyoadoiWE6feoptSNsvxry1/Xzwi/hYv/1bEtdfwTfIEoC5LIYq2T1042Suv02D4JnH+qHCC5
- zJi/etzDrRHpqVcU1YsWOv+7edppI33pZOYydz2gnmWS94Vtb++meOfMhGTSczvr18KI0/UOT
- t4s9o1xn9dBZNE1bjxvYHVmN+LCwcHbAd1xWG842s4EroTbvcpD/yE7zBSxGJN2uBnZRjtUrZ
- Zhez/GVm7PPqceA8C7QzAZaAHCW15lWimFftGfzmZZEnRbl5iy0WHL+TUpXEwNS9+EhEhM6VM
- N5iY2hOc3sQr4KHbHdyAuOp9TW6cWA4KYhtUfB8c4G2Vd3z0xhx9gecykCnvYrP61OWyNOjoA
- RgZ2DymITWXSDojqaeOp6y83tmEmM1HuzCAL1/HdTQpK626kf91kKdm0LNvSRKC8whYgR0SPm
- lsKo7X+fNHXO1x9rRv/yDxUljGiGQVGn4Y53XCjaz6JHDhhftj1OFAqqQa1SPUvF9Q4ZErQLk
- xn2NkmSrxWLMtlCojYMlrWCU32ued6xY21gTlIO7HokoQJ1bXhlI3O1dswPAta1eMa7niTP2C
- pQLE6xVeZsInaYBoZ8R6FTWvmkb3zMGAmuYgpglWxozDHznBQ91U/++5KJ9MC8TXJcGpzepmI
- P8Sd0rSbY8KVqDpnqo7GzYUAxT4Nx7OItnHASrxcBJYv3RBNWy7/jvHd1INhnDLHJQPA6bXyy
- ssOGf0sKjfbaMd9S8NZzKmva+zoqEWM0pbLBME/oLZkDT77rkVAemxpRvSExXnsCkYvKsOC6C
- tKZoacES7u0TjiErd/mrB8KmZQXKNIndlapbL1jvkT8enX56dbPvsp0J942EyjjiBOJT2c0PS
- wiiQXmkM+mESeKBMfwga15qmKfgls/nQpSLPqSXurJkgLcLfj086j2P9pNn8woSfSVem64YBP
- MOdKGexIahoC6YhMz637Pg171Whhqxd7EylDBPp1KSvkqCa0dW4BgBTRmyPyGZGeQRZosXgyX
- yJsVm9hWaNUkFdN9SkJMRYf7MRS3kHbgtvsWya6zyo87ZyhtCbbapiYI+JxJhmcv3l9CphJrq
- kZusiFvnUjdQOoczAuziScWvrrjLYW1YChWAYrOcioTphWmkE5wyET+k/3imbdE3G8WInd/Ap
- +yS21v6A1mrHsWYxZonGUAsHcHzwbc55ZsU9JgF96a9qoY1pYeMzJlmA6b+RsX8Idb/MOHYWv
- 7WUw0hTP5UjkzPuia
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200521034304.340040-19-david@gibson.dropbear.id.au>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/LYHMMuSwfzP+qx4=p_ni+M6
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Wed,  3 Jun 2020 16:49:02 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> COLO will copy all memory in a RAM block, disable discarding of RAM.
->=20
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Thu, May 21, 2020 at 01:43:04PM +1000, David Gibson wrote:
+> The default behaviour for virtio devices is not to use the platforms normal
+> DMA paths, but instead to use the fact that it's running in a hypervisor
+> to directly access guest memory.  That doesn't work if the guest's memory
+> is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
+> 
+> So, if a guest memory protection mechanism is enabled, then apply the
+> iommu_platform=on option so it will go through normal DMA mechanisms.
+> Those will presumably have some way of marking memory as shared with the
+> hypervisor or hardware so that DMA will work.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
+>  hw/core/machine.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 88d699bceb..cb6580954e 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -28,6 +28,8 @@
+>  #include "hw/mem/nvdimm.h"
+>  #include "migration/vmstate.h"
+>  #include "exec/guest-memory-protection.h"
+> +#include "hw/virtio/virtio.h"
+> +#include "hw/virtio/virtio-pci.h"
+>  
+>  GlobalProperty hw_compat_5_0[] = {};
+>  const size_t hw_compat_5_0_len = G_N_ELEMENTS(hw_compat_5_0);
+> @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *machine)
+>           * areas.
+>           */
+>          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
+> +
+> +        /*
+> +         * Virtio devices can't count on directly accessing guest
+> +         * memory, so they need iommu_platform=on to use normal DMA
+> +         * mechanisms.  That requires disabling legacy virtio support
+> +         * for virtio pci devices
+> +         */
+> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
+> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
+>      }
+>  
 
-Hi,
-This works well in my colo tests.
-Tested-by: Lukas Straub <lukasstraub2@web.de>
+I think it's a reasonable way to address this overall.
+As Cornelia has commented, addressing ccw as well as cases where user has
+specified the property manually could be worth-while.
 
-Regards,
-Lukas Straub
+>      machine_class->init(machine);
+> -- 
+> 2.26.2
 
---Sig_/LYHMMuSwfzP+qx4=p_ni+M6
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl7b78sACgkQNasLKJxd
-slgswQ/9HxF5Kde3XJ4TbdV2756BABKJDSIQxKbvLTFAVJ3J9uMZSP8lv0h1Yftc
-oMiKl1oKyeUDHZiwz+5MjCP6UZiIjl5UNqg4oJD7Tsl43aUYuxfBXhxtPGNVKFx1
-EJRphGSiZcd+kYFx5OUvzB+f/fNsu5n0YhJ+iyD54Ttj2NZgBgeTyQ2UCoGM2RQc
-kG8ZiUOGh6AEd/D5gRh5mbPToB9GVR54col2891RBBATA5gIfpxzRBY/gUoKCjKY
-t8aGiZ3NB9/Ekb4Zv0zpodsUPxfS4xfhJSFyU7DtNeF0PclVZDjhWKWpmoWUvo1P
-dhKCj7FtikfbuhRKbr5+myjYu+mZyK82+v7fR5KydmiAo5dL5x2uYD0sSKq/fZT9
-6xakcwHCi3h0438Pi7iIuH+COKw4IKIeF8Rt2UEz6pz+1xCGGfLi7M5MYl3qi4MI
-SQapHk1uruog/YLVK73H8KzqU7bc8qgKLOTqCcCdyWvhTf0t90J8k3fNQ8Fv62ej
-1Loyy/WOuaHfEO2ajYamJPCRbJm95echI6E4odyCLu2hAfQq1Z78+78EiXP9Cxnq
-rArF5n4vtGinKBLy4MDCByR/H0SYf2KAV0vSh9N82WhKHc3hNbN2jvijVK3CEn+E
-wc9Jyymae3vXdkU4CCZudCSwhuNX2w/eJ13WZVTWo9nftO8vJVE=
-=kqMZ
------END PGP SIGNATURE-----
-
---Sig_/LYHMMuSwfzP+qx4=p_ni+M6--
