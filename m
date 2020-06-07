@@ -2,147 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79D971F096D
-	for <lists+kvm@lfdr.de>; Sun,  7 Jun 2020 05:21:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A5001F0974
+	for <lists+kvm@lfdr.de>; Sun,  7 Jun 2020 05:43:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726035AbgFGDVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Jun 2020 23:21:22 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50697 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725818AbgFGDVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jun 2020 23:21:22 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 49fhVl42Z1z9sSf; Sun,  7 Jun 2020 13:21:19 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1591500079;
-        bh=sjxcB2ZCXQs3QAHxQ+jllLLgJ3Mg6gEnyr8XxHJVoes=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=d4OhZP2gompTbni7TJSU3GiP+7lrPUYcdefp9fn4Et0l/jj1HhNx9vOSU7wCR1QCQ
-         aDwnLMbB0d6RWdcoijAIMSqv/aNGeR+pBY9eFBfYRdPsixtF/OgF056S7AYyS8jNLA
-         B83auEeeC1HOkUUuCLT7w2XjNHjqGBlTaK40BNik=
-Date:   Sun, 7 Jun 2020 13:07:35 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com,
-        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
-        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
-        mdroth@linux.vnet.ibm.com, cohuck@redhat.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
- properties for protected guests
-Message-ID: <20200607030735.GN228651@umbus.fritz.box>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-19-david@gibson.dropbear.id.au>
- <20200606162014-mutt-send-email-mst@kernel.org>
+        id S1726068AbgFGDnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Jun 2020 23:43:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57616 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725818AbgFGDns (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Jun 2020 23:43:48 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595B2C08C5C2
+        for <kvm@vger.kernel.org>; Sat,  6 Jun 2020 20:43:47 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id h7so10942972otr.3
+        for <kvm@vger.kernel.org>; Sat, 06 Jun 2020 20:43:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=s4M639cJJobc0EN9vtx/B4ynyKGwXJyZrO/0uVS5uTA=;
+        b=TNqLjUuMQJRyGKb4j6fgdMxE8IJTtTx7yAAB1FsUxGxDn7E6IY8TKYRNcuz/riNisz
+         eel+CCeQR4DcofubzLV+KKFcf+P2hh92+l14NVwbW18EPaX6ow+6SyN72nYc/fgpWgns
+         rVpeG0YCd3ilG0TlVkJaOoVKyDsmhWyDgnRW+Dghxv/QxPoBBqzrQtru/w/uCeeQ9bWu
+         NIAUMCUoPZnoMzOHrxWkqQ5S1yqzH1cGw0tWsTZPp97GPSxDUNFbE8UkDSqFmZqJUBsl
+         IFYKbTWZqkYUeliQSM03ledP22mzLG2DTeDwXwkETG3L6SciEeDBKASkC0h0HS/xNKMa
+         l4yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=s4M639cJJobc0EN9vtx/B4ynyKGwXJyZrO/0uVS5uTA=;
+        b=P9BOtBK7SPskqJnHo6nJuFQnxNpv/5lwB1UnEcKy+L/qPxXP/ARp8PTpj8EtsC5Tdx
+         wYf4+FtfSO/GmN79KUpKBfDuswGZInmtr+9oaQCV3tLTsw40nijgkh4OZ9yavjpCZcgh
+         DsxWTUvOcylged1ouHN6OyyymLhOz1UNi8QEoiCSdWfdcKSYSTZ60XvtL1XjDwNFEs5B
+         km3YFP8uwn6DBvYrYofzFetCdqETCGBbnjIf/F6nBe+Hxna1C0DZEUO1Xt+l+b1bC8ml
+         98M9nXGrPMR7fn1Qq2AEQhtiJ6VIEW1BH4L6ElbL+pdgxLqYoeLERq8Y+wKygv9VAJMI
+         jCHA==
+X-Gm-Message-State: AOAM531sFYV5j7CH9FeWWVZkdhJaEFiFHbOdbD1DulfmjzlGbSHp+qMk
+        Uuw0AttGm/xVoszHsTuPNBBzxIKXnfCNHnIgbAo=
+X-Google-Smtp-Source: ABdhPJwt9PWgKQObiQ0E865KxQ7cPl/oPGE5lAtKLqwd0sN5BpQVBIfod3ReCJC5iEnZlkt0npdPuVE4u/yuGTGRjs4=
+X-Received: by 2002:a9d:aaa:: with SMTP id 39mr12316264otq.269.1591501426372;
+ Sat, 06 Jun 2020 20:43:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="WeDu0lr7bteb/II5"
-Content-Disposition: inline
-In-Reply-To: <20200606162014-mutt-send-email-mst@kernel.org>
+From:   Takuya Yoshikawa <takuya.yoshikawa@gmail.com>
+Date:   Sun, 7 Jun 2020 12:43:36 +0900
+Message-ID: <CANR1yOopgAkoT6UmXZjUaFHe2rPBn_R2K=i_WNzFpDRdtR-uDQ@mail.gmail.com>
+Subject: What will happen to hugetlbfs backed guest memory when nx_huge_pages
+ is enabled?
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Recently I noticed a significant performance issue with some of our KVM guests.
+It looked like that the ITLB_MULTIHIT mitigation patch had been
+backported to the
+Ubuntu kernel on which they were running on, and the KVM was trying to do the
+mitigation task on the guest memory backed by hugetlbfs 2MB pages.
 
---WeDu0lr7bteb/II5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+    perf showed me that the KVM was busy doing tdp_page_fault(), __direct_map(),
+    kvm_mmu_get_page() things. Normally, these were called in a short
+period of time
+    right after the VM got started because the guest soon touched the
+whole memory.
 
-On Sat, Jun 06, 2020 at 04:21:31PM -0400, Michael S. Tsirkin wrote:
-> On Thu, May 21, 2020 at 01:43:04PM +1000, David Gibson wrote:
-> > The default behaviour for virtio devices is not to use the platforms no=
-rmal
-> > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > to directly access guest memory.  That doesn't work if the guest's memo=
-ry
-> > is protected from hypervisor access, such as with AMD's SEV or POWER's =
-PEF.
-> >=20
-> > So, if a guest memory protection mechanism is enabled, then apply the
-> > iommu_platform=3Don option so it will go through normal DMA mechanisms.
-> > Those will presumably have some way of marking memory as shared with the
-> > hypervisor or hardware so that DMA will work.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/core/machine.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >=20
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index 88d699bceb..cb6580954e 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -28,6 +28,8 @@
-> >  #include "hw/mem/nvdimm.h"
-> >  #include "migration/vmstate.h"
-> >  #include "exec/guest-memory-protection.h"
-> > +#include "hw/virtio/virtio.h"
-> > +#include "hw/virtio/virtio-pci.h"
-> > =20
-> >  GlobalProperty hw_compat_5_0[] =3D {};
-> >  const size_t hw_compat_5_0_len =3D G_N_ELEMENTS(hw_compat_5_0);
-> > @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *machin=
-e)
-> >           * areas.
-> >           */
-> >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > +
-> > +        /*
-> > +         * Virtio devices can't count on directly accessing guest
-> > +         * memory, so they need iommu_platform=3Don to use normal DMA
-> > +         * mechanisms.  That requires disabling legacy virtio support
-> > +         * for virtio pci devices
-> > +         */
-> > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", =
-"on");
-> > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform=
-", "on");
-> >      }
-> > =20
->=20
-> I think it's a reasonable way to address this overall.
-> As Cornelia has commented, addressing ccw as well
+The patch explains when a guest attempts to execute on an NX marked huge page,
+KVM will break it down into 4KB pages. I understand how this works for
+THP backed
+guest memory, but what will happen to hugetlbfs backed guest memory?
 
-Sure.  I was assuming somebody who actually knows ccw could do that as
-a follow up.
+When a huge amount of system memory is reserved as the hugetlbfs pool and QEMU
+is said to use pages from there by the -mem-path option, is it safe to
+enable the
+nx_huge_pages mitigation?
 
-> as cases where user has
-> specified the property manually could be worth-while.
+We can turn it off now because the KVM guests are not from outside, and we only
+execute our applications on them.
 
-I don't really see what's to be done there.  I'm assuming that if the
-user specifies it, they know what they're doing - particularly with
-nonstandard guests there are some odd edge cases where those
-combinations might work, they're just not very likely.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+  UBUNTU: SAUCE: kvm: mmu: ITLB_MULTIHIT mitigation
+  https://git.launchpad.net/~ubuntu-kernel/ubuntu/ source/linux/
+git/xenial/commit/arch/x86/kvm?id=c6c9a37b564b8b4f7aad099388c55978ef456bb5
 
---WeDu0lr7bteb/II5
-Content-Type: application/pgp-signature; name="signature.asc"
+  kvm: mmu: ITLB_MULTIHIT mitigation
+  https://github.com/torvalds/linux/commit/b8e8c8303ff28c61046a4d0f6ea99aea609a7dc0
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7cWeoACgkQbDjKyiDZ
-s5KsURAAhiR6V12OFx0b5uCHQEi27xZICTkD74JVTRf00hH+bj7Lt2QZP4u1E/LX
-Bdrz2en9NcEm0c58y/ksosrzrq1stDpcepqJT27EES8GfNJ+O0b/4OA4w3EglxC4
-xrs6P7zlihJBf7X5jTRRbdwz7pmvismuPewerVGfcBBtQYWNnKko/6DHMYVi4Zqg
-W4YdWv0uhEUGI2uxQvU5II6Bo5sUiQlr6AyecP6i+uG0+0zMfjMDnz8WL+IlaOfJ
-+4KW1qqa2tTRUfz0XpXZNETTyjQJT2wuUFcc7n7bTQGHvtFrRu4snDzHX63fSlpP
-F//JMD6X0rtMXsGCD0wRHZoljBOUXCF17+hF4w3+aQXdw4g+H93RYZlslV2L9IQE
-TS35iCtGka8cRUPHxPhMT1hnQUInHTqFEW+bUqonhZZpx8iiZosoLeryrvKVEaUn
-AQY6UJty6NN+vaGbBDAQK5mnO1eFuiyB7SItwTguH0yqy4J1hsxo1/XNUPLpk1i5
-T7PgRcRGpA3hQefM8yhPlKTtRVoX+fpzeN9MOqE9a4PSaGN8OAKoX1ylvdTEv7IK
-IEd/I54C0BrwFoQxnQJ8ciEsuZAC0j8IqYoEwvb3FXh59OvWwO06+QFJaJXwuQ1c
-l30E6wGpXz0boBr+cIFc/8QFQjKS1paMBBbI52dmvaUlBppRG8k=
-=XDyW
------END PGP SIGNATURE-----
-
---WeDu0lr7bteb/II5--
+  Takuya
