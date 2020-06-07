@@ -2,90 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A5001F0974
-	for <lists+kvm@lfdr.de>; Sun,  7 Jun 2020 05:43:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 663871F0A65
+	for <lists+kvm@lfdr.de>; Sun,  7 Jun 2020 09:39:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726068AbgFGDnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Jun 2020 23:43:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57616 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725818AbgFGDns (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jun 2020 23:43:48 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595B2C08C5C2
-        for <kvm@vger.kernel.org>; Sat,  6 Jun 2020 20:43:47 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id h7so10942972otr.3
-        for <kvm@vger.kernel.org>; Sat, 06 Jun 2020 20:43:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=s4M639cJJobc0EN9vtx/B4ynyKGwXJyZrO/0uVS5uTA=;
-        b=TNqLjUuMQJRyGKb4j6fgdMxE8IJTtTx7yAAB1FsUxGxDn7E6IY8TKYRNcuz/riNisz
-         eel+CCeQR4DcofubzLV+KKFcf+P2hh92+l14NVwbW18EPaX6ow+6SyN72nYc/fgpWgns
-         rVpeG0YCd3ilG0TlVkJaOoVKyDsmhWyDgnRW+Dghxv/QxPoBBqzrQtru/w/uCeeQ9bWu
-         NIAUMCUoPZnoMzOHrxWkqQ5S1yqzH1cGw0tWsTZPp97GPSxDUNFbE8UkDSqFmZqJUBsl
-         IFYKbTWZqkYUeliQSM03ledP22mzLG2DTeDwXwkETG3L6SciEeDBKASkC0h0HS/xNKMa
-         l4yQ==
+        id S1726431AbgFGHj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Jun 2020 03:39:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33876 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726192AbgFGHj2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Jun 2020 03:39:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591515566;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aPxOctvuqxqnbhZwljS2gAqFDLDMhwYYqIKqplLlD90=;
+        b=RQwEdcDEb9xrOtP9ddjvOCD8FfEiYWL7eB6i/J2Qik3JeRh/QRWM5w/xPdavgzPeAZiv9m
+        FTuYV/09DKsTr2lFXmX2zQRqx4IcS3XLurOxfCqoT7wgQyLrCe60xzMYn5sfTJ1a0ZOBSr
+        k1hbA2xLJejHv+ZIevB9h2UugXuxom4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-60-WLACFa4nPoCW6Qi4Ew_6pw-1; Sun, 07 Jun 2020 03:39:24 -0400
+X-MC-Unique: WLACFa4nPoCW6Qi4Ew_6pw-1
+Received: by mail-wm1-f72.google.com with SMTP id t145so4139967wmt.2
+        for <kvm@vger.kernel.org>; Sun, 07 Jun 2020 00:39:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=s4M639cJJobc0EN9vtx/B4ynyKGwXJyZrO/0uVS5uTA=;
-        b=P9BOtBK7SPskqJnHo6nJuFQnxNpv/5lwB1UnEcKy+L/qPxXP/ARp8PTpj8EtsC5Tdx
-         wYf4+FtfSO/GmN79KUpKBfDuswGZInmtr+9oaQCV3tLTsw40nijgkh4OZ9yavjpCZcgh
-         DsxWTUvOcylged1ouHN6OyyymLhOz1UNi8QEoiCSdWfdcKSYSTZ60XvtL1XjDwNFEs5B
-         km3YFP8uwn6DBvYrYofzFetCdqETCGBbnjIf/F6nBe+Hxna1C0DZEUO1Xt+l+b1bC8ml
-         98M9nXGrPMR7fn1Qq2AEQhtiJ6VIEW1BH4L6ElbL+pdgxLqYoeLERq8Y+wKygv9VAJMI
-         jCHA==
-X-Gm-Message-State: AOAM531sFYV5j7CH9FeWWVZkdhJaEFiFHbOdbD1DulfmjzlGbSHp+qMk
-        Uuw0AttGm/xVoszHsTuPNBBzxIKXnfCNHnIgbAo=
-X-Google-Smtp-Source: ABdhPJwt9PWgKQObiQ0E865KxQ7cPl/oPGE5lAtKLqwd0sN5BpQVBIfod3ReCJC5iEnZlkt0npdPuVE4u/yuGTGRjs4=
-X-Received: by 2002:a9d:aaa:: with SMTP id 39mr12316264otq.269.1591501426372;
- Sat, 06 Jun 2020 20:43:46 -0700 (PDT)
-MIME-Version: 1.0
-From:   Takuya Yoshikawa <takuya.yoshikawa@gmail.com>
-Date:   Sun, 7 Jun 2020 12:43:36 +0900
-Message-ID: <CANR1yOopgAkoT6UmXZjUaFHe2rPBn_R2K=i_WNzFpDRdtR-uDQ@mail.gmail.com>
-Subject: What will happen to hugetlbfs backed guest memory when nx_huge_pages
- is enabled?
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aPxOctvuqxqnbhZwljS2gAqFDLDMhwYYqIKqplLlD90=;
+        b=GrSsRiL9brJHWcBtcVOdFkaNXJu4YNcidU3gxsLnp/1xdhRpmmZFga8bM5gj+t4goA
+         v26+4TbvCm/jnmXq8J0L1NzL4zt0cFYyFeHVqwpVT58ueu1Y9hCabP0kh1y79AYEaDWf
+         aX2HPYHJ23VgBbghHPdJ2ONdu0o6kw9lzj+h0OUpeh/VgxExg6aL1xKGrEaIvzUU2guh
+         6Uu7kYPD6IfXWjItCotixX4r5NUZwD6BqbZo6sWDFnqgQtQxkeyrYpwlTzZppsyxdKjR
+         DTT1fPf0xGBXDZuEHMgrNklkWsbbPQCOOM5FDHDv4kffNacvmP/Uz+GSv5f3FkQkNo74
+         1Kow==
+X-Gm-Message-State: AOAM530hvKd+4d0v2ZykvjDc39s7mhcgJ9PP3MZWB36+8CMp3lQXX54a
+        pegz6JAsev82+qN48BHtLdV9yI8HYLN2XrrYU1Y58MVQZMC3lrdjpNF8NanVaeNTJH6SHRCiljM
+        UnFfbgakKiy3q
+X-Received: by 2002:a1c:6a0d:: with SMTP id f13mr10933446wmc.180.1591515563037;
+        Sun, 07 Jun 2020 00:39:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyIHEhzSqDFLn756skBbmNZ7FmjftF4hDhkryd3J6mqhjd1sVVDGYYfLDbsGMd69xeQoYXf7g==
+X-Received: by 2002:a1c:6a0d:: with SMTP id f13mr10933433wmc.180.1591515562767;
+        Sun, 07 Jun 2020 00:39:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a973:d537:5f93:b58? ([2001:b07:6468:f312:a973:d537:5f93:b58])
+        by smtp.gmail.com with ESMTPSA id m129sm19349888wmf.2.2020.06.07.00.39.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 07 Jun 2020 00:39:22 -0700 (PDT)
+Subject: Re: What will happen to hugetlbfs backed guest memory when
+ nx_huge_pages is enabled?
+To:     Takuya Yoshikawa <takuya.yoshikawa@gmail.com>
 Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <CANR1yOopgAkoT6UmXZjUaFHe2rPBn_R2K=i_WNzFpDRdtR-uDQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6e57ba8c-7dfe-d52f-3bde-a8c28081026b@redhat.com>
+Date:   Sun, 7 Jun 2020 09:39:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <CANR1yOopgAkoT6UmXZjUaFHe2rPBn_R2K=i_WNzFpDRdtR-uDQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Recently I noticed a significant performance issue with some of our KVM guests.
-It looked like that the ITLB_MULTIHIT mitigation patch had been
-backported to the
-Ubuntu kernel on which they were running on, and the KVM was trying to do the
-mitigation task on the guest memory backed by hugetlbfs 2MB pages.
+On 07/06/20 05:43, Takuya Yoshikawa wrote:
+> I understand how this works for THP backed guest memory, but what 
+> will happen to hugetlbfs backed guest memory?
+> 
+> When a huge amount of system memory is reserved as the hugetlbfs
+> pool and QEMU is said to use pages from there by the -mem-path
+> option, is it safe to enable the nx_huge_pages mitigation?
 
-    perf showed me that the KVM was busy doing tdp_page_fault(), __direct_map(),
-    kvm_mmu_get_page() things. Normally, these were called in a short
-period of time
-    right after the VM got started because the guest soon touched the
-whole memory.
+The erratum arises when the guest sets up two iTLB entries of different
+sizes for the same page.  Using 4 KiB EPT pages for executable areas
+ensures that iTLB entries will all be for 4 KiB pages, independent of
+the page size from the guest's page tables.
 
-The patch explains when a guest attempts to execute on an NX marked huge page,
-KVM will break it down into 4KB pages. I understand how this works for
-THP backed
-guest memory, but what will happen to hugetlbfs backed guest memory?
+Therefore, even with hugetlbfs the EPT tables will be split.  There's no
+requirement for EPT pages to be the same size as the host page tables.
 
-When a huge amount of system memory is reserved as the hugetlbfs pool and QEMU
-is said to use pages from there by the -mem-path option, is it safe to
-enable the
-nx_huge_pages mitigation?
+Thanks,
 
-We can turn it off now because the KVM guests are not from outside, and we only
-execute our applications on them.
+Paolo
 
-
-  UBUNTU: SAUCE: kvm: mmu: ITLB_MULTIHIT mitigation
-  https://git.launchpad.net/~ubuntu-kernel/ubuntu/ source/linux/
-git/xenial/commit/arch/x86/kvm?id=c6c9a37b564b8b4f7aad099388c55978ef456bb5
-
-  kvm: mmu: ITLB_MULTIHIT mitigation
-  https://github.com/torvalds/linux/commit/b8e8c8303ff28c61046a4d0f6ea99aea609a7dc0
-
-  Takuya
