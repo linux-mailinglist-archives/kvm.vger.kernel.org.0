@@ -2,198 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F32201F0BC6
-	for <lists+kvm@lfdr.de>; Sun,  7 Jun 2020 16:12:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E013D1F0D45
+	for <lists+kvm@lfdr.de>; Sun,  7 Jun 2020 19:06:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727779AbgFGOMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Jun 2020 10:12:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42210 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727009AbgFGOL6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Jun 2020 10:11:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591539116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BdT/NVEYKIP5krUx3MbnbeOT2Gkkz8v5cdPwDSMfuzw=;
-        b=EQDwV0mobcDsgEqgAWZITbPyPU1dwr3Hm6EmRdsUqh/DydzMCOq8jh0SGl5zHdOD33YAM1
-        IXjmQ8FZGEL0XtwXuMUkBOMYiUhZ6PLc9z/fWh1n6V37cRa725gH00Ubm8vz5x5RWETlt0
-        t6cdfCTDcGnccd5zYCCGp1fNMYzKJdo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-Jvo1AxGQNhuCiWsG20P-Lg-1; Sun, 07 Jun 2020 10:11:55 -0400
-X-MC-Unique: Jvo1AxGQNhuCiWsG20P-Lg-1
-Received: by mail-wr1-f69.google.com with SMTP id w4so6066981wrl.13
-        for <kvm@vger.kernel.org>; Sun, 07 Jun 2020 07:11:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BdT/NVEYKIP5krUx3MbnbeOT2Gkkz8v5cdPwDSMfuzw=;
-        b=jXTDIuS9n1zSiNpzLurHDskF+sG8NWoVyKBS3UBxUnNWtbfwykvBhhcWXKb0ma2Egc
-         krpaXGn6HmJBVH69jYnsx4GO/wtmFJ4JDK6jvNHOK4opC8YCbugmfFfOCnlWoiOe1qzd
-         Ld3Xpy6Rh0q5KC2C1dOmv5typQfbrch8q4CdJ2mHoiPYD0PSTJuCU1rhi+v4bRRrfM/Y
-         HLvnRWYWlXQbzgE+j6qM4OKraj2Xk1hv/tckZ8jyFpwcqNBauSizeeeFCRP5d0tXu7pp
-         yAXkyYuwUieM4LbdepTxtd32VMYFVh12fuX/may8HVhsiaeLTmNXEWOJ1bG/FfUNBqOQ
-         c9rQ==
-X-Gm-Message-State: AOAM530h6MvD7mgM5JQyEPiv6fv6IAw3UoEvZIgu4/qxU0AMZM5HS2VA
-        10yJUZn6iypNOs683GQgycNb4WdW6/YIT51GidaRKKgI4sq9A2kcCq2phDW5oUQxm07Y8PuhuK1
-        4yqKicRu8laP2
-X-Received: by 2002:adf:aa42:: with SMTP id q2mr20101726wrd.360.1591539113491;
-        Sun, 07 Jun 2020 07:11:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxEuiY3dY5m3J+lc+g7iAjevWjCfgDBijLQ0kLevfltCIsWHMIGkkxV9D36m8hDgKdaJ2qeiA==
-X-Received: by 2002:adf:aa42:: with SMTP id q2mr20101707wrd.360.1591539113282;
-        Sun, 07 Jun 2020 07:11:53 -0700 (PDT)
-Received: from redhat.com (bzq-82-81-31-23.red.bezeqint.net. [82.81.31.23])
-        by smtp.gmail.com with ESMTPSA id c70sm8895722wme.32.2020.06.07.07.11.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2020 07:11:52 -0700 (PDT)
-Date:   Sun, 7 Jun 2020 10:11:51 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        eperezma@redhat.com
-Subject: [PATCH RFC v5 13/13] vhost: drop head based APIs
-Message-ID: <20200607141057.704085-14-mst@redhat.com>
-References: <20200607141057.704085-1-mst@redhat.com>
+        id S1726777AbgFGRGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Jun 2020 13:06:47 -0400
+Received: from mga06.intel.com ([134.134.136.31]:10691 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726661AbgFGRGr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Jun 2020 13:06:47 -0400
+IronPort-SDR: s0hGtRTdLwe4l5pdhypfts7/GG4frbT5PMeR49SlEMg3vBOXRVy5+nttmJI+ezvJlFPUPfvBSs
+ AGrgbfxH3N/A==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2020 10:06:46 -0700
+IronPort-SDR: uUzlo3huFi1ThPCjSgzE0xHNrO0RN1kM5QO4+J/yTdEihKjOtn3uwokhHmbD3lcM/SHP6umQ2H
+ uCTpIq/gMdoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,485,1583222400"; 
+   d="scan'208";a="273992627"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga006.jf.intel.com with ESMTP; 07 Jun 2020 10:06:46 -0700
+Date:   Sun, 7 Jun 2020 10:06:46 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] x86/split_lock: Don't write MSR_TEST_CTRL on CPUs that
+ aren't whitelisted
+Message-ID: <20200607170646.GD24576@linux.intel.com>
+References: <20200605192605.7439-1-sean.j.christopherson@intel.com>
+ <985fb434-523d-3fa0-072c-c039d532bbb0@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200607141057.704085-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
+In-Reply-To: <985fb434-523d-3fa0-072c-c039d532bbb0@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Everyone's using buf APIs, no need for head based ones anymore.
+On Sat, Jun 06, 2020 at 10:51:06AM +0800, Xiaoyao Li wrote:
+> On 6/6/2020 3:26 AM, Sean Christopherson wrote:
+> >Choo! Choo!  All aboard the Split Lock Express, with direct service to
+> >Wreckage!
+> >
+> >Skip split_lock_verify_msr() if the CPU isn't whitelisted as a possible
+> >SLD-enabled CPU model to avoid writing MSR_TEST_CTRL.  MSR_TEST_CTRL
+> >exists, and is writable, on many generations of CPUs.  Writing the MSR,
+> >even with '0', can result in bizarre, undocumented behavior.
+> >
+> >This fixes a crash on Haswell when resuming from suspend with a live KVM
+> >guest.  Because APs use the standard SMP boot flow for resume, they will
+> >go through split_lock_init() and the subsequent RDMSR/WRMSR sequence,
+> >which runs even when sld_state==sld_off to ensure SLD is disabled.  On
+> >Haswell (at least, my Haswell), writing MSR_TEST_CTRL with '0' will
+> >succeed and _may_ take the SMT _sibling_ out of VMX root mode.
+> >
+> >When KVM has an active guest, KVM performs VMXON as part of CPU onlining
+> >(see kvm_starting_cpu()).  Because SMP boot is serialized, the resulting
+> >flow is effectively:
+> >
+> >   on_each_ap_cpu() {
+> >      WRMSR(MSR_TEST_CTRL, 0)
+> >      VMXON
+> >   }
+> >
+> >As a result, the WRMSR can disable VMX on a different CPU that has
+> >already done VMXON.  This ultimately results in a #UD on VMPTRLD when
+> >KVM regains control and attempt run its vCPUs.
+> >
+> >The above voodoo was confirmed by reworking KVM's VMXON flow to write
+> >MSR_TEST_CTRL prior to VMXON, and to serialize the sequence as above.
+> >Further verification of the insanity was done by redoing VMXON on all
+> >APs after the initial WRMSR->VMXON sequence.  The additional VMXON,
+> >which should VM-Fail, occasionally succeeded, and also eliminated the
+> >unexpected #UD on VMPTRLD.
+> >
+> >The damage done by writing MSR_TEST_CTRL doesn't appear to be limited
+> >to VMX, e.g. after suspend with an active KVM guest, subsequent reboots
+> >almost always hang (even when fudging VMXON), a #UD on a random Jcc was
+> >observed, suspend/resume stability is qualitatively poor, and so on and
+> >so forth.
+> >
+> 
+> I'm wondering if all those side-effects of MSR_TEST_CTRL exist on CPUs have
+> SLD feature, have you ever tested on a SLD capable CPU?
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/vhost.c | 36 ++++++++----------------------------
- drivers/vhost/vhost.h | 12 ------------
- 2 files changed, 8 insertions(+), 40 deletions(-)
-
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 72ee55c810c4..e6931b760b61 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -2299,12 +2299,12 @@ static int fetch_buf(struct vhost_virtqueue *vq)
- 	return 1;
- }
- 
--/* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
-+/* Revert the effect of fetch_buf. Useful for error handling. */
-+static
- void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
- {
- 	vq->last_avail_idx -= n;
- }
--EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
- 
- /* This function returns a value > 0 if a descriptor was found, or 0 if none were found.
-  * A negative code is returned on error. */
-@@ -2464,8 +2464,7 @@ static int __vhost_add_used_n(struct vhost_virtqueue *vq,
- 	return 0;
- }
- 
--/* After we've used one of their buffers, we tell them about it.  We'll then
-- * want to notify the guest, using eventfd. */
-+static
- int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
- 		     unsigned count)
- {
-@@ -2499,10 +2498,8 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
- 	}
- 	return r;
- }
--EXPORT_SYMBOL_GPL(vhost_add_used_n);
- 
--/* After we've used one of their buffers, we tell them about it.  We'll then
-- * want to notify the guest, using eventfd. */
-+static
- int vhost_add_used(struct vhost_virtqueue *vq, unsigned int head, int len)
- {
- 	struct vring_used_elem heads = {
-@@ -2512,14 +2509,17 @@ int vhost_add_used(struct vhost_virtqueue *vq, unsigned int head, int len)
- 
- 	return vhost_add_used_n(vq, &heads, 1);
- }
--EXPORT_SYMBOL_GPL(vhost_add_used);
- 
-+/* After we've used one of their buffers, we tell them about it.  We'll then
-+ * want to notify the guest, using vhost_signal. */
- int vhost_put_used_buf(struct vhost_virtqueue *vq, struct vhost_buf *buf)
- {
- 	return vhost_add_used(vq, buf->id, buf->in_len);
- }
- EXPORT_SYMBOL_GPL(vhost_put_used_buf);
- 
-+/* After we've used one of their buffers, we tell them about it.  We'll then
-+ * want to notify the guest, using vhost_signal. */
- int vhost_put_used_n_bufs(struct vhost_virtqueue *vq,
- 			  struct vhost_buf *bufs, unsigned count)
- {
-@@ -2580,26 +2580,6 @@ void vhost_signal(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- }
- EXPORT_SYMBOL_GPL(vhost_signal);
- 
--/* And here's the combo meal deal.  Supersize me! */
--void vhost_add_used_and_signal(struct vhost_dev *dev,
--			       struct vhost_virtqueue *vq,
--			       unsigned int head, int len)
--{
--	vhost_add_used(vq, head, len);
--	vhost_signal(dev, vq);
--}
--EXPORT_SYMBOL_GPL(vhost_add_used_and_signal);
--
--/* multi-buffer version of vhost_add_used_and_signal */
--void vhost_add_used_and_signal_n(struct vhost_dev *dev,
--				 struct vhost_virtqueue *vq,
--				 struct vring_used_elem *heads, unsigned count)
--{
--	vhost_add_used_n(vq, heads, count);
--	vhost_signal(dev, vq);
--}
--EXPORT_SYMBOL_GPL(vhost_add_used_and_signal_n);
--
- /* return true if we're sure that avaiable ring is empty */
- bool vhost_vq_avail_empty(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- {
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index 28eea0155efb..264a2a2fae97 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -197,11 +197,6 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
- bool vhost_vq_access_ok(struct vhost_virtqueue *vq);
- bool vhost_log_access_ok(struct vhost_dev *);
- 
--int vhost_get_vq_desc(struct vhost_virtqueue *,
--		      struct iovec iov[], unsigned int iov_count,
--		      unsigned int *out_num, unsigned int *in_num,
--		      struct vhost_log *log, unsigned int *log_num);
--void vhost_discard_vq_desc(struct vhost_virtqueue *, int n);
- int vhost_get_avail_buf(struct vhost_virtqueue *, struct vhost_buf *buf,
- 			struct iovec iov[], unsigned int iov_count,
- 			unsigned int *out_num, unsigned int *in_num,
-@@ -209,13 +204,6 @@ int vhost_get_avail_buf(struct vhost_virtqueue *, struct vhost_buf *buf,
- void vhost_discard_avail_bufs(struct vhost_virtqueue *,
- 			      struct vhost_buf *, unsigned count);
- int vhost_vq_init_access(struct vhost_virtqueue *);
--int vhost_add_used(struct vhost_virtqueue *, unsigned int head, int len);
--int vhost_add_used_n(struct vhost_virtqueue *, struct vring_used_elem *heads,
--		     unsigned count);
--void vhost_add_used_and_signal(struct vhost_dev *, struct vhost_virtqueue *,
--			       unsigned int id, int len);
--void vhost_add_used_and_signal_n(struct vhost_dev *, struct vhost_virtqueue *,
--			       struct vring_used_elem *heads, unsigned count);
- int vhost_put_used_buf(struct vhost_virtqueue *, struct vhost_buf *buf);
- int vhost_put_used_n_bufs(struct vhost_virtqueue *,
- 			  struct vhost_buf *bufs, unsigned count);
--- 
-MST
-
+No, I'll poke at it on ICX tomorrow.
