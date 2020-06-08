@@ -2,164 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F7C91F12A3
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 08:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F7AC1F12DF
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 08:32:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728942AbgFHGCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 02:02:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37293 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728389AbgFHGCA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 02:02:00 -0400
+        id S1728792AbgFHGcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 02:32:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28190 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728022AbgFHGcu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 02:32:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591596118;
+        s=mimecast20190719; t=1591597969;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=h1jA/2yspI1Kg+Xtq3l1EAGzt+HBYj3BxWgseMub36o=;
-        b=WKmlCZeYuo1TB6gMMzWd0DunV6KT3UKtnTBPqkkZUGutooBjHRNaJ0LYiTNC+y4u+kWMOX
-        NhPrMoC1Ms2v8+IL0XvLq2hbIdU7XaajcJZIsZDBtqJDk4IC/fkeAD6S025OlpRau0gkKQ
-        ad/b9vTBnOKCXKYAFmh8+k2xHpmFvIU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-YO-eGsFANU61rpZOyCEHMQ-1; Mon, 08 Jun 2020 02:01:56 -0400
-X-MC-Unique: YO-eGsFANU61rpZOyCEHMQ-1
-Received: by mail-wr1-f70.google.com with SMTP id l1so6698007wrc.8
-        for <kvm@vger.kernel.org>; Sun, 07 Jun 2020 23:01:56 -0700 (PDT)
+        bh=uHa43udsYNKZo7N6VKsAJNE6lMJI4Ma06bbThMjTBZc=;
+        b=E+znX66PqYlcKhzCZFErXyHapDYqr5vEZUDPRxGmkfHUA8OcBTRvH+GFH1sQLFfUFljnWq
+        9M/QsOcfb+Vu8INbzRQlWLKdD3TNJp1MlAAfhuPJUqraLe1Bpoa0EIOm8XSjC/ZyzzLyxa
+        W9oBZN05HHdgqRNrS7NbytwMMFbBlF8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-hoMc2UbnPQuiE-TQnzYL6g-1; Mon, 08 Jun 2020 02:32:47 -0400
+X-MC-Unique: hoMc2UbnPQuiE-TQnzYL6g-1
+Received: by mail-wr1-f71.google.com with SMTP id h6so6781445wrx.4
+        for <kvm@vger.kernel.org>; Sun, 07 Jun 2020 23:32:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=h1jA/2yspI1Kg+Xtq3l1EAGzt+HBYj3BxWgseMub36o=;
-        b=MF2YzcZrXAgN+N37XymQI91MJGlDavBD1sm34bEmrigXpp61i6IL8ruRrNEovDTDPy
-         mu3FBMZ69wktcbwbFaMspRgr4oEZ6opMQrygyAQUgAD83lO80McsS3P4aOqsN/fubgVY
-         LHdOvCexPwFUCLYaAGdRBvVVV109Ev6An6S7xw+blqGZjCvIIeik8kovXBo6z8Qy1Ym6
-         FFM88iCrJeMochNVQnXTjEajiCR7l+9wIyuqKz599/kHJpruAaKJaqp99KXy1d03KK+b
-         zH97os+TTzNQeOQ7LjmF0aSubkNZjtVDjK6vKAIFVb5LmKnmZio2pGeQXkipWL50qDB8
-         Q4Mw==
-X-Gm-Message-State: AOAM5300vbgqmCpDVHjR8d/dhMPR3shhol9921cqhKwKFNz9pDGeR6g4
-        fRxJ/dS0CSHAugy9W5tCsoVdNkuxxw3gloxyqLys3wvfLIegPDOr/bRVjo1SJvXR51AFaWEfxpU
-        9UTj+QT5IkpHz
-X-Received: by 2002:a5d:468d:: with SMTP id u13mr23298766wrq.73.1591596115423;
-        Sun, 07 Jun 2020 23:01:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMtROZekUWaS9qn3KFC7xkMhTFpOrxDGPEfYMCPM7y6HFTjboC8wnw+oAxOEoXkXu0WIagpQ==
-X-Received: by 2002:a5d:468d:: with SMTP id u13mr23298753wrq.73.1591596115216;
-        Sun, 07 Jun 2020 23:01:55 -0700 (PDT)
+        bh=uHa43udsYNKZo7N6VKsAJNE6lMJI4Ma06bbThMjTBZc=;
+        b=tvUaK9oOY5Jm7U+Z4/G4+W/gvL3GviaPjbrJ4xD3DKwJN/3rP+CTuv7TNDIqT4NtUB
+         rDOUzR+JbbT7z41G6PBXJKTBPY+7d1b/9HF69xIzwMaXyDQo/ilrLd6tBOZ6UPL7KPiV
+         YKFvSgkp9yyPNiOukD74zmxjGsM1CKer7ReInAD9hCfxByDkD7Yhme/ECVx/B2ZtK7Wt
+         JB81Gq7aafjBeLfMRIjh1wHOTdAE0X07ubJyqV52bYkMk+ie7c5lBBnCZbPO5ss4yjzA
+         UAo3hvJrE3yAZXZ7oP9ofdJoNgiEGxtJuNveQ2bsWYT209t4HsmEPukJ263PE4r+Lh4r
+         tCGg==
+X-Gm-Message-State: AOAM530MSABQrc7Ifz4GVsLswtBGr4LlnjF79zAIjD15ShxvEYdKKbc2
+        X80nTvekjqxTdH6Ew6usiSI3uYlaxz/NxzJnz/uoP+KCVjDu2IgjCU4YvFziQe+tHUKxwWXn1f2
+        djKgMtTOEeHap
+X-Received: by 2002:adf:f4c6:: with SMTP id h6mr22588490wrp.398.1591597966538;
+        Sun, 07 Jun 2020 23:32:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwHTpMMuo2IYOqOej95ECMKiyl7nT0Q76q7fFs8v5zZkhDNtkqrniK0oE26ia6RYqO77tX8Xg==
+X-Received: by 2002:adf:f4c6:: with SMTP id h6mr22588471wrp.398.1591597966374;
+        Sun, 07 Jun 2020 23:32:46 -0700 (PDT)
 Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
-        by smtp.gmail.com with ESMTPSA id g82sm21407426wmf.1.2020.06.07.23.01.53
+        by smtp.gmail.com with ESMTPSA id c16sm22492989wrx.4.2020.06.07.23.32.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2020 23:01:54 -0700 (PDT)
-Date:   Mon, 8 Jun 2020 02:01:52 -0400
+        Sun, 07 Jun 2020 23:32:45 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 02:32:42 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 03/13] vhost: batching fetches
-Message-ID: <20200608020112-mutt-send-email-mst@kernel.org>
-References: <20200602130543.578420-1-mst@redhat.com>
- <20200602130543.578420-4-mst@redhat.com>
- <3323daa2-19ed-02de-0ff7-ab150f949fff@redhat.com>
- <20200604045830-mutt-send-email-mst@kernel.org>
- <6c2e6cc7-27c5-445b-f252-0356ff8a83f3@redhat.com>
- <20200607095219-mutt-send-email-mst@kernel.org>
- <0d791fe6-8fbe-ddcc-07fa-efbd4fac5ea4@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rob.miller@broadcom.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, eli@mellanox.com
+Subject: Re: [PATCH 5/6] vdpa: introduce virtio pci driver
+Message-ID: <20200608021438-mutt-send-email-mst@kernel.org>
+References: <20200529080303.15449-1-jasowang@redhat.com>
+ <20200529080303.15449-6-jasowang@redhat.com>
+ <20200602010332-mutt-send-email-mst@kernel.org>
+ <5dbb0386-beeb-5bf4-d12e-fb5427486bb8@redhat.com>
+ <6b1d1ef3-d65e-08c2-5b65-32969bb5ecbc@redhat.com>
+ <20200607095012-mutt-send-email-mst@kernel.org>
+ <9b1abd2b-232c-aa0f-d8bb-03e65fd47de2@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0d791fe6-8fbe-ddcc-07fa-efbd4fac5ea4@redhat.com>
+In-Reply-To: <9b1abd2b-232c-aa0f-d8bb-03e65fd47de2@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 11:35:40AM +0800, Jason Wang wrote:
+On Mon, Jun 08, 2020 at 11:32:31AM +0800, Jason Wang wrote:
 > 
-> On 2020/6/7 下午9:57, Michael S. Tsirkin wrote:
-> > On Fri, Jun 05, 2020 at 11:40:17AM +0800, Jason Wang wrote:
-> > > On 2020/6/4 下午4:59, Michael S. Tsirkin wrote:
-> > > > On Wed, Jun 03, 2020 at 03:27:39PM +0800, Jason Wang wrote:
-> > > > > On 2020/6/2 下午9:06, Michael S. Tsirkin wrote:
-> > > > > > With this patch applied, new and old code perform identically.
-> > > > > > 
-> > > > > > Lots of extra optimizations are now possible, e.g.
-> > > > > > we can fetch multiple heads with copy_from/to_user now.
-> > > > > > We can get rid of maintaining the log array.  Etc etc.
-> > > > > > 
-> > > > > > Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
-> > > > > > Signed-off-by: Eugenio Pérez<eperezma@redhat.com>
-> > > > > > Link:https://lore.kernel.org/r/20200401183118.8334-4-eperezma@redhat.com
-> > > > > > Signed-off-by: Michael S. Tsirkin<mst@redhat.com>
-> > > > > > ---
-> > > > > >     drivers/vhost/test.c  |  2 +-
-> > > > > >     drivers/vhost/vhost.c | 47 ++++++++++++++++++++++++++++++++++++++-----
-> > > > > >     drivers/vhost/vhost.h |  5 ++++-
-> > > > > >     3 files changed, 47 insertions(+), 7 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-> > > > > > index 9a3a09005e03..02806d6f84ef 100644
-> > > > > > --- a/drivers/vhost/test.c
-> > > > > > +++ b/drivers/vhost/test.c
-> > > > > > @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
-> > > > > >     	dev = &n->dev;
-> > > > > >     	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
-> > > > > >     	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
-> > > > > > -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
-> > > > > > +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
-> > > > > >     		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
-> > > > > >     	f->private_data = n;
-> > > > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > > > > index 8f9a07282625..aca2a5b0d078 100644
-> > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > @@ -299,6 +299,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
-> > > > > >     {
-> > > > > >     	vq->num = 1;
-> > > > > >     	vq->ndescs = 0;
-> > > > > > +	vq->first_desc = 0;
-> > > > > >     	vq->desc = NULL;
-> > > > > >     	vq->avail = NULL;
-> > > > > >     	vq->used = NULL;
-> > > > > > @@ -367,6 +368,11 @@ static int vhost_worker(void *data)
-> > > > > >     	return 0;
-> > > > > >     }
-> > > > > > +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
-> > > > > > +{
-> > > > > > +	return vq->max_descs - UIO_MAXIOV;
-> > > > > > +}
-> > > > > 1 descriptor does not mean 1 iov, e.g userspace may pass several 1 byte
-> > > > > length memory regions for us to translate.
-> > > > > 
-> > > > Yes but I don't see the relevance. This tells us how many descriptors to
-> > > > batch, not how many IOVs.
-> > > Yes, but questions are:
+> On 2020/6/7 下午9:51, Michael S. Tsirkin wrote:
+> > On Fri, Jun 05, 2020 at 04:54:17PM +0800, Jason Wang wrote:
+> > > On 2020/6/2 下午3:08, Jason Wang wrote:
+> > > > > > +static const struct pci_device_id vp_vdpa_id_table[] = {
+> > > > > > +    { PCI_DEVICE(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID) },
+> > > > > > +    { 0 }
+> > > > > > +};
+> > > > > This looks like it'll create a mess with either virtio pci
+> > > > > or vdpa being loaded at random. Maybe just don't specify
+> > > > > any IDs for now. Down the road we could get a
+> > > > > distinct vendor ID or a range of device IDs for this.
+> > > > 
+> > > > Right, will do.
+> > > > 
+> > > > Thanks
 > > > 
-> > > - this introduce another obstacle to support more than 1K queue size
-> > > - if we support 1K queue size, does it mean we need to cache 1K descriptors,
-> > > which seems a large stress on the cache
+> > > Rethink about this. If we don't specify any ID, the binding won't work.
+> > We can bind manually. It's not really for production anyway, so
+> > not a big deal imho.
+> 
+> 
+> I think you mean doing it via "new_id", right.
+
+I really meant driver_override. This is what people have been using
+with pci-stub for years now.
+
+> 
+> > 
+> > > How about using a dedicated subsystem vendor id for this?
 > > > 
 > > > Thanks
-> > > 
-> > > 
-> > Still don't understand the relevance. We support up to 1K descriptors
-> > per buffer just for IOV since we always did. This adds 64 more
-> > descriptors - is that a big deal?
+> > If virtio vendor id is used then standard driver is expected
+> > to bind, right? Maybe use a dedicated vendor id?
 > 
 > 
-> If I understanding correctly, for net, the code tries to batch descriptors
-> for at last one packet.
+> I meant something like:
 > 
-> If we allow 1K queue size then we allow a packet that consists of 1K
-> descriptors. Then we need to cache 1K descriptors.
+> static const struct pci_device_id vp_vdpa_id_table[] = {
+>     { PCI_DEVICE_SUB(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID,
+> VP_TEST_VENDOR_ID, VP_TEST_DEVICE_ID) },
+>     { 0 }
+> };
 > 
 > Thanks
+> 
 
-That case is already so pathological, I am not at all worried about
-it performing well.
+Then regular virtio will still bind to it. It has
+
+drivers/virtio/virtio_pci_common.c:     { PCI_DEVICE(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID) },
+
 
 -- 
 MST
