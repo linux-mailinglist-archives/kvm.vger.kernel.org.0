@@ -2,97 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 896611F19B1
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:13:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 030BE1F1991
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:01:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729069AbgFHNM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 09:12:58 -0400
-Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:32931 "EHLO
-        10.mo178.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728938AbgFHNM6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 09:12:58 -0400
-X-Greylist: delayed 2399 seconds by postgrey-1.27 at vger.kernel.org; Mon, 08 Jun 2020 09:12:57 EDT
-Received: from player699.ha.ovh.net (unknown [10.108.42.184])
-        by mo178.mail-out.ovh.net (Postfix) with ESMTP id 0137DA5553
-        for <kvm@vger.kernel.org>; Mon,  8 Jun 2020 13:57:25 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
-        (Authenticated sender: clg@kaod.org)
-        by player699.ha.ovh.net (Postfix) with ESMTPSA id E1AEA131F7A48;
-        Mon,  8 Jun 2020 11:57:18 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass (GARM-100R0039a28aace-0423-48ac-9d27-88d758f13fba,B6B0473EF73D0859AD85419D5DB97E88249038E4) smtp.auth=clg@kaod.org
-From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Paul Mackerras <paulus@samba.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH] KVM: PPC: Book3S HV: increase KVMPPC_NR_LPIDS on POWER8 and POWER9
-Date:   Mon,  8 Jun 2020 13:57:14 +0200
-Message-Id: <20200608115714.1139735-1-clg@kaod.org>
-X-Mailer: git-send-email 2.25.4
+        id S1729051AbgFHNBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 09:01:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46280 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728245AbgFHNBf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 09:01:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591621294;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N4tYRK/0WF4gJ3sPDYLn/EAB8Y9lZ28vccHh6mfdyZY=;
+        b=FHU9qE2Puzlp93xauPxSTcir0dV3lMZwwsyK505r+8E8S4p0LRaKVuDwEnwTTSg23XexjC
+        n4zsS5JvPJ0DNU0VsAT4gozOIPeW8nwiX4PjR57bLOOByTz2qpdxmH26HbHWWyYW3znZJj
+        KZrDIy0/v0tnhYldHke9ZlxcmTrtzXc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-14a6riF7Mo6X7YLJohSHdg-1; Mon, 08 Jun 2020 09:01:29 -0400
+X-MC-Unique: 14a6riF7Mo6X7YLJohSHdg-1
+Received: by mail-wr1-f72.google.com with SMTP id d6so7120882wrn.1
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:01:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=N4tYRK/0WF4gJ3sPDYLn/EAB8Y9lZ28vccHh6mfdyZY=;
+        b=sYc3R1AvjxoQM0818MArTQZq/Ooaz4X44w6zXMv44lgo9fQTFnrCoIgn1P1bKmlRSw
+         punz3HqrFj4MSE0q0V2RkTMfO57iw29ZMh2K4ZLWLiSgJslYO1uRriwU7fv4pqVeJK+E
+         5ThJ3XYQP77NsO3PGO9f/5d+W1JjwYkDPOPM+jdA6KVKer82Yu2AjfmgAwwWpR+L1XR/
+         kNk4HSHwmqN+P3ynnBTGDy7keFIAzqSF52etJEEtOZcEy1Un9z75rUyUJSV9ybPWM+Cg
+         tNZjnKl++KYVoeWkGBMXgG3JzbqgULCpZVzc9dZBvfeaaP7zSShKKCZLMMOgRQyYJV03
+         6GiQ==
+X-Gm-Message-State: AOAM53294xaYELPRKWBABkfUTsDr92COltzZChXzvhlfSxRJ/65YUuGF
+        sSwJX+gwCU01Fm8J0dpKnBoBe9wa1FIOKp29NP9o3ou4S4jAb2kDLImrQXTZnw6T0VLA21ID+5O
+        4ucN7V0pMaBXM
+X-Received: by 2002:adf:d851:: with SMTP id k17mr23165018wrl.30.1591621288297;
+        Mon, 08 Jun 2020 06:01:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+ZpeCIIHsXHsXp7F2is1vc7M7N6GxGrFprOEl+lRsTOD0+vtXz9a5XQCm3jC3ps0vzgeTJg==
+X-Received: by 2002:adf:d851:: with SMTP id k17mr23164991wrl.30.1591621288062;
+        Mon, 08 Jun 2020 06:01:28 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id z25sm22048079wmf.10.2020.06.08.06.01.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2020 06:01:27 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 09:01:24 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
+Message-ID: <20200608090010-mutt-send-email-mst@kernel.org>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <20200604151917-mutt-send-email-mst@kernel.org>
+ <20200605063435.GA32302@ubuntu>
+ <20200608073715.GA10562@ubuntu>
+ <20200608091100.GC10562@ubuntu>
+ <20200608051358-mutt-send-email-mst@kernel.org>
+ <20200608101526.GD10562@ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 2856689540546005937
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudehuddggeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeikeekleffteegleevveejheetuddviedvleejvedvueevtdfgieduieeviedugfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200608101526.GD10562@ubuntu>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-POWER8 and POWER9 have 12-bit LPIDs. Change LPID_RSVD to support up to
-(4096 - 2) guests on these processors. POWER7 is kept the same with a
-limitation of (1024 - 2), but it might be time to drop KVM support for
-POWER7.
+On Mon, Jun 08, 2020 at 12:15:27PM +0200, Guennadi Liakhovetski wrote:
+> On Mon, Jun 08, 2020 at 05:19:06AM -0400, Michael S. Tsirkin wrote:
+> > On Mon, Jun 08, 2020 at 11:11:00AM +0200, Guennadi Liakhovetski wrote:
+> > > Update: I looked through VirtIO 1.0 and 1.1 specs, data format their, 
+> > > including byte order, is defined on a per-device type basis. RPMsg is 
+> > > indeed included in the spec as device type 7, but that's the only 
+> > > mention of it in both versions. It seems RPMsg over VirtIO isn't 
+> > > standardised yet.
+> > 
+> > Yes. And it would be very good to have some standartization before we
+> > keep adding things. For example without any spec if host code breaks
+> > with some guests, how do we know which side should be fixed?
+> > 
+> > > Also it looks like newer interface definitions 
+> > > specify using "guest native endianness" for Virtual Queue data.
+> > 
+> > They really don't or shouldn't. That's limited to legacy chapters.
+> > Some definitions could have slipped through but it's not
+> > the norm. I just quickly looked through the 1.1 spec and could
+> > not find any instances that specify "guest native endianness"
+> > but feel free to point them out to me.
+> 
+> Oh, there you go. No, sorry, my fault, it's the other way round: "guest 
+> native" is for legacy and LE is for current / v1.0 and up.
+> 
+> > > So 
+> > > I think the same should be done for RPMsg instead of enforcing LE?
+> > 
+> > That makes hardware implementations as well as any cross-endian
+> > hypervisors tricky.
+> 
+> Yes, LE it is then. And we need to add some text to the spec.
+> 
+> In theory there could be a backward compatibility issue - in case someone 
+> was already using virtio_rpmsg_bus.c in BE mode, but I very much doubt 
+> that...
+> 
+> Thanks
+> Guennadi
 
-Tested with 2048 guests * 4 vCPUs on a witherspoon system with 512G
-RAM and a bit of swap.
+It's probably easiest to use virtio wrappers and then we don't need to
+worry about it.
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
----
- arch/powerpc/include/asm/reg.h      | 3 ++-
- arch/powerpc/kvm/book3s_64_mmu_hv.c | 8 ++++++--
- 2 files changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
-index 88e6c78100d9..b70bbfb0ea3c 100644
---- a/arch/powerpc/include/asm/reg.h
-+++ b/arch/powerpc/include/asm/reg.h
-@@ -473,7 +473,8 @@
- #ifndef SPRN_LPID
- #define SPRN_LPID	0x13F	/* Logical Partition Identifier */
- #endif
--#define   LPID_RSVD	0x3ff		/* Reserved LPID for partn switching */
-+#define   LPID_RSVD_POWER7	0x3ff	/* Reserved LPID for partn switching */
-+#define   LPID_RSVD		0xfff	/* Reserved LPID for partn switching */
- #define	SPRN_HMER	0x150	/* Hypervisor maintenance exception reg */
- #define   HMER_DEBUG_TRIG	(1ul << (63 - 17)) /* Debug trigger */
- #define	SPRN_HMEER	0x151	/* Hyp maintenance exception enable reg */
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-index 18aed9775a3c..23035ab2ec50 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-@@ -260,11 +260,15 @@ int kvmppc_mmu_hv_init(void)
- 	if (!mmu_has_feature(MMU_FTR_LOCKLESS_TLBIE))
- 		return -EINVAL;
- 
--	/* POWER7 has 10-bit LPIDs (12-bit in POWER8) */
- 	host_lpid = 0;
- 	if (cpu_has_feature(CPU_FTR_HVMODE))
- 		host_lpid = mfspr(SPRN_LPID);
--	rsvd_lpid = LPID_RSVD;
-+
-+	/* POWER8 and above have 12-bit LPIDs (10-bit in POWER7) */
-+	if (cpu_has_feature(CPU_FTR_ARCH_207S))
-+		rsvd_lpid = LPID_RSVD;
-+	else
-+		rsvd_lpid = LPID_RSVD_POWER7;
- 
- 	kvmppc_init_lpid(rsvd_lpid + 1);
- 
 -- 
-2.25.4
+MST
 
