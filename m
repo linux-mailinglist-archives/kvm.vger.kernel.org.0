@@ -2,192 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA301F1D3F
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 18:26:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76EA71F1D4D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 18:29:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730520AbgFHQ0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 12:26:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23340 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730442AbgFHQ0V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 12:26:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591633579;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PfesJHBEui5hetw3RxW9+nGTdupwdIhkqQYIwcx4mZo=;
-        b=Dpa8zufAVqW+PdK2C11LQ4NL1msXsLNkh9ynFHLk+4dBaGKdHFr5skPDI9ZxEN5X+eDgvU
-        AGjz+RX5jcrmuxyv1fC/SDBnqWBbxCtaV9QUR1uKOJZqB4oIaDeOS1OmhOcrTAImBGTMn6
-        0J3ZMGneHzzDWVgELC4gbaC4bZI4f1Q=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-3WlaaYQ3M7akcBDfpuSH_Q-1; Mon, 08 Jun 2020 12:26:13 -0400
-X-MC-Unique: 3WlaaYQ3M7akcBDfpuSH_Q-1
-Received: by mail-wr1-f70.google.com with SMTP id w4so7391876wrl.13
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 09:26:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PfesJHBEui5hetw3RxW9+nGTdupwdIhkqQYIwcx4mZo=;
-        b=fSPOSom2K2D7xsrvmRxu/jqP5eOnanDIplXWPREUQEpQVDuEcAIEv3DOOl9qEKwQ61
-         FGTdGZbrN4sQYyX6Zij1Pb7LWT3cVP09PNll46UKqRdsljECLrx3L6cDyI+1+dDQbU70
-         yWI2RRZyZv7vxFYiR9woW1WhsYNAdYQG3BNK/O9J8uYOjj3EIJBWD7wHtES8JR4AY0mB
-         s5Np40TdhSwTUKLIabDqWweid2pJJ8zp5IM1xbbRaLPq+HQdHIjdRJEnhCer2mvKRRHE
-         /YbMCaMut8Nwg4eyNwD5KaP3Iwjq5TlyNadSSD4VHc4OLlXoMS32ubibmdvavCxcsvRp
-         Niow==
-X-Gm-Message-State: AOAM533o2DldUkQOMr94iTsXOj+qcrkofVn7Mgt61aoZ9vI6JZjDqdPX
-        v2tlZtgRKUX7ZRJpuIXxA5n3lah93jj6GbrHrlALbvh/5TOkU4cXP7zjlJ9yYAIJ1JCvAlWjLU2
-        acMJWTFm2XRhM
-X-Received: by 2002:a1c:3c08:: with SMTP id j8mr151285wma.158.1591633571881;
-        Mon, 08 Jun 2020 09:26:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzMODrjwl3uJvjfo1A6dRDqHo2iDzOMSyj2EtMN5BDt+YBK8zUVruK6nz7/OV+XRdPj9GQbLA==
-X-Received: by 2002:a1c:3c08:: with SMTP id j8mr151258wma.158.1591633571606;
-        Mon, 08 Jun 2020 09:26:11 -0700 (PDT)
-Received: from steredhat ([79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id k21sm270313wrd.24.2020.06.08.09.26.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2020 09:26:10 -0700 (PDT)
-Date:   Mon, 8 Jun 2020 18:26:08 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>, eperezma@redhat.com,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH RFC v5 12/13] vhost/vsock: switch to the buf API
-Message-ID: <20200608162608.gk2fpebujpvmkzpc@steredhat>
-References: <20200607141057.704085-1-mst@redhat.com>
- <20200607141057.704085-13-mst@redhat.com>
- <20200608101746.xnxtwwygolsk7yol@steredhat>
- <20200608092953-mutt-send-email-mst@kernel.org>
+        id S1730539AbgFHQ3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 12:29:33 -0400
+Received: from foss.arm.com ([217.140.110.172]:54882 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726042AbgFHQ3d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 12:29:33 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 197121FB;
+        Mon,  8 Jun 2020 09:29:32 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.6.198])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C2273F73D;
+        Mon,  8 Jun 2020 09:29:30 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 17:29:22 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, Andrew Scull <ascull@google.com>
+Subject: Re: [PATCH v2] KVM: arm64: Remove host_cpu_context member from vcpu
+ structure
+Message-ID: <20200608162922.GA12957@C02TD0UTHF1T.local>
+References: <20200608085657.1405730-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200608092953-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200608085657.1405730-1-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 09:30:38AM -0400, Michael S. Tsirkin wrote:
-> On Mon, Jun 08, 2020 at 12:17:46PM +0200, Stefano Garzarella wrote:
-> > On Sun, Jun 07, 2020 at 10:11:49AM -0400, Michael S. Tsirkin wrote:
-> > > A straight-forward conversion.
-> > > 
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  drivers/vhost/vsock.c | 30 ++++++++++++++++++------------
-> > >  1 file changed, 18 insertions(+), 12 deletions(-)
-> > 
-> > The changes for vsock part LGTM:
-> > 
-> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> > 
-> > 
-> > I also did some tests with vhost-vsock (tools/testing/vsock/vsock_test
-> > and iperf-vsock), so for vsock:
-> > 
-> > Tested-by: Stefano Garzarella <sgarzare@redhat.com>
-> > 
-> > Thanks,
-> > Stefano
+On Mon, Jun 08, 2020 at 09:56:57AM +0100, Marc Zyngier wrote:
+> For very long, we have kept this pointer back to the per-cpu
+> host state, despite having working per-cpu accessors at EL2
+> for some time now.
 > 
-> Re-testing v6 would be very much appreciated.
-
-Sure, I'm building v6 now and I'll send you a feedback :-)
-
-Stefano
-
+> Recent investigations have shown that this pointer is easy
+> to abuse in preemptible context, which is a sure sign that
+> it would better be gone. Not to mention that a per-cpu
+> pointer is faster to access at all times.
 > 
-> > > 
-> > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > > index a483cec31d5c..61c6d3dd2ae3 100644
-> > > --- a/drivers/vhost/vsock.c
-> > > +++ b/drivers/vhost/vsock.c
-> > > @@ -103,7 +103,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> > >  		unsigned out, in;
-> > >  		size_t nbytes;
-> > >  		size_t iov_len, payload_len;
-> > > -		int head;
-> > > +		struct vhost_buf buf;
-> > > +		int ret;
-> > >  
-> > >  		spin_lock_bh(&vsock->send_pkt_list_lock);
-> > >  		if (list_empty(&vsock->send_pkt_list)) {
-> > > @@ -117,16 +118,17 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> > >  		list_del_init(&pkt->list);
-> > >  		spin_unlock_bh(&vsock->send_pkt_list_lock);
-> > >  
-> > > -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
-> > > -					 &out, &in, NULL, NULL);
-> > > -		if (head < 0) {
-> > > +		ret = vhost_get_avail_buf(vq, &buf,
-> > > +					  vq->iov, ARRAY_SIZE(vq->iov),
-> > > +					  &out, &in, NULL, NULL);
-> > > +		if (ret < 0) {
-> > >  			spin_lock_bh(&vsock->send_pkt_list_lock);
-> > >  			list_add(&pkt->list, &vsock->send_pkt_list);
-> > >  			spin_unlock_bh(&vsock->send_pkt_list_lock);
-> > >  			break;
-> > >  		}
-> > >  
-> > > -		if (head == vq->num) {
-> > > +		if (!ret) {
-> > >  			spin_lock_bh(&vsock->send_pkt_list_lock);
-> > >  			list_add(&pkt->list, &vsock->send_pkt_list);
-> > >  			spin_unlock_bh(&vsock->send_pkt_list_lock);
-> > > @@ -186,7 +188,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> > >  		 */
-> > >  		virtio_transport_deliver_tap_pkt(pkt);
-> > >  
-> > > -		vhost_add_used(vq, head, sizeof(pkt->hdr) + payload_len);
-> > > +		buf.in_len = sizeof(pkt->hdr) + payload_len;
-> > > +		vhost_put_used_buf(vq, &buf);
-> > >  		added = true;
-> > >  
-> > >  		pkt->off += payload_len;
-> > > @@ -440,7 +443,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
-> > >  	struct vhost_vsock *vsock = container_of(vq->dev, struct vhost_vsock,
-> > >  						 dev);
-> > >  	struct virtio_vsock_pkt *pkt;
-> > > -	int head, pkts = 0, total_len = 0;
-> > > +	int ret, pkts = 0, total_len = 0;
-> > > +	struct vhost_buf buf;
-> > >  	unsigned int out, in;
-> > >  	bool added = false;
-> > >  
-> > > @@ -461,12 +465,13 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
-> > >  			goto no_more_replies;
-> > >  		}
-> > >  
-> > > -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
-> > > -					 &out, &in, NULL, NULL);
-> > > -		if (head < 0)
-> > > +		ret = vhost_get_avail_buf(vq, &buf,
-> > > +					  vq->iov, ARRAY_SIZE(vq->iov),
-> > > +					  &out, &in, NULL, NULL);
-> > > +		if (ret < 0)
-> > >  			break;
-> > >  
-> > > -		if (head == vq->num) {
-> > > +		if (!ret) {
-> > >  			if (unlikely(vhost_enable_notify(&vsock->dev, vq))) {
-> > >  				vhost_disable_notify(&vsock->dev, vq);
-> > >  				continue;
-> > > @@ -494,7 +499,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
-> > >  			virtio_transport_free_pkt(pkt);
-> > >  
-> > >  		len += sizeof(pkt->hdr);
-> > > -		vhost_add_used(vq, head, len);
-> > > +		buf.in_len = len;
-> > > +		vhost_put_used_buf(vq, &buf);
-> > >  		total_len += len;
-> > >  		added = true;
-> > >  	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
-> > > -- 
-> > > MST
-> > > 
-> 
+> Reported-by: Andrew Scull <ascull@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
+From a quick scan, this looks sane to me, so FWIW:
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+Mark.
+
+> ---
+> 
+> Notes:
+>     v2: Stick to this_cpu_ptr() in pmu.c, as this only used on the
+>         kernel side and not the hypervisor.
+> 
+>  arch/arm64/include/asm/kvm_host.h | 3 ---
+>  arch/arm64/kvm/arm.c              | 3 ---
+>  arch/arm64/kvm/hyp/debug-sr.c     | 4 ++--
+>  arch/arm64/kvm/hyp/switch.c       | 6 +++---
+>  arch/arm64/kvm/hyp/sysreg-sr.c    | 6 ++++--
+>  arch/arm64/kvm/pmu.c              | 8 ++------
+>  6 files changed, 11 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 59029e90b557..ada1faa92211 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -284,9 +284,6 @@ struct kvm_vcpu_arch {
+>  	struct kvm_guest_debug_arch vcpu_debug_state;
+>  	struct kvm_guest_debug_arch external_debug_state;
+>  
+> -	/* Pointer to host CPU context */
+> -	struct kvm_cpu_context *host_cpu_context;
+> -
+>  	struct thread_info *host_thread_info;	/* hyp VA */
+>  	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+>  
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 14b747266607..6ddaa23ef346 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -340,10 +340,8 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+>  	int *last_ran;
+> -	kvm_host_data_t *cpu_data;
+>  
+>  	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
+> -	cpu_data = this_cpu_ptr(&kvm_host_data);
+>  
+>  	/*
+>  	 * We might get preempted before the vCPU actually runs, but
+> @@ -355,7 +353,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	}
+>  
+>  	vcpu->cpu = cpu;
+> -	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
+>  
+>  	kvm_vgic_load(vcpu);
+>  	kvm_timer_vcpu_load(vcpu);
+> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> index 0fc9872a1467..e95af204fec7 100644
+> --- a/arch/arm64/kvm/hyp/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> @@ -185,7 +185,7 @@ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+>  		return;
+>  
+> -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  	host_dbg = &vcpu->arch.host_debug_state.regs;
+>  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> @@ -207,7 +207,7 @@ void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
+>  	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
+>  		return;
+>  
+> -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  	host_dbg = &vcpu->arch.host_debug_state.regs;
+>  	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index fc09c3dfa466..fc671426c14b 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -544,7 +544,7 @@ static bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+>  		return false;
+>  	}
+>  
+> -	ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	__ptrauth_save_key(ctxt->sys_regs, APIA);
+>  	__ptrauth_save_key(ctxt->sys_regs, APIB);
+>  	__ptrauth_save_key(ctxt->sys_regs, APDA);
+> @@ -715,7 +715,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	struct kvm_cpu_context *guest_ctxt;
+>  	u64 exit_code;
+>  
+> -	host_ctxt = vcpu->arch.host_cpu_context;
+> +	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	host_ctxt->__hyp_running_vcpu = vcpu;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+> @@ -820,7 +820,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu = kern_hyp_va(vcpu);
+>  
+> -	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+> +	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	host_ctxt->__hyp_running_vcpu = vcpu;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 6d2df9fe0b5d..143d7b7358f2 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -265,12 +265,13 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
+>  	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+> +	struct kvm_cpu_context *host_ctxt;
+>  
+>  	if (!has_vhe())
+>  		return;
+>  
+> +	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	__sysreg_save_user_state(host_ctxt);
+>  
+>  	/*
+> @@ -301,12 +302,13 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
+>  	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+> +	struct kvm_cpu_context *host_ctxt;
+>  
+>  	if (!has_vhe())
+>  		return;
+>  
+> +	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
+>  	deactivate_traps_vhe_put();
+>  
+>  	__sysreg_save_el1_state(guest_ctxt);
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index e71d00bb5271..b5ae3a5d509e 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -163,15 +163,13 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
+>   */
+>  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_cpu_context *host_ctxt;
+>  	struct kvm_host_data *host;
+>  	u32 events_guest, events_host;
+>  
+>  	if (!has_vhe())
+>  		return;
+>  
+> -	host_ctxt = vcpu->arch.host_cpu_context;
+> -	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+> +	host = this_cpu_ptr(&kvm_host_data);
+>  	events_guest = host->pmu_events.events_guest;
+>  	events_host = host->pmu_events.events_host;
+>  
+> @@ -184,15 +182,13 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_cpu_context *host_ctxt;
+>  	struct kvm_host_data *host;
+>  	u32 events_guest, events_host;
+>  
+>  	if (!has_vhe())
+>  		return;
+>  
+> -	host_ctxt = vcpu->arch.host_cpu_context;
+> -	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+> +	host = this_cpu_ptr(&kvm_host_data);
+>  	events_guest = host->pmu_events.events_guest;
+>  	events_host = host->pmu_events.events_host;
+>  
+> -- 
+> 2.26.2
+> 
