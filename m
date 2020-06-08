@@ -2,154 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F72B1F1911
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 14:48:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CE971F1919
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 14:51:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729174AbgFHMrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 08:47:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20771 "EHLO
+        id S1728955AbgFHMvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 08:51:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39910 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728876AbgFHMrs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 08:47:48 -0400
+        with ESMTP id S1727003AbgFHMvX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 08:51:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591620467;
+        s=mimecast20190719; t=1591620682;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6GGnXZ/Ulj1bARnVGb1xIL6hYlj/UOXcAA/U4xgpTfA=;
-        b=SUgOlxWXWc7IV2YH/puZ97cZXDvWp8Z9msRRoMvR97atc6WaYnkfzFJ4/U2MgesYhNA6Ti
-        KWfmBdmUQCLsaeuR0pFVggbzfa1jispUS7QChjbtLZEFMZIwoQUj+3hEMFiXumOuz+Eaej
-        sDDs6IkW6Put3YqKM3+68eSfviYgKZM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-VPelCohaNF6m6rrqVDStCg-1; Mon, 08 Jun 2020 08:47:40 -0400
-X-MC-Unique: VPelCohaNF6m6rrqVDStCg-1
-Received: by mail-wr1-f69.google.com with SMTP id s17so7074717wrt.7
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 05:47:40 -0700 (PDT)
+        bh=NVMeqLaZj5lyXYDnWx/hOG/1m/ddxwQgh2GukSpwT7M=;
+        b=aCbtlUzEk6Eh8KpYU/v6q3OCc3IJeTyI4WeAj1xg4vbVQfRi8hSm0b1+tW5v5EyJzrYNUV
+        VIBA2744wQajIRcbiOG8w8UjfTAy+dhNPzuNbWF4+c10yA1uhNUKVlSdhyvIjvki0MrWzj
+        wFZ9uUS1SWZbLKjjlzhHgyIH+jpo1/s=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-509-BUjvq3hOP0-YMioM6eImLw-1; Mon, 08 Jun 2020 08:51:20 -0400
+X-MC-Unique: BUjvq3hOP0-YMioM6eImLw-1
+Received: by mail-ej1-f72.google.com with SMTP id p27so566176ejn.5
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 05:51:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6GGnXZ/Ulj1bARnVGb1xIL6hYlj/UOXcAA/U4xgpTfA=;
-        b=jpWWqnAf5zsy4+3Bb2ohUVeaVLDXxYPBWTjXwYxn/gO0wgAPGYFDyIbY4PNfmdAvan
-         lxjQpmsXUoLOaIIbL+cKABx8BJKZua7QqIf/OEqlq+UpnXIGL09OhaZ+OBMojLEo/oMr
-         znDREvuX8XdhNKi2cKcP3gqgtoOM+AC5hhArNjvZHv3CFYMmJvpHASaMetWeTxkNkAcn
-         QWZpwzbjJjlMmN2Q1RhTktrmFU8XyhAcoJd00xTeZOF8p823JRB7qAlVHmXRen3B+D/e
-         FKrKhrWk9YUToufIqCPNu9O0xOe2plBSnlyV2QkSPlXbBoNJtDGdRE6VAmDVhy2voxRc
-         /sRQ==
-X-Gm-Message-State: AOAM5305WQug8ZsQagTCL6e6WD3owl5DrkcbwP4+pXSDfURRTRbYEty7
-        IfXXS49FUTvWAY88kUuwI9LHt6y2UeCdKi61oPw/TK3WptD17qUXouEWYYTZde44E7n9a2qqZDx
-        4j/2e6tHc86b3
-X-Received: by 2002:adf:fb92:: with SMTP id a18mr23839341wrr.263.1591620458917;
-        Mon, 08 Jun 2020 05:47:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxEObCByEdnj3+VFYbS8XRYICS/8MHOag4jzq+lGs+CLQhZQYwnAKbGx+cjPlETlJKPhRESfw==
-X-Received: by 2002:adf:fb92:: with SMTP id a18mr23839319wrr.263.1591620458634;
-        Mon, 08 Jun 2020 05:47:38 -0700 (PDT)
-Received: from [192.168.178.58] ([151.30.87.23])
-        by smtp.gmail.com with ESMTPSA id a1sm21965353wmj.29.2020.06.08.05.47.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2020 05:47:38 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests 2/2] svm: INIT intercept test
-To:     Cathy Avery <cavery@redhat.com>, linux-kernel@vger.kernel.org,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=NVMeqLaZj5lyXYDnWx/hOG/1m/ddxwQgh2GukSpwT7M=;
+        b=Is+C9xMn8SshJyjfmxVQtC+pOdloTas2bh/HangS5QSTvPIgfGOhINIsQbTLhz/sWY
+         i/pUiA3Ndn8u6+cZeE9Pck9TfYnWfxxHHcV6sjFJfQG/gK0kXqA/zoprM54Gthl3cZeg
+         jGqxam5uuJ6QRjH+Mmz6dOGucn3Q6DkA0plQSPjo0i5Q9cbSjMZ275R6LEskdpwhpB3k
+         p2Q86EK6EfHLRtjTSY6SyPoMlKOEFg5oXcwS1aT1OFO2CKQcFff0I1OM75472K+PaCNv
+         Wrv4cwbNDa0q+7zAw82RwT54StxvC5jljbT8MyBa0rByoSQKLzvDOObb0Jin12j6NGTc
+         iYfA==
+X-Gm-Message-State: AOAM533IydwyTZ7CGsWwkWCK0jjY3ifFQUWqj9sDSPl/eghI90TfeQQM
+        YL6V83zwVL++FtM0eyRAyEVxurmMIyGJwhjB7ojdF8TnXVl7xdMO8/zI/B/XahJYpBh3k1mqyxZ
+        6VogU/N9RKb1N
+X-Received: by 2002:a17:906:5c0a:: with SMTP id e10mr6274847ejq.389.1591620678813;
+        Mon, 08 Jun 2020 05:51:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwwznb3Q7pGSNhjg8K3PzgwiJgh47LL1CoCkfvLhLC73i7kpFcsGfbIbjtXZtfhoqoraDN5Qg==
+X-Received: by 2002:a17:906:5c0a:: with SMTP id e10mr6274841ejq.389.1591620678637;
+        Mon, 08 Jun 2020 05:51:18 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id ok21sm9905881ejb.82.2020.06.08.05.51.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2020 05:51:18 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Qian Cai <cai@lca.pw>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-References: <20200608122800.6315-1-cavery@redhat.com>
- <20200608122800.6315-3-cavery@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4230c304-f08b-694b-9a8e-8f5b32eeb4e8@redhat.com>
-Date:   Mon, 8 Jun 2020 14:47:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+Subject: Re: [PATCH] KVM: SVM: fix calls to is_intercept
+In-Reply-To: <20200608121428.9214-1-pbonzini@redhat.com>
+References: <20200608121428.9214-1-pbonzini@redhat.com>
+Date:   Mon, 08 Jun 2020 14:51:17 +0200
+Message-ID: <87wo4hbu0q.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200608122800.6315-3-cavery@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/06/20 14:28, Cathy Avery wrote:
-> INIT vcpu 2 and intercept the INIT. This test
-> will leave the vcpu in an unusable state.
-> 
-> Signed-off-by: Cathy Avery <cavery@redhat.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-It should be possible to reinitialize the vCPU using a SIPI interrupt, like
-
-	old = cpu_online_count--;
-	apic_icr_write(APIC_DEST_PHYSICAL | APIC_DEST_SIPI,
-		       id_map[cpu]);
-	while (cpu_online_count != old)
-		cpu_relax();
-
-You can test this by using vCPU 1 to run this test.
-
-Paolo
-
+> is_intercept takes an INTERCEPT_* constant, not SVM_EXIT_*; because
+> of this, the compiler was removing the body of the conditionals,
+> as if is_intercept returned 0.
+>
+> This unveils a latent bug: when clearing the VINTR intercept,
+> int_ctl must also be changed in the L1 VMCB (svm->nested.hsave),
+> just like the intercept itself is also changed in the L1 VMCB.
+> Otherwise V_IRQ remains set and, due to the VINTR intercept being clear,
+> we get a spurious injection of a vector 0 interrupt on the next
+> L2->L1 vmexit.
+>
+> Reported-by: Qian Cai <cai@lca.pw>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  x86/svm_tests.c | 40 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
-> 
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index c1abd55..a4dbe91 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -1789,6 +1789,43 @@ static bool virq_inject_check(struct svm_test *test)
->      return get_test_stage(test) == 5;
->  }
->  
-> +static volatile bool init_intercept;
-> +
-> +static void init_signal_intercept_prepare(struct svm_test *test)
-> +{
-> +
-> +    vmcb_ident(vmcb);
-> +    vmcb->control.intercept |= (1ULL << INTERCEPT_INIT);
-> +    init_intercept = false;
-> +}
-> +
-> +static void init_signal_test(struct svm_test *test)
-> +{
-> +    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_INIT | APIC_INT_ASSERT, 0);
-> +}
-> +
-> +static bool init_signal_finished(struct svm_test *test)
-> +{
-> +    vmcb->save.rip += 3;
-> +
-> +    if (vmcb->control.exit_code != SVM_EXIT_INIT) {
-> +        report(false, "VMEXIT not due to init intercept. Exit reason 0x%x",
-> +               vmcb->control.exit_code);
-> +        return true;
-> +        }
-> +
-> +    init_intercept = true;
-> +
-> +    report(true, "INIT to vcpu intercepted");
-> +
-> +    return true;
-> +}
-> +
-> +static bool init_signal_check(struct svm_test *test)
-> +{
-> +    return init_intercept;
-> +}
-> +
->  #define TEST(name) { #name, .v2 = name }
->  
->  /*
-> @@ -1950,6 +1987,9 @@ struct svm_test svm_tests[] = {
->      { "virq_inject", default_supported, virq_inject_prepare,
->        default_prepare_gif_clear, virq_inject_test,
->        virq_inject_finished, virq_inject_check },
-> +    { "svm_init_signal_intercept_test", default_supported, init_signal_intercept_prepare,
-> +      default_prepare_gif_clear, init_signal_test,
-> +      init_signal_finished, init_signal_check, .on_vcpu = 2 },
->      TEST(svm_guest_state_test),
->      { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
->  };
-> 
+> 	Vitaly, can you give this a shot with Hyper-V?  I have already
+> 	placed it on kvm/queue, it passes both svm.flat and KVM-on-KVM
+> 	smoke tests.
+
+Quickly smoke-tested this with WS2016/2019 BIOS/UEFI and the patch
+doesn't seem to break anything. I'm having issues trying to launch a
+Gen2 (UEFI) VM in Hyper-V (Gen1 works OK) but the behavior looks exactly
+the same pre- and post-patch.
+
+-- 
+Vitaly
 
