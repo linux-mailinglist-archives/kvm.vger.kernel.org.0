@@ -2,184 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DA781F1E40
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 19:19:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDAAC1F1E56
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 19:29:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387514AbgFHRTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 13:19:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55690 "EHLO mail.kernel.org"
+        id S2387567AbgFHR3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 13:29:23 -0400
+Received: from mga11.intel.com ([192.55.52.93]:12672 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730490AbgFHRTI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 13:19:08 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2F9DB206C3;
-        Mon,  8 Jun 2020 17:19:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591636747;
-        bh=eN+Clm/cvykfn8Xvcj8t9z6v+LWSyFOpU01cRVXweQg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=siCGluGb7baF8rUg5uT2B8cjcn9mEflYF4YucD+8g9aqI5NtviAuyvsYxSA1flASp
-         kyNu+G/yQRdqy5+2ovlmgJeg/zKHSqrUowrRe5ofRYHtVY+fiB+NJcrJosIg2GGbjn
-         fqFzHOiKUPoPBSrHC6EWxHCbfpF68oK++mPhopMw=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jiLQP-001B5a-O4; Mon, 08 Jun 2020 18:19:05 +0100
+        id S1730697AbgFHR3W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 13:29:22 -0400
+IronPort-SDR: TkRODIQiUQCJlXzq7ghxlfdz+jDAX14ny9tZ6sz4B54ceGJeLgtUb6Fe7P0Fwlb9oSwZ7+MV+2
+ Hqb3RqJ92eGA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2020 10:29:21 -0700
+IronPort-SDR: qptkctbUJUSvQAC1ycvjADfEDhUrhHOX5yl1OzzQxI56au3vxE+MjQ88fkKwTx8lv1vlJ4i/FY
+ fWhF3aO1hQDA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,487,1583222400"; 
+   d="scan'208";a="258747153"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga007.fm.intel.com with ESMTP; 08 Jun 2020 10:29:21 -0700
+Date:   Mon, 8 Jun 2020 10:29:21 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Liam Merwick <liam.merwick@oracle.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+        Brad Campbell <lists2009@fnarfbargle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] x86/cpu: Reinitialize IA32_FEAT_CTL MSR on BSP during
+ wakeup
+Message-ID: <20200608172921.GC8223@linux.intel.com>
+References: <20200605200728.10145-1-sean.j.christopherson@intel.com>
+ <b2ac2400-dbc1-f6bc-a397-17f1ae10bd83@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 08 Jun 2020 18:19:05 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Allow in-atomic injection of SPIs
-In-Reply-To: <0a3875f0-9918-51f3-08eb-29a72eeb1306@redhat.com>
-References: <20200526161136.451312-1-maz@kernel.org>
- <0a3875f0-9918-51f3-08eb-29a72eeb1306@redhat.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <e3a8ea9947616f895021310127fe1477@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b2ac2400-dbc1-f6bc-a397-17f1ae10bd83@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2020-06-08 17:58, Auger Eric wrote:
-> Hi Marc,
+On Mon, Jun 08, 2020 at 11:12:35AM +0100, Liam Merwick wrote:
+> On 05/06/2020 21:07, Sean Christopherson wrote:
+> >Reinitialize IA32_FEAT_CTL on the BSP during wakeup to handle the case
+> >where firmware doesn't initialize or save/restore across S3.  This fixes
+> >a bug where IA32_FEAT_CTL is left uninitialized and results in VMXON
+> >taking a #GP due to VMX not being fully enabled, i.e. breaks KVM.
+> >
+> >Use init_ia32_feat_ctl() to "restore" IA32_FEAT_CTL as it already deals
+> >with the case where the MSR is locked, and because APs already redo
+> >init_ia32_feat_ctl() during suspend by virtue of the SMP boot flow being
+> >used to reinitialize APs upon wakeup.  Do the call in the early wakeup
+> >flow to avoid dependencies in the syscore_ops chain, e.g. simply adding
+> >a resume hook is not guaranteed to work, as KVM does VMXON in its own
+> >resume hook, kvm_resume(), when KVM has active guests.
+> >
+> >Reported-by: Brad Campbell <lists2009@fnarfbargle.com>
+> >Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> >Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >Cc: kvm@vger.kernel.org
 > 
-> On 5/26/20 6:11 PM, Marc Zyngier wrote:
->> On a system that uses SPIs to implement MSIs (as it would be
->> the case on a GICv2 system exposing a GICv2m to its guests),
->> we deny the possibility of injecting SPIs on the in-atomic
->> fast-path.
->> 
->> This results in a very large amount of context-switches
->> (roughly equivalent to twice the interrupt rate) on the host,
->> and suboptimal performance for the guest (as measured with
->> a test workload involving a virtio interface backed by vhost-net).
->> Given that GICv2 systems are usually on the low-end of the spectrum
->> performance wise, they could do without the aggravation.
->> 
->> We solved this for GICv3+ITS by having a translation cache. But
->> SPIs do not need any extra infrastructure, and can be immediately
->> injected in the virtual distributor as the locking is already
->> heavy enough that we don't need to worry about anything.
->> 
->> This halves the number of context switches for the same workload.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/vgic/vgic-irqfd.c | 20 ++++++++++++++++----
->>  arch/arm64/kvm/vgic/vgic-its.c   |  3 +--
->>  2 files changed, 17 insertions(+), 6 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c 
->> b/arch/arm64/kvm/vgic/vgic-irqfd.c
->> index d8cdfea5cc96..11a9f81115ab 100644
->> --- a/arch/arm64/kvm/vgic/vgic-irqfd.c
->> +++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-> There is still a comment above saying
->  * Currently only direct MSI injection is supported.
+> Should it have the following tag since it fixes a commit introduced in 5.6?
+> Cc: stable@vger.kernel.org # v5.6
 
-I believe this comment to be correct. There is no path other
-than MSI injection that leads us here. Case in point, we only
-ever inject a rising edge through this API, never a falling one.
+It definitely warrants a backport to v5.6.  I didn't include a Cc to stable
+because I swear I had seen an email fly by that stated an explicit Cc is
+unnecessary/unwanted for tip-tree patches, but per a recent statement from
+Boris it looks like I'm simply confused[*].  I'll add the Cc in v2.
 
->> @@ -107,15 +107,27 @@ int kvm_arch_set_irq_inatomic(struct 
->> kvm_kernel_irq_routing_entry *e,
->>  			      struct kvm *kvm, int irq_source_id, int level,
->>  			      bool line_status)
->>  {
->> -	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
->> +	if (!level)
->> +		return -EWOULDBLOCK;
->> +
->> +	switch (e->type) {
->> +	case KVM_IRQ_ROUTING_MSI: {
->>  		struct kvm_msi msi;
->> 
->> +		if (!vgic_has_its(kvm))
->> +			return -EINVAL;
-> Shouldn't we return -EWOULDBLOCK by default?
-> QEMU does not use that path with GICv2m but in kvm_set_routing_entry() 
-> I
-> don't see any check related to the ITS.
+[*] https://lkml.kernel.org/r/20200417164752.GF7322@zn.tnic
 
-Fair enough. I really don't anticipate anyone to be using
-KVM_IRQ_ROUTING_MSI with anything but the ITS, but who knows,
-people are crazy! ;-)
-
->> +
->>  		kvm_populate_msi(e, &msi);
->> -		if (!vgic_its_inject_cached_translation(kvm, &msi))
->> -			return 0;
->> +		return vgic_its_inject_cached_translation(kvm, &msi);
+> >Fixes: 21bd3467a58e ("KVM: VMX: Drop initialization of IA32_FEAT_CTL MSR")
+> >Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
->>  	}
->> 
->> -	return -EWOULDBLOCK;
->> +	case KVM_IRQ_ROUTING_IRQCHIP:
->> +		/* Injecting SPIs is always possible in atomic context */
->> +		return vgic_irqfd_set_irq(e, kvm, irq_source_id, 1, line_status);
-> what about the 	mutex_lock(&kvm->lock) called from within
-> vgic_irqfd_set_irq/kvm_vgic_inject_irq/vgic_lazy_init
-
-Holy crap. The lazy GIC init strikes again :-(.
-How about this on top of the existing patch:
-
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c 
-b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index 11a9f81115ab..6e5ca04d5589 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -115,19 +115,23 @@ int kvm_arch_set_irq_inatomic(struct 
-kvm_kernel_irq_routing_entry *e,
-  		struct kvm_msi msi;
-
-  		if (!vgic_has_its(kvm))
--			return -EINVAL;
-+			break;
-
-  		kvm_populate_msi(e, &msi);
-  		return vgic_its_inject_cached_translation(kvm, &msi);
-  	}
-
-  	case KVM_IRQ_ROUTING_IRQCHIP:
--		/* Injecting SPIs is always possible in atomic context */
-+		/*
-+		 * Injecting SPIs is always possible in atomic context
-+		 * as long as the damn vgic is initialized.
-+		 */
-+		if (unlikely(!vgic_initialized(kvm)))
-+			break;
-  		return vgic_irqfd_set_irq(e, kvm, irq_source_id, 1, line_status);
--
--	default:
--		return -EWOULDBLOCK;
-  	}
-+
-+	return -EWOULDBLOCK;
-  }
-
-  int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
-
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
