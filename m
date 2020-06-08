@@ -2,41 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F161C1F2948
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 02:04:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7FAE1F2D82
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 02:36:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387704AbgFHX6K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 19:58:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48462 "EHLO mail.kernel.org"
+        id S1729821AbgFHXO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 19:14:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34680 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728181AbgFHXXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:23:16 -0400
+        id S1729801AbgFHXOZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:14:25 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5DB9620814;
-        Mon,  8 Jun 2020 23:23:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6CB1B20C09;
+        Mon,  8 Jun 2020 23:14:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658596;
-        bh=exD6mbl+JGxYrw7LGOAyCf+W7gxP+F9nwfW9/zBznho=;
+        s=default; t=1591658065;
+        bh=KIVtMWsZYjSeXPcrFP3pyIwtXZ4XUtv5qHuAvVcJRs8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yy7984ASrKrLSeuCcm7r6DmTsuHHsFOEmL7fVzuI+2Td3HYBGz2Q2VK5fyWcEOKGQ
-         moA3PNghSJFOCY057Jua0l46L7w9V2cc+md9zRf/IvYEF60JVb2ffmhyiPqupYfqVm
-         7B6CVF2NI8UQqtmvFy9UCtVDiFkYJtinXFsW7aok=
+        b=VQ462wQb5I53Aca1fy2iy4ObG5pEKhHfXZGMQk8j43fTHUKSOPunlTddC5kOp6cAP
+         lDzEit+uKumjpnWuHPmiBI9OrwxH+o8/nAHi8JGMjkz4puUia6I8VR8GBUfI/QtUTv
+         +hxM+rS3y9UO1s0RqExcy6AK3lVndv5ql9MYC20Y=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jon Doron <arilou@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Roman Kagan <rvkagan@yandex-team.ru>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 028/106] x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
-Date:   Mon,  8 Jun 2020 19:21:20 -0400
-Message-Id: <20200608232238.3368589-28-sashal@kernel.org>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 111/606] vhost/vsock: fix packet delivery order to monitoring devices
+Date:   Mon,  8 Jun 2020 19:03:56 -0400
+Message-Id: <20200608231211.3363633-111-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200608232238.3368589-1-sashal@kernel.org>
-References: <20200608232238.3368589-1-sashal@kernel.org>
+In-Reply-To: <20200608231211.3363633-1-sashal@kernel.org>
+References: <20200608231211.3363633-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -46,73 +44,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jon Doron <arilou@gmail.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-[ Upstream commit f7d31e65368aeef973fab788aa22c4f1d5a6af66 ]
+[ Upstream commit 107bc0766b9feb5113074c753735a3f115c2141f ]
 
-The problem the patch is trying to address is the fact that 'struct
-kvm_hyperv_exit' has different layout on when compiling in 32 and 64 bit
-modes.
+We want to deliver packets to monitoring devices before it is
+put in the virtqueue, to avoid that replies can appear in the
+packet capture before the transmitted packet.
 
-In 64-bit mode the default alignment boundary is 64 bits thus
-forcing extra gaps after 'type' and 'msr' but in 32-bit mode the
-boundary is at 32 bits thus no extra gaps.
-
-This is an issue as even when the kernel is 64 bit, the userspace using
-the interface can be both 32 and 64 bit but the same 32 bit userspace has
-to work with 32 bit kernel.
-
-The issue is fixed by forcing the 64 bit layout, this leads to ABI
-change for 32 bit builds and while we are obviously breaking '32 bit
-userspace with 32 bit kernel' case, we're fixing the '32 bit userspace
-with 64 bit kernel' one.
-
-As the interface has no (known) users and 32 bit KVM is rather baroque
-nowadays, this seems like a reasonable decision.
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Jon Doron <arilou@gmail.com>
-Message-Id: <20200424113746.3473563-2-arilou@gmail.com>
-Reviewed-by: Roman Kagan <rvkagan@yandex-team.ru>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- Documentation/virtual/kvm/api.txt | 2 ++
- include/uapi/linux/kvm.h          | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/vhost/vsock.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 8e16017ff397..d2f265a9dc0d 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -3999,9 +3999,11 @@ EOI was received.
- #define KVM_EXIT_HYPERV_SYNIC          1
- #define KVM_EXIT_HYPERV_HCALL          2
- 			__u32 type;
-+			__u32 pad1;
- 			union {
- 				struct {
- 					__u32 msr;
-+					__u32 pad2;
- 					__u64 control;
- 					__u64 evt_page;
- 					__u64 msg_page;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 251be353f950..66ce6659ecb6 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -189,9 +189,11 @@ struct kvm_hyperv_exit {
- #define KVM_EXIT_HYPERV_SYNIC          1
- #define KVM_EXIT_HYPERV_HCALL          2
- 	__u32 type;
-+	__u32 pad1;
- 	union {
- 		struct {
- 			__u32 msr;
-+			__u32 pad2;
- 			__u64 control;
- 			__u64 evt_page;
- 			__u64 msg_page;
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index bb3f63386b47..53294c2f8cff 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -181,14 +181,14 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 			break;
+ 		}
+ 
+-		vhost_add_used(vq, head, sizeof(pkt->hdr) + payload_len);
+-		added = true;
+-
+-		/* Deliver to monitoring devices all correctly transmitted
+-		 * packets.
++		/* Deliver to monitoring devices all packets that we
++		 * will transmit.
+ 		 */
+ 		virtio_transport_deliver_tap_pkt(pkt);
+ 
++		vhost_add_used(vq, head, sizeof(pkt->hdr) + payload_len);
++		added = true;
++
+ 		pkt->off += payload_len;
+ 		total_len += payload_len;
+ 
 -- 
 2.25.1
 
