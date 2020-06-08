@@ -2,125 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69E381F1A11
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:29:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8601D1F1A17
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:30:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729783AbgFHN33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 09:29:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39447 "EHLO
+        id S1729782AbgFHNar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 09:30:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40008 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729645AbgFHN33 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 09:29:29 -0400
+        with ESMTP id S1725797AbgFHNaq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 09:30:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591622967;
+        s=mimecast20190719; t=1591623044;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tAi5RnB11l/kNjeRk8ozS/jXDdeHeIrWEjaZ8oVwPv4=;
-        b=PjMl2shGx5+3Yo9rsHi7AuNTbvJ9lQnArsuKSgaQ2Ab1+Ywxh2WGJmQXaj9wbj81PIKoh+
-        banPpXdoUMZZBla/5DAHiyguvaK2Bx8S4HhEl08Cxtg6FNC+UTVLnKFqSqw2gpMREZrtA8
-        Yu2734sTDrzljospIWgYzeSU1xlVBpc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-ihbsps0lP3eQHT7ZEPMRng-1; Mon, 08 Jun 2020 09:29:06 -0400
-X-MC-Unique: ihbsps0lP3eQHT7ZEPMRng-1
-Received: by mail-wm1-f70.google.com with SMTP id u15so3934224wmm.5
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:29:06 -0700 (PDT)
+        bh=gb88/02YmS9YtUx19YCEMGvgGVki3Ib3eUuUkCjJy+U=;
+        b=VpWAxmgcP+M+Nw6ahhL8fej9ahlYNi5QeZHh9m7vE4RCEhSYbMlfhNQw3q2CdT2UPH2hzN
+        ITGGIUktKDpwVbhHROmbAnnnhfNe7+RZM9jwP5hv+8t1Rb43bUpQp358GUSSSgm68d65Oc
+        6Sozw1TONatPLSeHpEHAJLr1K0fPzJA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-cgyhIe2hOfGVXlGq6evQpw-1; Mon, 08 Jun 2020 09:30:43 -0400
+X-MC-Unique: cgyhIe2hOfGVXlGq6evQpw-1
+Received: by mail-wr1-f72.google.com with SMTP id m14so7149357wrj.12
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:30:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=tAi5RnB11l/kNjeRk8ozS/jXDdeHeIrWEjaZ8oVwPv4=;
-        b=jX7ZdCpd+Lfg+RxB5Ys41icUT1ppkOrtpRIQNajRil1PJb1pAb71LdUmGq07IY4cGl
-         PLS2T8jnHLxTWh5wuNBeTb4JExqhmmKw/ka/R8tnaf4WStJU8m/j4H3QDc8q2Xik8FZo
-         OBgKpAJngCHFbnvpV/S6xk3aKKIV0v8cUiJtUvRR9kKn/pyLp2HW8eYr2oAdBBTG/pMm
-         IQxcLSZGijQBblwkYP+dJEBSLCnCuN6+CsqVMrth4z9G75QIM/TSTMA9wYe8Z0R1CaMd
-         OkHmW3j0iJ0QH/6qhXVF3Mpl3xHNMmplAxzvneLcJ2wGsG/brahx14oP/n/7RAM2cqrP
-         SUyg==
-X-Gm-Message-State: AOAM5316FFgHMAW6jKWHMmO49tscW/14ko5yX5AoGFfNwxjQh70xJA8V
-        OuRF+FfobnybtW5Lo+UzDs4oCiHgNPi2VgC2RPB6wvGjL2oA9vh8zhQAfAf7BTn2gvp9IPn6y6l
-        ch5U75w6SLN8h
-X-Received: by 2002:a5d:4a45:: with SMTP id v5mr23250524wrs.223.1591622945518;
-        Mon, 08 Jun 2020 06:29:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxLsV4zKcIqO3YHdQC1Vbu08DLKVYtIAwGXFJX9rmOu7fddWNahirZvRHnTir6Z4zHxaZCpjg==
-X-Received: by 2002:a5d:4a45:: with SMTP id v5mr23250502wrs.223.1591622945243;
-        Mon, 08 Jun 2020 06:29:05 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=gb88/02YmS9YtUx19YCEMGvgGVki3Ib3eUuUkCjJy+U=;
+        b=pmGx4gIOMLhucJWcgc3hpJyem6O0Wd17UuRgTvVMrWc+cZ9783R5JFlSwJawWeuGO4
+         p8U+xR1+ITsnw1g8svkN+caInzp/O5iVVzpS3XPeWSq89uki/OBkA99y0c4GDLgFxmj3
+         FGhsRbSAOwkJU/MfDGmc0KcHZ3gMUCVnW9LT4/v5szhGSoulsq1ecBkLzWKKm6MaKted
+         ECcoowVYNt/tBCDY+NazEEFrX8Ne7ELwq9W4K3QKWINP/nZZoQXT5PQgf2RR1JE/14/f
+         r0guyB1338ZfUy6puPwL0C6HlRh2vAn76oECbpxYL02Ipn8EJjvfWIF6BjJRs3B4CG6V
+         cGCQ==
+X-Gm-Message-State: AOAM531WBgcZKO4rmO/Mcu8a74X4+DFx808RUfU+qKryZs5jZM3aadIo
+        27NeVMDPvt1Nn6nHnl5bHVM7/eh+J2cKRP0mnBTYeMPpF3ReIJodWVMlLi5z/udCtGUvd8fIdLA
+        14uK46H4MNlCE
+X-Received: by 2002:adf:ec03:: with SMTP id x3mr23586213wrn.297.1591623041920;
+        Mon, 08 Jun 2020 06:30:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz62tJA6E64oEIZnfe39XFv8r0W7nilgUKIntVO4j0UrGBnVrvqs8Lk+4LFru+2gi/RHZ/CMw==
+X-Received: by 2002:adf:ec03:: with SMTP id x3mr23586189wrn.297.1591623041702;
+        Mon, 08 Jun 2020 06:30:41 -0700 (PDT)
 Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
-        by smtp.gmail.com with ESMTPSA id o20sm24303052wra.29.2020.06.08.06.29.03
+        by smtp.gmail.com with ESMTPSA id a81sm24080582wmd.25.2020.06.08.06.30.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2020 06:29:04 -0700 (PDT)
-Date:   Mon, 8 Jun 2020 09:29:01 -0400
+        Mon, 08 Jun 2020 06:30:41 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 09:30:38 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rob.miller@broadcom.com, lingshan.zhu@intel.com,
-        eperezma@redhat.com, lulu@redhat.com, shahafs@mellanox.com,
-        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
-        saugatm@xilinx.com, vmireyno@marvell.com,
-        zhangweining@ruijie.com.cn, eli@mellanox.com
-Subject: Re: [PATCH 5/6] vdpa: introduce virtio pci driver
-Message-ID: <20200608092530-mutt-send-email-mst@kernel.org>
-References: <20200607095012-mutt-send-email-mst@kernel.org>
- <9b1abd2b-232c-aa0f-d8bb-03e65fd47de2@redhat.com>
- <20200608021438-mutt-send-email-mst@kernel.org>
- <a1b1b7fb-b097-17b7-2e3a-0da07d2e48ae@redhat.com>
- <20200608052041-mutt-send-email-mst@kernel.org>
- <9d2571b6-0b95-53b3-6989-b4d801eeb623@redhat.com>
- <20200608054453-mutt-send-email-mst@kernel.org>
- <bc27064c-2309-acf3-ccd8-6182bfa2a4cd@redhat.com>
- <20200608055331-mutt-send-email-mst@kernel.org>
- <61117e6a-2568-d0f4-8713-d831af32814d@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>, eperezma@redhat.com,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH RFC v5 12/13] vhost/vsock: switch to the buf API
+Message-ID: <20200608092953-mutt-send-email-mst@kernel.org>
+References: <20200607141057.704085-1-mst@redhat.com>
+ <20200607141057.704085-13-mst@redhat.com>
+ <20200608101746.xnxtwwygolsk7yol@steredhat>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <61117e6a-2568-d0f4-8713-d831af32814d@redhat.com>
+In-Reply-To: <20200608101746.xnxtwwygolsk7yol@steredhat>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 06:07:36PM +0800, Jason Wang wrote:
+On Mon, Jun 08, 2020 at 12:17:46PM +0200, Stefano Garzarella wrote:
+> On Sun, Jun 07, 2020 at 10:11:49AM -0400, Michael S. Tsirkin wrote:
+> > A straight-forward conversion.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  drivers/vhost/vsock.c | 30 ++++++++++++++++++------------
+> >  1 file changed, 18 insertions(+), 12 deletions(-)
 > 
-> On 2020/6/8 下午5:54, Michael S. Tsirkin wrote:
-> > On Mon, Jun 08, 2020 at 05:46:52PM +0800, Jason Wang wrote:
-> > > On 2020/6/8 下午5:45, Michael S. Tsirkin wrote:
-> > > > On Mon, Jun 08, 2020 at 05:43:58PM +0800, Jason Wang wrote:
-> > > > > > > Looking at
-> > > > > > > pci_match_one_device() it checks both subvendor and subdevice there.
-> > > > > > > 
-> > > > > > > Thanks
-> > > > > > But IIUC there is no guarantee that driver with a specific subvendor
-> > > > > > matches in presence of a generic one.
-> > > > > > So either IFC or virtio pci can win, whichever binds first.
-> > > > > I'm not sure I get there. But I try manually bind IFCVF to qemu's
-> > > > > virtio-net-pci, and it fails.
-> > > > > 
-> > > > > Thanks
-> > > > Right but the reverse can happen: virtio-net can bind to IFCVF first.
-> > > 
-> > > That's kind of expected. The PF is expected to be bound to virtio-pci to
-> > > create VF via sysfs.
-> > > 
-> > > Thanks
-> > > 
-> > > 
-> > > 
-> > Once VFs are created, don't we want IFCVF to bind rather than
-> > virtio-pci?
+> The changes for vsock part LGTM:
+> 
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 > 
 > 
-> Yes, but for PF we need virtio-pci.
+> I also did some tests with vhost-vsock (tools/testing/vsock/vsock_test
+> and iperf-vsock), so for vsock:
 > 
-> Thanks
+> Tested-by: Stefano Garzarella <sgarzare@redhat.com>
 > 
+> Thanks,
+> Stefano
 
-(Ab)using the driver_data field for this is an option.
-What do you think?
+Re-testing v6 would be very much appreciated.
 
--- 
-MST
+> > 
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index a483cec31d5c..61c6d3dd2ae3 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -103,7 +103,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> >  		unsigned out, in;
+> >  		size_t nbytes;
+> >  		size_t iov_len, payload_len;
+> > -		int head;
+> > +		struct vhost_buf buf;
+> > +		int ret;
+> >  
+> >  		spin_lock_bh(&vsock->send_pkt_list_lock);
+> >  		if (list_empty(&vsock->send_pkt_list)) {
+> > @@ -117,16 +118,17 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> >  		list_del_init(&pkt->list);
+> >  		spin_unlock_bh(&vsock->send_pkt_list_lock);
+> >  
+> > -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
+> > -					 &out, &in, NULL, NULL);
+> > -		if (head < 0) {
+> > +		ret = vhost_get_avail_buf(vq, &buf,
+> > +					  vq->iov, ARRAY_SIZE(vq->iov),
+> > +					  &out, &in, NULL, NULL);
+> > +		if (ret < 0) {
+> >  			spin_lock_bh(&vsock->send_pkt_list_lock);
+> >  			list_add(&pkt->list, &vsock->send_pkt_list);
+> >  			spin_unlock_bh(&vsock->send_pkt_list_lock);
+> >  			break;
+> >  		}
+> >  
+> > -		if (head == vq->num) {
+> > +		if (!ret) {
+> >  			spin_lock_bh(&vsock->send_pkt_list_lock);
+> >  			list_add(&pkt->list, &vsock->send_pkt_list);
+> >  			spin_unlock_bh(&vsock->send_pkt_list_lock);
+> > @@ -186,7 +188,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> >  		 */
+> >  		virtio_transport_deliver_tap_pkt(pkt);
+> >  
+> > -		vhost_add_used(vq, head, sizeof(pkt->hdr) + payload_len);
+> > +		buf.in_len = sizeof(pkt->hdr) + payload_len;
+> > +		vhost_put_used_buf(vq, &buf);
+> >  		added = true;
+> >  
+> >  		pkt->off += payload_len;
+> > @@ -440,7 +443,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+> >  	struct vhost_vsock *vsock = container_of(vq->dev, struct vhost_vsock,
+> >  						 dev);
+> >  	struct virtio_vsock_pkt *pkt;
+> > -	int head, pkts = 0, total_len = 0;
+> > +	int ret, pkts = 0, total_len = 0;
+> > +	struct vhost_buf buf;
+> >  	unsigned int out, in;
+> >  	bool added = false;
+> >  
+> > @@ -461,12 +465,13 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+> >  			goto no_more_replies;
+> >  		}
+> >  
+> > -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
+> > -					 &out, &in, NULL, NULL);
+> > -		if (head < 0)
+> > +		ret = vhost_get_avail_buf(vq, &buf,
+> > +					  vq->iov, ARRAY_SIZE(vq->iov),
+> > +					  &out, &in, NULL, NULL);
+> > +		if (ret < 0)
+> >  			break;
+> >  
+> > -		if (head == vq->num) {
+> > +		if (!ret) {
+> >  			if (unlikely(vhost_enable_notify(&vsock->dev, vq))) {
+> >  				vhost_disable_notify(&vsock->dev, vq);
+> >  				continue;
+> > @@ -494,7 +499,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+> >  			virtio_transport_free_pkt(pkt);
+> >  
+> >  		len += sizeof(pkt->hdr);
+> > -		vhost_add_used(vq, head, len);
+> > +		buf.in_len = len;
+> > +		vhost_put_used_buf(vq, &buf);
+> >  		total_len += len;
+> >  		added = true;
+> >  	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
+> > -- 
+> > MST
+> > 
 
