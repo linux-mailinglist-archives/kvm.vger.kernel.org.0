@@ -2,83 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 589831F150E
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 11:11:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 247D91F1548
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 11:19:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728956AbgFHJLH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 05:11:07 -0400
-Received: from mga05.intel.com ([192.55.52.43]:2017 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726038AbgFHJLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 05:11:07 -0400
-IronPort-SDR: fD+vcAqL+03p7ub4XTNlzpAlyWEiGdmhMToTDq3yi5goe/TNmKdn0Wuh+ZDbzMaz6gDfAXJe5x
- h1qudhmYtLrg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2020 02:11:05 -0700
-IronPort-SDR: c6ZAhXQaDJ4dIM9JJuB5GZtmw6xqbYPfM0945uT+/Ru/NmZgrmDQg06GmHfhtPHtU9pg2Ir1JO
- luFM8hYzCbfw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,487,1583222400"; 
-   d="scan'208";a="258641818"
-Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.249.46.212])
-  by fmsmga007.fm.intel.com with ESMTP; 08 Jun 2020 02:11:02 -0700
-Date:   Mon, 8 Jun 2020 11:11:00 +0200
-From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+        id S1729212AbgFHJTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 05:19:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60045 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729181AbgFHJTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 05:19:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591607954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oS/KVBpran494cCFbIQ4AK45fomUTGyPOMA3CK9qr/I=;
+        b=IObOPmrwZMW9F2wJIkpGwmiODWV4sPcRq/EDAiaI4hrzm+nnEcxZkKjJX85jdbxCULRums
+        5SCEgXB80OkydbLUhvnlUOeMZYOh5NoTr0ZCa8BNBl7HiJxxXBjYbze/PmVJlJKbc2XkIH
+        kEYS0k3biZ1pzHobpCTGugM+uzacIvo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-VxbcQD1KO5K7RxYLu9namw-1; Mon, 08 Jun 2020 05:19:12 -0400
+X-MC-Unique: VxbcQD1KO5K7RxYLu9namw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 900E98064DF;
+        Mon,  8 Jun 2020 09:19:10 +0000 (UTC)
+Received: from [10.72.13.71] (ovpn-13-71.pek2.redhat.com [10.72.13.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4CC1C7E577;
+        Mon,  8 Jun 2020 09:18:52 +0000 (UTC)
+Subject: Re: [PATCH 5/6] vdpa: introduce virtio pci driver
 To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
-Message-ID: <20200608091100.GC10562@ubuntu>
-References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
- <20200604151917-mutt-send-email-mst@kernel.org>
- <20200605063435.GA32302@ubuntu>
- <20200608073715.GA10562@ubuntu>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rob.miller@broadcom.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, eli@mellanox.com
+References: <20200529080303.15449-1-jasowang@redhat.com>
+ <20200529080303.15449-6-jasowang@redhat.com>
+ <20200602010332-mutt-send-email-mst@kernel.org>
+ <5dbb0386-beeb-5bf4-d12e-fb5427486bb8@redhat.com>
+ <6b1d1ef3-d65e-08c2-5b65-32969bb5ecbc@redhat.com>
+ <20200607095012-mutt-send-email-mst@kernel.org>
+ <9b1abd2b-232c-aa0f-d8bb-03e65fd47de2@redhat.com>
+ <20200608021438-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a1b1b7fb-b097-17b7-2e3a-0da07d2e48ae@redhat.com>
+Date:   Mon, 8 Jun 2020 17:18:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200608073715.GA10562@ubuntu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200608021438-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update: I looked through VirtIO 1.0 and 1.1 specs, data format their, 
-including byte order, is defined on a per-device type basis. RPMsg is 
-indeed included in the spec as device type 7, but that's the only 
-mention of it in both versions. It seems RPMsg over VirtIO isn't 
-standardised yet. Also it looks like newer interface definitions 
-specify using "guest native endianness" for Virtual Queue data. So 
-I think the same should be done for RPMsg instead of enforcing LE?
+
+On 2020/6/8 下午2:32, Michael S. Tsirkin wrote:
+> On Mon, Jun 08, 2020 at 11:32:31AM +0800, Jason Wang wrote:
+>> On 2020/6/7 下午9:51, Michael S. Tsirkin wrote:
+>>> On Fri, Jun 05, 2020 at 04:54:17PM +0800, Jason Wang wrote:
+>>>> On 2020/6/2 下午3:08, Jason Wang wrote:
+>>>>>>> +static const struct pci_device_id vp_vdpa_id_table[] = {
+>>>>>>> +    { PCI_DEVICE(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID) },
+>>>>>>> +    { 0 }
+>>>>>>> +};
+>>>>>> This looks like it'll create a mess with either virtio pci
+>>>>>> or vdpa being loaded at random. Maybe just don't specify
+>>>>>> any IDs for now. Down the road we could get a
+>>>>>> distinct vendor ID or a range of device IDs for this.
+>>>>> Right, will do.
+>>>>>
+>>>>> Thanks
+>>>> Rethink about this. If we don't specify any ID, the binding won't work.
+>>> We can bind manually. It's not really for production anyway, so
+>>> not a big deal imho.
+>>
+>> I think you mean doing it via "new_id", right.
+> I really meant driver_override. This is what people have been using
+> with pci-stub for years now.
+
+
+Do you want me to implement "driver_overrid" in this series, or a NULL 
+id_table is sufficient?
+
+
+>
+>>>> How about using a dedicated subsystem vendor id for this?
+>>>>
+>>>> Thanks
+>>> If virtio vendor id is used then standard driver is expected
+>>> to bind, right? Maybe use a dedicated vendor id?
+>>
+>> I meant something like:
+>>
+>> static const struct pci_device_id vp_vdpa_id_table[] = {
+>>      { PCI_DEVICE_SUB(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID,
+>> VP_TEST_VENDOR_ID, VP_TEST_DEVICE_ID) },
+>>      { 0 }
+>> };
+>>
+>> Thanks
+>>
+> Then regular virtio will still bind to it. It has
+>
+> drivers/virtio/virtio_pci_common.c:     { PCI_DEVICE(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID) },
+>
+>
+
+IFCVF use this to avoid the binding to regular virtio device. Looking at 
+pci_match_one_device() it checks both subvendor and subdevice there.
 
 Thanks
-Guennadi
 
-On Mon, Jun 08, 2020 at 09:37:15AM +0200, Guennadi Liakhovetski wrote:
-> Hi Michael,
-> 
-> On Fri, Jun 05, 2020 at 08:34:35AM +0200, Guennadi Liakhovetski wrote:
-> > 
-> > On Thu, Jun 04, 2020 at 03:23:37PM -0400, Michael S. Tsirkin wrote:
-> 
-> [snip]
-> 
-> > > Another it's out of line with 1.0 spec passing guest
-> > > endian data around. Won't work if host and guest
-> > > endian-ness do not match. Should pass eveything in LE and
-> > > convert.
-> > 
-> > Yes, I have to fix this, thanks.
-> 
-> Just to make sure my understanding is correct: this would involve also 
-> modifying the current virtio_rpmsg_bus.c implementation to add 
-> endianness conversions. That's what you meant, right?
