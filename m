@@ -2,143 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B3D21F2003
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 21:38:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7C991F2326
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 01:13:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbgFHTiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 15:38:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33650 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbgFHTiR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 15:38:17 -0400
-Received: from mail-lj1-x241.google.com (mail-lj1-x241.google.com [IPv6:2a00:1450:4864:20::241])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F64AC08C5C3
-        for <kvm@vger.kernel.org>; Mon,  8 Jun 2020 12:38:16 -0700 (PDT)
-Received: by mail-lj1-x241.google.com with SMTP id j18so8961294lji.2
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 12:38:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Uexpwyn2fR7P1DcGlDr4HzbFjkt5L1616WAI7BXfvnM=;
-        b=r/pKKW7ldNYNP5VPsKHOOYA9uiCiJDTOjL1qxw7wXFhqNSqZZ1N8qblK6dt54QqUUg
-         eEplGmu6286Pb/e7cH0KQEBvToMQkN9LykMYJFc2UusP8YNKn0WwoDVzGkPixtKEVaes
-         r6rS8bP0yW00zf7RnIM5Lv+a6HudIjwQaeJ/Uqr+Mh7arJU9kgpSTBhWoZtQErrLTIJK
-         VGj40ZuwLCDffy95OV2HwmhW5RuBcPx9tSextzl+ojxDZeI7tCCAME8l3os7dvTM3ek7
-         7/lN68YINGXozqT3qZIVgnF8dSfTiR8QSXOvBqiB68QcMGnhB8UF56nSN/qJxbETBV9L
-         LyRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Uexpwyn2fR7P1DcGlDr4HzbFjkt5L1616WAI7BXfvnM=;
-        b=uEfd+kG0CHd74J4/bnYNWTWh19M6Dxw7pa8NZ1gHMKpynNF4v1yZVDX5YkUb8yuLMq
-         CzFFX2eljHRaNAk6hnjljv4C147Nll6Xn6vHotmRXdLyB7v53jUqhyLb/CTtA7Ytn1jy
-         fYS3svZeNGji8x4M1EeEl8IN/F1Y5GLSxC1Plg8Ay20Mh5cIjbH+vdbc2VOqMsXGKLFb
-         D7jAFAqUZJdXjUS0L4BM9xJSDYO7W06YxkvOP5BuUoGgtAZ6fQiqUeYlUr1kPcxRZD03
-         t6/7yiN9U3eZhNYoUAMc+hB4MZ/J4CeJIVsKpsaBAgV92k12n/jkwHDqe3NfDxg14iFk
-         Ymig==
-X-Gm-Message-State: AOAM530hZDYwtaqa/FvK1vv4lVd9XPg4OiSN2iGEIaiL1V/HnITaEdXl
-        rlF21K7xuaSD7jmB1a5QpwWGoPxyzoeqNr3tg+rkJQ==
-X-Google-Smtp-Source: ABdhPJxrj7FJ9fJQGeJQtBPLp7ShZUPGLANThjFoma8TGVYDJ4OyyT46PEHPEWDeFlK/FK+jySaCjca8WZ7k9lXI48o=
-X-Received: by 2002:a2e:a17a:: with SMTP id u26mr11302926ljl.235.1591645094413;
- Mon, 08 Jun 2020 12:38:14 -0700 (PDT)
+        id S1729219AbgFHXND (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 19:13:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60868 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729198AbgFHXNB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:13:01 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7222421501;
+        Mon,  8 Jun 2020 23:12:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591657980;
+        bh=576Ow5ZT61zgY2FffwPpL3/kpHTlNTB4V+Udpiiiqq0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Kl9DaJ8Jud5+lA0O8Cw647Q1Yq4UG5neNJiSX5xdCu/aMCKfFl/e0BL/DUvlpqwvO
+         T6u1ORcsg3Mx60qdG+UbF7pS5dcpSCTczakDVDWuQ/P75ihIf62PYItsm4Lrwmn5hp
+         XNN416SO1EuIDkAVQU5ls+SsSf59w1fTECXG8dJI=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Babu Moger <babu.moger@amd.com>, Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.6 041/606] KVM: x86: Fix pkru save/restore when guest CR4.PKE=0, move it to x86.c
+Date:   Mon,  8 Jun 2020 19:02:46 -0400
+Message-Id: <20200608231211.3363633-41-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200608231211.3363633-1-sashal@kernel.org>
+References: <20200608231211.3363633-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200608191857.30319-1-sean.j.christopherson@intel.com>
-In-Reply-To: <20200608191857.30319-1-sean.j.christopherson@intel.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Mon, 8 Jun 2020 12:38:03 -0700
-Message-ID: <CAOQ_QsjEnvk+ci8AAjytoFd+x8x3Li+iJjfT0gd=nMP036G9VQ@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: nVMX: Consult only the "basic" exit reason when
- routing nested exit
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 8, 2020 at 12:19 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Consult only the basic exit reason, i.e. bits 15:0 of vmcs.EXIT_REASON,
-> when determining whether a nested VM-Exit should be reflected into L1 or
-> handled by KVM in L0.
->
-> For better or worse, the switch statements nested_vmx_l0_wants_exit()
-> and nested_vmx_l1_wants_exit() default to reflecting the VM-Exit into L1
-> for any nested VM-Exit without dedicated logic.  Because the case
-> statements only contain the basic exit reason, any VM-Exit with modifier
-> bits set will be reflected to L1, even if KVM intended to handle it in
-> L0.
->
-> Practically speaking, this only affects EXIT_REASON_MCE_DURING_VMENTRY,
-> i.e. a #MC that occurs on nested VM-Enter would be incorrectly routed to
-> L1, as "failed VM-Entry" is the only modifier that KVM can currently
-> encounter.  The SMM modifiers will never be generated as KVM doesn't
-> support/employ a SMI Transfer Monitor.  Ditto for "exit from enclave",
-> as KVM doesn't yet support virtualizing SGX, i.e. it's impossible to
-> enter an enclave in a KVM guest (L1 or L2).
->
-> Note, the original version of this fix[*] is functionally equivalent and
-> far more suited to backporting as the affected code was refactored since
-> the original patch was posted.
->
-> [*] https://lkml.kernel.org/r/20200227174430.26371-1-sean.j.christopherson@intel.com
->
-> Fixes: 644d711aa0e1 ("KVM: nVMX: Deciding if L0 or L1 should handle an L2 exit")
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
-> Cc: stable@vger.kernel.org
-> Cc: Oliver Upton <oupton@google.com>
-> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Cc: Miaohe Lin <linmiaohe@huawei.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
-> ---
->
-> Another wounded soldier.
->
-> Oliver, Krish, and Miaohe all provided reviews for v1, but I didn't feel
-> comfortable adding the tags to v2 because this is far from a straight
-> rebase.
->
-> v2: Rebased to kvm/queue, commit fb7333dfd812 ("KVM: SVM: fix calls ...").
->
->  arch/x86/kvm/vmx/nested.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index bcb50724be38..adb11b504d5c 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5672,7 +5672,7 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu, u32 exit_reason)
->  {
->         u32 intr_info;
->
-> -       switch (exit_reason) {
-> +       switch ((u16)exit_reason) {
->         case EXIT_REASON_EXCEPTION_NMI:
->                 intr_info = vmx_get_intr_info(vcpu);
->                 if (is_nmi(intr_info))
-> @@ -5733,7 +5733,7 @@ static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu, u32 exit_reason)
->         struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
->         u32 intr_info;
->
-> -       switch (exit_reason) {
-> +       switch ((u16)exit_reason) {
->         case EXIT_REASON_EXCEPTION_NMI:
->                 intr_info = vmx_get_intr_info(vcpu);
->                 if (is_nmi(intr_info))
-> --
-> 2.26.0
->
+From: Babu Moger <babu.moger@amd.com>
+
+commit 37486135d3a7b03acc7755b63627a130437f066a upstream.
+
+Though rdpkru and wrpkru are contingent upon CR4.PKE, the PKRU
+resource isn't. It can be read with XSAVE and written with XRSTOR.
+So, if we don't set the guest PKRU value here(kvm_load_guest_xsave_state),
+the guest can read the host value.
+
+In case of kvm_load_host_xsave_state, guest with CR4.PKE clear could
+potentially use XRSTOR to change the host PKRU value.
+
+While at it, move pkru state save/restore to common code and the
+host_pkru field to kvm_vcpu_arch.  This will let SVM support protection keys.
+
+Cc: stable@vger.kernel.org
+Reported-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Message-Id: <158932794619.44260.14508381096663848853.stgit@naples-babu.amd.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/vmx/vmx.c          | 18 ------------------
+ arch/x86/kvm/x86.c              | 17 +++++++++++++++++
+ 3 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7ba99c0759cf..c121b8f24597 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -574,6 +574,7 @@ struct kvm_vcpu_arch {
+ 	unsigned long cr4;
+ 	unsigned long cr4_guest_owned_bits;
+ 	unsigned long cr8;
++	u32 host_pkru;
+ 	u32 pkru;
+ 	u32 hflags;
+ 	u64 efer;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c1ffe7d24f83..a83c94a971ee 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1380,7 +1380,6 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	vmx_vcpu_pi_load(vcpu, cpu);
+ 
+-	vmx->host_pkru = read_pkru();
+ 	vmx->host_debugctlmsr = get_debugctlmsr();
+ }
+ 
+@@ -6538,11 +6537,6 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_load_guest_xsave_state(vcpu);
+ 
+-	if (static_cpu_has(X86_FEATURE_PKU) &&
+-	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
+-	    vcpu->arch.pkru != vmx->host_pkru)
+-		__write_pkru(vcpu->arch.pkru);
+-
+ 	pt_guest_enter(vmx);
+ 
+ 	atomic_switch_perf_msrs(vmx);
+@@ -6631,18 +6625,6 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	pt_guest_exit(vmx);
+ 
+-	/*
+-	 * eager fpu is enabled if PKEY is supported and CR4 is switched
+-	 * back on host, so it is safe to read guest PKRU from current
+-	 * XSAVE.
+-	 */
+-	if (static_cpu_has(X86_FEATURE_PKU) &&
+-	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE)) {
+-		vcpu->arch.pkru = rdpkru();
+-		if (vcpu->arch.pkru != vmx->host_pkru)
+-			__write_pkru(vmx->host_pkru);
+-	}
+-
+ 	kvm_load_host_xsave_state(vcpu);
+ 
+ 	vmx->nested.nested_run_pending = 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 17650bda4331..56a21dd7c1a0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -809,11 +809,25 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
+ 		    vcpu->arch.ia32_xss != host_xss)
+ 			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
+ 	}
++
++	if (static_cpu_has(X86_FEATURE_PKU) &&
++	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
++	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU)) &&
++	    vcpu->arch.pkru != vcpu->arch.host_pkru)
++		__write_pkru(vcpu->arch.pkru);
+ }
+ EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
+ 
+ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+ {
++	if (static_cpu_has(X86_FEATURE_PKU) &&
++	    (kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
++	     (vcpu->arch.xcr0 & XFEATURE_MASK_PKRU))) {
++		vcpu->arch.pkru = rdpkru();
++		if (vcpu->arch.pkru != vcpu->arch.host_pkru)
++			__write_pkru(vcpu->arch.host_pkru);
++	}
++
+ 	if (kvm_read_cr4_bits(vcpu, X86_CR4_OSXSAVE)) {
+ 
+ 		if (vcpu->arch.xcr0 != host_xcr0)
+@@ -3529,6 +3543,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	kvm_x86_ops->vcpu_load(vcpu, cpu);
+ 
++	/* Save host pkru register if supported */
++	vcpu->arch.host_pkru = read_pkru();
++
+ 	/* Apply any externally detected TSC adjustments (due to suspend) */
+ 	if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
+ 		adjust_tsc_offset_host(vcpu, vcpu->arch.tsc_offset_adjustment);
+-- 
+2.25.1
+
