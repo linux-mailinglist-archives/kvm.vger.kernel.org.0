@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAAA51F1C19
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 17:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8BB71F1C1E
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 17:31:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730324AbgFHP3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 11:29:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55335 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730293AbgFHP3a (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 11:29:30 -0400
+        id S1730267AbgFHPbE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 11:31:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23892 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729580AbgFHPbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 11:31:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591630168;
+        s=mimecast20190719; t=1591630263;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=kjRoeZH0NyZtD89PVFlfF+OQXo1xpOAcyCbdy4We0xA=;
-        b=V4G3gL0EooORu4Vwp83IJhBCaPN999ScZZT/tbqprdXC+9BaawmQ/0SH+/VR/ggyQFwnKQ
-        s9MN0nogDNemYRQmmqPYDFKmgzVYTdTMnRmWfpvtz6VhIgYjEAJzU+DiRo/vG9nfYfEJzg
-        tXG7M3t50EAiaAVR3fNyBb5JeAvrSuA=
+        bh=xR2f824jyeDcek+juhYa40ZCw3TUqH2Eo9g1XqCPz98=;
+        b=CDrm8OiS6irtFiozaDxnyxuq4sbrIP0mpkA3c/iopeMbWU1r00QWgJaqIdRywgu3I4g4bo
+        5VPv/Oes3pnQa1a7KLCXFKCI1jtd1iMROj+D1kC25QN1QvmI5LUuP03Fym2QCiX/RBZErJ
+        rDWYQ/HyWCUJ00h4i4z7ggGb0xqwU9w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-oEOsEq0DMz-8-pyLYpiodw-1; Mon, 08 Jun 2020 11:29:25 -0400
-X-MC-Unique: oEOsEq0DMz-8-pyLYpiodw-1
+ us-mta-8-z2MvpZsmPDuQpqpZEhP0Lw-1; Mon, 08 Jun 2020 11:31:01 -0400
+X-MC-Unique: z2MvpZsmPDuQpqpZEhP0Lw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C599B461;
-        Mon,  8 Jun 2020 15:29:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB2A31083E81;
+        Mon,  8 Jun 2020 15:30:59 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-119.ams2.redhat.com [10.36.112.119])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A92C161981;
-        Mon,  8 Jun 2020 15:29:19 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v8 03/12] s390x: saving regs for interrupts
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B5CB860C47;
+        Mon,  8 Jun 2020 15:30:55 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v8 01/12] s390x: Use PSW bits definitions
+ in cstart
 To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         david@redhat.com, cohuck@redhat.com
 References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
- <1591603981-16879-4-git-send-email-pmorel@linux.ibm.com>
- <d4f1167c-5e44-f69c-8aac-f792a2a50ca7@redhat.com>
- <cde77b21-7fbb-bd09-bd3d-f77c5bd2a088@linux.ibm.com>
+ <1591603981-16879-2-git-send-email-pmorel@linux.ibm.com>
+ <59f3dda9-6cd1-a3b4-5265-1a9fb2ff51ed@redhat.com>
+ <e03cb81c-30cc-7cbc-c3a8-cc863a5d0be1@linux.ibm.com>
+ <1e51b893-dc1e-1740-f286-ec00195d6a7f@redhat.com>
+ <d94b6f43-2250-17ee-e146-1347c0350294@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <dc936814-13b3-c310-f0b1-1bec47c042b2@redhat.com>
-Date:   Mon, 8 Jun 2020 17:29:17 +0200
+Message-ID: <77f6ed8f-4b4c-be0f-f29a-429618c9e3c0@redhat.com>
+Date:   Mon, 8 Jun 2020 17:30:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <cde77b21-7fbb-bd09-bd3d-f77c5bd2a088@linux.ibm.com>
+In-Reply-To: <d94b6f43-2250-17ee-e146-1347c0350294@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -58,87 +61,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/06/2020 16.24, Pierre Morel wrote:
+On 08/06/2020 17.28, Pierre Morel wrote:
 > 
 > 
-> On 2020-06-08 11:05, Thomas Huth wrote:
->> On 08/06/2020 10.12, Pierre Morel wrote:
->>> If we use multiple source of interrupts, for example, using SCLP
->>> console to print information while using I/O interrupts, we need
->>> to have a re-entrant register saving interruption handling.
+> On 2020-06-08 16:52, Thomas Huth wrote:
+>> On 08/06/2020 16.33, Pierre Morel wrote:
 >>>
->>> Instead of saving at a static memory address, let's save the base
->>> registers, the floating point registers and the floating point
->>> control register on the stack in case of I/O interrupts
 >>>
->>> Note that we keep the static register saving to recover from the
->>> RESET tests.
+>>> On 2020-06-08 10:43, Thomas Huth wrote:
+>>>> On 08/06/2020 10.12, Pierre Morel wrote:
+>>>>> This patch defines the PSW bits EA/BA used to initialize the PSW masks
+>>>>> for exceptions.
+>>>>>
+>>>>> Since some PSW mask definitions exist already in arch_def.h we add
+>>>>> these
+>>>>> definitions there.
+>>>>> We move all PSW definitions together and protect assembler code
+>>>>> against
+>>>>> C syntax.
+>>>>>
+>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>> ---
+>>>>>    lib/s390x/asm/arch_def.h | 15 +++++++++++----
+>>>>>    s390x/cstart64.S         | 15 ++++++++-------
+>>>>>    2 files changed, 19 insertions(+), 11 deletions(-)
+>>>>>
+>>>>> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+>>>>> index 1b3bb0c..5388114 100644
+>>>>> --- a/lib/s390x/asm/arch_def.h
+>>>>> +++ b/lib/s390x/asm/arch_def.h
+>>>>> @@ -10,15 +10,21 @@
+>>>>>    #ifndef _ASM_S390X_ARCH_DEF_H_
+>>>>>    #define _ASM_S390X_ARCH_DEF_H_
+>>>>>    +#define PSW_MASK_EXT            0x0100000000000000UL
+>>>>> +#define PSW_MASK_DAT            0x0400000000000000UL
+>>>>> +#define PSW_MASK_SHORT_PSW        0x0008000000000000UL
+>>>>> +#define PSW_MASK_PSTATE            0x0001000000000000UL
+>>>>> +#define PSW_MASK_BA            0x0000000080000000UL
+>>>>> +#define PSW_MASK_EA            0x0000000100000000UL
+>>>>> +
+>>>>> +#define PSW_EXCEPTION_MASK    (PSW_MASK_EA | PSW_MASK_BA)
+>>>>
+>>>> PSW_EXCEPTION_MASK sounds a little bit unfortunate - that term rather
+>>>> reminds me of something that disables some interrupts
+>>>> ... in case you
+>>>> respin, maybe rather use something like "PSW_EXC_ADDR_MODE" ?
 >>>
->>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>> Acked-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>   s390x/cstart64.S | 41 +++++++++++++++++++++++++++++++++++++++--
->>>   1 file changed, 39 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
->>> index b50c42c..a9d8223 100644
->>> --- a/s390x/cstart64.S
->>> +++ b/s390x/cstart64.S
->>> @@ -119,6 +119,43 @@ memsetxc:
->>>       lmg    %r0, %r15, GEN_LC_SW_INT_GRS
->>>       .endm
->>>   +/* Save registers on the stack (r15), so we can have stacked
->>> interrupts. */
->>> +    .macro SAVE_REGS_STACK
->>> +    /* Allocate a stack frame for 15 general registers */
->>> +    slgfi   %r15, 15 * 8
->>> +    /* Store registers r0 to r14 on the stack */
->>> +    stmg    %r0, %r14, 0(%r15)
->>> +    /* Allocate a stack frame for 16 floating point registers */
->>> +    /* The size of a FP register is the size of an double word */
->>> +    slgfi   %r15, 16 * 8
->>> +    /* Save fp register on stack: offset to SP is multiple of reg
->>> number */
->>> +    .irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
->>> +    std    \i, \i * 8(%r15)
->>> +    .endr
->>> +    /* Save fpc, but keep stack aligned on 64bits */
->>> +    slgfi   %r15, 8
->>> +    efpc    %r0
->>> +    stg    %r0, 0(%r15)
->>> +    .endm
+>>> EXCEPTIONS_PSW_MASK ?
 >>
->> I wonder whether it would be sufficient to only save the registers here
->> that are "volatile" according to the ELF ABI? ... that would save quite
->> some space on the stack, I think... OTOH, the old code was also saving
->> all registers, so maybe that's something for a separate patch later...
+>> I think it is the _MASK suffix that mainly bugs me here, since this is
+>> not a define that you normally use for extracting the bits from a PSW...
+>> so EXCEPTIONS_PSW without _MASK would be fine for me... but as long as
+>> I'm the only one who has a strange feeling about this, it's also ok if
+>> you keep the current name.
+>>
+>>   Thomas
+>>
 > 
-> I don't think so for the general registers
-> The "volatile" registers are lost during a C call, so it is the duty of
-> the caller to save them before the call, if he wants, and this is
-> possible for the programmer or the compiler to arrange that.
+> The _MASK is because it is applied to the psw.mask and not to the
+> psw.addr part.
 > 
-> For interruptions, we steal the CPU with all the registers from the
-> program without warning, the program has no possibility to save them.
-> So we must save all registers for him.
+> But I agree that the name is not good, to keep the naming convention,
+> may be it should be:
+> 
+> PSW_MASK_ON_EXCEPTION
+> 
+> beginning with PSW_MASK_ like all other psw.mask definitions and
+> ON_EXCEPTION clearly define when it is used.
 
-We certainly have to save the registers that are marked as "volatile" in
-the ELF ABI, no discussion. But what about the others? If we do not
-touch them in the assembler code, and just jump to a C function, the C
-function will save them before changing them, and restore the old value
-before returning. So when the interrupt is done, the registers should
-contain their original values again, shouldn't they?
-
-> For the FP registers, we surely can do something if we establish a usage
-> convention on the floating point.
-> A few tests need hardware floating point.
-
-According to the ELF ABI, f0 - f7 are volatile, so they must be saved,
-but f8 - f15 should be saved by the called function instead, so I think
-we don't need to save them here?
-
-Anyway, as I said, that optimization could also be done in a future
-patch instead.
+Good idea, PSW_MASK_ON_EXCEPTION sounds better for me, too!
 
  Thomas
 
