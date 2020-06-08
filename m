@@ -2,109 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 701531F14F3
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 11:05:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CABA1F150A
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 11:09:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726535AbgFHJFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 05:05:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31308 "EHLO
+        id S1728022AbgFHJJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 05:09:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21962 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726536AbgFHJFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 05:05:43 -0400
+        with ESMTP id S1725927AbgFHJJS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 05:09:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591607142;
+        s=mimecast20190719; t=1591607356;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=JU1hlejrOwg52H4lSP+m9jVC+ZPcWO4HkWue5ppPBAM=;
-        b=MNPlepJg+vMBaU/eJ0uVvZg+9CtQAD9YR1imR45CNxvY7EsTgWgc7JEPAkW2SATenmjEmq
-        t0E7ZwbwqjO2yH0AiKBe0i+CJ/hTiRY8ZTq86wiIPg+jkWKnSlEpYqtCvAVLIcpeJ+d4J9
-        p2jzKGhfIbTTu2GFgbL4ntfU3cIgPU0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-uwOGySdZP0CcNqcFBTXFTQ-1; Mon, 08 Jun 2020 05:05:40 -0400
-X-MC-Unique: uwOGySdZP0CcNqcFBTXFTQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44C06461;
-        Mon,  8 Jun 2020 09:05:39 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-119.ams2.redhat.com [10.36.112.119])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB46B79C40;
-        Mon,  8 Jun 2020 09:05:34 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v8 03/12] s390x: saving regs for interrupts
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
- <1591603981-16879-4-git-send-email-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <d4f1167c-5e44-f69c-8aac-f792a2a50ca7@redhat.com>
-Date:   Mon, 8 Jun 2020 11:05:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+         in-reply-to:in-reply-to:references:references;
+        bh=1qzz8q0RXIAT8maH8NVpFy7idcd6AVSk1M7/8bU7JLI=;
+        b=D4LT/baqbcWPedk3QGlS7jWP4d0okcBiYzu/WQ11icJo83gE4jg+V4nw536GJZLlEHpJYE
+        hI4RQ0EiW2LhRJUFpfrNC/K2iEXBezWZuUiD3mlZBJSJXQ/vWMKx5YuYM4TDTVtbDC/Zxw
+        1QP9slsclbp44ixBS/tNUUfl/VozpYk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-3Mv-_nK9NT22B5iT3OWXeA-1; Mon, 08 Jun 2020 05:09:15 -0400
+X-MC-Unique: 3Mv-_nK9NT22B5iT3OWXeA-1
+Received: by mail-wr1-f69.google.com with SMTP id c14so6852570wrw.11
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 02:09:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1qzz8q0RXIAT8maH8NVpFy7idcd6AVSk1M7/8bU7JLI=;
+        b=TnEeagn51VZY/VmdBxuyPKuySFEuzSBIuTl9RF3YYb4AfkUvMFRM7+6Hk/Yslweian
+         l0/aQ55aw7czK40CGrTjefw6x4IO+jaAoFOBdbXi/wvdEq40hDW2nar/Cki00tZdlm41
+         JibcM6cBW4kvYo2JBzypPHpodtitMWQmheCnz9qp7HMH4HxuCt6rG7kxF+zyZbbdzwyP
+         tBIJDUUdGbHMzFXTRRhRoHUFNxlfVo8tyMgrZqsdK28+r4XTCwS3jfP34FVMqELHd0WG
+         R5EmDJR9vtvBwY8CE4lpzsW3La47TmPnlIab5ohgWxW77wGPxerqcJK3NKP7mtnMv63W
+         bDGQ==
+X-Gm-Message-State: AOAM530uF8NCxVbQEZO1K0BlbLHNGwfw1sF8hxP6Xtb6SnkzK+WILihP
+        0jtoZAEsVjycfct8H3vTFpGhglmIoxShGioN34We4h/f6nCdUF9Co/74CJua+2tyv8wkDAJyQIb
+        vYh8Xhs3m1Qcg
+X-Received: by 2002:adf:a41a:: with SMTP id d26mr23153875wra.324.1591607354004;
+        Mon, 08 Jun 2020 02:09:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxk4C2kFKYGkG3pOjWAb4BdA7+bim0qD4WM5BHVhr/1qFiireNP/Iu0BJQYaiwNrt1nr7CEGA==
+X-Received: by 2002:adf:a41a:: with SMTP id d26mr23153862wra.324.1591607353853;
+        Mon, 08 Jun 2020 02:09:13 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id u12sm23301667wrq.90.2020.06.08.02.09.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2020 02:09:13 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 05:09:10 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
+Message-ID: <20200608050757-mutt-send-email-mst@kernel.org>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <20200604151917-mutt-send-email-mst@kernel.org>
+ <20200605063435.GA32302@ubuntu>
+ <20200608073715.GA10562@ubuntu>
 MIME-Version: 1.0
-In-Reply-To: <1591603981-16879-4-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200608073715.GA10562@ubuntu>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/06/2020 10.12, Pierre Morel wrote:
-> If we use multiple source of interrupts, for example, using SCLP
-> console to print information while using I/O interrupts, we need
-> to have a re-entrant register saving interruption handling.
+On Mon, Jun 08, 2020 at 09:37:15AM +0200, Guennadi Liakhovetski wrote:
+> Hi Michael,
 > 
-> Instead of saving at a static memory address, let's save the base
-> registers, the floating point registers and the floating point
-> control register on the stack in case of I/O interrupts
+> On Fri, Jun 05, 2020 at 08:34:35AM +0200, Guennadi Liakhovetski wrote:
+> > 
+> > On Thu, Jun 04, 2020 at 03:23:37PM -0400, Michael S. Tsirkin wrote:
 > 
-> Note that we keep the static register saving to recover from the
-> RESET tests.
+> [snip]
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/cstart64.S | 41 +++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 39 insertions(+), 2 deletions(-)
+> > > Another it's out of line with 1.0 spec passing guest
+> > > endian data around. Won't work if host and guest
+> > > endian-ness do not match. Should pass eveything in LE and
+> > > convert.
+> > 
+> > Yes, I have to fix this, thanks.
 > 
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index b50c42c..a9d8223 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -119,6 +119,43 @@ memsetxc:
->  	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
->  	.endm
->  
-> +/* Save registers on the stack (r15), so we can have stacked interrupts. */
-> +	.macro SAVE_REGS_STACK
-> +	/* Allocate a stack frame for 15 general registers */
-> +	slgfi   %r15, 15 * 8
-> +	/* Store registers r0 to r14 on the stack */
-> +	stmg    %r0, %r14, 0(%r15)
-> +	/* Allocate a stack frame for 16 floating point registers */
-> +	/* The size of a FP register is the size of an double word */
-> +	slgfi   %r15, 16 * 8
-> +	/* Save fp register on stack: offset to SP is multiple of reg number */
-> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-> +	std	\i, \i * 8(%r15)
-> +	.endr
-> +	/* Save fpc, but keep stack aligned on 64bits */
-> +	slgfi   %r15, 8
-> +	efpc	%r0
-> +	stg	%r0, 0(%r15)
-> +	.endm
+> Just to make sure my understanding is correct: this would involve also 
+> modifying the current virtio_rpmsg_bus.c implementation to add 
+> endianness conversions. That's what you meant, right?
+> 
+> Thanks
+> Guennadi
 
-I wonder whether it would be sufficient to only save the registers here
-that are "volatile" according to the ELF ABI? ... that would save quite
-some space on the stack, I think... OTOH, the old code was also saving
-all registers, so maybe that's something for a separate patch later...
+right and if there are legacy compat considerations, using _virtio16 and
+friends types, as well as virtio16_to_cpu and friends functions.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+-- 
+MST
 
