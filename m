@@ -2,135 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D09BD1F1B0B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 16:34:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6779D1F1B27
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 16:39:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729963AbgFHOeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 10:34:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33088 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729553AbgFHOeG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 10:34:06 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 058EXfC0064133;
-        Mon, 8 Jun 2020 10:34:05 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31g41dvkp3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Jun 2020 10:34:05 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 058EXnvS064697;
-        Mon, 8 Jun 2020 10:34:05 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31g41dvkdf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Jun 2020 10:34:04 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 058EVfXo018271;
-        Mon, 8 Jun 2020 14:33:48 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 31g2s7spjx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Jun 2020 14:33:48 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 058EXkci1901038
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 8 Jun 2020 14:33:46 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17DD64203F;
-        Mon,  8 Jun 2020 14:33:46 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC5BF42047;
-        Mon,  8 Jun 2020 14:33:45 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.43.245])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  8 Jun 2020 14:33:45 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v8 01/12] s390x: Use PSW bits definitions
- in cstart
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
- <1591603981-16879-2-git-send-email-pmorel@linux.ibm.com>
- <59f3dda9-6cd1-a3b4-5265-1a9fb2ff51ed@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <e03cb81c-30cc-7cbc-c3a8-cc863a5d0be1@linux.ibm.com>
-Date:   Mon, 8 Jun 2020 16:33:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1730043AbgFHOjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 10:39:03 -0400
+Received: from mga18.intel.com ([134.134.136.126]:18724 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729948AbgFHOjC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 10:39:02 -0400
+IronPort-SDR: N3GlEXhnqNMQCejY1ESzxMxGyx1TkspY5lrO6C5ixCJNEn4Ke0NQ6XL0L/wSzrlHwsIYs3mBgX
+ I4BA1zZP/RHQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2020 07:39:00 -0700
+IronPort-SDR: D0ix12Bs+J8SSR/5T0JAzVazG4EHYXaHaQZdGGJV/fhEXHozxda9QrerepGNKMsiM62mxWyYUq
+ S2ymqfWc8sVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,487,1583222400"; 
+   d="scan'208";a="305840070"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga002.fm.intel.com with ESMTP; 08 Jun 2020 07:38:59 -0700
+Date:   Mon, 8 Jun 2020 07:38:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Marcelo Bandeira Condotta <mcondotta@redhat.com>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: selftests: fix vmx_preemption_timer_test build
+ with GCC10
+Message-ID: <20200608143859.GA8223@linux.intel.com>
+References: <20200608112346.593513-1-vkuznets@redhat.com>
+ <20200608112346.593513-2-vkuznets@redhat.com>
+ <39c73030-49ff-f25c-74de-9a52579eefbe@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <59f3dda9-6cd1-a3b4-5265-1a9fb2ff51ed@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-08_13:2020-06-08,2020-06-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- adultscore=0 malwarescore=0 impostorscore=0 clxscore=1015 mlxlogscore=999
- bulkscore=0 suspectscore=0 cotscore=-2147483648 priorityscore=1501
- spamscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006080109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <39c73030-49ff-f25c-74de-9a52579eefbe@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020-06-08 10:43, Thomas Huth wrote:
-> On 08/06/2020 10.12, Pierre Morel wrote:
->> This patch defines the PSW bits EA/BA used to initialize the PSW masks
->> for exceptions.
->>
->> Since some PSW mask definitions exist already in arch_def.h we add these
->> definitions there.
->> We move all PSW definitions together and protect assembler code against
->> C syntax.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   lib/s390x/asm/arch_def.h | 15 +++++++++++----
->>   s390x/cstart64.S         | 15 ++++++++-------
->>   2 files changed, 19 insertions(+), 11 deletions(-)
->>
->> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
->> index 1b3bb0c..5388114 100644
->> --- a/lib/s390x/asm/arch_def.h
->> +++ b/lib/s390x/asm/arch_def.h
->> @@ -10,15 +10,21 @@
->>   #ifndef _ASM_S390X_ARCH_DEF_H_
->>   #define _ASM_S390X_ARCH_DEF_H_
->>   
->> +#define PSW_MASK_EXT			0x0100000000000000UL
->> +#define PSW_MASK_DAT			0x0400000000000000UL
->> +#define PSW_MASK_SHORT_PSW		0x0008000000000000UL
->> +#define PSW_MASK_PSTATE			0x0001000000000000UL
->> +#define PSW_MASK_BA			0x0000000080000000UL
->> +#define PSW_MASK_EA			0x0000000100000000UL
->> +
->> +#define PSW_EXCEPTION_MASK	(PSW_MASK_EA | PSW_MASK_BA)
+On Mon, Jun 08, 2020 at 01:57:03PM +0200, Paolo Bonzini wrote:
+> On 08/06/20 13:23, Vitaly Kuznetsov wrote:
+> > GCC10 fails to build vmx_preemption_timer_test:
+> > 
+> > gcc -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99
+> > -fno-stack-protector -fno-PIE -I../../../../tools/include
+> >  -I../../../../tools/arch/x86/include -I../../../../usr/include/
+> >  -Iinclude -Ix86_64 -Iinclude/x86_64 -I..  -pthread  -no-pie
+> >  x86_64/evmcs_test.c ./linux/tools/testing/selftests/kselftest_harness.h
+> >  ./linux/tools/testing/selftests/kselftest.h
+> >  ./linux/tools/testing/selftests/kvm/libkvm.a
+> >  -o ./linux/tools/testing/selftests/kvm/x86_64/evmcs_test
+> > /usr/bin/ld: ./linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):
+> >  ./linux/tools/testing/selftests/kvm/include/x86_64/vmx.h:603:
+> >  multiple definition of `ctrl_exit_rev'; /tmp/ccMQpvNt.o:
+> >  ./linux/tools/testing/selftests/kvm/include/x86_64/vmx.h:603:
+> >  first defined here
+> > /usr/bin/ld: ./linux/tools/testing/selftests/kvm/libkvm.a(vmx.o):
+> >  ./linux/tools/testing/selftests/kvm/include/x86_64/vmx.h:602:
+> >  multiple definition of `ctrl_pin_rev'; /tmp/ccMQpvNt.o:
+> >  ./linux/tools/testing/selftests/kvm/include/x86_64/vmx.h:602:
+> >  first defined here
+> >  ...
+> > 
+> > ctrl_exit_rev/ctrl_pin_rev/basic variables are only used in
+> > vmx_preemption_timer_test.c, just move them there.
+> > 
+> > Fixes: 8d7fbf01f9af ("KVM: selftests: VMX preemption timer migration test")
+> > Reported-by: Marcelo Bandeira Condotta <mcondotta@redhat.com>
+> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > ---
+> >  tools/testing/selftests/kvm/include/x86_64/vmx.h              | 4 ----
+> >  .../testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c  | 4 ++++
+> >  2 files changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> > index ccff3e6e2704..766af9944294 100644
+> > --- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> > @@ -598,10 +598,6 @@ union vmx_ctrl_msr {
+> >  	};
+> >  };
+> >  
+> > -union vmx_basic basic;
+> > -union vmx_ctrl_msr ctrl_pin_rev;
+> > -union vmx_ctrl_msr ctrl_exit_rev;
+> > -
+> >  struct vmx_pages *vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva);
+> >  bool prepare_for_vmx_operation(struct vmx_pages *vmx);
+> >  void prepare_vmcs(struct vmx_pages *vmx, void *guest_rip, void *guest_rsp);
+> > diff --git a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+> > index cc72b6188ca7..a7737af1224f 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+> > @@ -31,6 +31,10 @@ bool l2_save_restore_done;
+> >  static u64 l2_vmx_pt_start;
+> >  volatile u64 l2_vmx_pt_finish;
+> >  
+> > +union vmx_basic basic;
+> > +union vmx_ctrl_msr ctrl_pin_rev;
+> > +union vmx_ctrl_msr ctrl_exit_rev;
+> > +
+> >  void l2_guest_code(void)
+> >  {
+> >  	u64 vmx_pt_delta;
+> > 
 > 
-> PSW_EXCEPTION_MASK sounds a little bit unfortunate - that term rather
-> reminds me of something that disables some interrupts
-> ... in case you
-> respin, maybe rather use something like "PSW_EXC_ADDR_MODE" ?
+> Queued both, thanks.
 
-EXCEPTIONS_PSW_MASK ?
+Hmm, someone go awry with your queue a while back?
 
-a vote?
-
-> Well, since nobody else complained yet, and the rest of the patch looks
-> fine:
-> 
-> Acked-by: Thomas Huth <thuth@redhat.com>
-> 
-
-Thanks,
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+https://lkml.kernel.org/r/ce6a5284-e09b-2f51-8cb6-baa29b3ac5c3@redhat.com
