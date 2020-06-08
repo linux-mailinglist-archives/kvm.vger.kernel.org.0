@@ -2,134 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75D2A1F19B3
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69E381F1A11
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:29:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729175AbgFHNNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 09:13:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24681 "EHLO
+        id S1729783AbgFHN33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 09:29:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39447 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729130AbgFHNNS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 09:13:18 -0400
+        with ESMTP id S1729645AbgFHN33 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 09:29:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591621996;
+        s=mimecast20190719; t=1591622967;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aE4uxEFzisXgU373/MFQA+2UMs2/qJwN6z64o4N5Dt4=;
-        b=R5fc6p79UyIJ/dAsbTm4TvTSlIZkM2nPuY35BhvdlqvQzobCEpJ/v2JhFrSGdWNO40XGCM
-        bmVP5hOMF77XVccgh+iDi3wh51ZWe8JI2uAbTaf2x7XJrnee+eaji+6Lc4Pg0HlKanOpiT
-        5FcYEJTRIEfgS/L2c7ZWCJ/lYXXyUI0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-UnznCOAOM_asWOEscL7p8g-1; Mon, 08 Jun 2020 09:13:13 -0400
-X-MC-Unique: UnznCOAOM_asWOEscL7p8g-1
-Received: by mail-wr1-f71.google.com with SMTP id l18so7187766wrm.0
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:13:13 -0700 (PDT)
+        bh=tAi5RnB11l/kNjeRk8ozS/jXDdeHeIrWEjaZ8oVwPv4=;
+        b=PjMl2shGx5+3Yo9rsHi7AuNTbvJ9lQnArsuKSgaQ2Ab1+Ywxh2WGJmQXaj9wbj81PIKoh+
+        banPpXdoUMZZBla/5DAHiyguvaK2Bx8S4HhEl08Cxtg6FNC+UTVLnKFqSqw2gpMREZrtA8
+        Yu2734sTDrzljospIWgYzeSU1xlVBpc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-ihbsps0lP3eQHT7ZEPMRng-1; Mon, 08 Jun 2020 09:29:06 -0400
+X-MC-Unique: ihbsps0lP3eQHT7ZEPMRng-1
+Received: by mail-wm1-f70.google.com with SMTP id u15so3934224wmm.5
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:29:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aE4uxEFzisXgU373/MFQA+2UMs2/qJwN6z64o4N5Dt4=;
-        b=hjV4sSY4qFA9FjaVUx75cWxDIBsTz8HikYKwH9B80IMWdJMRir87VZsYc48GUyJsOb
-         x3lxBz7rhqSU6IxedPjFMmNixuvmnFY7KQiBYLaXrr7A7Y39sb6O1QtkqGzbyklqEM6M
-         AdnN3uSVomrM0sjIwjk2MlJcBT4WobcG7OhDn5IYY7szKsJjfcYNk7L8Nfro/RBhF83Y
-         jvUxekPuoyDbKSAwjwHnSAdJIajEaAJRa+37EvTmBsieUP645veCbtXVWeVB2+/RgytA
-         PfDujAKq+kZOY5l+Z5iO9UeOGGXJPbrReLjUzRAZcdaCXN2FyIryHplzq6/LivlPqXSV
-         Ip7w==
-X-Gm-Message-State: AOAM530pM84pNjizoX3U10Iyq6CZzhurx+Zv3dy3pSANZiCg9OJyj+6H
-        /OHbwLSUDjOx8rw7n5MlLLJ2i6kwZtaOFm1tiD0NioKCPMSEidbkPWTRErRnwhNY+gbNxspnRpN
-        xdH7t2+TLQx+e
-X-Received: by 2002:adf:9163:: with SMTP id j90mr23117173wrj.65.1591621992172;
-        Mon, 08 Jun 2020 06:13:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFKKUfkK+tx2dyjLJychJAOnf6ou8lGUS/UM9N0R8J5nM/pSwyG9zl28UmZ6GGRGsYFCgLVg==
-X-Received: by 2002:adf:9163:: with SMTP id j90mr23117143wrj.65.1591621991883;
-        Mon, 08 Jun 2020 06:13:11 -0700 (PDT)
-Received: from [192.168.178.58] ([151.30.87.23])
-        by smtp.gmail.com with ESMTPSA id u4sm23511562wmb.48.2020.06.08.06.13.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2020 06:13:11 -0700 (PDT)
-Subject: Re: [RFC PATCH] KVM: x86: Fix APIC page invalidation race
-To:     Eiichi Tsukata <eiichi.tsukata@nutanix.com>,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     felipe.franciosi@nutanix.com, rkrcmar@redhat.com,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200606042627.61070-1-eiichi.tsukata@nutanix.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0d9b3313-5d4c-9ef3-63e4-ba08ddbbe7a1@redhat.com>
-Date:   Mon, 8 Jun 2020 15:13:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=tAi5RnB11l/kNjeRk8ozS/jXDdeHeIrWEjaZ8oVwPv4=;
+        b=jX7ZdCpd+Lfg+RxB5Ys41icUT1ppkOrtpRIQNajRil1PJb1pAb71LdUmGq07IY4cGl
+         PLS2T8jnHLxTWh5wuNBeTb4JExqhmmKw/ka/R8tnaf4WStJU8m/j4H3QDc8q2Xik8FZo
+         OBgKpAJngCHFbnvpV/S6xk3aKKIV0v8cUiJtUvRR9kKn/pyLp2HW8eYr2oAdBBTG/pMm
+         IQxcLSZGijQBblwkYP+dJEBSLCnCuN6+CsqVMrth4z9G75QIM/TSTMA9wYe8Z0R1CaMd
+         OkHmW3j0iJ0QH/6qhXVF3Mpl3xHNMmplAxzvneLcJ2wGsG/brahx14oP/n/7RAM2cqrP
+         SUyg==
+X-Gm-Message-State: AOAM5316FFgHMAW6jKWHMmO49tscW/14ko5yX5AoGFfNwxjQh70xJA8V
+        OuRF+FfobnybtW5Lo+UzDs4oCiHgNPi2VgC2RPB6wvGjL2oA9vh8zhQAfAf7BTn2gvp9IPn6y6l
+        ch5U75w6SLN8h
+X-Received: by 2002:a5d:4a45:: with SMTP id v5mr23250524wrs.223.1591622945518;
+        Mon, 08 Jun 2020 06:29:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxLsV4zKcIqO3YHdQC1Vbu08DLKVYtIAwGXFJX9rmOu7fddWNahirZvRHnTir6Z4zHxaZCpjg==
+X-Received: by 2002:a5d:4a45:: with SMTP id v5mr23250502wrs.223.1591622945243;
+        Mon, 08 Jun 2020 06:29:05 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id o20sm24303052wra.29.2020.06.08.06.29.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2020 06:29:04 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 09:29:01 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rob.miller@broadcom.com, lingshan.zhu@intel.com,
+        eperezma@redhat.com, lulu@redhat.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, eli@mellanox.com
+Subject: Re: [PATCH 5/6] vdpa: introduce virtio pci driver
+Message-ID: <20200608092530-mutt-send-email-mst@kernel.org>
+References: <20200607095012-mutt-send-email-mst@kernel.org>
+ <9b1abd2b-232c-aa0f-d8bb-03e65fd47de2@redhat.com>
+ <20200608021438-mutt-send-email-mst@kernel.org>
+ <a1b1b7fb-b097-17b7-2e3a-0da07d2e48ae@redhat.com>
+ <20200608052041-mutt-send-email-mst@kernel.org>
+ <9d2571b6-0b95-53b3-6989-b4d801eeb623@redhat.com>
+ <20200608054453-mutt-send-email-mst@kernel.org>
+ <bc27064c-2309-acf3-ccd8-6182bfa2a4cd@redhat.com>
+ <20200608055331-mutt-send-email-mst@kernel.org>
+ <61117e6a-2568-d0f4-8713-d831af32814d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200606042627.61070-1-eiichi.tsukata@nutanix.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <61117e6a-2568-d0f4-8713-d831af32814d@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/06/20 06:26, Eiichi Tsukata wrote:
-> Commit b1394e745b94 ("KVM: x86: fix APIC page invalidation") tried to
-> fix inappropriate APIC page invalidation by re-introducing arch specific
-> kvm_arch_mmu_notifier_invalidate_range() and calling it from
-> kvm_mmu_notifier_invalidate_range_start. But threre could be the
-> following race because VMCS APIC address cache can be updated
-> *before* it is unmapped.
+On Mon, Jun 08, 2020 at 06:07:36PM +0800, Jason Wang wrote:
 > 
-> Race:
->   (Invalidator) kvm_mmu_notifier_invalidate_range_start()
->   (Invalidator) kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD)
->   (KVM VCPU) vcpu_enter_guest()
->   (KVM VCPU) kvm_vcpu_reload_apic_access_page()
->   (Invalidator) actually unmap page
+> On 2020/6/8 下午5:54, Michael S. Tsirkin wrote:
+> > On Mon, Jun 08, 2020 at 05:46:52PM +0800, Jason Wang wrote:
+> > > On 2020/6/8 下午5:45, Michael S. Tsirkin wrote:
+> > > > On Mon, Jun 08, 2020 at 05:43:58PM +0800, Jason Wang wrote:
+> > > > > > > Looking at
+> > > > > > > pci_match_one_device() it checks both subvendor and subdevice there.
+> > > > > > > 
+> > > > > > > Thanks
+> > > > > > But IIUC there is no guarantee that driver with a specific subvendor
+> > > > > > matches in presence of a generic one.
+> > > > > > So either IFC or virtio pci can win, whichever binds first.
+> > > > > I'm not sure I get there. But I try manually bind IFCVF to qemu's
+> > > > > virtio-net-pci, and it fails.
+> > > > > 
+> > > > > Thanks
+> > > > Right but the reverse can happen: virtio-net can bind to IFCVF first.
+> > > 
+> > > That's kind of expected. The PF is expected to be bound to virtio-pci to
+> > > create VF via sysfs.
+> > > 
+> > > Thanks
+> > > 
+> > > 
+> > > 
+> > Once VFs are created, don't we want IFCVF to bind rather than
+> > virtio-pci?
 > 
-> Symptom:
->   The above race can make Guest OS see already freed page and Guest OS
-> will see broken APIC register values.
-
-This is not exactly the issue.  The values in the APIC-access page do
-not really matter, the problem is that the host physical address values
-won't match between the page tables and the APIC-access page address.
-Then the processor will not trap APIC accesses, and will instead show
-the raw contents of the APIC-access page (zeroes), and cause the crash
-as you mention below.
-
-Still, the race explains the symptoms and the patch matches this text in
-include/linux/mmu_notifier.h:
-
-	 * If the subsystem
-         * can't guarantee that no additional references are taken to
-         * the pages in the range, it has to implement the
-         * invalidate_range() notifier to remove any references taken
-         * after invalidate_range_start().
-
-where the "additional reference" is in the VMCS: because we have to
-account for kvm_vcpu_reload_apic_access_page running between
-invalidate_range_start() and invalidate_range_end(), we need to
-implement invalidate_range().
-
-The patch seems good, but I'd like Andrea Arcangeli to take a look as
-well so I've CCed him.
-
-Thank you very much!
-
-Paolo
-
-> Especially, Windows OS checks
-> LAPIC modification so it can cause BSOD crash with BugCheck
-> CRITICAL_STRUCTURE_CORRUPTION (109). These symptoms are the same as we
-> previously saw in https://bugzilla.kernel.org/show_bug.cgi?id=197951 and
-> we are currently seeing in
-> https://bugzilla.redhat.com/show_bug.cgi?id=1751017.
 > 
-> To prevent Guest OS from accessing already freed page, this patch calls
-> kvm_arch_mmu_notifier_invalidate_range() from
-> kvm_mmu_notifier_invalidate_range() instead of ..._range_start().
+> Yes, but for PF we need virtio-pci.
+> 
+> Thanks
+> 
+
+(Ab)using the driver_data field for this is an option.
+What do you think?
+
+-- 
+MST
 
