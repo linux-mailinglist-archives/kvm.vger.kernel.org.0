@@ -2,95 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93A911F10E9
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 02:59:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06EDB1F10F3
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 03:00:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729069AbgFHA7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Jun 2020 20:59:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58488 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729055AbgFHA7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Jun 2020 20:59:00 -0400
-Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07CC4C08C5C3;
-        Sun,  7 Jun 2020 17:59:00 -0700 (PDT)
-Received: from [5.158.153.53] (helo=debian-buster-darwi.lab.linutronix.de.)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
-        (Exim 4.80)
-        (envelope-from <a.darwish@linutronix.de>)
-        id 1ji67q-00010f-1y; Mon, 08 Jun 2020 02:58:54 +0200
-From:   "Ahmed S. Darwish" <a.darwish@linutronix.de>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        "Sebastian A. Siewior" <bigeasy@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Ahmed S. Darwish" <a.darwish@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH v2 17/18] kvm/eventfd: Use sequence counter with associated spinlock
-Date:   Mon,  8 Jun 2020 02:57:28 +0200
-Message-Id: <20200608005729.1874024-18-a.darwish@linutronix.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200608005729.1874024-1-a.darwish@linutronix.de>
-References: <20200519214547.352050-1-a.darwish@linutronix.de>
- <20200608005729.1874024-1-a.darwish@linutronix.de>
+        id S1728472AbgFHBAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Jun 2020 21:00:08 -0400
+Received: from mga14.intel.com ([192.55.52.115]:47604 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727999AbgFHBAH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Jun 2020 21:00:07 -0400
+IronPort-SDR: /lrh735UV839a8Dvy5rTR6HHMbDve9ivdliINp1MzhqLde6nzTwSJjcykxgnobY7fHLvCAy7OH
+ G/2yawePoxLA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2020 18:00:04 -0700
+IronPort-SDR: lZJIu1OKRS/KiiMmZ6aWz7XPPJdY0Qe8Nx+DhkQxhqH7x7lXR8iZxq7PKGhlZSPgDmaRax/7mZ
+ zW8ildmMMw8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,486,1583222400"; 
+   d="scan'208";a="349014593"
+Received: from lkp-server01.sh.intel.com (HELO 3b764b36c89c) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 07 Jun 2020 18:00:01 -0700
+Received: from kbuild by 3b764b36c89c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1ji68v-0000WX-8W; Mon, 08 Jun 2020 01:00:01 +0000
+Date:   Mon, 8 Jun 2020 08:59:29 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Subject: [vhost:vhost 18/52] drivers/virtio/virtio_mem.c:1391:5: warning:
+ Variable 'rc' is reassigned a value before the old one has been used.
+Message-ID: <202006080825.MWCyEzr3%lkp@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A sequence counter write side critical section must be protected by some
-form of locking to serialize writers. A plain seqcount_t does not
-contain the information of which lock must be held when entering a write
-side critical section.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+head:   f3861bc96a7e130943e1975e571ae62c0319b064
+commit: 5f1f79bbc9e26fa9412fa9522f957bb8f030c442 [18/52] virtio-mem: Paravirtualized memory hotplug
+compiler: gcc-9 (Debian 9.3.0-13) 9.3.0
 
-Use the new seqcount_spinlock_t data type, which allows to associate a
-spinlock with the sequence counter. This enables lockdep to verify that
-the spinlock used for writer serialization is held when the write side
-critical section is entered.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-If lockdep is disabled this lock association is compiled out and has
-neither storage size nor runtime overhead.
 
-Signed-off-by: Ahmed S. Darwish <a.darwish@linutronix.de>
+cppcheck warnings: (new ones prefixed by >>)
+
+>> drivers/virtio/virtio_mem.c:1391:5: warning: Variable 'rc' is reassigned a value before the old one has been used. [redundantAssignment]
+    rc = virtio_mem_init_vq(vm);
+       ^
+   drivers/virtio/virtio_mem.c:1375:0: note: Variable 'rc' is reassigned a value before the old one has been used.
+    int rc = -EINVAL;
+   ^
+   drivers/virtio/virtio_mem.c:1391:5: note: Variable 'rc' is reassigned a value before the old one has been used.
+    rc = virtio_mem_init_vq(vm);
+       ^
+>> drivers/virtio/virtio_mem.c:801:22: warning: int result is assigned to long variable. If the variable is long to avoid loss of information, then you have loss of information. [truncLongCastAssignment]
+    const uint64_t size = count * vm->subblock_size;
+                        ^
+   drivers/virtio/virtio_mem.c:822:22: warning: int result is assigned to long variable. If the variable is long to avoid loss of information, then you have loss of information. [truncLongCastAssignment]
+    const uint64_t size = count * vm->subblock_size;
+                        ^
+
+vim +/rc +1391 drivers/virtio/virtio_mem.c
+
+  1371	
+  1372	static int virtio_mem_probe(struct virtio_device *vdev)
+  1373	{
+  1374		struct virtio_mem *vm;
+  1375		int rc = -EINVAL;
+  1376	
+  1377		vdev->priv = vm = kzalloc(sizeof(*vm), GFP_KERNEL);
+  1378		if (!vm)
+  1379			return -ENOMEM;
+  1380	
+  1381		init_waitqueue_head(&vm->host_resp);
+  1382		vm->vdev = vdev;
+  1383		INIT_WORK(&vm->wq, virtio_mem_run_wq);
+  1384		mutex_init(&vm->hotplug_mutex);
+  1385		INIT_LIST_HEAD(&vm->next);
+  1386		spin_lock_init(&vm->removal_lock);
+  1387		hrtimer_init(&vm->retry_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+  1388		vm->retry_timer.function = virtio_mem_timer_expired;
+  1389	
+  1390		/* register the virtqueue */
+> 1391		rc = virtio_mem_init_vq(vm);
+  1392		if (rc)
+  1393			goto out_free_vm;
+  1394	
+  1395		/* initialize the device by querying the config */
+  1396		rc = virtio_mem_init(vm);
+  1397		if (rc)
+  1398			goto out_del_vq;
+  1399	
+  1400		/* register callbacks */
+  1401		vm->memory_notifier.notifier_call = virtio_mem_memory_notifier_cb;
+  1402		rc = register_memory_notifier(&vm->memory_notifier);
+  1403		if (rc)
+  1404			goto out_del_vq;
+  1405		rc = register_virtio_mem_device(vm);
+  1406		if (rc)
+  1407			goto out_unreg_mem;
+  1408	
+  1409		virtio_device_ready(vdev);
+  1410	
+  1411		/* trigger a config update to start processing the requested_size */
+  1412		atomic_set(&vm->config_changed, 1);
+  1413		queue_work(system_freezable_wq, &vm->wq);
+  1414	
+  1415		return 0;
+  1416	out_unreg_mem:
+  1417		unregister_memory_notifier(&vm->memory_notifier);
+  1418	out_del_vq:
+  1419		vdev->config->del_vqs(vdev);
+  1420	out_free_vm:
+  1421		kfree(vm);
+  1422		vdev->priv = NULL;
+  1423	
+  1424		return rc;
+  1425	}
+  1426	
+
 ---
- include/linux/kvm_irqfd.h | 2 +-
- virt/kvm/eventfd.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
-index dc1da020305b..dac047abdba7 100644
---- a/include/linux/kvm_irqfd.h
-+++ b/include/linux/kvm_irqfd.h
-@@ -42,7 +42,7 @@ struct kvm_kernel_irqfd {
- 	wait_queue_entry_t wait;
- 	/* Update side is protected by irqfds.lock */
- 	struct kvm_kernel_irq_routing_entry irq_entry;
--	seqcount_t irq_entry_sc;
-+	seqcount_spinlock_t irq_entry_sc;
- 	/* Used for level IRQ fast-path */
- 	int gsi;
- 	struct work_struct inject;
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 67b6fc153e9c..8694a2920ea9 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -303,7 +303,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- 	INIT_LIST_HEAD(&irqfd->list);
- 	INIT_WORK(&irqfd->inject, irqfd_inject);
- 	INIT_WORK(&irqfd->shutdown, irqfd_shutdown);
--	seqcount_init(&irqfd->irq_entry_sc);
-+	seqcount_spinlock_init(&irqfd->irq_entry_sc, &kvm->irqfds.lock);
- 
- 	f = fdget(args->fd);
- 	if (!f.file) {
--- 
-2.20.1
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
