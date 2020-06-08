@@ -2,93 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E84A11F1748
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 13:11:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDB6B1F1764
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 13:16:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729555AbgFHLLK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 07:11:10 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45916 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729545AbgFHLLJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 07:11:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591614668;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6UtZMmgd9hnL+iwknrZAm1Gp605OoCu4kNlweeMxR6w=;
-        b=AKkTRRkplfryGJvJn6iZigBYbsx93Vs4kRQPT9PhioEu4e4OTG76K8bIaLyFD+5wIYI+Zs
-        J5k3egdf9H/ovjXMvdBvqzLG7UaZwNTe8TfABZJJmtqWqnrojLFtj99XiWnnaxP3xLgSlF
-        e3mu8FQE1g2W08qK1zQg5nIEQxmUffA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-4-HbnUTGOiGQo2MV6dpRJA-1; Mon, 08 Jun 2020 07:11:07 -0400
-X-MC-Unique: 4-HbnUTGOiGQo2MV6dpRJA-1
-Received: by mail-wr1-f71.google.com with SMTP id z10so7062354wrs.2
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 04:11:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6UtZMmgd9hnL+iwknrZAm1Gp605OoCu4kNlweeMxR6w=;
-        b=cbJd1fREN/XjnR6+PeFkHKsHOYLoPHxQa4HvYANgurPU5+q4hSJVIYNgfETThWFfX0
-         16RyBxcGizTLLRPHHYfhxwrKtB1Ucnb2/9KaR/lTc3zlRDAV0wu/tKRRH1tKotWtQzEb
-         IMBH+eiUbrnPgNncTx4QfT5guYKtYEbGdzZt5SwyO20SFWa4oku+2Q2XkWZLQzlnXlXv
-         M5P1TDjS7DEsrSqHv1Ndn85y2zN3LoRrpoAaSXcJo1b4gwGiWGB3T3nOsLsP3ItqRnJp
-         QKZbnTz+OLTB7/gsmAtJqmUeeYRwLPqL7RxefCKSvoK3WN46385e+Rm0wOa3Vgw6dR7a
-         Pstg==
-X-Gm-Message-State: AOAM532vILJ0VEJ6dSsWqBuOFWvFWQJ7zaNz9AMb//EAXa+M/VexG8im
-        1sfznwd7RhZxWISwVWQe9XkUaUZuMIsAO2T9j0GcgYOm5mU2h3W7JRXnbUXkZ8m/ZwSiFsV5a9V
-        3XdD7EsY/0ow1
-X-Received: by 2002:a7b:c1ce:: with SMTP id a14mr14798179wmj.144.1591614665751;
-        Mon, 08 Jun 2020 04:11:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzv5u6HDK1/x+RarSMh01GURLAzTYLbxMBVZTOhO0ZDSZmDyVGktQuM1b3EGK6O2JN7nu/vVw==
-X-Received: by 2002:a7b:c1ce:: with SMTP id a14mr14798158wmj.144.1591614665568;
-        Mon, 08 Jun 2020 04:11:05 -0700 (PDT)
-Received: from [192.168.178.58] ([151.30.87.23])
-        by smtp.gmail.com with ESMTPSA id y66sm22490920wmy.24.2020.06.08.04.11.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jun 2020 04:11:04 -0700 (PDT)
-Subject: Re: [PATCH 19/30] KVM: nSVM: extract svm_set_gif
-To:     Qian Cai <cai@lca.pw>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        torvalds@linux-foundation.org
-References: <20200529153934.11694-1-pbonzini@redhat.com>
- <20200529153934.11694-20-pbonzini@redhat.com> <20200605203356.GC5393@lca.pw>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2a798f4c-5782-2e7c-7c87-ca7a3c576ff8@redhat.com>
-Date:   Mon, 8 Jun 2020 13:11:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1729532AbgFHLQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 07:16:43 -0400
+Received: from mga07.intel.com ([134.134.136.100]:17355 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729371AbgFHLQm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 07:16:42 -0400
+IronPort-SDR: rpZr5W3iBMzAwoth/g9/KtgFcfqya2pIC9fN7f1xSNnE6woowbTWpa+9bcOdkrQc8infoDNCHU
+ 4YZDyT9g8Icw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2020 04:16:42 -0700
+IronPort-SDR: dl0qMu7dTDv+wwShs4f6FCGDv2URJOMFnCoSpWPuwosIAU8FdJ3hB6cg3IQtAVv53P8j+CQP/X
+ 1sto+gbPjG1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,487,1583222400"; 
+   d="scan'208";a="288442494"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.249.46.212])
+  by orsmga002.jf.intel.com with ESMTP; 08 Jun 2020 04:16:39 -0700
+Date:   Mon, 8 Jun 2020 13:16:38 +0200
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
+Message-ID: <20200608111637.GE10562@ubuntu>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <20200604151917-mutt-send-email-mst@kernel.org>
+ <20200605063435.GA32302@ubuntu>
+ <20200608073715.GA10562@ubuntu>
+ <20200608091100.GC10562@ubuntu>
+ <20200608051358-mutt-send-email-mst@kernel.org>
+ <20200608101526.GD10562@ubuntu>
 MIME-Version: 1.0
-In-Reply-To: <20200605203356.GC5393@lca.pw>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200608101526.GD10562@ubuntu>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/06/20 22:33, Qian Cai wrote:
->> +	if (value) {
->> +		/*
->> +		 * If VGIF is enabled, the STGI intercept is only added to
->> +		 * detect the opening of the SMI/NMI window; remove it now.
->> +		 * Likewise, clear the VINTR intercept, we will set it
->> +		 * again while processing KVM_REQ_EVENT if needed.
->> +		 */
->> +		if (vgif_enabled(svm))
->> +			clr_intercept(svm, INTERCEPT_STGI);
->> +		if (is_intercept(svm, SVM_EXIT_VINTR))
-> A simple qemu-kvm will trigger the warning. (Looks like the patch had
-> already been pulled into the mainline quickly.)
+On Mon, Jun 08, 2020 at 12:15:26PM +0200, Guennadi Liakhovetski wrote:
+> On Mon, Jun 08, 2020 at 05:19:06AM -0400, Michael S. Tsirkin wrote:
+> > On Mon, Jun 08, 2020 at 11:11:00AM +0200, Guennadi Liakhovetski wrote:
+> > > Update: I looked through VirtIO 1.0 and 1.1 specs, data format their, 
+> > > including byte order, is defined on a per-device type basis. RPMsg is 
+> > > indeed included in the spec as device type 7, but that's the only 
+> > > mention of it in both versions. It seems RPMsg over VirtIO isn't 
+> > > standardised yet.
+> > 
+> > Yes. And it would be very good to have some standartization before we
+> > keep adding things. For example without any spec if host code breaks
+> > with some guests, how do we know which side should be fixed?
+> > 
+> > > Also it looks like newer interface definitions 
+> > > specify using "guest native endianness" for Virtual Queue data.
+> > 
+> > They really don't or shouldn't. That's limited to legacy chapters.
+> > Some definitions could have slipped through but it's not
+> > the norm. I just quickly looked through the 1.1 spec and could
+> > not find any instances that specify "guest native endianness"
+> > but feel free to point them out to me.
+> 
+> Oh, there you go. No, sorry, my fault, it's the other way round: "guest 
+> native" is for legacy and LE is for current / v1.0 and up.
+> 
+> > > So 
+> > > I think the same should be done for RPMsg instead of enforcing LE?
+> > 
+> > That makes hardware implementations as well as any cross-endian
+> > hypervisors tricky.
+> 
+> Yes, LE it is then. And we need to add some text to the spec.
 
-You're right, that should have been INTERCEPT_VINTR.  I'll post a fix.
+I found the protocol and the message format definition: 
+https://github.com/OpenAMP/open-amp/wiki/RPMsg-Messaging-Protocol#transport-layer---rpmsg 
+Don't know what the best way for referencing it in the VirtIO standard 
+would be: just a link to the source or a quote.
 
-Thanks,
-
-Paolo
-
+Thanks
+Guennadi
