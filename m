@@ -2,143 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAD9D1F1C75
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 17:55:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E1251F1C79
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 17:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730357AbgFHPzB convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 8 Jun 2020 11:55:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54908 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730267AbgFHPzB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 11:55:01 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 208091] vcpu1, guest rIP offset ignored wrmsr or rdmsr
-Date:   Mon, 08 Jun 2020 15:55:00 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: commandline@protonmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-208091-28872-WC6pn8HOnY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-208091-28872@https.bugzilla.kernel.org/>
-References: <bug-208091-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1730358AbgFHP4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 11:56:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47944 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730231AbgFHP4M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 11:56:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591631771;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=pVM91eqGNwsG4VqzhYU/SRoON7DAVTrgbBCNKcX/erc=;
+        b=MbhDsAtvYjBUYcyu1gULumrsaqUnpmlNi1Qk5sAtMIRlWImvV2m0bkX20JRjaHJYMREUyT
+        c93AOTcyDM4PuE6N8PH5xvBjFlivweki2ChJw+RrP9wJI4irONA7UQYCU+Fa5AeDBgGoGy
+        0DhUheyRPNMyiikUjZkU91NDkTEolLc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40--j5TbWd0PVikb6n1AMW7Hw-1; Mon, 08 Jun 2020 11:56:07 -0400
+X-MC-Unique: -j5TbWd0PVikb6n1AMW7Hw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D6CE1883607;
+        Mon,  8 Jun 2020 15:56:06 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-119.ams2.redhat.com [10.36.112.119])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D5B47F4FB;
+        Mon,  8 Jun 2020 15:55:59 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v8 06/12] s390x: clock and delays
+ caluculations
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
+ <1591603981-16879-7-git-send-email-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2f449a7b-2701-abcc-42b7-5b7441c10761@redhat.com>
+Date:   Mon, 8 Jun 2020 17:55:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <1591603981-16879-7-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=208091
+On 08/06/2020 10.12, Pierre Morel wrote:
+> The hardware gives us a good definition of the microsecond,
+> let's keep this information and let the routine accessing
+> the hardware keep all the information and return microseconds.
+> 
+> Calculate delays in microseconds and take care about wrapping
+> around zero.
+> 
+> Define values with macros and use inlines to keep the
+> milliseconds interface.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/asm/time.h | 29 +++++++++++++++++++++++++++--
+>  1 file changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
+> index 1791380..eb15941 100644
+> --- a/lib/s390x/asm/time.h
+> +++ b/lib/s390x/asm/time.h
+> @@ -13,14 +13,39 @@
+>  #ifndef ASM_S390X_TIME_H
+>  #define ASM_S390X_TIME_H
+>  
+> -static inline uint64_t get_clock_ms(void)
+> +#define STCK_SHIFT	(63 - 51)
 
---- Comment #4 from Joris L. (commandline@protonmail.com) ---
-These message are observed when starting a Proxmox VE 6.2 VM guest with GPU
-passthrough.  Current configuration is at the point there are not other error
-messages visible related to VM activity.
+Could you maybe rather call this STCK_SHIFT_US instead, so that it is
+clear that we refer to the microsecond bit here?
 
-Available to respond to and provide for actions to improve documenting these
-messages etc.
+> +#define STCK_MAX	((1 << (STCK_SHIFT + 1)) - 1)
 
-The vcpu0, guest rIP messages persist while a vm is running. Stopping and
-staring a VM results in no screen. messages however now show (repeat kvm ...
-msr messages, repeeat block of kvm, vcpu... rIP messages) followed by ecap
-messages.
+Hmm, is that really right? Shouldn't that rather be
 
-[ 2762.744734] kvm_get_msr_common: 275 callbacks suppressed
-[ 2762.744738] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc0010064
-[ 2762.744775] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc0010065
-[ 2762.744853] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc0010066
-[ 2762.744885] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc0010067
-[ 2762.744917] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc0010068
-[ 2762.744948] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc0010069
-[ 2762.744983] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc001006a
-[ 2762.745014] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc001006b
-[ 2762.745044] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xc0010293
-[ 2762.750132] kvm [19941]: vcpu2, guest rIP: 0xfffff8001123174b ignored rdmsr:
-0xe8
-[ 2844.034627] vfio-pci 0000:17:00.0: vfio_ecap_init: hiding ecap 0x19@0x270
-[ 2844.034641] vfio-pci 0000:17:00.0: vfio_ecap_init: hiding ecap 0x1b@0x2d0
-[ 2845.308346] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.324311] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.566461] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.569777] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.599693] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.602566] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.625243] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.627436] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.659282] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.665352] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.673673] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.673924] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.673948] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.674104] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.674870] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.675040] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.675063] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.675210] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.708785] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.710674] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.727404] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.727598] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.728296] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.728484] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.764636] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.765256] vfio-pci 0000:17:00.1: vfio_bar_restore: reset recovery -
-restoring BARs
-[ 2845.933638] vfio-pci 0000:17:00.0: vfio_bar_restore: reset recovery -
-restoring BARs
+ ((1 << (51 + 1)) - 1)
 
-now the VM no longer displays the desktop.
+instead?
 
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+(you want to have a max. value for the 52 bits that count the
+microseconds, not a max value for the remainder bits, do you?)
+
+> +static inline uint64_t get_clock_us(void)
+>  {
+>  	uint64_t clk;
+>  
+>  	asm volatile(" stck %0 " : : "Q"(clk) : "memory");
+>  
+>  	/* Bit 51 is incrememented each microsecond */
+> -	return (clk >> (63 - 51)) / 1000;
+> +	return clk >> STCK_SHIFT;
+> +}
+> +
+> +static inline void udelay(unsigned long us)
+> +{
+> +	unsigned long startclk = get_clock_us();
+> +	unsigned long c;
+> +
+> +	do {
+> +		c = get_clock_us();
+> +		if (c < startclk)
+> +			c += STCK_MAX;
+> +	} while (c < (startclk + us));
+
+You could omit the parentheses around "startclk + us" here.
+
+> +}
+> +
+> +static inline void mdelay(unsigned long ms)
+> +{
+> +	udelay(ms * 1000);
+> +}
+> +
+> +static inline uint64_t get_clock_ms(void)
+> +{
+> +	return get_clock_us() / 1000;
+>  }
+>  
+>  #endif
+> 
+
+ Thomas
+
