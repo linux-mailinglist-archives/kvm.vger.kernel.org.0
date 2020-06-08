@@ -2,137 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE8301F19AE
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:08:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75D2A1F19B3
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:13:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729040AbgFHNIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 09:08:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42416 "EHLO
+        id S1729175AbgFHNNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 09:13:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24681 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728245AbgFHNIm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 09:08:42 -0400
+        with ESMTP id S1729130AbgFHNNS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 09:13:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591621720;
+        s=mimecast20190719; t=1591621996;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dqBwBX1iWxa0YmZVaEODhc8PGLo2VfdKn86FOfgmR1g=;
-        b=RnImqbY2zCdhTc8uG5KaCKBtyA2QUWBP3+0tN1Kf6awKg2MTJG8kx0pUYd+SW0hgDlU7ty
-        SELEzOIynYlaY6JAzYUj1VUxfcNrpxjFAbRGZ5hEHizMR3iKc+ugxCND1+y9M2WTeDqylZ
-        +iT+6gD1kONPlIqWIkfqRgqYY7Svrbo=
+        bh=aE4uxEFzisXgU373/MFQA+2UMs2/qJwN6z64o4N5Dt4=;
+        b=R5fc6p79UyIJ/dAsbTm4TvTSlIZkM2nPuY35BhvdlqvQzobCEpJ/v2JhFrSGdWNO40XGCM
+        bmVP5hOMF77XVccgh+iDi3wh51ZWe8JI2uAbTaf2x7XJrnee+eaji+6Lc4Pg0HlKanOpiT
+        5FcYEJTRIEfgS/L2c7ZWCJ/lYXXyUI0=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-xL732I-9P6OUI6DyYvj_tg-1; Mon, 08 Jun 2020 09:08:38 -0400
-X-MC-Unique: xL732I-9P6OUI6DyYvj_tg-1
-Received: by mail-wr1-f71.google.com with SMTP id c14so7093545wrw.11
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:08:38 -0700 (PDT)
+ us-mta-489-UnznCOAOM_asWOEscL7p8g-1; Mon, 08 Jun 2020 09:13:13 -0400
+X-MC-Unique: UnznCOAOM_asWOEscL7p8g-1
+Received: by mail-wr1-f71.google.com with SMTP id l18so7187766wrm.0
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:13:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dqBwBX1iWxa0YmZVaEODhc8PGLo2VfdKn86FOfgmR1g=;
-        b=O42d8G3iOgg4+FTvlkstLBfeRZVrE33ZKGFz3zZxQ9eq/g7KjiS5Ug6qZerU87cCcw
-         rl3uxK6IPjnJ6Ui/jnLhSEfhJVdYsMerB5zTZvXj11bj5dte2WjkKoflNmO7g7GqSIN2
-         DrjI/RpJ/2vcsbdMtKsm2hbyz6VCMmoGBOJZmSWXqbRJmJiDFCSawhyDCAVDtg6vBGjY
-         kJ4D28zyBG40OPcwQCs9dEfa8ToLhML9z4sjaR1+1aSur8e7zqbDrHiDxCkdXj4BGQ2R
-         GP7DLC0a1IQoIlBp8S5+eCdeGwCF1SAlSX3d6azcu9SU3ucOomMYGQYkHktnLhf+t0tn
-         JK/g==
-X-Gm-Message-State: AOAM532iad9ESopWaOFUiU4k/riZHo3gBtA0/kNI70UezXMXk/A1yFPB
-        UGHhe/dCIiC50SIeAjQDxul0n4x6ifiQkyh83iADTnFVo+CodEw9MnQcxbWZRMGjzz7wRo3D/IC
-        qmPBq55t7z98R
-X-Received: by 2002:a5d:6789:: with SMTP id v9mr25040819wru.124.1591621716993;
-        Mon, 08 Jun 2020 06:08:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxMOU/wtRvJJc/E+tmpBswF5Ul40bkOzM0HliSRv4EENKFeQzLuZVeBr361vAI3C5zdXVwJig==
-X-Received: by 2002:a5d:6789:: with SMTP id v9mr25040787wru.124.1591621716746;
-        Mon, 08 Jun 2020 06:08:36 -0700 (PDT)
-Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
-        by smtp.gmail.com with ESMTPSA id b8sm24159773wrs.36.2020.06.08.06.08.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2020 06:08:36 -0700 (PDT)
-Date:   Mon, 8 Jun 2020 09:08:33 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        sound-open-firmware@alsa-project.org,
-        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
-        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Re: [PATCH v3 0/5] Add a vhost RPMsg API
-Message-ID: <20200608090145-mutt-send-email-mst@kernel.org>
-References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
- <20200604151917-mutt-send-email-mst@kernel.org>
- <20200605063435.GA32302@ubuntu>
- <20200608073715.GA10562@ubuntu>
- <20200608091100.GC10562@ubuntu>
- <20200608051358-mutt-send-email-mst@kernel.org>
- <20200608101526.GD10562@ubuntu>
- <20200608111637.GE10562@ubuntu>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aE4uxEFzisXgU373/MFQA+2UMs2/qJwN6z64o4N5Dt4=;
+        b=hjV4sSY4qFA9FjaVUx75cWxDIBsTz8HikYKwH9B80IMWdJMRir87VZsYc48GUyJsOb
+         x3lxBz7rhqSU6IxedPjFMmNixuvmnFY7KQiBYLaXrr7A7Y39sb6O1QtkqGzbyklqEM6M
+         AdnN3uSVomrM0sjIwjk2MlJcBT4WobcG7OhDn5IYY7szKsJjfcYNk7L8Nfro/RBhF83Y
+         jvUxekPuoyDbKSAwjwHnSAdJIajEaAJRa+37EvTmBsieUP645veCbtXVWeVB2+/RgytA
+         PfDujAKq+kZOY5l+Z5iO9UeOGGXJPbrReLjUzRAZcdaCXN2FyIryHplzq6/LivlPqXSV
+         Ip7w==
+X-Gm-Message-State: AOAM530pM84pNjizoX3U10Iyq6CZzhurx+Zv3dy3pSANZiCg9OJyj+6H
+        /OHbwLSUDjOx8rw7n5MlLLJ2i6kwZtaOFm1tiD0NioKCPMSEidbkPWTRErRnwhNY+gbNxspnRpN
+        xdH7t2+TLQx+e
+X-Received: by 2002:adf:9163:: with SMTP id j90mr23117173wrj.65.1591621992172;
+        Mon, 08 Jun 2020 06:13:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyFKKUfkK+tx2dyjLJychJAOnf6ou8lGUS/UM9N0R8J5nM/pSwyG9zl28UmZ6GGRGsYFCgLVg==
+X-Received: by 2002:adf:9163:: with SMTP id j90mr23117143wrj.65.1591621991883;
+        Mon, 08 Jun 2020 06:13:11 -0700 (PDT)
+Received: from [192.168.178.58] ([151.30.87.23])
+        by smtp.gmail.com with ESMTPSA id u4sm23511562wmb.48.2020.06.08.06.13.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jun 2020 06:13:11 -0700 (PDT)
+Subject: Re: [RFC PATCH] KVM: x86: Fix APIC page invalidation race
+To:     Eiichi Tsukata <eiichi.tsukata@nutanix.com>,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     felipe.franciosi@nutanix.com, rkrcmar@redhat.com,
+        Andrea Arcangeli <aarcange@redhat.com>
+References: <20200606042627.61070-1-eiichi.tsukata@nutanix.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0d9b3313-5d4c-9ef3-63e4-ba08ddbbe7a1@redhat.com>
+Date:   Mon, 8 Jun 2020 15:13:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200608111637.GE10562@ubuntu>
+In-Reply-To: <20200606042627.61070-1-eiichi.tsukata@nutanix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 01:16:38PM +0200, Guennadi Liakhovetski wrote:
-> On Mon, Jun 08, 2020 at 12:15:26PM +0200, Guennadi Liakhovetski wrote:
-> > On Mon, Jun 08, 2020 at 05:19:06AM -0400, Michael S. Tsirkin wrote:
-> > > On Mon, Jun 08, 2020 at 11:11:00AM +0200, Guennadi Liakhovetski wrote:
-> > > > Update: I looked through VirtIO 1.0 and 1.1 specs, data format their, 
-> > > > including byte order, is defined on a per-device type basis. RPMsg is 
-> > > > indeed included in the spec as device type 7, but that's the only 
-> > > > mention of it in both versions. It seems RPMsg over VirtIO isn't 
-> > > > standardised yet.
-> > > 
-> > > Yes. And it would be very good to have some standartization before we
-> > > keep adding things. For example without any spec if host code breaks
-> > > with some guests, how do we know which side should be fixed?
-> > > 
-> > > > Also it looks like newer interface definitions 
-> > > > specify using "guest native endianness" for Virtual Queue data.
-> > > 
-> > > They really don't or shouldn't. That's limited to legacy chapters.
-> > > Some definitions could have slipped through but it's not
-> > > the norm. I just quickly looked through the 1.1 spec and could
-> > > not find any instances that specify "guest native endianness"
-> > > but feel free to point them out to me.
-> > 
-> > Oh, there you go. No, sorry, my fault, it's the other way round: "guest 
-> > native" is for legacy and LE is for current / v1.0 and up.
-> > 
-> > > > So 
-> > > > I think the same should be done for RPMsg instead of enforcing LE?
-> > > 
-> > > That makes hardware implementations as well as any cross-endian
-> > > hypervisors tricky.
-> > 
-> > Yes, LE it is then. And we need to add some text to the spec.
+On 06/06/20 06:26, Eiichi Tsukata wrote:
+> Commit b1394e745b94 ("KVM: x86: fix APIC page invalidation") tried to
+> fix inappropriate APIC page invalidation by re-introducing arch specific
+> kvm_arch_mmu_notifier_invalidate_range() and calling it from
+> kvm_mmu_notifier_invalidate_range_start. But threre could be the
+> following race because VMCS APIC address cache can be updated
+> *before* it is unmapped.
 > 
-> I found the protocol and the message format definition: 
-> https://github.com/OpenAMP/open-amp/wiki/RPMsg-Messaging-Protocol#transport-layer---rpmsg 
-> Don't know what the best way for referencing it in the VirtIO standard 
-> would be: just a link to the source or a quote.
+> Race:
+>   (Invalidator) kvm_mmu_notifier_invalidate_range_start()
+>   (Invalidator) kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD)
+>   (KVM VCPU) vcpu_enter_guest()
+>   (KVM VCPU) kvm_vcpu_reload_apic_access_page()
+>   (Invalidator) actually unmap page
 > 
-> Thanks
-> Guennadi
+> Symptom:
+>   The above race can make Guest OS see already freed page and Guest OS
+> will see broken APIC register values.
 
-I wasn't aware of that one, thanks!
-OK so that's good.
+This is not exactly the issue.  The values in the APIC-access page do
+not really matter, the problem is that the host physical address values
+won't match between the page tables and the APIC-access page address.
+Then the processor will not trap APIC accesses, and will instead show
+the raw contents of the APIC-access page (zeroes), and cause the crash
+as you mention below.
 
-Ideally we'd have RPMsg Header Definition, RPMsg Channel and RPMsg
-Endppint in the spec proper.
+Still, the race explains the symptoms and the patch matches this text in
+include/linux/mmu_notifier.h:
 
-This link is informal so can't be copied into spec as is but can be used as a basis.
+	 * If the subsystem
+         * can't guarantee that no additional references are taken to
+         * the pages in the range, it has to implement the
+         * invalidate_range() notifier to remove any references taken
+         * after invalidate_range_start().
 
-We'd also need approval from authors for inclusion in the spec,
-sent to the TC mailing list.
+where the "additional reference" is in the VMCS: because we have to
+account for kvm_vcpu_reload_apic_access_page running between
+invalidate_range_start() and invalidate_range_end(), we need to
+implement invalidate_range().
 
--- 
-MST
+The patch seems good, but I'd like Andrea Arcangeli to take a look as
+well so I've CCed him.
+
+Thank you very much!
+
+Paolo
+
+> Especially, Windows OS checks
+> LAPIC modification so it can cause BSOD crash with BugCheck
+> CRITICAL_STRUCTURE_CORRUPTION (109). These symptoms are the same as we
+> previously saw in https://bugzilla.kernel.org/show_bug.cgi?id=197951 and
+> we are currently seeing in
+> https://bugzilla.redhat.com/show_bug.cgi?id=1751017.
+> 
+> To prevent Guest OS from accessing already freed page, this patch calls
+> kvm_arch_mmu_notifier_invalidate_range() from
+> kvm_mmu_notifier_invalidate_range() instead of ..._range_start().
 
