@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54CE41F2744
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 01:47:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F161C1F2948
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 02:04:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732249AbgFHXoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 19:44:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54940 "EHLO mail.kernel.org"
+        id S2387704AbgFHX6K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 19:58:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48462 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732086AbgFHX06 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 19:26:58 -0400
+        id S1728181AbgFHXXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 19:23:16 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EA0B72072F;
-        Mon,  8 Jun 2020 23:26:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5DB9620814;
+        Mon,  8 Jun 2020 23:23:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591658817;
-        bh=lbF6sIeU9WMTXx2rz1p0SggkawNhrB2OOVw0p1MoR6A=;
+        s=default; t=1591658596;
+        bh=exD6mbl+JGxYrw7LGOAyCf+W7gxP+F9nwfW9/zBznho=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cIGAiarW4kfveIv8GEt2irnVjKU3TJqkbtFGxQLM+9+JM9zz41rUGhTMf0a+yKFIQ
-         rG1bPsHM+PdWbzu4YubhPWu3a/ZRXQfbQVEmHZAW71jijsX+TKa5HiiLZ94lnDi7Hp
-         7LWtZ11nZKJYWX4BbvgtAJNZBCpf1Ru9vKyvJZvs=
+        b=yy7984ASrKrLSeuCcm7r6DmTsuHHsFOEmL7fVzuI+2Td3HYBGz2Q2VK5fyWcEOKGQ
+         moA3PNghSJFOCY057Jua0l46L7w9V2cc+md9zRf/IvYEF60JVb2ffmhyiPqupYfqVm
+         7B6CVF2NI8UQqtmvFy9UCtVDiFkYJtinXFsW7aok=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jon Doron <arilou@gmail.com>,
@@ -31,12 +31,12 @@ Cc:     Jon Doron <arilou@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-doc@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 13/50] x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
-Date:   Mon,  8 Jun 2020 19:26:03 -0400
-Message-Id: <20200608232640.3370262-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 028/106] x86/kvm/hyper-v: Explicitly align hcall param for kvm_hyperv_exit
+Date:   Mon,  8 Jun 2020 19:21:20 -0400
+Message-Id: <20200608232238.3368589-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200608232640.3370262-1-sashal@kernel.org>
-References: <20200608232640.3370262-1-sashal@kernel.org>
+In-Reply-To: <20200608232238.3368589-1-sashal@kernel.org>
+References: <20200608232238.3368589-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -82,10 +82,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 4 insertions(+)
 
 diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index d1908e50b506..b8f5bf2a890a 100644
+index 8e16017ff397..d2f265a9dc0d 100644
 --- a/Documentation/virtual/kvm/api.txt
 +++ b/Documentation/virtual/kvm/api.txt
-@@ -3534,9 +3534,11 @@ EOI was received.
+@@ -3999,9 +3999,11 @@ EOI was received.
  #define KVM_EXIT_HYPERV_SYNIC          1
  #define KVM_EXIT_HYPERV_HCALL          2
  			__u32 type;
@@ -98,10 +98,10 @@ index d1908e50b506..b8f5bf2a890a 100644
  					__u64 evt_page;
  					__u64 msg_page;
 diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index a0a365cbf3c9..0c02441d2cc9 100644
+index 251be353f950..66ce6659ecb6 100644
 --- a/include/uapi/linux/kvm.h
 +++ b/include/uapi/linux/kvm.h
-@@ -159,9 +159,11 @@ struct kvm_hyperv_exit {
+@@ -189,9 +189,11 @@ struct kvm_hyperv_exit {
  #define KVM_EXIT_HYPERV_SYNIC          1
  #define KVM_EXIT_HYPERV_HCALL          2
  	__u32 type;
