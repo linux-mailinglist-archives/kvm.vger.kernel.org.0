@@ -2,184 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8601D1F1A17
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 15:30:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A67A01F1AEA
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 16:24:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729782AbgFHNar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 09:30:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40008 "EHLO
+        id S1729949AbgFHOY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 10:24:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56600 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725797AbgFHNaq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 09:30:46 -0400
+        with ESMTP id S1729776AbgFHOY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 10:24:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591623044;
+        s=mimecast20190719; t=1591626267;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gb88/02YmS9YtUx19YCEMGvgGVki3Ib3eUuUkCjJy+U=;
-        b=VpWAxmgcP+M+Nw6ahhL8fej9ahlYNi5QeZHh9m7vE4RCEhSYbMlfhNQw3q2CdT2UPH2hzN
-        ITGGIUktKDpwVbhHROmbAnnnhfNe7+RZM9jwP5hv+8t1Rb43bUpQp358GUSSSgm68d65Oc
-        6Sozw1TONatPLSeHpEHAJLr1K0fPzJA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-cgyhIe2hOfGVXlGq6evQpw-1; Mon, 08 Jun 2020 09:30:43 -0400
-X-MC-Unique: cgyhIe2hOfGVXlGq6evQpw-1
-Received: by mail-wr1-f72.google.com with SMTP id m14so7149357wrj.12
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 06:30:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gb88/02YmS9YtUx19YCEMGvgGVki3Ib3eUuUkCjJy+U=;
-        b=pmGx4gIOMLhucJWcgc3hpJyem6O0Wd17UuRgTvVMrWc+cZ9783R5JFlSwJawWeuGO4
-         p8U+xR1+ITsnw1g8svkN+caInzp/O5iVVzpS3XPeWSq89uki/OBkA99y0c4GDLgFxmj3
-         FGhsRbSAOwkJU/MfDGmc0KcHZ3gMUCVnW9LT4/v5szhGSoulsq1ecBkLzWKKm6MaKted
-         ECcoowVYNt/tBCDY+NazEEFrX8Ne7ELwq9W4K3QKWINP/nZZoQXT5PQgf2RR1JE/14/f
-         r0guyB1338ZfUy6puPwL0C6HlRh2vAn76oECbpxYL02Ipn8EJjvfWIF6BjJRs3B4CG6V
-         cGCQ==
-X-Gm-Message-State: AOAM531WBgcZKO4rmO/Mcu8a74X4+DFx808RUfU+qKryZs5jZM3aadIo
-        27NeVMDPvt1Nn6nHnl5bHVM7/eh+J2cKRP0mnBTYeMPpF3ReIJodWVMlLi5z/udCtGUvd8fIdLA
-        14uK46H4MNlCE
-X-Received: by 2002:adf:ec03:: with SMTP id x3mr23586213wrn.297.1591623041920;
-        Mon, 08 Jun 2020 06:30:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz62tJA6E64oEIZnfe39XFv8r0W7nilgUKIntVO4j0UrGBnVrvqs8Lk+4LFru+2gi/RHZ/CMw==
-X-Received: by 2002:adf:ec03:: with SMTP id x3mr23586189wrn.297.1591623041702;
-        Mon, 08 Jun 2020 06:30:41 -0700 (PDT)
-Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
-        by smtp.gmail.com with ESMTPSA id a81sm24080582wmd.25.2020.06.08.06.30.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2020 06:30:41 -0700 (PDT)
-Date:   Mon, 8 Jun 2020 09:30:38 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>, eperezma@redhat.com,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH RFC v5 12/13] vhost/vsock: switch to the buf API
-Message-ID: <20200608092953-mutt-send-email-mst@kernel.org>
-References: <20200607141057.704085-1-mst@redhat.com>
- <20200607141057.704085-13-mst@redhat.com>
- <20200608101746.xnxtwwygolsk7yol@steredhat>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200608101746.xnxtwwygolsk7yol@steredhat>
+        bh=RvqpRgRgvNRWBq4GX41/PVrRgf4iheRb8T7cXZ3C5KA=;
+        b=PcdNDAnjjZTXUbVoSbAznyjlkeRjIZQi7FBXQEbBIjhvcOT/3clzSA5ty3NdxEI/7amfy7
+        Un+5+vUuRpxEXemBMVvY1pjG1hNkJrpER7JsIDD1gtPI8Tj2HxIwDZuTwubi6LSTX/azXU
+        5Yz1O9hTuj5SEwWiudS8k6HSzDQHV7I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-35K7qlVcMs6UGdUd9djO3Q-1; Mon, 08 Jun 2020 10:24:23 -0400
+X-MC-Unique: 35K7qlVcMs6UGdUd9djO3Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 018EF8018A7;
+        Mon,  8 Jun 2020 14:24:21 +0000 (UTC)
+Received: from starship-rhel (unknown [10.35.206.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EE2538926C;
+        Mon,  8 Jun 2020 14:24:15 +0000 (UTC)
+Message-ID: <48581807ab540690d970d499c8c311f1735b3222.camel@redhat.com>
+Subject: Re: [PATCH] x86/cpu: Reinitialize IA32_FEAT_CTL MSR on BSP during
+ wakeup
+From:   mlevitsk <mlevitsk@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org,
+        Brad Campbell <lists2009@fnarfbargle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Date:   Mon, 08 Jun 2020 17:24:14 +0300
+In-Reply-To: <20200605200728.10145-1-sean.j.christopherson@intel.com>
+References: <20200605200728.10145-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 12:17:46PM +0200, Stefano Garzarella wrote:
-> On Sun, Jun 07, 2020 at 10:11:49AM -0400, Michael S. Tsirkin wrote:
-> > A straight-forward conversion.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  drivers/vhost/vsock.c | 30 ++++++++++++++++++------------
-> >  1 file changed, 18 insertions(+), 12 deletions(-)
+On Fri, 2020-06-05 at 13:07 -0700, Sean Christopherson wrote:
+> Reinitialize IA32_FEAT_CTL on the BSP during wakeup to handle the
+> case
+> where firmware doesn't initialize or save/restore across S3.  This
+> fixes
+> a bug where IA32_FEAT_CTL is left uninitialized and results in VMXON
+> taking a #GP due to VMX not being fully enabled, i.e. breaks KVM.
 > 
-> The changes for vsock part LGTM:
+> Use init_ia32_feat_ctl() to "restore" IA32_FEAT_CTL as it already
+> deals
+> with the case where the MSR is locked, and because APs already redo
+> init_ia32_feat_ctl() during suspend by virtue of the SMP boot flow
+> being
+> used to reinitialize APs upon wakeup.  Do the call in the early
+> wakeup
+> flow to avoid dependencies in the syscore_ops chain, e.g. simply
+> adding
+> a resume hook is not guaranteed to work, as KVM does VMXON in its own
+> resume hook, kvm_resume(), when KVM has active guests.
 > 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Reported-by: Brad Campbell <lists2009@fnarfbargle.com>
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Fixes: 21bd3467a58e ("KVM: VMX: Drop initialization of IA32_FEAT_CTL
+> MSR")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/include/asm/cpu.h | 5 +++++
+>  arch/x86/kernel/cpu/cpu.h  | 4 ----
+>  arch/x86/power/cpu.c       | 6 ++++++
+>  3 files changed, 11 insertions(+), 4 deletions(-)
 > 
-> 
-> I also did some tests with vhost-vsock (tools/testing/vsock/vsock_test
-> and iperf-vsock), so for vsock:
-> 
-> Tested-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> Thanks,
-> Stefano
+> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
+> index dd17c2da1af5..da78ccbd493b 100644
+> --- a/arch/x86/include/asm/cpu.h
+> +++ b/arch/x86/include/asm/cpu.h
+> @@ -58,4 +58,9 @@ static inline bool handle_guest_split_lock(unsigned
+> long ip)
+>  	return false;
+>  }
+>  #endif
+> +#ifdef CONFIG_IA32_FEAT_CTL
+> +void init_ia32_feat_ctl(struct cpuinfo_x86 *c);
+> +#else
+> +static inline void init_ia32_feat_ctl(struct cpuinfo_x86 *c) {}
+> +#endif
+>  #endif /* _ASM_X86_CPU_H */
+> diff --git a/arch/x86/kernel/cpu/cpu.h b/arch/x86/kernel/cpu/cpu.h
+> index 37fdefd14f28..38ab6e115eac 100644
+> --- a/arch/x86/kernel/cpu/cpu.h
+> +++ b/arch/x86/kernel/cpu/cpu.h
+> @@ -80,8 +80,4 @@ extern void x86_spec_ctrl_setup_ap(void);
+>  
+>  extern u64 x86_read_arch_cap_msr(void);
+>  
+> -#ifdef CONFIG_IA32_FEAT_CTL
+> -void init_ia32_feat_ctl(struct cpuinfo_x86 *c);
+> -#endif
+> -
+>  #endif /* ARCH_X86_CPU_H */
+> diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
+> index aaff9ed7ff45..b0d3c5ca6d80 100644
+> --- a/arch/x86/power/cpu.c
+> +++ b/arch/x86/power/cpu.c
+> @@ -193,6 +193,8 @@ static void fix_processor_context(void)
+>   */
+>  static void notrace __restore_processor_state(struct saved_context
+> *ctxt)
+>  {
+> +	struct cpuinfo_x86 *c;
+> +
+>  	if (ctxt->misc_enable_saved)
+>  		wrmsrl(MSR_IA32_MISC_ENABLE, ctxt->misc_enable);
+>  	/*
+> @@ -263,6 +265,10 @@ static void notrace
+> __restore_processor_state(struct saved_context *ctxt)
+>  	mtrr_bp_restore();
+>  	perf_restore_debug_store();
+>  	msr_restore_context(ctxt);
+> +
+> +	c = &cpu_data(smp_processor_id());
+> +	if (cpu_has(c, X86_FEATURE_MSR_IA32_FEAT_CTL))
+> +		init_ia32_feat_ctl(c);
+>  }
+>  
+>  /* Needed by apm.c */
 
-Re-testing v6 would be very much appreciated.
 
-> > 
-> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > index a483cec31d5c..61c6d3dd2ae3 100644
-> > --- a/drivers/vhost/vsock.c
-> > +++ b/drivers/vhost/vsock.c
-> > @@ -103,7 +103,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> >  		unsigned out, in;
-> >  		size_t nbytes;
-> >  		size_t iov_len, payload_len;
-> > -		int head;
-> > +		struct vhost_buf buf;
-> > +		int ret;
-> >  
-> >  		spin_lock_bh(&vsock->send_pkt_list_lock);
-> >  		if (list_empty(&vsock->send_pkt_list)) {
-> > @@ -117,16 +118,17 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> >  		list_del_init(&pkt->list);
-> >  		spin_unlock_bh(&vsock->send_pkt_list_lock);
-> >  
-> > -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
-> > -					 &out, &in, NULL, NULL);
-> > -		if (head < 0) {
-> > +		ret = vhost_get_avail_buf(vq, &buf,
-> > +					  vq->iov, ARRAY_SIZE(vq->iov),
-> > +					  &out, &in, NULL, NULL);
-> > +		if (ret < 0) {
-> >  			spin_lock_bh(&vsock->send_pkt_list_lock);
-> >  			list_add(&pkt->list, &vsock->send_pkt_list);
-> >  			spin_unlock_bh(&vsock->send_pkt_list_lock);
-> >  			break;
-> >  		}
-> >  
-> > -		if (head == vq->num) {
-> > +		if (!ret) {
-> >  			spin_lock_bh(&vsock->send_pkt_list_lock);
-> >  			list_add(&pkt->list, &vsock->send_pkt_list);
-> >  			spin_unlock_bh(&vsock->send_pkt_list_lock);
-> > @@ -186,7 +188,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> >  		 */
-> >  		virtio_transport_deliver_tap_pkt(pkt);
-> >  
-> > -		vhost_add_used(vq, head, sizeof(pkt->hdr) + payload_len);
-> > +		buf.in_len = sizeof(pkt->hdr) + payload_len;
-> > +		vhost_put_used_buf(vq, &buf);
-> >  		added = true;
-> >  
-> >  		pkt->off += payload_len;
-> > @@ -440,7 +443,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
-> >  	struct vhost_vsock *vsock = container_of(vq->dev, struct vhost_vsock,
-> >  						 dev);
-> >  	struct virtio_vsock_pkt *pkt;
-> > -	int head, pkts = 0, total_len = 0;
-> > +	int ret, pkts = 0, total_len = 0;
-> > +	struct vhost_buf buf;
-> >  	unsigned int out, in;
-> >  	bool added = false;
-> >  
-> > @@ -461,12 +465,13 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
-> >  			goto no_more_replies;
-> >  		}
-> >  
-> > -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
-> > -					 &out, &in, NULL, NULL);
-> > -		if (head < 0)
-> > +		ret = vhost_get_avail_buf(vq, &buf,
-> > +					  vq->iov, ARRAY_SIZE(vq->iov),
-> > +					  &out, &in, NULL, NULL);
-> > +		if (ret < 0)
-> >  			break;
-> >  
-> > -		if (head == vq->num) {
-> > +		if (!ret) {
-> >  			if (unlikely(vhost_enable_notify(&vsock->dev, vq))) {
-> >  				vhost_disable_notify(&vsock->dev, vq);
-> >  				continue;
-> > @@ -494,7 +499,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
-> >  			virtio_transport_free_pkt(pkt);
-> >  
-> >  		len += sizeof(pkt->hdr);
-> > -		vhost_add_used(vq, head, len);
-> > +		buf.in_len = len;
-> > +		vhost_put_used_buf(vq, &buf);
-> >  		total_len += len;
-> >  		added = true;
-> >  	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
-> > -- 
-> > MST
-> > 
+I don't have currently an active VMX system to test this on,
+but from the code and from my knowelege of this area this looks all
+right.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
