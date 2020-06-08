@@ -2,176 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D0231F1E25
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 19:09:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AAE01F1E29
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 19:09:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730709AbgFHRI6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 13:08:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22544 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730490AbgFHRI5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jun 2020 13:08:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591636135;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sI72Ms6GymnWW5IgfsQfm5B7QZQFkpb/EFt5z5NFsqI=;
-        b=ILrdMXY7VyUV77Xbdh+HTzXB0Fkgsn+bKnVpuKJuAdR5BvVRg/LDvVlq2dAZ7zxap6aqfg
-        zdy9lKsA7oYyJ09Hc7/44HsGaowUUidL3XWPdXby3NIQUh4b5yPN+9snrRoUitvKmKGZXV
-        Uc+N6jvw8/2YGAtghYQzw0+uB0pZ7c8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-oCC8YqFDPOiGw59nhUg-PQ-1; Mon, 08 Jun 2020 13:08:54 -0400
-X-MC-Unique: oCC8YqFDPOiGw59nhUg-PQ-1
-Received: by mail-wr1-f72.google.com with SMTP id n6so7436767wrv.6
-        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 10:08:53 -0700 (PDT)
+        id S2387409AbgFHRJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 13:09:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730681AbgFHRJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 13:09:28 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F881C08C5C2
+        for <kvm@vger.kernel.org>; Mon,  8 Jun 2020 10:09:27 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id j198so455588wmj.0
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 10:09:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=O5kyIIzxsOCQ0wtFJtMJAdBIg3y6KuYFhCf9iMzgFJQ=;
+        b=p1wdQUodkbKA53RU829/S14bgNwXUZk4oaZTZITlLvC1R/7pCLt8Qec1xAGFhamIuc
+         6GF1n0XpMYAVGZKMywm22h1ALDMPKC6G/E5cO+DrxJ5qCSzcWyrUHMqFumgbHdUB4PKI
+         NXGPYjtcPBb58hKLeEFKZhEW3c+c7gfIsbHDkzXKT86fv2c6LRGCjIStT6NFcC/RFCUV
+         Cd6FPlkFGwdFBPcY9Gu+WoR99u+T8tOtU2rKJ8OttEpNZZcKTZiS/TQdIyt7UoWh0mnL
+         jSWwEg9ye92wgPswhOn2ZJsE21UwfoMC1vNYT56fDTeseRBdlyb87eNnOHq3gueSJbtm
+         +Z4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=sI72Ms6GymnWW5IgfsQfm5B7QZQFkpb/EFt5z5NFsqI=;
-        b=U7NGZ3NOLZVbYJ6YD6/Ptlc3dFIhxFa+irG/tVEBRKNi+A09wTiRtIe5hL3TO2xyAg
-         JDDPMx72EgoebhnMJxg1+mC1WoWItfem/6afVZOIkADPz8lRPvP8YGKEErTXZsk1aqsX
-         wbJnul0UCH1PW88KUqUuv4dH05ydluyjttxTToVza1Xoz60S6TnlvdHIp8UtpRwZgOl5
-         Ivvw49APLq71IPF17USlHB5V+5KMzqhy0DSEnJSa5bJ9AfyQXJeA9ilaiKOHpBnrnEYA
-         /jAPr94a4hYRQPgUmOVTN8p9FS1kPIRBv11rm+s46Il4LZzuRooSGZdPDes3wbOqLwqp
-         HGAQ==
-X-Gm-Message-State: AOAM533+PpHoVienW7nObsn4vlcQ6DYY3CQOnSESfRRhSPcECr8Pdfxm
-        zJ8oSvUzsLKpMjgtc3I0qOf34rHzRkyzjOFYH8BFQ2D7jod8qoi/jkDWQFORgtxHn44SqyEjtsY
-        BXlzaA5hMRM51
-X-Received: by 2002:a1c:3b43:: with SMTP id i64mr339445wma.112.1591636132908;
-        Mon, 08 Jun 2020 10:08:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4dUf9x3rgVZHJRvrEuMPKhxm/lCre/+sG86XOaArTyYsFZli8wP4z+s74imLE54MU9CeoNw==
-X-Received: by 2002:a1c:3b43:: with SMTP id i64mr339413wma.112.1591636132598;
-        Mon, 08 Jun 2020 10:08:52 -0700 (PDT)
-Received: from steredhat ([79.49.207.108])
-        by smtp.gmail.com with ESMTPSA id l2sm342741wru.58.2020.06.08.10.08.51
+        bh=O5kyIIzxsOCQ0wtFJtMJAdBIg3y6KuYFhCf9iMzgFJQ=;
+        b=orj7XTEfutbE1qX7f76Wd6gDe59AIgwe0MnTfQ0jVbx4xvM7WhkMr6dEa7KFf9G0uI
+         UUusoni5aSsSRnjTOEhTGgI1y8n1VsORlmya89YtiZ38cfjUNEGGykPq+5vfOds33Gho
+         h1akvrvJ11zt4K+e0trhrtCcumpw+gf7bXU1bki1QDdxFHLaDTjr0MBMj1SgZIRZzSEn
+         WEkBpZMIHnbIqzwAKq+NVfQqGFtJV0Q2DDUCy4gHtIwwbM41GH++CpKGfZSLE9B9O+yX
+         noW18LKicxbzmkCcwFZVpOLYCp02Ukx15JCf6D9rsKQj/P1AXDZU1xk5IYBIf4JsVRV/
+         plfQ==
+X-Gm-Message-State: AOAM5333kGvKsYu3qHHEVNTu/0MiSe3AJ350aOWzMw18X7NiwdUhuaQe
+        kgU2hysxW3XdH6WWN5hyrKcqTA==
+X-Google-Smtp-Source: ABdhPJxZEDJueTXgTcDW9U9iUaISMszgUVW6R1TTHIBvERHVRmV8seKAaqqSKuvHuMRooFnwn0NlQQ==
+X-Received: by 2002:a7b:cc08:: with SMTP id f8mr350455wmh.106.1591636165854;
+        Mon, 08 Jun 2020 10:09:25 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
+        by smtp.gmail.com with ESMTPSA id z8sm357180wru.33.2020.06.08.10.09.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jun 2020 10:08:51 -0700 (PDT)
-Date:   Mon, 8 Jun 2020 19:08:49 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>, eperezma@redhat.com,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH RFC v6 10/11] vhost/vsock: switch to the buf API
-Message-ID: <20200608170849.udaxzmfzmhbonoi7@steredhat>
-References: <20200608125238.728563-1-mst@redhat.com>
- <20200608125238.728563-11-mst@redhat.com>
+        Mon, 08 Jun 2020 10:09:25 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 18:09:20 +0100
+From:   Andrew Scull <ascull@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com
+Subject: Re: [PATCH v2] KVM: arm64: Remove host_cpu_context member from vcpu
+ structure
+Message-ID: <20200608170920.GC96714@google.com>
+References: <20200608085657.1405730-1-maz@kernel.org>
+ <20200608145145.GA96714@google.com>
+ <1a00887a4af019fa83380b68afd43a29@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200608125238.728563-11-mst@redhat.com>
+In-Reply-To: <1a00887a4af019fa83380b68afd43a29@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 08:53:13AM -0400, Michael S. Tsirkin wrote:
-> A straight-forward conversion.
+On Mon, Jun 08, 2020 at 04:42:42PM +0100, Marc Zyngier wrote:
+> Hi Andrew,
 > 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  drivers/vhost/vsock.c | 30 ++++++++++++++++++------------
->  1 file changed, 18 insertions(+), 12 deletions(-)
-
-I ran the vsock tests again with this new series and everything seems
-to go well:
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Tested-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
-
+> On 2020-06-08 15:51, Andrew Scull wrote:
+> > On Mon, Jun 08, 2020 at 09:56:57AM +0100, Marc Zyngier wrote:
+> > > For very long, we have kept this pointer back to the per-cpu
+> > > host state, despite having working per-cpu accessors at EL2
+> > > for some time now.
+> > > 
+> > > Recent investigations have shown that this pointer is easy
+> > > to abuse in preemptible context, which is a sure sign that
+> > > it would better be gone. Not to mention that a per-cpu
+> > > pointer is faster to access at all times.
+> > 
+> > Helps to make the references to `kvm_host_data` clearer with there now
+> > being just one way to get to it and shows that it is scoped to the
+> > current CPU. A good change IMO!
 > 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index a483cec31d5c..61c6d3dd2ae3 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -103,7 +103,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->  		unsigned out, in;
->  		size_t nbytes;
->  		size_t iov_len, payload_len;
-> -		int head;
-> +		struct vhost_buf buf;
-> +		int ret;
->  
->  		spin_lock_bh(&vsock->send_pkt_list_lock);
->  		if (list_empty(&vsock->send_pkt_list)) {
-> @@ -117,16 +118,17 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->  		list_del_init(&pkt->list);
->  		spin_unlock_bh(&vsock->send_pkt_list_lock);
->  
-> -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
-> -					 &out, &in, NULL, NULL);
-> -		if (head < 0) {
-> +		ret = vhost_get_avail_buf(vq, &buf,
-> +					  vq->iov, ARRAY_SIZE(vq->iov),
-> +					  &out, &in, NULL, NULL);
-> +		if (ret < 0) {
->  			spin_lock_bh(&vsock->send_pkt_list_lock);
->  			list_add(&pkt->list, &vsock->send_pkt_list);
->  			spin_unlock_bh(&vsock->send_pkt_list_lock);
->  			break;
->  		}
->  
-> -		if (head == vq->num) {
-> +		if (!ret) {
->  			spin_lock_bh(&vsock->send_pkt_list_lock);
->  			list_add(&pkt->list, &vsock->send_pkt_list);
->  			spin_unlock_bh(&vsock->send_pkt_list_lock);
-> @@ -186,7 +188,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->  		 */
->  		virtio_transport_deliver_tap_pkt(pkt);
->  
-> -		vhost_add_used(vq, head, sizeof(pkt->hdr) + payload_len);
-> +		buf.in_len = sizeof(pkt->hdr) + payload_len;
-> +		vhost_put_used_buf(vq, &buf);
->  		added = true;
->  
->  		pkt->off += payload_len;
-> @@ -440,7 +443,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
->  	struct vhost_vsock *vsock = container_of(vq->dev, struct vhost_vsock,
->  						 dev);
->  	struct virtio_vsock_pkt *pkt;
-> -	int head, pkts = 0, total_len = 0;
-> +	int ret, pkts = 0, total_len = 0;
-> +	struct vhost_buf buf;
->  	unsigned int out, in;
->  	bool added = false;
->  
-> @@ -461,12 +465,13 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
->  			goto no_more_replies;
->  		}
->  
-> -		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
-> -					 &out, &in, NULL, NULL);
-> -		if (head < 0)
-> +		ret = vhost_get_avail_buf(vq, &buf,
-> +					  vq->iov, ARRAY_SIZE(vq->iov),
-> +					  &out, &in, NULL, NULL);
-> +		if (ret < 0)
->  			break;
->  
-> -		if (head == vq->num) {
-> +		if (!ret) {
->  			if (unlikely(vhost_enable_notify(&vsock->dev, vq))) {
->  				vhost_disable_notify(&vsock->dev, vq);
->  				continue;
-> @@ -494,7 +499,8 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
->  			virtio_transport_free_pkt(pkt);
->  
->  		len += sizeof(pkt->hdr);
-> -		vhost_add_used(vq, head, len);
-> +		buf.in_len = len;
-> +		vhost_put_used_buf(vq, &buf);
->  		total_len += len;
->  		added = true;
->  	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
-> -- 
-> MST
-> 
+> Thanks! Can I take this as a Reviewed-by or Acked-by tag? Just let me know.
 
+Build and booted your kvm-arm64/ptrauth-fixes branch contianing this
+patch with VHE and nVHE on qemu. Booted a VM within each with kvmtool.
+
+Reviewed-by: Andrew Scull <ascull@google.com>
