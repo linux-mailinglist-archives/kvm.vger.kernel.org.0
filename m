@@ -2,74 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED1601F18EE
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 14:42:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C64111F18F2
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 14:43:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728245AbgFHMmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 08:42:32 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22660 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727052AbgFHMmb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 08:42:31 -0400
+        id S1729040AbgFHMn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 08:43:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49498 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728684AbgFHMnY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jun 2020 08:43:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591620150;
+        s=mimecast20190719; t=1591620202;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=BHiSv3/XIs4p+ocNnWY97Q87sD+jZaEpUwxAP3vu2p8=;
-        b=IORKHG+yEHNJ7Jlyp9R5FEGjRzChjqlnav5Cr0j2wqCiYhO5tSShZY8XaQ5TGp/czCI9k+
-        6lu150s5oCVvVhi7+igUT1WI6M2PGMX7Vw7RX3qmKosTA5K2fpXC8SwxFz+UTmqtmTmboc
-        iFj6NQ3YojsfFjs2T8uSmHV1iv6JIp8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-pIkcH4Q9NFW_DvQcTMdNIA-1; Mon, 08 Jun 2020 08:42:23 -0400
-X-MC-Unique: pIkcH4Q9NFW_DvQcTMdNIA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5D75EC1A0
-        for <kvm@vger.kernel.org>; Mon,  8 Jun 2020 12:42:22 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A2E8C5C1D6
-        for <kvm@vger.kernel.org>; Mon,  8 Jun 2020 12:42:22 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] remove unused file
-Date:   Mon,  8 Jun 2020 08:42:22 -0400
-Message-Id: <20200608124222.371807-1-pbonzini@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=utvLOGjABWchDzVBBNcvjGgT0Uw4uVA8BCJYHrkDTYE=;
+        b=TyCgMLODxX0a9jzlp75v5jJdlB/ziQNUZGG1WFR4A1VSJIXaKZL0jHDPKPxvBk36zGfPGV
+        Wm68hG1vlF+FKx1KiRVln78MzBLMBXw9e1DoWFHgU0c44YVcA0QoVqCJ97sc0Dxg4+L062
+        DBCepTeUpfOWILkpU7co5aKxYyNROn8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-MAajVjWZM92dYktXTB2bTg-1; Mon, 08 Jun 2020 08:42:59 -0400
+X-MC-Unique: MAajVjWZM92dYktXTB2bTg-1
+Received: by mail-wm1-f69.google.com with SMTP id k185so3890044wme.8
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 05:42:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=utvLOGjABWchDzVBBNcvjGgT0Uw4uVA8BCJYHrkDTYE=;
+        b=Mcf/6vmQ3TK/xzZA3GvMMghpmymXDAj1zDDRuuYbsBNEJTy7GXdbVvppxKXrwJFqFa
+         MywLSkju4V4+ylzEeQ/mHjfuotl13MrGZxqo2ECmYWZEhJWDC8OWb3gDYBrSezDit8gY
+         SkaScSAEtNey9miMAeVyASj9MicDJJWIHqyXcBCL3O+foqvbgURGK9IRyUn6A6tli2In
+         k/xmq4Liv1iuauG/suW02Qo9ROsEkR86jIrn/GQzr5ZSo4MEHzfoqgyy756vzmiSAuid
+         JITD2mI6Sch7I845S/pYTqFEHTMrb8NCOqMZIoRMR/frb9EPip5soa/tRC4piwM7JARW
+         Or0g==
+X-Gm-Message-State: AOAM5326FF91+NylQ3zo/+AYa67ArQImamfrj3WsoFOyszo8duxLEanc
+        gzYmASsYBwUaX+bFXCjBzaNmxFwUivxHp8CIJ0mK6yKN8Ckr6/H0rYGxexXdfVdN1tei5JQ8Rp8
+        8UJUnr78iHrX9
+X-Received: by 2002:a1c:5411:: with SMTP id i17mr17027053wmb.137.1591620178213;
+        Mon, 08 Jun 2020 05:42:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxxHCDKaiMql4q+MgfnmT9afh3wFAhLtf//8SgAbDqi4VLnsVn3wc/xBGn3Rmk2vnzUyPWpJw==
+X-Received: by 2002:a1c:5411:: with SMTP id i17mr17027042wmb.137.1591620178029;
+        Mon, 08 Jun 2020 05:42:58 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-41-91.red.bezeqint.net. [109.64.41.91])
+        by smtp.gmail.com with ESMTPSA id g82sm22458959wmf.1.2020.06.08.05.42.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2020 05:42:57 -0700 (PDT)
+Date:   Mon, 8 Jun 2020 08:42:56 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH] vhost/test: fix up after API change
+Message-ID: <20200608124254.727184-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
----
- lib/x86/fake-apic.h | 14 --------------
- 1 file changed, 14 deletions(-)
- delete mode 100644 lib/x86/fake-apic.h
+Pass a flag to request kernel thread use.
 
-diff --git a/lib/x86/fake-apic.h b/lib/x86/fake-apic.h
-deleted file mode 100644
-index eed63ba..0000000
---- a/lib/x86/fake-apic.h
-+++ /dev/null
-@@ -1,14 +0,0 @@
--#ifndef SILLY_APIC_H
--#define SILLY_APIC_H
--
--#define APIC_BASE 0x1000
--#define APIC_SIZE 0x100
--
--#define APIC_REG_NCPU        0x00
--#define APIC_REG_ID          0x04
--#define APIC_REG_SIPI_ADDR   0x08
--#define APIC_REG_SEND_SIPI   0x0c
--#define APIC_REG_IPI_VECTOR  0x10
--#define APIC_REG_SEND_IPI    0x14
--
--#endif
+Fixes: 01fcb1cbc88e ("vhost: allow device that does not depend on vhost worker")
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/vhost/test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+index f55cb584b84a..12304eb8da15 100644
+--- a/drivers/vhost/test.c
++++ b/drivers/vhost/test.c
+@@ -122,7 +122,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+ 	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+ 	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+ 	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
+-		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
++		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, true, NULL);
+ 
+ 	f->private_data = n;
+ 
 -- 
-2.26.2
+MST
 
