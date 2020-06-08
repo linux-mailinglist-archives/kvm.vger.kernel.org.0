@@ -2,366 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 131D01F143B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 10:13:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C2ED1F1467
+	for <lists+kvm@lfdr.de>; Mon,  8 Jun 2020 10:21:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729169AbgFHINU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jun 2020 04:13:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33072 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729121AbgFHINO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 04:13:14 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05883BaA045554;
-        Mon, 8 Jun 2020 04:13:13 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31g74svuar-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Jun 2020 04:13:12 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05883a7Y047402;
-        Mon, 8 Jun 2020 04:13:12 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31g74svu9g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Jun 2020 04:13:12 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05885Gs5027598;
-        Mon, 8 Jun 2020 08:13:10 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 31g2s7uh78-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Jun 2020 08:13:10 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0588D8DB3342836
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 8 Jun 2020 08:13:08 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4AFE84C044;
-        Mon,  8 Jun 2020 08:13:08 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EA2584C050;
-        Mon,  8 Jun 2020 08:13:07 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.43.245])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  8 Jun 2020 08:13:07 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v8 12/12] s390x: css: ssch/tsch with sense and interrupt
-Date:   Mon,  8 Jun 2020 10:13:01 +0200
-Message-Id: <1591603981-16879-13-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
-References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-08_03:2020-06-08,2020-06-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0
- cotscore=-2147483648 adultscore=0 priorityscore=1501 suspectscore=1
- bulkscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006080057
+        id S1729106AbgFHIU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jun 2020 04:20:57 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38968 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729060AbgFHIU4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Jun 2020 04:20:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591604454;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PgnSUhvnGmVlTMkExDgba+ehKY/BZAg587suJPnB15E=;
+        b=NRIuqQqOr7O84CDOFkH/Y/nLz2Vr3f1Uh6o8p/DnT89rh64GpFd+oN929vpRXcBVdEw42k
+        jPLBkQ1YG6EylBI5pfkHzKZgx15mfsnnL67Bh1xBr8i5apz6h6zcjZyMyRXx4vAi1grBj0
+        LYrKrAeDvLaYHPbxYyjGx/P6Ku4cPG4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-368-sWE8SV-SPOmQK9CVjEnElA-1; Mon, 08 Jun 2020 04:20:47 -0400
+X-MC-Unique: sWE8SV-SPOmQK9CVjEnElA-1
+Received: by mail-ej1-f72.google.com with SMTP id b24so3996906ejb.8
+        for <kvm@vger.kernel.org>; Mon, 08 Jun 2020 01:20:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=PgnSUhvnGmVlTMkExDgba+ehKY/BZAg587suJPnB15E=;
+        b=PGnxSrLtYJRD74sZTRVdTk6T1U7Axuuh5Zmf8ffihKZwLv/vWKIFtkUzZvqoKaPDA3
+         lgqQWO+JZKxCkcl23fsXextIJEm4CQeXPA/Xwr8AO+hYmFwq7qGtXS0JuZvuHQLybu3L
+         w7d5K2rBA6tOlK7sRJzhQQkDC2qX1CrHP5jfvd0Juw7J9J38/JQt351hTcgK6EDzwBUB
+         KwdmV/PAb3hZJ9TrIiPPHlIYgA3RFeUhJ6ozcAtH+x9ukc8czg9QfICVIPJAcvq65iY5
+         7v8NEcdBVsDxH58cytfsjX7iD1c+NeszdTI/BczD0J8Ra2FV/2ZzoDXnA+uLQGLHXWPl
+         urjA==
+X-Gm-Message-State: AOAM532qrbS6o1a9gxklU0Bmq+iAEQWHMjSsgWaaKddvL6V/Ju0oaYhh
+        fhcLijknuLYzUysH3SUG6e2cp4EYP8skFbTqztISl/+qm2/ToKJvmsEkyHsioL+uaqCzZkJEAd1
+        f6BNjaxAdNt26
+X-Received: by 2002:aa7:cd4b:: with SMTP id v11mr21652715edw.356.1591604446386;
+        Mon, 08 Jun 2020 01:20:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwOniuyMpVDAXmY9mtdQWcLY3TxxXpZEu8EMxsFfa1XUuHyKUuTjPkXBMFkMe7XQkw0Uy6jJA==
+X-Received: by 2002:aa7:cd4b:: with SMTP id v11mr21652704edw.356.1591604446164;
+        Mon, 08 Jun 2020 01:20:46 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id d11sm7157315edy.79.2020.06.08.01.20.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jun 2020 01:20:45 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: nVMX: Properly handle kvm_read/write_guest_virt*() result
+In-Reply-To: <20200605200651.GC11449@linux.intel.com>
+References: <20200605115906.532682-1-vkuznets@redhat.com> <20200605200651.GC11449@linux.intel.com>
+Date:   Mon, 08 Jun 2020 10:20:44 +0200
+Message-ID: <878sgyc6jn.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After a channel is enabled we start a SENSE_ID command using
-the SSCH instruction to recognize the control unit and device.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-This tests the success of SSCH, the I/O interruption and the TSCH
-instructions.
+> On Fri, Jun 05, 2020 at 01:59:05PM +0200, Vitaly Kuznetsov wrote:
+>> Introduce vmx_handle_memory_failure() as an interim solution.
+>
+> Heh, "interim".  I'll take the over on that :-D.
+>
 
-The SENSE_ID command response is tested to report 0xff inside
-its reserved field and to report the same control unit type
-as the cu_type kernel argument.
+We just need a crazy but real use-case to start acting :-)
 
-Without the cu_type kernel argument, the test expects a device
-with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
+>> Note, nested_vmx_get_vmptr() now has three possible outcomes: OK, PF,
+>> KVM_EXIT_INTERNAL_ERROR and callers need to know if userspace exit is
+>> needed (for KVM_EXIT_INTERNAL_ERROR) in case of failure. We don't seem
+>> to have a good enum describing this tristate, just add "int *ret" to
+>> nested_vmx_get_vmptr() interface to pass the information.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/css.h     |  20 ++++++
- lib/s390x/css_lib.c |  46 ++++++++++++++
- s390x/css.c         | 149 +++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 214 insertions(+), 1 deletion(-)
+On a loosely related note, while writing this patch I was struggling
+with our exit handlers calling convention (that the return value is '1'
+- return to the guest, '0' - return to userspace successfully, '< 0' -
+return to userspace with an error). This is intertwined with normal
+int/bool functions and make it hard to read. At the very minimum we can
+introduce an enum for 0/1 return values from exit handlers. Or, maybe,
+we can introduce KVM_REQ_USERSPACE_EXIT/KVM_REQ_INTERNAL_ERROR/.. and
+make all the exit handlers normal functions returning 0/error?
 
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 33caaa0..2a01f05 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -101,6 +101,19 @@ struct irb {
- 	uint32_t emw[8];
- } __attribute__ ((aligned(4)));
- 
-+#define CCW_CMD_SENSE_ID	0xe4
-+#define CSS_SENSEID_COMMON_LEN	8
-+struct senseid {
-+	/* common part */
-+	uint8_t reserved;        /* always 0x'FF' */
-+	uint16_t cu_type;        /* control unit type */
-+	uint8_t cu_model;        /* control unit model */
-+	uint16_t dev_type;       /* device type */
-+	uint8_t dev_model;       /* device model */
-+	uint8_t unused;          /* padding byte */
-+	uint8_t padding[256 - 10]; /* Extra padding for CCW */
-+} __attribute__ ((aligned(4))) __attribute__ ((packed));
-+
- /* CSS low level access functions */
- 
- static inline int ssch(unsigned long schid, struct orb *addr)
-@@ -254,4 +267,11 @@ int css_enumerate(void);
- #define MAX_ENABLE_RETRIES      5
- int css_enable(int schid);
- 
-+
-+/* Library functions */
-+int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw);
-+int start_subchannel(unsigned int sid, int code, void *data, int count,
-+		     unsigned char flags);
-+int sch_read_len(int sid);
-+
- #endif
-diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-index 831a116..935af49 100644
---- a/lib/s390x/css_lib.c
-+++ b/lib/s390x/css_lib.c
-@@ -128,3 +128,49 @@ retry:
- 		    schid, retry_count, pmcw->flags);
- 	return -1;
- }
-+
-+int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
-+{
-+	struct orb orb = {
-+		.intparm = sid,
-+		.ctrl = ORB_CTRL_ISIC|ORB_CTRL_FMT|ORB_LPM_DFLT,
-+		.cpa = (unsigned int) (unsigned long)ccw,
-+	};
-+
-+	return ssch(sid, &orb);
-+}
-+
-+/*
-+ * In the next revisions we will implement the possibility to handle
-+ * CCW chains doing this we will need to work with ccw1 pointers.
-+ * For now we only need a unique CCW.
-+ */
-+static struct ccw1 unique_ccw;
-+
-+int start_subchannel(unsigned int sid, int code, void *data, int count,
-+		     unsigned char flags)
-+{
-+	int cc;
-+	struct ccw1 *ccw = &unique_ccw;
-+
-+	report_prefix_push("start_senseid");
-+	/* Build the CCW chain with a single CCW */
-+	ccw->code = code;
-+	ccw->flags = flags; /* No flags need to be set */
-+	ccw->count = count;
-+	ccw->data_address = (int)(unsigned long)data;
-+
-+	cc = start_ccw1_chain(sid, ccw);
-+	if (cc) {
-+		report(0, "start_ccw_chain failed ret=%d", cc);
-+		report_prefix_pop();
-+		return cc;
-+	}
-+	report_prefix_pop();
-+	return 0;
-+}
-+
-+int sch_read_len(int sid)
-+{
-+	return unique_ccw.count;
-+}
-diff --git a/s390x/css.c b/s390x/css.c
-index 6f58d4a..79c997d 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -16,10 +16,26 @@
- #include <string.h>
- #include <interrupt.h>
- #include <asm/arch_def.h>
-+#include <kernel-args.h>
- 
- #include <css.h>
- 
-+#define DEFAULT_CU_TYPE		0x3832
-+static unsigned long cu_type = DEFAULT_CU_TYPE;
-+
-+struct lowcore *lowcore = (void *)0x0;
-+
- static int test_device_sid;
-+static struct irb irb;
-+static struct senseid senseid;
-+
-+static void set_io_irq_subclass_mask(uint64_t const new_mask)
-+{
-+	asm volatile (
-+		"lctlg %%c6, %%c6, %[source]\n"
-+		: /* No outputs */
-+		: [source] "R" (new_mask));
-+}
- 
- static void test_enumerate(void)
- {
-@@ -57,20 +73,151 @@ static void test_enable(void)
- 		report(1, "Subchannel %08x enabled", test_device_sid);
- }
- 
-+static void enable_io_isc(void)
-+{
-+	/* Let's enable all ISCs for I/O interrupt */
-+	set_io_irq_subclass_mask(0x00000000ff000000);
-+}
-+
-+static void irq_io(void)
-+{
-+	int ret = 0;
-+	char *flags;
-+	int sid;
-+
-+	report_prefix_push("Interrupt");
-+	/* Lowlevel set the SID as interrupt parameter. */
-+	if (lowcore->io_int_param != test_device_sid) {
-+		report(0,
-+		       "Bad io_int_param: %x expected %x",
-+		       lowcore->io_int_param, test_device_sid);
-+		goto pop;
-+	}
-+	report_prefix_pop();
-+
-+	report_prefix_push("tsch");
-+	sid = lowcore->subsys_id_word;
-+	ret = tsch(sid, &irb);
-+	switch (ret) {
-+	case 1:
-+		dump_irb(&irb);
-+		flags = dump_scsw_flags(irb.scsw.ctrl);
-+		report(0,
-+		       "I/O interrupt, CC 1 but tsch reporting sch %08x as not status pending: %s",
-+		       sid, flags);
-+		break;
-+	case 2:
-+		report(0, "tsch returns unexpected CC 2");
-+		break;
-+	case 3:
-+		report(0, "tsch reporting sch %08x as not operational", sid);
-+		break;
-+	case 0:
-+		/* Stay humble on success */
-+		break;
-+	}
-+pop:
-+	report_prefix_pop();
-+	lowcore->io_old_psw.mask &= ~PSW_MASK_WAIT;
-+}
-+
-+/*
-+ * test_sense
-+ * Pre-requisits:
-+ * - We need the test device as the first recognized
-+ *   device by the enumeration.
-+ */
-+static void test_sense(void)
-+{
-+	int ret;
-+
-+	if (!test_device_sid) {
-+		report_skip("No device");
-+		return;
-+	}
-+
-+	ret = css_enable(test_device_sid);
-+	if (ret) {
-+		report(0,
-+		       "Could not enable the subchannel: %08x",
-+		       test_device_sid);
-+		return;
-+	}
-+
-+	ret = register_io_int_func(irq_io);
-+	if (ret) {
-+		report(0, "Could not register IRQ handler");
-+		goto unreg_cb;
-+	}
-+
-+	lowcore->io_int_param = 0;
-+
-+	memset(&senseid, 0, sizeof(senseid));
-+	ret = start_subchannel(test_device_sid, CCW_CMD_SENSE_ID,
-+			       &senseid, sizeof(senseid), CCW_F_SLI);
-+	if (ret) {
-+		report(0, "ssch failed for SENSE ID on sch %08x with cc %d",
-+		       test_device_sid, ret);
-+		goto unreg_cb;
-+	}
-+
-+	wait_for_interrupt(PSW_MASK_IO);
-+
-+	ret = sch_read_len(test_device_sid);
-+	if (ret < CSS_SENSEID_COMMON_LEN) {
-+		report(0,
-+		       "ssch succeeded for SENSE ID but report a too short length: %d",
-+		       ret);
-+		goto unreg_cb;
-+	}
-+
-+	if (senseid.reserved != 0xff) {
-+		report(0,
-+		       "ssch succeeded for SENSE ID but reports garbage: %x",
-+		       senseid.reserved);
-+		goto unreg_cb;
-+	}
-+
-+	if (lowcore->io_int_param != test_device_sid)
-+		goto unreg_cb;
-+
-+	report_info("senseid length read: %d", ret);
-+	report_info("reserved %02x cu_type %04x cu_model %02x dev_type %04x dev_model %02x",
-+		    senseid.reserved, senseid.cu_type, senseid.cu_model,
-+		    senseid.dev_type, senseid.dev_model);
-+
-+	report((senseid.cu_type == cu_type),
-+	       "cu_type: expect 0x%04x got 0x%04x",
-+	       (uint16_t) cu_type, senseid.cu_type);
-+
-+unreg_cb:
-+	unregister_io_int_func(irq_io);
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
- } tests[] = {
- 	{ "enumerate (stsch)", test_enumerate },
- 	{ "enable (msch)", test_enable },
-+	{ "sense (ssch/tsch)", test_sense },
- 	{ NULL, NULL }
- };
- 
-+static unsigned long value;
-+
- int main(int argc, char *argv[])
- {
--	int i;
-+	int i, ret;
-+
-+	ret = kernel_arg(argc, argv, "cu_type=", &value);
-+	if (!ret)
-+		cu_type = (uint16_t)value;
-+	else
-+		report_info("Using cu_type default value: 0x%04lx", cu_type);
- 
- 	report_prefix_push("Channel Subsystem");
-+	enable_io_isc();
- 	for (i = 0; tests[i].name; i++) {
- 		report_prefix_push(tests[i].name);
- 		tests[i].func();
+>> 
+>> Reported-by: syzbot+2a7156e11dc199bdbd8a@syzkaller.appspotmail.com
+>> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>
+> ...
+>
+>> +/*
+>> + * Handles kvm_read/write_guest_virt*() result and either injects #PF or returns
+>> + * KVM_EXIT_INTERNAL_ERROR for cases not currently handled by KVM. Return value
+>> + * indicates whether exit to userspace is needed.
+>> + */
+>> +int vmx_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
+>> +			      struct x86_exception *e)
+>> +{
+>> +	if (r == X86EMUL_PROPAGATE_FAULT) {
+>> +		kvm_inject_emulated_page_fault(vcpu, e);
+>> +		return 1;
+>> +	}
+>> +
+>> +	/*
+>> +	 * In case kvm_read/write_guest_virt*() failed with X86EMUL_IO_NEEDED
+>> +	 * while handling a VMX instruction KVM could've handled the request
+>
+> A nit similar to your observation on the shortlog, this isn't limited to VMX
+> instructions.
+>
+
+Yea, it all started with nested_vmx_get_vmptr() then Paolo discovered
+vmwrite/vmread/vmptrst/invept/invvpid and then I discovered invpcid but
+forgot to update the comment ...
+
+>> +	 * correctly by exiting to userspace and performing I/O but there
+>> +	 * doesn't seem to be a real use-case behind such requests, just return
+>> +	 * KVM_EXIT_INTERNAL_ERROR for now.
+>> +	 */
+>> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> +	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+>> +	vcpu->run->internal.ndata = 0;
+>> +
+>> +	return 0;
+>> +}
+>
+
 -- 
-2.25.1
+Vitaly
 
