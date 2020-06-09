@@ -2,106 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 730011F3A13
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 13:48:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AF411F3A53
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 14:03:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729052AbgFILst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 07:48:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53686 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726395AbgFILso (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jun 2020 07:48:44 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8E6B52068D;
-        Tue,  9 Jun 2020 11:48:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591703323;
-        bh=jZQ4Zg8DwzAMUN+GXuZsfRY/XUjTHIpyRTgWTNdxQ6U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=SJHtmjskzqroQWd1r6br+wTjNT4XT/FqsM/GKHQWDyjLzIrRFrVhmW0IDafmtC9Ww
-         ehsbYKYgQVtTV/FweObun9JuYyHm7puwcbAMPh7GDgA5ur6YqoQ/+obEdfwg0sVJbn
-         EaYlTyWJUdF7g4ky+Jz8KNOfDDuKxchuhUyVaMQk=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jickD-001ROy-Pv; Tue, 09 Jun 2020 12:48:41 +0100
+        id S1729185AbgFIMDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 08:03:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14806 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726395AbgFIMDL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Jun 2020 08:03:11 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 059C32MO117869;
+        Tue, 9 Jun 2020 08:03:10 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31j6c8q502-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Jun 2020 08:03:10 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 059C383H118344;
+        Tue, 9 Jun 2020 08:03:08 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31j6c8q4e9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Jun 2020 08:03:08 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 059C1NiO030057;
+        Tue, 9 Jun 2020 12:02:28 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 31g2s7wvrd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Jun 2020 12:02:28 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 059C2Q1B54526060
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 9 Jun 2020 12:02:26 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E1E964C046;
+        Tue,  9 Jun 2020 12:02:25 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9CB264C04A;
+        Tue,  9 Jun 2020 12:02:25 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.16.61])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  9 Jun 2020 12:02:25 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v8 12/12] s390x: css: ssch/tsch with sense
+ and interrupt
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
+ <1591603981-16879-13-git-send-email-pmorel@linux.ibm.com>
+ <bfae9aa6-5802-dd24-a59f-75291cd5f67a@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <0b1739f1-63ce-9761-9cd9-edadbb6a6070@linux.ibm.com>
+Date:   Tue, 9 Jun 2020 14:02:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <bfae9aa6-5802-dd24-a59f-75291cd5f67a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 09 Jun 2020 12:48:41 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
-        James Morse <james.morse@arm.com>, stable@vger.kernel.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
-In-Reply-To: <7c173265-3f8e-51df-d700-7e3658a0e4d8@arm.com>
-References: <20200609084921.1448445-1-maz@kernel.org>
- <20200609084921.1448445-2-maz@kernel.org>
- <7c173265-3f8e-51df-d700-7e3658a0e4d8@arm.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <7451e64c22d8432f998458e0343aee7f@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com, james.morse@arm.com, stable@vger.kernel.org, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-09_03:2020-06-09,2020-06-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxscore=0 cotscore=-2147483648 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 mlxlogscore=999 spamscore=0 priorityscore=1501
+ impostorscore=0 suspectscore=0 phishscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006090093
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin,
 
-On 2020-06-09 12:41, Robin Murphy wrote:
-> On 2020-06-09 09:49, Marc Zyngier wrote:
->> AArch32 CP1x registers are overlayed on their AArch64 counterparts
->> in the vcpu struct. This leads to an interesting problem as they
->> are stored in their CPU-local format, and thus a CP1x register
->> doesn't "hit" the lower 32bit portion of the AArch64 register on
->> a BE host.
->> 
->> To workaround this unfortunate situation, introduce a bias trick
->> in the vcpu_cp1x() accessors which picks the correct half of the
->> 64bit register.
->> 
->> Cc: stable@vger.kernel.org
->> Reported-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+On 2020-06-09 10:15, Thomas Huth wrote:
+> On 08/06/2020 10.13, Pierre Morel wrote:
+>> After a channel is enabled we start a SENSE_ID command using
+>> the SSCH instruction to recognize the control unit and device.
+>>
+>> This tests the success of SSCH, the I/O interruption and the TSCH
+>> instructions.
+>>
+>> The SENSE_ID command response is tested to report 0xff inside
+>> its reserved field and to report the same control unit type
+>> as the cu_type kernel argument.
+>>
+>> Without the cu_type kernel argument, the test expects a device
+>> with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 >> ---
->>   arch/arm64/include/asm/kvm_host.h | 10 ++++++++--
->>   1 file changed, 8 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/arm64/include/asm/kvm_host.h 
->> b/arch/arm64/include/asm/kvm_host.h
->> index 59029e90b557..e80c0e06f235 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -404,8 +404,14 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, 
->> u64 val, int reg);
->>    * CP14 and CP15 live in the same array, as they are backed by the
->>    * same system registers.
->>    */
->> -#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
->> -#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
->> +#ifdef CPU_BIG_ENDIAN
+>>   lib/s390x/css.h     |  20 ++++++
+>>   lib/s390x/css_lib.c |  46 ++++++++++++++
+>>   s390x/css.c         | 149 +++++++++++++++++++++++++++++++++++++++++++-
+>>   3 files changed, 214 insertions(+), 1 deletion(-)
+> [...]
+>> +}
+>> diff --git a/s390x/css.c b/s390x/css.c
+>> index 6f58d4a..79c997d 100644
+>> --- a/s390x/css.c
+>> +++ b/s390x/css.c
+>> @@ -16,10 +16,26 @@
+>>   #include <string.h>
+>>   #include <interrupt.h>
+>>   #include <asm/arch_def.h>
+>> +#include <kernel-args.h>
+>>   
+>>   #include <css.h>
+>>   
+>> +#define DEFAULT_CU_TYPE		0x3832
+>> +static unsigned long cu_type = DEFAULT_CU_TYPE;
+>> +
+>> +struct lowcore *lowcore = (void *)0x0;
+>> +
+>>   static int test_device_sid;
+>> +static struct irb irb;
+>> +static struct senseid senseid;
+>> +
+>> +static void set_io_irq_subclass_mask(uint64_t const new_mask)
+>> +{
+>> +	asm volatile (
+>> +		"lctlg %%c6, %%c6, %[source]\n"
+>> +		: /* No outputs */
+>> +		: [source] "R" (new_mask));
 > 
-> Ahem... I think you're missing a "CONFIG_" there ;)
+> I think the "R" constraint is wrong here - this instruction does not use
+> an index register. "Q" is likely the better choice. But it might be
+> easier to use the lctlg() wrapper from lib/s390x/asm/arch_def.h instead.
 
-Duh! As I said, I didn't test the thing at all! ;-)
+OK, yes I do this.
 
-> Bonus trickery - for a 0 or 1 value you can simply use IS_ENABLED().
+> 
+> [...]
+>> +
+>> +	report((senseid.cu_type == cu_type),
+> 
+> Please drop the innermost parentheses here.
+> 
 
-Beautiful! Definitely a must! :D
-
+OK,
 Thanks,
 
-         M.
+Pierre
+
+
 -- 
-Jazz is not dead. It just smells funny...
+Pierre Morel
+IBM Lab Boeblingen
