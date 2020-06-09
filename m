@@ -2,138 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 627E71F467D
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 20:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDA901F46D7
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 21:10:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728799AbgFISnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 14:43:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25168 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728410AbgFISnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jun 2020 14:43:09 -0400
+        id S1730632AbgFITKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 15:10:45 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60753 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730378AbgFITKo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Jun 2020 15:10:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591728186;
+        s=mimecast20190719; t=1591729842;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Vf8PHzuNillXcrshKZnMvhUbr01AvkSJx/g1gW7lrxE=;
-        b=JAWISYliOeVTgw58ntPi50frCiBf/ZLgguxEVSkz2hbzJFZ60Is1/U6x6/qWnTMqhPYhZo
-        lKU6QMDuXzSPKubO3U2wszG7KFfFpwaTb08xGYOTJCIXTgFsPyiG4+IBJpxfkaBXzEdywW
-        7hnU9jFZ5c+8bCSoxLPVGWwrpIoOqpo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-6uMK5fPqNHGzGpCjq0y5Kg-1; Tue, 09 Jun 2020 14:43:05 -0400
-X-MC-Unique: 6uMK5fPqNHGzGpCjq0y5Kg-1
-Received: by mail-wr1-f71.google.com with SMTP id h6so9022111wrx.4
-        for <kvm@vger.kernel.org>; Tue, 09 Jun 2020 11:43:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Vf8PHzuNillXcrshKZnMvhUbr01AvkSJx/g1gW7lrxE=;
-        b=tfvHNy1QneZr+f8C3VlCaNOdj4/9+q7Xti9mfdjahxQwMmhRqRWQWCs1fFLbLAGZbI
-         2N/EhMgCvLX9kZzY9uZWQvjDuyepiAoI2uEwO0CWpTBN03vE6K1C4RgTjj80v/huwhi6
-         lglsgjLqMogKPSmGyQAaBZLouMy9xROKHD4fkdHBsGZxhguv9bemZI3rkvQ0Hu4byMUA
-         sXiyWj5lckzlyWXJgtTQuJbHuPtltCSGZLOSXAxUIS2VE+1p5gH03Q5pyTi8GNnGfmjA
-         eIuGdHXsdS6z4ScCD8/8Y1NenWYwx+vGRAVQLFIlorczQ02xeBKQkHbuYh2MczKDAbOX
-         1UpA==
-X-Gm-Message-State: AOAM532uVaI/WXR31fcf+2CiMMhGxuY58vzC+J2T0TgTjbw5MYaitrQK
-        A3oywBCs+ZQ8K5ExdKNi+2VxRaOJyCsrkSuxzLIZceyZ6Ce4fI+3tWUxXmDpbU4SXOPbsgeP8qF
-        VcCCNrbwn4xov
-X-Received: by 2002:a5d:66c3:: with SMTP id k3mr5903846wrw.401.1591728184068;
-        Tue, 09 Jun 2020 11:43:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw+8yheFLe15jkh/whJhF8IZCGXLwbicq5R++ZbkjoDIltm0r8kDVYyfqOHATH0CeWfo6UFww==
-X-Received: by 2002:a5d:66c3:: with SMTP id k3mr5903825wrw.401.1591728183863;
-        Tue, 09 Jun 2020 11:43:03 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
-        by smtp.gmail.com with ESMTPSA id v27sm4865849wrv.81.2020.06.09.11.43.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2020 11:43:03 -0700 (PDT)
-Date:   Tue, 9 Jun 2020 14:42:59 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
+        bh=hBBU/cx0qFeKPnx6mEnm0CnDpJpzp+VAeEZG8eQTZgs=;
+        b=Guu4606152iTgkjL9tDcMpA5f/wT3KDYoP9qRa1T4+nh/EftKEvVnRLTB7T+CRdptufWev
+        PXdX29C24FGEyZ3U1ziSUveOO7vkbaeOXDCEdGR3aRBR4F6JwYI8yaGTh3F+aENmnT2qsD
+        rZ9PNdBl7m1lseNimwe0NBldQnabkEY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-509-Qorq3XnkOrCWUZTPGOjXTg-1; Tue, 09 Jun 2020 15:10:41 -0400
+X-MC-Unique: Qorq3XnkOrCWUZTPGOjXTg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3008C835B52;
+        Tue,  9 Jun 2020 19:10:39 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-136.rdu2.redhat.com [10.10.115.136])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B3A985C1D6;
+        Tue,  9 Jun 2020 19:10:35 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 225602205BD; Tue,  9 Jun 2020 15:10:35 -0400 (EDT)
+Date:   Tue, 9 Jun 2020 15:10:35 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        teawater <teawaterz@linux.alibaba.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: [PATCH v3 00/20] virtio-mem: Paravirtualized memory hot(un)plug
-Message-ID: <20200609144242-mutt-send-email-mst@kernel.org>
-References: <20200603144914.41645-1-david@redhat.com>
- <20200609091034-mutt-send-email-mst@kernel.org>
- <08385823-d98f-fd9d-aa9d-bc1bd6747c29@redhat.com>
- <20200609115814-mutt-send-email-mst@kernel.org>
- <20200609161814.GJ2366737@habkost.net>
- <33021b38-cf60-fbfc-1baa-478ee6eed376@redhat.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 05/10] KVM: x86: interrupt based APF 'page ready'
+ event delivery
+Message-ID: <20200609191035.GA223235@redhat.com>
+References: <20200525144125.143875-1-vkuznets@redhat.com>
+ <20200525144125.143875-6-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <33021b38-cf60-fbfc-1baa-478ee6eed376@redhat.com>
+In-Reply-To: <20200525144125.143875-6-vkuznets@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 09, 2020 at 08:38:15PM +0200, David Hildenbrand wrote:
-> On 09.06.20 18:18, Eduardo Habkost wrote:
-> > On Tue, Jun 09, 2020 at 11:59:04AM -0400, Michael S. Tsirkin wrote:
-> >> On Tue, Jun 09, 2020 at 03:26:08PM +0200, David Hildenbrand wrote:
-> >>> On 09.06.20 15:11, Michael S. Tsirkin wrote:
-> >>>> On Wed, Jun 03, 2020 at 04:48:54PM +0200, David Hildenbrand wrote:
-> >>>>> This is the very basic, initial version of virtio-mem. More info on
-> >>>>> virtio-mem in general can be found in the Linux kernel driver v2 posting
-> >>>>> [1] and in patch #10. The latest Linux driver v4 can be found at [2].
-> >>>>>
-> >>>>> This series is based on [3]:
-> >>>>>     "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
-> >>>>>      buses"
-> >>>>>
-> >>>>> The patches can be found at:
-> >>>>>     https://github.com/davidhildenbrand/qemu.git virtio-mem-v3
-> >>>>
-> >>>> So given we tweaked the config space a bit, this needs a respin.
-> >>>
-> >>> Yeah, the virtio-mem-v4 branch already contains a fixed-up version. Will
-> >>> send during the next days.
-> >>
-> >> BTW. People don't normally capitalize the letter after ":".
-> >> So a better subject is
-> >>   virtio-mem: paravirtualized memory hot(un)plug
-> > 
-> > I'm not sure that's still the rule:
-> > 
-> > [qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [A-Z]' | wc -l
-> > 5261
-> > [qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [a-z]' | wc -l
-> > 2921
-> > 
-> 
-> Yeah, I switched to this scheme some years ago (I even remember that
-> some QEMU maintainer recommended it). I decided to just always
-> capitalize. Not that it should really matter ... :)
+On Mon, May 25, 2020 at 04:41:20PM +0200, Vitaly Kuznetsov wrote:
+[..]
+>  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+>  				 struct kvm_async_pf *work)
+>  {
+> -	struct x86_exception fault;
+> +	struct kvm_lapic_irq irq = {
+> +		.delivery_mode = APIC_DM_FIXED,
+> +		.vector = vcpu->arch.apf.vec
+> +	};
+>  
+>  	if (work->wakeup_all)
+>  		work->arch.token = ~0; /* broadcast wakeup */
+> @@ -10444,26 +10491,20 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+>  		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
+>  	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
+>  
+> -	if (vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED &&
+> -	    !apf_put_user_ready(vcpu, work->arch.token)) {
+> -			fault.vector = PF_VECTOR;
+> -			fault.error_code_valid = true;
+> -			fault.error_code = 0;
+> -			fault.nested_page_fault = false;
+> -			fault.address = work->arch.token;
+> -			fault.async_page_fault = true;
+> -			kvm_inject_page_fault(vcpu, &fault);
+> -	}
+> +	if (kvm_pv_async_pf_enabled(vcpu) &&
+> +	    !apf_put_user_ready(vcpu, work->arch.token))
+> +		kvm_apic_set_irq(vcpu, &irq, NULL);
+> +
 
-Don't mind about qemu but you don't want to do that for Linux.
+Hi Vitaly,
 
-> -- 
-> Thanks,
-> 
-> David / dhildenb
+Have a question about page ready events. 
+
+Now we deliver PAGE_NOT_PRESENT page faults only if guest is not in
+kernel mode. So say kernel tried to access a page and we halted cpu.
+When page is available, we will inject page_ready interrupt. At
+that time we don't seem to check whether page_not_present was injected
+or not. 
+
+IOW, we seem to deliver page_ready irrespective of the fact whether
+PAGE_NOT_PRESENT was delivered or not. And that means we will be
+sending page present tokens to guest. Guest will not have a state
+associated with that token and think that page_not_present has
+not been delivered yet and allocate an element in hash table for
+future page_not_present event. And that will lead to memory leak
+and token conflict etc.
+
+While setting up async pf, should we keep track whether associated
+page_not_present was delivered to guest or not and deliver page_ready
+accordingly.
+
+Thanks
+Vivek
 
