@@ -2,47 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 326D31F365B
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 10:49:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C4C51F3660
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 10:50:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728342AbgFIIto (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 04:49:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38252 "EHLO mail.kernel.org"
+        id S1728344AbgFIItp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 04:49:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38274 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728336AbgFIItl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jun 2020 04:49:41 -0400
+        id S1727124AbgFIItm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jun 2020 04:49:42 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4B054207C3;
+        by mail.kernel.org (Postfix) with ESMTPSA id 81E60207ED;
         Tue,  9 Jun 2020 08:49:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1591692581;
-        bh=DTLwx+4FGcD1qdI1v5kAz9K25967wcxylJEAbdulMwk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ytgOPaxFBmwQdjr6FKBkwvu6yN10vCR0Bl4hXjVrLMhediqGY6bm+xtmxvKssX6yG
-         vgYgCLA1k/s5X94SWV05hls/Gwxob2+qr0O8bTxRogYBzetvlxU54RihVoy56OoEoF
-         1KLUpYDyXrc3KCdw6rwhEh5rFK9RbnH4RWcCzOAc=
+        bh=X59E0JdQCbUCQrXwXF6MsA/SOxG0/0G1ya5dh8JIgH8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=csXoyx6NoetAEumOCwv3V2U08twEkRIfcS+FHU1N0YUiPJgmGLDBJ92AhSmlBKgtf
+         yS/+g+zgl2B0wn3f6HmJW+AmecyxIFq6Npn7rzKTblk13J0KWFehuvF21TQX37+EhC
+         U3Fj21L2cC73mDm+i2G0P7uH+WC9r7ZCiqlga4Y8=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jiZwx-001PEa-J5; Tue, 09 Jun 2020 09:49:39 +0100
+        id 1jiZwy-001PEa-2e; Tue, 09 Jun 2020 09:49:40 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
 Cc:     James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH 0/2] KVM: arm64: Additional 32bit fixes
-Date:   Tue,  9 Jun 2020 09:49:19 +0100
-Message-Id: <20200609084921.1448445-1-maz@kernel.org>
+        kernel-team@android.com, stable@vger.kernel.org
+Subject: [PATCH 1/2] KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
+Date:   Tue,  9 Jun 2020 09:49:20 +0100
+Message-Id: <20200609084921.1448445-2-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200609084921.1448445-1-maz@kernel.org>
+References: <20200609084921.1448445-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
@@ -50,22 +52,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Here's a couple of patches that address the issues that James
-mentionned in [1], affecting 32bit guests.
+AArch32 CP1x registers are overlayed on their AArch64 counterparts
+in the vcpu struct. This leads to an interesting problem as they
+are stored in their CPU-local format, and thus a CP1x register
+doesn't "hit" the lower 32bit portion of the AArch64 register on
+a BE host.
 
-I lack a BE-capable host to properly test the first patch, but it is
-obviously correct (ha! ;-).
+To workaround this unfortunate situation, introduce a bias trick
+in the vcpu_cp1x() accessors which picks the correct half of the
+64bit register.
 
-[1] https://lore.kernel.org/r/20200526161834.29165-1-james.morse@arm.com
-
-Marc Zyngier (2):
-  KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
-  KVM: arm64: Synchronize sysreg state on injecting an AArch32 exception
-
+Cc: stable@vger.kernel.org
+Reported-by: James Morse <james.morse@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
  arch/arm64/include/asm/kvm_host.h | 10 ++++++++--
- arch/arm64/kvm/aarch32.c          | 28 ++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 2 deletions(-)
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 59029e90b557..e80c0e06f235 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -404,8 +404,14 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+  * CP14 and CP15 live in the same array, as they are backed by the
+  * same system registers.
+  */
+-#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
+-#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
++#ifdef CPU_BIG_ENDIAN
++#define CPx_OFFSET	1
++#else
++#define CPx_OFFSET	0
++#endif
++
++#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_OFFSET])
++#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_OFFSET])
+ 
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
 -- 
 2.26.2
 
