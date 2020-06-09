@@ -2,115 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B710A1F4829
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 22:31:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30D321F489E
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 23:07:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388325AbgFIUbx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 16:31:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59387 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387680AbgFIUbc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Jun 2020 16:31:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591734690;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KEH5ES29dspwzWzD9R3UfAcYz+Md+T39kv30W9yHTos=;
-        b=UXCkAYCC2l7Hu6ZtJNdolN6MWNMOeA/u65InToAILAXkDVyIpVjBiJkS3CD01Egc/ApETR
-        NJx+Eb/9nm5wDpSwI8WoBWF+qqKOMQpc3Cb6GiW/+Eq2So5Re9F6kSFpm3cg6mIe+sbPF4
-        +pCaJQawhUvmFqK/+vhjTlLZq5h09VQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-bI6upVCEP7-1wnVbuNaLdQ-1; Tue, 09 Jun 2020 16:31:29 -0400
-X-MC-Unique: bI6upVCEP7-1wnVbuNaLdQ-1
-Received: by mail-wr1-f70.google.com with SMTP id l1so39728wrc.8
-        for <kvm@vger.kernel.org>; Tue, 09 Jun 2020 13:31:29 -0700 (PDT)
+        id S1727012AbgFIVHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 17:07:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43760 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726871AbgFIVHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jun 2020 17:07:16 -0400
+Received: from mail-ua1-x944.google.com (mail-ua1-x944.google.com [IPv6:2607:f8b0:4864:20::944])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A95C08C5C3
+        for <kvm@vger.kernel.org>; Tue,  9 Jun 2020 14:07:15 -0700 (PDT)
+Received: by mail-ua1-x944.google.com with SMTP id c9so93442uao.11
+        for <kvm@vger.kernel.org>; Tue, 09 Jun 2020 14:07:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=f15ThlgRIs3s50AvF0kFQ8PMHdAjHFT357oOtlUx/ug=;
+        b=YQTUSvv3PxEEhj5ujE/dPySButOyH55bK4Xn7FFJQPplWJdwV27lg1hiiGZPMl+Csy
+         utkQv6pOjG6DMuuUAn6OW8rUDsTwDk+L09wjyrOsEHgSM9DO1jG+4DXrAkvtnH7+VocI
+         GJeE84ALY1lEBJxLNfWmnbxI8H4dKWQGgYe6NIzbLwEX92BP0BVccbN5ywjf+ad2hItV
+         hOK3koJ698Vs9caFgU0Oz67/J789jH+4rxh31hXP0eWCQ0G50xlrah8Vhcbhoz+wsVGG
+         RvWp/Z6BsjYqNpoy5p5CsKAw38VlYjZy47xgAAr8XRHehyo5E50oaLRajAfxViZwx+CC
+         YVIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KEH5ES29dspwzWzD9R3UfAcYz+Md+T39kv30W9yHTos=;
-        b=iHqbsnXsiFIuG9KhK9LmjxOUr84YmQShJ5YfdvbaNJjkdfA9f9fSyQHvKzL8DYPw3w
-         eXJX3uI6rRUkQEi9LE4af1DkUEX68tp6xZKbPd1Z9Z/IYO7CkybqT9Qz3eJ2mxNziGiy
-         Z+L053FVG/w/yNKicAeECYGz7KgrFausZGfrTk4IvG/b9JJK8nH3VIyfqh9o2sb9dOvV
-         GofMA71SH3Ir9G75IBj9wuiEFkz2uSed0VW65irGNeU/ZBKbzN4sLY5yrzlzBtaqv+sM
-         j3RfhaFurbrkPk2DQ9psOMsZnkmpr9NpvcJxfJ8+giHCmD/4gqhDi5/E0HJkMgtfJloB
-         wIUg==
-X-Gm-Message-State: AOAM532ktwlNvPLe48sS8IQxqQKpymyW0K4sisSt39ZlVyLTWeM7pdoe
-        sXEodzJ5ClVxUtQyOhvno/Q/BDAc2DH4EsOtDk9IEEl+URtlzdTKdocHbOicEEF6toXMRVU6z+O
-        ddeftBWjTG87u
-X-Received: by 2002:a5d:5351:: with SMTP id t17mr6156465wrv.287.1591734687727;
-        Tue, 09 Jun 2020 13:31:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzU7S6RgssO4So7xK5AEwaniOKS/T+uTUiN9P8P46IPWjTCUaoOuKpdhLRvZRnsxMmePD+jDQ==
-X-Received: by 2002:a5d:5351:: with SMTP id t17mr6156435wrv.287.1591734687404;
-        Tue, 09 Jun 2020 13:31:27 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:29ed:810e:962c:aa0d? ([2001:b07:6468:f312:29ed:810e:962c:aa0d])
-        by smtp.gmail.com with ESMTPSA id y5sm5007069wrs.63.2020.06.09.13.31.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jun 2020 13:31:26 -0700 (PDT)
-Subject: Re: [PATCH v2 05/10] KVM: x86: interrupt based APF 'page ready' event
- delivery
-To:     Vivek Goyal <vgoyal@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-References: <20200525144125.143875-1-vkuznets@redhat.com>
- <20200525144125.143875-6-vkuznets@redhat.com>
- <20200609191035.GA223235@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dcdda87c-cf2f-da6f-3166-e2d0bfefce06@redhat.com>
-Date:   Tue, 9 Jun 2020 22:31:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=f15ThlgRIs3s50AvF0kFQ8PMHdAjHFT357oOtlUx/ug=;
+        b=m1SqbmP7Q0/8RmNLqBC1kCA7tNHpQUvVaLA/9mQxz7fxCiI6g6/3M6KKHLXm4Ss6R8
+         8gTUOg+lMhzTcs/Cvfq5PRHE6ajPAOC5/2a1Lz5b4fwVhQW1N1ST9T6woxUjvLVNPeMm
+         IIZ3a8Jt9vkxROOCb8WDDD0PpSVk6P8I3kZ3rZs5qFPuoS238j6aSvTv9/Wz8iexuQV2
+         89DtPZ0/N5/zfoWXKQZszQ8ONUpW1WI9h2YsNRGxitVu7Al0nVfpDsFyE7hJHifIcY62
+         LcBdDSSaLmb+3MPYdnGwar657TwL7y9x7I0vs/MhagCXYiL3YkjzHqyBcyWcqtIdgMEL
+         UnYQ==
+X-Gm-Message-State: AOAM533tJ3sm9DKoB1tlq0YP56TV3KvCHIMscf1GOFPRSFR1dAXvclel
+        +AzixIZl550pXpD+fa/1JMbg71y2Y6loKrfSpdE+AQ==
+X-Google-Smtp-Source: ABdhPJwQ+viuUyt4Xvfz0B/F5q8uWrpKqo6vNNs2uM0NepreAFEA0QuoyJVSJ76WQkzVbDy0sso7BcdwlZvUGeg7c1M=
+X-Received: by 2002:ab0:6012:: with SMTP id j18mr260224ual.69.1591736832385;
+ Tue, 09 Jun 2020 14:07:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200609191035.GA223235@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20200605213853.14959-2-sean.j.christopherson@intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 9 Jun 2020 14:07:01 -0700
+Message-ID: <CANgfPd87=eS6h=GX6CxZRwAj=MTET-AtVAjVQn4i1zkwZ4ApXw@mail.gmail.com>
+Subject: Re: [PATCH 01/21] KVM: x86/mmu: Track the associated kmem_cache in
+ the MMU caches
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/06/20 21:10, Vivek Goyal wrote:
-> Hi Vitaly,
-> 
-> Have a question about page ready events. 
-> 
-> Now we deliver PAGE_NOT_PRESENT page faults only if guest is not in
-> kernel mode. So say kernel tried to access a page and we halted cpu.
-> When page is available, we will inject page_ready interrupt. At
-> that time we don't seem to check whether page_not_present was injected
-> or not. 
-> 
-> IOW, we seem to deliver page_ready irrespective of the fact whether
-> PAGE_NOT_PRESENT was delivered or not. And that means we will be
-> sending page present tokens to guest. Guest will not have a state
-> associated with that token and think that page_not_present has
-> not been delivered yet and allocate an element in hash table for
-> future page_not_present event. And that will lead to memory leak
-> and token conflict etc.
-
-Yes, and this is https://bugzilla.kernel.org/show_bug.cgi?id=208081
-which I was looking at right today.
-
-> While setting up async pf, should we keep track whether associated
-> page_not_present was delivered to guest or not and deliver page_ready
-> accordingly.
-
-Yes, I think so.
-
-Paolo
-
+On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Track the kmem_cache used for non-page KVM MMU memory caches instead of
+> passing in the associated kmem_cache when filling the cache.  This will
+> allow consolidating code and other cleanups.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/mmu/mmu.c          | 24 +++++++++++-------------
+>  2 files changed, 12 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 1da5858501ca..16347b050754 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -251,6 +251,7 @@ struct kvm_kernel_irq_routing_entry;
+>   */
+>  struct kvm_mmu_memory_cache {
+>         int nobjs;
+> +       struct kmem_cache *kmem_cache;
+>         void *objects[KVM_NR_MEM_OBJS];
+>  };
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index fdd05c233308..0830c195c9ed 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1060,15 +1060,14 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+>         local_irq_enable();
+>  }
+>
+> -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+> -                                 struct kmem_cache *base_cache, int min)
+> +static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache, int min)
+>  {
+>         void *obj;
+>
+>         if (cache->nobjs >= min)
+>                 return 0;
+>         while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+> -               obj = kmem_cache_zalloc(base_cache, GFP_KERNEL_ACCOUNT);
+> +               obj = kmem_cache_zalloc(cache->kmem_cache, GFP_KERNEL_ACCOUNT);
+>                 if (!obj)
+>                         return cache->nobjs >= min ? 0 : -ENOMEM;
+>                 cache->objects[cache->nobjs++] = obj;
+> @@ -1081,11 +1080,10 @@ static int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *cache)
+>         return cache->nobjs;
+>  }
+>
+> -static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc,
+> -                                 struct kmem_cache *cache)
+> +static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+>  {
+>         while (mc->nobjs)
+> -               kmem_cache_free(cache, mc->objects[--mc->nobjs]);
+> +               kmem_cache_free(mc->kmem_cache, mc->objects[--mc->nobjs]);
+>  }
+>
+>  static int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache,
+> @@ -1115,25 +1113,22 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
+>         int r;
+>
+>         r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+> -                                  pte_list_desc_cache, 8 + PTE_PREFETCH_NUM);
+> +                                  8 + PTE_PREFETCH_NUM);
+>         if (r)
+>                 goto out;
+>         r = mmu_topup_memory_cache_page(&vcpu->arch.mmu_page_cache, 8);
+>         if (r)
+>                 goto out;
+> -       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
+> -                                  mmu_page_header_cache, 4);
+> +       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache, 4);
+>  out:
+>         return r;
+>  }
+>
+>  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+>  {
+> -       mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
+> -                               pte_list_desc_cache);
+> +       mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+>         mmu_free_memory_cache_page(&vcpu->arch.mmu_page_cache);
+> -       mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache,
+> -                               mmu_page_header_cache);
+> +       mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+>  }
+>
+>  static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+> @@ -5684,6 +5679,9 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>         uint i;
+>         int ret;
+>
+> +       vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+> +       vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+> +
+>         vcpu->arch.mmu = &vcpu->arch.root_mmu;
+>         vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+>
+> --
+> 2.26.0
+>
