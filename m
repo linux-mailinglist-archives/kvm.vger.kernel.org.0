@@ -2,92 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EB201F3355
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 07:22:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD6021F33A2
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 07:53:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725770AbgFIFWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 01:22:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25815 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727017AbgFIFWM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jun 2020 01:22:12 -0400
+        id S1727111AbgFIFxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 01:53:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57277 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727088AbgFIFxV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Jun 2020 01:53:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591680131;
+        s=mimecast20190719; t=1591682000;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=WHQ8UFZ46VmZPIRBXNrYRjN+az6Pby2qoab4JPg/jJg=;
-        b=KrCMZlzYjQWdPP1lb7Yf5H67H6RYGMf3gXw2TJBHwv348N1a6Tk2wxlUcu3z9m9TkmFRiA
-        4Wlhf30nhKtJI29mYRW9Zk7ScQpTaMVVLSlYPtn+DmgvAvHq19Az+NcUR40CnvBNu7caJ1
-        G/Gk5eRw5l2/uf4D9i+a8eg6mQwqlpw=
+         in-reply-to:in-reply-to:references:references;
+        bh=T/2A/WU2/svppr3uz/G5VVDxLgqlNP79/92mX4BoUzs=;
+        b=HAu5QEAEvAWi4nMb8Joq/26yUQTPIu4p/wpROhFnMgrqY/wN+kwtHMb/sGl+0lUBSvydar
+        lzj3z6tE7FM4zPZBxDg6yX7xjvv0UPcksXJNqpU7pY4CFlbC+SL7aHLulPKjt89G15/6Lk
+        wFqJw7vXAK2OoZALY7lvD51sYrbmYT4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-Zr_1y2IeMC6_TyrBPWae1A-1; Tue, 09 Jun 2020 01:22:06 -0400
-X-MC-Unique: Zr_1y2IeMC6_TyrBPWae1A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-290-7lBnAItnOB6WES0WKXa7sA-1; Tue, 09 Jun 2020 01:53:16 -0400
+X-MC-Unique: 7lBnAItnOB6WES0WKXa7sA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 955A48014D4;
-        Tue,  9 Jun 2020 05:22:05 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-109.ams2.redhat.com [10.36.112.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C83A60BF3;
-        Tue,  9 Jun 2020 05:22:01 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v8 08/12] s390x: retrieve decimal and
- hexadecimal kernel parameters
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
- <1591603981-16879-9-git-send-email-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <b013343d-d08d-43c6-1fac-f29d3070b535@redhat.com>
-Date:   Tue, 9 Jun 2020 07:21:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32E871005510;
+        Tue,  9 Jun 2020 05:53:15 +0000 (UTC)
+Received: from [10.72.12.252] (ovpn-12-252.pek2.redhat.com [10.72.12.252])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E327510013D6;
+        Tue,  9 Jun 2020 05:53:05 +0000 (UTC)
+Subject: Re: [PATCH] vhost/test: fix up after API change
+To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20200608124254.727184-1-mst@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <e747a953-3135-fef9-b098-fca11755d6e4@redhat.com>
+Date:   Tue, 9 Jun 2020 13:53:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <1591603981-16879-9-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200608124254.727184-1-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/06/2020 10.12, Pierre Morel wrote:
-> We often need to retrieve hexadecimal kernel parameters.
-> Let's implement a shared utility to do it.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+
+On 2020/6/8 下午8:42, Michael S. Tsirkin wrote:
+> Pass a flag to request kernel thread use.
+>
+> Fixes: 01fcb1cbc88e ("vhost: allow device that does not depend on vhost worker")
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  lib/s390x/kernel-args.c | 60 +++++++++++++++++++++++++++++++++++++++++
->  lib/s390x/kernel-args.h | 18 +++++++++++++
->  s390x/Makefile          |  1 +
->  3 files changed, 79 insertions(+)
->  create mode 100644 lib/s390x/kernel-args.c
->  create mode 100644 lib/s390x/kernel-args.h
-[...]
-> +int kernel_arg(int argc, char *argv[], const char *str, unsigned long *val)
-> +{
-> +	int i, ret;
-> +	char *p;
-> +
-> +	for (i = 0; i < argc; i++) {
-> +		ret = strncmp(argv[i], str, strlen(str));
-> +		if (ret)
-> +			continue;
-> +		p = strchr(argv[i], '=');
-> +		if (!p)
-> +			return -1;
-> +		p = strchr(p, 'x');
-> +		if (!p)
-> +			*val = atol(p + 1);
+>   drivers/vhost/test.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index f55cb584b84a..12304eb8da15 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -122,7 +122,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+>   	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+>   	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+>   	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
+> -		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, NULL);
+> +		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, true, NULL);
+>   
+>   	f->private_data = n;
+>   
 
-If p is NULL, then you call atol(NULL + 1) ... I think you need another
-temporary variable here instead to hold the new pointer / NULL value?
 
- Thomas
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Just to confirm, have you queued the doorbell mapping patches already? 
+Or you expect I squash this into v2 of doorbell mapping series?
+
+Thanks
 
