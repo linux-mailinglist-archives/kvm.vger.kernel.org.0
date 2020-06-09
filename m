@@ -2,91 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 264131F400A
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 18:01:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C2FF1F4087
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 18:19:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731030AbgFIQBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 12:01:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29285 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730794AbgFIQBf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jun 2020 12:01:35 -0400
+        id S1728333AbgFIQTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 12:19:20 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23385 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725894AbgFIQTT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Jun 2020 12:19:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591718494;
+        s=mimecast20190719; t=1591719558;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=i9mw0jwDqk9vebneZAm+rfcmH4lN//ILG94TBWdT15g=;
-        b=jI1VvTgiOt/rdeNlYtQKiRcjCwMvv5xayFTf5zzsS/M9FNFc0B75EhBfnbHsnD43wE/Fn7
-        XDdFFuXfkMpSaNdXDlYtTnLtzAkZ1CBOCCC8S1u3/tXxPkf79HmcfgiqPunoQUCuRR3V9/
-        DXrNdvQJ6v3q4LByyqjfL7swbhFwEXc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-ECI9jYpSOWGHLakU--S8Fg-1; Tue, 09 Jun 2020 12:01:32 -0400
-X-MC-Unique: ECI9jYpSOWGHLakU--S8Fg-1
-Received: by mail-wm1-f72.google.com with SMTP id y15so747701wmi.0
-        for <kvm@vger.kernel.org>; Tue, 09 Jun 2020 09:01:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=i9mw0jwDqk9vebneZAm+rfcmH4lN//ILG94TBWdT15g=;
-        b=dUM2QxKBmgFSNezPxiToNIHZGTHgqN0nAABJLbEfOZnqU/JdH2hDc4vZ9bscTeb7FQ
-         jVMb3q+opKA997jSCIyKkvaR57jMpfT2NFg7z87MnDlGzn4zGSrD88vtZ9d9RiELCHWR
-         4E7lASMeTtPaopE1ej0ZJC/vfkgTgx1WJynMtmZ02JjVIAwwdBK0/+XeKnI6I2EWS5U/
-         2v546cg2xXREdzrTUnTdVqexKhJvgc746mWNr+WONBolB6MI5oY4Jbv3vzu96a9aXjLy
-         YrmVl5C9t5wdrxnVnhC6gtB7J0BILSNvg1HZqbApV36vMMdcaLMS0zMmqVq6+j9gvTHB
-         RU5Q==
-X-Gm-Message-State: AOAM532WIOTbBNAm+77Ds6MJu8WF7Tia/jbYm5teQrpuMKLSchNsQmMg
-        47xUQnGotrZiUajHlB559mluWMGf6HYCGYLYVdDF6E/sdGy+FEPpwydtY8rGMSXJvVpU5i1Jx0j
-        YBqkHzRxyicFw
-X-Received: by 2002:a5d:408e:: with SMTP id o14mr5129555wrp.84.1591718491914;
-        Tue, 09 Jun 2020 09:01:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyN/kmT1mD5DAdfc2yIoMg5h96U9lEX8srTbHpB/HM+k7YK1UiWVh8jawTjEAAcaAaiezsmhA==
-X-Received: by 2002:a5d:408e:: with SMTP id o14mr5129534wrp.84.1591718491702;
-        Tue, 09 Jun 2020 09:01:31 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
-        by smtp.gmail.com with ESMTPSA id c81sm3482604wmd.42.2020.06.09.09.01.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jun 2020 09:01:31 -0700 (PDT)
-Date:   Tue, 9 Jun 2020 12:01:28 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        qemu-devel@nongnu.org, brijesh.singh@amd.com,
-        frankja@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
-        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
-        mdroth@linux.vnet.ibm.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        bh=xIjfaioqmBdVChcuQCpcGGXIjUXo4w4gXfPUySK3fk8=;
+        b=QbHK2GE1gnIkXL59cGoVG247P1nlPgbSf8iSUBY3HWGsWzPYuDKJ9UFNtdcfdptfZfnWFd
+        2Y8v35rLMEov8y8a4K9l2CyaVsL8Rg+XTT/oPvdCiWfSI3xhHtqWPCJcMrR/hwnvwvtrlI
+        CMTvNmZJNluRZcYS/FTPbjN4ZGkO980=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-485-FOFoOAkGP-mJYruZWnJrDw-1; Tue, 09 Jun 2020 12:19:08 -0400
+X-MC-Unique: FOFoOAkGP-mJYruZWnJrDw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08210107AFB2;
+        Tue,  9 Jun 2020 16:18:56 +0000 (UTC)
+Received: from localhost (ovpn-113-3.phx2.redhat.com [10.3.113.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E37958FF9A;
+        Tue,  9 Jun 2020 16:18:14 +0000 (UTC)
+Date:   Tue, 9 Jun 2020 12:18:14 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
- properties for protected guests
-Message-ID: <20200609120011-mutt-send-email-mst@kernel.org>
-References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200521034304.340040-19-david@gibson.dropbear.id.au>
- <20200606162014-mutt-send-email-mst@kernel.org>
- <20200607030735.GN228651@umbus.fritz.box>
- <20200609121641.5b3ffa48.cohuck@redhat.com>
- <20200609174046.0a0d83b9.pasic@linux.ibm.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        teawater <teawaterz@linux.alibaba.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: Re: [PATCH v3 00/20] virtio-mem: Paravirtualized memory hot(un)plug
+Message-ID: <20200609161814.GJ2366737@habkost.net>
+References: <20200603144914.41645-1-david@redhat.com>
+ <20200609091034-mutt-send-email-mst@kernel.org>
+ <08385823-d98f-fd9d-aa9d-bc1bd6747c29@redhat.com>
+ <20200609115814-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200609174046.0a0d83b9.pasic@linux.ibm.com>
+In-Reply-To: <20200609115814-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 09, 2020 at 05:40:46PM +0200, Halil Pasic wrote:
-> For s390x having a memory-encryption object is not prereq for doing
-> protected virtualization, so the scheme does not work for us right now.
+On Tue, Jun 09, 2020 at 11:59:04AM -0400, Michael S. Tsirkin wrote:
+> On Tue, Jun 09, 2020 at 03:26:08PM +0200, David Hildenbrand wrote:
+> > On 09.06.20 15:11, Michael S. Tsirkin wrote:
+> > > On Wed, Jun 03, 2020 at 04:48:54PM +0200, David Hildenbrand wrote:
+> > >> This is the very basic, initial version of virtio-mem. More info on
+> > >> virtio-mem in general can be found in the Linux kernel driver v2 posting
+> > >> [1] and in patch #10. The latest Linux driver v4 can be found at [2].
+> > >>
+> > >> This series is based on [3]:
+> > >>     "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
+> > >>      buses"
+> > >>
+> > >> The patches can be found at:
+> > >>     https://github.com/davidhildenbrand/qemu.git virtio-mem-v3
+> > > 
+> > > So given we tweaked the config space a bit, this needs a respin.
+> > 
+> > Yeah, the virtio-mem-v4 branch already contains a fixed-up version. Will
+> > send during the next days.
+> 
+> BTW. People don't normally capitalize the letter after ":".
+> So a better subject is
+>   virtio-mem: paravirtualized memory hot(un)plug
 
-It does make things much easier implementation-wise while just
-marginally harder to use though.
+I'm not sure that's still the rule:
+
+[qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [A-Z]' | wc -l
+5261
+[qemu/(49ee115552...)]$ git log --oneline v4.0.0.. | egrep ': [a-z]' | wc -l
+2921
 
 -- 
-MST
+Eduardo
 
