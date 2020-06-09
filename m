@@ -2,139 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E41A21F3662
-	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 10:50:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95CF51F3755
+	for <lists+kvm@lfdr.de>; Tue,  9 Jun 2020 11:54:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728358AbgFIIts (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 04:49:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38296 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728338AbgFIItn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jun 2020 04:49:43 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0B24E2078D;
-        Tue,  9 Jun 2020 08:49:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591692582;
-        bh=YpTPkF+pnFoMogA4X2GFObKXLTgxGc72fp25PaLmSWs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=W/6DplRB61Jn98Sp4t1KeQRbvrrCWHNQO0TdHaoZ1vGlAjbZFAGhoexEwsXl+syKO
-         XzwLFhQSjpvJIsx34gFf93rF+ITlwYmEWl+qfAvUWFEukPluntlxQ+pOtH1XX/vue8
-         Goz+luN8WPRdylarBtn5CiFELwsXNaJ0DCPxQXSE=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jiZwy-001PEa-J1; Tue, 09 Jun 2020 09:49:40 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-Subject: [PATCH 2/2] KVM: arm64: Synchronize sysreg state on injecting an AArch32 exception
-Date:   Tue,  9 Jun 2020 09:49:21 +0100
-Message-Id: <20200609084921.1448445-3-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200609084921.1448445-1-maz@kernel.org>
-References: <20200609084921.1448445-1-maz@kernel.org>
+        id S1728549AbgFIJyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 05:54:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54335 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726765AbgFIJyP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jun 2020 05:54:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591696453;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SC9syHJzq6iNk5VKVHnGheNpsoiQBFm88X04rtBYN08=;
+        b=Dg1clPLs289AJsYV0AzFGCaU6Q/dcpoHc7LosfKzz4s+Dgpgl19Biah8ENIoZ9fyIWmNln
+        PusxZsJ0ZsSfjkeyXWVxuBqsdRjvvKA12xD91epwupyx8RpttLX9KJdlXRfM8aFi9Cdsli
+        KyAuS+Mfp4hitb8uKDWE4p1ghaXIfFk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-SCcVfcc3NkOXZqnHJypDlQ-1; Tue, 09 Jun 2020 05:54:11 -0400
+X-MC-Unique: SCcVfcc3NkOXZqnHJypDlQ-1
+Received: by mail-wr1-f72.google.com with SMTP id i6so6786412wrr.23
+        for <kvm@vger.kernel.org>; Tue, 09 Jun 2020 02:54:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SC9syHJzq6iNk5VKVHnGheNpsoiQBFm88X04rtBYN08=;
+        b=EA7wo7GPt8WmooHhqdDWg2pSjBtq18d75LjfBNKnMjvOypweAK3LYbDxBN2jxKiHMY
+         H3CVd9Q3RYlKit+l4eGfjzXeEox+0eBHw34qwF+UHAd2MUZon2B8g1D34+dRlj9tIdpA
+         A+33kypiPe4/UxSzefdED+R4shKFUX60G2EYms43WE0lJSiFhTEFz39jfqSuxtaHfKQb
+         HwzylTElxoL9VIdYSp8PsSq/aYSCKnOTBYcMYa8GpGORxiaVCLvKcxvQWesj1VbYjFEJ
+         A68kQfB4Ym8ydabhM4qbT+0VlrT/8QhryKbJK3AeYZuF4ETZqJWYkvkoV7flqlmIaEf0
+         g55g==
+X-Gm-Message-State: AOAM533T26ybP6vgLppU3MKEmI7TKrnOkux9w6LTn4c2cluXQc/ejafz
+        QVgEC0VA+7xQgeF9SIc/PHaxxz/FzFXVtIdF68/oge+6pFGZCCrSs8OxHDFVSN5WIdjSYLyHbj6
+        S73shq+VxSLw4
+X-Received: by 2002:adf:910e:: with SMTP id j14mr3319821wrj.278.1591696450441;
+        Tue, 09 Jun 2020 02:54:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwNaCwWIicA8xSDlpgm/W3oiuEgYalTH4d6fD5Fqj+9Mro5lSmTaPsGiPPa7w/Cmzt0VCbrlw==
+X-Received: by 2002:adf:910e:: with SMTP id j14mr3319797wrj.278.1591696450189;
+        Tue, 09 Jun 2020 02:54:10 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.172.168])
+        by smtp.gmail.com with ESMTPSA id n189sm2309651wmb.43.2020.06.09.02.54.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jun 2020 02:54:09 -0700 (PDT)
+Subject: Re: [RFC PATCH] KVM: x86: Fix APIC page invalidation race
+To:     Eiichi Tsukata <eiichi.tsukata@nutanix.com>
+Cc:     "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Felipe Franciosi <felipe@nutanix.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+References: <20200606042627.61070-1-eiichi.tsukata@nutanix.com>
+ <0d9b3313-5d4c-9ef3-63e4-ba08ddbbe7a1@redhat.com>
+ <7B9024C7-98D0-4940-91AE-40BCDE555C8F@nutanix.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6d2d2faf-116f-8c71-fda2-3fc052952dee@redhat.com>
+Date:   Tue, 9 Jun 2020 11:54:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <7B9024C7-98D0-4940-91AE-40BCDE555C8F@nutanix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On a VHE system, the EL1 state is left in the CPU most of the time,
-and only syncronized back to memory when vcpu_put() is called (most
-of the time on preemption).
+On 09/06/20 03:04, Eiichi Tsukata wrote:
+> 
+> 
+>> On Jun 8, 2020, at 22:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 06/06/20 06:26, Eiichi Tsukata wrote:
+>>> Commit b1394e745b94 ("KVM: x86: fix APIC page invalidation") tried to
+>>> fix inappropriate APIC page invalidation by re-introducing arch specific
+>>> kvm_arch_mmu_notifier_invalidate_range() and calling it from
+>>> kvm_mmu_notifier_invalidate_range_start. But threre could be the
+>>> following race because VMCS APIC address cache can be updated
+>>> *before* it is unmapped.
+>>>
+>>> Race:
+>>>  (Invalidator) kvm_mmu_notifier_invalidate_range_start()
+>>>  (Invalidator) kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD)
+>>>  (KVM VCPU) vcpu_enter_guest()
+>>>  (KVM VCPU) kvm_vcpu_reload_apic_access_page()
+>>>  (Invalidator) actually unmap page
+>>>
+>>> Symptom:
+>>>  The above race can make Guest OS see already freed page and Guest OS
+>>> will see broken APIC register values.
+>>
+>> This is not exactly the issue.  The values in the APIC-access page do
+>> not really matter, the problem is that the host physical address values
+>> won't match between the page tables and the APIC-access page address.
+>> Then the processor will not trap APIC accesses, and will instead show
+>> the raw contents of the APIC-access page (zeroes), and cause the crash
+>> as you mention below.
+>>
+>> Still, the race explains the symptoms and the patch matches this text in
+>> include/linux/mmu_notifier.h:
+>>
+>> 	 * If the subsystem
+>>         * can't guarantee that no additional references are taken to
+>>         * the pages in the range, it has to implement the
+>>         * invalidate_range() notifier to remove any references taken
+>>         * after invalidate_range_start().
+>>
+>> where the "additional reference" is in the VMCS: because we have to
+>> account for kvm_vcpu_reload_apic_access_page running between
+>> invalidate_range_start() and invalidate_range_end(), we need to
+>> implement invalidate_range().
+>>
+>> The patch seems good, but I'd like Andrea Arcangeli to take a look as
+>> well so I've CCed him.
+>>
+>> Thank you very much!
+>>
+>> Paolo
+>>
+> 
+> Hello Paolo
+> 
+> Thanks for detailed explanation!
+> I’ll fix the commit message like this:
 
-Which means that when injecting an exception, we'd better have a way
-to either:
-(1) write directly to the EL1 sysregs
-(2) synchronize the state back to memory, and do the changes there
+No need to resend, the patch is good.  Here is my take on the commit message:
 
-For an AArch64, we already do (1), so we are safe. Unfortunately,
-doing the same thing for AArch32 would be pretty invasive. Instead,
-we can easily implement (2) by calling the put/load architectural
-backends, and keep preemption disabled. We can then reload the
-state back into EL1.
+    Commit b1394e745b94 ("KVM: x86: fix APIC page invalidation") tried
+    to fix inappropriate APIC page invalidation by re-introducing arch
+    specific kvm_arch_mmu_notifier_invalidate_range() and calling it from
+    kvm_mmu_notifier_invalidate_range_start. However, the patch left a
+    possible race where the VMCS APIC address cache is updated *before*
+    it is unmapped:
+    
+      (Invalidator) kvm_mmu_notifier_invalidate_range_start()
+      (Invalidator) kvm_make_all_cpus_request(kvm, KVM_REQ_APIC_PAGE_RELOAD)
+      (KVM VCPU) vcpu_enter_guest()
+      (KVM VCPU) kvm_vcpu_reload_apic_access_page()
+      (Invalidator) actually unmap page
+    
+    Because of the above race, there can be a mismatch between the
+    host physical address stored in the APIC_ACCESS_PAGE VMCS field and
+    the host physical address stored in the EPT entry for the APIC GPA
+    (0xfee0000).  When this happens, the processor will not trap APIC
+    accesses, and will instead show the raw contents of the APIC-access page.
+    Because Windows OS periodically checks for unexpected modifications to
+    the LAPIC register, this will show up as a BSOD crash with BugCheck
+    CRITICAL_STRUCTURE_CORRUPTION (109) we are currently seeing in
+    https://bugzilla.redhat.com/show_bug.cgi?id=1751017.
+    
+    The root cause of the issue is that kvm_arch_mmu_notifier_invalidate_range()
+    cannot guarantee that no additional references are taken to the pages in
+    the range before kvm_mmu_notifier_invalidate_range_end().  Fortunately,
+    this case is supported by the MMU notifier API, as documented in
+    include/linux/mmu_notifier.h:
+    
+             * If the subsystem
+             * can't guarantee that no additional references are taken to
+             * the pages in the range, it has to implement the
+             * invalidate_range() notifier to remove any references taken
+             * after invalidate_range_start().
+    
+    The fix therefore is to reload the APIC-access page field in the VMCS
+    from kvm_mmu_notifier_invalidate_range() instead of ..._range_start().
 
-Cc: stable@vger.kernel.org
-Reported-by: James Morse <james.morse@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/aarch32.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Thanks,
 
-diff --git a/arch/arm64/kvm/aarch32.c b/arch/arm64/kvm/aarch32.c
-index 0a356aa91aa1..40a62a99fbf8 100644
---- a/arch/arm64/kvm/aarch32.c
-+++ b/arch/arm64/kvm/aarch32.c
-@@ -33,6 +33,26 @@ static const u8 return_offsets[8][2] = {
- 	[7] = { 4, 4 },		/* FIQ, unused */
- };
- 
-+static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
-+{
-+	preempt_disable();
-+	if (vcpu->arch.sysregs_loaded_on_cpu) {
-+		kvm_arch_vcpu_put(vcpu);
-+		return true;
-+	}
-+
-+	preempt_enable();
-+	return false;
-+}
-+
-+static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
-+{
-+	if (loaded) {
-+		kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+		preempt_enable();
-+	}
-+}
-+
- /*
-  * When an exception is taken, most CPSR fields are left unchanged in the
-  * handler. However, some are explicitly overridden (e.g. M[4:0]).
-@@ -155,7 +175,10 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- 
- void kvm_inject_undef32(struct kvm_vcpu *vcpu)
- {
-+	bool loaded = pre_fault_synchronize(vcpu);
-+
- 	prepare_fault32(vcpu, PSR_AA32_MODE_UND, 4);
-+	post_fault_synchronize(vcpu, loaded);
- }
- 
- /*
-@@ -168,6 +191,9 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 	u32 vect_offset;
- 	u32 *far, *fsr;
- 	bool is_lpae;
-+	bool loaded;
-+
-+	loaded = pre_fault_synchronize(vcpu);
- 
- 	if (is_pabt) {
- 		vect_offset = 12;
-@@ -191,6 +217,8 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
- 		*fsr = DFSR_FSC_EXTABT_nLPAE;
- 	}
-+
-+	post_fault_synchronize(vcpu, loaded);
- }
- 
- void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr)
--- 
-2.26.2
+Paolo
 
