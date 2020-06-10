@@ -2,106 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E7681F5345
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 13:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 421A31F5346
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 13:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728468AbgFJLeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 07:34:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48186 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728412AbgFJLeI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 07:34:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591788847;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ztFqhUudHoU3NNYqFL5POta8Qmquf650y/nl/9Uo0mc=;
-        b=L31SJ0WmX/2p6ulGSebAb22Ofufm5BGModPLE4jXIbqaMxEEjKP0HNXckWpM1isege8QTe
-        gqdMldM6Lp0AMLQKAYluWGSNltWpU+YfFFWeIsieNrj55YWYY3ZMfZ9Ph2nadWpQPxuJZ5
-        c3nqnujtgdgqa+USYAGdy7RLQIkfLBM=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-128-y6HChBgoMn-n8O0z_b7wBQ-1; Wed, 10 Jun 2020 07:34:05 -0400
-X-MC-Unique: y6HChBgoMn-n8O0z_b7wBQ-1
-Received: by mail-ed1-f70.google.com with SMTP id f13so546046edv.11
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 04:34:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ztFqhUudHoU3NNYqFL5POta8Qmquf650y/nl/9Uo0mc=;
-        b=lpfFLCuF65h5MrouAWO1M+fFB9Brq4rhWtOi5Sp5Y07xKmc/U2X4uJBgc0V+AhKf+9
-         jNKPg9rGBlvJDHT/xgohgqDpEhgg8/8ebOul5wWqckRTA5mXZ6EWGH3WIFb6XSlsjHxu
-         a2IJbP6natGtWKvUBvqsaSbOaCzmzLb3+6snfybzmTcD29ZRafKDZUBc38uHukcOgL44
-         i6C/NO3HuPx1D6wsNkpdh9hyjqPz3Achb1jw0gu5Z36GlmZme0CZjOoH7jt0J635VhcS
-         Xka6emwF0Fz0QFpZzaXGvMFsZIjmSwQky2ozWU2NH5Akm3cGeqh7vfulgDxv2V6K38N7
-         eKuA==
-X-Gm-Message-State: AOAM5303yauJusyw43LPwNoN425ZBLeMM3R2DeM+zRD/gHXEGSga30ab
-        t9LJygAgZISJYwFWeywV2h+Phipuakc8ubVj3w8fCmzIl6EkKw7lUlkKIHPpVSBzwSwBaFJj4hW
-        z1NsBzrHtNaIp
-X-Received: by 2002:a17:907:441c:: with SMTP id om20mr2772954ejb.62.1591788844386;
-        Wed, 10 Jun 2020 04:34:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxYfnxO7q4EnVccZRzA4Vkj9BRco2fOIoVOAQFKJPWEKvKv7I1oFGHoz1Ks7Pdc073loFhqzQ==
-X-Received: by 2002:a17:907:441c:: with SMTP id om20mr2772924ejb.62.1591788844144;
-        Wed, 10 Jun 2020 04:34:04 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.134.4])
-        by smtp.gmail.com with ESMTPSA id e4sm16864342edy.17.2020.06.10.04.34.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2020 04:34:03 -0700 (PDT)
-Subject: Re: [PATCH v2 05/10] KVM: x86: interrupt based APF 'page ready' event
- delivery
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-References: <20200525144125.143875-1-vkuznets@redhat.com>
- <20200525144125.143875-6-vkuznets@redhat.com>
- <20200609191035.GA223235@redhat.com>
- <dcdda87c-cf2f-da6f-3166-e2d0bfefce06@redhat.com>
- <873673b8gc.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ce34f17a-d444-fdf4-1a1c-e052234c1516@redhat.com>
-Date:   Wed, 10 Jun 2020 13:34:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728527AbgFJLeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 07:34:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42712 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728491AbgFJLeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 07:34:16 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B0BCA20734;
+        Wed, 10 Jun 2020 11:34:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591788855;
+        bh=9N6nffWe0REroh98cZzvRnmfrffUIT7lJJ7yMkeQ6uI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Ksvks8e29KLnHD9le872+c+3SUvatPHr3scAMz190kRFvyApeml9YWHh8o+yITFcD
+         Mj8bsnfTJ1Vtcu0R5MHp396KaIIEEQ11lRB+vXVJj0rIdF/qd77dIO2NIfDLl5PFao
+         YoBbsMa+nMUOr7bfYEkscw/tyWNN//u47xzi+XXM=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jiyzm-001lrp-8M; Wed, 10 Jun 2020 12:34:14 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Scull <ascull@google.com>, kernel-team@android.com
+Subject: [PATCH v2 0/4] kvm: arm64: Pointer Authentication handling fixes
+Date:   Wed, 10 Jun 2020 12:34:02 +0100
+Message-Id: <20200610113406.1493170-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <873673b8gc.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, ascull@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/06/20 11:01, Vitaly Kuznetsov wrote:
-> The issue isn't related to the interrupt based APF mechanism, right?
-> 'Page ready' events are always injected (sooner or later). I'll take a
-> look.
+I recently discovered that the Pointer Authentication (PtrAuth)
+handling code in KVM is busted, and has been for a while. The main
+issue is that the we save the host's keys from a preemptible
+context. Things will go wrong at some point.
 
-No, it isn't.
+In order to address this, the first patch move the saving of the
+host's keys to vcpu_load(). It is done eagerly, which is a bore, but
+is at least safe. This is definitely stable material.
 
->>> While setting up async pf, should we keep track whether associated
->>> page_not_present was delivered to guest or not and deliver page_ready
->>> accordingly.
->>
->> Yes, I think so.
-> 
-> Something like this? (not even compile tested yet):
+The following patch is adding an optimisatioe: we handle key saving
+and HCR massaging as a fixup, much like the FPSIMD code.
 
-Pretty much, though I would avoid the reindentation if possible.
+Subsequent patch cleans up our HYP per-CPU accessor and make it sparse
+friendly, asthe last patch makes heavy use of it by killing the
+per-vcpu backpointer to the physical CPU context, avoiding the first
+bug altogether.
 
-Paolo
+This has been very lightly tested on a model. Unless someone shouts, I
+plan to send this as part of the pending set of fixes.
+
+* From v1:
+  - Dropped the misbehaving guest handling patch
+  - Added the two cleanup patches to the series (previously posted separately)
+
+Marc Zyngier (4):
+  KVM: arm64: Save the host's PtrAuth keys in non-preemptible context
+  KVM: arm64: Handle PtrAuth traps early
+  KVM: arm64: Stop sparse from moaning at __hyp_this_cpu_ptr
+  KVM: arm64: Remove host_cpu_context member from vcpu structure
+
+ arch/arm64/include/asm/kvm_asm.h     | 13 ++++--
+ arch/arm64/include/asm/kvm_emulate.h |  6 ---
+ arch/arm64/include/asm/kvm_host.h    |  3 --
+ arch/arm64/kvm/arm.c                 |  6 +--
+ arch/arm64/kvm/handle_exit.c         | 32 ++------------
+ arch/arm64/kvm/hyp/debug-sr.c        |  4 +-
+ arch/arm64/kvm/hyp/switch.c          | 65 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/sysreg-sr.c       |  6 ++-
+ arch/arm64/kvm/pmu.c                 |  8 +---
+ arch/arm64/kvm/sys_regs.c            | 13 +++---
+ 10 files changed, 91 insertions(+), 65 deletions(-)
+
+-- 
+2.26.2
 
