@@ -2,132 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44C031F4C85
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 06:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E80871F4C83
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 06:46:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726122AbgFJEqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726132AbgFJEqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 10 Jun 2020 00:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58034 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725988AbgFJEqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 00:46:12 -0400
+        with ESMTP id S1726089AbgFJEqN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 00:46:13 -0400
 Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9D5C05BD1E
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7098FC03E96F
         for <kvm@vger.kernel.org>; Tue,  9 Jun 2020 21:46:11 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 49hZFC4Sfcz9sSf; Wed, 10 Jun 2020 14:46:07 +1000 (AEST)
+        id 49hZFD1CVYz9sTF; Wed, 10 Jun 2020 14:46:07 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1591764367;
-        bh=xI1LVAdzVfoGGosUupL+fXC/IP9TGBExUdIO9fFVnoI=;
+        d=gibson.dropbear.id.au; s=201602; t=1591764368;
+        bh=Osaf39fCSY/1qSzfninEWFGQENOi5n5CA+3SvumXfy8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KtdYgiZb6/73I23C6hrE3AE0lmCS3luNtylhenXUxlgz2QP1oPt00hjQFWgW5TR9G
-         mdkpOtXRr2mm09VJ9Cyi6sOLtieKKnhQN+GI+BYiou8Wk81BNYho0xfsa6psU4p0x7
-         3iE7KqvfF1IEP3chCj4CAIUx8tvjd9OY0vQ7j7dY=
-Date:   Wed, 10 Jun 2020 14:36:21 +1000
+        b=THxvZXdqGTXnESoQQpJeej6P8xYOT8lMa9o4VHfZe1Dkmug+Jy8W9b0CK0OECSjn4
+         m36BI71Pl0ZljmzxZUsQtFIPMOWYRk8VFJxEwhbtPKFJOI21tJZdTICuikrvmWofXd
+         3++xX9IW6CIhlFTEqxHHgwQ5yFTlFbNZ/nuYeF4c=
+Date:   Wed, 10 Jun 2020 14:39:22 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, pair@us.ibm.com,
-        brijesh.singh@amd.com, frankja@linux.ibm.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, dgilbert@redhat.com,
-        qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>
-Subject: Re: [RFC v2 00/18] Refactor configuration of guest memory protection
-Message-ID: <20200610043621.GH494336@umbus.fritz.box>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, frankja@linux.ibm.com, dgilbert@redhat.com,
+        pair@us.ibm.com, qemu-ppc@nongnu.org, kvm@vger.kernel.org,
+        mdroth@linux.vnet.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [RFC v2 18/18] guest memory protection: Alter virtio default
+ properties for protected guests
+Message-ID: <20200610043922.GI494336@umbus.fritz.box>
 References: <20200521034304.340040-1-david@gibson.dropbear.id.au>
- <20200605125505.3fdd7de8.cohuck@redhat.com>
- <20200606084409.GL228651@umbus.fritz.box>
- <20200609121105.50588db9.pasic@linux.ibm.com>
+ <20200521034304.340040-19-david@gibson.dropbear.id.au>
+ <20200606162014-mutt-send-email-mst@kernel.org>
+ <20200607030735.GN228651@umbus.fritz.box>
+ <20200609121641.5b3ffa48.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="zhtSGe8h3+lMyY1M"
+        protocol="application/pgp-signature"; boundary="e5GLnnZ8mDMEwH4V"
 Content-Disposition: inline
-In-Reply-To: <20200609121105.50588db9.pasic@linux.ibm.com>
+In-Reply-To: <20200609121641.5b3ffa48.cohuck@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---zhtSGe8h3+lMyY1M
+--e5GLnnZ8mDMEwH4V
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 09, 2020 at 12:11:05PM +0200, Halil Pasic wrote:
-> On Sat, 6 Jun 2020 18:44:09 +1000
+On Tue, Jun 09, 2020 at 12:16:41PM +0200, Cornelia Huck wrote:
+> On Sun, 7 Jun 2020 13:07:35 +1000
 > David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> > On Fri, Jun 05, 2020 at 12:55:05PM +0200, Cornelia Huck wrote:
-> > > On Thu, 21 May 2020 13:42:46 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > On Sat, Jun 06, 2020 at 04:21:31PM -0400, Michael S. Tsirkin wrote:
+> > > On Thu, May 21, 2020 at 01:43:04PM +1000, David Gibson wrote: =20
+> > > > The default behaviour for virtio devices is not to use the platform=
+s normal
+> > > > DMA paths, but instead to use the fact that it's running in a hyper=
+visor
+> > > > to directly access guest memory.  That doesn't work if the guest's =
+memory
+> > > > is protected from hypervisor access, such as with AMD's SEV or POWE=
+R's PEF.
+> > > >=20
+> > > > So, if a guest memory protection mechanism is enabled, then apply t=
+he
+> > > > iommu_platform=3Don option so it will go through normal DMA mechani=
+sms.
+> > > > Those will presumably have some way of marking memory as shared wit=
+h the
+> > > > hypervisor or hardware so that DMA will work.
+> > > >=20
+> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > ---
+> > > >  hw/core/machine.c | 11 +++++++++++
+> > > >  1 file changed, 11 insertions(+)
+> > > >=20
+> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > index 88d699bceb..cb6580954e 100644
+> > > > --- a/hw/core/machine.c
+> > > > +++ b/hw/core/machine.c
+> > > > @@ -28,6 +28,8 @@
+> > > >  #include "hw/mem/nvdimm.h"
+> > > >  #include "migration/vmstate.h"
+> > > >  #include "exec/guest-memory-protection.h"
+> > > > +#include "hw/virtio/virtio.h"
+> > > > +#include "hw/virtio/virtio-pci.h"
+> > > > =20
+> > > >  GlobalProperty hw_compat_5_0[] =3D {};
+> > > >  const size_t hw_compat_5_0_len =3D G_N_ELEMENTS(hw_compat_5_0);
+> > > > @@ -1159,6 +1161,15 @@ void machine_run_board_init(MachineState *ma=
+chine)
+> > > >           * areas.
+> > > >           */
+> > > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort=
+);
+> > > > +
+> > > > +        /*
+> > > > +         * Virtio devices can't count on directly accessing guest
+> > > > +         * memory, so they need iommu_platform=3Don to use normal =
+DMA
+> > > > +         * mechanisms.  That requires disabling legacy virtio supp=
+ort
+> > > > +         * for virtio pci devices
+> > > > +         */
+> > > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legac=
+y", "on");
+> > > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_plat=
+form", "on");
+> > > >      }
+> > > >   =20
 > > >=20
-> > > > A number of hardware platforms are implementing mechanisms whereby =
-the
-> > > > hypervisor does not have unfettered access to guest memory, in order
-> > > > to mitigate the security impact of a compromised hypervisor.
-> > > >=20
-> > > > AMD's SEV implements this with in-cpu memory encryption, and Intel =
-has
-> > > > its own memory encryption mechanism.  POWER has an upcoming mechani=
-sm
-> > > > to accomplish this in a different way, using a new memory protection
-> > > > level plus a small trusted ultravisor.  s390 also has a protected
-> > > > execution environment.
-> > > >=20
-> > > > The current code (committed or draft) for these features has each
-> > > > platform's version configured entirely differently.  That doesn't s=
-eem
-> > > > ideal for users, or particularly for management layers.
-> > > >=20
-> > > > AMD SEV introduces a notionally generic machine option
-> > > > "machine-encryption", but it doesn't actually cover any cases other
-> > > > than SEV.
-> > > >=20
-> > > > This series is a proposal to at least partially unify configuration
-> > > > for these mechanisms, by renaming and generalizing AMD's
-> > > > "memory-encryption" property.  It is replaced by a
-> > > > "guest-memory-protection" property pointing to a platform specific
-> > > > object which configures and manages the specific details.
-> > > >=20
-> > > > For now this series covers just AMD SEV and POWER PEF.  I'm hoping =
-it
-> > > > can be extended to cover the Intel and s390 mechanisms as well,
-> > > > though.
-> > >=20
-> > > For s390, there's the 'unpack' cpu facility bit, which is indicated i=
-ff
-> > > the kernel indicates availability of the feature (depending on hardwa=
-re
-> > > support). If that cpu facility is available, a guest can choose to
-> > > transition into protected mode. The current state (protected mode or
-> > > not) is tracked in the s390 ccw machine.
-> > >=20
-> > > If I understand the series here correctly (I only did a quick
-> > > read-through), the user has to instruct QEMU to make protection
-> > > available, via a new machine property that links to an object?
+> > > I think it's a reasonable way to address this overall.
+> > > As Cornelia has commented, addressing ccw as well =20
 > >=20
-> > Correct.  We used to have basically the same model for POWER - the
-> > guest just talks to the ultravisor to enter secure mode.  But we
-> > realized that model is broken.  You're effectively advertising
-> > availability of a guest hardware feature based on host kernel or
-> > hardware properties.  That means if you try to migrate from a host
-> > with the facility to one without, you won't know there's a problem
-> > until too late.
-> >=20
+> > Sure.  I was assuming somebody who actually knows ccw could do that as
+> > a follow up.
 >=20
-> Sorry, I don't quite understand the migration problem described here. If
-> you have this modeled via a CPU model facility, then you can't migrate
-> from a host with the facility to one without, except if the user
-> specified CPU model does not include the facility in question. Or am I
-> missing something?
+> FWIW, I think we could simply enable iommu_platform for protected
+> guests for ccw; no prereqs like pci's disable-legacy.
 
-Ah, sorry, my mistake.  If it's all based on a cpu model facility that
-must be explicitly selected by the user (not based on host
-capbilities) then that's ok as well.
+Right, and the code above should in fact already do so, since it
+applies that to TYPE_VIRTIO_DEVICE, which is common.  The
+disable-legacy part should be harmless for s390, since this is
+effectively just setting a default, and we don't expect any
+TYPE_VIRTIO_PCI devices to be instantiated on z.
 
-The problem comes if you base guest availability on host availability,
-which early proposals for the POWER version did involve.
+> > > as cases where user has
+> > > specified the property manually could be worth-while. =20
+> >=20
+> > I don't really see what's to be done there.  I'm assuming that if the
+> > user specifies it, they know what they're doing - particularly with
+> > nonstandard guests there are some odd edge cases where those
+> > combinations might work, they're just not very likely.
+>=20
+> If I understood Halil correctly, devices without iommu_platform
+> apparently can crash protected guests on s390. Is that supposed to be a
+> "if it breaks, you get to keep the pieces" situation, or do we really
+> want to enforce iommu_platform?
+
+I actually think "if you broke it, keep the pieces" is an acceptable
+approach here, but that doesn't preclude some further enforcement to
+improve UX.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -135,24 +160,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---zhtSGe8h3+lMyY1M
+--e5GLnnZ8mDMEwH4V
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7gY0UACgkQbDjKyiDZ
-s5IejRAAtjMH9eFvNDqgz5oCfKYEzNSAqc3CD8MHrKOQ23blnzfRbVdMcVr9apii
-CuKm4FBmpluNAdj+5QOjqyHIpVqzY/Xn5xhJJp8TE2GGEyUVVWFRcCt6ga/XThTg
-e/IOlC/K4dzHJ10pIhfKf4Dmmyyo2FQxxZbjmc6vtQkElELv5+q4WABn6+4puF3s
-TMlpK6qtlO/onDNXpypk0c+b3yltKK7UUaJGw0yCVGbOT05yDbYOHHmmTDnlsd3j
-3di7VGUNC5pta5EiwrxZWbpw/lVAtPe9VSCScPdZOhjYb431WUuPHc3JRHEy8ABF
-dfbs1VBM2abQSXDxoh+x3RDZtv3uAtEJUhVW7TQe4ixQ3RANbE2aBHV+tV2LVUt5
-c/mmSVr4ij/CqNdirH8QMC9jBW6+gmzrsh9Assu0MU7scPn3sdn4GVz/PEtw+R9D
-Dki3l3BsHJHVVeVb/j1nERmTI9sqmSwI0TIkgD8XhMYEyLAEVJLDCoODZrKfVmny
-IuyUH4PsSQ1bWR/I+k85x1C5k8vy/C2YNxsQXSmDNRwBB4j9Gn1feRI0P6gSlWgH
-eOPpUTi8LVS+29FSbDwq10I5vwQMIjpjgoBvz6bLn15ON5ShX0/r9JBMdsudMEFF
-vtIHo/c97gLkQN72/Q9Uv7uUj5WuZQiRCh4T4Erq5IwgDope8B0=
-=3eJu
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl7gY/oACgkQbDjKyiDZ
+s5J87RAAq/uYcRY7iinhqt7d90hLrzoey+nofzsZB08Y44dLMeaixQhv/77xbJHs
+iOQybdAm7owLeR5Q3JcbS9FqitLKAcHVVDqat4CNNCTpjMOKleUEJXqQFQ1erbQp
+IDwSXElAVM1GgUU2C3M1MllHNCV+dPawFJxn6XZvBWh4gPbweckzpjdJw3HQ9acg
+X19RTUwsnYf1igM6FyQ+8Yw3xWFyRkw0qGiIPS21sGLWXxYmYdp+/ljxTjnKVhj0
+ZR4290u/8KBbo8W8Tz4q19bEYiIlDe9mTunH25fQZ1bhGVqp1S5tV04+c63qSjpL
+5B343P1INwA0ZIYpbltqgRylnIJqGq9jQ6hWLcOQHumomFIFgTHMNMI/U4DuqyQr
+7gRJWLpElF8Enh8zLE+bpi04daDr4gCzkEubBWxIDoCp9wHxniVaFco1OmBHXST/
+P9HnCt2XYeBKXPbItdEQA/Yaog4uRxb8qckybQbaLhGxe83hN4R5oI10bX0qpwEk
+gCuBOdqc1ST54neeievQ+GSNlHQ6d538ffzFwfjb9+4l+ba9cbwKkfvJSytY9RnE
+rWCGR2HPR97cpMHybqk8UDNWAVSTLKpj2b3gKhaMfmwKtIJTz+O49btyj92WXVH2
+qGLzrVUFi/rtuTqtpY7+aGLxYhh1uXQjQ4+65trpwhXnLNCuNRo=
+=pTND
 -----END PGP SIGNATURE-----
 
---zhtSGe8h3+lMyY1M--
+--e5GLnnZ8mDMEwH4V--
