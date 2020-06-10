@@ -2,226 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 109D61F50BB
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 11:01:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D7C11F5147
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 11:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727023AbgFJJBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 05:01:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50392 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726794AbgFJJBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 05:01:48 -0400
+        id S1727007AbgFJJjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 05:39:43 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41896 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727842AbgFJJjm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 05:39:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591779705;
+        s=mimecast20190719; t=1591781981;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=EAxWiuhgv3Kq1AdZkr0poWV1ssDLNyidhVho1ybrTKY=;
-        b=B4y9MqrxDxOz/N/QAk+vUEfbBP+3wSHPW1Qln+qo8yZivzaZlEi7hR3zI66eif1Z3SA/fG
-        dMXp/BXuLnK8IU/GFvGV5rpbIHOT9HE5TKlaD9x3velbGQbGPUWqTdsbLw+JuvmWHWxTkr
-        4UaXihUt32nf02+RitH6zTuBI61/flQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-bbVJR_NRPyeU6yXVKIGMWw-1; Wed, 10 Jun 2020 05:01:43 -0400
-X-MC-Unique: bbVJR_NRPyeU6yXVKIGMWw-1
-Received: by mail-ej1-f69.google.com with SMTP id ca6so785379ejb.7
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 02:01:43 -0700 (PDT)
+        bh=0H9JvbVSTDy5EkcBxAYDLVdpZdU6drMIY4wiOG5g/Cg=;
+        b=LgiZoQ7hpFwiFWah2o9PgSn0JevR3usDy5lrzkxVlB19C6JdmrOlkwVSfNasly0s21KdXN
+        amguAYByArB1UQZPDUG+iOSvVsT3eJwVPpiB9YhsJFvM59zm9QlR1RKq6D+76veH9Z2+YM
+        co9vAqol/9yoSdQ00zVju5giMu5E/O0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91--omjCFaDO9eYMTB64tF_MQ-1; Wed, 10 Jun 2020 05:39:40 -0400
+X-MC-Unique: -omjCFaDO9eYMTB64tF_MQ-1
+Received: by mail-wr1-f71.google.com with SMTP id l1so839405wrc.8
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 02:39:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=EAxWiuhgv3Kq1AdZkr0poWV1ssDLNyidhVho1ybrTKY=;
-        b=ZfAdK9eUiI20ZJBIhSeJITcGYacI825oNtNh3eV/NekcudWTk8ZoedT4RUVfUWDU2a
-         KD86CI/EEOt+TwgAAcuqWl4U6YyFfTrOcGAtW/bD22hXva2Ie17E9bxbEoyjBF2vREpJ
-         YSI8xbTBAN5/X3j+aOM8kRDdTWr58sxwVRw+Spe+ESJHvVKSgr3mlVvKUjQwcUCsqAaU
-         12/+wcONw+UY5GynqS3Ep/PWxCPBOC4REmMAylUIVAz3J4GgpldEY1SXloRsmQb/V4pa
-         ttNtA/cg9yMq+n2f9rThfiBazYpFyaa9PVYuRklWZK9hAoK61HwolGWTHetgyYfa5Wid
-         PC6w==
-X-Gm-Message-State: AOAM531ldexX2Kvw/5xUL71ZWkTQQ6lqbssOapdpCbAWwH4HP64oHbsU
-        hxvpOd/tltuirG+RVNS6SUI0oF2cwL6jAek1AFGNkTc0ZFbE52tTeLXmTLPA8KRqMB/ReCVqT8J
-        J0GiFXH0kJ1V7
-X-Received: by 2002:a05:6402:b31:: with SMTP id bo17mr1648821edb.152.1591779702581;
-        Wed, 10 Jun 2020 02:01:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz2BNd/gj5HBZQx2TQS5oisvaW33lJypi62ctlaKOpi/H0kMIzHWAdg7PKzXycJntBOJZrLPw==
-X-Received: by 2002:a05:6402:b31:: with SMTP id bo17mr1648777edb.152.1591779701875;
-        Wed, 10 Jun 2020 02:01:41 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id j16sm16817793edp.35.2020.06.10.02.01.40
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0H9JvbVSTDy5EkcBxAYDLVdpZdU6drMIY4wiOG5g/Cg=;
+        b=lCELSCm40Xs1u8s0mHs7gqR+jQsbz4dpOgUNIy0PDB9kEVw06Sn5LdhUaoCGXunG9x
+         l8yUzHnujRESnL9sIxzxOhaUlUA4ks2xx3o4aDjmWB+Qp/E5ds0U+8vj3/VN3P/bxaCA
+         57GXW7nea0QDZkl2ks4U/svaoECXyOmxDR2BWCkh+rZYEFMJJpGaBi0tOTbUSRa8WGxA
+         RlRml/f7GCTVVeqEIEKPklqtqKD7v4nOrls+qiFxW4VTuWJ1ymDFt9YXbtiDNNBL8sWt
+         rN988XqISM7rXUW/gjRkOJYnc/GAxBrv5YUaNblx5Hnb87iFgZCuDIVt2wt8JP8NpToB
+         bfDw==
+X-Gm-Message-State: AOAM5317f2hJp9VI62dqFJYSDmtsqPRVh6joO9CN43EWXW1fcfnyIhSC
+        krm2Hy1KpUE/ZVsJ9oi59YmNuAxt9z03XVQpq7topFQ0r/4gq46pHaQi02GwvJtrBURpUXzM9eC
+        dXC1RisAIJW0D
+X-Received: by 2002:adf:f2c2:: with SMTP id d2mr2548441wrp.424.1591781978384;
+        Wed, 10 Jun 2020 02:39:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxymu+fkfSsDo8znawTJ6c4VcvlNi7tdHuvNBBytAhcUZ0W/2OrQ3nbVPMH2Y9nzbPs1nQa3w==
+X-Received: by 2002:adf:f2c2:: with SMTP id d2mr2548422wrp.424.1591781978220;
+        Wed, 10 Jun 2020 02:39:38 -0700 (PDT)
+Received: from redhat.com ([212.92.121.57])
+        by smtp.gmail.com with ESMTPSA id c70sm5964690wme.32.2020.06.10.02.39.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2020 02:01:41 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 05/10] KVM: x86: interrupt based APF 'page ready' event delivery
-In-Reply-To: <dcdda87c-cf2f-da6f-3166-e2d0bfefce06@redhat.com>
-References: <20200525144125.143875-1-vkuznets@redhat.com> <20200525144125.143875-6-vkuznets@redhat.com> <20200609191035.GA223235@redhat.com> <dcdda87c-cf2f-da6f-3166-e2d0bfefce06@redhat.com>
-Date:   Wed, 10 Jun 2020 11:01:39 +0200
-Message-ID: <873673b8gc.fsf@vitty.brq.redhat.com>
+        Wed, 10 Jun 2020 02:39:37 -0700 (PDT)
+Date:   Wed, 10 Jun 2020 05:39:35 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] vhost_vdpa: Fix potential underflow in vhost_vdpa_mmap()
+Message-ID: <20200610053926-mutt-send-email-mst@kernel.org>
+References: <20200610085852.GB5439@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200610085852.GB5439@mwanda>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Wed, Jun 10, 2020 at 11:58:52AM +0300, Dan Carpenter wrote:
+> The "vma->vm_pgoff" variable is an unsigned long so if it's larger than
+> INT_MAX then "index" can be negative leading to an underflow.  Fix this
+> by changing the type of "index" to "unsigned long".
+> 
+> Fixes: ddd89d0a059d ("vhost_vdpa: support doorbell mapping via mmap")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-> On 09/06/20 21:10, Vivek Goyal wrote:
->> Hi Vitaly,
->> 
->> Have a question about page ready events. 
->> 
->> Now we deliver PAGE_NOT_PRESENT page faults only if guest is not in
->> kernel mode. So say kernel tried to access a page and we halted cpu.
->> When page is available, we will inject page_ready interrupt. At
->> that time we don't seem to check whether page_not_present was injected
->> or not. 
->> 
->> IOW, we seem to deliver page_ready irrespective of the fact whether
->> PAGE_NOT_PRESENT was delivered or not. And that means we will be
->> sending page present tokens to guest. Guest will not have a state
->> associated with that token and think that page_not_present has
->> not been delivered yet and allocate an element in hash table for
->> future page_not_present event. And that will lead to memory leak
->> and token conflict etc.
->
-> Yes, and this is https://bugzilla.kernel.org/show_bug.cgi?id=208081
-> which I was looking at right today.
->
+Applied, thanks!
 
-The issue isn't related to the interrupt based APF mechanism, right?
-'Page ready' events are always injected (sooner or later). I'll take a
-look.
-
->> While setting up async pf, should we keep track whether associated
->> page_not_present was delivered to guest or not and deliver page_ready
->> accordingly.
->
-> Yes, I think so.
->
-
-Something like this? (not even compile tested yet):
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 8e8fea13b6c7..68178d29d35c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1661,7 +1661,7 @@ void kvm_make_scan_ioapic_request(struct kvm *kvm);
- void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
- 				       unsigned long *vcpu_bitmap);
- 
--void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
-+bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
- 				     struct kvm_async_pf *work);
- void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
- 				 struct kvm_async_pf *work);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c26dd1363151..e1e840df6b69 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10515,7 +10515,7 @@ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
- 	return kvm_arch_interrupt_allowed(vcpu);
- }
- 
--void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
-+bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
- 				     struct kvm_async_pf *work)
- {
- 	struct x86_exception fault;
-@@ -10532,17 +10532,19 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
- 		fault.address = work->arch.token;
- 		fault.async_page_fault = true;
- 		kvm_inject_page_fault(vcpu, &fault);
--	} else {
--		/*
--		 * It is not possible to deliver a paravirtualized asynchronous
--		 * page fault, but putting the guest in an artificial halt state
--		 * can be beneficial nevertheless: if an interrupt arrives, we
--		 * can deliver it timely and perhaps the guest will schedule
--		 * another process.  When the instruction that triggered a page
--		 * fault is retried, hopefully the page will be ready in the host.
--		 */
--		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
-+		return true;
- 	}
-+
-+	/*
-+	 * It is not possible to deliver a paravirtualized asynchronous
-+	 * page fault, but putting the guest in an artificial halt state
-+	 * can be beneficial nevertheless: if an interrupt arrives, we
-+	 * can deliver it timely and perhaps the guest will schedule
-+	 * another process.  When the instruction that triggered a page
-+	 * fault is retried, hopefully the page will be ready in the host.
-+	 */
-+	kvm_make_request(KVM_REQ_APF_HALT, vcpu);
-+	return false;
- }
- 
- void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
-@@ -10559,7 +10561,8 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
- 		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
- 	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
- 
--	if (kvm_pv_async_pf_enabled(vcpu) &&
-+	if (work->notpresent_injected &&
-+	    kvm_pv_async_pf_enabled(vcpu) &&
- 	    !apf_put_user_ready(vcpu, work->arch.token)) {
- 		vcpu->arch.apf.pageready_pending = true;
- 		kvm_apic_set_irq(vcpu, &irq, NULL);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 802b9e2306f0..2456dc5338f8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -206,6 +206,7 @@ struct kvm_async_pf {
- 	unsigned long addr;
- 	struct kvm_arch_async_pf arch;
- 	bool   wakeup_all;
-+	bool notpresent_injected;
- };
- 
- void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-index f1e07fae84e9..de28413abefd 100644
---- a/virt/kvm/async_pf.c
-+++ b/virt/kvm/async_pf.c
-@@ -189,12 +189,14 @@ int kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		goto retry_sync;
- 
- 	INIT_WORK(&work->work, async_pf_execute);
--	if (!schedule_work(&work->work))
--		goto retry_sync;
- 
- 	list_add_tail(&work->queue, &vcpu->async_pf.queue);
- 	vcpu->async_pf.queued++;
--	kvm_arch_async_page_not_present(vcpu, work);
-+	work->notpresent_injected = kvm_arch_async_page_not_present(vcpu, work);
-+
-+	/* schedule_work() only fails for already queued works */
-+	schedule_work(&work->work);
-+
- 	return 1;
- retry_sync:
- 	kvm_put_kvm(work->vcpu->kvm);
-@@ -216,6 +218,7 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu)
- 		return -ENOMEM;
- 
- 	work->wakeup_all = true;
-+	work->notpresent_injected = true;
- 	INIT_LIST_HEAD(&work->queue); /* for list_del to work */
- 
- 	spin_lock(&vcpu->async_pf.lock);
-
--- 
-Vitaly
+> ---
+>  drivers/vhost/vdpa.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 7580e34f76c10..a54b60d6623f0 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -818,7 +818,7 @@ static int vhost_vdpa_mmap(struct file *file, struct vm_area_struct *vma)
+>  	struct vdpa_device *vdpa = v->vdpa;
+>  	const struct vdpa_config_ops *ops = vdpa->config;
+>  	struct vdpa_notification_area notify;
+> -	int index = vma->vm_pgoff;
+> +	unsigned long index = vma->vm_pgoff;
+>  
+>  	if (vma->vm_end - vma->vm_start != PAGE_SIZE)
+>  		return -EINVAL;
+> -- 
+> 2.26.2
 
