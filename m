@@ -2,149 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D9C41F57CA
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 17:27:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFB951F57CE
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 17:27:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730196AbgFJP1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 11:27:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1578 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726979AbgFJP1K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 11:27:10 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05AF2gsf099987;
-        Wed, 10 Jun 2020 11:27:08 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31k02b592u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Jun 2020 11:27:08 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05AFNV0K053784;
-        Wed, 10 Jun 2020 11:27:08 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31k02b591n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Jun 2020 11:27:07 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05AFLhcv021634;
-        Wed, 10 Jun 2020 15:27:05 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 31g2s7u905-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Jun 2020 15:27:05 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05AFR2pk44171334
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Jun 2020 15:27:02 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8BC6152050;
-        Wed, 10 Jun 2020 15:27:02 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.158.19])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1A9C15204E;
-        Wed, 10 Jun 2020 15:27:02 +0000 (GMT)
-Subject: Re: [PATCH] s390: protvirt: virtio: Refuse device without IOMMU
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-References: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
- <20200610152431.358fded7.cohuck@redhat.com>
- <54b28498-a6a7-4be2-9d2c-aef46c7fc642@linux.ibm.com>
- <20200610165305.1a34c548.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <8b15139d-cd38-0861-1510-9a53530a4637@linux.ibm.com>
-Date:   Wed, 10 Jun 2020 17:27:01 +0200
+        id S1730211AbgFJP12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 11:27:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29890 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730178AbgFJP11 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 11:27:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591802846;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jjvIRHOCxQwRkhqk1V3wNjs78W+1JFnbVDcZpT/Uz1M=;
+        b=HZ8e2nEToP3qFCSHhjqh+G+E5chPfMdcamIB+yxhW2bYgMdWrCFCwiyNpHteoi+urdgkcU
+        e653gDpiQXwSzyBKAPE6faodynn6z8TXDAlujc3g9sft01Obg9TcVsnLJ2lpG8rZ57HaCi
+        aWzDL00CyN8GDF9d3vCsoa1EPGlaIOU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-XzEScm3rPK2fW7Y7Y4v6Og-1; Wed, 10 Jun 2020 11:27:24 -0400
+X-MC-Unique: XzEScm3rPK2fW7Y7Y4v6Og-1
+Received: by mail-wr1-f70.google.com with SMTP id h6so1243311wrx.4
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 08:27:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jjvIRHOCxQwRkhqk1V3wNjs78W+1JFnbVDcZpT/Uz1M=;
+        b=do8kQMNqKa4p/kXEAryIMh/4g5yELdH7Fn2M+Z6BKRHNJ5AfW1sHcGcxOFcT4POPB5
+         bswq3ZhRm5IKsGlvmTN2UxnBE29LgNcz0Z0S3zGyPkeBbT5UIyW3+qCH/sd1XkjsUz3o
+         LKy4bf6oxqXPMOjYjOOit/pce5281HD5ehw1o/5Bmgb7Y2XprGUXRnBsxtLKCeibpDYp
+         jsXY5tp/ZBWMyE/ICtTo92/O6uIy/ilAcTnFA4SXWwUABFYAQOwNjur2KmrcqrYgqJUx
+         l68HmidHmf4trekv3/waJIxjKY4KMU/m1A1rcnDQuERz/9Yj3Lb5jVP93dZDEVJ4I6+W
+         RyPA==
+X-Gm-Message-State: AOAM530CbYq3Fepcc1zlkm8putOfETe0iWY5Y2tigbvfttetKR9hGleW
+        G+/1sc+JCunC4eVcmUu4JBGBafpL+Po9DhWb4SHs6UzoB1mFh2O0Om7OzIyKGzPuNQYktGcm1DQ
+        rT29jJ5Ud4Ky1
+X-Received: by 2002:adf:ab09:: with SMTP id q9mr4235966wrc.79.1591802843364;
+        Wed, 10 Jun 2020 08:27:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzbXFK9zAEzr9CiGFdxkngWHkdza78QVqblrUuo5Ya87D9rMSPYEpvNBknfprfCSRj30DMcMA==
+X-Received: by 2002:adf:ab09:: with SMTP id q9mr4235926wrc.79.1591802843123;
+        Wed, 10 Jun 2020 08:27:23 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.134.4])
+        by smtp.gmail.com with ESMTPSA id f185sm48624wmf.43.2020.06.10.08.27.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jun 2020 08:27:22 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: x86: respect singlestep when emulating
+ instruction
+To:     Felipe Franciosi <felipe@nutanix.com>
+Cc:     kvm@vger.kernel.org, stable@vger.kernel.org
+References: <20200519081048.8204-1-felipe@nutanix.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cfcd5d5f-eb3e-f6ec-2e28-c48750c1d7b5@redhat.com>
+Date:   Wed, 10 Jun 2020 17:27:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200610165305.1a34c548.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200519081048.8204-1-felipe@nutanix.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-10_08:2020-06-10,2020-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- spamscore=0 adultscore=0 priorityscore=1501 impostorscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 suspectscore=2 bulkscore=0
- cotscore=-2147483648 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006100115
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020-06-10 16:53, Cornelia Huck wrote:
-> On Wed, 10 Jun 2020 16:37:55 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 19/05/20 10:11, Felipe Franciosi wrote:
+> When userspace configures KVM_GUESTDBG_SINGLESTEP, KVM will manage the
+> presence of X86_EFLAGS_TF via kvm_set/get_rflags on vcpus. The actual
+> rflag bit is therefore hidden from callers.
 > 
->> On 2020-06-10 15:24, Cornelia Huck wrote:
->>> On Wed, 10 Jun 2020 15:11:51 +0200
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>    
->>>> Protected Virtualisation protects the memory of the guest and
->>>> do not allow a the host to access all of its memory.
->>>>
->>>> Let's refuse a VIRTIO device which does not use IOMMU
->>>> protected access.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> ---
->>>>    drivers/s390/virtio/virtio_ccw.c | 5 +++++
->>>>    1 file changed, 5 insertions(+)
->>>>
->>>> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
->>>> index 5730572b52cd..06ffbc96587a 100644
->>>> --- a/drivers/s390/virtio/virtio_ccw.c
->>>> +++ b/drivers/s390/virtio/virtio_ccw.c
->>>> @@ -986,6 +986,11 @@ static void virtio_ccw_set_status(struct virtio_device *vdev, u8 status)
->>>>    	if (!ccw)
->>>>    		return;
->>>>    
->>>> +	/* Protected Virtualisation guest needs IOMMU */
->>>> +	if (is_prot_virt_guest() &&
->>>> +	    !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
->>>> +			status &= ~VIRTIO_CONFIG_S_FEATURES_OK;
->>>> +
->>>
->>> set_status seems like an odd place to look at features; shouldn't that
->>> rather be done in finalize_features?
->>
->> Right, looks better to me too.
->> What about:
->>
->>
->>
->> diff --git a/drivers/s390/virtio/virtio_ccw.c
->> b/drivers/s390/virtio/virtio_ccw.c
->> index 06ffbc96587a..227676297ea0 100644
->> --- a/drivers/s390/virtio/virtio_ccw.c
->> +++ b/drivers/s390/virtio/virtio_ccw.c
->> @@ -833,6 +833,11 @@ static int virtio_ccw_finalize_features(struct
->> virtio_device *vdev)
->>                   ret = -ENOMEM;
->>                   goto out_free;
->>           }
->> +
->> +       if (is_prot_virt_guest() &&
->> +           !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
+> That includes init_emulate_ctxt() which uses the value returned from
+> kvm_get_flags() to set ctxt->tf. As a result, x86_emulate_instruction()
+> will skip a single step, leaving singlestep_rip stale and not returning
+> to userspace.
 > 
-> Add a comment, and (maybe) a message?
+> This resolves the issue by observing the vcpu guest_debug configuration
+> alongside ctxt->tf in x86_emulate_instruction(), performing the single
+> step if set.
 > 
-> Otherwise, I think this is fine, as it should fail the probe, which is
-> what we want.
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c17e6eb9ad43..64cb183636da 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6919,7 +6919,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  		if (!ctxt->have_exception ||
+>  		    exception_type(ctxt->exception.vector) == EXCPT_TRAP) {
+>  			kvm_rip_write(vcpu, ctxt->eip);
+> -			if (r && ctxt->tf)
+> +			if (r && (ctxt->tf || (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
+>  				r = kvm_vcpu_do_singlestep(vcpu);
+>  			if (kvm_x86_ops.update_emulated_instruction)
+>  				kvm_x86_ops.update_emulated_instruction(vcpu);
+> 
 
-yes right a message is needed.
-and I extend a little the comment I had before.
-thanks
+Queued, thanks.
 
-Regards,
-Pierre
+Paolo
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
