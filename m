@@ -2,190 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F18F81F574A
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 17:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 609D21F5755
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 17:10:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730002AbgFJPIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 11:08:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51225 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729988AbgFJPIM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 11:08:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591801690;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZvS3pY4wDKLBE9EMwiJvGN8pCoUxnpSAds/EiWZ00f4=;
-        b=I0685ZcZf4Fvrvkqw92ZrVz05k9UvhO3LuNQg0Crb4FwgwbArZIF3ydxoCx7xwvp/D6Vx1
-        OUvidjSL2xnOF8962wbYjwSiBJDSm/08UOSFSdlRozPBqIkVL5c615NSNUwUlAiVTinJvn
-        pHs3RdDEVcTBI7ZsSIQSRTX90nY6hHw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-CACsRbEEOme3044r0T4A2w-1; Wed, 10 Jun 2020 11:08:07 -0400
-X-MC-Unique: CACsRbEEOme3044r0T4A2w-1
-Received: by mail-wr1-f72.google.com with SMTP id w4so1209466wrl.13
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 08:08:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ZvS3pY4wDKLBE9EMwiJvGN8pCoUxnpSAds/EiWZ00f4=;
-        b=FGigwPDzJrIxtW+22VF5C2VNe8JXLao3sfWhFxvaAfFWut5eTItEJu1+Ep2LaIq+Xn
-         gfHuInruByXEkquoL5VldbACdd+qW7sq/uu0ULOrVaS6lh6PvEgSncupSq1mbUJkcskR
-         FdUtQaH/J8GdiWPQxBHHRzxKkjQBAGquJoQPBw+Srp8OxZNYKbJzlMCQEE28NIUepW/W
-         qaYXRbFbfKKH3rBpldRWDOxAoOsbxQ1pcshKkKJ/foXaZiPpqMmUsMtrwBNzxnf25sp4
-         xXttECyskImHsZqkcRA0ddaMekuGHp7ZxzS1GogLDVir7Mc9fVlwNk7gCBYyH9NUnVCG
-         i/Uw==
-X-Gm-Message-State: AOAM531xBapK7IQ1qCEDwnB3OL0FE1i6P5sW5+wgmv5fvnXq+XdfP0zs
-        MTQrwWfRZbSIQblefV6dbMoABtW+MenUTSdWHbXSspPxbj3XIH3b/A3I+kXJshSL6mciatRYDCK
-        Yt/VeGseWNuez
-X-Received: by 2002:a05:6000:1104:: with SMTP id z4mr4211607wrw.272.1591801686260;
-        Wed, 10 Jun 2020 08:08:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxSwDALN5Pur0obQjyi2Uc0HobQX48dqJRmEevxPLOFxJwcAkmH8xWT1y5vRmc5DFWcLholqg==
-X-Received: by 2002:a05:6000:1104:: with SMTP id z4mr4211584wrw.272.1591801685999;
-        Wed, 10 Jun 2020 08:08:05 -0700 (PDT)
-Received: from redhat.com ([212.92.121.57])
-        by smtp.gmail.com with ESMTPSA id j4sm42126wma.7.2020.06.10.08.08.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jun 2020 08:08:05 -0700 (PDT)
-Date:   Wed, 10 Jun 2020 11:08:02 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH RFC v7 03/14] vhost: use batched get_vq_desc version
-Message-ID: <20200610105829-mutt-send-email-mst@kernel.org>
-References: <20200610113515.1497099-1-mst@redhat.com>
- <20200610113515.1497099-4-mst@redhat.com>
- <035e82bcf4ade0017641c5b457d0c628c5915732.camel@redhat.com>
+        id S1730015AbgFJPKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 11:10:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22644 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728108AbgFJPKP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 11:10:15 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05AF4Yq2028244;
+        Wed, 10 Jun 2020 11:10:14 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31k02bmb2k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Jun 2020 11:10:14 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05AF4WWQ028178;
+        Wed, 10 Jun 2020 11:10:14 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31k02bmb1k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Jun 2020 11:10:13 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05AF5DSk006958;
+        Wed, 10 Jun 2020 15:10:12 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 31g2s7yx6p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Jun 2020 15:10:12 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05AFAAOD65077410
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 10 Jun 2020 15:10:10 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E06605207A;
+        Wed, 10 Jun 2020 15:10:09 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.158.19])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9D1045204E;
+        Wed, 10 Jun 2020 15:10:09 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v8 09/12] s390x: Library resources for CSS
+ tests
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
+ <1591603981-16879-10-git-send-email-pmorel@linux.ibm.com>
+ <ef5e71b6-9c4d-ac3f-7946-f67db73d740b@redhat.com>
+ <17e5ccdd-f2b2-00bd-4ee2-c0a0b78a669a@linux.ibm.com>
+ <e2b1ac8d-f2cb-d913-a64d-a8237633d804@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <fc730d3f-20b0-37b8-cda9-c738315c4f85@linux.ibm.com>
+Date:   Wed, 10 Jun 2020 17:10:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <e2b1ac8d-f2cb-d913-a64d-a8237633d804@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <035e82bcf4ade0017641c5b457d0c628c5915732.camel@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-10_09:2020-06-10,2020-06-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ malwarescore=0 clxscore=1015 suspectscore=0 cotscore=-2147483648
+ mlxscore=0 mlxlogscore=999 lowpriorityscore=0 spamscore=0 phishscore=0
+ bulkscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006100111
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 10, 2020 at 04:29:29PM +0200, Eugenio P�rez wrote:
-> On Wed, 2020-06-10 at 07:36 -0400, Michael S. Tsirkin wrote:
-> > As testing shows no performance change, switch to that now.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Eugenio P�rez <eperezma@redhat.com>
-> > Link: https://lore.kernel.org/r/20200401183118.8334-3-eperezma@redhat.com
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  drivers/vhost/test.c  |   2 +-
-> >  drivers/vhost/vhost.c | 318 ++++++++----------------------------------
-> >  drivers/vhost/vhost.h |   7 +-
-> >  3 files changed, 65 insertions(+), 262 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-> > index 0466921f4772..7d69778aaa26 100644
-> > --- a/drivers/vhost/test.c
-> > +++ b/drivers/vhost/test.c
-> > @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
-> >  	dev = &n->dev;
-> >  	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
-> >  	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
-> > -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
-> > +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
-> >  		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, true, NULL);
-> >  
-> >  	f->private_data = n;
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 11433d709651..28f324fd77df 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -304,6 +304,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
-> >  {
-> >  	vq->num = 1;
-> >  	vq->ndescs = 0;
-> > +	vq->first_desc = 0;
-> >  	vq->desc = NULL;
-> >  	vq->avail = NULL;
-> >  	vq->used = NULL;
-> > @@ -372,6 +373,11 @@ static int vhost_worker(void *data)
-> >  	return 0;
-> >  }
-> >  
-> > +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
-> > +{
-> > +	return vq->max_descs - UIO_MAXIOV;
-> > +}
-> > +
-> >  static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
-> >  {
-> >  	kfree(vq->descs);
-> > @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
-> >  	for (i = 0; i < dev->nvqs; ++i) {
-> >  		vq = dev->vqs[i];
-> >  		vq->max_descs = dev->iov_limit;
-> > +		if (vhost_vq_num_batch_descs(vq) < 0) {
-> > +			return -EINVAL;
-> > +		}
-> >  		vq->descs = kmalloc_array(vq->max_descs,
-> >  					  sizeof(*vq->descs),
-> >  					  GFP_KERNEL);
-> > @@ -1610,6 +1619,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
-> >  		vq->last_avail_idx = s.num;
-> >  		/* Forget the cached index value. */
-> >  		vq->avail_idx = vq->last_avail_idx;
-> > +		vq->ndescs = vq->first_desc = 0;
-> 
-> This is not needed if it is done in vhost_vq_set_backend, as far as I can tell.
-> 
-> Actually, maybe it is even better to move `vq->avail_idx = vq->last_avail_idx;` line to vhost_vq_set_backend, it is part
-> of the backend "set up" procedure, isn't it?
-> 
-> I tested with virtio_test + batch tests sent in 
-> https://lkml.kernel.org/lkml/20200418102217.32327-1-eperezma@redhat.com/T/.
-
-Ow did I forget to merge them for rc1?  Should I have? Maybe Linus won't
-yell to hard at me if I merge them after rc1.
 
 
-> I append here what I'm proposing in case it is clearer this way.
+On 2020-06-10 16:51, Thomas Huth wrote:
+> On 09/06/2020 17.01, Pierre Morel wrote:
+>>
+>>
+>> On 2020-06-09 09:09, Thomas Huth wrote:
+>>> On 08/06/2020 10.12, Pierre Morel wrote:
+>>>> Provide some definitions and library routines that can be used by
+>>
+>> ...snip...
+>>
+>>>> +static inline int ssch(unsigned long schid, struct orb *addr)
+>>>> +{
+>>>> +    register long long reg1 asm("1") = schid;
+>>>> +    int cc;
+>>>> +
+>>>> +    asm volatile(
+>>>> +        "    ssch    0(%2)\n"
+>>>> +        "    ipm    %0\n"
+>>>> +        "    srl    %0,28\n"
+>>>> +        : "=d" (cc)
+>>>> +        : "d" (reg1), "a" (addr), "m" (*addr)
+>>>
+>>> Hmm... What's the "m" (*addr) here good for? %3 is not used in the
+>>> assembly code?
+>>
+>> addr is %2
+>> "m" (*addr) means memory pointed by addr is read
+>>
+>>>
+>>>> +        : "cc", "memory");
+>>>
+>>> Why "memory" ? Can this instruction also change the orb?
+>>
+>> The orb not but this instruction modifies memory as follow:
+>> orb -> ccw -> data
+>>
+>> The CCW can be a READ or a WRITE instruction and the data my be anywhere
+>> in memory (<2G)
+>>
+>> A compiler memory barrier is need to avoid write instructions started
+>> before the SSCH instruction to occur after for a write
+>> and memory read made after the instruction to be executed before for a
+>> read.
 > 
-> Thanks!
+> Ok, makes sense now, thanks!
 > 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 4d198994e7be..809ad2cd2879 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1617,9 +1617,6 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
->  			break;
->  		}
->  		vq->last_avail_idx = s.num;
-> -		/* Forget the cached index value. */
-> -		vq->avail_idx = vq->last_avail_idx;
-> -		vq->ndescs = vq->first_desc = 0;
->  		break;
->  	case VHOST_GET_VRING_BASE:
->  		s.index = idx;
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index fed36af5c444..f4902dc808e4 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -258,6 +258,7 @@ static inline void vhost_vq_set_backend(struct vhost_virtqueue *vq,
->  					void *private_data)
->  {
->  	vq->private_data = private_data;
-> +	vq->avail_idx = vq->last_avail_idx;
->  	vq->ndescs = 0;
->  	vq->first_desc = 0;
->  }
+>>>> +static inline int msch(unsigned long schid, struct schib *addr)
+>>>> +{
+>>>> +    register unsigned long reg1 asm ("1") = schid;
+>>>> +    int cc;
+>>>> +
+>>>> +    asm volatile(
+>>>> +        "    msch    0(%3)\n"
+>>>> +        "    ipm    %0\n"
+>>>> +        "    srl    %0,28"
+>>>> +        : "=d" (cc), "=m" (*addr)
+>>>> +        : "d" (reg1), "a" (addr)
+>>>
+>>> I'm not an expert with these IO instructions, but this looks wrong to me
+>>> ... Is MSCH reading or writing the SCHIB data?
+>>
+>> MSCH is reading the SCHIB data in memory.
 > 
+> So if it is reading, you don't need the  "=m" (*addr) in the output
+> list, do you? You should rather use "m" (*addr) in the input list instead?
 
-Seems like a nice cleanup, though it's harmless right?
+Yes, absolutely, it should be the oposite of stsch(), not the same!
 
+I change it to:
+
+         asm volatile(
+                 "       msch    0(%3)\n"
+                 "       ipm     %0\n"
+                 "       srl     %0,28"
+                 : "=d" (cc)
+                 : "d" (reg1), "m" (*addr), "a" (addr)
+                 : "cc");
+
+Thanks,
+
+Pierre
+
+> 
+>   Thomas
+> 
 
 -- 
-MST
-
+Pierre Morel
+IBM Lab Boeblingen
