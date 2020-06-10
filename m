@@ -2,195 +2,587 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 959F61F56A5
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 16:13:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C7831F56CD
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 16:29:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729773AbgFJON4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 10:13:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35592 "EHLO
+        id S1729854AbgFJO3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 10:29:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39999 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727022AbgFJONz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 10:13:55 -0400
+        with ESMTP id S1726157AbgFJO3j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 10:29:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591798433;
+        s=mimecast20190719; t=1591799375;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=vQGmaF3kJuwxZRfFPgkkAxZRnaRj43xPvFfzjX5dh88=;
-        b=ad26TQm6n4zvt+IAWJaS9SAU3nRH7LwwiSQmHf6eYDsAcTMZ+axOdVYCm2lu8ykEAny4x7
-        o4OOl7ZkcqujXlFNUtzSAm2iT1a3gCUzbaK+Ilh7xwLg4PMGfiQskAfUfPbDW8+Lk5oKxE
-        1FzW7njivU7Xv3cY41Agn3BGHemgr7o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-1tyO6TELM-2iYkoxtz2SDQ-1; Wed, 10 Jun 2020 10:13:49 -0400
-X-MC-Unique: 1tyO6TELM-2iYkoxtz2SDQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AEA2461;
-        Wed, 10 Jun 2020 14:13:48 +0000 (UTC)
-Received: from [10.36.114.42] (ovpn-114-42.ams2.redhat.com [10.36.114.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C039F5D9E5;
-        Wed, 10 Jun 2020 14:13:39 +0000 (UTC)
-Subject: Re: [PATCH v4 02/21] vfio: Convert to ram_block_discard_disable()
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-References: <20200610115419.51688-1-david@redhat.com>
- <20200610115419.51688-3-david@redhat.com>
- <8c71bfda-e958-56f8-ddaf-6a831fff2bc6@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <56d20632-cab6-5768-ce9f-96f6587e4c2f@redhat.com>
-Date:   Wed, 10 Jun 2020 16:13:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <8c71bfda-e958-56f8-ddaf-6a831fff2bc6@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+         in-reply-to:in-reply-to:references:references;
+        bh=idMIiJOT09bgESC1Xwuj+7K7gWUtR0p+u+13akNztH4=;
+        b=VLu6r4rVkrzYx/h0cNQqAA6Y/zx1w/vOy4kPNzB7LfD6aVStn1B/0MiOmk3cfqIPpqPW/K
+        F0VHMorBZgrWmNUlhIyBNXKjna3V/YsUMWOTUoetFP0iaxTZECl/H4dTlRCWNZMQVe2bvx
+        ud276D9Weu5pFlvKNQV9z2wHYXTcLis=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-ldw9Tb-8PQixyxgEMu-7IQ-1; Wed, 10 Jun 2020 10:29:33 -0400
+X-MC-Unique: ldw9Tb-8PQixyxgEMu-7IQ-1
+Received: by mail-wr1-f71.google.com with SMTP id j16so1143513wre.22
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 07:29:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=idMIiJOT09bgESC1Xwuj+7K7gWUtR0p+u+13akNztH4=;
+        b=PN+peU6RD9oSs93zA7pWdrij7ab7/ggdrXq2fXS9mBypb/IraTKtkhxr1rXdHqw2Dv
+         59A7OTqgJu7i+lEscm6F8Q3UEoycTw/cyQ43GYonhBxRJPaJ6R9dw2CGqDy8fiqI8C6i
+         qbzTQFec7MBKLfY1S7r1+zaEjDwRtc/ENRtplTlkaUhc37Q/Q9p8NtM51m50XxTlrZrL
+         K1re7/qHvzLADhQDF3QuBDX1w45xuZEXKFV9XnEtAM3rvY02yiY6KltUd/uG2oHJ3gPC
+         SUvmm9yh44+OpJ7rMj4qwLFEwgt1tjjYe1Y5IL1M17R70dcCSmW0RDVdJGAsaGuwxU3f
+         r8zg==
+X-Gm-Message-State: AOAM530YF2wbYBtOwpVgcUr/RGB637VgMFqC5njFgBHRY59XD1sT9rQy
+        gfVjh8XneGCOOD0hTwA4KzMr13EEY6n9Ejqr3fWqKzF2KJ3c5q5jooF4BhbTD5tZezRgeqYENzA
+        RDDTLyyDimttX
+X-Received: by 2002:a5d:4a04:: with SMTP id m4mr4427278wrq.153.1591799372334;
+        Wed, 10 Jun 2020 07:29:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxRkqAoACOukf2PaRTB33MsiFGBeXf1uA+2oE+b4+96DsfOKM8DLT/GUf7hpdTX2fy2uK5j6g==
+X-Received: by 2002:a5d:4a04:: with SMTP id m4mr4427241wrq.153.1591799371814;
+        Wed, 10 Jun 2020 07:29:31 -0700 (PDT)
+Received: from eperezma.remote.csb (109.141.78.188.dynamic.jazztel.es. [188.78.141.109])
+        by smtp.gmail.com with ESMTPSA id w17sm8425820wra.71.2020.06.10.07.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jun 2020 07:29:31 -0700 (PDT)
+Message-ID: <035e82bcf4ade0017641c5b457d0c628c5915732.camel@redhat.com>
+Subject: Re: [PATCH RFC v7 03/14] vhost: use batched get_vq_desc version
+From:   Eugenio =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>
+Date:   Wed, 10 Jun 2020 16:29:29 +0200
+In-Reply-To: <20200610113515.1497099-4-mst@redhat.com>
+References: <20200610113515.1497099-1-mst@redhat.com>
+         <20200610113515.1497099-4-mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-6.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10.06.20 15:04, Tony Krowiak wrote:
+On Wed, 2020-06-10 at 07:36 -0400, Michael S. Tsirkin wrote:
+> As testing shows no performance change, switch to that now.
 > 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> Link: https://lore.kernel.org/r/20200401183118.8334-3-eperezma@redhat.com
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/vhost/test.c  |   2 +-
+>  drivers/vhost/vhost.c | 318 ++++++++----------------------------------
+>  drivers/vhost/vhost.h |   7 +-
+>  3 files changed, 65 insertions(+), 262 deletions(-)
 > 
-> On 6/10/20 7:54 AM, David Hildenbrand wrote:
->> VFIO is (except devices without a physical IOMMU or some mediated devices)
->> incompatible with discarding of RAM. The kernel will pin basically all VM
->> memory. Let's convert to ram_block_discard_disable(), which can now
->> fail, in contrast to qemu_balloon_inhibit().
->>
->> Leave "x-balloon-allowed" named as it is for now.
->>
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: Alex Williamson <alex.williamson@redhat.com>
->> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
->> Cc: Halil Pasic <pasic@linux.ibm.com>
->> Cc: Pierre Morel <pmorel@linux.ibm.com>
->> Cc: Eric Farman <farman@linux.ibm.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> See my two minor comments, other than that:
-> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> 
->> ---
->>   hw/vfio/ap.c                  | 10 +++----
->>   hw/vfio/ccw.c                 | 11 ++++----
->>   hw/vfio/common.c              | 53 +++++++++++++++++++----------------
->>   hw/vfio/pci.c                 |  6 ++--
->>   include/hw/vfio/vfio-common.h |  4 +--
->>   5 files changed, 45 insertions(+), 39 deletions(-)
->>
->> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
->> index 95564c17ed..d0b1bc7581 100644
->> --- a/hw/vfio/ap.c
->> +++ b/hw/vfio/ap.c
->> @@ -105,12 +105,12 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
->>       vapdev->vdev.dev = dev;
->>   
->>       /*
->> -     * vfio-ap devices operate in a way compatible with
->> -     * memory ballooning, as no pages are pinned in the host.
->> -     * This needs to be set before vfio_get_device() for vfio common to
->> -     * handle the balloon inhibitor.
->> +     * vfio-ap devices operate in a way compatible discarding of memory in
-> 
-> s/compatible discarding/compatible with discarding/?
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index 0466921f4772..7d69778aaa26 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+>  	dev = &n->dev;
+>  	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+>  	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+> -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
+> +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
+>  		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, true, NULL);
+>  
+>  	f->private_data = n;
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 11433d709651..28f324fd77df 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -304,6 +304,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>  {
+>  	vq->num = 1;
+>  	vq->ndescs = 0;
+> +	vq->first_desc = 0;
+>  	vq->desc = NULL;
+>  	vq->avail = NULL;
+>  	vq->used = NULL;
+> @@ -372,6 +373,11 @@ static int vhost_worker(void *data)
+>  	return 0;
+>  }
+>  
+> +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
+> +{
+> +	return vq->max_descs - UIO_MAXIOV;
+> +}
+> +
+>  static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+>  {
+>  	kfree(vq->descs);
+> @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
+>  	for (i = 0; i < dev->nvqs; ++i) {
+>  		vq = dev->vqs[i];
+>  		vq->max_descs = dev->iov_limit;
+> +		if (vhost_vq_num_batch_descs(vq) < 0) {
+> +			return -EINVAL;
+> +		}
+>  		vq->descs = kmalloc_array(vq->max_descs,
+>  					  sizeof(*vq->descs),
+>  					  GFP_KERNEL);
+> @@ -1610,6 +1619,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
+>  		vq->last_avail_idx = s.num;
+>  		/* Forget the cached index value. */
+>  		vq->avail_idx = vq->last_avail_idx;
+> +		vq->ndescs = vq->first_desc = 0;
 
-Very right!
+This is not needed if it is done in vhost_vq_set_backend, as far as I can tell.
 
-[...]
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 342dd6b912..c33c11b7e4 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -2796,7 +2796,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->>       }
->>   
->>       /*
->> -     * Mediated devices *might* operate compatibly with memory ballooning, but
->> +     * Mediated devices *might* operate compatibly with discarding of RAM, but
->>        * we cannot know for certain, it depends on whether the mdev vendor driver
->>        * stays in sync with the active working set of the guest driver.  Prevent
->>        * the x-balloon-allowed option unless this is minimally an mdev device.
->> @@ -2809,7 +2809,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->>   
->>       trace_vfio_mdev(vdev->vbasedev.name, is_mdev);
->>   
->> -    if (vdev->vbasedev.balloon_allowed && !is_mdev) {
->> +    if (vdev->vbasedev.ram_block_discard_allowed && !is_mdev) {
->>           error_setg(errp, "x-balloon-allowed only potentially compatible "
->>                      "with mdev devices");
-> 
-> Should this error message be changed?
+Actually, maybe it is even better to move `vq->avail_idx = vq->last_avail_idx;` line to vhost_vq_set_backend, it is part
+of the backend "set up" procedure, isn't it?
 
-I didn't rename the property ("x-balloon-allowed"), so the error message
-is still correct.
+I tested with virtio_test + batch tests sent in 
+https://lkml.kernel.org/lkml/20200418102217.32327-1-eperezma@redhat.com/T/.
+I append here what I'm proposing in case it is clearer this way.
 
 Thanks!
 
--- 
-Thanks,
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 4d198994e7be..809ad2cd2879 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -1617,9 +1617,6 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
+ 			break;
+ 		}
+ 		vq->last_avail_idx = s.num;
+-		/* Forget the cached index value. */
+-		vq->avail_idx = vq->last_avail_idx;
+-		vq->ndescs = vq->first_desc = 0;
+ 		break;
+ 	case VHOST_GET_VRING_BASE:
+ 		s.index = idx;
+diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+index fed36af5c444..f4902dc808e4 100644
+--- a/drivers/vhost/vhost.h
++++ b/drivers/vhost/vhost.h
+@@ -258,6 +258,7 @@ static inline void vhost_vq_set_backend(struct vhost_virtqueue *vq,
+ 					void *private_data)
+ {
+ 	vq->private_data = private_data;
++	vq->avail_idx = vq->last_avail_idx;
+ 	vq->ndescs = 0;
+ 	vq->first_desc = 0;
+ }
 
-David / dhildenb
+>  		break;
+>  	case VHOST_GET_VRING_BASE:
+>  		s.index = idx;
+> @@ -2078,253 +2088,6 @@ static unsigned next_desc(struct vhost_virtqueue *vq, struct vring_desc *desc)
+>  	return next;
+>  }
+>  
+> -static int get_indirect(struct vhost_virtqueue *vq,
+> -			struct iovec iov[], unsigned int iov_size,
+> -			unsigned int *out_num, unsigned int *in_num,
+> -			struct vhost_log *log, unsigned int *log_num,
+> -			struct vring_desc *indirect)
+> -{
+> -	struct vring_desc desc;
+> -	unsigned int i = 0, count, found = 0;
+> -	u32 len = vhost32_to_cpu(vq, indirect->len);
+> -	struct iov_iter from;
+> -	int ret, access;
+> -
+> -	/* Sanity check */
+> -	if (unlikely(len % sizeof desc)) {
+> -		vq_err(vq, "Invalid length in indirect descriptor: "
+> -		       "len 0x%llx not multiple of 0x%zx\n",
+> -		       (unsigned long long)len,
+> -		       sizeof desc);
+> -		return -EINVAL;
+> -	}
+> -
+> -	ret = translate_desc(vq, vhost64_to_cpu(vq, indirect->addr), len, vq->indirect,
+> -			     UIO_MAXIOV, VHOST_ACCESS_RO);
+> -	if (unlikely(ret < 0)) {
+> -		if (ret != -EAGAIN)
+> -			vq_err(vq, "Translation failure %d in indirect.\n", ret);
+> -		return ret;
+> -	}
+> -	iov_iter_init(&from, READ, vq->indirect, ret, len);
+> -
+> -	/* We will use the result as an address to read from, so most
+> -	 * architectures only need a compiler barrier here. */
+> -	read_barrier_depends();
+> -
+> -	count = len / sizeof desc;
+> -	/* Buffers are chained via a 16 bit next field, so
+> -	 * we can have at most 2^16 of these. */
+> -	if (unlikely(count > USHRT_MAX + 1)) {
+> -		vq_err(vq, "Indirect buffer length too big: %d\n",
+> -		       indirect->len);
+> -		return -E2BIG;
+> -	}
+> -
+> -	do {
+> -		unsigned iov_count = *in_num + *out_num;
+> -		if (unlikely(++found > count)) {
+> -			vq_err(vq, "Loop detected: last one at %u "
+> -			       "indirect size %u\n",
+> -			       i, count);
+> -			return -EINVAL;
+> -		}
+> -		if (unlikely(!copy_from_iter_full(&desc, sizeof(desc), &from))) {
+> -			vq_err(vq, "Failed indirect descriptor: idx %d, %zx\n",
+> -			       i, (size_t)vhost64_to_cpu(vq, indirect->addr) + i * sizeof desc);
+> -			return -EINVAL;
+> -		}
+> -		if (unlikely(desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_INDIRECT))) {
+> -			vq_err(vq, "Nested indirect descriptor: idx %d, %zx\n",
+> -			       i, (size_t)vhost64_to_cpu(vq, indirect->addr) + i * sizeof desc);
+> -			return -EINVAL;
+> -		}
+> -
+> -		if (desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_WRITE))
+> -			access = VHOST_ACCESS_WO;
+> -		else
+> -			access = VHOST_ACCESS_RO;
+> -
+> -		ret = translate_desc(vq, vhost64_to_cpu(vq, desc.addr),
+> -				     vhost32_to_cpu(vq, desc.len), iov + iov_count,
+> -				     iov_size - iov_count, access);
+> -		if (unlikely(ret < 0)) {
+> -			if (ret != -EAGAIN)
+> -				vq_err(vq, "Translation failure %d indirect idx %d\n",
+> -					ret, i);
+> -			return ret;
+> -		}
+> -		/* If this is an input descriptor, increment that count. */
+> -		if (access == VHOST_ACCESS_WO) {
+> -			*in_num += ret;
+> -			if (unlikely(log && ret)) {
+> -				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
+> -				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
+> -				++*log_num;
+> -			}
+> -		} else {
+> -			/* If it's an output descriptor, they're all supposed
+> -			 * to come before any input descriptors. */
+> -			if (unlikely(*in_num)) {
+> -				vq_err(vq, "Indirect descriptor "
+> -				       "has out after in: idx %d\n", i);
+> -				return -EINVAL;
+> -			}
+> -			*out_num += ret;
+> -		}
+> -	} while ((i = next_desc(vq, &desc)) != -1);
+> -	return 0;
+> -}
+> -
+> -/* This looks in the virtqueue and for the first available buffer, and converts
+> - * it to an iovec for convenient access.  Since descriptors consist of some
+> - * number of output then some number of input descriptors, it's actually two
+> - * iovecs, but we pack them into one and note how many of each there were.
+> - *
+> - * This function returns the descriptor number found, or vq->num (which is
+> - * never a valid descriptor number) if none was found.  A negative code is
+> - * returned on error. */
+> -int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> -		      struct iovec iov[], unsigned int iov_size,
+> -		      unsigned int *out_num, unsigned int *in_num,
+> -		      struct vhost_log *log, unsigned int *log_num)
+> -{
+> -	struct vring_desc desc;
+> -	unsigned int i, head, found = 0;
+> -	u16 last_avail_idx;
+> -	__virtio16 avail_idx;
+> -	__virtio16 ring_head;
+> -	int ret, access;
+> -
+> -	/* Check it isn't doing very strange things with descriptor numbers. */
+> -	last_avail_idx = vq->last_avail_idx;
+> -
+> -	if (vq->avail_idx == vq->last_avail_idx) {
+> -		if (unlikely(vhost_get_avail_idx(vq, &avail_idx))) {
+> -			vq_err(vq, "Failed to access avail idx at %p\n",
+> -				&vq->avail->idx);
+> -			return -EFAULT;
+> -		}
+> -		vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
+> -
+> -		if (unlikely((u16)(vq->avail_idx - last_avail_idx) > vq->num)) {
+> -			vq_err(vq, "Guest moved used index from %u to %u",
+> -				last_avail_idx, vq->avail_idx);
+> -			return -EFAULT;
+> -		}
+> -
+> -		/* If there's nothing new since last we looked, return
+> -		 * invalid.
+> -		 */
+> -		if (vq->avail_idx == last_avail_idx)
+> -			return vq->num;
+> -
+> -		/* Only get avail ring entries after they have been
+> -		 * exposed by guest.
+> -		 */
+> -		smp_rmb();
+> -	}
+> -
+> -	/* Grab the next descriptor number they're advertising, and increment
+> -	 * the index we've seen. */
+> -	if (unlikely(vhost_get_avail_head(vq, &ring_head, last_avail_idx))) {
+> -		vq_err(vq, "Failed to read head: idx %d address %p\n",
+> -		       last_avail_idx,
+> -		       &vq->avail->ring[last_avail_idx % vq->num]);
+> -		return -EFAULT;
+> -	}
+> -
+> -	head = vhost16_to_cpu(vq, ring_head);
+> -
+> -	/* If their number is silly, that's an error. */
+> -	if (unlikely(head >= vq->num)) {
+> -		vq_err(vq, "Guest says index %u > %u is available",
+> -		       head, vq->num);
+> -		return -EINVAL;
+> -	}
+> -
+> -	/* When we start there are none of either input nor output. */
+> -	*out_num = *in_num = 0;
+> -	if (unlikely(log))
+> -		*log_num = 0;
+> -
+> -	i = head;
+> -	do {
+> -		unsigned iov_count = *in_num + *out_num;
+> -		if (unlikely(i >= vq->num)) {
+> -			vq_err(vq, "Desc index is %u > %u, head = %u",
+> -			       i, vq->num, head);
+> -			return -EINVAL;
+> -		}
+> -		if (unlikely(++found > vq->num)) {
+> -			vq_err(vq, "Loop detected: last one at %u "
+> -			       "vq size %u head %u\n",
+> -			       i, vq->num, head);
+> -			return -EINVAL;
+> -		}
+> -		ret = vhost_get_desc(vq, &desc, i);
+> -		if (unlikely(ret)) {
+> -			vq_err(vq, "Failed to get descriptor: idx %d addr %p\n",
+> -			       i, vq->desc + i);
+> -			return -EFAULT;
+> -		}
+> -		if (desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_INDIRECT)) {
+> -			ret = get_indirect(vq, iov, iov_size,
+> -					   out_num, in_num,
+> -					   log, log_num, &desc);
+> -			if (unlikely(ret < 0)) {
+> -				if (ret != -EAGAIN)
+> -					vq_err(vq, "Failure detected "
+> -						"in indirect descriptor at idx %d\n", i);
+> -				return ret;
+> -			}
+> -			continue;
+> -		}
+> -
+> -		if (desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_WRITE))
+> -			access = VHOST_ACCESS_WO;
+> -		else
+> -			access = VHOST_ACCESS_RO;
+> -		ret = translate_desc(vq, vhost64_to_cpu(vq, desc.addr),
+> -				     vhost32_to_cpu(vq, desc.len), iov + iov_count,
+> -				     iov_size - iov_count, access);
+> -		if (unlikely(ret < 0)) {
+> -			if (ret != -EAGAIN)
+> -				vq_err(vq, "Translation failure %d descriptor idx %d\n",
+> -					ret, i);
+> -			return ret;
+> -		}
+> -		if (access == VHOST_ACCESS_WO) {
+> -			/* If this is an input descriptor,
+> -			 * increment that count. */
+> -			*in_num += ret;
+> -			if (unlikely(log && ret)) {
+> -				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
+> -				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
+> -				++*log_num;
+> -			}
+> -		} else {
+> -			/* If it's an output descriptor, they're all supposed
+> -			 * to come before any input descriptors. */
+> -			if (unlikely(*in_num)) {
+> -				vq_err(vq, "Descriptor has out after in: "
+> -				       "idx %d\n", i);
+> -				return -EINVAL;
+> -			}
+> -			*out_num += ret;
+> -		}
+> -	} while ((i = next_desc(vq, &desc)) != -1);
+> -
+> -	/* On success, increment avail index. */
+> -	vq->last_avail_idx++;
+> -
+> -	/* Assume notifications from guest are disabled at this point,
+> -	 * if they aren't we would need to update avail_event index. */
+> -	BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
+> -	return head;
+> -}
+> -EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+> -
+>  static struct vhost_desc *peek_split_desc(struct vhost_virtqueue *vq)
+>  {
+>  	BUG_ON(!vq->ndescs);
+> @@ -2428,7 +2191,7 @@ static int fetch_indirect_descs(struct vhost_virtqueue *vq,
+>  
+>  /* This function returns a value > 0 if a descriptor was found, or 0 if none were found.
+>   * A negative code is returned on error. */
+> -static int fetch_descs(struct vhost_virtqueue *vq)
+> +static int fetch_buf(struct vhost_virtqueue *vq)
+>  {
+>  	unsigned int i, head, found = 0;
+>  	struct vhost_desc *last;
+> @@ -2441,7 +2204,11 @@ static int fetch_descs(struct vhost_virtqueue *vq)
+>  	/* Check it isn't doing very strange things with descriptor numbers. */
+>  	last_avail_idx = vq->last_avail_idx;
+>  
+> -	if (vq->avail_idx == vq->last_avail_idx) {
+> +	if (unlikely(vq->avail_idx == vq->last_avail_idx)) {
+> +		/* If we already have work to do, don't bother re-checking. */
+> +		if (likely(vq->ndescs))
+> +			return 1;
+> +
+>  		if (unlikely(vhost_get_avail_idx(vq, &avail_idx))) {
+>  			vq_err(vq, "Failed to access avail idx at %p\n",
+>  				&vq->avail->idx);
+> @@ -2532,6 +2299,41 @@ static int fetch_descs(struct vhost_virtqueue *vq)
+>  	return 1;
+>  }
+>  
+> +/* This function returns a value > 0 if a descriptor was found, or 0 if none were found.
+> + * A negative code is returned on error. */
+> +static int fetch_descs(struct vhost_virtqueue *vq)
+> +{
+> +	int ret;
+> +
+> +	if (unlikely(vq->first_desc >= vq->ndescs)) {
+> +		vq->first_desc = 0;
+> +		vq->ndescs = 0;
+> +	}
+> +
+> +	if (vq->ndescs)
+> +		return 1;
+> +
+> +	for (ret = 1;
+> +	     ret > 0 && vq->ndescs <= vhost_vq_num_batch_descs(vq);
+> +	     ret = fetch_buf(vq))
+> +		;
+> +
+> +	/* On success we expect some descs */
+> +	BUG_ON(ret > 0 && !vq->ndescs);
+> +	return ret;
+> +}
+> +
+> +/* Reverse the effects of fetch_descs */
+> +static void unfetch_descs(struct vhost_virtqueue *vq)
+> +{
+> +	int i;
+> +
+> +	for (i = vq->first_desc; i < vq->ndescs; ++i)
+> +		if (!(vq->descs[i].flags & VRING_DESC_F_NEXT))
+> +			vq->last_avail_idx -= 1;
+> +	vq->ndescs = 0;
+> +}
+> +
+>  /* This looks in the virtqueue and for the first available buffer, and converts
+>   * it to an iovec for convenient access.  Since descriptors consist of some
+>   * number of output then some number of input descriptors, it's actually two
+> @@ -2540,7 +2342,7 @@ static int fetch_descs(struct vhost_virtqueue *vq)
+>   * This function returns the descriptor number found, or vq->num (which is
+>   * never a valid descriptor number) if none was found.  A negative code is
+>   * returned on error. */
+> -int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
+> +int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+>  		      struct iovec iov[], unsigned int iov_size,
+>  		      unsigned int *out_num, unsigned int *in_num,
+>  		      struct vhost_log *log, unsigned int *log_num)
+> @@ -2549,7 +2351,7 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
+>  	int i;
+>  
+>  	if (ret <= 0)
+> -		goto err_fetch;
+> +		goto err;
+>  
+>  	/* Now convert to IOV */
+>  	/* When we start there are none of either input nor output. */
+> @@ -2557,7 +2359,7 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
+>  	if (unlikely(log))
+>  		*log_num = 0;
+>  
+> -	for (i = 0; i < vq->ndescs; ++i) {
+> +	for (i = vq->first_desc; i < vq->ndescs; ++i) {
+>  		unsigned iov_count = *in_num + *out_num;
+>  		struct vhost_desc *desc = &vq->descs[i];
+>  		int access;
+> @@ -2603,24 +2405,26 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
+>  		}
+>  
+>  		ret = desc->id;
+> +
+> +		if (!(desc->flags & VRING_DESC_F_NEXT))
+> +			break;
+>  	}
+>  
+> -	vq->ndescs = 0;
+> +	vq->first_desc = i + 1;
+>  
+>  	return ret;
+>  
+>  err:
+> -	vhost_discard_vq_desc(vq, 1);
+> -err_fetch:
+> -	vq->ndescs = 0;
+> +	unfetch_descs(vq);
+>  
+>  	return ret ? ret : vq->num;
+>  }
+> -EXPORT_SYMBOL_GPL(vhost_get_vq_desc_batch);
+> +EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+>  
+>  /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
+>  void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
+>  {
+> +	unfetch_descs(vq);
+>  	vq->last_avail_idx -= n;
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index 87089d51490d..fed36af5c444 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -81,6 +81,7 @@ struct vhost_virtqueue {
+>  
+>  	struct vhost_desc *descs;
+>  	int ndescs;
+> +	int first_desc;
+>  	int max_descs;
+>  
+>  	struct file *kick;
+> @@ -189,10 +190,6 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
+>  bool vhost_vq_access_ok(struct vhost_virtqueue *vq);
+>  bool vhost_log_access_ok(struct vhost_dev *);
+>  
+> -int vhost_get_vq_desc_batch(struct vhost_virtqueue *,
+> -		      struct iovec iov[], unsigned int iov_count,
+> -		      unsigned int *out_num, unsigned int *in_num,
+> -		      struct vhost_log *log, unsigned int *log_num);
+>  int vhost_get_vq_desc(struct vhost_virtqueue *,
+>  		      struct iovec iov[], unsigned int iov_count,
+>  		      unsigned int *out_num, unsigned int *in_num,
+> @@ -261,6 +258,8 @@ static inline void vhost_vq_set_backend(struct vhost_virtqueue *vq,
+>  					void *private_data)
+>  {
+>  	vq->private_data = private_data;
+> +	vq->ndescs = 0;
+> +	vq->first_desc = 0;
+>  }
+>  
+>  /**
 
