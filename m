@@ -2,100 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E1591F58E5
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 18:19:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 865651F5943
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 18:41:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728156AbgFJQTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 12:19:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728157AbgFJQTE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 12:19:04 -0400
-Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 070BCC08C5C1
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 09:19:04 -0700 (PDT)
-Received: by mail-oo1-xc44.google.com with SMTP id h7so602767ooc.9
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 09:19:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=c4BI6qJGyzZVThLkKkzXe+RUQAfRoNQO65AznCnGs0c=;
-        b=ZmEUvhL+feLEo/KIN1LNGrPEkcPqaPC1iYCkLfEY6E30tND56twEYrOrCx6RvkVQLS
-         PZl9Utc3sXdl3MqKaChdt+uaOd/26i1I+Zcz/6TIF/y3s/Sgw6f1/stppapGsxYsyv0s
-         QWNVFG+RjbkzzjzP2CgsL7vFA+2BwToBgP7zY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=c4BI6qJGyzZVThLkKkzXe+RUQAfRoNQO65AznCnGs0c=;
-        b=YssZodD84JXNOYj/9AHWREy8YnJqJvXnMRsZzzeQxSLl8XpqUVV1zL5vbZ6fHifAH9
-         p0pXWcDG35C4+gBZ6tbYuY4AV8VqaEocrnRf+5YqnmKvl3aBe1sW1rMDbpMpe4iyrxr6
-         z53YcpmKf/JBFVcJ6fOZTzyAZ1fkOi4dbkTsnB4iQziSUmuBZDQLiIbRCFgwzHSimaPx
-         02j358ecBI85spVl7zEdZJt4JlnWVmPIwvM6D0g1RatQq9y9gzGdWj4oOY14qsg/9fVo
-         YrORNUeJHEqm8mmDAkKxaIJC6wk4vI0Lkw8r2+3oCaeS/2c8AUBSMYM5u5sO0Lz9cFaf
-         rdxA==
-X-Gm-Message-State: AOAM531l2E4i4UvyGTWWD0ouXurXL2gffEx9q/dIyxvZ14VkFoJ1lJuw
-        WIl6JV7pxZqZS4xe5wm0R5PMqg==
-X-Google-Smtp-Source: ABdhPJzkmrZoP749LWM5495c1Z2ZESXA5/2b9BwQ2lcVb97VBEK2JDC3CVDsKFJOhnrWqW4dExCOGA==
-X-Received: by 2002:a4a:c501:: with SMTP id i1mr3105074ooq.65.1591805943124;
-        Wed, 10 Jun 2020 09:19:03 -0700 (PDT)
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id u62sm41305oib.47.2020.06.10.09.19.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2020 09:19:02 -0700 (PDT)
-Subject: Re: [PATCH] kselftest: runner: fix TAP output for skipped tests
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     shuah@kernel.org, linux-kselftest@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20200610154447.15826-1-pbonzini@redhat.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <ac2c1eaa-acd7-7ac6-0666-6e6c0cbd546b@linuxfoundation.org>
-Date:   Wed, 10 Jun 2020 10:19:01 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726307AbgFJQlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 12:41:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40441 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726095AbgFJQlf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 12:41:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591807294;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JjmEXwM2z+xW1VlWIW84dTFtD9mhLZeCe5kD1Da0GoU=;
+        b=PCJVU6gTARkLBeTSc4H1dlsXrEe8I1OsyNWQ+f0JRgADF05R/AOrV30s+f8tqWfz8GRp4B
+        BIyvHG1Zt6zwYikyEYH7Y8paBq5fWi7FNHc6bAApHTMdihDTfDtR4xZTs/xEnAm9OcsJrf
+        /l2qOnfUmJYraU9yLuYaGJTmymfU4VQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-ShVyT7k7OSCrrFC0vmj9gw-1; Wed, 10 Jun 2020 12:41:32 -0400
+X-MC-Unique: ShVyT7k7OSCrrFC0vmj9gw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D24791B2C980;
+        Wed, 10 Jun 2020 16:41:30 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.192.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AC5017C3B9;
+        Wed, 10 Jun 2020 16:41:17 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Marcelo Bandeira Condotta <mcondotta@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: selftests: fix sync_with_host() in smm_test
+Date:   Wed, 10 Jun 2020 18:41:16 +0200
+Message-Id: <20200610164116.770811-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200610154447.15826-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/10/20 9:44 AM, Paolo Bonzini wrote:
-> According to the TAP specification, a skipped test must be marked as "ok"
-> and annotated with the SKIP directive, for example
-> 
->     ok 23 # skip Insufficient flogiston pressure.
->     (https://testanything.org/tap-specification.html)
-> 
-> Fix the runner script to match this.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   tools/testing/selftests/kselftest/runner.sh | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kselftest/runner.sh b/tools/testing/selftests/kselftest/runner.sh
-> index 676b3a8b114d..f4815cbcd60f 100644
-> --- a/tools/testing/selftests/kselftest/runner.sh
-> +++ b/tools/testing/selftests/kselftest/runner.sh
-> @@ -77,7 +77,7 @@ run_one()
->   		echo "ok $test_num $TEST_HDR_MSG") ||
->   		(rc=$?;	\
->   		if [ $rc -eq $skip_rc ]; then	\
-> -			echo "not ok $test_num $TEST_HDR_MSG # SKIP"
-> +			echo "ok $test_num $TEST_HDR_MSG # SKIP"
->   		elif [ $rc -eq $timeout_rc ]; then \
->   			echo "#"
->   			echo "not ok $test_num $TEST_HDR_MSG # TIMEOUT"
-> 
+It was reported that older GCCs compile smm_test in a way that breaks
+it completely:
 
-Thanks. I will pull this in for Linux 5.8-rc2
+  kvm_exit:             reason EXIT_CPUID rip 0x4014db info 0 0
+  func 7ffffffd idx 830 rax 0 rbx 0 rcx 0 rdx 0, cpuid entry not found
+  ...
+  kvm_exit:             reason EXIT_MSR rip 0x40abd9 info 0 0
+  kvm_msr:              msr_read 487 = 0x0 (#GP)
+  ...
 
-thanks,
--- Shuah
+Note, '7ffffffd' was supposed to be '80000001' as we're checking for
+SVM. Dropping '-O2' from compiler flags help. Turns out, asm block in
+sync_with_host() is wrong. We us 'in 0xe, %%al' instruction to sync
+with the host and in 'AL' register we actually pass the parameter
+(stage) but after sync 'AL' gets written to but GCC thinks the value
+is still there and uses it to compute 'EAX' for 'cpuid'.
+
+smm_test can't fully use standard ucall() framework as we need to
+write a very simple SMI handler there. Fix the immediate issue by
+making RAX input/output operand. While on it, make sync_with_host()
+static inline.
+
+Reported-by: Marcelo Bandeira Condotta <mcondotta@redhat.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ tools/testing/selftests/kvm/x86_64/smm_test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
+index 36314152943d..ae39a220609f 100644
+--- a/tools/testing/selftests/kvm/x86_64/smm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
+@@ -47,10 +47,10 @@ uint8_t smi_handler[] = {
+ 	0x0f, 0xaa,           /* rsm */
+ };
+ 
+-void sync_with_host(uint64_t phase)
++static inline void sync_with_host(uint64_t phase)
+ {
+ 	asm volatile("in $" XSTR(SYNC_PORT)", %%al \n"
+-		     : : "a" (phase));
++		     : "+a" (phase));
+ }
+ 
+ void self_smi(void)
+-- 
+2.25.4
+
