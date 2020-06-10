@@ -2,83 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59AED1F5B08
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 20:14:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1773D1F5B19
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 20:24:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728719AbgFJSOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 14:14:54 -0400
-Received: from mga18.intel.com ([134.134.136.126]:41611 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728505AbgFJSOy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 14:14:54 -0400
-IronPort-SDR: e0RDWAiLHQLZ+2cCmEc18+3tUdLt5cE+1ZHa86ZjJRq3oBVPGf5ObY4AX9LSCKsIQ+uqV6oUP9
- 78+ly9UBKb5g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2020 11:14:53 -0700
-IronPort-SDR: VYx3YZq2AsV1y/w9LJ0lJC4l9tlcDIzPcl7g0qx2ku0MqCPCbFKCfOmOtR4i0o94fG2ZmM5CSK
- cJFuaNhkdocA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,496,1583222400"; 
-   d="scan'208";a="447620613"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga005.jf.intel.com with ESMTP; 10 Jun 2020 11:14:53 -0700
-Date:   Wed, 10 Jun 2020 11:14:53 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vivek Goyal <vgoyal@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: async_pf: Cleanup kvm_setup_async_pf()
-Message-ID: <20200610181453.GC18790@linux.intel.com>
-References: <20200610175532.779793-1-vkuznets@redhat.com>
+        id S1728871AbgFJSYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 14:24:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48502 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726268AbgFJSX6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 14:23:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591813437;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OSjai+DFDzFrxMEYWRAg/j6/ardpz/bet/R5ZQH8NOQ=;
+        b=XgR7i3wSIH2LFkWVN7WFk3mWbSWYN0NsvG0v6rfTp+UEtwNFhClpC+taV61lAklx/vr80y
+        KLIzlHRTsjS4hARvnIiVy6Igusvzv+0BpmR5P4j1OUnsJkYV4J0Yt7a/SJRnRru0jYE71d
+        y+VDxSl3hBxXD/4zYy6z74WE956ioFo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-BwL6V9EGO1-IllmDEfpvYw-1; Wed, 10 Jun 2020 14:23:55 -0400
+X-MC-Unique: BwL6V9EGO1-IllmDEfpvYw-1
+Received: by mail-wr1-f72.google.com with SMTP id n6so1436995wrv.6
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 11:23:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OSjai+DFDzFrxMEYWRAg/j6/ardpz/bet/R5ZQH8NOQ=;
+        b=Ad4GJH0p4+OE4Lb5Lf9kicXkUbkzIVO5ujkraBHTKOUTAEdB0pk3qDHF1nimQF8Gof
+         saKXloBuPTwoqWsnsdi12WMuAW41l3U5PzK9nUPd0++s/EqaSRfJUlx5PXJI1BzlN5Gf
+         Pvn9F7aCS15x6d5SQ9Y9l8gqces8PHvkxm9X3Z88OEGjjdgxvsd1lDxIrILmzlrE5jep
+         PnJDr30xc2xPN2kTlHOpX/jTejddIVidmCxGyS6WXjtKWM2lC9VflEsxOGMhf+FZdaEp
+         kIAqXG4hSFIUX6QMbHPqfwg5yvcHzUE3XuQAo2P8sMHT2S22kPS2jnVPzdD4CXWdg1Uh
+         Lbwg==
+X-Gm-Message-State: AOAM532lx9zjyDoWbQBmFOhMY/YtAzkszmxftpQWwFqBln+CM6wlpvnN
+        R9CjuSrC324LmHsHYcy2YCo3b2XoQNl9jtIXzlYNdXf4xCojpvcK8m+wx7LChjd0JFi0PfTaa/g
+        E7JpUnAKnIaUT
+X-Received: by 2002:a5d:6391:: with SMTP id p17mr5459680wru.118.1591813373334;
+        Wed, 10 Jun 2020 11:22:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwL+HRgXUT5dVlw53IXZIty7joPl0qkXidchmFCFVFqHTrz1BuekJ/juSrrBdN78oDX42KGJw==
+X-Received: by 2002:a5d:6391:: with SMTP id p17mr5459653wru.118.1591813373088;
+        Wed, 10 Jun 2020 11:22:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b5a1:606f:4d92:f4e1? ([2001:b07:6468:f312:b5a1:606f:4d92:f4e1])
+        by smtp.gmail.com with ESMTPSA id n23sm593760wmc.21.2020.06.10.11.22.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jun 2020 11:22:52 -0700 (PDT)
+Subject: Re: [PATCH] kselftest: runner: fix TAP output for skipped tests
+To:     "Bird, Tim" <Tim.Bird@sony.com>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "shuah@kernel.org" <shuah@kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+References: <20200610154447.15826-1-pbonzini@redhat.com>
+ <ac2c1eaa-acd7-7ac6-0666-6e6c0cbd546b@linuxfoundation.org>
+ <CY4PR13MB1175A17F29B281642DF05A6DFD830@CY4PR13MB1175.namprd13.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6461f067-0fea-4419-dd56-2661c44a803a@redhat.com>
+Date:   Wed, 10 Jun 2020 20:22:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200610175532.779793-1-vkuznets@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <CY4PR13MB1175A17F29B281642DF05A6DFD830@CY4PR13MB1175.namprd13.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 10, 2020 at 07:55:31PM +0200, Vitaly Kuznetsov wrote:
-> schedule_work() returns 'false' only when the work is already on the queue
-> and this can't happen as kvm_setup_async_pf() always allocates a new one.
-> Also, to avoid potential race, it makes sense to to schedule_work() at the
-> very end after we've added it to the queue.
+On 10/06/20 19:43, Bird, Tim wrote:
+>>>   		(rc=$?;	\
+>>>   		if [ $rc -eq $skip_rc ]; then	\
+>>> -			echo "not ok $test_num $TEST_HDR_MSG # SKIP"
+>>> +			echo "ok $test_num $TEST_HDR_MSG # SKIP"
 > 
-> While on it, do some minor cleanup. gfn_to_pfn_async() mentioned in a
-> comment does not currently exist and, moreover, we can check
-> kvm_is_error_hva() at the very beginning, before we try to allocate work so
-> 'retry_sync' label can go away completely.
+> This is a pretty big change, and might break upstream CIs that have come to
+> rely on kselftest's existing behavior.  I know it's going to break Fuego's parsing
+> of results.
+
+Do you have a pointer to this code?
+
+> kselftest has a few conventions that are different from the TAP spec, 
+> and a few items it does that are extensions to the TAP spec.
+
+Yes, there are extensions to directives are not a problem and parsers
+might raise an error on them.  That can be an issue, but it's a separate
+one (and it's easier to ignore it as long as test pass...).
+
+> IMHO, the TAP spec got this one wrong, but I could be convinced
+> otherwise.
+
+Here the TAP spec says that a skip starts with "ok" and has a "SKIP"
+directive, and anyone can parse it to treat as it as a failure if
+desirable.  But doing something else should be treated simply as a
+violation of the spec, it's not a matter of "right" or "wrong".
+
+So, if you want to use "not ok ... # SKIP", don't call it TAP.
+
+However, I noticed now that there is another instance of "not ok.*SKIP"
+in testing/selftests/kselftest.h (and also one in a comment).  So they
+should all be fixed at the same time, and I'm okay with holding this patch.
+
+Paolo
+
+> But I think we should discuss this among CI users of
+> kselftest before making the change.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  virt/kvm/async_pf.c | 19 ++++++-------------
->  1 file changed, 6 insertions(+), 13 deletions(-)
+> I started work quite a while ago on an effort to document the
+> conventions used by kselftest (particularly where it deviates
+> from the TAP spec),  but never submitted it.
 > 
-> diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-> index f1e07fae84e9..ba080088da76 100644
-> --- a/virt/kvm/async_pf.c
-> +++ b/virt/kvm/async_pf.c
-> @@ -164,7 +164,9 @@ int kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	if (vcpu->async_pf.queued >= ASYNC_PF_PER_VCPU)
->  		return 0;
->  
-> -	/* setup delayed work */
-> +	/* Arch specific code should not do async PF in this case */
-> +	if (unlikely(kvm_is_error_hva(hva)))
+> I'm going to submit what I've got as an RFC now, for discussion,
+> even though it's not finished.  I'll do that in a separate thread.
+> 
+> 
+>>>   		elif [ $rc -eq $timeout_rc ]; then \
+>>>   			echo "#"
+>>>   			echo "not ok $test_num $TEST_HDR_MSG # TIMEOUT"
+>>>
+>>
+>> Thanks. I will pull this in for Linux 5.8-rc2
+> Shuah - can you hold off on this until we discuss it?
+> 
+> Thanks,
+>  -- Tim
+> 
 
-This feels like it should be changed to a WARN_ON_ONCE in a follow-up.
-With the WARN, the comment could probably be dropped.
-
-I'd also be in favor of changing the return type to a boolean.  I think
-you alluded to it earlier, the current semantics are quite confusing as they
-invert the normal "return 0 on success".
-
-For this patch:
-
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
