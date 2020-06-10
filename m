@@ -2,243 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DBF11F534F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 13:34:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9B421F535B
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 13:35:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728556AbgFJLeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 07:34:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42834 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728549AbgFJLeT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 07:34:19 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6B90B20734;
-        Wed, 10 Jun 2020 11:34:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591788858;
-        bh=msEjGp4qDF0WnQuD0W2AqRNSO4fEbHNst04epMYw4SU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PVelB2gG7s+PLGA+OiCsRQrUNglUkbwyybmHuupmwXszMqnXz9rIu+ZMqUnhBJ3gx
-         oF2Q9vwhz2dfvEWPVGhH3fi9IBN9sj/LZINfNY0dz5b1WxM0+kwBr5eEVDjp4xac9Y
-         DXGVDewR2e2QnQmseoZ9EqHrtAp78fsaGdDL4GYQ=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jiyzo-001lrp-UX; Wed, 10 Jun 2020 12:34:17 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Scull <ascull@google.com>, kernel-team@android.com
-Subject: [PATCH v2 4/4] KVM: arm64: Remove host_cpu_context member from vcpu structure
-Date:   Wed, 10 Jun 2020 12:34:06 +0100
-Message-Id: <20200610113406.1493170-5-maz@kernel.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200610113406.1493170-1-maz@kernel.org>
-References: <20200610113406.1493170-1-maz@kernel.org>
+        id S1728560AbgFJLfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 07:35:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41238 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728471AbgFJLfw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 07:35:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591788950;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=K8pYKea34n4xAOJeaGLf5FVVIvqFNqD4hPeT2vvgXYw=;
+        b=QF2OTnz9kxuNasah4u4+KL7oDpaLE1I/forXxt8yF2+vBNNpKWBHG80j0tpIXY1sZpqptQ
+        S5i5fLcweNfEER4kl5D0DL8ts+UN+0HWJLc+zsR5TfFnLo33R9HIQdyZ4PMsoaomRfIyTP
+        Z640UA6RqpCOJbBxRhC8R3RpymGfVmo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-tW4BO7umNFa-hHurk8rvWQ-1; Wed, 10 Jun 2020 07:35:49 -0400
+X-MC-Unique: tW4BO7umNFa-hHurk8rvWQ-1
+Received: by mail-wm1-f69.google.com with SMTP id g84so400295wmf.4
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 04:35:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=K8pYKea34n4xAOJeaGLf5FVVIvqFNqD4hPeT2vvgXYw=;
+        b=MiyK6LNjARTlLIVYy4PmWAEVPCIEJsDRTxRCE/YI9fKwLhOB1x4LJ69a13BhMwNEqN
+         kp2EGmv9aW9fP8dnSYg7SwXZMHkuvkU/XHwwj1X8eA6eq56zshJ3gk+ghWT2XCFnG8qW
+         97j08IXSK8PyUpARVGCdaEV+2KuIRt4ikwv0iEg/Ce1OMi4hnH7DjY/+VUcNcdk4zsoV
+         yrAYNupfZc2Pu4ZZggVrCRgZS/l5cFSeUwSSQ/gj4rHaj5MXGmfePVNApUa2j0Nv9z1F
+         0vpN8yOauvf10iGtmFcCyzwvO26UWyWKYrMWXuQKAMUH0aojtur5T4JtqZgBaMLQM6Tx
+         FlPg==
+X-Gm-Message-State: AOAM532zxWco2hRfo4odhgG3NJyvMcHn2fc+no25Yx0isGUSOG4ckVdr
+        q7YO+8OT7KwNvt/VtNfoEZBXKcEvZSbcy1K+mnusvnsyDmZoVa+MHICJ9hjHyyk2pr5BSptUMKG
+        9Ji488XTrgeIm
+X-Received: by 2002:adf:f251:: with SMTP id b17mr3051843wrp.289.1591788947565;
+        Wed, 10 Jun 2020 04:35:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyWnKuMQXjtn3IeBKm108U4YQm44aJFvUiXB9xS8f3b+y8TTFsSksejlRPFLR+mhd/ngiqchQ==
+X-Received: by 2002:adf:f251:: with SMTP id b17mr3051819wrp.289.1591788947339;
+        Wed, 10 Jun 2020 04:35:47 -0700 (PDT)
+Received: from redhat.com ([212.92.121.57])
+        by smtp.gmail.com with ESMTPSA id e15sm6864302wme.9.2020.06.10.04.35.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jun 2020 04:35:46 -0700 (PDT)
+Date:   Wed, 10 Jun 2020 07:35:44 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        eperezma@redhat.com
+Subject: [PATCH RFC v7 00/14] vhost: ring format independence
+Message-ID: <20200610113515.1497099-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, ascull@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For very long, we have kept this pointer back to the per-cpu
-host state, despite having working per-cpu accessors at EL2
-for some time now.
+This intentionally leaves "fixup" changes separate - hopefully
+that is enough to fix vhost-net crashes reported here,
+but it helps me keep track of what changed.
+I will naturally squash them later when we are done.
 
-Recent investigations have shown that this pointer is easy
-to abuse in preemptible context, which is a sure sign that
-it would better be gone. Not to mention that a per-cpu
-pointer is faster to access at all times.
 
-Reported-by: Andrew Scull <ascull@google.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com
-Reviewed-by: Andrew Scull <ascull@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 3 ---
- arch/arm64/kvm/arm.c              | 3 ---
- arch/arm64/kvm/hyp/debug-sr.c     | 4 ++--
- arch/arm64/kvm/hyp/switch.c       | 6 +++---
- arch/arm64/kvm/hyp/sysreg-sr.c    | 6 ++++--
- arch/arm64/kvm/pmu.c              | 8 ++------
- 6 files changed, 11 insertions(+), 19 deletions(-)
+This adds infrastructure required for supporting
+multiple ring formats.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 59029e90b557..ada1faa92211 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -284,9 +284,6 @@ struct kvm_vcpu_arch {
- 	struct kvm_guest_debug_arch vcpu_debug_state;
- 	struct kvm_guest_debug_arch external_debug_state;
- 
--	/* Pointer to host CPU context */
--	struct kvm_cpu_context *host_cpu_context;
--
- 	struct thread_info *host_thread_info;	/* hyp VA */
- 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 14b747266607..6ddaa23ef346 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -340,10 +340,8 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	int *last_ran;
--	kvm_host_data_t *cpu_data;
- 
- 	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
--	cpu_data = this_cpu_ptr(&kvm_host_data);
- 
- 	/*
- 	 * We might get preempted before the vCPU actually runs, but
-@@ -355,7 +353,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	}
- 
- 	vcpu->cpu = cpu;
--	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
- 
- 	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 0fc9872a1467..e95af204fec7 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -185,7 +185,7 @@ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-@@ -207,7 +207,7 @@ void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d60c2ef0fe8c..1853c1788e0c 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -532,7 +532,7 @@ static bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	    !esr_is_ptrauth_trap(kvm_vcpu_get_hsr(vcpu)))
- 		return false;
- 
--	ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	__ptrauth_save_key(ctxt->sys_regs, APIA);
- 	__ptrauth_save_key(ctxt->sys_regs, APIB);
- 	__ptrauth_save_key(ctxt->sys_regs, APDA);
-@@ -703,7 +703,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt;
- 	u64 exit_code;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-@@ -808,7 +808,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 
- 	vcpu = kern_hyp_va(vcpu);
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 6d2df9fe0b5d..143d7b7358f2 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -265,12 +265,13 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+	struct kvm_cpu_context *host_ctxt;
- 
- 	if (!has_vhe())
- 		return;
- 
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	__sysreg_save_user_state(host_ctxt);
- 
- 	/*
-@@ -301,12 +302,13 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+	struct kvm_cpu_context *host_ctxt;
- 
- 	if (!has_vhe())
- 		return;
- 
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	deactivate_traps_vhe_put();
- 
- 	__sysreg_save_el1_state(guest_ctxt);
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index e71d00bb5271..b5ae3a5d509e 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -163,15 +163,13 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
-  */
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
- 	if (!has_vhe())
- 		return;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
- 
-@@ -184,15 +182,13 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
- 	if (!has_vhe())
- 		return;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
- 
+The idea is as follows: we convert descriptors to an
+independent format first, and process that converting to
+iov later.
+
+Used ring is similar: we fetch into an independent struct first,
+convert that to IOV later.
+
+The point is that we have a tight loop that fetches
+descriptors, which is good for cache utilization.
+This will also allow all kind of batching tricks -
+e.g. it seems possible to keep SMAP disabled while
+we are fetching multiple descriptors.
+
+For used descriptors, this allows keeping track of the buffer length
+without need to rescan IOV.
+
+This seems to perform exactly the same as the original
+code based on a microbenchmark.
+Lightly tested.
+More testing would be very much appreciated.
+
+changes from v6:
+	- fixes some bugs introduced in v6 and v5
+
+changes from v5:
+	- addressed comments by Jason: squashed API changes, fixed up discard
+
+changes from v4:
+	- added used descriptor format independence
+	- addressed comments by jason
+	- fixed a crash detected by the lkp robot.
+
+changes from v3:
+        - fixed error handling in case of indirect descriptors
+        - add BUG_ON to detect buffer overflow in case of bugs
+                in response to comment by Jason Wang
+        - minor code tweaks
+
+Changes from v2:
+	- fixed indirect descriptor batching
+                reported by Jason Wang
+
+Changes from v1:
+	- typo fixes
+
+
+Michael S. Tsirkin (14):
+  vhost: option to fetch descriptors through an independent struct
+  fixup! vhost: option to fetch descriptors through an independent
+    struct
+  vhost: use batched get_vq_desc version
+  vhost/net: pass net specific struct pointer
+  vhost: reorder functions
+  vhost: format-independent API for used buffers
+  fixup! vhost: format-independent API for used buffers
+  fixup! vhost: use batched get_vq_desc version
+  vhost/net: convert to new API: heads->bufs
+  vhost/net: avoid iov length math
+  vhost/test: convert to the buf API
+  vhost/scsi: switch to buf APIs
+  vhost/vsock: switch to the buf API
+  vhost: drop head based APIs
+
+ drivers/vhost/net.c   | 174 +++++++++----------
+ drivers/vhost/scsi.c  |  73 ++++----
+ drivers/vhost/test.c  |  22 +--
+ drivers/vhost/vhost.c | 378 +++++++++++++++++++++++++++---------------
+ drivers/vhost/vhost.h |  44 +++--
+ drivers/vhost/vsock.c |  30 ++--
+ 6 files changed, 439 insertions(+), 282 deletions(-)
+
 -- 
-2.26.2
+MST
 
