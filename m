@@ -2,154 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C76A1F4A35
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 01:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F4A91F4A6C
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 02:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726045AbgFIX41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jun 2020 19:56:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41684 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726035AbgFIX40 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jun 2020 19:56:26 -0400
-Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96577C08C5C4
-        for <kvm@vger.kernel.org>; Tue,  9 Jun 2020 16:56:26 -0700 (PDT)
-Received: by mail-ua1-x943.google.com with SMTP id r9so245070ual.1
-        for <kvm@vger.kernel.org>; Tue, 09 Jun 2020 16:56:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4sxWZx3UI6VKLDq8Qy1UYUg5vtAHPMsTevThfv39TWA=;
-        b=WLpRcLXqwdVOvuMgwWkmR8Gr4lwaHRK/EF6daq2IMeFXYgWSJrphnkQvLEH+41LO0x
-         pBkEeJfVAEq/uryeN4HHM4Hb3NfdIqrrZcULOeMuMtGfZEKTK0JPggE4ybLNYEuiV0pp
-         hiSCdaRlAd+ayR3yLwkLqaPFRVUUau1KjcEyNNFF5lmfQTLhnmvgVGyA1JJV3qaW45Fh
-         jEN3gjAjfZpQCTtGPfowcu+cTV09P9OWMskURcxzz2UEuwU2bgMY7NSPvwSFJYRc6/bv
-         5cAINv0x9snM9p3flSgBPUFTJrC9TtnEnQ07K+dBbcgAeuIsCrM4zFy5fBTuIldM5yBs
-         xNEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4sxWZx3UI6VKLDq8Qy1UYUg5vtAHPMsTevThfv39TWA=;
-        b=OKH6LrI9UtyeS6Sm4hoz/noP2wvArhVnG82VD2o3McgsmjvfUvTYyFtdb/wtezRuGh
-         XlSijntIgXKa4uG10eJnyDWkIVfWMYXYXR27Rrhx2tCWVUdlVaOPqPuYuIJmeDBLIbGu
-         6mKXNS4Md4lMAdr8XMGOP0NSyIFPXBzohjEwNE/RcTh6qUjTkzloB2W7D5nKtJeqj6uj
-         8oNJk/FUma8wW1W79MwdGrNwoBEDSvYENSUSbhgA0x+Frpz6/ha0XlDjDFABSz/HwZB1
-         sjoitpGWj9CrD+ZDQs6cuMKOQ6UC0tQcai2hTXVMQIhH9ud8d1xECTGyAjj0DfojrqtT
-         BUGA==
-X-Gm-Message-State: AOAM533LhSyMxJQEnm+boTzwoSNrE0nigKDzCtJ/otCYTmYP6Z/XszEA
-        xlA/P7ECvkA08sTr8kEzBn7efM9RUhN51X6jx14Pww==
-X-Google-Smtp-Source: ABdhPJyXAGLXljdkHhgQRDD2Vm3KO3b89VigddFLuju4QbS8KbKbayXYphsX76+lBqoc+5yPzGQnUDz7icYaQgNy+rs=
-X-Received: by 2002:ab0:6012:: with SMTP id j18mr679163ual.69.1591746985111;
- Tue, 09 Jun 2020 16:56:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-10-sean.j.christopherson@intel.com>
-In-Reply-To: <20200605213853.14959-10-sean.j.christopherson@intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 9 Jun 2020 16:56:13 -0700
-Message-ID: <CANgfPd_ftZ_fC0EEt=1nOoyc6Yi6Xo3TB4woY=tkHzXbjHk4aA@mail.gmail.com>
-Subject: Re: [PATCH 09/21] KVM: x86/mmu: Separate the memory caches for shadow
- pages and gfn arrays
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
+        id S1726017AbgFJArk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jun 2020 20:47:40 -0400
+Received: from mga05.intel.com ([192.55.52.43]:30853 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725932AbgFJArh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jun 2020 20:47:37 -0400
+IronPort-SDR: qe3auWUc1RH0C0N8i4xQ0zF9HwseXneRt97DpO14F05zgxcKr4DvY1uqV5+6OYO+xOvfctU0yk
+ yF50M750JVVQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2020 17:47:37 -0700
+IronPort-SDR: QHcPfuhEyFKZBZGjv+AHLb7yD2CX3AfJvttvnBGdLUuD6msGHxR475WDT/GQscKUbvJDThKhXl
+ p/p9QbJDCm7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,494,1583222400"; 
+   d="scan'208";a="349688773"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
+  by orsmga001.jf.intel.com with ESMTP; 09 Jun 2020 17:47:29 -0700
+Date:   Tue, 9 Jun 2020 20:37:31 -0400
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "Zeng, Xin" <xin.zeng@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [PATCH v5 0/4] introduction of migration_version attribute for
+ VFIO live migration
+Message-ID: <20200610003731.GA13961@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20200429094844.GE2834@work-vm>
+ <20200430003949.GN12879@joy-OptiPlex-7040>
+ <20200602165527.34137955@x1.home>
+ <20200603031948.GB12300@joy-OptiPlex-7040>
+ <20200602215528.7a1008f0@x1.home>
+ <20200603052443.GC12300@joy-OptiPlex-7040>
+ <20200603102628.017e2896@x1.home>
+ <20200605102224.GB2936@work-vm>
+ <20200605083149.1809e783@x1.home>
+ <20200605143950.GG2897@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200605143950.GG2897@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Use separate caches for allocating shadow pages versus gfn arrays.  This
-> sets the stage for specifying __GFP_ZERO when allocating shadow pages
-> without incurring extra cost for gfn arrays.
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  3 ++-
->  arch/x86/kvm/mmu/mmu.c          | 15 ++++++++++-----
->  2 files changed, 12 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 16347b050754..e7a427547557 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -636,7 +636,8 @@ struct kvm_vcpu_arch {
->         struct kvm_mmu *walk_mmu;
->
->         struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
-> -       struct kvm_mmu_memory_cache mmu_page_cache;
-> +       struct kvm_mmu_memory_cache mmu_shadow_page_cache;
-> +       struct kvm_mmu_memory_cache mmu_gfn_array_cache;
->         struct kvm_mmu_memory_cache mmu_page_header_cache;
->
->         /*
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 451e0365e5dd..d245acece3cd 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1108,8 +1108,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
->                                    1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->         if (r)
->                 return r;
-> -       r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
-> -                                  2 * PT64_ROOT_MAX_LEVEL);
-> +       r = mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> +                                  PT64_ROOT_MAX_LEVEL);
-> +       if (r)
-> +               return r;
-> +       r = mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
-> +                                  PT64_ROOT_MAX_LEVEL);
->         if (r)
->                 return r;
->         return mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
-> @@ -1119,7 +1123,8 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
->  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
->  {
->         mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
-> -       mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-> +       mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
-> +       mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
->         mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
->  }
->
-> @@ -2096,9 +2101,9 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
->         struct kvm_mmu_page *sp;
->
->         sp = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> -       sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-> +       sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
->         if (!direct)
-> -               sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-> +               sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
->         set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
->
->         /*
+On Fri, Jun 05, 2020 at 03:39:50PM +0100, Dr. David Alan Gilbert wrote:
+> > > > I tried to simplify the problem a bit, but we keep going backwards.  If
+> > > > the requirement is that potentially any source device can migrate to any
+> > > > target device and we cannot provide any means other than writing an
+> > > > opaque source string into a version attribute on the target and
+> > > > evaluating the result to determine compatibility, then we're requiring
+> > > > userspace to do an exhaustive search to find a potential match.  That
+> > > > sucks.   
+> > >
+hi Alex and Dave,
+do you think it's good for us to put aside physical devices and mdev aggregation
+for the moment, and use Alex's original idea that
+
++  Userspace should regard two mdev devices compatible when ALL of below
++  conditions are met:
++  (0) The mdev devices are of the same type
++  (1) success when reading from migration_version attribute of one mdev device.
++  (2) success when writing migration_version string of one mdev device to
++  migration_version attribute of the other mdev device.
+
+and what about adding another sysfs attribute for vendors to put
+recommended migration compatible device type. e.g.
+#cat /sys/bus/pci/devices/0000:00:02.0/mdev_supported_types/i915-GVTg_V5_8/migration_compatible_devices
+parent id: 8086 591d
+mdev_type: i915-GVTg_V5_8
+
+vendors are free to define the format and conent of this migration_compatible_devices
+and it's even not to be a full list.
+
+before libvirt or user to do live migration, they have to read and test
+migration_version attributes of src/target devices to check migration compatibility.
+
+Thanks
+Yan
+
+
+> > > Why is the mechanism a 'write and test' why isn't it a 'write and ask'?
+> > > i.e. the destination tells the driver what type it's received from the
+> > > source, and the driver replies with a set of compatible configurations
+> > > (in some preferred order).
+> > 
+> > A 'write and ask' interface would imply some sort of session in order
+> > to not be racy with concurrent users.  More likely this would imply an
+> > ioctl interface, which I don't think we have in sysfs.  Where do we
+> > host this ioctl?
+> 
+> Or one fd?
+>   f=open()
+>   write(f, "The ID I want")
+>   do {
+>      read(f, ...)  -> The IDs we're offering that are compatible
+>   } while (!eof)
+> 
+> > > It's also not clear to me why the name has to be that opaque;
+> > > I agree it's only got to be understood by the driver but that doesn't
+> > > seem to be a reason for the driver to make it purposely obfuscated.
+> > > I wouldn't expect a user to be able to parse it necessarily; but would
+> > > expect something that would be useful for an error message.
+> > 
+> > If the name is not opaque, then we're going to rat hole on the format
+> > and the fields and evolving that format for every feature a vendor
+> > decides they want the user to be able to parse out of the version
+> > string.  Then we require a full specification of the string in order
+> > that it be parsed according to a standard such that we don't break
+> > users inferring features in subtly different ways.
+> > 
+> > This is a lot like the problems with mdev description attributes,
+> > libvirt complains they can't use description because there's no
+> > standard formatting, but even with two vendors describing the same class
+> > of device we don't have an agreed set of things to expose in the
+> > description attribute.  Thanks,
+> 
+> I'm not suggesting anything in anyway machine parsable; just something
+> human readable that you can present in a menu/choice/configuration/error
+> message.  The text would be down to the vendor, and I'd suggest it start
+> with the vendor name just as a disambiguator and to make it obvious when
+> we get it grossly wrong.
+> 
+> Dave
+> 
+> > Alex
 > --
-> 2.26.0
->
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> _______________________________________________
+> intel-gvt-dev mailing list
+> intel-gvt-dev@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
