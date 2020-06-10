@@ -2,134 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B335B1F5A41
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 19:24:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 920661F5ABE
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 19:43:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726365AbgFJRYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 13:24:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58204 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726254AbgFJRYp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 13:24:45 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05AH2Gtq033508;
-        Wed, 10 Jun 2020 13:24:42 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31k27rbjxs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Jun 2020 13:24:42 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05AH2jKw035604;
-        Wed, 10 Jun 2020 13:24:41 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31k27rbjx7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Jun 2020 13:24:41 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05AHFAom030282;
-        Wed, 10 Jun 2020 17:24:39 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 31g2s803xt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Jun 2020 17:24:39 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05AHObp435389646
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Jun 2020 17:24:37 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 01B4CA4064;
-        Wed, 10 Jun 2020 17:24:37 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C160A405B;
-        Wed, 10 Jun 2020 17:24:36 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.127.50])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 10 Jun 2020 17:24:36 +0000 (GMT)
-Date:   Wed, 10 Jun 2020 19:24:22 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, mst@redhat.com, jasowang@redhat.com,
-        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] s390: protvirt: virtio: Refuse device without IOMMU
-Message-ID: <20200610192422.1cefb642.pasic@linux.ibm.com>
-In-Reply-To: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
-References: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1726842AbgFJRnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 13:43:33 -0400
+Received: from mail-eopbgr760124.outbound.protection.outlook.com ([40.107.76.124]:6022
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726462AbgFJRnd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 13:43:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e9GLaYxU81Hmo+jXnyZTgQjIzlf4HLZ6j7utuWoMA+PlCYajOo6a/UemZLBTXn9aMlAugsOYWyjzOCVe83Um8z/LQhTAm08qLzSjjRPoZV++uIdIF0Hj0hPCq6PXlcpMGVuxV/IC2ozktVmHn/LStctfcddl28rw0MCi6cuTX2G9SaYsdbDAnp0HV1pxwOOuj3VI4RhHaTvqE/+MjgJz2NypgB+HykU8v+2lExPBR7E8EOg39VmF0i6zOKQ+zDtiiYKiAMqB9K1Maypaxt7euYmXj4fJMKyGr2vx4Gti88DOqT+YCFg5pGXukgv6SEHJgP6yFzcba7XFIvS0EheC5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8XDaFYLNrjC+/O9+tidBH1zZi8YzYHptc58LfSNFNP8=;
+ b=nvDSrT64Ogyq5qAwz6mav40w0Nv9940IjOI66MjENJcVU+LNVyaJl7IuMHBuGWMeKNiYeVrP8rkSZys4+vQGex4EFROgP8g+xyXfQet+MT4Sc0naqq9fZ22AwfSvfUa9XeKbAU2D+fp67Edr7emPNTKFLs7KXSHQQp/Qn4FeV03o5OAewwMFZQh8PH3krRVTLMoEIjpn+6v0aOooUwbAY7mClT2HIGwA3bQqWdSD5kCUNQfGJdR6r4ycs82WxcJ5oQnL7uLvuF3ta737GF8UsKIQFm7w1G/vqLYb4ao0Ekj9xfD96feB7KWlWkbdeQrfK3ZX5QXxKXSkvDbZdYFxUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=sony.com; dmarc=pass action=none header.from=sony.com;
+ dkim=pass header.d=sony.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Sony.onmicrosoft.com;
+ s=selector2-Sony-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8XDaFYLNrjC+/O9+tidBH1zZi8YzYHptc58LfSNFNP8=;
+ b=rg5U2kqIE8mO8SmTV+5d11WJ74im2H7rRfKTJmgiZ4Yp1HQb+TYmQrIOFSAiKVfsf6OUznwJgi/e9ckwvtu4RHDVAxsF8WkTnXkxG3eNhazmxgiQsSgRbndUjc+7SrYxJ/iaWaoaN0twc9QIlikj/bz0lfzFT3hOKr+AAlX+BiI=
+Received: from CY4PR13MB1175.namprd13.prod.outlook.com (2603:10b6:903:40::23)
+ by CY4PR1301MB2104.namprd13.prod.outlook.com (2603:10b6:910:45::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.13; Wed, 10 Jun
+ 2020 17:43:27 +0000
+Received: from CY4PR13MB1175.namprd13.prod.outlook.com
+ ([fe80::e486:a4f:7430:536e]) by CY4PR13MB1175.namprd13.prod.outlook.com
+ ([fe80::e486:a4f:7430:536e%9]) with mapi id 15.20.3088.018; Wed, 10 Jun 2020
+ 17:43:27 +0000
+From:   "Bird, Tim" <Tim.Bird@sony.com>
+To:     Shuah Khan <skhan@linuxfoundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "shuah@kernel.org" <shuah@kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: RE: [PATCH] kselftest: runner: fix TAP output for skipped tests
+Thread-Topic: [PATCH] kselftest: runner: fix TAP output for skipped tests
+Thread-Index: AQHWPz4jOoN+nSyJY0qUhBN3V+N4d6jSBzeAgAAVxfA=
+Date:   Wed, 10 Jun 2020 17:43:27 +0000
+Message-ID: <CY4PR13MB1175A17F29B281642DF05A6DFD830@CY4PR13MB1175.namprd13.prod.outlook.com>
+References: <20200610154447.15826-1-pbonzini@redhat.com>
+ <ac2c1eaa-acd7-7ac6-0666-6e6c0cbd546b@linuxfoundation.org>
+In-Reply-To: <ac2c1eaa-acd7-7ac6-0666-6e6c0cbd546b@linuxfoundation.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: linuxfoundation.org; dkim=none (message not signed)
+ header.d=none;linuxfoundation.org; dmarc=none action=none
+ header.from=sony.com;
+x-originating-ip: [160.33.195.21]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 91188255-4df4-44bb-6c19-08d80d65c859
+x-ms-traffictypediagnostic: CY4PR1301MB2104:
+x-microsoft-antispam-prvs: <CY4PR1301MB21048ABF95B9480C0BE1A791FD830@CY4PR1301MB2104.namprd13.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0430FA5CB7
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5JGs9nXuulsXSjjerSMa/AeeqQFF+BLhprbvM+cHyk4+lRx/6dxglK+JraqbPlYVlcDwFeVYYRdcx3X0i0non0alvxcWaNbCuTv1pUcfmHPMbeJyJ1RDuGbyA17ex0gsITRmwhbqL9GJtR7ezfDN6q5thNoS9cJ10m8bkvhRDxYyPBnNVGbeSJOst+VcJtFdWpXtHUVNeXXQtI9J0JZ4TD4TZPs/QzsaR6kJLkTCmrQofNM64BQw0YxF9/Us5Ia6ZDniteu4rDhGqnH4GqYBN6zAla9G9Yv96rw4lpifWE65sSUDHFhyBekEWq4a0cMqLDTQePyEq0QVbkQFZOTpVLMleHvqlM61ZKUk8SRN3ZwpESquoHHxZWdIPlJ2GqkzF4fuZhE6RE4Y/QkIptulEQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR13MB1175.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(136003)(376002)(366004)(396003)(39860400002)(478600001)(8936002)(71200400001)(86362001)(54906003)(2906002)(76116006)(66556008)(66476007)(66446008)(66946007)(33656002)(316002)(64756008)(55016002)(7696005)(4326008)(8676002)(9686003)(6506007)(53546011)(186003)(110136005)(26005)(5660300002)(83380400001)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: JAumHO2E277lc4HGA4YB9cQUDhqwk/PtGIMSYmEDoeSkpdCCoEfy/jvhs88sz7pm6qld1ZpFuAmXD7VO3bQN/NQMXLofUY3ZXdQcQKMFoJhvamfnaP5FIs5TX/6eBeXmlREZFFeHjsWiI3ay5KMBophzcg77rLL5/8G7SVNqDUL1hhzKyCh1YTTKQmHCR419p3sXL/Av78nd5QVT+NxKm0hbNm3H76/n6rqYvLfUI8oCndBv2nz+433IWxfy2a9H81PlfU7Q7qe8Mg6t2uWvb6UYMkNuPXrffL1RIMD/zDRFLzGEApMVAG65g/FDsK61S6zc7e7yHQlUELkt0mZxsizzID39h/HeQGkvqTsp/RstCtZs/GBhMxHoBwhKQKZ0+lunAJN2K78eauoPVz2KMjam/CpEJJC8tQpo9LXTNTO+GOUZkVA2VihLCbOc2f0xdYSXHddzr0ZBhyclLd8lRWC4ynuHDTZyrYKgx4UF+BM=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-10_10:2020-06-10,2020-06-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- suspectscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
- adultscore=0 clxscore=1011 bulkscore=0 mlxlogscore=999 malwarescore=0
- impostorscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006100126
+X-OriginatorOrg: sony.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91188255-4df4-44bb-6c19-08d80d65c859
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2020 17:43:27.6157
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 66c65d8a-9158-4521-a2d8-664963db48e4
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WbXMJNH9i6tWLDHD3jYbUhyCVJLeKup6R3gzjcsXAmw5BqynFijImGu6TZ0MA5zmJ416YQiXNeXa5lf25ca8Qw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1301MB2104
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Jun 2020 15:11:51 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> Protected Virtualisation protects the memory of the guest and
-> do not allow a the host to access all of its memory.
-> 
-> Let's refuse a VIRTIO device which does not use IOMMU
-> protected access.
-> 
-
-Should we ever get a virtio-ccw device implemented in hardware, we could
-in theory have a trusted device, i.e. one that is not affected by the
-memory protection.
-
-IMHO this restriction applies to paravitualized devices, that is devices
-realized by the hypervisor. In that sense this is not about ccw, but
-could in the future affect PCI as well. Thus the transport code may not
-be the best place to fence this, but frankly looking at how the QEMU
-discussion is going (the one where I try to prevent this condition) I
-would be glad to have something like this as a safety net.
-
-I would however like the commit message to reflect what is written above.
-
-Do we need backports (and cc-stable) for this? Connie what do you think?
-
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  drivers/s390/virtio/virtio_ccw.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 5730572b52cd..06ffbc96587a 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -986,6 +986,11 @@ static void virtio_ccw_set_status(struct virtio_device *vdev, u8 status)
->  	if (!ccw)
->  		return;
->  
-> +	/* Protected Virtualisation guest needs IOMMU */
-> +	if (is_prot_virt_guest() &&
-> +	    !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
-
-If you were to add && !__virtio_test_bit(vdev, VIRTIO_F_ORDER_PLATFORM)
-we could confine this check and the bail out to paravirtualized devices,
-because a device realized in HW is expected to give us both
-F_ACCESS_PLATFORM and F_ORDER_PLATFORM. I would not bet it will
-ever matter for virtio-ccw though.
-
-Connie, do you have an opinion on this?
-
-Regards,
-Halil
-
-> +			status &= ~VIRTIO_CONFIG_S_FEATURES_OK;
-> +
->  	/* Write the status to the host. */
->  	vcdev->dma_area->status = status;
->  	ccw->cmd_code = CCW_CMD_WRITE_STATUS;
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgta3NlbGZ0ZXN0
+LW93bmVyQHZnZXIua2VybmVsLm9yZyA8bGludXgta3NlbGZ0ZXN0LW93bmVyQHZnZXIua2VybmVs
+Lm9yZz4gT24gQmVoYWxmIE9mIFNodWFoIEtoYW4NCj4gDQo+IE9uIDYvMTAvMjAgOTo0NCBBTSwg
+UGFvbG8gQm9uemluaSB3cm90ZToNCj4gPiBBY2NvcmRpbmcgdG8gdGhlIFRBUCBzcGVjaWZpY2F0
+aW9uLCBhIHNraXBwZWQgdGVzdCBtdXN0IGJlIG1hcmtlZCBhcyAib2siDQo+ID4gYW5kIGFubm90
+YXRlZCB3aXRoIHRoZSBTS0lQIGRpcmVjdGl2ZSwgZm9yIGV4YW1wbGUNCj4gPg0KPiA+ICAgICBv
+ayAyMyAjIHNraXAgSW5zdWZmaWNpZW50IGZsb2dpc3RvbiBwcmVzc3VyZS4NCj4gPiAgICAgKGh0
+dHBzOi8vdGVzdGFueXRoaW5nLm9yZy90YXAtc3BlY2lmaWNhdGlvbi5odG1sKQ0KPiA+DQo+ID4g
+Rml4IHRoZSBydW5uZXIgc2NyaXB0IHRvIG1hdGNoIHRoaXMuDQo+ID4NCj4gPiBTaWduZWQtb2Zm
+LWJ5OiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiA+IC0tLQ0KPiA+ICAg
+dG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3NlbGZ0ZXN0L3J1bm5lci5zaCB8IDIgKy0NCj4gPiAg
+IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiA+DQo+ID4g
+ZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2tzZWxmdGVzdC9ydW5uZXIuc2gg
+Yi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rc2VsZnRlc3QvcnVubmVyLnNoDQo+ID4gaW5kZXgg
+Njc2YjNhOGIxMTRkLi5mNDgxNWNiY2Q2MGYgMTAwNjQ0DQo+ID4gLS0tIGEvdG9vbHMvdGVzdGlu
+Zy9zZWxmdGVzdHMva3NlbGZ0ZXN0L3J1bm5lci5zaA0KPiA+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcv
+c2VsZnRlc3RzL2tzZWxmdGVzdC9ydW5uZXIuc2gNCj4gPiBAQCAtNzcsNyArNzcsNyBAQCBydW5f
+b25lKCkNCj4gPiAgIAkJZWNobyAib2sgJHRlc3RfbnVtICRURVNUX0hEUl9NU0ciKSB8fA0KPiA+
+ICAgCQkocmM9JD87CVwNCj4gPiAgIAkJaWYgWyAkcmMgLWVxICRza2lwX3JjIF07IHRoZW4JXA0K
+PiA+IC0JCQllY2hvICJub3Qgb2sgJHRlc3RfbnVtICRURVNUX0hEUl9NU0cgIyBTS0lQIg0KPiA+
+ICsJCQllY2hvICJvayAkdGVzdF9udW0gJFRFU1RfSERSX01TRyAjIFNLSVAiDQoNClRoaXMgaXMg
+YSBwcmV0dHkgYmlnIGNoYW5nZSwgYW5kIG1pZ2h0IGJyZWFrIHVwc3RyZWFtIENJcyB0aGF0IGhh
+dmUgY29tZSB0bw0KcmVseSBvbiBrc2VsZnRlc3QncyBleGlzdGluZyBiZWhhdmlvci4gIEkga25v
+dyBpdCdzIGdvaW5nIHRvIGJyZWFrIEZ1ZWdvJ3MgcGFyc2luZw0Kb2YgcmVzdWx0cy4NCg0Ka3Nl
+bGZ0ZXN0IGhhcyBhIGZldyBjb252ZW50aW9ucyB0aGF0IGFyZSBkaWZmZXJlbnQgZnJvbSB0aGUg
+VEFQIHNwZWMsIA0KYW5kIGEgZmV3IGl0ZW1zIGl0IGRvZXMgdGhhdCBhcmUgZXh0ZW5zaW9ucyB0
+byB0aGUgVEFQIHNwZWMuDQpJTUhPLCB0aGUgVEFQIHNwZWMgZ290IHRoaXMgb25lIHdyb25nLCBi
+dXQgSSBjb3VsZCBiZSBjb252aW5jZWQNCm90aGVyd2lzZS4gIEJ1dCBJIHRoaW5rIHdlIHNob3Vs
+ZCBkaXNjdXNzIHRoaXMgYW1vbmcgQ0kgdXNlcnMgb2YNCmtzZWxmdGVzdCBiZWZvcmUgbWFraW5n
+IHRoZSBjaGFuZ2UuDQoNCkkgc3RhcnRlZCB3b3JrIHF1aXRlIGEgd2hpbGUgYWdvIG9uIGFuIGVm
+Zm9ydCB0byBkb2N1bWVudCB0aGUNCmNvbnZlbnRpb25zIHVzZWQgYnkga3NlbGZ0ZXN0IChwYXJ0
+aWN1bGFybHkgd2hlcmUgaXQgZGV2aWF0ZXMNCmZyb20gdGhlIFRBUCBzcGVjKSwgIGJ1dCBuZXZl
+ciBzdWJtaXR0ZWQgaXQuDQoNCkknbSBnb2luZyB0byBzdWJtaXQgd2hhdCBJJ3ZlIGdvdCBhcyBh
+biBSRkMgbm93LCBmb3IgZGlzY3Vzc2lvbiwNCmV2ZW4gdGhvdWdoIGl0J3Mgbm90IGZpbmlzaGVk
+LiAgSSdsbCBkbyB0aGF0IGluIGEgc2VwYXJhdGUgdGhyZWFkLg0KDQoNCj4gPiAgIAkJZWxpZiBb
+ICRyYyAtZXEgJHRpbWVvdXRfcmMgXTsgdGhlbiBcDQo+ID4gICAJCQllY2hvICIjIg0KPiA+ICAg
+CQkJZWNobyAibm90IG9rICR0ZXN0X251bSAkVEVTVF9IRFJfTVNHICMgVElNRU9VVCINCj4gPg0K
+PiANCj4gVGhhbmtzLiBJIHdpbGwgcHVsbCB0aGlzIGluIGZvciBMaW51eCA1LjgtcmMyDQpTaHVh
+aCAtIGNhbiB5b3UgaG9sZCBvZmYgb24gdGhpcyB1bnRpbCB3ZSBkaXNjdXNzIGl0Pw0KDQpUaGFu
+a3MsDQogLS0gVGltDQoNCg==
