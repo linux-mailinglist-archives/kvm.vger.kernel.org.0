@@ -2,127 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A5C41F5705
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 16:51:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8707C1F5710
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 16:53:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726959AbgFJOvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 10:51:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36882 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726956AbgFJOvV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 10:51:21 -0400
+        id S1729944AbgFJOxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 10:53:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41682 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726943AbgFJOxt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 10:53:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591800679;
+        s=mimecast20190719; t=1591800827;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=+d0A5D+aKHEy2W2BDMM73/2+Xy0Uv8ukd3DyCU4S0cg=;
-        b=fVrJK5XxYOWTwnfTVzBSwEhyzNCB2XfUYaafu+zC8U4OJdRwbjvYKFhpv9ocxwbPYmZ+YX
-        C2zVABl9HMBpsQWCFCbP72kiUHD/CK3PIK9XplKBBQGHq6PakkoF60xGMAvRGFe8p0K6LQ
-        O3XuzOGPnHvhpgQ8cxVm0L+AS3vhhKI=
+         in-reply-to:in-reply-to:references:references;
+        bh=SEnQxAW9uQsVBSiEtzbPpC8TpA8ftH1ryZnX+gay5Vs=;
+        b=dWGo7jdKPxNgXqOC/KoZA8U0EwMl9Rb2u4454KYEt3PF9HRD9REPq+IHIZFNDHZ/qa1qIV
+        Pc2oOJ7dIYVMU9eZPzQHl1AWaZ8Jm/KFpO7cXD7ogPyPJgMatPJDTuq4/EcvtPf6KHINS4
+        L4Skcaohvv3w76rQFjdQ8qVWMA7+1bI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-RIPUKyfbPRK2W7TuduoTSQ-1; Wed, 10 Jun 2020 10:51:17 -0400
-X-MC-Unique: RIPUKyfbPRK2W7TuduoTSQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-249-flirENk-PkmWukFoCP548w-1; Wed, 10 Jun 2020 10:53:43 -0400
+X-MC-Unique: flirENk-PkmWukFoCP548w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCCA8100AA22;
-        Wed, 10 Jun 2020 14:51:16 +0000 (UTC)
-Received: from thuth.remote.csb (unknown [10.40.192.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F0AD5D9D7;
-        Wed, 10 Jun 2020 14:51:12 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v8 09/12] s390x: Library resources for CSS
- tests
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
- <1591603981-16879-10-git-send-email-pmorel@linux.ibm.com>
- <ef5e71b6-9c4d-ac3f-7946-f67db73d740b@redhat.com>
- <17e5ccdd-f2b2-00bd-4ee2-c0a0b78a669a@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e2b1ac8d-f2cb-d913-a64d-a8237633d804@redhat.com>
-Date:   Wed, 10 Jun 2020 16:51:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79F9318A4176;
+        Wed, 10 Jun 2020 14:53:10 +0000 (UTC)
+Received: from gondolin (ovpn-112-196.ams2.redhat.com [10.36.112.196])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6CFB75C296;
+        Wed, 10 Jun 2020 14:53:08 +0000 (UTC)
+Date:   Wed, 10 Jun 2020 16:53:05 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH] s390: protvirt: virtio: Refuse device without IOMMU
+Message-ID: <20200610165305.1a34c548.cohuck@redhat.com>
+In-Reply-To: <54b28498-a6a7-4be2-9d2c-aef46c7fc642@linux.ibm.com>
+References: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
+        <20200610152431.358fded7.cohuck@redhat.com>
+        <54b28498-a6a7-4be2-9d2c-aef46c7fc642@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <17e5ccdd-f2b2-00bd-4ee2-c0a0b78a669a@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/06/2020 17.01, Pierre Morel wrote:
-> 
-> 
-> On 2020-06-09 09:09, Thomas Huth wrote:
->> On 08/06/2020 10.12, Pierre Morel wrote:
->>> Provide some definitions and library routines that can be used by
-> 
-> ...snip...
-> 
->>> +static inline int ssch(unsigned long schid, struct orb *addr)
->>> +{
->>> +    register long long reg1 asm("1") = schid;
->>> +    int cc;
->>> +
->>> +    asm volatile(
->>> +        "    ssch    0(%2)\n"
->>> +        "    ipm    %0\n"
->>> +        "    srl    %0,28\n"
->>> +        : "=d" (cc)
->>> +        : "d" (reg1), "a" (addr), "m" (*addr)
->>
->> Hmm... What's the "m" (*addr) here good for? %3 is not used in the
->> assembly code?
-> 
-> addr is %2
-> "m" (*addr) means memory pointed by addr is read
-> 
->>
->>> +        : "cc", "memory");
->>
->> Why "memory" ? Can this instruction also change the orb?
-> 
-> The orb not but this instruction modifies memory as follow:
-> orb -> ccw -> data
-> 
-> The CCW can be a READ or a WRITE instruction and the data my be anywhere
-> in memory (<2G)
-> 
-> A compiler memory barrier is need to avoid write instructions started
-> before the SSCH instruction to occur after for a write
-> and memory read made after the instruction to be executed before for a
-> read.
+On Wed, 10 Jun 2020 16:37:55 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-Ok, makes sense now, thanks!
-
->>> +static inline int msch(unsigned long schid, struct schib *addr)
->>> +{
->>> +    register unsigned long reg1 asm ("1") = schid;
->>> +    int cc;
->>> +
->>> +    asm volatile(
->>> +        "    msch    0(%3)\n"
->>> +        "    ipm    %0\n"
->>> +        "    srl    %0,28"
->>> +        : "=d" (cc), "=m" (*addr)
->>> +        : "d" (reg1), "a" (addr)
->>
->> I'm not an expert with these IO instructions, but this looks wrong to me
->> ... Is MSCH reading or writing the SCHIB data?
+> On 2020-06-10 15:24, Cornelia Huck wrote:
+> > On Wed, 10 Jun 2020 15:11:51 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >   
+> >> Protected Virtualisation protects the memory of the guest and
+> >> do not allow a the host to access all of its memory.
+> >>
+> >> Let's refuse a VIRTIO device which does not use IOMMU
+> >> protected access.
+> >>
+> >> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> >> ---
+> >>   drivers/s390/virtio/virtio_ccw.c | 5 +++++
+> >>   1 file changed, 5 insertions(+)
+> >>
+> >> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> >> index 5730572b52cd..06ffbc96587a 100644
+> >> --- a/drivers/s390/virtio/virtio_ccw.c
+> >> +++ b/drivers/s390/virtio/virtio_ccw.c
+> >> @@ -986,6 +986,11 @@ static void virtio_ccw_set_status(struct virtio_device *vdev, u8 status)
+> >>   	if (!ccw)
+> >>   		return;
+> >>   
+> >> +	/* Protected Virtualisation guest needs IOMMU */
+> >> +	if (is_prot_virt_guest() &&
+> >> +	    !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
+> >> +			status &= ~VIRTIO_CONFIG_S_FEATURES_OK;
+> >> +  
+> > 
+> > set_status seems like an odd place to look at features; shouldn't that
+> > rather be done in finalize_features?  
 > 
-> MSCH is reading the SCHIB data in memory.
+> Right, looks better to me too.
+> What about:
+> 
+> 
+> 
+> diff --git a/drivers/s390/virtio/virtio_ccw.c 
+> b/drivers/s390/virtio/virtio_ccw.c
+> index 06ffbc96587a..227676297ea0 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -833,6 +833,11 @@ static int virtio_ccw_finalize_features(struct 
+> virtio_device *vdev)
+>                  ret = -ENOMEM;
+>                  goto out_free;
+>          }
+> +
+> +       if (is_prot_virt_guest() &&
+> +           !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
 
-So if it is reading, you don't need the  "=m" (*addr) in the output
-list, do you? You should rather use "m" (*addr) in the input list instead?
+Add a comment, and (maybe) a message?
 
- Thomas
+Otherwise, I think this is fine, as it should fail the probe, which is
+what we want.
+
+> +               return -EIO;
+> +
+>          /* Give virtio_ring a chance to accept features. */
+>          vring_transport_features(vdev);
+> 
+> 
+> 
+> Thanks,
+> 
+> Regards,
+> Pierre
+> 
 
