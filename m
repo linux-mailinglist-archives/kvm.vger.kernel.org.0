@@ -2,235 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 521E11F5BB7
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 21:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB8B51F5BFA
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 21:32:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728247AbgFJTCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 15:02:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49430 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726759AbgFJTCG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 15:02:06 -0400
-Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84412C03E96F
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 12:02:06 -0700 (PDT)
-Received: by mail-vs1-xe44.google.com with SMTP id d21so1900583vsh.12
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 12:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XkZ55trzaUYm4ZN8iiWbYVBM5yaqKCA9LC0xYy1/Ppg=;
-        b=j77jjoo7BrC8ciPGZh5G4XNFx0e/IBM+vJQKsFXGHoq2TXyMMOLL5IFSAOeVWYXIHX
-         UUepAz4IhQ0AlzlRyIrLJDLHLN+OtKh3UbUcbB2FA8h2jPk0dBpfyHtdvHuw98gIMd/S
-         XJqRGYa0RiMBLTj/KghRH1rEWrRVKCG5FkNT65MrWebia3qbZLyzgCVQzSovmX+pk/QO
-         YLuGZoIPx1vpd9s1OPQZGxAui+c216eaaqJjwovF8i+u2NRGk6b5wFirQho+mZYNHiCo
-         M4pT5y57eyroD64Cjkknjiy2l/c1llHRr6NKOVDCNXHHADTAr3hlsVP2nooHvKJ0+0Qv
-         boAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XkZ55trzaUYm4ZN8iiWbYVBM5yaqKCA9LC0xYy1/Ppg=;
-        b=J2My0xgeDckaN0gzo7OW2BbtF80ikG3frglv78C9ULT9GGYlNH8+0OIQrOQXQhOFkT
-         uDJv8bqhkDob6jiDmlaz6hLYDytF5l9iTGzAL/YtmC65SwnKL+dn508xsPdqPrSAVmg4
-         vT36RN6uu4MQNg25J2Z2Fs24CkXE/hplcZbi5F46bSm5GwD4JE697BG3oXHmiwoUGX9f
-         1rQNyNliDOEwVu9Kn+d4Hli/kGOMBKidtlx7qc577IYjDEuo+OwLNYopG0wajJrb01Go
-         rjKJXapnRpIT3hJUwjvn30+dcO8fdo/P0a9MZlpCMDW4H1RFosm4sHz5JUtXzzkWGU52
-         C5tw==
-X-Gm-Message-State: AOAM532+hlOgSSBvZrzG8aj8x7+At8ONiZP4jn/QoZr74gaGnDapBqbv
-        MpoRF9zqRDchrn5e9tDyfsDHaQKErB9+caQxZeEsJw==
-X-Google-Smtp-Source: ABdhPJw1h1etsAjqik8ZjlfcXh6LoIcFUCUxEYjPHBc2XH6MGt7HC0fZP7/Ar9KFOlcDw0D5NiX7gZFNtlTQQHnm/A4=
-X-Received: by 2002:a67:af10:: with SMTP id v16mr4200556vsl.235.1591815725256;
- Wed, 10 Jun 2020 12:02:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-15-sean.j.christopherson@intel.com>
-In-Reply-To: <20200605213853.14959-15-sean.j.christopherson@intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 10 Jun 2020 12:01:54 -0700
-Message-ID: <CANgfPd_v31zC5-mKsT14hd7W=X2Pvg3RBPjn2d4tFSChdbsr3A@mail.gmail.com>
-Subject: Re: [PATCH 14/21] KVM: Move x86's version of struct
- kvm_mmu_memory_cache to common code
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S1730178AbgFJTcW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 15:32:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37917 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726806AbgFJTcW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 15:32:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591817540;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TXEO0NMuFamvlSFmJYPE6uLqbht0lTepf382LStAP+k=;
+        b=Exn7GRPaMLh6Mi3j0QwtjgO2xOu0/BE+bG5Hf6IWp06ccsiJFnd6nM+1+u6soT5RRZLflb
+        tKPIzmssHZ5rogwpdC9fiwFRBQo0SuP0dZ9Zop6/ZRrF14WFi36S8OHgY8NaBVuFtZj/Kd
+        EslBfwJ5LIQcqbP0DwRZgdE/TkKWC+c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421--wPs3G4uPouBF9N71rymCw-1; Wed, 10 Jun 2020 15:32:15 -0400
+X-MC-Unique: -wPs3G4uPouBF9N71rymCw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E45C8018AB;
+        Wed, 10 Jun 2020 19:32:13 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-64.rdu2.redhat.com [10.10.115.64])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 492365D9D7;
+        Wed, 10 Jun 2020 19:32:12 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id C5A582205BD; Wed, 10 Jun 2020 15:32:11 -0400 (EDT)
+Date:   Wed, 10 Jun 2020 15:32:11 -0400
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: async_pf: Inject 'page ready' event only if
+ 'page not present' was previously injected
+Message-ID: <20200610193211.GB243520@redhat.com>
+References: <20200610175532.779793-1-vkuznets@redhat.com>
+ <20200610175532.779793-2-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200610175532.779793-2-vkuznets@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Move x86's 'struct kvm_mmu_memory_cache' to common code in anticipation
-> of moving the entire x86 implementation code to common KVM and reusing
-> it for arm64 and MIPS.  Add a new architecture specific asm/kvm_types.h
-> to control the existence and parameters of the struct.  The new header
-> is needed to avoid a chicken-and-egg problem with asm/kvm_host.h as all
-> architectures define instances of the struct in their vCPU structs.
->
-> Suggested-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
+On Wed, Jun 10, 2020 at 07:55:32PM +0200, Vitaly Kuznetsov wrote:
+> 'Page not present' event may or may not get injected depending on
+> guest's state. If the event wasn't injected, there is no need to
+> inject the corresponding 'page ready' event as the guest may get
+> confused. E.g. Linux thinks that the corresponding 'page not present'
+> event wasn't delivered *yet* and allocates a 'dummy entry' for it.
+> This entry is never freed.
+> 
+> Note, 'wakeup all' events have no corresponding 'page not present'
+> event and always get injected.
+> 
+> s390 seems to always be able to inject 'page not present', the
+> change is effectively a nop.
+> 
+> Suggested-by: Vivek Goyal <vgoyal@redhat.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  arch/arm64/include/asm/kvm_types.h   |  6 ++++++
->  arch/mips/include/asm/kvm_types.h    |  5 +++++
->  arch/powerpc/include/asm/kvm_types.h |  5 +++++
->  arch/s390/include/asm/kvm_types.h    |  5 +++++
->  arch/x86/include/asm/kvm_host.h      | 13 -------------
->  arch/x86/include/asm/kvm_types.h     |  7 +++++++
->  include/linux/kvm_types.h            | 19 +++++++++++++++++++
->  7 files changed, 47 insertions(+), 13 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_types.h
->  create mode 100644 arch/mips/include/asm/kvm_types.h
->  create mode 100644 arch/powerpc/include/asm/kvm_types.h
->  create mode 100644 arch/s390/include/asm/kvm_types.h
->  create mode 100644 arch/x86/include/asm/kvm_types.h
->
-> diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
-> new file mode 100644
-> index 000000000000..d0987007d581
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_types.h
-> @@ -0,0 +1,6 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_ARM64_KVM_TYPES_H
-> +#define _ASM_ARM64_KVM_TYPES_H
+>  arch/s390/include/asm/kvm_host.h | 2 +-
+>  arch/s390/kvm/kvm-s390.c         | 4 +++-
+>  arch/x86/include/asm/kvm_host.h  | 2 +-
+>  arch/x86/kvm/x86.c               | 7 +++++--
+>  include/linux/kvm_host.h         | 1 +
+>  virt/kvm/async_pf.c              | 2 +-
+>  6 files changed, 12 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 3d554887794e..cee3cb6455a2 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -978,7 +978,7 @@ bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
+>  void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
+>  			       struct kvm_async_pf *work);
+>  
+> -void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+> +bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  				     struct kvm_async_pf *work);
+
+Hi Vitaly,
+
+A minor nit. Using return code to figure out if exception was injected
+or not is little odd. How about we pass a pointer instead as parameter
+and kvm_arch_async_page_not_present() sets it to true if page not
+present exception was injected. This probably will be easier to
+read.
+
+If for some reason you don't like above, atleats it warrants a comment
+explaining what do 0 and 1 mean.
+
+Otherwise both the patches look good to me. I tested and I can confirm
+that now page ready events are not being delivered to guest if page
+not present was not injected.
+
+Thanks
+Vivek
+
+>  
+>  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 06bde4bad205..33fea4488ef3 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3923,11 +3923,13 @@ static void __kvm_inject_pfault_token(struct kvm_vcpu *vcpu, bool start_token,
+>  	}
+>  }
+>  
+> -void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+> +bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  				     struct kvm_async_pf *work)
+>  {
+>  	trace_kvm_s390_pfault_init(vcpu, work->arch.pfault_token);
+>  	__kvm_inject_pfault_token(vcpu, true, work->arch.pfault_token);
 > +
-> +#endif /* _ASM_ARM64_KVM_TYPES_H */
-> +
-> diff --git a/arch/mips/include/asm/kvm_types.h b/arch/mips/include/asm/kvm_types.h
-> new file mode 100644
-> index 000000000000..5efeb32a5926
-> --- /dev/null
-> +++ b/arch/mips/include/asm/kvm_types.h
-> @@ -0,0 +1,5 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_MIPS_KVM_TYPES_H
-> +#define _ASM_MIPS_KVM_TYPES_H
-> +
-> +#endif /* _ASM_MIPS_KVM_TYPES_H */
-> diff --git a/arch/powerpc/include/asm/kvm_types.h b/arch/powerpc/include/asm/kvm_types.h
-> new file mode 100644
-> index 000000000000..f627eceaa314
-> --- /dev/null
-> +++ b/arch/powerpc/include/asm/kvm_types.h
-> @@ -0,0 +1,5 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_POWERPC_KVM_TYPES_H
-> +#define _ASM_POWERPC_KVM_TYPES_H
-> +
-> +#endif /* _ASM_POWERPC_KVM_TYPES_H */
-> diff --git a/arch/s390/include/asm/kvm_types.h b/arch/s390/include/asm/kvm_types.h
-> new file mode 100644
-> index 000000000000..b66a81f8a354
-> --- /dev/null
-> +++ b/arch/s390/include/asm/kvm_types.h
-> @@ -0,0 +1,5 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_S390_KVM_TYPES_H
-> +#define _ASM_S390_KVM_TYPES_H
-> +
-> +#endif /* _ASM_S390_KVM_TYPES_H */
+> +	return true;
+>  }
+>  
+>  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
 > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index fb99e6776e27..8e8fea13b6c7 100644
+> index 6e03c021956a..f54e7499fc6a 100644
 > --- a/arch/x86/include/asm/kvm_host.h
 > +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -193,8 +193,6 @@ struct x86_exception;
->  enum x86_intercept;
->  enum x86_intercept_stage;
->
-> -#define KVM_NR_MEM_OBJS 40
-> -
->  #define KVM_NR_DB_REGS 4
->
->  #define DR6_BD         (1 << 13)
-> @@ -245,17 +243,6 @@ enum x86_intercept_stage;
->
->  struct kvm_kernel_irq_routing_entry;
->
-> -/*
-> - * We don't want allocation failures within the mmu code, so we preallocate
-> - * enough memory for a single page fault in a cache.
-> - */
-> -struct kvm_mmu_memory_cache {
-> -       int nobjs;
-> -       gfp_t gfp_zero;
-> -       struct kmem_cache *kmem_cache;
-> -       void *objects[KVM_NR_MEM_OBJS];
-> -};
-> -
->  /*
->   * the pages used as guest page table on soft mmu are tracked by
->   * kvm_memory_slot.arch.gfn_track which is 16 bits, so the role bits used
-> diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
-> new file mode 100644
-> index 000000000000..08f1b57d3b62
-> --- /dev/null
-> +++ b/arch/x86/include/asm/kvm_types.h
-> @@ -0,0 +1,7 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_X86_KVM_TYPES_H
-> +#define _ASM_X86_KVM_TYPES_H
-> +
-> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-> +
-> +#endif /* _ASM_X86_KVM_TYPES_H */
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index 68e84cf42a3f..a7580f69dda0 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -20,6 +20,8 @@ enum kvm_mr_change;
->
->  #include <linux/types.h>
->
-> +#include <asm/kvm_types.h>
-> +
->  /*
->   * Address types:
->   *
-> @@ -58,4 +60,21 @@ struct gfn_to_pfn_cache {
->         bool dirty;
+> @@ -1660,7 +1660,7 @@ void kvm_make_scan_ioapic_request(struct kvm *kvm);
+>  void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
+>  				       unsigned long *vcpu_bitmap);
+>  
+> -void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+> +bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  				     struct kvm_async_pf *work);
+>  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+>  				 struct kvm_async_pf *work);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 13d0b0fa1a7c..75e4c68e9586 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10513,7 +10513,7 @@ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+>  	return kvm_arch_interrupt_allowed(vcpu);
+>  }
+>  
+> -void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+> +bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  				     struct kvm_async_pf *work)
+>  {
+>  	struct x86_exception fault;
+> @@ -10530,6 +10530,7 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  		fault.address = work->arch.token;
+>  		fault.async_page_fault = true;
+>  		kvm_inject_page_fault(vcpu, &fault);
+> +		return true;
+>  	} else {
+>  		/*
+>  		 * It is not possible to deliver a paravirtualized asynchronous
+> @@ -10540,6 +10541,7 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  		 * fault is retried, hopefully the page will be ready in the host.
+>  		 */
+>  		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+> +		return false;
+>  	}
+>  }
+>  
+> @@ -10557,7 +10559,8 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+>  		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
+>  	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
+>  
+> -	if (kvm_pv_async_pf_enabled(vcpu) &&
+> +	if ((work->wakeup_all || work->notpresent_injected) &&
+> +	    kvm_pv_async_pf_enabled(vcpu) &&
+>  	    !apf_put_user_ready(vcpu, work->arch.token)) {
+>  		vcpu->arch.apf.pageready_pending = true;
+>  		kvm_apic_set_irq(vcpu, &irq, NULL);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 802b9e2306f0..2456dc5338f8 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -206,6 +206,7 @@ struct kvm_async_pf {
+>  	unsigned long addr;
+>  	struct kvm_arch_async_pf arch;
+>  	bool   wakeup_all;
+> +	bool notpresent_injected;
 >  };
->
-> +#ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> +/*
-> + * Memory caches are used to preallocate memory ahead of various MMU flows,
-> + * e.g. page fault handlers.  Gracefully handling allocation failures deep in
-> + * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
-> + * holding MMU locks.  Note, these caches act more like prefetch buffers than
-> + * classical caches, i.e. objects are not returned to the cache on being freed.
-> + */
-> +struct kvm_mmu_memory_cache {
-> +       int nobjs;
-> +       gfp_t gfp_zero;
-> +       struct kmem_cache *kmem_cache;
-> +       void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
-> +};
-> +#endif
-> +
-> +
->  #endif /* __KVM_TYPES_H__ */
-> --
-> 2.26.0
->
+>  
+>  void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+> index ba080088da76..a36828fbf40a 100644
+> --- a/virt/kvm/async_pf.c
+> +++ b/virt/kvm/async_pf.c
+> @@ -189,7 +189,7 @@ int kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  
+>  	list_add_tail(&work->queue, &vcpu->async_pf.queue);
+>  	vcpu->async_pf.queued++;
+> -	kvm_arch_async_page_not_present(vcpu, work);
+> +	work->notpresent_injected = kvm_arch_async_page_not_present(vcpu, work);
+>  
+>  	schedule_work(&work->work);
+>  
+> -- 
+> 2.25.4
+> 
+
