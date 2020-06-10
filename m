@@ -2,208 +2,641 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A2491F53FC
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 13:56:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1498F1F5501
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 14:38:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728902AbgFJL4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 07:56:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22393 "EHLO
+        id S1729068AbgFJMif (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 08:38:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45613 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728893AbgFJL4O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 07:56:14 -0400
+        with ESMTP id S1728965AbgFJMid (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 08:38:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591790172;
+        s=mimecast20190719; t=1591792709;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OMm4of9YaGzegN5bSIFM+q+axawQAsBn39Dg4QO3Ssc=;
-        b=Vc6+AD0AMdlrA2DwSOk6vaiZ0+BJ6swksuGsbIOqkd6I740uCsYXTe0H7sDHnrO+YSkvWN
-        no/gsWZqJcHaAQn8aRi545YN4YcQZkCKnYjESCn63h+kR3c3eLW2zdicsA/4ZG67kuGqsG
-        NhGY5FhwoaXtVPLzsZjXPBEbAeie1cU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-iZtHDbZuMtaMTb9TjcRE4w-1; Wed, 10 Jun 2020 07:56:10 -0400
-X-MC-Unique: iZtHDbZuMtaMTb9TjcRE4w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 607EF1B18BC2;
-        Wed, 10 Jun 2020 11:56:08 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-114-42.ams2.redhat.com [10.36.114.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 188245D9D3;
-        Wed, 10 Jun 2020 11:55:59 +0000 (UTC)
-From:   David Hildenbrand <david@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        "qemu-arm @ nongnu . org" <qemu-arm@nongnu.org>
-Subject: [PATCH v4 21/21] numa: Auto-enable NUMA when any memory devices are possible
-Date:   Wed, 10 Jun 2020 13:54:19 +0200
-Message-Id: <20200610115419.51688-22-david@redhat.com>
-In-Reply-To: <20200610115419.51688-1-david@redhat.com>
-References: <20200610115419.51688-1-david@redhat.com>
+        bh=JvnBRX3u3bOKGa/2B5UvmFGwfWvOzR1TmjfeojRzTAo=;
+        b=LUQB+9Ec+B9LoMSDABB7wSFPNU2Pp00nhxdvtYsXXwZJ8lYNIjd8skRJwlrNQJNCsKKXOQ
+        47/SkdqUlqGwg1DoL9MY9aLEAkvW0fiybVXbawEve8iWRyb/jG0NKBkRcpTpVeski0N9xi
+        SNy5vWON//0Q2iC8rKxvggjBCv99bqo=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-imAPHSHWPf655NuB9geGPg-1; Wed, 10 Jun 2020 08:38:28 -0400
+X-MC-Unique: imAPHSHWPf655NuB9geGPg-1
+Received: by mail-qv1-f71.google.com with SMTP id w12so1668736qvh.13
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 05:38:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JvnBRX3u3bOKGa/2B5UvmFGwfWvOzR1TmjfeojRzTAo=;
+        b=mDWupu5QgTTbpBeo0Em/wAfiVHEb19MP0UE8An5tU73wQ1FSvrAV5LV8pSZUN+C9TN
+         wKxrjWT8PUiAA0oXAixZ763zMEcxCr7kMiLeZW/HLdiPncppxA8bFBxiuq/z+q6Fi1dj
+         PH9dRaB+yvbAfcoEooJYqceDcGFrkyjC9PBbK9f1Z6JMNAqNpJI7q1/m76YsbAaZH9jL
+         mSiHqKDujN0evzJ08stbq2+etFFbMf/sCNHZyZOVjxc+bYCKhQ3yNygRMK7ZH1F8vTK+
+         DaDKkbXbs86AkkkLPyktlif1Rk8QqxtXL+mNaAV3CbBLw4fTFtztNQGvmjxW8xUwsW9t
+         310Q==
+X-Gm-Message-State: AOAM532SW1IxPhNZA4uOd02M7S8h6lnXF9w5Up5ignibtiFLew/dgIHP
+        pR6UpNAU9JXW0GawgA1zCJlkFcc5myq+170ENGlT535zhN25YUnT0fCSNjvvQNWJwmnHboTeh6B
+        iwdETP8nhSZuyTZVZhwSDwiQ8w8kz
+X-Received: by 2002:ac8:312e:: with SMTP id g43mr2935616qtb.308.1591792707257;
+        Wed, 10 Jun 2020 05:38:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxapkAD/+woNve9hlswSBQOwr++naOpPTJ/NR9JBQGzQkFk1WCri4pL4WWH2ES6tR1CEtkwZVtRUUQhukKdvxU=
+X-Received: by 2002:ac8:312e:: with SMTP id g43mr2935573qtb.308.1591792706771;
+ Wed, 10 Jun 2020 05:38:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20200610113515.1497099-1-mst@redhat.com> <20200610113515.1497099-4-mst@redhat.com>
+In-Reply-To: <20200610113515.1497099-4-mst@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 10 Jun 2020 14:37:50 +0200
+Message-ID: <CAJaqyWdGKh5gSTndGuVPyJSgt3jfjfW4xNCrJ2tQ9f+mD8=sMQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 03/14] vhost: use batched get_vq_desc version
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's auto-enable it also when maxmem is specified but no slots are
-defined. This will result in us properly creating ACPI srat tables,
-indicating the maximum possible PFN to the guest OS. Based on this, e.g.,
-Linux will enable the swiotlb properly.
+On Wed, Jun 10, 2020 at 1:36 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> As testing shows no performance change, switch to that now.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> Link: https://lore.kernel.org/r/20200401183118.8334-3-eperezma@redhat.com
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/vhost/test.c  |   2 +-
+>  drivers/vhost/vhost.c | 318 ++++++++----------------------------------
+>  drivers/vhost/vhost.h |   7 +-
+>  3 files changed, 65 insertions(+), 262 deletions(-)
+>
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index 0466921f4772..7d69778aaa26 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struc=
+t file *f)
+>         dev =3D &n->dev;
+>         vqs[VHOST_TEST_VQ] =3D &n->vqs[VHOST_TEST_VQ];
+>         n->vqs[VHOST_TEST_VQ].handle_kick =3D handle_vq_kick;
+> -       vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
+> +       vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
+>                        VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, true, NU=
+LL);
+>
+>         f->private_data =3D n;
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 11433d709651..28f324fd77df 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -304,6 +304,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>  {
+>         vq->num =3D 1;
+>         vq->ndescs =3D 0;
+> +       vq->first_desc =3D 0;
+>         vq->desc =3D NULL;
+>         vq->avail =3D NULL;
+>         vq->used =3D NULL;
+> @@ -372,6 +373,11 @@ static int vhost_worker(void *data)
+>         return 0;
+>  }
+>
+> +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
+> +{
+> +       return vq->max_descs - UIO_MAXIOV;
+> +}
+> +
+>  static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+>  {
+>         kfree(vq->descs);
+> @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *=
+dev)
+>         for (i =3D 0; i < dev->nvqs; ++i) {
+>                 vq =3D dev->vqs[i];
+>                 vq->max_descs =3D dev->iov_limit;
+> +               if (vhost_vq_num_batch_descs(vq) < 0) {
+> +                       return -EINVAL;
+> +               }
+>                 vq->descs =3D kmalloc_array(vq->max_descs,
+>                                           sizeof(*vq->descs),
+>                                           GFP_KERNEL);
+> @@ -1610,6 +1619,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigne=
+d int ioctl, void __user *arg
+>                 vq->last_avail_idx =3D s.num;
+>                 /* Forget the cached index value. */
+>                 vq->avail_idx =3D vq->last_avail_idx;
+> +               vq->ndescs =3D vq->first_desc =3D 0;
+>                 break;
+>         case VHOST_GET_VRING_BASE:
+>                 s.index =3D idx;
+> @@ -2078,253 +2088,6 @@ static unsigned next_desc(struct vhost_virtqueue =
+*vq, struct vring_desc *desc)
+>         return next;
+>  }
+>
+> -static int get_indirect(struct vhost_virtqueue *vq,
+> -                       struct iovec iov[], unsigned int iov_size,
+> -                       unsigned int *out_num, unsigned int *in_num,
+> -                       struct vhost_log *log, unsigned int *log_num,
+> -                       struct vring_desc *indirect)
+> -{
+> -       struct vring_desc desc;
+> -       unsigned int i =3D 0, count, found =3D 0;
+> -       u32 len =3D vhost32_to_cpu(vq, indirect->len);
+> -       struct iov_iter from;
+> -       int ret, access;
+> -
+> -       /* Sanity check */
+> -       if (unlikely(len % sizeof desc)) {
+> -               vq_err(vq, "Invalid length in indirect descriptor: "
+> -                      "len 0x%llx not multiple of 0x%zx\n",
+> -                      (unsigned long long)len,
+> -                      sizeof desc);
+> -               return -EINVAL;
+> -       }
+> -
+> -       ret =3D translate_desc(vq, vhost64_to_cpu(vq, indirect->addr), le=
+n, vq->indirect,
+> -                            UIO_MAXIOV, VHOST_ACCESS_RO);
+> -       if (unlikely(ret < 0)) {
+> -               if (ret !=3D -EAGAIN)
+> -                       vq_err(vq, "Translation failure %d in indirect.\n=
+", ret);
+> -               return ret;
+> -       }
+> -       iov_iter_init(&from, READ, vq->indirect, ret, len);
+> -
+> -       /* We will use the result as an address to read from, so most
+> -        * architectures only need a compiler barrier here. */
+> -       read_barrier_depends();
+> -
+> -       count =3D len / sizeof desc;
+> -       /* Buffers are chained via a 16 bit next field, so
+> -        * we can have at most 2^16 of these. */
+> -       if (unlikely(count > USHRT_MAX + 1)) {
+> -               vq_err(vq, "Indirect buffer length too big: %d\n",
+> -                      indirect->len);
+> -               return -E2BIG;
+> -       }
+> -
+> -       do {
+> -               unsigned iov_count =3D *in_num + *out_num;
+> -               if (unlikely(++found > count)) {
+> -                       vq_err(vq, "Loop detected: last one at %u "
+> -                              "indirect size %u\n",
+> -                              i, count);
+> -                       return -EINVAL;
+> -               }
+> -               if (unlikely(!copy_from_iter_full(&desc, sizeof(desc), &f=
+rom))) {
+> -                       vq_err(vq, "Failed indirect descriptor: idx %d, %=
+zx\n",
+> -                              i, (size_t)vhost64_to_cpu(vq, indirect->ad=
+dr) + i * sizeof desc);
+> -                       return -EINVAL;
+> -               }
+> -               if (unlikely(desc.flags & cpu_to_vhost16(vq, VRING_DESC_F=
+_INDIRECT))) {
+> -                       vq_err(vq, "Nested indirect descriptor: idx %d, %=
+zx\n",
+> -                              i, (size_t)vhost64_to_cpu(vq, indirect->ad=
+dr) + i * sizeof desc);
+> -                       return -EINVAL;
+> -               }
+> -
+> -               if (desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_WRITE))
+> -                       access =3D VHOST_ACCESS_WO;
+> -               else
+> -                       access =3D VHOST_ACCESS_RO;
+> -
+> -               ret =3D translate_desc(vq, vhost64_to_cpu(vq, desc.addr),
+> -                                    vhost32_to_cpu(vq, desc.len), iov + =
+iov_count,
+> -                                    iov_size - iov_count, access);
+> -               if (unlikely(ret < 0)) {
+> -                       if (ret !=3D -EAGAIN)
+> -                               vq_err(vq, "Translation failure %d indire=
+ct idx %d\n",
+> -                                       ret, i);
+> -                       return ret;
+> -               }
+> -               /* If this is an input descriptor, increment that count. =
+*/
+> -               if (access =3D=3D VHOST_ACCESS_WO) {
+> -                       *in_num +=3D ret;
+> -                       if (unlikely(log && ret)) {
+> -                               log[*log_num].addr =3D vhost64_to_cpu(vq,=
+ desc.addr);
+> -                               log[*log_num].len =3D vhost32_to_cpu(vq, =
+desc.len);
+> -                               ++*log_num;
+> -                       }
+> -               } else {
+> -                       /* If it's an output descriptor, they're all supp=
+osed
+> -                        * to come before any input descriptors. */
+> -                       if (unlikely(*in_num)) {
+> -                               vq_err(vq, "Indirect descriptor "
+> -                                      "has out after in: idx %d\n", i);
+> -                               return -EINVAL;
+> -                       }
+> -                       *out_num +=3D ret;
+> -               }
+> -       } while ((i =3D next_desc(vq, &desc)) !=3D -1);
+> -       return 0;
+> -}
+> -
+> -/* This looks in the virtqueue and for the first available buffer, and c=
+onverts
+> - * it to an iovec for convenient access.  Since descriptors consist of s=
+ome
+> - * number of output then some number of input descriptors, it's actually=
+ two
+> - * iovecs, but we pack them into one and note how many of each there wer=
+e.
+> - *
+> - * This function returns the descriptor number found, or vq->num (which =
+is
+> - * never a valid descriptor number) if none was found.  A negative code =
+is
+> - * returned on error. */
+> -int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> -                     struct iovec iov[], unsigned int iov_size,
+> -                     unsigned int *out_num, unsigned int *in_num,
+> -                     struct vhost_log *log, unsigned int *log_num)
+> -{
+> -       struct vring_desc desc;
+> -       unsigned int i, head, found =3D 0;
+> -       u16 last_avail_idx;
+> -       __virtio16 avail_idx;
+> -       __virtio16 ring_head;
+> -       int ret, access;
+> -
+> -       /* Check it isn't doing very strange things with descriptor numbe=
+rs. */
+> -       last_avail_idx =3D vq->last_avail_idx;
+> -
+> -       if (vq->avail_idx =3D=3D vq->last_avail_idx) {
+> -               if (unlikely(vhost_get_avail_idx(vq, &avail_idx))) {
+> -                       vq_err(vq, "Failed to access avail idx at %p\n",
+> -                               &vq->avail->idx);
+> -                       return -EFAULT;
+> -               }
+> -               vq->avail_idx =3D vhost16_to_cpu(vq, avail_idx);
+> -
+> -               if (unlikely((u16)(vq->avail_idx - last_avail_idx) > vq->=
+num)) {
+> -                       vq_err(vq, "Guest moved used index from %u to %u"=
+,
+> -                               last_avail_idx, vq->avail_idx);
+> -                       return -EFAULT;
+> -               }
+> -
+> -               /* If there's nothing new since last we looked, return
+> -                * invalid.
+> -                */
+> -               if (vq->avail_idx =3D=3D last_avail_idx)
+> -                       return vq->num;
+> -
+> -               /* Only get avail ring entries after they have been
+> -                * exposed by guest.
+> -                */
+> -               smp_rmb();
+> -       }
+> -
+> -       /* Grab the next descriptor number they're advertising, and incre=
+ment
+> -        * the index we've seen. */
+> -       if (unlikely(vhost_get_avail_head(vq, &ring_head, last_avail_idx)=
+)) {
+> -               vq_err(vq, "Failed to read head: idx %d address %p\n",
+> -                      last_avail_idx,
+> -                      &vq->avail->ring[last_avail_idx % vq->num]);
+> -               return -EFAULT;
+> -       }
+> -
+> -       head =3D vhost16_to_cpu(vq, ring_head);
+> -
+> -       /* If their number is silly, that's an error. */
+> -       if (unlikely(head >=3D vq->num)) {
+> -               vq_err(vq, "Guest says index %u > %u is available",
+> -                      head, vq->num);
+> -               return -EINVAL;
+> -       }
+> -
+> -       /* When we start there are none of either input nor output. */
+> -       *out_num =3D *in_num =3D 0;
+> -       if (unlikely(log))
+> -               *log_num =3D 0;
+> -
+> -       i =3D head;
+> -       do {
+> -               unsigned iov_count =3D *in_num + *out_num;
+> -               if (unlikely(i >=3D vq->num)) {
+> -                       vq_err(vq, "Desc index is %u > %u, head =3D %u",
+> -                              i, vq->num, head);
+> -                       return -EINVAL;
+> -               }
+> -               if (unlikely(++found > vq->num)) {
+> -                       vq_err(vq, "Loop detected: last one at %u "
+> -                              "vq size %u head %u\n",
+> -                              i, vq->num, head);
+> -                       return -EINVAL;
+> -               }
+> -               ret =3D vhost_get_desc(vq, &desc, i);
+> -               if (unlikely(ret)) {
+> -                       vq_err(vq, "Failed to get descriptor: idx %d addr=
+ %p\n",
+> -                              i, vq->desc + i);
+> -                       return -EFAULT;
+> -               }
+> -               if (desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_INDIRECT=
+)) {
+> -                       ret =3D get_indirect(vq, iov, iov_size,
+> -                                          out_num, in_num,
+> -                                          log, log_num, &desc);
+> -                       if (unlikely(ret < 0)) {
+> -                               if (ret !=3D -EAGAIN)
+> -                                       vq_err(vq, "Failure detected "
+> -                                               "in indirect descriptor a=
+t idx %d\n", i);
+> -                               return ret;
+> -                       }
+> -                       continue;
+> -               }
+> -
+> -               if (desc.flags & cpu_to_vhost16(vq, VRING_DESC_F_WRITE))
+> -                       access =3D VHOST_ACCESS_WO;
+> -               else
+> -                       access =3D VHOST_ACCESS_RO;
+> -               ret =3D translate_desc(vq, vhost64_to_cpu(vq, desc.addr),
+> -                                    vhost32_to_cpu(vq, desc.len), iov + =
+iov_count,
+> -                                    iov_size - iov_count, access);
+> -               if (unlikely(ret < 0)) {
+> -                       if (ret !=3D -EAGAIN)
+> -                               vq_err(vq, "Translation failure %d descri=
+ptor idx %d\n",
+> -                                       ret, i);
+> -                       return ret;
+> -               }
+> -               if (access =3D=3D VHOST_ACCESS_WO) {
+> -                       /* If this is an input descriptor,
+> -                        * increment that count. */
+> -                       *in_num +=3D ret;
+> -                       if (unlikely(log && ret)) {
+> -                               log[*log_num].addr =3D vhost64_to_cpu(vq,=
+ desc.addr);
+> -                               log[*log_num].len =3D vhost32_to_cpu(vq, =
+desc.len);
+> -                               ++*log_num;
+> -                       }
+> -               } else {
+> -                       /* If it's an output descriptor, they're all supp=
+osed
+> -                        * to come before any input descriptors. */
+> -                       if (unlikely(*in_num)) {
+> -                               vq_err(vq, "Descriptor has out after in: =
+"
+> -                                      "idx %d\n", i);
+> -                               return -EINVAL;
+> -                       }
+> -                       *out_num +=3D ret;
+> -               }
+> -       } while ((i =3D next_desc(vq, &desc)) !=3D -1);
+> -
+> -       /* On success, increment avail index. */
+> -       vq->last_avail_idx++;
+> -
+> -       /* Assume notifications from guest are disabled at this point,
+> -        * if they aren't we would need to update avail_event index. */
+> -       BUG_ON(!(vq->used_flags & VRING_USED_F_NO_NOTIFY));
+> -       return head;
+> -}
+> -EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+> -
+>  static struct vhost_desc *peek_split_desc(struct vhost_virtqueue *vq)
+>  {
+>         BUG_ON(!vq->ndescs);
+> @@ -2428,7 +2191,7 @@ static int fetch_indirect_descs(struct vhost_virtqu=
+eue *vq,
+>
+>  /* This function returns a value > 0 if a descriptor was found, or 0 if =
+none were found.
+>   * A negative code is returned on error. */
+> -static int fetch_descs(struct vhost_virtqueue *vq)
+> +static int fetch_buf(struct vhost_virtqueue *vq)
+>  {
+>         unsigned int i, head, found =3D 0;
+>         struct vhost_desc *last;
+> @@ -2441,7 +2204,11 @@ static int fetch_descs(struct vhost_virtqueue *vq)
+>         /* Check it isn't doing very strange things with descriptor numbe=
+rs. */
+>         last_avail_idx =3D vq->last_avail_idx;
+>
+> -       if (vq->avail_idx =3D=3D vq->last_avail_idx) {
+> +       if (unlikely(vq->avail_idx =3D=3D vq->last_avail_idx)) {
+> +               /* If we already have work to do, don't bother re-checkin=
+g. */
+> +               if (likely(vq->ndescs))
+> +                       return 1;
+> +
+>                 if (unlikely(vhost_get_avail_idx(vq, &avail_idx))) {
+>                         vq_err(vq, "Failed to access avail idx at %p\n",
+>                                 &vq->avail->idx);
+> @@ -2532,6 +2299,41 @@ static int fetch_descs(struct vhost_virtqueue *vq)
+>         return 1;
+>  }
+>
+> +/* This function returns a value > 0 if a descriptor was found, or 0 if =
+none were found.
+> + * A negative code is returned on error. */
+> +static int fetch_descs(struct vhost_virtqueue *vq)
+> +{
+> +       int ret;
+> +
+> +       if (unlikely(vq->first_desc >=3D vq->ndescs)) {
+> +               vq->first_desc =3D 0;
+> +               vq->ndescs =3D 0;
+> +       }
+> +
+> +       if (vq->ndescs)
+> +               return 1;
+> +
+> +       for (ret =3D 1;
+> +            ret > 0 && vq->ndescs <=3D vhost_vq_num_batch_descs(vq);
+> +            ret =3D fetch_buf(vq))
+> +               ;
 
-This avoids having to manually force the switolb on (swiotlb=force) in
-Linux in case we're booting only using DMA memory (e.g., 2GB on x86-64),
-and virtio-mem adds memory later on that really needs the swiotlb to be
-used for DMA.
+(Expanding comment in V6):
 
-Let's take care of backwards compatibility if somebody has a setup that
-specifies "maxram" without "slots".
+We get an infinite loop this way:
+* vq->ndescs =3D=3D 0, so we call fetch_buf() here
+* fetch_buf gets less than vhost_vq_num_batch_descs(vq); descriptors. ret =
+=3D 1
+* This loop calls again fetch_buf, but vq->ndescs > 0 (and avail_vq =3D=3D
+last_avail_vq), so it just return 1
 
-Reported-by: Alex Shi <alex.shi@linux.alibaba.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Sergio Lopez <slp@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-arm@nongnu.org <qemu-arm@nongnu.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+I think that we should check vq->ndescs =3D=3D 0 instead of ndescs <=3D
+vhost_vq_num_batch_descs(vq). However, this could cause less
+descriptors to be fetches/cached, so less thoughput. Another
+possibility is to compare with vhost_vq_num_batch_descs(vq) for the
+"early return", or to find a sensible limit (increasing latency?).
+
+In my local version:
+
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 28f324fd77df..50b258a46cef 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2310,12 +2310,7 @@ static int fetch_descs(struct vhost_virtqueue *vq)
+         vq->ndescs =3D 0;
+     }
+
+-    if (vq->ndescs)
+-        return 1;
+-
+-    for (ret =3D 1;
+-         ret > 0 && vq->ndescs <=3D vhost_vq_num_batch_descs(vq);
+-         ret =3D fetch_buf(vq))
++    for (ret =3D 1; ret > 0 && vq->ndescs =3D=3D 0; ret =3D fetch_buf(vq))
+         ;
+
+     /* On success we expect some descs */
 ---
- hw/arm/virt.c       |  2 ++
- hw/core/numa.c      | 11 ++++++-----
- hw/i386/microvm.c   |  1 +
- hw/i386/pc.c        |  1 +
- hw/i386/pc_piix.c   |  1 +
- hw/i386/pc_q35.c    |  1 +
- include/hw/boards.h |  1 +
- 7 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 37462a6f78..d50ad6f841 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2265,6 +2265,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->numa_mem_supported = true;
-     mc->nvdimm_supported = true;
-     mc->auto_enable_numa_with_memhp = true;
-+    mc->auto_enable_numa_with_memdev = true;
-     mc->default_ram_id = "mach-virt.ram";
- 
-     object_class_property_add(oc, "acpi", "OnOffAuto",
-@@ -2375,6 +2376,7 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
- static void virt_machine_5_0_options(MachineClass *mc)
- {
-     virt_machine_5_1_options(mc);
-+    mc->auto_enable_numa_with_memdev = false;
- }
- DEFINE_VIRT_MACHINE(5, 0)
- 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 06960918e7..b9923cdd45 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -681,8 +681,9 @@ void numa_complete_configuration(MachineState *ms)
-     NodeInfo *numa_info = ms->numa_state->nodes;
- 
-     /*
--     * If memory hotplug is enabled (slots > 0) but without '-numa'
--     * options explicitly on CLI, guestes will break.
-+     * If memory hotplug is enabled (slot > 0) or memory devices are enabled
-+     * (ms->maxram_size > ram_size) but without '-numa' options explicitly on
-+     * CLI, guests will break.
-      *
-      *   Windows: won't enable memory hotplug without SRAT table at all
-      *
-@@ -697,9 +698,9 @@ void numa_complete_configuration(MachineState *ms)
-      * assume there is just one node with whole RAM.
-      */
-     if (ms->numa_state->num_nodes == 0 &&
--        ((ms->ram_slots > 0 &&
--        mc->auto_enable_numa_with_memhp) ||
--        mc->auto_enable_numa)) {
-+        ((ms->ram_slots && mc->auto_enable_numa_with_memhp) ||
-+         (ms->maxram_size > ms->ram_size && mc->auto_enable_numa_with_memdev) ||
-+         mc->auto_enable_numa)) {
-             NumaNodeOptions node = { };
-             parse_numa_node(ms, &node, &error_abort);
-             numa_info[0].node_mem = ram_size;
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index 937db10ae6..2c052ee2e5 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -497,6 +497,7 @@ static void microvm_class_init(ObjectClass *oc, void *data)
-     mc->max_cpus = 288;
-     mc->has_hotpluggable_cpus = false;
-     mc->auto_enable_numa_with_memhp = false;
-+    mc->auto_enable_numa_with_memdev = false;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-     mc->nvdimm_supported = false;
-     mc->default_ram_id = "microvm.ram";
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ee6368915b..ec93870de5 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1955,6 +1955,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
-     mc->auto_enable_numa_with_memhp = true;
-+    mc->auto_enable_numa_with_memdev = true;
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
-     mc->hot_add_cpu = pc_hot_add_cpu;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index f66e1d73ce..1bc68c3841 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -440,6 +440,7 @@ static void pc_i440fx_5_0_machine_options(MachineClass *m)
-     m->is_default = false;
-     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
-+    m->auto_enable_numa_with_memdev = false;
- }
- 
- DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 4ba8ac8774..a17459e37c 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -368,6 +368,7 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
-     m->alias = NULL;
-     compat_props_add(m->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-     compat_props_add(m->compat_props, pc_compat_5_0, pc_compat_5_0_len);
-+    m->auto_enable_numa_with_memhp = false;
- }
- 
- DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 18815d9be2..426ce5f625 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -207,6 +207,7 @@ struct MachineClass {
-     const char **valid_cpu_types;
-     strList *allowed_dynamic_sysbus_devices;
-     bool auto_enable_numa_with_memhp;
-+    bool auto_enable_numa_with_memdev;
-     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
-     bool ignore_boot_device_suffixes;
--- 
-2.26.2
+
+> +
+> +       /* On success we expect some descs */
+> +       BUG_ON(ret > 0 && !vq->ndescs);
+> +       return ret;
+> +}
+> +
+> +/* Reverse the effects of fetch_descs */
+> +static void unfetch_descs(struct vhost_virtqueue *vq)
+> +{
+> +       int i;
+> +
+> +       for (i =3D vq->first_desc; i < vq->ndescs; ++i)
+> +               if (!(vq->descs[i].flags & VRING_DESC_F_NEXT))
+> +                       vq->last_avail_idx -=3D 1;
+> +       vq->ndescs =3D 0;
+> +}
+> +
+>  /* This looks in the virtqueue and for the first available buffer, and c=
+onverts
+>   * it to an iovec for convenient access.  Since descriptors consist of s=
+ome
+>   * number of output then some number of input descriptors, it's actually=
+ two
+> @@ -2540,7 +2342,7 @@ static int fetch_descs(struct vhost_virtqueue *vq)
+>   * This function returns the descriptor number found, or vq->num (which =
+is
+>   * never a valid descriptor number) if none was found.  A negative code =
+is
+>   * returned on error. */
+> -int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
+> +int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+>                       struct iovec iov[], unsigned int iov_size,
+>                       unsigned int *out_num, unsigned int *in_num,
+>                       struct vhost_log *log, unsigned int *log_num)
+> @@ -2549,7 +2351,7 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue =
+*vq,
+>         int i;
+>
+>         if (ret <=3D 0)
+> -               goto err_fetch;
+> +               goto err;
+>
+>         /* Now convert to IOV */
+>         /* When we start there are none of either input nor output. */
+> @@ -2557,7 +2359,7 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue =
+*vq,
+>         if (unlikely(log))
+>                 *log_num =3D 0;
+>
+> -       for (i =3D 0; i < vq->ndescs; ++i) {
+> +       for (i =3D vq->first_desc; i < vq->ndescs; ++i) {
+>                 unsigned iov_count =3D *in_num + *out_num;
+>                 struct vhost_desc *desc =3D &vq->descs[i];
+>                 int access;
+> @@ -2603,24 +2405,26 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueu=
+e *vq,
+>                 }
+>
+>                 ret =3D desc->id;
+> +
+> +               if (!(desc->flags & VRING_DESC_F_NEXT))
+> +                       break;
+>         }
+>
+> -       vq->ndescs =3D 0;
+> +       vq->first_desc =3D i + 1;
+>
+>         return ret;
+>
+>  err:
+> -       vhost_discard_vq_desc(vq, 1);
+> -err_fetch:
+> -       vq->ndescs =3D 0;
+> +       unfetch_descs(vq);
+>
+>         return ret ? ret : vq->num;
+>  }
+> -EXPORT_SYMBOL_GPL(vhost_get_vq_desc_batch);
+> +EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+>
+>  /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. *=
+/
+>  void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
+>  {
+> +       unfetch_descs(vq);
+>         vq->last_avail_idx -=3D n;
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index 87089d51490d..fed36af5c444 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -81,6 +81,7 @@ struct vhost_virtqueue {
+>
+>         struct vhost_desc *descs;
+>         int ndescs;
+> +       int first_desc;
+>         int max_descs;
+>
+>         struct file *kick;
+> @@ -189,10 +190,6 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned=
+ int ioctl, void __user *arg
+>  bool vhost_vq_access_ok(struct vhost_virtqueue *vq);
+>  bool vhost_log_access_ok(struct vhost_dev *);
+>
+> -int vhost_get_vq_desc_batch(struct vhost_virtqueue *,
+> -                     struct iovec iov[], unsigned int iov_count,
+> -                     unsigned int *out_num, unsigned int *in_num,
+> -                     struct vhost_log *log, unsigned int *log_num);
+>  int vhost_get_vq_desc(struct vhost_virtqueue *,
+>                       struct iovec iov[], unsigned int iov_count,
+>                       unsigned int *out_num, unsigned int *in_num,
+> @@ -261,6 +258,8 @@ static inline void vhost_vq_set_backend(struct vhost_=
+virtqueue *vq,
+>                                         void *private_data)
+>  {
+>         vq->private_data =3D private_data;
+> +       vq->ndescs =3D 0;
+> +       vq->first_desc =3D 0;
+>  }
+>
+>  /**
+> --
+> MST
+>
 
