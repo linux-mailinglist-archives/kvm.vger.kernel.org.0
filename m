@@ -2,130 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 920661F5ABE
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 19:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 568401F5ACE
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 19:55:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726842AbgFJRnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 13:43:33 -0400
-Received: from mail-eopbgr760124.outbound.protection.outlook.com ([40.107.76.124]:6022
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726462AbgFJRnd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 13:43:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e9GLaYxU81Hmo+jXnyZTgQjIzlf4HLZ6j7utuWoMA+PlCYajOo6a/UemZLBTXn9aMlAugsOYWyjzOCVe83Um8z/LQhTAm08qLzSjjRPoZV++uIdIF0Hj0hPCq6PXlcpMGVuxV/IC2ozktVmHn/LStctfcddl28rw0MCi6cuTX2G9SaYsdbDAnp0HV1pxwOOuj3VI4RhHaTvqE/+MjgJz2NypgB+HykU8v+2lExPBR7E8EOg39VmF0i6zOKQ+zDtiiYKiAMqB9K1Maypaxt7euYmXj4fJMKyGr2vx4Gti88DOqT+YCFg5pGXukgv6SEHJgP6yFzcba7XFIvS0EheC5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8XDaFYLNrjC+/O9+tidBH1zZi8YzYHptc58LfSNFNP8=;
- b=nvDSrT64Ogyq5qAwz6mav40w0Nv9940IjOI66MjENJcVU+LNVyaJl7IuMHBuGWMeKNiYeVrP8rkSZys4+vQGex4EFROgP8g+xyXfQet+MT4Sc0naqq9fZ22AwfSvfUa9XeKbAU2D+fp67Edr7emPNTKFLs7KXSHQQp/Qn4FeV03o5OAewwMFZQh8PH3krRVTLMoEIjpn+6v0aOooUwbAY7mClT2HIGwA3bQqWdSD5kCUNQfGJdR6r4ycs82WxcJ5oQnL7uLvuF3ta737GF8UsKIQFm7w1G/vqLYb4ao0Ekj9xfD96feB7KWlWkbdeQrfK3ZX5QXxKXSkvDbZdYFxUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=sony.com; dmarc=pass action=none header.from=sony.com;
- dkim=pass header.d=sony.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Sony.onmicrosoft.com;
- s=selector2-Sony-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8XDaFYLNrjC+/O9+tidBH1zZi8YzYHptc58LfSNFNP8=;
- b=rg5U2kqIE8mO8SmTV+5d11WJ74im2H7rRfKTJmgiZ4Yp1HQb+TYmQrIOFSAiKVfsf6OUznwJgi/e9ckwvtu4RHDVAxsF8WkTnXkxG3eNhazmxgiQsSgRbndUjc+7SrYxJ/iaWaoaN0twc9QIlikj/bz0lfzFT3hOKr+AAlX+BiI=
-Received: from CY4PR13MB1175.namprd13.prod.outlook.com (2603:10b6:903:40::23)
- by CY4PR1301MB2104.namprd13.prod.outlook.com (2603:10b6:910:45::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3088.13; Wed, 10 Jun
- 2020 17:43:27 +0000
-Received: from CY4PR13MB1175.namprd13.prod.outlook.com
- ([fe80::e486:a4f:7430:536e]) by CY4PR13MB1175.namprd13.prod.outlook.com
- ([fe80::e486:a4f:7430:536e%9]) with mapi id 15.20.3088.018; Wed, 10 Jun 2020
- 17:43:27 +0000
-From:   "Bird, Tim" <Tim.Bird@sony.com>
-To:     Shuah Khan <skhan@linuxfoundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "shuah@kernel.org" <shuah@kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: RE: [PATCH] kselftest: runner: fix TAP output for skipped tests
-Thread-Topic: [PATCH] kselftest: runner: fix TAP output for skipped tests
-Thread-Index: AQHWPz4jOoN+nSyJY0qUhBN3V+N4d6jSBzeAgAAVxfA=
-Date:   Wed, 10 Jun 2020 17:43:27 +0000
-Message-ID: <CY4PR13MB1175A17F29B281642DF05A6DFD830@CY4PR13MB1175.namprd13.prod.outlook.com>
-References: <20200610154447.15826-1-pbonzini@redhat.com>
- <ac2c1eaa-acd7-7ac6-0666-6e6c0cbd546b@linuxfoundation.org>
-In-Reply-To: <ac2c1eaa-acd7-7ac6-0666-6e6c0cbd546b@linuxfoundation.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: linuxfoundation.org; dkim=none (message not signed)
- header.d=none;linuxfoundation.org; dmarc=none action=none
- header.from=sony.com;
-x-originating-ip: [160.33.195.21]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 91188255-4df4-44bb-6c19-08d80d65c859
-x-ms-traffictypediagnostic: CY4PR1301MB2104:
-x-microsoft-antispam-prvs: <CY4PR1301MB21048ABF95B9480C0BE1A791FD830@CY4PR1301MB2104.namprd13.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0430FA5CB7
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5JGs9nXuulsXSjjerSMa/AeeqQFF+BLhprbvM+cHyk4+lRx/6dxglK+JraqbPlYVlcDwFeVYYRdcx3X0i0non0alvxcWaNbCuTv1pUcfmHPMbeJyJ1RDuGbyA17ex0gsITRmwhbqL9GJtR7ezfDN6q5thNoS9cJ10m8bkvhRDxYyPBnNVGbeSJOst+VcJtFdWpXtHUVNeXXQtI9J0JZ4TD4TZPs/QzsaR6kJLkTCmrQofNM64BQw0YxF9/Us5Ia6ZDniteu4rDhGqnH4GqYBN6zAla9G9Yv96rw4lpifWE65sSUDHFhyBekEWq4a0cMqLDTQePyEq0QVbkQFZOTpVLMleHvqlM61ZKUk8SRN3ZwpESquoHHxZWdIPlJ2GqkzF4fuZhE6RE4Y/QkIptulEQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR13MB1175.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(136003)(376002)(366004)(396003)(39860400002)(478600001)(8936002)(71200400001)(86362001)(54906003)(2906002)(76116006)(66556008)(66476007)(66446008)(66946007)(33656002)(316002)(64756008)(55016002)(7696005)(4326008)(8676002)(9686003)(6506007)(53546011)(186003)(110136005)(26005)(5660300002)(83380400001)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: JAumHO2E277lc4HGA4YB9cQUDhqwk/PtGIMSYmEDoeSkpdCCoEfy/jvhs88sz7pm6qld1ZpFuAmXD7VO3bQN/NQMXLofUY3ZXdQcQKMFoJhvamfnaP5FIs5TX/6eBeXmlREZFFeHjsWiI3ay5KMBophzcg77rLL5/8G7SVNqDUL1hhzKyCh1YTTKQmHCR419p3sXL/Av78nd5QVT+NxKm0hbNm3H76/n6rqYvLfUI8oCndBv2nz+433IWxfy2a9H81PlfU7Q7qe8Mg6t2uWvb6UYMkNuPXrffL1RIMD/zDRFLzGEApMVAG65g/FDsK61S6zc7e7yHQlUELkt0mZxsizzID39h/HeQGkvqTsp/RstCtZs/GBhMxHoBwhKQKZ0+lunAJN2K78eauoPVz2KMjam/CpEJJC8tQpo9LXTNTO+GOUZkVA2VihLCbOc2f0xdYSXHddzr0ZBhyclLd8lRWC4ynuHDTZyrYKgx4UF+BM=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726823AbgFJRzm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 13:55:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48798 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726095AbgFJRzm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 13:55:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591811740;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=fT7MJxxe/N/GC6AUG3wTzK87t8/hohYB8InpgjdJuSE=;
+        b=Y0D40yWXtiHwnfRMbdQWAiPQmnf0jxowC9I8FgwVi5hG8p0JUuZxrG44UCY4A/VJTH0cLG
+        Q8YG19DutJDfiV44eDV1Mf8pSf5PWUMQCRmFK25M4VRqEZGMeZ5y2GZzRVlHWoihMb8yXD
+        0IMbcMhoulhGGcq0/ZMlcOKjl6UxNfg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-261-4-i27Ty0MxuQ6YUuacqyWQ-1; Wed, 10 Jun 2020 13:55:39 -0400
+X-MC-Unique: 4-i27Ty0MxuQ6YUuacqyWQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89904461;
+        Wed, 10 Jun 2020 17:55:37 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.192.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 415317BA14;
+        Wed, 10 Jun 2020 17:55:34 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vivek Goyal <vgoyal@redhat.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] KVM: async_pf: Cleanup kvm_setup_async_pf()
+Date:   Wed, 10 Jun 2020 19:55:31 +0200
+Message-Id: <20200610175532.779793-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: sony.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91188255-4df4-44bb-6c19-08d80d65c859
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2020 17:43:27.6157
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 66c65d8a-9158-4521-a2d8-664963db48e4
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WbXMJNH9i6tWLDHD3jYbUhyCVJLeKup6R3gzjcsXAmw5BqynFijImGu6TZ0MA5zmJ416YQiXNeXa5lf25ca8Qw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1301MB2104
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgta3NlbGZ0ZXN0
-LW93bmVyQHZnZXIua2VybmVsLm9yZyA8bGludXgta3NlbGZ0ZXN0LW93bmVyQHZnZXIua2VybmVs
-Lm9yZz4gT24gQmVoYWxmIE9mIFNodWFoIEtoYW4NCj4gDQo+IE9uIDYvMTAvMjAgOTo0NCBBTSwg
-UGFvbG8gQm9uemluaSB3cm90ZToNCj4gPiBBY2NvcmRpbmcgdG8gdGhlIFRBUCBzcGVjaWZpY2F0
-aW9uLCBhIHNraXBwZWQgdGVzdCBtdXN0IGJlIG1hcmtlZCBhcyAib2siDQo+ID4gYW5kIGFubm90
-YXRlZCB3aXRoIHRoZSBTS0lQIGRpcmVjdGl2ZSwgZm9yIGV4YW1wbGUNCj4gPg0KPiA+ICAgICBv
-ayAyMyAjIHNraXAgSW5zdWZmaWNpZW50IGZsb2dpc3RvbiBwcmVzc3VyZS4NCj4gPiAgICAgKGh0
-dHBzOi8vdGVzdGFueXRoaW5nLm9yZy90YXAtc3BlY2lmaWNhdGlvbi5odG1sKQ0KPiA+DQo+ID4g
-Rml4IHRoZSBydW5uZXIgc2NyaXB0IHRvIG1hdGNoIHRoaXMuDQo+ID4NCj4gPiBTaWduZWQtb2Zm
-LWJ5OiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiA+IC0tLQ0KPiA+ICAg
-dG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3NlbGZ0ZXN0L3J1bm5lci5zaCB8IDIgKy0NCj4gPiAg
-IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiA+DQo+ID4g
-ZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2tzZWxmdGVzdC9ydW5uZXIuc2gg
-Yi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rc2VsZnRlc3QvcnVubmVyLnNoDQo+ID4gaW5kZXgg
-Njc2YjNhOGIxMTRkLi5mNDgxNWNiY2Q2MGYgMTAwNjQ0DQo+ID4gLS0tIGEvdG9vbHMvdGVzdGlu
-Zy9zZWxmdGVzdHMva3NlbGZ0ZXN0L3J1bm5lci5zaA0KPiA+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcv
-c2VsZnRlc3RzL2tzZWxmdGVzdC9ydW5uZXIuc2gNCj4gPiBAQCAtNzcsNyArNzcsNyBAQCBydW5f
-b25lKCkNCj4gPiAgIAkJZWNobyAib2sgJHRlc3RfbnVtICRURVNUX0hEUl9NU0ciKSB8fA0KPiA+
-ICAgCQkocmM9JD87CVwNCj4gPiAgIAkJaWYgWyAkcmMgLWVxICRza2lwX3JjIF07IHRoZW4JXA0K
-PiA+IC0JCQllY2hvICJub3Qgb2sgJHRlc3RfbnVtICRURVNUX0hEUl9NU0cgIyBTS0lQIg0KPiA+
-ICsJCQllY2hvICJvayAkdGVzdF9udW0gJFRFU1RfSERSX01TRyAjIFNLSVAiDQoNClRoaXMgaXMg
-YSBwcmV0dHkgYmlnIGNoYW5nZSwgYW5kIG1pZ2h0IGJyZWFrIHVwc3RyZWFtIENJcyB0aGF0IGhh
-dmUgY29tZSB0bw0KcmVseSBvbiBrc2VsZnRlc3QncyBleGlzdGluZyBiZWhhdmlvci4gIEkga25v
-dyBpdCdzIGdvaW5nIHRvIGJyZWFrIEZ1ZWdvJ3MgcGFyc2luZw0Kb2YgcmVzdWx0cy4NCg0Ka3Nl
-bGZ0ZXN0IGhhcyBhIGZldyBjb252ZW50aW9ucyB0aGF0IGFyZSBkaWZmZXJlbnQgZnJvbSB0aGUg
-VEFQIHNwZWMsIA0KYW5kIGEgZmV3IGl0ZW1zIGl0IGRvZXMgdGhhdCBhcmUgZXh0ZW5zaW9ucyB0
-byB0aGUgVEFQIHNwZWMuDQpJTUhPLCB0aGUgVEFQIHNwZWMgZ290IHRoaXMgb25lIHdyb25nLCBi
-dXQgSSBjb3VsZCBiZSBjb252aW5jZWQNCm90aGVyd2lzZS4gIEJ1dCBJIHRoaW5rIHdlIHNob3Vs
-ZCBkaXNjdXNzIHRoaXMgYW1vbmcgQ0kgdXNlcnMgb2YNCmtzZWxmdGVzdCBiZWZvcmUgbWFraW5n
-IHRoZSBjaGFuZ2UuDQoNCkkgc3RhcnRlZCB3b3JrIHF1aXRlIGEgd2hpbGUgYWdvIG9uIGFuIGVm
-Zm9ydCB0byBkb2N1bWVudCB0aGUNCmNvbnZlbnRpb25zIHVzZWQgYnkga3NlbGZ0ZXN0IChwYXJ0
-aWN1bGFybHkgd2hlcmUgaXQgZGV2aWF0ZXMNCmZyb20gdGhlIFRBUCBzcGVjKSwgIGJ1dCBuZXZl
-ciBzdWJtaXR0ZWQgaXQuDQoNCkknbSBnb2luZyB0byBzdWJtaXQgd2hhdCBJJ3ZlIGdvdCBhcyBh
-biBSRkMgbm93LCBmb3IgZGlzY3Vzc2lvbiwNCmV2ZW4gdGhvdWdoIGl0J3Mgbm90IGZpbmlzaGVk
-LiAgSSdsbCBkbyB0aGF0IGluIGEgc2VwYXJhdGUgdGhyZWFkLg0KDQoNCj4gPiAgIAkJZWxpZiBb
-ICRyYyAtZXEgJHRpbWVvdXRfcmMgXTsgdGhlbiBcDQo+ID4gICAJCQllY2hvICIjIg0KPiA+ICAg
-CQkJZWNobyAibm90IG9rICR0ZXN0X251bSAkVEVTVF9IRFJfTVNHICMgVElNRU9VVCINCj4gPg0K
-PiANCj4gVGhhbmtzLiBJIHdpbGwgcHVsbCB0aGlzIGluIGZvciBMaW51eCA1LjgtcmMyDQpTaHVh
-aCAtIGNhbiB5b3UgaG9sZCBvZmYgb24gdGhpcyB1bnRpbCB3ZSBkaXNjdXNzIGl0Pw0KDQpUaGFu
-a3MsDQogLS0gVGltDQoNCg==
+schedule_work() returns 'false' only when the work is already on the queue
+and this can't happen as kvm_setup_async_pf() always allocates a new one.
+Also, to avoid potential race, it makes sense to to schedule_work() at the
+very end after we've added it to the queue.
+
+While on it, do some minor cleanup. gfn_to_pfn_async() mentioned in a
+comment does not currently exist and, moreover, we can check
+kvm_is_error_hva() at the very beginning, before we try to allocate work so
+'retry_sync' label can go away completely.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ virt/kvm/async_pf.c | 19 ++++++-------------
+ 1 file changed, 6 insertions(+), 13 deletions(-)
+
+diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+index f1e07fae84e9..ba080088da76 100644
+--- a/virt/kvm/async_pf.c
++++ b/virt/kvm/async_pf.c
+@@ -164,7 +164,9 @@ int kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	if (vcpu->async_pf.queued >= ASYNC_PF_PER_VCPU)
+ 		return 0;
+ 
+-	/* setup delayed work */
++	/* Arch specific code should not do async PF in this case */
++	if (unlikely(kvm_is_error_hva(hva)))
++		return 0;
+ 
+ 	/*
+ 	 * do alloc nowait since if we are going to sleep anyway we
+@@ -183,24 +185,15 @@ int kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	mmget(work->mm);
+ 	kvm_get_kvm(work->vcpu->kvm);
+ 
+-	/* this can't really happen otherwise gfn_to_pfn_async
+-	   would succeed */
+-	if (unlikely(kvm_is_error_hva(work->addr)))
+-		goto retry_sync;
+-
+ 	INIT_WORK(&work->work, async_pf_execute);
+-	if (!schedule_work(&work->work))
+-		goto retry_sync;
+ 
+ 	list_add_tail(&work->queue, &vcpu->async_pf.queue);
+ 	vcpu->async_pf.queued++;
+ 	kvm_arch_async_page_not_present(vcpu, work);
++
++	schedule_work(&work->work);
++
+ 	return 1;
+-retry_sync:
+-	kvm_put_kvm(work->vcpu->kvm);
+-	mmput(work->mm);
+-	kmem_cache_free(async_pf_cache, work);
+-	return 0;
+ }
+ 
+ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu)
+-- 
+2.25.4
+
