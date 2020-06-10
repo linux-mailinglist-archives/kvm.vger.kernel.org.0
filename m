@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5F6F1F53EC
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 13:55:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 755F61F53ED
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 13:55:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728769AbgFJLzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 07:55:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54041 "EHLO
+        id S1728783AbgFJLzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 07:55:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45106 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728774AbgFJLzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 07:55:10 -0400
+        with ESMTP id S1728779AbgFJLzP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 07:55:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591790109;
+        s=mimecast20190719; t=1591790113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/bRpzWo8mGWvq3enPFtqLN32egzNgjYQizck8xugJ+M=;
-        b=gaiF9uKQOEnw/xpkr2H7jSIDPpUY0a8EkIT+HSl5WeYeZfUaeTaJrtDs4oFVQnp7sC/jqu
-        B9WKyyjXA/b7VutLxn6fCUF2Z/gx2IWngFLBvakDUo9s1GVSXd4/uVCQsuEs7PtNrGOMrK
-        uRFHXqVpIW89thfAaY8TvlbdOnF/jzE=
+        bh=K0bxEZTNG5tW1NNkUgKUn7jrte0My/UUwSbEJ+zpHfA=;
+        b=a84Zw+vpW7dNbvZDqFH/x2jKk9eNdVXMhGnu+CGxLEQrrEGwQT+pLzPSzLs2ExiJ28Tx6o
+        QBxjl2p3sNFELjLifG9U/abek9F5kl6Ps3VNJJp+6jh59bMaaFYXl42Wu+0Ct84v+fhWOi
+        ueeJDh76D1BeSDpuhQVq/+BB2lHCZYQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-DLX1pjx1OeOHbokAJF5eVg-1; Wed, 10 Jun 2020 07:55:07 -0400
-X-MC-Unique: DLX1pjx1OeOHbokAJF5eVg-1
+ us-mta-36-xRLBABodNWGxytLWjIPfRQ-1; Wed, 10 Jun 2020 07:55:09 -0400
+X-MC-Unique: xRLBABodNWGxytLWjIPfRQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E40A461;
-        Wed, 10 Jun 2020 11:55:06 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D210A193F562;
+        Wed, 10 Jun 2020 11:55:08 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-114-42.ams2.redhat.com [10.36.114.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0AE695D9D3;
-        Wed, 10 Jun 2020 11:54:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CED915D9D3;
+        Wed, 10 Jun 2020 11:55:06 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -41,10 +41,11 @@ Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: [PATCH v4 06/21] target/i386: sev: Use ram_block_discard_disable()
-Date:   Wed, 10 Jun 2020 13:54:04 +0200
-Message-Id: <20200610115419.51688-7-david@redhat.com>
+        David Hildenbrand <david@redhat.com>,
+        Juan Quintela <quintela@redhat.com>
+Subject: [PATCH v4 07/21] migration/rdma: Use ram_block_discard_disable()
+Date:   Wed, 10 Jun 2020 13:54:05 +0200
+Message-Id: <20200610115419.51688-8-david@redhat.com>
 In-Reply-To: <20200610115419.51688-1-david@redhat.com>
 References: <20200610115419.51688-1-david@redhat.com>
 MIME-Version: 1.0
@@ -55,45 +56,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-AMD SEV will pin all guest memory, mark discarding of RAM broken. At the
-time this is called, we cannot have anyone active that relies on discards
-to work properly - let's still implement error handling.
+RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
+to disable RAM block discards - however, to keep it simple use
+ram_block_discard_is_required() instead of inhibiting.
+
+Note: It is not sufficient to limit disabling to pin_all. Even when only
+conditionally pinning 1 MB chunks, as soon as one page within such a
+chunk was discarded and one page not, the discarded pages will be pinned
+as well.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/i386/sev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ migration/rdma.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 51cdbe5496..4a4863db28 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -649,6 +649,12 @@ sev_guest_init(const char *id)
-     uint32_t host_cbitpos;
-     struct sev_user_data_status status = {};
+diff --git a/migration/rdma.c b/migration/rdma.c
+index ec45d33ba3..bbe6f36627 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -29,6 +29,7 @@
+ #include "qemu/sockets.h"
+ #include "qemu/bitmap.h"
+ #include "qemu/coroutine.h"
++#include "exec/memory.h"
+ #include <sys/socket.h>
+ #include <netdb.h>
+ #include <arpa/inet.h>
+@@ -4017,8 +4018,14 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+     Error *local_err = NULL;
  
-+    ret = ram_block_discard_disable(true);
-+    if (ret) {
-+        error_report("%s: cannot disable RAM discard", __func__);
-+        return NULL;
+     trace_rdma_start_incoming_migration();
+-    rdma = qemu_rdma_data_init(host_port, &local_err);
+ 
++    /* Avoid ram_block_discard_disable(), cannot change during migration. */
++    if (ram_block_discard_is_required()) {
++        error_setg(errp, "RDMA: cannot disable RAM discard");
++        return;
 +    }
 +
-     sev_state = s = g_new0(SEVState, 1);
-     s->sev_info = lookup_sev_guest_info(id);
-     if (!s->sev_info) {
-@@ -724,6 +730,7 @@ sev_guest_init(const char *id)
- err:
-     g_free(sev_state);
-     sev_state = NULL;
-+    ram_block_discard_disable(false);
-     return NULL;
- }
++    rdma = qemu_rdma_data_init(host_port, &local_err);
+     if (rdma == NULL) {
+         goto err;
+     }
+@@ -4067,10 +4074,17 @@ void rdma_start_outgoing_migration(void *opaque,
+                             const char *host_port, Error **errp)
+ {
+     MigrationState *s = opaque;
+-    RDMAContext *rdma = qemu_rdma_data_init(host_port, errp);
+     RDMAContext *rdma_return_path = NULL;
++    RDMAContext *rdma;
+     int ret = 0;
  
++    /* Avoid ram_block_discard_disable(), cannot change during migration. */
++    if (ram_block_discard_is_required()) {
++        error_setg(errp, "RDMA: cannot disable RAM discard");
++        return;
++    }
++
++    rdma = qemu_rdma_data_init(host_port, errp);
+     if (rdma == NULL) {
+         goto err;
+     }
 -- 
 2.26.2
 
