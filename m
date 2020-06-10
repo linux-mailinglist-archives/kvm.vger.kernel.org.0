@@ -2,135 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1773D1F5B19
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 20:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D25081F5B78
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 20:49:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728871AbgFJSYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 14:24:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48502 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726268AbgFJSX6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 14:23:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591813437;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OSjai+DFDzFrxMEYWRAg/j6/ardpz/bet/R5ZQH8NOQ=;
-        b=XgR7i3wSIH2LFkWVN7WFk3mWbSWYN0NsvG0v6rfTp+UEtwNFhClpC+taV61lAklx/vr80y
-        KLIzlHRTsjS4hARvnIiVy6Igusvzv+0BpmR5P4j1OUnsJkYV4J0Yt7a/SJRnRru0jYE71d
-        y+VDxSl3hBxXD/4zYy6z74WE956ioFo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-BwL6V9EGO1-IllmDEfpvYw-1; Wed, 10 Jun 2020 14:23:55 -0400
-X-MC-Unique: BwL6V9EGO1-IllmDEfpvYw-1
-Received: by mail-wr1-f72.google.com with SMTP id n6so1436995wrv.6
-        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 11:23:54 -0700 (PDT)
+        id S1729292AbgFJStR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 14:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47406 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726105AbgFJStP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 14:49:15 -0400
+Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E1FC03E96B
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 11:49:15 -0700 (PDT)
+Received: by mail-ua1-x941.google.com with SMTP id c15so1214285uar.9
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 11:49:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0A0qTEHL/4KHt4CSQ8r/67Dw7HuODJhcnw3jBL6/4J0=;
+        b=Uf3Tl88+r0ZyuZCQWfWB4PKDaMKAKtTmR6Y9IRa+cZCE9Bel4uJmzIXjeKMF6RESzG
+         LfRsF4qIQ0RgpqHmWzJlWqVEBTAqGpfp3uDaBvyS+7FpOH2I5TCz8Aup8cO5pEGd0SCa
+         dZZRdSK4u8zEu43fSdct+eOH+fiK8d8XsddBgDh0+mFmO/treg7/Zgl5ppH2zXln/3rm
+         aHbacx6sUYuvLvgSVcBokZ6/H9kJZ2LLodZG55RSeTYZ6S48Q6/WxuvmnbLN+rlClHkk
+         xZgdZAOd7KqDVNt1dPiM0Ajs/2q3d6Fqn5vfCVRThl9/PLnPIFWioYOR1khnyt7cBCZC
+         QdEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OSjai+DFDzFrxMEYWRAg/j6/ardpz/bet/R5ZQH8NOQ=;
-        b=Ad4GJH0p4+OE4Lb5Lf9kicXkUbkzIVO5ujkraBHTKOUTAEdB0pk3qDHF1nimQF8Gof
-         saKXloBuPTwoqWsnsdi12WMuAW41l3U5PzK9nUPd0++s/EqaSRfJUlx5PXJI1BzlN5Gf
-         Pvn9F7aCS15x6d5SQ9Y9l8gqces8PHvkxm9X3Z88OEGjjdgxvsd1lDxIrILmzlrE5jep
-         PnJDr30xc2xPN2kTlHOpX/jTejddIVidmCxGyS6WXjtKWM2lC9VflEsxOGMhf+FZdaEp
-         kIAqXG4hSFIUX6QMbHPqfwg5yvcHzUE3XuQAo2P8sMHT2S22kPS2jnVPzdD4CXWdg1Uh
-         Lbwg==
-X-Gm-Message-State: AOAM532lx9zjyDoWbQBmFOhMY/YtAzkszmxftpQWwFqBln+CM6wlpvnN
-        R9CjuSrC324LmHsHYcy2YCo3b2XoQNl9jtIXzlYNdXf4xCojpvcK8m+wx7LChjd0JFi0PfTaa/g
-        E7JpUnAKnIaUT
-X-Received: by 2002:a5d:6391:: with SMTP id p17mr5459680wru.118.1591813373334;
-        Wed, 10 Jun 2020 11:22:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwL+HRgXUT5dVlw53IXZIty7joPl0qkXidchmFCFVFqHTrz1BuekJ/juSrrBdN78oDX42KGJw==
-X-Received: by 2002:a5d:6391:: with SMTP id p17mr5459653wru.118.1591813373088;
-        Wed, 10 Jun 2020 11:22:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b5a1:606f:4d92:f4e1? ([2001:b07:6468:f312:b5a1:606f:4d92:f4e1])
-        by smtp.gmail.com with ESMTPSA id n23sm593760wmc.21.2020.06.10.11.22.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jun 2020 11:22:52 -0700 (PDT)
-Subject: Re: [PATCH] kselftest: runner: fix TAP output for skipped tests
-To:     "Bird, Tim" <Tim.Bird@sony.com>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "shuah@kernel.org" <shuah@kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-References: <20200610154447.15826-1-pbonzini@redhat.com>
- <ac2c1eaa-acd7-7ac6-0666-6e6c0cbd546b@linuxfoundation.org>
- <CY4PR13MB1175A17F29B281642DF05A6DFD830@CY4PR13MB1175.namprd13.prod.outlook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6461f067-0fea-4419-dd56-2661c44a803a@redhat.com>
-Date:   Wed, 10 Jun 2020 20:22:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0A0qTEHL/4KHt4CSQ8r/67Dw7HuODJhcnw3jBL6/4J0=;
+        b=Lynp55jeUZ28Bic6eJytHDxKYgGz57Y7oTU4H/4a6xpKdZ6ZHHQIw+8InaFAZ8Imy6
+         J1XEhvkoGYJ6IERefm0b5qFG+/Z/0f+rpgDPkQOn7OPiyVvH33jqjzL8J1erz3MvV8Eb
+         N63p1wyufC0FgyQek+UeG6lNwgTb+eHBFGm4uxlqLJqYIulD+mFh9viImLLw2+8QLyjP
+         mcRUYPqhlFarGe+/oFy4GSmeqXx/lcmAV7wt4buGyuiR5PI4SUAtGgo1ImtdchIOvcCT
+         zQMqABtMy7Q+r3hWkQShr6aDFNtfA35eZlkvJ/vhufwt+OClUMAD4rmtlN+oYCI6O5vC
+         pjEA==
+X-Gm-Message-State: AOAM531NXCa2tIm7d12ZMkLzBv/3uaIPOTi+IPwtHf0FmY0yNWO9Poif
+        vYTjApdtA4Uso40qXUy5YTHbjDmziCRpn7+Sj6pY2A==
+X-Google-Smtp-Source: ABdhPJx7n1Jzu9stxSW0B8Z2yESjtTjAbgEsU5PcOtsP0CIqXpGR8ePPHUya13zr/XKYKIv2ps3RYwappcy09FCWcjM=
+X-Received: by 2002:ab0:70c9:: with SMTP id r9mr3658814ual.15.1591814953932;
+ Wed, 10 Jun 2020 11:49:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CY4PR13MB1175A17F29B281642DF05A6DFD830@CY4PR13MB1175.namprd13.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com> <20200605213853.14959-12-sean.j.christopherson@intel.com>
+In-Reply-To: <20200605213853.14959-12-sean.j.christopherson@intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 10 Jun 2020 11:49:02 -0700
+Message-ID: <CANgfPd9vBbX66RYWhW+Lpsrya8Q4SduDHzpbAhAqRyU3i-gHxA@mail.gmail.com>
+Subject: Re: [PATCH 11/21] KVM: x86/mmu: Zero allocate shadow pages (outside
+ of mmu_lock)
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/06/20 19:43, Bird, Tim wrote:
->>>   		(rc=$?;	\
->>>   		if [ $rc -eq $skip_rc ]; then	\
->>> -			echo "not ok $test_num $TEST_HDR_MSG # SKIP"
->>> +			echo "ok $test_num $TEST_HDR_MSG # SKIP"
-> 
-> This is a pretty big change, and might break upstream CIs that have come to
-> rely on kselftest's existing behavior.  I know it's going to break Fuego's parsing
-> of results.
-
-Do you have a pointer to this code?
-
-> kselftest has a few conventions that are different from the TAP spec, 
-> and a few items it does that are extensions to the TAP spec.
-
-Yes, there are extensions to directives are not a problem and parsers
-might raise an error on them.  That can be an issue, but it's a separate
-one (and it's easier to ignore it as long as test pass...).
-
-> IMHO, the TAP spec got this one wrong, but I could be convinced
-> otherwise.
-
-Here the TAP spec says that a skip starts with "ok" and has a "SKIP"
-directive, and anyone can parse it to treat as it as a failure if
-desirable.  But doing something else should be treated simply as a
-violation of the spec, it's not a matter of "right" or "wrong".
-
-So, if you want to use "not ok ... # SKIP", don't call it TAP.
-
-However, I noticed now that there is another instance of "not ok.*SKIP"
-in testing/selftests/kselftest.h (and also one in a comment).  So they
-should all be fixed at the same time, and I'm okay with holding this patch.
-
-Paolo
-
-> But I think we should discuss this among CI users of
-> kselftest before making the change.
-> 
-> I started work quite a while ago on an effort to document the
-> conventions used by kselftest (particularly where it deviates
-> from the TAP spec),  but never submitted it.
-> 
-> I'm going to submit what I've got as an RFC now, for discussion,
-> even though it's not finished.  I'll do that in a separate thread.
-> 
-> 
->>>   		elif [ $rc -eq $timeout_rc ]; then \
->>>   			echo "#"
->>>   			echo "not ok $test_num $TEST_HDR_MSG # TIMEOUT"
->>>
->>
->> Thanks. I will pull this in for Linux 5.8-rc2
-> Shuah - can you hold off on this until we discuss it?
-> 
-> Thanks,
->  -- Tim
-> 
-
+On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Set __GFP_ZERO for the shadow page memory cache and drop the explicit
+> clear_page() from kvm_mmu_get_page().  This moves the cost of zeroing a
+> page to the allocation time of the physical page, i.e. when topping up
+> the memory caches, and thus avoids having to zero out an entire page
+> while holding mmu_lock.
+>
+> Cc: Peter Feiner <pfeiner@google.com>
+> Cc: Peter Shier <pshier@google.com>
+> Cc: Junaid Shahid <junaids@google.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Suggested-by: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6b0ec9060786..a8f8eebf67df 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2545,7 +2545,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>                 if (level > PG_LEVEL_4K && need_sync)
+>                         flush |= kvm_sync_pages(vcpu, gfn, &invalid_list);
+>         }
+> -       clear_page(sp->spt);
+>         trace_kvm_mmu_get_page(sp, true);
+>
+>         kvm_mmu_flush_or_zap(vcpu, &invalid_list, false, flush);
+> @@ -5687,6 +5686,8 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>         vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+>         vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+>
+> +       vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> +
+>         vcpu->arch.mmu = &vcpu->arch.root_mmu;
+>         vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+>
+> --
+> 2.26.0
+>
