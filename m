@@ -2,97 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D1DF1F5863
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 17:54:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDB491F58E8
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 18:19:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728594AbgFJPyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 11:54:43 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40083 "EHLO
+        id S1728804AbgFJQTO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 12:19:14 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41505 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728217AbgFJPym (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 11:54:42 -0400
+        by vger.kernel.org with ESMTP id S1728536AbgFJQTN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 12:19:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591804481;
+        s=mimecast20190719; t=1591805951;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0tCjaHRqySsbmgo1SDH04ZSF0FVSvkDa8UYEOkQpewY=;
-        b=PHzMrpgm/0f7i3Fmfcob5L4hiCyl7WFsQH5lOVo6z1ZKKYMt/ITE4UlwGE9NeO6qEbtrGz
-        r1vkR0MpGV0mQv+o4PdSJnBhY9xzF3bqJIAq6JmL4fc1aoqTdnl9W9PmOVELdtjl4Ge5Xg
-        o0G4tB2wykLwUjzA8+NinPq6sMOVhoo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-dzM1y0lSMs-4xPVPbqoQgA-1; Wed, 10 Jun 2020 11:54:37 -0400
-X-MC-Unique: dzM1y0lSMs-4xPVPbqoQgA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDF5D107ACF4;
-        Wed, 10 Jun 2020 15:54:36 +0000 (UTC)
-Received: from gondolin (ovpn-112-196.ams2.redhat.com [10.36.112.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C4A3178905;
-        Wed, 10 Jun 2020 15:54:32 +0000 (UTC)
-Date:   Wed, 10 Jun 2020 17:54:29 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v8 10/12] s390x: css: stsch, enumeration
- test
-Message-ID: <20200610175429.401a58ea.cohuck@redhat.com>
-In-Reply-To: <a9a44f1d-2179-5d95-f45f-172000f7a3c1@linux.ibm.com>
-References: <1591603981-16879-1-git-send-email-pmorel@linux.ibm.com>
-        <1591603981-16879-11-git-send-email-pmorel@linux.ibm.com>
-        <af39687e-4512-d147-5011-11d03b68e1bf@redhat.com>
-        <a9a44f1d-2179-5d95-f45f-172000f7a3c1@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=anaWHR8ODh6bT+XuFE0Xz0+EuRSEm+J1BoLhgrw84d0=;
+        b=PqwsPm3+wCtoi/v/uszAfAEjXalzKuvEu4AWipiAtWKzz1GnfaNnGLnOPmjOyIWdhWxO2b
+        DFL3m6P4s0A3ucDHFEe8Y2nMEoEOvu6tdBe1jKqVclnpj7P9WUtWn6AyXF6LrPBjjfaBQI
+        imBTP9sJb3LhvSUArEFFpRYYzpE+2As=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-wRY3h2HkMjCX7dyGAuYIfQ-1; Wed, 10 Jun 2020 12:19:10 -0400
+X-MC-Unique: wRY3h2HkMjCX7dyGAuYIfQ-1
+Received: by mail-qk1-f200.google.com with SMTP id x22so2548492qkj.6
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 09:19:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=anaWHR8ODh6bT+XuFE0Xz0+EuRSEm+J1BoLhgrw84d0=;
+        b=BhJsgROVERFCbvtykv0Ys9aw4aB4D5i+qjPBBo1GTJxturkK1yULDFh9rV4pp1bdJ2
+         zCITQatTMGRiXgj2KDP+BsV+AE0BroHHuxwsBkj4wUQqhHuBybIW5Ce+rHeaGidC6FL8
+         MG9dG/8P2Q/i1MJHq/J/PZFYun3iEORFdHlZTo2z9QZCVHdIuRpMPCjqLdjZP9+X87wY
+         6x7Ko3K2sM6606tLbFCQRQR/ZdYXM33olDqcFtpRFu/D6IHYJmwtbTt9JR3YmiV8/bN4
+         1fCj4XH45pKDNABkBVzPrDCQdPS0z5uL7p4wMg9VH05+hEXlNC8mt7Qh3K5J68rFfDIj
+         WBPw==
+X-Gm-Message-State: AOAM530NJw/K/+VdrkGvExw/bDMahH/lv/d6nal8nWv3NI+BJ3WtFFnP
+        sxKkLbXeuJFlTUn0hUwwdPmuEy6K/WfGj7oi060d/9TC8jB5OpK+mriN6WNcLOeCAMQfhLtNuDi
+        8rkuzoj9njucu4DHXPxa/+jfHL6LG
+X-Received: by 2002:a37:2702:: with SMTP id n2mr3862397qkn.497.1591805949115;
+        Wed, 10 Jun 2020 09:19:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4zn0n1VsDB2zRrhX3o2J87XhGBACiQ4fWr35+ECNuZ32gZdIovwS6Er7XIT1803b34VxsP/mWRIhTQj1OyYA=
+X-Received: by 2002:a37:2702:: with SMTP id n2mr3862363qkn.497.1591805948686;
+ Wed, 10 Jun 2020 09:19:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20200610113515.1497099-1-mst@redhat.com> <20200610113515.1497099-4-mst@redhat.com>
+ <CAJaqyWdGKh5gSTndGuVPyJSgt3jfjfW4xNCrJ2tQ9f+mD8=sMQ@mail.gmail.com> <20200610111147-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200610111147-mutt-send-email-mst@kernel.org>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 10 Jun 2020 18:18:32 +0200
+Message-ID: <CAJaqyWe6d19hFAbpqaQqOPuQQmBQyevyF4sTVkaXKhD729XDkw@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 03/14] vhost: use batched get_vq_desc version
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 9 Jun 2020 14:20:35 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Wed, Jun 10, 2020 at 5:13 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Jun 10, 2020 at 02:37:50PM +0200, Eugenio Perez Martin wrote:
+> > > +/* This function returns a value > 0 if a descriptor was found, or 0 if none were found.
+> > > + * A negative code is returned on error. */
+> > > +static int fetch_descs(struct vhost_virtqueue *vq)
+> > > +{
+> > > +       int ret;
+> > > +
+> > > +       if (unlikely(vq->first_desc >= vq->ndescs)) {
+> > > +               vq->first_desc = 0;
+> > > +               vq->ndescs = 0;
+> > > +       }
+> > > +
+> > > +       if (vq->ndescs)
+> > > +               return 1;
+> > > +
+> > > +       for (ret = 1;
+> > > +            ret > 0 && vq->ndescs <= vhost_vq_num_batch_descs(vq);
+> > > +            ret = fetch_buf(vq))
+> > > +               ;
+> >
+> > (Expanding comment in V6):
+> >
+> > We get an infinite loop this way:
+> > * vq->ndescs == 0, so we call fetch_buf() here
+> > * fetch_buf gets less than vhost_vq_num_batch_descs(vq); descriptors. ret = 1
+> > * This loop calls again fetch_buf, but vq->ndescs > 0 (and avail_vq ==
+> > last_avail_vq), so it just return 1
+>
+> That's what
+>          [PATCH RFC v7 08/14] fixup! vhost: use batched get_vq_desc version
+> is supposed to fix.
+>
 
-> On 2020-06-09 09:39, Thomas Huth wrote:
-> > On 08/06/2020 10.12, Pierre Morel wrote:  
+Sorry, I forgot to include that fixup.
 
-> >> +static void test_enumerate(void)
-> >> +{
-> >> +	test_device_sid = css_enumerate();
-> >> +	if (test_device_sid & SCHID_ONE) {
-> >> +		report(1, "First device schid: 0x%08x", test_device_sid);
-> >> +		return;
-> >> +	}
-> >> +
-> >> +	switch (test_device_sid) {
-> >> +	case 0:
-> >> +		report (0, "No I/O device found");
-> >> +		break;
-> >> +	default:	/* 1 or 2 should never happened for STSCH */
-> >> +		report(0, "Unexpected cc=%d during enumeration",
-> >> +		       test_device_sid);
-> >> +			return;
-> >> +	}  
-> > 
-> > Ok, so here is now the test failure for the cc=1 or 2 that should never
-> > happen. That means currently you print out the CC for this error twice.
-> > One time should be enough, either here, or use an report_abort() in the
-> > css_enumerate(), I'd say.
-> > 
-> > Anyway, can you please replace this switch statement with a "if
-> > (!test_device_sid)" instead? Or do you plan to add more "case"
-> > statements later?  
-> 
-> I will use the repor_abort() in the css_enumerate() so there
-> is only two case, I find a channel or not, so I don't even need the 
-> second if :) .
+With it I don't see CPU stalls, but with that version latency has
+increased a lot and I see packet lost:
++ ping -c 5 10.200.0.1
+PING 10.200.0.1 (10.200.0.1) 56(84) bytes of data.
+From 10.200.0.2 icmp_seq=1 Destination Host Unreachable
+From 10.200.0.2 icmp_seq=2 Destination Host Unreachable
+From 10.200.0.2 icmp_seq=3 Destination Host Unreachable
+64 bytes from 10.200.0.1: icmp_seq=5 ttl=64 time=6848 ms
 
-Yeah, testing only for SCHID_ONE present or not makes this a lot less
-confusing.
+--- 10.200.0.1 ping statistics ---
+5 packets transmitted, 1 received, +3 errors, 80% packet loss, time 76ms
+rtt min/avg/max/mdev = 6848.316/6848.316/6848.316/0.000 ms, pipe 4
+--
+
+I cannot even use netperf.
+
+If I modify with my proposed version:
++ ping -c 5 10.200.0.1
+PING 10.200.0.1 (10.200.0.1) 56(84) bytes of data.
+64 bytes from 10.200.0.1: icmp_seq=1 ttl=64 time=7.07 ms
+64 bytes from 10.200.0.1: icmp_seq=2 ttl=64 time=0.358 ms
+64 bytes from 10.200.0.1: icmp_seq=3 ttl=64 time=5.35 ms
+64 bytes from 10.200.0.1: icmp_seq=4 ttl=64 time=2.27 ms
+64 bytes from 10.200.0.1: icmp_seq=5 ttl=64 time=0.426 ms
+
+[root@localhost ~]# netperf -H 10.200.0.1 -p 12865 -l 10 -t TCP_STREAM
+MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to
+10.200.0.1 () port 0 AF_INET
+Recv   Send    Send
+Socket Socket  Message  Elapsed
+Size   Size    Size     Time     Throughput
+bytes  bytes   bytes    secs.    10^6bits/sec
+
+131072  16384  16384    10.01    4742.36
+[root@localhost ~]# netperf -H 10.200.0.1 -p 12865 -l 10 -t UDP_STREAM
+MIGRATED UDP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to
+10.200.0.1 () port 0 AF_INET
+Socket  Message  Elapsed      Messages
+Size    Size     Time         Okay Errors   Throughput
+bytes   bytes    secs            #      #   10^6bits/sec
+
+212992   65507   10.00        9214      0     482.83
+212992           10.00        9214            482.83
+
+I will compare with the non-batch version for reference, but the
+difference between the two is noticeable. Maybe it's worth finding a
+good value for the if() inside fetch_buf?
+
+Thanks!
+
+
+> --
+> MST
+>
 
