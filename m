@@ -2,130 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8707C1F5710
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 16:53:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F18F81F574A
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 17:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729944AbgFJOxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 10:53:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41682 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726943AbgFJOxt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 10:53:49 -0400
+        id S1730002AbgFJPIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 11:08:14 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51225 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729988AbgFJPIM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 11:08:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591800827;
+        s=mimecast20190719; t=1591801690;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SEnQxAW9uQsVBSiEtzbPpC8TpA8ftH1ryZnX+gay5Vs=;
-        b=dWGo7jdKPxNgXqOC/KoZA8U0EwMl9Rb2u4454KYEt3PF9HRD9REPq+IHIZFNDHZ/qa1qIV
-        Pc2oOJ7dIYVMU9eZPzQHl1AWaZ8Jm/KFpO7cXD7ogPyPJgMatPJDTuq4/EcvtPf6KHINS4
-        L4Skcaohvv3w76rQFjdQ8qVWMA7+1bI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-flirENk-PkmWukFoCP548w-1; Wed, 10 Jun 2020 10:53:43 -0400
-X-MC-Unique: flirENk-PkmWukFoCP548w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79F9318A4176;
-        Wed, 10 Jun 2020 14:53:10 +0000 (UTC)
-Received: from gondolin (ovpn-112-196.ams2.redhat.com [10.36.112.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6CFB75C296;
-        Wed, 10 Jun 2020 14:53:08 +0000 (UTC)
-Date:   Wed, 10 Jun 2020 16:53:05 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] s390: protvirt: virtio: Refuse device without IOMMU
-Message-ID: <20200610165305.1a34c548.cohuck@redhat.com>
-In-Reply-To: <54b28498-a6a7-4be2-9d2c-aef46c7fc642@linux.ibm.com>
-References: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
-        <20200610152431.358fded7.cohuck@redhat.com>
-        <54b28498-a6a7-4be2-9d2c-aef46c7fc642@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=ZvS3pY4wDKLBE9EMwiJvGN8pCoUxnpSAds/EiWZ00f4=;
+        b=I0685ZcZf4Fvrvkqw92ZrVz05k9UvhO3LuNQg0Crb4FwgwbArZIF3ydxoCx7xwvp/D6Vx1
+        OUvidjSL2xnOF8962wbYjwSiBJDSm/08UOSFSdlRozPBqIkVL5c615NSNUwUlAiVTinJvn
+        pHs3RdDEVcTBI7ZsSIQSRTX90nY6hHw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-CACsRbEEOme3044r0T4A2w-1; Wed, 10 Jun 2020 11:08:07 -0400
+X-MC-Unique: CACsRbEEOme3044r0T4A2w-1
+Received: by mail-wr1-f72.google.com with SMTP id w4so1209466wrl.13
+        for <kvm@vger.kernel.org>; Wed, 10 Jun 2020 08:08:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=ZvS3pY4wDKLBE9EMwiJvGN8pCoUxnpSAds/EiWZ00f4=;
+        b=FGigwPDzJrIxtW+22VF5C2VNe8JXLao3sfWhFxvaAfFWut5eTItEJu1+Ep2LaIq+Xn
+         gfHuInruByXEkquoL5VldbACdd+qW7sq/uu0ULOrVaS6lh6PvEgSncupSq1mbUJkcskR
+         FdUtQaH/J8GdiWPQxBHHRzxKkjQBAGquJoQPBw+Srp8OxZNYKbJzlMCQEE28NIUepW/W
+         qaYXRbFbfKKH3rBpldRWDOxAoOsbxQ1pcshKkKJ/foXaZiPpqMmUsMtrwBNzxnf25sp4
+         xXttECyskImHsZqkcRA0ddaMekuGHp7ZxzS1GogLDVir7Mc9fVlwNk7gCBYyH9NUnVCG
+         i/Uw==
+X-Gm-Message-State: AOAM531xBapK7IQ1qCEDwnB3OL0FE1i6P5sW5+wgmv5fvnXq+XdfP0zs
+        MTQrwWfRZbSIQblefV6dbMoABtW+MenUTSdWHbXSspPxbj3XIH3b/A3I+kXJshSL6mciatRYDCK
+        Yt/VeGseWNuez
+X-Received: by 2002:a05:6000:1104:: with SMTP id z4mr4211607wrw.272.1591801686260;
+        Wed, 10 Jun 2020 08:08:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxSwDALN5Pur0obQjyi2Uc0HobQX48dqJRmEevxPLOFxJwcAkmH8xWT1y5vRmc5DFWcLholqg==
+X-Received: by 2002:a05:6000:1104:: with SMTP id z4mr4211584wrw.272.1591801685999;
+        Wed, 10 Jun 2020 08:08:05 -0700 (PDT)
+Received: from redhat.com ([212.92.121.57])
+        by smtp.gmail.com with ESMTPSA id j4sm42126wma.7.2020.06.10.08.08.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jun 2020 08:08:05 -0700 (PDT)
+Date:   Wed, 10 Jun 2020 11:08:02 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH RFC v7 03/14] vhost: use batched get_vq_desc version
+Message-ID: <20200610105829-mutt-send-email-mst@kernel.org>
+References: <20200610113515.1497099-1-mst@redhat.com>
+ <20200610113515.1497099-4-mst@redhat.com>
+ <035e82bcf4ade0017641c5b457d0c628c5915732.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <035e82bcf4ade0017641c5b457d0c628c5915732.camel@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Jun 2020 16:37:55 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> On 2020-06-10 15:24, Cornelia Huck wrote:
-> > On Wed, 10 Jun 2020 15:11:51 +0200
-> > Pierre Morel <pmorel@linux.ibm.com> wrote:
-> >   
-> >> Protected Virtualisation protects the memory of the guest and
-> >> do not allow a the host to access all of its memory.
-> >>
-> >> Let's refuse a VIRTIO device which does not use IOMMU
-> >> protected access.
-> >>
-> >> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> >> ---
-> >>   drivers/s390/virtio/virtio_ccw.c | 5 +++++
-> >>   1 file changed, 5 insertions(+)
-> >>
-> >> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> >> index 5730572b52cd..06ffbc96587a 100644
-> >> --- a/drivers/s390/virtio/virtio_ccw.c
-> >> +++ b/drivers/s390/virtio/virtio_ccw.c
-> >> @@ -986,6 +986,11 @@ static void virtio_ccw_set_status(struct virtio_device *vdev, u8 status)
-> >>   	if (!ccw)
-> >>   		return;
-> >>   
-> >> +	/* Protected Virtualisation guest needs IOMMU */
-> >> +	if (is_prot_virt_guest() &&
-> >> +	    !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
-> >> +			status &= ~VIRTIO_CONFIG_S_FEATURES_OK;
-> >> +  
+On Wed, Jun 10, 2020 at 04:29:29PM +0200, Eugenio Pérez wrote:
+> On Wed, 2020-06-10 at 07:36 -0400, Michael S. Tsirkin wrote:
+> > As testing shows no performance change, switch to that now.
 > > 
-> > set_status seems like an odd place to look at features; shouldn't that
-> > rather be done in finalize_features?  
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> > Link: https://lore.kernel.org/r/20200401183118.8334-3-eperezma@redhat.com
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  drivers/vhost/test.c  |   2 +-
+> >  drivers/vhost/vhost.c | 318 ++++++++----------------------------------
+> >  drivers/vhost/vhost.h |   7 +-
+> >  3 files changed, 65 insertions(+), 262 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> > index 0466921f4772..7d69778aaa26 100644
+> > --- a/drivers/vhost/test.c
+> > +++ b/drivers/vhost/test.c
+> > @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+> >  	dev = &n->dev;
+> >  	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+> >  	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+> > -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
+> > +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
+> >  		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, true, NULL);
+> >  
+> >  	f->private_data = n;
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index 11433d709651..28f324fd77df 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -304,6 +304,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+> >  {
+> >  	vq->num = 1;
+> >  	vq->ndescs = 0;
+> > +	vq->first_desc = 0;
+> >  	vq->desc = NULL;
+> >  	vq->avail = NULL;
+> >  	vq->used = NULL;
+> > @@ -372,6 +373,11 @@ static int vhost_worker(void *data)
+> >  	return 0;
+> >  }
+> >  
+> > +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
+> > +{
+> > +	return vq->max_descs - UIO_MAXIOV;
+> > +}
+> > +
+> >  static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+> >  {
+> >  	kfree(vq->descs);
+> > @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
+> >  	for (i = 0; i < dev->nvqs; ++i) {
+> >  		vq = dev->vqs[i];
+> >  		vq->max_descs = dev->iov_limit;
+> > +		if (vhost_vq_num_batch_descs(vq) < 0) {
+> > +			return -EINVAL;
+> > +		}
+> >  		vq->descs = kmalloc_array(vq->max_descs,
+> >  					  sizeof(*vq->descs),
+> >  					  GFP_KERNEL);
+> > @@ -1610,6 +1619,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
+> >  		vq->last_avail_idx = s.num;
+> >  		/* Forget the cached index value. */
+> >  		vq->avail_idx = vq->last_avail_idx;
+> > +		vq->ndescs = vq->first_desc = 0;
 > 
-> Right, looks better to me too.
-> What about:
+> This is not needed if it is done in vhost_vq_set_backend, as far as I can tell.
 > 
+> Actually, maybe it is even better to move `vq->avail_idx = vq->last_avail_idx;` line to vhost_vq_set_backend, it is part
+> of the backend "set up" procedure, isn't it?
 > 
-> 
-> diff --git a/drivers/s390/virtio/virtio_ccw.c 
-> b/drivers/s390/virtio/virtio_ccw.c
-> index 06ffbc96587a..227676297ea0 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -833,6 +833,11 @@ static int virtio_ccw_finalize_features(struct 
-> virtio_device *vdev)
->                  ret = -ENOMEM;
->                  goto out_free;
->          }
-> +
-> +       if (is_prot_virt_guest() &&
-> +           !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
+> I tested with virtio_test + batch tests sent in 
+> https://lkml.kernel.org/lkml/20200418102217.32327-1-eperezma@redhat.com/T/.
 
-Add a comment, and (maybe) a message?
+Ow did I forget to merge them for rc1?  Should I have? Maybe Linus won't
+yell to hard at me if I merge them after rc1.
 
-Otherwise, I think this is fine, as it should fail the probe, which is
-what we want.
 
-> +               return -EIO;
-> +
->          /* Give virtio_ring a chance to accept features. */
->          vring_transport_features(vdev);
+> I append here what I'm proposing in case it is clearer this way.
 > 
+> Thanks!
 > 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 4d198994e7be..809ad2cd2879 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1617,9 +1617,6 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
+>  			break;
+>  		}
+>  		vq->last_avail_idx = s.num;
+> -		/* Forget the cached index value. */
+> -		vq->avail_idx = vq->last_avail_idx;
+> -		vq->ndescs = vq->first_desc = 0;
+>  		break;
+>  	case VHOST_GET_VRING_BASE:
+>  		s.index = idx;
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index fed36af5c444..f4902dc808e4 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -258,6 +258,7 @@ static inline void vhost_vq_set_backend(struct vhost_virtqueue *vq,
+>  					void *private_data)
+>  {
+>  	vq->private_data = private_data;
+> +	vq->avail_idx = vq->last_avail_idx;
+>  	vq->ndescs = 0;
+>  	vq->first_desc = 0;
+>  }
 > 
-> Thanks,
-> 
-> Regards,
-> Pierre
-> 
+
+Seems like a nice cleanup, though it's harmless right?
+
+
+-- 
+MST
 
