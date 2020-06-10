@@ -2,91 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ACA01F55B6
-	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 15:24:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99BDC1F5654
+	for <lists+kvm@lfdr.de>; Wed, 10 Jun 2020 15:59:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729278AbgFJNYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 09:24:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24835 "EHLO
+        id S1729597AbgFJN7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 09:59:01 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33098 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726306AbgFJNYn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 09:24:43 -0400
+        by vger.kernel.org with ESMTP id S1726316AbgFJN67 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Jun 2020 09:58:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591795482;
+        s=mimecast20190719; t=1591797538;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cmumuHmMHhqlAParqxNQ/YNCBmzeBy/qMSsDffXs8Eo=;
-        b=F3MhEMEMEwNjAnp+CNNbEkTJqNIxnT4deUFL6c6RGfW2ru4IDllHnvknKnrolDWXeqaRVL
-        jRp1d1sRUmXTZJRCrMXPG9Yujf6gSUBtGbJSEwHlryKdB3dGrRz1XBM1rq2Ipti9Hzx4Oi
-        tQi4uv87Ag/ocq7qbiG3pP5f3qAEGag=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+xK1FKusim+ilFQ1Wb/m7cl9km13yzEUJrwXMyQvZtM=;
+        b=A0ewlUM4IgzNdN79RWh2br9hjH4eOUeFl6S8FsOMMhG5RuPIU9v1bWcumrn228YgSnDQ6J
+        yHEUtnqLJkhqqyppxC0kC4L2J3UWW4r+WeVb8k/rLdJ/Hp+J954kLTo6KbS2UZejP/D7jY
+        MAPopu1T7w//ZgjcbEAE+pZpFMZnxcg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-HMY6qF-2Pqqun-sbMdrMqQ-1; Wed, 10 Jun 2020 09:24:40 -0400
-X-MC-Unique: HMY6qF-2Pqqun-sbMdrMqQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-320-ZyrC7x46PaucaFZt8eaF4A-1; Wed, 10 Jun 2020 09:58:55 -0400
+X-MC-Unique: ZyrC7x46PaucaFZt8eaF4A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E45148014D9;
-        Wed, 10 Jun 2020 13:24:38 +0000 (UTC)
-Received: from gondolin (ovpn-112-196.ams2.redhat.com [10.36.112.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F39CE709D7;
-        Wed, 10 Jun 2020 13:24:33 +0000 (UTC)
-Date:   Wed, 10 Jun 2020 15:24:31 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] s390: protvirt: virtio: Refuse device without IOMMU
-Message-ID: <20200610152431.358fded7.cohuck@redhat.com>
-In-Reply-To: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
-References: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01680100A614;
+        Wed, 10 Jun 2020 13:58:53 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.192.78])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1AE3D5C1BD;
+        Wed, 10 Jun 2020 13:58:48 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] KVM: selftests: avoid test failures with 'nested=0'
+Date:   Wed, 10 Jun 2020 15:58:45 +0200
+Message-Id: <20200610135847.754289-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Jun 2020 15:11:51 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Commit 33b22172452f ("KVM: x86: move nested-related kvm_x86_ops to a
+separate struct") made nested hooks (e.g. ->get_state(), ->enable_evmcs())
+always available, even when kvm module is loaded with 'nested=0'. Assuming
+the change was intentional, update selftests to not fail in this situation.
 
-> Protected Virtualisation protects the memory of the guest and
-> do not allow a the host to access all of its memory.
-> 
-> Let's refuse a VIRTIO device which does not use IOMMU
-> protected access.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  drivers/s390/virtio/virtio_ccw.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 5730572b52cd..06ffbc96587a 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -986,6 +986,11 @@ static void virtio_ccw_set_status(struct virtio_device *vdev, u8 status)
->  	if (!ccw)
->  		return;
->  
-> +	/* Protected Virtualisation guest needs IOMMU */
-> +	if (is_prot_virt_guest() &&
-> +	    !__virtio_test_bit(vdev, VIRTIO_F_IOMMU_PLATFORM))
-> +			status &= ~VIRTIO_CONFIG_S_FEATURES_OK;
-> +
+Vitaly Kuznetsov (2):
+  KVM: selftests: do not substitute SVM/VMX check with
+    KVM_CAP_NESTED_STATE check
+  KVM: selftests: Don't probe KVM_CAP_HYPERV_ENLIGHTENED_VMCS when
+    nested VMX is unsupported
 
-set_status seems like an odd place to look at features; shouldn't that
-rather be done in finalize_features?
+ .../testing/selftests/kvm/include/x86_64/svm_util.h |  1 +
+ tools/testing/selftests/kvm/include/x86_64/vmx.h    |  1 +
+ tools/testing/selftests/kvm/lib/x86_64/svm.c        | 10 +++++++---
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c        |  9 +++++++--
+ tools/testing/selftests/kvm/x86_64/evmcs_test.c     |  5 +++--
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c   |  3 ++-
+ tools/testing/selftests/kvm/x86_64/smm_test.c       | 13 +++++++------
+ tools/testing/selftests/kvm/x86_64/state_test.c     | 13 +++++++------
+ 8 files changed, 35 insertions(+), 20 deletions(-)
 
->  	/* Write the status to the host. */
->  	vcdev->dma_area->status = status;
->  	ccw->cmd_code = CCW_CMD_WRITE_STATUS;
+-- 
+2.25.4
 
