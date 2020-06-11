@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E9B01F6833
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 14:48:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F8781F682A
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 14:48:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbgFKMsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 08:48:35 -0400
-Received: from mga14.intel.com ([192.55.52.115]:37615 "EHLO mga14.intel.com"
+        id S1728004AbgFKMsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 08:48:16 -0400
+Received: from mga18.intel.com ([134.134.136.126]:58113 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726332AbgFKMsI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 08:48:08 -0400
-IronPort-SDR: YV0aLyni+m04/Zl1lGZXJ4LlmkGLq6eI2J4TFnRHpaUXj2Rf/wo1noseTjrGp0pOVus22XCRMe
- rvTnN5T9mB9w==
+        id S1726978AbgFKMsP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 08:48:15 -0400
+IronPort-SDR: bQdd8PC4Fqna6031ublYOa1zszfaBz5MEHyKg9V6kMJ5xNCPLkk0MilecgbXj7hqiZC14BAsbM
+ 6x8D5aYTBr6w==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 05:48:00 -0700
-IronPort-SDR: 4qfAmefgLYNTnN/vWx+pZwUgGdhdApYcHReu/f4iKic1P5cIMvE/vSomhjx9zYqNHp+CtJTF1J
- hyAeICU6WHnw==
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 05:48:00 -0700
+IronPort-SDR: 2caCxaX8rE7UhK23Pu6pQDAAPo4jWaWTbDae32ffABpNaPAPMkHbKkrsksa52xRz2TSzdsI5tW
+ OFyn6LG7tuXA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; 
-   d="scan'208";a="447911266"
+   d="scan'208";a="447911269"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
   by orsmga005.jf.intel.com with ESMTP; 11 Jun 2020 05:48:00 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
@@ -34,9 +34,9 @@ Cc:     mst@redhat.com, pbonzini@redhat.com, eric.auger@redhat.com,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Yi Sun <yi.y.sun@linux.intel.com>,
         Richard Henderson <rth@twiddle.net>
-Subject: [RFC v6 17/25] intel_iommu: sync IOMMU nesting cap info for assigned devices
-Date:   Thu, 11 Jun 2020 05:54:16 -0700
-Message-Id: <1591880064-30638-18-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v6 18/25] intel_iommu: bind/unbind guest page table to host
+Date:   Thu, 11 Jun 2020 05:54:17 -0700
+Message-Id: <1591880064-30638-19-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1591880064-30638-1-git-send-email-yi.l.liu@intel.com>
 References: <1591880064-30638-1-git-send-email-yi.l.liu@intel.com>
@@ -45,19 +45,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For assigned devices, Intel vIOMMU which wants to build DMA protection
-based on physical IOMMU nesting paging should check the IOMMU nesting
-support in host side. The host will return IOMMU nesting cap info to
-user-space (e.g. VFIO returns IOMMU nesting cap info for nesting type
-IOMMU). vIOMMU needs to check:
-a) IOMMU model
-b) 1st-level page table supports
-c) address width
-d) pasid support
-
-This patch syncs the IOMMU nesting cap info when PCIe device (VFIO case)
-sets HostIOMMUContext to vIOMMU. If the host IOMMU nesting support is not
-compatible, vIOMMU should return failure to PCIe device.
+This patch captures the guest PASID table entry modifications and
+propagates the changes to host to setup dual stage DMA translation.
+The guest page table is configured as 1st level page table (GVA->GPA)
+whose translation result would further go through host VT-d 2nd
+level page table(GPA->HPA) under nested translation mode. This is the
+key part of vSVA support, and also a key to support IOVA over 1st-
+level page table for Intel VT-d in virtualization environment.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -67,203 +61,187 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/i386/intel_iommu.c          | 105 +++++++++++++++++++++++++++++++++++++++++
- hw/i386/intel_iommu_internal.h |   5 ++
- include/hw/i386/intel_iommu.h  |   4 ++
- 3 files changed, 114 insertions(+)
+ hw/i386/intel_iommu.c          | 99 +++++++++++++++++++++++++++++++++++++++---
+ hw/i386/intel_iommu_internal.h | 18 ++++++++
+ 2 files changed, 112 insertions(+), 5 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 805801c..4a794f9 100644
+index 4a794f9..f4b07e9 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -4099,6 +4099,82 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
-     return ret;
+@@ -41,6 +41,7 @@
+ #include "migration/vmstate.h"
+ #include "trace.h"
+ #include "qemu/jhash.h"
++#include <linux/iommu.h>
+ 
+ /* context entry operations */
+ #define VTD_CE_GET_RID2PASID(ce) \
+@@ -700,6 +701,16 @@ static inline uint32_t vtd_sm_ce_get_pdt_entry_num(VTDContextEntry *ce)
+     return 1U << (VTD_SM_CONTEXT_ENTRY_PDTS(ce->val[0]) + 7);
  }
  
-+
-+static bool vtd_check_nesting_info(IntelIOMMUState *s,
-+                                   struct iommu_nesting_info_vtd *vtd)
++static inline uint32_t vtd_pe_get_fl_aw(VTDPASIDEntry *pe)
 +{
-+    return !((s->aw_bits != vtd->addr_width) ||
-+             ((s->host_cap & vtd->cap_mask) !=
-+              (vtd->cap_reg & vtd->cap_mask)) ||
-+             ((s->host_ecap & vtd->ecap_mask) !=
-+              (vtd->ecap_reg & vtd->ecap_mask)) ||
-+             (VTD_GET_PSS(s->host_ecap) != (vtd->pasid_bits - 1)));
++    return 48 + ((pe->val[2] >> 2) & VTD_SM_PASID_ENTRY_FLPM) * 9;
 +}
 +
-+/* Caller should hold iommu lock. */
-+static bool vtd_sync_nesting_info(IntelIOMMUState *s,
-+                                      struct iommu_nesting_info_vtd *vtd)
++static inline dma_addr_t vtd_pe_get_flpt_base(VTDPASIDEntry *pe)
 +{
-+    uint64_t cap, ecap;
-+
-+    if (s->cap_finalized) {
-+        return vtd_check_nesting_info(s, vtd);
-+    }
-+
-+    if (s->aw_bits > vtd->addr_width) {
-+        error_report("User aw-bits: %u > host address width: %u",
-+                      s->aw_bits, vtd->addr_width);
-+        return false;
-+    }
-+
-+    cap = s->host_cap & vtd->cap_reg & vtd->cap_mask;
-+    s->host_cap &= ~vtd->cap_mask;
-+    s->host_cap |= cap;
-+
-+    ecap = s->host_ecap & vtd->ecap_reg & vtd->ecap_mask;
-+    s->host_ecap &= ~vtd->ecap_mask;
-+    s->host_ecap |= ecap;
-+
-+    if ((VTD_ECAP_PASID & s->host_ecap) && vtd->pasid_bits &&
-+        (VTD_GET_PSS(s->host_ecap) > (vtd->pasid_bits - 1))) {
-+        s->host_ecap &= ~VTD_ECAP_PSS_MASK;
-+        s->host_ecap |= VTD_ECAP_PSS(vtd->pasid_bits - 1);
-+    }
-+    return true;
++    return pe->val[2] & VTD_SM_PASID_ENTRY_FLPTPTR;
 +}
 +
-+/*
-+ * virtual VT-d which wants nested needs to check the host IOMMU
-+ * nesting cap info behind the assigned devices. Thus that vIOMMU
-+ * could bind guest page table to host.
+ static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
+ {
+     return pdire->val & 1;
+@@ -1861,6 +1872,83 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+     vtd_iommu_replay_all(s);
+ }
+ 
++/**
++ * Caller should hold iommu_lock.
 + */
-+static bool vtd_check_iommu_ctx(IntelIOMMUState *s,
-+                                HostIOMMUContext *iommu_ctx)
++static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
++                                int devfn, int pasid, VTDPASIDEntry *pe,
++                                VTDPASIDOp op)
 +{
-+    struct iommu_nesting_info *info = iommu_ctx->info;
-+    struct iommu_nesting_info_vtd *vtd;
-+    uint32_t minsz, size;
++    VTDHostIOMMUContext *vtd_dev_icx;
++    HostIOMMUContext *iommu_ctx;
++    int ret = -1;
 +
-+    if (IOMMU_PASID_FORMAT_INTEL_VTD != info->format) {
-+        error_report("Format is not compatible for nesting!!!");
-+        return false;
++    vtd_dev_icx = vtd_bus->dev_icx[devfn];
++    if (!vtd_dev_icx) {
++        /* means no need to go further, e.g. for emulated devices */
++        return 0;
 +    }
 +
-+    size = sizeof(*vtd);
-+    minsz = endof(struct iommu_nesting_info, flags);
-+    if (size > (info->size - minsz)) {
-+        /*
-+         * QEMU may have been using new linux-headers/iommu.h than
-+         * kernel supports, hence fail it.
-+         */
-+        error_report("IOMMU nesting cap is not compatible!!!");
-+        return false;
++    iommu_ctx = vtd_dev_icx->iommu_ctx;
++    if (!iommu_ctx) {
++        return -EINVAL;
 +    }
 +
-+    vtd =  (struct iommu_nesting_info_vtd *) &info->data;
-+    return vtd_sync_nesting_info(s, vtd);
++    switch (op) {
++    case VTD_PASID_BIND:
++    {
++        struct iommu_gpasid_bind_data *g_bind_data;
++
++        g_bind_data = g_malloc0(sizeof(*g_bind_data));
++
++        g_bind_data->argsz = sizeof(*g_bind_data);
++        g_bind_data->version = IOMMU_GPASID_BIND_VERSION_1;
++        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
++        g_bind_data->gpgd = vtd_pe_get_flpt_base(pe);
++        g_bind_data->addr_width = vtd_pe_get_fl_aw(pe);
++        g_bind_data->hpasid = pasid;
++        g_bind_data->gpasid = pasid;
++        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
++        g_bind_data->vtd.flags =
++                             (VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]) ?
++                                            IOMMU_SVA_VTD_GPASID_SRE : 0)
++                           | (VTD_SM_PASID_ENTRY_EAFE_BIT(pe->val[2]) ?
++                                            IOMMU_SVA_VTD_GPASID_EAFE : 0)
++                           | (VTD_SM_PASID_ENTRY_PCD_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_PCD : 0)
++                           | (VTD_SM_PASID_ENTRY_PWT_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_PWT : 0)
++                           | (VTD_SM_PASID_ENTRY_EMTE_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_EMTE : 0)
++                           | (VTD_SM_PASID_ENTRY_CD_BIT(pe->val[1]) ?
++                                            IOMMU_SVA_VTD_GPASID_CD : 0);
++        g_bind_data->vtd.pat = VTD_SM_PASID_ENTRY_PAT(pe->val[1]);
++        g_bind_data->vtd.emt = VTD_SM_PASID_ENTRY_EMT(pe->val[1]);
++        ret = host_iommu_ctx_bind_stage1_pgtbl(iommu_ctx, g_bind_data);
++        g_free(g_bind_data);
++        break;
++    }
++    case VTD_PASID_UNBIND:
++    {
++        struct iommu_gpasid_unbind_data *g_unbind_data;
++
++        g_unbind_data = g_malloc0(sizeof(*g_unbind_data));
++
++        g_unbind_data->argsz = sizeof(*g_unbind_data);
++        g_unbind_data->pasid = pasid;
++        ret = host_iommu_ctx_unbind_stage1_pgtbl(iommu_ctx, g_unbind_data);
++        g_free(g_unbind_data);
++        break;
++    }
++    default:
++        error_report_once("Unknown VTDPASIDOp!!!\n");
++        break;
++    }
++
++
++    return ret;
 +}
 +
- static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
-                                      int devfn,
-                                      HostIOMMUContext *iommu_ctx)
-@@ -4113,6 +4189,11 @@ static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
- 
-     vtd_iommu_lock(s);
- 
-+    if (!vtd_check_iommu_ctx(s, iommu_ctx)) {
-+        vtd_iommu_unlock(s);
-+        return -ENOENT;
-+    }
-+
-     vtd_dev_icx = vtd_bus->dev_icx[devfn];
- 
-     assert(!vtd_dev_icx);
-@@ -4368,6 +4449,14 @@ static void vtd_init(IntelIOMMUState *s)
-         s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+ /* Do a context-cache device-selective invalidation.
+  * @func_mask: FM field after shifting
+  */
+@@ -2489,10 +2577,10 @@ static void vtd_fill_pe_in_cache(IntelIOMMUState *s,
      }
  
-+    if (!s->cap_finalized) {
-+        s->host_cap = s->cap;
-+        s->host_ecap = s->ecap;
-+    } else {
-+        s->cap = s->host_cap;
-+        s->ecap = s->host_ecap;
-+    }
-+
-     vtd_reset_caches(s);
+     pc_entry->pasid_entry = *pe;
+-    /*
+-     * TODO:
+-     * - send pasid bind to host for passthru devices
+-     */
++    vtd_bind_guest_pasid(s, vtd_pasid_as->vtd_bus,
++                         vtd_pasid_as->devfn,
++                         vtd_pasid_as->pasid,
++                         pe, VTD_PASID_BIND);
+ }
  
-     /* Define registers with default values and bit semantics */
-@@ -4501,6 +4590,12 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+ /**
+@@ -2565,10 +2653,11 @@ static gboolean vtd_flush_pasid(gpointer key, gpointer value,
+ remove:
+     /*
+      * TODO:
+-     * - send pasid bind to host for passthru devices
+      * - when pasid-base-iotlb(piotlb) infrastructure is ready,
+      *   should invalidate QEMU piotlb togehter with this change.
+      */
++    vtd_bind_guest_pasid(s, vtd_bus, devfn,
++                         pasid, NULL, VTD_PASID_UNBIND);
      return true;
  }
  
-+static void vtd_refresh_capability_reg(IntelIOMMUState *s)
-+{
-+    vtd_set_quad(s, DMAR_CAP_REG, s->cap);
-+    vtd_set_quad(s, DMAR_ECAP_REG, s->ecap);
-+}
-+
- static int vtd_machine_done_notify_one(Object *child, void *unused)
- {
-     IntelIOMMUState *iommu = INTEL_IOMMU_DEVICE(x86_iommu_get_default());
-@@ -4514,6 +4609,15 @@ static int vtd_machine_done_notify_one(Object *child, void *unused)
-         vtd_panic_require_caching_mode();
-     }
- 
-+    vtd_iommu_lock(iommu);
-+    iommu->cap = iommu->host_cap & iommu->cap;
-+    iommu->ecap = iommu->host_ecap & iommu->ecap;
-+    if (!iommu->cap_finalized) {
-+        iommu->cap_finalized = true;
-+    }
-+
-+    vtd_refresh_capability_reg(iommu);
-+    vtd_iommu_unlock(iommu);
-     return 0;
- }
- 
-@@ -4545,6 +4649,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
-     QLIST_INIT(&s->vtd_as_with_notifiers);
-     QLIST_INIT(&s->vtd_dev_icx_list);
-     qemu_mutex_init(&s->iommu_lock);
-+    s->cap_finalized = false;
-     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
-     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
-                           "intel_iommu", DMAR_REG_SIZE);
 diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 51c0833..dbadd66 100644
+index dbadd66..93adb37 100644
 --- a/hw/i386/intel_iommu_internal.h
 +++ b/hw/i386/intel_iommu_internal.h
-@@ -196,9 +196,14 @@
- #define VTD_ECAP_PT                 (1ULL << 6)
- #define VTD_ECAP_MHMV               (15ULL << 20)
- #define VTD_ECAP_SRS                (1ULL << 31)
-+#define VTD_ECAP_PSS(val)           (((val) & 0x1fULL) << 35)
-+#define VTD_ECAP_PASID              (1ULL << 40)
- #define VTD_ECAP_SMTS               (1ULL << 43)
- #define VTD_ECAP_SLTS               (1ULL << 46)
+@@ -522,6 +522,13 @@ typedef struct VTDRootEntry VTDRootEntry;
+ #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL0(aw)  (0x1e0ULL | ~VTD_HAW_MASK(aw))
+ #define VTD_SM_CONTEXT_ENTRY_RSVD_VAL1      0xffffffffffe00000ULL
  
-+#define VTD_GET_PSS(val)            (((val) >> 35) & 0x1f)
-+#define VTD_ECAP_PSS_MASK           (0x1fULL << 35)
++enum VTDPASIDOp {
++    VTD_PASID_BIND,
++    VTD_PASID_UNBIND,
++    VTD_OP_NUM
++};
++typedef enum VTDPASIDOp VTDPASIDOp;
 +
- /* CAP_REG */
- /* (offset >> 4) << 24 */
- #define VTD_CAP_FRO                 (DMAR_FRCD_REG_OFFSET << 20)
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 626c1cd..1aab882 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -284,6 +284,9 @@ struct IntelIOMMUState {
-     uint64_t cap;                   /* The value of capability reg */
-     uint64_t ecap;                  /* The value of extended capability reg */
+ typedef enum VTDPCInvType {
+     /* force reset all */
+     VTD_PASID_CACHE_FORCE_RESET = 0,
+@@ -564,6 +571,17 @@ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
+ #define VTD_SM_PASID_ENTRY_AW          7ULL /* Adjusted guest-address-width */
+ #define VTD_SM_PASID_ENTRY_DID(val)    ((val) & VTD_DOMAIN_ID_MASK)
  
-+    uint64_t host_cap;              /* The value of host capability reg */
-+    uint64_t host_ecap;             /* The value of host ext-capability reg */
++#define VTD_SM_PASID_ENTRY_FLPM          3ULL
++#define VTD_SM_PASID_ENTRY_FLPTPTR       (~0xfffULL)
++#define VTD_SM_PASID_ENTRY_SRE_BIT(val)  (!!((val) & 1ULL))
++#define VTD_SM_PASID_ENTRY_EAFE_BIT(val) (!!(((val) >> 7) & 1ULL))
++#define VTD_SM_PASID_ENTRY_PCD_BIT(val)  (!!(((val) >> 31) & 1ULL))
++#define VTD_SM_PASID_ENTRY_PWT_BIT(val)  (!!(((val) >> 30) & 1ULL))
++#define VTD_SM_PASID_ENTRY_EMTE_BIT(val) (!!(((val) >> 26) & 1ULL))
++#define VTD_SM_PASID_ENTRY_CD_BIT(val)   (!!(((val) >> 25) & 1ULL))
++#define VTD_SM_PASID_ENTRY_PAT(val)      (((val) >> 32) & 0xFFFFFFFFULL)
++#define VTD_SM_PASID_ENTRY_EMT(val)      (((val) >> 27) & 0x7ULL)
 +
-     uint32_t context_cache_gen;     /* Should be in [1,MAX] */
-     GHashTable *iotlb;              /* IOTLB */
+ /* Second Level Page Translation Pointer*/
+ #define VTD_SM_PASID_ENTRY_SLPTPTR     (~0xfffULL)
  
-@@ -310,6 +313,7 @@ struct IntelIOMMUState {
-     uint64_t vccap;                 /* The value of vcmd capability reg */
-     uint64_t vcrsp;                 /* Current value of VCMD RSP REG */
- 
-+    bool cap_finalized;             /* Whether VTD capability finalized */
-     /*
-      * iommu_lock protects below:
-      * - per-IOMMU IOTLB caches
 -- 
 2.7.4
 
