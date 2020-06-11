@@ -2,114 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42E7F1F6AF5
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 17:28:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0F1B1F6B28
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 17:36:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728555AbgFKP16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 11:27:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44967 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726497AbgFKP14 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jun 2020 11:27:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591889274;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tubQTvMCayyEO7VGNY1bAGU+lqkLOkwFY6fIG7RPrrg=;
-        b=AiW797L7xYUyHVCoMm373X8PqbX4OLiKu/k6El3vEwLWT/3mGLNFTun9zjH4thBI7qzFTE
-        l65gdcxEHp6kZN9Yip3M3WD6WF8OAsVai7b9UphgNGk939CM5o+z600iVrG8YZhDCSUTnA
-        U8DuVNVDtKQhDs9Hq/Ko8mN/KTuDYZ4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-yoHZSv1YO9Six2EpvqSfDA-1; Thu, 11 Jun 2020 11:27:51 -0400
-X-MC-Unique: yoHZSv1YO9Six2EpvqSfDA-1
-Received: by mail-wm1-f69.google.com with SMTP id r1so1461747wmh.7
-        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 08:27:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tubQTvMCayyEO7VGNY1bAGU+lqkLOkwFY6fIG7RPrrg=;
-        b=XMnu24FxPtzTN3zVs2Kmcl+1Xxua/KTvK9S2zRmjLrXvrm2demzVDrZTkvssQf+5Co
-         /MNDNXGF3tUxvf/FkJDDutNatqUqXineJG2L9Bm9guuSXnfySunhSmnnaGY9ctTQnBuf
-         Ef0G8NGNOIUj0BM1GftiM3r1icCYd1ycmeSjv3YjyiUKQGKAZumy4C5pPIiVm76Wr3gj
-         UOHxdhTRg8DSSF6MdtA5f+yfrK1Cyw+2z0jvTyAxSpTMOPZINHhIu8kqkEDHwBeMdCW6
-         1qpyZO2zO/2MvQQ0Qmp8h9mhE9zmr51I6dT+nYH61MWTV280ELRL7xx0ylgW+zMTU9zC
-         7egA==
-X-Gm-Message-State: AOAM5325Jb71aLuj9h3jMr3ED6WSktp889yDySLkf4Azb0rJDqdvqmsn
-        kZw4sUBG88evY9BSPp54/vCncb1r5PuKAyViiWteNVvlp9gcBaWb6UufBUrxoAz7GnjT8dkAGIB
-        DrnpW2sh+zqul
-X-Received: by 2002:a1c:2183:: with SMTP id h125mr8260908wmh.112.1591889269893;
-        Thu, 11 Jun 2020 08:27:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybUgRWiUuIG0MwV8QKdmngDG0hRIBA7dEUisc28nbd4b+WXjrTb/klVvugUgYwmfSnG7C9AA==
-X-Received: by 2002:a1c:2183:: with SMTP id h125mr8260888wmh.112.1591889269567;
-        Thu, 11 Jun 2020 08:27:49 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:29ed:810e:962c:aa0d? ([2001:b07:6468:f312:29ed:810e:962c:aa0d])
-        by smtp.gmail.com with ESMTPSA id l17sm5621237wrq.17.2020.06.11.08.27.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jun 2020 08:27:49 -0700 (PDT)
-Subject: Re: [PATCH] KVM: check userspace_addr for all memslots
-To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>
-References: <20200601082146.18969-1-pbonzini@redhat.com>
- <dde19d595336a5d79345f3115df26687871dfad5.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b97854bd-ff63-71ee-3c27-2602326a26b8@redhat.com>
-Date:   Thu, 11 Jun 2020 17:27:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1728607AbgFKPgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 11:36:06 -0400
+Received: from mga14.intel.com ([192.55.52.115]:57442 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728414AbgFKPgG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 11:36:06 -0400
+IronPort-SDR: kRaucVPWJf5Yhbrs8q+ld/yUa0tEMR+stgW6FHL2yotklPIrYwlwxwXjVbR89v0M2LgyYfk1E0
+ NrpH04E9RsAQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 08:36:06 -0700
+IronPort-SDR: dYUJwDTJHD9iP5wZvrIQO72rSowvuZXykZd4QOOytru91ojrVYKu2OqZys7+erBiefwxfBOBCz
+ 3TOrzMzfZ2Dw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; 
+   d="scan'208";a="314844159"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by FMSMGA003.fm.intel.com with ESMTP; 11 Jun 2020 08:36:04 -0700
+Date:   Thu, 11 Jun 2020 08:35:57 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vivek Goyal <vgoyal@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: async_pf: Cleanup kvm_setup_async_pf()
+Message-ID: <20200611153557.GE29918@linux.intel.com>
+References: <20200610175532.779793-1-vkuznets@redhat.com>
+ <20200610181453.GC18790@linux.intel.com>
+ <87sgf29f77.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <dde19d595336a5d79345f3115df26687871dfad5.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87sgf29f77.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/06/20 16:44, Maxim Levitsky wrote:
-> On Mon, 2020-06-01 at 04:21 -0400, Paolo Bonzini wrote:
->> The userspace_addr alignment and range checks are not performed for private
->> memory slots that are prepared by KVM itself.  This is unnecessary and makes
->> it questionable to use __*_user functions to access memory later on.  We also
->> rely on the userspace address being aligned since we have an entire family
->> of functions to map gfn to pfn.
->>
->> Fortunately skipping the check is completely unnecessary.  Only x86 uses
->> private memslots and their userspace_addr is obtained from vm_mmap,
->> therefore it must be below PAGE_OFFSET.  In fact, any attempt to pass
->> an address above PAGE_OFFSET would have failed because such an address
->> would return true for kvm_is_error_hva.
->>
->> Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Thu, Jun 11, 2020 at 10:31:08AM +0200, Vitaly Kuznetsov wrote:
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
 > 
-> I bisected this patch to break a VM on my AMD system (3970X)
+> >
+> > I'd also be in favor of changing the return type to a boolean.  I think
+> > you alluded to it earlier, the current semantics are quite confusing as they
+> > invert the normal "return 0 on success".
 > 
-> The reason it happens, is because I have avic enabled (which uses
-> a private KVM memslot), but it is permanently disabled for that VM,
-> since I enabled nesting for that VM (+svm) and that triggers the code
-> in __x86_set_memory_region to set userspace_addr of the disabled
-> memslot to non canonical address (0xdeadull << 48) which is later rejected in __kvm_set_memory_region
-> after that patch, and that makes it silently not disable the memslot, which hangs the guest.
+> Yes, will do a follow-up.
 > 
-> The call is from avic_update_access_page, which is called from svm_pre_update_apicv_exec_ctrl
-> which discards the return value.
+> KVM/x86 code has an intertwined mix of:
+> - normal 'int' functions ('0 on success')
+> - bool functions ('true'/'1' on success)
+> - 'int' exit handlers ('1'/'0' on success depending if exit to userspace
+>   was required)
+> - ...
 > 
-> 
-> I think that the fix for this would be to either make access_ok always return
-> true for size==0, or __kvm_set_memory_region should treat size==0 specially
-> and skip that check for it.
+> I think we can try to standardize this to:
+> - 'int' when error is propagated outside of KVM (userspace, other kernel
+>   subsystem,...)
+> - 'bool' when the function is internal to KVM and the result is binary
+>  ('is_exit_required()', 'was_pf_injected()', 'will_have_another_beer()',
+>  ...)
+> - 'enum' for the rest.
+> And, if there's a good reason for making an exception, require a
+> comment. (leaving aside everything returning a pointer, of course as
+> these are self-explanatory -- unless it's 'void *' :-))
 
-Or just set hva to 0.  Deletion goes through kvm_delete_memslot so that
-dummy hva is not used anywhere.  If we really want to poison the hva of
-deleted memslots we should not do it specially in
-__x86_set_memory_region.  I'll send a patch.
+Agreed for 'bool' case, but 'int' versus 'enum' is less straightforward as
+there are a huge number of functions that _may_ propagate an error outside
+of KVM, including all of the exit handlers.  As Paolo point out[*], it'd
+be quite easy to end up with a mixture of enum/#define and 0/1 code, which
+would be an even bigger mess than what we have today.  There are
+undoubtedly cases that could be converted to an enum, but they're probably
+few and far between as it requires total encapsulation, e.g. the emulator.
 
-Paolo
-
+[*] https://lkml.kernel.org/r/3d827e8b-a04e-0a93-4bb4-e0e9d59036da@redhat.com
