@@ -2,132 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0D871F6442
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:06:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B30871F6463
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:10:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726864AbgFKJGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 05:06:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29311 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726697AbgFKJGq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 05:06:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591866405;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EMC0E2B827Ia2DQRzxKsWY/OK5Bg//cvAlofONDhk2Q=;
-        b=CDXgEr+EKvV5ntUXOSA2QcNFsr/CHHfGNpy2UioYOT4kYXXA7Fb/YRwlB5NtGGRbZ0am2X
-        rOItVzsG2E2ekTGJylt8N+J/4iO6U+HiMOlaZIZ0V7qHKKh4+CR0QpS+WyiZXv14CQu8Gt
-        jlyIYphj03AwPrCiwGVkeCPUuGWjYjI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-T8bgOtZROdOY2KRCdkKtfg-1; Thu, 11 Jun 2020 05:06:43 -0400
-X-MC-Unique: T8bgOtZROdOY2KRCdkKtfg-1
-Received: by mail-wm1-f72.google.com with SMTP id b63so2704369wme.1
-        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 02:06:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=EMC0E2B827Ia2DQRzxKsWY/OK5Bg//cvAlofONDhk2Q=;
-        b=rF2m6a4msUh6DesKApfSr6GIQLyLdwUyuHarDTT5sUHjWygRJxzXqV1kktqvAhSR8P
-         Jlu39imUlszEomp1ex7jwND2Q3hXc6Tv6iiQlKnd8RrwJ7PnN1PUV+5AXAlNb3DZJoNO
-         hTIXdnxx0KAZRHyehCyy6tDQMIgiQXY7Fk5aBNi/evpVN7ir97+vctduRAI7SshNq2C4
-         V9UTSREny6X1BaO0bcxW84MdMj7SBNDS73WKRpa4GN4vMLjNI4LTCyJYlSCkeD1V/wbY
-         yD9agTO6YQHR/i2ptJCVb/CcdVmLi1wy4O7eYM+kSnzLFX7OeRPlmvxHMQ0j1Gpzkos8
-         zH4w==
-X-Gm-Message-State: AOAM532mkrvcdOkQj9yTUAGfxH4NrjeZuBTEq99xWBQGvY4lp6k/y5rJ
-        z0n4fA+0XuHZ/l5gM7/+701m6rwxjXcgftO9m9LFig6lsRngDWCUeOUJtCYqJ5wOzcZkRNUxAxa
-        StWObB9IYClvB
-X-Received: by 2002:adf:dccc:: with SMTP id x12mr8242099wrm.72.1591866401980;
-        Thu, 11 Jun 2020 02:06:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwjS282NzyfgjaTUCOeu+TiuTHkZ19eiBXmK6U3BwQgdXs1XxcOHzbjcay7nTvobbz5n62KJQ==
-X-Received: by 2002:adf:dccc:: with SMTP id x12mr8242068wrm.72.1591866401733;
-        Thu, 11 Jun 2020 02:06:41 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
-        by smtp.gmail.com with ESMTPSA id y80sm3152548wmc.34.2020.06.11.02.06.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2020 02:06:40 -0700 (PDT)
-Date:   Thu, 11 Jun 2020 05:06:38 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        eperezma@redhat.com
-Subject: Re: [PATCH RFC v6 02/11] vhost: use batched get_vq_desc version
-Message-ID: <20200611050416-mutt-send-email-mst@kernel.org>
-References: <20200608125238.728563-1-mst@redhat.com>
- <20200608125238.728563-3-mst@redhat.com>
- <81904cc5-b662-028d-3b4a-bdfdbd2deb8c@redhat.com>
- <20200610070259-mutt-send-email-mst@kernel.org>
- <76b14132-407a-48bf-c4d5-9d0b2c700bb0@redhat.com>
+        id S1726965AbgFKJKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 05:10:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49642 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726760AbgFKJKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 05:10:09 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A390420760;
+        Thu, 11 Jun 2020 09:10:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1591866608;
+        bh=LEb0TmHs9BwF0am32RadcRA4RU0L0oWhcV5wOopAYI8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=q1kTyCd8T/68YBv3CRIYzkVpMPW1eVFfsQhmwQGWah+mz+QtZQFif1Ws68NKb1Ewv
+         5h33hP+50DG851IfhM3j8LD838jhq44IXS+5sTXtxTnDJ4e+bh7XESwG8QuHZGDUJE
+         zliMhna5ReRYb8SpviD876yx5zB7YHXzQKgvvrPE=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jjJDr-0022ZT-4w; Thu, 11 Jun 2020 10:10:07 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.8, take #1
+Date:   Thu, 11 Jun 2020 10:09:45 +0100
+Message-Id: <20200611090956.1537104-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <76b14132-407a-48bf-c4d5-9d0b2c700bb0@redhat.com>
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, ascull@google.com, james.morse@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 11, 2020 at 11:02:57AM +0800, Jason Wang wrote:
-> 
-> On 2020/6/10 下午7:05, Michael S. Tsirkin wrote:
-> > > > +EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
-> > > >    /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
-> > > >    void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
-> > > >    {
-> > > > +	unfetch_descs(vq);
-> > > >    	vq->last_avail_idx -= n;
-> > > So unfetch_descs() has decreased last_avail_idx.
-> > > Can we fix this by letting unfetch_descs() return the number and then we can
-> > > do:
-> > > 
-> > > int d = unfetch_descs(vq);
-> > > vq->last_avail_idx -= (n > d) ? n - d: 0;
-> > > 
-> > > Thanks
-> > That's intentional I think - we need both.
-> 
-> 
-> Yes, but:
-> 
-> 
-> > 
-> > Unfetch_descs drops the descriptors in the cache that were
-> > *not returned to caller*  through get_vq_desc.
-> > 
-> > vhost_discard_vq_desc drops the ones that were returned through get_vq_desc.
-> > 
-> > Did I miss anything?
-> 
-> We could count some descriptors twice, consider the case e.g we only cache
-> on descriptor:
-> 
-> fetch_descs()
->     fetch_buf()
->         last_avail_idx++;
-> 
-> Then we want do discard it:
-> vhost_discard_avail_buf(1)
->     unfetch_descs()
->         last_avail_idx--;
->     last_avail_idx -= 1;
-> 
-> Thanks
+Hi Paolo,
 
+Here's a bunch of fixes that cropped up during the merge window,
+mostly falling into two categories: 32bit system register accesses,
+and 64bit pointer authentication handling.
 
-I don't think that happens. vhost_discard_avail_buf(1) is only called
-after get vhost_get_avail_buf. vhost_get_avail_buf increments
-first_desc.  unfetch_descs only counts from first_desc to ndescs.
+Please pull,
 
-If I'm wrong, could you show values of first_desc and ndescs in this
-scenario?
+	M.
 
--- 
-MST
+The following changes since commit 8f7f4fe756bd5cfef73cf8234445081385bdbf7d:
 
+  KVM: arm64: Drop obsolete comment about sys_reg ordering (2020-05-28 13:16:57 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.8-1
+
+for you to fetch changes up to 15c99816ed9396c548eed2e84f30c14caccad1f4:
+
+  Merge branch 'kvm-arm64/ptrauth-fixes' into kvmarm-master/next (2020-06-10 19:10:40 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for Linux 5.8, take #1
+
+* 32bit VM fixes:
+  - Fix embarassing mapping issue between AArch32 CSSELR and AArch64
+    ACTLR
+  - Add ACTLR2 support for AArch32
+  - Get rid of the useless ACTLR_EL1 save/restore
+  - Fix CP14/15 accesses for AArch32 guests on BE hosts
+  - Ensure that we don't loose any state when injecting a 32bit
+    exception when running on a VHE host
+
+* 64bit VM fixes:
+  - Fix PtrAuth host saving happening in preemptible contexts
+  - Optimize PtrAuth lazy enable
+  - Drop vcpu to cpu context pointer
+  - Fix sparse warnings for HYP per-CPU accesses
+
+----------------------------------------------------------------
+James Morse (3):
+      KVM: arm64: Stop writing aarch32's CSSELR into ACTLR
+      KVM: arm64: Add emulation for 32bit guests accessing ACTLR2
+      KVM: arm64: Stop save/restoring ACTLR_EL1
+
+Marc Zyngier (9):
+      KVM: arm64: Flush the instruction cache if not unmapping the VM on reboot
+      KVM: arm64: Save the host's PtrAuth keys in non-preemptible context
+      KVM: arm64: Handle PtrAuth traps early
+      KVM: arm64: Stop sparse from moaning at __hyp_this_cpu_ptr
+      KVM: arm64: Remove host_cpu_context member from vcpu structure
+      KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
+      KVM: arm64: Synchronize sysreg state on injecting an AArch32 exception
+      KVM: arm64: Move hyp_symbol_addr() to kvm_asm.h
+      Merge branch 'kvm-arm64/ptrauth-fixes' into kvmarm-master/next
+
+ arch/arm64/include/asm/kvm_asm.h     | 33 ++++++++++++++++--
+ arch/arm64/include/asm/kvm_emulate.h |  6 ----
+ arch/arm64/include/asm/kvm_host.h    |  9 +++--
+ arch/arm64/include/asm/kvm_mmu.h     | 20 -----------
+ arch/arm64/kvm/aarch32.c             | 28 ++++++++++++++++
+ arch/arm64/kvm/arm.c                 | 20 ++++++-----
+ arch/arm64/kvm/handle_exit.c         | 32 ++----------------
+ arch/arm64/kvm/hyp/debug-sr.c        |  4 +--
+ arch/arm64/kvm/hyp/switch.c          | 65 ++++++++++++++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/sysreg-sr.c       |  8 ++---
+ arch/arm64/kvm/pmu.c                 |  8 ++---
+ arch/arm64/kvm/sys_regs.c            | 25 +++++++-------
+ arch/arm64/kvm/sys_regs_generic_v8.c | 10 ++++++
+ 13 files changed, 171 insertions(+), 97 deletions(-)
