@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 289561F67A4
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 14:10:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AD1F1F67A7
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 14:10:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728268AbgFKMKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 08:10:06 -0400
+        id S1728054AbgFKMJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 08:09:15 -0400
 Received: from mga03.intel.com ([134.134.136.65]:19245 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728124AbgFKMJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 08:09:16 -0400
-IronPort-SDR: m0t2WJAyq/xqH4iOBRK7OPvPRvZvhLpLF1nC0z5zjCm+wf4TDpyjzaakkwgr4w1M6FO2rrLoB3
- wXZZ4Qhwqzww==
+        id S1728033AbgFKMJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 08:09:11 -0400
+IronPort-SDR: k+TJjRU9F/ii4Yhr6z5ds0UcrdvOjeLAWpcgwD+C72HMDW9PGYcEoG4TR6e6Dreyhw4W5TQ6oB
+ khBcRig0AiGA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 05:09:10 -0700
-IronPort-SDR: nL+qRrGATF8v4bFxG54vp1mxoLYcw24qUlGeXSvAnPvmy2uKYDGsLL8qI2XuOiW6k4cmoELGBX
- cr7X+gUxrWiA==
+IronPort-SDR: KWYFm8RJga25u+ujibRSnwROKR1ks6INPQqD/SWpJCOd1UfYHSIKoz2ediAmcr9HZe0DXLT01w
+ sLOTypCofhoA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; 
-   d="scan'208";a="419082499"
+   d="scan'208";a="419082502"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
   by orsmga004.jf.intel.com with ESMTP; 11 Jun 2020 05:09:10 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
@@ -32,9 +32,9 @@ Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
         yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
         hao.wu@intel.com, iommu@lists.linux-foundation.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 12/15] vfio/type1: Add vSVA support for IOMMU-backed mdevs
-Date:   Thu, 11 Jun 2020 05:15:31 -0700
-Message-Id: <1591877734-66527-13-git-send-email-yi.l.liu@intel.com>
+Subject: [PATCH v2 13/15] vfio/pci: Expose PCIe PASID capability to guest
+Date:   Thu, 11 Jun 2020 05:15:32 -0700
+Message-Id: <1591877734-66527-14-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
 References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
@@ -43,26 +43,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Recent years, mediated device pass-through framework (e.g. vfio-mdev)
-is used to achieve flexible device sharing across domains (e.g. VMs).
-Also there are hardware assisted mediated pass-through solutions from
-platform vendors. e.g. Intel VT-d scalable mode which supports Intel
-Scalable I/O Virtualization technology. Such mdevs are called IOMMU-
-backed mdevs as there are IOMMU enforced DMA isolation for such mdevs.
-In kernel, IOMMU-backed mdevs are exposed to IOMMU layer by aux-domain
-concept, which means mdevs are protected by an iommu domain which is
-auxiliary to the domain that the kernel driver primarily uses for DMA
-API. Details can be found in the KVM presentation as below:
+This patch exposes PCIe PASID capability to guest for assigned devices.
+Existing vfio_pci driver hides it from guest by setting the capability
+length as 0 in pci_ext_cap_length[].
 
-https://events19.linuxfoundation.org/wp-content/uploads/2017/12/\
-Hardware-Assisted-Mediated-Pass-Through-with-VFIO-Kevin-Tian-Intel.pdf
+And this patch only exposes PASID capability for devices which has PCIe
+PASID extended struture in its configuration space. So VFs, will will
+not see PASID capability on VFs as VF doesn't implement PASID extended
+structure in its configuration space. For VF, it is a TODO in future.
+Related discussion can be found in below link:
 
-This patch extends NESTING_IOMMU ops to IOMMU-backed mdev devices. The
-main requirement is to use the auxiliary domain associated with mdev.
+https://lkml.org/lkml/2020/4/7/693
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-CC: Jun Tian <jun.j.tian@intel.com>
 Cc: Alex Williamson <alex.williamson@redhat.com>
 Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
@@ -71,74 +65,24 @@ Cc: Lu Baolu <baolu.lu@linux.intel.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
 v1 -> v2:
-*) check the iommu_device to ensure the handling mdev is IOMMU-backed
+*) added in v2, but it was sent in a separate patchseries before
 
- drivers/vfio/vfio_iommu_type1.c | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+ drivers/vfio/pci/vfio_pci_config.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index c233c8e..bcd7935 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2041,13 +2041,27 @@ static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
- 	return ret;
- }
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 90c0b80..4b9af99 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -95,7 +95,7 @@ static const u16 pci_ext_cap_length[PCI_EXT_CAP_ID_MAX + 1] = {
+ 	[PCI_EXT_CAP_ID_LTR]	=	PCI_EXT_CAP_LTR_SIZEOF,
+ 	[PCI_EXT_CAP_ID_SECPCI]	=	0,	/* not yet */
+ 	[PCI_EXT_CAP_ID_PMUX]	=	0,	/* not yet */
+-	[PCI_EXT_CAP_ID_PASID]	=	0,	/* not yet */
++	[PCI_EXT_CAP_ID_PASID]	=	PCI_EXT_CAP_PASID_SIZEOF,
+ };
  
-+static struct device *vfio_get_iommu_device(struct vfio_group *group,
-+					    struct device *dev)
-+{
-+	if (group->mdev_group)
-+		return vfio_mdev_get_iommu_device(dev);
-+	else
-+		return dev;
-+}
-+
- static int vfio_dev_bind_gpasid_fn(struct device *dev, void *data)
- {
- 	struct domain_capsule *dc = (struct domain_capsule *)data;
- 	struct iommu_gpasid_bind_data *bind_data =
- 		(struct iommu_gpasid_bind_data *) dc->data;
-+	struct device *iommu_device;
-+
-+	iommu_device = vfio_get_iommu_device(dc->group, dev);
-+	if (!iommu_device)
-+		return -EINVAL;
- 
--	return iommu_sva_bind_gpasid(dc->domain, dev, bind_data);
-+	return iommu_sva_bind_gpasid(dc->domain, iommu_device, bind_data);
- }
- 
- static int vfio_dev_unbind_gpasid_fn(struct device *dev, void *data)
-@@ -2055,8 +2069,13 @@ static int vfio_dev_unbind_gpasid_fn(struct device *dev, void *data)
- 	struct domain_capsule *dc = (struct domain_capsule *)data;
- 	struct iommu_gpasid_unbind_data *unbind_data =
- 		(struct iommu_gpasid_unbind_data *) dc->data;
-+	struct device *iommu_device;
-+
-+	iommu_device = vfio_get_iommu_device(dc->group, dev);
-+	if (!iommu_device)
-+		return 0;
- 
--	iommu_sva_unbind_gpasid(dc->domain, dev, unbind_data);
-+	iommu_sva_unbind_gpasid(dc->domain, iommu_device, unbind_data);
- 	return 0;
- }
- 
-@@ -2587,8 +2606,13 @@ static int vfio_dev_cache_invalidate_fn(struct device *dev, void *data)
- 	struct domain_capsule *dc = (struct domain_capsule *)data;
- 	struct iommu_cache_invalidate_info *cache_info =
- 		(struct iommu_cache_invalidate_info *) dc->data;
-+	struct device *iommu_device;
-+
-+	iommu_device = vfio_get_iommu_device(dc->group, dev);
-+	if (!iommu_device)
-+		return -EINVAL;
- 
--	iommu_cache_invalidate(dc->domain, dev, cache_info);
-+	iommu_cache_invalidate(dc->domain, iommu_device, cache_info);
- 	return 0;
- }
- 
+ /*
 -- 
 2.7.4
 
