@@ -2,104 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 901BE1F6672
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 13:18:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F9BF1F66A7
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 13:30:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728029AbgFKLSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 07:18:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57428 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728017AbgFKLSy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 07:18:54 -0400
+        id S1728032AbgFKLaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 07:30:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22821 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727891AbgFKLaZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jun 2020 07:30:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591874333;
+        s=mimecast20190719; t=1591875023;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=aHs/k82DRtmbgpcekLlfLtqDNjfmaiN8XJYIsbpXYsw=;
-        b=VW91jxQPg8wJngBkjghZOMdCiAPv7qvFXqWw2g9Kp+DAjqzrBsz085mv9Xtl+/NACReAvO
-        aqmE+K7NCc1P+RdXEuTKQXexqIVSBj1miNnk3P8IMzxrg7de1ZP1zxcsubTOlbznpM4axs
-        LrtLlsVpCcVYHx8d+Q8ASzvq8tTXb0E=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-hLBVKRRtO_aztQRntsLroQ-1; Thu, 11 Jun 2020 07:18:51 -0400
-X-MC-Unique: hLBVKRRtO_aztQRntsLroQ-1
-Received: by mail-wr1-f69.google.com with SMTP id s7so2434867wrm.16
-        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 04:18:50 -0700 (PDT)
+        bh=9/jl7PRjuNx/C+pUMDHawKvKRMB5jFyju67YAOMh5Vw=;
+        b=PhQI0XuUIWtM87GLLu18qwHtIsV/lTNzKWJIPvLgEb5oAQv04QvjAQOm+dxo1LQ2nbbqpU
+        ET9n2jbMEoUGbj/DdluGeXNpkyfkdNzNMnEQQGaK+94Eh5AiYypxmBJKc0MGncrUf2IYpT
+        Ndrju12NbYFlJZZLWa2WQggj0q03E10=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-dmuHQcc4PBqVUA_EN5jkhA-1; Thu, 11 Jun 2020 07:30:19 -0400
+X-MC-Unique: dmuHQcc4PBqVUA_EN5jkhA-1
+Received: by mail-wm1-f70.google.com with SMTP id x6so1230180wmj.9
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 04:30:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=aHs/k82DRtmbgpcekLlfLtqDNjfmaiN8XJYIsbpXYsw=;
-        b=pNSZVMoTz6dby3VeRczFTAeQkKyaTXqS8q9rOp8H6wL0Pf4vExyw5X25bfYuFjf5lv
-         ntrG1QMke3FTXXtmtCTy8yyoNVd2E+5IQi8XcgXQwqIcUWdftYPJkwoAGmXL0nA8U97E
-         1l8vm/QAs+APLekMxB8qlm7V6rEiy8kjFMFlMR/Bdgh2Sv2HWRizigu3YjbL2Qvk7+dc
-         GjI6SXVMYkSVEGtC9jRAD7V0Os+kV071RuM3oj1w+lyj76u1oH9kAoPqrNmvzxxe+ZpY
-         nU1kvAfN6ZaBTLy2b4IJPmFKfFaMn+mMNYPj8E9gUHajiZLv9qZifiu+CLMhWckpcC9/
-         FGTg==
-X-Gm-Message-State: AOAM530/6tCdL7a+EfUgU4uxfAdwyvLp7kx4IZTUhnq8ODIKMtsxFQZx
-        i+Qvewv2p/+ZjQORW+Bw97zzn8U37jM2oHT7iEKDxvElWDqfZpqMIkyuTxFrwbSgVOMxpZCCwnQ
-        EnpsiVN/dLkm/
-X-Received: by 2002:a5d:4008:: with SMTP id n8mr8881549wrp.82.1591874329748;
-        Thu, 11 Jun 2020 04:18:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyhY9t8eWTFTFU22DEN3RpHOgBvqdz12LnsClmOERlrFjUovn0BcztQcQ+mkBp5lkPjBXyAsg==
-X-Received: by 2002:a5d:4008:: with SMTP id n8mr8881507wrp.82.1591874329286;
-        Thu, 11 Jun 2020 04:18:49 -0700 (PDT)
+        bh=9/jl7PRjuNx/C+pUMDHawKvKRMB5jFyju67YAOMh5Vw=;
+        b=rZwmKCU7I7GRP2ipgZ/g8enZ1Fc+n2LPm1l9Qm6PTrYwJfZmoaKx4kp0G+RqmeeCS8
+         x3k7tuA51bxQWhQH6WdvODuEl7tw+DAG08kstT1ssjnPA+x6XrQWDmTEqindeOpErjoC
+         Xa41XDQF4tuEu23M6hBoEYvQT7ugSCLemEzys8bkSd1AzoOEEG6SLOSSIyO6Z6rB3SHX
+         R/UUy10NteNDnvssvvuyMVQ0mdZYRu5aOeehT/5S1CvWDycMEN5FUnoaP5oXRMq56uZ2
+         kKCZ+UC+GK0omyW+xquzeEYbreNcGDrWWU8jWZ2jZGQGlKlsW0zCtfdtgFGm7QEJGaV0
+         UbRw==
+X-Gm-Message-State: AOAM531ABW+gzxkPENV4Da9yg5aJmKdQdvSI+kBpzhPvWT4c3jDL11ck
+        jnWXBTtM61Nxzr6EzbB0j70EHu/5UUpb1UDlrdTKQYvXdT5/MvBB3+9SFETGfzCY+eR3HAGwZYf
+        1PuCzT9y987BI
+X-Received: by 2002:a1c:3b8b:: with SMTP id i133mr7709143wma.111.1591875017438;
+        Thu, 11 Jun 2020 04:30:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzzJ6v/QkioaQycgPSzfq+keXBu76wlWx/mu62TPOFBjqUGGd1L5f5cXkoDx4uk2vFtzgVdWQ==
+X-Received: by 2002:a1c:3b8b:: with SMTP id i133mr7709124wma.111.1591875017186;
+        Thu, 11 Jun 2020 04:30:17 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
-        by smtp.gmail.com with ESMTPSA id z25sm3678047wmf.10.2020.06.11.04.18.47
+        by smtp.gmail.com with ESMTPSA id b81sm4055054wmc.5.2020.06.11.04.30.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2020 04:18:48 -0700 (PDT)
-Date:   Thu, 11 Jun 2020 07:18:45 -0400
+        Thu, 11 Jun 2020 04:30:16 -0700 (PDT)
+Date:   Thu, 11 Jun 2020 07:30:14 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        teawater <teawaterz@linux.alibaba.com>
-Subject: Re: [PATCH v1] virtio-mem: add memory via add_memory_driver_managed()
-Message-ID: <20200611071744-mutt-send-email-mst@kernel.org>
-References: <20200611093518.5737-1-david@redhat.com>
- <20200611060249-mutt-send-email-mst@kernel.org>
- <13ad9edf-31a1-35ee-a0b0-6390c3a0b4d9@redhat.com>
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH RFC v7 03/14] vhost: use batched get_vq_desc version
+Message-ID: <20200611072702-mutt-send-email-mst@kernel.org>
+References: <20200610113515.1497099-1-mst@redhat.com>
+ <20200610113515.1497099-4-mst@redhat.com>
+ <CAJaqyWdGKh5gSTndGuVPyJSgt3jfjfW4xNCrJ2tQ9f+mD8=sMQ@mail.gmail.com>
+ <20200610111147-mutt-send-email-mst@kernel.org>
+ <CAJaqyWe6d19hFAbpqaQqOPuQQmBQyevyF4sTVkaXKhD729XDkw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <13ad9edf-31a1-35ee-a0b0-6390c3a0b4d9@redhat.com>
+In-Reply-To: <CAJaqyWe6d19hFAbpqaQqOPuQQmBQyevyF4sTVkaXKhD729XDkw@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 11, 2020 at 01:00:24PM +0200, David Hildenbrand wrote:
-> >> I'd like to have this patch in 5.8, with the initial merge of virtio-mem
-> >> if possible (so the user space representation of virtio-mem added memory
-> >> resources won't change anymore).
-> > 
-> > So my plan is to rebase on top of -rc1 and merge this for rc2 then.
-> > I don't like rebase on top of tip as the results are sometimes kind of
-> > random.
+On Wed, Jun 10, 2020 at 06:18:32PM +0200, Eugenio Perez Martin wrote:
+> On Wed, Jun 10, 2020 at 5:13 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Wed, Jun 10, 2020 at 02:37:50PM +0200, Eugenio Perez Martin wrote:
+> > > > +/* This function returns a value > 0 if a descriptor was found, or 0 if none were found.
+> > > > + * A negative code is returned on error. */
+> > > > +static int fetch_descs(struct vhost_virtqueue *vq)
+> > > > +{
+> > > > +       int ret;
+> > > > +
+> > > > +       if (unlikely(vq->first_desc >= vq->ndescs)) {
+> > > > +               vq->first_desc = 0;
+> > > > +               vq->ndescs = 0;
+> > > > +       }
+> > > > +
+> > > > +       if (vq->ndescs)
+> > > > +               return 1;
+> > > > +
+> > > > +       for (ret = 1;
+> > > > +            ret > 0 && vq->ndescs <= vhost_vq_num_batch_descs(vq);
+> > > > +            ret = fetch_buf(vq))
+> > > > +               ;
+> > >
+> > > (Expanding comment in V6):
+> > >
+> > > We get an infinite loop this way:
+> > > * vq->ndescs == 0, so we call fetch_buf() here
+> > > * fetch_buf gets less than vhost_vq_num_batch_descs(vq); descriptors. ret = 1
+> > > * This loop calls again fetch_buf, but vq->ndescs > 0 (and avail_vq ==
+> > > last_avail_vq), so it just return 1
+> >
+> > That's what
+> >          [PATCH RFC v7 08/14] fixup! vhost: use batched get_vq_desc version
+> > is supposed to fix.
+> >
 > 
-> Right, I just wanted to get this out early so we can discuss how to proceed.
+> Sorry, I forgot to include that fixup.
 > 
-> > And let's add a Fixes: tag as well, this way people will remember to
-> > pick this.
-> > Makes sense?
+> With it I don't see CPU stalls, but with that version latency has
+> increased a lot and I see packet lost:
+> + ping -c 5 10.200.0.1
+> PING 10.200.0.1 (10.200.0.1) 56(84) bytes of data.
+> >From 10.200.0.2 icmp_seq=1 Destination Host Unreachable
+> >From 10.200.0.2 icmp_seq=2 Destination Host Unreachable
+> >From 10.200.0.2 icmp_seq=3 Destination Host Unreachable
+> 64 bytes from 10.200.0.1: icmp_seq=5 ttl=64 time=6848 ms
 > 
-> Yes, it's somehow a fix (for kexec). So
+> --- 10.200.0.1 ping statistics ---
+> 5 packets transmitted, 1 received, +3 errors, 80% packet loss, time 76ms
+> rtt min/avg/max/mdev = 6848.316/6848.316/6848.316/0.000 ms, pipe 4
+> --
 > 
-> Fixes: 5f1f79bbc9e26 ("virtio-mem: Paravirtualized memory hotplug")
+> I cannot even use netperf.
+
+OK so that's the bug to try to find and fix I think.
+
+
+> If I modify with my proposed version:
+> + ping -c 5 10.200.0.1
+> PING 10.200.0.1 (10.200.0.1) 56(84) bytes of data.
+> 64 bytes from 10.200.0.1: icmp_seq=1 ttl=64 time=7.07 ms
+> 64 bytes from 10.200.0.1: icmp_seq=2 ttl=64 time=0.358 ms
+> 64 bytes from 10.200.0.1: icmp_seq=3 ttl=64 time=5.35 ms
+> 64 bytes from 10.200.0.1: icmp_seq=4 ttl=64 time=2.27 ms
+> 64 bytes from 10.200.0.1: icmp_seq=5 ttl=64 time=0.426 ms
+
+
+Not sure which version this is.
+
+> [root@localhost ~]# netperf -H 10.200.0.1 -p 12865 -l 10 -t TCP_STREAM
+> MIGRATED TCP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to
+> 10.200.0.1 () port 0 AF_INET
+> Recv   Send    Send
+> Socket Socket  Message  Elapsed
+> Size   Size    Size     Time     Throughput
+> bytes  bytes   bytes    secs.    10^6bits/sec
 > 
-> I can respin after -rc1 with the commit id fixed as noted by Pankaj.
-> Just let me know what you prefer.
+> 131072  16384  16384    10.01    4742.36
+> [root@localhost ~]# netperf -H 10.200.0.1 -p 12865 -l 10 -t UDP_STREAM
+> MIGRATED UDP STREAM TEST from 0.0.0.0 (0.0.0.0) port 0 AF_INET to
+> 10.200.0.1 () port 0 AF_INET
+> Socket  Message  Elapsed      Messages
+> Size    Size     Time         Okay Errors   Throughput
+> bytes   bytes    secs            #      #   10^6bits/sec
+> 
+> 212992   65507   10.00        9214      0     482.83
+> 212992           10.00        9214            482.83
+> 
+> I will compare with the non-batch version for reference, but the
+> difference between the two is noticeable. Maybe it's worth finding a
+> good value for the if() inside fetch_buf?
 > 
 > Thanks!
-
-Some once this commit is in Linus' tree, please ping me.
-
-> -- 
-> Thanks,
 > 
-> David / dhildenb
+
+I don't think it's performance, I think it's a bug somewhere,
+e.g. maybe we corrupt a packet, or stall the queue, or
+something like this.
+
+Let's do this, I will squash the fixups and post v8 so you can bisect
+and then debug cleanly.
+
+> > --
+> > MST
+> >
 
