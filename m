@@ -2,132 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 570E51F661F
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 13:00:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 901BE1F6672
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 13:18:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727795AbgFKLAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 07:00:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36594 "EHLO
+        id S1728029AbgFKLSz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 07:18:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57428 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727074AbgFKLAg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 07:00:36 -0400
+        with ESMTP id S1728017AbgFKLSy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 07:18:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591873234;
+        s=mimecast20190719; t=1591874333;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=qCSzsxzakrA6PJeHXxV8tNlYk7clz+olbOoQ62gsCHs=;
-        b=P1R766UrQUFtyWxVPCdc2h+hpeO4cltc5rgzbRfbjbiupwFHHsA5LhRVdkblTNq/2kC+Zz
-        xy7ZJgODQTgQQerY64NuzZTaFQD/c6JjUlsY0q9NBN3FxwGBiZeG0rViAaNweokJ0wCNtY
-        PpO4bHLqFNI13uZhN1RsVjdMXqU19Gs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-9KynNReSPbWQJMZt8lqqnQ-1; Thu, 11 Jun 2020 07:00:30 -0400
-X-MC-Unique: 9KynNReSPbWQJMZt8lqqnQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F2A6107ACF2;
-        Thu, 11 Jun 2020 11:00:29 +0000 (UTC)
-Received: from [10.36.114.160] (ovpn-114-160.ams2.redhat.com [10.36.114.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB0548929F;
-        Thu, 11 Jun 2020 11:00:24 +0000 (UTC)
-Subject: Re: [PATCH v1] virtio-mem: add memory via add_memory_driver_managed()
-To:     "Michael S. Tsirkin" <mst@redhat.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=aHs/k82DRtmbgpcekLlfLtqDNjfmaiN8XJYIsbpXYsw=;
+        b=VW91jxQPg8wJngBkjghZOMdCiAPv7qvFXqWw2g9Kp+DAjqzrBsz085mv9Xtl+/NACReAvO
+        aqmE+K7NCc1P+RdXEuTKQXexqIVSBj1miNnk3P8IMzxrg7de1ZP1zxcsubTOlbznpM4axs
+        LrtLlsVpCcVYHx8d+Q8ASzvq8tTXb0E=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-hLBVKRRtO_aztQRntsLroQ-1; Thu, 11 Jun 2020 07:18:51 -0400
+X-MC-Unique: hLBVKRRtO_aztQRntsLroQ-1
+Received: by mail-wr1-f69.google.com with SMTP id s7so2434867wrm.16
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 04:18:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aHs/k82DRtmbgpcekLlfLtqDNjfmaiN8XJYIsbpXYsw=;
+        b=pNSZVMoTz6dby3VeRczFTAeQkKyaTXqS8q9rOp8H6wL0Pf4vExyw5X25bfYuFjf5lv
+         ntrG1QMke3FTXXtmtCTy8yyoNVd2E+5IQi8XcgXQwqIcUWdftYPJkwoAGmXL0nA8U97E
+         1l8vm/QAs+APLekMxB8qlm7V6rEiy8kjFMFlMR/Bdgh2Sv2HWRizigu3YjbL2Qvk7+dc
+         GjI6SXVMYkSVEGtC9jRAD7V0Os+kV071RuM3oj1w+lyj76u1oH9kAoPqrNmvzxxe+ZpY
+         nU1kvAfN6ZaBTLy2b4IJPmFKfFaMn+mMNYPj8E9gUHajiZLv9qZifiu+CLMhWckpcC9/
+         FGTg==
+X-Gm-Message-State: AOAM530/6tCdL7a+EfUgU4uxfAdwyvLp7kx4IZTUhnq8ODIKMtsxFQZx
+        i+Qvewv2p/+ZjQORW+Bw97zzn8U37jM2oHT7iEKDxvElWDqfZpqMIkyuTxFrwbSgVOMxpZCCwnQ
+        EnpsiVN/dLkm/
+X-Received: by 2002:a5d:4008:: with SMTP id n8mr8881549wrp.82.1591874329748;
+        Thu, 11 Jun 2020 04:18:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyhY9t8eWTFTFU22DEN3RpHOgBvqdz12LnsClmOERlrFjUovn0BcztQcQ+mkBp5lkPjBXyAsg==
+X-Received: by 2002:a5d:4008:: with SMTP id n8mr8881507wrp.82.1591874329286;
+        Thu, 11 Jun 2020 04:18:49 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
+        by smtp.gmail.com with ESMTPSA id z25sm3678047wmf.10.2020.06.11.04.18.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2020 04:18:48 -0700 (PDT)
+Date:   Thu, 11 Jun 2020 07:18:45 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         Jason Wang <jasowang@redhat.com>,
         Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
         teawater <teawaterz@linux.alibaba.com>
+Subject: Re: [PATCH v1] virtio-mem: add memory via add_memory_driver_managed()
+Message-ID: <20200611071744-mutt-send-email-mst@kernel.org>
 References: <20200611093518.5737-1-david@redhat.com>
  <20200611060249-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <13ad9edf-31a1-35ee-a0b0-6390c3a0b4d9@redhat.com>
-Date:   Thu, 11 Jun 2020 13:00:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ <13ad9edf-31a1-35ee-a0b0-6390c3a0b4d9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200611060249-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <13ad9edf-31a1-35ee-a0b0-6390c3a0b4d9@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> I'd like to have this patch in 5.8, with the initial merge of virtio-mem
->> if possible (so the user space representation of virtio-mem added memory
->> resources won't change anymore).
+On Thu, Jun 11, 2020 at 01:00:24PM +0200, David Hildenbrand wrote:
+> >> I'd like to have this patch in 5.8, with the initial merge of virtio-mem
+> >> if possible (so the user space representation of virtio-mem added memory
+> >> resources won't change anymore).
+> > 
+> > So my plan is to rebase on top of -rc1 and merge this for rc2 then.
+> > I don't like rebase on top of tip as the results are sometimes kind of
+> > random.
 > 
-> So my plan is to rebase on top of -rc1 and merge this for rc2 then.
-> I don't like rebase on top of tip as the results are sometimes kind of
-> random.
+> Right, I just wanted to get this out early so we can discuss how to proceed.
+> 
+> > And let's add a Fixes: tag as well, this way people will remember to
+> > pick this.
+> > Makes sense?
+> 
+> Yes, it's somehow a fix (for kexec). So
+> 
+> Fixes: 5f1f79bbc9e26 ("virtio-mem: Paravirtualized memory hotplug")
+> 
+> I can respin after -rc1 with the commit id fixed as noted by Pankaj.
+> Just let me know what you prefer.
+> 
+> Thanks!
 
-Right, I just wanted to get this out early so we can discuss how to proceed.
+Some once this commit is in Linus' tree, please ping me.
 
-> And let's add a Fixes: tag as well, this way people will remember to
-> pick this.
-> Makes sense?
-
-Yes, it's somehow a fix (for kexec). So
-
-Fixes: 5f1f79bbc9e26 ("virtio-mem: Paravirtualized memory hotplug")
-
-I can respin after -rc1 with the commit id fixed as noted by Pankaj.
-Just let me know what you prefer.
-
-Thanks!
-
--- 
-Thanks,
-
-David / dhildenb
+> -- 
+> Thanks,
+> 
+> David / dhildenb
 
