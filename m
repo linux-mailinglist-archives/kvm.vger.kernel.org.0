@@ -2,178 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C342C1F65B6
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 12:32:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F38061F660D
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 12:57:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726831AbgFKKcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 06:32:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726581AbgFKKcq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 06:32:46 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E747AC08C5C1;
-        Thu, 11 Jun 2020 03:32:45 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id h5so5605402wrc.7;
-        Thu, 11 Jun 2020 03:32:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=S1DHOFo6gIegKvTMa5vbni7NQMyet4sax/6N+ioAZRQ=;
-        b=pI/ZXc1eS0mK6/HSIeSOkMR5Ulb1J0U1FAAMsjazR2pRoXOesvMKckUWV5e5ad67Mn
-         iY0jcieN+vghiUkZWeEsKFFU6o/pg9xedcTeMfDMIpEtQYFzhT2frUj5u58c6BhzdC4/
-         IRdoSj9rKrKpRR2cE4tIYJuV5ts33u/tzYhKmU71+6mvT3qDtfkZbo1+jpd5Fr/6rjkI
-         Q1YwaINlhCR8qGEUfsFG4X1NFTkXCcrOk+9RcjEHo3duAar+dHbma+0DkNRpdwUHn9M8
-         9dvlUk1Tbtaq5LPkmzZmxKE9EmPO5hdOKFZUC+3nKkdzRR+85NX0zsyZ0orvDNZ8ZFa8
-         cHOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=S1DHOFo6gIegKvTMa5vbni7NQMyet4sax/6N+ioAZRQ=;
-        b=FgD7mws96W6FsANpTYDfxrh0y0fnsFHqss5lVzsuoZHJJ3DF4fpz9L173L92PdyvvF
-         SztkdJea9/kw6QUm3FTHi4VJEwLPAz268Ij5OvLj24dZRNLS9SfMfOS2RFPfp9u9eloB
-         sLNLmGgLKcIHDucHPpKHL23F7i5OeCbmNbUOh6G78FbJSIs4aRudsBfQ21xSuKIeBw6I
-         Z53Rdj2JyYoMwQg5r7DbNQHmN/P6fEwwQFd75rJvQUitws6LWZeBYiPK4DUBtoVXrOWd
-         dBqkwHSBkTNbRAPKrUyV13Nl1gI+gZKXJkgp9GoBNhCg+qgK/xupSx8wPOw9L0ChBv2S
-         FIVw==
-X-Gm-Message-State: AOAM530DCYqa3ySkiO4jJ0g7u8MvKeZ2w2aS+CHsID2JlQn/HhVNFol0
-        0/rd6+lNdlHTv7EgF87A8N1raCibINDFTJR4kYPMeHykfDc4Nw==
-X-Google-Smtp-Source: ABdhPJxjK3svYNT9cJJ+Ew1PeDQwIvwXhWHUG/rQXV+svRZUBu1+K3XXVBzHIKJWELOu9xonGk0kl0vLaU+gucmQ9bU=
-X-Received: by 2002:adf:fd81:: with SMTP id d1mr9042165wrr.96.1591871564244;
- Thu, 11 Jun 2020 03:32:44 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200611093518.5737-1-david@redhat.com>
-In-Reply-To: <20200611093518.5737-1-david@redhat.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Thu, 11 Jun 2020 12:32:33 +0200
-Message-ID: <CAM9Jb+jk=mHHQtLJ78=xZrebo6X6euGK_-aEjgQb-qtKjke-FA@mail.gmail.com>
+        id S1727795AbgFKK5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 06:57:37 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40617 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727059AbgFKK5g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jun 2020 06:57:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591873054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=8iNVn1lekkpas6Z5lQVlsVFa//ULP3MO5bGL0mA/gwc=;
+        b=fpwIiZk1XGnrutRHDO78LCaSEZJY3p6x4d5XCP40DftwIf92VfibxHpAUD3VoGj/tPn2Wm
+        IG85Phfa6BS3fpVy4RV8gZVDqZ33QVIlfSRdDLunW0Uz60nWix01U96MiBOMkRiarzdy4e
+        y6LShJiHsRjt52Ch+YvD4MW6kF8nXeE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-LAVIhyB2P0uZt0wlFeEMzQ-1; Thu, 11 Jun 2020 06:57:33 -0400
+X-MC-Unique: LAVIhyB2P0uZt0wlFeEMzQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71FF2805DC0;
+        Thu, 11 Jun 2020 10:57:31 +0000 (UTC)
+Received: from [10.36.114.160] (ovpn-114-160.ams2.redhat.com [10.36.114.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 131AC60BF3;
+        Thu, 11 Jun 2020 10:57:25 +0000 (UTC)
 Subject: Re: [PATCH v1] virtio-mem: add memory via add_memory_driver_managed()
-To:     David Hildenbrand <david@redhat.com>
+To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         teawater <teawaterz@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20200611093518.5737-1-david@redhat.com>
+ <CAM9Jb+jk=mHHQtLJ78=xZrebo6X6euGK_-aEjgQb-qtKjke-FA@mail.gmail.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <aed44d47-2995-555d-834f-20a919132bee@redhat.com>
+Date:   Thu, 11 Jun 2020 12:57:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAM9Jb+jk=mHHQtLJ78=xZrebo6X6euGK_-aEjgQb-qtKjke-FA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Virtio-mem managed memory is always detected and added by the virtio-mem
-> driver, never using something like the firmware-provided memory map.
-> This is the case after an ordinary system reboot, and has to be guaranteed
-> after kexec. Especially, virtio-mem added memory resources can contain
-> inaccessible parts ("unblocked memory blocks"), blindly forwarding them
-> to a kexec kernel is dangerous, as unplugged memory will get accessed
-> (esp. written).
->
-> Let's use the new way of adding special driver-managed memory introduced
-> in commit 75ac4c58bc0d ("mm/memory_hotplug: introduce
-> add_memory_driver_managed()").
+On 11.06.20 12:32, Pankaj Gupta wrote:
+>> Virtio-mem managed memory is always detected and added by the virtio-mem
+>> driver, never using something like the firmware-provided memory map.
+>> This is the case after an ordinary system reboot, and has to be guaranteed
+>> after kexec. Especially, virtio-mem added memory resources can contain
+>> inaccessible parts ("unblocked memory blocks"), blindly forwarding them
+>> to a kexec kernel is dangerous, as unplugged memory will get accessed
+>> (esp. written).
+>>
+>> Let's use the new way of adding special driver-managed memory introduced
+>> in commit 75ac4c58bc0d ("mm/memory_hotplug: introduce
+>> add_memory_driver_managed()").
+> 
+> Is this commit id correct?
 
-Is this commit id correct?
->
-> This will result in no entries in /sys/firmware/memmap ("raw firmware-
-> provided memory map"), the memory resource will be flagged
-> IORESOURCE_MEM_DRIVER_MANAGED (esp., kexec_file_load() will not place
-> kexec images on this memory), and it is exposed as "System RAM
-> (virtio_mem)" in /proc/iomem, so esp. kexec-tools can properly handle it.
->
-> Example /proc/iomem before this change:
->   [...]
->   140000000-333ffffff : virtio0
->     140000000-147ffffff : System RAM
->   334000000-533ffffff : virtio1
->     338000000-33fffffff : System RAM
->     340000000-347ffffff : System RAM
->     348000000-34fffffff : System RAM
->   [...]
->
-> Example /proc/iomem after this change:
->   [...]
->   140000000-333ffffff : virtio0
->     140000000-147ffffff : System RAM (virtio_mem)
->   334000000-533ffffff : virtio1
->     338000000-33fffffff : System RAM (virtio_mem)
->     340000000-347ffffff : System RAM (virtio_mem)
->     348000000-34fffffff : System RAM (virtio_mem)
->   [...]
->
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-> Cc: teawater <teawaterz@linux.alibaba.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->
-> Based on latest Linus' tree (and not a tag) because
-> - virtio-mem has just been merged via the vhost tree
-> - add_memory_driver_managed() has been merged a week ago via the -mm tree
->
-> I'd like to have this patch in 5.8, with the initial merge of virtio-mem
-> if possible (so the user space representation of virtio-mem added memory
-> resources won't change anymore).
->
-> ---
->  drivers/virtio/virtio_mem.c | 25 ++++++++++++++++++++++---
->  1 file changed, 22 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_mem.c b/drivers/virtio/virtio_mem.c
-> index 50c689f250450..d2eab3558a9e1 100644
-> --- a/drivers/virtio/virtio_mem.c
-> +++ b/drivers/virtio/virtio_mem.c
-> @@ -101,6 +101,11 @@ struct virtio_mem {
->
->         /* The parent resource for all memory added via this device. */
->         struct resource *parent_resource;
-> +       /*
-> +        * Copy of "System RAM (virtio_mem)" to be used for
-> +        * add_memory_driver_managed().
-> +        */
-> +       const char *resource_name;
->
->         /* Summary of all memory block states. */
->         unsigned long nb_mb_state[VIRTIO_MEM_MB_STATE_COUNT];
-> @@ -414,8 +419,20 @@ static int virtio_mem_mb_add(struct virtio_mem *vm, unsigned long mb_id)
->         if (nid == NUMA_NO_NODE)
->                 nid = memory_add_physaddr_to_nid(addr);
->
-> +       /*
-> +        * When force-unloading the driver and we still have memory added to
-> +        * Linux, the resource name has to stay.
-> +        */
-> +       if (!vm->resource_name) {
-> +               vm->resource_name = kstrdup_const("System RAM (virtio_mem)",
-> +                                                 GFP_KERNEL);
-> +               if (!vm->resource_name)
-> +                       return -ENOMEM;
-> +       }
-> +
->         dev_dbg(&vm->vdev->dev, "adding memory block: %lu\n", mb_id);
-> -       return add_memory(nid, addr, memory_block_size_bytes());
-> +       return add_memory_driver_managed(nid, addr, memory_block_size_bytes(),
-> +                                        vm->resource_name);
->  }
->
->  /*
-> @@ -1890,10 +1907,12 @@ static void virtio_mem_remove(struct virtio_device *vdev)
->             vm->nb_mb_state[VIRTIO_MEM_MB_STATE_OFFLINE_PARTIAL] ||
->             vm->nb_mb_state[VIRTIO_MEM_MB_STATE_ONLINE] ||
->             vm->nb_mb_state[VIRTIO_MEM_MB_STATE_ONLINE_PARTIAL] ||
-> -           vm->nb_mb_state[VIRTIO_MEM_MB_STATE_ONLINE_MOVABLE])
-> +           vm->nb_mb_state[VIRTIO_MEM_MB_STATE_ONLINE_MOVABLE]) {
->                 dev_warn(&vdev->dev, "device still has system memory added\n");
-> -       else
-> +       } else {
->                 virtio_mem_delete_resource(vm);
-> +               kfree_const(vm->resource_name);
-> +       }
->
->         /* remove all tracking data - no locking needed */
->         vfree(vm->mb_state);
+Good point, it's the one from next-20200605.
 
-Looks good to me.
-Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+7b7b27214bba
+
+Is the correct one.
+
+[...]
+
+> 
+> Looks good to me.
+> Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+> 
+
+Thanks!
+
+-- 
+Thanks,
+
+David / dhildenb
+
