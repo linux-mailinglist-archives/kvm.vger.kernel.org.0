@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F38061F660D
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 12:57:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 570E51F661F
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 13:00:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727795AbgFKK5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 06:57:37 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40617 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727059AbgFKK5g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jun 2020 06:57:36 -0400
+        id S1727795AbgFKLAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 07:00:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36594 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727074AbgFKLAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 07:00:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591873054;
+        s=mimecast20190719; t=1591873234;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=8iNVn1lekkpas6Z5lQVlsVFa//ULP3MO5bGL0mA/gwc=;
-        b=fpwIiZk1XGnrutRHDO78LCaSEZJY3p6x4d5XCP40DftwIf92VfibxHpAUD3VoGj/tPn2Wm
-        IG85Phfa6BS3fpVy4RV8gZVDqZ33QVIlfSRdDLunW0Uz60nWix01U96MiBOMkRiarzdy4e
-        y6LShJiHsRjt52Ch+YvD4MW6kF8nXeE=
+        bh=qCSzsxzakrA6PJeHXxV8tNlYk7clz+olbOoQ62gsCHs=;
+        b=P1R766UrQUFtyWxVPCdc2h+hpeO4cltc5rgzbRfbjbiupwFHHsA5LhRVdkblTNq/2kC+Zz
+        xy7ZJgODQTgQQerY64NuzZTaFQD/c6JjUlsY0q9NBN3FxwGBiZeG0rViAaNweokJ0wCNtY
+        PpO4bHLqFNI13uZhN1RsVjdMXqU19Gs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-LAVIhyB2P0uZt0wlFeEMzQ-1; Thu, 11 Jun 2020 06:57:33 -0400
-X-MC-Unique: LAVIhyB2P0uZt0wlFeEMzQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-287-9KynNReSPbWQJMZt8lqqnQ-1; Thu, 11 Jun 2020 07:00:30 -0400
+X-MC-Unique: 9KynNReSPbWQJMZt8lqqnQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71FF2805DC0;
-        Thu, 11 Jun 2020 10:57:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F2A6107ACF2;
+        Thu, 11 Jun 2020 11:00:29 +0000 (UTC)
 Received: from [10.36.114.160] (ovpn-114-160.ams2.redhat.com [10.36.114.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 131AC60BF3;
-        Thu, 11 Jun 2020 10:57:25 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CB0548929F;
+        Thu, 11 Jun 2020 11:00:24 +0000 (UTC)
 Subject: Re: [PATCH v1] virtio-mem: add memory via add_memory_driver_managed()
-To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         virtio-dev@lists.oasis-open.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
+        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
         teawater <teawaterz@linux.alibaba.com>
 References: <20200611093518.5737-1-david@redhat.com>
- <CAM9Jb+jk=mHHQtLJ78=xZrebo6X6euGK_-aEjgQb-qtKjke-FA@mail.gmail.com>
+ <20200611060249-mutt-send-email-mst@kernel.org>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -88,48 +88,41 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <aed44d47-2995-555d-834f-20a919132bee@redhat.com>
-Date:   Thu, 11 Jun 2020 12:57:25 +0200
+Message-ID: <13ad9edf-31a1-35ee-a0b0-6390c3a0b4d9@redhat.com>
+Date:   Thu, 11 Jun 2020 13:00:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAM9Jb+jk=mHHQtLJ78=xZrebo6X6euGK_-aEjgQb-qtKjke-FA@mail.gmail.com>
+In-Reply-To: <20200611060249-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11.06.20 12:32, Pankaj Gupta wrote:
->> Virtio-mem managed memory is always detected and added by the virtio-mem
->> driver, never using something like the firmware-provided memory map.
->> This is the case after an ordinary system reboot, and has to be guaranteed
->> after kexec. Especially, virtio-mem added memory resources can contain
->> inaccessible parts ("unblocked memory blocks"), blindly forwarding them
->> to a kexec kernel is dangerous, as unplugged memory will get accessed
->> (esp. written).
->>
->> Let's use the new way of adding special driver-managed memory introduced
->> in commit 75ac4c58bc0d ("mm/memory_hotplug: introduce
->> add_memory_driver_managed()").
+>> I'd like to have this patch in 5.8, with the initial merge of virtio-mem
+>> if possible (so the user space representation of virtio-mem added memory
+>> resources won't change anymore).
 > 
-> Is this commit id correct?
+> So my plan is to rebase on top of -rc1 and merge this for rc2 then.
+> I don't like rebase on top of tip as the results are sometimes kind of
+> random.
 
-Good point, it's the one from next-20200605.
+Right, I just wanted to get this out early so we can discuss how to proceed.
 
-7b7b27214bba
+> And let's add a Fixes: tag as well, this way people will remember to
+> pick this.
+> Makes sense?
 
-Is the correct one.
+Yes, it's somehow a fix (for kexec). So
 
-[...]
+Fixes: 5f1f79bbc9e26 ("virtio-mem: Paravirtualized memory hotplug")
 
-> 
-> Looks good to me.
-> Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-> 
+I can respin after -rc1 with the commit id fixed as noted by Pankaj.
+Just let me know what you prefer.
 
 Thanks!
 
