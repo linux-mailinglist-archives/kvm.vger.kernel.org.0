@@ -2,40 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F7841F6B99
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 17:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 180DF1F6BC1
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 18:00:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728716AbgFKPvn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 11:51:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45318 "EHLO mail.kernel.org"
+        id S1728760AbgFKP74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 11:59:56 -0400
+Received: from mga12.intel.com ([192.55.52.136]:55844 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728605AbgFKPvm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 11:51:42 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8073D2075E;
-        Thu, 11 Jun 2020 15:51:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591890701;
-        bh=buouFtbooRy71XGHmBWmTOUevELIfu0pjfzSCKPq8pY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=bQbd4R8QZfbn7RGrBxQfn1ruYStXtOK6Z0q8MjEGMxIEzfjWZbv9wPvu4ao+MPfv8
-         1J7TGdGcixpukgrpdY6nm/py23a0nU82XzHB+uJdHGeGlNwL3pBL6dyV251JqldMNo
-         uWAaERT1/kzBgRGTtto5IPIqD+QhtGoVipYhyA0Q=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jjPUR-0029gk-Lg; Thu, 11 Jun 2020 16:51:40 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 11 Jun 2020 16:51:39 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        id S1728626AbgFKP7z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 11:59:55 -0400
+IronPort-SDR: bY+V2ayMw4QpqINsoRDdT77eDGmYNPuAhXUy7OYV36KlfrAHn3CQwzULzUgfeCc2TBvuBJWnkN
+ vyb215Ef2quw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 08:59:55 -0700
+IronPort-SDR: vlQ6xqosUXqm2IK2atrupqAhPka9ERniiyAolofQ9QLnlgU84Ttdpz9HijVivDLr/IVeArXiV+
+ xSQxjn+bUQsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; 
+   d="scan'208";a="306964950"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga008.jf.intel.com with ESMTP; 11 Jun 2020 08:59:54 -0700
+Date:   Thu, 11 Jun 2020 08:59:54 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,73 +47,92 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Peter Feiner <pfeiner@google.com>,
         Peter Shier <pshier@google.com>,
         Junaid Shahid <junaids@google.com>,
-        Ben Gardon <bgardon@google.com>,
         Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 17/21] KVM: arm64: Use common code's approach for
- __GFP_ZERO with memory caches
-In-Reply-To: <20200611154359.GF29918@linux.intel.com>
+Subject: Re: [PATCH 16/21] KVM: arm64: Drop @max param from
+ mmu_topup_memory_cache()
+Message-ID: <20200611155954.GH29918@linux.intel.com>
 References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
- <20200605213853.14959-18-sean.j.christopherson@intel.com>
- <6cc08074c289cbea7b9c1deeaf18c63f@kernel.org>
- <20200611154359.GF29918@linux.intel.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <12ec535821111d503773d6f623047d27@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, pfeiner@google.com, pshier@google.com, junaids@google.com, bgardon@google.com, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+ <20200605213853.14959-17-sean.j.christopherson@intel.com>
+ <CANgfPd-x=Af6Wdn9Wz=9r5CiHDCbxEgQhS2swALUMQd00oQ3jg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd-x=Af6Wdn9Wz=9r5CiHDCbxEgQhS2swALUMQd00oQ3jg@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-06-11 16:43, Sean Christopherson wrote:
-> On Thu, Jun 11, 2020 at 08:59:05AM +0100, Marc Zyngier wrote:
->> >diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> >index 9398b66f8a87..688213ef34f0 100644
->> >--- a/arch/arm64/kvm/mmu.c
->> >+++ b/arch/arm64/kvm/mmu.c
->> >@@ -131,7 +131,8 @@ static int mmu_topup_memory_cache(struct
->> >kvm_mmu_memory_cache *cache, int min)
->> > 	if (cache->nobjs >= min)
->> > 		return 0;
->> > 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
->> >-		page = (void *)__get_free_page(GFP_PGTABLE_USER);
->> >+		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT |
->> 
->> This is definitely a change in the way we account for guest
->> page tables allocation, although I find it bizarre that not
->> all architectures account for it the same way.
-> 
-> It's not intended to be a functional change, i.e. the allocations 
-> should
-> still be accounted:
-> 
->   #define GFP_PGTABLE_USER  (GFP_PGTABLE_KERNEL | __GFP_ACCOUNT)
->   |
->   -> #define GFP_PGTABLE_KERNEL        (GFP_KERNEL | __GFP_ZERO)
-> 
->   == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
-> 
-> versus
-> 
->   #define GFP_KERNEL_ACCOUNT (GFP_KERNEL | __GFP_ACCOUNT)
-> 
->     with __GFP_ZERO explicitly OR'd in
-> 
->   == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
-> 
-> I can put the above in the changelog, unless of course it's wrong and 
-> I've
-> missed something.
+On Wed, Jun 10, 2020 at 03:00:47PM -0700, Ben Gardon wrote:
+> On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > Replace the @max param in mmu_topup_memory_cache() and instead use
+> > ARRAY_SIZE() to terminate the loop to fill the cache.  This removes a
+> > BUG_ON() and sets the stage for moving arm64 to the common memory cache
+> > implementation.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 12 ++++--------
+> >  1 file changed, 4 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index a1f6bc70c4e4..9398b66f8a87 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -124,15 +124,13 @@ static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pudp)
+> >         put_page(virt_to_page(pudp));
+> >  }
+> >
+> > -static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+> > -                                 int min, int max)
+> > +static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache, int min)
+> >  {
+> >         void *page;
+> >
+> > -       BUG_ON(max > KVM_NR_MEM_OBJS);
+> KVM_NR_MEM_OBJS should be undefined as of patch 14 in this series. I'd
+> recommend changing this to use the new constant you defined in that
+> patch.
 
-Ah, good point. Serves me right for judging the symbol at face value! 
-;-)
-I guess a quick mention in the changelog wouldn't hurt.
+My intent was to leave KVM_NR_MEM_OBJS defined by arm64 and MIPS until they
+move to the common implementation, e.g. this should be defined in
+arch/arm64/include/asm/kvm_host.h until patch 18.  I'll get cross-compiling
+setup so I can properly test bisection before sending v2.
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+> >         if (cache->nobjs >= min)
+> >                 return 0;
+> > -       while (cache->nobjs < max) {
+> > +       while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+> >                 page = (void *)__get_free_page(GFP_PGTABLE_USER);
+> >                 if (!page)
+> >                         return -ENOMEM;
+> > @@ -1356,8 +1354,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> >                         pte = kvm_s2pte_mkwrite(pte);
+> >
+> >                 ret = mmu_topup_memory_cache(&cache,
+> > -                                            kvm_mmu_cache_min_pages(kvm),
+> > -                                            KVM_NR_MEM_OBJS);
+> See above, KVM_NR_MEM_OBJS is undefined as of patch 14.
+> > +                                            kvm_mmu_cache_min_pages(kvm));
+> >                 if (ret)
+> >                         goto out;
+> >                 spin_lock(&kvm->mmu_lock);
+> > @@ -1737,8 +1734,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >         up_read(&current->mm->mmap_sem);
+> >
+> >         /* We need minimum second+third level pages */
+> > -       ret = mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm),
+> > -                                    KVM_NR_MEM_OBJS);
+> See above, KVM_NR_MEM_OBJS is undefined as of patch 14.
+> > +       ret = mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm));
+> >         if (ret)
+> >                 return ret;
+> >
+> > --
+> > 2.26.0
+> >
