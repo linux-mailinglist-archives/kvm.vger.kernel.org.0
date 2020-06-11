@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 875001F64CB
+	by mail.lfdr.de (Postfix) with ESMTP id 18E3E1F64C8
 	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:33:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbgFKJdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 05:33:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39518 "EHLO mail.kernel.org"
+        id S1726817AbgFKJdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 05:33:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39470 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726708AbgFKJdX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 05:33:23 -0400
+        id S1726708AbgFKJdW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 05:33:22 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 397D020760;
-        Thu, 11 Jun 2020 09:33:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8D08D20747;
+        Thu, 11 Jun 2020 09:33:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591868003;
-        bh=YpTPkF+pnFoMogA4X2GFObKXLTgxGc72fp25PaLmSWs=;
+        s=default; t=1591868001;
+        bh=9k1Z6Oc9tLld6mFM8g0LB4dGrlIcUbNndPsmAFUGesY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NEmNmzYzkA3y84M3ZhGDWpR28WRid82ZRnELneRdXX6lslEhH/jLhEcfpklnNwbXm
-         Jf3k8/KVtLZPQjtEvZSGncXQBrxjjVwCk1rOd4fHkwLKP0b3E8wilQB/XIck1bbMGK
-         rW0+mquEnEKuI+67r29r1PQRODQcdio00lvkcKkI=
+        b=SefjnXr1FArdFXM6HoG6yYiKFG+6zcCBmk1NZK7zvqUZtcoLekp5Ln/BBx/Jp0nBn
+         r2S6cXk/v+ZjU5YNdoo4JIIrLMtpYkAFrDu6SnrMAmUgEWRE2Zh0wvZ1OP23lcuBP6
+         SH8Hu+Udi95/tfwfOgKGv1zbjAZTBqXXQA2lZn34=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jjJDy-0022ZT-PS; Thu, 11 Jun 2020 10:10:14 +0100
+        id 1jjJDz-0022ZT-GD; Thu, 11 Jun 2020 10:10:15 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -37,17 +37,17 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: [PATCH 10/11] KVM: arm64: Synchronize sysreg state on injecting an AArch32 exception
-Date:   Thu, 11 Jun 2020 10:09:55 +0100
-Message-Id: <20200611090956.1537104-11-maz@kernel.org>
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 11/11] KVM: arm64: Move hyp_symbol_addr() to kvm_asm.h
+Date:   Thu, 11 Jun 2020 10:09:56 +0100
+Message-Id: <20200611090956.1537104-12-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200611090956.1537104-1-maz@kernel.org>
 References: <20200611090956.1537104-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, ascull@google.com, james.morse@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, ascull@google.com, james.morse@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
@@ -55,89 +55,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On a VHE system, the EL1 state is left in the CPU most of the time,
-and only syncronized back to memory when vcpu_put() is called (most
-of the time on preemption).
+Recent refactoring of the arm64 code make it awkward to have
+hyp_symbol_addr() in kvm_mmu.h. Instead, move it next to its
+main user, which is __hyp_this_cpu_ptr().
 
-Which means that when injecting an exception, we'd better have a way
-to either:
-(1) write directly to the EL1 sysregs
-(2) synchronize the state back to memory, and do the changes there
-
-For an AArch64, we already do (1), so we are safe. Unfortunately,
-doing the same thing for AArch32 would be pretty invasive. Instead,
-we can easily implement (2) by calling the put/load architectural
-backends, and keep preemption disabled. We can then reload the
-state back into EL1.
-
-Cc: stable@vger.kernel.org
-Reported-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/aarch32.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ arch/arm64/include/asm/kvm_asm.h | 20 ++++++++++++++++++++
+ arch/arm64/include/asm/kvm_mmu.h | 20 --------------------
+ 2 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm64/kvm/aarch32.c b/arch/arm64/kvm/aarch32.c
-index 0a356aa91aa1..40a62a99fbf8 100644
---- a/arch/arm64/kvm/aarch32.c
-+++ b/arch/arm64/kvm/aarch32.c
-@@ -33,6 +33,26 @@ static const u8 return_offsets[8][2] = {
- 	[7] = { 4, 4 },		/* FIQ, unused */
- };
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index d9b7da15dbca..352aaebf4198 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -81,6 +81,26 @@ extern u32 __kvm_get_mdcr_el2(void);
  
-+static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
-+{
-+	preempt_disable();
-+	if (vcpu->arch.sysregs_loaded_on_cpu) {
-+		kvm_arch_vcpu_put(vcpu);
-+		return true;
-+	}
-+
-+	preempt_enable();
-+	return false;
-+}
-+
-+static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
-+{
-+	if (loaded) {
-+		kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+		preempt_enable();
-+	}
-+}
+ extern char __smccc_workaround_1_smc[__SMCCC_WORKAROUND_1_SMC_SZ];
+ 
++/*
++ * Obtain the PC-relative address of a kernel symbol
++ * s: symbol
++ *
++ * The goal of this macro is to return a symbol's address based on a
++ * PC-relative computation, as opposed to a loading the VA from a
++ * constant pool or something similar. This works well for HYP, as an
++ * absolute VA is guaranteed to be wrong. Only use this if trying to
++ * obtain the address of a symbol (i.e. not something you obtained by
++ * following a pointer).
++ */
++#define hyp_symbol_addr(s)						\
++	({								\
++		typeof(s) *addr;					\
++		asm("adrp	%0, %1\n"				\
++		    "add	%0, %0, :lo12:%1\n"			\
++		    : "=r" (addr) : "S" (&s));				\
++		addr;							\
++	})
 +
  /*
-  * When an exception is taken, most CPSR fields are left unchanged in the
-  * handler. However, some are explicitly overridden (e.g. M[4:0]).
-@@ -155,7 +175,10 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+  * Home-grown __this_cpu_{ptr,read} variants that always work at HYP,
+  * provided that sym is really a *symbol* and not a pointer obtained from
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 53bd4d517a4d..df485840005c 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -107,26 +107,6 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
  
- void kvm_inject_undef32(struct kvm_vcpu *vcpu)
- {
-+	bool loaded = pre_fault_synchronize(vcpu);
-+
- 	prepare_fault32(vcpu, PSR_AA32_MODE_UND, 4);
-+	post_fault_synchronize(vcpu, loaded);
- }
+ #define kern_hyp_va(v) 	((typeof(v))(__kern_hyp_va((unsigned long)(v))))
  
+-/*
+- * Obtain the PC-relative address of a kernel symbol
+- * s: symbol
+- *
+- * The goal of this macro is to return a symbol's address based on a
+- * PC-relative computation, as opposed to a loading the VA from a
+- * constant pool or something similar. This works well for HYP, as an
+- * absolute VA is guaranteed to be wrong. Only use this if trying to
+- * obtain the address of a symbol (i.e. not something you obtained by
+- * following a pointer).
+- */
+-#define hyp_symbol_addr(s)						\
+-	({								\
+-		typeof(s) *addr;					\
+-		asm("adrp	%0, %1\n"				\
+-		    "add	%0, %0, :lo12:%1\n"			\
+-		    : "=r" (addr) : "S" (&s));				\
+-		addr;							\
+-	})
+-
  /*
-@@ -168,6 +191,9 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 	u32 vect_offset;
- 	u32 *far, *fsr;
- 	bool is_lpae;
-+	bool loaded;
-+
-+	loaded = pre_fault_synchronize(vcpu);
- 
- 	if (is_pabt) {
- 		vect_offset = 12;
-@@ -191,6 +217,8 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
- 		*fsr = DFSR_FSC_EXTABT_nLPAE;
- 	}
-+
-+	post_fault_synchronize(vcpu, loaded);
- }
- 
- void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr)
+  * We currently support using a VM-specified IPA size. For backward
+  * compatibility, the default IPA size is fixed to 40bits.
 -- 
 2.26.2
 
