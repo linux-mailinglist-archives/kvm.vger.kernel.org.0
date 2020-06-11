@@ -2,59 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A9411F5F78
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 03:28:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C120E1F5FFC
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 04:28:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726306AbgFKB2j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 21:28:39 -0400
-Received: from mga02.intel.com ([134.134.136.20]:15014 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726265AbgFKB2i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 21:28:38 -0400
-IronPort-SDR: EQPNe0vNgmOeu+IVk0MQgstMGO2IlRLUWgUm3mbrvPmy+oCzFbdzT6l9rFuvVF+hGaFf/Tqfja
- QgiHS7YHaOeA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2020 18:28:38 -0700
-IronPort-SDR: TDwZrLfXKyCPyLkRMz+erSgA3fgoVSeC0VxAIc+HU7rjn60eWjqAMO9lF9+BapzJ7p9RTyr8x5
- 07RBzg00SO+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,498,1583222400"; 
-   d="scan'208";a="259471853"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by fmsmga007.fm.intel.com with ESMTP; 10 Jun 2020 18:28:36 -0700
-Date:   Thu, 11 Jun 2020 09:29:13 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        jmattson@google.com, yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v12 00/10] Introduce support for guest CET feature
-Message-ID: <20200611012913.GA15497@local-michael-cet-test>
-References: <20200506082110.25441-1-weijiang.yang@intel.com>
- <20200610165635.GB18790@linux.intel.com>
+        id S1726336AbgFKC15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 22:27:57 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:58980 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726279AbgFKC15 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 22:27:57 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 7ABD42F40A3152786A0A;
+        Thu, 11 Jun 2020 10:27:54 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.213) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 11 Jun 2020
+ 10:27:45 +0800
+Subject: Re: [RFC PATCH v4 08/10] i40e/vf_migration: VF live migration -
+ pass-through VF first
+To:     Yan Zhao <yan.y.zhao@intel.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <alex.williamson@redhat.com>, <cohuck@redhat.com>,
+        <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
+        <kevin.tian@intel.com>, <shaopeng.he@intel.com>,
+        <yi.l.liu@intel.com>, <xin.zeng@intel.com>, <hang.yuan@intel.com>,
+        "Wang Haibin" <wanghaibin.wang@huawei.com>
+References: <20200518024202.13996-1-yan.y.zhao@intel.com>
+ <20200518025316.14491-1-yan.y.zhao@intel.com>
+ <e45d5bb6-6f15-dd4d-6de2-478b36f88069@huawei.com>
+ <20200611002319.GC13961@joy-OptiPlex-7040>
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <fe5c0a64-003c-1db6-8256-f0dc00333f1d@huawei.com>
+Date:   Thu, 11 Jun 2020 10:27:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200610165635.GB18790@linux.intel.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20200611002319.GC13961@joy-OptiPlex-7040>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.213]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 10, 2020 at 09:56:36AM -0700, Sean Christopherson wrote:
-> On Wed, May 06, 2020 at 04:20:59PM +0800, Yang Weijiang wrote:
-> > Several parts in KVM have been updated to provide VM CET support, including:
-> > CPUID/XSAVES config, MSR pass-through, user space MSR access interface, 
-> > vmentry/vmexit config, nested VM etc. These patches have dependency on CET
-> > kernel patches for xsaves support and CET definitions, e.g., MSR and related
-> > feature flags.
+
+
+On 2020/6/11 8:23, Yan Zhao wrote:
+> On Wed, Jun 10, 2020 at 04:59:43PM +0800, Xiang Zheng wrote:
+>> Hi Yan,
+>>
+>> few nits below...
+>>
+>> On 2020/5/18 10:53, Yan Zhao wrote:
+>>> This driver intercepts all device operations as long as it's probed
+>>> successfully by vfio-pci driver.
+>>>
+>>> It will process regions and irqs of its interest and then forward
+>>> operations to default handlers exported from vfio pci if it wishes to.
+>>>
+>>> In this patch, this driver does nothing but pass through VFs to guest
+>>> by calling to exported handlers from driver vfio-pci.
+>>>
+>>> Cc: Shaopeng He <shaopeng.he@intel.com>
+>>>
+>>> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+>>> ---
+>>>  drivers/net/ethernet/intel/Kconfig            |  10 ++
+>>>  drivers/net/ethernet/intel/i40e/Makefile      |   2 +
+>>>  .../ethernet/intel/i40e/i40e_vf_migration.c   | 165 ++++++++++++++++++
+>>>  .../ethernet/intel/i40e/i40e_vf_migration.h   |  59 +++++++
+>>>  4 files changed, 236 insertions(+)
+>>>  create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
+>>>  create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
+>>> index ad34e4335df2..31780d9a59f1 100644
+>>> --- a/drivers/net/ethernet/intel/Kconfig
+>>> +++ b/drivers/net/ethernet/intel/Kconfig
+>>> @@ -264,6 +264,16 @@ config I40E_DCB
+>>>  
+>>>  	  If unsure, say N.
+>>>  
+
+[...]
+
+>>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
+>>> new file mode 100644
+>>> index 000000000000..696d40601ec3
+>>> --- /dev/null
+>>> +++ b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
+>>> @@ -0,0 +1,59 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>> +/* Copyright(c) 2013 - 2019 Intel Corporation. */
+>>> +
+>>> +#ifndef I40E_MIG_H
+>>> +#define I40E_MIG_H
+>>> +
+>>> +#include <linux/pci.h>
+>>> +#include <linux/vfio.h>
+>>> +#include <linux/mdev.h>
+>>> +
+>>> +#include "i40e.h"
+>>> +#include "i40e_txrx.h"
+>>> +
+>>> +/* helper macros copied from vfio-pci */
+>>> +#define VFIO_PCI_OFFSET_SHIFT   40
+>>> +#define VFIO_PCI_OFFSET_TO_INDEX(off)   ((off) >> VFIO_PCI_OFFSET_SHIFT)
+>>> +#define VFIO_PCI_INDEX_TO_OFFSET(index)	((u64)(index) << VFIO_PCI_OFFSET_SHIFT)
+>>> +#define VFIO_PCI_OFFSET_MASK    (((u64)(1) << VFIO_PCI_OFFSET_SHIFT) - 1)
+>>> +
+>>> +/* Single Root I/O Virtualization */
+>>> +struct pci_sriov {
+>>> +	int		pos;		/* Capability position */
+>>> +	int		nres;		/* Number of resources */
+>>> +	u32		cap;		/* SR-IOV Capabilities */
+>>> +	u16		ctrl;		/* SR-IOV Control */
+>>> +	u16		total_VFs;	/* Total VFs associated with the PF */
+>>> +	u16		initial_VFs;	/* Initial VFs associated with the PF */
+>>> +	u16		num_VFs;	/* Number of VFs available */
+>>> +	u16		offset;		/* First VF Routing ID offset */
+>>> +	u16		stride;		/* Following VF stride */
+>>> +	u16		vf_device;	/* VF device ID */
+>>> +	u32		pgsz;		/* Page size for BAR alignment */
+>>> +	u8		link;		/* Function Dependency Link */
+>>> +	u8		max_VF_buses;	/* Max buses consumed by VFs */
+>>> +	u16		driver_max_VFs;	/* Max num VFs driver supports */
+>>> +	struct pci_dev	*dev;		/* Lowest numbered PF */
+>>> +	struct pci_dev	*self;		/* This PF */
+>>> +	u32		cfg_size;	/* VF config space size */
+>>> +	u32		class;		/* VF device */
+>>> +	u8		hdr_type;	/* VF header type */
+>>> +	u16		subsystem_vendor; /* VF subsystem vendor */
+>>> +	u16		subsystem_device; /* VF subsystem device */                                                                                   
+>>> +	resource_size_t	barsz[PCI_SRIOV_NUM_BARS];	/* VF BAR size */
+>>> +	bool		drivers_autoprobe; /* Auto probing of VFs by driver */
+>>> +};
+>>> +
+>>
+>> Can "struct pci_sriov" be extracted for common use? This should not be exclusive
+>> for "i40e_vf migration support".
+>>
+> the definition of this structure is actually in driver/pci/pci.h.
+> maybe removing the copy here and use below include is better?
+> #include "../../../../pci/pci.h"
 > 
-> Other than the MSR and cpufeatures flags definitions, is there any direct
-> dependency on kernel CET support?  I.e. if/when XSAVES support is merged,
-> is there anything beyond the architectural definitions that are required to
-> merge KVM CET virtualization?
-No, KVM CET patches only depend on kernel CET related definitions and XSAVES 
-support now. But to make guest CET work, we need CET patches for QEMU. 
+
+How about moving the definition from driver/pci/pci.h into include/linux/pci.h? So
+we can just include "linux/pci.h" and removing the copy here.
+
+-- 
+Thanks,
+Xiang
+
