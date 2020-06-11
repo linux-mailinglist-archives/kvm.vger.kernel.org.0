@@ -2,80 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5D761F5F60
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 03:05:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A9411F5F78
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 03:28:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726910AbgFKBEy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jun 2020 21:04:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48936 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726748AbgFKBEx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jun 2020 21:04:53 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09518C08C5C1;
-        Wed, 10 Jun 2020 18:04:53 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 49j5HR1WF0z9sRh;
-        Thu, 11 Jun 2020 11:04:51 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1591837491;
-        bh=9SbvOldnk3HdDzJ99pzZwFYv2zPgWhNNTx+EqZMeH+c=;
-        h=Date:From:To:Cc:Subject:From;
-        b=tJUsUmSZLzPHh7kKlK9YcH/r63foYNjTvdxyF4wexBJYCfhwFuttelJVtR/wU1j3z
-         NSl+WKLbc9+e32emefq64Z3ob9FN7jQqoZSq8/8IrCi34jKoJIcF9NTDmf9KcSBAxO
-         RlpH6BzmoFf9OrVXFuI5F0xoh2rEq2xGIPB1Q2HsrKyrBb6oA2OCIMQcwc7Et5Zix3
-         OQr9exkvPcyNKQag26rE5ZUFFIlVBoE65OHp4jJH5JVw+LD6GwH4Eq7is9vBjMkSYx
-         5+iFdcljX9TdNQflP00O/QFWwu9V7Lm7xVvK1q5QVgCmrOaWr6geHdMzfU9XVl89Ox
-         JbMVJEuSDpHDw==
-Date:   Thu, 11 Jun 2020 11:04:50 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the kvm tree
-Message-ID: <20200611110450.364e8e7b@canb.auug.org.au>
+        id S1726306AbgFKB2j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jun 2020 21:28:39 -0400
+Received: from mga02.intel.com ([134.134.136.20]:15014 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726265AbgFKB2i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jun 2020 21:28:38 -0400
+IronPort-SDR: EQPNe0vNgmOeu+IVk0MQgstMGO2IlRLUWgUm3mbrvPmy+oCzFbdzT6l9rFuvVF+hGaFf/Tqfja
+ QgiHS7YHaOeA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2020 18:28:38 -0700
+IronPort-SDR: TDwZrLfXKyCPyLkRMz+erSgA3fgoVSeC0VxAIc+HU7rjn60eWjqAMO9lF9+BapzJ7p9RTyr8x5
+ 07RBzg00SO+A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,498,1583222400"; 
+   d="scan'208";a="259471853"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by fmsmga007.fm.intel.com with ESMTP; 10 Jun 2020 18:28:36 -0700
+Date:   Thu, 11 Jun 2020 09:29:13 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v12 00/10] Introduce support for guest CET feature
+Message-ID: <20200611012913.GA15497@local-michael-cet-test>
+References: <20200506082110.25441-1-weijiang.yang@intel.com>
+ <20200610165635.GB18790@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/k.aEEGcxG7d.WWW+XcTG4+3";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200610165635.GB18790@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/k.aEEGcxG7d.WWW+XcTG4+3
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-
-Commit
-
-  b112f8184c50 ("KVM: nVMX: Consult only the "basic" exit reason when routi=
-ng nested exit")
-
-is missing a Signed-off-by from its committer.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/k.aEEGcxG7d.WWW+XcTG4+3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7hgzIACgkQAVBC80lX
-0GxSyAgAjKlt4zHw2DJSi6J9vD9SMKG8bHioHeKK7lsX1PAUGTLSa3QFKwrXnqmH
-D55LnCA1Fvu6sWXkAnUT0xdhXq6tQ25v1ZfiZo/0wbC/jdbtXNcJQ1d8UPNDzpP8
-Bv45fVqDztYMC/2Jlhz2UxWIstqOmE5K1zyT9DxGa0M01gqv1S1x9H9XOLMKigqC
-VHwl5GALN6ZcNtP7m35B0xdoeltHZbl4/l8oN1wbYgERjoMKWoJBORYwMTOAENgM
-85X/kcgB8WXjslaFL6aTABIddEhbHXXq/kbng8R7GNWc8h4r5tEn0bkR6SVAZyqh
-FnwM+mGy+1lWELZ95rbGF1B24Rltzg==
-=EH9N
------END PGP SIGNATURE-----
-
---Sig_/k.aEEGcxG7d.WWW+XcTG4+3--
+On Wed, Jun 10, 2020 at 09:56:36AM -0700, Sean Christopherson wrote:
+> On Wed, May 06, 2020 at 04:20:59PM +0800, Yang Weijiang wrote:
+> > Several parts in KVM have been updated to provide VM CET support, including:
+> > CPUID/XSAVES config, MSR pass-through, user space MSR access interface, 
+> > vmentry/vmexit config, nested VM etc. These patches have dependency on CET
+> > kernel patches for xsaves support and CET definitions, e.g., MSR and related
+> > feature flags.
+> 
+> Other than the MSR and cpufeatures flags definitions, is there any direct
+> dependency on kernel CET support?  I.e. if/when XSAVES support is merged,
+> is there anything beyond the architectural definitions that are required to
+> merge KVM CET virtualization?
+No, KVM CET patches only depend on kernel CET related definitions and XSAVES 
+support now. But to make guest CET work, we need CET patches for QEMU. 
