@@ -2,163 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20D131F70CE
-	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 01:20:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DDCA1F710A
+	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 01:50:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726331AbgFKXUw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 19:20:52 -0400
-Received: from mga18.intel.com ([134.134.136.126]:57714 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726284AbgFKXUw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 19:20:52 -0400
-IronPort-SDR: 4TuFqZyGUEfZDtEKac1V2eKelE8A+T4L71/kYn74cUyA7p6B9Jn/ycxf0xmFy1x4yKohxzDwDR
- oc6NRe4dnX6A==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 16:20:51 -0700
-IronPort-SDR: XhXMCmaBfuRgwtEFEXtJMZygbD7vqtJ8pGircQSzqdqyXnILtwUaucQYN/2ij0J2tfgHHt0zS8
- TZF78l9QkkIA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,501,1583222400"; 
-   d="scan'208";a="260815830"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.16])
-  by fmsmga008.fm.intel.com with ESMTP; 11 Jun 2020 16:20:48 -0700
-Date:   Thu, 11 Jun 2020 19:10:48 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Xiang Zheng <zhengxiang9@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        kevin.tian@intel.com, shaopeng.he@intel.com, yi.l.liu@intel.com,
-        xin.zeng@intel.com, hang.yuan@intel.com,
-        Wang Haibin <wanghaibin.wang@huawei.com>
-Subject: Re: [RFC PATCH v4 08/10] i40e/vf_migration: VF live migration -
- pass-through VF first
-Message-ID: <20200611231048.GE13961@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20200518024202.13996-1-yan.y.zhao@intel.com>
- <20200518025316.14491-1-yan.y.zhao@intel.com>
- <e45d5bb6-6f15-dd4d-6de2-478b36f88069@huawei.com>
- <20200611002319.GC13961@joy-OptiPlex-7040>
- <fe5c0a64-003c-1db6-8256-f0dc00333f1d@huawei.com>
+        id S1726369AbgFKXuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 19:50:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33610 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726284AbgFKXus (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 19:50:48 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9155CC08C5C2
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 16:50:48 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id i25so8415074iog.0
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 16:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=93n58JlbTzQHwlJI2pok5svmyI/MThLFd0Aotf1DgMs=;
+        b=cczANLzvQhJ1yfcj2R3/ewly07KCDishAHfcfv+SAFsZtudG5k9JcukGmFjq7GybLz
+         bcfCl5rtAzypBF6JvEovR9FJjAOphIowCzsosYSDOs97ONo+yW6eGNM/yxuZB+k+3G4j
+         n2FUEitUU9x1NmcbvtBnbb9H0rKf0F68FM6L066in5h7L+BC0putg0Bq0Jq0NTg4AaB8
+         /vpEw+yOkbdCLHPkEbuB0OmXyMNinGZZP8mbSosL4+rC8fkjfbl0UJgUmuD0I1XfYieA
+         WJsUl4TpC1IxI9Or9NKCfAacndQ1ezDArhbDekiCI6KKgBqX9rbzOTtFkJhtjBOGfRxb
+         Q2xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=93n58JlbTzQHwlJI2pok5svmyI/MThLFd0Aotf1DgMs=;
+        b=Fjw0tyu6gS/I1nDlBuVgbZINtL/UgGJFY4Crp2KGq8f4xmWwYnYW75GmzRipe+2pq6
+         fEp2EehLpt/TrKv6yf+wJCcOLwHOGpUGc6CVet2xeQzzvg5BWL1fVJz/EJx/pd46f3x8
+         0haixJTVYS/KQ0pA4ttETnsqB1pvMpU65jaC3Tf2xehu899DJuhNZeopcbeRHCVhubn8
+         Zn8xGPOGGmQU4UW+GSkySt6jvrzCejhC8kJpDVlmobZgo384Q++kzFDJIpYibsyAsCdF
+         zo+rTXDD4j5Lbd+Tw+LLr0mT6hV4YRB04uewk5PK5ru198RiyAVTy8VKCwh9F1i1vuYD
+         32+A==
+X-Gm-Message-State: AOAM530DZWsUvNzr2I2XqDd7bR1CswoggVvo+bdvfpP3/D10DCnpvPaN
+        IAhhcN3FrMzmSZRldqwofB6r35aUJd7zC66PNNAabw==
+X-Google-Smtp-Source: ABdhPJyo8bDnKKBLYgtlBf951W9VZgGEt7oQKsn+a2dTFPyjqgkEcmSM2wonYqe0wTVN1CuSc1Cq099NBglXCGOuwkg=
+X-Received: by 2002:a5e:a705:: with SMTP id b5mr11057427iod.12.1591919447631;
+ Thu, 11 Jun 2020 16:50:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe5c0a64-003c-1db6-8256-f0dc00333f1d@huawei.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <159191202523.31436.11959784252237488867.stgit@bmoger-ubuntu> <159191213022.31436.11150808867377936241.stgit@bmoger-ubuntu>
+In-Reply-To: <159191213022.31436.11150808867377936241.stgit@bmoger-ubuntu>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 11 Jun 2020 16:50:36 -0700
+Message-ID: <CALMp9eSC-wwP50gtprpakKjPYeZ5LdDSFS6i__csVCJwUKmqjA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM:SVM: Enable INVPCID feature on AMD
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>, Joerg Roedel <joro@8bytes.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 11, 2020 at 10:27:34AM +0800, Xiang Zheng wrote:
-> 
-> 
-> On 2020/6/11 8:23, Yan Zhao wrote:
-> > On Wed, Jun 10, 2020 at 04:59:43PM +0800, Xiang Zheng wrote:
-> >> Hi Yan,
-> >>
-> >> few nits below...
-> >>
-> >> On 2020/5/18 10:53, Yan Zhao wrote:
-> >>> This driver intercepts all device operations as long as it's probed
-> >>> successfully by vfio-pci driver.
-> >>>
-> >>> It will process regions and irqs of its interest and then forward
-> >>> operations to default handlers exported from vfio pci if it wishes to.
-> >>>
-> >>> In this patch, this driver does nothing but pass through VFs to guest
-> >>> by calling to exported handlers from driver vfio-pci.
-> >>>
-> >>> Cc: Shaopeng He <shaopeng.he@intel.com>
-> >>>
-> >>> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> >>> ---
-> >>>  drivers/net/ethernet/intel/Kconfig            |  10 ++
-> >>>  drivers/net/ethernet/intel/i40e/Makefile      |   2 +
-> >>>  .../ethernet/intel/i40e/i40e_vf_migration.c   | 165 ++++++++++++++++++
-> >>>  .../ethernet/intel/i40e/i40e_vf_migration.h   |  59 +++++++
-> >>>  4 files changed, 236 insertions(+)
-> >>>  create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
-> >>>  create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
-> >>>
-> >>> diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-> >>> index ad34e4335df2..31780d9a59f1 100644
-> >>> --- a/drivers/net/ethernet/intel/Kconfig
-> >>> +++ b/drivers/net/ethernet/intel/Kconfig
-> >>> @@ -264,6 +264,16 @@ config I40E_DCB
-> >>>  
-> >>>  	  If unsure, say N.
-> >>>  
-> 
-> [...]
-> 
-> >>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
-> >>> new file mode 100644
-> >>> index 000000000000..696d40601ec3
-> >>> --- /dev/null
-> >>> +++ b/drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
-> >>> @@ -0,0 +1,59 @@
-> >>> +/* SPDX-License-Identifier: GPL-2.0 */
-> >>> +/* Copyright(c) 2013 - 2019 Intel Corporation. */
-> >>> +
-> >>> +#ifndef I40E_MIG_H
-> >>> +#define I40E_MIG_H
-> >>> +
-> >>> +#include <linux/pci.h>
-> >>> +#include <linux/vfio.h>
-> >>> +#include <linux/mdev.h>
-> >>> +
-> >>> +#include "i40e.h"
-> >>> +#include "i40e_txrx.h"
-> >>> +
-> >>> +/* helper macros copied from vfio-pci */
-> >>> +#define VFIO_PCI_OFFSET_SHIFT   40
-> >>> +#define VFIO_PCI_OFFSET_TO_INDEX(off)   ((off) >> VFIO_PCI_OFFSET_SHIFT)
-> >>> +#define VFIO_PCI_INDEX_TO_OFFSET(index)	((u64)(index) << VFIO_PCI_OFFSET_SHIFT)
-> >>> +#define VFIO_PCI_OFFSET_MASK    (((u64)(1) << VFIO_PCI_OFFSET_SHIFT) - 1)
-> >>> +
-> >>> +/* Single Root I/O Virtualization */
-> >>> +struct pci_sriov {
-> >>> +	int		pos;		/* Capability position */
-> >>> +	int		nres;		/* Number of resources */
-> >>> +	u32		cap;		/* SR-IOV Capabilities */
-> >>> +	u16		ctrl;		/* SR-IOV Control */
-> >>> +	u16		total_VFs;	/* Total VFs associated with the PF */
-> >>> +	u16		initial_VFs;	/* Initial VFs associated with the PF */
-> >>> +	u16		num_VFs;	/* Number of VFs available */
-> >>> +	u16		offset;		/* First VF Routing ID offset */
-> >>> +	u16		stride;		/* Following VF stride */
-> >>> +	u16		vf_device;	/* VF device ID */
-> >>> +	u32		pgsz;		/* Page size for BAR alignment */
-> >>> +	u8		link;		/* Function Dependency Link */
-> >>> +	u8		max_VF_buses;	/* Max buses consumed by VFs */
-> >>> +	u16		driver_max_VFs;	/* Max num VFs driver supports */
-> >>> +	struct pci_dev	*dev;		/* Lowest numbered PF */
-> >>> +	struct pci_dev	*self;		/* This PF */
-> >>> +	u32		cfg_size;	/* VF config space size */
-> >>> +	u32		class;		/* VF device */
-> >>> +	u8		hdr_type;	/* VF header type */
-> >>> +	u16		subsystem_vendor; /* VF subsystem vendor */
-> >>> +	u16		subsystem_device; /* VF subsystem device */                                                                                   
-> >>> +	resource_size_t	barsz[PCI_SRIOV_NUM_BARS];	/* VF BAR size */
-> >>> +	bool		drivers_autoprobe; /* Auto probing of VFs by driver */
-> >>> +};
-> >>> +
-> >>
-> >> Can "struct pci_sriov" be extracted for common use? This should not be exclusive
-> >> for "i40e_vf migration support".
-> >>
-> > the definition of this structure is actually in driver/pci/pci.h.
-> > maybe removing the copy here and use below include is better?
-> > #include "../../../../pci/pci.h"
-> > 
-> 
-> How about moving the definition from driver/pci/pci.h into include/linux/pci.h? So
-> we can just include "linux/pci.h" and removing the copy here.
+On Thu, Jun 11, 2020 at 2:48 PM Babu Moger <babu.moger@amd.com> wrote:
 >
-I prefer to leaving it in drivers/pci/pci.h for now.
+> The following intercept is added for INVPCID instruction:
+> Code    Name            Cause
+> A2h     VMEXIT_INVPCID  INVPCID instruction
+>
+> The following bit is added to the VMCB layout control area
+> to control intercept of INVPCID:
+> Byte Offset     Bit(s)    Function
+> 14h             2         intercept INVPCID
+>
+> For the guests with nested page table (NPT) support, the INVPCID
+> feature works as running it natively. KVM does not need to do any
+> special handling in this case.
+>
+> Interceptions are required in the following cases.
+> 1. If the guest tries to disable the feature when the underlying
+> hardware supports it. In this case hypervisor needs to report #UD.
 
-Thanks
-Yan
+Per the AMD documentation, attempts to use INVPCID at CPL>0 will
+result in a #GP, regardless of the intercept bit. If the guest CPUID
+doesn't enumerate the feature, shouldn't the instruction raise #UD
+regardless of CPL? This seems to imply that we should intercept #GP
+and decode the instruction to see if we should synthesize #UD instead.
+
+> 2. When the guest is running with shadow page table enabled, in
+> this case the hypervisor needs to handle the tlbflush based on the
+> type of invpcid instruction type.
+>
+> AMD documentation for INVPCID feature is available at "AMD64
+> Architecture Programmer=E2=80=99s Manual Volume 2: System Programming,
+> Pub. 24593 Rev. 3.34(or later)"
+>
+> The documentation can be obtained at the links below:
+> Link: https://www.amd.com/system/files/TechDocs/24593.pdf
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
+>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  arch/x86/include/asm/svm.h      |    4 ++++
+>  arch/x86/include/uapi/asm/svm.h |    2 ++
+>  arch/x86/kvm/svm/svm.c          |   42 +++++++++++++++++++++++++++++++++=
+++++++
+>  3 files changed, 48 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 62649fba8908..6488094f67fa 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -55,6 +55,10 @@ enum {
+>         INTERCEPT_RDPRU,
+>  };
+>
+> +/* Extended Intercept bits */
+> +enum {
+> +       INTERCEPT_INVPCID =3D 2,
+> +};
+>
+>  struct __attribute__ ((__packed__)) vmcb_control_area {
+>         u32 intercept_cr;
+> diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/=
+svm.h
+> index 2e8a30f06c74..522d42dfc28c 100644
+> --- a/arch/x86/include/uapi/asm/svm.h
+> +++ b/arch/x86/include/uapi/asm/svm.h
+> @@ -76,6 +76,7 @@
+>  #define SVM_EXIT_MWAIT_COND    0x08c
+>  #define SVM_EXIT_XSETBV        0x08d
+>  #define SVM_EXIT_RDPRU         0x08e
+> +#define SVM_EXIT_INVPCID       0x0a2
+>  #define SVM_EXIT_NPF           0x400
+>  #define SVM_EXIT_AVIC_INCOMPLETE_IPI           0x401
+>  #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS     0x402
+> @@ -171,6 +172,7 @@
+>         { SVM_EXIT_MONITOR,     "monitor" }, \
+>         { SVM_EXIT_MWAIT,       "mwait" }, \
+>         { SVM_EXIT_XSETBV,      "xsetbv" }, \
+> +       { SVM_EXIT_INVPCID,     "invpcid" }, \
+>         { SVM_EXIT_NPF,         "npf" }, \
+>         { SVM_EXIT_AVIC_INCOMPLETE_IPI,         "avic_incomplete_ipi" }, =
+\
+>         { SVM_EXIT_AVIC_UNACCELERATED_ACCESS,   "avic_unaccelerated_acces=
+s" }, \
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 285e5e1ff518..82d974338f68 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -813,6 +813,11 @@ static __init void svm_set_cpu_caps(void)
+>         if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+>             boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>                 kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+> +
+> +       /* Enable INVPCID if both PCID and INVPCID enabled */
+> +       if (boot_cpu_has(X86_FEATURE_PCID) &&
+> +           boot_cpu_has(X86_FEATURE_INVPCID))
+> +               kvm_cpu_cap_set(X86_FEATURE_INVPCID);
+>  }
+>
+>  static __init int svm_hardware_setup(void)
+> @@ -1099,6 +1104,17 @@ static void init_vmcb(struct vcpu_svm *svm)
+>                 clr_intercept(svm, INTERCEPT_PAUSE);
+>         }
+>
+> +       /*
+> +        * Intercept INVPCID instruction only if shadow page table is
+> +        * enabled. Interception is not required with nested page table.
+> +        */
+> +       if (boot_cpu_has(X86_FEATURE_INVPCID)) {
+> +               if (!npt_enabled)
+> +                       set_extended_intercept(svm, INTERCEPT_INVPCID);
+> +               else
+> +                       clr_extended_intercept(svm, INTERCEPT_INVPCID);
+> +       }
+> +
+>         if (kvm_vcpu_apicv_active(&svm->vcpu))
+>                 avic_init_vmcb(svm);
+>
+> @@ -2715,6 +2731,23 @@ static int mwait_interception(struct vcpu_svm *svm=
+)
+>         return nop_interception(svm);
+>  }
+>
+> +static int invpcid_interception(struct vcpu_svm *svm)
+> +{
+> +       struct kvm_vcpu *vcpu =3D &svm->vcpu;
+> +       unsigned long type;
+> +       gva_t gva;
+> +
+> +       /*
+> +        * For an INVPCID intercept:
+> +        * EXITINFO1 provides the linear address of the memory operand.
+> +        * EXITINFO2 provides the contents of the register operand.
+> +        */
+> +       type =3D svm->vmcb->control.exit_info_2;
+> +       gva =3D svm->vmcb->control.exit_info_1;
+> +
+> +       return kvm_handle_invpcid_types(vcpu,  gva, type);
+> +}
+> +
+>  static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) =3D {
+>         [SVM_EXIT_READ_CR0]                     =3D cr_interception,
+>         [SVM_EXIT_READ_CR3]                     =3D cr_interception,
+> @@ -2777,6 +2810,7 @@ static int (*const svm_exit_handlers[])(struct vcpu=
+_svm *svm) =3D {
+>         [SVM_EXIT_MWAIT]                        =3D mwait_interception,
+>         [SVM_EXIT_XSETBV]                       =3D xsetbv_interception,
+>         [SVM_EXIT_RDPRU]                        =3D rdpru_interception,
+> +       [SVM_EXIT_INVPCID]                      =3D invpcid_interception,
+>         [SVM_EXIT_NPF]                          =3D npf_interception,
+>         [SVM_EXIT_RSM]                          =3D rsm_interception,
+>         [SVM_EXIT_AVIC_INCOMPLETE_IPI]          =3D avic_incomplete_ipi_i=
+nterception,
+> @@ -3562,6 +3596,14 @@ static void svm_cpuid_update(struct kvm_vcpu *vcpu=
+)
+>         svm->nrips_enabled =3D kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
+>                              guest_cpuid_has(&svm->vcpu, X86_FEATURE_NRIP=
+S);
+>
+> +       /*
+> +        * Intercept INVPCID instruction if the baremetal has the support
+> +        * but the guest doesn't claim the feature.
+> +        */
+> +       if (boot_cpu_has(X86_FEATURE_INVPCID) &&
+> +           !guest_cpuid_has(vcpu, X86_FEATURE_INVPCID))
+> +               set_extended_intercept(svm, INTERCEPT_INVPCID);
+> +
+
+What if INVPCID is enabled in the guest CPUID later? Shouldn't we then
+clear this intercept bit?
+
+>         if (!kvm_vcpu_apicv_active(vcpu))
+>                 return;
+>
+>
