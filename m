@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF74D1F645D
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:10:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C3E91F645E
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:10:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727019AbgFKJKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 05:10:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49902 "EHLO mail.kernel.org"
+        id S1727030AbgFKJKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 05:10:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49974 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727022AbgFKJKO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 05:10:14 -0400
+        id S1727033AbgFKJKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 05:10:16 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1798A207C3;
-        Thu, 11 Jun 2020 09:10:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 71C6A20760;
+        Thu, 11 Jun 2020 09:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591866614;
-        bh=msEjGp4qDF0WnQuD0W2AqRNSO4fEbHNst04epMYw4SU=;
+        s=default; t=1591866615;
+        bh=BFQrAygsJJlyDXb9tarWGIvLR0il/9XG69TZzgeENZo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=r6y3dHfHlFSyqXl+fUZa1w7c5vU1P3oQnxhvkIPj+d/U/Gm5KEC7XkCbUswSTmlRc
-         t/JX4ypc4EMazkDP/GeWami4757LK6A5h9QpUxxaDVT8mS0xSol4aKI4x32zHIm+Op
-         pxZ3EMxpI+yF0EwBl7plsevHcqFCxwOj8PSSZ1TU=
+        b=a1zZQHVrQwvkcKbbssi51DW+oi9sylfDOwdptICLjTP5YJpQkAX9DH7lNERX43QXA
+         u+3ZFySYQGea0+VS+LclrsMR7QOpdLpjFkPqULIx1vSR3JiIf1E7NI20MYwodHSBnk
+         NP1syYwNx9OYgenfgTVf1LSN1+hVBVni/hHRgPH0=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jjJDw-0022ZT-KQ; Thu, 11 Jun 2020 10:10:12 +0100
+        id 1jjJDx-0022ZT-G5; Thu, 11 Jun 2020 10:10:14 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -37,17 +37,17 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 08/11] KVM: arm64: Remove host_cpu_context member from vcpu structure
-Date:   Thu, 11 Jun 2020 10:09:53 +0100
-Message-Id: <20200611090956.1537104-9-maz@kernel.org>
+        linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Subject: [PATCH 09/11] KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
+Date:   Thu, 11 Jun 2020 10:09:54 +0100
+Message-Id: <20200611090956.1537104-10-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200611090956.1537104-1-maz@kernel.org>
 References: <20200611090956.1537104-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, ascull@google.com, james.morse@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, ascull@google.com, james.morse@arm.com, mark.rutland@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
@@ -55,190 +55,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For very long, we have kept this pointer back to the per-cpu
-host state, despite having working per-cpu accessors at EL2
-for some time now.
+AArch32 CP1x registers are overlayed on their AArch64 counterparts
+in the vcpu struct. This leads to an interesting problem as they
+are stored in their CPU-local format, and thus a CP1x register
+doesn't "hit" the lower 32bit portion of the AArch64 register on
+a BE host.
 
-Recent investigations have shown that this pointer is easy
-to abuse in preemptible context, which is a sure sign that
-it would better be gone. Not to mention that a per-cpu
-pointer is faster to access at all times.
+To workaround this unfortunate situation, introduce a bias trick
+in the vcpu_cp1x() accessors which picks the correct half of the
+64bit register.
 
-Reported-by: Andrew Scull <ascull@google.com>
-Acked-by: Mark Rutland <mark.rutland@arm.com
-Reviewed-by: Andrew Scull <ascull@google.com>
+Cc: stable@vger.kernel.org
+Reported-by: James Morse <james.morse@arm.com>
+Tested-by: James Morse <james.morse@arm.com>
+Acked-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 ---
- arch/arm64/kvm/arm.c              | 3 ---
- arch/arm64/kvm/hyp/debug-sr.c     | 4 ++--
- arch/arm64/kvm/hyp/switch.c       | 6 +++---
- arch/arm64/kvm/hyp/sysreg-sr.c    | 6 ++++--
- arch/arm64/kvm/pmu.c              | 8 ++------
- 6 files changed, 11 insertions(+), 19 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 59029e90b557..ada1faa92211 100644
+index 59029e90b557..521eaedfdcc3 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -284,9 +284,6 @@ struct kvm_vcpu_arch {
- 	struct kvm_guest_debug_arch vcpu_debug_state;
- 	struct kvm_guest_debug_arch external_debug_state;
- 
--	/* Pointer to host CPU context */
--	struct kvm_cpu_context *host_cpu_context;
--
- 	struct thread_info *host_thread_info;	/* hyp VA */
- 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 14b747266607..6ddaa23ef346 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -340,10 +340,8 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	int *last_ran;
--	kvm_host_data_t *cpu_data;
- 
- 	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
--	cpu_data = this_cpu_ptr(&kvm_host_data);
- 
- 	/*
- 	 * We might get preempted before the vCPU actually runs, but
-@@ -355,7 +353,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	}
- 
- 	vcpu->cpu = cpu;
--	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
- 
- 	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 0fc9872a1467..e95af204fec7 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -185,7 +185,7 @@ void __hyp_text __debug_switch_to_guest(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-@@ -207,7 +207,7 @@ void __hyp_text __debug_switch_to_host(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
- 		return;
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 	host_dbg = &vcpu->arch.host_debug_state.regs;
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index d60c2ef0fe8c..1853c1788e0c 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -532,7 +532,7 @@ static bool __hyp_text __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	    !esr_is_ptrauth_trap(kvm_vcpu_get_hsr(vcpu)))
- 		return false;
- 
--	ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	__ptrauth_save_key(ctxt->sys_regs, APIA);
- 	__ptrauth_save_key(ctxt->sys_regs, APIB);
- 	__ptrauth_save_key(ctxt->sys_regs, APDA);
-@@ -703,7 +703,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	struct kvm_cpu_context *guest_ctxt;
- 	u64 exit_code;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-@@ -808,7 +808,7 @@ int __hyp_text __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
- 
- 	vcpu = kern_hyp_va(vcpu);
- 
--	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	host_ctxt->__hyp_running_vcpu = vcpu;
- 	guest_ctxt = &vcpu->arch.ctxt;
- 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 6d2df9fe0b5d..143d7b7358f2 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -265,12 +265,13 @@ void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
+@@ -404,8 +404,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+  * CP14 and CP15 live in the same array, as they are backed by the
+  * same system registers.
   */
- void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+	struct kvm_cpu_context *host_ctxt;
+-#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
+-#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
++#define CPx_BIAS		IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)
++
++#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
++#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
  
- 	if (!has_vhe())
- 		return;
- 
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	__sysreg_save_user_state(host_ctxt);
- 
- 	/*
-@@ -301,12 +302,13 @@ void kvm_vcpu_load_sysregs(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_put_sysregs(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
-+	struct kvm_cpu_context *host_ctxt;
- 
- 	if (!has_vhe())
- 		return;
- 
-+	host_ctxt = &__hyp_this_cpu_ptr(kvm_host_data)->host_ctxt;
- 	deactivate_traps_vhe_put();
- 
- 	__sysreg_save_el1_state(guest_ctxt);
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index e71d00bb5271..b5ae3a5d509e 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -163,15 +163,13 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
-  */
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
- 	if (!has_vhe())
- 		return;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
- 
-@@ -184,15 +182,13 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
- {
--	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_host_data *host;
- 	u32 events_guest, events_host;
- 
- 	if (!has_vhe())
- 		return;
- 
--	host_ctxt = vcpu->arch.host_cpu_context;
--	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
-+	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
- 
+ struct kvm_vm_stat {
+ 	ulong remote_tlb_flush;
 -- 
 2.26.2
 
