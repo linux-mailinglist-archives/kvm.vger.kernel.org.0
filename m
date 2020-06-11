@@ -2,106 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3CC91F639C
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 10:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0D871F6442
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726724AbgFKIbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 04:31:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37945 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726646AbgFKIbP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jun 2020 04:31:15 -0400
+        id S1726864AbgFKJGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 05:06:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29311 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726697AbgFKJGq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 05:06:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591864273;
+        s=mimecast20190719; t=1591866405;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wqYVXT69UvryAYl9lNEvAFDCi4lpCbFocG1/WeDxI7w=;
-        b=Blkxil50M6ybT1eiAuFy1zwtUYkjpOp8G11dvxz5wGL5z6/PD39Zqd4X0i9T+LgPw2Dx4w
-        GstLUAhCPVE/NsA+HANkgG1H8Qk4iU2FgTofyVW00Sl6+UuU/0y1WB3gDEevcOHertiSTa
-        S8J+ZQqtjreiSSPjLxsz0oNRFCQMC2w=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-Fnwtwx17MWKxZLcaeSSclg-1; Thu, 11 Jun 2020 04:31:12 -0400
-X-MC-Unique: Fnwtwx17MWKxZLcaeSSclg-1
-Received: by mail-ed1-f69.google.com with SMTP id c1so1418876edd.21
-        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 01:31:11 -0700 (PDT)
+        bh=EMC0E2B827Ia2DQRzxKsWY/OK5Bg//cvAlofONDhk2Q=;
+        b=CDXgEr+EKvV5ntUXOSA2QcNFsr/CHHfGNpy2UioYOT4kYXXA7Fb/YRwlB5NtGGRbZ0am2X
+        rOItVzsG2E2ekTGJylt8N+J/4iO6U+HiMOlaZIZ0V7qHKKh4+CR0QpS+WyiZXv14CQu8Gt
+        jlyIYphj03AwPrCiwGVkeCPUuGWjYjI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-T8bgOtZROdOY2KRCdkKtfg-1; Thu, 11 Jun 2020 05:06:43 -0400
+X-MC-Unique: T8bgOtZROdOY2KRCdkKtfg-1
+Received: by mail-wm1-f72.google.com with SMTP id b63so2704369wme.1
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 02:06:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=wqYVXT69UvryAYl9lNEvAFDCi4lpCbFocG1/WeDxI7w=;
-        b=MT9QP2zczfiZr3KDAni7e2yqAMEOd1JVaIuVbkjuY+7R9e7Lbmu6M4oNIPZ7UhuLHS
-         ZkHK30/oHb9hLXyZbj8x4HlEcRBFVX4ulOaqV+EOwB3PjC6FGfE5xKNJFoTP+rbCcI5G
-         G5qmz9/H4W+cyzfimwkeHMbtqFQ4Xrtm3r3rZ9SEWuH/fpLp3LTV5fpXwRwx6HL471Qk
-         aIxRvBJM7PGkhOXTTWtxugdm0/wcxJtOus66vNOw/3wGy3NHsdisP8BpOYYny4yvoUu6
-         dypTAhih58U4/GhSdZDT45O4MpJgjntQkyhGdQTkyTAqP7CLLn9eKGZnWDpn7Acz+eYp
-         T6AQ==
-X-Gm-Message-State: AOAM531iJWh3fWc1mWQidJ77FhQueDV//ihn5Jbf6UCGJuQYKYihfDuZ
-        cSXcw1ylzIoS249eYzkwKwZkg1kUcOD574lxYtx0EbFszWU0brMUCGh1VnTR8c/2h+LEAXS5z+1
-        4chI6pMaairVQ
-X-Received: by 2002:a17:906:7f94:: with SMTP id f20mr7554733ejr.394.1591864270806;
-        Thu, 11 Jun 2020 01:31:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKlzTe4j+zEAO903+5izsigh9isK3JSgGRfJjNeyODoD2a9lb20KYC0JPI7N6g+dJC4qcPBw==
-X-Received: by 2002:a17:906:7f94:: with SMTP id f20mr7554717ejr.394.1591864270580;
-        Thu, 11 Jun 2020 01:31:10 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id qp16sm1487705ejb.64.2020.06.11.01.31.09
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=EMC0E2B827Ia2DQRzxKsWY/OK5Bg//cvAlofONDhk2Q=;
+        b=rF2m6a4msUh6DesKApfSr6GIQLyLdwUyuHarDTT5sUHjWygRJxzXqV1kktqvAhSR8P
+         Jlu39imUlszEomp1ex7jwND2Q3hXc6Tv6iiQlKnd8RrwJ7PnN1PUV+5AXAlNb3DZJoNO
+         hTIXdnxx0KAZRHyehCyy6tDQMIgiQXY7Fk5aBNi/evpVN7ir97+vctduRAI7SshNq2C4
+         V9UTSREny6X1BaO0bcxW84MdMj7SBNDS73WKRpa4GN4vMLjNI4LTCyJYlSCkeD1V/wbY
+         yD9agTO6YQHR/i2ptJCVb/CcdVmLi1wy4O7eYM+kSnzLFX7OeRPlmvxHMQ0j1Gpzkos8
+         zH4w==
+X-Gm-Message-State: AOAM532mkrvcdOkQj9yTUAGfxH4NrjeZuBTEq99xWBQGvY4lp6k/y5rJ
+        z0n4fA+0XuHZ/l5gM7/+701m6rwxjXcgftO9m9LFig6lsRngDWCUeOUJtCYqJ5wOzcZkRNUxAxa
+        StWObB9IYClvB
+X-Received: by 2002:adf:dccc:: with SMTP id x12mr8242099wrm.72.1591866401980;
+        Thu, 11 Jun 2020 02:06:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwjS282NzyfgjaTUCOeu+TiuTHkZ19eiBXmK6U3BwQgdXs1XxcOHzbjcay7nTvobbz5n62KJQ==
+X-Received: by 2002:adf:dccc:: with SMTP id x12mr8242068wrm.72.1591866401733;
+        Thu, 11 Jun 2020 02:06:41 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-55-232.red.bezeqint.net. [79.181.55.232])
+        by smtp.gmail.com with ESMTPSA id y80sm3152548wmc.34.2020.06.11.02.06.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2020 01:31:09 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vivek Goyal <vgoyal@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: async_pf: Cleanup kvm_setup_async_pf()
-In-Reply-To: <20200610181453.GC18790@linux.intel.com>
-References: <20200610175532.779793-1-vkuznets@redhat.com> <20200610181453.GC18790@linux.intel.com>
-Date:   Thu, 11 Jun 2020 10:31:08 +0200
-Message-ID: <87sgf29f77.fsf@vitty.brq.redhat.com>
+        Thu, 11 Jun 2020 02:06:40 -0700 (PDT)
+Date:   Thu, 11 Jun 2020 05:06:38 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        eperezma@redhat.com
+Subject: Re: [PATCH RFC v6 02/11] vhost: use batched get_vq_desc version
+Message-ID: <20200611050416-mutt-send-email-mst@kernel.org>
+References: <20200608125238.728563-1-mst@redhat.com>
+ <20200608125238.728563-3-mst@redhat.com>
+ <81904cc5-b662-028d-3b4a-bdfdbd2deb8c@redhat.com>
+ <20200610070259-mutt-send-email-mst@kernel.org>
+ <76b14132-407a-48bf-c4d5-9d0b2c700bb0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <76b14132-407a-48bf-c4d5-9d0b2c700bb0@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Thu, Jun 11, 2020 at 11:02:57AM +0800, Jason Wang wrote:
+> 
+> On 2020/6/10 下午7:05, Michael S. Tsirkin wrote:
+> > > > +EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
+> > > >    /* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
+> > > >    void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
+> > > >    {
+> > > > +	unfetch_descs(vq);
+> > > >    	vq->last_avail_idx -= n;
+> > > So unfetch_descs() has decreased last_avail_idx.
+> > > Can we fix this by letting unfetch_descs() return the number and then we can
+> > > do:
+> > > 
+> > > int d = unfetch_descs(vq);
+> > > vq->last_avail_idx -= (n > d) ? n - d: 0;
+> > > 
+> > > Thanks
+> > That's intentional I think - we need both.
+> 
+> 
+> Yes, but:
+> 
+> 
+> > 
+> > Unfetch_descs drops the descriptors in the cache that were
+> > *not returned to caller*  through get_vq_desc.
+> > 
+> > vhost_discard_vq_desc drops the ones that were returned through get_vq_desc.
+> > 
+> > Did I miss anything?
+> 
+> We could count some descriptors twice, consider the case e.g we only cache
+> on descriptor:
+> 
+> fetch_descs()
+>     fetch_buf()
+>         last_avail_idx++;
+> 
+> Then we want do discard it:
+> vhost_discard_avail_buf(1)
+>     unfetch_descs()
+>         last_avail_idx--;
+>     last_avail_idx -= 1;
+> 
+> Thanks
 
->
-> I'd also be in favor of changing the return type to a boolean.  I think
-> you alluded to it earlier, the current semantics are quite confusing as they
-> invert the normal "return 0 on success".
 
-Yes, will do a follow-up.
+I don't think that happens. vhost_discard_avail_buf(1) is only called
+after get vhost_get_avail_buf. vhost_get_avail_buf increments
+first_desc.  unfetch_descs only counts from first_desc to ndescs.
 
-KVM/x86 code has an intertwined mix of:
-- normal 'int' functions ('0 on success')
-- bool functions ('true'/'1' on success)
-- 'int' exit handlers ('1'/'0' on success depending if exit to userspace
-  was required)
-- ...
-
-I think we can try to standardize this to:
-- 'int' when error is propagated outside of KVM (userspace, other kernel
-  subsystem,...)
-- 'bool' when the function is internal to KVM and the result is binary
- ('is_exit_required()', 'was_pf_injected()', 'will_have_another_beer()',
- ...)
-- 'enum' for the rest.
-And, if there's a good reason for making an exception, require a
-comment. (leaving aside everything returning a pointer, of course as
-these are self-explanatory -- unless it's 'void *' :-))
-
->
-> For this patch:
->
-> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
->
-
-Thank you!
+If I'm wrong, could you show values of first_desc and ndescs in this
+scenario?
 
 -- 
-Vitaly
+MST
 
