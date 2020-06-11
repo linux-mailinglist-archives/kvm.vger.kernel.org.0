@@ -2,196 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B53DC1F67A9
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 14:10:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAEC61F67DD
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 14:31:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728300AbgFKMK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 08:10:26 -0400
-Received: from mga03.intel.com ([134.134.136.65]:19245 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728095AbgFKMJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 08:09:13 -0400
-IronPort-SDR: 31m7BoBifjHKe+D8ndYZ3mhKdraAPGfHMz/zNOsZFcgVNJXHCaxo5FUL5KWcT5SYNQDJomjiFD
- KScMWqiSWL9g==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 05:09:10 -0700
-IronPort-SDR: OPpcBOmwGlPnHo8b/0efIaorPIe39HBGnzJgbp6wfoG66DKVua5psE/K+zZ+vt/d9fiyMQvU/U
- 4m6wEr/ERC9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; 
-   d="scan'208";a="419082509"
-Received: from jacob-builder.jf.intel.com ([10.7.199.155])
-  by orsmga004.jf.intel.com with ESMTP; 11 Jun 2020 05:09:10 -0700
-From:   Liu Yi L <yi.l.liu@intel.com>
-To:     alex.williamson@redhat.com, eric.auger@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org
-Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
-        yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
-        hao.wu@intel.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 15/15] iommu/vt-d: Support reporting nesting capability info
-Date:   Thu, 11 Jun 2020 05:15:34 -0700
-Message-Id: <1591877734-66527-16-git-send-email-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
-References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
+        id S1727863AbgFKMbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 08:31:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41670 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726407AbgFKMbK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 08:31:10 -0400
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F79FC08C5C1
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 05:31:10 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id r9so4812997wmh.2
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 05:31:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dme-org.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:subject:in-reply-to:references:from:date:message-id
+         :mime-version;
+        bh=HOVgqrNF+UZt/ZblEAeFnOGGk9HKC6a+IPi5bRclrK0=;
+        b=qUn5CTYI8cZYIMeIBiuuqxWu/2eka/1oKU+kMldfJVkB0LvFxa8bmNn9Y8g76bB/9r
+         0Ck4SxxFXBOu3Z13kgwq6h8tObchc8+WOoh63G+V4JZUDRoUZdC3yenvMEhNakL2+E+S
+         thwYd02jYjoE7oWXGJ3rZfB7Nou0HwRuKkA1ZhqDMSVeBjri+Atq2d4DCqVN0/4XqnYs
+         45e4AICWUBWbsrl3o8czMtgJKlZMzWVvEmwh+CmZ/J1Tb7/ik99iPimvsbAeJXTx/sOg
+         KVucFC4QBF6jbhebJx7qcxes2gq38NawTuNI/wOX63UYbi2EmC5HvybQbqtO3DblNasB
+         VHDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
+         :message-id:mime-version;
+        bh=HOVgqrNF+UZt/ZblEAeFnOGGk9HKC6a+IPi5bRclrK0=;
+        b=ejgsG7LZ/MPmVRnniUJOUWlFOB8vlYl6aS9kGG6QpCvhVERJBiU43OjOAGQ9jSg5Aq
+         UrGTda6YW6N59os0aLV22yHkRxWnebM+8mXvTt1AdIMXUaDfBc4vlKTLUXjv1WkmUKeG
+         h7o1YETr8FkSZ9IqkYbDqxmOwH3LgwPZHfd0gXxNnYsh2/WiHBWN1Udalfbc9v5v9+3E
+         bbrgFwYC293tshwh3GVG68IA6jUskqDKrh9gXApFuwd9LTb5rh3TEi3fAh0PTRh2Lald
+         e0anFjxorNUP4DI2rO47ofg9NrpzoJt5npJLYOylzYaLbfQW0opwIQ2lsQLny4hyHS+J
+         nI4g==
+X-Gm-Message-State: AOAM533ZUIQvI8Lga/1sGIPPPsE5fI32cnWjK3pUiYqKZs8dnIqtyN6o
+        ftUEjAFGoPwd17gtLMSVIcidfg==
+X-Google-Smtp-Source: ABdhPJzly/94q8CC3aGfhn5rP0EVxTOYZ3cG/SeJ/YVte9ql+owmzzWAtksVFoCrYrXOn6Kkl+Qfjg==
+X-Received: by 2002:a05:600c:4401:: with SMTP id u1mr7839800wmn.36.1591878668383;
+        Thu, 11 Jun 2020 05:31:08 -0700 (PDT)
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net. [2001:8b0:bb71:7140:64::1])
+        by smtp.gmail.com with ESMTPSA id z12sm5268974wrg.9.2020.06.11.05.31.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2020 05:31:07 -0700 (PDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 894f5699;
+        Thu, 11 Jun 2020 12:31:06 +0000 (UTC)
+To:     Yan Zhao <yan.y.zhao@intel.com>, Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        alex.williamson@redhat.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, kevin.tian@intel.com, shaopeng.he@intel.com,
+        yi.l.liu@intel.com, xin.zeng@intel.com, hang.yuan@intel.com
+Subject: Re: [RFC PATCH v4 04/10] vfio/pci: let vfio_pci know number of
+ vendor regions and vendor irqs
+In-Reply-To: <20200605021542.GG12300@joy-OptiPlex-7040>
+References: <20200518024202.13996-1-yan.y.zhao@intel.com>
+ <20200518024944.14263-1-yan.y.zhao@intel.com>
+ <20200604172515.614e9864.cohuck@redhat.com>
+ <20200605021542.GG12300@joy-OptiPlex-7040>
+X-HGTTG: heart-of-gold
+From:   David Edmondson <dme@dme.org>
+Date:   Thu, 11 Jun 2020 13:31:05 +0100
+Message-ID: <m23671943a.fsf@dme.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Lu Baolu <baolu.lu@linux.intel.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
----
- drivers/iommu/intel-iommu.c | 81 +++++++++++++++++++++++++++++++++++++++++++--
- include/linux/intel-iommu.h | 16 +++++++++
- 2 files changed, 95 insertions(+), 2 deletions(-)
+On Thursday, 2020-06-04 at 22:15:42 -04, Yan Zhao wrote:
 
-diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index 25650ac..5415dc7 100644
---- a/drivers/iommu/intel-iommu.c
-+++ b/drivers/iommu/intel-iommu.c
-@@ -5655,12 +5655,16 @@ static inline bool iommu_pasid_support(void)
- static inline bool nested_mode_support(void)
- {
- 	struct dmar_drhd_unit *drhd;
--	struct intel_iommu *iommu;
-+	struct intel_iommu *iommu, *prev = NULL;
- 	bool ret = true;
- 
- 	rcu_read_lock();
- 	for_each_active_iommu(iommu, drhd) {
--		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap)) {
-+		if (!prev)
-+			prev = iommu;
-+		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap) ||
-+		    (VTD_CAP_MASK & (iommu->cap ^ prev->cap)) ||
-+		    (VTD_ECAP_MASK & (iommu->ecap ^ prev->ecap))) {
- 			ret = false;
- 			break;
- 		}
-@@ -6069,11 +6073,84 @@ intel_iommu_domain_set_attr(struct iommu_domain *domain,
- 	return ret;
- }
- 
-+static int intel_iommu_get_nesting_info(struct iommu_domain *domain,
-+					struct iommu_nesting_info *info)
-+{
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	u64 cap = VTD_CAP_MASK, ecap = VTD_ECAP_MASK;
-+	struct device_domain_info *domain_info;
-+	struct iommu_nesting_info_vtd vtd;
-+	unsigned long flags;
-+	u32 size;
-+
-+	if ((domain->type != IOMMU_DOMAIN_UNMANAGED) ||
-+	    !(dmar_domain->flags & DOMAIN_FLAG_NESTING_MODE))
-+		return -ENODEV;
-+
-+	if (!info)
-+		return -EINVAL;
-+
-+	size = sizeof(struct iommu_nesting_info) +
-+		sizeof(struct iommu_nesting_info_vtd);
-+	/*
-+	 * if provided buffer size is not equal to the size, should
-+	 * return 0 and also the expected buffer size to caller.
-+	 */
-+	if (info->size != size) {
-+		info->size = size;
-+		return 0;
-+	}
-+
-+	spin_lock_irqsave(&device_domain_lock, flags);
-+	/*
-+	 * arbitrary select the first domain_info as all nesting
-+	 * related capabilities should be consistent across iommu
-+	 * units.
-+	 */
-+	domain_info = list_first_entry(&dmar_domain->devices,
-+				      struct device_domain_info, link);
-+	cap &= domain_info->iommu->cap;
-+	ecap &= domain_info->iommu->ecap;
-+	spin_unlock_irqrestore(&device_domain_lock, flags);
-+
-+	info->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-+	info->features = IOMMU_NESTING_FEAT_SYSWIDE_PASID |
-+			 IOMMU_NESTING_FEAT_BIND_PGTBL |
-+			 IOMMU_NESTING_FEAT_CACHE_INVLD;
-+	vtd.flags = 0;
-+	vtd.addr_width = dmar_domain->gaw;
-+	vtd.pasid_bits = ilog2(intel_pasid_max_id);
-+	vtd.cap_reg = cap;
-+	vtd.cap_mask = VTD_CAP_MASK;
-+	vtd.ecap_reg = ecap;
-+	vtd.ecap_mask = VTD_ECAP_MASK;
-+
-+	memcpy(info->data, &vtd, sizeof(vtd));
-+	return 0;
-+}
-+
-+static int intel_iommu_domain_get_attr(struct iommu_domain *domain,
-+				       enum iommu_attr attr, void *data)
-+{
-+	switch (attr) {
-+	case DOMAIN_ATTR_NESTING_INFO:
-+	{
-+		struct iommu_nesting_info *info =
-+				(struct iommu_nesting_info *) data;
-+
-+		return intel_iommu_get_nesting_info(domain, info);
-+	}
-+	default:
-+		return -ENODEV;
-+	}
-+}
-+
- const struct iommu_ops intel_iommu_ops = {
- 	.capable		= intel_iommu_capable,
- 	.domain_alloc		= intel_iommu_domain_alloc,
- 	.domain_free		= intel_iommu_domain_free,
- 	.domain_set_attr	= intel_iommu_domain_set_attr,
-+	.domain_get_attr	= intel_iommu_domain_get_attr,
- 	.attach_dev		= intel_iommu_attach_device,
- 	.detach_dev		= intel_iommu_detach_device,
- 	.aux_attach_dev		= intel_iommu_aux_attach_device,
-diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-index 0b238c3..be48f4e 100644
---- a/include/linux/intel-iommu.h
-+++ b/include/linux/intel-iommu.h
-@@ -196,6 +196,22 @@
- #define ecap_max_handle_mask(e) ((e >> 20) & 0xf)
- #define ecap_sc_support(e)	((e >> 7) & 0x1) /* Snooping Control */
- 
-+/* Nesting Support Capability Alignment */
-+#define VTD_CAP_FL1GP		(1ULL << 56)
-+#define VTD_CAP_FL5LP		(1ULL << 60)
-+#define VTD_ECAP_PRS		(1ULL << 29)
-+#define VTD_ECAP_ERS		(1ULL << 30)
-+#define VTD_ECAP_SRS		(1ULL << 31)
-+#define VTD_ECAP_EAFS		(1ULL << 34)
-+#define VTD_ECAP_PASID		(1ULL << 40)
-+
-+/* Only capabilities marked in below MASKs are reported */
-+#define VTD_CAP_MASK		(VTD_CAP_FL1GP | VTD_CAP_FL5LP)
-+
-+#define VTD_ECAP_MASK		(VTD_ECAP_PRS | VTD_ECAP_ERS | \
-+				 VTD_ECAP_SRS | VTD_ECAP_EAFS | \
-+				 VTD_ECAP_PASID)
-+
- /* Virtual command interface capability */
- #define vccap_pasid(v)		(((v) & DMA_VCS_PAS)) /* PASID allocation */
- 
+> On Thu, Jun 04, 2020 at 05:25:15PM +0200, Cornelia Huck wrote:
+>> On Sun, 17 May 2020 22:49:44 -0400
+>> Yan Zhao <yan.y.zhao@intel.com> wrote:
+>> 
+>> > This allows a simpler VFIO_DEVICE_GET_INFO ioctl in vendor driver
+>> > 
+>> > Cc: Kevin Tian <kevin.tian@intel.com>
+>> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+>> > ---
+>> >  drivers/vfio/pci/vfio_pci.c         | 23 +++++++++++++++++++++--
+>> >  drivers/vfio/pci/vfio_pci_private.h |  2 ++
+>> >  include/linux/vfio.h                |  3 +++
+>> >  3 files changed, 26 insertions(+), 2 deletions(-)
+>> > 
+>> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+>> > index 290b7ab55ecf..30137c1c5308 100644
+>> > --- a/drivers/vfio/pci/vfio_pci.c
+>> > +++ b/drivers/vfio/pci/vfio_pci.c
+>> > @@ -105,6 +105,24 @@ void *vfio_pci_vendor_data(void *device_data)
+>> >  }
+>> >  EXPORT_SYMBOL_GPL(vfio_pci_vendor_data);
+>> >  
+>> > +int vfio_pci_set_vendor_regions(void *device_data, int num_vendor_regions)
+>> > +{
+>> > +	struct vfio_pci_device *vdev = device_data;
+>> > +
+>> > +	vdev->num_vendor_regions = num_vendor_regions;
+>> 
+>> Do we need any kind of sanity check here, in case this is called with a
+>> bogus value?
+>>
+> you are right. it at least needs to be >=0.
+> maybe type of "unsigned int" is more appropriate for num_vendor_regions.
+> we don't need to check its max value as QEMU would check it.
+
+That seems like a bad precedent - the caller may not be QEMU.
+
+dme.
 -- 
-2.7.4
-
+I'm not the reason you're looking for redemption.
