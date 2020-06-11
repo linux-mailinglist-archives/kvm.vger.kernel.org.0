@@ -2,84 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0F1B1F6B28
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 17:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95A331F6B4A
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 17:44:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728607AbgFKPgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 11:36:06 -0400
-Received: from mga14.intel.com ([192.55.52.115]:57442 "EHLO mga14.intel.com"
+        id S1728667AbgFKPoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 11:44:00 -0400
+Received: from mga03.intel.com ([134.134.136.65]:40538 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728414AbgFKPgG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 11:36:06 -0400
-IronPort-SDR: kRaucVPWJf5Yhbrs8q+ld/yUa0tEMR+stgW6FHL2yotklPIrYwlwxwXjVbR89v0M2LgyYfk1E0
- NrpH04E9RsAQ==
+        id S1728496AbgFKPn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 11:43:59 -0400
+IronPort-SDR: zVbYBjCm+9L7CvMejLIsQdTToMqnSAR/RHJ4NnfDXDmHKrJaHs392+3+drFf0F4Cv2P1+NSZnB
+ los2p04MIFKQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 08:36:06 -0700
-IronPort-SDR: dYUJwDTJHD9iP5wZvrIQO72rSowvuZXykZd4QOOytru91ojrVYKu2OqZys7+erBiefwxfBOBCz
- 3TOrzMzfZ2Dw==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2020 08:43:59 -0700
+IronPort-SDR: +Ydw/4Fg05XSUVeVdaVnYwXl169Eie8ePVgfFpQAiQZ2NUmXKZaRvV2IeZsKgMR2pcPAaKpDpn
+ +n8lSwG3SLOg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.73,499,1583222400"; 
-   d="scan'208";a="314844159"
+   d="scan'208";a="419144435"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by FMSMGA003.fm.intel.com with ESMTP; 11 Jun 2020 08:36:04 -0700
-Date:   Thu, 11 Jun 2020 08:35:57 -0700
+  by orsmga004.jf.intel.com with ESMTP; 11 Jun 2020 08:43:59 -0700
+Date:   Thu, 11 Jun 2020 08:43:59 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Vivek Goyal <vgoyal@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: async_pf: Cleanup kvm_setup_async_pf()
-Message-ID: <20200611153557.GE29918@linux.intel.com>
-References: <20200610175532.779793-1-vkuznets@redhat.com>
- <20200610181453.GC18790@linux.intel.com>
- <87sgf29f77.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 17/21] KVM: arm64: Use common code's approach for
+ __GFP_ZERO with memory caches
+Message-ID: <20200611154359.GF29918@linux.intel.com>
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
+ <20200605213853.14959-18-sean.j.christopherson@intel.com>
+ <6cc08074c289cbea7b9c1deeaf18c63f@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87sgf29f77.fsf@vitty.brq.redhat.com>
+In-Reply-To: <6cc08074c289cbea7b9c1deeaf18c63f@kernel.org>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 11, 2020 at 10:31:08AM +0200, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Thu, Jun 11, 2020 at 08:59:05AM +0100, Marc Zyngier wrote:
+> >diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >index 9398b66f8a87..688213ef34f0 100644
+> >--- a/arch/arm64/kvm/mmu.c
+> >+++ b/arch/arm64/kvm/mmu.c
+> >@@ -131,7 +131,8 @@ static int mmu_topup_memory_cache(struct
+> >kvm_mmu_memory_cache *cache, int min)
+> > 	if (cache->nobjs >= min)
+> > 		return 0;
+> > 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+> >-		page = (void *)__get_free_page(GFP_PGTABLE_USER);
+> >+		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT |
 > 
-> >
-> > I'd also be in favor of changing the return type to a boolean.  I think
-> > you alluded to it earlier, the current semantics are quite confusing as they
-> > invert the normal "return 0 on success".
-> 
-> Yes, will do a follow-up.
-> 
-> KVM/x86 code has an intertwined mix of:
-> - normal 'int' functions ('0 on success')
-> - bool functions ('true'/'1' on success)
-> - 'int' exit handlers ('1'/'0' on success depending if exit to userspace
->   was required)
-> - ...
-> 
-> I think we can try to standardize this to:
-> - 'int' when error is propagated outside of KVM (userspace, other kernel
->   subsystem,...)
-> - 'bool' when the function is internal to KVM and the result is binary
->  ('is_exit_required()', 'was_pf_injected()', 'will_have_another_beer()',
->  ...)
-> - 'enum' for the rest.
-> And, if there's a good reason for making an exception, require a
-> comment. (leaving aside everything returning a pointer, of course as
-> these are self-explanatory -- unless it's 'void *' :-))
+> This is definitely a change in the way we account for guest
+> page tables allocation, although I find it bizarre that not
+> all architectures account for it the same way.
 
-Agreed for 'bool' case, but 'int' versus 'enum' is less straightforward as
-there are a huge number of functions that _may_ propagate an error outside
-of KVM, including all of the exit handlers.  As Paolo point out[*], it'd
-be quite easy to end up with a mixture of enum/#define and 0/1 code, which
-would be an even bigger mess than what we have today.  There are
-undoubtedly cases that could be converted to an enum, but they're probably
-few and far between as it requires total encapsulation, e.g. the emulator.
+It's not intended to be a functional change, i.e. the allocations should
+still be accounted:
 
-[*] https://lkml.kernel.org/r/3d827e8b-a04e-0a93-4bb4-e0e9d59036da@redhat.com
+  #define GFP_PGTABLE_USER  (GFP_PGTABLE_KERNEL | __GFP_ACCOUNT)
+  |
+  -> #define GFP_PGTABLE_KERNEL        (GFP_KERNEL | __GFP_ZERO)
+
+  == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
+
+versus 
+
+  #define GFP_KERNEL_ACCOUNT (GFP_KERNEL | __GFP_ACCOUNT)
+
+    with __GFP_ZERO explicitly OR'd in
+
+  == GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO
+
+I can put the above in the changelog, unless of course it's wrong and I've
+missed something.
+
+> It seems logical to me that nested page tables would be accounted
+> against userspace, but I'm willing to be educated on the matter.
+> 
+> Another possibility is that depending on the context, some allocations
+> should be accounted on either the kernel or userspace (NV on arm64
+> could definitely do something like that). If that was the case,
+> maybe moving most of the GFP_* flags into the per-cache flags,
+> and have the renaming that Ben suggested earlier.
+> 
+> Thanks,
+> 
+>         M.
+> -- 
+> Jazz is not dead. It just smells funny...
