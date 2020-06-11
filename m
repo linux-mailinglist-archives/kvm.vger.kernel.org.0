@@ -2,119 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16E0C1F6346
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 10:07:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 452C81F6362
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 10:14:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726889AbgFKIGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 04:06:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50658 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726720AbgFKIGw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 04:06:52 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E6D4A2074B;
-        Thu, 11 Jun 2020 08:06:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591862812;
-        bh=c0zbTaBdIyfBYHMbVLwq48idCED4RJbRflyqGdC0K5I=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=fM3iQGrBseiVVoOOA7lzVDDThz+MiyAGJ3OAf4hwCs1yjKcFgJ81l7yITe79GF4n2
-         LkKEwYH+yZmvNv/zMU0waQ1zKjn/HpTPXIk6SN6kvpC7KFpuaLuXBHg65vRQw68oAL
-         OLoKHtUw+jx/rmHTSOGST2f9KCACyq7jNQMYGoTc=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jjIEc-0021ee-Gz; Thu, 11 Jun 2020 09:06:50 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 11 Jun 2020 09:06:50 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S1726663AbgFKIOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 04:14:19 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47135 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726620AbgFKIOS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jun 2020 04:14:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1591863256;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6d2EQPOsqa1ar4oQ2p7/Glt6a8pVE2+UZ79AyKGYcCI=;
+        b=G4JIXey8Hqf8vXC9ypEJJN3zPJi8gs5APXEdRKQoRF6qicUV724w6GvnnZ01rJ8t0lJ1+N
+        gXX9kYj3TqKvKnMQrAVLfOEVoBMmvtbTCCHlKXPG0tnqdOQhjKTBund767iHy4oW8f1ot/
+        ELuitS1CNmEbk+BPZ4NPhi/9EHeGW4E=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-Saf-u6C1P5Kmp5Ds54lzrA-1; Thu, 11 Jun 2020 04:14:14 -0400
+X-MC-Unique: Saf-u6C1P5Kmp5Ds54lzrA-1
+Received: by mail-ej1-f71.google.com with SMTP id p27so2358457ejn.5
+        for <kvm@vger.kernel.org>; Thu, 11 Jun 2020 01:14:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=6d2EQPOsqa1ar4oQ2p7/Glt6a8pVE2+UZ79AyKGYcCI=;
+        b=DB9WmgrgccIvZuTDAEvpPi+DOo9pHO5X+VQr56aCA5lz7kA409kgdEHJ9gnE50QSgw
+         9T8ADWjiu8Wlt7c3aquyYzn2Vj2Gb/f3wuefKfJ9/M3DSn+3dg8r/ydPUNxgblFOxmbY
+         DVVYlT27IVvPo+SY7WLXVb7G1v8hwEf2Hh7pJXOZEt++xcjNl5329wheXXUIXW89M5/A
+         /jWF6KsuhU1BK8Gu6S1rqG+r02U0BXCHDQLx/VY+XJX+VWZgVD/mxcY/6GoTsdIVykjf
+         GhPhXsmN5y7ptZBMaTRG6aSnmLePej9LjWa8aVo7Q3y7nVpaUPK2kInguBjfFu14wjka
+         Cj0A==
+X-Gm-Message-State: AOAM533mCaq2PAVDJkQixrG7BBfv1TtWelYsXlb+IquGNk5O8bthpa13
+        CFWxdLbBIr9aGY0+55Q1tpO1JOr8EI/2QBGsjqD/xdIII7xp6/feQp6Pz9YBMiik8Yl5lyJXv/m
+        F7w5d3T56bv11
+X-Received: by 2002:a05:6402:1bdc:: with SMTP id ch28mr5781447edb.19.1591863253571;
+        Thu, 11 Jun 2020 01:14:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyF/fbM6YhBbbEG+5RVEOLIWwN0fUrk9C7qt3qtRtoDs4uoIhuTSMMvI9gPov6XPGvOoLf5Kg==
+X-Received: by 2002:a05:6402:1bdc:: with SMTP id ch28mr5781428edb.19.1591863253290;
+        Thu, 11 Jun 2020 01:14:13 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id u13sm1452034ejf.60.2020.06.11.01.14.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2020 01:14:12 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 00/21] KVM: Cleanup and unify kvm_mmu_memory_cache usage
-In-Reply-To: <20200605213853.14959-1-sean.j.christopherson@intel.com>
-References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <bedae60cc8a6c6c3b77b52e3d3c7bbe2@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, pfeiner@google.com, pshier@google.com, junaids@google.com, bgardon@google.com, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: async_pf: Inject 'page ready' event only if 'page not present' was previously injected
+In-Reply-To: <20200610193211.GB243520@redhat.com>
+References: <20200610175532.779793-1-vkuznets@redhat.com> <20200610175532.779793-2-vkuznets@redhat.com> <20200610193211.GB243520@redhat.com>
+Date:   Thu, 11 Jun 2020 10:14:11 +0200
+Message-ID: <87v9jy9fzg.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+Vivek Goyal <vgoyal@redhat.com> writes:
 
-On 2020-06-05 22:38, Sean Christopherson wrote:
-> This series resurrects Christoffer Dall's series[1] to provide a common
-> MMU memory cache implementation that can be shared by x86, arm64 and 
-> MIPS.
-> 
-> It also picks up a suggested change from Ben Gardon[2] to clear shadow
-> page tables during initial allocation so as to avoid clearing entire
-> pages while holding mmu_lock.
-> 
-> The front half of the patches do house cleaning on x86's memory cache
-> implementation in preparation for moving it to common code, along with 
-> a
-> fair bit of cleanup on the usage.  The middle chunk moves the patches 
-> to
-> common KVM, and the last two chunks convert arm64 and MIPS to the 
-> common
-> implementation.
-> 
-> Cleanup aside, the notable difference from Christoffer and Ben's 
-> proposed
-> patches is to make __GFP_ZERO optional, e.g. to allow x86 to skip 
-> zeroing
-> for its gfns array and to provide line of sight for my
-> cannot-yet-be-discussed-in-detail use case for non-zero initialized 
-> shadow
-> page tables[3].
-> 
-> Tested on x86 only, no testing whatsoever on arm64 or MIPS.
+> On Wed, Jun 10, 2020 at 07:55:32PM +0200, Vitaly Kuznetsov wrote:
+>> 'Page not present' event may or may not get injected depending on
+>> guest's state. If the event wasn't injected, there is no need to
+>> inject the corresponding 'page ready' event as the guest may get
+>> confused. E.g. Linux thinks that the corresponding 'page not present'
+>> event wasn't delivered *yet* and allocates a 'dummy entry' for it.
+>> This entry is never freed.
+>> 
+>> Note, 'wakeup all' events have no corresponding 'page not present'
+>> event and always get injected.
+>> 
+>> s390 seems to always be able to inject 'page not present', the
+>> change is effectively a nop.
+>> 
+>> Suggested-by: Vivek Goyal <vgoyal@redhat.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/s390/include/asm/kvm_host.h | 2 +-
+>>  arch/s390/kvm/kvm-s390.c         | 4 +++-
+>>  arch/x86/include/asm/kvm_host.h  | 2 +-
+>>  arch/x86/kvm/x86.c               | 7 +++++--
+>>  include/linux/kvm_host.h         | 1 +
+>>  virt/kvm/async_pf.c              | 2 +-
+>>  6 files changed, 12 insertions(+), 6 deletions(-)
+>> 
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index 3d554887794e..cee3cb6455a2 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -978,7 +978,7 @@ bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
+>>  void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
+>>  			       struct kvm_async_pf *work);
+>>  
+>> -void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>> +bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>>  				     struct kvm_async_pf *work);
+>
+> Hi Vitaly,
+>
+> A minor nit. Using return code to figure out if exception was injected
+> or not is little odd. How about we pass a pointer instead as parameter
+> and kvm_arch_async_page_not_present() sets it to true if page not
+> present exception was injected. This probably will be easier to
+> read.
+>
+> If for some reason you don't like above, atleats it warrants a comment
+> explaining what do 0 and 1 mean.
+>
 
-I've given it a go on a small bunch of arm64 boxes, and nothing caught 
-fire!
-As Ben noticed, the series isn't bisectable (easily fixed) and there is 
-some
-nagging conflicts with the current state of mainline.
+I think it's the 'kvm_arch_async_page_not_present' name which is a bit
+misleading now, if we rename it to something like
+kvm_arch_inject_apf_not_present() then it becomes a bit more clear
+what's going on. We may as well write the code as
 
-Overall, a very welcome cleanup. The only point of contention is the 
-change
-in allocation accounting on arm64, but there is an easy fix for that.
+    if (kvm_arch_inject_apf_not_present())
+        work->notpresent_injected = true;
 
-Thanks,
+or change the return type to int so it'll be
 
-         M.
+    if (!kvm_arch_inject_apf_not_present())
+        work->notpresent_injected = true;
+
+> Otherwise both the patches look good to me. I tested and I can confirm
+> that now page ready events are not being delivered to guest if page
+> not present was not injected.
+
+Thank you for testing!
+
 -- 
-Jazz is not dead. It just smells funny...
+Vitaly
+
