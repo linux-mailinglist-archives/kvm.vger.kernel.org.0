@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C3E91F645E
-	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:10:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 875001F64CB
+	for <lists+kvm@lfdr.de>; Thu, 11 Jun 2020 11:33:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727030AbgFKJKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jun 2020 05:10:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49974 "EHLO mail.kernel.org"
+        id S1726876AbgFKJdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jun 2020 05:33:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39518 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727033AbgFKJKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 05:10:16 -0400
+        id S1726708AbgFKJdX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jun 2020 05:33:23 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 71C6A20760;
-        Thu, 11 Jun 2020 09:10:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 397D020760;
+        Thu, 11 Jun 2020 09:33:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1591866615;
-        bh=BFQrAygsJJlyDXb9tarWGIvLR0il/9XG69TZzgeENZo=;
+        s=default; t=1591868003;
+        bh=YpTPkF+pnFoMogA4X2GFObKXLTgxGc72fp25PaLmSWs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=a1zZQHVrQwvkcKbbssi51DW+oi9sylfDOwdptICLjTP5YJpQkAX9DH7lNERX43QXA
-         u+3ZFySYQGea0+VS+LclrsMR7QOpdLpjFkPqULIx1vSR3JiIf1E7NI20MYwodHSBnk
-         NP1syYwNx9OYgenfgTVf1LSN1+hVBVni/hHRgPH0=
+        b=NEmNmzYzkA3y84M3ZhGDWpR28WRid82ZRnELneRdXX6lslEhH/jLhEcfpklnNwbXm
+         Jf3k8/KVtLZPQjtEvZSGncXQBrxjjVwCk1rOd4fHkwLKP0b3E8wilQB/XIck1bbMGK
+         rW0+mquEnEKuI+67r29r1PQRODQcdio00lvkcKkI=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jjJDx-0022ZT-G5; Thu, 11 Jun 2020 10:10:14 +0100
+        id 1jjJDy-0022ZT-PS; Thu, 11 Jun 2020 10:10:14 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -38,9 +38,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: [PATCH 09/11] KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
-Date:   Thu, 11 Jun 2020 10:09:54 +0100
-Message-Id: <20200611090956.1537104-10-maz@kernel.org>
+Subject: [PATCH 10/11] KVM: arm64: Synchronize sysreg state on injecting an AArch32 exception
+Date:   Thu, 11 Jun 2020 10:09:55 +0100
+Message-Id: <20200611090956.1537104-11-maz@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200611090956.1537104-1-maz@kernel.org>
 References: <20200611090956.1537104-1-maz@kernel.org>
@@ -55,42 +55,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-AArch32 CP1x registers are overlayed on their AArch64 counterparts
-in the vcpu struct. This leads to an interesting problem as they
-are stored in their CPU-local format, and thus a CP1x register
-doesn't "hit" the lower 32bit portion of the AArch64 register on
-a BE host.
+On a VHE system, the EL1 state is left in the CPU most of the time,
+and only syncronized back to memory when vcpu_put() is called (most
+of the time on preemption).
 
-To workaround this unfortunate situation, introduce a bias trick
-in the vcpu_cp1x() accessors which picks the correct half of the
-64bit register.
+Which means that when injecting an exception, we'd better have a way
+to either:
+(1) write directly to the EL1 sysregs
+(2) synchronize the state back to memory, and do the changes there
+
+For an AArch64, we already do (1), so we are safe. Unfortunately,
+doing the same thing for AArch32 would be pretty invasive. Instead,
+we can easily implement (2) by calling the put/load architectural
+backends, and keep preemption disabled. We can then reload the
+state back into EL1.
 
 Cc: stable@vger.kernel.org
 Reported-by: James Morse <james.morse@arm.com>
-Tested-by: James Morse <james.morse@arm.com>
-Acked-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/aarch32.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 59029e90b557..521eaedfdcc3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -404,8 +404,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
-  * CP14 and CP15 live in the same array, as they are backed by the
-  * same system registers.
-  */
--#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r)])
--#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r)])
-+#define CPx_BIAS		IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)
-+
-+#define vcpu_cp14(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
-+#define vcpu_cp15(v,r)		((v)->arch.ctxt.copro[(r) ^ CPx_BIAS])
+diff --git a/arch/arm64/kvm/aarch32.c b/arch/arm64/kvm/aarch32.c
+index 0a356aa91aa1..40a62a99fbf8 100644
+--- a/arch/arm64/kvm/aarch32.c
++++ b/arch/arm64/kvm/aarch32.c
+@@ -33,6 +33,26 @@ static const u8 return_offsets[8][2] = {
+ 	[7] = { 4, 4 },		/* FIQ, unused */
+ };
  
- struct kvm_vm_stat {
- 	ulong remote_tlb_flush;
++static bool pre_fault_synchronize(struct kvm_vcpu *vcpu)
++{
++	preempt_disable();
++	if (vcpu->arch.sysregs_loaded_on_cpu) {
++		kvm_arch_vcpu_put(vcpu);
++		return true;
++	}
++
++	preempt_enable();
++	return false;
++}
++
++static void post_fault_synchronize(struct kvm_vcpu *vcpu, bool loaded)
++{
++	if (loaded) {
++		kvm_arch_vcpu_load(vcpu, smp_processor_id());
++		preempt_enable();
++	}
++}
++
+ /*
+  * When an exception is taken, most CPSR fields are left unchanged in the
+  * handler. However, some are explicitly overridden (e.g. M[4:0]).
+@@ -155,7 +175,10 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ 
+ void kvm_inject_undef32(struct kvm_vcpu *vcpu)
+ {
++	bool loaded = pre_fault_synchronize(vcpu);
++
+ 	prepare_fault32(vcpu, PSR_AA32_MODE_UND, 4);
++	post_fault_synchronize(vcpu, loaded);
+ }
+ 
+ /*
+@@ -168,6 +191,9 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 	u32 vect_offset;
+ 	u32 *far, *fsr;
+ 	bool is_lpae;
++	bool loaded;
++
++	loaded = pre_fault_synchronize(vcpu);
+ 
+ 	if (is_pabt) {
+ 		vect_offset = 12;
+@@ -191,6 +217,8 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 		/* no need to shuffle FS[4] into DFSR[10] as its 0 */
+ 		*fsr = DFSR_FSC_EXTABT_nLPAE;
+ 	}
++
++	post_fault_synchronize(vcpu, loaded);
+ }
+ 
+ void kvm_inject_dabt32(struct kvm_vcpu *vcpu, unsigned long addr)
 -- 
 2.26.2
 
