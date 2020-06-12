@@ -2,270 +2,310 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 02FA81F7BA0
-	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 18:31:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AA1C1F7CBA
+	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 20:02:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726323AbgFLQbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jun 2020 12:31:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29207 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726258AbgFLQbV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jun 2020 12:31:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591979478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=h+wFNh6g1LwXDIcDojVcNUqQDtORiQxjs31ZgD6xXJA=;
-        b=XyVIc4LdB30f1hrwp7TGmhldyHbb5nkpCe5gqWWwBGu7T9fk69Dq59+symM9JOQ+EPyJED
-        KT0LZnNdRARoOCf2ha8pZ53A76cggLmakcIhA+mXIayLTwPZxh49kppWKskO0wwFo93j/D
-        EHyl/3Nbtgx/b3rEkeNviu2B2PSD1N4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-outWB-s5OVqPgnDOmzv44A-1; Fri, 12 Jun 2020 12:31:14 -0400
-X-MC-Unique: outWB-s5OVqPgnDOmzv44A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0A14800053;
-        Fri, 12 Jun 2020 16:31:13 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2D9D210013C1;
-        Fri, 12 Jun 2020 16:31:13 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] Second batch of KVM patches for Linux 5.8
-Date:   Fri, 12 Jun 2020 12:31:12 -0400
-Message-Id: <20200612163112.16001-1-pbonzini@redhat.com>
+        id S1726286AbgFLSCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jun 2020 14:02:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60536 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726219AbgFLSCk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jun 2020 14:02:40 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A83C08C5C1
+        for <kvm@vger.kernel.org>; Fri, 12 Jun 2020 11:02:40 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id 9so9560717ilg.12
+        for <kvm@vger.kernel.org>; Fri, 12 Jun 2020 11:02:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9RL+bnA/t2I9/+f9q05Ybqo0E3j+56AnUDjas91ew54=;
+        b=Jv/2G/vn4x8GMl1fZ0geyYu4vyr+9hmLf0uaIzTgdJJJEZTB9bZ5j/o40j4iJOlFSF
+         ER2WuILuNoFA7JbFr8BJ3zJNhOTxe9iuHk5xnfuJsFs/Drs8nfMJKcqkDz0HCUwrXh0L
+         zGpp1MLMv7nmDSyxMaLpP7RdRv5gvP5XcfIoDSowiHxaw+zH5xvByj3T+LWkQJdmAKNK
+         /ES++BBIygsuY7os+0wwrQ3g4v+lygL8FQRwtRmImzr57NiO9zN3fvh71Z3+CwVn0OL+
+         gcUaQpLqyBzRjGioJePGNxWlazWp2TgAi89mGP+L1xVQHkLLLjk3Hg04fphtdykSKfP3
+         Qyfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9RL+bnA/t2I9/+f9q05Ybqo0E3j+56AnUDjas91ew54=;
+        b=shLNjgdoW4H2ZppMa/DoRD92PuLpIdyJg+RbE/w697qJVdhAQDYPNUDYxRlRxYifpq
+         IIjC15HaDSZMUANFFW8BJk1SRX1CY2d7ARGgcI4cSu+cn5zfqGh7evUS/6ZF3swF2Twz
+         zyMO+p42xHqhaN3TnZSgy3F5ATymiortyn0hJ5nG1mty9LkaU9buojj1hgBMGukqiVgm
+         kztmgG+WkzFWuwcK2WErIaGoraCZmrdsNI4VV1iMZ5sXcEdN1168Jw7H+3OUxNkT1FD/
+         3w5DlmH4QAqFul/7R7ZxEKeGAr6QxPkiilXxYxOYWDeNKFzFyayruyjhf0aBzH1RzXVr
+         NFIQ==
+X-Gm-Message-State: AOAM531pzzp6r0aBzoDj7b01amdU0iuZht2HOsx/zyzTI2af5oPUBC/e
+        lnaadycHRcC8u93gWq8UQBtOiExP3qnlkyzLMbrkrQ==
+X-Google-Smtp-Source: ABdhPJzv+UbygrLkbplfQ0ru5zjr+YIfYtosjexMqhll0H1zaMLhcXAncJgne3gr2xVXTmCOtMNsXHLM/+KS7jvi7w4=
+X-Received: by 2002:a05:6e02:11a5:: with SMTP id 5mr14477842ilj.108.1591984959242;
+ Fri, 12 Jun 2020 11:02:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <159191202523.31436.11959784252237488867.stgit@bmoger-ubuntu> <159191211555.31436.7157754769653935735.stgit@bmoger-ubuntu>
+In-Reply-To: <159191211555.31436.7157754769653935735.stgit@bmoger-ubuntu>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 12 Jun 2020 11:02:28 -0700
+Message-ID: <CALMp9eQrC5a2oquCPerEm29p482mik7Zbh=o74waTY6xqXZohA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: X86: Move handling of INVPCID types to x86
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>, Joerg Roedel <joro@8bytes.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Thu, Jun 11, 2020 at 2:48 PM Babu Moger <babu.moger@amd.com> wrote:
+>
+> INVPCID instruction handling is mostly same across both VMX and
+> SVM. So, move the code to common x86.c.
+>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c |   78 +-----------------------------------------
+>  arch/x86/kvm/x86.c     |   89 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.h     |    2 +
+>  3 files changed, 92 insertions(+), 77 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 170cc76a581f..d9c35f337da6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5477,29 +5477,15 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+>  {
+>         u32 vmx_instruction_info;
+>         unsigned long type;
+> -       bool pcid_enabled;
+>         gva_t gva;
+> -       struct x86_exception e;
+> -       unsigned i;
+> -       unsigned long roots_to_free = 0;
+>         struct {
+>                 u64 pcid;
+>                 u64 gla;
+>         } operand;
+>
+> -       if (!guest_cpuid_has(vcpu, X86_FEATURE_INVPCID)) {
+> -               kvm_queue_exception(vcpu, UD_VECTOR);
+> -               return 1;
+> -       }
+> -
+>         vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+>         type = kvm_register_readl(vcpu, (vmx_instruction_info >> 28) & 0xf);
+>
+> -       if (type > 3) {
+> -               kvm_inject_gp(vcpu, 0);
+> -               return 1;
+> -       }
+> -
 
-The following changes since commit 6929f71e46bdddbf1c4d67c2728648176c67c555:
+You've introduced some fault priority inversions by sinking the above
+tests for #UD and #GP below the call to get_vmx_mem_address(), which
+may raise #UD, #GP, or #SS.
 
-  atomisp: avoid warning about unused function (2020-06-03 21:22:46 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 49b3deaad3452217d62dbd78da8df24eb0c7e169:
-
-  Merge tag 'kvmarm-fixes-5.8-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2020-06-11 14:02:32 -0400)
-
-----------------------------------------------------------------
-MIPS:
-- Loongson port
-
-PPC:
-- Fixes
-
-ARM:
-- Fixes
-
-x86:
-- KVM_SET_USER_MEMORY_REGION optimizations
-- Fixes
-- Selftest fixes
-
-The guest side of the asynchronous page fault work has been delayed to 5.9
-in order to sync with Thomas's interrupt entry rework.
-
-----------------------------------------------------------------
-Anthony Yznaga (3):
-      KVM: x86: remove unnecessary rmap walk of read-only memslots
-      KVM: x86: avoid unnecessary rmap walks when creating/moving slots
-      KVM: x86: minor code refactor and comments fixup around dirty logging
-
-Babu Moger (1):
-      KVM: x86: Move MPK feature detection to common code
-
-Chen Zhou (1):
-      KVM: PPC: Book3S HV: Remove redundant NULL check
-
-Colin Ian King (1):
-      kvm: i8254: remove redundant assignment to pointer s
-
-Denis Efremov (1):
-      KVM: Use vmemdup_user()
-
-Eiichi Tsukata (1):
-      KVM: x86: Fix APIC page invalidation race
-
-Felipe Franciosi (1):
-      KVM: x86: respect singlestep when emulating instruction
-
-Huacai Chen (12):
-      KVM: MIPS: Increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16
-      KVM: MIPS: Add EVENTFD support which is needed by VHOST
-      KVM: MIPS: Use lddir/ldpte instructions to lookup gpa_mm.pgd
-      KVM: MIPS: Introduce and use cpu_guest_has_ldpte
-      KVM: MIPS: Use root tlb to control guest's CCA for Loongson-3
-      KVM: MIPS: Let indexed cacheops cause guest exit on Loongson-3
-      KVM: MIPS: Add more types of virtual interrupts
-      KVM: MIPS: Add Loongson-3 Virtual IPI interrupt support
-      KVM: MIPS: Add CPUCFG emulation for Loongson-3
-      KVM: MIPS: Add CONFIG6 and DIAG registers emulation
-      KVM: MIPS: Add more MMIO load/store instructions emulation
-      KVM: MIPS: Enable KVM support for Loongson-3
-
-James Morse (3):
-      KVM: arm64: Stop writing aarch32's CSSELR into ACTLR
-      KVM: arm64: Add emulation for 32bit guests accessing ACTLR2
-      KVM: arm64: Stop save/restoring ACTLR_EL1
-
-Laurent Dufour (2):
-      KVM: PPC: Book3S HV: Read ibm,secure-memory nodes
-      KVM: PPC: Book3S HV: Relax check on H_SVM_INIT_ABORT
-
-Marc Zyngier (9):
-      KVM: arm64: Flush the instruction cache if not unmapping the VM on reboot
-      KVM: arm64: Save the host's PtrAuth keys in non-preemptible context
-      KVM: arm64: Handle PtrAuth traps early
-      KVM: arm64: Stop sparse from moaning at __hyp_this_cpu_ptr
-      KVM: arm64: Remove host_cpu_context member from vcpu structure
-      KVM: arm64: Make vcpu_cp1x() work on Big Endian hosts
-      KVM: arm64: Synchronize sysreg state on injecting an AArch32 exception
-      KVM: arm64: Move hyp_symbol_addr() to kvm_asm.h
-      Merge branch 'kvm-arm64/ptrauth-fixes' into kvmarm-master/next
-
-Paolo Bonzini (7):
-      KVM: let kvm_destroy_vm_debugfs clean up vCPU debugfs directories
-      Merge tag 'kvm-ppc-next-5.8-1' of git://git.kernel.org/.../paulus/powerpc into HEAD
-      KVM: x86: emulate reserved nops from 0f/18 to 0f/1f
-      KVM: SVM: fix calls to is_intercept
-      Merge branch 'kvm-basic-exit-reason' into HEAD
-      KVM: x86: do not pass poisoned hva to __kvm_set_memory_region
-      Merge tag 'kvmarm-fixes-5.8-1' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
-
-Paul Mackerras (2):
-      KVM: PPC: Book3S HV: Remove user-triggerable WARN_ON
-      KVM: PPC: Book3S HV: Close race with page faults around memslot flushes
-
-Qian Cai (2):
-      KVM: PPC: Book3S HV: Ignore kmemleak false positives
-      KVM: PPC: Book3S: Fix some RCU-list locks
-
-Sean Christopherson (5):
-      KVM: VMX: Always treat MSR_IA32_PERF_CAPABILITIES as a valid PMU MSR
-      x86/kvm: Remove defunct KVM_DEBUG_FS Kconfig
-      KVM: selftests: Ignore KVM 5-level paging support for VM_MODE_PXXV48_4K
-      KVM: x86: Unexport x86_fpu_cache and make it static
-      KVM: nVMX: Consult only the "basic" exit reason when routing nested exit
-
-Tianjia Zhang (2):
-      KVM: PPC: Remove redundant kvm_run from vcpu_arch
-      KVM: PPC: Clean up redundant 'kvm_run' parameters
-
-Vitaly Kuznetsov (10):
-      KVM: selftests: Fix build with "make ARCH=x86_64"
-      KVM: VMX: Properly handle kvm_read/write_guest_virt*() result
-      Revert "KVM: x86: work around leak of uninitialized stack contents"
-      KVM: selftests: Add x86_64/debug_regs to .gitignore
-      KVM: selftests: fix vmx_preemption_timer_test build with GCC10
-      KVM: selftests: do not substitute SVM/VMX check with KVM_CAP_NESTED_STATE check
-      KVM: selftests: Don't probe KVM_CAP_HYPERV_ENLIGHTENED_VMCS when nested VMX is unsupported
-      KVM: async_pf: Cleanup kvm_setup_async_pf()
-      KVM: async_pf: Inject 'page ready' event only if 'page not present' was previously injected
-      KVM: selftests: fix sync_with_host() in smm_test
-
-Xiaoyao Li (1):
-      KVM: x86: Assign correct value to array.maxnent
-
-Xing Li (2):
-      KVM: MIPS: Define KVM_ENTRYHI_ASID to cpu_asid_mask(&boot_cpu_data)
-      KVM: MIPS: Fix VPN2_MASK definition for variable cpu_vmbits
-
- arch/arm64/include/asm/kvm_asm.h                   |  33 +-
- arch/arm64/include/asm/kvm_emulate.h               |   6 -
- arch/arm64/include/asm/kvm_host.h                  |   9 +-
- arch/arm64/include/asm/kvm_mmu.h                   |  20 -
- arch/arm64/kvm/aarch32.c                           |  28 ++
- arch/arm64/kvm/arm.c                               |  25 +-
- arch/arm64/kvm/handle_exit.c                       |  32 +-
- arch/arm64/kvm/hyp/debug-sr.c                      |   4 +-
- arch/arm64/kvm/hyp/switch.c                        |  65 ++-
- arch/arm64/kvm/hyp/sysreg-sr.c                     |   8 +-
- arch/arm64/kvm/pmu.c                               |   8 +-
- arch/arm64/kvm/sys_regs.c                          |  25 +-
- arch/arm64/kvm/sys_regs_generic_v8.c               |  10 +
- arch/mips/Kconfig                                  |   1 +
- arch/mips/include/asm/cpu-features.h               |   3 +
- arch/mips/include/asm/kvm_host.h                   |  52 ++-
- arch/mips/include/asm/mipsregs.h                   |   4 +
- arch/mips/include/uapi/asm/inst.h                  |  11 +
- arch/mips/kernel/cpu-probe.c                       |   5 +-
- arch/mips/kvm/Kconfig                              |   1 +
- arch/mips/kvm/Makefile                             |   5 +-
- arch/mips/kvm/emulate.c                            | 503 ++++++++++++++++++++-
- arch/mips/kvm/entry.c                              |  19 +-
- arch/mips/kvm/interrupt.c                          |  93 +---
- arch/mips/kvm/interrupt.h                          |  14 +-
- arch/mips/kvm/loongson_ipi.c                       | 214 +++++++++
- arch/mips/kvm/mips.c                               |  47 +-
- arch/mips/kvm/tlb.c                                |  41 ++
- arch/mips/kvm/trap_emul.c                          |   3 +
- arch/mips/kvm/vz.c                                 | 237 +++++++---
- arch/powerpc/include/asm/kvm_book3s.h              |  16 +-
- arch/powerpc/include/asm/kvm_host.h                |   1 -
- arch/powerpc/include/asm/kvm_ppc.h                 |  27 +-
- arch/powerpc/kvm/book3s.c                          |   4 +-
- arch/powerpc/kvm/book3s.h                          |   2 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c                |  12 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c             |  36 +-
- arch/powerpc/kvm/book3s_64_vio.c                   |  18 +-
- arch/powerpc/kvm/book3s_emulate.c                  |  10 +-
- arch/powerpc/kvm/book3s_hv.c                       |  75 +--
- arch/powerpc/kvm/book3s_hv_nested.c                |  15 +-
- arch/powerpc/kvm/book3s_hv_uvmem.c                 |  14 +
- arch/powerpc/kvm/book3s_paired_singles.c           |  72 +--
- arch/powerpc/kvm/book3s_pr.c                       |  30 +-
- arch/powerpc/kvm/booke.c                           |  36 +-
- arch/powerpc/kvm/booke.h                           |   8 +-
- arch/powerpc/kvm/booke_emulate.c                   |   2 +-
- arch/powerpc/kvm/e500_emulate.c                    |  15 +-
- arch/powerpc/kvm/emulate.c                         |  10 +-
- arch/powerpc/kvm/emulate_loadstore.c               |  32 +-
- arch/powerpc/kvm/powerpc.c                         |  72 +--
- arch/powerpc/kvm/trace_hv.h                        |   6 +-
- arch/s390/include/asm/kvm_host.h                   |   2 +-
- arch/s390/kvm/kvm-s390.c                           |   4 +-
- arch/x86/Kconfig                                   |   8 -
- arch/x86/include/asm/kvm_host.h                    |   3 +-
- arch/x86/kernel/kvm.c                              |   1 -
- arch/x86/kvm/cpuid.c                               |  31 +-
- arch/x86/kvm/debugfs.c                             |  10 +-
- arch/x86/kvm/emulate.c                             |   8 +-
- arch/x86/kvm/i8254.c                               |   1 -
- arch/x86/kvm/svm/nested.c                          |   2 +-
- arch/x86/kvm/svm/svm.c                             |   4 +-
- arch/x86/kvm/vmx/nested.c                          |  82 ++--
- arch/x86/kvm/vmx/pmu_intel.c                       |   2 +-
- arch/x86/kvm/vmx/vmx.c                             |  38 +-
- arch/x86/kvm/vmx/vmx.h                             |   2 +
- arch/x86/kvm/x86.c                                 | 139 +++---
- include/linux/kvm_host.h                           |   8 +-
- tools/testing/selftests/kvm/.gitignore             |   1 +
- tools/testing/selftests/kvm/Makefile               |   4 +
- .../selftests/kvm/include/x86_64/svm_util.h        |   1 +
- tools/testing/selftests/kvm/include/x86_64/vmx.h   |   5 +-
- tools/testing/selftests/kvm/lib/kvm_util.c         |  11 +-
- tools/testing/selftests/kvm/lib/x86_64/svm.c       |  10 +-
- tools/testing/selftests/kvm/lib/x86_64/vmx.c       |   9 +-
- tools/testing/selftests/kvm/x86_64/evmcs_test.c    |   5 +-
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c  |   3 +-
- tools/testing/selftests/kvm/x86_64/smm_test.c      |  17 +-
- tools/testing/selftests/kvm/x86_64/state_test.c    |  13 +-
- .../kvm/x86_64/vmx_preemption_timer_test.c         |   4 +
- virt/kvm/async_pf.c                                |  21 +-
- virt/kvm/kvm_main.c                                |  53 ++-
- 83 files changed, 1801 insertions(+), 740 deletions(-)
- create mode 100644 arch/mips/kvm/loongson_ipi.c
-
+>         /* According to the Intel instruction reference, the memory operand
+>          * is read even if it isn't needed (e.g., for type==all)
+>          */
+> @@ -5508,69 +5494,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+>                                 sizeof(operand), &gva))
+>                 return 1;
+>
+> -       if (kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e)) {
+> -               kvm_inject_emulated_page_fault(vcpu, &e);
+> -               return 1;
+> -       }
+> -
+> -       if (operand.pcid >> 12 != 0) {
+> -               kvm_inject_gp(vcpu, 0);
+> -               return 1;
+> -       }
+> -
+> -       pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> -
+> -       switch (type) {
+> -       case INVPCID_TYPE_INDIV_ADDR:
+> -               if ((!pcid_enabled && (operand.pcid != 0)) ||
+> -                   is_noncanonical_address(operand.gla, vcpu)) {
+> -                       kvm_inject_gp(vcpu, 0);
+> -                       return 1;
+> -               }
+> -               kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
+> -               return kvm_skip_emulated_instruction(vcpu);
+> -
+> -       case INVPCID_TYPE_SINGLE_CTXT:
+> -               if (!pcid_enabled && (operand.pcid != 0)) {
+> -                       kvm_inject_gp(vcpu, 0);
+> -                       return 1;
+> -               }
+> -
+> -               if (kvm_get_active_pcid(vcpu) == operand.pcid) {
+> -                       kvm_mmu_sync_roots(vcpu);
+> -                       kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> -               }
+> -
+> -               for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> -                       if (kvm_get_pcid(vcpu, vcpu->arch.mmu->prev_roots[i].pgd)
+> -                           == operand.pcid)
+> -                               roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+> -
+> -               kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
+> -               /*
+> -                * If neither the current cr3 nor any of the prev_roots use the
+> -                * given PCID, then nothing needs to be done here because a
+> -                * resync will happen anyway before switching to any other CR3.
+> -                */
+> -
+> -               return kvm_skip_emulated_instruction(vcpu);
+> -
+> -       case INVPCID_TYPE_ALL_NON_GLOBAL:
+> -               /*
+> -                * Currently, KVM doesn't mark global entries in the shadow
+> -                * page tables, so a non-global flush just degenerates to a
+> -                * global flush. If needed, we could optimize this later by
+> -                * keeping track of global entries in shadow page tables.
+> -                */
+> -
+> -               /* fall-through */
+> -       case INVPCID_TYPE_ALL_INCL_GLOBAL:
+> -               kvm_mmu_unload(vcpu);
+> -               return kvm_skip_emulated_instruction(vcpu);
+> -
+> -       default:
+> -               BUG(); /* We have already checked above that type <= 3 */
+> -       }
+> +       return kvm_handle_invpcid_types(vcpu,  gva, type);
+>  }
+>
+>  static int handle_pml_full(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9e41b5135340..13373359608c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -72,6 +72,7 @@
+>  #include <asm/hypervisor.h>
+>  #include <asm/intel_pt.h>
+>  #include <asm/emulate_prefix.h>
+> +#include <asm/tlbflush.h>
+>  #include <clocksource/hyperv_timer.h>
+>
+>  #define CREATE_TRACE_POINTS
+> @@ -10714,6 +10715,94 @@ u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_spec_ctrl_valid_bits);
+>
+> +int kvm_handle_invpcid_types(struct kvm_vcpu *vcpu, gva_t gva,
+> +                            unsigned long type)
+> +{
+> +       unsigned long roots_to_free = 0;
+> +       struct x86_exception e;
+> +       bool pcid_enabled;
+> +       unsigned i;
+> +       struct {
+> +               u64 pcid;
+> +               u64 gla;
+> +       } operand;
+> +
+> +       if (!guest_cpuid_has(vcpu, X86_FEATURE_INVPCID)) {
+> +               kvm_queue_exception(vcpu, UD_VECTOR);
+> +               return 1;
+> +       }
+> +
+> +       if (type > 3) {
+> +               kvm_inject_gp(vcpu, 0);
+> +               return 1;
+> +       }
+> +
+> +       if (kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e)) {
+> +               kvm_inject_emulated_page_fault(vcpu, &e);
+> +               return 1;
+> +       }
+> +
+> +       if (operand.pcid >> 12 != 0) {
+> +               kvm_inject_gp(vcpu, 0);
+> +               return 1;
+> +       }
+> +
+> +       pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> +
+> +       switch (type) {
+> +       case INVPCID_TYPE_INDIV_ADDR:
+> +               if ((!pcid_enabled && (operand.pcid != 0)) ||
+> +                   is_noncanonical_address(operand.gla, vcpu)) {
+> +                       kvm_inject_gp(vcpu, 0);
+> +                       return 1;
+> +               }
+> +               kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
+> +               return kvm_skip_emulated_instruction(vcpu);
+> +
+> +       case INVPCID_TYPE_SINGLE_CTXT:
+> +               if (!pcid_enabled && (operand.pcid != 0)) {
+> +                       kvm_inject_gp(vcpu, 0);
+> +                       return 1;
+> +               }
+> +
+> +               if (kvm_get_active_pcid(vcpu) == operand.pcid) {
+> +                       kvm_mmu_sync_roots(vcpu);
+> +                       kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> +               }
+> +
+> +               for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> +                       if (kvm_get_pcid(vcpu, vcpu->arch.mmu->prev_roots[i].pgd)
+> +                           == operand.pcid)
+> +                               roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+> +
+> +               kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
+> +               /*
+> +                * If neither the current cr3 nor any of the prev_roots use the
+> +                * given PCID, then nothing needs to be done here because a
+> +                * resync will happen anyway before switching to any other CR3.
+> +                */
+> +
+> +               return kvm_skip_emulated_instruction(vcpu);
+> +
+> +       case INVPCID_TYPE_ALL_NON_GLOBAL:
+> +               /*
+> +                * Currently, KVM doesn't mark global entries in the shadow
+> +                * page tables, so a non-global flush just degenerates to a
+> +                * global flush. If needed, we could optimize this later by
+> +                * keeping track of global entries in shadow page tables.
+> +                */
+> +
+> +               /* fall-through */
+> +       case INVPCID_TYPE_ALL_INCL_GLOBAL:
+> +               kvm_mmu_unload(vcpu);
+> +               return kvm_skip_emulated_instruction(vcpu);
+> +
+> +       default:
+> +               BUG(); /* We have already checked above that type <= 3 */
+> +       }
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_handle_invpcid_types);
+> +
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 6eb62e97e59f..8e23f2705344 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -365,5 +365,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+>  void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
+>  u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
+>  bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu);
+> +int kvm_handle_invpcid_types(struct kvm_vcpu *vcpu, gva_t gva,
+> +                            unsigned long type);
+>
+>  #endif
+>
