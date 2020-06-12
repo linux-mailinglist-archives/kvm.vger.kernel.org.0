@@ -2,155 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D6F81F73B6
-	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 08:15:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1021E1F749D
+	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 09:30:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbgFLGPZ convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 12 Jun 2020 02:15:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48808 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726300AbgFLGPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jun 2020 02:15:25 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 200101] random freeze under load
-Date:   Fri, 12 Jun 2020 06:15:24 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: filakhtov@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-200101-28872-Pc7HUPDomr@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-200101-28872@https.bugzilla.kernel.org/>
-References: <bug-200101-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726401AbgFLH3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jun 2020 03:29:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47708 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726290AbgFLH3v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jun 2020 03:29:51 -0400
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB6DC03E96F;
+        Fri, 12 Jun 2020 00:29:50 -0700 (PDT)
+Received: by mail-lf1-x144.google.com with SMTP id d27so354774lfq.5;
+        Fri, 12 Jun 2020 00:29:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=yaY+guszQhRqACS6lpSk6VXydA5a+jEb8jU9kD9q8OQ=;
+        b=Xhn0tRFKQHVe2F+mauTaMwFDuXm5bZRaGZgHSS18tN8QDEDCKF57B1emDOoibeFBiY
+         qYgx8L/lqZBHNumQqGxlFPmjUNIJzr6Dhd7bnOZ2/GS0r0d3VgmcCHSc1yY4U9O1NN5G
+         cnDZdGRdKM2VEtp+cVebrFtiMDncimEwcLjxY+e6wDlCI/yJCSU1Uyl3XuFkKa5KqMI1
+         gJKrMpAssPstbsNTZO2Kq+OboKM+bIRI4qtoYuqyDIwvB5YIQ9q0cP76PcgSD/pNbrGV
+         ee5q2yWT32+unACLWgjvdL/0nfRMVJXBfdBCKhQENXpsRJMDupGH5MrFwyBG1E8hS8a6
+         vOxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=yaY+guszQhRqACS6lpSk6VXydA5a+jEb8jU9kD9q8OQ=;
+        b=Xcgaexs+b/pqisowS5SFQMO+FM7zkU5d2w8GUBV55+27eh1r+ufdrfLvxBYuW1XXrR
+         Mjz9Z4sq9xyaSAr80VgyoQkYZuXVa/wfs89ujUsEKHwyshQ1HZl91moV7GGClVpM5kdp
+         Nn11w6txpG3xMlYMIm+9U6wO1fRFoPpri5LUSCiWtflICZmnH2DuXz9K2/LZqG2X1yBj
+         upQGTtbDuIYwGaYvvsnaohMSFdAMsoB7TJYmispN23qEMDYC/WQeuA6+74sS3itOFUTZ
+         iE9YCGGGGUNGfHkx+w12iO0Ioxdqpag9VheJBcQC7tLn+Bz/aUbyq+DGKEG1lUm2eu5q
+         Ep0Q==
+X-Gm-Message-State: AOAM530X/aRyIwq+Hw0pn1NHhxGSl9BZv8+2CDRrVQ9i3RB0rdbnCbRR
+        DoeuzgqChp8T6i/K403EeWVtQHyz/B/4pW2LC8WOeKrW
+X-Google-Smtp-Source: ABdhPJzhILk20wQY+TBqtu2mkA6zEZW3ZYh/xaVoGtazeX6yvVotWsy5Us+YOnu9u7ttzh/H7Y4cGh1127QI5XNtNaI=
+X-Received: by 2002:a19:4048:: with SMTP id n69mr6213984lfa.31.1591946988114;
+ Fri, 12 Jun 2020 00:29:48 -0700 (PDT)
 MIME-Version: 1.0
+References: <CALKTHW0B-kpjRgJVtHwdo0sqszYzHSCH3x_Oph2gDpa0diyEVA@mail.gmail.com>
+In-Reply-To: <CALKTHW0B-kpjRgJVtHwdo0sqszYzHSCH3x_Oph2gDpa0diyEVA@mail.gmail.com>
+From:   Jinpu Wang <jinpuwang@gmail.com>
+Date:   Fri, 12 Jun 2020 09:29:37 +0200
+Message-ID: <CAD9gYJJx3CHSDYmTzmomGNC7BG7C5yEyrT=gk+MV44QkSs9dOA@mail.gmail.com>
+Subject: Re: KVM guest freeze on Linux > 4.19
+To:     Garry Filakhtov <filakhtov@gmail.com>,
+        "KVM-ML (kvm@vger.kernel.org)" <kvm@vger.kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=200101
-
---- Comment #3 from Garry Filakhtov (filakhtov@gmail.com) ---
-Struggling with the same issue. Also coming from Gentoo 👋 lekto!
-
-This was long coming, I just needed a lot of time to ensure there is no
-hardware issues or any kind of misconfiguration on my end, before reporting
-here.
-
-I have Intel X299 platform and using it to run Windows 10 virtual machine with
-PCI pass-through. I use NVMe SSD (Samsung EVO 970 Plus), PCIe USB 3.0 (StarTech
-PEXUSB3S3GE) adapter and GPU (nVidia GeForce 1650) pass-through to get best
-possible performance and isolation from host OS.
-
-I have been running on 4.19 LTS kernel without any issues, but 5.4 LTS got
-promoted to stable for AMD64 architecture and I have switched. After doing so,
-I have started experiencing random guest freezes, happening anywhere
-immediately after boot all the way up to multiple hours of usage without a
-freeze. When the freeze occurs, guest machine will completely stop responding
-to input, ping, etc. Host machine works fine and I can connect to qemu socket
-without any problems. I am running on QEMU 4.2.0.
-
-Freeze can continue anywhere from 1 minute up to 5 minutes, and eventually VM
-is recovering and working properly afterwards, up until the next freeze.
-Inspecting dmesg or journalctl on the host machine reveals no any relevant
-entries.
-
-Problem appears regardless of the type of workflow performed. It can just
-freeze on the desktop, in the web browser or in the GPU benchmark. I was
-playing music on the system and just before freezing, sound starts to
-drop/glitch and then goes completely silent.
-
-Windows event viewer is of course as useful as a fridge on the North pole
-before the climate change :D (pardon my pun), meaning no entries are produced
-during the freeze, and there is actually a gap between written entries for
-however long the freeze took.
-
-So far, I have tested a good variety of Kernel versions:
-
-  [1]   linux-4.19.120-gentoo <- works fine
-  [2]   linux-4.20.17-gentoo <- works fine
-  [3]   linux-5.0.0-gentoo <- randomly freezes as described
-  [4]   linux-5.0.21-gentoo <- randomly freezes as described
-  [5]   linux-5.1.21-gentoo <- can't even boot guest, getting freeze during
-very early boot
-  [6]   linux-5.2.20-gentoo <- qemu won't even start, complaining about KVM
-suberror 1
-  [7]   linux-5.3.18-gentoo <- randomly freezes as described
-  [8]   linux-5.4.38-gentoo <- randomly freezes as described
-
-My takeaway here is that something went wrong in the 5.0.0 and was never fixed
-since.
-
-I have not yet tried to bisect the GIT source, but might give it a go, time
-permitting.
-
-I am using naked qemu-system-x86_64 command, to rule out virt-manager problems.
-PCIe devices are attached via separate pcie-root-port devices. Using OVMF UEFI
-(sys-firmware/edk2-ovmf-201905) for booting with Secure Boot enabled (disabling
-Secure Boot makes no difference). I have also did clean Windows 10 install to
-rule out any issues with the guest OS itself, but problem persisted. I have
-tried using Windows-provided GPU drivers as well as the latest from nVidia.
-Using "host" CPU for qemu.
-
-There is a similar problem reported on Reddit too, the solution was to
-downgrade:
-https://www.reddit.com/r/VFIO/comments/b1xx0g/windows_10_qemukvm_freezes_after_50x_kernel_update/
-
-Host hardware:
-Motherboard: ASUS WS X299 SAGE
-CPU: Intel i9-9940x
-Guest GPU: nVidia GTX 1650
-Host GPU: AMD Radeon PRO WX 3100
-RAM: 64Gb (4x16Gb) DDR4 2666MHz
-SSD: Samsung 970 EVO Plus
-PCIe adapter: StarTech PEXUSB3S3GE 3xUSB3.0 + USB Realtek Gigabit network combo
-adapter
-Guest OS: Windows 10 Professional (1909)
-QEMU version: 4.2.0
-
-qemu options used:
--name Microsoft Windows 10 Professional
--M q35,kernel_irqchip=on,vmport=off,accel=kvm,mem-merge=off
--nodefaults
--display none
--vga none
--net none
--nographic
--monitor unix:/run/qemu/win10.sock,server,nowait
--pidfile /run/qemu/win10.pid
--cpu host,kvm=off
--smp sockets=1,cores=6,threads=2
--m size=16G
--drive
-if=pflash,format=raw,readonly,file=/usr/share/edk2-ovmf/OVMF_CODE.secboot.fd
--drive if=pflash,format=raw,file=/usr/share/edk2-ovmf/OVMF_VARS.secboot.fd
--rtc base=localtime
--device pcie-root-port,id=port0.0,bus=pcie.0,chassis=0,slot=0,addr=1.0
--device vfio-pci,host=19:0.0,multifunction=on,bus=port0.0,addr=0.0
--device vfio-pci,host=19:0.1,bus=pcie.0,bus=port0.0,addr=0.1
--device pcie-root-port,id=port0.2,bus=pcie.0,chassis=0,slot=2
--device vfio-pci,host=1a:0.0,bus=port0.2
--device pcie-root-port,id=port0.5,bus=pcie.0,chassis=0,slot=5
--device vfio-pci,host=b3:0.0,bus=port0.5
-
-I will try lekto's suggestion and report back any progress.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+Garry Filakhtov <filakhtov@gmail.com> =E4=BA=8E2020=E5=B9=B46=E6=9C=8812=E6=
+=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=888:38=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Good time of the day,
+>
+> Hope you all are staying safe during these challenging times.
+>
+> I have been struggling with KVM guest freezes after the upgrade from
+> 4.19 LTS to 5.4 LTS.
+>
+> Searching through the internet lead me to
+> https://www.reddit.com/r/VFIO/comments/b1xx0g/windows_10_qemukvm_freezes_=
+after_50x_kernel_update/
+> and Kernel Bugzilla revealed
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D200101. I have added a
+> detailed problem description on the aforementioned bug.
+>
+> Would like to get some attention from people who might know more about
+> this, and see if I need to create a brand new bug report or if that's
+> okay to work through the existing bug.
+>
+> Also, any suggestions where else to look to find any clues that can
+> help resolve the issue or identify what's causing it are highly
+> appreciated.
+>
+> Kind regards,
+> Garry Filakhtov
++cc kvm maillist
