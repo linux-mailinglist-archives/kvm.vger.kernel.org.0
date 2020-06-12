@@ -2,189 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B9EB1F75EC
-	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 11:27:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C36D21F761A
+	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 11:35:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726514AbgFLJ1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jun 2020 05:27:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24816 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726335AbgFLJ1y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jun 2020 05:27:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591954072;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x/0gvwKjXYyuXUi96UBTWcxIAQBaGxOdnPZ29mvjKFc=;
-        b=HyofyW0rtU3wuZ/CY2FwqVr+VEEBq2nJ3J1JUyoU0aRoQDUlJXTB7+ZJEvcczDThvBssWG
-        5yjsBRp5H9r/rB40cFZ7AS/qsMiBUQVJu/UUuU+Eia36SP+ic/kwVuOpU/Kh7FBcPRKrgL
-        /jS+KxJM3Jsmgm6FOFPQoG4UX09My7A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-KnK77qtQOBWj1hWOOf7Kjw-1; Fri, 12 Jun 2020 05:27:39 -0400
-X-MC-Unique: KnK77qtQOBWj1hWOOf7Kjw-1
-Received: by mail-wr1-f72.google.com with SMTP id c14so3657228wrw.11
-        for <kvm@vger.kernel.org>; Fri, 12 Jun 2020 02:27:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=x/0gvwKjXYyuXUi96UBTWcxIAQBaGxOdnPZ29mvjKFc=;
-        b=GOGnv7C+95ykAY9xdy4VoT16R8ntUh6Ty610H+Z00b/9584ReJ5NpIqZ6Mw2aP+R5L
-         pK0xG61Pk/EgS2LvTzG42ufpB/BZ2enZ3TnMjDZGpVjAYhvwuocqRwgnyJjYoeJvR0Aa
-         7pRpqVIEG+BtLPi6Y+7+/zMXGVw1FkrUsTpt7qr+4ugOnVaouQZd2a3qfeP5mcOewBqQ
-         /1LZcdGMhuYwOts2CqVUeTS8bWB76kruzjlZGhDMN5SeaHD7Fhv9LCm6g02Ov3uAMMCJ
-         I2ayeQixWh4YY6M4+WiaC4e5k0mWouJLJKz5cqR2D0MkDpTmgKhY7AnB8H6yfbdxD5Jx
-         354w==
-X-Gm-Message-State: AOAM53156z9juRsWKTbXnd7h5kBFRNqYhJ9xYefla5KChmnj+OHep8hN
-        ywRluhJIA27D2T2YkYSvvedsIupUtheWETRO24WTAC8mH47jPmpTPlDknqiTqEH/ZpniWNZ151/
-        uMTBeG3iDPdTN
-X-Received: by 2002:a1c:6744:: with SMTP id b65mr12333771wmc.170.1591954058115;
-        Fri, 12 Jun 2020 02:27:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1TdB3aObx0TxkjqRsA3kfSJo0pyan9ZuQJmK8siJXSnxD1AHCmUf9T8+ialj2bEgzPj+sQQ==
-X-Received: by 2002:a1c:6744:: with SMTP id b65mr12333750wmc.170.1591954057816;
-        Fri, 12 Jun 2020 02:27:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:29ed:810e:962c:aa0d? ([2001:b07:6468:f312:29ed:810e:962c:aa0d])
-        by smtp.gmail.com with ESMTPSA id o82sm8119838wmo.40.2020.06.12.02.27.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jun 2020 02:27:37 -0700 (PDT)
-Subject: Re: [PATCH] kvm: support to get/set dirty log initial-all-set
- capability
-To:     "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
+        id S1726219AbgFLJfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jun 2020 05:35:23 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2544 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726100AbgFLJfW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jun 2020 05:35:22 -0400
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id B0A40246740D0EEFA83F;
+        Fri, 12 Jun 2020 17:35:19 +0800 (CST)
+Received: from DGGEMM508-MBX.china.huawei.com ([169.254.2.47]) by
+ DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id 14.03.0487.000;
+ Fri, 12 Jun 2020 17:35:11 +0800
+From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
+CC:     "mst@redhat.com" <mst@redhat.com>,
         "cohuck@redhat.com" <cohuck@redhat.com>,
         "peterx@redhat.com" <peterx@redhat.com>,
         "Wangxin (Alexander, Cloud Infrastructure Service Product Dept.)" 
         <wangxinxin.wang@huawei.com>,
         "Huangweidong (C)" <weidong.huang@huawei.com>,
         "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+Subject: RE: [PATCH] kvm: support to get/set dirty log initial-all-set
+ capability
+Thread-Topic: [PATCH] kvm: support to get/set dirty log initial-all-set
+ capability
+Thread-Index: AQHV8dBzPdW/4AkL+0GBczXBKqWav6hNu5OAgIcppiD//+h0AIAAh4nQ
+Date:   Fri, 12 Jun 2020 09:35:11 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BD283A5@dggemm508-mbx.china.huawei.com>
 References: <20200304025554.2159-1-jianjay.zhou@huawei.com>
  <18e7b781-8a52-d78a-a653-898445a5ee53@redhat.com>
  <B2D15215269B544CADD246097EACE7474BD26B9F@dggemm508-mbx.china.huawei.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5346f621-6792-21fe-5030-fcf104345813@redhat.com>
-Date:   Fri, 12 Jun 2020 11:27:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ <5346f621-6792-21fe-5030-fcf104345813@redhat.com>
+In-Reply-To: <5346f621-6792-21fe-5030-fcf104345813@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <B2D15215269B544CADD246097EACE7474BD26B9F@dggemm508-mbx.china.huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/06/20 05:01, Zhoujian (jay) wrote:
-> 
-> 
->> -----Original Message-----
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> Sent: Wednesday, March 18, 2020 6:48 PM
->> To: Zhoujian (jay) <jianjay.zhou@huawei.com>; qemu-devel@nongnu.org;
->> kvm@vger.kernel.org
->> Cc: mst@redhat.com; cohuck@redhat.com; peterx@redhat.com; wangxin (U)
->> <wangxinxin.wang@huawei.com>; Huangweidong (C)
->> <weidong.huang@huawei.com>; Liujinsong (Paul) <liu.jinsong@huawei.com>
->> Subject: Re: [PATCH] kvm: support to get/set dirty log initial-all-set capability
->>
->> On 04/03/20 03:55, Jay Zhou wrote:
->>> Since the new capability KVM_DIRTY_LOG_INITIALLY_SET of
->>> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 has been introduced in the kernel,
->>> tweak the userspace side to detect and enable this capability.
->>>
->>> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
->>> ---
->>>  accel/kvm/kvm-all.c       | 21 ++++++++++++++-------
->>>  linux-headers/linux/kvm.h |  3 +++
->>>  2 files changed, 17 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
->>> 439a4efe52..45ab25be63 100644
->>> --- a/accel/kvm/kvm-all.c
->>> +++ b/accel/kvm/kvm-all.c
->>> @@ -100,7 +100,7 @@ struct KVMState
->>>      bool kernel_irqchip_required;
->>>      OnOffAuto kernel_irqchip_split;
->>>      bool sync_mmu;
->>> -    bool manual_dirty_log_protect;
->>> +    uint64_t manual_dirty_log_protect;
->>>      /* The man page (and posix) say ioctl numbers are signed int, but
->>>       * they're not.  Linux, glibc and *BSD all treat ioctl numbers as
->>>       * unsigned, and treating them as signed here can break things */
->>> @@ -1882,6 +1882,7 @@ static int kvm_init(MachineState *ms)
->>>      int ret;
->>>      int type = 0;
->>>      const char *kvm_type;
->>> +    uint64_t dirty_log_manual_caps;
->>>
->>>      s = KVM_STATE(ms->accelerator);
->>>
->>> @@ -2007,14 +2008,20 @@ static int kvm_init(MachineState *ms)
->>>      s->coalesced_pio = s->coalesced_mmio &&
->>>                         kvm_check_extension(s,
->> KVM_CAP_COALESCED_PIO);
->>>
->>> -    s->manual_dirty_log_protect =
->>> +    dirty_log_manual_caps =
->>>          kvm_check_extension(s,
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
->>> -    if (s->manual_dirty_log_protect) {
->>> -        ret = kvm_vm_enable_cap(s,
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
->>> +    dirty_log_manual_caps &=
->> (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
->>> +                              KVM_DIRTY_LOG_INITIALLY_SET);
->>> +    s->manual_dirty_log_protect = dirty_log_manual_caps;
->>> +    if (dirty_log_manual_caps) {
->>> +        ret = kvm_vm_enable_cap(s,
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0,
->>> +                                   dirty_log_manual_caps);
->>>          if (ret) {
->>> -            warn_report("Trying to enable
->> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
->>> -                        "but failed.  Falling back to the legacy mode. ");
->>> -            s->manual_dirty_log_protect = false;
->>> +            warn_report("Trying to enable capability %"PRIu64" of "
->>> +                        "KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2
->> but failed. "
->>> +                        "Falling back to the legacy mode. ",
->>> +                        dirty_log_manual_caps);
->>> +            s->manual_dirty_log_protect = 0;
->>>          }
->>>      }
->>>
->>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
->>> index 265099100e..3cb71c2b19 100644
->>> --- a/linux-headers/linux/kvm.h
->>> +++ b/linux-headers/linux/kvm.h
->>> @@ -1628,4 +1628,7 @@ struct kvm_hyperv_eventfd {
->>>  #define KVM_HYPERV_CONN_ID_MASK		0x00ffffff
->>>  #define KVM_HYPERV_EVENTFD_DEASSIGN	(1 << 0)
->>>
->>> +#define KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE    (1 << 0)
->>> +#define KVM_DIRTY_LOG_INITIALLY_SET            (1 << 1)
->>> +
->>>  #endif /* __LINUX_KVM_H */
->>>
->>
->> Queued, thanks.
->>
-> 
-> Hi Paolo,
-> 
-> It seems that this patch isn't included in your last pull request...
-> If there's something else to be done, please let me know.
-
-Sorry, I thought mistakenly that it was a 5.8 feature (so it would have
-to wait for the 5.8-rc1 release and header update).  It's still queued
-though.
-
-Paolo
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8gQm9uemluaSBb
+bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgSnVuZSAxMiwgMjAy
+MCA1OjI4IFBNDQo+IFRvOiBaaG91amlhbiAoamF5KSA8amlhbmpheS56aG91QGh1YXdlaS5jb20+
+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IG1z
+dEByZWRoYXQuY29tOyBjb2h1Y2tAcmVkaGF0LmNvbTsgcGV0ZXJ4QHJlZGhhdC5jb207IFdhbmd4
+aW4NCj4gKEFsZXhhbmRlciwgQ2xvdWQgSW5mcmFzdHJ1Y3R1cmUgU2VydmljZSBQcm9kdWN0IERl
+cHQuKQ0KPiA8d2FuZ3hpbnhpbi53YW5nQGh1YXdlaS5jb20+OyBIdWFuZ3dlaWRvbmcgKEMpDQo+
+IDx3ZWlkb25nLmh1YW5nQGh1YXdlaS5jb20+OyBMaXVqaW5zb25nIChQYXVsKSA8bGl1LmppbnNv
+bmdAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSF0ga3ZtOiBzdXBwb3J0IHRvIGdl
+dC9zZXQgZGlydHkgbG9nIGluaXRpYWwtYWxsLXNldCBjYXBhYmlsaXR5DQo+IA0KPiBPbiAxMi8w
+Ni8yMCAwNTowMSwgWmhvdWppYW4gKGpheSkgd3JvdGU6DQo+ID4NCj4gPg0KPiA+PiAtLS0tLU9y
+aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWlsdG86cGJv
+bnppbmlAcmVkaGF0LmNvbV0NCj4gPj4gU2VudDogV2VkbmVzZGF5LCBNYXJjaCAxOCwgMjAyMCA2
+OjQ4IFBNDQo+ID4+IFRvOiBaaG91amlhbiAoamF5KSA8amlhbmpheS56aG91QGh1YXdlaS5jb20+
+OyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+ID4+IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gPj4g
+Q2M6IG1zdEByZWRoYXQuY29tOyBjb2h1Y2tAcmVkaGF0LmNvbTsgcGV0ZXJ4QHJlZGhhdC5jb207
+IHdhbmd4aW4gKFUpDQo+ID4+IDx3YW5neGlueGluLndhbmdAaHVhd2VpLmNvbT47IEh1YW5nd2Vp
+ZG9uZyAoQykNCj4gPj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNvbT47IExpdWppbnNvbmcgKFBh
+dWwpDQo+ID4+IDxsaXUuamluc29uZ0BodWF3ZWkuY29tPg0KPiA+PiBTdWJqZWN0OiBSZTogW1BB
+VENIXSBrdm06IHN1cHBvcnQgdG8gZ2V0L3NldCBkaXJ0eSBsb2cNCj4gPj4gaW5pdGlhbC1hbGwt
+c2V0IGNhcGFiaWxpdHkNCj4gPj4NCj4gPj4gT24gMDQvMDMvMjAgMDM6NTUsIEpheSBaaG91IHdy
+b3RlOg0KPiA+Pj4gU2luY2UgdGhlIG5ldyBjYXBhYmlsaXR5IEtWTV9ESVJUWV9MT0dfSU5JVElB
+TExZX1NFVCBvZg0KPiA+Pj4gS1ZNX0NBUF9NQU5VQUxfRElSVFlfTE9HX1BST1RFQ1QyIGhhcyBi
+ZWVuIGludHJvZHVjZWQgaW4gdGhlDQo+IGtlcm5lbCwNCj4gPj4+IHR3ZWFrIHRoZSB1c2Vyc3Bh
+Y2Ugc2lkZSB0byBkZXRlY3QgYW5kIGVuYWJsZSB0aGlzIGNhcGFiaWxpdHkuDQo+ID4+Pg0KPiA+
+Pj4gU2lnbmVkLW9mZi1ieTogSmF5IFpob3UgPGppYW5qYXkuemhvdUBodWF3ZWkuY29tPg0KPiA+
+Pj4gLS0tDQo+ID4+PiAgYWNjZWwva3ZtL2t2bS1hbGwuYyAgICAgICB8IDIxICsrKysrKysrKysr
+KysrLS0tLS0tLQ0KPiA+Pj4gIGxpbnV4LWhlYWRlcnMvbGludXgva3ZtLmggfCAgMyArKysNCj4g
+Pj4+ICAyIGZpbGVzIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQo+
+ID4+Pg0KPiA+Pj4gZGlmZiAtLWdpdCBhL2FjY2VsL2t2bS9rdm0tYWxsLmMgYi9hY2NlbC9rdm0v
+a3ZtLWFsbC5jIGluZGV4DQo+ID4+PiA0MzlhNGVmZTUyLi40NWFiMjViZTYzIDEwMDY0NA0KPiA+
+Pj4gLS0tIGEvYWNjZWwva3ZtL2t2bS1hbGwuYw0KPiA+Pj4gKysrIGIvYWNjZWwva3ZtL2t2bS1h
+bGwuYw0KPiA+Pj4gQEAgLTEwMCw3ICsxMDAsNyBAQCBzdHJ1Y3QgS1ZNU3RhdGUNCj4gPj4+ICAg
+ICAgYm9vbCBrZXJuZWxfaXJxY2hpcF9yZXF1aXJlZDsNCj4gPj4+ICAgICAgT25PZmZBdXRvIGtl
+cm5lbF9pcnFjaGlwX3NwbGl0Ow0KPiA+Pj4gICAgICBib29sIHN5bmNfbW11Ow0KPiA+Pj4gLSAg
+ICBib29sIG1hbnVhbF9kaXJ0eV9sb2dfcHJvdGVjdDsNCj4gPj4+ICsgICAgdWludDY0X3QgbWFu
+dWFsX2RpcnR5X2xvZ19wcm90ZWN0Ow0KPiA+Pj4gICAgICAvKiBUaGUgbWFuIHBhZ2UgKGFuZCBw
+b3NpeCkgc2F5IGlvY3RsIG51bWJlcnMgYXJlIHNpZ25lZCBpbnQsIGJ1dA0KPiA+Pj4gICAgICAg
+KiB0aGV5J3JlIG5vdC4gIExpbnV4LCBnbGliYyBhbmQgKkJTRCBhbGwgdHJlYXQgaW9jdGwgbnVt
+YmVycyBhcw0KPiA+Pj4gICAgICAgKiB1bnNpZ25lZCwgYW5kIHRyZWF0aW5nIHRoZW0gYXMgc2ln
+bmVkIGhlcmUgY2FuIGJyZWFrIHRoaW5ncw0KPiA+Pj4gKi8gQEAgLTE4ODIsNiArMTg4Miw3IEBA
+IHN0YXRpYyBpbnQga3ZtX2luaXQoTWFjaGluZVN0YXRlICptcykNCj4gPj4+ICAgICAgaW50IHJl
+dDsNCj4gPj4+ICAgICAgaW50IHR5cGUgPSAwOw0KPiA+Pj4gICAgICBjb25zdCBjaGFyICprdm1f
+dHlwZTsNCj4gPj4+ICsgICAgdWludDY0X3QgZGlydHlfbG9nX21hbnVhbF9jYXBzOw0KPiA+Pj4N
+Cj4gPj4+ICAgICAgcyA9IEtWTV9TVEFURShtcy0+YWNjZWxlcmF0b3IpOw0KPiA+Pj4NCj4gPj4+
+IEBAIC0yMDA3LDE0ICsyMDA4LDIwIEBAIHN0YXRpYyBpbnQga3ZtX2luaXQoTWFjaGluZVN0YXRl
+ICptcykNCj4gPj4+ICAgICAgcy0+Y29hbGVzY2VkX3BpbyA9IHMtPmNvYWxlc2NlZF9tbWlvICYm
+DQo+ID4+PiAgICAgICAgICAgICAgICAgICAgICAgICBrdm1fY2hlY2tfZXh0ZW5zaW9uKHMsDQo+
+ID4+IEtWTV9DQVBfQ09BTEVTQ0VEX1BJTyk7DQo+ID4+Pg0KPiA+Pj4gLSAgICBzLT5tYW51YWxf
+ZGlydHlfbG9nX3Byb3RlY3QgPQ0KPiA+Pj4gKyAgICBkaXJ0eV9sb2dfbWFudWFsX2NhcHMgPQ0K
+PiA+Pj4gICAgICAgICAga3ZtX2NoZWNrX2V4dGVuc2lvbihzLA0KPiA+PiBLVk1fQ0FQX01BTlVB
+TF9ESVJUWV9MT0dfUFJPVEVDVDIpOw0KPiA+Pj4gLSAgICBpZiAocy0+bWFudWFsX2RpcnR5X2xv
+Z19wcm90ZWN0KSB7DQo+ID4+PiAtICAgICAgICByZXQgPSBrdm1fdm1fZW5hYmxlX2NhcChzLA0K
+PiA+PiBLVk1fQ0FQX01BTlVBTF9ESVJUWV9MT0dfUFJPVEVDVDIsIDAsIDEpOw0KPiA+Pj4gKyAg
+ICBkaXJ0eV9sb2dfbWFudWFsX2NhcHMgJj0NCj4gPj4gKEtWTV9ESVJUWV9MT0dfTUFOVUFMX1BS
+T1RFQ1RfRU5BQkxFIHwNCj4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBLVk1f
+RElSVFlfTE9HX0lOSVRJQUxMWV9TRVQpOw0KPiA+Pj4gKyAgICBzLT5tYW51YWxfZGlydHlfbG9n
+X3Byb3RlY3QgPSBkaXJ0eV9sb2dfbWFudWFsX2NhcHM7DQo+ID4+PiArICAgIGlmIChkaXJ0eV9s
+b2dfbWFudWFsX2NhcHMpIHsNCj4gPj4+ICsgICAgICAgIHJldCA9IGt2bV92bV9lbmFibGVfY2Fw
+KHMsDQo+ID4+IEtWTV9DQVBfTUFOVUFMX0RJUlRZX0xPR19QUk9URUNUMiwgMCwNCj4gPj4+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRpcnR5X2xvZ19tYW51YWxfY2Fwcyk7
+DQo+ID4+PiAgICAgICAgICBpZiAocmV0KSB7DQo+ID4+PiAtICAgICAgICAgICAgd2Fybl9yZXBv
+cnQoIlRyeWluZyB0byBlbmFibGUNCj4gPj4gS1ZNX0NBUF9NQU5VQUxfRElSVFlfTE9HX1BST1RF
+Q1QyICINCj4gPj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAiYnV0IGZhaWxlZC4gIEZhbGxp
+bmcgYmFjayB0byB0aGUgbGVnYWN5IG1vZGUuDQo+ICIpOw0KPiA+Pj4gLSAgICAgICAgICAgIHMt
+Pm1hbnVhbF9kaXJ0eV9sb2dfcHJvdGVjdCA9IGZhbHNlOw0KPiA+Pj4gKyAgICAgICAgICAgIHdh
+cm5fcmVwb3J0KCJUcnlpbmcgdG8gZW5hYmxlIGNhcGFiaWxpdHkgJSJQUkl1NjQiIG9mICINCj4g
+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAiS1ZNX0NBUF9NQU5VQUxfRElSVFlfTE9HX1BS
+T1RFQ1QyDQo+ID4+IGJ1dCBmYWlsZWQuICINCj4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAiRmFsbGluZyBiYWNrIHRvIHRoZSBsZWdhY3kgbW9kZS4gIiwNCj4gPj4+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICBkaXJ0eV9sb2dfbWFudWFsX2NhcHMpOw0KPiA+Pj4gKyAgICAgICAgICAg
+IHMtPm1hbnVhbF9kaXJ0eV9sb2dfcHJvdGVjdCA9IDA7DQo+ID4+PiAgICAgICAgICB9DQo+ID4+
+PiAgICAgIH0NCj4gPj4+DQo+ID4+PiBkaWZmIC0tZ2l0IGEvbGludXgtaGVhZGVycy9saW51eC9r
+dm0uaCBiL2xpbnV4LWhlYWRlcnMvbGludXgva3ZtLmgNCj4gPj4+IGluZGV4IDI2NTA5OTEwMGUu
+LjNjYjcxYzJiMTkgMTAwNjQ0DQo+ID4+PiAtLS0gYS9saW51eC1oZWFkZXJzL2xpbnV4L2t2bS5o
+DQo+ID4+PiArKysgYi9saW51eC1oZWFkZXJzL2xpbnV4L2t2bS5oDQo+ID4+PiBAQCAtMTYyOCw0
+ICsxNjI4LDcgQEAgc3RydWN0IGt2bV9oeXBlcnZfZXZlbnRmZCB7DQo+ID4+PiAgI2RlZmluZSBL
+Vk1fSFlQRVJWX0NPTk5fSURfTUFTSwkJMHgwMGZmZmZmZg0KPiA+Pj4gICNkZWZpbmUgS1ZNX0hZ
+UEVSVl9FVkVOVEZEX0RFQVNTSUdOCSgxIDw8IDApDQo+ID4+Pg0KPiA+Pj4gKyNkZWZpbmUgS1ZN
+X0RJUlRZX0xPR19NQU5VQUxfUFJPVEVDVF9FTkFCTEUgICAgKDEgPDwgMCkNCj4gPj4+ICsjZGVm
+aW5lIEtWTV9ESVJUWV9MT0dfSU5JVElBTExZX1NFVCAgICAgICAgICAgICgxIDw8IDEpDQo+ID4+
+PiArDQo+ID4+PiAgI2VuZGlmIC8qIF9fTElOVVhfS1ZNX0ggKi8NCj4gPj4+DQo+ID4+DQo+ID4+
+IFF1ZXVlZCwgdGhhbmtzLg0KPiA+Pg0KPiA+DQo+ID4gSGkgUGFvbG8sDQo+ID4NCj4gPiBJdCBz
+ZWVtcyB0aGF0IHRoaXMgcGF0Y2ggaXNuJ3QgaW5jbHVkZWQgaW4geW91ciBsYXN0IHB1bGwgcmVx
+dWVzdC4uLg0KPiA+IElmIHRoZXJlJ3Mgc29tZXRoaW5nIGVsc2UgdG8gYmUgZG9uZSwgcGxlYXNl
+IGxldCBtZSBrbm93Lg0KPiANCj4gU29ycnksIEkgdGhvdWdodCBtaXN0YWtlbmx5IHRoYXQgaXQg
+d2FzIGEgNS44IGZlYXR1cmUgKHNvIGl0IHdvdWxkIGhhdmUgdG8gd2FpdCBmb3INCj4gdGhlIDUu
+OC1yYzEgcmVsZWFzZSBhbmQgaGVhZGVyIHVwZGF0ZSkuICBJdCdzIHN0aWxsIHF1ZXVlZCB0aG91
+Z2guDQoNCk9rYXksIG5ldmVyIG1pbmQsIDopDQoNClJlZ2FyZHMsDQpKYXkgWmhvdQ0K
