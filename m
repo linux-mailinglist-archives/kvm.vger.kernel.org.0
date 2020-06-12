@@ -2,155 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADD121F7253
-	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 05:01:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48AFD1F7317
+	for <lists+kvm@lfdr.de>; Fri, 12 Jun 2020 06:42:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726456AbgFLDBZ convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 11 Jun 2020 23:01:25 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2519 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726305AbgFLDBZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jun 2020 23:01:25 -0400
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.54])
-        by Forcepoint Email with ESMTP id 69D336AFA63EBD4CDCDE;
-        Fri, 12 Jun 2020 11:01:20 +0800 (CST)
-Received: from DGGEMM508-MBX.china.huawei.com ([169.254.2.47]) by
- DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id 14.03.0487.000;
- Fri, 12 Jun 2020 11:01:11 +0800
-From:   "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "mst@redhat.com" <mst@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wangxin (Alexander, Cloud Infrastructure Service Product Dept.)" 
-        <wangxinxin.wang@huawei.com>,
-        "Huangweidong (C)" <weidong.huang@huawei.com>,
-        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
-Subject: RE: [PATCH] kvm: support to get/set dirty log initial-all-set
- capability
-Thread-Topic: [PATCH] kvm: support to get/set dirty log initial-all-set
- capability
-Thread-Index: AQHV8dBzPdW/4AkL+0GBczXBKqWav6hNu5OAgIcppiA=
-Date:   Fri, 12 Jun 2020 03:01:10 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BD26B9F@dggemm508-mbx.china.huawei.com>
-References: <20200304025554.2159-1-jianjay.zhou@huawei.com>
- <18e7b781-8a52-d78a-a653-898445a5ee53@redhat.com>
-In-Reply-To: <18e7b781-8a52-d78a-a653-898445a5ee53@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.93]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+        id S1726029AbgFLEme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jun 2020 00:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50166 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725763AbgFLEme (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jun 2020 00:42:34 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B728C03E96F;
+        Thu, 11 Jun 2020 21:42:34 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id g12so3242332pll.10;
+        Thu, 11 Jun 2020 21:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=tnkNvIy4NyhOcfhzdkEEgf5Q0aBBdpOiKM99Ch2kRHo=;
+        b=p2J2k390abBAM4NCbA9yAEM/LrDNElIECJSQNv3Nr8adiQVAS5SzbFY95WgXXxsQIh
+         WJkHweRSLgzRw+GhG7AdtIsCCWhBM8XJSKuStAPyg5GzWrP6UfZokkvvSDuCia7LKDe8
+         71ujb6m40rMGRbwrRU+cN48oUNWf6r0I2VKCdk3XFkhd7SI1mBjeH2MYM00dZWC5qOCP
+         FHXiJVbAQiG/K5Obfn+8x9PhykJbXAlXcTajBOJKJlM1Wemqs6OzfESWAa5E+VfI9uFY
+         0/YzlC1zdTftffN4s1iJyIMA8CW79XvwgF/CZ2Um4s/Uxf3elaXGjlbcz4Tn9Hlj3jV0
+         d2tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=tnkNvIy4NyhOcfhzdkEEgf5Q0aBBdpOiKM99Ch2kRHo=;
+        b=jnbxLZSaU7SwEo9AWESk+sdWpRd0acuQbNxVGlvA178Yr3FThVn9nxmrSnfij3jgYh
+         AbDNn0ylgjdUqtmpRWt3ncPcSIU8t5D/y/fZ2E2em3n82W7QIK5DE+ZgwsXvsTzjbf3q
+         WTjPi+44VD5V1UhCsBJUdD2SsfdNJQ/Tj/iCAstzTsCbNw5pEZS0rJMQ5aQ9XawhEVbM
+         Wm44JjZi4/SOq6RotGy4vZR2CTYHJ3YxpvnqHo92ijzOIvkRA/ZQr12CjDc56u8qLN21
+         bzjToWMY8SN2aLQ6+QRSBx3j6Ee2pWygpbaLPBtTEI4uNxocvoB6Bug2rjD2LnGJQyPM
+         Y2ug==
+X-Gm-Message-State: AOAM530n+c/lTU6DkdV0kw91aOr8y6QHbomFPES85YR/QxpC6TsRrqhu
+        LWugph0OAvPpHEYWa1g7HRo=
+X-Google-Smtp-Source: ABdhPJwVfVwWuvBqsmyJQUwzIkKhTVDfAOSa0G75EXUmTNsmKXeQmrkCijvdn4svfC9O7GaAMKn6pA==
+X-Received: by 2002:a17:902:c30c:: with SMTP id k12mr10389411plx.130.1591936953486;
+        Thu, 11 Jun 2020 21:42:33 -0700 (PDT)
+Received: from localhost.localdomain ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id s9sm4084239pgo.22.2020.06.11.21.42.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2020 21:42:32 -0700 (PDT)
+From:   Florian Fainelli <f.fainelli@gmail.com>
+To:     linux-arm-kernel@lists.infradead.org
+Cc:     stable@vger.kernel.org, will@kernel.org,
+        Will Deacon <will.deacon@arm.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Christoffer Dall <christoffer.dall@linaro.org>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        linux-kernel@vger.kernel.org (open list),
+        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
+        kvmarm@lists.cs.columbia.edu (open list:KERNEL VIRTUAL MACHINE FOR
+        ARM64 (KVM/arm64))
+Subject: [PATCH stable 4.9] arm64: entry: Place an SB sequence following an ERET instruction
+Date:   Thu, 11 Jun 2020 21:42:18 -0700
+Message-Id: <20200612044219.31606-1-f.fainelli@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Will Deacon <will.deacon@arm.com>
 
+commit 679db70801da9fda91d26caf13bf5b5ccc74e8e8 upstream
 
-> -----Original Message-----
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> Sent: Wednesday, March 18, 2020 6:48 PM
-> To: Zhoujian (jay) <jianjay.zhou@huawei.com>; qemu-devel@nongnu.org;
-> kvm@vger.kernel.org
-> Cc: mst@redhat.com; cohuck@redhat.com; peterx@redhat.com; wangxin (U)
-> <wangxinxin.wang@huawei.com>; Huangweidong (C)
-> <weidong.huang@huawei.com>; Liujinsong (Paul) <liu.jinsong@huawei.com>
-> Subject: Re: [PATCH] kvm: support to get/set dirty log initial-all-set capability
-> 
-> On 04/03/20 03:55, Jay Zhou wrote:
-> > Since the new capability KVM_DIRTY_LOG_INITIALLY_SET of
-> > KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 has been introduced in the kernel,
-> > tweak the userspace side to detect and enable this capability.
-> >
-> > Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
-> > ---
-> >  accel/kvm/kvm-all.c       | 21 ++++++++++++++-------
-> >  linux-headers/linux/kvm.h |  3 +++
-> >  2 files changed, 17 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
-> > 439a4efe52..45ab25be63 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -100,7 +100,7 @@ struct KVMState
-> >      bool kernel_irqchip_required;
-> >      OnOffAuto kernel_irqchip_split;
-> >      bool sync_mmu;
-> > -    bool manual_dirty_log_protect;
-> > +    uint64_t manual_dirty_log_protect;
-> >      /* The man page (and posix) say ioctl numbers are signed int, but
-> >       * they're not.  Linux, glibc and *BSD all treat ioctl numbers as
-> >       * unsigned, and treating them as signed here can break things */
-> > @@ -1882,6 +1882,7 @@ static int kvm_init(MachineState *ms)
-> >      int ret;
-> >      int type = 0;
-> >      const char *kvm_type;
-> > +    uint64_t dirty_log_manual_caps;
-> >
-> >      s = KVM_STATE(ms->accelerator);
-> >
-> > @@ -2007,14 +2008,20 @@ static int kvm_init(MachineState *ms)
-> >      s->coalesced_pio = s->coalesced_mmio &&
-> >                         kvm_check_extension(s,
-> KVM_CAP_COALESCED_PIO);
-> >
-> > -    s->manual_dirty_log_protect =
-> > +    dirty_log_manual_caps =
-> >          kvm_check_extension(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-> > -    if (s->manual_dirty_log_protect) {
-> > -        ret = kvm_vm_enable_cap(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
-> > +    dirty_log_manual_caps &=
-> (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
-> > +                              KVM_DIRTY_LOG_INITIALLY_SET);
-> > +    s->manual_dirty_log_protect = dirty_log_manual_caps;
-> > +    if (dirty_log_manual_caps) {
-> > +        ret = kvm_vm_enable_cap(s,
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0,
-> > +                                   dirty_log_manual_caps);
-> >          if (ret) {
-> > -            warn_report("Trying to enable
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
-> > -                        "but failed.  Falling back to the legacy mode. ");
-> > -            s->manual_dirty_log_protect = false;
-> > +            warn_report("Trying to enable capability %"PRIu64" of "
-> > +                        "KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2
-> but failed. "
-> > +                        "Falling back to the legacy mode. ",
-> > +                        dirty_log_manual_caps);
-> > +            s->manual_dirty_log_protect = 0;
-> >          }
-> >      }
-> >
-> > diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> > index 265099100e..3cb71c2b19 100644
-> > --- a/linux-headers/linux/kvm.h
-> > +++ b/linux-headers/linux/kvm.h
-> > @@ -1628,4 +1628,7 @@ struct kvm_hyperv_eventfd {
-> >  #define KVM_HYPERV_CONN_ID_MASK		0x00ffffff
-> >  #define KVM_HYPERV_EVENTFD_DEASSIGN	(1 << 0)
-> >
-> > +#define KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE    (1 << 0)
-> > +#define KVM_DIRTY_LOG_INITIALLY_SET            (1 << 1)
-> > +
-> >  #endif /* __LINUX_KVM_H */
-> >
-> 
-> Queued, thanks.
-> 
+Some CPUs can speculate past an ERET instruction and potentially perform
+speculative accesses to memory before processing the exception return.
+Since the register state is often controlled by a lower privilege level
+at the point of an ERET, this could potentially be used as part of a
+side-channel attack.
 
-Hi Paolo,
+This patch emits an SB sequence after each ERET so that speculation is
+held up on exception return.
 
-It seems that this patch isn't included in your last pull request...
-If there's something else to be done, please let me know.
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+[florian: Adjust hyp-entry.S to account for the label]
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+---
+Will,
 
-Regards,
-Jay Zhou
+Can you confirm that for 4.9 these are the only places that require
+patching? Thank you!
+
+ arch/arm64/kernel/entry.S      | 2 ++
+ arch/arm64/kvm/hyp/entry.S     | 1 +
+ arch/arm64/kvm/hyp/hyp-entry.S | 4 ++++
+ 3 files changed, 7 insertions(+)
+
+diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+index ca978d7d98eb..3408c782702c 100644
+--- a/arch/arm64/kernel/entry.S
++++ b/arch/arm64/kernel/entry.S
+@@ -255,6 +255,7 @@ alternative_insn eret, nop, ARM64_UNMAP_KERNEL_AT_EL0
+ 	.else
+ 	eret
+ 	.endif
++	sb
+ 	.endm
+ 
+ 	.macro	get_thread_info, rd
+@@ -945,6 +946,7 @@ __ni_sys_trace:
+ 	mrs	x30, far_el1
+ 	.endif
+ 	eret
++	sb
+ 	.endm
+ 
+ 	.align	11
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index a360ac6e89e9..bc5c6cdb8538 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -83,6 +83,7 @@ ENTRY(__guest_enter)
+ 
+ 	// Do not touch any register after this!
+ 	eret
++	sb
+ ENDPROC(__guest_enter)
+ 
+ ENTRY(__guest_exit)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index bf4988f9dae8..3675e7f0ab72 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -97,6 +97,7 @@ el1_sync:				// Guest trapped into EL2
+ 	do_el2_call
+ 
+ 2:	eret
++	sb
+ 
+ el1_hvc_guest:
+ 	/*
+@@ -147,6 +148,7 @@ wa_epilogue:
+ 	mov	x0, xzr
+ 	add	sp, sp, #16
+ 	eret
++	sb
+ 
+ el1_trap:
+ 	get_vcpu_ptr	x1, x0
+@@ -198,6 +200,7 @@ el2_error:
+ 	b.ne	__hyp_panic
+ 	mov	x0, #(1 << ARM_EXIT_WITH_SERROR_BIT)
+ 	eret
++	sb
+ 
+ ENTRY(__hyp_do_panic)
+ 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+@@ -206,6 +209,7 @@ ENTRY(__hyp_do_panic)
+ 	ldr	lr, =panic
+ 	msr	elr_el2, lr
+ 	eret
++	sb
+ ENDPROC(__hyp_do_panic)
+ 
+ ENTRY(__hyp_panic)
+-- 
+2.17.1
+
