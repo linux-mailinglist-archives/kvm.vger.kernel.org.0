@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE8DF1F81AD
-	for <lists+kvm@lfdr.de>; Sat, 13 Jun 2020 10:12:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41E221F8234
+	for <lists+kvm@lfdr.de>; Sat, 13 Jun 2020 11:15:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726625AbgFMILv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Jun 2020 04:11:51 -0400
-Received: from mga07.intel.com ([134.134.136.100]:64611 "EHLO mga07.intel.com"
+        id S1726403AbgFMJPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Jun 2020 05:15:09 -0400
+Received: from mga03.intel.com ([134.134.136.65]:1528 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726607AbgFMILq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Jun 2020 04:11:46 -0400
-IronPort-SDR: lQwCqyn4kQwcLC+TU9yj/VMROTP5o0MRNprS+/xWCXOD0ebQaYQ+qd3+5Kd5N+2P0viY0g122v
- KYBCuUG4oPsw==
+        id S1726314AbgFMJPE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Jun 2020 05:15:04 -0400
+IronPort-SDR: Gyv6Nlf2DiVbZiQZtdNNdFqQ81RMdz4Lrc61z6mEt6CBwLdJ+D+qURWNoLVFFKbQIoggAqk056
+ WRYFoTdUx4aA==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2020 01:11:45 -0700
-IronPort-SDR: AK6qlJLtROluxcMsH4ncP5Bzl2ypOMmN2KFrcBhDfVHb8eHrTJd83OdsFQD10TmzWoJ06oh5md
- h891sxQCa/SQ==
-X-ExtLoop1: 1
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2020 02:15:03 -0700
+IronPort-SDR: pVhOY4l/eHdUJ4CPn9ZvbJGmQMP3bq1FGAlZr0mKMSQJ/9N8WlRsFdNEafge4fIkxjRgPB74Uw
+ QxZf/jfwLTzQ==
 X-IronPort-AV: E=Sophos;i="5.73,506,1583222400"; 
-   d="scan'208";a="474467502"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by fmsmga006.fm.intel.com with ESMTP; 13 Jun 2020 01:11:41 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+   d="scan'208";a="448588271"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.172.45]) ([10.249.172.45])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2020 02:15:00 -0700
+Subject: Re: [PATCH v12 07/11] KVM: vmx/pmu: Unmask LBR fields in the
+ MSR_IA32_DEBUGCTLMSR emualtion
+To:     Like Xu <like.xu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Peter Zijlstra <peterz@infradead.org>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -33,179 +34,160 @@ Cc:     Peter Zijlstra <peterz@infradead.org>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
         wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Like Xu <like.xu@linux.intel.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
-Subject: [Qemu-devel] [PATCH 2/2] target/i386: add -cpu,lbr=true support to enable guest LBR
-Date:   Sat, 13 Jun 2020 16:09:58 +0800
-Message-Id: <20200613080958.132489-14-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200613080958.132489-1-like.xu@linux.intel.com>
+        kvm@vger.kernel.org
 References: <20200613080958.132489-1-like.xu@linux.intel.com>
+ <20200613080958.132489-8-like.xu@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <654d931c-a724-ed69-6501-52ce195a6f44@intel.com>
+Date:   Sat, 13 Jun 2020 17:14:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200613080958.132489-8-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The LBR feature would be enabled on the guest if:
-- the KVM is enabled and the PMU is enabled and,
-- the msr-based-feature IA32_PERF_CAPABILITIES is supporterd and,
-- the supported returned value for lbr_fmt from this msr is not zero.
+On 6/13/2020 4:09 PM, Like Xu wrote:
+> When the LBR feature is reported by the vmx_get_perf_capabilities(),
+> the LBR fields in the [vmx|vcpu]_supported debugctl should be unmasked.
+> 
+> The debugctl msr is handled separately in vmx/svm and they're not
+> completely identical, hence remove the common msr handling code.
+> 
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>   arch/x86/kvm/vmx/capabilities.h | 12 ++++++++++++
+>   arch/x86/kvm/vmx/pmu_intel.c    | 19 +++++++++++++++++++
+>   arch/x86/kvm/x86.c              | 13 -------------
+>   3 files changed, 31 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index b633a90320ee..f6fcfabb1026 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -21,6 +21,8 @@ extern int __read_mostly pt_mode;
+>   #define PMU_CAP_FW_WRITES	(1ULL << 13)
+>   #define PMU_CAP_LBR_FMT		0x3f
+>   
+> +#define DEBUGCTLMSR_LBR_MASK		(DEBUGCTLMSR_LBR | DEBUGCTLMSR_FREEZE_LBRS_ON_PMI)
+> +
+>   struct nested_vmx_msrs {
+>   	/*
+>   	 * We only store the "true" versions of the VMX capability MSRs. We
+> @@ -387,4 +389,14 @@ static inline u64 vmx_get_perf_capabilities(void)
+>   	return perf_cap;
+>   }
+>   
+> +static inline u64 vmx_get_supported_debugctl(void)
+> +{
+> +	u64 val = 0;
+> +
+> +	if (vmx_get_perf_capabilities() & PMU_CAP_LBR_FMT)
+> +		val |= DEBUGCTLMSR_LBR_MASK;
+> +
+> +	return val;
+> +}
+> +
+>   #endif /* __KVM_X86_VMX_CAPS_H */
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index a953c7d633f6..d92e95b64c74 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -187,6 +187,7 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>   	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+>   		ret = pmu->version > 1;
+>   		break;
+> +	case MSR_IA32_DEBUGCTLMSR:
+>   	case MSR_IA32_PERF_CAPABILITIES:
+>   		ret = 1;
+>   		break;
+> @@ -237,6 +238,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			return 1;
+>   		msr_info->data = vcpu->arch.perf_capabilities;
+>   		return 0;
+> +	case MSR_IA32_DEBUGCTLMSR:
+> +		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
 
-The LBR feature would be disabled on the guest if:
-- the msr-based-feature IA32_PERF_CAPABILITIES is unsupporterd OR,
-- qemu set the IA32_PERF_CAPABILITIES msr feature without lbr_fmt values OR,
-- the requested guest vcpu model doesn't support PDCM.
+Can we put the emulation of MSR_IA32_DEBUGCTLMSR in 
+vmx_{get/set})_msr(). AFAIK, MSR_IA32_DEBUGCTLMSR is not a pure PMU 
+related MSR that there is bit 2 to enable #DB for bus lock.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- hw/i386/pc.c      |  1 +
- target/i386/cpu.c | 25 +++++++++++++++++++++++--
- target/i386/cpu.h |  2 ++
- target/i386/kvm.c |  7 ++++++-
- 4 files changed, 32 insertions(+), 3 deletions(-)
+> +		return 0;
+>   	default:
+>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> @@ -282,6 +286,16 @@ static inline bool lbr_is_compatible(struct kvm_vcpu *vcpu)
+>   	return true;
+>   }
+>   
+> +static inline u64 vcpu_get_supported_debugctl(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 debugctlmsr = vmx_get_supported_debugctl();
+> +
+> +	if (!lbr_is_enabled(vcpu))
+> +		debugctlmsr &= ~DEBUGCTLMSR_LBR_MASK;
+> +
+> +	return debugctlmsr;
+> +}
+> +
+>   static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   {
+>   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> @@ -336,6 +350,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		}
+>   		vcpu->arch.perf_capabilities = data;
+>   		return 0;
+> +	case MSR_IA32_DEBUGCTLMSR:
+> +		if (data & ~vcpu_get_supported_debugctl(vcpu))
+> +			return 1;
+> +		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> +		return 0;
+>   	default:
+>   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 00c88c2f34e4..56f275eb4554 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2840,18 +2840,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			return 1;
+>   		}
+>   		break;
+> -	case MSR_IA32_DEBUGCTLMSR:
+> -		if (!data) {
+> -			/* We support the non-activated case already */
+> -			break;
+> -		} else if (data & ~(DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF)) {
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2128f3d6fe..8d8d42a8ea 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -316,6 +316,7 @@ GlobalProperty pc_compat_1_5[] = {
-     { "Nehalem-" TYPE_X86_CPU, "min-level", "2" },
-     { "virtio-net-pci", "any_layout", "off" },
-     { TYPE_X86_CPU, "pmu", "on" },
-+    { TYPE_X86_CPU, "lbr", "on" },
-     { "i440FX-pcihost", "short_root_bus", "0" },
-     { "q35-pcihost", "short_root_bus", "0" },
- };
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index e47c9d1604..262a2595fa 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1142,8 +1142,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-     [FEAT_PERF_CAPABILITIES] = {
-         .type = MSR_FEATURE_WORD,
-         .feat_names = {
--            NULL, NULL, NULL, NULL,
--            NULL, NULL, NULL, NULL,
-+            "lbr-fmt-bit-0", "lbr-fmt-bit-1", "lbr-fmt-bit-2", "lbr-fmt-bit-3",
-+            "lbr-fmt-bit-4", "lbr-fmt-bit-5", NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, "full-width-write", NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -4187,6 +4187,13 @@ static bool lmce_supported(void)
-     return !!(mce_cap & MCG_LMCE_P);
- }
- 
-+static inline bool lbr_supported(void)
-+{
-+    return kvm_enabled() && (PERF_CAP_LBR_FMT &
-+        kvm_arch_get_supported_msr_feature(kvm_state,
-+                                           MSR_IA32_PERF_CAPABILITIES));
-+}
-+
- #define CPUID_MODEL_ID_SZ 48
- 
- /**
-@@ -4290,6 +4297,9 @@ static void max_x86_cpu_initfn(Object *obj)
-     }
- 
-     object_property_set_bool(OBJECT(cpu), true, "pmu", &error_abort);
-+    if (lbr_supported()) {
-+        object_property_set_bool(OBJECT(cpu), true, "lbr", &error_abort);
-+    }
- }
- 
- static const TypeInfo max_x86_cpu_type_info = {
-@@ -5510,6 +5520,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         }
-         if (!cpu->enable_pmu) {
-             *ecx &= ~CPUID_EXT_PDCM;
-+            if (cpu->enable_lbr) {
-+                warn_report("LBR is unsupported since guest PMU is disabled.");
-+                exit(1);
-+            }
-         }
-         break;
-     case 2:
-@@ -6528,6 +6542,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         }
-     }
- 
-+    if (!cpu->max_features && cpu->enable_lbr &&
-+        !(env->features[FEAT_1_ECX] & CPUID_EXT_PDCM)) {
-+        warn_report("requested vcpu model doesn't support PDCM for LBR.");
-+        exit(1);
-+    }
-+
-     if (cpu->ucode_rev == 0) {
-         /* The default is the same as KVM's.  */
-         if (IS_AMD_CPU(env)) {
-@@ -7165,6 +7185,7 @@ static Property x86_cpu_properties[] = {
- #endif
-     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-+    DEFINE_PROP_BOOL("lbr", X86CPU, enable_lbr, false),
- 
-     DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
-                        HYPERV_SPINLOCK_NEVER_RETRY),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index fad2f874bd..e5f65e9b0c 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -357,6 +357,7 @@ typedef enum X86Seg {
- #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
- 
- #define MSR_IA32_PERF_CAPABILITIES      0x345
-+#define PERF_CAP_LBR_FMT      0x3f
- 
- #define MSR_IA32_TSX_CTRL		0x122
- #define MSR_IA32_TSCDEADLINE            0x6e0
-@@ -1686,6 +1687,7 @@ struct X86CPU {
-      * capabilities) directly to the guest.
-      */
-     bool enable_pmu;
-+    bool enable_lbr;
- 
-     /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
-      * disabled by default to avoid breaking migration between QEMU with
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 9be6f76b2c..524ae86b0c 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2652,8 +2652,10 @@ static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
-     uint64_t kvm_perf_cap =
-         kvm_arch_get_supported_msr_feature(kvm_state,
-                                            MSR_IA32_PERF_CAPABILITIES);
--
-     if (kvm_perf_cap) {
-+        if (!cpu->enable_lbr) {
-+            kvm_perf_cap &= ~PERF_CAP_LBR_FMT;
-+        }
-         kvm_msr_entry_add(cpu, MSR_IA32_PERF_CAPABILITIES,
-                         kvm_perf_cap & f[FEAT_PERF_CAPABILITIES]);
-     }
-@@ -2693,6 +2695,9 @@ static void kvm_init_msrs(X86CPU *cpu)
- 
-     if (has_msr_perf_capabs && cpu->enable_pmu) {
-         kvm_msr_entry_add_perf(cpu, env->features);
-+    } else if (!has_msr_perf_capabs && cpu->enable_lbr) {
-+        warn_report("host doesn't support MSR_IA32_PERF_CAPABILITIES for LBR.");
-+        exit(1);
-     }
- 
-     if (has_msr_ucode_rev) {
--- 
-2.21.3
+So after this patch, guest trying to set bit DEBUGCTLMSR_BTF will get a 
+#GP instead of being ignored and printing a log in kernel.
+
+These codes were introduced ~12 years ago in commit b5e2fec0ebc3 ("KVM: 
+Ignore DEBUGCTL MSRs with no effect"), just to make Netware happy. Maybe 
+I'm overthinking for that too old thing.
+
+> -			/* Values other than LBR and BTF are vendor-specific,
+> -			   thus reserved and should throw a #GP */
+> -			return 1;
+> -		}
+> -		vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
+> -			    __func__, data);
+> -		break;
+>   	case 0x200 ... 0x2ff:
+>   		return kvm_mtrr_set_msr(vcpu, msr, data);
+>   	case MSR_IA32_APICBASE:
+> @@ -3120,7 +3108,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	switch (msr_info->index) {
+>   	case MSR_IA32_PLATFORM_ID:
+>   	case MSR_IA32_EBL_CR_POWERON:
+> -	case MSR_IA32_DEBUGCTLMSR:
+>   	case MSR_IA32_LASTBRANCHFROMIP:
+>   	case MSR_IA32_LASTBRANCHTOIP:
+>   	case MSR_IA32_LASTINTFROMIP:
+> 
 
