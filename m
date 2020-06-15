@@ -2,355 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F058B1F9380
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 11:32:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EEE01F9391
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 11:34:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729372AbgFOJcT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 05:32:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29542 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729297AbgFOJcO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Jun 2020 05:32:14 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05F84OTe006268;
-        Mon, 15 Jun 2020 05:32:12 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31p54p2gx1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Jun 2020 05:32:12 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05F9NbeK074512;
-        Mon, 15 Jun 2020 05:32:12 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31p54p2gvy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Jun 2020 05:32:12 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05F9L47T024518;
-        Mon, 15 Jun 2020 09:32:10 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04fra.de.ibm.com with ESMTP id 31mpe81age-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Jun 2020 09:32:10 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05F9Uool57278832
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Jun 2020 09:30:50 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4E9A52054;
-        Mon, 15 Jun 2020 09:32:07 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.1.141])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7AA1852069;
-        Mon, 15 Jun 2020 09:32:07 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v9 12/12] s390x: css: ssch/tsch with sense and interrupt
-Date:   Mon, 15 Jun 2020 11:32:01 +0200
-Message-Id: <1592213521-19390-13-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-15_01:2020-06-15,2020-06-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 clxscore=1015 cotscore=-2147483648 mlxscore=0
- mlxlogscore=999 impostorscore=0 lowpriorityscore=0 adultscore=0
- malwarescore=0 suspectscore=1 bulkscore=0 spamscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006150066
+        id S1729019AbgFOJel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 05:34:41 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57500 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728815AbgFOJel (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Jun 2020 05:34:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592213679;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+        bh=4Elhn4wrtO2ovR5dMkJU9uEDf1eDXOaakbyPO9IWdAA=;
+        b=WdtzFO9CwhTAEESiLNnU8gjpaYlHWkvGq2diqhXwhyy3xz9cuiVB+ZoMvYszhmD7GAUxdN
+        fuPeRmxzAunfW2OwxcvK+zgfi+kCyAZiBAqksF0W3edkjSeKeampLpTfdiZF2xeVXBxK4v
+        DbJ+WA5A3H/Aeed6x6nLY9gWiDEdGIY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-7vZEEnZfNzGUOOrr9UnW5Q-1; Mon, 15 Jun 2020 05:34:36 -0400
+X-MC-Unique: 7vZEEnZfNzGUOOrr9UnW5Q-1
+Received: by mail-wr1-f71.google.com with SMTP id c14so6759019wrw.11
+        for <kvm@vger.kernel.org>; Mon, 15 Jun 2020 02:34:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:user-agent:reply-to:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=4Elhn4wrtO2ovR5dMkJU9uEDf1eDXOaakbyPO9IWdAA=;
+        b=hXE7CSjk7Ee8W4d8mwSk9qJ93lDjbw9NFLMYTexM+7tb5pfYjCmb3x5iuDCmOqSICX
+         t+qNBZ631BwmCI3HKXmv1LEOxxXYlK6fKkHGPWWdlP7q4qOC2YvXokYCmzZMRFz5OAkV
+         80gsR2L444I8RXjWvcBNkdJsrnhas4/ti4qTB5inVkCtkm8ZVTYnr3Z+QsI9dpAmxgSZ
+         8OjndKXibarAzBgddz5HAz1p/Tf4tY1yb+tpLSvJPjoGu01fmJKX2rKSTdyA9MsuHv8z
+         skIL0eZAHW1c9EeJStj1TZHYzuEMlDYdXWw/4VURXiPmDKbAmZQrevHKTTIWUdWQoPNN
+         /fUQ==
+X-Gm-Message-State: AOAM531xbvzbGDnA73+/iZ+WYPH/rm0k+JdiPnJbm9ZDnZABLLyLnuDD
+        eRE8GIKNcqFc6OAo3rEvEQ2tW7lcHdgwVM5s6Ss7bUZA8SpyaC5cxKM681d9POEGPyAMshwiGC3
+        Xlmpu6s8wMYxN
+X-Received: by 2002:a5d:4a89:: with SMTP id o9mr26902041wrq.267.1592213674726;
+        Mon, 15 Jun 2020 02:34:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzlQwEtuJ6/6s6fadiHz23evnmnX6dhxzpjz205rdtzVbyaYCQccaL5YpIMr01GpJNwbmyNZQ==
+X-Received: by 2002:a5d:4a89:: with SMTP id o9mr26902022wrq.267.1592213674487;
+        Mon, 15 Jun 2020 02:34:34 -0700 (PDT)
+Received: from localhost (trasno.trasno.org. [83.165.45.250])
+        by smtp.gmail.com with ESMTPSA id y37sm26829970wrd.55.2020.06.15.02.34.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2020 02:34:33 -0700 (PDT)
+From:   Juan Quintela <quintela@redhat.com>
+To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
+Subject: KVM call for 2016-06-16
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Reply-To: quintela@redhat.com
+Date:   Mon, 15 Jun 2020 11:34:32 +0200
+Message-ID: <87wo48n047.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After a channel is enabled we start a SENSE_ID command using
-the SSCH instruction to recognize the control unit and device.
 
-This tests the success of SSCH, the I/O interruption and the TSCH
-instructions.
+Hi
 
-The SENSE_ID command response is tested to report 0xff inside
-its reserved field and to report the same control unit type
-as the cu_type kernel argument.
+Please, send any topic that you are interested in covering.
+There is already a topic from last call:
 
-Without the cu_type kernel argument, the test expects a device
-with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
+Last minute suggestion after recent IRC chat with Alex Benn=C3=A9e and
+Thomas Huth:
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/css.h     |  20 +++++++
- lib/s390x/css_lib.c |  46 +++++++++++++++
- s390x/css.c         | 140 +++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 205 insertions(+), 1 deletion(-)
+"Move some of the build/CI infrastructure to GitLab."
 
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 0ddceb1..3091d63 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -100,6 +100,19 @@ struct irb {
- 	uint32_t emw[8];
- } __attribute__ ((aligned(4)));
- 
-+#define CCW_CMD_SENSE_ID	0xe4
-+#define CSS_SENSEID_COMMON_LEN	8
-+struct senseid {
-+	/* common part */
-+	uint8_t reserved;        /* always 0x'FF' */
-+	uint16_t cu_type;        /* control unit type */
-+	uint8_t cu_model;        /* control unit model */
-+	uint16_t dev_type;       /* device type */
-+	uint8_t dev_model;       /* device model */
-+	uint8_t unused;          /* padding byte */
-+	uint8_t padding[256 - 10]; /* Extra padding for CCW */
-+} __attribute__ ((aligned(4))) __attribute__ ((packed));
-+
- /* CSS low level access functions */
- 
- static inline int ssch(unsigned long schid, struct orb *addr)
-@@ -253,4 +266,11 @@ int css_enumerate(void);
- #define MAX_ENABLE_RETRIES      5
- int css_enable(int schid);
- 
-+
-+/* Library functions */
-+int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw);
-+int start_subchannel(unsigned int sid, int code, void *data, int count,
-+		     unsigned char flags);
-+int sch_read_len(int sid);
-+
- #endif
-diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-index 06a76db..c3d93d3 100644
---- a/lib/s390x/css_lib.c
-+++ b/lib/s390x/css_lib.c
-@@ -128,3 +128,49 @@ retry:
- 		    schid, retry_count, pmcw->flags);
- 	return -1;
- }
-+
-+int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
-+{
-+	struct orb orb = {
-+		.intparm = sid,
-+		.ctrl = ORB_CTRL_ISIC|ORB_CTRL_FMT|ORB_LPM_DFLT,
-+		.cpa = (unsigned int) (unsigned long)ccw,
-+	};
-+
-+	return ssch(sid, &orb);
-+}
-+
-+/*
-+ * In the next revisions we will implement the possibility to handle
-+ * CCW chains doing this we will need to work with ccw1 pointers.
-+ * For now we only need a unique CCW.
-+ */
-+static struct ccw1 unique_ccw;
-+
-+int start_subchannel(unsigned int sid, int code, void *data, int count,
-+		     unsigned char flags)
-+{
-+	int cc;
-+	struct ccw1 *ccw = &unique_ccw;
-+
-+	report_prefix_push("start_subchannel");
-+	/* Build the CCW chain with a single CCW */
-+	ccw->code = code;
-+	ccw->flags = flags; /* No flags need to be set */
-+	ccw->count = count;
-+	ccw->data_address = (int)(unsigned long)data;
-+
-+	cc = start_ccw1_chain(sid, ccw);
-+	if (cc) {
-+		report(0, "start_ccw_chain failed ret=%d", cc);
-+		report_prefix_pop();
-+		return cc;
-+	}
-+	report_prefix_pop();
-+	return 0;
-+}
-+
-+int sch_read_len(int sid)
-+{
-+	return unique_ccw.count;
-+}
-diff --git a/s390x/css.c b/s390x/css.c
-index 6948d73..6b618a1 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -16,10 +16,18 @@
- #include <string.h>
- #include <interrupt.h>
- #include <asm/arch_def.h>
-+#include <kernel-args.h>
- 
- #include <css.h>
- 
-+#define DEFAULT_CU_TYPE		0x3832
-+static unsigned long cu_type = DEFAULT_CU_TYPE;
-+
-+struct lowcore *lowcore = (void *)0x0;
-+
- static int test_device_sid;
-+static struct irb irb;
-+static struct senseid senseid;
- 
- static void test_enumerate(void)
- {
-@@ -45,20 +53,150 @@ static void test_enable(void)
- 	report(cc == 0, "Enable subchannel %08x", test_device_sid);
- }
- 
-+static void enable_io_isc(void)
-+{
-+	/* Let's enable all ISCs for I/O interrupt */
-+	lctlg(6, 0x00000000ff000000);
-+}
-+
-+static void irq_io(void)
-+{
-+	int ret = 0;
-+	char *flags;
-+	int sid;
-+
-+	report_prefix_push("Interrupt");
-+	/* Lowlevel set the SID as interrupt parameter. */
-+	if (lowcore->io_int_param != test_device_sid) {
-+		report(0,
-+		       "Bad io_int_param: %x expected %x",
-+		       lowcore->io_int_param, test_device_sid);
-+		goto pop;
-+	}
-+	report_prefix_pop();
-+
-+	report_prefix_push("tsch");
-+	sid = lowcore->subsys_id_word;
-+	ret = tsch(sid, &irb);
-+	switch (ret) {
-+	case 1:
-+		dump_irb(&irb);
-+		flags = dump_scsw_flags(irb.scsw.ctrl);
-+		report(0,
-+		       "I/O interrupt, CC 1 but tsch reporting sch %08x as not status pending: %s",
-+		       sid, flags);
-+		break;
-+	case 2:
-+		report(0, "tsch returns unexpected CC 2");
-+		break;
-+	case 3:
-+		report(0, "tsch reporting sch %08x as not operational", sid);
-+		break;
-+	case 0:
-+		/* Stay humble on success */
-+		break;
-+	}
-+pop:
-+	report_prefix_pop();
-+	lowcore->io_old_psw.mask &= ~PSW_MASK_WAIT;
-+}
-+
-+/*
-+ * test_sense
-+ * Pre-requisits:
-+ * - We need the test device as the first recognized
-+ *   device by the enumeration.
-+ */
-+static void test_sense(void)
-+{
-+	int ret;
-+
-+	if (!test_device_sid) {
-+		report_skip("No device");
-+		return;
-+	}
-+
-+	ret = css_enable(test_device_sid);
-+	if (ret) {
-+		report(0,
-+		       "Could not enable the subchannel: %08x",
-+		       test_device_sid);
-+		return;
-+	}
-+
-+	ret = register_io_int_func(irq_io);
-+	if (ret) {
-+		report(0, "Could not register IRQ handler");
-+		goto unreg_cb;
-+	}
-+
-+	lowcore->io_int_param = 0;
-+
-+	memset(&senseid, 0, sizeof(senseid));
-+	ret = start_subchannel(test_device_sid, CCW_CMD_SENSE_ID,
-+			       &senseid, sizeof(senseid), CCW_F_SLI);
-+	if (ret) {
-+		report(0, "ssch failed for SENSE ID on sch %08x with cc %d",
-+		       test_device_sid, ret);
-+		goto unreg_cb;
-+	}
-+
-+	wait_for_interrupt(PSW_MASK_IO);
-+
-+	ret = sch_read_len(test_device_sid);
-+	if (ret < CSS_SENSEID_COMMON_LEN) {
-+		report(0,
-+		       "ssch succeeded for SENSE ID but report a too short length: %d",
-+		       ret);
-+		goto unreg_cb;
-+	}
-+
-+	if (senseid.reserved != 0xff) {
-+		report(0,
-+		       "ssch succeeded for SENSE ID but reports garbage: %x",
-+		       senseid.reserved);
-+		goto unreg_cb;
-+	}
-+
-+	if (lowcore->io_int_param != test_device_sid)
-+		goto unreg_cb;
-+
-+	report_info("senseid length read: %d", ret);
-+	report_info("reserved %02x cu_type %04x cu_model %02x dev_type %04x dev_model %02x",
-+		    senseid.reserved, senseid.cu_type, senseid.cu_model,
-+		    senseid.dev_type, senseid.dev_model);
-+
-+	report(senseid.cu_type == cu_type, "cu_type: expect 0x%04x got 0x%04x",
-+	       (uint16_t) cu_type, senseid.cu_type);
-+
-+unreg_cb:
-+	unregister_io_int_func(irq_io);
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
- } tests[] = {
- 	{ "enumerate (stsch)", test_enumerate },
- 	{ "enable (msch)", test_enable },
-+	{ "sense (ssch/tsch)", test_sense },
- 	{ NULL, NULL }
- };
- 
-+static unsigned long value;
-+
- int main(int argc, char *argv[])
- {
--	int i;
-+	int i, ret;
-+
-+	ret = kernel_arg(argc, argv, "cu_type=", &value);
-+	if (!ret)
-+		cu_type = (uint16_t)value;
-+	else
-+		report_info("Using cu_type default value: 0x%04lx", cu_type);
- 
- 	report_prefix_push("Channel Subsystem");
-+	enable_io_isc();
- 	for (i = 0; tests[i].name; i++) {
- 		report_prefix_push(tests[i].name);
- 		tests[i].func();
--- 
-2.25.1
+Pro/Con?
+
+ - GitLab does not offer s390x/ppc64el =3D> keep Travis for these?
+
+How to coordinate efforts?
+
+What we want to improve? Priorities?
+
+Who can do which task / is motivated.
+
+What has bugged us recently:
+- Cross-build images (currently rebuilt all the time on Shippable)
+
+Long term interests:
+
+- Collect quality metrics
+  . build time
+  . test duration
+  . performances
+  . binary size
+  . runtime memory used
+
+- Collect code coverage
+
+Note, this is orthogonal to the "Gating CI" task Cleber is working on:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg688150.html
+
+
+
+
+At the end of Monday I will send an email with the agenda or the
+cancellation of the call, so hurry up.
+
+After discussions on the QEMU Summit, we are going to have always open a
+KVM call where you can add topics.
+
+ Call details:
+
+By popular demand, a google calendar public entry with it
+
+  https://www.google.com/calendar/embed?src=3DdG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a=
+3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+
+(Let me know if you have any problems with the calendar entry.  I just
+gave up about getting right at the same time CEST, CET, EDT and DST).
+
+If you need phone number details,  contact me privately
+
+Thanks, Juan.
 
