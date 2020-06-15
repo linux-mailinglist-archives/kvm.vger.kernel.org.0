@@ -2,101 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CA9281F965A
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 14:15:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38C171F966D
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 14:21:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730029AbgFOMPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 08:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45326 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729642AbgFOMPi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jun 2020 08:15:38 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D457C061A0E;
-        Mon, 15 Jun 2020 05:15:38 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f063c0085fbd8d4455f52fc.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:3c00:85fb:d8d4:455f:52fc])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E7BB41EC0299;
-        Mon, 15 Jun 2020 14:15:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1592223336;
+        id S1729734AbgFOMVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 08:21:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37076 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728510AbgFOMU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jun 2020 08:20:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592223658;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=IvLplpOzdVR3pvv87mkIgy3s3a9HTre37RLfwpBuQDk=;
-        b=plcRE/HT8GZ7mDZeXigYxsn/J0PdLHE1t9di7d6lkuXvUjT1Zof0zG7KP6SR3Uf+cE0Wjk
-        l3L4tt5jYOsrc+gkBhllMZbwzxaGLpqY/tkVRGFNbVQdfyJTtWZOL1+0huSI5i62Hg7vzW
-        CkJLUbF2zDsZnIDh3W8rolEcZRq2V8s=
-Date:   Mon, 15 Jun 2020 14:15:24 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Sasha Levin <sashal@kernel.org>
-Cc:     Liam Merwick <liam.merwick@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-        Brad Campbell <lists2009@fnarfbargle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] x86/cpu: Reinitialize IA32_FEAT_CTL MSR on BSP during
- wakeup
-Message-ID: <20200615121524.GH14668@zn.tnic>
-References: <20200605200728.10145-1-sean.j.christopherson@intel.com>
- <b2ac2400-dbc1-f6bc-a397-17f1ae10bd83@oracle.com>
- <20200608172921.GC8223@linux.intel.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EasL+iwudDwaX8fibQYpdgDm70QqjTjs/gR6LEEX8a0=;
+        b=RfL5Nk8J7AbVEgxFd4sDxy+0Zwl59bO188ce+ug/i7jiSYTwWg/CBODAIMvW9HqSzUiNx4
+        JRQl7XJkdqybE+svApjosqCqX6WtZjZ+r8oa2pOfENeaqhto/4i8n0Cz2th89ivJwjdhws
+        gE1CX+8dIrhaJV/snY9l54xkN4SDwFY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-lrrSCWmEMBGUDwD1wy_KAA-1; Mon, 15 Jun 2020 08:20:56 -0400
+X-MC-Unique: lrrSCWmEMBGUDwD1wy_KAA-1
+Received: by mail-wr1-f72.google.com with SMTP id t5so6960260wro.20
+        for <kvm@vger.kernel.org>; Mon, 15 Jun 2020 05:20:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=EasL+iwudDwaX8fibQYpdgDm70QqjTjs/gR6LEEX8a0=;
+        b=n5hAvkAwhBSIkDa7WI98orudev9BPFOnHHw44GAF502zK+e4WzgGXwrcJ9LtQjxhY7
+         VrLPCJjlbmJptBg/kYZb3geX+/6whoua+IDPuoSpnEROckT9zntaXJIozPhqCqR9hkNv
+         7f8Rt+72qrJpm3itsCLLGKSMhY6Z0i1F6PMGYYucdLijT+y8npvJja4McXjsovp7JFnv
+         qgCiW0MQ7DskHMkQie4BW4mXI11FLLpma9+Njb7Dm1NOct6P9H5EO0GC1qcIw2uZH3p7
+         wNiMUmrZdXJjk0kbRON8A47LAIz8RvTvfyriLVRH55fJXWBL59j49fgdK05M/Bko62QQ
+         htUA==
+X-Gm-Message-State: AOAM531tzph4eQioJtr/j6b2Xka97ry3vei885GuKAxJgvUwMBLkMY/A
+        uU5O5jRtIybFhDaMzbze4uzySrTfovJliS53dT6+LUwuLA/E5GUtHyTZdZ4PEcfRuPo6SFaFKuD
+        wE4OQqwVHNMAt
+X-Received: by 2002:a1c:7f44:: with SMTP id a65mr13508630wmd.53.1592223655346;
+        Mon, 15 Jun 2020 05:20:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJycvVgLlOpAIDjOm9FC5SXpasBxt8RV7DxdXvmAerfLLDbnhKztR199zZ/sX2GcD0DNxVfagw==
+X-Received: by 2002:a1c:7f44:: with SMTP id a65mr13508611wmd.53.1592223655098;
+        Mon, 15 Jun 2020 05:20:55 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a923:91b5:cd79:f0e8? ([2001:b07:6468:f312:a923:91b5:cd79:f0e8])
+        by smtp.gmail.com with ESMTPSA id x18sm21611222wmi.35.2020.06.15.05.20.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Jun 2020 05:20:54 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: allow TSC to differ by NTP correction bounds
+ without TSC scaling
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20200615115952.GA224592@fuller.cnet>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <646f0beb-e050-ed2f-397b-a9afa2891e4f@redhat.com>
+Date:   Mon, 15 Jun 2020 14:20:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200615115952.GA224592@fuller.cnet>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200608172921.GC8223@linux.intel.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 08, 2020 at 10:29:21AM -0700, Sean Christopherson wrote:
-> On Mon, Jun 08, 2020 at 11:12:35AM +0100, Liam Merwick wrote:
-> > On 05/06/2020 21:07, Sean Christopherson wrote:
-> > >Reinitialize IA32_FEAT_CTL on the BSP during wakeup to handle the case
-> > >where firmware doesn't initialize or save/restore across S3.  This fixes
-> > >a bug where IA32_FEAT_CTL is left uninitialized and results in VMXON
-> > >taking a #GP due to VMX not being fully enabled, i.e. breaks KVM.
-> > >
-> > >Use init_ia32_feat_ctl() to "restore" IA32_FEAT_CTL as it already deals
-> > >with the case where the MSR is locked, and because APs already redo
-> > >init_ia32_feat_ctl() during suspend by virtue of the SMP boot flow being
-> > >used to reinitialize APs upon wakeup.  Do the call in the early wakeup
-> > >flow to avoid dependencies in the syscore_ops chain, e.g. simply adding
-> > >a resume hook is not guaranteed to work, as KVM does VMXON in its own
-> > >resume hook, kvm_resume(), when KVM has active guests.
-> > >
-> > >Reported-by: Brad Campbell <lists2009@fnarfbargle.com>
-> > >Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> > >Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > >Cc: kvm@vger.kernel.org
-> > 
-> > Should it have the following tag since it fixes a commit introduced in 5.6?
-> > Cc: stable@vger.kernel.org # v5.6
+On 15/06/20 13:59, Marcelo Tosatti wrote:
+> The Linux TSC calibration procedure is subject to small variations
+> (its common to see +-1 kHz difference between reboots on a given CPU, for example).
 > 
-> It definitely warrants a backport to v5.6.  I didn't include a Cc to stable
-> because I swear I had seen an email fly by that stated an explicit Cc is
-> unnecessary/unwanted for tip-tree patches, but per a recent statement from
-> Boris it looks like I'm simply confused[*].  I'll add the Cc in v2.
+> So migrating a guest between two hosts with identical processor can fail, in case
+> of a small variation in calibrated TSC between them.
 > 
-> [*] https://lkml.kernel.org/r/20200417164752.GF7322@zn.tnic
+> Allow a conservative 250ppm error between host TSC and VM TSC frequencies,
+> rather than requiring an exact match. NTP daemon in the guest can
+> correct this difference.
+> 
+> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-Yeah, I was simply parroting what Greg has told me. Maybe he should
-finally do that script. :-P
+This is the userspace commit message.  Can you resend with a better
+commit message that actually matches what the patch does and explains
+why the userspace patch is not enough?
 
-Also, I believe Sasha's Skynet machine already does that...
+Also you should explain what happens with new userspace and old kernel.
 
-CCed both.
+Thanks,
 
--- 
-Regards/Gruss,
-    Boris.
+Paolo
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3156e25..39a6664 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1772,6 +1772,8 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
+>  
+>  	/* TSC scaling supported? */
+>  	if (!kvm_has_tsc_control) {
+> +		if (!scale)
+> +			return 0;
+>  		if (user_tsc_khz > tsc_khz) {
+>  			vcpu->arch.tsc_catchup = 1;
+>  			vcpu->arch.tsc_always_catchup = 1;
+> @@ -4473,7 +4475,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		r = -EINVAL;
+>  		user_tsc_khz = (u32)arg;
+>  
+> -		if (user_tsc_khz >= kvm_max_guest_tsc_khz)
+> +		if (kvm_has_tsc_control &&
+> +		    user_tsc_khz >= kvm_max_guest_tsc_khz)
+>  			goto out;
+>  
+>  		if (user_tsc_khz == 0)
+> 
+
