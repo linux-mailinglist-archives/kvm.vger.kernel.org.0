@@ -2,93 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFC7A1F9499
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 12:29:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C7B21F94B1
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 12:37:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729402AbgFOK2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 06:28:51 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51087 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729348AbgFOK2g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Jun 2020 06:28:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592216893;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zEwHOEUVIsuITaUIIISThUPaugqQZ5HRCgo6EY/fF24=;
-        b=A3DCyxSCl0TT4ax67W1Nq71pfR/BCeW9SZ0C9+evZsonNRvZ3drs21rIy0/k1kYclLKul6
-        ZF8FOyV+Y3yjYI1drkghafzKOyl0yfjA51HmGj9hx0/j4dzBoatizWaWugTo6xFt9MYJ1T
-        NHeT4dQTOjsNZ/1RUGuZP7icvjSvmG4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-kdsTMPT-M7CtvAaMxFD4uw-1; Mon, 15 Jun 2020 06:28:11 -0400
-X-MC-Unique: kdsTMPT-M7CtvAaMxFD4uw-1
-Received: by mail-wr1-f72.google.com with SMTP id d6so6862112wrn.1
-        for <kvm@vger.kernel.org>; Mon, 15 Jun 2020 03:28:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references
-         :user-agent:reply-to:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zEwHOEUVIsuITaUIIISThUPaugqQZ5HRCgo6EY/fF24=;
-        b=J87yTVizL55MZ1Vywe0i6v0C5zYRE0xBGD1ZB0onBSHN3zVykZ3ghLHe/LY8SKbeOE
-         5kgeTddMA1tKyMRshCfLWizJ8F9l0d+mzn0RRS25EG/4HnJpwg7mJTCnkf3EJJt3rnkp
-         zQgmyxnpU4YZmLptJC1trK/C5J1YBVc3F6ROJC1kAZRU2hlFHJ6dGLo4a18ga7y1ysnT
-         ebBOiLlgkEZts3lSaLNfY7rXYFNJsazA1nDW27u7K0CBdsNhEQUaQTNzLt5HhqhteljE
-         PEzZBG6LHyof1FqsJLCee1G9oy37ZdXM1caJlJAWdb0jsAS/t9qKyEV53Nb2nAmxPKcl
-         wD+Q==
-X-Gm-Message-State: AOAM533e/3rESM5Z7cm7oWjybZbkAxjn0jSpxV2ud7NZ6hOcdwLNzTux
-        GPdLhZniQJYcER4tekd67Ok6Ny8gbhSIFClSWSMhYKvURE3uRHUtKJVEiGUAhpcEai5l1dykjvF
-        twpSVQoluuPex
-X-Received: by 2002:a1c:4c8:: with SMTP id 191mr12057846wme.14.1592216890147;
-        Mon, 15 Jun 2020 03:28:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyXZaVM8mnYQPDv9oJ62jKk46AqV6gjiZeFq/If6XKT6ORJLONLwMgXxzSqq2qzwKUh4cH5zA==
-X-Received: by 2002:a1c:4c8:: with SMTP id 191mr12057822wme.14.1592216889906;
-        Mon, 15 Jun 2020 03:28:09 -0700 (PDT)
-Received: from localhost (trasno.trasno.org. [83.165.45.250])
-        by smtp.gmail.com with ESMTPSA id r12sm25091486wrc.22.2020.06.15.03.28.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2020 03:28:09 -0700 (PDT)
-From:   Juan Quintela <quintela@redhat.com>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-Subject: Re: KVM call for 2016-06-16
-In-Reply-To: <6324140e-8cc1-074d-8c02-ccce2f48a094@redhat.com> ("Philippe
-        =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 15 Jun 2020 11:45:17
- +0200")
-References: <87wo48n047.fsf@secure.mitica>
-        <6324140e-8cc1-074d-8c02-ccce2f48a094@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Mon, 15 Jun 2020 12:28:08 +0200
-Message-ID: <87sgewmxmv.fsf@secure.mitica>
+        id S1729381AbgFOKhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 06:37:35 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9806 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728885AbgFOKhf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Jun 2020 06:37:35 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05F9WB8k191943;
+        Mon, 15 Jun 2020 06:37:33 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31mua61uwf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Jun 2020 06:37:33 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05FAIrP7011677;
+        Mon, 15 Jun 2020 06:37:33 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31mua61uvk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Jun 2020 06:37:32 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05FATw2G015404;
+        Mon, 15 Jun 2020 10:37:30 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 31mpe83chp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Jun 2020 10:37:30 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05FAaAMr64684452
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Jun 2020 10:36:10 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 990E711C05B;
+        Mon, 15 Jun 2020 10:37:27 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A22611C05C;
+        Mon, 15 Jun 2020 10:37:27 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.56.158])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 15 Jun 2020 10:37:27 +0000 (GMT)
+Date:   Mon, 15 Jun 2020 12:37:25 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH] s390: protvirt: virtio: Refuse device without IOMMU
+Message-ID: <20200615123725.13f6a8de.pasic@linux.ibm.com>
+In-Reply-To: <a02b9f94-eb48-4ae2-0ade-a4ce26b61ad8@redhat.com>
+References: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
+        <467d5b58-b70c-1c45-4130-76b6e18c05af@redhat.com>
+        <f7eb1154-0f52-0f12-129f-2b511f5a4685@linux.ibm.com>
+        <6356ba7f-afab-75e1-05ff-4a22b88c610e@linux.ibm.com>
+        <a02b9f94-eb48-4ae2-0ade-a4ce26b61ad8@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-12_17:2020-06-12,2020-06-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
+ spamscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0
+ clxscore=1015 adultscore=0 mlxscore=0 suspectscore=0 phishscore=0
+ priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006150075
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> Hi Juan,
->
-> On 6/15/20 11:34 AM, Juan Quintela wrote:
->>=20
->> Hi
->>=20
->> Please, send any topic that you are interested in covering.
->> There is already a topic from last call:
->
-> This topic was already discussed in the last call :)
+On Mon, 15 Jun 2020 11:01:55 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-Sorry.
+> > hum, in between I found another way which seems to me much better:
+> >
+> > We already have the force_dma_unencrypted() function available which 
+> > AFAIU is what we want for encrypted memory protection and is already 
+> > used by power and x86 SEV/SME in a way that seems AFAIU compatible 
+> > with our problem.
+> >
+> > Even DMA and IOMMU are different things, I think they should be used 
+> > together in our case.
+> >
+> > What do you think?
+> >
+> > The patch would then be something like:
+> >
+> > diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> > index a977e32a88f2..53476d5bbe35 100644
+> > --- a/drivers/virtio/virtio.c
+> > +++ b/drivers/virtio/virtio.c
+> > @@ -4,6 +4,7 @@
+> >  #include <linux/virtio_config.h>
+> >  #include <linux/module.h>
+> >  #include <linux/idr.h>
+> > +#include <linux/dma-direct.h>
+> >  #include <uapi/linux/virtio_ids.h>
+> >
+> >  /* Unique numbering for virtio devices. */
+> > @@ -179,6 +180,10 @@ int virtio_finalize_features(struct virtio_device 
+> > *dev)
+> >         if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+> >                 return 0;
+> >
+> > +       if (force_dma_unencrypted(&dev->dev) &&
+> > +           !virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM))
+> > +               return -EIO;
+> > +
+> >         virtio_add_status(dev, VIRTIO_CONFIG_S_FEATURES_OK);
+> >         status = dev->config->get_status(dev);
+> >         if (!(status & VIRTIO_CONFIG_S_FEATURES_OK)) {  
+> 
+> 
+> I think this can work but need to listen from Michael
 
-My understanding from last call was that we wanted to discuss it with
-more people from more organizations.
+I don't think Christoph Hellwig will like force_dma_unencrypted()
+in virtio code:
+https://lkml.org/lkml/2020/2/20/630
 
-Later, Juan.
-
+Regards,
+Halil
