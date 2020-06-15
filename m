@@ -2,83 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF86A1F9461
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 12:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77AAB1F946B
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 12:16:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728773AbgFOKMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 06:12:38 -0400
-Received: from foss.arm.com ([217.140.110.172]:44262 "EHLO foss.arm.com"
+        id S1728428AbgFOKQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 06:16:09 -0400
+Received: from foss.arm.com ([217.140.110.172]:44328 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728368AbgFOKMi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jun 2020 06:12:38 -0400
+        id S1728368AbgFOKQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jun 2020 06:16:09 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 008481F1;
-        Mon, 15 Jun 2020 03:12:38 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 860D71F1;
+        Mon, 15 Jun 2020 03:16:08 -0700 (PDT)
 Received: from C02TD0UTHF1T.local (unknown [10.57.7.221])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0EC203F71F;
-        Mon, 15 Jun 2020 03:12:36 -0700 (PDT)
-Date:   Mon, 15 Jun 2020 11:12:34 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A7FA3F71F;
+        Mon, 15 Jun 2020 03:16:07 -0700 (PDT)
+Date:   Mon, 15 Jun 2020 11:16:05 +0100
 From:   Mark Rutland <mark.rutland@arm.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-Subject: Re: [PATCH 2/4] KVM: arm64: Allow ARM64_PTR_AUTH when ARM64_VHE=n
-Message-ID: <20200615101234.GB773@C02TD0UTHF1T.local>
+Subject: Re: [PATCH 3/4] KVM: arm64: Allow PtrAuth to be enabled from
+ userspace on non-VHE systems
+Message-ID: <20200615101605.GC773@C02TD0UTHF1T.local>
 References: <20200615081954.6233-1-maz@kernel.org>
- <20200615081954.6233-3-maz@kernel.org>
+ <20200615081954.6233-4-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200615081954.6233-3-maz@kernel.org>
+In-Reply-To: <20200615081954.6233-4-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 15, 2020 at 09:19:52AM +0100, Marc Zyngier wrote:
-> We currently prevent PtrAuth from even being built if KVM is selected,
-> but VHE isn't. It is a bit of a pointless restriction, since we also
-> check this at run time (rejecting the enabling of PtrAuth for the
-> vcpu if we're not running with VHE).
-> 
-> Just drop this apparently useless restriction.
+On Mon, Jun 15, 2020 at 09:19:53AM +0100, Marc Zyngier wrote:
+> Now that the scene is set for enabling PtrAuth on non-VHE, drop
+> the restrictions preventing userspace from enabling it.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-I can't recall exactly why we had this limitation to begin with, but
-given we now save/restore the keys in common hyp code, I don't see a
-reason to forbid this, and agree the limitation is pointless, so:
+Other than dropping the `has_vhe()` check this appears to be
+functionally equivalent and easier to follow, so:
 
 Acked-by: Mark Rutland <mark.rutland@arm.com>
 
 Mark.
 
 > ---
->  arch/arm64/Kconfig | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>  arch/arm64/kvm/reset.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
 > 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 31380da53689..d719ea9c596d 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1516,7 +1516,6 @@ menu "ARMv8.3 architectural features"
->  config ARM64_PTR_AUTH
->  	bool "Enable support for pointer authentication"
->  	default y
-> -	depends on !KVM || ARM64_VHE
->  	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
->  	# GCC 9.1 and later inserts a .note.gnu.property section note for PAC
->  	# which is only understood by binutils starting with version 2.33.1.
-> @@ -1543,8 +1542,7 @@ config ARM64_PTR_AUTH
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index d3b209023727..2a929789fe2e 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -42,6 +42,11 @@ static u32 kvm_ipa_limit;
+>  #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+>  				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
 >  
->  	  The feature is detected at runtime. If the feature is not present in
->  	  hardware it will not be advertised to userspace/KVM guest nor will it
-> -	  be enabled. However, KVM guest also require VHE mode and hence
-> -	  CONFIG_ARM64_VHE=y option to use this feature.
-> +	  be enabled.
+> +static bool system_has_full_ptr_auth(void)
+> +{
+> +	return system_supports_address_auth() && system_supports_generic_auth();
+> +}
+> +
+>  /**
+>   * kvm_arch_vm_ioctl_check_extension
+>   *
+> @@ -80,8 +85,7 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		break;
+>  	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+>  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> -		r = has_vhe() && system_supports_address_auth() &&
+> -				 system_supports_generic_auth();
+> +		r = system_has_full_ptr_auth();
+>  		break;
+>  	default:
+>  		r = 0;
+> @@ -205,19 +209,14 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
 >  
->  	  If the feature is present on the boot CPU but not on a late CPU, then
->  	  the late CPU will be parked. Also, if the boot CPU does not have
+>  static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+>  {
+> -	/* Support ptrauth only if the system supports these capabilities. */
+> -	if (!has_vhe())
+> -		return -EINVAL;
+> -
+> -	if (!system_supports_address_auth() ||
+> -	    !system_supports_generic_auth())
+> -		return -EINVAL;
+>  	/*
+>  	 * For now make sure that both address/generic pointer authentication
+> -	 * features are requested by the userspace together.
+> +	 * features are requested by the userspace together and the system
+> +	 * supports these capabilities.
+>  	 */
+>  	if (!test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
+> -	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features))
+> +	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features) ||
+> +	    !system_has_full_ptr_auth())
+>  		return -EINVAL;
+>  
+>  	vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_PTRAUTH;
 > -- 
 > 2.27.0
 > 
