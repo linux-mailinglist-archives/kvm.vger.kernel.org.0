@@ -2,152 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D5641F9430
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 12:02:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B2571F9438
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 12:03:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729557AbgFOKCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 06:02:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53024 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729415AbgFOKCS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jun 2020 06:02:18 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A63BC061A0E;
-        Mon, 15 Jun 2020 03:02:18 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id r15so14176483wmh.5;
-        Mon, 15 Jun 2020 03:02:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=08GcNeJgDJiHZoSCn55z5bT9ubYArPoNshimIgtmrxI=;
-        b=QO0pRvC2qVcMaJQ1lTSuk7HXw4jnlqpbEwCy2b7HVqADTf/GNIv4YdnBzNHVw3OIKF
-         MLsXLdpHZPMdBG6PfwTT0SFTybZXh835oquCUm3jZWE6QH0/QhDucD7SUl35TWO6e/rV
-         mmbDpBoam0NEmYWiatJfvtqstG0WOrOLAIH5oAcUkSU/pJWz7lFjNjSE6NaolLfr3pbG
-         87EkcDfgVc4XMUYzKZcUKGUSK3xEZ2eKA8JHRXDWTW65Imb84jXh5XDbArdXBC4p9Hao
-         i5lZNcj3+1DHaWTnpmE+rPhIg6sTXyGn2hnHJ5UgC+BicdM4b25DZUULNrvk6pERMvfR
-         UcbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=08GcNeJgDJiHZoSCn55z5bT9ubYArPoNshimIgtmrxI=;
-        b=mVOnwPNT6Bj339C5KQSGuLfWVFdYh+/gM/RdXV5Y1kFI6rtw6OLl6uPI5vt2cJ2F66
-         CiPQl7VLFBrgrpJo3+hrKbQ3t0ugxhDVPqiGU/+JjI3JgxUkHEGR+yDPnHhmnJnLXzX6
-         EBKA7J49PKsD431gTaunbefGpb7C6IWIjNTs1MckEPbhGrA/zfLYmMLqiiDHvfi37MNl
-         k1FTS4KI5QF9YHMJCLkxTxiAaSYqI9jEx24VETCr1A5FlIWQs9N4REqfUEEv67xivz9j
-         ITsglEFSDZ8eCpeWpdlrq70kQaxduA+SJcvuUY/wK5SxmHkjWg0LiFlsWATiHudsTPvM
-         wBfA==
-X-Gm-Message-State: AOAM531GltE4Z1wBo0EJJpkCw1PKOQzu75PjQx9/WmxDnf2Xwjh8rNIV
-        jwXx2Nj2Hx0i9spLoGs4Af0=
-X-Google-Smtp-Source: ABdhPJzWSdHeJZNPFXdicH+0DDwzdE3V7acyxzPD+oe7DXfRReDP+5v+LccZQloVMXDtKOAvZKdHbg==
-X-Received: by 2002:a1c:dc44:: with SMTP id t65mr13176902wmg.128.1592215337114;
-        Mon, 15 Jun 2020 03:02:17 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id k17sm23995217wrl.54.2020.06.15.03.02.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2020 03:02:16 -0700 (PDT)
-Date:   Mon, 15 Jun 2020 11:02:14 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, eric.auger@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, jean-philippe@linaro.org,
-        peterx@redhat.com, hao.wu@intel.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 00/15] vfio: expose virtual Shared Virtual Addressing
- to VMs
-Message-ID: <20200615100214.GC1491454@stefanha-x1.localdomain>
-References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
+        id S1729579AbgFOKD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 06:03:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:44104 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728833AbgFOKD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jun 2020 06:03:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F0E51F1;
+        Mon, 15 Jun 2020 03:03:26 -0700 (PDT)
+Received: from C02TD0UTHF1T.local (unknown [10.57.7.221])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 39CB53F71F;
+        Mon, 15 Jun 2020 03:03:25 -0700 (PDT)
+Date:   Mon, 15 Jun 2020 11:03:18 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kernel-team@android.com
+Subject: Re: [PATCH 1/4] KVM: arm64: Enable Pointer Authentication at EL2 if
+ available
+Message-ID: <20200615100318.GA773@C02TD0UTHF1T.local>
+References: <20200615081954.6233-1-maz@kernel.org>
+ <20200615081954.6233-2-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="E13BgyNx05feLLmH"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <20200615081954.6233-2-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jun 15, 2020 at 09:19:51AM +0100, Marc Zyngier wrote:
+> While initializing EL2, switch Pointer Authentication if detected
+> from EL1. We use the EL1-provided keys though.
 
---E13BgyNx05feLLmH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Perhaps "enable address authentication", to avoid confusion with
+context-switch, and since generic authentication cannot be disabled
+locally at EL2.
 
-On Thu, Jun 11, 2020 at 05:15:19AM -0700, Liu Yi L wrote:
-> Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
-> Intel platforms allows address space sharing between device DMA and
-> applications. SVA can reduce programming complexity and enhance security.
->=20
-> This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
-> guest application address space with passthru devices. This is called
-> vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
-> changes. For IOMMU and QEMU changes, they are in separate series (listed
-> in the "Related series").
->=20
-> The high-level architecture for SVA virtualization is as below, the key
-> design of vSVA support is to utilize the dual-stage IOMMU translation (
-> also known as IOMMU nesting translation) capability in host IOMMU.
->=20
->=20
->     .-------------.  .---------------------------.
->     |   vIOMMU    |  | Guest process CR3, FL only|
->     |             |  '---------------------------'
->     .----------------/
->     | PASID Entry |--- PASID cache flush -
->     '-------------'                       |
->     |             |                       V
->     |             |                CR3 in GPA
->     '-------------'
-> Guest
-> ------| Shadow |--------------------------|--------
->       v        v                          v
-> Host
->     .-------------.  .----------------------.
->     |   pIOMMU    |  | Bind FL for GVA-GPA  |
->     |             |  '----------------------'
->     .----------------/  |
->     | PASID Entry |     V (Nested xlate)
->     '----------------\.------------------------------.
->     |             |   |SL for GPA-HPA, default domain|
->     |             |   '------------------------------'
->     '-------------'
-> Where:
->  - FL =3D First level/stage one page tables
->  - SL =3D Second level/stage two page tables
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp-init.S | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+> index 6e6ed5581eed..81732177507d 100644
+> --- a/arch/arm64/kvm/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp-init.S
+> @@ -104,6 +104,17 @@ alternative_else_nop_endif
+>  	 */
+>  	mov_q	x4, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+>  CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
+> +alternative_if ARM64_HAS_ADDRESS_AUTH_ARCH
+> +	b	1f
+> +alternative_else_nop_endif
+> +alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
+> +	b	2f
+> +alternative_else_nop_endif
 
-Hi,
-Looks like an interesting feature!
+I see this is the same pattern we use in the kvm context switch, but I
+think we can use the ARM64_HAS_ADDRESS_AUTH cap instead (likewise in the
+existing code).
 
-To check I understand this feature: can applications now pass virtual
-addresses to devices instead of translating to IOVAs?
+AFAICT that won't permit mismatch given both ARM64_HAS_ADDRESS_AUTH_ARCH
+and ARM64_HAS_ADDRESS_AUTH_IMP_DEF are dealt with as
+ARM64_CPUCAP_BOOT_CPU_FEATURE.
 
-If yes, can guest applications restrict the vSVA address space so the
-device only has access to certain regions?
+> +1:
+> +	orr	x4, x4, #(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB)
+> +	orr	x4, x4, #SCTLR_ELx_ENDA
+> +	orr	x4, x4, #SCTLR_ELx_ENDB
 
-On one hand replacing IOVA translation with virtual addresses simplifies
-the application programming model, but does it give up isolation if the
-device can now access all application memory?
+Assuming we have a spare register, it would be nice if we could follow the same
+pattern as in proc.S, where we do:
+
+| ldr     x2, =SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
+|              SCTLR_ELx_ENDA | SCTLR_ELx_ENDB
+| orr     x0, x0, x2
+
+... though we could/should use mov_q rather than a load literal, here and in
+proc.S.
+
+... otherwise this looks sound to me.
 
 Thanks,
-Stefan
+Mark.
 
---E13BgyNx05feLLmH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7nRyYACgkQnKSrs4Gr
-c8it8gf/TeJTtf8ILMVekJJKiE/LzXVWGX/dqeYBMEp9fhU6QYQIgieaQ9coR+zu
-2Rk66LdmgfNDct0Yd9JsUgcBzggYCE4EXUQq2gX5+43O6KkbMKPZq9XWG3c1lorL
-dcghm6bL66QtyXtTuirc4PLDyXHQXrSFE1XyCqb1LI4ZJ06ixoayWLvG1Y+OhaE6
-QsTzNbo5RhADYG+l5U40nTXoQu4sr/7oPK3fBT5BI8/iTGgVnb43tHBTLtxxMPXS
-h8S8N0eJpXdfudpdp7YMUu9crttpDcTvtWIRQm2gLVpF+t95Dh1RKtntiKPfNTzz
-dlmLpMC5acu6JEAimAswW5t7IYqzfQ==
-=zQiU
------END PGP SIGNATURE-----
-
---E13BgyNx05feLLmH--
+> +2:
+>  	msr	sctlr_el2, x4
+>  	isb
+>  
+> -- 
+> 2.27.0
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
