@@ -2,73 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F1BA1F92C2
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 11:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E5891F92D4
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 11:09:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729251AbgFOJII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 05:08:08 -0400
-Received: from sonic304-56.consmr.mail.bf2.yahoo.com ([74.6.128.31]:36229 "EHLO
-        sonic304-56.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728953AbgFOJIH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Jun 2020 05:08:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1592212086; bh=NajTNMrfMLb6UXcjRhYpYerQX8PtVBLz0oFgaMINSWY=; h=Date:From:Reply-To:Subject:References:From:Subject; b=fJwHrABtjVer10c5B7UIB6m2/JKOgeznMU1v29ABl8wS3QU6WDbRMl0Cm4YiyqqvHapGNHDS7FadxhetbgDwZBsbjCKNBWL2aLNWgTF8IwiHQMWiKPqBohVKttR5NqTbbIsM9G8YxXCeLROzihNh3P/MCCMTMHM3lG30nyCPQuB5Ji83QB8BZleY7zToqZwV/98D/Z582qpWRy7Cxxgf6hwK7LSlfgRx1y5b2ciwk/S6uOnGSBNxXbIRXmQf/BVL85n4fn0U1AS3CHXa+zJLDQ3l2MGcldrbjpTBVvG2QXF4/zuq/vsk4HCtPrXnXT23oXyDkIdOdp3l8+KK16LL7w==
-X-YMail-OSG: mOksHJYVM1nLYKD.HqFcgYc3shNTGSaThlWgsl6qtdgx7_Fl56VVMcUvobnNd_w
- Gdjsxe8XgYv6YtOFKcRqhP3Gdmzt4uvHiu7hLZQpSYaVHLLuwQhjBAZpGUixBXKGp2oxpmmrUcsW
- CpTMlhohBdTWRoosow3rm9npfS7kx1nDCFh53eoQHyy7Jv82x7TfZ_eokDhgTEJvf3ICEEPAx.XV
- MsLiw1h65EkcnVpkJ5JwvbR4bhmQtqVIoHI7m3ObR7jBLjmxfZkDBIRE0AJcYriMpJc_6M4gSlOj
- 3sgGed8IXw5nYK1XUv59lI2CbrnIAedZyA2TMc4zsAHdhZK7e3eU5Njr6vdYmxjr08daSUykcuQt
- HKqIvTc099E4s90bcmEP3gNB4js8N4CcNsuD4UbzdoS3HuUAngfPWypWA6WOof34HF9tlJCjrFqu
- nskTzo77E_c9FEZK8zZ48EjPb0QcdcscCyBlAL3MaYVqL96DrKOewrORwdmyTB9rXfN8bKQbfUc_
- QMH4.EbMS4EYxwqGYq8U5VBhuRIuG0_ZPfkLdo_NVzPKYWrmBX4hdMUHQWUenN090ozYWiuK5ecT
- GIutzFqTF4oKTgpVqOgNfgdapK2OCrDONV75pCrd26x.Z5cNq_7UiEfsQQ3NRN_EXttb3RAxqZgH
- ZIPscGLx4iS_w017bpUhfT29raRKYiorHQTH9sSHDTxhwxIjp1ynTkSZtf9NMhe35fHUbRpoSArd
- 6MT3OJI6ZHGe78TywggjnjegSLlCiybw6RLu3S4AnIWgbKP0JGLs4y69TIQ0z8AXtwvQfe3D.Dcd
- lgYi7jS6jCdxVSkfYSUyTzh5kQw7aGd9Iitpujygl5_9jpHk_2qtT5WsHy5tRm_Xg4Bm5RaeU3WD
- SlulgWcMqZLxG6qq6BMEWz6flbs8mMuubCzqE.kDhjZd_09YruwWsa.nvspvqDVHW5dUj5o.uEGY
- ypAYcKn2TZSDioe4_YoWwtys47QmQqqnPDQYpamhk0LpkwiH1Bz9u32ot5HDHDYZyQIl71X3npil
- n18k3TskidSGk2N5iCJ6SQOceMK1m9TAgd1FXI8cGF71_GvK_5sehRp10dJP7BevN.LvMHJKg7K7
- 1NDDIqi3wcG_VER1sMRB0MpFSzhO06rqXhKUnqTDSUNtyj5lLaZ.ceVaB7_x2cqDZ_aAdAycJwio
- Af0D.580ciaUiT.vlx8cbRyWDBiQkI0RXpgWoshskAygLL0wwi1p5EtsSXFfmZKya0CSHCakMOKj
- ke4UDYQaX4aGdI61ESVroc0nkmsMMZZW43w1QbTR0cHRfIuJ.H.Lo3M9nKg5pic6m0YPh4WcawsL
- bE00-
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.bf2.yahoo.com with HTTP; Mon, 15 Jun 2020 09:08:06 +0000
-Date:   Mon, 15 Jun 2020 09:08:03 +0000 (UTC)
-From:   Ms Lisa Hugh <lisa.hugh111@gmail.com>
-Reply-To: ms.lisahugh000@gmail.com
-Message-ID: <1444476700.620133.1592212083863@mail.yahoo.com>
-Subject: BUSINESS FROM(Ms Lisa hugh).
+        id S1729337AbgFOJJm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 05:09:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728872AbgFOJJl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jun 2020 05:09:41 -0400
+Received: from mail-wm1-x344.google.com (mail-wm1-x344.google.com [IPv6:2a00:1450:4864:20::344])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7589AC061A0E
+        for <kvm@vger.kernel.org>; Mon, 15 Jun 2020 02:09:41 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id o8so4389779wmh.4
+        for <kvm@vger.kernel.org>; Mon, 15 Jun 2020 02:09:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kBWHSnavnojggz6uvJr4ssNYwt9EO3XZXmWi0mLaVfo=;
+        b=u5WnUGXso1CB5GxvVY5/j8SU9R6DyWFLnNXkqLW/yca23ej9LHGG9t327osTw7hV6c
+         otK2j+87vksb+pxAnQaE3otq6MTONULdqSOIwMauTjgFICXMGSu3Op4aJ4lOuT+6LJMr
+         Z9YA09iSVvv1mUuCTCnu8OICojUAQHjlqjkevFZlNOGr4krWeO0z4IFTZRpfScryQwo3
+         T3FYYsNdi1/BurX6pBUs9ch+JI+OUYm5L76j4lj5vjueB3DqOShrhp3KB3VeARns7BTr
+         YAbOVynWkOenw/7UXgg2PExrlbTHPj+8+hPpIPFVZdqIPCMc+CG2LAQCeN8d73G9mEB6
+         1NPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kBWHSnavnojggz6uvJr4ssNYwt9EO3XZXmWi0mLaVfo=;
+        b=eLeh1vB5U6xo7DXowUErDPLkAQLqrqrwEJ7FlvIiQiPMJb3dINzlgqAKEuSs6nnDm2
+         9T8nd8OS6eKNDXtjqAIm8RA7Ye7MGWipjmMrsomMOC2G+RIAkTeclc7VmOl7cXZDEvG/
+         CKuWfTrtXdPfCBGo0DrD9+15j/7nd99wY51VyEcJd5xjgXWTXw40HL1MnxfDHuRUnaTW
+         /pR8uO0qMRNGEz6aivdzm658Qwz1pxTmiGeokwP9B6V/c/KEbB45jhTtha85TRQSz1MQ
+         p2SF6lBOf7Y0r2GEQvu1SxZ/5FSzNK6Fl1zdSozFL45fJPvmuagRQhpIBWWM5DtEqwIf
+         wRrg==
+X-Gm-Message-State: AOAM533QYqV1Xs/RNI7BgjhVV6gXCzqYbA84KoQjqlO50nEtghbFux2l
+        OCpPoeS50F6djVnKgE98ic+CIM3XEJs=
+X-Google-Smtp-Source: ABdhPJxWx8VU501epgibxbnVhiRJ1svQndBXVYgotpBnvYqxiAcvxjK5SEZuaVtNXVlxltfUJaKCZg==
+X-Received: by 2002:a7b:cb18:: with SMTP id u24mr2040292wmj.67.1592212180116;
+        Mon, 15 Jun 2020 02:09:40 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
+        by smtp.gmail.com with ESMTPSA id j5sm24100579wrq.39.2020.06.15.02.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2020 02:09:39 -0700 (PDT)
+Date:   Mon, 15 Jun 2020 10:09:35 +0100
+From:   Andrew Scull <ascull@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 3/4] KVM: arm64: Allow PtrAuth to be enabled from
+ userspace on non-VHE systems
+Message-ID: <20200615090935.GF177680@google.com>
+References: <20200615081954.6233-1-maz@kernel.org>
+ <20200615081954.6233-4-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <1444476700.620133.1592212083863.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.16119 YMailNodin Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200615081954.6233-4-maz@kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jun 15, 2020 at 09:19:53AM +0100, Marc Zyngier wrote:
+> Now that the scene is set for enabling PtrAuth on non-VHE, drop
+> the restrictions preventing userspace from enabling it.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/reset.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index d3b209023727..2a929789fe2e 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -42,6 +42,11 @@ static u32 kvm_ipa_limit;
+>  #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+>  				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
+>  
+> +static bool system_has_full_ptr_auth(void)
+> +{
+> +	return system_supports_address_auth() && system_supports_generic_auth();
+> +}
+> +
+>  /**
+>   * kvm_arch_vm_ioctl_check_extension
+>   *
+> @@ -80,8 +85,7 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		break;
+>  	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+>  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> -		r = has_vhe() && system_supports_address_auth() &&
+> -				 system_supports_generic_auth();
+> +		r = system_has_full_ptr_auth();
+>  		break;
+>  	default:
+>  		r = 0;
+> @@ -205,19 +209,14 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+>  
+>  static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+>  {
+> -	/* Support ptrauth only if the system supports these capabilities. */
+> -	if (!has_vhe())
+> -		return -EINVAL;
+> -
+> -	if (!system_supports_address_auth() ||
+> -	    !system_supports_generic_auth())
+> -		return -EINVAL;
+>  	/*
+>  	 * For now make sure that both address/generic pointer authentication
+> -	 * features are requested by the userspace together.
+> +	 * features are requested by the userspace together and the system
+> +	 * supports these capabilities.
+>  	 */
+>  	if (!test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
+> -	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features))
+> +	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features) ||
+> +	    !system_has_full_ptr_auth())
+>  		return -EINVAL;
+>  
+>  	vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_PTRAUTH;
 
+That was easy. Let EL2 use ptrauth and it can save and restore the
+guest's state and done.
 
-Dear Friend,
-
-I am Ms Lisa hugh, work with the department of Audit and accounting manager here in the Bank(B.O.A).
-
-Please i need your assistance for the transferring of thIs fund to your bank account for both of us benefit for life time investment, amount (US$4.5M DOLLARS).
-
-I have every inquiry details to make the bank believe you and release the fund in within 5 banking working days with your full co-operation with me for success.
-
-Note/ 50% for you why 50% for me after success of the transfer to your bank account.
-
-Below information is what i need from you so will can be reaching each other
-
-1)Full name ...
-2)Private telephone number...
-3)Age...
-4)Nationality...
-5)Occupation ...
-
-
-Thanks.
-
-Ms Lisa hugh.
+Acked-by: Andrew Scull <ascull@google.com>
