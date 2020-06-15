@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B5891F9139
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 10:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63E5C1F913C
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 10:20:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728813AbgFOIUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 04:20:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39190 "EHLO mail.kernel.org"
+        id S1728603AbgFOIUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 04:20:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39214 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728162AbgFOIUG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jun 2020 04:20:06 -0400
+        id S1728162AbgFOIUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jun 2020 04:20:07 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD0E52068E;
-        Mon, 15 Jun 2020 08:20:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6076620714;
+        Mon, 15 Jun 2020 08:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592209205;
-        bh=IyUoA5HHobhU+zQ+UlsDQmzlUdahHvTQN8l1w3bApgE=;
+        s=default; t=1592209206;
+        bh=teLpAbnj9atb0pVhfPoGLTjUX7m3uxJIO1TyC1h59vY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PgiUupTNUC/sx/RLSvYu1ASmHcnr8UkaYGZYaDrk4UdUpIkFVHCImTmiTMiKsKhsN
-         aO9QNGCgumztrkR3305CuDdGDtY9T/Bzli2u5ea1wNQ5n8sjGT1QspUzfY3j6GCJHS
-         r3SO+n+EYzmgDdWPLcqx0E7HRZPQIYQJa9PveiAM=
+        b=lZuFDXssn8emu7X/tg8N78917FwVRqNDHKQXjkCvvoxpQsRJjQexKxXK61MeK4ODD
+         soHkKFhEr2beO4N43BYHW7J2tCp0g8HbhidR4ihWVYGMGxyJTYy0sxvGMpMD4lVR1t
+         2neHDmARfYxvJ6wyi6ZzP7btSdSXoboV7R+TOTVU=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jkkLc-0031ew-81; Mon, 15 Jun 2020 09:20:04 +0100
+        id 1jkkLc-0031ew-Qn; Mon, 15 Jun 2020 09:20:05 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu
@@ -35,9 +35,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kernel-team@android.com
-Subject: [PATCH 2/4] KVM: arm64: Allow ARM64_PTR_AUTH when ARM64_VHE=n
-Date:   Mon, 15 Jun 2020 09:19:52 +0100
-Message-Id: <20200615081954.6233-3-maz@kernel.org>
+Subject: [PATCH 3/4] KVM: arm64: Allow PtrAuth to be enabled from userspace on non-VHE systems
+Date:   Mon, 15 Jun 2020 09:19:53 +0100
+Message-Id: <20200615081954.6233-4-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200615081954.6233-1-maz@kernel.org>
 References: <20200615081954.6233-1-maz@kernel.org>
@@ -52,40 +52,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We currently prevent PtrAuth from even being built if KVM is selected,
-but VHE isn't. It is a bit of a pointless restriction, since we also
-check this at run time (rejecting the enabling of PtrAuth for the
-vcpu if we're not running with VHE).
-
-Just drop this apparently useless restriction.
+Now that the scene is set for enabling PtrAuth on non-VHE, drop
+the restrictions preventing userspace from enabling it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/Kconfig | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ arch/arm64/kvm/reset.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 31380da53689..d719ea9c596d 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1516,7 +1516,6 @@ menu "ARMv8.3 architectural features"
- config ARM64_PTR_AUTH
- 	bool "Enable support for pointer authentication"
- 	default y
--	depends on !KVM || ARM64_VHE
- 	depends on (CC_HAS_SIGN_RETURN_ADDRESS || CC_HAS_BRANCH_PROT_PAC_RET) && AS_HAS_PAC
- 	# GCC 9.1 and later inserts a .note.gnu.property section note for PAC
- 	# which is only understood by binutils starting with version 2.33.1.
-@@ -1543,8 +1542,7 @@ config ARM64_PTR_AUTH
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index d3b209023727..2a929789fe2e 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -42,6 +42,11 @@ static u32 kvm_ipa_limit;
+ #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
+ 				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
  
- 	  The feature is detected at runtime. If the feature is not present in
- 	  hardware it will not be advertised to userspace/KVM guest nor will it
--	  be enabled. However, KVM guest also require VHE mode and hence
--	  CONFIG_ARM64_VHE=y option to use this feature.
-+	  be enabled.
++static bool system_has_full_ptr_auth(void)
++{
++	return system_supports_address_auth() && system_supports_generic_auth();
++}
++
+ /**
+  * kvm_arch_vm_ioctl_check_extension
+  *
+@@ -80,8 +85,7 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+-		r = has_vhe() && system_supports_address_auth() &&
+-				 system_supports_generic_auth();
++		r = system_has_full_ptr_auth();
+ 		break;
+ 	default:
+ 		r = 0;
+@@ -205,19 +209,14 @@ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
  
- 	  If the feature is present on the boot CPU but not on a late CPU, then
- 	  the late CPU will be parked. Also, if the boot CPU does not have
+ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+ {
+-	/* Support ptrauth only if the system supports these capabilities. */
+-	if (!has_vhe())
+-		return -EINVAL;
+-
+-	if (!system_supports_address_auth() ||
+-	    !system_supports_generic_auth())
+-		return -EINVAL;
+ 	/*
+ 	 * For now make sure that both address/generic pointer authentication
+-	 * features are requested by the userspace together.
++	 * features are requested by the userspace together and the system
++	 * supports these capabilities.
+ 	 */
+ 	if (!test_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, vcpu->arch.features) ||
+-	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features))
++	    !test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, vcpu->arch.features) ||
++	    !system_has_full_ptr_auth())
+ 		return -EINVAL;
+ 
+ 	vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_PTRAUTH;
 -- 
 2.27.0
 
