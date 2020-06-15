@@ -2,129 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 007D71F94F2
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 12:55:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6217B1F958F
+	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 13:50:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729569AbgFOKz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 06:55:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58296 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728860AbgFOKz4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jun 2020 06:55:56 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 759C82068E;
-        Mon, 15 Jun 2020 10:55:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592218555;
-        bh=QaBa2U9Geoqv5p35xEZGCPFzj0swu4OiDh55cMIarDQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=uIlbWLp6f1Vl5kwtuO2o8tEhAOPhh8OwsbhlCIUjVE5onhQxrcOt2paYytzhQFZ+S
-         ELIHnWlyL61RYWU/C3dTm+2G2hErdEZSbK5DW3FL9qg5z91Ymd4N6jhMqSAN1YD6Je
-         HKrDTYLd1K0oZDSgUbNGNojGjlv4ZletzawM1YYY=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jkmmP-0034WH-Vp; Mon, 15 Jun 2020 11:55:54 +0100
+        id S1729717AbgFOLuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 07:50:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41142 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728285AbgFOLuF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Jun 2020 07:50:05 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05FBg3T5127084;
+        Mon, 15 Jun 2020 07:50:02 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31p5eud4n6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Jun 2020 07:50:02 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05FA3w7v187985;
+        Mon, 15 Jun 2020 07:50:02 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31p5eud4kt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Jun 2020 07:50:01 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05FBjlpH005231;
+        Mon, 15 Jun 2020 11:49:58 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 31mpe89dj7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Jun 2020 11:49:58 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05FBntha59507018
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Jun 2020 11:49:55 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8E389AE058;
+        Mon, 15 Jun 2020 11:49:55 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A334AE045;
+        Mon, 15 Jun 2020 11:49:55 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.1.141])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 15 Jun 2020 11:49:55 +0000 (GMT)
+Subject: Re: [PATCH] s390: protvirt: virtio: Refuse device without IOMMU
+To:     Halil Pasic <pasic@linux.ibm.com>, Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+References: <1591794711-5915-1-git-send-email-pmorel@linux.ibm.com>
+ <467d5b58-b70c-1c45-4130-76b6e18c05af@redhat.com>
+ <f7eb1154-0f52-0f12-129f-2b511f5a4685@linux.ibm.com>
+ <6356ba7f-afab-75e1-05ff-4a22b88c610e@linux.ibm.com>
+ <a02b9f94-eb48-4ae2-0ade-a4ce26b61ad8@redhat.com>
+ <20200615123725.13f6a8de.pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <96a236da-7165-b59b-e013-919554fb1ac4@linux.ibm.com>
+Date:   Mon, 15 Jun 2020 13:49:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 15 Jun 2020 11:55:53 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-Subject: Re: [PATCH 1/4] KVM: arm64: Enable Pointer Authentication at EL2 if
- available
-In-Reply-To: <20200615100318.GA773@C02TD0UTHF1T.local>
-References: <20200615081954.6233-1-maz@kernel.org>
- <20200615081954.6233-2-maz@kernel.org>
- <20200615100318.GA773@C02TD0UTHF1T.local>
-User-Agent: Roundcube Webmail/1.4.4
-Message-ID: <c1ab609a8888d1c67b1946ebbf934dac@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20200615123725.13f6a8de.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-15_01:2020-06-15,2020-06-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 cotscore=-2147483648
+ adultscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 impostorscore=0 clxscore=1015 malwarescore=0
+ suspectscore=0 bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006150082
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-06-15 11:03, Mark Rutland wrote:
-> On Mon, Jun 15, 2020 at 09:19:51AM +0100, Marc Zyngier wrote:
->> While initializing EL2, switch Pointer Authentication if detected
->> from EL1. We use the EL1-provided keys though.
-> 
-> Perhaps "enable address authentication", to avoid confusion with
-> context-switch, and since generic authentication cannot be disabled
-> locally at EL2.
 
-Ah, fair enough.
 
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/hyp-init.S | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
->> 
->> diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
->> index 6e6ed5581eed..81732177507d 100644
->> --- a/arch/arm64/kvm/hyp-init.S
->> +++ b/arch/arm64/kvm/hyp-init.S
->> @@ -104,6 +104,17 @@ alternative_else_nop_endif
->>  	 */
->>  	mov_q	x4, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
->>  CPU_BE(	orr	x4, x4, #SCTLR_ELx_EE)
->> +alternative_if ARM64_HAS_ADDRESS_AUTH_ARCH
->> +	b	1f
->> +alternative_else_nop_endif
->> +alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
->> +	b	2f
->> +alternative_else_nop_endif
+On 2020-06-15 12:37, Halil Pasic wrote:
+> On Mon, 15 Jun 2020 11:01:55 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
 > 
-> I see this is the same pattern we use in the kvm context switch, but I
-> think we can use the ARM64_HAS_ADDRESS_AUTH cap instead (likewise in 
-> the
-> existing code).
+>>> hum, in between I found another way which seems to me much better:
+>>>
+>>> We already have the force_dma_unencrypted() function available which
+>>> AFAIU is what we want for encrypted memory protection and is already
+>>> used by power and x86 SEV/SME in a way that seems AFAIU compatible
+>>> with our problem.
+>>>
+>>> Even DMA and IOMMU are different things, I think they should be used
+>>> together in our case.
+>>>
+>>> What do you think?
+>>>
+>>> The patch would then be something like:
+>>>
+>>> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+>>> index a977e32a88f2..53476d5bbe35 100644
+>>> --- a/drivers/virtio/virtio.c
+>>> +++ b/drivers/virtio/virtio.c
+>>> @@ -4,6 +4,7 @@
+>>>   #include <linux/virtio_config.h>
+>>>   #include <linux/module.h>
+>>>   #include <linux/idr.h>
+>>> +#include <linux/dma-direct.h>
+>>>   #include <uapi/linux/virtio_ids.h>
+>>>
+>>>   /* Unique numbering for virtio devices. */
+>>> @@ -179,6 +180,10 @@ int virtio_finalize_features(struct virtio_device
+>>> *dev)
+>>>          if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+>>>                  return 0;
+>>>
+>>> +       if (force_dma_unencrypted(&dev->dev) &&
+>>> +           !virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM))
+>>> +               return -EIO;
+>>> +
+>>>          virtio_add_status(dev, VIRTIO_CONFIG_S_FEATURES_OK);
+>>>          status = dev->config->get_status(dev);
+>>>          if (!(status & VIRTIO_CONFIG_S_FEATURES_OK)) {
+>>
+>>
+>> I think this can work but need to listen from Michael
 > 
-> AFAICT that won't permit mismatch given both 
-> ARM64_HAS_ADDRESS_AUTH_ARCH
-> and ARM64_HAS_ADDRESS_AUTH_IMP_DEF are dealt with as
-> ARM64_CPUCAP_BOOT_CPU_FEATURE.
+> I don't think Christoph Hellwig will like force_dma_unencrypted()
+> in virtio code:
+> https://lkml.org/lkml/2020/2/20/630
+> 
+> Regards,
+> Halil
+> 
 
-That'd be a nice cleanup, as the two back to back alternatives are a bit 
-hard to read.
-
-> 
->> +1:
->> +	orr	x4, x4, #(SCTLR_ELx_ENIA | SCTLR_ELx_ENIB)
->> +	orr	x4, x4, #SCTLR_ELx_ENDA
->> +	orr	x4, x4, #SCTLR_ELx_ENDB
-> 
-> Assuming we have a spare register, it would be nice if we could follow 
-> the same
-> pattern as in proc.S, where we do:
-> 
-> | ldr     x2, =SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
-> |              SCTLR_ELx_ENDA | SCTLR_ELx_ENDB
-> | orr     x0, x0, x2
-> 
-> ... though we could/should use mov_q rather than a load literal, here 
-> and in
-> proc.S.
-
-Looks like this code isn't in -rc1 anymore, replaced with a mov_q in 
-__ptrauth_keys_init_cpu.
-
-I'll switch to that in v2.
-
+OK, then back to the first idea.
 Thanks,
 
-         M.
+Pierre
+
 -- 
-Jazz is not dead. It just smells funny...
+Pierre Morel
+IBM Lab Boeblingen
