@@ -2,143 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E6A5E1FA1C7
-	for <lists+kvm@lfdr.de>; Mon, 15 Jun 2020 22:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E58111FA3E0
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 01:07:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731581AbgFOUjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jun 2020 16:39:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46196 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728346AbgFOUjF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jun 2020 16:39:05 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8D9142078E;
-        Mon, 15 Jun 2020 20:39:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592253544;
-        bh=G3kx7gmxUbYjMZujOdTgVsLt+bvnDQ4dZNfve9RFnlk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=hbeSjzVU1xGOS4JUuRdRRivUGCZtnAK3/1Mi7AdM0dFxbIlDquwWgRGgJk9elc6RK
-         ZAvejcacP6lB+rH/i8FHrct33CahwXAecKzBCB4b7SMS1FBFMmN+vfuOpJK5Dyp8qE
-         2SGqkn4qmSXBvT1oNMcHN2XapvUrv3nj+nEk6TD4=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jkvsl-003EcH-0j; Mon, 15 Jun 2020 21:39:03 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     yuzenghui@huawei.com, eric.auger@redhat.com,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH v2] KVM: arm64: Allow in-atomic injection of SPIs
-Date:   Mon, 15 Jun 2020 21:38:44 +0100
-Message-Id: <20200615203844.14793-1-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, yuzenghui@huawei.com, eric.auger@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1726652AbgFOXH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jun 2020 19:07:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33510 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725960AbgFOXH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jun 2020 19:07:57 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0234BC061A0E
+        for <kvm@vger.kernel.org>; Mon, 15 Jun 2020 16:07:57 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id h18so15502420qkj.13
+        for <kvm@vger.kernel.org>; Mon, 15 Jun 2020 16:07:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=xcoRC3ukd3JVnqlPGdKawsU/brIQlrTI1XM8BxAKzo0=;
+        b=qNvgE9pA0YdBpFN8P5+egecHo526fpmt4Uq5HFPR05TM3ek+tBUrzY5I8/GhaFUmqX
+         W5+Y3ispf43Wy5mGsPVD376WYegQvJZIC+fGK+DRmDIBcpRP5L6iiA5mALQzocGKULRi
+         aHdDBgVE68TvwuTLKapsXEY9ma3QjdBv5t3x8ehV6JV6JznyPyfV+QxE0iPJzXa8hqN+
+         ZHsgDwftz6xx9FBwL9AD059zyFWG/yWEwWbGXL6z7PfuPWV9zrogxR480iPmE4W3rtyT
+         3V9U6Xsh6bIRFeKjdeKLwEV4DiybfJyvYr6eKOjUBPqNWxywWj1G9V4EbGMVGLzU2gLK
+         4EMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=xcoRC3ukd3JVnqlPGdKawsU/brIQlrTI1XM8BxAKzo0=;
+        b=FXZnRkHKZwdxwq85FyIrxgYEgi97x8BvkxAaQV0RZP+qmrTKh0HYXKsjyG5jwd6u9R
+         vCrx4/SXZn/gcn/N/ivverFoKCME34F+AlxlATJHbPGX+0Zc5ojoB5TbKMg8E4zhu2HS
+         FNjnkFavlMIlqoDdzWk3vPTUvRpJ6R0rZK/MtZPMSyBYXGq8aK2UeI7WSTZp+TBFPdHJ
+         cdDhH6AGXPSuRw4vL9vqSe68t2kKbIbAh4E1ll8fH41ktRfQu8tv0k/c6gRHf4Hop6eq
+         evUHcYGdDmvuJGGW97ZmIKFmMZnluhvmHbThvGtiGy7MhrbfhwS6W6780Zu7cHQGHi4Z
+         c6Zw==
+X-Gm-Message-State: AOAM5303SrfEGzC+o/7C5JQ0Sssvp/mQtPmItWGG8HWN8pnmg+1ubCAN
+        yZU6ae2XnIZiwxQJGWItOj9IoGPOOdIM5WJ06o7/wKnoFUvS/Ex89YtNkEh7w1JqGdKa/FPDT21
+        rLBOmic3jTtxmHu++ZJqM5ax9UF8+oduyJgUd1T58k5LnmKlCCKD4YT4bOns1iWc=
+X-Google-Smtp-Source: ABdhPJy7/o7amkHHEBR+jxgFfk29OJ/uSYG4K0BSuLhWRqEMXkXcD7V3eNPH7A2RdX2rL1zYdGwXX/z69lxehw==
+X-Received: by 2002:a05:6214:10e1:: with SMTP id q1mr84631qvt.78.1592262476058;
+ Mon, 15 Jun 2020 16:07:56 -0700 (PDT)
+Date:   Mon, 15 Jun 2020 16:07:49 -0700
+Message-Id: <20200615230750.105008-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
+Subject: [PATCH 1/2] kvm: x86: Refine kvm_write_tsc synchronization generations
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On a system that uses SPIs to implement MSIs (as it would be
-the case on a GICv2 system exposing a GICv2m to its guests),
-we deny the possibility of injecting SPIs on the in-atomic
-fast-path.
+Start a new TSC synchronization generation whenever the
+IA32_TIME_STAMP_COUNTER MSR is written on a vCPU that has already
+participated in the current TSC synchronization generation.
 
-This results in a very large amount of context-switches
-(roughly equivalent to twice the interrupt rate) on the host,
-and suboptimal performance for the guest (as measured with
-a test workload involving a virtio interface backed by vhost-net).
-Given that GICv2 systems are usually on the low-end of the spectrum
-performance wise, they could do without the aggravation.
+Previously, it was not possible to restore the IA32_TIME_STAMP_COUNTER
+MSR to a value less than the TSC frequency. Since vCPU initialization
+sets the IA32_TIME_STAMP_COUNTER MSR to zero, a subsequent
+KVM_SET_MSRS ioctl that attempted to write a small value to the
+IA32_TIME_STAMP_COUNTER MSR was viewed as an attempt at TSC
+synchronization. Notably, this was the case even for single vCPU VMs,
+which were always synchronized.
 
-We solved this for GICv3+ITS by having a translation cache. But
-SPIs do not need any extra infrastructure, and can be immediately
-injected in the virtual distributor as the locking is already
-heavy enough that we don't need to worry about anything.
-
-This halves the number of context switches for the same workload.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
 ---
-* From v1:
-  - Drop confusing comment (Zenghui, Eric)
-  - Now consistently return -EWOULDBLOCK when unable to inject (Eric)
-  - Don't inject if the vgic isn't initialized yet (Eric)
+ arch/x86/kvm/x86.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
- arch/arm64/kvm/vgic/vgic-irqfd.c | 24 +++++++++++++++++++-----
- arch/arm64/kvm/vgic/vgic-its.c   |  3 +--
- 2 files changed, 20 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index d8cdfea5cc96..79f8899b234c 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -100,19 +100,33 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9e41b5135340..2555ea2cd91e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2015,7 +2015,6 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 	u64 offset, ns, elapsed;
+ 	unsigned long flags;
+ 	bool matched;
+-	bool already_matched;
+ 	u64 data = msr->data;
+ 	bool synchronizing = false;
  
- /**
-  * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
-- *
-- * Currently only direct MSI injection is supported.
-  */
- int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
- 			      struct kvm *kvm, int irq_source_id, int level,
- 			      bool line_status)
- {
--	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
-+	if (!level)
-+		return -EWOULDBLOCK;
-+
-+	switch (e->type) {
-+	case KVM_IRQ_ROUTING_MSI: {
- 		struct kvm_msi msi;
+@@ -2032,7 +2031,8 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 			 * kvm_clock stable after CPU hotplug
+ 			 */
+ 			synchronizing = true;
+-		} else {
++		} else if (vcpu->arch.this_tsc_generation !=
++			   kvm->arch.cur_tsc_generation) {
+ 			u64 tsc_exp = kvm->arch.last_tsc_write +
+ 						nsec_to_cycles(vcpu, elapsed);
+ 			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
+@@ -2062,7 +2062,6 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 			offset = kvm_compute_tsc_offset(vcpu, data);
+ 		}
+ 		matched = true;
+-		already_matched = (vcpu->arch.this_tsc_generation == kvm->arch.cur_tsc_generation);
+ 	} else {
+ 		/*
+ 		 * We split periods of matched TSC writes into generations.
+@@ -2102,12 +2101,10 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
  
-+		if (!vgic_has_its(kvm))
-+			break;
-+
- 		kvm_populate_msi(e, &msi);
--		if (!vgic_its_inject_cached_translation(kvm, &msi))
--			return 0;
-+		return vgic_its_inject_cached_translation(kvm, &msi);
-+	}
-+
-+	case KVM_IRQ_ROUTING_IRQCHIP:
-+		/*
-+		 * Injecting SPIs is always possible in atomic context
-+		 * as long as the damn vgic is initialized.
-+		 */
-+		if (unlikely(!vgic_initialized(kvm)))
-+			break;
-+		return vgic_irqfd_set_irq(e, kvm, irq_source_id, 1, line_status);
- 	}
- 
- 	return -EWOULDBLOCK;
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index c012a52b19f5..40cbaca81333 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -757,9 +757,8 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
- 
- 	db = (u64)msi->address_hi << 32 | msi->address_lo;
- 	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
+ 	spin_lock(&kvm->arch.pvclock_gtod_sync_lock);
+-	if (!matched) {
+-		kvm->arch.nr_vcpus_matched_tsc = 0;
+-	} else if (!already_matched) {
++	if (matched)
+ 		kvm->arch.nr_vcpus_matched_tsc++;
+-	}
 -
- 	if (!irq)
--		return -1;
-+		return -EWOULDBLOCK;
- 
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 	irq->pending_latch = true;
++	else
++		kvm->arch.nr_vcpus_matched_tsc = 0;
+ 	kvm_track_tsc_matching(vcpu);
+ 	spin_unlock(&kvm->arch.pvclock_gtod_sync_lock);
+ }
 -- 
-2.26.2
+2.27.0.290.gba653c62da-goog
 
