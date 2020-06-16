@@ -2,90 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D73551FB04A
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 14:21:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAFB11FB0AD
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 14:29:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728743AbgFPMV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 08:21:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33890 "EHLO
+        id S1728673AbgFPM3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 08:29:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38183 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728694AbgFPMV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 08:21:26 -0400
+        with ESMTP id S1726467AbgFPM3A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 08:29:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592310085;
+        s=mimecast20190719; t=1592310538;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=h2SlXHGpqwt43th89psSAGozPMwGRRAsdb7ODXzU9w0=;
-        b=gyr9sNwbPl+nXW49OIQ9ZaYti1hISkEEpiGS35C3Kd03CU/GVu2vS3sMzjXl2290fBfWAO
-        i27GlZTqnVOzc5TCjmnaASC0Z8fvrBu1hM8mY9qVHhARjyCUMgIvEDlb+TD52Xu1EfuBwa
-        PH3tBonHXZG0vg2jcRyXopyBpuF+rGU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-FYI6Xt7gPKyDGTLzv_M7uQ-1; Tue, 16 Jun 2020 08:21:21 -0400
-X-MC-Unique: FYI6Xt7gPKyDGTLzv_M7uQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBB4B8005AD;
-        Tue, 16 Jun 2020 12:21:19 +0000 (UTC)
-Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D5AE31001B2B;
-        Tue, 16 Jun 2020 12:21:14 +0000 (UTC)
-Date:   Tue, 16 Jun 2020 14:21:12 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        frankja@linux.ibm.com, mst@redhat.com, jasowang@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v2 1/1] s390: virtio: let arch accept devices without
- IOMMU feature
-Message-ID: <20200616142112.2d08ff7d.cohuck@redhat.com>
-In-Reply-To: <a93bf169-55ca-2a77-f9a5-b27bf18176e2@linux.ibm.com>
-References: <1592224764-1258-1-git-send-email-pmorel@linux.ibm.com>
-        <1592224764-1258-2-git-send-email-pmorel@linux.ibm.com>
-        <74b6cf8a-d5a6-e0bf-f1c1-e453af133614@de.ibm.com>
-        <a93bf169-55ca-2a77-f9a5-b27bf18176e2@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=67GIuCamd4MgSsvesfvqYg7CyR/yaU34h6Ys25meAe0=;
+        b=YLyaUimnSgPa84m4KXj0OjczvmDjb8tcLayO2Ygu3E/Z+fmfw0A7fOGMKFG+qRT0/s+y/L
+        jHmbZyuPKpm4W3UqgGbWI9/6dw7oXYehRWaegryqdvXQwCpLMWRD3FfrLXMbRQMtNNdvuI
+        5Hu9mdfPvDnoZ5C7pRWA8LXDjCtIntI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-tq4am805OAuhp_32U0TPew-1; Tue, 16 Jun 2020 08:28:55 -0400
+X-MC-Unique: tq4am805OAuhp_32U0TPew-1
+Received: by mail-wm1-f71.google.com with SMTP id b65so1180034wmb.5
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 05:28:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=67GIuCamd4MgSsvesfvqYg7CyR/yaU34h6Ys25meAe0=;
+        b=D4JOTAkx2bvZOs83kTBkU+GRYfXWFfZu1iWeCPC6UvHbcYyPIV9qC3T2mgErsI/6uF
+         x4X+O7MiL2OxvPPIr99tYsqrRMCvLrLH6/bPeT7cZV6h1tJo+BcieKOE67NHaJEq63Ok
+         jygVWqp9wtOrirSEKpKCkxy+NkTJA0L6HnPw4x7u92tDi0os2VWG3mliUB7/uC5ixIih
+         H2xFL8QEwgAqrPp1hhOus17kXZOgdlOiUplZr6msSWerUIixBoPqIsQk3FjgrfLQsakA
+         Id19uf2m9rPJnyAjl/9rs0tm7aM1aPQdUlcNExs6LFcTJMSEE17gXqyGMMUjK03Y1GwL
+         ceNQ==
+X-Gm-Message-State: AOAM532MwZ3jitqz1F9S0kTFQQG5xu0g1IAk00IoYonWHh/rFqjH08fL
+        ukUtUir3nTRgMGiXpoI4E3mH0y3lpdkaRqK5NQ2ewC4rU5V/nkfHqzeNBM+uVlaBOlSamXK2tDZ
+        4bvuUF+RLXijf
+X-Received: by 2002:a5d:4f81:: with SMTP id d1mr2971485wru.95.1592310533562;
+        Tue, 16 Jun 2020 05:28:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNsomDYYUeDLHsz6oPtzv9ic6c3G/8BovSOHkTiki/aC+lDX9Zjg+2kCJO168r708tABUNrw==
+X-Received: by 2002:a5d:4f81:: with SMTP id d1mr2971469wru.95.1592310533343;
+        Tue, 16 Jun 2020 05:28:53 -0700 (PDT)
+Received: from [192.168.178.58] ([151.30.88.161])
+        by smtp.gmail.com with ESMTPSA id z206sm3745314wmg.30.2020.06.16.05.28.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jun 2020 05:28:52 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: pmu: Test full-width counter writes
+ support
+To:     Thomas Huth <thuth@redhat.com>, Like Xu <like.xu@linux.intel.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20200529074347.124619-1-like.xu@linux.intel.com>
+ <20200529074347.124619-4-like.xu@linux.intel.com>
+ <b1a5472b-f7d0-82b0-e753-dabf81254488@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1272fbd7-3ff1-5eac-e9e2-78b824fbc4e0@redhat.com>
+Date:   Tue, 16 Jun 2020 14:28:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <b1a5472b-f7d0-82b0-e753-dabf81254488@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Jun 2020 09:35:19 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 16/06/20 12:49, Thomas Huth wrote:
+> On 29/05/2020 09.43, Like Xu wrote:
+>> When the full-width writes capability is set, use the alternative MSR
+>> range to write larger sign counter values (up to GP counter width).
+>>
+>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>> ---
+>>  lib/x86/msr.h |   1 +
+>>  x86/pmu.c     | 125 ++++++++++++++++++++++++++++++++++++++++----------
+>>  2 files changed, 102 insertions(+), 24 deletions(-)
+> [...]
+>> @@ -452,6 +468,66 @@ static void check_running_counter_wrmsr(void)
+>>  	report_prefix_pop();
+>>  }
+>>  
+>> +static void check_counters(void)
+>> +{
+>> +	check_gp_counters();
+>> +	check_fixed_counters();
+>> +	check_rdpmc();
+>> +	check_counters_many();
+>> +	check_counter_overflow();
+>> +	check_gp_counter_cmask();
+>> +	check_running_counter_wrmsr();
+>> +}
+>> +
+>> +static void do_unsupported_width_counter_write(void *index)
+>> +{
+>> +	wrmsr(MSR_IA32_PMC0 + *((int *) index), 0xffffff0123456789ull);
+>> +}
+>> +
+>> +static void  check_gp_counters_write_width(void)
+>> +{
+>> +	u64 val_64 = 0xffffff0123456789ull;
+>> +	u64 val_32 = val_64 & ((1ul << 32) - 1);
+>  Hi,
+> 
+> this broke compilation on 32-bit hosts:
+> 
+>  https://travis-ci.com/github/huth/kvm-unit-tests/jobs/349654654#L710
+> 
+> Fix should be easy, I guess - either use 1ull or specify the mask
+> 0xffffffff directly.
 
-> On 2020-06-16 08:55, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 15.06.20 14:39, Pierre Morel wrote:  
-> >> An architecture protecting the guest memory against unauthorized host
-> >> access may want to enforce VIRTIO I/O device protection through the
-> >> use of VIRTIO_F_IOMMU_PLATFORM.
-> >>
-> >> Let's give a chance to the architecture to accept or not devices
-> >> without VIRTIO_F_IOMMU_PLATFORM.
-> >>
-> >> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>  
-> > 
-> > 
-> > Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>  
-> 
-> Thanks,
-> 
-> > 
-> > Shouldnt we maybe add a pr_warn if that happens to help the admins to understand what is going on?
-> > 
-> >   
-> 
-> Yes, Connie asked for it too, good that you remind it to me, I add it.
+Or
 
-Yes, please :)
+u64 val_32 = (u64)(u32) val_64;
+
+I'll send a patch.
+
+Paolo
 
