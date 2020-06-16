@@ -2,172 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A1831FB8BD
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 17:58:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 258E11FBAE7
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 18:15:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732980AbgFPP6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 11:58:33 -0400
-Received: from foss.arm.com ([217.140.110.172]:40872 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730932AbgFPP6c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 11:58:32 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 70E8A1F1;
-        Tue, 16 Jun 2020 08:58:31 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A36E3F73C;
-        Tue, 16 Jun 2020 08:58:29 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
- from struct kvm
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-2-maz@kernel.org>
-Message-ID: <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
-Date:   Tue, 16 Jun 2020 16:59:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1732333AbgFPQPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 12:15:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35407 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731536AbgFPQPQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 12:15:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592324115;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DZiLPWz8tGyf2nq5zcM61Q3toxd9Lry4Lg91Iu4Wmfo=;
+        b=RJChc1jZd3AqYs2oLWQSog9jzaonM1tWv3UhwirdTSRAev4Pw1Xbnuu3LmRUMjfZlgY1NH
+        ovO90e5fv8ZOArwmytoLIrZAdFSx2CPIyy3ozwo/mwoxTvPlCndtoivhACTRPx6FxyH4zx
+        vWUFSj60lOXN8ehiKy0iWugc2uaxVEE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-wKsb1WAUP1yyDdZj35nrQg-1; Tue, 16 Jun 2020 12:15:13 -0400
+X-MC-Unique: wKsb1WAUP1yyDdZj35nrQg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D869D5AEC7
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 16:15:12 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-9.gru2.redhat.com [10.97.112.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C0457CAA0;
+        Tue, 16 Jun 2020 16:15:12 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 622D041807CE; Tue, 16 Jun 2020 08:47:41 -0300 (-03)
+Date:   Tue, 16 Jun 2020 08:47:41 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH v2] KVM: x86: allow TSC to differ by NTP correction bounds
+ without TSC scaling
+Message-ID: <20200616114741.GA298183@fuller.cnet>
+References: <20200615115952.GA224592@fuller.cnet>
+ <646f0beb-e050-ed2f-397b-a9afa2891e4f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200615132719.1932408-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <646f0beb-e050-ed2f-397b-a9afa2891e4f@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-IMO, this patch does two different things: adds a new structure, kvm_s2_mmu, and
-converts the memory management code to use the 4 level page table API. I realize
-it's painful to convert the MMU code to use the p4d functions, and then modify
-everything to use kvm_s2_mmu in a separate patch, but I believe splitting it into
-2 would be better in the long run. The resulting patches will be smaller and both
-will have a better chance of being reviewed by the right people.
+The Linux TSC calibration procedure is subject to small variations
+(its common to see +-1 kHz difference between reboots on a given CPU, for example).
 
-Either way, there were still some suggestions left over from v1, I don't know if
-they were were too minor/subjective to implement, or they were overlooked. I'll
-re-post them here and I'll try to review the patch again once I figure out how the
-p4d changes fit in.
+So migrating a guest between two hosts with identical processor can fail, in case
+of a small variation in calibrated TSC between them.
 
-On 6/15/20 2:27 PM, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
->
-> As we are about to reuse our stage 2 page table manipulation code for
-> shadow stage 2 page tables in the context of nested virtualization, we
-> are going to manage multiple stage 2 page tables for a single VM.
->
-> This requires some pretty invasive changes to our data structures,
-> which moves the vmid and pgd pointers into a separate structure and
-> change pretty much all of our mmu code to operate on this structure
-> instead.
->
-> The new structure is called struct kvm_s2_mmu.
->
-> There is no intended functional change by this patch alone.
->
-> Reviewed-by: James Morse <james.morse@arm.com>
-> [Designed data structure layout in collaboration]
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Co-developed-by: Marc Zyngier <maz@kernel.org>
-> [maz: Moved the last_vcpu_ran down to the S2 MMU structure as well]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_asm.h  |   7 +-
->  arch/arm64/include/asm/kvm_host.h |  32 +++-
->  arch/arm64/include/asm/kvm_mmu.h  |  16 +-
->  arch/arm64/kvm/arm.c              |  36 ++--
->  arch/arm64/kvm/hyp/switch.c       |   8 +-
->  arch/arm64/kvm/hyp/tlb.c          |  52 +++---
->  arch/arm64/kvm/mmu.c              | 278 +++++++++++++++++-------------
->  7 files changed, 233 insertions(+), 196 deletions(-)
->
-> [..]
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 90cb90561446..360396ecc6d3 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
+Without TSC scaling, the current kernel interface will either return an error
+(if user_tsc_khz <= tsc_khz) or enable TSC catchup mode.
 
-There's still one comment in the file that refers to arch.vmid:
+This change enables the following TSC tolerance check to
+accept KVM_SET_TSC_KHZ within tsc_tolerance_ppm (which is 250ppm by default).
 
-static bool need_new_vmid_gen(struct kvm_vmid *vmid)
-{
-    u64 current_vmid_gen = atomic64_read(&kvm_vmid_gen);
-    smp_rmb(); /* Orders read of kvm_vmid_gen and kvm->arch.vmid */
-    return unlikely(READ_ONCE(vmid->vmid_gen) != current_vmid_gen);
-}
+        /*
+         * Compute the variation in TSC rate which is acceptable
+         * within the range of tolerance and decide if the
+         * rate being applied is within that bounds of the hardware
+         * rate.  If so, no scaling or compensation need be done.
+         */
+        thresh_lo = adjust_tsc_khz(tsc_khz, -tsc_tolerance_ppm);
+        thresh_hi = adjust_tsc_khz(tsc_khz, tsc_tolerance_ppm);
+        if (user_tsc_khz < thresh_lo || user_tsc_khz > thresh_hi) {
+                pr_debug("kvm: requested TSC rate %u falls outside tolerance [%u,%u]\n", user_tsc_khz, thresh_lo, thresh_hi);
+                use_scaling = 1;
+        }
 
-The comment could be rephrased to remove the reference to kvm->arch.vmid: "Orders
-read of kvm_vmid_gen and kvm_s2_mmu->vmid".
+NTP daemon in the guest can correct this difference (NTP can correct upto 500ppm).
 
-> [..]
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 8c0035cab6b6..4a4437be4bc5 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
->
-> [..]
->  
->  /**
-> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
-> - * @kvm:	The KVM struct pointer for the VM.
-> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
-> + * @kvm:	The pointer to the KVM structure
-> + * @mmu:	The pointer to the s2 MMU structure
->   *
->   * Allocates only the stage-2 HW PGD level table(s) of size defined by
-> - * stage2_pgd_size(kvm).
-> + * stage2_pgd_size(mmu->kvm).
->   *
->   * Note we don't need locking here as this is only called when the VM is
->   * created, which can only be done once.
->   */
-> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
-> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->  {
->  	phys_addr_t pgd_phys;
->  	pgd_t *pgd;
-> +	int cpu;
->  
-> -	if (kvm->arch.pgd != NULL) {
-> +	if (mmu->pgd != NULL) {
->  		kvm_err("kvm_arch already initialized?\n");
->  		return -EINVAL;
->  	}
-> @@ -1024,8 +1040,20 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
->  	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
->  		return -EINVAL;
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-We don't free the pgd if we get the error above, but we do free it below, if
-allocating last_vcpu_ran fails. Shouldn't we free it in both cases?
+---
 
-> -	kvm->arch.pgd = pgd;
-> -	kvm->arch.pgd_phys = pgd_phys;
-> +	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
-> +	if (!mmu->last_vcpu_ran) {
-> +		free_pages_exact(pgd, stage2_pgd_size(kvm));
-> +		return -ENOMEM;
-> +	}
->
-> [..]
+v2: improve changelog (Paolo Bonzini)
 
-Thanks,
-Alex
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3156e25..39a6664 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1772,6 +1772,8 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
+ 
+ 	/* TSC scaling supported? */
+ 	if (!kvm_has_tsc_control) {
++		if (!scale)
++			return 0;
+ 		if (user_tsc_khz > tsc_khz) {
+ 			vcpu->arch.tsc_catchup = 1;
+ 			vcpu->arch.tsc_always_catchup = 1;
+@@ -4473,7 +4475,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = -EINVAL;
+ 		user_tsc_khz = (u32)arg;
+ 
+-		if (user_tsc_khz >= kvm_max_guest_tsc_khz)
++		if (kvm_has_tsc_control &&
++		    user_tsc_khz >= kvm_max_guest_tsc_khz)
+ 			goto out;
+ 
+ 		if (user_tsc_khz == 0)
+
