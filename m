@@ -2,240 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71CE81FAEBC
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 12:56:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D5971FAED0
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 12:59:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728428AbgFPK4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 06:56:23 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53945 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728259AbgFPK4U (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 06:56:20 -0400
+        id S1728420AbgFPK7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 06:59:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22473 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728217AbgFPK7s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 06:59:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592304978;
+        s=mimecast20190719; t=1592305188;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WJBp+ID5LXYV7cWyimQ0RHI64ObYqnX+y+V18BCeHx0=;
-        b=XFFibQ4JaKQHk/C5ILvC33t7ciOUuqsYY43jyJ9Zy99hJw1jdHoBT4L98LU3V8n8WFWU4N
-        Ei9sc5hAT6lXN7Bn4mulieCU8EHh78/Y1T5uzhq/YKXYXiWYj1UCnSF1un7FYd5nfYxHQa
-        CkFBhkV0fv/WPXtjJ/fyFe4ogjMwai8=
+         to:to:cc:cc; bh=VSb5JMG1sxeC0xJQaXKMewCIfOw5Nog4KVL7A45ysQk=;
+        b=DlRr78wbg1IejgE0QWuf0038T1GKCUUWvuw8/LJhRtB0Bf0jNDbwAtj2owkGSuDPxnRF4h
+        WcJA2rFeH6udgNDZe+M8WCsJfhsXMb14gBzI+IfBttlbNumYkFPD2U/rVDIkdl3o5nUhRt
+        baOf7td1hePd4ONRNxDe+8M3ukW7ocE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-4XleZ_fRP8uoFSUuw7UURA-1; Tue, 16 Jun 2020 06:56:14 -0400
-X-MC-Unique: 4XleZ_fRP8uoFSUuw7UURA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-177-aQ9ly5QJOI-RNW31h3pRQw-1; Tue, 16 Jun 2020 06:59:44 -0400
+X-MC-Unique: aQ9ly5QJOI-RNW31h3pRQw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50B4710AB64A;
-        Tue, 16 Jun 2020 10:56:13 +0000 (UTC)
-Received: from work-vm (ovpn-112-42.ams2.redhat.com [10.36.112.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 73C767CAC3;
-        Tue, 16 Jun 2020 10:56:05 +0000 (UTC)
-Date:   Tue, 16 Jun 2020 11:56:03 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v4 05/21] virtio-balloon: Rip out qemu_balloon_inhibit()
-Message-ID: <20200616105603.GB2788@work-vm>
-References: <20200610115419.51688-1-david@redhat.com>
- <20200610115419.51688-6-david@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200610115419.51688-6-david@redhat.com>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A76F11009618;
+        Tue, 16 Jun 2020 10:59:43 +0000 (UTC)
+Received: from thuth.com (ovpn-114-128.ams2.redhat.com [10.36.114.128])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6813A19C71;
+        Tue, 16 Jun 2020 10:59:42 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     like.xu@linux.intel.com, vkuznets@redhat.com
+Subject: [kvm-unit-tests PATCH] x86/pmu: Fix compilation on 32-bit hosts
+Date:   Tue, 16 Jun 2020 12:59:40 +0200
+Message-Id: <20200616105940.2907-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* David Hildenbrand (david@redhat.com) wrote:
-> The only remaining special case is postcopy. It cannot handle
-> concurrent discards yet, which would result in requesting already sent
-> pages from the source. Special-case it in virtio-balloon instead.
-> 
-> Introduce migration_in_incoming_postcopy(), to find out if incoming
-> postcopy is active.
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+When building for 32-bit hosts, the compiler currently complains:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+ x86/pmu.c: In function 'check_gp_counters_write_width':
+ x86/pmu.c:490:30: error: left shift count >= width of type
 
-> ---
->  balloon.c                  | 18 ------------------
->  hw/virtio/virtio-balloon.c |  8 +++++++-
->  include/migration/misc.h   |  2 ++
->  include/sysemu/balloon.h   |  2 --
->  migration/migration.c      |  7 +++++++
->  migration/postcopy-ram.c   | 23 -----------------------
->  6 files changed, 16 insertions(+), 44 deletions(-)
-> 
-> diff --git a/balloon.c b/balloon.c
-> index 5fff79523a..354408c6ea 100644
-> --- a/balloon.c
-> +++ b/balloon.c
-> @@ -36,24 +36,6 @@
->  static QEMUBalloonEvent *balloon_event_fn;
->  static QEMUBalloonStatus *balloon_stat_fn;
->  static void *balloon_opaque;
-> -static int balloon_inhibit_count;
-> -
-> -bool qemu_balloon_is_inhibited(void)
-> -{
-> -    return atomic_read(&balloon_inhibit_count) > 0 ||
-> -           ram_block_discard_is_disabled();
-> -}
-> -
-> -void qemu_balloon_inhibit(bool state)
-> -{
-> -    if (state) {
-> -        atomic_inc(&balloon_inhibit_count);
-> -    } else {
-> -        atomic_dec(&balloon_inhibit_count);
-> -    }
-> -
-> -    assert(atomic_read(&balloon_inhibit_count) >= 0);
-> -}
->  
->  static bool have_balloon(Error **errp)
->  {
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 065cd450f1..5ce2f956df 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -63,6 +63,12 @@ static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
->      return pbp->base_gpa == base_gpa;
->  }
->  
-> +static bool virtio_balloon_inhibited(void)
-> +{
-> +    /* Postcopy cannot deal with concurrent discards, so it's special. */
-> +    return ram_block_discard_is_disabled() || migration_in_incoming_postcopy();
-> +}
-> +
->  static void balloon_inflate_page(VirtIOBalloon *balloon,
->                                   MemoryRegion *mr, hwaddr mr_offset,
->                                   PartiallyBalloonedPage *pbp)
-> @@ -360,7 +366,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
->  
->              trace_virtio_balloon_handle_output(memory_region_name(section.mr),
->                                                 pa);
-> -            if (!qemu_balloon_is_inhibited()) {
-> +            if (!virtio_balloon_inhibited()) {
->                  if (vq == s->ivq) {
->                      balloon_inflate_page(s, section.mr,
->                                           section.offset_within_region, &pbp);
-> diff --git a/include/migration/misc.h b/include/migration/misc.h
-> index d2762257aa..34e7d75713 100644
-> --- a/include/migration/misc.h
-> +++ b/include/migration/misc.h
-> @@ -69,6 +69,8 @@ bool migration_has_failed(MigrationState *);
->  /* ...and after the device transmission */
->  bool migration_in_postcopy_after_devices(MigrationState *);
->  void migration_global_dump(Monitor *mon);
-> +/* True if incomming migration entered POSTCOPY_INCOMING_DISCARD */
-> +bool migration_in_incoming_postcopy(void);
->  
->  /* migration/block-dirty-bitmap.c */
->  void dirty_bitmap_mig_init(void);
-> diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
-> index aea0c44985..20a2defe3a 100644
-> --- a/include/sysemu/balloon.h
-> +++ b/include/sysemu/balloon.h
-> @@ -23,7 +23,5 @@ typedef void (QEMUBalloonStatus)(void *opaque, BalloonInfo *info);
->  int qemu_add_balloon_handler(QEMUBalloonEvent *event_func,
->                               QEMUBalloonStatus *stat_func, void *opaque);
->  void qemu_remove_balloon_handler(void *opaque);
-> -bool qemu_balloon_is_inhibited(void);
-> -void qemu_balloon_inhibit(bool state);
->  
->  #endif
-> diff --git a/migration/migration.c b/migration/migration.c
-> index b63ad91d34..14856cc930 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1772,6 +1772,13 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
->      return migration_in_postcopy() && s->postcopy_after_devices;
->  }
->  
-> +bool migration_in_incoming_postcopy(void)
-> +{
-> +    PostcopyState ps = postcopy_state_get();
-> +
-> +    return ps >= POSTCOPY_INCOMING_DISCARD && ps < POSTCOPY_INCOMING_END;
-> +}
-> +
->  bool migration_is_idle(void)
->  {
->      MigrationState *s = current_migration;
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index a36402722b..b41a9fe2fd 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -27,7 +27,6 @@
->  #include "qemu/notify.h"
->  #include "qemu/rcu.h"
->  #include "sysemu/sysemu.h"
-> -#include "sysemu/balloon.h"
->  #include "qemu/error-report.h"
->  #include "trace.h"
->  #include "hw/boards.h"
-> @@ -520,20 +519,6 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
->      return 0;
->  }
->  
-> -/*
-> - * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
-> - * last caller wins.
-> - */
-> -static void postcopy_balloon_inhibit(bool state)
-> -{
-> -    static bool cur_state = false;
-> -
-> -    if (state != cur_state) {
-> -        qemu_balloon_inhibit(state);
-> -        cur_state = state;
-> -    }
-> -}
-> -
->  /*
->   * At the end of a migration where postcopy_ram_incoming_init was called.
->   */
-> @@ -565,8 +550,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->          mis->have_fault_thread = false;
->      }
->  
-> -    postcopy_balloon_inhibit(false);
-> -
->      if (enable_mlock) {
->          if (os_mlock() < 0) {
->              error_report("mlock: %s", strerror(errno));
-> @@ -1160,12 +1143,6 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
->      }
->      memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
->  
-> -    /*
-> -     * Ballooning can mark pages as absent while we're postcopying
-> -     * that would cause false userfaults.
-> -     */
-> -    postcopy_balloon_inhibit(true);
-> -
->      trace_postcopy_ram_enable_notify();
->  
->      return 0;
-> -- 
-> 2.26.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Use the correct suffix to avoid this problem.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ x86/pmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 57a2b23..91a6fb4 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -487,7 +487,7 @@ static void do_unsupported_width_counter_write(void *index)
+ static void  check_gp_counters_write_width(void)
+ {
+ 	u64 val_64 = 0xffffff0123456789ull;
+-	u64 val_32 = val_64 & ((1ul << 32) - 1);
++	u64 val_32 = val_64 & ((1ull << 32) - 1);
+ 	u64 val_max_width = val_64 & ((1ul << eax.split.bit_width) - 1);
+ 	int i;
+ 
+-- 
+2.18.1
 
