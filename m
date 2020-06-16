@@ -2,108 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 959BE1FABA4
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 10:51:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C7241FABAA
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 10:53:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728070AbgFPIvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 04:51:03 -0400
-Received: from mx2.suse.de ([195.135.220.15]:35732 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727795AbgFPIvC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 04:51:02 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 089C8AFA8;
-        Tue, 16 Jun 2020 08:51:03 +0000 (UTC)
-Date:   Tue, 16 Jun 2020 10:50:52 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: vfio: refcount_t: underflow; use-after-free.
-Message-ID: <20200616085052.sahrunsesjyjeyf2@beryllium.lan>
+        id S1726052AbgFPIxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 04:53:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31003 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725710AbgFPIxE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 04:53:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592297582;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x6AWtnIXsr8Pf+vdCf9SuJ7M4o4r+GS5IQOCBagOKD0=;
+        b=BsbLGtC5FS9SAFVgWW+Kw3H6V8saOaA+ZUCmmOaM5DbcCGnB5nkCx0Nf6DuhbUyG+dXxhc
+        PBiQZUR8y9G2fAeWsznJMTU+2QEP9i64wcbMCKmGr8BUwXKnSvY9Z0Ha65XOlML5L7y4LC
+        O2nN/gkqLaGMyBi/otmpd2DC8wF6m1s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-Kncd8T43NEerIrj_COjv7A-1; Tue, 16 Jun 2020 04:52:58 -0400
+X-MC-Unique: Kncd8T43NEerIrj_COjv7A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E637873429;
+        Tue, 16 Jun 2020 08:52:57 +0000 (UTC)
+Received: from [10.36.114.197] (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id ABD4260BEC;
+        Tue, 16 Jun 2020 08:52:54 +0000 (UTC)
+Subject: Re: [PATCH v2] KVM: arm64: Allow in-atomic injection of SPIs
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>, yuzenghui@huawei.com,
+        kernel-team@android.com,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20200615203844.14793-1-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <c4c2d7ec-16a2-a019-283d-18a9bd576d81@redhat.com>
+Date:   Tue, 16 Jun 2020 10:52:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20200615203844.14793-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hi Marc,
 
-I'm getting the warning below when starting a KVM the second time with an
-Emulex PCI card 'passthroughed' into a KVM. I'm terminating the session
-via 'ctrl-a x', not sure if this is relevant.
+On 6/15/20 10:38 PM, Marc Zyngier wrote:
+> On a system that uses SPIs to implement MSIs (as it would be
+> the case on a GICv2 system exposing a GICv2m to its guests),
+> we deny the possibility of injecting SPIs on the in-atomic
+> fast-path.
+> 
+> This results in a very large amount of context-switches
+> (roughly equivalent to twice the interrupt rate) on the host,
+> and suboptimal performance for the guest (as measured with
+> a test workload involving a virtio interface backed by vhost-net).
+> Given that GICv2 systems are usually on the low-end of the spectrum
+> performance wise, they could do without the aggravation.
+> 
+> We solved this for GICv3+ITS by having a translation cache. But
+> SPIs do not need any extra infrastructure, and can be immediately
+> injected in the virtual distributor as the locking is already
+> heavy enough that we don't need to worry about anything.
+> 
+> This halves the number of context switches for the same workload.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-This is with 5.8-rc1. IIRC, older version didn't have this problem.
+Thanks
 
- modprobe -r lpfc
- modprobe vfio-pci ids=10df:f400
- qemu-system-x86_64 ... \
-      -device vfio-pci,host=04:00.0 \
-      -device vfio-pci,host=04:00.1 \
-      -device vfio-pci,host=c1:00.0 \
-      -device vfio-pci,host=c1:00.1 \
-      ...
+Eric
 
+> ---
+> * From v1:
+>   - Drop confusing comment (Zenghui, Eric)
+>   - Now consistently return -EWOULDBLOCK when unable to inject (Eric)
+>   - Don't inject if the vgic isn't initialized yet (Eric)
+> 
+>  arch/arm64/kvm/vgic/vgic-irqfd.c | 24 +++++++++++++++++++-----
+>  arch/arm64/kvm/vgic/vgic-its.c   |  3 +--
+>  2 files changed, 20 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
+> index d8cdfea5cc96..79f8899b234c 100644
+> --- a/arch/arm64/kvm/vgic/vgic-irqfd.c
+> +++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
+> @@ -100,19 +100,33 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>  
+>  /**
+>   * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
+> - *
+> - * Currently only direct MSI injection is supported.
+>   */
+>  int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>  			      struct kvm *kvm, int irq_source_id, int level,
+>  			      bool line_status)
+>  {
+> -	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
+> +	if (!level)
+> +		return -EWOULDBLOCK;
+> +
+> +	switch (e->type) {
+> +	case KVM_IRQ_ROUTING_MSI: {
+>  		struct kvm_msi msi;
+>  
+> +		if (!vgic_has_its(kvm))
+> +			break;
+> +
+>  		kvm_populate_msi(e, &msi);
+> -		if (!vgic_its_inject_cached_translation(kvm, &msi))
+> -			return 0;
+> +		return vgic_its_inject_cached_translation(kvm, &msi);
+> +	}
+> +
+> +	case KVM_IRQ_ROUTING_IRQCHIP:
+> +		/*
+> +		 * Injecting SPIs is always possible in atomic context
+> +		 * as long as the damn vgic is initialized.
+> +		 */
+> +		if (unlikely(!vgic_initialized(kvm)))
+> +			break;
+> +		return vgic_irqfd_set_irq(e, kvm, irq_source_id, 1, line_status);
+>  	}
+>  
+>  	return -EWOULDBLOCK;
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index c012a52b19f5..40cbaca81333 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -757,9 +757,8 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
+>  
+>  	db = (u64)msi->address_hi << 32 | msi->address_lo;
+>  	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
+> -
+>  	if (!irq)
+> -		return -1;
+> +		return -EWOULDBLOCK;
+>  
+>  	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+>  	irq->pending_latch = true;
+> 
 
- vfio-pci 0000:04:00.0: vfio_ecap_init: hiding ecap 0x19@0x20c
- vfio-pci 0000:04:00.0: vfio_ecap_init: hiding ecap 0x26@0x238
- vfio-pci 0000:04:00.0: vfio_ecap_init: hiding ecap 0x27@0x278
- ------------[ cut here ]------------
- refcount_t: underflow; use-after-free.
- WARNING: CPU: 14 PID: 59978 at lib/refcount.c:28 refcount_warn_saturate+0x8d/0xf0
- Modules linked in: rpcsec_gss_krb5(E) auth_rpcgss(E) nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E) sunrpc(E) fscache(E) vfio_pci(E) vfio_virqfd(E) vfio_iommu_type1(E) vfio(E) af_packet(E) xt_tcpudp(E) ip6t_rpfilter(E) ip6t_REJECT(E) ipt_REJECT(E) xt_conntrack(E) ip_set(E) nfnetlink(E) ebtable_nat(E) ebtable_broute(E) ip6table_nat(E) ip6table_mangle(E) ip6table_raw(E) ip6table_security(E) iptable_nat(E) nf_nat(E) nf_conntrack(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E) iptable_mangle(E) iptable_raw(E) iptable_security(E) ebtable_filter(E) ebtables(E) ip6table_filter(E) ip6_tables(E) iptable_filter(E) ip_tables(E) iscsi_ibft(E) x_tables(E) iscsi_boot_sysfs(E) bpfilter(E) rfkill(E) nls_iso8859_1(E) nls_cp437(E) vfat(E) fat(E) intel_rapl_msr(E) intel_rapl_common(E) sb_edac(E) x86_pkg_temp_thermal(E) intel_powerclamp(E) coretemp(E) iTCO_wdt(E) kvm_intel(E) iTCO_vendor_support(E) kvm(E) irqbypass(E) crc32_pclmul(E) ghash_clmulni_intel(E) aesni_intel(E) crypto_simd(E) cryptd(E)
-  glue_helper(E) pcspkr(E) ipmi_ssif(E) bnx2x(E) lpc_ich(E) mfd_core(E) hpwdt(E) mdio(E) acpi_ipmi(E) ioatdma(E) hpilo(E) dca(E) ipmi_si(E) tg3(E) ipmi_devintf(E) libphy(E) ipmi_msghandler(E) acpi_tad(E) button(E) btrfs(E) libcrc32c(E) xor(E) raid6_pq(E) dm_service_time(E) sd_mod(E) mgag200(E) drm_vram_helper(E) drm_kms_helper(E) syscopyarea(E) sysfillrect(E) sysimgblt(E) fb_sys_fops(E) qla2xxx(E) cec(E) configfs(E) drm_ttm_helper(E) uhci_hcd(E) ehci_pci(E) nvme_fc(E) ehci_hcd(E) nvme_fabrics(E) ttm(E) nvme_core(E) drm(E) t10_pi(E) i2c_algo_bit(E) usbcore(E) crc32c_intel(E) scsi_transport_fc(E) hpsa(E) scsi_transport_sas(E) wmi(E) dm_mirror(E) dm_region_hash(E) dm_log(E) sg(E) dm_multipath(E) dm_mod(E) scsi_dh_rdac(E) scsi_dh_emc(E) scsi_dh_alua(E) scsi_mod(E) efivarfs(E) [last unloaded: nvmet]
- CPU: 14 PID: 59978 Comm: qemu-system-x86 Kdump: loaded Tainted: G            E     5.8.0-rc1-default #28
- Hardware name: HP ProLiant DL580 Gen9/ProLiant DL580 Gen9, BIOS U17 07/21/2019
- RIP: 0010:refcount_warn_saturate+0x8d/0xf0
- Code: 05 2c 11 17 01 01 e8 b2 1b c1 ff 0f 0b c3 80 3d 1f 11 17 01 00 75 ad 48 c7 c7 b8 aa 56 a0 c6 05 0f 11 17 01 01 e8 93 1b c1 ff <0f> 0b c3 80 3d 03 11 17 01 00 75 8e 48 c7 c7 60 aa 56 a0 c6 05 f3
- RSP: 0018:ffffa10929087df0 EFLAGS: 00010282
- RAX: 0000000000000000 RBX: ffff958bdb474b80 RCX: 0000000000000000
- RDX: 0000000000000001 RSI: ffff958bdf91ac90 RDI: ffff958bdf91ac90
- RBP: ffff958393e3e0f0 R08: 0000000000000000 R09: 000000000000000e
- R10: 000000000000003b R11: ffffa10929087c88 R12: 00005617ef8baa70
- R13: ffff958405be2650 R14: 0000000000000038 R15: ffff958393e3e060
- FS:  00007fbeb6c86600(0000) GS:ffff958bdf900000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 00005617edfbe108 CR3: 0000000f7f5e2004 CR4: 00000000001626e0
- DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
- DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
- Call Trace:
-  vfio_pci_set_ctx_trigger_single+0x69/0xc0 [vfio_pci]
-  vfio_pci_ioctl+0x2ea/0xe80 [vfio_pci]
-  ? _copy_from_user+0x2c/0x60
-  ? ksys_ioctl+0x92/0xb0
-  ? vfio_pci_memory_lock_and_enable+0x80/0x80 [vfio_pci]
-  ksys_ioctl+0x92/0xb0
-  __x64_sys_ioctl+0x16/0x20
-  do_syscall_64+0x4d/0x90
-  entry_SYSCALL_64_after_hwframe+0x44/0xa9
- RIP: 0033:0x7fbeb0ca2ac7
- Code: Bad RIP value.
- RSP: 002b:00007ffec9254908 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
- RAX: ffffffffffffffda RBX: 00005617ef8baa70 RCX: 00007fbeb0ca2ac7
- RDX: 00005617ef8baa70 RSI: 0000000000003b6e RDI: 0000000000000038
- RBP: 00005617ef722a30 R08: 0000000000000000 R09: 0000000000000000
- R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000006
- R13: 00005617ef722730 R14: 0000000000000005 R15: 00005617ef721e50
- ---[ end trace fbd9c0c3c859d391 ]---
- irq 17: Affinity broken due to vector space exhaustion.
- vfio-pci 0000:c1:00.0: vfio_ecap_init: hiding ecap 0x19@0x20c
- vfio-pci 0000:c1:00.0: vfio_ecap_init: hiding ecap 0x26@0x238
- vfio-pci 0000:c1:00.0: vfio_ecap_init: hiding ecap 0x27@0x278
- vfio-pci 0000:04:00.0: vfio_bar_restore: reset recovery - restoring BARs
- vfio-pci 0000:04:00.1: vfio_bar_restore: reset recovery - restoring BARs
- vfio-pci 0000:c1:00.0: vfio_bar_restore: reset recovery - restoring BARs
- vfio-pci 0000:c1:00.1: vfio_bar_restore: reset recovery - restoring BARs
- vfio-pci 0000:04:00.0: vfio_bar_restore: reset recovery - restoring BARs
- vfio-pci 0000:04:00.1: vfio_bar_restore: reset recovery - restoring BARs
- vfio-pci 0000:c1:00.0: vfio_bar_restore: reset recovery - restoring BARs
- vfio-pci 0000:c1:00.1: vfio_bar_restore: reset recovery - restoring BARs
- kvm [59978]: vcpu0, guest rIP: 0xffffffff85c75208 disabled perfctr wrmsr: 0xc2 data 0xffff
-
-Thanks,
-Daniel
