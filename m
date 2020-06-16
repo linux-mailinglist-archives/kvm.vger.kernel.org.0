@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AB021FBB30
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 18:17:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4510D1FBA0E
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 18:08:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731828AbgFPQRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 12:17:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36672 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730842AbgFPPjH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 11:39:07 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GFYGGh062035;
-        Tue, 16 Jun 2020 11:39:04 -0400
+        id S1732168AbgFPPqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 11:46:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5248 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732161AbgFPPqJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 11:46:09 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GFjugD169906;
+        Tue, 16 Jun 2020 11:46:07 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31pux0b74n-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31q0qj8mf5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 11:39:04 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GFYNMi063033;
-        Tue, 16 Jun 2020 11:39:03 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31pux0b73x-1
+        Tue, 16 Jun 2020 11:46:06 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GFk6n5170958;
+        Tue, 16 Jun 2020 11:46:06 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31q0qj8kwp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 11:39:03 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GFLl7Y011983;
-        Tue, 16 Jun 2020 15:39:01 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 31mpe7wk0r-1
+        Tue, 16 Jun 2020 11:46:04 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GFLmTA022281;
+        Tue, 16 Jun 2020 15:45:20 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 31mpe7t92x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 15:39:01 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GFcwMC65470816
+        Tue, 16 Jun 2020 15:45:20 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GFhx0458982700
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jun 2020 15:38:58 GMT
+        Tue, 16 Jun 2020 15:44:00 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 701B042047;
-        Tue, 16 Jun 2020 15:38:58 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 478FC4204C;
+        Tue, 16 Jun 2020 15:45:17 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B001842041;
-        Tue, 16 Jun 2020 15:38:57 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id BAEA542042;
+        Tue, 16 Jun 2020 15:45:16 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.20.221])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 16 Jun 2020 15:38:57 +0000 (GMT)
+        Tue, 16 Jun 2020 15:45:16 +0000 (GMT)
 Subject: Re: [PATCH v8 02/16] s390/vfio-ap: use new AP bus interface to search
  for queue devices
 To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
@@ -98,8 +98,8 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <1f64ef13-412d-f124-60f3-36f8c639725e@de.ibm.com>
-Date:   Tue, 16 Jun 2020 17:38:57 +0200
+Message-ID: <93492fa3-31f1-a551-4b26-e46bc277e351@de.ibm.com>
+Date:   Tue, 16 Jun 2020 17:45:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
@@ -110,12 +110,11 @@ Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-06-16_04:2020-06-16,2020-06-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- cotscore=-2147483648 lowpriorityscore=0 spamscore=0 suspectscore=0
- malwarescore=0 clxscore=1015 adultscore=0 phishscore=0 mlxlogscore=999
- mlxscore=0 priorityscore=1501 bulkscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006160108
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ suspectscore=0 mlxscore=0 cotscore=-2147483648 mlxlogscore=999
+ adultscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0 spamscore=0
+ priorityscore=1501 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006160108
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -124,37 +123,60 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 05.06.20 23:39, Tony Krowiak wrote:
-[..]
-> --- a/drivers/s390/crypto/vfio_ap_private.h
-> +++ b/drivers/s390/crypto/vfio_ap_private.h
-> @@ -18,6 +18,7 @@
->  #include <linux/delay.h>
->  #include <linux/mutex.h>
->  #include <linux/kvm_host.h>
-> +#include <linux/hashtable.h>
->  
->  #include "ap_bus.h"
->  
-> @@ -90,8 +91,6 @@ struct ap_matrix_mdev {
->  
->  extern int vfio_ap_mdev_register(void);
->  extern void vfio_ap_mdev_unregister(void);
-> -int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
-> -			     unsigned int retry);
->  
->  struct vfio_ap_queue {
->  	struct ap_matrix_mdev *matrix_mdev;
-> @@ -100,5 +99,8 @@ struct vfio_ap_queue {
->  #define VFIO_AP_ISC_INVALID 0xff
->  	unsigned char saved_isc;
->  };
-> -struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
-
-This looks wrong and unrelated. 
-
-> +
-> +int vfio_ap_mdev_probe_queue(struct ap_queue *queue);
-> +void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
-> +
->  #endif /* _VFIO_AP_PRIVATE_H_ */
+> This patch refactor's the vfio_ap device driver to use the AP bus's
+> ap_get_qdev() function to retrieve the vfio_ap_queue struct containing
+> information about a queue that is bound to the vfio_ap device driver.
+> The bus's ap_get_qdev() function retrieves the queue device from a
+> hashtable keyed by APQN. This is much more efficient than looping over
+> the list of devices attached to the AP bus by several orders of
+> magnitude.
 > 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_drv.c     | 27 ++-------
+>  drivers/s390/crypto/vfio_ap_ops.c     | 82 +++++++++++++++------------
+>  drivers/s390/crypto/vfio_ap_private.h |  8 ++-
+>  3 files changed, 58 insertions(+), 59 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> index be2520cc010b..59233cf7419d 100644
+> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> @@ -51,15 +51,9 @@ MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
+>   */
+>  static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
+>  {
+> -	struct vfio_ap_queue *q;
+> -
+> -	q = kzalloc(sizeof(*q), GFP_KERNEL);
+> -	if (!q)
+> -		return -ENOMEM;
+> -	dev_set_drvdata(&apdev->device, q);
+> -	q->apqn = to_ap_queue(&apdev->device)->qid;
+> -	q->saved_isc = VFIO_AP_ISC_INVALID;
+> -	return 0;
+> +	struct ap_queue *queue = to_ap_queue(&apdev->device);
+> +
+> +	return vfio_ap_mdev_probe_queue(queue);
+>  }
+
+Here we did not hold a mutex in the old code 
+[...]
+
+> +int vfio_ap_mdev_probe_queue(struct ap_queue *queue)
+> +{
+> +	struct vfio_ap_queue *q;
+> +
+> +	q = kzalloc(sizeof(*q), GFP_KERNEL);
+> +	if (!q)
+> +		return -ENOMEM;
+> +
+> +	mutex_lock(&matrix_dev->lock);
+> +	dev_set_drvdata(&queue->ap_dev.device, q);
+> +	q->apqn = queue->qid;
+> +	q->saved_isc = VFIO_AP_ISC_INVALID;
+> +	mutex_unlock(&matrix_dev->lock);
+> +
+
+here we do. Why do we need the matrix_dev->lock here?
+
