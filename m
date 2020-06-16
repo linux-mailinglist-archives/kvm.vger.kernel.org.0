@@ -2,153 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 009AC1FBC34
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 18:58:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CCB11FBC41
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 19:01:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729771AbgFPQ6v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 12:58:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47817 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728861AbgFPQ6v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 12:58:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592326729;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2naFO3eclxh//d8xCYs/AzrLY0N7rdJ2y7/KIjLVWcw=;
-        b=UzRJUaJPme5r91VRJgYXgYtUPsdl17b9wngTILn3mxi8mP8L6hO6zCZx/5Ukkv6tfdL2uY
-        DXC92PfwSaA98O6ygwqHnIL128QR7bzTidlFspavE85DxTGPg6//scQiqAOHwy4G+YjONK
-        M20z6ZZ/owO48Nbi5QWKCyV+BsFvUXg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-5cKJ0fWnNB6C7W_m0zQ0sA-1; Tue, 16 Jun 2020 12:58:48 -0400
-X-MC-Unique: 5cKJ0fWnNB6C7W_m0zQ0sA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C09F80F5E5;
-        Tue, 16 Jun 2020 16:58:47 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-9.gru2.redhat.com [10.97.112.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DF1BF19C79;
-        Tue, 16 Jun 2020 16:58:46 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
-        id 43FBB41887FC; Tue, 16 Jun 2020 13:58:05 -0300 (-03)
-Date:   Tue, 16 Jun 2020 13:58:05 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     qemu-devel <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH v2] kvm: i386: allow TSC to differ by NTP correction bounds
- without TSC scaling
-Message-ID: <20200616165805.GA324612@fuller.cnet>
-References: <20200615120127.GB224592@fuller.cnet>
+        id S1729841AbgFPRAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 13:00:37 -0400
+Received: from mga14.intel.com ([192.55.52.115]:57921 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729103AbgFPRAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 13:00:36 -0400
+IronPort-SDR: tPXq8KsMIkMJ+lekExbd+RoNkgurPpzW5SCs2kVElBx3wEcHkXhoKhO2tezU3GlMedG2sAKeNA
+ j9PgdE/DwCMA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 10:00:17 -0700
+IronPort-SDR: shXlJDB6Aa2I7qVQkpqzSISC/9/CbPOu9n9L7Pl4JZVPZQbC2aORL/Zi3VEf3kIBSNnoifV9z0
+ o0yzMkUEcJDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,518,1583222400"; 
+   d="scan'208";a="273217899"
+Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.25])
+  by orsmga003.jf.intel.com with ESMTP; 16 Jun 2020 10:00:16 -0700
+Date:   Tue, 16 Jun 2020 10:00:16 -0700
+From:   "Raj, Ashok" <ashok.raj@intel.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Ashok Raj <ashok.raj@intel.com>
+Subject: Re: [PATCH v2 00/15] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Message-ID: <20200616170016.GC34820@otc-nc-03>
+References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
+ <20200615100214.GC1491454@stefanha-x1.localdomain>
+ <MWHPR11MB16451F1E4748DF97D6A1DDD48C9D0@MWHPR11MB1645.namprd11.prod.outlook.com>
+ <20200616154928.GF1491454@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200615120127.GB224592@fuller.cnet>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200616154928.GF1491454@stefanha-x1.localdomain>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jun 16, 2020 at 04:49:28PM +0100, Stefan Hajnoczi wrote:
+> On Tue, Jun 16, 2020 at 02:26:38AM +0000, Tian, Kevin wrote:
+> > > From: Stefan Hajnoczi <stefanha@gmail.com>
+> > > Sent: Monday, June 15, 2020 6:02 PM
+> > > 
+> > > On Thu, Jun 11, 2020 at 05:15:19AM -0700, Liu Yi L wrote:
+> > > > Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+> > > > Intel platforms allows address space sharing between device DMA and
+> > > > applications. SVA can reduce programming complexity and enhance
+> > > security.
+> > > >
+> > > > This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+> > > > guest application address space with passthru devices. This is called
+> > > > vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+> > > > changes. For IOMMU and QEMU changes, they are in separate series (listed
+> > > > in the "Related series").
+> > > >
+> > > > The high-level architecture for SVA virtualization is as below, the key
+> > > > design of vSVA support is to utilize the dual-stage IOMMU translation (
+> > > > also known as IOMMU nesting translation) capability in host IOMMU.
+> > > >
+> > > >
+> > > >     .-------------.  .---------------------------.
+> > > >     |   vIOMMU    |  | Guest process CR3, FL only|
+> > > >     |             |  '---------------------------'
+> > > >     .----------------/
+> > > >     | PASID Entry |--- PASID cache flush -
+> > > >     '-------------'                       |
+> > > >     |             |                       V
+> > > >     |             |                CR3 in GPA
+> > > >     '-------------'
+> > > > Guest
+> > > > ------| Shadow |--------------------------|--------
+> > > >       v        v                          v
+> > > > Host
+> > > >     .-------------.  .----------------------.
+> > > >     |   pIOMMU    |  | Bind FL for GVA-GPA  |
+> > > >     |             |  '----------------------'
+> > > >     .----------------/  |
+> > > >     | PASID Entry |     V (Nested xlate)
+> > > >     '----------------\.------------------------------.
+> > > >     |             |   |SL for GPA-HPA, default domain|
+> > > >     |             |   '------------------------------'
+> > > >     '-------------'
+> > > > Where:
+> > > >  - FL = First level/stage one page tables
+> > > >  - SL = Second level/stage two page tables
+> > > 
+> > > Hi,
+> > > Looks like an interesting feature!
+> > > 
+> > > To check I understand this feature: can applications now pass virtual
+> > > addresses to devices instead of translating to IOVAs?
+> > > 
+> > > If yes, can guest applications restrict the vSVA address space so the
+> > > device only has access to certain regions?
+> > > 
+> > > On one hand replacing IOVA translation with virtual addresses simplifies
+> > > the application programming model, but does it give up isolation if the
+> > > device can now access all application memory?
+> > > 
+> > 
+> > with SVA each application is allocated with a unique PASID to tag its
+> > virtual address space. The device that claims SVA support must guarantee 
+> > that one application can only program the device to access its own virtual
+> > address space (i.e. all DMAs triggered by this application are tagged with
+> > the application's PASID, and are translated by IOMMU's PASID-granular
+> > page table). So, isolation is not sacrificed in SVA.
+> 
+> Isolation between applications is preserved but there is no isolation
+> between the device and the application itself. The application needs to
+> trust the device.
 
-The Linux TSC calibration procedure is subject to small variations
-(its common to see +-1 kHz difference between reboots on a given CPU, for example).
+Right. With all convenience comes security trust. With SVA there is an
+expectation that the device has the required security boundaries properly
+implemented. FWIW, what is our guarantee today that VF's are secure from
+one another or even its own PF? They can also generate transactions with
+any of its peer id's and there is nothing an IOMMU can do today. Other than
+rely on ACS. Even BusMaster enable can be ignored and devices (malicious
+or otherwise) can generate after the BM=0. With SVM you get the benefits of
 
-So migrating a guest between two hosts with identical processor can fail, in case 
-of a small variation in calibrated TSC between them.
+* Not having to register regions
+* Don't need to pin application space for DMA.
 
-Allow a conservative 250ppm error between host TSC and VM TSC frequencies,
-rather than requiring an exact match. NTP daemon in the guest can
-correct this difference.
+> 
+> Examples:
+> 
+> 1. The device can snoop secret data from readable pages in the
+>    application's virtual memory space.
 
-Also change migration to accept this bound.
+Aren't there other security technologies that can address this?
 
-KVM_SET_TSC_KHZ depends on a kernel interface change. Without this change,
-the behaviour remains the same: in case of a different frequency 
-between host and VM, KVM_SET_TSC_KHZ will fail and QEMU will exit.
+> 
+> 2. The device can gain arbitrary execution on the CPU by overwriting
+>    control flow addresses (e.g. function pointers, stack return
+>    addresses) in writable pages.
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+I suppose technology like CET might be able to guard. The general
+expectation is code pages and anything that needs to be protected should be
+mapped nor writable.
 
----
-
-v2: ensure behaviour is unchanged for older kernels and
-    improve changelogs (Paolo)
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 34f8387..ad825b1 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -735,26 +735,62 @@ static bool hyperv_enabled(X86CPU *cpu)
-          cpu->hyperv_features || cpu->hyperv_passthrough);
- }
- 
-+/*
-+ * Check whether target_freq is within conservative
-+ * ntp correctable bounds (250ppm) of freq
-+ */
-+static inline bool freq_within_bounds(int freq, int target_freq)
-+{
-+        int max_freq = freq + (freq * 250 / 1000000);
-+        int min_freq = freq - (freq * 250 / 1000000);
-+
-+        if (target_freq >= min_freq && target_freq <= max_freq) {
-+                return true;
-+        }
-+
-+        return false;
-+}
-+
- static int kvm_arch_set_tsc_khz(CPUState *cs)
- {
-     X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
--    int r;
-+    int r, cur_freq;
-+    bool set_ioctl = false;
- 
-     if (!env->tsc_khz) {
-         return 0;
-     }
- 
--    r = kvm_check_extension(cs->kvm_state, KVM_CAP_TSC_CONTROL) ?
-+    cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-+               kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) : -ENOTSUP;
-+
-+    /*
-+     * If TSC scaling is supported, attempt to set TSC frequency.
-+     */
-+    if (kvm_check_extension(cs->kvm_state, KVM_CAP_TSC_CONTROL)) {
-+        set_ioctl = true;
-+    }
-+
-+    /*
-+     * If desired TSC frequency is within bounds of NTP correction,
-+     * attempt to set TSC frequency.
-+     */
-+    if (cur_freq != -ENOTSUP && freq_within_bounds(cur_freq, env->tsc_khz)) {
-+        set_ioctl = true;
-+    }
-+
-+    r = set_ioctl ?
-         kvm_vcpu_ioctl(cs, KVM_SET_TSC_KHZ, env->tsc_khz) :
-         -ENOTSUP;
-+
-     if (r < 0) {
-         /* When KVM_SET_TSC_KHZ fails, it's an error only if the current
-          * TSC frequency doesn't match the one we want.
-          */
--        int cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
--                       kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
--                       -ENOTSUP;
-+        cur_freq = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-+                   kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
-+                   -ENOTSUP;
-         if (cur_freq <= 0 || cur_freq != env->tsc_khz) {
-             warn_report("TSC frequency mismatch between "
-                         "VM (%" PRId64 " kHz) and host (%d kHz), "
-
+Cheers,
+Ashok
