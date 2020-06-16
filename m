@@ -2,118 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4135C1FA823
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 07:22:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 693EF1FA8BF
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 08:23:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbgFPFWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 01:22:32 -0400
-Received: from mga11.intel.com ([192.55.52.93]:32103 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726261AbgFPFWc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 01:22:32 -0400
-IronPort-SDR: SzG/bMS3Sne1lNE2uhEqqMMPB1ui6q8JT0dhYyWsQByxAfjE8fkTW8cqGUOLXAWMFOv1tVQlGc
- RmosoHO5/fyw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2020 22:22:31 -0700
-IronPort-SDR: butAZOv0zFAFZgppKHYoCFHLQnFeIKas1AdMjVWvR7PRx3NBb+8f1ewJZNBc9LEsjo6xc+yDIA
- g48RpFrKvD1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,517,1583222400"; 
-   d="scan'208";a="317115995"
-Received: from lkp-server02.sh.intel.com (HELO ec7aa6149bd9) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 15 Jun 2020 22:22:29 -0700
-Received: from kbuild by ec7aa6149bd9 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1jl43I-0000TL-J6; Tue, 16 Jun 2020 05:22:28 +0000
-Date:   Tue, 16 Jun 2020 13:21:34 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kbuild-all@lists.01.org, kvm@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm:kvm-async-pf-int-5.8 3/6] arch/x86/kernel/kvm.c:330:6: warning:
- Variable 'pa' is reassigned a value before the old one has been used.
-Message-ID: <202006161327.d4RqWvaG%lkp@intel.com>
+        id S1726864AbgFPGXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 02:23:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31710 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726261AbgFPGXE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 02:23:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592288582;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8VH7R/DoU62ut+esRu7Hjq7cJgKyK7i23Q0GKINZbgM=;
+        b=L074jNjqCzjBqcI21Lh8nf+zRILP45p/Lg2LNjOQLEoZ22hJ4qgUmHRqyJgmUuFTMXG0wD
+        dSJggUtqfl38Ysfb3ZlA+u5MKSUUhf41tgUM1hlPBXnO5vRStDjzU48GO2xjmPMZXgxV7V
+        MdKrIF8XVqTtmPSj/4al0oWcEY4jvVk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-224-dV-6KyFgPMiZJmzQP3PJeQ-1; Tue, 16 Jun 2020 02:22:58 -0400
+X-MC-Unique: dV-6KyFgPMiZJmzQP3PJeQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 057271085945;
+        Tue, 16 Jun 2020 06:22:57 +0000 (UTC)
+Received: from [10.72.13.124] (ovpn-13-124.pek2.redhat.com [10.72.13.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 72FE71001901;
+        Tue, 16 Jun 2020 06:22:46 +0000 (UTC)
+Subject: Re: [PATCH v2 1/1] s390: virtio: let arch accept devices without
+ IOMMU feature
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc:     pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        mst@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+References: <1592224764-1258-1-git-send-email-pmorel@linux.ibm.com>
+ <1592224764-1258-2-git-send-email-pmorel@linux.ibm.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <b45e321a-5acb-9be2-4cd6-ae75d7f78f05@redhat.com>
+Date:   Tue, 16 Jun 2020 14:22:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <1592224764-1258-2-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-async-pf-int-5.8
-head:   62a9576cc07b7dcba951aaa00d6a55933c49367e
-commit: b1d405751cd5792856b1b8333aafaca6bf09ccbb [3/6] KVM: x86: Switch KVM guest to using interrupts for page ready APF delivery
-compiler: gcc-9 (Debian 9.3.0-13) 9.3.0
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+On 2020/6/15 下午8:39, Pierre Morel wrote:
+> An architecture protecting the guest memory against unauthorized host
+> access may want to enforce VIRTIO I/O device protection through the
+> use of VIRTIO_F_IOMMU_PLATFORM.
+>
+> Let's give a chance to the architecture to accept or not devices
+> without VIRTIO_F_IOMMU_PLATFORM.
+>
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 
 
-cppcheck warnings: (new ones prefixed by >>)
+Acked-by: Jason Wang <jasowang@redhat.com>
 
->> arch/x86/kernel/kvm.c:330:6: warning: Variable 'pa' is reassigned a value before the old one has been used. [redundantAssignment]
-     pa = slow_virt_to_phys(this_cpu_ptr(&apf_reason));
-        ^
-   arch/x86/kernel/kvm.c:326:0: note: Variable 'pa' is reassigned a value before the old one has been used.
-     u64 pa = slow_virt_to_phys(this_cpu_ptr(&apf_reason));
-   ^
-   arch/x86/kernel/kvm.c:330:6: note: Variable 'pa' is reassigned a value before the old one has been used.
-     pa = slow_virt_to_phys(this_cpu_ptr(&apf_reason));
-        ^
 
-vim +/pa +330 arch/x86/kernel/kvm.c
+> ---
+>   arch/s390/mm/init.c     | 6 ++++++
+>   drivers/virtio/virtio.c | 9 +++++++++
+>   include/linux/virtio.h  | 2 ++
+>   3 files changed, 17 insertions(+)
+>
+> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
+> index 87b2d024e75a..3f04ad09650f 100644
+> --- a/arch/s390/mm/init.c
+> +++ b/arch/s390/mm/init.c
+> @@ -46,6 +46,7 @@
+>   #include <asm/kasan.h>
+>   #include <asm/dma-mapping.h>
+>   #include <asm/uv.h>
+> +#include <linux/virtio.h>
+>   
+>   pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
+>   
+> @@ -162,6 +163,11 @@ bool force_dma_unencrypted(struct device *dev)
+>   	return is_prot_virt_guest();
+>   }
+>   
+> +int arch_needs_iommu_platform(struct virtio_device *dev)
+> +{
+> +	return is_prot_virt_guest();
+> +}
+> +
+>   /* protected virtualization */
+>   static void pv_init(void)
+>   {
+> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> index a977e32a88f2..30091089bee8 100644
+> --- a/drivers/virtio/virtio.c
+> +++ b/drivers/virtio/virtio.c
+> @@ -167,6 +167,11 @@ void virtio_add_status(struct virtio_device *dev, unsigned int status)
+>   }
+>   EXPORT_SYMBOL_GPL(virtio_add_status);
+>   
+> +int __weak arch_needs_iommu_platform(struct virtio_device *dev)
+> +{
+> +	return 0;
+> +}
+> +
+>   int virtio_finalize_features(struct virtio_device *dev)
+>   {
+>   	int ret = dev->config->finalize_features(dev);
+> @@ -179,6 +184,10 @@ int virtio_finalize_features(struct virtio_device *dev)
+>   	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+>   		return 0;
+>   
+> +	if (arch_needs_iommu_platform(dev) &&
+> +		!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM))
+> +		return -EIO;
+> +
+>   	virtio_add_status(dev, VIRTIO_CONFIG_S_FEATURES_OK);
+>   	status = dev->config->get_status(dev);
+>   	if (!(status & VIRTIO_CONFIG_S_FEATURES_OK)) {
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index a493eac08393..2c46b310c38c 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -195,4 +195,6 @@ void unregister_virtio_driver(struct virtio_driver *drv);
+>   #define module_virtio_driver(__virtio_driver) \
+>   	module_driver(__virtio_driver, register_virtio_driver, \
+>   			unregister_virtio_driver)
+> +
+> +int arch_needs_iommu_platform(struct virtio_device *dev);
+>   #endif /* _LINUX_VIRTIO_H */
 
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  322  
-ed3cf15271fa15 Nicholas Krause    2015-05-20  323  static void kvm_guest_cpu_init(void)
-fd10cde9294f73 Gleb Natapov       2010-10-14  324  {
-b1d405751cd579 Vitaly Kuznetsov   2020-05-25  325  	if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT) && kvmapf) {
-b1d405751cd579 Vitaly Kuznetsov   2020-05-25  326  		u64 pa = slow_virt_to_phys(this_cpu_ptr(&apf_reason));
-ef68017eb5704e Andy Lutomirski    2020-02-28  327  
-ef68017eb5704e Andy Lutomirski    2020-02-28  328  		WARN_ON_ONCE(!static_branch_likely(&kvm_async_pf_enabled));
-ef68017eb5704e Andy Lutomirski    2020-02-28  329  
-ef68017eb5704e Andy Lutomirski    2020-02-28 @330  		pa = slow_virt_to_phys(this_cpu_ptr(&apf_reason));
-b1d405751cd579 Vitaly Kuznetsov   2020-05-25  331  		pa |= KVM_ASYNC_PF_ENABLED | KVM_ASYNC_PF_DELIVERY_AS_INT;
-52a5c155cf79f1 Wanpeng Li         2017-07-13  332  
-fe2a3027e74e40 Radim Krčmář       2018-02-01  333  		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_VMEXIT))
-fe2a3027e74e40 Radim Krčmář       2018-02-01  334  			pa |= KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
-fe2a3027e74e40 Radim Krčmář       2018-02-01  335  
-b1d405751cd579 Vitaly Kuznetsov   2020-05-25  336  		wrmsrl(MSR_KVM_ASYNC_PF_INT, HYPERVISOR_CALLBACK_VECTOR);
-b1d405751cd579 Vitaly Kuznetsov   2020-05-25  337  
-52a5c155cf79f1 Wanpeng Li         2017-07-13  338  		wrmsrl(MSR_KVM_ASYNC_PF_EN, pa);
-89cbc76768c2fa Christoph Lameter  2014-08-17  339  		__this_cpu_write(apf_reason.enabled, 1);
-6bca69ada4bc20 Thomas Gleixner    2020-03-07  340  		pr_info("KVM setup async PF for cpu %d\n", smp_processor_id());
-fd10cde9294f73 Gleb Natapov       2010-10-14  341  	}
-d910f5c1064d7f Glauber Costa      2011-07-11  342  
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  343  	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI)) {
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  344  		unsigned long pa;
-6bca69ada4bc20 Thomas Gleixner    2020-03-07  345  
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  346  		/* Size alignment is implied but just to make it explicit. */
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  347  		BUILD_BUG_ON(__alignof__(kvm_apic_eoi) < 4);
-89cbc76768c2fa Christoph Lameter  2014-08-17  348  		__this_cpu_write(kvm_apic_eoi, 0);
-89cbc76768c2fa Christoph Lameter  2014-08-17  349  		pa = slow_virt_to_phys(this_cpu_ptr(&kvm_apic_eoi))
-5dfd486c4750c9 Dave Hansen        2013-01-22  350  			| KVM_MSR_ENABLED;
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  351  		wrmsrl(MSR_KVM_PV_EOI_EN, pa);
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  352  	}
-ab9cf4996bb989 Michael S. Tsirkin 2012-06-24  353  
-d910f5c1064d7f Glauber Costa      2011-07-11  354  	if (has_steal_clock)
-d910f5c1064d7f Glauber Costa      2011-07-11  355  		kvm_register_steal_time();
-fd10cde9294f73 Gleb Natapov       2010-10-14  356  }
-fd10cde9294f73 Gleb Natapov       2010-10-14  357  
-
-:::::: The code at line 330 was first introduced by commit
-:::::: ef68017eb5704eb2b0577c3aa6619e13caf2b59f x86/kvm: Handle async page faults directly through do_page_fault()
-
-:::::: TO: Andy Lutomirski <luto@kernel.org>
-:::::: CC: Thomas Gleixner <tglx@linutronix.de>
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
