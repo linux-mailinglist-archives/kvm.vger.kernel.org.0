@@ -2,117 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B7021FB266
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 15:44:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 949FD1FB283
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 15:51:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728981AbgFPNoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 09:44:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63556 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728869AbgFPNn6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 09:43:58 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GDXfZm163618;
-        Tue, 16 Jun 2020 09:43:57 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31mtxfw6c7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 09:43:57 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GDYo48171672;
-        Tue, 16 Jun 2020 09:43:57 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31mtxfw6bg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 09:43:56 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GDe9WE007434;
-        Tue, 16 Jun 2020 13:43:55 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 31mpe85e5j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 13:43:55 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GDhrni1900914
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jun 2020 13:43:53 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0E8024C046;
-        Tue, 16 Jun 2020 13:43:53 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B345B4C04E;
-        Tue, 16 Jun 2020 13:43:52 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.26.88])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 16 Jun 2020 13:43:52 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v9 11/12] s390x: css: msch, enable test
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-12-git-send-email-pmorel@linux.ibm.com>
- <665f6c4c-6e72-5980-a3c8-d6ca31ff470c@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <16a6a1c3-d6da-75bb-084d-2e990ddadd49@linux.ibm.com>
-Date:   Tue, 16 Jun 2020 15:43:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1729024AbgFPNvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 09:51:11 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46210 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728763AbgFPNvK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 09:51:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592315469;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bW70KetN1S9pgLmduemj3sE+2f4ymbV6PKsDI2lVIow=;
+        b=bs9VPbmYoCplUqi+W3i0mJAR9XlKNpX6L13lLQw3Zcdx6lpgR1LpPqpLe6ulpJyOBj08r+
+        CdMPORHKUw/SW8cnvvqsgVunFTzuvVZ9S1zgBmUqm0oWd8ujKpEgPtrNBVpHjVS6J6BI4x
+        lnAL3vuohD7t6M0ljZhaWW7muXPVXrw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-WNGUn7ENPFa3byWrPY6RhQ-1; Tue, 16 Jun 2020 09:51:04 -0400
+X-MC-Unique: WNGUn7ENPFa3byWrPY6RhQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6239118C35BB;
+        Tue, 16 Jun 2020 13:51:02 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A5EB679303;
+        Tue, 16 Jun 2020 13:50:53 +0000 (UTC)
+Date:   Tue, 16 Jun 2020 15:50:51 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: Re: [PATCH v2 1/1] s390: virtio: let arch accept devices without
+ IOMMU feature
+Message-ID: <20200616155051.5b842895.cohuck@redhat.com>
+In-Reply-To: <e130c5e7-40e5-40a8-eac3-c2d17c90ee7b@linux.ibm.com>
+References: <1592224764-1258-1-git-send-email-pmorel@linux.ibm.com>
+        <1592224764-1258-2-git-send-email-pmorel@linux.ibm.com>
+        <20200616115202.0285aa08.pasic@linux.ibm.com>
+        <ef235cc9-9d4b-1247-c01a-9dd1c63f437c@linux.ibm.com>
+        <20200616135726.04fa8314.pasic@linux.ibm.com>
+        <20200616141744.61b3a139.cohuck@redhat.com>
+        <e130c5e7-40e5-40a8-eac3-c2d17c90ee7b@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <665f6c4c-6e72-5980-a3c8-d6ca31ff470c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-16_04:2020-06-16,2020-06-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 suspectscore=0
- phishscore=0 lowpriorityscore=0 mlxscore=0 cotscore=-2147483648
- bulkscore=0 adultscore=0 mlxlogscore=999 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006160101
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 16 Jun 2020 15:41:20 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
+> On 2020-06-16 14:17, Cornelia Huck wrote:
+> > On Tue, 16 Jun 2020 13:57:26 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >   
+> >> On Tue, 16 Jun 2020 12:52:50 +0200
+> >> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >>  
+> >>>>>    int virtio_finalize_features(struct virtio_device *dev)
+> >>>>>    {
+> >>>>>    	int ret = dev->config->finalize_features(dev);
+> >>>>> @@ -179,6 +184,10 @@ int virtio_finalize_features(struct virtio_device *dev)
+> >>>>>    	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+> >>>>>    		return 0;
+> >>>>>    
+> >>>>> +	if (arch_needs_iommu_platform(dev) &&
+> >>>>> +		!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM))
+> >>>>> +		return -EIO;
+> >>>>> +  
+> >>>>
+> >>>> Why EIO?  
+> >>>
+> >>> Because I/O can not occur correctly?
+> >>> I am open to suggestions.  
+> >>
+> >> We use -ENODEV if feature when the device rejects the features we
+> >> tried to negotiate (see virtio_finalize_features()) and -EINVAL when
+> >> the F_VERSION_1 and the virtio-ccw revision ain't coherent (in
+> >> virtio_ccw_finalize_features()). Any of those seems more fitting
+> >> that EIO to me. BTW does the error code itself matter in any way,
+> >> or is it just OK vs some error?  
+> > 
+> > If I haven't lost my way, we end up in the driver core probe failure
+> > handling; we probably should do -ENODEV if we just want probing to fail
+> > and -EINVAL or -EIO if we want the code to moan.
+> >   
+> 
+> what about returning -ENODEV and add a dedicated warning here?
+> 
 
-On 2020-06-16 13:43, Thomas Huth wrote:
-> On 15/06/2020 11.32, Pierre Morel wrote:
->> A second step when testing the channel subsystem is to prepare a channel
->> for use.
->> This includes:
->> - Get the current subchannel Information Block (SCHIB) using STSCH
->> - Update it in memory to set the ENABLE bit
->> - Tell the CSS that the SCHIB has been modified using MSCH
->> - Get the SCHIB from the CSS again to verify that the subchannel is
->>    enabled.
->> - If the command succeeds but subchannel is not enabled retry a
->>    predefined retries count.
->> - If the command fails, report the failure and do not retry, even
->>    if cc indicates a busy/status pending as we do not expect this.
->>
->> This tests the MSCH instruction to enable a channel succesfuly.
-> 
-> s/succesfuly/successfully/
+Sounds good at least to me.
 
-yes.
-
-> 
->> This some retries are done and in case of error, and if the retries
->> count is exceeded, a report is made.
-> 
-> That sentence needs some fixes, too ;-)
-> 
-> With the commit description fixed:
-> 
-> Acked-by: Thomas Huth <thuth@redhat.com>
-> 
-
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
