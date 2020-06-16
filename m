@@ -2,81 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A1C11FBE9B
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 20:57:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E2BC1FBF17
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 21:39:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730621AbgFPS4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 14:56:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34965 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730549AbgFPS4r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 14:56:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592333806;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=m8xQB6mQZC1dBMukO1QKy6l2+Gq6ZtFVdy6w67HPVeU=;
-        b=ZgVbHv7xRuB96NEDMVZz8VY2VH6GlbBigglPsrhBt/bES9vC7yTasR8wp3pAPJYzhLZLWH
-        uQVJQkLqdy+Q2ABVn43uzJaz1M9ZTAOBGVVcld8/gmaTO1qmfK9STLsRAZV9z+RoLBy6fp
-        Nw3DDwsKLOhRd5DDKp/jj0rVyVfkBZU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-DB-JvC8ANOemVURQ4x3gFw-1; Tue, 16 Jun 2020 14:56:44 -0400
-X-MC-Unique: DB-JvC8ANOemVURQ4x3gFw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 719C880F5D5;
-        Tue, 16 Jun 2020 18:56:43 +0000 (UTC)
-Received: from thuth.com (ovpn-114-128.ams2.redhat.com [10.36.114.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 662A37CAA8;
-        Tue, 16 Jun 2020 18:56:42 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>
-Subject: [kvm-unit-tests PULL 12/12] s390x: stsi: Make output tap13 compatible
-Date:   Tue, 16 Jun 2020 20:56:22 +0200
-Message-Id: <20200616185622.8644-13-thuth@redhat.com>
-In-Reply-To: <20200616185622.8644-1-thuth@redhat.com>
-References: <20200616185622.8644-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        id S1730651AbgFPTjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 15:39:15 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:56103 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728144AbgFPTjO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 15:39:14 -0400
+Received: by mail-io1-f71.google.com with SMTP id b11so10375ioh.22
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 12:39:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=xhWTXz6SmpEnhzfxWd+ix6TSZuz6ykxq9UiT0D4oYAs=;
+        b=RVwiCbhtI/UeVqN62D/IknxclwcNn1e+tRUhxCtvpDbGvM3hmm5CTTAQYIK+/Uc7cV
+         NYRRsc+Q2UfGfu3kHAyaToKpJ4j2p0G9v9nYA0IoWQxrCX+cLCVTsfX9u9ZeD1h5yv/m
+         gUIW2lYM05L7Jn6Fc6NIZToDOiQ/Al/zAUbOLtqptFC1BCEwuOjtWtMXlUKspNtpH/mK
+         vGkPqDwXCOdKRJNdIfluCYkW2PDY2faNofpXK/pFHpm3nwTD7V48aTQMGsBai80YlUBI
+         RkdWDkKXvhdJQagE7FlUwT7F/hCK2NbzUtCoKAFqcYiR+WYC/cpvWDFAnJgjDBUZ5xou
+         w/MA==
+X-Gm-Message-State: AOAM531/aAlApfhxPcY0UUZ/JRYLNZ3Elbu8yHbIcg6gdH2XylTpWR4c
+        qFGQDnMO6cKbilj3fK9fstvRIO7+WXC6ETqIokSZGL9Fwt8O
+X-Google-Smtp-Source: ABdhPJybcNcAP46lIRGqhcmL2DWu9VS8dbLVuupp560V+LfqLzVSt4u+Oi1giUa6whiX5ml9Qf1TlhPyzYCQlwGoOFEDK7jfloWj
+MIME-Version: 1.0
+X-Received: by 2002:a92:2907:: with SMTP id l7mr4878547ilg.48.1592336353676;
+ Tue, 16 Jun 2020 12:39:13 -0700 (PDT)
+Date:   Tue, 16 Jun 2020 12:39:13 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b953d805a838b240@google.com>
+Subject: KASAN: user-memory-access Read in sync_vmcs02_to_vmcs12
+From:   syzbot <syzbot+961278f56598a876c889@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Janosch Frank <frankja@linux.ibm.com>
+Hello,
 
-In tap13 output # is a special character and only "skip" and "todo"
-are allowed to come after it. Let's appease our CI environment and
-replace # with "count".
+syzbot found the following crash on:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20200525084340.1454-1-frankja@linux.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+HEAD commit:    7ae77150 Merge tag 'powerpc-5.8-1' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14f70989100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d195fe572fb15312
+dashboard link: https://syzkaller.appspot.com/bug?extid=961278f56598a876c889
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+961278f56598a876c889@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: user-memory-access in vmcs12_guest_cr0 arch/x86/kvm/vmx/nested.c:3545 [inline]
+BUG: KASAN: user-memory-access in sync_vmcs02_to_vmcs12+0x16fb/0x1a40 arch/x86/kvm/vmx/nested.c:3960
+Read of size 18446744071694194346 at addr 0000000001617928 by task systemd-udevd/3877
+
+CPU: 1 PID: 3877 Comm: systemd-udevd Not tainted 5.7.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x188/0x20d lib/dump_stack.c:118
+ __kasan_report mm/kasan/report.c:517 [inline]
+ kasan_report.cold+0x5/0x37 mm/kasan/report.c:530
+ vmcs12_guest_cr0 arch/x86/kvm/vmx/nested.c:3545 [inline]
+ sync_vmcs02_to_vmcs12+0x16fb/0x1a40 arch/x86/kvm/vmx/nested.c:3960
+ </IRQ>
+==================================================================
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 1 PID: 3877 Comm: systemd-udevd Tainted: G    B             5.7.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x188/0x20d lib/dump_stack.c:118
+ panic+0x2e3/0x75c kernel/panic.c:221
+ end_report+0x4d/0x53 mm/kasan/report.c:104
+ __kasan_report mm/kasan/report.c:520 [inline]
+ kasan_report.cold+0xd/0x37 mm/kasan/report.c:530
+ vmcs12_guest_cr0 arch/x86/kvm/vmx/nested.c:3545 [inline]
+ sync_vmcs02_to_vmcs12+0x16fb/0x1a40 arch/x86/kvm/vmx/nested.c:3960
+ </IRQ>
+Shutting down cpus with NMI
+Kernel Offset: disabled
+
+
 ---
- s390x/stsi.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/s390x/stsi.c b/s390x/stsi.c
-index 66b4257..b81cea7 100644
---- a/s390x/stsi.c
-+++ b/s390x/stsi.c
-@@ -129,11 +129,11 @@ static void test_3_2_2(void)
- 	}
- 
- 	report(!memcmp(data->vm[0].uuid, uuid, sizeof(uuid)), "uuid");
--	report(data->vm[0].conf_cpus == smp_query_num_cpus(), "cpu # configured");
-+	report(data->vm[0].conf_cpus == smp_query_num_cpus(), "cpu count configured");
- 	report(data->vm[0].total_cpus ==
- 	       data->vm[0].reserved_cpus + data->vm[0].conf_cpus,
--	       "cpu # total == conf + reserved");
--	report(data->vm[0].standby_cpus == 0, "cpu # standby");
-+	       "cpu count total == conf + reserved");
-+	report(data->vm[0].standby_cpus == 0, "cpu count standby");
- 	report(!memcmp(data->vm[0].name, vm_name, sizeof(data->vm[0].name)),
- 	       "VM name == kvm-unit-test");
- 
--- 
-2.18.1
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
