@@ -2,103 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E75901FACA4
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 11:36:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 664B81FACDA
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 11:39:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728038AbgFPJg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 05:36:28 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:6267 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728131AbgFPJg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 05:36:26 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id B1B0AEC54AB3263F89AF;
-        Tue, 16 Jun 2020 17:36:23 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 16 Jun 2020 17:36:14 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-CC:     Catalin Marinas <catalin.marinas@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Will Deacon <will@kernel.org>,
-        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <liangpeng10@huawei.com>, <zhengxiang9@huawei.com>,
-        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: [PATCH 12/12] KVM: arm64: Enable stage2 hardware DBM
-Date:   Tue, 16 Jun 2020 17:35:53 +0800
-Message-ID: <20200616093553.27512-13-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20200616093553.27512-1-zhukeqian1@huawei.com>
-References: <20200616093553.27512-1-zhukeqian1@huawei.com>
+        id S1727969AbgFPJj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 05:39:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7890 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725911AbgFPJj3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 05:39:29 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05G92iQv110447;
+        Tue, 16 Jun 2020 05:39:28 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31p5esfye6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 05:39:28 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05G933aH112435;
+        Tue, 16 Jun 2020 05:39:28 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31p5esfydb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 05:39:28 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05G9U77c012432;
+        Tue, 16 Jun 2020 09:39:26 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 31mpe7j2jf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 09:39:25 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05G9dNsp61079930
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jun 2020 09:39:23 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A07384C059;
+        Tue, 16 Jun 2020 09:39:23 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 52B644C046;
+        Tue, 16 Jun 2020 09:39:23 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.26.88])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 16 Jun 2020 09:39:23 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v9 01/12] s390x: Use PSW bits definitions
+ in cstart
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
+ <1592213521-19390-2-git-send-email-pmorel@linux.ibm.com>
+ <accfc1b6-6ddb-2b04-7f8a-ea6fd83b8b2f@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <04f889dc-7706-5f4a-f568-760ea9337f65@linux.ibm.com>
+Date:   Tue, 16 Jun 2020 11:39:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.230]
-X-CFilter-Loop: Reflected
+In-Reply-To: <accfc1b6-6ddb-2b04-7f8a-ea6fd83b8b2f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-16_03:2020-06-15,2020-06-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 adultscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
+ spamscore=0 impostorscore=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006160066
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We are ready to support hw management of dirty state, enable it if
-hardware support it.
 
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-Signed-off-by: Peng Liang <liangpeng10@huawei.com>
----
- arch/arm64/include/asm/sysreg.h | 2 ++
- arch/arm64/kvm/reset.c          | 9 ++++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 463175f80341..b22bd903284d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -744,6 +744,8 @@
- #define ID_AA64MMFR1_VMIDBITS_8		0
- #define ID_AA64MMFR1_VMIDBITS_16	2
- 
-+#define ID_AA64MMFR1_HADBS_DBS		2
-+
- /* id_aa64mmfr2 */
- #define ID_AA64MMFR2_E0PD_SHIFT		60
- #define ID_AA64MMFR2_FWB_SHIFT		40
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 52bb801c9b2c..c1215b13bdd5 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -427,7 +427,7 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- {
- 	u64 vtcr = VTCR_EL2_FLAGS, mmfr0;
- 	u32 parange, phys_shift;
--	u8 lvls;
-+	u8 lvls, hadbs;
- 
- 	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
- 		return -EINVAL;
-@@ -465,6 +465,13 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	 */
- 	vtcr |= VTCR_EL2_HA;
- 
-+#ifdef CONFIG_ARM64_HW_AFDBM
-+	hadbs = (read_sysreg(id_aa64mmfr1_el1) >>
-+			ID_AA64MMFR1_HADBS_SHIFT) & 0xf;
-+	if (hadbs == ID_AA64MMFR1_HADBS_DBS)
-+		vtcr |= VTCR_EL2_HD;
-+#endif
-+
- 	/* Set the vmid bits */
- 	vtcr |= (kvm_get_vmid_bits() == 16) ?
- 		VTCR_EL2_VS_16BIT :
+On 2020-06-16 11:31, Thomas Huth wrote:
+> On 15/06/2020 11.31, Pierre Morel wrote:
+>> This patch defines the PSW bits EA/BA used to initialize the PSW masks
+>> for exceptions.
+>>
+>> Since some PSW mask definitions exist already in arch_def.h we add these
+>> definitions there.
+>> We move all PSW definitions together and protect assembler code against
+>> C syntax.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   lib/s390x/asm/arch_def.h | 15 +++++++++++----
+>>   s390x/cstart64.S         | 15 ++++++++-------
+>>   2 files changed, 19 insertions(+), 11 deletions(-)
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+
+Thanks,
+Pierre
+
 -- 
-2.19.1
-
+Pierre Morel
+IBM Lab Boeblingen
