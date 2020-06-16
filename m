@@ -2,17 +2,17 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56F831FACC3
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 11:37:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE0F41FACC6
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 11:37:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728322AbgFPJgT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 05:36:19 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:6339 "EHLO huawei.com"
+        id S1728589AbgFPJh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 05:37:27 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6336 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728038AbgFPJgS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 05:36:18 -0400
+        id S1726099AbgFPJgR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 05:36:17 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id C14F1D5C778EF500B1DF;
+        by Forcepoint Email with ESMTP id A7F67EB29739727ABAE9;
         Tue, 16 Jun 2020 17:36:13 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
@@ -34,9 +34,9 @@ CC:     Catalin Marinas <catalin.marinas@arm.com>,
         Alexios Zavras <alexios.zavras@intel.com>,
         <liangpeng10@huawei.com>, <zhengxiang9@huawei.com>,
         <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: [PATCH 04/12] KVM: arm64: Support clear DBM bit for PTEs
-Date:   Tue, 16 Jun 2020 17:35:45 +0800
-Message-ID: <20200616093553.27512-5-zhukeqian1@huawei.com>
+Subject: [PATCH 05/12] KVM: arm64: Add KVM_CAP_ARM_HW_DIRTY_LOG capability
+Date:   Tue, 16 Jun 2020 17:35:46 +0800
+Message-ID: <20200616093553.27512-6-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20200616093553.27512-1-zhukeqian1@huawei.com>
 References: <20200616093553.27512-1-zhukeqian1@huawei.com>
@@ -49,190 +49,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This supports clear DBM bit for PTEs, to realize dynamic enable
-of hardware DBM.
+For that using arm64 DBM to log dirty pages has the side effect
+of long time dirty log sync, we should give userspace opportunity
+to enable or disable this feature, to realize some policy.
 
 Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   2 +
- arch/arm64/kvm/mmu.c              | 151 ++++++++++++++++++++++++++++++
- 2 files changed, 153 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  7 +++++++
+ arch/arm64/kvm/arm.c              | 10 ++++++++++
+ arch/arm64/kvm/reset.c            |  5 +++++
+ include/uapi/linux/kvm.h          |  1 +
+ tools/include/uapi/linux/kvm.h    |  1 +
+ 5 files changed, 24 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c3e6fcc664b1..9ea2dcfd609c 100644
+index 9ea2dcfd609c..2bc3256759e3 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -480,6 +480,8 @@ u64 __kvm_call_hyp(void *hypfn, ...);
+@@ -95,6 +95,13 @@ struct kvm_arch {
+ 	 * supported.
+ 	 */
+ 	bool return_nisv_io_abort_to_user;
++
++	/*
++	 * Use hardware management of dirty status (DBM) to log dirty pages.
++	 * Userspace can enable this feature if KVM_CAP_ARM_HW_DIRTY_LOG is
++	 * supported.
++	 */
++	bool hw_dirty_log;
+ };
  
- void force_vm_exit(const cpumask_t *mask);
- void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
-+void kvm_mmu_clear_dbm(struct kvm *kvm, struct kvm_memory_slot *memslot);
-+void kvm_mmu_clear_dbm_all(struct kvm *kvm);
- 
- int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		int exception_index);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 27407153121b..f08b0fbca0a0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2446,6 +2446,157 @@ int kvm_mmu_init(void)
- 	return err;
- }
- 
+ #define KVM_NR_MEM_OBJS     40
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 90cb90561446..850cc5cbc6f0 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -87,6 +87,16 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		r = 0;
+ 		kvm->arch.return_nisv_io_abort_to_user = true;
+ 		break;
 +#ifdef CONFIG_ARM64_HW_AFDBM
-+/**
-+ * stage2_clear_dbm_ptes() - clear DBM bit from PMD range
-+ * @pmd:	pointer to pmd entry
-+ * @addr:	range start address
-+ * @end:	range end address
-+ */
-+static void stage2_clear_dbm_ptes(pmd_t *pmd, phys_addr_t addr,
-+				  phys_addr_t end)
-+{
-+	pte_t *pte;
-+
-+	pte = pte_offset_kernel(pmd, addr);
-+	do {
-+		if (!pte_none(*pte) && kvm_s2pte_dbm(pte))
-+			kvm_clear_s2pte_dbm(pte);
-+	} while (pte++, addr += PAGE_SIZE, addr != end);
-+}
-+
-+/**
-+ * stage2_clear_dbm_pmds() - clear DBM bit from PUD range
-+ * @kvm:	The KVM pointer
-+ * @pud:	pointer to pud entry
-+ * @addr:	range start address
-+ * @end:	range end address
-+ */
-+static void stage2_clear_dbm_pmds(struct kvm *kvm, pud_t *pud,
-+				  phys_addr_t addr, phys_addr_t end)
-+{
-+	pmd_t *pmd;
-+	phys_addr_t next;
-+
-+	pmd = stage2_pmd_offset(kvm, pud, addr);
-+	do {
-+		next = stage2_pmd_addr_end(kvm, addr, end);
-+		if (!pmd_none(*pmd) && !pmd_thp_or_huge(*pmd))
-+			stage2_clear_dbm_ptes(pmd, addr, next);
-+	} while (pmd++, addr = next, addr != end);
-+}
-+
-+/**
-+ * stage2_clear_dbm_puds() - clear DBM bit from P4D range
-+ * @kvm:	The KVM pointer
-+ * @pgd:	pointer to pgd entry
-+ * @addr:	range start address
-+ * @end:	range end address
-+ */
-+static void stage2_clear_dbm_puds(struct kvm *kvm, p4d_t *p4d,
-+				  phys_addr_t addr, phys_addr_t end)
-+{
-+	pud_t *pud;
-+	phys_addr_t next;
-+
-+	pud = stage2_pud_offset(kvm, p4d, addr);
-+	do {
-+		next = stage2_pud_addr_end(kvm, addr, end);
-+		if (!stage2_pud_none(kvm, *pud) && !stage2_pud_huge(kvm, *pud))
-+			stage2_clear_dbm_pmds(kvm, pud, addr, next);
-+	} while (pud++, addr = next, addr != end);
-+}
-+
-+/**
-+ * stage2_clear_dbm_p4ds() - clear DBM bit from PGD range
-+ * @kvm:	The KVM pointer
-+ * @pgd:	pointer to pgd entry
-+ * @addr:	range start address
-+ * @end:	range end address
-+ */
-+static void stage2_clear_dbm_p4ds(struct kvm *kvm, pgd_t *pgd,
-+				  phys_addr_t addr, phys_addr_t end)
-+{
-+	p4d_t *p4d;
-+	phys_addr_t next;
-+
-+	p4d = stage2_p4d_offset(kvm, pgd, addr);
-+	do {
-+		next = stage2_p4d_addr_end(kvm, addr, end);
-+		if (!stage2_p4d_none(kvm, *p4d))
-+			stage2_clear_dbm_puds(kvm, p4d, addr, next);
-+	} while (p4d++, addr = next, addr != end);
-+}
-+
-+/**
-+ * stage2_clear_dbm_range() - clear DBM bit from stage2 memory
-+ * region range
-+ * @kvm:	The KVM pointer
-+ * @addr:	Start address of range
-+ * @end:	End address of range
-+ */
-+static void stage2_clear_dbm_range(struct kvm *kvm, phys_addr_t addr,
-+				   phys_addr_t end)
-+{
-+	pgd_t *pgd;
-+	phys_addr_t next;
-+
-+	pgd = kvm->arch.pgd + stage2_pgd_index(kvm, addr);
-+	do {
-+		cond_resched_lock(&kvm->mmu_lock);
-+		if (!READ_ONCE(kvm->arch.pgd))
-+			break;
-+		next = stage2_pgd_addr_end(kvm, addr, end);
-+		if (stage2_pgd_present(kvm, *pgd))
-+			stage2_clear_dbm_p4ds(kvm, pgd, addr, next);
-+	} while (pgd++, addr = next, addr != end);
-+}
-+
-+/**
-+ * kvm_mmu_clear_dbm() - clear DBM bit from stage2 PTEs for memory slot
-+ * @kvm:	The KVM pointer
-+ * @slot:	The memory slot to clear DBM bit
-+ *
-+ * After this function returns, DBM bit of all block or page descriptors
-+ * is cleared.
-+ *
-+ * Acquires kvm_mmu_lock. Called with kvm->slots_lock mutex acquired,
-+ * serializing operations for VM memory regions.
-+ */
-+void kvm_mmu_clear_dbm(struct kvm *kvm, struct kvm_memory_slot *memslot)
-+{
-+	phys_addr_t start = memslot->base_gfn << PAGE_SHIFT;
-+	phys_addr_t end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
-+
-+	spin_lock(&kvm->mmu_lock);
-+	stage2_clear_dbm_range(kvm, start, end);
-+	spin_unlock(&kvm->mmu_lock);
-+	kvm_flush_remote_tlbs(kvm);
-+}
-+
-+/**
-+ * kvm_mmu_clear_dbm_all() - clear DBM bit from stage2 PTEs for whole VM
-+ * @kvm:	The KVM pointer
-+ *
-+ * Called with kvm->slots_lock mutex acquired.
-+ */
-+void kvm_mmu_clear_dbm_all(struct kvm *kvm)
-+{
-+	struct kvm_memslots *slots = kvm_memslots(kvm);
-+	struct kvm_memory_slot *memslots = slots->memslots;
-+	struct kvm_memory_slot *memslot;
-+	int slot;
-+
-+	if (unlikely(!slots->used_slots))
-+		return;
-+
-+	for (slot = 0; slot < slots->used_slots; slot++) {
-+		memslot = &memslots[slot];
-+		kvm_mmu_clear_dbm(kvm, memslot);
-+	}
-+}
++	case KVM_CAP_ARM_HW_DIRTY_LOG:
++		if ((cap->args[0] & ~1) || !kvm_hw_dbm_enabled()) {
++			r = -EINVAL;
++		} else {
++			r = 0;
++			kvm->arch.hw_dirty_log = cap->args[0];
++		}
++		break;
++#endif
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index d3b209023727..52bb801c9b2c 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -83,6 +83,11 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = has_vhe() && system_supports_address_auth() &&
+ 				 system_supports_generic_auth();
+ 		break;
++#ifdef CONFIG_ARM64_HW_AFDBM
++	case KVM_CAP_ARM_HW_DIRTY_LOG:
++		r = kvm_hw_dbm_enabled();
++		break;
 +#endif /* CONFIG_ARM64_HW_AFDBM */
-+
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   const struct kvm_userspace_memory_region *mem,
- 				   struct kvm_memory_slot *old,
+ 	default:
+ 		r = 0;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 4fdf30316582..e0b12c43397b 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SECURE_GUEST 181
+ #define KVM_CAP_HALT_POLL 182
+ #define KVM_CAP_ASYNC_PF_INT 183
++#define KVM_CAP_ARM_HW_DIRTY_LOG 184
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index fdd632c833b4..53908a8881a4 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -1017,6 +1017,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_VCPU_RESETS 179
+ #define KVM_CAP_S390_PROTECTED 180
+ #define KVM_CAP_PPC_SECURE_GUEST 181
++#define KVM_CAP_ARM_HW_DIRTY_LOG 184
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.19.1
 
