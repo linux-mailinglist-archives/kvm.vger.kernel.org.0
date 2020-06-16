@@ -2,79 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 368391FAC84
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 11:35:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8629B1FACA1
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 11:36:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728049AbgFPJfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 05:35:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39046 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725911AbgFPJfS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 05:35:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592300116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=4OcfCuG1vNGsZvLvoiRnSaiZvP8xLfhihUIJTYWNKxs=;
-        b=JeZd360sdnXujxIIirIVX3zQ8r5koaIwinDXIX4BotET4lI/jwnFYjPRmEUU2k9thsNXeJ
-        YJ/Bc+YpiOJAaHpmXwzLqRLcEdI86Ee/X9uGYivba7+gNM3sgM9/5xeyRZICFHDfwZJAhw
-        CTp9cv0DXjcErBlbCRUtzZNuL8un2zs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-PmwOFWtJPtK_lRromgykUA-1; Tue, 16 Jun 2020 05:35:13 -0400
-X-MC-Unique: PmwOFWtJPtK_lRromgykUA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14734107B7C9;
-        Tue, 16 Jun 2020 09:35:12 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-128.ams2.redhat.com [10.36.114.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ED3C25C1C3;
-        Tue, 16 Jun 2020 09:35:07 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v9 06/12] s390x: clock and delays
- caluculations
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-7-git-send-email-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <81557eed-ff8e-2076-44f7-2174befce7b5@redhat.com>
-Date:   Tue, 16 Jun 2020 11:35:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728271AbgFPJgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 05:36:17 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6334 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728240AbgFPJgQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 05:36:16 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 968F783B892EBF894D59;
+        Tue, 16 Jun 2020 17:36:13 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.173.221.230) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 16 Jun 2020 17:36:03 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
+CC:     Catalin Marinas <catalin.marinas@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Will Deacon <will@kernel.org>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <liangpeng10@huawei.com>, <zhengxiang9@huawei.com>,
+        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: [PATCH 00/12] KVM: arm64: Support stage2 hardware DBM
+Date:   Tue, 16 Jun 2020 17:35:41 +0800
+Message-ID: <20200616093553.27512-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-In-Reply-To: <1592213521-19390-7-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain
+X-Originating-IP: [10.173.221.230]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/06/2020 11.31, Pierre Morel wrote:
-> The hardware gives us a good definition of the microsecond,
-> let's keep this information and let the routine accessing
-> the hardware keep all the information and return microseconds.
-> 
-> Calculate delays in microseconds and take care about wrapping
-> around zero.
-> 
-> Define values with macros and use inlines to keep the
-> milliseconds interface.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/asm/time.h | 29 +++++++++++++++++++++++++++--
->  1 file changed, 27 insertions(+), 2 deletions(-)
+This patch series add support for stage2 hardware DBM, and it is only
+used for dirty log for now.
 
-In case you respin, there is a typo in the title ("caluculations") ...
-otherwise this can be fixed when the patch gets picked up.
+It works well under some migration test cases, including VM with 4K
+pages or 2M THP. I checked the SHA256 hash digest of all memory and
+they keep same for source VM and destination VM, which means no dirty
+pages is missed under hardware DBM.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Some key points:
+
+1. Only support hardware updates of dirty status for PTEs. PMDs and PUDs
+   are not involved for now.
+
+2. About *performance*: In RFC patch, I have mentioned that for every 64GB
+   memory, KVM consumes about 40ms to scan all PTEs to collect dirty log.
+   
+   Initially, I plan to solve this problem using parallel CPUs. However
+   I faced two problems.
+
+   The first is bottleneck of memory bandwith. Single thread will occupy
+   bandwidth about 500GB/s, we can support about 4 parallel threads at
+   most, so the ideal speedup ratio is low.
+
+   The second is huge impact on other CPUs. To scan PTs quickly, I use
+   smp_call_function_many, which is based on IPI, to dispatch workload
+   on other CPUs. Though it can complete work in time, the interrupt is
+   disabled during scaning PTs, which has huge impact on other CPUs.
+
+   Now, I make hardware dirty log can be dynamic enabled and disabled.
+   Userspace can enable it before VM migration and disable it when
+   remaining dirty pages is little. Thus VM downtime is not affected. 
+
+
+3. About correctness: Only add DBM bit when PTE is already writable, so
+   we still have readonly PTE and some mechanisms which rely on readonly
+   PTs are not broken.
+
+4. About PTs modification races: There are two kinds of PTs modification.
+   
+   The first is adding or clearing specific bit, such as AF or RW. All
+   these operations have been converted to be atomic, avoid covering
+   dirty status set by hardware.
+   
+   The second is replacement, such as PTEs unmapping or changement. All
+   these operations will invoke kvm_set_pte finally. kvm_set_pte have
+   been converted to be atomic and we save the dirty status to underlying
+   bitmap if dirty status is coverred.
+
+
+Keqian Zhu (12):
+  KVM: arm64: Add some basic functions to support hw DBM
+  KVM: arm64: Modify stage2 young mechanism to support hw DBM
+  KVM: arm64: Report hardware dirty status of stage2 PTE if coverred
+  KVM: arm64: Support clear DBM bit for PTEs
+  KVM: arm64: Add KVM_CAP_ARM_HW_DIRTY_LOG capability
+  KVM: arm64: Set DBM bit of PTEs during write protecting
+  KVM: arm64: Scan PTEs to sync dirty log
+  KVM: Omit dirty log sync in log clear if initially all set
+  KVM: arm64: Steply write protect page table by mask bit
+  KVM: arm64: Save stage2 PTE dirty status if it is coverred
+  KVM: arm64: Support disable hw dirty log after enable
+  KVM: arm64: Enable stage2 hardware DBM
+
+ arch/arm64/include/asm/kvm_host.h |  11 +
+ arch/arm64/include/asm/kvm_mmu.h  |  56 +++-
+ arch/arm64/include/asm/sysreg.h   |   2 +
+ arch/arm64/kvm/arm.c              |  22 +-
+ arch/arm64/kvm/mmu.c              | 411 ++++++++++++++++++++++++++++--
+ arch/arm64/kvm/reset.c            |  14 +-
+ include/uapi/linux/kvm.h          |   1 +
+ tools/include/uapi/linux/kvm.h    |   1 +
+ virt/kvm/kvm_main.c               |   7 +-
+ 9 files changed, 499 insertions(+), 26 deletions(-)
+
+-- 
+2.19.1
 
