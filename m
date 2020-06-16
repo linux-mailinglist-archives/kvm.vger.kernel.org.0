@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03FDF1FBE95
+	by mail.lfdr.de (Postfix) with ESMTP id 7AFFF1FBE96
 	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 20:56:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730421AbgFPS4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1730436AbgFPS4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 16 Jun 2020 14:56:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47736 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729994AbgFPS4e (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 14:56:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56768 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730312AbgFPS4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 14:56:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592333793;
+        s=mimecast20190719; t=1592333794;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:in-reply-to:in-reply-to:references:references;
-        bh=gI8VGlGSnMQyE03VP9aqGEe1Ss4f/jEXIJkRru5nAI0=;
-        b=bbrH74ioRNDpfWMWmwgBMvrGOSpEzDagMJPAMoJYkKlhEVbF1rQVysukm+I0h4FGbRNMIB
-        LdIw7PNn5tAt0IHPVaTvYZZ0DAtvb5fIYyGceZ4YEVFivmPosj8ot2isdPM/GBmL/okCOy
-        bNcPMjAlfZgvhSWtqFl184+SnEeQVQc=
+        bh=6OpF2PS0+M7A0UkOIJJrI29Srt4ywHknxIiHcFjvmY8=;
+        b=Rl9iHZcysq1BJk1LLJtkbB7YiX2zmsL15J/9YOBldTpycHs0Ivjxn9GQV5B0gSuZdFt+Fk
+        JQF5PkPCyTsU4acXhEXPNbkjMYZGeV3euwo0eOu9YjgzZO/PclnJ/OALDNNjTYm4X8KK29
+        POAoANgMzdyTQF/xh6pLhBd6zZIKp40=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-bp5IqzFENWC7hdZHdySVVw-1; Tue, 16 Jun 2020 14:56:31 -0400
-X-MC-Unique: bp5IqzFENWC7hdZHdySVVw-1
+ us-mta-36-agPJjcitNg6tXZztgXZpeg-1; Tue, 16 Jun 2020 14:56:32 -0400
+X-MC-Unique: agPJjcitNg6tXZztgXZpeg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 890F110AB64C
-        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 18:56:30 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B76EE81EE22
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 18:56:31 +0000 (UTC)
 Received: from thuth.com (ovpn-114-128.ams2.redhat.com [10.36.114.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B01037CAA8;
-        Tue, 16 Jun 2020 18:56:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E90F7891C2;
+        Tue, 16 Jun 2020 18:56:30 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PULL 04/12] Always compile the kvm-unit-tests with -fno-common
-Date:   Tue, 16 Jun 2020 20:56:14 +0200
-Message-Id: <20200616185622.8644-5-thuth@redhat.com>
+Subject: [kvm-unit-tests PULL 05/12] Fix powerpc issue with the linker from Fedora 32
+Date:   Tue, 16 Jun 2020 20:56:15 +0200
+Message-Id: <20200616185622.8644-6-thuth@redhat.com>
 In-Reply-To: <20200616185622.8644-1-thuth@redhat.com>
 References: <20200616185622.8644-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
@@ -44,59 +44,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The new GCC v10 uses -fno-common by default. To avoid that we commit
-code that declares global variables twice and thus fails to link with
-the latest version, we should also compile with -fno-common when using
-older versions of the compiler. However, this now also means that we
-can not play the trick with the common auxinfo struct anymore. Thus
-declare it as extern in the header now and link auxinfo.c on x86, too.
+The linker from Fedora 32 complains:
 
-Message-Id: <20200514192626.9950-6-thuth@redhat.com>
+powerpc64-linux-gnu-ld: powerpc/selftest.elf: error: PHDR segment not
+ covered by LOAD segment
+
+Let's introduce some fake PHDRs to the linker script to get this
+working again.
+
+Message-Id: <20200514192626.9950-7-thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- Makefile            | 2 +-
- lib/auxinfo.h       | 3 +--
- x86/Makefile.common | 1 +
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ powerpc/flat.lds | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 754ed65..3ff2f91 100644
---- a/Makefile
-+++ b/Makefile
-@@ -49,7 +49,7 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
- cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-               > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+diff --git a/powerpc/flat.lds b/powerpc/flat.lds
+index 53221e8..5eed368 100644
+--- a/powerpc/flat.lds
++++ b/powerpc/flat.lds
+@@ -1,7 +1,17 @@
  
--COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing
-+COMMON_CFLAGS += -g $(autodepend-flags) -fno-strict-aliasing -fno-common
- COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
- COMMON_CFLAGS += -Wignored-qualifiers -Werror
- 
-diff --git a/lib/auxinfo.h b/lib/auxinfo.h
-index 08b96f8..a46a1e6 100644
---- a/lib/auxinfo.h
-+++ b/lib/auxinfo.h
-@@ -13,7 +13,6 @@ struct auxinfo {
- 	unsigned long flags;
- };
- 
--/* No extern!  Define a common symbol.  */
--struct auxinfo auxinfo;
-+extern struct auxinfo auxinfo;
- #endif
- #endif
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index ab67ca0..2ea9c9f 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -5,6 +5,7 @@ all: directories test_cases
- cflatobjs += lib/pci.o
- cflatobjs += lib/pci-edu.o
- cflatobjs += lib/alloc.o
-+cflatobjs += lib/auxinfo.o
- cflatobjs += lib/vmalloc.o
- cflatobjs += lib/alloc_page.o
- cflatobjs += lib/alloc_phys.o
++PHDRS
++{
++    text PT_LOAD FLAGS(5);
++    data PT_LOAD FLAGS(6);
++}
++
+ SECTIONS
+ {
+-    .text : { *(.init) *(.text) *(.text.*) }
++    .text : {
++        *(.init)
++        *(.text)
++        *(.text.*)
++    } :text
+     . = ALIGN(64K);
+     etext = .;
+     .opd : { *(.opd) }
+@@ -19,9 +29,12 @@ SECTIONS
+     .data : {
+         *(.data)
+         *(.data.rel*)
+-    }
++    } :data
+     . = ALIGN(16);
+-    .rodata : { *(.rodata) *(.rodata.*) }
++    .rodata : {
++        *(.rodata)
++        *(.rodata.*)
++    } :data
+     . = ALIGN(16);
+     .bss : { *(.bss) }
+     . = ALIGN(256);
 -- 
 2.18.1
 
