@@ -2,89 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 927EF1FAF91
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 13:55:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F72E1FAFAC
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 13:58:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727966AbgFPLzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 07:55:04 -0400
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:44277 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726261AbgFPLzE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 07:55:04 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07484;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U.mfflQ_1592308495;
-Received: from 30.27.116.240(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U.mfflQ_1592308495)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 16 Jun 2020 19:54:57 +0800
-Subject: Re: [PATCH v4 6/7] KVM: MIPS: clean up redundant 'kvm_run' parameters
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@gmail.com>
-Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>, paulus@ozlabs.org,
-        mpe@ellerman.id.au,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        Thomas Gleixner <tglx@linutronix.de>, mingo@redhat.com,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org, hpa@zytor.com,
-        Marc Zyngier <maz@kernel.org>, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, Peter Xu <peterx@redhat.com>,
-        thuth@redhat.com, kvm@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
- <20200427043514.16144-7-tianjia.zhang@linux.alibaba.com>
- <CAAhV-H7kpKUfQoWid6GSNL5+4hTTroGyL83EaW6yZwS2+Ti9kA@mail.gmail.com>
- <37246a25-c4dc-7757-3f5c-d46870a4f186@linux.alibaba.com>
- <30c2ac06-1a7e-2f85-fbe1-e9dc25bf2ae2@redhat.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <5f0d01ad-d299-083b-70e4-995ad7596fbd@linux.alibaba.com>
-Date:   Tue, 16 Jun 2020 19:54:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.1
+        id S1728716AbgFPL6D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 07:58:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45776 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728481AbgFPL6D (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 07:58:03 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GBVkN5176896;
+        Tue, 16 Jun 2020 07:57:56 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31pc7qdxth-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 07:57:56 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GBlCB6032338;
+        Tue, 16 Jun 2020 07:57:56 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31pc7qdxsc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 07:57:55 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GBtjk4016289;
+        Tue, 16 Jun 2020 11:57:53 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 31mpe7w980-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 11:57:53 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GBvoDl60555284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jun 2020 11:57:50 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A55BC4C046;
+        Tue, 16 Jun 2020 11:57:50 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EC4D14C040;
+        Tue, 16 Jun 2020 11:57:49 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.56.227])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 16 Jun 2020 11:57:49 +0000 (GMT)
+Date:   Tue, 16 Jun 2020 13:57:26 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, mst@redhat.com, jasowang@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: Re: [PATCH v2 1/1] s390: virtio: let arch accept devices without
+ IOMMU feature
+Message-ID: <20200616135726.04fa8314.pasic@linux.ibm.com>
+In-Reply-To: <ef235cc9-9d4b-1247-c01a-9dd1c63f437c@linux.ibm.com>
+References: <1592224764-1258-1-git-send-email-pmorel@linux.ibm.com>
+        <1592224764-1258-2-git-send-email-pmorel@linux.ibm.com>
+        <20200616115202.0285aa08.pasic@linux.ibm.com>
+        <ef235cc9-9d4b-1247-c01a-9dd1c63f437c@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <30c2ac06-1a7e-2f85-fbe1-e9dc25bf2ae2@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-16_04:2020-06-15,2020-06-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 impostorscore=0 suspectscore=0 priorityscore=1501
+ malwarescore=0 mlxlogscore=999 adultscore=0 spamscore=0 mlxscore=0
+ clxscore=1015 cotscore=-2147483648 phishscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006160084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 16 Jun 2020 12:52:50 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-
-On 2020/5/29 17:48, Paolo Bonzini wrote:
-> On 27/05/20 08:24, Tianjia Zhang wrote:
->>>>
->>>>
->>
->> Hi Huacai,
->>
->> These two patches(6/7 and 7/7) should be merged into the tree of the
->> mips architecture separately. At present, there seems to be no good way
->> to merge the whole architecture patchs.
->>
->> For this series of patches, some architectures have been merged, some
->> need to update the patch.
+> >>   int virtio_finalize_features(struct virtio_device *dev)
+> >>   {
+> >>   	int ret = dev->config->finalize_features(dev);
+> >> @@ -179,6 +184,10 @@ int virtio_finalize_features(struct virtio_device *dev)
+> >>   	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+> >>   		return 0;
+> >>   
+> >> +	if (arch_needs_iommu_platform(dev) &&
+> >> +		!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM))
+> >> +		return -EIO;
+> >> +  
+> > 
+> > Why EIO?  
 > 
-> Hi Tianjia, I will take care of this during the merge window.
-> 
-> Thanks,
-> 
-> Paolo
-> 
+> Because I/O can not occur correctly?
+> I am open to suggestions.
 
-Hi Paolo,
+We use -ENODEV if feature when the device rejects the features we
+tried to negotiate (see virtio_finalize_features()) and -EINVAL when
+the F_VERSION_1 and the virtio-ccw revision ain't coherent (in
+virtio_ccw_finalize_features()). Any of those seems more fitting
+that EIO to me. BTW does the error code itself matter in any way,
+or is it just OK vs some error?
 
-The following individual patch is the v5 version of 5/7 in this group of 
-patches.
-
-https://lkml.org/lkml/2020/5/28/106
-([v5] KVM: PPC: clean up redundant kvm_run parameters in assembly)
-
-Thanks and best,
-Tianjia
+Regards,
+Halil
