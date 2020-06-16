@@ -2,99 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6151C1FBA81
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 18:12:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC5441FBADC
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 18:15:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732123AbgFPQLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 12:11:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18882 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730984AbgFPQLp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 12:11:45 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GG3kFx018055;
-        Tue, 16 Jun 2020 12:11:44 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31pgbxtp2r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 12:11:43 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GG9k3e033855;
-        Tue, 16 Jun 2020 12:11:43 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31pgbxtp24-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 12:11:43 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GFxif6008442;
-        Tue, 16 Jun 2020 16:11:40 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 31mpe7wmcb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 16:11:40 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GGALTY9109780
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jun 2020 16:10:21 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 893564C052;
-        Tue, 16 Jun 2020 16:11:38 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 38B654C04E;
-        Tue, 16 Jun 2020 16:11:38 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.26.88])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 16 Jun 2020 16:11:38 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v9 01/12] s390x: Use PSW bits definitions
- in cstart
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-2-git-send-email-pmorel@linux.ibm.com>
- <f160d328-694a-4476-4863-c49a1d0e5349@redhat.com>
- <eebf1927-f1b2-cca0-529a-9a97c761345d@linux.ibm.com>
-Message-ID: <fc27e211-2d9c-63f1-4f10-ca3d744a3ea7@linux.ibm.com>
-Date:   Tue, 16 Jun 2020 18:11:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1732302AbgFPQOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 12:14:44 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56907 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732260AbgFPQOm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 12:14:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592324081;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=EGk4MDxuxjJxgEfnB6gIyOaKHUzMx57nfzVxFUf1flw=;
+        b=b/U4j28mnQmJJ2K3ZZsm0kFoFZauhNVQWi91KqZiObYKmnSxwHnOTGNlUxvUVAm+Up9VPI
+        mU+iLjzCDkwv9A0SIT6YKPmLVt4CmJ2j8f6U4UirpCAp9qmuzdGfXS4Za1xCMavVHWpU2L
+        le6pg+Ywc8kZp3Ung2wBcWIrLEw7GYU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-460-KOglBjA_PZOFj8z9UPRzyA-1; Tue, 16 Jun 2020 12:14:39 -0400
+X-MC-Unique: KOglBjA_PZOFj8z9UPRzyA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22EC5100A69D;
+        Tue, 16 Jun 2020 16:14:32 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.192.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C6FF7CAA0;
+        Tue, 16 Jun 2020 16:14:28 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <like.xu@linux.intel.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: SVM: drop MSR_IA32_PERF_CAPABILITIES from emulated MSRs
+Date:   Tue, 16 Jun 2020 18:14:27 +0200
+Message-Id: <20200616161427.375651-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <eebf1927-f1b2-cca0-529a-9a97c761345d@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-16_07:2020-06-16,2020-06-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 bulkscore=0 mlxlogscore=711 mlxscore=0 suspectscore=0
- cotscore=-2147483648 impostorscore=0 spamscore=0 phishscore=0
- clxscore=1015 malwarescore=0 adultscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006160110
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+state_test/smm_test selftests are failing on AMD with:
+"Unexpected result from KVM_GET_MSRS, r: 51 (failed MSR was 0x345)"
 
+MSR_IA32_PERF_CAPABILITIES is an emulated MSR indeed but only on Intel,
+make svm_has_emulated_msr() skip it so it is not returned by
+KVM_GET_MSR_INDEX_LIST.
 
-On 2020-06-16 18:08, Pierre Morel wrote:
-> 
-> 
-> On 2020-06-16 15:13, Thomas Huth wrote:
->> On 15/06/2020 11.31, Pierre Morel wrote:
->>> This patch defines the PSW bits EA/BA used to initialize the PSW masks
->>> for exceptions.
-> 
+Fixes: 27461da31089 ("KVM: x86/pmu: Support full width counting")
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/svm/svm.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> 
-> Should I keep your RB for the arch_def.h ?
-> 
-
-Hi, sorry, the changes in arch_def go are not used any more so...
-
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 8ccfa4197d9c..2c423d64fb8f 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3539,6 +3539,8 @@ static bool svm_has_emulated_msr(u32 index)
+ 	case MSR_IA32_MCG_EXT_CTL:
+ 	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
+ 		return false;
++	case MSR_IA32_PERF_CAPABILITIES:
++		return false;
+ 	default:
+ 		break;
+ 	}
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.25.4
+
