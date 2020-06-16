@@ -2,107 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBE311FBF68
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 21:51:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C95931FC0FC
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 23:26:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731064AbgFPTvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 15:51:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42192 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730183AbgFPTvB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 15:51:01 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GJ7PqH145980;
-        Tue, 16 Jun 2020 15:51:01 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31q23tc694-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 15:51:01 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GJmeTQ007358;
-        Tue, 16 Jun 2020 15:51:01 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31q23tc68g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 15:51:00 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GJnqlZ016464;
-        Tue, 16 Jun 2020 19:50:58 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 31mpe7jd8k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 19:50:58 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GJoto942008594
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jun 2020 19:50:55 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5F64FA4057;
-        Tue, 16 Jun 2020 19:50:55 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4CE08A4055;
-        Tue, 16 Jun 2020 19:50:55 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 16 Jun 2020 19:50:55 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id EE7D7E02B1; Tue, 16 Jun 2020 21:50:54 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Jared Rossi <jrossi@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH v3 3/3] vfio-ccw: Check workqueue before doing START
-Date:   Tue, 16 Jun 2020 21:50:53 +0200
-Message-Id: <20200616195053.99253-4-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200616195053.99253-1-farman@linux.ibm.com>
-References: <20200616195053.99253-1-farman@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-16_12:2020-06-16,2020-06-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- cotscore=-2147483648 impostorscore=0 mlxlogscore=476 adultscore=0
- priorityscore=1501 clxscore=1015 lowpriorityscore=0 malwarescore=0
- bulkscore=0 phishscore=0 spamscore=0 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006160134
+        id S1726387AbgFPV0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 17:26:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37961 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726134AbgFPV0p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 17:26:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592342803;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rfjyihg61U3ImXhyN/RZdOnqUBmVbpAphX1IIssGqq4=;
+        b=jMOd9W8OZVUfbqdp/+zCeeWqPtazUN7tG6pOiknb4fD1/E5QRuM6T6f/m763lDxLnAxDBp
+        I0QZlK0UcrEnLSPT/U2dHPs6mWSGwYBPIeTr562K43AzYylteLw5cZt4JusRdh9y3RnnW9
+        XQrbs5OMYc3KKDLlRlNESBi3y4jtUEg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-iB73ybuIMlKdSBblkDt8xw-1; Tue, 16 Jun 2020 17:26:41 -0400
+X-MC-Unique: iB73ybuIMlKdSBblkDt8xw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 853891512E0;
+        Tue, 16 Jun 2020 21:26:40 +0000 (UTC)
+Received: from gimli.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C52A5D9D3;
+        Tue, 16 Jun 2020 21:26:37 +0000 (UTC)
+Subject: [PATCH] vfio/pci: Clear error and request eventfd ctx after
+ releasing
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     alex.williamson@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        cohuck@redhat.com, dwagner@suse.de, cai@lca.pw
+Date:   Tue, 16 Jun 2020 15:26:36 -0600
+Message-ID: <159234276956.31057.6902954364435481688.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When an interrupt is received via the IRQ, the bulk of the work is
-stacked on a workqueue for later processing. Which means that concurrent
-START or a HALT/CLEAR operation (via the async_region) will race with
-this process and require some serialization.
+The next use of the device will generate an underflow from the
+stale reference.
 
-Once we have all our locks acquired, let's just look to see if we're
-in a window where the process has been started from the IRQ, but not
-yet picked up by vfio-ccw to clean up an I/O. If there is, mark the
-request as BUSY so it can be redriven after we have a chance to breathe.
-
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Cc: Qian Cai <cai@lca.pw>
+Fixes: 1518ac272e78 ("vfio/pci: fix memory leaks of eventfd ctx")
+Reported-by: Daniel Wagner <dwagner@suse.de>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/s390/cio/vfio_ccw_fsm.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/vfio/pci/vfio_pci.c |    8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-index f0952192480e..9dc5b4d549b3 100644
---- a/drivers/s390/cio/vfio_ccw_fsm.c
-+++ b/drivers/s390/cio/vfio_ccw_fsm.c
-@@ -28,6 +28,11 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 7c0779018b1b..f634c81998bb 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -521,10 +521,14 @@ static void vfio_pci_release(void *device_data)
+ 		vfio_pci_vf_token_user_add(vdev, -1);
+ 		vfio_spapr_pci_eeh_release(vdev->pdev);
+ 		vfio_pci_disable(vdev);
+-		if (vdev->err_trigger)
++		if (vdev->err_trigger) {
+ 			eventfd_ctx_put(vdev->err_trigger);
+-		if (vdev->req_trigger)
++			vdev->err_trigger = NULL;
++		}
++		if (vdev->req_trigger) {
+ 			eventfd_ctx_put(vdev->req_trigger);
++			vdev->req_trigger = NULL;
++		}
+ 	}
  
- 	spin_lock_irqsave(sch->lock, flags);
- 
-+	if (work_pending(&private->io_work)) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
- 	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
- 	if (!orb) {
- 		ret = -EIO;
--- 
-2.17.1
+ 	mutex_unlock(&vdev->reflck->lock);
 
