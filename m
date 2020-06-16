@@ -2,143 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA7FC1FAB93
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 10:48:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E7401FAB98
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 10:49:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727907AbgFPIsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 04:48:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36294 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725710AbgFPIsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 04:48:09 -0400
+        id S1727916AbgFPItH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 04:49:07 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21646 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725710AbgFPItH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 04:49:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592297288;
+        s=mimecast20190719; t=1592297345;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=M8KB+cTLS7xorWY/8wkVIPQKcO1yqa/ZtcbOQCRk7fw=;
-        b=QA3iypAmaAEJurC13tHN5Dmd6DCBNwPHBww6BlyckgiWvI518DFTCyw8q8/HKb+igdbLPC
-        vwyaaY7mIQ0wNmQ9URQVjhiLytwhcnqrMkOp57GAIEhQpg/Z+UqNdP2tpXUCgdHzFf9irG
-        0gYKn/Boe4kGEtuQBonq1vVlvuFPAxc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-VAqHAvSINC--U-re_Sk9eg-1; Tue, 16 Jun 2020 04:48:04 -0400
-X-MC-Unique: VAqHAvSINC--U-re_Sk9eg-1
-Received: by mail-wr1-f71.google.com with SMTP id r5so8044902wrt.9
-        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 01:48:04 -0700 (PDT)
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type; bh=aHw0WHUDjplHhyM2x7z49ozQEApYFi2qNDHdSE7wkJ4=;
+        b=J/OKJ+x8WoN1fO7CP/VINKY4JjpkFHuvXvGJ4GsZ8TM1K6Sdou54cBSUZWmS7wVXUOyEIQ
+        X/jtX8kWVIqO14lVAbKlAyiAbpTgxAoyGN+5IOQ3JCqz+VhiAS77UwRbEy/SsnL4Tpn2RW
+        B7S5JdcGglzW5DnjTA3yAVTrmIBXCRo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-449-UP2a1wEiMF69-InK8f8O2w-1; Tue, 16 Jun 2020 04:49:03 -0400
+X-MC-Unique: UP2a1wEiMF69-InK8f8O2w-1
+Received: by mail-wm1-f71.google.com with SMTP id b65so953668wmb.5
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 01:49:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references
-         :user-agent:reply-to:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=M8KB+cTLS7xorWY/8wkVIPQKcO1yqa/ZtcbOQCRk7fw=;
-        b=t811rVkrwjOt4SpTA0LJlVdy3ePGWikPcA6ZAw/R1KPnyBAMZpz9b7cRfpvG5fPGwG
-         GssXO2pMecl2SYcGKsyQ71sIHp4yW3g9HR3kOir3cTvYHjFhFrLBVUWa5hINgto5a8AG
-         CCnVgNN5uS/xb+ioE37Ccu4Lz44VvbfWfzDeDLVwtWlDpLvbobGGjCctMOJXLa6K8S7N
-         74qJVQo9yBhdQBSUUrsIZM7d8DHCWixWeGAlJ5GRVArNs19xZE0ftn4SQM0nYblor4Ph
-         XdW+JpAUdtlhpqzgjVteg9azct6dWy2KlUYDnf7L6FsuS0GJptgTX0P93vUi9F3iV+8J
-         9Jgw==
-X-Gm-Message-State: AOAM530SZqJNdoU+6VL6HkAUwFH7EIxD+BLDXoW3tUFu6bLNTdR2AY07
-        kJpDHHFI6UBdsQ/+7RQGTX3lMEhpVpNhxJYr3CKQ3qCUaQuZj8fr54C4D/YflgB7pkond6I8l8w
-        J3hODGsEo6NyS
-X-Received: by 2002:a7b:c11a:: with SMTP id w26mr2029654wmi.0.1592297283225;
-        Tue, 16 Jun 2020 01:48:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvZnUjAE4GDabkYeFSd57AxeyTiGDyShyzrSQHYgdOvkCCTgddGvqjYyXzr8kCLBpWD5eVJA==
-X-Received: by 2002:a7b:c11a:: with SMTP id w26mr2029638wmi.0.1592297282996;
-        Tue, 16 Jun 2020 01:48:02 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:user-agent:reply-to:date
+         :message-id:mime-version;
+        bh=aHw0WHUDjplHhyM2x7z49ozQEApYFi2qNDHdSE7wkJ4=;
+        b=loul9qVKH6ZpI28aJIp0wcQ1f3JjUKSDtj3ToDUrXwDp5wuKCgUERAXE2mp1l5Bvma
+         QbioL39xU0JElevohudR5fk4PnO1vNLHnuXgQ0g3bezNgBsWOcIOQnzTSgbUNVWdn4fU
+         bWRtloMP1b9njNx6PKmTy2zr1dmykJQH7Dngu+L6k7mIqOES3pNCR/alff9fs5moSILf
+         Wm6mho4PMHlUox/k3QmQlZHj/H1bzV7ow8voZsXFheHWm8LZ47B8P9c3GHCWowi54uMX
+         Jq2KFbtPRnXufVenZ9hewJF/6Cq4HxTtMrObq8+AZSkZMCvZ96cq+QTko7FfGpkt134X
+         Y9Og==
+X-Gm-Message-State: AOAM532YIVnvF9f1K1rsvjC8FjbrlSvu8bcVjQM4AIbK8W8KK6nIMWxZ
+        qB+VueGurU7YhIPfR5H6uv5Rr6uVm2zw5Wr1GjChfzbsvtq88HVicR77ZD21NUO5ZKCGwdhJoUQ
+        +hi8hoT8+zVI8
+X-Received: by 2002:adf:e285:: with SMTP id v5mr1840474wri.129.1592297342348;
+        Tue, 16 Jun 2020 01:49:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxEn7kENsYjcXnQwyyS7aWlQp3jLb1PHk7TkKGkmsPonFYcw7ViNxKhXJFLqEgygiHSMwM0ug==
+X-Received: by 2002:adf:e285:: with SMTP id v5mr1840455wri.129.1592297342108;
+        Tue, 16 Jun 2020 01:49:02 -0700 (PDT)
 Received: from localhost (trasno.trasno.org. [83.165.45.250])
-        by smtp.gmail.com with ESMTPSA id f185sm3009408wmf.43.2020.06.16.01.48.02
+        by smtp.gmail.com with ESMTPSA id c68sm2976259wmd.12.2020.06.16.01.49.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2020 01:48:02 -0700 (PDT)
+        Tue, 16 Jun 2020 01:49:01 -0700 (PDT)
 From:   Juan Quintela <quintela@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>
-Cc:     qemu-devel@nongnu.org
-Subject: Re: KVM call for 2016-06-16
-In-Reply-To: <87wo48n047.fsf@secure.mitica> (Juan Quintela's message of "Mon,
-        15 Jun 2020 11:34:32 +0200")
-References: <87wo48n047.fsf@secure.mitica>
+To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
+Subject: KVM call for 2020-06-30
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 Reply-To: quintela@redhat.com
-Date:   Tue, 16 Jun 2020 10:48:01 +0200
-Message-ID: <87h7vbxupq.fsf@secure.mitica>
+Date:   Tue, 16 Jun 2020 10:49:00 +0200
+Message-ID: <87d05zxuo3.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Juan Quintela <quintela@redhat.com> wrote:
-> Hi
+
 
 Hi
 
-As there are no topics, this calls gets cancelled.
+Please, send any topic that you are interested in covering.
 
-Happy hacking.
+At the end of Monday I will send an email with the agenda or the
+cancellation of the call, so hurry up.
 
-Later, Juan.
+After discussions on the QEMU Summit, we are going to have always open a
+KVM call where you can add topics.
 
+ Call details:
 
->
-> Please, send any topic that you are interested in covering.
-> There is already a topic from last call:
->
-> Last minute suggestion after recent IRC chat with Alex Benn=C3=A9e and
-> Thomas Huth:
->
-> "Move some of the build/CI infrastructure to GitLab."
->
-> Pro/Con?
->
->  - GitLab does not offer s390x/ppc64el =3D> keep Travis for these?
->
-> How to coordinate efforts?
->
-> What we want to improve? Priorities?
->
-> Who can do which task / is motivated.
->
-> What has bugged us recently:
-> - Cross-build images (currently rebuilt all the time on Shippable)
->
-> Long term interests:
->
-> - Collect quality metrics
->   . build time
->   . test duration
->   . performances
->   . binary size
->   . runtime memory used
->
-> - Collect code coverage
->
-> Note, this is orthogonal to the "Gating CI" task Cleber is working on:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg688150.html
->
->
->
->
-> At the end of Monday I will send an email with the agenda or the
-> cancellation of the call, so hurry up.
->
-> After discussions on the QEMU Summit, we are going to have always open a
-> KVM call where you can add topics.
->
->  Call details:
->
-> By popular demand, a google calendar public entry with it
->
->   https://www.google.com/calendar/embed?src=3DdG9iMXRqcXAzN3Y4ZXZwNzRoMHE=
-4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
->
-> (Let me know if you have any problems with the calendar entry.  I just
-> gave up about getting right at the same time CEST, CET, EDT and DST).
->
-> If you need phone number details,  contact me privately
->
-> Thanks, Juan.
+By popular demand, a google calendar public entry with it
+
+  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+
+(Let me know if you have any problems with the calendar entry.  I just
+gave up about getting right at the same time CEST, CET, EDT and DST).
+
+If you need phone number details,  contact me privately
+
+Thanks, Juan.
 
