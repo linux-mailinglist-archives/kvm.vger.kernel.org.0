@@ -2,164 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CCB11FBC41
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 19:01:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 392BF1FBD57
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 19:51:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729841AbgFPRAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 13:00:37 -0400
-Received: from mga14.intel.com ([192.55.52.115]:57921 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729103AbgFPRAg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 13:00:36 -0400
-IronPort-SDR: tPXq8KsMIkMJ+lekExbd+RoNkgurPpzW5SCs2kVElBx3wEcHkXhoKhO2tezU3GlMedG2sAKeNA
- j9PgdE/DwCMA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 10:00:17 -0700
-IronPort-SDR: shXlJDB6Aa2I7qVQkpqzSISC/9/CbPOu9n9L7Pl4JZVPZQbC2aORL/Zi3VEf3kIBSNnoifV9z0
- o0yzMkUEcJDQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,518,1583222400"; 
-   d="scan'208";a="273217899"
-Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.25])
-  by orsmga003.jf.intel.com with ESMTP; 16 Jun 2020 10:00:16 -0700
-Date:   Tue, 16 Jun 2020 10:00:16 -0700
-From:   "Raj, Ashok" <ashok.raj@intel.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Ashok Raj <ashok.raj@intel.com>
-Subject: Re: [PATCH v2 00/15] vfio: expose virtual Shared Virtual Addressing
- to VMs
-Message-ID: <20200616170016.GC34820@otc-nc-03>
-References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
- <20200615100214.GC1491454@stefanha-x1.localdomain>
- <MWHPR11MB16451F1E4748DF97D6A1DDD48C9D0@MWHPR11MB1645.namprd11.prod.outlook.com>
- <20200616154928.GF1491454@stefanha-x1.localdomain>
+        id S1731186AbgFPRu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 13:50:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24370 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728785AbgFPRu4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 13:50:56 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GHW915071349;
+        Tue, 16 Jun 2020 13:50:51 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31q1nmt14c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 13:50:51 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GHWElU071618;
+        Tue, 16 Jun 2020 13:50:50 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31q1nmt13w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 13:50:50 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GHfKSG000575;
+        Tue, 16 Jun 2020 17:50:48 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 31mpe7tb3m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Jun 2020 17:50:48 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GHoj3K18940026
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jun 2020 17:50:45 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9E7FA42049;
+        Tue, 16 Jun 2020 17:50:45 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3129842042;
+        Tue, 16 Jun 2020 17:50:45 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.20.221])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 16 Jun 2020 17:50:45 +0000 (GMT)
+Subject: Re: [PATCH v8 03/16] s390/vfio-ap: manage link between queue struct
+ and matrix mdev
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com
+References: <20200605214004.14270-1-akrowiak@linux.ibm.com>
+ <20200605214004.14270-4-akrowiak@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <6ae77590-8401-a06b-eec5-713319c21017@de.ibm.com>
+Date:   Tue, 16 Jun 2020 19:50:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200616154928.GF1491454@stefanha-x1.localdomain>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200605214004.14270-4-akrowiak@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-16_10:2020-06-16,2020-06-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
+ malwarescore=0 mlxlogscore=999 adultscore=0 suspectscore=0 clxscore=1015
+ cotscore=-2147483648 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006160120
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 16, 2020 at 04:49:28PM +0100, Stefan Hajnoczi wrote:
-> On Tue, Jun 16, 2020 at 02:26:38AM +0000, Tian, Kevin wrote:
-> > > From: Stefan Hajnoczi <stefanha@gmail.com>
-> > > Sent: Monday, June 15, 2020 6:02 PM
-> > > 
-> > > On Thu, Jun 11, 2020 at 05:15:19AM -0700, Liu Yi L wrote:
-> > > > Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
-> > > > Intel platforms allows address space sharing between device DMA and
-> > > > applications. SVA can reduce programming complexity and enhance
-> > > security.
-> > > >
-> > > > This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
-> > > > guest application address space with passthru devices. This is called
-> > > > vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
-> > > > changes. For IOMMU and QEMU changes, they are in separate series (listed
-> > > > in the "Related series").
-> > > >
-> > > > The high-level architecture for SVA virtualization is as below, the key
-> > > > design of vSVA support is to utilize the dual-stage IOMMU translation (
-> > > > also known as IOMMU nesting translation) capability in host IOMMU.
-> > > >
-> > > >
-> > > >     .-------------.  .---------------------------.
-> > > >     |   vIOMMU    |  | Guest process CR3, FL only|
-> > > >     |             |  '---------------------------'
-> > > >     .----------------/
-> > > >     | PASID Entry |--- PASID cache flush -
-> > > >     '-------------'                       |
-> > > >     |             |                       V
-> > > >     |             |                CR3 in GPA
-> > > >     '-------------'
-> > > > Guest
-> > > > ------| Shadow |--------------------------|--------
-> > > >       v        v                          v
-> > > > Host
-> > > >     .-------------.  .----------------------.
-> > > >     |   pIOMMU    |  | Bind FL for GVA-GPA  |
-> > > >     |             |  '----------------------'
-> > > >     .----------------/  |
-> > > >     | PASID Entry |     V (Nested xlate)
-> > > >     '----------------\.------------------------------.
-> > > >     |             |   |SL for GPA-HPA, default domain|
-> > > >     |             |   '------------------------------'
-> > > >     '-------------'
-> > > > Where:
-> > > >  - FL = First level/stage one page tables
-> > > >  - SL = Second level/stage two page tables
-> > > 
-> > > Hi,
-> > > Looks like an interesting feature!
-> > > 
-> > > To check I understand this feature: can applications now pass virtual
-> > > addresses to devices instead of translating to IOVAs?
-> > > 
-> > > If yes, can guest applications restrict the vSVA address space so the
-> > > device only has access to certain regions?
-> > > 
-> > > On one hand replacing IOVA translation with virtual addresses simplifies
-> > > the application programming model, but does it give up isolation if the
-> > > device can now access all application memory?
-> > > 
-> > 
-> > with SVA each application is allocated with a unique PASID to tag its
-> > virtual address space. The device that claims SVA support must guarantee 
-> > that one application can only program the device to access its own virtual
-> > address space (i.e. all DMAs triggered by this application are tagged with
-> > the application's PASID, and are translated by IOMMU's PASID-granular
-> > page table). So, isolation is not sacrificed in SVA.
-> 
-> Isolation between applications is preserved but there is no isolation
-> between the device and the application itself. The application needs to
-> trust the device.
 
-Right. With all convenience comes security trust. With SVA there is an
-expectation that the device has the required security boundaries properly
-implemented. FWIW, what is our guarantee today that VF's are secure from
-one another or even its own PF? They can also generate transactions with
-any of its peer id's and there is nothing an IOMMU can do today. Other than
-rely on ACS. Even BusMaster enable can be ignored and devices (malicious
-or otherwise) can generate after the BM=0. With SVM you get the benefits of
 
-* Not having to register regions
-* Don't need to pin application space for DMA.
+On 05.06.20 23:39, Tony Krowiak wrote:
+[...]
+> +static void vfio_ap_mdev_link_queues(struct ap_matrix_mdev *matrix_mdev,
+> +				     enum qlink_type type,
+> +				     unsigned long qlink_id)
+> +{
+> +	unsigned long id;
+> +	struct vfio_ap_queue *q;
+> +
+> +	switch (type) {
+> +	case LINK_APID:
+> +	case UNLINK_APID:
+> +		for_each_set_bit_inv(id, matrix_mdev->matrix.aqm,
+> +				     matrix_mdev->matrix.aqm_max + 1) {
+> +			q = vfio_ap_get_queue(AP_MKQID(qlink_id, id));
+> +			if (q) {
+> +				if (type == LINK_APID)
+> +					q->matrix_mdev = matrix_mdev;
+> +				else
+> +					q->matrix_mdev = NULL;> +			}
+> +		}
+> +		break;
+> +	default:
 
-> 
-> Examples:
-> 
-> 1. The device can snoop secret data from readable pages in the
->    application's virtual memory space.
+Can you rather use
+	case LINK_APQI:
+	case UNLINK_APQI:
 
-Aren't there other security technologies that can address this?
+and add a default case with a WARN_ON_ONCE?
 
-> 
-> 2. The device can gain arbitrary execution on the CPU by overwriting
->    control flow addresses (e.g. function pointers, stack return
->    addresses) in writable pages.
+> +		for_each_set_bit_inv(id, matrix_mdev->matrix.apm,
+> +				     matrix_mdev->matrix.apm_max + 1) {
+> +			q = vfio_ap_get_queue(AP_MKQID(id, qlink_id));
+> +			if (q) {
+> +				if (type == LINK_APQI)
+> +					q->matrix_mdev = matrix_mdev;
+> +				else
+> +					q->matrix_mdev = NULL;
+> +			}
+> +		}
+> +		break;
+> +	}
+> +}
+> +
 
-I suppose technology like CET might be able to guard. The general
-expectation is code pages and anything that needs to be protected should be
-mapped nor writable.
-
-Cheers,
-Ashok
