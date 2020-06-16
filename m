@@ -2,258 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FBDE1FC1C9
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 00:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B40761FC230
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 01:20:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726025AbgFPWne (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 18:43:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54734 "EHLO
+        id S1726369AbgFPXRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 19:17:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725849AbgFPWne (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 18:43:34 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC6E8C061573
-        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 15:43:32 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id v15so223968qvm.2
-        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 15:43:32 -0700 (PDT)
+        with ESMTP id S1725849AbgFPXRX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 19:17:23 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87CD4C061573
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 16:17:21 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id t8so273176ilm.7
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 16:17:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=1ZS29LeX+3tvxr4Tw+LAYsKpl9FN0zDSujjFudjKbJQ=;
-        b=bGdZAuvy5rOwnjAX9d4wyGzm0CnX0+lD7ClzAMndgj+qrBhgc5HjY9oZHMuI6dHP52
-         9bE29dG6T2aQndRP95tWHfvNZWS/umrbje6gRxjpUN+Jwwg9jo3REkb3xfOxuvF4M4cg
-         vvI7q8AHWNUdXt6GwwsejTQYOU0/W3fqUjwiB+WmShlgrRoGiT9R+KLgIPzRE5D7XqjD
-         2Y6K53CJV+5XdXuNPGDZR6UeYvO2zihCwi2xZmJOo0sah3TvX+/kWpyIFkAgicrvjj+u
-         vVzjz+T2frAPtNb/mlOrNz0aevldzm08mz9FuKS6729qjFjxSYy1OG/YCCqML+yXrdev
-         7tYw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=2suWlJa8CpH6BIGy7EoIm2xIgo7asmnb0ube9qU2ZKk=;
+        b=eq+7vwnpvebg3rd3wG9R+noiw205POdh0tWyYaRranqq/PD30SLj0QFQlCh+9IrNPE
+         lPcquAIew/6yDSLJ4H7rhCnTweLD0e5EXs2SBne34BYDYeHwV34PqkgyM0XBRQcyrkBD
+         ZYZE7toxMTPsLxWi3AErNt2zSzuOb4tWYafwc4eFqQsaddLZmlyEZGtVMzhvRuRwDWrR
+         LncAbtZYwsRE19gQNbbvhjW7sQUEL86wM3AVn+rY3Swkqwft3mWeVNV04Y+/Q8DilSvo
+         FIcLi8slFYfuV8gDATUiLWBYABJmthAIbWyzER3395cFjAf2A02yrrAJTkEkAk+cJrjS
+         y+bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=1ZS29LeX+3tvxr4Tw+LAYsKpl9FN0zDSujjFudjKbJQ=;
-        b=INyaqj4BhdaIE5rG6J0PgfYq1IKJafL7/H9k7tvZXNqXGUn/O4BADgUZI4xrny8UKr
-         Y2ox0ImjuTQn8utLwvGmBP/Vjt3phAd+FT2Ji+CtWcTE1cK5gLU9qiTW6BXFpLH/Ezy3
-         g6ORjxY+0QWE8aSae0lFcdrNJTsO2CV6XAG2eMdGn2ftbXuwHgv38FfwNAXRlic5hakr
-         VuXPun7B7MSuosW2G01n3sX4S0HmjtstjEubjIwqJwyS2M5VUl12agM0ld8sq2PrV3lj
-         2hmunVyC8FGNw9yREpIUSpslxqp9GFS5JpA7jKSqGE5IvFdlpAImG1J79W4ENdLLTAGr
-         rtJA==
-X-Gm-Message-State: AOAM530zHx1azKc71gYttwMsekMEgx1pFKK2h0+kXFRH5E/QAU5WR3/j
-        /ToVYBee/ed3wtbeZJtnKRSH9TUZ3rm1ZNRiKENrJIFYpaS+kLwF8BgMuw82JzI+fpimRLtkcAl
-        5ruFPI94ee6QTaPD9i5xGmN4kWAAtKfRt9CYBbQuHaCTFHTb8TSHfpUmFbw==
-X-Google-Smtp-Source: ABdhPJwm7FxidjZUR9hxNa4GxH27OP1BwC5fHRY1imNw5xCwm176YSy1ku28UHX9qndJjVNoOLGXv01fm3Y=
-X-Received: by 2002:a05:6214:12cf:: with SMTP id s15mr4581045qvv.242.1592347411747;
- Tue, 16 Jun 2020 15:43:31 -0700 (PDT)
-Date:   Tue, 16 Jun 2020 22:43:05 +0000
-Message-Id: <20200616224305.44242-1-oupton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.27.0.290.gba653c62da-goog
-Subject: [PATCH] kvm: nVMX: flush TLB when decoded insn != VM-exit reason
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Oliver Upton <oupton@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=2suWlJa8CpH6BIGy7EoIm2xIgo7asmnb0ube9qU2ZKk=;
+        b=XWuskszYYc7wccn9SDmxHKYkimKj8OYlDYPB2an7FfZKNQGYTUoNDhU83JaApXKSia
+         soe3/OnwACwHDhjprTJhHDHRwwumHM0IsE4UvpEDQig5TCnn+nYS8VbvpFx//PwXtdDP
+         SQxACJtj2X+gUAamMs3cH6a7FMs1eTcFqnxUBRy5Pvsn9ULElw9hEMR1ZVR71ZIbmMe/
+         XRBKFPW4pNRGTrZ1MdFm5mxkDW/wqaDlIrfts4YgEcNmuQ/EBlBbSYU2aOgDfCAjWi/r
+         kGYMAH3aM8RV7fM4WHjWkLa7n9Fds0SHpaT/sDO0+tfFxqtN9QDEMVOiV4GOJ22jpCUO
+         GdtA==
+X-Gm-Message-State: AOAM532wZb0bxTCVSyriwK8hx/LENh8t7wVlT5tCpqTw62kDluhI89aR
+        g14yy6vfj4f3mYtnxQnNljh4HIoxkIZM/99rnFLJow==
+X-Google-Smtp-Source: ABdhPJwV6lb4T8E6Us4v6aI0n/kcJpPwIFqsk2SK5vA5bPQN6SJQSZlp17j1pgg0EWXgiE6GIBwyukvNj686beLRO3I=
+X-Received: by 2002:a05:6e02:1208:: with SMTP id a8mr5682459ilq.118.1592349440425;
+ Tue, 16 Jun 2020 16:17:20 -0700 (PDT)
+MIME-Version: 1.0
+References: <159234483706.6230.13753828995249423191.stgit@bmoger-ubuntu> <159234502394.6230.5169466123693241678.stgit@bmoger-ubuntu>
+In-Reply-To: <159234502394.6230.5169466123693241678.stgit@bmoger-ubuntu>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 16 Jun 2020 16:17:09 -0700
+Message-ID: <CALMp9eTxs5nb9Ay0ELVa71cmA9VPzaMSuGgW_iM2tmAVvXs4Pg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM:SVM: Add extended intercept support
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>, Joerg Roedel <joro@8bytes.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is possible for the instruction emulator to decode a different
-instruction from what was implied by the VM-exit information provided by
-hardware in vmcs02. Such is the case when the TLB entry for the guest's
-IP is out of sync with the appropriate page-table mapping if page
-installation isn't followed with a TLB flush.
+On Tue, Jun 16, 2020 at 3:03 PM Babu Moger <babu.moger@amd.com> wrote:
+>
+> The new intercept bits have been added in vmcb control
+> area to support the interception of INVPCID instruction.
+>
+> The following bit is added to the VMCB layout control area
+> to control intercept of INVPCID:
+>
+> Byte Offset     Bit(s)          Function
+> 14h             2               intercept INVPCID
+>
+> Add the interfaces to support these extended interception.
+> Also update the tracing for extended intercepts.
+>
+> AMD documentation for INVPCID feature is available at "AMD64
+> Architecture Programmer=E2=80=99s Manual Volume 2: System Programming,
+> Pub. 24593 Rev. 3.34(or later)"
+>
+> The documentation can be obtained at the links below:
+> Link: https://www.amd.com/system/files/TechDocs/24593.pdf
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
 
-Currently, KVM refuses to emulate in these scenarios, instead injecting
-a #UD into L2. While this does address the security risk of
-CVE-2020-2732, it could result in spurious #UDs to the L2 guest. Fix
-this by instead flushing the TLB then resuming L2, allowing hardware to
-generate the appropriate VM-exit to be reflected into L1.
+Not your change, but this documentation is terrible. There is no
+INVLPCID instruction, nor is there a PCID instruction.
 
-Exceptional handling is also required for RSM and RDTSCP instructions.
-RDTSCP could be emulated on hardware which doesn't support it,
-therefore hardware will not generate a RDTSCP VM-exit on L2 resume. The
-dual-monitor treatment of SMM is not supported in nVMX, which implies
-that L0 should never handle a RSM instruction. Resuming the guest will
-only result in another #UD. Avoid getting stuck in a loop with these
-instructions by injecting a #UD for RSM and the appropriate VM-exit for
-RDTSCP.
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  arch/x86/include/asm/svm.h |    3 ++-
+>  arch/x86/kvm/svm/nested.c  |    6 +++++-
+>  arch/x86/kvm/svm/svm.c     |    1 +
+>  arch/x86/kvm/svm/svm.h     |   18 ++++++++++++++++++
+>  arch/x86/kvm/trace.h       |   12 ++++++++----
+>  5 files changed, 34 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+> index 8a1f5382a4ea..62649fba8908 100644
+> --- a/arch/x86/include/asm/svm.h
+> +++ b/arch/x86/include/asm/svm.h
+> @@ -61,7 +61,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>         u32 intercept_dr;
+>         u32 intercept_exceptions;
+>         u64 intercept;
+> -       u8 reserved_1[40];
+> +       u32 intercept_extended;
+> +       u8 reserved_1[36];
 
-Fixes: 07721feee46b ("KVM: nVMX: Don't emulate instructions in guest mode")
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
----
- arch/x86/kvm/emulate.c     |  2 ++
- arch/x86/kvm/kvm_emulate.h |  1 +
- arch/x86/kvm/vmx/vmx.c     | 68 ++++++++++++++++++++++++++++----------
- arch/x86/kvm/x86.c         |  2 +-
- 4 files changed, 55 insertions(+), 18 deletions(-)
+It seems like a more straightforward implementation would simply
+change 'u64 intercept' to 'u32 intercept[3].'
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index d0e2825ae617..6e56e7a29ba1 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5812,6 +5812,8 @@ int x86_emulate_insn(struct x86_emulate_ctxt *ctxt)
- 	}
- 	if (rc == X86EMUL_INTERCEPTED)
- 		return EMULATION_INTERCEPTED;
-+	if (rc == X86EMUL_RETRY_INSTR)
-+		return EMULATION_RETRY_INSTR;
- 
- 	if (rc == X86EMUL_CONTINUE)
- 		writeback_registers(ctxt);
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 43c93ffa76ed..5bfab8d65cd1 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -496,6 +496,7 @@ bool x86_page_table_writing_insn(struct x86_emulate_ctxt *ctxt);
- #define EMULATION_OK 0
- #define EMULATION_RESTART 1
- #define EMULATION_INTERCEPTED 2
-+#define EMULATION_RETRY_INSTR 3
- void init_decode_cache(struct x86_emulate_ctxt *ctxt);
- int x86_emulate_insn(struct x86_emulate_ctxt *ctxt);
- int emulator_task_switch(struct x86_emulate_ctxt *ctxt,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 08e26a9518c2..ebfafd7837ba 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7329,12 +7329,11 @@ static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
- 	to_vmx(vcpu)->req_immediate_exit = true;
- }
- 
--static int vmx_check_intercept_io(struct kvm_vcpu *vcpu,
--				  struct x86_instruction_info *info)
-+static bool vmx_check_intercept_io(struct kvm_vcpu *vcpu,
-+				   struct x86_instruction_info *info)
- {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 	unsigned short port;
--	bool intercept;
- 	int size;
- 
- 	if (info->intercept == x86_intercept_in ||
-@@ -7354,13 +7353,10 @@ static int vmx_check_intercept_io(struct kvm_vcpu *vcpu,
- 	 * Otherwise, IO instruction VM-exits are controlled by the IO bitmaps.
- 	 */
- 	if (!nested_cpu_has(vmcs12, CPU_BASED_USE_IO_BITMAPS))
--		intercept = nested_cpu_has(vmcs12,
--					   CPU_BASED_UNCOND_IO_EXITING);
--	else
--		intercept = nested_vmx_check_io_bitmaps(vcpu, port, size);
-+		return nested_cpu_has(vmcs12,
-+				      CPU_BASED_UNCOND_IO_EXITING);
- 
--	/* FIXME: produce nested vmexit and return X86EMUL_INTERCEPTED.  */
--	return intercept ? X86EMUL_UNHANDLEABLE : X86EMUL_CONTINUE;
-+	return nested_vmx_check_io_bitmaps(vcpu, port, size);
- }
- 
- static int vmx_check_intercept(struct kvm_vcpu *vcpu,
-@@ -7369,6 +7365,7 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 			       struct x86_exception *exception)
- {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-+	bool intercepted;
- 
- 	switch (info->intercept) {
- 	/*
-@@ -7381,13 +7378,27 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 			exception->error_code_valid = false;
- 			return X86EMUL_PROPAGATE_FAULT;
- 		}
-+
-+		intercepted = nested_cpu_has(vmcs12, CPU_BASED_RDTSC_EXITING);
-+
-+		/*
-+		 * RDTSCP could be emulated on a CPU which doesn't support it.
-+		 * As such, flushing the TLB and resuming L2 will result in
-+		 * another #UD rather than a VM-exit to reflect into L1.
-+		 * Instead, synthesize the VM-exit here.
-+		 */
-+		if (intercepted) {
-+			nested_vmx_vmexit(vcpu, EXIT_REASON_RDTSCP, 0, 0);
-+			return X86EMUL_INTERCEPTED;
-+		}
- 		break;
- 
- 	case x86_intercept_in:
- 	case x86_intercept_ins:
- 	case x86_intercept_out:
- 	case x86_intercept_outs:
--		return vmx_check_intercept_io(vcpu, info);
-+		intercepted = vmx_check_intercept_io(vcpu, info);
-+		break;
- 
- 	case x86_intercept_lgdt:
- 	case x86_intercept_lidt:
-@@ -7397,18 +7408,41 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 	case x86_intercept_sidt:
- 	case x86_intercept_sldt:
- 	case x86_intercept_str:
--		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_DESC))
--			return X86EMUL_CONTINUE;
--
--		/* FIXME: produce nested vmexit and return X86EMUL_INTERCEPTED.  */
-+		intercepted = nested_cpu_has2(vmcs12, SECONDARY_EXEC_DESC);
- 		break;
- 
--	/* TODO: check more intercepts... */
-+	/*
-+	 * The dual-monitor treatment of SMM is not supported in nVMX. As such,
-+	 * L0 will never handle the RSM instruction nor should it retry
-+	 * instruction execution. Instead, a #UD should be injected into the
-+	 * guest for the execution of RSM outside of SMM.
-+	 */
-+	case x86_intercept_rsm:
-+		exception->vector = UD_VECTOR;
-+		exception->error_code_valid = false;
-+		return X86EMUL_PROPAGATE_FAULT;
-+
- 	default:
--		break;
-+		intercepted = true;
- 	}
- 
--	return X86EMUL_UNHANDLEABLE;
-+	if (!intercepted)
-+		return X86EMUL_CONTINUE;
-+
-+	/*
-+	 * The only uses of the emulator in VMX for instructions which may be
-+	 * intercepted are port IO instructions, descriptor-table accesses, and
-+	 * the RDTSCP instruction. As such, if the emulator has decoded an
-+	 * instruction that is different from the VM-exit provided by hardware
-+	 * it is likely that the TLB entry and page-table mapping for the
-+	 * guest's RIP are out of sync.
-+	 *
-+	 * Rather than synthesizing a VM-exit into L1 for every possible
-+	 * instruction just flush the TLB, resume L2, and let hardware generate
-+	 * the appropriate VM-exit.
-+	 */
-+	vmx_flush_tlb_gva(vcpu, kvm_rip_read(vcpu));
-+	return X86EMUL_RETRY_INSTR;
- }
- 
- #ifdef CONFIG_X86_64
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 00c88c2f34e4..2ab47485100f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6967,7 +6967,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 
- 	r = x86_emulate_insn(ctxt);
- 
--	if (r == EMULATION_INTERCEPTED)
-+	if (r == EMULATION_INTERCEPTED || r == EMULATION_RETRY_INSTR)
- 		return 1;
- 
- 	if (r == EMULATION_FAILED) {
--- 
-2.27.0.290.gba653c62da-goog
+>         u16 pause_filter_thresh;
+>         u16 pause_filter_count;
+>         u64 iopm_base_pa;
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 8a6db11dcb43..7f6d0f2533e2 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -121,6 +121,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>         c->intercept_dr =3D h->intercept_dr;
+>         c->intercept_exceptions =3D h->intercept_exceptions;
+>         c->intercept =3D h->intercept;
+> +       c->intercept_extended =3D h->intercept_extended;
+>
+>         if (g->int_ctl & V_INTR_MASKING_MASK) {
+>                 /* We only want the cr8 intercept bits of L1 */
+> @@ -142,6 +143,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>         c->intercept_dr |=3D g->intercept_dr;
+>         c->intercept_exceptions |=3D g->intercept_exceptions;
+>         c->intercept |=3D g->intercept;
+> +       c->intercept_extended |=3D g->intercept_extended;
+>  }
+>
+>  static void copy_vmcb_control_area(struct vmcb_control_area *dst,
+> @@ -151,6 +153,7 @@ static void copy_vmcb_control_area(struct vmcb_contro=
+l_area *dst,
+>         dst->intercept_dr         =3D from->intercept_dr;
+>         dst->intercept_exceptions =3D from->intercept_exceptions;
+>         dst->intercept            =3D from->intercept;
+> +       dst->intercept_extended   =3D from->intercept_extended;
+>         dst->iopm_base_pa         =3D from->iopm_base_pa;
+>         dst->msrpm_base_pa        =3D from->msrpm_base_pa;
+>         dst->tsc_offset           =3D from->tsc_offset;
+> @@ -433,7 +436,8 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
+>         trace_kvm_nested_intercepts(nested_vmcb->control.intercept_cr & 0=
+xffff,
+>                                     nested_vmcb->control.intercept_cr >> =
+16,
+>                                     nested_vmcb->control.intercept_except=
+ions,
+> -                                   nested_vmcb->control.intercept);
+> +                                   nested_vmcb->control.intercept,
+> +                                   nested_vmcb->control.intercept_extend=
+ed);
+>
+>         /* Clear internal status */
+>         kvm_clear_exception_queue(&svm->vcpu);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 9e333b91ff78..285e5e1ff518 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2801,6 +2801,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
+>         pr_err("%-20s%04x\n", "dr_write:", control->intercept_dr >> 16);
+>         pr_err("%-20s%08x\n", "exceptions:", control->intercept_exception=
+s);
+>         pr_err("%-20s%016llx\n", "intercepts:", control->intercept);
+> +       pr_err("%-20s%08x\n", "intercepts (extended):", control->intercep=
+t_extended);
+>         pr_err("%-20s%d\n", "pause filter count:", control->pause_filter_=
+count);
+>         pr_err("%-20s%d\n", "pause filter threshold:",
+>                control->pause_filter_thresh);
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 6ac4c00a5d82..935d08fac03d 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -311,6 +311,24 @@ static inline void clr_intercept(struct vcpu_svm *sv=
+m, int bit)
+>         recalc_intercepts(svm);
+>  }
+>
+> +static inline void set_extended_intercept(struct vcpu_svm *svm, int bit)
+> +{
+> +       struct vmcb *vmcb =3D get_host_vmcb(svm);
+> +
+> +       vmcb->control.intercept_extended |=3D (1U << bit);
+> +
+> +       recalc_intercepts(svm);
+> +}
+> +
+> +static inline void clr_extended_intercept(struct vcpu_svm *svm, int bit)
+> +{
+> +       struct vmcb *vmcb =3D get_host_vmcb(svm);
+> +
+> +       vmcb->control.intercept_extended &=3D ~(1U << bit);
+> +
+> +       recalc_intercepts(svm);
+> +}
 
+You wouldn't need these new functions if you defined 'u32
+intercept[3],' as I suggested above. Just change set_intercept and
+clr_intercept to use __set_bit and __clear_bit.
+
+>  static inline bool is_intercept(struct vcpu_svm *svm, int bit)
+>  {
+>         return (svm->vmcb->control.intercept & (1ULL << bit)) !=3D 0;
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index b66432b015d2..5c841c42b33d 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -544,14 +544,16 @@ TRACE_EVENT(kvm_nested_vmrun,
+>  );
+>
+>  TRACE_EVENT(kvm_nested_intercepts,
+> -           TP_PROTO(__u16 cr_read, __u16 cr_write, __u32 exceptions, __u=
+64 intercept),
+> -           TP_ARGS(cr_read, cr_write, exceptions, intercept),
+> +           TP_PROTO(__u16 cr_read, __u16 cr_write, __u32 exceptions, __u=
+64 intercept,
+> +                    __u32 extended),
+> +           TP_ARGS(cr_read, cr_write, exceptions, intercept, extended),
+>
+>         TP_STRUCT__entry(
+>                 __field(        __u16,          cr_read         )
+>                 __field(        __u16,          cr_write        )
+>                 __field(        __u32,          exceptions      )
+>                 __field(        __u64,          intercept       )
+> +               __field(        __u32,          extended        )
+>         ),
+>
+>         TP_fast_assign(
+> @@ -559,11 +561,13 @@ TRACE_EVENT(kvm_nested_intercepts,
+>                 __entry->cr_write       =3D cr_write;
+>                 __entry->exceptions     =3D exceptions;
+>                 __entry->intercept      =3D intercept;
+> +               __entry->extended       =3D extended;
+>         ),
+>
+> -       TP_printk("cr_read: %04x cr_write: %04x excp: %08x intercept: %01=
+6llx",
+> +       TP_printk("cr_read: %04x cr_write: %04x excp: %08x intercept: %01=
+6llx"
+> +                 "intercept (extended): %08x",
+>                 __entry->cr_read, __entry->cr_write, __entry->exceptions,
+> -               __entry->intercept)
+> +               __entry->intercept, __entry->extended)
+>  );
+>  /*
+>   * Tracepoint for #VMEXIT while nested
+>
