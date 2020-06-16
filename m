@@ -2,41 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 143291FBE93
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 20:56:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 234581FBE91
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 20:56:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730301AbgFPS4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 14:56:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20072 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729994AbgFPS4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 14:56:31 -0400
+        id S1730139AbgFPS4c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 14:56:32 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44486 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730082AbgFPS4b (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 14:56:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1592333790;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=QG4GcvBqyaMGQs6iL8I7UP/KbYkVhSk8WJz8geiWD8w=;
-        b=Wn8VUZkRFImC8nVawRnoHcsIbEG8eKAIHOaCYF5Y7YGq+TjkupwrOPShnJEJzdmsrkfYO0
-        kA4VRp0fhd2EFC2n0kilqv2jspVCsdXGQ3CBvRa2pzzLhej7dD4zfp2Vdq8CyBTNi/ENOj
-        CFtinjcypHtPSpRpF0wdyrMSr2ywRlg=
+         to:to:cc:in-reply-to:in-reply-to:references:references;
+        bh=7sORUDwgRVhhtfiGbJgwh7emKoMOBNl3hnH5dpBlRZc=;
+        b=V5RFi+2tVWGVCjPb3Lgb3YKrl8jWwApqzVSs1KQ/McSA2WjIWgWr7DgwD/0o15NyVFNcQJ
+        JHwxk9BwAO+F1VWCNQrD+8WnndiDDDaLeNADgj0KKFmKNqTmch9O6Apm3C84qiz/Jnh0jO
+        vD0fJeWHp8KRksEWVAZcjWl32NQI2jQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-YCtvSGvoOJyIIn9s_dqwXQ-1; Tue, 16 Jun 2020 14:56:28 -0400
-X-MC-Unique: YCtvSGvoOJyIIn9s_dqwXQ-1
+ us-mta-218-qQBRkPb3OrmiKxx0muK7fA-1; Tue, 16 Jun 2020 14:56:29 -0400
+X-MC-Unique: qQBRkPb3OrmiKxx0muK7fA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D55CB80F5EA
-        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 18:56:26 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19B35134ED
+        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 18:56:28 +0000 (UTC)
 Received: from thuth.com (ovpn-114-128.ams2.redhat.com [10.36.114.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CAB207CAA8;
-        Tue, 16 Jun 2020 18:56:25 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 40ED57CAA8;
+        Tue, 16 Jun 2020 18:56:27 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PULL 01/12] Fix out-of-tree builds
-Date:   Tue, 16 Jun 2020 20:56:11 +0200
-Message-Id: <20200616185622.8644-2-thuth@redhat.com>
+Subject: [kvm-unit-tests PULL 02/12] x86: avoid multiple defined symbol
+Date:   Tue, 16 Jun 2020 20:56:12 +0200
+Message-Id: <20200616185622.8644-3-thuth@redhat.com>
 In-Reply-To: <20200616185622.8644-1-thuth@redhat.com>
 References: <20200616185622.8644-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
@@ -45,57 +44,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Andrew Jones <drjones@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Since b16df9ee5f3b out-of-tree builds have been broken because we
-started validating the newly user-configurable $erratatxt file
-before linking it into the build dir. We fix this not by moving
-the validation, but by removing the linking and instead using the
-full path of the $erratatxt file. This allows one to keep that file
-separate from the src and build dirs.
+Fedora 32 croaks about a symbol that is defined twice, fix it.
 
-Fixes: b16df9ee5f3b ("arch-run: Add reserved variables to the default environ")
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Message-Id: <20200511070641.23492-1-drjones@redhat.com>
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20200511165959.42442-1-pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- configure | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ lib/x86/fault_test.c | 2 +-
+ lib/x86/usermode.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 5d2cd90..f9d030f 100755
---- a/configure
-+++ b/configure
-@@ -17,7 +17,7 @@ environ_default=yes
- u32_long=
- vmm="qemu"
- errata_force=0
--erratatxt="errata.txt"
-+erratatxt="$srcdir/errata.txt"
+diff --git a/lib/x86/fault_test.c b/lib/x86/fault_test.c
+index 078dae3..e15a218 100644
+--- a/lib/x86/fault_test.c
++++ b/lib/x86/fault_test.c
+@@ -1,6 +1,6 @@
+ #include "fault_test.h"
  
- usage() {
-     cat <<-EOF
-@@ -89,7 +89,8 @@ while [[ "$1" = -* ]]; do
- 	    environ_default=no
- 	    ;;
- 	--erratatxt)
--	    erratatxt="$arg"
-+	    erratatxt=
-+	    [ "$arg" ] && erratatxt=$(eval realpath "$arg")
- 	    ;;
- 	--help)
- 	    usage
-@@ -169,9 +170,6 @@ if test ! -e Makefile; then
+-jmp_buf jmpbuf;
++static jmp_buf jmpbuf;
  
-     echo "linking scripts..."
-     ln -sf "$srcdir/scripts"
--
--    echo "linking errata.txt..."
--    ln -sf "$srcdir/errata.txt"
- fi
+ static void restore_exec_to_jmpbuf(void)
+ {
+diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+index f01ad9b..f032523 100644
+--- a/lib/x86/usermode.c
++++ b/lib/x86/usermode.c
+@@ -14,7 +14,7 @@
+ #define USERMODE_STACK_SIZE	0x2000
+ #define RET_TO_KERNEL_IRQ	0x20
  
- # link lib/asm for the architecture
+-jmp_buf jmpbuf;
++static jmp_buf jmpbuf;
+ 
+ static void restore_exec_to_jmpbuf(void)
+ {
 -- 
 2.18.1
 
