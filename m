@@ -2,216 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B3A11FC10C
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 23:36:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E18B1FC12A
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 23:51:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725964AbgFPVgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 17:36:12 -0400
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21711 "EHLO
-        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725860AbgFPVgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 17:36:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1592343362; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=S/NVSxS8UAOUnHqcq3S4jVUOnTVHx3Rl7dJ51s+fZyuL1vyTpWspdAXLggaTlPZRQxxn7jr38l/hFdn36GHz6Aof8m17sWf+PB3DC7VXAISpEfKHKpHROkNGhh11H0GXihVbsp+TEryc8QgwXtK+Ua7PNQJmv3myKt0MFNXgfjc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1592343362; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=xRRgKjORyuWeFxrKEk0klHH8CXBqjg0/wtrRrtaiVEs=; 
-        b=XvMFaIzoKqG/zm7HM8ZRseOzgeLv5fXNwZQN8Ek15u+UJu9XeOUDgEKH57mpNhOedvZlaRti/t4W+3mHnHyZKPcREaJ5lWuO4dWIwSP/+QtrCdi7QGiawyfyfTGJpDF0Nom0InZ0Sz9YM8Zsc0/TFB/qn8TvUM9A5sHh4a+H7xU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1592343359636504.5438890875514; Tue, 16 Jun 2020 14:35:59 -0700 (PDT)
-Message-ID: <159234335828.10897.17772299300824847703@d1fd068a5071>
-Subject: Re: [PATCH v2] kvm: i386: allow TSC to differ by NTP correction bounds without TSC scaling
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20200616165805.GA324612@fuller.cnet>
+        id S1726454AbgFPVtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 17:49:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35136 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726311AbgFPVtQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 17:49:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592344154;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=uv780jpNQSYzquFkmBB1m3mWJ1oYSVcoXMxNLu+Q8MQ=;
+        b=Rg9C1Stka9T5KHBzH1e0vJi5ep0klrGSWjHxzpapBn87iQ9N8k8n2bMPbhU+LgNxfUSBlS
+        ++ZiA61XnjsCNWNwh/KLiqYSusbLc/mDg75JC1H/L6+S2cNi15/p9OrTVcxCJZapxnAraF
+        0XakA0vcFblYcZRNGnqOaAXrjPuzqik=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-E7zfeKlANEm4BKAq4l_3xQ-1; Tue, 16 Jun 2020 17:49:11 -0400
+X-MC-Unique: E7zfeKlANEm4BKAq4l_3xQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7A0C872FF2;
+        Tue, 16 Jun 2020 21:49:09 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-114-132.rdu2.redhat.com [10.10.114.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E62360BE2;
+        Tue, 16 Jun 2020 21:49:03 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id C17E522363A; Tue, 16 Jun 2020 17:49:02 -0400 (EDT)
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     virtio-fs@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
+        dgilbert@redhat.com, vgoyal@redhat.com, vkuznets@redhat.com,
+        pbonzini@redhat.com, wanpengli@tencent.com,
+        sean.j.christopherson@intel.com
+Subject: [RFC PATCH 0/3] kvm,x86: Improve kvm page fault error handling
+Date:   Tue, 16 Jun 2020 17:48:44 -0400
+Message-Id: <20200616214847.24482-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     mtosatti@redhat.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, ehabkost@redhat.com
-Date:   Tue, 16 Jun 2020 14:35:59 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNjE2NTgwNS5HQTMy
-NDYxMkBmdWxsZXIuY25ldC8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGFzYW4gYnVp
-bGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1
-dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSBy
-ZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09S
-Sz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0
-LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgR0VOICAg
-ICB0b29scy92aXJ0aW9mc2QvNTAtcWVtdS12aXJ0aW9mc2QuanNvbgogIENDICAgICAgY29udHJp
-Yi92aG9zdC11c2VyLWlucHV0L21haW4ubwogIExJTksgICAgdGVzdHMvcWVtdS1pb3Rlc3RzL3Nv
-Y2tldF9zY21faGVscGVyCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIv
-bGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5T
-Lm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVy
-cmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGlu
-dXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBH
-RU4gICAgIGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYuaHRtbAogIEdFTiAgICAgZG9jcy9pbnRl
-cm9wL3FlbXUtcW1wLXJlZi50eHQKICBHRU4gICAgIGRvY3MvaW50ZXJvcC9xZW11LXFtcC1yZWYu
-NwotLS0KICBBUiAgICAgIGxpYnFlbXV1dGlsLmEKICBMSU5LICAgIGVsZjJkbXAKICBDQyAgICAg
-IHFlbXUtaW1nLm8KL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51
-eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6
-IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRk
-ZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9s
-aWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksg
-ICAgcWVtdS1pbwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4
-L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTog
-d2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRl
-biBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xp
-YmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgTElOSyAg
-ICBxZW11LWVkaWQKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdF9kbWEuaW1n
-CiAgQlVJTEQgICBwYy1iaW9zL29wdGlvbnJvbS9wdmguaW1nCi0tLQogIEJVSUxEICAgcGMtYmlv
-cy9vcHRpb25yb20vcHZoLnJhdwogIFNJR04gICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLmJpbgog
-IExJTksgICAgZnNkZXYvdmlydGZzLXByb3h5LWhlbHBlcgovdXNyL2Jpbi9sZDogL3Vzci9saWI2
-NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9p
-bnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlv
-bjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9j
-bGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRl
-cmNlcHRvcnMuY3BwLm8pCiAgTElOSyAgICBzY3NpL3FlbXUtcHItaGVscGVyCi91c3IvYmluL2xk
-OiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZf
-NjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9f
-aW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAv
-dXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQu
-YShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtYnJpZGdlLWhlbHBlcgov
-dXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0
-LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29t
-bW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0
-aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFz
-YW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgQVIgICAgICBsaWJ2aG9zdC11
-c2VyLmEKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJj
-bGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5p
-bmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkg
-ZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
-Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIEdFTiAgICAgZG9j
-cy9pbnRlcm9wL3FlbXUtZ2EtcmVmLmh0bWwKICBHRU4gICAgIGRvY3MvaW50ZXJvcC9xZW11LWdh
-LXJlZi50eHQKICBHRU4gICAgIGRvY3MvaW50ZXJvcC9xZW11LWdhLXJlZi43CiAgTElOSyAgICBx
-ZW11LWtleW1hcAovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4
-L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTog
-d2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRl
-biBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xp
-YmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgTElOSyAg
-ICBpdnNobWVtLWNsaWVudAogIExJTksgICAgaXZzaG1lbS1zZXJ2ZXIKL3Vzci9iaW4vbGQ6IC91
-c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5h
-KGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRl
-cmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3Iv
-bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
-YW5faW50ZXJjZXB0b3JzLmNwcC5vKQovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4w
-LjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNf
-dmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9y
-aycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAv
-bGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3Bw
-Lm8pCiAgTElOSyAgICBxZW11LW5iZAovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4w
-LjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNf
-dmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9y
-aycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAv
-bGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3Bw
-Lm8pCiAgTElOSyAgICBxZW11LXN0b3JhZ2UtZGFlbW9uCiAgTElOSyAgICB2aXJ0aW9mc2QKICBM
-SU5LICAgIHZob3N0LXVzZXItaW5wdXQKICBMSU5LICAgIHFlbXUtZ2EKL3Vzci9iaW4vbGQ6IC91
-c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5h
-KGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRl
-cmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3Iv
-bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
-YW5faW50ZXJjZXB0b3JzLmNwcC5vKQovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4w
-LjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNf
-dmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9y
-aycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAv
-bGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3Bw
-Lm8pCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xh
-bmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5n
-OiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRl
-ZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdf
-cnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKL3Vzci9iaW4vbGQ6IC91
-c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5h
-KGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRl
-cmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3Iv
-bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
-YW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVtdS1pbWcKL3Vzci9iaW4vbGQ6IC91
-c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5h
-KGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRl
-cmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3Iv
-bGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFz
-YW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvaG1wLWNvbW1h
-bmRzLmgKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy1pbmZvLmgKICBHRU4g
-ICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLmgKLS0tCiAgQ0MgICAgICB4ODZfNjQt
-c29mdG1tdS9xdGVzdC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9tZW1vcnkubwogIENDICAg
-ICAgeDg2XzY0LXNvZnRtbXUvbWVtb3J5X21hcHBpbmcubwovdG1wL3FlbXUtdGVzdC9zcmMvZnB1
-L3NvZnRmbG9hdC5jOjMzNjU6MTM6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVh
-biBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdi
-b29sLW9wZXJhdGlvbl0KICAgIGFic1ogJj0gfiAoICggKCByb3VuZEJpdHMgXiAweDQwICkgPT0g
-MCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgIQovdG1wL3Fl
-bXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM0MjM6MTg6IGVycm9yOiBiaXR3aXNlIG5lZ2F0
-aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlv
-bj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgICAgICBhYnNaMCAmPSB+ICggKCAodWlu
-dDY0X3QpICggYWJzWjE8PDEgKSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAg
-ICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRm
-bG9hdC5jOjM0ODM6MTg6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHBy
-ZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9w
-ZXJhdGlvbl0KICAgICAgICBhYnNaMCAmPSB+KCgodWludDY0X3QpKGFic1oxPDwxKSA9PSAwKSAm
-IHJvdW5kTmVhcmVzdEV2ZW4pOwogICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAhCi90bXAvcWVt
-dS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6MzYwNjoxMzogZXJyb3I6IGJpdHdpc2UgbmVnYXRp
-b24gb2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9u
-PyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgelNpZyAmPSB+ICggKCAoIHJvdW5kQml0
-cyBeIDB4NDAgKSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAgICAgIF5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAg
-ICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6Mzc2MDoxMzogZXJyb3I6
-IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBs
-b2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgelNpZyAmPSB+
-ICggKCAoIHJvdW5kQml0cyBeIDB4MjAwICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwog
-ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+CiAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQu
-YzozOTg3OjIxOiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lv
-bjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRp
-b25dCiAgICAgICAgICAgICAgICAgICAgfiAoICggKHVpbnQ2NF90KSAoIHpTaWcxPDwxICkgPT0g
-MCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAg
-ICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzo0MDAzOjIyOiBl
-cnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBt
-ZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAg
-ICAgIHpTaWcwICY9IH4gKCAoICh1aW50NjRfdCkgKCB6U2lnMTw8MSApID09IDAgKSAmIHJvdW5k
-TmVhcmVzdEV2ZW4gKTsKICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgICAg
-ICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzo0MjczOjE4OiBlcnJvcjogYml0
-d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2lj
-YWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgelNpZzEgJj0g
-fiAoICggelNpZzIgKyB6U2lnMiA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAg
-ICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4K
-ICAgICAgICAgICAgICAgICAhCjggZXJyb3JzIGdlbmVyYXRlZC4KbWFrZVsxXTogKioqIFsvdG1w
-L3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBmcHUvc29mdGZsb2F0Lm9dIEVycm9yIDEKbWFr
-ZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtl
-ZmlsZTo1Mjc6IHg4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgpUcmFjZWJhY2sgKG1vc3QgcmVj
-ZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2
-NjksIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVk
-UHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6
-IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29t
-LnFlbXUuaW5zdGFuY2UudXVpZD1iNGE1MTg0ZmMxNjY0NGIwOTE0YWZjMDIyOTU3YTljMCcsICct
-dScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJt
-JywgJy1lJywgJ1RBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11JywgJy1lJywgJ0VYVFJBX0NPTkZJ
-R1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICct
-ZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYn
-LCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNo
-ZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC16Z3B6dWN6OS9zcmMvZG9j
-a2VyLXNyYy4yMDIwLTA2LTE2LTE3LjI5LjM5LjEzODA0Oi92YXIvdG1wL3FlbXU6eixybycsICdx
-ZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LWRlYnVnJ10nIHJldHVybmVk
-IG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5p
-bnN0YW5jZS51dWlkPWI0YTUxODRmYzE2NjQ0YjA5MTRhZmMwMjI5NTdhOWMwCm1ha2VbMV06ICoq
-KiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90
-bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXpncHp1Y3o5L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVu
-LXRlc3QtZGVidWdAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDZtMTkuODQycwp1c2VyICAgIDBt
-OC41MzBzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDIwMDYxNjE2NTgwNS5HQTMyNDYxMkBmdWxsZXIuY25ldC90ZXN0aW5nLmFzYW4vP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi,
+
+This is an RFC patch series to improve error handling. Compiled and
+tested only on x86. Have not tested or thought about nested
+configuration yet.
+
+This is built on top of Vitaly's patches sending "page ready" events
+using interrupts. But it has not been rebased on top of recent
+interrupt rework yet. Patches are also available here.
+
+https://github.com/rhvgoyal/linux/commits/asyncpf-error-v1
+
+Problem
+=======
+Currently kvm page fault error handling seems very unpredictable. If
+a page fault fails and kvm decided not to do async page fault, then
+upon error, we exit to user space and qemu prints
+"error: kvm run failed Bad address" and associated cpu state and VM
+freezes.
+
+But if kvm decided to async page fault, then async_pf_execute() simply
+ignores the error code (-EFAULT) returned by get_user_pages_remote()
+and injects "page ready" event into guest. Guest retries the faulting
+instruction and takes exit again and kvm again retries async page
+fault and this cycle continues and forms an infinite loop.
+
+I can reproduce this -EFAULT situation easily. Created a file
+(nvdimm.img) and exported it to guest as nvdimm device. Inside the guest
+created ext4 filesystem on device and mounted with dax enabled. Now mmap a
+file (/mnt/pmem0/foo.txt) and load from it one page at a time. Also
+truncate nvdimm.img on host. So when guest tries to load from nvdimm,
+its not mapped in page tables anymore (due to truncation) and we take
+exit and try to fault in the page. Now we either exit to user space
+with bad address or and get into infinite loop depending on state of
+filesystem in guest whether at the time of exit we were in kernel mode
+or user space mode.
+
+I am implementing DAX support in virtiofs (which is very close to what
+nvdimm will do) and I have scenarios where a DAX mapped file in guest
+can get truncated on host and page fault errors can happen. I need to
+do better error handling instead of guest and host spinning infinitely.
+It otherwise sort of creates an attack vector where a kata container
+has to mount virtiofs using DAX, mmap a file, and then truncate that
+file on host and then access it inside guest and we can hog kvm on
+host in this infinite loop of trying to fault in page.
+
+Proposed Solution
+=================
+So first idea is that how about we make the error behavior uniform. That
+is when an error is encountered, we exit to qemu which prints the
+error message and VM freezes. That will end the discrepancy in the
+behavior of sync/async page fault. First patch of the series does
+that.
+
+Second idea is that if we are doing async page fault and if guest is
+in a state so that we can inject "page not present" and "page ready"
+events, then instead of exiting to user space, send error back to
+guest as part of "page ready" event. This will allow guest to do
+finer grained error handling. For example, send SIGBUS to offending
+process. And whole of the VM does not have to go down. Second patch
+implemented it.
+
+Third idea is that find a way to inject error even when async page
+fault can't be injected. Now if we disabled any kind of async page
+fault delivery if guest is in kernel mode because this was racy.
+Once we figure out a race free way  to be able to inject page
+fault in guest (using #VE?), then use that to report errors back
+to guest even when it is in kernel mode. And that will allow
+guest to call fixup_exception() and possibly recover from situation
+otherwise panic(). This can only be implemented once we have a
+way race free way to inject an async page event into guest. So this
+is a future TBD item. For now, if we took exit and guest is in kernel
+mode and error happened, we will vcpu_run() will fail and exit
+to user space.  
+
+I have only compiled and tested this series on x86. Before I refine
+it further, wanted to post it for some feedback and see if this
+the right direction or not.
+
+Any feedback or comments are welcome.
+
+Thanks
+Vivek 
+
+Vivek Goyal (3):
+  kvm,x86: Force sync fault if previous attempts failed
+  kvm: Add capability to be able to report async pf error to guest
+  kvm, async_pf: Use FOLL_WRITE only for write faults
+
+ Documentation/virt/kvm/cpuid.rst     |  4 +++
+ Documentation/virt/kvm/msr.rst       | 10 +++---
+ arch/x86/include/asm/kvm_host.h      |  4 +++
+ arch/x86/include/asm/kvm_para.h      |  8 ++---
+ arch/x86/include/uapi/asm/kvm_para.h | 10 ++++--
+ arch/x86/kernel/kvm.c                | 34 +++++++++++++++----
+ arch/x86/kvm/cpuid.c                 |  3 +-
+ arch/x86/kvm/mmu.h                   |  2 +-
+ arch/x86/kvm/mmu/mmu.c               | 11 ++++---
+ arch/x86/kvm/x86.c                   | 49 +++++++++++++++++++++++-----
+ include/linux/kvm_host.h             |  5 ++-
+ virt/kvm/async_pf.c                  | 15 +++++++--
+ 12 files changed, 119 insertions(+), 36 deletions(-)
+
+-- 
+2.25.4
+
