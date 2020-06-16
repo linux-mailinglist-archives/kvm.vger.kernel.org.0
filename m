@@ -2,125 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A4001FB62F
-	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 17:31:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76C351FB648
+	for <lists+kvm@lfdr.de>; Tue, 16 Jun 2020 17:35:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729543AbgFPPbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 11:31:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34098 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728809AbgFPPbO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Jun 2020 11:31:14 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05GF1vU3085449;
-        Tue, 16 Jun 2020 11:31:13 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31pux0b0vu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 11:31:13 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05GF1xtG085731;
-        Tue, 16 Jun 2020 11:31:13 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31pux0b0um-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 11:31:12 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05GFLBAT021774;
-        Tue, 16 Jun 2020 15:31:10 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 31mpe7t8u7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Jun 2020 15:31:10 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05GFV7tb21692480
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jun 2020 15:31:07 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4F55A5204F;
-        Tue, 16 Jun 2020 15:31:07 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.20.221])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DB6C552050;
-        Tue, 16 Jun 2020 15:31:06 +0000 (GMT)
-Subject: Re: [PATCH v8 00/16] s390/vfio-ap: dynamic configuration support
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com
-References: <20200605214004.14270-1-akrowiak@linux.ibm.com>
- <cf889ee5-ae5c-4752-507b-a31a4c42e1c8@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
- J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
- CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
- 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
- 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
- +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
- T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
- OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
- /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
- IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
- Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
- b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
- gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
- kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
- NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
- hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
- QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
- OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
- tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
- WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
- DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
- OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
- t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
- PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
- Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
- 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
- PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
- YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
- REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
- vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
- DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
- D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
- 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
- 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
- v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
- 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
- JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
- cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
- i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
- jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
- ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <9981d271-1936-c93e-1609-8e306c343b50@de.ibm.com>
-Date:   Tue, 16 Jun 2020 17:31:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1729826AbgFPPeo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 11:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728448AbgFPPen (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 11:34:43 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28302C061573;
+        Tue, 16 Jun 2020 08:34:43 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id x13so21236614wrv.4;
+        Tue, 16 Jun 2020 08:34:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=heeKT585/GdJnkdDzmupKcXSMWfb3JfA/9n//HJB8KI=;
+        b=cVYrNLNBPz0x7FpNz+U7hpChITwYsvE8DuKNm4jFWi++FFsx9Oy5FGkGG7EMAeixt5
+         U3WtXC/XYWsXL42lruWiNAMIaRDKlzVff8qoSZ6PoHK8XWLzziskLvOWnmeVBWIZHREj
+         CLvmtD80NhJ1D3CeNego+GCMSfHpbodVfLy68PkArxZaBkTttH9eFkxIviYNo08PweY8
+         sS3ZAV6yrqnkiOElaGZ4qLNldl23QnU4OchQd0QTff25M+gljt2uNkwy5AgCTYni49N3
+         NPLLKrZrawdCqgE+FotClWohXnwxarw70eHiR7UTtByQZ6/I8ry/BGO43Iok3f9zc6iT
+         ZDfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=heeKT585/GdJnkdDzmupKcXSMWfb3JfA/9n//HJB8KI=;
+        b=YNZDwyxupcP++IpDYgee3U0DRKGNhrfylg5QMqsAeVUTTr6mmYFqOXT8/nGvouY/YQ
+         BZMSzh9J1MTZdleeX5sVKERcOjy3Vr1Rvq2xh5wLfjJ/ErEIfSla1iSljhXuhxGmxvLg
+         GI3RzxTBtkCjvO8WDSfFdvqSFtxy04QEOb/TaWKgfNkqjw/iZ8IvVPwa4P3tyuNFCuVn
+         PPeIpP/NIgiN/JMf/BTDDT8dpuNjs9oGHnt97Fl17r7thTnKkR6hlx/Ef8YUTAJt5LSx
+         caL1uUpaapN1URn+IxfFrQviaW4CQd2ElFkR9zL0IGSc6y+Flu9coYxLfO9bwOV3GEry
+         OQeg==
+X-Gm-Message-State: AOAM532etjRxO0PXpBO8ZhLrjZaPpVWctlg0dIlBkqnKA48ZAW4GVbFs
+        a2zHYQ4I8ZpHwRtBKqyIddQ=
+X-Google-Smtp-Source: ABdhPJw/GEtHnCh8n9ATBH9qJvvqoxLPRCt8puQyiC7D6fMHA7H4jA6wx0SyNiBrwSUDVP8LvdB0DQ==
+X-Received: by 2002:adf:e692:: with SMTP id r18mr3503560wrm.192.1592321681879;
+        Tue, 16 Jun 2020 08:34:41 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id j4sm4815947wma.7.2020.06.16.08.34.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2020 08:34:41 -0700 (PDT)
+Date:   Tue, 16 Jun 2020 16:34:39 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 00/15] vfio: expose virtual Shared Virtual Addressing
+ to VMs
+Message-ID: <20200616153439.GE1491454@stefanha-x1.localdomain>
+References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
+ <20200615100214.GC1491454@stefanha-x1.localdomain>
+ <DM5PR11MB143598745517132685DF1D09C39C0@DM5PR11MB1435.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <cf889ee5-ae5c-4752-507b-a31a4c42e1c8@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-16_04:2020-06-16,2020-06-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- cotscore=-2147483648 lowpriorityscore=0 spamscore=0 suspectscore=0
- malwarescore=0 clxscore=1011 adultscore=0 phishscore=0 mlxlogscore=899
- mlxscore=0 priorityscore=1501 bulkscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006160107
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="TD8GDToEDw0WLGOL"
+Content-Disposition: inline
+In-Reply-To: <DM5PR11MB143598745517132685DF1D09C39C0@DM5PR11MB1435.namprd11.prod.outlook.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16.06.20 16:26, Tony Krowiak wrote:
-> I would greatly appreciate some attention to this patch series ... Please?
 
-Any idea about the kernel test build mails? Are these patches maybe against
-a wrong tree?
+--TD8GDToEDw0WLGOL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jun 15, 2020 at 12:39:40PM +0000, Liu, Yi L wrote:
+> > From: Stefan Hajnoczi <stefanha@gmail.com>
+> > Sent: Monday, June 15, 2020 6:02 PM
+> >=20
+> > On Thu, Jun 11, 2020 at 05:15:19AM -0700, Liu Yi L wrote:
+> > > Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+> > > Intel platforms allows address space sharing between device DMA and
+> > > applications. SVA can reduce programming complexity and enhance secur=
+ity.
+> > >
+> > > This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+> > > guest application address space with passthru devices. This is called
+> > > vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+> > > changes. For IOMMU and QEMU changes, they are in separate series (lis=
+ted
+> > > in the "Related series").
+> > >
+> > > The high-level architecture for SVA virtualization is as below, the k=
+ey
+> > > design of vSVA support is to utilize the dual-stage IOMMU translation=
+ (
+> > > also known as IOMMU nesting translation) capability in host IOMMU.
+> > >
+> > >
+> > >     .-------------.  .---------------------------.
+> > >     |   vIOMMU    |  | Guest process CR3, FL only|
+> > >     |             |  '---------------------------'
+> > >     .----------------/
+> > >     | PASID Entry |--- PASID cache flush -
+> > >     '-------------'                       |
+> > >     |             |                       V
+> > >     |             |                CR3 in GPA
+> > >     '-------------'
+> > > Guest
+> > > ------| Shadow |--------------------------|--------
+> > >       v        v                          v
+> > > Host
+> > >     .-------------.  .----------------------.
+> > >     |   pIOMMU    |  | Bind FL for GVA-GPA  |
+> > >     |             |  '----------------------'
+> > >     .----------------/  |
+> > >     | PASID Entry |     V (Nested xlate)
+> > >     '----------------\.------------------------------.
+> > >     |             |   |SL for GPA-HPA, default domain|
+> > >     |             |   '------------------------------'
+> > >     '-------------'
+> > > Where:
+> > >  - FL =3D First level/stage one page tables
+> > >  - SL =3D Second level/stage two page tables
+> >=20
+> > Hi,
+> > Looks like an interesting feature!
+>=20
+> thanks for the interest. Stefan :-)
+>=20
+> > To check I understand this feature: can applications now pass virtual
+> > addresses to devices instead of translating to IOVAs?
+>=20
+> yes, application could pass virtual addresses to device directly. As
+> long as the virtual address is mapped in cpu page table, then IOMMU
+> would get it translated to physical address.
+>=20
+> > If yes, can guest applications restrict the vSVA address space so the
+> > device only has access to certain regions?
+>=20
+> do you mean restrict the access of certain virtual address regions of
+> guest application ? or certain guest memory? :-)
 
+Your reply below answered my question. I was wondering if applications
+can protect parts of their virtual memory space that should not be
+accessed by the device. It makes sense that there is a trade-off to
+simplify the programming model and performance might also be better if
+the application doesn't need to DMA map/unmap buffers frequently.
+
+Stefan
+
+--TD8GDToEDw0WLGOL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7o5o8ACgkQnKSrs4Gr
+c8g6Tgf/Van2m7eceyvVRw03HdeF1bB30zQNxTLZWlAYDwU8aW2VTupF58Qp/21A
+SqcR20C9LsPofsXKrbhWfK+6FVu/HxqQTR2cNtRLGE6/lSMB892d4YC/wEgMPWyb
+h+bHpwTOxse5/ywwglCtapKMgTpLdtvFWXGRAF5/g4BLM19dEji5JoSZf1oQEIT6
+g8aCbxYoaD9GyE7HpYazYL1xPawp67YQNIp833WVsNky/9F/b9qnJxsg9QcVVJyq
+2wcW/9L18xKbM2lEBHgIkJp/6tumX0x02wn5E+TsLj5l1X5FxMC5VDqUY4dovBvu
+yzWMCyrcU+JnPV6o2VOhBqNiZf4SZQ==
+=jhcy
+-----END PGP SIGNATURE-----
+
+--TD8GDToEDw0WLGOL--
