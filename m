@@ -2,484 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14DB01FCE2B
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 15:12:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44FF61FCE64
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 15:30:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726773AbgFQNMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 09:12:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59285 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726303AbgFQNMM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 09:12:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592399530;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2lAvnguFBJfbpAn9ko140xdBjcLz8OLfMbowVz8ANzc=;
-        b=DppQXHIVa18rEiEEtmmvR/HYNaK27xLE4HP1z2xUVPb9NNHsJ2jMupkaaFS+A/nHoGWu4w
-        iuEWdILwFTxxRONbE3yk8H78l7tBEW0GPLpyAxCsyMkRcI33Vtr+k6PU11KnS8uk3fIXA+
-        ffkUaDqneIiQvBMEyoYGKBuFnBvGaOc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-IoHZ-aADNLGVDDEEvQS0iQ-1; Wed, 17 Jun 2020 09:12:07 -0400
-X-MC-Unique: IoHZ-aADNLGVDDEEvQS0iQ-1
-Received: by mail-ed1-f70.google.com with SMTP id o3so820449eda.23
-        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 06:12:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=2lAvnguFBJfbpAn9ko140xdBjcLz8OLfMbowVz8ANzc=;
-        b=Mg4w7YIFF9i9uyzSLB0pb10vOvzf5RvS9IuEPwBjjBY37Sv+D5kc7e0F3egFliTJ5k
-         L2Bl+ebpynTaqG89JK3NjpC9MvnzAmf4LtOQBo6Mfbp5M2sQhGaWiR52TAOdTIVUyg5P
-         do+9sGJJhw5bga3eWCd2fimDP948ck1/lJcKCTVfks/QwkT488h8MsIU+kGltndJyX67
-         DwHBYQ664MWoWPMcZtAA0o1iSzEgRbWCIRMS0xEylpusGypHMCV4eBZNE9q6T59aGgUY
-         YSDaXgxi0y/W1sz3IWWSC4lFsT5ZxgMcB3+DwsAl7k6dhRxcSTV+3ikOhg5N1jmRDfFi
-         ASZg==
-X-Gm-Message-State: AOAM530CWdbJd759nFUJNexczDntfVfPFA+CQUf2cEb8CLZ15zDe5Zhx
-        3zVMoaR5qLcyKc7Bef6c1FMmwujdK+jF6BonBn1XIarGtALHsP1igXSCaeDj2UclYRsKF4iBP7R
-        F1w+xhQBeFa45
-X-Received: by 2002:a17:906:178c:: with SMTP id t12mr7103629eje.464.1592399525774;
-        Wed, 17 Jun 2020 06:12:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyN2Sy5hyq2qFc3E+ICbb5JtuoFD6/Ce8fFPulpau2noIJ8aUBJ0N4sWhRdtr2LnvLEn4Pduw==
-X-Received: by 2002:a17:906:178c:: with SMTP id t12mr7103593eje.464.1592399525333;
-        Wed, 17 Jun 2020 06:12:05 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id z38sm8901748ede.96.2020.06.17.06.12.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 06:12:04 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vivek Goyal <vgoyal@redhat.com>
-Cc:     virtio-fs@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
-        dgilbert@redhat.com, pbonzini@redhat.com, wanpengli@tencent.com,
-        sean.j.christopherson@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] kvm: Add capability to be able to report async pf error to guest
-In-Reply-To: <20200616214847.24482-3-vgoyal@redhat.com>
-References: <20200616214847.24482-1-vgoyal@redhat.com> <20200616214847.24482-3-vgoyal@redhat.com>
-Date:   Wed, 17 Jun 2020 15:12:03 +0200
-Message-ID: <87lfklhm58.fsf@vitty.brq.redhat.com>
+        id S1726480AbgFQN34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 09:29:56 -0400
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21742 "EHLO
+        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726329AbgFQN34 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 09:29:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1592400585; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=LNqwuYlxwGDqioeN2nk1PfadyeRY5mM4s8FnqSYadg17J/xffejvxoJ/Ep0vM4yIv3bf4+/Lfo/Q4GxsaKBpQEfFbf2AibXCWkbXB8XlLgp75sYD/o0WcIKFOv25MDhAahWbyGajtB2q+grf9/HvhUyH0o79qegd6IZlqJCHNOg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1592400585; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=SmjsO6KR//ZAsaZs4G4V8qFdve8h/LEiXS/V2M5h2kQ=; 
+        b=OhpgfJF8YuD7XU5l0zDCngls3g1GmF1iG1wAzhjDcmtkM/jW5WEFLQYNFo6vnLMRhfvnFIxnmiQDxI7asp7suPNRa/iNlxyBGenirYk0CF/ioJfb4Bzf530CcS+MXZe4ETUyksv9oKv2Fvd8hSSlwzmC0vDrQiNhghXPmOKoWWw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1592400582425904.3995152175448; Wed, 17 Jun 2020 06:29:42 -0700 (PDT)
+Message-ID: <159240058084.14731.5036122065107017224@d1fd068a5071>
+Subject: Re: [PATCH] target/arm/kvm: Check supported feature per accelerator (not per vCPU)
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20200617130800.26355-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     philmd@redhat.com
+Cc:     qemu-devel@nongnu.org, peter.maydell@linaro.org,
+        drjones@redhat.com, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+        haibo.xu@linaro.org, pbonzini@redhat.com, philmd@redhat.com
+Date:   Wed, 17 Jun 2020 06:29:42 -0700 (PDT)
+X-ZohoMailClient: External
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vivek Goyal <vgoyal@redhat.com> writes:
-
-> As of now asynchronous page fault mecahanism assumes host will always be
-> successful in resolving page fault. So there are only two states, that
-> is page is not present and page is ready.
->
-> If a page is backed by a file and that file has been truncated (as
-> can be the case with virtio-fs), then page fault handler on host returns
-> -EFAULT.
->
-> As of now async page fault logic does not look at error code (-EFAULT)
-> returned by get_user_pages_remote() and returns PAGE_READY to guest.
-> Guest tries to access page and page fault happnes again. And this
-> gets kvm into an infinite loop. (Killing host process gets kvm out of
-> this loop though).
->
-> This patch adds another state to async page fault logic which allows
-> host to return error to guest. Once guest knows that async page fault
-> can't be resolved, it can send SIGBUS to host process (if user space
-> was accessing the page in question).
->
-> Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-> ---
->  Documentation/virt/kvm/cpuid.rst     |  4 +++
->  Documentation/virt/kvm/msr.rst       | 10 +++++---
->  arch/x86/include/asm/kvm_host.h      |  3 +++
->  arch/x86/include/asm/kvm_para.h      |  8 +++---
->  arch/x86/include/uapi/asm/kvm_para.h | 10 ++++++--
->  arch/x86/kernel/kvm.c                | 34 ++++++++++++++++++++-----
->  arch/x86/kvm/cpuid.c                 |  3 ++-
->  arch/x86/kvm/mmu/mmu.c               |  2 +-
->  arch/x86/kvm/x86.c                   | 38 ++++++++++++++++++++--------
->  9 files changed, 83 insertions(+), 29 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-> index a7dff9186bed..a4497f3a6e7f 100644
-> --- a/Documentation/virt/kvm/cpuid.rst
-> +++ b/Documentation/virt/kvm/cpuid.rst
-> @@ -92,6 +92,10 @@ KVM_FEATURE_ASYNC_PF_INT          14          guest checks this feature bit
->                                                async pf acknowledgment msr
->                                                0x4b564d07.
->  
-> +KVM_FEATURE_ASYNC_PF_ERROR        15          paravirtualized async PF error
-> +                                              can be enabled by setting bit 4
-> +                                              when writing to msr 0x4b564d02
-> +
->  KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
->                                                per-cpu warps are expeced in
->                                                kvmclock
-> diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
-> index e37a14c323d2..513eb8e0b0eb 100644
-> --- a/Documentation/virt/kvm/msr.rst
-> +++ b/Documentation/virt/kvm/msr.rst
-> @@ -202,19 +202,21 @@ data:
->  
->  		/* Used for 'page ready' events delivered via interrupt notification */
->  		__u32 token;
-> -
-> -		__u8 pad[56];
-> +                __u32 ready_flags;
-> +		__u8 pad[52];
->  		__u32 enabled;
->  	  };
->  
-> -	Bits 5-4 of the MSR are reserved and should be zero. Bit 0 is set to 1
-> +	Bits 5 of the MSR is reserved and should be zero. Bit 0 is set to 1
->  	when asynchronous page faults are enabled on the vcpu, 0 when disabled.
->  	Bit 1 is 1 if asynchronous page faults can be injected when vcpu is in
->  	cpl == 0. Bit 2 is 1 if asynchronous page faults are delivered to L1 as
->  	#PF vmexits.  Bit 2 can be set only if KVM_FEATURE_ASYNC_PF_VMEXIT is
->  	present in CPUID. Bit 3 enables interrupt based delivery of 'page ready'
->  	events. Bit 3 can only be set if KVM_FEATURE_ASYNC_PF_INT is present in
-> -	CPUID.
-> +	CPUID. Bit 4 enables reporting of page fault errors if hypervisor
-> +        encounters errors while faulting in page. Bit 4 can only be set if
-> +        KVM_FEATURE_ASYNC_PF_ERROR is present in CPUID.
-
-Would it actually make sense to deliver the exact error from
-get_user_pages() and not a binary failure/no-failure? Is the guest
-interested in how exactly we failed?
-
->  
->  	'Page not present' events are currently always delivered as synthetic
->  	#PF exception. During delivery of these events APF CR2 register contains
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 348a73106556..ff8dbc604dbe 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -779,6 +779,7 @@ struct kvm_vcpu_arch {
->  		bool delivery_as_pf_vmexit;
->  		bool pageready_pending;
->  		gfn_t error_gfn;
-> +		bool send_pf_error;
->  	} apf;
->  
->  	/* OSVW MSRs (AMD only) */
-> @@ -1680,6 +1681,8 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
->  			       struct kvm_async_pf *work);
->  void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu);
->  bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
-> +void kvm_arch_async_page_fault_error(struct kvm_vcpu *vcpu,
-> +				     struct kvm_async_pf *work);
->  extern bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
->  
->  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-> index bbc43e5411d9..6c738e91ca2c 100644
-> --- a/arch/x86/include/asm/kvm_para.h
-> +++ b/arch/x86/include/asm/kvm_para.h
-> @@ -89,8 +89,8 @@ static inline long kvm_hypercall4(unsigned int nr, unsigned long p1,
->  bool kvm_para_available(void);
->  unsigned int kvm_arch_para_features(void);
->  unsigned int kvm_arch_para_hints(void);
-> -void kvm_async_pf_task_wait_schedule(u32 token);
-> -void kvm_async_pf_task_wake(u32 token);
-> +void kvm_async_pf_task_wait_schedule(u32 token, bool user_mode);
-> +void kvm_async_pf_task_wake(u32 token, bool is_err);
->  u32 kvm_read_and_reset_apf_flags(void);
->  void kvm_disable_steal_time(void);
->  bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token);
-> @@ -120,8 +120,8 @@ static inline void kvm_spinlock_init(void)
->  #endif /* CONFIG_PARAVIRT_SPINLOCKS */
->  
->  #else /* CONFIG_KVM_GUEST */
-> -#define kvm_async_pf_task_wait_schedule(T) do {} while(0)
-> -#define kvm_async_pf_task_wake(T) do {} while(0)
-> +#define kvm_async_pf_task_wait_schedule(T, U) do {} while(0)
-> +#define kvm_async_pf_task_wake(T, I) do {} while(0)
->  
->  static inline bool kvm_para_available(void)
->  {
-> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> index 812e9b4c1114..b43fd2ddc949 100644
-> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> @@ -32,6 +32,7 @@
->  #define KVM_FEATURE_POLL_CONTROL	12
->  #define KVM_FEATURE_PV_SCHED_YIELD	13
->  #define KVM_FEATURE_ASYNC_PF_INT	14
-> +#define KVM_FEATURE_ASYNC_PF_ERROR	15
->  
->  #define KVM_HINTS_REALTIME      0
->  
-> @@ -85,6 +86,7 @@ struct kvm_clock_pairing {
->  #define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1)
->  #define KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT	(1 << 2)
->  #define KVM_ASYNC_PF_DELIVERY_AS_INT		(1 << 3)
-> +#define KVM_ASYNC_PF_SEND_ERROR			(1 << 4)
->  
->  /* MSR_KVM_ASYNC_PF_INT */
->  #define KVM_ASYNC_PF_VEC_MASK			GENMASK(7, 0)
-> @@ -119,14 +121,18 @@ struct kvm_mmu_op_release_pt {
->  #define KVM_PV_REASON_PAGE_NOT_PRESENT 1
->  #define KVM_PV_REASON_PAGE_READY 2
->  
-> +
-> +/* Bit flags for ready_flags field */
-> +#define KVM_PV_REASON_PAGE_ERROR 1
-> +
->  struct kvm_vcpu_pv_apf_data {
->  	/* Used for 'page not present' events delivered via #PF */
->  	__u32 flags;
->  
->  	/* Used for 'page ready' events delivered via interrupt notification */
->  	__u32 token;
-> -
-> -	__u8 pad[56];
-> +	__u32 ready_flags;
-> +	__u8 pad[52];
->  	__u32 enabled;
->  };
->  
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index ff95429d206b..2ee9c9d971ae 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -75,6 +75,7 @@ struct kvm_task_sleep_node {
->  	struct swait_queue_head wq;
->  	u32 token;
->  	int cpu;
-> +	bool is_err;
->  };
->  
->  static struct kvm_task_sleep_head {
-> @@ -97,7 +98,14 @@ static struct kvm_task_sleep_node *_find_apf_task(struct kvm_task_sleep_head *b,
->  	return NULL;
->  }
->  
-> -static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
-> +static void handle_async_pf_error(bool user_mode)
-> +{
-> +	if (user_mode)
-> +		send_sig_info(SIGBUS, SEND_SIG_PRIV, current);
-> +}
-> +
-> +static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n,
-> +				    bool user_mode)
->  {
->  	u32 key = hash_32(token, KVM_TASK_SLEEP_HASHBITS);
->  	struct kvm_task_sleep_head *b = &async_pf_sleepers[key];
-> @@ -107,6 +115,8 @@ static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
->  	e = _find_apf_task(b, token);
->  	if (e) {
->  		/* dummy entry exist -> wake up was delivered ahead of PF */
-> +		if (e->is_err)
-> +			handle_async_pf_error(user_mode);
->  		hlist_del(&e->link);
->  		raw_spin_unlock(&b->lock);
->  		kfree(e);
-> @@ -128,14 +138,14 @@ static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
->   * Invoked from the async pagefault handling code or from the VM exit page
->   * fault handler. In both cases RCU is watching.
->   */
-> -void kvm_async_pf_task_wait_schedule(u32 token)
-> +void kvm_async_pf_task_wait_schedule(u32 token, bool user_mode)
->  {
->  	struct kvm_task_sleep_node n;
->  	DECLARE_SWAITQUEUE(wait);
->  
->  	lockdep_assert_irqs_disabled();
->  
-> -	if (!kvm_async_pf_queue_task(token, &n))
-> +	if (!kvm_async_pf_queue_task(token, &n, user_mode))
->  		return;
->  
->  	for (;;) {
-> @@ -148,6 +158,8 @@ void kvm_async_pf_task_wait_schedule(u32 token)
->  		local_irq_disable();
->  	}
->  	finish_swait(&n.wq, &wait);
-> +	if (n.is_err)
-> +		handle_async_pf_error(user_mode);
->  }
->  EXPORT_SYMBOL_GPL(kvm_async_pf_task_wait_schedule);
->  
-> @@ -177,7 +189,7 @@ static void apf_task_wake_all(void)
->  	}
->  }
->  
-> -void kvm_async_pf_task_wake(u32 token)
-> +void kvm_async_pf_task_wake(u32 token, bool is_err)
->  {
->  	u32 key = hash_32(token, KVM_TASK_SLEEP_HASHBITS);
->  	struct kvm_task_sleep_head *b = &async_pf_sleepers[key];
-> @@ -208,9 +220,11 @@ void kvm_async_pf_task_wake(u32 token)
->  		}
->  		n->token = token;
->  		n->cpu = smp_processor_id();
-> +		n->is_err = is_err;
->  		init_swait_queue_head(&n->wq);
->  		hlist_add_head(&n->link, &b->list);
->  	} else {
-> +		n->is_err = is_err;
->  		apf_task_wake_one(n);
->  	}
->  	raw_spin_unlock(&b->lock);
-> @@ -256,14 +270,15 @@ bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token)
->  		panic("Host injected async #PF in kernel mode\n");
->  
->  	/* Page is swapped out by the host. */
-> -	kvm_async_pf_task_wait_schedule(token);
-> +	kvm_async_pf_task_wait_schedule(token, user_mode(regs));
->  	return true;
->  }
->  NOKPROBE_SYMBOL(__kvm_handle_async_pf);
->  
->  __visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs)
->  {
-> -	u32 token;
-> +	u32 token, ready_flags;
-> +	bool is_err;
->  
->  	entering_ack_irq();
->  
-> @@ -271,7 +286,9 @@ __visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs)
->  
->  	if (__this_cpu_read(apf_reason.enabled)) {
->  		token = __this_cpu_read(apf_reason.token);
-> -		kvm_async_pf_task_wake(token);
-> +		ready_flags = __this_cpu_read(apf_reason.ready_flags);
-> +		is_err = ready_flags & KVM_PV_REASON_PAGE_ERROR;
-> +		kvm_async_pf_task_wake(token, is_err);
->  		__this_cpu_write(apf_reason.token, 0);
->  		wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
->  	}
-> @@ -335,6 +352,9 @@ static void kvm_guest_cpu_init(void)
->  
->  		wrmsrl(MSR_KVM_ASYNC_PF_INT, KVM_ASYNC_PF_VECTOR);
->  
-> +		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_ERROR))
-> +			pa |= KVM_ASYNC_PF_SEND_ERROR;
-> +
->  		wrmsrl(MSR_KVM_ASYNC_PF_EN, pa);
->  		__this_cpu_write(apf_reason.enabled, 1);
->  		pr_info("KVM setup async PF for cpu %d\n", smp_processor_id());
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 253b8e875ccd..f811f36e0c24 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -712,7 +712,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  			     (1 << KVM_FEATURE_PV_SEND_IPI) |
->  			     (1 << KVM_FEATURE_POLL_CONTROL) |
->  			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
-> -			     (1 << KVM_FEATURE_ASYNC_PF_INT);
-> +			     (1 << KVM_FEATURE_ASYNC_PF_INT) |
-> +			     (1 << KVM_FEATURE_ASYNC_PF_ERROR);
->  
->  		if (sched_info_on())
->  			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e207900ab303..634182bb07c7 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4175,7 +4175,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
->  	} else if (flags & KVM_PV_REASON_PAGE_NOT_PRESENT) {
->  		vcpu->arch.apf.host_apf_flags = 0;
->  		local_irq_disable();
-> -		kvm_async_pf_task_wait_schedule(fault_address);
-> +		kvm_async_pf_task_wait_schedule(fault_address, 0);
->  		local_irq_enable();
->  	} else {
->  		WARN_ONCE(1, "Unexpected host async PF flags: %x\n", flags);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4c5205434b9c..c3b2097f2eaa 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2690,8 +2690,8 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
->  {
->  	gpa_t gpa = data & ~0x3f;
->  
-> -	/* Bits 4:5 are reserved, Should be zero */
-> -	if (data & 0x30)
-> +	/* Bits 5 is reserved, Should be zero */
-> +	if (data & 0x20)
->  		return 1;
->  
->  	vcpu->arch.apf.msr_en_val = data;
-> @@ -2703,11 +2703,12 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
->  	}
->  
->  	if (kvm_gfn_to_hva_cache_init(vcpu->kvm, &vcpu->arch.apf.data, gpa,
-> -					sizeof(u64)))
-> +					sizeof(u64) + sizeof(u32)))
->  		return 1;
->  
->  	vcpu->arch.apf.send_user_only = !(data & KVM_ASYNC_PF_SEND_ALWAYS);
->  	vcpu->arch.apf.delivery_as_pf_vmexit = data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
-> +	vcpu->arch.apf.send_pf_error = data & KVM_ASYNC_PF_SEND_ERROR;
->  
->  	kvm_async_pf_wakeup_all(vcpu);
->  
-> @@ -10481,12 +10482,25 @@ static inline int apf_put_user_notpresent(struct kvm_vcpu *vcpu)
->  				      sizeof(reason));
->  }
->  
-> -static inline int apf_put_user_ready(struct kvm_vcpu *vcpu, u32 token)
-> +static inline int apf_put_user_ready(struct kvm_vcpu *vcpu, u32 token,
-> +				     bool is_err)
->  {
->  	unsigned int offset = offsetof(struct kvm_vcpu_pv_apf_data, token);
-> +	int ret;
-> +	u32 ready_flags = 0;
-> +
-> +	if (is_err && vcpu->arch.apf.send_pf_error)
-> +		ready_flags = KVM_PV_REASON_PAGE_ERROR;
-> +
-> +	ret = kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.apf.data,
-> +					    &token, offset, sizeof(token));
-> +	if (ret < 0)
-> +		return ret;
->  
-> +	offset = offsetof(struct kvm_vcpu_pv_apf_data, ready_flags);
->  	return kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.apf.data,
-> -					     &token, offset, sizeof(token));
-> +					    &ready_flags, offset,
-> +					    sizeof(ready_flags));
->  }
->  
->  static inline bool apf_pageready_slot_free(struct kvm_vcpu *vcpu)
-> @@ -10571,6 +10585,8 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
->  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
->  				 struct kvm_async_pf *work)
->  {
-> +	bool present_injected = false;
-> +
->  	struct kvm_lapic_irq irq = {
->  		.delivery_mode = APIC_DM_FIXED,
->  		.vector = vcpu->arch.apf.vec
-> @@ -10584,16 +10600,18 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
->  
->  	if ((work->wakeup_all || work->notpresent_injected) &&
->  	    kvm_pv_async_pf_enabled(vcpu) &&
-> -	    !apf_put_user_ready(vcpu, work->arch.token)) {
-> +	    !apf_put_user_ready(vcpu, work->arch.token, work->error_code)) {
->  		vcpu->arch.apf.pageready_pending = true;
->  		kvm_apic_set_irq(vcpu, &irq, NULL);
-> +		present_injected = true;
->  	}
->  
-> -	if (work->error_code) {
-> +	if (work->error_code &&
-> +	    (!present_injected || !vcpu->arch.apf.send_pf_error)) {
->  		/*
-> -		 * Page fault failed and we don't have a way to report
-> -		 * errors back to guest yet. So save this pfn and force
-> -		 * sync page fault next time.
-> +		 * Page fault failed. If we did not report error back
-> +		 * to guest, save this pfn and force sync page fault next
-> +		 * time.
->  		 */
->  		vcpu->arch.apf.error_gfn = work->cr2_or_gpa >> PAGE_SHIFT;
->  	}
-
--- 
-Vitaly
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDYxNzEzMDgwMC4yNjM1
+NS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
+biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
+b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
+Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14
+ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
+QyAgICAgIHFnYS9ndWVzdC1hZ2VudC1jb21tYW5kLXN0YXRlLm8KICBDQyAgICAgIHFnYS9tYWlu
+Lm8KICBDQyAgICAgIHFnYS9jb21tYW5kcy1wb3NpeC5vCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0
+L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2lu
+dGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9u
+OjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2Ns
+YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
+Y2VwdG9ycy5jcHAubykKICBDQyAgICAgIHFnYS9jaGFubmVsLXBvc2l4Lm8KICBDQyAgICAgIHFn
+YS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS10eXBlcy5vCiAgQ0MgICAgICBxZ2EvcWFwaS1nZW5l
+cmF0ZWQvcWdhLXFhcGktdmlzaXQubwotLS0KICBHRU4gICAgIGRvY3MvaW50ZXJvcC9xZW11LWdh
+LXJlZi5odG1sCiAgR0VOICAgICBkb2NzL2ludGVyb3AvcWVtdS1nYS1yZWYudHh0CiAgR0VOICAg
+ICBkb2NzL2ludGVyb3AvcWVtdS1nYS1yZWYuNwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFu
+Zy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNl
+cHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVh
+bF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8x
+MC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRv
+cnMuY3BwLm8pCiAgTElOSyAgICBxZW11LWtleW1hcAogIExJTksgICAgaXZzaG1lbS1jbGllbnQK
+L3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19y
+dC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNv
+bW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5p
+dGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5h
+c2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgaXZzaG1lbS1z
+ZXJ2ZXIKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJj
+bGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5p
+bmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkg
+ZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
+Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVt
+dS1uYmQKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJj
+bGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMubyk6IHdhcm5p
+bmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJyaWRkZW4gYnkg
+ZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51eC9saWJjbGFu
+Z19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQogIExJTksgICAgcWVt
+dS1zdG9yYWdlLWRhZW1vbgovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGli
+L2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsu
+Uy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3Zl
+cnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xp
+bnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAg
+QVMgICAgICBwYy1iaW9zL29wdGlvbnJvbS9tdWx0aWJvb3QubwogIEFTICAgICAgcGMtYmlvcy9v
+cHRpb25yb20vbGludXhib290Lm8KL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4w
+L2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zm
+b3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsn
+IG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xp
+Yi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5v
+KQogIExJTksgICAgcWVtdS1pbWcKICBDQyAgICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9v
+dF9kbWEubwovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xp
+YmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2Fy
+bmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBi
+eSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNs
+YW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgQVMgICAgICBw
+Yy1iaW9zL29wdGlvbnJvbS9rdm12YXBpYy5vCiAgTElOSyAgICBxZW11LWlvCi91c3IvYmluL2xk
+OiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZf
+NjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9f
+aW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAv
+dXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQu
+YShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBMSU5LICAgIHFlbXUtZWRpZAogIEFTICAgICAg
+cGMtYmlvcy9vcHRpb25yb20vcHZoLm8KL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAu
+MC4wL2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3Jz
+X3Zmb3JrLlMubyk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZv
+cmsnIG92ZXJyaWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4w
+L2xpYi9saW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNw
+cC5vKQogIExJTksgICAgZnNkZXYvdmlydGZzLXByb3h5LWhlbHBlcgogIENDICAgICAgcGMtYmlv
+cy9vcHRpb25yb20vcHZoX21haW4ubwogIExJTksgICAgc2NzaS9xZW11LXByLWhlbHBlcgovdXNy
+L2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFz
+YW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9u
+IG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9u
+IGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4t
+eDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgQlVJTEQgICBwYy1iaW9zL29wdGlv
+bnJvbS9tdWx0aWJvb3QuaW1nCiAgQlVJTEQgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJvb3Qu
+aW1nCiAgTElOSyAgICBxZW11LWJyaWRnZS1oZWxwZXIKLS0tCiAgQlVJTEQgICBwYy1iaW9zL29w
+dGlvbnJvbS9saW51eGJvb3QucmF3CiAgQlVJTEQgICBwYy1iaW9zL29wdGlvbnJvbS9saW51eGJv
+b3RfZG1hLmltZwogIExJTksgICAgdmlydGlvZnNkCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2Ns
+YW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVy
+Y2VwdG9yc192Zm9yay5TLm8pOiB3YXJuaW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpy
+ZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5n
+LzEwLjAuMC9saWIvbGludXgvbGliY2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2Vw
+dG9ycy5jcHAubykKICBTSUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL211bHRpYm9vdC5iaW4KICBT
+SUdOICAgIHBjLWJpb3Mvb3B0aW9ucm9tL2xpbnV4Ym9vdC5iaW4KICBCVUlMRCAgIHBjLWJpb3Mv
+b3B0aW9ucm9tL2xpbnV4Ym9vdF9kbWEucmF3Ci0tLQogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25y
+b20vcHZoLmltZwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLnJhdwogIFNJR04gICAg
+cGMtYmlvcy9vcHRpb25yb20vcHZoLmJpbgovdXNyL2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8x
+MC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRv
+cnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9uIG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92
+Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9uIGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4w
+LjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMu
+Y3BwLm8pCi91c3IvYmluL2xkOiAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGli
+Y2xhbmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9yc192Zm9yay5TLm8pOiB3YXJu
+aW5nOiBjb21tb24gb2YgYF9faW50ZXJjZXB0aW9uOjpyZWFsX3Zmb3JrJyBvdmVycmlkZGVuIGJ5
+IGRlZmluaXRpb24gZnJvbSAvdXNyL2xpYjY0L2NsYW5nLzEwLjAuMC9saWIvbGludXgvbGliY2xh
+bmdfcnQuYXNhbi14ODZfNjQuYShhc2FuX2ludGVyY2VwdG9ycy5jcHAubykKICBCVUlMRCAgIHBj
+LWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGljLmltZwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20v
+a3ZtdmFwaWMucmF3CiAgU0lHTiAgICBwYy1iaW9zL29wdGlvbnJvbS9rdm12YXBpYy5iaW4KICBM
+SU5LICAgIHFlbXUtZ2EKL3Vzci9iaW4vbGQ6IC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9s
+aW51eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzX3Zmb3JrLlMu
+byk6IHdhcm5pbmc6IGNvbW1vbiBvZiBgX19pbnRlcmNlcHRpb246OnJlYWxfdmZvcmsnIG92ZXJy
+aWRkZW4gYnkgZGVmaW5pdGlvbiBmcm9tIC91c3IvbGliNjQvY2xhbmcvMTAuMC4wL2xpYi9saW51
+eC9saWJjbGFuZ19ydC5hc2FuLXg4Nl82NC5hKGFzYW5faW50ZXJjZXB0b3JzLmNwcC5vKQovdXNy
+L2Jpbi9sZDogL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFz
+YW4teDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnNfdmZvcmsuUy5vKTogd2FybmluZzogY29tbW9u
+IG9mIGBfX2ludGVyY2VwdGlvbjo6cmVhbF92Zm9yaycgb3ZlcnJpZGRlbiBieSBkZWZpbml0aW9u
+IGZyb20gL3Vzci9saWI2NC9jbGFuZy8xMC4wLjAvbGliL2xpbnV4L2xpYmNsYW5nX3J0LmFzYW4t
+eDg2XzY0LmEoYXNhbl9pbnRlcmNlcHRvcnMuY3BwLm8pCiAgR0VOICAgICB4ODZfNjQtc29mdG1t
+dS9jb25maWctdGFyZ2V0LmgKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy5o
+CiAgR0VOICAgICB4ODZfNjQtc29mdG1tdS9obXAtY29tbWFuZHMtaW5mby5oCi0tLQogIENDICAg
+ICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby5vCiAgQ0MgICAgICB4ODZfNjQtc29m
+dG1tdS9ody92aXJ0aW8vdmhvc3QubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlv
+L3Zob3N0LWJhY2tlbmQubwovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjMzNjU6
+MTM6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQg
+eW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAg
+IGFic1ogJj0gfiAoICggKCByb3VuZEJpdHMgXiAweDQwICkgPT0gMCApICYgcm91bmROZWFyZXN0
+RXZlbiApOwogICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3Nv
+ZnRmbG9hdC5jOjM0MjM6MTg6IGVycm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBl
+eHByZXNzaW9uOyBkaWQgeW91IG1lYW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29s
+LW9wZXJhdGlvbl0KICAgICAgICBhYnNaMCAmPSB+ICggKCAodWludDY0X3QpICggYWJzWjE8PDEg
+KSA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAg
+ICAgICAgICAgIQovdG1wL3FlbXUtdGVzdC9zcmMvZnB1L3NvZnRmbG9hdC5jOjM0ODM6MTg6IGVy
+cm9yOiBiaXR3aXNlIG5lZ2F0aW9uIG9mIGEgYm9vbGVhbiBleHByZXNzaW9uOyBkaWQgeW91IG1l
+YW4gbG9naWNhbCBuZWdhdGlvbj8gWy1XZXJyb3IsLVdib29sLW9wZXJhdGlvbl0KICAgICAgICBh
+YnNaMCAmPSB+KCgodWludDY0X3QpKGFic1oxPDwxKSA9PSAwKSAmIHJvdW5kTmVhcmVzdEV2ZW4p
+OwogICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAhCi90bXAvcWVtdS10ZXN0L3NyYy9mcHUvc29m
+dGZsb2F0LmM6MzYwNjoxMzogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24gb2YgYSBib29sZWFuIGV4
+cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBbLVdlcnJvciwtV2Jvb2wt
+b3BlcmF0aW9uXQogICAgelNpZyAmPSB+ICggKCAoIHJvdW5kQml0cyBeIDB4NDAgKSA9PSAwICkg
+JiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAhCi90bXAvcWVtdS10
+ZXN0L3NyYy9mcHUvc29mdGZsb2F0LmM6Mzc2MDoxMzogZXJyb3I6IGJpdHdpc2UgbmVnYXRpb24g
+b2YgYSBib29sZWFuIGV4cHJlc3Npb247IGRpZCB5b3UgbWVhbiBsb2dpY2FsIG5lZ2F0aW9uPyBb
+LVdlcnJvciwtV2Jvb2wtb3BlcmF0aW9uXQogICAgelNpZyAmPSB+ICggKCAoIHJvdW5kQml0cyBe
+IDB4MjAwICkgPT0gMCApICYgcm91bmROZWFyZXN0RXZlbiApOwogICAgICAgICAgICBefn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAg
+ICAgICEKL3RtcC9xZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzozOTg3OjIxOiBlcnJvcjog
+Yml0d2lzZSBuZWdhdGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxv
+Z2ljYWwgbmVnYXRpb24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgICAgICAg
+ICAgICAgfiAoICggKHVpbnQ2NF90KSAoIHpTaWcxPDwxICkgPT0gMCApICYgcm91bmROZWFyZXN0
+RXZlbiApOwogICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICAgICAgICAgICAgICAgICEKL3RtcC9x
+ZW11LXRlc3Qvc3JjL2ZwdS9zb2Z0ZmxvYXQuYzo0MDAzOjIyOiBlcnJvcjogYml0d2lzZSBuZWdh
+dGlvbiBvZiBhIGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRp
+b24/IFstV2Vycm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgICAgIHpTaWcwICY9IH4gKCAo
+ICh1aW50NjRfdCkgKCB6U2lnMTw8MSApID09IDAgKSAmIHJvdW5kTmVhcmVzdEV2ZW4gKTsKICAg
+ICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgICAgICEKL3RtcC9xZW11LXRlc3Qv
+c3JjL2ZwdS9zb2Z0ZmxvYXQuYzo0MjczOjE4OiBlcnJvcjogYml0d2lzZSBuZWdhdGlvbiBvZiBh
+IGJvb2xlYW4gZXhwcmVzc2lvbjsgZGlkIHlvdSBtZWFuIGxvZ2ljYWwgbmVnYXRpb24/IFstV2Vy
+cm9yLC1XYm9vbC1vcGVyYXRpb25dCiAgICAgICAgelNpZzEgJj0gfiAoICggelNpZzIgKyB6U2ln
+MiA9PSAwICkgJiByb3VuZE5lYXJlc3RFdmVuICk7CiAgICAgICAgICAgICAgICAgXn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAh
+CjggZXJyb3JzIGdlbmVyYXRlZC4KbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVs
+ZXMubWFrOjY5OiBmcHUvc29mdGZsb2F0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcg
+Zm9yIHVuZmluaXNoZWQgam9icy4uLi4KL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi9yYW0u
+Yzo5MTk6NDU6IGVycm9yOiBpbXBsaWNpdCBjb252ZXJzaW9uIGZyb20gJ3Vuc2lnbmVkIGxvbmcn
+IHRvICdkb3VibGUnIGNoYW5nZXMgdmFsdWUgZnJvbSAxODQ0Njc0NDA3MzcwOTU1MTYxNSB0byAx
+ODQ0Njc0NDA3MzcwOTU1MTYxNiBbLVdlcnJvciwtV2ltcGxpY2l0LWludC1mbG9hdC1jb252ZXJz
+aW9uXQogICAgICAgICAgICB4YnpybGVfY291bnRlcnMuZW5jb2RpbmdfcmF0ZSA9IFVJTlQ2NF9N
+QVg7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIH4gXn5+fn5+fn5+
+fgovdXNyL2luY2x1ZGUvc3RkaW50Lmg6MTMwOjIzOiBub3RlOiBleHBhbmRlZCBmcm9tIG1hY3Jv
+ICdVSU5UNjRfTUFYJwotLS0KMTg0NDY3NDQwNzM3MDk1NTE2MTVVTApefn5+fn5+fn5+fn5+fn5+
+fn5+fn5+CjEgZXJyb3IgZ2VuZXJhdGVkLgptYWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3Ny
+Yy9ydWxlcy5tYWs6Njk6IG1pZ3JhdGlvbi9yYW0ub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2Vm
+aWxlOjUyNzogeDg2XzY0LXNvZnRtbXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCByZWNl
+bnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2
+OSwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQ
+cm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjog
+Q29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20u
+cWVtdS5pbnN0YW5jZS51dWlkPWFkYzgzM2EzZGQ5ZjRhYWE5ZDlkMTMwYjc1ZDBiNzk0JywgJy11
+JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0n
+LCAnLWUnLCAnVEFSR0VUX0xJU1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklH
+VVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1l
+JywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdics
+ICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hl
+OnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWhuZ2llanpkL3NyYy9kb2Nr
+ZXItc3JjLjIwMjAtMDYtMTctMDkuMjUuNDAuMjQ1MDc6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3Fl
+bXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtZGVidWcnXScgcmV0dXJuZWQg
+bm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmlu
+c3RhbmNlLnV1aWQ9YWRjODMzYTNkZDlmNGFhYTlkOWQxMzBiNzVkMGI3OTQKbWFrZVsxXTogKioq
+IFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3Rt
+cC9wYXRjaGV3LXRlc3Rlci10bXAtaG5naWVqemQvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4t
+dGVzdC1kZWJ1Z0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgNG0xLjIxNHMKdXNlciAgICAwbTgu
+NTUzcwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
+Z3MvMjAyMDA2MTcxMzA4MDAuMjYzNTUtMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmFzYW4v
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
