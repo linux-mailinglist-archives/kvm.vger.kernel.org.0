@@ -2,141 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EC8D1FCBFD
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 13:14:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D7421FCC2B
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 13:22:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbgFQLOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 07:14:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63436 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726708AbgFQLOX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 07:14:23 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05HB1cV3034010;
-        Wed, 17 Jun 2020 07:14:21 -0400
+        id S1726701AbgFQLWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 07:22:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34280 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725894AbgFQLWj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 07:22:39 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05HB3SBG124022;
+        Wed, 17 Jun 2020 07:22:30 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hpt8hx-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31q6j3jnpq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 07:14:21 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HAYDcP148046;
-        Wed, 17 Jun 2020 07:14:20 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hpt8ha-1
+        Wed, 17 Jun 2020 07:22:30 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HBHbu5176128;
+        Wed, 17 Jun 2020 07:22:30 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31q6j3jnnx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 07:14:20 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HBAJDJ019170;
-        Wed, 17 Jun 2020 11:14:18 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 31q6bs8wy5-1
+        Wed, 17 Jun 2020 07:22:29 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HBLLMO027045;
+        Wed, 17 Jun 2020 11:22:27 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 31q6c8rcah-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 11:14:18 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05HBEG8765274366
+        Wed, 17 Jun 2020 11:22:27 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05HBMO8Y59179156
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Jun 2020 11:14:16 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B5F211C04C;
-        Wed, 17 Jun 2020 11:14:16 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 38B0C11C058;
-        Wed, 17 Jun 2020 11:14:16 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.186.32])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 17 Jun 2020 11:14:16 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v9 10/12] s390x: css: stsch, enumeration
- test
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-11-git-send-email-pmorel@linux.ibm.com>
- <20200617104857.1bdab6a5.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <20d6e17c-a396-1a99-938a-7e55656d518c@linux.ibm.com>
-Date:   Wed, 17 Jun 2020 13:14:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Wed, 17 Jun 2020 11:22:24 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF95CA405C;
+        Wed, 17 Jun 2020 11:22:24 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A86DA405B;
+        Wed, 17 Jun 2020 11:22:24 +0000 (GMT)
+Received: from osiris (unknown [9.171.12.194])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 17 Jun 2020 11:22:24 +0000 (GMT)
+Date:   Wed, 17 Jun 2020 13:22:22 +0200
+From:   Heiko Carstens <heiko.carstens@de.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v3 1/1] s390: virtio: let arch accept devices without
+ IOMMU feature
+Message-ID: <20200617112222.GF4479@osiris>
+References: <1592390637-17441-1-git-send-email-pmorel@linux.ibm.com>
+ <1592390637-17441-2-git-send-email-pmorel@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200617104857.1bdab6a5.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1592390637-17441-2-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-06-17_03:2020-06-17,2020-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- bulkscore=0 phishscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
- clxscore=1015 lowpriorityscore=0 mlxscore=0 spamscore=0 impostorscore=0
- cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2006170083
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 phishscore=0 clxscore=1011 cotscore=-2147483648
+ suspectscore=1 spamscore=0 mlxscore=0 priorityscore=1501 bulkscore=0
+ mlxlogscore=648 adultscore=0 impostorscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006170087
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020-06-17 10:48, Cornelia Huck wrote:
-> On Mon, 15 Jun 2020 11:31:59 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Wed, Jun 17, 2020 at 12:43:57PM +0200, Pierre Morel wrote:
+> An architecture protecting the guest memory against unauthorized host
+> access may want to enforce VIRTIO I/O device protection through the
+> use of VIRTIO_F_IOMMU_PLATFORM.
 > 
->> First step for testing the channel subsystem is to enumerate the css and
->> retrieve the css devices.
+> Let's give a chance to the architecture to accept or not devices
+> without VIRTIO_F_IOMMU_PLATFORM.
 > 
-> Maybe worth adding a note:
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/mm/init.c     |  6 ++++++
+>  drivers/virtio/virtio.c | 22 ++++++++++++++++++++++
+>  include/linux/virtio.h  |  2 ++
+>  3 files changed, 30 insertions(+)
 > 
-> "We currently don't enable multiple subchannel sets and therefore only
-> look in subchannel set 0."
-
-right, thanks
-
+> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
+> index 6dc7c3b60ef6..215070c03226 100644
+> --- a/arch/s390/mm/init.c
+> +++ b/arch/s390/mm/init.c
+> @@ -45,6 +45,7 @@
+>  #include <asm/kasan.h>
+>  #include <asm/dma-mapping.h>
+>  #include <asm/uv.h>
+> +#include <linux/virtio.h>
 > 
->>
->> This tests the success of STSCH I/O instruction, we do not test the
->> reaction of the VM for an instruction with wrong parameters.
-
-...snip...
-
->> +	for (scn = 0; scn < 0xffff; scn++) {
->> +		cc = stsch(scn | SCHID_ONE, &schib);
->> +		switch (cc) {
->> +		case 0:		/* 0 means SCHIB stored */
->> +			break;
->> +		case 3:		/* 3 means no more channels */
->> +			goto out;
->> +		default:	/* 1 or 2 should never happened for STSCH */
+>  pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
 > 
-> s/happened/happen/
-
-yes
-
-...snip...
-
-
->> diff --git a/s390x/css.c b/s390x/css.c
-...
->> +static void test_enumerate(void)
->> +{
->> +	test_device_sid = css_enumerate();
->> +	if (test_device_sid & SCHID_ONE) {
->> +		report(1, "First device schid: 0x%08x", test_device_sid);
+> @@ -161,6 +162,11 @@ bool force_dma_unencrypted(struct device *dev)
+>  	return is_prot_virt_guest();
+>  }
 > 
-> Maybe "Schid of first I/O device" ?
+> +int arch_needs_virtio_iommu_platform(struct virtio_device *dev)
+> +{
+> +	return is_prot_virt_guest();
+> +}
+> +
+>  /* protected virtualization */
+>  static void pv_init(void)
 
-yes, better.
+Can we please stop dumping random code to arch/s390/mm/init.c?
 
-> 
-...snip...
->> +}
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+All the protected virtualization functions should go into a separate
+file (e.g. mem_encrypt.c like on x86), some of which could also be in
+header files.
 
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Please consider this a comment for the future.. just go ahead with
+this patch as-is.
