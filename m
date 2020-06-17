@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D43181FD3C1
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 19:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70CD91FD3CE
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 19:55:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726840AbgFQRx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 13:53:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20998 "EHLO
+        id S1726896AbgFQRzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 13:55:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25861 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726558AbgFQRxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 13:53:25 -0400
+        with ESMTP id S1726496AbgFQRzG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 13:55:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592416404;
+        s=mimecast20190719; t=1592416504;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
         bh=9uliBsP0an46gPx+oD2wPLvOfI9JPxFlPTJ+G83rjdw=;
-        b=DpLINvgT5zHumSDMC6AWxDJDIBzlW5zX8E+wK33zpgOLfJTvIyB8MzUVg7NCZpbvkCV8Gs
-        ixODI8VxHVjwKpeHq6K1dPqnpEb9QEOQp+SLWsUUnq3QXyd8J89gph0woAYZPcbKc8iRJO
-        /WGA/ShVL47GORxhBlngYD7BramNP4c=
+        b=VwhsHfMhCN1p2yzqf7hA0xVzF6E8Q/yrUuYAJqtshHfEDS+FS3uaVvZah2YbSX8DOtha7C
+        VWJoQB0wHE9kp0S3j7p6n7kmrnAPWu/f8TVXyLGtYl2v+0ZyLLpJdvXTAIoMhm0PcVLzb5
+        ZD5J/mRSf1vHFXE95VwwQCthnUfyNyA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-MVvxKsLKM2GGAUSbxMZzxQ-1; Wed, 17 Jun 2020 13:53:20 -0400
-X-MC-Unique: MVvxKsLKM2GGAUSbxMZzxQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-371-TpG8KuHNP8KlmTijxJmZOA-1; Wed, 17 Jun 2020 13:55:01 -0400
+X-MC-Unique: TpG8KuHNP8KlmTijxJmZOA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC01D100CCCE;
-        Wed, 17 Jun 2020 17:53:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49F42BFC0;
+        Wed, 17 Jun 2020 17:55:00 +0000 (UTC)
 Received: from work-vm (ovpn-115-47.ams2.redhat.com [10.36.115.47])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C7C2F19931;
-        Wed, 17 Jun 2020 17:53:11 +0000 (UTC)
-Date:   Wed, 17 Jun 2020 18:53:09 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E11E8512FE;
+        Wed, 17 Jun 2020 17:54:53 +0000 (UTC)
+Date:   Wed, 17 Jun 2020 18:54:50 +0100
 From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To:     David Hildenbrand <david@redhat.com>
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -42,7 +42,7 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         "Michael S . Tsirkin" <mst@redhat.com>
 Subject: Re: [PATCH v4 13/21] hmp: Handle virtio-mem when printing memory
  device info
-Message-ID: <20200617175309.GJ2776@work-vm>
+Message-ID: <20200617175450.GK2776@work-vm>
 References: <20200610115419.51688-1-david@redhat.com>
  <20200610115419.51688-14-david@redhat.com>
 MIME-Version: 1.0
@@ -50,7 +50,7 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20200610115419.51688-14-david@redhat.com>
 User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
