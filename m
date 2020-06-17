@@ -2,91 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC2161FD940
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 00:53:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C195D1FD951
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 01:01:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726848AbgFQWxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 18:53:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52534 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726758AbgFQWxC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 18:53:02 -0400
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBEB8C06174E
-        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 15:53:01 -0700 (PDT)
-Received: by mail-pf1-x444.google.com with SMTP id x207so1858690pfc.5
-        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 15:53:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=jDsiGpHlHt3A6TlGq6foih1kuiL4GlYeWIrZSOkZpxY=;
-        b=gzQGj00ueXc2W/kOiGPOcTIAbJbr/M/MLdgqTtuhg5grPOrTu3BaxWlh8qOcwEYPtj
-         qe03kbeetPJMdpKWXdSYw0Ln/fx9cMl6bRF4zZ6alGlnV6HRhnHB+trO2CH/K2qV/gpS
-         3NB8IJAhQw/Nvs7O7OFXgO56j6elETkFG+H0kzbZRn0JJ8Ojl3tyJLYdU8fjrsBMwGug
-         PKlkZtp0fFdkyBfsIHsCui78044VbKGgQrlzz8hC3KW/Rjw7DeF/XFuLkcpIzzy610eT
-         mGfCtn90i5IVz76mMYs+ZX9N8SbKCwhS6p1zBzFzWMY12QRrZ21+X78Sjh6+b6G40Onk
-         6D/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=jDsiGpHlHt3A6TlGq6foih1kuiL4GlYeWIrZSOkZpxY=;
-        b=cwy2ArR8S9Dronub+7fkc9HQD5COjTWYEqeDEaTmz25cC0eFWdMzGmrbrk8/NKBRyZ
-         9wRQKXGg824II+ekOlwMjZnBv3OpgkhyvtYvGhlDMcrj5ZUyNpfAA5ZQeTFOGUHWcj0u
-         DVPP34fBW1VlTkENCcmW0SnF6IJz8LvI3MeNhq06g2Ldrr3xWwKtCBRRDjBX0wiwp//9
-         EwQr1Ou9MOpshf0HX4I3MDpx47Ijr2Kw7yRy3QsrFQsdFLJMFLOsVfSc7b7JoAtq64cp
-         jTDMHSWW27Enb+by3wtHtE0IeE7H6qtjIuJDljhOGbiZA3t6mI0gD/1h7yt1uKpElJz8
-         d9/A==
-X-Gm-Message-State: AOAM530nt37/D6J8EoPdly1DPvNyc2MLjCa7gI/Zi5cPV357Erfp0qel
-        gMDEwc3EhH8R3AEdqog07jhx4WkyMfA=
-X-Google-Smtp-Source: ABdhPJx8Qbf49zWcMX8/NXw0QB3RvDxyw4NaaPU5k5Ty2ssb3CbYBVNbXy4fzd/ZWZlzMfKdx8wrmQ==
-X-Received: by 2002:a63:1718:: with SMTP id x24mr916736pgl.72.1592434381286;
-        Wed, 17 Jun 2020 15:53:01 -0700 (PDT)
-Received: from ?IPv6:2601:647:4700:9b2:1c36:bfc:73ae:1f3? ([2601:647:4700:9b2:1c36:bfc:73ae:1f3])
-        by smtp.gmail.com with ESMTPSA id p19sm821798pff.116.2020.06.17.15.52.59
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 17 Jun 2020 15:53:00 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [kvm-unit-tests PATCH] x86: Add control register pinning tests
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20200617224606.27954-1-john.s.andersen@intel.com>
-Date:   Wed, 17 Jun 2020 15:52:59 -0700
-Cc:     corbet@lwn.net, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, mingo <mingo@redhat.com>,
-        bp <bp@alien8.de>, hpa@zytor.com, shuah@kernel.org,
-        sean.j.christopherson@intel.com, rick.p.edgecombe@intel.com,
-        kvm@vger.kernel.org, kernel-hardening@lists.openwall.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <ACCCF382-0077-4B08-8CF1-73C561F930CD@gmail.com>
-References: <20200617224606.27954-1-john.s.andersen@intel.com>
-To:     John Andersen <john.s.andersen@intel.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        id S1726848AbgFQXAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 19:00:55 -0400
+Received: from mga02.intel.com ([134.134.136.20]:17508 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726763AbgFQXAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 19:00:55 -0400
+IronPort-SDR: ZP5ih+tSDC9aIPn8fcL28dzYCbZLfEIZyHBv83oZJv50oWFo49SHcFgwTM1ZBzpk/LwGuqFhRa
+ LAc7VoTl7p2Q==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2020 16:00:52 -0700
+IronPort-SDR: 39B39cA4AVab78uxbf5UfZhQfSRnar/nbAc7NerzD2ThDDe6rK8i+r58mbEplD94DGvJWfV/aX
+ Nvs1n5nUlT/Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,523,1583222400"; 
+   d="scan'208";a="317662996"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by FMSMGA003.fm.intel.com with ESMTP; 17 Jun 2020 16:00:52 -0700
+Date:   Wed, 17 Jun 2020 16:00:52 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, virtio-fs@redhat.com,
+        miklos@szeredi.hu, stefanha@redhat.com, dgilbert@redhat.com,
+        pbonzini@redhat.com, wanpengli@tencent.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] kvm: Add capability to be able to report async pf
+ error to guest
+Message-ID: <20200617230052.GB27751@linux.intel.com>
+References: <20200616214847.24482-1-vgoyal@redhat.com>
+ <20200616214847.24482-3-vgoyal@redhat.com>
+ <87lfklhm58.fsf@vitty.brq.redhat.com>
+ <20200617183224.GK26818@linux.intel.com>
+ <20200617215152.GF26770@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200617215152.GF26770@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jun 17, 2020, at 3:46 PM, John Andersen <john.s.andersen@intel.com> =
-wrote:
->=20
-> Paravirutalized control register pinning adds MSRs guests can use to
-> discover which bits in CR0/4 they may pin, and MSRs for activating
-> pinning for any of those bits.
->=20
+On Wed, Jun 17, 2020 at 05:51:52PM -0400, Vivek Goyal wrote:
+> > And, it's not clear that the optimizations are necessary, e.g. I assume the
+> > virtio-fs truncation scenario is relatively uncommon, i.e. not performance
+> > sensitive?
+> 
+> As of now this scenario is less common but with virtio-fs this truncation
+> can become more common. A file can be truncated on host or by another
+> guest. Its a full filesystem. And most of the time filesystem will
+> try to cope with it but invariably there will be some cases where
+> user space/kernel space will try to load/store to a page which got
+> truncated.  And in that case, guest can do error handling much 
+> better as long as we can inject error back into guest.
+> 
+> For process, we can send SIGBUS and for kernel access, a special
+> version of memcpy_mcsafe() equivalent will be used which simply
+> return -EIO to user space. 
+> 
+> So these optimizations make sense to me because guest can continue
+> to work instead of dying when error occurs.
 
-[ sni[
+By "optimization" I meant avoiding an exit to host userspace.  Not killing
+the guest is not an optimization, it's a full on new paravirt feature.
 
-> +static void vmx_cr_pin_test_guest(void)
-> +{
-> +	unsigned long i, cr0, cr4;
-> +
-> +	/* Step 1. Skip feature detection to skip handling VMX_CPUID */
-> +	/* nop */
+> > > > This patch adds another state to async page fault logic which allows
+> > > > host to return error to guest. Once guest knows that async page fault
+> > > > can't be resolved, it can send SIGBUS to host process (if user space
+> > 
+> > I assume this is supposed to be "it can send SIGBUS to guest process"?
+> > Otherwise none of this makes sense (to me).
+> 
+> Yes, I meant SIGBUS to guest process (and not host process). Its a typo.
+> 
+> > 
+> > > > was accessing the page in question).
+> > 
+> > Allowing the guest to opt-in to intercepting host page allocation failures
+> > feels wrong, and fragile.  KVM can't possibly know whether an allocation
+> > failure is something that should be forwarded to the guest, as KVM doesn't
+> > know the physical backing for any given hva/gfn, e.g. the error could be
+> > due to a physical device failure or a configuration issue.  Relying on the
+> > async #PF mechanism to prevent allocation failures from crashing the guest
+> > is fragile because there is no guarantee that a #PF can be async.
+> > 
+> 
+> Actually it is it does not necessarily have to be async #PF. What we
+> are missing right now, is a synchronous method to report errors back.
+> And once that is available (#VE), then we can use that instead. So
+> if KVM decides to do synchrous fault, we can inject error using #VE
+> otherwise use interrupt based APF READY.
+> 
+> IOW, we are not necessarily relying on #PF being async. For now if
+> page fault is sync and error happens, we will exit to qemu and
+> VM will freeze/die.
+> 
+> > IMO, the virtio-fs truncation use case should first be addressed in a way
+> > that requires explicit userspace intervention, e.g. by enhancing
+> > kvm_handle_bad_page() to provide the necessary information to userspace so
+> > that userspace can reflect select errors into the guest.
+> 
+> Which errors do you want to filter out. And this does not take away
+> filtering capability. When we figure out what needs to be filtered
+> out, we can do something like kvm_send_hwpoison_signal() to signal
+> to user space and not exit to user space with error.
 
-I do not quite get this comment. Why do you skip checking whether the
-feature is enabled? What happens if KVM/bare-metal/other-hypervisor that
-runs this test does not support this feature?
+What I'm saying is that KVM cannot do the filtering.  KVM, by design, does
+not know what lies behind any given hva, or what the associated gpa maps to
+in the guest.  As is, userspace can't even opt out of this behavior, e.g.
+it can't even "filter" on a per-VM granularity, since kvm_pv_enable_async_pf()
+unconditionally allows the guest to enable the behavior[*].
 
+Doing something similar to kvm_send_hwpoison_signal() would be fine, just
+so long as userspace has full control over what to do in response to a
+failure.
+
+[*] Not technically true, as kvm_pv_enable_async_pf() explicitly prevents
+setting bit 4, which is used in this RFC.  But, assuming that unrelated
+code didn't exist, host userspace couldn't prevent this behavior.
+
+> Anway, so we executed async page fault which did get_user_pages_remote()
+> and populated page tables. Now we check for completion can call
+> kvm_arch_async_page_ready() which will call into direct_page_fault()
+> and try_async_pf() and handle_abnormal_pfn(). I think we could
+> capture the error from kvm_arch_async_page_ready() also. That way
+> handle_abnormal_pfn() will be able to filter it out and do out
+> of band action (like poisoned pages) and page_present() will not
+> inject error in guest.
+> 
+> > The reflection
+> > could piggyback whatever vector is used by async page faults (#PF or #VE),
+> > but would not be an async page fault per se.  If an async #PF happens to
+> > encounter an allocation failure, it would naturally fall back to the
+> > synchronous path (provided by patch 1/3) and the synchronous path would
+> > automagically handle the error as above.
+> 
+> We could do that as well. So you are suggesting that instead of reporting
+> error in async PF PAGE_READY event. Instead send PAGE_READY and upon retry
+> path force sync page fault and then report error using new race free
+> vector (#VE). 
+
+Yes.  Though what I'm really saying is that the "send PAGE_READY and upon
+retry path force sync page fault" should be the _only_ required behavior
+from an async #PF perspective.
+
+> We don't have that vector yet though and given the conversation it might
+> not be simple to implement that. 
+> 
+> I had played with using MCE also to inject errors as Andy had suggested
+> but this error can happen on store path too and MCEs are not generated
+> on store path. So this is not suitable either.
+> 
+> > 
+> > In other words, I think the guest should be able to enable "error handling"
+> > support without first enabling async #PF.  From a functional perspective it
+> > probably won't change a whole lot, but it would hopefully force us to
+> > concoct an overall "paravirt page fault" design as opposed to simply async
+> > #PF v2.
+> 
+> I am not sure how independent these two can be. Even if there was
+> a separate way to enable error handling, one will have to opt in
+> in async pf V2 to report errors because shared data between host
+> and guest will change accordingly. So we probably will end up
+> electing for error reporting at two places. One a generic method
+> and then also at async PF level.
+> 
+> Or maybe we we can choose to never report errors using async PF
+> protocol. Always choose suboptimal implementation of retrying
+> the fault and inject errors *always* using that new vector( #VE).
+
+Yes, this latter idea is the point I'm trying to make.  Async #PF could be
+enhanced to support error injection, but the error injection should be
+fully functional with or without async #PF being enabled.
