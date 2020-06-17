@@ -2,76 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FA011FC499
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 05:19:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0BDA1FC4C9
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 05:42:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbgFQDTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 23:19:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36034 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726497AbgFQDTi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 23:19:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592363977;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mq/stawXjx0dcB0y1QUsFlRW19BEay/7Pm1Vse2Y1ZY=;
-        b=hvjuil4itLv34XSCzPH5UpQnwFhLwaWHcr1OJpyNSf/1t491Hsq/xPxiLR8vKFEjw4PJ7p
-        K9wIgoCk4SdK2j7vEYucWbWpDf+7AWTOMTJt71e+nDXTMAdT/2YvSX5z8PcxMe+1iB9H4F
-        1HHeuHR91Vw9TCHqtYs5N6rpdtjMXic=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-xkJ2Kb9hMbC8iI2CXnx6hw-1; Tue, 16 Jun 2020 23:19:33 -0400
-X-MC-Unique: xkJ2Kb9hMbC8iI2CXnx6hw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A81C910059A6;
-        Wed, 17 Jun 2020 03:19:32 +0000 (UTC)
-Received: from [10.72.13.217] (ovpn-13-217.pek2.redhat.com [10.72.13.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D49205D9D3;
-        Wed, 17 Jun 2020 03:19:27 +0000 (UTC)
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, eperezma@redhat.com
-References: <20200611113404.17810-1-mst@redhat.com>
- <20200611113404.17810-3-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <0332b0cf-cf00-9216-042c-e870efa33626@redhat.com>
-Date:   Wed, 17 Jun 2020 11:19:26 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726795AbgFQDlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 23:41:25 -0400
+Received: from mga01.intel.com ([192.55.52.88]:52603 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726497AbgFQDlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 23:41:25 -0400
+IronPort-SDR: dn648OMM6fiiGGXoX67YKFvqmLIsxO9YidWKl2N1+4pLfC5Kodvb19wA/6duW9kfOxm5L7mv31
+ 7v0aRtT2YhtQ==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 20:41:25 -0700
+IronPort-SDR: yD9c5qPCcw0nP5vDwu24s9gyXkO/DttkWnkRWj5wM2HuyxcvjgAB/UB7ij1AxJLzjfzqTRK9/w
+ jcHjjDhLRfQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,521,1583222400"; 
+   d="scan'208";a="476681552"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by fmsmga006.fm.intel.com with ESMTP; 16 Jun 2020 20:41:24 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru
+Date:   Tue, 16 Jun 2020 20:41:23 -0700
+Message-Id: <20200617034123.25647-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-In-Reply-To: <20200611113404.17810-3-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Remove vcpu_vmx.host_pkru, which got left behind when PKRU support was
+moved to common x86 code.
 
-On 2020/6/11 下午7:34, Michael S. Tsirkin wrote:
->   static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
->   {
->   	kfree(vq->descs);
-> @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
->   	for (i = 0; i < dev->nvqs; ++i) {
->   		vq = dev->vqs[i];
->   		vq->max_descs = dev->iov_limit;
-> +		if (vhost_vq_num_batch_descs(vq) < 0) {
-> +			return -EINVAL;
-> +		}
+No functional change intended.
 
+Fixes: 37486135d3a7b ("KVM: x86: Fix pkru save/restore when guest CR4.PKE=0, move it to x86.c")
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/vmx.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-This check breaks vdpa which set iov_limit to zero. Consider iov_limit 
-is meaningless to vDPA, I wonder we can skip the test when device 
-doesn't use worker.
-
-Thanks
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 8a83b5edc820..639798e4a6ca 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -288,8 +288,6 @@ struct vcpu_vmx {
+ 
+ 	u64 current_tsc_ratio;
+ 
+-	u32 host_pkru;
+-
+ 	unsigned long host_debugctlmsr;
+ 
+ 	/*
+-- 
+2.26.0
 
