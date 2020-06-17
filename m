@@ -2,257 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B40761FC230
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 01:20:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D7D51FC304
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 02:53:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbgFPXRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 19:17:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59900 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725849AbgFPXRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 19:17:23 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87CD4C061573
-        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 16:17:21 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id t8so273176ilm.7
-        for <kvm@vger.kernel.org>; Tue, 16 Jun 2020 16:17:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2suWlJa8CpH6BIGy7EoIm2xIgo7asmnb0ube9qU2ZKk=;
-        b=eq+7vwnpvebg3rd3wG9R+noiw205POdh0tWyYaRranqq/PD30SLj0QFQlCh+9IrNPE
-         lPcquAIew/6yDSLJ4H7rhCnTweLD0e5EXs2SBne34BYDYeHwV34PqkgyM0XBRQcyrkBD
-         ZYZE7toxMTPsLxWi3AErNt2zSzuOb4tWYafwc4eFqQsaddLZmlyEZGtVMzhvRuRwDWrR
-         LncAbtZYwsRE19gQNbbvhjW7sQUEL86wM3AVn+rY3Swkqwft3mWeVNV04Y+/Q8DilSvo
-         FIcLi8slFYfuV8gDATUiLWBYABJmthAIbWyzER3395cFjAf2A02yrrAJTkEkAk+cJrjS
-         y+bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2suWlJa8CpH6BIGy7EoIm2xIgo7asmnb0ube9qU2ZKk=;
-        b=XWuskszYYc7wccn9SDmxHKYkimKj8OYlDYPB2an7FfZKNQGYTUoNDhU83JaApXKSia
-         soe3/OnwACwHDhjprTJhHDHRwwumHM0IsE4UvpEDQig5TCnn+nYS8VbvpFx//PwXtdDP
-         SQxACJtj2X+gUAamMs3cH6a7FMs1eTcFqnxUBRy5Pvsn9ULElw9hEMR1ZVR71ZIbmMe/
-         XRBKFPW4pNRGTrZ1MdFm5mxkDW/wqaDlIrfts4YgEcNmuQ/EBlBbSYU2aOgDfCAjWi/r
-         kGYMAH3aM8RV7fM4WHjWkLa7n9Fds0SHpaT/sDO0+tfFxqtN9QDEMVOiV4GOJ22jpCUO
-         GdtA==
-X-Gm-Message-State: AOAM532wZb0bxTCVSyriwK8hx/LENh8t7wVlT5tCpqTw62kDluhI89aR
-        g14yy6vfj4f3mYtnxQnNljh4HIoxkIZM/99rnFLJow==
-X-Google-Smtp-Source: ABdhPJwV6lb4T8E6Us4v6aI0n/kcJpPwIFqsk2SK5vA5bPQN6SJQSZlp17j1pgg0EWXgiE6GIBwyukvNj686beLRO3I=
-X-Received: by 2002:a05:6e02:1208:: with SMTP id a8mr5682459ilq.118.1592349440425;
- Tue, 16 Jun 2020 16:17:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <159234483706.6230.13753828995249423191.stgit@bmoger-ubuntu> <159234502394.6230.5169466123693241678.stgit@bmoger-ubuntu>
-In-Reply-To: <159234502394.6230.5169466123693241678.stgit@bmoger-ubuntu>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 16 Jun 2020 16:17:09 -0700
-Message-ID: <CALMp9eTxs5nb9Ay0ELVa71cmA9VPzaMSuGgW_iM2tmAVvXs4Pg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM:SVM: Add extended intercept support
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>, Joerg Roedel <joro@8bytes.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
+        id S1726519AbgFQAxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jun 2020 20:53:12 -0400
+Received: from mga05.intel.com ([192.55.52.43]:15691 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725894AbgFQAxL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jun 2020 20:53:11 -0400
+IronPort-SDR: +KUZnhYYyR7FjA8JRq3sCOK7/rdA5UMdgiO1cFLMbLueNiLqTFP+kV+AEtQn+3+zwh71QDQGhj
+ VFl7d3CA7ipw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 17:53:10 -0700
+IronPort-SDR: SUBjWGuROTOrr9kwwyRCGbl/hrI+QkSJ1Q57v0iPCxSIqpvvppNJdDsU/RssN7WxgNYb+sJfYU
+ HH4TrYIFT3hQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,520,1583222400"; 
+   d="scan'208";a="309309155"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga002.fm.intel.com with ESMTP; 16 Jun 2020 17:53:09 -0700
+Date:   Tue, 16 Jun 2020 17:53:09 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 05/21] KVM: x86/mmu: Try to avoid crashing KVM if a MMU
+ memory cache is empty
+Message-ID: <20200617005309.GA19540@linux.intel.com>
+References: <20200605213853.14959-1-sean.j.christopherson@intel.com>
+ <20200605213853.14959-6-sean.j.christopherson@intel.com>
+ <CANgfPd8B5R9NRL5q_4v4xvvn_3Vo9N93Ms3EiUFANMzqAMedMw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd8B5R9NRL5q_4v4xvvn_3Vo9N93Ms3EiUFANMzqAMedMw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 16, 2020 at 3:03 PM Babu Moger <babu.moger@amd.com> wrote:
->
-> The new intercept bits have been added in vmcb control
-> area to support the interception of INVPCID instruction.
->
-> The following bit is added to the VMCB layout control area
-> to control intercept of INVPCID:
->
-> Byte Offset     Bit(s)          Function
-> 14h             2               intercept INVPCID
->
-> Add the interfaces to support these extended interception.
-> Also update the tracing for extended intercepts.
->
-> AMD documentation for INVPCID feature is available at "AMD64
-> Architecture Programmer=E2=80=99s Manual Volume 2: System Programming,
-> Pub. 24593 Rev. 3.34(or later)"
->
-> The documentation can be obtained at the links below:
-> Link: https://www.amd.com/system/files/TechDocs/24593.pdf
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
+On Wed, Jun 10, 2020 at 03:12:04PM -0700, Ben Gardon wrote:
+> On Fri, Jun 5, 2020 at 2:39 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > Attempt to allocate a new object instead of crashing KVM (and likely the
+> > kernel) if a memory cache is unexpectedly empty.  Use GFP_ATOMIC for the
+> > allocation as the caches are used while holding mmu_lock.  The immediate
+> > BUG_ON() makes the code unnecessarily explosive and led to confusing
+> > minimums being used in the past, e.g. allocating 4 objects where 1 would
+> > suffice.
+> >
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 21 +++++++++++++++------
+> >  1 file changed, 15 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index ba70de24a5b0..5e773564ab20 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1060,6 +1060,15 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+> >         local_irq_enable();
+> >  }
+> >
+> > +static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+> > +                                              gfp_t gfp_flags)
+> > +{
+> > +       if (mc->kmem_cache)
+> > +               return kmem_cache_zalloc(mc->kmem_cache, gfp_flags);
+> > +       else
+> > +               return (void *)__get_free_page(gfp_flags);
+> > +}
+> > +
+> >  static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> >  {
+> >         void *obj;
+> > @@ -1067,10 +1076,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> >         if (mc->nobjs >= min)
+> >                 return 0;
+> >         while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+> > -               if (mc->kmem_cache)
+> > -                       obj = kmem_cache_zalloc(mc->kmem_cache, GFP_KERNEL_ACCOUNT);
+> > -               else
+> > -                       obj = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
+> > +               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
+> >                 if (!obj)
+> >                         return mc->nobjs >= min ? 0 : -ENOMEM;
+> >                 mc->objects[mc->nobjs++] = obj;
+> > @@ -1118,8 +1124,11 @@ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+> >  {
+> >         void *p;
+> >
+> > -       BUG_ON(!mc->nobjs);
+> > -       p = mc->objects[--mc->nobjs];
+> > +       if (WARN_ON(!mc->nobjs))
+> > +               p = mmu_memory_cache_alloc_obj(mc, GFP_ATOMIC | __GFP_ACCOUNT);
+> Is an atomic allocation really necessary here? In most cases, when
+> topping up the memory cache we are handing a guest page fault. This
+> bug could also be removed by returning null if unable to allocate from
+> the cache, and then re-trying the page fault in that case.
 
-Not your change, but this documentation is terrible. There is no
-INVLPCID instruction, nor is there a PCID instruction.
+The whole point of these caches is to avoid having to deal with allocation
+errors in the low level MMU paths, e.g. propagating an error up from
+pte_list_add() would be a mess.
 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->  arch/x86/include/asm/svm.h |    3 ++-
->  arch/x86/kvm/svm/nested.c  |    6 +++++-
->  arch/x86/kvm/svm/svm.c     |    1 +
->  arch/x86/kvm/svm/svm.h     |   18 ++++++++++++++++++
->  arch/x86/kvm/trace.h       |   12 ++++++++----
->  5 files changed, 34 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 8a1f5382a4ea..62649fba8908 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -61,7 +61,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
->         u32 intercept_dr;
->         u32 intercept_exceptions;
->         u64 intercept;
-> -       u8 reserved_1[40];
-> +       u32 intercept_extended;
-> +       u8 reserved_1[36];
+> I don't know if this is necessary to handle other, non-x86 architectures more
+> easily, but I worry this could cause some unpleasantness if combined with
+> some other bug or the host was in a low memory situation and then this
+> consumed the atomic pool. Perhaps this is a moot point since we log a warning
+> and consider the atomic allocation something of an error.
 
-It seems like a more straightforward implementation would simply
-change 'u64 intercept' to 'u32 intercept[3].'
+Yeah, it's the latter.  If we reach this point it's a guaranteed KVM bug.
+Because it's likely that the caller holds a lock, triggering the BUG_ON()
+has a high chance of hanging the system.  The idea is to take the path that
+_may_ crash the kernel instead of killing the VM and more than likely
+crashing the kernel.  And hopefully this code will never be exercised on a
+production kernel.
 
->         u16 pause_filter_thresh;
->         u16 pause_filter_count;
->         u64 iopm_base_pa;
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 8a6db11dcb43..7f6d0f2533e2 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -121,6 +121,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
->         c->intercept_dr =3D h->intercept_dr;
->         c->intercept_exceptions =3D h->intercept_exceptions;
->         c->intercept =3D h->intercept;
-> +       c->intercept_extended =3D h->intercept_extended;
->
->         if (g->int_ctl & V_INTR_MASKING_MASK) {
->                 /* We only want the cr8 intercept bits of L1 */
-> @@ -142,6 +143,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
->         c->intercept_dr |=3D g->intercept_dr;
->         c->intercept_exceptions |=3D g->intercept_exceptions;
->         c->intercept |=3D g->intercept;
-> +       c->intercept_extended |=3D g->intercept_extended;
->  }
->
->  static void copy_vmcb_control_area(struct vmcb_control_area *dst,
-> @@ -151,6 +153,7 @@ static void copy_vmcb_control_area(struct vmcb_contro=
-l_area *dst,
->         dst->intercept_dr         =3D from->intercept_dr;
->         dst->intercept_exceptions =3D from->intercept_exceptions;
->         dst->intercept            =3D from->intercept;
-> +       dst->intercept_extended   =3D from->intercept_extended;
->         dst->iopm_base_pa         =3D from->iopm_base_pa;
->         dst->msrpm_base_pa        =3D from->msrpm_base_pa;
->         dst->tsc_offset           =3D from->tsc_offset;
-> @@ -433,7 +436,8 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
->         trace_kvm_nested_intercepts(nested_vmcb->control.intercept_cr & 0=
-xffff,
->                                     nested_vmcb->control.intercept_cr >> =
-16,
->                                     nested_vmcb->control.intercept_except=
-ions,
-> -                                   nested_vmcb->control.intercept);
-> +                                   nested_vmcb->control.intercept,
-> +                                   nested_vmcb->control.intercept_extend=
-ed);
->
->         /* Clear internal status */
->         kvm_clear_exception_queue(&svm->vcpu);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 9e333b91ff78..285e5e1ff518 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2801,6 +2801,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
->         pr_err("%-20s%04x\n", "dr_write:", control->intercept_dr >> 16);
->         pr_err("%-20s%08x\n", "exceptions:", control->intercept_exception=
-s);
->         pr_err("%-20s%016llx\n", "intercepts:", control->intercept);
-> +       pr_err("%-20s%08x\n", "intercepts (extended):", control->intercep=
-t_extended);
->         pr_err("%-20s%d\n", "pause filter count:", control->pause_filter_=
-count);
->         pr_err("%-20s%d\n", "pause filter threshold:",
->                control->pause_filter_thresh);
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 6ac4c00a5d82..935d08fac03d 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -311,6 +311,24 @@ static inline void clr_intercept(struct vcpu_svm *sv=
-m, int bit)
->         recalc_intercepts(svm);
->  }
->
-> +static inline void set_extended_intercept(struct vcpu_svm *svm, int bit)
-> +{
-> +       struct vmcb *vmcb =3D get_host_vmcb(svm);
-> +
-> +       vmcb->control.intercept_extended |=3D (1U << bit);
-> +
-> +       recalc_intercepts(svm);
-> +}
-> +
-> +static inline void clr_extended_intercept(struct vcpu_svm *svm, int bit)
-> +{
-> +       struct vmcb *vmcb =3D get_host_vmcb(svm);
-> +
-> +       vmcb->control.intercept_extended &=3D ~(1U << bit);
-> +
-> +       recalc_intercepts(svm);
-> +}
-
-You wouldn't need these new functions if you defined 'u32
-intercept[3],' as I suggested above. Just change set_intercept and
-clr_intercept to use __set_bit and __clear_bit.
-
->  static inline bool is_intercept(struct vcpu_svm *svm, int bit)
->  {
->         return (svm->vmcb->control.intercept & (1ULL << bit)) !=3D 0;
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index b66432b015d2..5c841c42b33d 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -544,14 +544,16 @@ TRACE_EVENT(kvm_nested_vmrun,
->  );
->
->  TRACE_EVENT(kvm_nested_intercepts,
-> -           TP_PROTO(__u16 cr_read, __u16 cr_write, __u32 exceptions, __u=
-64 intercept),
-> -           TP_ARGS(cr_read, cr_write, exceptions, intercept),
-> +           TP_PROTO(__u16 cr_read, __u16 cr_write, __u32 exceptions, __u=
-64 intercept,
-> +                    __u32 extended),
-> +           TP_ARGS(cr_read, cr_write, exceptions, intercept, extended),
->
->         TP_STRUCT__entry(
->                 __field(        __u16,          cr_read         )
->                 __field(        __u16,          cr_write        )
->                 __field(        __u32,          exceptions      )
->                 __field(        __u64,          intercept       )
-> +               __field(        __u32,          extended        )
->         ),
->
->         TP_fast_assign(
-> @@ -559,11 +561,13 @@ TRACE_EVENT(kvm_nested_intercepts,
->                 __entry->cr_write       =3D cr_write;
->                 __entry->exceptions     =3D exceptions;
->                 __entry->intercept      =3D intercept;
-> +               __entry->extended       =3D extended;
->         ),
->
-> -       TP_printk("cr_read: %04x cr_write: %04x excp: %08x intercept: %01=
-6llx",
-> +       TP_printk("cr_read: %04x cr_write: %04x excp: %08x intercept: %01=
-6llx"
-> +                 "intercept (extended): %08x",
->                 __entry->cr_read, __entry->cr_write, __entry->exceptions,
-> -               __entry->intercept)
-> +               __entry->intercept, __entry->extended)
->  );
->  /*
->   * Tracepoint for #VMEXIT while nested
->
+> > +       else
+> > +               p = mc->objects[--mc->nobjs];
+> > +       BUG_ON(!p);
+> >         return p;
+> >  }
+> >
+> > --
+> > 2.26.0
+> >
