@@ -2,308 +2,484 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E7931FCE15
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 15:08:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14DB01FCE2B
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 15:12:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726454AbgFQNIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 09:08:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59882 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726134AbgFQNII (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 09:08:08 -0400
+        id S1726773AbgFQNMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 09:12:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59285 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726303AbgFQNMM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 09:12:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592399286;
+        s=mimecast20190719; t=1592399530;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fCMg1kyMR7N+Ov+rmWJLbOZmzhhnmVRoJdGi9LpTDn0=;
-        b=RVHdz7kwkzymeFnzd9yLewByyDGKGEfpZuH9TCvpMBFqC9zC7/AO/GmZYZlVSRFyg76GsS
-        c9YzNg9tnbw2BRvwFTCXg5WR6x+qjR8g/Kb+e9CXsFRAH6Al47aMbNrIrQwOQtTLziAO8T
-        jES857rfFE0/CSqIyoZXc7TrI4P4Wmc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-1bie_mK8NnK8pZITc4e_Qw-1; Wed, 17 Jun 2020 09:08:04 -0400
-X-MC-Unique: 1bie_mK8NnK8pZITc4e_Qw-1
-Received: by mail-ed1-f71.google.com with SMTP id bs22so844927edb.0
-        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 06:08:04 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2lAvnguFBJfbpAn9ko140xdBjcLz8OLfMbowVz8ANzc=;
+        b=DppQXHIVa18rEiEEtmmvR/HYNaK27xLE4HP1z2xUVPb9NNHsJ2jMupkaaFS+A/nHoGWu4w
+        iuEWdILwFTxxRONbE3yk8H78l7tBEW0GPLpyAxCsyMkRcI33Vtr+k6PU11KnS8uk3fIXA+
+        ffkUaDqneIiQvBMEyoYGKBuFnBvGaOc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-IoHZ-aADNLGVDDEEvQS0iQ-1; Wed, 17 Jun 2020 09:12:07 -0400
+X-MC-Unique: IoHZ-aADNLGVDDEEvQS0iQ-1
+Received: by mail-ed1-f70.google.com with SMTP id o3so820449eda.23
+        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 06:12:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fCMg1kyMR7N+Ov+rmWJLbOZmzhhnmVRoJdGi9LpTDn0=;
-        b=IvJgRFncpTEuFm4vkqv87NQvr6muCY0De+w1uYiwphltnilc8gw5xUJwtk28XPI1M5
-         KsZa5kt5X7NQEsL14Bgp1nyl8JAfknP2lv18AZSFoTvIIjSKlqCplP8l9quYSCTSb0eN
-         w+1NgqPD0vC6V9u2x2rVnreEh5UH1rx0D0DEKCIqpcbYz7U4w94702Vkmjm1MW2DKe1p
-         a0t/Joa95XdXKapwJwOoa1KikMnGojCiKPo5Uq0gc3qflAEQHIk3ORu1Lngq/ndGtS+e
-         O49ALrn/RGwH0k4AKv3JQ99rU1CdtlV4xqgCQUwd9cqhfqctBmAQ3Hl6aC2dIY4LLb7h
-         WEXw==
-X-Gm-Message-State: AOAM533L5AT9AVvtRJrVqjRGYdbPYpCHVm4zNObF6/KxbELI3luEB8U1
-        +IW4SXcVAyIv+OL7S1hayOezs7BDhymUOCd65m+lZpd88FttWHLcYOdhTRS3gaNukBdwIpE2cf1
-        VyvvfbdWxDfrY
-X-Received: by 2002:a17:906:55c9:: with SMTP id z9mr7766498ejp.276.1592399283544;
-        Wed, 17 Jun 2020 06:08:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzqGwZAlp1/5617vMNvkO75RiBgN5ywDU37uIBjmwAxJX74lr3MvZAKptbotXpKIAHgsvXJ8Q==
-X-Received: by 2002:a17:906:55c9:: with SMTP id z9mr7766472ejp.276.1592399283279;
-        Wed, 17 Jun 2020 06:08:03 -0700 (PDT)
-Received: from x1w.redhat.com (93.red-83-59-160.dynamicip.rima-tde.net. [83.59.160.93])
-        by smtp.gmail.com with ESMTPSA id ce23sm13475432ejc.53.2020.06.17.06.08.01
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=2lAvnguFBJfbpAn9ko140xdBjcLz8OLfMbowVz8ANzc=;
+        b=Mg4w7YIFF9i9uyzSLB0pb10vOvzf5RvS9IuEPwBjjBY37Sv+D5kc7e0F3egFliTJ5k
+         L2Bl+ebpynTaqG89JK3NjpC9MvnzAmf4LtOQBo6Mfbp5M2sQhGaWiR52TAOdTIVUyg5P
+         do+9sGJJhw5bga3eWCd2fimDP948ck1/lJcKCTVfks/QwkT488h8MsIU+kGltndJyX67
+         DwHBYQ664MWoWPMcZtAA0o1iSzEgRbWCIRMS0xEylpusGypHMCV4eBZNE9q6T59aGgUY
+         YSDaXgxi0y/W1sz3IWWSC4lFsT5ZxgMcB3+DwsAl7k6dhRxcSTV+3ikOhg5N1jmRDfFi
+         ASZg==
+X-Gm-Message-State: AOAM530CWdbJd759nFUJNexczDntfVfPFA+CQUf2cEb8CLZ15zDe5Zhx
+        3zVMoaR5qLcyKc7Bef6c1FMmwujdK+jF6BonBn1XIarGtALHsP1igXSCaeDj2UclYRsKF4iBP7R
+        F1w+xhQBeFa45
+X-Received: by 2002:a17:906:178c:: with SMTP id t12mr7103629eje.464.1592399525774;
+        Wed, 17 Jun 2020 06:12:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyN2Sy5hyq2qFc3E+ICbb5JtuoFD6/Ce8fFPulpau2noIJ8aUBJ0N4sWhRdtr2LnvLEn4Pduw==
+X-Received: by 2002:a17:906:178c:: with SMTP id t12mr7103593eje.464.1592399525333;
+        Wed, 17 Jun 2020 06:12:05 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id z38sm8901748ede.96.2020.06.17.06.12.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2020 06:08:02 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
-        kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
-        Andrew Jones <drjones@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Haibo Xu <haibo.xu@linaro.org>
-Subject: [PATCH] target/arm/kvm: Check supported feature per accelerator (not per vCPU)
-Date:   Wed, 17 Jun 2020 15:08:00 +0200
-Message-Id: <20200617130800.26355-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+        Wed, 17 Jun 2020 06:12:04 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     virtio-fs@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
+        dgilbert@redhat.com, pbonzini@redhat.com, wanpengli@tencent.com,
+        sean.j.christopherson@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] kvm: Add capability to be able to report async pf error to guest
+In-Reply-To: <20200616214847.24482-3-vgoyal@redhat.com>
+References: <20200616214847.24482-1-vgoyal@redhat.com> <20200616214847.24482-3-vgoyal@redhat.com>
+Date:   Wed, 17 Jun 2020 15:12:03 +0200
+Message-ID: <87lfklhm58.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since commit d70c996df23f, when enabling the PMU we get:
+Vivek Goyal <vgoyal@redhat.com> writes:
 
-  $ qemu-system-aarch64 -cpu host,pmu=on -M virt,accel=kvm,gic-version=3
-  Segmentation fault (core dumped)
+> As of now asynchronous page fault mecahanism assumes host will always be
+> successful in resolving page fault. So there are only two states, that
+> is page is not present and page is ready.
+>
+> If a page is backed by a file and that file has been truncated (as
+> can be the case with virtio-fs), then page fault handler on host returns
+> -EFAULT.
+>
+> As of now async page fault logic does not look at error code (-EFAULT)
+> returned by get_user_pages_remote() and returns PAGE_READY to guest.
+> Guest tries to access page and page fault happnes again. And this
+> gets kvm into an infinite loop. (Killing host process gets kvm out of
+> this loop though).
+>
+> This patch adds another state to async page fault logic which allows
+> host to return error to guest. Once guest knows that async page fault
+> can't be resolved, it can send SIGBUS to host process (if user space
+> was accessing the page in question).
+>
+> Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> ---
+>  Documentation/virt/kvm/cpuid.rst     |  4 +++
+>  Documentation/virt/kvm/msr.rst       | 10 +++++---
+>  arch/x86/include/asm/kvm_host.h      |  3 +++
+>  arch/x86/include/asm/kvm_para.h      |  8 +++---
+>  arch/x86/include/uapi/asm/kvm_para.h | 10 ++++++--
+>  arch/x86/kernel/kvm.c                | 34 ++++++++++++++++++++-----
+>  arch/x86/kvm/cpuid.c                 |  3 ++-
+>  arch/x86/kvm/mmu/mmu.c               |  2 +-
+>  arch/x86/kvm/x86.c                   | 38 ++++++++++++++++++++--------
+>  9 files changed, 83 insertions(+), 29 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
+> index a7dff9186bed..a4497f3a6e7f 100644
+> --- a/Documentation/virt/kvm/cpuid.rst
+> +++ b/Documentation/virt/kvm/cpuid.rst
+> @@ -92,6 +92,10 @@ KVM_FEATURE_ASYNC_PF_INT          14          guest checks this feature bit
+>                                                async pf acknowledgment msr
+>                                                0x4b564d07.
+>  
+> +KVM_FEATURE_ASYNC_PF_ERROR        15          paravirtualized async PF error
+> +                                              can be enabled by setting bit 4
+> +                                              when writing to msr 0x4b564d02
+> +
+>  KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
+>                                                per-cpu warps are expeced in
+>                                                kvmclock
+> diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
+> index e37a14c323d2..513eb8e0b0eb 100644
+> --- a/Documentation/virt/kvm/msr.rst
+> +++ b/Documentation/virt/kvm/msr.rst
+> @@ -202,19 +202,21 @@ data:
+>  
+>  		/* Used for 'page ready' events delivered via interrupt notification */
+>  		__u32 token;
+> -
+> -		__u8 pad[56];
+> +                __u32 ready_flags;
+> +		__u8 pad[52];
+>  		__u32 enabled;
+>  	  };
+>  
+> -	Bits 5-4 of the MSR are reserved and should be zero. Bit 0 is set to 1
+> +	Bits 5 of the MSR is reserved and should be zero. Bit 0 is set to 1
+>  	when asynchronous page faults are enabled on the vcpu, 0 when disabled.
+>  	Bit 1 is 1 if asynchronous page faults can be injected when vcpu is in
+>  	cpl == 0. Bit 2 is 1 if asynchronous page faults are delivered to L1 as
+>  	#PF vmexits.  Bit 2 can be set only if KVM_FEATURE_ASYNC_PF_VMEXIT is
+>  	present in CPUID. Bit 3 enables interrupt based delivery of 'page ready'
+>  	events. Bit 3 can only be set if KVM_FEATURE_ASYNC_PF_INT is present in
+> -	CPUID.
+> +	CPUID. Bit 4 enables reporting of page fault errors if hypervisor
+> +        encounters errors while faulting in page. Bit 4 can only be set if
+> +        KVM_FEATURE_ASYNC_PF_ERROR is present in CPUID.
 
-  Thread 1 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
-  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
-  2588        ret = ioctl(s->fd, type, arg);
-  (gdb) bt
-  #0  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
-  #1  0x0000aaaaaae31568 in kvm_check_extension (s=0x0, extension=126) at accel/kvm/kvm-all.c:916
-  #2  0x0000aaaaaafce254 in kvm_arm_pmu_supported (cpu=0xaaaaac214ab0) at target/arm/kvm.c:213
-  #3  0x0000aaaaaafc0f94 in arm_set_pmu (obj=0xaaaaac214ab0, value=true, errp=0xffffffffe438) at target/arm/cpu.c:1111
-  #4  0x0000aaaaab5533ac in property_set_bool (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", opaque=0xaaaaac222730, errp=0xffffffffe438) at qom/object.c:2170
-  #5  0x0000aaaaab5512f0 in object_property_set (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1328
-  #6  0x0000aaaaab551e10 in object_property_parse (obj=0xaaaaac214ab0, string=0xaaaaac11b4c0 "on", name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1561
-  #7  0x0000aaaaab54ee8c in object_apply_global_props (obj=0xaaaaac214ab0, props=0xaaaaac018e20, errp=0xaaaaabd6fd88 <error_fatal>) at qom/object.c:407
-  #8  0x0000aaaaab1dd5a4 in qdev_prop_set_globals (dev=0xaaaaac214ab0) at hw/core/qdev-properties.c:1218
-  #9  0x0000aaaaab1d9fac in device_post_init (obj=0xaaaaac214ab0) at hw/core/qdev.c:1050
-  ...
-  #15 0x0000aaaaab54f310 in object_initialize_with_type (obj=0xaaaaac214ab0, size=52208, type=0xaaaaabe237f0) at qom/object.c:512
-  #16 0x0000aaaaab54fa24 in object_new_with_type (type=0xaaaaabe237f0) at qom/object.c:687
-  #17 0x0000aaaaab54fa80 in object_new (typename=0xaaaaabe23970 "host-arm-cpu") at qom/object.c:702
-  #18 0x0000aaaaaaf04a74 in machvirt_init (machine=0xaaaaac0a8550) at hw/arm/virt.c:1770
-  #19 0x0000aaaaab1e8720 in machine_run_board_init (machine=0xaaaaac0a8550) at hw/core/machine.c:1138
-  #20 0x0000aaaaaaf95394 in qemu_init (argc=5, argv=0xffffffffea58, envp=0xffffffffea88) at softmmu/vl.c:4348
-  #21 0x0000aaaaaada3f74 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at softmmu/main.c:48
+Would it actually make sense to deliver the exact error from
+get_user_pages() and not a binary failure/no-failure? Is the guest
+interested in how exactly we failed?
 
-This is because in frame #2, cpu->kvm_state is still NULL
-(the vCPU is not yet realized).
+>  
+>  	'Page not present' events are currently always delivered as synthetic
+>  	#PF exception. During delivery of these events APF CR2 register contains
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 348a73106556..ff8dbc604dbe 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -779,6 +779,7 @@ struct kvm_vcpu_arch {
+>  		bool delivery_as_pf_vmexit;
+>  		bool pageready_pending;
+>  		gfn_t error_gfn;
+> +		bool send_pf_error;
+>  	} apf;
+>  
+>  	/* OSVW MSRs (AMD only) */
+> @@ -1680,6 +1681,8 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
+>  			       struct kvm_async_pf *work);
+>  void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
+> +void kvm_arch_async_page_fault_error(struct kvm_vcpu *vcpu,
+> +				     struct kvm_async_pf *work);
+>  extern bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+>  
+>  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
+> index bbc43e5411d9..6c738e91ca2c 100644
+> --- a/arch/x86/include/asm/kvm_para.h
+> +++ b/arch/x86/include/asm/kvm_para.h
+> @@ -89,8 +89,8 @@ static inline long kvm_hypercall4(unsigned int nr, unsigned long p1,
+>  bool kvm_para_available(void);
+>  unsigned int kvm_arch_para_features(void);
+>  unsigned int kvm_arch_para_hints(void);
+> -void kvm_async_pf_task_wait_schedule(u32 token);
+> -void kvm_async_pf_task_wake(u32 token);
+> +void kvm_async_pf_task_wait_schedule(u32 token, bool user_mode);
+> +void kvm_async_pf_task_wake(u32 token, bool is_err);
+>  u32 kvm_read_and_reset_apf_flags(void);
+>  void kvm_disable_steal_time(void);
+>  bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token);
+> @@ -120,8 +120,8 @@ static inline void kvm_spinlock_init(void)
+>  #endif /* CONFIG_PARAVIRT_SPINLOCKS */
+>  
+>  #else /* CONFIG_KVM_GUEST */
+> -#define kvm_async_pf_task_wait_schedule(T) do {} while(0)
+> -#define kvm_async_pf_task_wake(T) do {} while(0)
+> +#define kvm_async_pf_task_wait_schedule(T, U) do {} while(0)
+> +#define kvm_async_pf_task_wake(T, I) do {} while(0)
+>  
+>  static inline bool kvm_para_available(void)
+>  {
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index 812e9b4c1114..b43fd2ddc949 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -32,6 +32,7 @@
+>  #define KVM_FEATURE_POLL_CONTROL	12
+>  #define KVM_FEATURE_PV_SCHED_YIELD	13
+>  #define KVM_FEATURE_ASYNC_PF_INT	14
+> +#define KVM_FEATURE_ASYNC_PF_ERROR	15
+>  
+>  #define KVM_HINTS_REALTIME      0
+>  
+> @@ -85,6 +86,7 @@ struct kvm_clock_pairing {
+>  #define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1)
+>  #define KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT	(1 << 2)
+>  #define KVM_ASYNC_PF_DELIVERY_AS_INT		(1 << 3)
+> +#define KVM_ASYNC_PF_SEND_ERROR			(1 << 4)
+>  
+>  /* MSR_KVM_ASYNC_PF_INT */
+>  #define KVM_ASYNC_PF_VEC_MASK			GENMASK(7, 0)
+> @@ -119,14 +121,18 @@ struct kvm_mmu_op_release_pt {
+>  #define KVM_PV_REASON_PAGE_NOT_PRESENT 1
+>  #define KVM_PV_REASON_PAGE_READY 2
+>  
+> +
+> +/* Bit flags for ready_flags field */
+> +#define KVM_PV_REASON_PAGE_ERROR 1
+> +
+>  struct kvm_vcpu_pv_apf_data {
+>  	/* Used for 'page not present' events delivered via #PF */
+>  	__u32 flags;
+>  
+>  	/* Used for 'page ready' events delivered via interrupt notification */
+>  	__u32 token;
+> -
+> -	__u8 pad[56];
+> +	__u32 ready_flags;
+> +	__u8 pad[52];
+>  	__u32 enabled;
+>  };
+>  
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index ff95429d206b..2ee9c9d971ae 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -75,6 +75,7 @@ struct kvm_task_sleep_node {
+>  	struct swait_queue_head wq;
+>  	u32 token;
+>  	int cpu;
+> +	bool is_err;
+>  };
+>  
+>  static struct kvm_task_sleep_head {
+> @@ -97,7 +98,14 @@ static struct kvm_task_sleep_node *_find_apf_task(struct kvm_task_sleep_head *b,
+>  	return NULL;
+>  }
+>  
+> -static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
+> +static void handle_async_pf_error(bool user_mode)
+> +{
+> +	if (user_mode)
+> +		send_sig_info(SIGBUS, SEND_SIG_PRIV, current);
+> +}
+> +
+> +static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n,
+> +				    bool user_mode)
+>  {
+>  	u32 key = hash_32(token, KVM_TASK_SLEEP_HASHBITS);
+>  	struct kvm_task_sleep_head *b = &async_pf_sleepers[key];
+> @@ -107,6 +115,8 @@ static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
+>  	e = _find_apf_task(b, token);
+>  	if (e) {
+>  		/* dummy entry exist -> wake up was delivered ahead of PF */
+> +		if (e->is_err)
+> +			handle_async_pf_error(user_mode);
+>  		hlist_del(&e->link);
+>  		raw_spin_unlock(&b->lock);
+>  		kfree(e);
+> @@ -128,14 +138,14 @@ static bool kvm_async_pf_queue_task(u32 token, struct kvm_task_sleep_node *n)
+>   * Invoked from the async pagefault handling code or from the VM exit page
+>   * fault handler. In both cases RCU is watching.
+>   */
+> -void kvm_async_pf_task_wait_schedule(u32 token)
+> +void kvm_async_pf_task_wait_schedule(u32 token, bool user_mode)
+>  {
+>  	struct kvm_task_sleep_node n;
+>  	DECLARE_SWAITQUEUE(wait);
+>  
+>  	lockdep_assert_irqs_disabled();
+>  
+> -	if (!kvm_async_pf_queue_task(token, &n))
+> +	if (!kvm_async_pf_queue_task(token, &n, user_mode))
+>  		return;
+>  
+>  	for (;;) {
+> @@ -148,6 +158,8 @@ void kvm_async_pf_task_wait_schedule(u32 token)
+>  		local_irq_disable();
+>  	}
+>  	finish_swait(&n.wq, &wait);
+> +	if (n.is_err)
+> +		handle_async_pf_error(user_mode);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_async_pf_task_wait_schedule);
+>  
+> @@ -177,7 +189,7 @@ static void apf_task_wake_all(void)
+>  	}
+>  }
+>  
+> -void kvm_async_pf_task_wake(u32 token)
+> +void kvm_async_pf_task_wake(u32 token, bool is_err)
+>  {
+>  	u32 key = hash_32(token, KVM_TASK_SLEEP_HASHBITS);
+>  	struct kvm_task_sleep_head *b = &async_pf_sleepers[key];
+> @@ -208,9 +220,11 @@ void kvm_async_pf_task_wake(u32 token)
+>  		}
+>  		n->token = token;
+>  		n->cpu = smp_processor_id();
+> +		n->is_err = is_err;
+>  		init_swait_queue_head(&n->wq);
+>  		hlist_add_head(&n->link, &b->list);
+>  	} else {
+> +		n->is_err = is_err;
+>  		apf_task_wake_one(n);
+>  	}
+>  	raw_spin_unlock(&b->lock);
+> @@ -256,14 +270,15 @@ bool __kvm_handle_async_pf(struct pt_regs *regs, u32 token)
+>  		panic("Host injected async #PF in kernel mode\n");
+>  
+>  	/* Page is swapped out by the host. */
+> -	kvm_async_pf_task_wait_schedule(token);
+> +	kvm_async_pf_task_wait_schedule(token, user_mode(regs));
+>  	return true;
+>  }
+>  NOKPROBE_SYMBOL(__kvm_handle_async_pf);
+>  
+>  __visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs)
+>  {
+> -	u32 token;
+> +	u32 token, ready_flags;
+> +	bool is_err;
+>  
+>  	entering_ack_irq();
+>  
+> @@ -271,7 +286,9 @@ __visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs)
+>  
+>  	if (__this_cpu_read(apf_reason.enabled)) {
+>  		token = __this_cpu_read(apf_reason.token);
+> -		kvm_async_pf_task_wake(token);
+> +		ready_flags = __this_cpu_read(apf_reason.ready_flags);
+> +		is_err = ready_flags & KVM_PV_REASON_PAGE_ERROR;
+> +		kvm_async_pf_task_wake(token, is_err);
+>  		__this_cpu_write(apf_reason.token, 0);
+>  		wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
+>  	}
+> @@ -335,6 +352,9 @@ static void kvm_guest_cpu_init(void)
+>  
+>  		wrmsrl(MSR_KVM_ASYNC_PF_INT, KVM_ASYNC_PF_VECTOR);
+>  
+> +		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_ERROR))
+> +			pa |= KVM_ASYNC_PF_SEND_ERROR;
+> +
+>  		wrmsrl(MSR_KVM_ASYNC_PF_EN, pa);
+>  		__this_cpu_write(apf_reason.enabled, 1);
+>  		pr_info("KVM setup async PF for cpu %d\n", smp_processor_id());
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 253b8e875ccd..f811f36e0c24 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -712,7 +712,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  			     (1 << KVM_FEATURE_PV_SEND_IPI) |
+>  			     (1 << KVM_FEATURE_POLL_CONTROL) |
+>  			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
+> -			     (1 << KVM_FEATURE_ASYNC_PF_INT);
+> +			     (1 << KVM_FEATURE_ASYNC_PF_INT) |
+> +			     (1 << KVM_FEATURE_ASYNC_PF_ERROR);
+>  
+>  		if (sched_info_on())
+>  			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e207900ab303..634182bb07c7 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4175,7 +4175,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+>  	} else if (flags & KVM_PV_REASON_PAGE_NOT_PRESENT) {
+>  		vcpu->arch.apf.host_apf_flags = 0;
+>  		local_irq_disable();
+> -		kvm_async_pf_task_wait_schedule(fault_address);
+> +		kvm_async_pf_task_wait_schedule(fault_address, 0);
+>  		local_irq_enable();
+>  	} else {
+>  		WARN_ONCE(1, "Unexpected host async PF flags: %x\n", flags);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4c5205434b9c..c3b2097f2eaa 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2690,8 +2690,8 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+>  {
+>  	gpa_t gpa = data & ~0x3f;
+>  
+> -	/* Bits 4:5 are reserved, Should be zero */
+> -	if (data & 0x30)
+> +	/* Bits 5 is reserved, Should be zero */
+> +	if (data & 0x20)
+>  		return 1;
+>  
+>  	vcpu->arch.apf.msr_en_val = data;
+> @@ -2703,11 +2703,12 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+>  	}
+>  
+>  	if (kvm_gfn_to_hva_cache_init(vcpu->kvm, &vcpu->arch.apf.data, gpa,
+> -					sizeof(u64)))
+> +					sizeof(u64) + sizeof(u32)))
+>  		return 1;
+>  
+>  	vcpu->arch.apf.send_user_only = !(data & KVM_ASYNC_PF_SEND_ALWAYS);
+>  	vcpu->arch.apf.delivery_as_pf_vmexit = data & KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
+> +	vcpu->arch.apf.send_pf_error = data & KVM_ASYNC_PF_SEND_ERROR;
+>  
+>  	kvm_async_pf_wakeup_all(vcpu);
+>  
+> @@ -10481,12 +10482,25 @@ static inline int apf_put_user_notpresent(struct kvm_vcpu *vcpu)
+>  				      sizeof(reason));
+>  }
+>  
+> -static inline int apf_put_user_ready(struct kvm_vcpu *vcpu, u32 token)
+> +static inline int apf_put_user_ready(struct kvm_vcpu *vcpu, u32 token,
+> +				     bool is_err)
+>  {
+>  	unsigned int offset = offsetof(struct kvm_vcpu_pv_apf_data, token);
+> +	int ret;
+> +	u32 ready_flags = 0;
+> +
+> +	if (is_err && vcpu->arch.apf.send_pf_error)
+> +		ready_flags = KVM_PV_REASON_PAGE_ERROR;
+> +
+> +	ret = kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.apf.data,
+> +					    &token, offset, sizeof(token));
+> +	if (ret < 0)
+> +		return ret;
+>  
+> +	offset = offsetof(struct kvm_vcpu_pv_apf_data, ready_flags);
+>  	return kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.apf.data,
+> -					     &token, offset, sizeof(token));
+> +					    &ready_flags, offset,
+> +					    sizeof(ready_flags));
+>  }
+>  
+>  static inline bool apf_pageready_slot_free(struct kvm_vcpu *vcpu)
+> @@ -10571,6 +10585,8 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+>  				 struct kvm_async_pf *work)
+>  {
+> +	bool present_injected = false;
+> +
+>  	struct kvm_lapic_irq irq = {
+>  		.delivery_mode = APIC_DM_FIXED,
+>  		.vector = vcpu->arch.apf.vec
+> @@ -10584,16 +10600,18 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+>  
+>  	if ((work->wakeup_all || work->notpresent_injected) &&
+>  	    kvm_pv_async_pf_enabled(vcpu) &&
+> -	    !apf_put_user_ready(vcpu, work->arch.token)) {
+> +	    !apf_put_user_ready(vcpu, work->arch.token, work->error_code)) {
+>  		vcpu->arch.apf.pageready_pending = true;
+>  		kvm_apic_set_irq(vcpu, &irq, NULL);
+> +		present_injected = true;
+>  	}
+>  
+> -	if (work->error_code) {
+> +	if (work->error_code &&
+> +	    (!present_injected || !vcpu->arch.apf.send_pf_error)) {
+>  		/*
+> -		 * Page fault failed and we don't have a way to report
+> -		 * errors back to guest yet. So save this pfn and force
+> -		 * sync page fault next time.
+> +		 * Page fault failed. If we did not report error back
+> +		 * to guest, save this pfn and force sync page fault next
+> +		 * time.
+>  		 */
+>  		vcpu->arch.apf.error_gfn = work->cr2_or_gpa >> PAGE_SHIFT;
+>  	}
 
-KVM has a hard requirement of all cores supporting the same
-feature set. We only need to check if the accelerator supports
-a feature, not each vCPU individually.
-
-Fix by kvm_arm_<FEATURE>_supported() functions take a AccelState
-argument (already realized/valid at this point) instead of a
-CPUState argument.
-
-Reported-by: Haibo Xu <haibo.xu@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- target/arm/kvm_arm.h | 25 +++++++++++++------------
- target/arm/cpu.c     |  2 +-
- target/arm/cpu64.c   | 10 +++++-----
- target/arm/kvm.c     |  4 ++--
- target/arm/kvm64.c   | 14 +++++---------
- 5 files changed, 26 insertions(+), 29 deletions(-)
-
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 48bf5e16d5..8209525f20 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -12,6 +12,7 @@
- #define QEMU_KVM_ARM_H
- 
- #include "sysemu/kvm.h"
-+#include "sysemu/accel.h"
- #include "exec/memory.h"
- #include "qemu/error-report.h"
- 
-@@ -269,29 +270,29 @@ void kvm_arm_add_vcpu_properties(Object *obj);
- 
- /**
-  * kvm_arm_aarch32_supported:
-- * @cs: CPUState
-+ * @as: AccelState
-  *
-- * Returns: true if the KVM VCPU can enable AArch32 mode
-+ * Returns: true if the KVM accelerator can enable AArch32 mode
-  * and false otherwise.
-  */
--bool kvm_arm_aarch32_supported(CPUState *cs);
-+bool kvm_arm_aarch32_supported(AccelState *as);
- 
- /**
-  * kvm_arm_pmu_supported:
-- * @cs: CPUState
-+ * @as: AccelState
-  *
-- * Returns: true if the KVM VCPU can enable its PMU
-+ * Returns: true if the KVM accelerator can enable its PMU
-  * and false otherwise.
-  */
--bool kvm_arm_pmu_supported(CPUState *cs);
-+bool kvm_arm_pmu_supported(AccelState *as);
- 
- /**
-  * kvm_arm_sve_supported:
-- * @cs: CPUState
-+ * @as: AccelState
-  *
-- * Returns true if the KVM VCPU can enable SVE and false otherwise.
-+ * Returns true if the KVM accelerator can enable SVE and false otherwise.
-  */
--bool kvm_arm_sve_supported(CPUState *cs);
-+bool kvm_arm_sve_supported(AccelState *as);
- 
- /**
-  * kvm_arm_get_max_vm_ipa_size:
-@@ -359,17 +360,17 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
- 
- static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
- 
--static inline bool kvm_arm_aarch32_supported(CPUState *cs)
-+static inline bool kvm_arm_aarch32_supported(AccelState *as)
- {
-     return false;
- }
- 
--static inline bool kvm_arm_pmu_supported(CPUState *cs)
-+static inline bool kvm_arm_pmu_supported(AccelState *as)
- {
-     return false;
- }
- 
--static inline bool kvm_arm_sve_supported(CPUState *cs)
-+static inline bool kvm_arm_sve_supported(AccelState *as)
- {
-     return false;
- }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 5b7a36b5d7..29b314427c 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1108,7 +1108,7 @@ static void arm_set_pmu(Object *obj, bool value, Error **errp)
-     ARMCPU *cpu = ARM_CPU(obj);
- 
-     if (value) {
--        if (kvm_enabled() && !kvm_arm_pmu_supported(CPU(cpu))) {
-+        if (kvm_enabled() && !kvm_arm_pmu_supported(current_accel())) {
-             error_setg(errp, "'pmu' feature not supported by KVM on this host");
-             return;
-         }
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 778cecc2e6..13835768ab 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -266,7 +266,7 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
- 
-     /* Collect the set of vector lengths supported by KVM. */
-     bitmap_zero(kvm_supported, ARM_MAX_VQ);
--    if (kvm_enabled() && kvm_arm_sve_supported(CPU(cpu))) {
-+    if (kvm_enabled() && kvm_arm_sve_supported(current_accel())) {
-         kvm_arm_sve_get_vls(CPU(cpu), kvm_supported);
-     } else if (kvm_enabled()) {
-         assert(!cpu_isar_feature(aa64_sve, cpu));
-@@ -473,7 +473,7 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    if (kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (kvm_enabled() && !kvm_arm_sve_supported(current_accel())) {
-         error_setg(errp, "cannot set sve-max-vq");
-         error_append_hint(errp, "SVE not supported by KVM on this host\n");
-         return;
-@@ -519,7 +519,7 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported(current_accel())) {
-         error_setg(errp, "cannot enable %s", name);
-         error_append_hint(errp, "SVE not supported by KVM on this host\n");
-         return;
-@@ -556,7 +556,7 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported(current_accel())) {
-         error_setg(errp, "'sve' feature not supported by KVM on this host");
-         return;
-     }
-@@ -751,7 +751,7 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
-      * uniform execution state like do_interrupt.
-      */
-     if (value == false) {
--        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
-+        if (!kvm_enabled() || !kvm_arm_aarch32_supported(current_accel())) {
-             error_setg(errp, "'aarch64' feature cannot be disabled "
-                              "unless KVM is enabled and 32-bit EL1 "
-                              "is supported");
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index eef3bbd1cc..2247a96757 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -208,9 +208,9 @@ void kvm_arm_add_vcpu_properties(Object *obj)
-     }
- }
- 
--bool kvm_arm_pmu_supported(CPUState *cpu)
-+bool kvm_arm_pmu_supported(AccelState *as)
- {
--    return kvm_check_extension(cpu->kvm_state, KVM_CAP_ARM_PMU_V3);
-+    return kvm_check_extension(KVM_STATE(as), KVM_CAP_ARM_PMU_V3);
- }
- 
- int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index f09ed9f4df..ae4e37ce78 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -652,18 +652,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     return true;
- }
- 
--bool kvm_arm_aarch32_supported(CPUState *cpu)
-+bool kvm_arm_aarch32_supported(AccelState *as)
- {
--    KVMState *s = KVM_STATE(current_accel());
--
--    return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
-+    return kvm_check_extension(KVM_STATE(as), KVM_CAP_ARM_EL1_32BIT);
- }
- 
--bool kvm_arm_sve_supported(CPUState *cpu)
-+bool kvm_arm_sve_supported(AccelState *as)
- {
--    KVMState *s = KVM_STATE(current_accel());
--
--    return kvm_check_extension(s, KVM_CAP_ARM_SVE);
-+    return kvm_check_extension(KVM_STATE(as), KVM_CAP_ARM_SVE);
- }
- 
- QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN != 1);
-@@ -798,7 +794,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         env->features &= ~(1ULL << ARM_FEATURE_PMU);
-     }
-     if (cpu_isar_feature(aa64_sve, cpu)) {
--        assert(kvm_arm_sve_supported(cs));
-+        assert(kvm_arm_sve_supported(ACCEL(cs->kvm_state)));
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-     }
- 
 -- 
-2.21.3
+Vitaly
 
