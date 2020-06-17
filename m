@@ -2,71 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0BDA1FC4C9
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 05:42:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3F281FC5DE
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 07:56:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbgFQDlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jun 2020 23:41:25 -0400
-Received: from mga01.intel.com ([192.55.52.88]:52603 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726497AbgFQDlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jun 2020 23:41:25 -0400
-IronPort-SDR: dn648OMM6fiiGGXoX67YKFvqmLIsxO9YidWKl2N1+4pLfC5Kodvb19wA/6duW9kfOxm5L7mv31
- 7v0aRtT2YhtQ==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2020 20:41:25 -0700
-IronPort-SDR: yD9c5qPCcw0nP5vDwu24s9gyXkO/DttkWnkRWj5wM2HuyxcvjgAB/UB7ij1AxJLzjfzqTRK9/w
- jcHjjDhLRfQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,521,1583222400"; 
-   d="scan'208";a="476681552"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
-  by fmsmga006.fm.intel.com with ESMTP; 16 Jun 2020 20:41:24 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru
-Date:   Tue, 16 Jun 2020 20:41:23 -0700
-Message-Id: <20200617034123.25647-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.26.0
+        id S1726848AbgFQF4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 01:56:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35519 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725929AbgFQF4P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 01:56:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592373374;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bqylOELuu5u+OMaXH6+BHxzbmV1N3q++LSowq/nIA1I=;
+        b=if8rRWzPXbrRTcUgVKnHdwGfxjxcgY+C/09WD+Y9yq70sS35gzJmV/haFHiGUrQyT5CoEr
+        ypBHKVcHMxQY33G10izf+25Lazen9clOsDPbXpJzX6wiJfYSZFiZ2ELPja76TYGBQUG63J
+        g0zkWylheEMGiuQ0w67NZ9EBNh7Xyu8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-P4RaW-KYNnSocYt9_L0J7w-1; Wed, 17 Jun 2020 01:56:12 -0400
+X-MC-Unique: P4RaW-KYNnSocYt9_L0J7w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEA79188362F;
+        Wed, 17 Jun 2020 05:56:10 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F03060CC0;
+        Wed, 17 Jun 2020 05:56:06 +0000 (UTC)
+Date:   Wed, 17 Jun 2020 07:56:04 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, dwagner@suse.de,
+        cai@lca.pw
+Subject: Re: [PATCH] vfio/pci: Clear error and request eventfd ctx after
+ releasing
+Message-ID: <20200617075604.67b47078.cohuck@redhat.com>
+In-Reply-To: <159234276956.31057.6902954364435481688.stgit@gimli.home>
+References: <159234276956.31057.6902954364435481688.stgit@gimli.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove vcpu_vmx.host_pkru, which got left behind when PKRU support was
-moved to common x86 code.
+On Tue, 16 Jun 2020 15:26:36 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-No functional change intended.
+> The next use of the device will generate an underflow from the
+> stale reference.
+> 
+> Cc: Qian Cai <cai@lca.pw>
+> Fixes: 1518ac272e78 ("vfio/pci: fix memory leaks of eventfd ctx")
+> Reported-by: Daniel Wagner <dwagner@suse.de>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c |    8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 7c0779018b1b..f634c81998bb 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -521,10 +521,14 @@ static void vfio_pci_release(void *device_data)
+>  		vfio_pci_vf_token_user_add(vdev, -1);
+>  		vfio_spapr_pci_eeh_release(vdev->pdev);
+>  		vfio_pci_disable(vdev);
+> -		if (vdev->err_trigger)
+> +		if (vdev->err_trigger) {
+>  			eventfd_ctx_put(vdev->err_trigger);
+> -		if (vdev->req_trigger)
+> +			vdev->err_trigger = NULL;
+> +		}
+> +		if (vdev->req_trigger) {
+>  			eventfd_ctx_put(vdev->req_trigger);
+> +			vdev->req_trigger = NULL;
+> +		}
+>  	}
+>  
+>  	mutex_unlock(&vdev->reflck->lock);
+> 
 
-Fixes: 37486135d3a7b ("KVM: x86: Fix pkru save/restore when guest CR4.PKE=0, move it to x86.c")
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/vmx/vmx.h | 2 --
- 1 file changed, 2 deletions(-)
+Clearing this seems like the right thing to do.
 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 8a83b5edc820..639798e4a6ca 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -288,8 +288,6 @@ struct vcpu_vmx {
- 
- 	u64 current_tsc_ratio;
- 
--	u32 host_pkru;
--
- 	unsigned long host_debugctlmsr;
- 
- 	/*
--- 
-2.26.0
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
