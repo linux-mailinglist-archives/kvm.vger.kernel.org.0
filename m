@@ -2,355 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 461A11FCCD6
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 13:56:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E61531FCCD8
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 13:56:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726541AbgFQL4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 07:56:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8202 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725894AbgFQL4A (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 07:56:00 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05HBY7aa098643;
-        Wed, 17 Jun 2020 07:55:58 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6gtm5cp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 07:55:58 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HBkVwU140049;
-        Wed, 17 Jun 2020 07:55:57 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6gtm5c4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 07:55:57 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HBpxng023969;
-        Wed, 17 Jun 2020 11:55:55 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma02fra.de.ibm.com with ESMTP id 31q6ckrd9a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 11:55:55 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05HBtrPD2425106
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Jun 2020 11:55:53 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62F9011C04A;
-        Wed, 17 Jun 2020 11:55:53 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EDE4411C04C;
-        Wed, 17 Jun 2020 11:55:52 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.186.32])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 17 Jun 2020 11:55:52 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v9 12/12] s390x: css: ssch/tsch with sense
- and interrupt
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-13-git-send-email-pmorel@linux.ibm.com>
- <20200617115442.036735c5.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <2383bdc0-caaf-9cb0-f4c4-ed57c1d3dfb1@linux.ibm.com>
-Date:   Wed, 17 Jun 2020 13:55:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726628AbgFQL4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 07:56:14 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35757 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726558AbgFQL4N (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 07:56:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592394970;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DrKJT2s3bUdWnzLFBfBTky/5kjFEtfKokxByL0U1MXc=;
+        b=aPuhsoH3GQw1GUeStbYukvb2eBy4vJG7h8VXXiEfpVjZ+Rc3DxoSaxyeunA/hlDaH0injs
+        lqYi4w2BsScm2ejqr0mWxlvA7mJosG+if/2yy61JUq90AftMx6M7WVLZlSMJg86HbAdzE6
+        ASQxTrefIUVe/GK5YVZPf9EjobICmfI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473--VVnrQiCNbeFZgKYPiBvew-1; Wed, 17 Jun 2020 07:56:09 -0400
+X-MC-Unique: -VVnrQiCNbeFZgKYPiBvew-1
+Received: by mail-ej1-f72.google.com with SMTP id op14so915272ejb.15
+        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 04:56:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=DrKJT2s3bUdWnzLFBfBTky/5kjFEtfKokxByL0U1MXc=;
+        b=tzck93131Z7Zcg6m/mBPFebaQK7JIkuYud84kBXacXu/2GMxnhvzVVI9SyXHjnEVrm
+         50yAXCbbcNFKhx4aMF/kyKzjaNxKV7gR7JBJXTnvquMKgQ/vQUbBLI9kEOYb1KYqMmyM
+         FpiJbc/mu5VQSkNpQPeNIY2otxPwkgsQ23MgF35xXRUJ/SbZesowLZ5HtuAqvuHTWEup
+         XRTKYuk2F7VsgzZXQVMTYVJc9EEgfiF+DHX7Go2erokTZbjUgHGwtoGPaNAJFG3DyKER
+         lfyMllChhGpEh0W0EaMgoIPq3/BemHgYawhypnyREFXCu5U1yaPsBO5hu+qfaxaI+vhn
+         P5sw==
+X-Gm-Message-State: AOAM532QeK4MRKcGjf11MJgV3alLlKRHGlzA4dliLzfs48UB2yREYnci
+        XdVf9CUF6a6hlZe6ETLswY/gSWm0qCmh0I66R6j1hi95LfVZMI0HQ7AF+bFrtcKmFps3Cn5Pqet
+        MHlDIvyXXD9Dm
+X-Received: by 2002:a17:906:b80d:: with SMTP id dv13mr1922654ejb.428.1592394967831;
+        Wed, 17 Jun 2020 04:56:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwU9N1pAmlWVvFA0KdYaO5rBhYhPzQIV23EoUU4jIE2FcmubZoVpk0UiLcFkXzYWBwqXzVlhg==
+X-Received: by 2002:a17:906:b80d:: with SMTP id dv13mr1922623ejb.428.1592394967579;
+        Wed, 17 Jun 2020 04:56:07 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id b11sm13205979eju.91.2020.06.17.04.56.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2020 04:56:06 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Babu Moger <babu.moger@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        wanpengli@tencent.com, joro@8bytes.org, x86@kernel.org,
+        sean.j.christopherson@intel.com, mingo@redhat.com, bp@alien8.de,
+        hpa@zytor.com, pbonzini@redhat.com, tglx@linutronix.de,
+        jmattson@google.com
+Subject: Re: [PATCH v2 1/3] KVM: X86: Move handling of INVPCID types to x86
+In-Reply-To: <159234501692.6230.5105866433978454983.stgit@bmoger-ubuntu>
+References: <159234483706.6230.13753828995249423191.stgit@bmoger-ubuntu> <159234501692.6230.5105866433978454983.stgit@bmoger-ubuntu>
+Date:   Wed, 17 Jun 2020 13:56:05 +0200
+Message-ID: <87tuz9hpnu.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200617115442.036735c5.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-17_03:2020-06-17,2020-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 impostorscore=0
- clxscore=1015 phishscore=0 adultscore=0 spamscore=0 bulkscore=0
- priorityscore=1501 cotscore=-2147483648 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006170087
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Babu Moger <babu.moger@amd.com> writes:
 
+> INVPCID instruction handling is mostly same across both VMX and
+> SVM. So, move the code to common x86.c.
+>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c |   68 +----------------------------------------
+>  arch/x86/kvm/x86.c     |   79 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.h     |    3 +-
+>  3 files changed, 82 insertions(+), 68 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 170cc76a581f..b4140cfd15fd 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5477,11 +5477,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 vmx_instruction_info;
+>  	unsigned long type;
+> -	bool pcid_enabled;
+>  	gva_t gva;
+> -	struct x86_exception e;
+> -	unsigned i;
+> -	unsigned long roots_to_free = 0;
+>  	struct {
+>  		u64 pcid;
+>  		u64 gla;
+> @@ -5508,69 +5504,7 @@ static int handle_invpcid(struct kvm_vcpu *vcpu)
+>  				sizeof(operand), &gva))
+>  		return 1;
+>  
+> -	if (kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e)) {
+> -		kvm_inject_emulated_page_fault(vcpu, &e);
+> -		return 1;
+> -	}
+> -
+> -	if (operand.pcid >> 12 != 0) {
+> -		kvm_inject_gp(vcpu, 0);
+> -		return 1;
+> -	}
+> -
+> -	pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> -
+> -	switch (type) {
+> -	case INVPCID_TYPE_INDIV_ADDR:
+> -		if ((!pcid_enabled && (operand.pcid != 0)) ||
+> -		    is_noncanonical_address(operand.gla, vcpu)) {
+> -			kvm_inject_gp(vcpu, 0);
+> -			return 1;
+> -		}
+> -		kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
+> -		return kvm_skip_emulated_instruction(vcpu);
+> -
+> -	case INVPCID_TYPE_SINGLE_CTXT:
+> -		if (!pcid_enabled && (operand.pcid != 0)) {
+> -			kvm_inject_gp(vcpu, 0);
+> -			return 1;
+> -		}
+> -
+> -		if (kvm_get_active_pcid(vcpu) == operand.pcid) {
+> -			kvm_mmu_sync_roots(vcpu);
+> -			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> -		}
+> -
+> -		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> -			if (kvm_get_pcid(vcpu, vcpu->arch.mmu->prev_roots[i].pgd)
+> -			    == operand.pcid)
+> -				roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+> -
+> -		kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
+> -		/*
+> -		 * If neither the current cr3 nor any of the prev_roots use the
+> -		 * given PCID, then nothing needs to be done here because a
+> -		 * resync will happen anyway before switching to any other CR3.
+> -		 */
+> -
+> -		return kvm_skip_emulated_instruction(vcpu);
+> -
+> -	case INVPCID_TYPE_ALL_NON_GLOBAL:
+> -		/*
+> -		 * Currently, KVM doesn't mark global entries in the shadow
+> -		 * page tables, so a non-global flush just degenerates to a
+> -		 * global flush. If needed, we could optimize this later by
+> -		 * keeping track of global entries in shadow page tables.
+> -		 */
+> -
+> -		/* fall-through */
+> -	case INVPCID_TYPE_ALL_INCL_GLOBAL:
+> -		kvm_mmu_unload(vcpu);
+> -		return kvm_skip_emulated_instruction(vcpu);
+> -
+> -	default:
+> -		BUG(); /* We have already checked above that type <= 3 */
+> -	}
+> +	return kvm_handle_invpcid_types(vcpu,  gva, type);
 
-On 2020-06-17 11:54, Cornelia Huck wrote:
-> On Mon, 15 Jun 2020 11:32:01 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> After a channel is enabled we start a SENSE_ID command using
->> the SSCH instruction to recognize the control unit and device.
->>
->> This tests the success of SSCH, the I/O interruption and the TSCH
->> instructions.
->>
->> The SENSE_ID command response is tested to report 0xff inside
->> its reserved field and to report the same control unit type
->> as the cu_type kernel argument.
->>
->> Without the cu_type kernel argument, the test expects a device
->> with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
-> 
-> 0x3832 is any virtio-ccw device; you could also test for the cu model
-> to make sure that it is a net device, but that probably doesn't add
-> much additional coverage.
-> 
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h     |  20 +++++++
->>   lib/s390x/css_lib.c |  46 +++++++++++++++
->>   s390x/css.c         | 140 +++++++++++++++++++++++++++++++++++++++++++-
->>   3 files changed, 205 insertions(+), 1 deletion(-)
-> 
-...snip...
+Nit: redundant space.
 
->> +/*
->> + * In the next revisions we will implement the possibility to handle
->> + * CCW chains doing this we will need to work with ccw1 pointers.
-> 
-> "In the future, we want to implement support for CCW chains; for that,
-> we will need to work with ccw1 pointers."
-> 
-> ?
+>  }
+>  
+>  static int handle_pml_full(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9e41b5135340..9c858ca0e592 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -70,6 +70,7 @@
+>  #include <asm/irq_remapping.h>
+>  #include <asm/mshyperv.h>
+>  #include <asm/hypervisor.h>
+> +#include <asm/tlbflush.h>
+>  #include <asm/intel_pt.h>
+>  #include <asm/emulate_prefix.h>
+>  #include <clocksource/hyperv_timer.h>
+> @@ -10714,6 +10715,84 @@ u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_spec_ctrl_valid_bits);
+>  
+> +int kvm_handle_invpcid_types(struct kvm_vcpu *vcpu, gva_t gva,
+> +			     unsigned long type)
 
-yes, better, thanks.
+(sorry if this was discussed before) do we really need '_types' suffix?
 
-> 
->> + * For now we only need a unique CCW.
->> + */
->> +static struct ccw1 unique_ccw;
->> +
->> +int start_subchannel(unsigned int sid, int code, void *data, int count,
->> +		     unsigned char flags)
->> +{
->> +	int cc;
->> +	struct ccw1 *ccw = &unique_ccw;
-> 
-> Hm... it might better to call this function "start_single_ccw" or
-> something like that.
+> +{
+> +	unsigned long roots_to_free = 0;
+> +	struct x86_exception e;
+> +	bool pcid_enabled;
+> +	unsigned int i;
+> +	struct {
+> +		u64 pcid;
+> +		u64 gla;
+> +	} operand;
+> +
+> +	if (kvm_read_guest_virt(vcpu, gva, &operand, sizeof(operand), &e)) {
+> +		kvm_inject_emulated_page_fault(vcpu, &e);
+> +		return 1;
+> +	}
+> +
+> +	if (operand.pcid >> 12 != 0) {
+> +		kvm_inject_gp(vcpu, 0);
+> +		return 1;
+> +	}
+> +
+> +	pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+> +
+> +	switch (type) {
+> +	case INVPCID_TYPE_INDIV_ADDR:
+> +		if ((!pcid_enabled && (operand.pcid != 0)) ||
+> +		    is_noncanonical_address(operand.gla, vcpu)) {
+> +			kvm_inject_gp(vcpu, 0);
+> +			return 1;
+> +		}
+> +		kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
+> +		return kvm_skip_emulated_instruction(vcpu);
+> +
+> +	case INVPCID_TYPE_SINGLE_CTXT:
+> +		if (!pcid_enabled && (operand.pcid != 0)) {
+> +			kvm_inject_gp(vcpu, 0);
+> +			return 1;
+> +		}
+> +
+> +		if (kvm_get_active_pcid(vcpu) == operand.pcid) {
+> +			kvm_mmu_sync_roots(vcpu);
+> +			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> +		}
+> +
+> +		for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+> +			if (kvm_get_pcid(vcpu, vcpu->arch.mmu->prev_roots[i].pgd)
+> +			    == operand.pcid)
+> +				roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+> +
+> +		kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, roots_to_free);
+> +		/*
+> +		 * If neither the current cr3 nor any of the prev_roots use the
+> +		 * given PCID, then nothing needs to be done here because a
+> +		 * resync will happen anyway before switching to any other CR3.
+> +		 */
+> +
+> +		return kvm_skip_emulated_instruction(vcpu);
+> +
+> +	case INVPCID_TYPE_ALL_NON_GLOBAL:
+> +		/*
+> +		 * Currently, KVM doesn't mark global entries in the shadow
+> +		 * page tables, so a non-global flush just degenerates to a
+> +		 * global flush. If needed, we could optimize this later by
+> +		 * keeping track of global entries in shadow page tables.
+> +		 */
+> +
+> +		/* fall-through */
+> +	case INVPCID_TYPE_ALL_INCL_GLOBAL:
+> +		kvm_mmu_unload(vcpu);
+> +		return kvm_skip_emulated_instruction(vcpu);
+> +
+> +	default:
+> +		BUG(); /* We have already checked above that type <= 3 */
 
-You are right.
-I will rework this.
-What about differentiating this badly named "start_subchannel()" into:
+The check was left in VMX' handle_invpcid() so we either need to update
+the comment to something like "the caller was supposed to check that
+type <= 3" or move the check to kvm_handle_invpcid_types().
 
-ccw_setup_ccw(ccw, data, cnt, flgs);
-ccw_setup_orb(orb, ccw, flgs)
-ccw_start_request(schid, orb);
-
-would be much clearer I think.
-
-> 
->> +
->> +	report_prefix_push("start_subchannel");
->> +	/* Build the CCW chain with a single CCW */
->> +	ccw->code = code;
->> +	ccw->flags = flags; /* No flags need to be set */
->> +	ccw->count = count;
->> +	ccw->data_address = (int)(unsigned long)data;
->> +
->> +	cc = start_ccw1_chain(sid, ccw);
->> +	if (cc) {
->> +		report(0, "start_ccw_chain failed ret=%d", cc);
->> +		report_prefix_pop();
->> +		return cc;
->> +	}
->> +	report_prefix_pop();
->> +	return 0;
->> +}
->> +
->> +int sch_read_len(int sid)
->> +{
->> +	return unique_ccw.count;
->> +}
-> 
-> This function is very odd... it takes a subchannel id as a parameter,
-> which it ignores, and instead returns the count field of the static ccw
-> used when starting I/O. What is the purpose of this function? Grab the
-> data length for the last I/O operation that was started on the
-> subchannel? If yes, it might be better to store that information along
-> with the sid? If it is the length for the last I/O operation that the
-> code _thinks_ it started, it might be better to reuse that information
-> from further up in the function instead.
-
-agreed, I forgot to update this, totally confused.
-will rework this.
-
-
-> 
->> diff --git a/s390x/css.c b/s390x/css.c
->> index 6948d73..6b618a1 100644
->> --- a/s390x/css.c
->> +++ b/s390x/css.c
->> @@ -16,10 +16,18 @@
->>   #include <string.h>
->>   #include <interrupt.h>
->>   #include <asm/arch_def.h>
->> +#include <kernel-args.h>
->>   
->>   #include <css.h>
->>   
->> +#define DEFAULT_CU_TYPE		0x3832
-> 
-> Maybe append /* virtio-ccw */
-
-yes, thanks
-
-> 
->> +static unsigned long cu_type = DEFAULT_CU_TYPE;
->> +
->> +struct lowcore *lowcore = (void *)0x0;
->> +
->>   static int test_device_sid;
->> +static struct irb irb;
->> +static struct senseid senseid;
->>   
->>   static void test_enumerate(void)
->>   {
->> @@ -45,20 +53,150 @@ static void test_enable(void)
->>   	report(cc == 0, "Enable subchannel %08x", test_device_sid);
->>   }
->>   
->> +static void enable_io_isc(void)
->> +{
->> +	/* Let's enable all ISCs for I/O interrupt */
->> +	lctlg(6, 0x00000000ff000000);
->> +}
->> +
->> +static void irq_io(void)
->> +{
->> +	int ret = 0;
->> +	char *flags;
->> +	int sid;
->> +
->> +	report_prefix_push("Interrupt");
->> +	/* Lowlevel set the SID as interrupt parameter. */
->> +	if (lowcore->io_int_param != test_device_sid) {
->> +		report(0,
->> +		       "Bad io_int_param: %x expected %x",
->> +		       lowcore->io_int_param, test_device_sid);
->> +		goto pop;
->> +	}
->> +	report_prefix_pop();
->> +
->> +	report_prefix_push("tsch");
->> +	sid = lowcore->subsys_id_word;
->> +	ret = tsch(sid, &irb);
->> +	switch (ret) {
->> +	case 1:
->> +		dump_irb(&irb);
->> +		flags = dump_scsw_flags(irb.scsw.ctrl);
->> +		report(0,
->> +		       "I/O interrupt, CC 1 but tsch reporting sch %08x as not status pending: %s",
->> +		       sid, flags);
->> +		break;
->> +	case 2:
->> +		report(0, "tsch returns unexpected CC 2");
->> +		break;
->> +	case 3:
->> +		report(0, "tsch reporting sch %08x as not operational", sid);
->> +		break;
->> +	case 0:
->> +		/* Stay humble on success */
->> +		break;
->> +	}
->> +pop:
->> +	report_prefix_pop();
->> +	lowcore->io_old_psw.mask &= ~PSW_MASK_WAIT;
->> +}
->> +
->> +/*
->> + * test_sense
->> + * Pre-requisits:
->> + * - We need the test device as the first recognized
->> + *   device by the enumeration.
->> + */
->> +static void test_sense(void)
->> +{
->> +	int ret;
->> +
->> +	if (!test_device_sid) {
->> +		report_skip("No device");
->> +		return;
->> +	}
->> +
->> +	ret = css_enable(test_device_sid);
->> +	if (ret) {
->> +		report(0,
->> +		       "Could not enable the subchannel: %08x",
->> +		       test_device_sid);
->> +		return;
->> +	}
->> +
->> +	ret = register_io_int_func(irq_io);
->> +	if (ret) {
->> +		report(0, "Could not register IRQ handler");
->> +		goto unreg_cb;
->> +	}
->> +
->> +	lowcore->io_int_param = 0;
->> +
->> +	memset(&senseid, 0, sizeof(senseid));
->> +	ret = start_subchannel(test_device_sid, CCW_CMD_SENSE_ID,
->> +			       &senseid, sizeof(senseid), CCW_F_SLI);
->> +	if (ret) {
->> +		report(0, "ssch failed for SENSE ID on sch %08x with cc %d",
->> +		       test_device_sid, ret);
->> +		goto unreg_cb;
->> +	}
->> +
->> +	wait_for_interrupt(PSW_MASK_IO);
->> +
->> +	ret = sch_read_len(test_device_sid);
->> +	if (ret < CSS_SENSEID_COMMON_LEN) {
->> +		report(0,
->> +		       "ssch succeeded for SENSE ID but report a too short length: %d",
->> +		       ret);
->> +		goto unreg_cb;
->> +	}
-> 
-> Oh, so you want to check something even different: You know what you
-> put in the request, and you expect a certain minimal length back. But
-> that length is contained in the scsw, not in the started ccw, isn't it?
-
-yes it is.
-
-> 
->> +
->> +	if (senseid.reserved != 0xff) {
->> +		report(0,
->> +		       "ssch succeeded for SENSE ID but reports garbage: %x",
->> +		       senseid.reserved);
->> +		goto unreg_cb;
->> +	}
->> +
->> +	if (lowcore->io_int_param != test_device_sid)
->> +		goto unreg_cb;
-> 
-> You probably want to check this further up? But doesn't irq_io()
-> already check this?
-
-yes it does
-
-Thanks for the comments,
-
-I will rework this.
-
-- rework the start_subchannel()
-- rework the read_len() if we ever need this
-
-Also thinking to put the irq_io routine inside the library, it will be 
-reused by other tests.
-
-Regards,
-Pierre
-
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_handle_invpcid_types);
+> +
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 6eb62e97e59f..f706f6f7196d 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -365,5 +365,6 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+>  void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
+>  u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu);
+>  bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu);
+> -
+> +int kvm_handle_invpcid_types(struct kvm_vcpu *vcpu, gva_t gva,
+> +			     unsigned long type);
+>  #endif
+>
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Vitaly
+
