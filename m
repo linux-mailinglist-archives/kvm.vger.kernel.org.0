@@ -2,83 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1973B1FD286
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 18:47:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FB1D1FD2B6
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 18:50:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726896AbgFQQrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 12:47:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52504 "EHLO
+        id S1727835AbgFQQsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 12:48:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726341AbgFQQrP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 12:47:15 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E68C061755
-        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 09:47:14 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id s18so3574121ioe.2
-        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 09:47:14 -0700 (PDT)
+        with ESMTP id S1727824AbgFQQsu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 12:48:50 -0400
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE677C06174E
+        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 09:48:49 -0700 (PDT)
+Received: by mail-il1-x141.google.com with SMTP id c75so2828050ila.8
+        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 09:48:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kQoOO+VF4SBHpGOMcAz5jGxlKXeUrUgImS0zglw1/Uo=;
-        b=Gzyi9/fcMu3VCfePJqRa51D4oz9qb4xhzSSdu0IECQ6t5vsEXW8/sePtO98+w5zDin
-         HO3TsJLee5XV60S/wyy+zT0u/NogW8r1HinR6+wGJ30xpcf3ZAFTOfI3JjRa4BkL1IbJ
-         o1PmNqUdp0zHqA1+j7nid9rcmzFBPa4l/D44BFQ71M1zmUpsLssvJ7+6ADIOT2XVevOK
-         /qVEiBU1MFbXKlOoswkFkN6uJo8+vDMZc3g1a3gV3NgVRT/2WLaRBKFx5zgrkYvBI8ud
-         O61JtuaEeNlQR8ijLGtkOHnYDfPwLhLqZIGagzsC383xHJz/dTeuMditEiHJ7ztMgyop
-         K9Lw==
+        bh=C1m1sNsxt+pmFyO9zmeOR+ZlQ1V+PNbNheSbC5K30NE=;
+        b=JkZDV62Xlw71dz/JaoZYaNaeZVHyaykn5PqCcWpXFcgmP2FaVyOzYM9uQyskKGZsm8
+         NIB1EC5Vekm3hgbkejg1xlC+wxcZErRmV/voBrD+Rox0gMIxeNRnYohjCCuxpqwgfapC
+         4gtKysxvI2pb0Wa2kIAjzvcoi6YvsvepYEiJnXncnHVZs6d+bpUNvH67tLmllvDptL8U
+         zto623piIjWSwrrrPA/TLNNT2W8cOMFeCUeAn8ZRpxgE+lM8AjFlWBxxxnrtv8evDgid
+         jKiVRfng8bjGIhRloq7tdFTnaZia7MkC+cFAm89sXZRTZ/NqQ9GrhPeQEeDtNug9ipie
+         RDcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kQoOO+VF4SBHpGOMcAz5jGxlKXeUrUgImS0zglw1/Uo=;
-        b=HM2/4OxndZQH1EoAje2r6fVnGVDTgjhpKxN39ZipOuHGPPX8HOcL8osg9VM1vHEg3R
-         U7sRkomjPMY999Db//9Dy97pB/gKZkqV8yZACdb/aHRzh3TaF92E4yOXLL9sdolG03f/
-         tfsuoR4XMkUxQXParqj4BF/UdJ6MJG6TYxwUonC5hmRK0GKr20n7nP8H8ihqYNS7H5CX
-         Muv2GnOZKGtDrYwgiZV3f3QgRXIp0Y61Q9AmrVwruh1QeCSfn50V/6Fa3/yjWkR5Ikhi
-         7vVh/42/VXtBG9Owzw1vVY5PsGQTbTAeaKiDNyUKpo1nLlY1EBUaYTqAAdBvMlNbrdZg
-         RPOg==
-X-Gm-Message-State: AOAM532T/nEK0A+Db3v2pkD2p7cOMTGBXSnkgxNha6grxKWWTfJkBU3U
-        +qLP+FrbESNtqA1g7skN9VDhMPiX/W/SzFjL25gXPg==
-X-Google-Smtp-Source: ABdhPJyspdBz5XZmNNacGUiyqAhl2DY9cyi9vJ5/SPZuoEnOMWtFiNLuNhrkq1K5MVzA228YLegc1IL58aQE/ReQvAI=
-X-Received: by 2002:a05:6638:209:: with SMTP id e9mr180304jaq.48.1592412432984;
- Wed, 17 Jun 2020 09:47:12 -0700 (PDT)
+        bh=C1m1sNsxt+pmFyO9zmeOR+ZlQ1V+PNbNheSbC5K30NE=;
+        b=FIS5NsvuS9oQhil5quwnzPt9r8FL80CSkD8LbOEyeJzhevs23qD2Y3/HTGm7RD6K8c
+         sH89/+K+rb3/Ailw4y8Gu2kHyDk+5sES/UmUaM6BgvfHx5DVp3DhKoowa/ujYdG3F2Vy
+         +oi59El3aXMd75l1A4u/TYZJbtvBV4b3jpVFYhCIMtUmy43lJplXrUVxQMLoeSf43ZGO
+         vI2Sm1akv5bvVwqd+k/9h+DsJF32/VNXhJI1Pvyny/2h+cOh8SkEXChLgfgraihJV3uC
+         8IorATqWkWZkXajS0sEayF/2zv0Yf/yoQ8ZK2zXdOE2BIFx45ufXe8vdHevduhBjdQur
+         MF9w==
+X-Gm-Message-State: AOAM532gRhdvFsZiHg+4Ei8TUBS7OXKObon6PEGRB+xJGlHDJIrUqHFF
+        xAXPEGHHejnA6/wQb6ZUZ1dsSLmRbcSsX88tr0dtBA==
+X-Google-Smtp-Source: ABdhPJyVtkt5I4e5RgBLgLKo2zuqJOAam0dFZZsYuMOSxQd+NK4vd4yPrgYH/ZRsMJwSuDuAD7kVSfJd9U6pUtYCN/Q=
+X-Received: by 2002:a05:6e02:11a5:: with SMTP id 5mr9655996ilj.108.1592412529122;
+ Wed, 17 Jun 2020 09:48:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200616161427.375651-1-vkuznets@redhat.com> <CALMp9eSWXGQkOOzSrALfZDMj5JHSH=CsK1wKfdj2x2jtV4XJsw@mail.gmail.com>
- <87366vhscx.fsf@vitty.brq.redhat.com> <CALMp9eQ1qe4w5FojzgsUHKpD=zXqen_D6bBg4-vfHa03BdomGA@mail.gmail.com>
- <87wo45hqhy.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87wo45hqhy.fsf@vitty.brq.redhat.com>
+References: <20200617034123.25647-1-sean.j.christopherson@intel.com> <87zh92gic9.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87zh92gic9.fsf@vitty.brq.redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 17 Jun 2020 09:47:01 -0700
-Message-ID: <CALMp9eQCbKz5aeacvMvBX4kq5Oxy5Tap3dUT4SZ_dnO-zmrPVQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: SVM: drop MSR_IA32_PERF_CAPABILITIES from emulated MSRs
+Date:   Wed, 17 Jun 2020 09:48:38 -0700
+Message-ID: <CALMp9eR-O6ikxYaqi5iYQsVp9KaHDAm_7h4f8FPvssBi2-7Eyw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 17, 2020 at 4:38 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-
-> Side note: MSR_IA32_PERF_CAPABILITIES can be returned by both
-> KVM_GET_MSR_INDEX_LIST and KVM_GET_MSR_FEATURE_INDEX_LIST as we have it
-> both as an emulated MSR filtered by kvm_x86_ops.has_emulated_msr() and
-> a feature msr filtered by kvm_x86_ops.get_msr_feature(). But the later
-> is a whitelist so MSR_IA32_PERF_CAPABILITIES won't appear on AMD and the
-> promise "can be passed to the KVM_GET_MSRS" is kept.
-
-So, how is MSR_IA32_PERF_CAPABILITIES different from, say,
-MSR_K7_HWCR, which by its very name doesn't sound like it would be
-supported on Intel CPUs? Why not just emulate
-MSR_IA32_PERF_CAPABILITIES on AMD, just as we emulate MSR_K7_HWCR on
-Intel?
-
-My concern is that we don't seem to have a standard here. Each
-individual MSR is handled ad hoc, which adds unnecessary complexity.
+On Wed, Jun 17, 2020 at 2:19 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>
+> > Remove vcpu_vmx.host_pkru, which got left behind when PKRU support was
+> > moved to common x86 code.
+> >
+> > No functional change intended.
+> >
+> > Fixes: 37486135d3a7b ("KVM: x86: Fix pkru save/restore when guest CR4.PKE=0, move it to x86.c")
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.h | 2 --
+> >  1 file changed, 2 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index 8a83b5edc820..639798e4a6ca 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -288,8 +288,6 @@ struct vcpu_vmx {
+> >
+> >       u64 current_tsc_ratio;
+> >
+> > -     u32 host_pkru;
+> > -
+> >       unsigned long host_debugctlmsr;
+> >
+> >       /*
+>
+> (Is there a better [automated] way to figure out whether the particular
+> field is being used or not than just dropping it and trying to compile
+> the whole thing? Leaving #define-s, configs,... aside ...)
+>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
