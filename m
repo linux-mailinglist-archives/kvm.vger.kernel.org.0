@@ -2,195 +2,643 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D7AC1FD95D
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 01:12:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 797271FD997
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 01:23:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726883AbgFQXMA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 19:12:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30692 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726761AbgFQXMA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 19:12:00 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05HN1wbh084333;
-        Wed, 17 Jun 2020 19:12:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31qg6pg5uf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 19:11:59 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HN29gH085267;
-        Wed, 17 Jun 2020 19:11:59 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31qg6pg5tq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 19:11:59 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HNAD0M007291;
-        Wed, 17 Jun 2020 23:11:57 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 31qur601uu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 23:11:57 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05HNBsWN63111604
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Jun 2020 23:11:54 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4252EAE053;
-        Wed, 17 Jun 2020 23:11:54 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E689AAE04D;
-        Wed, 17 Jun 2020 23:11:53 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.74.214])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 17 Jun 2020 23:11:53 +0000 (GMT)
-Date:   Thu, 18 Jun 2020 01:11:09 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        id S1726835AbgFQXXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 19:23:21 -0400
+Received: from mga02.intel.com ([134.134.136.20]:19231 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726763AbgFQXXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 19:23:21 -0400
+IronPort-SDR: D0W1BIO6YqDcfIk8Gq3McLO8poZVXO5wSO6FscPRm8zNyAugFYEXvRit9q5chC5mjVgyJUTvNr
+ HJDIaxl5R+rg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2020 16:23:18 -0700
+IronPort-SDR: grxigde+lG8I2L+/nQ2JIHKCoNSU37hds0MKG5ZxMKlJxmdfi0FJFYdjcy5YULrFPQEohqT6FC
+ zelq7jfvNpzw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,523,1583222400"; 
+   d="scan'208";a="299466743"
+Received: from gza.jf.intel.com ([10.54.75.28])
+  by fmsmga004.fm.intel.com with ESMTP; 17 Jun 2020 16:23:17 -0700
+From:   John Andersen <john.s.andersen@intel.com>
+To:     corbet@lwn.net, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, shuah@kernel.org,
+        sean.j.christopherson@intel.com, rick.p.edgecombe@intel.com,
         kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v3 1/3] vfio-ccw: Indicate if a channel_program is
- started
-Message-ID: <20200618011109.294a972d.pasic@linux.ibm.com>
-In-Reply-To: <20200616195053.99253-2-farman@linux.ibm.com>
-References: <20200616195053.99253-1-farman@linux.ibm.com>
-        <20200616195053.99253-2-farman@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+Cc:     john.s.andersen@intel.com, kernel-hardening@lists.openwall.com
+Subject: [kvm-unit-tests RESEND PATCH] x86: Add control register pinning tests
+Date:   Wed, 17 Jun 2020 16:26:01 -0700
+Message-Id: <20200617232600.2119-1-john.s.andersen@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-17_12:2020-06-17,2020-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=2 clxscore=1015
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0
- cotscore=-2147483648 bulkscore=0 phishscore=0 impostorscore=0 adultscore=0
- malwarescore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006170168
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Jun 2020 21:50:51 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
+Paravirutalized control register pinning adds MSRs guests can use to
+discover which bits in CR0/4 they may pin, and MSRs for activating
+pinning for any of those bits.
 
-> The interrupt path checks the FSM state when processing a final interrupt
-> (an interrupt that is neither subchannel active, nor device active),
-> to determine whether to call cp_free() and release the associated memory.
-> But, this does not fully close the window where a START comes in after a
-> HALT/CLEAR. If the START runs while the CLEAR interrupt is being processed,
-> the channel program struct will be allocated while the interrupt would be
-> considering whether or not to free it. If the FSM state is CP_PROCESSING,
-> then everything is fine. But if the START is able to issue its SSCH and get
-> a cc0, then the in-flight interrupt would have been for an unrelated
-> operation (perhaps none, if the subchannel was previously idle).
-> 
-> The channel_program struct has an "initialized" flag that is set early
-> in the fsm_io_request() flow, to simplify the various cp_*() accessors.
-> Let's extend this idea to include a "started" flag that announces that the
-> channel program has successfully been issued to hardware. With this, the
-> interrupt path can determine whether the final interrupt should also
-> release the cp resources instead of relying on a transient FSM state.
+We check that the bits allowed to be pinned for CR4 are UMIP, SMEP, and
+SMAP. Only WP should be allowed to be pinned in CR0.
 
-AFAICT cp->started is potentially accessed by multiple threads, form
-which at least one writes. Am I right?
+We turn on all of the allowed bits, pin them, then attempt to disable
+them. We verify that the attempt to disable was unsuccessful, and that
+it generated a general protection fault.
 
-Actually AFAICT you want to use cp->sarted for synchronization between
-multiple treads (I/O requester(s), IRQ handler(s)). How does the
-synchronization work for bool started itself, i.e. don't we have a data
-race on 'started'?
+For nested, we check that for when pinning enabled in L1, changing
+HOST_CR0/4 will not result in the un-setting of pinned bits. The VMX CR
+pinning tests is it's own test so that the pinning doesn't potentially
+affect other tests within the same .flat testing VM.
 
-A side note: I know, I asked a similar question about 'initialized' back
-then.
+Signed-off-by: John Andersen <john.s.andersen@intel.com>
+---
+ x86/Makefile.common |   3 +-
+ lib/x86/desc.h      |   1 +
+ lib/x86/msr.h       |   8 ++
+ lib/x86/processor.h |   1 +
+ lib/x86/desc.c      |   8 ++
+ x86/cr_pin_high.c   | 208 ++++++++++++++++++++++++++++++++++++++++++++
+ x86/cr_pin_low.c    |  60 +++++++++++++
+ x86/pcid.c          |   8 --
+ x86/vmx_tests.c     | 139 +++++++++++++++++++++++++++++
+ x86/unittests.cfg   |  16 +++-
+ 10 files changed, 442 insertions(+), 10 deletions(-)
+ create mode 100644 x86/cr_pin_high.c
+ create mode 100644 x86/cr_pin_low.c
 
-Regards,
-Halil
-
-> 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->  drivers/s390/cio/vfio_ccw_cp.c  |  2 ++
->  drivers/s390/cio/vfio_ccw_cp.h  |  1 +
->  drivers/s390/cio/vfio_ccw_drv.c |  2 +-
->  drivers/s390/cio/vfio_ccw_fsm.c | 11 +++++++++++
->  4 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index b9febc581b1f..7748eeef434e 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -657,6 +657,7 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
->  
->  	if (!ret) {
->  		cp->initialized = true;
-> +		cp->started = false;
->  
->  		/* It is safe to force: if it was not set but idals used
->  		 * ccwchain_calc_length would have returned an error.
-> @@ -685,6 +686,7 @@ void cp_free(struct channel_program *cp)
->  		return;
->  
->  	cp->initialized = false;
-> +	cp->started = false;
->  	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
->  		for (i = 0; i < chain->ch_len; i++) {
->  			pfn_array_unpin_free(chain->ch_pa + i, cp->mdev);
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
-> index ba31240ce965..7ea14910aaaa 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.h
-> +++ b/drivers/s390/cio/vfio_ccw_cp.h
-> @@ -39,6 +39,7 @@ struct channel_program {
->  	union orb orb;
->  	struct device *mdev;
->  	bool initialized;
-> +	bool started;
->  	struct ccw1 *guest_cp;
->  };
->  
-> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-> index 8c625b530035..7e2a790dc9a1 100644
-> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> @@ -94,7 +94,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
->  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
->  	if (scsw_is_solicited(&irb->scsw)) {
->  		cp_update_scsw(&private->cp, &irb->scsw);
-> -		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
-> +		if (is_final && private->cp.started)
->  			cp_free(&private->cp);
->  	}
->  	mutex_lock(&private->io_mutex);
-> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-> index 23e61aa638e4..d806f88eba72 100644
-> --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> @@ -50,6 +50,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
->  		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
->  		ret = 0;
->  		private->state = VFIO_CCW_STATE_CP_PENDING;
-> +		private->cp.started = true;
->  		break;
->  	case 1:		/* Status pending */
->  	case 2:		/* Busy */
-> @@ -246,6 +247,16 @@ static void fsm_io_request(struct vfio_ccw_private *private,
->  	char *errstr = "request";
->  	struct subchannel_id schid = get_schid(private);
->  
-> +	if (private->cp.started) {
-> +		io_region->ret_code = -EBUSY;
-> +		VFIO_CCW_MSG_EVENT(2,
-> +				   "%pUl (%x.%x.%04x): busy\n",
-> +				   mdev_uuid(mdev), schid.cssid,
-> +				   schid.ssid, schid.sch_no);
-> +		errstr = "busy";
-> +		goto err_out;
-> +	}
-> +
->  	private->state = VFIO_CCW_STATE_CP_PROCESSING;
->  	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
->  
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index ab67ca0..bab7fe2 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -58,7 +58,8 @@ tests-common = $(TEST_DIR)/vmexit.flat $(TEST_DIR)/tsc.flat \
+                $(TEST_DIR)/init.flat $(TEST_DIR)/smap.flat \
+                $(TEST_DIR)/hyperv_synic.flat $(TEST_DIR)/hyperv_stimer.flat \
+                $(TEST_DIR)/hyperv_connections.flat \
+-               $(TEST_DIR)/umip.flat $(TEST_DIR)/tsx-ctrl.flat
++               $(TEST_DIR)/umip.flat $(TEST_DIR)/tsx-ctrl.flat \
++               $(TEST_DIR)/cr_pin_low.flat $(TEST_DIR)/cr_pin_high.flat
+ 
+ test_cases: $(tests-common) $(tests)
+ 
+diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+index 0fe5cbf..9fb921c 100644
+--- a/lib/x86/desc.h
++++ b/lib/x86/desc.h
+@@ -211,6 +211,7 @@ extern tss64_t tss;
+ #endif
+ 
+ unsigned exception_vector(void);
++int write_cr0_checking(unsigned long val);
+ int write_cr4_checking(unsigned long val);
+ unsigned exception_error_code(void);
+ bool exception_rflags_rf(void);
+diff --git a/lib/x86/msr.h b/lib/x86/msr.h
+index 6ef5502..13152a3 100644
+--- a/lib/x86/msr.h
++++ b/lib/x86/msr.h
+@@ -431,4 +431,12 @@
+ #define MSR_VM_IGNNE                    0xc0010115
+ #define MSR_VM_HSAVE_PA                 0xc0010117
+ 
++/* KVM MSRs */
++#define MSR_KVM_CR0_PIN_ALLOWED		0x4b564d08
++#define MSR_KVM_CR4_PIN_ALLOWED		0x4b564d09
++#define MSR_KVM_CR0_PINNED_LOW		0x4b564d0a
++#define MSR_KVM_CR0_PINNED_HIGH		0x4b564d0b
++#define MSR_KVM_CR4_PINNED_LOW		0x4b564d0c
++#define MSR_KVM_CR4_PINNED_HIGH		0x4b564d0d
++
+ #endif /* _ASM_X86_MSR_INDEX_H */
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 6e0811e..6769ca6 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -146,6 +146,7 @@ static inline u8 cpuid_maxphyaddr(void)
+ #define	X86_FEATURE_SMEP	        (CPUID(0x7, 0, EBX, 7))
+ #define	X86_FEATURE_INVPCID		(CPUID(0x7, 0, EBX, 10))
+ #define	X86_FEATURE_RTM			(CPUID(0x7, 0, EBX, 11))
++#define	X86_FEATURE_SMEP		(CPUID(0x7, 0, EBX, 7))
+ #define	X86_FEATURE_SMAP		(CPUID(0x7, 0, EBX, 20))
+ #define	X86_FEATURE_PCOMMIT		(CPUID(0x7, 0, EBX, 22))
+ #define	X86_FEATURE_CLFLUSHOPT		(CPUID(0x7, 0, EBX, 23))
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index 451f504..6cf4fac 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -251,6 +251,14 @@ unsigned exception_vector(void)
+     return vector;
+ }
+ 
++int write_cr0_checking(unsigned long val)
++{
++    asm volatile(ASM_TRY("1f")
++		 "mov %0, %%cr0\n\t"
++		 "1:" : : "r" (val));
++    return exception_vector();
++}
++
+ int write_cr4_checking(unsigned long val)
+ {
+     asm volatile(ASM_TRY("1f")
+diff --git a/x86/cr_pin_high.c b/x86/cr_pin_high.c
+new file mode 100644
+index 0000000..815bdb8
+--- /dev/null
++++ b/x86/cr_pin_high.c
+@@ -0,0 +1,208 @@
++/* CR pinning tests. Not including pinning CR0 WP low, that lives in
++ * cr_pin_low.c. This file tests that CR pinning prevents the guest VM from
++ * flipping bit pinned via MSRs in control registers. For CR4 we pin UMIP and
++ * SMEP bits high and SMAP low, and verify we can't toggle them after pinning
++ */
++
++#include "libcflat.h"
++#include "x86/desc.h"
++#include "x86/processor.h"
++#include "x86/vm.h"
++#include "x86/msr.h"
++
++#define USER_BASE	(1 << 24)
++
++#define CR0_PINNED X86_CR0_WP
++#define CR4_SOME_PINNED (X86_CR4_UMIP | X86_CR4_SMEP)
++#define CR4_ALL_PINNED (CR4_SOME_PINNED | X86_CR4_SMAP)
++
++static void test_cr0_pinning(void)
++{
++	unsigned long long r = 0;
++	ulong cr0 = read_cr0();
++	int vector = 0;
++
++	r = rdmsr(MSR_KVM_CR0_PIN_ALLOWED);
++	report(r == CR0_PINNED, "[CR0] MSR_KVM_CR0_PIN_ALLOWED: %llx", r);
++
++	cr0 |= CR0_PINNED;
++
++	vector = write_cr0_checking(cr0);
++	report(vector == 0, "[CR0] enable pinned bits. vector: %d", vector);
++
++	cr0 = read_cr0();
++	report((cr0 & CR0_PINNED) == CR0_PINNED,
++	       "[CR0] after enabling pinned bits: %lx", cr0);
++
++	wrmsr(MSR_KVM_CR0_PINNED_HIGH, CR0_PINNED);
++	r = rdmsr(MSR_KVM_CR0_PINNED_HIGH);
++	report(r == CR0_PINNED,
++	       "[CR0] enable pinning. MSR_KVM_CR0_PINNED_HIGH: %llx", r);
++
++	vector = write_cr0_checking(cr0);
++	report(vector == 0, "[CR0] write same value");
++
++	vector = write_cr0_checking(cr0 & ~CR0_PINNED);
++	report(vector == GP_VECTOR,
++	       "[CR0] disable pinned bits. vector: %d", vector);
++
++	cr0 = read_cr0();
++	report((cr0 & CR0_PINNED) == CR0_PINNED,
++	       "[CR0] pinned bits: %lx", cr0 & CR0_PINNED);
++}
++
++static void test_cr4_pin_allowed(void)
++{
++	unsigned long long r = 0;
++
++	r = rdmsr(MSR_KVM_CR4_PIN_ALLOWED);
++	report(r == CR4_ALL_PINNED, "[CR4] MSR_KVM_CR4_PIN_ALLOWED: %llx", r);
++}
++
++static void test_cr4_pinning_some_umip_smep_pinned(void)
++{
++	unsigned long long r = 0;
++	ulong cr4 = read_cr4();
++	int vector = 0;
++
++	cr4 |= CR4_SOME_PINNED;
++
++	vector = write_cr4_checking(cr4);
++	report(vector == 0,
++	       "[CR4 SOME] enable pinned bits. vector: %d", vector);
++
++	wrmsr(MSR_KVM_CR4_PINNED_HIGH, CR4_SOME_PINNED);
++	r = rdmsr(MSR_KVM_CR4_PINNED_HIGH);
++	report(r == CR4_SOME_PINNED,
++	       "[CR4 SOME] enable pinning. MSR_KVM_CR4_PINNED_HIGH: %llx", r);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_SOME_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 SOME] after enabling pinned bits: %lx", cr4);
++	report(1, "[CR4 SOME] cr4: 0x%08lx", cr4);
++
++	vector = write_cr4_checking(cr4);
++	report(vector == 0, "[CR4 SOME] write same value");
++
++	vector = write_cr4_checking(cr4 & ~CR4_SOME_PINNED);
++	report(vector == GP_VECTOR,
++	       "[CR4 SOME] disable pinned bits. vector: %d", vector);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_SOME_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 SOME] pinned bits: %lx", cr4 & CR4_SOME_PINNED);
++
++	vector = write_cr4_checking(cr4 & ~X86_CR4_SMEP);
++	report(vector == GP_VECTOR,
++	       "[CR4 SOME] disable single pinned bit. vector: %d", vector);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_SOME_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 SOME] pinned bits: %lx", cr4 & CR4_SOME_PINNED);
++}
++
++static void test_cr4_pinning_all_umip_smep_high_smap_low_pinned(void)
++{
++	unsigned long long r = 0;
++	ulong cr4 = read_cr4();
++	int vector = 0;
++
++	cr4 |= CR4_SOME_PINNED;
++	cr4 &= ~X86_CR4_SMAP;
++
++	report((cr4 & CR4_ALL_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 ALL] CHECK: %lx", cr4);
++
++	vector = write_cr4_checking(cr4);
++	report(vector == 0, "[CR4 ALL] write bits to cr4. vector: %d", vector);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_ALL_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 ALL] after enabling pinned bits: %lx", cr4);
++
++	wrmsr(MSR_KVM_CR4_PINNED_LOW, X86_CR4_SMAP);
++	r = rdmsr(MSR_KVM_CR4_PINNED_LOW);
++	report(r == X86_CR4_SMAP,
++	       "[CR4 ALL] enable pinning. MSR_KVM_CR4_PINNED_LOW: %llx", r);
++
++	vector = write_cr4_checking(cr4);
++	report(vector == 0, "[CR4 ALL] write same value");
++
++	cr4 &= ~CR4_SOME_PINNED;
++	cr4 |= X86_CR4_SMAP;
++
++	vector = write_cr4_checking(cr4);
++	report(vector == GP_VECTOR,
++	       "[CR4 ALL] disable pinned bits. vector: %d", vector);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_ALL_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 ALL] pinned bits: %lx", cr4 & CR4_ALL_PINNED);
++
++	vector = write_cr4_checking(cr4 | X86_CR4_SMAP);
++	report(vector == GP_VECTOR,
++	       "[CR4 ALL] enable pinned low bit. vector: %d", vector);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_ALL_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 ALL] pinned bits: %lx", cr4 & CR4_ALL_PINNED);
++
++	vector = write_cr4_checking(cr4 & ~X86_CR4_SMEP);
++	report(vector == GP_VECTOR,
++	       "[CR4 ALL] disable pinned high bit. vector: %d", vector);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_ALL_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 ALL] pinned bits: %lx", cr4 & CR4_ALL_PINNED);
++
++	vector = write_cr4_checking((cr4 & ~X86_CR4_SMEP) | X86_CR4_SMAP);
++	report(vector == GP_VECTOR,
++	       "[CR4 ALL] disable pinned high bit enable pinned low. vector: %d",
++	       vector);
++
++	cr4 = read_cr4();
++	report((cr4 & CR4_ALL_PINNED) == CR4_SOME_PINNED,
++	       "[CR4 ALL] pinned bits: %lx", cr4 & CR4_ALL_PINNED);
++}
++
++static void test_cr4_pinning(void)
++{
++	test_cr4_pin_allowed();
++
++	if (!this_cpu_has(X86_FEATURE_UMIP)) {
++		printf("UMIP not available\n");
++		return;
++	}
++
++	if (!this_cpu_has(X86_FEATURE_SMEP)) {
++		printf("SMEP not available\n");
++		return;
++	}
++
++	test_cr4_pinning_some_umip_smep_pinned();
++
++	if (!this_cpu_has(X86_FEATURE_SMAP)) {
++		printf("SMAP not enabled\n");
++		return;
++	}
++
++	test_cr4_pinning_all_umip_smep_high_smap_low_pinned();
++}
++
++int main(int ac, char **av)
++{
++	unsigned long i;
++
++	setup_idt();
++	setup_vm();
++
++	// Map first 16MB as supervisor pages
++	for (i = 0; i < USER_BASE; i += PAGE_SIZE)
++		*get_pte(phys_to_virt(read_cr3()), phys_to_virt(i)) &= ~PT_USER_MASK;
++
++	test_cr0_pinning();
++	test_cr4_pinning();
++
++	return report_summary();
++}
++
+diff --git a/x86/cr_pin_low.c b/x86/cr_pin_low.c
+new file mode 100644
+index 0000000..6751241
+--- /dev/null
++++ b/x86/cr_pin_low.c
+@@ -0,0 +1,60 @@
++/* CR pinning tests to check that WP bit in CR0 be pinned low correctly. This
++ * has to be in a separate file than the CR0 high pinning because once pinned we
++ * can't unpin from the guest. So we can't switch from high pinning to low
++ * pinning to test within the same file / VM
++ */
++
++#include "libcflat.h"
++#include "x86/desc.h"
++#include "x86/processor.h"
++#include "x86/vm.h"
++#include "x86/msr.h"
++
++#define USER_BASE	(1 << 24)
++
++#define CR0_PINNED X86_CR0_WP
++
++static void test_cr0_pinning_low(void)
++{
++	unsigned long long r = 0;
++	ulong cr0 = read_cr0();
++	int vector = 0;
++
++	r = rdmsr(MSR_KVM_CR0_PIN_ALLOWED);
++	report(r == CR0_PINNED, "[CR0] MSR_KVM_CR0_PIN_ALLOWED: %llx", r);
++
++	cr0 &= ~CR0_PINNED;
++
++	vector = write_cr0_checking(cr0);
++	report(vector == 0, "[CR0] enable pinned bits. vector: %d", vector);
++
++	cr0 = read_cr0();
++	report((cr0 & CR0_PINNED) != CR0_PINNED,
++	       "[CR0] after enabling pinned bits: %lx", cr0);
++
++	wrmsr(MSR_KVM_CR0_PINNED_LOW, CR0_PINNED);
++	r = rdmsr(MSR_KVM_CR0_PINNED_LOW);
++	report(r == CR0_PINNED,
++	       "[CR0] enable pinning. MSR_KVM_CR0_PINNED_LOW: %llx", r);
++
++	vector = write_cr0_checking(cr0);
++	report(vector == 0, "[CR0] write same value");
++
++	vector = write_cr0_checking(cr0 | CR0_PINNED);
++	report(vector == GP_VECTOR,
++	       "[CR0] disable pinned bits. vector: %d", vector);
++
++	cr0 = read_cr0();
++	report((cr0 & CR0_PINNED) != CR0_PINNED,
++	       "[CR0] pinned bits: %lx", cr0 & CR0_PINNED);
++}
++
++int main(int ac, char **av)
++{
++	setup_idt();
++
++	test_cr0_pinning_low();
++
++	return report_summary();
++}
++
+diff --git a/x86/pcid.c b/x86/pcid.c
+index a8dc8cb..5688699 100644
+--- a/x86/pcid.c
++++ b/x86/pcid.c
+@@ -10,14 +10,6 @@ struct invpcid_desc {
+     unsigned long addr : 64;
+ };
+ 
+-static int write_cr0_checking(unsigned long val)
+-{
+-    asm volatile(ASM_TRY("1f")
+-                 "mov %0, %%cr0\n\t"
+-                 "1:": : "r" (val));
+-    return exception_vector();
+-}
+-
+ static int invpcid_checking(unsigned long type, void *desc)
+ {
+     asm volatile (ASM_TRY("1f")
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 68f93d3..ed3b5be 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -7929,6 +7929,143 @@ static void vmentry_movss_shadow_test(void)
+ 	vmcs_write(GUEST_RFLAGS, X86_EFLAGS_FIXED);
+ }
+ 
++#define USER_BASE	(1 << 24)
++
++#define CR0_PINNED X86_CR0_WP
++#define CR4_SOME_PINNED (X86_CR4_UMIP | X86_CR4_SMEP)
++#define CR4_ALL_PINNED (CR4_SOME_PINNED | X86_CR4_SMAP)
++
++static void vmx_cr_pin_test_guest(void)
++{
++	unsigned long i, cr0, cr4;
++
++	/* Step 1. Skip feature detection to skip handling VMX_CPUID */
++	/* nop */
++
++	/* Step 2. Setup supervisor pages so that we can enable SMAP */
++	setup_vm();
++	for (i = 0; i < USER_BASE; i += PAGE_SIZE) {
++		*get_pte(phys_to_virt(read_cr3()), phys_to_virt(i)) &= ~PT_USER_MASK;
++	}
++
++	/* Step 3. Enable CR0/4 bits */
++	cr0 = read_cr0() | X86_CR0_WP;
++	TEST_ASSERT(!write_cr0_checking(cr0));
++	cr0 = read_cr0();
++	report(cr0 & X86_CR0_WP, "L2 cr0 has WP bit: cr0(%lx)", cr0);
++
++	cr4 = read_cr4() | CR4_ALL_PINNED;
++	TEST_ASSERT(!write_cr4_checking(cr4));
++	cr4 = read_cr4();
++	report((cr4 & CR4_ALL_PINNED) == CR4_ALL_PINNED,
++		"L2 cr4 has correct bits: cr4(%lx)", cr4);
++
++	/* Step 3. Call to host */
++	vmx_set_test_stage(1);
++	vmcall();
++
++	/* Step 4. Disable bits that the host has pinned to make sure host
++	 * pinning doesn't effect us.
++	 */
++	cr0 = read_cr0() & ~X86_CR0_WP;
++	TEST_ASSERT(!write_cr0_checking(cr0));
++	cr0 = read_cr0();
++	report(!(cr0 & X86_CR0_WP),
++		"L2 cr0 should not have host pinned WP bit: cr0(%lx)", cr0);
++
++	cr4 = read_cr4() & ~CR4_ALL_PINNED;
++	TEST_ASSERT(!write_cr4_checking(cr4));
++	cr4 = read_cr4();
++	report(!(cr4 & CR4_ALL_PINNED),
++		"L2 cr4 should not have host pinned bits: cr4(%lx)", cr4);
++
++	/* Step 5. Call to host */
++	vmx_set_test_stage(2);
++	vmcall();
++
++	/* Step 6. Ensure CR registers still do not contain L1 pinned values */
++	report(!(cr0 & X86_CR0_WP),
++		"L2 cr0 should still not have host pinned WP bit: cr0(%lx)", cr0);
++	report(!(cr4 & CR4_ALL_PINNED),
++		"L2 cr4 should still not have host pinned bits: cr4(%lx)", cr4);
++
++	vmx_set_test_stage(3);
++}
++
++static void vmx_cr_pin_test(void)
++{
++	unsigned long long r = 0;
++	unsigned long i, cr0, cr4;
++
++	/* Step 1. Ensure we have required CR4 bits */
++	if (!this_cpu_has(X86_FEATURE_UMIP)) {
++		report_skip("UMIP not detected");
++		return;
++	}
++	if (!this_cpu_has(X86_FEATURE_SMEP)) {
++		report_skip("SMEP not detected");
++		return;
++	}
++	if (!this_cpu_has(X86_FEATURE_SMAP)) {
++		report_skip("SMAP not detected");
++		return;
++	}
++	/* Step 2. Setup supervisor pages so that we can enable SMAP */
++	setup_vm();
++	for (i = 0; i < USER_BASE; i += PAGE_SIZE) {
++		*get_pte(phys_to_virt(read_cr3()), phys_to_virt(i)) &= ~PT_USER_MASK;
++	}
++
++	/* Step 3. Enable CR0/4 bits */
++	cr0 = read_cr0() | X86_CR0_WP;
++	TEST_ASSERT(!write_cr0_checking(cr0));
++	cr0 = read_cr0();
++	report(cr0 & X86_CR0_WP, "L1 cr0 has WP bit: cr0(%lx)", cr0);
++
++	cr4 = read_cr4() | CR4_ALL_PINNED;
++	TEST_ASSERT(!write_cr4_checking(cr4));
++	cr4 = read_cr4();
++	report((cr4 & CR4_ALL_PINNED) == CR4_ALL_PINNED,
++		"L1 cr4 has correct bits: cr4(%lx)", cr4);
++
++	/* Step 3. Pin CR0/4 bits */
++	wrmsr(MSR_KVM_CR0_PINNED_HIGH, CR0_PINNED);
++	r = rdmsr(MSR_KVM_CR0_PINNED_HIGH);
++	report(r == X86_CR0_WP, "MSR_KVM_CR0_PINNED_HIGH: %llx", r);
++
++	wrmsr(MSR_KVM_CR4_PINNED_HIGH, CR4_ALL_PINNED);
++	r = rdmsr(MSR_KVM_CR4_PINNED_HIGH);
++	report(r == CR4_ALL_PINNED, "MSR_KVM_CR4_PINNED_HIGH: %llx", r);
++
++	/* Step 4. Enter guest for first time */
++	test_set_guest(vmx_cr_pin_test_guest);
++	enter_guest();
++	skip_exit_vmcall();
++	TEST_ASSERT_EQ(vmx_get_test_stage(), 1);
++
++	/* Step 5. Modify VMCS so that Host-state contains unpinned cr values */
++	vmcs_write(HOST_CR0, read_cr0() & ~X86_CR0_WP);
++	vmcs_write(HOST_CR4, read_cr4() & ~CR4_ALL_PINNED);
++
++	/* Step 6. Enter guest second time */
++	enter_guest();
++	skip_exit_vmcall();
++	TEST_ASSERT_EQ(vmx_get_test_stage(), 2);
++
++	/* Step 7. Ensure CR registers still contain pinned values */
++	cr0 = read_cr0();
++	cr4 = read_cr4();
++	report(cr0 & X86_CR0_WP,
++		"L1 cr0 WP bit still pinned: cr0(%lx)", cr0);
++	report((cr4 & CR4_ALL_PINNED) == CR4_ALL_PINNED,
++		"L1 cr4 bits still pinned: cr4(%lx)", cr4);
++
++	/* Step 8. Run L2 to completion */
++	enter_guest();
++	skip_exit_vmcall();
++	TEST_ASSERT_EQ(vmx_get_test_stage(), 3);
++}
++
+ static void vmx_cr_load_test(void)
+ {
+ 	unsigned long cr3, cr4, orig_cr3, orig_cr4;
+@@ -10050,6 +10187,8 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(vmx_init_signal_test),
+ 	/* VMCS Shadowing tests */
+ 	TEST(vmx_vmcs_shadow_test),
++	/* CR pinning tests */
++	TEST(vmx_cr_pin_test),
+ 	/* Regression tests */
+ 	TEST(vmx_cr_load_test),
+ 	TEST(vmx_nm_test),
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 504e04e..708bca4 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -245,9 +245,17 @@ arch = x86_64
+ file = umip.flat
+ extra_params = -cpu qemu64,+umip
+ 
++[cr_pin_low]
++file = cr_pin_low.flat
++extra_params = -cpu qemu64,+umip,+smap,+smep
++
++[cr_pin_high]
++file = cr_pin_high.flat
++extra_params = -cpu qemu64,+umip,+smap,+smep
++
+ [vmx]
+ file = vmx.flat
+-extra_params = -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
++extra_params = -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test -vmx_cr_pin_test"
+ arch = x86_64
+ groups = vmx
+ 
+@@ -306,6 +314,12 @@ extra_params = -cpu host,+vmx -append vmx_vmcs_shadow_test
+ arch = x86_64
+ groups = vmx
+ 
++[vmx_cr_pin_test]
++file = vmx.flat
++extra_params = -cpu host,+vmx -append vmx_cr_pin_test
++arch = x86_64
++groups = vmx
++
+ [debug]
+ file = debug.flat
+ arch = x86_64
+-- 
+2.21.0
 
