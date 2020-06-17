@@ -2,336 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D27151FD50F
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 21:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3A771FD56A
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 21:24:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727839AbgFQTFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 15:05:15 -0400
-Received: from mga04.intel.com ([192.55.52.120]:48978 "EHLO mga04.intel.com"
+        id S1726840AbgFQTYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 15:24:54 -0400
+Received: from smtp2.axis.com ([195.60.68.18]:13084 "EHLO smtp2.axis.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726991AbgFQTFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 15:05:12 -0400
-IronPort-SDR: NooAGNyQf0ZPhrz42xP9jstf9Gded30rYMc3C7Pr7lebLop2SdcCjeEBA8MAl2wsQFi0pagCu2
- tJjbBA3sdeEA==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2020 12:05:11 -0700
-IronPort-SDR: 16liMDp6fjMJskgBNoaSNQ/ghF+MJxz6rqa/Oic4ytifJV5tNpXBCV6ChubOykl3ZRrsk1hjFv
- 8O6IvGieAe+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,523,1583222400"; 
-   d="scan'208";a="273609675"
-Received: from gza.jf.intel.com ([10.54.75.28])
-  by orsmga003.jf.intel.com with ESMTP; 17 Jun 2020 12:05:11 -0700
-From:   John Andersen <john.s.andersen@intel.com>
-To:     corbet@lwn.net, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-        shuah@kernel.org, sean.j.christopherson@intel.com,
-        liran.alon@oracle.com, drjones@redhat.com,
-        rick.p.edgecombe@intel.com, kristen@linux.intel.com
-Cc:     vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, mchehab+huawei@kernel.org,
-        gregkh@linuxfoundation.org, paulmck@kernel.org,
-        pawan.kumar.gupta@linux.intel.com, jgross@suse.com,
-        mike.kravetz@oracle.com, oneukum@suse.com, luto@kernel.org,
-        peterz@infradead.org, fenghua.yu@intel.com,
-        reinette.chatre@intel.com, vineela.tummalapalli@intel.com,
-        dave.hansen@linux.intel.com, john.s.andersen@intel.com,
-        arjan@linux.intel.com, caoj.fnst@cn.fujitsu.com, bhe@redhat.com,
-        nivedita@alum.mit.edu, keescook@chromium.org,
-        dan.j.williams@intel.com, eric.auger@redhat.com,
-        aaronlewis@google.com, peterx@redhat.com,
-        makarandsonare@google.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        kernel-hardening@lists.openwall.com
-Subject: [PATCH 4/4] X86: Use KVM CR pin MSRs
-Date:   Wed, 17 Jun 2020 12:07:57 -0700
-Message-Id: <20200617190757.27081-5-john.s.andersen@intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200617190757.27081-1-john.s.andersen@intel.com>
-References: <20200617190757.27081-1-john.s.andersen@intel.com>
+        id S1726496AbgFQTYy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 15:24:54 -0400
+X-Greylist: delayed 429 seconds by postgrey-1.27 at vger.kernel.org; Wed, 17 Jun 2020 15:24:53 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=axis.com; l=849; q=dns/txt; s=axis-central1;
+  t=1592421894; x=1623957894;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CoUUOiZsKnhfZqKAoIVjBNqmCj7KbvkrBiiGm12QUvk=;
+  b=fLTT4ce6FvCdr7SPkTWjXKMxp0NGkXFnSbrFCtgWGAhxs06ODfRgqGhM
+   o77Mdo9PBopqbKgUTRcwFDe+7JBlSkIdd+sJgH6Lyrh1tmnw933HG6MP8
+   R3YEpJ6iBXHJYOvRttsyusgjLaF46pQ2NJV2WvDF+hLcZwPYyLx/3zwdI
+   EGEd4iTo6KThZLpxoebuFvqWWdt8G4sUOyggpcJCnQHbnLyfQ8q1hJBl8
+   rm11QmDc4f/J0p2YJQyiu+PDDfxpl3n6R11o/sCtQ1scBqIFDRJxE8kvO
+   BuHohtbGzOqqQTai7AT/dvgWTph83ArLizGjsAfQtzAgAjaLqctIzIjHJ
+   A==;
+IronPort-SDR: 50gvyFBNjMKUk/jDHf+ZW0rKM/PX94/QfJ2H/hQVUTkuOhRG7tSy1HEPaCQN8cGV3u0BQQf5yz
+ fnNsWYdK4cje1vxXsJJWOlkqkzQrolqA0EkbYD1VqeDnLBQMoq6zy3abPfLaGze7gIk8zsJvEd
+ +GXNNz64YbIU8/cF66x62jk94fPDL6KP3ZO37r28eTVj6WNHkUzZh9cZEi0luEdkaoGLcvGtjM
+ Cm3xOoFqdtXohCBzU8Gf/EwwXLmFGW1uVf+GdxOPJ0Xobup1pE7tNGtw091SdnZc3WmPOUXa1K
+ GkA=
+X-IronPort-AV: E=Sophos;i="5.73,523,1583190000"; 
+   d="scan'208";a="9645544"
+Date:   Wed, 17 Jun 2020 21:17:42 +0200
+From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+CC:     <kvm@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <sound-open-firmware@alsa-project.org>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 5/5] vhost: add an RPMsg API
+Message-ID: <20200617191741.whnp7iteb36cjnia@axis.com>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <20200527180541.5570-6-guennadi.liakhovetski@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200527180541.5570-6-guennadi.liakhovetski@linux.intel.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Strengthen existing control register pinning when running
-paravirtualized under KVM. Check which bits KVM supports pinning for
-each control register and only pin supported bits which are already
-pinned via the existing native protection. Write to KVM CR0/4 pinned
-MSRs to enable pinning.
+On Wed, May 27, 2020 at 08:05:41PM +0200, Guennadi Liakhovetski wrote:
+> Linux supports running the RPMsg protocol over the VirtIO transport
+> protocol, but currently there is only support for VirtIO clients and
+> no support for a VirtIO server. This patch adds a vhost-based RPMsg
+> server implementation.
 
-Initiate KVM assisted pinning directly following the setup of native
-pinning on boot CPU. For non-boot CPUs initiate paravirtualized pinning
-on CPU identification.
+This looks really useful, but why is it implemented as an API and not as
+a real vhost driver which implements an rpmsg bus?  If you implement it
+as a vhost driver which implements rpmsg_device_ops and
+rpmsg_endpoint_ops, then wouldn't you be able to implement your
+vhost-sof driver using the normal rpmsg APIs?
 
-Identification of non-boot CPUs takes place after the boot CPU has setup
-native CR pinning. Therefore, non-boot CPUs access pinned bits setup by
-the boot CPU and request that those be pinned. All CPUs request
-paravirtualized pinning of the same bits which are already pinned
-natively.
-
-Guests using the kexec system call currently do not support
-paravirtualized control register pinning. This is due to early boot
-code writing known good values to control registers, these values do
-not contain the protected bits. This is due to CPU feature
-identification being done at a later time, when the kernel properly
-checks if it can enable protections. As such, the pv_cr_pin command line
-option has been added which instructs the kernel to disable kexec in
-favor of enabling paravirtualized control register pinning. crashkernel
-is also disabled when the pv_cr_pin parameter is specified due to its
-reliance on kexec.
-
-When we fix kexec, we will still need a way for a kernel with support to
-know if the kernel it is attempting to load has support. If a kernel
-with this enabled attempts to kexec a kernel where this is not
-supported, it would trigger a fault almost immediately.
-
-Liran suggested adding a section to the built image acting as a flag to
-signify support for being kexec'd by a kernel with pinning enabled.
-Should that approach be implemented, it is likely that the command line
-flag (pv_cr_pin) would still be desired for some deprecation period. We
-wouldn't want the default behavior to change from being able to kexec
-older kernels to not being able to, as this might break some users
-workflows.
-
-Signed-off-by: John Andersen <john.s.andersen@intel.com>
----
- .../admin-guide/kernel-parameters.txt         | 11 ++++++
- arch/x86/Kconfig                              | 10 +++++
- arch/x86/include/asm/kvm_para.h               | 28 +++++++++++++
- arch/x86/kernel/cpu/common.c                  |  5 +++
- arch/x86/kernel/kvm.c                         | 39 +++++++++++++++++++
- arch/x86/kernel/setup.c                       |  8 ++++
- 6 files changed, 101 insertions(+)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 89386f6f3ab6..54fb2b5ab8fc 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -3926,6 +3926,17 @@
- 			[KNL] Number of legacy pty's. Overwrites compiled-in
- 			default number.
- 
-+	pv_cr_pin	[SECURITY,X86]
-+			Enable paravirtualized control register pinning. When
-+			running paravirutalized under KVM, request that KVM not
-+			allow the guest to disable kernel protection features
-+			set in CPU control registers. Specifying this option
-+			will disable kexec (and crashkernel). If kexec support
-+			has not been compiled into the kernel and host KVM
-+			supports paravirtualized control register pinning, it
-+			will be active by default without the need to specify
-+			this parameter.
-+
- 	quiet		[KNL] Disable most log messages
- 
- 	r128=		[HW,DRM]
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 67f6a40b5e93..bc0b27483001 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -800,6 +800,7 @@ config KVM_GUEST
- 	bool "KVM Guest support (including kvmclock)"
- 	depends on PARAVIRT
- 	select PARAVIRT_CLOCK
-+	select PARAVIRT_CR_PIN
- 	select ARCH_CPUIDLE_HALTPOLL
- 	default y
- 	---help---
-@@ -835,6 +836,15 @@ config PARAVIRT_TIME_ACCOUNTING
- config PARAVIRT_CLOCK
- 	bool
- 
-+config PARAVIRT_CR_PIN
-+       bool "Paravirtual bit pinning for CR0 and CR4"
-+       depends on KVM_GUEST
-+       help
-+         Select this option to have the virtualised guest request that the
-+         hypervisor disallow it from disabling protections set in control
-+         registers. The hypervisor will prevent exploits from disabling
-+         features such as SMEP, SMAP, UMIP, and WP.
-+
- config JAILHOUSE_GUEST
- 	bool "Jailhouse non-root cell support"
- 	depends on X86_64 && PCI
-diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-index 57fd1966c4ea..f021531e98dc 100644
---- a/arch/x86/include/asm/kvm_para.h
-+++ b/arch/x86/include/asm/kvm_para.h
-@@ -112,6 +112,23 @@ static inline void kvm_spinlock_init(void)
- }
- #endif /* CONFIG_PARAVIRT_SPINLOCKS */
- 
-+#ifdef CONFIG_PARAVIRT_CR_PIN
-+void __init kvm_paravirt_cr_pinning_init(void);
-+void kvm_setup_paravirt_cr_pinning(unsigned long cr0_pinned_bits,
-+				   unsigned long cr4_pinned_bits);
-+#else
-+static inline void kvm_paravirt_cr_pinning_init(void)
-+{
-+	return;
-+}
-+
-+static inline void kvm_setup_paravirt_cr_pinning(unsigned long cr0_pinned_bits,
-+						 unsigned long cr4_pinned_bits)
-+{
-+	return;
-+}
-+#endif /* CONFIG_PARAVIRT_CR_PIN */
-+
- #else /* CONFIG_KVM_GUEST */
- #define kvm_async_pf_task_wait_schedule(T) do {} while(0)
- #define kvm_async_pf_task_wake(T) do {} while(0)
-@@ -145,6 +162,17 @@ static inline bool kvm_handle_async_pf(struct pt_regs *regs, u32 token)
- {
- 	return false;
- }
-+
-+static inline void kvm_paravirt_cr_pinning_init(void)
-+{
-+	return;
-+}
-+
-+static inline void kvm_setup_paravirt_cr_pinning(unsigned long cr0_pinned_bits,
-+						 unsigned long cr4_pinned_bits)
-+{
-+	return;
-+}
- #endif
- 
- #endif /* _ASM_X86_KVM_PARA_H */
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 921e67086a00..ee17223b1fa8 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -21,6 +21,7 @@
- #include <linux/smp.h>
- #include <linux/io.h>
- #include <linux/syscore_ops.h>
-+#include <linux/kvm_para.h>
- 
- #include <asm/stackprotector.h>
- #include <asm/perf_event.h>
-@@ -416,6 +417,8 @@ static void __init setup_cr_pinning(void)
- 	mask = (X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP);
- 	cr4_pinned_bits = this_cpu_read(cpu_tlbstate.cr4) & mask;
- 	static_key_enable(&cr_pinning.key);
-+
-+	kvm_setup_paravirt_cr_pinning(X86_CR0_WP, cr4_pinned_bits);
- }
- 
- /*
-@@ -1551,6 +1554,8 @@ void identify_secondary_cpu(struct cpuinfo_x86 *c)
- 	mtrr_ap_init();
- 	validate_apic_and_package_id(c);
- 	x86_spec_ctrl_setup_ap();
-+
-+	kvm_setup_paravirt_cr_pinning(X86_CR0_WP, cr4_pinned_bits);
- }
- 
- static __init int setup_noclflush(char *arg)
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 7e6403a8d861..def913b86a99 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -23,6 +23,8 @@
- #include <linux/kprobes.h>
- #include <linux/nmi.h>
- #include <linux/swait.h>
-+#include <linux/init.h>
-+#include <linux/kexec.h>
- #include <asm/timer.h>
- #include <asm/cpu.h>
- #include <asm/traps.h>
-@@ -33,6 +35,7 @@
- #include <asm/hypervisor.h>
- #include <asm/tlb.h>
- #include <asm/cpuidle_haltpoll.h>
-+#include <asm/cmdline.h>
- 
- DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
- 
-@@ -723,6 +726,7 @@ static void __init kvm_apic_init(void)
- static void __init kvm_init_platform(void)
- {
- 	kvmclock_init();
-+	kvm_paravirt_cr_pinning_init();
- 	x86_platform.apic_post_init = kvm_apic_init;
- }
- 
-@@ -877,6 +881,41 @@ void __init kvm_spinlock_init(void)
- 
- #endif	/* CONFIG_PARAVIRT_SPINLOCKS */
- 
-+#ifdef CONFIG_PARAVIRT_CR_PIN
-+static int kvm_paravirt_cr_pinning_enabled __ro_after_init;
-+
-+void __init kvm_paravirt_cr_pinning_init(void)
-+{
-+#ifdef CONFIG_KEXEC_CORE
-+	if (!cmdline_find_option_bool(boot_command_line, "pv_cr_pin"))
-+		return;
-+
-+	/* Paravirtualized CR pinning is currently incompatible with kexec */
-+	kexec_load_disabled = 1;
-+#endif
-+
-+	kvm_paravirt_cr_pinning_enabled = 1;
-+}
-+
-+void kvm_setup_paravirt_cr_pinning(unsigned long cr0_pinned_bits,
-+				   unsigned long cr4_pinned_bits)
-+{
-+	u64 mask;
-+
-+	if (!kvm_paravirt_cr_pinning_enabled)
-+		return;
-+
-+	if (!kvm_para_has_feature(KVM_FEATURE_CR_PIN))
-+		return;
-+
-+	rdmsrl(MSR_KVM_CR0_PIN_ALLOWED, mask);
-+	wrmsrl(MSR_KVM_CR0_PINNED_HIGH, cr0_pinned_bits & mask);
-+
-+	rdmsrl(MSR_KVM_CR4_PIN_ALLOWED, mask);
-+	wrmsrl(MSR_KVM_CR4_PINNED_HIGH, cr4_pinned_bits & mask);
-+}
-+#endif
-+
- #ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
- 
- static void kvm_disable_host_haltpoll(void *i)
-diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
-index d9c678b37a9b..ed3bcc85d40d 100644
---- a/arch/x86/kernel/setup.c
-+++ b/arch/x86/kernel/setup.c
-@@ -27,6 +27,9 @@
- #include <asm/apic.h>
- #include <asm/bios_ebda.h>
- #include <asm/bugs.h>
-+#include <asm/kasan.h>
-+#include <asm/cmdline.h>
-+
- #include <asm/cpu.h>
- #include <asm/efi.h>
- #include <asm/gart.h>
-@@ -502,6 +505,11 @@ static void __init reserve_crashkernel(void)
- 		return;
- 	}
- 
-+	if (cmdline_find_option_bool(boot_command_line, "pv_cr_pin")) {
-+		pr_info("Ignoring crashkernel since pv_cr_pin present in cmdline\n");
-+		return;
-+	}
-+
- 	/* 0 means: find the address automatically */
- 	if (!crash_base) {
- 		/*
--- 
-2.21.0
-
+I tried quickly hooking up this code to such a vhost driver and I was
+able to communicate between host and guest systems with both
+rpmsg-client-sample and rpmsg-char which almost no modifications to
+those drivers.
