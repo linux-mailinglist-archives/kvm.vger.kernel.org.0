@@ -2,169 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAA951FCC37
-	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 13:25:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A51281FCC8A
+	for <lists+kvm@lfdr.de>; Wed, 17 Jun 2020 13:40:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbgFQLZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 07:25:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45728 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725536AbgFQLZx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 07:25:53 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05HB4T92183210;
-        Wed, 17 Jun 2020 07:25:52 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hdjyw7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 07:25:51 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05HB4nax184414;
-        Wed, 17 Jun 2020 07:25:51 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31q6hdjyvj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 07:25:51 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05HBGjxb024991;
-        Wed, 17 Jun 2020 11:25:49 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 31q6bs8xgb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Jun 2020 11:25:49 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05HBPlhP786780
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Jun 2020 11:25:47 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9943911C054;
-        Wed, 17 Jun 2020 11:25:47 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 42F1C11C04C;
-        Wed, 17 Jun 2020 11:25:47 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.186.32])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 17 Jun 2020 11:25:47 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v9 11/12] s390x: css: msch, enable test
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-12-git-send-email-pmorel@linux.ibm.com>
- <20200617105433.6a79e92c.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <c529e53c-3b4e-8c5f-9dc2-4a7a1507a44e@linux.ibm.com>
-Date:   Wed, 17 Jun 2020 13:25:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726899AbgFQLiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 07:38:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22643 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726874AbgFQLiI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 07:38:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592393886;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oS2sHeOWkDi5/NnXrNwUVCA9Ew0qnl4Cg+hQYeorxVM=;
+        b=hi+jKuFXEx7wcmDZxxEWD6G0Vfl0Ama/z523llu6qHix6K94zWGwVdk8TIz+K7KaKmNl+s
+        8Spv6CYdFhKuWoq5Cz2LHl7zYgkED1fRpN1VPrA6urIhQ6jxQDw2x8Y+0TwZv08GdOQRg4
+        EuFCvfMs9++FCC6CB/NMHOGqZ96XsBs=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-VYmDkj0CO0OdUW794Mk7OA-1; Wed, 17 Jun 2020 07:38:04 -0400
+X-MC-Unique: VYmDkj0CO0OdUW794Mk7OA-1
+Received: by mail-ej1-f72.google.com with SMTP id gr26so885312ejb.22
+        for <kvm@vger.kernel.org>; Wed, 17 Jun 2020 04:38:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=oS2sHeOWkDi5/NnXrNwUVCA9Ew0qnl4Cg+hQYeorxVM=;
+        b=SjWmoiVS7L0hP9vvW0qlBXRGSZht6dh/nXlIAAf7HbopfMfFKs2L/E0zN6iPx4Cus/
+         q5t2p1ONxMoxRtIXuCGFlegIiQ6c/KCDkll8lmGWW0NC6yD+00lVugUBr8K0O4Z7nuM4
+         XJNFLZt6D8yNn/2XDECPDyYKMsV7XSGgXYVST1YPrf7B17vkLzz3gInUbLG4/T2/bv+0
+         MWxuLEfSGCBMYx8wR5eZU1TLRpDiiV5y5XOmGMxuzydcPMVjeqLuX2qPX1b57Qd0BLWw
+         XbmMKxsC8k2Ih9o/ufAop2SFD9HCrcc9ih+JbrqsupgjdIDUALY+FPdl3nPRCnjZKE/4
+         ExSg==
+X-Gm-Message-State: AOAM532nwK2EffsPMyNPHj8xVLAr7SaZLJU7abzQ/9fav+0ddFPgxItu
+        3BcUY1OJ/CFIvdeZcAbdatEdCke/yVWyfR7Kfwz1SxCWl+CTRY6Hvo371cfhh6ZmP8pknSL6RnH
+        zHHVQCfTfVGdN
+X-Received: by 2002:a05:6402:1512:: with SMTP id f18mr7008259edw.101.1592393883360;
+        Wed, 17 Jun 2020 04:38:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwJArYTpIQqF0kcPvSiZNCMpM4scmG/Pu1RYbyYqnZ4Pb4T9s1BJXq1/3aoKfzT/Ftt5o3QDg==
+X-Received: by 2002:a05:6402:1512:: with SMTP id f18mr7008246edw.101.1592393883098;
+        Wed, 17 Jun 2020 04:38:03 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id v5sm11829338edl.51.2020.06.17.04.38.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2020 04:38:02 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu@linux.intel.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: SVM: drop MSR_IA32_PERF_CAPABILITIES from emulated MSRs
+In-Reply-To: <CALMp9eQ1qe4w5FojzgsUHKpD=zXqen_D6bBg4-vfHa03BdomGA@mail.gmail.com>
+References: <20200616161427.375651-1-vkuznets@redhat.com> <CALMp9eSWXGQkOOzSrALfZDMj5JHSH=CsK1wKfdj2x2jtV4XJsw@mail.gmail.com> <87366vhscx.fsf@vitty.brq.redhat.com> <CALMp9eQ1qe4w5FojzgsUHKpD=zXqen_D6bBg4-vfHa03BdomGA@mail.gmail.com>
+Date:   Wed, 17 Jun 2020 13:38:01 +0200
+Message-ID: <87wo45hqhy.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200617105433.6a79e92c.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-17_03:2020-06-17,2020-06-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- mlxscore=0 priorityscore=1501 cotscore=-2147483648 malwarescore=0
- suspectscore=0 clxscore=1015 lowpriorityscore=0 mlxlogscore=999
- spamscore=0 impostorscore=0 bulkscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006170083
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Jim Mattson <jmattson@google.com> writes:
 
+> On Tue, Jun 16, 2020 at 9:45 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>>
+>> Jim Mattson <jmattson@google.com> writes:
+>>
+>> > On Tue, Jun 16, 2020 at 9:14 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>> >>
+>> >> state_test/smm_test selftests are failing on AMD with:
+>> >> "Unexpected result from KVM_GET_MSRS, r: 51 (failed MSR was 0x345)"
+>> >>
+>> >> MSR_IA32_PERF_CAPABILITIES is an emulated MSR indeed but only on Intel,
+>> >> make svm_has_emulated_msr() skip it so it is not returned by
+>> >> KVM_GET_MSR_INDEX_LIST.
+>> >
+>> > Do we need to support this MSR under SVM for cross-vendor migration?
+>> > Or, have we given up on that?
+>>
+>> To be honest I'm not sure about the status of cross-vendor migration in
+>> general and PMU implications in particular, hope Paolo/Sean can shed
+>> some light. In this particular case my shallow understanding is that
+>> MSR_IA32_PERF_CAPABILITIES has only one known feature bit which unlocks
+>> an MSR range with additional counters. If the feature bit is not set
+>> this, I guess, can easily be migrated (basically, let's allow writing
+>> '0' there on AMD and return '0' on read). But what if the feature was
+>> enabled? We'll have to support the new MSR range and do something with
+>> it after migration (run intel_pmu in fully emulated mode?).
+>>
+>> Anyway, the immediate issue I'm trying to fix here is: whatever is
+>> returned by KVM_GET_MSR_INDEX_LIST can be successfully queried with
+>> KVM_GET_MSRS as some userspaces count on that.
+>
+> That's a nice property. Is it documented somewhere?
+>
 
-On 2020-06-17 10:54, Cornelia Huck wrote:
-> On Mon, 15 Jun 2020 11:32:00 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> A second step when testing the channel subsystem is to prepare a channel
->> for use.
-...snip...
->> +
->> +	/* Read the SCHIB for this subchannel */
->> +	cc = stsch(schid, &schib);
->> +	if (cc) {
->> +		report_info("stsch failed with cc=%d", cc);
-> 
-> Mention the schid in the message?
+Hm, good question.
 
-Yes:
-report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+Documentation/virt/kvm/api.rst says:
 
-> 
->> +		return cc;
->> +	}
->> +
->> +	if (pmcw->flags & PMCW_ENABLE) {
->> +		report_info("stsch: sch %08x already enabled", schid);
->> +		return 0;
->> +	}
->> +
->> +retry:
->> +	/* Update the SCHIB to enable the channel */
->> +	pmcw->flags |= PMCW_ENABLE;
->> +
->> +	/* Tell the CSS we want to modify the subchannel */
->> +	cc = msch(schid, &schib);
->> +	if (cc) {
->> +		/*
->> +		 * If the subchannel is status pending or
->> +		 * if a function is in progress,
->> +		 * we consider both cases as errors.
->> +		 */
->> +		report_info("msch failed with cc=%d", cc);
+"KVM_GET_MSR_INDEX_LIST returns the guest msrs that are supported.  The list
+varies by kvm version and host processor, but does not change otherwise.
 
-added schid here too
+[...]
 
->> +		return cc;
->> +	}
->> +
->> +	/*
->> +	 * Read the SCHIB again to verify the enablement
->> +	 */
->> +	cc = stsch(schid, &schib);
->> +	if (cc) {
->> +		report_info("stsch failed with cc=%d", cc);
-> 
-> Also add the schid here? Maybe also add a marker to distinguish the two
-> cases?
+KVM_GET_MSR_FEATURE_INDEX_LIST returns the list of MSRs that can be passed
+to the KVM_GET_MSRS system ioctl.  This lets userspace probe host capabilities
+and processor features that are exposed via MSRs (e.g., VMX capabilities)."
 
-changed to:
-report_info("stsch: updating sch %08x failed with cc=%d",schid, cc);
-                     ^^^
-> 
->> +		return cc;
->> +	}
->> +
->> +	if (pmcw->flags & PMCW_ENABLE) {
->> +		report_info("Subchannel %08x enabled after %d retries",
->> +			    schid, retry_count);
->> +		return 0;
->> +	}
->> +
->> +	if (retry_count++ < MAX_ENABLE_RETRIES) {
->> +		mdelay(10); /* the hardware was not ready, give it some time */
->> +		goto retry;
->> +	}
->> +
->> +	report_info("msch: enabling sch %08x failed after %d retries. pmcw flags: %x",
->> +		    schid, retry_count, pmcw->flags);
->> +	return -1;
->> +}
-> 
-> With the messages updated,
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+Side note: MSR_IA32_PERF_CAPABILITIES can be returned by both
+KVM_GET_MSR_INDEX_LIST and KVM_GET_MSR_FEATURE_INDEX_LIST as we have it
+both as an emulated MSR filtered by kvm_x86_ops.has_emulated_msr() and
+a feature msr filtered by kvm_x86_ops.get_msr_feature(). But the later
+is a whitelist so MSR_IA32_PERF_CAPABILITIES won't appear on AMD and the
+promise "can be passed to the KVM_GET_MSRS" is kept.
 
-Thanks,
-Pierre
+For KVM_GET_MSR_INDEX_LIST, the promise is "guest msrs that are
+supported" and I'm not exactly sure what this means. Personally, I see
+no point in returning MSRs which can't be read with KVM_GET_MSRS (as
+this also means the guest can't read them) and KVM selftests seem to
+rely on that (vcpu_save_state()) but this is not a documented feature.
+
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+>
+
+Thanks!
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Vitaly
+
