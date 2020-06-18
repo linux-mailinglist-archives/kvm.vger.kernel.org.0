@@ -2,112 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D50FE1FF32A
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 15:35:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68EC71FF3EC
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 15:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730205AbgFRNfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 09:35:24 -0400
-Received: from mga01.intel.com ([192.55.52.88]:38222 "EHLO mga01.intel.com"
+        id S1730163AbgFRNwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 09:52:50 -0400
+Received: from smtp1.axis.com ([195.60.68.17]:46204 "EHLO smtp1.axis.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726940AbgFRNfW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 09:35:22 -0400
-IronPort-SDR: Y1IRtbBG5AmWjoNHKW2jSGzaj6rS+syn2WPrn/dV7THgL7Fskm1icI0Pw3eKVAWqBNYKSqJq0n
- /a6q5kO6eBqg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9655"; a="160666223"
-X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
-   d="scan'208";a="160666223"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2020 06:35:22 -0700
-IronPort-SDR: dC+UKz9z8EPRe5pE9bo991HFfRGNF1ADcjBGu33/TZvtX24g1aacuLygl1/kwlAWN8EbY8nhny
- MLRZQvUSQ3Qw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
-   d="scan'208";a="421500098"
-Received: from otcsectest.jf.intel.com (HELO 258ff54ff3c0) ([10.54.30.81])
-  by orsmga004.jf.intel.com with ESMTP; 18 Jun 2020 06:35:22 -0700
-Date:   Thu, 18 Jun 2020 13:31:57 +0000
-From:   "Andersen, John" <john.s.andersen@intel.com>
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     corbet@lwn.net, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, mingo <mingo@redhat.com>,
-        bp <bp@alien8.de>, hpa@zytor.com, shuah@kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        rick.p.edgecombe@intel.com, kvm <kvm@vger.kernel.org>,
-        kernel-hardening@lists.openwall.com
-Subject: Re: [kvm-unit-tests PATCH] x86: Add control register pinning tests
-Message-ID: <20200618133157.GA23@258ff54ff3c0>
-References: <20200617224606.27954-1-john.s.andersen@intel.com>
- <ACCCF382-0077-4B08-8CF1-73C561F930CD@gmail.com>
- <5D576A1A-AD52-4BB1-A514-1E6641982465@gmail.com>
- <20200618050834.GA23@0d4958db2004>
- <FAFB5DA6-FA6F-4A1A-AB10-4B99F314B23D@gmail.com>
+        id S1730399AbgFRNwp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jun 2020 09:52:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=axis.com; l=1795; q=dns/txt; s=axis-central1;
+  t=1592488365; x=1624024365;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=K3qXhXuXakILYod+5kBesnr9hqgCoyRBGyf2BukPwdg=;
+  b=fotyo2v5cDMacL+i5mPFjax2SFLNqM7d0K9wU1g09qgJYvXAoQs4Ebls
+   wvrPuwClnFE3H8zpWsioK/0pMFbfEW8ni3QjdCm6HnbhOjI2cHEre8mg+
+   niEN15uyl3LJBtXwR3G4+G0UI5XaKsik+CiCKLg1Zm5HOfkchUNx3xLTs
+   ni0b/YH3Tx3mDTjrwVvgrWKhGMg3e4GJAVT16Y1B0cfVMfHFUTugSuVO2
+   VhWQQ+jKvjC5bbH0gIe1bNeVmOwuY200036ohIoH2MJj/Lu3lEBPmVriM
+   UNuVVFI3BfcmNqrsph66HAeachg7tuFC0mRj1BXnHaNt2C6BiCfpDZHFy
+   A==;
+IronPort-SDR: 39f17DGWhFX5mDaAv7IFIaJMjHJWXn2jBB81PhoK6/VVmRVRxOLK37romffu9KZl3JRlPdAynf
+ sAA8fjyOW6T7KjXFkatNsLBerEF8qKy5i3xVWCN/ww2yn5w0iQa4ZNI/vFYW09hFS4Vgu0BHRt
+ 23WOtQVtc1NvNPxB+h+h4MD6plcO6WuKOWHRTnIeWx8ltuBZe2DW6IkGbeE+o04bL1rUQh4src
+ H03lOeRTsDA4ir9o2LZedXL8hFawX0edYqNXElrOqYFUsxPlIHs11izPXHVw4r3XB4ls/erFsC
+ p3c=
+X-IronPort-AV: E=Sophos;i="5.73,526,1583190000"; 
+   d="scan'208";a="9960045"
+Date:   Thu, 18 Jun 2020 15:52:42 +0200
+From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
+To:     Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "sound-open-firmware@alsa-project.org" 
+        <sound-open-firmware@alsa-project.org>,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 5/5] vhost: add an RPMsg API
+Message-ID: <20200618135241.362iuggde3jslx3p@axis.com>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <20200527180541.5570-6-guennadi.liakhovetski@linux.intel.com>
+ <20200617191741.whnp7iteb36cjnia@axis.com> <20200618090341.GA4189@ubuntu>
+ <20200618093324.tu7oldr332ndfgev@axis.com> <20200618103940.GB4189@ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <FAFB5DA6-FA6F-4A1A-AB10-4B99F314B23D@gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200618103940.GB4189@ubuntu>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 17, 2020 at 11:59:10PM -0700, Nadav Amit wrote:
-> > On Jun 17, 2020, at 10:08 PM, Andersen, John <john.s.andersen@intel.com> wrote:
-> > 
-> > On Wed, Jun 17, 2020 at 08:18:39PM -0700, Nadav Amit wrote:
-> >>> On Jun 17, 2020, at 3:52 PM, Nadav Amit <nadav.amit@gmail.com> wrote:
-> >>> 
-> >>>> On Jun 17, 2020, at 3:46 PM, John Andersen <john.s.andersen@intel.com> wrote:
-> >>>> 
-> >>>> Paravirutalized control register pinning adds MSRs guests can use to
-> >>>> discover which bits in CR0/4 they may pin, and MSRs for activating
-> >>>> pinning for any of those bits.
-> >>> 
-> >>> [ sni[
-> >>> 
-> >>>> +static void vmx_cr_pin_test_guest(void)
-> >>>> +{
-> >>>> +	unsigned long i, cr0, cr4;
-> >>>> +
-> >>>> +	/* Step 1. Skip feature detection to skip handling VMX_CPUID */
-> >>>> +	/* nop */
-> >>> 
-> >>> I do not quite get this comment. Why do you skip checking whether the
-> >>> feature is enabled? What happens if KVM/bare-metal/other-hypervisor that
-> >>> runs this test does not support this feature?
-> >> 
-> >> My bad, I was confused between the nested checks and the non-nested ones.
-> >> 
-> >> Nevertheless, can we avoid situations in which
-> >> rdmsr(MSR_KVM_CR0_PIN_ALLOWED) causes #GP when the feature is not
-> >> implemented? Is there some protocol for detection that this feature is
-> >> supported by the hypervisor, or do we need something like rdmsr_safe()?
-> > 
-> > Ah, yes we can. By checking the CPUID for the feature bit. Thanks for pointing
-> > this out, I was confused about this. I was operating under the assumption that
-> > the unit tests assume the features in the latest kvm/next are present and
-> > available when the unit tests are being run.
-> > 
-> > I'm happy to add the check, but I haven't see anywhere else where a
-> > KVM_FEATURE_ was checked for. Which is why it doesn't check in this patch. As
-> > soon as I get an answer from you or anyone else as to if the unit tests assume
-> > that the features in the latest kvm/next are present and available or not when
-> > the unit tests are being run I'll modify if necessary.
+On Thu, Jun 18, 2020 at 12:39:40PM +0200, Guennadi Liakhovetski wrote:
+> On Thu, Jun 18, 2020 at 11:33:24AM +0200, Vincent Whitchurch wrote:
+> > By the "normal rpmsg API" I mean register_rpmsg_driver(), rpmsg_send(),
+> > etc.  That API is not tied to virtio in any way and there are other
+> > non-virtio backends for this API in the tree.  So it seems quite natural
+> > to implement a vhost backend for this API so that both sides of the link
+> > can use the same API but different backends, instead of forcing them to
+> > use of different APIs.
 > 
-> I would appreciate if you add a check of CPUID and not run the test if the 
-> feature is not supported.
+> Ok, I see what you mean now. But I'm not sure this is useful or desired. I'm 
+> not an expert in KVM / VirtIO, I've only been working in the area for less 
+> than a year, so, I might well be wrong.
 > 
-> I run the tests on bare-metal (and other non-KVM environment) from time to
-> time. Doing so allows to find bugs in tests due to wrong assumptions of KVM
-> test developers. Liran runs the tests using QEMU/WHPX (non-KVM). So allowing
-> the tests to run on non-KVM environments is important, at least for some of
-> us, and benefits KVM as well.
-> 
-> While I can disable this specific test using the test parameters, I prefer
-> that the test will first check the environment they run on. Debugging test
-> failures on bare-metal is hard enough without the paravirt stuff noise.
-> 
+> You're proposing to use the rpmsg API in vhost drivers. As far as I 
+> understand so far that API was only designated for the Linux side (in case of 
+> AMPs) which corresponds to VM guests in virtualisation case. So, I'm not sure 
+> we want to use the same API for the hosts? This can be done as you have 
+> illustrated, but is it desirable? The vhost API is far enough from the VirtIO 
+> driver API, so I'm not sure why we want the same API for rpmsg?
 
-Great point! I'll add the check
+Note that "the Linux side" is ambiguous for AMP since both sides can be
+Linux, as they happen to be in my case.  I'm running virtio/rpmsg
+between two physical processors (of different architectures), both
+running Linux.
+
+virtio has distinct driver and device roles so the completely different
+APIs on each side are understandable.  But I don't see that distinction
+in the rpmsg API which is why it seems like a good idea to me to make it
+work from both sides of the link and allow the reuse of drivers like
+rpmsg-char, instead of imposing virtio's distinction on rpmsg.
