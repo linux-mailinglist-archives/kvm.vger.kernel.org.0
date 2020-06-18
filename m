@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CA1451FDCF7
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:24:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05E891FDD7B
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730875AbgFRBW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 21:22:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56190 "EHLO mail.kernel.org"
+        id S1731687AbgFRB0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 21:26:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33968 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730864AbgFRBW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:22:56 -0400
+        id S1731672AbgFRB03 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:26:29 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3A767221EB;
-        Thu, 18 Jun 2020 01:22:55 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9620E20897;
+        Thu, 18 Jun 2020 01:26:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443375;
+        s=default; t=1592443588;
         bh=an/zaLandEMihlzb+tSmJDq/vI4kyl5kmY+HJhpYiSY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=N7ZIc0EX2ZWk3kKWpX40h30YXxnNTkNbGfa/yn6b9N/fyN/RSGioUSO50+EMz3hMu
-         n8JdYvkRb6PBlMgBE0vS2N3dH+8HOprR7bQVlqNDLzViVDxm5Opz3NgpKuDIwW8YbO
-         7lduDrewWa9ZC8JVZ9XKpwvYCG990qvYBbYm0nbs=
+        b=zNIklVxlLYZv+qZHNqpyGkSqBkBdDOQq1GbFsq3iZ1MbMauF/dqdNPl7Aq+upc6K6
+         rbEOCQDNv0FnKB+16dRuNuXrYHdRYnkx+5aeBThYnKVDe5EJYiT3ip6EKV21Awo/5e
+         eKnXQWAbwJxaoipOOaY8D2vIoKtfnUhODS43YBXA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Qian Cai <cai@lca.pw>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 028/172] vfio/pci: fix memory leaks in alloc_perm_bits()
-Date:   Wed, 17 Jun 2020 21:19:54 -0400
-Message-Id: <20200618012218.607130-28-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 022/108] vfio/pci: fix memory leaks in alloc_perm_bits()
+Date:   Wed, 17 Jun 2020 21:24:34 -0400
+Message-Id: <20200618012600.608744-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618012218.607130-1-sashal@kernel.org>
-References: <20200618012218.607130-1-sashal@kernel.org>
+In-Reply-To: <20200618012600.608744-1-sashal@kernel.org>
+References: <20200618012600.608744-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
