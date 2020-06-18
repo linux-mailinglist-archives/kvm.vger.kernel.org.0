@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA7051FDF61
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:43:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C4AA1FDF24
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:39:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731715AbgFRB3q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 21:29:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39284 "EHLO mail.kernel.org"
+        id S1732504AbgFRBaW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 21:30:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40296 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730743AbgFRB3m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:29:42 -0400
+        id S1732492AbgFRBaU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:30:20 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9CB122224E;
-        Thu, 18 Jun 2020 01:29:41 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 874FC20FC3;
+        Thu, 18 Jun 2020 01:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443782;
-        bh=xuBkutn12I3P5ofNQloqVpY7uGZTbiEiWlaCEe7QcVs=;
+        s=default; t=1592443819;
+        bh=oY/+5xBlrGE38UWtSlh2atSS1Rl3wGe76zZDaBp9bR0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vNo8r0QKQEaHgWOw1fbTXLGplC1bzPe8NmUnwD8JTlUorQUkeiXraUiis7FrmQvmi
-         JX/FRZ/vFldiXJHGNa3xABh+rLlOps59RgHPrz46a+jKLhRY3kYb6WsNfKgvzlpjHt
-         +iY8bTrYYqxwI9axK+U3IsM1vcbM5znXU3Dq/7XE=
+        b=a/vCQENAbK8RE6s7KLLg2JVd41QY14FXQqPSlT64uIyVmu0QP6SMyoXi+rzu8/+ru
+         af8bHjZkfEw7714kH7suYJbayEHhrZXEOcOR8dR4ol5L1L/VsLv2hCpvYpvqHXKuSM
+         OEEaXfNmUPw7Ff6FA4zSXZ7TBC9rtU1wQRmS2NsE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Qian Cai <cai@lca.pw>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 64/80] vfio/pci: fix memory leaks of eventfd ctx
-Date:   Wed, 17 Jun 2020 21:28:03 -0400
-Message-Id: <20200618012819.609778-64-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 11/60] vfio/pci: fix memory leaks in alloc_perm_bits()
+Date:   Wed, 17 Jun 2020 21:29:15 -0400
+Message-Id: <20200618013004.610532-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618012819.609778-1-sashal@kernel.org>
-References: <20200618012819.609778-1-sashal@kernel.org>
+In-Reply-To: <20200618013004.610532-1-sashal@kernel.org>
+References: <20200618013004.610532-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -45,63 +45,70 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Qian Cai <cai@lca.pw>
 
-[ Upstream commit 1518ac272e789cae8c555d69951b032a275b7602 ]
+[ Upstream commit 3e63b94b6274324ff2e7d8615df31586de827c4e ]
 
-Finished a qemu-kvm (-device vfio-pci,host=0001:01:00.0) triggers a few
-memory leaks after a while because vfio_pci_set_ctx_trigger_single()
-calls eventfd_ctx_fdget() without the matching eventfd_ctx_put() later.
-Fix it by calling eventfd_ctx_put() for those memory in
-vfio_pci_release() before vfio_device_release().
+vfio_pci_disable() calls vfio_config_free() but forgets to call
+free_perm_bits() resulting in memory leaks,
 
-unreferenced object 0xebff008981cc2b00 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994816 (age 9796.310s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+unreferenced object 0xc000000c4db2dee0 (size 16):
+  comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
+  hex dump (first 16 bytes):
+    00 00 ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
   backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
-unreferenced object 0x29ff008981cc4180 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994818 (age 9796.290s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+    [<00000000a6a4552d>] alloc_perm_bits+0x58/0xe0 [vfio_pci]
+    [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
+    init_pci_cap_msi_perm at drivers/vfio/pci/vfio_pci_config.c:1125
+    (inlined by) vfio_msi_cap_len at drivers/vfio/pci/vfio_pci_config.c:1180
+    (inlined by) vfio_cap_len at drivers/vfio/pci/vfio_pci_config.c:1241
+    (inlined by) vfio_cap_init at drivers/vfio/pci/vfio_pci_config.c:1468
+    (inlined by) vfio_config_init at drivers/vfio/pci/vfio_pci_config.c:1707
+    [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
+    [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
+    [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
+    [<000000006577923d>] sys_ioctl+0x28/0x40
+    [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
+    [<0000000008ea7dd5>] system_call_common+0xf0/0x278
+unreferenced object 0xc000000c4db2e330 (size 16):
+  comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
+  hex dump (first 16 bytes):
+    00 ff ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
   backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
+    [<000000004c71914f>] alloc_perm_bits+0x44/0xe0 [vfio_pci]
+    [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
+    [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
+    [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
+    [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
+    [<000000006577923d>] sys_ioctl+0x28/0x40
+    [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
+    [<0000000008ea7dd5>] system_call_common+0xf0/0x278
 
+Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
 Signed-off-by: Qian Cai <cai@lca.pw>
+[aw: rolled in follow-up patch]
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/vfio/pci/vfio_pci_config.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index c94167d87178..9d8715abbec1 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -390,6 +390,10 @@ static void vfio_pci_release(void *device_data)
- 	if (!(--vdev->refcnt)) {
- 		vfio_spapr_pci_eeh_release(vdev->pdev);
- 		vfio_pci_disable(vdev);
-+		if (vdev->err_trigger)
-+			eventfd_ctx_put(vdev->err_trigger);
-+		if (vdev->req_trigger)
-+			eventfd_ctx_put(vdev->req_trigger);
- 	}
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 98a12be76c9c..bf65572f47a8 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -1644,8 +1644,11 @@ void vfio_config_free(struct vfio_pci_device *vdev)
+ 	vdev->vconfig = NULL;
+ 	kfree(vdev->pci_config_map);
+ 	vdev->pci_config_map = NULL;
+-	kfree(vdev->msi_perm);
+-	vdev->msi_perm = NULL;
++	if (vdev->msi_perm) {
++		free_perm_bits(vdev->msi_perm);
++		kfree(vdev->msi_perm);
++		vdev->msi_perm = NULL;
++	}
+ }
  
- 	mutex_unlock(&driver_lock);
+ /*
 -- 
 2.25.1
 
