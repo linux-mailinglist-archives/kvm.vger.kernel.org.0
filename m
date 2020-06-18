@@ -2,109 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC3251FEE35
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 10:57:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 410531FEE45
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 11:03:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728993AbgFRI5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 04:57:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26667 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728957AbgFRI5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 04:57:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592470653;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wqDesyDEKvVE0arFjXLzrboQB8n4OlGRbAZdAmnqecc=;
-        b=IGQpmxwFGysMzJa7mSrntR4WU6ki38FxpCCqtpLP58lFxER7SF10sW0xPtw36MsgbL15Es
-        ZZ/nsrgI+UPDQjXpSygocaurea7lUMHqFBYS0J/PcSFNLMf0jltTaAgMOdF32ze8/Ju6GF
-        OyUWscMV1PkufoifnWwOYRfpzAJyv28=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-nDrm9QDzPK-zvyR-WUdb0Q-1; Thu, 18 Jun 2020 04:57:31 -0400
-X-MC-Unique: nDrm9QDzPK-zvyR-WUdb0Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83ECE107ACCA;
-        Thu, 18 Jun 2020 08:57:30 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.195.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E31285D9D3;
-        Thu, 18 Jun 2020 08:57:28 +0000 (UTC)
-Date:   Thu, 18 Jun 2020 10:57:26 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] target/arm/kvm: Check supported feature per accelerator
- (not per vCPU)
-Message-ID: <20200618085726.ti2hny6554l4l5kt@kamzik.brq.redhat.com>
-References: <20200617130800.26355-1-philmd@redhat.com>
- <20200617152319.l77b4kdzwcftx7by@kamzik.brq.redhat.com>
- <69f9adc8-28ec-d949-60aa-ba760ea210a9@redhat.com>
+        id S1728973AbgFRJDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 05:03:50 -0400
+Received: from mga04.intel.com ([192.55.52.120]:51740 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728964AbgFRJDs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jun 2020 05:03:48 -0400
+IronPort-SDR: Xp0RTI8c6kbb+VsF6d38iUSdr5kquLxg97SIyNTTT7P3S+uTP26bAc3+XLmr3lIefSfKJtzWq9
+ 2GyfNypcVv8w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9655"; a="140002609"
+X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
+   d="scan'208";a="140002609"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2020 02:03:48 -0700
+IronPort-SDR: /6kHDHX7wY1CRf0e6PPCtYuooZMheWGl/tF42hkNHlSAubcrMt9WbD6cJYqo6V6SVrDIB93lxX
+ COgb867Ow9Cw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
+   d="scan'208";a="261966815"
+Received: from gliakhov-mobl2.ger.corp.intel.com (HELO ubuntu) ([10.252.48.152])
+  by fmsmga007.fm.intel.com with ESMTP; 18 Jun 2020 02:03:44 -0700
+Date:   Thu, 18 Jun 2020 11:03:42 +0200
+From:   Guennadi Liakhovetski <guennadi.liakhovetski@linux.intel.com>
+To:     Vincent Whitchurch <vincent.whitchurch@axis.com>
+Cc:     kvm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        sound-open-firmware@alsa-project.org,
+        Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+        Liam Girdwood <liam.r.girdwood@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>
+Subject: Re: [PATCH v3 5/5] vhost: add an RPMsg API
+Message-ID: <20200618090341.GA4189@ubuntu>
+References: <20200527180541.5570-1-guennadi.liakhovetski@linux.intel.com>
+ <20200527180541.5570-6-guennadi.liakhovetski@linux.intel.com>
+ <20200617191741.whnp7iteb36cjnia@axis.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <69f9adc8-28ec-d949-60aa-ba760ea210a9@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200617191741.whnp7iteb36cjnia@axis.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 17, 2020 at 07:37:42PM +0200, Paolo Bonzini wrote:
-> On 17/06/20 17:23, Andrew Jones wrote:
-> >>
-> >> Fix by kvm_arm_<FEATURE>_supported() functions take a AccelState
-> >> argument (already realized/valid at this point) instead of a
-> >> CPUState argument.
-> > I'd rather not do that. IMO, a CPU feature test should operate on CPU,
-> > not an "accelerator".
-> 
-> If it's a test that the feature is enabled (e.g. via -cpu) then I agree.  
-> For something that ends up as a KVM_CHECK_EXTENSION or KVM_ENABLE_CAP on 
-> the KVM fd, however, I think passing an AccelState is better.
+Hi Vincent,
 
-I can live with that justification as long as we don't support
-heterogeneous VCPU configurations. And, if that ever happens, then I
-guess we'll be reworking a lot more than just the interface of these
-cpu feature probes.
+On Wed, Jun 17, 2020 at 09:17:42PM +0200, Vincent Whitchurch wrote:
+> On Wed, May 27, 2020 at 08:05:41PM +0200, Guennadi Liakhovetski wrote:
+> > Linux supports running the RPMsg protocol over the VirtIO transport
+> > protocol, but currently there is only support for VirtIO clients and
+> > no support for a VirtIO server. This patch adds a vhost-based RPMsg
+> > server implementation.
+> 
+> This looks really useful, but why is it implemented as an API and not as
+> a real vhost driver which implements an rpmsg bus?  If you implement it
+> as a vhost driver which implements rpmsg_device_ops and
+> rpmsg_endpoint_ops, then wouldn't you be able to implement your
+> vhost-sof driver using the normal rpmsg APIs?
 
-Thanks,
-drew
+Sorry, not sure what you mean by the "normal rpmsg API?" Do you mean the 
+VirtIO RPMsg API? But that's the opposite side of the link - that's the 
+guest side in the VM case and the Linux side in the remoteproc case. What 
+this API is adding is a vhost RPMsg API. The kernel vhost framework 
+itself is essentially a library of functions. Kernel vhost drivers simply 
+create a misc device and use the vhost functions for some common 
+functionality. This RPMsg vhost API stays in the same concept and provides 
+further functions for RPMsg specific vhost operation.
 
+> I tried quickly hooking up this code to such a vhost driver and I was
+> able to communicate between host and guest systems with both
+> rpmsg-client-sample and rpmsg-char which almost no modifications to
+> those drivers.
 
-> kvm_arm_pmu_supported case is clearly the latter, even the error message
-> hints at that:
-> 
-> +        if (kvm_enabled() && !kvm_arm_pmu_supported(current_accel())) {
->              error_setg(errp, "'pmu' feature not supported by KVM on this host");
->              return;
->          }
-> 
-> but the same is true of kvm_arm_aarch32_supported and kvm_arm_sve_supported.
-> 
-> Applying the change to kvm_arm_pmu_supported as you suggest below would be
-> a bit of a bandaid because it would not have consistent prototypes.  Sp
-> for Philippe's patch
-> 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> > How that test is implemented is another story.
-> > If the CPUState isn't interesting, but it points to something that is,
-> > or there's another function that uses globals to get the job done, then
-> > fine, but the callers of a CPU feature test shouldn't need to know that.
-> > 
-> > I think we should just revert d70c996df23f and then apply the same
-> > change to kvm_arm_pmu_supported() that other similar functions got
-> > with 4f7f589381d5.
-> 
-> 
+You mean you used this patch to create RPMsg vhost drivers? Without 
+creating a vhost RPMsg bus? Nice, glad to hear that!
 
+Thanks
+Guennadi
