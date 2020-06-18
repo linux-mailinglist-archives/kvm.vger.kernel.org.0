@@ -2,35 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97D401FE54B
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 04:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C4531FE52D
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 04:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730784AbgFRCZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 22:25:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48736 "EHLO mail.kernel.org"
+        id S1731307AbgFRCXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 22:23:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49116 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729802AbgFRBRe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:17:34 -0400
+        id S1729829AbgFRBRv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:17:51 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1FA64221FB;
-        Thu, 18 Jun 2020 01:17:33 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DF8C021D82;
+        Thu, 18 Jun 2020 01:17:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443053;
-        bh=10F4CPTPJOlqylM7nyFGiW9conTOcnHjIbF+IqJVeTQ=;
+        s=default; t=1592443071;
+        bh=m5MjLN5kHPqximv4jc7KfEfNo/8ZvUuXiLLO/NUGhaQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JwvzRGUe8sltNTO+ky39frzh06qZtXIj3dIur6yYJHFWEOC4KxdaED//FDtKyCOrg
-         b9dKVaGt5s2R1i4v5YoEKCRetC0CpfxVzMNTCVIRvizR/WNNbITlobJ+zwCMMhICrB
-         vdkCf+GUBsUGSXZi9MGPTm+0llHUM8KglesGOyZs=
+        b=S9Wtqzx4iz3mO3jUbqEh14Z1RhHbvWIp+aRbxIPUWQt2I/FNB8CFh968yZ1dn4Sbf
+         t3eqkOaDj+9N2Ir2rnvXg92CByuBQp7dkRHhH/AbuMz1Em+kFSdVaG1QdTeKBhIjp6
+         2qoaJj4+ufhivzWOyFAh+UA8c6sYDiK+bfKKIZrA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Qian Cai <cai@lca.pw>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 046/266] vfio/pci: fix memory leaks in alloc_perm_bits()
-Date:   Wed, 17 Jun 2020 21:12:51 -0400
-Message-Id: <20200618011631.604574-46-sashal@kernel.org>
+Cc:     Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Mike Christie <mchristi@redhat.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Sasha Levin <sashal@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 059/266] scsi: vhost: Notify TCM about the maximum sg entries supported per command
+Date:   Wed, 17 Jun 2020 21:13:04 -0400
+Message-Id: <20200618011631.604574-59-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
 References: <20200618011631.604574-1-sashal@kernel.org>
@@ -43,72 +50,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Qian Cai <cai@lca.pw>
+From: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
 
-[ Upstream commit 3e63b94b6274324ff2e7d8615df31586de827c4e ]
+[ Upstream commit 5ae6a6a915033bfee79e76e0c374d4f927909edc ]
 
-vfio_pci_disable() calls vfio_config_free() but forgets to call
-free_perm_bits() resulting in memory leaks,
+vhost-scsi pre-allocates the maximum sg entries per command and if a
+command requires more than VHOST_SCSI_PREALLOC_SGLS entries, then that
+command is failed by it. This patch lets vhost communicate the max sg limit
+when it registers vhost_scsi_ops with TCM. With this change, TCM would
+report the max sg entries through "Block Limits" VPD page which will be
+typically queried by the SCSI initiator during device discovery. By knowing
+this limit, the initiator could ensure the maximum transfer length is less
+than or equal to what is reported by vhost-scsi.
 
-unreferenced object 0xc000000c4db2dee0 (size 16):
-  comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
-  hex dump (first 16 bytes):
-    00 00 ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
-  backtrace:
-    [<00000000a6a4552d>] alloc_perm_bits+0x58/0xe0 [vfio_pci]
-    [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
-    init_pci_cap_msi_perm at drivers/vfio/pci/vfio_pci_config.c:1125
-    (inlined by) vfio_msi_cap_len at drivers/vfio/pci/vfio_pci_config.c:1180
-    (inlined by) vfio_cap_len at drivers/vfio/pci/vfio_pci_config.c:1241
-    (inlined by) vfio_cap_init at drivers/vfio/pci/vfio_pci_config.c:1468
-    (inlined by) vfio_config_init at drivers/vfio/pci/vfio_pci_config.c:1707
-    [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
-    [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
-    [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
-    [<000000006577923d>] sys_ioctl+0x28/0x40
-    [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
-    [<0000000008ea7dd5>] system_call_common+0xf0/0x278
-unreferenced object 0xc000000c4db2e330 (size 16):
-  comm "qemu-kvm", pid 4305, jiffies 4295020272 (age 3463.780s)
-  hex dump (first 16 bytes):
-    00 ff ff 00 ff ff ff ff ff ff ff ff ff ff 00 00  ................
-  backtrace:
-    [<000000004c71914f>] alloc_perm_bits+0x44/0xe0 [vfio_pci]
-    [<00000000ac990549>] vfio_config_init+0xdf0/0x11b0 [vfio_pci]
-    [<000000006db873a1>] vfio_pci_open+0x234/0x700 [vfio_pci]
-    [<00000000630e1906>] vfio_group_fops_unl_ioctl+0x8e0/0xb84 [vfio]
-    [<000000009e34c54f>] ksys_ioctl+0xd8/0x130
-    [<000000006577923d>] sys_ioctl+0x28/0x40
-    [<000000006d7b1cf2>] system_call_exception+0x114/0x1e0
-    [<0000000008ea7dd5>] system_call_common+0xf0/0x278
-
-Fixes: 89e1f7d4c66d ("vfio: Add PCI device driver")
-Signed-off-by: Qian Cai <cai@lca.pw>
-[aw: rolled in follow-up patch]
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Link: https://lore.kernel.org/r/1590166317-953-1-git-send-email-sudhakar.panneerselvam@oracle.com
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Mike Christie <mchristi@redhat.com>
+Signed-off-by: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci_config.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/vhost/scsi.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index f0891bd8444c..c4d0cf9a1ab9 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -1726,8 +1726,11 @@ void vfio_config_free(struct vfio_pci_device *vdev)
- 	vdev->vconfig = NULL;
- 	kfree(vdev->pci_config_map);
- 	vdev->pci_config_map = NULL;
--	kfree(vdev->msi_perm);
--	vdev->msi_perm = NULL;
-+	if (vdev->msi_perm) {
-+		free_perm_bits(vdev->msi_perm);
-+		kfree(vdev->msi_perm);
-+		vdev->msi_perm = NULL;
-+	}
- }
- 
- /*
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index a9caf1bc3c3e..88ce114790d7 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -2290,6 +2290,7 @@ static struct configfs_attribute *vhost_scsi_wwn_attrs[] = {
+ static const struct target_core_fabric_ops vhost_scsi_ops = {
+ 	.module				= THIS_MODULE,
+ 	.fabric_name			= "vhost",
++	.max_data_sg_nents		= VHOST_SCSI_PREALLOC_SGLS,
+ 	.tpg_get_wwn			= vhost_scsi_get_fabric_wwn,
+ 	.tpg_get_tag			= vhost_scsi_get_tpgt,
+ 	.tpg_check_demo_mode		= vhost_scsi_check_true,
 -- 
 2.25.1
 
