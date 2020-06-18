@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 176131FE172
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1811FE11D
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:53:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731514AbgFRBZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 21:25:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50390 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731493AbgFRBZq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:25:46 -0400
+        id S1731658AbgFRB0W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 21:26:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44243 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731632AbgFRB0T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Jun 2020 21:26:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592443545;
+        s=mimecast20190719; t=1592443578;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Y7xJe4wll8RNT7ZvRCMxIEw6+h6IlLNJEj6S4QZiEyg=;
-        b=SpxSV7CMA3WO2JYsDZ7iECyZo6yrsYFV3QQyQ43EbsWFyrwOXd2aYo5X9TDg5LzuD9rrWw
-        KDYq3JhKPjYzUx1NNPrwQHNNydfmxh27J4ORcahbPPHXoQaXy+CDbYiOq25qI6mmW7vKIL
-        TC2Bj0oHKnlO6UxExgN4w5QHoH6oID0=
+        bh=2XjA8FU67I5A0k2SpuvQQRfjiKYOCajyJbpRDZTCuUQ=;
+        b=ZdiXgvOlhzjdkJ6UbPjGIZs0rygvHuJ9ZMYGnznQyqwVIkyj15WjDSblOJ83HMfxtbjU7P
+        jQKSAvC3Cp8jsFzRuBcn84dX88VmbkVD37JzNS8iKA5aDke3iRYbhFsHXHJZfeAEtANyEQ
+        4aR2UcnZtEzlvWEe1ZrutDq/bRpbEC0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-VWZLx5xVO2-22TnHDUQr5w-1; Wed, 17 Jun 2020 21:25:43 -0400
-X-MC-Unique: VWZLx5xVO2-22TnHDUQr5w-1
+ us-mta-284-Ztw866pgPtud6cyLII22fA-1; Wed, 17 Jun 2020 21:26:14 -0400
+X-MC-Unique: Ztw866pgPtud6cyLII22fA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C83A58018A6;
-        Thu, 18 Jun 2020 01:25:41 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2685A1800D42;
+        Thu, 18 Jun 2020 01:26:13 +0000 (UTC)
 Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 67DEA7CAC4;
-        Thu, 18 Jun 2020 01:25:41 +0000 (UTC)
-Date:   Wed, 17 Jun 2020 19:25:40 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C12107CACC;
+        Thu, 18 Jun 2020 01:26:12 +0000 (UTC)
+Date:   Wed, 17 Jun 2020 19:26:12 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Sasha Levin <sashal@kernel.org>
 Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
         Qian Cai <cai@lca.pw>, kvm@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.4 191/266] vfio/pci: fix memory leaks of
+Subject: Re: [PATCH AUTOSEL 4.19 120/172] vfio/pci: fix memory leaks of
  eventfd ctx
-Message-ID: <20200617192540.7da361fd@x1.home>
-In-Reply-To: <20200618011631.604574-191-sashal@kernel.org>
-References: <20200618011631.604574-1-sashal@kernel.org>
-        <20200618011631.604574-191-sashal@kernel.org>
+Message-ID: <20200617192612.17188760@x1.home>
+In-Reply-To: <20200618012218.607130-120-sashal@kernel.org>
+References: <20200618012218.607130-1-sashal@kernel.org>
+        <20200618012218.607130-120-sashal@kernel.org>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -54,7 +54,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 17 Jun 2020 21:15:16 -0400
+On Wed, 17 Jun 2020 21:21:26 -0400
 Sasha Levin <sashal@kernel.org> wrote:
 
 > From: Qian Cai <cai@lca.pw>
@@ -102,10 +102,10 @@ Sasha Levin <sashal@kernel.org> wrote:
 >  1 file changed, 4 insertions(+)
 > 
 > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 02206162eaa9..d917dd2df3b3 100644
+> index 66783a37f450..36b2ea920bc9 100644
 > --- a/drivers/vfio/pci/vfio_pci.c
 > +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -472,6 +472,10 @@ static void vfio_pci_release(void *device_data)
+> @@ -407,6 +407,10 @@ static void vfio_pci_release(void *device_data)
 >  	if (!(--vdev->refcnt)) {
 >  		vfio_spapr_pci_eeh_release(vdev->pdev);
 >  		vfio_pci_disable(vdev);
@@ -115,7 +115,7 @@ Sasha Levin <sashal@kernel.org> wrote:
 > +			eventfd_ctx_put(vdev->req_trigger);
 >  	}
 >  
->  	mutex_unlock(&vdev->reflck->lock);
+>  	mutex_unlock(&driver_lock);
 
 This has a fix pending, I'd suggest not picking it on its own:
 
