@@ -2,173 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63FCB1FF703
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 17:38:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F04E1FF785
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 17:42:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731484AbgFRPiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 11:38:16 -0400
-Received: from mga05.intel.com ([192.55.52.43]:8347 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727911AbgFRPiP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 11:38:15 -0400
-IronPort-SDR: 3zBUUty2gPUGSdInPvnP930ICYbOT+6+5jKQR/OoskFlfUCknBRLw2LS2oTO3PcJiN1iSGUDnJ
- RTC23b61wu8g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9656"; a="227323377"
-X-IronPort-AV: E=Sophos;i="5.75,251,1589266800"; 
-   d="scan'208";a="227323377"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2020 08:38:12 -0700
-IronPort-SDR: Jx9RZIPt2o3AJ++sWiaidQnOzWwRol2yNKySxe4nHAfJUKHU/7w3TMYKXKnmUecQBjxmClP4Om
- uLkK6GvzgIuQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,251,1589266800"; 
-   d="scan'208";a="277662454"
-Received: from mcrum-mobl1.amr.corp.intel.com (HELO [10.255.0.127]) ([10.255.0.127])
-  by orsmga006.jf.intel.com with ESMTP; 18 Jun 2020 08:38:06 -0700
-Subject: Re: [PATCH 4/4] X86: Use KVM CR pin MSRs
-To:     "Andersen, John" <john.s.andersen@intel.com>
-Cc:     corbet@lwn.net, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-        shuah@kernel.org, sean.j.christopherson@intel.com,
-        liran.alon@oracle.com, drjones@redhat.com,
-        rick.p.edgecombe@intel.com, kristen@linux.intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, mchehab+huawei@kernel.org,
-        gregkh@linuxfoundation.org, paulmck@kernel.org,
-        pawan.kumar.gupta@linux.intel.com, jgross@suse.com,
-        mike.kravetz@oracle.com, oneukum@suse.com, luto@kernel.org,
-        peterz@infradead.org, fenghua.yu@intel.com,
-        reinette.chatre@intel.com, vineela.tummalapalli@intel.com,
-        dave.hansen@linux.intel.com, arjan@linux.intel.com,
-        caoj.fnst@cn.fujitsu.com, bhe@redhat.com, nivedita@alum.mit.edu,
-        keescook@chromium.org, dan.j.williams@intel.com,
-        eric.auger@redhat.com, aaronlewis@google.com, peterx@redhat.com,
-        makarandsonare@google.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        kernel-hardening@lists.openwall.com
-References: <20200617190757.27081-1-john.s.andersen@intel.com>
- <20200617190757.27081-5-john.s.andersen@intel.com>
- <b5d791f9-1708-9715-e03d-4618d1b27d05@intel.com>
- <20200618152649.GC23@258ff54ff3c0>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <5706af0c-e426-91bc-4c38-d1203cf1b3b7@intel.com>
-Date:   Thu, 18 Jun 2020 08:38:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <20200618152649.GC23@258ff54ff3c0>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1731820AbgFRPlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 11:41:36 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:54962 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731713AbgFRPkn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jun 2020 11:40:43 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20200618154038euoutp010e1948411e76854c49c7ba236cdc4602~ZrZ4pHgIR1844818448euoutp01P
+        for <kvm@vger.kernel.org>; Thu, 18 Jun 2020 15:40:38 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20200618154038euoutp010e1948411e76854c49c7ba236cdc4602~ZrZ4pHgIR1844818448euoutp01P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1592494838;
+        bh=i9tfBl9XK1ZIcmVNmOj760Z4Av4MmZkmEeWSykU107Y=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=KZMr6zGKccCjIXwLvtaZvINM5cvedqSKjLsMAlbFaqa/2uidxZv4eJwZw6UlCvaeF
+         9YebsQk0pCSOf0hZVeGz5jyKC7bIKsyTqcxutg8SECaAxAFjSsElGDvinxdLb+wtUU
+         aDzTWa6ipwlVAyqCaRl33uC2xz3NXA3enEo71oO0=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200618154037eucas1p162bd4bce5ff25284dc35a3b750373f07~ZrZ4YCBn21545815458eucas1p1m;
+        Thu, 18 Jun 2020 15:40:37 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id FB.1F.61286.5FA8BEE5; Thu, 18
+        Jun 2020 16:40:37 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20200618154037eucas1p19a60af169ef9c272b9d1eecf589f6627~ZrZ4Bn1_B1545815458eucas1p1l;
+        Thu, 18 Jun 2020 15:40:37 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20200618154037eusmtrp2e1d1f0ddf5441e208cc3e8e1afc41c0b~ZrZ4A_iTP0370403704eusmtrp2w;
+        Thu, 18 Jun 2020 15:40:37 +0000 (GMT)
+X-AuditID: cbfec7f2-ef1ff7000001ef66-f2-5eeb8af57b24
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 78.FE.08375.5FA8BEE5; Thu, 18
+        Jun 2020 16:40:37 +0100 (BST)
+Received: from AMDC2765.digital.local (unknown [106.120.51.73]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200618154036eusmtip1fb60c40ddcb27db26c518640dc3aacde~ZrZ3a9J5Z0742307423eusmtip1Y;
+        Thu, 18 Jun 2020 15:40:36 +0000 (GMT)
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+To:     dri-devel@lists.freedesktop.org, iommu@lists.linux-foundation.org,
+        linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org
+Cc:     Marek Szyprowski <m.szyprowski@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-arm-kernel@lists.infradead.org,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: [PATCH v6 33/36] samples: vfio-mdev/mbochs: fix common struct
+ sg_table related issues
+Date:   Thu, 18 Jun 2020 17:39:54 +0200
+Message-Id: <20200618153956.29558-34-m.szyprowski@samsung.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200618153956.29558-1-m.szyprowski@samsung.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA0VSa0hTYRjuO2fn7GjOjpvgh0nGIsnAGxUeUMTMH4cKuv0oBC8zDypuuja1
+        FCRTFzK1NDNNLC0E865zzktKOdQlmpcpy0umov7QoYY6sUma2yn79zzP+7zP873wESi/BXMm
+        YuMTGVm8SCzEbTma/l8jHialMcy79J07lTc8gFDNJY0YdaApQKkJ0wZOVdf2IVTFJz+qrOgB
+        pR58A6jtiQWEUi0aMGq8swyn6ntnuVTPzyUskEfXva0DdPdOBYdu25nH6LkcHUK3VD6mZ/YX
+        UbpwsgrQH6fScTovcx2nn6lrAL2lOnXzeIitfxQjjk1mZF4BEbYxexoVV1rp8Gi6PSEdNNsr
+        AUFA8iKcrwpUAluCT34AcKm8msOSbQDzVrU4S7YAVGv6MCWwsW4MVOpRdlAF4N5GNnq0krE8
+        iltcOOkDlWtKK3YkFQB+ybOzmFDSgMC13+vWKAEZAfWmSivmkGfhXFkNYsE8MgAOPM/B2TpX
+        WNv0GbVgm0N9UKfALEGQ1HJhxVAZwl4RDL+1oqxfAFd1ai6LXeBBRznC+jMBXBiu57IkF8Dx
+        jBLAuvzg92EzbglCSXfY2OnFypfhzKtpLptvDyfXHCwyeghfaIpRVubB7Kd81u0GS3UNR7U9
+        o/q/z6Hham+R9RQ+WQDgSAueD1xL/3dVAFADnJgkuSSakfvEMw895SKJPCk+2vN+gkQFDr/S
+        4L5usx2Y9JFaQBJAaMcLvGsM42OiZHmKRAsggQodeUFfB8P4vChRSiojSwiXJYkZuRacJDhC
+        J96F9yuhfDJalMjEMYyUkf2bIoSNczroNt+OG+1o8hGPFRnRW/5TY0OOBwvBsy6hpzPPtc0c
+        w38sh6f2GnyvKN2WpVncrq6NEKwYO9mflTtuZphLuVpkZa/1xtVrL8ndFLP0db1CIvCG+Y2+
+        Z5bvnNj0bfDfuFeoSDMJnlCl3rtBxm6P/fWt4rTIIUNzd6ZICJ0414UceYzI5zwqk4v+ALRX
+        GcFGAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKIsWRmVeSWpSXmKPExsVy+t/xu7pfu17HGZxYLWbRe+4kk8XGGetZ
+        Lf5vm8hsceXrezaLlauPMlks2G9tMWdqocWW03MZLb5cechksenxNVaLy7vmsFmsPXKX3eLg
+        hyesDrwea+atYfTY+20Bi8f2bw9YPe53H2fy2Lyk3uP2v8fMHpNvLGf02H2zgc2jt/kdm0ff
+        llWMHp83yQVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZpKTmZJal
+        FunbJehl/N62ib1giWDFrR35DYwb+boYOTkkBEwkTi65xNzFyMUhJLCUUeLC9H3MEAkZiZPT
+        GlghbGGJP9e62CCKPjFKPLo3mw0kwSZgKNH1FiIhItDJKDGt+yM7SIJZ4B6TxN51fl2MHBzC
+        AnEST0+BhVkEVCXuz1nFBGLzCthJnOzvZoNYIC+xesMBsMWcQPHTx1vBFgsJ2Eo8/9DGNoGR
+        bwEjwypGkdTS4tz03GJDveLE3OLSvHS95PzcTYzAKNl27OfmHYyXNgYfYhTgYFTi4X0R8jpO
+        iDWxrLgy9xCjBAezkgiv09nTcUK8KYmVValF+fFFpTmpxYcYTYGOmsgsJZqcD4zgvJJ4Q1ND
+        cwtLQ3Njc2MzCyVx3g6BgzFCAumJJanZqakFqUUwfUwcnFINjDNCV88xOhK1dtqtd3p1c/RW
+        1HUGTYi8FZc783pN96+0qub/YddXfs0JeHXlfvnWqjZ2Xo66CbeuzfAq6LoicuVD5/ZMF5+r
+        ZxoKZNjVfuwxXpiTKCivzDx9JVf0tFnRDyXXfPjzNOKHRXR17fqjHuvXO2iGtN9vO1deKc4+
+        4ZWu398liUarGJVYijMSDbWYi4oTAZpEzByoAgAA
+X-CMS-MailID: 20200618154037eucas1p19a60af169ef9c272b9d1eecf589f6627
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20200618154037eucas1p19a60af169ef9c272b9d1eecf589f6627
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200618154037eucas1p19a60af169ef9c272b9d1eecf589f6627
+References: <20200618153956.29558-1-m.szyprowski@samsung.com>
+        <CGME20200618154037eucas1p19a60af169ef9c272b9d1eecf589f6627@eucas1p1.samsung.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/18/20 8:26 AM, Andersen, John wrote:
-> On Thu, Jun 18, 2020 at 07:41:04AM -0700, Dave Hansen wrote:
->> Let's say kexec is config'd off.  This feature is enabled by default and
->> crashes the kernel in early boot.  I have no way to disable this fancy
->> new feature.  Is that what we want?
->>
->> I also think that instead of having to *enable* this explicitly when
->> kexec is present, maybe we should have a "disable_kexec" parameter.  If
->> kexec is configured out or disabled on the command-line, then you can
->> turn CR pinning on.
->>
->> If someone fails to kexec() because of this feature, there's no way in
->> hell they'll ever track down "pv_cr_pin" on the command-line as the
->> cause.  The might have a chance of finding disable_kexec, though.
->>
->> Wouldn't it also be nice to add a single printk() the first time a kexec
->> fails because of this feature being present?
-> 
-> That sounds like a good plan. I'll change pv_cr_pin to disable_kexec, and add a
-> disable_pv_cr_pin option in case it's being on by default via the compile time
-> option breaks a users workflow at runtime.
-> 
-> In this case, I'm assuming we can do away with the kconfig option then.
-> 
-> Just have it enabled by default. If kexec is present, it's disabled by default,
-> unless kexec is disabled, in which case, pinning is enabled unless
-> disable_pv_cr_pin is set.
+The Documentation/DMA-API-HOWTO.txt states that the dma_map_sg() function
+returns the number of the created entries in the DMA address space.
+However the subsequent calls to the dma_sync_sg_for_{device,cpu}() and
+dma_unmap_sg must be called with the original number of the entries
+passed to the dma_map_sg().
 
-Yes, that sounds good to me.
+struct sg_table is a common structure used for describing a non-contiguous
+memory buffer, used commonly in the DRM and graphics subsystems. It
+consists of a scatterlist with memory pages and DMA addresses (sgl entry),
+as well as the number of scatterlist entries: CPU pages (orig_nents entry)
+and DMA mapped pages (nents entry).
 
-...
->>> +config PARAVIRT_CR_PIN
->>> +       bool "Paravirtual bit pinning for CR0 and CR4"
->>> +       depends on KVM_GUEST
->>> +       help
->>> +         Select this option to have the virtualised guest request that the
->>> +         hypervisor disallow it from disabling protections set in control
->>> +         registers. The hypervisor will prevent exploits from disabling
->>> +         features such as SMEP, SMAP, UMIP, and WP.
->>
->> I'm confused.  Does this add support for ""Paravirtual bit pinning", or
->> actually tell the guest to request pinning by default?
->>
->> It says "Select this option to have the virtualised guest request...",
->> which makes it sound like it affects the default rather than the
->> availability of the option.
-> 
-> How about this
-> 
-> Select this option to request protection of SMEP, SMAP, UMIP, and WP
-> control register bits when running paravirtualized under KVM. Protection will
-> be active provided the feature is available host side and kexec is disabled via
-> kconfig or the command line for the guest requesting protection.
+It turned out that it was a common mistake to misuse nents and orig_nents
+entries, calling DMA-mapping functions with a wrong number of entries or
+ignoring the number of mapped entries returned by the dma_map_sg()
+function.
 
-It still isn't very clear to me.
+To avoid such issues, lets use a common dma-mapping wrappers operating
+directly on the struct sg_table objects and use scatterlist page
+iterators where possible. This, almost always, hides references to the
+nents and orig_nents entries, making the code robust, easier to follow
+and copy/paste safe.
 
-Let's pull the config option out of this patch.  Enable the feature by
-default and do the command-line processing in this patch.
+While touching this code, also add missing call to dma_unmap_sgtable.
 
-If you still think a Kconfig option is helpful, add it in a separate
-patch calling out the deficiencies with the boot-time options.
+Signed-off-by: Marek Szyprowski <m.szyprowski@samsung.com>
+---
+ samples/vfio-mdev/mbochs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index 3cc5e5921682..e03068917273 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -846,7 +846,7 @@ static struct sg_table *mbochs_map_dmabuf(struct dma_buf_attachment *at,
+ 	if (sg_alloc_table_from_pages(sg, dmabuf->pages, dmabuf->pagecount,
+ 				      0, dmabuf->mode.size, GFP_KERNEL) < 0)
+ 		goto err2;
+-	if (!dma_map_sg(at->dev, sg->sgl, sg->nents, direction))
++	if (dma_map_sgtable(at->dev, sg, direction, 0))
+ 		goto err3;
+ 
+ 	return sg;
+@@ -868,6 +868,7 @@ static void mbochs_unmap_dmabuf(struct dma_buf_attachment *at,
+ 
+ 	dev_dbg(dev, "%s: %d\n", __func__, dmabuf->id);
+ 
++	dma_unmap_sgtable(at->dev, sg, direction, 0);
+ 	sg_free_table(sg);
+ 	kfree(sg);
+ }
+-- 
+2.17.1
+
