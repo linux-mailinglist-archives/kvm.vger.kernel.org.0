@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C51861FE458
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 04:17:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A01F1FE3F8
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 04:14:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730661AbgFRCRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 22:17:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51774 "EHLO mail.kernel.org"
+        id S1730340AbgFRBUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 21:20:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52936 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730207AbgFRBTy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:19:54 -0400
+        id S1730328AbgFRBUk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:20:40 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 37D1221D90;
-        Thu, 18 Jun 2020 01:19:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DBA1020CC7;
+        Thu, 18 Jun 2020 01:20:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443193;
-        bh=ovU23r/Etbj70jTV5pACK96PBP4+CkrG2+2V3Ar5ZZU=;
+        s=default; t=1592443239;
+        bh=yQ+EPRKOgzEMoRCrMgASq94CU8eenfNluTLG2ZL6VGg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=e2uhbmvWyUEqBGQOfhuDOJiO5DLzDBCCWwlmwKQGOfpnCQE0kzBd2SMknNyrxyUBs
-         X3ekBRGGCRn/XhN6G31aGK1yGz4RVWouYLhBxu7GY77bBfwJlTiARkKtGASg7F4eu2
-         1/q/JplJfz1TyzIEH9oSgnnvKVhI3f1bJajBhrkg=
+        b=YXf00QIgXAu8WyIdaasf0H3V/SYk+VnMpy83tiDDiwCqKEJi4OihALisWwT/rhMOa
+         7O1bK1xYuuAzpFxUv6MKliGUW75EzcYeZEGLKH3wTEoEtfItYjf+oSyTMpz5STTa/+
+         Ne8SlCuS2MoOeloRAozYUdfgyBdNSknPPf1sZYpk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
+Cc:     Qian Cai <cai@lca.pw>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 154/266] vfio-pci: Mask cap zero
-Date:   Wed, 17 Jun 2020 21:14:39 -0400
-Message-Id: <20200618011631.604574-154-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 191/266] vfio/pci: fix memory leaks of eventfd ctx
+Date:   Wed, 17 Jun 2020 21:15:16 -0400
+Message-Id: <20200618011631.604574-191-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
 References: <20200618011631.604574-1-sashal@kernel.org>
@@ -43,48 +43,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alex Williamson <alex.williamson@redhat.com>
+From: Qian Cai <cai@lca.pw>
 
-[ Upstream commit bc138db1b96264b9c1779cf18d5a3b186aa90066 ]
+[ Upstream commit 1518ac272e789cae8c555d69951b032a275b7602 ]
 
-The PCI Code and ID Assignment Specification changed capability ID 0
-from reserved to a NULL capability in the v1.1 revision.  The NULL
-capability is defined to include only the 16-bit capability header,
-ie. only the ID and next pointer.  Unfortunately vfio-pci creates a
-map of config space, where ID 0 is used to reserve the standard type
-0 header.  Finding an actual capability with this ID therefore results
-in a bogus range marked in that map and conflicts with subsequent
-capabilities.  As this seems to be a dummy capability anyway and we
-already support dropping capabilities, let's hide this one rather than
-delving into the potentially subtle dependencies within our map.
+Finished a qemu-kvm (-device vfio-pci,host=0001:01:00.0) triggers a few
+memory leaks after a while because vfio_pci_set_ctx_trigger_single()
+calls eventfd_ctx_fdget() without the matching eventfd_ctx_put() later.
+Fix it by calling eventfd_ctx_put() for those memory in
+vfio_pci_release() before vfio_device_release().
 
-Seen on an NVIDIA Tesla T4.
+unreferenced object 0xebff008981cc2b00 (size 128):
+  comm "qemu-kvm", pid 4043, jiffies 4294994816 (age 9796.310s)
+  hex dump (first 32 bytes):
+    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
+    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+  backtrace:
+    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
+    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
+    [<000000005fcec025>] do_eventfd+0x54/0x1ac
+    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
+    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
+    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
+    [<00000000d495ef94>] el0_sync+0x164/0x180
+unreferenced object 0x29ff008981cc4180 (size 128):
+  comm "qemu-kvm", pid 4043, jiffies 4294994818 (age 9796.290s)
+  hex dump (first 32 bytes):
+    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
+    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+  backtrace:
+    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
+    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
+    [<000000005fcec025>] do_eventfd+0x54/0x1ac
+    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
+    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
+    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
+    [<00000000d495ef94>] el0_sync+0x164/0x180
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Qian Cai <cai@lca.pw>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci_config.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/vfio_pci.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index c4d0cf9a1ab9..d6359c37c9e5 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -1460,7 +1460,12 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
- 		if (ret)
- 			return ret;
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 02206162eaa9..d917dd2df3b3 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -472,6 +472,10 @@ static void vfio_pci_release(void *device_data)
+ 	if (!(--vdev->refcnt)) {
+ 		vfio_spapr_pci_eeh_release(vdev->pdev);
+ 		vfio_pci_disable(vdev);
++		if (vdev->err_trigger)
++			eventfd_ctx_put(vdev->err_trigger);
++		if (vdev->req_trigger)
++			eventfd_ctx_put(vdev->req_trigger);
+ 	}
  
--		if (cap <= PCI_CAP_ID_MAX) {
-+		/*
-+		 * ID 0 is a NULL capability, conflicting with our fake
-+		 * PCI_CAP_ID_BASIC.  As it has no content, consider it
-+		 * hidden for now.
-+		 */
-+		if (cap && cap <= PCI_CAP_ID_MAX) {
- 			len = pci_cap_length[cap];
- 			if (len == 0xFF) { /* Variable length */
- 				len = vfio_cap_len(vdev, cap, pos);
+ 	mutex_unlock(&vdev->reflck->lock);
 -- 
 2.25.1
 
