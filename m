@@ -2,184 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AC0D1FEE52
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 11:07:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F6BE1FEE87
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 11:22:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728920AbgFRJHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 05:07:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26453 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728588AbgFRJHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 05:07:16 -0400
+        id S1729038AbgFRJWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 05:22:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22859 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728819AbgFRJWU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jun 2020 05:22:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592471234;
+        s=mimecast20190719; t=1592472138;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=zph7qfgsNm0uG10f1WSBDBIX+C5pgP3v2hrfa3bjGas=;
-        b=QZ23tj3LZoGFyqtVS09+7VriySZXprn2dudRAQsg6B53k13g5auQt9PyTMp4lM1FCA5S9a
-        qRkCNcHyOk/2k7k+dUm3qyXTeTI+q5vUZZpXuwH9DDFXkdQb26bmW404KC2PDZUTxhHO8y
-        ZcO7TbIC24O8nCFsQ5tQBqZ9KaELQNo=
+         in-reply-to:in-reply-to:references:references;
+        bh=qXY1JC4o7ZuNXiWnBfqiZqSRUf7O9tuUj/URnfUW+BQ=;
+        b=W2n8spOiAAENF41wbN7ZkqXlw2VOvf42MFRBzP/7JnAgtpEU4623q/RrEMeWK9uZQv5pzf
+        G5Guw2txNryiaLaXO073/APmzvHNHorT/QfHdWviYEtNxrBhvlFnCDayvLf2nnwoul6fM0
+        byPY9aB48u1JTxWumF+RGeshX9PIZ2Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-9_5xjY4nO3C6vlQFRovjOA-1; Thu, 18 Jun 2020 05:07:10 -0400
-X-MC-Unique: 9_5xjY4nO3C6vlQFRovjOA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-31-lkuk9eJyMzqg3Uc9CKV4mA-1; Thu, 18 Jun 2020 05:22:15 -0400
+X-MC-Unique: lkuk9eJyMzqg3Uc9CKV4mA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50453100CCC0;
-        Thu, 18 Jun 2020 09:07:09 +0000 (UTC)
-Received: from [10.36.114.105] (ovpn-114-105.ams2.redhat.com [10.36.114.105])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ECC597A01A;
-        Thu, 18 Jun 2020 09:07:06 +0000 (UTC)
-Subject: Re: [PATCH] KVM: s390: reduce number of IO pins to 1
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC7D5EC1A0;
+        Thu, 18 Jun 2020 09:22:13 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.195.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 98ADE5C1D6;
+        Thu, 18 Jun 2020 09:22:11 +0000 (UTC)
+Date:   Thu, 18 Jun 2020 11:22:08 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        kvm@vger.kernel.org, qemu-arm@nongnu.org,
+        Haibo Xu <haibo.xu@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>
-References: <20200617083620.5409-1-borntraeger@de.ibm.com>
- <d17de7d7-6cca-672a-5519-c67fc147f6a5@redhat.com>
- <6953c580-9b99-1c76-b6eb-510dcb70894c@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <66419659-e678-2daf-2e02-4f2158076ddb@redhat.com>
-Date:   Thu, 18 Jun 2020 11:07:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+Subject: Re: [PATCH] target/arm/kvm: Check supported feature per accelerator
+ (not per vCPU)
+Message-ID: <20200618092208.nn67fgre4h7yjcnt@kamzik.brq.redhat.com>
+References: <20200617130800.26355-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6953c580-9b99-1c76-b6eb-510dcb70894c@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200617130800.26355-1-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17.06.20 13:04, Christian Borntraeger wrote:
+On Wed, Jun 17, 2020 at 03:08:00PM +0200, Philippe Mathieu-Daudé wrote:
+> Since commit d70c996df23f, when enabling the PMU we get:
 > 
+>   $ qemu-system-aarch64 -cpu host,pmu=on -M virt,accel=kvm,gic-version=3
+>   Segmentation fault (core dumped)
 > 
-> On 17.06.20 12:19, David Hildenbrand wrote:
->> On 17.06.20 10:36, Christian Borntraeger wrote:
->>> The current number of KVM_IRQCHIP_NUM_PINS results in an order 3
->>> allocation (32kb) for each guest start/restart. This can result in OOM
->>> killer activity even with free swap when the memory is fragmented
->>> enough:
->>>
->>> kernel: qemu-system-s39 invoked oom-killer: gfp_mask=0x440dc0(GFP_KERNEL_ACCOUNT|__GFP_COMP|__GFP_ZERO), order=3, oom_score_adj=0
->>> kernel: CPU: 1 PID: 357274 Comm: qemu-system-s39 Kdump: loaded Not tainted 5.4.0-29-generic #33-Ubuntu
->>> kernel: Hardware name: IBM 8562 T02 Z06 (LPAR)
->>> kernel: Call Trace:
->>> kernel: ([<00000001f848fe2a>] show_stack+0x7a/0xc0)
->>> kernel:  [<00000001f8d3437a>] dump_stack+0x8a/0xc0
->>> kernel:  [<00000001f8687032>] dump_header+0x62/0x258
->>> kernel:  [<00000001f8686122>] oom_kill_process+0x172/0x180
->>> kernel:  [<00000001f8686abe>] out_of_memory+0xee/0x580
->>> kernel:  [<00000001f86e66b8>] __alloc_pages_slowpath+0xd18/0xe90
->>> kernel:  [<00000001f86e6ad4>] __alloc_pages_nodemask+0x2a4/0x320
->>> kernel:  [<00000001f86b1ab4>] kmalloc_order+0x34/0xb0
->>> kernel:  [<00000001f86b1b62>] kmalloc_order_trace+0x32/0xe0
->>> kernel:  [<00000001f84bb806>] kvm_set_irq_routing+0xa6/0x2e0
->>> kernel:  [<00000001f84c99a4>] kvm_arch_vm_ioctl+0x544/0x9e0
->>> kernel:  [<00000001f84b8936>] kvm_vm_ioctl+0x396/0x760
->>> kernel:  [<00000001f875df66>] do_vfs_ioctl+0x376/0x690
->>> kernel:  [<00000001f875e304>] ksys_ioctl+0x84/0xb0
->>> kernel:  [<00000001f875e39a>] __s390x_sys_ioctl+0x2a/0x40
->>> kernel:  [<00000001f8d55424>] system_call+0xd8/0x2c8
->>>
->>> As far as I can tell s390x does not use the iopins as we bail our for
->>> anything other than KVM_IRQ_ROUTING_S390_ADAPTER and the chip/pin is
->>> only used for KVM_IRQ_ROUTING_IRQCHIP. So let us use a small number to
->>> reduce the memory footprint.
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  arch/s390/include/asm/kvm_host.h | 8 ++++----
->>>  1 file changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->>> index cee3cb6455a2..6ea0820e7c7f 100644
->>> --- a/arch/s390/include/asm/kvm_host.h
->>> +++ b/arch/s390/include/asm/kvm_host.h
->>> @@ -31,12 +31,12 @@
->>>  #define KVM_USER_MEM_SLOTS 32
->>>  
->>>  /*
->>> - * These seem to be used for allocating ->chip in the routing table,
->>> - * which we don't use. 4096 is an out-of-thin-air value. If we need
->>> - * to look at ->chip later on, we'll need to revisit this.
->>> + * These seem to be used for allocating ->chip in the routing table, which we
->>> + * don't use. 1 is as small as we can get to reduce the needed memory. If we
->>> + * need to look at ->chip later on, we'll need to revisit this.
->>>   */
->>>  #define KVM_NR_IRQCHIPS 1
->>> -#define KVM_IRQCHIP_NUM_PINS 4096
->>> +#define KVM_IRQCHIP_NUM_PINS 1
->>>  #define KVM_HALT_POLL_NS_DEFAULT 50000
->>>  
->>>  /* s390-specific vcpu->requests bit members */
->>>
->>
->> Guess it doesn't make sense to wrap all the "->chip" handling in a
->> separate set of defines.
->>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
+>   Thread 1 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
+>   0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
+>   2588        ret = ioctl(s->fd, type, arg);
+>   (gdb) bt
+>   #0  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
+>   #1  0x0000aaaaaae31568 in kvm_check_extension (s=0x0, extension=126) at accel/kvm/kvm-all.c:916
+>   #2  0x0000aaaaaafce254 in kvm_arm_pmu_supported (cpu=0xaaaaac214ab0) at target/arm/kvm.c:213
+>   #3  0x0000aaaaaafc0f94 in arm_set_pmu (obj=0xaaaaac214ab0, value=true, errp=0xffffffffe438) at target/arm/cpu.c:1111
+>   #4  0x0000aaaaab5533ac in property_set_bool (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", opaque=0xaaaaac222730, errp=0xffffffffe438) at qom/object.c:2170
+>   #5  0x0000aaaaab5512f0 in object_property_set (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1328
+>   #6  0x0000aaaaab551e10 in object_property_parse (obj=0xaaaaac214ab0, string=0xaaaaac11b4c0 "on", name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1561
+>   #7  0x0000aaaaab54ee8c in object_apply_global_props (obj=0xaaaaac214ab0, props=0xaaaaac018e20, errp=0xaaaaabd6fd88 <error_fatal>) at qom/object.c:407
+>   #8  0x0000aaaaab1dd5a4 in qdev_prop_set_globals (dev=0xaaaaac214ab0) at hw/core/qdev-properties.c:1218
+>   #9  0x0000aaaaab1d9fac in device_post_init (obj=0xaaaaac214ab0) at hw/core/qdev.c:1050
+>   ...
+>   #15 0x0000aaaaab54f310 in object_initialize_with_type (obj=0xaaaaac214ab0, size=52208, type=0xaaaaabe237f0) at qom/object.c:512
+>   #16 0x0000aaaaab54fa24 in object_new_with_type (type=0xaaaaabe237f0) at qom/object.c:687
+>   #17 0x0000aaaaab54fa80 in object_new (typename=0xaaaaabe23970 "host-arm-cpu") at qom/object.c:702
+>   #18 0x0000aaaaaaf04a74 in machvirt_init (machine=0xaaaaac0a8550) at hw/arm/virt.c:1770
+>   #19 0x0000aaaaab1e8720 in machine_run_board_init (machine=0xaaaaac0a8550) at hw/core/machine.c:1138
+>   #20 0x0000aaaaaaf95394 in qemu_init (argc=5, argv=0xffffffffea58, envp=0xffffffffea88) at softmmu/vl.c:4348
+>   #21 0x0000aaaaaada3f74 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at softmmu/main.c:48
 > 
-> I guess this is just the most simple solution. I am asking myself if I should add
-> cc stable of Fixes as I was able to trigger this by having several guests with a
-> reboot loop and several guests that trigger memory overcommitment.
+> This is because in frame #2, cpu->kvm_state is still NULL
+> (the vCPU is not yet realized).
 > 
+> KVM has a hard requirement of all cores supporting the same
+> feature set. We only need to check if the accelerator supports
+> a feature, not each vCPU individually.
+> 
+> Fix by kvm_arm_<FEATURE>_supported() functions take a AccelState
+> argument (already realized/valid at this point) instead of a
+> CPUState argument.
+> 
+> Reported-by: Haibo Xu <haibo.xu@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  target/arm/kvm_arm.h | 25 +++++++++++++------------
+>  target/arm/cpu.c     |  2 +-
+>  target/arm/cpu64.c   | 10 +++++-----
+>  target/arm/kvm.c     |  4 ++--
+>  target/arm/kvm64.c   | 14 +++++---------
+>  5 files changed, 26 insertions(+), 29 deletions(-)
+> 
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index 48bf5e16d5..8209525f20 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -12,6 +12,7 @@
+>  #define QEMU_KVM_ARM_H
+>  
+>  #include "sysemu/kvm.h"
+> +#include "sysemu/accel.h"
+>  #include "exec/memory.h"
+>  #include "qemu/error-report.h"
+>  
+> @@ -269,29 +270,29 @@ void kvm_arm_add_vcpu_properties(Object *obj);
+>  
+>  /**
+>   * kvm_arm_aarch32_supported:
+> - * @cs: CPUState
+> + * @as: AccelState
+>   *
+> - * Returns: true if the KVM VCPU can enable AArch32 mode
+> + * Returns: true if the KVM accelerator can enable AArch32 mode
+>   * and false otherwise.
+>   */
+> -bool kvm_arm_aarch32_supported(CPUState *cs);
+> +bool kvm_arm_aarch32_supported(AccelState *as);
+>  
+>  /**
+>   * kvm_arm_pmu_supported:
+> - * @cs: CPUState
+> + * @as: AccelState
+>   *
+> - * Returns: true if the KVM VCPU can enable its PMU
+> + * Returns: true if the KVM accelerator can enable its PMU
+>   * and false otherwise.
+>   */
+> -bool kvm_arm_pmu_supported(CPUState *cs);
+> +bool kvm_arm_pmu_supported(AccelState *as);
+>  
+>  /**
+>   * kvm_arm_sve_supported:
+> - * @cs: CPUState
+> + * @as: AccelState
+>   *
+> - * Returns true if the KVM VCPU can enable SVE and false otherwise.
+> + * Returns true if the KVM accelerator can enable SVE and false otherwise.
+>   */
+> -bool kvm_arm_sve_supported(CPUState *cs);
+> +bool kvm_arm_sve_supported(AccelState *as);
+>  
+>  /**
+>   * kvm_arm_get_max_vm_ipa_size:
+> @@ -359,17 +360,17 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+>  
+>  static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
+>  
+> -static inline bool kvm_arm_aarch32_supported(CPUState *cs)
+> +static inline bool kvm_arm_aarch32_supported(AccelState *as)
+>  {
+>      return false;
+>  }
+>  
+> -static inline bool kvm_arm_pmu_supported(CPUState *cs)
+> +static inline bool kvm_arm_pmu_supported(AccelState *as)
+>  {
+>      return false;
+>  }
+>  
+> -static inline bool kvm_arm_sve_supported(CPUState *cs)
+> +static inline bool kvm_arm_sve_supported(AccelState *as)
+>  {
+>      return false;
+>  }
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 5b7a36b5d7..29b314427c 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1108,7 +1108,7 @@ static void arm_set_pmu(Object *obj, bool value, Error **errp)
+>      ARMCPU *cpu = ARM_CPU(obj);
+>  
+>      if (value) {
+> -        if (kvm_enabled() && !kvm_arm_pmu_supported(CPU(cpu))) {
+> +        if (kvm_enabled() && !kvm_arm_pmu_supported(current_accel())) {
+>              error_setg(errp, "'pmu' feature not supported by KVM on this host");
+>              return;
+>          }
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 778cecc2e6..13835768ab 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -266,7 +266,7 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+>  
+>      /* Collect the set of vector lengths supported by KVM. */
+>      bitmap_zero(kvm_supported, ARM_MAX_VQ);
+> -    if (kvm_enabled() && kvm_arm_sve_supported(CPU(cpu))) {
+> +    if (kvm_enabled() && kvm_arm_sve_supported(current_accel())) {
+>          kvm_arm_sve_get_vls(CPU(cpu), kvm_supported);
+>      } else if (kvm_enabled()) {
+>          assert(!cpu_isar_feature(aa64_sve, cpu));
+> @@ -473,7 +473,7 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
+>          return;
+>      }
+>  
+> -    if (kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
+> +    if (kvm_enabled() && !kvm_arm_sve_supported(current_accel())) {
+>          error_setg(errp, "cannot set sve-max-vq");
+>          error_append_hint(errp, "SVE not supported by KVM on this host\n");
+>          return;
+> @@ -519,7 +519,7 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
+>          return;
+>      }
+>  
+> -    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
+> +    if (value && kvm_enabled() && !kvm_arm_sve_supported(current_accel())) {
+>          error_setg(errp, "cannot enable %s", name);
+>          error_append_hint(errp, "SVE not supported by KVM on this host\n");
+>          return;
+> @@ -556,7 +556,7 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
+>          return;
+>      }
+>  
+> -    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
+> +    if (value && kvm_enabled() && !kvm_arm_sve_supported(current_accel())) {
+>          error_setg(errp, "'sve' feature not supported by KVM on this host");
+>          return;
+>      }
+> @@ -751,7 +751,7 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
+>       * uniform execution state like do_interrupt.
+>       */
+>      if (value == false) {
+> -        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
+> +        if (!kvm_enabled() || !kvm_arm_aarch32_supported(current_accel())) {
+>              error_setg(errp, "'aarch64' feature cannot be disabled "
+>                               "unless KVM is enabled and 32-bit EL1 "
+>                               "is supported");
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index eef3bbd1cc..2247a96757 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -208,9 +208,9 @@ void kvm_arm_add_vcpu_properties(Object *obj)
+>      }
+>  }
+>  
+> -bool kvm_arm_pmu_supported(CPUState *cpu)
+> +bool kvm_arm_pmu_supported(AccelState *as)
+>  {
+> -    return kvm_check_extension(cpu->kvm_state, KVM_CAP_ARM_PMU_V3);
+> +    return kvm_check_extension(KVM_STATE(as), KVM_CAP_ARM_PMU_V3);
+>  }
+>  
+>  int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index f09ed9f4df..ae4e37ce78 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -652,18 +652,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>      return true;
+>  }
+>  
+> -bool kvm_arm_aarch32_supported(CPUState *cpu)
+> +bool kvm_arm_aarch32_supported(AccelState *as)
+>  {
+> -    KVMState *s = KVM_STATE(current_accel());
+> -
+> -    return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
+> +    return kvm_check_extension(KVM_STATE(as), KVM_CAP_ARM_EL1_32BIT);
+>  }
+>  
+> -bool kvm_arm_sve_supported(CPUState *cpu)
+> +bool kvm_arm_sve_supported(AccelState *as)
+>  {
+> -    KVMState *s = KVM_STATE(current_accel());
+> -
+> -    return kvm_check_extension(s, KVM_CAP_ARM_SVE);
+> +    return kvm_check_extension(KVM_STATE(as), KVM_CAP_ARM_SVE);
+>  }
+>  
+>  QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN != 1);
+> @@ -798,7 +794,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          env->features &= ~(1ULL << ARM_FEATURE_PMU);
+>      }
+>      if (cpu_isar_feature(aa64_sve, cpu)) {
+> -        assert(kvm_arm_sve_supported(cs));
+> +        assert(kvm_arm_sve_supported(ACCEL(cs->kvm_state)));
 
-I don't think this classifies as stable material.
+Might as well use current_accel() here too, right?
 
--- 
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
+>      }
+>  
+> -- 
+> 2.21.3
+> 
+>
+
+At all callsites we pass current_accel() to the kvm_arm_<feat>_supported()
+functions. Is there any reason not to drop their input parameter and just
+use current_accel() internally?
+
 Thanks,
-
-David / dhildenb
+drew
 
