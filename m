@@ -2,95 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A691D1FF23B
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 14:47:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CAAA1FF276
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 14:55:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729926AbgFRMrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 08:47:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25779 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727091AbgFRMrL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 08:47:11 -0400
+        id S1729912AbgFRMyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 08:54:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30913 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728215AbgFRMyw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jun 2020 08:54:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592484430;
+        s=mimecast20190719; t=1592484891;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=TlsMc1mLQuW6Fy9nTnXlEoj8JWjnrS7Ag2B0bw3WO+0=;
-        b=hcvUqJNHx7VuqItLfUrqnABeCIA4YRU1qF1V1RN4CwvuipUwx0iZa2HFJTT/cdP+HDT9kC
-        b+Uz2KGpBbOKhZbqfazMYPPZxRqP0ysjwNDbcHoe/YNzX7W7WfJ4P4jedDawJ9DIlYhk87
-        c8npjuqBU2H3fdET+2Rmuyucez/X3NY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431--p8fARLGP9OVjj786ZgFmQ-1; Thu, 18 Jun 2020 08:47:09 -0400
-X-MC-Unique: -p8fARLGP9OVjj786ZgFmQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2CF9107ACCD;
-        Thu, 18 Jun 2020 12:47:07 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-115-20.rdu2.redhat.com [10.10.115.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C52D5D9D3;
-        Thu, 18 Jun 2020 12:47:01 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id B8E99222D7B; Thu, 18 Jun 2020 08:47:00 -0400 (EDT)
-Date:   Thu, 18 Jun 2020 08:47:00 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, virtio-fs@redhat.com,
-        miklos@szeredi.hu, stefanha@redhat.com, dgilbert@redhat.com,
-        pbonzini@redhat.com, wanpengli@tencent.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] kvm: Add capability to be able to report async pf
- error to guest
-Message-ID: <20200618124700.GA3814@redhat.com>
-References: <20200616214847.24482-1-vgoyal@redhat.com>
- <20200616214847.24482-3-vgoyal@redhat.com>
- <87lfklhm58.fsf@vitty.brq.redhat.com>
- <20200617183224.GK26818@linux.intel.com>
- <20200617215152.GF26770@redhat.com>
- <20200617230052.GB27751@linux.intel.com>
- <20200617230548.GC27751@linux.intel.com>
+        bh=GFWBe5zShZuKjAbK8diRva50YzmRg/DMEjWSnvAfB8Y=;
+        b=KWo2k/KGFwuvHo9k8ao6KfvENQUAnkhlJ6TkmfQHrqjehelQ9nWH5VITxmO/llqb8W/ZAL
+        jXcwZxFzrql8rcUjn+Th0zrIMJBT09hOD+phN5jNzlGZwlchsbqqAftHT5CgSQvWXQuBDK
+        p9aogIuekxMsp5tnMJPjwHU45p1NZCU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-470-tmyxXAhJNMK6wMrgJUaLQA-1; Thu, 18 Jun 2020 08:54:49 -0400
+X-MC-Unique: tmyxXAhJNMK6wMrgJUaLQA-1
+Received: by mail-ed1-f70.google.com with SMTP id w23so2207669edt.18
+        for <kvm@vger.kernel.org>; Thu, 18 Jun 2020 05:54:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=GFWBe5zShZuKjAbK8diRva50YzmRg/DMEjWSnvAfB8Y=;
+        b=Nrtc/POlAyFsFMocz8hczFYL9YkY4oBugqUkmK0KI6+IHOdNUXI9mmYHyy5QgfI2ZW
+         /l3WkyibPmrxyyEeDECdEq8KfY5cvYFwW1oB2ZiJBykY3pdhZEtjFqxqFbAAR3e57mPX
+         d2kJFSL4xWeevGw0xzDy9/ZhokqgKbHj+irs2ht23XdoFv+fOXT5Yd9AVzqrzXV10+Bd
+         dIGtfAfcKkVdZecqKQmv3Sw5NWtRTKPtK2k3IK4uLdgRMNvyD7ArOWI8Nh1CT0lFFvaT
+         IHuvF+ZY5Qz6R7EFCfm0ZGlR/9GJK/s62b80gHSEkZDJJjtHOECWG66sxB6u36RMOLDx
+         djbg==
+X-Gm-Message-State: AOAM531IRfoqxAlg2CyrV7qxwHzcMoW5c/wtxmCDmqy6n3+WyQp6VJVH
+        uRRrEsG+x2eAtkQwMS50fSlwLoRirmvG/Lt8P90f1wvD9+tk2H+NgaAnZzq430XKUKoOLK1iEXV
+        NyYCV4VIT7Jvx
+X-Received: by 2002:a17:906:c317:: with SMTP id s23mr3617467ejz.311.1592484887485;
+        Thu, 18 Jun 2020 05:54:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzRngFvcNIFMCnpL9zk3fKov7ZL02XwX7tWjBgDoozUFRVE2MF9vR2PEm8PRvEU9vHi3nYP+Q==
+X-Received: by 2002:a17:906:c317:: with SMTP id s23mr3617452ejz.311.1592484887278;
+        Thu, 18 Jun 2020 05:54:47 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id me8sm2255441ejb.28.2020.06.18.05.54.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2020 05:54:46 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <like.xu@linux.intel.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: SVM: emulate MSR_IA32_PERF_CAPABILITIES
+In-Reply-To: <adc8b307-4ec4-575f-ff94-c9b820189fb1@redhat.com>
+References: <20200618111328.429931-1-vkuznets@redhat.com> <adc8b307-4ec4-575f-ff94-c9b820189fb1@redhat.com>
+Date:   Thu, 18 Jun 2020 14:54:45 +0200
+Message-ID: <87ftash6ui.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200617230548.GC27751@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 17, 2020 at 04:05:48PM -0700, Sean Christopherson wrote:
-> On Wed, Jun 17, 2020 at 04:00:52PM -0700, Sean Christopherson wrote:
-> > On Wed, Jun 17, 2020 at 05:51:52PM -0400, Vivek Goyal wrote:
-> > What I'm saying is that KVM cannot do the filtering.  KVM, by design, does
-> > not know what lies behind any given hva, or what the associated gpa maps to
-> > in the guest.  As is, userspace can't even opt out of this behavior, e.g.
-> > it can't even "filter" on a per-VM granularity, since kvm_pv_enable_async_pf()
-> > unconditionally allows the guest to enable the behavior[*].
-> 
-> Let me rephrase that slightly.  KVM can do the filtering, but it cannot make
-> the decision on what to filter.  E.g. if the use case is compatible with doing
-> this at a memslot level, then a memslot flag could be added to control the
-> behavior.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Ok, may be. But what is that thing which you want to filter out. Just
-creating a framework for filtering selective regions without any specific
-use case is hard.
+> On 18/06/20 13:13, Vitaly Kuznetsov wrote:
+>> state_test/smm_test selftests are failing on AMD with:
+>> "Unexpected result from KVM_GET_MSRS, r: 51 (failed MSR was 0x345)"
+>> 
+>> MSR_IA32_PERF_CAPABILITIES is an emulated MSR on Intel but it is not
+>> known to AMD code, emulate it there too (by returning 0 and allowing
+>> userspace to write 0). This way the code is better prepared to the
+>> eventual appearance of the feature in AMD hardware.
+>> 
+>> Fixes: 27461da31089 ("KVM: x86/pmu: Support full width counting")
+>> Suggested-by: Jim Mattson <jmattson@google.com>
+>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/svm/pmu.c | 29 ++++++++++++++++++++++++++++-
+>>  1 file changed, 28 insertions(+), 1 deletion(-)
+>
+> This is okay and I'll apply it, but it would be even better to move the
+> whole handling of the MSR to common x86 code.
 
-Right now we have one switch to enable/disable error reporting and
-this can be turned off both at qemu level as well as guest level.
+I thought about that but intel_pmu_set_msr() looks at
+vmx_get_perf_capabilities(), we'll need to abstract this somehow.
 
-If the desire is that this needs to me more finer grained, I need
-to have some examples which show that in these cases we don't want
-to report page fault errors.
-
-Anyway, it seems that atleast first patch is less contentious and
-can be relatively easily be done. That is exit to user space if
-page fault error happens instead of getting into an infinite loop.
-I will post that separately.
-
-Thanks
-Vivek
+-- 
+Vitaly
 
