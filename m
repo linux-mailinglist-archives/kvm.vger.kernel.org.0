@@ -2,124 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A7951FF48C
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 16:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C4A71FF4B3
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 16:29:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730442AbgFROSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 10:18:22 -0400
-Received: from mga03.intel.com ([134.134.136.65]:3868 "EHLO mga03.intel.com"
+        id S1728161AbgFRO3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 10:29:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53382 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728340AbgFROST (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 10:18:19 -0400
-IronPort-SDR: 1PoJ4qzKIM8deSZtzmTrO0NTUE7emF8vNCevOnRf4qn7R+IOOOpojqrMMOSWNmw81JtPypTKWu
- HvCrsL363k6Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9655"; a="142528941"
-X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
-   d="scan'208";a="142528941"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2020 07:18:18 -0700
-IronPort-SDR: Z3EwOfLlV2OW9hD3bZAORhaaaJXjZT3oK6CMXq2HjaoC/5xRKHBH8qvIpgsk9o744/qlyJ7jWT
- RvboVXVkhOdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
-   d="scan'208";a="277637357"
-Received: from ryanr2x-mobl1.amr.corp.intel.com (HELO [10.255.0.133]) ([10.255.0.133])
-  by orsmga006.jf.intel.com with ESMTP; 18 Jun 2020 07:18:10 -0700
-Subject: Re: [PATCH 2/4] KVM: x86: Introduce paravirt feature CR0/CR4 pinning
-To:     John Andersen <john.s.andersen@intel.com>, corbet@lwn.net,
-        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com, shuah@kernel.org,
-        sean.j.christopherson@intel.com, liran.alon@oracle.com,
-        drjones@redhat.com, rick.p.edgecombe@intel.com,
-        kristen@linux.intel.com
-Cc:     vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, mchehab+huawei@kernel.org,
-        gregkh@linuxfoundation.org, paulmck@kernel.org,
-        pawan.kumar.gupta@linux.intel.com, jgross@suse.com,
-        mike.kravetz@oracle.com, oneukum@suse.com, luto@kernel.org,
-        peterz@infradead.org, fenghua.yu@intel.com,
-        reinette.chatre@intel.com, vineela.tummalapalli@intel.com,
-        dave.hansen@linux.intel.com, arjan@linux.intel.com,
-        caoj.fnst@cn.fujitsu.com, bhe@redhat.com, nivedita@alum.mit.edu,
-        keescook@chromium.org, dan.j.williams@intel.com,
-        eric.auger@redhat.com, aaronlewis@google.com, peterx@redhat.com,
-        makarandsonare@google.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        kernel-hardening@lists.openwall.com
-References: <20200617190757.27081-1-john.s.andersen@intel.com>
- <20200617190757.27081-3-john.s.andersen@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <0fa9682e-59d4-75f7-366f-103d6b8e71b8@intel.com>
-Date:   Thu, 18 Jun 2020 07:18:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726905AbgFRO3p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jun 2020 10:29:45 -0400
+Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A0C70207E8;
+        Thu, 18 Jun 2020 14:29:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592490584;
+        bh=3OO4kEs57sfNjzQq7iy84oQLGMRCkyvOCnFELjitwc4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=yOGTyQZOeF3MreSMzsPgPbZLSkqgahgCBlwYFNIo1+IfNVR/j5HUQf3D6q9UUwZ2F
+         TaWa3A6AdQE8H12eN+fJiEi6BldZIt4aGEPbVbjNGD/odz8DK5A3IdjJNw/5mRhRl6
+         4v2SZZtTzg3QkOEU+dUmO6UV4hAKfnbjrLZyNLvo=
+Date:   Thu, 18 Jun 2020 10:29:43 -0400
+From:   Sasha Levin <sashal@kernel.org>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Qian Cai <cai@lca.pw>, kvm@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 5.7 280/388] vfio/pci: fix memory leaks of
+ eventfd ctx
+Message-ID: <20200618142943.GS1931@sasha-vm>
+References: <20200618010805.600873-1-sashal@kernel.org>
+ <20200618010805.600873-280-sashal@kernel.org>
+ <20200617192501.2310afe6@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <20200617190757.27081-3-john.s.andersen@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200617192501.2310afe6@x1.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/17/20 12:07 PM, John Andersen wrote:
-> +#define KVM_CR0_PIN_ALLOWED	(X86_CR0_WP)
-> +#define KVM_CR4_PIN_ALLOWED	(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP)
+On Wed, Jun 17, 2020 at 07:25:01PM -0600, Alex Williamson wrote:
+>On Wed, 17 Jun 2020 21:06:17 -0400
+>Sasha Levin <sashal@kernel.org> wrote:
+>
+>> From: Qian Cai <cai@lca.pw>
+>>
+>> [ Upstream commit 1518ac272e789cae8c555d69951b032a275b7602 ]
+>>
+>> Finished a qemu-kvm (-device vfio-pci,host=0001:01:00.0) triggers a few
+>> memory leaks after a while because vfio_pci_set_ctx_trigger_single()
+>> calls eventfd_ctx_fdget() without the matching eventfd_ctx_put() later.
+>> Fix it by calling eventfd_ctx_put() for those memory in
+>> vfio_pci_release() before vfio_device_release().
+>>
+>> unreferenced object 0xebff008981cc2b00 (size 128):
+>>   comm "qemu-kvm", pid 4043, jiffies 4294994816 (age 9796.310s)
+>>   hex dump (first 32 bytes):
+>>     01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
+>>     ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+>>   backtrace:
+>>     [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
+>>     [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
+>>     [<000000005fcec025>] do_eventfd+0x54/0x1ac
+>>     [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
+>>     [<00000000b819758c>] do_el0_svc+0x128/0x1dc
+>>     [<00000000b244e810>] el0_sync_handler+0xd0/0x268
+>>     [<00000000d495ef94>] el0_sync+0x164/0x180
+>> unreferenced object 0x29ff008981cc4180 (size 128):
+>>   comm "qemu-kvm", pid 4043, jiffies 4294994818 (age 9796.290s)
+>>   hex dump (first 32 bytes):
+>>     01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
+>>     ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
+>>   backtrace:
+>>     [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
+>>     [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
+>>     [<000000005fcec025>] do_eventfd+0x54/0x1ac
+>>     [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
+>>     [<00000000b819758c>] do_el0_svc+0x128/0x1dc
+>>     [<00000000b244e810>] el0_sync_handler+0xd0/0x268
+>>     [<00000000d495ef94>] el0_sync+0x164/0x180
+>>
+>> Signed-off-by: Qian Cai <cai@lca.pw>
+>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>> ---
+>>  drivers/vfio/pci/vfio_pci.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+>> index 6c6b37b5c04e..080e6608f297 100644
+>> --- a/drivers/vfio/pci/vfio_pci.c
+>> +++ b/drivers/vfio/pci/vfio_pci.c
+>> @@ -519,6 +519,10 @@ static void vfio_pci_release(void *device_data)
+>>  		vfio_pci_vf_token_user_add(vdev, -1);
+>>  		vfio_spapr_pci_eeh_release(vdev->pdev);
+>>  		vfio_pci_disable(vdev);
+>> +		if (vdev->err_trigger)
+>> +			eventfd_ctx_put(vdev->err_trigger);
+>> +		if (vdev->req_trigger)
+>> +			eventfd_ctx_put(vdev->req_trigger);
+>>  	}
+>>
+>>  	mutex_unlock(&vdev->reflck->lock);
+>
+>
+>This has a fix pending, I'd suggest not picking it on its own:
+>
+>https://lore.kernel.org/kvm/20200616085052.sahrunsesjyjeyf2@beryllium.lan/
+>https://lore.kernel.org/kvm/159234276956.31057.6902954364435481688.stgit@gimli.home/
 
-Why *is* there an allowed set?  Why don't we just allow everything?
+Thanks! I'll hold off on this until the fix is in too.
 
-Shouldn't we also pin any unknown bits?  The CR4.FSGSBASE bit is an
-example of something that showed up CPUs without Linux knowing about it.
- If set, it causes problems.  This set couldn't have helped FSGSBASE
-because it is not in the allowed set.
-
-Let's say Intel loses its marbles and adds a CR4 bit that lets userspace
-write to kernel memory.  Linux won't set it, but an attacker would go
-after it, first thing.
+-- 
+Thanks,
+Sasha
