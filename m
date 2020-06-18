@@ -2,293 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 932ED1FF0E7
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 13:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EB311FF0F1
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 13:48:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727788AbgFRLqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 07:46:20 -0400
-Received: from mga06.intel.com ([134.134.136.31]:56483 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726946AbgFRLqS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 07:46:18 -0400
-IronPort-SDR: 99y4AMArUCCbu34YxXFh7DeCXTb5yIJJpkD/qJnEClTnrA4kbC0kaLZQ3kqzSYHMRIAoqU/Q2o
- iU4i+eLOQiMA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9655"; a="204034544"
-X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
-   d="scan'208";a="204034544"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2020 04:46:16 -0700
-IronPort-SDR: skJ/m7HCEEOJpJDHueF17lGDMtd/CqH1rHAXjEcf/s8tVYVUmPBoMZy/lfhi4wWArcimEU00Gk
- WLVkB4pPBO9Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,526,1583222400"; 
-   d="scan'208";a="477168236"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Jun 2020 04:46:16 -0700
-Received: from fmsmsx154.amr.corp.intel.com (10.18.116.70) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 18 Jun 2020 04:46:16 -0700
-Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
- FMSMSX154.amr.corp.intel.com (10.18.116.70) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 18 Jun 2020 04:46:15 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Thu, 18 Jun 2020 04:46:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S7Bnwp3CMLslNqZb/leek6Zx67D+CJkiWsNnCmD/7WgrrH2a754WcIsi7rrWmwjZSQb+NGNCC45sP5gdIf56zSgZBL7Xrq1PvSwBz21cOdi/o5scwUjyVmaAuJd3mdck6omiGu4HJ3JvbDC2bVDH3lLgnANJSsBxsDECeJIz1aKpZZa8wfip5llJfknJzd1Fl+b7fDmcqvCOY9p5IiezB2N676QtGHMt0yVP7xxk5zuBZDYIqKL/KpXsMH/qVmBxpf8Igx3epoHTLo8SuHyb9BMTM2WkNzcW8Z0liHl8y/P2iGyKywrUg397gOJVowkI5FdT7cIfQjiIAAGxs8n3yA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5ol9zyn9oa9grmPjVICjgwEjvWL/ohYiZouqtGV1UmI=;
- b=NXnuHFb2O//zk5BESGQND8wff1cPgH5NM2x+VWRfghUR6IsYvEGIwCIuPZCCk/DZNgIhQiU+XJHth4mLBdzgwUAIKiIQRhrMZs4krejcsGBIZ4KnRlYtu4L7N3ZljgAVMCpJujsleMloIkYQZcb+uR1ru5h6WntzCGhkmS9RpdJ44jESg0YotTFznQXFB85oUcmpdcJWLC+ExfFEeOoPYc5ioZu58LOph90C2F0YNUMwWxfw8DTS0y4bCeg5IUHNdDzQA0vMaoeVcDGkzYGkZf3dikILvbJW6OwppaFXE4TxrIFHV3daaekSwPmyyylpRSSXvfwWQCtuV6iICrSRKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5ol9zyn9oa9grmPjVICjgwEjvWL/ohYiZouqtGV1UmI=;
- b=CK60GrklKgsLzy+Ot4SIDD9aPHBMhZOUk4rvN1mT/f2jMfqqjFfgO0B6pl3P/BC4AMYu+8fV3Gz2xKcbF77+rccTbid9BLh0bAdlxj1AO/Pg7cmWCDeZ/aJntnke2zYLbAZLSiHeKd+CcDWzTZx7xalUSisLtLHXLhmBSNBrIlQ=
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com (2603:10b6:4:7::18) by
- DM5PR1101MB2108.namprd11.prod.outlook.com (2603:10b6:4:53::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.23; Thu, 18 Jun 2020 11:46:14 +0000
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::2c3d:98d9:4e81:c86c]) by DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::2c3d:98d9:4e81:c86c%6]) with mapi id 15.20.3109.023; Thu, 18 Jun 2020
- 11:46:14 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Subject: RE: [PATCH v2 02/15] iommu: Report domain nesting info
-Thread-Topic: [PATCH v2 02/15] iommu: Report domain nesting info
-Thread-Index: AQHWP+lAvgybSaO2NECN4P16s7e2zKjc6kyAgAFaSXA=
-Date:   Thu, 18 Jun 2020 11:46:14 +0000
-Message-ID: <DM5PR11MB143583396465E5DEFF8BA8CDC39B0@DM5PR11MB1435.namprd11.prod.outlook.com>
-References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
- <1591877734-66527-3-git-send-email-yi.l.liu@intel.com>
- <20200617143909.GA886590@myrica>
-In-Reply-To: <20200617143909.GA886590@myrica>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.2.0.6
-dlp-product: dlpe-windows
-authentication-results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.217]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f0d44784-4e10-4ec2-7294-08d8137d34ac
-x-ms-traffictypediagnostic: DM5PR1101MB2108:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR1101MB2108AC57E7CA7EB1601768DBC39B0@DM5PR1101MB2108.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0438F90F17
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: KtsLESTArB/qOy0K5OMCWSdlXSlrPsUyKXOtmeBmYN3RBqOBGrLUxLmLLr0aeLXwf5gaD54GYOrPrdj4P1IhEXQEcOD/JtyRccmHcOpBRhJ1+1s6/keNQrO6AIYbkhnDOQbIRrKYT8aYmgRoWjZjMGbkxCDOd6T6pKQp0s/LyiCn5vMu/31OAd9U8RLxmAexFA3MQKy0B5PhLDExTJe+SCPCxF9ypV1jZJTVTqFly49Shqg6mcgBDDyNA6R9Xb/2J2Ajorb4GgDGk23/84Xdbh1G3fhpSnuspLlDwUttygNJyLiOKrSCBdE9B7lek2ZK90Qmg5lUVuJXqhe1dxQu5A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(346002)(376002)(136003)(39860400002)(396003)(366004)(5660300002)(52536014)(6506007)(478600001)(86362001)(8936002)(4326008)(186003)(26005)(71200400001)(83380400001)(7696005)(33656002)(7416002)(54906003)(316002)(2906002)(55016002)(6916009)(9686003)(66476007)(66556008)(64756008)(66446008)(76116006)(66946007)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: 3YLUHKosrlkGtpx5GI5Yk3CSTowreJFJGNbAAfN1rVMaAIX6Y/wd0mlVHaQWnLS+HY89tFzxaMYcmgPMJEtpahNa2P7hQDcjtF68LEasbX20o4rs2XMANlk0mK1n/rO/dI7JgMSg3lXYjIss2pNVOJBxZh3urQXMO/4rS1CHoYG3+9bSzmt+mUs3TCb+qLa9erY0NFTFcfDZXNU6x05jPf3N0sKCduBh/i0eaznRfBHfh5B8CVlfwPSw1SGQzS5e79Zdd43ed/ELVqQCy1+VuNn15Hf+YoiI8lZT8zw35T+p9zB64JUo/hNncW3+ycGtzruxdj/+9nzXR/zDxQPoVMqdynakwgw9ifXbXE3WMzdvhbrVRal9f2cg4ETGX62vch8XfUMt0gpBHWuS7kmugh5ADY+yWvuuB60zEJdvGmJSGX/NIlhtvFBA99lpxltqLcW+BDJatWtimKRwXO/v8F6qQyWWrvOSpASwiLx9ZqQtLeGL0dtVbuBSrIwB3Iib
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1728867AbgFRLr6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 07:47:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62996 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726946AbgFRLrx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jun 2020 07:47:53 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05IBWLUY179659;
+        Thu, 18 Jun 2020 07:47:51 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31r6g1247x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Jun 2020 07:47:51 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05IBWOpd180004;
+        Thu, 18 Jun 2020 07:47:51 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31r6g1247m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Jun 2020 07:47:51 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05IBeIs4009845;
+        Thu, 18 Jun 2020 11:47:50 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma01dal.us.ibm.com with ESMTP id 31q9v6famg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Jun 2020 11:47:50 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05IBlnvx38994324
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Jun 2020 11:47:49 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 666F7AC05B;
+        Thu, 18 Jun 2020 11:47:49 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0416AC059;
+        Thu, 18 Jun 2020 11:47:48 +0000 (GMT)
+Received: from [9.160.28.91] (unknown [9.160.28.91])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Jun 2020 11:47:48 +0000 (GMT)
+Subject: Re: [RFC PATCH v3 1/3] vfio-ccw: Indicate if a channel_program is
+ started
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200616195053.99253-1-farman@linux.ibm.com>
+ <20200616195053.99253-2-farman@linux.ibm.com>
+ <20200618011109.294a972d.pasic@linux.ibm.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Autocrypt: addr=farman@linux.ibm.com; keydata=
+ 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
+Message-ID: <d859aa8d-186a-31b0-0770-2885de61b4bb@linux.ibm.com>
+Date:   Thu, 18 Jun 2020 07:47:48 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0d44784-4e10-4ec2-7294-08d8137d34ac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2020 11:46:14.5852
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9BUmJTMLylUgoozkzduI8YivJzT2ev7eVNDBRBkrD4YA1Xt/2BwytlVSlqNKrigGWFrQchPBj/I0BOIAbNwvbw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1101MB2108
-X-OriginatorOrg: intel.com
+In-Reply-To: <20200618011109.294a972d.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-18_07:2020-06-18,2020-06-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 suspectscore=2 bulkscore=0 cotscore=-2147483648
+ adultscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 impostorscore=0
+ mlxscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006180085
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jean,
 
-> From: Jean-Philippe Brucker < jean-philippe@linaro.org>
-> Sent: Wednesday, June 17, 2020 10:39 PM
->=20
-> [+ Will and Robin]
->=20
-> Hi Yi,
->=20
-> On Thu, Jun 11, 2020 at 05:15:21AM -0700, Liu Yi L wrote:
-> > IOMMUs that support nesting translation needs report the capability
-> > info to userspace, e.g. the format of first level/stage paging structur=
-es.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > Cc: Joerg Roedel <joro@8bytes.org>
-> > Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > ---
-> > @Jean, Eric: as nesting was introduced for ARM, but looks like no
-> > actual user of it. right? So I'm wondering if we can reuse
-> > DOMAIN_ATTR_NESTING to retrieve nesting info? how about your opinions?
->=20
-> Sure, I think we could rework the getters for DOMAIN_ATTR_NESTING since t=
-hey
-> aren't used, but we do need to keep the setters as is.
->=20
-> Before attaching a domain, VFIO sets DOMAIN_ATTR_NESTING if userspace
-> requested a VFIO_TYPE1_NESTING_IOMMU container. This is necessary for the
-> SMMU driver to know how to attach later, but at that point we don't know =
-whether
-> the SMMU does support nesting (since the domain isn't attached to any end=
-point).
-> During attach, the SMMU driver adapts to the SMMU's capabilities, and may=
- well
-> fallback to one stage if the SMMU doesn't support nesting.
 
-got you. so even VFIO sets DOMAIN_ATTR_NESTING successfully, it doesn't mea=
-n
-the nesting will be used. yeah, it's a little bit different with VT-d side.=
- intel iommu
-driver will fail ATT_NESTING setting if it found not all iommu units in the=
- system
-are nesting capable.
+On 6/17/20 7:11 PM, Halil Pasic wrote:
+> On Tue, 16 Jun 2020 21:50:51 +0200
+> Eric Farman <farman@linux.ibm.com> wrote:
+> 
+>> The interrupt path checks the FSM state when processing a final interrupt
+>> (an interrupt that is neither subchannel active, nor device active),
+>> to determine whether to call cp_free() and release the associated memory.
+>> But, this does not fully close the window where a START comes in after a
+>> HALT/CLEAR. If the START runs while the CLEAR interrupt is being processed,
+>> the channel program struct will be allocated while the interrupt would be
+>> considering whether or not to free it. If the FSM state is CP_PROCESSING,
+>> then everything is fine. But if the START is able to issue its SSCH and get
+>> a cc0, then the in-flight interrupt would have been for an unrelated
+>> operation (perhaps none, if the subchannel was previously idle).
+>>
+>> The channel_program struct has an "initialized" flag that is set early
+>> in the fsm_io_request() flow, to simplify the various cp_*() accessors.
+>> Let's extend this idea to include a "started" flag that announces that the
+>> channel program has successfully been issued to hardware. With this, the
+>> interrupt path can determine whether the final interrupt should also
+>> release the cp resources instead of relying on a transient FSM state.
+> 
+> AFAICT cp->started is potentially accessed by multiple threads, form
+> which at least one writes. Am I right?
 
-> VFIO should check after attaching that the nesting attribute held, by cal=
-ling
-> iommu_domain_get_attr(NESTING). At the moment it does not, and since your
-> 03/15 patch does that with additional info, I agree with reusing
-> DOMAIN_ATTR_NESTING instead of adding DOMAIN_ATTR_NESTING_INFO.
->
-> However it requires changing the get_attr(NESTING) implementations in bot=
-h SMMU
-> drivers as a precursor of this series, to avoid breaking
-> VFIO_TYPE1_NESTING_IOMMU on Arm. Since we haven't yet defined the
-> nesting_info structs for SMMUv2 and v3, I suppose we could return an empt=
-y struct
-> iommu_nesting_info for now?
+Yup. And with the exception of the cp_free() call out of the interrupt
+path, every one is accessed under the io_mutex. I'm still measuring
+possible behavior at that point.
 
-got you. I think it works. So far, I didn't see any getter for ATTR_NESTING=
-, once
-SMMU drivers return empty struct iommu_nesting_info, VFIO won't fail. will
-do it when switching to reuse ATTR_NESTING for getting nesting info.
-
-> >
-> >  include/linux/iommu.h      |  1 +
-> >  include/uapi/linux/iommu.h | 34 ++++++++++++++++++++++++++++++++++
-> >  2 files changed, 35 insertions(+)
-> >
-> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h index
-> > 78a26ae..f6e4b49 100644
-> > --- a/include/linux/iommu.h
-> > +++ b/include/linux/iommu.h
-> > @@ -126,6 +126,7 @@ enum iommu_attr {
-> >  	DOMAIN_ATTR_FSL_PAMUV1,
-> >  	DOMAIN_ATTR_NESTING,	/* two stages of translation */
-> >  	DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE,
-> > +	DOMAIN_ATTR_NESTING_INFO,
-> >  	DOMAIN_ATTR_MAX,
-> >  };
-> >
-> > diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-> > index 303f148..02eac73 100644
-> > --- a/include/uapi/linux/iommu.h
-> > +++ b/include/uapi/linux/iommu.h
-> > @@ -332,4 +332,38 @@ struct iommu_gpasid_bind_data {
-> >  	};
-> >  };
-> >
-> > +struct iommu_nesting_info {
-> > +	__u32	size;
-> > +	__u32	format;
->=20
-> What goes into format? And flags? This structure needs some documentation=
-.
-
-format will be the same with the definition of @format in iommu_gpasid_bind=
-_data.
-flags is reserved for future extension. will add description in next versio=
-n. :-)
-
-struct iommu_gpasid_bind_data {
-        __u32 argsz;
-#define IOMMU_GPASID_BIND_VERSION_1     1
-        __u32 version;
-#define IOMMU_PASID_FORMAT_INTEL_VTD    1
-        __u32 format;
-#define IOMMU_SVA_GPASID_VAL    (1 << 0) /* guest PASID valid */
-        __u64 flags;
-        __u64 gpgd;
-        __u64 hpasid;
-        __u64 gpasid;
-        __u32 addr_width;
-        __u8  padding[12];
-        /* Vendor specific data */
-        union {
-                struct iommu_gpasid_bind_data_vtd vtd;
-        } vendor;
-};
-
-Regards,
-Yi Liu
-
-> Thanks,
-> Jean
->=20
-> > +	__u32	features;
-> > +#define IOMMU_NESTING_FEAT_SYSWIDE_PASID	(1 << 0)
-> > +#define IOMMU_NESTING_FEAT_BIND_PGTBL		(1 << 1)
-> > +#define IOMMU_NESTING_FEAT_CACHE_INVLD		(1 << 2)
-> > +	__u32	flags;
-> > +	__u8	data[];
-> > +};
-> > +
-> > +/*
-> > + * @flags:	VT-d specific flags. Currently reserved for future
-> > + *		extension.
-> > + * @addr_width:	The output addr width of first level/stage translation
-> > + * @pasid_bits:	Maximum supported PASID bits, 0 represents no PASID
-> > + *		support.
-> > + * @cap_reg:	Describe basic capabilities as defined in VT-d capability
-> > + *		register.
-> > + * @cap_mask:	Mark valid capability bits in @cap_reg.
-> > + * @ecap_reg:	Describe the extended capabilities as defined in VT-d
-> > + *		extended capability register.
-> > + * @ecap_mask:	Mark the valid capability bits in @ecap_reg.
-> > + */
-> > +struct iommu_nesting_info_vtd {
-> > +	__u32	flags;
-> > +	__u16	addr_width;
-> > +	__u16	pasid_bits;
-> > +	__u64	cap_reg;
-> > +	__u64	cap_mask;
-> > +	__u64	ecap_reg;
-> > +	__u64	ecap_mask;
-> > +};
-> > +
-> >  #endif /* _UAPI_IOMMU_H */
-> > --
-> > 2.7.4
-> >
+> 
+> Actually AFAICT you want to use cp->sarted for synchronization between
+> multiple treads (I/O requester(s), IRQ handler(s)). How does the
+> synchronization work for bool started itself, i.e. don't we have a data
+> race on 'started'?
+> 
+> A side note: I know, I asked a similar question about 'initialized' back
+> then.
+> 
+> Regards,
+> Halil
+> 
+>>
+>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>> ---
+>>  drivers/s390/cio/vfio_ccw_cp.c  |  2 ++
+>>  drivers/s390/cio/vfio_ccw_cp.h  |  1 +
+>>  drivers/s390/cio/vfio_ccw_drv.c |  2 +-
+>>  drivers/s390/cio/vfio_ccw_fsm.c | 11 +++++++++++
+>>  4 files changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+>> index b9febc581b1f..7748eeef434e 100644
+>> --- a/drivers/s390/cio/vfio_ccw_cp.c
+>> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+>> @@ -657,6 +657,7 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>>  
+>>  	if (!ret) {
+>>  		cp->initialized = true;
+>> +		cp->started = false;
+>>  
+>>  		/* It is safe to force: if it was not set but idals used
+>>  		 * ccwchain_calc_length would have returned an error.
+>> @@ -685,6 +686,7 @@ void cp_free(struct channel_program *cp)
+>>  		return;
+>>  
+>>  	cp->initialized = false;
+>> +	cp->started = false;
+>>  	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
+>>  		for (i = 0; i < chain->ch_len; i++) {
+>>  			pfn_array_unpin_free(chain->ch_pa + i, cp->mdev);
+>> diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
+>> index ba31240ce965..7ea14910aaaa 100644
+>> --- a/drivers/s390/cio/vfio_ccw_cp.h
+>> +++ b/drivers/s390/cio/vfio_ccw_cp.h
+>> @@ -39,6 +39,7 @@ struct channel_program {
+>>  	union orb orb;
+>>  	struct device *mdev;
+>>  	bool initialized;
+>> +	bool started;
+>>  	struct ccw1 *guest_cp;
+>>  };
+>>  
+>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+>> index 8c625b530035..7e2a790dc9a1 100644
+>> --- a/drivers/s390/cio/vfio_ccw_drv.c
+>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+>> @@ -94,7 +94,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+>>  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+>>  	if (scsw_is_solicited(&irb->scsw)) {
+>>  		cp_update_scsw(&private->cp, &irb->scsw);
+>> -		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
+>> +		if (is_final && private->cp.started)
+>>  			cp_free(&private->cp);
+>>  	}
+>>  	mutex_lock(&private->io_mutex);
+>> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+>> index 23e61aa638e4..d806f88eba72 100644
+>> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+>> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+>> @@ -50,6 +50,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+>>  		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
+>>  		ret = 0;
+>>  		private->state = VFIO_CCW_STATE_CP_PENDING;
+>> +		private->cp.started = true;
+>>  		break;
+>>  	case 1:		/* Status pending */
+>>  	case 2:		/* Busy */
+>> @@ -246,6 +247,16 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+>>  	char *errstr = "request";
+>>  	struct subchannel_id schid = get_schid(private);
+>>  
+>> +	if (private->cp.started) {
+>> +		io_region->ret_code = -EBUSY;
+>> +		VFIO_CCW_MSG_EVENT(2,
+>> +				   "%pUl (%x.%x.%04x): busy\n",
+>> +				   mdev_uuid(mdev), schid.cssid,
+>> +				   schid.ssid, schid.sch_no);
+>> +		errstr = "busy";
+>> +		goto err_out;
+>> +	}
+>> +
+>>  	private->state = VFIO_CCW_STATE_CP_PROCESSING;
+>>  	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+>>  
+> 
