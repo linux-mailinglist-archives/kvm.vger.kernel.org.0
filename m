@@ -2,35 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 473F21FE0A6
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:50:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AADE1FE099
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 03:50:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732162AbgFRBtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jun 2020 21:49:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35914 "EHLO mail.kernel.org"
+        id S1732645AbgFRBsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jun 2020 21:48:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36200 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731910AbgFRB1l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:27:41 -0400
+        id S1731968AbgFRB1v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:27:51 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 25CF4221FC;
-        Thu, 18 Jun 2020 01:27:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 25C49221FC;
+        Thu, 18 Jun 2020 01:27:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443660;
-        bh=7824x3/k4YK+DHkRKW4nSpWl3FtLjPQecHfwGNVT5TY=;
+        s=default; t=1592443671;
+        bh=kfumCbCRBNBMv65SENjTVAsvXjAh+EuIfOHq0R3kI4w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=j/YTVtBDClNdkH9xCV+s8Hgzxs5bOzAigX8cl/v+2svB0SCaz+heQO6Fo31fpc6Xx
-         JT5LEnOEFZcznAb9fENqVIs/qiiKNkJHe9dJJSbg7VLQckzcXPEX7MtLkVR73ki5my
-         Cs9Kh9F7xiPounumBlUF96Z/f0SNI5j49MZos55A=
+        b=0UpKGRF12kHMsCiXnkwrHB+CAOW6i5cWTLBgi3Pwl2YJArO+RgVCOrtCD3WRYWmNk
+         1rYqUudeGKnjpD2IDHoywnhV49va/j9e816uDybK2HH8yPHNmXMHj7c2Wh3xK+HQ0S
+         dmMdfz30r/BViRdk/koOvW6uaZyV/aeVlVY5WHVE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Qian Cai <cai@lca.pw>,
+Cc:     Qiushi Wu <wu000273@umn.edu>, Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 079/108] vfio/pci: fix memory leaks of eventfd ctx
-Date:   Wed, 17 Jun 2020 21:25:31 -0400
-Message-Id: <20200618012600.608744-79-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 087/108] vfio/mdev: Fix reference count leak in add_mdev_supported_type
+Date:   Wed, 17 Jun 2020 21:25:39 -0400
+Message-Id: <20200618012600.608744-87-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200618012600.608744-1-sashal@kernel.org>
 References: <20200618012600.608744-1-sashal@kernel.org>
@@ -43,65 +44,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Qian Cai <cai@lca.pw>
+From: Qiushi Wu <wu000273@umn.edu>
 
-[ Upstream commit 1518ac272e789cae8c555d69951b032a275b7602 ]
+[ Upstream commit aa8ba13cae3134b8ef1c1b6879f66372531da738 ]
 
-Finished a qemu-kvm (-device vfio-pci,host=0001:01:00.0) triggers a few
-memory leaks after a while because vfio_pci_set_ctx_trigger_single()
-calls eventfd_ctx_fdget() without the matching eventfd_ctx_put() later.
-Fix it by calling eventfd_ctx_put() for those memory in
-vfio_pci_release() before vfio_device_release().
+kobject_init_and_add() takes reference even when it fails.
+If this function returns an error, kobject_put() must be called to
+properly clean up the memory associated with the object. Thus,
+replace kfree() by kobject_put() to fix this issue. Previous
+commit "b8eb718348b8" fixed a similar problem.
 
-unreferenced object 0xebff008981cc2b00 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994816 (age 9796.310s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
-  backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
-unreferenced object 0x29ff008981cc4180 (size 128):
-  comm "qemu-kvm", pid 4043, jiffies 4294994818 (age 9796.290s)
-  hex dump (first 32 bytes):
-    01 00 00 00 6b 6b 6b 6b 00 00 00 00 ad 4e ad de  ....kkkk.....N..
-    ff ff ff ff 6b 6b 6b 6b ff ff ff ff ff ff ff ff  ....kkkk........
-  backtrace:
-    [<00000000917e8f8d>] slab_post_alloc_hook+0x74/0x9c
-    [<00000000df0f2aa2>] kmem_cache_alloc_trace+0x2b4/0x3d4
-    [<000000005fcec025>] do_eventfd+0x54/0x1ac
-    [<0000000082791a69>] __arm64_sys_eventfd2+0x34/0x44
-    [<00000000b819758c>] do_el0_svc+0x128/0x1dc
-    [<00000000b244e810>] el0_sync_handler+0xd0/0x268
-    [<00000000d495ef94>] el0_sync+0x164/0x180
-
-Signed-off-by: Qian Cai <cai@lca.pw>
+Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
+Signed-off-by: Qiushi Wu <wu000273@umn.edu>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/vfio/mdev/mdev_sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 550ab7707b57..b7733d3c06de 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -397,6 +397,10 @@ static void vfio_pci_release(void *device_data)
- 	if (!(--vdev->refcnt)) {
- 		vfio_spapr_pci_eeh_release(vdev->pdev);
- 		vfio_pci_disable(vdev);
-+		if (vdev->err_trigger)
-+			eventfd_ctx_put(vdev->err_trigger);
-+		if (vdev->req_trigger)
-+			eventfd_ctx_put(vdev->req_trigger);
+diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
+index 802df210929b..7e474e41c85e 100644
+--- a/drivers/vfio/mdev/mdev_sysfs.c
++++ b/drivers/vfio/mdev/mdev_sysfs.c
+@@ -113,7 +113,7 @@ struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
+ 				   "%s-%s", dev_driver_string(parent->dev),
+ 				   group->name);
+ 	if (ret) {
+-		kfree(type);
++		kobject_put(&type->kobj);
+ 		return ERR_PTR(ret);
  	}
  
- 	mutex_unlock(&driver_lock);
 -- 
 2.25.1
 
