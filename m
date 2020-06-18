@@ -2,106 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87D5C1FF041
-	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 13:10:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5485C1FF053
+	for <lists+kvm@lfdr.de>; Thu, 18 Jun 2020 13:14:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729431AbgFRLKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 07:10:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55295 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729387AbgFRLJC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jun 2020 07:09:02 -0400
+        id S1729454AbgFRLNs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 07:13:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26074 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728262AbgFRLNg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jun 2020 07:13:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592478531;
+        s=mimecast20190719; t=1592478814;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J1NwggmtPlp9uQFfGPrVl4ulrDOEZX3SrXMA/mcsYFo=;
-        b=BHZ1uM6+UpZCAbFlgI75K7hNNJCk8PddLWijPBym6dNLJR0FgMgDbGhiGwnveShv3ojOM8
-        DG4Z6WSsU+GyrQLqDfd64KwlNeslvkEPWhPD0sqARHWdEsoa1No2mZVI9lGzH6p+syF6yU
-        2p7RU5jdRsX6uQT9AK7emV8kKVazATg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-l2o5YftyPHWpUtrMuZjHbg-1; Thu, 18 Jun 2020 07:08:50 -0400
-X-MC-Unique: l2o5YftyPHWpUtrMuZjHbg-1
-Received: by mail-ej1-f71.google.com with SMTP id e14so2415674ejt.16
-        for <kvm@vger.kernel.org>; Thu, 18 Jun 2020 04:08:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=J1NwggmtPlp9uQFfGPrVl4ulrDOEZX3SrXMA/mcsYFo=;
-        b=Ti91y9SQ9EEXgYfu1Lx6PRy65XVTtBoAxlQnmznbYWRD44aSe8R6mWb6uS5sDUvuCg
-         zS9RtMoPQ2CA0e2DLSvgJSAhcVl49UX/rYiEvw9EjG9W7gtM5g7iGvEt0Vj+eds074CY
-         Bl6+RdTe1p0UCxtVEN8R2SlyFA+m7iFNXeYagf23yvh1bvipPoVxcEghP2LbeOSwGyyv
-         JDPTeTnrrm5xywd9Ro6zYA0BvGjMjvl5/H92IJlEvCIwdmZlE0L4GZxR44xw91HnrA1/
-         5Gd2p8FYnaOGOuri9/F8fwfLV3UcKoGv5MLaoa+OnUW4cgZr7inFQ9D/qdiMgG+NWLJf
-         E4Fw==
-X-Gm-Message-State: AOAM531afxpfUgPmseJGYeFNj+lHieIXAzxIenodvFB4ZY1ct/HyauiE
-        q/U9NBTZFkCnNrTQREuXwfIRGqnU1yQkX9C7kBWtzifff6P4NBKRXSXl6SKcTL8Pow93/C7lRyc
-        Qfhh2+lqkOvky
-X-Received: by 2002:a17:906:c10f:: with SMTP id do15mr3616387ejc.249.1592478528884;
-        Thu, 18 Jun 2020 04:08:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwAB/LLMky0F0neyQ9UeNJROmlJCPgomnAgnL34Rt8rpIkHiStd0Bd+cZYMJXhj0HIX7IVdfQ==
-X-Received: by 2002:a17:906:c10f:: with SMTP id do15mr3616372ejc.249.1592478528676;
-        Thu, 18 Jun 2020 04:08:48 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id bs1sm1878005edb.43.2020.06.18.04.08.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2020 04:08:48 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dAjSN5aDL+hVRsYsF7/VthZ3MY7xiAzNFu4+vdSACNM=;
+        b=HiYSsdPrQ4WA5YRuQB2k54tYe5BIYF6NX2SHReOPGjYShxC4VHW3pmDf1M7xQGOouq2l4s
+        BYbV39c14Hn4UAUrF6XBdds9ELsZCIXHMYp1+1OkZzFYbjvYUrClwAQBKmfe43A8EITMy6
+        GcqMftPU7i3p97W2LAd8Ww5DrY3PJ9w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-aqOfGQKUNQKHtDcjW29_eg-1; Thu, 18 Jun 2020 07:13:33 -0400
+X-MC-Unique: aqOfGQKUNQKHtDcjW29_eg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D907E801504;
+        Thu, 18 Jun 2020 11:13:31 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.81])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8FAE910013D6;
+        Thu, 18 Jun 2020 11:13:29 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: SVM: drop MSR_IA32_PERF_CAPABILITIES from emulated MSRs
-In-Reply-To: <36ebc576-52c0-4164-1c83-e31146806b6b@redhat.com>
-References: <20200616161427.375651-1-vkuznets@redhat.com> <CALMp9eSWXGQkOOzSrALfZDMj5JHSH=CsK1wKfdj2x2jtV4XJsw@mail.gmail.com> <87366vhscx.fsf@vitty.brq.redhat.com> <CALMp9eQ1qe4w5FojzgsUHKpD=zXqen_D6bBg4-vfHa03BdomGA@mail.gmail.com> <87wo45hqhy.fsf@vitty.brq.redhat.com> <36ebc576-52c0-4164-1c83-e31146806b6b@redhat.com>
-Date:   Thu, 18 Jun 2020 13:08:46 +0200
-Message-ID: <87imfohbr5.fsf@vitty.brq.redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <like.xu@linux.intel.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: SVM: emulate MSR_IA32_PERF_CAPABILITIES
+Date:   Thu, 18 Jun 2020 13:13:28 +0200
+Message-Id: <20200618111328.429931-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+state_test/smm_test selftests are failing on AMD with:
+"Unexpected result from KVM_GET_MSRS, r: 51 (failed MSR was 0x345)"
 
-> On 17/06/20 13:38, Vitaly Kuznetsov wrote:
->> 
->> For KVM_GET_MSR_INDEX_LIST, the promise is "guest msrs that are
->> supported" and I'm not exactly sure what this means. Personally, I see
->> no point in returning MSRs which can't be read with KVM_GET_MSRS (as
->> this also means the guest can't read them) and KVM selftests seem to
->> rely on that (vcpu_save_state()) but this is not a documented feature.
->
-> Yes, this is intended.  KVM_GET_MSR_INDEX_LIST is not the full list of
-> supported MSRs or KVM_GET_MSRS (especially PMU MSRs are missing) but it
-> certainly should be a sufficient condition for KVM_GET_MSRS support.
->
-> In this case your patch is sort-of correct because AMD machines won't
-> have X86_FEATURE_PDCM.  However, even in that case there are two things
-> we can do that are better:
->
-> 1) force-set X86_FEATURE_PDCM in vmx_set_cpu_caps instead of having it
-> in kvm_set_cpu_caps.  The latter is incorrect because if AMD for
-> whatever reason added it we'd lack the support.  This would be basically
-> a refined version of your patch.
->
-> 2) emulate the MSR on AMD too (returning zero) if somebody for whatever
-> reason enables PDCM in there too: this would include returning it in
-> KVM_GET_FEATURE_MSR_INDEX_LIST, and using kvm_get_msr_feature to set a
-> default value in kvm_pmu_refresh.  The feature bit then would be
-> force-set in kvm_set_cpu_caps.  This would be nicer since we have the
-> value in vcpu->arch already instead of struct vcpu_vmx.
+MSR_IA32_PERF_CAPABILITIES is an emulated MSR on Intel but it is not
+known to AMD code, emulate it there too (by returning 0 and allowing
+userspace to write 0). This way the code is better prepared to the
+eventual appearance of the feature in AMD hardware.
 
-Let's try the hard way :-) I'll send v2 implementing 2) (hope I got the
-idea right), thanks!
+Fixes: 27461da31089 ("KVM: x86/pmu: Support full width counting")
+Suggested-by: Jim Mattson <jmattson@google.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/svm/pmu.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index 035da07500e8..f13ee3cd6d0f 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -200,7 +200,13 @@ static struct kvm_pmc *amd_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+ 
+ static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ {
+-	/* All MSRs refer to exactly one PMC, so msr_idx_to_pmc is enough.  */
++	switch (msr) {
++	case MSR_IA32_PERF_CAPABILITIES:
++		return true;
++	default:
++		break;
++	}
++
+ 	return false;
+ }
+ 
+@@ -221,6 +227,14 @@ static int amd_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	struct kvm_pmc *pmc;
+ 	u32 msr = msr_info->index;
+ 
++	if (msr == MSR_IA32_PERF_CAPABILITIES) {
++		if (!msr_info->host_initiated &&
++		    !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++			return 1;
++		msr_info->data = vcpu->arch.perf_capabilities;
++		return 0;
++	}
++
+ 	/* MSR_PERFCTRn */
+ 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
+ 	if (pmc) {
+@@ -244,6 +258,18 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	u32 msr = msr_info->index;
+ 	u64 data = msr_info->data;
+ 
++	if (msr == MSR_IA32_PERF_CAPABILITIES) {
++		if (!msr_info->host_initiated)
++			return 1;
++
++		/* No feature bits are currently supported */
++		if (data)
++			return 1;
++
++		vcpu->arch.perf_capabilities = data;
++		return 0;
++	}
++
+ 	/* MSR_PERFCTRn */
+ 	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
+ 	if (pmc) {
+@@ -281,6 +307,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	pmu->nr_arch_fixed_counters = 0;
+ 	pmu->global_status = 0;
+ 	bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
++	vcpu->arch.perf_capabilities = 0;
+ }
+ 
+ static void amd_pmu_init(struct kvm_vcpu *vcpu)
 -- 
-Vitaly
+2.25.4
 
