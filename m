@@ -2,24 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EF7B200007
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 04:06:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9412720000B
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 04:06:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729523AbgFSCGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 22:06:19 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59127 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729161AbgFSCGO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 22:06:14 -0400
+        id S1729497AbgFSCGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 22:06:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729445AbgFSCGR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jun 2020 22:06:17 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF30C0613F0
+        for <kvm@vger.kernel.org>; Thu, 18 Jun 2020 19:06:15 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 49p2GT35rgz9sT8; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
+        id 49p2GT2LD1z9sT2; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1592532369;
-        bh=rKuvzP3I0zndPbCxEWAF/KYSFkgJfgyIKqNEdtPx2Aw=;
+        bh=qMsc309NrDU+kjkrkNdXuQ5jS6081SEdRvf2Ra68+0k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=i+8S4y1njyzLLozEwk54jAInltcAB7xtL2/XwnGGBQFN7qOQAQ0LZY3Evxk2yTYJd
-         6bUkAK3fV2KpkTo/COE+7OTMowzQkzMykiAVXGhU7yVD8isuUojgXeq1Qi3x0BZowU
-         tubDnZmwDpkophHRr3f8elKyeKGTHw6YoExLu9ag=
+        b=Dh6czTEKkpC3AwFZDUZjJ8VQHRUr7RcuJheAzLqBP5kPURdYs+0yGjCA/XT1zxs7D
+         s1fb+ETwTqir/AVT8/Fg42F1EGeA4vLI/0GtfCdmqaPQ+UY6gkl6xNDVkQ5NE1MxKj
+         c0LeubLAdqYb7kxaejnrpYAIiqHooNIW4j31udso=
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
         pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com
@@ -29,141 +32,152 @@ Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
         pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
         David Gibson <david@gibson.dropbear.id.au>,
         qemu-s390x@nongnu.org, david@redhat.com,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH v3 6/9] host trust limitation: Add Error ** to HostTrustLimitation::kvm_init
-Date:   Fri, 19 Jun 2020 12:05:59 +1000
-Message-Id: <20200619020602.118306-7-david@gibson.dropbear.id.au>
+        Ram Pai <linuxram@us.ibm.com>
+Subject: [PATCH v3 7/9] spapr: Add PEF based host trust limitation
+Date:   Fri, 19 Jun 2020 12:06:00 +1000
+Message-Id: <20200619020602.118306-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows failures to be reported richly and idiomatically.
+Some upcoming POWER machines have a system called PEF (Protected
+Execution Facility) which uses a small ultravisor to allow guests to
+run in a way that they can't be eavesdropped by the hypervisor.  The
+effect is roughly similar to AMD SEV, although the mechanisms are
+quite different.
+
+Most of the work of this is done between the guest, KVM and the
+ultravisor, with little need for involvement by qemu.  However qemu
+does need to tell KVM to allow secure VMs.
+
+Because the availability of secure mode is a guest visible difference
+which depends on having the right hardware and firmware, we don't
+enable this by default.  In order to run a secure guest you need to
+create a "pef-guest" object and set the host-trust-limitation machine
+property to point to it.
+
+Note that this just *allows* secure guests, the architecture of PEF is
+such that the guest still needs to talk to the ultravisor to enter
+secure mode.  Qemu has no directly way of knowing if the guest is in
+secure mode, and certainly can't know until well after machine
+creation time.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: Ram Pai <linuxram@us.ibm.com>
 ---
- accel/kvm/kvm-all.c                  |  4 +++-
- include/exec/host-trust-limitation.h |  2 +-
- target/i386/sev.c                    | 31 ++++++++++++++--------------
- 3 files changed, 19 insertions(+), 18 deletions(-)
+ target/ppc/Makefile.objs |  2 +-
+ target/ppc/pef.c         | 83 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+), 1 deletion(-)
+ create mode 100644 target/ppc/pef.c
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9645271ca5..c236ebeae0 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2158,9 +2158,11 @@ static int kvm_init(MachineState *ms)
-     if (ms->htl) {
-         HostTrustLimitationClass *htlc =
-             HOST_TRUST_LIMITATION_GET_CLASS(ms->htl);
-+        Error *local_err = NULL;
- 
--        ret = htlc->kvm_init(ms->htl);
-+        ret = htlc->kvm_init(ms->htl, &local_err);
-         if (ret < 0) {
-+            error_report_err(local_err);
-             goto err;
-         }
-     }
-diff --git a/include/exec/host-trust-limitation.h b/include/exec/host-trust-limitation.h
-index fc30ea3f78..d93b537280 100644
---- a/include/exec/host-trust-limitation.h
-+++ b/include/exec/host-trust-limitation.h
-@@ -30,7 +30,7 @@
- typedef struct HostTrustLimitationClass {
-     InterfaceClass parent;
- 
--    int (*kvm_init)(HostTrustLimitation *);
-+    int (*kvm_init)(HostTrustLimitation *, Error **);
-     int (*encrypt_data)(HostTrustLimitation *, uint8_t *, uint64_t);
- } HostTrustLimitationClass;
- 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 052a05d15a..829f78436a 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -617,7 +617,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
-     }
- }
- 
--static int sev_kvm_init(HostTrustLimitation *htl)
-+static int sev_kvm_init(HostTrustLimitation *htl, Error **errp)
- {
-     SevGuestState *sev = SEV_GUEST(htl);
-     char *devname;
-@@ -633,14 +633,14 @@ static int sev_kvm_init(HostTrustLimitation *htl)
-     host_cbitpos = ebx & 0x3f;
- 
-     if (host_cbitpos != sev->cbitpos) {
--        error_report("%s: cbitpos check failed, host '%d' requested '%d'",
--                     __func__, host_cbitpos, sev->cbitpos);
-+        error_setg(errp, "%s: cbitpos check failed, host '%d' requested '%d'",
-+                   __func__, host_cbitpos, sev->cbitpos);
-         goto err;
-     }
- 
-     if (sev->reduced_phys_bits < 1) {
--        error_report("%s: reduced_phys_bits check failed, it should be >=1,"
--                     " requested '%d'", __func__, sev->reduced_phys_bits);
-+        error_setg(errp, "%s: reduced_phys_bits check failed, it should be >=1,"
-+                   " requested '%d'", __func__, sev->reduced_phys_bits);
-         goto err;
-     }
- 
-@@ -649,20 +649,19 @@ static int sev_kvm_init(HostTrustLimitation *htl)
-     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
-     sev->sev_fd = open(devname, O_RDWR);
-     if (sev->sev_fd < 0) {
--        error_report("%s: Failed to open %s '%s'", __func__,
--                     devname, strerror(errno));
--    }
--    g_free(devname);
--    if (sev->sev_fd < 0) {
-+        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
-+                   devname, strerror(errno));
-+        g_free(devname);
-         goto err;
-     }
-+    g_free(devname);
- 
-     ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
-                              &fw_error);
-     if (ret) {
--        error_report("%s: failed to get platform status ret=%d "
--                     "fw_error='%d: %s'", __func__, ret, fw_error,
--                     fw_error_to_str(fw_error));
-+        error_setg(errp, "%s: failed to get platform status ret=%d "
-+                   "fw_error='%d: %s'", __func__, ret, fw_error,
-+                   fw_error_to_str(fw_error));
-         goto err;
-     }
-     sev->build_id = status.build;
-@@ -672,14 +671,14 @@ static int sev_kvm_init(HostTrustLimitation *htl)
-     trace_kvm_sev_init();
-     ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-     if (ret) {
--        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
--                     __func__, ret, fw_error, fw_error_to_str(fw_error));
-+        error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
-+                   __func__, ret, fw_error, fw_error_to_str(fw_error));
-         goto err;
-     }
- 
-     ret = sev_launch_start(sev);
-     if (ret) {
--        error_report("%s: failed to create encryption context", __func__);
-+        error_setg(errp, "%s: failed to create encryption context", __func__);
-         goto err;
-     }
- 
+diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+index e8fa18ce13..ac93b9700e 100644
+--- a/target/ppc/Makefile.objs
++++ b/target/ppc/Makefile.objs
+@@ -6,7 +6,7 @@ obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o arch_dump.o
+ obj-$(TARGET_PPC64) += mmu-hash64.o mmu-book3s-v3.o compat.o
+ obj-$(TARGET_PPC64) += mmu-radix64.o
+ endif
+-obj-$(CONFIG_KVM) += kvm.o
++obj-$(CONFIG_KVM) += kvm.o pef.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ obj-y += dfp_helper.o
+ obj-y += excp_helper.o
+diff --git a/target/ppc/pef.c b/target/ppc/pef.c
+new file mode 100644
+index 0000000000..53a6af0347
+--- /dev/null
++++ b/target/ppc/pef.c
+@@ -0,0 +1,83 @@
++/*
++ * PEF (Protected Execution Facility) for POWER support
++ *
++ * Copyright David Gibson, Redhat Inc. 2020
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++
++#include "qapi/error.h"
++#include "qom/object_interfaces.h"
++#include "sysemu/kvm.h"
++#include "migration/blocker.h"
++#include "exec/host-trust-limitation.h"
++
++#define TYPE_PEF_GUEST "pef-guest"
++#define PEF_GUEST(obj)                                  \
++    OBJECT_CHECK(PefGuestState, (obj), TYPE_PEF_GUEST)
++
++typedef struct PefGuestState PefGuestState;
++
++/**
++ * PefGuestState:
++ *
++ * The PefGuestState object is used for creating and managing a PEF
++ * guest.
++ *
++ * # $QEMU \
++ *         -object pef-guest,id=pef0 \
++ *         -machine ...,host-trust-limitation=pef0
++ */
++struct PefGuestState {
++    Object parent_obj;
++};
++
++static int pef_kvm_init(HostTrustLimitation *gmpo, Error **errp)
++{
++    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
++        error_setg(errp,
++                   "KVM implementation does not support Secure VMs (is an ultravisor running?)");
++        return -1;
++    } else {
++        int ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SECURE_GUEST, 0, 1);
++
++        if (ret < 0) {
++            error_setg(errp,
++                       "Error enabling PEF with KVM");
++            return -1;
++        }
++    }
++
++    return 0;
++}
++
++static void pef_guest_class_init(ObjectClass *oc, void *data)
++{
++    HostTrustLimitationClass *gmpc = HOST_TRUST_LIMITATION_CLASS(oc);
++
++    gmpc->kvm_init = pef_kvm_init;
++}
++
++static const TypeInfo pef_guest_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_PEF_GUEST,
++    .instance_size = sizeof(PefGuestState),
++    .class_init = pef_guest_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOST_TRUST_LIMITATION },
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++static void
++pef_register_types(void)
++{
++    type_register_static(&pef_guest_info);
++}
++
++type_init(pef_register_types);
 -- 
 2.26.2
 
