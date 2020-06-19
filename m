@@ -2,130 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D058201442
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 18:14:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B2862016DB
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 18:45:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391470AbgFSPGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 11:06:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40517 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2391454AbgFSPGg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 11:06:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592579194;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lr+LUOaLSBgm41JBpkX79KrfQBxFPphNoXJMk//1n6g=;
-        b=OzJifZ3HrW0zP7g1jhAs49nT9SgA5eYVeWnD7h2xPxrEF2LH00yt+/H38GKbtadKpM5Rbt
-        5Skr2kr8/D1r1gxV2kJJ4bSqlXPulKWaCi52XF0qVR8CnEE3SQQZeMnvQ4McMOlhhRDWG1
-        ObgkEKdsdrv/OvjTRSwb/9snIsdGhx0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-112-Nn_I5OnqOAaEp7tXeJv0cQ-1; Fri, 19 Jun 2020 11:06:07 -0400
-X-MC-Unique: Nn_I5OnqOAaEp7tXeJv0cQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 178EF106C01C;
-        Fri, 19 Jun 2020 15:06:05 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13C135C1D0;
-        Fri, 19 Jun 2020 15:05:59 +0000 (UTC)
-Date:   Fri, 19 Jun 2020 16:05:56 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
-        pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        mst@redhat.com, cohuck@redhat.com, david@redhat.com,
-        mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
-        qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200619150556.GW700896@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <20200619020602.118306-10-david@gibson.dropbear.id.au>
- <20200619101245.GC700896@redhat.com>
- <20200619144541.GM17085@umbus.fritz.box>
+        id S2388701AbgFSOp0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 10:45:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4064 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388693AbgFSOpX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 10:45:23 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05JEXHNO181563;
+        Fri, 19 Jun 2020 10:45:19 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31rtha9f38-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 10:45:19 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JEWdaU178935;
+        Fri, 19 Jun 2020 10:45:19 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31rtha9f2q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 10:45:19 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JEfJUt031330;
+        Fri, 19 Jun 2020 14:45:18 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma01dal.us.ibm.com with ESMTP id 31rdtr7wh2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 14:45:18 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05JEjF6j47513892
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Jun 2020 14:45:15 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD2CC2805E;
+        Fri, 19 Jun 2020 14:45:15 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 16DC528058;
+        Fri, 19 Jun 2020 14:45:14 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.172.102])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Fri, 19 Jun 2020 14:45:13 +0000 (GMT)
+Subject: Re: [PATCH v8 2/2] s390/kvm: diagnose 0x318 sync and reset
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, david@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
+References: <20200618222222.23175-1-walling@linux.ibm.com>
+ <20200618222222.23175-3-walling@linux.ibm.com>
+ <f4b49098-e417-eafe-ff9f-df9ba2004fd9@linux.ibm.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <edd90e6c-e10f-924b-158a-f403788faf10@linux.ibm.com>
+Date:   Fri, 19 Jun 2020 10:45:13 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <f4b49098-e417-eafe-ff9f-df9ba2004fd9@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200619144541.GM17085@umbus.fritz.box>
-User-Agent: Mutt/1.14.0 (2020-05-02)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-19_14:2020-06-19,2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 clxscore=1015 priorityscore=1501 adultscore=0 malwarescore=0
+ mlxscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 suspectscore=0
+ bulkscore=0 cotscore=-2147483648 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006190105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 20, 2020 at 12:45:41AM +1000, David Gibson wrote:
-> On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. Berrangé wrote:
-> > On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
-> > > The default behaviour for virtio devices is not to use the platforms normal
-> > > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > > to directly access guest memory.  That doesn't work if the guest's memory
-> > > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> > > 
-> > > So, if a host trust limitation mechanism is enabled, then apply the
-> > > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > > Those will presumably have some way of marking memory as shared with the
-> > > hypervisor or hardware so that DMA will work.
-> > > 
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/core/machine.c | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
-> > > 
-> > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > index a71792bc16..8dfc1bb3f8 100644
-> > > --- a/hw/core/machine.c
-> > > +++ b/hw/core/machine.c
-> > > @@ -28,6 +28,8 @@
-> > >  #include "hw/mem/nvdimm.h"
-> > >  #include "migration/vmstate.h"
-> > >  #include "exec/host-trust-limitation.h"
-> > > +#include "hw/virtio/virtio.h"
-> > > +#include "hw/virtio/virtio-pci.h"
-> > >  
-> > >  GlobalProperty hw_compat_5_0[] = {
-> > >      { "virtio-balloon-device", "page-poison", "false" },
-> > > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *machine)
-> > >           * areas.
-> > >           */
-> > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > > +
-> > > +        /*
-> > > +         * Virtio devices can't count on directly accessing guest
-> > > +         * memory, so they need iommu_platform=on to use normal DMA
-> > > +         * mechanisms.  That requires disabling legacy virtio support
-> > > +         * for virtio pci devices
-> > > +         */
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
-> > >      }
-> > 
-> > Silently changing the user's request configuration like this
+On 6/19/20 7:02 AM, Janosch Frank wrote:
+> On 6/19/20 12:22 AM, Collin Walling wrote:
+>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
+>> the VM is running in (Linux, z/VM, etc) and is observed via
+>> firmware/service events.
+>>
+>> This is a privileged s390x instruction that must be intercepted by
+>> SIE. Userspace handles the instruction as well as migration. Data
+>> is communicated via VCPU register synchronization.
+>>
+>> The Control Program Name Code (CPNC) is stored in the SIE block. The
+>> CPNC along with the Control Program Version Code (CPVC) are stored
+>> in the kvm_vcpu_arch struct.
+>>
+>> The CPNC is shadowed/unshadowed in VSIE.
+>>
+>> This data is reset on load normal and clear resets.
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
 > 
-> It doesn't, though.  register_sugar_prop() effectively registers a
-> default, so if the user has explicitly specified something, that will
-> take precedence.
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> 
+> Could you extend the s390 kvm selftests sync_regs test with diag318 please?
+> 
 
-Don't assume that the user has set "disable-legacy=off". People who want to
-have a transtional device are almost certainly pasing "-device virtio-blk-pci",
-because historical behaviour is that this is sufficient to give you a
-transitional device. Changing the default of disable-legacy=on has not
-honoured the users' requested config.
+Can do!
 
-Regards,
-Daniel
+> I'd also like to have it added to the kvm unit tests. You can either do
+> that yourself or I'll add it when I go over my pending patches. Since we
+> can't retrieve these values from the VM, a simple check for the sclp
+> feature bit and an execution of the instruction would be enough.
+> 
+>> ---
+>>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>>  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
+>>  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
+>>  arch/s390/kvm/vsie.c             |  3 +++
+>>  include/uapi/linux/kvm.h         |  1 +
+>>  5 files changed, 21 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index 3d554887794e..8bdf6f1607ca 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -260,7 +260,8 @@ struct kvm_s390_sie_block {
+>>  	__u32	scaol;			/* 0x0064 */
+>>  	__u8	sdf;			/* 0x0068 */
+>>  	__u8    epdx;			/* 0x0069 */
+>> -	__u8    reserved6a[2];		/* 0x006a */
+>> +	__u8	cpnc;			/* 0x006a */
+>> +	__u8	reserved6b;		/* 0x006b */
+>>  	__u32	todpr;			/* 0x006c */
+>>  #define GISA_FORMAT1 0x00000001
+>>  	__u32	gd;			/* 0x0070 */
+>> @@ -745,6 +746,7 @@ struct kvm_vcpu_arch {
+>>  	bool gs_enabled;
+>>  	bool skey_enabled;
+>>  	struct kvm_s390_pv_vcpu pv;
+>> +	union diag318_info diag318_info;
+>>  };
+>>  
+>>  struct kvm_vm_stat {
+>> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+>> index 436ec7636927..2ae1b660086c 100644
+>> --- a/arch/s390/include/uapi/asm/kvm.h
+>> +++ b/arch/s390/include/uapi/asm/kvm.h
+>> @@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
+>>  #define KVM_SYNC_GSCB   (1UL << 9)
+>>  #define KVM_SYNC_BPBC   (1UL << 10)
+>>  #define KVM_SYNC_ETOKEN (1UL << 11)
+>> +#define KVM_SYNC_DIAG318 (1UL << 12)
+>>  
+>>  #define KVM_SYNC_S390_VALID_FIELDS \
+>>  	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
+>>  	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
+>> -	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
+>> +	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
+>> +	 KVM_SYNC_DIAG318)
+>>  
+>>  /* length and alignment of the sdnx as a power of two */
+>>  #define SDNXC 8
+>> @@ -254,6 +256,7 @@ struct kvm_sync_regs {
+>>  	__u64 pft;	/* pfault token [PFAULT] */
+>>  	__u64 pfs;	/* pfault select [PFAULT] */
+>>  	__u64 pfc;	/* pfault compare [PFAULT] */
+>> +	__u64 diag318;	/* diagnose 0x318 info */
+>>  	union {
+>>  		__u64 vrs[32][2];	/* vector registers (KVM_SYNC_VRS) */
+>>  		__u64 fprs[16];		/* fp registers (KVM_SYNC_FPRS) */
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index d0ff26d157bc..b05ad718b64b 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -545,6 +545,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_S390_AIS_MIGRATION:
+>>  	case KVM_CAP_S390_VCPU_RESETS:
+>>  	case KVM_CAP_SET_GUEST_DEBUG:
+>> +	case KVM_CAP_S390_DIAG318:
+>>  		r = 1;
+>>  		break;
+>>  	case KVM_CAP_S390_HPAGE_1M:
+>> @@ -3267,7 +3268,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>>  				    KVM_SYNC_ACRS |
+>>  				    KVM_SYNC_CRS |
+>>  				    KVM_SYNC_ARCH0 |
+>> -				    KVM_SYNC_PFAULT;
+>> +				    KVM_SYNC_PFAULT |
+>> +				    KVM_SYNC_DIAG318;
+>>  	kvm_s390_set_prefix(vcpu, 0);
+>>  	if (test_kvm_facility(vcpu->kvm, 64))
+>>  		vcpu->run->kvm_valid_regs |= KVM_SYNC_RICCB;
+>> @@ -3562,6 +3564,7 @@ static void kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>>  		vcpu->arch.sie_block->pp = 0;
+>>  		vcpu->arch.sie_block->fpf &= ~FPF_BPBC;
+>>  		vcpu->arch.sie_block->todpr = 0;
+>> +		vcpu->arch.sie_block->cpnc = 0;
+>>  	}
+>>  }
+>>  
+>> @@ -3579,6 +3582,7 @@ static void kvm_arch_vcpu_ioctl_clear_reset(struct kvm_vcpu *vcpu)
+>>  
+>>  	regs->etoken = 0;
+>>  	regs->etoken_extension = 0;
+>> +	regs->diag318 = 0;
+>>  }
+>>  
+>>  int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>> @@ -4194,6 +4198,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>  		if (vcpu->arch.pfault_token == KVM_S390_PFAULT_TOKEN_INVALID)
+>>  			kvm_clear_async_pf_completion_queue(vcpu);
+>>  	}
+>> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_DIAG318) {
+>> +		vcpu->arch.diag318_info.val = kvm_run->s.regs.diag318;
+>> +		vcpu->arch.sie_block->cpnc = vcpu->arch.diag318_info.cpnc;
+>> +	}
+>>  	/*
+>>  	 * If userspace sets the riccb (e.g. after migration) to a valid state,
+>>  	 * we should enable RI here instead of doing the lazy enablement.
+>> @@ -4295,6 +4303,7 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>  	kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
+>>  	kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
+>>  	kvm_run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
+>> +	kvm_run->s.regs.diag318 = vcpu->arch.diag318_info.val;
+>>  	if (MACHINE_HAS_GS) {
+>>  		__ctl_set_bit(2, 4);
+>>  		if (vcpu->arch.gs_enabled)
+>> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+>> index 9e9056cebfcf..ba83d0568bc7 100644
+>> --- a/arch/s390/kvm/vsie.c
+>> +++ b/arch/s390/kvm/vsie.c
+>> @@ -423,6 +423,8 @@ static void unshadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>>  		break;
+>>  	}
+>>  
+>> +	scb_o->cpnc = scb_s->cpnc;
+>> +
+>>  	if (scb_s->ihcpu != 0xffffU)
+>>  		scb_o->ihcpu = scb_s->ihcpu;
+>>  }
+>> @@ -548,6 +550,7 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>>  		scb_s->ecd |= scb_o->ecd & ECD_ETOKENF;
+>>  
+>>  	scb_s->hpid = HPID_VSIE;
+>> +	scb_s->cpnc = scb_o->cpnc;
+>>  
+>>  	prepare_ibc(vcpu, vsie_page);
+>>  	rc = shadow_crycb(vcpu, vsie_page);
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 4fdf30316582..35cdb4307904 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_PPC_SECURE_GUEST 181
+>>  #define KVM_CAP_HALT_POLL 182
+>>  #define KVM_CAP_ASYNC_PF_INT 183
+>> +#define KVM_CAP_S390_DIAG318 184
+>>  
+>>  #ifdef KVM_CAP_IRQ_ROUTING
+>>  
+>>
+> 
+> 
+
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Regards,
+Collin
 
+Stay safe and stay healthy
