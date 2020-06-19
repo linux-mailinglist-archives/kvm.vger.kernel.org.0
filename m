@@ -2,306 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F422C2005CD
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 11:55:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB7052005D5
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 11:57:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731636AbgFSJzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 05:55:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44930 "EHLO
+        id S1732283AbgFSJ5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 05:57:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44231 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729195AbgFSJzu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 05:55:50 -0400
+        with ESMTP id S1732264AbgFSJ5E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jun 2020 05:57:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592560548;
+        s=mimecast20190719; t=1592560623;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=XfPfFaCxaa/T1kqInXIsZ3mZZB5WY2/ynXcN7FcGNnk=;
-        b=d2upQC0xagk91yNR+clpcL3/EEUeWGj8Ym3ZAWsq6jVKo6e0TFKYyabQaRF9qOPMH5thT1
-        GTFWLtc+VvXRFLCKl/yFtY4oP+K0b6PKWYfx/dB2efj87F7H8E1hEDsqzmSpo4L9reXbJy
-        0v7QvibJfEnL+kOBkUvnkrT9rDQYLAI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-qbl4mRCxMeaGVW2KBofcDg-1; Fri, 19 Jun 2020 05:55:46 -0400
-X-MC-Unique: qbl4mRCxMeaGVW2KBofcDg-1
-Received: by mail-wm1-f72.google.com with SMTP id b63so3936031wme.1
-        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 02:55:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XfPfFaCxaa/T1kqInXIsZ3mZZB5WY2/ynXcN7FcGNnk=;
-        b=nRArqMBEzyAfDGsRUV19Uq4vU+vdPO/PHmLpDs+Zw5QT6TlLu36swu7AqOxKG/TJlA
-         i2wf/RCgKAjCQPz26NIntaVwQgaP2Ux1Bx7urNulfCmjGFC//HyY67W5M0QuI9NP7+IL
-         mlDb22AiEF2nYvL7C1iV3wcCdO0GSnlFUouAiST5RhHKILZmohwLxRh6XpGR7j5QXv4I
-         gv/D9gWQC5zNkWZIZz6VcRcjSuptTJP879mHMBSiRy3EhkfskpCUBgHOivxk8qu7x+tH
-         lwZGVftGALQWONBLrNhRS5jRgCUQV0WKCEW3uBRhenY0PJuAkSOqEytgceC/uzwE/Lii
-         TP0w==
-X-Gm-Message-State: AOAM533YRBYjz+7ivpgQNbzvy7us0YdjtPyX9Ef6AUg2MaphKzJzVWhE
-        hotD2vX9kMQfjYTzvnHbCulGehaDswMzTFHWYWX4RLt8+r2OQJOxZwEx1tO6bAYqMuOsqgrsGwO
-        VQlOrELRoLhUY
-X-Received: by 2002:a1c:9d09:: with SMTP id g9mr2805106wme.31.1592560545269;
-        Fri, 19 Jun 2020 02:55:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzato/vJMecQoKyx5I8aGz7ePiNZCR3cTLm0WhI5JTnkyfD6EkApXh8z9T03JUmFi+wLOSLsA==
-X-Received: by 2002:a1c:9d09:: with SMTP id g9mr2805075wme.31.1592560544865;
-        Fri, 19 Jun 2020 02:55:44 -0700 (PDT)
-Received: from localhost.localdomain (93.red-83-59-160.dynamicip.rima-tde.net. [83.59.160.93])
-        by smtp.gmail.com with ESMTPSA id h18sm6585676wru.7.2020.06.19.02.55.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2020 02:55:44 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
-        qemu-arm@nongnu.org, Andrew Jones <drjones@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: [PATCH v2] target/arm: Check supported KVM features globally (not per vCPU)
-Date:   Fri, 19 Jun 2020 11:55:42 +0200
-Message-Id: <20200619095542.2095-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=vx71wkDKaRIzZp5ahrFhGIySkg9P38QSOneYyU0yrOI=;
+        b=ERO1nYfVR3PcndOhMMP6cpjmWShl0DIdOARGJ6jKiZM4C271bWNN921Rfv5UZxRVo4V8XF
+        CwxwRPGi0b8Dm3w0GmgzaQpXiqDs5FtUHgZCFpvcbJuuJHGE70AMnvv2sIMMGjcqZU7PK3
+        anM51uFCTeJMowM912ey2ojEpWx+Zpc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-mofLdTMBPw2mIIqmXM-eQw-1; Fri, 19 Jun 2020 05:56:58 -0400
+X-MC-Unique: mofLdTMBPw2mIIqmXM-eQw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F095036409;
+        Fri, 19 Jun 2020 09:56:56 +0000 (UTC)
+Received: from [10.36.113.137] (ovpn-113-137.ams2.redhat.com [10.36.113.137])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A51F71002396;
+        Fri, 19 Jun 2020 09:56:50 +0000 (UTC)
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
+        dgilbert@redhat.com, frankja@linux.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
+        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
+        pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
+        qemu-s390x@nongnu.org
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
+ <20200619114526.6a6f70c6.cohuck@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
+ 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
+ zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
+ Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
+ jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
+ II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
+ Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
+ RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
+ ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
+ Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
+ ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
+ 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
+ GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
+ GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
+ H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
+ 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
+ ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
+ GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
+ CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
+ njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
+ FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
+Organization: Red Hat GmbH
+Message-ID: <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
+Date:   Fri, 19 Jun 2020 11:56:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200619114526.6a6f70c6.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since commit d70c996df23f, when enabling the PMU we get:
+>> "host-trust-limitation"  sounds like "I am the hypervisor, I configure
+>> limited trust into myself". Also, "untrusted-host" would be a little bit
+>> nicer (I think trust is a black/white thing).
+>>
+>> However, once we have multiple options to protect a guest (memory
+>> encryption, unmapping guest pages ,...) the name will no longer really
+>> suffice to configure QEMU, no?
+> 
+> Hm... we could have a property that accepts bits indicating where the
+> actual limitation lies. Different parts of the code could then make
+> more fine-grained decisions of what needs to be done. Feels a bit
+> overengineered today; but maybe there's already stuff with different
+> semantics in the pipeline somewhere?
+> 
+>>
+>>> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+>>> can be extended to cover the Intel and s390 mechanisms as well,
+>>> though.  
+>>
+>> The only approach on s390x to not glue command line properties to the
+>> cpu model would be to remove the CPU model feature and replace it by the
+>> command line parameter. But that would, of course, be an incompatible break.
+> 
+> Yuck.
+> 
+> We still need to provide the cpu feature to the *guest* in any case, no?
 
-  $ qemu-system-aarch64 -cpu host,pmu=on -M virt,accel=kvm,gic-version=3
-  Segmentation fault (core dumped)
-
-  Thread 1 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
-  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
-  2588        ret = ioctl(s->fd, type, arg);
-  (gdb) bt
-  #0  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
-  #1  0x0000aaaaaae31568 in kvm_check_extension (s=0x0, extension=126) at accel/kvm/kvm-all.c:916
-  #2  0x0000aaaaaafce254 in kvm_arm_pmu_supported (cpu=0xaaaaac214ab0) at target/arm/kvm.c:213
-  #3  0x0000aaaaaafc0f94 in arm_set_pmu (obj=0xaaaaac214ab0, value=true, errp=0xffffffffe438) at target/arm/cpu.c:1111
-  #4  0x0000aaaaab5533ac in property_set_bool (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", opaque=0xaaaaac222730, errp=0xffffffffe438) at qom/object.c:2170
-  #5  0x0000aaaaab5512f0 in object_property_set (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1328
-  #6  0x0000aaaaab551e10 in object_property_parse (obj=0xaaaaac214ab0, string=0xaaaaac11b4c0 "on", name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1561
-  #7  0x0000aaaaab54ee8c in object_apply_global_props (obj=0xaaaaac214ab0, props=0xaaaaac018e20, errp=0xaaaaabd6fd88 <error_fatal>) at qom/object.c:407
-  #8  0x0000aaaaab1dd5a4 in qdev_prop_set_globals (dev=0xaaaaac214ab0) at hw/core/qdev-properties.c:1218
-  #9  0x0000aaaaab1d9fac in device_post_init (obj=0xaaaaac214ab0) at hw/core/qdev.c:1050
-  ...
-  #15 0x0000aaaaab54f310 in object_initialize_with_type (obj=0xaaaaac214ab0, size=52208, type=0xaaaaabe237f0) at qom/object.c:512
-  #16 0x0000aaaaab54fa24 in object_new_with_type (type=0xaaaaabe237f0) at qom/object.c:687
-  #17 0x0000aaaaab54fa80 in object_new (typename=0xaaaaabe23970 "host-arm-cpu") at qom/object.c:702
-  #18 0x0000aaaaaaf04a74 in machvirt_init (machine=0xaaaaac0a8550) at hw/arm/virt.c:1770
-  #19 0x0000aaaaab1e8720 in machine_run_board_init (machine=0xaaaaac0a8550) at hw/core/machine.c:1138
-  #20 0x0000aaaaaaf95394 in qemu_init (argc=5, argv=0xffffffffea58, envp=0xffffffffea88) at softmmu/vl.c:4348
-  #21 0x0000aaaaaada3f74 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at softmmu/main.c:48
-
-This is because in frame #2, cpu->kvm_state is still NULL
-(the vCPU is not yet realized).
-
-KVM has a hard requirement of all cores supporting the same
-feature set. We only need to check if the accelerator supports
-a feature, not each vCPU individually.
-
-Fix by kvm_arm_<FEATURE>_supported() functions take a AccelState
-argument (already realized/valid at this point) instead of a
-CPUState argument.
-
-Reported-by: Haibo Xu <haibo.xu@linaro.org>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-v2: Use global kvm_state (bonzini)
-
-Paolo, does this break migration of encrypted memory assumptions?
-
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Supersedes: <20200617130800.26355-1-philmd@redhat.com>
----
- target/arm/kvm_arm.h | 21 +++++++++------------
- target/arm/cpu.c     |  2 +-
- target/arm/cpu64.c   | 10 +++++-----
- target/arm/kvm.c     |  4 ++--
- target/arm/kvm64.c   | 14 +++++---------
- 5 files changed, 22 insertions(+), 29 deletions(-)
-
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 48bf5e16d5..a4ce4fd93d 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -269,29 +269,26 @@ void kvm_arm_add_vcpu_properties(Object *obj);
- 
- /**
-  * kvm_arm_aarch32_supported:
-- * @cs: CPUState
-  *
-- * Returns: true if the KVM VCPU can enable AArch32 mode
-+ * Returns: true if KVM can enable AArch32 mode
-  * and false otherwise.
-  */
--bool kvm_arm_aarch32_supported(CPUState *cs);
-+bool kvm_arm_aarch32_supported(void);
- 
- /**
-  * kvm_arm_pmu_supported:
-- * @cs: CPUState
-  *
-- * Returns: true if the KVM VCPU can enable its PMU
-+ * Returns: true if KVM can enable the PMU
-  * and false otherwise.
-  */
--bool kvm_arm_pmu_supported(CPUState *cs);
-+bool kvm_arm_pmu_supported(void);
- 
- /**
-  * kvm_arm_sve_supported:
-- * @cs: CPUState
-  *
-- * Returns true if the KVM VCPU can enable SVE and false otherwise.
-+ * Returns true if KVM can enable SVE and false otherwise.
-  */
--bool kvm_arm_sve_supported(CPUState *cs);
-+bool kvm_arm_sve_supported(void);
- 
- /**
-  * kvm_arm_get_max_vm_ipa_size:
-@@ -359,17 +356,17 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
- 
- static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
- 
--static inline bool kvm_arm_aarch32_supported(CPUState *cs)
-+static inline bool kvm_arm_aarch32_supported(void)
- {
-     return false;
- }
- 
--static inline bool kvm_arm_pmu_supported(CPUState *cs)
-+static inline bool kvm_arm_pmu_supported(void)
- {
-     return false;
- }
- 
--static inline bool kvm_arm_sve_supported(CPUState *cs)
-+static inline bool kvm_arm_sve_supported(void)
- {
-     return false;
- }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 5b7a36b5d7..e44e18062c 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1108,7 +1108,7 @@ static void arm_set_pmu(Object *obj, bool value, Error **errp)
-     ARMCPU *cpu = ARM_CPU(obj);
- 
-     if (value) {
--        if (kvm_enabled() && !kvm_arm_pmu_supported(CPU(cpu))) {
-+        if (kvm_enabled() && !kvm_arm_pmu_supported()) {
-             error_setg(errp, "'pmu' feature not supported by KVM on this host");
-             return;
-         }
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 778cecc2e6..a0c1d8894b 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -266,7 +266,7 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
- 
-     /* Collect the set of vector lengths supported by KVM. */
-     bitmap_zero(kvm_supported, ARM_MAX_VQ);
--    if (kvm_enabled() && kvm_arm_sve_supported(CPU(cpu))) {
-+    if (kvm_enabled() && kvm_arm_sve_supported()) {
-         kvm_arm_sve_get_vls(CPU(cpu), kvm_supported);
-     } else if (kvm_enabled()) {
-         assert(!cpu_isar_feature(aa64_sve, cpu));
-@@ -473,7 +473,7 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    if (kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (kvm_enabled() && !kvm_arm_sve_supported()) {
-         error_setg(errp, "cannot set sve-max-vq");
-         error_append_hint(errp, "SVE not supported by KVM on this host\n");
-         return;
-@@ -519,7 +519,7 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported()) {
-         error_setg(errp, "cannot enable %s", name);
-         error_append_hint(errp, "SVE not supported by KVM on this host\n");
-         return;
-@@ -556,7 +556,7 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported()) {
-         error_setg(errp, "'sve' feature not supported by KVM on this host");
-         return;
-     }
-@@ -751,7 +751,7 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
-      * uniform execution state like do_interrupt.
-      */
-     if (value == false) {
--        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
-+        if (!kvm_enabled() || !kvm_arm_aarch32_supported()) {
-             error_setg(errp, "'aarch64' feature cannot be disabled "
-                              "unless KVM is enabled and 32-bit EL1 "
-                              "is supported");
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index eef3bbd1cc..7c672c78b8 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -208,9 +208,9 @@ void kvm_arm_add_vcpu_properties(Object *obj)
-     }
- }
- 
--bool kvm_arm_pmu_supported(CPUState *cpu)
-+bool kvm_arm_pmu_supported(void)
- {
--    return kvm_check_extension(cpu->kvm_state, KVM_CAP_ARM_PMU_V3);
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_PMU_V3);
- }
- 
- int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index f09ed9f4df..3dc494aaa7 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -652,18 +652,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-     return true;
- }
- 
--bool kvm_arm_aarch32_supported(CPUState *cpu)
-+bool kvm_arm_aarch32_supported(void)
- {
--    KVMState *s = KVM_STATE(current_accel());
--
--    return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_EL1_32BIT);
- }
- 
--bool kvm_arm_sve_supported(CPUState *cpu)
-+bool kvm_arm_sve_supported(void)
- {
--    KVMState *s = KVM_STATE(current_accel());
--
--    return kvm_check_extension(s, KVM_CAP_ARM_SVE);
-+    return kvm_check_extension(kvm_state, KVM_CAP_ARM_SVE);
- }
- 
- QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN != 1);
-@@ -798,7 +794,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         env->features &= ~(1ULL << ARM_FEATURE_PMU);
-     }
-     if (cpu_isar_feature(aa64_sve, cpu)) {
--        assert(kvm_arm_sve_supported(cs));
-+        assert(kvm_arm_sve_supported());
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-     }
- 
+Yeah, but that could be wired up internally. Wouldn't consider it clean,
+though (I second the "overengineered" above).
 -- 
-2.21.3
+Thanks,
+
+David / dhildenb
 
