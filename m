@@ -2,164 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A71642003DD
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 10:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F7D22004E1
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 11:21:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731206AbgFSI2m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 04:28:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40708 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731358AbgFSI2f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 04:28:35 -0400
+        id S1729740AbgFSJVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 05:21:10 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26682 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727926AbgFSJVJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 05:21:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592555313;
+        s=mimecast20190719; t=1592558467;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=bUMLmqUDkDZTnXcHE6qS/PZtC/08HkblY8Sqdtg6EZo=;
-        b=VX688YU8xSTAG+V6TvBomfHukOYxAvoLgQ4ZsUp6ZFuCyET9esGp3jZsrHFfJLIqmj+zqE
-        BSdR+aVqVfc7XtTv6076H0ft0ekBGCDXt117jBGWtKfztTZfeJdwRMHZn6hJ0RhXm3si5/
-        HEDoND/vc6nE06ceJ7A9Jm1vty4/vMc=
+         in-reply-to:in-reply-to:references:references;
+        bh=CSYuwtmT8b+8sMwO2HmTx/vO/pKshfycGSOo4nB9oQo=;
+        b=KiGa8w7JAfh5Ekn7maJSuwc6WUeeOE+A2FEZVjQTWzknOAsaLyxkJFbXKwlJGWDlSo+tzG
+        6HRlUpkNgcKhZFSG9W4Qh68goTSW9qNPmmfMjms6+vLIBIUDdBRq8afou9KAd5VhWCjMle
+        Zrhh2VS278g0aXkusuCwgby8O0w5Hjo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-WUd-yxjsNfu_zVHXQNxdSg-1; Fri, 19 Jun 2020 04:28:31 -0400
-X-MC-Unique: WUd-yxjsNfu_zVHXQNxdSg-1
+ us-mta-292-UBAxIcEyPSmqjbxnv0juBg-1; Fri, 19 Jun 2020 05:21:03 -0400
+X-MC-Unique: UBAxIcEyPSmqjbxnv0juBg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAEFF835B40;
-        Fri, 19 Jun 2020 08:28:29 +0000 (UTC)
-Received: from [10.36.113.137] (ovpn-113-137.ams2.redhat.com [10.36.113.137])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AE2510021B3;
-        Fri, 19 Jun 2020 08:28:23 +0000 (UTC)
-Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-To:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
-        brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
-        dgilbert@redhat.com, frankja@linux.ibm.com
-Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
-        qemu-ppc@nongnu.org, mst@redhat.com, mdroth@linux.vnet.ibm.com,
-        Richard Henderson <rth@twiddle.net>, cohuck@redhat.com,
-        pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
-        qemu-s390x@nongnu.org
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 643A6107ACCD;
+        Fri, 19 Jun 2020 09:21:01 +0000 (UTC)
+Received: from gondolin (ovpn-112-224.ams2.redhat.com [10.36.112.224])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45F8F1002382;
+        Fri, 19 Jun 2020 09:20:54 +0000 (UTC)
+Date:   Fri, 19 Jun 2020 11:20:51 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v3 1/1] s390: virtio: let arch accept devices without
+ IOMMU feature
+Message-ID: <20200619112051.74babdb1.cohuck@redhat.com>
+In-Reply-To: <20200618002956.5f179de4.pasic@linux.ibm.com>
+References: <1592390637-17441-1-git-send-email-pmorel@linux.ibm.com>
+        <1592390637-17441-2-git-send-email-pmorel@linux.ibm.com>
+        <20200618002956.5f179de4.pasic@linux.ibm.com>
 Organization: Red Hat GmbH
-Message-ID: <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
-Date:   Fri, 19 Jun 2020 10:28:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.06.20 04:05, David Gibson wrote:
-> A number of hardware platforms are implementing mechanisms whereby the
-> hypervisor does not have unfettered access to guest memory, in order
-> to mitigate the security impact of a compromised hypervisor.
+On Thu, 18 Jun 2020 00:29:56 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On Wed, 17 Jun 2020 12:43:57 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
-> AMD's SEV implements this with in-cpu memory encryption, and Intel has
-> its own memory encryption mechanism.  POWER has an upcoming mechanism
-> to accomplish this in a different way, using a new memory protection
-> level plus a small trusted ultravisor.  s390 also has a protected
-> execution environment.
+> > An architecture protecting the guest memory against unauthorized host
+> > access may want to enforce VIRTIO I/O device protection through the
+> > use of VIRTIO_F_IOMMU_PLATFORM.
+> > 
+> > Let's give a chance to the architecture to accept or not devices
+> > without VIRTIO_F_IOMMU_PLATFORM.
+> >   
+> [..]
+> 
+> 
+> I'm still not really satisfied with your commit message, furthermore
+> I did some thinking about the abstraction you introduce here. I will
+> give a short analysis of that, but first things first. Your patch does
+> the job of preventing calamity, and the details can be changed any time,
+> thus: 
+> 
+> Acked-by: Halil Pasic <pasic@linux.ibm.com>
+> 
+> Regarding the interaction of architecture specific code with virtio core,
+> I believe we could have made the interface more generic.
+> 
+> One option is to introduce virtio_arch_finalize_features(), a hook that
+> could reject any feature that is inappropriate.
 
-Each architecture finds its own way to vandalize the original
-architecture, some in more extreme/obscure ways than others. I guess in
-the long term we'll regret most of that, but what do I know :)
+s/any feature/any combination of features/
+
+This sounds like a good idea (for a later update).
 
 > 
-> The current code (committed or draft) for these features has each
-> platform's version configured entirely differently.  That doesn't seem
-> ideal for users, or particularly for management layers.
+> Another option would be to find a common name for is_prot_virt_guest()
+> (arch/s390) sev_active() (arch/x86) and is_secure_guest() (arch/powerpc)
+> and use that instead of arch_needs_virtio_iommu_platform() and where-ever
+> appropriate. Currently we seem to want this info in driver code only for
+> virtio, but if the virtio driver has a legitimate need to know, other
+> drivers may as well have a legitimate need to know. For example if we
+> wanted to protect ourselves in ccw device drivers from somebody
+> setting up a vfio-ccw device and attach it to the prot-virt guest (AFAICT
+> we only lack guest enablement for this) such a function could be useful.
+
+I'm not really sure if we can find enough commonality between
+architectures, unless you propose to have a function for checking
+things like device memory only.
+
 > 
-> AMD SEV introduces a notionally generic machine option
-> "machine-encryption", but it doesn't actually cover any cases other
-> than SEV.
+> But since this can be rewritten any time, let's go with the option
+> people already agree with, instead of more discussion.
+
+Yes, there's nothing wrong with the patch as-is.
+
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+
+Which tree should this go through? Virtio? s390?
+
 > 
-> This series is a proposal to at least partially unify configuration
-> for these mechanisms, by renaming and generalizing AMD's
-> "memory-encryption" property.  It is replaced by a
-> "host-trust-limitation" property pointing to a platform specific
-> object which configures and manages the specific details.
+> Just another question. Do we want this backported? Do we need cc stable?
+
+It does change behaviour of virtio-ccw devices; but then, it only
+fences off configurations that would not have worked anyway.
+Distributions should probably pick this; but I do not consider it
+strictly a "fix" (more a mitigation for broken configurations), so I'm
+not sure whether stable applies.
+
+> [..]
 > 
+> 
+> >  int virtio_finalize_features(struct virtio_device *dev)
+> >  {
+> >  	int ret = dev->config->finalize_features(dev);
+> > @@ -179,6 +194,13 @@ int virtio_finalize_features(struct virtio_device *dev)
+> >  	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+> >  		return 0;
+> >  
+> > +	if (arch_needs_virtio_iommu_platform(dev) &&
+> > +		!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
+> > +		dev_warn(&dev->dev,
+> > +			 "virtio: device must provide VIRTIO_F_IOMMU_PLATFORM\n");  
+> 
+> I'm not sure, divulging the current Linux name of this feature bit is a
+> good idea, but if everybody else is fine with this, I don't care that
 
-I consider the property name sub-optimal. Yes, I am aware that there are
-other approaches being discussed on the KVM list to disallow access to
-guest memory without memory encryption. (most of them sound like people
-are trying to convert KVM into XEN, but again, what do I know ... :)  )
+Not sure if that feature name will ever change, as it is exported in
+headers. At most, we might want to add the new ACCESS_PLATFORM define
+and keep the old one, but that would still mean some churn.
 
-"host-trust-limitation"  sounds like "I am the hypervisor, I configure
-limited trust into myself". Also, "untrusted-host" would be a little bit
-nicer (I think trust is a black/white thing).
+> much. An alternative would be:
+> "virtio: device falsely claims to have full access to the memory,
+> aborting the device"
 
-However, once we have multiple options to protect a guest (memory
-encryption, unmapping guest pages ,...) the name will no longer really
-suffice to configure QEMU, no?
+"virtio: device does not work with limited memory access" ?
 
-> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
-> can be extended to cover the Intel and s390 mechanisms as well,
-> though.
-
-The only approach on s390x to not glue command line properties to the
-cpu model would be to remove the CPU model feature and replace it by the
-command line parameter. But that would, of course, be an incompatible break.
-
-How do upper layers actually figure out if memory encryption etc is
-available? on s390x, it's simply via the expanded host CPU model.
-
--- 
-Thanks,
-
-David / dhildenb
+But no issue with keeping the current message.
 
