@@ -2,100 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DECB2007CA
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 13:29:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6836200800
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 13:40:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731381AbgFSL3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 07:29:47 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55347 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731168AbgFSL3o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 07:29:44 -0400
+        id S1731794AbgFSLkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 07:40:17 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44278 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731501AbgFSLkP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 07:40:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592566183;
+        s=mimecast20190719; t=1592566814;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b3G5Sg9UDrE3ygdkaaLbR8lITkBl+GdILcq1UrtCIMM=;
-        b=VMWqPkzU4iEvuSBgyoVny3Ifr52RLGvEkYWKEbE1R+Xj0hxNCHCGUlbgFtTyOEV82jXV0g
-        RFJm0R2F4dYh0C04q8RzgAgrnmCC/hBOlzGNOeJvaa5q4dPS6BI4TZ82OX+Aw/lm1yK1mD
-        ow4fmqLp8rqKamLVj0+zgdJHfepyz+I=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-MYIh07HpPDSTIBqsGc194Q-1; Fri, 19 Jun 2020 07:29:41 -0400
-X-MC-Unique: MYIh07HpPDSTIBqsGc194Q-1
-Received: by mail-ej1-f71.google.com with SMTP id i17so3873022ejb.9
-        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 04:29:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=b3G5Sg9UDrE3ygdkaaLbR8lITkBl+GdILcq1UrtCIMM=;
-        b=S4URI1aY7TsBQM9w3D4gxHwS25m2YNtaGxAbZ3h6bhVHDJGTyAUBdqPl4oVyhFvke0
-         J3Q8P4Rt/DjPBYC8abj/FCkNZuDM/7bfIzGAt1F7WyMmAIf65cECH/oscq1xExUge/Sj
-         q4KYEYKUgx4SyI0dxjiVeYFYYyTuGU2ZmUVhdIuuL/SR4J8SI5MJlFEhxk44dUOW73Rp
-         VQMUyluTWlgGQGDnB45hpTZATa0mz3Q6SLtaHjob/U+v5KW074hcQ9WMDKCRx65gdWxF
-         Hes8kSbPyAAwwW7/z+c5PKiQbor4fLgg/rsqdu0VZWqiZ2EQJH3sOiv4C+sX/NjVh3T2
-         kkuA==
-X-Gm-Message-State: AOAM532IW1wuwR/5LgODbf1AB/2tDi8l92h64OHjloMEce42xpHMrUMv
-        uoiU4H6GOjZbaV/hSM4RdCPzYIQJ39QfFxFoZY8zqbq/nTwz0xL4U9hSVlA0WwN/B+eGi4Chp1h
-        I0H/Cr4rtKvz7
-X-Received: by 2002:a17:906:cc85:: with SMTP id oq5mr3120803ejb.142.1592566180116;
-        Fri, 19 Jun 2020 04:29:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzKOezBmCA21RB4bkpAUbx0Esf7jxxGwzvG3u6+Ourw/aIp/mFzQOIEXQr09AR9vOGl8T5Zqg==
-X-Received: by 2002:a17:906:cc85:: with SMTP id oq5mr3120784ejb.142.1592566179899;
-        Fri, 19 Jun 2020 04:29:39 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id q5sm4447074edr.21.2020.06.19.04.29.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jun 2020 04:29:39 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     like.xu@intel.com, kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>,
-        Maxime Coquelin <maxime.coquelin@redhat.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH RFC] Revert "KVM: VMX: Micro-optimize vmexit time when not exposing PMU"
-In-Reply-To: <2c7d6849-7fac-b9f6-7bcb-5509863564f3@intel.com>
-References: <20200619094046.654019-1-vkuznets@redhat.com> <2c7d6849-7fac-b9f6-7bcb-5509863564f3@intel.com>
-Date:   Fri, 19 Jun 2020 13:29:38 +0200
-Message-ID: <87366rguot.fsf@vitty.brq.redhat.com>
+        bh=Z77TS/LJ6vJkiK4iQM9yFBovLkLZxtIwofZz9fNlivs=;
+        b=HTGDjd7U13Jk1KIOi3/+qIYs7lSPr8REKYscFg+PugO5/yMpRZn8Ix8o4x+jboPA5nQ6a7
+        82RxYT+iAdFKC4usym8Mci4LAYuLUYtgNUoUScEh+z1wEbGAz5scb4G3tL0IfsCppRe1iO
+        ZTWRSbV2kmrMMRZWT4XM/X/XTC2jhJE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-i93rwnIIOB6D-CxrGiSjww-1; Fri, 19 Jun 2020 07:40:10 -0400
+X-MC-Unique: i93rwnIIOB6D-CxrGiSjww-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AD0991137;
+        Fri, 19 Jun 2020 11:40:09 +0000 (UTC)
+Received: from gondolin (ovpn-112-224.ams2.redhat.com [10.36.112.224])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CF74100238D;
+        Fri, 19 Jun 2020 11:40:07 +0000 (UTC)
+Date:   Fri, 19 Jun 2020 13:40:05 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Jared Rossi <jrossi@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v3 3/3] vfio-ccw: Check workqueue before doing START
+Message-ID: <20200619134005.512fc54f.cohuck@redhat.com>
+In-Reply-To: <20200616195053.99253-4-farman@linux.ibm.com>
+References: <20200616195053.99253-1-farman@linux.ibm.com>
+        <20200616195053.99253-4-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"Xu, Like" <like.xu@intel.com> writes:
+On Tue, 16 Jun 2020 21:50:53 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-> On 2020/6/19 17:40, Vitaly Kuznetsov wrote:
->> Guest crashes are observed on a Cascade Lake system when 'perf top' is
->> launched on the host, e.g.
-> Interesting, is it specific to Cascade Lake?
->
+> When an interrupt is received via the IRQ, the bulk of the work is
+> stacked on a workqueue for later processing. Which means that concurrent
+> START or a HALT/CLEAR operation (via the async_region) will race with
+> this process and require some serialization.
+> 
+> Once we have all our locks acquired, let's just look to see if we're
+> in a window where the process has been started from the IRQ, but not
+> yet picked up by vfio-ccw to clean up an I/O. If there is, mark the
+> request as BUSY so it can be redriven after we have a chance to breathe.
 
-Actually no, just reproduced this on a Haswell system. If you run the
-guest with "-cpu host,-pmu" and do 'perf top' (on the host) the guest
-crashes immediately.
+This change looks reasonable to me. It would be even better if we could
+send off I/O requests at any time; but if signaling to retry saves us
+from some hairy code elsewhere, it is a good idea to do so.
 
-> Would you mind sharing the output of
-> "cpuid -r -l 1 -1" and "cat /proc/cpuinfo| grep microcode | uniq" with us ?
-
-Sure (this is probably unrelated because the issue also reproduces on
-Haswell but still):
-
-# cpuid -r -l 1 -1
-
-CPU:
-   0x00000001 0x00: eax=0x00050657 ebx=0x03200800 ecx=0x7ffefbff edx=0xbfebfbff
-
-# cat /proc/cpuinfo| grep microcode | uniq
-microcode	: 0x500002c
-
-This is "Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz"
-
--- 
-Vitaly
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_fsm.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+> index f0952192480e..9dc5b4d549b3 100644
+> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+> @@ -28,6 +28,11 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+>  
+>  	spin_lock_irqsave(sch->lock, flags);
+>  
+> +	if (work_pending(&private->io_work)) {
+> +		ret = -EBUSY;
+> +		goto out;
+> +	}
+> +
+>  	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
+>  	if (!orb) {
+>  		ret = -EIO;
 
