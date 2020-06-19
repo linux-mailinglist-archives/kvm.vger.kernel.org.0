@@ -2,203 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37D55201A46
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 20:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2F9C201A61
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 20:27:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436621AbgFSSYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 14:24:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48822 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2406019AbgFSSX4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 14:23:56 -0400
+        id S1732009AbgFSS0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 14:26:30 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24811 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728522AbgFSS03 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 14:26:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592591035;
+        s=mimecast20190719; t=1592591187;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tYgwx/S0czXjeI7eutEPjbQtilI+2+QRsI8jC+dRvu0=;
-        b=MDa2ktHDrZh/yhnpT41WKmR+669NQoSvzIl0kahZy7uts0BZBez3/0fZ9c6IyXdN5DwHUs
-        5TlAT2KKUVCo4hyG30fVtxvbdo28fgJ1L6i2TZNmtJyrunkn4aT044L8esY8UXfD/LrnJC
-        KEHBzyhp8HezJEH87PoQofLN/aiGhac=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-tynZoVW8NMe7yZ9Pwu3JHg-1; Fri, 19 Jun 2020 14:23:53 -0400
-X-MC-Unique: tynZoVW8NMe7yZ9Pwu3JHg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17D8C107B767;
-        Fri, 19 Jun 2020 18:23:52 +0000 (UTC)
-Received: from eperezma.remote.csb (ovpn-113-14.ams2.redhat.com [10.36.113.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B6011CA;
-        Fri, 19 Jun 2020 18:23:42 +0000 (UTC)
-From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-To:     mst@redhat.com
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Subject: [RFC v9 11/11] vhost: drop head based APIs
-Date:   Fri, 19 Jun 2020 20:23:02 +0200
-Message-Id: <20200619182302.850-12-eperezma@redhat.com>
-In-Reply-To: <20200619182302.850-1-eperezma@redhat.com>
-References: <20200619182302.850-1-eperezma@redhat.com>
+        bh=o7jACTPMklupBCcyQ4Eej+eEvNAjD27aYrs6PEc/vLM=;
+        b=Hu+g/wioYbreRDmEZA02uco8afd2fu9cS+f7wK2b9Huzy8mjkqz8MR4Dgxs5ZIezHNBloo
+        IPml2XoI6kQpYGC8ibLDTOL7eVtFBan2mMYCw4KydxsB420PXdPMthtSmXcK99sw1URPBt
+        xSafn/Qx+rq7TH6/8sryXdbS94rhG0Y=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-GPLmRYpFOSSrZzwj5jdqCQ-1; Fri, 19 Jun 2020 14:26:25 -0400
+X-MC-Unique: GPLmRYpFOSSrZzwj5jdqCQ-1
+Received: by mail-qt1-f197.google.com with SMTP id x6so5848801qtq.1
+        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 11:26:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=o7jACTPMklupBCcyQ4Eej+eEvNAjD27aYrs6PEc/vLM=;
+        b=MXlAWQVElfoctPQJX6XMcV8x24T8sDQSKwbr/72TIyJdoRYe0GdfYkDAM5x+eJ+9hk
+         iK3/MRpGacuTW5o+cDV0iqlhSsu4nQ16eP3H0gZ3tZhR3zXCbhbrBBvM0nQGRscn+qRE
+         Y1IkwO9uvDGPwlw7gytS/Pa9K13AEHp+j2RgVC1fauQc7S7i3ks+o/WYusGbipMT1SbO
+         vOpGTZbaIR/SM4FfBrXTl5JFMPpXoeoLgcOzeIETxN+zQJ4Tmujkv/yCUmqOLySY6tkS
+         XK3bHAvRWZqTa8VpIji1+QdumxKipMkq1kg8h80aUvW1KU86gY7GcJSVfthXVLs2VSOx
+         DV7g==
+X-Gm-Message-State: AOAM531Jq5dtFCR4z8W9Oz362J2n4yLL/mB9+8Y7RmYSc6w/L5JbzFFJ
+        lvPe9uQFR+AOjYmNPrKnPntMca/Srb+jck+u3Bkb5d/H2nHThS5e/rGym4BLG8wEbnrnxFpXwMh
+        E+SNIhuh0jta6cuROWZ89CKnBM2JO
+X-Received: by 2002:aed:2171:: with SMTP id 104mr2351982qtc.22.1592591184845;
+        Fri, 19 Jun 2020 11:26:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzmu89J2VMwmehul4uuct4yakQaH6gNxgS333NyHo7rSAKDL/C3Yad8XzwEayBTHv1AAc0+ox+DOJ6fz/Cp2Vk=
+X-Received: by 2002:aed:2171:: with SMTP id 104mr2351958qtc.22.1592591184592;
+ Fri, 19 Jun 2020 11:26:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20200611113404.17810-1-mst@redhat.com> <20200611113404.17810-3-mst@redhat.com>
+ <20200611152257.GA1798@char.us.oracle.com> <CAJaqyWdwXMX0JGhmz6soH2ZLNdaH6HEdpBM8ozZzX9WUu8jGoQ@mail.gmail.com>
+ <CAJaqyWdwgy0fmReOgLfL4dAv-E+5k_7z3d9M+vHqt0aO2SmOFg@mail.gmail.com>
+In-Reply-To: <CAJaqyWdwgy0fmReOgLfL4dAv-E+5k_7z3d9M+vHqt0aO2SmOFg@mail.gmail.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Fri, 19 Jun 2020 20:25:48 +0200
+Message-ID: <CAJaqyWe1+FmPC9L_+8oGfYUT63BaWuGrOnkRnUcGapvwtzqmPw@mail.gmail.com>
+Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+On Fri, Jun 19, 2020 at 8:07 PM Eugenio Perez Martin
+<eperezma@redhat.com> wrote:
+>
+> On Mon, Jun 15, 2020 at 2:28 PM Eugenio Perez Martin
+> <eperezma@redhat.com> wrote:
+> >
+> > On Thu, Jun 11, 2020 at 5:22 PM Konrad Rzeszutek Wilk
+> > <konrad.wilk@oracle.com> wrote:
+> > >
+> > > On Thu, Jun 11, 2020 at 07:34:19AM -0400, Michael S. Tsirkin wrote:
+> > > > As testing shows no performance change, switch to that now.
+> > >
+> > > What kind of testing? 100GiB? Low latency?
+> > >
+> >
+> > Hi Konrad.
+> >
+> > I tested this version of the patch:
+> > https://lkml.org/lkml/2019/10/13/42
+> >
+> > It was tested for throughput with DPDK's testpmd (as described in
+> > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html)
+> > and kernel pktgen. No latency tests were performed by me. Maybe it is
+> > interesting to perform a latency test or just a different set of tests
+> > over a recent version.
+> >
+> > Thanks!
+>
+> I have repeated the tests with v9, and results are a little bit different:
+> * If I test opening it with testpmd, I see no change between versions
+> * If I forward packets between two vhost-net interfaces in the guest
+> using a linux bridge in the host:
+>   - netperf UDP_STREAM shows a performance increase of 1.8, almost
+> doubling performance. This gets lower as frame size increase.
+>   - rests of the test goes noticeably worse: UDP_RR goes from ~6347
+> transactions/sec to 5830
+>   - TCP_STREAM goes from ~10.7 gbps to ~7Gbps
+>   - TCP_RR from 6223.64 transactions/sec to 5739.44
 
-Everyone's using buf APIs, no need for head based ones anymore.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
----
- drivers/vhost/vhost.c | 58 +++----------------------------------------
- drivers/vhost/vhost.h | 12 ---------
- 2 files changed, 4 insertions(+), 66 deletions(-)
-
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index e227e0667790..736fa1a3cee5 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -2423,39 +2423,11 @@ EXPORT_SYMBOL_GPL(vhost_get_avail_buf);
- /* Reverse the effect of vhost_get_avail_buf. Useful for error handling. */
- void vhost_discard_avail_bufs(struct vhost_virtqueue *vq,
- 			      struct vhost_buf *buf, unsigned count)
--{
--	vhost_discard_vq_desc(vq, count);
--}
--EXPORT_SYMBOL_GPL(vhost_discard_avail_bufs);
--
--/* This function returns the descriptor number found, or vq->num (which is
-- * never a valid descriptor number) if none was found.  A negative code is
-- * returned on error. */
--int vhost_get_vq_desc(struct vhost_virtqueue *vq,
--		      struct iovec iov[], unsigned int iov_size,
--		      unsigned int *out_num, unsigned int *in_num,
--		      struct vhost_log *log, unsigned int *log_num)
--{
--	struct vhost_buf buf;
--	int ret = vhost_get_avail_buf(vq, &buf,
--				      iov, iov_size, out_num, in_num,
--				      log, log_num);
--
--	if (likely(ret > 0))
--		return buf.id;
--	if (likely(!ret))
--		return vq->num;
--	return ret;
--}
--EXPORT_SYMBOL_GPL(vhost_get_vq_desc);
--
--/* Reverse the effect of vhost_get_vq_desc. Useful for error handling. */
--void vhost_discard_vq_desc(struct vhost_virtqueue *vq, int n)
- {
- 	unfetch_descs(vq);
--	vq->last_avail_idx -= n;
-+	vq->last_avail_idx -= count;
- }
--EXPORT_SYMBOL_GPL(vhost_discard_vq_desc);
-+EXPORT_SYMBOL_GPL(vhost_discard_avail_bufs);
- 
- static int __vhost_add_used_n(struct vhost_virtqueue *vq,
- 			    struct vring_used_elem *heads,
-@@ -2491,7 +2463,7 @@ static int __vhost_add_used_n(struct vhost_virtqueue *vq,
- 
- /* After we've used one of their buffers, we tell them about it.  We'll then
-  * want to notify the guest, using eventfd. */
--int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
-+static int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
- 		     unsigned count)
- {
- 	int start, n, r;
-@@ -2524,11 +2496,10 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
- 	}
- 	return r;
- }
--EXPORT_SYMBOL_GPL(vhost_add_used_n);
- 
- /* After we've used one of their buffers, we tell them about it.  We'll then
-  * want to notify the guest, using eventfd. */
--int vhost_add_used(struct vhost_virtqueue *vq, unsigned int head, int len)
-+static int vhost_add_used(struct vhost_virtqueue *vq, unsigned int head, int len)
- {
- 	struct vring_used_elem heads = {
- 		cpu_to_vhost32(vq, head),
-@@ -2537,7 +2508,6 @@ int vhost_add_used(struct vhost_virtqueue *vq, unsigned int head, int len)
- 
- 	return vhost_add_used_n(vq, &heads, 1);
- }
--EXPORT_SYMBOL_GPL(vhost_add_used);
- 
- int vhost_put_used_buf(struct vhost_virtqueue *vq, struct vhost_buf *buf)
- {
-@@ -2605,26 +2575,6 @@ void vhost_signal(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- }
- EXPORT_SYMBOL_GPL(vhost_signal);
- 
--/* And here's the combo meal deal.  Supersize me! */
--void vhost_add_used_and_signal(struct vhost_dev *dev,
--			       struct vhost_virtqueue *vq,
--			       unsigned int head, int len)
--{
--	vhost_add_used(vq, head, len);
--	vhost_signal(dev, vq);
--}
--EXPORT_SYMBOL_GPL(vhost_add_used_and_signal);
--
--/* multi-buffer version of vhost_add_used_and_signal */
--void vhost_add_used_and_signal_n(struct vhost_dev *dev,
--				 struct vhost_virtqueue *vq,
--				 struct vring_used_elem *heads, unsigned count)
--{
--	vhost_add_used_n(vq, heads, count);
--	vhost_signal(dev, vq);
--}
--EXPORT_SYMBOL_GPL(vhost_add_used_and_signal_n);
--
- /* return true if we're sure that avaiable ring is empty */
- bool vhost_vq_avail_empty(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- {
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index 28eea0155efb..264a2a2fae97 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -197,11 +197,6 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
- bool vhost_vq_access_ok(struct vhost_virtqueue *vq);
- bool vhost_log_access_ok(struct vhost_dev *);
- 
--int vhost_get_vq_desc(struct vhost_virtqueue *,
--		      struct iovec iov[], unsigned int iov_count,
--		      unsigned int *out_num, unsigned int *in_num,
--		      struct vhost_log *log, unsigned int *log_num);
--void vhost_discard_vq_desc(struct vhost_virtqueue *, int n);
- int vhost_get_avail_buf(struct vhost_virtqueue *, struct vhost_buf *buf,
- 			struct iovec iov[], unsigned int iov_count,
- 			unsigned int *out_num, unsigned int *in_num,
-@@ -209,13 +204,6 @@ int vhost_get_avail_buf(struct vhost_virtqueue *, struct vhost_buf *buf,
- void vhost_discard_avail_bufs(struct vhost_virtqueue *,
- 			      struct vhost_buf *, unsigned count);
- int vhost_vq_init_access(struct vhost_virtqueue *);
--int vhost_add_used(struct vhost_virtqueue *, unsigned int head, int len);
--int vhost_add_used_n(struct vhost_virtqueue *, struct vring_used_elem *heads,
--		     unsigned count);
--void vhost_add_used_and_signal(struct vhost_dev *, struct vhost_virtqueue *,
--			       unsigned int id, int len);
--void vhost_add_used_and_signal_n(struct vhost_dev *, struct vhost_virtqueue *,
--			       struct vring_used_elem *heads, unsigned count);
- int vhost_put_used_buf(struct vhost_virtqueue *, struct vhost_buf *buf);
- int vhost_put_used_n_bufs(struct vhost_virtqueue *,
- 			  struct vhost_buf *bufs, unsigned count);
--- 
-2.18.1
+And I forgot to add: It seems that avoiding IOV length math helps,
+since performance increases in all tests from patch 02/11 ("vhost: use
+batched get_vq_desc version") to 11/11 ("vhost: drop head based
+APIs").
 
