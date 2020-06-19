@@ -2,95 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6836200800
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 13:40:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23D89200803
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 13:41:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731794AbgFSLkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 07:40:17 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44278 "EHLO
+        id S1732047AbgFSLl5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 07:41:57 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20534 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731501AbgFSLkP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 07:40:15 -0400
+        by vger.kernel.org with ESMTP id S1732035AbgFSLlh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 07:41:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592566814;
+        s=mimecast20190719; t=1592566894;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Z77TS/LJ6vJkiK4iQM9yFBovLkLZxtIwofZz9fNlivs=;
-        b=HTGDjd7U13Jk1KIOi3/+qIYs7lSPr8REKYscFg+PugO5/yMpRZn8Ix8o4x+jboPA5nQ6a7
-        82RxYT+iAdFKC4usym8Mci4LAYuLUYtgNUoUScEh+z1wEbGAz5scb4G3tL0IfsCppRe1iO
-        ZTWRSbV2kmrMMRZWT4XM/X/XTC2jhJE=
+        bh=ciTHkDJblJ9rWL0l3niXPRssQfA1jdhX6wUgfZqPUV0=;
+        b=Wx2ewJ7ahSapSATRnfnHs/kJ4JoOagOPj2SNVOo/H4eqRn9H4V7eswAKv8ShxkoRQIhPe8
+        y8/3Pde/X9RpOTEu/zWBrwWE+2yDvodT4HJvLGNZofzFevf7VktKESDpqlRLTCbcPQXXJX
+        1VMqgGDbggPVQK50xszGKXa9uYOXEV0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-i93rwnIIOB6D-CxrGiSjww-1; Fri, 19 Jun 2020 07:40:10 -0400
-X-MC-Unique: i93rwnIIOB6D-CxrGiSjww-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-229-xKZLqt_PNI-0CyN0b4gYpQ-1; Fri, 19 Jun 2020 07:41:30 -0400
+X-MC-Unique: xKZLqt_PNI-0CyN0b4gYpQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AD0991137;
-        Fri, 19 Jun 2020 11:40:09 +0000 (UTC)
-Received: from gondolin (ovpn-112-224.ams2.redhat.com [10.36.112.224])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CF74100238D;
-        Fri, 19 Jun 2020 11:40:07 +0000 (UTC)
-Date:   Fri, 19 Jun 2020 13:40:05 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Jared Rossi <jrossi@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v3 3/3] vfio-ccw: Check workqueue before doing START
-Message-ID: <20200619134005.512fc54f.cohuck@redhat.com>
-In-Reply-To: <20200616195053.99253-4-farman@linux.ibm.com>
-References: <20200616195053.99253-1-farman@linux.ibm.com>
-        <20200616195053.99253-4-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EB39835B49;
+        Fri, 19 Jun 2020 11:41:29 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.110])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC5555BAC3;
+        Fri, 19 Jun 2020 11:41:25 +0000 (UTC)
+Date:   Fri, 19 Jun 2020 13:41:23 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+        Haibo Xu <haibo.xu@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v2] target/arm: Check supported KVM features globally
+ (not per vCPU)
+Message-ID: <20200619114123.7nhuehm76iwhsw5i@kamzik.brq.redhat.com>
+References: <20200619095542.2095-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: multipart/mixed; boundary="42nl7cd6ilamj2ht"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200619095542.2095-1-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Jun 2020 21:50:53 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> When an interrupt is received via the IRQ, the bulk of the work is
-> stacked on a workqueue for later processing. Which means that concurrent
-> START or a HALT/CLEAR operation (via the async_region) will race with
-> this process and require some serialization.
+--42nl7cd6ilamj2ht
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+
+On Fri, Jun 19, 2020 at 11:55:42AM +0200, Philippe Mathieu-Daudé wrote:
+> Since commit d70c996df23f, when enabling the PMU we get:
 > 
-> Once we have all our locks acquired, let's just look to see if we're
-> in a window where the process has been started from the IRQ, but not
-> yet picked up by vfio-ccw to clean up an I/O. If there is, mark the
-> request as BUSY so it can be redriven after we have a chance to breathe.
-
-This change looks reasonable to me. It would be even better if we could
-send off I/O requests at any time; but if signaling to retry saves us
-from some hairy code elsewhere, it is a good idea to do so.
-
+>   $ qemu-system-aarch64 -cpu host,pmu=on -M virt,accel=kvm,gic-version=3
+>   Segmentation fault (core dumped)
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>   Thread 1 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
+>   0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
+>   2588        ret = ioctl(s->fd, type, arg);
+>   (gdb) bt
+>   #0  0x0000aaaaaae356d0 in kvm_ioctl (s=0x0, type=44547) at accel/kvm/kvm-all.c:2588
+>   #1  0x0000aaaaaae31568 in kvm_check_extension (s=0x0, extension=126) at accel/kvm/kvm-all.c:916
+>   #2  0x0000aaaaaafce254 in kvm_arm_pmu_supported (cpu=0xaaaaac214ab0) at target/arm/kvm.c:213
+>   #3  0x0000aaaaaafc0f94 in arm_set_pmu (obj=0xaaaaac214ab0, value=true, errp=0xffffffffe438) at target/arm/cpu.c:1111
+>   #4  0x0000aaaaab5533ac in property_set_bool (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", opaque=0xaaaaac222730, errp=0xffffffffe438) at qom/object.c:2170
+>   #5  0x0000aaaaab5512f0 in object_property_set (obj=0xaaaaac214ab0, v=0xaaaaac223a80, name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1328
+>   #6  0x0000aaaaab551e10 in object_property_parse (obj=0xaaaaac214ab0, string=0xaaaaac11b4c0 "on", name=0xaaaaac11a970 "pmu", errp=0xffffffffe438) at qom/object.c:1561
+>   #7  0x0000aaaaab54ee8c in object_apply_global_props (obj=0xaaaaac214ab0, props=0xaaaaac018e20, errp=0xaaaaabd6fd88 <error_fatal>) at qom/object.c:407
+>   #8  0x0000aaaaab1dd5a4 in qdev_prop_set_globals (dev=0xaaaaac214ab0) at hw/core/qdev-properties.c:1218
+>   #9  0x0000aaaaab1d9fac in device_post_init (obj=0xaaaaac214ab0) at hw/core/qdev.c:1050
+>   ...
+>   #15 0x0000aaaaab54f310 in object_initialize_with_type (obj=0xaaaaac214ab0, size=52208, type=0xaaaaabe237f0) at qom/object.c:512
+>   #16 0x0000aaaaab54fa24 in object_new_with_type (type=0xaaaaabe237f0) at qom/object.c:687
+>   #17 0x0000aaaaab54fa80 in object_new (typename=0xaaaaabe23970 "host-arm-cpu") at qom/object.c:702
+>   #18 0x0000aaaaaaf04a74 in machvirt_init (machine=0xaaaaac0a8550) at hw/arm/virt.c:1770
+>   #19 0x0000aaaaab1e8720 in machine_run_board_init (machine=0xaaaaac0a8550) at hw/core/machine.c:1138
+>   #20 0x0000aaaaaaf95394 in qemu_init (argc=5, argv=0xffffffffea58, envp=0xffffffffea88) at softmmu/vl.c:4348
+>   #21 0x0000aaaaaada3f74 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at softmmu/main.c:48
+> 
+> This is because in frame #2, cpu->kvm_state is still NULL
+> (the vCPU is not yet realized).
+> 
+> KVM has a hard requirement of all cores supporting the same
+> feature set. We only need to check if the accelerator supports
+> a feature, not each vCPU individually.
+> 
+> Fix by kvm_arm_<FEATURE>_supported() functions take a AccelState
+> argument (already realized/valid at this point) instead of a
+> CPUState argument.
+> 
+> Reported-by: Haibo Xu <haibo.xu@linaro.org>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  drivers/s390/cio/vfio_ccw_fsm.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> v2: Use global kvm_state (bonzini)
 > 
-> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-> index f0952192480e..9dc5b4d549b3 100644
-> --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> @@ -28,6 +28,11 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
->  
->  	spin_lock_irqsave(sch->lock, flags);
->  
-> +	if (work_pending(&private->io_work)) {
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +
->  	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
->  	if (!orb) {
->  		ret = -EIO;
+> Paolo, does this break migration of encrypted memory assumptions?
+> 
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Supersedes: <20200617130800.26355-1-philmd@redhat.com>
+> ---
+>  target/arm/kvm_arm.h | 21 +++++++++------------
+>  target/arm/cpu.c     |  2 +-
+>  target/arm/cpu64.c   | 10 +++++-----
+>  target/arm/kvm.c     |  4 ++--
+>  target/arm/kvm64.c   | 14 +++++---------
+>  5 files changed, 22 insertions(+), 29 deletions(-)
+>
+
+Hi Phil,
+
+Can you also post the attached patch with this one (a two patch series)?
+I want to ensure the bug is fixed before the test gets merged, but I
+also would like the test to be added in order to catch things like this
+in the future.
+
+Thanks,
+drew
+
+--42nl7cd6ilamj2ht
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-tests-qtest-arm-cpu-features-Add-feature-setting-tes.patch"
+
+From 0bcb766d51b7c1c328218ae735f687b1160d6b42 Mon Sep 17 00:00:00 2001
+From: Andrew Jones <drjones@redhat.com>
+Date: Fri, 19 Jun 2020 13:30:38 +0200
+Subject: [PATCH] tests/qtest/arm-cpu-features: Add feature setting tests
+
+A recent regression (-cpu host,pmu=on caused a segfault) inspired
+adding these tests.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ tests/qtest/arm-cpu-features.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
+
+diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+index 469217367661..d6bdbc171893 100644
+--- a/tests/qtest/arm-cpu-features.c
++++ b/tests/qtest/arm-cpu-features.c
+@@ -159,16 +159,35 @@ static bool resp_get_feature(QDict *resp, const char *feature)
+     qobject_unref(_resp);                                              \
+ })
+ 
+-#define assert_feature(qts, cpu_type, feature, expected_value)         \
++#define resp_assert_feature(resp, feature, expected_value)             \
+ ({                                                                     \
+-    QDict *_resp, *_props;                                             \
++    QDict *_props;                                                     \
+                                                                        \
+-    _resp = do_query_no_props(qts, cpu_type);                          \
+     g_assert(_resp);                                                   \
+     g_assert(resp_has_props(_resp));                                   \
+     _props = resp_get_props(_resp);                                    \
+     g_assert(qdict_get(_props, feature));                              \
+     g_assert(qdict_get_bool(_props, feature) == (expected_value));     \
++})
++
++#define assert_feature(qts, cpu_type, feature, expected_value)         \
++({                                                                     \
++    QDict *_resp;                                                      \
++                                                                       \
++    _resp = do_query_no_props(qts, cpu_type);                          \
++    g_assert(_resp);                                                   \
++    resp_assert_feature(_resp, feature, expected_value);               \
++    qobject_unref(_resp);                                              \
++})
++
++#define assert_set_feature(qts, cpu_type, feature, value)              \
++({                                                                     \
++    const char *_fmt = (value) ? "{ %s: true }" : "{ %s: false }";     \
++    QDict *_resp;                                                      \
++                                                                       \
++    _resp = do_query(qts, cpu_type, _fmt, feature);                    \
++    g_assert(_resp);                                                   \
++    resp_assert_feature(_resp, feature, value);                        \
+     qobject_unref(_resp);                                              \
+ })
+ 
+@@ -464,7 +483,10 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+         return;
+     }
+ 
++    /* Enabling and disabling kvm-no-adjvtime should always work. */
+     assert_has_feature_disabled(qts, "host", "kvm-no-adjvtime");
++    assert_set_feature(qts, "host", "kvm-no-adjvtime", true);
++    assert_set_feature(qts, "host", "kvm-no-adjvtime", false);
+ 
+     if (g_str_equal(qtest_get_arch(), "aarch64")) {
+         bool kvm_supports_sve;
+@@ -475,7 +497,11 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+         char *error;
+ 
+         assert_has_feature_enabled(qts, "host", "aarch64");
++
++        /* Enabling and disabling pmu should always work. */
+         assert_has_feature_enabled(qts, "host", "pmu");
++        assert_set_feature(qts, "host", "pmu", true);
++        assert_set_feature(qts, "host", "pmu", false);
+ 
+         assert_error(qts, "cortex-a15",
+             "We cannot guarantee the CPU type 'cortex-a15' works "
+-- 
+2.25.4
+
+
+--42nl7cd6ilamj2ht--
 
