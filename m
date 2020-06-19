@@ -2,160 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69837201E30
-	for <lists+kvm@lfdr.de>; Sat, 20 Jun 2020 00:46:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30D39201E3C
+	for <lists+kvm@lfdr.de>; Sat, 20 Jun 2020 00:53:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729559AbgFSWqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 18:46:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42946 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729541AbgFSWqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 18:46:05 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE30C0613EF
-        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 15:46:05 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id c75so10794417ila.8
-        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 15:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jH/dA5uUVqsNDjbuGLof+U+Gygv8PhIcTewwE4gKMYE=;
-        b=h+W2MNijvEM9ot6E9WHNBXmS1ToD1hq5GjBBRg9FiDIAhdrq/U8LAdUUL2CrlbgzeI
-         vbc+QmN6dbp+0pyOM1WCOwkQyX7M+yn+liam5gAXjt4KkD8xx/dY9tkHw3TvGNUQhnTW
-         sPGQg7XfaqxRqI9oDp2tjWf77JjQ4+JybbF0TDWqI5V6oYr1gk5kD9XQnzwYxw9mwr5+
-         dmSwxwZ/EaNn/QTZMHGYJjfnfJ6eLH9hnc1BOP31FwaxUS2kii1TGA6XoOpyqHDdo6sH
-         6A09eecpEIY2xd4GHT0fxS6fPtrTNXxcg8jwf3br4icbG4TS1U2Sc8UDM5//s0htPwO/
-         hQtg==
+        id S1729840AbgFSWw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 18:52:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30104 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729822AbgFSWw5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 18:52:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592607175;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=w6bylLJixqz3s8BXyWddFU9FNbd2DZqPgXkXfHXbAtk=;
+        b=fmC1JmeftmmT1vFQ8bnLYEqOUGx9y0PX7RbISEJ+uGFVR4WIUbOrwcLILiQb0pnyB32Orc
+        D9VjNN9Gi90TBhzElvn8IooT19/TYA/645SfY40wCIAXE3p7eBvY7avKV9Q0uLxtB6Eucr
+        zZ5qrI+1QoDtP8coATksS/IpTDsfaKc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-195-7TKA1cZOPhGJl80-FjJ9mg-1; Fri, 19 Jun 2020 18:52:54 -0400
+X-MC-Unique: 7TKA1cZOPhGJl80-FjJ9mg-1
+Received: by mail-wr1-f69.google.com with SMTP id o25so3403590wro.16
+        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 15:52:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jH/dA5uUVqsNDjbuGLof+U+Gygv8PhIcTewwE4gKMYE=;
-        b=IkDXo7gK2otzAJEcZjaeIDVhrpZNV1et5ndXMPia0NLNEfQM5wELYMTfeebrpmob4Z
-         YFt1XJUUDHwhyZDacm3/EhI4d1eGmjW3whLi+66LC6KPgengDvOf5IQ4nqyB49Caz4a1
-         mNODxK1TiWyzeLlU6jHHK61uS/9qtb6CHRzLaNlFXY4hywxZXNXNqBeWbKHcrc6E/bMS
-         F9JI0IB0D2iGQyVS8gNmGI0PKwp7KC1dq7UJsUnrd31cgI9naW8+RoWTUcwthzxBxVHS
-         C2QL0AbQeRWDECy+5LBVUOoFmEGiGi9ywiNydbKZWSYywE94KBxEXzCShpMvnZ6GWp11
-         Q9WA==
-X-Gm-Message-State: AOAM532q+nyl1bSDPxPrNjGM3CC/DljvCEc6SwPJLUPndv988C2gmkII
-        JGbzNKcnZymq55GjS31TP7Fc3LzyXic6Cz6Q1bFdHA==
-X-Google-Smtp-Source: ABdhPJxhACCnJ0xgIquosf8TXeeHudyVXlyxNNnw7oBChStulF96+S1xMUy85W5DNj7bpuInqTGdOwVHXFJpU40VcBc=
-X-Received: by 2002:a05:6e02:11a5:: with SMTP id 5mr5978727ilj.108.1592606764363;
- Fri, 19 Jun 2020 15:46:04 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=w6bylLJixqz3s8BXyWddFU9FNbd2DZqPgXkXfHXbAtk=;
+        b=c+51QPdG5C0YEHtyICgu3V3ANFqP2GfmQCWdqjelLe+ZJyw1rDiJAdKkVpFTxfPIem
+         dPL8mhzMEDEGTnN7L/Cb2o9I7G9gbb70IgcJ71hq0Y3mu/pBSCCvRdxlTE9298vcg35s
+         B6BNwzDxB82hnhLlP5G8qIAafdvNymNJjmYfM52p9b4xXyBQvWKUsmi/+UybdlmOuYmh
+         Vqz9zQ+R2p2M28iiOZYipHAHl4zhDkSGBvFnxpMl+VDq3TUZFgbGGK6k47jO3L1bJ9Kh
+         DySCNNTJLsrp1RlVTjZCEkbZj4ma/qjgIyhXe9nyAZyghdRnXfBL/ouK3s0bWiNZN5Z1
+         tA8Q==
+X-Gm-Message-State: AOAM531BNh+pqyrnny1bGepIMcBufwirZmwh6oeZjMSQNaevXxfHJu2R
+        x162kpJwBg076L0U+YzYPT4ewyv/oLXCm+CgZBrjY5BTUfEW7drr4AJOz85ibJ0oIumRpruNw/y
+        o1zLk+aX7HmP9
+X-Received: by 2002:a05:6000:10c3:: with SMTP id b3mr6741413wrx.53.1592607172906;
+        Fri, 19 Jun 2020 15:52:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJweCmZ3aEUYUFaiG/NLXLcWjLHYDejdz0Qrw3uOVbYYRqYp1q9vAdc6zh6O4aaf/z5FVf2jeg==
+X-Received: by 2002:a05:6000:10c3:: with SMTP id b3mr6741399wrx.53.1592607172638;
+        Fri, 19 Jun 2020 15:52:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e1d2:138e:4eff:42cb? ([2001:b07:6468:f312:e1d2:138e:4eff:42cb])
+        by smtp.gmail.com with ESMTPSA id o18sm8426146wme.19.2020.06.19.15.52.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2020 15:52:52 -0700 (PDT)
+Subject: Re: [PATCH 0/3] Pin the hrtimer used for VMX-preemption timer
+ emulation
+To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
+References: <20200508203643.85477-1-jmattson@google.com>
+ <CALMp9eRS3FT9QSjTYihBZaZjzMVRx1bYrRaY+jsiOqthyMyv6Q@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a2f428d1-c42c-a0b1-cf15-971017cd85e9@redhat.com>
+Date:   Sat, 20 Jun 2020 00:52:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200619153925.79106-1-mgamal@redhat.com> <20200619153925.79106-7-mgamal@redhat.com>
-In-Reply-To: <20200619153925.79106-7-mgamal@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 19 Jun 2020 15:45:52 -0700
-Message-ID: <CALMp9eQYRoB5vmxL0U7Mn0rWqotxLpUAJD15YX0DDYop1ZmuEg@mail.gmail.com>
-Subject: Re: [PATCH v2 06/11] KVM: VMX: introduce vmx_need_pf_intercept
-To:     Mohammed Gamal <mgamal@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Moger, Babu" <babu.moger@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CALMp9eRS3FT9QSjTYihBZaZjzMVRx1bYrRaY+jsiOqthyMyv6Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 19, 2020 at 8:40 AM Mohammed Gamal <mgamal@redhat.com> wrote:
->
-> From: Paolo Bonzini <pbonzini@redhat.com>
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 28 +++++++++++++++++-----------
->  arch/x86/kvm/vmx/vmx.c    |  2 +-
->  arch/x86/kvm/vmx/vmx.h    |  5 +++++
->  3 files changed, 23 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index d1af20b050a8..328411919518 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2433,22 +2433,28 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
->
->         /*
->          * Whether page-faults are trapped is determined by a combination of
-> -        * 3 settings: PFEC_MASK, PFEC_MATCH and EXCEPTION_BITMAP.PF.
-> -        * If enable_ept, L0 doesn't care about page faults and we should
-> -        * set all of these to L1's desires. However, if !enable_ept, L0 does
-> -        * care about (at least some) page faults, and because it is not easy
-> -        * (if at all possible?) to merge L0 and L1's desires, we simply ask
-> -        * to exit on each and every L2 page fault. This is done by setting
-> -        * MASK=MATCH=0 and (see below) EB.PF=1.
-> +        * 3 settings: PFEC_MASK, PFEC_MATCH and EXCEPTION_BITMAP.PF.  If L0
-> +        * doesn't care about page faults then we should set all of these to
-> +        * L1's desires. However, if L0 does care about (some) page faults, it
-> +        * is not easy (if at all possible?) to merge L0 and L1's desires, we
-> +        * simply ask to exit on each and every L2 page fault. This is done by
-> +        * setting MASK=MATCH=0 and (see below) EB.PF=1.
->          * Note that below we don't need special code to set EB.PF beyond the
->          * "or"ing of the EB of vmcs01 and vmcs12, because when enable_ept,
->          * vmcs01's EB.PF is 0 so the "or" will take vmcs12's value, and when
->          * !enable_ept, EB.PF is 1, so the "or" will always be 1.
->          */
-> -       vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK,
-> -               enable_ept ? vmcs12->page_fault_error_code_mask : 0);
-> -       vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH,
-> -               enable_ept ? vmcs12->page_fault_error_code_match : 0);
-> +       if (vmx_need_pf_intercept(&vmx->vcpu)) {
-> +               /*
-> +                * TODO: if both L0 and L1 need the same MASK and MATCH,
-> +                * go ahead and use it?
-> +                */
+On 19/06/20 20:49, Jim Mattson wrote:
+> On Fri, May 8, 2020 at 1:36 PM Jim Mattson <jmattson@google.com> wrote:
+>>
+>> I'm still not entirely convinced that the Linux hrtimer can be used to
+>> accurately emulate the VMX-preemption timer...
+> 
+> It can't, for several reasons:
+> 
+> 1) The conversion between wall-clock time and TSC frequency, based on
+> tsc_khz, isn't precise enough.
+> 2) The base clock for the hrtimer, CLOCK_MONOTONIC, can be slewed,
+> whereas the TSC cannot.
+> 3) The VMX-preemption timer is suspended during MWAIT; the hrtimer is not.
+> 
+> Is there any reason that VMX-preemption timer emulation shouldn't just
+> be a second client of the hv_timer, along with lapic timer emulation?
 
-I'm not sure there's much "TODO", since L0's MASK and MATCH are both
-0. So, if L1's MASK and MATCH are also both 0, we would go ahead and
-use 0's, which it seems we already do here:
+I don't think so, you'd just need logic to multiplex it.
 
-> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
-> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
-> +       } else {
-> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, vmcs12->page_fault_error_code_mask);
-> +               vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, vmcs12->page_fault_error_code_match);
-> +       }
->
->         if (cpu_has_vmx_apicv()) {
->                 vmcs_write64(EOI_EXIT_BITMAP0, vmcs12->eoi_exit_bitmap0);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index f82c42ac87f9..46d522ee5cb1 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -783,7 +783,7 @@ void update_exception_bitmap(struct kvm_vcpu *vcpu)
->                 eb |= 1u << BP_VECTOR;
->         if (to_vmx(vcpu)->rmode.vm86_active)
->                 eb = ~0;
-> -       if (enable_ept)
-> +       if (!vmx_need_pf_intercept(vcpu))
->                 eb &= ~(1u << PF_VECTOR);
->
->         /* When we are running a nested L2 guest and L1 specified for it a
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 8a83b5edc820..5e2da15fe94f 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -552,6 +552,11 @@ static inline bool vmx_has_waitpkg(struct vcpu_vmx *vmx)
->                 SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE;
->  }
->
-> +static inline bool vmx_need_pf_intercept(struct kvm_vcpu *vcpu)
-> +{
-> +       return !enable_ept;
-> +}
-> +
->  void dump_vmcs(void);
->
->  #endif /* __KVM_X86_VMX_H */
-> --
-> 2.26.2
->
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Paolo
+
