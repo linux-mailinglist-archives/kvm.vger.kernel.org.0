@@ -2,110 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2F9C201A61
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 20:27:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1623C201A9D
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 20:46:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732009AbgFSS0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 14:26:30 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24811 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728522AbgFSS03 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 14:26:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592591187;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=o7jACTPMklupBCcyQ4Eej+eEvNAjD27aYrs6PEc/vLM=;
-        b=Hu+g/wioYbreRDmEZA02uco8afd2fu9cS+f7wK2b9Huzy8mjkqz8MR4Dgxs5ZIezHNBloo
-        IPml2XoI6kQpYGC8ibLDTOL7eVtFBan2mMYCw4KydxsB420PXdPMthtSmXcK99sw1URPBt
-        xSafn/Qx+rq7TH6/8sryXdbS94rhG0Y=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-GPLmRYpFOSSrZzwj5jdqCQ-1; Fri, 19 Jun 2020 14:26:25 -0400
-X-MC-Unique: GPLmRYpFOSSrZzwj5jdqCQ-1
-Received: by mail-qt1-f197.google.com with SMTP id x6so5848801qtq.1
-        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 11:26:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=o7jACTPMklupBCcyQ4Eej+eEvNAjD27aYrs6PEc/vLM=;
-        b=MXlAWQVElfoctPQJX6XMcV8x24T8sDQSKwbr/72TIyJdoRYe0GdfYkDAM5x+eJ+9hk
-         iK3/MRpGacuTW5o+cDV0iqlhSsu4nQ16eP3H0gZ3tZhR3zXCbhbrBBvM0nQGRscn+qRE
-         Y1IkwO9uvDGPwlw7gytS/Pa9K13AEHp+j2RgVC1fauQc7S7i3ks+o/WYusGbipMT1SbO
-         vOpGTZbaIR/SM4FfBrXTl5JFMPpXoeoLgcOzeIETxN+zQJ4Tmujkv/yCUmqOLySY6tkS
-         XK3bHAvRWZqTa8VpIji1+QdumxKipMkq1kg8h80aUvW1KU86gY7GcJSVfthXVLs2VSOx
-         DV7g==
-X-Gm-Message-State: AOAM531Jq5dtFCR4z8W9Oz362J2n4yLL/mB9+8Y7RmYSc6w/L5JbzFFJ
-        lvPe9uQFR+AOjYmNPrKnPntMca/Srb+jck+u3Bkb5d/H2nHThS5e/rGym4BLG8wEbnrnxFpXwMh
-        E+SNIhuh0jta6cuROWZ89CKnBM2JO
-X-Received: by 2002:aed:2171:: with SMTP id 104mr2351982qtc.22.1592591184845;
-        Fri, 19 Jun 2020 11:26:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzmu89J2VMwmehul4uuct4yakQaH6gNxgS333NyHo7rSAKDL/C3Yad8XzwEayBTHv1AAc0+ox+DOJ6fz/Cp2Vk=
-X-Received: by 2002:aed:2171:: with SMTP id 104mr2351958qtc.22.1592591184592;
- Fri, 19 Jun 2020 11:26:24 -0700 (PDT)
+        id S2388340AbgFSSqV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 14:46:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61672 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731358AbgFSSqV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 14:46:21 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05JIW8wF094575;
+        Fri, 19 Jun 2020 14:46:19 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31s2p4gcav-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 14:46:19 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JIWjMR097170;
+        Fri, 19 Jun 2020 14:46:19 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31s2p4gcaj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 14:46:19 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JIZdQH010617;
+        Fri, 19 Jun 2020 18:46:18 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02wdc.us.ibm.com with ESMTP id 31rdtffng4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 18:46:18 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05JIkGgv46137838
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Jun 2020 18:46:16 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1B4542805A;
+        Fri, 19 Jun 2020 18:46:16 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0BF72805E;
+        Fri, 19 Jun 2020 18:46:15 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.172.102])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Fri, 19 Jun 2020 18:46:15 +0000 (GMT)
+Subject: Re: [PATCH v8 2/2] s390/kvm: diagnose 0x318 sync and reset
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
+References: <91933f00-476b-7e94-29e6-99f96abd5fc3@linux.ibm.com>
+ <3CD269AF-2179-4380-96D0-9A9C551A6153@redhat.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <b0d05a70-862d-a2f7-c13c-6c99090f849a@linux.ibm.com>
+Date:   Fri, 19 Jun 2020 14:46:15 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200611113404.17810-1-mst@redhat.com> <20200611113404.17810-3-mst@redhat.com>
- <20200611152257.GA1798@char.us.oracle.com> <CAJaqyWdwXMX0JGhmz6soH2ZLNdaH6HEdpBM8ozZzX9WUu8jGoQ@mail.gmail.com>
- <CAJaqyWdwgy0fmReOgLfL4dAv-E+5k_7z3d9M+vHqt0aO2SmOFg@mail.gmail.com>
-In-Reply-To: <CAJaqyWdwgy0fmReOgLfL4dAv-E+5k_7z3d9M+vHqt0aO2SmOFg@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 19 Jun 2020 20:25:48 +0200
-Message-ID: <CAJaqyWe1+FmPC9L_+8oGfYUT63BaWuGrOnkRnUcGapvwtzqmPw@mail.gmail.com>
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <3CD269AF-2179-4380-96D0-9A9C551A6153@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-19_20:2020-06-19,2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ suspectscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ mlxlogscore=999 cotscore=-2147483648 bulkscore=0 phishscore=0
+ malwarescore=0 spamscore=0 lowpriorityscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006190133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 19, 2020 at 8:07 PM Eugenio Perez Martin
-<eperezma@redhat.com> wrote:
->
-> On Mon, Jun 15, 2020 at 2:28 PM Eugenio Perez Martin
-> <eperezma@redhat.com> wrote:
-> >
-> > On Thu, Jun 11, 2020 at 5:22 PM Konrad Rzeszutek Wilk
-> > <konrad.wilk@oracle.com> wrote:
-> > >
-> > > On Thu, Jun 11, 2020 at 07:34:19AM -0400, Michael S. Tsirkin wrote:
-> > > > As testing shows no performance change, switch to that now.
-> > >
-> > > What kind of testing? 100GiB? Low latency?
-> > >
-> >
-> > Hi Konrad.
-> >
-> > I tested this version of the patch:
-> > https://lkml.org/lkml/2019/10/13/42
-> >
-> > It was tested for throughput with DPDK's testpmd (as described in
-> > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html)
-> > and kernel pktgen. No latency tests were performed by me. Maybe it is
-> > interesting to perform a latency test or just a different set of tests
-> > over a recent version.
-> >
-> > Thanks!
->
-> I have repeated the tests with v9, and results are a little bit different:
-> * If I test opening it with testpmd, I see no change between versions
-> * If I forward packets between two vhost-net interfaces in the guest
-> using a linux bridge in the host:
->   - netperf UDP_STREAM shows a performance increase of 1.8, almost
-> doubling performance. This gets lower as frame size increase.
->   - rests of the test goes noticeably worse: UDP_RR goes from ~6347
-> transactions/sec to 5830
->   - TCP_STREAM goes from ~10.7 gbps to ~7Gbps
->   - TCP_RR from 6223.64 transactions/sec to 5739.44
+On 6/19/20 2:13 PM, David Hildenbrand wrote:
+> 
+> 
+>> Am 19.06.2020 um 19:56 schrieb Collin Walling <walling@linux.ibm.com>:
+>>
+>> ﻿On 6/19/20 1:17 PM, David Hildenbrand wrote:
+>>>> On 19.06.20 17:47, Collin Walling wrote:
+>>>> On 6/19/20 10:52 AM, David Hildenbrand wrote:
+>>>>> On 19.06.20 00:22, Collin Walling wrote:
+>>>>>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
+>>>>>> the VM is running in (Linux, z/VM, etc) and is observed via
+>>>>>> firmware/service events.
+>>>>>>
+>>>>>> This is a privileged s390x instruction that must be intercepted by
+>>>>>> SIE. Userspace handles the instruction as well as migration. Data
+>>>>>> is communicated via VCPU register synchronization.
+>>>>>>
+>>>>>> The Control Program Name Code (CPNC) is stored in the SIE block. The
+>>>>>> CPNC along with the Control Program Version Code (CPVC) are stored
+>>>>>> in the kvm_vcpu_arch struct.
+>>>>>>
+>>>>>> The CPNC is shadowed/unshadowed in VSIE.
+>>>>>>
+>>>>>
+>>>>> [...]
+>>>>>
+>>>>>>
+>>>>>> int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>>>>>> @@ -4194,6 +4198,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>>>>>        if (vcpu->arch.pfault_token == KVM_S390_PFAULT_TOKEN_INVALID)
+>>>>>>            kvm_clear_async_pf_completion_queue(vcpu);
+>>>>>>    }
+>>>>>> +    if (kvm_run->kvm_dirty_regs & KVM_SYNC_DIAG318) {
+>>>>>> +        vcpu->arch.diag318_info.val = kvm_run->s.regs.diag318;
+>>>>>> +        vcpu->arch.sie_block->cpnc = vcpu->arch.diag318_info.cpnc;
+>>>>>> +    }
+>>>>>>    /*
+>>>>>>     * If userspace sets the riccb (e.g. after migration) to a valid state,
+>>>>>>     * we should enable RI here instead of doing the lazy enablement.
+>>>>>> @@ -4295,6 +4303,7 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>>>>>    kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
+>>>>>>    kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
+>>>>>>    kvm_run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
+>>>>>> +    kvm_run->s.regs.diag318 = vcpu->arch.diag318_info.val;
+>>>>>>    if (MACHINE_HAS_GS) {
+>>>>>>        __ctl_set_bit(2, 4);
+>>>>>>        if (vcpu->arch.gs_enabled)
+>>>>>> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+>>>>>> index 9e9056cebfcf..ba83d0568bc7 100644
+>>>>>> --- a/arch/s390/kvm/vsie.c
+>>>>>> +++ b/arch/s390/kvm/vsie.c
+>>>>>> @@ -423,6 +423,8 @@ static void unshadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>>>>>>        break;
+>>>>>>    }
+>>>>>>
+>>>>>> +    scb_o->cpnc = scb_s->cpnc;
+>>>>>
+>>>>> "This is a privileged s390x instruction that must be intercepted", how
+>>>>> can the cpnc change, then, while in SIE?
+>>>>>
+>>>>> Apart from that LGTM.
+>>>>>
+>>>>
+>>>> I thought shadow/unshadow was a load/store (respectively) when executing
+>>>> in SIE for a level 3+ guest (where LPAR is level 1)?
+>>>>
+>>>> * Shadow SCB (load shadow VSIE page; originally CPNC is 0)
+>>>
+>>> 1. Here, you copy the cpnc from the pinned (original) SCB to the shadow SCB.
+>>>
+>>>>
+>>>> * Execute diag318 (under SIE)
+>>>
+>>> 2. Here the SIE runs using the shadow SCB.
+>>>
+>>>>
+>>>> * Unshadow SCB (store in original VSIE page; CPNC is whatever code the
+>>>> guest decided to set)
+>>>
+>>> 3. Here you copy back the cpnc from the shadow SCB to the pinned
+>>> (original) SCB.
+>>>
+>>>
+>>> If 2. cannot modify the cpnc residing in the shadow SCB, 3. can be
+>>> dropped, because the values will always match.
+>>>
+>>>
+>>> If guest3 tries to modify the cpnc (via diag 318), we exit the SIE
+>>> (intercept) in 2., return to our guest 2. guest 2 will perform the
+>>> change and adapt the original SCB.
+>>>
+>>> (yep, it's confusing)
+>>>
+>>> Or did I miss anything?
+>>>
+>>
+>> Ah, I see. So the shadowing isn't necessarily for SIE block values, but
+>> for storing the register / PSW / clock states, as well as facility bits
+>> for the level 3+ guests? Looking at what the
+> 
+> We have to forward all values the SIE has to see and copy back only what could have been changed by the SIE.
+> 
+>> vsie code does, that seems
+>> to make sense.
+>>
+>> So we don't need to shadow OR unshadow the CPNC, then?
+> 
+> I think you have to shadow (forward the value) but not unshadow (value cannot change).
+> 
+> Cheers!
+> 
 
-And I forgot to add: It seems that avoiding IOV length math helps,
-since performance increases in all tests from patch 02/11 ("vhost: use
-batched get_vq_desc version") to 11/11 ("vhost: drop head based
-APIs").
+Gotcha. Very tricky. I'll have to study on it some more. Thanks for the
+info!
 
+Take care.
+
+>>
+>> -- 
+>> Regards,
+>> Collin
+>>
+>> Stay safe and stay healthy
+>>
+> 
+
+
+-- 
+Regards,
+Collin
+
+Stay safe and stay healthy
