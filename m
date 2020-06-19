@@ -2,241 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 743A5200504
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 11:30:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BA2C20050B
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 11:31:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730810AbgFSJaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 05:30:11 -0400
-Received: from mga05.intel.com ([192.55.52.43]:15980 "EHLO mga05.intel.com"
+        id S1731163AbgFSJav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 05:30:51 -0400
+Received: from foss.arm.com ([217.140.110.172]:49090 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729842AbgFSJaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 05:30:10 -0400
-IronPort-SDR: Y8Ca/is27NlL7lDRtMD5cP5qFeMwhYb9UfPOEfvv5r7X1+rYnfb52uzDtOUxefO6ge1a/Jo1tp
- jHNrD19z5WOg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9656"; a="227588177"
-X-IronPort-AV: E=Sophos;i="5.75,254,1589266800"; 
-   d="scan'208";a="227588177"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2020 02:30:09 -0700
-IronPort-SDR: IIFx2t4iR+8bPGJhrxIWx8UKarBhwVRmadism7GHXw/sKftHXAXdHSGm7HFpk2orDtNEuVzkKd
- hcBfrDtwQZBA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,254,1589266800"; 
-   d="scan'208";a="318070362"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by FMSMGA003.fm.intel.com with ESMTP; 19 Jun 2020 02:30:09 -0700
-Received: from fmsmsx158.amr.corp.intel.com (10.18.116.75) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 19 Jun 2020 02:30:09 -0700
-Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
- fmsmsx158.amr.corp.intel.com (10.18.116.75) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 19 Jun 2020 02:30:09 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.172)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Fri, 19 Jun 2020 02:30:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZkDQdjJORKJeEwyJmu4X6MNq6bs1BZDwydhcUyZCaBJIP2JZiLyKE/w7I4Uhq1muE+v0NSz8lf2m4L0crS6Z5KVAWj27zPX+j5lOKuNZQO//YreOx0/b+G2n02XSrsLmZYr3umY0LJKYfRgDOAxCYUi+L9xvH70JXARORyacfXERnZTyEnatY6wdvxRDLrNdKJ4G0yxyVUxWytU0d85Ck972Vzhf1CDoPP1L9PZfgPXl9jM5iWlNuH3wn4yI6lWpOx6CQ+Txh/O2MqSY1/IYZqdB5vT8qqs6/d+xtjBel0XYAguO+8wAhAA35fE/TQRCZh3n+7NbUIKyoQ42jJpFkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B2pBI6MktaVJSUg3k2Q12oz3tR69JzTDIIMYtfqjCOg=;
- b=iX2/fQcVLGFOpF/KYLn3/5xEGpbq/dQwveLlWWN5fRyhowJHcQEKRMUP/b0y9BN4hCuOoE6Nr0CtH6eLOWEID9RlMUFLLpDl6TWadnby6FjY1bCv1nc633c+DTxy9MN9Ht3WoF2l3hPX5nTldLMtD24v1AtKflXjY8Woya6rhySEvR6UUuwmjgMhC6R3DGg4QVIZjv8s7Zxi5STMCml4mlqhMzDuX+SrAQcoREBC7mzkHjSQOT/aVtxO37OY7/CJ2sOpxwX0beffFqxTOWg8UzmesfkOi0anUUpnnvjydSb+jMg8eFhfcYbyx7DmKNHoxdOQUNcK3WMXMw2MbbKwFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B2pBI6MktaVJSUg3k2Q12oz3tR69JzTDIIMYtfqjCOg=;
- b=wULh9TI0iazbXgxDwhd6DHvlRfUmF3cYqaSKVjRaNsFNtYw0B3kerNGNTPsCQcfU1rbrIX+DshzmgIWFXaOpjIoIfIN3aH6Q8/NL4anixgl1Xc2HTYq17k4lDy5tTGZFljDZaVrJgdmkBlrZBSxHolTcu9ik4qy2UA2l3PGub2g=
-Received: from DM5PR1101MB2266.namprd11.prod.outlook.com (2603:10b6:4:57::17)
- by DM5PR11MB1308.namprd11.prod.outlook.com (2603:10b6:3:e::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.21; Fri, 19 Jun 2020 09:30:06 +0000
-Received: from DM5PR1101MB2266.namprd11.prod.outlook.com
- ([fe80::b07e:e40:d34e:b601]) by DM5PR1101MB2266.namprd11.prod.outlook.com
- ([fe80::b07e:e40:d34e:b601%6]) with mapi id 15.20.3109.021; Fri, 19 Jun 2020
- 09:30:06 +0000
-From:   "Kang, Luwei" <luwei.kang@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        "Liang, Kan" <kan.liang@linux.intel.com>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "acme@kernel.org" <acme@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "jolsa@redhat.com" <jolsa@redhat.com>,
-        "namhyung@kernel.org" <namhyung@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "Yu, Fenghua" <fenghua.yu@intel.com>,
-        "like.xu@linux.intel.com" <like.xu@linux.intel.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>
-Subject: RE: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a dedicated
- counter for guest PEBS
-Thread-Topic: [PATCH v1 01/11] perf/x86/core: Support KVM to assign a
- dedicated counter for guest PEBS
-Thread-Index: AQHV8tS2uZDJ2Dgk6EqR/a2HW+9LbKg7EWeAgAAN1ICABGlOgIAANIUAgAAfgACAlQF+kIALdHMQ
-Date:   Fri, 19 Jun 2020 09:30:06 +0000
-Message-ID: <DM5PR1101MB22663D2305EAC6A3D00F239580980@DM5PR1101MB2266.namprd11.prod.outlook.com>
-References: <1583431025-19802-1-git-send-email-luwei.kang@intel.com>
- <1583431025-19802-2-git-send-email-luwei.kang@intel.com>
- <20200306135317.GD12561@hirez.programming.kicks-ass.net>
- <b72cb68e-1a0a-eeff-21b4-ce412e939cfd@linux.intel.com>
- <20200309100443.GG12561@hirez.programming.kicks-ass.net>
- <97ce1ba4-d75a-8db2-ea2f-7d334942b4e6@linux.intel.com>
- <20200309150526.GI12561@hirez.programming.kicks-ass.net>
- <DM5PR1101MB22667E832B3E9C1EF5389F2280810@DM5PR1101MB2266.namprd11.prod.outlook.com>
-In-Reply-To: <DM5PR1101MB22667E832B3E9C1EF5389F2280810@DM5PR1101MB2266.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.2.0.6
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.221]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: eb973f8d-d602-49e6-8905-08d814335a61
-x-ms-traffictypediagnostic: DM5PR11MB1308:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR11MB13086D80A009B849C8B9716680980@DM5PR11MB1308.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0439571D1D
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ey7+5jnHc3CmBclAUiUWtasaKt/olCZIIQqFRwl3Atf/GZ30gk825T8EQZxCh9VWC0M11xMa3AGZisii7fsBH63blklhEwV+njkeuveOdk5mJ9r1cI3UJ+A2UPD2fhB431ECeGT2Sd9iUNYL9+kIWiFabHDZMtGcwuoUbPtswXHpTviuh5Zrj/D49xqWq01mjqu7v1Ks6GACUGaAOw88q60p5n2pP7XIFKzyLztjLgebQazVV5Pqq45Vg+4NXnrD+8c4woIdgapEUimXciiAnVmz4EHndREHoJO9wF3Q1LvnMUTcFIq3di73T1X18363EkFZoC1Nh1jlf23Snbeelw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR1101MB2266.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(396003)(346002)(136003)(366004)(39860400002)(66476007)(64756008)(66446008)(66556008)(33656002)(66946007)(7696005)(55016002)(8676002)(76116006)(6506007)(71200400001)(8936002)(9686003)(52536014)(54906003)(83380400001)(7416002)(86362001)(26005)(5660300002)(186003)(316002)(478600001)(110136005)(4326008)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: byC3fMr48YD3CQv+ZNKsfq71lZutZqZwDX7csvTmlaX5d9t0UtbX0zVQemJg+i/FlumvzkrHrS0KhVLYpM460n88ctb3qzw1F0WDTMSQX3tZ4QVAjdIv2aoRX0koXSn/JtUbtWsYd+PwVvfZin8ieTxIWg6mR9hLf6DnNbhKxhrj3EtlFo8prmhpn5O32jqzOb3CUatdgRAILUkBIHcbs7Ax6q/BUpOSHFunV54bcTUxufMt2w9qoSs/Rue2aOYG3YlvgnoqwzFzgTmQDrp7mdD4viZAiq9x6wx2Jd6MOJnrUjMxR11cvrCjUk3v8GhcLVc2ZlKpKb+0bbHiBHC+pBVkDYT+a87sWupihI2jhl7vnt5oyJqbI43KnTZcWrWuKMLMpHPFT5W7Bxp9mGIb1cs6EdnEvhnUeSsJ3Z4H02EYBsG/Ec6U/xrOl6I2Xk9nCwO9DcdS6EDJ0ltifk/+GBpYZWPazzUEss8BPSSzBO16CjcGKWvKaEnNomsKIG9O
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb973f8d-d602-49e6-8905-08d814335a61
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jun 2020 09:30:06.2275
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MYInDnMfSOz4gaEFn7Xdrps41D/sIp2iOExbP/9DQAFv4wcPzJc8dzMJ/UpQ++1TpNOQ8+MMV5plr9WMOLBYwA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR11MB1308
-X-OriginatorOrg: intel.com
+        id S1729718AbgFSJau (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jun 2020 05:30:50 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5DD12B;
+        Fri, 19 Jun 2020 02:30:48 -0700 (PDT)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 883613F71F;
+        Fri, 19 Jun 2020 02:30:42 -0700 (PDT)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com, steven.price@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        Wei.Chen@arm.com, jianyong.wu@arm.com, nd@arm.com
+Subject: [RFC PATCH v13 0/9] Enable ptp_kvm for arm64
+Date:   Fri, 19 Jun 2020 17:30:24 +0800
+Message-Id: <20200619093033.58344-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > > Suppose your KVM thing claims counter 0/2 (ICL/SKL) for some
-> > > > random PEBS event, and then the host wants to use PREC_DIST.. Then
-> > > > one of them will be screwed for no reason what so ever.
-> > > >
-> > >
-> > > The multiplexing should be triggered.
-> > >
-> > > For host, if both user A and user B requires PREC_DIST, the
-> > > multiplexing should be triggered for them.
-> > > Now, the user B is KVM. I don't think there is difference. The
-> > > multiplexing should still be triggered. Why it is screwed?
-> >
-> > Becuase if KVM isn't PREC_DIST we should be able to reschedule it to a
-> > different counter.
-> >
-> > > > How is that not destroying scheduling freedom? Any other situation
-> > > > we'd have moved the !PREC_DIST PEBS event to another counter.
-> > > >
-> > >
-> > > All counters are equivalent for them. It doesn't matter if we move
-> > > it to another counter. There is no impact for the user.
-> >
-> > But we cannot move it to another counter, because you're pinning it.
->=20
-> Hi Peter,
->=20
-> To avoid the pinning counters, I have tried to do some evaluation about
-> patching the PEBS record for guest in KVM. In this approach, about ~30% t=
-ime
-> increased on guest PEBS PMI handler latency ( e.g.perf record -e branch-
-> loads:p -c 1000 ~/Tools/br_instr a).
->=20
-> Some implementation details as below:
-> 1. Patching the guest PEBS records "Applicable Counters" filed when the g=
-uest
->      required counter is not the same with the host. Because the guest PE=
-BS
->      driver will drop these PEBS records if the "Applicable Counters" not=
- the
->      same with the required counter index.
-> 2. Traping the guest driver's behavior(VM-exit) of disabling PEBS.
->      It happens before reading PEBS records (e.g. PEBS PMI handler, befor=
-e
->      application exit and so on)
-> 3. To patch the Guest PEBS records in KVM, we need to get the HPA of the
->      guest PEBS buffer.
->      <1> Trapping the guest write of IA32_DS_AREA register and get the GV=
-A
->              of guest DS_AREA.
->      <2> Translate the DS AREA GVA to GPA(kvm_mmu_gva_to_gpa_read)
->              and get the GVA of guest PEBS buffer from DS AREA
->              (kvm_vcpu_read_guest_atomic).
->      <3> Although we have got the GVA of PEBS buffer, we need to do the
->              address translation(GVA->GPA->HPA) for each page. Because we=
- can't
->              assume the GPAs of Guest PEBS buffer are always continuous.
->=20
-> But we met another issue about the PEBS counter reset field in DS AREA.
-> pebs_event_reset in DS area has to be set for auto reload, which is per c=
-ounter.
-> Guest and Host may use different counters. Let's say guest wants to use
-> counter 0, but host assign counter 1 to guest. Guest sets the reset value=
- to
-> pebs_event_reset[0]. However, since counter 1 is the one which is eventua=
-lly
-> scheduled, HW will use  pebs_event_reset[1] as reset value.
->=20
-> We can't copy the value of the guest pebs_event_reset[0] to
-> pebs_event_reset[1] directly(Patching DS AREA) because the guest driver m=
-ay
-> confused, and we can't assume the guest counter 0 and 1 are not used for =
-this
-> PEBS task at the same time. And what's more, KVM can't aware the guest
-> read/write to the DS AREA because it just a general memory for guest.
->=20
-> What is your opinion or do you have a better proposal?
+Currently, we offen use ntp (sync time with remote network clock)
+to sync time in VM. But the precision of ntp is subject to network delay
+so it's difficult to sync time in a high precision.
 
-Kindly ping~
+kvm virtual ptp clock (ptp_kvm) offers another way to sync time in VM,
+as the remote clock locates in the host instead of remote network clock.
+It targets to sync time between guest and host in virtualization
+environment and in this way, we can keep the time of all the VMs running
+in the same host in sync. In general, the delay of communication between
+host and guest is quiet small, so ptp_kvm can offer time sync precision
+up to in order of nanosecond. Please keep in mind that ptp_kvm just
+limits itself to be a channel which transmit the remote clock from
+host to guest and leaves the time sync jobs to an application, eg. chrony,
+in usersapce in VM.
 
-Thanks,
-Luwei Kang
+How ptp_kvm works:
+After ptp_kvm initialized, there will be a new device node under
+/dev called ptp%d. A guest userspace service, like chrony, can use this
+device to get host walltime, sometimes also counter cycle, which depends
+on the service it calls. Then this guest userspace service can use those
+data to do the time sync for guest.
+here is a rough sketch to show how kvm ptp clock works.
 
->=20
-> Thanks,
-> Luwei Kang
->=20
-> >
-> > > In the new proposal, KVM user is treated the same as other host
-> > > events with event constraint. The scheduler is free to choose
-> > > whether or not to assign a counter for it.
-> >
-> > That's what it does, I understand that. I'm saying that that is
-> > creating artificial contention.
-> >
-> >
-> > Why is this needed anyway? Can't we force the guest to flush and then
-> > move it over to a new counter?
+|----------------------------|              |--------------------------|
+|       guest userspace      |              |          host            |
+|ioctl -> /dev/ptp%d         |              |                          |
+|       ^   |                |              |                          |
+|----------------------------|              |                          |
+|       |   | guest kernel   |              |                          |
+|       |   V      (get host walltime/counter cycle)                   |
+|      ptp_kvm -> hypercall - - - - - - - - - - ->hypercall service    |
+|                         <- - - - - - - - - - - -                     |
+|----------------------------|              |--------------------------|
+
+1. time sync service in guest userspace call ptp device through /dev/ptp%d.
+2. ptp_kvm module in guest recive this request then invoke hypercall to
+route into host kernel to request host walltime/counter cycle.
+3. ptp_kvm hypercall service in host response to the request and send data
+back.
+4. ptp (not ptp_kvm) in guest copy the data to userspace.
+
+This ptp_kvm implementation focuses itself to step 2 and 3 and step 2 works
+in guest comparing step 3 works in host kernel.
+
+change log:
+from v12 to v13:
+        (1) rebase code on 5.8-rc1.
+        (2) this patch set base on 2 patches of 1/8 and 2/8 from Will Decon.
+        (3) remove the change to ptp device code of extend getcrosststamp.
+        (4) remove the mechanism of letting user choose the counter type in
+ptp_kvm for arm64.
+        (5) add virtual counter option in ptp_kvm service to let user choose
+the specific counter explicitly.
+
+from v11 to v12:
+        (1) rebase code on 5.7-rc6 and rebase 2 patches from Will Decon
+including 1/11 and 2/11. as these patches introduce discover mechanism of
+vendor smccc service.
+        (2) rebase ptp_kvm hypercall service from standard smccc to vendor
+smccc and add ptp_kvm to vendor smccc service discover mechanism.
+        (3) add detail of why we need ptp_kvm and how ptp_kvm works in cover
+letter.
+
+from v10 to v11:
+        (1) rebase code on 5.7-rc2.
+        (2) remove support for arm32, as kvm support for arm32 will be
+removed [1]
+        (3) add error report in ptp_kvm initialization.
+
+from v9 to v10:
+        (1) change code base to v5.5.
+        (2) enable ptp_kvm both for arm32 and arm64.
+        (3) let user choose which of virtual counter or physical counter
+should return when using crosstimestamp mode of ptp_kvm for arm/arm64.
+        (4) extend input argument for getcrosstimestamp API.
+
+from v8 to v9:
+        (1) move ptp_kvm.h to driver/ptp/
+        (2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
+
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
+
+from v6 to v7:
+        (1) include the omitted clocksource_id.h in last version.
+        (2) reorder the header file in patch.
+        (3) refine some words in commit message to make it more impersonal.
+
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
+
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1] https://patchwork.kernel.org/cover/11373351/
+
+Jianyong Wu (7):
+  arm/arm64: KVM: Advertise KVM UID to guests via SMCCC
+  smccc: export smccc conduit get helper.
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  arm64/kvm: Add hypercall service for kvm ptp.
+  ptp: arm64: Enable ptp_kvm for arm64
+  arm64: Add kvm capability check extension for ptp_kvm
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Will Deacon (1):
+  arm64: Probe for the presence of KVM hypervisor services during boot
+
+ arch/arm64/include/asm/hypervisor.h         | 11 +++
+ arch/arm64/kernel/setup.c                   | 36 +++++++++
+ arch/arm64/kvm/arm.c                        |  4 +
+ arch/arm64/kvm/hypercalls.c                 | 79 +++++++++++++++---
+ drivers/clocksource/arm_arch_timer.c        | 26 ++++++
+ drivers/firmware/smccc/smccc.c              |  1 +
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  1 +
+ drivers/ptp/ptp_kvm.h                       | 11 +++
+ drivers/ptp/ptp_kvm_arm64.c                 | 53 ++++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 80 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 89 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 56 +++++++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  3 +
+ kernel/time/timekeeping.c                   |  1 +
+ virt/kvm/Kconfig                            |  4 +
+ 20 files changed, 413 insertions(+), 75 deletions(-)
+ create mode 100644 drivers/ptp/ptp_kvm.h
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (63%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+
+-- 
+2.17.1
+
