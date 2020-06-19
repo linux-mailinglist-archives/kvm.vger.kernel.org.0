@@ -2,80 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34EB8200530
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 11:33:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3698A20058B
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 11:42:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732112AbgFSJck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 05:32:40 -0400
-Received: from foss.arm.com ([217.140.110.172]:49376 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731953AbgFSJbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 05:31:50 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1A0F81477;
-        Fri, 19 Jun 2020 02:31:49 -0700 (PDT)
-Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D5DBB3F71F;
-        Fri, 19 Jun 2020 02:31:42 -0700 (PDT)
-From:   Jianyong Wu <jianyong.wu@arm.com>
-To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, steven.price@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        Wei.Chen@arm.com, jianyong.wu@arm.com, nd@arm.com
-Subject: [RFC PATCH v13 9/9] arm64: Add kvm capability check extension for ptp_kvm
-Date:   Fri, 19 Jun 2020 17:30:33 +0800
-Message-Id: <20200619093033.58344-10-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200619093033.58344-1-jianyong.wu@arm.com>
-References: <20200619093033.58344-1-jianyong.wu@arm.com>
+        id S1732147AbgFSJmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 05:42:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54226 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732121AbgFSJmD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jun 2020 05:42:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592559722;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=zPadoQCK/Zr9dBTIUqiEQCreoi9mBoOI8SaL3yX0d6k=;
+        b=ESGagB1D/3k7fc6ZFBIVwjKWWqdft1VkmlO8D62YMQAj3aKYt2NZPZoxPFLF92zDnoKdJl
+        pOn9LsvRuPm2dLGExbcuvijphCBAnpEjHcf059qaTzptU0rB5WxQEHtTXoFIDPRi4z8cK7
+        ipRR8jh2llRSBUi223vJOYCNMo0uyAA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-Sjz3vM05PgSz-fHbhIqSIQ-1; Fri, 19 Jun 2020 05:40:57 -0400
+X-MC-Unique: Sjz3vM05PgSz-fHbhIqSIQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 272688035D7;
+        Fri, 19 Jun 2020 09:40:56 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.248])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 726A971688;
+        Fri, 19 Jun 2020 09:40:47 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH RFC] Revert "KVM: VMX: Micro-optimize vmexit time when not exposing PMU"
+Date:   Fri, 19 Jun 2020 11:40:46 +0200
+Message-Id: <20200619094046.654019-1-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let userspace check if there is kvm ptp service in host.
-Before VMs migrate to another host, VMM may check if this
-cap is available to determine the next behavior.
+Guest crashes are observed on a Cascade Lake system when 'perf top' is
+launched on the host, e.g.
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
+ BUG: unable to handle kernel paging request at fffffe0000073038
+ PGD 7ffa7067 P4D 7ffa7067 PUD 7ffa6067 PMD 7ffa5067 PTE ffffffffff120
+ Oops: 0000 [#1] SMP PTI
+ CPU: 1 PID: 1 Comm: systemd Not tainted 4.18.0+ #380
+...
+ Call Trace:
+  serial8250_console_write+0xfe/0x1f0
+  call_console_drivers.constprop.0+0x9d/0x120
+  console_unlock+0x1ea/0x460
+
+Call traces are different but the crash is imminent. The problem was
+blindly bisected to the commit 041bc42ce2d0 ("KVM: VMX: Micro-optimize
+vmexit time when not exposing PMU"). It was also confirmed that the
+issue goes away if PMU is exposed to the guest.
+
+With some instrumentation of the guest we can see what is being switched
+(when we do atomic_switch_perf_msrs()):
+
+ vmx_vcpu_run: switching 2 msrs
+ vmx_vcpu_run: switching MSR38f guest: 70000000d host: 70000000f
+ vmx_vcpu_run: switching MSR3f1 guest: 0 host: 2
+
+The current guess is that PEBS (MSR_IA32_PEBS_ENABLE, 0x3f1) is to blame.
+Regardless of whether PMU is exposed to the guest or not, PEBS needs to
+be disabled upon switch.
+
+This reverts commit 041bc42ce2d0efac3b85bbb81dea8c74b81f4ef9.
+
+Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/arm64/kvm/arm.c     | 4 ++++
- include/uapi/linux/kvm.h | 1 +
- 2 files changed, 5 insertions(+)
+- Perf/KVM interractions are a mystery to me, thus RFC.
+---
+ arch/x86/kvm/vmx/vmx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 90cb90561446..f41e84346468 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -194,6 +194,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
- 	case KVM_CAP_ARM_NISV_TO_USER:
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
-+
-+#ifdef CONFIG_ARM64_KVM_PTP_HOST
-+	case KVM_CAP_ARM_KVM_PTP:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4fdf30316582..f3d4b00dac57 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SECURE_GUEST 181
- #define KVM_CAP_HALT_POLL 182
- #define KVM_CAP_ASYNC_PF_INT 183
-+#define KVM_CAP_ARM_KVM_PTP 184
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 36c771728c8c..b1a23ad986ff 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6728,8 +6728,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ 	pt_guest_enter(vmx);
  
+-	if (vcpu_to_pmu(vcpu)->version)
+-		atomic_switch_perf_msrs(vmx);
++	atomic_switch_perf_msrs(vmx);
+ 	atomic_switch_umwait_control_msr(vmx);
+ 
+ 	if (enable_preemption_timer)
 -- 
-2.17.1
+2.25.4
 
