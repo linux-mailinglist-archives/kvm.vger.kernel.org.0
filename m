@@ -2,201 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30329201A11
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 20:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E44E1201A35
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 20:23:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732061AbgFSSNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 14:13:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43752 "EHLO
+        id S2388969AbgFSSXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 14:23:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39201 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732041AbgFSSNN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 14:13:13 -0400
+        with ESMTP id S2388374AbgFSSXS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jun 2020 14:23:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592590391;
+        s=mimecast20190719; t=1592590997;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GKuNOSeVsWCylPYPvboexkKZspEDaUyz5MPngYtE4UI=;
-        b=cAdgKjwnhOfsihX9fZgkJUzcq5N/aVByXNDPSoC9qYj8qpfJl2mW9M8PQDYwdIJJzkMIi4
-        aSgHFCCqauporDE1WmxvsdiyHXYFY8sGgFhPhh2pwAQwj7Lgv5zpDH56Hbi5WAVct1/lVU
-        I0i+R4dUFRfuXoMhK0R4amE4/MveeYw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-tqhx6PROOiuA50shJE_1WQ-1; Fri, 19 Jun 2020 14:13:10 -0400
-X-MC-Unique: tqhx6PROOiuA50shJE_1WQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 11so2884273wmj.6
-        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 11:13:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=GKuNOSeVsWCylPYPvboexkKZspEDaUyz5MPngYtE4UI=;
-        b=ITgwsZpxKTBrk+zs+KNGm1Bmb7b+q0ZvllKeb8dKiJB2UI0TgoRjrYTu6SF7Mvlj2a
-         MrkapkS9lJH1ZbeNqeGgCWBa0sCV6ngXpLkCR+IzTUJDY7TyH106pI3fVgX32AJQHa+o
-         Db1heaH+I8grTctvIIUX6sly1KZggycXfRXJYmRvXdtQGqrYztOWHn5nT9/qtMgzbKDa
-         yy/oxGhLlqbtdU4IvzWASghyBhFxMEEqj6+Rn4SgsLewGMdflsqRfaYj075armGqCCZ1
-         GC9hD5lk0pM0fHmax3Y3TwzfMen+lKq7+HIgqZY7n6rAIePqtZTP9OH8yoAaWnc0MwmT
-         vScA==
-X-Gm-Message-State: AOAM532H3kBHB1lg0n0tRaEdiwoAUEBN2XG3Va1TF0NMy/RIq4F2VgJK
-        lWiGHCj+K83J37qX/f+cJ6JMhkwq6vso63X4kpS+Vu9nZmTacW5t1eDNWIzsq/blkkjmoicYnof
-        4Q/Q5MOYOYApB
-X-Received: by 2002:a5d:6809:: with SMTP id w9mr5686590wru.182.1592590388789;
-        Fri, 19 Jun 2020 11:13:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzxJXtVqrJvDmDE4n/VaRneMJnWsp7u8lFb1ne3HYLI8OJtlNMwWzcGtvIesjA01214Xb5UVQ==
-X-Received: by 2002:a5d:6809:: with SMTP id w9mr5686564wru.182.1592590388487;
-        Fri, 19 Jun 2020 11:13:08 -0700 (PDT)
-Received: from [192.168.3.122] (p5b0c675e.dip0.t-ipconnect.de. [91.12.103.94])
-        by smtp.gmail.com with ESMTPSA id d24sm7166256wmb.45.2020.06.19.11.13.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jun 2020 11:13:07 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   David Hildenbrand <david@redhat.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v8 2/2] s390/kvm: diagnose 0x318 sync and reset
-Date:   Fri, 19 Jun 2020 20:13:07 +0200
-Message-Id: <3CD269AF-2179-4380-96D0-9A9C551A6153@redhat.com>
-References: <91933f00-476b-7e94-29e6-99f96abd5fc3@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, pbonzini@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, thuth@redhat.com
-In-Reply-To: <91933f00-476b-7e94-29e6-99f96abd5fc3@linux.ibm.com>
-To:     Collin Walling <walling@linux.ibm.com>
-X-Mailer: iPhone Mail (17F80)
+         content-transfer-encoding:content-transfer-encoding;
+        bh=bc8bgBZaKAykX+oT4Ghe9dJSFsYjpNWBpF2Ak/zUniM=;
+        b=eNgDG8eopkX9HAO9j+AuBxLrTJ9ATfQYCWMVs9BWRN4gCvtqhWf0u7cDo2TsfoOPsPKCrK
+        KuJsfHw7aWPESto5Qp1FZo/I4T2NZwig3BsGtXCK5Hg2ZlQRJoX6WpfWgTCRv2OVyy99Uj
+        7rRukWLxAT3teDbCLTx8/4Gh4qayDrk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-178-78tk4Hn8OS2BD-oyfUyQKg-1; Fri, 19 Jun 2020 14:23:13 -0400
+X-MC-Unique: 78tk4Hn8OS2BD-oyfUyQKg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2264800053;
+        Fri, 19 Jun 2020 18:23:12 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-113-14.ams2.redhat.com [10.36.113.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F73B7C1E4;
+        Fri, 19 Jun 2020 18:23:05 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     mst@redhat.com
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Subject: [RFC v9 00/11] vhost: ring format independence
+Date:   Fri, 19 Jun 2020 20:22:51 +0200
+Message-Id: <20200619182302.850-1-eperezma@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This adds infrastructure required for supporting
+multiple ring formats.
 
+The idea is as follows: we convert descriptors to an
+independent format first, and process that converting to
+iov later.
 
-> Am 19.06.2020 um 19:56 schrieb Collin Walling <walling@linux.ibm.com>:
->=20
-> =EF=BB=BFOn 6/19/20 1:17 PM, David Hildenbrand wrote:
->>> On 19.06.20 17:47, Collin Walling wrote:
->>> On 6/19/20 10:52 AM, David Hildenbrand wrote:
->>>> On 19.06.20 00:22, Collin Walling wrote:
->>>>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
->>>>> the VM is running in (Linux, z/VM, etc) and is observed via
->>>>> firmware/service events.
->>>>>=20
->>>>> This is a privileged s390x instruction that must be intercepted by
->>>>> SIE. Userspace handles the instruction as well as migration. Data
->>>>> is communicated via VCPU register synchronization.
->>>>>=20
->>>>> The Control Program Name Code (CPNC) is stored in the SIE block. The
->>>>> CPNC along with the Control Program Version Code (CPVC) are stored
->>>>> in the kvm_vcpu_arch struct.
->>>>>=20
->>>>> The CPNC is shadowed/unshadowed in VSIE.
->>>>>=20
->>>>=20
->>>> [...]
->>>>=20
->>>>>=20
->>>>> int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_reg=
-s *regs)
->>>>> @@ -4194,6 +4198,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcp=
-u, struct kvm_run *kvm_run)
->>>>>        if (vcpu->arch.pfault_token =3D=3D KVM_S390_PFAULT_TOKEN_INVALI=
-D)
->>>>>            kvm_clear_async_pf_completion_queue(vcpu);
->>>>>    }
->>>>> +    if (kvm_run->kvm_dirty_regs & KVM_SYNC_DIAG318) {
->>>>> +        vcpu->arch.diag318_info.val =3D kvm_run->s.regs.diag318;
->>>>> +        vcpu->arch.sie_block->cpnc =3D vcpu->arch.diag318_info.cpnc;
->>>>> +    }
->>>>>    /*
->>>>>     * If userspace sets the riccb (e.g. after migration) to a valid st=
-ate,
->>>>>     * we should enable RI here instead of doing the lazy enablement.
->>>>> @@ -4295,6 +4303,7 @@ static void store_regs_fmt2(struct kvm_vcpu *vcp=
-u, struct kvm_run *kvm_run)
->>>>>    kvm_run->s.regs.pp =3D vcpu->arch.sie_block->pp;
->>>>>    kvm_run->s.regs.gbea =3D vcpu->arch.sie_block->gbea;
->>>>>    kvm_run->s.regs.bpbc =3D (vcpu->arch.sie_block->fpf & FPF_BPBC) =3D=
-=3D FPF_BPBC;
->>>>> +    kvm_run->s.regs.diag318 =3D vcpu->arch.diag318_info.val;
->>>>>    if (MACHINE_HAS_GS) {
->>>>>        __ctl_set_bit(2, 4);
->>>>>        if (vcpu->arch.gs_enabled)
->>>>> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
->>>>> index 9e9056cebfcf..ba83d0568bc7 100644
->>>>> --- a/arch/s390/kvm/vsie.c
->>>>> +++ b/arch/s390/kvm/vsie.c
->>>>> @@ -423,6 +423,8 @@ static void unshadow_scb(struct kvm_vcpu *vcpu, st=
-ruct vsie_page *vsie_page)
->>>>>        break;
->>>>>    }
->>>>>=20
->>>>> +    scb_o->cpnc =3D scb_s->cpnc;
->>>>=20
->>>> "This is a privileged s390x instruction that must be intercepted", how
->>>> can the cpnc change, then, while in SIE?
->>>>=20
->>>> Apart from that LGTM.
->>>>=20
->>>=20
->>> I thought shadow/unshadow was a load/store (respectively) when executing=
+Used ring is similar: we fetch into an independent struct first,
+convert that to IOV later.
 
->>> in SIE for a level 3+ guest (where LPAR is level 1)?
->>>=20
->>> * Shadow SCB (load shadow VSIE page; originally CPNC is 0)
->>=20
->> 1. Here, you copy the cpnc from the pinned (original) SCB to the shadow S=
-CB.
->>=20
->>>=20
->>> * Execute diag318 (under SIE)
->>=20
->> 2. Here the SIE runs using the shadow SCB.
->>=20
->>>=20
->>> * Unshadow SCB (store in original VSIE page; CPNC is whatever code the
->>> guest decided to set)
->>=20
->> 3. Here you copy back the cpnc from the shadow SCB to the pinned
->> (original) SCB.
->>=20
->>=20
->> If 2. cannot modify the cpnc residing in the shadow SCB, 3. can be
->> dropped, because the values will always match.
->>=20
->>=20
->> If guest3 tries to modify the cpnc (via diag 318), we exit the SIE
->> (intercept) in 2., return to our guest 2. guest 2 will perform the
->> change and adapt the original SCB.
->>=20
->> (yep, it's confusing)
->>=20
->> Or did I miss anything?
->>=20
->=20
-> Ah, I see. So the shadowing isn't necessarily for SIE block values, but
-> for storing the register / PSW / clock states, as well as facility bits
-> for the level 3+ guests? Looking at what the
+The point is that we have a tight loop that fetches
+descriptors, which is good for cache utilization.
+This will also allow all kind of batching tricks -
+e.g. it seems possible to keep SMAP disabled while
+we are fetching multiple descriptors.
 
-We have to forward all values the SIE has to see and copy back only what cou=
-ld have been changed by the SIE.
+For used descriptors, this allows keeping track of the buffer length
+without need to rescan IOV.
 
-> vsie code does, that seems
-> to make sense.
->=20
-> So we don't need to shadow OR unshadow the CPNC, then?
+This seems to perform better on UDP stream tests, but a little bit worse on
+RR tests and TCP streams, based on a microbenchmark.
+More testing would be very much appreciated.
 
-I think you have to shadow (forward the value) but not unshadow (value canno=
-t change).
+changes from v8:
+        - fixes fetch_descs returning "no descriptors available" when
+          only few descriptors were available, stalling the communications.
+        - minor syntax errors in intermediate commits.
+        - skipping checking for sane max_descs if vhost device is not going to
+          use worker like vDPA devices.
 
-Cheers!
+changes from v7:
+        - squashed in fixes. no longer hangs but still known
+          to cause data corruption for some people. under debug.
 
->=20
-> --=20
-> Regards,
-> Collin
->=20
-> Stay safe and stay healthy
->=20
+changes from v6:
+        - fixes some bugs introduced in v6 and v5
+
+changes from v5:
+        - addressed comments by Jason: squashed API changes, fixed up discard
+
+changes from v4:
+        - added used descriptor format independence
+        - addressed comments by jason
+        - fixed a crash detected by the lkp robot.
+
+changes from v3:
+        - fixed error handling in case of indirect descriptors
+        - add BUG_ON to detect buffer overflow in case of bugs
+                in response to comment by Jason Wang
+        - minor code tweaks
+
+Changes from v2:
+        - fixed indirect descriptor batching
+                reported by Jason Wang
+
+Changes from v1:
+        - typo fixes
+
+Michael S. Tsirkin (11):
+  vhost: option to fetch descriptors through an independent struct
+  vhost: use batched get_vq_desc version
+  vhost/net: pass net specific struct pointer
+  vhost: reorder functions
+  vhost: format-independent API for used buffers
+  vhost/net: convert to new API: heads->bufs
+  vhost/net: avoid iov length math
+  vhost/test: convert to the buf API
+  vhost/scsi: switch to buf APIs
+  vhost/vsock: switch to the buf API
+  vhost: drop head based APIs
+
+ drivers/vhost/net.c   | 174 ++++++++++----------
+ drivers/vhost/scsi.c  |  73 +++++----
+ drivers/vhost/test.c  |  22 +--
+ drivers/vhost/vhost.c | 372 +++++++++++++++++++++++++++---------------
+ drivers/vhost/vhost.h |  44 +++--
+ drivers/vhost/vsock.c |  30 ++--
+ 6 files changed, 435 insertions(+), 280 deletions(-)
+
+-- 
+2.18.1
 
