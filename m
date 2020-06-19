@@ -2,24 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EB5A200005
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 04:06:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27FA820000A
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 04:06:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729228AbgFSCGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jun 2020 22:06:14 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:43839 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728125AbgFSCGL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jun 2020 22:06:11 -0400
+        id S1728125AbgFSCGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jun 2020 22:06:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49586 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729456AbgFSCGR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jun 2020 22:06:17 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5FD1C0613EE
+        for <kvm@vger.kernel.org>; Thu, 18 Jun 2020 19:06:15 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 49p2GS51gdz9sSf; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
+        id 49p2GT1nx6z9sSg; Fri, 19 Jun 2020 12:06:08 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1592532368;
-        bh=Tyfc+G1PqLXR9Edr87dtqwm5FYWBIwO1iB0LtB7dWSM=;
+        d=gibson.dropbear.id.au; s=201602; t=1592532369;
+        bh=T8XqkWK5JYfur3/pmkkptr+wA0TMGxmdlb99ZrpmXZk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=drqFS3tpsGIz2+f7bAqa/NyDDVa8fH74EB+evMxQBZ+GKXjKVqjxhls6+I8ngzm4X
-         aYxiIo3goBkbOVNhJO3Kxp/sVaSHSc8Yn/BFhn0ZiluUUAP7vKlkigQ70pu7WuRso9
-         DHGoeXqhC1s5d09Esffgc94vIW1vDMUjWYMAEf6g=
+        b=cBvMriufB9iG+tUu4tP1QPH2DHnINBGfgG58DZp8rqgZKdt7GFlHSdgv2cbCxtmxY
+         64vPS+bMDu4WjEraFgPx/XClkpfn2dYIukR9dAIGrInHf3xTwu3qOmrgZTJ4qjpqjK
+         2KZR9fPhMiGpVYa/el8HATHhqCc3ofYY+tgMm7Pk=
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
         pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com
@@ -28,10 +31,11 @@ Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
         Richard Henderson <rth@twiddle.net>, cohuck@redhat.com,
         pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
         David Gibson <david@gibson.dropbear.id.au>,
-        qemu-s390x@nongnu.org, david@redhat.com
-Subject: [PATCH v3 4/9] host trust limitation: Rework the "memory-encryption" property
-Date:   Fri, 19 Jun 2020 12:05:57 +1000
-Message-Id: <20200619020602.118306-5-david@gibson.dropbear.id.au>
+        qemu-s390x@nongnu.org, david@redhat.com,
+        Richard Henderson <richard.henderson@linaro.org>
+Subject: [PATCH v3 5/9] host trust limitation: Decouple kvm_memcrypt_*() helpers from KVM
+Date:   Fri, 19 Jun 2020 12:05:58 +1000
+Message-Id: <20200619020602.118306-6-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200619020602.118306-1-david@gibson.dropbear.id.au>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
@@ -42,155 +46,206 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently the "memory-encryption" property is only looked at once we get to
-kvm_init().  Although protection of guest memory from the hypervisor isn't
-something that could really ever work with TCG, it's not conceptually tied
-to the KVM accelerator.
+The kvm_memcrypt_enabled() and kvm_memcrypt_encrypt_data() helper functions
+don't conceptually have any connection to KVM (although it's not possible
+in practice to use them without it).
 
-In addition, the way the string property is resolved to an object is
-almost identical to how a QOM link property is handled.
+They also rely on looking at the global KVMState.  But the same information
+is available from the machine, and the only existing callers have natural
+access to the machine state.
 
-So, create a new "host-trust-limitation" link property which sets this QOM
-interface link directly in the machine.  For compatibility we keep the
-"memory-encryption" property, but now implemented in terms of the new
-property.
+Therefore, move and rename them to helpers in host-trust-limitation.h,
+taking an explicit machine parameter.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/kvm/kvm-all.c | 23 +++++++----------------
- hw/core/machine.c   | 41 ++++++++++++++++++++++++++++++++++++-----
- include/hw/boards.h |  2 +-
- 3 files changed, 44 insertions(+), 22 deletions(-)
+ accel/kvm/kvm-all.c                  | 27 ---------------------
+ accel/stubs/kvm-stub.c               | 10 --------
+ hw/i386/pc_sysfw.c                   |  6 +++--
+ include/exec/host-trust-limitation.h | 36 ++++++++++++++++++++++++++++
+ include/sysemu/kvm.h                 | 17 -------------
+ 5 files changed, 40 insertions(+), 56 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 1e43e27f45..d8e8fa345e 100644
+index d8e8fa345e..9645271ca5 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -2180,25 +2180,16 @@ static int kvm_init(MachineState *ms)
-      * if memory encryption object is specified then initialize the memory
-      * encryption context.
-      */
--    if (ms->memory_encryption) {
--        Object *obj = object_resolve_path_component(object_get_objects_root(),
--                                                    ms->memory_encryption);
--
--        if (object_dynamic_cast(obj, TYPE_HOST_TRUST_LIMITATION)) {
--            HostTrustLimitation *htl = HOST_TRUST_LIMITATION(obj);
--            HostTrustLimitationClass *htlc
--                = HOST_TRUST_LIMITATION_GET_CLASS(htl);
--
--            ret = htlc->kvm_init(htl);
--            if (ret < 0) {
--                goto err;
--            }
-+    if (ms->htl) {
-+        HostTrustLimitationClass *htlc =
-+            HOST_TRUST_LIMITATION_GET_CLASS(ms->htl);
+@@ -118,9 +118,6 @@ struct KVMState
+     KVMMemoryListener memory_listener;
+     QLIST_HEAD(, KVMParkedVcpu) kvm_parked_vcpus;
  
--            kvm_state->htl = htl;
--        } else {
--            ret = -1;
-+        ret = htlc->kvm_init(ms->htl);
-+        if (ret < 0) {
+-    /* host trust limitation (e.g. by guest memory encryption) */
+-    HostTrustLimitation *htl;
+-
+     /* For "info mtree -f" to tell if an MR is registered in KVM */
+     int nr_as;
+     struct KVMAs {
+@@ -219,28 +216,6 @@ int kvm_get_max_memslots(void)
+     return s->nr_slots;
+ }
+ 
+-bool kvm_memcrypt_enabled(void)
+-{
+-    if (kvm_state && kvm_state->htl) {
+-        return true;
+-    }
+-
+-    return false;
+-}
+-
+-int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+-{
+-    HostTrustLimitation *htl = kvm_state->htl;
+-
+-    if (htl) {
+-        HostTrustLimitationClass *htlc = HOST_TRUST_LIMITATION_GET_CLASS(htl);
+-
+-        return htlc->encrypt_data(htl, ptr, len);
+-    }
+-
+-    return 1;
+-}
+-
+ /* Called with KVMMemoryListener.slots_lock held */
+ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+ {
+@@ -2188,8 +2163,6 @@ static int kvm_init(MachineState *ms)
+         if (ret < 0) {
              goto err;
          }
-+
-+        kvm_state->htl = ms->htl;
+-
+-        kvm_state->htl = ms->htl;
      }
  
      ret = kvm_arch_init(ms, s);
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index fdc0c7e038..a71792bc16 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -27,6 +27,7 @@
- #include "hw/pci/pci.h"
- #include "hw/mem/nvdimm.h"
- #include "migration/vmstate.h"
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 82f118d2df..78b3eef117 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -104,16 +104,6 @@ int kvm_on_sigbus(int code, void *addr)
+     return 1;
+ }
+ 
+-bool kvm_memcrypt_enabled(void)
+-{
+-    return false;
+-}
+-
+-int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+-{
+-  return 1;
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+ {
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index ec2a3b3e7e..cab5ac5695 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -38,6 +38,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/block/flash.h"
+ #include "sysemu/kvm.h"
 +#include "exec/host-trust-limitation.h"
  
- GlobalProperty hw_compat_5_0[] = {
-     { "virtio-balloon-device", "page-poison", "false" },
-@@ -425,16 +426,37 @@ static char *machine_get_memory_encryption(Object *obj, Error **errp)
- {
-     MachineState *ms = MACHINE(obj);
+ /*
+  * We don't have a theoretically justifiable exact lower bound on the base
+@@ -196,10 +197,11 @@ static void pc_system_flash_map(PCMachineState *pcms,
+             pc_isa_bios_init(rom_memory, flash_mem, size);
  
--    return g_strdup(ms->memory_encryption);
-+    if (ms->htl) {
-+        return object_get_canonical_path_component(OBJECT(ms->htl));
-+    }
-+
-+    return NULL;
- }
+             /* Encrypt the pflash boot ROM */
+-            if (kvm_memcrypt_enabled()) {
++            if (host_trust_limitation_enabled(MACHINE(pcms))) {
+                 flash_ptr = memory_region_get_ram_ptr(flash_mem);
+                 flash_size = memory_region_size(flash_mem);
+-                ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
++                ret = host_trust_limitation_encrypt(MACHINE(pcms),
++                                                    flash_ptr, flash_size);
+                 if (ret) {
+                     error_report("failed to encrypt pflash rom");
+                     exit(1);
+diff --git a/include/exec/host-trust-limitation.h b/include/exec/host-trust-limitation.h
+index a19f12ae14..fc30ea3f78 100644
+--- a/include/exec/host-trust-limitation.h
++++ b/include/exec/host-trust-limitation.h
+@@ -14,6 +14,7 @@
+ #define QEMU_HOST_TRUST_LIMITATION_H
  
- static void machine_set_memory_encryption(Object *obj, const char *value,
-                                         Error **errp)
- {
--    MachineState *ms = MACHINE(obj);
-+    Object *htl =
-+        object_resolve_path_component(object_get_objects_root(), value);
-+
-+    if (!htl) {
-+        error_setg(errp, "No such memory encryption object '%s'", value);
-+        return;
-+    }
+ #include "qom/object.h"
++#include "hw/boards.h"
  
--    g_free(ms->memory_encryption);
--    ms->memory_encryption = g_strdup(value);
-+    object_property_set_link(obj, htl, "host-trust-limitation", errp);
+ #define TYPE_HOST_TRUST_LIMITATION "host-trust-limitation"
+ #define HOST_TRUST_LIMITATION(obj)                                    \
+@@ -33,4 +34,39 @@ typedef struct HostTrustLimitationClass {
+     int (*encrypt_data)(HostTrustLimitation *, uint8_t *, uint64_t);
+ } HostTrustLimitationClass;
+ 
++/**
++ * host_trust_limitation_enabled - return whether guest memory is protected
++ *                                 from hypervisor access (with memory
++ *                                 encryption or otherwise)
++ * Returns: true guest memory is not directly accessible to qemu
++ *          false guest memory is directly accessible to qemu
++ */
++static inline bool host_trust_limitation_enabled(MachineState *machine)
++{
++    return !!machine->htl;
 +}
 +
-+static void machine_check_host_trust_limitation(const Object *obj,
-+                                                const char *name,
-+                                                Object *new_target,
-+                                                Error **errp)
++/**
++ * host_trust_limitation_encrypt: encrypt the memory range to make
++ *                                it guest accessible
++ *
++ * Return: 1 failed to encrypt the range
++ *         0 succesfully encrypted memory region
++ */
++static inline int host_trust_limitation_encrypt(MachineState *machine,
++                                                uint8_t *ptr, uint64_t len)
 +{
-+    /*
-+     * So far the only constraint is that the target has the
-+     * TYPE_HOST_TRUST_LIMITATION interface, and that's checked by the
-+     * QOM core
-+     */
- }
- 
- static bool machine_get_nvdimm(Object *obj, Error **errp)
-@@ -855,6 +877,15 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_set_description(oc, "enforce-config-section",
-         "Set on to enforce configuration section migration");
- 
-+    object_class_property_add_link(oc, "host-trust-limitation",
-+                                   TYPE_HOST_TRUST_LIMITATION,
-+                                   offsetof(MachineState, htl),
-+                                   machine_check_host_trust_limitation,
-+                                   OBJ_PROP_LINK_STRONG);
-+    object_class_property_set_description(oc, "host-trust-limitation",
-+        "Set host trust limitation object to use");
++    HostTrustLimitation *htl = machine->htl;
 +
-+    /* For compatibility */
-     object_class_property_add_str(oc, "memory-encryption",
-         machine_get_memory_encryption, machine_set_memory_encryption);
-     object_class_property_set_description(oc, "memory-encryption",
-@@ -1127,7 +1158,7 @@ void machine_run_board_init(MachineState *machine)
-         }
-     }
++    if (htl) {
++        HostTrustLimitationClass *htlc = HOST_TRUST_LIMITATION_GET_CLASS(htl);
++
++        if (htlc->encrypt_data) {
++            return htlc->encrypt_data(htl, ptr, len);
++        }
++    }
++
++    return 1;
++}
++
+ #endif /* QEMU_HOST_TRUST_LIMITATION_H */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index b4174d941c..c7b9739609 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -231,23 +231,6 @@ int kvm_destroy_vcpu(CPUState *cpu);
+  */
+ bool kvm_arm_supports_user_irq(void);
  
--    if (machine->memory_encryption) {
-+    if (machine->htl) {
-         /*
-          * With host trust limitation, the host can't see the real
-          * contents of RAM, so there's no point in it trying to merge
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 18815d9be2..a9f8444729 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -277,7 +277,7 @@ struct MachineState {
-     bool suppress_vmdesc;
-     bool enforce_config_section;
-     bool enable_graphics;
--    char *memory_encryption;
-+    HostTrustLimitation *htl;
-     char *ram_memdev_id;
-     /*
-      * convenience alias to ram_memdev_id backend memory region
+-/**
+- * kvm_memcrypt_enabled - return boolean indicating whether memory encryption
+- *                        is enabled
+- * Returns: 1 memory encryption is enabled
+- *          0 memory encryption is disabled
+- */
+-bool kvm_memcrypt_enabled(void);
+-
+-/**
+- * kvm_memcrypt_encrypt_data: encrypt the memory range
+- *
+- * Return: 1 failed to encrypt the range
+- *         0 succesfully encrypted memory region
+- */
+-int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
+-
+-
+ #ifdef NEED_CPU_H
+ #include "cpu.h"
+ 
 -- 
 2.26.2
 
