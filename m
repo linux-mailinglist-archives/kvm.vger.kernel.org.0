@@ -2,96 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59C6F2011B5
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 17:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9F842011FF
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 17:48:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394077AbgFSPnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 11:43:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58962 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2394065AbgFSPnb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 11:43:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592581410;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BJ4olDP4sE92e0G3XhQT7E9mJ/AvOujEs+OICxyS890=;
-        b=hAn1461PW1iP6vlcEItLPBnI42Q+yqzlQJRRefWAM4sBBAJyky0UhdwDyfEXLxAPF1gult
-        yTJVQlSLiC5GKf4EpLJUTl1iBiBZpVKEo9Rj4D1VppqQz0wmyYit1/AAYu34wA899flaXN
-        CoSaU1gBTbNBj9VHaBwLvLj3PFCfg6k=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-ux74PetVNR6FFkG-TQ0T6Q-1; Fri, 19 Jun 2020 11:43:28 -0400
-X-MC-Unique: ux74PetVNR6FFkG-TQ0T6Q-1
-Received: by mail-wr1-f70.google.com with SMTP id e1so4452137wrm.3
-        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 08:43:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BJ4olDP4sE92e0G3XhQT7E9mJ/AvOujEs+OICxyS890=;
-        b=IIJ4IOGmr6LW2MCefSQBGxWIcGSNRGQZDBIfz/vMSkpqXHcfgY/ndtB6ca6P+oiYTJ
-         houdIsuhN0JG2Ie0mxarc86UogUvkaIKXROQRF3rKTY9eych/zpAVBnkrC9d3FAHGSJp
-         vdezSiEAuJ2Ip42N021/28cA5fcrLj9N66hjY3z6VrfJVlQk5maxuvtt4gEImYmK98W8
-         IcULMTjcPEnyWCGII7Ns6FMLfKNRAIVaeWXihMgSXB6QLUIgiq3PCDtnW8ueFpu0k1er
-         XdNUbolP0RNmvcPl4ivMXoS4GpztnMCnQcB9w3DgPqawYAMnb381vlfTLIxtTwbOkkws
-         ZHvw==
-X-Gm-Message-State: AOAM530mgtBSIVMv7KvTgWwAmnv7F6jKthTVidST8EZHQvbQd3sdLsx1
-        5Whtv7spXzTCAQGgA/TK9+EsHu2CBgq5zIns+nQlaoHGOlEsN3wChXgYtV7QhGvw0d0qZTUNSl1
-        qu5dfX6/4tRRz
-X-Received: by 2002:a1c:ab04:: with SMTP id u4mr4641082wme.52.1592581407893;
-        Fri, 19 Jun 2020 08:43:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzM2p8s4uLxagQNK//PxpJ+oT8+9b3lN2UK1YhhNUn9fFNMbEk3eFggdKAd4PlTflL32CmW3Q==
-X-Received: by 2002:a1c:ab04:: with SMTP id u4mr4641071wme.52.1592581407700;
-        Fri, 19 Jun 2020 08:43:27 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e1d2:138e:4eff:42cb? ([2001:b07:6468:f312:e1d2:138e:4eff:42cb])
-        by smtp.gmail.com with ESMTPSA id d63sm7719649wmc.22.2020.06.19.08.43.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jun 2020 08:43:27 -0700 (PDT)
-Subject: Re: [PATCH v2 00/11] KVM: Support guest MAXPHYADDR < host MAXPHYADDR
-To:     Mohammed Gamal <mgamal@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, thomas.lendacky@amd.com,
-        babu.moger@amd.com
-References: <20200619153925.79106-1-mgamal@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <87312ebb-e842-3b21-e216-916d54557319@redhat.com>
-Date:   Fri, 19 Jun 2020 17:43:25 +0200
+        id S2405319AbgFSPrz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 11:47:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10972 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2405313AbgFSPru (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 11:47:50 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05JFWnNc062376;
+        Fri, 19 Jun 2020 11:47:50 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31rs7knuhj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 11:47:50 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05JFWnY0062452;
+        Fri, 19 Jun 2020 11:47:49 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31rs7knuha-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 11:47:49 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05JFjRoH026513;
+        Fri, 19 Jun 2020 15:47:49 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma02dal.us.ibm.com with ESMTP id 31q6c8v3u8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Jun 2020 15:47:49 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05JFlkwY51183982
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Jun 2020 15:47:46 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A1C3428059;
+        Fri, 19 Jun 2020 15:47:46 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 755BE28058;
+        Fri, 19 Jun 2020 15:47:46 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.172.102])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Fri, 19 Jun 2020 15:47:46 +0000 (GMT)
+Subject: Re: [PATCH v8 2/2] s390/kvm: diagnose 0x318 sync and reset
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
+References: <20200618222222.23175-1-walling@linux.ibm.com>
+ <20200618222222.23175-3-walling@linux.ibm.com>
+ <eb41cdd1-9bdf-eb0c-1296-254ade66397a@redhat.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <e080cf6d-c8cb-a363-1fd1-cbbc4cbda7fe@linux.ibm.com>
+Date:   Fri, 19 Jun 2020 11:47:46 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200619153925.79106-1-mgamal@redhat.com>
+In-Reply-To: <eb41cdd1-9bdf-eb0c-1296-254ade66397a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-19_16:2020-06-19,2020-06-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 spamscore=0 clxscore=1015
+ cotscore=-2147483648 mlxlogscore=999 suspectscore=0 phishscore=0
+ priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006190114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/06/20 17:39, Mohammed Gamal wrote:
-> The last 3 patches (i.e. SVM bits and patch 11) are not intended for
-> immediate inclusion and probably need more discussion.
-> We've been noticing some unexpected behavior in handling NPF vmexits
-> on AMD CPUs (see individual patches for details), and thus we are
-> proposing a workaround (see last patch) that adds a capability that
-> userspace can use to decide who to deal with hosts that might have
-> issues supprting guest MAXPHYADDR < host MAXPHYADDR.
+On 6/19/20 10:52 AM, David Hildenbrand wrote:
+> On 19.06.20 00:22, Collin Walling wrote:
+>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
+>> the VM is running in (Linux, z/VM, etc) and is observed via
+>> firmware/service events.
+>>
+>> This is a privileged s390x instruction that must be intercepted by
+>> SIE. Userspace handles the instruction as well as migration. Data
+>> is communicated via VCPU register synchronization.
+>>
+>> The Control Program Name Code (CPNC) is stored in the SIE block. The
+>> CPNC along with the Control Program Version Code (CPVC) are stored
+>> in the kvm_vcpu_arch struct.
+>>
+>> The CPNC is shadowed/unshadowed in VSIE.
+>>
+> 
+> [...]
+> 
+>>  
+>>  int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>> @@ -4194,6 +4198,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>  		if (vcpu->arch.pfault_token == KVM_S390_PFAULT_TOKEN_INVALID)
+>>  			kvm_clear_async_pf_completion_queue(vcpu);
+>>  	}
+>> +	if (kvm_run->kvm_dirty_regs & KVM_SYNC_DIAG318) {
+>> +		vcpu->arch.diag318_info.val = kvm_run->s.regs.diag318;
+>> +		vcpu->arch.sie_block->cpnc = vcpu->arch.diag318_info.cpnc;
+>> +	}
+>>  	/*
+>>  	 * If userspace sets the riccb (e.g. after migration) to a valid state,
+>>  	 * we should enable RI here instead of doing the lazy enablement.
+>> @@ -4295,6 +4303,7 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>>  	kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
+>>  	kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
+>>  	kvm_run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
+>> +	kvm_run->s.regs.diag318 = vcpu->arch.diag318_info.val;
+>>  	if (MACHINE_HAS_GS) {
+>>  		__ctl_set_bit(2, 4);
+>>  		if (vcpu->arch.gs_enabled)
+>> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+>> index 9e9056cebfcf..ba83d0568bc7 100644
+>> --- a/arch/s390/kvm/vsie.c
+>> +++ b/arch/s390/kvm/vsie.c
+>> @@ -423,6 +423,8 @@ static void unshadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>>  		break;
+>>  	}
+>>  
+>> +	scb_o->cpnc = scb_s->cpnc;
+> 
+> "This is a privileged s390x instruction that must be intercepted", how
+> can the cpnc change, then, while in SIE?
+> 
+> Apart from that LGTM.
+> 
 
-I think patch 11 can be committed (more or less).  You would actually
-move it to the beginning of the series and have
-"allow_smaller_maxphyaddr = !enable_ept;" for VMX.  It is then changed
-to "allow_smaller_maxphyaddr = true;" in "KVM: VMX: Add guest physical
-address check in EPT violation and misconfig".
+I thought shadow/unshadow was a load/store (respectively) when executing
+in SIE for a level 3+ guest (where LPAR is level 1)?
 
-In fact, it would be a no-brainer to commit patch 11 in that form, so
-feel free to submit it separately.
+* Shadow SCB (load shadow VSIE page; originally CPNC is 0)
 
-Thanks,
+* Execute diag318 (under SIE)
 
-Paolo
+* Unshadow SCB (store in original VSIE page; CPNC is whatever code the
+guest decided to set)
 
+Don't we need to preserve the CPNC for the level 3+ guest somehow?
+
+-- 
+Regards,
+Collin
+
+Stay safe and stay healthy
