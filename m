@@ -2,80 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 516CA200965
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 15:03:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52C842009BB
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 15:16:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733018AbgFSNCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 09:02:47 -0400
-Received: from foss.arm.com ([217.140.110.172]:57638 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733002AbgFSNCl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 09:02:41 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 17DFC11B3;
-        Fri, 19 Jun 2020 06:02:40 -0700 (PDT)
-Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D51983F6CF;
-        Fri, 19 Jun 2020 06:02:33 -0700 (PDT)
-From:   Jianyong Wu <jianyong.wu@arm.com>
-To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, steven.price@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        Wei.Chen@arm.com, jianyong.wu@arm.com, nd@arm.com
-Subject: [PATCH v13 9/9] arm64: Add kvm capability check extension for ptp_kvm
-Date:   Fri, 19 Jun 2020 21:01:20 +0800
-Message-Id: <20200619130120.40556-10-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200619130120.40556-1-jianyong.wu@arm.com>
-References: <20200619130120.40556-1-jianyong.wu@arm.com>
+        id S1731835AbgFSNQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 09:16:30 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56089 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728606AbgFSNQX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jun 2020 09:16:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592572582;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=baDBAe02KQ36Q6NWRcq2fodzKUQjQGzUg0rUSF7F5Mg=;
+        b=SFEDMHr42UyAJ7nSTgABBo+R08pRB2qqsDeWi4vTa320sORwiGiBQJeBMuThDcSF02SBg2
+        lvuPqCwTE0sHygTUjzgD1Rd/s4EjOKu3ykvnFLlscSp9/xbFwU0KyV9Vm6W1h0QRT56yUN
+        p/D2WNKC6kEthH5zYGrzXXFRQ9ROJNA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-d7BrEqVdPhyY9OQtvkrZ6A-1; Fri, 19 Jun 2020 09:16:19 -0400
+X-MC-Unique: d7BrEqVdPhyY9OQtvkrZ6A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B58A51005512;
+        Fri, 19 Jun 2020 13:16:18 +0000 (UTC)
+Received: from x1.home (ovpn-112-195.phx2.redhat.com [10.3.112.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C8485D9CA;
+        Fri, 19 Jun 2020 13:16:18 +0000 (UTC)
+Date:   Fri, 19 Jun 2020 07:16:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        cohuck@redhat.com
+Subject: Re: [PATCH] vfio: Cleanup allowed driver naming
+Message-ID: <20200619071617.25e46824@x1.home>
+In-Reply-To: <20200619071802.GA28304@infradead.org>
+References: <159251018108.23973.14170848139642305203.stgit@gimli.home>
+        <20200619071802.GA28304@infradead.org>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let userspace check if there is kvm ptp service in host.
-Before VMs migrate to another host, VMM may check if this
-cap is available to determine the next behavior.
+On Fri, 19 Jun 2020 00:18:02 -0700
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c     | 4 ++++
- include/uapi/linux/kvm.h | 1 +
- 2 files changed, 5 insertions(+)
+> On Thu, Jun 18, 2020 at 01:57:18PM -0600, Alex Williamson wrote:
+> > No functional change, avoid non-inclusive naming schemes.  
+> 
+> Adding a bunch of overly long lines that don't change anything are
+> everything but an improvement.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 90cb90561446..f41e84346468 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -194,6 +194,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
- 	case KVM_CAP_ARM_NISV_TO_USER:
- 	case KVM_CAP_ARM_INJECT_EXT_DABT:
-+
-+#ifdef CONFIG_ARM64_KVM_PTP_HOST
-+	case KVM_CAP_ARM_KVM_PTP:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4fdf30316582..f3d4b00dac57 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SECURE_GUEST 181
- #define KVM_CAP_HALT_POLL 182
- #define KVM_CAP_ASYNC_PF_INT 183
-+#define KVM_CAP_ARM_KVM_PTP 184
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.17.1
+In fact, 3 of 5 code change lines are shorter, the other two are 3
+characters longer each and arguably more descriptive.  One line does now
+exceed 80 columns, though checkpatch no longer cares.  I'll send a v2
+with that line wrapped.  Thanks,
+
+Alex
 
