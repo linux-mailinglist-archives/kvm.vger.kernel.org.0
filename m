@@ -2,151 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89ECD200875
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 14:14:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE8A8200877
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 14:14:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731241AbgFSMOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 08:14:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58258 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727074AbgFSMOb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 08:14:31 -0400
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAC4C06174E;
-        Fri, 19 Jun 2020 05:14:29 -0700 (PDT)
-Received: by mail-wr1-x443.google.com with SMTP id q11so9486794wrp.3;
-        Fri, 19 Jun 2020 05:14:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+rBhCFgGCMdVAfWKM4PW53kmT786Xr6XtnAv8uvw9zw=;
-        b=eRce76G6vjbDkG32qBLsbDtV5RaN2z73qkS/xZtt/XKQ4wvEky0RLCo6sUHibH3kx4
-         6/K6WpP5JRvj9xgg/zpp4vVlMsPXNovf2iJEptZU63TCIeHAxG+bSc4eifGBwrl6Qeu/
-         JoEtKdoazeFs+B2iscDACPJYYMS+ZA9QBDDb3FQ0CIGYvLKZnkLaDopCAX2MsqG4uYJ9
-         z6Nx8NEodajlkoqJrsxYQo5L7qn3tNXDNu1GDNoMpzxMxkDlBICDwwiIJxN961r35a4c
-         IbLlPH7K7/Wem++MyTOxHUocH7ZO8y1S4MA8Fof9z5XG49Sfb/+Wn+cWX7wFBtkFHlky
-         xBcg==
+        id S1732846AbgFSMO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 08:14:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43352 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732862AbgFSMOt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jun 2020 08:14:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592568885;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R8cRJ9mKHnqlRMCmgZ9Saj2HVMswrOptw4ckNPEI2IU=;
+        b=SBkr9l7oXhrZDGG1UvlquFZpdS/9erxJz5vHupMT81NFmawIXy7D38zvPVMgyrjxAFIJqh
+        s4u6TpfWmXO+vPny3xBBX/y/m7eTR8dw0ASfBUWpPjWTbu6wVvc5AzCj1pd6dZj1x9/sRg
+        mEea9RA/4HxoBPkv25akCoCr22v0vnw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-0xET-NeFPJSOwiohwRsUzA-1; Fri, 19 Jun 2020 08:14:42 -0400
+X-MC-Unique: 0xET-NeFPJSOwiohwRsUzA-1
+Received: by mail-wr1-f71.google.com with SMTP id c14so4175815wrw.11
+        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 05:14:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=+rBhCFgGCMdVAfWKM4PW53kmT786Xr6XtnAv8uvw9zw=;
-        b=TkS2+84iLsXXTd6LvS2SES983ZKJOU/FnLrNdx9EGSGdEKBKZYOlbyOgZo6j9fPNc6
-         rQBp7Kj/yoBzICaWPcuKe97SK3v8xModK3CO64PIMvAX1X0UuHPmVmsBZO4K8qYXkJFS
-         4uM79FWpDsmSSQO6KHWt9QPxKYULJYtP3QiPEzmH6aTYsOndD5iV+EIj8sydsRy71/7j
-         fQJoGZfuTnggGPg7lLJRMOCiMgoFp7clPC4Dw8DJJJ6ZSSYPv/govLTAYmc2QrGmf13z
-         TOjkBom0VJuhpGq6s0FkpQreMQ6RwMX4LQVlxMR0CxsAPjysaerDu8MKXEs/jctSOxSX
-         Re2A==
-X-Gm-Message-State: AOAM530b/csQLydqclKVSqHrt3RxbFru6dk76Vek/DES9EUoaqKNvh8o
-        62kz6fnwsIG5Yz41n0LWXfE=
-X-Google-Smtp-Source: ABdhPJycKWMcuWz4mdS/MU9EyO8oQT9LX+h1VyNN9/kqsPr+ozgOHkNsoiWlmRCPjS3vdYumbyrj/Q==
-X-Received: by 2002:a5d:4d4d:: with SMTP id a13mr3881692wru.252.1592568868130;
-        Fri, 19 Jun 2020 05:14:28 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.googlemail.com with ESMTPSA id f185sm6951462wmf.43.2020.06.19.05.14.26
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=R8cRJ9mKHnqlRMCmgZ9Saj2HVMswrOptw4ckNPEI2IU=;
+        b=AOXbJ0fZhK7MxA+X4jSqnqFNLoR8OacQ8B+LQPFfdZTkRiK45sdcxwe6kXulXVqBx0
+         2LPpR8sNObW1ExIisHvyWWd+uNLbTgX0p1e/yNfDlHJUZsPmTJws8iJjG+4pqZQyNyF8
+         yKTgGzb0Ar5n39JSXzh7fSrKzrqKhG/W+UPy6Po75Izt0hN1S81k4Yp28plfzQXfGaqy
+         6s18iVmML8PmjKUFO6CgqgeSOlIpeIXp0FtM3ltGSOREg7yuXykiUdfDggavFVzOjN6O
+         GX3d9XgjdoWczS0Q7cT+T1PsEAmIcd2+8XOKxWPSccPFCFXCY6hrFQY6b2dG/ctfc3I6
+         8dKA==
+X-Gm-Message-State: AOAM530tHCuwBImMIDduGqIG0A/Dtu7YaYtZqB9+iEN0mHDIILBWOO+f
+        TkCj/oB6TN1CUKmh/yrY0BUgL3UJL3XlcI0KJmmB4ZkWThe+E4cgeMSoSoGQ1g530jyUbvJAnrL
+        3gyYCqeOYIvRK
+X-Received: by 2002:adf:db09:: with SMTP id s9mr3724451wri.256.1592568881585;
+        Fri, 19 Jun 2020 05:14:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzI0DHsQbRkAzRAW/4WimBoJGHA0E5juzZDQy4xA4UsJjmsZK6Wry3yY0B5r4VoAJNzMN1cjA==
+X-Received: by 2002:adf:db09:: with SMTP id s9mr3724431wri.256.1592568881336;
+        Fri, 19 Jun 2020 05:14:41 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e1d2:138e:4eff:42cb? ([2001:b07:6468:f312:e1d2:138e:4eff:42cb])
+        by smtp.gmail.com with ESMTPSA id b201sm6852671wmb.36.2020.06.19.05.14.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jun 2020 05:14:27 -0700 (PDT)
-Subject: Re: [RFC PATCH] KVM: x86: Fix APIC page invalidation race
-To:     Xinlong Lin <linxl3@wangsu.com>,
-        Eiichi Tsukata <eiichi.tsukata@nutanix.com>
-Cc:     "sean.j.christopherson" <sean.j.christopherson@intel.com>,
-        vkuznets <vkuznets@redhat.com>,
-        wanpengli <wanpengli@tencent.com>,
-        jmattson <jmattson@google.com>, joro <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Felipe Franciosi <felipe@nutanix.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <20200606042627.61070-1-eiichi.tsukata@nutanix.com>
- <0d9b3313-5d4c-9ef3-63e4-ba08ddbbe7a1@redhat.com>
- <7B9024C7-98D0-4940-91AE-40BCDE555C8F@nutanix.com>
- <6d2d2faf-116f-8c71-fda2-3fc052952dee@redhat.com>
- <202006191317431160122@wangsu.com>
+        Fri, 19 Jun 2020 05:14:40 -0700 (PDT)
+Subject: Re: [PATCH RFC] Revert "KVM: VMX: Micro-optimize vmexit time when not
+ exposing PMU"
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        linux-kernel@vger.kernel.org
+References: <20200619094046.654019-1-vkuznets@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <09bc7ef5-445f-b2df-aa55-a23710ecc481@redhat.com>
-Date:   Fri, 19 Jun 2020 14:12:16 +0200
+Message-ID: <d72de2a8-7c65-6ad1-8f53-5a2a94533018@redhat.com>
+Date:   Fri, 19 Jun 2020 14:13:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <202006191317431160122@wangsu.com>
+In-Reply-To: <20200619094046.654019-1-vkuznets@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/06/20 07:17, Xinlong Lin wrote:
->>     Because of the above race, there can be a mismatch between the
->>     host physical address stored in the APIC_ACCESS_PAGE VMCS field and
->>     the host physical address stored in the EPT entry for the APIC GPA
->>     (0xfee0000).  When this happens, the processor will not trap APIC 
+On 19/06/20 11:40, Vitaly Kuznetsov wrote:
+> Guest crashes are observed on a Cascade Lake system when 'perf top' is
+> launched on the host, e.g.
 > 
-> Is the APIC GPA shoud be 0xfee00000?
+>  BUG: unable to handle kernel paging request at fffffe0000073038
+>  PGD 7ffa7067 P4D 7ffa7067 PUD 7ffa6067 PMD 7ffa5067 PTE ffffffffff120
+>  Oops: 0000 [#1] SMP PTI
+>  CPU: 1 PID: 1 Comm: systemd Not tainted 4.18.0+ #380
+> ...
+>  Call Trace:
+>   serial8250_console_write+0xfe/0x1f0
+>   call_console_drivers.constprop.0+0x9d/0x120
+>   console_unlock+0x1ea/0x460
+> 
+> Call traces are different but the crash is imminent. The problem was
+> blindly bisected to the commit 041bc42ce2d0 ("KVM: VMX: Micro-optimize
+> vmexit time when not exposing PMU"). It was also confirmed that the
+> issue goes away if PMU is exposed to the guest.
+> 
+> With some instrumentation of the guest we can see what is being switched
+> (when we do atomic_switch_perf_msrs()):
+> 
+>  vmx_vcpu_run: switching 2 msrs
+>  vmx_vcpu_run: switching MSR38f guest: 70000000d host: 70000000f
+>  vmx_vcpu_run: switching MSR3f1 guest: 0 host: 2
+> 
+> The current guess is that PEBS (MSR_IA32_PEBS_ENABLE, 0x3f1) is to blame.
+> Regardless of whether PMU is exposed to the guest or not, PEBS needs to
+> be disabled upon switch.
+> 
+> This reverts commit 041bc42ce2d0efac3b85bbb81dea8c74b81f4ef9.
+> 
+> Reported-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+> - Perf/KVM interractions are a mystery to me, thus RFC.
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 36c771728c8c..b1a23ad986ff 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6728,8 +6728,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>  
+>  	pt_guest_enter(vmx);
+>  
+> -	if (vcpu_to_pmu(vcpu)->version)
+> -		atomic_switch_perf_msrs(vmx);
+> +	atomic_switch_perf_msrs(vmx);
+>  	atomic_switch_umwait_control_msr(vmx);
+>  
+>  	if (enable_preemption_timer)
+> 
 
-Yes, there's a missing zero.
+Queued, thanks.
 
 Paolo
+
