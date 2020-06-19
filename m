@@ -2,74 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62A1D200AD1
-	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 15:57:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6166200B0B
+	for <lists+kvm@lfdr.de>; Fri, 19 Jun 2020 16:11:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732362AbgFSN5U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jun 2020 09:57:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45910 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731794AbgFSN5U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jun 2020 09:57:20 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461BCC06174E;
-        Fri, 19 Jun 2020 06:57:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=LAV5/s/2D5B3lhz5CBbE1JjwfKpleg8M/EZQLJv3gY0=; b=JyJL+hT/3UDxfhF0s3aTnfKjXz
-        4WDgwcRLMVoKg+qSDE9yLxzSco+H+pQ5Wb81Ou3fMfUQ/D/PUj99vJvG8DVfHMK7Xit5EUflkCXHg
-        NVjSoMF1iXJkFyunmO4bT0bhYKqy8plu+KhCaWDYL5rTcS+0HqBZ2l2cO31jrjswYnTHix3XxuIdh
-        CLa7YNXieoKzxyNI69zTga5BeVIp2nuN6JUkyNZVDF48paS3Z97GcqjEXS4SbkETaMrcC7oCiPtz7
-        ebga12ePId6FrnHzkZ06/ly0HjW7/bElp6nlinv8nqqvH/e7fLXCA9LkJfD50awg4CtQOX9My32fH
-        tAIxb96w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jmHW8-0000yl-Di; Fri, 19 Jun 2020 13:57:16 +0000
-Date:   Fri, 19 Jun 2020 06:57:16 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jianyong Wu <jianyong.wu@arm.com>
-Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, steven.price@arm.com, justin.he@arm.com,
-        Wei.Chen@arm.com, kvm@vger.kernel.org, Steve.Capper@arm.com,
-        linux-kernel@vger.kernel.org, Kaly.Xin@arm.com, nd@arm.com,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v13 3/9] smccc: Export smccc conduit get helper.
-Message-ID: <20200619135716.GA14308@infradead.org>
-References: <20200619130120.40556-1-jianyong.wu@arm.com>
- <20200619130120.40556-4-jianyong.wu@arm.com>
+        id S1732907AbgFSOKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jun 2020 10:10:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55681 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726275AbgFSOKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jun 2020 10:10:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592575848;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OQGcTYNZ0qd2ZL6M4exRQEolMRV74PfXhnhqE6+gOjU=;
+        b=AvBjJy69VReMQPVLUz7wBhOr0jXBJ9EK8oxomptNJw2eYsXutARoFLqXLazQW1HJH10+O/
+        9pnezOQd+4/1HS3vpYX1W9emOgCLn06qXSaKPLv3yhIzICUGWlftLDSO0vYv4brT3zFSDq
+        6xkezGQSqPASZCstu5QsKNob2UKM7mM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-f_3dPH-wOb6URru_YdNZ3w-1; Fri, 19 Jun 2020 10:10:46 -0400
+X-MC-Unique: f_3dPH-wOb6URru_YdNZ3w-1
+Received: by mail-wr1-f70.google.com with SMTP id a4so4327420wrp.5
+        for <kvm@vger.kernel.org>; Fri, 19 Jun 2020 07:10:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OQGcTYNZ0qd2ZL6M4exRQEolMRV74PfXhnhqE6+gOjU=;
+        b=A2Bp2zR3PBQe4zgORWg0bFIJtall84sb9LScQnDl79uftCCowkdNbQ9KdVCliAJfvj
+         y3sHkQKIv41DNrDWhmdKV1LUnznaMgDKIO8u7xT/xNBO2JL2GaRyjAqc1J83MiJqq9wc
+         jMNfewe38a63OSL6vaoXXNWs1Vg99Cq4sPzqkMIrwq7lsAIOhc/VhBlKdazJKDlKlixm
+         Su2XHtDzteO5d+F9CTMfmhr6zDEn/C2/3skmllVD4jDFJOQ+jM0p7gzM8bwMES5OaJRz
+         89ELvsZPYV0WyEOMfJZr65nFudVQb2ut/d4TSehb/dPBWmsYm44x6uKkRbSRMcKNdjur
+         jvTg==
+X-Gm-Message-State: AOAM532BVHhY/BNrb1Aq/T6T6nFqTULRSt6QnY/3DqB1QWVsVUrLaLaW
+        4qGPL0IUbMGfq1U/0U37xrRS6u/5d5N0s8+Bzn66Z3Y0WZ8DwYGujKLy5P5gTn0dQf5tom2fS3n
+        4ayQC6bacQts5
+X-Received: by 2002:a1c:4e1a:: with SMTP id g26mr3416506wmh.148.1592575845677;
+        Fri, 19 Jun 2020 07:10:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx2lf9yJVDZ3TMxLfmzqD+pzoOr6W+H3pQlOKmVqwKx1RlwQw91jzYg+uud8qh9pLidgwOIBw==
+X-Received: by 2002:a1c:4e1a:: with SMTP id g26mr3416482wmh.148.1592575845471;
+        Fri, 19 Jun 2020 07:10:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e1d2:138e:4eff:42cb? ([2001:b07:6468:f312:e1d2:138e:4eff:42cb])
+        by smtp.gmail.com with ESMTPSA id e12sm7410682wro.52.2020.06.19.07.10.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jun 2020 07:10:44 -0700 (PDT)
+Subject: Re: [PATCH v3] KVM: LAPIC: Recalculate apic map in batch
+To:     Igor Mammedov <imammedo@redhat.com>,
+        Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <1582684862-10880-1-git-send-email-wanpengli@tencent.com>
+ <20200619143626.1b326566@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3e025538-297b-74e5-f1b1-2193b614978b@redhat.com>
+Date:   Fri, 19 Jun 2020 16:10:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200619130120.40556-4-jianyong.wu@arm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20200619143626.1b326566@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 19, 2020 at 09:01:14PM +0800, Jianyong Wu wrote:
-> Export arm_smccc_1_1_get_conduit then modules can use smccc helper which
-> adopts it.
+On 19/06/20 14:36, Igor Mammedov wrote:
+> qemu-kvm -m 2G -smp 4,maxcpus=8  -monitor stdio
+> (qemu) device_add qemu64-x86_64-cpu,socket-id=4,core-id=0,thread-id=0
 > 
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->  drivers/firmware/smccc/smccc.c | 1 +
->  1 file changed, 1 insertion(+)
+> in guest fails with:
 > 
-> diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
-> index 4e80921ee212..b855fe7b5c90 100644
-> --- a/drivers/firmware/smccc/smccc.c
-> +++ b/drivers/firmware/smccc/smccc.c
-> @@ -24,6 +24,7 @@ enum arm_smccc_conduit arm_smccc_1_1_get_conduit(void)
->  
->  	return smccc_conduit;
->  }
-> +EXPORT_SYMBOL(arm_smccc_1_1_get_conduit);
+>  smpboot: do_boot_cpu failed(-1) to wakeup CPU#4
+> 
+> which makes me suspect that  INIT/SIPI wasn't delivered
+> 
+> Is it a know issue?
+> 
 
-EXPORT_SYMBOL_GPL, please.
+No, it isn't.  I'll revert.
+
+Paolo
 
