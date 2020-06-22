@@ -2,200 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FF7F2034E0
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 12:31:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02AF42034F3
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 12:39:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727952AbgFVKb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 06:31:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38274 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727946AbgFVKb5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 06:31:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592821916;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zstoew6+y+ErDDpNlJitNVBDWEMg32PIYZVfYRB6WUo=;
-        b=gwQDk079wCN4ulNybKO/zwTiGlOtVLbsb+Bh+5Ep7/UC55AD7uXcI7nMAhykd61AvzdMHG
-        e7W32Qamg8cgliGLBozVmgLFHLDEvuT2gfqPopwgHx2EG5AqN2hSsirr+KWBuKvmCF5k0d
-        KRjgetbZKXs6I9uly7wvWy4W4zmUh64=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-ArnuUmN3M1uOaHHBKtftMQ-1; Mon, 22 Jun 2020 06:31:52 -0400
-X-MC-Unique: ArnuUmN3M1uOaHHBKtftMQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 416451B18BC3;
-        Mon, 22 Jun 2020 10:31:51 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9112F60C05;
-        Mon, 22 Jun 2020 10:31:49 +0000 (UTC)
-Date:   Mon, 22 Jun 2020 12:31:46 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, steven.price@arm.com
-Subject: Re: [PATCH 2/4] arm64/x86: KVM: Introduce steal time cap
-Message-ID: <20200622103146.fwtr7z3l3mnq4foh@kamzik.brq.redhat.com>
-References: <20200619184629.58653-1-drjones@redhat.com>
- <20200619184629.58653-3-drjones@redhat.com>
- <5b1e895dc0c80bef3c0653894e2358cf@kernel.org>
- <20200622084110.uosiqx3oy22lremu@kamzik.brq.redhat.com>
- <5a52210e5f123d52459f15c594e77bad@kernel.org>
+        id S1727108AbgFVKjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 06:39:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727066AbgFVKjk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 06:39:40 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B803BC061794
+        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 03:39:39 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id f18so2658063wml.3
+        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 03:39:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=Lb/frQrugPlke769VI0ZGjO7llYS1ocNVbXaMbRE4lg=;
+        b=BYWy1U3LTb7z1OQDvwZvSosKr1sv3gduL754zzevWWN7Ns1D38AkKsd8PAjr7ruqJP
+         6N36GAb4b+1ZsqTjT9BGrE7KWe6iP5ifH6s3842R+A+9WxhZ5pnuVruniORrL3BAEAvk
+         mj6HXKQ45TrrgkqBKLaFqO9x73kt+C/ulCuNRcQn12CJEOApO9pxx5gXJTgGdy5WmY3k
+         a8Gs3FP1mmk0BhmfR8zcCbQlZYkEfdhv+D7gyjFiwPjkiCCnfwW7vEH89P5um6fgfwXT
+         9IXfqrX+ZNUkFtXTxkzsHQX7s85JjnoMpwb2Wm1HTIu6XaDeTOsltX4wJIEfDxHr/NIk
+         +7YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=Lb/frQrugPlke769VI0ZGjO7llYS1ocNVbXaMbRE4lg=;
+        b=aNwMvwJcr7fsPjmYggP6fgtCHjMNdR7s1q49O05VAiRCno8nwOipwoZPxgIld6LdXL
+         Bp1zZcvf/1i7w3xSaob7K0Je+lE3BxsMuPM/FB9wWzUMK/qci7PgBro6BVwULrQG+e2b
+         2R0dZBsYJlu5TXR8PSySQYsk5IflynZGJZWeNow1L0fp9iyCgGJtdiERTM057KwhFzVM
+         8BP4lB69+dFIzQEs33ys6OD353rST+skiqovkHxI4bJW7k8ysMJFUfqM3i0xRrnv3LkW
+         jTMfKEJY7nNBOiCUP8guSsTZRYUolfp/GvNznKmVjpQwvmhJn03DnrL/4AxnKowiASlu
+         zNuQ==
+X-Gm-Message-State: AOAM533my1N6oNmrdj1WOKR6a3m9eOsprIe+oHk91vKzQS9M8MHEE3kJ
+        fI+49MitTJi6+WTOyU9gPrvcag==
+X-Google-Smtp-Source: ABdhPJw4ly1lF7pDB7TqBfR669amiQoWOkVZzba+2H5Qih6YqqlqJd9J1Sg6mf6Q9ECAf2qRBMfBMw==
+X-Received: by 2002:a1c:6408:: with SMTP id y8mr9774703wmb.122.1592822378088;
+        Mon, 22 Jun 2020 03:39:38 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
+        by smtp.gmail.com with ESMTPSA id 65sm12666681wre.6.2020.06.22.03.39.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2020 03:39:37 -0700 (PDT)
+Date:   Mon, 22 Jun 2020 11:39:32 +0100
+From:   Andrew Scull <ascull@google.com>
+To:     Mark Rutland <mark.rutland@arm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>, kernel-team@android.com
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Simplify PtrAuth alternative patching
+Message-ID: <20200622103932.GA178085@google.com>
+References: <20200622080643.171651-1-maz@kernel.org>
+ <20200622080643.171651-6-maz@kernel.org>
+ <20200622091508.GB88608@C02TD0UTHF1T.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5a52210e5f123d52459f15c594e77bad@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200622091508.GB88608@C02TD0UTHF1T.local>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 10:51:47AM +0100, Marc Zyngier wrote:
-> On 2020-06-22 09:41, Andrew Jones wrote:
-> > On Mon, Jun 22, 2020 at 09:20:02AM +0100, Marc Zyngier wrote:
-> > > Hi Andrew,
-> > > 
-> > > On 2020-06-19 19:46, Andrew Jones wrote:
-> > > > arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
-> > > > support for steal time. However this is unnecessary and complicates
-> > > > userspace (userspace may prefer delaying vcpu creation until after
-> > > > feature probing). Since probing steal time only requires a KVM fd,
-> > > > we introduce a cap that can be checked.
-> > > 
-> > > So this is purely an API convenience, right? You want a way to
-> > > identify the presence of steal time accounting without having to
-> > > create a vcpu? It would have been nice to have this requirement
-> > > before we merged this code :-(.
-> > 
-> > Yes. I wish I had considered it more closely when I was reviewing the
-> > patches. And, I believe we have yet another user interface issue that
-> > I'm looking at now. Without the VCPU feature bit I'm not sure how easy
-> > it will be for a migration to fail when attempting to migrate from a
-> > host
-> > with steal-time enabled to one that does not support steal-time. So it's
-> > starting to look like steal-time should have followed the pmu pattern
-> > completely, not just the vcpu device ioctl part.
+On Mon, Jun 22, 2020 at 10:15:08AM +0100, Mark Rutland wrote:
+> On Mon, Jun 22, 2020 at 09:06:43AM +0100, Marc Zyngier wrote:
+
+
+> > --- a/arch/arm64/include/asm/kvm_ptrauth.h
+> > +++ b/arch/arm64/include/asm/kvm_ptrauth.h
+> > @@ -61,44 +61,36 @@
+> >  
+> >  /*
+> >   * Both ptrauth_switch_to_guest and ptrauth_switch_to_host macros will
+> > - * check for the presence of one of the cpufeature flag
+> > - * ARM64_HAS_ADDRESS_AUTH_ARCH or ARM64_HAS_ADDRESS_AUTH_IMP_DEF and
+> > + * check for the presence ARM64_HAS_ADDRESS_AUTH, which is defined as
+> > + * (ARM64_HAS_ADDRESS_AUTH_ARCH || ARM64_HAS_ADDRESS_AUTH_IMP_DEF) and
+> >   * then proceed ahead with the save/restore of Pointer Authentication
+> > - * key registers.
+> > + * key registers if enabled for the guest.
+> >   */
+> >  .macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+> > -alternative_if ARM64_HAS_ADDRESS_AUTH_ARCH
+> > +alternative_if_not ARM64_HAS_ADDRESS_AUTH
+> >  	b	1000f
+> >  alternative_else_nop_endif
+> > -alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
+> > -	b	1001f
+> > -alternative_else_nop_endif
+> > -1000:
+> >  	mrs	\reg1, hcr_el2
+> >  	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+> > -	cbz	\reg1, 1001f
+> > +	cbz	\reg1, 1000f
+> >  	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+> >  	ptrauth_restore_state	\reg1, \reg2, \reg3
+> > -1001:
+> > +1000:
+> >  .endm
 > 
-> Should we consider disabling steal time altogether until this is worked out?
-
-I think we can leave it alone and just try to resolve it before merging
-QEMU patches (which I'm working on now). It doesn't look like kvmtool or
-rust-vmm (the only other two KVM userspaces I'm paying some attention to)
-do anything with steal-time yet, so they won't notice. And, I'm not sure
-disabling steal-time for any other userspaces is better than just trying
-to keep them working the best we can while improving the uapi.
-
+> Since these are in macros, we could use \@ to generate a macro-specific
+> lavel rather than a magic number, which would be less likely to conflict
+> with the surrounding environment and would be more descriptive. We do
+> that in a few places already, and here it could look something like:
 > 
-> > > 
-> > > > Additionally, when probing
-> > > > steal time we should check delayacct_on, because even though
-> > > > CONFIG_KVM selects TASK_DELAY_ACCT, it's possible for the host
-> > > > kernel to have delay accounting disabled with the 'nodelayacct'
-> > > > command line option. x86 already determines support for steal time
-> > > > by checking delayacct_on and can already probe steal time support
-> > > > with a kvm fd (KVM_GET_SUPPORTED_CPUID), but we add the cap there
-> > > > too for consistency.
-> > > >
-> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > ---
-> > > >  Documentation/virt/kvm/api.rst | 11 +++++++++++
-> > > >  arch/arm64/kvm/arm.c           |  3 +++
-> > > >  arch/x86/kvm/x86.c             |  3 +++
-> > > >  include/uapi/linux/kvm.h       |  1 +
-> > > >  4 files changed, 18 insertions(+)
-> > > >
-> > > > diff --git a/Documentation/virt/kvm/api.rst
-> > > > b/Documentation/virt/kvm/api.rst
-> > > > index 9a12ea498dbb..05b1fdb88383 100644
-> > > > --- a/Documentation/virt/kvm/api.rst
-> > > > +++ b/Documentation/virt/kvm/api.rst
-> > > > @@ -6151,3 +6151,14 @@ KVM can therefore start protected VMs.
-> > > >  This capability governs the KVM_S390_PV_COMMAND ioctl and the
-> > > >  KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
-> > > >  guests when the state change is invalid.
-> > > > +
-> > > > +8.24 KVM_CAP_STEAL_TIME
-> > > > +-----------------------
-> > > > +
-> > > > +:Architectures: arm64, x86
-> > > > +
-> > > > +This capability indicates that KVM supports steal time accounting.
-> > > > +When steal time accounting is supported it may be enabled with
-> > > > +architecture-specific interfaces.  For x86 see
-> > > > +Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".  For arm64 see
-> > > > +Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL"
-> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > index 90cb90561446..f6dca6d09952 100644
-> > > > --- a/arch/arm64/kvm/arm.c
-> > > > +++ b/arch/arm64/kvm/arm.c
-> > > > @@ -222,6 +222,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
-> > > > long ext)
-> > > >  		 */
-> > > >  		r = 1;
-> > > >  		break;
-> > > > +	case KVM_CAP_STEAL_TIME:
-> > > > +		r = sched_info_on();
-> > > > +		break;
-> > > >  	default:
-> > > >  		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
-> > > >  		break;
-> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > index 00c88c2f34e4..ced6335e403e 100644
-> > > > --- a/arch/x86/kvm/x86.c
-> > > > +++ b/arch/x86/kvm/x86.c
-> > > > @@ -3533,6 +3533,9 @@ int kvm_vm_ioctl_check_extension(struct kvm
-> > > > *kvm, long ext)
-> > > >  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
-> > > >  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
-> > > >  		break;
-> > > > +	case KVM_CAP_STEAL_TIME:
-> > > > +		r = sched_info_on();
-> > > > +		break;
-> > > >  	default:
-> > > >  		break;
-> > > >  	}
-> > > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > > > index 4fdf30316582..121fb29ac004 100644
-> > > > --- a/include/uapi/linux/kvm.h
-> > > > +++ b/include/uapi/linux/kvm.h
-> > > > @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
-> > > >  #define KVM_CAP_PPC_SECURE_GUEST 181
-> > > >  #define KVM_CAP_HALT_POLL 182
-> > > >  #define KVM_CAP_ASYNC_PF_INT 183
-> > > > +#define KVM_CAP_STEAL_TIME 184
-> > > >
-> > > >  #ifdef KVM_CAP_IRQ_ROUTING
-> > > 
-> > > Shouldn't you also add the same check of sched_info_on() to
-> > > the various pvtime attribute handling functions? It feels odd
-> > > that the capability can say "no", and yet we'd accept userspace
-> > > messing with the steal time parameters...
-> > 
-> > I considered that, but the 'has attr' interface is really only asking
-> > if the interface exists, not if it should be used. I'm not sure what
-> > we should do about it other than document that the cap needs to say
-> > it's usable, rather than just the attr presence. But, since we've had
-> > the attr merged quite a while without the cap, then maybe we can't
-> > rely on a doc change alone?
+> | alternative_if_not ARM64_HAS_ADDRESS_AUTH
+> | 	b	.L__skip_pauth_switch\@
+> | alternative_else_nop_endif
+> | 	
+> | 	...
+> | 
+> | .L__skip_pauth_switch\@:
 > 
-> Accepting the pvtime attributes (setting up the per-vcpu area) has two
-> effects: we promise both the guest and userspace that we will provide
-> the guest with steal time. By not checking sched_info_on(), we lie to
-> both, with potential consequences. It really feels like a bug.
+> Per the gas documentation
+> 
+> | \@
+> |
+> |    as maintains a counter of how many macros it has executed in this
+> |    pseudo-variable; you can copy that number to your output with ‘\@’,
+> |    but only within a macro definition.
 
-Yes, I agree now. Again, following the pmu pattern looks best here. The
-pmu will report that it doesn't have the attr support when its underlying
-kernel support (perf counters) doesn't exist. That's a direct analogy with
-steal-time relying on sched_info_on().
-
-I'll work up another version of this series doing that, but before posting
-I'll look at the migration issue a bit more and likely post something for
-that as well.
-
-Thanks,
-drew
-
+Is this relibale for this sort of application? The description just
+sounds like a counter of macros rather than specifically a unique label
+generator. It may work most of the time but also seems that it has the
+potential to be more fragile given that it would change based on the
+rest of the code in the file to potentially conflict with something it
+didn't previously conflict with. 
