@@ -2,212 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55635203533
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 12:57:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7062203536
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 13:00:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727805AbgFVK5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 06:57:55 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44189 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727027AbgFVK5z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 06:57:55 -0400
+        id S1727024AbgFVLAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 07:00:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21952 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727079AbgFVK77 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 06:59:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592823473;
+        s=mimecast20190719; t=1592823598;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QNtLcQUUpe7Kiye03+uWIKIsvdaKDl9k+0TDPFxbq+o=;
-        b=U3iDN9dr+T9bDTQ3C+CMqHQd3FYAXDcEEa4mMwbVtZAnMbPnFR/XqbZf6NNEwTGA/urRU1
-        RpjugOOe3tbUkfw9q7dqk6redrSY8TfnLMtml7cGM1YSD2vzLohSviAHxV0N7QW+mmV1mT
-        ZVEswTwlhrWcmsTgjDKMIon/nPGAzPM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-vvHedkppPJSm-k8IcpII3w-1; Mon, 22 Jun 2020 06:57:51 -0400
-X-MC-Unique: vvHedkppPJSm-k8IcpII3w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CE488730E9;
-        Mon, 22 Jun 2020 10:57:50 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0517E5C220;
-        Mon, 22 Jun 2020 10:57:42 +0000 (UTC)
-Date:   Mon, 22 Jun 2020 12:57:40 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v9 08/12] s390x: retrieve decimal and
- hexadecimal kernel parameters
-Message-ID: <20200622105740.isyt5hhj5sxwfj4d@kamzik.brq.redhat.com>
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-9-git-send-email-pmorel@linux.ibm.com>
- <a86a71c7-8c5e-7216-0a74-7bdc36355c02@linux.ibm.com>
+        bh=h8E9QgTr5DUSmPQUcgFY/pyHg2J7mDIdAy0q0CM6YVs=;
+        b=DBN7rO9eXfk2a1SeJw9pJ7r/xUYkmgQQMVVdFuPyXNkZdpVq1+GpHJnZFjqT7tRApPOjKs
+        McWKHZlQAS8zCs7RrZDVp7ylU01YOrcgQ/OI5Kc9/Lbj0jjLGsJUgXxcu2r1oLTQbco4gI
+        FgLM1vvIA0sXmPfRUYFwh99EHjLrnwk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-o1W3qd8GNN2zhqw14Vwi7A-1; Mon, 22 Jun 2020 06:59:56 -0400
+X-MC-Unique: o1W3qd8GNN2zhqw14Vwi7A-1
+Received: by mail-wr1-f71.google.com with SMTP id m14so10659577wrj.12
+        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 03:59:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=h8E9QgTr5DUSmPQUcgFY/pyHg2J7mDIdAy0q0CM6YVs=;
+        b=lgvuV4KsjI5aLI9RboD00pY+TFB3y1CMlIqHS2wrqQf6n/j23YGTqmcZpin1ZhfYc7
+         UJxvwEoX7KcdjUlAAhlYIsABdaKhV/6ashRfvX5Pjyr5b3+llMVavj3EARNI+esLeqJw
+         Umalgmdmp46U77hFC3cgPorVyGb36nrU+vko8hBDTZ6jeSRqz8vBxa1U7UfXdkksL+QK
+         U9PVZGXusmRKZTKe7qlviFR5XJP0bE+DPF8+pa0jBkAX+3O/RMqGT74/ZV4tClsJHqSU
+         DGo+aH+ozhBOQGmGO9tajuKSF65y18s3Q7AK5BB7oZIQv0Ff8cKuVnF5y8fd/c0us6oS
+         DgrQ==
+X-Gm-Message-State: AOAM5338gi02lnjyt3OT4uJL1lPvqa/4so9Qv4AijpInLA+t7NV9yOs4
+        HM/puFBgCCGZFhk5qyLFRQsaJQQruizjpv6qQjnperifc1nopUyyFY36N4ZJOswsvhUa3fLPU7O
+        WrCy410sz14vG
+X-Received: by 2002:a1c:9ec4:: with SMTP id h187mr17658398wme.27.1592823595773;
+        Mon, 22 Jun 2020 03:59:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzU0bX7wm+ozkWz+5aBqs2YpW0BK97Ao8m+ZhEht7Htjof/4aAVnlwSlLaDsim2jqnkq0PV2A==
+X-Received: by 2002:a1c:9ec4:: with SMTP id h187mr17658362wme.27.1592823595363;
+        Mon, 22 Jun 2020 03:59:55 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id u13sm15951613wmm.6.2020.06.22.03.59.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2020 03:59:54 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, xudong.hao@intel.com,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        lkft-triage@lists.linaro.org
+Subject: Re: selftests: kvm: Test results on x86_64
+In-Reply-To: <CA+G9fYvVfSEBsZCaiMCpCKfJNdbFzrKGdXR0KeRYG+nhDiEpuA@mail.gmail.com>
+References: <CA+G9fYvVfSEBsZCaiMCpCKfJNdbFzrKGdXR0KeRYG+nhDiEpuA@mail.gmail.com>
+Date:   Mon, 22 Jun 2020 12:59:53 +0200
+Message-ID: <87r1u7fjrq.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a86a71c7-8c5e-7216-0a74-7bdc36355c02@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 11:33:24AM +0200, Janosch Frank wrote:
-> On 6/15/20 11:31 AM, Pierre Morel wrote:
-> > We often need to retrieve hexadecimal kernel parameters.
-> > Let's implement a shared utility to do it.
-> 
-> Often?
-> 
-> My main problem with this patch is that it doesn't belong into the s390
-> library. atol() is already in string.c so htol() can be next to it.
-> 
-> util.c already has parse_keyval() so you should be able to extend it a
-> bit for hex values and add a function below that goes through argv[].
-> 
-> CCing Andrew as he wrote most of the common library
+Naresh Kamboju <naresh.kamboju@linaro.org> writes:
 
-I'd prefer we add strtol(), rather than htol(), as we try to add
-common libc functions when possible. It could live in the same
-files at atol (string.c/libcflat.h), but we should considering
-adding a stdlib.c file some day.
+> FYI,
+> Linaro test farm selftests kvm test cases results.
+>   * kvm_mmio_warning_test — SKIP
+>   * kvm_svm_vmcall_test — SKIP
+>   * kvm_clear_dirty_log_test — PASS
+>   * kvm_cr4_cpuid_sync_test — PASS
+>   * kvm_debug_regs — PASS
+>   * kvm_demand_paging_test — PASS
+>   * kvm_dirty_log_test — PASS
+>   * kvm_evmcs_test — PASS
+>   * kvm_hyperv_cpuid — PASS
+>   * kvm_ * kvm_create_max_vcpus — PASS
+>   * kvm_platform_info_test — PASS
+>   * kvm_set_memory_region_test — PASS
+>   * kvm_set_sregs_test — PASS
+>   * kvm_smm_test — PASS
+>   * kvm_state_test — PASS
+>   * kvm_steal_time — PASS
+>   * kvm_sync_regs_test — PASS
+>   * kvm_vmx_close_while_nested_test — PASS
+>   * kvm_vmx_dirty_log_test — PASS
+>   * kvm_vmx_preemption_timer_test — PASS
+>   * kvm_vmx_set_nested_state_test — PASS
+>   * kvm_vmx_tsc_adjust_test — PASS
+>   * kvm_xss_msr_test — PASS
 
-Also, if we had strtol(), than parse_key() could use it with base=0
-instead of atol(). That would get pretty close to the implementation
-of kernel_arg(). We'd just need to add a
+[...]
 
-  char *find_key(const char *key, char **array, int array_len)
+Thanks you! It would be great to see which particular commit was tested
+here and how often you run these tests in general, which git/branch you
+follow. Also, you can improve your subject line by adding [PASS] or
+[FAIL] so we can see if there's a problem to deal with.
 
-type of a function to do the command line iterating. Then,
-
-  ret = parse_keyval(find_key("foo", argv, argc), &val);
-
-should be the same as kernel_arg() if find_key returns NULL when
-the key isn't found and parse_keyval learns to return -2 when s
-is NULL.
-
-Thanks,
-drew
-
-
-> 
-> > 
-> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > ---
-> >  lib/s390x/kernel-args.c | 60 +++++++++++++++++++++++++++++++++++++++++
-> >  lib/s390x/kernel-args.h | 18 +++++++++++++
-> >  s390x/Makefile          |  1 +
-> >  3 files changed, 79 insertions(+)
-> >  create mode 100644 lib/s390x/kernel-args.c
-> >  create mode 100644 lib/s390x/kernel-args.h
-> > 
-> > diff --git a/lib/s390x/kernel-args.c b/lib/s390x/kernel-args.c
-> > new file mode 100644
-> > index 0000000..2d3b2c2
-> > --- /dev/null
-> > +++ b/lib/s390x/kernel-args.c
-> > @@ -0,0 +1,60 @@
-> > +/*
-> > + * Retrieving kernel arguments
-> > + *
-> > + * Copyright (c) 2020 IBM Corp
-> > + *
-> > + * Authors:
-> > + *  Pierre Morel <pmorel@linux.ibm.com>
-> > + *
-> > + * This code is free software; you can redistribute it and/or modify it
-> > + * under the terms of the GNU General Public License version 2.
-> > + */
-> > +
-> > +#include <libcflat.h>
-> > +#include <string.h>
-> > +#include <asm/arch_def.h>
-> > +#include <kernel-args.h>
-> > +
-> > +static const char *hex_digit = "0123456789abcdef";
-> > +
-> > +static unsigned long htol(char *s)
-> > +{
-> > +	unsigned long v = 0, shift = 0, value = 0;
-> > +	int i, digit, len = strlen(s);
-> > +
-> > +	for (shift = 0, i = len - 1; i >= 0; i--, shift += 4) {
-> > +		digit = s[i] | 0x20;	/* Set lowercase */
-> > +		if (!strchr(hex_digit, digit))
-> > +			return 0;	/* this is not a digit ! */
-> > +
-> > +		if (digit <= '9')
-> > +			v = digit - '0';
-> > +		else
-> > +			v = digit - 'a' + 10;
-> > +		value += (v << shift);
-> > +	}
-> > +
-> > +	return value;
-> > +}
-> > +
-> > +int kernel_arg(int argc, char *argv[], const char *str, unsigned long *val)
-> > +{
-> > +	int i, ret;
-> > +	char *p, *q;
-> > +
-> > +	for (i = 0; i < argc; i++) {
-> > +		ret = strncmp(argv[i], str, strlen(str));
-> > +		if (ret)
-> > +			continue;
-> > +		p = strchr(argv[i], '=');
-> > +		if (!p)
-> > +			return -1;
-> > +		q = strchr(p, 'x');
-> > +		if (!q)
-> > +			*val = atol(p + 1);
-> > +		else
-> > +			*val = htol(q + 1);
-> > +		return 0;
-> > +	}
-> > +	return -2;
-> > +}
-> > diff --git a/lib/s390x/kernel-args.h b/lib/s390x/kernel-args.h
-> > new file mode 100644
-> > index 0000000..a88e34e
-> > --- /dev/null
-> > +++ b/lib/s390x/kernel-args.h
-> > @@ -0,0 +1,18 @@
-> > +/*
-> > + * Kernel argument
-> > + *
-> > + * Copyright (c) 2020 IBM Corp
-> > + *
-> > + * Authors:
-> > + *  Pierre Morel <pmorel@linux.ibm.com>
-> > + *
-> > + * This code is free software; you can redistribute it and/or modify it
-> > + * under the terms of the GNU General Public License version 2.
-> > + */
-> > +
-> > +#ifndef KERNEL_ARGS_H
-> > +#define KERNEL_ARGS_H
-> > +
-> > +int kernel_arg(int argc, char *argv[], const char *str, unsigned long *val);
-> > +
-> > +#endif
-> > diff --git a/s390x/Makefile b/s390x/Makefile
-> > index ddb4b48..47a94cc 100644
-> > --- a/s390x/Makefile
-> > +++ b/s390x/Makefile
-> > @@ -51,6 +51,7 @@ cflatobjs += lib/s390x/sclp-console.o
-> >  cflatobjs += lib/s390x/interrupt.o
-> >  cflatobjs += lib/s390x/mmu.o
-> >  cflatobjs += lib/s390x/smp.o
-> > +cflatobjs += lib/s390x/kernel-args.o
-> >  
-> >  OBJDIRS += lib/s390x
-> >  
-> > 
-> 
-> 
-
-
+-- 
+Vitaly
 
