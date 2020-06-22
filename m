@@ -2,59 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 038992039FD
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 16:51:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7B37203A15
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 16:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729187AbgFVOvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 10:51:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16080 "EHLO
+        id S1729250AbgFVO4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 10:56:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39756 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729128AbgFVOvA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 10:51:00 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05MEWaWr188097;
-        Mon, 22 Jun 2020 10:51:00 -0400
+        by vger.kernel.org with ESMTP id S1728954AbgFVO4M (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 10:56:12 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05MEY2Qx167937;
+        Mon, 22 Jun 2020 10:56:12 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31sk2rbjc0-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31submwky1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 10:50:59 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05MEWbXS188142;
-        Mon, 22 Jun 2020 10:50:51 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31sk2rbj9c-1
+        Mon, 22 Jun 2020 10:56:12 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05MEuCxt041910;
+        Mon, 22 Jun 2020 10:56:12 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31submwkwx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 10:50:50 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05MEeKc2003140;
-        Mon, 22 Jun 2020 14:50:45 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 31sa37ugwq-1
+        Mon, 22 Jun 2020 10:56:12 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05MEeI0W025911;
+        Mon, 22 Jun 2020 14:56:08 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 31sa381d67-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 14:50:45 +0000
+        Mon, 22 Jun 2020 14:56:08 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05MEogxO37093470
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05MEu5Oq56819792
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Jun 2020 14:50:42 GMT
+        Mon, 22 Jun 2020 14:56:06 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9380711C05C;
-        Mon, 22 Jun 2020 14:50:42 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E54F211C05C;
+        Mon, 22 Jun 2020 14:56:05 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1F5A011C04A;
-        Mon, 22 Jun 2020 14:50:42 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 70F4B11C052;
+        Mon, 22 Jun 2020 14:56:05 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.75.158])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 22 Jun 2020 14:50:42 +0000 (GMT)
-Subject: Re: [PATCH v8 2/2] s390/kvm: diagnose 0x318 sync and reset
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Collin Walling <walling@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, thuth@redhat.com
+        Mon, 22 Jun 2020 14:56:05 +0000 (GMT)
+Subject: Re: [PATCH v8 1/2] s390/setup: diag 318: refactor struct
+To:     Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
 References: <20200618222222.23175-1-walling@linux.ibm.com>
- <20200618222222.23175-3-walling@linux.ibm.com>
- <20200622122456.781492a8.cohuck@redhat.com>
+ <20200618222222.23175-2-walling@linux.ibm.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -99,79 +97,79 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <43967a50-a69c-face-805d-7cc935d3f230@de.ibm.com>
-Date:   Mon, 22 Jun 2020 16:50:41 +0200
+Message-ID: <e3edb120-33cb-9f3a-bf05-79b3a48613fe@de.ibm.com>
+Date:   Mon, 22 Jun 2020 16:56:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200622122456.781492a8.cohuck@redhat.com>
+In-Reply-To: <20200618222222.23175-2-walling@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-06-22_08:2020-06-22,2020-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- suspectscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0
- cotscore=-2147483648 mlxscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 spamscore=0 phishscore=0 impostorscore=0 classifier=spam
- adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006220111
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ suspectscore=0 mlxlogscore=999 cotscore=-2147483648 mlxscore=0
+ adultscore=0 phishscore=0 spamscore=0 clxscore=1015 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006220107
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 19.06.20 00:22, Collin Walling wrote:
+> The diag 318 struct introduced in include/asm/diag.h can be
+> reused in KVM, so let's condense the version code fields in the
+> diag318_info struct for easier usage and simplify it until we
+> can determine how the data should be formatted.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-On 22.06.20 12:24, Cornelia Huck wrote:
-> On Thu, 18 Jun 2020 18:22:22 -0400
-> Collin Walling <walling@linux.ibm.com> wrote:
-> 
->> DIAGNOSE 0x318 (diag318) sets information regarding the environment
->> the VM is running in (Linux, z/VM, etc) and is observed via
->> firmware/service events.
->>
->> This is a privileged s390x instruction that must be intercepted by
->> SIE. Userspace handles the instruction as well as migration. Data
->> is communicated via VCPU register synchronization.
->>
->> The Control Program Name Code (CPNC) is stored in the SIE block. The
->> CPNC along with the Control Program Version Code (CPVC) are stored
->> in the kvm_vcpu_arch struct.
->>
->> The CPNC is shadowed/unshadowed in VSIE.
->>
->> This data is reset on load normal and clear resets.
->>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> ---
->>  arch/s390/include/asm/kvm_host.h |  4 +++-
->>  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
->>  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
->>  arch/s390/kvm/vsie.c             |  3 +++
->>  include/uapi/linux/kvm.h         |  1 +
->>  5 files changed, 21 insertions(+), 3 deletions(-)
->>
-> 
-> (...)
-> 
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 4fdf30316582..35cdb4307904 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_PPC_SECURE_GUEST 181
->>  #define KVM_CAP_HALT_POLL 182
->>  #define KVM_CAP_ASYNC_PF_INT 183
->> +#define KVM_CAP_S390_DIAG318 184
-> 
-> Do we strictly need this new cap, or would checking against the sync
-> regs capabilities be enough?
+Series looks good to me. Can you respin the 2nd patch regarding the VSIE things
+and I can then apply it.
 
-We could check the sync_regs valid field to decide about the sync. We do
-that for ETOKEN as well and QEMU also uses it in handle_diag_318.
 
-I think what this is used for is actually to tell the QEMU CPU model
-if this is there. And for that the sync_reg validity seems wrong. So better
-keep the CAP?
+> ---
+>  arch/s390/include/asm/diag.h | 6 ++----
+>  arch/s390/kernel/setup.c     | 3 +--
+>  2 files changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/diag.h b/arch/s390/include/asm/diag.h
+> index 0036eab14391..ca8f85b53a90 100644
+> --- a/arch/s390/include/asm/diag.h
+> +++ b/arch/s390/include/asm/diag.h
+> @@ -298,10 +298,8 @@ struct diag26c_mac_resp {
+>  union diag318_info {
+>  	unsigned long val;
+>  	struct {
+> -		unsigned int cpnc : 8;
+> -		unsigned int cpvc_linux : 24;
+> -		unsigned char cpvc_distro[3];
+> -		unsigned char zero;
+> +		unsigned long cpnc : 8;
+> +		unsigned long cpvc : 56;
+>  	};
+>  };
+>  
+> diff --git a/arch/s390/kernel/setup.c b/arch/s390/kernel/setup.c
+> index 5853c9872dfe..878cacfc9c3e 100644
+> --- a/arch/s390/kernel/setup.c
+> +++ b/arch/s390/kernel/setup.c
+> @@ -1021,8 +1021,7 @@ static void __init setup_control_program_code(void)
+>  {
+>  	union diag318_info diag318_info = {
+>  		.cpnc = CPNC_LINUX,
+> -		.cpvc_linux = 0,
+> -		.cpvc_distro = {0},
+> +		.cpvc = 0,
+>  	};
+>  
+>  	if (!sclp.has_diag318)
+> 
