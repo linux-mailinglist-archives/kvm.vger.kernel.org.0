@@ -2,109 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0B4D203551
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 13:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5D46203656
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 14:03:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727880AbgFVLGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 07:06:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53964 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727819AbgFVLGg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jun 2020 07:06:36 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0B59C061796
-        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 04:06:35 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id e5so12675577ote.11
-        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 04:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bVCGBNAMVVzJBUyEH8AYaaJuZeDFv/AQspAXfpR7QWs=;
-        b=H0nc56373dVnFC0+ikr2sQCUW3pSnEIy19Lc57N1R1+mlC6lUNu5QQPGytZhsXgC7f
-         c6Uk3RG80/AsxrGiNe5k//VGeexfUJ264jlYjVOoIG+NxTKBE+lhBVgR/a/XpjmBh1vO
-         /mvEhZTrcZNBlPOdxsj6hPKS4fIuxWRF29fs9M4eYDgc6TEbmTSITFQdJnLM770QuTdR
-         c91KXzpGjPgaX/ZJo6uxQ4z2MAjuHjSKvZcjDOS9bP3f198zaE1eW0140/qQiNCNazUn
-         RJomDJKecJdfe65g/1abkUo1Zl7W+quhWj4+4IwZaYIUHiOxcTzLlE1Af+Uvco54MLIA
-         dQrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bVCGBNAMVVzJBUyEH8AYaaJuZeDFv/AQspAXfpR7QWs=;
-        b=oSXNV133a0MczpXb27hkvnYYNI2Gu2hNpvPtXTSlfq2Ic9abz1NVUrtZaejK44U4Xx
-         5X7/GP3TAdIbmTYbIScXnRMNoeS05+mbfCY7Wd6ppzUBHKgrSqtoyb5u0wJUKP7eMA9M
-         7gamjRl+VX1CuDRdcz+DogQkK21DRc0iRN7nAuSj9XMoqhiQDAVVVAqMKQ7PWt6eLmW1
-         /VaCzoXEzUaNYX6A3Mls9+5wKGhq4h7y4h4Lrlhrg1daNVFMY3fIuJ8RWeTGWye8sU+o
-         fRNc4lSTR7WbsGYZKcO4Ro5PDG8RZhGUqmWaQAyo0qC5jJVcGEPKgfnrGNCt5iLGyRFt
-         sSGA==
-X-Gm-Message-State: AOAM533IFwH71sm8OUqA9TPzTgg2gSg6SpOg76QQ+OIfLvdq7PCSh3SZ
-        QzRkgG40uXPUis5HURY8nAFblW+tcSWpwfA4vBq9Vw==
-X-Google-Smtp-Source: ABdhPJxAl2Be/hK5NnkGkpXO2GQ9KziacpATXhsXKpvvVg2BuS4BDxq29uLM52C/E3EyVpoHnBW9WWKjtAa5gKfsGeQ=
-X-Received: by 2002:a9d:638c:: with SMTP id w12mr10791348otk.251.1592823994787;
- Mon, 22 Jun 2020 04:06:34 -0700 (PDT)
+        id S1728105AbgFVMDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 08:03:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60388 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726889AbgFVMDN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 08:03:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592827393;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bVZM5JCuZkIi5xnj5bE3R/j/IYiq0+TYez1QiVgCgow=;
+        b=TzFMjgtgWs0Qpb+/5FjB8F9QZeHmoDUDjw0uQjgHLU4N9uzqej6szP1RTv9tgR/sX6sMDb
+        uieXHs0/R0VKmRGpLHlA1IDwUyPKS9rNndriQp9r9EM7vtg3+v0kK/WBLzbaNd2Uv6vWr2
+        FTz6NJ2L/HBf0ssQbrBQRoqrT/CpIF8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-EnuZ-F8lNi-ouCQj2c7U3Q-1; Mon, 22 Jun 2020 08:03:11 -0400
+X-MC-Unique: EnuZ-F8lNi-ouCQj2c7U3Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B3728014D4;
+        Mon, 22 Jun 2020 12:03:09 +0000 (UTC)
+Received: from gondolin (ovpn-113-56.ams2.redhat.com [10.36.113.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D5742100238C;
+        Mon, 22 Jun 2020 12:02:56 +0000 (UTC)
+Date:   Mon, 22 Jun 2020 14:02:54 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
+        dgilbert@redhat.com, frankja@linux.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
+        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
+        pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
+        qemu-s390x@nongnu.org
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+Message-ID: <20200622140254.0dbe5d8c.cohuck@redhat.com>
+In-Reply-To: <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+        <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
+        <20200619114526.6a6f70c6.cohuck@redhat.com>
+        <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
+        <20200619120530.256c36cb.cohuck@redhat.com>
+        <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <000000000000c25ce105a8a8fcd9@google.com> <20200622094923.GP576888@hirez.programming.kicks-ass.net>
-In-Reply-To: <20200622094923.GP576888@hirez.programming.kicks-ass.net>
-From:   Marco Elver <elver@google.com>
-Date:   Mon, 22 Jun 2020 13:06:23 +0200
-Message-ID: <CANpmjNMJL2euWekeJ-pRcW7-BQaDCmfCSr=8Z3Mfnz-ugtUX4g@mail.gmail.com>
-Subject: Re: linux-next build error (9)
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     syzbot <syzbot+dbf8cf3717c8ef4a90a0@syzkaller.appspotmail.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, jmattson@google.com,
-        joro@8bytes.org, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        sean.j.christopherson@intel.com,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>, vkuznets@redhat.com,
-        wanpengli@tencent.com, "the arch/x86 maintainers" <x86@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Jun 2020 at 11:49, Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Mon, Jun 22, 2020 at 02:37:12AM -0700, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following crash on:
-> >
-> > HEAD commit:    27f11fea Add linux-next specific files for 20200622
-> > git tree:       linux-next
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=138dc743100000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=41c659db5cada6f4
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=dbf8cf3717c8ef4a90a0
-> > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> >
-> > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > Reported-by: syzbot+dbf8cf3717c8ef4a90a0@syzkaller.appspotmail.com
-> >
-> > ./arch/x86/include/asm/kvm_para.h:99:29: error: inlining failed in call to always_inline 'kvm_handle_async_pf': function attribute mismatch
-> > ./arch/x86/include/asm/processor.h:824:29: error: inlining failed in call to always_inline 'prefetchw': function attribute mismatch
-> > ./arch/x86/include/asm/current.h:13:44: error: inlining failed in call to always_inline 'get_current': function attribute mismatch
-> > arch/x86/mm/fault.c:1353:1: error: inlining failed in call to always_inline 'handle_page_fault': function attribute mismatch
-> > ./arch/x86/include/asm/processor.h:576:29: error: inlining failed in call to always_inline 'native_swapgs': function attribute mismatch
-> > ./arch/x86/include/asm/fsgsbase.h:33:38: error: inlining failed in call to always_inline 'rdgsbase': function attribute mismatch
-> > ./arch/x86/include/asm/irq_stack.h:40:29: error: inlining failed in call to always_inline 'run_on_irqstack_cond': function attribute mismatch
-> > ./include/linux/debug_locks.h:15:28: error: inlining failed in call to always_inline '__debug_locks_off': function attribute mismatch
-> > ./include/asm-generic/atomic-instrumented.h:70:1: error: inlining failed in call to always_inline 'atomic_add_return': function attribute mismatch
-> > kernel/locking/lockdep.c:396:29: error: inlining failed in call to always_inline 'lockdep_recursion_finish': function attribute mismatch
-> > kernel/locking/lockdep.c:4725:5: error: inlining failed in call to always_inline '__lock_is_held': function attribute mismatch
->
-> Hurmph, I though that was cured in GCC >= 8. Marco?
+On Fri, 19 Jun 2020 12:10:13 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Yeah, time to upgrade syzbot's compiler. This experimental gcc 9.0.0
-still has the bug, but stable gcc 9 doesn't. For now, I think this
-requires no fixes on the kernel side.
+> On 19.06.20 12:05, Cornelia Huck wrote:
+> > On Fri, 19 Jun 2020 11:56:49 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >>>>> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> >>>>> can be extended to cover the Intel and s390 mechanisms as well,
+> >>>>> though.      
+> >>>>
+> >>>> The only approach on s390x to not glue command line properties to the
+> >>>> cpu model would be to remove the CPU model feature and replace it by the
+> >>>> command line parameter. But that would, of course, be an incompatible break.    
+> >>>
+> >>> Yuck.
+> >>>
+> >>> We still need to provide the cpu feature to the *guest* in any case, no?    
+> >>
+> >> Yeah, but that could be wired up internally. Wouldn't consider it clean,
+> >> though (I second the "overengineered" above).  
+> > 
+> > Could an internally wired-up cpu feature be introspected? Also, what  
+> 
+> Nope. It would just be e.g., a "machine feature" indicated to the guest
+> via the STFL interface/instruction. I was tackling the introspect part
+> when asking David how to sense from upper layers. It would have to be
+> sense via a different interface as it would not longer be modeled as
+> part of CPU features in QEMU.
+> 
+> > happens if new cpu features are introduced that have a dependency on or
+> > a conflict with this one?  
+> 
+> Conflict: bail out in QEMU when incompatible options are specified.
+> Dependency: warn and continue/fixup (e.g., mask off?)
 
-Thanks,
--- Marco
+Masking off would likely be surprising to the user.
+
+> Not clean I think.
+
+I agree.
+
+Still unsure how to bring this new machine property and the cpu feature
+together. Would be great to have the same interface everywhere, but
+having two distinct command line objects depend on each other sucks.
+Automatically setting the feature bit if pv is supported complicates
+things further.
+
+(Is there any requirement that the machine object has been already set
+up before the cpu features are processed? Or the other way around?)
+
+Does this have any implications when probing with the 'none' machine?
+
