@@ -2,104 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E275202F7C
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 07:27:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECD9B203017
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 09:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731162AbgFVF1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 01:27:14 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:56048 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725934AbgFVF1M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jun 2020 01:27:12 -0400
-Received: by mail-il1-f197.google.com with SMTP id l20so11219646ilk.22
-        for <kvm@vger.kernel.org>; Sun, 21 Jun 2020 22:27:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=WAbF95MgN8ZYZsWID6ErjvPvo/yEVx8gXF6X3UgNnwE=;
-        b=WXCqiZVOWUuLVbXCKvPFwP+AuoMIPIW+60OaMs/rIR6fkMiTWpSUM/gE41FhFwju70
-         bDyJrNyvrqouJPc6HOb+gefWpfOLQppcncWOwIEtvPwAJbI7z7evmEOeiL+hAJCfRdTh
-         jllbH0TA8xQHCRYWQGir/gZvHtDnVVR/8b+TcDffd7k01UM0sHP2IoV3+8ueARafaI4y
-         YBbGIRleIftmmHG4RJ3WgwNm2mG5ABSi9x0kYg8/cfRMDctgX8hYhjTLfh1KdGsrlaai
-         4x7/1D60OfO5EaoGwkULQ07kbW1Le/XSI6ZSF6uNEy9yq9UxJLDTyOJUD7FRr2gcjniE
-         GerQ==
-X-Gm-Message-State: AOAM533OOaNwg5FlEixo5pfe7Y6+XTHS2+D9x5epvWsy5YE+BJdq4WUf
-        kogg8ivrs89yWGSHYnTELB8+zSaPjdxWFkWEMH1enMg8zOlq
-X-Google-Smtp-Source: ABdhPJx1d2x8MplJ7qZiLPqN7qsCGSk24mbh9hQ0jkWLY6ngXy5/k2A7sFw9yePX9F81jEWL281xJItlf+5A1VMl9Sqtp1btximk
+        id S1731319AbgFVHHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 03:07:31 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6381 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731258AbgFVHHb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 03:07:31 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 9387677F378764EFCB63;
+        Mon, 22 Jun 2020 15:07:28 +0800 (CST)
+Received: from DESKTOP-J8O3A6U.china.huawei.com (10.173.221.213) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 22 Jun 2020 15:07:22 +0800
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <alex.williamson@redhat.com>, <cohuck@redhat.com>,
+        <wanghaibin.wang@huawei.com>
+Subject: [PATCH] vfio/type1: Add conditional rescheduling after iommu map failed
+Date:   Mon, 22 Jun 2020 15:02:17 +0800
+Message-ID: <20200622070217.4768-1-zhengxiang9@huawei.com>
+X-Mailer: git-send-email 2.15.1.windows.2
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:d42:: with SMTP id d2mr16942376jak.9.1592803631022;
- Sun, 21 Jun 2020 22:27:11 -0700 (PDT)
-Date:   Sun, 21 Jun 2020 22:27:11 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009fc59f05a8a57efd@google.com>
-Subject: KASAN: null-ptr-deref Write in kvm_vcpu_halt
-From:   syzbot <syzbot+76004d8cdf5443dcd8e7@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.173.221.213]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+c5e6688752c25 ("vfio/type1: Add conditional rescheduling") missed
+a "cond_resched()" in vfio_iommu_map if iommu map failed.
 
-syzbot found the following crash on:
+This is a very tiny optimization and the case can hardly happen.
 
-HEAD commit:    7ae77150 Merge tag 'powerpc-5.8-1' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17d9bfa9100000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=be4578b3f1083656
-dashboard link: https://syzkaller.appspot.com/bug?extid=76004d8cdf5443dcd8e7
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+76004d8cdf5443dcd8e7@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: null-ptr-deref in kvm_vcpu_halt+0xea/0x110 arch/x86/kvm/x86.c:7546
-Write of size 4 at addr 0000000000000000 by task syz-executor.0/11111
-
-CPU: 1 PID: 11111 Comm: syz-executor.0 Not tainted 5.7.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1e9/0x30e lib/dump_stack.c:118
- __kasan_report mm/kasan/report.c:517 [inline]
- kasan_report+0x151/0x1d0 mm/kasan/report.c:530
- kvm_vcpu_halt+0xea/0x110 arch/x86/kvm/x86.c:7546
- </IRQ>
-==================================================================
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 11111 Comm: syz-executor.0 Tainted: G    B             5.7.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1e9/0x30e lib/dump_stack.c:118
- panic+0x264/0x7a0 kernel/panic.c:221
- end_report mm/kasan/report.c:104 [inline]
- __kasan_report mm/kasan/report.c:520 [inline]
- kasan_report+0x1c9/0x1d0 mm/kasan/report.c:530
- kvm_vcpu_halt+0xea/0x110 arch/x86/kvm/x86.c:7546
- </IRQ>
-Shutting down cpus with NMI
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
-
-
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/vfio/vfio_iommu_type1.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 5e556ac9102a..48fb9cc4a40a 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1225,8 +1225,10 @@ static int vfio_iommu_map(struct vfio_iommu *iommu, dma_addr_t iova,
+ 	return 0;
+ 
+ unwind:
+-	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next)
++	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
+ 		iommu_unmap(d->domain, iova, npage << PAGE_SHIFT);
++		cond_resched();
++	}
+ 
+ 	return ret;
+ }
+-- 
+2.19.1
+
+
