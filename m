@@ -2,273 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C4B52033FE
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 11:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 466DB203401
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 11:51:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727038AbgFVJv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 05:51:29 -0400
-Received: from foss.arm.com ([217.140.110.172]:35490 "EHLO foss.arm.com"
+        id S1727091AbgFVJvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 05:51:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34196 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726901AbgFVJv3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jun 2020 05:51:29 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80FF41FB;
-        Mon, 22 Jun 2020 02:51:28 -0700 (PDT)
-Received: from [192.168.1.84] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C7EE93F71E;
-        Mon, 22 Jun 2020 02:51:25 -0700 (PDT)
-Subject: Re: [RFC PATCH v13 7/9] arm64/kvm: Add hypercall service for kvm ptp.
-To:     Jianyong Wu <Jianyong.Wu@arm.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
-        "john.stultz@linaro.org" <john.stultz@linaro.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "richardcochran@gmail.com" <richardcochran@gmail.com>,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Steve Capper <Steve.Capper@arm.com>,
-        Kaly Xin <Kaly.Xin@arm.com>, Justin He <Justin.He@arm.com>,
-        Wei Chen <Wei.Chen@arm.com>, nd <nd@arm.com>
-References: <20200619093033.58344-1-jianyong.wu@arm.com>
- <20200619093033.58344-8-jianyong.wu@arm.com>
- <c56a5b56-8bcb-915c-ae7e-5de92161538c@arm.com>
- <HE1PR0802MB25558F9A526C327134C7A7EEF4970@HE1PR0802MB2555.eurprd08.prod.outlook.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <f331dc59-5642-33b0-9a37-553b7f536afe@arm.com>
-Date:   Mon, 22 Jun 2020 10:51:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1726901AbgFVJvu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 05:51:50 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4A3F3206F1;
+        Mon, 22 Jun 2020 09:51:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592819509;
+        bh=rVF+9gcAfBgoO5QMjVC82HmvyQAsTljKLIObnB7+V7k=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=xlvC8uLW6kj3gouL5RXCKfImri7AfcHGBH7ugeHRWCyySAi2UdREYdkVLjAxs0ypt
+         HS6RL0eqK9MgSN9uxYIrhhZnemfCoux7AjmUJfIc5VcObBCfJH7dVboV4RgUglNIw3
+         /0g/M5fcpGdzIwV8PK2mFc/VIo2CF8OEjl/gwyXU=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jnJ7D-005H5Q-QD; Mon, 22 Jun 2020 10:51:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <HE1PR0802MB25558F9A526C327134C7A7EEF4970@HE1PR0802MB2555.eurprd08.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+Date:   Mon, 22 Jun 2020 10:51:47 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, steven.price@arm.com
+Subject: Re: [PATCH 2/4] arm64/x86: KVM: Introduce steal time cap
+In-Reply-To: <20200622084110.uosiqx3oy22lremu@kamzik.brq.redhat.com>
+References: <20200619184629.58653-1-drjones@redhat.com>
+ <20200619184629.58653-3-drjones@redhat.com>
+ <5b1e895dc0c80bef3c0653894e2358cf@kernel.org>
+ <20200622084110.uosiqx3oy22lremu@kamzik.brq.redhat.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <5a52210e5f123d52459f15c594e77bad@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, steven.price@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/06/2020 03:25, Jianyong Wu wrote:
-> Hi Steven,
-
-Hi Jianyong
-
-[...]
->>> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
->>> index db6dce3d0e23..366b0646c360 100644
->>> --- a/arch/arm64/kvm/hypercalls.c
->>> +++ b/arch/arm64/kvm/hypercalls.c
->>> @@ -3,6 +3,7 @@
->>>
->>>    #include <linux/arm-smccc.h>
->>>    #include <linux/kvm_host.h>
->>> +#include <linux/clocksource_ids.h>
->>>
->>>    #include <asm/kvm_emulate.h>
->>>
->>> @@ -11,6 +12,10 @@
->>>
->>>    int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>>    {
->>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
->>> +	struct system_time_snapshot systime_snapshot;
->>> +	u64 cycles = 0;
->>> +#endif
->>>    	u32 func_id = smccc_get_function(vcpu);
->>>    	u32 val[4] = {SMCCC_RET_NOT_SUPPORTED};
->>>    	u32 feature;
->>> @@ -70,7 +75,52 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>>    		break;
->>>    	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
->>>    		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
->>> +
->>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
->>> +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_KVM_PTP); #endif
->>> +		break;
->>> +
->>> +#ifdef CONFIG_ARM64_KVM_PTP_HOST
->>> +	/*
->>> +	 * This serves virtual kvm_ptp.
->>> +	 * Four values will be passed back.
->>> +	 * reg0 stores high 32-bit host ktime;
->>> +	 * reg1 stores low 32-bit host ktime;
->>> +	 * reg2 stores high 32-bit difference of host cycles and cntvoff;
->>> +	 * reg3 stores low 32-bit difference of host cycles and cntvoff.
->>> +	 */
->>> +	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
->>> +		/*
->>> +		 * system time and counter value must captured in the same
->>> +		 * time to keep consistency and precision.
->>> +		 */
->>> +		ktime_get_snapshot(&systime_snapshot);
->>> +		if (systime_snapshot.cs_id != CSID_ARM_ARCH_COUNTER)
->>> +			break;
->>> +		val[0] = upper_32_bits(systime_snapshot.real);
->>> +		val[1] = lower_32_bits(systime_snapshot.real);
->>> +		/*
->>> +		 * which of virtual counter or physical counter being
->>> +		 * asked for is decided by the first argument of smccc
->>> +		 * call. If no first argument or invalid argument, zero
->>> +		 * counter value will return;
->>> +		 */
->>
->> It's not actually possible to have "no first argument" - there's no argument
->> count, so whatever is in the register during the call with be passed. I'd also
->> caution that "first argument" is ambigious: r0 could be the 'first' but is also the
->> function number, here you mean r1.
->>
-> Sorry,  I really make mistake here, I really mean no r1 value.
-
-My point is that it's not possible to have "no r1 value" - r1 always has 
-a value. So you can have an "invalid argument" (r1 has a value which 
-isn't valid), but it's not possible to have "no first argument". It 
-would only be possible to have no argument if the interface told us how 
-many arguments were valid, but SMCCC doesn't do that.
-
->> There's also a subtle cast to 32 bits here (feature is u32), which might be
->> worth a comment before someone 'optimises' by removing the 'feature'
->> variable.
->>
-> Yeah, it's better to add a note, but I think it's better add it at the first time calling smccc_get_arg1.
-> WDYT?
-
-I'm a bit confused about where exactly you were suggesting. The 
-assignment (and implicit cast) are just below, so this comment block 
-seemed a sensible place to add the note. But I don't really mind exactly 
-where you put it (as long as it's close), it's just a subtle detail that 
-might get lost if there isn't a comment.
-
->> Finally I'm not sure if zero counter value is best - would it not be possible for
->> this to be a valid counter value?
+On 2020-06-22 09:41, Andrew Jones wrote:
+> On Mon, Jun 22, 2020 at 09:20:02AM +0100, Marc Zyngier wrote:
+>> Hi Andrew,
+>> 
+>> On 2020-06-19 19:46, Andrew Jones wrote:
+>> > arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
+>> > support for steal time. However this is unnecessary and complicates
+>> > userspace (userspace may prefer delaying vcpu creation until after
+>> > feature probing). Since probing steal time only requires a KVM fd,
+>> > we introduce a cap that can be checked.
+>> 
+>> So this is purely an API convenience, right? You want a way to
+>> identify the presence of steal time accounting without having to
+>> create a vcpu? It would have been nice to have this requirement
+>> before we merged this code :-(.
 > 
-> We have two different ways to call this service in ptp_kvm guest, one needs counter cycle,  the other
-> not. So I think it's vain to return a valid counter cycle back if the ptp_kvm does not needs it.
+> Yes. I wish I had considered it more closely when I was reviewing the
+> patches. And, I believe we have yet another user interface issue that
+> I'm looking at now. Without the VCPU feature bit I'm not sure how easy
+> it will be for a migration to fail when attempting to migrate from a 
+> host
+> with steal-time enabled to one that does not support steal-time. So 
+> it's
+> starting to look like steal-time should have followed the pmu pattern
+> completely, not just the vcpu device ioctl part.
 
-Sorry, I didn't write that very clearly. What I meant is that returning 
-'0' in the case of an invalid argument might be difficult to recognise. 
-'0' may be a valid reading of a counter (e.g. reading the counter just 
-after the VM has been created if the counter increments very slowly). So 
-it may be worth using a different value when an invalid argument has 
-been specified. E.g. an "all ones" (-1) value may be more recognisable.
+Should we consider disabling steal time altogether until this is worked 
+out?
 
-In practice most counters increment fast enough that this may not 
-actually be an issue, but this sort of thing is a pain to fix if it 
-becomes a problem in the future.
-
->>
->>> +		feature = smccc_get_arg1(vcpu);
->>> +		switch (feature) {
->>> +		case ARM_PTP_VIRT_COUNTER:
->>> +			cycles = systime_snapshot.cycles -
->>> +			vcpu_vtimer(vcpu)->cntvoff;
->>
->> Please indent the continuation line so that it's obvious.
-> Ok,
+>> 
+>> > Additionally, when probing
+>> > steal time we should check delayacct_on, because even though
+>> > CONFIG_KVM selects TASK_DELAY_ACCT, it's possible for the host
+>> > kernel to have delay accounting disabled with the 'nodelayacct'
+>> > command line option. x86 already determines support for steal time
+>> > by checking delayacct_on and can already probe steal time support
+>> > with a kvm fd (KVM_GET_SUPPORTED_CPUID), but we add the cap there
+>> > too for consistency.
+>> >
+>> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+>> > ---
+>> >  Documentation/virt/kvm/api.rst | 11 +++++++++++
+>> >  arch/arm64/kvm/arm.c           |  3 +++
+>> >  arch/x86/kvm/x86.c             |  3 +++
+>> >  include/uapi/linux/kvm.h       |  1 +
+>> >  4 files changed, 18 insertions(+)
+>> >
+>> > diff --git a/Documentation/virt/kvm/api.rst
+>> > b/Documentation/virt/kvm/api.rst
+>> > index 9a12ea498dbb..05b1fdb88383 100644
+>> > --- a/Documentation/virt/kvm/api.rst
+>> > +++ b/Documentation/virt/kvm/api.rst
+>> > @@ -6151,3 +6151,14 @@ KVM can therefore start protected VMs.
+>> >  This capability governs the KVM_S390_PV_COMMAND ioctl and the
+>> >  KVM_MP_STATE_LOAD MP_STATE. KVM_SET_MP_STATE can fail for protected
+>> >  guests when the state change is invalid.
+>> > +
+>> > +8.24 KVM_CAP_STEAL_TIME
+>> > +-----------------------
+>> > +
+>> > +:Architectures: arm64, x86
+>> > +
+>> > +This capability indicates that KVM supports steal time accounting.
+>> > +When steal time accounting is supported it may be enabled with
+>> > +architecture-specific interfaces.  For x86 see
+>> > +Documentation/virt/kvm/msr.rst "MSR_KVM_STEAL_TIME".  For arm64 see
+>> > +Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL"
+>> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> > index 90cb90561446..f6dca6d09952 100644
+>> > --- a/arch/arm64/kvm/arm.c
+>> > +++ b/arch/arm64/kvm/arm.c
+>> > @@ -222,6 +222,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>> > long ext)
+>> >  		 */
+>> >  		r = 1;
+>> >  		break;
+>> > +	case KVM_CAP_STEAL_TIME:
+>> > +		r = sched_info_on();
+>> > +		break;
+>> >  	default:
+>> >  		r = kvm_arch_vm_ioctl_check_extension(kvm, ext);
+>> >  		break;
+>> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> > index 00c88c2f34e4..ced6335e403e 100644
+>> > --- a/arch/x86/kvm/x86.c
+>> > +++ b/arch/x86/kvm/x86.c
+>> > @@ -3533,6 +3533,9 @@ int kvm_vm_ioctl_check_extension(struct kvm
+>> > *kvm, long ext)
+>> >  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+>> >  		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
+>> >  		break;
+>> > +	case KVM_CAP_STEAL_TIME:
+>> > +		r = sched_info_on();
+>> > +		break;
+>> >  	default:
+>> >  		break;
+>> >  	}
+>> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> > index 4fdf30316582..121fb29ac004 100644
+>> > --- a/include/uapi/linux/kvm.h
+>> > +++ b/include/uapi/linux/kvm.h
+>> > @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
+>> >  #define KVM_CAP_PPC_SECURE_GUEST 181
+>> >  #define KVM_CAP_HALT_POLL 182
+>> >  #define KVM_CAP_ASYNC_PF_INT 183
+>> > +#define KVM_CAP_STEAL_TIME 184
+>> >
+>> >  #ifdef KVM_CAP_IRQ_ROUTING
+>> 
+>> Shouldn't you also add the same check of sched_info_on() to
+>> the various pvtime attribute handling functions? It feels odd
+>> that the capability can say "no", and yet we'd accept userspace
+>> messing with the steal time parameters...
 > 
->>
->>> +			break;
->>> +		case ARM_PTP_PHY_COUNTER:
->>> +			cycles = systime_snapshot.cycles;
->>> +			break;
->>> +		}
->>> +		val[2] = upper_32_bits(cycles);
->>> +		val[3] = lower_32_bits(cycles);
->>>    		break;
->>> +#endif
->>> +
->>>    	default:
->>>    		return kvm_psci_call(vcpu);
->>>    	}
->>> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
->>> index 86ff30131e7b..e593ec515f82 100644
->>> --- a/include/linux/arm-smccc.h
->>> +++ b/include/linux/arm-smccc.h
->>> @@ -98,6 +98,9 @@
->>>
->>>    /* KVM "vendor specific" services */
->>>    #define ARM_SMCCC_KVM_FUNC_FEATURES		0
->>> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP		1
->>> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY		2
->>> +#define ARM_SMCCC_KVM_FUNC_KVM_PTP_VIRT		3
->>>    #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
->>>    #define ARM_SMCCC_KVM_NUM_FUNCS			128
->>>
->>> @@ -107,6 +110,33 @@
->>>    			   ARM_SMCCC_OWNER_VENDOR_HYP,
->> 		\
->>>    			   ARM_SMCCC_KVM_FUNC_FEATURES)
->>>
->>> +/*
->>> + * kvm_ptp is a feature used for time sync between vm and host.
->>> + * kvm_ptp module in guest kernel will get service from host using
->>> + * this hypercall ID.
->>> + */
->>> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
->> 		\
->>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
->> 		\
->>> +			   ARM_SMCCC_SMC_32,
->> 	\
->>> +			   ARM_SMCCC_OWNER_VENDOR_HYP,
->> 		\
->>> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP)
->>> +
->>> +/*
->>> + * kvm_ptp may get counter cycle from host and should ask for which
->>> +of
->>> + * physical counter or virtual counter by using ARM_PTP_PHY_COUNTER
->>> +and
->>> + * ARM_PTP_VIRT_COUNTER explicitly.
->>> + */
->>> +#define ARM_PTP_PHY_COUNTER
->> 	\
->>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
->> 		\
->>> +			   ARM_SMCCC_SMC_32,
->> 	\
->>> +			   ARM_SMCCC_OWNER_VENDOR_HYP,
->> 		\
->>> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP_PHY)
->>> +
->>> +#define ARM_PTP_VIRT_COUNTER
->> 	\
->>> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,
->> 		\
->>> +			   ARM_SMCCC_SMC_32,
->> 	\
->>> +			   ARM_SMCCC_OWNER_VENDOR_HYP,
->> 		\
->>> +			   ARM_SMCCC_KVM_FUNC_KVM_PTP_VIRT)
->>
->> These two are not SMCCC calls themselves (just parameters to an SMCCC),
->> so they really shouldn't be defined using ARM_SMCCC_CALL_VAL (it's just
->> confusing and unnecessary). Can we not just pick small integers (e.g. 0 and 1)
->> for these?
->>
-> Yeah, I think so, it's better to define these parameters ID as single number and not related to
-> SMCCC. What about keep these 2 macros and define it directly as a number in include/linux/arm-smccc.h.
+> I considered that, but the 'has attr' interface is really only asking
+> if the interface exists, not if it should be used. I'm not sure what
+> we should do about it other than document that the cap needs to say
+> it's usable, rather than just the attr presence. But, since we've had
+> the attr merged quite a while without the cap, then maybe we can't
+> rely on a doc change alone?
 
-Yes that sounds good.
-
->> We also need some documentation of these SMCCC calls somewhere which
->> would make this sort of review easier. For instance for paravirtualised stolen
->> time there is Documentation/virt/kvm/arm/pvtime.rst (which also links to
->> the published document from Arm).
->>
-> Good point, a documentation is needed to explain these new SMCCC funcs.
-> Do you think we should do that in this patch serial? Does it beyond the scope of this patch set?
-
-Adding it in this patch series seems like the right place to me.
+Accepting the pvtime attributes (setting up the per-vcpu area) has two
+effects: we promise both the guest and userspace that we will provide
+the guest with steal time. By not checking sched_info_on(), we lie to
+both, with potential consequences. It really feels like a bug.
 
 Thanks,
 
-Steve
+          M.
+-- 
+Jazz is not dead. It just smells funny...
