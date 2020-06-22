@@ -2,107 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95AEA2039B0
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 16:37:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 038992039FD
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 16:51:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729441AbgFVOhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 10:37:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45576 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729377AbgFVOhM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jun 2020 10:37:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592836630;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rhaA+I0JFMBynaEViVLcWDggNAbJpIVf0sPk39R0QYE=;
-        b=GSQwoEhs8Q4sbDE3us0RhSKS91aF9N3ibXkaMCD8TxI1xD0pFMu+xNSfkV0QNTLW0JUBMn
-        zi0pk7qWGilKHhe46VTxEPQ+exXcFCF19q5UvyOo3r7JjVBAUweNT6YFi7Khlw3ZrgE+39
-        UdlNINJwawZZVm16GCpRjtW9YLMWABM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-az20D47rNQa8LaHRoZP1nQ-1; Mon, 22 Jun 2020 10:37:09 -0400
-X-MC-Unique: az20D47rNQa8LaHRoZP1nQ-1
-Received: by mail-wr1-f70.google.com with SMTP id o25so9039129wro.16
-        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 07:37:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rhaA+I0JFMBynaEViVLcWDggNAbJpIVf0sPk39R0QYE=;
-        b=YHEEDFXu99z0ZYKFTuZ9kD8q3OQ1dvKoEa4yhScXy3huweb+xKhpn4myn2f1KxqqhM
-         8ZvlEfMaZIYtXCal46b9EMzeltlYRS/vjxaWcYmime1IdneyvPo6USUPgjuDKssgD3N6
-         sPdYo9NXsbpjJop1tv7w1pknov7wGQm9Qa/kkdHzhQVOFFEqU1W3oB4Ep+/UBDgfrsi2
-         TENFkDQMF2tRyTfgqDSBYDwmOM+uEmdkvr6UG+lQ5fXmy4LmZjnHml4dMsRHbj1dvB9r
-         3D9R6VGCUuQFJwMbRjsHrDSJElTNjsi5OQNzY3ZCtNnhL8f8DjOUM4Reqy12o8bmz+WY
-         YoiA==
-X-Gm-Message-State: AOAM531efYgX5fmtRb5hgTRCvnxjh2ijRFVQGR8gj3GUwYiBib9Yo0nU
-        MSp09JMO/sD5CmAJEd1D3D/2FQrjKArYVV9iBls2f/cX8EZSSNT8E99D4B580qJxAXRTWive1e4
-        TY/2uFFxIcat3
-X-Received: by 2002:a05:600c:2317:: with SMTP id 23mr19095312wmo.139.1592836627930;
-        Mon, 22 Jun 2020 07:37:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJztqu1oKbzSSjrl7L3+QyPP72A21fy7XJuosE7miCXFYthUAfyXzD1V8PIxlT2RSA76DOqswg==
-X-Received: by 2002:a05:600c:2317:: with SMTP id 23mr19095292wmo.139.1592836627759;
-        Mon, 22 Jun 2020 07:37:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:fd64:dd90:5ad5:d2e1? ([2001:b07:6468:f312:fd64:dd90:5ad5:d2e1])
-        by smtp.gmail.com with ESMTPSA id w7sm12908477wmc.32.2020.06.22.07.37.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jun 2020 07:37:07 -0700 (PDT)
-Subject: Re: [PATCH v3] KVM: LAPIC: Recalculate apic map in batch
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1582684862-10880-1-git-send-email-wanpengli@tencent.com>
- <20200619143626.1b326566@redhat.com>
- <3e025538-297b-74e5-f1b1-2193b614978b@redhat.com>
- <20200622002637.33358827@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cc8b429e-74dd-70f1-8f1c-8893a5485e76@redhat.com>
-Date:   Mon, 22 Jun 2020 16:37:06 +0200
+        id S1729187AbgFVOvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 10:51:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16080 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729128AbgFVOvA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 10:51:00 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05MEWaWr188097;
+        Mon, 22 Jun 2020 10:51:00 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31sk2rbjc0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Jun 2020 10:50:59 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05MEWbXS188142;
+        Mon, 22 Jun 2020 10:50:51 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31sk2rbj9c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Jun 2020 10:50:50 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05MEeKc2003140;
+        Mon, 22 Jun 2020 14:50:45 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 31sa37ugwq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Jun 2020 14:50:45 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05MEogxO37093470
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Jun 2020 14:50:42 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9380711C05C;
+        Mon, 22 Jun 2020 14:50:42 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1F5A011C04A;
+        Mon, 22 Jun 2020 14:50:42 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.75.158])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 22 Jun 2020 14:50:42 +0000 (GMT)
+Subject: Re: [PATCH v8 2/2] s390/kvm: diagnose 0x318 sync and reset
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Collin Walling <walling@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, thuth@redhat.com
+References: <20200618222222.23175-1-walling@linux.ibm.com>
+ <20200618222222.23175-3-walling@linux.ibm.com>
+ <20200622122456.781492a8.cohuck@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <43967a50-a69c-face-805d-7cc935d3f230@de.ibm.com>
+Date:   Mon, 22 Jun 2020 16:50:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200622002637.33358827@redhat.com>
+In-Reply-To: <20200622122456.781492a8.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-22_08:2020-06-22,2020-06-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0
+ cotscore=-2147483648 mlxscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 spamscore=0 phishscore=0 impostorscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006220111
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/06/20 00:26, Igor Mammedov wrote:
+
+
+On 22.06.20 12:24, Cornelia Huck wrote:
+> On Thu, 18 Jun 2020 18:22:22 -0400
+> Collin Walling <walling@linux.ibm.com> wrote:
 > 
-> following sequence looks like a race that can cause lost map update events:
+>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
+>> the VM is running in (Linux, z/VM, etc) and is observed via
+>> firmware/service events.
+>>
+>> This is a privileged s390x instruction that must be intercepted by
+>> SIE. Userspace handles the instruction as well as migration. Data
+>> is communicated via VCPU register synchronization.
+>>
+>> The Control Program Name Code (CPNC) is stored in the SIE block. The
+>> CPNC along with the Control Program Version Code (CPVC) are stored
+>> in the kvm_vcpu_arch struct.
+>>
+>> The CPNC is shadowed/unshadowed in VSIE.
+>>
+>> This data is reset on load normal and clear resets.
+>>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>>  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
+>>  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
+>>  arch/s390/kvm/vsie.c             |  3 +++
+>>  include/uapi/linux/kvm.h         |  1 +
+>>  5 files changed, 21 insertions(+), 3 deletions(-)
+>>
 > 
->          cpu1                            cpu2
->                              
->                                 apic_map_dirty = true     
->   ------------------------------------------------------------   
->                                 kvm_recalculate_apic_map:
->                                      pass check
->                                          mutex_lock(&kvm->arch.apic_map_lock);
->                                          if (!kvm->arch.apic_map_dirty)
->                                      and in process of updating map
->   -------------------------------------------------------------
->     other calls to
->        apic_map_dirty = true         might be too late for affected cpu
->   -------------------------------------------------------------
->                                      apic_map_dirty = false
->   -------------------------------------------------------------
->     kvm_recalculate_apic_map:
->     bail out on
->       if (!kvm->arch.apic_map_dirty)
+> (...)
+> 
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 4fdf30316582..35cdb4307904 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_PPC_SECURE_GUEST 181
+>>  #define KVM_CAP_HALT_POLL 182
+>>  #define KVM_CAP_ASYNC_PF_INT 183
+>> +#define KVM_CAP_S390_DIAG318 184
+> 
+> Do we strictly need this new cap, or would checking against the sync
+> regs capabilities be enough?
 
-I will post a fix for that.  Thanks for the analysis!
+We could check the sync_regs valid field to decide about the sync. We do
+that for ETOKEN as well and QEMU also uses it in handle_diag_318.
 
-Paolo
-
+I think what this is used for is actually to tell the QEMU CPU model
+if this is there. And for that the sync_reg validity seems wrong. So better
+keep the CAP?
