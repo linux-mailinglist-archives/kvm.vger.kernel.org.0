@@ -2,127 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 220C4203CDC
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 18:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 359AF203D0B
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 18:48:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729655AbgFVQqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 12:46:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37368 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729309AbgFVQp7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 12:45:59 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05MG6rdD184226;
-        Mon, 22 Jun 2020 12:45:58 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31tys216yn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 12:45:58 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05MGHxpp011500;
-        Mon, 22 Jun 2020 12:45:58 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31tys216yh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 12:45:58 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05MGjejp007622;
-        Mon, 22 Jun 2020 16:45:57 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma02dal.us.ibm.com with ESMTP id 31t35bkup9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 16:45:57 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05MGjqJc20316564
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Jun 2020 16:45:52 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE4DFBE04F;
-        Mon, 22 Jun 2020 16:45:53 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B794ABE051;
-        Mon, 22 Jun 2020 16:45:52 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.169.243])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Mon, 22 Jun 2020 16:45:52 +0000 (GMT)
-Subject: Re: [PATCH v9 2/2] s390/kvm: diagnose 0x318 sync and reset
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
-References: <20200622154636.5499-1-walling@linux.ibm.com>
- <20200622154636.5499-3-walling@linux.ibm.com>
- <20200622180459.4cf7cbf4.cohuck@redhat.com>
- <93bd30de-2cd0-a044-4e9b-05b1eda9acb3@linux.ibm.com>
- <cda0b27f-ec26-e596-9814-c4ce81915bcb@linux.ibm.com>
- <20200622183512.3547d21b.cohuck@redhat.com>
-From:   Collin Walling <walling@linux.ibm.com>
-Message-ID: <effbf851-452b-bdf0-6455-3df2ec0b9a87@linux.ibm.com>
-Date:   Mon, 22 Jun 2020 12:45:51 -0400
+        id S1729783AbgFVQsG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 12:48:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47543 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729519AbgFVQsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 12:48:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592844484;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iOeVX/Nmmhafg16NYOvc8EUfqW7AqnkiAPvBHza8Wys=;
+        b=I7ephK6GXcHf8eWXoVjc/mnJCJ+zqtb8YGgdBBbWNPXp8ROKPStHwnoEXUV+XFO8mlctMC
+        ZUBAh4HJAWywChQLr16kSq7zbOoaehR3zRZ6OzcQRPUqpqR5ZNwwR8at3GHYXlloU+cGa1
+        2WTxTwx7hxmzFzVZCxBvjBj2VwjZTxc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-3joIunGvNyyp6mU43_Ux3A-1; Mon, 22 Jun 2020 12:47:59 -0400
+X-MC-Unique: 3joIunGvNyyp6mU43_Ux3A-1
+Received: by mail-wm1-f72.google.com with SMTP id b63so213006wme.1
+        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 09:47:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iOeVX/Nmmhafg16NYOvc8EUfqW7AqnkiAPvBHza8Wys=;
+        b=ek3Fiy9lo9uSBwMejJeH8UByfXPkvWjBaQJXrCkz60FoRBSuj844xFvk69xs9vlyrI
+         eRyX1WYbN3xuiwSrzzE76JDgpm9dHUW2WXi8sEYWEkXhCHuNhFPny9m+G4NRpTlRtOE4
+         dyl+Xm6Nhv6YPjRwFHnilGmS5Ff/qSQo66yUeNKPMLXJrAt32NBHrEFKu/ScgVR76YQj
+         zPrG4f3fC2Cihn951U6a+nxLwwgO/z6RHS/xK4D7tuPon6BlVANf1jv2z4UptFHX1kUb
+         Wj50EK34cFNAtbXH/aLwXd2eBfbm1bN93FHBgNcxVIHGYvwoFbtbvHo5nw4O0lv4pI31
+         jdeg==
+X-Gm-Message-State: AOAM533jy1O5jFnNK6xDn9B04pMc3ujwVzJkYYUsUpdRmj03E9pe0a7/
+        xznPYiA+itsyJjtpudaC7at2GLcb9RS11VOTvhgK+GQ/+uV1j2RJnh5/vv555CLcSRDS5Pt2stE
+        O+fMTxgVAkhUg
+X-Received: by 2002:a05:600c:d5:: with SMTP id u21mr13001288wmm.156.1592844478704;
+        Mon, 22 Jun 2020 09:47:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwHLwyIASJ1NU8MCn0vyMb6gJ0n7NqOi3eUC+ZSx8IQnYJvHUsEt91e44yFMyg/Pc1Zq7UIrg==
+X-Received: by 2002:a05:600c:d5:: with SMTP id u21mr13001265wmm.156.1592844478401;
+        Mon, 22 Jun 2020 09:47:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:fd64:dd90:5ad5:d2e1? ([2001:b07:6468:f312:fd64:dd90:5ad5:d2e1])
+        by smtp.gmail.com with ESMTPSA id j14sm18864654wrs.75.2020.06.22.09.47.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jun 2020 09:47:57 -0700 (PDT)
+Subject: Re: [PATCH] kvm: lapic: fix broken vcpu hotplug
+To:     Igor Mammedov <imammedo@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        kvm@vger.kernel.org, wanpengli@tencent.com
+References: <20200622160830.426022-1-imammedo@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c00acf88-0655-686e-3b8c-7aad03791f20@redhat.com>
+Date:   Mon, 22 Jun 2020 18:47:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200622183512.3547d21b.cohuck@redhat.com>
+In-Reply-To: <20200622160830.426022-1-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-22_09:2020-06-22,2020-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 adultscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
- suspectscore=0 impostorscore=0 cotscore=-2147483648 phishscore=0
- malwarescore=0 mlxlogscore=999 mlxscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006220117
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/22/20 12:35 PM, Cornelia Huck wrote:
-> On Mon, 22 Jun 2020 12:23:45 -0400
-> Collin Walling <walling@linux.ibm.com> wrote:
+On 22/06/20 18:08, Igor Mammedov wrote:
+> Guest fails to online hotplugged CPU with error
+>   smpboot: do_boot_cpu failed(-1) to wakeup CPU#4
 > 
->> Mind if I get some early feedback for the first run? How does this sound:
->>
->> 8.24 KVM_CAP_S390_DIAG318
->> -------------------------
->>
->> :Architecture: s390
->>
->> This capability allows for information regarding the control program
->> that may be observed via system/firmware service events. The
->> availability of this capability indicates that KVM handling of the
->> register synchronization, reset, and VSIE shadowing of the DIAGNOSE
->> 0x318 related information is present.
->>
->> The information associated with the instruction is an 8-byte value
->> consisting of a one-byte Control Program Name Code (CPNC), and a 7-byte
->> Control Program Version Code (CPVC). The CPNC determines what
->> environment the control program is running in (e.g. Linux, z/VM...), and
->> the CPVC is used for extraneous information specific to OS (e.g. Linux
->> version, Linux distribution...)
->>
->> The CPNC must be stored in the SIE block for the CPU that executes the
->> diag instruction, which is communicated from userspace to KVM via
->> register synchronization using the KVM_SYNC_DIAG318 flag. Both codes are
->> stored together in the kvm_vcpu_arch struct.
+> It's caused by the fact that kvm_apic_set_state(), which used to call
+> recalculate_apic_map() unconditionally and pulled hotplugged CPU into
+> apic map, is updating map conditionally [1] on state change which doesn't
+> happen in this case and apic map update is skipped.
 > 
-> Hm... what about replacing that last paragraph with
+> Note:
+> new CPU during kvm_arch_vcpu_create() is not visible to
+> kvm_recalculate_apic_map(), so all related update calls endup
+> as NOP and only follow up kvm_apic_set_state() used to trigger map
+> update that counted in hotplugged CPU.
+> Fix issue by forcing unconditional update from kvm_apic_set_state(),
+> like it used to be.
 > 
-> "If this capability is available, the CPNC and CPVC are available for
-> synchronization between KVM and userspace via the sync regs mechanism
-> (KVM_SYNC_DIAG318)."
+> 1)
+> Fixes: (4abaffce4d25a KVM: LAPIC: Recalculate apic map in batch)
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> PS:
+> it's alternative to full revert of [1], I've posted earlier
+> https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2205600.html
+> so fii free to pick up whatever is better by now
+> ---
+>  arch/x86/kvm/lapic.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> ?
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 34a7e0533dad..5696831d4005 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2556,6 +2556,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+>  	struct kvm_lapic *apic = vcpu->arch.apic;
+>  	int r;
+>  
+> +	apic->vcpu->kvm->arch.apic_map_dirty = true;
+>  	kvm_lapic_set_base(vcpu, vcpu->arch.apic_base);
+>  	/* set SPIV separately to get count of SW disabled APICs right */
+>  	apic_set_spiv(apic, *((u32 *)(s->regs + APIC_SPIV)));
 > 
 
-I like it!
+Queued, but it's better to set apic_map_dirty just before the call to
+kvm_recalculate_apic_map, or you can have a variant of the race that you
+pointed out.
 
--- 
-Regards,
-Collin
+Paolo
 
-Stay safe and stay healthy
