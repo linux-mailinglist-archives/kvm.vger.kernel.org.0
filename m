@@ -2,104 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5BF62034C2
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 12:25:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDBC12034C5
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 12:25:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbgFVKZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 06:25:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56100 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726841AbgFVKZO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jun 2020 06:25:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592821512;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Jxlew434ZREQ+yaO+wj/+fLKjUJf2xES+lf3Lg2HMoA=;
-        b=YNi0dKtcgxZ/N5AHbLrJjyY6oK/MeFWxcruZ5RCnRn3hndE7ItuLQMU/8AQ/zyfPUj5W4n
-        Bsyt6QCZWh03vfOtEekKinrRfBPxueDl5HcQ8+gUJrWeJTprhVn7TuvXzQY0G/T3CGHJf/
-        tTPUXuO8a+HLyfvhahTY4l1ul81gOic=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-ue5_nad-MOSQtgb8DlVwhQ-1; Mon, 22 Jun 2020 06:25:11 -0400
-X-MC-Unique: ue5_nad-MOSQtgb8DlVwhQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727869AbgFVKZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 06:25:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47140 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727082AbgFVKZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 06:25:43 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 072BE106B209;
-        Mon, 22 Jun 2020 10:25:05 +0000 (UTC)
-Received: from gondolin (ovpn-113-56.ams2.redhat.com [10.36.113.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2CD865BAF4;
-        Mon, 22 Jun 2020 10:24:59 +0000 (UTC)
-Date:   Mon, 22 Jun 2020 12:24:56 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Collin Walling <walling@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
-Subject: Re: [PATCH v8 2/2] s390/kvm: diagnose 0x318 sync and reset
-Message-ID: <20200622122456.781492a8.cohuck@redhat.com>
-In-Reply-To: <20200618222222.23175-3-walling@linux.ibm.com>
-References: <20200618222222.23175-1-walling@linux.ibm.com>
-        <20200618222222.23175-3-walling@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mail.kernel.org (Postfix) with ESMTPSA id C8D26206E2;
+        Mon, 22 Jun 2020 10:25:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592821542;
+        bh=HAvNwdYJYUv2sMuSO6XMR6c+0C8F1uKoJ7w1PIP5his=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=E6v4INaIw8GQtwIF/kjfeqXi8sJCi2DwspvfaIEZ/pouuiKtPJknhk/ppmc06Pr60
+         BM48QHcqEy+z/uMKfHvEd4Tb3Z+OvWejQzb+kqMh1eSVJWKH5orUO7RRspA9RfSHSb
+         TDieOjeUZD1avPyFPYbTGSSZAkxGfCfHN4UcM0D8=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jnJe1-005Hbf-7u; Mon, 22 Jun 2020 11:25:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Mon, 22 Jun 2020 11:25:41 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Mark Rutland <mark.rutland@arm.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Dave Martin <Dave.Martin@arm.com>, kernel-team@android.com
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Simplify PtrAuth alternative patching
+In-Reply-To: <20200622091508.GB88608@C02TD0UTHF1T.local>
+References: <20200622080643.171651-1-maz@kernel.org>
+ <20200622080643.171651-6-maz@kernel.org>
+ <20200622091508.GB88608@C02TD0UTHF1T.local>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <422da5e4a8cfb9f9d7870d0a50985e55@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, ascull@google.com, Dave.Martin@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Jun 2020 18:22:22 -0400
-Collin Walling <walling@linux.ibm.com> wrote:
+Hi Mark,
 
-> DIAGNOSE 0x318 (diag318) sets information regarding the environment
-> the VM is running in (Linux, z/VM, etc) and is observed via
-> firmware/service events.
+On 2020-06-22 10:15, Mark Rutland wrote:
+> On Mon, Jun 22, 2020 at 09:06:43AM +0100, Marc Zyngier wrote:
+>> We currently decide to execute the PtrAuth save/restore code based
+>> on a set of branches that evaluate as (ARM64_HAS_ADDRESS_AUTH_ARCH ||
+>> ARM64_HAS_ADDRESS_AUTH_IMP_DEF). This can be easily replaced by
+>> a much simpler test as the ARM64_HAS_ADDRESS_AUTH capability is
+>> exactly this expression.
+>> 
+>> Suggested-by: Mark Rutland <mark.rutland@arm.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
-> This is a privileged s390x instruction that must be intercepted by
-> SIE. Userspace handles the instruction as well as migration. Data
-> is communicated via VCPU register synchronization.
+> Looks good to me. One minor suggestion below, but either way:
 > 
-> The Control Program Name Code (CPNC) is stored in the SIE block. The
-> CPNC along with the Control Program Version Code (CPVC) are stored
-> in the kvm_vcpu_arch struct.
+> Acked-by: Mark Rutland <mark.rutland@arm.com>
 > 
-> The CPNC is shadowed/unshadowed in VSIE.
+>> ---
+>>  arch/arm64/include/asm/kvm_ptrauth.h | 26 +++++++++-----------------
+>>  1 file changed, 9 insertions(+), 17 deletions(-)
+>> 
+>> diff --git a/arch/arm64/include/asm/kvm_ptrauth.h 
+>> b/arch/arm64/include/asm/kvm_ptrauth.h
+>> index f1830173fa9e..7a72508a841b 100644
+>> --- a/arch/arm64/include/asm/kvm_ptrauth.h
+>> +++ b/arch/arm64/include/asm/kvm_ptrauth.h
+>> @@ -61,44 +61,36 @@
+>> 
+>>  /*
+>>   * Both ptrauth_switch_to_guest and ptrauth_switch_to_host macros 
+>> will
+>> - * check for the presence of one of the cpufeature flag
+>> - * ARM64_HAS_ADDRESS_AUTH_ARCH or ARM64_HAS_ADDRESS_AUTH_IMP_DEF and
+>> + * check for the presence ARM64_HAS_ADDRESS_AUTH, which is defined as
+>> + * (ARM64_HAS_ADDRESS_AUTH_ARCH || ARM64_HAS_ADDRESS_AUTH_IMP_DEF) 
+>> and
+>>   * then proceed ahead with the save/restore of Pointer Authentication
+>> - * key registers.
+>> + * key registers if enabled for the guest.
+>>   */
+>>  .macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+>> -alternative_if ARM64_HAS_ADDRESS_AUTH_ARCH
+>> +alternative_if_not ARM64_HAS_ADDRESS_AUTH
+>>  	b	1000f
+>>  alternative_else_nop_endif
+>> -alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
+>> -	b	1001f
+>> -alternative_else_nop_endif
+>> -1000:
+>>  	mrs	\reg1, hcr_el2
+>>  	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+>> -	cbz	\reg1, 1001f
+>> +	cbz	\reg1, 1000f
+>>  	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+>>  	ptrauth_restore_state	\reg1, \reg2, \reg3
+>> -1001:
+>> +1000:
+>>  .endm
 > 
-> This data is reset on load normal and clear resets.
+> Since these are in macros, we could use \@ to generate a macro-specific
+> lavel rather than a magic number, which would be less likely to 
+> conflict
+> with the surrounding environment and would be more descriptive. We do
+> that in a few places already, and here it could look something like:
 > 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h |  4 +++-
->  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
->  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
->  arch/s390/kvm/vsie.c             |  3 +++
->  include/uapi/linux/kvm.h         |  1 +
->  5 files changed, 21 insertions(+), 3 deletions(-)
+> | alternative_if_not ARM64_HAS_ADDRESS_AUTH
+> | 	b	.L__skip_pauth_switch\@
+> | alternative_else_nop_endif
+> |
+> | 	...
+> |
+> | .L__skip_pauth_switch\@:
 > 
+> Per the gas documentation
+> 
+> | \@
+> |
+> |    as maintains a counter of how many macros it has executed in this
+> |    pseudo-variable; you can copy that number to your output with 
+> ‘\@’,
+> |    but only within a macro definition.
+> 
+> No worries if you don't want to change that now; the Acked-by stands
+> either way.
 
-(...)
+I have folded in the following patch:
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4fdf30316582..35cdb4307904 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_SECURE_GUEST 181
->  #define KVM_CAP_HALT_POLL 182
->  #define KVM_CAP_ASYNC_PF_INT 183
-> +#define KVM_CAP_S390_DIAG318 184
+diff --git a/arch/arm64/include/asm/kvm_ptrauth.h 
+b/arch/arm64/include/asm/kvm_ptrauth.h
+index 7a72508a841b..0ddf98c3ba9f 100644
+--- a/arch/arm64/include/asm/kvm_ptrauth.h
++++ b/arch/arm64/include/asm/kvm_ptrauth.h
+@@ -68,29 +68,29 @@
+   */
+  .macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
+  alternative_if_not ARM64_HAS_ADDRESS_AUTH
+-	b	1000f
++	b	.L__skip_switch\@
+  alternative_else_nop_endif
+  	mrs	\reg1, hcr_el2
+  	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+-	cbz	\reg1, 1000f
++	cbz	\reg1, .L__skip_switch\@
+  	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+  	ptrauth_restore_state	\reg1, \reg2, \reg3
+-1000:
++.L__skip_switch\@:
+  .endm
 
-Do we strictly need this new cap, or would checking against the sync
-regs capabilities be enough?
+  .macro ptrauth_switch_to_host g_ctxt, h_ctxt, reg1, reg2, reg3
+  alternative_if_not ARM64_HAS_ADDRESS_AUTH
+-	b	2000f
++	b	.L__skip_switch\@
+  alternative_else_nop_endif
+  	mrs	\reg1, hcr_el2
+  	and	\reg1, \reg1, #(HCR_API | HCR_APK)
+-	cbz	\reg1, 2000f
++	cbz	\reg1, .L__skip_switch\@
+  	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
+  	ptrauth_save_state	\reg1, \reg2, \reg3
+  	add	\reg1, \h_ctxt, #CPU_APIAKEYLO_EL1
+  	ptrauth_restore_state	\reg1, \reg2, \reg3
+  	isb
+-2000:
++.L__skip_switch\@:
+  .endm
 
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
+  #else /* !CONFIG_ARM64_PTR_AUTH */
 
+
+Thanks,
+
+          M.
+-- 
+Jazz is not dead. It just smells funny...
