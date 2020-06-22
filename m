@@ -2,174 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7B37203A15
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 16:56:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FE01203A2D
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 17:00:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729250AbgFVO4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 10:56:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39756 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728954AbgFVO4M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 10:56:12 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05MEY2Qx167937;
-        Mon, 22 Jun 2020 10:56:12 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31submwky1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 10:56:12 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05MEuCxt041910;
-        Mon, 22 Jun 2020 10:56:12 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31submwkwx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 10:56:12 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05MEeI0W025911;
-        Mon, 22 Jun 2020 14:56:08 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 31sa381d67-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Jun 2020 14:56:08 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05MEu5Oq56819792
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Jun 2020 14:56:06 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E54F211C05C;
-        Mon, 22 Jun 2020 14:56:05 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 70F4B11C052;
-        Mon, 22 Jun 2020 14:56:05 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.75.158])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 22 Jun 2020 14:56:05 +0000 (GMT)
-Subject: Re: [PATCH v8 1/2] s390/setup: diag 318: refactor struct
-To:     Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
-References: <20200618222222.23175-1-walling@linux.ibm.com>
- <20200618222222.23175-2-walling@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <e3edb120-33cb-9f3a-bf05-79b3a48613fe@de.ibm.com>
-Date:   Mon, 22 Jun 2020 16:56:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1729439AbgFVPAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 11:00:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33518 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729399AbgFVO75 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 10:59:57 -0400
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407B9C061573;
+        Mon, 22 Jun 2020 07:59:57 -0700 (PDT)
+Received: by mail-wm1-x342.google.com with SMTP id r9so15190105wmh.2;
+        Mon, 22 Jun 2020 07:59:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qjSTpOx1f56iFgaO+NU8TyLZb7WbmaX8dzGpT5a8k9c=;
+        b=QdC4ageFNjGFqfuJ5zOPmcy0Zek9teeLvjDxiAasLgYKuvtzSjOhecWkqBbc45SJ9W
+         VgC46xc3TLSFCXuxzIJc/CTLCt/Vqp1OV+AHKkbsdIUXCK/MnhkGoVfeqJd7111qLDf4
+         ZPubLr7Z2ppru/kZd8ZHORwzmTRWUnCbWcT4+9dyn6/oMb6YbK5wOOSQOLENgf5HYGvw
+         iN5SYNTaEB3Jzb7+vd4LEffa3YXPgrlydmD9HyibTvpM1kjTZNxOwjV6neUezXy7rh6u
+         TQUAy5XENnnGjD3E28ifKViGlJGvXNLQPfjlaKPp4P3hJ6bQl7zLoVULgna/wof1I6Jl
+         EhOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=qjSTpOx1f56iFgaO+NU8TyLZb7WbmaX8dzGpT5a8k9c=;
+        b=JwXoPQqNtbLWrT0WNiINfzwbnwtXib0LrwwYlPA5MGyflFfX+MFX4vRNcjHgCoj2A6
+         FLlz1kAvB2S7afk4DyFDB1A5frRfkyr3S9bAGIAHNXGV1ZgAzTYj22dBtpfBL0vkP9K1
+         CwCP0vKGg8Y5UlnYSM7+UUV5UfcujTadKLJXcXvPj+H2OReNW7gXEyBPVlZapoqJtDJy
+         J7nbH2VyXLiAOOH2/jhm/kzCXIngsQ5UR0cIwElq/Q1oIuxbIhkiFblR4HTeCkrrQqt+
+         FuhFsGS4hFCSpx2GB0pkZTIy8XeWgKnDdIf1Z/d/3sB77MDIuitTuAend68hmzFj2OpN
+         n93w==
+X-Gm-Message-State: AOAM532QHZ+E3SYFNIUxa6Ata+amqeMs+gDIvQQ9PwP/wQYb8YmMd8Cj
+        bZtNBaTN//9qM2V+QNorvSHFxq28srU=
+X-Google-Smtp-Source: ABdhPJwA8xXLcqPBJmCRdS3o9ebWim/QBXgcamtIJm1bEpbBLy5MWC1znFH7T51ioAPZ8Enl5lU4ow==
+X-Received: by 2002:a7b:c7d2:: with SMTP id z18mr19420099wmk.149.1592837995575;
+        Mon, 22 Jun 2020 07:59:55 -0700 (PDT)
+Received: from donizetti.redhat.com ([2001:b07:6468:f312:fd64:dd90:5ad5:d2e1])
+        by smtp.gmail.com with ESMTPSA id 1sm13135806wmf.0.2020.06.22.07.59.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2020 07:59:54 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Igor Mammedov <imammedo@redhat.com>
+Subject: [PATCH] KVM: LAPIC: ensure APIC map is up to date on concurrent update requests
+Date:   Mon, 22 Jun 2020 16:59:53 +0200
+Message-Id: <20200622145953.41931-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-In-Reply-To: <20200618222222.23175-2-walling@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-22_08:2020-06-22,2020-06-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- suspectscore=0 mlxlogscore=999 cotscore=-2147483648 mlxscore=0
- adultscore=0 phishscore=0 spamscore=0 clxscore=1015 lowpriorityscore=0
- malwarescore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006220107
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The following race can cause lost map update events:
 
-On 19.06.20 00:22, Collin Walling wrote:
-> The diag 318 struct introduced in include/asm/diag.h can be
-> reused in KVM, so let's condense the version code fields in the
-> diag318_info struct for easier usage and simplify it until we
-> can determine how the data should be formatted.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+         cpu1                            cpu2
 
-Series looks good to me. Can you respin the 2nd patch regarding the VSIE things
-and I can then apply it.
+                                apic_map_dirty = true
+  ------------------------------------------------------------
+                                kvm_recalculate_apic_map:
+                                     pass check
+                                         mutex_lock(&kvm->arch.apic_map_lock);
+                                         if (!kvm->arch.apic_map_dirty)
+                                     and in process of updating map
+  -------------------------------------------------------------
+    other calls to
+       apic_map_dirty = true         might be too late for affected cpu
+  -------------------------------------------------------------
+                                     apic_map_dirty = false
+  -------------------------------------------------------------
+    kvm_recalculate_apic_map:
+    bail out on
+      if (!kvm->arch.apic_map_dirty)
 
+To fix it, record the beginning of an update of the APIC map in
+apic_map_dirty.  If another APIC map change switches apic_map_dirty
+back to DIRTY, kvm_recalculate_apic_map should not make it CLEAN and
+let the other caller go through the slow path.
 
-> ---
->  arch/s390/include/asm/diag.h | 6 ++----
->  arch/s390/kernel/setup.c     | 3 +--
->  2 files changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/diag.h b/arch/s390/include/asm/diag.h
-> index 0036eab14391..ca8f85b53a90 100644
-> --- a/arch/s390/include/asm/diag.h
-> +++ b/arch/s390/include/asm/diag.h
-> @@ -298,10 +298,8 @@ struct diag26c_mac_resp {
->  union diag318_info {
->  	unsigned long val;
->  	struct {
-> -		unsigned int cpnc : 8;
-> -		unsigned int cpvc_linux : 24;
-> -		unsigned char cpvc_distro[3];
-> -		unsigned char zero;
-> +		unsigned long cpnc : 8;
-> +		unsigned long cpvc : 56;
->  	};
->  };
->  
-> diff --git a/arch/s390/kernel/setup.c b/arch/s390/kernel/setup.c
-> index 5853c9872dfe..878cacfc9c3e 100644
-> --- a/arch/s390/kernel/setup.c
-> +++ b/arch/s390/kernel/setup.c
-> @@ -1021,8 +1021,7 @@ static void __init setup_control_program_code(void)
->  {
->  	union diag318_info diag318_info = {
->  		.cpnc = CPNC_LINUX,
-> -		.cpvc_linux = 0,
-> -		.cpvc_distro = {0},
-> +		.cpvc = 0,
->  	};
->  
->  	if (!sclp.has_diag318)
-> 
+Reported-by: Igor Mammedov <imammedo@redhat.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/lapic.c            | 45 +++++++++++++++++++--------------
+ 2 files changed, 27 insertions(+), 20 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1da5858501ca..d814032a81e7 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -943,7 +943,7 @@ struct kvm_arch {
+ 	atomic_t vapics_in_nmi_mode;
+ 	struct mutex apic_map_lock;
+ 	struct kvm_apic_map *apic_map;
+-	bool apic_map_dirty;
++	atomic_t apic_map_dirty;
+ 
+ 	bool apic_access_page_done;
+ 	unsigned long apicv_inhibit_reasons;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 34a7e0533dad..ef98f2fd3bbd 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -169,6 +169,18 @@ static void kvm_apic_map_free(struct rcu_head *rcu)
+ 	kvfree(map);
+ }
+ 
++/*
++ * CLEAN -> DIRTY and UPDATE_IN_PROGRESS -> DIRTY changes happen without a lock.
++ *
++ * DIRTY -> UPDATE_IN_PROGRESS and UPDATE_IN_PROGRESS -> CLEAN happen with
++ * apic_map_lock_held.
++ */
++enum {
++	CLEAN,
++	UPDATE_IN_PROGRESS,
++	DIRTY
++};
++
+ void kvm_recalculate_apic_map(struct kvm *kvm)
+ {
+ 	struct kvm_apic_map *new, *old = NULL;
+@@ -176,17 +188,13 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 	int i;
+ 	u32 max_id = 255; /* enough space for any xAPIC ID */
+ 
+-	if (!kvm->arch.apic_map_dirty) {
+-		/*
+-		 * Read kvm->arch.apic_map_dirty before
+-		 * kvm->arch.apic_map
+-		 */
+-		smp_rmb();
++	/* Read kvm->arch.apic_map_dirty before kvm->arch.apic_map.  */
++	if (atomic_read_acquire(&kvm->arch.apic_map_dirty) == CLEAN)
+ 		return;
+-	}
+ 
+ 	mutex_lock(&kvm->arch.apic_map_lock);
+-	if (!kvm->arch.apic_map_dirty) {
++	if (atomic_cmpxchg_acquire(&kvm->arch.apic_map_dirty,
++				   DIRTY, UPDATE_IN_PROGRESS) == CLEAN) {
+ 		/* Someone else has updated the map. */
+ 		mutex_unlock(&kvm->arch.apic_map_lock);
+ 		return;
+@@ -256,11 +264,11 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 			lockdep_is_held(&kvm->arch.apic_map_lock));
+ 	rcu_assign_pointer(kvm->arch.apic_map, new);
+ 	/*
+-	 * Write kvm->arch.apic_map before
+-	 * clearing apic->apic_map_dirty
++	 * Write kvm->arch.apic_map before clearing apic->apic_map_dirty.
++	 * If another update came in, leave it DIRTY.
+ 	 */
+-	smp_wmb();
+-	kvm->arch.apic_map_dirty = false;
++	atomic_cmpxchg_release(&kvm->arch.apic_map_dirty,
++			       UPDATE_IN_PROGRESS, CLEAN);
+ 	mutex_unlock(&kvm->arch.apic_map_lock);
+ 
+ 	if (old)
+@@ -282,20 +290,20 @@ static inline void apic_set_spiv(struct kvm_lapic *apic, u32 val)
+ 		else
+ 			static_key_slow_inc(&apic_sw_disabled.key);
+ 
+-		apic->vcpu->kvm->arch.apic_map_dirty = true;
++		atomic_set(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ 	}
+ }
+ 
+ static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 id)
+ {
+ 	kvm_lapic_set_reg(apic, APIC_ID, id << 24);
+-	apic->vcpu->kvm->arch.apic_map_dirty = true;
++	atomic_set(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ }
+ 
+ static inline void kvm_apic_set_ldr(struct kvm_lapic *apic, u32 id)
+ {
+ 	kvm_lapic_set_reg(apic, APIC_LDR, id);
+-	apic->vcpu->kvm->arch.apic_map_dirty = true;
++	atomic_set(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ }
+ 
+ static inline u32 kvm_apic_calc_x2apic_ldr(u32 id)
+@@ -311,7 +319,7 @@ static inline void kvm_apic_set_x2apic_id(struct kvm_lapic *apic, u32 id)
+ 
+ 	kvm_lapic_set_reg(apic, APIC_ID, id);
+ 	kvm_lapic_set_reg(apic, APIC_LDR, ldr);
+-	apic->vcpu->kvm->arch.apic_map_dirty = true;
++	atomic_set(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ }
+ 
+ static inline int apic_lvt_enabled(struct kvm_lapic *apic, int lvt_type)
+@@ -1976,7 +1984,7 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ 	case APIC_DFR:
+ 		if (!apic_x2apic_mode(apic)) {
+ 			kvm_lapic_set_reg(apic, APIC_DFR, val | 0x0FFFFFFF);
+-			apic->vcpu->kvm->arch.apic_map_dirty = true;
++			atomic_set(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ 		} else
+ 			ret = 1;
+ 		break;
+@@ -2232,7 +2240,7 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+ 			static_key_slow_dec_deferred(&apic_hw_disabled);
+ 		} else {
+ 			static_key_slow_inc(&apic_hw_disabled.key);
+-			vcpu->kvm->arch.apic_map_dirty = true;
++			atomic_set(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ 		}
+ 	}
+ 
+@@ -2273,7 +2281,6 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	if (!apic)
+ 		return;
+ 
+-	vcpu->kvm->arch.apic_map_dirty = false;
+ 	/* Stop the timer in case it's a reset to an active apic */
+ 	hrtimer_cancel(&apic->lapic_timer.timer);
+ 
+-- 
+2.25.4
+
