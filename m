@@ -2,96 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0E5B204199
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 22:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4238A2041DB
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 22:21:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730927AbgFVUL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 16:11:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60812 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730896AbgFVULX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 16:11:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592856682;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mTc3nTuv3+E95YWblrZ4womgAmwm01Da22NV/Nv8VAA=;
-        b=DC+4koDzFcJe0nNOLUQ1Q5FPi0tsMeX0a/azwFR4bJV8STGtRi0h3Z6pU+UbGSIAYEe/n4
-        tq2VB4N8OFsdZ+7Yre/iUESvTdphcjXIE9WPHju4dVm2L7a8AT3JC5VwXghTXZ63MpyX65
-        69s62s450kjYsJHZybiJ6wsD77aDxVQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-plwrIt9uN_G2waASGBkpag-1; Mon, 22 Jun 2020 16:11:20 -0400
-X-MC-Unique: plwrIt9uN_G2waASGBkpag-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF0D0804004;
-        Mon, 22 Jun 2020 20:11:18 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CA1E619D61;
-        Mon, 22 Jun 2020 20:11:16 +0000 (UTC)
-Date:   Mon, 22 Jun 2020 22:11:13 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     kvm-devel <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        qemu-arm <qemu-arm@nongnu.org>, Haibo Xu <haibo.xu@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2] target/arm: Check supported KVM features globally
- (not per vCPU)
-Message-ID: <20200622201113.o7uqsgiuyyvfgmgm@kamzik.brq.redhat.com>
-References: <20200619095542.2095-1-philmd@redhat.com>
- <20200619114123.7nhuehm76iwhsw5i@kamzik.brq.redhat.com>
- <CAFEAcA-3keThbaWccv+Rzh4dmnLquSwXMyEOmbMMHgQHM=c-8Q@mail.gmail.com>
+        id S1728555AbgFVUUh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 16:20:37 -0400
+Received: from mga07.intel.com ([134.134.136.100]:62017 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728405AbgFVUUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 16:20:37 -0400
+IronPort-SDR: rpPC6FH9qWpRYypU/6l+4vVDhStTbgIYVyScAsZrdFpD1A1LCVjQUOBC+1g+78SJCR6VHy3L1z
+ QRSbqRz5Udiw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="209057474"
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; 
+   d="scan'208";a="209057474"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2020 13:20:36 -0700
+IronPort-SDR: IIknzzp2CyZi4jR/40NntXy9138dMaGyEd1yeTT7VXR8VLoz6c8hb1nfpUfRP1ZHEwfK0e6wZN
+ 9eKCRXf06pkw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,268,1589266800"; 
+   d="scan'208";a="478506313"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
+  by fmsmga006.fm.intel.com with ESMTP; 22 Jun 2020 13:20:36 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/6] KVM: x86/mmu: Files and sp helper cleanups
+Date:   Mon, 22 Jun 2020 13:20:28 -0700
+Message-Id: <20200622202034.15093-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-3keThbaWccv+Rzh4dmnLquSwXMyEOmbMMHgQHM=c-8Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 08:57:51PM +0100, Peter Maydell wrote:
-> On Fri, 19 Jun 2020 at 12:41, Andrew Jones <drjones@redhat.com> wrote:
-> > Can you also post the attached patch with this one (a two patch series)?
-> 
-> This would be easier to review if you'd just posted it as
-> a patch with a Based-on: and a note that it needed to be
+Move more files to the mmu/ directory, and an mmu_internal.h to share
+stuff amongst the mmu/ files, and clean up the helpers for retrieving a
+shadow page from a sptep and/or hpa.
 
-OK, will do.
+Sean Christopherson (6):
+  KVM: x86/mmu: Move mmu_audit.c and mmutrace.h into the mmu/
+    sub-directory
+  KVM: x86/mmu: Move kvm_mmu_available_pages() into mmu.c
+  KVM: x86/mmu: Add MMU-internal header
+  KVM: x86/mmu: Make kvm_mmu_page definition and accessor internal-only
+  KVM: x86/mmu: Add sptep_to_sp() helper to wrap shadow page lookup
+  KVM: x86/mmu: Rename page_header() to to_shadow_page()
 
-> applied after the bugfix patch. Anyway:
-> 
-> +    /* Enabling and disabling kvm-no-adjvtime should always work. */
->      assert_has_feature_disabled(qts, "host", "kvm-no-adjvtime");
-> +    assert_set_feature(qts, "host", "kvm-no-adjvtime", true);
-> +    assert_set_feature(qts, "host", "kvm-no-adjvtime", false);
-> 
->      if (g_str_equal(qtest_get_arch(), "aarch64")) {
->          bool kvm_supports_sve;
-> @@ -475,7 +497,11 @@ static void
-> test_query_cpu_model_expansion_kvm(const void *data)
->          char *error;
-> 
->          assert_has_feature_enabled(qts, "host", "aarch64");
-> +
-> +        /* Enabling and disabling pmu should always work. */
->          assert_has_feature_enabled(qts, "host", "pmu");
-> +        assert_set_feature(qts, "host", "pmu", true);
-> +        assert_set_feature(qts, "host", "pmu", false);
-> 
-> It seems a bit odd that we do the same "set true, then
-> set false" sequence whether the feature is enabled or not.
-> Shouldn't the second one be "set false, then set true" ?
+ arch/x86/include/asm/kvm_host.h    | 46 +---------------------
+ arch/x86/kvm/mmu.h                 | 13 ------
+ arch/x86/kvm/mmu/mmu.c             | 58 +++++++++++++++------------
+ arch/x86/kvm/{ => mmu}/mmu_audit.c | 12 +++---
+ arch/x86/kvm/mmu/mmu_internal.h    | 63 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/{ => mmu}/mmutrace.h  |  2 +-
+ arch/x86/kvm/mmu/page_track.c      |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h     |  4 +-
+ 8 files changed, 108 insertions(+), 92 deletions(-)
+ rename arch/x86/kvm/{ => mmu}/mmu_audit.c (96%)
+ create mode 100644 arch/x86/kvm/mmu/mmu_internal.h
+ rename arch/x86/kvm/{ => mmu}/mmutrace.h (99%)
 
-That would be better. Will do.
-
-Thanks,
-drew
+-- 
+2.26.0
 
