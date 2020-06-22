@@ -2,105 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3320C203A71
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 17:14:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FF4F203AB3
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 17:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729296AbgFVPOr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 11:14:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51864 "EHLO
+        id S1729275AbgFVPXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 11:23:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31807 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729199AbgFVPOq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jun 2020 11:14:46 -0400
+        with ESMTP id S1729049AbgFVPXy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 11:23:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592838885;
+        s=mimecast20190719; t=1592839432;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=NIQCA5ZckTuLuocOtdMBGLUU2Sj+VfxVeRxU4kvLvWg=;
-        b=PndyeTcrL8jquNZf4pLLLz3+hxIW6+xKHp7LjOtmNl+LFIASh1SGH+VWnb+cKKa/xDJypT
-        b/6w1KVbtiMVQFPnkzsIxGrqEhENIjY63sIcR4qdiwiFB1q0BPNZzbo66QSB5tyhxmzZei
-        UOKjKnP6JgHnO3p6dRYRmaKLfozGKjQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-9ya5N6rCP0iHAeJJWgqevw-1; Mon, 22 Jun 2020 11:14:40 -0400
-X-MC-Unique: 9ya5N6rCP0iHAeJJWgqevw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F3C107ACF6;
-        Mon, 22 Jun 2020 15:14:38 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2551B60BE2;
-        Mon, 22 Jun 2020 15:14:36 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/mmu: Avoid mixing gpa_t with gfn_t in walk_addr_generic()
-Date:   Mon, 22 Jun 2020 17:14:35 +0200
-Message-Id: <20200622151435.752560-1-vkuznets@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wGpF0Z4o98o6k0v3vIzdGQK4IxCExf5QSKDcyS94Xvc=;
+        b=WIzqC71X0A5hN4gOoXemTu/J+1yvz80y1jvPYSibdSKjR1ZKagJQeRVM+YbkbwPdic1C9o
+        ibBWhrgXrP9pTFWPmbMj+B3Gehohy/Tfm5IjYNjdSodvExbdGT3CCQkzHl19bPaIcXo3Mc
+        GLvs6Ass6OeGnxsyzVbGpUJ3Jn5BG2w=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-s9pgzdDDOYmK0-UM3_gaow-1; Mon, 22 Jun 2020 11:23:51 -0400
+X-MC-Unique: s9pgzdDDOYmK0-UM3_gaow-1
+Received: by mail-wm1-f69.google.com with SMTP id s134so5755894wme.6
+        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 08:23:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wGpF0Z4o98o6k0v3vIzdGQK4IxCExf5QSKDcyS94Xvc=;
+        b=f9Xv4LAcbFFa8VxvHFrrh5WA32anrK8loHBwoAdCGVHfJ32lkKaVXpptyLBn99bWNL
+         5jENpiS8tljRn1U6uMO+MBu7mgh2WRi4ZqoycD2Pv5Uy6SdtwRtVcVzAhV+gqursB8zM
+         XzPsHZjFPyQGGKD4Wf1ijMEzB7WCkrHLApnNQqibVRHUCe6c6zKCGj/BTNH0yawsIL1z
+         LBbaFfEkmC4Jg7eEEWf77yUZJcHJhQK18fFzjN3CeUgD/zAYM4yiuvn1J14odhG4/1gp
+         BRx0tVacgsOZ4RxHqYH9Ao9sBfih+PjrExuObkS8HytlvFo6nEr+UPRHGphnM96X9LAK
+         VRUw==
+X-Gm-Message-State: AOAM533fB++7QGkd3+Y0At+Z2d6ycZFo+mH3w9H635GWvLeZpBnd/34H
+        YIJ2H++Fbq/+hcXc8nqxMAyY0oF0RQWZ8lCSOssclvgPIgTp2HSmdGuluRBUhoW2uDA46zTJeQJ
+        wESe4dhhyTZHn
+X-Received: by 2002:adf:ef46:: with SMTP id c6mr1166994wrp.34.1592839429933;
+        Mon, 22 Jun 2020 08:23:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyJvSRmLdiYDCgpOU1rHgnpl7Ep95bf98pJLlBYjznBMbbO5UABy+Hb03Ct9Xk8BS49lBEPeA==
+X-Received: by 2002:adf:ef46:: with SMTP id c6mr1166972wrp.34.1592839429751;
+        Mon, 22 Jun 2020 08:23:49 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:fd64:dd90:5ad5:d2e1? ([2001:b07:6468:f312:fd64:dd90:5ad5:d2e1])
+        by smtp.gmail.com with ESMTPSA id 63sm19975505wra.86.2020.06.22.08.23.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jun 2020 08:23:49 -0700 (PDT)
+Subject: Re: [PATCH v2 00/11] KVM: Support guest MAXPHYADDR < host MAXPHYADDR
+To:     Mohammed Gamal <mgamal@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, babu.moger@amd.com
+References: <20200619153925.79106-1-mgamal@redhat.com>
+ <5a52fd65-e1b2-ca87-e923-1d5ac167cfb9@amd.com>
+ <a5793938619c1c328b8283aab90166e352071317.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <08594d32-9be2-b4d6-1dac-a335e8bda9f7@redhat.com>
+Date:   Mon, 22 Jun 2020 17:23:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <a5793938619c1c328b8283aab90166e352071317.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-translate_gpa() returns a GPA, assigning it to 'real_gfn' seems obviously
-wrong. There is no real issue because both 'gpa_t' and 'gfn_t' are u64 and
-we don't use the value in 'real_gfn' as a GFN, we do
+On 22/06/20 17:08, Mohammed Gamal wrote:
+>> Also, something to consider. On AMD, when memory encryption is 
+>> enabled (via the SYS_CFG MSR), a guest can actually have a larger
+>> MAXPHYADDR than the host. How do these patches all play into that?
 
- real_gfn = gpa_to_gfn(real_gfn);
+As long as the NPT page tables handle the guest MAXPHYADDR just fine,
+there's no need to do anything.  I think that's the case?
 
-instead. 'If you see a "buffalo" sign on an elephant's cage, do not trust
-your eyes', but let's fix it for good.
+Paolo
 
-No functional change intended.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/mmu/paging_tmpl.h | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index a6d484ea110b..58234bfaca07 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -360,7 +360,6 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	++walker->level;
- 
- 	do {
--		gfn_t real_gfn;
- 		unsigned long host_addr;
- 
- 		pt_access = pte_access;
-@@ -375,7 +374,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 		walker->table_gfn[walker->level - 1] = table_gfn;
- 		walker->pte_gpa[walker->level - 1] = pte_gpa;
- 
--		real_gfn = mmu->translate_gpa(vcpu, gfn_to_gpa(table_gfn),
-+		real_gpa = mmu->translate_gpa(vcpu, gfn_to_gpa(table_gfn),
- 					      nested_access,
- 					      &walker->fault);
- 
-@@ -389,12 +388,10 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 		 * information to fix the exit_qualification or exit_info_1
- 		 * fields.
- 		 */
--		if (unlikely(real_gfn == UNMAPPED_GVA))
-+		if (unlikely(real_gpa == UNMAPPED_GVA))
- 			return 0;
- 
--		real_gfn = gpa_to_gfn(real_gfn);
--
--		host_addr = kvm_vcpu_gfn_to_hva_prot(vcpu, real_gfn,
-+		host_addr = kvm_vcpu_gfn_to_hva_prot(vcpu, gpa_to_gfn(real_gpa),
- 					    &walker->pte_writable[walker->level - 1]);
- 		if (unlikely(kvm_is_error_hva(host_addr)))
- 			goto error;
--- 
-2.25.4
+> Well the patches definitely don't address that case. It's assumed a
+> guest VM's MAXPHYADDR <= host MAXPHYADDR, and hence we handle the case
+> where a guests's physical address space is smaller and try to trap
+> faults that may go unnoticed by the host.
+> 
+> My question is in the case of guest MAXPHYADDR > host MAXPHYADDR, do we
+> expect somehow that there might be guest physical addresses that
+> contain what the host could see as reserved bits? And how'd the host
+> handle that?
 
