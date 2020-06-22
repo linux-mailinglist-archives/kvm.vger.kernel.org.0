@@ -2,68 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A1EB204415
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 00:53:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4BC2204434
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 01:02:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731110AbgFVWxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 18:53:20 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23150 "EHLO
+        id S1731439AbgFVXC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 19:02:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42254 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730970AbgFVWxU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 18:53:20 -0400
+        by vger.kernel.org with ESMTP id S1731406AbgFVXC0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jun 2020 19:02:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592866399;
+        s=mimecast20190719; t=1592866945;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=opFQqNN7yTSwuKd+JxjwXkah+/KWifMnnM11JXOBi50=;
-        b=hmZa6FU5Em1v37bZZPAu9s82wSLIxcbILQEmgOgyHQQ0JeeMAQ5OUs1sYXVdCOwoEePEtq
-        YLX5O004ZqUtpvF1E5ow3NLHno0sFF2DfuQjXWTZob4rPkMe3PmkkiJVRQTcUDt0oPiYW5
-        ohuJlNvGQ1v9nE2wjcByN72EpUIxZlk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-HAmsOtblOwmOvLuVdbiuiA-1; Mon, 22 Jun 2020 18:53:17 -0400
-X-MC-Unique: HAmsOtblOwmOvLuVdbiuiA-1
-Received: by mail-wm1-f70.google.com with SMTP id t18so956408wmj.5
-        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 15:53:17 -0700 (PDT)
+        bh=cLgMiGtPFjIaSIz3RbHMh7JjOAzoUD45vxqY2OF/ySw=;
+        b=SSD/skXBvZ4z7zL+NultChBP03kcdZ2x2qonzmPaf3LokZXviXPIuT6Sk95tLVssFtc3U+
+        HBuA9J0jBn6bh+duHcaoOi5wUAN/M/97Z+yzH57VCtCEUjSs0QI+CKG4aK1AZbNlkMAjzu
+        qFz4/69CDSzWQ1XbKK7+/Ee/vETOgqk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-pDxYIQreOd2yCEKWc8Zqvw-1; Mon, 22 Jun 2020 19:02:23 -0400
+X-MC-Unique: pDxYIQreOd2yCEKWc8Zqvw-1
+Received: by mail-wr1-f71.google.com with SMTP id o25so10303594wro.16
+        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 16:02:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=opFQqNN7yTSwuKd+JxjwXkah+/KWifMnnM11JXOBi50=;
-        b=LYzGR3RdIV+8dG60CoJwiKmdADcr1aQNudHfZu7GE9SmPtJdFlrMIadc4bgS10ycoe
-         9jdOMtCmvtBZSox++l4PIhG9HUOi8ALI0GnT88Zs3NTkx7ymfiLX6aTgmPw8IgVAmEwl
-         Q+hvkaPI49D3a1ZBEwHqHrh67naA8TBj7iTzz5DlX41us145IPl6vflHCxvIsP6dcI7I
-         BDDzplU79/gjt6M6AHewaoyWLdUgL78NXdfLEv61tIbk8UuIXxSG0zw5DQo/clME1aF6
-         wRPL7/FcoNNVdMBV+dE0Xa2h419u04itzOLyJ2KtdEy5fSVb9kKp6Q433yb2YXAnka4g
-         eYGg==
-X-Gm-Message-State: AOAM532yY/wKd4aqNnMIQVfsgINagFDMqeBfvaTm/vhr2EL7i6AW6s2y
-        nVQRDmLT19Jom1dJ0wNKB9bqcznM85scIrsBv9+3DrcqOwonL7Qm6a4HtmENLQGSS+ozaTvHhQD
-        2a9gcOWSMqN/3
-X-Received: by 2002:adf:f542:: with SMTP id j2mr7218145wrp.61.1592866396258;
-        Mon, 22 Jun 2020 15:53:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyf27AYsmfHOiwx93ASBnyneRClsppOWxeUsRJNfYRFhoTPIzlaWDYr3TtIgIyROSUKHBrMeQ==
-X-Received: by 2002:adf:f542:: with SMTP id j2mr7218106wrp.61.1592866395945;
-        Mon, 22 Jun 2020 15:53:15 -0700 (PDT)
+        bh=cLgMiGtPFjIaSIz3RbHMh7JjOAzoUD45vxqY2OF/ySw=;
+        b=JFUGEJYAn4jASdZ4hySf4jn2VF6fx/aexKqclAh8LazZLjNENHIvH21TUq2chHdpLk
+         jz8H/uDsjsnA48ih7BUP6eLcXTctMyC0zEP2kh7zcBfFWk7ob1ZZTxMhChgscJW/anlc
+         fC2eJ9tl32zpA9FiaY1xYCrRAcBXXkgA73Y5Osbq53V8cPCdIKYt8hIZYgf2sYVNDoUW
+         qHwO21wmh9PeNX9PdCb9sQmX1OwIjekMk2K2BSv/yIn0WAaBnHyPkUu0whtLX162Yo/J
+         Ms5obfx/PWNepYcbV5inUSczDFziHm/kxlr+xD+jRcz/M2Az64l55nCzM6OQN7lphZhN
+         s/sg==
+X-Gm-Message-State: AOAM53207WTWL8nZqzEseC3RPzi/XwRagLQaCiMzexNb4Tb5HobERYRw
+        /PvaA1JNbfbfa1BEYKOTIaD/gA+8WnozqEnAcg1qScpwQTHUZHUoE18Cdm9TM72XvEtm0dvX/jH
+        b1xBWyADi8uwE
+X-Received: by 2002:a5d:45cb:: with SMTP id b11mr20715496wrs.235.1592866942007;
+        Mon, 22 Jun 2020 16:02:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwWBFC/i0pH767rQ65hiPwG4g0Y0IABLIaMpXiHXR7sC46xcI7ASgS6BosXoA31yasCAsDrVQ==
+X-Received: by 2002:a5d:45cb:: with SMTP id b11mr20715475wrs.235.1592866941776;
+        Mon, 22 Jun 2020 16:02:21 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id v4sm4675011wro.26.2020.06.22.15.53.14
+        by smtp.gmail.com with ESMTPSA id n16sm1136322wmc.40.2020.06.22.16.02.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jun 2020 15:53:15 -0700 (PDT)
-Subject: Re: [PATCH] kvm: nVMX: flush TLB when decoded insn != VM-exit reason
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-References: <20200616224305.44242-1-oupton@google.com>
+        Mon, 22 Jun 2020 16:02:21 -0700 (PDT)
+Subject: Re: [PATCH 1/2] kvm: x86: Refine kvm_write_tsc synchronization
+ generations
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>
+References: <20200615230750.105008-1-jmattson@google.com>
+ <05fe5fcb-ef64-3592-48a2-2721db52b4e3@redhat.com>
+ <CALMp9eR4Ny1uaXmOFGTr2JoGqwTw1SUeY34OyEoLpD8oe2n=6w@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <72d71987-15c1-a963-cddd-468a88342f4f@redhat.com>
-Date:   Tue, 23 Jun 2020 00:53:14 +0200
+Message-ID: <3818ac9f-79fb-c5b3-dcd2-663f21be9caf@redhat.com>
+Date:   Tue, 23 Jun 2020 01:02:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200616224305.44242-1-oupton@google.com>
+In-Reply-To: <CALMp9eR4Ny1uaXmOFGTr2JoGqwTw1SUeY34OyEoLpD8oe2n=6w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,37 +74,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/06/20 00:43, Oliver Upton wrote:
-> -		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_DESC))
-> -			return X86EMUL_CONTINUE;
-> -
-> -		/* FIXME: produce nested vmexit and return X86EMUL_INTERCEPTED.  */
-> +		intercepted = nested_cpu_has2(vmcs12, SECONDARY_EXEC_DESC);
->  		break;
->  
+On 23/06/20 00:36, Jim Mattson wrote:
+> On Mon, Jun 22, 2020 at 3:33 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 16/06/20 01:07, Jim Mattson wrote:
+>>> +             } else if (vcpu->arch.this_tsc_generation !=
+>>> +                        kvm->arch.cur_tsc_generation) {
+>>>                       u64 tsc_exp = kvm->arch.last_tsc_write +
+>>>                                               nsec_to_cycles(vcpu, elapsed);
+>>>                       u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
+>>
+>> Can this cause the same vCPU to be counted multiple times in
+>> nr_vcpus_matched_tsc?  I think you need to keep already_matched (see
+>> also the commit message for 0d3da0d26e3c, "KVM: x86: fix TSC matching",
+>> 2014-07-09, which introduced that variable).
+> 
+> No. In the case where we previously might have counted the vCPU a
+> second time, we now start a brand-new generation, and the vCPU is the
+> first to be counted for the new generation.
 
-[...]
+Right, because synchronizing is false.  But I'm worried that a migration
+at the wrong time would cause a wrong start of a new generation.
 
-> +	/*
-> +	 * The only uses of the emulator in VMX for instructions which may be
-> +	 * intercepted are port IO instructions, descriptor-table accesses, and
-> +	 * the RDTSCP instruction. As such, if the emulator has decoded an
-> +	 * instruction that is different from the VM-exit provided by hardware
-> +	 * it is likely that the TLB entry and page-table mapping for the
-> +	 * guest's RIP are out of sync.
-> +	 *
-> +	 * Rather than synthesizing a VM-exit into L1 for every possible
-> +	 * instruction just flush the TLB, resume L2, and let hardware generate
-> +	 * the appropriate VM-exit.
-> +	 */
+start:
+	all TSCs are 0
 
-So you're saying that (in the SECONDARY_EXEC_DESC case above for an
-example) this should have been handled earlier by
-nested_vmx_l1_wants_exit.  But what about LGDT and friends from an MMIO
-address?  I would say we could just not care, but an infinite #UD loop
-is an ugly failure mode.
+mid of synchronization
+	some TSCs are adjusted by a small amount, gen 1 is started
 
-(Or perhaps it's just not my day for reviewing code...).
+----------------- migration -------------
+
+start:
+	all TSCs are 0
+
+restore state
+	all TSCs are written with KVM_SET_MSR, gen 1 is	started and
+	completed
+
+after execution restarts
+	guests finishes updating TSCs, gen 2 starts
+
+and now nr_vcpus_matched_tsc never reaches the maximum.
 
 Paolo
 
