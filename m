@@ -2,137 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 02AF42034F3
-	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 12:39:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 427722034F8
+	for <lists+kvm@lfdr.de>; Mon, 22 Jun 2020 12:39:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727108AbgFVKjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jun 2020 06:39:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727066AbgFVKjk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jun 2020 06:39:40 -0400
-Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B803BC061794
-        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 03:39:39 -0700 (PDT)
-Received: by mail-wm1-x341.google.com with SMTP id f18so2658063wml.3
-        for <kvm@vger.kernel.org>; Mon, 22 Jun 2020 03:39:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Lb/frQrugPlke769VI0ZGjO7llYS1ocNVbXaMbRE4lg=;
-        b=BYWy1U3LTb7z1OQDvwZvSosKr1sv3gduL754zzevWWN7Ns1D38AkKsd8PAjr7ruqJP
-         6N36GAb4b+1ZsqTjT9BGrE7KWe6iP5ifH6s3842R+A+9WxhZ5pnuVruniORrL3BAEAvk
-         mj6HXKQ45TrrgkqBKLaFqO9x73kt+C/ulCuNRcQn12CJEOApO9pxx5gXJTgGdy5WmY3k
-         a8Gs3FP1mmk0BhmfR8zcCbQlZYkEfdhv+D7gyjFiwPjkiCCnfwW7vEH89P5um6fgfwXT
-         9IXfqrX+ZNUkFtXTxkzsHQX7s85JjnoMpwb2Wm1HTIu6XaDeTOsltX4wJIEfDxHr/NIk
-         +7YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=Lb/frQrugPlke769VI0ZGjO7llYS1ocNVbXaMbRE4lg=;
-        b=aNwMvwJcr7fsPjmYggP6fgtCHjMNdR7s1q49O05VAiRCno8nwOipwoZPxgIld6LdXL
-         Bp1zZcvf/1i7w3xSaob7K0Je+lE3BxsMuPM/FB9wWzUMK/qci7PgBro6BVwULrQG+e2b
-         2R0dZBsYJlu5TXR8PSySQYsk5IflynZGJZWeNow1L0fp9iyCgGJtdiERTM057KwhFzVM
-         8BP4lB69+dFIzQEs33ys6OD353rST+skiqovkHxI4bJW7k8ysMJFUfqM3i0xRrnv3LkW
-         jTMfKEJY7nNBOiCUP8guSsTZRYUolfp/GvNznKmVjpQwvmhJn03DnrL/4AxnKowiASlu
-         zNuQ==
-X-Gm-Message-State: AOAM533my1N6oNmrdj1WOKR6a3m9eOsprIe+oHk91vKzQS9M8MHEE3kJ
-        fI+49MitTJi6+WTOyU9gPrvcag==
-X-Google-Smtp-Source: ABdhPJw4ly1lF7pDB7TqBfR669amiQoWOkVZzba+2H5Qih6YqqlqJd9J1Sg6mf6Q9ECAf2qRBMfBMw==
-X-Received: by 2002:a1c:6408:: with SMTP id y8mr9774703wmb.122.1592822378088;
-        Mon, 22 Jun 2020 03:39:38 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:109:355c:447d:ad3d:ac5c])
-        by smtp.gmail.com with ESMTPSA id 65sm12666681wre.6.2020.06.22.03.39.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2020 03:39:37 -0700 (PDT)
-Date:   Mon, 22 Jun 2020 11:39:32 +0100
-From:   Andrew Scull <ascull@google.com>
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>, kernel-team@android.com
-Subject: Re: [PATCH v2 5/5] KVM: arm64: Simplify PtrAuth alternative patching
-Message-ID: <20200622103932.GA178085@google.com>
-References: <20200622080643.171651-1-maz@kernel.org>
- <20200622080643.171651-6-maz@kernel.org>
- <20200622091508.GB88608@C02TD0UTHF1T.local>
+        id S1727819AbgFVKjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jun 2020 06:39:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50840 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727113AbgFVKjw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jun 2020 06:39:52 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 80FC4206FA;
+        Mon, 22 Jun 2020 10:39:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1592822391;
+        bh=dgm7kjeoShRXdQis73vvUuIZrsj5DaDNqgHFNWcsw3Q=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=S2oqL5OT+ITpyFdrgk4+bxcZAFW/FLK52PcA/biEqraUAECNSX51/R5fzxvk2f7WB
+         UZAqUvp6800mgPzpJVP1UgHxUjFIhx+Vr4r85xUfOyDqkQFtKx5pQWnolc5lfZtUZ3
+         +aVaTL+FXQM5zI0NYlNCAtqiefaCGGTkIjQrkO6E=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jnJrh-005Hny-Qi; Mon, 22 Jun 2020 11:39:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200622091508.GB88608@C02TD0UTHF1T.local>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 22 Jun 2020 11:39:49 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, steven.price@arm.com
+Subject: Re: [PATCH 2/4] arm64/x86: KVM: Introduce steal time cap
+In-Reply-To: <20200622103146.fwtr7z3l3mnq4foh@kamzik.brq.redhat.com>
+References: <20200619184629.58653-1-drjones@redhat.com>
+ <20200619184629.58653-3-drjones@redhat.com>
+ <5b1e895dc0c80bef3c0653894e2358cf@kernel.org>
+ <20200622084110.uosiqx3oy22lremu@kamzik.brq.redhat.com>
+ <5a52210e5f123d52459f15c594e77bad@kernel.org>
+ <20200622103146.fwtr7z3l3mnq4foh@kamzik.brq.redhat.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <7118fcbe911bdb30374b400dc01ca8de@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, steven.price@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 10:15:08AM +0100, Mark Rutland wrote:
-> On Mon, Jun 22, 2020 at 09:06:43AM +0100, Marc Zyngier wrote:
+On 2020-06-22 11:31, Andrew Jones wrote:
+> On Mon, Jun 22, 2020 at 10:51:47AM +0100, Marc Zyngier wrote:
+>> On 2020-06-22 09:41, Andrew Jones wrote:
+>> > On Mon, Jun 22, 2020 at 09:20:02AM +0100, Marc Zyngier wrote:
+>> > > Hi Andrew,
+>> > >
+>> > > On 2020-06-19 19:46, Andrew Jones wrote:
+>> > > > arm64 requires a vcpu fd (KVM_HAS_DEVICE_ATTR vcpu ioctl) to probe
+>> > > > support for steal time. However this is unnecessary and complicates
+>> > > > userspace (userspace may prefer delaying vcpu creation until after
+>> > > > feature probing). Since probing steal time only requires a KVM fd,
+>> > > > we introduce a cap that can be checked.
+>> > >
+>> > > So this is purely an API convenience, right? You want a way to
+>> > > identify the presence of steal time accounting without having to
+>> > > create a vcpu? It would have been nice to have this requirement
+>> > > before we merged this code :-(.
+>> >
+>> > Yes. I wish I had considered it more closely when I was reviewing the
+>> > patches. And, I believe we have yet another user interface issue that
+>> > I'm looking at now. Without the VCPU feature bit I'm not sure how easy
+>> > it will be for a migration to fail when attempting to migrate from a
+>> > host
+>> > with steal-time enabled to one that does not support steal-time. So it's
+>> > starting to look like steal-time should have followed the pmu pattern
+>> > completely, not just the vcpu device ioctl part.
+>> 
+>> Should we consider disabling steal time altogether until this is 
+>> worked out?
+> 
+> I think we can leave it alone and just try to resolve it before merging
+> QEMU patches (which I'm working on now). It doesn't look like kvmtool 
+> or
+> rust-vmm (the only other two KVM userspaces I'm paying some attention 
+> to)
+> do anything with steal-time yet, so they won't notice. And, I'm not 
+> sure
+> disabling steal-time for any other userspaces is better than just 
+> trying
+> to keep them working the best we can while improving the uapi.
 
+Is it only migration that is affected? Or do you see issues that would
+affect non-migrating userspace?
 
-> > --- a/arch/arm64/include/asm/kvm_ptrauth.h
-> > +++ b/arch/arm64/include/asm/kvm_ptrauth.h
-> > @@ -61,44 +61,36 @@
-> >  
-> >  /*
-> >   * Both ptrauth_switch_to_guest and ptrauth_switch_to_host macros will
-> > - * check for the presence of one of the cpufeature flag
-> > - * ARM64_HAS_ADDRESS_AUTH_ARCH or ARM64_HAS_ADDRESS_AUTH_IMP_DEF and
-> > + * check for the presence ARM64_HAS_ADDRESS_AUTH, which is defined as
-> > + * (ARM64_HAS_ADDRESS_AUTH_ARCH || ARM64_HAS_ADDRESS_AUTH_IMP_DEF) and
-> >   * then proceed ahead with the save/restore of Pointer Authentication
-> > - * key registers.
-> > + * key registers if enabled for the guest.
-> >   */
-> >  .macro ptrauth_switch_to_guest g_ctxt, reg1, reg2, reg3
-> > -alternative_if ARM64_HAS_ADDRESS_AUTH_ARCH
-> > +alternative_if_not ARM64_HAS_ADDRESS_AUTH
-> >  	b	1000f
-> >  alternative_else_nop_endif
-> > -alternative_if_not ARM64_HAS_ADDRESS_AUTH_IMP_DEF
-> > -	b	1001f
-> > -alternative_else_nop_endif
-> > -1000:
-> >  	mrs	\reg1, hcr_el2
-> >  	and	\reg1, \reg1, #(HCR_API | HCR_APK)
-> > -	cbz	\reg1, 1001f
-> > +	cbz	\reg1, 1000f
-> >  	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
-> >  	ptrauth_restore_state	\reg1, \reg2, \reg3
-> > -1001:
-> > +1000:
-> >  .endm
-> 
-> Since these are in macros, we could use \@ to generate a macro-specific
-> lavel rather than a magic number, which would be less likely to conflict
-> with the surrounding environment and would be more descriptive. We do
-> that in a few places already, and here it could look something like:
-> 
-> | alternative_if_not ARM64_HAS_ADDRESS_AUTH
-> | 	b	.L__skip_pauth_switch\@
-> | alternative_else_nop_endif
-> | 	
-> | 	...
-> | 
-> | .L__skip_pauth_switch\@:
-> 
-> Per the gas documentation
-> 
-> | \@
-> |
-> |    as maintains a counter of how many macros it has executed in this
-> |    pseudo-variable; you can copy that number to your output with ‘\@’,
-> |    but only within a macro definition.
+[...]
 
-Is this relibale for this sort of application? The description just
-sounds like a counter of macros rather than specifically a unique label
-generator. It may work most of the time but also seems that it has the
-potential to be more fragile given that it would change based on the
-rest of the code in the file to potentially conflict with something it
-didn't previously conflict with. 
+>> Accepting the pvtime attributes (setting up the per-vcpu area) has two
+>> effects: we promise both the guest and userspace that we will provide
+>> the guest with steal time. By not checking sched_info_on(), we lie to
+>> both, with potential consequences. It really feels like a bug.
+> 
+> Yes, I agree now. Again, following the pmu pattern looks best here. The
+> pmu will report that it doesn't have the attr support when its 
+> underlying
+> kernel support (perf counters) doesn't exist. That's a direct analogy 
+> with
+> steal-time relying on sched_info_on().
+
+Indeed. I'd be happy to take a fix early if you can spin one.
+
+> I'll work up another version of this series doing that, but before 
+> posting
+> I'll look at the migration issue a bit more and likely post something 
+> for
+> that as well.
+
+OK. I'll park this series for now.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
