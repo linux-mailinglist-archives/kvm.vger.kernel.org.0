@@ -2,76 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4826520582B
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 19:02:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B19620584A
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 19:11:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733024AbgFWRC3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 13:02:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728916AbgFWRC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:02:28 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0AC6C061573
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 10:02:28 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id n2so9347470pld.13
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 10:02:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=hBYapAhWIOf0yfzh5Sy0kQURgE1MviISrIh1um9hujs=;
-        b=c7T8G/9Q4UEEmHYn0Jx7Rx2Rk/GBybUUoKCa0aLL3t8AXQhFq37GpUgDW//MwFu1B4
-         W7/qEmgFX5Jj88WA7yv3plv6iXDQasioXkAvbvCEcC+1lvcSet0xwjkNlqr1dwoTlfXs
-         SfSoI0c6dnOhq98S+DvjH8SSDwa29IkAJZOmRT+BXk06zUpiDUZatub7u46lgQ3nGUOt
-         R29RhC8ixtlXCc1jgW/uPlLiXrPBcYMM80XbXPT1HFncx4nZmdWi9HCXY5+W/JfHhE7F
-         ex3oBo/NNtx6f5MYNn+N8CDp0mWrOxF1a7D1IAC+VOrVcT5RJZ6YTW8wX3Ems2OViLMp
-         BGRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=hBYapAhWIOf0yfzh5Sy0kQURgE1MviISrIh1um9hujs=;
-        b=I/Ya32uMVO++92F4WY5d0pGjfLY0Sz/sYD63fIFvHnE02uPKn0ZehwshPI4nMtC3Ky
-         nVJiseeZRq0SgcB9b4hkxPrGVSUBGDI2vs1l0mJe2S2ZsuNjGW4H0Qro+IfsSkC7X2VA
-         ENnNRE4Pt6RbcAUMcE8VfXQO4HU78rH6fVvbr2OYksim7R8bS/28aYrGL1tgsiqJ1jab
-         jArbyHa7A+mruIB0IyvJYTP3zmzr/ea8k6mcg3wEi+L18fJAfULgjSmlTcHC2KyC2fIT
-         ZKD5ZA38WWwM/trztth3039A3XV8fsSAWu63xO6kvDeZOQbVdhnxrOHHU23bV9LqDfEc
-         rd8g==
-X-Gm-Message-State: AOAM5305VWovJZz69a7FDflX/sP6WoFO43rZVkaaEoc4kaH45Ol1Rb92
-        fJ17ApGfFGfFva/i9h0496c=
-X-Google-Smtp-Source: ABdhPJyCL5WEyZEZYENX0ywdXLvGojQiiEhDKvvJdn+nGZT+bg2WyRe7SX7uUhzXE8V30aJooH655g==
-X-Received: by 2002:a17:902:bd0b:: with SMTP id p11mr24552983pls.91.1592931748022;
-        Tue, 23 Jun 2020 10:02:28 -0700 (PDT)
-Received: from ?IPv6:2601:647:4700:9b2:55dc:2130:bbc8:d35e? ([2601:647:4700:9b2:55dc:2130:bbc8:d35e])
-        by smtp.gmail.com with ESMTPSA id j36sm14815285pgj.39.2020.06.23.10.02.26
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Jun 2020 10:02:26 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH kvm-unit-tests] vmx: remove unnecessary #ifdef __x86_64__
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20200623092045.271835-1-pbonzini@redhat.com>
-Date:   Tue, 23 Jun 2020 10:02:25 -0700
-Cc:     kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Transfer-Encoding: 7bit
-Message-Id: <AB6977D0-7844-49AE-A631-FF98A74E60FB@gmail.com>
-References: <20200623092045.271835-1-pbonzini@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        id S1732979AbgFWRLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 13:11:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29048 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728916AbgFWRLX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 13:11:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592932281;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=tgpqv+Z4YzvIf/4SqnrwWUNPhSAJzQTNmQO1fWEnu4g=;
+        b=AZk02rCAYz9FmShJrHLK/213qOgbmJRA0fQvN4CAdiR9hbgHLY6qLIlp57p+qsjV72qm7d
+        FZGHL+J5Hj22VmoFLPZLXzIeFkydt7/HL/gfzgGP2sl1kw6JvXThUxbfRmUeXIYqNQouc5
+        zT452za7dMG39a39mwssx7e0IGOONn8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-372-fa8R2lz4PIqGlC1xadbvrQ-1; Tue, 23 Jun 2020 13:11:19 -0400
+X-MC-Unique: fa8R2lz4PIqGlC1xadbvrQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E71B8C4BA1;
+        Tue, 23 Jun 2020 17:11:18 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F2AF5D9D3;
+        Tue, 23 Jun 2020 17:11:18 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 5.8-rc3
+Date:   Tue, 23 Jun 2020 13:11:17 -0400
+Message-Id: <20200623171117.326222-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jun 23, 2020, at 2:20 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> The VMX tests are 64-bit only, so checking the architecture is
-> unnecessary.  Also, if the tests supported 32-bits environments
-> the #ifdef would probably go in test_canonical.
+Linus,
 
-Why do you say that the VMX tests are 64-bit only? I ran it the other day on
-32-bit and it was working.
+The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+
+  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to e4553b4976d1178c13da295cb5c7b21f55baf8f9:
+
+  KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru (2020-06-23 06:01:29 -0400)
+
+----------------------------------------------------------------
+All bugfixes except for a couple cleanup patches.
+
+----------------------------------------------------------------
+Huacai Chen (1):
+      KVM: MIPS: Fix a build error for !CPU_LOONGSON64
+
+Igor Mammedov (1):
+      kvm: lapic: fix broken vcpu hotplug
+
+Marcelo Tosatti (1):
+      KVM: x86: allow TSC to differ by NTP correction bounds without TSC scaling
+
+Paolo Bonzini (1):
+      KVM: LAPIC: ensure APIC map is up to date on concurrent update requests
+
+Qian Cai (1):
+      kvm/svm: disable KCSAN for svm_vcpu_run()
+
+Sean Christopherson (4):
+      KVM: VMX: Add helpers to identify interrupt type from intr_info
+      KVM: nVMX: Plumb L2 GPA through to PML emulation
+      KVM: VMX: Stop context switching MSR_IA32_UMWAIT_CONTROL
+      KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru
+
+Vitaly Kuznetsov (2):
+      Revert "KVM: VMX: Micro-optimize vmexit time when not exposing PMU"
+      KVM: x86/mmu: Avoid mixing gpa_t with gfn_t in walk_addr_generic()
+
+Xiaoyao Li (1):
+      KVM: X86: Fix MSR range of APIC registers in X2APIC mode
+
+ arch/mips/kvm/mips.c            |  2 ++
+ arch/x86/include/asm/kvm_host.h |  4 ++--
+ arch/x86/include/asm/mwait.h    |  2 --
+ arch/x86/kernel/cpu/umwait.c    |  6 -----
+ arch/x86/kvm/lapic.c            | 50 +++++++++++++++++++++++++----------------
+ arch/x86/kvm/mmu.h              |  2 +-
+ arch/x86/kvm/mmu/mmu.c          |  4 ++--
+ arch/x86/kvm/mmu/paging_tmpl.h  | 16 ++++++-------
+ arch/x86/kvm/svm/svm.c          |  2 +-
+ arch/x86/kvm/vmx/vmcs.h         | 32 ++++++++++++++++----------
+ arch/x86/kvm/vmx/vmx.c          | 27 ++++------------------
+ arch/x86/kvm/vmx/vmx.h          |  2 --
+ arch/x86/kvm/x86.c              |  7 +++---
+ 13 files changed, 74 insertions(+), 82 deletions(-)
 
