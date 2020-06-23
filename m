@@ -2,158 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A005E204D29
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:56:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 017E9204D31
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:58:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731914AbgFWI42 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 04:56:28 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22173 "EHLO
+        id S1731786AbgFWI62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 04:58:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32502 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731687AbgFWI41 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 04:56:27 -0400
+        by vger.kernel.org with ESMTP id S1731158AbgFWI61 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 04:58:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592902586;
+        s=mimecast20190719; t=1592902705;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3uH2ase3wNwFDCFATNF+XbECQJVAVscMNWry+4f/1Ps=;
-        b=i4bKXcKQ2XYmYzUXlNwnaRzZZ2bf5AnnGdvRX47r77JE2HFeMLVcpqHx734IfphaGdfGGp
-        PeAjwyNXty+RLHTjAbJcdHwgT13T2NY2gy+iqkDOELqbAHQnWAnXgHhb+UMCsEXaBqVG3v
-        r+hOFiaRqHku3HGTD9a1/arG1ICjbhw=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=9KqTHczwitwsDmQMmizRhopAA0XrT1pemLfi2ghMEbY=;
+        b=GT7vdWBKdVX5YXGqsvq8ZnY0VNKRKmq8Aot7HLCq961KcmiDO+W9EwNac+pVDK5u8UbbFZ
+        MZHJXCJbuOOSkO3Zhsq5XiyZYKrHHmeQGZLuQKZBo6KrSLgVkYU7ZXSM15g8P4cGJze7v7
+        yhPfVuiRTvVnYnx1Jfe2pnYeH7fuNfg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-CCUZqEhzP9-5hGeoayuAiQ-1; Tue, 23 Jun 2020 04:56:23 -0400
-X-MC-Unique: CCUZqEhzP9-5hGeoayuAiQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-299-wGMApQJEN0qCHeOdaOEDHw-1; Tue, 23 Jun 2020 04:58:23 -0400
+X-MC-Unique: wGMApQJEN0qCHeOdaOEDHw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4CE918A0765;
-        Tue, 23 Jun 2020 08:56:20 +0000 (UTC)
-Received: from localhost (ovpn-112-109.ams2.redhat.com [10.36.112.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A1E006E9F3;
-        Tue, 23 Jun 2020 08:56:18 +0000 (UTC)
-Date:   Tue, 23 Jun 2020 09:56:17 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Andra Paraschiv <andraprs@amazon.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-Subject: Re: [PATCH v4 01/18] nitro_enclaves: Add ioctl interface definition
-Message-ID: <20200623085617.GE32718@stefanha-x1.localdomain>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-2-andraprs@amazon.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D8A6804001;
+        Tue, 23 Jun 2020 08:58:22 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-170.ams2.redhat.com [10.36.112.170])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C638876114;
+        Tue, 23 Jun 2020 08:58:16 +0000 (UTC)
+Subject: Re: [PATCH v9 2/2] s390/kvm: diagnose 0x318 sync and reset
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+References: <20200622154636.5499-1-walling@linux.ibm.com>
+ <20200622154636.5499-3-walling@linux.ibm.com>
+ <06bd4fde-ecdb-0795-bcab-e8f5fbabcd14@redhat.com>
+ <4387834c-7cd4-df50-294c-4f56aa14a089@de.ibm.com>
+ <a1bcfa5a-368a-cdef-9681-aff2deee2a42@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <a90f723d-d425-5b3d-d87b-e124a6b55db6@redhat.com>
+Date:   Tue, 23 Jun 2020 10:58:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200622200329.52996-2-andraprs@amazon.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ILuaRSyQpoVaJ1HG"
-Content-Disposition: inline
+In-Reply-To: <a1bcfa5a-368a-cdef-9681-aff2deee2a42@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---ILuaRSyQpoVaJ1HG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 23/06/2020 10.47, Christian Borntraeger wrote:
+> 
+> 
+> On 23.06.20 10:45, Christian Borntraeger wrote:
+>>
+>>
+>> On 23.06.20 10:42, Thomas Huth wrote:
+>>> On 22/06/2020 17.46, Collin Walling wrote:
+>>>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
+>>>> the VM is running in (Linux, z/VM, etc) and is observed via
+>>>> firmware/service events.
+>>>>
+>>>> This is a privileged s390x instruction that must be intercepted by
+>>>> SIE. Userspace handles the instruction as well as migration. Data
+>>>> is communicated via VCPU register synchronization.
+>>>>
+>>>> The Control Program Name Code (CPNC) is stored in the SIE block. The
+>>>> CPNC along with the Control Program Version Code (CPVC) are stored
+>>>> in the kvm_vcpu_arch struct.
+>>>>
+>>>> This data is reset on load normal and clear resets.
+>>>>
+>>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>>>> ---
+>>>>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>>>>  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
+>>>>  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
+>>>>  arch/s390/kvm/vsie.c             |  1 +
+>>>>  include/uapi/linux/kvm.h         |  1 +
+>>>>  5 files changed, 19 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>>>> index 3d554887794e..8bdf6f1607ca 100644
+>>>> --- a/arch/s390/include/asm/kvm_host.h
+>>>> +++ b/arch/s390/include/asm/kvm_host.h
+>>>> @@ -260,7 +260,8 @@ struct kvm_s390_sie_block {
+>>>>  	__u32	scaol;			/* 0x0064 */
+>>>>  	__u8	sdf;			/* 0x0068 */
+>>>>  	__u8    epdx;			/* 0x0069 */
+>>>> -	__u8    reserved6a[2];		/* 0x006a */
+>>>> +	__u8	cpnc;			/* 0x006a */
+>>>> +	__u8	reserved6b;		/* 0x006b */
+>>>>  	__u32	todpr;			/* 0x006c */
+>>>>  #define GISA_FORMAT1 0x00000001
+>>>>  	__u32	gd;			/* 0x0070 */
+>>>> @@ -745,6 +746,7 @@ struct kvm_vcpu_arch {
+>>>>  	bool gs_enabled;
+>>>>  	bool skey_enabled;
+>>>>  	struct kvm_s390_pv_vcpu pv;
+>>>> +	union diag318_info diag318_info;
+>>>>  };
+>>>>  
+>>>>  struct kvm_vm_stat {
+>>>> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+>>>> index 436ec7636927..2ae1b660086c 100644
+>>>> --- a/arch/s390/include/uapi/asm/kvm.h
+>>>> +++ b/arch/s390/include/uapi/asm/kvm.h
+>>>> @@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
+>>>>  #define KVM_SYNC_GSCB   (1UL << 9)
+>>>>  #define KVM_SYNC_BPBC   (1UL << 10)
+>>>>  #define KVM_SYNC_ETOKEN (1UL << 11)
+>>>> +#define KVM_SYNC_DIAG318 (1UL << 12)
+>>>>  
+>>>>  #define KVM_SYNC_S390_VALID_FIELDS \
+>>>>  	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
+>>>>  	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
+>>>> -	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
+>>>> +	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
+>>>> +	 KVM_SYNC_DIAG318)
+>>>>  
+>>>>  /* length and alignment of the sdnx as a power of two */
+>>>>  #define SDNXC 8
+>>>> @@ -254,6 +256,7 @@ struct kvm_sync_regs {
+>>>>  	__u64 pft;	/* pfault token [PFAULT] */
+>>>>  	__u64 pfs;	/* pfault select [PFAULT] */
+>>>>  	__u64 pfc;	/* pfault compare [PFAULT] */
+>>>> +	__u64 diag318;	/* diagnose 0x318 info */
+>>>>  	union {
+>>>>  		__u64 vrs[32][2];	/* vector registers (KVM_SYNC_VRS) */
+>>>>  		__u64 fprs[16];		/* fp registers (KVM_SYNC_FPRS) */
+>>>
+>>> It's been a while since I touched kvm_sync_regs the last time ... but
+>>> can your really extend this structure right in the middle without
+>>> breaking older user spaces (ie. QEMUs) ? This is a uapi header ... so I
+>>> think you rather have to add this add the end or e.g. put it into the
+>>> padding2 region or something like that...? Or do I miss something?
+>>
+>> Argh. You are right. It should go to the end and not in the middle. Will fixup.
+>>
+> 
+> Something like this on top. 
+> 
+> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+> index 2ae1b660086c..7a6b14874d65 100644
+> --- a/arch/s390/include/uapi/asm/kvm.h
+> +++ b/arch/s390/include/uapi/asm/kvm.h
+> @@ -256,7 +256,6 @@ struct kvm_sync_regs {
+>         __u64 pft;      /* pfault token [PFAULT] */
+>         __u64 pfs;      /* pfault select [PFAULT] */
+>         __u64 pfc;      /* pfault compare [PFAULT] */
+> -       __u64 diag318;  /* diagnose 0x318 info */
+>         union {
+>                 __u64 vrs[32][2];       /* vector registers (KVM_SYNC_VRS) */
+>                 __u64 fprs[16];         /* fp registers (KVM_SYNC_FPRS) */
+> @@ -267,7 +266,8 @@ struct kvm_sync_regs {
+>         __u8 reserved2 : 7;
+>         __u8 padding1[51];      /* riccb needs to be 64byte aligned */
+>         __u8 riccb[64];         /* runtime instrumentation controls block */
+> -       __u8 padding2[192];     /* sdnx needs to be 256byte aligned */
+> +       __u64 diag318;          /* diagnose 0x318 info */
+> +       __u8 padding2[184];     /* sdnx needs to be 256byte aligned */
+>         union {
+>                 __u8 sdnx[SDNXL];  /* state description annex */
+>                 struct {
 
-On Mon, Jun 22, 2020 at 11:03:12PM +0300, Andra Paraschiv wrote:
-> diff --git a/include/uapi/linux/nitro_enclaves.h b/include/uapi/linux/nitro_enclaves.h
-> new file mode 100644
-> index 000000000000..3270eb939a97
-> --- /dev/null
-> +++ b/include/uapi/linux/nitro_enclaves.h
-> @@ -0,0 +1,137 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/*
-> + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-> + */
-> +
-> +#ifndef _UAPI_LINUX_NITRO_ENCLAVES_H_
-> +#define _UAPI_LINUX_NITRO_ENCLAVES_H_
-> +
-> +#include <linux/types.h>
-> +
-> +/* Nitro Enclaves (NE) Kernel Driver Interface */
-> +
-> +#define NE_API_VERSION (1)
-> +
-> +/**
-> + * The command is used to get the version of the NE API. This way the user space
-> + * processes can be aware of the feature sets provided by the NE kernel driver.
-> + *
-> + * The NE API version is returned as result of this ioctl call.
-> + */
-> +#define NE_GET_API_VERSION _IO(0xAE, 0x20)
-> +
-> +/**
-> + * The command is used to create a slot that is associated with an enclave VM.
-> + *
-> + * The generated unique slot id is a read parameter of this command. An enclave
-> + * file descriptor is returned as result of this ioctl call. The enclave fd can
-> + * be further used with ioctl calls to set vCPUs and memory regions, then start
-> + * the enclave.
-> + */
-> +#define NE_CREATE_VM _IOR(0xAE, 0x21, __u64)
+Ack!
 
-Information that would be useful for the ioctls:
-
-1. Which fd the ioctl must be invoked on (/dev/nitro-enclaves, enclave fd, vCPU fd)
-
-2. Errnos and their meanings
-
-3. Which state(s) the ioctls may be invoked in (e.g. enclave created/started/etc)
-
-> +/* User memory region flags */
-> +
-> +/* Memory region for enclave general usage. */
-> +#define NE_DEFAULT_MEMORY_REGION (0x00)
-> +
-> +/* Memory region to be set for an enclave (write). */
-> +struct ne_user_memory_region {
-> +	/**
-> +	 * Flags to determine the usage for the memory region (write).
-> +	 */
-> +	__u64 flags;
-
-Where is the write flag defined?
-
-I guess it's supposed to be:
-
-  #define NE_USER_MEMORY_REGION_FLAG_WRITE (0x01)
-
---ILuaRSyQpoVaJ1HG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7xw7EACgkQnKSrs4Gr
-c8hwxQgAi3YUJ25wbsEdkGotyLSdG2c5mOoYfxYMfBJ6YXKB2gfDGUkJoWf2w3y+
-K7kP5vtCrPxZ+D1dfkPmyftRkocDFbzIS71EqbD14bMDKjPdvDjNI25XCCWpJf7I
-8rGr+HTzqq6w/W93LkGjUDNr0eNReyOXihvzWFmtiorGlqQt61XBoncwL4fr8tI2
-PpFjfJQ1yg5og8uxefvtJ9g8dChliP+WoRDDrqxoUSC39YZ4rVRS/jGF2UkQzw7S
-oE5S/T7ktI3Cu0x118OBHcVgNWwsWOPr/y52jbfUvTT0huZIlKKQfVSlj1saA6sa
-kGgFRv5JEYZkA/HHds91GHeKtGnbIQ==
-=059p
------END PGP SIGNATURE-----
-
---ILuaRSyQpoVaJ1HG--
+ Thomas
 
