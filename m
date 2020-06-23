@@ -2,121 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C28E204C4D
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:26:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62B86204C56
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:27:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731792AbgFWIZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 04:25:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26328 "EHLO
+        id S1731885AbgFWI1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 04:27:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54409 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731630AbgFWIZx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 04:25:53 -0400
+        with ESMTP id S1731718AbgFWI1S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 04:27:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592900752;
+        s=mimecast20190719; t=1592900837;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uatLoTht3LpxtV8y54s42CvqtAcAPf7U2lYUBgXuz/c=;
-        b=fVb3U84p2K2Yg+P/gazZWZawGmI4PlUwIxqiyU/xOwJ46x7o8PuY/6PZmCGXjFeVPFbL2d
-        kh5IEEmuSLpgzhBhboXsUUB2cXqXyU75nE1M69H3ROW2WVU22x0tocnY2gpH/Vga3wR6s6
-        DhFC3VDudS6Uh4nNWD4lM1AdnW8Hc/E=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-OBbQLGRLNjGHiyNx8QOtmg-1; Tue, 23 Jun 2020 04:25:50 -0400
-X-MC-Unique: OBbQLGRLNjGHiyNx8QOtmg-1
-Received: by mail-wr1-f70.google.com with SMTP id e11so4969491wrs.2
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 01:25:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=uatLoTht3LpxtV8y54s42CvqtAcAPf7U2lYUBgXuz/c=;
-        b=J10sF8z8yDIyWgSDcNWBpIHbIoFvK8eSx3EBHM4FjnpDt/IiAjs3zXkpJzkR/noX1r
-         WeY/KrETLgPD4+s/HdXMgX2YkSE09kUhe3xk6fr2Do9fp5pTtJRjuTP2cTAFp8cHUh0h
-         uGRvvvs9FCTd7TV8od9kwJ7QJot41knqu+zHMobVx3ZhNsWk2w+ZvZlwZSWzUDDa8QXU
-         yTPiHEJRUhMWByqfatb4ugjWZ9JeevlqQ4cf4/d/0pCOjQVt5H95kdz+E/dvyO0XDbde
-         Jg4OBvYYZNI4jH04nBFMxkjXMp7NqvDf0RTLvgu/OcKOOiT/qe2/YrD0tNob37TQ20vE
-         VgJQ==
-X-Gm-Message-State: AOAM533IFdOmUSwugV+IlkXtT4K0a2fFL5oUCeAhIL/ZY3kNmMEbYzXr
-        ks3NyodpE2SaEhAy3USea55rdplYxXScwhzkPAb5NIH8tDnYlYNRtktR2bcVP7HA26I17anpn9f
-        1i0SLdEsf+3qs
-X-Received: by 2002:adf:e482:: with SMTP id i2mr36530wrm.75.1592900749387;
-        Tue, 23 Jun 2020 01:25:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwc3XogzeNwsdZ7v2sDlZRwXqKbrYs2e6doW+SBbFx4Sho/d0OEnV4LbHlJbrymQKkvurtxAg==
-X-Received: by 2002:adf:e482:: with SMTP id i2mr36515wrm.75.1592900749185;
-        Tue, 23 Jun 2020 01:25:49 -0700 (PDT)
-Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
-        by smtp.gmail.com with ESMTPSA id e5sm19713184wrs.33.2020.06.23.01.25.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2020 01:25:48 -0700 (PDT)
-Date:   Tue, 23 Jun 2020 04:25:46 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-Message-ID: <20200623042456-mutt-send-email-mst@kernel.org>
-References: <20200611113404.17810-1-mst@redhat.com>
- <20200611113404.17810-3-mst@redhat.com>
- <0332b0cf-cf00-9216-042c-e870efa33626@redhat.com>
- <20200622115946-mutt-send-email-mst@kernel.org>
- <c56cc86d-a420-79ca-8420-e99db91980fa@redhat.com>
- <CAJaqyWc3C_Td_SpV97CuemkQH9vH+EL3sGgeWGE82E5gYxZNCA@mail.gmail.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=d9HjsnlPG7d2lI7SP6pinbDLKBTZckBRqaBaiNwA4Is=;
+        b=K4+8qw0bnMOcXn3eV2Xcj7xfKjUTTpRv5euXV5I9dAe/b0IGcYtdXgmJCepW9cQJB4ERgC
+        NUoJfzTNKUhwwXoH3dCwvp3H65HLCJFuoSBrMqVBU2SrF2uYD3hvFxdQTKkKng+D15BZN9
+        sB8g8RFxxXBrnHJl/5YyGtxnNJ6v1N8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-3w0UAWawMh-7EOKBLPfsXQ-1; Tue, 23 Jun 2020 04:27:15 -0400
+X-MC-Unique: 3w0UAWawMh-7EOKBLPfsXQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 708A6800597
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 08:27:14 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.193.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D93519D82;
+        Tue, 23 Jun 2020 08:27:13 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests RFC] Revert "SVM: move guest past HLT"
+Date:   Tue, 23 Jun 2020 10:27:11 +0200
+Message-Id: <20200623082711.803916-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJaqyWc3C_Td_SpV97CuemkQH9vH+EL3sGgeWGE82E5gYxZNCA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 09:00:57AM +0200, Eugenio Perez Martin wrote:
-> On Tue, Jun 23, 2020 at 4:51 AM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> >
-> > On 2020/6/23 上午12:00, Michael S. Tsirkin wrote:
-> > > On Wed, Jun 17, 2020 at 11:19:26AM +0800, Jason Wang wrote:
-> > >> On 2020/6/11 下午7:34, Michael S. Tsirkin wrote:
-> > >>>    static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
-> > >>>    {
-> > >>>     kfree(vq->descs);
-> > >>> @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
-> > >>>     for (i = 0; i < dev->nvqs; ++i) {
-> > >>>             vq = dev->vqs[i];
-> > >>>             vq->max_descs = dev->iov_limit;
-> > >>> +           if (vhost_vq_num_batch_descs(vq) < 0) {
-> > >>> +                   return -EINVAL;
-> > >>> +           }
-> > >> This check breaks vdpa which set iov_limit to zero. Consider iov_limit is
-> > >> meaningless to vDPA, I wonder we can skip the test when device doesn't use
-> > >> worker.
-> > >>
-> > >> Thanks
-> > > It doesn't need iovecs at all, right?
-> > >
-> > > -- MST
-> >
-> >
-> > Yes, so we may choose to bypass the iovecs as well.
-> >
-> > Thanks
-> >
-> 
-> I think that the kmalloc_array returns ZERO_SIZE_PTR for all of them
-> in that case, so I didn't bother to skip the kmalloc_array parts.
-> Would you prefer to skip them all and let them NULL? Or have I
-> misunderstood what you mean?
-> 
-> Thanks!
+'nmi_hlt' test returns somewhat weird result:
 
-Sorry about being unclear. I just meant that it seems cleaner
-to check for iov_limit being 0 not for worker thread.
+...
+PASS: direct NMI + hlt
+PASS: NMI intercept while running guest
+PASS: intercepted NMI + hlt
+PASS: nmi_hlt
+SUMMARY: 4 tests, 1 unexpected failures
 
+Trying to investigate where the failure is coming from I was tweaking
+the code around and with tiny meaningless changes I was able to observe
+ #PF, #GP, #UD and other 'interesting' results. Compiler optimization
+flags also change the outcome so there's obviously a corruption somewhere.
+Adding a meaningless 'nop' to the second 'asm volatile ("hlt");' in
+nmi_hlt_test() saves the day so it seems we erroneously advance RIP
+twice, the advancement in nmi_hlt_finished() is not needed.
+
+The outcome, however, contradicts with the commit message in 7e7aa86f74
+("SVM: move guest past HLT"). With that commit reverted, all tests seem
+to pass but I'm not sure what issue the commit was trying to fix, thus
+RFC.
+
+This reverts commit 7e7aa86f7418a8343de46583977f631e55fd02ed.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ x86/svm_tests.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index c1abd55646f2..977ead5235b8 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -1362,11 +1362,6 @@ static bool interrupt_finished(struct svm_test *test)
+             return true;
+         }
+ 
+-        /* The guest is not woken up from HLT and RIP still points to it.  */
+-        if (get_test_stage(test) == 3) {
+-            vmcb->save.rip++;
+-        }
+-
+         irq_enable();
+         asm volatile ("nop");
+         irq_disable();
+@@ -1553,9 +1548,6 @@ static bool nmi_hlt_finished(struct svm_test *test)
+             return true;
+         }
+ 
+-        /* The guest is not woken up from HLT and RIP still points to it.  */
+-        vmcb->save.rip++;
+-
+         report(true, "NMI intercept while running guest");
+         break;
+ 
 -- 
-MST
+2.25.4
 
