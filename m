@@ -2,124 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80F9E205319
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 15:13:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05B1C20531F
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 15:14:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732616AbgFWNN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 09:13:27 -0400
-Received: from mga07.intel.com ([134.134.136.100]:17374 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725955AbgFWNN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 09:13:26 -0400
-IronPort-SDR: 7Gm3tEZV3EjtHMTJEzAfW3UctKMDaq6HGEZ6Et0EflnJbIxrZRnxqJnGW0dj4digaitFSkwXND
- cuwvmINQM0bw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="209263120"
-X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
-   d="scan'208";a="209263120"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 06:13:25 -0700
-IronPort-SDR: Le9ycPgGvDojUvw7Md80fDMLb9kacjWq24P/YjbEzwBrc835iCcDz4RWW5PN2U2USulevGAv+k
- jX6e5y9up5jA==
-X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
-   d="scan'208";a="452218159"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.174.20]) ([10.249.174.20])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 06:13:22 -0700
-Subject: Re: [PATCH v12 00/11] Guest Last Branch Recording Enabling
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
-        wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200613080958.132489-1-like.xu@linux.intel.com>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <dc1c7ef1-5ab4-0f7b-5036-457193bc722c@linux.intel.com>
-Date:   Tue, 23 Jun 2020 21:13:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200613080958.132489-1-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1732649AbgFWNO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 09:14:26 -0400
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:42064 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732602AbgFWNO0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 09:14:26 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04397;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=38;SR=0;TI=SMTPD_---0U0WFKzW_1592918058;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U0WFKzW_1592918058)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 23 Jun 2020 21:14:18 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
+        chenhuacai@gmail.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tianjia.zhang@linux.alibaba.com
+Subject: [PATCH v6 0/5] clean up redundant 'kvm_run' parameters
+Date:   Tue, 23 Jun 2020 21:14:13 +0800
+Message-Id: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020/6/13 16:09, Like Xu wrote:
-> Hi all,
-> 
-> Please help review this new version for the Kenrel 5.9 release.
-> 
-> Now, you may apply the last two qemu-devel patches to the upstream
-> qemu and try the guest LBR feature with '-cpu host' command line.
-> 
-> v11->v12 Changelog:
-> - apply "Signed-off-by" form PeterZ and his codes for the perf subsystem;
-> - add validity checks before expose LBR via MSR_IA32_PERF_CAPABILITIES;
-> - refactor MSR_IA32_DEBUGCTLMSR emulation with validity check;
-> - reorder "perf_event_attr" fields according to how they're declared;
-> - replace event_is_oncpu() with "event->state" check;
-> - make LBR emualtion specific to vmx rather than x86 generic;
-> - move pass-through LBR code to vmx.c instead of pmu_intel.c;
-> - add vmx_lbr_en/disable_passthrough layer to make code readable;
-> - rewrite pmu availability check with vmx_passthrough_lbr_msrs();
-> 
-> You may check more details in each commit.
-> 
-> Previous:
-> https://lore.kernel.org/kvm/20200514083054.62538-1-like.xu@linux.intel.com/
-> 
-> ---
-...
-> 
-> Wei Wang (1):
->   perf/x86: Fix variable types for LBR registers > Like Xu (10):
->    perf/x86/core: Refactor hw->idx checks and cleanup
->    perf/x86/lbr: Add interface to get LBR information
->    perf/x86: Add constraint to create guest LBR event without hw counter
->    perf/x86: Keep LBR records unchanged in host context for guest usage
+In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+structure. For historical reasons, many kvm-related function parameters
+retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+patch does a unified cleanup of these remaining redundant parameters.
 
-Hi Peter,
-Would you like to add "Acked-by" to the first three perf patches ?
+This series of patches has completely cleaned the architecture of
+arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
+the large number of modified codes, a separate patch is made for each
+platform. On the ppc platform, there is also a redundant structure
+pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
+separately.
 
->    KVM: vmx/pmu: Expose LBR to guest via MSR_IA32_PERF_CAPABILITIES
->    KVM: vmx/pmu: Unmask LBR fields in the MSR_IA32_DEBUGCTLMSR emualtion
->    KVM: vmx/pmu: Pass-through LBR msrs when guest LBR event is scheduled
->    KVM: vmx/pmu: Emulate legacy freezing LBRs on virtual PMI
->    KVM: vmx/pmu: Reduce the overhead of LBR pass-through or cancellation
->    KVM: vmx/pmu: Release guest LBR event via lazy release mechanism
-> 
+---
+v6 changes:
+  Rearrange patch sets, only keep the unmerged patch.
+  rebase on mainline.
 
-Hi Paolo,
-Would you like to take a moment to review the KVM part for this feature ?
+v5 change:
+  ppc: fix for review.
 
-Thanks,
-Like Xu
+v4 change:
+  mips: fixes two errors in entry.c.
 
-> 
-> Qemu-devel:
->    target/i386: add -cpu,lbr=true support to enable guest LBR
-> 
->   arch/x86/events/core.c            |  26 +--
->   arch/x86/events/intel/core.c      | 109 ++++++++-----
->   arch/x86/events/intel/lbr.c       |  51 +++++-
->   arch/x86/events/perf_event.h      |   8 +-
->   arch/x86/include/asm/perf_event.h |  34 +++-
->   arch/x86/kvm/pmu.c                |  12 +-
->   arch/x86/kvm/pmu.h                |   5 +
->   arch/x86/kvm/vmx/capabilities.h   |  23 ++-
->   arch/x86/kvm/vmx/pmu_intel.c      | 253 +++++++++++++++++++++++++++++-
->   arch/x86/kvm/vmx/vmx.c            |  86 +++++++++-
->   arch/x86/kvm/vmx/vmx.h            |  17 ++
->   arch/x86/kvm/x86.c                |  13 --
->   12 files changed, 559 insertions(+), 78 deletions(-)
-> 
+v3 change:
+  Keep the existing `vcpu->run` in the function body unchanged.
+
+v2 change:
+  s390 retains the original variable name and minimizes modification.
+
+Tianjia Zhang (5):
+  KVM: s390: clean up redundant 'kvm_run' parameters
+  KVM: arm64: clean up redundant 'kvm_run' parameters
+  KVM: PPC: clean up redundant kvm_run parameters in assembly
+  KVM: MIPS: clean up redundant 'kvm_run' parameters
+  KVM: MIPS: clean up redundant kvm_run parameters in assembly
+
+ arch/arm64/include/asm/kvm_coproc.h   |  12 +--
+ arch/arm64/include/asm/kvm_host.h     |  11 +--
+ arch/arm64/include/asm/kvm_mmu.h      |   2 +-
+ arch/arm64/kvm/arm.c                  |   6 +-
+ arch/arm64/kvm/handle_exit.c          |  36 ++++----
+ arch/arm64/kvm/mmio.c                 |  11 +--
+ arch/arm64/kvm/mmu.c                  |   5 +-
+ arch/arm64/kvm/sys_regs.c             |  13 ++-
+ arch/mips/include/asm/kvm_host.h      |  32 ++------
+ arch/mips/kvm/emulate.c               |  59 +++++--------
+ arch/mips/kvm/entry.c                 |  21 ++---
+ arch/mips/kvm/mips.c                  |  14 ++--
+ arch/mips/kvm/trap_emul.c             | 114 +++++++++++---------------
+ arch/mips/kvm/vz.c                    |  26 +++---
+ arch/powerpc/include/asm/kvm_ppc.h    |   2 +-
+ arch/powerpc/kvm/book3s_interrupts.S  |  22 +++--
+ arch/powerpc/kvm/book3s_pr.c          |   9 +-
+ arch/powerpc/kvm/booke.c              |   9 +-
+ arch/powerpc/kvm/booke_interrupts.S   |   9 +-
+ arch/powerpc/kvm/bookehv_interrupts.S |  10 +--
+ arch/s390/kvm/kvm-s390.c              |  23 ++++--
+ 21 files changed, 188 insertions(+), 258 deletions(-)
+
+-- 
+2.17.1
 
