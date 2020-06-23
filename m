@@ -2,74 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60A72204B0B
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 09:28:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA533204B1C
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 09:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731505AbgFWH24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 03:28:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26932 "EHLO
+        id S1731612AbgFWHaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 03:30:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29528 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731057AbgFWH2z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 03:28:55 -0400
+        with ESMTP id S1730830AbgFWHaN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 03:30:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592897335;
+        s=mimecast20190719; t=1592897412;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=KOoSXZOmbiUr1rlTG1Dr2upX/xU5gp149xe2zR0H7ME=;
-        b=UeuuIx/XMCRxn4A5gt9CcY40DMzsh9FuYtwsxWlQtRURcj8RIJTkxRFRXjqwVCL8Dpq1F6
-        4JL653LCutGLT2o2w7LaLtWthNokdN3utUmSkqiFhA0ridLPqn2I/wyclBRCmwMBDSOftF
-        hX4LlOEtwHI6V4JzDtShpbrL0aKVos0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-1Uup3uu5NKKfl9DPjjzKFA-1; Tue, 23 Jun 2020 03:28:52 -0400
-X-MC-Unique: 1Uup3uu5NKKfl9DPjjzKFA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29A50805EE4
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 07:28:52 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E86E25C1D4
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 07:28:51 +0000 (UTC)
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xG+vPmO09PLIStXFidNP/fWUMuwznoRLPwS1a87G2rU=;
+        b=S5XTefc3vA3r7VSOY8DWooJA2Zaw4ImC+U3RtYmsiR0GHuxc7bpKKqFK27bWAaxu5NmATc
+        RenhDxu7qaeJmDl2D1lRUlr1qPm1CevGyrfmHou28RCEgDzpzzzPSrmNDHpgDU8qxFddIE
+        YEYdLgegCfcNK+Qt5wVRYlLOrtJ1rF8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-aoYgrzCDPjCeOtohvEfYBg-1; Tue, 23 Jun 2020 03:30:10 -0400
+X-MC-Unique: aoYgrzCDPjCeOtohvEfYBg-1
+Received: by mail-wr1-f70.google.com with SMTP id y13so1213158wrp.13
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 00:30:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xG+vPmO09PLIStXFidNP/fWUMuwznoRLPwS1a87G2rU=;
+        b=TCZhYK0j5zeKbyesSdTqp7NJq0rJYAccgOupalsU8uzsU56PuBZCRr0E14tRxDeJwB
+         CRHUu43BrHE3wP/4rBgZD8WTYRpinMrYk5Zw81lqNPb7OpKjMcoWkeuiMT1LsP5NAX/B
+         GA7XxVvazHLG3p4pEv3Z3U6jNaTA0GI/t9aUMT+kuqBMCZJu8LpzfPomx2JKELCxh37e
+         KHxzGpf/Y/d+nBrcKvg4eoNS5QBT41L6M0IriEQ+DA4JbKXoTwRs3rR2AYir1Q77X9WO
+         y+xchCqri/yL2vT3/yDqtcPHSDJ+7kB/yKwLT2P01A5JeZ8mHc8s4VynLWpzYYd5y6Mc
+         q+Bg==
+X-Gm-Message-State: AOAM530XISHOi3s7Y2LuspTwPwdqbFELNTQdxdNbDIRQrOjWJxIA7bIO
+        so4g02UqtUPVssh8a80bJaCUr9pfgo+F11ravqLJlySbGQIGTcv+8PcvfXJi/TJkRHCXiSeM3yS
+        LBKkHI7zay+3k
+X-Received: by 2002:adf:a491:: with SMTP id g17mr24849392wrb.132.1592897409320;
+        Tue, 23 Jun 2020 00:30:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyq7ChqOSjzQTjNWD8bKOLf2k0/XEOFe3M1v/CXfxXvnOz5le81vgnjgvqLGIC9Ugzy5sPvFQ==
+X-Received: by 2002:adf:a491:: with SMTP id g17mr24849369wrb.132.1592897409099;
+        Tue, 23 Jun 2020 00:30:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:24f5:23b:4085:b879? ([2001:b07:6468:f312:24f5:23b:4085:b879])
+        by smtp.gmail.com with ESMTPSA id x11sm2334177wmc.26.2020.06.23.00.30.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jun 2020 00:30:08 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PULL 00/12] CI-related fixes and improvements
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+References: <20200616185622.8644-1-thuth@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] lib/alloc.c: fix missing include
-Date:   Tue, 23 Jun 2020 03:28:51 -0400
-Message-Id: <20200623072851.30972-1-pbonzini@redhat.com>
+Message-ID: <2948ba50-acad-4c18-33ae-e45a2b876969@redhat.com>
+Date:   Tue, 23 Jun 2020 09:30:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200616185622.8644-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Include bitops.h to get BITS_PER_LONG and avoid errors such as
+On 16/06/20 20:56, Thomas Huth wrote:
+>   https://gitlab.com/huth/kvm-unit-tests.git tags/pull-request-2020-06-16
 
-lib/alloc.c: In function mult_overflow:
-lib/alloc.c:24:9: error: right shift count >= width of type
-[-Werror=shift-count-overflow]
-   24 |  if ((a >> 32) && (b >> 32))
-      |         ^~
+Pulled, thanks.
 
-Fixes: cde8415e1 ("lib/alloc.c: add overflow check for calloc")
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- lib/alloc.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/lib/alloc.c b/lib/alloc.c
-index f4aa87a..6c89f98 100644
---- a/lib/alloc.c
-+++ b/lib/alloc.c
-@@ -1,5 +1,6 @@
- #include "alloc.h"
- #include "asm/page.h"
-+#include "bitops.h"
- 
- void *malloc(size_t size)
- {
--- 
-2.26.2
+Paolo
 
