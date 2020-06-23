@@ -2,113 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 137B9205B36
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 20:56:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CE06205B6C
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 21:05:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387433AbgFWS4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 14:56:11 -0400
-Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:40565 "EHLO
-        esa2.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733170AbgFWS4J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 14:56:09 -0400
-Authentication-Results: esa2.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none
-IronPort-SDR: HZoyfT2vf33w1z9W96Q31xxyjCAMO0xw8TBy2gZTBDmoSy1MZFeXrch2n1spl+f6E/NmTrtxwS
- k5iP7kQ8cuLxbbU/vnhwv+jjfEP+J4H7JT9PoWyzn9SMW32au21uissWCgPFMqewyZ+dmLcQmm
- xToOXokdpxYtZvL+C7DQ2JGvzLImSCiT/rWn4+gqqkVjcrBkNDR1toDJYNrOUlwscUAo3zkcWF
- YwCzwu7QTuQSrF+xGeJofhf4ROYfqp3oP8mmvifiIBd7DBn9hUnF0i5LHE+uR6dxKq+LyfjgFx
- fo8=
-X-SBRS: 2.7
-X-MesageID: 20764232
-X-Ironport-Server: esa2.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.75,272,1589256000"; 
-   d="scan'208";a="20764232"
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-To:     Andy Lutomirski <luto@kernel.org>
-CC:     Peter Zijlstra <peterz@infradead.org>,
-        Joerg Roedel <jroedel@suse.de>, Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Tom Lendacky" <Thomas.Lendacky@amd.com>,
-        Mike Stunes <mstunes@vmware.com>,
-        "Dan Williams" <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Juergen Gross" <JGross@suse.com>, Jiri Slaby <jslaby@suse.cz>,
-        Kees Cook <keescook@chromium.org>,
+        id S1733248AbgFWTFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 15:05:08 -0400
+Received: from mga12.intel.com ([192.55.52.136]:30096 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733138AbgFWTFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 15:05:08 -0400
+IronPort-SDR: Zj6Oc6+RSg+O8gIKqtbcRDOP/aJObN2iAV96FP32RaamC3N9/N76An69uZl/FYyyJDI+KOvhZb
+ DP0gO5aSJREw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="123874407"
+X-IronPort-AV: E=Sophos;i="5.75,272,1589266800"; 
+   d="scan'208";a="123874407"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 12:05:05 -0700
+IronPort-SDR: Chcib1/+wuz5WjhZ0050ny00zBjMRvXvTvNn3tklhvytgw8+sR8FvVU90+35xP2RxmCjhmwSjR
+ mKS0w4Ebbh6Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,272,1589266800"; 
+   d="scan'208";a="287431388"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga007.jf.intel.com with ESMTP; 23 Jun 2020 12:05:04 -0700
+Date:   Tue, 23 Jun 2020 12:05:04 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Like Xu <like.xu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         kvm list <kvm@vger.kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, wei.huang2@amd.com,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         LKML <linux-kernel@vger.kernel.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        X86 ML <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200425202316.GL21900@8bytes.org>
- <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
- <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
- <20200623094519.GF31822@suse.de>
- <20200623104559.GA4817@hirez.programming.kicks-ass.net>
- <20200623111107.GG31822@suse.de>
- <20200623111443.GC4817@hirez.programming.kicks-ass.net>
- <20200623114324.GA14101@suse.de>
- <20200623115014.GE4817@hirez.programming.kicks-ass.net>
- <20200623121237.GC14101@suse.de>
- <20200623130322.GH4817@hirez.programming.kicks-ass.net>
- <9e3f9b2a-505e-dfd7-c936-461227b4033e@citrix.com>
- <CALCETrWEUXU_BYd5ypF3XC10hSQUJ=XCVz40n3VfcWELS+roTg@mail.gmail.com>
-From:   Andrew Cooper <andrew.cooper3@citrix.com>
-Message-ID: <7a7c6e7c-8450-3785-035a-197be9268b70@citrix.com>
-Date:   Tue, 23 Jun 2020 19:56:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Li RongQing <lirongqing@baidu.com>,
+        Chai Wen <chaiwen@baidu.com>, Jia Lina <jialina01@baidu.com>
+Subject: Re: [PATCH] KVM: X86: Emulate APERF/MPERF to report actual VCPU
+ frequency
+Message-ID: <20200623190504.GC24107@linux.intel.com>
+References: <20200623063530.81917-1-like.xu@linux.intel.com>
+ <20200623182910.GA24107@linux.intel.com>
+ <CALMp9eQPA40FWBEOiQ8T5JX2fv+uEfU_x6js8WhAguQ8TL6frA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CALCETrWEUXU_BYd5ypF3XC10hSQUJ=XCVz40n3VfcWELS+roTg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eQPA40FWBEOiQ8T5JX2fv+uEfU_x6js8WhAguQ8TL6frA@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/2020 19:26, Andy Lutomirski wrote:
-> On Tue, Jun 23, 2020 at 8:23 AM Andrew Cooper <andrew.cooper3@citrix.com> wrote:
->> On 23/06/2020 14:03, Peter Zijlstra wrote:
->>> On Tue, Jun 23, 2020 at 02:12:37PM +0200, Joerg Roedel wrote:
->>>> On Tue, Jun 23, 2020 at 01:50:14PM +0200, Peter Zijlstra wrote:
->>>>> If SNP is the sole reason #VC needs to be IST, then I'd strongly urge
->>>>> you to only make it IST if/when you try and make SNP happen, not before.
->>>> It is not the only reason, when ES guests gain debug register support
->>>> then #VC also needs to be IST, because #DB can be promoted into #VC
->>>> then, and as #DB is IST for a reason, #VC needs to be too.
->>> Didn't I read somewhere that that is only so for Rome/Naples but not for
->>> the later chips (Milan) which have #DB pass-through?
->> I don't know about hardware timelines, but some future part can now opt
->> in to having debug registers as part of the encrypted state, and swapped
->> by VMExit, which would make debug facilities generally usable, and
->> supposedly safe to the #DB infinite loop issues, at which point the
->> hypervisor need not intercept #DB for safety reasons.
->>
->> Its worth nothing that on current parts, the hypervisor can set up debug
->> facilities on behalf of the guest (or behind its back) as the DR state
->> is unencrypted, but that attempting to intercept #DB will redirect to
->> #VC inside the guest and cause fun. (Also spare a thought for 32bit
->> kernels which have to cope with userspace singlestepping the SYSENTER
->> path with every #DB turning into #VC.)
-> What do you mean 32-bit?  64-bit kernels have exactly the same
-> problem.  At least the stack is okay, though.
+On Tue, Jun 23, 2020 at 11:39:16AM -0700, Jim Mattson wrote:
+> On Tue, Jun 23, 2020 at 11:29 AM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > On Tue, Jun 23, 2020 at 02:35:30PM +0800, Like Xu wrote:
+> > > The aperf/mperf are used to report current CPU frequency after 7d5905dc14a
+> > > "x86 / CPU: Always show current CPU frequency in /proc/cpuinfo". But guest
+> > > kernel always reports a fixed VCPU frequency in the /proc/cpuinfo, which
+> > > may confuse users especially when turbo is enabled on the host.
+> > >
+> > > Emulate guest APERF/MPERF capability based their values on the host.
+> > >
+> > > Co-developed-by: Li RongQing <lirongqing@baidu.com>
+> > > Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> > > Reviewed-by: Chai Wen <chaiwen@baidu.com>
+> > > Reviewed-by: Jia Lina <jialina01@baidu.com>
+> > > Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> > > ---
+> >
+> > ...
+> >
+> > > @@ -8312,7 +8376,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> > >               dm_request_for_irq_injection(vcpu) &&
+> > >               kvm_cpu_accept_dm_intr(vcpu);
+> > >       fastpath_t exit_fastpath;
+> > > -
+> > > +     u64 enter_mperf = 0, enter_aperf = 0, exit_mperf = 0, exit_aperf = 0;
+> > >       bool req_immediate_exit = false;
+> > >
+> > >       if (kvm_request_pending(vcpu)) {
+> > > @@ -8516,8 +8580,17 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> > >               vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
+> > >       }
+> > >
+> > > +     if (unlikely(vcpu->arch.hwp.hw_coord_fb_cap))
+> > > +             get_host_amperf(&enter_mperf, &enter_aperf);
+> > > +
+> > >       exit_fastpath = kvm_x86_ops.run(vcpu);
+> > >
+> > > +     if (unlikely(vcpu->arch.hwp.hw_coord_fb_cap)) {
+> > > +             get_host_amperf(&exit_mperf, &exit_aperf);
+> > > +             vcpu_update_amperf(vcpu, get_amperf_delta(enter_aperf, exit_aperf),
+> > > +                     get_amperf_delta(enter_mperf, exit_mperf));
+> > > +     }
+> > > +
+> >
+> > Is there an alternative approach that doesn't require 4 RDMSRs on every VMX
+> > round trip?  That's literally more expensive than VM-Enter + VM-Exit
+> > combined.
+> >
+> > E.g. what about adding KVM_X86_DISABLE_EXITS_APERF_MPERF and exposing the
+> > MSRs for read when that capability is enabled?
+> 
+> When would you load the hardware MSRs with the guest/host values?
 
-:)
+Ugh, I was thinking the MSRs were read-only.
 
-AMD-like CPUs disallow SYSENTER/SYSEXIT in Long Mode, and raise #UD,
-even from a compatibility mode segment.
-
-64bit kernels only have this problem on Intel-like CPUs.
-
-(It is a massive shame that between everyone's attempts, there are 0
-"fast system call" instructions with sane semantics, but it is several
-decades late to fix this problem...)
-
-~Andrew
+Doesn't this also interact with TSC scaling?
