@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4465E20517B
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 13:58:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02397205184
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 13:58:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732583AbgFWL6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 07:58:34 -0400
+        id S1732620AbgFWL6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 07:58:48 -0400
 Received: from mga05.intel.com ([192.55.52.43]:58474 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732573AbgFWL6b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 07:58:31 -0400
-IronPort-SDR: S6+6KISBQ74xbYVjjwRu6OlQr2JYX3lNZW1LTPf8C6on7MDS+7q8awbrel/QXEbyKHizXSxKCD
- 1Crl731P0cEg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="228710092"
+        id S1732578AbgFWL6d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 07:58:33 -0400
+IronPort-SDR: rupZRBzTxkE7NtOkSPo6EvNfVKu6lfAral80sx3SfaZycRERQpJ8xKcBOeLpYnOOGLeRJ3m25C
+ aztTi4zltXWA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="228710113"
 X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
-   d="scan'208";a="228710092"
+   d="scan'208";a="228710113"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 04:58:30 -0700
-IronPort-SDR: J3EYd2Ed+YO377YOzdYgFTak2ETrA48FJbCAbIuhcgob9bRZdLWPFrMWtd1Yz2xJv2760zwhVA
- u2E/v67qJUNA==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 04:58:33 -0700
+IronPort-SDR: uVAnUNFTByGXkW9TyRZCZbEIB48K8uxJ+DwXuuu55pSWYlwlD3r7Qt0dLM/UAmMZ3qG8vn6J6J
+ 2oPNxdYz1VwQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
-   d="scan'208";a="285745721"
+   d="scan'208";a="285745900"
 Received: from lxy-dell.sh.intel.com ([10.239.159.21])
-  by orsmga007.jf.intel.com with ESMTP; 23 Jun 2020 04:58:28 -0700
+  by orsmga007.jf.intel.com with ESMTP; 23 Jun 2020 04:58:30 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -35,9 +35,9 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v2 4/7] KVM: X86: Split kvm_update_cpuid()
-Date:   Tue, 23 Jun 2020 19:58:13 +0800
-Message-Id: <20200623115816.24132-5-xiaoyao.li@intel.com>
+Subject: [PATCH v2 5/7] KVM: X86: Rename cpuid_update() to update_vcpu_model()
+Date:   Tue, 23 Jun 2020 19:58:14 +0800
+Message-Id: <20200623115816.24132-6-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200623115816.24132-1-xiaoyao.li@intel.com>
 References: <20200623115816.24132-1-xiaoyao.li@intel.com>
@@ -46,127 +46,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Split the part of updating vcpu model out of kvm_update_cpuid(), and put
-it into a new kvm_update_vcpu_model(). So it's more clear that
-kvm_update_cpuid() is to update guest CPUID settings, while
-kvm_update_vcpu_model() is to update vcpu model (settings) based on the
-updated CPUID settings.
+The name of callback cpuid_update() is misleading that it's not about
+updating CPUID settings of vcpu but updating the configurations of vcpu
+based on the CPUIDs. So rename it to update_vcpu_model().
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- arch/x86/kvm/cpuid.c | 38 ++++++++++++++++++++++++--------------
- arch/x86/kvm/cpuid.h |  1 +
- arch/x86/kvm/x86.c   |  1 +
- 3 files changed, 26 insertions(+), 14 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 2 +-
+ arch/x86/kvm/cpuid.c            | 4 ++--
+ arch/x86/kvm/svm/svm.c          | 4 ++--
+ arch/x86/kvm/vmx/nested.c       | 2 +-
+ arch/x86/kvm/vmx/vmx.c          | 4 ++--
+ 5 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f852ee350beb..e8ae89eef199 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1083,7 +1083,7 @@ struct kvm_x86_ops {
+ 	void (*hardware_unsetup)(void);
+ 	bool (*cpu_has_accelerated_tpr)(void);
+ 	bool (*has_emulated_msr)(u32 index);
+-	void (*cpuid_update)(struct kvm_vcpu *vcpu);
++	void (*update_vcpu_model)(struct kvm_vcpu *vcpu);
+ 
+ 	unsigned int vm_size;
+ 	int (*vm_init)(struct kvm *kvm);
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 67e5c68fdb45..001f5a94880e 100644
+index 001f5a94880e..d2f93823f9fd 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -76,7 +76,6 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
- void kvm_update_cpuid(struct kvm_vcpu *vcpu)
+@@ -224,7 +224,7 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+ 
+ 	cpuid_fix_nx_cap(vcpu);
+ 	kvm_apic_set_version(vcpu);
+-	kvm_x86_ops.cpuid_update(vcpu);
++	kvm_x86_ops.update_vcpu_model(vcpu);
+ 	kvm_update_cpuid(vcpu);
+ 	kvm_update_vcpu_model(vcpu);
+ 
+@@ -254,7 +254,7 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ 	kvm_apic_set_version(vcpu);
+-	kvm_x86_ops.cpuid_update(vcpu);
++	kvm_x86_ops.update_vcpu_model(vcpu);
+ 	kvm_update_cpuid(vcpu);
+ 	kvm_update_vcpu_model(vcpu);
+ out:
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c0da4dd78ac5..480d0354910a 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3551,7 +3551,7 @@ static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ 	return 0;
+ }
+ 
+-static void svm_cpuid_update(struct kvm_vcpu *vcpu)
++static void svm_update_vcpu_model(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_cpuid_entry2 *best;
--	struct kvm_lapic *apic = vcpu->arch.apic;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
- 	best = kvm_find_cpuid_entry(vcpu, 1, 0);
- 	if (best) {
-@@ -87,13 +86,6 @@ void kvm_update_cpuid(struct kvm_vcpu *vcpu)
+@@ -4051,7 +4051,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
  
- 		cpuid_entry_change(best, X86_FEATURE_APIC,
- 			   vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE);
--
--		if (apic) {
--			if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
--				apic->lapic_timer.timer_mode_mask = 3 << 17;
--			else
--				apic->lapic_timer.timer_mode_mask = 1 << 17;
--		}
- 	}
+ 	.get_exit_info = svm_get_exit_info,
  
- 	best = kvm_find_cpuid_entry(vcpu, 7, 0);
-@@ -102,13 +94,8 @@ void kvm_update_cpuid(struct kvm_vcpu *vcpu)
- 				   kvm_read_cr4_bits(vcpu, X86_CR4_PKE));
+-	.cpuid_update = svm_cpuid_update,
++	.update_vcpu_model = svm_update_vcpu_model,
  
- 	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
--	if (!best) {
--		vcpu->arch.guest_supported_xcr0 = 0;
--	} else {
--		vcpu->arch.guest_supported_xcr0 =
--			(best->eax | ((u64)best->edx << 32)) & supported_xcr0;
-+	if (best)
- 		best->ebx = xstate_required_size(vcpu->arch.xcr0, false);
--	}
+ 	.has_wbinvd_exit = svm_has_wbinvd_exit,
  
- 	best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
- 	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-@@ -127,6 +114,27 @@ void kvm_update_cpuid(struct kvm_vcpu *vcpu)
- 					   vcpu->arch.ia32_misc_enable_msr &
- 					   MSR_IA32_MISC_ENABLE_MWAIT);
- 	}
-+}
-+
-+void kvm_update_vcpu_model(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_lapic *apic = vcpu->arch.apic;
-+	struct kvm_cpuid_entry2 *best;
-+
-+	best = kvm_find_cpuid_entry(vcpu, 1, 0);
-+	if (best && apic) {
-+		if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
-+			apic->lapic_timer.timer_mode_mask = 3 << 17;
-+		else
-+			apic->lapic_timer.timer_mode_mask = 1 << 17;
-+	}
-+
-+	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
-+	if (!best)
-+		vcpu->arch.guest_supported_xcr0 = 0;
-+	else
-+		vcpu->arch.guest_supported_xcr0 =
-+			(best->eax | ((u64)best->edx << 32)) & supported_xcr0;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index d1af20b050a8..86ba7cd49c97 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -6322,7 +6322,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
  
- 	/* Note, maxphyaddr must be updated before tdp_level. */
- 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
-@@ -218,6 +226,7 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
- 	kvm_apic_set_version(vcpu);
- 	kvm_x86_ops.cpuid_update(vcpu);
- 	kvm_update_cpuid(vcpu);
-+	kvm_update_vcpu_model(vcpu);
- 
- 	kvfree(cpuid_entries);
- out:
-@@ -247,6 +256,7 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
- 	kvm_apic_set_version(vcpu);
- 	kvm_x86_ops.cpuid_update(vcpu);
- 	kvm_update_cpuid(vcpu);
-+	kvm_update_vcpu_model(vcpu);
- out:
- 	return r;
+ 	/*
+ 	 * secondary cpu-based controls.  Do not include those that
+-	 * depend on CPUID bits, they are added later by vmx_cpuid_update.
++	 * depend on CPUID bits, they are added later by vmx_update_vcpu_model.
+ 	 */
+ 	if (msrs->procbased_ctls_high & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS)
+ 		rdmsr(MSR_IA32_VMX_PROCBASED_CTLS2,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b1a23ad986ff..147c696d6445 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7251,7 +7251,7 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+ 		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
  }
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index f136de1debad..45e3643e2fba 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -10,6 +10,7 @@ extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
- void kvm_set_cpu_caps(void);
  
- void kvm_update_cpuid(struct kvm_vcpu *vcpu);
-+void kvm_update_vcpu_model(struct kvm_vcpu *vcpu);
- struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
- 					      u32 function, u32 index);
- int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 00c88c2f34e4..4dee28bbc087 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8149,6 +8149,7 @@ static void enter_smm(struct kvm_vcpu *vcpu)
- #endif
+-static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
++static void vmx_update_vcpu_model(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
  
- 	kvm_update_cpuid(vcpu);
-+	kvm_update_vcpu_model(vcpu);
- 	kvm_mmu_reset_context(vcpu);
- }
+@@ -7945,7 +7945,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 
+ 	.get_exit_info = vmx_get_exit_info,
+ 
+-	.cpuid_update = vmx_cpuid_update,
++	.update_vcpu_model = vmx_update_vcpu_model,
+ 
+ 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
  
 -- 
 2.18.2
