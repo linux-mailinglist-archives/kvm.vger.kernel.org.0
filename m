@@ -2,104 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AEB9204DFB
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 11:31:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C5FB204E05
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 11:33:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732198AbgFWJbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 05:31:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1942 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731945AbgFWJbA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 05:31:00 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05N922Vq034764;
-        Tue, 23 Jun 2020 05:31:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31tysr85dh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 05:30:59 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05N9Uxhm158687;
-        Tue, 23 Jun 2020 05:30:59 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31tysr82ar-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 05:30:59 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05N9OP7x008836;
-        Tue, 23 Jun 2020 09:24:25 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 31sa37vuup-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 09:24:25 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05N9OMTY50921618
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Jun 2020 09:24:22 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8B3125205A;
-        Tue, 23 Jun 2020 09:24:22 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.145.62.182])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 19AE75204F;
-        Tue, 23 Jun 2020 09:24:22 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, frankja@linux.vnet.ibm.com, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
-Subject: [GIT PULL 0/1] KVM: s390: Fix for 5.8
-Date:   Tue, 23 Jun 2020 11:23:40 +0200
-Message-Id: <20200623092341.10348-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.4
+        id S1731888AbgFWJdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 05:33:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731786AbgFWJdU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 05:33:20 -0400
+Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2016C061573;
+        Tue, 23 Jun 2020 02:33:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=XVgP/PctBqJeW7JDqvouvQRrXRHjlxZTGxeF2IRtkpg=; b=N5tZXcc8BD2j+X6gFYm94ce8eJ
+        W+D+b2Wna0rnhFRpaQqDWTmavQWAOS0V/Im/fsGPLpJvkU/YdrPwVRxUqttLxxWCeLEcStH4ZT49B
+        3Jm9vkG7l2YCqfA4atcqtKolWnpX+tNkwZwZ2g2e8abmFRmZVkUMwSmiM/puM7sOEFyuLx5JlbGgv
+        HTfwvJRyWOq2C4vlCdGGVrf+UyKg0wEd5RWURJ9b+XgZUhHV6cfOOufrcIKhFd4S2n7wTYQvai6r5
+        WcUV5EKtwJiR4rkDowdyxg4RBoUFuEWlP5oZpDbKX4LRgDJvs3s4mn4Olm1FC5Lft3bzzH6dU4x57
+        KPpMAqyw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jnfI9-0002rp-BP; Tue, 23 Jun 2020 09:32:33 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0D19C300F28;
+        Tue, 23 Jun 2020 11:32:31 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id EDE10237095DD; Tue, 23 Jun 2020 11:32:30 +0200 (CEST)
+Date:   Tue, 23 Jun 2020 11:32:30 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     syzbot <syzbot+dbf8cf3717c8ef4a90a0@syzkaller.appspotmail.com>,
+        bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-next@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org, elver@google.com
+Subject: Re: linux-next build error (9)
+Message-ID: <20200623093230.GD4781@hirez.programming.kicks-ass.net>
+References: <000000000000c25ce105a8a8fcd9@google.com>
+ <20200622094923.GP576888@hirez.programming.kicks-ass.net>
+ <20200623124413.08b2bd65@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-23_04:2020-06-22,2020-06-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- mlxscore=0 bulkscore=0 spamscore=0 clxscore=1015 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 phishscore=0 mlxlogscore=999
- cotscore=-2147483648 suspectscore=1 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006230068
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
+In-Reply-To: <20200623124413.08b2bd65@canb.auug.org.au>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
 
-please pull this fix reducing the number of (currently unused) iopins
-for kvm/master.
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jun 23, 2020 at 12:44:13PM +1000, Stephen Rothwell wrote:
+> Hi Peter,
+>=20
+> On Mon, 22 Jun 2020 11:49:23 +0200 Peter Zijlstra <peterz@infradead.org> =
+wrote:
 
-The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+> > Hurmph, I though that was cured in GCC >=3D 8. Marco?
+>=20
+> So what causes this? Because we got a couple of these in our s390 builds =
+last night as well.
 
-  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
+This is KASAN's __no_sanitize_address function attribute. Some GCC
+versions are utterly wrecked when that function attribute is combined
+with inlining. It wants to have matching attributes for the function
+being inlined and function it is inlined into -- hence the function
+attribute mismatch.
 
-are available in the Git repository at:
+> kernel/locking/lockdep.c:805:1: error: inlining failed in call to always_=
+inline 'look_up_lock_class': function attribute mismatch
+> include/linux/debug_locks.h:15:28: error: inlining failed in call to alwa=
+ys_inline '__debug_locks_off': function attribute mismatch
+>=20
+> s390-linux-gcc (GCC) 8.1.0 / GNU ld (GNU Binutils) 2.30
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-5.8-3
+*groan*... So supposedly it was supposed to work on GCC-8 and later, see
+commit 7b861a53e46b6. But now it turns out there's some later versions
+that fail too.
 
-for you to fetch changes up to 774911290c589e98e3638e73b24b0a4d4530e97c:
+I suppose the next quest is finding a s390 compiler version that works
+and then bumping the version test in the aforementioned commit.
 
-  KVM: s390: reduce number of IO pins to 1 (2020-06-18 09:48:19 +0200)
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature; name="signature.asc"
 
-----------------------------------------------------------------
-The current number of KVM_IRQCHIP_NUM_PINS results in an order 3
-allocation (32kb) for each guest start/restart which can result in OOM
-killer activity when kernel memory is fragmented enough.
+-----BEGIN PGP SIGNATURE-----
 
-This fix reduces the number of iopins as s390 doesn't use them, hence
-reducing the memory footprint.
+iQIzBAABCgAdFiEEv3OU3/byMaA0LqWJdkfhpEvA5LoFAl7xzCcACgkQdkfhpEvA
+5LpS8hAAiCq1u5KZtbSLBd1h7uWs5MluIRQlxH3Lwjm5BzMpV5X3z8Gd4PGJDcUv
+jXyQonD/+OdSUIZVIq5TjrpSntrmMjYhbsPMke/8/A7XGZPLe0zhvfYf1PiXbUU3
+Cp85cpbTMwLgJDZbz6h6Lu5PdLJLO5YopIe2RppRsgPulBUgGyIOFaRDMh7YWsFc
+IwnBTjrJiPSy3PxsgyteNmxEAtyN4MLoZsqxcpiE39WtCXf9qMADV3wnh8saRyHf
+8kvowW/6O/rLwmjOoiGKUMlRb/0RYvSqPSBdQw/5a2XzIHfoOviHOLroAaCeiVd/
+g5qRtGjjWHP0QtOoNT+gEaxn9JsAbAaoasML2uza7tMxzE2w+fmLstGwNpxf+cTi
+PlXSKiJmdhXjm0mVA7pTupNrGRUyUkyN2z18J4/ct49EkZfwGEQSnq6b5EjB6bZB
+Z6aRfe6TfdFqkrGWUqaGmipIVNNY36zAlb8EhrnKeCC5ewQ9J9cwnA0fHkWu+lTY
+ihgvveUktZEjw097fkW2ZleNQLCObDiEpJFHvlNKnVZlW/crMzJYbJfd53smXltZ
+wBQ39ad43l+plg5pqdjsOx4VkIsgtne6n7/PpKaDW64KV6Zth7ckgK6q+czSdqZx
+gOkP0vG538OhOkf97QO+D6jxvpbW7hopSUlBLYqMu/6z0hJzbNE=
+=uKOi
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-
-Christian Borntraeger (1):
-  KVM: s390: reduce number of IO pins to 1
-
- arch/s390/include/asm/kvm_host.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
--- 
-2.25.4
-
+--d6Gm4EdcadzBjdND--
