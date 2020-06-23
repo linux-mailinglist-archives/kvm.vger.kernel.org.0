@@ -2,76 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 49B0C204EA8
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 12:00:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CC6B204EAE
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 12:01:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732261AbgFWKAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 06:00:20 -0400
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:58589 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732168AbgFWKAT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 06:00:19 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01419;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U0VEqxu_1592906410;
-Received: from 30.27.116.246(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U0VEqxu_1592906410)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 23 Jun 2020 18:00:12 +0800
-Subject: Re: [PATCH v4 0/7] clean up redundant 'kvm_run' parameters
-To:     Paolo Bonzini <pbonzini@redhat.com>, tsbogend@alpha.franken.de,
-        paulus@ozlabs.org, mpe@ellerman.id.au, benh@kernel.crashing.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
- <fe463233-d094-fca5-b4e9-c1d97124fd69@redhat.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <3a2bee8b-20b4-5d33-7d12-09c374a5afde@linux.alibaba.com>
-Date:   Tue, 23 Jun 2020 18:00:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1732201AbgFWKBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 06:01:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22347 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732056AbgFWKBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 06:01:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592906468;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u1ZMbB/9nLT7AEeDFZo4BOmzf6TAec2bOyX4Xc71HDc=;
+        b=KthzeApE0ZHApi9MwsGRuVdBzGcIE/eDnr19qpdQiUGdubVwon/qlmXI47u0tmDC50ysXl
+        zDoEaLZIig8XvPDg9ZivFdLsP5yoosRM7eiYpghsFC6YmhIIG4+pb+FLDFgYe6TOJUCUCj
+        ag1UyTVmfVH7FN3rD8r/lg73wF+0QME=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429--qsXY9RlNWOrGWBAOYTR8w-1; Tue, 23 Jun 2020 06:01:06 -0400
+X-MC-Unique: -qsXY9RlNWOrGWBAOYTR8w-1
+Received: by mail-wm1-f71.google.com with SMTP id a18so3284519wmm.3
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 03:01:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=u1ZMbB/9nLT7AEeDFZo4BOmzf6TAec2bOyX4Xc71HDc=;
+        b=X+OZlNZySU8OrAuGdNGaeT+ZyMLs9JMYe2Gu9i1c1ITcjXP1+4UW7RcQ+PLFWoriR/
+         nd++cUuWuIWCLZK0HpVFO1ssIkW+90K1cEtoYYqVLEDFdQSSA1z4DlVbCtf1nTiUL3Uk
+         JLATAdvIZrTtfc/S8qxSL2k2a+nD0VDIiDPwbN881UdmNUov8W/i2aGRkpyjrQJvo+4r
+         j70brBMYGxd7KTN+4H+HwpdwlM6UOW+IExopb/xWwr90HydBjORHEdFqETX+IeE+9Gep
+         vcEWTuFI847mXr1xYH2jWHtQAulg0yZraPGRpMX4bZuZTMIctyR2EwGCitY/OurpQRKW
+         4y7Q==
+X-Gm-Message-State: AOAM532brgCH/W2X9X8V2Rg9rW6vU8MuK34iXa00Seqt/3E4lA1gC80E
+        DhZxgyVEJ57C+YpYXipmhI+L/TMJaHwMtdW/Rg3h7qK2jQevAMoKXRrteERsrc6vwfw5ZgOlKnN
+        DLwaPd2Yilr2m
+X-Received: by 2002:a1c:a993:: with SMTP id s141mr23161652wme.174.1592906465236;
+        Tue, 23 Jun 2020 03:01:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw6Klqi+ChpmYXj/U3wPJCEvd+sIvt5GbPl7+KEwbGRq0VcWfSbiK8Noa4n5Vj59gWIbUnRTA==
+X-Received: by 2002:a1c:a993:: with SMTP id s141mr23161581wme.174.1592906464462;
+        Tue, 23 Jun 2020 03:01:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:24f5:23b:4085:b879? ([2001:b07:6468:f312:24f5:23b:4085:b879])
+        by smtp.gmail.com with ESMTPSA id v24sm25096994wrd.92.2020.06.23.03.01.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jun 2020 03:01:03 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: skip hyperv_clock test when host
+ clocksource is not TSC
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+References: <20200617152139.402827-1-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d04351b2-1bb1-2bb8-0588-534315dbd4bb@redhat.com>
+Date:   Tue, 23 Jun 2020 12:01:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <fe463233-d094-fca5-b4e9-c1d97124fd69@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200617152139.402827-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020/6/23 17:42, Paolo Bonzini wrote:
-> On 27/04/20 06:35, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. For historical reasons, many kvm-related function parameters
->> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
->> patch does a unified cleanup of these remaining redundant parameters.
->>
->> This series of patches has completely cleaned the architecture of
->> arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
->> the large number of modified codes, a separate patch is made for each
->> platform. On the ppc platform, there is also a redundant structure
->> pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
->> separately.
+On 17/06/20 17:21, Vitaly Kuznetsov wrote:
+> Hyper-V TSC page clocksource is TSC based so it requires host to use TSC
+> for clocksource. While TSC is more or less standard for x86 hardware
+> nowadays, when kvm-unit-tests are run in a VM the clocksource tends to be
+> different (e.g. kvm-clock).
 > 
-> Tianjia, can you please refresh the patches so that each architecture
-> maintainer can pick them up?  Thanks very much for this work!
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  x86/unittests.cfg | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> Paolo
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 504e04e5f2b5..3a7915143479 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -334,6 +334,7 @@ smp = 2
+>  extra_params = -cpu kvm64,hv_time
+>  arch = x86_64
+>  groups = hyperv
+> +check = /sys/devices/system/clocksource/clocksource0/current_clocksource=tsc
+>  
+>  [intel_iommu]
+>  file = intel-iommu.flat
 > 
 
-No problem, this is what I should do.
-After I update, do I submit separately for each architecture or submit 
-them together in a patchset?
+Queued, thanks.
 
-Thanks,
-Tianjia
+Paolo
+
