@@ -2,41 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2174C205625
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:39:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 254F6205620
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:39:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733049AbgFWPjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 11:39:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732821AbgFWPjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:39:13 -0400
-Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DCBDC061573;
-        Tue, 23 Jun 2020 08:39:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MAuMHFTHX8XSOrS+3WRKmxA3YZs5uM2D2sS+hm8j/xA=; b=Q2V8keP0FVZG/TkiTzzDC4vKCj
-        nyT6JjEu5SmZ8Er8y26AZbbgkMF9mKPNSmAFN9XQBQQqP4264ILIB06TlmxfjBabBTG6Y2NicjupJ
-        BAvy12H7mmAKvaxjdM8ad7SRMIhiRvyFTnekaSC+rwLSzAbCO1mQIsrZv0+9Lhu5j6zkp2Z5mFONc
-        80XN5GSP4bOB4TvlyRq0sWNQUFDHDDjo1FOAWItkimokCQlBzt2XZQqjItjtwZfxGzNt7fhwRQnH7
-        WH9UsqHANKhP4VJ4ph07S4gcfxEvJIq24QXBhv7MbZI5g9K9eYwub4yRvwGPfCxi9NkA21uyFQjzH
-        ocw5FYSg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jnl0X-0008BI-L3; Tue, 23 Jun 2020 15:38:45 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8B35730477A;
-        Tue, 23 Jun 2020 17:38:44 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 79859234EBA52; Tue, 23 Jun 2020 17:38:44 +0200 (CEST)
-Date:   Tue, 23 Jun 2020 17:38:44 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joerg Roedel <jroedel@suse.de>
+        id S1732952AbgFWPi7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 11:38:59 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45762 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732521AbgFWPi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 11:38:59 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0A2E6AF3D;
+        Tue, 23 Jun 2020 15:38:57 +0000 (UTC)
+Date:   Tue, 23 Jun 2020 17:38:55 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
         Dave Hansen <dave.hansen@intel.com>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
@@ -54,7 +35,7 @@ Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
         Andrew Cooper <andrew.cooper3@citrix.com>
 Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
  from userspace)
-Message-ID: <20200623153844.GN4817@hirez.programming.kicks-ass.net>
+Message-ID: <20200623153855.GM14101@suse.de>
 References: <20200623110706.GB4817@hirez.programming.kicks-ass.net>
  <20200623113007.GH31822@suse.de>
  <20200623114818.GD4817@hirez.programming.kicks-ass.net>
@@ -69,6 +50,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20200623152326.GL4817@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -89,10 +71,30 @@ On Tue, Jun 23, 2020 at 05:23:26PM +0200, Peter Zijlstra wrote:
 > 
 > That shouldn't be possible with the current code, I think.
 
-To clarify, we have: NMI, MCE, DB and DF.
+Not with the current code, but possibly with SNP #VC exceptions:
 
-DF (with the exception of ESPFIX) is fatal.
-MCE from kernel is fatal (which is what makes the MCE in NMI 'work')
-NMI and DB clear DR7, which avoids DB in NMI.
+      ->  First #VC
+	  -> NMI before VC handler switched off its IST stack
+	     (now on NMI IST stack)
+	      -> Second SNP #VC exception before the NMI handler did the
+		 #VC stack check (because HV messed around with some pages
+		 touched there).
 
-So that leaves: NMI in DB, and that works.
+In the second #VC you use the same IST stack as in the first #VC, but
+the the NMI-stack in-between.
+
+> Reliability of that depends on the unwinder, I wouldn't want the guess
+> uwinder to OOPS me by accident.
+
+It doesn't use the full unwinder, it just assumes that there is a
+pt_regs struct at the top of every kernel stack and walks through them
+until SP points to a user-space stack.
+
+As long as the assumption that there is a pt_regs struct on top of every
+stack holds, this should be safe. The assumption might be wrong when an
+exception happens during SYSCALL/SYSENTER entry, when the return frame
+is not written by hardware.
+
+
+	Joerg
+
