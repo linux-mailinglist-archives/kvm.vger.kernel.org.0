@@ -2,102 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25DD1205407
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 16:00:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F00B82054F5
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 16:38:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732730AbgFWN7x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 09:59:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49958 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732687AbgFWN7x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 09:59:53 -0400
-Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68041C061573;
-        Tue, 23 Jun 2020 06:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=vWFZnmE8muSdoNv/rlN/zg+D4ErnvxS0/K6mx8ubUo4=; b=QQqHr4IslmzJW09bxhv1Ibqy14
-        exvYtd4xNdVggaYQ7J+3Ux3ltaf/4zgfPk5nlZA57lRVghngQDw3jFFH1qd4JvYdxS7Gzuffi/EXa
-        pJCr6X0+J6sOE4R312V3eYLvvquor1WCpbl3LiqTvvZdXDG5QgUdiRucg2Mg1GfrE0aqshfm7iISX
-        4vueqvSBN9VUfaOsOehNU2M6fjlHD+xQrwa7GWTRoizDBchrv0ovCNNMo+E0mT0CThS8FbkY+19V5
-        PlUbml1JCC4gS4MGCLinM5pdDFLQRUkizCTYkXF/HLVQpJDKZXWrZLBOsC944fXDC+vkIXa/9RrRU
-        GcD0Wmtw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jnjSI-0004Rt-F5; Tue, 23 Jun 2020 13:59:18 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 73420300F28;
-        Tue, 23 Jun 2020 15:59:16 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 6467323CBF701; Tue, 23 Jun 2020 15:59:16 +0200 (CEST)
-Date:   Tue, 23 Jun 2020 15:59:16 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Mike Stunes <mstunes@vmware.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
-        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        X86 ML <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-Message-ID: <20200623135916.GI4817@hirez.programming.kicks-ass.net>
-References: <20200425202316.GL21900@8bytes.org>
- <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
- <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
- <20200428075512.GP30814@suse.de>
- <20200623110706.GB4817@hirez.programming.kicks-ass.net>
- <20200623113007.GH31822@suse.de>
- <20200623114818.GD4817@hirez.programming.kicks-ass.net>
- <20200623120433.GB14101@suse.de>
- <20200623125201.GG4817@hirez.programming.kicks-ass.net>
- <20200623134003.GD14101@suse.de>
+        id S1732821AbgFWOiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 10:38:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18738 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732738AbgFWOiW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 10:38:22 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05NEX67i033482;
+        Tue, 23 Jun 2020 10:38:21 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31ukkng7r0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Jun 2020 10:38:20 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NEX9h0033877;
+        Tue, 23 Jun 2020 10:38:19 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31ukkng7qd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Jun 2020 10:38:19 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NEaJvv027641;
+        Tue, 23 Jun 2020 14:38:19 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02wdc.us.ibm.com with ESMTP id 31uk2mr8pa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Jun 2020 14:38:19 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05NEcFhO26280290
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Jun 2020 14:38:15 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A50566E050;
+        Tue, 23 Jun 2020 14:38:15 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B38DD6E054;
+        Tue, 23 Jun 2020 14:38:14 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.182.30])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Tue, 23 Jun 2020 14:38:14 +0000 (GMT)
+Subject: Re: [PATCH v9 0/2] Use DIAG318 to set Control Program Name & Version
+ Codes
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
+References: <20200622154636.5499-1-walling@linux.ibm.com>
+ <cfe77de0-e1d8-5779-541f-286cf3002459@de.ibm.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Message-ID: <704fd712-1883-9aad-bb60-4412cb8a9573@linux.ibm.com>
+Date:   Tue, 23 Jun 2020 10:38:13 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200623134003.GD14101@suse.de>
+In-Reply-To: <cfe77de0-e1d8-5779-541f-286cf3002459@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-23_07:2020-06-23,2020-06-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 spamscore=0 malwarescore=0 priorityscore=1501
+ mlxlogscore=999 adultscore=0 phishscore=0 bulkscore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006120000 definitions=main-2006230110
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 03:40:03PM +0200, Joerg Roedel wrote:
-> On Tue, Jun 23, 2020 at 02:52:01PM +0200, Peter Zijlstra wrote:
+On 6/23/20 3:13 AM, Christian Borntraeger wrote:
+> 
+> 
+> On 22.06.20 17:46, Collin Walling wrote:
+>> Changelog:
+>>
+>>     v9
+>>
+>>     • No longer unshadowing CPNC in VSIE
+>>
+> applied. 
+> 
 
-> > You only have that guarantee when any SNP #VC from kernel is an
-> > automatic panic. But in that case, what's the point of having the
-> > recursion count?
-> 
-> It is not a recursion count, it is a stack-recursion check. Basically
-> walk down the stack and look if your current stack is already in use.
-> Yes, this can be optimized, but that is what is needed.
-> 
-> IIRC the current prototype code for SNP just pre-validates all memory in
-> the VM and doesn't support moving pages around on the host. So any #VC
-> SNP exception would be fatal, yes.
-> 
-> In a scenario with on-demand validation of guest pages and support for
-> guest-assisted page-moving on the HV side it would be more complicated.
-> Basically all memory that is accessed during #VC exception handling must
-> stay validated at all times, including the IST stack.
-> 
-> So saying this, I don't understand why _all_ SNP #VC exceptions from
-> kernel space must be fatal?
+Thanks!
 
-Ah, because I hadn't thought of the stack-recursion check.
+-- 
+Regards,
+Collin
 
-So basically when your exception frame points to your own IST, you die.
-That sounds like something we should have in generic IST code.
+Stay safe and stay healthy
