@@ -2,113 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0F302058B3
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 19:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D2592059F1
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 19:49:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733054AbgFWReV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 13:34:21 -0400
-Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:58600 "EHLO
-        2.mo4.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732408AbgFWReV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 13:34:21 -0400
-X-Greylist: delayed 8399 seconds by postgrey-1.27 at vger.kernel.org; Tue, 23 Jun 2020 13:34:19 EDT
-Received: from player798.ha.ovh.net (unknown [10.110.115.113])
-        by mo4.mail-out.ovh.net (Postfix) with ESMTP id 71F7724187E
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 17:08:36 +0200 (CEST)
-Received: from kaod.org (lfbn-tou-1-921-245.w86-210.abo.wanadoo.fr [86.210.152.245])
-        (Authenticated sender: clg@kaod.org)
-        by player798.ha.ovh.net (Postfix) with ESMTPSA id C552413C3C203;
-        Tue, 23 Jun 2020 15:08:29 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass (GARM-95G0011b9a0027-edf8-442a-be60-5d401cd56ded,EED1DA90FC9B795DFFB5AB62ED4F19E3D36D96F8) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: increase KVMPPC_NR_LPIDS on POWER8
- and POWER9
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Paul Mackerras <paulus@samba.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20200608115714.1139735-1-clg@kaod.org>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <d73950f5-131a-962c-aea3-ac7e4275b85b@kaod.org>
-Date:   Tue, 23 Jun 2020 17:08:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1733144AbgFWRta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 13:49:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57210 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733061AbgFWRt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 13:49:29 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92520C061573;
+        Tue, 23 Jun 2020 10:49:29 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id ne5so1788399pjb.5;
+        Tue, 23 Jun 2020 10:49:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=mU2Mqb/3Lzu3sqpNfQHlFitWN9RRppFyAwuH1XGEq/o=;
+        b=Lt4FeIyKfPgR3dcCvP2WoEwHlKCPfb+zd+e7g56VPCjojWT8UAkOuMcNuZ8GfO1e9z
+         PLvj9Ie8IethxX+Hvch4tg+PMXZQfAMVl+k1MaZ49GWwd5HLN0nrU3kShISTA8iUUUiy
+         nmqzb/gb/ZMfRS87ayTJxcGIfmgVe9uTycEehOic1Q/13UayHkxdqmzzFHgScG0gfCDa
+         CzyWaQdhZTEt9hHIqWdlW2gIcur5ZpUV5KVNfWlhXTP58vy+DUtzuEl83SxW6UIjxckQ
+         GSn2Y7Zup2rr0S8eh3iENpeAEn8Xdy3XU1N/hIuEWA1Bb35+YYND8xOGo2Du4lwYp0Rr
+         XvKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=mU2Mqb/3Lzu3sqpNfQHlFitWN9RRppFyAwuH1XGEq/o=;
+        b=qo247sr4+aOzUn6EMtWzYp1llc/MKp8y57ya7wrWmNhO2I27MqDGEqgzs2rewwukUQ
+         cFXtBO/JpG16Igultfq6falT7fjU7Ng+bIbUnV3qmNkTeyGq8ML5Z4ISc48ri1uOwfz2
+         UPnj/YYLeIccepC0F4l6PKxQdxzr2MOr6dRLAUpKZsbW5F2OxfBklQkwpw21xepL/chN
+         YHKO4DsTzVPmVzKiHyBSmJxcJ+8EA17vcxBUL3eLHkZvWFGTgPgv/Paviu5M2PVrwaSe
+         lYHxUxqsFLyGd8XJ+9/iZJJreZSVmE4tTtOxw6CwESjEHmLB8akO0EQWwVdnJ2/8YEOC
+         hdmg==
+X-Gm-Message-State: AOAM533kIzmNDzQrT6OrxV0s4RcbJ7i82fAA24ksHc61BubkeiPRj84a
+        cZTi3SxmIknr6AP0URjycNqPIz8lvg==
+X-Google-Smtp-Source: ABdhPJxw/501/ORteOExfhyBnl/+yEVHkdQ3mDOuLpARGMwKOdFv65cx46gPEERRdrAfgGM6ZQ1jSQ==
+X-Received: by 2002:a17:90a:70c6:: with SMTP id a6mr22379165pjm.16.1592934569041;
+        Tue, 23 Jun 2020 10:49:29 -0700 (PDT)
+Received: from madhuparna-HP-Notebook ([2402:3a80:ceb:846:8098:13b7:478d:bfe2])
+        by smtp.gmail.com with ESMTPSA id y10sm14768935pgi.54.2020.06.23.10.49.23
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 23 Jun 2020 10:49:28 -0700 (PDT)
+From:   Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+X-Google-Original-From: Madhuparna Bhowmik <change_this_user_name@gmail.com>
+Date:   Tue, 23 Jun 2020 23:19:20 +0530
+To:     "Paul E. McKenney" <paulmck@kernel.org>
+Cc:     Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
+        bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, frextrite@gmail.com,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH v2] kvm: Fix false positive RCU usage warning
+Message-ID: <20200623174920.GA13794@madhuparna-HP-Notebook>
+References: <20200516082227.22194-1-madhuparnabhowmik10@gmail.com>
+ <9fff3c6b-1978-c647-16f7-563a1cdf62ff@redhat.com>
+ <20200623150236.GD9005@google.com>
+ <20200623153036.GB9914@madhuparna-HP-Notebook>
+ <20200623153901.GG9247@paulmck-ThinkPad-P72>
 MIME-Version: 1.0
-In-Reply-To: <20200608115714.1139735-1-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 1942177340510145415
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrudekhedgheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkeeirddvuddtrdduhedvrddvgeehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623153901.GG9247@paulmck-ThinkPad-P72>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/8/20 1:57 PM, Cédric Le Goater wrote:
-> POWER8 and POWER9 have 12-bit LPIDs. Change LPID_RSVD to support up to
-> (4096 - 2) guests on these processors. POWER7 is kept the same with a
-> limitation of (1024 - 2), but it might be time to drop KVM support for
-> POWER7.
+On Tue, Jun 23, 2020 at 08:39:01AM -0700, Paul E. McKenney wrote:
+> On Tue, Jun 23, 2020 at 09:00:36PM +0530, Madhuparna Bhowmik wrote:
+> > On Tue, Jun 23, 2020 at 11:02:36AM -0400, Joel Fernandes wrote:
+> > > On Tue, Jun 23, 2020 at 09:39:53AM +0200, Paolo Bonzini wrote:
+> > > > On 16/05/20 10:22, madhuparnabhowmik10@gmail.com wrote:
+> > > > > From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+> > > > > 
+> > > > > Fix the following false positive warnings:
+> > > > > 
+> > > > > [ 9403.765413][T61744] =============================
+> > > > > [ 9403.786541][T61744] WARNING: suspicious RCU usage
+> > > > > [ 9403.807865][T61744] 5.7.0-rc1-next-20200417 #4 Tainted: G             L
+> > > > > [ 9403.838945][T61744] -----------------------------
+> > > > > [ 9403.860099][T61744] arch/x86/kvm/mmu/page_track.c:257 RCU-list traversed in non-reader section!!
+> > > > > 
+> > > > > and
+> > > > > 
+> > > > > [ 9405.859252][T61751] =============================
+> > > > > [ 9405.859258][T61751] WARNING: suspicious RCU usage
+> > > > > [ 9405.880867][T61755] -----------------------------
+> > > > > [ 9405.911936][T61751] 5.7.0-rc1-next-20200417 #4 Tainted: G             L
+> > > > > [ 9405.911942][T61751] -----------------------------
+> > > > > [ 9405.911950][T61751] arch/x86/kvm/mmu/page_track.c:232 RCU-list traversed in non-reader section!!
+> > > > > 
+> > > > > Since srcu read lock is held, these are false positive warnings.
+> > > > > Therefore, pass condition srcu_read_lock_held() to
+> > > > > list_for_each_entry_rcu().
+> > > > > 
+> > > > > Reported-by: kernel test robot <lkp@intel.com>
+> > > > > Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+> > > > > ---
+> > > > > v2:
+> > > > > -Rebase v5.7-rc5
+> > > > > 
+> > > > >  arch/x86/kvm/mmu/page_track.c | 6 ++++--
+> > > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+> > > > > index ddc1ec3bdacd..1ad79c7aa05b 100644
+> > > > > --- a/arch/x86/kvm/mmu/page_track.c
+> > > > > +++ b/arch/x86/kvm/mmu/page_track.c
+> > > > > @@ -229,7 +229,8 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+> > > > >  		return;
+> > > > >  
+> > > > >  	idx = srcu_read_lock(&head->track_srcu);
+> > > > > -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
+> > > > > +	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
+> > > > > +				srcu_read_lock_held(&head->track_srcu))
+> > > > >  		if (n->track_write)
+> > > > >  			n->track_write(vcpu, gpa, new, bytes, n);
+> > > > >  	srcu_read_unlock(&head->track_srcu, idx);
+> > > > > @@ -254,7 +255,8 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> > > > >  		return;
+> > > > >  
+> > > > >  	idx = srcu_read_lock(&head->track_srcu);
+> > > > > -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
+> > > > > +	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
+> > > > > +				srcu_read_lock_held(&head->track_srcu))
+> > > > >  		if (n->track_flush_slot)
+> > > > >  			n->track_flush_slot(kvm, slot, n);
+> > > > >  	srcu_read_unlock(&head->track_srcu, idx);
+> > > > > 
+> > > > 
+> > > > Hi, sorry for the delay in reviewing this patch.  I would like to ask
+> > > > Paul about it.
+> > > > 
+> > > > While you're correctly fixing a false positive, hlist_for_each_entry_rcu
+> > > > would have a false _negative_ if you called it under
+> > > > rcu_read_lock/unlock and the data structure was protected by SRCU.  This
+> > > > is why for example srcu_dereference is used instead of
+> > > > rcu_dereference_check, and why srcu_dereference uses
+> > > > __rcu_dereference_check (with the two underscores) instead of
+> > > > rcu_dereference_check.  Using rcu_dereference_check would add an "||
+> > > > rcu_read_lock_held()" to the condition which is wrong.
+> > > > 
+> > > > I think instead you should add hlist_for_each_srcu and
+> > > > hlist_for_each_entry_srcu macro to include/linux/rculist.h.
+> > > > 
+> > > > There is no need for equivalents of hlist_for_each_entry_continue_rcu
+> > > > and hlist_for_each_entry_from_rcu, because they use rcu_dereference_raw.
+> > > >  However, it's not documented why they do so.
+> > > 
+> > > You are right, this patch is wrong, we need a new SRCU list macro to do the
+> > > right thing which would also get rid of the last list argument.
+> > >
+> > Can we really get rid of the last argument? We would need the
+> > srcu_struct right for checking?
 > 
-> Tested with 2048 guests * 4 vCPUs on a witherspoon system with 512G
-> RAM and a bit of swap.
+> Agreed!  However, the API could be simplified by passing in a pointer to
+> the srcu_struct instead of a lockdep expression.  An optional lockdep
+> expression might still be helpful for calls from the update side,
+> of course.
+>
+Sure, I will work on this.
 
-For the record, it is possible to run 4094 guests * 4 vCPUs on a POWER9 
-system with 1TB. It takes ~5m to boot them all.
-
-CONFIG_NR_IRQS needs to be increased to support 4094 * 4 escalation 
-interrupts.
-
-Cheers,
-
-C.
-
-
-> 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
->  arch/powerpc/include/asm/reg.h      | 3 ++-
->  arch/powerpc/kvm/book3s_64_mmu_hv.c | 8 ++++++--
->  2 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/reg.h b/arch/powerpc/include/asm/reg.h
-> index 88e6c78100d9..b70bbfb0ea3c 100644
-> --- a/arch/powerpc/include/asm/reg.h
-> +++ b/arch/powerpc/include/asm/reg.h
-> @@ -473,7 +473,8 @@
->  #ifndef SPRN_LPID
->  #define SPRN_LPID	0x13F	/* Logical Partition Identifier */
->  #endif
-> -#define   LPID_RSVD	0x3ff		/* Reserved LPID for partn switching */
-> +#define   LPID_RSVD_POWER7	0x3ff	/* Reserved LPID for partn switching */
-> +#define   LPID_RSVD		0xfff	/* Reserved LPID for partn switching */
->  #define	SPRN_HMER	0x150	/* Hypervisor maintenance exception reg */
->  #define   HMER_DEBUG_TRIG	(1ul << (63 - 17)) /* Debug trigger */
->  #define	SPRN_HMEER	0x151	/* Hyp maintenance exception enable reg */
-> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> index 18aed9775a3c..23035ab2ec50 100644
-> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> @@ -260,11 +260,15 @@ int kvmppc_mmu_hv_init(void)
->  	if (!mmu_has_feature(MMU_FTR_LOCKLESS_TLBIE))
->  		return -EINVAL;
->  
-> -	/* POWER7 has 10-bit LPIDs (12-bit in POWER8) */
->  	host_lpid = 0;
->  	if (cpu_has_feature(CPU_FTR_HVMODE))
->  		host_lpid = mfspr(SPRN_LPID);
-> -	rsvd_lpid = LPID_RSVD;
-> +
-> +	/* POWER8 and above have 12-bit LPIDs (10-bit in POWER7) */
-> +	if (cpu_has_feature(CPU_FTR_ARCH_207S))
-> +		rsvd_lpid = LPID_RSVD;
-> +	else
-> +		rsvd_lpid = LPID_RSVD_POWER7;
->  
->  	kvmppc_init_lpid(rsvd_lpid + 1);
->  
-> 
-
+Thanks,
+Madhuparna
+> 							Thanx, Paul
