@@ -2,164 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C3FF204E36
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 11:42:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90F5F204E4D
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 11:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732012AbgFWJmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 05:42:47 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44475 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731923AbgFWJmq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 05:42:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592905364;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QoBwKmjOvInG9MfmBsLrqKkfpaZqKCYNSmoYTUfOHHE=;
-        b=W4imJMlVrdXnxVmceX+aEA5Vc0QjNCsiOIZ/YP4/e15mTqZa3dvrTqJ/Vi9YdJVop+Ad/F
-        X77hWs09TzvvUVpIOtWeIFvLPBA6x9X8PKtpgyta+JyChwSyGbYYYSCUFZzAvBi1yGreuh
-        xPFYNC5qVZGN9GyBGJnQ5L+aRMU6J4A=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-olQ18c3ePvqvYAcyVG0E0w-1; Tue, 23 Jun 2020 05:42:42 -0400
-X-MC-Unique: olQ18c3ePvqvYAcyVG0E0w-1
-Received: by mail-wr1-f69.google.com with SMTP id l3so5399211wrw.4
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 02:42:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QoBwKmjOvInG9MfmBsLrqKkfpaZqKCYNSmoYTUfOHHE=;
-        b=HzRN3A8geGJLt+y9PDOqEIuDRrzvSViH+g4tD5FiulDmapSEAHMGZ1VBngsZExYDbM
-         e5RCG8XKaEYqdBbHj+j+QB0Zi6yrh5NtvrlpnRBCKKE9D+RywTLr3zgy4Rn2d1Fg+uc9
-         lLJNaI0fPwDadM+PCZAXez6U/BJuZXt26d/yfoPSmNXmWSexWEx5rafgZlw9OwFESrJB
-         wT60coTZ2uIU7F96kzQirXNZkWD5tToo3MwvvwB46sjb8NGKOOb2brU042zDCRJ7vsSs
-         YwVJ7A5aT/LfGN35g+a9Mh3Aa1PN9vTSfmyrFGBDY8rjA15DM0r7lOU+Wc2oyNz5qPtu
-         cb3w==
-X-Gm-Message-State: AOAM533jeztxch99jzIH8JrMaSHcx1qmfVAbiBr9UWLNksLyFqKAxwLq
-        YEI4UykvPV1QhDVJKi00V9fKWBBxroapoFCBQzmwdRAtHrU0LJR4Mt71U1fXZI/w0UM1vu07kke
-        Kde3tR6la6txf
-X-Received: by 2002:adf:e908:: with SMTP id f8mr1064532wrm.3.1592905361580;
-        Tue, 23 Jun 2020 02:42:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYpabjIXBcOB9eaiLhNkEzAaSPqokuBtil8iucj5gBxqX45bVu6WVMKG+2KSXPDnKUswgA9A==
-X-Received: by 2002:adf:e908:: with SMTP id f8mr1064490wrm.3.1592905361326;
-        Tue, 23 Jun 2020 02:42:41 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:fd64:dd90:5ad5:d2e1? ([2001:b07:6468:f312:fd64:dd90:5ad5:d2e1])
-        by smtp.gmail.com with ESMTPSA id 26sm1149131wmj.25.2020.06.23.02.42.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jun 2020 02:42:40 -0700 (PDT)
-Subject: Re: [PATCH v4 0/7] clean up redundant 'kvm_run' parameters
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        tsbogend@alpha.franken.de, paulus@ozlabs.org, mpe@ellerman.id.au,
-        benh@kernel.crashing.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fe463233-d094-fca5-b4e9-c1d97124fd69@redhat.com>
-Date:   Tue, 23 Jun 2020 11:42:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        id S1732095AbgFWJpY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 05:45:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45664 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731921AbgFWJpY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 05:45:24 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 07763AE8C;
+        Tue, 23 Jun 2020 09:45:22 +0000 (UTC)
+Date:   Tue, 23 Jun 2020 11:45:19 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623094519.GF31822@suse.de>
+References: <20200425191032.GK21900@8bytes.org>
+ <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
+ <20200425202316.GL21900@8bytes.org>
+ <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
+ <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200427043514.16144-1-tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/04/20 06:35, Tianjia Zhang wrote:
-> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
-> structure. For historical reasons, many kvm-related function parameters
-> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
-> patch does a unified cleanup of these remaining redundant parameters.
-> 
-> This series of patches has completely cleaned the architecture of
-> arm64, mips, ppc, and s390 (no such redundant code on x86). Due to
-> the large number of modified codes, a separate patch is made for each
-> platform. On the ppc platform, there is also a redundant structure
-> pointer of 'kvm_run' in 'vcpu_arch', which has also been cleaned
-> separately.
+Hi Andy,
 
-Tianjia, can you please refresh the patches so that each architecture
-maintainer can pick them up?  Thanks very much for this work!
+On Mon, Apr 27, 2020 at 10:37:41AM -0700, Andy Lutomirski wrote:
+> 1. Use IST for #VC and deal with all the mess that entails.
 
-Paolo
+With the removal of IST shifting I wonder what you would suggest on how
+to best implement an NMI-safe IST handler with nesting support.
 
-> 
-> ---
-> v4 change:
->   mips: fixes two errors in entry.c.
-> 
-> v3 change:
->   Keep the existing `vcpu->run` in the function body unchanged.
-> 
-> v2 change:
->   s390 retains the original variable name and minimizes modification.
-> 
-> Tianjia Zhang (7):
->   KVM: s390: clean up redundant 'kvm_run' parameters
->   KVM: arm64: clean up redundant 'kvm_run' parameters
->   KVM: PPC: Remove redundant kvm_run from vcpu_arch
->   KVM: PPC: clean up redundant 'kvm_run' parameters
->   KVM: PPC: clean up redundant kvm_run parameters in assembly
->   KVM: MIPS: clean up redundant 'kvm_run' parameters
->   KVM: MIPS: clean up redundant kvm_run parameters in assembly
-> 
->  arch/arm64/include/asm/kvm_coproc.h      |  12 +--
->  arch/arm64/include/asm/kvm_host.h        |  11 +--
->  arch/arm64/include/asm/kvm_mmu.h         |   2 +-
->  arch/arm64/kvm/handle_exit.c             |  36 +++----
->  arch/arm64/kvm/sys_regs.c                |  13 ++-
->  arch/mips/include/asm/kvm_host.h         |  32 +------
->  arch/mips/kvm/emulate.c                  |  59 ++++--------
->  arch/mips/kvm/entry.c                    |  21 ++---
->  arch/mips/kvm/mips.c                     |  14 +--
->  arch/mips/kvm/trap_emul.c                | 114 ++++++++++-------------
->  arch/mips/kvm/vz.c                       |  26 ++----
->  arch/powerpc/include/asm/kvm_book3s.h    |  16 ++--
->  arch/powerpc/include/asm/kvm_host.h      |   1 -
->  arch/powerpc/include/asm/kvm_ppc.h       |  27 +++---
->  arch/powerpc/kvm/book3s.c                |   4 +-
->  arch/powerpc/kvm/book3s.h                |   2 +-
->  arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +--
->  arch/powerpc/kvm/book3s_64_mmu_radix.c   |   4 +-
->  arch/powerpc/kvm/book3s_emulate.c        |  10 +-
->  arch/powerpc/kvm/book3s_hv.c             |  64 ++++++-------
->  arch/powerpc/kvm/book3s_hv_nested.c      |  12 +--
->  arch/powerpc/kvm/book3s_interrupts.S     |  17 ++--
->  arch/powerpc/kvm/book3s_paired_singles.c |  72 +++++++-------
->  arch/powerpc/kvm/book3s_pr.c             |  33 ++++---
->  arch/powerpc/kvm/booke.c                 |  39 ++++----
->  arch/powerpc/kvm/booke.h                 |   8 +-
->  arch/powerpc/kvm/booke_emulate.c         |   2 +-
->  arch/powerpc/kvm/booke_interrupts.S      |   9 +-
->  arch/powerpc/kvm/bookehv_interrupts.S    |  10 +-
->  arch/powerpc/kvm/e500_emulate.c          |  15 ++-
->  arch/powerpc/kvm/emulate.c               |  10 +-
->  arch/powerpc/kvm/emulate_loadstore.c     |  32 +++----
->  arch/powerpc/kvm/powerpc.c               |  72 +++++++-------
->  arch/powerpc/kvm/trace_hv.h              |   6 +-
->  arch/s390/kvm/kvm-s390.c                 |  23 +++--
->  virt/kvm/arm/arm.c                       |   6 +-
->  virt/kvm/arm/mmio.c                      |  11 ++-
->  virt/kvm/arm/mmu.c                       |   5 +-
->  38 files changed, 392 insertions(+), 470 deletions(-)
-> 
+My current plan is to implement an IST handler which switches itself off
+the IST stack as soon as possible, freeing it for re-use.
 
+The flow would be roughly like this upon entering the handler;
+
+	build_pt_regs();
+
+	RSP = pt_regs->sp;
+
+	if (RSP in VC_IST_stack)
+		error("unallowed nesting")
+
+	if (RSP in current_kernel_stack)
+		RSP = round_down_to_8(RSP)
+	else
+		RSP = current_top_of_stack() // non-ist kernel stack
+
+	copy_pt_regs(pt_regs, RSP);
+	switch_stack_to(RSP);
+
+To make this NMI safe, the NMI handler needs some logic too. Upon
+entering NMI, it needs to check the return RSP, and if it is in the #VC
+IST stack, it must do the above flow by itself and update the return RSP
+and RIP. It needs to take into account the case when PT_REGS is not
+fully populated on the return side.
+
+Alternativly the NMI handler could safe/restore the contents of the #VC
+IST stack or just switch to a special #VC-in-NMI IST stack.
+
+All in all it could get complicated, and imho shift_ist would have been
+simpler, but who am I anyway...
+
+Or maybe you have a better idea how to implement this, so I'd like to
+hear your opinion first before I spend too many days implementing
+something.
+
+Regards,
+
+	Joerg
