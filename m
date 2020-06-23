@@ -2,108 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59712205302
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 15:03:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80F9E205319
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 15:13:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732650AbgFWNDx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 09:03:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41306 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732542AbgFWNDw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 09:03:52 -0400
-Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D49C061573;
-        Tue, 23 Jun 2020 06:03:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YaPfqTCjeDJ9yQ4e7Ug2AGa7kbHGPm3KcaODCyhYn5k=; b=kGSfp6xHac4GqUF2vY+RwsZvtv
-        UtLfm9rQDTo+JtvY9BvI3ZBed/ULh8lhJvTMgFO03+l0rXmutXve4emLYgluNUaAjGzxt7P3/Dq7z
-        jEQ2dZHsRc0N9TSA3Onut7BDTJdXmUQ1ktnDfGVTNvD09O61TCjE8ggrVHK7U8vOoGMvG2Qx6IDfM
-        OrAT6fCMMx5AHvdh8ofYbc3OcE1CAByxLfGEty3z8FkvgQVSjRtA2G5zp+VMADbkm8Y5TYaPkDTSW
-        OC7F6qJi6s4/AF1qlXVPlcrECrBgRFz4ONJWn6G71e1KFlk7Usfpdjv91uJ6wGPH2ixslVKd91zDi
-        61hKOVmQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jniaC-0007Vk-Lm; Tue, 23 Jun 2020 13:03:24 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E0300300F28;
-        Tue, 23 Jun 2020 15:03:22 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id CCDBB23CBF713; Tue, 23 Jun 2020 15:03:22 +0200 (CEST)
-Date:   Tue, 23 Jun 2020 15:03:22 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Mike Stunes <mstunes@vmware.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
-        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        X86 ML <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-Message-ID: <20200623130322.GH4817@hirez.programming.kicks-ass.net>
-References: <20200425202316.GL21900@8bytes.org>
- <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
- <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
- <20200623094519.GF31822@suse.de>
- <20200623104559.GA4817@hirez.programming.kicks-ass.net>
- <20200623111107.GG31822@suse.de>
- <20200623111443.GC4817@hirez.programming.kicks-ass.net>
- <20200623114324.GA14101@suse.de>
- <20200623115014.GE4817@hirez.programming.kicks-ass.net>
- <20200623121237.GC14101@suse.de>
+        id S1732616AbgFWNN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 09:13:27 -0400
+Received: from mga07.intel.com ([134.134.136.100]:17374 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725955AbgFWNN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 09:13:26 -0400
+IronPort-SDR: 7Gm3tEZV3EjtHMTJEzAfW3UctKMDaq6HGEZ6Et0EflnJbIxrZRnxqJnGW0dj4digaitFSkwXND
+ cuwvmINQM0bw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="209263120"
+X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
+   d="scan'208";a="209263120"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 06:13:25 -0700
+IronPort-SDR: Le9ycPgGvDojUvw7Md80fDMLb9kacjWq24P/YjbEzwBrc835iCcDz4RWW5PN2U2USulevGAv+k
+ jX6e5y9up5jA==
+X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
+   d="scan'208";a="452218159"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.174.20]) ([10.249.174.20])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 06:13:22 -0700
+Subject: Re: [PATCH v12 00/11] Guest Last Branch Recording Enabling
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
+        wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20200613080958.132489-1-like.xu@linux.intel.com>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <dc1c7ef1-5ab4-0f7b-5036-457193bc722c@linux.intel.com>
+Date:   Tue, 23 Jun 2020 21:13:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200623121237.GC14101@suse.de>
+In-Reply-To: <20200613080958.132489-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 02:12:37PM +0200, Joerg Roedel wrote:
-> On Tue, Jun 23, 2020 at 01:50:14PM +0200, Peter Zijlstra wrote:
-> > If SNP is the sole reason #VC needs to be IST, then I'd strongly urge
-> > you to only make it IST if/when you try and make SNP happen, not before.
+On 2020/6/13 16:09, Like Xu wrote:
+> Hi all,
 > 
-> It is not the only reason, when ES guests gain debug register support
-> then #VC also needs to be IST, because #DB can be promoted into #VC
-> then, and as #DB is IST for a reason, #VC needs to be too.
+> Please help review this new version for the Kenrel 5.9 release.
+> 
+> Now, you may apply the last two qemu-devel patches to the upstream
+> qemu and try the guest LBR feature with '-cpu host' command line.
+> 
+> v11->v12 Changelog:
+> - apply "Signed-off-by" form PeterZ and his codes for the perf subsystem;
+> - add validity checks before expose LBR via MSR_IA32_PERF_CAPABILITIES;
+> - refactor MSR_IA32_DEBUGCTLMSR emulation with validity check;
+> - reorder "perf_event_attr" fields according to how they're declared;
+> - replace event_is_oncpu() with "event->state" check;
+> - make LBR emualtion specific to vmx rather than x86 generic;
+> - move pass-through LBR code to vmx.c instead of pmu_intel.c;
+> - add vmx_lbr_en/disable_passthrough layer to make code readable;
+> - rewrite pmu availability check with vmx_passthrough_lbr_msrs();
+> 
+> You may check more details in each commit.
+> 
+> Previous:
+> https://lore.kernel.org/kvm/20200514083054.62538-1-like.xu@linux.intel.com/
+> 
+> ---
+...
+> 
+> Wei Wang (1):
+>   perf/x86: Fix variable types for LBR registers > Like Xu (10):
+>    perf/x86/core: Refactor hw->idx checks and cleanup
+>    perf/x86/lbr: Add interface to get LBR information
+>    perf/x86: Add constraint to create guest LBR event without hw counter
+>    perf/x86: Keep LBR records unchanged in host context for guest usage
 
-Didn't I read somewhere that that is only so for Rome/Naples but not for
-the later chips (Milan) which have #DB pass-through?
+Hi Peter,
+Would you like to add "Acked-by" to the first three perf patches ?
 
-> Besides that, I am not a fan of delegating problems I already see coming
-> to future-Joerg and future-Peter, but if at all possible deal with them
-> now and be safe later.
+>    KVM: vmx/pmu: Expose LBR to guest via MSR_IA32_PERF_CAPABILITIES
+>    KVM: vmx/pmu: Unmask LBR fields in the MSR_IA32_DEBUGCTLMSR emualtion
+>    KVM: vmx/pmu: Pass-through LBR msrs when guest LBR event is scheduled
+>    KVM: vmx/pmu: Emulate legacy freezing LBRs on virtual PMI
+>    KVM: vmx/pmu: Reduce the overhead of LBR pass-through or cancellation
+>    KVM: vmx/pmu: Release guest LBR event via lazy release mechanism
+> 
 
-Well, we could just say no :-) At some point in the very near future
-this house of cards is going to implode.
+Hi Paolo,
+Would you like to take a moment to review the KVM part for this feature ?
 
-We're talking about the 3rd case where the only reason things 'work' is
-because we'll have to panic():
+Thanks,
+Like Xu
 
- - #MC
- - #DB with BUS LOCK DEBUG EXCEPTION
- - #VC SNP
-
-(and it ain't a happy accident they're all IST)
-
-Did someone forget to pass the 'ISTs are *EVIL*' memo to the hardware
-folks? How come we're getting more and more of them? (/me puts fingers
-in ears and goes la-la-la-la in anticipation of Andrew mentioning CET)
-
+> 
+> Qemu-devel:
+>    target/i386: add -cpu,lbr=true support to enable guest LBR
+> 
+>   arch/x86/events/core.c            |  26 +--
+>   arch/x86/events/intel/core.c      | 109 ++++++++-----
+>   arch/x86/events/intel/lbr.c       |  51 +++++-
+>   arch/x86/events/perf_event.h      |   8 +-
+>   arch/x86/include/asm/perf_event.h |  34 +++-
+>   arch/x86/kvm/pmu.c                |  12 +-
+>   arch/x86/kvm/pmu.h                |   5 +
+>   arch/x86/kvm/vmx/capabilities.h   |  23 ++-
+>   arch/x86/kvm/vmx/pmu_intel.c      | 253 +++++++++++++++++++++++++++++-
+>   arch/x86/kvm/vmx/vmx.c            |  86 +++++++++-
+>   arch/x86/kvm/vmx/vmx.h            |  17 ++
+>   arch/x86/kvm/x86.c                |  13 --
+>   12 files changed, 559 insertions(+), 78 deletions(-)
+> 
 
