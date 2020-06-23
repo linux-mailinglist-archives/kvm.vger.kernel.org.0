@@ -2,125 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C7FC204D34
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:59:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF42F204D5A
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 11:04:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731885AbgFWI7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 04:59:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52521 "EHLO
+        id S1731950AbgFWJEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 05:04:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20692 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731758AbgFWI7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 04:59:25 -0400
+        with ESMTP id S1731786AbgFWJEb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 05:04:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592902763;
+        s=mimecast20190719; t=1592903070;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GmSiSTe5jRQCybzks4GiyZ26oQ9Db64kMPNmljxfAUo=;
-        b=MW0hA/5AIfRZ0mz9s3Pqn5YwxMF8JjYKetT3CSZh/guL0pdXkHJKKin3zmjmD37qdoQr0U
-        iFED/jTZYM1YhKFyzfsA7c+S1FFF5DX2g1uHm8JCI5AoXiK9C2+aMGVdH8HqYeILDq+wgk
-        BvXL2GiuOjPA1MlDbJpwMd/XA9LO/AY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-g7mPeteWNNKxhttc1B8icA-1; Tue, 23 Jun 2020 04:59:19 -0400
-X-MC-Unique: g7mPeteWNNKxhttc1B8icA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93A0F18A8220;
-        Tue, 23 Jun 2020 08:59:17 +0000 (UTC)
-Received: from localhost (ovpn-112-109.ams2.redhat.com [10.36.112.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 24FE47168D;
-        Tue, 23 Jun 2020 08:59:16 +0000 (UTC)
-Date:   Tue, 23 Jun 2020 09:59:15 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Andra Paraschiv <andraprs@amazon.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-Subject: Re: [PATCH v4 17/18] nitro_enclaves: Add overview documentation
-Message-ID: <20200623085915.GF32718@stefanha-x1.localdomain>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-18-andraprs@amazon.com>
+        bh=MGieKfyK5EqEvIJm2Uhtek3MXs3nrz2LXOt+Sfu/fVc=;
+        b=G6yFMilqei+Uh/WISr6hO3MTDqCjGgYysbe6TGLZP0yDUd/h/EzD3FnWPEXyPddt7yj/N7
+        V5RZiZZDJLK/2H/xK07VCUbGtSK6djwu6CI+3/mzuLT42BNW2txXXusoxGf1zE2s8Mdh4p
+        xw7nrLn78VuSCZb6qyDsT4uwJM8dHTk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-dC1oaOkjPpaL8Xg5In35sA-1; Tue, 23 Jun 2020 05:04:28 -0400
+X-MC-Unique: dC1oaOkjPpaL8Xg5In35sA-1
+Received: by mail-wr1-f70.google.com with SMTP id l3so5335646wrw.4
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 02:04:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MGieKfyK5EqEvIJm2Uhtek3MXs3nrz2LXOt+Sfu/fVc=;
+        b=iHQeUpYJuiTM2FOXJ0OLhA7SSq5Jvt8LorjYChaf3IHJSpUBcGlAUmTATBTWf6UDrT
+         L7s00yPfW2IftT3R0FmSmbwB1YgncXcfrU7LTJPK62RaFdaaSCrc7P/iwSV3XBJaCAJM
+         IFMy9quMD6gzGFHuagOoi5p/z9w3QSU77Dkw+d9YxyWfsE/qLF8KTO25LfxbiV0A5iTa
+         quqCoWM9cwoR11Wl9afAZHQKt5kRZBgSUfwxenJmLEDOeWFfpIy3I9u/LYK7o96zHZnV
+         11OhahI3ng0Wx5NlGWnVwNShOOazVlqPc56dklveX722negxQtg7afXkn+A9TRuWwbVo
+         4FEw==
+X-Gm-Message-State: AOAM533vYvD60b400Wen7ZEZK5k3l12T2iyEntPwAr57Lvap2EpneyZV
+        P2uJ+VHM4F/yWxd/PEUNq2qnQYvVuxtUQNG3jKx5ziQNbjdbrQccOff70k+X9Lui/6hnzNlgRG8
+        Xa9gvyqnjxYRw
+X-Received: by 2002:adf:de12:: with SMTP id b18mr16010378wrm.390.1592903067313;
+        Tue, 23 Jun 2020 02:04:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxrLMdyOT1yS66Or/wZR6Ty2z8rs5YtCrhaoKF5RKYeeJOu55RR8lINTGxXQ/PqiR9RBZlDhw==
+X-Received: by 2002:adf:de12:: with SMTP id b18mr16010359wrm.390.1592903067012;
+        Tue, 23 Jun 2020 02:04:27 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:fd64:dd90:5ad5:d2e1? ([2001:b07:6468:f312:fd64:dd90:5ad5:d2e1])
+        by smtp.gmail.com with ESMTPSA id b19sm2945206wmj.0.2020.06.23.02.04.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jun 2020 02:04:26 -0700 (PDT)
+Subject: Re: [PATCH 0/4] KVM: nSVM: Check reserved bits in DR6, DR7 and EFER
+ on vmrun of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+References: <20200522221954.32131-1-krish.sadhukhan@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <357fca54-25ed-4b58-f685-7c5d1546b4c6@redhat.com>
+Date:   Tue, 23 Jun 2020 11:04:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200622200329.52996-18-andraprs@amazon.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="sDKAb4OeUBrWWL6P"
-Content-Disposition: inline
+In-Reply-To: <20200522221954.32131-1-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---sDKAb4OeUBrWWL6P
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 23/05/20 00:19, Krish Sadhukhan wrote:
+> Patch# 1: Moves the check for upper 32 reserved bits of DR6 to a new function.
+> Patch# 2: Adds the KVM checks for DR6[63:32] and DR7[64:32] reserved bits
+> Patch# 3: Adds kvm-unit-tests for DR6[63:32] and DR7[64:32] reserved bits and
+> 	  reserved bits in EFER
+> Patch# 4: Removes the duplicate definition of 'vmcb' that sneaked via one of
+> 	  my previous patches.
+> 
+> 
+> [PATCH 1/4] KVM: x86: Move the check for upper 32 reserved bits of
+> [PATCH 2/4] KVM: nSVM: Check that DR6[63:32] and DR7[64:32] are not
+> [PATCH 3/4] kvm-unit-tests: nSVM: Test that DR6[63:32], DR7[63:32]
+> [PATCH 4/4] kvm-unit-tests: x86: Remove duplicate instance of 'vmcb'
+> 
+>  arch/x86/kvm/svm/nested.c | 3 +++
+>  arch/x86/kvm/x86.c        | 2 +-
+>  arch/x86/kvm/x86.h        | 5 +++++
+>  3 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> Krish Sadhukhan (2):
+>       KVM: x86: Move the check for upper 32 reserved bits of DR6 to separate fun
+>       KVM: nVMX: Check that DR6[63:32] and DR7[64:32] are not set on vmrun of ne
+>  x86/svm.c       |  1 -
+>  x86/svm.h       |  3 +++
+>  x86/svm_tests.c | 59 ++++++++++++++++++++++++++++++++++++++-------------------
+>  3 files changed, 42 insertions(+), 21 deletions(-)
+> 
+> Krish Sadhukhan (2):
+>       kvm-unit-tests: nSVM: Test that DR6[63:32], DR7[63:32] and EFER reserved b
+>       kvm-unit-tests: x86: Remove duplicate instance of 'vmcb'
+> 
 
-On Mon, Jun 22, 2020 at 11:03:28PM +0300, Andra Paraschiv wrote:
-> +The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
-> +Enclave Image Format (EIF); plus an EIF header including metadata such as magic
-> +number, eif version, image size and CRC.
-> +
-> +Hash values are computed for the entire enclave image (EIF), the kernel and
-> +ramdisk(s). That's used, for example, to check that the enclave image that is
-> +loaded in the enclave VM is the one that was intended to be run.
-> +
-> +These crypto measurements are included in a signed attestation document
-> +generated by the Nitro Hypervisor and further used to prove the identity of the
-> +enclave; KMS is an example of service that NE is integrated with and that checks
-> +the attestation doc.
-> +
-> +The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB. The
-> +init process in the enclave connects to the vsock CID of the primary VM and a
-> +predefined port - 9000 - to send a heartbeat value - 0xb7. This mechanism is
-> +used to check in the primary VM that the enclave has booted.
-> +
-> +If the enclave VM crashes or gracefully exits, an interrupt event is received by
-> +the NE driver. This event is sent further to the user space enclave process
-> +running in the primary VM via a poll notification mechanism. Then the user space
-> +enclave process can exit.
-> +
-> +[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
-> +[2] https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
-> +[3] https://lwn.net/Articles/807108/
-> +[4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
-> +[5] https://man7.org/linux/man-pages/man7/vsock.7.html
+Queued, thanks.
 
-Is the EIF specification and the attestation protocol available?
-
-Stefan
-
---sDKAb4OeUBrWWL6P
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7xxGMACgkQnKSrs4Gr
-c8ilQAgAySyG/iUuzEfDma7s6a9gpS3VSxdadu7D4zfWtsotaQR3ZIiAzSHXAIXt
-3YDUtxYWfz7HHHTtch14TrQkXYlpuWMshTNgMCq552345hWPBDwWQqtX6yxbQrlo
-1AFvwLmLuebUyOWzxumR5gIOvspTEyqa90WFlY8uY4DoFPX/uCSvblGCt134IJKk
-vA2iWwXW2CBMTztmYSw1ia7cBhVb5digZI1+NGSrw7VWhGaSswu6THsuY1R/qasW
-kPA3CwnBDQEK4EoC/x21bsFm3q0mczumiMqwDhnXk1MpPSbV90wdpxGeG41ixZ5H
-p6U7rD60bV08qx/MwjSsA8KnumbzJg==
-=Az/F
------END PGP SIGNATURE-----
-
---sDKAb4OeUBrWWL6P--
+Paolo
 
