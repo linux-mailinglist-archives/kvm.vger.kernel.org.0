@@ -2,139 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71D1C204DA8
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 11:17:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0913204DB4
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 11:18:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731944AbgFWJRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 05:17:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57682 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731887AbgFWJRb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 05:17:31 -0400
+        id S1732146AbgFWJSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 05:18:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27299 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731735AbgFWJSY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 05:18:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592903849;
+        s=mimecast20190719; t=1592903903;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=yiRnWHa9VVB1e8yxG1o2k5x8axs0i04jT/k6YjjG0Ms=;
-        b=F0tg31KlJEWsT8ByuvUPbpq2SI4IVldwNOxJHQzEkJmrhfgNly8KMPgFFUMCouaENj2Jz/
-        ylQAOyIt1lpSvyVR+rdOXFusNbnwWnlURHsJxW5URc/3onmtCYhy/bSkktmKIuDk2b7ln1
-        cxPW0kpfmw4JQ5fUltMeE90Ha6OrtFA=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CfnLed3EmdqbWeg4skLqNDsC7ZqeohtA8a6yn0mbkZo=;
+        b=C5Pm8fs6kFL4iSEegLTj3XT8cjiILnTW0cl36e/LC1IPwYK7O5aChtuFlS40KJIRK9wulM
+        ew2P+URSEa8y0TI/n1r9OlxPg/7VsT7J49P871d+7rysbJX7Vx9ZolfN7JaIZy3nON7G/F
+        PdJW1JjqnvVOOLxDrtCSoWYycaHEhdI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-BsDaQ65hNNuuXgpF2hlGSw-1; Tue, 23 Jun 2020 05:17:27 -0400
-X-MC-Unique: BsDaQ65hNNuuXgpF2hlGSw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-162-6TrjvSv5OmqkNy4Q1L1BvQ-1; Tue, 23 Jun 2020 05:18:19 -0400
+X-MC-Unique: 6TrjvSv5OmqkNy4Q1L1BvQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68A0619057A0;
-        Tue, 23 Jun 2020 09:17:26 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 12D887166D;
-        Tue, 23 Jun 2020 09:17:26 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH] KVM: x86: report sev_pin_memory errors with PTR_ERR
-Date:   Tue, 23 Jun 2020 05:17:25 -0400
-Message-Id: <20200623091725.271605-1-pbonzini@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC6C5107ACCD;
+        Tue, 23 Jun 2020 09:18:18 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.84])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE73D11A9F2;
+        Tue, 23 Jun 2020 09:18:14 +0000 (UTC)
+Date:   Tue, 23 Jun 2020 11:18:07 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 0/2] target/arm: Fix using pmu=on on KVM
+Message-ID: <20200623091807.vlqy53ckagcrhoah@kamzik.brq.redhat.com>
+References: <20200623090622.30365-1-philmd@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200623090622.30365-1-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Callers of sev_pin_memory() treat
-NULL differently:
+On Tue, Jun 23, 2020 at 11:06:20AM +0200, Philippe Mathieu-Daudé wrote:
+> Since v2:
+> - include Drew test fix (addressed Peter review comments)
+> - addressed Drew review comments
+> - collected R-b/A-b
+> 
+> Andrew Jones (1):
+>   tests/qtest/arm-cpu-features: Add feature setting tests
+> 
+> Philippe Mathieu-Daudé (1):
+>   target/arm: Check supported KVM features globally (not per vCPU)
+> 
+>  target/arm/kvm_arm.h           | 21 ++++++++-----------
+>  target/arm/cpu.c               |  2 +-
+>  target/arm/cpu64.c             | 10 ++++-----
+>  target/arm/kvm.c               |  4 ++--
+>  target/arm/kvm64.c             | 14 +++++--------
+>  tests/qtest/arm-cpu-features.c | 38 ++++++++++++++++++++++++++++++----
+>  6 files changed, 56 insertions(+), 33 deletions(-)
+> 
+> -- 
+> 2.21.3
+> 
+>
 
-sev_launch_secret()/svm_register_enc_region() return -ENOMEM
-sev_dbg_crypt() returns -EFAULT.
+Hi Phil,
 
-Switching to ERR_PTR() preserves the error and enables cleaner reporting of
-different kinds of failures.
+Thanks for including the test patch. To avoid breaking bisection, if one
+were to use qtest to bisect something, then the order of patches should
+be reversed. I guess Peter can apply them that way without a repost
+though.
 
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm/sev.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index a893624b9275..2b4916ffa906 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -320,7 +320,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 	unsigned long first, last;
- 
- 	if (ulen == 0 || uaddr + ulen < uaddr)
--		return NULL;
-+		return ERR_PTR(-EINVAL);
- 
- 	/* Calculate number of pages. */
- 	first = (uaddr & PAGE_MASK) >> PAGE_SHIFT;
-@@ -331,11 +331,11 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 	lock_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
- 	if (locked > lock_limit && !capable(CAP_IPC_LOCK)) {
- 		pr_err("SEV: %lu locked pages exceed the lock limit of %lu.\n", locked, lock_limit);
--		return NULL;
-+		return ERR_PTR(-ENOMEM);
- 	}
- 
- 	if (WARN_ON_ONCE(npages > INT_MAX))
--		return NULL;
-+		return ERR_PTR(-EINVAL);
- 
- 	/* Avoid using vmalloc for smaller buffers. */
- 	size = npages * sizeof(struct page *);
-@@ -345,7 +345,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 		pages = kmalloc(size, GFP_KERNEL_ACCOUNT);
- 
- 	if (!pages)
--		return NULL;
-+		return ERR_PTR(-ENOMEM);
- 
- 	/* Pin the user virtual address. */
- 	npinned = pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0, pages);
-@@ -360,11 +360,13 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 	return pages;
- 
- err:
--	if (npinned > 0)
-+	if (npinned > 0) {
- 		unpin_user_pages(pages, npinned);
-+		npinned = -ENOMEM;
-+	}
- 
- 	kvfree(pages);
--	return NULL;
-+	return ERR_PTR(npinned);
- }
- 
- static void sev_unpin_memory(struct kvm *kvm, struct page **pages,
-@@ -864,8 +866,8 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		return -EFAULT;
- 
- 	pages = sev_pin_memory(kvm, params.guest_uaddr, params.guest_len, &n, 1);
--	if (!pages)
--		return -ENOMEM;
-+	if (IS_ERR(pages))
-+		return PTR_ERR(pages);
- 
- 	/*
- 	 * The secret must be copied into contiguous memory region, lets verify
-@@ -991,8 +993,8 @@ int svm_register_enc_region(struct kvm *kvm,
- 		return -ENOMEM;
- 
- 	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
--	if (!region->pages) {
--		ret = -ENOMEM;
-+	if (IS_ERR(region->pages)) {
-+		ret = PTR_ERR(region->pages);
- 		goto e_free;
- 	}
- 
--- 
-2.26.2
+Thanks,
+drew 
 
