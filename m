@@ -2,201 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06A81205325
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 15:14:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F386C2053A4
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 15:40:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732707AbgFWNOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 09:14:38 -0400
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:45843 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732662AbgFWNOb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 09:14:31 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R801e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=38;SR=0;TI=SMTPD_---0U0WFL-I_1592918062;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U0WFL-I_1592918062)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 23 Jun 2020 21:14:23 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tianjia.zhang@linux.alibaba.com
-Subject: [PATCH v6 5/5] KVM: MIPS: clean up redundant kvm_run parameters in assembly
-Date:   Tue, 23 Jun 2020 21:14:18 +0800
-Message-Id: <20200623131418.31473-6-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
-References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
+        id S1732697AbgFWNkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 09:40:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59130 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732631AbgFWNkH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 09:40:07 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 6A681ACF2;
+        Tue, 23 Jun 2020 13:40:05 +0000 (UTC)
+Date:   Tue, 23 Jun 2020 15:40:03 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623134003.GD14101@suse.de>
+References: <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
+ <20200425202316.GL21900@8bytes.org>
+ <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
+ <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
+ <20200428075512.GP30814@suse.de>
+ <20200623110706.GB4817@hirez.programming.kicks-ass.net>
+ <20200623113007.GH31822@suse.de>
+ <20200623114818.GD4817@hirez.programming.kicks-ass.net>
+ <20200623120433.GB14101@suse.de>
+ <20200623125201.GG4817@hirez.programming.kicks-ass.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623125201.GG4817@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
-structure. For historical reasons, many kvm-related function parameters
-retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
-patch does a unified cleanup of these remaining redundant parameters.
+On Tue, Jun 23, 2020 at 02:52:01PM +0200, Peter Zijlstra wrote:
+> On Tue, Jun 23, 2020 at 02:04:33PM +0200, Joerg Roedel wrote:
+> > No, the recursion check is fine, because overwriting an already used IST
+> > stack doesn't matter (as long as it can be detected) if we are going to
+> > panic anyway. It doesn't matter because the kernel will not leave the
+> > currently running handler anymore.
+> 
+> You only have that guarantee when any SNP #VC from kernel is an
+> automatic panic. But in that case, what's the point of having the
+> recursion count?
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Reviewed-by: Huacai Chen <chenhc@lemote.com>
----
- arch/mips/include/asm/kvm_host.h |  4 ++--
- arch/mips/kvm/entry.c            | 21 ++++++++-------------
- arch/mips/kvm/mips.c             |  3 ++-
- arch/mips/kvm/trap_emul.c        |  2 +-
- arch/mips/kvm/vz.c               |  2 +-
- 5 files changed, 14 insertions(+), 18 deletions(-)
+It is not a recursion count, it is a stack-recursion check. Basically
+walk down the stack and look if your current stack is already in use.
+Yes, this can be optimized, but that is what is needed.
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 157fc876feca..01efa635fa73 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -352,7 +352,7 @@ struct kvm_mmu_memory_cache {
- #define KVM_MIPS_GUEST_TLB_SIZE	64
- struct kvm_vcpu_arch {
- 	void *guest_ebase;
--	int (*vcpu_run)(struct kvm_run *run, struct kvm_vcpu *vcpu);
-+	int (*vcpu_run)(struct kvm_vcpu *vcpu);
- 
- 	/* Host registers preserved across guest mode execution */
- 	unsigned long host_stack;
-@@ -863,7 +863,7 @@ int kvm_mips_emulation_init(struct kvm_mips_callbacks **install_callbacks);
- /* Debug: dump vcpu state */
- int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
- 
--extern int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu);
-+extern int kvm_mips_handle_exit(struct kvm_vcpu *vcpu);
- 
- /* Building of entry/exception code */
- int kvm_mips_entry_setup(void);
-diff --git a/arch/mips/kvm/entry.c b/arch/mips/kvm/entry.c
-index fd716942e302..832475bf2055 100644
---- a/arch/mips/kvm/entry.c
-+++ b/arch/mips/kvm/entry.c
-@@ -205,7 +205,7 @@ static inline void build_set_exc_base(u32 **p, unsigned int reg)
-  * Assemble the start of the vcpu_run function to run a guest VCPU. The function
-  * conforms to the following prototype:
-  *
-- * int vcpu_run(struct kvm_run *run, struct kvm_vcpu *vcpu);
-+ * int vcpu_run(struct kvm_vcpu *vcpu);
-  *
-  * The exit from the guest and return to the caller is handled by the code
-  * generated by kvm_mips_build_ret_to_host().
-@@ -218,8 +218,7 @@ void *kvm_mips_build_vcpu_run(void *addr)
- 	unsigned int i;
- 
- 	/*
--	 * A0: run
--	 * A1: vcpu
-+	 * A0: vcpu
- 	 */
- 
- 	/* k0/k1 not being used in host kernel context */
-@@ -238,10 +237,10 @@ void *kvm_mips_build_vcpu_run(void *addr)
- 	kvm_mips_build_save_scratch(&p, V1, K1);
- 
- 	/* VCPU scratch register has pointer to vcpu */
--	UASM_i_MTC0(&p, A1, scratch_vcpu[0], scratch_vcpu[1]);
-+	UASM_i_MTC0(&p, A0, scratch_vcpu[0], scratch_vcpu[1]);
- 
- 	/* Offset into vcpu->arch */
--	UASM_i_ADDIU(&p, K1, A1, offsetof(struct kvm_vcpu, arch));
-+	UASM_i_ADDIU(&p, K1, A0, offsetof(struct kvm_vcpu, arch));
- 
- 	/*
- 	 * Save the host stack to VCPU, used for exception processing
-@@ -645,10 +644,7 @@ void *kvm_mips_build_exit(void *addr)
- 	/* Now that context has been saved, we can use other registers */
- 
- 	/* Restore vcpu */
--	UASM_i_MFC0(&p, S1, scratch_vcpu[0], scratch_vcpu[1]);
--
--	/* Restore run (vcpu->run) */
--	UASM_i_LW(&p, S0, offsetof(struct kvm_vcpu, run), S1);
-+	UASM_i_MFC0(&p, S0, scratch_vcpu[0], scratch_vcpu[1]);
- 
- 	/*
- 	 * Save Host level EPC, BadVaddr and Cause to VCPU, useful to process
-@@ -810,7 +806,6 @@ void *kvm_mips_build_exit(void *addr)
- 	 * with this in the kernel
- 	 */
- 	uasm_i_move(&p, A0, S0);
--	uasm_i_move(&p, A1, S1);
- 	UASM_i_LA(&p, T9, (unsigned long)kvm_mips_handle_exit);
- 	uasm_i_jalr(&p, RA, T9);
- 	 UASM_i_ADDIU(&p, SP, SP, -CALLFRAME_SIZ);
-@@ -852,7 +847,7 @@ static void *kvm_mips_build_ret_from_exit(void *addr)
- 	 * guest, reload k1
- 	 */
- 
--	uasm_i_move(&p, K1, S1);
-+	uasm_i_move(&p, K1, S0);
- 	UASM_i_ADDIU(&p, K1, K1, offsetof(struct kvm_vcpu, arch));
- 
- 	/*
-@@ -886,8 +881,8 @@ static void *kvm_mips_build_ret_to_guest(void *addr)
- {
- 	u32 *p = addr;
- 
--	/* Put the saved pointer to vcpu (s1) back into the scratch register */
--	UASM_i_MTC0(&p, S1, scratch_vcpu[0], scratch_vcpu[1]);
-+	/* Put the saved pointer to vcpu (s0) back into the scratch register */
-+	UASM_i_MTC0(&p, S0, scratch_vcpu[0], scratch_vcpu[1]);
- 
- 	/* Load up the Guest EBASE to minimize the window where BEV is set */
- 	UASM_i_LW(&p, T0, offsetof(struct kvm_vcpu_arch, guest_ebase), K1);
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index f5ba393472e3..21bfbf414d2c 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1195,8 +1195,9 @@ static void kvm_mips_set_c0_status(void)
- /*
-  * Return value is in the form (errcode<<2 | RESUME_FLAG_HOST | RESUME_FLAG_NV)
-  */
--int kvm_mips_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu)
-+int kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_run *run = vcpu->run;
- 	u32 cause = vcpu->arch.host_cp0_cause;
- 	u32 exccode = (cause >> CAUSEB_EXCCODE) & 0x1f;
- 	u32 __user *opc = (u32 __user *) vcpu->arch.pc;
-diff --git a/arch/mips/kvm/trap_emul.c b/arch/mips/kvm/trap_emul.c
-index f8cba51e1054..0788c00d7e94 100644
---- a/arch/mips/kvm/trap_emul.c
-+++ b/arch/mips/kvm/trap_emul.c
-@@ -1241,7 +1241,7 @@ static int kvm_trap_emul_vcpu_run(struct kvm_vcpu *vcpu)
- 	 */
- 	kvm_mips_suspend_mm(cpu);
- 
--	r = vcpu->arch.vcpu_run(vcpu->run, vcpu);
-+	r = vcpu->arch.vcpu_run(vcpu);
- 
- 	/* We may have migrated while handling guest exits */
- 	cpu = smp_processor_id();
-diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-index 9e58c479ee20..9ca6a879f222 100644
---- a/arch/mips/kvm/vz.c
-+++ b/arch/mips/kvm/vz.c
-@@ -3265,7 +3265,7 @@ static int kvm_vz_vcpu_run(struct kvm_vcpu *vcpu)
- 	kvm_vz_vcpu_load_tlb(vcpu, cpu);
- 	kvm_vz_vcpu_load_wired(vcpu);
- 
--	r = vcpu->arch.vcpu_run(vcpu->run, vcpu);
-+	r = vcpu->arch.vcpu_run(vcpu);
- 
- 	kvm_vz_vcpu_save_wired(vcpu);
- 
--- 
-2.17.1
+IIRC the current prototype code for SNP just pre-validates all memory in
+the VM and doesn't support moving pages around on the host. So any #VC
+SNP exception would be fatal, yes.
+
+In a scenario with on-demand validation of guest pages and support for
+guest-assisted page-moving on the HV side it would be more complicated.
+Basically all memory that is accessed during #VC exception handling must
+stay validated at all times, including the IST stack.
+
+So saying this, I don't understand why _all_ SNP #VC exceptions from
+kernel space must be fatal?
+
+Regards,
+
+	Joerg
 
