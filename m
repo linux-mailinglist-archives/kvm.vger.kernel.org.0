@@ -2,39 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CE912055E7
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:30:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4861A2055BF
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:24:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732982AbgFWPaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 11:30:14 -0400
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:5214 "EHLO
-        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732821AbgFWPaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:30:10 -0400
-X-Greylist: delayed 427 seconds by postgrey-1.27 at vger.kernel.org; Tue, 23 Jun 2020 11:30:10 EDT
-Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none
-IronPort-SDR: /GrFiUnpMH0W1AmH16iOP4fF+hxzWdtD9D+GISmoRYqR9NUtqwq7oNSKz4sucvE9pe0J4q44B7
- YPhx3w0bbMe7At7SPDagk+W+pBlnB3922l+qjz6SB7+59/ApAY01JpymxYxQB/94hJVnwwx0hu
- mFWsCVB1OyWETH6EOQgYMgbq3BvnqklFn/9U3YmTb/P+RlHggHk+LCKhL2ufV+TQIExUPEF/c/
- iBObNjUKWYetodeXq+AyoWV8QwqwHww4DnX12xwYBQL5sOXqBlQ7a5064JbCHOcBXl3kQZ+uQp
- tKU=
-X-SBRS: 2.7
-X-MesageID: 20952771
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.75,271,1589256000"; 
-   d="scan'208";a="20952771"
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Joerg Roedel <jroedel@suse.de>
-CC:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        "Dave Hansen" <dave.hansen@intel.com>,
+        id S1732969AbgFWPXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 11:23:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732781AbgFWPXy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 11:23:54 -0400
+Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA48AC061573;
+        Tue, 23 Jun 2020 08:23:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=67GmQHoj5zNuUwz09OSjiIC4O8VKYFdYpYZwr4wExTc=; b=HKSxQszno971bP/TsveUX1OfYN
+        w+iddIX3Sb92BzDuh9mM+TMd424oct3epZCyddn8xYMXBq2wYT92dhpKJLqXjKVgS3b3qyGyC7HE1
+        jdNWFF+LsxwRamTTgoCMYmptuxP9dIkgdc/piRBGfC0z2EXgQMlfYqjVz6SF9uCFAa+PNY0Q7pUpD
+        y8qIHKn8jwZGsl/4ZFkT95KFdxCd8HuPbP+IODLDl0y6amInT0EYw1+XAoCGUScP3zwAF8GJHOsTG
+        H4vzhX9bOmnERkNENcGq2LrO6Sv/s7921BB80kd93Wfg931RZpLLOKf5q/hf20joXKq/9UM9Q4ebC
+        2UsjCpJg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jnklk-00037n-BU; Tue, 23 Jun 2020 15:23:28 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AC38A303DA0;
+        Tue, 23 Jun 2020 17:23:26 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 9AB3C234EBA53; Tue, 23 Jun 2020 17:23:26 +0200 (CEST)
+Date:   Tue, 23 Jun 2020 17:23:26 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "Mike Stunes" <mstunes@vmware.com>,
+        Mike Stunes <mstunes@vmware.com>,
         Dan Williams <dan.j.williams@intel.com>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
         Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
         kvm list <kvm@vger.kernel.org>,
@@ -42,81 +50,45 @@ CC:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
         Thomas Hellstrom <thellstrom@vmware.com>,
         Linux Virtualization <virtualization@lists.linux-foundation.org>,
         X86 ML <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20200425202316.GL21900@8bytes.org>
- <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
- <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
- <20200623094519.GF31822@suse.de>
- <20200623104559.GA4817@hirez.programming.kicks-ass.net>
- <20200623111107.GG31822@suse.de>
- <20200623111443.GC4817@hirez.programming.kicks-ass.net>
- <20200623114324.GA14101@suse.de>
- <20200623115014.GE4817@hirez.programming.kicks-ass.net>
- <20200623121237.GC14101@suse.de>
- <20200623130322.GH4817@hirez.programming.kicks-ass.net>
-From:   Andrew Cooper <andrew.cooper3@citrix.com>
-Message-ID: <9e3f9b2a-505e-dfd7-c936-461227b4033e@citrix.com>
-Date:   Tue, 23 Jun 2020 16:22:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623152326.GL4817@hirez.programming.kicks-ass.net>
+References: <20200428075512.GP30814@suse.de>
+ <20200623110706.GB4817@hirez.programming.kicks-ass.net>
+ <20200623113007.GH31822@suse.de>
+ <20200623114818.GD4817@hirez.programming.kicks-ass.net>
+ <20200623120433.GB14101@suse.de>
+ <20200623125201.GG4817@hirez.programming.kicks-ass.net>
+ <20200623134003.GD14101@suse.de>
+ <20200623135916.GI4817@hirez.programming.kicks-ass.net>
+ <20200623145344.GA117543@hirez.programming.kicks-ass.net>
+ <20200623145914.GF14101@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20200623130322.GH4817@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623145914.GF14101@suse.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/2020 14:03, Peter Zijlstra wrote:
-> On Tue, Jun 23, 2020 at 02:12:37PM +0200, Joerg Roedel wrote:
->> On Tue, Jun 23, 2020 at 01:50:14PM +0200, Peter Zijlstra wrote:
->>> If SNP is the sole reason #VC needs to be IST, then I'd strongly urge
->>> you to only make it IST if/when you try and make SNP happen, not before.
->> It is not the only reason, when ES guests gain debug register support
->> then #VC also needs to be IST, because #DB can be promoted into #VC
->> then, and as #DB is IST for a reason, #VC needs to be too.
-> Didn't I read somewhere that that is only so for Rome/Naples but not for
-> the later chips (Milan) which have #DB pass-through?
+On Tue, Jun 23, 2020 at 04:59:14PM +0200, Joerg Roedel wrote:
+> On Tue, Jun 23, 2020 at 04:53:44PM +0200, Peter Zijlstra wrote:
+> > +noinstr void idtentry_validate_ist(struct pt_regs *regs)
+> > +{
+> > +	if ((regs->sp & ~(EXCEPTION_STKSZ-1)) ==
+> > +	    (_RET_IP_ & ~(EXCEPTION_STKSZ-1)))
+> > +		die("IST stack recursion", regs, 0);
+> > +}
+> 
+> Yes, this is a start, it doesn't cover the case where the NMI stack is
+> in-between, so I think you need to walk down regs->sp too.
 
-I don't know about hardware timelines, but some future part can now opt
-in to having debug registers as part of the encrypted state, and swapped
-by VMExit, which would make debug facilities generally usable, and
-supposedly safe to the #DB infinite loop issues, at which point the
-hypervisor need not intercept #DB for safety reasons.
+That shouldn't be possible with the current code, I think.
 
-Its worth nothing that on current parts, the hypervisor can set up debug
-facilities on behalf of the guest (or behind its back) as the DR state
-is unencrypted, but that attempting to intercept #DB will redirect to
-#VC inside the guest and cause fun. (Also spare a thought for 32bit
-kernels which have to cope with userspace singlestepping the SYSENTER
-path with every #DB turning into #VC.)
+> The dumpstack code already has some logic for this.
 
->> Besides that, I am not a fan of delegating problems I already see coming
->> to future-Joerg and future-Peter, but if at all possible deal with them
->> now and be safe later.
-> Well, we could just say no :-) At some point in the very near future
-> this house of cards is going to implode.
-
-What currently exists is a picture of a house of cards in front of
-something which has fallen down.
-
-> Did someone forget to pass the 'ISTs are *EVIL*' memo to the hardware
-> folks? How come we're getting more and more of them?
-
-I have tried to get this point across.  Then again - its far easier for
-the software folk in the same company as the hardware folk to make this
-point.
-
-> (/me puts fingers
-> in ears and goes la-la-la-la in anticipation of Andrew mentioning CET)
-
-I wasn't going to bring it up, but seeing as you have - while there are
-prohibitively-complicating issues preventing it from working on native,
-I don't see any point even considering it for the mess which is #VC, or
-the even bigger mess which is #HV.
-
-~Andrew
+Reliability of that depends on the unwinder, I wouldn't want the guess
+uwinder to OOPS me by accident.
