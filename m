@@ -2,138 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38217204A40
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 08:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37ECE204A68
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 09:02:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730928AbgFWGxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 02:53:50 -0400
-Received: from mga14.intel.com ([192.55.52.115]:6827 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730688AbgFWGxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 02:53:50 -0400
-IronPort-SDR: yOdSviwHOn+YOjpmOf/m44Aq1Z3dExqdTAHPmKzdvRT8mAVc0WD4CKqKGRKSnbMBAAWxZpX1y/
- FjXnkFV/K6Kw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="143047816"
-X-IronPort-AV: E=Sophos;i="5.75,270,1589266800"; 
-   d="scan'208";a="143047816"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2020 23:53:48 -0700
-IronPort-SDR: vXYGhTn5jjwCXa1TPq2WcjobErcEKb5oX7SP1jRjbQBs3qmdFjCxe35EuPr4Xm7mi4Xfv6h8PP
- qgKOf/f+HmIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,270,1589266800"; 
-   d="scan'208";a="279012600"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga006.jf.intel.com with ESMTP; 22 Jun 2020 23:53:48 -0700
-Date:   Mon, 22 Jun 2020 23:53:48 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Feiner <pfeiner@google.com>
-Cc:     Jon Cargille <jcargill@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] kvm: x86 mmu: avoid mmu_page_hash lookup for
- direct_map-only VM
-Message-ID: <20200623065348.GA23054@linux.intel.com>
-References: <20200508182425.69249-1-jcargill@google.com>
- <20200508201355.GS27052@linux.intel.com>
- <CAM3pwhEw+KYq9AD+z8wPGyG10Bex7xLKaPM=yVV-H+W_eHTW4w@mail.gmail.com>
+        id S1731374AbgFWHBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 03:01:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33140 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730793AbgFWHBi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 03:01:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592895696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zy58zDIczPqYbbCU2I0rBDICf2p/vJOkTqkK2TZ8PAQ=;
+        b=a/BcGEsJWnDpN1L/CQe/esfPC5/4bR7k18k//Ent0/sbaJDZbznMdGNBfmwfyzBkcDXFzy
+        hAC8r2x60nKqPUAqI+NpVvSmCztawiShnkCUoHqvQkq3SXvGiNXHh6PWvAosDzZ79xGswF
+        AnhjAuWOOTYyawEeKQNiE5zY/s947aA=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-EjPkCuW4Nj-OEcefoHo50A-1; Tue, 23 Jun 2020 03:01:35 -0400
+X-MC-Unique: EjPkCuW4Nj-OEcefoHo50A-1
+Received: by mail-qt1-f198.google.com with SMTP id u26so14949420qtj.21
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 00:01:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=zy58zDIczPqYbbCU2I0rBDICf2p/vJOkTqkK2TZ8PAQ=;
+        b=oxOW8vcfyRRFjHB4dZINojlRI15lJRpvdOUtreihxqPwTNbvUSH7XFpouDD2RCxRsc
+         SOibot4QoGs/n/YD8t78IsYFZAJEjXmoLiQYub4OZb+vYGzIj8D7Wm/oo9q5DMWJ3Fe/
+         74vSp/spsEI3+xi8js25jpNzRW0ClAUhNuDZOxWdU3tSlnd/4RZFT9nhRfYi7C4h7pe5
+         P+oeaRtUqcnP4y0t+oLczjfYma36DGVTwgM3l6str5exNwWp0QvcnKipAuJiaZ++ebkI
+         hQEURC0z3mkapcOp+3u6/S/ASAJoDrCXtYuEC5thRmEQbccD6ONaMG93rGig2TZ/EYQ8
+         RRwQ==
+X-Gm-Message-State: AOAM533/PXjFeEaN10hvLhSWATvbRLyV3BORrfKOK4a6wjPg7GEFmyMu
+        VNG3CZBow/klhk5ExaWBYoXzYY1isBvhftpjXdfRe46pEz+gmqy/rfc7t2GNCj1nWsl0k7wCvcg
+        0UHxsNu6SkECHF46AsCVYCtrjwLo/
+X-Received: by 2002:ae9:e841:: with SMTP id a62mr19452233qkg.497.1592895694369;
+        Tue, 23 Jun 2020 00:01:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyOZBN3nbHPtHiWYdDSxBqd0YcCYWHIzJTjzaFifnLqnQv36MEZ0ptTmo2xbqy/ajLlIIBFDzPj3siE/rmhtiE=
+X-Received: by 2002:ae9:e841:: with SMTP id a62mr19452207qkg.497.1592895693904;
+ Tue, 23 Jun 2020 00:01:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAM3pwhEw+KYq9AD+z8wPGyG10Bex7xLKaPM=yVV-H+W_eHTW4w@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20200611113404.17810-1-mst@redhat.com> <20200611113404.17810-3-mst@redhat.com>
+ <0332b0cf-cf00-9216-042c-e870efa33626@redhat.com> <20200622115946-mutt-send-email-mst@kernel.org>
+ <c56cc86d-a420-79ca-8420-e99db91980fa@redhat.com>
+In-Reply-To: <c56cc86d-a420-79ca-8420-e99db91980fa@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Tue, 23 Jun 2020 09:00:57 +0200
+Message-ID: <CAJaqyWc3C_Td_SpV97CuemkQH9vH+EL3sGgeWGE82E5gYxZNCA@mail.gmail.com>
+Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 12, 2020 at 03:36:21PM -0700, Peter Feiner wrote:
-> On Fri, May 8, 2020 at 1:14 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
+On Tue, Jun 23, 2020 at 4:51 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2020/6/23 =E4=B8=8A=E5=8D=8812:00, Michael S. Tsirkin wrote:
+> > On Wed, Jun 17, 2020 at 11:19:26AM +0800, Jason Wang wrote:
+> >> On 2020/6/11 =E4=B8=8B=E5=8D=887:34, Michael S. Tsirkin wrote:
+> >>>    static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+> >>>    {
+> >>>     kfree(vq->descs);
+> >>> @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_d=
+ev *dev)
+> >>>     for (i =3D 0; i < dev->nvqs; ++i) {
+> >>>             vq =3D dev->vqs[i];
+> >>>             vq->max_descs =3D dev->iov_limit;
+> >>> +           if (vhost_vq_num_batch_descs(vq) < 0) {
+> >>> +                   return -EINVAL;
+> >>> +           }
+> >> This check breaks vdpa which set iov_limit to zero. Consider iov_limit=
+ is
+> >> meaningless to vDPA, I wonder we can skip the test when device doesn't=
+ use
+> >> worker.
+> >>
+> >> Thanks
+> > It doesn't need iovecs at all, right?
 > >
-> > On Fri, May 08, 2020 at 11:24:25AM -0700, Jon Cargille wrote:
-> > > From: Peter Feiner <pfeiner@google.com>
-> > >
-> > > Optimization for avoiding lookups in mmu_page_hash. When there's a
-> > > single direct root, a shadow page has at most one parent SPTE
-> > > (non-root SPs have exactly one; the root has none). Thus, if an SPTE
-> > > is non-present, it can be linked to a newly allocated SP without
-> > > first checking if the SP already exists.
-> >
-> > Some mechanical comments below.  I'll think through the actual logic next
-> > week, my brain needs to be primed anytime the MMU is involved :-)
-> >
-> > > This optimization has proven significant in batch large SP shattering
-> > > where the hash lookup accounted for 95% of the overhead.
+> > -- MST
+>
+>
+> Yes, so we may choose to bypass the iovecs as well.
+>
+> Thanks
+>
 
-Is it the hash lookup or the hlist walk that is expensive?  If it's the
-hash lookup, then a safer fix would be to do the hash lookup once in
-kvm_mmu_get_page() instead of doing it for both the walk and the insertion.
-Assuming, that's the case, I'll send a patch.  Actually, I'll probably send
-a patch no matter what, I've been looking for an excuse to get rid of that
-obnoxiously long hash lookup line.  :-)
+I think that the kmalloc_array returns ZERO_SIZE_PTR for all of them
+in that case, so I didn't bother to skip the kmalloc_array parts.
+Would you prefer to skip them all and let them NULL? Or have I
+misunderstood what you mean?
 
-> > > Signed-off-by: Peter Feiner <pfeiner@google.com>
-> > > Signed-off-by: Jon Cargille <jcargill@google.com>
-> > > Reviewed-by: Jim Mattson <jmattson@google.com>
-> > >
-> > > ---
-> > >  arch/x86/include/asm/kvm_host.h | 13 ++++++++
-> > >  arch/x86/kvm/mmu/mmu.c          | 55 +++++++++++++++++++--------------
-> > >  2 files changed, 45 insertions(+), 23 deletions(-)
-> > >
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index a239a297be33..9b70d764b626 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -913,6 +913,19 @@ struct kvm_arch {
-> > >       struct kvm_page_track_notifier_node mmu_sp_tracker;
-> > >       struct kvm_page_track_notifier_head track_notifier_head;
-> > >
-> > > +     /*
-> > > +      * Optimization for avoiding lookups in mmu_page_hash. When there's a
-> > > +      * single direct root, a shadow page has at most one parent SPTE
-> > > +      * (non-root SPs have exactly one; the root has none). Thus, if an SPTE
-> > > +      * is non-present, it can be linked to a newly allocated SP without
-> > > +      * first checking if the SP already exists.
+Thanks!
 
-I'm pretty sure this will break due to the "zap oldest shadow page"
-behavior of make_mmu_pages_available() and mmu_shrink_scan().  In that case,
-KVM can zap a parent SP and leave a dangling child.  If/when the zapped
-parent SP is rebuilt, it should find and relink the temporarily orphaned
-child.  I believe the error will not actively manifest since the new,
-duplicate SP will be added to the front of the hlist, i.e. the newest entry
-will always be observed first.  But, it will "leak" the child and all its
-children, at least until they get zapped in turn.
-
-Hitting the above is probably extremely rare in the current code base.
-Presumably the make_mmu_pages_available() path is rarely hit, and the
-mmu_shrink_scan() path is basically broken (it zaps at most a single page
-after reporting to the scanner that it can potentially free thousands of
-pages; I'm working on a series).
-
-One thought would be to zap the entire family tree when zapping a shadow
-page for a direct MMU.  Then the above assumption would hold.  I think
-that would be ok/safe-ish?  It definitely would have "interesting" side
-effects.
-
-Actually, there's another case that would break, though it's contrived and
-silly.  If a VM is configured to have vCPUs with different physical address
-widths (yay KVM) and caused KVM to use both 4-level and 5-level EPT, then
-the "single direct root" rule above would be violated.
-
-If we do get agressive and zap all children (or if my analysis is wrong),
-and prevent the mixed level insansity, then a simpler approach would be to
-skip the lookup if the MMU is direct.  I.e. no need for the per-VM toggle.
-Direct vs. indirect MMUs are guaranteed to have different roles and so the
-direct MMU's pages can't be reused/shared.
