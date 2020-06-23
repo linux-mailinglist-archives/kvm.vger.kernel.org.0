@@ -2,98 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F00B82054F5
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 16:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43D4920550B
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 16:42:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732821AbgFWOiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 10:38:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18738 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732738AbgFWOiW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 10:38:22 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05NEX67i033482;
-        Tue, 23 Jun 2020 10:38:21 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31ukkng7r0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 10:38:20 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NEX9h0033877;
-        Tue, 23 Jun 2020 10:38:19 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31ukkng7qd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 10:38:19 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NEaJvv027641;
-        Tue, 23 Jun 2020 14:38:19 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma02wdc.us.ibm.com with ESMTP id 31uk2mr8pa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 14:38:19 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05NEcFhO26280290
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Jun 2020 14:38:15 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A50566E050;
-        Tue, 23 Jun 2020 14:38:15 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B38DD6E054;
-        Tue, 23 Jun 2020 14:38:14 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.182.30])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Tue, 23 Jun 2020 14:38:14 +0000 (GMT)
-Subject: Re: [PATCH v9 0/2] Use DIAG318 to set Control Program Name & Version
- Codes
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
-References: <20200622154636.5499-1-walling@linux.ibm.com>
- <cfe77de0-e1d8-5779-541f-286cf3002459@de.ibm.com>
-From:   Collin Walling <walling@linux.ibm.com>
-Message-ID: <704fd712-1883-9aad-bb60-4412cb8a9573@linux.ibm.com>
-Date:   Tue, 23 Jun 2020 10:38:13 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1732928AbgFWOmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 10:42:21 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51305 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732738AbgFWOmT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 10:42:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592923337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mPOfZFaF+bdCbm0ydM+kQRFRBQ8scE3A9xTZmb9+eHU=;
+        b=PzVCpiCW7oHGx66e6FC7jyw+wmqS5JPPZzX8iCfiyiVGOOnWQGTFtvw/zbUcbTyNvfpOio
+        cvag0+rwwDSCoxtbMcUsdCoV6WRrS3i1u4/TFJY5LfMpfj1wtRnMPFJOgZnpFAqR+MOAy7
+        e9+c8O2X3Y17WUQyPNHYdlwc0WunMIA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-ZHPOzBYDN9ST43UWBpGNJw-1; Tue, 23 Jun 2020 10:42:12 -0400
+X-MC-Unique: ZHPOzBYDN9ST43UWBpGNJw-1
+Received: by mail-wm1-f72.google.com with SMTP id h6so4560920wmb.7
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 07:42:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=mPOfZFaF+bdCbm0ydM+kQRFRBQ8scE3A9xTZmb9+eHU=;
+        b=r+6+KqW0vefcFhDcgeRfanMW36TNP5q6gYxAHz58IIs8xd5JyE7FLpV+zIO5lVt7hl
+         gVWy/sMzpOn9eQQgV0oPI5Xsj5MLGzW2nPQ2RPgi+h+BBrFesXm7MThOgI5rKU4PalmJ
+         iqNIO3XkZA6xMAdXgi+U4GTDWqU70fJ5SsLAiAAYCfRBoEiDLcTEbD3oKZ19ls+qEfS7
+         5Lbxvx0fcTjAURzF7VIXul38krDvGu7GKWtAC2Bo6YBgDPf7w9nAbZafIb+jBVRVEj3J
+         OqqEBz1RjoF94HI/wInM+c1H0okz2hdPCF+7cakXw+c5tK1xtm5hVAiXSnxppfBe8sXb
+         aicw==
+X-Gm-Message-State: AOAM530BDlrvJEOHt1yKdDh+V6WmPkzTEXhFvYc41qYf5TRiwXRtlRFH
+        6HdSuzpFf9QyE0Dt/BDn0MQeSqn8QPWipqqUMm29omKNTpDvwBzTOoaSqd4VTr0pdw2DvT4aFJ4
+        8bsy0sgdEYYKx
+X-Received: by 2002:adf:e285:: with SMTP id v5mr25169179wri.129.1592923330751;
+        Tue, 23 Jun 2020 07:42:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmHWDOuDtiB37Ir1bpYYZm3cgpiWQYz+hwCXOOThQnShQNMF77cdnf/6yuMEyCU5MTi1D9bA==
+X-Received: by 2002:adf:e285:: with SMTP id v5mr25169152wri.129.1592923330463;
+        Tue, 23 Jun 2020 07:42:10 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+        by smtp.gmail.com with ESMTPSA id n14sm521539wro.81.2020.06.23.07.42.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jun 2020 07:42:09 -0700 (PDT)
+Date:   Tue, 23 Jun 2020 10:42:06 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC v9 02/11] vhost: use batched get_vq_desc version
+Message-ID: <20200623103746-mutt-send-email-mst@kernel.org>
+References: <20200619182302.850-1-eperezma@redhat.com>
+ <20200619182302.850-3-eperezma@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cfe77de0-e1d8-5779-541f-286cf3002459@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
- definitions=2020-06-23_07:2020-06-23,2020-06-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 spamscore=0 malwarescore=0 priorityscore=1501
- mlxlogscore=999 adultscore=0 phishscore=0 bulkscore=0 clxscore=1015
- impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006120000 definitions=main-2006230110
+In-Reply-To: <20200619182302.850-3-eperezma@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/23/20 3:13 AM, Christian Borntraeger wrote:
+On Fri, Jun 19, 2020 at 08:22:53PM +0200, Eugenio Pérez wrote:
+> From: "Michael S. Tsirkin" <mst@redhat.com>
 > 
+> As testing shows no performance change, switch to that now.
 > 
-> On 22.06.20 17:46, Collin Walling wrote:
->> Changelog:
->>
->>     v9
->>
->>     â€¢ No longer unshadowing CPNC in VSIE
->>
-> applied. 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> Link: https://lore.kernel.org/r/20200401183118.8334-3-eperezma@redhat.com
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> ---
+>  drivers/vhost/test.c  |   2 +-
+>  drivers/vhost/vhost.c | 314 ++++++++----------------------------------
+>  drivers/vhost/vhost.h |   7 +-
+>  3 files changed, 61 insertions(+), 262 deletions(-)
 > 
+> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> index a09dedc79f68..650e69261557 100644
+> --- a/drivers/vhost/test.c
+> +++ b/drivers/vhost/test.c
+> @@ -119,7 +119,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
+>  	dev = &n->dev;
+>  	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
+>  	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
+> -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
+> +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
+>  		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT, true, NULL);
+>  
+>  	f->private_data = n;
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 2d784681b0fa..13021d6986eb 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -304,6 +304,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>  {
+>  	vq->num = 1;
+>  	vq->ndescs = 0;
+> +	vq->first_desc = 0;
+>  	vq->desc = NULL;
+>  	vq->avail = NULL;
+>  	vq->used = NULL;
+> @@ -372,6 +373,11 @@ static int vhost_worker(void *data)
+>  	return 0;
+>  }
+>  
+> +static int vhost_vq_num_batch_descs(struct vhost_virtqueue *vq)
+> +{
+> +	return vq->max_descs - UIO_MAXIOV;
+> +}
+> +
+>  static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+>  {
+>  	kfree(vq->descs);
 
-Thanks!
+
+Batching is enabled if max_descs > UIO_MAXIOV.
+
+So this uses batching for test.
+
+But net is unchanged, so it is still not using the batched version.
+Is that right?
+
+I think a better subject would be "vhost/test: use batched get_vq_desc version".
+
+And that explains which testing it refers to: the one executed by vhost test.
+
+I think there was a separate patch to enable that for net separately,
+but it got lost - or did I miss it?
 
 -- 
-Regards,
-Collin
+MST
 
-Stay safe and stay healthy
