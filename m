@@ -2,297 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DAB9204A1B
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 08:44:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38217204A40
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 08:53:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730793AbgFWGoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 02:44:00 -0400
-Received: from mga18.intel.com ([134.134.136.126]:26234 "EHLO mga18.intel.com"
+        id S1730928AbgFWGxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 02:53:50 -0400
+Received: from mga14.intel.com ([192.55.52.115]:6827 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730635AbgFWGn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 02:43:59 -0400
-IronPort-SDR: 0HgRcXXQBRSCRLQacXHLqbK0aCxjjEq16lFIWOzLBhJBN7Oe3vH/fNjEDMawN2FNrc8zOhAh/C
- LnwmqsMzzsPw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="131392280"
+        id S1730688AbgFWGxu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 02:53:50 -0400
+IronPort-SDR: yOdSviwHOn+YOjpmOf/m44Aq1Z3dExqdTAHPmKzdvRT8mAVc0WD4CKqKGRKSnbMBAAWxZpX1y/
+ FjXnkFV/K6Kw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9660"; a="143047816"
 X-IronPort-AV: E=Sophos;i="5.75,270,1589266800"; 
-   d="scan'208";a="131392280"
+   d="scan'208";a="143047816"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2020 23:43:57 -0700
-IronPort-SDR: gRyOhPTSYh3q8zWeBbY+U921fRQR9fqVt4htZy6NbsKmJMCeRQ7Nhoy5UNQYLHmF/0gtiKjSLR
- dJXNQjnUJ1Yg==
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2020 23:53:48 -0700
+IronPort-SDR: vXYGhTn5jjwCXa1TPq2WcjobErcEKb5oX7SP1jRjbQBs3qmdFjCxe35EuPr4Xm7mi4Xfv6h8PP
+ qgKOf/f+HmIg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,270,1589266800"; 
-   d="scan'208";a="452112000"
-Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
-  by orsmga005.jf.intel.com with ESMTP; 22 Jun 2020 23:43:57 -0700
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 22 Jun 2020 23:43:57 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 22 Jun 2020 23:43:57 -0700
-Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Mon, 22 Jun 2020 23:43:57 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
- by edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 22 Jun 2020 23:43:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nP8TBDz1Uu6ygKRNFv/0qLfLsHYj9Nxi/CCwp+GbEYfC7m0xWSFPFvt3FEVGtDWUzo2z3s8FNFjQWPHM8xL5S042TAYerZqzuw4Phy8H7QnEiY0PBl3BSoiKR50WC8Ve5S2fglfBHwt51Qmb9RxrRvhsHhB4jLzsmgBgALq0Xhz6GmbbRnKzwDAQDhU7ZpozkWkX+zGAvUkNGAAlyDpakRb19z7Q95+ssT7VoudWKpuWur/3rXlIeqbS3aQHZHrwKq4WzmEuj2PRP+N6+S9sjyZO1/PdCNZ/UoeVfYNVvrV1a/I00I0cR/wRgJ7qPLTXZaISwH54wDTYSMWQRAqO8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GZed6e6lLPqftRY0AmBrf0V0x+yCfEMnEYvTMTsNQ40=;
- b=NrXOgFhMBGLzyFp+vqTeRXqa0TY2b8Z7ZnGto8Ufb9t1uwPRW9a5Z/89uLCHUbmiEcfhNfDbk+OiUsMsoAs6Oku/dsPwDY3paQOJBTfY/Ugd94Z6mIyJ7G8Pq0PVqWOGKvqAO632njMwB3ssfm3NpQxBeGa6tz8VlnJcLgpuSFAR8QWzOcethm8wHE3DwqPFMSI5e61MgUr5l6ejV3buhrqz5H0HU//1FbD1uWEjqTxruatymHPreOvL+S3zgtjmPMzfsEx9qtPAQocCAKrKSZWps6/SO/mkr64XCAwIeFzIJeLEW8ZZvKm7CTEoMNHESA+Z2STue/vH6a+DTFYBCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GZed6e6lLPqftRY0AmBrf0V0x+yCfEMnEYvTMTsNQ40=;
- b=UVJ9/QPkWpz5r14PzASX+h1OhQ7nebc36PwNBxKCSB/HF/vet0P4e8jW98YDDoEYSd8XWY1pFK47e16dv4srINGBN3hdiDxjKxK9htHm/YozXbiCcCkKdznnjfzSYs6i4pkkphTB7YT3d/QZ+nAs2XrefEfxwxDgrSadVt3NxHE=
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com (2603:10b6:4:7::18) by
- DM5PR1101MB2265.namprd11.prod.outlook.com (2603:10b6:4:50::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3109.22; Tue, 23 Jun 2020 06:43:55 +0000
-Received: from DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::2c3d:98d9:4e81:c86c]) by DM5PR11MB1435.namprd11.prod.outlook.com
- ([fe80::2c3d:98d9:4e81:c86c%6]) with mapi id 15.20.3109.027; Tue, 23 Jun 2020
- 06:43:55 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 14/15] vfio: Document dual stage control
-Thread-Topic: [PATCH v2 14/15] vfio: Document dual stage control
-Thread-Index: AQHWP+klJ2WDrhzcJUGl5z7dUgTydqjZcnYAgALkw9CACFCUAIABK3hA
-Date:   Tue, 23 Jun 2020 06:43:54 +0000
-Message-ID: <DM5PR11MB1435B5A1D25A245AD5E3B6D3C3940@DM5PR11MB1435.namprd11.prod.outlook.com>
-References: <1591877734-66527-1-git-send-email-yi.l.liu@intel.com>
- <1591877734-66527-15-git-send-email-yi.l.liu@intel.com>
- <20200615094128.GB1491454@stefanha-x1.localdomain>
- <DM5PR11MB1435C484283BDCD75F19EDB5C39A0@DM5PR11MB1435.namprd11.prod.outlook.com>
- <20200622125114.GC15683@stefanha-x1.localdomain>
-In-Reply-To: <20200622125114.GC15683@stefanha-x1.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.2.0.6
-dlp-product: dlpe-windows
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.218]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7eb49aa1-328b-4a79-10a3-08d81740cca7
-x-ms-traffictypediagnostic: DM5PR1101MB2265:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR1101MB2265B1C1335A17691D2A8F39C3940@DM5PR1101MB2265.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2449;
-x-forefront-prvs: 04433051BF
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: p5zwf0+TCX1gLLQ45aLgZPtOgWPTnSWV9P8MeU6DjYH5E45azjBgqoF37yjhaNFv/I00xcNY94CPSHO+hvsMYWT/lDJWtBDCgGYa2MJ+qNOyKgVJqzFxycgWyDYt1v/mlMTY1lK6Q6shZ9U272NLwZhe/LnhH0adgxyvQklIbe94i1eq8ZVZVBGtVPE41yWKjE7E5mej7bU13yH08NJKpnIuLq9uR7J+oY+TQ4jCtbgXYlViJ8wF5dAlsjTT7GvdksOOECGUCbLd8evkwV+ighFlS9v3xIEnPSRFWt8FalXAqHPr/XnCfiJ8CMqRA34NIUf439cl6/JfwRrzBINHCl8Q8yBYAW9BVE4mcI+cbJ/3Trbe/9fmdjsojIX4J4H9sZBJHaolcvs88xiwdiLHqg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(39860400002)(346002)(366004)(376002)(136003)(83380400001)(2906002)(6916009)(8676002)(52536014)(478600001)(5660300002)(71200400001)(966005)(7696005)(6506007)(76116006)(64756008)(7416002)(26005)(66556008)(66476007)(66946007)(54906003)(186003)(316002)(33656002)(4326008)(8936002)(86362001)(55016002)(66446008)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: cCfq0L/wGTLlCgiraBieapfe2xZMMFs6RhpN9u3GNmdscIbzn2eKih6U+7pBra1oOF9TERgKQF5Z28x2aZ1wH/s0CiCM6XFU8Mirt0emExY+5PX2AXTy/QZj8AE1DkQpmQLA6bFrEE6LfhSNpVWO5qF5c/U5l31JcGM1tEdyre/qsVi/5nv3G4Sfwsy0aB8lDhyKdbv3SWQuUgtPT9EiO3Ou4rNEcX9eGFITx/tZaeR9QOeSZXVLzMFAKLv73G8d/owYvAseuN9Id48gjEbd06r6vSty68mGe9+yUw6g+kmUqEfnITdjhW2AodyWFvqsrDPg3rzuZ2x0feD4c2PStw/JhyfYFDylItU3oNMKqJ5JKr73MbBayMzUBNeFRYPJmiwvU45cvcPbK82Pi52P9e7nLlLUQkKG0pDSCFY6WzswuAtguUBRT/1aNUqG46VMYgHJozGmdsJB1YVfA8f6v0yOt/kJIxTZ0NpZPjpdxun4c85iPN76ddCCDHBZ77uL
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="279012600"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga006.jf.intel.com with ESMTP; 22 Jun 2020 23:53:48 -0700
+Date:   Mon, 22 Jun 2020 23:53:48 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Feiner <pfeiner@google.com>
+Cc:     Jon Cargille <jcargill@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] kvm: x86 mmu: avoid mmu_page_hash lookup for
+ direct_map-only VM
+Message-ID: <20200623065348.GA23054@linux.intel.com>
+References: <20200508182425.69249-1-jcargill@google.com>
+ <20200508201355.GS27052@linux.intel.com>
+ <CAM3pwhEw+KYq9AD+z8wPGyG10Bex7xLKaPM=yVV-H+W_eHTW4w@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7eb49aa1-328b-4a79-10a3-08d81740cca7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2020 06:43:55.0412
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Gn1TSR9n1QJ8Qh/eXK1wZOryIg5NuBqgjS3SJXj7QKRwv0D37Y7RL9utydwHDtf39xo01oF3/tju2ivvkI9M8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1101MB2265
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAM3pwhEw+KYq9AD+z8wPGyG10Bex7xLKaPM=yVV-H+W_eHTW4w@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Stefan Hajnoczi <stefanha@gmail.com>
-> Sent: Monday, June 22, 2020 8:51 PM
->=20
-> On Wed, Jun 17, 2020 at 06:27:27AM +0000, Liu, Yi L wrote:
-> > > From: Stefan Hajnoczi <stefanha@gmail.com>
-> > > Sent: Monday, June 15, 2020 5:41 PM
-> > > On Thu, Jun 11, 2020 at 05:15:33AM -0700, Liu Yi L wrote:
+On Tue, May 12, 2020 at 03:36:21PM -0700, Peter Feiner wrote:
+> On Fri, May 8, 2020 at 1:14 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > On Fri, May 08, 2020 at 11:24:25AM -0700, Jon Cargille wrote:
+> > > From: Peter Feiner <pfeiner@google.com>
 > > >
-> > > > From: Eric Auger <eric.auger@redhat.com>
-> > > >
-> > > > The VFIO API was enhanced to support nested stage control: a bunch =
-of
-> > > > new iotcls and usage guideline.
-> > > >
-> > > > Let's document the process to follow to set up nested mode.
-> > > >
-> > > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > > Cc: Joerg Roedel <joro@8bytes.org>
-> > > > Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> > > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > > ---
-> > > > v1 -> v2:
-> > > > *) new in v2, compared with Eric's original version, pasid table bi=
-nd
-> > > >    and fault reporting is removed as this series doesn't cover them=
-.
-> > > >    Original version from Eric.
-> > > >    https://lkml.org/lkml/2020/3/20/700
-> > > >
-> > > >  Documentation/driver-api/vfio.rst | 64
-> > > > +++++++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 64 insertions(+)
-> > > >
-> > > > diff --git a/Documentation/driver-api/vfio.rst
-> > > > b/Documentation/driver-api/vfio.rst
-> > > > index f1a4d3c..06224bd 100644
-> > > > --- a/Documentation/driver-api/vfio.rst
-> > > > +++ b/Documentation/driver-api/vfio.rst
-> > > > @@ -239,6 +239,70 @@ group and can access them as follows::
-> > > >  	/* Gratuitous device reset and go... */
-> > > >  	ioctl(device, VFIO_DEVICE_RESET);
-> > > >
-> > > > +IOMMU Dual Stage Control
-> > > > +------------------------
-> > > > +
-> > > > +Some IOMMUs support 2 stages/levels of translation. Stage correspo=
-nds
-> > > > +to the ARM terminology while level corresponds to Intel's VTD term=
-inology.
-> > > > +In the following text we use either without distinction.
-> > > > +
-> > > > +This is useful when the guest is exposed with a virtual IOMMU and
-> > > > +some devices are assigned to the guest through VFIO. Then the gues=
-t
-> > > > +OS can use stage 1 (GIOVA -> GPA or GVA->GPA), while the hyperviso=
-r
-> > > > +uses stage 2 for VM isolation (GPA -> HPA).
-> > > > +
-> > > > +Under dual stage translation, the guest gets ownership of the stag=
-e 1
-> > > > +page tables and also owns stage 1 configuration structures. The
-> > > > +hypervisor owns the root configuration structure (for security
-> > > > +reason), including stage 2 configuration. This works as long
-> > > > +configuration structures and page table
-> > >
-> > > s/as long configuration/as long as configuration/
+> > > Optimization for avoiding lookups in mmu_page_hash. When there's a
+> > > single direct root, a shadow page has at most one parent SPTE
+> > > (non-root SPs have exactly one; the root has none). Thus, if an SPTE
+> > > is non-present, it can be linked to a newly allocated SP without
+> > > first checking if the SP already exists.
 > >
-> > got it.
+> > Some mechanical comments below.  I'll think through the actual logic next
+> > week, my brain needs to be primed anytime the MMU is involved :-)
 > >
-> > >
-> > > > +format are compatible between the virtual IOMMU and the physical I=
-OMMU.
-> > >
-> > > s/format/formats/
-> >
-> > I see.
-> >
-> > > > +
-> > > > +Assuming the HW supports it, this nested mode is selected by choos=
-ing
-> > > > +the VFIO_TYPE1_NESTING_IOMMU type through:
-> > > > +
-> > > > +    ioctl(container, VFIO_SET_IOMMU, VFIO_TYPE1_NESTING_IOMMU);
-> > > > +
-> > > > +This forces the hypervisor to use the stage 2, leaving stage 1
-> > > > +available for guest usage. The guest stage 1 format depends on IOM=
-MU
-> > > > +vendor, and it is the same with the nesting configuration method.
-> > > > +User space should check the format and configuration method after
-> > > > +setting nesting type by
-> > > > +using:
-> > > > +
-> > > > +    ioctl(container->fd, VFIO_IOMMU_GET_INFO, &nesting_info);
-> > > > +
-> > > > +Details can be found in Documentation/userspace-api/iommu.rst. For
-> > > > +Intel VT-d, each stage 1 page table is bound to host by:
-> > > > +
-> > > > +    nesting_op->flags =3D VFIO_IOMMU_NESTING_OP_BIND_PGTBL;
-> > > > +    memcpy(&nesting_op->data, &bind_data, sizeof(bind_data));
-> > > > +    ioctl(container->fd, VFIO_IOMMU_NESTING_OP, nesting_op);
-> > > > +
-> > > > +As mentioned above, guest OS may use stage 1 for GIOVA->GPA or GVA=
-->GPA.
-> > > > +GVA->GPA page tables are available when PASID (Process Address Spa=
-ce
-> > > > +GVA->ID)
-> > > > +is exposed to guest. e.g. guest with PASID-capable devices assigne=
-d.
-> > > > +For such page table binding, the bind_data should include PASID in=
-fo,
-> > > > +which is allocated by guest itself or by host. This depends on
-> > > > +hardware vendor e.g. Intel VT-d requires to allocate PASID from ho=
-st.
-> > > > +This requirement is available by VFIO_IOMMU_GET_INFO. User space
-> > > > +could allocate PASID from host by:
-> > > > +
-> > > > +    req.flags =3D VFIO_IOMMU_ALLOC_PASID;
-> > > > +    ioctl(container, VFIO_IOMMU_PASID_REQUEST, &req);
-> > >
-> > > It is not clear how the userspace application determines whether PASI=
-Ds must be
-> > > allocated from the host via VFIO_IOMMU_PASID_REQUEST or if the guest =
-itself
-> can
-> > > allocate PASIDs. The text mentions VFIO_IOMMU_GET_INFO but what exact=
-ly
-> > > should the userspace application check?
-> >
-> > For VT-d, spec 3.0 introduced Virtual Cmd interface for PASID allocatio=
-n,
-> > guest request PASID from host if it detects the interface. Application
-> > should check the IOMMU_NESTING_FEAT_SYSWIDE_PASID setting in the below
-> > info reported by VFIO_IOMMU_GET_INFO. And virtual VT-d should not repor=
-t
-> > SVA related capabilities to guest if  SYSWIDE_PASID is not supported by
-> > kernel.
-> >
-> > +struct iommu_nesting_info {
-> > +	__u32	size;
-> > +	__u32	format;
-> > +	__u32	features;
-> > +#define IOMMU_NESTING_FEAT_SYSWIDE_PASID	(1 << 0)
-> > +#define IOMMU_NESTING_FEAT_BIND_PGTBL		(1 << 1)
-> > +#define IOMMU_NESTING_FEAT_CACHE_INVLD		(1 << 2)
-> > +	__u32	flags;
-> > +	__u8	data[];
-> > +};
-> > https://lore.kernel.org/linux-iommu/1591877734-66527-3-git-send-email-
-> yi.l.liu@intel.com/
->=20
-> I see. Is it possible to add this information into this patch or at
-> least a reference so readers know where to find out exactly how to do
-> this?
+> > > This optimization has proven significant in batch large SP shattering
+> > > where the hash lookup accounted for 95% of the overhead.
 
-oh, yes. this would help a lot. will add it.
+Is it the hash lookup or the hlist walk that is expensive?  If it's the
+hash lookup, then a safer fix would be to do the hash lookup once in
+kvm_mmu_get_page() instead of doing it for both the walk and the insertion.
+Assuming, that's the case, I'll send a patch.  Actually, I'll probably send
+a patch no matter what, I've been looking for an excuse to get rid of that
+obnoxiously long hash lookup line.  :-)
 
-Regards,
-Yi Liu
-> Stefan
+> > > Signed-off-by: Peter Feiner <pfeiner@google.com>
+> > > Signed-off-by: Jon Cargille <jcargill@google.com>
+> > > Reviewed-by: Jim Mattson <jmattson@google.com>
+> > >
+> > > ---
+> > >  arch/x86/include/asm/kvm_host.h | 13 ++++++++
+> > >  arch/x86/kvm/mmu/mmu.c          | 55 +++++++++++++++++++--------------
+> > >  2 files changed, 45 insertions(+), 23 deletions(-)
+> > >
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index a239a297be33..9b70d764b626 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -913,6 +913,19 @@ struct kvm_arch {
+> > >       struct kvm_page_track_notifier_node mmu_sp_tracker;
+> > >       struct kvm_page_track_notifier_head track_notifier_head;
+> > >
+> > > +     /*
+> > > +      * Optimization for avoiding lookups in mmu_page_hash. When there's a
+> > > +      * single direct root, a shadow page has at most one parent SPTE
+> > > +      * (non-root SPs have exactly one; the root has none). Thus, if an SPTE
+> > > +      * is non-present, it can be linked to a newly allocated SP without
+> > > +      * first checking if the SP already exists.
+
+I'm pretty sure this will break due to the "zap oldest shadow page"
+behavior of make_mmu_pages_available() and mmu_shrink_scan().  In that case,
+KVM can zap a parent SP and leave a dangling child.  If/when the zapped
+parent SP is rebuilt, it should find and relink the temporarily orphaned
+child.  I believe the error will not actively manifest since the new,
+duplicate SP will be added to the front of the hlist, i.e. the newest entry
+will always be observed first.  But, it will "leak" the child and all its
+children, at least until they get zapped in turn.
+
+Hitting the above is probably extremely rare in the current code base.
+Presumably the make_mmu_pages_available() path is rarely hit, and the
+mmu_shrink_scan() path is basically broken (it zaps at most a single page
+after reporting to the scanner that it can potentially free thousands of
+pages; I'm working on a series).
+
+One thought would be to zap the entire family tree when zapping a shadow
+page for a direct MMU.  Then the above assumption would hold.  I think
+that would be ok/safe-ish?  It definitely would have "interesting" side
+effects.
+
+Actually, there's another case that would break, though it's contrived and
+silly.  If a VM is configured to have vCPUs with different physical address
+widths (yay KVM) and caused KVM to use both 4-level and 5-level EPT, then
+the "single direct root" rule above would be violated.
+
+If we do get agressive and zap all children (or if my analysis is wrong),
+and prevent the mixed level insansity, then a simpler approach would be to
+skip the lookup if the MMU is direct.  I.e. no need for the per-VM toggle.
+Direct vs. indirect MMUs are guaranteed to have different roles and so the
+direct MMU's pages can't be reused/shared.
