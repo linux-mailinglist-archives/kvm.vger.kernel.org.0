@@ -2,107 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95245204AC8
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 09:15:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64757204AFF
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 09:27:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730992AbgFWHPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 03:15:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28538 "EHLO
+        id S1731211AbgFWH1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 03:27:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48156 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730781AbgFWHPu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 03:15:50 -0400
+        with ESMTP id S1731054AbgFWH1i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 03:27:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592896550;
+        s=mimecast20190719; t=1592897256;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HjkVUr/S/a3Xewkk0G7CYjpjGpF5YBjTPi+qkO5aYLE=;
-        b=aK7ng8p+Nxs06rkLu5gfTAJySqfP/6uiCcAvz5uvTKAQ5P9RjDFFEQzQGXKgyJ9dMjcQfI
-        DKlcf/JmJbYpwQR9jiGmNrUxDalqhjiOSKYzPGICsSxbhNLftDB6d6uPUvpvgszOdU0WC9
-        szqqNVRlZE5kkZY7wZJcDY6maFM4Ze0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-0YPiTuEgM8O-Zx2HigyzCw-1; Tue, 23 Jun 2020 03:15:48 -0400
-X-MC-Unique: 0YPiTuEgM8O-Zx2HigyzCw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 621081005512;
-        Tue, 23 Jun 2020 07:15:47 +0000 (UTC)
-Received: from [10.72.12.144] (ovpn-12-144.pek2.redhat.com [10.72.12.144])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E80E260F80;
-        Tue, 23 Jun 2020 07:15:41 +0000 (UTC)
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20200611113404.17810-1-mst@redhat.com>
- <20200611113404.17810-3-mst@redhat.com>
- <0332b0cf-cf00-9216-042c-e870efa33626@redhat.com>
- <20200622115946-mutt-send-email-mst@kernel.org>
- <c56cc86d-a420-79ca-8420-e99db91980fa@redhat.com>
- <CAJaqyWc3C_Td_SpV97CuemkQH9vH+EL3sGgeWGE82E5gYxZNCA@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <6715f515-3db6-1006-09dd-19464e3ff676@redhat.com>
-Date:   Tue, 23 Jun 2020 15:15:40 +0800
+        bh=qLYOujDDx1aBVpzEpAYgWCS7UouFMa1b4GD1woVG6zc=;
+        b=ZGctLeWYMMRpUyeEpJdl7KOqD9YRBSkffPIxIEn70t0IfdPnNRF6dOf6ygnJXLzHFmjef2
+        7HDWvZsgUTIl5E1yuh6RDMReL+wGuX7t2myucLyLkNeWzOmjJEhHxJk1AFRYe1dGoAD5lG
+        Aw5eE/k0NN8jwz8AtS65OotZkFxm3q4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-yhUBIU64NfSb1UaRYiITbA-1; Tue, 23 Jun 2020 03:27:35 -0400
+X-MC-Unique: yhUBIU64NfSb1UaRYiITbA-1
+Received: by mail-wm1-f71.google.com with SMTP id t18so3115515wmj.5
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 00:27:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qLYOujDDx1aBVpzEpAYgWCS7UouFMa1b4GD1woVG6zc=;
+        b=WmSrSf8N25dsM+Nx3ooQ6Pp9QFvjx9HYPMqWAm/UHq+ZoiCPbCYSedPr+dcCMwo3/5
+         egjRvVva5Uw9LD0IggSIHHFG11RcXtdyGKxI4bVzB4Q2yoM8wLT2klQqtBi4E5oQOhSP
+         Xq381q2gtluEIMMY8G5eLHfvv4rBpGWeiDpK2TMvA/U9WtrztMKUhkyD/KdFReN7gX1x
+         mmi54mB3PBhwg2mDT27sweYEaam2IYHGhp9UpjTOmiQJv6zqCHmBukAaIuffagdKXsZp
+         CZ7M5MNJ4P8sPQIDDIfDvhrstsQU1hLTUh48t7CjN0cLC97lD+kgwdXYrcOyTPSfib+p
+         EsBg==
+X-Gm-Message-State: AOAM533Z3AIbM29nY5cpJP1a4H8sLhUTbGH8QlogSMXRWjpP8prGJG/K
+        uHUaiCUhuYvYjwwzuukRMOST0dFdOVtoeCk2V37qbJ9r5rFR0zU3wYKyvmA0YR7m7Hdm3R0+6XZ
+        qbQ7gXimVOXQY
+X-Received: by 2002:a5d:54c9:: with SMTP id x9mr24766743wrv.247.1592897253836;
+        Tue, 23 Jun 2020 00:27:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyQYkWVH3VEDx+syDsPmDus0VeHj8xuspDjggksaf4Dx9vOkybGi/V7R2c3xM0jNuWLcp4VKQ==
+X-Received: by 2002:a5d:54c9:: with SMTP id x9mr24766724wrv.247.1592897253623;
+        Tue, 23 Jun 2020 00:27:33 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:24f5:23b:4085:b879? ([2001:b07:6468:f312:24f5:23b:4085:b879])
+        by smtp.gmail.com with ESMTPSA id a12sm11131695wrv.41.2020.06.23.00.27.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jun 2020 00:27:33 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v1 4/8] lib/alloc.c: add overflow check for
+ calloc
+To:     Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com
+References: <20200622162141.279716-1-imbrenda@linux.ibm.com>
+ <20200622162141.279716-5-imbrenda@linux.ibm.com>
+ <efb517a5-f5d7-e870-2bb6-654690121c20@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ddb0a038-ff81-afe3-94da-ee53387a4994@redhat.com>
+Date:   Tue, 23 Jun 2020 09:27:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAJaqyWc3C_Td_SpV97CuemkQH9vH+EL3sGgeWGE82E5gYxZNCA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <efb517a5-f5d7-e870-2bb6-654690121c20@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 23/06/20 07:57, Thomas Huth wrote:
+> cc1: all warnings being treated as errors
+> 
+> Claudio, any ideas how to fix that?
 
-On 2020/6/23 下午3:00, Eugenio Perez Martin wrote:
-> On Tue, Jun 23, 2020 at 4:51 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2020/6/23 上午12:00, Michael S. Tsirkin wrote:
->>> On Wed, Jun 17, 2020 at 11:19:26AM +0800, Jason Wang wrote:
->>>> On 2020/6/11 下午7:34, Michael S. Tsirkin wrote:
->>>>>     static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
->>>>>     {
->>>>>      kfree(vq->descs);
->>>>> @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
->>>>>      for (i = 0; i < dev->nvqs; ++i) {
->>>>>              vq = dev->vqs[i];
->>>>>              vq->max_descs = dev->iov_limit;
->>>>> +           if (vhost_vq_num_batch_descs(vq) < 0) {
->>>>> +                   return -EINVAL;
->>>>> +           }
->>>> This check breaks vdpa which set iov_limit to zero. Consider iov_limit is
->>>> meaningless to vDPA, I wonder we can skip the test when device doesn't use
->>>> worker.
->>>>
->>>> Thanks
->>> It doesn't need iovecs at all, right?
->>>
->>> -- MST
->>
->> Yes, so we may choose to bypass the iovecs as well.
->>
->> Thanks
->>
-> I think that the kmalloc_array returns ZERO_SIZE_PTR for all of them
-> in that case, so I didn't bother to skip the kmalloc_array parts.
-> Would you prefer to skip them all and let them NULL? Or have I
-> misunderstood what you mean?
+I guess it's just
 
+diff --git a/lib/alloc.c b/lib/alloc.c
+index f4aa87a..6c89f98 100644
+--- a/lib/alloc.c
++++ b/lib/alloc.c
+@@ -1,5 +1,6 @@
+ #include "alloc.h"
+ #include "asm/page.h"
++#include "bitops.h"
 
-I'm ok with either approach, but my understanding is that Michael wants 
-to skip them all.
+ void *malloc(size_t size)
+ {
 
-Thanks
+> Paolo, could you maybe push your staging branches to Githab or Gitlab
+> first, to see whether there are any regressions in Travis or Gitlab-CI
+> before you push the branch to the main repo? ... almost all of the
+> recent updates broke something, and analyzing the problems afterwards is
+> a little bit cumbersome...
 
+Ok, I'll catch you on IRC to discuss this.
 
->
-> Thanks!
->
+Paolo
 
