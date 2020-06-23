@@ -2,80 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A482F20564D
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:51:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A6B7205650
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:51:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733007AbgFWPvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 11:51:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21657 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732942AbgFWPvK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:51:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592927468;
+        id S1733016AbgFWPvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 11:51:54 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:58620 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731870AbgFWPvy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 11:51:54 -0400
+Received: from zn.tnic (p200300ec2f0d470028fe1155168fd3d2.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:4700:28fe:1155:168f:d3d2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C05C01EC0318;
+        Tue, 23 Jun 2020 17:51:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1592927512;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=U59aUKaHON6D7wc3ZgtCJStGneCJUIZPhgdNzvltSN8=;
-        b=VENbCsl0bUzJIUUt83J53W8tz27VdHLE2W0nH3dF6IN4j9fw5ILNaomxx+30xgbfkqD3Qb
-        S3oUz+hc1u/omF61Xu7w+NhbHkCcb6FVWRdlYIf2AYItksj+6mbgCbEoKVhz3ompDFt8MV
-        IVux9fndhqltbrs+rqci7cgoWlDEe94=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-nyV9kjAYPGie_T5WYnW2AQ-1; Tue, 23 Jun 2020 11:51:07 -0400
-X-MC-Unique: nyV9kjAYPGie_T5WYnW2AQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1236A0BE2;
-        Tue, 23 Jun 2020 15:51:04 +0000 (UTC)
-Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA9F26109F;
-        Tue, 23 Jun 2020 15:50:55 +0000 (UTC)
-Date:   Tue, 23 Jun 2020 17:50:53 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, qemu-arm@nongnu.org,
-        qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 3/7] accel/kvm: Simplify kvm_check_extension_list()
-Message-ID: <20200623175053.26b5558d.cohuck@redhat.com>
-In-Reply-To: <20200623105052.1700-4-philmd@redhat.com>
-References: <20200623105052.1700-1-philmd@redhat.com>
-        <20200623105052.1700-4-philmd@redhat.com>
-Organization: Red Hat GmbH
+        bh=2M4dPDLeLsejQozbS41vpz4rnLlW8vCdyqTb0kIw2d8=;
+        b=L3laiMxCskkcebkat4zrLZQGr1hD02Dv29rK5VGvx7Sm1nAayDeF6xBed99AUxBGn3rThu
+        bArWMr3Qs5gJg7hDP6BLlgtcGOSPo8e17/oq1Mel0/393sSFGOcCGrIF0aLvviN3EchPeO
+        Xbdwn8DRLHajvZNTd2fREOPxoBsKLBo=
+Date:   Tue, 23 Jun 2020 17:51:44 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Andrew Cooper <andrew.cooper3@citrix.com>
+Cc:     Joerg Roedel <jroedel@suse.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623155144.GD32590@zn.tnic>
+References: <20200425191032.GK21900@8bytes.org>
+ <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
+ <20200425202316.GL21900@8bytes.org>
+ <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
+ <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
+ <20200428075512.GP30814@suse.de>
+ <20200623110706.GB4817@hirez.programming.kicks-ass.net>
+ <20200623113007.GH31822@suse.de>
+ <8413fe52-04ee-f4e1-873c-17595110856a@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8413fe52-04ee-f4e1-873c-17595110856a@citrix.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Jun 2020 12:50:48 +0200
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Tue, Jun 23, 2020 at 12:51:03PM +0100, Andrew Cooper wrote:
+> Crashing out hard if the hypervisor is misbehaving is acceptable.  In a
+> cloud, I as a customer would (threaten to?) take my credit card
+> elsewhere, while for enterprise, I'd shout at my virtualisation vendor
+> until a fix happened (also perhaps threaten to take my credit card
+> elsewhere).
 
-> The KVMState* argument is now unused, drop it.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  accel/kvm/kvm-all.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+This is called customer, credit-card-enforced bug fixing.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+-- 
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
