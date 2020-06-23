@@ -2,33 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EB3A205401
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 15:57:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25DD1205407
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 16:00:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732711AbgFWN51 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 09:57:27 -0400
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:50852 "EHLO
-        esa1.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732657AbgFWN50 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 09:57:26 -0400
-Authentication-Results: esa1.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none
-IronPort-SDR: RxHCBkGn6WCYmKI8uhwqpDzWq9+T02hGLgx/4StGqp26rXVL/9EHUTW4ZgZWcdrwy973h8+FL1
- vuqOMF+AEy3R03F6tyzjQrt2Z04lpSzdTjGVedKmE+8goFjOSXq8bTLW7X1REC5Cfa0KZuLHu2
- 2qD6s/B/VzsFyM3jt90pG1SIBE4FZqvelWngm1YJyUG8/pNVPZt+4klXSO5TluydnT49CwDygG
- limi5Xh2jdtnNS/3Y5BWVO88o78s3uWHLpkzsF9dVK1dQ3NXHK8JVP176FwTkg1lAJtb/ohx2C
- C6Y=
-X-SBRS: 2.7
-X-MesageID: 21024354
-X-Ironport-Server: esa1.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.75,271,1589256000"; 
-   d="scan'208";a="21024354"
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     Joerg Roedel <jroedel@suse.de>, Andy Lutomirski <luto@kernel.org>,
-        "Joerg Roedel" <joro@8bytes.org>,
+        id S1732730AbgFWN7x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 09:59:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49958 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732687AbgFWN7x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 09:59:53 -0400
+Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68041C061573;
+        Tue, 23 Jun 2020 06:59:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=vWFZnmE8muSdoNv/rlN/zg+D4ErnvxS0/K6mx8ubUo4=; b=QQqHr4IslmzJW09bxhv1Ibqy14
+        exvYtd4xNdVggaYQ7J+3Ux3ltaf/4zgfPk5nlZA57lRVghngQDw3jFFH1qd4JvYdxS7Gzuffi/EXa
+        pJCr6X0+J6sOE4R312V3eYLvvquor1WCpbl3LiqTvvZdXDG5QgUdiRucg2Mg1GfrE0aqshfm7iISX
+        4vueqvSBN9VUfaOsOehNU2M6fjlHD+xQrwa7GWTRoizDBchrv0ovCNNMo+E0mT0CThS8FbkY+19V5
+        PlUbml1JCC4gS4MGCLinM5pdDFLQRUkizCTYkXF/HLVQpJDKZXWrZLBOsC944fXDC+vkIXa/9RrRU
+        GcD0Wmtw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jnjSI-0004Rt-F5; Tue, 23 Jun 2020 13:59:18 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 73420300F28;
+        Tue, 23 Jun 2020 15:59:16 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 6467323CBF701; Tue, 23 Jun 2020 15:59:16 +0200 (CEST)
+Date:   Tue, 23 Jun 2020 15:59:16 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
         Dave Hansen <dave.hansen@intel.com>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
         Mike Stunes <mstunes@vmware.com>,
@@ -41,56 +50,54 @@ CC:     Joerg Roedel <jroedel@suse.de>, Andy Lutomirski <luto@kernel.org>,
         Thomas Hellstrom <thellstrom@vmware.com>,
         Linux Virtualization <virtualization@lists.linux-foundation.org>,
         X86 ML <x86@kernel.org>,
-        "Sean Christopherson" <sean.j.christopherson@intel.com>
-References: <20200425191032.GK21900@8bytes.org>
- <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
- <20200425202316.GL21900@8bytes.org>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623135916.GI4817@hirez.programming.kicks-ass.net>
+References: <20200425202316.GL21900@8bytes.org>
  <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
  <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
  <20200428075512.GP30814@suse.de>
  <20200623110706.GB4817@hirez.programming.kicks-ass.net>
  <20200623113007.GH31822@suse.de>
- <8413fe52-04ee-f4e1-873c-17595110856a@citrix.com>
- <20200623124712.GF4817@hirez.programming.kicks-ass.net>
-From:   Andrew Cooper <andrew.cooper3@citrix.com>
-Message-ID: <4113e368-6bc8-51b7-9412-3b4df2633ad6@citrix.com>
-Date:   Tue, 23 Jun 2020 14:57:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ <20200623114818.GD4817@hirez.programming.kicks-ass.net>
+ <20200623120433.GB14101@suse.de>
+ <20200623125201.GG4817@hirez.programming.kicks-ass.net>
+ <20200623134003.GD14101@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20200623124712.GF4817@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623134003.GD14101@suse.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/2020 13:47, Peter Zijlstra wrote:
-> On Tue, Jun 23, 2020 at 12:51:03PM +0100, Andrew Cooper wrote:
->
->> There are cases which are definitely non-recoverable.
->>
->> For both ES and SNP, a malicious hypervisor can mess with the guest
->> physmap to make the the NMI, #VC and #DF stacks all alias.
->>
->> For ES, this had better result in the #DF handler deciding that crashing
->> is the way out, whereas for SNP, this had better escalate to Shutdown.
->> Crashing out hard if the hypervisor is misbehaving is acceptable.
-> Then I'm thinking the only sensible option is to crash hard for any SNP
-> #VC from kernel mode.
->
-> Sadly that doesn't help with #VC needing to be IST :-( IST is such a
-> frigging nightmare.
+On Tue, Jun 23, 2020 at 03:40:03PM +0200, Joerg Roedel wrote:
+> On Tue, Jun 23, 2020 at 02:52:01PM +0200, Peter Zijlstra wrote:
 
-I presume you mean any #VC caused by RMP faults (i.e. something went
-wrong with the memory owner/etc metadata) ?
+> > You only have that guarantee when any SNP #VC from kernel is an
+> > automatic panic. But in that case, what's the point of having the
+> > recursion count?
+> 
+> It is not a recursion count, it is a stack-recursion check. Basically
+> walk down the stack and look if your current stack is already in use.
+> Yes, this can be optimized, but that is what is needed.
+> 
+> IIRC the current prototype code for SNP just pre-validates all memory in
+> the VM and doesn't support moving pages around on the host. So any #VC
+> SNP exception would be fatal, yes.
+> 
+> In a scenario with on-demand validation of guest pages and support for
+> guest-assisted page-moving on the HV side it would be more complicated.
+> Basically all memory that is accessed during #VC exception handling must
+> stay validated at all times, including the IST stack.
+> 
+> So saying this, I don't understand why _all_ SNP #VC exceptions from
+> kernel space must be fatal?
 
-If so, then yes.  Any failure here is a bug in the kernel or hypervisor
-(and needs fixing) or a malicious hypervisor and the guest should
-terminate for its own safety.
+Ah, because I hadn't thought of the stack-recursion check.
 
-~Andrew
+So basically when your exception frame points to your own IST, you die.
+That sounds like something we should have in generic IST code.
