@@ -2,93 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4861A2055BF
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:24:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97C612055CA
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:25:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732969AbgFWPXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 11:23:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732781AbgFWPXy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:23:54 -0400
-Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA48AC061573;
-        Tue, 23 Jun 2020 08:23:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=67GmQHoj5zNuUwz09OSjiIC4O8VKYFdYpYZwr4wExTc=; b=HKSxQszno971bP/TsveUX1OfYN
-        w+iddIX3Sb92BzDuh9mM+TMd424oct3epZCyddn8xYMXBq2wYT92dhpKJLqXjKVgS3b3qyGyC7HE1
-        jdNWFF+LsxwRamTTgoCMYmptuxP9dIkgdc/piRBGfC0z2EXgQMlfYqjVz6SF9uCFAa+PNY0Q7pUpD
-        y8qIHKn8jwZGsl/4ZFkT95KFdxCd8HuPbP+IODLDl0y6amInT0EYw1+XAoCGUScP3zwAF8GJHOsTG
-        H4vzhX9bOmnERkNENcGq2LrO6Sv/s7921BB80kd93Wfg931RZpLLOKf5q/hf20joXKq/9UM9Q4ebC
-        2UsjCpJg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jnklk-00037n-BU; Tue, 23 Jun 2020 15:23:28 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AC38A303DA0;
-        Tue, 23 Jun 2020 17:23:26 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 9AB3C234EBA53; Tue, 23 Jun 2020 17:23:26 +0200 (CEST)
-Date:   Tue, 23 Jun 2020 17:23:26 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Mike Stunes <mstunes@vmware.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
-        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        X86 ML <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-Message-ID: <20200623152326.GL4817@hirez.programming.kicks-ass.net>
-References: <20200428075512.GP30814@suse.de>
- <20200623110706.GB4817@hirez.programming.kicks-ass.net>
- <20200623113007.GH31822@suse.de>
- <20200623114818.GD4817@hirez.programming.kicks-ass.net>
- <20200623120433.GB14101@suse.de>
- <20200623125201.GG4817@hirez.programming.kicks-ass.net>
- <20200623134003.GD14101@suse.de>
- <20200623135916.GI4817@hirez.programming.kicks-ass.net>
- <20200623145344.GA117543@hirez.programming.kicks-ass.net>
- <20200623145914.GF14101@suse.de>
+        id S1732982AbgFWPZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 11:25:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40140 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732781AbgFWPZv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 11:25:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592925949;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jBAXVsoXXh0/I2Sku0Zs4vjlE275yD39tzwQsaS7Dok=;
+        b=a3nZagn72f6P0zZqZoYWCPnFrl8K8Mk4LQ/za22lPCLjpGpvAwBgRdTp6CMZiZ4JrVHsYx
+        6c+24Pzv/wNvGsz3N+ARTsZhttq/1q341+dw65t793/4leg08wTxMBl8SPSgNTEAVrrmzx
+        ZAYcclAMLb+Ew57Dw2VgKhiK5bNmWTo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-A9yNL1DHOtOBrK8pOcq0nA-1; Tue, 23 Jun 2020 11:25:47 -0400
+X-MC-Unique: A9yNL1DHOtOBrK8pOcq0nA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0FBF107ACF2;
+        Tue, 23 Jun 2020 15:25:45 +0000 (UTC)
+Received: from gondolin (ovpn-112-222.ams2.redhat.com [10.36.112.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B3CDB60F8D;
+        Tue, 23 Jun 2020 15:25:31 +0000 (UTC)
+Date:   Tue, 23 Jun 2020 17:25:29 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-arm@nongnu.org,
+        qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 1/7] accel/kvm: Let kvm_check_extension use global KVM
+ state
+Message-ID: <20200623172529.4ebe956c.cohuck@redhat.com>
+In-Reply-To: <20200623105052.1700-2-philmd@redhat.com>
+References: <20200623105052.1700-1-philmd@redhat.com>
+        <20200623105052.1700-2-philmd@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200623145914.GF14101@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 04:59:14PM +0200, Joerg Roedel wrote:
-> On Tue, Jun 23, 2020 at 04:53:44PM +0200, Peter Zijlstra wrote:
-> > +noinstr void idtentry_validate_ist(struct pt_regs *regs)
-> > +{
-> > +	if ((regs->sp & ~(EXCEPTION_STKSZ-1)) ==
-> > +	    (_RET_IP_ & ~(EXCEPTION_STKSZ-1)))
-> > +		die("IST stack recursion", regs, 0);
-> > +}
-> 
-> Yes, this is a start, it doesn't cover the case where the NMI stack is
-> in-between, so I think you need to walk down regs->sp too.
+On Tue, 23 Jun 2020 12:50:46 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-That shouldn't be possible with the current code, I think.
+> As KVM supported extentions those should be the same for
+> all VMs, it is safe to directly use the global kvm_state
+> in kvm_check_extension().
+>=20
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  accel/kvm/kvm-all.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index f24d7da783..934a7d6b24 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -913,7 +913,7 @@ int kvm_check_extension(KVMState *s, unsigned int ext=
+ension)
+>  {
+>      int ret;
+> =20
+> -    ret =3D kvm_ioctl(s, KVM_CHECK_EXTENSION, extension);
+> +    ret =3D kvm_ioctl(kvm_state, KVM_CHECK_EXTENSION, extension);
+>      if (ret < 0) {
+>          ret =3D 0;
+>      }
 
-> The dumpstack code already has some logic for this.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Reliability of that depends on the unwinder, I wouldn't want the guess
-uwinder to OOPS me by accident.
