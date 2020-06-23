@@ -2,69 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D139920568C
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:59:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 373542056B7
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 18:02:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733047AbgFWP71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 11:59:27 -0400
-Received: from mga07.intel.com ([134.134.136.100]:31599 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731616AbgFWP70 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:59:26 -0400
-IronPort-SDR: JLvwQvHAfJ24nOt7c4x1dL7A7H+/aMZnYu6O3btioplnOvwzRMNyz5slbB22fKC9lf/DlG0sfs
- g2GhNQv5r0Pw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="209307529"
-X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
-   d="scan'208";a="209307529"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 08:59:22 -0700
-IronPort-SDR: iq26dOLKgX3H15tBFZLuja+vdDxalzbD2WF/C0QK3i/G9gmZaftr40VuZiXDtyitN0nWawvHvG
- 0hDSMJ3QZjKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,271,1589266800"; 
-   d="scan'208";a="301299965"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga004.fm.intel.com with ESMTP; 23 Jun 2020 08:59:19 -0700
-Date:   Tue, 23 Jun 2020 08:59:18 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Feiner <pfeiner@google.com>
-Cc:     Jon Cargille <jcargill@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        id S1733007AbgFWQCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 12:02:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40764 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731723AbgFWQCl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 12:02:41 -0400
+Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25CFFC061573;
+        Tue, 23 Jun 2020 09:02:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=inEENWPOzGzfsRSt470zS1Lo3/U6Y1WgM8bPuF0BE3s=; b=vklOthUx90OknmglN/7t1NkgIU
+        79j+4BcR4TJlT6iVzTfl5fAzvw8vz6lmSM2iod8IG5T98bck5m/zrnJA5eoC9p9/WZOoBkl8UX9cs
+        DCzlQrHW8ITqu9LbaQFujnXWFILM8OFw7X/Ss1id9S84yal9wiD/3Ixl9boAyaORr3j9v8qFA+nN9
+        0ypvnZ+iJRvDZImoDygYw1SfKurZMzMTFtI7D11hXqDjhzvoGWbs1/jHW50SEU007OH3xepHIh8HI
+        ecYAdfH3gwNp/D7FqX01M/3UVAgGjLytHd3q93sLHONiDntvqXvyCvG+EWmhHdYlcMwJd7jhGIEx6
+        Jk/2RsgQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jnlNJ-0003gH-8n; Tue, 23 Jun 2020 16:02:17 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 77B34300F28;
+        Tue, 23 Jun 2020 18:02:15 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 652D6234EBA53; Tue, 23 Jun 2020 18:02:15 +0200 (CEST)
+Date:   Tue, 23 Jun 2020 18:02:15 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
         kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] kvm: x86 mmu: avoid mmu_page_hash lookup for
- direct_map-only VM
-Message-ID: <20200623155918.GC23842@linux.intel.com>
-References: <20200508182425.69249-1-jcargill@google.com>
- <20200508201355.GS27052@linux.intel.com>
- <CAM3pwhEw+KYq9AD+z8wPGyG10Bex7xLKaPM=yVV-H+W_eHTW4w@mail.gmail.com>
- <20200623065348.GA23054@linux.intel.com>
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623160215.GP4817@hirez.programming.kicks-ass.net>
+References: <20200623113007.GH31822@suse.de>
+ <20200623114818.GD4817@hirez.programming.kicks-ass.net>
+ <20200623120433.GB14101@suse.de>
+ <20200623125201.GG4817@hirez.programming.kicks-ass.net>
+ <20200623134003.GD14101@suse.de>
+ <20200623135916.GI4817@hirez.programming.kicks-ass.net>
+ <20200623145344.GA117543@hirez.programming.kicks-ass.net>
+ <20200623145914.GF14101@suse.de>
+ <20200623152326.GL4817@hirez.programming.kicks-ass.net>
+ <20200623153855.GM14101@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200623065348.GA23054@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200623153855.GM14101@suse.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 11:53:48PM -0700, Sean Christopherson wrote:
-> If we do get agressive and zap all children (or if my analysis is wrong),
-> and prevent the mixed level insansity, then a simpler approach would be to
-> skip the lookup if the MMU is direct.  I.e. no need for the per-VM toggle.
-> Direct vs. indirect MMUs are guaranteed to have different roles and so the
-> direct MMU's pages can't be reused/shared.
+On Tue, Jun 23, 2020 at 05:38:55PM +0200, Joerg Roedel wrote:
+> On Tue, Jun 23, 2020 at 05:23:26PM +0200, Peter Zijlstra wrote:
 
-Clarification on the above.  Direct and not-guaranteed-to-be-direct MMUs for
-a given VM are guaranteed to have different roles, even for nested NPT vs.
-NPT, as nested MMUs will have role.guest_mode=1.
+> > Reliability of that depends on the unwinder, I wouldn't want the guess
+> > uwinder to OOPS me by accident.
+> 
+> It doesn't use the full unwinder, it just assumes that there is a
+> pt_regs struct at the top of every kernel stack and walks through them
+> until SP points to a user-space stack.
+> 
+> As long as the assumption that there is a pt_regs struct on top of every
+> stack holds, this should be safe. The assumption might be wrong when an
+> exception happens during SYSCALL/SYSENTER entry, when the return frame
+> is not written by hardware.
+
+The IRQ and SoftIRQ stacks don't have that I think. Only the task and
+exception stacks.
