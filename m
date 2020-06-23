@@ -2,161 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D30932055EC
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:30:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 303AF2055FD
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:33:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732942AbgFWPap (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 11:30:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35802 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732821AbgFWPap (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:30:45 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25468C061573;
-        Tue, 23 Jun 2020 08:30:45 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id b5so10004286pgm.8;
-        Tue, 23 Jun 2020 08:30:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=U8SXlxHG0Q6oN1qgWSeTQEtfQ8leT+LbxGiKZqDaphM=;
-        b=FV+cU0FnpyvJ21DF7CNvu8URn27BUCpCmo2BaQ49099YqKeQL/1vRgYsRyPPEAnepl
-         tLa3YqsmsrsCvVyDPa2HRA84sokHZtxs0cm0J8Xbg/bTQqrq7S13186hIG2MvVUnQI81
-         DusZxmjDhkO7g+oD1+Yv6VsuzEie+3gIKXfbTB3FVC5o8DnVvF6cPzFpk5Zf42+8/ZmX
-         R3ofh9mZuObtIIcSdFjmaOZjMZzw5miC1OmDAb4p+CuSvH4ga1MSZnDccnL9QbSoFbZT
-         Zal/DXznDkzJU7Ef8+pClXl7lxWlWfQpUNNzrNXcBbz53UIOQvqDEhbi2fY08PdI6q+y
-         xYVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=U8SXlxHG0Q6oN1qgWSeTQEtfQ8leT+LbxGiKZqDaphM=;
-        b=gK4cihIo12/fca+iKfBWqjS6BidbPl5ug82J9B2aORM+5VloQeQOpTD0b7xl7FoM0z
-         AfhP2878A37SZ54eHPp1GLlkJepvq2c7j44WcKYz80UGZZN48KwerecTtDaVopA79+IO
-         X56a8B1QNI+jO75aKV3zVcJ/LXLYn9Bt8vbg7DmHYnc2kfK5/vr0LjwHlvddViZiANim
-         ISutUiHVkX50ucfM0lGOgQ5IYszk5MmleuJ43gl4+rVLKJG9WcaIraEaVbH5hKulfY99
-         ddcuvo070SFx9ZSGU8VytPbMrecKkjN4JdszH1BKm8HOsmrbuvB6nmGVQPFvReXe71kO
-         0Ohw==
-X-Gm-Message-State: AOAM532ZO0K4f4MEwbNJpdXu49QLCMgSqF1F8mBzZDgL150R8VGJCPUi
-        Fn4cScXyI2sw6LZ5EZSnLw==
-X-Google-Smtp-Source: ABdhPJwydvU2PMUOL2Vy5NXMGuqyAs5q5DfziRbXUm8TcLxtPMKaIHZ7LGgQ1xckcoFqvJT3WmRGfA==
-X-Received: by 2002:a63:ec05:: with SMTP id j5mr18069122pgh.109.1592926244197;
-        Tue, 23 Jun 2020 08:30:44 -0700 (PDT)
-Received: from madhuparna-HP-Notebook ([2402:3a80:ceb:846:8098:13b7:478d:bfe2])
-        by smtp.gmail.com with ESMTPSA id 3sm7750071pfv.156.2020.06.23.08.30.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 23 Jun 2020 08:30:43 -0700 (PDT)
-From:   Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-X-Google-Original-From: Madhuparna Bhowmik <change_this_user_name@gmail.com>
-Date:   Tue, 23 Jun 2020 21:00:36 +0530
-To:     Joel Fernandes <joel@joelfernandes.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, madhuparnabhowmik10@gmail.com,
+        id S1732985AbgFWPdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 11:33:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48198 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732885AbgFWPdM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 11:33:12 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05NFLXZp156754;
+        Tue, 23 Jun 2020 11:31:43 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31ukma9tb3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Jun 2020 11:31:42 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05NFNJSl161576;
+        Tue, 23 Jun 2020 11:31:42 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31ukma9t9p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Jun 2020 11:31:42 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05NFFIW0008219;
+        Tue, 23 Jun 2020 15:31:39 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 31uk50g19g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Jun 2020 15:31:39 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05NFUH6K63963492
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Jun 2020 15:30:17 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5FBBAA405B;
+        Tue, 23 Jun 2020 15:31:36 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF99FA4055;
+        Tue, 23 Jun 2020 15:31:34 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.187.217])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Jun 2020 15:31:34 +0000 (GMT)
+Subject: Re: [PATCH v6 1/5] KVM: s390: clean up redundant 'kvm_run' parameters
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
         sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
-        bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, paulmck@kernel.org,
-        frextrite@gmail.com,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Paul McKenney <paulmck@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2] kvm: Fix false positive RCU usage warning
-Message-ID: <20200623153036.GB9914@madhuparna-HP-Notebook>
-References: <20200516082227.22194-1-madhuparnabhowmik10@gmail.com>
- <9fff3c6b-1978-c647-16f7-563a1cdf62ff@redhat.com>
- <20200623150236.GD9005@google.com>
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
+        chenhuacai@gmail.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
+ <20200623131418.31473-2-tianjia.zhang@linux.alibaba.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
+Date:   Tue, 23 Jun 2020 17:31:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200623150236.GD9005@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200623131418.31473-2-tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-23_07:2020-06-23,2020-06-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ suspectscore=0 clxscore=1011 mlxlogscore=999 priorityscore=1501
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 mlxscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006120000 definitions=main-2006230117
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 11:02:36AM -0400, Joel Fernandes wrote:
-> On Tue, Jun 23, 2020 at 09:39:53AM +0200, Paolo Bonzini wrote:
-> > On 16/05/20 10:22, madhuparnabhowmik10@gmail.com wrote:
-> > > From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-> > > 
-> > > Fix the following false positive warnings:
-> > > 
-> > > [ 9403.765413][T61744] =============================
-> > > [ 9403.786541][T61744] WARNING: suspicious RCU usage
-> > > [ 9403.807865][T61744] 5.7.0-rc1-next-20200417 #4 Tainted: G             L
-> > > [ 9403.838945][T61744] -----------------------------
-> > > [ 9403.860099][T61744] arch/x86/kvm/mmu/page_track.c:257 RCU-list traversed in non-reader section!!
-> > > 
-> > > and
-> > > 
-> > > [ 9405.859252][T61751] =============================
-> > > [ 9405.859258][T61751] WARNING: suspicious RCU usage
-> > > [ 9405.880867][T61755] -----------------------------
-> > > [ 9405.911936][T61751] 5.7.0-rc1-next-20200417 #4 Tainted: G             L
-> > > [ 9405.911942][T61751] -----------------------------
-> > > [ 9405.911950][T61751] arch/x86/kvm/mmu/page_track.c:232 RCU-list traversed in non-reader section!!
-> > > 
-> > > Since srcu read lock is held, these are false positive warnings.
-> > > Therefore, pass condition srcu_read_lock_held() to
-> > > list_for_each_entry_rcu().
-> > > 
-> > > Reported-by: kernel test robot <lkp@intel.com>
-> > > Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-> > > ---
-> > > v2:
-> > > -Rebase v5.7-rc5
-> > > 
-> > >  arch/x86/kvm/mmu/page_track.c | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-> > > index ddc1ec3bdacd..1ad79c7aa05b 100644
-> > > --- a/arch/x86/kvm/mmu/page_track.c
-> > > +++ b/arch/x86/kvm/mmu/page_track.c
-> > > @@ -229,7 +229,8 @@ void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
-> > >  		return;
-> > >  
-> > >  	idx = srcu_read_lock(&head->track_srcu);
-> > > -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
-> > > +	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
-> > > +				srcu_read_lock_held(&head->track_srcu))
-> > >  		if (n->track_write)
-> > >  			n->track_write(vcpu, gpa, new, bytes, n);
-> > >  	srcu_read_unlock(&head->track_srcu, idx);
-> > > @@ -254,7 +255,8 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> > >  		return;
-> > >  
-> > >  	idx = srcu_read_lock(&head->track_srcu);
-> > > -	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node)
-> > > +	hlist_for_each_entry_rcu(n, &head->track_notifier_list, node,
-> > > +				srcu_read_lock_held(&head->track_srcu))
-> > >  		if (n->track_flush_slot)
-> > >  			n->track_flush_slot(kvm, slot, n);
-> > >  	srcu_read_unlock(&head->track_srcu, idx);
-> > > 
-> > 
-> > Hi, sorry for the delay in reviewing this patch.  I would like to ask
-> > Paul about it.
-> > 
-> > While you're correctly fixing a false positive, hlist_for_each_entry_rcu
-> > would have a false _negative_ if you called it under
-> > rcu_read_lock/unlock and the data structure was protected by SRCU.  This
-> > is why for example srcu_dereference is used instead of
-> > rcu_dereference_check, and why srcu_dereference uses
-> > __rcu_dereference_check (with the two underscores) instead of
-> > rcu_dereference_check.  Using rcu_dereference_check would add an "||
-> > rcu_read_lock_held()" to the condition which is wrong.
-> > 
-> > I think instead you should add hlist_for_each_srcu and
-> > hlist_for_each_entry_srcu macro to include/linux/rculist.h.
-> > 
-> > There is no need for equivalents of hlist_for_each_entry_continue_rcu
-> > and hlist_for_each_entry_from_rcu, because they use rcu_dereference_raw.
-> >  However, it's not documented why they do so.
-> 
-> You are right, this patch is wrong, we need a new SRCU list macro to do the
-> right thing which would also get rid of the last list argument.
->
-Can we really get rid of the last argument? We would need the
-srcu_struct right for checking?
 
+
+On 23.06.20 15:14, Tianjia Zhang wrote:
+> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+> structure. For historical reasons, many kvm-related function parameters
+> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+> patch does a unified cleanup of these remaining redundant parameters.
+> 
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 23 +++++++++++++++--------
+>  1 file changed, 15 insertions(+), 8 deletions(-)
+
+Tinajia,
+
+I have trouble seeing value in this particular patch. We add LOCs
+without providing any noticable benefit. All other patches in this series at
+least reduce the amount of code. So I would defer this to Paolo if he prefers
+to have this way across all architectures. 
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d47c19718615..f5f96dc33712 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4175,8 +4175,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+>  	return rc;
+>  }
+>  
+> -static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+>  	struct runtime_instr_cb *riccb;
+>  	struct gs_cb *gscb;
+>  
+> @@ -4242,8 +4243,10 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	/* SIE will load etoken directly from SDNX and therefore kvm_run */
+>  }
+>  
+> -static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void sync_regs(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +
+>  	if (kvm_run->kvm_dirty_regs & KVM_SYNC_PREFIX)
+>  		kvm_s390_set_prefix(vcpu, kvm_run->s.regs.prefix);
+>  	if (kvm_run->kvm_dirty_regs & KVM_SYNC_CRS) {
+> @@ -4272,7 +4275,7 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  
+>  	/* Sync fmt2 only data */
+>  	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu))) {
+> -		sync_regs_fmt2(vcpu, kvm_run);
+> +		sync_regs_fmt2(vcpu);
+>  	} else {
+>  		/*
+>  		 * In several places we have to modify our internal view to
+> @@ -4291,8 +4294,10 @@ static void sync_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	kvm_run->kvm_dirty_regs = 0;
+>  }
+>  
+> -static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void store_regs_fmt2(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +
+>  	kvm_run->s.regs.todpr = vcpu->arch.sie_block->todpr;
+>  	kvm_run->s.regs.pp = vcpu->arch.sie_block->pp;
+>  	kvm_run->s.regs.gbea = vcpu->arch.sie_block->gbea;
+> @@ -4312,8 +4317,10 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	/* SIE will save etoken directly into SDNX and therefore kvm_run */
+>  }
+>  
+> -static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+> +static void store_regs(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_run *kvm_run = vcpu->run;
+> +
+>  	kvm_run->psw_mask = vcpu->arch.sie_block->gpsw.mask;
+>  	kvm_run->psw_addr = vcpu->arch.sie_block->gpsw.addr;
+>  	kvm_run->s.regs.prefix = kvm_s390_get_prefix(vcpu);
+> @@ -4332,7 +4339,7 @@ static void store_regs(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+>  	current->thread.fpu.fpc = vcpu->arch.host_fpregs.fpc;
+>  	current->thread.fpu.regs = vcpu->arch.host_fpregs.regs;
+>  	if (likely(!kvm_s390_pv_cpu_is_protected(vcpu)))
+> -		store_regs_fmt2(vcpu, kvm_run);
+> +		store_regs_fmt2(vcpu);
+>  }
+>  
+>  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> @@ -4370,7 +4377,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		goto out;
+>  	}
+>  
+> -	sync_regs(vcpu, kvm_run);
+> +	sync_regs(vcpu);
+>  	enable_cpu_timer_accounting(vcpu);
+>  
+>  	might_fault();
+> @@ -4392,7 +4399,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	disable_cpu_timer_accounting(vcpu);
+> -	store_regs(vcpu, kvm_run);
+> +	store_regs(vcpu);
+>  
+>  	kvm_sigset_deactivate(vcpu);
+>  
+> 
