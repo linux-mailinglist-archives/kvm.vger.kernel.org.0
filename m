@@ -2,84 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EA22204F21
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 12:35:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84C02204F79
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 12:46:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732191AbgFWKfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 06:35:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46294 "EHLO
+        id S1732243AbgFWKql (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 06:46:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732172AbgFWKfp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 06:35:45 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E939CC061573
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 03:35:45 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id g7so16024791oti.13
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 03:35:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=bIkwkdvNiJAf0orWIsRcV+UMCPxDrTLTXZw1i+6s9m8=;
-        b=jsdGyXlM+aozS095vIDQ9z3AsMIz2IuqvFkoRBLOHjAs2YFVra9Obs8pqRn/1N2kCA
-         /UZQ7+V2uZ9q7LDElnCRdouBeEBcxeCj4bzwVos11VvG207PKfFJbefraEv3BipqzY3q
-         tWDJkaCMD6OcUQvVGA5GzhKADn2+ZDRzPaLePVEUBD+kwzV5wMYjlCLh7PbyBlRu6k9Y
-         YXvLk5zhMtILKsspnH/JLKcR/3VQTlmXU0pJAmwAd7jc+1ln4dh2iUddq7nhXCIKwmqP
-         gFJWd7icMnFwhFl03riL14MKEQ6Ppz5PAmGOAccGXXyXXO43aKVvnxHwlWJO/1GQxIkX
-         ifeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=bIkwkdvNiJAf0orWIsRcV+UMCPxDrTLTXZw1i+6s9m8=;
-        b=Zh0WZ8eTeMwz9hlMTGcRH4LHasl2kySxkEhC4T2c3b0YNVcYk93iECo3bLjYNeEh4X
-         EGVTmlHW5s/CY9zJwfjJR7T45g1aYltegiBXpX7ow4+XDeQQegShCXC7aerZA++X5G45
-         Lfz9PqQkGXOgiYO3uIHK3PjkkJau3UI0kdGXfp4Ejw/pbrgfNzsd0sh7eneUhCvILQVy
-         fQGts7rW6I+JvaoCsP3v/7CwhBSrV/SbgXfWy0cUdvG2YsOu9edfVY0wG7osDAm/IWS1
-         zP1hZu6Qa3yZ2MKfjABTGo6n0S4wkPgHHWQAti7F8rvbub6hc2A4lkvCOfoe2yHngEhk
-         UBQA==
-X-Gm-Message-State: AOAM5314Gz5EqtkW8jC6plHctXVhjmnNr6x6QflgT8ekqX0xgPRnrcD5
-        XepYRW7Zoo03rD8sBX6+nk+akScEI7P2IuIeWhjHGQ==
-X-Google-Smtp-Source: ABdhPJxjoO2Hzb/jopFLxXuQ0nZMHBSKzskC5XtkO6vOi0BpS60Ao3jg0qwxazSMsE6nux1hmiAl5J7DDyRBznGuwEU=
-X-Received: by 2002:a9d:67d6:: with SMTP id c22mr16897084otn.221.1592908545318;
- Tue, 23 Jun 2020 03:35:45 -0700 (PDT)
+        with ESMTP id S1728472AbgFWKqk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 06:46:40 -0400
+Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDED1C061573;
+        Tue, 23 Jun 2020 03:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=B1WPwb6BmprV17sdTfJbm9Oox9tpXpQcWcJkTgOLOpY=; b=LD2YZjbcst8zK+3aVeIV1Er8++
+        Vty8JFIkh7rNw/YIQSSMUaA3vqu9Wr2kKwsX0WpCrzmvWsxNuyl9VlDW6HaWexE7PyqGNXvWx88Rp
+        8GuhkgsNwkZZWiEWwSTmoBjvqUb1cun5wNfV33EOhtrb375BURVbR+wWqSvL3ygGNrN1uKtPmcRHD
+        1PCEfMpdsDf5fFIBFs6da+HM6RP7uF8/Y8ACqYx/3MbIzKCL2klzrzuicid8RLoeDRAqiYTLVjpa2
+        D3REhWmBtBa7hwKYjQ67LSjPGsAS55Hfx6D40LWfWkMbJlC9szoHTpaHK0QmQMA1hwNMhCfZ5KhN5
+        oIlS+m+w==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jngRH-0005eM-1o; Tue, 23 Jun 2020 10:46:03 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6F056303DA0;
+        Tue, 23 Jun 2020 12:45:59 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 637212B7BB5F2; Tue, 23 Jun 2020 12:45:59 +0200 (CEST)
+Date:   Tue, 23 Jun 2020 12:45:59 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623104559.GA4817@hirez.programming.kicks-ass.net>
+References: <20200425191032.GK21900@8bytes.org>
+ <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
+ <20200425202316.GL21900@8bytes.org>
+ <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
+ <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
+ <20200623094519.GF31822@suse.de>
 MIME-Version: 1.0
-References: <20200623090622.30365-1-philmd@redhat.com>
-In-Reply-To: <20200623090622.30365-1-philmd@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 23 Jun 2020 11:35:34 +0100
-Message-ID: <CAFEAcA-HJ0Zd5Ad0EO3SeOue5NWyg=FSVwUquOQKweYtiBkJLQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] target/arm: Fix using pmu=on on KVM
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>, Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623094519.GF31822@suse.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Jun 2020 at 10:06, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Since v2:
-> - include Drew test fix (addressed Peter review comments)
-> - addressed Drew review comments
-> - collected R-b/A-b
->
-> Andrew Jones (1):
->   tests/qtest/arm-cpu-features: Add feature setting tests
->
-> Philippe Mathieu-Daud=C3=A9 (1):
->   target/arm: Check supported KVM features globally (not per vCPU)
+On Tue, Jun 23, 2020 at 11:45:19AM +0200, Joerg Roedel wrote:
+> Hi Andy,
+> 
+> On Mon, Apr 27, 2020 at 10:37:41AM -0700, Andy Lutomirski wrote:
+> > 1. Use IST for #VC and deal with all the mess that entails.
+> 
+> With the removal of IST shifting I wonder what you would suggest on how
+> to best implement an NMI-safe IST handler with nesting support.
+> 
+> My current plan is to implement an IST handler which switches itself off
+> the IST stack as soon as possible, freeing it for re-use.
+> 
+> The flow would be roughly like this upon entering the handler;
+> 
+> 	build_pt_regs();
+> 
+> 	RSP = pt_regs->sp;
+> 
+> 	if (RSP in VC_IST_stack)
+> 		error("unallowed nesting")
+> 
+> 	if (RSP in current_kernel_stack)
+> 		RSP = round_down_to_8(RSP)
+> 	else
+> 		RSP = current_top_of_stack() // non-ist kernel stack
+> 
+> 	copy_pt_regs(pt_regs, RSP);
+> 	switch_stack_to(RSP);
+> 
+> To make this NMI safe, the NMI handler needs some logic too. Upon
+> entering NMI, it needs to check the return RSP, and if it is in the #VC
+> IST stack, it must do the above flow by itself and update the return RSP
+> and RIP. It needs to take into account the case when PT_REGS is not
+> fully populated on the return side.
+> 
+> Alternativly the NMI handler could safe/restore the contents of the #VC
+> IST stack or just switch to a special #VC-in-NMI IST stack.
+> 
+> All in all it could get complicated, and imho shift_ist would have been
+> simpler, but who am I anyway...
+> 
+> Or maybe you have a better idea how to implement this, so I'd like to
+> hear your opinion first before I spend too many days implementing
+> something.
 
-Applied to target-arm.next, thanks. I dropped the Analyzed-by
-tag from one patch because I think we ought to stick to a
-standard set of reviewed-by/signed-off-by/acked-by tags.
+OK, excuse my ignorance, but I'm not seeing how that IST shifting
+nonsense would've helped in the first place.
 
--- PMM
+If I understand correctly the problem is:
+
+	<#VC>
+	  shift IST
+	  <NMI>
+	    ... does stuff
+	    <#VC> # again, safe because the shift
+
+But what happens if you get the NMI before your IST adjustment?
+
+	<#VC>
+	  <NMI>
+	    ... does stuff
+	    <#VC> # again, happily wrecks your earlier #VC
+	  shift IST # whoopsy, too late
+
+Either way around we get to fix this up in NMI (and any other IST
+exception that can happen while in #VC, hello #MC). And more complexity
+there is the very last thing we need :-(
+
+There's no way you can fix up the IDT without getting an NMI first.
+
+This entire exception model is fundamentally buggered :-/
