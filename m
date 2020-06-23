@@ -2,108 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B19620584A
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 19:11:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AA9620584D
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 19:12:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732979AbgFWRLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 13:11:23 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29048 "EHLO
+        id S1732958AbgFWRM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 13:12:57 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60305 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728916AbgFWRLX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 13:11:23 -0400
+        by vger.kernel.org with ESMTP id S1732548AbgFWRM5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 13:12:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592932281;
+        s=mimecast20190719; t=1592932376;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=tgpqv+Z4YzvIf/4SqnrwWUNPhSAJzQTNmQO1fWEnu4g=;
-        b=AZk02rCAYz9FmShJrHLK/213qOgbmJRA0fQvN4CAdiR9hbgHLY6qLIlp57p+qsjV72qm7d
-        FZGHL+J5Hj22VmoFLPZLXzIeFkydt7/HL/gfzgGP2sl1kw6JvXThUxbfRmUeXIYqNQouc5
-        zT452za7dMG39a39mwssx7e0IGOONn8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-fa8R2lz4PIqGlC1xadbvrQ-1; Tue, 23 Jun 2020 13:11:19 -0400
-X-MC-Unique: fa8R2lz4PIqGlC1xadbvrQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E71B8C4BA1;
-        Tue, 23 Jun 2020 17:11:18 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F2AF5D9D3;
-        Tue, 23 Jun 2020 17:11:18 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bjSHi5j3igysNj9l7cpgMqXLiUPBi+Ky+x4600a3LLI=;
+        b=JbyvPPaH1gFsSyxhELE7YY/Kdxv+Tm5/FOB5BcONcENeznXX/vhEULnvw7Uh6KWC37DQSm
+        rBZHTb89YR92NHhZvHS4u04pp4ORZBNSU6QGciIDzgvVOvbajGekZF3259Ow7MwwBQgoLc
+        QUf7FKnO/DwH31Vy8lKuJvDL5VVW28w=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-bd3dgAftNcqdGN6mXJmiUA-1; Tue, 23 Jun 2020 13:12:54 -0400
+X-MC-Unique: bd3dgAftNcqdGN6mXJmiUA-1
+Received: by mail-wr1-f72.google.com with SMTP id o25so14411292wro.16
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 10:12:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bjSHi5j3igysNj9l7cpgMqXLiUPBi+Ky+x4600a3LLI=;
+        b=igVj6+nD9vNZuK3nMMhVaJX1w9MEb5RNrY8S+JcMVdpevui78KuNN79ogt12554PCC
+         /QxIGe4OmsgioGPW7sSYQXPLpXmxoLmD5nLDpUKau/4/i8kwuwgvhyCWLMS+SXc4kOvE
+         8N4AgEwAke8URZcZ6kHcxdDACaKbwKA24K+XaANDCeiW7TmTGRYm1u/Osms7rObOyW+N
+         Ps7W5iKwGpEmZe79AnIHeI+V1PzQHhGKZQ78ny1GVhVqLRDvM598ZBgMSryvXZEl4XB7
+         G42zlOl+KcsL+NT+fjUufshX/2W/g1iXVCVO/unbPm5/yowOalmfHUbDGwsyZJygygai
+         yiyg==
+X-Gm-Message-State: AOAM531VNAfD9wvJvUcF4iPvwjm1w2saoHMIIP2jjjPtZJIreSA3lcIy
+        PQV8g8pLi7nTzzoWOy8RHKyzRxIBBHjOjbqiWU9e28SJDQ2NxWBEthPENU0TP5qRWY3IErjTM36
+        QV7eKdC+dTQBr
+X-Received: by 2002:a5d:60d1:: with SMTP id x17mr14975275wrt.293.1592932372956;
+        Tue, 23 Jun 2020 10:12:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwRuMtyw/dGzTkDP+Lg+Hs1P60eNiOELYrqxHsVCwOUVolT1dJnEB/9IIlJTdqeYRbPpr31iw==
+X-Received: by 2002:a5d:60d1:: with SMTP id x17mr14975254wrt.293.1592932372705;
+        Tue, 23 Jun 2020 10:12:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:24f5:23b:4085:b879? ([2001:b07:6468:f312:24f5:23b:4085:b879])
+        by smtp.gmail.com with ESMTPSA id 207sm5303231wme.13.2020.06.23.10.12.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jun 2020 10:12:52 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] vmx: remove unnecessary #ifdef __x86_64__
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20200623092045.271835-1-pbonzini@redhat.com>
+ <AB6977D0-7844-49AE-A631-FF98A74E60FB@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 5.8-rc3
-Date:   Tue, 23 Jun 2020 13:11:17 -0400
-Message-Id: <20200623171117.326222-1-pbonzini@redhat.com>
+Message-ID: <0e052425-0eb6-0bca-1948-8485d5c76ac1@redhat.com>
+Date:   Tue, 23 Jun 2020 19:12:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <AB6977D0-7844-49AE-A631-FF98A74E60FB@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On 23/06/20 19:02, Nadav Amit wrote:
+>> On Jun 23, 2020, at 2:20 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The VMX tests are 64-bit only, so checking the architecture is
+>> unnecessary.  Also, if the tests supported 32-bits environments
+>> the #ifdef would probably go in test_canonical.
+> 
+> Why do you say that the VMX tests are 64-bit only? I ran it the other day on
+> 32-bit and it was working.
+> 
 
-The following changes since commit b3a9e3b9622ae10064826dccb4f7a52bd88c7407:
+Because it is not listed in either x86/Makefile.i386 or
+x86/Makefile.common. :)
 
-  Linux 5.8-rc1 (2020-06-14 12:45:04 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to e4553b4976d1178c13da295cb5c7b21f55baf8f9:
-
-  KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru (2020-06-23 06:01:29 -0400)
-
-----------------------------------------------------------------
-All bugfixes except for a couple cleanup patches.
-
-----------------------------------------------------------------
-Huacai Chen (1):
-      KVM: MIPS: Fix a build error for !CPU_LOONGSON64
-
-Igor Mammedov (1):
-      kvm: lapic: fix broken vcpu hotplug
-
-Marcelo Tosatti (1):
-      KVM: x86: allow TSC to differ by NTP correction bounds without TSC scaling
-
-Paolo Bonzini (1):
-      KVM: LAPIC: ensure APIC map is up to date on concurrent update requests
-
-Qian Cai (1):
-      kvm/svm: disable KCSAN for svm_vcpu_run()
-
-Sean Christopherson (4):
-      KVM: VMX: Add helpers to identify interrupt type from intr_info
-      KVM: nVMX: Plumb L2 GPA through to PML emulation
-      KVM: VMX: Stop context switching MSR_IA32_UMWAIT_CONTROL
-      KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru
-
-Vitaly Kuznetsov (2):
-      Revert "KVM: VMX: Micro-optimize vmexit time when not exposing PMU"
-      KVM: x86/mmu: Avoid mixing gpa_t with gfn_t in walk_addr_generic()
-
-Xiaoyao Li (1):
-      KVM: X86: Fix MSR range of APIC registers in X2APIC mode
-
- arch/mips/kvm/mips.c            |  2 ++
- arch/x86/include/asm/kvm_host.h |  4 ++--
- arch/x86/include/asm/mwait.h    |  2 --
- arch/x86/kernel/cpu/umwait.c    |  6 -----
- arch/x86/kvm/lapic.c            | 50 +++++++++++++++++++++++++----------------
- arch/x86/kvm/mmu.h              |  2 +-
- arch/x86/kvm/mmu/mmu.c          |  4 ++--
- arch/x86/kvm/mmu/paging_tmpl.h  | 16 ++++++-------
- arch/x86/kvm/svm/svm.c          |  2 +-
- arch/x86/kvm/vmx/vmcs.h         | 32 ++++++++++++++++----------
- arch/x86/kvm/vmx/vmx.c          | 27 ++++------------------
- arch/x86/kvm/vmx/vmx.h          |  2 --
- arch/x86/kvm/x86.c              |  7 +++---
- 13 files changed, 74 insertions(+), 82 deletions(-)
+Paolo
 
