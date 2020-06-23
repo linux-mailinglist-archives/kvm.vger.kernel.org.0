@@ -2,112 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0853020503A
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 13:14:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F37A8205044
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 13:15:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732467AbgFWLOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 07:14:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23709 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732422AbgFWLN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 07:13:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592910836;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NvUBdJ0TDQrWcFygpaWTMSHERx8u64732APgLFi7a5I=;
-        b=AzhlZWNaEz5E3bIuoDXbLUQtb/rldauPcUCbIzgUCZBdOLt53YkyvR1lhx4fsHoKrmieeg
-        ziym9iN7bVqITsQyrAylHUK9jzwWRMdCGjOAXnO7iQ7bMhUvdrSyyUCS3G9C5wUlqxgb9y
-        SJMLtKS/fUoBLWo6AcJDNKjh8abPB1g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-134-Rk8Oj6GQPzysWOyMqpvILQ-1; Tue, 23 Jun 2020 07:13:49 -0400
-X-MC-Unique: Rk8Oj6GQPzysWOyMqpvILQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FEA08018AC;
-        Tue, 23 Jun 2020 11:13:48 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E7A57166A;
-        Tue, 23 Jun 2020 11:13:46 +0000 (UTC)
-Date:   Tue, 23 Jun 2020 13:13:43 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, kvm@vger.kernel.org, wanpengli@tencent.com
-Subject: Re: [PATCH] kvm: lapic: fix broken vcpu hotplug
-Message-ID: <20200623131343.01842ee5@redhat.com>
-In-Reply-To: <c00acf88-0655-686e-3b8c-7aad03791f20@redhat.com>
-References: <20200622160830.426022-1-imammedo@redhat.com>
-        <c00acf88-0655-686e-3b8c-7aad03791f20@redhat.com>
+        id S1732413AbgFWLPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 07:15:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52450 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732261AbgFWLPM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 07:15:12 -0400
+Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6074AC061573;
+        Tue, 23 Jun 2020 04:15:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=kbjAKWhzfgOj923ZSmk/+0La2WIuOqVntNXB3to3NaY=; b=xsXdYkCrqqHaG0/uNn9otnZ92O
+        bQLlNydLgpYpRZ19BLNcTK51b7J6swMSOX2NKGX8Hy0bXAwxheGpBaivL2lF311orkcO5VSiZ7oxD
+        OL8nBV4GZBkD2zuJ4wzQucOc4qbT2WIRLdws+iCHmAc78Ax3GgfArKXaDTmo5CSRLn4yoaDRxBr6i
+        PMhRrAT3PLo+fp/Z6DY3wGLET4pisfFbcyBMjDvE+J2IkD8qPYM38ZgVlnMnoBbX22Wr8upCldDKq
+        Og09chKT10e9T3DFlyzPLo8eOQVUPcwAHKeiia0mBkSiyxpwG8QvWNb7+VwWEKn0hC9alHDY009Kr
+        /zssl0yA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jngt3-0008DI-3y; Tue, 23 Jun 2020 11:14:45 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6901730477A;
+        Tue, 23 Jun 2020 13:14:43 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 55D892370FA07; Tue, 23 Jun 2020 13:14:43 +0200 (CEST)
+Date:   Tue, 23 Jun 2020 13:14:43 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623111443.GC4817@hirez.programming.kicks-ass.net>
+References: <20200425191032.GK21900@8bytes.org>
+ <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
+ <20200425202316.GL21900@8bytes.org>
+ <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
+ <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
+ <20200623094519.GF31822@suse.de>
+ <20200623104559.GA4817@hirez.programming.kicks-ass.net>
+ <20200623111107.GG31822@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623111107.GG31822@suse.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Jun 2020 18:47:57 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 22/06/20 18:08, Igor Mammedov wrote:
-> > Guest fails to online hotplugged CPU with error
-> >   smpboot: do_boot_cpu failed(-1) to wakeup CPU#4
-> > 
-> > It's caused by the fact that kvm_apic_set_state(), which used to call
-> > recalculate_apic_map() unconditionally and pulled hotplugged CPU into
-> > apic map, is updating map conditionally [1] on state change which doesn't
-> > happen in this case and apic map update is skipped.
-> > 
-> > Note:
-> > new CPU during kvm_arch_vcpu_create() is not visible to
-> > kvm_recalculate_apic_map(), so all related update calls endup
-> > as NOP and only follow up kvm_apic_set_state() used to trigger map
-> > update that counted in hotplugged CPU.
-> > Fix issue by forcing unconditional update from kvm_apic_set_state(),
-> > like it used to be.
-> > 
-> > 1)
-> > Fixes: (4abaffce4d25a KVM: LAPIC: Recalculate apic map in batch)
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > PS:
-> > it's alternative to full revert of [1], I've posted earlier
-> > https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2205600.html
-> > so fii free to pick up whatever is better by now
-> > ---
-> >  arch/x86/kvm/lapic.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 34a7e0533dad..5696831d4005 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2556,6 +2556,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
-> >  	struct kvm_lapic *apic = vcpu->arch.apic;
-> >  	int r;
-> >  
-> > +	apic->vcpu->kvm->arch.apic_map_dirty = true;
-> >  	kvm_lapic_set_base(vcpu, vcpu->arch.apic_base);
-> >  	/* set SPIV separately to get count of SW disabled APICs right */
-> >  	apic_set_spiv(apic, *((u32 *)(s->regs + APIC_SPIV)));
-> >   
+On Tue, Jun 23, 2020 at 01:11:07PM +0200, Joerg Roedel wrote:
+> Hi Peter,
 > 
-> Queued, but it's better to set apic_map_dirty just before the call to
-> kvm_recalculate_apic_map, or you can have a variant of the race that you
-> pointed out.
-
-Here I was worried about failure path as well that is just before normal
-kvm_recalculate_apic_map(), and has its own kvm_recalculate_apic_map().
-
-but I'm not sure if we should force map update in that case.
-
+> On Tue, Jun 23, 2020 at 12:45:59PM +0200, Peter Zijlstra wrote:
+> > On Tue, Jun 23, 2020 at 11:45:19AM +0200, Joerg Roedel wrote:
+> > > Or maybe you have a better idea how to implement this, so I'd like to
+> > > hear your opinion first before I spend too many days implementing
+> > > something.
+> > 
+> > OK, excuse my ignorance, but I'm not seeing how that IST shifting
+> > nonsense would've helped in the first place.
+> > 
+> > If I understand correctly the problem is:
+> > 
+> > 	<#VC>
+> > 	  shift IST
+> > 	  <NMI>
+> > 	    ... does stuff
+> > 	    <#VC> # again, safe because the shift
+> > 
+> > But what happens if you get the NMI before your IST adjustment?
 > 
-> Paolo
-> 
+> The v3 patchset implements an unconditional shift of the #VC IST entry
+> in the NMI handler, before it can trigger a #VC exception.
 
+Going by that other thread -- where you said that any memory access can
+trigger a #VC, there just isn't such a guarantee.
+
+> > Either way around we get to fix this up in NMI (and any other IST
+> > exception that can happen while in #VC, hello #MC). And more complexity
+> > there is the very last thing we need :-(
+> 
+> Yes, in whatever way this gets implemented, it needs some fixup in the
+> NMI handler. But that can happen in C code, so it does not make the
+> assembly more complex, at least.
+> 
+> > There's no way you can fix up the IDT without getting an NMI first.
+> 
+> Not sure what you mean by this.
+
+I was talking about the case where #VC would try and fix up its own IST.
