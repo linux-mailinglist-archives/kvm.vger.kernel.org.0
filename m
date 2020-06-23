@@ -2,85 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 085CE2056D8
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 18:14:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 786942056E6
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 18:16:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732533AbgFWQOA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 12:14:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42514 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728916AbgFWQOA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 12:14:00 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB55CC061573;
-        Tue, 23 Jun 2020 09:13:59 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0d47007938aef930b6c4fb.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:4700:7938:aef9:30b6:c4fb])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 768C01EC0318;
-        Tue, 23 Jun 2020 18:13:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1592928838;
+        id S1732940AbgFWQQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 12:16:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44866 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1732326AbgFWQQM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 12:16:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1592928970;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=3hydVVgqDlrgbEgBTFy7VUDI9fCz0nmR1nF+TA1bYQw=;
-        b=AR8Cmxfvj2g5TZiJF22qVNjyxrjEzi3qfokFyvjRPZq+FHX1ONnQ12Y6ioP86xvNIHjtpg
-        gOafUnBClkDXUL9gFcNJbChJb5NJxzTl5Zu/LFrlT4AOc2DvxW0JNlKjsJmB/sKD0V4kPs
-        hmqNU/N1ePn0BbF1IV0jxu/Bj1GQ9R0=
-Date:   Tue, 23 Jun 2020 18:13:55 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Andrew Cooper <andrew.cooper3@citrix.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Mike Stunes <mstunes@vmware.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
-        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        X86 ML <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-Message-ID: <20200623161355.GF32590@zn.tnic>
-References: <20200623113007.GH31822@suse.de>
- <20200623114818.GD4817@hirez.programming.kicks-ass.net>
- <20200623120433.GB14101@suse.de>
- <20200623125201.GG4817@hirez.programming.kicks-ass.net>
- <20200623134003.GD14101@suse.de>
- <20200623135916.GI4817@hirez.programming.kicks-ass.net>
- <20200623145344.GA117543@hirez.programming.kicks-ass.net>
- <20200623145914.GF14101@suse.de>
- <20200623152326.GL4817@hirez.programming.kicks-ass.net>
- <56af2f70-a1c6-aa64-006e-23f2f3880887@citrix.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=tQbe5rqyYjvehV1zKMS5pdkClT9pyr1+42ShsT+YZus=;
+        b=b0ujaW/a0YLO6kcVRK2Zi4Ahea83QS9yDXnGJnYQi6FqJAB1NoAlQLtXQETDTkj9vipStv
+        KwZwsBHXxY9NYyz4EekXMmqhhzUpQY5V0MTfLeLWTx1X+LC+gDJHfxnetplIvtEv37TvYo
+        gwqk0SNtFDCbJ+HaDEGsBEIBCtNtSek=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-Kisb03y5NoaJpOa1-5JaWg-1; Tue, 23 Jun 2020 12:16:03 -0400
+X-MC-Unique: Kisb03y5NoaJpOa1-5JaWg-1
+Received: by mail-qk1-f198.google.com with SMTP id a6so15636305qka.9
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 09:16:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tQbe5rqyYjvehV1zKMS5pdkClT9pyr1+42ShsT+YZus=;
+        b=lnK8qiC7+lqZIYk8S1k4EMCUGKoTMUOPWgb3jdirsTSPoWNM0cy+Kh/IPtKjjOv8ZA
+         qAKDpI5OWJc9J4lKvJqt4QjinZ/DbKWswOXS6gfav0TCOiBqZmLAG7L89t45jPOfpBep
+         3+iB4kET6/B8PgrSvUaOBoMnMmBWUYiVWOwNZL3OslvGkua2TH9CiM4sLxF62nYwkhTN
+         muSVEDAk/sciel9IuXnc+eAGzgMTQ9uJzimFprxTRIXJZQTtXJGVnNX1GRNFZ3h0XzsH
+         uH3Wm2cYLMqnStiTIahWz2tTKA4ykt1UWGm1I8nLxv2SoFZrpKmwEEhEa5l9qE2jmp2W
+         5efw==
+X-Gm-Message-State: AOAM5318c4Eapz1wABquuATTjj50Hod8ndQ/BtjgsQziK7r5KFHCdI4V
+        Hsu/UZaVc0A37zmfhCDDf3xcGn5TsmBW9Dys0Kg3buDgyBakLen/mZfmcWyjXO1UWGArDVd+k03
+        BTciMyVoEqB3OL2I0EIDkQgyJWyxy
+X-Received: by 2002:ad4:4732:: with SMTP id l18mr3881516qvz.208.1592928963233;
+        Tue, 23 Jun 2020 09:16:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy7yTqnj7uaB03wNLu96uz9OlO0RH8CN880kbmRfNOi6PGV8nVOyNP6bAd1kbfBqw7cKF6f/d17HlC1XDYmWqU=
+X-Received: by 2002:ad4:4732:: with SMTP id l18mr3881493qvz.208.1592928962969;
+ Tue, 23 Jun 2020 09:16:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <56af2f70-a1c6-aa64-006e-23f2f3880887@citrix.com>
+References: <20200611113404.17810-1-mst@redhat.com> <20200611113404.17810-3-mst@redhat.com>
+ <20200611152257.GA1798@char.us.oracle.com> <CAJaqyWdwXMX0JGhmz6soH2ZLNdaH6HEdpBM8ozZzX9WUu8jGoQ@mail.gmail.com>
+ <CAJaqyWdwgy0fmReOgLfL4dAv-E+5k_7z3d9M+vHqt0aO2SmOFg@mail.gmail.com>
+ <20200622114622-mutt-send-email-mst@kernel.org> <CAJaqyWfrf94Gc-DMaXO+f=xC8eD3DVCD9i+x1dOm5W2vUwOcGQ@mail.gmail.com>
+ <20200622122546-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200622122546-mutt-send-email-mst@kernel.org>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Tue, 23 Jun 2020 18:15:26 +0200
+Message-ID: <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
+Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 04:39:26PM +0100, Andrew Cooper wrote:
-> P.S. did you also hear that with Rowhammer, userspace has a nonzero
-> quantity of control over generating #MC, depending on how ECC is
-> configured on the platform.
+On Mon, Jun 22, 2020 at 6:29 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Jun 22, 2020 at 06:11:21PM +0200, Eugenio Perez Martin wrote:
+> > On Mon, Jun 22, 2020 at 5:55 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Fri, Jun 19, 2020 at 08:07:57PM +0200, Eugenio Perez Martin wrote:
+> > > > On Mon, Jun 15, 2020 at 2:28 PM Eugenio Perez Martin
+> > > > <eperezma@redhat.com> wrote:
+> > > > >
+> > > > > On Thu, Jun 11, 2020 at 5:22 PM Konrad Rzeszutek Wilk
+> > > > > <konrad.wilk@oracle.com> wrote:
+> > > > > >
+> > > > > > On Thu, Jun 11, 2020 at 07:34:19AM -0400, Michael S. Tsirkin wrote:
+> > > > > > > As testing shows no performance change, switch to that now.
+> > > > > >
+> > > > > > What kind of testing? 100GiB? Low latency?
+> > > > > >
+> > > > >
+> > > > > Hi Konrad.
+> > > > >
+> > > > > I tested this version of the patch:
+> > > > > https://lkml.org/lkml/2019/10/13/42
+> > > > >
+> > > > > It was tested for throughput with DPDK's testpmd (as described in
+> > > > > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html)
+> > > > > and kernel pktgen. No latency tests were performed by me. Maybe it is
+> > > > > interesting to perform a latency test or just a different set of tests
+> > > > > over a recent version.
+> > > > >
+> > > > > Thanks!
+> > > >
+> > > > I have repeated the tests with v9, and results are a little bit different:
+> > > > * If I test opening it with testpmd, I see no change between versions
+> > >
+> > >
+> > > OK that is testpmd on guest, right? And vhost-net on the host?
+> > >
+> >
+> > Hi Michael.
+> >
+> > No, sorry, as described in
+> > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html.
+> > But I could add to test it in the guest too.
+> >
+> > These kinds of raw packets "bursts" do not show performance
+> > differences, but I could test deeper if you think it would be worth
+> > it.
+>
+> Oh ok, so this is without guest, with virtio-user.
+> It might be worth checking dpdk within guest too just
+> as another data point.
+>
 
-Where does that #MC point to? Can it control for which address to flip
-the bits for, i.e., make the #MC appear it has been generated for an
-address in kernel space?
+Ok, I will do it!
 
--- 
-Regards/Gruss,
-    Boris.
+> > > > * If I forward packets between two vhost-net interfaces in the guest
+> > > > using a linux bridge in the host:
+> > >
+> > > And here I guess you mean virtio-net in the guest kernel?
+> >
+> > Yes, sorry: Two virtio-net interfaces connected with a linux bridge in
+> > the host. More precisely:
+> > * Adding one of the interfaces to another namespace, assigning it an
+> > IP, and starting netserver there.
+> > * Assign another IP in the range manually to the other virtual net
+> > interface, and start the desired test there.
+> >
+> > If you think it would be better to perform then differently please let me know.
+>
+>
+> Not sure why you bother with namespaces since you said you are
+> using L2 bridging. I guess it's unimportant.
+>
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Sorry, I think I should have provided more context about that.
+
+The only reason to use namespaces is to force the traffic of these
+netperf tests to go through the external bridge. To test netperf
+different possibilities than the testpmd (or pktgen or others "blast
+of frames unconditionally" tests).
+
+This way, I make sure that is the same version of everything in the
+guest, and is a little bit easier to manage cpu affinity, start and
+stop testing...
+
+I could use a different VM for sending and receiving, but I find this
+way a faster one and it should not introduce a lot of noise. I can
+test with two VM if you think that this use of network namespace
+introduces too much noise.
+
+Thanks!
+
+> > >
+> > > >   - netperf UDP_STREAM shows a performance increase of 1.8, almost
+> > > > doubling performance. This gets lower as frame size increase.
+> > > >   - rests of the test goes noticeably worse: UDP_RR goes from ~6347
+> > > > transactions/sec to 5830
+> > >
+> > > OK so it seems plausible that we still have a bug where an interrupt
+> > > is delayed. That is the main difference between pmd and virtio.
+> > > Let's try disabling event index, and see what happens - that's
+> > > the trickiest part of interrupts.
+> > >
+> >
+> > Got it, will get back with the results.
+> >
+> > Thank you very much!
+> >
+> > >
+> > >
+> > > >   - TCP_STREAM goes from ~10.7 gbps to ~7Gbps
+> > > >   - TCP_RR from 6223.64 transactions/sec to 5739.44
+> > >
+>
+
