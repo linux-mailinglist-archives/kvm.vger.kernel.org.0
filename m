@@ -2,47 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A7AE2055A0
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:16:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CE912055E7
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 17:30:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732928AbgFWPQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 11:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33626 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732781AbgFWPQm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 11:16:42 -0400
-Received: from merlin.infradead.org (unknown [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE227C061755;
-        Tue, 23 Jun 2020 08:16:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Id637uzu2oPJgbSFSrub5lvl6io8BJJDeJLsBbUH3no=; b=bi0ePU5G654k+t0TAm058MHXSd
-        lCqyZOcX6Qodx8rJdBmSj5AAhpyDPz+bOg/LKlMIsTlUsu+PJHSPm5Mwmerm0dt8rhY73XDELOD7f
-        d8s7S6cD8f5p7SHCUnRySBYP5y+C7I9jt3OS5qDNJ8bdyBie87xD3Iko98kPmp41cLlhSCJthd8St
-        GOevS0VrCJIo1gPBKZjIRzYTt4Wv8PU24Svlrfeq2keb1a0vIWIZVi9UtKG2v/QFkvFUXhhY8oui/
-        gNdfuq+INIKSQfVl6/C4GkEz+FrA9nGYvpJCcXM3WTqlwZYpOK0SiaYA2a5rM96hUuvkJikGeEmV4
-        0Hksg6bQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jnkeg-0001Bn-C8; Tue, 23 Jun 2020 15:16:10 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9979230477A;
-        Tue, 23 Jun 2020 17:16:07 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8DE24234EBA61; Tue, 23 Jun 2020 17:16:07 +0200 (CEST)
-Date:   Tue, 23 Jun 2020 17:16:07 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@intel.com>,
+        id S1732982AbgFWPaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 11:30:14 -0400
+Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:5214 "EHLO
+        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732821AbgFWPaK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 11:30:10 -0400
+X-Greylist: delayed 427 seconds by postgrey-1.27 at vger.kernel.org; Tue, 23 Jun 2020 11:30:10 EDT
+Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none
+IronPort-SDR: /GrFiUnpMH0W1AmH16iOP4fF+hxzWdtD9D+GISmoRYqR9NUtqwq7oNSKz4sucvE9pe0J4q44B7
+ YPhx3w0bbMe7At7SPDagk+W+pBlnB3922l+qjz6SB7+59/ApAY01JpymxYxQB/94hJVnwwx0hu
+ mFWsCVB1OyWETH6EOQgYMgbq3BvnqklFn/9U3YmTb/P+RlHggHk+LCKhL2ufV+TQIExUPEF/c/
+ iBObNjUKWYetodeXq+AyoWV8QwqwHww4DnX12xwYBQL5sOXqBlQ7a5064JbCHOcBXl3kQZ+uQp
+ tKU=
+X-SBRS: 2.7
+X-MesageID: 20952771
+X-Ironport-Server: esa5.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.75,271,1589256000"; 
+   d="scan'208";a="20952771"
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Joerg Roedel <jroedel@suse.de>
+CC:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        "Dave Hansen" <dave.hansen@intel.com>,
         Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Mike Stunes <mstunes@vmware.com>,
+        "Mike Stunes" <mstunes@vmware.com>,
         Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
         Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
         kvm list <kvm@vger.kernel.org>,
@@ -50,12 +42,10 @@ Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
         Thomas Hellstrom <thellstrom@vmware.com>,
         Linux Virtualization <virtualization@lists.linux-foundation.org>,
         X86 ML <x86@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>
-Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
- from userspace)
-Message-ID: <20200623151607.GJ4817@hirez.programming.kicks-ass.net>
-References: <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20200425202316.GL21900@8bytes.org>
+ <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
+ <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
  <20200623094519.GF31822@suse.de>
  <20200623104559.GA4817@hirez.programming.kicks-ass.net>
  <20200623111107.GG31822@suse.de>
@@ -64,64 +54,69 @@ References: <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
  <20200623115014.GE4817@hirez.programming.kicks-ass.net>
  <20200623121237.GC14101@suse.de>
  <20200623130322.GH4817@hirez.programming.kicks-ass.net>
- <20200623144940.GE14101@suse.de>
+From:   Andrew Cooper <andrew.cooper3@citrix.com>
+Message-ID: <9e3f9b2a-505e-dfd7-c936-461227b4033e@citrix.com>
+Date:   Tue, 23 Jun 2020 16:22:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200623144940.GE14101@suse.de>
+In-Reply-To: <20200623130322.GH4817@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
+ AMSPEX02CL02.citrite.net (10.69.22.126)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 04:49:40PM +0200, Joerg Roedel wrote:
-> > We're talking about the 3rd case where the only reason things 'work' is
-> > because we'll have to panic():
-> > 
-> >  - #MC
-> 
-> Okay, #MC is special and can only be handled on a best-effort basis, as
-> #MC could happen anytime, also while already executing the #MC handler.
+On 23/06/2020 14:03, Peter Zijlstra wrote:
+> On Tue, Jun 23, 2020 at 02:12:37PM +0200, Joerg Roedel wrote:
+>> On Tue, Jun 23, 2020 at 01:50:14PM +0200, Peter Zijlstra wrote:
+>>> If SNP is the sole reason #VC needs to be IST, then I'd strongly urge
+>>> you to only make it IST if/when you try and make SNP happen, not before.
+>> It is not the only reason, when ES guests gain debug register support
+>> then #VC also needs to be IST, because #DB can be promoted into #VC
+>> then, and as #DB is IST for a reason, #VC needs to be too.
+> Didn't I read somewhere that that is only so for Rome/Naples but not for
+> the later chips (Milan) which have #DB pass-through?
 
-I think the hardware has a MCE-mask bit somewhere. Flaky though because
-clearing it isn't 'atomic' with IRET, so there's a 'funny' window.
+I don't know about hardware timelines, but some future part can now opt
+in to having debug registers as part of the encrypted state, and swapped
+by VMExit, which would make debug facilities generally usable, and
+supposedly safe to the #DB infinite loop issues, at which point the
+hypervisor need not intercept #DB for safety reasons.
 
-It also interacts really bad with the NMI handler. If we get an #MC
-early in the NMI, where we hard-rely on the NMI-mask being set to set-up
-the recursion stack, then the #MC IRET will clear the NMI-mask, and
-we're toast.
+Its worth nothing that on current parts, the hypervisor can set up debug
+facilities on behalf of the guest (or behind its back) as the DR state
+is unencrypted, but that attempting to intercept #DB will redirect to
+#VC inside the guest and cause fun. (Also spare a thought for 32bit
+kernels which have to cope with userspace singlestepping the SYSENTER
+path with every #DB turning into #VC.)
 
-Andy has wild and crazy ideas, but I don't think we need more crazy
-here.
+>> Besides that, I am not a fan of delegating problems I already see coming
+>> to future-Joerg and future-Peter, but if at all possible deal with them
+>> now and be safe later.
+> Well, we could just say no :-) At some point in the very near future
+> this house of cards is going to implode.
 
-#VC SNP has a similar problem vs NMI, that needs to die() irrespective
-of the #VC IST recursion.
+What currently exists is a picture of a house of cards in front of
+something which has fallen down.
 
-> >  - #DB with BUS LOCK DEBUG EXCEPTION
-> 
-> If I understand the problem correctly, this can be solved by moving off
-> the IST stack to the current task stack in the #DB handler, like I plan
-> to do for #VC, no?
+> Did someone forget to pass the 'ISTs are *EVIL*' memo to the hardware
+> folks? How come we're getting more and more of them?
 
-Hmm, probably. Would take a bit of care, but should be doable.
+I have tried to get this point across.  Then again - its far easier for
+the software folk in the same company as the hardware folk to make this
+point.
 
-> >  - #VC SNP
-> 
-> This has to panic for other reasons that can't be worked around. It
-> boils down to detecting that the HV is doing something fishy and bail
-> out to avoid further harm (like in the #MC handler).
+> (/me puts fingers
+> in ears and goes la-la-la-la in anticipation of Andrew mentioning CET)
 
-Right, but it doesn't take away that IST-any-time vectors are
-fundamentally screwy.
+I wasn't going to bring it up, but seeing as you have - while there are
+prohibitively-complicating issues preventing it from working on native,
+I don't see any point even considering it for the mess which is #VC, or
+the even bigger mess which is #HV.
 
-Both the MCE and NMI have masks that are, as per the above, differently
-funny, but the other ISTs do not. Also, even if they had masks, the
-interaction between them is still screwy.
-
-#VC would've been so much better if it would've had a mask bit
-somewhere, then at least we could've had the exception entry covered.
-Another #VC with the mask set should probably result in #DF or Shutdown,
-but that's all water under the bridge I suspect.
-
-
-
+~Andrew
