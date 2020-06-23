@@ -2,197 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEC77204FBB
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 12:58:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86E70205004
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 13:07:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732392AbgFWK6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 06:58:00 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54473 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732205AbgFWK6A (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 06:58:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592909878;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=871U1h3+VeTM+mW5/x+GAvCNAH6Zyntb3WnyFVChx4U=;
-        b=LbWuaGaUG2tPqEIiGcT3zxAoAHCwkJCM/HhCCOOsUjT7wodTrDP/0WUuTMlZi4KzqD0Y5k
-        c0C3oGCll6xkQqZmwTslfmgF1inwsb2eWYZN9vTkPcRr7j7RCzS8P2mwqOy9t9g3pWZQTq
-        bspkJet5Hjd42VY9BDPieliFKfzJFMg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-NLZ_d_CoP1SJkHR4F95puQ-1; Tue, 23 Jun 2020 06:57:54 -0400
-X-MC-Unique: NLZ_d_CoP1SJkHR4F95puQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBBD3805EE4
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 10:57:53 +0000 (UTC)
-Received: from starship (unknown [10.35.206.216])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B6F1D10013D2;
-        Tue, 23 Jun 2020 10:57:52 +0000 (UTC)
-Message-ID: <2bcd1344ad9c4871be1a02b93e01b0f9cabf3062.camel@redhat.com>
-Subject: Re: [PATCH v2] SVM: add test for nested guest RIP corruption
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue, 23 Jun 2020 13:57:51 +0300
-In-Reply-To: <20200623105207.149798-1-mlevitsk@redhat.com>
-References: <20200623105207.149798-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+        id S1732371AbgFWLHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 07:07:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732189AbgFWLHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 07:07:36 -0400
+Received: from casper.infradead.org (unknown [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAAE8C061573;
+        Tue, 23 Jun 2020 04:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4eAYveGOd5Gez3be6eH40cghw2s0xCHHy8CvDzPrHTA=; b=ua9bUxKgV6UuUKYXhlrAwvEA+M
+        JWMyWbeW4rCzaGNCKK8dur1jeln7leLjad6kn0qQtpEjgmKNWtFxZd7aFYNjSN+E2LtYgBR8ZfdC2
+        UZUcpLwpNSvy5cBKmWIEVq6w3lZjbeB+E1QK0vV9yhpGQU6WutF9uC7kROcxmox/0WbjhY9F95Y7i
+        R44TOUGibZYH1jJqDpxiGYXpstZlnEMCWDgYZdFoauoYsV4da0v+O79VK7jvOaUcf7wfVYLSrwJcJ
+        pu3eYomUVflopB7io2JVme0q9YdvUUDDhYCYum2qHANZwjKYdPEYfWkJiY4mjBiC0t3zhm02w+K8w
+        kZPZXtsw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jnglf-0006E2-Dh; Tue, 23 Jun 2020 11:07:07 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 56694303DA0;
+        Tue, 23 Jun 2020 13:07:06 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 437002370FA3D; Tue, 23 Jun 2020 13:07:06 +0200 (CEST)
+Date:   Tue, 23 Jun 2020 13:07:06 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Mike Stunes <mstunes@vmware.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Juergen Gross <JGross@suse.com>,
+        Jiri Slaby <jslaby@suse.cz>, Kees Cook <keescook@chromium.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        X86 ML <x86@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>
+Subject: Re: Should SEV-ES #VC use IST? (Re: [PATCH] Allow RDTSC and RDTSCP
+ from userspace)
+Message-ID: <20200623110706.GB4817@hirez.programming.kicks-ass.net>
+References: <20200425191032.GK21900@8bytes.org>
+ <910AE5B4-4522-4133-99F7-64850181FBF9@amacapital.net>
+ <20200425202316.GL21900@8bytes.org>
+ <CALCETrW2Y6UFC=zvGbXEYqpsDyBh0DSEM4NQ+L=_pp4aOd6Fuw@mail.gmail.com>
+ <CALCETrXGr+o1_bKbnre8cVY14c_76m8pEf3iB_i7h+zfgE5_jA@mail.gmail.com>
+ <20200428075512.GP30814@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200428075512.GP30814@suse.de>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2020-06-23 at 13:52 +0300, Maxim Levitsky wrote:
-> This adds a unit test for SVM nested register corruption that happened when
-> L0 was emulating an instruction, but then injecting an interrupt intercept to L1, which
-> lead it to give L1 vmexit handler stale (pre emulation) values of RAX,RIP and RSP.
+On Tue, Apr 28, 2020 at 09:55:12AM +0200, Joerg Roedel wrote:
+> On Mon, Apr 27, 2020 at 10:37:41AM -0700, Andy Lutomirski wrote:
+> > I have a somewhat serious question: should we use IST for #VC at all?
+> > As I understand it, Rome and Naples make it mandatory for hypervisors
+> > to intercept #DB, which means that, due to the MOV SS mess, it's sort
+> > of mandatory to use IST for #VC.  But Milan fixes the #DB issue, so,
+> > if we're running under a sufficiently sensible hypervisor, we don't
+> > need IST for #VC.
 > 
-> This test detects the RIP corruption (situation when RIP is at the start of
-> the emulated instruction but the instruction, was already executed.
+> The reason for #VC being IST is not only #DB, but also SEV-SNP. SNP adds
+> page ownership tracking between guest and host, so that the hypervisor
+> can't remap guest pages without the guest noticing.
 > 
-> The upstream commit that fixed this bug is b6162e82aef19fee9c32cb3fe9ac30d9116a8c73
->   KVM: nSVM: Preserve registers modifications done before nested_svm_vmexit()
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  x86/svm_tests.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 102 insertions(+)
-> 
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index c1abd55..202c829 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -1789,6 +1789,105 @@ static bool virq_inject_check(struct svm_test *test)
->      return get_test_stage(test) == 5;
->  }
->  
-> +/*
-> + * Detect nested guest RIP corruption as explained in kernel commit
-> + * b6162e82aef19fee9c32cb3fe9ac30d9116a8c73
-> + *
-> + * In the assembly loop below 'ins' is executed while IO instructions
-> + * are not intercepted; the instruction is emulated by L0.
-> +
-> + * At the same time we are getting interrupts from the local APIC timer,
-> + * and we do intercept them in L1
-> + *
-> + * If the interrupt happens on the insb instruction, L0 will VMexit, emulate
-> + * the insb instruction and then it will inject the interrupt to L1 through
-> + * a nested VMexit.  Due to a bug, it would leave pre-emulation values of RIP,
-> + * RAX and RSP in the VMCB.
-> + *
-> + * In our intercept handler we detect the bug by checking that RIP is that of
-> + * the insb instruction, but its memory operand has already been written.
-> + * This means that insb was already executed.
-> + */
-> +
-> +static volatile int isr_cnt = 0;
-> +static volatile uint8_t io_port_var = 0xAA;
-> +extern const char insb_instruction_label[];
-> +
-> +static void reg_corruption_isr(isr_regs_t *regs)
-> +{
-> +    isr_cnt++;
-> +    apic_write(APIC_EOI, 0);
-> +}
-> +
-> +static void reg_corruption_prepare(struct svm_test *test)
-> +{
-> +    default_prepare(test);
-> +    set_test_stage(test, 0);
-> +
-> +    vmcb->control.int_ctl = V_INTR_MASKING_MASK;
-> +    vmcb->control.intercept |= (1ULL << INTERCEPT_INTR);
-> +
-> +    handle_irq(TIMER_VECTOR, reg_corruption_isr);
-> +
-> +    /* set local APIC to inject external interrupts */
-> +    apic_write(APIC_TMICT, 0);
-> +    apic_write(APIC_TDCR, 0);
-> +    apic_write(APIC_LVTT, TIMER_VECTOR | APIC_LVT_TIMER_PERIODIC);
-> +    apic_write(APIC_TMICT, 1000);
-> +}
-> +
-> +static void reg_corruption_test(struct svm_test *test)
-> +{
-> +    /* this is endless loop, which is interrupted by the timer interrupt */
-> +    asm volatile (
-> +            "1:\n\t"
-> +            "movw $0x4d0, %%dx\n\t" // IO port
-> +            "lea %[_io_port_var], %%rdi\n\t"
-> +            "movb $0xAA, %[_io_port_var]\n\t"
-> +            "insb_instruction_label:\n\t"
-> +            "insb\n\t"
-> +            "jmp 1b\n\t"
-> +
-> +            : [_io_port_var] "=m" (io_port_var)
-> +            : /* no inputs*/
-> +            : "rdx", "rdi"
-> +    );
-> +}
-> +
-> +static bool reg_corruption_finished(struct svm_test *test)
-> +{
-> +    if (isr_cnt == 10000) {
-> +        report(true,
-> +               "No RIP corruption detected after %d timer interrupts",
-> +               isr_cnt);
-> +        set_test_stage(test, 1);
-> +        return true;
-> +    }
-> +
-> +    if (vmcb->control.exit_code == SVM_EXIT_INTR) {
-> +
-> +        void* guest_rip = (void*)vmcb->save.rip;
-> +
-> +        irq_enable();
-> +        asm volatile ("nop");
-> +        irq_disable();
-> +
-> +        if (guest_rip == insb_instruction_label && io_port_var != 0xAA) {
-> +            report(false,
-> +                   "RIP corruption detected after %d timer interrupts",
-> +                   isr_cnt);
-> +            return true;
-> +        }
-> +
-> +    }
-> +    return false;
-> +}
-> +
-> +static bool reg_corruption_check(struct svm_test *test)
-> +{
-> +    return get_test_stage(test) == 1;
-> +}
-> +
->  #define TEST(name) { #name, .v2 = name }
->  
->  /*
-> @@ -1950,6 +2049,9 @@ struct svm_test svm_tests[] = {
->      { "virq_inject", default_supported, virq_inject_prepare,
->        default_prepare_gif_clear, virq_inject_test,
->        virq_inject_finished, virq_inject_check },
-> +    { "reg_corruption", default_supported, reg_corruption_prepare,
-> +      default_prepare_gif_clear, reg_corruption_test,
-> +      reg_corruption_finished, reg_corruption_check },
->      TEST(svm_guest_state_test),
->      { NULL, NULL, NULL, NULL, NULL, NULL, NULL }
->  };
+> If there is a violation of ownership, which can happen at any memory
+> access, there will be a #VC exception to notify the guest. And as this
+> can happen anywhere, for example on a carefully crafted stack page set
+> by userspace before doing SYSCALL, the only robust choice for #VC is to
+> use IST.
 
-Oops, I see that you already applied the patch with the changes,
-so no need for this patch.
-Thanks!
+So what happens if this #VC triggers on the first access to the #VC
+stack, because the malicious host has craftily mucked with only the #VC
+IST stack page?
 
-Best regards,
-	Maxim Levitsky
+Or on the NMI IST stack, then we get #VC in NMI before the NMI can fix
+you up.
+
+AFAICT all of that is non-recoverable.
 
