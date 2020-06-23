@@ -2,108 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37ECE204A68
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 09:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69111204ABD
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 09:12:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731374AbgFWHBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 03:01:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33140 "EHLO
+        id S1731054AbgFWHMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 03:12:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52350 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730793AbgFWHBi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 03:01:38 -0400
+        with ESMTP id S1730957AbgFWHMN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 03:12:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592895696;
+        s=mimecast20190719; t=1592896332;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zy58zDIczPqYbbCU2I0rBDICf2p/vJOkTqkK2TZ8PAQ=;
-        b=a/BcGEsJWnDpN1L/CQe/esfPC5/4bR7k18k//Ent0/sbaJDZbznMdGNBfmwfyzBkcDXFzy
-        hAC8r2x60nKqPUAqI+NpVvSmCztawiShnkCUoHqvQkq3SXvGiNXHh6PWvAosDzZ79xGswF
-        AnhjAuWOOTYyawEeKQNiE5zY/s947aA=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-EjPkCuW4Nj-OEcefoHo50A-1; Tue, 23 Jun 2020 03:01:35 -0400
-X-MC-Unique: EjPkCuW4Nj-OEcefoHo50A-1
-Received: by mail-qt1-f198.google.com with SMTP id u26so14949420qtj.21
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 00:01:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zy58zDIczPqYbbCU2I0rBDICf2p/vJOkTqkK2TZ8PAQ=;
-        b=oxOW8vcfyRRFjHB4dZINojlRI15lJRpvdOUtreihxqPwTNbvUSH7XFpouDD2RCxRsc
-         SOibot4QoGs/n/YD8t78IsYFZAJEjXmoLiQYub4OZb+vYGzIj8D7Wm/oo9q5DMWJ3Fe/
-         74vSp/spsEI3+xi8js25jpNzRW0ClAUhNuDZOxWdU3tSlnd/4RZFT9nhRfYi7C4h7pe5
-         P+oeaRtUqcnP4y0t+oLczjfYma36DGVTwgM3l6str5exNwWp0QvcnKipAuJiaZ++ebkI
-         hQEURC0z3mkapcOp+3u6/S/ASAJoDrCXtYuEC5thRmEQbccD6ONaMG93rGig2TZ/EYQ8
-         RRwQ==
-X-Gm-Message-State: AOAM533/PXjFeEaN10hvLhSWATvbRLyV3BORrfKOK4a6wjPg7GEFmyMu
-        VNG3CZBow/klhk5ExaWBYoXzYY1isBvhftpjXdfRe46pEz+gmqy/rfc7t2GNCj1nWsl0k7wCvcg
-        0UHxsNu6SkECHF46AsCVYCtrjwLo/
-X-Received: by 2002:ae9:e841:: with SMTP id a62mr19452233qkg.497.1592895694369;
-        Tue, 23 Jun 2020 00:01:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyOZBN3nbHPtHiWYdDSxBqd0YcCYWHIzJTjzaFifnLqnQv36MEZ0ptTmo2xbqy/ajLlIIBFDzPj3siE/rmhtiE=
-X-Received: by 2002:ae9:e841:: with SMTP id a62mr19452207qkg.497.1592895693904;
- Tue, 23 Jun 2020 00:01:33 -0700 (PDT)
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=Kq31YiDTuTgmeHHPjKNn5ucynYXAog1IB/ZzgX6ZWRY=;
+        b=cbON1ThjMiRbVTh+4W/0KSHHb5iIqYnY87VShM6rarJPXvFNjFd0qzq4EdqmNlFIrWUF1j
+        k6q8mb8aw9rSxOywCaGzT2K66qFN48defgChBOufDI0F2zRkRp4KsrqZd5qgDy63aTORCS
+        jDPJUpIjsAJyIxrRm/mio8bU2qPhbIU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-282-FGRZ2h1DM1uHISPGJ_Shbg-1; Tue, 23 Jun 2020 03:12:08 -0400
+X-MC-Unique: FGRZ2h1DM1uHISPGJ_Shbg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CC7F801503;
+        Tue, 23 Jun 2020 07:12:07 +0000 (UTC)
+Received: from [10.36.113.187] (ovpn-113-187.ams2.redhat.com [10.36.113.187])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F156E71686;
+        Tue, 23 Jun 2020 07:12:04 +0000 (UTC)
+Subject: Re: [PATCH v9 2/2] s390/kvm: diagnose 0x318 sync and reset
+To:     Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
+References: <20200622154636.5499-1-walling@linux.ibm.com>
+ <20200622154636.5499-3-walling@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <9ac1d372-0de2-6eb0-c3b1-594e70512ab0@redhat.com>
+Date:   Tue, 23 Jun 2020 09:12:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-References: <20200611113404.17810-1-mst@redhat.com> <20200611113404.17810-3-mst@redhat.com>
- <0332b0cf-cf00-9216-042c-e870efa33626@redhat.com> <20200622115946-mutt-send-email-mst@kernel.org>
- <c56cc86d-a420-79ca-8420-e99db91980fa@redhat.com>
-In-Reply-To: <c56cc86d-a420-79ca-8420-e99db91980fa@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Tue, 23 Jun 2020 09:00:57 +0200
-Message-ID: <CAJaqyWc3C_Td_SpV97CuemkQH9vH+EL3sGgeWGE82E5gYxZNCA@mail.gmail.com>
-Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200622154636.5499-3-walling@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 23, 2020 at 4:51 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2020/6/23 =E4=B8=8A=E5=8D=8812:00, Michael S. Tsirkin wrote:
-> > On Wed, Jun 17, 2020 at 11:19:26AM +0800, Jason Wang wrote:
-> >> On 2020/6/11 =E4=B8=8B=E5=8D=887:34, Michael S. Tsirkin wrote:
-> >>>    static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
-> >>>    {
-> >>>     kfree(vq->descs);
-> >>> @@ -394,6 +400,9 @@ static long vhost_dev_alloc_iovecs(struct vhost_d=
-ev *dev)
-> >>>     for (i =3D 0; i < dev->nvqs; ++i) {
-> >>>             vq =3D dev->vqs[i];
-> >>>             vq->max_descs =3D dev->iov_limit;
-> >>> +           if (vhost_vq_num_batch_descs(vq) < 0) {
-> >>> +                   return -EINVAL;
-> >>> +           }
-> >> This check breaks vdpa which set iov_limit to zero. Consider iov_limit=
- is
-> >> meaningless to vDPA, I wonder we can skip the test when device doesn't=
- use
-> >> worker.
-> >>
-> >> Thanks
-> > It doesn't need iovecs at all, right?
-> >
-> > -- MST
->
->
-> Yes, so we may choose to bypass the iovecs as well.
->
-> Thanks
->
+On 22.06.20 17:46, Collin Walling wrote:
+> DIAGNOSE 0x318 (diag318) sets information regarding the environment
+> the VM is running in (Linux, z/VM, etc) and is observed via
+> firmware/service events.
+> 
+> This is a privileged s390x instruction that must be intercepted by
+> SIE. Userspace handles the instruction as well as migration. Data
+> is communicated via VCPU register synchronization.
+> 
+> The Control Program Name Code (CPNC) is stored in the SIE block. The
+> CPNC along with the Control Program Version Code (CPVC) are stored
+> in the kvm_vcpu_arch struct.
+> 
+> This data is reset on load normal and clear resets.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-I think that the kmalloc_array returns ZERO_SIZE_PTR for all of them
-in that case, so I didn't bother to skip the kmalloc_array parts.
-Would you prefer to skip them all and let them NULL? Or have I
-misunderstood what you mean?
+LGTM
 
-Thanks!
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Thanks,
+
+David / dhildenb
 
