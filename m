@@ -2,50 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 455BB204CD2
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:46:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4389E204CD9
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:47:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731819AbgFWIqE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 04:46:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35938 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731588AbgFWIqD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 04:46:03 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05N8Yt9u043045;
-        Tue, 23 Jun 2020 04:46:02 -0400
+        id S1731806AbgFWIrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 04:47:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28920 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731158AbgFWIrk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 04:47:40 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05N8YkdN059305;
+        Tue, 23 Jun 2020 04:47:38 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31uds01adp-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31ud982mp7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 04:46:01 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05N8YZc1042080;
-        Tue, 23 Jun 2020 04:46:01 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 31uds01ad5-1
+        Tue, 23 Jun 2020 04:47:38 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05N8XXJh054804;
+        Tue, 23 Jun 2020 04:47:37 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31ud982mnf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 04:46:01 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05N8g6Hj003497;
-        Tue, 23 Jun 2020 08:45:59 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma02fra.de.ibm.com with ESMTP id 31sa381vyu-1
+        Tue, 23 Jun 2020 04:47:37 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05N8eTRv030877;
+        Tue, 23 Jun 2020 08:47:36 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 31sa37vst1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Jun 2020 08:45:59 +0000
+        Tue, 23 Jun 2020 08:47:35 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05N8juho55705624
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05N8lXTR2490792
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Jun 2020 08:45:56 GMT
+        Tue, 23 Jun 2020 08:47:33 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6B3FD11C04C;
-        Tue, 23 Jun 2020 08:45:56 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2C0C211C054;
+        Tue, 23 Jun 2020 08:47:33 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DAE8311C050;
-        Tue, 23 Jun 2020 08:45:55 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 908B711C058;
+        Tue, 23 Jun 2020 08:47:32 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.187.217])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Jun 2020 08:45:55 +0000 (GMT)
+        Tue, 23 Jun 2020 08:47:32 +0000 (GMT)
 Subject: Re: [PATCH v9 2/2] s390/kvm: diagnose 0x318 sync and reset
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Thomas Huth <thuth@redhat.com>,
         Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
@@ -55,7 +56,7 @@ Cc:     pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
 References: <20200622154636.5499-1-walling@linux.ibm.com>
  <20200622154636.5499-3-walling@linux.ibm.com>
  <06bd4fde-ecdb-0795-bcab-e8f5fbabcd14@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+ <4387834c-7cd4-df50-294c-4f56aa14a089@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
  J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
@@ -99,23 +100,24 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <4387834c-7cd4-df50-294c-4f56aa14a089@de.ibm.com>
-Date:   Tue, 23 Jun 2020 10:45:55 +0200
+Message-ID: <a1bcfa5a-368a-cdef-9681-aff2deee2a42@de.ibm.com>
+Date:   Tue, 23 Jun 2020 10:47:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <06bd4fde-ecdb-0795-bcab-e8f5fbabcd14@redhat.com>
+In-Reply-To: <4387834c-7cd4-df50-294c-4f56aa14a089@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-06-23_04:2020-06-22,2020-06-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
- cotscore=-2147483648 clxscore=1015 mlxscore=0 bulkscore=0 mlxlogscore=999
- lowpriorityscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006230068
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 cotscore=-2147483648 mlxlogscore=999
+ lowpriorityscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ bulkscore=0 adultscore=0 suspectscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2006230064
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -123,87 +125,117 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 23.06.20 10:42, Thomas Huth wrote:
-> On 22/06/2020 17.46, Collin Walling wrote:
->> DIAGNOSE 0x318 (diag318) sets information regarding the environment
->> the VM is running in (Linux, z/VM, etc) and is observed via
->> firmware/service events.
->>
->> This is a privileged s390x instruction that must be intercepted by
->> SIE. Userspace handles the instruction as well as migration. Data
->> is communicated via VCPU register synchronization.
->>
->> The Control Program Name Code (CPNC) is stored in the SIE block. The
->> CPNC along with the Control Program Version Code (CPVC) are stored
->> in the kvm_vcpu_arch struct.
->>
->> This data is reset on load normal and clear resets.
->>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  arch/s390/include/asm/kvm_host.h |  4 +++-
->>  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
->>  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
->>  arch/s390/kvm/vsie.c             |  1 +
->>  include/uapi/linux/kvm.h         |  1 +
->>  5 files changed, 19 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index 3d554887794e..8bdf6f1607ca 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -260,7 +260,8 @@ struct kvm_s390_sie_block {
->>  	__u32	scaol;			/* 0x0064 */
->>  	__u8	sdf;			/* 0x0068 */
->>  	__u8    epdx;			/* 0x0069 */
->> -	__u8    reserved6a[2];		/* 0x006a */
->> +	__u8	cpnc;			/* 0x006a */
->> +	__u8	reserved6b;		/* 0x006b */
->>  	__u32	todpr;			/* 0x006c */
->>  #define GISA_FORMAT1 0x00000001
->>  	__u32	gd;			/* 0x0070 */
->> @@ -745,6 +746,7 @@ struct kvm_vcpu_arch {
->>  	bool gs_enabled;
->>  	bool skey_enabled;
->>  	struct kvm_s390_pv_vcpu pv;
->> +	union diag318_info diag318_info;
->>  };
->>  
->>  struct kvm_vm_stat {
->> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
->> index 436ec7636927..2ae1b660086c 100644
->> --- a/arch/s390/include/uapi/asm/kvm.h
->> +++ b/arch/s390/include/uapi/asm/kvm.h
->> @@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
->>  #define KVM_SYNC_GSCB   (1UL << 9)
->>  #define KVM_SYNC_BPBC   (1UL << 10)
->>  #define KVM_SYNC_ETOKEN (1UL << 11)
->> +#define KVM_SYNC_DIAG318 (1UL << 12)
->>  
->>  #define KVM_SYNC_S390_VALID_FIELDS \
->>  	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
->>  	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
->> -	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
->> +	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
->> +	 KVM_SYNC_DIAG318)
->>  
->>  /* length and alignment of the sdnx as a power of two */
->>  #define SDNXC 8
->> @@ -254,6 +256,7 @@ struct kvm_sync_regs {
->>  	__u64 pft;	/* pfault token [PFAULT] */
->>  	__u64 pfs;	/* pfault select [PFAULT] */
->>  	__u64 pfc;	/* pfault compare [PFAULT] */
->> +	__u64 diag318;	/* diagnose 0x318 info */
->>  	union {
->>  		__u64 vrs[32][2];	/* vector registers (KVM_SYNC_VRS) */
->>  		__u64 fprs[16];		/* fp registers (KVM_SYNC_FPRS) */
+On 23.06.20 10:45, Christian Borntraeger wrote:
 > 
-> It's been a while since I touched kvm_sync_regs the last time ... but
-> can your really extend this structure right in the middle without
-> breaking older user spaces (ie. QEMUs) ? This is a uapi header ... so I
-> think you rather have to add this add the end or e.g. put it into the
-> padding2 region or something like that...? Or do I miss something?
+> 
+> On 23.06.20 10:42, Thomas Huth wrote:
+>> On 22/06/2020 17.46, Collin Walling wrote:
+>>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
+>>> the VM is running in (Linux, z/VM, etc) and is observed via
+>>> firmware/service events.
+>>>
+>>> This is a privileged s390x instruction that must be intercepted by
+>>> SIE. Userspace handles the instruction as well as migration. Data
+>>> is communicated via VCPU register synchronization.
+>>>
+>>> The Control Program Name Code (CPNC) is stored in the SIE block. The
+>>> CPNC along with the Control Program Version Code (CPVC) are stored
+>>> in the kvm_vcpu_arch struct.
+>>>
+>>> This data is reset on load normal and clear resets.
+>>>
+>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>>>  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
+>>>  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
+>>>  arch/s390/kvm/vsie.c             |  1 +
+>>>  include/uapi/linux/kvm.h         |  1 +
+>>>  5 files changed, 19 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>>> index 3d554887794e..8bdf6f1607ca 100644
+>>> --- a/arch/s390/include/asm/kvm_host.h
+>>> +++ b/arch/s390/include/asm/kvm_host.h
+>>> @@ -260,7 +260,8 @@ struct kvm_s390_sie_block {
+>>>  	__u32	scaol;			/* 0x0064 */
+>>>  	__u8	sdf;			/* 0x0068 */
+>>>  	__u8    epdx;			/* 0x0069 */
+>>> -	__u8    reserved6a[2];		/* 0x006a */
+>>> +	__u8	cpnc;			/* 0x006a */
+>>> +	__u8	reserved6b;		/* 0x006b */
+>>>  	__u32	todpr;			/* 0x006c */
+>>>  #define GISA_FORMAT1 0x00000001
+>>>  	__u32	gd;			/* 0x0070 */
+>>> @@ -745,6 +746,7 @@ struct kvm_vcpu_arch {
+>>>  	bool gs_enabled;
+>>>  	bool skey_enabled;
+>>>  	struct kvm_s390_pv_vcpu pv;
+>>> +	union diag318_info diag318_info;
+>>>  };
+>>>  
+>>>  struct kvm_vm_stat {
+>>> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+>>> index 436ec7636927..2ae1b660086c 100644
+>>> --- a/arch/s390/include/uapi/asm/kvm.h
+>>> +++ b/arch/s390/include/uapi/asm/kvm.h
+>>> @@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
+>>>  #define KVM_SYNC_GSCB   (1UL << 9)
+>>>  #define KVM_SYNC_BPBC   (1UL << 10)
+>>>  #define KVM_SYNC_ETOKEN (1UL << 11)
+>>> +#define KVM_SYNC_DIAG318 (1UL << 12)
+>>>  
+>>>  #define KVM_SYNC_S390_VALID_FIELDS \
+>>>  	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
+>>>  	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
+>>> -	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
+>>> +	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
+>>> +	 KVM_SYNC_DIAG318)
+>>>  
+>>>  /* length and alignment of the sdnx as a power of two */
+>>>  #define SDNXC 8
+>>> @@ -254,6 +256,7 @@ struct kvm_sync_regs {
+>>>  	__u64 pft;	/* pfault token [PFAULT] */
+>>>  	__u64 pfs;	/* pfault select [PFAULT] */
+>>>  	__u64 pfc;	/* pfault compare [PFAULT] */
+>>> +	__u64 diag318;	/* diagnose 0x318 info */
+>>>  	union {
+>>>  		__u64 vrs[32][2];	/* vector registers (KVM_SYNC_VRS) */
+>>>  		__u64 fprs[16];		/* fp registers (KVM_SYNC_FPRS) */
+>>
+>> It's been a while since I touched kvm_sync_regs the last time ... but
+>> can your really extend this structure right in the middle without
+>> breaking older user spaces (ie. QEMUs) ? This is a uapi header ... so I
+>> think you rather have to add this add the end or e.g. put it into the
+>> padding2 region or something like that...? Or do I miss something?
+> 
+> Argh. You are right. It should go to the end and not in the middle. Will fixup.
+> 
 
-Argh. You are right. It should go to the end and not in the middle. Will fixup.
+Something like this on top. 
+
+diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+index 2ae1b660086c..7a6b14874d65 100644
+--- a/arch/s390/include/uapi/asm/kvm.h
++++ b/arch/s390/include/uapi/asm/kvm.h
+@@ -256,7 +256,6 @@ struct kvm_sync_regs {
+        __u64 pft;      /* pfault token [PFAULT] */
+        __u64 pfs;      /* pfault select [PFAULT] */
+        __u64 pfc;      /* pfault compare [PFAULT] */
+-       __u64 diag318;  /* diagnose 0x318 info */
+        union {
+                __u64 vrs[32][2];       /* vector registers (KVM_SYNC_VRS) */
+                __u64 fprs[16];         /* fp registers (KVM_SYNC_FPRS) */
+@@ -267,7 +266,8 @@ struct kvm_sync_regs {
+        __u8 reserved2 : 7;
+        __u8 padding1[51];      /* riccb needs to be 64byte aligned */
+        __u8 riccb[64];         /* runtime instrumentation controls block */
+-       __u8 padding2[192];     /* sdnx needs to be 256byte aligned */
++       __u64 diag318;          /* diagnose 0x318 info */
++       __u8 padding2[184];     /* sdnx needs to be 256byte aligned */
+        union {
+                __u8 sdnx[SDNXL];  /* state description annex */
+                struct {
+
 
