@@ -2,183 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 017E9204D31
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:58:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C7FC204D34
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 10:59:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731786AbgFWI62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 04:58:28 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32502 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731158AbgFWI61 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 04:58:27 -0400
+        id S1731885AbgFWI7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 04:59:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52521 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731758AbgFWI7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 04:59:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592902705;
+        s=mimecast20190719; t=1592902763;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=9KqTHczwitwsDmQMmizRhopAA0XrT1pemLfi2ghMEbY=;
-        b=GT7vdWBKdVX5YXGqsvq8ZnY0VNKRKmq8Aot7HLCq961KcmiDO+W9EwNac+pVDK5u8UbbFZ
-        MZHJXCJbuOOSkO3Zhsq5XiyZYKrHHmeQGZLuQKZBo6KrSLgVkYU7ZXSM15g8P4cGJze7v7
-        yhPfVuiRTvVnYnx1Jfe2pnYeH7fuNfg=
+         in-reply-to:in-reply-to:references:references;
+        bh=GmSiSTe5jRQCybzks4GiyZ26oQ9Db64kMPNmljxfAUo=;
+        b=MW0hA/5AIfRZ0mz9s3Pqn5YwxMF8JjYKetT3CSZh/guL0pdXkHJKKin3zmjmD37qdoQr0U
+        iFED/jTZYM1YhKFyzfsA7c+S1FFF5DX2g1uHm8JCI5AoXiK9C2+aMGVdH8HqYeILDq+wgk
+        BvXL2GiuOjPA1MlDbJpwMd/XA9LO/AY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-wGMApQJEN0qCHeOdaOEDHw-1; Tue, 23 Jun 2020 04:58:23 -0400
-X-MC-Unique: wGMApQJEN0qCHeOdaOEDHw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-189-g7mPeteWNNKxhttc1B8icA-1; Tue, 23 Jun 2020 04:59:19 -0400
+X-MC-Unique: g7mPeteWNNKxhttc1B8icA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D8A6804001;
-        Tue, 23 Jun 2020 08:58:22 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-170.ams2.redhat.com [10.36.112.170])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C638876114;
-        Tue, 23 Jun 2020 08:58:16 +0000 (UTC)
-Subject: Re: [PATCH v9 2/2] s390/kvm: diagnose 0x318 sync and reset
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     pbonzini@redhat.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-References: <20200622154636.5499-1-walling@linux.ibm.com>
- <20200622154636.5499-3-walling@linux.ibm.com>
- <06bd4fde-ecdb-0795-bcab-e8f5fbabcd14@redhat.com>
- <4387834c-7cd4-df50-294c-4f56aa14a089@de.ibm.com>
- <a1bcfa5a-368a-cdef-9681-aff2deee2a42@de.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <a90f723d-d425-5b3d-d87b-e124a6b55db6@redhat.com>
-Date:   Tue, 23 Jun 2020 10:58:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93A0F18A8220;
+        Tue, 23 Jun 2020 08:59:17 +0000 (UTC)
+Received: from localhost (ovpn-112-109.ams2.redhat.com [10.36.112.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 24FE47168D;
+        Tue, 23 Jun 2020 08:59:16 +0000 (UTC)
+Date:   Tue, 23 Jun 2020 09:59:15 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Andra Paraschiv <andraprs@amazon.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+Subject: Re: [PATCH v4 17/18] nitro_enclaves: Add overview documentation
+Message-ID: <20200623085915.GF32718@stefanha-x1.localdomain>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-18-andraprs@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <a1bcfa5a-368a-cdef-9681-aff2deee2a42@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200622200329.52996-18-andraprs@amazon.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="sDKAb4OeUBrWWL6P"
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/2020 10.47, Christian Borntraeger wrote:
-> 
-> 
-> On 23.06.20 10:45, Christian Borntraeger wrote:
->>
->>
->> On 23.06.20 10:42, Thomas Huth wrote:
->>> On 22/06/2020 17.46, Collin Walling wrote:
->>>> DIAGNOSE 0x318 (diag318) sets information regarding the environment
->>>> the VM is running in (Linux, z/VM, etc) and is observed via
->>>> firmware/service events.
->>>>
->>>> This is a privileged s390x instruction that must be intercepted by
->>>> SIE. Userspace handles the instruction as well as migration. Data
->>>> is communicated via VCPU register synchronization.
->>>>
->>>> The Control Program Name Code (CPNC) is stored in the SIE block. The
->>>> CPNC along with the Control Program Version Code (CPVC) are stored
->>>> in the kvm_vcpu_arch struct.
->>>>
->>>> This data is reset on load normal and clear resets.
->>>>
->>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->>>> ---
->>>>  arch/s390/include/asm/kvm_host.h |  4 +++-
->>>>  arch/s390/include/uapi/asm/kvm.h |  5 ++++-
->>>>  arch/s390/kvm/kvm-s390.c         | 11 ++++++++++-
->>>>  arch/s390/kvm/vsie.c             |  1 +
->>>>  include/uapi/linux/kvm.h         |  1 +
->>>>  5 files changed, 19 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->>>> index 3d554887794e..8bdf6f1607ca 100644
->>>> --- a/arch/s390/include/asm/kvm_host.h
->>>> +++ b/arch/s390/include/asm/kvm_host.h
->>>> @@ -260,7 +260,8 @@ struct kvm_s390_sie_block {
->>>>  	__u32	scaol;			/* 0x0064 */
->>>>  	__u8	sdf;			/* 0x0068 */
->>>>  	__u8    epdx;			/* 0x0069 */
->>>> -	__u8    reserved6a[2];		/* 0x006a */
->>>> +	__u8	cpnc;			/* 0x006a */
->>>> +	__u8	reserved6b;		/* 0x006b */
->>>>  	__u32	todpr;			/* 0x006c */
->>>>  #define GISA_FORMAT1 0x00000001
->>>>  	__u32	gd;			/* 0x0070 */
->>>> @@ -745,6 +746,7 @@ struct kvm_vcpu_arch {
->>>>  	bool gs_enabled;
->>>>  	bool skey_enabled;
->>>>  	struct kvm_s390_pv_vcpu pv;
->>>> +	union diag318_info diag318_info;
->>>>  };
->>>>  
->>>>  struct kvm_vm_stat {
->>>> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
->>>> index 436ec7636927..2ae1b660086c 100644
->>>> --- a/arch/s390/include/uapi/asm/kvm.h
->>>> +++ b/arch/s390/include/uapi/asm/kvm.h
->>>> @@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
->>>>  #define KVM_SYNC_GSCB   (1UL << 9)
->>>>  #define KVM_SYNC_BPBC   (1UL << 10)
->>>>  #define KVM_SYNC_ETOKEN (1UL << 11)
->>>> +#define KVM_SYNC_DIAG318 (1UL << 12)
->>>>  
->>>>  #define KVM_SYNC_S390_VALID_FIELDS \
->>>>  	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
->>>>  	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
->>>> -	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
->>>> +	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \
->>>> +	 KVM_SYNC_DIAG318)
->>>>  
->>>>  /* length and alignment of the sdnx as a power of two */
->>>>  #define SDNXC 8
->>>> @@ -254,6 +256,7 @@ struct kvm_sync_regs {
->>>>  	__u64 pft;	/* pfault token [PFAULT] */
->>>>  	__u64 pfs;	/* pfault select [PFAULT] */
->>>>  	__u64 pfc;	/* pfault compare [PFAULT] */
->>>> +	__u64 diag318;	/* diagnose 0x318 info */
->>>>  	union {
->>>>  		__u64 vrs[32][2];	/* vector registers (KVM_SYNC_VRS) */
->>>>  		__u64 fprs[16];		/* fp registers (KVM_SYNC_FPRS) */
->>>
->>> It's been a while since I touched kvm_sync_regs the last time ... but
->>> can your really extend this structure right in the middle without
->>> breaking older user spaces (ie. QEMUs) ? This is a uapi header ... so I
->>> think you rather have to add this add the end or e.g. put it into the
->>> padding2 region or something like that...? Or do I miss something?
->>
->> Argh. You are right. It should go to the end and not in the middle. Will fixup.
->>
-> 
-> Something like this on top. 
-> 
-> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
-> index 2ae1b660086c..7a6b14874d65 100644
-> --- a/arch/s390/include/uapi/asm/kvm.h
-> +++ b/arch/s390/include/uapi/asm/kvm.h
-> @@ -256,7 +256,6 @@ struct kvm_sync_regs {
->         __u64 pft;      /* pfault token [PFAULT] */
->         __u64 pfs;      /* pfault select [PFAULT] */
->         __u64 pfc;      /* pfault compare [PFAULT] */
-> -       __u64 diag318;  /* diagnose 0x318 info */
->         union {
->                 __u64 vrs[32][2];       /* vector registers (KVM_SYNC_VRS) */
->                 __u64 fprs[16];         /* fp registers (KVM_SYNC_FPRS) */
-> @@ -267,7 +266,8 @@ struct kvm_sync_regs {
->         __u8 reserved2 : 7;
->         __u8 padding1[51];      /* riccb needs to be 64byte aligned */
->         __u8 riccb[64];         /* runtime instrumentation controls block */
-> -       __u8 padding2[192];     /* sdnx needs to be 256byte aligned */
-> +       __u64 diag318;          /* diagnose 0x318 info */
-> +       __u8 padding2[184];     /* sdnx needs to be 256byte aligned */
->         union {
->                 __u8 sdnx[SDNXL];  /* state description annex */
->                 struct {
+--sDKAb4OeUBrWWL6P
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Ack!
+On Mon, Jun 22, 2020 at 11:03:28PM +0300, Andra Paraschiv wrote:
+> +The kernel bzImage, the kernel command line, the ramdisk(s) are part of the
+> +Enclave Image Format (EIF); plus an EIF header including metadata such as magic
+> +number, eif version, image size and CRC.
+> +
+> +Hash values are computed for the entire enclave image (EIF), the kernel and
+> +ramdisk(s). That's used, for example, to check that the enclave image that is
+> +loaded in the enclave VM is the one that was intended to be run.
+> +
+> +These crypto measurements are included in a signed attestation document
+> +generated by the Nitro Hypervisor and further used to prove the identity of the
+> +enclave; KMS is an example of service that NE is integrated with and that checks
+> +the attestation doc.
+> +
+> +The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB. The
+> +init process in the enclave connects to the vsock CID of the primary VM and a
+> +predefined port - 9000 - to send a heartbeat value - 0xb7. This mechanism is
+> +used to check in the primary VM that the enclave has booted.
+> +
+> +If the enclave VM crashes or gracefully exits, an interrupt event is received by
+> +the NE driver. This event is sent further to the user space enclave process
+> +running in the primary VM via a poll notification mechanism. Then the user space
+> +enclave process can exit.
+> +
+> +[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+> +[2] https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
+> +[3] https://lwn.net/Articles/807108/
+> +[4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
+> +[5] https://man7.org/linux/man-pages/man7/vsock.7.html
 
- Thomas
+Is the EIF specification and the attestation protocol available?
+
+Stefan
+
+--sDKAb4OeUBrWWL6P
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl7xxGMACgkQnKSrs4Gr
+c8ilQAgAySyG/iUuzEfDma7s6a9gpS3VSxdadu7D4zfWtsotaQR3ZIiAzSHXAIXt
+3YDUtxYWfz7HHHTtch14TrQkXYlpuWMshTNgMCq552345hWPBDwWQqtX6yxbQrlo
+1AFvwLmLuebUyOWzxumR5gIOvspTEyqa90WFlY8uY4DoFPX/uCSvblGCt134IJKk
+vA2iWwXW2CBMTztmYSw1ia7cBhVb5digZI1+NGSrw7VWhGaSswu6THsuY1R/qasW
+kPA3CwnBDQEK4EoC/x21bsFm3q0mczumiMqwDhnXk1MpPSbV90wdpxGeG41ixZ5H
+p6U7rD60bV08qx/MwjSsA8KnumbzJg==
+=Az/F
+-----END PGP SIGNATURE-----
+
+--sDKAb4OeUBrWWL6P--
 
