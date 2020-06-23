@@ -2,106 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2457204EB1
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 12:01:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2674204ED4
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 12:09:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732271AbgFWKB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 06:01:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20732 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732056AbgFWKB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 06:01:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592906485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IQEOlaY8lxWBLhrq3UdUAQbRpH9mXTgZnwUd3lDN5GM=;
-        b=DL2Ro76oByhd4hbudVqp72gyHK0ATINEnbr4w3zCl0b2Nl7JX/J+nPAZwJXwwcDzvuU85L
-        0XDqRR9vZGN6dwHEYOpS0ZWaX4x5vjZwkej+3EkLB8KtGQUNec6Jf3H7EdO6CCMNkwL0mu
-        5LIzdhfCj4CutolLeEFk74GUUm+mZ4U=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-Lhecx49UMrCX-LY6Vqqp2Q-1; Tue, 23 Jun 2020 06:01:24 -0400
-X-MC-Unique: Lhecx49UMrCX-LY6Vqqp2Q-1
-Received: by mail-wm1-f72.google.com with SMTP id h25so2008964wmb.0
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 03:01:23 -0700 (PDT)
+        id S1732236AbgFWKJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 06:09:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732135AbgFWKJT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 06:09:19 -0400
+Received: from mail-oi1-x243.google.com (mail-oi1-x243.google.com [IPv6:2607:f8b0:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C398C061755
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 03:09:19 -0700 (PDT)
+Received: by mail-oi1-x243.google.com with SMTP id d67so18333960oig.6
+        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 03:09:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rU2hdhGD7fNtW6Y+12AGojPtiGkpRBwEsJIOODw6oSk=;
+        b=pCU7BT0tDtwCvaiAm4xPhpb1ZoO7AvlAMIiGWxQqFb9kiDu3fiYmT+Y1yteEWeSc8M
+         N1dfj19zTPci8X2KQTYhNOI719d7om5Q3LDRcDayt/Or/0DdPiNQ/Yu2eFHh7B9bQAk/
+         yhZILXAelpJfhCF34X76NuMC0NO+V2pFFftCrfwqJ/DNjQ7EzfIAYp21TpEW3BncSE2u
+         ADuFCObQQiM6P0oROGxUywcr1Xmu6rKUJ6P/+pTuhSyUWRhVizBeUVr3R7/6w9hGV40t
+         t/q9hOcDfwTdpaOkVqoy+jWDDyPuLd1gcisny5nVn5726xXHQfo6b6FjfE1K4dSGIqJ/
+         7rUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IQEOlaY8lxWBLhrq3UdUAQbRpH9mXTgZnwUd3lDN5GM=;
-        b=JWqjjPq3r2icWGvuPVvUmo/w8nFCQe+fkRPxzJ+vaKJEkwdc2kyqGi1De1+TXfU+j0
-         pWG0+lTStVtBj1qGKz5cr3R7b4Yb+BUEmRBFDOoUfpp0wo2QE2mMm1NCDSQeGUHx+jmS
-         zviOJSggxvTX5dV9zBUaFF7ZP19Agq1A6iJNarShvG7piBeY3INC4PVdYneGc7zDLPCs
-         O9QdPDcVcbOr+TW97acYyqZ+A6uRebH9sWuWL89nLxRtl8oyEbAxg1jTQlWMHTSt2zhR
-         +hNXSQ0jFPkjq9bgUcs7z2VOWFb5hR72h0ChxDfe8RnLVp32hmfDlqoI1LtvbY2zHnoq
-         5unw==
-X-Gm-Message-State: AOAM533/+62ruLx2H71+bptAM0g+xQ9yb3LgWXEfqPXpIxKr4cMpKSUm
-        inbaHEstOV7pDOP33L62sE/snqihs68K3sdHtiUctHyydcR4YV59qtVi+k7IzrbU9yUR3q0YKs5
-        pKM06p22g5l8h
-X-Received: by 2002:a1c:7fd7:: with SMTP id a206mr15910104wmd.104.1592906482794;
-        Tue, 23 Jun 2020 03:01:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyfjQfcrfEvAiyMmTmFbpV5259IlrHhUHT8iGhKenG96MPP3HDlHdZJMiu3eN2Qsh/PdP0hPQ==
-X-Received: by 2002:a1c:7fd7:: with SMTP id a206mr15910080wmd.104.1592906482548;
-        Tue, 23 Jun 2020 03:01:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:24f5:23b:4085:b879? ([2001:b07:6468:f312:24f5:23b:4085:b879])
-        by smtp.gmail.com with ESMTPSA id z16sm12335961wrr.35.2020.06.23.03.01.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jun 2020 03:01:21 -0700 (PDT)
-Subject: Re: [PATCH] KVM: VMX: Remove vcpu_vmx's defunct copy of host_pkru
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200617034123.25647-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <49c2b03c-900b-864f-2eae-770068908ad9@redhat.com>
-Date:   Tue, 23 Jun 2020 12:01:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rU2hdhGD7fNtW6Y+12AGojPtiGkpRBwEsJIOODw6oSk=;
+        b=iNIjT2M8pbX2dbpnGi+1OMpgduSkM3bdMAnGBWFQqMq50mEvGEKJBd4C3UdxtjXt0i
+         V2mhaw4+Sxr3vULbUnP6f6ubsOfVamhEuAeIouGxfYnPDN3sTpvfy8tL6UhpveyWgVDg
+         bp8s0EynIHHYXm6yaLxTXoqd/WAbhX4+9waNSiw+xwJ4wh/zoacDEFqncUBYUFrRm6rj
+         inHnaVimklOMY+FL5/LTesssA/VqOidLUbXQlZDmG0j4N6mmX9XBL/ZjPg2x8HX/PB1Q
+         TJii9jIi67bDR/AT3k4XVoV9V6uiKAb9LnDRMVyUVRAhNPulCw9imcaayBGT3G6l9mSN
+         mJUw==
+X-Gm-Message-State: AOAM532fC2/HNE8vD3iitIj/RSNbgEP7jB1wuF0DblZ1YA38BVkuGfQ8
+        4Dt6WSDpRV+75w/3eGkqy+K9+ih7hrWUQctW/JpD/g==
+X-Google-Smtp-Source: ABdhPJyLbqT3YNW3hb8nC+z6sAupP/viLWv3tDVCgY+urTIUfRq5q9195OLwSA9zcAZDtENjTwGGr82qLFRD3gKojPU=
+X-Received: by 2002:aca:530e:: with SMTP id h14mr15692305oib.172.1592906958117;
+ Tue, 23 Jun 2020 03:09:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200617034123.25647-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <000000000000c25ce105a8a8fcd9@google.com> <20200622094923.GP576888@hirez.programming.kicks-ass.net>
+ <20200623124413.08b2bd65@canb.auug.org.au> <20200623093230.GD4781@hirez.programming.kicks-ass.net>
+In-Reply-To: <20200623093230.GD4781@hirez.programming.kicks-ass.net>
+From:   Marco Elver <elver@google.com>
+Date:   Tue, 23 Jun 2020 12:09:06 +0200
+Message-ID: <CANpmjNOeN=m5i-kEn-no5d3zUdAKv=gLidEENtgQCo5umNTSjw@mail.gmail.com>
+Subject: Re: linux-next build error (9)
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        syzbot <syzbot+dbf8cf3717c8ef4a90a0@syzkaller.appspotmail.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>, joro@8bytes.org,
+        kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        sean.j.christopherson@intel.com,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>, vkuznets@redhat.com,
+        wanpengli@tencent.com, "the arch/x86 maintainers" <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/06/20 05:41, Sean Christopherson wrote:
-> Remove vcpu_vmx.host_pkru, which got left behind when PKRU support was
-> moved to common x86 code.
-> 
-> No functional change intended.
-> 
-> Fixes: 37486135d3a7b ("KVM: x86: Fix pkru save/restore when guest CR4.PKE=0, move it to x86.c")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 8a83b5edc820..639798e4a6ca 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -288,8 +288,6 @@ struct vcpu_vmx {
->  
->  	u64 current_tsc_ratio;
->  
-> -	u32 host_pkru;
-> -
->  	unsigned long host_debugctlmsr;
->  
->  	/*
-> 
+On Tue, 23 Jun 2020 at 11:32, Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> On Tue, Jun 23, 2020 at 12:44:13PM +1000, Stephen Rothwell wrote:
+> > Hi Peter,
+> >
+> > On Mon, 22 Jun 2020 11:49:23 +0200 Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> > > Hurmph, I though that was cured in GCC >= 8. Marco?
+> >
+> > So what causes this? Because we got a couple of these in our s390 builds last night as well.
+>
+> This is KASAN's __no_sanitize_address function attribute. Some GCC
+> versions are utterly wrecked when that function attribute is combined
+> with inlining. It wants to have matching attributes for the function
+> being inlined and function it is inlined into -- hence the function
+> attribute mismatch.
+>
+> > kernel/locking/lockdep.c:805:1: error: inlining failed in call to always_inline 'look_up_lock_class': function attribute mismatch
+> > include/linux/debug_locks.h:15:28: error: inlining failed in call to always_inline '__debug_locks_off': function attribute mismatch
+> >
+> > s390-linux-gcc (GCC) 8.1.0 / GNU ld (GNU Binutils) 2.30
+>
+> *groan*... So supposedly it was supposed to work on GCC-8 and later, see
+> commit 7b861a53e46b6. But now it turns out there's some later versions
+> that fail too.
+>
+> I suppose the next quest is finding a s390 compiler version that works
+> and then bumping the version test in the aforementioned commit.
 
-Queued, thanks.
+ I'm trying to figure out by inspecting GCC changelogs which version
+and which arch is actually good.
 
-Paolo
-
+Thanks,
+-- Marco
