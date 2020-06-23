@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E26B9205BD9
-	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 21:35:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76008205BE0
+	for <lists+kvm@lfdr.de>; Tue, 23 Jun 2020 21:36:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387513AbgFWTfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 15:35:46 -0400
-Received: from mga11.intel.com ([192.55.52.93]:11007 "EHLO mga11.intel.com"
+        id S2387563AbgFWTf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 15:35:59 -0400
+Received: from mga11.intel.com ([192.55.52.93]:11008 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387430AbgFWTfo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 15:35:44 -0400
-IronPort-SDR: sJ9sRrvxb1h5Okc9pcBYB6agzuUxgWFnBl5k//utyzCFXv1OdBKibJm+1+i3gUy5SWrC7W9i6J
- im2bQ1BqbqXg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="142430969"
+        id S2387502AbgFWTfp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 15:35:45 -0400
+IronPort-SDR: Q8lFbMZ7xy/EiJM7FIaf9pBZPtH7Qibg9eiEH/x0dP3ijrnUGLhZRKhUOPJoEXnqf0RfhrQocD
+ 7xW6KTslSi7w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="142430971"
 X-IronPort-AV: E=Sophos;i="5.75,272,1589266800"; 
-   d="scan'208";a="142430969"
+   d="scan'208";a="142430971"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
   by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 12:35:44 -0700
-IronPort-SDR: f/IL09ce9Xl12I9sC84qWOGB+ALwlnlDkcqdbVGwKzExiEQfaqkLOU6xbOyYA/jWnWsc4Xx629
- B2L/gsVdejgQ==
+IronPort-SDR: paQmTNzGnJBumOT+MUhvZ2x9BWmJndGmv2BbB6jitFmvWqLuje/y2u830LNVT9ST0JZj0z1O4/
+ I5V00FXetfBw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,272,1589266800"; 
-   d="scan'208";a="263428289"
+   d="scan'208";a="263428292"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.152])
   by fmsmga007.fm.intel.com with ESMTP; 23 Jun 2020 12:35:43 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -35,9 +35,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/4] KVM: x86/mmu: Don't put invalid SPs back on the list of active pages
-Date:   Tue, 23 Jun 2020 12:35:39 -0700
-Message-Id: <20200623193542.7554-2-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 2/4] KVM: x86/mmu: Batch zap MMU pages when recycling oldest pages
+Date:   Tue, 23 Jun 2020 12:35:40 -0700
+Message-Id: <20200623193542.7554-3-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.26.0
 In-Reply-To: <20200623193542.7554-1-sean.j.christopherson@intel.com>
 References: <20200623193542.7554-1-sean.j.christopherson@intel.com>
@@ -48,79 +48,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Delete a shadow page from the invalidation list instead of throwing it
-back on the list of active pages when it's a root shadow page with
-active users.  Invalid active root pages will be explicitly freed by
-mmu_free_root_page() when the root_count hits zero, i.e. they don't need
-to be put on the active list to avoid leakage.
-
-Use sp->role.invalid to detect that a shadow page has already been
-zapped, i.e. is not on a list.
-
-WARN if an invalid page is encountered when zapping pages, as it should
-now be impossible.
+Collect MMU pages for zapping in a loop when making MMU pages available,
+and skip over active roots when doing so as zapping an active root can
+never immediately free up a page.  Batching the zapping avoids multiple
+remote TLB flushes and remedies the issue where the loop would bail
+early if an active root was encountered.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 58 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 42 insertions(+), 16 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3dd0af7e7515..8e7df4ed4b55 100644
+index 8e7df4ed4b55..8c85a3a178f4 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2757,10 +2757,23 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 	if (!sp->root_count) {
- 		/* Count self */
- 		(*nr_zapped)++;
--		list_move(&sp->link, invalid_list);
+@@ -2838,20 +2838,51 @@ static bool prepare_zap_oldest_mmu_page(struct kvm *kvm,
+ 	return kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
+ }
+ 
++static unsigned long kvm_mmu_zap_oldest_mmu_pages(struct kvm *kvm,
++						  unsigned long nr_to_zap)
++{
++	unsigned long total_zapped = 0;
++	struct kvm_mmu_page *sp, *tmp;
++	LIST_HEAD(invalid_list);
++	bool unstable;
++	int nr_zapped;
 +
++	if (list_empty(&kvm->arch.active_mmu_pages))
++		return 0;
++
++restart:
++	list_for_each_entry_safe(sp, tmp, &kvm->arch.active_mmu_pages, link) {
 +		/*
-+		 * Already invalid pages (previously active roots) are not on
-+		 * the active page list.  See list_del() in the "else" case of
-+		 * !sp->root_count.
++		 * Don't zap active root pages, the page itself can't be freed
++		 * and zapping it will just force vCPUs to realloc and reload.
 +		 */
-+		if (sp->role.invalid)
-+			list_add(&sp->link, invalid_list);
-+		else
-+			list_move(&sp->link, invalid_list);
- 		kvm_mod_used_mmu_pages(kvm, -1);
- 	} else {
--		list_move(&sp->link, &kvm->arch.active_mmu_pages);
-+		/*
-+		 * Remove the active root from the active page list, the root
-+		 * will be explicitly freed when the root_count hits zero.
-+		 */
-+		list_del(&sp->link);
++		if (sp->root_count)
++			continue;
++
++		unstable = __kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list,
++						      &nr_zapped);
++		total_zapped += nr_zapped;
++		if (total_zapped >= nr_to_zap)
++			break;
++
++		if (unstable)
++			goto restart;
++	}
++
++	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++
++	kvm->stat.mmu_recycled += total_zapped;
++	return total_zapped;
++}
++
+ static int make_mmu_pages_available(struct kvm_vcpu *vcpu)
+ {
+-	LIST_HEAD(invalid_list);
++	unsigned long avail = kvm_mmu_available_pages(vcpu->kvm);
  
- 		/*
- 		 * Obsolete pages cannot be used on any vCPUs, see the comment
-@@ -5727,12 +5740,11 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
- 			break;
+-	if (likely(kvm_mmu_available_pages(vcpu->kvm) >= KVM_MIN_FREE_MMU_PAGES))
++	if (likely(avail >= KVM_MIN_FREE_MMU_PAGES))
+ 		return 0;
  
- 		/*
--		 * Skip invalid pages with a non-zero root count, zapping pages
--		 * with a non-zero root count will never succeed, i.e. the page
--		 * will get thrown back on active_mmu_pages and we'll get stuck
--		 * in an infinite loop.
-+		 * Invalid pages should never land back on the list of active
-+		 * pages.  Skip the bogus page, otherwise we'll get stuck in an
-+		 * infinite loop if the page gets put back on the list (again).
- 		 */
--		if (sp->role.invalid && sp->root_count)
-+		if (WARN_ON(sp->role.invalid))
- 			continue;
+-	while (kvm_mmu_available_pages(vcpu->kvm) < KVM_REFILL_PAGES) {
+-		if (!prepare_zap_oldest_mmu_page(vcpu->kvm, &invalid_list))
+-			break;
+-
+-		++vcpu->kvm->stat.mmu_recycled;
+-	}
+-	kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
++	kvm_mmu_zap_oldest_mmu_pages(vcpu->kvm, KVM_REFILL_PAGES - avail);
  
- 		/*
-@@ -6010,7 +6022,7 @@ void kvm_mmu_zap_all(struct kvm *kvm)
+ 	if (!kvm_mmu_available_pages(vcpu->kvm))
+ 		return -ENOSPC;
+@@ -2864,17 +2895,12 @@ static int make_mmu_pages_available(struct kvm_vcpu *vcpu)
+  */
+ void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long goal_nr_mmu_pages)
+ {
+-	LIST_HEAD(invalid_list);
+-
  	spin_lock(&kvm->mmu_lock);
- restart:
- 	list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
--		if (sp->role.invalid && sp->root_count)
-+		if (WARN_ON(sp->role.invalid))
- 			continue;
- 		if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
- 			goto restart;
+ 
+ 	if (kvm->arch.n_used_mmu_pages > goal_nr_mmu_pages) {
+-		/* Need to free some mmu pages to achieve the goal. */
+-		while (kvm->arch.n_used_mmu_pages > goal_nr_mmu_pages)
+-			if (!prepare_zap_oldest_mmu_page(kvm, &invalid_list))
+-				break;
++		kvm_mmu_zap_oldest_mmu_pages(kvm, kvm->arch.n_used_mmu_pages -
++						  goal_nr_mmu_pages);
+ 
+-		kvm_mmu_commit_zap_page(kvm, &invalid_list);
+ 		goal_nr_mmu_pages = kvm->arch.n_used_mmu_pages;
+ 	}
+ 
 -- 
 2.26.0
 
