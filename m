@@ -2,148 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8684A2067C5
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 01:00:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 301F120691B
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 02:40:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387779AbgFWXAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 19:00:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48826 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387606AbgFWXAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 19:00:35 -0400
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59AE2C061573;
-        Tue, 23 Jun 2020 16:00:35 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 49s1vy3D5Wz9s1x;
-        Wed, 24 Jun 2020 09:00:30 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1592953233;
-        bh=KPI3aAUIMWOgw1b5tXl9B51uLxeA81au0UgltAmeN6U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=EkIXFub/WzsMZ+H1Ralc3gj/qmMIfcAtcnviBfxlxctDYfwGaiNZnImNIIO63lYY5
-         Dr1FQGblvHue0YFe8kEV6C/vmiPDk6ZhxybbP5QqsPKjAAY7VToPXAmJUHWxv//ne7
-         iyKvfBpH1KAZev3MfY6XqZLv5Us2toeZ8vZaVYLDuuaE+3LVaFjKKQ1axbEyRKO5Bn
-         SpTbpmTuK23m+NQVA6Cx6byInmz0Ovxg76eVYqEOf5hrN1UvO/LFAE9TLcYmL3SpF1
-         t8p5Cvuh6aSWAPmMdWY7mkJUUzQkK9qNMYFJZWmTV9vQAxxTr1Fj0S9CIRTv2WWtn2
-         9Mg8HrmvY4f8Q==
-Date:   Wed, 24 Jun 2020 09:00:29 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Marco Elver <elver@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        syzbot <syzbot+dbf8cf3717c8ef4a90a0@syzkaller.appspotmail.com>,
-        bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-next@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Subject: Re: linux-next build error (9)
-Message-ID: <20200624090029.5fa2dc1f@canb.auug.org.au>
-In-Reply-To: <20200623112448.GA208112@elver.google.com>
-References: <000000000000c25ce105a8a8fcd9@google.com>
-        <20200622094923.GP576888@hirez.programming.kicks-ass.net>
-        <20200623124413.08b2bd65@canb.auug.org.au>
-        <20200623093230.GD4781@hirez.programming.kicks-ass.net>
-        <20200623201730.6c085687@canb.auug.org.au>
-        <20200623112448.GA208112@elver.google.com>
+        id S2387899AbgFXAkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 20:40:17 -0400
+Received: from mga05.intel.com ([192.55.52.43]:5063 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387586AbgFXAkR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jun 2020 20:40:17 -0400
+IronPort-SDR: qTpRyEPjTfSu2eBUZYRGqgxCVIIFpMVDv12Wxua2ksdPaWEFQtZ10ESRWEL25e+tDTPh7A9wj0
+ XHBMmwQDHOWQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="228964118"
+X-IronPort-AV: E=Sophos;i="5.75,273,1589266800"; 
+   d="scan'208";a="228964118"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 17:40:16 -0700
+IronPort-SDR: 4rbmInvG3yqk+WGpQtfSk6qnzq3kaKehHPA+gtmKCH/MeZoC06bDIFTP15RgNt94gjrQ2xLe45
+ gvXEiYEPfrSw==
+X-IronPort-AV: E=Sophos;i="5.75,273,1589266800"; 
+   d="scan'208";a="452446201"
+Received: from cli46-mobl2.ccr.corp.intel.com (HELO [10.255.29.15]) ([10.255.29.15])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 17:40:13 -0700
+Subject: Re: [PATCH v2 1/7] KVM: X86: Reset vcpu->arch.cpuid_nent to 0 if
+ SET_CPUID fails
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20200623115816.24132-1-xiaoyao.li@intel.com>
+ <20200623115816.24132-2-xiaoyao.li@intel.com>
+ <CALMp9eRsWqM-OAKO+y7EpoX7Oq1Qee0vAzgOBpYixUVH8Df1JA@mail.gmail.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <59535ddb-373a-952f-f049-91d8f142c6a9@intel.com>
+Date:   Wed, 24 Jun 2020 08:40:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/vx20BsoZP5nc+1hY2szmS6d";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <CALMp9eRsWqM-OAKO+y7EpoX7Oq1Qee0vAzgOBpYixUVH8Df1JA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/vx20BsoZP5nc+1hY2szmS6d
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 6/24/2020 2:20 AM, Jim Mattson wrote:
+> On Tue, Jun 23, 2020 at 4:58 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>
+>> It needs to invalidate CPUID configruations if usersapce provides
+> 
+> Nits: configurations, userspace
 
-Hi Marco,
+oh, I'll fix it.
 
-On Tue, 23 Jun 2020 13:24:48 +0200 Marco Elver <elver@google.com> wrote:
+>> illegal input.
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   arch/x86/kvm/cpuid.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 8a294f9747aa..1d13bad42bf9 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -207,6 +207,8 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
+>>          kvm_apic_set_version(vcpu);
+>>          kvm_x86_ops.cpuid_update(vcpu);
+>>          r = kvm_update_cpuid(vcpu);
+>> +       if (r)
+>> +               vcpu->arch.cpuid_nent = 0;
+>>
+>>          kvfree(cpuid_entries);
+>>   out:
+>> @@ -230,6 +232,8 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
+>>          kvm_apic_set_version(vcpu);
+>>          kvm_x86_ops.cpuid_update(vcpu);
+>>          r = kvm_update_cpuid(vcpu);
+>> +       if (r)
+>> +               vcpu->arch.cpuid_nent = 0;
+>>   out:
+>>          return r;
+>>   }
+>> --
+>> 2.18.2
+> 
+> What if vcpu->arch.cpuid_nent was greater than 0 before the ioctl in question?
 >
-> On Tue, Jun 23, 2020 at 08:17PM +1000, Stephen Rothwell wrote:
-> > Hi Peter,
-> >=20
-> > On Tue, 23 Jun 2020 11:32:30 +0200 Peter Zijlstra <peterz@infradead.org=
-> wrote: =20
-> > >
-> > > I suppose the next quest is finding a s390 compiler version that works
-> > > and then bumping the version test in the aforementioned commit. =20
-> >=20
-> > Not a lot of help, but my Debian cross compiler seems to work:
-> >=20
-> > $ s390x-linux-gnu-gcc --version
-> > s390x-linux-gnu-gcc (Debian 9.3.0-13) 9.3.0 =20
->=20
-> Rummaging through changelogs led me to 8.3.0 as the first good GCC. Also
-> confirmed by building that version and compiling a file that breaks with
-> older versions. It seems the first major version to fix it was 9, but
-> backported to 8.3. This is for all architectures.
->=20
-> Suggested patch below.
->=20
-> Thanks,
-> -- Marco
->=20
-> ------ >8 ------ =20
->=20
-> From: Marco Elver <elver@google.com>
-> Date: Tue, 23 Jun 2020 12:57:42 +0200
-> Subject: [PATCH] kasan: Fix required compiler version
->=20
-> The first working GCC version to satisfy
-> CC_HAS_WORKING_NOSANITIZE_ADDRESS is GCC 8.3.0.
->=20
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D89124
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: Marco Elver <elver@google.com>
-> ---
->  lib/Kconfig.kasan | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
-> index 7a496b885f46..19fba15e99c6 100644
-> --- a/lib/Kconfig.kasan
-> +++ b/lib/Kconfig.kasan
-> @@ -16,7 +16,7 @@ config CC_HAS_KASAN_SW_TAGS
->  	def_bool $(cc-option, -fsanitize=3Dkernel-hwaddress)
-> =20
->  config CC_HAS_WORKING_NOSANITIZE_ADDRESS
-> -	def_bool !CC_IS_GCC || GCC_VERSION >=3D 80000
-> +	def_bool !CC_IS_GCC || GCC_VERSION >=3D 80300
-> =20
->  config KASAN
->  	bool "KASAN: runtime memory debugger"
-> --=20
-> 2.27.0.111.gc72c7da667-goog
->=20
 
-Thanks for tracking that down.  I will add that patch to the tip tree
-merge for today.
+Nice catch!
 
---=20
-Cheers,
-Stephen Rothwell
+If considering it, then we have to restore the old CPUID configuration. 
+So how about making it simpler to just add one line of comment in API doc:
+If KVM_SET_CPUID{2} fails, the old valid configuration is cleared as a 
+side effect.
 
---Sig_/vx20BsoZP5nc+1hY2szmS6d
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7yiY0ACgkQAVBC80lX
-0Gytxwf/XSrFXKqHN67FRDF9pjKF802HQJnp4w+90WqMxbbxwr3+eodMzrTQMOBG
-5qW60CEHccXVmT3ErY7S4fqBV/4a/gUzSZIqWIuckfSBJDWM8SD3480SWTtWKTTc
-sR3Bk1jKyd+NSsA3b2gVgzWyzDKwQqFofPVZVWyNrsPq7wlOQdx/gYG0PvXXxmpo
-poRcjeAOeLL5CDAZysCTA0mwptdkiYBYZqZ0Hh8Uq9t4aVzaq/8DUCrkN6CdTh0T
-Epm0SVi+CrXDBKIskh9MLBRGimc9g7w9BnxYZlA0ek+PBDZTHfBTpY+LFvUbMbDE
-c25DPzSkr4ftsJMLqsiFHvs27ETbKA==
-=jf2S
------END PGP SIGNATURE-----
-
---Sig_/vx20BsoZP5nc+1hY2szmS6d--
