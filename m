@@ -2,243 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4DD1207B37
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 20:08:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 314F2207C75
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 21:58:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405191AbgFXSIV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jun 2020 14:08:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56460 "EHLO
+        id S2391346AbgFXT6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 15:58:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405099AbgFXSIU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jun 2020 14:08:20 -0400
-Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E68C061795
-        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 11:08:20 -0700 (PDT)
-Received: by mail-vs1-xe44.google.com with SMTP id o2so1950159vsr.0
-        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 11:08:20 -0700 (PDT)
+        with ESMTP id S2391221AbgFXT6F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jun 2020 15:58:05 -0400
+Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCEC4C061573
+        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 12:58:04 -0700 (PDT)
+Received: by mail-pg1-x541.google.com with SMTP id l63so1923130pge.12
+        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 12:58:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kZtsQ2QNgpTuGJ0L1UMDGKkHsHIMQ6IFPmQoCgXSxPk=;
-        b=I8xsjIFuXxhPs3/VTvNDexQl4rZEOI5GPNOHlVduDEWE/AEaBV1aY37eSRWsPccgVS
-         AlxzyS5GQfBUPAlJ4cy7tWZuyxndg6qqZjdP++mE7aRv6yBuqWO5Si/RflVJum6TWjU3
-         w/sFsCFId/I82+L82jE2RjnZyPvuaBMQzDrbFBWYQBouvCeo4nuxpdakQe7uiGqti9n2
-         eYa2QIvE5N8aBTwg5m28l1F6C0lStww0PWhCNQjunELBNvSFYFL1brZrMqojoqlR4X08
-         8/w4r6hLrmBzJVjqQRRO8AE1vvcAGOg4f/rfFBwNkuMn6PrCJuD83PxBN/WwyI3qAQRu
-         Ihsg==
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=PgaMmtpkGqbKR3M2m9sNn9S1kNExQoTttRDdPiXcHjE=;
+        b=UvskA3kJnR8QThcPBryiiZ0cw5pKXulcRMtV8OcGy7ZkwEly7sgHMCviw5apgnTvQO
+         L/9GXbukdXgEQoND+1z/LUNcq6tezlXVOq934Vlq2VCDz4gW7IgmgrnJ22XIX+1E6kWE
+         vDpI069xxtXMzX8O7mMWdyl+qVAHndsv0LseoxQxxJj6+yifA8GPQuSjTBGnQLYx/nwO
+         x9bh7TZ2CP3E1e5Dq/RkFLlAEBdOPo1AWUVnwPlp9mHkESsig337MBcSdzGTHtVQyWVo
+         NX4RLzqxEn2Nz/zFVworE5pfRF52nARrK2mrr+tk+d4oGf2U5M00tKkreQiX7QAMBT8X
+         pKPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kZtsQ2QNgpTuGJ0L1UMDGKkHsHIMQ6IFPmQoCgXSxPk=;
-        b=jymqbI3vwqdFPlw0RriW3UWwqdsIcw+0JC+JTh2S5Klpkw+pNicXWgkYXMYIBOheya
-         wfsMpl7C43UV3oWFkUaGmca4pxXHwmORzpHr8t6JTrl7CRe8mIvUqIFcKqL5cuHYaMs/
-         zvAoE3xfHxj+9qhHY3rOYbeRE4s4n+ii4W6AhOt2BfQySvttu20jDMgISFXfIjRQM+Vh
-         kfBGiM4O9hgb9CPAxe7q+6wgYm/t5I2ydWz//2HPKnpcGly/jBiqMn+3czRzVg0KRFOL
-         /TlGuIpavuz9RiG2IFLdYCjJDBkPVNq06yAAlgJ/4wvrcm2H0i5CrrDvlYz5V9NgqzwL
-         ObiA==
-X-Gm-Message-State: AOAM532oeC1Hq4n0py6YZVXI80FFkOvMI2tO4E+6unfgcM7kb6aq8FOb
-        471TQJYDoDpS5SpFYKKIKe4o7LMVf+2bvu8EIFz5uA==
-X-Google-Smtp-Source: ABdhPJzuRlQ95b/mJxpHj6fyGu6vv+Y0WjTglWnoJiPvmyfevswBLVPi2uBDRpD6d9rATOFTV5xKnGgq/SnO/bWt35s=
-X-Received: by 2002:a67:f785:: with SMTP id j5mr2811502vso.17.1593022099114;
- Wed, 24 Jun 2020 11:08:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200622200822.4426-1-sean.j.christopherson@intel.com> <20200622200822.4426-15-sean.j.christopherson@intel.com>
-In-Reply-To: <20200622200822.4426-15-sean.j.christopherson@intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 24 Jun 2020 11:08:08 -0700
-Message-ID: <CANgfPd_K8PhM26T3GB7BFoDNTLCi+OcYp6DGhXuJcxKMwvZrFg@mail.gmail.com>
-Subject: Re: [PATCH v2 14/21] KVM: Move x86's version of struct
- kvm_mmu_memory_cache to common code
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Christoffer Dall <christoffer.dall@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=PgaMmtpkGqbKR3M2m9sNn9S1kNExQoTttRDdPiXcHjE=;
+        b=hdrc4Gi4W3JkBuVIV8b/wjyOYlZNAIaFg8ICk1ZuYuNtspQh698oQt5/B0p7hNgSD3
+         YUUq4Y/YGUbrG9t9/eQrPp4kfHAY9b8DWIDm5uUCTt1RdwbNF8mwE7sJFGsKdq/WmlX7
+         eTPIChMtktIbl4LNOrtVB5nV12oA6LbKVU0Cx9GMdpsA8HVSM00HakUF4htQ4Qe+YoEV
+         o5dbfJIlIPf+v//20xe94r394kOSpPkaGYDLaIioychpsSure4CnQLb/OpRSUmXO3r1T
+         VzdpOyfjO86NBOrfK8B0r+n43kv1OBAyhzVaAO7URQvv7r/lA2ZWq4TMC0x9np7MhR9g
+         Upsg==
+X-Gm-Message-State: AOAM531/es2aYVfU1T9TxopFG6Hq14rpblkNFLf5wjpQmLxdWpwTTD8h
+        vB7i6FxDIwv2GKxGXDxNv38=
+X-Google-Smtp-Source: ABdhPJxloAYR9INUD1r7rwSzT5xHPmPpMeAc8Gwg4y72gwIEzlCjBdGcm2ibkCeOo6KM/G3bugh02w==
+X-Received: by 2002:a63:924b:: with SMTP id s11mr22569206pgn.74.1593028684064;
+        Wed, 24 Jun 2020 12:58:04 -0700 (PDT)
+Received: from [10.0.1.10] (c-24-4-128-201.hsd1.ca.comcast.net. [24.4.128.201])
+        by smtp.gmail.com with ESMTPSA id f23sm5895593pja.8.2020.06.24.12.58.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Jun 2020 12:58:02 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH kvm-unit-tests] i386: setup segment registers before
+ percpu areas
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20200624141429.382157-1-pbonzini@redhat.com>
+Date:   Wed, 24 Jun 2020 12:58:01 -0700
+Cc:     kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A954DB27-C5E8-435B-A1D7-76D21943F70F@gmail.com>
+References: <20200624141429.382157-1-pbonzini@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 22, 2020 at 1:09 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Move x86's 'struct kvm_mmu_memory_cache' to common code in anticipation
-> of moving the entire x86 implementation code to common KVM and reusing
-> it for arm64 and MIPS.  Add a new architecture specific asm/kvm_types.h
-> to control the existence and parameters of the struct.  The new header
-> is needed to avoid a chicken-and-egg problem with asm/kvm_host.h as all
-> architectures define instances of the struct in their vCPU structs.
->
-> Add an asm-generic version of kvm_types.h to avoid having empty files on
-> PPC and s390 in the long term, and for arm64 and mips in the short term.
->
-> Suggested-by: Christoffer Dall <christoffer.dall@arm.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> On Jun 24, 2020, at 7:14 AM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>=20
+> The base of the percpu area is stored in the %gs base, and writing
+> to %gs destroys it.  Move setup_segments earlier, before the %gs
+> base is written.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/arm64/include/asm/Kbuild    |  1 +
->  arch/mips/include/asm/Kbuild     |  1 +
->  arch/powerpc/include/asm/Kbuild  |  1 +
->  arch/s390/include/asm/Kbuild     |  1 +
->  arch/x86/include/asm/kvm_host.h  | 13 -------------
->  arch/x86/include/asm/kvm_types.h |  7 +++++++
->  include/asm-generic/kvm_types.h  |  5 +++++
->  include/linux/kvm_types.h        | 19 +++++++++++++++++++
->  8 files changed, 35 insertions(+), 13 deletions(-)
->  create mode 100644 arch/x86/include/asm/kvm_types.h
->  create mode 100644 include/asm-generic/kvm_types.h
->
-> diff --git a/arch/arm64/include/asm/Kbuild b/arch/arm64/include/asm/Kbuild
-> index ff9cbb631212..35a68155cd0e 100644
-> --- a/arch/arm64/include/asm/Kbuild
-> +++ b/arch/arm64/include/asm/Kbuild
-> @@ -1,5 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  generic-y += early_ioremap.h
-> +generic-y += kvm_types.h
->  generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += qrwlock.h
-> diff --git a/arch/mips/include/asm/Kbuild b/arch/mips/include/asm/Kbuild
-> index 8643d313890e..397e6d24d2ab 100644
-> --- a/arch/mips/include/asm/Kbuild
-> +++ b/arch/mips/include/asm/Kbuild
-> @@ -5,6 +5,7 @@ generated-y += syscall_table_64_n32.h
->  generated-y += syscall_table_64_n64.h
->  generated-y += syscall_table_64_o32.h
->  generic-y += export.h
-> +generic-y += kvm_types.h
->  generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += parport.h
-> diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
-> index dadbcf3a0b1e..2d444d09b553 100644
-> --- a/arch/powerpc/include/asm/Kbuild
-> +++ b/arch/powerpc/include/asm/Kbuild
-> @@ -4,6 +4,7 @@ generated-y += syscall_table_64.h
->  generated-y += syscall_table_c32.h
->  generated-y += syscall_table_spu.h
->  generic-y += export.h
-> +generic-y += kvm_types.h
->  generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += vtime.h
-> diff --git a/arch/s390/include/asm/Kbuild b/arch/s390/include/asm/Kbuild
-> index 83f6e85de7bc..319efa0e6d02 100644
-> --- a/arch/s390/include/asm/Kbuild
-> +++ b/arch/s390/include/asm/Kbuild
-> @@ -6,5 +6,6 @@ generated-y += unistd_nr.h
->
->  generic-y += asm-offsets.h
->  generic-y += export.h
-> +generic-y += kvm_types.h
->  generic-y += local64.h
->  generic-y += mcs_spinlock.h
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 67b84aa2984e..70832aa762e5 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -193,8 +193,6 @@ struct x86_exception;
->  enum x86_intercept;
->  enum x86_intercept_stage;
->
-> -#define KVM_NR_MEM_OBJS 40
-> -
->  #define KVM_NR_DB_REGS 4
->
->  #define DR6_BD         (1 << 13)
-> @@ -245,17 +243,6 @@ enum x86_intercept_stage;
->
->  struct kvm_kernel_irq_routing_entry;
->
-> -/*
-> - * We don't want allocation failures within the mmu code, so we preallocate
-> - * enough memory for a single page fault in a cache.
-> - */
-> -struct kvm_mmu_memory_cache {
-> -       int nobjs;
-> -       gfp_t gfp_zero;
-> -       struct kmem_cache *kmem_cache;
-> -       void *objects[KVM_NR_MEM_OBJS];
-> -};
-> -
->  /*
->   * the pages used as guest page table on soft mmu are tracked by
->   * kvm_memory_slot.arch.gfn_track which is 16 bits, so the role bits used
-> diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
-> new file mode 100644
-> index 000000000000..08f1b57d3b62
-> --- /dev/null
-> +++ b/arch/x86/include/asm/kvm_types.h
-> @@ -0,0 +1,7 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_X86_KVM_TYPES_H
-> +#define _ASM_X86_KVM_TYPES_H
-> +
-> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE 40
-> +
-> +#endif /* _ASM_X86_KVM_TYPES_H */
-> diff --git a/include/asm-generic/kvm_types.h b/include/asm-generic/kvm_types.h
-> new file mode 100644
-> index 000000000000..2a82daf110f1
-> --- /dev/null
-> +++ b/include/asm-generic/kvm_types.h
-> @@ -0,0 +1,5 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_GENERIC_KVM_TYPES_H
-> +#define _ASM_GENERIC_KVM_TYPES_H
-> +
-> +#endif
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index 68e84cf42a3f..a7580f69dda0 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -20,6 +20,8 @@ enum kvm_mr_change;
->
->  #include <linux/types.h>
->
-> +#include <asm/kvm_types.h>
-> +
->  /*
->   * Address types:
->   *
-> @@ -58,4 +60,21 @@ struct gfn_to_pfn_cache {
->         bool dirty;
->  };
->
-> +#ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> +/*
-> + * Memory caches are used to preallocate memory ahead of various MMU flows,
-> + * e.g. page fault handlers.  Gracefully handling allocation failures deep in
-> + * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
-> + * holding MMU locks.  Note, these caches act more like prefetch buffers than
-> + * classical caches, i.e. objects are not returned to the cache on being freed.
-> + */
-> +struct kvm_mmu_memory_cache {
-> +       int nobjs;
-> +       gfp_t gfp_zero;
-> +       struct kmem_cache *kmem_cache;
-> +       void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
-> +};
-> +#endif
-> +
-> +
->  #endif /* __KVM_TYPES_H__ */
-> --
-> 2.26.0
->
+> x86/cstart.S | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/x86/cstart.S b/x86/cstart.S
+> index 5ad70b5..77dc34d 100644
+> --- a/x86/cstart.S
+> +++ b/x86/cstart.S
+> @@ -106,6 +106,7 @@ MSR_GS_BASE =3D 0xc0000101
+> .globl start
+> start:
+>         mov $stacktop, %esp
+> +        setup_segments
+>         push %ebx
+>         call setup_multiboot
+>         call setup_libcflat
+> @@ -118,7 +119,6 @@ start:
+>=20
+> prepare_32:
+>         lgdtl gdt32_descr
+> -	setup_segments
+>=20
+> 	mov %cr4, %eax
+> 	bts $4, %eax  // pse
+> =E2=80=94=20
+> 2.26.2
+
+As I said in a different thread, this change breaks my setup. It is =
+better
+not to make any assumption (or as few as possible) about the GDT content
+after boot and load the GDTR before setting up the segments. So I prefer =
+to
+load the GDT before the segments. How about this change instead of =
+yours?
+
+-- >8 --
+
+From: Nadav Amit <namit@vmware.com>
+Date: Wed, 24 Jun 2020 19:50:36 +0000
+Subject: [PATCH] x86: load gdt while loading segments
+
+Signed-off-by: Nadav Amit <namit@vmware.com>
+---
+ x86/cstart.S | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/x86/cstart.S b/x86/cstart.S
+index dd33d4d..1d8b8ac 100644
+--- a/x86/cstart.S
++++ b/x86/cstart.S
+@@ -95,6 +95,8 @@ MSR_GS_BASE =3D 0xc0000101
+ .endm
+=20
+ .macro setup_segments
++	lgdtl gdt32_descr
++
+ 	mov $0x10, %ax
+ 	mov %ax, %ds
+ 	mov %ax, %es
+@@ -106,6 +108,8 @@ MSR_GS_BASE =3D 0xc0000101
+ .globl start
+ start:
+         mov $stacktop, %esp
++	setup_segments
++
+         push %ebx
+         call setup_multiboot
+         call setup_libcflat
+@@ -117,9 +121,6 @@ start:
+         jmpl $8, $start32
+=20
+ prepare_32:
+-        lgdtl gdt32_descr
+-	setup_segments
+-
+ 	mov %cr4, %eax
+ 	bts $4, %eax  // pse
+ 	mov %eax, %cr4
+--=20
+
+
