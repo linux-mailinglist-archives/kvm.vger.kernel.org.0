@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 696F8207F49
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 00:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 583BF209717
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 01:21:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389274AbgFXWZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jun 2020 18:25:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39466 "EHLO
+        id S2388395AbgFXXVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 19:21:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57087 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2388453AbgFXWZ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jun 2020 18:25:56 -0400
+        with ESMTP id S1728035AbgFXXV3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jun 2020 19:21:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593037553;
+        s=mimecast20190719; t=1593040887;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
         bh=1qVm+qFHpBcFnajiwKWBoYJyF5SCnRnSLqkqB/nC2LI=;
-        b=ZH6UUHjQ2rjcSSkpkeMlAj4F9vgKU0lxT6W9SIxwuyCqba4/ywEh4XR6bvb8xLacF692fA
-        2dHVZ9VU3h52lEMsgfYTFFuEGDKHuCLCfU9czgtzfUBQeh/ftXvnCAkuU0wkOnG/Cb+EOb
-        MeoI0hz15HF884tLc5zmFgyPCNIndBU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-BN_p8ucpNWC7b1IziLImnQ-1; Wed, 24 Jun 2020 18:25:52 -0400
-X-MC-Unique: BN_p8ucpNWC7b1IziLImnQ-1
-Received: by mail-wm1-f72.google.com with SMTP id o138so3339465wme.4
-        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 15:25:51 -0700 (PDT)
+        b=jFkzpH9owUc8bZLwn1UaSk89u6eTTma4xsChaQTztd2coDNmdyqW3VAVR+dPTunQqZX3/2
+        U7/Tvyi0Yb0TkydH6yusCE2js+ur42hzFDpd2tzRpLX2M2Wjkr7FdrB4GDdIQ6+RJ5ULxI
+        x/ZgWoa013gMBfmENfHn5OgiZdir4lE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-132-wMnrbZdRNN-TAcYD-NhjYQ-1; Wed, 24 Jun 2020 19:21:25 -0400
+X-MC-Unique: wMnrbZdRNN-TAcYD-NhjYQ-1
+Received: by mail-wm1-f70.google.com with SMTP id a21so4660786wmd.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 16:21:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
         bh=1qVm+qFHpBcFnajiwKWBoYJyF5SCnRnSLqkqB/nC2LI=;
-        b=EWay/aHy/StK8NVhWvuS3divrLkYGSnr/l/vGPeVtvTnkNxG7UBO855H+4ldzLO65v
-         v2BEuKXoA083JA6h7rWmPLGiBvZVlNgF2jBuifztds3Nve7mizOvmFlHKPrUvuTZoOF9
-         TEFjO3wTJsrQ+CNg4ugKOjEL3engotaOBdyQm/+jwIWyuukYJp9QTvzcsNLRIe5bv1Rc
-         wtAUniyz0zGOskUnxFk30SUKUp7h9B7g7uPknefuudGiiSKih/QUCzu+rs1xfaMPlyg+
-         MYnYkn9vcEOwy0+S092de4j3ggKmf7dv6HgkuYHQTrQJc4yUI3Du+BnAc6EH1YcXL8Ig
-         rm4A==
-X-Gm-Message-State: AOAM532HMhOmJ08SeRELiHkbwbmaQZC5PnsYg6tKXC9EhY+ALmln8jyk
-        EVLkbWXa3vuF3vrLjudXxJS5xg/pAuQX4CfEXnqONZ060mSIaRXyF5AcYXB3XaM7/Pdohs9O+mK
-        MkS75rs+IeizS
-X-Received: by 2002:a5d:5389:: with SMTP id d9mr35177570wrv.77.1593037550095;
-        Wed, 24 Jun 2020 15:25:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx5gkNnNw1CL/BcAtvH4812k2atgKf2tuErPH8kANjueWieY9PbxsFzSbaKi8RCVMCZsYBf3w==
-X-Received: by 2002:a5d:5389:: with SMTP id d9mr35177546wrv.77.1593037549818;
-        Wed, 24 Jun 2020 15:25:49 -0700 (PDT)
+        b=QeKG7+Gh/YzVvassk3QICntBWquTsBHuTjv+KIqon3N0D683Q9ryK5OBPrjF70JWBO
+         WCcgJEEiBB6f9L3mD/UZ1C9fP9VLZXV/TqExZ2uuK0igHCHPBSqwzcxepulZtcBAW5db
+         7BZeHhhkCXjo6F8B2BHjgnkUpNULqi6kDkNgOA+4sMASEUjYAp2qSd98iMHJ4XO0hoDv
+         mZwfieNC0kxYsEO8t7kZ6SM4thZXCD4lv778Y0WOWgfhunpuwo9wQdsQvMvL4RMQOCHb
+         sc8B0heo/alew0RMoGUzdfzq0FZkXH2JT47K6Rd/F4xMvcImOQIsa43gjKt0srQp7mYQ
+         9v8A==
+X-Gm-Message-State: AOAM531EbfxYaPVFWjHeFiqXsuQPlNY9iF7t6xaJuoVcV4M69J6Nazbk
+        VJzvpFpkK9IWMa8qq1J2dXgzDonvTFAcigMEg4BFkqiufQVqJEUuJP0uke/XESkrW/PGJSZXRjN
+        P+r06hNn4pmBi
+X-Received: by 2002:adf:9205:: with SMTP id 5mr31880033wrj.232.1593040884077;
+        Wed, 24 Jun 2020 16:21:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxqFyNRbJvNmvq82fhlM5himBZXXkAKRBOYQGCEH/gPc8s0pO7SeqL9CkzgxhVJ/ckX6aHU5w==
+X-Received: by 2002:adf:9205:: with SMTP id 5mr31880025wrj.232.1593040883843;
+        Wed, 24 Jun 2020 16:21:23 -0700 (PDT)
 Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
-        by smtp.gmail.com with ESMTPSA id p4sm18772481wrx.63.2020.06.24.15.25.48
+        by smtp.gmail.com with ESMTPSA id c206sm10725877wmf.36.2020.06.24.16.21.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2020 15:25:49 -0700 (PDT)
-Date:   Wed, 24 Jun 2020 18:25:47 -0400
+        Wed, 24 Jun 2020 16:21:23 -0700 (PDT)
+Date:   Wed, 24 Jun 2020 19:21:21 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
@@ -58,11 +59,14 @@ Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
         linux-um@lists.infradead.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH] virtio: VIRTIO_F_IOMMU_PLATFORM -> VIRTIO_F_ACCESS_PLATFORM
-Message-ID: <20200624222540.584772-1-mst@redhat.com>
+Subject: [PATCH v2 1/2] virtio: VIRTIO_F_IOMMU_PLATFORM ->
+ VIRTIO_F_ACCESS_PLATFORM
+Message-ID: <20200624232035.704217-2-mst@redhat.com>
+References: <20200624232035.704217-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20200624232035.704217-1-mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
