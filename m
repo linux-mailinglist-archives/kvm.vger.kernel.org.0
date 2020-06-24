@@ -2,103 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 746DA206D06
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 08:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 177A0206D45
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 09:07:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389479AbgFXGuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jun 2020 02:50:40 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56838 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389214AbgFXGuk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jun 2020 02:50:40 -0400
+        id S2389430AbgFXHHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 03:07:09 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45342 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2389349AbgFXHHJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jun 2020 03:07:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592981438;
+        s=mimecast20190719; t=1592982428;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bmgzEdsW5xKNCYqU5zzbiOw4uX+8fJU9lxC550BH36A=;
-        b=YumIx9Qh8ce8rSor2x5Ls+AbVbTJK2QWFXhDRtgo4A6dzEKxxQuVmw6ax4TEDJpeaJhuyr
-        ysqJ8QLFHxSHq66woFxoVWS4AogSPcXCKkiPq6BGuQhYryb8r+54ap078qGs5kQyLOFzcL
-        llJQCyA2unAirq5mt8Elko/LvsGM0ws=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-fXwNDDBbM8Oys4soHt5MUA-1; Wed, 24 Jun 2020 02:50:36 -0400
-X-MC-Unique: fXwNDDBbM8Oys4soHt5MUA-1
-Received: by mail-wm1-f69.google.com with SMTP id g187so1913119wme.0
-        for <kvm@vger.kernel.org>; Tue, 23 Jun 2020 23:50:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bmgzEdsW5xKNCYqU5zzbiOw4uX+8fJU9lxC550BH36A=;
-        b=mAfipjcqsHoPEBOxLFTSaiRS7DFp5/BIiVWzArmtQm+2I8gq/t48/yuA6JINFrbaqn
-         j7lEmtgloJtOvrWSTkJWLNTWJ7WiwJR0sJDuZhgChQbHgUKBQ7hynSP9qhdHGlIxd1K9
-         9MEGNSINLx1b5MnQfDF4MqnDm6Am8hIfzVvWgUcGx72EZULwVa/v23MIHVTp1jEY/32M
-         WKQ2LVlnGo3El2klhbgsAraKYQlyMromiK3nxov4GS1eL1QEB4C7fhWXyLD4MCkyLq5c
-         t8StrI/VXbYZKW9xFeoBxxylh7DXqBYG0G3vtAqDOv3Wy5fmyufJ5ZUMJ8/8+Namm18J
-         I/jg==
-X-Gm-Message-State: AOAM532jJITGXVA6bcqgMUo0Di/GLRcgop6biRJhZTyxjLwdbnr4S2Eg
-        aRQmARLTqIZ4fSWMRu5/QeZgr5Ib7SST1+0ZImcsDdYOXuRv7aXcK/0SeKrl6QRRiOOCMn/TYv1
-        2S4TxUhYzhOcf
-X-Received: by 2002:adf:e68d:: with SMTP id r13mr24469167wrm.141.1592981435184;
-        Tue, 23 Jun 2020 23:50:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWt/WkQ0/wQ6hfsQIBhIo1dqzI5Qp98SsKkcGT/ANvXAnuF+0KqJDX6VZulJ4Zn3nCoVe5oA==
-X-Received: by 2002:adf:e68d:: with SMTP id r13mr24469151wrm.141.1592981434958;
-        Tue, 23 Jun 2020 23:50:34 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
-        by smtp.gmail.com with ESMTPSA id a3sm6656686wmb.7.2020.06.23.23.50.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jun 2020 23:50:34 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests RFC] Revert "SVM: move guest past HLT"
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20200623082711.803916-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2e9999fc-a41a-2832-6dec-4c6db7296c19@redhat.com>
-Date:   Wed, 24 Jun 2020 08:50:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        bh=Vuoo9Wk/qRlj5IesQ7i9MM7vgq2ZkA6l9+chYSUsDoU=;
+        b=K22e0jNMwAdaBbY4YokC3eZShbX1md+RaPddvYPBfP7BjRTQHlW0FYGnRvUkOe3LwDiqlD
+        ZXRnE2dt9znyywCQMkakkZWiGJv60FuRiEjlfi2m9o04+QsRVG3dh7iKMGgS8U9Xi5hg2y
+        gEHXwydKPLu+i9UCEzAdDbiW4e4AUUg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-ZV4iU5pCMhaB_Q7W4Oka8w-1; Wed, 24 Jun 2020 03:07:04 -0400
+X-MC-Unique: ZV4iU5pCMhaB_Q7W4Oka8w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96B22800C60;
+        Wed, 24 Jun 2020 07:07:01 +0000 (UTC)
+Received: from gondolin (ovpn-113-3.ams2.redhat.com [10.36.113.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1654A100238C;
+        Wed, 24 Jun 2020 07:06:50 +0000 (UTC)
+Date:   Wed, 24 Jun 2020 09:06:48 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
+        dgilbert@redhat.com, frankja@linux.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        mst@redhat.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+        pasic@linux.ibm.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+Message-ID: <20200624090648.6bdf82bd.cohuck@redhat.com>
+In-Reply-To: <2fa7c84a-6929-ef04-1d61-f76a4cac35f5@de.ibm.com>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+        <2fa7c84a-6929-ef04-1d61-f76a4cac35f5@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200623082711.803916-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/20 10:27, Vitaly Kuznetsov wrote:
-> 'nmi_hlt' test returns somewhat weird result:
-> 
-> ...
-> PASS: direct NMI + hlt
-> PASS: NMI intercept while running guest
-> PASS: intercepted NMI + hlt
-> PASS: nmi_hlt
-> SUMMARY: 4 tests, 1 unexpected failures
-> 
-> Trying to investigate where the failure is coming from I was tweaking
-> the code around and with tiny meaningless changes I was able to observe
->  #PF, #GP, #UD and other 'interesting' results. Compiler optimization
-> flags also change the outcome so there's obviously a corruption somewhere.
-> Adding a meaningless 'nop' to the second 'asm volatile ("hlt");' in
-> nmi_hlt_test() saves the day so it seems we erroneously advance RIP
-> twice, the advancement in nmi_hlt_finished() is not needed.
-> 
-> The outcome, however, contradicts with the commit message in 7e7aa86f74
-> ("SVM: move guest past HLT"). With that commit reverted, all tests seem
-> to pass but I'm not sure what issue the commit was trying to fix, thus
-> RFC.
-> 
-> This reverts commit 7e7aa86f7418a8343de46583977f631e55fd02ed.
+On Mon, 22 Jun 2020 16:27:28 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Hmm it's possible that the commit was working around something bad in
-nested SVM in the middle of the development.  I cannot see the
-unexpected failure, but reverting the patch does not seem to have any
-ill effect.  I pushed the patch, thanks.
+> On 19.06.20 04:05, David Gibson wrote:
+> > A number of hardware platforms are implementing mechanisms whereby the
+> > hypervisor does not have unfettered access to guest memory, in order
+> > to mitigate the security impact of a compromised hypervisor.
+> > 
+> > AMD's SEV implements this with in-cpu memory encryption, and Intel has
+> > its own memory encryption mechanism.  POWER has an upcoming mechanism
+> > to accomplish this in a different way, using a new memory protection
+> > level plus a small trusted ultravisor.  s390 also has a protected
+> > execution environment.
+> > 
+> > The current code (committed or draft) for these features has each
+> > platform's version configured entirely differently.  That doesn't seem
+> > ideal for users, or particularly for management layers.
+> > 
+> > AMD SEV introduces a notionally generic machine option
+> > "machine-encryption", but it doesn't actually cover any cases other
+> > than SEV.
+> > 
+> > This series is a proposal to at least partially unify configuration
+> > for these mechanisms, by renaming and generalizing AMD's
+> > "memory-encryption" property.  It is replaced by a
+> > "host-trust-limitation" property pointing to a platform specific
+> > object which configures and manages the specific details.
+> > 
+> > For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> > can be extended to cover the Intel and s390 mechanisms as well,
+> > though.  
+> 
+> Let me try to summarize what I understand what you try to achieve:
+> one command line parameter for all platforms that 
+> 
+> common across all platforms:
+> - disable KSM
+> - by default enables iommu_platform
+> 
+> 
+> per platform:
+> - setup the necessary encryption scheme when appropriate
+> - block migration
+> -....
+> 
+> 
+> The tricky part is certainly the per platform thing. For example on
+> s390 we just have a cpumodel flag that provides interfaces to the guest
+> to switch into protected mode via the ultravisor. This works perfectly
+> fine with the host model, so no need to configure anything.  The platform
+> code then disables KSM _on_switchover_ and not in general. Because the 
+> guest CAN switch into protected, but it does not have to.
+> 
+> So this feels really hard to do right. Would a virtual BoF on KVM forum
+> be too late? We had a BoF on protected guests last year and that was
+> valuable.
 
-Paolo
+Maybe we can do some kind of call to discuss this earlier? (Maybe in
+the KVM call slot on Tuesdays?) I think it would be really helpful if
+everybody would have at least a general understanding about how
+encryption/protection works on the different architectures.
 
