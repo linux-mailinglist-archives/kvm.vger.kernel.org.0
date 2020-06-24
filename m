@@ -2,111 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE522207347
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 14:26:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99EC02073BC
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 14:52:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389504AbgFXM0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jun 2020 08:26:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44026 "EHLO
+        id S2390775AbgFXMwM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 08:52:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55670 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2388296AbgFXM0d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jun 2020 08:26:33 -0400
+        with ESMTP id S2388942AbgFXMwM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jun 2020 08:52:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593001591;
+        s=mimecast20190719; t=1593003132;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=//a7AwgdL3EMlmKzdzygrkm/h2UlJCHixiMJsRC6eY0=;
-        b=jFYhhFeTOnSlGmL3FpqrF3Geq7ORbep1oul/VgMzRhADncWyvWt4TIa6/1qDLiU116332m
-        x7G7sV2qXoEylgmYpRJ6E/7I1Sr9F3+UxrUkU4cDlE4SiPjuLDSwUGzMPvbtrwsBhYoapY
-        6GzrKUx0f4wofKVEldqIjEdfdBccFqY=
+        bh=QUzO0qEqu9arcmCuZtUfpn6KlJSu5wBZTCa9jOa4Guk=;
+        b=LxulAwUuG0K2lPZuG8sOCRifMSroUmW1ockCXOOFiHMrMCqQb6314nUpWcwDgBwKdtiWdu
+        47KTr/2Py/SyaLEHMX1+W9OVtjoutS+4joq/+MO0VPzDuBIjDtcsHHzB4R2rMQSwXhrTx3
+        J9/lqZRw3fOC29AdYlZyhJofsp1CiKM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-ti_anV-MOPSmAJ-nLh_sMg-1; Wed, 24 Jun 2020 08:26:28 -0400
-X-MC-Unique: ti_anV-MOPSmAJ-nLh_sMg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-278-Pw4DkEHOPyijq7vu6OSxUg-1; Wed, 24 Jun 2020 08:52:07 -0400
+X-MC-Unique: Pw4DkEHOPyijq7vu6OSxUg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3EAE107ACF5;
-        Wed, 24 Jun 2020 12:26:26 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6AFD464;
+        Wed, 24 Jun 2020 12:52:06 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-114-35.ams2.redhat.com [10.36.114.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F15521008034;
-        Wed, 24 Jun 2020 12:26:22 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v9 09/12] s390x: Library resources for CSS
- tests
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1592213521-19390-1-git-send-email-pmorel@linux.ibm.com>
- <1592213521-19390-10-git-send-email-pmorel@linux.ibm.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 18B032B47C;
+        Wed, 24 Jun 2020 12:52:05 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] x86: Initialize segment selectors
+To:     Nadav Amit <namit@vmware.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20200623084132.36213-1-namit@vmware.com>
 From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <9de11879-4429-bfe8-7f1e-1f5880764a6a@redhat.com>
-Date:   Wed, 24 Jun 2020 14:26:21 +0200
+Message-ID: <40203296-7f31-16c7-bebb-e1f1cd478a19@redhat.com>
+Date:   Wed, 24 Jun 2020 14:52:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1592213521-19390-10-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <20200623084132.36213-1-namit@vmware.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/06/2020 11.31, Pierre Morel wrote:
-> Provide some definitions and library routines that can be used by
-> tests targeting the channel subsystem.
+On 23/06/2020 10.41, Nadav Amit wrote:
+> Currently, the BSP's segment selectors are not initialized in 32-bit
+> (cstart.S). As a result the tests implicitly rely on the segment
+> selector values that are set by the BIOS. If this assumption is not
+> kept, the task-switch test fails.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Fix it by initializing them.
+> 
+> Signed-off-by: Nadav Amit <namit@vmware.com>
 > ---
->   lib/s390x/css.h      | 256 +++++++++++++++++++++++++++++++++++++++++++
->   lib/s390x/css_dump.c | 153 ++++++++++++++++++++++++++
->   s390x/Makefile       |   1 +
->   3 files changed, 410 insertions(+)
->   create mode 100644 lib/s390x/css.h
->   create mode 100644 lib/s390x/css_dump.c
-[...]
-> diff --git a/lib/s390x/css_dump.c b/lib/s390x/css_dump.c
-> new file mode 100644
-> index 0000000..0c2b64e
-> --- /dev/null
-> +++ b/lib/s390x/css_dump.c
-> @@ -0,0 +1,153 @@
-> +/*
-> + * Channel subsystem structures dumping
-> + *
-> + * Copyright (c) 2020 IBM Corp.
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2.
-> + *
-> + * Description:
-> + * Provides the dumping functions for various structures used by subchannels:
-> + * - ORB  : Operation request block, describes the I/O operation and points to
-> + *          a CCW chain
-> + * - CCW  : Channel Command Word, describes the command, data and flow control
-> + * - IRB  : Interuption response Block, describes the result of an operation;
-> + *          holds a SCSW and model-dependent data.
-> + * - SCHIB: SubCHannel Information Block composed of:
-> + *   - SCSW: SubChannel Status Word, status of the channel.
-> + *   - PMCW: Path Management Control Word
-> + * You need the QEMU ccw-pong device in QEMU to answer the I/O transfers.
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <unistd.h>
+>   x86/cstart.S | 17 +++++++++++------
+>   1 file changed, 11 insertions(+), 6 deletions(-)
 
-Please don't use unistd.h in kvm-unit-tests - this header is not usable 
-in cross-compilation environments:
+I'm sorry to be the bearer of bad news again, but this commit broke 
+another set of tests in the Travis CI:
 
-  https://travis-ci.com/github/huth/kvm-unit-tests/jobs/353089278#L536
+  https://travis-ci.com/github/huth/kvm-unit-tests/jobs/353103187#L796
 
-Thanks,
+smptest, smptest3, kvmclock_test, hyperv_synic and hyperv_stimer are 
+failing now in the 32-bit kvm-unit-tests :-(
+
   Thomas
 
