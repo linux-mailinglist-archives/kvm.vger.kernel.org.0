@@ -2,154 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E50B2077BB
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 17:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAC792079A1
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 18:55:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404381AbgFXPkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jun 2020 11:40:41 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28541 "EHLO
+        id S2404796AbgFXQzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 12:55:03 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40315 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2404146AbgFXPkl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jun 2020 11:40:41 -0400
+        by vger.kernel.org with ESMTP id S2404431AbgFXQzD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jun 2020 12:55:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593013239;
+        s=mimecast20190719; t=1593017702;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=Kf7M+Oex0RfW9kqk+x/Os8ToO8Ye/Q/MXZNq+RHcqj8=;
-        b=R/fHL/5WjR9vnI1f/OFdm9v0S/LRNo5nbxadAVQNLUEO3b4Tx8O8+TxfvQZ2YbXvvd2CXM
-        dn83FeVFGkrDnsR6EspyjURLJZGagaiIqwYd84xH5WQCx1L0YRTi5bpVYWGnLGWuzCSFcn
-        y9d6+cRlIKAANQXSbr6f1bXRHHy07Jc=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Vip8xwgwmcPl38v+bIxTFJ+koVkwq3bCJZqiOBGmcbM=;
+        b=YaazptKHYyTlWEKws59l85RRdbUSF/Kc0wwSxk5jbn4dbJWFPt30mh8AuGqhtSFB0o7hev
+        /1/7+NDXGRUAdittrWvxLVg+mluIsrHce7Pjw20ubRRR/8uScUPOgDnDICWq5w/mL59usz
+        F+Oi2V72zMWuHe1KQoWTsabvOt43kfQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-4l99331SNIa_nFE_-8d4_A-1; Wed, 24 Jun 2020 11:40:35 -0400
-X-MC-Unique: 4l99331SNIa_nFE_-8d4_A-1
+ us-mta-436-BIc9UCOsMYiMtfQknvvg5g-1; Wed, 24 Jun 2020 12:55:00 -0400
+X-MC-Unique: BIc9UCOsMYiMtfQknvvg5g-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 816E4800C60;
-        Wed, 24 Jun 2020 15:40:32 +0000 (UTC)
-Received: from [10.36.113.65] (ovpn-113-65.ams2.redhat.com [10.36.113.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9650C19D7D;
-        Wed, 24 Jun 2020 15:40:17 +0000 (UTC)
-Subject: Re: [PATCH v4 00/21] virtio-mem: Paravirtualized memory hot(un)plug
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        teawater <teawaterz@linux.alibaba.com>,
-        Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Lukas Straub <lukasstraub2@web.de>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-        Sergio Lopez <slp@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-References: <20200610115419.51688-1-david@redhat.com>
- <20200624113157-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <53fbc30a-fead-2da6-9215-2aae9c3027d5@redhat.com>
-Date:   Wed, 24 Jun 2020 17:40:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ECCC800D5C
+        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 16:54:59 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C4EC42B4AB;
+        Wed, 24 Jun 2020 16:54:55 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     mcondotta@redhat.com, Thomas Huth <thuth@redhat.com>
+Subject: [PATCH kvm-unit-tests] x86: move IDT away from address 0
+Date:   Wed, 24 Jun 2020 12:54:55 -0400
+Message-Id: <20200624165455.19266-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200624113157-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.06.20 17:33, Michael S. Tsirkin wrote:
-> On Wed, Jun 10, 2020 at 01:53:58PM +0200, David Hildenbrand wrote:
->> This is the very basic, initial version of virtio-mem. More info on
->> virtio-mem in general can be found in the Linux kernel driver v2 posting
->> [1] and in patch #10. The Linux driver is currently on its way upstream.
->>
->> This series is based on [3]:
->>     "[PATCH v1] pc: Support coldplugging of virtio-pmem-pci devices on all
->>      buses"
->> And [4]:
->>     "[PATCH v2] hmp: Make json format optional for qom-set"
->>
->> The patches can be found at:
->>     https://github.com/davidhildenbrand/qemu.git virtio-mem-v4
-> 
-> 
-> OK so looks sane to me.
-> IIUC there are a couple of minor tweaks still so I'm expecting v5
-> of this.
-> You want me to merge this, right?
+Address 0 is also used for the SIPI vector (which is probably something worth
+changing as well), and now that we call setup_idt very early the SIPI vector
+overwrites the first few bytes of the IDT, and in particular the #DE handler.
 
-Yes, I am planning to send (rebased) v5 most probably tomorrow. Thanks!
+Fix this for both 32-bit and 64-bit, even though the different form of the
+descriptors meant that only 32-bit showed a failure.
 
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/cstart.S   | 10 +++++++---
+ x86/cstart64.S | 11 ++++++++++-
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
+diff --git a/x86/cstart.S b/x86/cstart.S
+index 77dc34d..e93dbca 100644
+--- a/x86/cstart.S
++++ b/x86/cstart.S
+@@ -4,8 +4,6 @@
+ .globl boot_idt
+ .global online_cpus
+ 
+-boot_idt = 0
+-
+ ipi_vector = 0x20
+ 
+ max_cpus = MAX_TEST_CPUS
+@@ -30,6 +28,12 @@ i = 0
+         i = i + 1
+         .endr
+ 
++boot_idt:
++	.rept 256
++	.quad 0
++	.endr
++end_boot_idt:
++
+ .globl gdt32
+ gdt32:
+ 	.quad 0
+@@ -71,7 +75,7 @@ tss:
+ tss_end:
+ 
+ idt_descr:
+-	.word 16 * 256 - 1
++	.word end_boot_idt - boot_idt - 1
+ 	.long boot_idt
+ 
+ .section .init
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 1ecfbdb..b44d0ae 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -9,6 +9,8 @@ boot_idt = 0
+ .globl gdt64_desc
+ .globl online_cpus
+ 
++boot_idt = 0
++
+ ipi_vector = 0x20
+ 
+ max_cpus = MAX_TEST_CPUS
+@@ -51,6 +53,13 @@ ptl5:
+ 
+ .align 4096
+ 
++boot_idt:
++	.rept 256
++	.quad 0
++	.quad 0
++	.endr
++end_boot_idt:
++
+ gdt64_desc:
+ 	.word gdt64_end - gdt64 - 1
+ 	.quad gdt64
+@@ -282,7 +291,7 @@ lvl5:
+ 	retq
+ 
+ idt_descr:
+-	.word 16 * 256 - 1
++	.word end_boot_idt - boot_idt - 1
+ 	.quad boot_idt
+ 
+ online_cpus:
 -- 
-Thanks,
-
-David / dhildenb
+2.26.2
 
