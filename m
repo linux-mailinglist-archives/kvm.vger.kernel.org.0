@@ -2,82 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4904206A41
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 04:39:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDCC9206C05
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 07:56:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388202AbgFXCjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 22:39:48 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:56207 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387970AbgFXCjr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 22:39:47 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04427;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U0YmjzJ_1592966379;
-Received: from 30.27.116.246(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U0YmjzJ_1592966379)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 24 Jun 2020 10:39:41 +0800
-Subject: Re: [PATCH v6 1/5] KVM: s390: clean up redundant 'kvm_run' parameters
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
-        mpe@ellerman.id.au, benh@kernel.crashing.org,
-        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
-        chenhuacai@gmail.com
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
- <20200623131418.31473-2-tianjia.zhang@linux.alibaba.com>
- <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <650c2193-5299-714e-92f4-75cbff319948@linux.alibaba.com>
-Date:   Wed, 24 Jun 2020 10:39:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S2389060AbgFXF4E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 01:56:04 -0400
+Received: from mga18.intel.com ([134.134.136.126]:14787 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388280AbgFXF4E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jun 2020 01:56:04 -0400
+IronPort-SDR: g/asH8//nlEQk76LudjXvHhqlhOgB0eeFxCPF7tu/Tz7UeNbVFrVlgks8mX+4o6BqWbfvfOkCi
+ JPyuFh+m3zkQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="131780348"
+X-IronPort-AV: E=Sophos;i="5.75,274,1589266800"; 
+   d="scan'208";a="131780348"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 22:56:03 -0700
+IronPort-SDR: +WRzbudH5WccXgHhEBtGs7jLgYUfPgjlpURNgwMRnNr8taqh93vYgYIb0rMoD/QWuyHKAlqow+
+ /rk7ofOMn1ig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,274,1589266800"; 
+   d="scan'208";a="452519601"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga005.jf.intel.com with ESMTP; 23 Jun 2020 22:55:58 -0700
+Date:   Wed, 24 Jun 2020 13:56:11 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com
+Subject: Re: [PATCH v12 00/10] Introduce support for guest CET feature
+Message-ID: <20200624055611.GA14379@local-michael-cet-test>
+References: <20200506082110.25441-1-weijiang.yang@intel.com>
+ <20200610165635.GB18790@linux.intel.com>
+ <20200611012913.GA15497@local-michael-cet-test>
+ <20200623183919.GB24107@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200623183919.GB24107@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2020/6/23 23:31, Christian Borntraeger wrote:
+On Tue, Jun 23, 2020 at 11:39:19AM -0700, Sean Christopherson wrote:
+> On Thu, Jun 11, 2020 at 09:29:13AM +0800, Yang Weijiang wrote:
+> > On Wed, Jun 10, 2020 at 09:56:36AM -0700, Sean Christopherson wrote:
+> > > On Wed, May 06, 2020 at 04:20:59PM +0800, Yang Weijiang wrote:
+> > > > Several parts in KVM have been updated to provide VM CET support, including:
+> > > > CPUID/XSAVES config, MSR pass-through, user space MSR access interface, 
+> > > > vmentry/vmexit config, nested VM etc. These patches have dependency on CET
+> > > > kernel patches for xsaves support and CET definitions, e.g., MSR and related
+> > > > feature flags.
+> > > 
+> > > Other than the MSR and cpufeatures flags definitions, is there any direct
+> > > dependency on kernel CET support?  I.e. if/when XSAVES support is merged,
+> > > is there anything beyond the architectural definitions that are required to
+> > > merge KVM CET virtualization?
+> > No, KVM CET patches only depend on kernel CET related definitions and XSAVES 
+> > support now.
+> 
+> Neato.
+> 
+> > But to make guest CET work, we need CET patches for QEMU.
+> 
+> Ya, but we don't need to wait for host kernel support, which was the crux of
+> my question.
 > 
 > 
-> On 23.06.20 15:14, Tianjia Zhang wrote:
->> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
->> structure. For historical reasons, many kvm-related function parameters
->> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
->> patch does a unified cleanup of these remaining redundant parameters.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>   arch/s390/kvm/kvm-s390.c | 23 +++++++++++++++--------
->>   1 file changed, 15 insertions(+), 8 deletions(-)
-> 
-> Tinajia,
-> 
-> I have trouble seeing value in this particular patch. We add LOCs
-> without providing any noticable benefit. All other patches in this series at
-> least reduce the amount of code. So I would defer this to Paolo if he prefers
-> to have this way across all architectures.
+> Can you please respin this series with the CET definition patches included?
+> The XSAVES support has been queued to tip/x86/fpu.  Assuming that lands in
+> kernel 5.9, I _think_ KVM support for CET can land in 5.10.
 
-Yes, this is a full architecture optimization. Some of the architecture 
-optimization has been merged into the mainline. I think it is necessary 
-to unify this optimization. This is also the meaning of Paolo.
-You can refer to the email of the previous version:
-https://lkml.org/lkml/2020/4/27/16
+Sure. Besides this change and the unrestricted guest case change, any
+other changes I should do to v12 patch?
 
-Thanks,
-Tianjia
+Thanks for review!
+> 
+> Base your series on kvm/queue, i.e. don't worry about the XSAVES patches,
+> I'll merge them in from tip/x86/fpu for testing.
+> 
+> Thanks!
