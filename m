@@ -2,162 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37815206E5A
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 09:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 078FD206F70
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 10:51:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390002AbgFXH4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jun 2020 03:56:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33445 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2388029AbgFXH4L (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jun 2020 03:56:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592985369;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jGLpjtaK4gx9ypihPopUPCr5NEjJhJ3CIRNBT38ZCPg=;
-        b=etmDsZ+yPntmX+kR+AYiQnbzBxgzv8IFuoiI/UkWlQ42cb9s7nC/7BL9adtLTTlNy55vWu
-        JgIyQZDcnX6YWgyAXNL04gYeXSLvEc6OVR7ivbd8u0vEYEnH2nvcJT0zo3kMdmMNRcN40P
-        MYLmfSKyAW4yDvMNyODpz4U+icT3bqI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-Faqxr5GSOHOxmsXAmJ9tDQ-1; Wed, 24 Jun 2020 03:56:05 -0400
-X-MC-Unique: Faqxr5GSOHOxmsXAmJ9tDQ-1
-Received: by mail-wr1-f69.google.com with SMTP id m14so2157860wrj.12
-        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 00:56:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=jGLpjtaK4gx9ypihPopUPCr5NEjJhJ3CIRNBT38ZCPg=;
-        b=cCOD7YDoO5GQySxSt/mM0r8M/NRwF0P6Zix+5RE3T3SbE4LP3kbz0hzh6WQnRMBFke
-         srMXHILKv29PJL5TQdtaSXwlCO7n5sRCo8NjjFot7cMue8XjsnlTbvS9LXoi4Z1m0uyv
-         qnDs39Pg207+W/j7E++Fa0iDORhw4ezdpbaZtSzfyznWupxP5rEb8ifBwC2Ku9JZJTRi
-         o7lOo38cz3xlMmuBwDdOFsOB2mxCus7Yf1IC77M4RGpOArCjnem1RSS/WCZEFMMwlXcn
-         QOYhcgdE+TEoPuQkYEEopHO0uHmt39n0tENB3XClFJeSPOcZLxZ/P74XAW57abrS2QBJ
-         gyUQ==
-X-Gm-Message-State: AOAM530FR5E53kG5zx8UgRhQjGO1klolDCJMKSzvikaDjpzNHT9U4IDc
-        FJXGiV5u0Eg0nceJU3V3++YWk2okj5QBGTARhnn0Sn8oWGqKuCJmrLpBC6MD5QbAz+H/i/vKKAO
-        wdzYcm9kB4YHi
-X-Received: by 2002:a5d:6651:: with SMTP id f17mr16581139wrw.29.1592985364628;
-        Wed, 24 Jun 2020 00:56:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxQierUv/ZViS8VI68a8MUeEYG60ndQYpclpxQhLzof5wumctFwEDuPBGfgqDfPpwi858vT7g==
-X-Received: by 2002:a5d:6651:: with SMTP id f17mr16581112wrw.29.1592985364323;
-        Wed, 24 Jun 2020 00:56:04 -0700 (PDT)
-Received: from redhat.com ([82.166.20.53])
-        by smtp.gmail.com with ESMTPSA id c18sm1057269wmk.18.2020.06.24.00.56.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2020 00:56:03 -0700 (PDT)
-Date:   Wed, 24 Jun 2020 03:55:59 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc:     pair@us.ibm.com, brijesh.singh@amd.com, frankja@linux.ibm.com,
-        kvm@vger.kernel.org, david@redhat.com, cohuck@redhat.com,
-        qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        dgilbert@redhat.com, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
-        qemu-ppc@nongnu.org, pbonzini@redhat.com,
-        Richard Henderson <rth@twiddle.net>, mdroth@linux.vnet.ibm.com,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v3 9/9] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200624034932-mutt-send-email-mst@kernel.org>
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <20200619020602.118306-10-david@gibson.dropbear.id.au>
- <20200619101245.GC700896@redhat.com>
- <20200619074432-mutt-send-email-mst@kernel.org>
- <20200619074630-mutt-send-email-mst@kernel.org>
- <20200619121638.GK700896@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200619121638.GK700896@redhat.com>
+        id S2389600AbgFXIup (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 04:50:45 -0400
+Received: from mga01.intel.com ([192.55.52.88]:1309 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387796AbgFXIs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jun 2020 04:48:58 -0400
+IronPort-SDR: dof78PE56RueGZuaA/IkzjRmMN5qmqtInXwqzspmx5gul6ERErijfWmgRrfUMqwX9GlyQDsbTO
+ yEgEt9AqXhxg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="162484865"
+X-IronPort-AV: E=Sophos;i="5.75,274,1589266800"; 
+   d="scan'208";a="162484865"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2020 01:48:56 -0700
+IronPort-SDR: 3wjsszL64qt/U6/qcUJlWSGelCbu9HW5E0/evm5z894kj3Dtspdpx+1+N9J8/5oAYE3DaDplnU
+ Sg64TNcC6g2g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,274,1589266800"; 
+   d="scan'208";a="275624490"
+Received: from jacob-builder.jf.intel.com ([10.7.199.155])
+  by orsmga003.jf.intel.com with ESMTP; 24 Jun 2020 01:48:55 -0700
+From:   Liu Yi L <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, eric.auger@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
+        yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
+        hao.wu@intel.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/14] vfio: expose virtual Shared Virtual Addressing to VMs
+Date:   Wed, 24 Jun 2020 01:55:13 -0700
+Message-Id: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 19, 2020 at 01:16:38PM +0100, Daniel P. Berrang� wrote:
-> On Fri, Jun 19, 2020 at 07:47:20AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Jun 19, 2020 at 07:46:14AM -0400, Michael S. Tsirkin wrote:
-> > > On Fri, Jun 19, 2020 at 11:12:45AM +0100, Daniel P. BerrangÃ© wrote:
-> > > > On Fri, Jun 19, 2020 at 12:06:02PM +1000, David Gibson wrote:
-> > > > > The default behaviour for virtio devices is not to use the platforms normal
-> > > > > DMA paths, but instead to use the fact that it's running in a hypervisor
-> > > > > to directly access guest memory.  That doesn't work if the guest's memory
-> > > > > is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> > > > > 
-> > > > > So, if a host trust limitation mechanism is enabled, then apply the
-> > > > > iommu_platform=on option so it will go through normal DMA mechanisms.
-> > > > > Those will presumably have some way of marking memory as shared with the
-> > > > > hypervisor or hardware so that DMA will work.
-> > > > > 
-> > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > > ---
-> > > > >  hw/core/machine.c | 11 +++++++++++
-> > > > >  1 file changed, 11 insertions(+)
-> > > > > 
-> > > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > > > index a71792bc16..8dfc1bb3f8 100644
-> > > > > --- a/hw/core/machine.c
-> > > > > +++ b/hw/core/machine.c
-> > > > > @@ -28,6 +28,8 @@
-> > > > >  #include "hw/mem/nvdimm.h"
-> > > > >  #include "migration/vmstate.h"
-> > > > >  #include "exec/host-trust-limitation.h"
-> > > > > +#include "hw/virtio/virtio.h"
-> > > > > +#include "hw/virtio/virtio-pci.h"
-> > > > >  
-> > > > >  GlobalProperty hw_compat_5_0[] = {
-> > > > >      { "virtio-balloon-device", "page-poison", "false" },
-> > > > > @@ -1165,6 +1167,15 @@ void machine_run_board_init(MachineState *machine)
-> > > > >           * areas.
-> > > > >           */
-> > > > >          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> > > > > +
-> > > > > +        /*
-> > > > > +         * Virtio devices can't count on directly accessing guest
-> > > > > +         * memory, so they need iommu_platform=on to use normal DMA
-> > > > > +         * mechanisms.  That requires disabling legacy virtio support
-> > > > > +         * for virtio pci devices
-> > > > > +         */
-> > > > > +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> > > > > +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
-> > > > >      }
-> > > > 
-> > > > Silently changing the user's request configuration like this is a bad idea.
-> > > > The "disable-legacy" option in particular is undesirable as that switches
-> > > > the device to virtio-1.0 only mode, which exposes a different PCI ID to
-> > > > the guest.
-> > > > 
-> > > > If some options are incompatible with encryption, then we should raise a
-> > > > fatal error at startup, so applications/admins are aware that their requested
-> > > > config is broken.
-> > >
-> > > Agreed - my suggestion is an on/off/auto property, auto value
-> > > changes automatically, on/off is validated.
-> > 
-> > In fact should we extend all bit properties to allow an auto value?
-> 
-> If "auto" was made the default that creates a similar headache, as to
-> preserve existing configuration semantics we expose to apps, libvirt
-> would need to find all the properties changed to use "auto" and manually
-> set them back to on/off explicitly.
-> 
-> Regards,
-> Daniel
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
 
-It's QEMU's job to try and have more or less consistent semantics across
-versions. QEMU does not guarantee not to change any option defaults
-though.
+This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes. For IOMMU and QEMU changes, they are in separate series (listed
+in the "Related series").
 
-My point is to add ability to differentiate between property values
-set by user and ones set by machine type for compatibility.
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
 
+
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
+
+Patch Overview:
+ 1. a refactor to vfio_iommu_type1 ioctl (patch 0001)
+ 2. reports IOMMU nesting info to userspace ( patch 0002, 0003 and 0014)
+ 3. vfio support for PASID allocation and free for VMs (patch 0004, 0005, 0006)
+ 4. vfio support for binding guest page table to host (patch 0007, 0008, 0009)
+ 5. vfio support for IOMMU cache invalidation from VMs (patch 0010)
+ 6. vfio support for vSVA usage on IOMMU-backed mdevs (patch 0011)
+ 7. expose PASID capability to VM (patch 0012)
+ 8. add doc for VFIO dual stage control (patch 0013)
+
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
+
+This patchset is aiming for the phase 1 and phase 2, and based on Jacob's
+below series.
+[PATCH v3 0/5] IOMMU user API enhancement - wip
+https://lore.kernel.org/linux-iommu/1592931837-58223-1-git-send-email-jacob.jun.pan@linux.intel.com/
+
+[PATCH 00/10] IOASID extensions for guest SVA - wip
+https://lkml.org/lkml/2020/3/25/874
+
+The latest IOASID code added below new interface for itertate all PASIDs of an
+ioasid_set. The implementation is not sent out yet as Jacob needs some cleanup,
+it can be found in branch vsva-linux-5.8-rc1-v3
+ int ioasid_set_for_each_ioasid(int sid, void (*fn)(ioasid_t id, void *data), void *data);
+
+Complete set for current vSVA can be found in below branch.
+This branch also includes some extra modifications to IOASID core code and
+vt-d iommu driver cleanup patches.
+https://github.com/luxis1999/linux-vsva.git:vsva-linux-5.8-rc1-v3
+
+The corresponding QEMU patch series is included in below branch:
+https://github.com/luxis1999/qemu.git:vsva_5.8_rc1_qemu_rfcv6
+
+
+Regards,
+Yi Liu
+
+Changelog:
+	- Patch v2 -> Patch v3:
+	  a) Rebase on top of Jacob's v3 iommu uapi patchset
+	  b) Address comments from Kevin and Stefan Hajnoczi
+	  c) Reuse DOMAIN_ATTR_NESTING to get iommu nesting info
+	  d) Drop [PATCH v2 07/15] iommu/uapi: Add iommu_gpasid_unbind_data
+	  https://lore.kernel.org/linux-iommu/1591877734-66527-1-git-send-email-yi.l.liu@intel.com/#r
+
+	- Patch v1 -> Patch v2:
+	  a) Refactor vfio_iommu_type1_ioctl() per suggestion from Christoph
+	     Hellwig.
+	  b) Re-sequence the patch series for better bisect support.
+	  c) Report IOMMU nesting cap info in detail instead of a format in
+	     v1.
+	  d) Enforce one group per nesting type container for vfio iommu type1
+	     driver.
+	  e) Build the vfio_mm related code from vfio.c to be a separate
+	     vfio_pasid.ko.
+	  f) Add PASID ownership check in IOMMU driver.
+	  g) Adopted to latest IOMMU UAPI design. Removed IOMMU UAPI version
+	     check. Added iommu_gpasid_unbind_data for unbind requests from
+	     userspace.
+	  h) Define a single ioctl:VFIO_IOMMU_NESTING_OP for bind/unbind_gtbl
+	     and cahce_invld.
+	  i) Document dual stage control in vfio.rst.
+	  Patch v1: https://lore.kernel.org/linux-iommu/1584880325-10561-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v3 -> Patch v1:
+	  a) Address comments to the PASID request(alloc/free) path
+	  b) Report PASID alloc/free availabitiy to user-space
+	  c) Add a vfio_iommu_type1 parameter to support pasid quota tuning
+	  d) Adjusted to latest ioasid code implementation. e.g. remove the
+	     code for tracking the allocated PASIDs as latest ioasid code
+	     will track it, VFIO could use ioasid_free_set() to free all
+	     PASIDs.
+	  RFC v3: https://lore.kernel.org/linux-iommu/1580299912-86084-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v2 -> v3:
+	  a) Refine the whole patchset to fit the roughly parts in this series
+	  b) Adds complete vfio PASID management framework. e.g. pasid alloc,
+	  free, reclaim in VM crash/down and per-VM PASID quota to prevent
+	  PASID abuse.
+	  c) Adds IOMMU uAPI version check and page table format check to ensure
+	  version compatibility and hardware compatibility.
+	  d) Adds vSVA vfio support for IOMMU-backed mdevs.
+	  RFC v2: https://lore.kernel.org/linux-iommu/1571919983-3231-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v1 -> v2:
+	  Dropped vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE.
+	  RFC v1: https://lore.kernel.org/linux-iommu/1562324772-3084-1-git-send-email-yi.l.liu@intel.com/
+
+---
+Eric Auger (1):
+  vfio: Document dual stage control
+
+Liu Yi L (12):
+  vfio/type1: Refactor vfio_iommu_type1_ioctl()
+  iommu: Report domain nesting info
+  vfio/type1: Report iommu nesting info to userspace
+  vfio: Add PASID allocation/free support
+  iommu/vt-d: Support setting ioasid set to domain
+  vfio/type1: Add VFIO_IOMMU_PASID_REQUEST (alloc/free)
+  iommu/vt-d: Check ownership for PASIDs from user-space
+  vfio/type1: Support binding guest page tables to PASID
+  vfio/type1: Allow invalidating first-level/stage IOMMU cache
+  vfio/type1: Add vSVA support for IOMMU-backed mdevs
+  vfio/pci: Expose PCIe PASID capability to guest
+  iommu/vt-d: Support reporting nesting capability info
+
+Yi Sun (1):
+  iommu: Pass domain to sva_unbind_gpasid()
+
+ Documentation/driver-api/vfio.rst  |  67 ++++
+ drivers/iommu/arm-smmu-v3.c        |  29 +-
+ drivers/iommu/arm-smmu.c           |  29 +-
+ drivers/iommu/intel/iommu.c        | 105 ++++-
+ drivers/iommu/intel/svm.c          |  10 +-
+ drivers/iommu/iommu.c              |   2 +-
+ drivers/vfio/Kconfig               |   6 +
+ drivers/vfio/Makefile              |   1 +
+ drivers/vfio/pci/vfio_pci_config.c |   2 +-
+ drivers/vfio/vfio_iommu_type1.c    | 800 +++++++++++++++++++++++++++++--------
+ drivers/vfio/vfio_pasid.c          | 191 +++++++++
+ include/linux/intel-iommu.h        |  23 +-
+ include/linux/iommu.h              |   4 +-
+ include/linux/vfio.h               |  54 +++
+ include/uapi/linux/iommu.h         |  59 +++
+ include/uapi/linux/vfio.h          |  78 ++++
+ 16 files changed, 1273 insertions(+), 187 deletions(-)
+ create mode 100644 drivers/vfio/vfio_pasid.c
 
 -- 
-MST
+2.7.4
 
