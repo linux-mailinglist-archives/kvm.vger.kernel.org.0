@@ -2,78 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24C5C207568
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 16:14:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41EC12075D9
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 16:40:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390049AbgFXOOf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jun 2020 10:14:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48942 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389583AbgFXOOe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jun 2020 10:14:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593008073;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ZEqT8Oy86SuWyMii7V54P8YjMki3kKQTmwnWT92jSIM=;
-        b=dJnNKjAbHuGjaIHfG/XJkaplIIF091l7p5r0tv1UaCjWHzVkg8+P/eaRPoC1zbnzQVW8ng
-        ZPO8YymZv6CUXwKYtU85nfk1cQKFxbM2Z7zpA1j7AKrXR7Wp7iobZzhBexw31PClmPs6jo
-        TvTjOiDv5lpZQKlAh9p6hevaFNxm+so=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-KSvMrACgOAWHNwbjwLkQmA-1; Wed, 24 Jun 2020 10:14:31 -0400
-X-MC-Unique: KSvMrACgOAWHNwbjwLkQmA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D3251940923
-        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 14:14:30 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A5F07B600
-        for <kvm@vger.kernel.org>; Wed, 24 Jun 2020 14:14:30 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] i386: setup segment registers before percpu areas
-Date:   Wed, 24 Jun 2020 10:14:29 -0400
-Message-Id: <20200624141429.382157-1-pbonzini@redhat.com>
+        id S2390481AbgFXOj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jun 2020 10:39:57 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:55808 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388652AbgFXOj5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jun 2020 10:39:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1593009597; x=1624545597;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=5CptIMYGtLRJUOaEOQnppqBMq8qhYumr4bsnmrqP5lg=;
+  b=oNn5R7Qju6A+Ltwehv0z8SBGUFDAZO76khwSMFqK/0L32n2s/iT5kv21
+   KlZX6WubHmxCzPClZCa9w5gdarx+rzJMnKEcgobuWeFlcVbP05W4pUtxy
+   sCPZ5c/HqPKeG7Lgm8TOa3LGWBxq0aZug6sqVsLjWeFvO2GXvbuseWNBS
+   8=;
+IronPort-SDR: A3ZScZaN5pcVEarGidONVw36S6jhSY5hGDEmMARNsoO6mC2ciUVky/UU1Ven2APoflA8+in+9f
+ ViJxg/aeeqIA==
+X-IronPort-AV: E=Sophos;i="5.75,275,1589241600"; 
+   d="scan'208";a="38170872"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 24 Jun 2020 14:39:55 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (Postfix) with ESMTPS id 4481CA2177;
+        Wed, 24 Jun 2020 14:39:53 +0000 (UTC)
+Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 24 Jun 2020 14:39:52 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.109) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 24 Jun 2020 14:39:44 +0000
+Subject: Re: [PATCH v4 17/18] nitro_enclaves: Add overview documentation
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        "Alexander Graf" <graf@amazon.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-18-andraprs@amazon.com>
+ <20200623085915.GF32718@stefanha-x1.localdomain>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <746fcd7d-5946-35ec-6471-8bf8dccdf400@amazon.com>
+Date:   Wed, 24 Jun 2020 17:39:39 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200623085915.GF32718@stefanha-x1.localdomain>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.109]
+X-ClientProxiedBy: EX13D36UWA003.ant.amazon.com (10.43.160.237) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The base of the percpu area is stored in the %gs base, and writing
-to %gs destroys it.  Move setup_segments earlier, before the %gs
-base is written.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/cstart.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/x86/cstart.S b/x86/cstart.S
-index 5ad70b5..77dc34d 100644
---- a/x86/cstart.S
-+++ b/x86/cstart.S
-@@ -106,6 +106,7 @@ MSR_GS_BASE = 0xc0000101
- .globl start
- start:
-         mov $stacktop, %esp
-+        setup_segments
-         push %ebx
-         call setup_multiboot
-         call setup_libcflat
-@@ -118,7 +119,6 @@ start:
- 
- prepare_32:
-         lgdtl gdt32_descr
--	setup_segments
- 
- 	mov %cr4, %eax
- 	bts $4, %eax  // pse
--- 
-2.26.2
+On 23/06/2020 11:59, Stefan Hajnoczi wrote:
+> On Mon, Jun 22, 2020 at 11:03:28PM +0300, Andra Paraschiv wrote:
+>> +The kernel bzImage, the kernel command line, the ramdisk(s) are part of=
+ the
+>> +Enclave Image Format (EIF); plus an EIF header including metadata such =
+as magic
+>> +number, eif version, image size and CRC.
+>> +
+>> +Hash values are computed for the entire enclave image (EIF), the kernel=
+ and
+>> +ramdisk(s). That's used, for example, to check that the enclave image t=
+hat is
+>> +loaded in the enclave VM is the one that was intended to be run.
+>> +
+>> +These crypto measurements are included in a signed attestation document
+>> +generated by the Nitro Hypervisor and further used to prove the identit=
+y of the
+>> +enclave; KMS is an example of service that NE is integrated with and th=
+at checks
+>> +the attestation doc.
+>> +
+>> +The enclave image (EIF) is loaded in the enclave memory at offset 8 MiB=
+. The
+>> +init process in the enclave connects to the vsock CID of the primary VM=
+ and a
+>> +predefined port - 9000 - to send a heartbeat value - 0xb7. This mechani=
+sm is
+>> +used to check in the primary VM that the enclave has booted.
+>> +
+>> +If the enclave VM crashes or gracefully exits, an interrupt event is re=
+ceived by
+>> +the NE driver. This event is sent further to the user space enclave pro=
+cess
+>> +running in the primary VM via a poll notification mechanism. Then the u=
+ser space
+>> +enclave process can exit.
+>> +
+>> +[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+>> +[2] https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
+>> +[3] https://lwn.net/Articles/807108/
+>> +[4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameter=
+s.html
+>> +[5] https://man7.org/linux/man-pages/man7/vsock.7.html
+> Is the EIF specification and the attestation protocol available?
+
+For now, they are not publicly available. Once the refs are available =
+
+(e.g. AWS documentation, GitHub documentation), I'll include them in the =
+
+kernel documentation as well.
+
+As a note here, the NE project is currently in preview =
+
+(https://aws.amazon.com/ec2/nitro/nitro-enclaves/) and part of the =
+
+documentation / codebase will be publicly available when NE is generally =
+
+available (GA). This will be in addition to the ones already publicly =
+
+available, like the NE kernel driver.
+
+Let me know if I can help with any particular questions / clarifications.
+
+Thanks,
+Andra
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
 
