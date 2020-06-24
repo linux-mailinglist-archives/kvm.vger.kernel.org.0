@@ -2,90 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62F112069E7
-	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 04:00:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4904206A41
+	for <lists+kvm@lfdr.de>; Wed, 24 Jun 2020 04:39:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387692AbgFXCAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jun 2020 22:00:45 -0400
-Received: from mga05.intel.com ([192.55.52.43]:12261 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730898AbgFXCAp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jun 2020 22:00:45 -0400
-IronPort-SDR: rrS8TqHZfrqc5u3S9NZdlxRhkrtJTqaUj06dnpYqPzPtd2UAStEZksx6uJXTlKkJx/Qblr+o7D
- Bg6ZEWLSoX3Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9661"; a="228978274"
-X-IronPort-AV: E=Sophos;i="5.75,273,1589266800"; 
-   d="scan'208";a="228978274"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2020 19:00:44 -0700
-IronPort-SDR: nyusmRsoLpw4RhjXmgQ2g5Ff9IPLjc3Aqcjzxi8zdrmzruuMYtvvxZvnEX1FQas3QtGUjJl3yS
- ns3x6FbD8c/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,273,1589266800"; 
-   d="scan'208";a="310649991"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga008.jf.intel.com with ESMTP; 23 Jun 2020 19:00:41 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH] kvm: x86: limit the maximum number of vPMU fixed counters to 3
-Date:   Wed, 24 Jun 2020 09:59:28 +0800
-Message-Id: <20200624015928.118614-1-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.3
+        id S2388202AbgFXCjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jun 2020 22:39:48 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:56207 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387970AbgFXCjr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jun 2020 22:39:47 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04427;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0U0YmjzJ_1592966379;
+Received: from 30.27.116.246(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0U0YmjzJ_1592966379)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 24 Jun 2020 10:39:41 +0800
+Subject: Re: [PATCH v6 1/5] KVM: s390: clean up redundant 'kvm_run' parameters
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        pbonzini@redhat.com, tsbogend@alpha.franken.de, paulus@ozlabs.org,
+        mpe@ellerman.id.au, benh@kernel.crashing.org,
+        frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, maz@kernel.org, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, peterx@redhat.com, thuth@redhat.com,
+        chenhuacai@gmail.com
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200623131418.31473-1-tianjia.zhang@linux.alibaba.com>
+ <20200623131418.31473-2-tianjia.zhang@linux.alibaba.com>
+ <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Message-ID: <650c2193-5299-714e-92f4-75cbff319948@linux.alibaba.com>
+Date:   Wed, 24 Jun 2020 10:39:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <c49f8814-c7ea-6884-91c5-3dcd40c6509f@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some new Intel platforms (such as TGL) already have the
-fourth fixed counter TOPDOWN.SLOTS, but it has not been
-fully enabled on KVM and the host.
 
-Therefore, we limit edx.split.num_counters_fixed to 3,
-so that it does not break the kvm-unit-tests PMU test
-case and bad-handled userspace.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- arch/x86/kvm/cpuid.c | 2 +-
- arch/x86/kvm/pmu.h   | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+On 2020/6/23 23:31, Christian Borntraeger wrote:
+> 
+> 
+> On 23.06.20 15:14, Tianjia Zhang wrote:
+>> In the current kvm version, 'kvm_run' has been included in the 'kvm_vcpu'
+>> structure. For historical reasons, many kvm-related function parameters
+>> retain the 'kvm_run' and 'kvm_vcpu' parameters at the same time. This
+>> patch does a unified cleanup of these remaining redundant parameters.
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>   arch/s390/kvm/kvm-s390.c | 23 +++++++++++++++--------
+>>   1 file changed, 15 insertions(+), 8 deletions(-)
+> 
+> Tinajia,
+> 
+> I have trouble seeing value in this particular patch. We add LOCs
+> without providing any noticable benefit. All other patches in this series at
+> least reduce the amount of code. So I would defer this to Paolo if he prefers
+> to have this way across all architectures.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 8a294f9747aa..0a2c6d2b4650 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -604,7 +604,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		eax.split.bit_width = cap.bit_width_gp;
- 		eax.split.mask_length = cap.events_mask_len;
- 
--		edx.split.num_counters_fixed = cap.num_counters_fixed;
-+		edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
- 		edx.split.bit_width_fixed = cap.bit_width_fixed;
- 		edx.split.reserved = 0;
- 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index ab85eed8a6cc..067fef51760c 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -15,6 +15,8 @@
- #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
- #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
- 
-+#define MAX_FIXED_COUNTERS	3
-+
- struct kvm_event_hw_type_mapping {
- 	u8 eventsel;
- 	u8 unit_mask;
--- 
-2.21.3
+Yes, this is a full architecture optimization. Some of the architecture 
+optimization has been merged into the mainline. I think it is necessary 
+to unify this optimization. This is also the meaning of Paolo.
+You can refer to the email of the previous version:
+https://lkml.org/lkml/2020/4/27/16
 
+Thanks,
+Tianjia
