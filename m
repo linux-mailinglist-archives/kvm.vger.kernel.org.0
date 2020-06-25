@@ -2,160 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1289C209F5B
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:10:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A9FC209FD0
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:26:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404696AbgFYNKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 09:10:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37884 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2404803AbgFYNKe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 09:10:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593090632;
+        id S2405000AbgFYN0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 09:26:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404888AbgFYN0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 09:26:18 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ADF6C08C5C1;
+        Thu, 25 Jun 2020 06:26:18 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0ed10074d8a868b8f3cf92.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:d100:74d8:a868:b8f3:cf92])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CFE0C1EC03F0;
+        Thu, 25 Jun 2020 15:26:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1593091577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LN1Esb/7Hi/Z/DHHBSlOzerqkyDCNAofXS9512fRksY=;
-        b=YWp5MC2z2X5qoBnfzsR8XY0OWty3BbrbSBuy95N1CR/e7eDBKPSisGsR7vqQYISvcBK9Ak
-        lmrV4pcoXk5tMMMaqORJo6txwezovi1lF1bJf2XMJtIBKvLYitOGTH9sVYvp9LkTFJMRwA
-        S1j0BVRD+uRvsLlUeHDekP/HU+rQe0k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-kOw_BvQeM5GFVWO-Gh_oew-1; Thu, 25 Jun 2020 09:10:25 -0400
-X-MC-Unique: kOw_BvQeM5GFVWO-Gh_oew-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2452107ACF2;
-        Thu, 25 Jun 2020 13:10:22 +0000 (UTC)
-Received: from localhost (ovpn-115-49.ams2.redhat.com [10.36.115.49])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 588BE79315;
-        Thu, 25 Jun 2020 13:10:21 +0000 (UTC)
-Date:   Thu, 25 Jun 2020 14:10:20 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        Alexander Graf <graf@amazon.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
-        ne-devel-upstream@amazon.com
-Subject: Re: [PATCH v4 17/18] nitro_enclaves: Add overview documentation
-Message-ID: <20200625131020.GD221479@stefanha-x1.localdomain>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-18-andraprs@amazon.com>
- <20200623085915.GF32718@stefanha-x1.localdomain>
- <746fcd7d-5946-35ec-6471-8bf8dccdf400@amazon.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=8nllPNkefZLtge6T1+fl0TvxIAEHeAqYDppxTpvHcOQ=;
+        b=DozaLm20n98Ezq6eqr0ypoKyVBmALyjCP2oB1ZgFm5fcMbETYgS52lX85HRJP1duth2cPu
+        AqgVvBoe2jPWmP1ghlFhSERaxbWyBmrErnQW8YQW0a93S9XjJz8vS/VzaXj81y2uHjnRve
+        AKekWCCk1d/Jr2ASG885uF15Ku2Z+0I=
+Date:   Thu, 25 Jun 2020 15:26:10 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, "H. Peter Anvin" <hpa@zytor.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Brad Campbell <lists2009@fnarfbargle.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2] x86/cpu: Reinitialize IA32_FEAT_CTL MSR on BSP during
+ wakeup
+Message-ID: <20200625132610.GD20319@zn.tnic>
+References: <20200608174134.11157-1-sean.j.christopherson@intel.com>
+ <CAJZ5v0inhpW1vbYJYPqWgkekK7hKhgO_fE5JmemT+p2qh7RFaw@mail.gmail.com>
+ <2a3976ac-242b-260a-ce7b-2080d8e9d0f8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <746fcd7d-5946-35ec-6471-8bf8dccdf400@amazon.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="hoZxPH4CaxYzWscb"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <2a3976ac-242b-260a-ce7b-2080d8e9d0f8@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---hoZxPH4CaxYzWscb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jun 25, 2020 at 02:27:46PM +0200, Paolo Bonzini wrote:
+> > Given the regression fix nature of this patch, is it being taken care
+> > of by anyone (tip in particular) already?
+> 
+> I was waiting for tip to pick it up, but I can as well with an Acked-by
+> (KVM is broken by the patch but there's nothing KVM specific in it).
 
-On Wed, Jun 24, 2020 at 05:39:39PM +0300, Paraschiv, Andra-Irina wrote:
->=20
->=20
-> On 23/06/2020 11:59, Stefan Hajnoczi wrote:
-> > On Mon, Jun 22, 2020 at 11:03:28PM +0300, Andra Paraschiv wrote:
-> > > +The kernel bzImage, the kernel command line, the ramdisk(s) are part=
- of the
-> > > +Enclave Image Format (EIF); plus an EIF header including metadata su=
-ch as magic
-> > > +number, eif version, image size and CRC.
-> > > +
-> > > +Hash values are computed for the entire enclave image (EIF), the ker=
-nel and
-> > > +ramdisk(s). That's used, for example, to check that the enclave imag=
-e that is
-> > > +loaded in the enclave VM is the one that was intended to be run.
-> > > +
-> > > +These crypto measurements are included in a signed attestation docum=
-ent
-> > > +generated by the Nitro Hypervisor and further used to prove the iden=
-tity of the
-> > > +enclave; KMS is an example of service that NE is integrated with and=
- that checks
-> > > +the attestation doc.
-> > > +
-> > > +The enclave image (EIF) is loaded in the enclave memory at offset 8 =
-MiB. The
-> > > +init process in the enclave connects to the vsock CID of the primary=
- VM and a
-> > > +predefined port - 9000 - to send a heartbeat value - 0xb7. This mech=
-anism is
-> > > +used to check in the primary VM that the enclave has booted.
-> > > +
-> > > +If the enclave VM crashes or gracefully exits, an interrupt event is=
- received by
-> > > +the NE driver. This event is sent further to the user space enclave =
-process
-> > > +running in the primary VM via a poll notification mechanism. Then th=
-e user space
-> > > +enclave process can exit.
-> > > +
-> > > +[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
-> > > +[2] https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
-> > > +[3] https://lwn.net/Articles/807108/
-> > > +[4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-parame=
-ters.html
-> > > +[5] https://man7.org/linux/man-pages/man7/vsock.7.html
-> > Is the EIF specification and the attestation protocol available?
->=20
-> For now, they are not publicly available. Once the refs are available (e.=
-g.
-> AWS documentation, GitHub documentation), I'll include them in the kernel
-> documentation as well.
->=20
-> As a note here, the NE project is currently in preview
-> (https://aws.amazon.com/ec2/nitro/nitro-enclaves/) and part of the
-> documentation / codebase will be publicly available when NE is generally
-> available (GA). This will be in addition to the ones already publicly
-> available, like the NE kernel driver.
->=20
-> Let me know if I can help with any particular questions / clarifications.
+https://git.kernel.org/tip/5d5103595e9e53048bb7e70ee2673c897ab38300
 
-Thanks!
+will be in -rc3, most likely.
 
-Stefan
+-- 
+Regards/Gruss,
+    Boris.
 
---hoZxPH4CaxYzWscb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl70ojwACgkQnKSrs4Gr
-c8hY1Af49KQr66earh3/QlA88cMkax3Hj7qRR9/hKpBS8qDRjwSHzSDhvemS0Qrf
-jH84GXs6j8Kjj2VdXFpyEaH183Ktz+27ydyMETDYpAvakhvOkBW5bSE6qqpK/EE1
-CuI2kIDVBDSCxul81JSB4ATnAfa6plUgUntTUjF4mhvLBWp3HgYW6S07o5LvzaD9
-6XcoDarRxGWErRs/3tVPHQrTtpMztrIxkp3eu+AiPdQuID4JUiKSzgMSne1lThRP
-9OZjF1nyAkx+UxBDFYpf5MmyKB4aEUz6UmFdLKoIGYExnAfuS+9rMtgWW+Rcnwpc
-uwLL0sfOGSkX8jJwQJWTV+ItlRhy
-=dz1i
------END PGP SIGNATURE-----
-
---hoZxPH4CaxYzWscb--
-
+https://people.kernel.org/tglx/notes-about-netiquette
