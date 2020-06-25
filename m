@@ -2,91 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04306209ACF
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 09:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 226E1209AF3
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 10:02:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390330AbgFYHx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 03:53:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26719 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726930AbgFYHxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 03:53:25 -0400
+        id S2390439AbgFYICG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 04:02:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25326 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726930AbgFYICF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 04:02:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593071604;
+        s=mimecast20190719; t=1593072123;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ynck+4XeRB5o/nAH8FvdWG6Q5cXbjS/vIoJ1d8F0QNI=;
-        b=QdpqfercvMv2euan1h6IpD5GpBLdAQ8+KnuZvL7cLL+LLsNTTq+5M0+ZQ95BDjoA+xL39J
-        xfseDS8LSwQVsWiHuQ99cMXkFaST0lx1bT3kSgKnV1M3H4OACKESFTjWXukYt2nu/2fdqO
-        O0ezT8ZgtaccSMriy7y0kbqteU2OWFM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-nuvLY76RNkmvkmZIBcnonA-1; Thu, 25 Jun 2020 03:53:22 -0400
-X-MC-Unique: nuvLY76RNkmvkmZIBcnonA-1
-Received: by mail-wr1-f70.google.com with SMTP id m14so6223067wrj.12
-        for <kvm@vger.kernel.org>; Thu, 25 Jun 2020 00:53:21 -0700 (PDT)
+        bh=9eou9vqm4AHgzTtr7mdfoVHRauo3785uY9+qzNqMF9o=;
+        b=FLeN4MicnYn26edy7c0Q7ncHXX7OhjTbXfKdQYtK31VSd7+WpJa7MLnh9D0kXYOjMC/rsf
+        pS922V5T5l5XVcwVEpUYwBPXN4/1U/pv4Ed3kh/E1bXlN1VmtYolDJSw6+VAgv87K+RpWn
+        iIKHURgf3pDQj9hElsn2eRrfqEOUowI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-3LNpiA5lP6Wg4ZNiBKlGTQ-1; Thu, 25 Jun 2020 04:02:01 -0400
+X-MC-Unique: 3LNpiA5lP6Wg4ZNiBKlGTQ-1
+Received: by mail-wr1-f69.google.com with SMTP id e11so6310271wrs.2
+        for <kvm@vger.kernel.org>; Thu, 25 Jun 2020 01:02:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ynck+4XeRB5o/nAH8FvdWG6Q5cXbjS/vIoJ1d8F0QNI=;
-        b=VwcWXFSZR70YE1lxaO4RDblsXdffmbc4i+Sl3WRZTrJUwkQoZIHBlxdbZnrknkL/hT
-         XHkJ4y4FynKYhwGgvCKNlxJyALqPQ5nUuPmajy66FHd35jbIYBP1/7eVBt4pofYcCAIF
-         6y/g17JmtXAEZbrAipcV7RnOLh9BHbEnmoacu32W5gkwzErh9hwRXNOSW+xusOlIJa0l
-         V400I/ZVbZr961QPF9ufMyz+a+vt85pFzEfnxYYiLPV1I/Okyu6PYO761+lBFBxzauvC
-         WTckNjyQyyhhlz6DjfVsHr9IoAELOAvUnvIWb55Kkw3bKCtRJlY8J33adXpanJTXHWg5
-         JZCA==
-X-Gm-Message-State: AOAM530Pi7bPXweB8Wly+7colCr2QFUq/ztf/qBD//U542Mx+PEy3mDR
-        UijUNPN1x1QIQs8HFcVSNx/3UCzr82D9AU8J7uoWDCy7fyYQSJUTr40uLo72HZ9A7ai/0gRAGXs
-        x42OU97NE0zg5
-X-Received: by 2002:adf:df03:: with SMTP id y3mr33592172wrl.376.1593071600745;
-        Thu, 25 Jun 2020 00:53:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy929kM6SqkvoDSBqbNn9Pi+shHgfgvq2gm2KvmOc9sU+kcBzjiMshXUWG5kFMMzrQ2r3BTNw==
-X-Received: by 2002:adf:df03:: with SMTP id y3mr33592151wrl.376.1593071600505;
-        Thu, 25 Jun 2020 00:53:20 -0700 (PDT)
+        bh=9eou9vqm4AHgzTtr7mdfoVHRauo3785uY9+qzNqMF9o=;
+        b=jiMu8FJ/hBgJHWYgK6LMtZxQqAVBfzGVzjR9s/CMjF4eBY3pauEBVUWDH4rxAr+N29
+         vz0QuOr0/rkkHPMl9nRIPasdP0Z5mdY0qIaecD4IyCUzP1bVD+weySTJoFY2XxeuM/HP
+         0Q0XDatZvW2mb458kJdtJvfR+5dtiF4frHurSbJNC9ZiFzgBbYgdr6XVerVRQgvz+qhV
+         zv6yZYqhjd1eTvnJjbgW9DYg7g0jpTQiUp7HvWfgpykQ1oWwMSKwpe80oPZWcrVl770k
+         F7JAiKZ1WqWTsTyifomVBgAPO7PU1Im+Nr95IbitVIITfYIaRSL0tCMZ+2kDgmk5dO1g
+         RltQ==
+X-Gm-Message-State: AOAM531G35o2+hMAJajVMZ49dKJJqjehdOFx4ZzPpjZo8fxPw0g6cnE8
+        mn+hedEcAQN2wvTBzaOYLM/o1Ivj4jvfKdYutEw0cYUbaHxhH0htikcOcwTP8DsCcY2NZWZ5wH5
+        d+0+JUFL5Wb/O
+X-Received: by 2002:a1c:dcc2:: with SMTP id t185mr2098522wmg.91.1593072120560;
+        Thu, 25 Jun 2020 01:02:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7EpWGFNqIYa10mLbhT45jOJYdIWf2dOHwjj4fHw6US1mEdfsdFjoqWoc0G2UL9T1ycVUBaQ==
+X-Received: by 2002:a1c:dcc2:: with SMTP id t185mr2098499wmg.91.1593072120281;
+        Thu, 25 Jun 2020 01:02:00 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:91d0:a5f0:9f34:4d80? ([2001:b07:6468:f312:91d0:a5f0:9f34:4d80])
-        by smtp.gmail.com with ESMTPSA id j14sm30337492wrs.75.2020.06.25.00.53.19
+        by smtp.gmail.com with ESMTPSA id b18sm29856972wrn.88.2020.06.25.01.01.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2020 00:53:19 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] x86: Initialize segment selectors
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20200623084132.36213-1-namit@vmware.com>
- <40203296-7f31-16c7-bebb-e1f1cd478a19@redhat.com>
- <a9956a6f-5049-af9f-4e26-e37eb26e19c6@redhat.com>
- <3A313913-BDFC-496B-8F44-4760333E306C@vmware.com>
+        Thu, 25 Jun 2020 01:01:59 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] i386: setup segment registers before
+ percpu areas
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm@vger.kernel.org
+References: <20200624141429.382157-1-pbonzini@redhat.com>
+ <A954DB27-C5E8-435B-A1D7-76D21943F70F@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <66892b98-b3de-5e2c-d54c-a7fec812727e@redhat.com>
-Date:   Thu, 25 Jun 2020 09:53:19 +0200
+Message-ID: <64c76417-c89a-65bf-c0cd-4d664d826e90@redhat.com>
+Date:   Thu, 25 Jun 2020 10:01:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <3A313913-BDFC-496B-8F44-4760333E306C@vmware.com>
+In-Reply-To: <A954DB27-C5E8-435B-A1D7-76D21943F70F@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/20 19:28, Nadav Amit wrote:
-> Unfortunately this change does not work for me (i.e., it breaks the
-> task-switch test on my setup). Admittedly, my patch was wrong.
+On 24/06/20 21:58, Nadav Amit wrote:
+>> On Jun 24, 2020, at 7:14 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The base of the percpu area is stored in the %gs base, and writing
+>> to %gs destroys it.  Move setup_segments earlier, before the %gs
+>> base is written.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>> x86/cstart.S | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/x86/cstart.S b/x86/cstart.S
+>> index 5ad70b5..77dc34d 100644
+>> --- a/x86/cstart.S
+>> +++ b/x86/cstart.S
+>> @@ -106,6 +106,7 @@ MSR_GS_BASE = 0xc0000101
+>> .globl start
+>> start:
+>>         mov $stacktop, %esp
+>> +        setup_segments
+>>         push %ebx
+>>         call setup_multiboot
+>>         call setup_libcflat
+>> @@ -118,7 +119,6 @@ start:
+>>
+>> prepare_32:
+>>         lgdtl gdt32_descr
+>> -	setup_segments
+>>
+>> 	mov %cr4, %eax
+>> 	bts $4, %eax  // pse
+>> — 
+>> 2.26.2
 > 
-> I actually did not notice this scheme of having the GS descriptor and
-> GS-base out of sync. It seems very fragile, specifically when you have a
-> task-switch that reloads the GS and overwrites the original value.
-> 
-> I will try to investigate it further later.
+> As I said in a different thread, this change breaks my setup. It is better
+> not to make any assumption (or as few as possible) about the GDT content
+> after boot and load the GDTR before setting up the segments. So I prefer to
+> load the GDT before the segments. How about this change instead of yours?
 
-Yeah, it's fragile but it's limited to the task switch tests; and it's
-the only way to do it without having a separate selector or LDT for each
-CPU.
+Yes, this is better.
 
 Paolo
+
+> -- >8 --
+> 
+> From: Nadav Amit <namit@vmware.com>
+> Date: Wed, 24 Jun 2020 19:50:36 +0000
+> Subject: [PATCH] x86: load gdt while loading segments
+> 
+> Signed-off-by: Nadav Amit <namit@vmware.com>
+> ---
+>  x86/cstart.S | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/x86/cstart.S b/x86/cstart.S
+> index dd33d4d..1d8b8ac 100644
+> --- a/x86/cstart.S
+> +++ b/x86/cstart.S
+> @@ -95,6 +95,8 @@ MSR_GS_BASE = 0xc0000101
+>  .endm
+>  
+>  .macro setup_segments
+> +	lgdtl gdt32_descr
+> +
+>  	mov $0x10, %ax
+>  	mov %ax, %ds
+>  	mov %ax, %es
+> @@ -106,6 +108,8 @@ MSR_GS_BASE = 0xc0000101
+>  .globl start
+>  start:
+>          mov $stacktop, %esp
+> +	setup_segments
+> +
+>          push %ebx
+>          call setup_multiboot
+>          call setup_libcflat
+> @@ -117,9 +121,6 @@ start:
+>          jmpl $8, $start32
+>  
+>  prepare_32:
+> -        lgdtl gdt32_descr
+> -	setup_segments
+> -
+>  	mov %cr4, %eax
+>  	bts $4, %eax  // pse
+>  	mov %eax, %cr4
+> 
 
