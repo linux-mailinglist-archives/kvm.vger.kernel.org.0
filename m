@@ -2,101 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C87F209E7D
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 14:33:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 275BE209ED9
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 14:48:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404578AbgFYMdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 08:33:03 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37055 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2404343AbgFYMdC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 08:33:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593088381;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4QAA6xTzivbUQMA9MfIr8KswP1KP4qpqOKsLkXMz+OE=;
-        b=hquYfcFjFb3GQTuEInUnMWpfkFSqcr3qx+4jDfZwggx1P6M5iJciZu5ipc/PhmM4FMZ99i
-        1TnZ1GMsnTjqXaTGY5N/95O3AI7Yy+Iw9MoPTn1KikKcK5k01gz/Wxrk6RP9tcee3wnzJd
-        YSvNPXV/7Bbr4N2J4f84ZzcGuPIxOvw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-fEUBl5GKPM-poKqdBgnlAg-1; Thu, 25 Jun 2020 08:32:59 -0400
-X-MC-Unique: fEUBl5GKPM-poKqdBgnlAg-1
-Received: by mail-wm1-f69.google.com with SMTP id t18so6904010wmj.5
-        for <kvm@vger.kernel.org>; Thu, 25 Jun 2020 05:32:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4QAA6xTzivbUQMA9MfIr8KswP1KP4qpqOKsLkXMz+OE=;
-        b=FdX+VLCiFga/saki6ldwhnbwifTLQCx7CXzaQfo8JkcUAW1F44h3zzzKnUCH9Vi3yH
-         RIPIFdYd1VG0Tz3NvOMWyRuezFHtbr9vUTb6v9kQYqX4JV42dUGUKHBwcvWfR+y84OZv
-         weA5whVSJXhWIIfpBFF1zepqx4UXn5ZhRAA8Y6Uf94OinKdM6rCZ2iOdxVKPAmOhHaBn
-         geJCHqf+YLZQ4ZX0GcqdDN/yQ0nM8bk8xbp1/IfJwvLyzvRhjTGCHuMxCbk7PNn5E6gL
-         8vTtbBMcxj0qfhS4mwe1UdrZpppE0hZ2WvNfJ9bqkcBnsSoi6D7smb3UMlqM110eTqBc
-         zlGg==
-X-Gm-Message-State: AOAM530Mt0lcbKvACmbjSATcf1MnPX9h4nEk1GceoGR4fyCLYd4de+g4
-        OGvCHxDyeMDXVrkaqWE3WgXfLiHKl+VGe5bb++oQ6jW30Py8yH1lvI5efCdtx+nituUTXPcnSEG
-        gertK5BpTI83z
-X-Received: by 2002:adf:ff8c:: with SMTP id j12mr36129918wrr.230.1593088378326;
-        Thu, 25 Jun 2020 05:32:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJza6yC5dQ/KR4rQM92i44NL4zzevHmVpFRpkaZKX3IcBVU9bdyAaS6xr67Dsr0Uv3NHlppSyg==
-X-Received: by 2002:adf:ff8c:: with SMTP id j12mr36129899wrr.230.1593088378068;
-        Thu, 25 Jun 2020 05:32:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:91d0:a5f0:9f34:4d80? ([2001:b07:6468:f312:91d0:a5f0:9f34:4d80])
-        by smtp.gmail.com with ESMTPSA id b18sm30801881wrn.88.2020.06.25.05.32.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2020 05:32:57 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: Use VMCALL and VMMCALL mnemonics in kvm_para.h
-To:     Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200623183439.5526-1-ubizjak@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <30a01d1f-5b36-5171-3d0a-e14fa7afa62e@redhat.com>
-Date:   Thu, 25 Jun 2020 14:32:55 +0200
+        id S2404690AbgFYMsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 08:48:23 -0400
+Received: from foss.arm.com ([217.140.110.172]:42884 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404125AbgFYMsX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 08:48:23 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4E131FB;
+        Thu, 25 Jun 2020 05:48:22 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B02CB3F73C;
+        Thu, 25 Jun 2020 05:48:20 -0700 (PDT)
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Andrew Scull <ascull@google.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-2-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <e092c251-3dec-e9fd-5150-73414cab3af4@arm.com>
+Date:   Thu, 25 Jun 2020 13:49:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200623183439.5526-1-ubizjak@gmail.com>
+In-Reply-To: <20200615132719.1932408-2-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/20 20:34, Uros Bizjak wrote:
-> Current minimum required version of binutils is 2.23,
-> which supports VMCALL and VMMCALL instruction mnemonics.
-> 
-> Replace the byte-wise specification of VMCALL and
-> VMMCALL with these proper mnemonics.
-> 
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
+Hi,
+
+On 6/15/20 2:27 PM, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
+>
+> As we are about to reuse our stage 2 page table manipulation code for
+> shadow stage 2 page tables in the context of nested virtualization, we
+> are going to manage multiple stage 2 page tables for a single VM.
+>
+> This requires some pretty invasive changes to our data structures,
+> which moves the vmid and pgd pointers into a separate structure and
+> change pretty much all of our mmu code to operate on this structure
+> instead.
+>
+> The new structure is called struct kvm_s2_mmu.
+>
+> There is no intended functional change by this patch alone.
+>
+> Reviewed-by: James Morse <james.morse@arm.com>
+> [Designed data structure layout in collaboration]
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Co-developed-by: Marc Zyngier <maz@kernel.org>
+> [maz: Moved the last_vcpu_ran down to the S2 MMU structure as well]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/x86/include/asm/kvm_para.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
-> index 49d3a9edb06f..01317493807e 100644
-> --- a/arch/x86/include/asm/kvm_para.h
-> +++ b/arch/x86/include/asm/kvm_para.h
-> @@ -18,7 +18,7 @@ static inline bool kvm_check_and_clear_guest_paused(void)
->  #endif /* CONFIG_KVM_GUEST */
->  
->  #define KVM_HYPERCALL \
-> -        ALTERNATIVE(".byte 0x0f,0x01,0xc1", ".byte 0x0f,0x01,0xd9", X86_FEATURE_VMMCALL)
-> +        ALTERNATIVE("vmcall", "vmmcall", X86_FEATURE_VMMCALL)
->  
->  /* For KVM hypercalls, a three-byte sequence of either the vmcall or the vmmcall
->   * instruction.  The hypervisor may replace it with something else but only the
-> 
+>  arch/arm64/include/asm/kvm_asm.h  |   7 +-
+>  arch/arm64/include/asm/kvm_host.h |  32 +++-
+>  arch/arm64/include/asm/kvm_mmu.h  |  16 +-
+>  arch/arm64/kvm/arm.c              |  36 ++--
+>  arch/arm64/kvm/hyp/switch.c       |   8 +-
+>  arch/arm64/kvm/hyp/tlb.c          |  52 +++---
+>  arch/arm64/kvm/mmu.c              | 278 +++++++++++++++++-------------
+>  7 files changed, 233 insertions(+), 196 deletions(-)
+>
+> [..]
+>
+> @@ -96,31 +96,33 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+>   *
+>   * Function clears a PMD entry, flushes addr 1st and 2nd stage TLBs.
+>   */
+> -static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
+> +static void stage2_dissolve_pmd(struct kvm_s2_mmu *mmu, phys_addr_t addr, pmd_t *pmd)
 
-Queued, thanks.
+The comment for the function hasn't been updated, it still mentions kvm instead of
+mmu.
 
+I applied your fix to __kvm_tlb_flush_local_vmid, and I was able to boot a virtual
+machine and run perf in it. The remaining comments from me are minor, so for what
+it's worth:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
