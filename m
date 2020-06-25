@@ -2,178 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42CF7209E19
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 14:07:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AB32209E51
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 14:19:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404486AbgFYMGq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 08:06:46 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:33004 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404222AbgFYMGq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 08:06:46 -0400
-Received: by mail-ot1-f65.google.com with SMTP id n6so5033395otl.0;
-        Thu, 25 Jun 2020 05:06:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rD/XDnXIKX8gNhT/DuKyWWpCmsBD1jr7T2XgYaQBYJQ=;
-        b=H+hiF3xg+yVjD5dVHOyzq6oMDavu21+adZp52vIq4/e9ER0Adx6yXhN6s+a3TeFUSs
-         2Bjsa0q1obKSn9fckL0V2qdFYOkOl/wow1tkdFyaCDETMZrahuOFa18ffXIMkuFzW2c+
-         aS04dAe3J5l7t1B0qO58jv/8w2oVguXMfo8c0hwttq2QQ+nZA7AZv0B3Jm50C5f3Amkt
-         YPgi9dvZ/eAHvoJPQbttFJTXqbJPl2rWHi8/4jZ/6JgYQyXQemuXh+pxuXQ1lIq718cq
-         SgfXLJ9L5FFW4E09f3Hg/nJs7y3b/beXQRZSgvGPyVx2NcaRsRCXQ6a0+if3w6321lhA
-         O0aw==
-X-Gm-Message-State: AOAM533LaEYkY4xFebpI2b3blXIIRIOzMVBaixFMcguyfMZHtL+tN5Kc
-        Aa0LezSo1iwguU0NH8Wq5G/h65+/bbmB22P6VFD2hnJ0
-X-Google-Smtp-Source: ABdhPJxZ5HE61KmrZClwMlPjhbYjedR8tZFyYwac2mmi23TtFNeN3JzwcImgSG9LuPFH0jGfiufbraqmXRuh6M68dPI=
-X-Received: by 2002:a9d:7d15:: with SMTP id v21mr25614213otn.118.1593086804897;
- Thu, 25 Jun 2020 05:06:44 -0700 (PDT)
+        id S2404694AbgFYMTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 08:19:19 -0400
+Received: from foss.arm.com ([217.140.110.172]:40206 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404343AbgFYMTS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 08:19:18 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A0751FB;
+        Thu, 25 Jun 2020 05:19:18 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 073353F73C;
+        Thu, 25 Jun 2020 05:19:15 -0700 (PDT)
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com,
+        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        George Cherian <gcherian@marvell.com>,
+        James Morse <james.morse@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Dave Martin <Dave.Martin@arm.com>,
+        linux-arm-kernel@lists.infradead.org
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-2-maz@kernel.org>
+ <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
+ <9c0044564885d3356f76b55f35426987@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
+Date:   Thu, 25 Jun 2020 13:19:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200608174134.11157-1-sean.j.christopherson@intel.com>
-In-Reply-To: <20200608174134.11157-1-sean.j.christopherson@intel.com>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Thu, 25 Jun 2020 14:06:33 +0200
-Message-ID: <CAJZ5v0inhpW1vbYJYPqWgkekK7hKhgO_fE5JmemT+p2qh7RFaw@mail.gmail.com>
-Subject: Re: [PATCH v2] x86/cpu: Reinitialize IA32_FEAT_CTL MSR on BSP during wakeup
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, "H. Peter Anvin" <hpa@zytor.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Brad Campbell <lists2009@fnarfbargle.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <9c0044564885d3356f76b55f35426987@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 8, 2020 at 7:49 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Reinitialize IA32_FEAT_CTL on the BSP during wakeup to handle the case
-> where firmware doesn't initialize or save/restore across S3.  This fixes
-> a bug where IA32_FEAT_CTL is left uninitialized and results in VMXON
-> taking a #GP due to VMX not being fully enabled, i.e. breaks KVM.
->
-> Use init_ia32_feat_ctl() to "restore" IA32_FEAT_CTL as it already deals
-> with the case where the MSR is locked, and because APs already redo
-> init_ia32_feat_ctl() during suspend by virtue of the SMP boot flow being
-> used to reinitialize APs upon wakeup.  Do the call in the early wakeup
-> flow to avoid dependencies in the syscore_ops chain, e.g. simply adding
-> a resume hook is not guaranteed to work, as KVM does VMXON in its own
-> resume hook, kvm_resume(), when KVM has active guests.
->
-> Reported-by: Brad Campbell <lists2009@fnarfbargle.com>
-> Tested-by: Brad Campbell <lists2009@fnarfbargle.com>
-> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Cc: stable@vger.kernel.org # v5.6
-> Fixes: 21bd3467a58e ("KVM: VMX: Drop initialization of IA32_FEAT_CTL MSR")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Hi Marc,
 
-Given the regression fix nature of this patch, is it being taken care
-of by anyone (tip in particular) already?
+On 6/16/20 5:18 PM, Marc Zyngier wrote:
+> Hi Alexandru,
+> [..]
+>>> [..]
+>>>
+>>>  /**
+>>> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
+>>> - * @kvm:    The KVM struct pointer for the VM.
+>>> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
+>>> + * @kvm:    The pointer to the KVM structure
+>>> + * @mmu:    The pointer to the s2 MMU structure
+>>>   *
+>>>   * Allocates only the stage-2 HW PGD level table(s) of size defined by
+>>> - * stage2_pgd_size(kvm).
+>>> + * stage2_pgd_size(mmu->kvm).
+>>>   *
+>>>   * Note we don't need locking here as this is only called when the VM is
+>>>   * created, which can only be done once.
+>>>   */
+>>> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+>>>  {
+>>>      phys_addr_t pgd_phys;
+>>>      pgd_t *pgd;
+>>> +    int cpu;
+>>>
+>>> -    if (kvm->arch.pgd != NULL) {
+>>> +    if (mmu->pgd != NULL) {
+>>>          kvm_err("kvm_arch already initialized?\n");
+>>>          return -EINVAL;
+>>>      }
+>>> @@ -1024,8 +1040,20 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>>      if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
+>>>          return -EINVAL;
+>>
+>> We don't free the pgd if we get the error above, but we do free it below, if
+>> allocating last_vcpu_ran fails. Shouldn't we free it in both cases?
+>
+> Worth investigating. This code gets majorly revamped in the NV series, so it is
+> likely that I missed something in the middle.
 
-> ---
->
-> v2:
->   - Collect Reviewed/Tested tags. [Brad, Liam, Maxim].
->   - Include asm/cpu.h to fix Zhaoxin and Centaur builds. [Brad, LKP]
->   - Add Cc to stable. [Liam]
->
->  arch/x86/include/asm/cpu.h    | 5 +++++
->  arch/x86/kernel/cpu/centaur.c | 1 +
->  arch/x86/kernel/cpu/cpu.h     | 4 ----
->  arch/x86/kernel/cpu/zhaoxin.c | 1 +
->  arch/x86/power/cpu.c          | 6 ++++++
->  5 files changed, 13 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-> index dd17c2da1af5..da78ccbd493b 100644
-> --- a/arch/x86/include/asm/cpu.h
-> +++ b/arch/x86/include/asm/cpu.h
-> @@ -58,4 +58,9 @@ static inline bool handle_guest_split_lock(unsigned long ip)
->         return false;
->  }
->  #endif
-> +#ifdef CONFIG_IA32_FEAT_CTL
-> +void init_ia32_feat_ctl(struct cpuinfo_x86 *c);
-> +#else
-> +static inline void init_ia32_feat_ctl(struct cpuinfo_x86 *c) {}
-> +#endif
->  #endif /* _ASM_X86_CPU_H */
-> diff --git a/arch/x86/kernel/cpu/centaur.c b/arch/x86/kernel/cpu/centaur.c
-> index 426792565d86..c5cf336e5077 100644
-> --- a/arch/x86/kernel/cpu/centaur.c
-> +++ b/arch/x86/kernel/cpu/centaur.c
-> @@ -3,6 +3,7 @@
->  #include <linux/sched.h>
->  #include <linux/sched/clock.h>
->
-> +#include <asm/cpu.h>
->  #include <asm/cpufeature.h>
->  #include <asm/e820/api.h>
->  #include <asm/mtrr.h>
-> diff --git a/arch/x86/kernel/cpu/cpu.h b/arch/x86/kernel/cpu/cpu.h
-> index 37fdefd14f28..38ab6e115eac 100644
-> --- a/arch/x86/kernel/cpu/cpu.h
-> +++ b/arch/x86/kernel/cpu/cpu.h
-> @@ -80,8 +80,4 @@ extern void x86_spec_ctrl_setup_ap(void);
->
->  extern u64 x86_read_arch_cap_msr(void);
->
-> -#ifdef CONFIG_IA32_FEAT_CTL
-> -void init_ia32_feat_ctl(struct cpuinfo_x86 *c);
-> -#endif
-> -
->  #endif /* ARCH_X86_CPU_H */
-> diff --git a/arch/x86/kernel/cpu/zhaoxin.c b/arch/x86/kernel/cpu/zhaoxin.c
-> index df1358ba622b..05fa4ef63490 100644
-> --- a/arch/x86/kernel/cpu/zhaoxin.c
-> +++ b/arch/x86/kernel/cpu/zhaoxin.c
-> @@ -2,6 +2,7 @@
->  #include <linux/sched.h>
->  #include <linux/sched/clock.h>
->
-> +#include <asm/cpu.h>
->  #include <asm/cpufeature.h>
->
->  #include "cpu.h"
-> diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
-> index aaff9ed7ff45..b0d3c5ca6d80 100644
-> --- a/arch/x86/power/cpu.c
-> +++ b/arch/x86/power/cpu.c
-> @@ -193,6 +193,8 @@ static void fix_processor_context(void)
->   */
->  static void notrace __restore_processor_state(struct saved_context *ctxt)
->  {
-> +       struct cpuinfo_x86 *c;
-> +
->         if (ctxt->misc_enable_saved)
->                 wrmsrl(MSR_IA32_MISC_ENABLE, ctxt->misc_enable);
->         /*
-> @@ -263,6 +265,10 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
->         mtrr_bp_restore();
->         perf_restore_debug_store();
->         msr_restore_context(ctxt);
-> +
-> +       c = &cpu_data(smp_processor_id());
-> +       if (cpu_has(c, X86_FEATURE_MSR_IA32_FEAT_CTL))
-> +               init_ia32_feat_ctl(c);
->  }
->
->  /* Needed by apm.c */
-> --
-> 2.26.0
->
+You didn't miss anything, I checked and it's the same in the upstream version of KVM.
+
+kvm_arch_init_vm() returns with an error if this functions fails, so it's up to
+the function to do the clean up. kvm_alloc_pages_exact() returns NULL on error, so
+at this point we have a valid allocation of physical contiguous pages. Failing to
+create a VM is not a fatal error for the system, so I'm thinking that maybe we
+should free those pages for the rest of the system to use. However, this is a
+minor issue, and the patch isn't supposed to make any functional changes, so it
+can be probably be left for another patch and not add more to an already big series.
+
+Thanks,
+Alex
