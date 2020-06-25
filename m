@@ -2,167 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C4FA20A034
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:44:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D31920A064
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:58:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405250AbgFYNoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 09:44:22 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:49622 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2405247AbgFYNoU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 09:44:20 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 991E3A2CC515FC3F8A23;
-        Thu, 25 Jun 2020 21:44:15 +0800 (CST)
-Received: from A190218597.china.huawei.com (10.47.76.118) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 25 Jun 2020 21:44:07 +0800
-From:   Salil Mehta <salil.mehta@huawei.com>
-To:     <linux-arm-kernel@lists.infradead.org>
-CC:     <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
-        <christoffer.dall@arm.com>, <andre.przywara@arm.com>,
-        <james.morse@arm.com>, <mark.rutland@arm.com>,
-        <lorenzo.pieralisi@arm.com>, <sudeep.holla@arm.com>,
-        <qemu-arm@nongnu.org>, <peter.maydell@linaro.org>,
-        <richard.henderson@linaro.org>, <imammedo@redhat.com>,
-        <mst@redhat.com>, <drjones@redhat.com>, <pbonzini@redhat.com>,
-        <eric.auger@redhat.com>, <gshan@redhat.com>, <david@redhat.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linuxarm@huawei.com>, <mehta.salil.lnk@gmail.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        "Xiongfeng Wang" <wangxiongfeng2@huawei.com>
-Subject: [PATCH RFC 4/4] arm64: kernel: Arch specific ACPI hooks(like logical cpuid<->hwid etc.)
-Date:   Thu, 25 Jun 2020 14:37:57 +0100
-Message-ID: <20200625133757.22332-5-salil.mehta@huawei.com>
-X-Mailer: git-send-email 2.8.3
-In-Reply-To: <20200625133757.22332-1-salil.mehta@huawei.com>
-References: <20200625133757.22332-1-salil.mehta@huawei.com>
+        id S2405145AbgFYN6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 09:58:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23056 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2404890AbgFYN6D (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 09:58:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593093482;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=a3sOV0ZHvCtW1jwkrpJy23JJcAH66RTksrishZc28jc=;
+        b=YPKwJLXGrBpLwxeIymWJ+tB3RiMv/gznx0/2Sac2F5Y0Lnx3tJXOv8VXCfq19gLk2vFDbf
+        NpjJtkZxgkRNI3MhnYxgRim1vwOWnV14lmd85WHqwD0Y506GEJhKVfgj+7MyNvfepec5k+
+        k0I8vNa1nPQqRTO4nsx4eFLZpDXIzFE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-rMkuzU0sPliCfnKdECi-2w-1; Thu, 25 Jun 2020 09:57:58 -0400
+X-MC-Unique: rMkuzU0sPliCfnKdECi-2w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E5751940920;
+        Thu, 25 Jun 2020 13:57:57 +0000 (UTC)
+Received: from localhost (ovpn-115-49.ams2.redhat.com [10.36.115.49])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CCF521DC;
+        Thu, 25 Jun 2020 13:57:53 +0000 (UTC)
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Subject: [RFC 0/3] virtio: NUMA-aware memory allocation
+Date:   Thu, 25 Jun 2020 14:57:49 +0100
+Message-Id: <20200625135752.227293-1-stefanha@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.47.76.118]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: base64
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To support virtual cpu hotplug, some arch specifc hooks must be
-facilitated. These hooks are called by the generic ACPI cpu hotplug
-framework during a vcpu hot-(un)plug event handling. The changes
-required involve:
-
-1. Allocation of the logical cpuid corresponding to the hwid/mpidr
-2. Mapping of logical cpuid to hwid/mpidr and marking present
-3. Removing vcpu from present mask during hot-unplug
-4. For arm64, all possible cpus are registered within topology_init()
-   Hence, we need to override the weak ACPI call of arch_register_cpu()
-   (which returns -ENODEV) and return success.
-5. NUMA node mapping set for this vcpu using SRAT Table info during init
-   time will be discarded as the logical cpu-ids used at that time
-   might not be correct. This mapping will be set again using the
-   proximity/node info obtained by evaluating _PXM ACPI method.
-
-Note, during hot unplug of vcpu, we do not unmap the association between
-the logical cpuid and hwid/mpidr. This remains persistent.
-
-Signed-off-by: Salil Mehta <salil.mehta@huawei.com>
-Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
----
- arch/arm64/kernel/smp.c | 80 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
-
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index 63f31ea23e55..f3315840e829 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -528,6 +528,86 @@ struct acpi_madt_generic_interrupt *acpi_cpu_get_madt_gicc(int cpu)
- 	return &cpu_madt_gicc[cpu];
- }
- 
-+#ifdef CONFIG_ACPI_HOTPLUG_CPU
-+int arch_register_cpu(int num)
-+{
-+	return 0;
-+}
-+
-+static int set_numa_node_for_cpu(acpi_handle handle, int cpu)
-+{
-+#ifdef CONFIG_ACPI_NUMA
-+	int node_id;
-+
-+	/* will evaluate _PXM */
-+	node_id = acpi_get_node(handle);
-+	if (node_id != NUMA_NO_NODE)
-+		set_cpu_numa_node(cpu, node_id);
-+#endif
-+	return 0;
-+}
-+
-+static void unset_numa_node_for_cpu(int cpu)
-+{
-+#ifdef CONFIG_ACPI_NUMA
-+	set_cpu_numa_node(cpu, NUMA_NO_NODE);
-+#endif
-+}
-+
-+static int allocate_logical_cpuid(u64 physid)
-+{
-+	int first_invalid_idx = -1;
-+	bool first = true;
-+	int i;
-+
-+	for_each_possible_cpu(i) {
-+		/*
-+		 * logical cpuid<->hwid association remains persistent once
-+		 * established
-+		 */
-+		if (cpu_logical_map(i) == physid)
-+			return i;
-+
-+		if ((cpu_logical_map(i) == INVALID_HWID) && first) {
-+			first_invalid_idx = i;
-+			first = false;
-+		}
-+	}
-+
-+	return first_invalid_idx;
-+}
-+
-+int acpi_unmap_cpu(int cpu)
-+{
-+	set_cpu_present(cpu, false);
-+	unset_numa_node_for_cpu(cpu);
-+
-+	return 0;
-+}
-+
-+int acpi_map_cpu(acpi_handle handle, phys_cpuid_t physid, u32 acpi_id,
-+		 int *cpuid)
-+{
-+	int cpu;
-+
-+	cpu = allocate_logical_cpuid(physid);
-+	if (cpu < 0) {
-+		pr_warn("Unable to map logical cpuid to physid 0x%llx\n",
-+			physid);
-+		return -ENOSPC;
-+	}
-+
-+	/* map the logical cpu id to cpu MPIDR */
-+	cpu_logical_map(cpu) = physid;
-+	set_numa_node_for_cpu(handle, cpu);
-+
-+	set_cpu_present(cpu, true);
-+	*cpuid = cpu;
-+
-+	return 0;
-+}
-+#endif
-+
- /*
-  * acpi_map_gic_cpu_interface - parse processor MADT entry
-  *
--- 
-2.17.1
-
+VGhlc2UgcGF0Y2hlcyBhcmUgbm90IHJlYWR5IHRvIGJlIG1lcmdlZCBiZWNhdXNlIEkgd2FzIHVu
+YWJsZSB0byBtZWFzdXJlIGENCnBlcmZvcm1hbmNlIGltcHJvdmVtZW50LiBJJ20gcHVibGlzaGlu
+ZyB0aGVtIHNvIHRoZXkgYXJlIGFyY2hpdmVkIGluIGNhc2UNCnNvbWVvbmUgcGlja3MgdXAgdGhp
+cyB3b3JrIGFnYWluIGluIHRoZSBmdXR1cmUuDQoNClRoZSBnb2FsIG9mIHRoZXNlIHBhdGNoZXMg
+aXMgdG8gYWxsb2NhdGUgdmlydHF1ZXVlcyBhbmQgZHJpdmVyIHN0YXRlIGZyb20gdGhlDQpkZXZp
+Y2UncyBOVU1BIG5vZGUgZm9yIG9wdGltYWwgbWVtb3J5IGFjY2VzcyBsYXRlbmN5LiBPbmx5IGd1
+ZXN0cyB3aXRoIGEgdk5VTUENCnRvcG9sb2d5IGFuZCB2aXJ0aW8gZGV2aWNlcyBzcHJlYWQgYWNy
+b3NzIHZOVU1BIG5vZGVzIGJlbmVmaXQgZnJvbSB0aGlzLiAgSW4NCm90aGVyIGNhc2VzIHRoZSBt
+ZW1vcnkgcGxhY2VtZW50IGlzIGZpbmUgYW5kIHdlIGRvbid0IG5lZWQgdG8gdGFrZSBOVU1BIGlu
+dG8NCmFjY291bnQgaW5zaWRlIHRoZSBndWVzdC4NCg0KVGhlc2UgcGF0Y2hlcyBjb3VsZCBiZSBl
+eHRlbmRlZCB0byB2aXJ0aW9fbmV0LmtvIGFuZCBvdGhlciBkZXZpY2VzIGluIHRoZQ0KZnV0dXJl
+LiBJIG9ubHkgdGVzdGVkIHZpcnRpb19ibGsua28uDQoNClRoZSBiZW5jaG1hcmsgY29uZmlndXJh
+dGlvbiB3YXMgZGVzaWduZWQgdG8gdHJpZ2dlciB3b3JzdC1jYXNlIE5VTUEgcGxhY2VtZW50Og0K
+ICogUGh5c2ljYWwgTlZNZSBzdG9yYWdlIGNvbnRyb2xsZXIgb24gaG9zdCBOVU1BIG5vZGUgMA0K
+ICogSU9UaHJlYWQgcGlubmVkIHRvIGhvc3QgTlVNQSBub2RlIDANCiAqIHZpcnRpby1ibGstcGNp
+IGRldmljZSBpbiB2TlVNQSBub2RlIDENCiAqIHZDUFUgMCBvbiBob3N0IE5VTUEgbm9kZSAxIGFu
+ZCB2Q1BVIDEgb24gaG9zdCBOVU1BIG5vZGUgMA0KICogdkNQVSAwIGluIHZOVU1BIG5vZGUgMCBh
+bmQgdkNQVSAxIGluIHZOVU1BIG5vZGUgMQ0KDQpUaGUgaW50ZW50IGlzIHRvIGhhdmUgLnByb2Jl
+KCkgY29kZSBydW4gb24gdkNQVSAwIGluIHZOVU1BIG5vZGUgMCAoaG9zdCBOVU1BDQpub2RlIDEp
+IHNvIHRoYXQgbWVtb3J5IGlzIGluIHRoZSB3cm9uZyBOVU1BIG5vZGUgZm9yIHRoZSB2aXJ0aW8t
+YmxrLXBjaSBkZXZpYz0NCmUuDQpBcHBseWluZyB0aGVzZSBwYXRjaGVzIGZpeGVzIG1lbW9yeSBw
+bGFjZW1lbnQgc28gdGhhdCB2aXJ0cXVldWVzIGFuZCBkcml2ZXINCnN0YXRlIGlzIGFsbG9jYXRl
+ZCBpbiB2TlVNQSBub2RlIDEgd2hlcmUgdGhlIHZpcnRpby1ibGstcGNpIGRldmljZSBpcyBsb2Nh
+dGVkLg0KDQpUaGUgZmlvIDRLQiByYW5kcmVhZCBiZW5jaG1hcmsgcmVzdWx0cyBkbyBub3Qgc2hv
+dyBhIHNpZ25pZmljYW50IGltcHJvdmVtZW50Og0KDQpOYW1lICAgICAgICAgICAgICAgICAgSU9Q
+UyAgIEVycm9yDQp2aXJ0aW8tYmxrICAgICAgICA0MjM3My43OSA9QzI9QjEgMC41NCUNCnZpcnRp
+by1ibGstbnVtYSAgIDQyNTE3LjA3ID1DMj1CMSAwLjc5JQ0KDQpTdGVmYW4gSGFqbm9jemkgKDMp
+Og0KICB2aXJ0aW8tcGNpOiB1c2UgTlVNQS1hd2FyZSBtZW1vcnkgYWxsb2NhdGlvbiBpbiBwcm9i
+ZQ0KICB2aXJ0aW9fcmluZzogdXNlIE5VTUEtYXdhcmUgbWVtb3J5IGFsbG9jYXRpb24gaW4gcHJv
+YmUNCiAgdmlydGlvLWJsazogdXNlIE5VTUEtYXdhcmUgbWVtb3J5IGFsbG9jYXRpb24gaW4gcHJv
+YmUNCg0KIGluY2x1ZGUvbGludXgvZ2ZwLmggICAgICAgICAgICAgICAgfCAgMiArLQ0KIGRyaXZl
+cnMvYmxvY2svdmlydGlvX2Jsay5jICAgICAgICAgfCAgNyArKysrKy0tDQogZHJpdmVycy92aXJ0
+aW8vdmlydGlvX3BjaV9jb21tb24uYyB8IDE2ICsrKysrKysrKysrKy0tLS0NCiBkcml2ZXJzL3Zp
+cnRpby92aXJ0aW9fcmluZy5jICAgICAgIHwgMjYgKysrKysrKysrKysrKysrKystLS0tLS0tLS0N
+CiBtbS9wYWdlX2FsbG9jLmMgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0NCiA1IGZpbGVzIGNo
+YW5nZWQsIDM2IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQ0KDQotLT0yMA0KMi4yNi4y
+DQoNCg==
 
