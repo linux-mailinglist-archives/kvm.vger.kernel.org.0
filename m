@@ -2,161 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFB3720998D
+	by mail.lfdr.de (Postfix) with ESMTP id 41EC520998C
 	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 07:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389600AbgFYFrc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2389589AbgFYFrc (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 25 Jun 2020 01:47:32 -0400
-Received: from ozlabs.org ([203.11.71.1]:60719 "EHLO ozlabs.org"
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51835 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389367AbgFYFrb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S2389430AbgFYFrb (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 25 Jun 2020 01:47:31 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 49spv468Qqz9sSy; Thu, 25 Jun 2020 15:47:28 +1000 (AEST)
+        id 49spv46hYQz9sT2; Thu, 25 Jun 2020 15:47:28 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1593064048;
-        bh=QESinVtHA3WjWaRveH+RITe1nVtNFNsNWPr1TKchI0c=;
+        bh=r+Tfaf10u6+JztU+M0YXzOVRuDJqj9jnhzXznvdkc6A=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=irPTrlQCu8Nlhsv8YkSuWo3Qhxcl1bqL+EufmEonT98Woup90bhBgnS5hfPOiG3xP
-         Z7zlc879J6YzNYL/ErnDHCRWqKkGQq1DjP69tEwKF3hd/acX7bJPnrMkpi7otcl8W2
-         YYRP97nesMIYxmdCIvi+q72lK/b/GAovgFtFwttE=
-Date:   Thu, 25 Jun 2020 15:25:18 +1000
+        b=J94a9Ufe0V2zmeVJBSlO4OOyVKi8TlKAiDE9fH5DTCp4VIcbtHvjYuFj3iSv9bphT
+         ScqsjulCydjiOQMc+wmUajepzkETYwm5IbFDvRn1SfqKrPexYAeZrZdHPjI46uVlbf
+         R1ongJeCB21HfL7932OJM9TuZ6Z4gk+IO72IJ6i4=
+Date:   Thu, 25 Jun 2020 15:42:01 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
-        brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
-        dgilbert@redhat.com, frankja@linux.ibm.com,
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
+        pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
         mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
-        pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
-        qemu-s390x@nongnu.org
+        cohuck@redhat.com, pasic@linux.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org
 Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-Message-ID: <20200625052518.GD172395@umbus.fritz.box>
+Message-ID: <20200625054201.GE172395@umbus.fritz.box>
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
  <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
- <20200619114526.6a6f70c6.cohuck@redhat.com>
- <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
- <20200619120530.256c36cb.cohuck@redhat.com>
- <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
- <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200619094820.GJ17085@umbus.fritz.box>
+ <a1f47bc3-40d6-f46e-42e7-9c44597c3c90@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="T7mxYSe680VjQnyC"
+        protocol="application/pgp-signature"; boundary="CGDBiGfvSTbxKZlW"
 Content-Disposition: inline
-In-Reply-To: <20200622140254.0dbe5d8c.cohuck@redhat.com>
+In-Reply-To: <a1f47bc3-40d6-f46e-42e7-9c44597c3c90@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---T7mxYSe680VjQnyC
+--CGDBiGfvSTbxKZlW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 22, 2020 at 02:02:54PM +0200, Cornelia Huck wrote:
-> On Fri, 19 Jun 2020 12:10:13 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->=20
-> > On 19.06.20 12:05, Cornelia Huck wrote:
-> > > On Fri, 19 Jun 2020 11:56:49 +0200
-> > > David Hildenbrand <david@redhat.com> wrote:
-> > >  =20
-> > >>>>> For now this series covers just AMD SEV and POWER PEF.  I'm hopin=
-g it
-> > >>>>> can be extended to cover the Intel and s390 mechanisms as well,
-> > >>>>> though.     =20
-> > >>>>
-> > >>>> The only approach on s390x to not glue command line properties to =
-the
-> > >>>> cpu model would be to remove the CPU model feature and replace it =
-by the
-> > >>>> command line parameter. But that would, of course, be an incompati=
-ble break.   =20
-> > >>>
-> > >>> Yuck.
-> > >>>
-> > >>> We still need to provide the cpu feature to the *guest* in any case=
-, no?   =20
-> > >>
-> > >> Yeah, but that could be wired up internally. Wouldn't consider it cl=
-ean,
-> > >> though (I second the "overengineered" above). =20
-> > >=20
-> > > Could an internally wired-up cpu feature be introspected? Also, what =
-=20
+On Fri, Jun 19, 2020 at 12:04:25PM +0200, David Hildenbrand wrote:
+> >> However, once we have multiple options to protect a guest (memory
+> >> encryption, unmapping guest pages ,...) the name will no longer really
+> >> suffice to configure QEMU, no?
 > >=20
-> > Nope. It would just be e.g., a "machine feature" indicated to the guest
-> > via the STFL interface/instruction. I was tackling the introspect part
-> > when asking David how to sense from upper layers. It would have to be
-> > sense via a different interface as it would not longer be modeled as
-> > part of CPU features in QEMU.
+> > That's why it takes a parameter.  It points to an object which can
+> > itself have more properties to configure the details.  SEV already
+> > needs that set up, though for both PEF and s390 PV we could pre-create
+> > a standard htl object.
+>=20
+> Ah, okay, that's the "platform specific object which configures and
+> manages the specific details". It would have been nice in the cover
+> letter to show some examples of how that would look like.
+
+Ok, I can try to add some.
+
+> So it's wrapping architecture-specific data in a common
+> parameter. Hmm.
+
+Well, I don't know I'd say "wrapping".  You have a common parameter
+that points to an object with a well defined interface.  The available
+implementations of that object will tend to be either zero or one per
+architecture, but there's no theoretical reason it has to be.  Indeed
+we expect at least 2 for x86 (SEV and the Intel one who's name I never
+remember).  Extra ones are entirely plausible for POWER and maybe s390
+too, when an updated version of PEF or PV inevitably rolls around.
+
+Some sort of new HTL scheme which could work across multiple archs is
+much less likely, but it's not totally impossible either.
+
+> >>> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+> >>> can be extended to cover the Intel and s390 mechanisms as well,
+> >>> though.
+> >>
+> >> The only approach on s390x to not glue command line properties to the
+> >> cpu model would be to remove the CPU model feature and replace it by t=
+he
+> >> command line parameter. But that would, of course, be an incompatible =
+break.
 > >=20
-> > > happens if new cpu features are introduced that have a dependency on =
-or
-> > > a conflict with this one? =20
+> > I don't really understand why you're so against setting the cpu
+> > default parameters from the machine.  The machine already sets basic
+> > configuration for all sorts of devices in the VM, that's kind of what
+> > it's for.
+>=20
+> It's a general design philosophy that the CPU model (especially the host
+> CPU model) does not depend on other command line parameters (except the
+> accelerator, and I think in corner cases on the machine). Necessary for
+> reliable host model probing by libvirt, for example.
+
+Ok, I've proposed a revision which doesn't require altering the CPU
+model elsewhere in this thread.
+
+> We also don't have similar things for nested virt.
+
+I'm not sure what you're getting at there.
+
+> >> How do upper layers actually figure out if memory encryption etc is
+> >> available? on s390x, it's simply via the expanded host CPU model.
 > >=20
-> > Conflict: bail out in QEMU when incompatible options are specified.
-> > Dependency: warn and continue/fixup (e.g., mask off?)
+> > Haven't really tackled that yet.  But one way that works for multiple
+> > systems has got to be better than a separate one for each, right?
 >=20
-> Masking off would likely be surprising to the user.
->=20
-> > Not clean I think.
->=20
-> I agree.
->=20
-> Still unsure how to bring this new machine property and the cpu feature
-> together. Would be great to have the same interface everywhere, but
-> having two distinct command line objects depend on each other sucks.
+> I think that's an important piece. Especially once multiple different
+> approaches are theoretically available one wants to sense from upper laye=
+rs.
 
-Kinda, but the reality is that hardware - virtual and otherwise -
-frequently doesn't have entirely orthogonal configuration for each of
-its components.  This is by no means new in that regard.
+Fair point.
 
-> Automatically setting the feature bit if pv is supported complicates
-> things further.
+So... IIRC there's a general way of looking at available properties
+for any object, including the machine.  So we can probe for
+availability of the "host-trust-limitation" property itself easily
+enough.
 
-AIUI, on s390 the "unpack" feature is available by default on recent
-models.  In that case you could do this:
+I guess we do need a way of probing for what implementations of the
+htl interface are available.  And, if we go down that path, if there
+are any pre-generated htl objects available.
 
- * Don't modify either cpu or HTL options based on each other
- * Bail out if the user specifies a non "unpack" secure CPU along with
-   the HTL option
+> At least on s390x, it really is like just another CPU-visible feature
+> that tells the guest that it can switch to protected mode.
 
-Cases of note:
- - User specifies an old CPU model + htl
-   or explicitly sets unpack=3Doff + htl
-	=3D> fails with an error, correctly
- - User specifies modern/default cpu + htl, with secure aware guest
- 	=3D> works as a secure guest
- - User specifies modern/default cpu + htl, with non secure aware guest
-	=3D> works, though not secure (and maybe slower than neccessary)
- - User specifies modern/default cpu, no htl, with non-secure guest
- 	=3D> works, "unpack" feature is present but unused
- - User specifies modern/default cpu, no htl, secure guest
-  	=3D> this is the worst one.  It kind of works by accident if
-	   you've also  manually specified whatever virtio (and
-	   anything else) options are necessary. Ugly, but no
-	   different from the situation right now, IIUC
-
-> (Is there any requirement that the machine object has been already set
-> up before the cpu features are processed? Or the other way around?)
-
-CPUs are usually created by the machine, so I believe we can count on
-the machine object being there first.
-
-> Does this have any implications when probing with the 'none' machine?
-
-I'm not sure.  In your case, I guess the cpu bit would still show up
-as before, so it would tell you base feature availability, but not
-whether you can use the new configuration option.
-
-Since the HTL option is generic, you could still set it on the "none"
-machine, though it wouldn't really have any effect.  That is, if you
-could create a suitable object to point it at, which would depend on
-=2E.. details.
+Right.. which is great for you, since you already have a nice
+orthogonal interface for that.   On POWER, (a) CPU model isn't enough
+since you need a running ultravisor as well and (b) CPU feature
+detection is already a real mess for.. reasons.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -164,24 +144,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---T7mxYSe680VjQnyC
+--CGDBiGfvSTbxKZlW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl70NTwACgkQbDjKyiDZ
-s5IEJw//Q3blGapB6G59qbzf4DGYZafe8dSyr3kKvUrTarEftg931msWvmzqwnlp
-P6tVVx60exm1x4RSYWYdEZQL5tdBdkvZ+YB7Vk8OLFcPf0ObtNBckImmfJoxeQdC
-fsPSoFSjdcSBbOwExw3rh+DB3lLHlkpup1GDGlPszpN3ek3Wp+NIF5jyA31Ojrau
-PukGQe+Xf9eIgRrYGFD9iJGaewFFf753vOOUlRi5aX87KlXtqxwZ0HA2tnVSKreq
-jGR2ibH/KODsBqZPDmkm+FNdq0VQgC85/otmR3cKDDmPyjnKyhbV9oSjIgXO/SLb
-675nG/KBfXSSKBZS0T8BZxy6FB7Z7wn89oLYzBRHmU5OffdjkGuEgEWk2QQDS1fY
-GpyrNJstGppcr2fglatDo4wzQKoUXnb7U7Itq2wMfRNlKQ7IhsfthaGRpafTmtLN
-ip0oYOz9fRAvag4A3JEuB+Xwkf3XDBNxXzZjy47rUtgSwC9HQZuXcrmM0qRxo+kp
-UHAUEaTUNCpyo/suuVzv1CotbDYa0gEt6pi9HMA5nigkZD/5Eb0b2sL6JbqlCgkm
-743jSXNVbyXDFz/81siiv16q5vhU7MHCvxJ1uTk+RriMBsoMwfIMtNIQHwtvPvBA
-aUeEqFAwDmst6/SNma6xMHnb2WZX62gC60+Ns2kaeNEdvu79wH8=
-=o5AP
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl70OScACgkQbDjKyiDZ
+s5LYYBAAoPb5bPM7XphcHM6aWbdZ30UgWmvTPoIWr/Jxhv4zJLdl7HMVztp19G7+
+krDSxxn8Wb9mWIqbOgpxiqMyhdA5IsDvxiDANR05v+jvg9YSjX+6F17oHfRP2l1a
+VTpG3lk0HYR242ofRR2y1Ad9lBP28abun5rXJcoc5LvjjNcqDq7ZV5meH6jm4E5z
+HDRwxqsVGya9Yafm0aYSEnhW7r7PY3R5JWzovDI3jCxvXDFXGnbm2zPV2QWp/gur
+K69zTJCCi0i6RTNx2aMtZnHQagD1kU58bKlI+IwrEEyXoIhnJQa9wzGEyCaLoUgd
+Rdd7O9ND+6ENEvN5+m3RgUCtID1cNOIqgGBsiyjA9tzf2z2TJpZF4H1UamJsGNhA
+NdV4i3xVRBSrX44vOQ67LkK8NRbn3FdM7VrqapL83MCbkl7SO/h9nOAesStmdxKn
++Uxf7xayib5pGdzBRBQCBChOYD6497SZV1YBwZvSWwjiBABL2gyFRMCiJwpVHsgO
+Ev3ZRir01R5Jt39aOtKEu3Jt1Fv1LAhNE6r6MUob2r0gzwfoi78PrarvdI2JfAaB
+P0AR8z+VzP1/zyurEGTMZdSKJ6IZedumSvSVR+QION5b2Au049J6Q5XGOTT47t69
+vVHuZeYFZFNSbT24E2x08ATXkji8TEuLp9zI73x41DeZld1KavQ=
+=Li+j
 -----END PGP SIGNATURE-----
 
---T7mxYSe680VjQnyC--
+--CGDBiGfvSTbxKZlW--
