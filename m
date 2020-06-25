@@ -2,49 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1185F209A4D
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 09:09:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8737A209A50
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 09:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390039AbgFYHJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 03:09:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56535 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2390013AbgFYHJK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 03:09:10 -0400
+        id S2390077AbgFYHJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 03:09:28 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23586 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2390013AbgFYHJ1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 03:09:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593068948;
+        s=mimecast20190719; t=1593068965;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=9yNNFDydL+4d1p/yKcNu2OToc9OJx6TbwZO+wSZ1xpY=;
-        b=LGY8YlU+iqcy/e9DBVhgbA2hWsMUQcOzlEf8oCC2rWeHvZbLPQAu1rggugoGAPZMQIzjMj
-        pP/vYVkshYEMjEy8gGv2jIUA5f1bs+ux6vjBwyUQ5QkhESrTjHD1DyvfLTxewFI32tLUhW
-        JfE2b/92ph6Zig+AGkbwb9/a1aiZChM=
+        bh=rSYOhH5fc7Aypf8cMYc86QVxkYYlevgE+Gp8QTKgKvM=;
+        b=V1obYD725fah1GtWczW3g4c27ScZhV5jm8athExh/OdnIWjOhcj3SnjDPubz90ChbpQ62T
+        7/gf3yrWPjCGIL5vMH3gbGNNj2knsdxdpnuhsvZWmgOFA6HNdxxS5nNVPJjdcd0n0C25IN
+        wHFh4YmPZdcvgI4dduE1BAsBRNu1zuc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-4BvqFmX2Ne-Xljz0Nalygg-1; Thu, 25 Jun 2020 03:09:06 -0400
-X-MC-Unique: 4BvqFmX2Ne-Xljz0Nalygg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-442-B0KGqMmPM_K9K_AETkHdyg-1; Thu, 25 Jun 2020 03:09:24 -0400
+X-MC-Unique: B0KGqMmPM_K9K_AETkHdyg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E9E3107ACF2;
-        Thu, 25 Jun 2020 07:09:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E380418A8222;
+        Thu, 25 Jun 2020 07:09:22 +0000 (UTC)
 Received: from [10.36.113.65] (ovpn-113-65.ams2.redhat.com [10.36.113.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 96AB15C1D4;
-        Thu, 25 Jun 2020 07:09:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C751178FD9;
+        Thu, 25 Jun 2020 07:09:19 +0000 (UTC)
 Subject: Re: [PATCH 2/2] docs: kvm: fix rst formatting
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Collin Walling <walling@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pbonzini@redhat.com, borntraeger@de.ibm.com,
-        imbrenda@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, thuth@redhat.com
+To:     Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
 References: <20200624202200.28209-1-walling@linux.ibm.com>
  <20200624202200.28209-3-walling@linux.ibm.com>
- <20200625083423.2ee75bb1.cohuck@redhat.com>
- <22b7d435-480e-ac7f-de4f-b992df6c9ebb@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -90,37 +86,58 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <afcdae56-5d53-4395-7326-cfce66eef545@redhat.com>
-Date:   Thu, 25 Jun 2020 09:08:59 +0200
+Message-ID: <7ac2c896-bf55-5b0b-7289-3a3797ddd2cf@redhat.com>
+Date:   Thu, 25 Jun 2020 09:09:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <22b7d435-480e-ac7f-de4f-b992df6c9ebb@linux.ibm.com>
+In-Reply-To: <20200624202200.28209-3-walling@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.06.20 09:07, Janosch Frank wrote:
-> On 6/25/20 8:34 AM, Cornelia Huck wrote:
->> On Wed, 24 Jun 2020 16:22:00 -0400
->> Collin Walling <walling@linux.ibm.com> wrote:
->>
->>> KVM_CAP_S390_VCPU_RESETS and KVM_CAP_S390_PROTECTED needed
->>> just a little bit of rst touch-up
->>>
->>
->> Fixes: 7de3f1423ff9 ("KVM: s390: Add new reset vcpu API")
->> Fixes: 04ed89dc4aeb ("KVM: s390: protvirt: Add KVM api documentation")
+On 24.06.20 22:22, Collin Walling wrote:
+> KVM_CAP_S390_VCPU_RESETS and KVM_CAP_S390_PROTECTED needed
+> just a little bit of rst touch-up
 > 
-> Do we really do that for documentation changes?
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 056608e8f243..2d1572d92616 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6134,16 +6134,17 @@ in CPUID and only exposes Hyper-V identification. In this case, guest
+>  thinks it's running on Hyper-V and only use Hyper-V hypercalls.
+>  
+>  8.22 KVM_CAP_S390_VCPU_RESETS
+> +-----------------------------
+>  
+> -Architectures: s390
+> +:Architectures: s390
+>  
+>  This capability indicates that the KVM_S390_NORMAL_RESET and
+>  KVM_S390_CLEAR_RESET ioctls are available.
+>  
+>  8.23 KVM_CAP_S390_PROTECTED
+> +---------------------------
+>  
+> -Architecture: s390
+> -
+> +:Architecture: s390
+>  
+>  This capability indicates that the Ultravisor has been initialized and
+>  KVM can therefore start protected VMs.
+> 
 
-Had a similar discussion recently, I prefer to just mention the commits
-in the commit message like "Introduced in commit ...".
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
