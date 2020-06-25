@@ -2,51 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C2A4209A2A
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 08:59:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B43A209A3C
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 09:06:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389923AbgFYG7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 02:59:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54468 "EHLO
+        id S2390091AbgFYHG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 03:06:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26631 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727999AbgFYG7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 02:59:17 -0400
+        with ESMTP id S2390080AbgFYHG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 03:06:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593068354;
+        s=mimecast20190719; t=1593068783;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=4YmFKv5BPyvUP3dHFPJ60Okn4MqIBG/j/Iz9R2fJchw=;
-        b=B1aWIEAXQt1egDlxJVQheUEZ2DOEC8D2eYqX/LzW1rmgAuBhZHY66ziwo14JXHwbOHYCNu
-        EvYCiHrJ7XjBpLdMZENKW0X/IDbjvGupaT1Apfz7qjL0D1ZHhBc3bk5AiEARzwJTzbzATj
-        lgw/nqKHWuwo1ZhBronQ7TVqjVFGVNQ=
+        bh=CZEWp9ZQefV/02yGn88CINhYvGg0H6CJEWFjp7/4nJc=;
+        b=CwyzdW84j6biZfltbiNHg+2ZSSHUx7ulhN0aUIVhXw86QU+sMv9yT+PV+fQNUOEC8Ubgi4
+        ok6VaTq0cje1b/BVHnVAz9I7bXC2FO+Hpe5szvGAyPjQlZWfGoi8z3CTK0hO42sCMC2NlO
+        Sr6UuAoblNEOH/XBN4HG2aVyxs0He10=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-DbKryyKLOgmq3gfQAN4SSQ-1; Thu, 25 Jun 2020 02:59:13 -0400
-X-MC-Unique: DbKryyKLOgmq3gfQAN4SSQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-377-J0dK2jPpMy2RYG6PvZdTxw-1; Thu, 25 Jun 2020 03:06:16 -0400
+X-MC-Unique: J0dK2jPpMy2RYG6PvZdTxw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1826804003;
-        Thu, 25 Jun 2020 06:59:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCDE21005513;
+        Thu, 25 Jun 2020 07:06:14 +0000 (UTC)
 Received: from [10.36.113.65] (ovpn-113-65.ams2.redhat.com [10.36.113.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 462C491D99;
-        Thu, 25 Jun 2020 06:59:01 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 619155C1D4;
+        Thu, 25 Jun 2020 07:06:06 +0000 (UTC)
 Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-To:     David Gibson <david@gibson.dropbear.id.au>
+To:     David Gibson <david@gibson.dropbear.id.au>,
+        Cornelia Huck <cohuck@redhat.com>
 Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
         pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
         mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
-        cohuck@redhat.com, pasic@linux.ibm.com,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org
+        pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
+        qemu-s390x@nongnu.org
 References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
  <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
- <20200619094820.GJ17085@umbus.fritz.box>
- <a1f47bc3-40d6-f46e-42e7-9c44597c3c90@redhat.com>
- <20200625054201.GE172395@umbus.fritz.box>
+ <20200619114526.6a6f70c6.cohuck@redhat.com>
+ <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
+ <20200619120530.256c36cb.cohuck@redhat.com>
+ <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+ <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200625052518.GD172395@umbus.fritz.box>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -92,115 +96,92 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <778050eb-c6b2-e471-1945-598520fdc894@redhat.com>
-Date:   Thu, 25 Jun 2020 08:59:00 +0200
+Message-ID: <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
+Date:   Thu, 25 Jun 2020 09:06:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200625054201.GE172395@umbus.fritz.box>
+In-Reply-To: <20200625052518.GD172395@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+>> Still unsure how to bring this new machine property and the cpu feature
+>> together. Would be great to have the same interface everywhere, but
+>> having two distinct command line objects depend on each other sucks.
 > 
->> So it's wrapping architecture-specific data in a common
->> parameter. Hmm.
+> Kinda, but the reality is that hardware - virtual and otherwise -
+> frequently doesn't have entirely orthogonal configuration for each of
+> its components.  This is by no means new in that regard.
 > 
-> Well, I don't know I'd say "wrapping".  You have a common parameter
-> that points to an object with a well defined interface.  The available
-> implementations of that object will tend to be either zero or one per
-> architecture, but there's no theoretical reason it has to be.  Indeed
-> we expect at least 2 for x86 (SEV and the Intel one who's name I never
-> remember).  Extra ones are entirely plausible for POWER and maybe s390
-> too, when an updated version of PEF or PV inevitably rolls around.
+>> Automatically setting the feature bit if pv is supported complicates
+>> things further.
 > 
-> Some sort of new HTL scheme which could work across multiple archs is
-> much less likely, but it's not totally impossible either.
+> AIUI, on s390 the "unpack" feature is available by default on recent
+> models.  In that case you could do this:
 > 
->>>>> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
->>>>> can be extended to cover the Intel and s390 mechanisms as well,
->>>>> though.
->>>>
->>>> The only approach on s390x to not glue command line properties to the
->>>> cpu model would be to remove the CPU model feature and replace it by the
->>>> command line parameter. But that would, of course, be an incompatible break.
->>>
->>> I don't really understand why you're so against setting the cpu
->>> default parameters from the machine.  The machine already sets basic
->>> configuration for all sorts of devices in the VM, that's kind of what
->>> it's for.
->>
->> It's a general design philosophy that the CPU model (especially the host
->> CPU model) does not depend on other command line parameters (except the
->> accelerator, and I think in corner cases on the machine). Necessary for
->> reliable host model probing by libvirt, for example.
+>  * Don't modify either cpu or HTL options based on each other
+>  * Bail out if the user specifies a non "unpack" secure CPU along with
+>    the HTL option
 > 
-> Ok, I've proposed a revision which doesn't require altering the CPU
-> model elsewhere in this thread.
+> Cases of note:
+>  - User specifies an old CPU model + htl
+>    or explicitly sets unpack=off + htl
+> 	=> fails with an error, correctly
+>  - User specifies modern/default cpu + htl, with secure aware guest
+>  	=> works as a secure guest
+>  - User specifies modern/default cpu + htl, with non secure aware guest
+> 	=> works, though not secure (and maybe slower than neccessary)
+>  - User specifies modern/default cpu, no htl, with non-secure guest
+>  	=> works, "unpack" feature is present but unused
+>  - User specifies modern/default cpu, no htl, secure guest
+>   	=> this is the worst one.  It kind of works by accident if
+> 	   you've also  manually specified whatever virtio (and
+> 	   anything else) options are necessary. Ugly, but no
+> 	   different from the situation right now, IIUC
 > 
->> We also don't have similar things for nested virt.
+>> (Is there any requirement that the machine object has been already set
+>> up before the cpu features are processed? Or the other way around?)
 > 
-> I'm not sure what you're getting at there.
+> CPUs are usually created by the machine, so I believe we can count on
+> the machine object being there first.
 
-Sorry, back when we introduced nested virt there was a similar
-(internal?) discussion, to enable/disable it via a machine flag and not
-via 1..X CPU features. We went for the latter, because it matches the
-actual architecture and allows for easy migration checks etc. Nested
-virt also collides with some features currently (e.g., huge page backing
-for the guest), but not as severe as encrypted virtualization.
+CPU model initialization is one of the first things machine
+initialization code does on s390x.
 
-> 
->>>> How do upper layers actually figure out if memory encryption etc is
->>>> available? on s390x, it's simply via the expanded host CPU model.
->>>
->>> Haven't really tackled that yet.  But one way that works for multiple
->>> systems has got to be better than a separate one for each, right?
->>
->> I think that's an important piece. Especially once multiple different
->> approaches are theoretically available one wants to sense from upper layers.
-> 
-> Fair point.
-> 
-> So... IIRC there's a general way of looking at available properties
-> for any object, including the machine.  So we can probe for
-> availability of the "host-trust-limitation" property itself easily
-> enough.
-
-You can have a look at how it's currently probed by libvirt in
-
-https://www.redhat.com/archives/libvir-list/2020-June/msg00518.html
-
-For now, the s390x check consists of
-- checking if /sys/firmware/uv is available
-- checking if the kernel cmdline contains 'prot_virt=1'
-
-The sev check is
-- checking if /sys/module/kvm_amd/parameters/sev contains the
-   value '1'
-- checking if /dev/sev
-
-So at least libvirt does not sense via the CPU model on s390x yet.
+static void ccw_init(MachineState *machine)
+{
+    [... memory init ...]
+    s390_sclp_init();
+    s390_memory_init(machine->ram);
+    /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+    s390_init_cpus(machine);
+    [...]
+}
 
 > 
-> I guess we do need a way of probing for what implementations of the
-> htl interface are available.  And, if we go down that path, if there
-> are any pre-generated htl objects available.
+>> Does this have any implications when probing with the 'none' machine?
 > 
->> At least on s390x, it really is like just another CPU-visible feature
->> that tells the guest that it can switch to protected mode.
+> I'm not sure.  In your case, I guess the cpu bit would still show up
+> as before, so it would tell you base feature availability, but not
+> whether you can use the new configuration option.
 > 
-> Right.. which is great for you, since you already have a nice
-> orthogonal interface for that.   On POWER, (a) CPU model isn't enough
-> since you need a running ultravisor as well and (b) CPU feature
-> detection is already a real mess for.. reasons.
+> Since the HTL option is generic, you could still set it on the "none"
+> machine, though it wouldn't really have any effect.  That is, if you
+> could create a suitable object to point it at, which would depend on
+> ... details.
+> 
 
-I can understand the pain of the latter ... :)
-
+The important point is that we never want the (expanded) host cpu model
+look different when either specifying or not specifying the HTL
+property. We don't want to run into issues where libvirt probes and gets
+host model X, but when using that probed model (automatically) for a
+guest domain, we suddenly cannot run X anymore.
 
 -- 
 Thanks,
