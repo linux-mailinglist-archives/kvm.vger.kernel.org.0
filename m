@@ -2,66 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FB8F209CFA
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 12:41:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 102B6209D41
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 13:09:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404038AbgFYKlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 06:41:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34233 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2404000AbgFYKlI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 06:41:08 -0400
+        id S2404083AbgFYLJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 07:09:50 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44331 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2404042AbgFYLJt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 07:09:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593081667;
+        s=mimecast20190719; t=1593083387;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vllVC2Cgz99U4g4CTF9C3PsHuHaj3GajD97wMzhY5bY=;
-        b=bv8xKO7pSLCt7yEV8KKnw+GPuEmJUWKQUDioZkicDZSbjTljv0I7dQQOMUn228jF9sDanC
-        Y51OeMi3tF/eit6eTAc21esO78KxR/B/52iNA8WoPEBaCgnqMhd1YaZatmyumdj/fFU2qL
-        A9VEMx5I6ZbiXvchfx/F2y56vC42EZg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-bcEj0bjZOJ6AjP3hILlpHQ-1; Thu, 25 Jun 2020 06:41:05 -0400
-X-MC-Unique: bcEj0bjZOJ6AjP3hILlpHQ-1
-Received: by mail-wm1-f69.google.com with SMTP id t145so6786050wmt.2
-        for <kvm@vger.kernel.org>; Thu, 25 Jun 2020 03:41:04 -0700 (PDT)
+        bh=414dz0hN6JZuQ+Lj2kCtX1/sSgrlvJ69+d5ay2kJPaU=;
+        b=d9YRXUaOX/TGvy942v0w3mWoblHE/v12hTrdPUfcVPFqhuSJeKN0w/fAluZYMjVB85Sggh
+        xsoIkHybGZXnXXuaHnuQI3g37C575yegGTc1+F8P2sQicKe070EqMXv6FdWiVd7VDZRPnW
+        rYWFhaDNs5PxYjceSgcXVwTsY2f1M7I=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-117-m9NchG2hNX-uU-WgKlj56A-1; Thu, 25 Jun 2020 07:09:46 -0400
+X-MC-Unique: m9NchG2hNX-uU-WgKlj56A-1
+Received: by mail-wr1-f72.google.com with SMTP id f5so6515725wrv.22
+        for <kvm@vger.kernel.org>; Thu, 25 Jun 2020 04:09:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=vllVC2Cgz99U4g4CTF9C3PsHuHaj3GajD97wMzhY5bY=;
-        b=p6blBxxSFSOLK5kXka7zoH45xdm54rBdfXxOQL8OlQHRCGHVEwjbLFFP9GWahfHvbN
-         VAwzwngTggYFOWe50u1PZvdnC6GBiWTE0B1CCgy5YHTYl2eEMPsTrAWQszhSLum+NmvX
-         dfOWyNifMbqL2PjeM+Pmphz4dMpTHhUBcRiYicRs9DmMeOywCmO5Uc7P+p6ElbcBf6d7
-         pKPKLpPWisKWqKCBBwZHeWpTqR0ZBIanotdVJUVV77RySGa1kCKREFDpNwpYp5yQNh6+
-         S8uo7LUjYowtDJQO7dygmwmWaE2ml1kvoFLP0rF7vmAbtQ/5soqdPm8oIUU8GTjFCi6N
-         Zeug==
-X-Gm-Message-State: AOAM533moVsyRvx611OwF8ZzH+3z5K+1AhOEuvxtI2CfRX76CEQum1a1
-        vPEb81l6lcJuAc1ex/Rw4ttrKZxz+NwO8JlIOlOm/nwR8IC6px+r9sFOynxoeU8zmDozGcow2uZ
-        TVTIMuStMX+jF
-X-Received: by 2002:a1c:8117:: with SMTP id c23mr2528267wmd.157.1593081663791;
-        Thu, 25 Jun 2020 03:41:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzulRZXeVwT8x2psHA44QZMKK4kBMbdv8sAotTGwsRljA7T1Iw/0PADkYooEvKx/7DiBpn3CA==
-X-Received: by 2002:a1c:8117:: with SMTP id c23mr2528247wmd.157.1593081663596;
-        Thu, 25 Jun 2020 03:41:03 -0700 (PDT)
+        bh=414dz0hN6JZuQ+Lj2kCtX1/sSgrlvJ69+d5ay2kJPaU=;
+        b=pU2yG1Y2ct+jvK+7bqgpws6Md63d2mrpBmcG7BORglfuF6yJxB0SWyEflcqTuKtmar
+         ZvoGLHaqOMcwotjYtXm/nv7xoWMqRQonNClkFMiFAWUMQ6kMmASGWZ8fcn3bz5Q8735O
+         nNI4gRtBTgMs3wNhaAtegwIGk6+fZR1OeHt6Xxmt9LkfkVw+RHIcM/YhrSvwJi9Sjdcy
+         y0BZTmuPWTgJiDs59DzkSUmg6AUlLcrI6gsbJHR6CtnhuU3G+scdkTTkUeJ0yHB+AOHe
+         IrPZYRJq7H6w4nwcvkyPz8sm4SqYstclgaB4X/qtp920LgxvrTku8SRUUrRhiTdpgp18
+         pS3A==
+X-Gm-Message-State: AOAM531vmHxXRKyaxXCyQ/2l0FsM41S9yRKHK3nOcRkTqTjTI6/OlKzC
+        AGOr/obNCHTG/NbFCY8QYWgyAvSQpT3O2m/sMTYbAlr3MkemXQ6yCyN7OzftaVmTQo6e7DhV5iM
+        Uln8ZeyXbMFDm
+X-Received: by 2002:adf:afc7:: with SMTP id y7mr36134502wrd.173.1593083384733;
+        Thu, 25 Jun 2020 04:09:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysruiP9wUV/6ak5eR135Z60MsRm2t2OatIMsUZA7SZ/jK/0PsGFsU+eMGLSQ9pBGrO94xaTA==
+X-Received: by 2002:adf:afc7:: with SMTP id y7mr36134484wrd.173.1593083384540;
+        Thu, 25 Jun 2020 04:09:44 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:91d0:a5f0:9f34:4d80? ([2001:b07:6468:f312:91d0:a5f0:9f34:4d80])
-        by smtp.gmail.com with ESMTPSA id r3sm243165wmh.36.2020.06.25.03.41.02
+        by smtp.gmail.com with ESMTPSA id o7sm10264034wmb.9.2020.06.25.04.09.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jun 2020 03:41:03 -0700 (PDT)
-Subject: Re: [PATCH] x86: fix smp_stacktop on 32-bit
-To:     Nadav Amit <namit@vmware.com>
+        Thu, 25 Jun 2020 04:09:44 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] i386: setup segment registers before
+ percpu areas
+To:     Nadav Amit <nadav.amit@gmail.com>
 Cc:     kvm@vger.kernel.org
-References: <20200624203602.44659-1-namit@vmware.com>
+References: <20200624141429.382157-1-pbonzini@redhat.com>
+ <A954DB27-C5E8-435B-A1D7-76D21943F70F@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a4ffe112-44af-3ee7-94f8-90edd8e3841b@redhat.com>
-Date:   Thu, 25 Jun 2020 12:41:02 +0200
+Message-ID: <f284b980-32dc-1cb3-84d7-923ce9dea503@redhat.com>
+Date:   Thu, 25 Jun 2020 13:09:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200624203602.44659-1-namit@vmware.com>
+In-Reply-To: <A954DB27-C5E8-435B-A1D7-76D21943F70F@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -70,31 +72,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/20 22:36, Nadav Amit wrote:
-> smp_stacktop in 32-bit is fixed to some magic address. Use the address
-> of the memory that was reserved for the stack instead.
+On 24/06/20 21:58, Nadav Amit wrote:
+> From: Nadav Amit <namit@vmware.com>
+> Date: Wed, 24 Jun 2020 19:50:36 +0000
+> Subject: [PATCH] x86: load gdt while loading segments
 > 
 > Signed-off-by: Nadav Amit <namit@vmware.com>
 > ---
->  x86/cstart.S | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  x86/cstart.S | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
 > diff --git a/x86/cstart.S b/x86/cstart.S
-> index 1d8b8ac..a072aed 100644
+> index dd33d4d..1d8b8ac 100644
 > --- a/x86/cstart.S
 > +++ b/x86/cstart.S
-> @@ -134,7 +134,7 @@ prepare_32:
->  	mov %eax, %cr0
->  	ret
+> @@ -95,6 +95,8 @@ MSR_GS_BASE = 0xc0000101
+>  .endm
 >  
-> -smp_stacktop:	.long 0xa0000
-> +smp_stacktop:	.long stacktop - 4096
+>  .macro setup_segments
+> +	lgdtl gdt32_descr
+> +
+>  	mov $0x10, %ax
+>  	mov %ax, %ds
+>  	mov %ax, %es
+> @@ -106,6 +108,8 @@ MSR_GS_BASE = 0xc0000101
+>  .globl start
+>  start:
+>          mov $stacktop, %esp
+> +	setup_segments
+> +
+>          push %ebx
+>          call setup_multiboot
+>          call setup_libcflat
+> @@ -117,9 +121,6 @@ start:
+>          jmpl $8, $start32
 >  
->  save_id:
->  	movl $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
-> 
+>  prepare_32:
+> -        lgdtl gdt32_descr
+> -	setup_segments
+> -
+>  	mov %cr4, %eax
+>  	bts $4, %eax  // pse
+>  	mov %eax, %cr4
+> -- 
 
-Queued, thanks.
+The GDT is already loaded elsewhere for APs, but the gist of the patch
+is good.  I'll send v2
 
 Paolo
 
