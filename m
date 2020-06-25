@@ -2,118 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BFD720A2D1
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 18:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED1B020A2E6
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 18:28:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406084AbgFYQZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 12:25:41 -0400
-Received: from mga17.intel.com ([192.55.52.151]:57733 "EHLO mga17.intel.com"
+        id S2406116AbgFYQ23 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 12:28:29 -0400
+Received: from mga11.intel.com ([192.55.52.93]:58771 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2403774AbgFYQZl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 12:25:41 -0400
-IronPort-SDR: u6XJbGrSiCBnPK2yuWidMn5K81r3e5SRQok+qCx/868SI0NqfEnl1D8L1HvtQ0BclGBaJzMhEC
- FboovSrdY8bQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9663"; a="125206964"
+        id S2406106AbgFYQ23 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 12:28:29 -0400
+IronPort-SDR: +y3+eP53OBW//CdDrRJi9DgQXNHGemXYpkySa8H1ofAMDiIh+3utXDhDvPHRfpPmaNhTJkZLzO
+ jzCDwUBK+gPg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9663"; a="143201227"
 X-IronPort-AV: E=Sophos;i="5.75,279,1589266800"; 
-   d="scan'208";a="125206964"
+   d="scan'208";a="143201227"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2020 09:25:40 -0700
-IronPort-SDR: 1zS+rKFXbHVQPEC745baSDFiDF5jgMUXzZR8vksvauU4x2EUqzh4xrkgKCNl9SBfMX6UlBpuNR
- sTWBigkKJ+JQ==
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2020 09:28:29 -0700
+IronPort-SDR: eTSVGgqQpkWsmjHSjFziy+kG2/pnMG0Wf8YnuEp2DQVPL6rwVTO80QKA2r9whJhCjhvqaooG0f
+ Oxh0mDPMM28w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,279,1589266800"; 
-   d="scan'208";a="293931084"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2020 09:25:40 -0700
-Date:   Thu, 25 Jun 2020 09:25:40 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
-Message-ID: <20200625162540.GC3437@linux.intel.com>
-References: <20200622220442.21998-1-peterx@redhat.com>
- <20200622220442.21998-2-peterx@redhat.com>
- <20200625061544.GC2141@linux.intel.com>
- <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
+   d="scan'208";a="302048236"
+Received: from tassilo.jf.intel.com (HELO tassilo.localdomain) ([10.7.201.21])
+  by fmsmga004.fm.intel.com with ESMTP; 25 Jun 2020 09:28:28 -0700
+Received: by tassilo.localdomain (Postfix, from userid 1000)
+        id 91C84301B9F; Thu, 25 Jun 2020 09:28:28 -0700 (PDT)
+Date:   Thu, 25 Jun 2020 09:28:28 -0700
+From:   Andi Kleen <ak@linux.intel.com>
+To:     Kevin Locke <kevin@kevinlocke.name>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Subject: Re: qemu polling KVM_IRQ_LINE_STATUS when stopped
+Message-ID: <20200625162828.GE818054@tassilo.jf.intel.com>
+References: <87a80pihlz.fsf@linux.intel.com>
+ <20171018174946.GU5109@tassilo.jf.intel.com>
+ <3d37ef15-932a-1492-3068-9ef0b8cd5794@redhat.com>
+ <20171020003449.GG5109@tassilo.jf.intel.com>
+ <22d62b58-725b-9065-1f6d-081972ca32c3@redhat.com>
+ <20171020140917.GH5109@tassilo.jf.intel.com>
+ <2db78631-3c63-5e93-0ce8-f52b313593e1@redhat.com>
+ <20171020205026.GI5109@tassilo.jf.intel.com>
+ <1560363269.13828538.1508539882580.JavaMail.zimbra@redhat.com>
+ <20200625142651.GA154525@kevinolos>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200625142651.GA154525@kevinolos>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 25, 2020 at 10:09:13AM +0200, Paolo Bonzini wrote:
-> On 25/06/20 08:15, Sean Christopherson wrote:
-> > IMO, kvm_cpuid() is simply buggy.  If KVM attempts to access a non-existent
-> > MSR then it darn well should warn.
-> > 
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 8a294f9747aa..7ef7283011d6 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -1013,7 +1013,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
-> >                 *ebx = entry->ebx;
-> >                 *ecx = entry->ecx;
-> >                 *edx = entry->edx;
-> > -               if (function == 7 && index == 0) {
-> > +               if (function == 7 && index == 0 && (*ebx | (F(RTM) | F(HLE))) &&
-> > +                   (vcpu->arch.arch_capabilities & ARCH_CAP_TSX_CTRL_MSR)) {
-> >                         u64 data;
-> >                         if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
-> >                             (data & TSX_CTRL_CPUID_CLEAR))
-> > 
-> 
-> That works too, but I disagree that warning is the correct behavior
-> here.  It certainly should warn as long as kvm_get_msr blindly returns
-> zero.  However, for a guest it's fine to access a potentially
-> non-existent MSR if you're ready to trap the #GP, and the point of this
-> series is to let cpuid.c or any other KVM code do the same.
+> From the discussion in https://bugs.launchpad.net/bugs/1851062 it
+> appears that the issue does not occur for all Windows 10 VMs.  Does
+> that fit the theory it is caused by RTC periodic timer ticks?  In my
+> VM, clockres reports
 
-I get the "what" of the change, and even the "why" to some extent, but I
-dislike the idea of supporting/encouraging blind reads/writes to MSRs.
-Blind writes are just asking for problems, and suppressing warnings on reads
-is almost guaranteed to be suppressing a KVM bug.
+These days I just kill -STOP/-CONT the qemu of the VMs when pausing/resuming
+to work around this.
 
-Case in point, looking at the TSX thing again, I actually think the fix
-should be:
+I also haven't noticed any clock drift in the Windows VM (which is Windows 8,
+so quite old for Windows standards)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 5eb618dbf211..64322446e590 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1013,9 +1013,9 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
-                *ebx = entry->ebx;
-                *ecx = entry->ecx;
-                *edx = entry->edx;
--               if (function == 7 && index == 0) {
-+               if (function == 7 && index == 0 && (*ebx | (F(RTM) | F(HLE))) {
-                        u64 data;
--                       if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
-+                       if (!kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data) &&
-                            (data & TSX_CTRL_CPUID_CLEAR))
-                                *ebx &= ~(F(RTM) | F(HLE));
-                }
+So whatever the Windows drift problem was it's likely long fixed,
+and we're just burning CPU time for no good reason on modern Windows.
 
-
-On VMX, MSR_IA32_TSX_CTRL will be added to the so called shared MSR array
-regardless of whether or not it is being advertised to userspace (this is
-a bug in its own right).  Using the host_initiated variant means KVM will
-incorrectly bypass VMX's ARCH_CAP_TSX_CTRL_MSR check, i.e. incorrectly
-clear the bits if userspace is being weird and stuffed MSR_IA32_TSX_CTRL
-without advertising it to the guest.
-
-In short, the whole MSR_IA32_TSX_CTRL implementation seems messy and this
-is just papering over that mess.  The correct fix is to invoke setup_msrs()
-on writes to MSR_IA32_ARCH_CAPABILITIES, filtering MSR_IA32_TSX_CTRL out of
-shared MSRs when it's not advertised, and change kvm_cpuid() to use the
-unpriveleged variant.
-
-TSC_CTRL aside, if we insist on pointing a gun at our foot at some point,
-this should be a dedicated flavor of MSR access, e.g. msr_data.kvm_initiated,
-so that it at least requires intentionally loading the gun.
+-Andi
