@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5755720A039
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:45:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D53920A031
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:44:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405181AbgFYNph (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 09:45:37 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:6827 "EHLO huawei.com"
+        id S2405221AbgFYNoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 09:44:11 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:49350 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2405096AbgFYNph (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 09:45:37 -0400
+        id S2405190AbgFYNoK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 09:44:10 -0400
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 52A299654FC5BEE3B867;
-        Thu, 25 Jun 2020 21:43:55 +0800 (CST)
+        by Forcepoint Email with ESMTP id 6F308B2C6D69505DCE5A;
+        Thu, 25 Jun 2020 21:44:05 +0800 (CST)
 Received: from A190218597.china.huawei.com (10.47.76.118) by
  DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 25 Jun 2020 21:43:48 +0800
+ 14.3.487.0; Thu, 25 Jun 2020 21:43:54 +0800
 From:   Salil Mehta <salil.mehta@huawei.com>
 To:     <linux-arm-kernel@lists.infradead.org>
 CC:     <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
@@ -31,9 +31,9 @@ CC:     <maz@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
         <linuxarm@huawei.com>, <mehta.salil.lnk@gmail.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         "Xiongfeng Wang" <wangxiongfeng2@huawei.com>
-Subject: [PATCH RFC 1/4] arm64: kernel: Handle disabled[(+)present] cpus in MADT/GICC during init
-Date:   Thu, 25 Jun 2020 14:37:54 +0100
-Message-ID: <20200625133757.22332-2-salil.mehta@huawei.com>
+Subject: [PATCH RFC 2/4] arm64: kernel: Bound the total(present+disabled) cpus with nr_cpu_ids
+Date:   Thu, 25 Jun 2020 14:37:55 +0100
+Message-ID: <20200625133757.22332-3-salil.mehta@huawei.com>
 X-Mailer: git-send-email 2.8.3
 In-Reply-To: <20200625133757.22332-1-salil.mehta@huawei.com>
 References: <20200625133757.22332-1-salil.mehta@huawei.com>
@@ -46,142 +46,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With ACPI enabled, cpus get identified by the presence of the GICC
-entry in the MADT Table. Each GICC entry part of MADT presents cpu as
-enabled or disabled. As of now, the disabled cpus are skipped as
-physical cpu hotplug is not supported. These remain disabled even after
-the kernel has booted.
-
-To support virtual cpu hotplug(in which case disabled vcpus could be
-hotplugged even after kernel has booted), QEMU will populate MADT Table
-with appropriate details of GICC entry for each possible(present+disabled)
-vcpu. Now, during the init time vcpus will be identified as present or
-disabled. To achieve this, below changes have been made with respect to
-the present/possible vcpu handling along with the mentioned reasoning:
-
-1. Identify all possible(present+disabled) vcpus at boot/init time
-   and set their present mask and possible mask. In the existing code,
-   cpus are being marked present quite late within smp_prepare_cpus()
-   function, which gets called in context to the kernel thread. Since
-   the cpu hotplug is not supported, present cpus are always equal to
-   the possible cpus. But with cpu hotplug enabled, this assumption is
-   not true. Hence, present cpus should be marked while MADT GICC entries
-   are bring parsed for each vcpu.
-2. Set possible cpus to include disabled. This needs to be done now
-   while parsing MADT GICC entries corresponding to each vcpu as the
-   disabled vcpu info is available only at this point as for hotplug
-   case possible vcpus is not equal to present vcpus.
-3. We will store the parsed madt/gicc entry even for the disabled vcpus
-   during init time. This is needed as some modules like PMU registers
-   IRQs for each possible vcpus during init time. Therefore, a valid
-   entry of the MADT GICC should be present for all possible vcpus.
-4. Refactoring related to DT/OF is also done to align it with the init
-   changes to support vcpu hotplug.
+Bound the total number of identified cpus(including disabled cpus) by
+maximum allowed limit by the kernel. Max value is either specified as
+part of the kernel parameters 'nr_cpus' or specified during compile
+time using CONFIG_NR_CPUS.
 
 Signed-off-by: Salil Mehta <salil.mehta@huawei.com>
 Signed-off-by: Xiongfeng Wang <wangxiongfeng2@huawei.com>
 ---
- arch/arm64/kernel/smp.c | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ arch/arm64/kernel/smp.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index e43a8ff19f0f..51a707928302 100644
+index 51a707928302..864ccd3da419 100644
 --- a/arch/arm64/kernel/smp.c
 +++ b/arch/arm64/kernel/smp.c
-@@ -509,13 +509,12 @@ static int __init smp_cpu_setup(int cpu)
- 	if (ops->cpu_init(cpu))
- 		return -ENODEV;
- 
--	set_cpu_possible(cpu, true);
--
- 	return 0;
+@@ -513,6 +513,7 @@ static int __init smp_cpu_setup(int cpu)
  }
  
  static bool bootcpu_valid __initdata;
++static bool cpus_clipped __initdata = false;
  static unsigned int cpu_count = 1;
-+static unsigned int disabled_cpu_count;
+ static unsigned int disabled_cpu_count;
  
- #ifdef CONFIG_ACPI
- static struct acpi_madt_generic_interrupt cpu_madt_gicc[NR_CPUS];
-@@ -534,10 +533,17 @@ struct acpi_madt_generic_interrupt *acpi_cpu_get_madt_gicc(int cpu)
- static void __init
- acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
- {
-+	unsigned int total_cpu_count = disabled_cpu_count + cpu_count;
+@@ -536,6 +537,11 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
+ 	unsigned int total_cpu_count = disabled_cpu_count + cpu_count;
  	u64 hwid = processor->arm_mpidr;
  
++	if (total_cpu_count > nr_cpu_ids) {
++		cpus_clipped = true;
++		return;
++	}
++
  	if (!(processor->flags & ACPI_MADT_ENABLED)) {
-+#ifndef CONFIG_ACPI_HOTPLUG_CPU
+ #ifndef CONFIG_ACPI_HOTPLUG_CPU
  		pr_debug("skipping disabled CPU entry with 0x%llx MPIDR\n", hwid);
-+#else
-+		cpu_madt_gicc[total_cpu_count] = *processor;
-+		set_cpu_possible(total_cpu_count, true);
-+		disabled_cpu_count++;
-+#endif
+@@ -569,9 +575,6 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
  		return;
  	}
  
-@@ -546,7 +552,7 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
- 		return;
- 	}
- 
--	if (is_mpidr_duplicate(cpu_count, hwid)) {
-+	if (is_mpidr_duplicate(total_cpu_count, hwid)) {
- 		pr_err("duplicate CPU MPIDR 0x%llx in MADT\n", hwid);
- 		return;
- 	}
-@@ -567,9 +573,9 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
- 		return;
- 
+-	if (cpu_count >= NR_CPUS)
+-		return;
+-
  	/* map the logical cpu id to cpu MPIDR */
--	cpu_logical_map(cpu_count) = hwid;
-+	cpu_logical_map(total_cpu_count) = hwid;
+ 	cpu_logical_map(total_cpu_count) = hwid;
  
--	cpu_madt_gicc[cpu_count] = *processor;
-+	cpu_madt_gicc[total_cpu_count] = *processor;
- 
- 	/*
- 	 * Set-up the ACPI parking protocol cpu entries
-@@ -580,8 +586,10 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
- 	 * initialize the cpu if the parking protocol is
- 	 * the only available enable method).
- 	 */
--	acpi_set_mailbox_entry(cpu_count, processor);
-+	acpi_set_mailbox_entry(total_cpu_count, processor);
- 
-+	set_cpu_possible(total_cpu_count, true);
-+	set_cpu_present(total_cpu_count, true);
- 	cpu_count++;
- }
- 
-@@ -614,6 +622,9 @@ static void __init acpi_parse_and_init_cpus(void)
- 	acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
- 				      acpi_parse_gic_cpu_interface, 0);
- 
-+	pr_debug("possible cpus(%u) present cpus(%u) disabled cpus(%u)\n",
-+		 cpu_count+disabled_cpu_count, cpu_count, disabled_cpu_count);
-+
- 	/*
- 	 * In ACPI, SMP and CPU NUMA information is provided in separate
- 	 * static tables, namely the MADT and the SRAT.
-@@ -684,6 +695,9 @@ static void __init of_parse_and_init_cpus(void)
- 		cpu_logical_map(cpu_count) = hwid;
- 
- 		early_map_cpu_to_node(cpu_count, of_node_to_nid(dn));
-+
-+		set_cpu_possible(cpu_count, true);
-+		set_cpu_present(cpu_count, true);
- next:
- 		cpu_count++;
- 	}
-@@ -768,7 +782,6 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
- 		if (err)
+@@ -688,8 +691,10 @@ static void __init of_parse_and_init_cpus(void)
  			continue;
+ 		}
  
--		set_cpu_present(cpu, true);
- 		numa_store_cpu_info(cpu);
- 	}
- }
+-		if (cpu_count >= NR_CPUS)
++		if (cpu_count >= NR_CPUS) {
++			cpus_clipped = true;
+ 			goto next;
++		}
+ 
+ 		pr_debug("cpu logical map 0x%llx\n", hwid);
+ 		cpu_logical_map(cpu_count) = hwid;
+@@ -710,6 +715,7 @@ static void __init of_parse_and_init_cpus(void)
+  */
+ void __init smp_init_cpus(void)
+ {
++	unsigned int total_cpu_count = disabled_cpu_count + cpu_count;
+ 	int i;
+ 
+ 	if (acpi_disabled)
+@@ -717,9 +723,9 @@ void __init smp_init_cpus(void)
+ 	else
+ 		acpi_parse_and_init_cpus();
+ 
+-	if (cpu_count > nr_cpu_ids)
++	if (cpus_clipped)
+ 		pr_warn("Number of cores (%d) exceeds configured maximum of %u - clipping\n",
+-			cpu_count, nr_cpu_ids);
++			total_cpu_count, nr_cpu_ids);
+ 
+ 	if (!bootcpu_valid) {
+ 		pr_err("missing boot CPU MPIDR, not enabling secondaries\n");
 -- 
 2.17.1
 
