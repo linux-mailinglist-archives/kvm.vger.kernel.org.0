@@ -2,81 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81F5F209F10
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:01:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1289C209F5B
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:10:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404834AbgFYNBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 09:01:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54120 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2404709AbgFYNBr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 09:01:47 -0400
+        id S2404696AbgFYNKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 09:10:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37884 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2404803AbgFYNKe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 09:10:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593090106;
+        s=mimecast20190719; t=1593090632;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jExNRMp55CBcYWqWxNtFmp58bp9Mx/2CR39nOQBFaFA=;
-        b=JTjQC1d4YWtYGvscl+M+uO5oU8xbNznyto8pknGfkBdkx3Nzfmf/f9HHbqkWCkct0aYqOe
-        jf3NMG/5TTbRsy5ZM0HkDg3TI9AY6K1+HaRLvJ9N430fnJC5riycocI0lwmrEjg17qrGXw
-        6aYRBD6AlmPw84VNU9k3G/WzJb9HN+E=
+        bh=LN1Esb/7Hi/Z/DHHBSlOzerqkyDCNAofXS9512fRksY=;
+        b=YWp5MC2z2X5qoBnfzsR8XY0OWty3BbrbSBuy95N1CR/e7eDBKPSisGsR7vqQYISvcBK9Ak
+        lmrV4pcoXk5tMMMaqORJo6txwezovi1lF1bJf2XMJtIBKvLYitOGTH9sVYvp9LkTFJMRwA
+        S1j0BVRD+uRvsLlUeHDekP/HU+rQe0k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-_2kG6wJdPqakioWgNL6kaA-1; Thu, 25 Jun 2020 09:01:44 -0400
-X-MC-Unique: _2kG6wJdPqakioWgNL6kaA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-241-kOw_BvQeM5GFVWO-Gh_oew-1; Thu, 25 Jun 2020 09:10:25 -0400
+X-MC-Unique: kOw_BvQeM5GFVWO-Gh_oew-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 705DE1083E87;
-        Thu, 25 Jun 2020 13:01:42 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-150.ams2.redhat.com [10.36.112.150])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 42C067CAA3;
-        Thu, 25 Jun 2020 13:01:40 +0000 (UTC)
-Subject: Re: [PATCH kvm-unit-tests] x86: fix stack pointer after call
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     namit@vmware.com
-References: <20200625111526.1620-1-pbonzini@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <ae3f91d8-9e6a-c90d-0fca-5e4df2833a0c@redhat.com>
-Date:   Thu, 25 Jun 2020 15:01:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2452107ACF2;
+        Thu, 25 Jun 2020 13:10:22 +0000 (UTC)
+Received: from localhost (ovpn-115-49.ams2.redhat.com [10.36.115.49])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 588BE79315;
+        Thu, 25 Jun 2020 13:10:21 +0000 (UTC)
+Date:   Thu, 25 Jun 2020 14:10:20 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Alexander Graf <graf@amazon.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, kvm@vger.kernel.org,
+        ne-devel-upstream@amazon.com
+Subject: Re: [PATCH v4 17/18] nitro_enclaves: Add overview documentation
+Message-ID: <20200625131020.GD221479@stefanha-x1.localdomain>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-18-andraprs@amazon.com>
+ <20200623085915.GF32718@stefanha-x1.localdomain>
+ <746fcd7d-5946-35ec-6471-8bf8dccdf400@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20200625111526.1620-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <746fcd7d-5946-35ec-6471-8bf8dccdf400@amazon.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="hoZxPH4CaxYzWscb"
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/06/2020 13.15, Paolo Bonzini wrote:
-> Since setup_multiboot has a C calling convention, the stack pointer must
-> be adjusted after the call.  Without this change, the bottom of the
-> percpu area would be 4 bytes below the bottom of the stack.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   x86/cstart.S | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/x86/cstart.S b/x86/cstart.S
-> index deb08b7..409cb00 100644
-> --- a/x86/cstart.S
-> +++ b/x86/cstart.S
-> @@ -116,6 +116,7 @@ start:
->   
->           push %ebx
->           call setup_multiboot
-> +        addl $4, %esp
->           call setup_libcflat
->           mov mb_cmdline(%ebx), %eax
->           mov %eax, __args
+--hoZxPH4CaxYzWscb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Looks right.
+On Wed, Jun 24, 2020 at 05:39:39PM +0300, Paraschiv, Andra-Irina wrote:
+>=20
+>=20
+> On 23/06/2020 11:59, Stefan Hajnoczi wrote:
+> > On Mon, Jun 22, 2020 at 11:03:28PM +0300, Andra Paraschiv wrote:
+> > > +The kernel bzImage, the kernel command line, the ramdisk(s) are part=
+ of the
+> > > +Enclave Image Format (EIF); plus an EIF header including metadata su=
+ch as magic
+> > > +number, eif version, image size and CRC.
+> > > +
+> > > +Hash values are computed for the entire enclave image (EIF), the ker=
+nel and
+> > > +ramdisk(s). That's used, for example, to check that the enclave imag=
+e that is
+> > > +loaded in the enclave VM is the one that was intended to be run.
+> > > +
+> > > +These crypto measurements are included in a signed attestation docum=
+ent
+> > > +generated by the Nitro Hypervisor and further used to prove the iden=
+tity of the
+> > > +enclave; KMS is an example of service that NE is integrated with and=
+ that checks
+> > > +the attestation doc.
+> > > +
+> > > +The enclave image (EIF) is loaded in the enclave memory at offset 8 =
+MiB. The
+> > > +init process in the enclave connects to the vsock CID of the primary=
+ VM and a
+> > > +predefined port - 9000 - to send a heartbeat value - 0xb7. This mech=
+anism is
+> > > +used to check in the primary VM that the enclave has booted.
+> > > +
+> > > +If the enclave VM crashes or gracefully exits, an interrupt event is=
+ received by
+> > > +the NE driver. This event is sent further to the user space enclave =
+process
+> > > +running in the primary VM via a poll notification mechanism. Then th=
+e user space
+> > > +enclave process can exit.
+> > > +
+> > > +[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+> > > +[2] https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
+> > > +[3] https://lwn.net/Articles/807108/
+> > > +[4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-parame=
+ters.html
+> > > +[5] https://man7.org/linux/man-pages/man7/vsock.7.html
+> > Is the EIF specification and the attestation protocol available?
+>=20
+> For now, they are not publicly available. Once the refs are available (e.=
+g.
+> AWS documentation, GitHub documentation), I'll include them in the kernel
+> documentation as well.
+>=20
+> As a note here, the NE project is currently in preview
+> (https://aws.amazon.com/ec2/nitro/nitro-enclaves/) and part of the
+> documentation / codebase will be publicly available when NE is generally
+> available (GA). This will be in addition to the ones already publicly
+> available, like the NE kernel driver.
+>=20
+> Let me know if I can help with any particular questions / clarifications.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks!
+
+Stefan
+
+--hoZxPH4CaxYzWscb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl70ojwACgkQnKSrs4Gr
+c8hY1Af49KQr66earh3/QlA88cMkax3Hj7qRR9/hKpBS8qDRjwSHzSDhvemS0Qrf
+jH84GXs6j8Kjj2VdXFpyEaH183Ktz+27ydyMETDYpAvakhvOkBW5bSE6qqpK/EE1
+CuI2kIDVBDSCxul81JSB4ATnAfa6plUgUntTUjF4mhvLBWp3HgYW6S07o5LvzaD9
+6XcoDarRxGWErRs/3tVPHQrTtpMztrIxkp3eu+AiPdQuID4JUiKSzgMSne1lThRP
+9OZjF1nyAkx+UxBDFYpf5MmyKB4aEUz6UmFdLKoIGYExnAfuS+9rMtgWW+Rcnwpc
+uwLL0sfOGSkX8jJwQJWTV+ItlRhy
+=dz1i
+-----END PGP SIGNATURE-----
+
+--hoZxPH4CaxYzWscb--
 
