@@ -2,92 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EC2920A068
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 15:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D720620A0EC
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 16:36:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405221AbgFYN6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 09:58:13 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34079 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2405218AbgFYN6N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 09:58:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593093492;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HP9THfq0e57aimyJmnA5TRP+h5ylmLpPTeTOZs2TrL8=;
-        b=TGA8QPs1CLc/mZaLSCExffKxwkck00FCcBzwTxgWfdbIHMbPs1JjUBcxPDW7yGLeUXLNU6
-        5nyM0aTgl6hro70k9ZWq7NFbCsYxpuUPH1dTDuag6EbUg7lX/gWWTQAolpnotin37Chrad
-        zGaNrRq3hcVAarw3jpngMJVcVzJRFx4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-qAq2OK1TOByuX1mhSoJ6uQ-1; Thu, 25 Jun 2020 09:58:10 -0400
-X-MC-Unique: qAq2OK1TOByuX1mhSoJ6uQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EBC7464;
-        Thu, 25 Jun 2020 13:58:09 +0000 (UTC)
-Received: from localhost (ovpn-115-49.ams2.redhat.com [10.36.115.49])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D98C860C1D;
-        Thu, 25 Jun 2020 13:58:08 +0000 (UTC)
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Subject: [RFC 3/3] virtio-blk: use NUMA-aware memory allocation in probe
-Date:   Thu, 25 Jun 2020 14:57:52 +0100
-Message-Id: <20200625135752.227293-4-stefanha@redhat.com>
-In-Reply-To: <20200625135752.227293-1-stefanha@redhat.com>
-References: <20200625135752.227293-1-stefanha@redhat.com>
+        id S2405395AbgFYOgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 10:36:42 -0400
+Received: from vulcan.kevinlocke.name ([107.191.43.88]:42576 "EHLO
+        vulcan.kevinlocke.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405340AbgFYOgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 10:36:42 -0400
+X-Greylist: delayed 583 seconds by postgrey-1.27 at vger.kernel.org; Thu, 25 Jun 2020 10:36:41 EDT
+Received: from kevinolos (host-69-145-60-23.bln-mt.client.bresnan.net [69.145.60.23])
+        (Authenticated sender: kevin@kevinlocke.name)
+        by vulcan.kevinlocke.name (Postfix) with ESMTPSA id 812B71A0E756;
+        Thu, 25 Jun 2020 14:26:53 +0000 (UTC)
+Received: by kevinolos (Postfix, from userid 1000)
+        id 5F4711300552; Thu, 25 Jun 2020 08:26:51 -0600 (MDT)
+Date:   Thu, 25 Jun 2020 08:26:51 -0600
+From:   Kevin Locke <kevin@kevinlocke.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Andi Kleen <ak@linux.intel.com>,
+        Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Subject: Re: qemu polling KVM_IRQ_LINE_STATUS when stopped
+Message-ID: <20200625142651.GA154525@kevinolos>
+Mail-Followup-To: Kevin Locke <kevin@kevinlocke.name>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Andi Kleen <ak@linux.intel.com>,
+        Christian Ehrhardt <christian.ehrhardt@canonical.com>
+References: <87a80pihlz.fsf@linux.intel.com>
+ <20171018174946.GU5109@tassilo.jf.intel.com>
+ <3d37ef15-932a-1492-3068-9ef0b8cd5794@redhat.com>
+ <20171020003449.GG5109@tassilo.jf.intel.com>
+ <22d62b58-725b-9065-1f6d-081972ca32c3@redhat.com>
+ <20171020140917.GH5109@tassilo.jf.intel.com>
+ <2db78631-3c63-5e93-0ce8-f52b313593e1@redhat.com>
+ <20171020205026.GI5109@tassilo.jf.intel.com>
+ <1560363269.13828538.1508539882580.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1560363269.13828538.1508539882580.JavaMail.zimbra@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QWxsb2NhdGUgZnJlcXVlbnRseS1hY2Nlc3NlZCBkYXRhIHN0cnVjdHVyZXMgZnJvbSB0aGUgTlVN
-QSBub2RlCmFzc29jaWF0ZWQgd2l0aCB0aGlzIGRldmljZSB0byBhdm9pZCBzbG93IGNyb3NzLU5V
-TUEgbm9kZSBtZW1vcnkKYWNjZXNzZXMuCgpPbmx5IHRoZSBmb2xsb3dpbmcgbWVtb3J5IGFsbG9j
-YXRpb25zIGFyZSBtYWRlIE5VTUEtYXdhcmU6CgoxLiBDYWxsZWQgZHVyaW5nIHByb2JlLiBJZiBj
-YWxsZWQgaW4gdGhlIGRhdGEgcGF0aCB0aGVuIGhvcGVmdWxseSB3ZSdyZQogICBleGVjdXRpbmcg
-b24gYSBDUFUgaW4gdGhlIHNhbWUgTlVNQSBub2RlIGFzIHRoZSBkZXZpY2UuIElmIHRoZSBDUFUg
-aXMKICAgbm90IGluIHRoZSByaWdodCBOVU1BIG5vZGUgdGhlbiBpdCdzIHVuY2xlYXIgd2hldGhl
-ciBmb3JjaW5nIG1lbW9yeQogICBhbGxvY2F0aW9ucyB0byB1c2UgdGhlIGRldmljZSdzIE5VTUEg
-bm9kZSB3aWxsIGluY3JlYXNlIG9yIGRlY3JlYXNlCiAgIHBlcmZvcm1hbmNlLgoKMi4gTWVtb3J5
-IHdpbGwgYmUgZnJlcXVlbnRseSBhY2Nlc3NlZCBmcm9tIHRoZSBkYXRhIHBhdGguIFRoZXJlIGlz
-IG5vCiAgIG5lZWQgdG8gd29ycnkgYWJvdXQgZGF0YSB0aGF0IGlzIG5vdCBhY2Nlc3NlZCBmcm9t
-CiAgIHBlcmZvcm1hbmNlLWNyaXRpY2FsIGNvZGUgcGF0aHMuCgpTaWduZWQtb2ZmLWJ5OiBTdGVm
-YW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Ci0tLQogZHJpdmVycy9ibG9jay92aXJ0
-aW9fYmxrLmMgfCA3ICsrKysrLS0KIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDIg
-ZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMgYi9k
-cml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYwppbmRleCA5ZDIxYmYwZjE1NWUuLjQwODQ1ZTlhZDNi
-MSAxMDA2NDQKLS0tIGEvZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMKKysrIGIvZHJpdmVycy9i
-bG9jay92aXJ0aW9fYmxrLmMKQEAgLTQ4Miw2ICs0ODIsNyBAQCBzdGF0aWMgaW50IGluaXRfdnEo
-c3RydWN0IHZpcnRpb19ibGsgKnZibGspCiAJdW5zaWduZWQgc2hvcnQgbnVtX3ZxczsKIAlzdHJ1
-Y3QgdmlydGlvX2RldmljZSAqdmRldiA9IHZibGstPnZkZXY7CiAJc3RydWN0IGlycV9hZmZpbml0
-eSBkZXNjID0geyAwLCB9OworCWludCBub2RlID0gZGV2X3RvX25vZGUoJnZkZXYtPmRldik7CiAK
-IAllcnIgPSB2aXJ0aW9fY3JlYWRfZmVhdHVyZSh2ZGV2LCBWSVJUSU9fQkxLX0ZfTVEsCiAJCQkJ
-ICAgc3RydWN0IHZpcnRpb19ibGtfY29uZmlnLCBudW1fcXVldWVzLApAQCAtNDkxLDcgKzQ5Miw4
-IEBAIHN0YXRpYyBpbnQgaW5pdF92cShzdHJ1Y3QgdmlydGlvX2JsayAqdmJsaykKIAogCW51bV92
-cXMgPSBtaW5fdCh1bnNpZ25lZCBpbnQsIG5yX2NwdV9pZHMsIG51bV92cXMpOwogCi0JdmJsay0+
-dnFzID0ga21hbGxvY19hcnJheShudW1fdnFzLCBzaXplb2YoKnZibGstPnZxcyksIEdGUF9LRVJO
-RUwpOworCXZibGstPnZxcyA9IGttYWxsb2NfYXJyYXlfbm9kZShudW1fdnFzLCBzaXplb2YoKnZi
-bGstPnZxcyksCisJCQkJICAgICAgIEdGUF9LRVJORUwsIG5vZGUpOwogCWlmICghdmJsay0+dnFz
-KQogCQlyZXR1cm4gLUVOT01FTTsKIApAQCAtNjgzLDYgKzY4NSw3IEBAIG1vZHVsZV9wYXJhbV9u
-YW1lZChxdWV1ZV9kZXB0aCwgdmlydGJsa19xdWV1ZV9kZXB0aCwgdWludCwgMDQ0NCk7CiAKIHN0
-YXRpYyBpbnQgdmlydGJsa19wcm9iZShzdHJ1Y3QgdmlydGlvX2RldmljZSAqdmRldikKIHsKKwlp
-bnQgbm9kZSA9IGRldl90b19ub2RlKCZ2ZGV2LT5kZXYpOwogCXN0cnVjdCB2aXJ0aW9fYmxrICp2
-YmxrOwogCXN0cnVjdCByZXF1ZXN0X3F1ZXVlICpxOwogCWludCBlcnIsIGluZGV4OwpAQCAtNzE0
-LDcgKzcxNyw3IEBAIHN0YXRpYyBpbnQgdmlydGJsa19wcm9iZShzdHJ1Y3QgdmlydGlvX2Rldmlj
-ZSAqdmRldikKIAogCS8qIFdlIG5lZWQgYW4gZXh0cmEgc2cgZWxlbWVudHMgYXQgaGVhZCBhbmQg
-dGFpbC4gKi8KIAlzZ19lbGVtcyArPSAyOwotCXZkZXYtPnByaXYgPSB2YmxrID0ga21hbGxvYyhz
-aXplb2YoKnZibGspLCBHRlBfS0VSTkVMKTsKKwl2ZGV2LT5wcml2ID0gdmJsayA9IGttYWxsb2Nf
-bm9kZShzaXplb2YoKnZibGspLCBHRlBfS0VSTkVMLCBub2RlKTsKIAlpZiAoIXZibGspIHsKIAkJ
-ZXJyID0gLUVOT01FTTsKIAkJZ290byBvdXRfZnJlZV9pbmRleDsKLS0gCjIuMjYuMgoK
+Hi Paolo et al.,
 
+I recently noticed ~30% CPU usage on a paused Windows 10 VM, as
+reported in https://bugs.launchpad.net/bugs/1851062 and
+https://bugzilla.redhat.com/1638289 which, with the help of Christian
+Ehrhardt, led to your previous discussion of the issue with Andi Kleen
+at https://lore.kernel.org/kvm/87a80pihlz.fsf@linux.intel.com/ quoted
+below:
+
+On Fri, 2017-10-20 at 18:51 -0400, Paolo Bonzini wrote:
+> On Fri, 2017-10-20 at 13:50 -0700, Andi Kleen wrote:
+>> On Fri, Oct 20, 2017 at 05:12:40PM +0200, Paolo Bonzini wrote:
+>>> On 20/10/2017 16:09, Andi Kleen wrote:
+>>>>> Unfortunately that's not possible in general.  Windows uses the periodic
+>>>>> timer to track wall time (!), so if you do that your clock is going to
+>>>>> be late when you resume the guest.
+>>>> 
+>>>> But when the guest cannot execute instructions
+>>>> it cannot see whatever the handler does.
+>>>> 
+>>>> So the handler could always catch up after stopping for longer,
+>>>> without making any difference.
+>>> 
+>>> You may be right... you should get the interrupt storm *after
+>>> continuing* the guest, but not while it's stopped.
+>> 
+>> Maybe be find to not have a storm, but only one. I belive real hardware
+>> cannot have a storm because only one interrupt can be pending at a time.
+> 
+> Real hardware also doesn't pause for an extended period of time, with
+> exceptions such as JTAG that aren't as prominent as pausing a virtual
+> machine.  This is just how Windows works: unless it's S3/S4, it updates
+> the time from RTC periodic timer ticks, and the frequency sometimes goes
+> up as much as 1024 or 2048 Hz (default being 64 Hz IIRC).
+> 
+> In fact, we have a lot of cruft in KVM just to track periodic timer
+> ticks that couldn't be delivered and retry again a little later.  Without
+> that, the smallest load on the host is enough for time to drift in
+> Windows guests.
+
+I'm trying to understand the cause and what options might exist for
+addressing it.  Several questions:
+
+1. Do I understand correctly that the CPU usage is due to counting
+   RTC periodic timer ticks for replay when the guest is resumed?
+2. If so, would it be possible to calculate the number of ticks
+   required from the time delta at resume, rather than polling each
+   tick while paused?
+3. Presumably when restoring from a snapshot, Windows time must jump
+   forward from the time the snapshot was taken.  How does this differ
+   from resuming from a paused state?
+4. How is this handled if the host is suspended (S3) when the VM is
+   paused (or not paused) and ticks aren't counted on the host?
+5. I have not observed high CPU usage for paused VMs in VirtualBox.
+   Would it be worth investigating how they handle this?
+
+From the discussion in https://bugs.launchpad.net/bugs/1851062 it
+appears that the issue does not occur for all Windows 10 VMs.  Does
+that fit the theory it is caused by RTC periodic timer ticks?  In my
+VM, clockres reports
+
+    Maximum timer interval: 15.625 ms
+    Minimum timer interval: 0.500 ms
+    Current timer interval: 15.625 ms
+
+immediately before and after pausing, suggesting that high periodic
+tick frequency is not necessary to cause the issue.
+
+Thanks,
+Kevin
