@@ -2,47 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43FAC209A17
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 08:50:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C2A4209A2A
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 08:59:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390057AbgFYGu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 02:50:28 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57188 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389540AbgFYGu0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 02:50:26 -0400
+        id S2389923AbgFYG7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 02:59:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54468 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727999AbgFYG7R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 02:59:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593067823;
+        s=mimecast20190719; t=1593068354;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=dMrGGsPmPQz/O10isWZueLXcJoi7kOZlheHxHohsvbg=;
-        b=Zjas2ATNTXWl+xbtJrwOMjWrYHDN527Mf2rZr2V/oZjjyJcHo4e1X/AdKDLwL7iLsBCaaA
-        ivAZNFs83+y2oPioa99plbKBQCgGTrP5Iorm2wiM3ge3ZlRxyqaRp8XjM8Uq2/HP1c3S9Q
-        S6XACF4aRzzjYU0iD3CQMxHkbcGqqLI=
+        bh=4YmFKv5BPyvUP3dHFPJ60Okn4MqIBG/j/Iz9R2fJchw=;
+        b=B1aWIEAXQt1egDlxJVQheUEZ2DOEC8D2eYqX/LzW1rmgAuBhZHY66ziwo14JXHwbOHYCNu
+        EvYCiHrJ7XjBpLdMZENKW0X/IDbjvGupaT1Apfz7qjL0D1ZHhBc3bk5AiEARzwJTzbzATj
+        lgw/nqKHWuwo1ZhBronQ7TVqjVFGVNQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-U1roUC2gN3efwwX44rbtTg-1; Thu, 25 Jun 2020 02:50:19 -0400
-X-MC-Unique: U1roUC2gN3efwwX44rbtTg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-461-DbKryyKLOgmq3gfQAN4SSQ-1; Thu, 25 Jun 2020 02:59:13 -0400
+X-MC-Unique: DbKryyKLOgmq3gfQAN4SSQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3927A107ACF2;
-        Thu, 25 Jun 2020 06:50:17 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1826804003;
+        Thu, 25 Jun 2020 06:59:10 +0000 (UTC)
 Received: from [10.36.113.65] (ovpn-113-65.ams2.redhat.com [10.36.113.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 185981DC;
-        Thu, 25 Jun 2020 06:50:10 +0000 (UTC)
-Subject: Re: [PATCH v2 1/2] virtio: VIRTIO_F_IOMMU_PLATFORM ->
- VIRTIO_F_ACCESS_PLATFORM
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20200624232035.704217-1-mst@redhat.com>
- <20200624232035.704217-2-mst@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 462C491D99;
+        Thu, 25 Jun 2020 06:59:01 +0000 (UTC)
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
+        pbonzini@redhat.com, dgilbert@redhat.com, frankja@linux.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
+        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
+        cohuck@redhat.com, pasic@linux.ibm.com,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
+ <20200619094820.GJ17085@umbus.fritz.box>
+ <a1f47bc3-40d6-f46e-42e7-9c44597c3c90@redhat.com>
+ <20200625054201.GE172395@umbus.fritz.box>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -88,202 +92,115 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <dc85a45d-5507-2cb2-7e6f-2c569844914f@redhat.com>
-Date:   Thu, 25 Jun 2020 08:50:10 +0200
+Message-ID: <778050eb-c6b2-e471-1945-598520fdc894@redhat.com>
+Date:   Thu, 25 Jun 2020 08:59:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200624232035.704217-2-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200625054201.GE172395@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.06.20 01:21, Michael S. Tsirkin wrote:
-> Rename the bit to match latest virtio spec.
-> Add a compat macro to avoid breaking existing userspace.
 > 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  arch/um/drivers/virtio_uml.c       |  2 +-
->  drivers/vdpa/ifcvf/ifcvf_base.h    |  2 +-
->  drivers/vdpa/vdpa_sim/vdpa_sim.c   |  4 ++--
->  drivers/vhost/net.c                |  4 ++--
->  drivers/vhost/vdpa.c               |  2 +-
->  drivers/virtio/virtio_balloon.c    |  2 +-
->  drivers/virtio/virtio_ring.c       |  2 +-
->  include/linux/virtio_config.h      |  2 +-
->  include/uapi/linux/virtio_config.h | 10 +++++++---
->  tools/virtio/linux/virtio_config.h |  2 +-
->  10 files changed, 18 insertions(+), 14 deletions(-)
+>> So it's wrapping architecture-specific data in a common
+>> parameter. Hmm.
 > 
-> diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
-> index 351aee52aca6..a6c4bb6c2c01 100644
-> --- a/arch/um/drivers/virtio_uml.c
-> +++ b/arch/um/drivers/virtio_uml.c
-> @@ -385,7 +385,7 @@ static irqreturn_t vu_req_interrupt(int irq, void *data)
->  		}
->  		break;
->  	case VHOST_USER_SLAVE_IOTLB_MSG:
-> -		/* not supported - VIRTIO_F_IOMMU_PLATFORM */
-> +		/* not supported - VIRTIO_F_ACCESS_PLATFORM */
->  	case VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG:
->  		/* not supported - VHOST_USER_PROTOCOL_F_HOST_NOTIFIER */
->  	default:
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-> index f4554412e607..24af422b5a3e 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
-> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-> @@ -29,7 +29,7 @@
->  		 (1ULL << VIRTIO_F_VERSION_1)			| \
->  		 (1ULL << VIRTIO_NET_F_STATUS)			| \
->  		 (1ULL << VIRTIO_F_ORDER_PLATFORM)		| \
-> -		 (1ULL << VIRTIO_F_IOMMU_PLATFORM)		| \
-> +		 (1ULL << VIRTIO_F_ACCESS_PLATFORM)		| \
->  		 (1ULL << VIRTIO_NET_F_MRG_RXBUF))
->  
->  /* Only one queue pair for now. */
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> index c7334cc65bb2..a9bc5e0fb353 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -55,7 +55,7 @@ struct vdpasim_virtqueue {
->  
->  static u64 vdpasim_features = (1ULL << VIRTIO_F_ANY_LAYOUT) |
->  			      (1ULL << VIRTIO_F_VERSION_1)  |
-> -			      (1ULL << VIRTIO_F_IOMMU_PLATFORM);
-> +			      (1ULL << VIRTIO_F_ACCESS_PLATFORM);
->  
->  /* State of each vdpasim device */
->  struct vdpasim {
-> @@ -450,7 +450,7 @@ static int vdpasim_set_features(struct vdpa_device *vdpa, u64 features)
->  	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
->  
->  	/* DMA mapping must be done by driver */
-> -	if (!(features & (1ULL << VIRTIO_F_IOMMU_PLATFORM)))
-> +	if (!(features & (1ULL << VIRTIO_F_ACCESS_PLATFORM)))
->  		return -EINVAL;
->  
->  	vdpasim->features = features & vdpasim_features;
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index e992decfec53..8e0921d3805d 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -73,7 +73,7 @@ enum {
->  	VHOST_NET_FEATURES = VHOST_FEATURES |
->  			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
->  			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> -			 (1ULL << VIRTIO_F_IOMMU_PLATFORM)
-> +			 (1ULL << VIRTIO_F_ACCESS_PLATFORM)
->  };
->  
->  enum {
-> @@ -1653,7 +1653,7 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
->  	    !vhost_log_access_ok(&n->dev))
->  		goto out_unlock;
->  
-> -	if ((features & (1ULL << VIRTIO_F_IOMMU_PLATFORM))) {
-> +	if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
->  		if (vhost_init_device_iotlb(&n->dev, true))
->  			goto out_unlock;
->  	}
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index a54b60d6623f..18869a35d408 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -31,7 +31,7 @@ enum {
->  		(1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
->  		(1ULL << VIRTIO_F_ANY_LAYOUT) |
->  		(1ULL << VIRTIO_F_VERSION_1) |
-> -		(1ULL << VIRTIO_F_IOMMU_PLATFORM) |
-> +		(1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->  		(1ULL << VIRTIO_F_RING_PACKED) |
->  		(1ULL << VIRTIO_F_ORDER_PLATFORM) |
->  		(1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> index 1f157d2f4952..fc7301406540 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -1120,7 +1120,7 @@ static int virtballoon_validate(struct virtio_device *vdev)
->  	else if (!virtio_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON))
->  		__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_REPORTING);
->  
-> -	__virtio_clear_bit(vdev, VIRTIO_F_IOMMU_PLATFORM);
-> +	__virtio_clear_bit(vdev, VIRTIO_F_ACCESS_PLATFORM);
->  	return 0;
->  }
->  
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 58b96baa8d48..a1a5c2a91426 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2225,7 +2225,7 @@ void vring_transport_features(struct virtio_device *vdev)
->  			break;
->  		case VIRTIO_F_VERSION_1:
->  			break;
-> -		case VIRTIO_F_IOMMU_PLATFORM:
-> +		case VIRTIO_F_ACCESS_PLATFORM:
->  			break;
->  		case VIRTIO_F_RING_PACKED:
->  			break;
-> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-> index bb4cc4910750..f2cc2a0df174 100644
-> --- a/include/linux/virtio_config.h
-> +++ b/include/linux/virtio_config.h
-> @@ -171,7 +171,7 @@ static inline bool virtio_has_iommu_quirk(const struct virtio_device *vdev)
->  	 * Note the reverse polarity of the quirk feature (compared to most
->  	 * other features), this is for compatibility with legacy systems.
->  	 */
-> -	return !virtio_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
-> +	return !virtio_has_feature(vdev, VIRTIO_F_ACCESS_PLATFORM);
->  }
->  
->  static inline
-> diff --git a/include/uapi/linux/virtio_config.h b/include/uapi/linux/virtio_config.h
-> index ff8e7dc9d4dd..b5eda06f0d57 100644
-> --- a/include/uapi/linux/virtio_config.h
-> +++ b/include/uapi/linux/virtio_config.h
-> @@ -67,13 +67,17 @@
->  #define VIRTIO_F_VERSION_1		32
->  
->  /*
-> - * If clear - device has the IOMMU bypass quirk feature.
-> - * If set - use platform tools to detect the IOMMU.
-> + * If clear - device has the platform DMA (e.g. IOMMU) bypass quirk feature.
-> + * If set - use platform DMA tools to access the memory.
->   *
->   * Note the reverse polarity (compared to most other features),
->   * this is for compatibility with legacy systems.
->   */
-> -#define VIRTIO_F_IOMMU_PLATFORM		33
-> +#define VIRTIO_F_ACCESS_PLATFORM	33
-> +#ifndef __KERNEL__
-> +/* Legacy name for VIRTIO_F_ACCESS_PLATFORM (for compatibility with old userspace) */
-> +#define VIRTIO_F_IOMMU_PLATFORM		VIRTIO_F_ACCESS_PLATFORM
-> +#endif /* __KERNEL__ */
->  
->  /* This feature indicates support for the packed virtqueue layout. */
->  #define VIRTIO_F_RING_PACKED		34
-> diff --git a/tools/virtio/linux/virtio_config.h b/tools/virtio/linux/virtio_config.h
-> index dbf14c1e2188..f99ae42668e0 100644
-> --- a/tools/virtio/linux/virtio_config.h
-> +++ b/tools/virtio/linux/virtio_config.h
-> @@ -51,7 +51,7 @@ static inline bool virtio_has_iommu_quirk(const struct virtio_device *vdev)
->  	 * Note the reverse polarity of the quirk feature (compared to most
->  	 * other features), this is for compatibility with legacy systems.
->  	 */
-> -	return !virtio_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
-> +	return !virtio_has_feature(vdev, VIRTIO_F_ACCESS_PLATFORM);
->  }
->  
->  static inline bool virtio_is_little_endian(struct virtio_device *vdev)
+> Well, I don't know I'd say "wrapping".  You have a common parameter
+> that points to an object with a well defined interface.  The available
+> implementations of that object will tend to be either zero or one per
+> architecture, but there's no theoretical reason it has to be.  Indeed
+> we expect at least 2 for x86 (SEV and the Intel one who's name I never
+> remember).  Extra ones are entirely plausible for POWER and maybe s390
+> too, when an updated version of PEF or PV inevitably rolls around.
 > 
+> Some sort of new HTL scheme which could work across multiple archs is
+> much less likely, but it's not totally impossible either.
+> 
+>>>>> For now this series covers just AMD SEV and POWER PEF.  I'm hoping it
+>>>>> can be extended to cover the Intel and s390 mechanisms as well,
+>>>>> though.
+>>>>
+>>>> The only approach on s390x to not glue command line properties to the
+>>>> cpu model would be to remove the CPU model feature and replace it by the
+>>>> command line parameter. But that would, of course, be an incompatible break.
+>>>
+>>> I don't really understand why you're so against setting the cpu
+>>> default parameters from the machine.  The machine already sets basic
+>>> configuration for all sorts of devices in the VM, that's kind of what
+>>> it's for.
+>>
+>> It's a general design philosophy that the CPU model (especially the host
+>> CPU model) does not depend on other command line parameters (except the
+>> accelerator, and I think in corner cases on the machine). Necessary for
+>> reliable host model probing by libvirt, for example.
+> 
+> Ok, I've proposed a revision which doesn't require altering the CPU
+> model elsewhere in this thread.
+> 
+>> We also don't have similar things for nested virt.
+> 
+> I'm not sure what you're getting at there.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Sorry, back when we introduced nested virt there was a similar
+(internal?) discussion, to enable/disable it via a machine flag and not
+via 1..X CPU features. We went for the latter, because it matches the
+actual architecture and allows for easy migration checks etc. Nested
+virt also collides with some features currently (e.g., huge page backing
+for the guest), but not as severe as encrypted virtualization.
+
+> 
+>>>> How do upper layers actually figure out if memory encryption etc is
+>>>> available? on s390x, it's simply via the expanded host CPU model.
+>>>
+>>> Haven't really tackled that yet.  But one way that works for multiple
+>>> systems has got to be better than a separate one for each, right?
+>>
+>> I think that's an important piece. Especially once multiple different
+>> approaches are theoretically available one wants to sense from upper layers.
+> 
+> Fair point.
+> 
+> So... IIRC there's a general way of looking at available properties
+> for any object, including the machine.  So we can probe for
+> availability of the "host-trust-limitation" property itself easily
+> enough.
+
+You can have a look at how it's currently probed by libvirt in
+
+https://www.redhat.com/archives/libvir-list/2020-June/msg00518.html
+
+For now, the s390x check consists of
+- checking if /sys/firmware/uv is available
+- checking if the kernel cmdline contains 'prot_virt=1'
+
+The sev check is
+- checking if /sys/module/kvm_amd/parameters/sev contains the
+   value '1'
+- checking if /dev/sev
+
+So at least libvirt does not sense via the CPU model on s390x yet.
+
+> 
+> I guess we do need a way of probing for what implementations of the
+> htl interface are available.  And, if we go down that path, if there
+> are any pre-generated htl objects available.
+> 
+>> At least on s390x, it really is like just another CPU-visible feature
+>> that tells the guest that it can switch to protected mode.
+> 
+> Right.. which is great for you, since you already have a nice
+> orthogonal interface for that.   On POWER, (a) CPU model isn't enough
+> since you need a running ultravisor as well and (b) CPU feature
+> detection is already a real mess for.. reasons.
+
+I can understand the pain of the latter ... :)
+
 
 -- 
 Thanks,
