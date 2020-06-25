@@ -2,128 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB39C20A43B
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 19:43:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EA2720A440
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 19:45:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406876AbgFYRnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 13:43:18 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:22147 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406853AbgFYRnS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 13:43:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1593106997; x=1624642997;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=KODjYew9y5CUziLeFgjT5ulnlYrrJbK8+FK4VwP38dI=;
-  b=exn+sTQKVPFUVa4g6ulHQ7ObCrEB4+LjuL+dp09zPUqgQ/Om3Eq4QE5p
-   ODXDzMek/7r4gpWZ0qPYUjN9hyHl1+A6B9UXF1PbIz2ZC/R3MwQA4YnqO
-   hT2Bg9i03eTrhal2SQJczokNXIyGltOUovWFzbngsGxDsomFleHoXHGUk
-   A=;
-IronPort-SDR: +jsvhuffAApEIscULjVxCw5is0GCt1rNasOc19Af70mwDZkCwVYqbddDi8/4TmcvOF7S/0Emme
- 3zZs1HPZfSHg==
-X-IronPort-AV: E=Sophos;i="5.75,280,1589241600"; 
-   d="scan'208";a="53960560"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1e-a70de69e.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 25 Jun 2020 17:43:14 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1e-a70de69e.us-east-1.amazon.com (Postfix) with ESMTPS id 1D5AFA4099;
-        Thu, 25 Jun 2020 17:43:12 +0000 (UTC)
-Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 25 Jun 2020 17:43:12 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.65) by
- EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 25 Jun 2020 17:43:02 +0000
-Subject: Re: [PATCH v4 01/18] nitro_enclaves: Add ioctl interface definition
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-CC:     <linux-kernel@vger.kernel.org>,
-        Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Bjoern Doebel <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Frank van der Linden <fllinden@amazon.com>,
-        "Alexander Graf" <graf@amazon.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-2-andraprs@amazon.com>
- <20200623085617.GE32718@stefanha-x1.localdomain>
- <60d7d8be-7c8c-964a-a339-8ef7f5bd2fef@amazon.com>
- <20200625132905.GE221479@stefanha-x1.localdomain>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <5df6efdf-a304-ddaa-6335-ae158f7c6ccb@amazon.com>
-Date:   Thu, 25 Jun 2020 20:42:57 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+        id S2405674AbgFYRpk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 13:45:40 -0400
+Received: from mga03.intel.com ([134.134.136.65]:3760 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405267AbgFYRpj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 13:45:39 -0400
+IronPort-SDR: KrwDKL/v4h43iAik/gCe/WEfFJVyjGlIN5qaR38XSyWN6pDf8rw7MDexk6C6B33My41laEOmIQ
+ wbC9bhd+SqSg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9663"; a="145047064"
+X-IronPort-AV: E=Sophos;i="5.75,280,1589266800"; 
+   d="scan'208";a="145047064"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2020 10:45:37 -0700
+IronPort-SDR: bisn9uHgNczvefwLPkn56R4MNC63uy3nFlUvwY4ywU1CiWTK8TIWkVhKHaUHDxGRu4zILG2si1
+ akggcaHzIq1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,280,1589266800"; 
+   d="scan'208";a="279885429"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga006.jf.intel.com with ESMTP; 25 Jun 2020 10:45:37 -0700
+Date:   Thu, 25 Jun 2020 10:45:37 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
+Message-ID: <20200625174537.GE3437@linux.intel.com>
+References: <20200622220442.21998-1-peterx@redhat.com>
+ <20200622220442.21998-2-peterx@redhat.com>
+ <20200625061544.GC2141@linux.intel.com>
+ <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
+ <20200625162540.GC3437@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200625132905.GE221479@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Originating-IP: [10.43.160.65]
-X-ClientProxiedBy: EX13D43UWC001.ant.amazon.com (10.43.162.69) To
- EX13D16EUB003.ant.amazon.com (10.43.166.99)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200625162540.GC3437@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jun 25, 2020 at 09:25:40AM -0700, Sean Christopherson wrote:
+> On Thu, Jun 25, 2020 at 10:09:13AM +0200, Paolo Bonzini wrote:
+> > On 25/06/20 08:15, Sean Christopherson wrote:
+> > > IMO, kvm_cpuid() is simply buggy.  If KVM attempts to access a non-existent
+> > > MSR then it darn well should warn.
+> > > 
+> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > > index 8a294f9747aa..7ef7283011d6 100644
+> > > --- a/arch/x86/kvm/cpuid.c
+> > > +++ b/arch/x86/kvm/cpuid.c
+> > > @@ -1013,7 +1013,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+> > >                 *ebx = entry->ebx;
+> > >                 *ecx = entry->ecx;
+> > >                 *edx = entry->edx;
+> > > -               if (function == 7 && index == 0) {
+> > > +               if (function == 7 && index == 0 && (*ebx | (F(RTM) | F(HLE))) &&
+> > > +                   (vcpu->arch.arch_capabilities & ARCH_CAP_TSX_CTRL_MSR)) {
+> > >                         u64 data;
+> > >                         if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
+> > >                             (data & TSX_CTRL_CPUID_CLEAR))
+> > > 
+> > 
+> > That works too, but I disagree that warning is the correct behavior
+> > here.  It certainly should warn as long as kvm_get_msr blindly returns
+> > zero.  However, for a guest it's fine to access a potentially
+> > non-existent MSR if you're ready to trap the #GP, and the point of this
+> > series is to let cpuid.c or any other KVM code do the same.
+> 
+> I get the "what" of the change, and even the "why" to some extent, but I
+> dislike the idea of supporting/encouraging blind reads/writes to MSRs.
+> Blind writes are just asking for problems, and suppressing warnings on reads
+> is almost guaranteed to be suppressing a KVM bug.
+> 
+> Case in point, looking at the TSX thing again, I actually think the fix
+> should be:
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 5eb618dbf211..64322446e590 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1013,9 +1013,9 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>                 *ebx = entry->ebx;
+>                 *ecx = entry->ecx;
+>                 *edx = entry->edx;
+> -               if (function == 7 && index == 0) {
+> +               if (function == 7 && index == 0 && (*ebx | (F(RTM) | F(HLE))) {
+>                         u64 data;
+> -                       if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
+> +                       if (!kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data) &&
+>                             (data & TSX_CTRL_CPUID_CLEAR))
+>                                 *ebx &= ~(F(RTM) | F(HLE));
+>                 }
+> 
+> 
+> On VMX, MSR_IA32_TSX_CTRL will be added to the so called shared MSR array
+> regardless of whether or not it is being advertised to userspace (this is
+> a bug in its own right).  Using the host_initiated variant means KVM will
+> incorrectly bypass VMX's ARCH_CAP_TSX_CTRL_MSR check, i.e. incorrectly
+> clear the bits if userspace is being weird and stuffed MSR_IA32_TSX_CTRL
+> without advertising it to the guest.
 
+Argh, belatedly realized that MSR_IA32_TSX_CTRL needs to be swapped even
+when ARCH_CAP_TSX_CTRL_MSR isn't exposed to the guest, but if and only if
+if TSX is disabled in the host _and_ enabled in the guest.  So triggering
+setup_msrs() on ARCH_CAP_TSX_CTRL_MSR is insufficient, but I believe we can
+and should redo setup_msrs() during vmx_cpuid_update().  I'm pretty sure
+that's needed for MSR_TSC_AUX+RDTSCP as well.  I suspect RDTSCP is broken
+on 32-bit guests, but no has noticed because Linux only employs RDTSCP on
+64-bit kernels, and 32-bit guests are exactly common in the first place.
 
-On 25/06/2020 16:29, Stefan Hajnoczi wrote:
-> On Wed, Jun 24, 2020 at 05:02:54PM +0300, Paraschiv, Andra-Irina wrote:
->> On 23/06/2020 11:56, Stefan Hajnoczi wrote:
->>> On Mon, Jun 22, 2020 at 11:03:12PM +0300, Andra Paraschiv wrote:
->>>> +/* User memory region flags */
->>>> +
->>>> +/* Memory region for enclave general usage. */
->>>> +#define NE_DEFAULT_MEMORY_REGION (0x00)
->>>> +
->>>> +/* Memory region to be set for an enclave (write). */
->>>> +struct ne_user_memory_region {
->>>> +	/**
->>>> +	 * Flags to determine the usage for the memory region (write).
->>>> +	 */
->>>> +	__u64 flags;
->>> Where is the write flag defined?
->>>
->>> I guess it's supposed to be:
->>>
->>>     #define NE_USER_MEMORY_REGION_FLAG_WRITE (0x01)
->> For now, the flags field is included in the NE ioctl interface for
->> extensions, it is not part of the NE PCI device interface yet.
-> ...
->> Ah, and just as a note, that "read" / "write" in parentheses means that a
->> certain data structure / field is read / written by user space. I update=
-d to
->> use "in" / "out" instead of "read" / "write" in v5.
-> Oops, I got confused. I thought "(write)" was an example of a flag that
-> can be set on the memory region. Now I realize "write" means this field
-> is an input to the ioctl. :)
->
-> Thanks for updating the docs.
+I'll check the above to confirm and prep some patches if RDTSCP is indeed
+busted.
 
-I was thinking this may be the case. :) Should be less confusing now, =
-
-with the "in / out" updates.
-
-Thanks also for feedback.
-
-Andra
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
-
+> In short, the whole MSR_IA32_TSX_CTRL implementation seems messy and this
+> is just papering over that mess.  The correct fix is to invoke setup_msrs()
+> on writes to MSR_IA32_ARCH_CAPABILITIES, filtering MSR_IA32_TSX_CTRL out of
+> shared MSRs when it's not advertised, and change kvm_cpuid() to use the
+> unpriveleged variant.
+> 
+> TSC_CTRL aside, if we insist on pointing a gun at our foot at some point,
+> this should be a dedicated flavor of MSR access, e.g. msr_data.kvm_initiated,
+> so that it at least requires intentionally loading the gun.
