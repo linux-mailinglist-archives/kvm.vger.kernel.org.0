@@ -2,99 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB5362099E5
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 08:34:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C88292099EA
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 08:37:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389239AbgFYGel (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 02:34:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38758 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389617AbgFYGel (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 02:34:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593066879;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gOGPW4iqB2BAVPdKSs/l6tFu14U0yVMld2Wp+wO+/b4=;
-        b=WE/zOcc9pa2+bhw4sZz0N8pHVEsT3l28SH4IPr82/nYGNhqSJ4JcwdaraSdU6I8Xu+sbrQ
-        VGEcdx3qkTXXe/elRTzR3GLRnuyjqJ1FRJGVARZ0QV5wA5B0HR7ToObZB6njSCFzX/N7oh
-        q8tFjUsoqWzQDT1zCTdpPNqa36c/kG8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-2iyiyblTPmC5huaotI7Mpw-1; Thu, 25 Jun 2020 02:34:37 -0400
-X-MC-Unique: 2iyiyblTPmC5huaotI7Mpw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F945805EEF;
-        Thu, 25 Jun 2020 06:34:36 +0000 (UTC)
-Received: from gondolin (ovpn-112-36.ams2.redhat.com [10.36.112.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 24DCA7CADB;
-        Thu, 25 Jun 2020 06:34:27 +0000 (UTC)
-Date:   Thu, 25 Jun 2020 08:34:23 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Collin Walling <walling@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pbonzini@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
-Subject: Re: [PATCH 2/2] docs: kvm: fix rst formatting
-Message-ID: <20200625083423.2ee75bb1.cohuck@redhat.com>
-In-Reply-To: <20200624202200.28209-3-walling@linux.ibm.com>
-References: <20200624202200.28209-1-walling@linux.ibm.com>
-        <20200624202200.28209-3-walling@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S2389951AbgFYGhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 02:37:21 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:9181 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727999AbgFYGhU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 02:37:20 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5ef446130000>; Wed, 24 Jun 2020 23:37:07 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 24 Jun 2020 23:37:20 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 24 Jun 2020 23:37:20 -0700
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 25 Jun
+ 2020 06:37:19 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 25 Jun 2020 06:37:20 +0000
+Received: from sandstorm.nvidia.com (Not Verified[10.2.59.206]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5ef4461f0005>; Wed, 24 Jun 2020 23:37:20 -0700
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     LKML <linux-kernel@vger.kernel.org>
+CC:     John Hubbard <jhubbard@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>
+Subject: [PATCH v2] vfio/spapr_tce: convert get_user_pages() --> pin_user_pages()
+Date:   Wed, 24 Jun 2020 23:37:17 -0700
+Message-ID: <20200625063717.834923-1-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-NVConfidentiality: public
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1593067027; bh=T8kM6kIhzYlig7AUGzoS+A4qc/UX6U40K3WHpkS7F4M=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Transfer-Encoding:
+         Content-Type;
+        b=PzYJ3lae3MPcCxOUNX59NTfx3uUcrmR2uRJaVRYyA3k0Wp4+0gX7xyZqXFse1JxWq
+         0R9PMXLvoFGX731TeqEDRI/WZWNQUtRkW2t+mONUCcpiprl0dgUjuKXzrjsqZ8iceE
+         8Y/Y6aU4kBZxJrs0CiS/pCXAxi11FP0ISPiAK8s39RzVzTr3nSJzR6wuEMIs4j9MMh
+         HZ+87EQp1abZ2ixJK+7Olm10PPuvjY9TsJ5s4i/UrvkGe0WBGfh/BkgFcWbsi81xYb
+         IdzPSrwWhvM6hdcsFyn9kMDPBZPYatjs8tJ4+dePb4XL2eiSN7rYDD6B3lIasQ1Ixn
+         NOMJ8IW9Cg5Hg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 Jun 2020 16:22:00 -0400
-Collin Walling <walling@linux.ibm.com> wrote:
+This code was using get_user_pages*(), in a "Case 2" scenario
+(DMA/RDMA), using the categorization from [1]. That means that it's
+time to convert the get_user_pages*() + put_page() calls to
+pin_user_pages*() + unpin_user_pages() calls.
 
-> KVM_CAP_S390_VCPU_RESETS and KVM_CAP_S390_PROTECTED needed
-> just a little bit of rst touch-up
-> 
+There is some helpful background in [2]: basically, this is a small
+part of fixing a long-standing disconnect between pinning pages, and
+file systems' use of those pages.
 
-Fixes: 7de3f1423ff9 ("KVM: s390: Add new reset vcpu API")
-Fixes: 04ed89dc4aeb ("KVM: s390: protvirt: Add KVM api documentation")
+[1] Documentation/core-api/pin_user_pages.rst
 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  Documentation/virt/kvm/api.rst | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 056608e8f243..2d1572d92616 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6134,16 +6134,17 @@ in CPUID and only exposes Hyper-V identification. In this case, guest
->  thinks it's running on Hyper-V and only use Hyper-V hypercalls.
->  
->  8.22 KVM_CAP_S390_VCPU_RESETS
-> +-----------------------------
->  
-> -Architectures: s390
-> +:Architectures: s390
->  
->  This capability indicates that the KVM_S390_NORMAL_RESET and
->  KVM_S390_CLEAR_RESET ioctls are available.
->  
->  8.23 KVM_CAP_S390_PROTECTED
-> +---------------------------
->  
-> -Architecture: s390
-> -
-> +:Architecture: s390
->  
->  This capability indicates that the Ultravisor has been initialized and
->  KVM can therefore start protected VMs.
+[2] "Explicit pinning of user-space pages":
+    https://lwn.net/Articles/807108/
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+
+Hi,
+
+Changes since v1: rebased onto Linux-5.8-rc2.
+
+thanks,
+John Hubbard
+
+ drivers/vfio/vfio_iommu_spapr_tce.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_=
+spapr_tce.c
+index 16b3adc508db..fe888b5dcc00 100644
+--- a/drivers/vfio/vfio_iommu_spapr_tce.c
++++ b/drivers/vfio/vfio_iommu_spapr_tce.c
+@@ -383,7 +383,7 @@ static void tce_iommu_unuse_page(struct tce_container *=
+container,
+ 	struct page *page;
+=20
+ 	page =3D pfn_to_page(hpa >> PAGE_SHIFT);
+-	put_page(page);
++	unpin_user_page(page);
+ }
+=20
+ static int tce_iommu_prereg_ua_to_hpa(struct tce_container *container,
+@@ -486,7 +486,7 @@ static int tce_iommu_use_page(unsigned long tce, unsign=
+ed long *hpa)
+ 	struct page *page =3D NULL;
+ 	enum dma_data_direction direction =3D iommu_tce_direction(tce);
+=20
+-	if (get_user_pages_fast(tce & PAGE_MASK, 1,
++	if (pin_user_pages_fast(tce & PAGE_MASK, 1,
+ 			direction !=3D DMA_TO_DEVICE ? FOLL_WRITE : 0,
+ 			&page) !=3D 1)
+ 		return -EFAULT;
+--=20
+2.27.0
 
