@@ -2,104 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AE0520A36F
-	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 18:57:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2E5720A41C
+	for <lists+kvm@lfdr.de>; Thu, 25 Jun 2020 19:37:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403965AbgFYQ5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 12:57:16 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27810 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2390448AbgFYQ5Q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jun 2020 12:57:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593104235;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=GF5LkOlnhTVNoedCdKoIYF7NkNTIxZXf2Tb7J0LGaQ4=;
-        b=L/cdiRfUxVsivUDkBMKDfaB6n1++DKCrt1rXsnVN5nVzWDI9xwRXeg8QO60wo9NE+EVAKy
-        e9wuEeS59H6oM+t4+ImN2qDrMeU8d8/j0ub+JnrD9oRIKxMbBIWJtJgNE+N9dvenGiYYvO
-        YnnLrCiadGaoyWIv/JNIcCXJLd9cAK0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-wkv-tCLbMWuF2rp9omMg7w-1; Thu, 25 Jun 2020 12:57:12 -0400
-X-MC-Unique: wkv-tCLbMWuF2rp9omMg7w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D636464;
-        Thu, 25 Jun 2020 16:57:12 +0000 (UTC)
-Received: from gimli.home (ovpn-112-156.phx2.redhat.com [10.3.112.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 08E855D9D3;
-        Thu, 25 Jun 2020 16:57:03 +0000 (UTC)
-Subject: [PATCH] vfio/pci: Fix SR-IOV VF handling with MMIO blocking
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        maxime.coquelin@redhat.com
-Date:   Thu, 25 Jun 2020 10:57:03 -0600
-Message-ID: <159310421505.27590.16617666489295503039.stgit@gimli.home>
-User-Agent: StGit/0.19-dirty
+        id S2405141AbgFYRhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jun 2020 13:37:06 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:19634 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728181AbgFYRhG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jun 2020 13:37:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1593106626; x=1624642626;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=TBJlsNi6EkrGTKSTk1vvF3t132dofHTu9Y2/7H6Ck1I=;
+  b=mM0ISaCRJl3xIBatbS55nGllrYjet+cNLEH9/zDzKOxTEPyQNeURjK2a
+   1MEnsN/EVHU0Zqa/6Ob6b7HByUea+/C+rU+onFqmzIoswnlnHLG+HYufG
+   M0qG+uxH8I/cuoEFdlTHQK93T8SkKBkJKE0DTn41E6c6YWvJPvtcnDaLi
+   w=;
+IronPort-SDR: p+c4FLm88WG8ByjniKpF4JhxFLx70kr2tcWp4GyF2O8BFiQKW6LWB1r6rUjEsrvCInEJyd9M8Z
+ Xp4sZOtloRlA==
+X-IronPort-AV: E=Sophos;i="5.75,280,1589241600"; 
+   d="scan'208";a="47011046"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-807d4a99.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 25 Jun 2020 17:37:01 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1a-807d4a99.us-east-1.amazon.com (Postfix) with ESMTPS id 769A3A1788;
+        Thu, 25 Jun 2020 17:36:59 +0000 (UTC)
+Received: from EX13D16EUB003.ant.amazon.com (10.43.166.99) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 25 Jun 2020 17:36:58 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.109) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 25 Jun 2020 17:36:48 +0000
+Subject: Re: [PATCH v4 17/18] nitro_enclaves: Add overview documentation
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        "Alexander Graf" <graf@amazon.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-18-andraprs@amazon.com>
+ <20200623085915.GF32718@stefanha-x1.localdomain>
+ <746fcd7d-5946-35ec-6471-8bf8dccdf400@amazon.com>
+ <20200625131020.GD221479@stefanha-x1.localdomain>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <e37f9647-3a29-5619-4c90-26a24dde6a65@amazon.com>
+Date:   Thu, 25 Jun 2020 20:36:38 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200625131020.GD221479@stefanha-x1.localdomain>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.109]
+X-ClientProxiedBy: EX13D10UWB001.ant.amazon.com (10.43.161.111) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SR-IOV VFs do not implement the memory enable bit of the command
-register, therefore this bit is not set in config space after
-pci_enable_device().  This leads to an unintended difference
-between PF and VF in hand-off state to the user.  We can correct
-this by setting the initial value of the memory enable bit in our
-virtualized config space.  There's really no need however to
-ever fault a user on a VF though as this would only indicate an
-error in the user's management of the enable bit, versus a PF
-where the same access could trigger hardware faults.
 
-Fixes: abafbc551fdd ("vfio-pci: Invalidate mmaps and block MMIO access on disabled memory")
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci_config.c |   17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 8746c943247a..d98843feddce 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -398,9 +398,15 @@ static inline void p_setd(struct perm_bits *p, int off, u32 virt, u32 write)
- /* Caller should hold memory_lock semaphore */
- bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
- {
-+	struct pci_dev *pdev = vdev->pdev;
- 	u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
- 
--	return cmd & PCI_COMMAND_MEMORY;
-+	/*
-+	 * SR-IOV VF memory enable is handled by the MSE bit in the
-+	 * PF SR-IOV capability, there's therefore no need to trigger
-+	 * faults based on the virtual value.
-+	 */
-+	return pdev->is_virtfn || (cmd & PCI_COMMAND_MEMORY);
- }
- 
- /*
-@@ -1728,6 +1734,15 @@ int vfio_config_init(struct vfio_pci_device *vdev)
- 				 vconfig[PCI_INTERRUPT_PIN]);
- 
- 		vconfig[PCI_INTERRUPT_PIN] = 0; /* Gratuitous for good VFs */
-+
-+		/*
-+		 * VFs do no implement the memory enable bit of the COMMAND
-+		 * register therefore we'll not have it set in our initial
-+		 * copy of config space after pci_enable_device().  For
-+		 * consistency with PFs, set the virtual enable bit here.
-+		 */
-+		*(__le16 *)&vconfig[PCI_COMMAND] |=
-+					cpu_to_le16(PCI_COMMAND_MEMORY);
- 	}
- 
- 	if (!IS_ENABLED(CONFIG_VFIO_PCI_INTX) || vdev->nointx)
+On 25/06/2020 16:10, Stefan Hajnoczi wrote:
+> On Wed, Jun 24, 2020 at 05:39:39PM +0300, Paraschiv, Andra-Irina wrote:
+>>
+>> On 23/06/2020 11:59, Stefan Hajnoczi wrote:
+>>> On Mon, Jun 22, 2020 at 11:03:28PM +0300, Andra Paraschiv wrote:
+>>>> +The kernel bzImage, the kernel command line, the ramdisk(s) are part =
+of the
+>>>> +Enclave Image Format (EIF); plus an EIF header including metadata suc=
+h as magic
+>>>> +number, eif version, image size and CRC.
+>>>> +
+>>>> +Hash values are computed for the entire enclave image (EIF), the kern=
+el and
+>>>> +ramdisk(s). That's used, for example, to check that the enclave image=
+ that is
+>>>> +loaded in the enclave VM is the one that was intended to be run.
+>>>> +
+>>>> +These crypto measurements are included in a signed attestation docume=
+nt
+>>>> +generated by the Nitro Hypervisor and further used to prove the ident=
+ity of the
+>>>> +enclave; KMS is an example of service that NE is integrated with and =
+that checks
+>>>> +the attestation doc.
+>>>> +
+>>>> +The enclave image (EIF) is loaded in the enclave memory at offset 8 M=
+iB. The
+>>>> +init process in the enclave connects to the vsock CID of the primary =
+VM and a
+>>>> +predefined port - 9000 - to send a heartbeat value - 0xb7. This mecha=
+nism is
+>>>> +used to check in the primary VM that the enclave has booted.
+>>>> +
+>>>> +If the enclave VM crashes or gracefully exits, an interrupt event is =
+received by
+>>>> +the NE driver. This event is sent further to the user space enclave p=
+rocess
+>>>> +running in the primary VM via a poll notification mechanism. Then the=
+ user space
+>>>> +enclave process can exit.
+>>>> +
+>>>> +[1] https://aws.amazon.com/ec2/nitro/nitro-enclaves/
+>>>> +[2] https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
+>>>> +[3] https://lwn.net/Articles/807108/
+>>>> +[4] https://www.kernel.org/doc/html/latest/admin-guide/kernel-paramet=
+ers.html
+>>>> +[5] https://man7.org/linux/man-pages/man7/vsock.7.html
+>>> Is the EIF specification and the attestation protocol available?
+>> For now, they are not publicly available. Once the refs are available (e=
+.g.
+>> AWS documentation, GitHub documentation), I'll include them in the kernel
+>> documentation as well.
+>>
+>> As a note here, the NE project is currently in preview
+>> (https://aws.amazon.com/ec2/nitro/nitro-enclaves/) and part of the
+>> documentation / codebase will be publicly available when NE is generally
+>> available (GA). This will be in addition to the ones already publicly
+>> available, like the NE kernel driver.
+>>
+>> Let me know if I can help with any particular questions / clarifications.
+> Thanks!
+
+You are welcome.
+
+Andra
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
 
