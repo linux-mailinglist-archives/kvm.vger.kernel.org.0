@@ -2,110 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F12EB20A8F8
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 01:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B788020ABEB
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 07:42:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728077AbgFYXaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jun 2020 19:30:15 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:50268 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726658AbgFYXaP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jun 2020 19:30:15 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05PNS36k151842;
-        Thu, 25 Jun 2020 23:29:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=CbeDyVYB5S3oRr4NWtBuj8dX4L5T2zsa98Esoc/k5Z4=;
- b=yBm5DkIhgvhKovZ94p1DlYmsJTp6Ydj5zaYkQWZ2pdFD1Q0xbGHtdGtXSfOylQh3mgQZ
- zcWrfv9sfHrEhuLu56ePLqmW5hx3okyDaI8BrwuM8Y6UxQSI6pYD/5YLUamdgwf9h65e
- RZRpiedUPzIuWkX/c1rUIrex6emM0ZHAIbNkJK2GGHi5QsenasWwu1FtMAPrATn5TEzL
- JDkhAg38jDozDVh2vjag5r0Uc/otWmOY3Ur8sjSe8XgV6HyDj4vsWUh6viWdTN+V9o7k
- GqhqvPQRyun2Woi4hwjQXaIRU7mgZt9H0NH95WvszmN5wY9vAskheffDGkxaF3rdmUoc yw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 31uusu3aa3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 25 Jun 2020 23:29:07 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 05PNSHWm110879;
-        Thu, 25 Jun 2020 23:29:07 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 31uur9r3pr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Jun 2020 23:29:06 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 05PNT5AL007704;
-        Thu, 25 Jun 2020 23:29:05 GMT
-Received: from localhost.localdomain (/10.159.236.36)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 25 Jun 2020 23:29:05 +0000
-Subject: Re: [PATCH 0/4] KVM: SVM: Code move follow-up
-To:     Joerg Roedel <joro@8bytes.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
-References: <20200625080325.28439-1-joro@8bytes.org>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <a34c61ad-f28f-4560-2918-a826c03cee6b@oracle.com>
-Date:   Thu, 25 Jun 2020 16:29:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1728049AbgFZFmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 01:42:54 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:40479 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728042AbgFZFmy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jun 2020 01:42:54 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 49tQlJ01lyz9sSc; Fri, 26 Jun 2020 15:42:51 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1593150172;
+        bh=iD16IXZFAh5RfUbHS6Y8juImA3EwRSNNnBkAvImyly8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jnCzMNrl9l+rYL0vvU4apLkftlDgf4oR3XP9LeauFpGiSGevGFzoZbmbH9ArEW5zm
+         nMpFsHUCAoXadFvTJPPuUu2P+DiFS2+c58GA3qqftCN29Vham5qzeKyAqFVBGsDIVT
+         RTpOMcUvnbfnSb/RjChs9xSPU2MmB5o/rKWz/jXM=
+Date:   Fri, 26 Jun 2020 14:42:59 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
+        dgilbert@redhat.com, frankja@linux.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
+        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
+        pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
+        qemu-s390x@nongnu.org
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+Message-ID: <20200626044259.GK172395@umbus.fritz.box>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
+ <20200619114526.6a6f70c6.cohuck@redhat.com>
+ <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
+ <20200619120530.256c36cb.cohuck@redhat.com>
+ <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+ <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200625052518.GD172395@umbus.fritz.box>
+ <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200625080325.28439-1-joro@8bytes.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9663 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 malwarescore=0
- suspectscore=0 mlxlogscore=999 adultscore=0 phishscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006250136
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9663 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 bulkscore=0
- cotscore=-2147483648 malwarescore=0 mlxscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
- spamscore=0 impostorscore=0 adultscore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2006250136
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="8tUgZ4IE8L4vmMyh"
+Content-Disposition: inline
+In-Reply-To: <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 6/25/20 1:03 AM, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
->
-> Hi,
->
-> here is small series to follow-up on the review comments for moving
-> the kvm-amd module code to its own sub-directory. The comments were
-> only about renaming structs and symbols, so there are no functional
-> changes in these patches.
->
-> The comments addressed here are all from [1].
->
-> Regards,
->
-> 	Joerg
->
-> [1] https://lore.kernel.org/lkml/87d0917ezq.fsf@vitty.brq.redhat.com/
->
-> Joerg Roedel (4):
->    KVM: SVM: Rename struct nested_state to svm_nested_state
->    KVM: SVM: Add vmcb_ prefix to mark_*() functions
->    KVM: SVM: Add svm_ prefix to set/clr/is_intercept()
->    KVM: SVM: Rename svm_nested_virtualize_tpr() to
->      nested_svm_virtualize_tpr()
->
->   arch/x86/kvm/svm/avic.c   |   2 +-
->   arch/x86/kvm/svm/nested.c |   8 +--
->   arch/x86/kvm/svm/sev.c    |   2 +-
->   arch/x86/kvm/svm/svm.c    | 138 +++++++++++++++++++-------------------
->   arch/x86/kvm/svm/svm.h    |  20 +++---
->   5 files changed, 85 insertions(+), 85 deletions(-)
->
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+--8tUgZ4IE8L4vmMyh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jun 25, 2020 at 09:06:05AM +0200, David Hildenbrand wrote:
+> >> Still unsure how to bring this new machine property and the cpu feature
+> >> together. Would be great to have the same interface everywhere, but
+> >> having two distinct command line objects depend on each other sucks.
+> >=20
+> > Kinda, but the reality is that hardware - virtual and otherwise -
+> > frequently doesn't have entirely orthogonal configuration for each of
+> > its components.  This is by no means new in that regard.
+> >=20
+> >> Automatically setting the feature bit if pv is supported complicates
+> >> things further.
+> >=20
+> > AIUI, on s390 the "unpack" feature is available by default on recent
+> > models.  In that case you could do this:
+> >=20
+> >  * Don't modify either cpu or HTL options based on each other
+> >  * Bail out if the user specifies a non "unpack" secure CPU along with
+> >    the HTL option
+> >=20
+> > Cases of note:
+> >  - User specifies an old CPU model + htl
+> >    or explicitly sets unpack=3Doff + htl
+> > 	=3D> fails with an error, correctly
+> >  - User specifies modern/default cpu + htl, with secure aware guest
+> >  	=3D> works as a secure guest
+> >  - User specifies modern/default cpu + htl, with non secure aware guest
+> > 	=3D> works, though not secure (and maybe slower than neccessary)
+> >  - User specifies modern/default cpu, no htl, with non-secure guest
+> >  	=3D> works, "unpack" feature is present but unused
+> >  - User specifies modern/default cpu, no htl, secure guest
+> >   	=3D> this is the worst one.  It kind of works by accident if
+> > 	   you've also  manually specified whatever virtio (and
+> > 	   anything else) options are necessary. Ugly, but no
+> > 	   different from the situation right now, IIUC
+> >=20
+> >> (Is there any requirement that the machine object has been already set
+> >> up before the cpu features are processed? Or the other way around?)
+> >=20
+> > CPUs are usually created by the machine, so I believe we can count on
+> > the machine object being there first.
+>=20
+> CPU model initialization is one of the first things machine
+> initialization code does on s390x.
+
+As it is for most platforms, but still, the values of machine
+properties are available to you at this point.
+
+> static void ccw_init(MachineState *machine)
+> {
+>     [... memory init ...]
+>     s390_sclp_init();
+>     s390_memory_init(machine->ram);
+>     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+>     s390_init_cpus(machine);
+>     [...]
+> }
+>=20
+> >=20
+> >> Does this have any implications when probing with the 'none' machine?
+> >=20
+> > I'm not sure.  In your case, I guess the cpu bit would still show up
+> > as before, so it would tell you base feature availability, but not
+> > whether you can use the new configuration option.
+> >=20
+> > Since the HTL option is generic, you could still set it on the "none"
+> > machine, though it wouldn't really have any effect.  That is, if you
+> > could create a suitable object to point it at, which would depend on
+> > ... details.
+> >=20
+>=20
+> The important point is that we never want the (expanded) host cpu model
+> look different when either specifying or not specifying the HTL
+> property.
+
+Ah, yes, I see your point.  So my current suggestion will satisfy
+that, basically it is:
+
+cpu has unpack (inc. by default) && htl specified
+	=3D> works (allowing secure), as expected
+
+!cpu has unpack && htl specified
+	=3D> bails out with an error
+
+!cpu has unpack && !htl specified
+	=3D> works for a non-secure guest, as expected
+	=3D> guest will fail if it attempts to go secure
+
+cpu has unpack && !htl specified
+	=3D> works as expected for a non-secure guest (unpack feature is
+	   present, but unused)
+	=3D> secure guest may work "by accident", but only if all virtio
+	   properties have the right values, which is the user's
+	   problem
+
+That last case is kinda ugly, but I think it's tolerable.
+
+> We don't want to run into issues where libvirt probes and gets
+> host model X, but when using that probed model (automatically) for a
+> guest domain, we suddenly cannot run X anymore.
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--8tUgZ4IE8L4vmMyh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl71fNMACgkQbDjKyiDZ
+s5Jn7g/7B85dO80x9MKReXN358gRZcNMYr3LcZ+HlyE7pMOyKFQ7vvFKN8BSEmYP
+Y6MOR0P+i4kusGH5Y/HfKMBintgZoljg/ibJ/Nhpt2x9g2jrBai4heJ1IIY9MMjs
+HxDTXLZCxIauYIL3HYHOf7UAjdWnnrvQGX2cqY6vCKS4J7RrAs5+DPI+xHhpBh66
+/+8gkZbcEdz7l55rjSsJ2h238hMzFmCNzu3pJlx/CviQNp1ScSu3aOT9LkRFfIBL
+TlSCey5xnudp5uQSHhsEZjMflJUqlZtQ1zOyqFmOEQ5QpBnU9oLZqRY2SenJumps
+05Imr/lJg1EeRw2hZXugcc1o1G5rQkfJXAgQd5ikxGxtCGC1ly5xsWepyjGaEw5Y
+d5VDo2g/al3lLm07V6xJ0MSHpTWxksX23S4P0iH6iPFLxA1yqLjU2rqNhcpZ9X3q
+n59CEam7H8kPo5xsS+4TkpGGB0bgXX4/uRNv4L+nYQ5z6p7ruhTbt4EeTCphbqR1
+9JAB0gIkXZzWpDyW8gTXPs86lT+04619xQKK1QuAmRgqDadYmPt8/NefbX7qGbln
+MrL7wPHP9vH2Ei1xeVg2QSPGYCLk4kIQknktwPScVq1sVQm4QFbmFaS3ug8dAjWB
+DCGZ4aUGyqgIFVDNgmX7mydhH1YZUnOn406Jd8Pa11SA25GMJoU=
+=86Td
+-----END PGP SIGNATURE-----
+
+--8tUgZ4IE8L4vmMyh--
