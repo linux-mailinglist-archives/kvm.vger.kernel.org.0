@@ -2,172 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E00E20AC8A
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 08:54:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFC0020ACBF
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:05:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728538AbgFZGyP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 02:54:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39312 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726311AbgFZGyO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jun 2020 02:54:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593154453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=kR+SmAY+xsfkxXorQMDrqAqUa8iQM8BH7m4fjjBzyTs=;
-        b=K1r0stN2/NIJTxzWn4nXPGD5/VRol9jmygu+EkN5blErwVpuGFk3lBXZBjd4ustIJEi3Ty
-        L4h0OKLIM/8uGUySJFSXk73HT0TEek05AghCGwNv1lC9X3/HhligTNNW0Lgt7i82qi5Io6
-        M3Rsafi6peiG3Savog7RMZFGo2qROOs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-_gncghMZPGWN5EnkIv40aw-1; Fri, 26 Jun 2020 02:54:08 -0400
-X-MC-Unique: _gncghMZPGWN5EnkIv40aw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05976804001;
-        Fri, 26 Jun 2020 06:54:07 +0000 (UTC)
-Received: from [10.36.113.35] (ovpn-113-35.ams2.redhat.com [10.36.113.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 02BDC5C541;
-        Fri, 26 Jun 2020 06:54:00 +0000 (UTC)
-Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
-        brijesh.singh@amd.com, pair@us.ibm.com, pbonzini@redhat.com,
-        dgilbert@redhat.com, frankja@linux.ibm.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
-        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
-        pasic@linux.ibm.com, Eduardo Habkost <ehabkost@redhat.com>,
-        qemu-s390x@nongnu.org
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
- <20200619114526.6a6f70c6.cohuck@redhat.com>
- <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
- <20200619120530.256c36cb.cohuck@redhat.com>
- <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
- <20200622140254.0dbe5d8c.cohuck@redhat.com>
- <20200625052518.GD172395@umbus.fritz.box>
- <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
- <20200626044259.GK172395@umbus.fritz.box>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
-Date:   Fri, 26 Jun 2020 08:53:59 +0200
+        id S1728069AbgFZHFZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 03:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59504 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725801AbgFZHFY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jun 2020 03:05:24 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3068AC08C5C1
+        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 00:05:24 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id l17so7823938wmj.0
+        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 00:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ed8U9AwGW0CzzyP4TPcyZPt8dyiZRz+wWbbwYhaT2kE=;
+        b=XbRSyYjwp1a2pLOLy+VkJdmvrpuYB5IRIvOjNiyUzcZ4v2rUKKNHRAJNzL1Y4wy9QA
+         sgXu7pXpK6ubzhwMBDpRo5ApSw4aKN3K9ttPwuRmJ3Pcu7pk8DgSuDo8lIUqWRDBp4+U
+         wJ9pnjGtcylnRfCH/IL4PNpmnwHMrw6K+vvRO1FGSeK2KkK9eSUacmLIrAlSDVK+k3uz
+         FYEDVpdk0u7nYJQmkqm2vllPRrmRO/ob5W/em886ThOhJAvyPrHChZRU1zncN8VLTM61
+         fhdUDh3QtjZt1+Bmq4OMwG8BXCvrynogW352xCrQZieFhybwgwn6U1iAimCjt29vYWhz
+         HrWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=ed8U9AwGW0CzzyP4TPcyZPt8dyiZRz+wWbbwYhaT2kE=;
+        b=ZnjzJrHMd7inOfsyY1HsjjZTACsKVqVKIEZaOOe3miExAXFs/jZhQb0drsBOy98dz7
+         o3kU5eUZYqckcB/F3sUvJtt15Nlo8Hr4juB6+a7hHYRvaEFx+iN2YhGUeDOfNBe5ebOc
+         1o5gI7Gw8ZVpHPOwbDrFobQvzYMl/WQGcmW66FSRTi47R7b1tUcOF36OY+07dv6rwTRz
+         IOrHaMNyBnWtVXQzIGgB8ZyVenjQ2r73lmabG2C0W7cKwkoN7PdEeN0LbcDNskHfJbpm
+         Xh84px02LcAhut0yu7o86UoUo6QbWBio+oE3qSmBkSDnwY2KIIkBMk28JCBpI5YCg97F
+         vu4g==
+X-Gm-Message-State: AOAM531rKqIylCtVFuxktWMAp3A5cphIAx4jDFRt6h6T3RMqgUORlqDk
+        uJB4sdQlRefq9kIAhxZ6pro=
+X-Google-Smtp-Source: ABdhPJwXEXk6JS8EBpC17a5393hxrBZSUmx0OzKHdEgZr+YV783OzELcsrY8GG7oogz6akZUBcOC/Q==
+X-Received: by 2002:a7b:cb51:: with SMTP id v17mr1957523wmj.17.1593155122923;
+        Fri, 26 Jun 2020 00:05:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:91d0:a5f0:9f34:4d80? ([2001:b07:6468:f312:91d0:a5f0:9f34:4d80])
+        by smtp.googlemail.com with ESMTPSA id l190sm15621861wml.12.2020.06.26.00.05.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jun 2020 00:05:22 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] x86: move IDT away from address 0
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm <kvm@vger.kernel.org>, mcondotta@redhat.com,
+        Thomas Huth <thuth@redhat.com>
+References: <20200624165455.19266-1-pbonzini@redhat.com>
+ <8926010E-3AC0-4707-B1E2-A8DF576660F9@gmail.com>
+ <ded0805e-15a4-5af8-0edd-10f9c9cf57d7@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+ uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <1b981258-6b03-a120-622f-8e597570ed53@redhat.com>
+Date:   Fri, 26 Jun 2020 09:05:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200626044259.GK172395@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <ded0805e-15a4-5af8-0edd-10f9c9cf57d7@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->>>> Does this have any implications when probing with the 'none' machine?
->>>
->>> I'm not sure.  In your case, I guess the cpu bit would still show up
->>> as before, so it would tell you base feature availability, but not
->>> whether you can use the new configuration option.
->>>
->>> Since the HTL option is generic, you could still set it on the "none"
->>> machine, though it wouldn't really have any effect.  That is, if you
->>> could create a suitable object to point it at, which would depend on
->>> ... details.
->>>
+On 25/06/20 21:18, Paolo Bonzini wrote:
+> On 25/06/20 20:59, Nadav Amit wrote:
+>> I think that there is a hidden assumption about the IDT location in
+>> realmode’s test_int(), which this would break:
 >>
->> The important point is that we never want the (expanded) host cpu model
->> look different when either specifying or not specifying the HTL
->> property.
+>> static void test_int(void)
+>> {
+>>         init_inregs(NULL);
+>>
+>>         boot_idt[11] = 0x1000; /* Store a pointer to address 0x1000 in IDT entry 0x11 */
+>>         *(u8 *)(0x1000) = 0xcf; /* 0x1000 contains an IRET instruction */
+>>
+>>         MK_INSN(int11, "int $0x11\n\t");
+>>
+>>         exec_in_big_real_mode(&insn_int11);
+>>         report("int 1", 0, 1);
+>> }
 > 
-> Ah, yes, I see your point.  So my current suggestion will satisfy
-> that, basically it is:
-> 
-> cpu has unpack (inc. by default) && htl specified
-> 	=> works (allowing secure), as expected
+> Uuuuuuuuuuuuuuuumph... you're right. :(  Will send a patch tomorrow.
 
-ack
+Actually the IDTR is not reloaded by exec_in_big_real_mode, so this
+(while a bit weird) works fine.
 
-> 
-> !cpu has unpack && htl specified
-> 	=> bails out with an error
-
-ack
-
-> 
-> !cpu has unpack && !htl specified
-> 	=> works for a non-secure guest, as expected
-> 	=> guest will fail if it attempts to go secure
-
-ack, behavior just like running on older hw without unpack
-
-> 
-> cpu has unpack && !htl specified
-> 	=> works as expected for a non-secure guest (unpack feature is
-> 	   present, but unused)
-> 	=> secure guest may work "by accident", but only if all virtio
-> 	   properties have the right values, which is the user's
-> 	   problem
-> 
-> That last case is kinda ugly, but I think it's tolerable.
-
-Right, we must not affect non-secure guests, and existing secure setups
-(e.g., older qemu machines). Will have to think about this some more,
-but does not sound too crazy.
-
-Thanks!
-
--- 
-Thanks,
-
-David / dhildenb
-
+Paolo
