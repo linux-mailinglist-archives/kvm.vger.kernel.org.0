@@ -2,275 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB77620AD85
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:47:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6F4720AD91
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:53:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728874AbgFZHrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 03:47:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728858AbgFZHrw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jun 2020 03:47:52 -0400
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1971AC08C5DB
-        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 00:47:52 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id dp18so8423656ejc.8
-        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 00:47:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uilk6pA4v6KKUsLLMKY6bcWg9QtWqaF5/DWx18U/CC0=;
-        b=wNRHexa5s1zJiUOQyWtpLRXSG5ABe3ivQzpVwdwmn8o/tEZ3m+fyj4FO67sPTR7iGi
-         DpNfp1sF5xQI6z+w34Q0nCrcdbvULmc0+e1I8AwkbPv/n7tBvK9hQWB5afKP87qjKW06
-         AKTO4Ic3DR6pc55MzBsi6SUhapT0eVSocXd+lW+19x5PYMm8xySVNbEGipLDiYUeTeVV
-         cK+kzpFrFU3vZ6pjqQRkZj4aeFNbOMZ6nFAAh/Mr4AEKLD+UxIHEOX3PSGfZ1VYrpPSl
-         C+jhxyMXPeiK8p3tM4y8nLAf39PmbenImLBlqlgNyJa2RI/2nWh4gggsgzCCsz1g3Flx
-         Wr3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uilk6pA4v6KKUsLLMKY6bcWg9QtWqaF5/DWx18U/CC0=;
-        b=GCJpaJEgOez0wIw9V3YfkWDzjuCeIy+ARcSa7Zj0yywA85+d/8xCQYwcVixzfAxA68
-         ZG/XVM5UC3kVoI40y51K5whrOw4nhGz6+i/yep0TNIfIwThJjgsa1ximo8k7CoRyc530
-         NIqwsacSzrcgaphXXv7JEcvN9L1UOz2VbX7R9OFrZl3t0evGWiAvaNyckOyLuDxMNnmz
-         CeDwQaDXI/vNyW0X2gMauhz6xo0151XRvrgQGwEFOe0X9fqHEPqrhbTeMOhr+26M00sN
-         7buI1qh4O3otq+5j3GKTmzqVwSMwGDlH3TcuTCP/7chm0l1VmZZsDFLZ5ORbfzW9Xg2i
-         jccA==
-X-Gm-Message-State: AOAM532QnjNMOpLXLiHBkxFTsTjyZMPo5IjssRfO4TiqkKSC/m4N62QY
-        JMcKc3F/Y5yI50FN75zP1Rq60w==
-X-Google-Smtp-Source: ABdhPJz95Ad9tZXwAAZZfpGTo9871UG/cCB3/qufTsd1aPfFz2/WXFO57hB5+K4dVtoXfNQLW+GeCg==
-X-Received: by 2002:a17:906:c14f:: with SMTP id dp15mr1444508ejc.454.1593157670667;
-        Fri, 26 Jun 2020 00:47:50 -0700 (PDT)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id be2sm8717486edb.92.2020.06.26.00.47.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2020 00:47:50 -0700 (PDT)
-Date:   Fri, 26 Jun 2020 09:47:38 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, eric.auger@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, peterx@redhat.com,
-        hao.wu@intel.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH v3 02/14] iommu: Report domain nesting info
-Message-ID: <20200626074738.GA2107508@myrica>
-References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
- <1592988927-48009-3-git-send-email-yi.l.liu@intel.com>
+        id S1728846AbgFZHxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 03:53:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40072 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728683AbgFZHxJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Jun 2020 03:53:09 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05Q7WplL124203;
+        Fri, 26 Jun 2020 03:53:07 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31ux0153nm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Jun 2020 03:53:07 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05Q7YB1G130366;
+        Fri, 26 Jun 2020 03:53:06 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 31ux0153mx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Jun 2020 03:53:06 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05Q7p0RF017302;
+        Fri, 26 Jun 2020 07:53:05 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04fra.de.ibm.com with ESMTP id 31v7fwh0c7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Jun 2020 07:53:05 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05Q7r2bK2490842
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Jun 2020 07:53:02 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A3C14C044;
+        Fri, 26 Jun 2020 07:53:02 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9D5B94C046;
+        Fri, 26 Jun 2020 07:53:01 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.191.93])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 26 Jun 2020 07:53:01 +0000 (GMT)
+Subject: Re: [PATCH v2 0/2] s390: Add API Docs for DIAGNOSE 0x318 and fix rst
+To:     Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, david@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
+References: <20200625150724.10021-1-walling@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <1c737c33-24e3-82c5-a514-3931e6f9bb5a@linux.ibm.com>
+Date:   Fri, 26 Jun 2020 09:53:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1592988927-48009-3-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <20200625150724.10021-1-walling@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
+ definitions=2020-06-26_04:2020-06-26,2020-06-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ clxscore=1015 bulkscore=0 cotscore=-2147483648 mlxlogscore=999
+ phishscore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0
+ priorityscore=1501 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2006260050
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 24, 2020 at 01:55:15AM -0700, Liu Yi L wrote:
-> IOMMUs that support nesting translation needs report the capability info
-> to userspace, e.g. the format of first level/stage paging structures.
-> 
-> This patch reports nesting info by DOMAIN_ATTR_NESTING. Caller can get
-> nesting info after setting DOMAIN_ATTR_NESTING.
-> 
-> v2 -> v3:
-> *) remvoe cap/ecap_mask in iommu_nesting_info.
-> *) reuse DOMAIN_ATTR_NESTING to get nesting info.
-> *) return an empty iommu_nesting_info for SMMU drivers per Jean'
->    suggestion.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> ---
->  drivers/iommu/arm-smmu-v3.c | 29 ++++++++++++++++++++--
->  drivers/iommu/arm-smmu.c    | 29 ++++++++++++++++++++--
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6
+Content-Type: multipart/mixed; boundary="0a4vBZZE3h9P6sG4TWnhjJZjvAJhes9ms"
 
-Looks reasonable to me. Please move the SMMU changes to a separate patch
-and Cc the SMMU maintainers:
+--0a4vBZZE3h9P6sG4TWnhjJZjvAJhes9ms
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Cc: Will Deacon <will@kernel.org>
-Cc: Robin Murphy <robin.murphy@arm.com>
+On 6/25/20 5:07 PM, Collin Walling wrote:
+> Changelog:
+>=20
+>     v2
+>=20
+>     =E2=80=A2 Reworded patch 1 doc text
+>=20
+>     =E2=80=A2 Added "Introduced in commit..." for rst fix patch
+>=20
+>     =E2=80=A2 Added r-b's (thanks!)
+>=20
+> Adds documentation for the s390-specfic DIAGNOSE 0x318 instruction, as
+> well as fixes some missing rst symbols for the neighboring entries.
+>=20
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
 
-Thanks,
-Jean
+thanks, applied
 
->  include/uapi/linux/iommu.h  | 59 +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 113 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index f578677..0c45d4d 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -3019,6 +3019,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
->  	return group;
->  }
->  
-> +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
-> +					void *data)
-> +{
-> +	struct iommu_nesting_info *info = (struct iommu_nesting_info *) data;
-> +	u32 size;
-> +
-> +	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -ENODEV;
-> +
-> +	size = sizeof(struct iommu_nesting_info);
-> +
-> +	/*
-> +	 * if provided buffer size is not equal to the size, should
-> +	 * return 0 and also the expected buffer size to caller.
-> +	 */
-> +	if (info->size != size) {
-> +		info->size = size;
-> +		return 0;
-> +	}
-> +
-> +	/* report an empty iommu_nesting_info for now */
-> +	memset(info, 0x0, size);
-> +	info->size = size;
-> +	return 0;
-> +}
-> +
->  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
->  				    enum iommu_attr attr, void *data)
->  {
-> @@ -3028,8 +3054,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
->  	case IOMMU_DOMAIN_UNMANAGED:
->  		switch (attr) {
->  		case DOMAIN_ATTR_NESTING:
-> -			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
-> -			return 0;
-> +			return arm_smmu_domain_nesting_info(smmu_domain, data);
->  		default:
->  			return -ENODEV;
->  		}
-> diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-> index 243bc4c..908607d 100644
-> --- a/drivers/iommu/arm-smmu.c
-> +++ b/drivers/iommu/arm-smmu.c
-> @@ -1506,6 +1506,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
->  	return group;
->  }
->  
-> +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
-> +					void *data)
-> +{
-> +	struct iommu_nesting_info *info = (struct iommu_nesting_info *) data;
-> +	u32 size;
-> +
-> +	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -ENODEV;
-> +
-> +	size = sizeof(struct iommu_nesting_info);
-> +
-> +	/*
-> +	 * if provided buffer size is not equal to the size, should
-> +	 * return 0 and also the expected buffer size to caller.
-> +	 */
-> +	if (info->size != size) {
-> +		info->size = size;
-> +		return 0;
-> +	}
-> +
-> +	/* report an empty iommu_nesting_info for now */
-> +	memset(info, 0x0, size);
-> +	info->size = size;
-> +	return 0;
-> +}
-> +
->  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
->  				    enum iommu_attr attr, void *data)
->  {
-> @@ -1515,8 +1541,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
->  	case IOMMU_DOMAIN_UNMANAGED:
->  		switch (attr) {
->  		case DOMAIN_ATTR_NESTING:
-> -			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
-> -			return 0;
-> +			return arm_smmu_domain_nesting_info(smmu_domain, data);
->  		default:
->  			return -ENODEV;
->  		}
-> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-> index 1afc661..898c99a 100644
-> --- a/include/uapi/linux/iommu.h
-> +++ b/include/uapi/linux/iommu.h
-> @@ -332,4 +332,63 @@ struct iommu_gpasid_bind_data {
->  	} vendor;
->  };
->  
-> +/*
-> + * struct iommu_nesting_info - Information for nesting-capable IOMMU.
-> + *				user space should check it before using
-> + *				nesting capability.
-> + *
-> + * @size:	size of the whole structure
-> + * @format:	PASID table entry format, the same definition with
-> + *		@format of struct iommu_gpasid_bind_data.
-> + * @features:	supported nesting features.
-> + * @flags:	currently reserved for future extension.
-> + * @data:	vendor specific cap info.
-> + *
-> + * +---------------+----------------------------------------------------+
-> + * | feature       |  Notes                                             |
-> + * +===============+====================================================+
-> + * | SYSWIDE_PASID |  Kernel manages PASID in system wide, PASIDs used  |
-> + * |               |  in the system should be allocated by host kernel  |
-> + * +---------------+----------------------------------------------------+
-> + * | BIND_PGTBL    |  bind page tables to host PASID, the PASID could   |
-> + * |               |  either be a host PASID passed in bind request or  |
-> + * |               |  default PASIDs (e.g. default PASID of aux-domain) |
-> + * +---------------+----------------------------------------------------+
-> + * | CACHE_INVLD   |  mandatory feature for nesting capable IOMMU       |
-> + * +---------------+----------------------------------------------------+
-> + *
-> + */
-> +struct iommu_nesting_info {
-> +	__u32	size;
-> +	__u32	format;
-> +	__u32	features;
-> +#define IOMMU_NESTING_FEAT_SYSWIDE_PASID	(1 << 0)
-> +#define IOMMU_NESTING_FEAT_BIND_PGTBL		(1 << 1)
-> +#define IOMMU_NESTING_FEAT_CACHE_INVLD		(1 << 2)
-> +	__u32	flags;
-> +	__u8	data[];
-> +};
-> +
-> +/*
-> + * struct iommu_nesting_info_vtd - Intel VT-d specific nesting info
-> + *
-> + *
-> + * @flags:	VT-d specific flags. Currently reserved for future
-> + *		extension.
-> + * @addr_width:	The output addr width of first level/stage translation
-> + * @pasid_bits:	Maximum supported PASID bits, 0 represents no PASID
-> + *		support.
-> + * @cap_reg:	Describe basic capabilities as defined in VT-d capability
-> + *		register.
-> + * @ecap_reg:	Describe the extended capabilities as defined in VT-d
-> + *		extended capability register.
-> + */
-> +struct iommu_nesting_info_vtd {
-> +	__u32	flags;
-> +	__u16	addr_width;
-> +	__u16	pasid_bits;
-> +	__u64	cap_reg;
-> +	__u64	ecap_reg;
-> +};
-> +
->  #endif /* _UAPI_IOMMU_H */
-> -- 
-> 2.7.4
-> 
+>=20
+> Collin Walling (2):
+>   docs: kvm: add documentation for KVM_CAP_S390_DIAG318
+>   docs: kvm: fix rst formatting
+>=20
+>  Documentation/virt/kvm/api.rst | 27 ++++++++++++++++++++++++---
+>  1 file changed, 24 insertions(+), 3 deletions(-)
+>=20
+
+
+
+--0a4vBZZE3h9P6sG4TWnhjJZjvAJhes9ms--
+
+--Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl71qV0ACgkQ41TmuOI4
+ufhujhAAkJ0dxtwLTvboDRrmHcYYQHIPcxXMScS1zOBW0AScNun7VtjvFUTdE2fT
+vsdEVtHD05z2uVSLruMl4sDMMjDH3jyLabP0UEhdmSWyVe10sLDpMcro62lHEbE4
+vp1VrTPI9YquUPUaHNECVGJ7jinWR60ERf+ZcruXc7WzhdLfvR6e1X+VR/9SiheL
+AyJ3gQpcTXu7f845y2fNXyVjrZIZnLwRPibNP+tiWS1nKp99A23UvwwtZevGYKGw
+9O+bBpcqr4uiyDCS5s7Oh6wa9V2Y9OPtA9j5D9h5smb5rOM+AO/EWxleOP2KL/7g
+KAD5uh8iwTRWj/S4dt3qblShE1RR91KqMPwj+jO+73XHJUyGl6l53wV9L3hAagyL
+guXqe1ciXu/Hu63L06tDcroiM88kvJyswLxwBZFEM+q8p+khAdHccSgsT2AN4QMX
+kpo3vLgDdj9Mk1u126ei5dW0g1xla8jGP45zILhsoyWkPp5/j+LpxeOBP5D1x6dW
+R4fbAINSkdhDfd2rJMunSSkRvsf5Ch49Aq0knDq/KxIjsR6EY5x3RgfmOaXMSYAV
+hHKQDlB9sek8sVSQE9kRzwfNV1DWtsdlcMLBxCQFExYdCBeucCTJaNHCFoTdpL/B
+8IB/klBsiwTnbpcuBwXvh9Cj5fSXE/DSjVyxMKTmMOaQk1d7jpA=
+=apDD
+-----END PGP SIGNATURE-----
+
+--Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6--
+
