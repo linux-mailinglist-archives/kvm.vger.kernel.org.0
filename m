@@ -2,124 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F21FB20B712
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 19:32:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAC0820B72B
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 19:38:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726576AbgFZRcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 13:32:51 -0400
-Received: from mga11.intel.com ([192.55.52.93]:60379 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726026AbgFZRcv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jun 2020 13:32:51 -0400
-IronPort-SDR: oDDpGQ9DkD2yhajW3T0Nw4HdzOwTRuneL1APYHIpUni0A5+NDB3hSaGolxLHmQ+d0647rznA7z
- Y8905fz8Qlbw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9664"; a="143636123"
-X-IronPort-AV: E=Sophos;i="5.75,284,1589266800"; 
-   d="scan'208";a="143636123"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2020 10:32:50 -0700
-IronPort-SDR: 683zrk3+/N0PzTLuVyGiqSJ0I1/gZCPh8DgZ/lJ9MLkP64scatxeS6cNssvvj5JvvQhpLiZREg
- jxFCqGc+HRLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,284,1589266800"; 
-   d="scan'208";a="354832808"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga001.jf.intel.com with ESMTP; 26 Jun 2020 10:32:50 -0700
-Date:   Fri, 26 Jun 2020 10:32:50 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
-Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Message-ID: <20200626173250.GD6583@linux.intel.com>
-References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
- <20190205210137.1377-11-sean.j.christopherson@intel.com>
- <20190813100458.70b7d82d@x1.home>
- <20190813170440.GC13991@linux.intel.com>
- <20190813115737.5db7d815@x1.home>
- <20190813133316.6fc6f257@x1.home>
- <20190813201914.GI13991@linux.intel.com>
- <20190815092324.46bb3ac1@x1.home>
- <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
- <20190820200318.GA15808@linux.intel.com>
+        id S1726509AbgFZRh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 13:37:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56106 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725806AbgFZRh5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jun 2020 13:37:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593193075;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fyws02fLz3vFP4WruqNyiJlcETyOe6KDZOHSeNYTwDU=;
+        b=dRs0GVOvM+xtVkiee/4vqA9Vwp4+q8K7HGFE7OZqHxvMekHOWKNCtNO2YaaJ84cx1hkrRW
+        2BHSGEwwblmopClcoLNpmZxMoBzKcvSBTotSC27IXdRv/iNL8r2b2EAgzSTocNSgozds5M
+        xPuiTQ4W1BMVvPnZSKqBnkVAd+Zgo4c=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-obixYrbhMeuID-HEBrkjeQ-1; Fri, 26 Jun 2020 13:37:53 -0400
+X-MC-Unique: obixYrbhMeuID-HEBrkjeQ-1
+Received: by mail-qk1-f199.google.com with SMTP id s75so7156745qka.1
+        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 10:37:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Fyws02fLz3vFP4WruqNyiJlcETyOe6KDZOHSeNYTwDU=;
+        b=WRws5IJLTS8dUkX80chKyPokQjBFC+DIKyeNqG4ywfslgckcmhhNLeFzCoZMM7fzh9
+         d9W86xwzrpYl9psbJzYYbciaqQDi/IFNJC4R88Vuq97cYQquK+AOu8EfV1myPFojdIHB
+         uKZaw0pnXhjPEt98T0AFIrd4vMJUCNhm8XTNyOTvZmHJCgMO687mSnHn35FumiB6Nu6+
+         B0AWTFBkX88sAhzOlYqnYwja7RqKDQ+crd0dnu1y1+OHPQvxKaXb4V4vnTprWwBvOiOQ
+         dJ9+MzIxkxgFhlnIZc2/FFIF964bFi3wq9j+LWbfD0XbVPnUqQkK5MMjXQPjQ5dHbY1I
+         rJBw==
+X-Gm-Message-State: AOAM531qGbAOwBxdAZERDaG45948QhR6DEqANwLAJBR71KDrW8GbRkSG
+        NfQE4fPAZrYeFSuAEtJ7e28woKpolYuSBQCwy7HeCpUaBqpgJpiqwNS/UoeY3NpWLvJ+6oew+Bt
+        rFvz5lasK54N0
+X-Received: by 2002:ac8:3528:: with SMTP id y37mr3932649qtb.308.1593193073402;
+        Fri, 26 Jun 2020 10:37:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzCjiss13XM/Mi86v8m2KXOv1zy/29jTkRJ4pMfL9LzwqwqinbO63hC+WtdwXeCbrDYcCRPow==
+X-Received: by 2002:ac8:3528:: with SMTP id y37mr3932632qtb.308.1593193073163;
+        Fri, 26 Jun 2020 10:37:53 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+        by smtp.gmail.com with ESMTPSA id b22sm7937935qka.43.2020.06.26.10.37.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2020 10:37:52 -0700 (PDT)
+Date:   Fri, 26 Jun 2020 13:37:50 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
+Message-ID: <20200626173750.GA175520@xz-x1>
+References: <20200622220442.21998-1-peterx@redhat.com>
+ <20200622220442.21998-2-peterx@redhat.com>
+ <20200625061544.GC2141@linux.intel.com>
+ <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
+ <20200625162540.GC3437@linux.intel.com>
+ <df859fb0-a665-a82a-0cf1-8db95179cb74@redhat.com>
+ <20200626155657.GC6583@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190820200318.GA15808@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200626155657.GC6583@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-/cast <thread necromancy>
-
-On Tue, Aug 20, 2019 at 01:03:19PM -0700, Sean Christopherson wrote:
-> On Mon, Aug 19, 2019 at 06:03:05PM +0200, Paolo Bonzini wrote:
-> > It seems like the problem occurs when the sp->gfn you "continue over"
-> > includes a userspace-MMIO gfn.  But since I have no better ideas right
-> > now, I'm going to apply the revert (we don't know for sure that it only
-> > happens with assigned devices).
+On Fri, Jun 26, 2020 at 08:56:57AM -0700, Sean Christopherson wrote:
+> Not really?  It's solving a problem that doesn't exist in the current code
+> base (assuming TSC_CTRL is fixed), and IMO solving it in an ugly fashion.
 > 
-> After many hours of staring, I've come to the conclusion that
-> kvm_mmu_invalidate_zap_pages_in_memslot() is completely broken, i.e.
-> a revert is definitely in order for 5.3 and stable.
-
-Whelp, past me was wrong.  The patch wasn't completely broken, as the rmap
-zapping piece of kvm_mmu_invalidate_zap_pages_in_memslot() was sufficient
-to satisfy removal of the memslot.  I.e. zapping leaf PTEs (including large
-pages) should prevent referencing the old memslot, the fact that zapping
-upper level shadow pages was broken was irrelevant because there should be
-no need to zap non-leaf PTEs.
-
-The one thing that sticks out as potentially concerning is passing %false
-for @lock_flush_tlb.  Dropping mmu_lock during slot_handle_level_range()
-without flushing would allow a vCPU to create and use a new entry while a
-different vCPU has the old entry cached in its TLB.  I think that could
-even happen with a single vCPU if the memslot is deleted by a helper task,
-and the zapped page was a large page that was fractured into small pages
-when inserted into the TLB.
-
-TL;DR: Assuming no other bugs in the kernel, this should be sufficient if
-the goal is simply to prevent usage of a memslot:
-
-static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
-			struct kvm_memory_slot *slot,
-			struct kvm_page_track_notifier_node *node)
-{
-	bool flush;
-
-	spin_lock(&kvm->mmu_lock);
-	flush = slot_handle_all_level(kvm, slot, kvm_zap_rmapp, true);
-	if (flush)
-		kvm_flush_remote_tlbs(kvm);
-	spin_unlock(&
-}
-
-> mmu_page_hash is indexed by the gfn of the shadow pages, not the gfn of
-> the shadow ptes, e.g. for_each_valid_sp() will find page tables, page
-> directories, etc...  Passing in the raw gfns of the memslot doesn't work
-> because the gfn isn't properly adjusted/aligned to match how KVM tracks
-> gfns for shadow pages, e.g. removal of the companion audio memslot that
-> occupies gfns 0xc1080 - 0xc1083 would need to query gfn 0xc1000 to find
-> the shadow page table containing the relevant sptes.
+> I would much prefer that, _if_ we want to support blind KVM-internal MSR
+> accesses, we end up with code like:
 > 
-> This is why Paolo's suggestion to remove slot_handle_all_level() on
-> kvm_zap_rmapp() caused a BUG(), as zapping the rmaps cleaned up KVM's
-> accounting without actually zapping the relevant sptes.
+> 	if (msr_info->kvm_internal) {
+> 		return 1;
+> 	} else if (!ignore_msrs) {
+> 		vcpu_debug_ratelimited(vcpu, "unhandled wrmsr: 0x%x data 0x%llx\n",
+> 			    msr, data);
+> 		return 1;
+> 	} else {
+> 		if (report_ignored_msrs)
+> 			vcpu_unimpl(vcpu,
+> 				"ignored wrmsr: 0x%x data 0x%llx\n",
+> 				msr, data);
+> 		break;
+> 	}
+> 
+> But I'm still not convinced that there is a legimiate scenario for setting
+> kvm_internal=true.
 
-This is just straight up wrong, zapping the rmaps does zap the leaf sptes.
-The BUG() occurs because gfn_to_rmap() works on the _new_ memslots instance,
-and if a memslot is being deleted there is no memslot for the gfn, hence the
-NULL pointer bug when mmu_page_zap_pte() attempts to zap a PTE.  Zapping the
-rmaps (leaf/last PTEs) first "fixes" the issue by making it so that
-mmu_page_zap_pte() will never see a present PTE for a non-existent meslot.
+Actually this really looks like my initial version when I was discussing this
+with Paolo before this version, but Paolo suggested what I implemented last.  I
+think I agree with Paolo that it's an improvement to have a way to get/set real
+msr value so that we don't need to further think about effects being taken with
+the two tricky msr knobs (report_ignored_msrs, ignore_msrs).  These knobs are
+even trickier to me when they're hidden deep, because they are not easily
+expected when seeing the name of the functions (e.g. __kvm_set_msr, rather than
+__kvm_set_msr_retval_fixed).
 
-I don't think any of this explains the pass-through GPU issue.  But, we
-have a few use cases where zapping the entire MMU is undesirable, so I'm
-going to retry upstreaming this patch as with per-VM opt-in.  I wanted to
-set the record straight for posterity before doing so.
+Thanks,
+
+-- 
+Peter Xu
+
