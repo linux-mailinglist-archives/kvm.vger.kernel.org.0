@@ -2,112 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7859020B4D6
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 17:39:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B443220B570
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 17:57:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729700AbgFZPjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 11:39:15 -0400
-Received: from foss.arm.com ([217.140.110.172]:60668 "EHLO foss.arm.com"
+        id S1730073AbgFZP46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 11:56:58 -0400
+Received: from mga05.intel.com ([192.55.52.43]:24803 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729689AbgFZPjP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jun 2020 11:39:15 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 53F771042;
-        Fri, 26 Jun 2020 08:39:14 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F1E33F6CF;
-        Fri, 26 Jun 2020 08:39:12 -0700 (PDT)
-Subject: Re: [PATCH v2 06/17] KVM: arm64: Introduce accessor for ctxt->sys_reg
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-7-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <a9c3a43e-7850-e74d-5383-905885721ab4@arm.com>
-Date:   Fri, 26 Jun 2020 16:39:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726875AbgFZP46 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jun 2020 11:56:58 -0400
+IronPort-SDR: uZQOJbZQHU7FIEjatT2pAbXG+e0xawdGTY1SLzdpGToUcjg487EUGVs4cM9QXBTmRBrAqz3Mu1
+ g3AvZvTQCkHQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9664"; a="230146587"
+X-IronPort-AV: E=Sophos;i="5.75,284,1589266800"; 
+   d="scan'208";a="230146587"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2020 08:56:57 -0700
+IronPort-SDR: j+HuT071Nr3F3FGpKOZF8ToqB4YfiJFxn9esIc79m4HAcTKwxP/nrGkykJA7rdjQjkHYdehxx2
+ Pe6gTsaglh7g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,284,1589266800"; 
+   d="scan'208";a="276400676"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga003.jf.intel.com with ESMTP; 26 Jun 2020 08:56:57 -0700
+Date:   Fri, 26 Jun 2020 08:56:57 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
+Message-ID: <20200626155657.GC6583@linux.intel.com>
+References: <20200622220442.21998-1-peterx@redhat.com>
+ <20200622220442.21998-2-peterx@redhat.com>
+ <20200625061544.GC2141@linux.intel.com>
+ <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
+ <20200625162540.GC3437@linux.intel.com>
+ <df859fb0-a665-a82a-0cf1-8db95179cb74@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200615132719.1932408-7-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df859fb0-a665-a82a-0cf1-8db95179cb74@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Thu, Jun 25, 2020 at 08:44:16PM +0200, Paolo Bonzini wrote:
+> On 25/06/20 18:25, Sean Christopherson wrote:
+> > I get the "what" of the change, and even the "why" to some extent, but I
+> > dislike the idea of supporting/encouraging blind reads/writes to MSRs.
+> > Blind writes are just asking for problems, and suppressing warnings on reads
+> > is almost guaranteed to be suppressing a KVM bug.
+> 
+> Right, that's why this patch does not just suppress warnings: it adds a
+> different return value to detect the case.
+> 
+> > TSC_CTRL aside, if we insist on pointing a gun at our foot at some point,
+> > this should be a dedicated flavor of MSR access, e.g. msr_data.kvm_initiated,
+> > so that it at least requires intentionally loading the gun.
+> 
+> With this patch, __kvm_get_msr does not know about ignore_msrs at all,
+> that seems to be strictly an improvement; do you agree with that?
 
-On 6/15/20 2:27 PM, Marc Zyngier wrote:
-> In order to allow the disintegration of the per-vcpu sysreg array,
-> let's introduce a new helper (ctxt_sys_reg()) that returns the
-> in-memory copy of a system register, picked from a given context.
->
-> __vcpu_sys_reg() is rewritten to use this helper.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e7fd03271e52..5314399944e7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -405,12 +405,17 @@ struct kvm_vcpu_arch {
->  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
->  
->  /*
-> - * Only use __vcpu_sys_reg if you know you want the memory backed version of a
-> - * register, and not the one most recently accessed by a running VCPU.  For
-> - * example, for userspace access or for system registers that are never context
-> - * switched, but only emulated.
-> + * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
-> + * memory backed version of a register, and not the one most recently
-> + * accessed by a running VCPU.  For example, for userspace access or
-> + * for system registers that are never context switched, but only
-> + * emulated.
->   */
-> -#define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
-> +#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
-> +
-> +#define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
-> +
-> +#define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
+Not really?  It's solving a problem that doesn't exist in the current code
+base (assuming TSC_CTRL is fixed), and IMO solving it in an ugly fashion.
 
-This is confusing - __vcpu_sys_reg() returns the value, but __ctxt_sys_reg()
-return a pointer to the value. Because of that, I made the mistake of thinking
-that __vcpu_sys_reg() returns a pointer when reviewing the next patch in the
-series, and I got really worried that stuff was seriously broken (it was not).
+I would much prefer that, _if_ we want to support blind KVM-internal MSR
+accesses, we end up with code like:
 
-I'm not sure what the reasonable solution is, or even if there is one.
+	if (msr_info->kvm_internal) {
+		return 1;
+	} else if (!ignore_msrs) {
+		vcpu_debug_ratelimited(vcpu, "unhandled wrmsr: 0x%x data 0x%llx\n",
+			    msr, data);
+		return 1;
+	} else {
+		if (report_ignored_msrs)
+			vcpu_unimpl(vcpu,
+				"ignored wrmsr: 0x%x data 0x%llx\n",
+				msr, data);
+		break;
+	}
 
-Some thoughts: we could have just one macro, ctxt_sys_reg() and dereference that
-when we want the value; we could keep both and swap the macro definitions; or we
-could encode the fact that a macro returns a pointer in the macro name (so we
-would end up with __ctxt_sys_reg() -> __ctxt_sys_regp() and ctxt_sys_reg ->
-__ctxt_sys_reg()).
+But I'm still not convinced that there is a legimiate scenario for setting
+kvm_internal=true.
 
-What do you think?
+> What would you think about adding warn_unused_result to __kvm_get_msr?
 
-Thanks,
-Alex
->  
->  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg);
->  void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+I guess I wouldn't object to it, but that seems like an orthogonal issue.
