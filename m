@@ -2,159 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 654D920B91F
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 21:11:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DA6320B9FF
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 22:08:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725861AbgFZTL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 15:11:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58310 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725780AbgFZTL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jun 2020 15:11:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593198685;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oMtqF4vi6DX6dXlsvQVICwp3FFeCPzU9wJWbHt5gbk0=;
-        b=M3xt43n7H00ecpZbK5DRbBPBvTVX1fZpXH/NvLQywX7V3KWThOKwRaA0v+Vp2hvn0TzBqe
-        XBAmBSQDPSvRhKrryxYLXkZk1k14jXSeWIm7BR27a6JKSYo/Y2Bh3gHmZS4U5p6A1HpUit
-        Msiha/E4GQp6MbtEf++zETGWOBoVg+s=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-xHDcUrPfMO2mp3XnqEgz-w-1; Fri, 26 Jun 2020 15:11:22 -0400
-X-MC-Unique: xHDcUrPfMO2mp3XnqEgz-w-1
-Received: by mail-qv1-f72.google.com with SMTP id v1so7032822qvx.8
-        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 12:11:22 -0700 (PDT)
+        id S1726128AbgFZUIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 16:08:20 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:32855 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725921AbgFZUIU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jun 2020 16:08:20 -0400
+Received: by mail-io1-f71.google.com with SMTP id x2so7058950iof.0
+        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 13:08:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oMtqF4vi6DX6dXlsvQVICwp3FFeCPzU9wJWbHt5gbk0=;
-        b=kKQNOVD078jNwa+E0EtUozsljKlCn5RMtDANI1tbPGOhZKBzgJrvoNqWfvLdhTnRTJ
-         bkLb13mcjqCfsl4zYEeR7KsuVaB+irPgqBrqfcTSSfTJrIS3G56QhpHx2mPoMecEk/aj
-         TCHI6dUfdZdIJgAt53rEvr4iWgYJofd4C4zxe7H/pkCBeWUxLxYQF6kL1T+OAXZWlVZp
-         uM1cUnZYtS+p55ac4kY6gad+wM1h5h/x9+Kwwx8SRMDKa9U7beV08KmQ2vAqLczh0tU1
-         ZmhSR4ma4OeYvHFvjC347QaDfASLXKN3+EzqmndIg6TkGuVdPT5ULAFtCr/n9xVNneLB
-         Yvew==
-X-Gm-Message-State: AOAM5335um9za/k2IPdC3EUZjSNYpKCixTWAlHTSxg2sJZJagMi173RE
-        ePtyTGvKXWjIoPDwvNchfVts6PEjDl6JqetNe1vT0cS6RO3/NDVmaj0bfayQC/obz3bLi7ks8K4
-        OOOq5RUjdZdKK
-X-Received: by 2002:a0c:e554:: with SMTP id n20mr4623340qvm.14.1593198681682;
-        Fri, 26 Jun 2020 12:11:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzpLVlhU1X6J3CS20kGcMtpRORBsaRk1S+ucab60PTn/peBSUj/R0YxVh2GO7NrepuCA38VxQ==
-X-Received: by 2002:a0c:e554:: with SMTP id n20mr4623305qvm.14.1593198681307;
-        Fri, 26 Jun 2020 12:11:21 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id x197sm8784816qka.74.2020.06.26.12.11.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2020 12:11:20 -0700 (PDT)
-Date:   Fri, 26 Jun 2020 15:11:18 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
-Message-ID: <20200626191118.GC175520@xz-x1>
-References: <20200622220442.21998-1-peterx@redhat.com>
- <20200622220442.21998-2-peterx@redhat.com>
- <20200625061544.GC2141@linux.intel.com>
- <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
- <20200625162540.GC3437@linux.intel.com>
- <20200626180732.GB175520@xz-x1>
- <20200626181820.GG6583@linux.intel.com>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=dtnkD+akOW0FGGW63gF00wjPRoN0fMAttFlcVW1sdeQ=;
+        b=H7wTFBhPS+mg6Ohe8VJNpcuB1xpnm3dICUtWISZSedDo1ekB3nMBw0fRc5muqvuMEU
+         DkCLRK6t/UVKXHLK7+1y97j/O4U3jSYup99zhPusSwCVK9lWfw0Jo/09dViwko0AO+5O
+         lc8KcPcWwkNvc5aZyHO9KKbe0ALWKdbRWvfopjk3CvHsZx5DSjBDFnpCc7VONvzAwlsK
+         BYXXCiVyKmmLAgWNs6D7b1cdSIsH4cULfWf1CeOp3GITROy2GENawzoC+4FIOgyUt588
+         pwKPpo32Irhd6wOlu5D7gYhTLKMeSSnna9CcAFqNLTvx4t3mLHxg6gArBfRurnXRWP5A
+         5Yag==
+X-Gm-Message-State: AOAM530d19JSoPIT26lgZLz3EQyVk/dU59o5jRRsaedmjY3zaNSLdVN+
+        1CnUeAMVUOru7vSNKS6MtUp1WObDylLHLf+LPkhaLsXZUNHp
+X-Google-Smtp-Source: ABdhPJyhhHPTgYRHLjTWhT0wiJEBuw33hT2u+i0HguFA5DDP5BEdzCQmPm15ik/HGLCLO+DY/CMM5QsjLPA041era1o5XCxRescX
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200626181820.GG6583@linux.intel.com>
+X-Received: by 2002:a92:cf42:: with SMTP id c2mr4946215ilr.13.1593202099251;
+ Fri, 26 Jun 2020 13:08:19 -0700 (PDT)
+Date:   Fri, 26 Jun 2020 13:08:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002e703905a902457b@google.com>
+Subject: general protection fault in pvclock_gtod_notify
+From:   syzbot <syzbot+b46fb19f175c5c7d1f03@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 26, 2020 at 11:18:20AM -0700, Sean Christopherson wrote:
-> On Fri, Jun 26, 2020 at 02:07:32PM -0400, Peter Xu wrote:
-> > On Thu, Jun 25, 2020 at 09:25:40AM -0700, Sean Christopherson wrote:
-> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > index 5eb618dbf211..64322446e590 100644
-> > > --- a/arch/x86/kvm/cpuid.c
-> > > +++ b/arch/x86/kvm/cpuid.c
-> > > @@ -1013,9 +1013,9 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
-> > >                 *ebx = entry->ebx;
-> > >                 *ecx = entry->ecx;
-> > >                 *edx = entry->edx;
-> > > -               if (function == 7 && index == 0) {
-> > > +               if (function == 7 && index == 0 && (*ebx | (F(RTM) | F(HLE))) {
-> > >                         u64 data;
-> > > -                       if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
-> > > +                       if (!kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data) &&
-> > >                             (data & TSX_CTRL_CPUID_CLEAR))
-> > >                                 *ebx &= ~(F(RTM) | F(HLE));
-> > >                 }
-> > > 
-> > > 
-> > > On VMX, MSR_IA32_TSX_CTRL will be added to the so called shared MSR array
-> > > regardless of whether or not it is being advertised to userspace (this is
-> > > a bug in its own right).  Using the host_initiated variant means KVM will
-> > > incorrectly bypass VMX's ARCH_CAP_TSX_CTRL_MSR check, i.e. incorrectly
-> > > clear the bits if userspace is being weird and stuffed MSR_IA32_TSX_CTRL
-> > > without advertising it to the guest.
-> > 
-> > Btw, would it be more staightforward to check "vcpu->arch.arch_capabilities &
-> > ARCH_CAP_TSX_CTRL_MSR" rather than "*ebx | (F(RTM) | F(HLE))" even if we want
-> > to have such a fix?
-> 
-> Not really, That ends up duplicating the check in vmx_get_msr().  From an
-> emulation perspective, this really is a "guest" access to the MSR, in the
-> sense that it the virtual CPU is in the guest domain, i.e. not a god-like
-> entity that gets to break the rules of emulation.
+Hello,
 
-I can't say I agree that it's a guest behavior.  IMHO kvm plays the role as the
-virtual processor.  If the bit in a cpuid entry depends on another MSR bit,
-then the read of that MSR value is a "processor behavior", which in our case is
-still a host behavior.  It's exactly because we thought it was a guest behavior
-so we got confused when we saw the error message of "ignored rdmsr" the first
-time but see the guest has no reason to do so...  So even if you want to keep
-those error messages, I'd really appreciate if they can show something else so
-we know it's not a guest rdmsr instruction.
+syzbot found the following crash on:
 
-To me, the existing tsx code is not a bug at all (IMHO the evil thing is the
-tricky knobs and the fact that it hides deep, and that's why I really want to
-move this series forward), and instead I think it's quite elegant to write
-things like below...
+HEAD commit:    4a21185c Merge git://git.kernel.org/pub/scm/linux/kernel/g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16958f4d100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bf3aec367b9ab569
+dashboard link: https://syzkaller.appspot.com/bug?extid=b46fb19f175c5c7d1f03
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1080e9c5100000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1685d2e3100000
 
-  if (!__kvm_read_msr(&data) && (data & XXX))
-    ...
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+b46fb19f175c5c7d1f03@syzkaller.appspotmail.com
 
-It's definitely subjective so I can't argu much... However it's slightly
-similar to rdmsr_safe and friends in that we don't need to remember two flags
-(cap+msr) but only the msr (and I bet I'm not the only one who likes it, just
-see the massive callers of all the "safe" versioned msr friends...).
+general protection fault, probably for non-canonical address 0x1ffffffff135a2b4: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.8.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:pvclock_gtod_notify+0x0/0x4d0 arch/x86/kvm/x86.c:7400
+Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+RSP: 0018:ffffc90000007bf8 EFLAGS: 00010046
+RAX: 1ffffffff135a2b4 RBX: 00000000ffffffff RCX: ffffffff814db41b
+RDX: ffffffff8c90a9c0 RSI: 0000000000000000 RDI: ffffffff89ad15a0
+RBP: dffffc0000000000 R08: 0000000000000000 R09: ffffffff8c58aa27
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: ffffffff89ad15a0
+FS:  0000000000000000(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f8ae8dd4e78 CR3: 00000000a1f9e000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ notifier_call_chain+0xb5/0x200 kernel/notifier.c:83
+ update_pvclock_gtod kernel/time/timekeeping.c:578 [inline]
+ timekeeping_update+0x28a/0x4a0 kernel/time/timekeeping.c:672
+ timekeeping_advance+0x663/0x9a0 kernel/time/timekeeping.c:2119
+ tick_do_update_jiffies64.part.0+0x183/0x290 kernel/time/tick-sched.c:101
+ tick_do_update_jiffies64 kernel/time/tick-sched.c:64 [inline]
+ tick_sched_do_timer kernel/time/tick-sched.c:147 [inline]
+ tick_sched_timer+0x22c/0x290 kernel/time/tick-sched.c:1313
+ __run_hrtimer kernel/time/hrtimer.c:1520 [inline]
+ __hrtimer_run_queues+0x1d5/0xfc0 kernel/time/hrtimer.c:1584
+ hrtimer_interrupt+0x32a/0x930 kernel/time/hrtimer.c:1646
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1080 [inline]
+ __sysvec_apic_timer_interrupt+0x142/0x5e0 arch/x86/kernel/apic/apic.c:1097
+ asm_call_on_stack+0xf/0x20 arch/x86/entry/entry_64.S:711
+ </IRQ>
+ __run_on_irqstack arch/x86/include/asm/irq_stack.h:22 [inline]
+ run_on_irqstack_cond arch/x86/include/asm/irq_stack.h:48 [inline]
+ sysvec_apic_timer_interrupt+0x18f/0x220 arch/x86/kernel/apic/apic.c:1091
+ asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:596
+RIP: 0010:native_safe_halt+0xe/0x10 arch/x86/include/asm/irqflags.h:61
+Code: ff 4c 89 ef e8 63 70 cb f9 e9 8e fe ff ff 48 89 df e8 56 70 cb f9 eb 8a cc cc cc cc e9 07 00 00 00 0f 00 2d 24 79 61 00 fb f4 <c3> 90 e9 07 00 00 00 0f 00 2d 14 79 61 00 f4 c3 cc cc 55 53 e8 a9
+RSP: 0018:ffffffff89a07c70 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 1ffffffff155cb92
+RDX: ffffffff89a86580 RSI: ffffffff87e736f8 RDI: ffffffff89a86e00
+RBP: ffff8880a6b58064 R08: 0000000000000000 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff8880a6b58064
+R13: 1ffffffff1340f98 R14: ffff8880a6b58065 R15: 0000000000000001
+ arch_safe_halt arch/x86/include/asm/paravirt.h:150 [inline]
+ acpi_safe_halt+0x8d/0x110 drivers/acpi/processor_idle.c:111
+ acpi_idle_do_entry+0x15c/0x1b0 drivers/acpi/processor_idle.c:525
+ acpi_idle_enter+0x3f9/0xab0 drivers/acpi/processor_idle.c:651
+ cpuidle_enter_state+0xff/0x960 drivers/cpuidle/cpuidle.c:234
+ cpuidle_enter+0x4a/0xa0 drivers/cpuidle/cpuidle.c:345
+ call_cpuidle kernel/sched/idle.c:117 [inline]
+ cpuidle_idle_call kernel/sched/idle.c:207 [inline]
+ do_idle+0x431/0x6a0 kernel/sched/idle.c:269
+ cpu_startup_entry+0x14/0x20 kernel/sched/idle.c:365
+ start_kernel+0x9cb/0xa06 init/main.c:1043
+ secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:243
+Modules linked in:
+---[ end trace 7b036d48895e60ed ]---
+RIP: 0010:pvclock_gtod_notify+0x0/0x4d0 arch/x86/kvm/x86.c:7400
+Code: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 <00> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+RSP: 0018:ffffc90000007bf8 EFLAGS: 00010046
+RAX: 1ffffffff135a2b4 RBX: 00000000ffffffff RCX: ffffffff814db41b
+RDX: ffffffff8c90a9c0 RSI: 0000000000000000 RDI: ffffffff89ad15a0
+RBP: dffffc0000000000 R08: 0000000000000000 R09: ffffffff8c58aa27
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: ffffffff89ad15a0
+FS:  0000000000000000(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f8ae8dd4e78 CR3: 00000000a1f9e000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-Considering the fact that we still have the unexpected warning message on some
-hosts with upgraded firmwares which potentially breaks some realtime systems,
-do you think below simple and clear patch acceptable to you?
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 901cd1fdecd9..052c93997965 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1005,7 +1005,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
-                *ebx = entry->ebx;
-                *ecx = entry->ecx;
-                *edx = entry->edx;
--               if (function == 7 && index == 0) {
-+               if (function == 7 && index == 0 &&
-+                   vcpu->arch.arch_capabilities & ARCH_CAP_TSX_CTRL_MSR) {
-                        u64 data;
-                        if (!__kvm_get_msr(vcpu, MSR_IA32_TSX_CTRL, &data, true) &&
-                            (data & TSX_CTRL_CPUID_CLEAR))
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Then we can further discuss whether and how we'd like to refactor the knobs and
-around.
-
-Thanks,
-
--- 
-Peter Xu
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
