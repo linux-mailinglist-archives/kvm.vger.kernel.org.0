@@ -2,89 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF5FB20AD65
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:38:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB77620AD85
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:47:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728811AbgFZHin (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 03:38:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56196 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726128AbgFZHim (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jun 2020 03:38:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593157121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=s0r92vpPNUuJ5d0ss49/zV+F8au5GdLIRCKpG3jKSAA=;
-        b=D53ZeFUry77IIpGEIEILS6EbBbDFym+Qn4E2xcapNMnCeT3ZkQL0Kn9C27s59MwDep1nDa
-        JJtsGlxB3pukgwwXfL9QEYZpQ+9jeDsrmW09GJnyVTWJ7bkkr1Hov+Ncbrw60Dj2FLCkiV
-        HB7EPVyrhdcpbZ4/Z20+IJFbOl4DC6M=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-94bjQjhjOnqyE4lt_DlcFQ-1; Fri, 26 Jun 2020 03:38:39 -0400
-X-MC-Unique: 94bjQjhjOnqyE4lt_DlcFQ-1
-Received: by mail-wr1-f70.google.com with SMTP id p10so9995607wrn.19
-        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 00:38:39 -0700 (PDT)
+        id S1728874AbgFZHrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 03:47:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37878 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728858AbgFZHrw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jun 2020 03:47:52 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1971AC08C5DB
+        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 00:47:52 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id dp18so8423656ejc.8
+        for <kvm@vger.kernel.org>; Fri, 26 Jun 2020 00:47:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=uilk6pA4v6KKUsLLMKY6bcWg9QtWqaF5/DWx18U/CC0=;
+        b=wNRHexa5s1zJiUOQyWtpLRXSG5ABe3ivQzpVwdwmn8o/tEZ3m+fyj4FO67sPTR7iGi
+         DpNfp1sF5xQI6z+w34Q0nCrcdbvULmc0+e1I8AwkbPv/n7tBvK9hQWB5afKP87qjKW06
+         AKTO4Ic3DR6pc55MzBsi6SUhapT0eVSocXd+lW+19x5PYMm8xySVNbEGipLDiYUeTeVV
+         cK+kzpFrFU3vZ6pjqQRkZj4aeFNbOMZ6nFAAh/Mr4AEKLD+UxIHEOX3PSGfZ1VYrpPSl
+         C+jhxyMXPeiK8p3tM4y8nLAf39PmbenImLBlqlgNyJa2RI/2nWh4gggsgzCCsz1g3Flx
+         Wr3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=s0r92vpPNUuJ5d0ss49/zV+F8au5GdLIRCKpG3jKSAA=;
-        b=T9WuUtvOjxhMD6Mq7yXFeh9KJDkaUxWA6lgzsemRcTa1PGDw7emYHI0y5A4XY5JLVh
-         Xl/TdhdK1LInhzNyHvdf7RvblNym2RxkHKzqUpSGLSphdzl7rczw0qZCF55a/2OcRjWc
-         BRgLU8AT2f+CpnFcXQ0AaU0Ume/cRV10hDEhFoY+4AqiW81OQUt8UzKVx9inGZDRil0s
-         tkWPKesiVhYWMFAQpjWdHzIhEQLNVd1xr4Dh88dRn8hMcFHChYEfvyzWQ3hT0+c8c1Ny
-         27VkRdUjyhf2EgpZjb2sFvvQsKf5JP9Y+mPoEdB9QPn5cFFxmOM91TgKaTXU+Lrqn06D
-         ulqg==
-X-Gm-Message-State: AOAM533Jpem2cFwMVyMe2mkHlZS75Y+1vDyojBFZp1IvwyqbMkvubbwy
-        dkSIMzydDnBcHBSg6KwMfOMa0ZawBwU6R1NtLbt7NCVRS4HDNtvy0Yl0rBfq5f05zxJDZ7n8alt
-        DqWfnQPGuSyfU
-X-Received: by 2002:a1c:e209:: with SMTP id z9mr1976603wmg.153.1593157118049;
-        Fri, 26 Jun 2020 00:38:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXc1SO408Hl23Nzc/21/+jA8Rn/l+R/j3FpV4K6qTif0B9i/uhH+LvKKpNaV8umOIp4TGiig==
-X-Received: by 2002:a1c:e209:: with SMTP id z9mr1976576wmg.153.1593157117777;
-        Fri, 26 Jun 2020 00:38:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:91d0:a5f0:9f34:4d80? ([2001:b07:6468:f312:91d0:a5f0:9f34:4d80])
-        by smtp.gmail.com with ESMTPSA id h29sm38085551wrc.78.2020.06.26.00.38.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Jun 2020 00:38:37 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] x86: move IDT away from address 0
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     kvm <kvm@vger.kernel.org>, mcondotta@redhat.com,
-        Thomas Huth <thuth@redhat.com>
-References: <20200624165455.19266-1-pbonzini@redhat.com>
- <8926010E-3AC0-4707-B1E2-A8DF576660F9@gmail.com>
- <ded0805e-15a4-5af8-0edd-10f9c9cf57d7@redhat.com>
- <1b981258-6b03-a120-622f-8e597570ed53@redhat.com>
- <F270BE77-F66B-42CC-B6BE-D4D3272B9F17@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6dd03c38-9689-84c4-04ab-aaa79bbadd6a@redhat.com>
-Date:   Fri, 26 Jun 2020 09:38:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uilk6pA4v6KKUsLLMKY6bcWg9QtWqaF5/DWx18U/CC0=;
+        b=GCJpaJEgOez0wIw9V3YfkWDzjuCeIy+ARcSa7Zj0yywA85+d/8xCQYwcVixzfAxA68
+         ZG/XVM5UC3kVoI40y51K5whrOw4nhGz6+i/yep0TNIfIwThJjgsa1ximo8k7CoRyc530
+         NIqwsacSzrcgaphXXv7JEcvN9L1UOz2VbX7R9OFrZl3t0evGWiAvaNyckOyLuDxMNnmz
+         CeDwQaDXI/vNyW0X2gMauhz6xo0151XRvrgQGwEFOe0X9fqHEPqrhbTeMOhr+26M00sN
+         7buI1qh4O3otq+5j3GKTmzqVwSMwGDlH3TcuTCP/7chm0l1VmZZsDFLZ5ORbfzW9Xg2i
+         jccA==
+X-Gm-Message-State: AOAM532QnjNMOpLXLiHBkxFTsTjyZMPo5IjssRfO4TiqkKSC/m4N62QY
+        JMcKc3F/Y5yI50FN75zP1Rq60w==
+X-Google-Smtp-Source: ABdhPJz95Ad9tZXwAAZZfpGTo9871UG/cCB3/qufTsd1aPfFz2/WXFO57hB5+K4dVtoXfNQLW+GeCg==
+X-Received: by 2002:a17:906:c14f:: with SMTP id dp15mr1444508ejc.454.1593157670667;
+        Fri, 26 Jun 2020 00:47:50 -0700 (PDT)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+        by smtp.gmail.com with ESMTPSA id be2sm8717486edb.92.2020.06.26.00.47.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jun 2020 00:47:50 -0700 (PDT)
+Date:   Fri, 26 Jun 2020 09:47:38 +0200
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, eric.auger@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org, kevin.tian@intel.com,
+        jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
+        jun.j.tian@intel.com, yi.y.sun@intel.com, peterx@redhat.com,
+        hao.wu@intel.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH v3 02/14] iommu: Report domain nesting info
+Message-ID: <20200626074738.GA2107508@myrica>
+References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
+ <1592988927-48009-3-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <F270BE77-F66B-42CC-B6BE-D4D3272B9F17@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1592988927-48009-3-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/06/20 09:06, Nadav Amit wrote:
->> Actually the IDTR is not reloaded by exec_in_big_real_mode, so this
->> (while a bit weird) works fine.
-> Err… So it means I need to debug why it does not work for *me*…
+On Wed, Jun 24, 2020 at 01:55:15AM -0700, Liu Yi L wrote:
+> IOMMUs that support nesting translation needs report the capability info
+> to userspace, e.g. the format of first level/stage paging structures.
+> 
+> This patch reports nesting info by DOMAIN_ATTR_NESTING. Caller can get
+> nesting info after setting DOMAIN_ATTR_NESTING.
+> 
+> v2 -> v3:
+> *) remvoe cap/ecap_mask in iommu_nesting_info.
+> *) reuse DOMAIN_ATTR_NESTING to get nesting info.
+> *) return an empty iommu_nesting_info for SMMU drivers per Jean'
+>    suggestion.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> ---
+>  drivers/iommu/arm-smmu-v3.c | 29 ++++++++++++++++++++--
+>  drivers/iommu/arm-smmu.c    | 29 ++++++++++++++++++++--
 
-Hmm, maybe a dislike for an IDT that is placed above the first MiB of
-memory?  But I cannot read anything about it in the manuals.
+Looks reasonable to me. Please move the SMMU changes to a separate patch
+and Cc the SMMU maintainers:
 
-In any case I would accept a patch that switches to the "usual" address
-0 IDT in exec_big_real_mode.
+Cc: Will Deacon <will@kernel.org>
+Cc: Robin Murphy <robin.murphy@arm.com>
 
-Paolo
+Thanks,
+Jean
 
+>  include/uapi/linux/iommu.h  | 59 +++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 113 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+> index f578677..0c45d4d 100644
+> --- a/drivers/iommu/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm-smmu-v3.c
+> @@ -3019,6 +3019,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+>  	return group;
+>  }
+>  
+> +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
+> +					void *data)
+> +{
+> +	struct iommu_nesting_info *info = (struct iommu_nesting_info *) data;
+> +	u32 size;
+> +
+> +	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> +		return -ENODEV;
+> +
+> +	size = sizeof(struct iommu_nesting_info);
+> +
+> +	/*
+> +	 * if provided buffer size is not equal to the size, should
+> +	 * return 0 and also the expected buffer size to caller.
+> +	 */
+> +	if (info->size != size) {
+> +		info->size = size;
+> +		return 0;
+> +	}
+> +
+> +	/* report an empty iommu_nesting_info for now */
+> +	memset(info, 0x0, size);
+> +	info->size = size;
+> +	return 0;
+> +}
+> +
+>  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  				    enum iommu_attr attr, void *data)
+>  {
+> @@ -3028,8 +3054,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  	case IOMMU_DOMAIN_UNMANAGED:
+>  		switch (attr) {
+>  		case DOMAIN_ATTR_NESTING:
+> -			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
+> -			return 0;
+> +			return arm_smmu_domain_nesting_info(smmu_domain, data);
+>  		default:
+>  			return -ENODEV;
+>  		}
+> diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+> index 243bc4c..908607d 100644
+> --- a/drivers/iommu/arm-smmu.c
+> +++ b/drivers/iommu/arm-smmu.c
+> @@ -1506,6 +1506,32 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+>  	return group;
+>  }
+>  
+> +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain *smmu_domain,
+> +					void *data)
+> +{
+> +	struct iommu_nesting_info *info = (struct iommu_nesting_info *) data;
+> +	u32 size;
+> +
+> +	if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> +		return -ENODEV;
+> +
+> +	size = sizeof(struct iommu_nesting_info);
+> +
+> +	/*
+> +	 * if provided buffer size is not equal to the size, should
+> +	 * return 0 and also the expected buffer size to caller.
+> +	 */
+> +	if (info->size != size) {
+> +		info->size = size;
+> +		return 0;
+> +	}
+> +
+> +	/* report an empty iommu_nesting_info for now */
+> +	memset(info, 0x0, size);
+> +	info->size = size;
+> +	return 0;
+> +}
+> +
+>  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  				    enum iommu_attr attr, void *data)
+>  {
+> @@ -1515,8 +1541,7 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+>  	case IOMMU_DOMAIN_UNMANAGED:
+>  		switch (attr) {
+>  		case DOMAIN_ATTR_NESTING:
+> -			*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
+> -			return 0;
+> +			return arm_smmu_domain_nesting_info(smmu_domain, data);
+>  		default:
+>  			return -ENODEV;
+>  		}
+> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+> index 1afc661..898c99a 100644
+> --- a/include/uapi/linux/iommu.h
+> +++ b/include/uapi/linux/iommu.h
+> @@ -332,4 +332,63 @@ struct iommu_gpasid_bind_data {
+>  	} vendor;
+>  };
+>  
+> +/*
+> + * struct iommu_nesting_info - Information for nesting-capable IOMMU.
+> + *				user space should check it before using
+> + *				nesting capability.
+> + *
+> + * @size:	size of the whole structure
+> + * @format:	PASID table entry format, the same definition with
+> + *		@format of struct iommu_gpasid_bind_data.
+> + * @features:	supported nesting features.
+> + * @flags:	currently reserved for future extension.
+> + * @data:	vendor specific cap info.
+> + *
+> + * +---------------+----------------------------------------------------+
+> + * | feature       |  Notes                                             |
+> + * +===============+====================================================+
+> + * | SYSWIDE_PASID |  Kernel manages PASID in system wide, PASIDs used  |
+> + * |               |  in the system should be allocated by host kernel  |
+> + * +---------------+----------------------------------------------------+
+> + * | BIND_PGTBL    |  bind page tables to host PASID, the PASID could   |
+> + * |               |  either be a host PASID passed in bind request or  |
+> + * |               |  default PASIDs (e.g. default PASID of aux-domain) |
+> + * +---------------+----------------------------------------------------+
+> + * | CACHE_INVLD   |  mandatory feature for nesting capable IOMMU       |
+> + * +---------------+----------------------------------------------------+
+> + *
+> + */
+> +struct iommu_nesting_info {
+> +	__u32	size;
+> +	__u32	format;
+> +	__u32	features;
+> +#define IOMMU_NESTING_FEAT_SYSWIDE_PASID	(1 << 0)
+> +#define IOMMU_NESTING_FEAT_BIND_PGTBL		(1 << 1)
+> +#define IOMMU_NESTING_FEAT_CACHE_INVLD		(1 << 2)
+> +	__u32	flags;
+> +	__u8	data[];
+> +};
+> +
+> +/*
+> + * struct iommu_nesting_info_vtd - Intel VT-d specific nesting info
+> + *
+> + *
+> + * @flags:	VT-d specific flags. Currently reserved for future
+> + *		extension.
+> + * @addr_width:	The output addr width of first level/stage translation
+> + * @pasid_bits:	Maximum supported PASID bits, 0 represents no PASID
+> + *		support.
+> + * @cap_reg:	Describe basic capabilities as defined in VT-d capability
+> + *		register.
+> + * @ecap_reg:	Describe the extended capabilities as defined in VT-d
+> + *		extended capability register.
+> + */
+> +struct iommu_nesting_info_vtd {
+> +	__u32	flags;
+> +	__u16	addr_width;
+> +	__u16	pasid_bits;
+> +	__u64	cap_reg;
+> +	__u64	ecap_reg;
+> +};
+> +
+>  #endif /* _UAPI_IOMMU_H */
+> -- 
+> 2.7.4
+> 
