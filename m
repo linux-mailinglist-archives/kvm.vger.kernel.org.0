@@ -2,56 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6F4720AD91
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:53:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E3DA20AEAE
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 11:02:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728846AbgFZHxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 03:53:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40072 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728683AbgFZHxJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Jun 2020 03:53:09 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05Q7WplL124203;
-        Fri, 26 Jun 2020 03:53:07 -0400
+        id S1725876AbgFZJCc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 05:02:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42894 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725820AbgFZJCc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Jun 2020 05:02:32 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 05Q8XIhh134679;
+        Fri, 26 Jun 2020 05:02:13 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31ux0153nm-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31ux04d55j-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Jun 2020 03:53:07 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05Q7YB1G130366;
-        Fri, 26 Jun 2020 03:53:06 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 31ux0153mx-1
+        Fri, 26 Jun 2020 05:02:12 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 05Q8XJtk134695;
+        Fri, 26 Jun 2020 05:02:11 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 31ux04d52e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Jun 2020 03:53:06 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05Q7p0RF017302;
-        Fri, 26 Jun 2020 07:53:05 GMT
+        Fri, 26 Jun 2020 05:02:11 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 05Q90noQ027936;
+        Fri, 26 Jun 2020 09:02:03 GMT
 Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 31v7fwh0c7-1
+        by ppma03ams.nl.ibm.com with ESMTP id 31uus52u6v-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Jun 2020 07:53:05 +0000
+        Fri, 26 Jun 2020 09:02:02 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05Q7r2bK2490842
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 05Q91xDJ1507808
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 26 Jun 2020 07:53:02 GMT
+        Fri, 26 Jun 2020 09:02:00 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A3C14C044;
-        Fri, 26 Jun 2020 07:53:02 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D650F4C05C;
+        Fri, 26 Jun 2020 09:01:59 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9D5B94C046;
-        Fri, 26 Jun 2020 07:53:01 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 06AC34C040;
+        Fri, 26 Jun 2020 09:01:59 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.191.93])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 26 Jun 2020 07:53:01 +0000 (GMT)
-Subject: Re: [PATCH v2 0/2] s390: Add API Docs for DIAGNOSE 0x318 and fix rst
-To:     Collin Walling <walling@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     pbonzini@redhat.com, borntraeger@de.ibm.com, david@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com, thuth@redhat.com
-References: <20200625150724.10021-1-walling@linux.ibm.com>
+        Fri, 26 Jun 2020 09:01:58 +0000 (GMT)
+Subject: Re: [PATCH v3 0/9] Generalize memory encryption models
+To:     David Hildenbrand <david@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+Cc:     pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
+        mst@redhat.com, Cornelia Huck <cohuck@redhat.com>,
+        qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        dgilbert@redhat.com, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, pbonzini@redhat.com,
+        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
+ <e045e202-cd56-4ddc-8c1d-a2fe5a799d32@redhat.com>
+ <20200619114526.6a6f70c6.cohuck@redhat.com>
+ <79890826-f67c-2228-e98d-25d2168be3da@redhat.com>
+ <20200619120530.256c36cb.cohuck@redhat.com>
+ <358d48e5-4c57-808b-50da-275f5e2a352c@redhat.com>
+ <20200622140254.0dbe5d8c.cohuck@redhat.com>
+ <20200625052518.GD172395@umbus.fritz.box>
+ <025fb54b-60b7-a58b-e3d7-1bbaad152c5c@redhat.com>
+ <20200626044259.GK172395@umbus.fritz.box>
+ <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -95,89 +109,146 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Message-ID: <1c737c33-24e3-82c5-a514-3931e6f9bb5a@linux.ibm.com>
-Date:   Fri, 26 Jun 2020 09:53:00 +0200
+Message-ID: <a3c05575-6fb2-8d1b-f6d9-2eabf3f4082d@linux.ibm.com>
+Date:   Fri, 26 Jun 2020 11:01:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200625150724.10021-1-walling@linux.ibm.com>
+In-Reply-To: <892533f8-cd3c-e282-58c2-4212eb3a84b8@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6"
+ boundary="o0wnudrGTveFKQZVihsDES1creHCyYN8y"
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.687
  definitions=2020-06-26_04:2020-06-26,2020-06-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- clxscore=1015 bulkscore=0 cotscore=-2147483648 mlxlogscore=999
- phishscore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0
- priorityscore=1501 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2006260050
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1011
+ lowpriorityscore=0 phishscore=0 impostorscore=0 cotscore=-2147483648
+ bulkscore=0 adultscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
+ spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2006260062
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6
-Content-Type: multipart/mixed; boundary="0a4vBZZE3h9P6sG4TWnhjJZjvAJhes9ms"
+--o0wnudrGTveFKQZVihsDES1creHCyYN8y
+Content-Type: multipart/mixed; boundary="PyWDNMOefQZvCcwQaNVtxm6rFyxcGIGp2"
 
---0a4vBZZE3h9P6sG4TWnhjJZjvAJhes9ms
-Content-Type: text/plain; charset=utf-8
+--PyWDNMOefQZvCcwQaNVtxm6rFyxcGIGp2
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 6/25/20 5:07 PM, Collin Walling wrote:
-> Changelog:
->=20
->     v2
->=20
->     =E2=80=A2 Reworded patch 1 doc text
->=20
->     =E2=80=A2 Added "Introduced in commit..." for rst fix patch
->=20
->     =E2=80=A2 Added r-b's (thanks!)
->=20
-> Adds documentation for the s390-specfic DIAGNOSE 0x318 instruction, as
-> well as fixes some missing rst symbols for the neighboring entries.
->=20
-> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+On 6/26/20 8:53 AM, David Hildenbrand wrote:
+>>>>> Does this have any implications when probing with the 'none' machin=
+e?
+>>>>
+>>>> I'm not sure.  In your case, I guess the cpu bit would still show up=
 
-thanks, applied
+>>>> as before, so it would tell you base feature availability, but not
+>>>> whether you can use the new configuration option.
+>>>>
+>>>> Since the HTL option is generic, you could still set it on the "none=
+"
+>>>> machine, though it wouldn't really have any effect.  That is, if you=
+
+>>>> could create a suitable object to point it at, which would depend on=
+
+>>>> ... details.
+>>>>
+>>>
+>>> The important point is that we never want the (expanded) host cpu mod=
+el
+>>> look different when either specifying or not specifying the HTL
+>>> property.
+>>
+>> Ah, yes, I see your point.  So my current suggestion will satisfy
+>> that, basically it is:
+>>
+>> cpu has unpack (inc. by default) && htl specified
+>> 	=3D> works (allowing secure), as expected
+>=20
+> ack
+>=20
+>>
+>> !cpu has unpack && htl specified
+>> 	=3D> bails out with an error
+>=20
+> ack
+>=20
+>>
+>> !cpu has unpack && !htl specified
+>> 	=3D> works for a non-secure guest, as expected
+>> 	=3D> guest will fail if it attempts to go secure
+>=20
+> ack, behavior just like running on older hw without unpack
+>=20
+>>
+>> cpu has unpack && !htl specified
+>> 	=3D> works as expected for a non-secure guest (unpack feature is
+>> 	   present, but unused)
+>> 	=3D> secure guest may work "by accident", but only if all virtio
+>> 	   properties have the right values, which is the user's
+>> 	   problem
+>>
+>> That last case is kinda ugly, but I think it's tolerable.
+>=20
+> Right, we must not affect non-secure guests, and existing secure setups=
+
+> (e.g., older qemu machines). Will have to think about this some more,
+> but does not sound too crazy.
+
+I severely dislike having to specify things to make PV work.
+The IOMMU is already a thorn in our side and we're working on making the
+whole ordeal completely transparent so the only requirement to make this
+work is the right machine, kernel, qemu and kernel cmd line option
+"prot_virt=3D1". That's why we do the reboot into PV mode in the first pl=
+ace.
+
+I.e. the goal is that if customers convert compatible guests into
+protected ones and start them up on a z15 on a distro with PV support
+they can just use the guest without having to change XML or command line
+parameters.
+
+Internal customers have already created bugs because they did not follow
+the documentation and the more cmd options we bring the more bugzillas
+we'll get.
+
+PV is already in the field/GA and can be ordered, as is our documentation=
+=2E
+
+@Christian: Please chime in here
 
 >=20
-> Collin Walling (2):
->   docs: kvm: add documentation for KVM_CAP_S390_DIAG318
->   docs: kvm: fix rst formatting
->=20
->  Documentation/virt/kvm/api.rst | 27 ++++++++++++++++++++++++---
->  1 file changed, 24 insertions(+), 3 deletions(-)
+> Thanks!
 >=20
 
 
 
---0a4vBZZE3h9P6sG4TWnhjJZjvAJhes9ms--
+--PyWDNMOefQZvCcwQaNVtxm6rFyxcGIGp2--
 
---Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6
+--o0wnudrGTveFKQZVihsDES1creHCyYN8y
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl71qV0ACgkQ41TmuOI4
-ufhujhAAkJ0dxtwLTvboDRrmHcYYQHIPcxXMScS1zOBW0AScNun7VtjvFUTdE2fT
-vsdEVtHD05z2uVSLruMl4sDMMjDH3jyLabP0UEhdmSWyVe10sLDpMcro62lHEbE4
-vp1VrTPI9YquUPUaHNECVGJ7jinWR60ERf+ZcruXc7WzhdLfvR6e1X+VR/9SiheL
-AyJ3gQpcTXu7f845y2fNXyVjrZIZnLwRPibNP+tiWS1nKp99A23UvwwtZevGYKGw
-9O+bBpcqr4uiyDCS5s7Oh6wa9V2Y9OPtA9j5D9h5smb5rOM+AO/EWxleOP2KL/7g
-KAD5uh8iwTRWj/S4dt3qblShE1RR91KqMPwj+jO+73XHJUyGl6l53wV9L3hAagyL
-guXqe1ciXu/Hu63L06tDcroiM88kvJyswLxwBZFEM+q8p+khAdHccSgsT2AN4QMX
-kpo3vLgDdj9Mk1u126ei5dW0g1xla8jGP45zILhsoyWkPp5/j+LpxeOBP5D1x6dW
-R4fbAINSkdhDfd2rJMunSSkRvsf5Ch49Aq0knDq/KxIjsR6EY5x3RgfmOaXMSYAV
-hHKQDlB9sek8sVSQE9kRzwfNV1DWtsdlcMLBxCQFExYdCBeucCTJaNHCFoTdpL/B
-8IB/klBsiwTnbpcuBwXvh9Cj5fSXE/DSjVyxMKTmMOaQk1d7jpA=
-=apDD
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl71uYYACgkQ41TmuOI4
+ufh+hA/9Ew+NYmS9OZ7ysDBd+nuPwAvjL3nfozml/up8dRizMntrRlzATKd0jvtL
+JxP6ZANUjyWPT0BN0fJRgH3hsugvMjQ3W9jeVtPYN7RoPnv3ffSd5H5qDL6TA2Je
+NReItg5BJXNEk+PhAOlIoKdfyjHu0ptWM2zdtF27JHk/hrBMhby7jYdpssLNI3XJ
+FIRYt9iea0KVfVyhhn66Ts1ZCBFwULR3mkH3kEpeQ6I7qUA5hrfT4bz8OCIhSIsv
+mHOYDORdfv8dYeIdxdtK2dw311+/OS/4cliQnEM2s0rzTg947L3zh3rHQ4/ymT9B
+8sogwzZLbMryvqLnHJT1WXTMzZHI6uDsRfn8b/Zoddyi99k1Lpc1lnjoWtDMMk4e
+LDMB5bNNB045MwA5bIlzSpvJOqX02QiFP/23Eq2lwHXtEYrf///xZcp1q6jaTUdw
+IYBWVyOFSnt5NrT/ZSKQYAHPBYvCBCj4wZsVeS6imBhlf5iJLfSvqKWRG3rbPpyP
+ToTFuyhbIAf5VPyw/sJ1k0ssv7k3cccCBrNdl8rH43r2qAyeYcFuCPPZ3aOil6Fm
+i4jSw2cqTMfthz5C1hV5PLsQ6CpOgfBYRZ0E7yOG9s7eMkY4ngNJnAuZ4NCeHaM4
+DbUwzB7/mvnMTcEP3wd4Oeg2OrwNDiUm519lJrW/RuTMOkKB9eo=
+=aF15
 -----END PGP SIGNATURE-----
 
---Ms35jRd0TPvx7oMlttJBslfaZq6dLGTq6--
+--o0wnudrGTveFKQZVihsDES1creHCyYN8y--
 
