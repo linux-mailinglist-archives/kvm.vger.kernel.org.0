@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F09D020AD06
-	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:24:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84C9320AD08
+	for <lists+kvm@lfdr.de>; Fri, 26 Jun 2020 09:24:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728745AbgFZHYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jun 2020 03:24:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59562 "EHLO
+        id S1728748AbgFZHYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jun 2020 03:24:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27883 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728735AbgFZHYw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jun 2020 03:24:52 -0400
+        with ESMTP id S1728746AbgFZHYy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jun 2020 03:24:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593156291;
+        s=mimecast20190719; t=1593156293;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QV/i1z2MdoLcEveXzKrfJK9Ga4VeN9xqfQfrvYILfX0=;
-        b=MYK9NZhlcBM64mhuN4WuQUJ2k0MfDOPI/E3Rko51HRPjvYqmtd3kT/e76pLw18Pir3ax2B
-        1smdG4NSRh/98DKT4sALmScDPzOdfgLGIP+yKot+tDjfx/KQ8c7kBGm5O1xEQEWO0ztcds
-        D3kjLuAYouwcq9fmuDSSBJmexat3Vx4=
+        bh=890zCM1i2w9vNLJBA0onUmcgxu4k65J2G8qmPmDeVrU=;
+        b=d/x2a19aDjB5Mm/9u8abVZjL2aITgGO5ECXnggMPxF4QK3eh29Ti3wJSOEBzB0lvVB69Ck
+        a+jBPEpZ0COW3HoykjV6zGASg1heqO/bdq7kLFXifyk9MhzjnFyuXiig0f00U6zW2qVCqS
+        OdiONLXGtEyVUb2eLOOnGuSvr0kGMJI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-O7EhWTsyPK-tQ04PiLPOCA-1; Fri, 26 Jun 2020 03:24:49 -0400
-X-MC-Unique: O7EhWTsyPK-tQ04PiLPOCA-1
+ us-mta-363-K7Db4um-NxyqZ-KDZv-sGQ-1; Fri, 26 Jun 2020 03:24:51 -0400
+X-MC-Unique: K7Db4um-NxyqZ-KDZv-sGQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BCD2464;
-        Fri, 26 Jun 2020 07:24:48 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 406E8804001;
+        Fri, 26 Jun 2020 07:24:50 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-35.ams2.redhat.com [10.36.113.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 469247C1FB;
-        Fri, 26 Jun 2020 07:24:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 68C781C8;
+        Fri, 26 Jun 2020 07:24:48 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
@@ -42,9 +42,9 @@ Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
         Eduardo Habkost <ehabkost@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         David Hildenbrand <david@redhat.com>
-Subject: [PATCH v5 18/21] virtio-mem: Migration sanity checks
-Date:   Fri, 26 Jun 2020 09:22:45 +0200
-Message-Id: <20200626072248.78761-19-david@redhat.com>
+Subject: [PATCH v5 19/21] virtio-mem: Add trace events
+Date:   Fri, 26 Jun 2020 09:22:46 +0200
+Message-Id: <20200626072248.78761-20-david@redhat.com>
 In-Reply-To: <20200626072248.78761-1-david@redhat.com>
 References: <20200626072248.78761-1-david@redhat.com>
 MIME-Version: 1.0
@@ -55,105 +55,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We want to make sure that certain properties don't change during
-migration, especially to catch user errors in a nice way. Let's migrate
-a temporary structure and validate that the properties didn't change.
+Let's add some trace events that might come in handy later.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/virtio-mem.c | 70 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ hw/virtio/trace-events | 10 ++++++++++
+ hw/virtio/virtio-mem.c | 10 +++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 6427a0047d..292fc15e29 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -74,3 +74,13 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+ virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+ virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+ virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
++
++# virtio-mem.c
++virtio_mem_send_response(uint16_t type) "type=%" PRIu16
++virtio_mem_plug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_unplug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_unplugged_all(void) ""
++virtio_mem_unplug_all_request(void) ""
++virtio_mem_resized_usable_region(uint64_t old_size, uint64_t new_size) "old_size=0x%" PRIx64 "new_size=0x%" PRIx64
++virtio_mem_state_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
++virtio_mem_state_response(uint16_t state) "state=%" PRIu16
 diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index 2df33f9125..6ed5409669 100644
+index 6ed5409669..fdd4dbb42c 100644
 --- a/hw/virtio/virtio-mem.c
 +++ b/hw/virtio/virtio-mem.c
-@@ -519,12 +519,82 @@ static int virtio_mem_post_load(void *opaque, int version_id)
-     return virtio_mem_restore_unplugged(VIRTIO_MEM(opaque));
+@@ -30,6 +30,7 @@
+ #include "hw/boards.h"
+ #include "hw/qdev-properties.h"
+ #include "config-devices.h"
++#include "trace.h"
+ 
+ /*
+  * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
+@@ -100,6 +101,7 @@ static void virtio_mem_send_response(VirtIOMEM *vmem, VirtQueueElement *elem,
+     VirtIODevice *vdev = VIRTIO_DEVICE(vmem);
+     VirtQueue *vq = vmem->vq;
+ 
++    trace_virtio_mem_send_response(le16_to_cpu(resp->type));
+     iov_from_buf(elem->in_sg, elem->in_num, 0, resp, sizeof(*resp));
+ 
+     virtqueue_push(vq, elem, sizeof(*resp));
+@@ -195,6 +197,7 @@ static void virtio_mem_plug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     const uint16_t nb_blocks = le16_to_cpu(req->u.plug.nb_blocks);
+     uint16_t type;
+ 
++    trace_virtio_mem_plug_request(gpa, nb_blocks);
+     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, true);
+     virtio_mem_send_response_simple(vmem, elem, type);
+ }
+@@ -206,6 +209,7 @@ static void virtio_mem_unplug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     const uint16_t nb_blocks = le16_to_cpu(req->u.unplug.nb_blocks);
+     uint16_t type;
+ 
++    trace_virtio_mem_unplug_request(gpa, nb_blocks);
+     type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, false);
+     virtio_mem_send_response_simple(vmem, elem, type);
+ }
+@@ -225,6 +229,7 @@ static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
+         return;
+     }
+ 
++    trace_virtio_mem_resized_usable_region(vmem->usable_region_size, newsize);
+     vmem->usable_region_size = newsize;
  }
  
-+typedef struct VirtIOMEMMigSanityChecks {
-+    VirtIOMEM *parent;
-+    uint64_t addr;
-+    uint64_t region_size;
-+    uint64_t block_size;
-+    uint32_t node;
-+} VirtIOMEMMigSanityChecks;
-+
-+static int virtio_mem_mig_sanity_checks_pre_save(void *opaque)
-+{
-+    VirtIOMEMMigSanityChecks *tmp = opaque;
-+    VirtIOMEM *vmem = tmp->parent;
-+
-+    tmp->addr = vmem->addr;
-+    tmp->region_size = memory_region_size(&vmem->memdev->mr);
-+    tmp->block_size = vmem->block_size;
-+    tmp->node = vmem->node;
-+    return 0;
-+}
-+
-+static int virtio_mem_mig_sanity_checks_post_load(void *opaque, int version_id)
-+{
-+    VirtIOMEMMigSanityChecks *tmp = opaque;
-+    VirtIOMEM *vmem = tmp->parent;
-+    const uint64_t new_region_size = memory_region_size(&vmem->memdev->mr);
-+
-+    if (tmp->addr != vmem->addr) {
-+        error_report("Property '%s' changed from 0x%" PRIx64 " to 0x%" PRIx64,
-+                     VIRTIO_MEM_ADDR_PROP, tmp->addr, vmem->addr);
-+        return -EINVAL;
-+    }
-+    /*
-+     * Note: Preparation for resizeable memory regions. The maximum size
-+     * of the memory region must not change during migration.
-+     */
-+    if (tmp->region_size != new_region_size) {
-+        error_report("Property '%s' size changed from 0x%" PRIx64 " to 0x%"
-+                     PRIx64, VIRTIO_MEM_MEMDEV_PROP, tmp->region_size,
-+                     new_region_size);
-+        return -EINVAL;
-+    }
-+    if (tmp->block_size != vmem->block_size) {
-+        error_report("Property '%s' changed from 0x%" PRIx64 " to 0x%" PRIx64,
-+                     VIRTIO_MEM_BLOCK_SIZE_PROP, tmp->block_size,
-+                     vmem->block_size);
-+        return -EINVAL;
-+    }
-+    if (tmp->node != vmem->node) {
-+        error_report("Property '%s' changed from %" PRIu32 " to %" PRIu32,
-+                     VIRTIO_MEM_NODE_PROP, tmp->node, vmem->node);
-+        return -EINVAL;
-+    }
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_virtio_mem_sanity_checks = {
-+    .name = "virtio-mem-device/sanity-checks",
-+    .pre_save = virtio_mem_mig_sanity_checks_pre_save,
-+    .post_load = virtio_mem_mig_sanity_checks_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(addr, VirtIOMEMMigSanityChecks),
-+        VMSTATE_UINT64(region_size, VirtIOMEMMigSanityChecks),
-+        VMSTATE_UINT64(block_size, VirtIOMEMMigSanityChecks),
-+        VMSTATE_UINT32(node, VirtIOMEMMigSanityChecks),
-+        VMSTATE_END_OF_LIST(),
-+    },
-+};
-+
- static const VMStateDescription vmstate_virtio_mem_device = {
-     .name = "virtio-mem-device",
-     .minimum_version_id = 1,
-     .version_id = 1,
-     .post_load = virtio_mem_post_load,
-     .fields = (VMStateField[]) {
-+        VMSTATE_WITH_TMP(VirtIOMEM, VirtIOMEMMigSanityChecks,
-+                         vmstate_virtio_mem_sanity_checks),
-         VMSTATE_UINT64(usable_region_size, VirtIOMEM),
-         VMSTATE_UINT64(size, VirtIOMEM),
-         VMSTATE_UINT64(requested_size, VirtIOMEM),
+@@ -247,7 +252,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+         vmem->size = 0;
+         notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
+     }
+-
++    trace_virtio_mem_unplugged_all();
+     virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
+     return 0;
+ }
+@@ -255,6 +260,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+ static void virtio_mem_unplug_all_request(VirtIOMEM *vmem,
+                                           VirtQueueElement *elem)
+ {
++    trace_virtio_mem_unplug_all_request();
+     if (virtio_mem_unplug_all(vmem)) {
+         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_BUSY);
+     } else {
+@@ -272,6 +278,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+         .type = cpu_to_le16(VIRTIO_MEM_RESP_ACK),
+     };
+ 
++    trace_virtio_mem_state_request(gpa, nb_blocks);
+     if (!virtio_mem_valid_range(vmem, gpa, size)) {
+         virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ERROR);
+         return;
+@@ -284,6 +291,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+     } else {
+         resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_MIXED);
+     }
++    trace_virtio_mem_state_response(le16_to_cpu(resp.u.state.state));
+     virtio_mem_send_response(vmem, elem, &resp);
+ }
+ 
 -- 
 2.26.2
 
