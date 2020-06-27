@@ -2,89 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD5A820C494
-	for <lists+kvm@lfdr.de>; Sun, 28 Jun 2020 00:05:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B3A520C4BF
+	for <lists+kvm@lfdr.de>; Sun, 28 Jun 2020 00:45:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726672AbgF0WFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Jun 2020 18:05:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726316AbgF0WF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Jun 2020 18:05:29 -0400
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57237C061794
-        for <kvm@vger.kernel.org>; Sat, 27 Jun 2020 15:05:29 -0700 (PDT)
-Received: by mail-wm1-x343.google.com with SMTP id 17so12509333wmo.1
-        for <kvm@vger.kernel.org>; Sat, 27 Jun 2020 15:05:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=hDm0J70xfMLbVvceQHwxPddZCp69UMTk2d0jtKg2a8s=;
-        b=f9F4OeCeRmjyCn/l5zWRCnvqn8abBSCJ0Y8qujQ0kmxWn834D2fXcj9rvsWpCDPIuS
-         J4EoerIfxQNxbL3GXEU7ldfNRYPjw9+UDx+oUErzer3ipQGx1bMVBJ4GKw5qxwtLFKgm
-         GIGKX0Yf3u59BQOeDfpIf5jZ+3vnA0ZzLii/fzh6lT1DnoxV12hExchyOgRH8ZWUzh6h
-         YfJSqrAXwDwYWOkanSpTn/205IELx8NOzYqaPLRhLaj+p8d8Tqco8ZlQgP7W4AOriRZo
-         /C1JWu9y1DjEpYGijceZGziK7m0b44a1VzD/YaM40U0hZVpq1t42ddRbOo9XgyjTsiIU
-         X8hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=hDm0J70xfMLbVvceQHwxPddZCp69UMTk2d0jtKg2a8s=;
-        b=ZpvJdaDSwDigztXUWauyBSWrAWezEVu6Krdo4tj5xJbMUSuN6ccZYTK5XQ8l2G3F9q
-         GIGNuywEismblSqJiHUvRUoomePiwNZ+yMp3AbCdDNLilKpkl/il2TyB4oktb2tJLKGH
-         Wu+Z7Gc/E3TyZw6qeLM7sfu19W7rVtJnIgTIVSf0J2q2HtDZi4j6VnYF2fWkkzkhKc5h
-         aQzyczxUY1UPdDyfaArZ6PI+X0DCeV1KMUTtMw9HwHRTvia0/tTfl9wf+YQs0Ct2test
-         BDEG40mPwZp4R8gsN+TkTN2tNVELZAJKynZ8dYJYdEbIEREwq8aVMQU570VzqIxMBFXn
-         Gxng==
-X-Gm-Message-State: AOAM530kQe2eyr9ch7qvYiDDAFkOzyrMBYPTOaEdfE7IxKal5BZkoQjw
-        FOwJpeoRKwcMNo2koDVAIHUYxxYNUkoYiq2wPTsHRgHNhQg=
-X-Google-Smtp-Source: ABdhPJzB2PS1uLzfXnv9RJ9+8ywF0BTYmMReQpmFB2cwHUGJdFU/VqT1TPNRIciUkUVNxK28Z0jWU0doicUzCH8V5Ek=
-X-Received: by 2002:a7b:c043:: with SMTP id u3mr10377547wmc.185.1593295180142;
- Sat, 27 Jun 2020 14:59:40 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:adf:f187:0:0:0:0:0 with HTTP; Sat, 27 Jun 2020 14:59:39
- -0700 (PDT)
-Reply-To: un.org@i.ua
-From:   helen <upspostexpress@gmail.com>
-Date:   Sat, 27 Jun 2020 22:59:39 +0100
-Message-ID: <CA+HWcLeFxWA2HFg2eTDi9xRk8OKWn7oojHXSEX-EzsM7GcSGnA@mail.gmail.com>
-Subject: 
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1726738AbgF0WpN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Jun 2020 18:45:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43114 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725916AbgF0WpM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Jun 2020 18:45:12 -0400
+Subject: Re: [GIT PULL] VFIO fixes for v5.8-rc3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593297912;
+        bh=jyZZ18KkRpX5wgksdKr8kWB63rnqisWW7ZTZXJd/bhk=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=k7pnSZJM5uPbA2zSdf6K2PxlBbYGvt3E5TO4RC53cdm5YXyTdI3HWJl/CRZ1v1Cra
+         LrySvFRq1ELF/UwikyxfXLIDZXfzKqe3hd8vFDB30pLgCV2FkcM6s1DknexEyL11Ye
+         YufDKoGrcsLR1JjhJiMYGwt3WBKbejRfBLwXHfmM=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200627082518.38f98251@x1.home>
+References: <20200627082518.38f98251@x1.home>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200627082518.38f98251@x1.home>
+X-PR-Tracked-Remote: git://github.com/awilliam/linux-vfio.git
+ tags/vfio-v5.8-rc3
+X-PR-Tracked-Commit-Id: ebfa440ce38b7e2e04c3124aa89c8a9f4094cf21
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: c322f5399fc36300ae870db8fbcf793e063aaae5
+Message-Id: <159329791253.3578.13577951558627313676.pr-tracker-bot@kernel.org>
+Date:   Sat, 27 Jun 2020 22:45:12 +0000
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-MONEY-GRAM TRANSFERRED PAYMENT INFO:
+The pull request you sent on Sat, 27 Jun 2020 08:25:18 -0600:
 
-Below is the sender=E2=80=99s information
+> git://github.com/awilliam/linux-vfio.git tags/vfio-v5.8-rc3
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c322f5399fc36300ae870db8fbcf793e063aaae5
 
+Thank you!
 
-1. MG. REFERENCE NO#: 36360857
-
-2. SENDER'S NAME: Johnson Williams
-
-3. AMOUNT TO PICKUP: US$10,000
-
-
-
-Go to any Money Gram office near you and pick up the payment Track the
-
-Reference Number by visiting and click the link below
-
-(https://secure.moneygram.com/embed/track) and enter the Reference
-
-Number: 36360857 and the Last Name: Williams, you will find the payment
-
-available for pickup instantly.
-
-Yours Sincerely,
-
-Mrs. Helen Marvis
-United Nations Liaison Office
-Directorate for International Payments
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
