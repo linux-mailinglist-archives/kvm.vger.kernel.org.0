@@ -2,128 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A5FB20E00B
-	for <lists+kvm@lfdr.de>; Mon, 29 Jun 2020 23:56:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 903C020E048
+	for <lists+kvm@lfdr.de>; Mon, 29 Jun 2020 23:56:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388884AbgF2UmP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jun 2020 16:42:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43356 "EHLO
+        id S2388942AbgF2Uol (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jun 2020 16:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731629AbgF2TOF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jun 2020 15:14:05 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F154C00877C;
-        Mon, 29 Jun 2020 02:24:52 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id j18so14678585wmi.3;
-        Mon, 29 Jun 2020 02:24:52 -0700 (PDT)
+        with ESMTP id S1731594AbgF2TN7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jun 2020 15:13:59 -0400
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E1BBC00877D
+        for <kvm@vger.kernel.org>; Mon, 29 Jun 2020 02:26:50 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id k6so15806819wrn.3
+        for <kvm@vger.kernel.org>; Mon, 29 Jun 2020 02:26:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Ld9UvqUlCnaDa6Nr3mgdlVma1GzBMI5TiJRPCMQofBE=;
-        b=nwiUy9yd09ET9XzcpcuXez3fMHQncNtE8g7djjkGgNt2GR+i//HlDlD37trW1/VkEv
-         816mnzjBNfxUnnGthrCdGeibMQDDOYLZh2pTjsf38WtAXbWqWCsP0eAGT8SSXiNlX35y
-         H8dYrWISxUff+AHAT3X2ZCH+jBq0N9R15IY8Xa95ER+hDlDDOEhMdSWaaCG5z1rpkQRL
-         kzHTatKOeVnb+VeXWALxLiJ3TozcMod7N2rqSrV9IiZJD9vhAaan8CWoKiESTNpeTXTt
-         VZPYjg9GrERjBs0f2V6Bb+u4jSAzsd9Lwvg8x3x1Mj7Rd8DXQY06jouGdiyjp3Xx16tX
-         hBFA==
+        bh=2ag+08nSeSr6EqkiGuHLlAELsHQApzSuYKPqMWgc+aA=;
+        b=sGVxejwGSDuSw2Q1kO4cvm5jx1DmxMYSYraHX6cHuB0RJNXu+AVUG/392jEMAZWFiN
+         rqLodF1hAY1isTwa7TGAF8sPw782rX09KHEpMQdnR+ZGr7IbQN05/7Q1GhPT2X10V5bz
+         Xbm+tPkA2azeZ55pSjdePfxWMcem9WNDIjN/Iv309PoMB9CapVAIiTG4zzQlT+ygA+kP
+         Myn5f74stAiNV+OrA0CvqIucteZ8PjjPq3oq2c6GQZiJT75JdNsfRrbLRkZBsmjVtvs+
+         9MgsGDOI2yj9taw/BsNjwj2dixG2tsffTsOwt6S3vPEdQt/6Altn4pm/WlhI1TM/pIf5
+         EKkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Ld9UvqUlCnaDa6Nr3mgdlVma1GzBMI5TiJRPCMQofBE=;
-        b=hVVIlbEM1Lykw6X7OLdITW+mu+ovzirOiLFcFx5luMpjwLzR7FNL+HV2W6h21MVMic
-         sSk1kX7no7M0YC4jVliTdrvWtMweiFFKD6JYbeYJxePerc7BSKrj0y6TdxfHMY7Gpuna
-         cNjb3qgcuiHSkHUlI3JRiwftGsbj8ZZBtiEZcHJ0yo2KbMbU3XaTQRt72oMkmZ3HhjM6
-         LN0T23UiZ0mS2/pqNZyvLxZm/sit+3FdWAOHuJrNNtpbfkVwMkJBx4GJ7CNO4LEtwN13
-         qKMxk2fxxWn7I962cfLrmOnaPFyxmoFqtKoNHf+ZEAdiIHVHXj2sAvM/wmD7hPWOnoaO
-         VdOQ==
-X-Gm-Message-State: AOAM530aCK40ceLLgZGP6Uj2+gMZSFoS8YvzP/oO7tEDJRsO0iY2T1Qn
-        uJ2ASlct/p6bn089KN2X5JY=
-X-Google-Smtp-Source: ABdhPJw2RkUG8Z0dPKHKb4TAjtfyGZ1T5JajSYZC/wPGfYi1xn86DVsJzfXAObmKns0fDMcS6MpByg==
-X-Received: by 2002:a1c:e285:: with SMTP id z127mr15922880wmg.162.1593422691054;
-        Mon, 29 Jun 2020 02:24:51 -0700 (PDT)
+        bh=2ag+08nSeSr6EqkiGuHLlAELsHQApzSuYKPqMWgc+aA=;
+        b=kGT9Gje/u8w86VSJK4UhQTU8oU2cdNcTrTMwlEOXyxFcNUv+NpgFRZwn3+XwJkekn9
+         AVz5hXGcMWWWidbAxyKB235kHEo9sx2nAN9HZmN3MGPiiCxwwXeZZk3MFxMEOH5kIiZI
+         QEYFhVMO48Vt+JpsdigAFbfjWDfxP/Ti8m5nFbgHhMdjjAK6n7yLNFLyr5LF5REH4jkl
+         yTuTJ/SSzZoAzrEJdOz13GJu0i6qwSaQowGnGRAwGD00r37Qr4nyJuJXnGkhUKMnCVqC
+         rBXixdP7uWNEJTcydHVTIFQT+EVthlUPMCGjjeYd/54g+yoseafjmYOicTWtFN2gU2hI
+         Gfdg==
+X-Gm-Message-State: AOAM530IWzHl0cH1B9SxI5UDADkJd+8V6rDUZsqwbk8TjamZEa9ss6d5
+        WY8skOZMhj+wzwbn1Ko4zd8=
+X-Google-Smtp-Source: ABdhPJw2AMURrJPby179MwG4mhz9UG670amev/bcvGRiECK4d8FyEybeGQpKxfxKTP0KVngy0h617A==
+X-Received: by 2002:a5d:4603:: with SMTP id t3mr17395732wrq.38.1593422809180;
+        Mon, 29 Jun 2020 02:26:49 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id w2sm38771557wrs.77.2020.06.29.02.24.49
+        by smtp.gmail.com with ESMTPSA id l18sm19774398wrm.52.2020.06.29.02.26.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jun 2020 02:24:50 -0700 (PDT)
-Date:   Mon, 29 Jun 2020 10:24:48 +0100
+        Mon, 29 Jun 2020 02:26:48 -0700 (PDT)
+Date:   Mon, 29 Jun 2020 10:26:46 +0100
 From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, eric.auger@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org, kevin.tian@intel.com,
-        jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
-        jun.j.tian@intel.com, yi.y.sun@intel.com, jean-philippe@linaro.org,
-        peterx@redhat.com, hao.wu@intel.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 02/14] iommu: Report domain nesting info
-Message-ID: <20200629092448.GB31392@stefanha-x1.localdomain>
-References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
- <1592988927-48009-3-git-send-email-yi.l.liu@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [RFC 0/3] virtio: NUMA-aware memory allocation
+Message-ID: <20200629092646.GC31392@stefanha-x1.localdomain>
+References: <20200625135752.227293-1-stefanha@redhat.com>
+ <9cd725b5-4954-efd9-4d1b-3a448a436472@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="O5XBE6gyVG5Rl6Rj"
+        protocol="application/pgp-signature"; boundary="m51xatjYGsM+13rf"
 Content-Disposition: inline
-In-Reply-To: <1592988927-48009-3-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <9cd725b5-4954-efd9-4d1b-3a448a436472@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---O5XBE6gyVG5Rl6Rj
-Content-Type: text/plain; charset=us-ascii
+--m51xatjYGsM+13rf
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 24, 2020 at 01:55:15AM -0700, Liu Yi L wrote:
-> +/*
-> + * struct iommu_nesting_info - Information for nesting-capable IOMMU.
-> + *				user space should check it before using
-> + *				nesting capability.
-> + *
-> + * @size:	size of the whole structure
-> + * @format:	PASID table entry format, the same definition with
-> + *		@format of struct iommu_gpasid_bind_data.
-> + * @features:	supported nesting features.
-> + * @flags:	currently reserved for future extension.
-> + * @data:	vendor specific cap info.
-> + *
-> + * +---------------+----------------------------------------------------+
-> + * | feature       |  Notes                                             |
-> + * +===============+====================================================+
-> + * | SYSWIDE_PASID |  Kernel manages PASID in system wide, PASIDs used  |
-> + * |               |  in the system should be allocated by host kernel  |
-> + * +---------------+----------------------------------------------------+
-> + * | BIND_PGTBL    |  bind page tables to host PASID, the PASID could   |
-> + * |               |  either be a host PASID passed in bind request or  |
-> + * |               |  default PASIDs (e.g. default PASID of aux-domain) |
-> + * +---------------+----------------------------------------------------+
-> + * | CACHE_INVLD   |  mandatory feature for nesting capable IOMMU       |
-> + * +---------------+----------------------------------------------------+
+On Sun, Jun 28, 2020 at 02:34:37PM +0800, Jason Wang wrote:
+>=20
+> On 2020/6/25 =E4=B8=8B=E5=8D=889:57, Stefan Hajnoczi wrote:
+> > These patches are not ready to be merged because I was unable to measur=
+e a
+> > performance improvement. I'm publishing them so they are archived in ca=
+se
+> > someone picks up this work again in the future.
+> >=20
+> > The goal of these patches is to allocate virtqueues and driver state fr=
+om the
+> > device's NUMA node for optimal memory access latency. Only guests with =
+a vNUMA
+> > topology and virtio devices spread across vNUMA nodes benefit from this=
+=2E  In
+> > other cases the memory placement is fine and we don't need to take NUMA=
+ into
+> > account inside the guest.
+> >=20
+> > These patches could be extended to virtio_net.ko and other devices in t=
+he
+> > future. I only tested virtio_blk.ko.
+> >=20
+> > The benchmark configuration was designed to trigger worst-case NUMA pla=
+cement:
+> >   * Physical NVMe storage controller on host NUMA node 0
+> >   * IOThread pinned to host NUMA node 0
+> >   * virtio-blk-pci device in vNUMA node 1
+> >   * vCPU 0 on host NUMA node 1 and vCPU 1 on host NUMA node 0
+> >   * vCPU 0 in vNUMA node 0 and vCPU 1 in vNUMA node 1
+> >=20
+> > The intent is to have .probe() code run on vCPU 0 in vNUMA node 0 (host=
+ NUMA
+> > node 1) so that memory is in the wrong NUMA node for the virtio-blk-pci=
+ devic=3D
+> > e.
+> > Applying these patches fixes memory placement so that virtqueues and dr=
+iver
+> > state is allocated in vNUMA node 1 where the virtio-blk-pci device is l=
+ocated.
+> >=20
+> > The fio 4KB randread benchmark results do not show a significant improv=
+ement:
+> >=20
+> > Name                  IOPS   Error
+> > virtio-blk        42373.79 =3DC2=3DB1 0.54%
+> > virtio-blk-numa   42517.07 =3DC2=3DB1 0.79%
+>=20
+>=20
+> I remember I did something similar in vhost by using page_to_nid() for
+> descriptor ring. And I get little improvement as shown here.
+>=20
+> Michael reminds that it was probably because all data were cached. So I
+> doubt if the test lacks sufficient stress on the cache ...
 
-This feature description is vague about what CACHE_INVLD does and how to
-use it. If I understand correctly, the presence of this feature means
-that VFIO_IOMMU_NESTING_OP_CACHE_INVLD must be used?
-
-The same kind of clarification could be done for SYSWIDE_PASID and
-BIND_PGTBL too.
+Yes, that sounds likely. If there's no real-world performance
+improvement then I'm happy to leave these patches unmerged.
 
 Stefan
 
---O5XBE6gyVG5Rl6Rj
+--m51xatjYGsM+13rf
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl75s2AACgkQnKSrs4Gr
-c8hGZgf/S6BmV5BJlZFL4v96V8MqJ1UApXYPiFhSWcTAi3F2d7D1PHEMnb2lik58
-p5STu+PaKGaPqTdgbYN9HuBnxDICBJeK15QlUiYiqUZ4fJWyoji1YKex99TBArJv
-d+aM8KEhWqQAmX6XC98rBa22CpE2o2KGopAAeHYebRuB7HLeaPbP0382nABszqQt
-JpkAcSMTXRXiwM82Bkt9wajLDQt90FksLcZl3mdMqYCn1sqKmOxLeCwJ4T4EuJMz
-/zH426rvbLkJeLWNgeI3+5fMdvqfAkbflq34AI6MQITTkhjKtfEs0WOH7Sn8EBA/
-SdAw3quTGbPopTw9cv2jtd+owKiL8w==
-=IfDH
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl75s9YACgkQnKSrs4Gr
+c8jAlQgAkxcrX8BwizJMukF4LIVrZHVVDcZjCvl+WEazZ8s6RpSCMj1yeg1wyplH
+lt34UesBkGMWTyRQPfQTC16lAQy9hn1nPLhrqyFPk9oiQUEK9Kzf5j7I3JnLVNnI
+jBGARfiyb0nKnhfqx0y/ixeAOLDNf9d2swoEc4lnqCo584dlMliJLIC/2jE7AvwF
+M6xsrjW6JNxLuV4shp0CaWVgsPd/6OR8PMPy9XatWVPgyF9fpPn6pZJsb6B8d+gL
+8lCvNa0+Deq/ruy67yyzenpuqvyMmA11HeQocFFqIvaEdCHA6QCGil0fmXVb0Ile
+4X2GnES1wsHbGId3ofPrpM4rjxm7Rw==
+=IwcF
 -----END PGP SIGNATURE-----
 
---O5XBE6gyVG5Rl6Rj--
+--m51xatjYGsM+13rf--
