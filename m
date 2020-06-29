@@ -2,133 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 354AF20E0A0
-	for <lists+kvm@lfdr.de>; Mon, 29 Jun 2020 23:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0ADC20DF91
+	for <lists+kvm@lfdr.de>; Mon, 29 Jun 2020 23:55:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731589AbgF2UsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jun 2020 16:48:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43360 "EHLO
+        id S2389540AbgF2UiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jun 2020 16:38:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731534AbgF2TNv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jun 2020 15:13:51 -0400
-Received: from mail-il1-x147.google.com (mail-il1-x147.google.com [IPv6:2607:f8b0:4864:20::147])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69EB1C00875F
-        for <kvm@vger.kernel.org>; Mon, 29 Jun 2020 01:51:11 -0700 (PDT)
-Received: by mail-il1-x147.google.com with SMTP id k13so11798829ilh.23
-        for <kvm@vger.kernel.org>; Mon, 29 Jun 2020 01:51:11 -0700 (PDT)
+        with ESMTP id S1731762AbgF2TOU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jun 2020 15:14:20 -0400
+Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7E69C00877A;
+        Mon, 29 Jun 2020 02:21:35 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id o11so15770028wrv.9;
+        Mon, 29 Jun 2020 02:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=u36sE6+AVFdBFxDD1Z4WGH1iqkdyYgs1gbZlLzZxPLE=;
+        b=IJ889BmJs5fJA5JUI2j9TnvlzUL6xKrXd3eu1AW6e3BrxmyJ2ATlUFZy+P7GIYORW6
+         HYez5wQ7G/KioFh7zuBQymOuqxnI7c6j5yRe11o57m44r8/F60mZ6D+45IRLGvKPT5qt
+         aW3wey9iITO657/ug3AKdVol5V7hFGckvAEbPUkmm4tbITw/bvsNqYeXyI4ykT/inVt3
+         sloPqSCvfLyPkPQG7mNpTNMCsWUbRe5bsYtwjHO8nL5cv993DWt6EhGXXCUqNcGEwttk
+         prxRqeBfShqro3WzaLRT8X+17rgo3DhgNG5L8W2ai+AlV91Mlb7pJO0OmOXsHs/DEz10
+         PgnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=ROvN58bMs+/Mdp+fmaywI8ZO468/VS7QI9MJ+inN3wQ=;
-        b=cJPpsdZwqfYqSkWXuOGNLiJy2FiL1vxTzZ1nVRPPa7hH27btrb7zoHBQhEA5tlM7/N
-         E8zV4YSEk2kDWe1M/3hOYmW9Vu8ZjyfKLPwGeGY21kC5AqrzF4Pj2ETPnqIlr0/uTgBl
-         9NOEwRHTGPzWvI1VUEJN10JsJ12yx7g8IxWPtWJmkOhSYspRmv8VV1KwS/B9rCvsy8UN
-         JiFgJalefgxPCsHcas9Oq5nEl7QnMfFoKOMvY+ilkfYU2/dmAYUlMAHjR/iHYNhabBG5
-         QfvMkPearrS3YabI8n/4E/zhnwRCYnvlhGsjWiwggrQG/RaJi4ixbe2PhTow2LjO6uLF
-         35gw==
-X-Gm-Message-State: AOAM532/aTiVMydyAG99NFY8hlX7jUY+POKZr5e6xeQF8Qv3fa/owLRH
-        JuomWfvy7fmjSHJD209yzKJWktwXDoxEeQ3oPZ59VdZMnZqb
-X-Google-Smtp-Source: ABdhPJwWSIaP5qztCBfp4O0+tW449qcsNaqurETy0KKZrJmSIlXdLHj3Dsc1s8iJi2HSTJ4Jk4yrPZwR7aFDELFxt6eaBzHfdOWp
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=u36sE6+AVFdBFxDD1Z4WGH1iqkdyYgs1gbZlLzZxPLE=;
+        b=DBlLYeZ+GaW/SlZ+ld0/yMz3loUdyO0spnDlXTjaLEXZgSNTgGnHLsHMDo29/caZCc
+         PzsVx/s+L28ewg7bQ1N3rf1gXRMGgbu+jsDWXHAJtz9Z4+ut9G5FnNJ+xXAGZmSj/scy
+         qbP3IlCA/XZzKqBPSAHo7w+W+jTy3nb+PPi7dViYvNeZ8+lpmu836OoE5ZOjLFdgI1JI
+         40wDs9rXLzkR/WRwhob5nFpx+eNE2fy31QhwfDIREj21mlSNIEUGqef3BJvdrV2C/h1J
+         v+G9KPqaFrCF6Jc9qwvr46GBils1ZogBI/NEgCNdW/PlZ3txFm6V7/1En43HVmW0e8jP
+         724A==
+X-Gm-Message-State: AOAM533eAvd6dQn6vdvk2ajzHZe3aNPsWKZOC1spEq6ALvHMnt9tuUi8
+        nkGR+KlIeZRlT2uuAUS1inI=
+X-Google-Smtp-Source: ABdhPJzh7GPo/4W5Lhu8m6qyhHoxvF0iYmpIYlqSS2hKwQ7UFkCIhEfG19AD/L05HblV+ynNCJCBSg==
+X-Received: by 2002:a5d:508e:: with SMTP id a14mr15439712wrt.335.1593422494478;
+        Mon, 29 Jun 2020 02:21:34 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id b18sm18487064wmb.18.2020.06.29.02.21.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2020 02:21:33 -0700 (PDT)
+Date:   Mon, 29 Jun 2020 10:21:32 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, eric.auger@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org, kevin.tian@intel.com,
+        jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
+        jun.j.tian@intel.com, yi.y.sun@intel.com, jean-philippe@linaro.org,
+        peterx@redhat.com, hao.wu@intel.com,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 13/14] vfio: Document dual stage control
+Message-ID: <20200629092132.GA31392@stefanha-x1.localdomain>
+References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
+ <1592988927-48009-14-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2172:: with SMTP id p18mr17111736jak.63.1593420670562;
- Mon, 29 Jun 2020 01:51:10 -0700 (PDT)
-Date:   Mon, 29 Jun 2020 01:51:10 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000bf7b405a93529d8@google.com>
-Subject: general protection fault in __apic_accept_irq (2)
-From:   syzbot <syzbot+1bf777dfdde86d64b89b@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
+Content-Disposition: inline
+In-Reply-To: <1592988927-48009-14-git-send-email-yi.l.liu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
 
-syzbot found the following crash on:
+--YZ5djTAD1cGYuMQK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-HEAD commit:    7ae77150 Merge tag 'powerpc-5.8-1' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1024dead100000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d195fe572fb15312
-dashboard link: https://syzkaller.appspot.com/bug?extid=1bf777dfdde86d64b89b
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10e542f9100000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=154c1c03100000
+On Wed, Jun 24, 2020 at 01:55:26AM -0700, Liu Yi L wrote:
+> +Details can be found in Documentation/userspace-api/iommu.rst. For Intel
+> +VT-d, each stage 1 page table is bound to host by:
+> +
+> +    nesting_op->flags = VFIO_IOMMU_NESTING_OP_BIND_PGTBL;
+> +    memcpy(&nesting_op->data, &bind_data, sizeof(bind_data));
+> +    ioctl(container->fd, VFIO_IOMMU_NESTING_OP, nesting_op);
+> +
+> +As mentioned above, guest OS may use stage 1 for GIOVA->GPA or GVA->GPA.
+> +GVA->GPA page tables are available when PASID (Process Address Space ID)
+> +is exposed to guest. e.g. guest with PASID-capable devices assigned. For
+> +such page table binding, the bind_data should include PASID info, which
+> +is allocated by guest itself or by host. This depends on hardware vendor
+> +e.g. Intel VT-d requires to allocate PASID from host. This requirement is
+> +defined by the Virtual Command Support in VT-d 3.0 spec, guest software
+> +running on VT-d should allocate PASID from host kernel. To allocate PASID
+> +from host, user space should +check the IOMMU_NESTING_FEAT_SYSWIDE_PASID
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+1bf777dfdde86d64b89b@syzkaller.appspotmail.com
+s/+check/check/g
 
-L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
-general protection fault, probably for non-canonical address 0xdffffc0000000013: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000098-0x000000000000009f]
-CPU: 1 PID: 6780 Comm: syz-executor153 Not tainted 5.7.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:__apic_accept_irq+0x46/0xb80 arch/x86/kvm/lapic.c:1039
-Code: 4c 24 18 4c 89 4c 24 08 e8 67 0d 61 00 49 8d 87 98 00 00 00 48 89 c2 48 89 44 24 20 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 1b 0a 00 00 49 8b af 98 00 00 00 0f 1f 44 00 00
-RSP: 0018:ffffc900015f79a8 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: ffff888095b00040 RCX: 0000000000000000
-RDX: 0000000000000013 RSI: ffffffff8112c159 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000003 R11: fffff520002bef4c R12: 0000000000000000
-R13: ffff8880a00b8e68 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000001193880(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa6130226c0 CR3: 00000000a1257000 CR4: 00000000001426e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- kvm_arch_async_page_present+0x7de/0x9e0 arch/x86/kvm/x86.c:10580
- kvm_check_async_pf_completion+0x18d/0x400 arch/x86/kvm/../../../virt/kvm/async_pf.c:151
- vcpu_enter_guest arch/x86/kvm/x86.c:8437 [inline]
- vcpu_run arch/x86/kvm/x86.c:8669 [inline]
- kvm_arch_vcpu_ioctl_run+0x18bf/0x69f0 arch/x86/kvm/x86.c:8890
- kvm_vcpu_ioctl+0x46a/0xe20 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3163
- vfs_ioctl fs/ioctl.c:47 [inline]
- ksys_ioctl+0x11a/0x180 fs/ioctl.c:771
- __do_sys_ioctl fs/ioctl.c:780 [inline]
- __se_sys_ioctl fs/ioctl.c:778 [inline]
- __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:778
- do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
- entry_SYSCALL_64_after_hwframe+0x49/0xb3
-RIP: 0033:0x440299
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffc336022f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440299
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-RBP: 00000000006ca018 R08: 00000000004002c8 R09: 00000000004002c8
-R10: 00000000004002c8 R11: 0000000000000246 R12: 0000000000401b20
-R13: 0000000000401bb0 R14: 0000000000000000 R15: 0000000000000000
-Modules linked in:
----[ end trace 85b25eaa183f3d19 ]---
-RIP: 0010:__apic_accept_irq+0x46/0xb80 arch/x86/kvm/lapic.c:1039
-Code: 4c 24 18 4c 89 4c 24 08 e8 67 0d 61 00 49 8d 87 98 00 00 00 48 89 c2 48 89 44 24 20 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 1b 0a 00 00 49 8b af 98 00 00 00 0f 1f 44 00 00
-RSP: 0018:ffffc900015f79a8 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: ffff888095b00040 RCX: 0000000000000000
-RDX: 0000000000000013 RSI: ffffffff8112c159 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000003 R11: fffff520002bef4c R12: 0000000000000000
-R13: ffff8880a00b8e68 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000001193880(0000) GS:ffff8880ae600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000560b8ba34fa8 CR3: 00000000a1257000 CR4: 00000000001426f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+--YZ5djTAD1cGYuMQK
+Content-Type: application/pgp-signature; name="signature.asc"
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-----BEGIN PGP SIGNATURE-----
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl75spgACgkQnKSrs4Gr
+c8gpagf9FTccG+B43s7SRg40eJAbPdgjqaIGSOHqn1yr6h4wG9TuIbEZ9RTdmYdm
+OsRKzgTHXIQ6C7tk9qW9o5tUa0qFbeYKsOaxMPYt11sEio0dTJsv82DN4Frl422t
+8UMqnTHS2w6hK2ia+Vze5zRF1otE0YPJmnO2riabWnX0i3Imp3n2sEaV8uuZMFie
+WSEUaVcm2db2HnS1W02ydcserBdM2RmaMCJ3mbbzlLMfqF6sK/h+UWXqIIfgJk6y
+A/F0I15YUSxlGVeNpWym8mbJPDrKmdxu2LuB8Mc1HF/ByH9OY9tlmApru5EGkr/x
+hGn3rreQu+7yknOXixQ9sQ5l8jiweg==
+=PF2X
+-----END PGP SIGNATURE-----
+
+--YZ5djTAD1cGYuMQK--
