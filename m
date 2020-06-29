@@ -2,127 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 244A520E39F
-	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 00:03:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CF1B20E3CF
+	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 00:03:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390677AbgF2VP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jun 2020 17:15:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42430 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729954AbgF2SzQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:55:16 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5CDE125595;
-        Mon, 29 Jun 2020 16:25:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593447935;
-        bh=y9/mharb+W/Wo8t1uox6jiNNY7oYrYExuo1ibLqnBrI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yRxh8t3va+r0SZYY70IM+SupCD7KWJrc4Fh2FeUL/H8WeeyAbNSt6OvibEVWU1PZs
-         1+OLP7dQQUHaABxzN6djmfymJNXZ3571UX26nWjeTZtcBL4Orcwl9eqSMHtAmDOF3X
-         vtqNYqlW/JjXDeNy1dRZTYHhfnPSzzUbIyNd6t0M=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jpwb7-007M5T-Uj; Mon, 29 Jun 2020 17:25:34 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Steven Price <steven.price@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Subject: [PATCH 3/4] KVM: arm64: pvtime: Ensure task delay accounting is enabled
-Date:   Mon, 29 Jun 2020 17:25:18 +0100
-Message-Id: <20200629162519.825200-4-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200629162519.825200-1-maz@kernel.org>
-References: <20200629162519.825200-1-maz@kernel.org>
+        id S2390797AbgF2VSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jun 2020 17:18:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58562 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2390790AbgF2VST (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jun 2020 17:18:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593465496;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YiDtiNB2oFeGuS+CRFVjpgq47fViDI5SfncnPvci6SI=;
+        b=PioFVzOu22M6qahmLGk+D2dBJWPt0kZZyRNm6BWT2MOH7D6GUP+BBPGIbw0euJFXJGcIQ7
+        YarBiDCE7Vndtd+C0O0/uSPXBTTNktpNDiHwogMKMo4pKIHrLNKiccnVgEYlp1Xt4/0C2g
+        xfHqkXGumA3NDH/LQJp/3iTowVTgAP8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-fBQ1vXpVOnOuhw5cfhUSgw-1; Mon, 29 Jun 2020 17:18:14 -0400
+X-MC-Unique: fBQ1vXpVOnOuhw5cfhUSgw-1
+Received: by mail-wr1-f70.google.com with SMTP id 59so11014654wrp.4
+        for <kvm@vger.kernel.org>; Mon, 29 Jun 2020 14:18:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YiDtiNB2oFeGuS+CRFVjpgq47fViDI5SfncnPvci6SI=;
+        b=VmBOdVsjLSZx0IKua5uvl30uBwNSsJgV/FfK6G0jzILl7Sg/Qd7NiFxcTZgF/jjT/H
+         xW49ZIDQVs1SypKQjPA2fWhKRCMipd4PVpA8iDbfEZrKq88AiCkwZqFCIC3feUAJ+3KE
+         t9kQnZyllD74Blxx9oTSH7tlAD7QjqaNvXuRMHasW+4WMs+jTUsfPnk5+YuW7lNZCiuY
+         OKEWmy1RiVgKljadV3csq6OCUocx+cqTi6/AvNq1HI9SFLS8ZGUSPmc2jMtO4kyVBWau
+         WjAP+pzb1PsdbUp8ZI9OmlEZmigF7kIRtfaimplXiOPwexYn/6OZoQiQ7STcD34Bw3Nw
+         mb4g==
+X-Gm-Message-State: AOAM531iS+DiyEQb687rW1R2wZ0KwZqbnV9Xxy9IXENPOU285HIWIw8Z
+        S9hAvQ/yJM96Wvyx8TX47Vgf7KXI/eDoFeZXBOQcVWk1KBjI8JKqXCOjTvq4lXyxU4+AxylBLnd
+        3sJE5QirvCxTk
+X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr18539559wml.33.1593465493783;
+        Mon, 29 Jun 2020 14:18:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxzfgRem+KXercJkxWwHYUfzWnoeVDCjjDW1dg0ezKr2F2J/LJYjbsk39o6uhlbY8GuP56chg==
+X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr18539534wml.33.1593465493510;
+        Mon, 29 Jun 2020 14:18:13 -0700 (PDT)
+Received: from redhat.com (bzq-79-182-31-92.red.bezeqint.net. [79.182.31.92])
+        by smtp.gmail.com with ESMTPSA id c25sm1063645wml.46.2020.06.29.14.18.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jun 2020 14:18:12 -0700 (PDT)
+Date:   Mon, 29 Jun 2020 17:18:09 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, jasowang@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v3 1/1] s390: virtio: let arch accept devices without
+ IOMMU feature
+Message-ID: <20200629171241-mutt-send-email-mst@kernel.org>
+References: <1592390637-17441-1-git-send-email-pmorel@linux.ibm.com>
+ <1592390637-17441-2-git-send-email-pmorel@linux.ibm.com>
+ <20200629115952-mutt-send-email-mst@kernel.org>
+ <66f808f2-5dd9-9127-d0e8-6bafbf13fc62@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, james.morse@arm.com, steven.price@arm.com, yuzenghui@huawei.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66f808f2-5dd9-9127-d0e8-6bafbf13fc62@linux.ibm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Andrew Jones <drjones@redhat.com>
+On Mon, Jun 29, 2020 at 06:48:28PM +0200, Pierre Morel wrote:
+> 
+> 
+> On 2020-06-29 18:09, Michael S. Tsirkin wrote:
+> > On Wed, Jun 17, 2020 at 12:43:57PM +0200, Pierre Morel wrote:
+> > > An architecture protecting the guest memory against unauthorized host
+> > > access may want to enforce VIRTIO I/O device protection through the
+> > > use of VIRTIO_F_IOMMU_PLATFORM.
+> > > Let's give a chance to the architecture to accept or not devices
+> > > without VIRTIO_F_IOMMU_PLATFORM.
+> > 
+> > I agree it's a bit misleading. Protection is enforced by memory
+> > encryption, you can't trust the hypervisor to report the bit correctly
+> > so using that as a securoty measure would be pointless.
+> > The real gain here is that broken configs are easier to
+> > debug.
+> > 
+> > Here's an attempt at a better description:
+> > 
+> > 	On some architectures, guest knows that VIRTIO_F_IOMMU_PLATFORM is
+> > 	required for virtio to function: e.g. this is the case on s390 protected
+> > 	virt guests, since otherwise guest passes encrypted guest memory to devices,
+> > 	which the device can't read. Without VIRTIO_F_IOMMU_PLATFORM the
+> > 	result is that affected memory (or even a whole page containing
+> > 	it is corrupted). Detect and fail probe instead - that is easier
+> > 	to debug.
+> 
+> Thanks indeed better aside from the "encrypted guest memory": the mechanism
+> used to avoid the access to the guest memory from the host by s390 is not
+> encryption but a hardware feature denying the general host access and
+> allowing pieces of memory to be shared between guest and host.
 
-Ensure we're actually accounting run_delay before we claim that we'll
-expose it to the guest. If we're not, then we just pretend like steal
-time isn't supported in order to avoid any confusion.
+s/encrypted/protected/
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20200622142710.18677-1-drjones@redhat.com
----
- arch/arm64/kvm/pvtime.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+> As a consequence the data read from memory is not corrupted but not read at
+> all and the read error kills the hypervizor with a SIGSEGV.
 
-diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index 1e0f4c284888..f7b52ce1557e 100644
---- a/arch/arm64/kvm/pvtime.c
-+++ b/arch/arm64/kvm/pvtime.c
-@@ -3,6 +3,7 @@
- 
- #include <linux/arm-smccc.h>
- #include <linux/kvm_host.h>
-+#include <linux/sched/stat.h>
- 
- #include <asm/kvm_mmu.h>
- #include <asm/pvclock-abi.h>
-@@ -73,6 +74,11 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
- 	return base;
- }
- 
-+static bool kvm_arm_pvtime_supported(void)
-+{
-+	return !!sched_info_on();
-+}
-+
- int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 			    struct kvm_device_attr *attr)
- {
-@@ -82,7 +88,8 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 	int ret = 0;
- 	int idx;
- 
--	if (attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+	if (!kvm_arm_pvtime_supported() ||
-+	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
- 		return -ENXIO;
- 
- 	if (get_user(ipa, user))
-@@ -110,7 +117,8 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
- 	u64 __user *user = (u64 __user *)attr->addr;
- 	u64 ipa;
- 
--	if (attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
-+	if (!kvm_arm_pvtime_supported() ||
-+	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
- 		return -ENXIO;
- 
- 	ipa = vcpu->arch.steal.base;
-@@ -125,7 +133,8 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
- {
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_PVTIME_IPA:
--		return 0;
-+		if (kvm_arm_pvtime_supported())
-+			return 0;
- 	}
- 	return -ENXIO;
- }
--- 
-2.27.0
+s/(or even a whole page containing it is corrupted)/can not be
+	read and the read error kills the hypervizor with a SIGSEGV/
+
+
+As an aside, we could maybe handle that more gracefully
+on the hypervisor side.
+
+> 
+> > 
+> > however, now that we have described what it is (hypervisor
+> > misconfiguration) I ask a question: can we be sure this will never
+> > ever work? E.g. what if some future hypervisor gains ability to
+> > access the protected guest memory in some abstractly secure manner?
+> 
+> The goal of the s390 PV feature is to avoid this possibility so I don't
+> think so; however, there is a possibility that some hardware VIRTIO device
+> gain access to the guest's protected memory, even such device does not exist
+> yet.
+> 
+> At the moment such device exists we will need a driver for it, at least to
+> enable the feature and apply policies, it is also one of the reasons why a
+> hook to the architecture is interesting.
+
+
+Not neessarily, it could also be fully transparent. See e.g.
+recent AMD andvances allowing unmodified guests with SEV.
+
+
+> > We are blocking this here, and it's hard to predict the future,
+> > and a broken hypervisor can always find ways to crash the guest ...
+> 
+> yes, this is also something to fix on the hypervizor side, Halil is working
+> on it.
+> 
+> > 
+> > IMHO it would be safer to just print a warning.
+> > What do you think?
+> 
+> Sadly, putting a warning may not help as qemu is killed if it accesses the
+> protected memory.
+> Also note that the crash occurs not only on start but also on hotplug.
+> 
+> Thanks,
+> Pierre
+
+Well that depends on where does the warning go. If it's on a serial port
+it might be reported host side before the crash triggers.  But
+interesting point generally. How about a feature to send a warning code
+or string to host then?
+
+> -- 
+> Pierre Morel
+> IBM Lab Boeblingen
 
