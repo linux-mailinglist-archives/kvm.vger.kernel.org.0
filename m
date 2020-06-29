@@ -2,102 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76F0720D433
-	for <lists+kvm@lfdr.de>; Mon, 29 Jun 2020 21:14:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 186DC20D31F
+	for <lists+kvm@lfdr.de>; Mon, 29 Jun 2020 21:11:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730731AbgF2TGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jun 2020 15:06:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36434 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729932AbgF2TGO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jun 2020 15:06:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593457573;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LUfU3DwcJDvqG3254Hkil0FQVUF3NIrSHMy6nXbf4kc=;
-        b=A0cch82ayDJOhrgqSUHnpDL8bZEGiJqIgZLpnJEFRg9ibAYkyrnsbZY3CaifN8aCXzRLSh
-        JyhwutMoe6zYgELpJ1W3ka1pEj8N8lgamDrHXsnbrc19XfUdvpgzNPSyPbvbJSjJH47QPA
-        JhPy10+z//byA2Lm/0Rv9bjAdGdrYzU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-srnLdMb6O5SSjgOgzzj6JA-1; Mon, 29 Jun 2020 12:05:38 -0400
-X-MC-Unique: srnLdMb6O5SSjgOgzzj6JA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1730019AbgF2Sz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jun 2020 14:55:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42470 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729980AbgF2SzR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jun 2020 14:55:17 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4A4EBFC3;
-        Mon, 29 Jun 2020 16:05:36 +0000 (UTC)
-Received: from gondolin (ovpn-113-61.ams2.redhat.com [10.36.113.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6DB1960BEC;
-        Mon, 29 Jun 2020 16:05:28 +0000 (UTC)
-Date:   Mon, 29 Jun 2020 18:05:26 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v3 1/1] s390: virtio: let arch accept devices without
- IOMMU feature
-Message-ID: <20200629180526.41d0732b.cohuck@redhat.com>
-In-Reply-To: <20200629115651-mutt-send-email-mst@kernel.org>
-References: <1592390637-17441-1-git-send-email-pmorel@linux.ibm.com>
-        <1592390637-17441-2-git-send-email-pmorel@linux.ibm.com>
-        <20200629115651-mutt-send-email-mst@kernel.org>
-Organization: Red Hat GmbH
+        by mail.kernel.org (Postfix) with ESMTPSA id EE06E25597;
+        Mon, 29 Jun 2020 16:25:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593447936;
+        bh=82FEL/lqihaAkT9TFcf9PCxFsGrapDUAVvxVatgi5Vo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=gJxoU9hYrPT/VBynK7z5mLddD59VHlU/a18A1OaJmulhYRFOSIbHFOWk72bX96NXi
+         We08VIiml9jpcgCOpwBUkCZ0gn/wSsloMsUZVuNB0f/EHCxeF8RLs/8uvHZ7Uoj/GI
+         Kp5U2EKZlQqsDJUNPWXMH16HikkaudzG214zKYRQ=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jpwb8-007M5T-Hn; Mon, 29 Jun 2020 17:25:34 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Subject: [PATCH 4/4] KVM: arm64: vgic-v4: Plug race between non-residency and v4.1 doorbell
+Date:   Mon, 29 Jun 2020 17:25:19 +0100
+Message-Id: <20200629162519.825200-5-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200629162519.825200-1-maz@kernel.org>
+References: <20200629162519.825200-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, james.morse@arm.com, steven.price@arm.com, yuzenghui@huawei.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 29 Jun 2020 11:57:14 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+When making a vPE non-resident because it has hit a blocking WFI,
+the doorbell can fire at any time after the write to the RD.
+Crucially, it can fire right between the write to GICR_VPENDBASER
+and the write to the pending_last field in the its_vpe structure.
 
-> On Wed, Jun 17, 2020 at 12:43:57PM +0200, Pierre Morel wrote:
-> > An architecture protecting the guest memory against unauthorized host
-> > access may want to enforce VIRTIO I/O device protection through the
-> > use of VIRTIO_F_IOMMU_PLATFORM.
-> > 
-> > Let's give a chance to the architecture to accept or not devices
-> > without VIRTIO_F_IOMMU_PLATFORM.
-> > 
-> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> > Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > ---
-> >  arch/s390/mm/init.c     |  6 ++++++
-> >  drivers/virtio/virtio.c | 22 ++++++++++++++++++++++
-> >  include/linux/virtio.h  |  2 ++
-> >  3 files changed, 30 insertions(+)
+This means that we would overwrite pending_last with stale data,
+and potentially not wakeup until some unrelated event (such as
+a timer interrupt) puts the vPE back on the CPU.
 
-> > @@ -179,6 +194,13 @@ int virtio_finalize_features(struct virtio_device *dev)
-> >  	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
-> >  		return 0;
-> >  
-> > +	if (arch_needs_virtio_iommu_platform(dev) &&
-> > +		!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
-> > +		dev_warn(&dev->dev,
-> > +			 "virtio: device must provide VIRTIO_F_IOMMU_PLATFORM\n");
-> > +		return -ENODEV;
-> > +	}
-> > +
-> >  	virtio_add_status(dev, VIRTIO_CONFIG_S_FEATURES_OK);
-> >  	status = dev->config->get_status(dev);
-> >  	if (!(status & VIRTIO_CONFIG_S_FEATURES_OK)) {  
-> 
-> Well don't you need to check it *before* VIRTIO_F_VERSION_1, not after?
+GICv4 isn't affected by this as we actively mask the doorbell on
+entering the guest, while GICv4.1 automatically manages doorbell
+delivery without any hypervisor-driven masking.
 
-But it's only available with VERSION_1 anyway, isn't it? So it probably
-also needs to fail when this feature is needed if VERSION_1 has not been
-negotiated, I think.
+Use the vpe_lock to synchronize such update, which solves the
+problem altogether.
+
+Fixes: ae699ad348cdc ("irqchip/gic-v4.1: Move doorbell management to the GICv4 abstraction layer")
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-v4.c    | 8 ++++++++
+ drivers/irqchip/irq-gic-v3-its.c | 8 ++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index 27ac833e5ec7..b5fa73c9fd35 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -90,7 +90,15 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+ 	    !irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
+ 		disable_irq_nosync(irq);
+ 
++	/*
++	 * The v4.1 doorbell can fire concurrently with the vPE being
++	 * made non-resident. Ensure we only update pending_last
++	 * *after* the non-residency sequence has completed.
++	 */
++	raw_spin_lock(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vpe_lock);
+ 	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
++	raw_spin_unlock(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vpe_lock);
++
+ 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 	kvm_vcpu_kick(vcpu);
+ 
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index cd685f521c77..205f69592471 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -4054,16 +4054,24 @@ static void its_vpe_4_1_deschedule(struct its_vpe *vpe,
+ 	u64 val;
+ 
+ 	if (info->req_db) {
++		unsigned long flags;
++
+ 		/*
+ 		 * vPE is going to block: make the vPE non-resident with
+ 		 * PendingLast clear and DB set. The GIC guarantees that if
+ 		 * we read-back PendingLast clear, then a doorbell will be
+ 		 * delivered when an interrupt comes.
++		 *
++		 * Note the locking to deal with the concurrent update of
++		 * pending_last from the doorbell interrupt handler that can
++		 * run concurrently.
+ 		 */
++		raw_spin_lock_irqsave(&vpe->vpe_lock, flags);
+ 		val = its_clear_vpend_valid(vlpi_base,
+ 					    GICR_VPENDBASER_PendingLast,
+ 					    GICR_VPENDBASER_4_1_DB);
+ 		vpe->pending_last = !!(val & GICR_VPENDBASER_PendingLast);
++		raw_spin_unlock_irqrestore(&vpe->vpe_lock, flags);
+ 	} else {
+ 		/*
+ 		 * We're not blocking, so just make the vPE non-resident
+-- 
+2.27.0
 
