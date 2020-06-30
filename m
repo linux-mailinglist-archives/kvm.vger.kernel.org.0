@@ -2,120 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F099420F983
-	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 18:32:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F31F20F9D4
+	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 18:51:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732008AbgF3QcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jun 2020 12:32:21 -0400
-Received: from mga17.intel.com ([192.55.52.151]:2223 "EHLO mga17.intel.com"
+        id S2389565AbgF3Qvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jun 2020 12:51:35 -0400
+Received: from foss.arm.com ([217.140.110.172]:43726 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731126AbgF3QcU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jun 2020 12:32:20 -0400
-IronPort-SDR: IodXyb0xPi/vxOTgYu3u9Yj3kSWN9XPkOQdritQZipp9xaT3O3Za+m0+fIb6GcbnnUhd+cqqYF
- WJHclqZGYAMg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9667"; a="126405342"
-X-IronPort-AV: E=Sophos;i="5.75,298,1589266800"; 
-   d="scan'208";a="126405342"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2020 09:32:19 -0700
-IronPort-SDR: oIQS/OHkEep/5BuWVDTlfTy5KSQp+wkGHV1WNKsGdyAtesGvONkbufj8q93zfcv++IYL9K5LX7
- JKCcfTcQgYKA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,298,1589266800"; 
-   d="scan'208";a="266519139"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga008.fm.intel.com with ESMTP; 30 Jun 2020 09:32:18 -0700
-Date:   Tue, 30 Jun 2020 09:32:18 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Vivek Goyal <vgoyal@redhat.com>, kvm@vger.kernel.org,
-        virtio-fs@redhat.com, pbonzini@redhat.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] kvm,x86: Exit to user space in case of page fault
- error
-Message-ID: <20200630163218.GF7733@linux.intel.com>
-References: <20200626150303.GC195150@redhat.com>
- <874kqtd212.fsf@vitty.brq.redhat.com>
- <20200629220353.GC269627@redhat.com>
- <87sgecbs9w.fsf@vitty.brq.redhat.com>
- <20200630145303.GB322149@redhat.com>
- <87mu4kbn7x.fsf@vitty.brq.redhat.com>
- <20200630152529.GC322149@redhat.com>
- <87k0zobltx.fsf@vitty.brq.redhat.com>
- <20200630155028.GE7733@linux.intel.com>
- <87h7usbkhq.fsf@vitty.brq.redhat.com>
+        id S1728022AbgF3Qve (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jun 2020 12:51:34 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7189330E;
+        Tue, 30 Jun 2020 09:51:33 -0700 (PDT)
+Received: from [10.57.21.32] (unknown [10.57.21.32])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68BCD3F68F;
+        Tue, 30 Jun 2020 09:51:30 -0700 (PDT)
+Subject: Re: [PATCH 1/2] iommu: Add iommu_group_get/set_domain()
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Kevin Tian <kevin.tian@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
+References: <20200627031532.28046-1-baolu.lu@linux.intel.com>
+ <acc0a8fd-bd23-fc34-aecc-67796ab216e7@arm.com>
+ <5dc1cece-6111-9b56-d04c-9553d592675b@linux.intel.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <48dd9f1e-c18b-77b7-650a-c35ecbb69f2b@arm.com>
+Date:   Tue, 30 Jun 2020 17:51:29 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87h7usbkhq.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <5dc1cece-6111-9b56-d04c-9553d592675b@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 30, 2020 at 06:12:49PM +0200, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On 2020-06-30 02:03, Lu Baolu wrote:
+> Hi Robin,
 > 
-> > On Tue, Jun 30, 2020 at 05:43:54PM +0200, Vitaly Kuznetsov wrote:
-> >> Vivek Goyal <vgoyal@redhat.com> writes:
-> >> 
-> >> > On Tue, Jun 30, 2020 at 05:13:54PM +0200, Vitaly Kuznetsov wrote:
-> >> >> 
-> >> >> > - If you retry in kernel, we will change the context completely that
-> >> >> >   who was trying to access the gfn in question. We want to retain
-> >> >> >   the real context and retain information who was trying to access
-> >> >> >   gfn in question.
-> >> >> 
-> >> >> (Just so I understand the idea better) does the guest context matter to
-> >> >> the host? Or, more specifically, are we going to do anything besides
-> >> >> get_user_pages() which will actually analyze who triggered the access
-> >> >> *in the guest*?
-> >> >
-> >> > When we exit to user space, qemu prints bunch of register state. I am
-> >> > wondering what does that state represent. Does some of that traces
-> >> > back to the process which was trying to access that hva? I don't
-> >> > know.
-> >> 
-> >> We can get the full CPU state when the fault happens if we need to but
-> >> generally we are not analyzing it. I can imagine looking at CPL, for
-> >> example, but trying to distinguish guest's 'process A' from 'process B'
-> >> may not be simple.
-> >> 
-> >> >
-> >> > I think keeping a cache of error gfns might not be too bad from
-> >> > implemetation point of view. I will give it a try and see how
-> >> > bad does it look.
-> >> 
-> >> Right; I'm only worried about the fact that every cache (or hash) has a
-> >> limited size and under certain curcumstances we may overflow it. When an
-> >> overflow happens, we will follow the APF path again and this can go over
-> >> and over. Maybe we can punch a hole in EPT/NPT making the PFN reserved/
-> >> not-present so when the guest tries to access it again we trap the
-> >> access in KVM and, if the error persists, don't follow the APF path?
-> >
-> > Just to make sure I'm somewhat keeping track, is the problem we're trying to
-> > solve that the guest may not immediately retry the "bad" GPA and so KVM may
-> > not detect that the async #PF already came back as -EFAULT or whatever? 
+> On 6/29/20 7:56 PM, Robin Murphy wrote:
+>> On 2020-06-27 04:15, Lu Baolu wrote:
+>>> The hardware assistant vfio mediated device is a use case of iommu
+>>> aux-domain. The interactions between vfio/mdev and iommu during mdev
+>>> creation and passthr are:
+>>>
+>>> - Create a group for mdev with iommu_group_alloc();
+>>> - Add the device to the group with
+>>>          group = iommu_group_alloc();
+>>>          if (IS_ERR(group))
+>>>                  return PTR_ERR(group);
+>>>
+>>>          ret = iommu_group_add_device(group, &mdev->dev);
+>>>          if (!ret)
+>>>                  dev_info(&mdev->dev, "MDEV: group_id = %d\n",
+>>>                           iommu_group_id(group));
+>>> - Allocate an aux-domain
+>>>     iommu_domain_alloc()
+>>> - Attach the aux-domain to the physical device from which the mdev is
+>>>    created.
+>>>     iommu_aux_attach_device()
+>>>
+>>> In the whole process, an iommu group was allocated for the mdev and an
+>>> iommu domain was attached to the group, but the group->domain leaves
+>>> NULL. As the result, iommu_get_domain_for_dev() doesn't work anymore.
+>>>
+>>> This adds iommu_group_get/set_domain() so that group->domain could be
+>>> managed whenever a domain is attached or detached through the aux-domain
+>>> api's.
+>>
+>> Letting external callers poke around directly in the internals of 
+>> iommu_group doesn't look right to me.
 > 
-> Yes. In Vivek's patch there's a single 'error_gfn' per vCPU which serves
-> as an indicator whether to follow APF path or not.
+> Unfortunately, it seems that the vifo iommu abstraction is deeply bound
+> to the IOMMU subsystem. We can easily find other examples:
+> 
+> iommu_group_get/set_iommudata()
+> iommu_group_get/set_name()
+> ...
 
-A thought along the lines of your "punch a hole in the page tables" idea
-would be to invalidate the SPTE (in the unlikely case it's present but not
-writable) and tagging it as being invalid for async #PF.  E.g. for !EPT,
-there are 63 bits available for metadata.  For EPT, there's a measly 60,
-assuming we want to avoid using SUPPRESS_VE.  The fully !present case would
-be straightforward, but the !writable case would require extra work,
-especially for shadow paging.
+Sure, but those are ways for users of a group to attach useful 
+information of their own to it, that doesn't matter to the IOMMU 
+subsystem itself. The interface you've proposed gives callers rich new 
+opportunities to fundamentally break correct operation of the API:
 
-With the SPTE tagged, it'd "just" be a matter of hooking into the page fault
-paths to detect the flag and disable async #PF.  For TDP that's not too bad,
-e.g. pass in a flag to fast_page_fault() and propagate it to try_async_pf().
-Not sure how to handle shadow paging, that code makes my head hurt just
-looking at it.
+	dom = iommu_domain_alloc();
+	iommu_attach_group(dom, grp);
+	...
+	iommu_group_set_domain(grp, NULL);
+	// oops, leaked and can't ever detach properly now
 
-It'd require tweaking is_shadow_present_pte() to be more precise, but that's
-probably a good thing, and peanuts compared to handling the faults.
+or perhaps:
+
+	grp = iommu_group_alloc();
+	iommu_group_add_device(grp, dev);
+	iommu_group_set_domain(grp, dom);
+	...
+	iommu_detach_group(dom, grp);
+	// oops, IOMMU driver might not handle this
+
+>> If a regular device is attached to one or more aux domains for PASID 
+>> use, iommu_get_domain_for_dev() is still going to return the primary 
+>> domain, so why should it be expected to behave differently for mediated
+> 
+> Unlike the normal device attach, we will encounter two devices when it
+> comes to aux-domain.
+> 
+> - Parent physical device - this might be, for example, a PCIe device
+> with PASID feature support, hence it is able to tag an unique PASID
+> for DMA transfers originated from its subset. The device driver hence
+> is able to wrapper this subset into an isolated:
+> 
+> - Mediated device - a fake device created by the device driver mentioned
+> above.
+> 
+> Yes. All you mentioned are right for the parent device. But for mediated
+> device, iommu_get_domain_for_dev() doesn't work even it has an valid
+> iommu_group and iommu_domain.
+> 
+> iommu_get_domain_for_dev() is a necessary interface for device drivers
+> which want to support aux-domain. For example,
+
+Only if they want to follow this very specific notion of using made-up 
+devices and groups to represent aux attachments. Even if a driver 
+managing its own aux domains entirely privately does create child 
+devices for them, it's not like it can't keep its domain pointers in 
+drvdata if it wants to ;)
+
+Let's not conflate the current implementation of vfio_mdev with the 
+general concepts involved here.
+
+>            struct iommu_domain *domain;
+>            struct device *dev = mdev_dev(mdev);
+>        unsigned long pasid;
+> 
+>            domain = iommu_get_domain_for_dev(dev);
+>            if (!domain)
+>                    return -ENODEV;
+> 
+>            pasid = iommu_aux_get_pasid(domain, dev->parent);
+>        if (pasid == IOASID_INVALID)
+>            return -EINVAL;
+> 
+>        /* Program the device context with the PASID value */
+>        ....
+> 
+> Without this fix, iommu_get_domain_for_dev() always returns NULL and the
+> device driver has no means to support aux-domain.
+
+So either the IOMMU API itself is missing the ability to do the right 
+thing internally, or the mdev layer isn't using it appropriately. Either 
+way, simply punching holes in the API for mdev to hack around its own 
+mess doesn't seem like the best thing to do.
+
+The initial impression I got was that it's implicitly assumed here that 
+the mdev itself is attached to exactly one aux domain and nothing else, 
+at which point I would wonder why it's using aux at all, but are you 
+saying that in fact no attach happens with the mdev group either way, 
+only to the parent device?
+
+I'll admit I'm not hugely familiar with any of this, but it seems to me 
+that the logical flow should be:
+
+	- allocate domain
+	- attach as aux to parent
+	- retrieve aux domain PASID
+	- create mdev child based on PASID
+	- attach mdev to domain (normally)
+
+Of course that might require giving the IOMMU API a proper first-class 
+notion of mediated devices, such that it knows the mdev represents the 
+PASID, and can recognise the mdev attach is equivalent to the earlier 
+parent aux attach so not just blindly hand it down to an IOMMU driver 
+that's never heard of this new device before. Or perhaps the IOMMU 
+drivers do their own bookkeeping for the mdev bus, such that they do 
+handle the attach call, and just validate it internally based on the 
+associated parent device and PASID. Either way, the inside maintains 
+self-consistency and from the outside it looks like standard API usage 
+without nasty hacks.
+
+I'm pretty sure I've heard suggestions of using mediated devices beyond 
+VFIO (e.g. within the kernel itself), so chances are this is a direction 
+that we'll have to take at some point anyway.
+
+And, that said, even if people do want an immediate quick fix regardless 
+of technical debt, I'd still be a lot happier to see 
+iommu_group_set_domain() lightly respun as iommu_attach_mdev() ;)
+
+Robin.
