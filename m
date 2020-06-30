@@ -2,105 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D2ED20F8BD
-	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 17:44:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D75B20F8C6
+	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 17:47:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389711AbgF3PoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jun 2020 11:44:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22823 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389654AbgF3PoP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Jun 2020 11:44:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593531853;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=g+7JZMmEMWPm9TcnXCXFzCXeXPgv7LEiZobSQGLUt4c=;
-        b=f2pW6/Hb86atlptqhqikgNm+JaXgRxlhWJkciSdY8USd5/AR3zDuDFRJOGustYh9C+JZbu
-        2H2BF0T9IQUk1+P/duubVqPX8tq5WF5ZCWbspnK+9x9gJV4ZsBhciOYiEp8HQG+6hQWTqE
-        3Nanxr2jx0uD6Fq+sVI0VHZezFXA5v8=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-JnFv8AOzO6mC0mN25W1Rnw-1; Tue, 30 Jun 2020 11:43:57 -0400
-X-MC-Unique: JnFv8AOzO6mC0mN25W1Rnw-1
-Received: by mail-ej1-f72.google.com with SMTP id h26so13325639ejb.5
-        for <kvm@vger.kernel.org>; Tue, 30 Jun 2020 08:43:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=g+7JZMmEMWPm9TcnXCXFzCXeXPgv7LEiZobSQGLUt4c=;
-        b=mJvFsU0vJXG7XBOkmXaxjG2dmuYBA/YUD4/uxpGUzlAcc+dJpRToiNDafW2VhN5urK
-         b2s8uRFe8+sdgumJkQM4TiPSv0Rb52gaGVEHNdFo5vRivrEgvdb4lK2PODtWPVi3Pd9p
-         re2Nd4JmbjQMrv6XUEu8xjsgGn8yir9Lx4jAC1LtJujz3EA9NInqe6k9X/kVl4F9lpv7
-         w7kMCfT2itMdGwH3H774aTCzwiQIFpsjNh8tNUIW3SbnA6no5oosdacaF8rMu3Vdej2Y
-         JuShBdSjZxwCXfDEfDDpuZGTdUESEFnRZUDUlLiHWgHXv4Jeex07/WbfX5gW8eDLTArx
-         i8RQ==
-X-Gm-Message-State: AOAM530W2flNv3iduGkKW+9jxs78FdX98z1+vy0ld1VMtRXPUpeVcS8a
-        +AniOcc3bMksMUfgq3OhB8xUSPb0l0Q7qa1PCd+jBANoAeIax7KOjKUj9jUXAlv0ivhPXu07pLT
-        bfAGedrh8oxcS
-X-Received: by 2002:a17:906:6a14:: with SMTP id o20mr19371692ejr.128.1593531836504;
-        Tue, 30 Jun 2020 08:43:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwN5020D0g4+WwC4BExYGDMsxQNa0UsSFFuaNfKIVU9PWBDqP5EAnwkz46NPYCIlmVoziF18w==
-X-Received: by 2002:a17:906:6a14:: with SMTP id o20mr19371673ejr.128.1593531836311;
-        Tue, 30 Jun 2020 08:43:56 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id w18sm2247913ejc.62.2020.06.30.08.43.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jun 2020 08:43:55 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vivek Goyal <vgoyal@redhat.com>
-Cc:     kvm@vger.kernel.org, virtio-fs@redhat.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] kvm,x86: Exit to user space in case of page fault error
-In-Reply-To: <20200630152529.GC322149@redhat.com>
-References: <20200625214701.GA180786@redhat.com> <87lfkach6o.fsf@vitty.brq.redhat.com> <20200626150303.GC195150@redhat.com> <874kqtd212.fsf@vitty.brq.redhat.com> <20200629220353.GC269627@redhat.com> <87sgecbs9w.fsf@vitty.brq.redhat.com> <20200630145303.GB322149@redhat.com> <87mu4kbn7x.fsf@vitty.brq.redhat.com> <20200630152529.GC322149@redhat.com>
-Date:   Tue, 30 Jun 2020 17:43:54 +0200
-Message-ID: <87k0zobltx.fsf@vitty.brq.redhat.com>
+        id S2389721AbgF3Pr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jun 2020 11:47:28 -0400
+Received: from mga07.intel.com ([134.134.136.100]:20427 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389506AbgF3Pr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jun 2020 11:47:27 -0400
+IronPort-SDR: 8rQoriK83JpukFlV/DZl9lUathskizCdGdw+gG3Ntu1+AYs8/nypLgpNRG+kczPQ92vYxhvXnu
+ 6klSq8C5Y2bQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="211338407"
+X-IronPort-AV: E=Sophos;i="5.75,297,1589266800"; 
+   d="scan'208";a="211338407"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2020 08:47:26 -0700
+IronPort-SDR: SlYIPYZJa5+zSOlnlfXA5REL6IeHhXYQKfFJ6b9i9QWvxh8YKY9HdlppbI+mFmE6m2ZnA1o1oc
+ zG0AzYoQSv4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,297,1589266800"; 
+   d="scan'208";a="355814591"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2020 08:47:26 -0700
+Date:   Tue, 30 Jun 2020 08:47:26 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: X86: Move ignore_msrs handling upper the stack
+Message-ID: <20200630154726.GD7733@linux.intel.com>
+References: <20200622220442.21998-1-peterx@redhat.com>
+ <20200622220442.21998-2-peterx@redhat.com>
+ <20200625061544.GC2141@linux.intel.com>
+ <1cebc562-89e9-3806-bb3c-771946fc64f3@redhat.com>
+ <20200625162540.GC3437@linux.intel.com>
+ <20200626180732.GB175520@xz-x1>
+ <20200626181820.GG6583@linux.intel.com>
+ <47b90b77-cf03-6087-b25f-fcd2fd313165@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <47b90b77-cf03-6087-b25f-fcd2fd313165@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vivek Goyal <vgoyal@redhat.com> writes:
+On Sat, Jun 27, 2020 at 04:24:34PM +0200, Paolo Bonzini wrote:
+> On 26/06/20 20:18, Sean Christopherson wrote:
+> >> Btw, would it be more staightforward to check "vcpu->arch.arch_capabilities &
+> >> ARCH_CAP_TSX_CTRL_MSR" rather than "*ebx | (F(RTM) | F(HLE))" even if we want
+> >> to have such a fix?
+> > Not really, That ends up duplicating the check in vmx_get_msr().  From an
+> > emulation perspective, this really is a "guest" access to the MSR, in the
+> > sense that it the virtual CPU is in the guest domain, i.e. not a god-like
+> > entity that gets to break the rules of emulation.
+> 
+> But if you wrote a guest that wants to read MSR_IA32_TSX_CTRL, there are
+> two choices:
+> 
+> 1) check ARCH_CAPABILITIES first
+> 
+> 2) blindly access it and default to 0.
+> 
+> Both are fine, because we know MSR_IA32_TSX_CTRL has no
+> reserved/must-be-one bits.  Calling __kvm_get_msr and checking for an
+> invalid MSR through the return value is not breaking the rules of
+> emulation, it is "faking" a #GP handler.
 
-> On Tue, Jun 30, 2020 at 05:13:54PM +0200, Vitaly Kuznetsov wrote:
->> 
->> > - If you retry in kernel, we will change the context completely that
->> >   who was trying to access the gfn in question. We want to retain
->> >   the real context and retain information who was trying to access
->> >   gfn in question.
->> 
->> (Just so I understand the idea better) does the guest context matter to
->> the host? Or, more specifically, are we going to do anything besides
->> get_user_pages() which will actually analyze who triggered the access
->> *in the guest*?
->
-> When we exit to user space, qemu prints bunch of register state. I am
-> wondering what does that state represent. Does some of that traces
-> back to the process which was trying to access that hva? I don't
-> know.
+"guest" was the wrong choice of word.  My point was that, IMO, emulation
+should never set host_initiated=true.
 
-We can get the full CPU state when the fault happens if we need to but
-generally we are not analyzing it. I can imagine looking at CPL, for
-example, but trying to distinguish guest's 'process A' from 'process B'
-may not be simple.
+To me, accessing MSRs with host_initiated is the equivalent of loading a
+ucode patch, i.e. it's super duper special stuff that deliberately turns
+off all safeguards and can change the fundamental behavior of the (virtual)
+CPU.
 
->
-> I think keeping a cache of error gfns might not be too bad from
-> implemetation point of view. I will give it a try and see how
-> bad does it look.
+Emulation on the other handle should either be subject to all the normal
+rules or have dedicated, intelligent handling for breaking the normal rules,
+e.g. nested usage of vmx_set_efer(), vmx_set_cr0, vmx_set_cr4, etc...
 
-Right; I'm only worried about the fact that every cache (or hash) has a
-limited size and under certain curcumstances we may overflow it. When an
-overflow happens, we will follow the APF path again and this can go over
-and over. Maybe we can punch a hole in EPT/NPT making the PFN reserved/
-not-present so when the guest tries to access it again we trap the
-access in KVM and, if the error persists, don't follow the APF path?
-
--- 
-Vitaly
-
+> So I think Peter's patch is fine, but (possibly on top as a third patch)
+> __must_check should be added to MSR getters and setters.  Also one
+> possibility is to return -EINVAL for invalid MSRs.
+> 
+> Paolo
+> 
