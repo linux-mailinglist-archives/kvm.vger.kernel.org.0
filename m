@@ -2,108 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 87B2120F35C
-	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 13:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1804B20F36B
+	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 13:10:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732807AbgF3LGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jun 2020 07:06:13 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31630 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728534AbgF3LGM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jun 2020 07:06:12 -0400
+        id S1732880AbgF3LKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jun 2020 07:10:12 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41545 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732874AbgF3LKK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Jun 2020 07:10:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593515170;
+        s=mimecast20190719; t=1593515409;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cnFIGetcwbVSZpWesLt/qU2CyjQtIMdEkML+yF3k6Ak=;
-        b=Gm+n3P1R+qS53LoGYWR3YvkYBmin4j1f7ettJxoAeakoa3NLYlZNBLxyc7aK8an6DikMNE
-        d5m2GBRll9VhEGfiAcOlsCHazXN23baMk1j2wd9YbtXpwWQ5745hcQlR2tbbt/9DdqsmO6
-        AyjV37vLAGuWzZR1lgks2N/jF+gVVqY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-suefEhYGMh-tbjpJ2TRc6w-1; Tue, 30 Jun 2020 07:06:09 -0400
-X-MC-Unique: suefEhYGMh-tbjpJ2TRc6w-1
-Received: by mail-wm1-f72.google.com with SMTP id z11so20706632wmg.5
-        for <kvm@vger.kernel.org>; Tue, 30 Jun 2020 04:06:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cnFIGetcwbVSZpWesLt/qU2CyjQtIMdEkML+yF3k6Ak=;
-        b=uaV6KKpQa8iukEQc0LdcHXlPJQCvrQPAgI9sbyzuCGELrU7NOpYBMmZ3tFsLTkAVAF
-         ksImkeH0R7WlWtZOlVM+OwnGIZgmVj/B/JvUrF9PcehJZkXHMQ65JO+SDRWMId1pkZLg
-         tql1XAxde6OxXJtWQxOqqeADykcjpZFF4vCw+3A4tTQjkUfrGVBNUiJ9Ke84XtpUk3pc
-         ix0tAppPnKYspVMEVtaF9OckfpckgFL2U/zAdVsDZSNQPYeSrhu5+iGzO43qxSA8BN6F
-         9/bpy0hDlbuyPE9rxALJ+F/A4kRDO46W7+vnivcsa1uwpgyZFJifADSXkoe9gK7Hxl6H
-         pL6w==
-X-Gm-Message-State: AOAM530Hd1I0xIabjZkGd9i6YeBIBPs+pAVCsl+BADqLxLm16eMa/9TG
-        wIrkHlDhE9K0xaOknZ9d5QULkoMR2gyC8ERKwqZRjPeXx9HpQNueLfcH0fnB3gfAMbhpLC/recZ
-        21zmxbwXHdpBZ
-X-Received: by 2002:a5d:4b84:: with SMTP id b4mr22421190wrt.334.1593515167634;
-        Tue, 30 Jun 2020 04:06:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBjypSCSAbWQNUFfpQuNm1ll95g6cdGIHaECloUwW4eKmJ0EHPo6DZFBDCz2eeeW7f9gmM4Q==
-X-Received: by 2002:a5d:4b84:: with SMTP id b4mr22421175wrt.334.1593515167449;
-        Tue, 30 Jun 2020 04:06:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:acad:d1d4:42b8:23e4? ([2001:b07:6468:f312:acad:d1d4:42b8:23e4])
-        by smtp.gmail.com with ESMTPSA id b23sm3388374wmd.37.2020.06.30.04.06.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jun 2020 04:06:06 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 4/5] x86: svm: wrong reserved bit in
- npt_rsvd_pfwalk_prepare
-To:     Nadav Amit <namit@vmware.com>
-Cc:     kvm@vger.kernel.org
-References: <20200630094516.22983-1-namit@vmware.com>
- <20200630094516.22983-5-namit@vmware.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=msnFaJYZDu81wFuqZFTp1ZOR5QC4oyv6dPxquziRN8w=;
+        b=HytoAQ3l5t4/mzUdrDO+1cm6r5p4j9FTs+iOJXMGAtfWT7bvzmhuGh8N5rxbmjSU3jE+mT
+        qO1fuvk8/H7yjzVvex5h6Jkk1rLPAzpm02tar+MXSeaVXG/D5AoS7AxJKZxBqMYCxn0RZg
+        SQAeR0W0uvLd9C9tVh9/WaOVioOUIDI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-VBh_BiGdOGuDy8VESVo1Dw-1; Tue, 30 Jun 2020 07:10:07 -0400
+X-MC-Unique: VBh_BiGdOGuDy8VESVo1Dw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B4C28015F4;
+        Tue, 30 Jun 2020 11:10:06 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 171861001901;
+        Tue, 30 Jun 2020 11:10:06 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eebb5fff-6090-e9ed-d604-d692054e9f6e@redhat.com>
-Date:   Tue, 30 Jun 2020 13:06:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Nadav Amit <namit@vmware.com>
+Subject: [PATCH] KVM: x86: bit 8 of non-leaf PDPEs is not reserved
+Date:   Tue, 30 Jun 2020 07:10:05 -0400
+Message-Id: <20200630111005.457029-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200630094516.22983-5-namit@vmware.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/06/20 11:45, Nadav Amit wrote:
-> According to AMD manual bit 8 in PDPE is not reserved, but bit 7.
+Bit 8 would be the "global" bit, which does not quite make sense for non-leaf
+page table entries.  Intel ignores it; AMD ignores it in PDEs and PDPEs, but
+reserves it in PML4Es.
 
-Indeed.  Maybe it was a problem in the previous versions because I
-remember adding this check explicitly.  I've sent a patch.
+Probably, earlier versions of the AMD manual documented it as reserved in PDPEs
+as well, and that behavior made it into KVM as well as kvm-unit-tests; fix it.
 
-Paolo
+Cc: stable@vger.kernel.org
+Reported-by: Nadav Amit <namit@vmware.com>
+Fixes: a0c0feb57992 ("KVM: x86: reserve bit 8 of non-leaf PDPEs and PML4Es in 64-bit mode on AMD", 2014-09-03)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Signed-off-by: Nadav Amit <namit@vmware.com>
-> ---
->  x86/svm_tests.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index 92cefaf..323031f 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -825,13 +825,13 @@ static void npt_rsvd_pfwalk_prepare(struct svm_test *test)
->      vmcb_ident(vmcb);
->  
->      pdpe = npt_get_pdpe();
-> -    pdpe[0] |= (1ULL << 8);
-> +    pdpe[0] |= (1ULL << 7);
->  }
->  
->  static bool npt_rsvd_pfwalk_check(struct svm_test *test)
->  {
->      u64 *pdpe = npt_get_pdpe();
-> -    pdpe[0] &= ~(1ULL << 8);
-> +    pdpe[0] &= ~(1ULL << 7);
->  
->      return (vmcb->control.exit_code == SVM_EXIT_NPF)
->              && (vmcb->control.exit_info_1 == 0x20000000eULL);
-> 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 76817d13c86e..6d6a0ae7800c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4449,7 +4449,7 @@ __reset_rsvds_bits_mask(struct kvm_vcpu *vcpu,
+ 			nonleaf_bit8_rsvd | rsvd_bits(7, 7) |
+ 			rsvd_bits(maxphyaddr, 51);
+ 		rsvd_check->rsvd_bits_mask[0][2] = exb_bit_rsvd |
+-			nonleaf_bit8_rsvd | gbpages_bit_rsvd |
++			gbpages_bit_rsvd |
+ 			rsvd_bits(maxphyaddr, 51);
+ 		rsvd_check->rsvd_bits_mask[0][1] = exb_bit_rsvd |
+ 			rsvd_bits(maxphyaddr, 51);
+-- 
+2.26.2
 
