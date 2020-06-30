@@ -2,108 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F25620EDD0
-	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 07:46:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D28820EE19
+	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 08:11:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730048AbgF3Fqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jun 2020 01:46:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57646 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730039AbgF3Fqc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jun 2020 01:46:32 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED699C061755;
-        Mon, 29 Jun 2020 22:46:31 -0700 (PDT)
-From:   "Ahmed S. Darwish" <a.darwish@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1593495988;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0pgkphRaGEy8Yhqq7odaGRHYOVQX84dVuNSHLC82kuU=;
-        b=E9otwvbsP6fkQIQEzrCLtoiSgGeFf4td6kMkZ8W7QaDr3/zwuxbE36rk6GMf+IhaSpz0Km
-        8N0+y2u+4FGwt7XZgIvxFlBrYY1rmNeWUlaPxiAdQw0is+7Q5ONMFRg4qvt0u0xbIoPsaZ
-        k/Smy86qXZVyaa9F7wj5oEAdfphHd6WpujuJh/S+XKmsZ1YNULvHCnt/XEpacTrjCOZg6m
-        HRTxT2hGtSfcZHD3+HdElggf7j6BTDwzDpR1lPfPuTlThTYRbHFQep8zjU4lV4urLp1YmH
-        QqKOvkX7NO/LbeAxhPB9kAtvkdzb2w3Dbsj6Fcx/ACRc2ydnkE2Xu5cw841+lw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1593495988;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0pgkphRaGEy8Yhqq7odaGRHYOVQX84dVuNSHLC82kuU=;
-        b=Xwgu3AOumeCzro6vBPT+CXbrO72V/FxDvk0GJo8E3RKV5/d3jWPZxXaVH9cPcuW8jYMeTp
-        qxjJYZnEuMDaNwCw==
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        "Sebastian A. Siewior" <bigeasy@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Ahmed S. Darwish" <a.darwish@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH v3 19/20] kvm/eventfd: Use sequence counter with associated spinlock
-Date:   Tue, 30 Jun 2020 07:44:51 +0200
-Message-Id: <20200630054452.3675847-20-a.darwish@linutronix.de>
-In-Reply-To: <20200630054452.3675847-1-a.darwish@linutronix.de>
-References: <20200519214547.352050-1-a.darwish@linutronix.de>
- <20200630054452.3675847-1-a.darwish@linutronix.de>
+        id S1729888AbgF3GLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jun 2020 02:11:51 -0400
+Received: from mga14.intel.com ([192.55.52.115]:56664 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725845AbgF3GLv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jun 2020 02:11:51 -0400
+IronPort-SDR: SWeiPHPHTaUUvP2lGpElwJJaB+GLorP+UeZTj67Rq2nYmsn0Un4mchnI0DbwWrB06CFVqDkJ+l
+ o40xmWn/iLJA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9666"; a="145228536"
+X-IronPort-AV: E=Sophos;i="5.75,296,1589266800"; 
+   d="scan'208";a="145228536"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2020 23:11:50 -0700
+IronPort-SDR: WHE0t9yzwpQ0xsCGPsCSh2IpbpMzO83OTzGpFF2gffqQMYkSgRBW7p3bEYpUK5mE+OUzVt0xek
+ mSi74pFIOZSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,296,1589266800"; 
+   d="scan'208";a="386605000"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga001.fm.intel.com with ESMTP; 29 Jun 2020 23:11:49 -0700
+Date:   Mon, 29 Jun 2020 23:11:49 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     syzbot <syzbot+a99874f5323ce6088e53@syzkaller.appspotmail.com>
+Cc:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Subject: Re: KASAN: null-ptr-deref Read in kvm_arch_check_processor_compat
+Message-ID: <20200630061149.GT12312@linux.intel.com>
+References: <000000000000077a6505a8bf57b2@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000077a6505a8bf57b2@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A sequence counter write side critical section must be protected by some
-form of locking to serialize writers. A plain seqcount_t does not
-contain the information of which lock must be held when entering a write
-side critical section.
+On Tue, Jun 23, 2020 at 05:17:15AM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following crash on:
+> 
+> HEAD commit:    7ae77150 Merge tag 'powerpc-5.8-1' of git://git.kernel.org..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=135e7235100000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=d195fe572fb15312
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a99874f5323ce6088e53
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14d001be100000
 
-Use the new seqcount_spinlock_t data type, which allows to associate a
-spinlock with the sequence counter. This enables lockdep to verify that
-the spinlock used for writer serialization is held when the write side
-critical section is entered.
-
-If lockdep is disabled this lock association is compiled out and has
-neither storage size nor runtime overhead.
-
-Signed-off-by: Ahmed S. Darwish <a.darwish@linutronix.de>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
----
- include/linux/kvm_irqfd.h | 2 +-
- virt/kvm/eventfd.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
-index dc1da020305b..dac047abdba7 100644
---- a/include/linux/kvm_irqfd.h
-+++ b/include/linux/kvm_irqfd.h
-@@ -42,7 +42,7 @@ struct kvm_kernel_irqfd {
- 	wait_queue_entry_t wait;
- 	/* Update side is protected by irqfds.lock */
- 	struct kvm_kernel_irq_routing_entry irq_entry;
--	seqcount_t irq_entry_sc;
-+	seqcount_spinlock_t irq_entry_sc;
- 	/* Used for level IRQ fast-path */
- 	int gsi;
- 	struct work_struct inject;
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index ef7ed916ad4a..d6408bb497dc 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -303,7 +303,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- 	INIT_LIST_HEAD(&irqfd->list);
- 	INIT_WORK(&irqfd->inject, irqfd_inject);
- 	INIT_WORK(&irqfd->shutdown, irqfd_shutdown);
--	seqcount_init(&irqfd->irq_entry_sc);
-+	seqcount_spinlock_init(&irqfd->irq_entry_sc, &kvm->irqfds.lock);
- 
- 	f = fdget(args->fd);
- 	if (!f.file) {
--- 
-2.20.1
-
+#syz dup: general protection fault in syscall_return_slowpath
