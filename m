@@ -2,197 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F31F20F9D4
-	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 18:51:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFA1820F9E7
+	for <lists+kvm@lfdr.de>; Tue, 30 Jun 2020 18:54:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389565AbgF3Qvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jun 2020 12:51:35 -0400
-Received: from foss.arm.com ([217.140.110.172]:43726 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728022AbgF3Qve (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jun 2020 12:51:34 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7189330E;
-        Tue, 30 Jun 2020 09:51:33 -0700 (PDT)
-Received: from [10.57.21.32] (unknown [10.57.21.32])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68BCD3F68F;
-        Tue, 30 Jun 2020 09:51:30 -0700 (PDT)
-Subject: Re: [PATCH 1/2] iommu: Add iommu_group_get/set_domain()
-To:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kevin Tian <kevin.tian@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
-References: <20200627031532.28046-1-baolu.lu@linux.intel.com>
- <acc0a8fd-bd23-fc34-aecc-67796ab216e7@arm.com>
- <5dc1cece-6111-9b56-d04c-9553d592675b@linux.intel.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <48dd9f1e-c18b-77b7-650a-c35ecbb69f2b@arm.com>
-Date:   Tue, 30 Jun 2020 17:51:29 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S2389893AbgF3QyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jun 2020 12:54:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55175 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731280AbgF3QyM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jun 2020 12:54:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593536050;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pXmamib9WjdIQWclbtNv+Mtf3LRDcnCnedPdsW7rtqo=;
+        b=afgm2PYkw8Lg8J6Yyjlw49/3V/kniMrnPBwnMyYyQKyKdL4DTWe9mcpGIuAtnS380gHGRV
+        L4UKijDTAflYU3jp1jnrLtyUsVe5yaif+RHdz4Hoa1yuIbGDuzm296HO329pzXx6DW1MgY
+        4fjwN3oXmY6cCQ5WbB5/uMSq5+WR1gU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-JBsnC_h9Nme6fk2yw_RyPA-1; Tue, 30 Jun 2020 12:54:07 -0400
+X-MC-Unique: JBsnC_h9Nme6fk2yw_RyPA-1
+Received: by mail-wr1-f71.google.com with SMTP id j16so13719209wrw.3
+        for <kvm@vger.kernel.org>; Tue, 30 Jun 2020 09:54:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pXmamib9WjdIQWclbtNv+Mtf3LRDcnCnedPdsW7rtqo=;
+        b=o68cPjEDLOjvNnp69q2Wkdyn2L2q+VTTE6Dd4YT9+He/jDdUx6rahsvVGSClv5MaYw
+         eWLGohu7rdrLDoJ9sIVBFiP8PXVOaSj4Q58+f1jQtmNTi6q22T4BTHOaBvZ8j/fmQRSW
+         9M8qWRL4/p5FITdWl54lUYmh2gpwi6YgurhKNYDJhRifvkxZpPziqmhk3qV+lqvO2g6u
+         PnkrDsusKmLdtUYq1NrcW1YwXS67EAu0KdzHdp+E9dSDJ2wEzudiQQpqdJtLmw4hyr6m
+         bWGetYGUFiF5ZuJ65b77Tz6XKdKDPytPtfPkM7XZ1fa+/PG/S841znIr8sLd6nf8Yc8O
+         Ibrw==
+X-Gm-Message-State: AOAM5323WRDsPlmO48DX8VfBZgTXy2MvCpqG9AOCdYinnBPaVJWx98NA
+        Y2V6aeMLAY7kv17Hmn9PK39DgztUhP7nTQ8RZNwHnk73cSKJgYXwQIUh+V0YiUOxSdGpb18HjK5
+        f167qHCo3fs41
+X-Received: by 2002:adf:eec8:: with SMTP id a8mr22963149wrp.421.1593536046020;
+        Tue, 30 Jun 2020 09:54:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzbzDEkQoe89/m3RRoO03z6agDDw19BZf29Q3NgMiaPn74wnB91OVrEdiyS+amyb3Y2sYal/Q==
+X-Received: by 2002:adf:eec8:: with SMTP id a8mr22963136wrp.421.1593536045825;
+        Tue, 30 Jun 2020 09:54:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:acad:d1d4:42b8:23e4? ([2001:b07:6468:f312:acad:d1d4:42b8:23e4])
+        by smtp.gmail.com with ESMTPSA id 65sm4318938wre.6.2020.06.30.09.54.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jun 2020 09:54:05 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 4/5] x86: svm: wrong reserved bit in
+ npt_rsvd_pfwalk_prepare
+To:     Nadav Amit <namit@vmware.com>
+Cc:     kvm@vger.kernel.org
+References: <20200630094516.22983-1-namit@vmware.com>
+ <20200630094516.22983-5-namit@vmware.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <306265c5-0593-397b-3b8f-eb237d1425cc@redhat.com>
+Date:   Tue, 30 Jun 2020 18:54:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <5dc1cece-6111-9b56-d04c-9553d592675b@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200630094516.22983-5-namit@vmware.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-06-30 02:03, Lu Baolu wrote:
-> Hi Robin,
+On 30/06/20 11:45, Nadav Amit wrote:
+> According to AMD manual bit 8 in PDPE is not reserved, but bit 7.
 > 
-> On 6/29/20 7:56 PM, Robin Murphy wrote:
->> On 2020-06-27 04:15, Lu Baolu wrote:
->>> The hardware assistant vfio mediated device is a use case of iommu
->>> aux-domain. The interactions between vfio/mdev and iommu during mdev
->>> creation and passthr are:
->>>
->>> - Create a group for mdev with iommu_group_alloc();
->>> - Add the device to the group with
->>>          group = iommu_group_alloc();
->>>          if (IS_ERR(group))
->>>                  return PTR_ERR(group);
->>>
->>>          ret = iommu_group_add_device(group, &mdev->dev);
->>>          if (!ret)
->>>                  dev_info(&mdev->dev, "MDEV: group_id = %d\n",
->>>                           iommu_group_id(group));
->>> - Allocate an aux-domain
->>>     iommu_domain_alloc()
->>> - Attach the aux-domain to the physical device from which the mdev is
->>>    created.
->>>     iommu_aux_attach_device()
->>>
->>> In the whole process, an iommu group was allocated for the mdev and an
->>> iommu domain was attached to the group, but the group->domain leaves
->>> NULL. As the result, iommu_get_domain_for_dev() doesn't work anymore.
->>>
->>> This adds iommu_group_get/set_domain() so that group->domain could be
->>> managed whenever a domain is attached or detached through the aux-domain
->>> api's.
->>
->> Letting external callers poke around directly in the internals of 
->> iommu_group doesn't look right to me.
+> Signed-off-by: Nadav Amit <namit@vmware.com>
+> ---
+>  x86/svm_tests.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Unfortunately, it seems that the vifo iommu abstraction is deeply bound
-> to the IOMMU subsystem. We can easily find other examples:
+> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+> index 92cefaf..323031f 100644
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -825,13 +825,13 @@ static void npt_rsvd_pfwalk_prepare(struct svm_test *test)
+>      vmcb_ident(vmcb);
+>  
+>      pdpe = npt_get_pdpe();
+> -    pdpe[0] |= (1ULL << 8);
+> +    pdpe[0] |= (1ULL << 7);
+>  }
+>  
+>  static bool npt_rsvd_pfwalk_check(struct svm_test *test)
+>  {
+>      u64 *pdpe = npt_get_pdpe();
+> -    pdpe[0] &= ~(1ULL << 8);
+> +    pdpe[0] &= ~(1ULL << 7);
+>  
+>      return (vmcb->control.exit_code == SVM_EXIT_NPF)
+>              && (vmcb->control.exit_info_1 == 0x20000000eULL);
 > 
-> iommu_group_get/set_iommudata()
-> iommu_group_get/set_name()
-> ...
 
-Sure, but those are ways for users of a group to attach useful 
-information of their own to it, that doesn't matter to the IOMMU 
-subsystem itself. The interface you've proposed gives callers rich new 
-opportunities to fundamentally break correct operation of the API:
+Wait, bit 7 is not reserved, it's the PS bit.  We need to use the PML4E instead (and
+then using bit 7 or bit 8 is irrelevant):
 
-	dom = iommu_domain_alloc();
-	iommu_attach_group(dom, grp);
-	...
-	iommu_group_set_domain(grp, NULL);
-	// oops, leaked and can't ever detach properly now
+diff --git a/x86/svm.c b/x86/svm.c
+index 0fcad8d..62907fd 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -49,6 +49,11 @@ u64 *npt_get_pdpe(void)
+ 	return pdpe;
+ }
+ 
++u64 *npt_get_pml4e(void)
++{
++	return pml4e;
++}
++
+ bool smp_supported(void)
+ {
+ 	return cpu_count() > 1;
+diff --git a/x86/svm.h b/x86/svm.h
+index 645deb7..8d688b6 100644
+--- a/x86/svm.h
++++ b/x86/svm.h
+@@ -365,6 +365,7 @@ typedef void (*test_guest_func)(struct svm_test *);
+ u64 *npt_get_pte(u64 address);
+ u64 *npt_get_pde(u64 address);
+ u64 *npt_get_pdpe(void);
++u64 *npt_get_pml4e(void);
+ bool smp_supported(void);
+ bool default_supported(void);
+ void default_prepare(struct svm_test *test);
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 92cefaf..b540527 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -824,13 +824,13 @@ static void npt_rsvd_pfwalk_prepare(struct svm_test *test)
+     u64 *pdpe;
+     vmcb_ident(vmcb);
+ 
+-    pdpe = npt_get_pdpe();
++    pdpe = npt_get_pml4e();
+     pdpe[0] |= (1ULL << 8);
+ }
+ 
+ static bool npt_rsvd_pfwalk_check(struct svm_test *test)
+ {
+-    u64 *pdpe = npt_get_pdpe();
++    u64 *pdpe = npt_get_pml4e();
+     pdpe[0] &= ~(1ULL << 8);
+ 
+     return (vmcb->control.exit_code == SVM_EXIT_NPF)
 
-or perhaps:
-
-	grp = iommu_group_alloc();
-	iommu_group_add_device(grp, dev);
-	iommu_group_set_domain(grp, dom);
-	...
-	iommu_detach_group(dom, grp);
-	// oops, IOMMU driver might not handle this
-
->> If a regular device is attached to one or more aux domains for PASID 
->> use, iommu_get_domain_for_dev() is still going to return the primary 
->> domain, so why should it be expected to behave differently for mediated
-> 
-> Unlike the normal device attach, we will encounter two devices when it
-> comes to aux-domain.
-> 
-> - Parent physical device - this might be, for example, a PCIe device
-> with PASID feature support, hence it is able to tag an unique PASID
-> for DMA transfers originated from its subset. The device driver hence
-> is able to wrapper this subset into an isolated:
-> 
-> - Mediated device - a fake device created by the device driver mentioned
-> above.
-> 
-> Yes. All you mentioned are right for the parent device. But for mediated
-> device, iommu_get_domain_for_dev() doesn't work even it has an valid
-> iommu_group and iommu_domain.
-> 
-> iommu_get_domain_for_dev() is a necessary interface for device drivers
-> which want to support aux-domain. For example,
-
-Only if they want to follow this very specific notion of using made-up 
-devices and groups to represent aux attachments. Even if a driver 
-managing its own aux domains entirely privately does create child 
-devices for them, it's not like it can't keep its domain pointers in 
-drvdata if it wants to ;)
-
-Let's not conflate the current implementation of vfio_mdev with the 
-general concepts involved here.
-
->            struct iommu_domain *domain;
->            struct device *dev = mdev_dev(mdev);
->        unsigned long pasid;
-> 
->            domain = iommu_get_domain_for_dev(dev);
->            if (!domain)
->                    return -ENODEV;
-> 
->            pasid = iommu_aux_get_pasid(domain, dev->parent);
->        if (pasid == IOASID_INVALID)
->            return -EINVAL;
-> 
->        /* Program the device context with the PASID value */
->        ....
-> 
-> Without this fix, iommu_get_domain_for_dev() always returns NULL and the
-> device driver has no means to support aux-domain.
-
-So either the IOMMU API itself is missing the ability to do the right 
-thing internally, or the mdev layer isn't using it appropriately. Either 
-way, simply punching holes in the API for mdev to hack around its own 
-mess doesn't seem like the best thing to do.
-
-The initial impression I got was that it's implicitly assumed here that 
-the mdev itself is attached to exactly one aux domain and nothing else, 
-at which point I would wonder why it's using aux at all, but are you 
-saying that in fact no attach happens with the mdev group either way, 
-only to the parent device?
-
-I'll admit I'm not hugely familiar with any of this, but it seems to me 
-that the logical flow should be:
-
-	- allocate domain
-	- attach as aux to parent
-	- retrieve aux domain PASID
-	- create mdev child based on PASID
-	- attach mdev to domain (normally)
-
-Of course that might require giving the IOMMU API a proper first-class 
-notion of mediated devices, such that it knows the mdev represents the 
-PASID, and can recognise the mdev attach is equivalent to the earlier 
-parent aux attach so not just blindly hand it down to an IOMMU driver 
-that's never heard of this new device before. Or perhaps the IOMMU 
-drivers do their own bookkeeping for the mdev bus, such that they do 
-handle the attach call, and just validate it internally based on the 
-associated parent device and PASID. Either way, the inside maintains 
-self-consistency and from the outside it looks like standard API usage 
-without nasty hacks.
-
-I'm pretty sure I've heard suggestions of using mediated devices beyond 
-VFIO (e.g. within the kernel itself), so chances are this is a direction 
-that we'll have to take at some point anyway.
-
-And, that said, even if people do want an immediate quick fix regardless 
-of technical debt, I'd still be a lot happier to see 
-iommu_group_set_domain() lightly respun as iommu_attach_mdev() ;)
-
-Robin.
