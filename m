@@ -2,50 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C245E210835
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 11:33:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9F92210874
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 11:43:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729339AbgGAJdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 05:33:00 -0400
-Received: from mga04.intel.com ([192.55.52.120]:58972 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729125AbgGAJc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jul 2020 05:32:59 -0400
-IronPort-SDR: AAEhakG+OcgAVZ2LEtwjaOTxoonbHU4icWraLazP5hcXqQzebymBlZnb8tEzpNTiJq0M3HcoYL
- qT/Vnwp4N6ew==
-X-IronPort-AV: E=McAfee;i="6000,8403,9668"; a="144022533"
-X-IronPort-AV: E=Sophos;i="5.75,299,1589266800"; 
-   d="scan'208";a="144022533"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 02:32:58 -0700
-IronPort-SDR: xPVmHT9r7rUz4ROWtBdompbiKh6cjb5Z+vG9xsw7w1ClrxwrAbTCELUz2R1TC7WyyBlPHckyT+
- bqe9gywTZcog==
-X-IronPort-AV: E=Sophos;i="5.75,299,1589266800"; 
-   d="scan'208";a="455036278"
-Received: from unknown (HELO [10.239.13.99]) ([10.239.13.99])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 02:32:56 -0700
-Subject: Re: [RFC 2/2] KVM: VMX: Enable bus lock VM exit
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20200628085341.5107-1-chenyi.qiang@intel.com>
- <20200628085341.5107-3-chenyi.qiang@intel.com>
- <878sg3bo8b.fsf@vitty.brq.redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <0159554d-82d5-b388-d289-a5375ca91323@intel.com>
-Date:   Wed, 1 Jul 2020 17:32:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1729262AbgGAJnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 05:43:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26223 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726343AbgGAJnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jul 2020 05:43:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593596587;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ntHMqGGzlSHdiWiMet5NwG/fAwiBWyche/+yMJxtBy8=;
+        b=F8btWrXp8HXJBZMFlkejuyvBkZ9X0JifpCphaQ4uJbQ9+40ER802Sns4ecp3Amkk0uHwxr
+        2Dsc5UOWePx6bDTb+xYGQ1Y2Q5MojEtTDNPukSW5EfWX7doG2i769e/XGqED5pOGAeTY6X
+        yFNDaCjghHC1ynCeJGA9r4dErpFlaCI=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-yC39GEN2NHi5fOz3lF12vQ-1; Wed, 01 Jul 2020 05:43:05 -0400
+X-MC-Unique: yC39GEN2NHi5fOz3lF12vQ-1
+Received: by mail-ej1-f69.google.com with SMTP id yh3so7590820ejb.16
+        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 02:43:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ntHMqGGzlSHdiWiMet5NwG/fAwiBWyche/+yMJxtBy8=;
+        b=dBe8VNR+xnY1hrgTHOFK8c8s1xX3dUwIIm2GhGG8fpfb6k6jhAFCbTih8c3Q3kN1b8
+         rUA2C3cqwPL6hTNXz91HMAhnPKbnpMYRvsYhHjx3iUbiUlCPSRwdm6tjIRZT2AuXrYPV
+         YK4kUunA/xn+dEMUICmhWiMj1vborUNICVymtMuBjOYkZP68d9GX28zQ5aKHvMpK879P
+         xOBM4i3zY3GS/psVPInVT8cnmCDhoG5OqwZUAvD97DSXyCZWpsfcqxyLJRWGIZRC6r7i
+         gFHiIIInoW71n8txe2613U/6OsLyxLGJIQ3+7RBdYQMM/LRrZq6B3vROmyJ5eixK5e17
+         f9Kg==
+X-Gm-Message-State: AOAM531UUQKua1oYHzjGXyUOOtCLuXHIDtq4jcSag/0KV+EJhSBhl4L4
+        R9lbxt/dV5+4pB+NaBtmneDG46HRDP8f9gYysniVflPLi6u/X6yFiRqzfQ0PjPa2aB6SH3oGHCL
+        ZvLX82e/k919i
+X-Received: by 2002:a50:d9cb:: with SMTP id x11mr26800273edj.93.1593596584768;
+        Wed, 01 Jul 2020 02:43:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysAD6eZS4h835YPzGv1oon872AAd124CBtSWatVPo/tbwN4cCnQFkdj98u0SpTxXTudJ4wtQ==
+X-Received: by 2002:a50:d9cb:: with SMTP id x11mr26800253edj.93.1593596584553;
+        Wed, 01 Jul 2020 02:43:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1142:70d6:6b9b:3cd1? ([2001:b07:6468:f312:1142:70d6:6b9b:3cd1])
+        by smtp.gmail.com with ESMTPSA id aq25sm4346066ejc.11.2020.07.01.02.43.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2020 02:43:03 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] scripts: Fix the check whether testname is
+ in the only_tests list
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     Drew Jones <drjones@redhat.com>
+References: <20200701083753.31366-1-thuth@redhat.com>
+ <11b56d2f-e481-8951-69ea-8400f1cb7939@redhat.com>
+ <c7485f32-d3bb-81f2-786a-3716f0a32800@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3b521930-4cec-e7d5-0d30-9d79684c9949@redhat.com>
+Date:   Wed, 1 Jul 2020 11:43:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <878sg3bo8b.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <c7485f32-d3bb-81f2-786a-3716f0a32800@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -53,40 +73,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/1/2020 5:04 PM, Vitaly Kuznetsov wrote:
-> Chenyi Qiang <chenyi.qiang@intel.com> writes:
-[...]
->>   static const int kvm_vmx_max_exit_handlers =
->> @@ -6830,6 +6838,13 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>   	if (unlikely(vmx->exit_reason.failed_vmentry))
->>   		return EXIT_FASTPATH_NONE;
->>   
->> +	/*
->> +	 * check the exit_reason to see if there is a bus lock
->> +	 * happened in guest.
->> +	 */
->> +	if (vmx->exit_reason.bus_lock_detected)
->> +		handle_bus_lock(vcpu);
+On 01/07/20 10:57, Thomas Huth wrote:
+>>>
+>>
+>> Simpler: grep -q " $testname " <<< " $only_tests "
 > 
-> In case the ultimate goal is to have an exit to userspace on bus lock,
-
-I don't think we will need an exit to userspace on bus lock. See below.
-
-> the two ways to reach handle_bus_lock() are very different: in case
-> we're handling EXIT_REASON_BUS_LOCK we can easily drop to userspace by
-> returning 0 but what are we going to do in case of
-> exit_reason.bus_lock_detected? The 'higher priority VM exit' may require
-> exit to userspace too. So what's the plan? Maybe we can ignore the case
-> when we're exiting to userspace for some other reason as this is slow
-> already and force the exit otherwise? 
-
-> And should we actually introduce
-> the KVM_EXIT_BUS_LOCK and a capability to enable it here?
+> That doesn't work:
 > 
+> $ ./run_tests.sh ioapic-split
+> PASS apic-split (53 tests)
+> PASS ioapic-split (19 tests)
+> PASS apic (53 tests)
+> PASS ioapic (26 tests)
+> 
+> ... because the $testname comes from unittests.cfg and $only_tests is
+> the list that has been given on the command line. It would maybe work if
+> the check was the other way round ... but that would require to rewrite
+> quite a bit of the script logic...
 
-Introducing KVM_EXIT_BUS_LOCK maybe help nothing. No matter 
-EXIT_REASON_BUS_LOCK or exit_reason.bus_lock_detected, the bus lock has 
-already happened. Exit to userspace cannot prevent bus lock, so what 
-userspace can do is recording and counting as what this patch does in 
-vcpu->stat.bus_locks.
+It works here.  I'll send a patch.
+
+Paolo
+
+> By the way, you can currently also run "./run_test.sh badname" and it
+> does *not* complain that "badname" is an illegal test name...
 
