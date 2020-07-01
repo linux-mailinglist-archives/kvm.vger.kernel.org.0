@@ -2,87 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A64E21098D
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 12:42:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07D82210995
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 12:43:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729976AbgGAKmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 06:42:02 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23657 "EHLO
+        id S1730015AbgGAKnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 06:43:52 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34256 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729180AbgGAKmC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 06:42:02 -0400
+        by vger.kernel.org with ESMTP id S1729926AbgGAKnv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 06:43:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593600121;
+        s=mimecast20190719; t=1593600229;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=m/kPRm/zKRHB19QtubNaxx70JX8VBZbCEiMqsySYO9A=;
-        b=VcW4WFvEv8NoWHS0Gral2cq0Rt62lzJoyxJVQ9fVcbRLWCxRBEcsNm8G18QefAUo09AqU1
-        2XMvU2uWoyzY2TqvhtjOmDEi39hTqzEpkP7hPtapeA+6RW2pB1hWORYDmymVv3+AyBoTqT
-        PnMkhNIsIjOqccdt1PW1J9OiFgwzE/w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-eF9s6Ru_OmuETudaU2vnXw-1; Wed, 01 Jul 2020 06:41:58 -0400
-X-MC-Unique: eF9s6Ru_OmuETudaU2vnXw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8729107B115;
-        Wed,  1 Jul 2020 10:41:57 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-45.ams2.redhat.com [10.36.114.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A7ADC5C1C5;
-        Wed,  1 Jul 2020 10:41:53 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] gitlab-ci.yml: Extend the lists of tests
- that we run with TCG
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Drew Jones <drjones@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20200701100615.7975-1-thuth@redhat.com>
- <38846a44-2e55-4c5f-5846-d4bca6eda8ee@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <77190b11-4575-e59a-67e4-250e49c0a360@redhat.com>
-Date:   Wed, 1 Jul 2020 12:41:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        bh=iJDnIere4ckUlcqu2vjyvbJB29ysZfytbrXR/5K7PEs=;
+        b=RALVUCmR9gp9sRHt4CA64SI+z5ffw291dGk7Ikx7LlRTHOmpv0Xg6c+rIwP8uAaqtw2Q9B
+        xKxhUsRqw5qygzGw+CtObK5ZErRCfX2zvkHBRsMsev8yLq8Yoxm2Pb1M8LZ/4TWwEAUuQI
+        GktTFF3ih0DxhtHN66GpDAdooZXs6No=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-_c-3B-Z5Oc6yU3D2Au3t6w-1; Wed, 01 Jul 2020 06:43:46 -0400
+X-MC-Unique: _c-3B-Z5Oc6yU3D2Au3t6w-1
+Received: by mail-qk1-f198.google.com with SMTP id p126so602022qkf.15
+        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 03:43:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iJDnIere4ckUlcqu2vjyvbJB29ysZfytbrXR/5K7PEs=;
+        b=K57j2/W6cCIgTImb48tYPOVR2s1BEW+PlCQ5ZnP0nMbKICw5FokNxlFKSD+p1mHO48
+         rHeQ0b2ARN8NzkO4L9DGs8FSNa/taqK/8zaDjyFiSYCSgpJnq5JjvYN9e7PybBYfin7g
+         258dIKD3ZlGNN/kR3R0BeYezySgGJOyrk0kFoWuJunAVkyx+zCx0y3uT1oKcuyCzflAp
+         qnK98PaoGflrBHAr5WAzUkLdagQSyr+7eEidrDA025rqmnFmLIHkltIAx/RYGfOzYZqM
+         HAS90O6eAS1W992zTGOfgGQWDK3ZuetzxXia3ANr1leyGgTxdk28la26iKnFWM1Ugzy9
+         ByNA==
+X-Gm-Message-State: AOAM531yf0bOz/7BxBI+vN1v/NEgmqYYKNJjoQN4XhWJ+ZCYg+ctVtez
+        +mP9cGsPg9k6/odypAcidIP9K+o93XTxLNV87olcDxmnX1bSqTbd/ueoiW2GyBz0PnDNiKUiEEM
+        TpQmS1LQGHg2QPbLA15mMMc3oCDZ8
+X-Received: by 2002:a05:620a:11b3:: with SMTP id c19mr24282753qkk.203.1593600226407;
+        Wed, 01 Jul 2020 03:43:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxA+6E7kiqCtAV/8nSkNYVRZ2RneWi1RECnUnttFwOq2tXRpiCh8ne4TffX0pRmGxcg2IGuMwNPewmLwloiNcE=
+X-Received: by 2002:a05:620a:11b3:: with SMTP id c19mr24282729qkk.203.1593600226047;
+ Wed, 01 Jul 2020 03:43:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <38846a44-2e55-4c5f-5846-d4bca6eda8ee@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200611113404.17810-1-mst@redhat.com> <20200611113404.17810-3-mst@redhat.com>
+ <20200611152257.GA1798@char.us.oracle.com> <CAJaqyWdwXMX0JGhmz6soH2ZLNdaH6HEdpBM8ozZzX9WUu8jGoQ@mail.gmail.com>
+ <CAJaqyWdwgy0fmReOgLfL4dAv-E+5k_7z3d9M+vHqt0aO2SmOFg@mail.gmail.com>
+ <20200622114622-mutt-send-email-mst@kernel.org> <CAJaqyWfrf94Gc-DMaXO+f=xC8eD3DVCD9i+x1dOm5W2vUwOcGQ@mail.gmail.com>
+ <20200622122546-mutt-send-email-mst@kernel.org> <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
+In-Reply-To: <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 1 Jul 2020 12:43:09 +0200
+Message-ID: <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com>
+Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/07/2020 12.37, Paolo Bonzini wrote:
-> On 01/07/20 12:06, Thomas Huth wrote:
->> Thank to the recent fixes, there are now quite a lot of additional 32-bit
->> x86 tests that we can run in the CI.
->> And thanks to the update to Fedora 32 (that introduced a newer version of
->> QEMU), there are now also some additional tests that we can run with TCG
->> for the other architectures.
->> Note that for arm/aarch64, we now also set the MAX_SMP to be able to run
->> SMP-tests with TCG in the single-threaded CI containers, too.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   Note: taskswitch2 for 32-bit x86 is still broken, and thus has not been
->>   added back again. It used to work with F30 ... maybe it's a QEMU regression?
-> 
-> It's on my todo list to check.  One thing (sorry about the constant
-> nitpicking), should tests be listed one per line so that it's clearer
-> when we add them?
+On Tue, Jun 23, 2020 at 6:15 PM Eugenio Perez Martin
+<eperezma@redhat.com> wrote:
+>
+> On Mon, Jun 22, 2020 at 6:29 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Jun 22, 2020 at 06:11:21PM +0200, Eugenio Perez Martin wrote:
+> > > On Mon, Jun 22, 2020 at 5:55 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Fri, Jun 19, 2020 at 08:07:57PM +0200, Eugenio Perez Martin wrote:
+> > > > > On Mon, Jun 15, 2020 at 2:28 PM Eugenio Perez Martin
+> > > > > <eperezma@redhat.com> wrote:
+> > > > > >
+> > > > > > On Thu, Jun 11, 2020 at 5:22 PM Konrad Rzeszutek Wilk
+> > > > > > <konrad.wilk@oracle.com> wrote:
+> > > > > > >
+> > > > > > > On Thu, Jun 11, 2020 at 07:34:19AM -0400, Michael S. Tsirkin wrote:
+> > > > > > > > As testing shows no performance change, switch to that now.
+> > > > > > >
+> > > > > > > What kind of testing? 100GiB? Low latency?
+> > > > > > >
+> > > > > >
+> > > > > > Hi Konrad.
+> > > > > >
+> > > > > > I tested this version of the patch:
+> > > > > > https://lkml.org/lkml/2019/10/13/42
+> > > > > >
+> > > > > > It was tested for throughput with DPDK's testpmd (as described in
+> > > > > > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html)
+> > > > > > and kernel pktgen. No latency tests were performed by me. Maybe it is
+> > > > > > interesting to perform a latency test or just a different set of tests
+> > > > > > over a recent version.
+> > > > > >
+> > > > > > Thanks!
+> > > > >
+> > > > > I have repeated the tests with v9, and results are a little bit different:
+> > > > > * If I test opening it with testpmd, I see no change between versions
+> > > >
+> > > >
+> > > > OK that is testpmd on guest, right? And vhost-net on the host?
+> > > >
+> > >
+> > > Hi Michael.
+> > >
+> > > No, sorry, as described in
+> > > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html.
+> > > But I could add to test it in the guest too.
+> > >
+> > > These kinds of raw packets "bursts" do not show performance
+> > > differences, but I could test deeper if you think it would be worth
+> > > it.
+> >
+> > Oh ok, so this is without guest, with virtio-user.
+> > It might be worth checking dpdk within guest too just
+> > as another data point.
+> >
+>
+> Ok, I will do it!
+>
+> > > > > * If I forward packets between two vhost-net interfaces in the guest
+> > > > > using a linux bridge in the host:
+> > > >
+> > > > And here I guess you mean virtio-net in the guest kernel?
+> > >
+> > > Yes, sorry: Two virtio-net interfaces connected with a linux bridge in
+> > > the host. More precisely:
+> > > * Adding one of the interfaces to another namespace, assigning it an
+> > > IP, and starting netserver there.
+> > > * Assign another IP in the range manually to the other virtual net
+> > > interface, and start the desired test there.
+> > >
+> > > If you think it would be better to perform then differently please let me know.
+> >
+> >
+> > Not sure why you bother with namespaces since you said you are
+> > using L2 bridging. I guess it's unimportant.
+> >
+>
+> Sorry, I think I should have provided more context about that.
+>
+> The only reason to use namespaces is to force the traffic of these
+> netperf tests to go through the external bridge. To test netperf
+> different possibilities than the testpmd (or pktgen or others "blast
+> of frames unconditionally" tests).
+>
+> This way, I make sure that is the same version of everything in the
+> guest, and is a little bit easier to manage cpu affinity, start and
+> stop testing...
+>
+> I could use a different VM for sending and receiving, but I find this
+> way a faster one and it should not introduce a lot of noise. I can
+> test with two VM if you think that this use of network namespace
+> introduces too much noise.
+>
+> Thanks!
+>
+> > > >
+> > > > >   - netperf UDP_STREAM shows a performance increase of 1.8, almost
+> > > > > doubling performance. This gets lower as frame size increase.
 
-I guess that's mostly a matter of taste, I think I slightly prefer the 
-more condensed list to avoid that the test case definitions get too 
-big... but if it bugs you, feel free to change it.
+Regarding UDP_STREAM:
+* with event_idx=on: The performance difference is reduced a lot if
+applied affinity properly (manually assigning CPU on host/guest and
+setting IRQs on guest), making them perform equally with and without
+the patch again. Maybe the batching makes the scheduler perform
+better.
 
-> But anyway I'm queuing this patch.
+> > > > >   - rests of the test goes noticeably worse: UDP_RR goes from ~6347
+> > > > > transactions/sec to 5830
+
+* Regarding UDP_RR, TCP_STREAM, and TCP_RR, proper CPU pinning makes
+them perform similarly again, only a very small performance drop
+observed. It could be just noise.
+** All of them perform better than vanilla if event_idx=off, not sure
+why. I can try to repeat them if you suspect that can be a test
+failure.
+
+* With testpmd and event_idx=off, if I send from the VM to host, I see
+a performance increment especially in small packets. The buf api also
+increases performance compared with only batching: Sending the minimum
+packet size in testpmd makes pps go from 356kpps to 473 kpps. Sending
+1024 length UDP-PDU makes it go from 570kpps to 64 kpps.
+
+Something strange I observe in these tests: I get more pps the bigger
+the transmitted buffer size is. Not sure why.
+
+** Sending from the host to the VM does not make a big change with the
+patches in small packets scenario (minimum, 64 bytes, about 645
+without the patch, ~625 with batch and batch+buf api). If the packets
+are bigger, I can see a performance increase: with 256 bits, it goes
+from 590kpps to about 600kpps, and in case of 1500 bytes payload it
+gets from 348kpps to 528kpps, so it is clearly an improvement.
+
+* with testpmd and event_idx=on, batching+buf api perform similarly in
+both directions.
+
+All of testpmd tests were performed with no linux bridge, just a
+host's tap interface (<interface type='ethernet'> in xml), with a
+testpmd txonly and another in rxonly forward mode, and using the
+receiving side packets/bytes data. Guest's rps, xps and interrupts,
+and host's vhost threads affinity were also tuned in each test to
+schedule both testpmd and vhost in different processors.
+
+I will send the v10 RFC with the small changes requested by Stefan and Jason.
 
 Thanks!
-  Thomas
+
+
+
+
+
+
+
+> > > >
+> > > > OK so it seems plausible that we still have a bug where an interrupt
+> > > > is delayed. That is the main difference between pmd and virtio.
+> > > > Let's try disabling event index, and see what happens - that's
+> > > > the trickiest part of interrupts.
+> > > >
+> > >
+> > > Got it, will get back with the results.
+> > >
+> > > Thank you very much!
+> > >
+> > > >
+> > > >
+> > > > >   - TCP_STREAM goes from ~10.7 gbps to ~7Gbps
+> > > > >   - TCP_RR from 6223.64 transactions/sec to 5739.44
+> > > >
+> >
 
