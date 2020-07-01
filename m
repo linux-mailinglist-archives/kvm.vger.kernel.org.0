@@ -2,102 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58FC72108B5
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 11:55:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CAEF2108E4
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 12:05:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729339AbgGAJzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 05:55:33 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56483 "EHLO
+        id S1729716AbgGAKFp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 06:05:45 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26894 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729109AbgGAJzd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 05:55:33 -0400
+        by vger.kernel.org with ESMTP id S1729057AbgGAKFo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 06:05:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593597332;
+        s=mimecast20190719; t=1593597943;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Je7e+r7292aKuavAnjcPANtEH7N/fnSqK9E4e4P46/M=;
-        b=Nb0/h64QZUkTbl9uERBW39EvIsUT2uFwNfbNJ20paUey0BKkwVlb3701a4L1d/U9hYsjG4
-        C3JGVj8MmbE13Eyyl9lhwppOW2Zr12/2Vww7LXB7Q8pBakXk1lT8hJBSwgY7wsD1uVdC81
-        qcjcm6Vo8iDyefnd3MU3H2tsxuczgag=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-jqqthDMpN_S_S5-bjl1eOQ-1; Wed, 01 Jul 2020 05:55:28 -0400
-X-MC-Unique: jqqthDMpN_S_S5-bjl1eOQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D581100CCD3
-        for <kvm@vger.kernel.org>; Wed,  1 Jul 2020 09:55:27 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-45.ams2.redhat.com [10.36.114.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B456810013C1;
-        Wed,  1 Jul 2020 09:55:26 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] scripts: Fix the check whether testname is
+        bh=li9kQYxVCnOWZjNd5oQ1bpoIqi+vU3V1yJrJ39eSBFg=;
+        b=RBVwPN/PALEhlJCeTmN1zGxhN+oURKXrR8g0+hI60FmMd6zQLYxIJTlsXfRTsMotz9BFGg
+        jpJGPBwbruyP4/audVBRhJmi8WxiRJcYL14I9y0caTIIaPN4VnebVN2Q44ieuUtgaOUfbJ
+        lZoHbjJH4Za/eD1DIIlRtICqSe746rA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-gD1oVM58Oc25VykIQsCcUQ-1; Wed, 01 Jul 2020 06:05:41 -0400
+X-MC-Unique: gD1oVM58Oc25VykIQsCcUQ-1
+Received: by mail-ej1-f72.google.com with SMTP id op28so12952079ejb.15
+        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 03:05:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=li9kQYxVCnOWZjNd5oQ1bpoIqi+vU3V1yJrJ39eSBFg=;
+        b=rr3rBqi8hYiqz8qFfSh2AScIKc37oOTUVVvIZjnrYDdpcQQS60uKL/YaQs9lF8oqgb
+         WatcJApiQHuGZT0ZSn5oI3dW4+QcsIF9ZGrFdc0L9go/r0SrLqENJmR8TSYCydAuE9ND
+         994NC3ETTpAtAEEMIiK9dii/ybh4t3BX7S/BzRZuWT2hEXdk3Ein09ZCiD3SlLwGeVeW
+         Fh5wFyarP7M0c9Z25PtUQINEdYR4mn+ot0V2XiY/Kkz8cd+fkHOce5/evqG/5i+Z/SY5
+         hy0SyUMx+EM0h2MhqFSZQueXvL6aNQZHFEHJRJbau832r3I7UxldmG1AFjQCahkcdw9b
+         +Fgg==
+X-Gm-Message-State: AOAM533qWPPOd13uDtStbImm/XLnxo3qV83hSwm6gDDB5CLkmpFiHoxX
+        CwzoGrRhtk303mJ37sqP85o54KGPuLxwxvaR1qAETVS3JaNRdSrRj2qa/272gyxrx/vDGhxMe2+
+        O/WQRH7B4QKIs
+X-Received: by 2002:a17:907:7245:: with SMTP id ds5mr21983630ejc.1.1593597940403;
+        Wed, 01 Jul 2020 03:05:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzHvzskXgfVlBxP5vb4TvAlruikyK7KVp4OUyw+FNTlg8IZLazZ6bkS/SUTM94YDYowVPxbtA==
+X-Received: by 2002:a17:907:7245:: with SMTP id ds5mr21983617ejc.1.1593597940213;
+        Wed, 01 Jul 2020 03:05:40 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1142:70d6:6b9b:3cd1? ([2001:b07:6468:f312:1142:70d6:6b9b:3cd1])
+        by smtp.gmail.com with ESMTPSA id p18sm4339638ejm.55.2020.07.01.03.05.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2020 03:05:39 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] scripts: Fix the check whether testname is
  in the only_tests list
-From:   Thomas Huth <thuth@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Drew Jones <drjones@redhat.com>
-References: <20200701083753.31366-1-thuth@redhat.com>
- <11b56d2f-e481-8951-69ea-8400f1cb7939@redhat.com>
- <c7485f32-d3bb-81f2-786a-3716f0a32800@redhat.com>
-Message-ID: <bcf84232-4a3e-e8ed-e414-d9efb853ae8c@redhat.com>
-Date:   Wed, 1 Jul 2020 11:55:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+References: <20200701094635.19491-1-pbonzini@redhat.com>
+ <db772d67-a16a-086b-bfc3-e9348ea27c16@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a972d2db-4c41-3140-2716-f797ed27f440@redhat.com>
+Date:   Wed, 1 Jul 2020 12:05:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <c7485f32-d3bb-81f2-786a-3716f0a32800@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <db772d67-a16a-086b-bfc3-e9348ea27c16@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/07/2020 10.57, Thomas Huth wrote:
-> On 01/07/2020 10.51, Paolo Bonzini wrote:
->> On 01/07/20 10:37, Thomas Huth wrote:
->>> When you currently run
->>>
->>>   ./run_tests.sh ioapic-split
->>>
->>> the kvm-unit-tests run scripts do not only execute the "ioapic-split"
->>> test, but also the "ioapic" test, which is quite surprising. This
->>> happens because we use "grep -w" for checking whether a test should
->>> be run or not - and "grep -w" does not consider the "-" character as
->>> part of a word.
->>>
->>> To fix the issue, convert the dash into an underscore character before
->>> running "grep -w".
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>   scripts/runtime.bash | 3 ++-
->>>   1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
->>> index 8bfe31c..03fd20a 100644
->>> --- a/scripts/runtime.bash
->>> +++ b/scripts/runtime.bash
->>> @@ -84,7 +84,8 @@ function run()
->>>           return
->>>       fi
->>> -    if [ -n "$only_tests" ] && ! grep -qw "$testname" 
->>> <<<$only_tests; then
->>> +    if [ -n "$only_tests" ] && ! sed s/-/_/ <<<$only_tests \
->>> +                               | grep -qw $(sed s/-/_/ <<< 
->>> "$testname") ; then
->>>           return
->>>       fi
->>>
->>
->> Simpler: grep -q " $testname " <<< " $only_tests "
+On 01/07/20 11:52, Thomas Huth wrote:
+>>   +function find_word()
+>> +{
+>> +    grep -q " $1 " <<< " $2 "
+>> +}
 > 
-> That doesn't work:
+> Ah, clever idea with the surrounding spaces here!
 
-I obviously missed the surrounding spaces ... not enough coffee... ;-)
+That's what you gain from learning to program in GW-BASIC, who wants
+regular expression when you have INSTR.
 
-  Thomas
+But seriously: what do you think about adding "-F"?  The use of regex in
+only_tests/only_group is not documented and might have surprising
+effects.  If we want to keep it, we could replace spaces with newlines
+and use ^$ in the regex.
+
+Paolo
+
+> Works great for me, so:
+> Tested-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
 
