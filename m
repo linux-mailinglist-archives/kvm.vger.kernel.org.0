@@ -2,84 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3FE72114AD
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 23:02:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3FB62114D8
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 23:16:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727062AbgGAVCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 17:02:41 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45634 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725535AbgGAVCl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 17:02:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593637360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=/2cNlIlhLsfre0+HjP1RIAKjqNYYQUIp8pAZWmFwfi4=;
-        b=IPTjrwRLKgX5vGqlQUHuEKWboqsYd1OItQweRMqzPAZoQHM7+UQ2dMuOgu5AvXWaV4J4rc
-        UbbM/T7uBhNK2JSYlFTyLpBZeKM0PUs+bqVnfsl4N7xy9u0x6HFrijVLMGUIoBbC2s8Bq9
-        iPp4/z6RGVp6FjkmqrJPo+Ibl0/IfTY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-Zr6jlFD3OeGcr5l350Wb2g-1; Wed, 01 Jul 2020 17:02:38 -0400
-X-MC-Unique: Zr6jlFD3OeGcr5l350Wb2g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726897AbgGAVQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 17:16:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35176 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725915AbgGAVQp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jul 2020 17:16:45 -0400
+Received: from localhost (mobile-166-175-191-139.mycingular.net [166.175.191.139])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55E07186A200;
-        Wed,  1 Jul 2020 21:02:37 +0000 (UTC)
-Received: from gimli.home (ovpn-112-156.phx2.redhat.com [10.3.112.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3654A60CD1;
-        Wed,  1 Jul 2020 21:02:34 +0000 (UTC)
-Subject: [PATCH] vfio/pci: Add Intel X550 to hidden INTx devices
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com
-Cc:     Jesse Brandeburg <jesse.brandeburg@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Date:   Wed, 01 Jul 2020 15:02:33 -0600
-Message-ID: <159363734524.19359.5271945196793749675.stgit@gimli.home>
-User-Agent: StGit/0.19-dirty
+        by mail.kernel.org (Postfix) with ESMTPSA id 942C6206DD;
+        Wed,  1 Jul 2020 21:16:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593638204;
+        bh=yqcCUEC8nfgHouSGRrdvAT45NLmgQ8sLV2KP9vvzvko=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=qUF14IjzVJOUcBQNw2iXejzu+oMXcWIle9BD00FgE+DLF+9zFscGD8EHT/6Gi6REv
+         9X0mdNcAXiageGtlO9TCW2tBPhuWK8ckKvIyYlo+dSFFmYftmuvob2ExE9iTJ7Lvcf
+         4C4DN+LeTjCA/AkE9OKDk16dYWLVWoYGAoM81VEw=
+Date:   Wed, 1 Jul 2020 16:16:43 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     alex.williamson@redhat.com, herbert@gondor.apana.org.au,
+        cohuck@redhat.com, nhorman@redhat.com, vdronov@redhat.com,
+        bhelgaas@google.com, mark.a.chambers@intel.com,
+        gordon.mcfadden@intel.com, ahsan.atta@intel.com,
+        qat-linux@intel.com, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] PCI: add Intel QuickAssist device IDs
+Message-ID: <20200701211643.GA3660000@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200701110302.75199-2-giovanni.cabiddu@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Intel document 333717-008, "Intel® Ethernet Controller X550
-Specification Update", version 2.7, dated June 2020, includes errata
-#22, added in version 2.1, May 2016, indicating X550 NICs suffer from
-the same implementation deficiency as the 700-series NICs:
+Please follow the subject line convention, e.g.,
 
-"The Interrupt Status bit in the Status register of the PCIe
- configuration space is not implemented and is not set as described
- in the PCIe specification."
+  PCI: Add Intel QuickAssist Device IDs
 
-Without the interrupt status bit, vfio-pci cannot determine when
-these devices signal INTx.  They are therefore added to the nointx
-quirk.
-
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci.c |    2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index f634c81998bb..9968dc0f87a3 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -207,6 +207,8 @@ static bool vfio_pci_nointx(struct pci_dev *pdev)
- 		case 0x1580 ... 0x1581:
- 		case 0x1583 ... 0x158b:
- 		case 0x37d0 ... 0x37d2:
-+		/* X550 */
-+		case 0x1563:
- 			return true;
- 		default:
- 			return false;
-
+On Wed, Jul 01, 2020 at 12:02:58PM +0100, Giovanni Cabiddu wrote:
+> Add device IDs for the following Intel QuickAssist devices: DH895XCC,
+> C3XXX and C62X.
+> 
+> The defines in this patch are going to be referenced in two independent
+> drivers, qat and vfio-pci.
+> 
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>  include/linux/pci_ids.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index 0ad57693f392..f3166b1425ca 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -2659,6 +2659,8 @@
+>  #define PCI_DEVICE_ID_INTEL_80332_1	0x0332
+>  #define PCI_DEVICE_ID_INTEL_80333_0	0x0370
+>  #define PCI_DEVICE_ID_INTEL_80333_1	0x0372
+> +#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC	0x0435
+> +#define PCI_DEVICE_ID_INTEL_QAT_DH895XCC_VF	0x0443
+>  #define PCI_DEVICE_ID_INTEL_82375	0x0482
+>  #define PCI_DEVICE_ID_INTEL_82424	0x0483
+>  #define PCI_DEVICE_ID_INTEL_82378	0x0484
+> @@ -2708,6 +2710,8 @@
+>  #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_NHI     0x1577
+>  #define PCI_DEVICE_ID_INTEL_ALPINE_RIDGE_4C_BRIDGE  0x1578
+>  #define PCI_DEVICE_ID_INTEL_80960_RP	0x1960
+> +#define PCI_DEVICE_ID_INTEL_QAT_C3XXX	0x19e2
+> +#define PCI_DEVICE_ID_INTEL_QAT_C3XXX_VF	0x19e3
+>  #define PCI_DEVICE_ID_INTEL_82840_HB	0x1a21
+>  #define PCI_DEVICE_ID_INTEL_82845_HB	0x1a30
+>  #define PCI_DEVICE_ID_INTEL_IOAT	0x1a38
+> @@ -2924,6 +2928,8 @@
+>  #define PCI_DEVICE_ID_INTEL_IOAT_JSF7	0x3717
+>  #define PCI_DEVICE_ID_INTEL_IOAT_JSF8	0x3718
+>  #define PCI_DEVICE_ID_INTEL_IOAT_JSF9	0x3719
+> +#define PCI_DEVICE_ID_INTEL_QAT_C62X	0x37c8
+> +#define PCI_DEVICE_ID_INTEL_QAT_C62X_VF	0x37c9
+>  #define PCI_DEVICE_ID_INTEL_ICH10_0	0x3a14
+>  #define PCI_DEVICE_ID_INTEL_ICH10_1	0x3a16
+>  #define PCI_DEVICE_ID_INTEL_ICH10_2	0x3a18
+> -- 
+> 2.26.2
+> 
