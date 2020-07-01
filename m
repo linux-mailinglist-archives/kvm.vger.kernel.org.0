@@ -2,117 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFDA2210B2A
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 14:44:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23422210B61
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 14:57:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730393AbgGAMoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 08:44:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28639 "EHLO
+        id S1730624AbgGAM5c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 08:57:32 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54945 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730521AbgGAMoW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 08:44:22 -0400
+        by vger.kernel.org with ESMTP id S1730388AbgGAM5b (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 08:57:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593607461;
+        s=mimecast20190719; t=1593608248;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=riQxZ5rhfq+xTLDrKWBK+2YUUfRaxcLTVz5p24IUk7M=;
-        b=A9YbqXI2T25yE+Cyp9Ydb46O+KMb9UPuSmomLQXvRdkJOdHCtdhktELm+3/W4D2cLrJZRS
-        uxPyMqD8DU+MO/Gk1UEKRKgBfH57LUsghNghBWum0HTvFY50dYxSYntnISCylloIZVGJCf
-        bYL8efmsseIXeu82B9lcc3rAqcFB0/U=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-04T5n_qXN6iTbwFlAZRwNA-1; Wed, 01 Jul 2020 08:44:17 -0400
-X-MC-Unique: 04T5n_qXN6iTbwFlAZRwNA-1
-Received: by mail-ed1-f72.google.com with SMTP id m12so18721590edv.3
-        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 05:44:16 -0700 (PDT)
+        bh=9aHAu1fe/5+f35nrgAqNhkbpHOt1DMXflxZdTOhVWnM=;
+        b=L2kr0MX96FFeh4UrcGKOcISdvwRsIxirR9WLu+DjQYOyX6YeatR+oZ+i3tUh1J+nE/GNep
+        cqZrC3jo6u/OuXe1GbBEN6hQEwLkJnlfeiMIzw5T+6ltEZKHUyp8/dAZdwADNLEVcTdUeh
+        eagI/IhiJkj8E+tAIrYYR1ohAv81KRM=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-58-VqmTdrI3OYGIBW3OvdWlTw-1; Wed, 01 Jul 2020 08:57:24 -0400
+X-MC-Unique: VqmTdrI3OYGIBW3OvdWlTw-1
+Received: by mail-qt1-f200.google.com with SMTP id c26so16722352qtq.6
+        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 05:57:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=riQxZ5rhfq+xTLDrKWBK+2YUUfRaxcLTVz5p24IUk7M=;
-        b=V0lTuGR9PqrDk9U00eN5vJy4QgMCuuV8eb9E1XpaCmuMjrGZBBqEGTe5O/XqT8CexA
-         JW6KUcDkvWlP4BuDe+8uBEy2/WRzQZW3dbHOzh5Mh4NeY82g5Ggix6EeeYYRie3N4b41
-         b4QiIDbtp3KCvN7d/vqyKfVcBvN9fKWYqLgMoMdMMh8bM1F60EvHV8fWQ9NqyQueTYFj
-         ZokQNxByDkcoRY2CujWMMvw3LnFWgtOC4vgsb/MLyM8ZhOSLCMcVZY3rhEsnysUbmnRh
-         O3LTmPqSPfci1suUxoNKw0HJkeyjUHc6rv5VqjLMf+Oxr07KSxZh5QFXq06qOJ54pgTZ
-         oUPA==
-X-Gm-Message-State: AOAM532oncbSEf+DVym9dC1xngm37vBfqCDAPEsLsJSrCcZlhdosVuP9
-        EscFiCENvFie5H9Z6gnlAqVvPVdzmgV6ZdlqcgXdjEWLdVbCxFCE+CRfaNUZqATUxKTXMRv2+x+
-        gQdFPpxa26rAD
-X-Received: by 2002:a05:6402:31ba:: with SMTP id dj26mr22401323edb.181.1593607455470;
-        Wed, 01 Jul 2020 05:44:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxlhs2/hMdT+AuIFl2+vhvO3qechJDVg98Gz7ZMissArc72TZWdEtQtZ/ZYXN935osYIJZjfg==
-X-Received: by 2002:a05:6402:31ba:: with SMTP id dj26mr22401299edb.181.1593607455292;
-        Wed, 01 Jul 2020 05:44:15 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id c18sm4595965eja.59.2020.07.01.05.44.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2020 05:44:13 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [RFC 2/2] KVM: VMX: Enable bus lock VM exit
-In-Reply-To: <0159554d-82d5-b388-d289-a5375ca91323@intel.com>
-References: <20200628085341.5107-1-chenyi.qiang@intel.com> <20200628085341.5107-3-chenyi.qiang@intel.com> <878sg3bo8b.fsf@vitty.brq.redhat.com> <0159554d-82d5-b388-d289-a5375ca91323@intel.com>
-Date:   Wed, 01 Jul 2020 14:44:09 +0200
-Message-ID: <87366bbe1y.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9aHAu1fe/5+f35nrgAqNhkbpHOt1DMXflxZdTOhVWnM=;
+        b=svlA907KWXRNxFQV+ULVa8EaW5IeNNS5eNKzQNA5/tOmpKxJ37JSdtJa5bhNcyQTic
+         H6NV4N0TRDQzKO90anLH5odH0XOdRdzNFb1H4aNKLf7S1hrfalf6YdZyGnrNZkHYyVLt
+         RkTnHoINTvU6b/uAXO+KACplWT6UJRH/vxwTdsHTAdK29vTpBVbHpg8toHRxQIoeF/GL
+         6MtmOsFfAxwoc57Hy5B7DXbIzlju4/qaGxfrc4vs8BkaT+Drv/javAuPKZTorj8wNSeI
+         2KaV6EQc98s+iVVsajHL9hDryn96Xd4heIgOco2Px2FGnVl75JN92uT/PFC/g1ek189s
+         66jg==
+X-Gm-Message-State: AOAM530ZtiCkW4TatjPEgCbRys9B/eteXXdbIhX2w+8twCDp8lYIsT98
+        xc0ujhAiYHLdZ8OEEmCBwe1xb8m2Gp09v50HjM9byGjcLlGcs7ocdvsRhwp0NZFPOQJwAViXqsI
+        aBr+ZMyy7iI8iGscvhSRWLBpFP+ea
+X-Received: by 2002:aed:2a75:: with SMTP id k50mr25069838qtf.27.1593608243804;
+        Wed, 01 Jul 2020 05:57:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzL1f0eN6LhXqx9i3RVi3ZTLzWJX9zawk/bYCWVEriejNOHGvG3sjaWuj2FZBP4lDumnoiphf1YDStynwhEhnw=
+X-Received: by 2002:aed:2a75:: with SMTP id k50mr25069812qtf.27.1593608243487;
+ Wed, 01 Jul 2020 05:57:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20200611113404.17810-1-mst@redhat.com> <20200611113404.17810-3-mst@redhat.com>
+ <20200611152257.GA1798@char.us.oracle.com> <CAJaqyWdwXMX0JGhmz6soH2ZLNdaH6HEdpBM8ozZzX9WUu8jGoQ@mail.gmail.com>
+ <CAJaqyWdwgy0fmReOgLfL4dAv-E+5k_7z3d9M+vHqt0aO2SmOFg@mail.gmail.com>
+ <20200622114622-mutt-send-email-mst@kernel.org> <CAJaqyWfrf94Gc-DMaXO+f=xC8eD3DVCD9i+x1dOm5W2vUwOcGQ@mail.gmail.com>
+ <20200622122546-mutt-send-email-mst@kernel.org> <CAJaqyWfbouY4kEXkc6sYsbdCAEk0UNsS5xjqEdHTD7bcTn40Ow@mail.gmail.com>
+ <CAJaqyWefMHPguj8ZGCuccTn0uyKxF9ZTEi2ASLtDSjGNb1Vwsg@mail.gmail.com> <20200701071041-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200701071041-mutt-send-email-mst@kernel.org>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 1 Jul 2020 14:56:47 +0200
+Message-ID: <CAJaqyWd-0N00FxULk5OVVKr4CnX45kMbrLHet8=nB+J67tEwfg@mail.gmail.com>
+Subject: Re: [PATCH RFC v8 02/11] vhost: use batched get_vq_desc version
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
+On Wed, Jul 1, 2020 at 1:12 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Jul 01, 2020 at 12:43:09PM +0200, Eugenio Perez Martin wrote:
+> > On Tue, Jun 23, 2020 at 6:15 PM Eugenio Perez Martin
+> > <eperezma@redhat.com> wrote:
+> > >
+> > > On Mon, Jun 22, 2020 at 6:29 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Jun 22, 2020 at 06:11:21PM +0200, Eugenio Perez Martin wrote:
+> > > > > On Mon, Jun 22, 2020 at 5:55 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Fri, Jun 19, 2020 at 08:07:57PM +0200, Eugenio Perez Martin wrote:
+> > > > > > > On Mon, Jun 15, 2020 at 2:28 PM Eugenio Perez Martin
+> > > > > > > <eperezma@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Thu, Jun 11, 2020 at 5:22 PM Konrad Rzeszutek Wilk
+> > > > > > > > <konrad.wilk@oracle.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Thu, Jun 11, 2020 at 07:34:19AM -0400, Michael S. Tsirkin wrote:
+> > > > > > > > > > As testing shows no performance change, switch to that now.
+> > > > > > > > >
+> > > > > > > > > What kind of testing? 100GiB? Low latency?
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > Hi Konrad.
+> > > > > > > >
+> > > > > > > > I tested this version of the patch:
+> > > > > > > > https://lkml.org/lkml/2019/10/13/42
+> > > > > > > >
+> > > > > > > > It was tested for throughput with DPDK's testpmd (as described in
+> > > > > > > > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html)
+> > > > > > > > and kernel pktgen. No latency tests were performed by me. Maybe it is
+> > > > > > > > interesting to perform a latency test or just a different set of tests
+> > > > > > > > over a recent version.
+> > > > > > > >
+> > > > > > > > Thanks!
+> > > > > > >
+> > > > > > > I have repeated the tests with v9, and results are a little bit different:
+> > > > > > > * If I test opening it with testpmd, I see no change between versions
+> > > > > >
+> > > > > >
+> > > > > > OK that is testpmd on guest, right? And vhost-net on the host?
+> > > > > >
+> > > > >
+> > > > > Hi Michael.
+> > > > >
+> > > > > No, sorry, as described in
+> > > > > http://doc.dpdk.org/guides/howto/virtio_user_as_exceptional_path.html.
+> > > > > But I could add to test it in the guest too.
+> > > > >
+> > > > > These kinds of raw packets "bursts" do not show performance
+> > > > > differences, but I could test deeper if you think it would be worth
+> > > > > it.
+> > > >
+> > > > Oh ok, so this is without guest, with virtio-user.
+> > > > It might be worth checking dpdk within guest too just
+> > > > as another data point.
+> > > >
+> > >
+> > > Ok, I will do it!
+> > >
+> > > > > > > * If I forward packets between two vhost-net interfaces in the guest
+> > > > > > > using a linux bridge in the host:
+> > > > > >
+> > > > > > And here I guess you mean virtio-net in the guest kernel?
+> > > > >
+> > > > > Yes, sorry: Two virtio-net interfaces connected with a linux bridge in
+> > > > > the host. More precisely:
+> > > > > * Adding one of the interfaces to another namespace, assigning it an
+> > > > > IP, and starting netserver there.
+> > > > > * Assign another IP in the range manually to the other virtual net
+> > > > > interface, and start the desired test there.
+> > > > >
+> > > > > If you think it would be better to perform then differently please let me know.
+> > > >
+> > > >
+> > > > Not sure why you bother with namespaces since you said you are
+> > > > using L2 bridging. I guess it's unimportant.
+> > > >
+> > >
+> > > Sorry, I think I should have provided more context about that.
+> > >
+> > > The only reason to use namespaces is to force the traffic of these
+> > > netperf tests to go through the external bridge. To test netperf
+> > > different possibilities than the testpmd (or pktgen or others "blast
+> > > of frames unconditionally" tests).
+> > >
+> > > This way, I make sure that is the same version of everything in the
+> > > guest, and is a little bit easier to manage cpu affinity, start and
+> > > stop testing...
+> > >
+> > > I could use a different VM for sending and receiving, but I find this
+> > > way a faster one and it should not introduce a lot of noise. I can
+> > > test with two VM if you think that this use of network namespace
+> > > introduces too much noise.
+> > >
+> > > Thanks!
+> > >
+> > > > > >
+> > > > > > >   - netperf UDP_STREAM shows a performance increase of 1.8, almost
+> > > > > > > doubling performance. This gets lower as frame size increase.
+> >
+> > Regarding UDP_STREAM:
+> > * with event_idx=on: The performance difference is reduced a lot if
+> > applied affinity properly (manually assigning CPU on host/guest and
+> > setting IRQs on guest), making them perform equally with and without
+> > the patch again. Maybe the batching makes the scheduler perform
+> > better.
+> >
+> > > > > > >   - rests of the test goes noticeably worse: UDP_RR goes from ~6347
+> > > > > > > transactions/sec to 5830
+> >
+> > * Regarding UDP_RR, TCP_STREAM, and TCP_RR, proper CPU pinning makes
+> > them perform similarly again, only a very small performance drop
+> > observed. It could be just noise.
+> > ** All of them perform better than vanilla if event_idx=off, not sure
+> > why. I can try to repeat them if you suspect that can be a test
+> > failure.
+> >
+> > * With testpmd and event_idx=off, if I send from the VM to host, I see
+> > a performance increment especially in small packets. The buf api also
+> > increases performance compared with only batching: Sending the minimum
+> > packet size in testpmd makes pps go from 356kpps to 473 kpps. Sending
+> > 1024 length UDP-PDU makes it go from 570kpps to 64 kpps.
+> >
+> > Something strange I observe in these tests: I get more pps the bigger
+> > the transmitted buffer size is. Not sure why.
+> >
+> > ** Sending from the host to the VM does not make a big change with the
+> > patches in small packets scenario (minimum, 64 bytes, about 645
+> > without the patch, ~625 with batch and batch+buf api). If the packets
+> > are bigger, I can see a performance increase: with 256 bits, it goes
+> > from 590kpps to about 600kpps, and in case of 1500 bytes payload it
+> > gets from 348kpps to 528kpps, so it is clearly an improvement.
+> >
+> > * with testpmd and event_idx=on, batching+buf api perform similarly in
+> > both directions.
+> >
+> > All of testpmd tests were performed with no linux bridge, just a
+> > host's tap interface (<interface type='ethernet'> in xml), with a
+> > testpmd txonly and another in rxonly forward mode, and using the
+> > receiving side packets/bytes data. Guest's rps, xps and interrupts,
+> > and host's vhost threads affinity were also tuned in each test to
+> > schedule both testpmd and vhost in different processors.
+> >
+> > I will send the v10 RFC with the small changes requested by Stefan and Jason.
+> >
+> > Thanks!
+> >
+>
+> OK so there's a chance you are seeing effects of an aggressive power
+> management. which tuned profile are you using? It might be helpful
+> to disable PM/frequency scaling.
+>
 
-> On 7/1/2020 5:04 PM, Vitaly Kuznetsov wrote:
->> Chenyi Qiang <chenyi.qiang@intel.com> writes:
-> [...]
->>>   static const int kvm_vmx_max_exit_handlers =
->>> @@ -6830,6 +6838,13 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>>   	if (unlikely(vmx->exit_reason.failed_vmentry))
->>>   		return EXIT_FASTPATH_NONE;
->>>   
->>> +	/*
->>> +	 * check the exit_reason to see if there is a bus lock
->>> +	 * happened in guest.
->>> +	 */
->>> +	if (vmx->exit_reason.bus_lock_detected)
->>> +		handle_bus_lock(vcpu);
->> 
->> In case the ultimate goal is to have an exit to userspace on bus lock,
->
-> I don't think we will need an exit to userspace on bus lock. See below.
->
->> the two ways to reach handle_bus_lock() are very different: in case
->> we're handling EXIT_REASON_BUS_LOCK we can easily drop to userspace by
->> returning 0 but what are we going to do in case of
->> exit_reason.bus_lock_detected? The 'higher priority VM exit' may require
->> exit to userspace too. So what's the plan? Maybe we can ignore the case
->> when we're exiting to userspace for some other reason as this is slow
->> already and force the exit otherwise? 
->
->> And should we actually introduce
->> the KVM_EXIT_BUS_LOCK and a capability to enable it here?
->> 
->
-> Introducing KVM_EXIT_BUS_LOCK maybe help nothing. No matter 
-> EXIT_REASON_BUS_LOCK or exit_reason.bus_lock_detected, the bus lock has 
-> already happened. Exit to userspace cannot prevent bus lock, so what 
-> userspace can do is recording and counting as what this patch does in 
-> vcpu->stat.bus_locks.
+I didn't change the tuned profile.
 
-Exiting to userspace would allow to implement custom 'throttling'
-policies to mitigate the 'noisy neighbour' problem. The simplest would
-be to just inject some sleep time.
+I set all cpus involved in the test isolated with cmdline:
+'isolcpus=1,3,5,7,9,11 nohz_full=1,3,5,7,9,11 rcu_nocbs=1,3,5,7,9,11
+rcu_nocb_poll intel_pstate=disable'
 
--- 
-Vitaly
+Wil try to change them though tuned, thanks!
+
+>
+> >
+> >
+> >
+> >
+> >
+> > > > > >
+> > > > > > OK so it seems plausible that we still have a bug where an interrupt
+> > > > > > is delayed. That is the main difference between pmd and virtio.
+> > > > > > Let's try disabling event index, and see what happens - that's
+> > > > > > the trickiest part of interrupts.
+> > > > > >
+> > > > >
+> > > > > Got it, will get back with the results.
+> > > > >
+> > > > > Thank you very much!
+> > > > >
+> > > > > >
+> > > > > >
+> > > > > > >   - TCP_STREAM goes from ~10.7 gbps to ~7Gbps
+> > > > > > >   - TCP_RR from 6223.64 transactions/sec to 5739.44
+> > > > > >
+> > > >
+>
 
