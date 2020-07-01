@@ -2,78 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50AA1210668
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 10:38:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2851D2106B8
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 10:51:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728683AbgGAIiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 04:38:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25782 "EHLO
+        id S1728577AbgGAIvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 04:51:10 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36244 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726670AbgGAIiA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 04:38:00 -0400
+        by vger.kernel.org with ESMTP id S1726009AbgGAIvJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 04:51:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593592679;
+        s=mimecast20190719; t=1593593467;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=QahaNqoJpNuE2oXc7Lbni+jgHUbCC+VzOS4RvDj9bVU=;
-        b=D9LSLefOI98MKj02ej8i6tuQ2hulqH44JmY/IcNAy9eMbvVgw9cfQXrJSUQhrXs1DTG4F7
-        DrI5NPG975bJd2/qFxY6rFpudI/FuYibKmm4fg8mWxryuuEbsv5gI59TvckS1QFFdTGpD8
-        hOSYzb47ev+hpd0fIYt2GAqDEUXQggE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-ybOFw22LP5SCzkSRCEONrA-1; Wed, 01 Jul 2020 04:37:57 -0400
-X-MC-Unique: ybOFw22LP5SCzkSRCEONrA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AA341902EA1
-        for <kvm@vger.kernel.org>; Wed,  1 Jul 2020 08:37:57 +0000 (UTC)
-Received: from thuth.com (ovpn-114-45.ams2.redhat.com [10.36.114.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 01CC68ACE9;
-        Wed,  1 Jul 2020 08:37:55 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7VNQywQ4WULmvG5XJASmUxhfJNh3Bpzu0ny98FqLsuk=;
+        b=Pttcv8M9iIlP3WHtqOqWnEthgUxBYp8iN/GALQitgufKr8b/QpJFTM5fY56EP+Y8hpiLcR
+        B4NLEoitD3UoWiFGr0xvNxjm6VNLSCN78bnWmLXZUb0pboWd0TyeOH6cpulJWwMrt83xUK
+        Hw6YvrM3WrskK+VeqTQbBRkOk3h4Z/w=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-fSEUZtFUOlSECFk7wlrOwQ-1; Wed, 01 Jul 2020 04:51:06 -0400
+X-MC-Unique: fSEUZtFUOlSECFk7wlrOwQ-1
+Received: by mail-ej1-f70.google.com with SMTP id b14so14208391ejv.14
+        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 01:51:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7VNQywQ4WULmvG5XJASmUxhfJNh3Bpzu0ny98FqLsuk=;
+        b=Dr3WG0W8UOx3VRzTTJeJlW6vCDUb82AjqNiCtDU45rb7VuJiS38ZVxfZuzlFEPKvgP
+         ffzZyUCxzZyUl/cBrjCmzzLRvTJa4+vQkN7UOU/zkFFdT4BDlToxGz6K0isOaEtm2Mt8
+         W0iF6vhQw/5wIvDERREQBBJWtmmqu/m/wW8J6q2/038NaaFzWXFayCM3+W4vx+tkko+e
+         7wEcxb/Qfh5mGL4S5719soI9Qzk5yOx6VbDC7ZXF1iYXqqhcYMgSNyhLPEZs+F5pOhB9
+         LwW9QjNhRQ+8kaogX82g8NGZZKjjoqEZBt703V8xXj2JevlgjAHhnlWzsZDyBRxrZIlT
+         ABPw==
+X-Gm-Message-State: AOAM5315BE1ROf5OWYdtR7mHGsYf1bSymmtRznelVnhNguG5dMgQ1y0C
+        bmksZOc9aDn3Qzc6/bl7SXOLyck/T4AcQQ4sjEs4oUM+kxjPKKyoVLpfDboDkTfyyv8U+dJfb0B
+        YJpeI/zQ8IM1s
+X-Received: by 2002:a17:906:35d2:: with SMTP id p18mr22924999ejb.393.1593593464949;
+        Wed, 01 Jul 2020 01:51:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxSG1SxV9LNm00jpW3vWYbuZ97Hrer23zo2O7oCAGyecirVUpQT5PffbZ/+cfuq6y+H8w4EUQ==
+X-Received: by 2002:a17:906:35d2:: with SMTP id p18mr22924979ejb.393.1593593464700;
+        Wed, 01 Jul 2020 01:51:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1142:70d6:6b9b:3cd1? ([2001:b07:6468:f312:1142:70d6:6b9b:3cd1])
+        by smtp.gmail.com with ESMTPSA id cq7sm5469069edb.66.2020.07.01.01.51.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2020 01:51:04 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] scripts: Fix the check whether testname is
+ in the only_tests list
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
 Cc:     Drew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH] scripts: Fix the check whether testname is in the only_tests list
-Date:   Wed,  1 Jul 2020 10:37:53 +0200
-Message-Id: <20200701083753.31366-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20200701083753.31366-1-thuth@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <11b56d2f-e481-8951-69ea-8400f1cb7939@redhat.com>
+Date:   Wed, 1 Jul 2020 10:51:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200701083753.31366-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When you currently run
+On 01/07/20 10:37, Thomas Huth wrote:
+> When you currently run
+> 
+>  ./run_tests.sh ioapic-split
+> 
+> the kvm-unit-tests run scripts do not only execute the "ioapic-split"
+> test, but also the "ioapic" test, which is quite surprising. This
+> happens because we use "grep -w" for checking whether a test should
+> be run or not - and "grep -w" does not consider the "-" character as
+> part of a word.
+> 
+> To fix the issue, convert the dash into an underscore character before
+> running "grep -w".
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  scripts/runtime.bash | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 8bfe31c..03fd20a 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -84,7 +84,8 @@ function run()
+>          return
+>      fi
+>  
+> -    if [ -n "$only_tests" ] && ! grep -qw "$testname" <<<$only_tests; then
+> +    if [ -n "$only_tests" ] && ! sed s/-/_/ <<<$only_tests \
+> +                               | grep -qw $(sed s/-/_/ <<< "$testname") ; then
+>          return
+>      fi
+>  
+> 
 
- ./run_tests.sh ioapic-split
+Simpler: grep -q " $testname " <<< " $only_tests "
 
-the kvm-unit-tests run scripts do not only execute the "ioapic-split"
-test, but also the "ioapic" test, which is quite surprising. This
-happens because we use "grep -w" for checking whether a test should
-be run or not - and "grep -w" does not consider the "-" character as
-part of a word.
+Also, please do the same for groups in the two "if" statements right below.
 
-To fix the issue, convert the dash into an underscore character before
-running "grep -w".
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- scripts/runtime.bash | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 8bfe31c..03fd20a 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -84,7 +84,8 @@ function run()
-         return
-     fi
- 
--    if [ -n "$only_tests" ] && ! grep -qw "$testname" <<<$only_tests; then
-+    if [ -n "$only_tests" ] && ! sed s/-/_/ <<<$only_tests \
-+                               | grep -qw $(sed s/-/_/ <<< "$testname") ; then
-         return
-     fi
- 
--- 
-2.18.1
+Paolo
 
