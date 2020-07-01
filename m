@@ -2,162 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 050322104C4
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 09:14:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78F2E210514
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 09:32:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728142AbgGAHOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 03:14:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32373 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727981AbgGAHO3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jul 2020 03:14:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593587667;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VDri2wVbiZD6ehChmeSXuSPV/fqPWCU1uyCnw8k16cM=;
-        b=c8dieeoesqfzQW/TAfiq8gDyJT9RXU5kyQ5rIvHYonBHbecqO3nKq2dgOw9Jts1ryHoPv4
-        GKGOeEYIDBQ0wMdMFuA9yFKR3rzQMki5E+isbMKEp0GjhhLTuf1DOTjHX2eku/ZPDtXC8s
-        LoL5YHClUNl/nnEVWcLJTIWzJxDPdO8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-kdkOSaEAOV2HqfwecqAQoQ-1; Wed, 01 Jul 2020 03:14:26 -0400
-X-MC-Unique: kdkOSaEAOV2HqfwecqAQoQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 92so18729466edl.8
-        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 00:14:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=VDri2wVbiZD6ehChmeSXuSPV/fqPWCU1uyCnw8k16cM=;
-        b=cop6J4EzUj/5v5/dQnWX8APxg8EEagXtvqbFeVQWuOnC1Ch5r4bRNJIYnAqjIvPK+j
-         KFbUzkcSaijcaediYH42t3c8PJfH5dRZDoD8zirsU8Y3RNFOvJlWNnHg0EA28HYCy8Q4
-         kxuwbvbV5ymUiGWZ9/6TDtXnNVbvKTZXyaUo6ILwsuwnn2bq/OrpXvqCwitNSc20GX9G
-         y1Nn45zdVVrmpdAL6LqB6cCU/rX3N2l9xS6ziNyqdSSGgOrfiW4AhpePMKIJ14yo/mIR
-         EckJftnkDxuh/iVdXtZF7Tg0w41ZCDv/5iWXlOojPvWhLVfWMA76snDBsvPg+4K7/JBS
-         HE/Q==
-X-Gm-Message-State: AOAM530pSPKXruqwvfhz8i59SGl8HY5zfd1N42wfuhaiXp22BX2s2iE6
-        XOybOK1b4rMr/NlnpW3v7kYRu8sZDoN9HI2mG6hnWnyYbWLc71Nb6sr03xszABvQ9PoW1R8hZiR
-        AQpSoQ9AMIh/e
-X-Received: by 2002:a17:906:c452:: with SMTP id ck18mr22807598ejb.415.1593587665077;
-        Wed, 01 Jul 2020 00:14:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyLfSJIpDI6snfHAvpom7GIuiRRpE4Ll1MJoMLi7Z9Bn0wYmhwULtCfStE/67tvD3y0dWiOZg==
-X-Received: by 2002:a17:906:c452:: with SMTP id ck18mr22807579ejb.415.1593587664814;
-        Wed, 01 Jul 2020 00:14:24 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o21sm3847754eja.37.2020.07.01.00.14.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2020 00:14:24 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Junaid Shahid <junaids@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: drop erroneous mmu_check_root() from fast_pgd_switch()
-In-Reply-To: <a8f60652-c419-58bc-fe78-67954fc6d4c1@google.com>
-References: <20200630100742.1167961-1-vkuznets@redhat.com> <a8f60652-c419-58bc-fe78-67954fc6d4c1@google.com>
-Date:   Wed, 01 Jul 2020 09:14:23 +0200
-Message-ID: <87eepvbtbk.fsf@vitty.brq.redhat.com>
+        id S1728249AbgGAHch (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 03:32:37 -0400
+Received: from mga06.intel.com ([134.134.136.31]:41099 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727981AbgGAHch (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jul 2020 03:32:37 -0400
+IronPort-SDR: 5pUF98NJwRmIHdmFsL5UWlds5UK0FOL4xrjBLc0IRgVpooJGzbvPRV/UIT6zwWN+sHpjQu6WHW
+ /+oOMcAxONZA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9668"; a="208003211"
+X-IronPort-AV: E=Sophos;i="5.75,299,1589266800"; 
+   d="scan'208";a="208003211"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 00:32:28 -0700
+IronPort-SDR: rY7m5Sdzq9E4NKlQ9G3cljrbnk0qrUh/K0wzgG8CpFgIeiOlgJ2oo+NY9+vsI0ztmajo5WTPJJ
+ tPhwgQOXsX2g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,299,1589266800"; 
+   d="scan'208";a="277685135"
+Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.255.30.5]) ([10.255.30.5])
+  by orsmga003.jf.intel.com with ESMTP; 01 Jul 2020 00:32:24 -0700
+Cc:     baolu.lu@linux.intel.com, Kevin Tian <kevin.tian@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
+Subject: Re: [PATCH 1/2] iommu: Add iommu_group_get/set_domain()
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+References: <20200627031532.28046-1-baolu.lu@linux.intel.com>
+ <acc0a8fd-bd23-fc34-aecc-67796ab216e7@arm.com>
+ <5dc1cece-6111-9b56-d04c-9553d592675b@linux.intel.com>
+ <48dd9f1e-c18b-77b7-650a-c35ecbb69f2b@arm.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <c38784ad-9dba-0840-3a61-e2c21e781f1e@linux.intel.com>
+Date:   Wed, 1 Jul 2020 15:32:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <48dd9f1e-c18b-77b7-650a-c35ecbb69f2b@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Junaid Shahid <junaids@google.com> writes:
+Hi Robin,
 
-> On 6/30/20 3:07 AM, Vitaly Kuznetsov wrote:
->> Undesired triple fault gets injected to L1 guest on SVM when L2 is
->> launched with certain CR3 values. It seems the mmu_check_root()
->> check in fast_pgd_switch() is wrong: first of all we don't know
->> if 'new_pgd' is a GPA or a nested GPA and, in case it is a nested
->> GPA, we can't check it with kvm_is_visible_gfn().
->> 
->> The problematic code path is:
->> nested_svm_vmrun()
->>    ...
->>    nested_prepare_vmcb_save()
->>      kvm_set_cr3(..., nested_vmcb->save.cr3)
->>        kvm_mmu_new_pgd()
->>          ...
->>          mmu_check_root() -> TRIPLE FAULT
->> 
->> The mmu_check_root() check in fast_pgd_switch() seems to be
->> superfluous even for non-nested case: when GPA is outside of the
->> visible range cached_root_available() will fail for non-direct
->> roots (as we can't have a matching one on the list) and we don't
->> seem to care for direct ones.
->> 
->> Also, raising #TF immediately when a non-existent GFN is written to CR3
->> doesn't seem to mach architecture behavior.
->> 
->> Fixes: 7c390d350f8b ("kvm: x86: Add fast CR3 switch code path")
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->> - The patch fixes the immediate issue and doesn't seem to break any
->>    tests even with shadow PT but I'm not sure I properly understood
->>    why the check was there in the first place. Please review!
->> ---
->>   arch/x86/kvm/mmu/mmu.c | 3 +--
->>   1 file changed, 1 insertion(+), 2 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index 76817d13c86e..286c74d2ae8d 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -4277,8 +4277,7 @@ static bool fast_pgd_switch(struct kvm_vcpu *vcpu, gpa_t new_pgd,
->>   	 */
->>   	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
->>   	    mmu->root_level >= PT64_ROOT_4LEVEL)
->> -		return !mmu_check_root(vcpu, new_pgd >> PAGE_SHIFT) &&
->> -		       cached_root_available(vcpu, new_pgd, new_role);
->> +		return cached_root_available(vcpu, new_pgd, new_role);
->>   
->>   	return false;
->>   }
->> 
->
-> The check does seem superfluous, so should be ok to remove. Though I
-> think that fast_pgd_switch() really should be getting only L1
-> GPAs. Otherwise, there could be confusion between the same GPAs from
-> two different L2s.
->
-> IIUC, at least on Intel, only L1 CR3s (including shadow L1 CR3s for
-> L2) or L1 EPTPs should get to fast_pgd_switch(). But I am not familiar
-> enough with SVM to see why an L2 GPA would end up there. From a
-> cursory look, it seems that until "978ce5837c7e KVM: SVM: always
-> update CR3 in VMCB", enter_svm_guest_mode() was calling kvm_set_cr3()
-> only when using shadow paging, in which case I assume that
-> nested_vmcb->save.cr3 would have been an L1 CR3 shadowing the L2 CR3,
-> correct? But now kvm_set_cr3() is called even when not using shadow
-> paging, which I suppose is how we are getting the L2 CR3. Should we
-> skip calling fast_pgd_switch() in that particular case?
+On 2020/7/1 0:51, Robin Murphy wrote:
+> On 2020-06-30 02:03, Lu Baolu wrote:
+>> Hi Robin,
+>>
+>> On 6/29/20 7:56 PM, Robin Murphy wrote:
+>>> On 2020-06-27 04:15, Lu Baolu wrote:
+>>>> The hardware assistant vfio mediated device is a use case of iommu
+>>>> aux-domain. The interactions between vfio/mdev and iommu during mdev
+>>>> creation and passthr are:
+>>>>
+>>>> - Create a group for mdev with iommu_group_alloc();
+>>>> - Add the device to the group with
+>>>>          group = iommu_group_alloc();
+>>>>          if (IS_ERR(group))
+>>>>                  return PTR_ERR(group);
+>>>>
+>>>>          ret = iommu_group_add_device(group, &mdev->dev);
+>>>>          if (!ret)
+>>>>                  dev_info(&mdev->dev, "MDEV: group_id = %d\n",
+>>>>                           iommu_group_id(group));
+>>>> - Allocate an aux-domain
+>>>>     iommu_domain_alloc()
+>>>> - Attach the aux-domain to the physical device from which the mdev is
+>>>>    created.
+>>>>     iommu_aux_attach_device()
+>>>>
+>>>> In the whole process, an iommu group was allocated for the mdev and an
+>>>> iommu domain was attached to the group, but the group->domain leaves
+>>>> NULL. As the result, iommu_get_domain_for_dev() doesn't work anymore.
+>>>>
+>>>> This adds iommu_group_get/set_domain() so that group->domain could be
+>>>> managed whenever a domain is attached or detached through the 
+>>>> aux-domain
+>>>> api's.
+>>>
+>>> Letting external callers poke around directly in the internals of 
+>>> iommu_group doesn't look right to me.
+>>
+>> Unfortunately, it seems that the vifo iommu abstraction is deeply bound
+>> to the IOMMU subsystem. We can easily find other examples:
+>>
+>> iommu_group_get/set_iommudata()
+>> iommu_group_get/set_name()
+>> ...
+> 
+> Sure, but those are ways for users of a group to attach useful 
+> information of their own to it, that doesn't matter to the IOMMU 
+> subsystem itself. The interface you've proposed gives callers rich new 
+> opportunities to fundamentally break correct operation of the API:
+> 
+>      dom = iommu_domain_alloc();
+>      iommu_attach_group(dom, grp);
+>      ...
+>      iommu_group_set_domain(grp, NULL);
+>      // oops, leaked and can't ever detach properly now
+> 
+> or perhaps:
+> 
+>      grp = iommu_group_alloc();
+>      iommu_group_add_device(grp, dev);
+>      iommu_group_set_domain(grp, dom);
+>      ...
+>      iommu_detach_group(dom, grp);
+>      // oops, IOMMU driver might not handle this
+> 
+>>> If a regular device is attached to one or more aux domains for PASID 
+>>> use, iommu_get_domain_for_dev() is still going to return the primary 
+>>> domain, so why should it be expected to behave differently for mediated
+>>
+>> Unlike the normal device attach, we will encounter two devices when it
+>> comes to aux-domain.
+>>
+>> - Parent physical device - this might be, for example, a PCIe device
+>> with PASID feature support, hence it is able to tag an unique PASID
+>> for DMA transfers originated from its subset. The device driver hence
+>> is able to wrapper this subset into an isolated:
+>>
+>> - Mediated device - a fake device created by the device driver mentioned
+>> above.
+>>
+>> Yes. All you mentioned are right for the parent device. But for mediated
+>> device, iommu_get_domain_for_dev() doesn't work even it has an valid
+>> iommu_group and iommu_domain.
+>>
+>> iommu_get_domain_for_dev() is a necessary interface for device drivers
+>> which want to support aux-domain. For example,
+> 
+> Only if they want to follow this very specific notion of using made-up 
+> devices and groups to represent aux attachments. Even if a driver 
+> managing its own aux domains entirely privately does create child 
+> devices for them, it's not like it can't keep its domain pointers in 
+> drvdata if it wants to ;)
+> 
+> Let's not conflate the current implementation of vfio_mdev with the 
+> general concepts involved here.
+> 
+>>            struct iommu_domain *domain;
+>>            struct device *dev = mdev_dev(mdev);
+>>        unsigned long pasid;
+>>
+>>            domain = iommu_get_domain_for_dev(dev);
+>>            if (!domain)
+>>                    return -ENODEV;
+>>
+>>            pasid = iommu_aux_get_pasid(domain, dev->parent);
+>>        if (pasid == IOASID_INVALID)
+>>            return -EINVAL;
+>>
+>>        /* Program the device context with the PASID value */
+>>        ....
+>>
+>> Without this fix, iommu_get_domain_for_dev() always returns NULL and the
+>> device driver has no means to support aux-domain.
+> 
+> So either the IOMMU API itself is missing the ability to do the right 
+> thing internally, or the mdev layer isn't using it appropriately. Either 
+> way, simply punching holes in the API for mdev to hack around its own 
+> mess doesn't seem like the best thing to do.
+> 
+> The initial impression I got was that it's implicitly assumed here that 
+> the mdev itself is attached to exactly one aux domain and nothing else, 
+> at which point I would wonder why it's using aux at all, but are you 
+> saying that in fact no attach happens with the mdev group either way, 
+> only to the parent device?
+> 
+> I'll admit I'm not hugely familiar with any of this, but it seems to me 
+> that the logical flow should be:
+> 
+>      - allocate domain
+>      - attach as aux to parent
+>      - retrieve aux domain PASID
+>      - create mdev child based on PASID
+>      - attach mdev to domain (normally)
+> 
+> Of course that might require giving the IOMMU API a proper first-class 
+> notion of mediated devices, such that it knows the mdev represents the 
+> PASID, and can recognise the mdev attach is equivalent to the earlier 
+> parent aux attach so not just blindly hand it down to an IOMMU driver 
+> that's never heard of this new device before. Or perhaps the IOMMU 
+> drivers do their own bookkeeping for the mdev bus, such that they do 
+> handle the attach call, and just validate it internally based on the 
+> associated parent device and PASID. Either way, the inside maintains 
+> self-consistency and from the outside it looks like standard API usage 
+> without nasty hacks.
+> 
+> I'm pretty sure I've heard suggestions of using mediated devices beyond 
+> VFIO (e.g. within the kernel itself), so chances are this is a direction 
+> that we'll have to take at some point anyway.
+> 
+> And, that said, even if people do want an immediate quick fix regardless 
+> of technical debt, I'd still be a lot happier to see 
+> iommu_group_set_domain() lightly respun as iommu_attach_mdev() ;)
 
-Thank you for your thoughts, this is helpful indeed.
+Get your point and I agree with your concerns.
 
-As far as I can see, nVMX calls kvm_mmu_new_pgd() directly in two cases:
+To maintain the relationship between mdev's iommu_group and
+iommu_domain, how about extending below existing aux_attach api
 
-1) nested_ept_init_mmu_context() -> kvm_init_shadow_ept_mmu() when
-switching to L2 (and 'new_pgd' is EPTP)
+int iommu_aux_attach_device(struct iommu_domain *domain,
+			    struct device *dev)
 
-2) nested_vmx_load_cr3() when !nested_ept (and 'new_pgd' is 'cr3')
+by adding the mdev's iommu_group?
 
-I think we need to do something similar for nSVM to make the root cache
-work and work correctly:
+int iommu_aux_attach_device(struct iommu_domain *domain,
+			    struct device *dev,
+			    struct iommu_group *group)
 
-1) supplement nested_svm_init_mmu_context() -> kvm_init_shadow_mmu()
-with kvm_mmu_new_pgd()
+And, in iommu_aux_attach_device(), we require,
+  - @group only has a single device;
+  - @group hasn't been attached by any devices;
+  - Set the @domain to @group
 
-2) stop doing kvm_mmu_new_pgd() from nested_prepare_vmcb_save() ->
-kvm_set_cr3() when npt_enabled
+Just like what we've done in iommu_attach_device().
 
-Let me try to experiment here a bit.
+Any thoughts?
 
-Thanks again!
-
--- 
-Vitaly
-
+Best regards,
+baolu
