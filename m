@@ -2,141 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E47C210E05
-	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 16:50:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1F3B210FF2
+	for <lists+kvm@lfdr.de>; Wed,  1 Jul 2020 18:00:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731479AbgGAOt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 10:49:57 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24200 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726251AbgGAOt5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 1 Jul 2020 10:49:57 -0400
+        id S1731171AbgGAQAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 12:00:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57353 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728534AbgGAQAJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jul 2020 12:00:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593614994;
+        s=mimecast20190719; t=1593619208;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VfENiHNRnwNDgfhjH2onCnBOkQjCEWTV+c8v5VnSwKY=;
-        b=Bf5ojbllwYISojpLvMUsF8a2FUMslam+MIr5TXk7uqvCARHIdaIQsTNUAUtJSd6tEvj8v0
-        simHKtg3GnFzvxtuGgrXoyK0TyW+wSxLptvih8tux7GMmufEWur61rMwpPSm225dBLw1GS
-        IjAT6NbWqXz8HJwI0LDwtFy9oH8Th1Q=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-jenL8w2lNne_2BKOoXBSaw-1; Wed, 01 Jul 2020 10:49:53 -0400
-X-MC-Unique: jenL8w2lNne_2BKOoXBSaw-1
-Received: by mail-ej1-f71.google.com with SMTP id yh3so9160225ejb.16
-        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 07:49:53 -0700 (PDT)
+        bh=FJlCDVz4BNthnJ1K64dOijcsJqHEUA8U3GXuwRStVyU=;
+        b=fD4+tBnz19qoK80CYfXaAPht67MddgBrR1QmqudKQCXaeT8R+liqqEaqG9jlmAfHMR1fm1
+        TKMI8dGYopvRj9Ayc2EiJt3pNB/rr1mUWKdVRegpvFBeq10UZtSQbnT9XwhmdtPF/z0QBW
+        3bMyUOOvPeD0NWAXUXZ8Y3W4Dyq3GsI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-0lIFHuQpPhu3fSJtxW3nCg-1; Wed, 01 Jul 2020 12:00:04 -0400
+X-MC-Unique: 0lIFHuQpPhu3fSJtxW3nCg-1
+Received: by mail-wm1-f69.google.com with SMTP id t145so24103650wmt.2
+        for <kvm@vger.kernel.org>; Wed, 01 Jul 2020 09:00:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=VfENiHNRnwNDgfhjH2onCnBOkQjCEWTV+c8v5VnSwKY=;
-        b=tqzA4kRp2b5N7karkwNNtqVacEB7NRRwhOxLe3HKCwWpAhzlD99BD3U54eHLwiI1K2
-         0YHPtfJiFPtvepgPUEtnDpoQAkNffTsjfZiJti5fmXO+UbLIbsu7pPwiBvakb/ivb5Zn
-         EvOatLHc5pciuv4c5DC4HonZNsHYURA4T9Yk2/QT2CKLTicUiMH5M4rZ1U/hzn9zGMrB
-         DL037GrRizRZjbwRdLti+jZj/b6lQiWDLw7F3wzmxzHXd69/dIn9i3JzpxUWyQ//DDI6
-         00fRRZZHrsc4oM3ky2dfLMjunnSo6aJqRl/MMA1ppVb3mgMzgu+LOdoFOC1WlU9IppDL
-         dcbg==
-X-Gm-Message-State: AOAM533W9sIfoYTryAd9GKar9t4A/9akt0T/5cL+lg0fwQG8jK60irzP
-        QZrJezcS6DNsE3Ve58N/ci6LueZf9kbUFMVdYR5lQe1dcnbDBtdwq+6WIJLD9uBbE+Cf2uI4izD
-        0qWD0PBSJi3IL
-X-Received: by 2002:a17:906:4f87:: with SMTP id o7mr22886621eju.233.1593614991814;
-        Wed, 01 Jul 2020 07:49:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFsmocBW6sUuPzil85gcSE/fWsfuLfnmCtOnoI7ei4G309ht7jv4kcRD+SnbqzFh2OzQabFg==
-X-Received: by 2002:a17:906:4f87:: with SMTP id o7mr22886610eju.233.1593614991615;
-        Wed, 01 Jul 2020 07:49:51 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id z25sm4831346ejd.38.2020.07.01.07.49.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jul 2020 07:49:50 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [RFC 2/2] KVM: VMX: Enable bus lock VM exit
-In-Reply-To: <adad61e8-8252-0491-7feb-992a52c1b4f3@intel.com>
-References: <20200628085341.5107-1-chenyi.qiang@intel.com> <20200628085341.5107-3-chenyi.qiang@intel.com> <878sg3bo8b.fsf@vitty.brq.redhat.com> <0159554d-82d5-b388-d289-a5375ca91323@intel.com> <87366bbe1y.fsf@vitty.brq.redhat.com> <adad61e8-8252-0491-7feb-992a52c1b4f3@intel.com>
-Date:   Wed, 01 Jul 2020 16:49:49 +0200
-Message-ID: <87zh8j9to2.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FJlCDVz4BNthnJ1K64dOijcsJqHEUA8U3GXuwRStVyU=;
+        b=jj5nbBtxnK60EG3AtE99pGhn5ehR41r+SF7E33ipIbt45s7Q2PXBMLp1Q7jnzFeKZA
+         MzMkKsc8EI8mxI1KffyUkeLulog2Dv2NrhG6q7VQNlLb7ji+MhjhgzcDQIBVhm2WqxAs
+         2c+j2Rwr25uSgLkffOTwNrmnNUONp8+xwRa/qrCLY6uZFSf4hslOeIjf4sIc63seLsLd
+         Bticnr3fBegdeh9fUKthybqc8kr+a7NW/oWnRsiFczVhtCxQHhZ3GgKLujhWTzNfYPZ5
+         tMzcecebXZ2O7y5dkuwR/Lnwr4L5a9PRg2tO9KfxtE08jD6cFD5r9d81jME+yhoar613
+         wXvQ==
+X-Gm-Message-State: AOAM532cdKzZ63hF9RTddNUKaMAEd7RQTrbRkL6LJswmttEwcAOVu9tK
+        xcpPSlHBnVOFfDH25Ub+e6Od17SoT60xLbmHeB/9wnYI67ScGoG3mXDU5u+BOnP5b+BWe97AQkO
+        fpiq0KxXoB9kl
+X-Received: by 2002:a5d:5647:: with SMTP id j7mr26379423wrw.242.1593619202928;
+        Wed, 01 Jul 2020 09:00:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwYYbld5GIitz312TmZjWLr1aHJ//Cqa9XW0DxvWDaPFRw8BYjgQ4L8klNdzhoOKXb2ncc90g==
+X-Received: by 2002:a5d:5647:: with SMTP id j7mr26379406wrw.242.1593619202668;
+        Wed, 01 Jul 2020 09:00:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9d66:2ca3:22cf:9fa9? ([2001:b07:6468:f312:9d66:2ca3:22cf:9fa9])
+        by smtp.gmail.com with ESMTPSA id 59sm8212297wrj.37.2020.07.01.09.00.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2020 09:00:02 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: nVMX: Print more (accurate) info if
+ RDTSC diff test fails
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org,
+        Nadav Amit <nadav.amit@gmail.com>
+References: <20200124234608.10754-1-sean.j.christopherson@intel.com>
+ <705151e0-6a8b-1e15-934d-dd96f419dcd8@oracle.com>
+ <CAAAPnDEA4u0YRLtW7OsWtL-Uy=5paDmrxx7EScDFsH5aqG6QJA@mail.gmail.com>
+ <20200630193540.GH7733@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <94e46dcc-de1c-5701-8f9c-fc51e72a35a9@redhat.com>
+Date:   Wed, 1 Jul 2020 18:00:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20200630193540.GH7733@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
-
-> On 7/1/2020 8:44 PM, Vitaly Kuznetsov wrote:
->> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->> 
->>> On 7/1/2020 5:04 PM, Vitaly Kuznetsov wrote:
->>>> Chenyi Qiang <chenyi.qiang@intel.com> writes:
->>> [...]
->>>>>    static const int kvm_vmx_max_exit_handlers =
->>>>> @@ -6830,6 +6838,13 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>>>>    	if (unlikely(vmx->exit_reason.failed_vmentry))
->>>>>    		return EXIT_FASTPATH_NONE;
->>>>>    
->>>>> +	/*
->>>>> +	 * check the exit_reason to see if there is a bus lock
->>>>> +	 * happened in guest.
->>>>> +	 */
->>>>> +	if (vmx->exit_reason.bus_lock_detected)
->>>>> +		handle_bus_lock(vcpu);
+On 30/06/20 21:35, Sean Christopherson wrote:
+> Ping.
+> 
+> On Mon, Jan 27, 2020 at 06:30:11AM -0800, Aaron Lewis wrote:
+>> On Sat, Jan 25, 2020 at 11:16 PM Krish Sadhukhan
+>> <krish.sadhukhan@oracle.com> wrote:
+>>>
+>>>
+>>> On 1/24/20 3:46 PM, Sean Christopherson wrote:
+>>>> Snapshot the delta of the last run and display it in the report if the
+>>>> test fails.  Abort the run loop as soon as the threshold is reached so
+>>>> that the displayed delta is guaranteed to a failed delta.  Displaying
+>>>> the delta helps triage failures, e.g. is my system completely broken or
+>>>> did I get unlucky, and aborting the loop early saves 99900 runs when
+>>>> the system is indeed broken.
 >>>>
->>>> In case the ultimate goal is to have an exit to userspace on bus lock,
->>>
->>> I don't think we will need an exit to userspace on bus lock. See below.
->>>
->>>> the two ways to reach handle_bus_lock() are very different: in case
->>>> we're handling EXIT_REASON_BUS_LOCK we can easily drop to userspace by
->>>> returning 0 but what are we going to do in case of
->>>> exit_reason.bus_lock_detected? The 'higher priority VM exit' may require
->>>> exit to userspace too. So what's the plan? Maybe we can ignore the case
->>>> when we're exiting to userspace for some other reason as this is slow
->>>> already and force the exit otherwise?
->>>
->>>> And should we actually introduce
->>>> the KVM_EXIT_BUS_LOCK and a capability to enable it here?
+>>>> Cc: Nadav Amit <nadav.amit@gmail.com>
+>>>> Cc: Aaron Lewis <aaronlewis@google.com>
+>>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>>>> ---
+>>>>   x86/vmx_tests.c | 11 ++++++-----
+>>>>   1 file changed, 6 insertions(+), 5 deletions(-)
 >>>>
->>>
->>> Introducing KVM_EXIT_BUS_LOCK maybe help nothing. No matter
->>> EXIT_REASON_BUS_LOCK or exit_reason.bus_lock_detected, the bus lock has
->>> already happened. Exit to userspace cannot prevent bus lock, so what
->>> userspace can do is recording and counting as what this patch does in
->>> vcpu->stat.bus_locks.
->> 
->> Exiting to userspace would allow to implement custom 'throttling'
->> policies to mitigate the 'noisy neighbour' problem. The simplest would
->> be to just inject some sleep time.
->> 
->
-> So you want an exit to userspace for every bus lock and leave it all to 
-> userspace. Yes, it's doable.
->
+>>>> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+>>>> index b31c360..4049dec 100644
+>>>> --- a/x86/vmx_tests.c
+>>>> +++ b/x86/vmx_tests.c
+>>>> @@ -9204,6 +9204,7 @@ static unsigned long long rdtsc_vmexit_diff_test_iteration(void)
+>>>>
+>>>>   static void rdtsc_vmexit_diff_test(void)
+>>>>   {
+>>>> +     unsigned long long delta;
+>>>>       int fail = 0;
+>>>>       int i;
+>>>>
+>>>> @@ -9226,17 +9227,17 @@ static void rdtsc_vmexit_diff_test(void)
+>>>>       vmcs_write(EXI_MSR_ST_CNT, 1);
+>>>>       vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
+>>>>
+>>>> -     for (i = 0; i < RDTSC_DIFF_ITERS; i++) {
+>>>> -             if (rdtsc_vmexit_diff_test_iteration() >=
+>>>> -                 HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
+>>>> +     for (i = 0; i < RDTSC_DIFF_ITERS && fail < RDTSC_DIFF_FAILS; i++) {
+>>>> +             delta = rdtsc_vmexit_diff_test_iteration();
+>>>> +             if (delta >= HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD)
+>>>>                       fail++;
+>>>>       }
+>>>>
+>>>>       enter_guest();
+>>>>
+>>>>       report(fail < RDTSC_DIFF_FAILS,
+>>>> -            "RDTSC to VM-exit delta too high in %d of %d iterations",
+>>>> -            fail, RDTSC_DIFF_ITERS);
+>>>> +            "RDTSC to VM-exit delta too high in %d of %d iterations, last = %llu",
+>>>> +            fail, i, delta);
+>>>>   }
+>>>>
+>>>>   static int invalid_msr_init(struct vmcs *vmcs)
+>>> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>>
+>> Reviewed-by: Aaron Lewis <aaronlewis@google.com>
+> 
 
-In some cases we may not even want to have a VM exit: think
-e.g. real-time/partitioning case when even in case of bus lock we may
-not want to add additional latency just to count such events. I'd
-suggest we make the new capability tri-state:
-- disabled (no vmexit, default)
-- stats only (what this patch does)
-- userspace exit
-But maybe this is an overkill, I'd like to hear what others think.
+Queued, thanks.
 
-> As you said, the exit_reason.bus_lock_detected case is the tricky one. 
-> We cannot do the similar to extend vcpu->run->exit_reason, this breaks 
-> ABI. Maybe we can extend the vcpu->run->flags to indicate bus lock 
-> detected for the other exit reason?
-
-This is likely the easiest solution.
-
--- 
-Vitaly
+Paolo
 
