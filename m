@@ -2,92 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD15B212408
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 15:01:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6269921240E
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 15:03:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729012AbgGBNB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 09:01:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45158 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726343AbgGBNB4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Jul 2020 09:01:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593694915;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=v8SnQ4u0UTLmhKt73+PAqeYdxoNSV8q95I5k2+Mk11E=;
-        b=QsUNtgkEIlIv2Tjby72mO7MB6t6zNkTq2pDfhvYwLRJw+Ltycvi7fGR++J2PHL79oiQ5Lf
-        uJJkIelP7TnFg8MQ3qzMSwQ3li1toS9icg16AG4Wr72+Lb66KLTGu+MuHNDe9mmCqa6Xle
-        o9fFJjIryH00XX+b3pzQ1qDUGJNQcdc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-3QslMo8oMuerZaJzE0OIgg-1; Thu, 02 Jul 2020 09:01:53 -0400
-X-MC-Unique: 3QslMo8oMuerZaJzE0OIgg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729035AbgGBNDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 09:03:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54852 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726343AbgGBNDS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 09:03:18 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 364B0A0BD7;
-        Thu,  2 Jul 2020 13:01:51 +0000 (UTC)
-Received: from [10.36.112.70] (ovpn-112-70.ams2.redhat.com [10.36.112.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EE3C73FC7;
-        Thu,  2 Jul 2020 13:01:49 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 4/8] arm64: its: Handle its command
- queue wrapping
-To:     Jingyi Wang <wangjingyi11@huawei.com>, drjones@redhat.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-References: <20200702030132.20252-1-wangjingyi11@huawei.com>
- <20200702030132.20252-5-wangjingyi11@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <870ae6e6-0c02-1770-085b-4e031e391a24@redhat.com>
-Date:   Thu, 2 Jul 2020 15:01:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mail.kernel.org (Postfix) with ESMTPSA id D492220772;
+        Thu,  2 Jul 2020 13:03:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593694998;
+        bh=DU/qEXJhyo5s+7zwwietRnCmtfRVZjPerieDNN6bTyM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bb02j41HDWRtcMeJGS5a/HmXQ23YjPopSGVn5Fy7ifGkuKU7hIY3kMM/XusJII12W
+         Qqptkx7RxdiW6bkN5AuaLpY2SK+5RBPUXi1KWdbe5MQ588jxSdV3Xp/0xtqtYgy4u9
+         zLTqhAs1lybS/8Simh/QLfLI7YZkb7+9nkhv0tls=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jqys0-008PHk-Es; Thu, 02 Jul 2020 14:03:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20200702030132.20252-5-wangjingyi11@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Date:   Thu, 02 Jul 2020 14:03:16 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     Jingyi Wang <wangjingyi11@huawei.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 3/8] arm64: microbench: gic: Add gicv4.1
+ support for ipi latency test.
+In-Reply-To: <dabc2406-4a7f-61cf-cdbd-b0b79d97bf2c@redhat.com>
+References: <20200702030132.20252-1-wangjingyi11@huawei.com>
+ <20200702030132.20252-4-wangjingyi11@huawei.com>
+ <fe9699e3ee2131fe800911aea1425af4@kernel.org>
+ <dabc2406-4a7f-61cf-cdbd-b0b79d97bf2c@redhat.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <688823451d3d4a0cb4d346bb7f7b99aa@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, wangjingyi11@huawei.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jingyi,
+Hi Eric,
 
-On 7/2/20 5:01 AM, Jingyi Wang wrote:
-> Because micro-bench may send a large number of ITS commands, we
-> should handle ITS command queue wrapping as kernel instead of just
-> failing the test.
+On 2020-07-02 13:36, Auger Eric wrote:
+> Hi Marc,
 > 
-> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-
-> ---
->  lib/arm64/gic-v3-its-cmd.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> On 7/2/20 10:22 AM, Marc Zyngier wrote:
+>> On 2020-07-02 04:01, Jingyi Wang wrote:
+>>> If gicv4.1(sgi hardware injection) supported, we test ipi injection
+>>> via hw/sw way separately.
+>> 
+>> nit: active-less SGIs are not strictly a feature of GICv4.1 (you could
+>> imagine a GIC emulation offering the same thing). Furthermore, GICv4.1
+>> isn't as such visible to the guest itself (it only sees a GICv3).
 > 
-> diff --git a/lib/arm64/gic-v3-its-cmd.c b/lib/arm64/gic-v3-its-cmd.c
-> index 2c208d1..34574f7 100644
-> --- a/lib/arm64/gic-v3-its-cmd.c
-> +++ b/lib/arm64/gic-v3-its-cmd.c
-> @@ -164,8 +164,9 @@ static struct its_cmd_block *its_allocate_entry(void)
->  {
->  	struct its_cmd_block *cmd;
->  
-> -	assert((u64)its_data.cmd_write < (u64)its_data.cmd_base + SZ_64K);
->  	cmd = its_data.cmd_write++;
-> +	if ((u64)its_data.cmd_write  == (u64)its_data.cmd_base + SZ_64K)
-> +		its_data.cmd_write = its_data.cmd_base;
->  	return cmd;
->  }
->  
-> 
+> By the way, I have just downloaded the latest GIC spec from the ARM
+> portal and I still do not find the GICD_CTLR_ENABLE_G1A,
+> GICD_CTLR_nASSGIreq and GICD_TYPER2_nASSGIcap. Do I miss something?
 
+The latest spec still is the old one. There is a *confidential* erratum
+to the spec that adds the missing bits, but nothing public.
+
+You unfortunately will have to take my word for it.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
