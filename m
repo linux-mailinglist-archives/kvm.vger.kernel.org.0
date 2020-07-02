@@ -2,493 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 123E121298E
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 18:31:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF5B4212B49
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 19:31:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726856AbgGBQbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 12:31:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27044 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726904AbgGBQbe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Jul 2020 12:31:34 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 062G2foq177211;
-        Thu, 2 Jul 2020 12:31:32 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 321cvddded-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jul 2020 12:31:32 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 062G34k0179592;
-        Thu, 2 Jul 2020 12:31:31 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 321cvddddr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jul 2020 12:31:31 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 062GPfj0023940;
-        Thu, 2 Jul 2020 16:31:30 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 3217b00qrw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Jul 2020 16:31:30 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 062GVR8N41811978
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Jul 2020 16:31:28 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B780C11C064;
-        Thu,  2 Jul 2020 16:31:27 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4D65011C052;
-        Thu,  2 Jul 2020 16:31:27 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.146.43])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Jul 2020 16:31:27 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        drjones@redhat.com
-Subject: [kvm-unit-tests PATCH v10 9/9] s390x: css: ssch/tsch with sense and interrupt
-Date:   Thu,  2 Jul 2020 18:31:20 +0200
-Message-Id: <1593707480-23921-10-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1593707480-23921-1-git-send-email-pmorel@linux.ibm.com>
-References: <1593707480-23921-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-02_09:2020-07-02,2020-07-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 suspectscore=1 phishscore=0 clxscore=1015
- bulkscore=0 malwarescore=0 adultscore=0 mlxscore=0 cotscore=-2147483648
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007020107
+        id S1727896AbgGBRbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 13:31:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47592 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727124AbgGBRbf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 13:31:35 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D812CC08C5DF
+        for <kvm@vger.kernel.org>; Thu,  2 Jul 2020 10:31:34 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id q8so29735876iow.7
+        for <kvm@vger.kernel.org>; Thu, 02 Jul 2020 10:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qS9aKixWg8M2HwkRwLxIhre1iwIBiL08luFNH178zko=;
+        b=dlardQB2kRCLmJxUeHCCJ1I//DtST1JMzmk2zK2iYoauEZmj8YlzMayYjIs8nTaonS
+         etg4Ag4rCqNDLBYKFt2YxlJ7IsVmzeOEMu7xoCYebrrw/y9piCzD7+NrUIKt0Q/3l1UT
+         etQxxjV7IZ0iyC3qlWPNbBYh0mW28oml8cxYs6Kk3y4qDW/U1PsEGy5y3E8sFzC0EY0Q
+         Qb4GgY6BdqGv5MT61oqVVem0THpeS3KdnPmEKSeTGFRLV6076ASt+Ts3Sc5XHNA177VE
+         lj1Siv1c6nDNc06rawhTBbQpydFWRRhZsu2BedcpPsSsVW1t5HZRKlufOzdJzYGTbUak
+         5Ppg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qS9aKixWg8M2HwkRwLxIhre1iwIBiL08luFNH178zko=;
+        b=hmdx648y3Z6CFSrby4shEVyM1BwS+kC/qR0eFpCC5b/sSFu0bd3MuKg3DJaJbDU8pb
+         Px1Yc1OW/3k7Ihrvrwzr7OzzBqCJQJ4J/CMlK1l7AoAkocrdPtIUEXlIRG4M0/XyVzGB
+         Bm+T/d9PGkCVcDvO41fBnkEeSQCDW7cQHxzDaH7AqcJIbgcONIvhUkZCJ3fZUeIca4lF
+         YFvoIV5V15KH7uyf5sx7ADNq62MIXFJs8GRhqs9xZXW9jDwVbGK68brJNWKVIGLQyQYj
+         wVxOhAraUUTczOozoDOLSuDbX4Af5WrigCngonnw9Bo25dqnMHSRiU2XG/35Dto0pKbS
+         kSgw==
+X-Gm-Message-State: AOAM531wJMQSoSlZg0gPMMAZ4H7lpfNqzYPAjWpes2Sf6DAcYDnM5vY4
+        ozw6DcgmH7tGrqyoJocg+C1KL8Xt6lF2hd0X6MY9QQ==
+X-Google-Smtp-Source: ABdhPJzLKR5y/4qxmdCN5zOuywjt8u2E+3dsyGdmjEwUOvRQTg/hQElVu0bbAUkE1Z5HPhVEQOaIOwv1coyY7vNqIl8=
+X-Received: by 2002:a02:7f89:: with SMTP id r131mr34382094jac.98.1593711094007;
+ Thu, 02 Jul 2020 10:31:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200702082143.25259-1-kishon@ti.com> <20200702055026-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200702055026-mutt-send-email-mst@kernel.org>
+From:   Mathieu Poirier <mathieu.poirier@linaro.org>
+Date:   Thu, 2 Jul 2020 11:31:23 -0600
+Message-ID: <CANLsYky4ZrgYGZUyg4iVwbM3TQk5dvOSBwPFER8qofixjn4vyA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC communication
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Kishon Vijay Abraham I <kishon@ti.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Jon Mason <jdmason@kudzu.us>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Allen Hubbe <allenbh@gmail.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-remoteproc <linux-remoteproc@vger.kernel.org>,
+        linux-ntb@googlegroups.com, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After a channel is enabled we start a SENSE_ID command using
-the SSCH instruction to recognize the control unit and device.
+On Thu, 2 Jul 2020 at 03:51, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Jul 02, 2020 at 01:51:21PM +0530, Kishon Vijay Abraham I wrote:
+> > This series enhances Linux Vhost support to enable SoC-to-SoC
+> > communication over MMIO. This series enables rpmsg communication between
+> > two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
+> >
+> > 1) Modify vhost to use standard Linux driver model
+> > 2) Add support in vring to access virtqueue over MMIO
+> > 3) Add vhost client driver for rpmsg
+> > 4) Add PCIe RC driver (uses virtio) and PCIe EP driver (uses vhost) for
+> >    rpmsg communication between two SoCs connected to each other
+> > 5) Add NTB Virtio driver and NTB Vhost driver for rpmsg communication
+> >    between two SoCs connected via NTB
+> > 6) Add configfs to configure the components
+> >
+> > UseCase1 :
+> >
+> >  VHOST RPMSG                     VIRTIO RPMSG
+> >       +                               +
+> >       |                               |
+> >       |                               |
+> >       |                               |
+> >       |                               |
+> > +-----v------+                 +------v-------+
+> > |   Linux    |                 |     Linux    |
+> > |  Endpoint  |                 | Root Complex |
+> > |            <----------------->              |
+> > |            |                 |              |
+> > |    SOC1    |                 |     SOC2     |
+> > +------------+                 +--------------+
+> >
+> > UseCase 2:
+> >
+> >      VHOST RPMSG                                      VIRTIO RPMSG
+> >           +                                                 +
+> >           |                                                 |
+> >           |                                                 |
+> >           |                                                 |
+> >           |                                                 |
+> >    +------v------+                                   +------v------+
+> >    |             |                                   |             |
+> >    |    HOST1    |                                   |    HOST2    |
+> >    |             |                                   |             |
+> >    +------^------+                                   +------^------+
+> >           |                                                 |
+> >           |                                                 |
+> > +---------------------------------------------------------------------+
+> > |  +------v------+                                   +------v------+  |
+> > |  |             |                                   |             |  |
+> > |  |     EP      |                                   |     EP      |  |
+> > |  | CONTROLLER1 |                                   | CONTROLLER2 |  |
+> > |  |             <----------------------------------->             |  |
+> > |  |             |                                   |             |  |
+> > |  |             |                                   |             |  |
+> > |  |             |  SoC With Multiple EP Instances   |             |  |
+> > |  |             |  (Configured using NTB Function)  |             |  |
+> > |  +-------------+                                   +-------------+  |
+> > +---------------------------------------------------------------------+
+> >
+> > Software Layering:
+> >
+> > The high-level SW layering should look something like below. This series
+> > adds support only for RPMSG VHOST, however something similar should be
+> > done for net and scsi. With that any vhost device (PCI, NTB, Platform
+> > device, user) can use any of the vhost client driver.
+> >
+> >
+> >     +----------------+  +-----------+  +------------+  +----------+
+> >     |  RPMSG VHOST   |  | NET VHOST |  | SCSI VHOST |  |    X     |
+> >     +-------^--------+  +-----^-----+  +-----^------+  +----^-----+
+> >             |                 |              |              |
+> >             |                 |              |              |
+> >             |                 |              |              |
+> > +-----------v-----------------v--------------v--------------v----------+
+> > |                            VHOST CORE                                |
+> > +--------^---------------^--------------------^------------------^-----+
+> >          |               |                    |                  |
+> >          |               |                    |                  |
+> >          |               |                    |                  |
+> > +--------v-------+  +----v------+  +----------v----------+  +----v-----+
+> > |  PCI EPF VHOST |  | NTB VHOST |  |PLATFORM DEVICE VHOST|  |    X     |
+> > +----------------+  +-----------+  +---------------------+  +----------+
+> >
+> > This was initially proposed here [1]
+> >
+> > [1] -> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com
+>
+>
+> I find this very interesting. A huge patchset so will take a bit
+> to review, but I certainly plan to do that. Thanks!
 
-This tests the success of SSCH, the I/O interruption and the TSCH
-instructions.
+Same here - it will take time.  This patchset is sizable and sits
+behind a few others that are equally big.
 
-The SENSE_ID command response is tested to report 0xff inside
-its reserved field and to report the same control unit type
-as the cu_type kernel argument.
-
-Without the cu_type kernel argument, the test expects a device
-with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/asm/arch_def.h |   1 +
- lib/s390x/css.h          |  32 ++++++++-
- lib/s390x/css_lib.c      | 148 ++++++++++++++++++++++++++++++++++++++-
- s390x/css.c              |  94 ++++++++++++++++++++++++-
- 4 files changed, 272 insertions(+), 3 deletions(-)
-
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 022a564..edc06ef 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -16,6 +16,7 @@ struct psw {
- };
- 
- #define PSW_MASK_EXT			0x0100000000000000UL
-+#define PSW_MASK_IO			0x0200000000000000UL
- #define PSW_MASK_DAT			0x0400000000000000UL
- #define PSW_MASK_WAIT			0x0002000000000000UL
- #define PSW_MASK_PSTATE			0x0001000000000000UL
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 0ddceb1..9c22644 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -11,6 +11,8 @@
- #ifndef CSS_H
- #define CSS_H
- 
-+#define lowcore_ptr ((struct lowcore *)0x0)
-+
- /* subchannel ID bit 16 must always be one */
- #define SCHID_ONE	0x00010000
- 
-@@ -62,9 +64,13 @@ struct orb {
- } __attribute__ ((aligned(4)));
- 
- struct scsw {
-+#define SCSW_SC_PENDING	0x00000001
-+#define SCSW_SC_PRIMARY	0x00000004
- 	uint32_t ctrl;
- 	uint32_t ccw_addr;
- 	uint8_t  dev_stat;
-+#define SCSW_SCHS_PCI	0x80
-+#define SCSW_SCHS_IL	0x40
- 	uint8_t  sch_stat;
- 	uint16_t count;
- };
-@@ -73,6 +79,7 @@ struct pmcw {
- 	uint32_t intparm;
- #define PMCW_DNV        0x0001
- #define PMCW_ENABLE     0x0080
-+#define PMCW_ISC_SHIFT	11
- 	uint16_t flags;
- 	uint16_t devnum;
- 	uint8_t  lpm;
-@@ -100,6 +107,19 @@ struct irb {
- 	uint32_t emw[8];
- } __attribute__ ((aligned(4)));
- 
-+#define CCW_CMD_SENSE_ID	0xe4
-+#define CSS_SENSEID_COMMON_LEN	8
-+struct senseid {
-+	/* common part */
-+	uint8_t reserved;        /* always 0x'FF' */
-+	uint16_t cu_type;        /* control unit type */
-+	uint8_t cu_model;        /* control unit model */
-+	uint16_t dev_type;       /* device type */
-+	uint8_t dev_model;       /* device model */
-+	uint8_t unused;          /* padding byte */
-+	uint8_t padding[256 - 10]; /* Extra padding for CCW */
-+} __attribute__ ((aligned(4))) __attribute__ ((packed));
-+
- /* CSS low level access functions */
- 
- static inline int ssch(unsigned long schid, struct orb *addr)
-@@ -251,6 +271,16 @@ void dump_orb(struct orb *op);
- 
- int css_enumerate(void);
- #define MAX_ENABLE_RETRIES      5
--int css_enable(int schid);
-+int css_enable(int schid, int isc);
-+
-+
-+/* Library functions */
-+int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw);
-+int start_single_ccw(unsigned int sid, int code, void *data, int count,
-+		     unsigned char flags);
-+void css_irq_io(void);
-+int css_residual_count(unsigned int schid);
- 
-+#define IO_SCH_ISC	3
-+void enable_io_isc(uint8_t isc);
- #endif
-diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-index 6e5ffed..249330f 100644
---- a/lib/s390x/css_lib.c
-+++ b/lib/s390x/css_lib.c
-@@ -16,6 +16,7 @@
- #include <interrupt.h>
- #include <asm/arch_def.h>
- #include <asm/time.h>
-+#include <asm/arch_def.h>
- 
- #include <css.h>
- 
-@@ -70,7 +71,17 @@ out:
- 	return schid;
- }
- 
--int css_enable(int schid)
-+/*
-+ * css_enable: enable Subchannel
-+ * @schid: Subchannel Identifier
-+ * @isc: Interruption subclass for this subchannel as a number
-+ * Return value:
-+ *   On success: 0
-+ *   On error the CC of the faulty instruction
-+ *      or -1 if the retry count is exceeded.
-+ *
-+ */
-+int css_enable(int schid, int isc)
- {
- 	struct pmcw *pmcw = &schib.pmcw;
- 	int retry_count = 0;
-@@ -92,6 +103,9 @@ retry:
- 	/* Update the SCHIB to enable the channel */
- 	pmcw->flags |= PMCW_ENABLE;
- 
-+	/* Set Interruption Subclass to IO_SCH_ISC */
-+	pmcw->flags |= (isc << PMCW_ISC_SHIFT);
-+
- 	/* Tell the CSS we want to modify the subchannel */
- 	cc = msch(schid, &schib);
- 	if (cc) {
-@@ -114,6 +128,7 @@ retry:
- 		return cc;
- 	}
- 
-+	report_info("stsch: flags: %04x", pmcw->flags);
- 	if (pmcw->flags & PMCW_ENABLE) {
- 		report_info("stsch: sch %08x enabled after %d retries",
- 			    schid, retry_count);
-@@ -129,3 +144,134 @@ retry:
- 		    schid, retry_count, pmcw->flags);
- 	return -1;
- }
-+
-+static struct irb irb;
-+
-+void css_irq_io(void)
-+{
-+	int ret = 0;
-+	char *flags;
-+	int sid;
-+
-+	report_prefix_push("Interrupt");
-+	sid = lowcore_ptr->subsys_id_word;
-+	/* Lowlevel set the SID as interrupt parameter. */
-+	if (lowcore_ptr->io_int_param != sid) {
-+		report(0,
-+		       "io_int_param: %x differs from subsys_id_word: %x",
-+		       lowcore_ptr->io_int_param, sid);
-+		goto pop;
-+	}
-+	report_info("subsys_id_word: %08x io_int_param %08x io_int_word %08x",
-+			lowcore_ptr->subsys_id_word,
-+			lowcore_ptr->io_int_param,
-+			lowcore_ptr->io_int_word);
-+	report_prefix_pop();
-+
-+	report_prefix_push("tsch");
-+	ret = tsch(sid, &irb);
-+	switch (ret) {
-+	case 1:
-+		dump_irb(&irb);
-+		flags = dump_scsw_flags(irb.scsw.ctrl);
-+		report(0,
-+		       "I/O interrupt, CC 1 but tsch reporting sch %08x as not status pending: %s",
-+		       sid, flags);
-+		break;
-+	case 2:
-+		report(0, "tsch returns unexpected CC 2");
-+		break;
-+	case 3:
-+		report(0, "tsch reporting sch %08x as not operational", sid);
-+		break;
-+	case 0:
-+		/* Stay humble on success */
-+		break;
-+	}
-+pop:
-+	report_prefix_pop();
-+	lowcore_ptr->io_old_psw.mask &= ~PSW_MASK_WAIT;
-+}
-+
-+int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
-+{
-+	struct orb orb = {
-+		.intparm = sid,
-+		.ctrl = ORB_CTRL_ISIC|ORB_CTRL_FMT|ORB_LPM_DFLT,
-+		.cpa = (unsigned int) (unsigned long)ccw,
-+	};
-+
-+	return ssch(sid, &orb);
-+}
-+
-+/*
-+ * In the future, we want to implement support for CCW chains;
-+ * for that, we will need to work with ccw1 pointers.
-+ */
-+static struct ccw1 unique_ccw;
-+
-+int start_single_ccw(unsigned int sid, int code, void *data, int count,
-+		     unsigned char flags)
-+{
-+	int cc;
-+	struct ccw1 *ccw = &unique_ccw;
-+
-+	report_prefix_push("start_subchannel");
-+	/* Build the CCW chain with a single CCW */
-+	ccw->code = code;
-+	ccw->flags = flags; /* No flags need to be set */
-+	ccw->count = count;
-+	ccw->data_address = (int)(unsigned long)data;
-+
-+	cc = start_ccw1_chain(sid, ccw);
-+	if (cc) {
-+		report(0, "start_ccw_chain failed ret=%d", cc);
-+		report_prefix_pop();
-+		return cc;
-+	}
-+	report_prefix_pop();
-+	return 0;
-+}
-+
-+/*
-+ * css_residual_count
-+ * We expect no residual count when the ORB request was successful
-+ * The residual count is valid when the subchannel is status pending
-+ * with primary status and device status only or device status and
-+ * subchannel status with PCI or incorrect length.
-+ * Return value:
-+ * Success: the residual count
-+ * Not meaningful: -1 (-1 can not be a valid count)
-+ */
-+int css_residual_count(unsigned int schid)
-+{
-+
-+	if (!(irb.scsw.ctrl & (SCSW_SC_PENDING | SCSW_SC_PRIMARY)))
-+		goto fail;
-+
-+	if (irb.scsw.dev_stat)
-+		if (irb.scsw.sch_stat & ~(SCSW_SCHS_PCI | SCSW_SCHS_IL))
-+			goto fail;
-+
-+	return irb.scsw.count;
-+
-+fail:
-+	report_info("sch  status %02x", irb.scsw.sch_stat);
-+	report_info("dev  status %02x", irb.scsw.dev_stat);
-+	report_info("ctrl status %08x", irb.scsw.ctrl);
-+	report_info("count       %04x", irb.scsw.count);
-+	report_info("ccw addr    %08x", irb.scsw.ccw_addr);
-+	return -1;
-+}
-+
-+/*
-+ * enable_io_isc: setup ISC in Control Register 6
-+ * @isc: The interruption Sub Class as a bitfield
-+ */
-+void enable_io_isc(uint8_t isc)
-+{
-+	uint64_t value;
-+
-+	value = (uint64_t)isc << 24;
-+	lctlg(6, value);
-+}
-diff --git a/s390x/css.c b/s390x/css.c
-index 72aec43..60e6434 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -19,7 +19,11 @@
- 
- #include <css.h>
- 
-+#define DEFAULT_CU_TYPE		0x3832 /* virtio-ccw */
-+static unsigned long cu_type = DEFAULT_CU_TYPE;
-+
- static int test_device_sid;
-+static struct senseid senseid;
- 
- static void test_enumerate(void)
- {
-@@ -40,17 +44,104 @@ static void test_enable(void)
- 		return;
- 	}
- 
--	cc = css_enable(test_device_sid);
-+	cc = css_enable(test_device_sid, IO_SCH_ISC);
- 
- 	report(cc == 0, "Enable subchannel %08x", test_device_sid);
- }
- 
-+/*
-+ * test_sense
-+ * Pre-requisits:
-+ * - We need the test device as the first recognized
-+ *   device by the enumeration.
-+ */
-+static void test_sense(void)
-+{
-+	int ret;
-+	int len;
-+
-+	if (!test_device_sid) {
-+		report_skip("No device");
-+		return;
-+	}
-+
-+	ret = css_enable(test_device_sid, IO_SCH_ISC);
-+	if (ret) {
-+		report(0,
-+		       "Could not enable the subchannel: %08x",
-+		       test_device_sid);
-+		return;
-+	}
-+
-+	ret = register_io_int_func(css_irq_io);
-+	if (ret) {
-+		report(0, "Could not register IRQ handler");
-+		goto unreg_cb;
-+	}
-+
-+	lowcore_ptr->io_int_param = 0;
-+
-+	memset(&senseid, 0, sizeof(senseid));
-+	ret = start_single_ccw(test_device_sid, CCW_CMD_SENSE_ID,
-+			       &senseid, sizeof(senseid), CCW_F_SLI);
-+	if (ret) {
-+		report(0, "ssch failed for SENSE ID on sch %08x with cc %d",
-+		       test_device_sid, ret);
-+		goto unreg_cb;
-+	}
-+
-+	wait_for_interrupt(PSW_MASK_IO);
-+
-+	if (lowcore_ptr->io_int_param != test_device_sid) {
-+		report(0, "ssch succeeded but interrupt parameter is wrong: expect %08x got %08x",
-+		       test_device_sid, lowcore_ptr->io_int_param);
-+		goto unreg_cb;
-+	}
-+
-+	ret = css_residual_count(test_device_sid);
-+	if (ret < 0) {
-+		report(0, "ssch succeeded for SENSE ID but can not get a valid residual count");
-+		goto unreg_cb;
-+	}
-+
-+	len = sizeof(senseid) - ret;
-+	if (ret && len < CSS_SENSEID_COMMON_LEN) {
-+		report(0,
-+		       "ssch succeeded for SENSE ID but report a too short length: %d",
-+		       ret);
-+		goto unreg_cb;
-+	}
-+
-+	if (ret && len)
-+		report_info("ssch succeeded for SENSE ID but report a shorter length: %d",
-+			    len);
-+
-+	if (senseid.reserved != 0xff) {
-+		report(0,
-+		       "ssch succeeded for SENSE ID but reports garbage: %x",
-+		       senseid.reserved);
-+		goto unreg_cb;
-+	}
-+
-+	report_info("senseid length read: %d", ret);
-+	report_info("reserved %02x cu_type %04x cu_model %02x dev_type %04x dev_model %02x",
-+		    senseid.reserved, senseid.cu_type, senseid.cu_model,
-+		    senseid.dev_type, senseid.dev_model);
-+
-+	report(senseid.cu_type == cu_type, "cu_type: expect 0x%04x got 0x%04x",
-+	       (uint16_t) cu_type, senseid.cu_type);
-+
-+unreg_cb:
-+	unregister_io_int_func(css_irq_io);
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
- } tests[] = {
- 	{ "enumerate (stsch)", test_enumerate },
- 	{ "enable (msch)", test_enable },
-+	{ "sense (ssch/tsch)", test_sense },
- 	{ NULL, NULL }
- };
- 
-@@ -59,6 +150,7 @@ int main(int argc, char *argv[])
- 	int i;
- 
- 	report_prefix_push("Channel Subsystem");
-+	enable_io_isc(0x80 >> IO_SCH_ISC);
- 	for (i = 0; tests[i].name; i++) {
- 		report_prefix_push(tests[i].name);
- 		tests[i].func();
--- 
-2.25.1
-
+>
+> >
+> > Kishon Vijay Abraham I (22):
+> >   vhost: Make _feature_ bits a property of vhost device
+> >   vhost: Introduce standard Linux driver model in VHOST
+> >   vhost: Add ops for the VHOST driver to configure VHOST device
+> >   vringh: Add helpers to access vring in MMIO
+> >   vhost: Add MMIO helpers for operations on vhost virtqueue
+> >   vhost: Introduce configfs entry for configuring VHOST
+> >   virtio_pci: Use request_threaded_irq() instead of request_irq()
+> >   rpmsg: virtio_rpmsg_bus: Disable receive virtqueue callback when
+> >     reading messages
+> >   rpmsg: Introduce configfs entry for configuring rpmsg
+> >   rpmsg: virtio_rpmsg_bus: Add Address Service Notification support
+> >   rpmsg: virtio_rpmsg_bus: Move generic rpmsg structure to
+> >     rpmsg_internal.h
+> >   virtio: Add ops to allocate and free buffer
+> >   rpmsg: virtio_rpmsg_bus: Use virtio_alloc_buffer() and
+> >     virtio_free_buffer()
+> >   rpmsg: Add VHOST based remote processor messaging bus
+> >   samples/rpmsg: Setup delayed work to send message
+> >   samples/rpmsg: Wait for address to be bound to rpdev for sending
+> >     message
+> >   rpmsg.txt: Add Documentation to configure rpmsg using configfs
+> >   virtio_pci: Add VIRTIO driver for VHOST on Configurable PCIe Endpoint
+> >     device
+> >   PCI: endpoint: Add EP function driver to provide VHOST interface
+> >   NTB: Add a new NTB client driver to implement VIRTIO functionality
+> >   NTB: Add a new NTB client driver to implement VHOST functionality
+> >   NTB: Describe the ntb_virtio and ntb_vhost client in the documentation
+> >
+> >  Documentation/driver-api/ntb.rst              |   11 +
+> >  Documentation/rpmsg.txt                       |   56 +
+> >  drivers/ntb/Kconfig                           |   18 +
+> >  drivers/ntb/Makefile                          |    2 +
+> >  drivers/ntb/ntb_vhost.c                       |  776 +++++++++++
+> >  drivers/ntb/ntb_virtio.c                      |  853 ++++++++++++
+> >  drivers/ntb/ntb_virtio.h                      |   56 +
+> >  drivers/pci/endpoint/functions/Kconfig        |   11 +
+> >  drivers/pci/endpoint/functions/Makefile       |    1 +
+> >  .../pci/endpoint/functions/pci-epf-vhost.c    | 1144 ++++++++++++++++
+> >  drivers/rpmsg/Kconfig                         |   10 +
+> >  drivers/rpmsg/Makefile                        |    3 +-
+> >  drivers/rpmsg/rpmsg_cfs.c                     |  394 ++++++
+> >  drivers/rpmsg/rpmsg_core.c                    |    7 +
+> >  drivers/rpmsg/rpmsg_internal.h                |  136 ++
+> >  drivers/rpmsg/vhost_rpmsg_bus.c               | 1151 +++++++++++++++++
+> >  drivers/rpmsg/virtio_rpmsg_bus.c              |  184 ++-
+> >  drivers/vhost/Kconfig                         |    1 +
+> >  drivers/vhost/Makefile                        |    2 +-
+> >  drivers/vhost/net.c                           |   10 +-
+> >  drivers/vhost/scsi.c                          |   24 +-
+> >  drivers/vhost/test.c                          |   17 +-
+> >  drivers/vhost/vdpa.c                          |    2 +-
+> >  drivers/vhost/vhost.c                         |  730 ++++++++++-
+> >  drivers/vhost/vhost_cfs.c                     |  341 +++++
+> >  drivers/vhost/vringh.c                        |  332 +++++
+> >  drivers/vhost/vsock.c                         |   20 +-
+> >  drivers/virtio/Kconfig                        |    9 +
+> >  drivers/virtio/Makefile                       |    1 +
+> >  drivers/virtio/virtio_pci_common.c            |   25 +-
+> >  drivers/virtio/virtio_pci_epf.c               |  670 ++++++++++
+> >  include/linux/mod_devicetable.h               |    6 +
+> >  include/linux/rpmsg.h                         |    6 +
+> >  {drivers/vhost => include/linux}/vhost.h      |  132 +-
+> >  include/linux/virtio.h                        |    3 +
+> >  include/linux/virtio_config.h                 |   42 +
+> >  include/linux/vringh.h                        |   46 +
+> >  samples/rpmsg/rpmsg_client_sample.c           |   32 +-
+> >  tools/virtio/virtio_test.c                    |    2 +-
+> >  39 files changed, 7083 insertions(+), 183 deletions(-)
+> >  create mode 100644 drivers/ntb/ntb_vhost.c
+> >  create mode 100644 drivers/ntb/ntb_virtio.c
+> >  create mode 100644 drivers/ntb/ntb_virtio.h
+> >  create mode 100644 drivers/pci/endpoint/functions/pci-epf-vhost.c
+> >  create mode 100644 drivers/rpmsg/rpmsg_cfs.c
+> >  create mode 100644 drivers/rpmsg/vhost_rpmsg_bus.c
+> >  create mode 100644 drivers/vhost/vhost_cfs.c
+> >  create mode 100644 drivers/virtio/virtio_pci_epf.c
+> >  rename {drivers/vhost => include/linux}/vhost.h (66%)
+> >
+> > --
+> > 2.17.1
+> >
+>
