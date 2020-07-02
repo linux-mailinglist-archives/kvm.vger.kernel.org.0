@@ -2,41 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 172DD2127C5
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 17:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 480702127CA
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 17:25:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730349AbgGBPYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 11:24:35 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:28765 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730090AbgGBPYc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 11:24:32 -0400
+        id S1730357AbgGBPYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 11:24:47 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:15197 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730195AbgGBPYq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 11:24:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1593703472; x=1625239472;
+  t=1593703486; x=1625239486;
   h=subject:to:cc:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=IlEE+mwY2EeET+viiChdK1i+ylGRuwctUmYhriiqkXI=;
-  b=IM+poplqmHoSyRuA8fSwGRrdIaYLb9Hatsurd8Tu+JbYX39X8xbesmiX
-   M+pq8NJgJyHimxS1xqMb74A5CVvTcQvLxErRsdyPAzy2/ZWiT+/VuclBD
-   TEMIUP/aoq05ccbPDgV/FUV8eOmb1Y+MoSUcbkFdWBAucizw/vKLMRSNJ
-   I=;
-IronPort-SDR: WLisDY8317emsysH4WhGm+ZObGNeudhV3GsL7ETo2aiZC1i5JxiF2bIGMoFVRdYpE7CuZGZA/r
- /SXi9NnHVa/Q==
+  bh=nkmDXtaePXWcmJSfN1BNlH1GK4LqQIDWcLPiBV5PH2s=;
+  b=P5Fo+ozDrtIcA+LN1oaPberN/9P2DEMnMYI9NX3U6cXbaOvwShyZc635
+   xi2hndz6zs86EpPSUXFRY7STZFjCmHqKTibL5feInPPtnPFmL6ZwGl41h
+   LAfAtmPvwOdSqUu8g9v48MFO6EwW/58LV7tUPk/c/e7oiRo/TSIbGhNXB
+   k=;
+IronPort-SDR: 7OfPpNa0i//+CwtAHQ5YfMb5h/bANcQOcdVPx0MyXiJDDqxyK4u4tF7aixXGOvJ9IHM11RMSsu
+ atVPHNMy+t8g==
 X-IronPort-AV: E=Sophos;i="5.75,304,1589241600"; 
-   d="scan'208";a="55643964"
+   d="scan'208";a="56915989"
 Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-e7be2041.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 02 Jul 2020 15:24:31 +0000
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 02 Jul 2020 15:24:40 +0000
 Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-e7be2041.us-west-2.amazon.com (Postfix) with ESMTPS id D98B2A2818;
-        Thu,  2 Jul 2020 15:24:29 +0000 (UTC)
+        by email-inbound-relay-2a-e7be2041.us-west-2.amazon.com (Postfix) with ESMTPS id 1639EA1F30;
+        Thu,  2 Jul 2020 15:24:40 +0000 (UTC)
 Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
  EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 2 Jul 2020 15:24:29 +0000
+ id 15.0.1497.2; Thu, 2 Jul 2020 15:24:39 +0000
 Received: from 38f9d3867b82.ant.amazon.com (10.43.160.65) by
  EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 2 Jul 2020 15:24:24 +0000
-Subject: Re: [PATCH v4 01/18] nitro_enclaves: Add ioctl interface definition
+ id 15.0.1497.2; Thu, 2 Jul 2020 15:24:32 +0000
+Subject: Re: [PATCH v4 03/18] nitro_enclaves: Define enclave info for internal
+ bookkeeping
 To:     Andra Paraschiv <andraprs@amazon.com>,
         <linux-kernel@vger.kernel.org>
 CC:     Anthony Liguori <aliguori@amazon.com>,
@@ -56,17 +57,17 @@ CC:     Anthony Liguori <aliguori@amazon.com>,
         Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
         <ne-devel-upstream@amazon.com>
 References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-2-andraprs@amazon.com>
+ <20200622200329.52996-4-andraprs@amazon.com>
 From:   Alexander Graf <graf@amazon.de>
-Message-ID: <402dca8b-8650-777a-5b34-95057d4a42c4@amazon.de>
-Date:   Thu, 2 Jul 2020 17:24:22 +0200
+Message-ID: <cc84e2ee-1a85-c92e-9d29-2f4a33148a61@amazon.de>
+Date:   Thu, 2 Jul 2020 17:24:30 +0200
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
  Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200622200329.52996-2-andraprs@amazon.com>
+In-Reply-To: <20200622200329.52996-4-andraprs@amazon.com>
 Content-Language: en-US
 X-Originating-IP: [10.43.160.65]
-X-ClientProxiedBy: EX13D16UWB004.ant.amazon.com (10.43.161.170) To
+X-ClientProxiedBy: EX13D21UWA001.ant.amazon.com (10.43.160.154) To
  EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Content-Transfer-Encoding: quoted-printable
@@ -78,18 +79,15 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 22.06.20 22:03, Andra Paraschiv wrote:
-> The Nitro Enclaves driver handles the enclave lifetime management. This
-> includes enclave creation, termination and setting up its resources such
-> as memory and CPU.
+> The Nitro Enclaves driver keeps an internal info per each enclave.
 > =
 
-> An enclave runs alongside the VM that spawned it. It is abstracted as a
-> process running in the VM that launched it. The process interacts with
-> the NE driver, that exposes an ioctl interface for creating an enclave
-> and setting up its resources.
+> This is needed to be able to manage enclave resources state, enclave
+> notifications and have a reference of the PCI device that handles
+> command requests for enclave lifetime management.
 > =
 
-> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
 > Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 
 Reviewed-by: Alexander Graf <graf@amazon.com>
