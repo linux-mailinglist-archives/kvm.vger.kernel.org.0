@@ -2,120 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B32F4212882
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 17:51:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FE3021292E
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 18:19:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726148AbgGBPv1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 11:51:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33156 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725878AbgGBPv0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 11:51:26 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C2D4020771;
-        Thu,  2 Jul 2020 15:51:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593705085;
-        bh=LatYfnFQW+JJJ0wcc9nAbgxLlp9C7ksydLETo+4P4Ko=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=edhW3U+Qy2Pa4QcZijlqaZoTFlbilTvv6fxYldqRNT/apMaG8kJUFkRk/3i+qPD9E
-         s4CBvVG+lhQDeagtt7AkWSFgDz9Q40XSOMhPU7alTW4RlSRkqwWxcgpOMBgLSL3Bqf
-         jg6d2o5RYlaY/Y2NeWht3O7U57vdtBdlxuoCO6js=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jr1Ui-008T23-6U; Thu, 02 Jul 2020 16:51:24 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Thu, 02 Jul 2020 16:51:24 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     kvm@vger.kernel.org, andre.przywara@arm.com, sami.mujawar@arm.com,
-        will@kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] kvmtool: arm64: Report missing support for 32bit guests
-In-Reply-To: <0657181e-dff8-5bcc-add6-1b41df2993af@arm.com>
-References: <20200701142002.51654-1-suzuki.poulose@arm.com>
- <1aa7885c0d1554c8797e65b13bd05e82@misterjones.org>
- <0657181e-dff8-5bcc-add6-1b41df2993af@arm.com>
-User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <31468a9ac80f34f1cb267c453dc914bb@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, andre.przywara@arm.com, sami.mujawar@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        id S1726379AbgGBQTW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 12:19:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36420 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726082AbgGBQTW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 12:19:22 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00528C08C5C1
+        for <kvm@vger.kernel.org>; Thu,  2 Jul 2020 09:19:21 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id h10so6136440qtc.4
+        for <kvm@vger.kernel.org>; Thu, 02 Jul 2020 09:19:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=CXTe1dgoIkziCoFVfYKeWk3MqTpTpSjmG77p0bE6NoA=;
+        b=suMZCdb64YsbSOryl020BrcFDQ3UYPbRVImF5H5v6pc9aBeBZtiSXm2zZ/33mPrnrb
+         WxErBfDhtBLdxno5VWInb25pAdsvuAPINvWptBxml477CQfyEGDM3UfI6YJU3GkUxAce
+         dD2tKHU0hLlD3swE/sXOkvX4FezCBbL2CLT77TSj6dWGSLou78WiYYmFPRjE0KnZZCS9
+         m8R9XTNuKGncmUoCWNwAEnGp/RmNxWEICtYd5aEeoZB+zc0m1WR4/9SF/rdlNDw43VeA
+         eJvJ4i9pIQ/aVIbIIRz0oZ+uoGCA/KjIwzJPxFewdN5NdyBvSRAONvVOOUamk+z9Sm6d
+         cC7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=CXTe1dgoIkziCoFVfYKeWk3MqTpTpSjmG77p0bE6NoA=;
+        b=ivcTZi5n/KYEZkIeTuTJVRpkPG7qs4DKutkp6FXrUToBnVbUKF3yo436bDM2d1pOOd
+         wh6nwtDWvD+07vQt3JJcgjTE/qMXjnszW6zPK8zKo1rQ6pBg1vW5al8yoSP4V6Yj1MIf
+         TM1M5pa5I1yydsepKefS6T4QtuXiS6fP/LWCarN6q1OFY5qf9Il700AI1Z+wXafJRARY
+         l6g1a6Lf5+Tba6MABw9r1EDY8jLoHEN5ao25xPYstorJh+yDboI4h/vNKZ5t7SaA4BhD
+         xYVuTr6dj3eBetePLwbicxn4QSn9r+2h2JOal6jlY+b/Xk7lmqLsvHtQNBORYAeKQtFO
+         r1vw==
+X-Gm-Message-State: AOAM533Di/NesDGlwmSF+oyEoF6LYNTucHr4B1Fn5vLrY3UMaFuZYPjV
+        SgApDsWghnAVZ1MfRwSoNxL4yeU9h4yCXL4v
+X-Google-Smtp-Source: ABdhPJyMIMas8tgBt7VQOheH8xigvokD2vo4KZ/A/aw4GacYLB8/fzAlrqaYDQevZIT7u27IzMfwRvfLL/vjfnRF
+X-Received: by 2002:ad4:4d83:: with SMTP id cv3mr31515092qvb.236.1593706761146;
+ Thu, 02 Jul 2020 09:19:21 -0700 (PDT)
+Date:   Thu,  2 Jul 2020 09:19:16 -0700
+Message-Id: <20200702161916.2456342-1-abhishekbh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
+Subject: [PATCH] x86/speculation/l1tf: Add KConfig for setting the L1D cache
+ flush mode
+From:   Abhishek Bhardwaj <abhishekbh@google.com>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     Abhishek Bhardwaj <abhishekbh@google.com>,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tony Luck <tony.luck@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Waiman Long <longman@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2020-07-02 16:37, Suzuki K Poulose wrote:
-> Hi Marc
-> 
-> On 07/01/2020 04:42 PM, Marc Zyngier wrote:
->> On 2020-07-01 15:20, Suzuki K Poulose wrote:
->>> When the host doesn't support 32bit guests, the kvmtool fails
->>> without a proper message on what is wrong. i.e,
->>> 
->>>  $ lkvm run -c 1 Image --aarch32
->>>   # lkvm run -k Image -m 256 -c 1 --name guest-105618
->>>   Fatal: Unable to initialise vcpu
->>> 
->>> Given that there is no other easy way to check if the host supports 
->>> 32bit
->>> guests, it is always good to report this by checking the capability, 
->>> rather
->>> than leaving the users to hunt this down by looking at the code!
->>> 
->>> After this patch:
->>> 
->>>  $ lkvm run -c 1 Image --aarch32
->>>   # lkvm run -k Image -m 256 -c 1 --name guest-105695
->>>   Fatal: 32bit guests are not supported
->> 
->> Fancy!
->> 
->>> 
->>> Cc: Will Deacon <will@kernel.org>
->>> Reported-by: Sami Mujawar <sami.mujawar@arm.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> ---
->>>  arm/kvm-cpu.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>> 
->>> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
->>> index 554414f..2acecae 100644
->>> --- a/arm/kvm-cpu.c
->>> +++ b/arm/kvm-cpu.c
->>> @@ -46,6 +46,10 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm 
->>> *kvm,
->>> unsigned long cpu_id)
->>>          .features = ARM_VCPU_FEATURE_FLAGS(kvm, cpu_id)
->>>      };
->>> 
->>> +    if (kvm->cfg.arch.aarch32_guest &&
->>> +        !kvm__supports_extension(kvm, KVM_CAP_ARM_EL1_32BIT))
->> 
->> Can you please check that this still compiles for 32bit host?
-> 
-> Yes, it does. I have built this on an arm32 rootfs with make ARCH=arm.
-> The kvm->cfg.arch is common across arm/arm64 and is defined here :
-> 
-> arm/include/arm-common/kvm-config-arch.h
+This change adds a new kernel configuration that sets the l1d cache
+flush setting at compile time rather than at run time.
 
-I was worried about the availability of KVM_CAP_ARM_EL1_32BIT,
-but being a capability, it is common to all arches. It is
-KVM_ARM_VCPU_EL1_32BIT that is 32bit only, but that's not what
-you are using. Too many flags! ;-)
+Signed-off-by: Abhishek Bhardwaj <abhishekbh@google.com>
+---
 
-Thanks,
+ arch/x86/kernel/cpu/bugs.c |  8 ++++++++
+ arch/x86/kvm/Kconfig       | 17 +++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-         M.
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 0b71970d2d3d2..1dcc875cf5547 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -1406,7 +1406,15 @@ enum l1tf_mitigations l1tf_mitigation __ro_after_init = L1TF_MITIGATION_FLUSH;
+ #if IS_ENABLED(CONFIG_KVM_INTEL)
+ EXPORT_SYMBOL_GPL(l1tf_mitigation);
+ #endif
++#if (CONFIG_KVM_VMENTRY_L1D_FLUSH == 1)
++enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NEVER;
++#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 2)
++enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_COND;
++#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 3)
++enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_ALWAYS;
++#else
+ enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
++#endif
+ EXPORT_SYMBOL_GPL(l1tf_vmx_mitigation);
+ 
+ /*
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index b277a2db62676..f82a0c564e931 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -107,4 +107,21 @@ config KVM_MMU_AUDIT
+ 	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
+ 	 auditing of KVM MMU events at runtime.
+ 
++config KVM_VMENTRY_L1D_FLUSH
++	int "L1D cache flush settings (1-3)"
++	range 1 3
++	default "2"
++	depends on KVM && X86 && X86_64
++	help
++	 This setting determines the L1D cache flush behavior before a VMENTER.
++	 This is similar to setting the option / parameter to
++	 kvm-intel.vmentry_l1d_flush.
++	 1 - Never flush.
++	 2 - Conditinally flush.
++	 3 - Always flush.
++
++# OK, it's a little counter-intuitive to do this, but it puts it neatly under
++# the virtualization menu.
++source "drivers/vhost/Kconfig"
++
+ endif # VIRTUALIZATION
 -- 
-Jazz is not dead. It just smells funny...
+2.27.0.212.ge8ba1cc988-goog
+
