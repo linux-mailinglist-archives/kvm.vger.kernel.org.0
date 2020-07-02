@@ -2,241 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 357B5211DD6
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 10:13:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91124211E0B
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 10:22:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728192AbgGBINx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 04:13:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51728 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725379AbgGBINx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 04:13:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593677631;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=gbJA/RmWRo4DsQRLNHyZabYf9h247N0ChofgtBrHV28=;
-        b=ARTn6apRcseLHyGFappwKqsn/aMEnYR5aFZoAHyUNOAM8EqHrRNHEBeyaU6k7anzJqokNM
-        OzDWUG1RtTBzOnB+J3sZVvD0NXs+llJqLgL7AYDkomIjNuuPAUeFlsdiCQvaoTpV2N3+vQ
-        NV+1te96w4elwtv57pOLbw+dDwp7OYA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-3c3HQYISMbCahuG9rQWcKw-1; Thu, 02 Jul 2020 04:13:48 -0400
-X-MC-Unique: 3c3HQYISMbCahuG9rQWcKw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EF1F185B3B3;
-        Thu,  2 Jul 2020 08:12:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 004EB610F2;
-        Thu,  2 Jul 2020 08:12:20 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     wangjingyi11@huawei.com, maz@kernel.org,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com,
-        eric.auger@redhat.com
-Subject: [PATCH kvm-unit-tests] arm/arm64: timer: Extract irqs at setup time
-Date:   Thu,  2 Jul 2020 10:12:19 +0200
-Message-Id: <20200702081219.27176-1-drjones@redhat.com>
+        id S1727782AbgGBIWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 04:22:08 -0400
+Received: from lelv0142.ext.ti.com ([198.47.23.249]:59346 "EHLO
+        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726362AbgGBIWI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 04:22:08 -0400
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 0628LuYq081675;
+        Thu, 2 Jul 2020 03:21:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1593678116;
+        bh=KmDEx84ZylqeHRRIg+ywtR6uqUDz71eDn9DrKmWcHRo=;
+        h=From:To:CC:Subject:Date;
+        b=JYTSz6tCbffjaS8p0R98jFdU890cGlFgkaOIUX73Isf6MRMb/U17YWcenQm9dERCa
+         uNWmCgLlLq60cM9CJqROng6gAsyNsVmRi/7u5UBoPIUD9KHejtBD55BvUyeeVEw5IC
+         /B77fRU9Di3zLD24jEuw3XemZ32TkSelC9dgTAEw=
+Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 0628LoK6065017
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 2 Jul 2020 03:21:51 -0500
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Thu, 2 Jul
+ 2020 03:21:50 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Thu, 2 Jul 2020 03:21:50 -0500
+Received: from a0393678ub.india.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 0628LiYC006145;
+        Thu, 2 Jul 2020 03:21:45 -0500
+From:   Kishon Vijay Abraham I <kishon@ti.com>
+To:     Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Jon Mason <jdmason@kudzu.us>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Allen Hubbe <allenbh@gmail.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+CC:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-remoteproc@vger.kernel.org>, <linux-ntb@googlegroups.com>,
+        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>
+Subject: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC communication
+Date:   Thu, 2 Jul 2020 13:51:21 +0530
+Message-ID: <20200702082143.25259-1-kishon@ti.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The timer can be useful for other tests besides the timer test.
-Extract the DT parsing of the irqs out of the timer test into
-setup and provide them along with some defines in a new timer.h
-file.
+This series enhances Linux Vhost support to enable SoC-to-SoC
+communication over MMIO. This series enables rpmsg communication between
+two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- arm/timer.c           | 26 ++++----------------------
- lib/arm/asm/timer.h   | 31 +++++++++++++++++++++++++++++++
- lib/arm/setup.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
- lib/arm64/asm/timer.h |  1 +
- 4 files changed, 78 insertions(+), 22 deletions(-)
- create mode 100644 lib/arm/asm/timer.h
- create mode 100644 lib/arm64/asm/timer.h
+1) Modify vhost to use standard Linux driver model
+2) Add support in vring to access virtqueue over MMIO
+3) Add vhost client driver for rpmsg
+4) Add PCIe RC driver (uses virtio) and PCIe EP driver (uses vhost) for
+   rpmsg communication between two SoCs connected to each other
+5) Add NTB Virtio driver and NTB Vhost driver for rpmsg communication
+   between two SoCs connected via NTB
+6) Add configfs to configure the components
 
-diff --git a/arm/timer.c b/arm/timer.c
-index 44621b4f2967..09e3f8f6bd7d 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -8,15 +8,12 @@
- #include <libcflat.h>
- #include <devicetree.h>
- #include <errata.h>
-+#include <asm/timer.h>
- #include <asm/delay.h>
- #include <asm/processor.h>
- #include <asm/gic.h>
- #include <asm/io.h>
- 
--#define ARCH_TIMER_CTL_ENABLE  (1 << 0)
--#define ARCH_TIMER_CTL_IMASK   (1 << 1)
--#define ARCH_TIMER_CTL_ISTATUS (1 << 2)
--
- static void *gic_isenabler;
- static void *gic_icenabler;
- 
-@@ -108,7 +105,6 @@ static void write_ptimer_ctl(u64 val)
- 
- struct timer_info {
- 	u32 irq;
--	u32 irq_flags;
- 	volatile bool irq_received;
- 	u64 (*read_counter)(void);
- 	u64 (*read_cval)(void);
-@@ -304,23 +300,9 @@ static void test_ptimer(void)
- 
- static void test_init(void)
- {
--	const struct fdt_property *prop;
--	const void *fdt = dt_fdt();
--	int node, len;
--	u32 *data;
--
--	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
--	assert(node >= 0);
--	prop = fdt_get_property(fdt, node, "interrupts", &len);
--	assert(prop && len == (4 * 3 * sizeof(u32)));
--
--	data = (u32 *)prop->data;
--	assert(fdt32_to_cpu(data[3]) == 1);
--	ptimer_info.irq = fdt32_to_cpu(data[4]);
--	ptimer_info.irq_flags = fdt32_to_cpu(data[5]);
--	assert(fdt32_to_cpu(data[6]) == 1);
--	vtimer_info.irq = fdt32_to_cpu(data[7]);
--	vtimer_info.irq_flags = fdt32_to_cpu(data[8]);
-+	assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
-+	ptimer_info.irq = TIMER_PTIMER_IRQ;
-+	vtimer_info.irq = TIMER_VTIMER_IRQ;
- 
- 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
- 	ptimer_info.read_ctl();
-diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
-new file mode 100644
-index 000000000000..f75cc67f3ac4
---- /dev/null
-+++ b/lib/arm/asm/timer.h
-@@ -0,0 +1,31 @@
-+/*
-+ * Copyright (C) 2020, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_TIMER_H_
-+#define _ASMARM_TIMER_H_
-+
-+#define ARCH_TIMER_CTL_ENABLE  (1 << 0)
-+#define ARCH_TIMER_CTL_IMASK   (1 << 1)
-+#define ARCH_TIMER_CTL_ISTATUS (1 << 2)
-+
-+#ifndef __ASSEMBLY__
-+
-+struct timer_state {
-+	struct {
-+		u32 irq;
-+		u32 irq_flags;
-+	} ptimer;
-+	struct {
-+		u32 irq;
-+		u32 irq_flags;
-+	} vtimer;
-+};
-+extern struct timer_state __timer_state;
-+
-+#define TIMER_PTIMER_IRQ (__timer_state.ptimer.irq)
-+#define TIMER_VTIMER_IRQ (__timer_state.vtimer.irq)
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_TIMER_H_ */
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 418b4e58a5f8..78562e47c01c 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -22,6 +22,7 @@
- #include <asm/page.h>
- #include <asm/processor.h>
- #include <asm/smp.h>
-+#include <asm/timer.h>
- 
- #include "io.h"
- 
-@@ -29,6 +30,8 @@
- 
- extern unsigned long stacktop;
- 
-+struct timer_state __timer_state;
-+
- char *initrd;
- u32 initrd_size;
- 
-@@ -156,6 +159,43 @@ static void mem_init(phys_addr_t freemem_start)
- 	page_alloc_ops_enable();
- }
- 
-+static void timer_save_state(void)
-+{
-+	const struct fdt_property *prop;
-+	const void *fdt = dt_fdt();
-+	int node, len;
-+	u32 *data;
-+
-+	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
-+	assert(node >= 0 || node == -FDT_ERR_NOTFOUND);
-+
-+	if (node == -FDT_ERR_NOTFOUND) {
-+		__timer_state.ptimer.irq = -1;
-+		__timer_state.vtimer.irq = -1;
-+		return;
-+	}
-+
-+	/*
-+	 * From Linux devicetree timer binding documentation
-+	 *
-+	 * interrupts <type irq flags>:
-+	 *	secure timer irq
-+	 *	non-secure timer irq		(ptimer)
-+	 *	virtual timer irq		(vtimer)
-+	 *	hypervisor timer irq
-+	 */
-+	prop = fdt_get_property(fdt, node, "interrupts", &len);
-+	assert(prop && len == (4 * 3 * sizeof(u32)));
-+
-+	data = (u32 *)prop->data;
-+	assert(fdt32_to_cpu(data[3]) == 1 /* PPI */);
-+	__timer_state.ptimer.irq = fdt32_to_cpu(data[4]);
-+	__timer_state.ptimer.irq_flags = fdt32_to_cpu(data[5]);
-+	assert(fdt32_to_cpu(data[6]) == 1 /* PPI */);
-+	__timer_state.vtimer.irq = fdt32_to_cpu(data[7]);
-+	__timer_state.vtimer.irq_flags = fdt32_to_cpu(data[8]);
-+}
-+
- void setup(const void *fdt)
- {
- 	void *freemem = &stacktop;
-@@ -211,6 +251,8 @@ void setup(const void *fdt)
- 	io_init();
- 
- 	/* finish setup */
-+	timer_save_state();
-+
- 	ret = dt_get_bootargs(&bootargs);
- 	assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
- 	setup_args_progname(bootargs);
-diff --git a/lib/arm64/asm/timer.h b/lib/arm64/asm/timer.h
-new file mode 100644
-index 000000000000..c0f5f88287de
---- /dev/null
-+++ b/lib/arm64/asm/timer.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/timer.h"
+UseCase1 :
+
+ VHOST RPMSG                     VIRTIO RPMSG
+      +                               +
+      |                               |
+      |                               |
+      |                               |
+      |                               |
++-----v------+                 +------v-------+
+|   Linux    |                 |     Linux    |
+|  Endpoint  |                 | Root Complex |
+|            <----------------->              |
+|            |                 |              |
+|    SOC1    |                 |     SOC2     |
++------------+                 +--------------+
+
+UseCase 2:
+
+     VHOST RPMSG                                      VIRTIO RPMSG
+          +                                                 +
+          |                                                 |
+          |                                                 |
+          |                                                 |
+          |                                                 |
+   +------v------+                                   +------v------+
+   |             |                                   |             |
+   |    HOST1    |                                   |    HOST2    |
+   |             |                                   |             |
+   +------^------+                                   +------^------+
+          |                                                 |
+          |                                                 |
++---------------------------------------------------------------------+
+|  +------v------+                                   +------v------+  |
+|  |             |                                   |             |  |
+|  |     EP      |                                   |     EP      |  |
+|  | CONTROLLER1 |                                   | CONTROLLER2 |  |
+|  |             <----------------------------------->             |  |
+|  |             |                                   |             |  |
+|  |             |                                   |             |  |
+|  |             |  SoC With Multiple EP Instances   |             |  |
+|  |             |  (Configured using NTB Function)  |             |  |
+|  +-------------+                                   +-------------+  |
++---------------------------------------------------------------------+
+
+Software Layering:
+
+The high-level SW layering should look something like below. This series
+adds support only for RPMSG VHOST, however something similar should be
+done for net and scsi. With that any vhost device (PCI, NTB, Platform
+device, user) can use any of the vhost client driver.
+
+
+    +----------------+  +-----------+  +------------+  +----------+
+    |  RPMSG VHOST   |  | NET VHOST |  | SCSI VHOST |  |    X     |
+    +-------^--------+  +-----^-----+  +-----^------+  +----^-----+
+            |                 |              |              |
+            |                 |              |              |
+            |                 |              |              |
++-----------v-----------------v--------------v--------------v----------+
+|                            VHOST CORE                                |
++--------^---------------^--------------------^------------------^-----+
+         |               |                    |                  |
+         |               |                    |                  |
+         |               |                    |                  |
++--------v-------+  +----v------+  +----------v----------+  +----v-----+
+|  PCI EPF VHOST |  | NTB VHOST |  |PLATFORM DEVICE VHOST|  |    X     |
++----------------+  +-----------+  +---------------------+  +----------+
+
+This was initially proposed here [1]
+
+[1] -> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com
+
+
+Kishon Vijay Abraham I (22):
+  vhost: Make _feature_ bits a property of vhost device
+  vhost: Introduce standard Linux driver model in VHOST
+  vhost: Add ops for the VHOST driver to configure VHOST device
+  vringh: Add helpers to access vring in MMIO
+  vhost: Add MMIO helpers for operations on vhost virtqueue
+  vhost: Introduce configfs entry for configuring VHOST
+  virtio_pci: Use request_threaded_irq() instead of request_irq()
+  rpmsg: virtio_rpmsg_bus: Disable receive virtqueue callback when
+    reading messages
+  rpmsg: Introduce configfs entry for configuring rpmsg
+  rpmsg: virtio_rpmsg_bus: Add Address Service Notification support
+  rpmsg: virtio_rpmsg_bus: Move generic rpmsg structure to
+    rpmsg_internal.h
+  virtio: Add ops to allocate and free buffer
+  rpmsg: virtio_rpmsg_bus: Use virtio_alloc_buffer() and
+    virtio_free_buffer()
+  rpmsg: Add VHOST based remote processor messaging bus
+  samples/rpmsg: Setup delayed work to send message
+  samples/rpmsg: Wait for address to be bound to rpdev for sending
+    message
+  rpmsg.txt: Add Documentation to configure rpmsg using configfs
+  virtio_pci: Add VIRTIO driver for VHOST on Configurable PCIe Endpoint
+    device
+  PCI: endpoint: Add EP function driver to provide VHOST interface
+  NTB: Add a new NTB client driver to implement VIRTIO functionality
+  NTB: Add a new NTB client driver to implement VHOST functionality
+  NTB: Describe the ntb_virtio and ntb_vhost client in the documentation
+
+ Documentation/driver-api/ntb.rst              |   11 +
+ Documentation/rpmsg.txt                       |   56 +
+ drivers/ntb/Kconfig                           |   18 +
+ drivers/ntb/Makefile                          |    2 +
+ drivers/ntb/ntb_vhost.c                       |  776 +++++++++++
+ drivers/ntb/ntb_virtio.c                      |  853 ++++++++++++
+ drivers/ntb/ntb_virtio.h                      |   56 +
+ drivers/pci/endpoint/functions/Kconfig        |   11 +
+ drivers/pci/endpoint/functions/Makefile       |    1 +
+ .../pci/endpoint/functions/pci-epf-vhost.c    | 1144 ++++++++++++++++
+ drivers/rpmsg/Kconfig                         |   10 +
+ drivers/rpmsg/Makefile                        |    3 +-
+ drivers/rpmsg/rpmsg_cfs.c                     |  394 ++++++
+ drivers/rpmsg/rpmsg_core.c                    |    7 +
+ drivers/rpmsg/rpmsg_internal.h                |  136 ++
+ drivers/rpmsg/vhost_rpmsg_bus.c               | 1151 +++++++++++++++++
+ drivers/rpmsg/virtio_rpmsg_bus.c              |  184 ++-
+ drivers/vhost/Kconfig                         |    1 +
+ drivers/vhost/Makefile                        |    2 +-
+ drivers/vhost/net.c                           |   10 +-
+ drivers/vhost/scsi.c                          |   24 +-
+ drivers/vhost/test.c                          |   17 +-
+ drivers/vhost/vdpa.c                          |    2 +-
+ drivers/vhost/vhost.c                         |  730 ++++++++++-
+ drivers/vhost/vhost_cfs.c                     |  341 +++++
+ drivers/vhost/vringh.c                        |  332 +++++
+ drivers/vhost/vsock.c                         |   20 +-
+ drivers/virtio/Kconfig                        |    9 +
+ drivers/virtio/Makefile                       |    1 +
+ drivers/virtio/virtio_pci_common.c            |   25 +-
+ drivers/virtio/virtio_pci_epf.c               |  670 ++++++++++
+ include/linux/mod_devicetable.h               |    6 +
+ include/linux/rpmsg.h                         |    6 +
+ {drivers/vhost => include/linux}/vhost.h      |  132 +-
+ include/linux/virtio.h                        |    3 +
+ include/linux/virtio_config.h                 |   42 +
+ include/linux/vringh.h                        |   46 +
+ samples/rpmsg/rpmsg_client_sample.c           |   32 +-
+ tools/virtio/virtio_test.c                    |    2 +-
+ 39 files changed, 7083 insertions(+), 183 deletions(-)
+ create mode 100644 drivers/ntb/ntb_vhost.c
+ create mode 100644 drivers/ntb/ntb_virtio.c
+ create mode 100644 drivers/ntb/ntb_virtio.h
+ create mode 100644 drivers/pci/endpoint/functions/pci-epf-vhost.c
+ create mode 100644 drivers/rpmsg/rpmsg_cfs.c
+ create mode 100644 drivers/rpmsg/vhost_rpmsg_bus.c
+ create mode 100644 drivers/vhost/vhost_cfs.c
+ create mode 100644 drivers/virtio/virtio_pci_epf.c
+ rename {drivers/vhost => include/linux}/vhost.h (66%)
+
 -- 
-2.25.4
+2.17.1
 
