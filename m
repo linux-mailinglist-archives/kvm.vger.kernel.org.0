@@ -2,108 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 480702127CA
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 17:25:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D0642127EF
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 17:32:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730357AbgGBPYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 11:24:47 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:15197 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730195AbgGBPYq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 11:24:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1593703486; x=1625239486;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=nkmDXtaePXWcmJSfN1BNlH1GK4LqQIDWcLPiBV5PH2s=;
-  b=P5Fo+ozDrtIcA+LN1oaPberN/9P2DEMnMYI9NX3U6cXbaOvwShyZc635
-   xi2hndz6zs86EpPSUXFRY7STZFjCmHqKTibL5feInPPtnPFmL6ZwGl41h
-   LAfAtmPvwOdSqUu8g9v48MFO6EwW/58LV7tUPk/c/e7oiRo/TSIbGhNXB
-   k=;
-IronPort-SDR: 7OfPpNa0i//+CwtAHQ5YfMb5h/bANcQOcdVPx0MyXiJDDqxyK4u4tF7aixXGOvJ9IHM11RMSsu
- atVPHNMy+t8g==
-X-IronPort-AV: E=Sophos;i="5.75,304,1589241600"; 
-   d="scan'208";a="56915989"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-e7be2041.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 02 Jul 2020 15:24:40 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2a-e7be2041.us-west-2.amazon.com (Postfix) with ESMTPS id 1639EA1F30;
-        Thu,  2 Jul 2020 15:24:40 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 2 Jul 2020 15:24:39 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.160.65) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 2 Jul 2020 15:24:32 +0000
-Subject: Re: [PATCH v4 03/18] nitro_enclaves: Define enclave info for internal
- bookkeeping
-To:     Andra Paraschiv <andraprs@amazon.com>,
-        <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Bjoern Doebel" <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-4-andraprs@amazon.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <cc84e2ee-1a85-c92e-9d29-2f4a33148a61@amazon.de>
-Date:   Thu, 2 Jul 2020 17:24:30 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+        id S1729952AbgGBPc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 11:32:26 -0400
+Received: from foss.arm.com ([217.140.110.172]:35842 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729936AbgGBPc0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 11:32:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B950E31B;
+        Thu,  2 Jul 2020 08:32:25 -0700 (PDT)
+Received: from [10.37.12.95] (unknown [10.37.12.95])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 686573F68F;
+        Thu,  2 Jul 2020 08:32:24 -0700 (PDT)
+Subject: Re: [PATCH] kvmtool: arm64: Report missing support for 32bit guests
+To:     maz@misterjones.org
+Cc:     kvm@vger.kernel.org, andre.przywara@arm.com, sami.mujawar@arm.com,
+        will@kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20200701142002.51654-1-suzuki.poulose@arm.com>
+ <1aa7885c0d1554c8797e65b13bd05e82@misterjones.org>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <0657181e-dff8-5bcc-add6-1b41df2993af@arm.com>
+Date:   Thu, 2 Jul 2020 16:37:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200622200329.52996-4-andraprs@amazon.com>
+In-Reply-To: <1aa7885c0d1554c8797e65b13bd05e82@misterjones.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.43.160.65]
-X-ClientProxiedBy: EX13D21UWA001.ant.amazon.com (10.43.160.154) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Marc
 
+On 07/01/2020 04:42 PM, Marc Zyngier wrote:
+> On 2020-07-01 15:20, Suzuki K Poulose wrote:
+>> When the host doesn't support 32bit guests, the kvmtool fails
+>> without a proper message on what is wrong. i.e,
+>>
+>>  $ lkvm run -c 1 Image --aarch32
+>>   # lkvm run -k Image -m 256 -c 1 --name guest-105618
+>>   Fatal: Unable to initialise vcpu
+>>
+>> Given that there is no other easy way to check if the host supports 32bit
+>> guests, it is always good to report this by checking the capability, 
+>> rather
+>> than leaving the users to hunt this down by looking at the code!
+>>
+>> After this patch:
+>>
+>>  $ lkvm run -c 1 Image --aarch32
+>>   # lkvm run -k Image -m 256 -c 1 --name guest-105695
+>>   Fatal: 32bit guests are not supported
+> 
+> Fancy!
+> 
+>>
+>> Cc: Will Deacon <will@kernel.org>
+>> Reported-by: Sami Mujawar <sami.mujawar@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>>  arm/kvm-cpu.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+>> index 554414f..2acecae 100644
+>> --- a/arm/kvm-cpu.c
+>> +++ b/arm/kvm-cpu.c
+>> @@ -46,6 +46,10 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm,
+>> unsigned long cpu_id)
+>>          .features = ARM_VCPU_FEATURE_FLAGS(kvm, cpu_id)
+>>      };
+>>
+>> +    if (kvm->cfg.arch.aarch32_guest &&
+>> +        !kvm__supports_extension(kvm, KVM_CAP_ARM_EL1_32BIT))
+> 
+> Can you please check that this still compiles for 32bit host?
 
-On 22.06.20 22:03, Andra Paraschiv wrote:
-> The Nitro Enclaves driver keeps an internal info per each enclave.
-> =
+Yes, it does. I have built this on an arm32 rootfs with make ARCH=arm.
+The kvm->cfg.arch is common across arm/arm64 and is defined here :
 
-> This is needed to be able to manage enclave resources state, enclave
-> notifications and have a reference of the PCI device that handles
-> command requests for enclave lifetime management.
-> =
+arm/include/arm-common/kvm-config-arch.h
 
-> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
-> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+And the aarch32 command line option is only available on aarch64 host.
+So this is safe on an arm32 host.
 
-Reviewed-by: Alexander Graf <graf@amazon.com>
+> 
+>> +        die("32bit guests are not supported\n");
+>> +
+>>      vcpu = calloc(1, sizeof(struct kvm_cpu));
+>>      if (!vcpu)
+>>          return NULL;
+> 
+> With the above detail checked,
+> 
+> Acked-by: Marc Zyngier <maz@kernel.org>
 
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Thanks
+Suzuki
