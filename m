@@ -2,100 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C349F211D31
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 09:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 357B5211DD6
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 10:13:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbgGBHld (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 03:41:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40532 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726362AbgGBHlc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 03:41:32 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F09C08C5C1;
-        Thu,  2 Jul 2020 00:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=XTabvSLO7S5tELpoXrJiNFuMzsHwzZp5WpQClf4PKdk=; b=sFgSl9Gcs3uRIVF548A0umcLQi
-        AYzzAb0cgK1h5LwXjvrGL5QlYbYgclSEKGtQ5tkEMf9oqwvekDTGpGihN6spqQLWxbkv/xGizG/Y9
-        WWbPTB0Iq57rX8tmEYegHLfU11KypvtrGRBwXATY74N33TY8slcS0ZuB3KmZzMu4Ec9XG7HKckpdu
-        rOFuSDmVjg5Xrt7ubIC7FrM3G/SvlhhnOCBwz/THMKv05SdGA07BTmTeMHazs9aLXXO6tNurvl+DJ
-        GRdsJmn5y8ZcZwdJsvQNTXJH4R1hW+S8N/7bfXH860MbylzsTrc9vCqhkRsCYb+e5JvsiNKhHQ/jH
-        Z+kv+yYA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jqtq9-0006AV-NN; Thu, 02 Jul 2020 07:41:04 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 7240E3003D8;
-        Thu,  2 Jul 2020 09:40:59 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 366CA23D44E56; Thu,  2 Jul 2020 09:40:59 +0200 (CEST)
-Date:   Thu, 2 Jul 2020 09:40:59 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
-        wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, "Liang, Kan" <kan.liang@intel.com>
-Subject: Re: [PATCH v12 00/11] Guest Last Branch Recording Enabling
-Message-ID: <20200702074059.GX4781@hirez.programming.kicks-ass.net>
-References: <20200613080958.132489-1-like.xu@linux.intel.com>
+        id S1728192AbgGBINx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 04:13:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51728 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725379AbgGBINx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 04:13:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593677631;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=gbJA/RmWRo4DsQRLNHyZabYf9h247N0ChofgtBrHV28=;
+        b=ARTn6apRcseLHyGFappwKqsn/aMEnYR5aFZoAHyUNOAM8EqHrRNHEBeyaU6k7anzJqokNM
+        OzDWUG1RtTBzOnB+J3sZVvD0NXs+llJqLgL7AYDkomIjNuuPAUeFlsdiCQvaoTpV2N3+vQ
+        NV+1te96w4elwtv57pOLbw+dDwp7OYA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-3c3HQYISMbCahuG9rQWcKw-1; Thu, 02 Jul 2020 04:13:48 -0400
+X-MC-Unique: 3c3HQYISMbCahuG9rQWcKw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EF1F185B3B3;
+        Thu,  2 Jul 2020 08:12:26 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 004EB610F2;
+        Thu,  2 Jul 2020 08:12:20 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     wangjingyi11@huawei.com, maz@kernel.org,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com,
+        eric.auger@redhat.com
+Subject: [PATCH kvm-unit-tests] arm/arm64: timer: Extract irqs at setup time
+Date:   Thu,  2 Jul 2020 10:12:19 +0200
+Message-Id: <20200702081219.27176-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200613080958.132489-1-like.xu@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 13, 2020 at 04:09:45PM +0800, Like Xu wrote:
-> Like Xu (10):
->   perf/x86/core: Refactor hw->idx checks and cleanup
->   perf/x86/lbr: Add interface to get LBR information
->   perf/x86: Add constraint to create guest LBR event without hw counter
->   perf/x86: Keep LBR records unchanged in host context for guest usage
+The timer can be useful for other tests besides the timer test.
+Extract the DT parsing of the irqs out of the timer test into
+setup and provide them along with some defines in a new timer.h
+file.
 
-> Wei Wang (1):
->   perf/x86: Fix variable types for LBR registers
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arm/timer.c           | 26 ++++----------------------
+ lib/arm/asm/timer.h   | 31 +++++++++++++++++++++++++++++++
+ lib/arm/setup.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
+ lib/arm64/asm/timer.h |  1 +
+ 4 files changed, 78 insertions(+), 22 deletions(-)
+ create mode 100644 lib/arm/asm/timer.h
+ create mode 100644 lib/arm64/asm/timer.h
 
->  arch/x86/events/core.c            |  26 +--
->  arch/x86/events/intel/core.c      | 109 ++++++++-----
->  arch/x86/events/intel/lbr.c       |  51 +++++-
->  arch/x86/events/perf_event.h      |   8 +-
->  arch/x86/include/asm/perf_event.h |  34 +++-
+diff --git a/arm/timer.c b/arm/timer.c
+index 44621b4f2967..09e3f8f6bd7d 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -8,15 +8,12 @@
+ #include <libcflat.h>
+ #include <devicetree.h>
+ #include <errata.h>
++#include <asm/timer.h>
+ #include <asm/delay.h>
+ #include <asm/processor.h>
+ #include <asm/gic.h>
+ #include <asm/io.h>
+ 
+-#define ARCH_TIMER_CTL_ENABLE  (1 << 0)
+-#define ARCH_TIMER_CTL_IMASK   (1 << 1)
+-#define ARCH_TIMER_CTL_ISTATUS (1 << 2)
+-
+ static void *gic_isenabler;
+ static void *gic_icenabler;
+ 
+@@ -108,7 +105,6 @@ static void write_ptimer_ctl(u64 val)
+ 
+ struct timer_info {
+ 	u32 irq;
+-	u32 irq_flags;
+ 	volatile bool irq_received;
+ 	u64 (*read_counter)(void);
+ 	u64 (*read_cval)(void);
+@@ -304,23 +300,9 @@ static void test_ptimer(void)
+ 
+ static void test_init(void)
+ {
+-	const struct fdt_property *prop;
+-	const void *fdt = dt_fdt();
+-	int node, len;
+-	u32 *data;
+-
+-	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
+-	assert(node >= 0);
+-	prop = fdt_get_property(fdt, node, "interrupts", &len);
+-	assert(prop && len == (4 * 3 * sizeof(u32)));
+-
+-	data = (u32 *)prop->data;
+-	assert(fdt32_to_cpu(data[3]) == 1);
+-	ptimer_info.irq = fdt32_to_cpu(data[4]);
+-	ptimer_info.irq_flags = fdt32_to_cpu(data[5]);
+-	assert(fdt32_to_cpu(data[6]) == 1);
+-	vtimer_info.irq = fdt32_to_cpu(data[7]);
+-	vtimer_info.irq_flags = fdt32_to_cpu(data[8]);
++	assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
++	ptimer_info.irq = TIMER_PTIMER_IRQ;
++	vtimer_info.irq = TIMER_VTIMER_IRQ;
+ 
+ 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
+ 	ptimer_info.read_ctl();
+diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
+new file mode 100644
+index 000000000000..f75cc67f3ac4
+--- /dev/null
++++ b/lib/arm/asm/timer.h
+@@ -0,0 +1,31 @@
++/*
++ * Copyright (C) 2020, Red Hat Inc, Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#ifndef _ASMARM_TIMER_H_
++#define _ASMARM_TIMER_H_
++
++#define ARCH_TIMER_CTL_ENABLE  (1 << 0)
++#define ARCH_TIMER_CTL_IMASK   (1 << 1)
++#define ARCH_TIMER_CTL_ISTATUS (1 << 2)
++
++#ifndef __ASSEMBLY__
++
++struct timer_state {
++	struct {
++		u32 irq;
++		u32 irq_flags;
++	} ptimer;
++	struct {
++		u32 irq;
++		u32 irq_flags;
++	} vtimer;
++};
++extern struct timer_state __timer_state;
++
++#define TIMER_PTIMER_IRQ (__timer_state.ptimer.irq)
++#define TIMER_VTIMER_IRQ (__timer_state.vtimer.irq)
++
++#endif /* !__ASSEMBLY__ */
++#endif /* _ASMARM_TIMER_H_ */
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 418b4e58a5f8..78562e47c01c 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -22,6 +22,7 @@
+ #include <asm/page.h>
+ #include <asm/processor.h>
+ #include <asm/smp.h>
++#include <asm/timer.h>
+ 
+ #include "io.h"
+ 
+@@ -29,6 +30,8 @@
+ 
+ extern unsigned long stacktop;
+ 
++struct timer_state __timer_state;
++
+ char *initrd;
+ u32 initrd_size;
+ 
+@@ -156,6 +159,43 @@ static void mem_init(phys_addr_t freemem_start)
+ 	page_alloc_ops_enable();
+ }
+ 
++static void timer_save_state(void)
++{
++	const struct fdt_property *prop;
++	const void *fdt = dt_fdt();
++	int node, len;
++	u32 *data;
++
++	node = fdt_node_offset_by_compatible(fdt, -1, "arm,armv8-timer");
++	assert(node >= 0 || node == -FDT_ERR_NOTFOUND);
++
++	if (node == -FDT_ERR_NOTFOUND) {
++		__timer_state.ptimer.irq = -1;
++		__timer_state.vtimer.irq = -1;
++		return;
++	}
++
++	/*
++	 * From Linux devicetree timer binding documentation
++	 *
++	 * interrupts <type irq flags>:
++	 *	secure timer irq
++	 *	non-secure timer irq		(ptimer)
++	 *	virtual timer irq		(vtimer)
++	 *	hypervisor timer irq
++	 */
++	prop = fdt_get_property(fdt, node, "interrupts", &len);
++	assert(prop && len == (4 * 3 * sizeof(u32)));
++
++	data = (u32 *)prop->data;
++	assert(fdt32_to_cpu(data[3]) == 1 /* PPI */);
++	__timer_state.ptimer.irq = fdt32_to_cpu(data[4]);
++	__timer_state.ptimer.irq_flags = fdt32_to_cpu(data[5]);
++	assert(fdt32_to_cpu(data[6]) == 1 /* PPI */);
++	__timer_state.vtimer.irq = fdt32_to_cpu(data[7]);
++	__timer_state.vtimer.irq_flags = fdt32_to_cpu(data[8]);
++}
++
+ void setup(const void *fdt)
+ {
+ 	void *freemem = &stacktop;
+@@ -211,6 +251,8 @@ void setup(const void *fdt)
+ 	io_init();
+ 
+ 	/* finish setup */
++	timer_save_state();
++
+ 	ret = dt_get_bootargs(&bootargs);
+ 	assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
+ 	setup_args_progname(bootargs);
+diff --git a/lib/arm64/asm/timer.h b/lib/arm64/asm/timer.h
+new file mode 100644
+index 000000000000..c0f5f88287de
+--- /dev/null
++++ b/lib/arm64/asm/timer.h
+@@ -0,0 +1 @@
++#include "../../arm/asm/timer.h"
+-- 
+2.25.4
 
-These look good to me; but at the same time Kan is sending me
-Architectural LBR patches.
-
-Kan, if I take these perf patches and stick them in a tip/perf/vlbr
-topic branch, can you rebase the arch lbr stuff on top, or is there
-anything in the arch-lbr series that badly conflicts with this work?
-
-Paolo, would that topic branch work for you too, to then stick these
-patches in top?
-
->   KVM: vmx/pmu: Expose LBR to guest via MSR_IA32_PERF_CAPABILITIES
->   KVM: vmx/pmu: Unmask LBR fields in the MSR_IA32_DEBUGCTLMSR emualtion
->   KVM: vmx/pmu: Pass-through LBR msrs when guest LBR event is scheduled
->   KVM: vmx/pmu: Emulate legacy freezing LBRs on virtual PMI
->   KVM: vmx/pmu: Reduce the overhead of LBR pass-through or cancellation
->   KVM: vmx/pmu: Release guest LBR event via lazy release mechanism
-
->  arch/x86/kvm/pmu.c                |  12 +-
->  arch/x86/kvm/pmu.h                |   5 +
->  arch/x86/kvm/vmx/capabilities.h   |  23 ++-
->  arch/x86/kvm/vmx/pmu_intel.c      | 253 +++++++++++++++++++++++++++++-
->  arch/x86/kvm/vmx/vmx.c            |  86 +++++++++-
->  arch/x86/kvm/vmx/vmx.h            |  17 ++
->  arch/x86/kvm/x86.c                |  13 --
-
->  12 files changed, 559 insertions(+), 78 deletions(-)
