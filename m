@@ -2,57 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EBDE4212464
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 15:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AB4A21247F
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 15:23:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729012AbgGBNR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 09:17:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38071 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726343AbgGBNR6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Jul 2020 09:17:58 -0400
+        id S1729271AbgGBNXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 09:23:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22442 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729067AbgGBNXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 09:23:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593695877;
+        s=mimecast20190719; t=1593696204;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iPqmxCco2qOcPw6NCGzpbeppRDF5Nngtn4bMyEz2Q8g=;
-        b=jG26Z2atWAtPxgu3qY2P4esKNtto0zU0Jv/qAUd8DAnSCatE8ZfwZQHpCLCMVhWa24sY0W
-        w9i5tKX8Ufrnv3j8qhZoE5m68NQARe8B9SHaJgDI7iuIbjTDWqGyRitUIwMNeXAoL/AbM8
-        rAJCUMhsN2lDoQ2UpAvxQaiU/21IM1w=
+        bh=lt+MVol6YDoR2oUdOzFWj33k5KFHukA6bYuMZo4OVHM=;
+        b=Py7ZifIlRVcamu0mblQjNuJdJTt/1RahgxAhAwpWTIrI8xGsgZQN9rcJN8VDKVZ8gcPJli
+        Fow0vRM5f3hwPxy+3B55hyQEc9DxpvtCa9SY+UWERrwklMUpJ48kPrS917AVuI9TV3bicx
+        F9qMcuPCNt9ki7yuG4xzs7mmZ9N1Ahw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-RM255m1bMSK_e0Skae9WbA-1; Thu, 02 Jul 2020 09:17:55 -0400
-X-MC-Unique: RM255m1bMSK_e0Skae9WbA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-418-60C4cSREMq2bFAXkYNTVzA-1; Thu, 02 Jul 2020 09:23:22 -0400
+X-MC-Unique: 60C4cSREMq2bFAXkYNTVzA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAE9819253C2;
-        Thu,  2 Jul 2020 13:17:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD7C218B6474;
+        Thu,  2 Jul 2020 13:23:20 +0000 (UTC)
 Received: from [10.36.112.70] (ovpn-112-70.ams2.redhat.com [10.36.112.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DCCD5DD61;
-        Thu,  2 Jul 2020 13:17:52 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 6/8] arm64: microbench: Allow each test
- to specify its running times
-To:     Andrew Jones <drjones@redhat.com>,
-        Jingyi Wang <wangjingyi11@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D9CAD60BE1;
+        Thu,  2 Jul 2020 13:23:18 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 7/8] arm64: microbench: Add time limit
+ for each individual test
+To:     Jingyi Wang <wangjingyi11@huawei.com>, drjones@redhat.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
 References: <20200702030132.20252-1-wangjingyi11@huawei.com>
- <20200702030132.20252-7-wangjingyi11@huawei.com>
- <20200702052942.laodlgq2yrlxwsh4@kamzik.brq.redhat.com>
+ <20200702030132.20252-8-wangjingyi11@huawei.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <0ac90a80-2180-ee07-b614-dc2466b711a5@redhat.com>
-Date:   Thu, 2 Jul 2020 15:17:50 +0200
+Message-ID: <49bf0b58-38b9-1cd6-8396-b8561d6f90cb@redhat.com>
+Date:   Thu, 2 Jul 2020 15:23:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200702052942.laodlgq2yrlxwsh4@kamzik.brq.redhat.com>
+In-Reply-To: <20200702030132.20252-8-wangjingyi11@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -60,90 +58,71 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Jingyi,
 
-On 7/2/20 7:29 AM, Andrew Jones wrote:
-> On Thu, Jul 02, 2020 at 11:01:30AM +0800, Jingyi Wang wrote:
->> For some test in micro-bench can be time consuming, we add a
->> micro-bench test parameter to allow each individual test to specify
->> its running times.
->>
->> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+On 7/2/20 5:01 AM, Jingyi Wang wrote:
+> Besides using separate running times parameter, we add time limit
+> for loop_test to make sure each test should be done in a certain
+> time(5 sec here).
+> 
+> Signed-off-by: Jingyi Wang <wangjingyi11@huawei.com>
+> ---
+>  arm/micro-bench.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> index 506d2f9..4c962b7 100644
+> --- a/arm/micro-bench.c
+> +++ b/arm/micro-bench.c
+> @@ -23,6 +23,7 @@
+>  #include <asm/gic-v3-its.h>
+>  
+>  #define NTIMES (1U << 16)
+> +#define MAX_NS (5 * 1000 * 1000 * 1000UL)
+>  
+>  static u32 cntfrq;
+>  
+> @@ -258,22 +259,26 @@ static void loop_test(struct exit_test *test)
+>  	uint64_t start, end, total_ticks, ntimes = 0;
+>  	struct ns_time total_ns, avg_ns;
+>  
+> +	total_ticks = 0;
+>  	if (test->prep) {
+>  		if(!test->prep()) {
+>  			printf("%s test skipped\n", test->name);
+>  			return;
+>  		}
+>  	}
+> -	isb();
+> -	start = read_sysreg(cntpct_el0);
+> -	while (ntimes < test->times) {
+> +
+> +	while (ntimes < test->times && total_ns.ns < MAX_NS) {
+> +		isb();
+> +		start = read_sysreg(cntpct_el0);
+>  		test->exec();
+> +		isb();
+> +		end = read_sysreg(cntpct_el0);
+> +
+>  		ntimes++;
+> +		total_ticks += (end - start);
+> +		ticks_to_ns_time(total_ticks, &total_ns);
+>  	}
+you don't need the
+ticks_to_ns_time(total_ticks, &total_ns);
+
+after the loop
+> -	isb();
+> -	end = read_sysreg(cntpct_el0);
+>  
+> -	total_ticks = end - start;
+>  	ticks_to_ns_time(total_ticks, &total_ns);
+>  	avg_ns.ns = total_ns.ns / ntimes;
+>  	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
+> 
+
+Besides
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
+Thanks
+
 Eric
->> ---
->>  arm/micro-bench.c | 25 ++++++++++++++-----------
->>  1 file changed, 14 insertions(+), 11 deletions(-)
->>
->> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
->> index aeb60a7..506d2f9 100644
->> --- a/arm/micro-bench.c
->> +++ b/arm/micro-bench.c
->> @@ -223,17 +223,18 @@ struct exit_test {
->>  	const char *name;
->>  	bool (*prep)(void);
->>  	void (*exec)(void);
->> +	u32 times;
->>  	bool run;
->>  };
->>  
->>  static struct exit_test tests[] = {
->> -	{"hvc",			NULL,		hvc_exec,		true},
->> -	{"mmio_read_user",	NULL,		mmio_read_user_exec,	true},
->> -	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	true},
->> -	{"eoi",			NULL,		eoi_exec,		true},
->> -	{"ipi",			ipi_prep,	ipi_exec,		true},
->> -	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		true},
->> -	{"lpi",			lpi_prep,	lpi_exec,		true},
->> +	{"hvc",			NULL,		hvc_exec,		NTIMES,		true},
->> +	{"mmio_read_user",	NULL,		mmio_read_user_exec,	NTIMES,		true},
->> +	{"mmio_read_vgic",	NULL,		mmio_read_vgic_exec,	NTIMES,		true},
->> +	{"eoi",			NULL,		eoi_exec,		NTIMES,		true},
->> +	{"ipi",			ipi_prep,	ipi_exec,		NTIMES,		true},
->> +	{"ipi_hw",		ipi_hw_prep,	ipi_exec,		NTIMES,		true},
->> +	{"lpi",			lpi_prep,	lpi_exec,		NTIMES,		true},
-> 
-> Now that we no longer use 'NTIMES' in functions we don't really need the
-> define at all. We can just put 65536 directly into the table here for
-> each test that needs 65536 times.
-> 
-> Thanks,
-> drew
-> 
->>  };
->>  
->>  struct ns_time {
->> @@ -254,7 +255,7 @@ static void ticks_to_ns_time(uint64_t ticks, struct ns_time *ns_time)
->>  
->>  static void loop_test(struct exit_test *test)
->>  {
->> -	uint64_t start, end, total_ticks, ntimes = NTIMES;
->> +	uint64_t start, end, total_ticks, ntimes = 0;
->>  	struct ns_time total_ns, avg_ns;
->>  
->>  	if (test->prep) {
->> @@ -265,15 +266,17 @@ static void loop_test(struct exit_test *test)
->>  	}
->>  	isb();
->>  	start = read_sysreg(cntpct_el0);
->> -	while (ntimes--)
->> +	while (ntimes < test->times) {
->>  		test->exec();
->> +		ntimes++;
->> +	}
->>  	isb();
->>  	end = read_sysreg(cntpct_el0);
->>  
->>  	total_ticks = end - start;
->>  	ticks_to_ns_time(total_ticks, &total_ns);
->> -	avg_ns.ns = total_ns.ns / NTIMES;
->> -	avg_ns.ns_frac = total_ns.ns_frac / NTIMES;
->> +	avg_ns.ns = total_ns.ns / ntimes;
->> +	avg_ns.ns_frac = total_ns.ns_frac / ntimes;
->>  
->>  	printf("%-30s%15" PRId64 ".%-15" PRId64 "%15" PRId64 ".%-15" PRId64 "\n",
->>  		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
->> -- 
->> 2.19.1
->>
->>
 
