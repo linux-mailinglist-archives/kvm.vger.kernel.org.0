@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB9A8212F8F
-	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 00:35:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EF3D212F90
+	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 00:36:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726139AbgGBWfd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 18:35:33 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:44622 "EHLO
+        id S1726194AbgGBWf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 18:35:59 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44836 "EHLO
         userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726029AbgGBWfc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 18:35:32 -0400
+        with ESMTP id S1726015AbgGBWf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 18:35:59 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062MSKgq159748;
-        Thu, 2 Jul 2020 22:35:29 GMT
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062MSGAl159707;
+        Thu, 2 Jul 2020 22:35:56 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
  cc : references : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=xlbrTGZfCtli3Wu7vMNvj+DYwyAg+qHp5XBf6/obxfY=;
- b=v3MIq9XXN3wyUL7ViIeAtzupxsvPPPGhxqF7yQk681s1UXCD6U/ob+4jtPEpSW2MY265
- prRv8Voob1U1SpMZ0jOEbCrF5vFib0yWkgj+SLJnZYwxKr2F4CcNJq/Qay9dKYS67/yP
- QmFDJf40emhIo/NNC6e2j6CD+dPrFisR/ycGpFMVTqX36WdslFZAbpJ+ZgTqAY35AaKT
- B2S9bcHQd+nKQ2wSILu79vc5/jzSazvc7taP442D0NdwQ03IhzQRam+K4O8sfIBQ2a8/
- SqxWKW7frpJd7dtz93Dp/jpKIoqn1sDjrMNWB65V2Y7xiz0SRMGWSh9tLp3gTf6SVeG6 Kw== 
+ bh=pI/I0GQlo/5hwo35H7R36a5/4TxdHYFWAt9rB96vzsc=;
+ b=M9ph//CFG5evsdUH46ARcuiavfY3mQg8+/6kgRsSZo9ztZ4w+0wtlJgY1k7a2omF/1xa
+ cKb8MIp1Glj2deGYxP/hjstqtmABsM7ycZyRWrhQCVsz8hrcoKC2FvqZCSWcuuKP1UOD
+ MrRDp8/rC9Is6aPrBFKlHugv4YK+icpQKjHyxsf0yv0UuAp9xxdVSNL2xAejSz1Hb/SF
+ y8dP46Oz2u7Zh2DazfAPNxYa0GBjqQ/YKjXeCelLjkUidm+ywbzP4kOwoenIw3Ac8vEs
+ wCWRxP+Y9cP9dXVJhWiAaoZgmM2Gt7jpDd1/WQQm9WPejPxa+rAtf0AL/6BjQnLr0Bn+ Uw== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 31wxrnjwsd-1
+        by userp2120.oracle.com with ESMTP id 31wxrnjwtd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 02 Jul 2020 22:35:29 +0000
+        Thu, 02 Jul 2020 22:35:56 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062MWggQ006112;
-        Thu, 2 Jul 2020 22:33:29 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 31xfvwadk3-1
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062MWg53006061;
+        Thu, 2 Jul 2020 22:33:56 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 31xfvwadvv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Jul 2020 22:33:29 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 062MXSD7023329;
-        Thu, 2 Jul 2020 22:33:28 GMT
+        Thu, 02 Jul 2020 22:33:56 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 062MXt15007271;
+        Thu, 2 Jul 2020 22:33:55 GMT
 Received: from localhost.localdomain (/10.159.136.117)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 02 Jul 2020 22:33:27 +0000
-Subject: Re: [PATCH 0/3 v3] KVM: nSVM: Check MBZ bits in CR3 and CR4 on vmrun
- of nested guests
+        with ESMTP ; Thu, 02 Jul 2020 22:33:55 +0000
+Subject: Re: [PATCH 0/4] KVM: nSVM: Check reserved bits in DR6, DR7 and EFER
+ on vmrun of nested guests
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com
-References: <20200515053609.3347-1-krish.sadhukhan@oracle.com>
-Message-ID: <fff40d79-1731-2f24-227a-bf57e8e33b97@oracle.com>
-Date:   Thu, 2 Jul 2020 15:33:21 -0700
+References: <20200522221954.32131-1-krish.sadhukhan@oracle.com>
+Message-ID: <2fa88813-684c-f7ac-495b-68fe6cdbd5b2@oracle.com>
+Date:   Thu, 2 Jul 2020 15:33:53 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200515053609.3347-1-krish.sadhukhan@oracle.com>
+In-Reply-To: <20200522221954.32131-1-krish.sadhukhan@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9670 signatures=668680
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 adultscore=0 spamscore=0
- phishscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ phishscore=0 malwarescore=0 mlxlogscore=973 bulkscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
  definitions=main-2007020149
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9670 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=990
  priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
  malwarescore=0 phishscore=0 adultscore=0 cotscore=-2147483648
  lowpriorityscore=0 suspectscore=1 spamscore=0 classifier=spam adjust=0
@@ -74,32 +74,34 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Ping.
 
-On 5/14/20 10:36 PM, Krish Sadhukhan wrote:
-> v2 -> v3:
-> 	In patch# 1, the mask for guest CR4 reserved bits is now cached in
-> 	'struct kvm_vcpu_arch', instead of in a global variable.
+On 5/22/20 3:19 PM, Krish Sadhukhan wrote:
+> Patch# 1: Moves the check for upper 32 reserved bits of DR6 to a new function.
+> Patch# 2: Adds the KVM checks for DR6[63:32] and DR7[64:32] reserved bits
+> Patch# 3: Adds kvm-unit-tests for DR6[63:32] and DR7[64:32] reserved bits and
+> 	  reserved bits in EFER
+> Patch# 4: Removes the duplicate definition of 'vmcb' that sneaked via one of
+> 	  my previous patches.
 >
 >
-> [PATCH 1/3 v3] KVM: x86: Create mask for guest CR4 reserved bits in
-> [PATCH 2/3 v3] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are not set on
-> [PATCH 3/3 v3] KVM: nSVM: Test that MBZ bits in CR3 and CR4 are not set on vmrun
+> [PATCH 1/4] KVM: x86: Move the check for upper 32 reserved bits of
+> [PATCH 2/4] KVM: nSVM: Check that DR6[63:32] and DR7[64:32] are not
+> [PATCH 3/4] kvm-unit-tests: nSVM: Test that DR6[63:32], DR7[63:32]
+> [PATCH 4/4] kvm-unit-tests: x86: Remove duplicate instance of 'vmcb'
 >
->   arch/x86/include/asm/kvm_host.h |  2 ++
->   arch/x86/kvm/cpuid.c            |  2 ++
->   arch/x86/kvm/svm/nested.c       | 22 ++++++++++++++++++++--
->   arch/x86/kvm/svm/svm.h          |  5 ++++-
->   arch/x86/kvm/x86.c              | 27 ++++-----------------------
->   arch/x86/kvm/x86.h              | 21 +++++++++++++++++++++
->   6 files changed, 53 insertions(+), 26 deletions(-)
+>   arch/x86/kvm/svm/nested.c | 3 +++
+>   arch/x86/kvm/x86.c        | 2 +-
+>   arch/x86/kvm/x86.h        | 5 +++++
+>   3 files changed, 9 insertions(+), 1 deletion(-)
 >
 > Krish Sadhukhan (2):
->        KVM: x86: Create mask for guest CR4 reserved bits in kvm_update_cpuid()
->        nSVM: Check that MBZ bits in CR3 and CR4 are not set on vmrun of nested gu
+>        KVM: x86: Move the check for upper 32 reserved bits of DR6 to separate fun
+>        KVM: nVMX: Check that DR6[63:32] and DR7[64:32] are not set on vmrun of ne
+>   x86/svm.c       |  1 -
+>   x86/svm.h       |  3 +++
+>   x86/svm_tests.c | 59 ++++++++++++++++++++++++++++++++++++++-------------------
+>   3 files changed, 42 insertions(+), 21 deletions(-)
 >
->   x86/svm.h       |   6 ++++
->   x86/svm_tests.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++-------
->   2 files changed, 99 insertions(+), 12 deletions(-)
->
-> Krish Sadhukhan (1):
->        nSVM: Test that MBZ bits in CR3 and CR4 are not set on vmrun of nested g
+> Krish Sadhukhan (2):
+>        kvm-unit-tests: nSVM: Test that DR6[63:32], DR7[63:32] and EFER reserved b
+>        kvm-unit-tests: x86: Remove duplicate instance of 'vmcb'
 >
