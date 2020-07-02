@@ -2,123 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCC92212CB8
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 21:02:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 523D4212CC9
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 21:08:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726030AbgGBTCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 15:02:38 -0400
-Received: from mga17.intel.com ([192.55.52.151]:64486 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725847AbgGBTCi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 15:02:38 -0400
-IronPort-SDR: lk74/hlgE32MX2GtseI39Jie7T6PvDhRZK9yWuVXzJVjnUS55JtP+YEjgMywGpkyDOXilh8tFf
- nmOL6d2XsD0Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="127091924"
-X-IronPort-AV: E=Sophos;i="5.75,305,1589266800"; 
-   d="scan'208";a="127091924"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 12:02:37 -0700
-IronPort-SDR: gqCB9HkRCBF6S7rrNVV2Z23F3fxIRaBzgKImzclHpj6Ezom7wnyYy+4gmOaoH937QDlipleBc0
- OBvwMLwkERYA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,305,1589266800"; 
-   d="scan'208";a="267152476"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Jul 2020 12:02:37 -0700
-Date:   Thu, 2 Jul 2020 12:02:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] KVM: X86: Go on updating other CPUID leaves when
- leaf 1 is absent
-Message-ID: <20200702190237.GK3575@linux.intel.com>
-References: <20200623115816.24132-1-xiaoyao.li@intel.com>
- <20200623115816.24132-3-xiaoyao.li@intel.com>
- <20200702185403.GH3575@linux.intel.com>
+        id S1726035AbgGBTIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 15:08:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39982 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725862AbgGBTIT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 15:08:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1593716897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YuSa6A609nCROWP7gC5jQIgxvOmH9Y437gf1RGlTqlE=;
+        b=IssdcEf2wPCsU7wA89gJ2tuGA7EYD51xfPbYqZjbUAlsisx4I9c6wcysOssqsNfFo7OZeO
+        Oc+qIzCFHEGDbCHoF/XT+bJGl1NyHPuRE2gFLZhyl8pthi7MlSeCme4wXiJ15gbIyNP0C0
+        JH8wYXEXOdL38ND1LzuWUz7lcv89Pl8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-o0rWxKUQPRqPEDkLcsJRvA-1; Thu, 02 Jul 2020 15:08:16 -0400
+X-MC-Unique: o0rWxKUQPRqPEDkLcsJRvA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D82D51005513;
+        Thu,  2 Jul 2020 19:08:14 +0000 (UTC)
+Received: from work-vm (ovpn-114-239.ams2.redhat.com [10.36.114.239])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D49E757DF;
+        Thu,  2 Jul 2020 19:08:07 +0000 (UTC)
+Date:   Thu, 2 Jul 2020 20:08:04 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        Richard Henderson <rth@twiddle.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v5 19/21] virtio-mem: Add trace events
+Message-ID: <20200702190804.GG14863@work-vm>
+References: <20200626072248.78761-1-david@redhat.com>
+ <20200626072248.78761-20-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200702185403.GH3575@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20200626072248.78761-20-david@redhat.com>
+User-Agent: Mutt/1.14.3 (2020-06-14)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 11:54:03AM -0700, Sean Christopherson wrote:
-> On Tue, Jun 23, 2020 at 07:58:11PM +0800, Xiaoyao Li wrote:
-> > As handling of bits other leaf 1 added over time, kvm_update_cpuid()
-> > should not return directly if leaf 1 is absent, but should go on
-> > updateing other CPUID leaves.
-> > 
-> > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+* David Hildenbrand (david@redhat.com) wrote:
+> Let's add some trace events that might come in handy later.
 > 
-> This should probably be marked for stable.
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hw/virtio/trace-events | 10 ++++++++++
+>  hw/virtio/virtio-mem.c | 10 +++++++++-
+>  2 files changed, 19 insertions(+), 1 deletion(-)
 > 
-> > ---
-> >  arch/x86/kvm/cpuid.c | 23 +++++++++++------------
-> >  1 file changed, 11 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 1d13bad42bf9..0164dac95ef5 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -60,22 +60,21 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
-> >  	struct kvm_lapic *apic = vcpu->arch.apic;
-> >  
-> >  	best = kvm_find_cpuid_entry(vcpu, 1, 0);
-> > -	if (!best)
-> > -		return 0;
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 6427a0047d..292fc15e29 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -74,3 +74,13 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+>  virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+>  virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+>  virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
+> +
+> +# virtio-mem.c
+> +virtio_mem_send_response(uint16_t type) "type=%" PRIu16
+> +virtio_mem_plug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
+> +virtio_mem_unplug_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
+> +virtio_mem_unplugged_all(void) ""
+> +virtio_mem_unplug_all_request(void) ""
+> +virtio_mem_resized_usable_region(uint64_t old_size, uint64_t new_size) "old_size=0x%" PRIx64 "new_size=0x%" PRIx64
+> +virtio_mem_state_request(uint64_t addr, uint16_t nb_blocks) "addr=0x%" PRIx64 " nb_blocks=%" PRIu16
+> +virtio_mem_state_response(uint16_t state) "state=%" PRIu16
+> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+> index 6ed5409669..fdd4dbb42c 100644
+> --- a/hw/virtio/virtio-mem.c
+> +++ b/hw/virtio/virtio-mem.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/boards.h"
+>  #include "hw/qdev-properties.h"
+>  #include "config-devices.h"
+> +#include "trace.h"
+>  
+>  /*
+>   * Use QEMU_VMALLOC_ALIGN, so no THP will have to be split when unplugging
+> @@ -100,6 +101,7 @@ static void virtio_mem_send_response(VirtIOMEM *vmem, VirtQueueElement *elem,
+>      VirtIODevice *vdev = VIRTIO_DEVICE(vmem);
+>      VirtQueue *vq = vmem->vq;
+>  
+> +    trace_virtio_mem_send_response(le16_to_cpu(resp->type));
+>      iov_from_buf(elem->in_sg, elem->in_num, 0, resp, sizeof(*resp));
+>  
+>      virtqueue_push(vq, elem, sizeof(*resp));
+> @@ -195,6 +197,7 @@ static void virtio_mem_plug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+>      const uint16_t nb_blocks = le16_to_cpu(req->u.plug.nb_blocks);
+>      uint16_t type;
+>  
+> +    trace_virtio_mem_plug_request(gpa, nb_blocks);
+>      type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, true);
+>      virtio_mem_send_response_simple(vmem, elem, type);
+>  }
+> @@ -206,6 +209,7 @@ static void virtio_mem_unplug_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+>      const uint16_t nb_blocks = le16_to_cpu(req->u.unplug.nb_blocks);
+>      uint16_t type;
+>  
+> +    trace_virtio_mem_unplug_request(gpa, nb_blocks);
+>      type = virtio_mem_state_change_request(vmem, gpa, nb_blocks, false);
+>      virtio_mem_send_response_simple(vmem, elem, type);
+>  }
+> @@ -225,6 +229,7 @@ static void virtio_mem_resize_usable_region(VirtIOMEM *vmem,
+>          return;
+>      }
+>  
+> +    trace_virtio_mem_resized_usable_region(vmem->usable_region_size, newsize);
+>      vmem->usable_region_size = newsize;
+>  }
+>  
+> @@ -247,7 +252,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+>          vmem->size = 0;
+>          notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
+>      }
+> -
+> +    trace_virtio_mem_unplugged_all();
+>      virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
+>      return 0;
+>  }
+> @@ -255,6 +260,7 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+>  static void virtio_mem_unplug_all_request(VirtIOMEM *vmem,
+>                                            VirtQueueElement *elem)
+>  {
+> +    trace_virtio_mem_unplug_all_request();
+>      if (virtio_mem_unplug_all(vmem)) {
+>          virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_BUSY);
+>      } else {
+> @@ -272,6 +278,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+>          .type = cpu_to_le16(VIRTIO_MEM_RESP_ACK),
+>      };
+>  
+> +    trace_virtio_mem_state_request(gpa, nb_blocks);
+>      if (!virtio_mem_valid_range(vmem, gpa, size)) {
+>          virtio_mem_send_response_simple(vmem, elem, VIRTIO_MEM_RESP_ERROR);
+>          return;
+> @@ -284,6 +291,7 @@ static void virtio_mem_state_request(VirtIOMEM *vmem, VirtQueueElement *elem,
+>      } else {
+>          resp.u.state.state = cpu_to_le16(VIRTIO_MEM_STATE_MIXED);
+>      }
+> +    trace_virtio_mem_state_response(le16_to_cpu(resp.u.state.state));
+>      virtio_mem_send_response(vmem, elem, &resp);
+>  }
+>  
+> -- 
+> 2.26.2
 > 
-> Rather than wrap the existing code, what about throwing it in a separate
-> helper?  That generates an easier to read diff and also has the nice
-> property of getting 'apic' out of the common code.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Hrm, that'd be overkill once the apic code is moved in a few patches.
-What if you keep the cpuid updates wrapped (as in this patch), but then
-do
-
-	if (best && apic) {
-	}
-
-for the apic path?  That'll minimize churn for code that is disappearing,
-e.g. will make future git archaeologists happy :-).
-
-> > -
-> > -	/* Update OSXSAVE bit */
-> > -	if (boot_cpu_has(X86_FEATURE_XSAVE) && best->function == 0x1)
-> > -		cpuid_entry_change(best, X86_FEATURE_OSXSAVE,
-> > +	if (best) {
-> > +		/* Update OSXSAVE bit */
-> > +		if (boot_cpu_has(X86_FEATURE_XSAVE))
-> > +			cpuid_entry_change(best, X86_FEATURE_OSXSAVE,
-> >  				   kvm_read_cr4_bits(vcpu, X86_CR4_OSXSAVE));
-> >  
-> > -	cpuid_entry_change(best, X86_FEATURE_APIC,
-> > +		cpuid_entry_change(best, X86_FEATURE_APIC,
-> >  			   vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE);
-> >  
-> > -	if (apic) {
-> > -		if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
-> > -			apic->lapic_timer.timer_mode_mask = 3 << 17;
-> > -		else
-> > -			apic->lapic_timer.timer_mode_mask = 1 << 17;
-> > +		if (apic) {
-> > +			if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
-> > +				apic->lapic_timer.timer_mode_mask = 3 << 17;
-> > +			else
-> > +				apic->lapic_timer.timer_mode_mask = 1 << 17;
-> > +		}
-> >  	}
-> >  
-> >  	best = kvm_find_cpuid_entry(vcpu, 7, 0);
-> > -- 
-> > 2.18.2
-> > 
