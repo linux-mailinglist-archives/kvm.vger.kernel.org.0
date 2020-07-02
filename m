@@ -2,152 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF7B621224A
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 13:28:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B23A2122CE
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 13:59:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728532AbgGBL2q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 07:28:46 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:42058 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726521AbgGBL2q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 07:28:46 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 7AFE2180E2AE9E80C0B8;
-        Thu,  2 Jul 2020 19:28:44 +0800 (CST)
-Received: from [10.174.187.22] (10.174.187.22) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 2 Jul 2020 19:28:34 +0800
-Subject: Re: [PATCH 03/12] KVM: arm64: Report hardware dirty status of stage2
- PTE if coverred
-To:     Steven Price <steven.price@arm.com>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-References: <20200616093553.27512-1-zhukeqian1@huawei.com>
- <20200616093553.27512-4-zhukeqian1@huawei.com>
- <a73952ac-5e81-6c05-9b21-734e25250845@arm.com>
-CC:     Catalin Marinas <catalin.marinas@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        <liangpeng10@huawei.com>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-From:   zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <d994811b-ca95-236e-b2b0-461ab4f1f065@huawei.com>
-Date:   Thu, 2 Jul 2020 19:28:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1728876AbgGBL74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 07:59:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52164 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbgGBL7z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 07:59:55 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C17A7C08C5C1
+        for <kvm@vger.kernel.org>; Thu,  2 Jul 2020 04:59:55 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id w2so12562719pgg.10
+        for <kvm@vger.kernel.org>; Thu, 02 Jul 2020 04:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:references:in-reply-to:subject:date:message-id:mime-version
+         :content-transfer-encoding:thread-index:content-language;
+        bh=golg96dEpXJfAgzCstEFxGpWdvx8DIRvbEfz0uUuoIU=;
+        b=oGit0OQ+v3MOMKe1sjN5JJFJHX6WQY7mFvxNExN8CetcH7tNuqfvFXx8xrgytbCx1v
+         xLtm/bi3ADJHG1G2a9jzXTuvyrimP9fbCY6hLWfpd8lVsSwK5tUj25Gxcx0vle0wxX2n
+         RJrCk8ll3IIvoh/V7E27oex+NQaRzRZCLGWyx/x+CDtUu95K/xAHQ3kl2sORwb86tHIR
+         s41EyHnWiFUbh9XhkrG5/c6t7dRCPmI0tNs/rCLw4s5Vke/9zj7WpBKRs48PzoVt2q+Y
+         nH6805Vc86t3KTclSgHYW/i4eyi4zTm7+RRElBLtHGC+50lJCop5A6iPZ98+svsRa++V
+         PEpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:references:in-reply-to:subject:date
+         :message-id:mime-version:content-transfer-encoding:thread-index
+         :content-language;
+        bh=golg96dEpXJfAgzCstEFxGpWdvx8DIRvbEfz0uUuoIU=;
+        b=RZ7FGx0f9yCdUgfrsz//tMSDEPEE0SLhp5y8+QXuo1PtHdh+hsrdfWjEjirnzFm3SL
+         qFvKj755UEIJ+H5z7krIZATHxH+0QPvWwJ3UfhNrP/6CMoZjTGFEsHhUHcs+/COczGdR
+         AlOCAQHKwD4XIPBWxkKob+DDU8BmuqAqVLXFIlIUzgP066M9ITBHfyIikhTOeXcRqhbQ
+         5GTNDSJdaWldz3EjaW58Aj6prTK//Qt075odaRBf3GBxU/XQ20J5GhJ6iHVQOICQJNgm
+         ulonRXffBZP2g6RX+P1r27kOtkimZ/Kbnzb10AXEiNEkW1RyE/YwYeP+4yNOL1FTvqFd
+         pDXQ==
+X-Gm-Message-State: AOAM532j7InYR6r0ePNZePo84F0fSDp3Qqcdx9bmS4uHqH6NMnxBmOA4
+        y7xHK6eGWlFbt6cLl1AEMBZr/XVM
+X-Google-Smtp-Source: ABdhPJzeW+/LIxZSNpAChZc6gtpeX6JkIp1xVfJP/brUku5AfqF+RkZPUr1J3aB9WTJWG/QSTgzUsg==
+X-Received: by 2002:aa7:84ce:: with SMTP id x14mr23430650pfn.220.1593691194969;
+        Thu, 02 Jul 2020 04:59:54 -0700 (PDT)
+Received: from MarksSpectreX360 ([216.228.117.191])
+        by smtp.gmail.com with ESMTPSA id z5sm8449133pfn.117.2020.07.02.04.59.53
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 02 Jul 2020 04:59:54 -0700 (PDT)
+From:   <mwoodpatrick@gmail.com>
+To:     <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <MN2PR12MB41758B8F79B8F3BBBAF6C314A06C0@MN2PR12MB4175.namprd12.prod.outlook.com>
+In-Reply-To: <MN2PR12MB41758B8F79B8F3BBBAF6C314A06C0@MN2PR12MB4175.namprd12.prod.outlook.com>
+Subject: Seeing a problem in multi cpu runs where memory mapped pcie device register reads are returning incorrect values
+Date:   Thu, 2 Jul 2020 04:59:52 -0700
+Message-ID: <05f901d65068$4c23be00$e46b3a00$@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <a73952ac-5e81-6c05-9b21-734e25250845@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain;
+        charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AdZP0xwDhu8cf1EMQLyhyg6esmh9lQAkw8Jg
+Content-Language: en-us
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Steven,
+Background
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-On 2020/7/1 19:28, Steven Price wrote:
-> Hi,
-> 
-> On 16/06/2020 10:35, Keqian Zhu wrote:
->> kvm_set_pte is called to replace a target PTE with a desired one.
->> We always do this without changing the desired one, but if dirty
->> status set by hardware is coverred, let caller know it.
->>
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>   arch/arm64/kvm/mmu.c | 36 +++++++++++++++++++++++++++++++++++-
->>   1 file changed, 35 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 5ad87bce23c0..27407153121b 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -194,11 +194,45 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
->>       put_page(virt_to_page(pmd));
->>   }
->>   -static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
->> +#ifdef CONFIG_ARM64_HW_AFDBM
->> +/**
->> + * @ret: true if dirty status set by hardware is coverred.
-> 
-> NIT: s/coverred/covered/, this is in several places.
-> 
-OK.
->> + */
->> +static bool kvm_set_pte(pte_t *ptep, pte_t new_pte)
->> +{
->> +    pteval_t old_pteval, new_pteval, pteval;
->> +    bool old_logging, new_no_write;
->> +
->> +    old_logging = kvm_hw_dbm_enabled() && !pte_none(*ptep) &&
->> +              kvm_s2pte_dbm(ptep);
->> +    new_no_write = pte_none(new_pte) || kvm_s2pte_readonly(&new_pte);
->> +
->> +    if (!old_logging || !new_no_write) {
->> +        WRITE_ONCE(*ptep, new_pte);
->> +        dsb(ishst);
->> +        return false;
->> +    }
->> +
->> +    new_pteval = pte_val(new_pte);
->> +    pteval = READ_ONCE(pte_val(*ptep));
-> 
-> This usage of *ptep looks wrong - it's read twice using READ_ONCE (once in kvm_s2pte_dbm()) and once without any decoration (in the pte_none() call). Which looks a bit dodgy and at the very least needs some justification. AFAICT you would be better taking a local copy and using that rather than reading from memory repeatedly.
-> 
-oh yes. Here we can use a local copy to get higher performance.
+I have a test environment which runs QEMU 4.2 with a plugin that runs =
+two
+copies of a PCIE device simulator on a CentOS 7.5 host with an Ubuntu =
+18.04
+guest. When running with a single QEMU CPU using:
 
-I am not sure here has problem about correctness. I *think* we should always acquire corresponding lock before manipulate PTs,
-so there is no other agent will update PTs during our several PTs access (except MMU, but it just modifies AF and [S2]AP) .
-But do I miss something?
+=A0=A0=A0=A0 -cpu kvm64,+lahf_lm -M q35,kernel-irqchip=3Doff -device
+intel-iommu,intremap=3Don
 
->> +    do {
->> +        old_pteval = pteval;
->> +        pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval, new_pteval);
->> +    } while (pteval != old_pteval);
-> This look appears to be reinventing xchg_relaxed(). Any reason we can't just use xchg_relaxed()? Also we had a dsb() after the WRITE_ONCE but you are using the _relaxed variant here. What is the justification for not having a barrier?
-> 
-Aha, I have changed the code for several times and it is equal to xchg_relaxed now, thanks.
+Our tests run fine.=20
 
-I use _relaxd here because I am not clear about the reason that we use _relaxed in kvm_set_s2XXX_XXX and use dsb() in kvm_set_pte.
-But I will correct this in patch v2.
->> +
->> +    return !kvm_s2pte_readonly(&__pte(pteval));
->> +}
->> +#else
->> +/**
->> + * @ret: true if dirty status set by hardware is coverred.
->> + */
->> +static inline bool kvm_set_pte(pte_t *ptep, pte_t new_pte)
->>   {
->>       WRITE_ONCE(*ptep, new_pte);
->>       dsb(ishst);
->> +    return false;
->>   }
->> +#endif /* CONFIG_ARM64_HW_AFDBM */
-> 
-> You might be able to avoid this #ifdef by redefining old_logging as:
-> 
->   old_logging = IS_ENABLED(CONFIG_ARM64_HW_AFDBM) && ...
-> 
-> I *think* the compiler should be able to kill the dead code and leave you with just the above when the config symbol is off.
-> 
-After my test, you are right ;-) .
+But when running with multiple cpu=92s:
 
+=A0=A0=A0 -cpu kvm64,+lahf_lm -M q35,kernel-irqchip=3Doff -device
+intel-iommu,intremap=3Don -smp 2,sockets=3D1,cores=3D2
 
-Thanks,
-Keqian
-> Steve
-> 
->>     static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
->>   {
->>
-> 
-> .
-> 
+Some mmio reads to the simulated devices BAR 0 registers by our device
+driver running on the guest are returning are returning incorrect =
+values.=20
+
+Running QEMU under gdb I see that the read request is reaching our =
+simulated
+device correctly and that the correct result is being returned by the
+simulator. Using gdb I have tracked the return value all the way back up =
+the
+call stack and the correct value is arriving in KVM_EXIT_MMIO
+in=A0kvm_cpu_exec (qemu-4.2.0/accel/kvm/kvm-all.c:2365)=A0 but the value
+returned to the device driver which initiated the read is 0.
+
+Question
+=3D=3D=3D=3D=3D=3D=3D=3D
+
+Is anyone else running QEMU 4.2 in multi cpu mode? Is anyone getting
+incorrect reads from memory mapped device registers =A0when running in =
+this
+mode? I would appreciate any pointers on how best to debug the flow from
+KVM_EXIT_MMIO back to the device driver running on the guest
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=20
+
