@@ -2,142 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5687211F96
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 11:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97912211F9F
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 11:17:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728195AbgGBJPi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 05:15:38 -0400
-Received: from mga18.intel.com ([134.134.136.126]:14280 "EHLO mga18.intel.com"
+        id S1728097AbgGBJRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 05:17:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42782 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726462AbgGBJPg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 05:15:36 -0400
-IronPort-SDR: b6T+wuhXac6pqvTJxmcn7z/B5oikGIa2mH2CUTDGZG+YeNqXURQqQMfv3RE+Qx5oy8Cz3kfutS
- 7DoSh9eqIW1Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9669"; a="134294467"
-X-IronPort-AV: E=Sophos;i="5.75,303,1589266800"; 
-   d="scan'208";a="134294467"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 02:15:35 -0700
-IronPort-SDR: rajVduwRZx0geE0D73jmwWpga/dD7VPkVb0WYBIsZcR3Ig7hIF0K/UN45F9x8dKkwlVoXay086
- kd4b62u++lKQ==
-X-IronPort-AV: E=Sophos;i="5.75,303,1589266800"; 
-   d="scan'208";a="455456545"
-Received: from unknown (HELO [10.239.13.99]) ([10.239.13.99])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 02:15:33 -0700
-Subject: Re: [RFC 2/2] KVM: VMX: Enable bus lock VM exit
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20200628085341.5107-1-chenyi.qiang@intel.com>
- <20200628085341.5107-3-chenyi.qiang@intel.com>
- <878sg3bo8b.fsf@vitty.brq.redhat.com>
- <0159554d-82d5-b388-d289-a5375ca91323@intel.com>
- <87366bbe1y.fsf@vitty.brq.redhat.com>
- <adad61e8-8252-0491-7feb-992a52c1b4f3@intel.com>
- <87zh8j9to2.fsf@vitty.brq.redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <1a121829-34a0-31f9-5dcd-10f9e10dedc0@intel.com>
-Date:   Thu, 2 Jul 2020 17:15:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1727057AbgGBJRy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 05:17:54 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9682A20702;
+        Thu,  2 Jul 2020 09:17:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593681473;
+        bh=riJbnj3lW3s52zzCoIpgx8rEdxBveXjj8C/8uqF6YXA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=mS7Kx7xYu+bjeniGuvdTqxDXvaGhLAfh6dHUKqojLyPj+YnkZTflqYGw3OX9HzrGD
+         Ycbo5dO99JLrgJFCqQFaHhTZl218E1kvwpL41NITMDrC54GRgfV/COebsqB+sSI+Fo
+         +8yCWS16sszLfyai63yMS9HBlW9Q1vmMRZc1cKTw=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jqvLs-008L2R-4Q; Thu, 02 Jul 2020 10:17:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <87zh8j9to2.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Thu, 02 Jul 2020 10:17:52 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jingyi Wang <wangjingyi11@huawei.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH v2 3/8] arm64: microbench: gic: Add gicv4.1
+ support for ipi latency test.
+In-Reply-To: <a570c59c-965f-8832-b0c3-4cfc342f18fe@huawei.com>
+References: <20200702030132.20252-1-wangjingyi11@huawei.com>
+ <20200702030132.20252-4-wangjingyi11@huawei.com>
+ <fe9699e3ee2131fe800911aea1425af4@kernel.org>
+ <a570c59c-965f-8832-b0c3-4cfc342f18fe@huawei.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <10c3562dc019a3440d82dd507918faef@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: wangjingyi11@huawei.com, drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/1/2020 10:49 PM, Vitaly Kuznetsov wrote:
-> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+On 2020-07-02 10:02, Jingyi Wang wrote:
+> Hi Marc,
 > 
->> On 7/1/2020 8:44 PM, Vitaly Kuznetsov wrote:
->>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->>>
->>>> On 7/1/2020 5:04 PM, Vitaly Kuznetsov wrote:
->>>>> Chenyi Qiang <chenyi.qiang@intel.com> writes:
->>>> [...]
->>>>>>     static const int kvm_vmx_max_exit_handlers =
->>>>>> @@ -6830,6 +6838,13 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>>>>>     	if (unlikely(vmx->exit_reason.failed_vmentry))
->>>>>>     		return EXIT_FASTPATH_NONE;
->>>>>>     
->>>>>> +	/*
->>>>>> +	 * check the exit_reason to see if there is a bus lock
->>>>>> +	 * happened in guest.
->>>>>> +	 */
->>>>>> +	if (vmx->exit_reason.bus_lock_detected)
->>>>>> +		handle_bus_lock(vcpu);
->>>>>
->>>>> In case the ultimate goal is to have an exit to userspace on bus lock,
->>>>
->>>> I don't think we will need an exit to userspace on bus lock. See below.
->>>>
->>>>> the two ways to reach handle_bus_lock() are very different: in case
->>>>> we're handling EXIT_REASON_BUS_LOCK we can easily drop to userspace by
->>>>> returning 0 but what are we going to do in case of
->>>>> exit_reason.bus_lock_detected? The 'higher priority VM exit' may require
->>>>> exit to userspace too. So what's the plan? Maybe we can ignore the case
->>>>> when we're exiting to userspace for some other reason as this is slow
->>>>> already and force the exit otherwise?
->>>>
->>>>> And should we actually introduce
->>>>> the KVM_EXIT_BUS_LOCK and a capability to enable it here?
->>>>>
->>>>
->>>> Introducing KVM_EXIT_BUS_LOCK maybe help nothing. No matter
->>>> EXIT_REASON_BUS_LOCK or exit_reason.bus_lock_detected, the bus lock has
->>>> already happened. Exit to userspace cannot prevent bus lock, so what
->>>> userspace can do is recording and counting as what this patch does in
->>>> vcpu->stat.bus_locks.
->>>
->>> Exiting to userspace would allow to implement custom 'throttling'
->>> policies to mitigate the 'noisy neighbour' problem. The simplest would
->>> be to just inject some sleep time.
->>>
->>
->> So you want an exit to userspace for every bus lock and leave it all to
->> userspace. Yes, it's doable.
->>
+> On 7/2/2020 4:22 PM, Marc Zyngier wrote:
+>> On 2020-07-02 04:01, Jingyi Wang wrote:
+>>> If gicv4.1(sgi hardware injection) supported, we test ipi injection
+>>> via hw/sw way separately.
+>> 
+>> nit: active-less SGIs are not strictly a feature of GICv4.1 (you could
+>> imagine a GIC emulation offering the same thing). Furthermore, GICv4.1
+>> isn't as such visible to the guest itself (it only sees a GICv3).
+>> 
+>> Thanks,
+>> 
+>>          M.
 > 
-> In some cases we may not even want to have a VM exit: think
-> e.g. real-time/partitioning case when even in case of bus lock we may
-> not want to add additional latency just to count such events. 
+> Yes, but to measure the performance difference of hw/sw SGI injection,
+> do you think it is acceptable to make it visible to guest and let it
+> switch SGI injection mode?
 
-For real-time case, the bus lock needs to be avoided at all, since bus 
-lock takes many cycles and prevents others accessing memory. If no bus 
-lock, then no bus lock vm exit to worry about. If bus lock, the latency 
-requirement maybe cannot be met due to it.
+It is of course acceptable. I simply object to the "GICv4.1" 
+description.
 
-> I'd
-> suggest we make the new capability tri-state:
-> - disabled (no vmexit, default)
-> - stats only (what this patch does)
-> - userspace exit
-> But maybe this is an overkill, I'd like to hear what others think.
-
-Yeah. Others' thought is very welcomed.
-
-Besides, for how to throttle, KVM maybe has to take kernel policy into 
-account. Since in the spec, there is another feature for bare metal to 
-raise a #DB for bus lock. Native kernel likely implements some policy to 
-restrict the rate the bus lock can happen. So qemu threads will have to 
-follow that as well.
-
->> As you said, the exit_reason.bus_lock_detected case is the tricky one.
->> We cannot do the similar to extend vcpu->run->exit_reason, this breaks
->> ABI. Maybe we can extend the vcpu->run->flags to indicate bus lock
->> detected for the other exit reason?
-> 
-> This is likely the easiest solution.
-> 
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
