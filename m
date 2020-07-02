@@ -2,101 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2B16211E74
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 10:24:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B001211E97
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 10:25:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728851AbgGBIYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 04:24:33 -0400
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:59768 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728755AbgGBIYF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 04:24:05 -0400
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 0628Nt6b082238;
-        Thu, 2 Jul 2020 03:23:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1593678235;
-        bh=2Ps3sR9VF/LqByb34nV2fM7x0C723HV4lrdTJSaPtuA=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=iCY0E9W7YtWImyjACut0NGZBKOpaf22G78SdPYYg8vG5CI0IfbPCrAZ/V5/Wqr0ek
-         8lX40jte/wRY2JN8ardU2oSSftFNtSPIesQSJizfY8pkyhecWg5VidgZWPsuJ9vn10
-         7CU7+V1dA0D5K+DoWGKlSxkziCwP9B9jOImc4hIc=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 0628NtLg087605;
-        Thu, 2 Jul 2020 03:23:55 -0500
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Thu, 2 Jul
- 2020 03:23:54 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Thu, 2 Jul 2020 03:23:54 -0500
-Received: from a0393678ub.india.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 0628LiYY006145;
-        Thu, 2 Jul 2020 03:23:49 -0500
-From:   Kishon Vijay Abraham I <kishon@ti.com>
-To:     Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-CC:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-remoteproc@vger.kernel.org>, <linux-ntb@googlegroups.com>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>
-Subject: [RFC PATCH 22/22] NTB: Describe ntb_virtio and ntb_vhost client in the documentation
-Date:   Thu, 2 Jul 2020 13:51:43 +0530
-Message-ID: <20200702082143.25259-23-kishon@ti.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200702082143.25259-1-kishon@ti.com>
-References: <20200702082143.25259-1-kishon@ti.com>
+        id S1726790AbgGBIZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 04:25:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49518 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728461AbgGBIW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 04:22:56 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9E9C320874;
+        Thu,  2 Jul 2020 08:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593678175;
+        bh=pbs0tL/KRHo9Or+8WKf0S/Y8rnUfyyi5aMuo4ndjDb0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Uk4KAbidTKiBkRHckpKADLipXJTOreeNHvPrKb0/67ZecOH6IgOJjzNDBtWfmaXOG
+         KBUxXgWmt2fdxdnW+sjvGjf3tbkPUnCPmPBVE2tPjGoOcPG+gnL67tX8o8kLujvEde
+         oi5fWrU2KfcDFL147o//XX8GD29gNVVwbL56CLYY=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jquUg-008JXG-8g; Thu, 02 Jul 2020 09:22:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 02 Jul 2020 09:22:54 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jingyi Wang <wangjingyi11@huawei.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH v2 3/8] arm64: microbench: gic: Add gicv4.1
+ support for ipi latency test.
+In-Reply-To: <20200702030132.20252-4-wangjingyi11@huawei.com>
+References: <20200702030132.20252-1-wangjingyi11@huawei.com>
+ <20200702030132.20252-4-wangjingyi11@huawei.com>
+User-Agent: Roundcube Webmail/1.4.5
+Message-ID: <fe9699e3ee2131fe800911aea1425af4@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: wangjingyi11@huawei.com, drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a blurb in Documentation/ntb.txt to describe the ntb_virtio and
-ntb_vhost client
+On 2020-07-02 04:01, Jingyi Wang wrote:
+> If gicv4.1(sgi hardware injection) supported, we test ipi injection
+> via hw/sw way separately.
 
-Signed-off-by: Kishon Vijay Abraham I <kishon@ti.com>
----
- Documentation/driver-api/ntb.rst | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+nit: active-less SGIs are not strictly a feature of GICv4.1 (you could
+imagine a GIC emulation offering the same thing). Furthermore, GICv4.1
+isn't as such visible to the guest itself (it only sees a GICv3).
 
-diff --git a/Documentation/driver-api/ntb.rst b/Documentation/driver-api/ntb.rst
-index 87d1372da879..f84b81625397 100644
---- a/Documentation/driver-api/ntb.rst
-+++ b/Documentation/driver-api/ntb.rst
-@@ -227,6 +227,17 @@ test client is interacted with through the debugfs filesystem:
- 	specified peer. That peer's interrupt's occurrence file
- 	should be incremented.
- 
-+NTB Vhost Client (ntb\_vhost) and NTB Virtio Client (ntb\_virtio)
-+------------------------------------------------------------------
-+
-+When two hosts are connected via NTB, one of the hosts should use NTB Vhost
-+Client and the other host should use NTB Virtio Client. The NTB Vhost client
-+interfaces with the Linux Vhost Framework and lets it to be used with any
-+vhost client driver. The NTB Virtio client interfaces with the Linux Virtio
-+Framework and lets it to be used with any virtio client driver. The Vhost
-+client driver and Virtio client driver creates a logic cink to exchange data
-+with each other.
-+
- NTB Hardware Drivers
- ====================
- 
+Thanks,
+
+         M.
 -- 
-2.17.1
-
+Jazz is not dead. It just smells funny...
