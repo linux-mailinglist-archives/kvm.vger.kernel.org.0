@@ -2,256 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 288C9212120
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 12:25:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF7B621224A
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 13:28:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728425AbgGBKZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 06:25:52 -0400
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:41774 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728335AbgGBKZv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 06:25:51 -0400
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 062APcbX118477;
-        Thu, 2 Jul 2020 05:25:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1593685538;
-        bh=gBYdU800xh6dQKjBPuvfkzBmCflHN8ls1rX5bKT5/kw=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=TsmRNSiukncVTUATe3oOTSwCBh0QmKgK8rCAIytH87fm76e0uXVhwu/fKC2261QxX
-         HhqJ3t4HjwlyrLv3KaQGuQsZjIiJHFmYKbNeMQVU8JtXWYBxceQY57pdNxX5QMfnPI
-         Ey3s+eoCg8LhmFlktxaEicf1hWFgR5hRWJZp4vHU=
-Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 062APcgA000760;
-        Thu, 2 Jul 2020 05:25:38 -0500
-Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Thu, 2 Jul
- 2020 05:25:38 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Thu, 2 Jul 2020 05:25:38 -0500
-Received: from [10.250.233.85] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 062APW9v117767;
-        Thu, 2 Jul 2020 05:25:32 -0500
-Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
- communication
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-remoteproc@vger.kernel.org>, <linux-ntb@googlegroups.com>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>
-References: <20200702082143.25259-1-kishon@ti.com>
- <20200702055026-mutt-send-email-mst@kernel.org>
-From:   Kishon Vijay Abraham I <kishon@ti.com>
-Message-ID: <cfe992c7-a968-d26c-0a34-96ceff7d02cd@ti.com>
-Date:   Thu, 2 Jul 2020 15:55:31 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1728532AbgGBL2q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 07:28:46 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:42058 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726521AbgGBL2q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 07:28:46 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 7AFE2180E2AE9E80C0B8;
+        Thu,  2 Jul 2020 19:28:44 +0800 (CST)
+Received: from [10.174.187.22] (10.174.187.22) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 2 Jul 2020 19:28:34 +0800
+Subject: Re: [PATCH 03/12] KVM: arm64: Report hardware dirty status of stage2
+ PTE if coverred
+To:     Steven Price <steven.price@arm.com>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
+References: <20200616093553.27512-1-zhukeqian1@huawei.com>
+ <20200616093553.27512-4-zhukeqian1@huawei.com>
+ <a73952ac-5e81-6c05-9b21-734e25250845@arm.com>
+CC:     Catalin Marinas <catalin.marinas@arm.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        <liangpeng10@huawei.com>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+From:   zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <d994811b-ca95-236e-b2b0-461ab4f1f065@huawei.com>
+Date:   Thu, 2 Jul 2020 19:28:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <20200702055026-mutt-send-email-mst@kernel.org>
+In-Reply-To: <a73952ac-5e81-6c05-9b21-734e25250845@arm.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Originating-IP: [10.174.187.22]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael,
+Hi Steven,
 
-On 7/2/2020 3:21 PM, Michael S. Tsirkin wrote:
-> On Thu, Jul 02, 2020 at 01:51:21PM +0530, Kishon Vijay Abraham I wrote:
->> This series enhances Linux Vhost support to enable SoC-to-SoC
->> communication over MMIO. This series enables rpmsg communication between
->> two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
->>
->> 1) Modify vhost to use standard Linux driver model
->> 2) Add support in vring to access virtqueue over MMIO
->> 3) Add vhost client driver for rpmsg
->> 4) Add PCIe RC driver (uses virtio) and PCIe EP driver (uses vhost) for
->>    rpmsg communication between two SoCs connected to each other
->> 5) Add NTB Virtio driver and NTB Vhost driver for rpmsg communication
->>    between two SoCs connected via NTB
->> 6) Add configfs to configure the components
->>
->> UseCase1 :
->>
->>  VHOST RPMSG                     VIRTIO RPMSG
->>       +                               +
->>       |                               |
->>       |                               |
->>       |                               |
->>       |                               |
->> +-----v------+                 +------v-------+
->> |   Linux    |                 |     Linux    |
->> |  Endpoint  |                 | Root Complex |
->> |            <----------------->              |
->> |            |                 |              |
->> |    SOC1    |                 |     SOC2     |
->> +------------+                 +--------------+
->>
->> UseCase 2:
->>
->>      VHOST RPMSG                                      VIRTIO RPMSG
->>           +                                                 +
->>           |                                                 |
->>           |                                                 |
->>           |                                                 |
->>           |                                                 |
->>    +------v------+                                   +------v------+
->>    |             |                                   |             |
->>    |    HOST1    |                                   |    HOST2    |
->>    |             |                                   |             |
->>    +------^------+                                   +------^------+
->>           |                                                 |
->>           |                                                 |
->> +---------------------------------------------------------------------+
->> |  +------v------+                                   +------v------+  |
->> |  |             |                                   |             |  |
->> |  |     EP      |                                   |     EP      |  |
->> |  | CONTROLLER1 |                                   | CONTROLLER2 |  |
->> |  |             <----------------------------------->             |  |
->> |  |             |                                   |             |  |
->> |  |             |                                   |             |  |
->> |  |             |  SoC With Multiple EP Instances   |             |  |
->> |  |             |  (Configured using NTB Function)  |             |  |
->> |  +-------------+                                   +-------------+  |
->> +---------------------------------------------------------------------+
->>
->> Software Layering:
->>
->> The high-level SW layering should look something like below. This series
->> adds support only for RPMSG VHOST, however something similar should be
->> done for net and scsi. With that any vhost device (PCI, NTB, Platform
->> device, user) can use any of the vhost client driver.
->>
->>
->>     +----------------+  +-----------+  +------------+  +----------+
->>     |  RPMSG VHOST   |  | NET VHOST |  | SCSI VHOST |  |    X     |
->>     +-------^--------+  +-----^-----+  +-----^------+  +----^-----+
->>             |                 |              |              |
->>             |                 |              |              |
->>             |                 |              |              |
->> +-----------v-----------------v--------------v--------------v----------+
->> |                            VHOST CORE                                |
->> +--------^---------------^--------------------^------------------^-----+
->>          |               |                    |                  |
->>          |               |                    |                  |
->>          |               |                    |                  |
->> +--------v-------+  +----v------+  +----------v----------+  +----v-----+
->> |  PCI EPF VHOST |  | NTB VHOST |  |PLATFORM DEVICE VHOST|  |    X     |
->> +----------------+  +-----------+  +---------------------+  +----------+
->>
->> This was initially proposed here [1]
->>
->> [1] -> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com
+On 2020/7/1 19:28, Steven Price wrote:
+> Hi,
 > 
+> On 16/06/2020 10:35, Keqian Zhu wrote:
+>> kvm_set_pte is called to replace a target PTE with a desired one.
+>> We always do this without changing the desired one, but if dirty
+>> status set by hardware is coverred, let caller know it.
+>>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>   arch/arm64/kvm/mmu.c | 36 +++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 35 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 5ad87bce23c0..27407153121b 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -194,11 +194,45 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
+>>       put_page(virt_to_page(pmd));
+>>   }
+>>   -static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
+>> +#ifdef CONFIG_ARM64_HW_AFDBM
+>> +/**
+>> + * @ret: true if dirty status set by hardware is coverred.
 > 
-> I find this very interesting. A huge patchset so will take a bit
-> to review, but I certainly plan to do that. Thanks!
-
-Great to hear! Thanks in advance for reviewing!
-
-Regards
-Kishon
-
+> NIT: s/coverred/covered/, this is in several places.
 > 
+OK.
+>> + */
+>> +static bool kvm_set_pte(pte_t *ptep, pte_t new_pte)
+>> +{
+>> +    pteval_t old_pteval, new_pteval, pteval;
+>> +    bool old_logging, new_no_write;
+>> +
+>> +    old_logging = kvm_hw_dbm_enabled() && !pte_none(*ptep) &&
+>> +              kvm_s2pte_dbm(ptep);
+>> +    new_no_write = pte_none(new_pte) || kvm_s2pte_readonly(&new_pte);
+>> +
+>> +    if (!old_logging || !new_no_write) {
+>> +        WRITE_ONCE(*ptep, new_pte);
+>> +        dsb(ishst);
+>> +        return false;
+>> +    }
+>> +
+>> +    new_pteval = pte_val(new_pte);
+>> +    pteval = READ_ONCE(pte_val(*ptep));
+> 
+> This usage of *ptep looks wrong - it's read twice using READ_ONCE (once in kvm_s2pte_dbm()) and once without any decoration (in the pte_none() call). Which looks a bit dodgy and at the very least needs some justification. AFAICT you would be better taking a local copy and using that rather than reading from memory repeatedly.
+> 
+oh yes. Here we can use a local copy to get higher performance.
+
+I am not sure here has problem about correctness. I *think* we should always acquire corresponding lock before manipulate PTs,
+so there is no other agent will update PTs during our several PTs access (except MMU, but it just modifies AF and [S2]AP) .
+But do I miss something?
+
+>> +    do {
+>> +        old_pteval = pteval;
+>> +        pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval, new_pteval);
+>> +    } while (pteval != old_pteval);
+> This look appears to be reinventing xchg_relaxed(). Any reason we can't just use xchg_relaxed()? Also we had a dsb() after the WRITE_ONCE but you are using the _relaxed variant here. What is the justification for not having a barrier?
+> 
+Aha, I have changed the code for several times and it is equal to xchg_relaxed now, thanks.
+
+I use _relaxd here because I am not clear about the reason that we use _relaxed in kvm_set_s2XXX_XXX and use dsb() in kvm_set_pte.
+But I will correct this in patch v2.
+>> +
+>> +    return !kvm_s2pte_readonly(&__pte(pteval));
+>> +}
+>> +#else
+>> +/**
+>> + * @ret: true if dirty status set by hardware is coverred.
+>> + */
+>> +static inline bool kvm_set_pte(pte_t *ptep, pte_t new_pte)
+>>   {
+>>       WRITE_ONCE(*ptep, new_pte);
+>>       dsb(ishst);
+>> +    return false;
+>>   }
+>> +#endif /* CONFIG_ARM64_HW_AFDBM */
+> 
+> You might be able to avoid this #ifdef by redefining old_logging as:
+> 
+>   old_logging = IS_ENABLED(CONFIG_ARM64_HW_AFDBM) && ...
+> 
+> I *think* the compiler should be able to kill the dead code and leave you with just the above when the config symbol is off.
+> 
+After my test, you are right ;-) .
+
+
+Thanks,
+Keqian
+> Steve
+> 
+>>     static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
+>>   {
 >>
->> Kishon Vijay Abraham I (22):
->>   vhost: Make _feature_ bits a property of vhost device
->>   vhost: Introduce standard Linux driver model in VHOST
->>   vhost: Add ops for the VHOST driver to configure VHOST device
->>   vringh: Add helpers to access vring in MMIO
->>   vhost: Add MMIO helpers for operations on vhost virtqueue
->>   vhost: Introduce configfs entry for configuring VHOST
->>   virtio_pci: Use request_threaded_irq() instead of request_irq()
->>   rpmsg: virtio_rpmsg_bus: Disable receive virtqueue callback when
->>     reading messages
->>   rpmsg: Introduce configfs entry for configuring rpmsg
->>   rpmsg: virtio_rpmsg_bus: Add Address Service Notification support
->>   rpmsg: virtio_rpmsg_bus: Move generic rpmsg structure to
->>     rpmsg_internal.h
->>   virtio: Add ops to allocate and free buffer
->>   rpmsg: virtio_rpmsg_bus: Use virtio_alloc_buffer() and
->>     virtio_free_buffer()
->>   rpmsg: Add VHOST based remote processor messaging bus
->>   samples/rpmsg: Setup delayed work to send message
->>   samples/rpmsg: Wait for address to be bound to rpdev for sending
->>     message
->>   rpmsg.txt: Add Documentation to configure rpmsg using configfs
->>   virtio_pci: Add VIRTIO driver for VHOST on Configurable PCIe Endpoint
->>     device
->>   PCI: endpoint: Add EP function driver to provide VHOST interface
->>   NTB: Add a new NTB client driver to implement VIRTIO functionality
->>   NTB: Add a new NTB client driver to implement VHOST functionality
->>   NTB: Describe the ntb_virtio and ntb_vhost client in the documentation
->>
->>  Documentation/driver-api/ntb.rst              |   11 +
->>  Documentation/rpmsg.txt                       |   56 +
->>  drivers/ntb/Kconfig                           |   18 +
->>  drivers/ntb/Makefile                          |    2 +
->>  drivers/ntb/ntb_vhost.c                       |  776 +++++++++++
->>  drivers/ntb/ntb_virtio.c                      |  853 ++++++++++++
->>  drivers/ntb/ntb_virtio.h                      |   56 +
->>  drivers/pci/endpoint/functions/Kconfig        |   11 +
->>  drivers/pci/endpoint/functions/Makefile       |    1 +
->>  .../pci/endpoint/functions/pci-epf-vhost.c    | 1144 ++++++++++++++++
->>  drivers/rpmsg/Kconfig                         |   10 +
->>  drivers/rpmsg/Makefile                        |    3 +-
->>  drivers/rpmsg/rpmsg_cfs.c                     |  394 ++++++
->>  drivers/rpmsg/rpmsg_core.c                    |    7 +
->>  drivers/rpmsg/rpmsg_internal.h                |  136 ++
->>  drivers/rpmsg/vhost_rpmsg_bus.c               | 1151 +++++++++++++++++
->>  drivers/rpmsg/virtio_rpmsg_bus.c              |  184 ++-
->>  drivers/vhost/Kconfig                         |    1 +
->>  drivers/vhost/Makefile                        |    2 +-
->>  drivers/vhost/net.c                           |   10 +-
->>  drivers/vhost/scsi.c                          |   24 +-
->>  drivers/vhost/test.c                          |   17 +-
->>  drivers/vhost/vdpa.c                          |    2 +-
->>  drivers/vhost/vhost.c                         |  730 ++++++++++-
->>  drivers/vhost/vhost_cfs.c                     |  341 +++++
->>  drivers/vhost/vringh.c                        |  332 +++++
->>  drivers/vhost/vsock.c                         |   20 +-
->>  drivers/virtio/Kconfig                        |    9 +
->>  drivers/virtio/Makefile                       |    1 +
->>  drivers/virtio/virtio_pci_common.c            |   25 +-
->>  drivers/virtio/virtio_pci_epf.c               |  670 ++++++++++
->>  include/linux/mod_devicetable.h               |    6 +
->>  include/linux/rpmsg.h                         |    6 +
->>  {drivers/vhost => include/linux}/vhost.h      |  132 +-
->>  include/linux/virtio.h                        |    3 +
->>  include/linux/virtio_config.h                 |   42 +
->>  include/linux/vringh.h                        |   46 +
->>  samples/rpmsg/rpmsg_client_sample.c           |   32 +-
->>  tools/virtio/virtio_test.c                    |    2 +-
->>  39 files changed, 7083 insertions(+), 183 deletions(-)
->>  create mode 100644 drivers/ntb/ntb_vhost.c
->>  create mode 100644 drivers/ntb/ntb_virtio.c
->>  create mode 100644 drivers/ntb/ntb_virtio.h
->>  create mode 100644 drivers/pci/endpoint/functions/pci-epf-vhost.c
->>  create mode 100644 drivers/rpmsg/rpmsg_cfs.c
->>  create mode 100644 drivers/rpmsg/vhost_rpmsg_bus.c
->>  create mode 100644 drivers/vhost/vhost_cfs.c
->>  create mode 100644 drivers/virtio/virtio_pci_epf.c
->>  rename {drivers/vhost => include/linux}/vhost.h (66%)
->>
->> -- 
->> 2.17.1
->>
+> 
+> .
 > 
