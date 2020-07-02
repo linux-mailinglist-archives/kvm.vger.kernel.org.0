@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03C0D2119AD
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 03:38:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E29A211A3C
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 04:40:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728673AbgGBBg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Jul 2020 21:36:56 -0400
-Received: from mga05.intel.com ([192.55.52.43]:62645 "EHLO mga05.intel.com"
+        id S1726151AbgGBCkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Jul 2020 22:40:51 -0400
+Received: from mga02.intel.com ([134.134.136.20]:55147 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728214AbgGBBgy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Jul 2020 21:36:54 -0400
-IronPort-SDR: TZBpTelp9mVVdw+E83ac5/hjCpSkxuO9Vw4Xoa2JzKcoiA5H7Cnzh7AoDZU4+/hIfCITNTKtGH
- TQ+M5mWVzAug==
-X-IronPort-AV: E=McAfee;i="6000,8403,9669"; a="231639030"
+        id S1725805AbgGBCku (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Jul 2020 22:40:50 -0400
+IronPort-SDR: hjQbQsEza1t2Q6v0u1W/2B4dp0GWuMzjvdR6FvIo8UdWqAKVC84jl6879fQbaTSWTMPRmOIxCC
+ Z5W8Pt3QpBEw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9669"; a="135062905"
 X-IronPort-AV: E=Sophos;i="5.75,302,1589266800"; 
-   d="scan'208";a="231639030"
+   d="scan'208";a="135062905"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 18:36:46 -0700
-IronPort-SDR: WkKQyRyyqk5ma2TxGzRlpWt9aUvcoXaeaKhhIOT8ecUHVr18IikLb5bXNbGzjSNv+vu2aYJSOH
- JT/Lsj+Ot3yw==
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2020 19:40:48 -0700
+IronPort-SDR: 3rWF4o7dj0Ks55pw/e1j1+Rko8fpP3l2gbGQ7Q1uLw7AYQbvftMP/JPf6pEccmeDYQLmXVdYJS
+ KZSN34a2rj8Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,302,1589266800"; 
-   d="scan'208";a="304068748"
+   d="scan'208";a="304080014"
 Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
-  by fmsmga004.fm.intel.com with ESMTP; 01 Jul 2020 18:36:44 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 01 Jul 2020 19:40:45 -0700
 Cc:     baolu.lu@linux.intel.com, Kevin Tian <kevin.tian@intel.com>,
         Dave Jiang <dave.jiang@intel.com>,
         Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
@@ -43,8 +43,8 @@ References: <20200627031532.28046-1-baolu.lu@linux.intel.com>
  <c38784ad-9dba-0840-3a61-e2c21e781f1e@linux.intel.com>
  <ffbb405b-5617-5659-3fc1-302c530aceef@arm.com>
 From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <122f0e0a-5220-f00a-a329-6679d5aa8077@linux.intel.com>
-Date:   Thu, 2 Jul 2020 09:32:20 +0800
+Message-ID: <5f3ad162-647c-1295-880b-6b104807ba9a@linux.intel.com>
+Date:   Thu, 2 Jul 2020 10:36:21 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.8.0
 MIME-Version: 1.0
@@ -57,7 +57,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+Hi Robin,
 
 On 7/1/20 8:18 PM, Robin Murphy wrote:
 > On 2020-07-01 08:32, Lu Baolu wrote:
@@ -256,7 +256,31 @@ On 7/1/20 8:18 PM, Robin Murphy wrote:
 > first, then finish it's PASID-based configuration afterwards, I guess 
 > it's not far off what I was thinking yesterday :)
 
-Hi Alex, Joerg and others, any comments here?
+It looks good to me if we pass an *optional* made-up device instead of
+iommu_group. But it seems that vfio/mdev assumes an iommu_group first
+and then attaches domains to the groups. Hence, it's hard to move the
+group allocation and setting up into the attach interface.
+
+As proposed, the new iommu_aux_attach_device() might look like this:
+
+int iommu_aux_attach_device(struct iommu_domain *domain,
+                             struct device *phys_dev,
+                             struct device *dev)
+
+where,
+
+@phys_dev: The physical device which supports IOMMU_DEV_FEAT_AUX;
+@dev: a made-up device which presents the subset resources binding to
+       the aux-domain. An example use case is vfio/mdev. For cases where
+       no made-up devices are used, pass NULL instead.
+
+With @dev passed, we can require
+
+- single device in group;
+- no previous attaching;
+- set up internal logistics between group and domain;
+
+The iommu_aux_detach_device() needs the equivalent extensions.
 
 Best regards,
 baolu
