@@ -2,103 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B712F212F87
-	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 00:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB9A8212F8F
+	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 00:35:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbgGBWac (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 18:30:32 -0400
-Received: from mga01.intel.com ([192.55.52.88]:33166 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726455AbgGBWac (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 18:30:32 -0400
-IronPort-SDR: /+uu6vBm3TTkeELGuzMiELa0hCwBhECRETk+u41TuMzmWKvRQsMZiHFBms2a2K28I7XR9u9Ii/
- 4N45HfwVcfUQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="165105694"
-X-IronPort-AV: E=Sophos;i="5.75,305,1589266800"; 
-   d="scan'208";a="165105694"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 15:30:32 -0700
-IronPort-SDR: AoX6z7b952IgJfuZpUh7lLEbsAT13vsfdzjjbueafDO/JsHVoWA2qFNKpfVSocNGFgEyqp6LVd
- W+HHxOQhD7FQ==
-X-IronPort-AV: E=Sophos;i="5.75,305,1589266800"; 
-   d="scan'208";a="426100622"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.34]) ([10.255.31.34])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 15:30:29 -0700
-Subject: Re: [PATCH v2 7/7] KVM: X86: Move kvm_apic_set_version() to
- kvm_update_vcpu_model()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20200623115816.24132-1-xiaoyao.li@intel.com>
- <20200623115816.24132-8-xiaoyao.li@intel.com>
- <20200702190009.GJ3575@linux.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <e3f0b5dd-b82b-55ce-6a89-2bffc89c9c72@intel.com>
-Date:   Fri, 3 Jul 2020 06:30:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726139AbgGBWfd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 18:35:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44622 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726029AbgGBWfc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 18:35:32 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062MSKgq159748;
+        Thu, 2 Jul 2020 22:35:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
+ cc : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=xlbrTGZfCtli3Wu7vMNvj+DYwyAg+qHp5XBf6/obxfY=;
+ b=v3MIq9XXN3wyUL7ViIeAtzupxsvPPPGhxqF7yQk681s1UXCD6U/ob+4jtPEpSW2MY265
+ prRv8Voob1U1SpMZ0jOEbCrF5vFib0yWkgj+SLJnZYwxKr2F4CcNJq/Qay9dKYS67/yP
+ QmFDJf40emhIo/NNC6e2j6CD+dPrFisR/ycGpFMVTqX36WdslFZAbpJ+ZgTqAY35AaKT
+ B2S9bcHQd+nKQ2wSILu79vc5/jzSazvc7taP442D0NdwQ03IhzQRam+K4O8sfIBQ2a8/
+ SqxWKW7frpJd7dtz93Dp/jpKIoqn1sDjrMNWB65V2Y7xiz0SRMGWSh9tLp3gTf6SVeG6 Kw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 31wxrnjwsd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 02 Jul 2020 22:35:29 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 062MWggQ006112;
+        Thu, 2 Jul 2020 22:33:29 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 31xfvwadk3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 02 Jul 2020 22:33:29 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 062MXSD7023329;
+        Thu, 2 Jul 2020 22:33:28 GMT
+Received: from localhost.localdomain (/10.159.136.117)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 02 Jul 2020 22:33:27 +0000
+Subject: Re: [PATCH 0/3 v3] KVM: nSVM: Check MBZ bits in CR3 and CR4 on vmrun
+ of nested guests
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+References: <20200515053609.3347-1-krish.sadhukhan@oracle.com>
+Message-ID: <fff40d79-1731-2f24-227a-bf57e8e33b97@oracle.com>
+Date:   Thu, 2 Jul 2020 15:33:21 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200702190009.GJ3575@linux.intel.com>
+In-Reply-To: <20200515053609.3347-1-krish.sadhukhan@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9670 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 adultscore=0 spamscore=0
+ phishscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2007020149
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9670 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
+ priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
+ malwarescore=0 phishscore=0 adultscore=0 cotscore=-2147483648
+ lowpriorityscore=0 suspectscore=1 spamscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2007020149
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/3/2020 3:00 AM, Sean Christopherson wrote:
-> On Tue, Jun 23, 2020 at 07:58:16PM +0800, Xiaoyao Li wrote:
->> Obviously, kvm_apic_set_version() fits well in kvm_update_vcpu_model().
-> 
-> Same as the last patch, it would be nice to explicitly document that there
-> are no dependencies between kvm_apic_set_version() and kvm_update_cpuid().
+Ping.
 
-Sure, will do.
-
-Thanks!
-
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->>   arch/x86/kvm/cpuid.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 5decc2dd5448..3428f4d84b42 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -129,6 +129,8 @@ void kvm_update_vcpu_model(struct kvm_vcpu *vcpu)
->>   			apic->lapic_timer.timer_mode_mask = 3 << 17;
->>   		else
->>   			apic->lapic_timer.timer_mode_mask = 1 << 17;
->> +
->> +		kvm_apic_set_version(vcpu);
->>   	}
->>   
->>   	best = kvm_find_cpuid_entry(vcpu, 0xD, 0);
->> @@ -226,7 +228,6 @@ int kvm_vcpu_ioctl_set_cpuid(struct kvm_vcpu *vcpu,
->>   	}
->>   
->>   	cpuid_fix_nx_cap(vcpu);
->> -	kvm_apic_set_version(vcpu);
->>   	kvm_update_cpuid(vcpu);
->>   	kvm_update_vcpu_model(vcpu);
->>   
->> @@ -255,7 +256,6 @@ int kvm_vcpu_ioctl_set_cpuid2(struct kvm_vcpu *vcpu,
->>   		goto out;
->>   	}
->>   
->> -	kvm_apic_set_version(vcpu);
->>   	kvm_update_cpuid(vcpu);
->>   	kvm_update_vcpu_model(vcpu);
->>   out:
->> -- 
->> 2.18.2
->>
-
+On 5/14/20 10:36 PM, Krish Sadhukhan wrote:
+> v2 -> v3:
+> 	In patch# 1, the mask for guest CR4 reserved bits is now cached in
+> 	'struct kvm_vcpu_arch', instead of in a global variable.
+>
+>
+> [PATCH 1/3 v3] KVM: x86: Create mask for guest CR4 reserved bits in
+> [PATCH 2/3 v3] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are not set on
+> [PATCH 3/3 v3] KVM: nSVM: Test that MBZ bits in CR3 and CR4 are not set on vmrun
+>
+>   arch/x86/include/asm/kvm_host.h |  2 ++
+>   arch/x86/kvm/cpuid.c            |  2 ++
+>   arch/x86/kvm/svm/nested.c       | 22 ++++++++++++++++++++--
+>   arch/x86/kvm/svm/svm.h          |  5 ++++-
+>   arch/x86/kvm/x86.c              | 27 ++++-----------------------
+>   arch/x86/kvm/x86.h              | 21 +++++++++++++++++++++
+>   6 files changed, 53 insertions(+), 26 deletions(-)
+>
+> Krish Sadhukhan (2):
+>        KVM: x86: Create mask for guest CR4 reserved bits in kvm_update_cpuid()
+>        nSVM: Check that MBZ bits in CR3 and CR4 are not set on vmrun of nested gu
+>
+>   x86/svm.h       |   6 ++++
+>   x86/svm_tests.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++-------
+>   2 files changed, 99 insertions(+), 12 deletions(-)
+>
+> Krish Sadhukhan (1):
+>        nSVM: Test that MBZ bits in CR3 and CR4 are not set on vmrun of nested g
+>
