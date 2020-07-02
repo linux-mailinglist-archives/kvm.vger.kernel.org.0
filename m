@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CF85212F51
-	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 00:12:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08337212F59
+	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 00:15:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726228AbgGBWMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 18:12:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34356 "EHLO
+        id S1726152AbgGBWPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 18:15:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726014AbgGBWMn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 18:12:43 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A654DC08C5C1
-        for <kvm@vger.kernel.org>; Thu,  2 Jul 2020 15:12:43 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id e20so31226788ybc.23
-        for <kvm@vger.kernel.org>; Thu, 02 Jul 2020 15:12:43 -0700 (PDT)
+        with ESMTP id S1726074AbgGBWPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 18:15:16 -0400
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8412BC08C5DD
+        for <kvm@vger.kernel.org>; Thu,  2 Jul 2020 15:15:16 -0700 (PDT)
+Received: by mail-il1-x143.google.com with SMTP id t27so20664204ill.9
+        for <kvm@vger.kernel.org>; Thu, 02 Jul 2020 15:15:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=PswgYOjFLHR50otlPxE8b2oGJ3kDUK3h2XTdWa425M0=;
-        b=miWQau211dDj1fe/9wWIj67CDW+WofqWHYP6On71PKk8qGABIWIZgsg6QaVQF6200z
-         2HekYUpa8CR/8ZH0IXD751av4uDRNbhIdcY+G8Phl/p+3Ou/pfeWlUvJIgpUw6vNbPJg
-         LxXCichKPhMD8l+s3+ilWXjoveWcdwpx0o6QwAYWJPoH19aeUDoNCx4srH8TcWuUmzbN
-         fYmAJzSvKt/ujCua/IZfLJDHYuK1Xv568YfbiYgddoviuLdQNfo+a9eRDZ0tdhsrYygC
-         guLIit+pK9pvWkFfP5DnA3Lng+PSZWCC4j/lTxqrdiuUGwgxuonF2SjkKQZoO7u+xJ/j
-         XPUw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lcJAZjj8xewF97TwahN5y7Et+lrdL5BLJ9rAmJHlt1A=;
+        b=WBlUeMpgJQDKEDr6LjGfbHL+WCZTjSL7sdTk3Er+AOhPtLqBsqC8FMT3017u+4ojX4
+         NMLBegMXmRc6lbCAfWFJf75lGJnl9q5EP6QDTszdA9UcYkQyysEpsbtLr1iC7Xx0qsah
+         rUeoDIYTMOeWWLfa8FBqN4StcBcX89Qv6PPJsVkB8QNMlV9WmT67j3517lvJpCcntFhm
+         uBVmKsHhCyiEKXjai1Dpu9CwVlCVCAL97IiCiChQhWYRp5RR6MxKfyhMjGOZ0dWBheRJ
+         JyWtYovv+ZQAcoFrBYibIKxIt7hvLCSLv4zV4GRNLwPkJnf1lbnOvi2uwNwytCpODpCB
+         n4vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=PswgYOjFLHR50otlPxE8b2oGJ3kDUK3h2XTdWa425M0=;
-        b=ctg+6dYYIJqoQc5/GYNNnxG2qWqrOxOoD2MqdCh0G0KexRsDUDXyMsGzlPIvVBXcYE
-         xbKHjckFwaz33jGn49NlkMH75S8gjDVj0GMe5FsrThQ4Jh1aHFh5sa45uWp5/goLgH3V
-         NZujrUVw6pV2TjCebIcGM/noJJfDzMrXoXpxsERwNJz6953ZpcgPWGWG9rsfyFBe6O/f
-         +fZ1XxgsZeP9KLxMvnbIOUvtiYhu3yt4iOn5LXGBs4mlZyITkUkixTNpvwaREAv57IP/
-         mFAFZroFonmE2svXI80uhGlirb/ztDWI3BPnsiYxELp/i4Wc2pQICb3zralaffnBDZdt
-         4xFA==
-X-Gm-Message-State: AOAM532IvKnVToOkm/FPve5BmC0ZisIjXRng7loGepFWi0rgr6N9+BU5
-        cHVHbRPxHvnJT21Fbs0dyJHRsDtxK1IW6aCv
-X-Google-Smtp-Source: ABdhPJxMgLnACwCz65RBY/9qPnP80m0LmIZzQopaUlX4E3h+C8yL6JDA7+Y5Ako8csmqguYSuHXJQYdGnP1puQAi
-X-Received: by 2002:a25:38c5:: with SMTP id f188mr54720332yba.332.1593727962818;
- Thu, 02 Jul 2020 15:12:42 -0700 (PDT)
-Date:   Thu,  2 Jul 2020 15:12:37 -0700
-Message-Id: <20200702221237.2517080-1-abhishekbh@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.27.0.212.ge8ba1cc988-goog
-Subject: [PATCH v3] x86/speculation/l1tf: Add KConfig for setting the L1D
- cache flush mode
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lcJAZjj8xewF97TwahN5y7Et+lrdL5BLJ9rAmJHlt1A=;
+        b=WAe7LMSmOW+EHknLu9VTDtInjolNqh28AcjwUi4Lb18kRMxw2KThX8jMOtHbMqeS/y
+         5gdQWLko6KYhv7EZZKoSDP5TGyHOacbipu5PutK1feRLSJKVn49KrMhPsDLMaKepyKod
+         tnEyDDJtyBY7mIr3is+e7GuUZJho3mXqZhVBEpwrqJc+ouTAXaZNpEbzVOpCHG/EZPkH
+         EdJpy8KtD8E73kgZS3iIbPFkVj57uAg6ko1ic7RtjpIUrY1GjtsQIl+RzUWMjIrd+lnT
+         GnODMkPt41PE+zT5GUom3jqwQuPkWTV3A4LludLYuFiE1xiICq3vIAZJsQRewODN4hI9
+         KAKQ==
+X-Gm-Message-State: AOAM531VaGz1lRCBXc5X3cdQXVR8HXmKMlDuqaBanFZFDbuVXbYeP3LI
+        RjZhZKonTiLy2mU7SLJid2QG5IhV/Mye43BJhd+tig==
+X-Google-Smtp-Source: ABdhPJwutdoMSAMPPZKN4tGNoXxVk81W7gmwa77ORx/9+vAJ3jHdPFToEHlBk3Jz0SPEj3C1/QpsDK9V8T2HdSvwIXM=
+X-Received: by 2002:a92:cd01:: with SMTP id z1mr14965787iln.103.1593728115606;
+ Thu, 02 Jul 2020 15:15:15 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200702213807.2511503-1-abhishekbh@google.com> <9c648d11-6b52-c755-d0a6-58f035ccd99d@infradead.org>
+In-Reply-To: <9c648d11-6b52-c755-d0a6-58f035ccd99d@infradead.org>
 From:   Abhishek Bhardwaj <abhishekbh@google.com>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Abhishek Bhardwaj <abhishekbh@google.com>,
+Date:   Thu, 2 Jul 2020 15:14:38 -0700
+Message-ID: <CA+noqojQ9FmvQ3k7r1Yh5bdrtDF4+eDd-Spo4PG7fdMSVxVP1w@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/speculation/l1tf: Add KConfig for setting the L1D
+ cache flush mode
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Anthony Steinhauser <asteinhauser@google.com>,
         Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
@@ -57,7 +60,6 @@ Cc:     Abhishek Bhardwaj <abhishekbh@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Josh Poimboeuf <jpoimboe@redhat.com>,
         Mark Gross <mgross@linux.intel.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -74,66 +76,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change adds a new kernel configuration that sets the l1d cache
-flush setting at compile time rather than at run time.
+On Thu, Jul 2, 2020 at 3:01 PM Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> Hi--
+>
+> On 7/2/20 2:38 PM, Abhishek Bhardwaj wrote:
+> > This change adds a new kernel configuration that sets the l1d cache
+> > flush setting at compile time rather than at run time.
+> >
+> > Signed-off-by: Abhishek Bhardwaj <abhishekbh@google.com>
+> >
+> > ---
+> >
+> > Changes in v2:
+> > - Fix typo in the help of the new KConfig.
+> >
+> >  arch/x86/kernel/cpu/bugs.c |  8 ++++++++
+> >  arch/x86/kvm/Kconfig       | 17 +++++++++++++++++
+> >  2 files changed, 25 insertions(+)
+> >
+> > diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> > index 0b71970d2d3d2..1dcc875cf5547 100644
+> > --- a/arch/x86/kernel/cpu/bugs.c
+> > +++ b/arch/x86/kernel/cpu/bugs.c
+> > @@ -1406,7 +1406,15 @@ enum l1tf_mitigations l1tf_mitigation __ro_after_init = L1TF_MITIGATION_FLUSH;
+> >  #if IS_ENABLED(CONFIG_KVM_INTEL)
+> >  EXPORT_SYMBOL_GPL(l1tf_mitigation);
+> >  #endif
+> > +#if (CONFIG_KVM_VMENTRY_L1D_FLUSH == 1)
+> > +enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NEVER;
+> > +#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 2)
+> > +enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_COND;
+> > +#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 3)
+> > +enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_ALWAYS;
+> > +#else
+> >  enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
+> > +#endif
+> >  EXPORT_SYMBOL_GPL(l1tf_vmx_mitigation);
+> >
+> >  /*
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index b277a2db62676..d375dcedd447d 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -107,4 +107,21 @@ config KVM_MMU_AUDIT
+> >        This option adds a R/W kVM module parameter 'mmu_audit', which allows
+> >        auditing of KVM MMU events at runtime.
+> >
+> > +config KVM_VMENTRY_L1D_FLUSH
+> > +     int "L1D cache flush settings (1-3)"
+> > +     range 1 3
+> > +     default "2"
+> > +     depends on KVM && X86 && X86_64
+>
+> Why does this apply only to KVM?
+Sorry, I don't know what this means. The runtime options this aims to
+emulate applied to kvm driver.
+Hence, this kernel config applies to KVM ?
 
-Signed-off-by: Abhishek Bhardwaj <abhishekbh@google.com>
+>
+> and the "X86 && X86_64" is more than is needed. Just "X86_64" alone
+> should be enough.
+Fixed in v3.
 
----
+>
+>
+> > +     help
+> > +      This setting determines the L1D cache flush behavior before a VMENTER.
+> > +      This is similar to setting the option / parameter to
+> > +      kvm-intel.vmentry_l1d_flush.
+> > +      1 - Never flush.
+> > +      2 - Conditionally flush.
+> > +      3 - Always flush.
+> > +
+> > +# OK, it's a little counter-intuitive to do this, but it puts it neatly under
+> > +# the virtualization menu.
+> > +source "drivers/vhost/Kconfig"
+This was a bad copy paste. Removed in v3.
+>
+>
+> I don't quite understand why this 'source' line is here.
+> Can you explain more about that, please?
+>
+> It puts "VHOST drivers" in the menu 2 times, in 2 totally unrelated
+> places.  Seems like it could be confusing.
+>
+> > +
+> >  endif # VIRTUALIZATION
+>
+>
+> --
+> ~Randy
+>
 
-Changes in v3:
-- Change depends on to only x86_64.
-- Remove copy paste errors at the end of the KConfig.
 
-Changes in v2:
-- Fix typo in the help of the new KConfig.
-
- arch/x86/kernel/cpu/bugs.c |  8 ++++++++
- arch/x86/kvm/Kconfig       | 13 +++++++++++++
- 2 files changed, 21 insertions(+)
-
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 0b71970d2d3d2..1dcc875cf5547 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -1406,7 +1406,15 @@ enum l1tf_mitigations l1tf_mitigation __ro_after_init = L1TF_MITIGATION_FLUSH;
- #if IS_ENABLED(CONFIG_KVM_INTEL)
- EXPORT_SYMBOL_GPL(l1tf_mitigation);
- #endif
-+#if (CONFIG_KVM_VMENTRY_L1D_FLUSH == 1)
-+enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NEVER;
-+#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 2)
-+enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_COND;
-+#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 3)
-+enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_ALWAYS;
-+#else
- enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
-+#endif
- EXPORT_SYMBOL_GPL(l1tf_vmx_mitigation);
- 
- /*
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index b277a2db62676..1f85374a0b812 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -107,4 +107,17 @@ config KVM_MMU_AUDIT
- 	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
- 	 auditing of KVM MMU events at runtime.
- 
-+config KVM_VMENTRY_L1D_FLUSH
-+	int "L1D cache flush settings (1-3)"
-+	range 1 3
-+	default "2"
-+	depends on KVM && X86_64
-+	help
-+	 This setting determines the L1D cache flush behavior before a VMENTER.
-+	 This is similar to setting the option / parameter to
-+	 kvm-intel.vmentry_l1d_flush.
-+	 1 - Never flush.
-+	 2 - Conditionally flush.
-+	 3 - Always flush.
-+
- endif # VIRTUALIZATION
 -- 
-2.27.0.212.ge8ba1cc988-goog
-
+Abhishek
