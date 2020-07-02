@@ -2,291 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABAD9212769
-	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 17:10:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ABD1212779
+	for <lists+kvm@lfdr.de>; Thu,  2 Jul 2020 17:13:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730213AbgGBPJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Jul 2020 11:09:50 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:24149 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730071AbgGBPJs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Jul 2020 11:09:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1593702587; x=1625238587;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=nUqbRO4JQN2O8vXQu7fD3zBvcmQ+5j1BGXkH6csZfbU=;
-  b=e+QuZVrYgPksW8dqofgB9OCb2wpKVx7Kc/SM8TZu8m6nsltn+/V0Dh2f
-   4qMO8NLVP9xgBliKGDXLj8p78e0IBuSU7yZtXsvcEdVH/a0mw1gEZ3haE
-   9ToU/3VQmR5t6SwTh81Sww9GQxrkfP49sZHryngEZbAfy2FkvzHV7aZvc
-   8=;
-IronPort-SDR: DZCMyW4xNZwdiPIrntjZaG4WB3JsXH3wVlLIurK2/XlOKCaCJTcnFFYfmYVPanv5sGyjgdgK4O
- bD6mFhnck3ng==
-X-IronPort-AV: E=Sophos;i="5.75,304,1589241600"; 
-   d="scan'208";a="55638937"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 02 Jul 2020 15:09:44 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com (Postfix) with ESMTPS id D03FDA1ED4;
-        Thu,  2 Jul 2020 15:09:41 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 2 Jul 2020 15:09:41 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.145) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 2 Jul 2020 15:09:32 +0000
-Subject: Re: [PATCH v4 04/18] nitro_enclaves: Init PCI device driver
-To:     Andra Paraschiv <andraprs@amazon.com>,
-        <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Bjoern Doebel" <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-5-andraprs@amazon.com>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <d8fe8668-15c3-fe3b-1ad1-eb939a4977c2@amazon.de>
-Date:   Thu, 2 Jul 2020 17:09:29 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+        id S1729953AbgGBPNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Jul 2020 11:13:43 -0400
+Received: from mga01.intel.com ([192.55.52.88]:52230 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729444AbgGBPNk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Jul 2020 11:13:40 -0400
+IronPort-SDR: iajELP3UsSF2IeDLnfZUX725wBoh4XSBQQ6StChvk5OTO67ZjMXUfZlhljr30Eqo1DtHgaK/5g
+ nRlQPxm5fgIA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="164978440"
+X-IronPort-AV: E=Sophos;i="5.75,304,1589266800"; 
+   d="scan'208";a="164978440"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 08:13:39 -0700
+IronPort-SDR: 4Rx2c4iLRCuuqFUZdlbQd3DsK9c9h17DHJI0TfiqA205bfstBHUb/Pnav7X2d2yF4FFfAVkGqN
+ jre45HTvBdog==
+X-IronPort-AV: E=Sophos;i="5.75,304,1589266800"; 
+   d="scan'208";a="455552276"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.34]) ([10.255.31.34])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 08:13:37 -0700
+Subject: Re: [PATCH v13 03/11] KVM: VMX: Set guest CET MSRs per KVM and host
+ configuration
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, jmattson@google.com
+Cc:     yu.c.zhang@linux.intel.com
+References: <20200701080411.5802-1-weijiang.yang@intel.com>
+ <20200701080411.5802-4-weijiang.yang@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <75f0ef0b-ce95-fd92-00df-4231ffa1fa8e@intel.com>
+Date:   Thu, 2 Jul 2020 23:13:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200622200329.52996-5-andraprs@amazon.com>
+In-Reply-To: <20200701080411.5802-4-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.43.161.145]
-X-ClientProxiedBy: EX13D43UWA002.ant.amazon.com (10.43.160.109) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 22.06.20 22:03, Andra Paraschiv wrote:
-> The Nitro Enclaves PCI device is used by the kernel driver as a means of
-> communication with the hypervisor on the host where the primary VM and
-> the enclaves run. It handles requests with regard to enclave lifetime.
-> =
-
-> Setup the PCI device driver and add support for MSI-X interrupts.
-> =
-
-> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
-> Signed-off-by: Alexandru Ciobotaru <alcioa@amazon.com>
-> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+On 7/1/2020 4:04 PM, Yang Weijiang wrote:
+> CET MSRs pass through guest directly to enhance performance. CET runtime
+> control settings are stored in MSR_IA32_{U,S}_CET, Shadow Stack Pointer(SSP)
+> are stored in MSR_IA32_PL{0,1,2,3}_SSP, SSP table base address is stored in
+> MSR_IA32_INT_SSP_TAB, these MSRs are defined in kernel and re-used here.
+> 
+> MSR_IA32_U_CET and MSR_IA32_PL3_SSP are used for user-mode protection,the MSR
+> contents are switched between threads during scheduling, it makes sense to pass
+> through them so that the guest kernel can use xsaves/xrstors to operate them
+> efficiently. Other MSRs are used for non-user mode protection. See SDM for detailed
+> info.
+> 
+> The difference between CET VMCS fields and CET MSRs is that,the former are used
+> during VMEnter/VMExit, whereas the latter are used for CET state storage between
+> task/thread scheduling.
+> 
+> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > ---
-> Changelog
-> =
-
-> v3 -> v4
-> =
-
-> * Use dev_err instead of custom NE log pattern.
-> * Update NE PCI driver name to "nitro_enclaves".
-> =
-
-> v2 -> v3
-> =
-
-> * Remove the GPL additional wording as SPDX-License-Identifier is
->    already in place.
-> * Remove the WARN_ON calls.
-> * Remove linux/bug include that is not needed.
-> * Update static calls sanity checks.
-> * Remove "ratelimited" from the logs that are not in the ioctl call
->    paths.
-> * Update kzfree() calls to kfree().
-> =
-
-> v1 -> v2
-> =
-
-> * Add log pattern for NE.
-> * Update PCI device setup functions to receive PCI device data structure =
-and
->    then get private data from it inside the functions logic.
-> * Remove the BUG_ON calls.
-> * Add teardown function for MSI-X setup.
-> * Update goto labels to match their purpose.
-> * Implement TODO for NE PCI device disable state check.
-> * Update function name for NE PCI device probe / remove.
-> ---
->   drivers/virt/nitro_enclaves/ne_pci_dev.c | 261 +++++++++++++++++++++++
->   1 file changed, 261 insertions(+)
->   create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.c
-> =
-
-> diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c b/drivers/virt/nitr=
-o_enclaves/ne_pci_dev.c
-> new file mode 100644
-> index 000000000000..235fa3ecbee2
-> --- /dev/null
-> +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
-> @@ -0,0 +1,261 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserve=
-d.
-> + */
-> +
-> +/* Nitro Enclaves (NE) PCI device driver. */
-> +
-> +#include <linux/delay.h>
-> +#include <linux/device.h>
-> +#include <linux/list.h>
-> +#include <linux/mutex.h>
-> +#include <linux/module.h>
-> +#include <linux/nitro_enclaves.h>
-> +#include <linux/pci.h>
-> +#include <linux/types.h>
-> +#include <linux/wait.h>
-> +
-> +#include "ne_misc_dev.h"
-> +#include "ne_pci_dev.h"
-> +
-> +#define NE_DEFAULT_TIMEOUT_MSECS (120000) /* 120 sec */
-> +
-> +static const struct pci_device_id ne_pci_ids[] =3D {
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_AMAZON, PCI_DEVICE_ID_NE) },
-> +	{ 0, }
-> +};
-> +
-> +MODULE_DEVICE_TABLE(pci, ne_pci_ids);
-> +
-> +/**
-> + * ne_setup_msix - Setup MSI-X vectors for the PCI device.
-> + *
-> + * @pdev: PCI device to setup the MSI-X for.
-> + *
-> + * @returns: 0 on success, negative return value on failure.
-> + */
-> +static int ne_setup_msix(struct pci_dev *pdev)
+>   arch/x86/kvm/vmx/vmx.c | 46 ++++++++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/x86.c     |  3 +++
+>   2 files changed, 49 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d52d470e36b1..97e766875a7e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -3020,6 +3020,13 @@ void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long cr3)
+>   		vmcs_writel(GUEST_CR3, guest_cr3);
+>   }
+>   
+> +static bool is_cet_state_supported(struct kvm_vcpu *vcpu, u32 xss_states)
 > +{
-> +	struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
-> +	int nr_vecs =3D 0;
-> +	int rc =3D -EINVAL;
-> +
-> +	if (!ne_pci_dev)
-> +		return -EINVAL;
-> +
-> +	nr_vecs =3D pci_msix_vec_count(pdev);
-> +	if (nr_vecs < 0) {
-> +		rc =3D nr_vecs;
-> +
-> +		dev_err(&pdev->dev, "Error in getting vec count [rc=3D%d]\n", rc);
-> +
-> +		return rc;
-> +	}
-> +
-> +	rc =3D pci_alloc_irq_vectors(pdev, nr_vecs, nr_vecs, PCI_IRQ_MSIX);
-> +	if (rc < 0) {
-> +		dev_err(&pdev->dev, "Error in alloc MSI-X vecs [rc=3D%d]\n", rc);
-> +
-> +		return rc;
-> +	}
-> +
-> +	return 0;
+> +	return ((supported_xss & xss_states) &&
+> +		(guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
+> +		guest_cpuid_has(vcpu, X86_FEATURE_IBT)));
 > +}
 > +
-> +/**
-> + * ne_teardown_msix - Teardown MSI-X vectors for the PCI device.
-> + *
-> + * @pdev: PCI device to teardown the MSI-X for.
-> + */
-> +static void ne_teardown_msix(struct pci_dev *pdev)
+>   int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+>   {
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -7098,6 +7105,42 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+>   		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
+>   }
+>   
+> +static void vmx_update_intercept_for_cet_msr(struct kvm_vcpu *vcpu)
 > +{
-> +	struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> +	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
+> +	bool incpt;
 > +
-> +	if (!ne_pci_dev)
-> +		return;
+> +	incpt = !is_cet_state_supported(vcpu, XFEATURE_MASK_CET_USER);
+> +	/*
+> +	 * U_CET is required for USER CET, and U_CET, PL3_SPP are bound as
+> +	 * one component and controlled by IA32_XSS[bit 11].
+> +	 */
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_U_CET, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL3_SSP, MSR_TYPE_RW,
+> +				  incpt);
 > +
-> +	pci_free_irq_vectors(pdev);
+> +	incpt = !is_cet_state_supported(vcpu, XFEATURE_MASK_CET_KERNEL);
+> +	/*
+> +	 * S_CET is required for KERNEL CET, and PL0_SSP ... PL2_SSP are
+> +	 * bound as one component and controlled by IA32_XSS[bit 12].
+> +	 */
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_S_CET, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL0_SSP, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL1_SSP, MSR_TYPE_RW,
+> +				  incpt);
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PL2_SSP, MSR_TYPE_RW,
+> +				  incpt);
+> +
+> +	incpt |= !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+> +	/* SSP_TAB is only available for KERNEL SHSTK.*/
+> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW,
+> +				  incpt);
 > +}
 > +
-> +/**
-> + * ne_pci_dev_enable - Select PCI device version and enable it.
-> + *
-> + * @pdev: PCI device to select version for and then enable.
-> + *
-> + * @returns: 0 on success, negative return value on failure.
-> + */
-> +static int ne_pci_dev_enable(struct pci_dev *pdev)
-> +{
-> +	u8 dev_enable_reply =3D 0;
-> +	u16 dev_version_reply =3D 0;
-> +	struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>   static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -7136,6 +7179,9 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+>   			vmx_set_guest_msr(vmx, msr, enabled ? 0 : TSX_CTRL_RTM_DISABLE);
+>   		}
+>   	}
 > +
-> +	if (!ne_pci_dev || !ne_pci_dev->iomem_base)
-> +		return -EINVAL;
-
-How can this ever happen?
-
+> +	if (supported_xss & (XFEATURE_MASK_CET_KERNEL | XFEATURE_MASK_CET_USER))
+> +		vmx_update_intercept_for_cet_msr(vcpu);
+>   }
+>   
+>   static __init void vmx_set_cpu_caps(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c5835f9cb9ad..6390b62c12ed 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -186,6 +186,9 @@ static struct kvm_shared_msrs __percpu *shared_msrs;
+>   				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+>   				| XFEATURE_MASK_PKRU)
+>   
+> +#define KVM_SUPPORTED_XSS       (XFEATURE_MASK_CET_USER | \
+> +				 XFEATURE_MASK_CET_KERNEL)
 > +
-> +	iowrite16(NE_VERSION_MAX, ne_pci_dev->iomem_base + NE_VERSION);
-> +
-> +	dev_version_reply =3D ioread16(ne_pci_dev->iomem_base + NE_VERSION);
-> +	if (dev_version_reply !=3D NE_VERSION_MAX) {
-> +		dev_err(&pdev->dev, "Error in pci dev version cmd\n");
-> +
-> +		return -EIO;
-> +	}
-> +
-> +	iowrite8(NE_ENABLE_ON, ne_pci_dev->iomem_base + NE_ENABLE);
-> +
-> +	dev_enable_reply =3D ioread8(ne_pci_dev->iomem_base + NE_ENABLE);
-> +	if (dev_enable_reply !=3D NE_ENABLE_ON) {
-> +		dev_err(&pdev->dev, "Error in pci dev enable cmd\n");
-> +
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ne_pci_dev_disable - Disable PCI device.
-> + *
-> + * @pdev: PCI device to disable.
-> + */
-> +static void ne_pci_dev_disable(struct pci_dev *pdev)
-> +{
-> +	u8 dev_disable_reply =3D 0;
-> +	struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
-> +	const unsigned int sleep_time =3D 10; /* 10 ms */
-> +	unsigned int sleep_time_count =3D 0;
-> +
-> +	if (!ne_pci_dev || !ne_pci_dev->iomem_base)
-> +		return;
 
-How can this ever happen?
+This definition need to be moved to Patch 5?
 
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+>   u64 __read_mostly host_efer;
+>   EXPORT_SYMBOL_GPL(host_efer);
+>   
+> 
 
