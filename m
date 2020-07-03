@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 946262133DA
-	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 08:05:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D7FB2133DF
+	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 08:08:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726208AbgGCGFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jul 2020 02:05:44 -0400
-Received: from mga17.intel.com ([192.55.52.151]:58080 "EHLO mga17.intel.com"
+        id S1725960AbgGCGIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jul 2020 02:08:25 -0400
+Received: from mga12.intel.com ([192.55.52.136]:41474 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725648AbgGCGFo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Jul 2020 02:05:44 -0400
-IronPort-SDR: flycSxtA5y0HEyvIqAyBWRMkPS2qMDyL802RLCd8bmGXZoE3SuswPoQLLQ+h+SiBhOX2xlEC8W
- VKJZocrcG6fQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="127188482"
+        id S1725648AbgGCGIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Jul 2020 02:08:25 -0400
+IronPort-SDR: n0a0pJo7Wv2OxBUQHOhVGxA6E52W3N4yq0cmbFEvqGBxUgjTt6RtT32Nk836bhlu5dvjIrX5rm
+ ahinGRsjiqSA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9670"; a="126711695"
 X-IronPort-AV: E=Sophos;i="5.75,307,1589266800"; 
-   d="scan'208";a="127188482"
+   d="scan'208";a="126711695"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 23:05:41 -0700
-IronPort-SDR: 9JjE1OBDWY3xGui3+OP5E6PIz9psoM21Yngz+HP0Duceh5UZROnI8GRQthLGC5UYMDNn7zaY4Q
- nP5WdM5M55zg==
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2020 23:08:24 -0700
+IronPort-SDR: OW/CqDDMASl2uw27Mw4Iw2JpeldjfqX/G/QlPPSsEgkfWLmzSV2yHQnpGi4k8bH5Y6aU1UNN8o
+ aXAiJiFCgWjg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,307,1589266800"; 
-   d="scan'208";a="282192419"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by orsmga006.jf.intel.com with ESMTP; 02 Jul 2020 23:05:41 -0700
-Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 2 Jul 2020 23:05:40 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.173)
- by edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 2 Jul 2020 23:05:40 -0700
+   d="scan'208";a="482263822"
+Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
+  by fmsmga005.fm.intel.com with ESMTP; 02 Jul 2020 23:08:23 -0700
+Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 2 Jul 2020 23:08:23 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.103)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 2 Jul 2020 23:08:23 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S3sil0Of3U3N/kISgb2Oxgam9tfOfkyi7PxAzQYm1E6JgBdvT0YoyC6mpu17pvnFfMrS290S9Sp4W7jY728e5R0yw07bfyU2c03HtimsA3lhU3CIeL/ScvnMky+gn5yFf3E2kDzly1H2XAkgy9v0RVJHC5q7tP7q+ZOm5zx4nA4XLdQw26Uqfywh86ZWJb48TBtyV8J9bQrWUvxvKLpuCS7TsU5irPzKdXBEn0Ca/6mhfXXnHh5mFuEoEo+nDTh0ZBDEt6gUbIl3WMe38XhxmGXjvsX+j99jIn0Gv8TQctd+XetcR0iUjo9woHtF5ed5LYYWWsdbHA2G1+Nf7daiPw==
+ b=k4Za5t0rwFG1GXc/8nEIZR+9LqvXKqw7//m0sYYE+3wawxMahMU4K3OTb41h+TwjJxgJsV089maVOqDN5GhtTyVCIOKHMVi9cn1GZlQnvjkO4OMUCX3wy+BGDt+UOqCA1/U14H3SiXI1IWmPAz11mztgKq1YQh9QG7RgvEEj2hgPDtTPSl2Bg1cSTVgsA8NgV4nB4TAETe0Lh6N+e4eA1CVTER9rxTxxgZUATavLLXv3knd8KpEBZ96lht8yUFrxwdv1CoQVJavsnz+fK91/GEl1Zd1xbnAKmBDlcnQ4JTN/enVV93ihm2adrQZPWa23z3aqMg73iGZ6HIDHTCX1fA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ov8zp8pcnQup6sewZlsMFKfPoFv0aJXe21yxlX4jsP4=;
- b=ePM6+7SiSHhKSIuHXx82yfAPUd2q07CiJpLrV6N7ZT9IapJ8qPoKJv3g+uV6yGHhnyHNYs7T3OMqMAZKS1xrIbVCoQENa4kUp/qSabY2K/lsIN2xKX6kgc/bSkuAewQO2mk4FgLJQOq7Bc1gynpzESlwCVh1i7Q/givzVhFPOQEHnQJ21R7E5UB/BDL5Av2rdm1LkNFWIuGGZkq4L0Mj8e+A86EtjSlxo+j0WkcHCUvAe3BkBLsOaw4G2CoI0njcmY7LR1AA/sLvgmU/iGGIUi+TKzXBssNwwQIofKTZNYMwNnPzcoQjUDoemHLGAYUqolUFasfSbVrVpHuaNIsfMg==
+ bh=Io9C94QWiIgriNh7dlktteqyDXWO1jL9LP4JFl/erh0=;
+ b=bQrgIJmjZHkWxT2BUmJ+zr640oJ0EM3dygI7p0Vn/kOneiViofR2QpRB5V6ucyDjKr2BGuy9pWsrYCPF+gjXKngOhqBzLvVTsHxKm1ShSWm9UtXzSVwXU2IDSRrRryehlmQI6Fpk7OuqCpY7kEKGh9hmvUlxTDkofR7xaSX3+lfOvfCkuK5/l0t71xcYLExbldr+UYbcC4ttTOFS6c8gKcszyPw2uX513hM7GF2TSEvxhxquMAX3pz7tgnEuGCkF1pWFMkCSLkh3Hu0Cz4xt8kVu0INyZVB232siAOn8M/XrL0Uomsyo5oj5T2FB3ojWuVfEl2+R8IBMBOwIPehkCg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ov8zp8pcnQup6sewZlsMFKfPoFv0aJXe21yxlX4jsP4=;
- b=oZ5h2SeNsPqU8hvJYATH8/yVU9+cHFnK6VRyrowxQSIlZG91PJM81rYdkRlbL9EhidFHLI6shEsyaAIfKXTXY3Mnett0bWPAxQEbHETWUkBcqnqpqDLOhdd+CuEx/+8Gf98eHbyD+ttrwRbK0aohqO/tVb5680a8wUhWr3MmogU=
+ bh=Io9C94QWiIgriNh7dlktteqyDXWO1jL9LP4JFl/erh0=;
+ b=PRxWXl5ajrdjFb+HsEAx9ry1VS1g2rYMhwHEUMeCX2EygvNiVzsb4UjrMmgzdutRAr4fsCEaxhhu56MBkbATPGDm8EOlSMeN8YIBI9o8we17+KnvA3zzVDeIZErGTeevo6cFmoXgXARmdr/pOxS23lkicOTGGFkdD3xaO9+PN88=
 Received: from CY4PR11MB1432.namprd11.prod.outlook.com (2603:10b6:910:5::22)
  by CY4PR11MB1784.namprd11.prod.outlook.com (2603:10b6:903:126::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.20; Fri, 3 Jul
- 2020 06:05:39 +0000
+ 2020 06:08:22 +0000
 Received: from CY4PR11MB1432.namprd11.prod.outlook.com
  ([fe80::b46e:9dcb:b46b:884a]) by CY4PR11MB1432.namprd11.prod.outlook.com
  ([fe80::b46e:9dcb:b46b:884a%4]) with mapi id 15.20.3153.027; Fri, 3 Jul 2020
- 06:05:39 +0000
+ 06:08:21 +0000
 From:   "Liu, Yi L" <yi.l.liu@intel.com>
 To:     Alex Williamson <alex.williamson@redhat.com>
 CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
@@ -73,17 +73,15 @@ CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3 03/14] vfio/type1: Report iommu nesting info to
- userspace
-Thread-Topic: [PATCH v3 03/14] vfio/type1: Report iommu nesting info to
- userspace
-Thread-Index: AQHWSgRR9wDstDmC00qnq2+G1pK7Waj0rAKAgACc8/A=
-Date:   Fri, 3 Jul 2020 06:05:38 +0000
-Message-ID: <CY4PR11MB14320E069DF2C75131A94DB3C36A0@CY4PR11MB1432.namprd11.prod.outlook.com>
+Subject: RE: [PATCH v3 04/14] vfio: Add PASID allocation/free support
+Thread-Topic: [PATCH v3 04/14] vfio: Add PASID allocation/free support
+Thread-Index: AQHWSgRR5bz4tOM/oUaIsA0C5MG6Daj02DkAgACTvOA=
+Date:   Fri, 3 Jul 2020 06:08:21 +0000
+Message-ID: <CY4PR11MB14328B2485B4A6FA5412D0D0C36A0@CY4PR11MB1432.namprd11.prod.outlook.com>
 References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
-        <1592988927-48009-4-git-send-email-yi.l.liu@intel.com>
- <20200702123847.384e7460@x1.home>
-In-Reply-To: <20200702123847.384e7460@x1.home>
+        <1592988927-48009-5-git-send-email-yi.l.liu@intel.com>
+ <20200702151702.1baa65cb@x1.home>
+In-Reply-To: <20200702151702.1baa65cb@x1.home>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -95,30 +93,30 @@ authentication-results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
 x-originating-ip: [192.102.204.45]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: dbff58b4-f2ea-4769-8d74-08d81f171c29
+x-ms-office365-filtering-correlation-id: c921a38e-d5c2-4954-8f00-08d81f177d4f
 x-ms-traffictypediagnostic: CY4PR11MB1784:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR11MB1784FC839B3F0213F217436FC36A0@CY4PR11MB1784.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-microsoft-antispam-prvs: <CY4PR11MB17845486D4D2E4308BB4B44EC36A0@CY4PR11MB1784.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 045315E1EE
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: k0jIdR/Be3AovwUe+7Bx6ftC+ORwwe0YpNbBr7Svj/TDHOAIk7itRdXNFw1uZKB8fN+T/abBgCW5b1UClQJUk2/SvIUFMLIejb23eRpuTHy0PtZetW+XeH4ZijPDug7k8KQEN9OhqrEVPCg4a1FU9fmg/8TPy/7aXOT+dqYZcUU0fYSEOx3VzkbEPXAvoMJsJFyqEaSRuHgvebGkyGrnHJfPdimeg9AB84vsJdhTD73iAplDoQ7nR6mYH0YDMOQglIqdarOoOzeMMYdJeN4kLKfZtoQhX1qxYTzn0qQYSGnuGa/E8cg31Jvmfnf9Xt07BjPLAo4OnWfbUdlPCsUZHr95eIiOWvKkwPMiuiLAOVB3kantcjFwDLHu/UUsy05ybLRI+FpIySo54AwYa5g35Q==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR11MB1432.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(346002)(366004)(39860400002)(396003)(966005)(55016002)(4326008)(33656002)(9686003)(186003)(316002)(66476007)(66556008)(64756008)(66446008)(54906003)(76116006)(66946007)(26005)(8676002)(83380400001)(6916009)(8936002)(7416002)(86362001)(5660300002)(6506007)(71200400001)(7696005)(478600001)(52536014)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: tWZ1wZ8Qg33hBpqwdRqdCGXcRrd15kR3RljbN26m3fYF9wtRhx9tKc/vvMU1lT5sZzzcFiPNX7fnQ2zThoQqBjbfbunlFUR1QZEYuZa7eLB5skvxB3E4eK3g5OU3xBa+pqZARYM7/XrQtmFn1W9IGmx4bC91ZSKz8wwetoWH+hac6Eg03PB8P3qUaegS82J/tMM1RcywQt0gPpN/eRxDR/i8pBHGopPHz25GaoX6Uxxq64GBKUF4RwcwEz+0SR8q5o7RYqFqkpMjV6M7T/xMomGHbvx0s04a1M62QXldYJ6ye7j7mwqKB+UiVe6cPj6o0MzTeTOQG7mBiwD4nSBoYsU1nuZDaASz3hKSW6JMpAlLjwsQ+TlrpszdkvWzF7UHMl5NhikY4FW3x3aBJGFtTanOhnudg4BXcf2VOCMFJhHJly+riIFb/Dc5R9ZWEboByAxNVNS824lA+4M8aiLawaW/s77M6DQgO1CY4stOkukuWxzMpmblqd8rh6wyjJu7
+x-microsoft-antispam-message-info: 9ndxJGTU71xmKnF1I/nQhJoDmpyAHIz4j5LXr1fgAHdmHXhBVQO00OH4QNhdEftTD8Q2ab3L3xOQkCaZWmU4A6utlCiBKrhAQMmslKy00944Tjr2aImkZKPcE6L+ctQTTQIvz0/TavMAVHVJ1H0yAcB7v3EX8UqEimG5aGpADknT2/0CbOk7h7qfp/aOK7/vsLld1/VF0A5dQ1B4Z+8FUHCH8252Wxquq092LS1c6phlNjD8OzOF11Qj0rDa5HGNzV5Isat8eHvFqrfCdWoGsB5nqp3Y4RnHjc8I27+Rq7IgLbZ1wWD1uIq37UBZlp9DKbPgUBCIO0915xn4/gjbVA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR11MB1432.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(376002)(136003)(346002)(366004)(39860400002)(396003)(55016002)(4326008)(33656002)(9686003)(186003)(316002)(66476007)(66556008)(64756008)(66446008)(54906003)(76116006)(66946007)(26005)(8676002)(83380400001)(6916009)(8936002)(7416002)(86362001)(5660300002)(6506007)(71200400001)(7696005)(478600001)(52536014)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: yLakeEzcL6EqdRlwNNqbaxtDUlk9LBIFYctH0pKSH8Br7g7oiCeMeFw1SF9TkCKuYF+qutXPNT4tjOPIqE2Y3vVWyAY48kNhR+enn0mfTab+DuYBxWbczqB0ME33/nCqmOVUVv7PATG/Lhzavxg489xRderN3eqp8BQI2bY5kyXlukr1TfRTMJiyAz3gjQpCxtLJG4kB8lo+yTK8oyMYlADnYZ8pb/fHhtRri5s2PEWixGRvii4xZGOc83pp5zVkgbZfde5jdH+vDgyYPsgsgu5kkIMiHzSLgpYbshFPE5fN0loDvPLf+BoQJ/9DEIS1WNozKbi2qELmuJJuByc/1rPyRrWRU7GPPFYDUlCp62n0F6d0LAW4kJstg/Fis3jyNhPUeikFGGO02OTBmYp1d0R3vvlvmasa9ewRybQyoc7CTADE2pCtu62vNU91wVnfxlFh0rLAwan6zJOP7yDdGiISTtYiHC0TNZHIPDwXlx1eudDXD0w4RLEFEDUjjSA9
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CY4PR11MB1432.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbff58b4-f2ea-4769-8d74-08d81f171c29
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2020 06:05:38.8180
+X-MS-Exchange-CrossTenant-Network-Message-Id: c921a38e-d5c2-4954-8f00-08d81f177d4f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2020 06:08:21.8040
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CjvueAYuE1/XyoS7s5GTjNys7yxTOPXUMBi0poBlN6rCublPI3N8BwJeKc2QIgoshw3HD5AuyUZ4yaloDNGm7A==
+X-MS-Exchange-CrossTenant-userprincipalname: Lg4ROJlbblHXYopkqpbL8chNyxiJ7NERmw9NnLCTDZysFKb2fSVIH1Zxi+OqmneqyTODRRsq423BYcDH9BJHcQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1784
 X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
@@ -128,296 +126,298 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Alex,
 
-> From: Alex Williamson < alex.williamson@redhat.com >
-> Sent: Friday, July 3, 2020 2:39 AM
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Friday, July 3, 2020 5:17 AM
 >=20
-> On Wed, 24 Jun 2020 01:55:16 -0700
+> On Wed, 24 Jun 2020 01:55:17 -0700
 > Liu Yi L <yi.l.liu@intel.com> wrote:
 >=20
-> > This patch exports iommu nesting capability info to user space through
-> > VFIO. User space is expected to check this info for supported uAPIs (e.=
-g.
-> > PASID alloc/free, bind page table, and cache invalidation) and the
-> > vendor specific format information for first level/stage page table
-> > that will be bound to.
+> > Shared Virtual Addressing (a.k.a Shared Virtual Memory) allows sharing
+> > multiple process virtual address spaces with the device for simplified
+> > programming model. PASID is used to tag an virtual address space in
+> > DMA requests and to identify the related translation structure in
+> > IOMMU. When a PASID-capable device is assigned to a VM, we want the
+> > same capability of using PASID to tag guest process virtual address
+> > spaces to achieve virtual SVA (vSVA).
 > >
-> > The nesting info is available only after the nesting iommu type is set
-> > for a container. Current implementation imposes one limitation - one
-> > nesting container should include at most one group. The philosophy of
-> > vfio container is having all groups/devices within the container share
-> > the same IOMMU context. When vSVA is enabled, one IOMMU context could
-> > include one 2nd-level address space and multiple 1st-level address spac=
-es.
-> > While the 2nd-leve address space is reasonably sharable by multiple
-> > groups , blindly sharing 1st-level address spaces across all groups
-> > within the container might instead break the guest expectation. In the
-> > future sub/ super container concept might be introduced to allow
-> > partial address space sharing within an IOMMU context. But for now
-> > let's go with this restriction by requiring singleton container for
-> > using nesting iommu features. Below link has the related discussion
-> > about this
-> > decision.
+> > PASID management for guest is vendor specific. Some vendors (e.g.
+> > Intel
+> > VT-d) requires system-wide managed PASIDs cross all devices,
+> > regardless of whether a device is used by host or assigned to guest.
+> > Other vendors (e.g. ARM SMMU) may allow PASIDs managed per-device thus
+> > could be fully delegated to the guest for assigned devices.
 > >
-> > https://lkml.org/lkml/2020/5/15/1028
+> > For system-wide managed PASIDs, this patch introduces a vfio module to
+> > handle explicit PASID alloc/free requests from guest. Allocated PASIDs
+> > are associated to a process (or, mm_struct) in IOASID core. A vfio_mm
+> > object is introduced to track mm_struct. Multiple VFIO containers
+> > within a process share the same vfio_mm object.
+> >
+> > A quota mechanism is provided to prevent malicious user from
+> > exhausting available PASIDs. Currently the quota is a global parameter
+> > applied to all VFIO devices. In the future per-device quota might be su=
+pported
+> too.
 > >
 > > Cc: Kevin Tian <kevin.tian@intel.com>
 > > CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
 > > Cc: Eric Auger <eric.auger@redhat.com>
 > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > > Cc: Joerg Roedel <joro@8bytes.org>
 > > Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> > Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 > > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 73
-> +++++++++++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/vfio.h       |  9 +++++
-> >  2 files changed, 82 insertions(+)
+> > v1 -> v2:
+> > *) added in v2, split from the pasid alloc/free support of v1
+> > ---
+> >  drivers/vfio/Kconfig      |   5 ++
+> >  drivers/vfio/Makefile     |   1 +
+> >  drivers/vfio/vfio_pasid.c | 151
+> ++++++++++++++++++++++++++++++++++++++++++++++
+> >  include/linux/vfio.h      |  28 +++++++++
+> >  4 files changed, 185 insertions(+)
+> >  create mode 100644 drivers/vfio/vfio_pasid.c
 > >
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c
-> > b/drivers/vfio/vfio_iommu_type1.c index 7accb59..8c143d5 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -72,6 +72,7 @@ struct vfio_iommu {
-> >  	uint64_t		pgsize_bitmap;
-> >  	bool			v2;
-> >  	bool			nesting;
-> > +	struct iommu_nesting_info *nesting_info;
-> >  	bool			dirty_page_tracking;
-> >  	bool			pinned_page_dirty_scope;
-> >  };
->=20
-> Mind the structure packing and alignment, placing a pointer in the middle
-> of a
-> section of bools is going to create wasteful holes in the data structure.
-
-how about below? Add the @nesting_info and @vmm in the end of this struct.
-I've two questions, the first one is how the place the comment of the
-@external_domain; second question is do you want me to move the @nesting
-field to be near-by with the @nesting_info and @vmm. :) please let me know
-your preference.
-
-struct vfio_iommu {
-	struct list_head		domain_list;
-	struct list_head		iova_list;
-	struct vfio_domain		*external_domain; /* domain for external user */
-	struct mutex			lock;
-	struct rb_root			dma_list;
-	struct blocking_notifier_head	notifier;
-	unsigned int			dma_avail;
-	uint64_t			pgsize_bitmap;
-	bool				v2;
-	bool				nesting;
-	bool				dirty_page_tracking;
-	bool				pinned_page_dirty_scope;
-	struct iommu_nesting_info 	*nesting_info;
-	struct vfio_mm			*vmm;
-};
-
-> > @@ -130,6 +131,9 @@ struct vfio_regions {
-> >  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
-> >  					(!list_empty(&iommu->domain_list))
+> > diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig index
+> > fd17db9..3d8a108 100644
+> > --- a/drivers/vfio/Kconfig
+> > +++ b/drivers/vfio/Kconfig
+> > @@ -19,6 +19,11 @@ config VFIO_VIRQFD
+> >  	depends on VFIO && EVENTFD
+> >  	default n
 > >
-> > +#define IS_DOMAIN_IN_CONTAINER(iommu)	((iommu-
-> >external_domain) || \
-> > +					 (!list_empty(&iommu->domain_list)))
+> > +config VFIO_PASID
+> > +	tristate
+> > +	depends on IOASID && VFIO
+> > +	default n
 > > +
-> >  #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) /
-> BITS_PER_BYTE)
+> >  menuconfig VFIO
+> >  	tristate "VFIO Non-Privileged userspace driver framework"
+> >  	depends on IOMMU_API
+> > diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile index
+> > de67c47..bb836a3 100644
+> > --- a/drivers/vfio/Makefile
+> > +++ b/drivers/vfio/Makefile
+> > @@ -3,6 +3,7 @@ vfio_virqfd-y :=3D virqfd.o
 > >
-> >  /*
-> > @@ -1959,6 +1963,12 @@ static int vfio_iommu_type1_attach_group(void
-> *iommu_data,
-> >  		}
-> >  	}
-> >
-> > +	/* Nesting type container can include only one group */
-> > +	if (iommu->nesting && IS_DOMAIN_IN_CONTAINER(iommu)) {
-> > +		mutex_unlock(&iommu->lock);
-> > +		return -EINVAL;
+> >  obj-$(CONFIG_VFIO) +=3D vfio.o
+> >  obj-$(CONFIG_VFIO_VIRQFD) +=3D vfio_virqfd.o
+> > +obj-$(CONFIG_VFIO_PASID) +=3D vfio_pasid.o
+> >  obj-$(CONFIG_VFIO_IOMMU_TYPE1) +=3D vfio_iommu_type1.o
+> >  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) +=3D vfio_iommu_spapr_tce.o
+> >  obj-$(CONFIG_VFIO_SPAPR_EEH) +=3D vfio_spapr_eeh.o diff --git
+> > a/drivers/vfio/vfio_pasid.c b/drivers/vfio/vfio_pasid.c new file mode
+> > 100644 index 0000000..dd5b6d1
+> > --- /dev/null
+> > +++ b/drivers/vfio/vfio_pasid.c
+> > @@ -0,0 +1,151 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright (C) 2020 Intel Corporation.
+> > + *     Author: Liu Yi L <yi.l.liu@intel.com>
+> > + *
+> > + */
+> > +
+> > +#include <linux/vfio.h>
+> > +#include <linux/eventfd.h>
+> > +#include <linux/file.h>
+> > +#include <linux/module.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/sched/mm.h>
+> > +
+> > +#define DRIVER_VERSION  "0.1"
+> > +#define DRIVER_AUTHOR   "Liu Yi L <yi.l.liu@intel.com>"
+> > +#define DRIVER_DESC     "PASID management for VFIO bus drivers"
+> > +
+> > +#define VFIO_DEFAULT_PASID_QUOTA	1000
+> > +static int pasid_quota =3D VFIO_DEFAULT_PASID_QUOTA;
+> > +module_param_named(pasid_quota, pasid_quota, uint, 0444);
+> > +MODULE_PARM_DESC(pasid_quota,
+> > +		 " Set the quota for max number of PASIDs that an application is
+> > +allowed to request (default 1000)");
+> > +
+> > +struct vfio_mm_token {
+> > +	unsigned long long val;
+> > +};
+> > +
+> > +struct vfio_mm {
+> > +	struct kref		kref;
+> > +	struct vfio_mm_token	token;
+> > +	int			ioasid_sid;
+> > +	int			pasid_quota;
+> > +	struct list_head	next;
+> > +};
+> > +
+> > +static struct vfio_pasid {
+> > +	struct mutex		vfio_mm_lock;
+> > +	struct list_head	vfio_mm_list;
+> > +} vfio_pasid;
+> > +
+> > +/* called with vfio.vfio_mm_lock held */ static void
+> > +vfio_mm_release(struct kref *kref) {
+> > +	struct vfio_mm *vmm =3D container_of(kref, struct vfio_mm, kref);
+> > +
+> > +	list_del(&vmm->next);
+> > +	mutex_unlock(&vfio_pasid.vfio_mm_lock);
+> > +	ioasid_free_set(vmm->ioasid_sid, true);
+> > +	kfree(vmm);
+> > +}
+> > +
+> > +void vfio_mm_put(struct vfio_mm *vmm) {
+> > +	kref_put_mutex(&vmm->kref, vfio_mm_release,
+> > +&vfio_pasid.vfio_mm_lock); }
+> > +
+> > +static void vfio_mm_get(struct vfio_mm *vmm) {
+> > +	kref_get(&vmm->kref);
+> > +}
+> > +
+> > +struct vfio_mm *vfio_mm_get_from_task(struct task_struct *task) {
+> > +	struct mm_struct *mm =3D get_task_mm(task);
+> > +	struct vfio_mm *vmm;
+> > +	unsigned long long val =3D (unsigned long long) mm;
+> > +	int ret;
+> > +
+> > +	mutex_lock(&vfio_pasid.vfio_mm_lock);
+> > +	/* Search existing vfio_mm with current mm pointer */
+> > +	list_for_each_entry(vmm, &vfio_pasid.vfio_mm_list, next) {
+> > +		if (vmm->token.val =3D=3D val) {
+> > +			vfio_mm_get(vmm);
+> > +			goto out;
+> > +		}
 > > +	}
 > > +
-> >  	group =3D kzalloc(sizeof(*group), GFP_KERNEL);
-> >  	domain =3D kzalloc(sizeof(*domain), GFP_KERNEL);
-> >  	if (!group || !domain) {
-> > @@ -2029,6 +2039,36 @@ static int vfio_iommu_type1_attach_group(void
-> *iommu_data,
-> >  	if (ret)
-> >  		goto out_domain;
-> >
-> > +	/* Nesting cap info is available only after attaching */
-> > +	if (iommu->nesting) {
-> > +		struct iommu_nesting_info tmp;
-> > +		struct iommu_nesting_info *info;
-> > +
-> > +		/* First get the size of vendor specific nesting info */
-> > +		ret =3D iommu_domain_get_attr(domain->domain,
-> > +					    DOMAIN_ATTR_NESTING,
-> > +					    &tmp);
-> > +		if (ret)
-> > +			goto out_detach;
-> > +
-> > +		info =3D kzalloc(tmp.size, GFP_KERNEL);
-> > +		if (!info) {
-> > +			ret =3D -ENOMEM;
-> > +			goto out_detach;
-> > +		}
-> > +
-> > +		/* Now get the nesting info */
-> > +		info->size =3D tmp.size;
-> > +		ret =3D iommu_domain_get_attr(domain->domain,
-> > +					    DOMAIN_ATTR_NESTING,
-> > +					    info);
-> > +		if (ret) {
-> > +			kfree(info);
-> > +			goto out_detach;
-> > +		}
-> > +		iommu->nesting_info =3D info;
-> > +	}
-> > +
-> >  	/* Get aperture info */
-> >  	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY,
-> &geo);
-> >
-> > @@ -2138,6 +2178,7 @@ static int vfio_iommu_type1_attach_group(void
-> *iommu_data,
-> >  	return 0;
-> >
-> >  out_detach:
-> > +	kfree(iommu->nesting_info);
+> > +	vmm =3D kzalloc(sizeof(*vmm), GFP_KERNEL);
+> > +	if (!vmm)
+> > +		return ERR_PTR(-ENOMEM);
 >=20
-> This looks prone to a use-after-free.
+> lock leaked, mm leaked.
 
-how about setting iommu->nesting_info to NULL? just as the next comment
-from you.
+oh, yes. silly mistake.
 
-> >  	vfio_iommu_detach_group(domain, group);
-> >  out_domain:
-> >  	iommu_domain_free(domain->domain);
-> > @@ -2338,6 +2379,8 @@ static void vfio_iommu_type1_detach_group(void
-> *iommu_data,
-> >  					vfio_iommu_unmap_unpin_all(iommu);
-> >  				else
-> >
-> 	vfio_iommu_unmap_unpin_reaccount(iommu);
 > > +
-> > +				kfree(iommu->nesting_info);
+> > +	/*
+> > +	 * IOASID core provides a 'IOASID set' concept to track all
+> > +	 * PASIDs associated with a token. Here we use mm_struct as
+> > +	 * the token and create a IOASID set per mm_struct. All the
+> > +	 * containers of the process share the same IOASID set.
+> > +	 */
+> > +	ret =3D ioasid_alloc_set((struct ioasid_set *) mm, pasid_quota,
+> > +			       &vmm->ioasid_sid);
+> > +	if (ret) {
+> > +		kfree(vmm);
+> > +		return ERR_PTR(ret);
 >=20
-> As does this.  Set to NULL since get_info tests the pointer before trying=
- to
-> use it.
+> lock leaked, mm leaked.
 
 got it.
 
-> >  			}
-> >  			iommu_domain_free(domain->domain);
-> >  			list_del(&domain->next);
-> > @@ -2546,6 +2589,30 @@ static int vfio_iommu_migration_build_caps(struc=
-t
-> vfio_iommu *iommu,
-> >  	return vfio_info_add_capability(caps, &cap_mig.header,
-> > sizeof(cap_mig));  }
-> >
-> > +static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
-> > +					   struct vfio_info_cap *caps)
-> > +{
-> > +	struct vfio_info_cap_header *header;
-> > +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
-> > +	size_t size;
-> > +
-> > +	size =3D sizeof(*nesting_cap) + iommu->nesting_info->size;
-> > +
-> > +	header =3D vfio_info_cap_add(caps, size,
-> > +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
-> > +	if (IS_ERR(header))
-> > +		return PTR_ERR(header);
-> > +
-> > +	nesting_cap =3D container_of(header,
-> > +				   struct vfio_iommu_type1_info_cap_nesting,
-> > +				   header);
-> > +
-> > +	memcpy(&nesting_cap->info, iommu->nesting_info,
-> > +	       iommu->nesting_info->size);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
-> >  				     unsigned long arg)
-> >  {
-> > @@ -2586,6 +2653,12 @@ static int vfio_iommu_type1_get_info(struct
-> vfio_iommu *iommu,
-> >  	if (ret)
-> >  		return ret;
-> >
-> > +	if (iommu->nesting_info) {
-> > +		ret =3D vfio_iommu_info_add_nesting_cap(iommu, &caps);
-> > +		if (ret)
-> > +			return ret;
 > > +	}
 > > +
-> >  	if (caps.size) {
-> >  		info.flags |=3D VFIO_IOMMU_INFO_CAPS;
-> >
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index eca66926..f1f39e1 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -14,6 +14,7 @@
-> >
-> >  #include <linux/types.h>
-> >  #include <linux/ioctl.h>
-> > +#include <linux/iommu.h>
+> > +	kref_init(&vmm->kref);
+> > +	vmm->token.val =3D (unsigned long long) mm;
 >=20
-> Why?  We're not directly referencing any IOMMU UAPI structures here.
+> We already have it in @val.
 
-oh, yes. will remove it.
+yep, let me use val directly.
 
-> >
-> >  #define VFIO_API_VERSION	0
-> >
-> > @@ -1039,6 +1040,14 @@ struct vfio_iommu_type1_info_cap_migration {
-> >  	__u64	max_dirty_bitmap_size;		/* in bytes */
-> >  };
-> >
-> > +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  3
-> > +
-> > +struct vfio_iommu_type1_info_cap_nesting {
-> > +	struct	vfio_info_cap_header header;
-> > +	__u32	flags;
+> > +	vmm->pasid_quota =3D pasid_quota;
 >=20
-> I think there's an alignment issue here for a uapi.  The header field is
-> 8-bytes total
-> and info[] should start at an 8-byte alignment to allow data[] within inf=
-o
-> to have
-> 8-byte alignment.  This could lead to the structure having a compiler
-> dependent
-> size and offsets.  We should add a 4-byte reserved field here to resolve.
+> This field on the structure and this assignment seems to serve no purpose=
+.
 
-got it. or how about defining the flags as __u64?
+yeah, it's used in prior version. let me drop it. if we still want it, may =
+add
+later.
 
->=20
-> > +	__u8	info[];
-> > +};
->=20
-> This should have a lot more description around it, a user could not infer
-> that info[]
-> is including a struct iommu_nesting_info from the information provided he=
-re.
 > Thanks,
-
-sure. BTW. do you think it is necessary to add a flag to indicate the info[=
-]
-is a struct iommu_nesting_info? or as a start, it's not necessary to do it.
-
-Regards,
-Yi Liu
-
+>=20
 > Alex
 >=20
 > > +
-> >  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+> > +	list_add(&vmm->next, &vfio_pasid.vfio_mm_list);
+> > +out:
+> > +	mutex_unlock(&vfio_pasid.vfio_mm_lock);
+> > +	mmput(mm);
+> > +	return vmm;
+> > +}
+> > +
+> > +int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max) {
+> > +	ioasid_t pasid;
+> > +
+> > +	pasid =3D ioasid_alloc(vmm->ioasid_sid, min, max, NULL);
+> > +
+> > +	return (pasid =3D=3D INVALID_IOASID) ? -ENOSPC : pasid; }
+> > +
+> > +void vfio_pasid_free_range(struct vfio_mm *vmm,
+> > +			    ioasid_t min, ioasid_t max)
+> > +{
+> > +	ioasid_t pasid =3D min;
+> > +
+> > +	if (min > max)
+> > +		return;
+> > +
+> > +	/*
+> > +	 * IOASID core will notify PASID users (e.g. IOMMU driver) to
+> > +	 * teardown necessary structures depending on the to-be-freed
+> > +	 * PASID.
+> > +	 */
+> > +	for (; pasid <=3D max; pasid++)
+> > +		ioasid_free(pasid);
+> > +}
+> > +
+> > +static int __init vfio_pasid_init(void) {
+> > +	mutex_init(&vfio_pasid.vfio_mm_lock);
+> > +	INIT_LIST_HEAD(&vfio_pasid.vfio_mm_list);
+> > +	return 0;
+> > +}
+> > +
+> > +static void __exit vfio_pasid_exit(void) {
+> > +	WARN_ON(!list_empty(&vfio_pasid.vfio_mm_list));
+> > +}
+> > +
+> > +module_init(vfio_pasid_init);
+> > +module_exit(vfio_pasid_exit);
+> > +
+> > +MODULE_VERSION(DRIVER_VERSION);
+> > +MODULE_LICENSE("GPL v2");
+> > +MODULE_AUTHOR(DRIVER_AUTHOR);
+> > +MODULE_DESCRIPTION(DRIVER_DESC);
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h index
+> > 38d3c6a..74e077d 100644
+> > --- a/include/linux/vfio.h
+> > +++ b/include/linux/vfio.h
+> > @@ -97,6 +97,34 @@ extern int vfio_register_iommu_driver(const struct
+> > vfio_iommu_driver_ops *ops);  extern void vfio_unregister_iommu_driver(
+> >  				const struct vfio_iommu_driver_ops *ops);
 > >
-> >  /**
+> > +struct vfio_mm;
+> > +#if IS_ENABLED(CONFIG_VFIO_PASID)
+> > +extern struct vfio_mm *vfio_mm_get_from_task(struct task_struct
+> > +*task); extern void vfio_mm_put(struct vfio_mm *vmm); extern int
+> > +vfio_pasid_alloc(struct vfio_mm *vmm, int min, int max); extern void
+> > +vfio_pasid_free_range(struct vfio_mm *vmm,
+> > +					ioasid_t min, ioasid_t max);
+> > +#else
+> > +static inline struct vfio_mm *vfio_mm_get_from_task(struct
+> > +task_struct *task) {
+> > +	return NULL;
+> > +}
+> > +
+> > +static inline void vfio_mm_put(struct vfio_mm *vmm) { }
+> > +
+> > +static inline int vfio_pasid_alloc(struct vfio_mm *vmm, int min, int
+> > +max) {
+> > +	return -ENOTTY;
+> > +}
+> > +
+> > +static inline void vfio_pasid_free_range(struct vfio_mm *vmm,
+> > +					  ioasid_t min, ioasid_t max)
+> > +{
+> > +}
+> > +#endif /* CONFIG_VFIO_PASID */
+> > +
+> >  /*
+> >   * External user API
+> >   */
 
