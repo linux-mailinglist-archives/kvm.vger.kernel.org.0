@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EF1F213F50
-	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 20:41:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32AC4213FC2
+	for <lists+kvm@lfdr.de>; Fri,  3 Jul 2020 21:03:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726406AbgGCSl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Jul 2020 14:41:28 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42076 "EHLO
+        id S1726693AbgGCTC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Jul 2020 15:02:57 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51832 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726147AbgGCSl2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Jul 2020 14:41:28 -0400
+        by vger.kernel.org with ESMTP id S1726258AbgGCTC5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Jul 2020 15:02:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593801686;
+        s=mimecast20190719; t=1593802974;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=c83Dgu3F7bsHrP60t6VLlQzU3WYklyXESDcu0K3MgRU=;
-        b=XfMbHs2JD8sSBX5KjRny4etHxOrsVHYiKsXRqDhInM9BCqpQEGzF41b3fXkhiH5MtNXT/a
-        VsN/PwNcOxzFA73DyHiymJmLRxval/42BA7hwbbKGJ+GtvBAKPR54Lmz2rMyoMTNPpyR1E
-        LlqIIlRkvG9DT87xSUitbp1A/6ubAGM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-B2__HWXXO2W0aUJ7C_I98A-1; Fri, 03 Jul 2020 14:41:25 -0400
-X-MC-Unique: B2__HWXXO2W0aUJ7C_I98A-1
-Received: by mail-qk1-f197.google.com with SMTP id g12so22183819qko.19
-        for <kvm@vger.kernel.org>; Fri, 03 Jul 2020 11:41:25 -0700 (PDT)
+        bh=twCkwjE0ryMOZi8fpz1SnT5K9pmvk7PL5PT5FftWV/0=;
+        b=CtJaKG5dMWZsU7SZn5EBApnMn7s58x70BSjZmecY+b+EZugUyF6s8rc4mlSwvDmUGKtcBW
+        YpIeyA3Q9VK2lEG3yj3fuqNEjVi/PoXqVNPapMETi/p9ZGxZBBNzc5XQm530kwZIpEAOT0
+        CMvc0vk5EdxNPRbyCcvdNHMJ3UvQ6Bo=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-261-iYSb60_oPbKd8WHG_DGlQg-1; Fri, 03 Jul 2020 15:02:51 -0400
+X-MC-Unique: iYSb60_oPbKd8WHG_DGlQg-1
+Received: by mail-qk1-f198.google.com with SMTP id 13so10346378qkk.10
+        for <kvm@vger.kernel.org>; Fri, 03 Jul 2020 12:02:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=c83Dgu3F7bsHrP60t6VLlQzU3WYklyXESDcu0K3MgRU=;
-        b=efx0Sy2BAYhdItDjFeQTO0QWFLJ7Xi+g88R2RFhvnX6YG3QABSbpWyYTXOEEwB4YgJ
-         btE3NQCjPoJpcQ3iAkt0dRt99Lx7/VKjNQFEMXR58DJ+Gk2VMWJgZdigOvEjW80wVrDT
-         hYu5ifAcAdxaTC7mKyGuBoG+ua6AFdGtHCp/xkJhUZF4o0iwIhKjNdgaLDyiSuPcgkLv
-         yzMTORBCyVO7+PA3vUrnKXxbgZL0iIQsh2MNMD5UCeDVLmw/xb/gkajfN0iVXUmTJ6YZ
-         UCJ6rH58BiBKfYWPKwEnRlbubWeGqCLBP9NxWraryw1CxB/0LDqFqXwBAmOITmbJKxvW
-         Ol9A==
-X-Gm-Message-State: AOAM533aeUf//XKxrcexCq1I+4NYPLBHH98/Yy7qu7CWSmnzh3LW75uS
-        mSubk//bKf6RHj8vK+K1ItMZF+dmQGTNzH78/CA8d6gDB6NzYFHUV8m2ttjhmGPkUVXKGie/U8Z
-        AMb5SavcKlbsj
-X-Received: by 2002:a0c:db8a:: with SMTP id m10mr36623050qvk.21.1593801684761;
-        Fri, 03 Jul 2020 11:41:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBEnbzWFcgnnEyEN9LPngYgaXBJvTYCdREKhTVEN13IPzAhqv4lj8Wr6UjTQ7Znh1FC+wJ5w==
-X-Received: by 2002:a0c:db8a:: with SMTP id m10mr36623028qvk.21.1593801684349;
-        Fri, 03 Jul 2020 11:41:24 -0700 (PDT)
+        bh=twCkwjE0ryMOZi8fpz1SnT5K9pmvk7PL5PT5FftWV/0=;
+        b=jujQJT6xlpxQ/YFjsimXnjRzc2tme50yLEKIICZP0uP2u9DBNljGaDgMGGEhdyfK4t
+         +G8SRupFg3BatondBFQBjQvS9mtsX1QpxPGa0ywSm9sQS4lsikzTTnKXX/ltCA2Ss9A6
+         x80fKtfRvLEYd+pZMcO786pgm7Fb+6CEaHE8SgYtTAhPYeApOXjvyCQXrZeYJxcPuoJO
+         aTXER0VXylbCWKiMYLirWmr3vPjZMONCcyVlwf7oqkQFWUB3XDV8UK+F1gvnYYxjkhUk
+         +aopmJi8RbfG5Qjdl0qcMhCNDG3dyZ/B9j0RcHOtICZkYR9hM7r9kx6JzC/bpy191R5x
+         y+rQ==
+X-Gm-Message-State: AOAM5327NHKB1XNo+6zQp2T/Ws1G6+RWxdMeDkMU1l7UH+MAS7XRlwcU
+        JVfxCsZM8+1gHfddlMrmFiR3906s37AF397iRFK/kNBOah+E3XT0D+sSlR8jjwx40XHljWlPsi9
+        FKQNExrUZxU1o
+X-Received: by 2002:a05:6214:1882:: with SMTP id cx2mr37285511qvb.240.1593802970305;
+        Fri, 03 Jul 2020 12:02:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx9utD0D8BS338JK3zldVLP/DumaDiDAvSmzpYFOet+EDIzmo1/XzuAyJnljqPxWQ2+i8nViA==
+X-Received: by 2002:a05:6214:1882:: with SMTP id cx2mr37285481qvb.240.1593802970018;
+        Fri, 03 Jul 2020 12:02:50 -0700 (PDT)
 Received: from xz-x1 ([2607:9880:19c0:32::2])
-        by smtp.gmail.com with ESMTPSA id a28sm10753840qko.45.2020.07.03.11.41.22
+        by smtp.gmail.com with ESMTPSA id t65sm8946800qkf.119.2020.07.03.12.02.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2020 11:41:23 -0700 (PDT)
-Date:   Fri, 3 Jul 2020 14:41:22 -0400
+        Fri, 03 Jul 2020 12:02:49 -0700 (PDT)
+Date:   Fri, 3 Jul 2020 15:02:47 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -60,66 +60,86 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH v10 02/14] KVM: Cache as_id in kvm_memory_slot
-Message-ID: <20200703184122.GF6677@xz-x1>
+Subject: Re: [PATCH v10 03/14] KVM: X86: Don't track dirty for
+ KVM_SET_[TSS_ADDR|IDENTITY_MAP_ADDR]
+Message-ID: <20200703190247.GG6677@xz-x1>
 References: <20200601115957.1581250-1-peterx@redhat.com>
- <20200601115957.1581250-3-peterx@redhat.com>
- <20200702230849.GL3575@linux.intel.com>
+ <20200601115957.1581250-4-peterx@redhat.com>
+ <20200703000557.GM3575@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200702230849.GL3575@linux.intel.com>
+In-Reply-To: <20200703000557.GM3575@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 04:08:49PM -0700, Sean Christopherson wrote:
-> On Mon, Jun 01, 2020 at 07:59:45AM -0400, Peter Xu wrote:
-> > Cache the address space ID just like the slot ID.  It will be used in
-> > order to fill in the dirty ring entries.
-> > 
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/linux/kvm_host.h | 1 +
-> >  virt/kvm/kvm_main.c      | 1 +
-> >  2 files changed, 2 insertions(+)
-> > 
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 01276e3d01b9..5e7bbaf7a36b 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -346,6 +346,7 @@ struct kvm_memory_slot {
-> >  	unsigned long userspace_addr;
-> >  	u32 flags;
-> >  	short id;
-> > +	u16 as_id;
-> >  };
-> >  
-> >  static inline unsigned long kvm_dirty_bitmap_bytes(struct kvm_memory_slot *memslot)
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 74bdb7bf3295..ebdd98a30e82 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1243,6 +1243,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> >  	if (!mem->memory_size)
-> >  		return kvm_delete_memslot(kvm, mem, &old, as_id);
+On Thu, Jul 02, 2020 at 05:05:57PM -0700, Sean Christopherson wrote:
+> >  	/* Set up identity-mapping pagetable for EPT in real mode */
+> >  	for (i = 0; i < PT32_ENT_PER_PAGE; i++) {
+> >  		tmp = (i << 22) + (_PAGE_PRESENT | _PAGE_RW | _PAGE_USER |
+> >  			_PAGE_ACCESSED | _PAGE_DIRTY | _PAGE_PSE);
+> > -		r = kvm_write_guest_page(kvm, identity_map_pfn,
+> > -				&tmp, i * sizeof(tmp), sizeof(tmp));
+> > -		if (r < 0)
+> > +		r = __copy_to_user(uaddr + i * sizeof(tmp), &tmp, sizeof(tmp));
+> > +		if (r) {
+> > +			r = -EFAULT;
 > 
-> This technically needs to set as_id in the deleted memslot.  I highly doubt
-> it will ever matter from a functionality perspective, but it'd be confusing
-> to encounter a memslot whose as_id did not match that of its owner.
+> Another case where capturing the result is unnecessary.  I don't have a
+> preference as to whether the result of __copy_{to,from}_user() is returned
+> directly or morphed to -EFAULT, but we should be consistent, especially
+> within a single patch.
 
-Yeah it shouldn't matter because as_id is directly passed in to look up the
-pointer of kvm_memslots in kvm_delete_memslot, and memslot->as_id shouldn't be
-further referenced.
+OK, I'll clean all these __copy_to_user() callers in the next version.
 
-I can add a comment above if this can clarify things a bit:
+> 
+> >  			goto out;
+> > +		}
+> >  	}
+> >  	kvm_vmx->ept_identity_pagetable_done = true;
+> >  
+> > @@ -3532,19 +3525,22 @@ static void seg_setup(int seg)
+> >  static int alloc_apic_access_page(struct kvm *kvm)
+> >  {
+> >  	struct page *page;
+> > -	int r = 0;
+> > +	void __user *r;
+> > +	int ret = 0;
+> >  
+> >  	mutex_lock(&kvm->slots_lock);
+> >  	if (kvm->arch.apic_access_page_done)
+> >  		goto out;
+> >  	r = __x86_set_memory_region(kvm, APIC_ACCESS_PAGE_PRIVATE_MEMSLOT,
+> >  				    APIC_DEFAULT_PHYS_BASE, PAGE_SIZE);
+> 
+> Naming the new 'void __user *hva' would yield a smaller differ and would
+> probably help readers in the future.
 
-+	u16 as_id; /* cache of as_id; only valid if npages != 0 */
+OK.
 
-Thanks,
+> >  	} else {
+> > -		if (!slot || !slot->npages)
+> > -			return 0;
+> > -
+> >  		/*
+> >  		 * Stuff a non-canonical value to catch use-after-delete.  This
+> >  		 * ends up being 0 on 32-bit KVM, but there's no better
+> >  		 * alternative.
+> >  		 */
+> >  		hva = (unsigned long)(0xdeadull << 48);
+> > +
+> > +		if (!slot || !slot->npages)
+> > +			return (void __user *)hva;
+> 
+> My clever shenanigans got discarded, so this weirdness happily is gone. 
+
+I'll see what I get when I rebase.  This series is easy to encounter conflicts
+during previous rebases for misterious reasons.  I guess I'll just repost less
+frequently so I suffer less from rebase too. :)
+
+Thanks.
 
 -- 
 Peter Xu
