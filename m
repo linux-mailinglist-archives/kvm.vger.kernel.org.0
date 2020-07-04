@@ -2,143 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB50B2146D0
-	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 17:11:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30C5F2146FC
+	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 17:43:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726926AbgGDPL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jul 2020 11:11:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44936 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726501AbgGDPLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jul 2020 11:11:25 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1D4C061794;
-        Sat,  4 Jul 2020 08:11:25 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id b25so4469804qto.2;
-        Sat, 04 Jul 2020 08:11:25 -0700 (PDT)
+        id S1726927AbgGDPn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jul 2020 11:43:28 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:64804 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726405AbgGDPn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jul 2020 11:43:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OOkooQcgZT8G2WjNcK+Cq5ASRRPbRLgNwU0mUCZTWZI=;
-        b=SSCGTrxShtNJIdkHMwubUtEAPLob65gZ9Nz5GIsi4JTIzZCXrLS/99iaMWNLeILZZh
-         dUCTc3VZFmhBFFLd6jSGUcZoz4xga8nOBy81G/6qLO+eDQFVHxsn45Hc+A2nfJbxQLQ3
-         F/yWQeimUTBDQsKwVTH3jhKYtwL7xOf7lN40MjPuRNoNjMdHcoy12/g+hDD3lKHj4+yW
-         4w2ihNFDM1x8cwKAZcSDup2S5B+BdcBesMzzm3szOfZD3uGB51X/o6qFL+ZwB749hzBe
-         DWEjqvR/fDIzJeaw5zs0M8WY8K+4iXiLIzARk5Sn76TMP5jOkhrKt6AE/QYT8GXmRlM/
-         0w3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=OOkooQcgZT8G2WjNcK+Cq5ASRRPbRLgNwU0mUCZTWZI=;
-        b=DU1IyXEHq0szioK2dOKcmbWf9AF5ZtFC3bhzKAX86tsYbgYYV1t8/cHEwWR7k7bKM/
-         izEMEhIL8cz8ZtYJ587zrB60/4GP8381hCNeaH/5Z9/RicPH5yLCt4qhZGhHn/q+SAPQ
-         vviKlsF89ahLwPNfnsh87KItPl2ETyOHQhKZ/BF0h9Ephw+UwvTUcPQxV6+hrO7gNqg3
-         DgkDjqb0hhzsI04nhzdMN5NhhcY92aXkGhMT3Xe64pYUeOm+jhjKXqf2kk5OGyz00uxi
-         t7F+PT04KkAbZ5QOPl8KYuMLm13JXFDBYfST7s5YC0A3/0DB5/ufJPoRpJOW9EZmASNU
-         EPfg==
-X-Gm-Message-State: AOAM531DqdCNzkRkpwUCOaM5WVElITjacx9x7ADqNKgj6gh4bRdCQKjW
-        xaNoe20oHlDywdqQmuZGAqc=
-X-Google-Smtp-Source: ABdhPJyYWEY9xvrLxysif9VMRbbPNXdpPaaf7cVFq/ebirldMeLAaEYpHqI6t21b12ayi2VmWj4t2Q==
-X-Received: by 2002:aed:2492:: with SMTP id t18mr42182035qtc.353.1593875484322;
-        Sat, 04 Jul 2020 08:11:24 -0700 (PDT)
-Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
-        by smtp.gmail.com with ESMTPSA id z68sm13598056qke.113.2020.07.04.08.11.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jul 2020 08:11:23 -0700 (PDT)
-From:   Arvind Sankar <nivedita@alum.mit.edu>
-X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
-Date:   Sat, 4 Jul 2020 11:11:21 -0400
-To:     "Andersen, John" <john.s.andersen@intel.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Shuah Khan <shuah@kernel.org>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, mchehab+huawei@kernel.org,
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1593877406; x=1625413406;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=n2dWr7gm9H7OUjK09qHgnMN5WT5OD5pPnkAXz3ZiBaU=;
+  b=F7Nif+jJpIu2w9MLX2MUED8FBjJIE8/GW+08OVuaZbdfonbe/FpoeUSD
+   Qw5JTxyTGHDHKDDnUxgkBLsHVveGiFInDnUabJ2B4goVz0uyoOCx8Ax9Z
+   YOJ8R4wTTISx8fPSULGAv14O6K7CncxlWYKwb8gvLKooSywUJSoN/QR7z
+   0=;
+IronPort-SDR: vvTuIuFDl5r/cTkYtiJkATQ043ltuAmqvaxQkIS5WF0gcyHyfoNEaC2byrcD5n/2sprJDIe8LV
+ 3qkcRDh0zYVw==
+X-IronPort-AV: E=Sophos;i="5.75,312,1589241600"; 
+   d="scan'208";a="57284908"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-9ec21598.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 04 Jul 2020 15:43:21 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-9ec21598.us-east-1.amazon.com (Postfix) with ESMTPS id 956CBA205F;
+        Sat,  4 Jul 2020 15:43:18 +0000 (UTC)
+Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sat, 4 Jul 2020 15:43:17 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.140) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sat, 4 Jul 2020 15:43:09 +0000
+Subject: Re: [PATCH v4 06/18] nitro_enclaves: Handle out-of-band PCI device
+ events
+To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Bjoern Doebel" <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
         Greg KH <gregkh@linuxfoundation.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        pawan.kumar.gupta@linux.intel.com, Juergen Gross <jgross@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Fenghua Yu <fenghua.yu@intel.com>, reinette.chatre@intel.com,
-        vineela.tummalapalli@intel.com,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        caoj.fnst@cn.fujitsu.com, Baoquan He <bhe@redhat.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Kees Cook <keescook@chromium.org>,
-        Geremy Condra <geremy.condra@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>, eric.auger@redhat.com,
-        aaronlewis@google.com, Peter Xu <peterx@redhat.com>,
-        makarandsonare@google.com,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>
-Subject: Re: [PATCH 4/4] X86: Use KVM CR pin MSRs
-Message-ID: <20200704151121.GA1611291@rani.riverdale.lan>
-References: <20200617190757.27081-1-john.s.andersen@intel.com>
- <20200617190757.27081-5-john.s.andersen@intel.com>
- <CALCETrXwzQDDd1rfBW+ptmijEjc2cMqfWGvJu-qqrqia5Ls=Uw@mail.gmail.com>
- <20200623200334.GA23@6540770db1d7>
- <20200703214814.GA25@0e1a9e0069b7>
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        "Stefano Garzarella" <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-7-andraprs@amazon.com>
+ <82768612-0d23-55a9-dedf-58ade57b37af@amazon.de>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <96667e27-3379-4817-843f-988af9db4366@amazon.com>
+Date:   Sat, 4 Jul 2020 18:43:04 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200703214814.GA25@0e1a9e0069b7>
+In-Reply-To: <82768612-0d23-55a9-dedf-58ade57b37af@amazon.de>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.140]
+X-ClientProxiedBy: EX13D08UWB002.ant.amazon.com (10.43.161.168) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 03, 2020 at 09:48:14PM +0000, Andersen, John wrote:
-> > > Is there a plan for fixing this for real?  I'm wondering if there is a
-> > > sane weakening of this feature that still allows things like kexec.
-> > > 
-> > 
-> > I'm pretty sure kexec can be fixed. I had it working at one point, I'm
-> > currently in the process of revalidating this. The issue was though that
-> > kexec only worked within the guest, not on the physical host, which I suspect
-> > is related to the need for supervisor pages to be mapped, which seems to be
-> > required before enabling SMAP (based on what I'd seen with the selftests and
-> > unittests). I was also just blindly turning on the bits without checking for
-> > support when I'd tried this, so that could have been the issue too.
-> > 
-> > I think most of the changes for just blindly enabling the bits were in
-> > relocate_kernel, secondary_startup_64, and startup_32.
-> > 
-> 
-> So I have a naive fix for kexec which has only been tested to work under KVM.
-> When tested on a physical host, it did not boot when SMAP or UMIP were set.
-> Undoubtedly it's not the correct way to do this, as it skips CPU feature
-> identification, opting instead for blindly setting the bits. The physical host
-> I tested this on does not have UMIP so that's likely why it failed to boot when
-> UMIP gets set blindly. Within kvm-unit-tests, the test for SMAP maps memory as
-> supervisor pages before enabling SMAP. I suspect this is why setting SMAP
-> blindly causes the physical host not to boot.
-> 
-> Within trampoline_32bit_src() if I add more instructions I get an error
-> about "attempt to move .org backwards", which as I understand it means
-> there are only so many instructions allowed in each of those functions.
-> 
-> My suspicion is that someone with more knowledge of this area has a good
-> idea on how best to handle this. Feedback would be much appreciated.
 
-You can simply increase the value of TRAMPOLINE_32BIT_CODE_SIZE in
-pgtable.h, assuming you don't need a very large increase. There's one
-page available for code + stack at present.
+
+On 02/07/2020 18:24, Alexander Graf wrote:
+>
+>
+> On 22.06.20 22:03, Andra Paraschiv wrote:
+>> In addition to the replies sent by the Nitro Enclaves PCI device in
+>> response to command requests, out-of-band enclave events can happen e.g.
+>> an enclave crashes. In this case, the Nitro Enclaves driver needs to be
+>> aware of the event and notify the corresponding user space process that
+>> abstracts the enclave.
+>>
+>> Register an MSI-X interrupt vector to be used for this kind of
+>> out-of-band events. The interrupt notifies that the state of an enclave
+>> changed and the driver logic scans the state of each running enclave to
+>> identify for which this notification is intended.
+>>
+>> Create an workqueue to handle the out-of-band events. Notify user space
+>> enclave process that is using a polling mechanism on the enclave fd.
+>>
+>> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
+>> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+>> ---
+>> Changelog
+>>
+>> v3 -> v4
+>>
+>> * Use dev_err instead of custom NE log pattern.
+>> * Return IRQ_NONE when interrupts are not handled.
+>>
+>> v2 -> v3
+>>
+>> * Remove the WARN_ON calls.
+>> * Update static calls sanity checks.
+>> * Remove "ratelimited" from the logs that are not in the ioctl call
+>> =A0=A0 paths.
+>>
+>> v1 -> v2
+>>
+>> * Add log pattern for NE.
+>> * Update goto labels to match their purpose.
+>> ---
+>> =A0 drivers/virt/nitro_enclaves/ne_pci_dev.c | 122 +++++++++++++++++++++=
+++
+>> =A0 1 file changed, 122 insertions(+)
+>>
+>> diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c =
+
+>> b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> index c24230cfe7c0..9a137862cade 100644
+>> --- a/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> @@ -239,6 +239,93 @@ static irqreturn_t ne_reply_handler(int irq, =
+
+>> void *args)
+>> =A0=A0=A0=A0=A0 return IRQ_HANDLED;
+>> =A0 }
+>> =A0 +/**
+>> + * ne_event_work_handler - Work queue handler for notifying enclaves on
+>> + * a state change received by the event interrupt handler.
+>> + *
+>> + * An out-of-band event is being issued by the Nitro Hypervisor when =
+
+>> at least
+>> + * one enclave is changing state without client interaction.
+>> + *
+>> + * @work: item containing the Nitro Enclaves PCI device for which a
+>> + *=A0=A0=A0=A0=A0 out-of-band event was issued.
+>> + */
+>> +static void ne_event_work_handler(struct work_struct *work)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev_cmd_reply cmd_reply =3D {};
+>> +=A0=A0=A0 struct ne_enclave *ne_enclave =3D NULL;
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D
+>> +=A0=A0=A0=A0=A0=A0=A0 container_of(work, struct ne_pci_dev, notify_work=
+);
+>> +=A0=A0=A0 int rc =3D -EINVAL;
+>> +=A0=A0=A0 struct slot_info_req slot_info_req =3D {};
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev)
+>> +=A0=A0=A0=A0=A0=A0=A0 return;
+>
+> How?
+
+Removed this check and the one below. Thank you.
+
+Andra
+
+>
+>> +
+>> +=A0=A0=A0 mutex_lock(&ne_pci_dev->enclaves_list_mutex);
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * Iterate over all enclaves registered for the Nitro Encla=
+ves
+>> +=A0=A0=A0=A0 * PCI device and determine for which enclave(s) the out-of=
+-band =
+
+>> event
+>> +=A0=A0=A0=A0 * is corresponding to.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 list_for_each_entry(ne_enclave, &ne_pci_dev->enclaves_list,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 enclave_list_entry) {
+>> +=A0=A0=A0=A0=A0=A0=A0 mutex_lock(&ne_enclave->enclave_info_mutex);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 /*
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 * Enclaves that were never started cannot rece=
+ive out-of-band
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 * events.
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 */
+>> +=A0=A0=A0=A0=A0=A0=A0 if (ne_enclave->state !=3D NE_STATE_RUNNING)
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto unlock;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 slot_info_req.slot_uid =3D ne_enclave->slot_uid;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 rc =3D ne_do_request(ne_enclave->pdev, SLOT_INFO,=
+ &slot_info_req,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(slot_info=
+_req), &cmd_reply,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(cmd_reply=
+));
+>> +=A0=A0=A0=A0=A0=A0=A0 if (rc < 0)
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_err(&ne_enclave->pdev->dev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in slot info [rc=
+=3D%d]\n", rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 /* Notify enclave process that the enclave state =
+changed. */
+>> +=A0=A0=A0=A0=A0=A0=A0 if (ne_enclave->state !=3D cmd_reply.state) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_enclave->state =3D cmd_reply.state;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_enclave->has_event =3D true;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 wake_up_interruptible(&ne_enclave->ev=
+entq);
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +unlock:
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 mutex_unlock(&ne_enclave->enclave_info_mutex);
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
+>> +}
+>> +
+>> +/**
+>> + * ne_event_handler - Interrupt handler for PCI device out-of-band
+>> + * events. This interrupt does not supply any data in the MMIO region.
+>> + * It notifies a change in the state of any of the launched enclaves.
+>> + *
+>> + * @irq: received interrupt for an out-of-band event.
+>> + * @args: PCI device private data structure.
+>> + *
+>> + * @returns: IRQ_HANDLED on handled interrupt, IRQ_NONE otherwise.
+>> + */
+>> +static irqreturn_t ne_event_handler(int irq, void *args)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D (struct ne_pci_dev *)args;
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev)
+>> +=A0=A0=A0=A0=A0=A0=A0 return IRQ_NONE;
+>
+> How can this happen?
+>
+>
+> Alex
+>
+>> +
+>> +=A0=A0=A0 queue_work(ne_pci_dev->event_wq, &ne_pci_dev->notify_work);
+>> +
+>> +=A0=A0=A0 return IRQ_HANDLED;
+>> +}
+>> +
+>> =A0 /**
+>> =A0=A0 * ne_setup_msix - Setup MSI-X vectors for the PCI device.
+>> =A0=A0 *
+>> @@ -284,8 +371,37 @@ static int ne_setup_msix(struct pci_dev *pdev)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 goto free_irq_vectors;
+>> =A0=A0=A0=A0=A0 }
+>> =A0 +=A0=A0=A0 ne_pci_dev->event_wq =3D =
+
+>> create_singlethread_workqueue("ne_pci_dev_wq");
+>> +=A0=A0=A0 if (!ne_pci_dev->event_wq) {
+>> +=A0=A0=A0=A0=A0=A0=A0 rc =3D -ENOMEM;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Cannot get wq for dev events=
+ [rc=3D%d]\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto free_reply_irq_vec;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 INIT_WORK(&ne_pci_dev->notify_work, ne_event_work_handler);
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * This IRQ gets triggered every time any enclave's state =
+
+>> changes. Its
+>> +=A0=A0=A0=A0 * handler then scans for the changes and propagates them t=
+o the =
+
+>> user
+>> +=A0=A0=A0=A0 * space.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 rc =3D request_irq(pci_irq_vector(pdev, NE_VEC_EVENT),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_event_handler, 0, "enclave_evt"=
+, ne_pci_dev);
+>> +=A0=A0=A0 if (rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in request irq event [=
+rc=3D%d]\n", =
+
+>> rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto destroy_wq;
+>> +=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0=A0 return 0;
+>> =A0 +destroy_wq:
+>> +=A0=A0=A0 destroy_workqueue(ne_pci_dev->event_wq);
+>> +free_reply_irq_vec:
+>> +=A0=A0=A0 free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
+>> =A0 free_irq_vectors:
+>> =A0=A0=A0=A0=A0 pci_free_irq_vectors(pdev);
+>> =A0 @@ -304,6 +420,12 @@ static void ne_teardown_msix(struct pci_dev =
+
+>> *pdev)
+>> =A0=A0=A0=A0=A0 if (!ne_pci_dev)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return;
+>> =A0 +=A0=A0=A0 free_irq(pci_irq_vector(pdev, NE_VEC_EVENT), ne_pci_dev);
+>> +
+>> +=A0=A0=A0 flush_work(&ne_pci_dev->notify_work);
+>> +=A0=A0=A0 flush_workqueue(ne_pci_dev->event_wq);
+>> +=A0=A0=A0 destroy_workqueue(ne_pci_dev->event_wq);
+>> +
+>> =A0=A0=A0=A0=A0 free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
+>> =A0 =A0=A0=A0=A0=A0 pci_free_irq_vectors(pdev);
+>>
+
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
+
