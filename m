@@ -2,304 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 49B8B2144BA
-	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 12:00:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8290214509
+	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 13:22:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726869AbgGDKA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jul 2020 06:00:28 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:61441 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726253AbgGDKA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jul 2020 06:00:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1593856827; x=1625392827;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=lj8o6qIN9a5pDYqi9LY2WR3SoxcoKhnmVOZo6/K7oAk=;
-  b=QZyIOirxWJ3JnirVwHa8HeI9bglCw6m1rxbCJMV56NgOleVGW5gqJr96
-   IOpJMY+FUqewSqcwUKSReN8iMQMB2lGgYbxS1PSi22he4mrUWY2LpKehq
-   eX3sWIWMyvUN9fil5p3k2/jibT7/nHs8Fx5J4qsKPOFsCSMP5lwHlF1g5
-   s=;
-IronPort-SDR: yZO/v/8BUrG7uTbSiMhU3mB+iCTkCteBPb7wBaiHZWcdyUtmoRzQkD/oYVm3WGcuO502Ntn6el
- XR1KK6BWDKXw==
-X-IronPort-AV: E=Sophos;i="5.75,311,1589241600"; 
-   d="scan'208";a="55995232"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 04 Jul 2020 10:00:26 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id E5327A20C4;
-        Sat,  4 Jul 2020 10:00:25 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Sat, 4 Jul 2020 10:00:25 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.214) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Sat, 4 Jul 2020 10:00:16 +0000
-Subject: Re: [PATCH v4 04/18] nitro_enclaves: Init PCI device driver
-To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Bjoern Doebel" <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-5-andraprs@amazon.com>
- <d8fe8668-15c3-fe3b-1ad1-eb939a4977c2@amazon.de>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <9b9f0ab6-8413-abdf-0829-7b4563593e86@amazon.com>
-Date:   Sat, 4 Jul 2020 13:00:10 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <d8fe8668-15c3-fe3b-1ad1-eb939a4977c2@amazon.de>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.214]
-X-ClientProxiedBy: EX13D25UWB004.ant.amazon.com (10.43.161.180) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+        id S1727075AbgGDLT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jul 2020 07:19:57 -0400
+Received: from mga11.intel.com ([192.55.52.93]:48334 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726621AbgGDLT4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jul 2020 07:19:56 -0400
+IronPort-SDR: WxoLjHF5XPuwWkfzbVlpJ6yQHAPs873IQIkCNCGMgiObjen247qX9tnbRVcL3/TDUd+2mth5Jt
+ eaZjonxVSYDw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9671"; a="145371333"
+X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; 
+   d="scan'208";a="145371333"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2020 04:19:52 -0700
+IronPort-SDR: At/bGCAiDX2YRW4GGkNp90+9At/50BzCeV0tPz6cQPJ7F0KDWfi25LNus9i8rnosytCZJKN6HO
+ AoQ1mIUSOiCQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; 
+   d="scan'208";a="282521405"
+Received: from jacob-builder.jf.intel.com ([10.7.199.155])
+  by orsmga006.jf.intel.com with ESMTP; 04 Jul 2020 04:19:52 -0700
+From:   Liu Yi L <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, eric.auger@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
+        yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
+        hao.wu@intel.com, stefanha@gmail.com,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v4 00/15] vfio: expose virtual Shared Virtual Addressing to VMs
+Date:   Sat,  4 Jul 2020 04:26:14 -0700
+Message-Id: <1593861989-35920-1-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
+
+This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes. For IOMMU and QEMU changes, they are in separate series (listed
+in the "Related series").
+
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
 
 
-On 02/07/2020 18:09, Alexander Graf wrote:
->
->
-> On 22.06.20 22:03, Andra Paraschiv wrote:
->> The Nitro Enclaves PCI device is used by the kernel driver as a means of
->> communication with the hypervisor on the host where the primary VM and
->> the enclaves run. It handles requests with regard to enclave lifetime.
->>
->> Setup the PCI device driver and add support for MSI-X interrupts.
->>
->> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
->> Signed-off-by: Alexandru Ciobotaru <alcioa@amazon.com>
->> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
->> ---
->> Changelog
->>
->> v3 -> v4
->>
->> * Use dev_err instead of custom NE log pattern.
->> * Update NE PCI driver name to "nitro_enclaves".
->>
->> v2 -> v3
->>
->> * Remove the GPL additional wording as SPDX-License-Identifier is
->> =A0=A0 already in place.
->> * Remove the WARN_ON calls.
->> * Remove linux/bug include that is not needed.
->> * Update static calls sanity checks.
->> * Remove "ratelimited" from the logs that are not in the ioctl call
->> =A0=A0 paths.
->> * Update kzfree() calls to kfree().
->>
->> v1 -> v2
->>
->> * Add log pattern for NE.
->> * Update PCI device setup functions to receive PCI device data =
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
 
->> structure and
->> =A0=A0 then get private data from it inside the functions logic.
->> * Remove the BUG_ON calls.
->> * Add teardown function for MSI-X setup.
->> * Update goto labels to match their purpose.
->> * Implement TODO for NE PCI device disable state check.
->> * Update function name for NE PCI device probe / remove.
->> ---
->> =A0 drivers/virt/nitro_enclaves/ne_pci_dev.c | 261 +++++++++++++++++++++=
-++
->> =A0 1 file changed, 261 insertions(+)
->> =A0 create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.c
->>
->> diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c =
+Patch Overview:
+ 1. a refactor to vfio_iommu_type1 ioctl (patch 0001)
+ 2. reports IOMMU nesting info to userspace ( patch 0002, 0003 and 0014)
+ 3. vfio support for PASID allocation and free for VMs (patch 0004, 0005, 0006)
+ 4. vfio support for binding guest page table to host (patch 0007, 0008, 0009)
+ 5. vfio support for IOMMU cache invalidation from VMs (patch 0010)
+ 6. vfio support for vSVA usage on IOMMU-backed mdevs (patch 0011)
+ 7. expose PASID capability to VM (patch 0012)
+ 8. add doc for VFIO dual stage control (patch 0013)
 
->> b/drivers/virt/nitro_enclaves/ne_pci_dev.c
->> new file mode 100644
->> index 000000000000..235fa3ecbee2
->> --- /dev/null
->> +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
->> @@ -0,0 +1,261 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights =
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
 
->> Reserved.
->> + */
->> +
->> +/* Nitro Enclaves (NE) PCI device driver. */
->> +
->> +#include <linux/delay.h>
->> +#include <linux/device.h>
->> +#include <linux/list.h>
->> +#include <linux/mutex.h>
->> +#include <linux/module.h>
->> +#include <linux/nitro_enclaves.h>
->> +#include <linux/pci.h>
->> +#include <linux/types.h>
->> +#include <linux/wait.h>
->> +
->> +#include "ne_misc_dev.h"
->> +#include "ne_pci_dev.h"
->> +
->> +#define NE_DEFAULT_TIMEOUT_MSECS (120000) /* 120 sec */
->> +
->> +static const struct pci_device_id ne_pci_ids[] =3D {
->> +=A0=A0=A0 { PCI_DEVICE(PCI_VENDOR_ID_AMAZON, PCI_DEVICE_ID_NE) },
->> +=A0=A0=A0 { 0, }
->> +};
->> +
->> +MODULE_DEVICE_TABLE(pci, ne_pci_ids);
->> +
->> +/**
->> + * ne_setup_msix - Setup MSI-X vectors for the PCI device.
->> + *
->> + * @pdev: PCI device to setup the MSI-X for.
->> + *
->> + * @returns: 0 on success, negative return value on failure.
->> + */
->> +static int ne_setup_msix(struct pci_dev *pdev)
->> +{
->> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
->> +=A0=A0=A0 int nr_vecs =3D 0;
->> +=A0=A0=A0 int rc =3D -EINVAL;
->> +
->> +=A0=A0=A0 if (!ne_pci_dev)
->> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->> +
->> +=A0=A0=A0 nr_vecs =3D pci_msix_vec_count(pdev);
->> +=A0=A0=A0 if (nr_vecs < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 rc =3D nr_vecs;
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in getting vec count [=
-rc=3D%d]\n", =
+This patchset is aiming for the phase 1 and phase 2, and based on Jacob's
+below series.
+*) [PATCH v3 0/5] IOMMU user API enhancement - wip
+   https://lore.kernel.org/linux-iommu/1592931837-58223-1-git-send-email-jacob.jun.pan@linux.intel.com/
 
->> rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return rc;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 rc =3D pci_alloc_irq_vectors(pdev, nr_vecs, nr_vecs, PCI_IRQ_=
-MSIX);
->> +=A0=A0=A0 if (rc < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in alloc MSI-X vecs [r=
-c=3D%d]\n", rc);
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return rc;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 return 0;
->> +}
->> +
->> +/**
->> + * ne_teardown_msix - Teardown MSI-X vectors for the PCI device.
->> + *
->> + * @pdev: PCI device to teardown the MSI-X for.
->> + */
->> +static void ne_teardown_msix(struct pci_dev *pdev)
->> +{
->> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
->> +
->> +=A0=A0=A0 if (!ne_pci_dev)
->> +=A0=A0=A0=A0=A0=A0=A0 return;
->> +
->> +=A0=A0=A0 pci_free_irq_vectors(pdev);
->> +}
->> +
->> +/**
->> + * ne_pci_dev_enable - Select PCI device version and enable it.
->> + *
->> + * @pdev: PCI device to select version for and then enable.
->> + *
->> + * @returns: 0 on success, negative return value on failure.
->> + */
->> +static int ne_pci_dev_enable(struct pci_dev *pdev)
->> +{
->> +=A0=A0=A0 u8 dev_enable_reply =3D 0;
->> +=A0=A0=A0 u16 dev_version_reply =3D 0;
->> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
->> +
->> +=A0=A0=A0 if (!ne_pci_dev || !ne_pci_dev->iomem_base)
->> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
->
-> How can this ever happen?
+*) [PATCH 00/10] IOASID extensions for guest SVA - wip
+   https://lkml.org/lkml/2020/3/25/874
 
-This check and the following one are part of that checks added before =
+The latest IOASID code added below new interface for itertate all PASIDs of an
+ioasid_set. The implementation is not sent out yet as Jacob needs some cleanup,
+it can be found in branch vsva-linux-5.8-rc3-v4 on github (mentioned below):
+ int ioasid_set_for_each_ioasid(int sid, void (*fn)(ioasid_t id, void *data), void *data);
 
-for the situations that shouldn't happen, only if buggy system or broken =
+Complete set for current vSVA can be found in below branch.
+https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.8-rc3-v4
 
-logic at all. Removed the checks.
-
-Thanks,
-Andra
-
->
->> +
->> +=A0=A0=A0 iowrite16(NE_VERSION_MAX, ne_pci_dev->iomem_base + NE_VERSION=
-);
->> +
->> +=A0=A0=A0 dev_version_reply =3D ioread16(ne_pci_dev->iomem_base + NE_VE=
-RSION);
->> +=A0=A0=A0 if (dev_version_reply !=3D NE_VERSION_MAX) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in pci dev version cmd=
-\n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 iowrite8(NE_ENABLE_ON, ne_pci_dev->iomem_base + NE_ENABLE);
->> +
->> +=A0=A0=A0 dev_enable_reply =3D ioread8(ne_pci_dev->iomem_base + NE_ENAB=
-LE);
->> +=A0=A0=A0 if (dev_enable_reply !=3D NE_ENABLE_ON) {
->> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in pci dev enable cmd\=
-n");
->> +
->> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
->> +=A0=A0=A0 }
->> +
->> +=A0=A0=A0 return 0;
->> +}
->> +
->> +/**
->> + * ne_pci_dev_disable - Disable PCI device.
->> + *
->> + * @pdev: PCI device to disable.
->> + */
->> +static void ne_pci_dev_disable(struct pci_dev *pdev)
->> +{
->> +=A0=A0=A0 u8 dev_disable_reply =3D 0;
->> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
->> +=A0=A0=A0 const unsigned int sleep_time =3D 10; /* 10 ms */
->> +=A0=A0=A0 unsigned int sleep_time_count =3D 0;
->> +
->> +=A0=A0=A0 if (!ne_pci_dev || !ne_pci_dev->iomem_base)
->> +=A0=A0=A0=A0=A0=A0=A0 return;
->
-> How can this ever happen?
->
->
-> Alex
+The corresponding QEMU patch series is included in below branch:
+https://github.com/luxis1999/qemu.git: vsva_5.8_rc3_qemu_rfcv7
 
 
+Regards,
+Yi Liu
 
+Changelog:
+	- Patch v3 -> Patch v4:
+	  a) Address comments against v3
+	  b) Add rb from Stefan on patch 14/15
+	  Patch v3: https://lore.kernel.org/linux-iommu/1592988927-48009-1-git-send-email-yi.l.liu@intel.com/
 
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
+	- Patch v2 -> Patch v3:
+	  a) Rebase on top of Jacob's v3 iommu uapi patchset
+	  b) Address comments from Kevin and Stefan Hajnoczi
+	  c) Reuse DOMAIN_ATTR_NESTING to get iommu nesting info
+	  d) Drop [PATCH v2 07/15] iommu/uapi: Add iommu_gpasid_unbind_data
+	  Patch v2: https://lore.kernel.org/linux-iommu/1591877734-66527-1-git-send-email-yi.l.liu@intel.com/#r
+
+	- Patch v1 -> Patch v2:
+	  a) Refactor vfio_iommu_type1_ioctl() per suggestion from Christoph
+	     Hellwig.
+	  b) Re-sequence the patch series for better bisect support.
+	  c) Report IOMMU nesting cap info in detail instead of a format in
+	     v1.
+	  d) Enforce one group per nesting type container for vfio iommu type1
+	     driver.
+	  e) Build the vfio_mm related code from vfio.c to be a separate
+	     vfio_pasid.ko.
+	  f) Add PASID ownership check in IOMMU driver.
+	  g) Adopted to latest IOMMU UAPI design. Removed IOMMU UAPI version
+	     check. Added iommu_gpasid_unbind_data for unbind requests from
+	     userspace.
+	  h) Define a single ioctl:VFIO_IOMMU_NESTING_OP for bind/unbind_gtbl
+	     and cahce_invld.
+	  i) Document dual stage control in vfio.rst.
+	  Patch v1: https://lore.kernel.org/linux-iommu/1584880325-10561-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v3 -> Patch v1:
+	  a) Address comments to the PASID request(alloc/free) path
+	  b) Report PASID alloc/free availabitiy to user-space
+	  c) Add a vfio_iommu_type1 parameter to support pasid quota tuning
+	  d) Adjusted to latest ioasid code implementation. e.g. remove the
+	     code for tracking the allocated PASIDs as latest ioasid code
+	     will track it, VFIO could use ioasid_free_set() to free all
+	     PASIDs.
+	  RFC v3: https://lore.kernel.org/linux-iommu/1580299912-86084-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v2 -> v3:
+	  a) Refine the whole patchset to fit the roughly parts in this series
+	  b) Adds complete vfio PASID management framework. e.g. pasid alloc,
+	  free, reclaim in VM crash/down and per-VM PASID quota to prevent
+	  PASID abuse.
+	  c) Adds IOMMU uAPI version check and page table format check to ensure
+	  version compatibility and hardware compatibility.
+	  d) Adds vSVA vfio support for IOMMU-backed mdevs.
+	  RFC v2: https://lore.kernel.org/linux-iommu/1571919983-3231-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v1 -> v2:
+	  Dropped vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE.
+	  RFC v1: https://lore.kernel.org/linux-iommu/1562324772-3084-1-git-send-email-yi.l.liu@intel.com/
+
+---
+Eric Auger (1):
+  vfio: Document dual stage control
+
+Liu Yi L (13):
+  vfio/type1: Refactor vfio_iommu_type1_ioctl()
+  iommu: Report domain nesting info
+  iommu/smmu: Report empty domain nesting info
+  vfio/type1: Report iommu nesting info to userspace
+  vfio: Add PASID allocation/free support
+  iommu/vt-d: Support setting ioasid set to domain
+  vfio/type1: Add VFIO_IOMMU_PASID_REQUEST (alloc/free)
+  iommu/vt-d: Check ownership for PASIDs from user-space
+  vfio/type1: Support binding guest page tables to PASID
+  vfio/type1: Allow invalidating first-level/stage IOMMU cache
+  vfio/type1: Add vSVA support for IOMMU-backed mdevs
+  vfio/pci: Expose PCIe PASID capability to guest
+  iommu/vt-d: Support reporting nesting capability info
+
+Yi Sun (1):
+  iommu: Pass domain to sva_unbind_gpasid()
+
+ Documentation/driver-api/vfio.rst  |  67 +++
+ drivers/iommu/arm-smmu-v3.c        |  29 +-
+ drivers/iommu/arm-smmu.c           |  29 +-
+ drivers/iommu/intel/iommu.c        | 107 ++++-
+ drivers/iommu/intel/svm.c          |  10 +-
+ drivers/iommu/iommu.c              |   2 +-
+ drivers/vfio/Kconfig               |   6 +
+ drivers/vfio/Makefile              |   1 +
+ drivers/vfio/pci/vfio_pci_config.c |   2 +-
+ drivers/vfio/vfio_iommu_type1.c    | 819 ++++++++++++++++++++++++++++---------
+ drivers/vfio/vfio_pasid.c          | 192 +++++++++
+ include/linux/intel-iommu.h        |  23 +-
+ include/linux/iommu.h              |   4 +-
+ include/linux/vfio.h               |  54 +++
+ include/uapi/linux/iommu.h         |  78 ++++
+ include/uapi/linux/vfio.h          |  85 ++++
+ 16 files changed, 1309 insertions(+), 199 deletions(-)
+ create mode 100644 drivers/vfio/vfio_pasid.c
+
+-- 
+2.7.4
 
