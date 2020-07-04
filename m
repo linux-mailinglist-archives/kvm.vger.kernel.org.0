@@ -2,104 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48772214495
-	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 10:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 617632144A0
+	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 11:17:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727054AbgGDIYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jul 2020 04:24:01 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:32141 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726157AbgGDIYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jul 2020 04:24:01 -0400
+        id S1726304AbgGDJJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jul 2020 05:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45658 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726178AbgGDJJy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jul 2020 05:09:54 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2948AC061794
+        for <kvm@vger.kernel.org>; Sat,  4 Jul 2020 02:09:54 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id f18so36432571wml.3
+        for <kvm@vger.kernel.org>; Sat, 04 Jul 2020 02:09:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1593851040; x=1625387040;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=MGKZRxRlGDCpn2GdZLuWjghVOYAjAXEXtuDigg+AjhM=;
-  b=JkhJzPZuf9Hnm1bQHodCCczRTPDyU00h3jwXOlsBuJTLO4rMhN41Pin/
-   URmksnzscmK6lUy0FOkw+q8qPCbV5JTh3Bq2xRa7HGdncOJYH71/NNa2V
-   DOfcjTg59dzUukl/uRArUU2FRHRGYi0FpAMyjvBb+nO1EkWy9YN+VvINd
-   E=;
-IronPort-SDR: XfhBsKEaKsDwZrAPvxsOomlSENBP+C0tqBkFfqF9sBZyav32ucOe/R3jmVMy0mqmw6pwOhzISc
- Y57D5XSEYYkQ==
-X-IronPort-AV: E=Sophos;i="5.75,311,1589241600"; 
-   d="scan'208";a="39935489"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2c-87a10be6.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 04 Jul 2020 08:23:59 +0000
-Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2c-87a10be6.us-west-2.amazon.com (Postfix) with ESMTPS id BA783A1D35;
-        Sat,  4 Jul 2020 08:23:57 +0000 (UTC)
-Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
- EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Sat, 4 Jul 2020 08:23:57 +0000
-Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.85) by
- EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Sat, 4 Jul 2020 08:23:48 +0000
-Subject: Re: [PATCH v4 03/18] nitro_enclaves: Define enclave info for internal
- bookkeeping
-To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
-CC:     Anthony Liguori <aliguori@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Bjoern Doebel" <doebel@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Frank van der Linden" <fllinden@amazon.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Martin Pohlack <mpohlack@amazon.de>,
-        Matt Wilson <msw@amazon.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Balbir Singh <sblbir@amazon.com>,
-        "Stefano Garzarella" <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stewart Smith <trawets@amazon.com>,
-        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
-        <ne-devel-upstream@amazon.com>
-References: <20200622200329.52996-1-andraprs@amazon.com>
- <20200622200329.52996-4-andraprs@amazon.com>
- <cc84e2ee-1a85-c92e-9d29-2f4a33148a61@amazon.de>
-From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
-Message-ID: <04453234-40ad-4ebc-7273-41880484e1b7@amazon.com>
-Date:   Sat, 4 Jul 2020 11:23:43 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=zmPyzSZ4jwwesHsKEURbETDCROe4ArINyrDqXDoheMY=;
+        b=pBWtb6MnTVeWS/fQMF0cw3ZGqKtUNdGZgv+qJ9orBvpP/kMBd2jQbeauRED2P/H6z2
+         qDyT0d4BqyPADJaYP6OD414h5GpHBKCLdZ12knPaclzG1oGGyd/grJsWYR4pR3irz/ei
+         mQRuSlTz3xDMbkFpkzkMYA9PBrfaxKo3cZYDH0PaBsJ9nfulONMa5mkpYl8WPYOVCMSm
+         NJ1VD1Jn4qVPhH8sRzZycqt3YnFLlLXsxVYlwBMuZDQ4M/eUGlP+tmtmFsMjW9PJIEK7
+         BTa2larGOI+GhSWdib7+HJ72flGwZIqwkIhHPbHHQRJwAx+4oC4pNYLi4WNOPFxJVaGu
+         Yigg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=zmPyzSZ4jwwesHsKEURbETDCROe4ArINyrDqXDoheMY=;
+        b=GV+sQcIuldc/SAEtWySEpDWROZr3c9Gmior8dAkZ7gast06m11rHgxfbn2p8blVGPr
+         MGzMOW8V2jl2ften1ncYZ5y4kKze33aJ5dinGimm1Z6Bh7jbtJONAWnAhzrSD3agjv7k
+         WkgMHBiQXvSTqyojlMkx6DcvpvCPWaYzQIOLo6Y50Wg9Us8etapxwECMJn51QX4YhM0w
+         i8Lm8uR6F59hSIygcoa69lH75l1/mN+8R1StdELTKR0rOG9UFC/GclF7PLGR7dBfCgy7
+         77xAZEHRIgbd/Pyb5w5t18Xj3Du+IxWBAjvgJNtzAlo0Xi9Q3MV5hhCtAo6X/3x0RaTC
+         M1RQ==
+X-Gm-Message-State: AOAM53025F0AoPa+xGbGJsDV+HAzc/lWOEk8sYwFcGTHF6jatCbUUDUS
+        7XEvDXpEIBAUzKT8BeNUjL2kwJGDGQVOpBejOh2/uA==
+X-Google-Smtp-Source: ABdhPJzOvMqSd4xpuJgiCdh+/xyK5ViKRuWcbTg2Kcp6WpcoTUz1rP/uXLPIT3z/w0Hyu+iMBXBFqYj09LgJmRwfvU0=
+X-Received: by 2002:a7b:c84d:: with SMTP id c13mr40205192wml.170.1593853791689;
+ Sat, 04 Jul 2020 02:09:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <cc84e2ee-1a85-c92e-9d29-2f4a33148a61@amazon.de>
-Content-Language: en-US
-X-Originating-IP: [10.43.162.85]
-X-ClientProxiedBy: EX13D27UWA002.ant.amazon.com (10.43.160.30) To
- EX13D16EUB001.ant.amazon.com (10.43.166.28)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+From:   Jidong Xiao <jidong.xiao@gmail.com>
+Date:   Sat, 4 Jul 2020 03:09:41 -0600
+Message-ID: <CAG4AFWZ3zd1LEZa6RHbUYyMsT8vGzOJSmw9G0CK-pnpRLv6Hfw@mail.gmail.com>
+Subject: KVM upcall questions
+To:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi, Paolo and all,
 
+Do KVM support upcalls, which enable the hypervisor to make requests
+to the guest? Or if I want to add one more upcall by myself, which
+part of the KVM code should I examine? I know Xen has implemented
+upcalls, but I can't find any documents about upcalls in KVM.
 
-On 02/07/2020 18:24, Alexander Graf wrote:
->
->
-> On 22.06.20 22:03, Andra Paraschiv wrote:
->> The Nitro Enclaves driver keeps an internal info per each enclave.
->>
->> This is needed to be able to manage enclave resources state, enclave
->> notifications and have a reference of the PCI device that handles
->> command requests for enclave lifetime management.
->>
->> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
->> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
->
-> Reviewed-by: Alexander Graf <graf@amazon.com>
+Thank you!
 
-Added. Thank you.
-
-Andra
-
-
-
-Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
- Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
-omania. Registration number J22/2621/2005.
-
+-Jidong
