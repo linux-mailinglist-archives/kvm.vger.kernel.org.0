@@ -2,120 +2,466 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94DA7214629
-	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 15:37:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A5362146C5
+	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 17:06:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727043AbgGDNhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jul 2020 09:37:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43488 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726643AbgGDNhw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jul 2020 09:37:52 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9539020826;
-        Sat,  4 Jul 2020 13:37:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593869871;
-        bh=pNwXVAMDXVJlIpm6TO8om9y6iGboItUmVHhsv43zIi0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=yreCcty7LGBA5T6a7Ze4NTB5GSHk/LphvReviko9cP/XfSOd/Saz9yjRkY+UPH1aR
-         YsAFhRdDj9CFlAxzgqh66MrC0LaQP1cfB3kNXPwiKZEBKf6NJ2KyTGhON09NOt69MR
-         pc5uSp4PjmGKq/uH6V5nFurdtpwYNvXTKfFSwW38=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.lan)
-        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <maz@kernel.org>)
-        id 1jriMX-008xsK-Tf; Sat, 04 Jul 2020 14:37:50 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     ascull@google.com, Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, amurray@thegoodpenguin.co.uk
-Subject: [PATCH] KVM: arm64: PMU: Fix per-CPU access in preemptible context
-Date:   Sat,  4 Jul 2020 14:37:41 +0100
-Message-Id: <20200704133741.148094-1-maz@kernel.org>
-X-Mailer: git-send-email 2.27.0
+        id S1726924AbgGDPGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jul 2020 11:06:19 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:42854 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726488AbgGDPGT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jul 2020 11:06:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1593875177; x=1625411177;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=R7ccU/N1wUG2cYHnGhImJaNpAoGB23p3cOO7bV/+heQ=;
+  b=vBym4Rs38WlStpXNpQuAlX8RyR6o3jTTrHXrY+7c5A61VQoqez9VPVao
+   icuD9bd3dqT7+4rOqWp/zUAZnNlDw7J/MDVsG2hXtiwQhXI+qukgEhmQf
+   +8XM9qriACqzHV8volGisd5HoCnzmYKvUPT10ETVo+DSdNyqUESa2rPm+
+   k=;
+IronPort-SDR: Q15QUAqYuHangPG8Z8KH/xEzfFuJD3cA/xaMxSWf4rsUVnfK/tVLNSwe6HFajq06E3uo/Zdvii
+ yBZICUraYRoA==
+X-IronPort-AV: E=Sophos;i="5.75,312,1589241600"; 
+   d="scan'208";a="56011891"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 04 Jul 2020 15:06:15 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com (Postfix) with ESMTPS id 4D1EAA2523;
+        Sat,  4 Jul 2020 15:06:14 +0000 (UTC)
+Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sat, 4 Jul 2020 15:06:13 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.160.100) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sat, 4 Jul 2020 15:06:04 +0000
+Subject: Re: [PATCH v4 05/18] nitro_enclaves: Handle PCI device command
+ requests
+To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Bjoern Doebel" <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        "Stefano Garzarella" <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>, kbuild test robot <lkp@intel.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-6-andraprs@amazon.com>
+ <7a0b3e10-8760-db9c-37a3-aadbb7a042de@amazon.de>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <525958ac-c244-612b-daa3-c34f89a0e2c6@amazon.com>
+Date:   Sat, 4 Jul 2020 18:05:58 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, ascull@google.com, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, amurray@thegoodpenguin.co.uk
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <7a0b3e10-8760-db9c-37a3-aadbb7a042de@amazon.de>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.100]
+X-ClientProxiedBy: EX13D38UWC003.ant.amazon.com (10.43.162.23) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 07da1ffaa137 ("KVM: arm64: Remove host_cpu_context
-member from vcpu structure") has, by removing the host CPU
-context pointer, exposed that kvm_vcpu_pmu_restore_guest
-is called in preemptible contexts:
 
-[  266.932442] BUG: using smp_processor_id() in preemptible [00000000] code: qemu-system-aar/779
-[  266.939721] caller is debug_smp_processor_id+0x20/0x30
-[  266.944157] CPU: 2 PID: 779 Comm: qemu-system-aar Tainted: G            E     5.8.0-rc3-00015-g8d4aa58b2fe3 #1374
-[  266.954268] Hardware name: amlogic w400/w400, BIOS 2020.04 05/22/2020
-[  266.960640] Call trace:
-[  266.963064]  dump_backtrace+0x0/0x1e0
-[  266.966679]  show_stack+0x20/0x30
-[  266.969959]  dump_stack+0xe4/0x154
-[  266.973338]  check_preemption_disabled+0xf8/0x108
-[  266.977978]  debug_smp_processor_id+0x20/0x30
-[  266.982307]  kvm_vcpu_pmu_restore_guest+0x2c/0x68
-[  266.986949]  access_pmcr+0xf8/0x128
-[  266.990399]  perform_access+0x8c/0x250
-[  266.994108]  kvm_handle_sys_reg+0x10c/0x2f8
-[  266.998247]  handle_exit+0x78/0x200
-[  267.001697]  kvm_arch_vcpu_ioctl_run+0x2ac/0xab8
 
-Note that the bug was always there, it is only the switch to
-using percpu accessors that made it obvious.
-The fix is to wrap these accesses in a preempt-disabled section,
-so that we sample a coherent context on trap from the guest.
+On 02/07/2020 18:19, Alexander Graf wrote:
+>
+>
+> On 22.06.20 22:03, Andra Paraschiv wrote:
+>> The Nitro Enclaves PCI device exposes a MMIO space that this driver
+>> uses to submit command requests and to receive command replies e.g. for
+>> enclave creation / termination or setting enclave resources.
+>>
+>> Add logic for handling PCI device command requests based on the given
+>> command type.
+>>
+>> Register an MSI-X interrupt vector for command reply notifications to
+>> handle this type of communication events.
+>>
+>> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
+>> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+>>
+>> Fix issue reported in:
+>> https://lore.kernel.org/lkml/202004231644.xTmN4Z1z%25lkp@intel.com/
+>>
+>> Reported-by: kbuild test robot <lkp@intel.com>
+>> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+>> ---
+>> Changelog
+>>
+>> v3 -> v4
+>>
+>> * Use dev_err instead of custom NE log pattern.
+>> * Return IRQ_NONE when interrupts are not handled.
+>>
+>> v2 -> v3
+>>
+>> * Remove the WARN_ON calls.
+>> * Update static calls sanity checks.
+>> * Remove "ratelimited" from the logs that are not in the ioctl call
+>> =A0=A0 paths.
+>>
+>> v1 -> v2
+>>
+>> * Add log pattern for NE.
+>> * Remove the BUG_ON calls.
+>> * Update goto labels to match their purpose.
+>> * Add fix for kbuild report.
+>> ---
+>> =A0 drivers/virt/nitro_enclaves/ne_pci_dev.c | 232 +++++++++++++++++++++=
+++
+>> =A0 1 file changed, 232 insertions(+)
+>>
+>> diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c =
 
-Fixes: 435e53fb5e21 ("arm64: KVM: Enable VHE support for :G/:H perf event modifiers")
-Cc:: Andrew Murray <amurray@thegoodpenguin.co.uk>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/pmu.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+>> b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> index 235fa3ecbee2..c24230cfe7c0 100644
+>> --- a/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> @@ -27,6 +27,218 @@ static const struct pci_device_id ne_pci_ids[] =3D {
+>> =A0 =A0 MODULE_DEVICE_TABLE(pci, ne_pci_ids);
+>> =A0 +/**
+>> + * ne_submit_request - Submit command request to the PCI device =
 
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index b5ae3a5d509e..3c224162b3dd 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -159,7 +159,10 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
- }
- 
- /*
-- * On VHE ensure that only guest events have EL0 counting enabled
-+ * On VHE ensure that only guest events have EL0 counting enabled.
-+ * This is called from both vcpu_{load,put} and the sysreg handling.
-+ * Since the latter is preemptible, special care must be taken to
-+ * disable preemption.
-  */
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- {
-@@ -169,12 +172,14 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- 	if (!has_vhe())
- 		return;
- 
-+	preempt_disable();
- 	host = this_cpu_ptr(&kvm_host_data);
- 	events_guest = host->pmu_events.events_guest;
- 	events_host = host->pmu_events.events_host;
- 
- 	kvm_vcpu_pmu_enable_el0(events_guest);
- 	kvm_vcpu_pmu_disable_el0(events_host);
-+	preempt_enable();
- }
- 
- /*
--- 
-2.27.0
+>> based on the
+>> + * command type.
+>> + *
+>> + * This function gets called with the ne_pci_dev mutex held.
+>> + *
+>> + * @pdev: PCI device to send the command to.
+>> + * @cmd_type: command type of the request sent to the PCI device.
+>> + * @cmd_request: command request payload.
+>> + * @cmd_request_size: size of the command request payload.
+>> + *
+>> + * @returns: 0 on success, negative return value on failure.
+>> + */
+>> +static int ne_submit_request(struct pci_dev *pdev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 enum ne_pci_dev_cmd_ty=
+pe cmd_type,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 void *cmd_request, siz=
+e_t cmd_request_size)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev || !ne_pci_dev->iomem_base)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>
+> How can this ever happen?
+
+Removed this one and the next checks in v5 of the patch series.
+
+Thanks,
+Andra
+
+>
+>> +
+>> +=A0=A0=A0 memcpy_toio(ne_pci_dev->iomem_base + NE_SEND_DATA, cmd_reques=
+t,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cmd_request_size);
+>> +
+>> +=A0=A0=A0 iowrite32(cmd_type, ne_pci_dev->iomem_base + NE_COMMAND);
+>> +
+>> +=A0=A0=A0 return 0;
+>> +}
+>> +
+>> +/**
+>> + * ne_retrieve_reply - Retrieve reply from the PCI device.
+>> + *
+>> + * This function gets called with the ne_pci_dev mutex held.
+>> + *
+>> + * @pdev: PCI device to receive the reply from.
+>> + * @cmd_reply: command reply payload.
+>> + * @cmd_reply_size: size of the command reply payload.
+>> + *
+>> + * @returns: 0 on success, negative return value on failure.
+>> + */
+>> +static int ne_retrieve_reply(struct pci_dev *pdev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct ne_pci_dev_cmd_=
+reply *cmd_reply,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 size_t cmd_reply_size)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev || !ne_pci_dev->iomem_base)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>
+> Same.
+>
+>> +
+>> +=A0=A0=A0 memcpy_fromio(cmd_reply, ne_pci_dev->iomem_base + NE_RECV_DAT=
+A,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cmd_reply_size);
+>> +
+>> +=A0=A0=A0 return 0;
+>> +}
+>> +
+>> +/**
+>> + * ne_wait_for_reply - Wait for a reply of a PCI command.
+>> + *
+>> + * This function gets called with the ne_pci_dev mutex held.
+>> + *
+>> + * @pdev: PCI device for which a reply is waited.
+>> + *
+>> + * @returns: 0 on success, negative return value on failure.
+>> + */
+>> +static int ne_wait_for_reply(struct pci_dev *pdev)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +=A0=A0=A0 int rc =3D -EINVAL;
+>
+> Unused assignment?
+>
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>
+> Same.
+>
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * TODO: Update to _interruptible and handle interrupted wa=
+it event
+>> +=A0=A0=A0=A0 * e.g. -ERESTARTSYS, incoming signals + add / update timeo=
+ut.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 rc =3D wait_event_timeout(ne_pci_dev->cmd_reply_wait_q,
+>> + atomic_read(&ne_pci_dev->cmd_reply_avail) !=3D 0,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 msecs_to_jiffies(NE_DEFAU=
+LT_TIMEOUT_MSECS));
+>> +=A0=A0=A0 if (!rc)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -ETIMEDOUT;
+>> +
+>> +=A0=A0=A0 return 0;
+>> +}
+>> +
+>> +int ne_do_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type =
+
+>> cmd_type,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0 void *cmd_request, size_t cmd_request_size,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct ne_pci_dev_cmd_reply *cmd_reply, siz=
+e_t =
+
+>> cmd_reply_size)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D NULL;
+>> +=A0=A0=A0 int rc =3D -EINVAL;
+>> +
+>> +=A0=A0=A0 if (!pdev)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -ENODEV;
+>
+> When can this happen?
+>
+>> +
+>> +=A0=A0=A0 ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +=A0=A0=A0 if (!ne_pci_dev || !ne_pci_dev->iomem_base)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>
+> Same
+>
+>> +
+>> +=A0=A0=A0 if (cmd_type <=3D INVALID_CMD || cmd_type >=3D MAX_CMD) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev, "Invalid cmd type=
+=3D%u\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cmd_type);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if (!cmd_request) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev, "Null cmd request=
+\n");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if (cmd_request_size > NE_SEND_DATA_SIZE) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Invalid req =
+size=3D%zu for cmd type=3D%u\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cmd_request_s=
+ize, cmd_type);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if (!cmd_reply) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev, "Null cmd reply\n=
+");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if (cmd_reply_size > NE_RECV_DATA_SIZE) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev, "Invalid reply si=
+ze=3D%zu\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cmd_reply_siz=
+e);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * Use this mutex so that the PCI device handles one comman=
+d =
+
+>> request at
+>> +=A0=A0=A0=A0 * a time.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 mutex_lock(&ne_pci_dev->pci_dev_mutex);
+>> +
+>> +=A0=A0=A0 atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
+>> +
+>> +=A0=A0=A0 rc =3D ne_submit_request(pdev, cmd_type, cmd_request, =
+
+>> cmd_request_size);
+>> +=A0=A0=A0 if (rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in sub=
+mit request [rc=3D%d]\n", rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 rc =3D ne_wait_for_reply(pdev);
+>> +=A0=A0=A0 if (rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in wai=
+t for reply [rc=3D%d]\n", rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 rc =3D ne_retrieve_reply(pdev, cmd_reply, cmd_reply_size);
+>> +=A0=A0=A0 if (rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in ret=
+rieve reply [rc=3D%d]\n", rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 atomic_set(&ne_pci_dev->cmd_reply_avail, 0);
+>> +
+>> +=A0=A0=A0 if (cmd_reply->rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err_ratelimited(&pdev->dev,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "Error in cmd=
+ process logic [rc=3D%d]\n",
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cmd_reply->rc=
+);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 rc =3D cmd_reply->rc;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto unlock_mutex;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 mutex_unlock(&ne_pci_dev->pci_dev_mutex);
+>> +
+>> +=A0=A0=A0 return 0;
+>
+> Can you just set rc to 0 and fall through?
+
+Done.
+
+>
+>> +
+>> +unlock_mutex:
+>> +=A0=A0=A0 mutex_unlock(&ne_pci_dev->pci_dev_mutex);
+>> +
+>> +=A0=A0=A0 return rc;
+>> +}
+>> +
+>> +/**
+>> + * ne_reply_handler - Interrupt handler for retrieving a reply matching
+>> + * a request sent to the PCI device for enclave lifetime management.
+>> + *
+>> + * @irq: received interrupt for a reply sent by the PCI device.
+>> + * @args: PCI device private data structure.
+>> + *
+>> + * @returns: IRQ_HANDLED on handled interrupt, IRQ_NONE otherwise.
+>> + */
+>> +static irqreturn_t ne_reply_handler(int irq, void *args)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D (struct ne_pci_dev *)args;
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev)
+>> +=A0=A0=A0=A0=A0=A0=A0 return IRQ_NONE;
+>
+> How can this ever happen?
+>
+>
+> Alex
+>
+>> +
+>> +=A0=A0=A0 atomic_set(&ne_pci_dev->cmd_reply_avail, 1);
+>> +
+>> +=A0=A0=A0 /* TODO: Update to _interruptible. */
+>> +=A0=A0=A0 wake_up(&ne_pci_dev->cmd_reply_wait_q);
+>> +
+>> +=A0=A0=A0 return IRQ_HANDLED;
+>> +}
+>> +
+>> =A0 /**
+>> =A0=A0 * ne_setup_msix - Setup MSI-X vectors for the PCI device.
+>> =A0=A0 *
+>> @@ -59,7 +271,25 @@ static int ne_setup_msix(struct pci_dev *pdev)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return rc;
+>> =A0=A0=A0=A0=A0 }
+>> =A0 +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * This IRQ gets triggered every time the PCI device respon=
+ds to a
+>> +=A0=A0=A0=A0 * command request. The reply is then retrieved, reading fr=
+om =
+
+>> the MMIO
+>> +=A0=A0=A0=A0 * space of the PCI device.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 rc =3D request_irq(pci_irq_vector(pdev, NE_VEC_REPLY),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ne_reply_handler, 0, "enclave_cmd"=
+, ne_pci_dev);
+>> +=A0=A0=A0 if (rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in request irq reply [=
+rc=3D%d]\n", =
+
+>> rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 goto free_irq_vectors;
+>> +=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0=A0 return 0;
+>> +
+>> +free_irq_vectors:
+>> +=A0=A0=A0 pci_free_irq_vectors(pdev);
+>> +
+>> +=A0=A0=A0 return rc;
+>> =A0 }
+>> =A0 =A0 /**
+>> @@ -74,6 +304,8 @@ static void ne_teardown_msix(struct pci_dev *pdev)
+>> =A0=A0=A0=A0=A0 if (!ne_pci_dev)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return;
+>> =A0 +=A0=A0=A0 free_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_pci_dev);
+>> +
+>> =A0=A0=A0=A0=A0 pci_free_irq_vectors(pdev);
+>> =A0 }
+>>
+
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
 
