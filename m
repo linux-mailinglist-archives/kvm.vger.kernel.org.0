@@ -2,86 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 201942145B3
-	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 13:59:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94DA7214629
+	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 15:37:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727069AbgGDL7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jul 2020 07:59:00 -0400
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21757 "EHLO
-        sender4-of-o57.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbgGDL67 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jul 2020 07:58:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1593863912; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=AZddr8J8I8qWlBIPS37LxAXWkOYGoJK9a6whMLKON+8k4Pisr55X12r+cY2xfbOWBM0bAs3GzAbc+by83SJcVZYZTLXQPfOI9s0k8EVncqZGuf8gV1sTR03T8uxx3RBkqpa0zBGDr9xncdpwNn56Cwo/GEbzWhmT4N8MCnwaFrg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1593863912; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=K3QjHM+2sCUaBsxROMpqrxaYxwc6vlTPOjSyhx3eIgc=; 
-        b=Va8NWt/V91T4H591Jcd2+gV/a0biUgH4U5JWOEVdKOiD1y/eEbtDhzWFh5UGH2cRUGrDV1m8GoR3MmV2XZnr4fdtJBo4HZMcwMvKIAqhu1f234opw6LWHM98TJNvpv57aL+peM1YnqSLI7bseZ7hrqKrvcFzE+WEr7e2/aRmE3o=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 15938639106211016.487946550666; Sat, 4 Jul 2020 04:58:30 -0700 (PDT)
-Message-ID: <159386390837.16530.6161604423603998922@d1fd068a5071>
-Subject: Re: [RFC v7 00/25] intel_iommu: expose Shared Virtual Addressing to VMs
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <1593862609-36135-1-git-send-email-yi.l.liu@intel.com>
+        id S1727043AbgGDNhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jul 2020 09:37:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43488 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726643AbgGDNhw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jul 2020 09:37:52 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9539020826;
+        Sat,  4 Jul 2020 13:37:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1593869871;
+        bh=pNwXVAMDXVJlIpm6TO8om9y6iGboItUmVHhsv43zIi0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=yreCcty7LGBA5T6a7Ze4NTB5GSHk/LphvReviko9cP/XfSOd/Saz9yjRkY+UPH1aR
+         YsAFhRdDj9CFlAxzgqh66MrC0LaQP1cfB3kNXPwiKZEBKf6NJ2KyTGhON09NOt69MR
+         pc5uSp4PjmGKq/uH6V5nFurdtpwYNvXTKfFSwW38=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jriMX-008xsK-Tf; Sat, 04 Jul 2020 14:37:50 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     ascull@google.com, Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, amurray@thegoodpenguin.co.uk
+Subject: [PATCH] KVM: arm64: PMU: Fix per-CPU access in preemptible context
+Date:   Sat,  4 Jul 2020 14:37:41 +0100
+Message-Id: <20200704133741.148094-1-maz@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     yi.l.liu@intel.com
-Cc:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
-        peterx@redhat.com, jean-philippe@linaro.org, kevin.tian@intel.com,
-        yi.l.liu@intel.com, kvm@vger.kernel.org, mst@redhat.com,
-        jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
-        pbonzini@redhat.com, hao.wu@intel.com, jasowang@redhat.com,
-        david@gibson.dropbear.id.au
-Date:   Sat, 4 Jul 2020 04:58:30 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, ascull@google.com, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, amurray@thegoodpenguin.co.uk
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTkzODYyNjA5LTM2MTM1LTEt
-Z2l0LXNlbmQtZW1haWwteWkubC5saXVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1h
-a2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
-ICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9ody9wY2kvcGNp
-X2J1cy5oOjQsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVk
-ZS9ody9wY2ktaG9zdC9pNDQwZnguaDoxNSwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAvcWVt
-dS10ZXN0L3NyYy9zdHVicy9wY2ktaG9zdC1waWl4LmM6MjoKL3RtcC9xZW11LXRlc3Qvc3JjL2lu
-Y2x1ZGUvaHcvaW9tbXUvaG9zdF9pb21tdV9jb250ZXh0Lmg6Mjg6MTA6IGZhdGFsIGVycm9yOiBs
-aW51eC9pb21tdS5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CiAgIDI4IHwgI2luY2x1ZGUg
-PGxpbnV4L2lvbW11Lmg+CiAgICAgIHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+CmNvbXBpbGF0
-aW9uIHRlcm1pbmF0ZWQuCm1ha2U6ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2
-OTogc3R1YnMvcGNpLWhvc3QtcGlpeC5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1
-bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBG
-aWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2OSwgaW4gPG1vZHVsZT4KLS0t
-CiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNh
-bGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4n
-LCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTJkMWEwYWM0ODgyOTQwNzhhNmQz
-YjZkZjJjNGZlZmU3JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11
-bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NP
-TkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScs
-ICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAn
-LXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2Nj
-YWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0wZmhqbWRrby9zcmMv
-ZG9ja2VyLXNyYy4yMDIwLTA3LTA0LTA3LjU1LjIwLjI3Nzg0Oi92YXIvdG1wL3FlbXU6eixybycs
-ICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVy
-bmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVt
-dS5pbnN0YW5jZS51dWlkPTJkMWEwYWM0ODgyOTQwNzhhNmQzYjZkZjJjNGZlZmU3Cm1ha2VbMV06
-ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTBmaGptZGtvL3NyYycKbWFrZTogKioqIFtkb2NrZXIt
-cnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDNtOS40ODBzCnVzZXIgICAg
-MG04LjgzMnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzE1OTM4NjI2MDktMzYxMzUtMS1naXQtc2VuZC1lbWFpbC15aS5sLmxpdUBpbnRlbC5j
-b20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Commit 07da1ffaa137 ("KVM: arm64: Remove host_cpu_context
+member from vcpu structure") has, by removing the host CPU
+context pointer, exposed that kvm_vcpu_pmu_restore_guest
+is called in preemptible contexts:
+
+[  266.932442] BUG: using smp_processor_id() in preemptible [00000000] code: qemu-system-aar/779
+[  266.939721] caller is debug_smp_processor_id+0x20/0x30
+[  266.944157] CPU: 2 PID: 779 Comm: qemu-system-aar Tainted: G            E     5.8.0-rc3-00015-g8d4aa58b2fe3 #1374
+[  266.954268] Hardware name: amlogic w400/w400, BIOS 2020.04 05/22/2020
+[  266.960640] Call trace:
+[  266.963064]  dump_backtrace+0x0/0x1e0
+[  266.966679]  show_stack+0x20/0x30
+[  266.969959]  dump_stack+0xe4/0x154
+[  266.973338]  check_preemption_disabled+0xf8/0x108
+[  266.977978]  debug_smp_processor_id+0x20/0x30
+[  266.982307]  kvm_vcpu_pmu_restore_guest+0x2c/0x68
+[  266.986949]  access_pmcr+0xf8/0x128
+[  266.990399]  perform_access+0x8c/0x250
+[  266.994108]  kvm_handle_sys_reg+0x10c/0x2f8
+[  266.998247]  handle_exit+0x78/0x200
+[  267.001697]  kvm_arch_vcpu_ioctl_run+0x2ac/0xab8
+
+Note that the bug was always there, it is only the switch to
+using percpu accessors that made it obvious.
+The fix is to wrap these accesses in a preempt-disabled section,
+so that we sample a coherent context on trap from the guest.
+
+Fixes: 435e53fb5e21 ("arm64: KVM: Enable VHE support for :G/:H perf event modifiers")
+Cc:: Andrew Murray <amurray@thegoodpenguin.co.uk>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/pmu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index b5ae3a5d509e..3c224162b3dd 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -159,7 +159,10 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
+ }
+ 
+ /*
+- * On VHE ensure that only guest events have EL0 counting enabled
++ * On VHE ensure that only guest events have EL0 counting enabled.
++ * This is called from both vcpu_{load,put} and the sysreg handling.
++ * Since the latter is preemptible, special care must be taken to
++ * disable preemption.
+  */
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
+ {
+@@ -169,12 +172,14 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
+ 	if (!has_vhe())
+ 		return;
+ 
++	preempt_disable();
+ 	host = this_cpu_ptr(&kvm_host_data);
+ 	events_guest = host->pmu_events.events_guest;
+ 	events_host = host->pmu_events.events_host;
+ 
+ 	kvm_vcpu_pmu_enable_el0(events_guest);
+ 	kvm_vcpu_pmu_disable_el0(events_host);
++	preempt_enable();
+ }
+ 
+ /*
+-- 
+2.27.0
+
