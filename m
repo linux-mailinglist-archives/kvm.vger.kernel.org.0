@@ -2,103 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A1482144B5
-	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 11:53:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49B8B2144BA
+	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 12:00:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726675AbgGDJx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jul 2020 05:53:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726178AbgGDJx1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jul 2020 05:53:27 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201A5C061794
-        for <kvm@vger.kernel.org>; Sat,  4 Jul 2020 02:53:27 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id f7so32253737wrw.1
-        for <kvm@vger.kernel.org>; Sat, 04 Jul 2020 02:53:27 -0700 (PDT)
+        id S1726869AbgGDKA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jul 2020 06:00:28 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:61441 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726253AbgGDKA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jul 2020 06:00:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ou+aNkcv9LCQBlsQrwAFagxbTlyfWRNE7XbCh8l7dyY=;
-        b=PZlgAsG9xrZrlG9GhtRUw6gCMGCW3+41JK6uDtFg/i87267w/D5Nc6+xbKTExEdRCe
-         Z0mhKRFzF8SFLGLU4LobJBtvgVIhjbjRVHB5s+gUciIZGlmZJJe78PTSBRtVVcR3j/Yf
-         OjGD+sjbi5Jkwl5+/xuwF6Xg6nxBWCzW6IzyCm8OEBD3EthN5oK4vaEOfoG2al2Qd/tj
-         3n7w1GDkyCc2WhfiFrgOSajhYj1cfoEyv/ONa8KpBDPmxTnberwRt3Uv8459wQ+kWv3w
-         F3k4Nc9HrSyZtzPvoAPpsgzzmJaj/YOqzPnl1mZihSkUcHXCf+wuviK8RRwV3UOUkmRe
-         SpCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ou+aNkcv9LCQBlsQrwAFagxbTlyfWRNE7XbCh8l7dyY=;
-        b=Xw05T765v14OHwxvTG17dpoBj/qYi1bCE2ByWDoZ0iEn+18QIItUobM4ABOvtZLMpw
-         npnLQfwkPnmpZxB7y21/q922onto7cFzGr/hnOy36EIc4pK6MXYcFdmcMwsp9wce/FJ6
-         TdwKIx4KeVNpjhmONmB1bqesq6/MyeaZOGSeTSKJ9s2Yg4XeJA/OHNRNhMyW6+xonqUJ
-         GeoUWh8Qa0Zzb8Lh+2HaVBzSwWb8+UB47ep+wHLpD0L8CXmYCpAjHeWxVSaER96h4sPV
-         j4IX9tne/ffmHPH6o/MVbZqskjuLQqcAmNYq6Er8vfqYml0BMrh0Dhp2PNY8LOBHKss9
-         YnLQ==
-X-Gm-Message-State: AOAM531VlXziPLhL1SF/PCdvxtbuFZsBIdGdUW6dgrhHuAj2+vVWqzlg
-        klEjiIvKHGdrJgUrRu9BnscZTQlOCx18v2p3tE4gf+ou
-X-Google-Smtp-Source: ABdhPJx67XOWygWg7EMQNA6isQXukXMWCSCxVemHzhm/c5V9E7rhqnJJQ8PnFNvub8L9YE0/o8TLLCUjwxxfjN1jVDY=
-X-Received: by 2002:adf:ed87:: with SMTP id c7mr38868380wro.422.1593856405871;
- Sat, 04 Jul 2020 02:53:25 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1593856827; x=1625392827;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=lj8o6qIN9a5pDYqi9LY2WR3SoxcoKhnmVOZo6/K7oAk=;
+  b=QZyIOirxWJ3JnirVwHa8HeI9bglCw6m1rxbCJMV56NgOleVGW5gqJr96
+   IOpJMY+FUqewSqcwUKSReN8iMQMB2lGgYbxS1PSi22he4mrUWY2LpKehq
+   eX3sWIWMyvUN9fil5p3k2/jibT7/nHs8Fx5J4qsKPOFsCSMP5lwHlF1g5
+   s=;
+IronPort-SDR: yZO/v/8BUrG7uTbSiMhU3mB+iCTkCteBPb7wBaiHZWcdyUtmoRzQkD/oYVm3WGcuO502Ntn6el
+ XR1KK6BWDKXw==
+X-IronPort-AV: E=Sophos;i="5.75,311,1589241600"; 
+   d="scan'208";a="55995232"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 04 Jul 2020 10:00:26 +0000
+Received: from EX13MTAUEA002.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-4e7c8266.us-west-2.amazon.com (Postfix) with ESMTPS id E5327A20C4;
+        Sat,  4 Jul 2020 10:00:25 +0000 (UTC)
+Received: from EX13D16EUB001.ant.amazon.com (10.43.166.28) by
+ EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sat, 4 Jul 2020 10:00:25 +0000
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.161.214) by
+ EX13D16EUB001.ant.amazon.com (10.43.166.28) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Sat, 4 Jul 2020 10:00:16 +0000
+Subject: Re: [PATCH v4 04/18] nitro_enclaves: Init PCI device driver
+To:     Alexander Graf <graf@amazon.de>, <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Bjoern Doebel" <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        "Stefano Garzarella" <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-5-andraprs@amazon.com>
+ <d8fe8668-15c3-fe3b-1ad1-eb939a4977c2@amazon.de>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <9b9f0ab6-8413-abdf-0829-7b4563593e86@amazon.com>
+Date:   Sat, 4 Jul 2020 13:00:10 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <CAG4AFWZ3zd1LEZa6RHbUYyMsT8vGzOJSmw9G0CK-pnpRLv6Hfw@mail.gmail.com>
- <CABgObfbXnYoNNZ9SmF56XHhJ8Lx4bN4L-ZYnGF_UBFfkEMyBHQ@mail.gmail.com>
-In-Reply-To: <CABgObfbXnYoNNZ9SmF56XHhJ8Lx4bN4L-ZYnGF_UBFfkEMyBHQ@mail.gmail.com>
-From:   Jidong Xiao <jidong.xiao@gmail.com>
-Date:   Sat, 4 Jul 2020 03:53:14 -0600
-Message-ID: <CAG4AFWbwEtxsvCVyOJ0cvHQ1RNGaCPRMEEmoGzAp-=TRdLExLw@mail.gmail.com>
-Subject: Re: KVM upcall questions
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <d8fe8668-15c3-fe3b-1ad1-eb939a4977c2@amazon.de>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.214]
+X-ClientProxiedBy: EX13D25UWB004.ant.amazon.com (10.43.161.180) To
+ EX13D16EUB001.ant.amazon.com (10.43.166.28)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Paolo,
 
-On Sat, Jul 4, 2020 at 3:12 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+On 02/07/2020 18:09, Alexander Graf wrote:
 >
-> KVM has an interrupt MSR that is currently used for asynchronous page faults. It can be extended to general upcalls if useful.
 >
-> Paolo
+> On 22.06.20 22:03, Andra Paraschiv wrote:
+>> The Nitro Enclaves PCI device is used by the kernel driver as a means of
+>> communication with the hypervisor on the host where the primary VM and
+>> the enclaves run. It handles requests with regard to enclave lifetime.
+>>
+>> Setup the PCI device driver and add support for MSI-X interrupts.
+>>
+>> Signed-off-by: Alexandru-Catalin Vasile <lexnv@amazon.com>
+>> Signed-off-by: Alexandru Ciobotaru <alcioa@amazon.com>
+>> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+>> ---
+>> Changelog
+>>
+>> v3 -> v4
+>>
+>> * Use dev_err instead of custom NE log pattern.
+>> * Update NE PCI driver name to "nitro_enclaves".
+>>
+>> v2 -> v3
+>>
+>> * Remove the GPL additional wording as SPDX-License-Identifier is
+>> =A0=A0 already in place.
+>> * Remove the WARN_ON calls.
+>> * Remove linux/bug include that is not needed.
+>> * Update static calls sanity checks.
+>> * Remove "ratelimited" from the logs that are not in the ioctl call
+>> =A0=A0 paths.
+>> * Update kzfree() calls to kfree().
+>>
+>> v1 -> v2
+>>
+>> * Add log pattern for NE.
+>> * Update PCI device setup functions to receive PCI device data =
+
+>> structure and
+>> =A0=A0 then get private data from it inside the functions logic.
+>> * Remove the BUG_ON calls.
+>> * Add teardown function for MSI-X setup.
+>> * Update goto labels to match their purpose.
+>> * Implement TODO for NE PCI device disable state check.
+>> * Update function name for NE PCI device probe / remove.
+>> ---
+>> =A0 drivers/virt/nitro_enclaves/ne_pci_dev.c | 261 +++++++++++++++++++++=
+++
+>> =A0 1 file changed, 261 insertions(+)
+>> =A0 create mode 100644 drivers/virt/nitro_enclaves/ne_pci_dev.c
+>>
+>> diff --git a/drivers/virt/nitro_enclaves/ne_pci_dev.c =
+
+>> b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> new file mode 100644
+>> index 000000000000..235fa3ecbee2
+>> --- /dev/null
+>> +++ b/drivers/virt/nitro_enclaves/ne_pci_dev.c
+>> @@ -0,0 +1,261 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights =
+
+>> Reserved.
+>> + */
+>> +
+>> +/* Nitro Enclaves (NE) PCI device driver. */
+>> +
+>> +#include <linux/delay.h>
+>> +#include <linux/device.h>
+>> +#include <linux/list.h>
+>> +#include <linux/mutex.h>
+>> +#include <linux/module.h>
+>> +#include <linux/nitro_enclaves.h>
+>> +#include <linux/pci.h>
+>> +#include <linux/types.h>
+>> +#include <linux/wait.h>
+>> +
+>> +#include "ne_misc_dev.h"
+>> +#include "ne_pci_dev.h"
+>> +
+>> +#define NE_DEFAULT_TIMEOUT_MSECS (120000) /* 120 sec */
+>> +
+>> +static const struct pci_device_id ne_pci_ids[] =3D {
+>> +=A0=A0=A0 { PCI_DEVICE(PCI_VENDOR_ID_AMAZON, PCI_DEVICE_ID_NE) },
+>> +=A0=A0=A0 { 0, }
+>> +};
+>> +
+>> +MODULE_DEVICE_TABLE(pci, ne_pci_ids);
+>> +
+>> +/**
+>> + * ne_setup_msix - Setup MSI-X vectors for the PCI device.
+>> + *
+>> + * @pdev: PCI device to setup the MSI-X for.
+>> + *
+>> + * @returns: 0 on success, negative return value on failure.
+>> + */
+>> +static int ne_setup_msix(struct pci_dev *pdev)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +=A0=A0=A0 int nr_vecs =3D 0;
+>> +=A0=A0=A0 int rc =3D -EINVAL;
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
+>> +
+>> +=A0=A0=A0 nr_vecs =3D pci_msix_vec_count(pdev);
+>> +=A0=A0=A0 if (nr_vecs < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 rc =3D nr_vecs;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in getting vec count [=
+rc=3D%d]\n", =
+
+>> rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return rc;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 rc =3D pci_alloc_irq_vectors(pdev, nr_vecs, nr_vecs, PCI_IRQ_=
+MSIX);
+>> +=A0=A0=A0 if (rc < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in alloc MSI-X vecs [r=
+c=3D%d]\n", rc);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return rc;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 return 0;
+>> +}
+>> +
+>> +/**
+>> + * ne_teardown_msix - Teardown MSI-X vectors for the PCI device.
+>> + *
+>> + * @pdev: PCI device to teardown the MSI-X for.
+>> + */
+>> +static void ne_teardown_msix(struct pci_dev *pdev)
+>> +{
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev)
+>> +=A0=A0=A0=A0=A0=A0=A0 return;
+>> +
+>> +=A0=A0=A0 pci_free_irq_vectors(pdev);
+>> +}
+>> +
+>> +/**
+>> + * ne_pci_dev_enable - Select PCI device version and enable it.
+>> + *
+>> + * @pdev: PCI device to select version for and then enable.
+>> + *
+>> + * @returns: 0 on success, negative return value on failure.
+>> + */
+>> +static int ne_pci_dev_enable(struct pci_dev *pdev)
+>> +{
+>> +=A0=A0=A0 u8 dev_enable_reply =3D 0;
+>> +=A0=A0=A0 u16 dev_version_reply =3D 0;
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev || !ne_pci_dev->iomem_base)
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EINVAL;
 >
-Thanks! Are you talking about this MSR: MSR_KVM_ASYNC_PF_EN?
+> How can this ever happen?
 
-I look at the document in the Documentation/virtual/kvm/msr.txt file
-and see this:
+This check and the following one are part of that checks added before =
 
-MSR_KVM_ASYNC_PF_EN: 0x4b564d02
-data: Bits 63-6 hold 64-byte aligned physical address of a
-64 byte memory area which must be in guest RAM and must be
-zeroed....First 4 byte of 64 byte memory location will be written to by
-the hypervisor at the time of asynchronous page fault (APF)
-injection to indicate type of asynchronous page fault. Value
-of 1 means that the page referred to by the page fault is not
-present. Value 2 means that the page is now available.
+for the situations that shouldn't happen, only if buggy system or broken =
 
-When you say "it can be extended to general upcalls", do you mean we
-use a value higher than 2 to represent a different reason, and the
-guest will take an action according to that value? Should the return
-value of the upcall be written in the 64-byte memory space, or how
-does the hypervisor know the return value of the upcall?
+logic at all. Removed the checks.
 
--Jidong
+Thanks,
+Andra
 
-> Il sab 4 lug 2020, 11:09 Jidong Xiao <jidong.xiao@gmail.com> ha scritto:
->>
->> Hi, Paolo and all,
->>
->> Do KVM support upcalls, which enable the hypervisor to make requests
->> to the guest? Or if I want to add one more upcall by myself, which
->> part of the KVM code should I examine? I know Xen has implemented
->> upcalls, but I can't find any documents about upcalls in KVM.
->>
->> Thank you!
->>
->> -Jidong
->>
+>
+>> +
+>> +=A0=A0=A0 iowrite16(NE_VERSION_MAX, ne_pci_dev->iomem_base + NE_VERSION=
+);
+>> +
+>> +=A0=A0=A0 dev_version_reply =3D ioread16(ne_pci_dev->iomem_base + NE_VE=
+RSION);
+>> +=A0=A0=A0 if (dev_version_reply !=3D NE_VERSION_MAX) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in pci dev version cmd=
+\n");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 iowrite8(NE_ENABLE_ON, ne_pci_dev->iomem_base + NE_ENABLE);
+>> +
+>> +=A0=A0=A0 dev_enable_reply =3D ioread8(ne_pci_dev->iomem_base + NE_ENAB=
+LE);
+>> +=A0=A0=A0 if (dev_enable_reply !=3D NE_ENABLE_ON) {
+>> +=A0=A0=A0=A0=A0=A0=A0 dev_err(&pdev->dev, "Error in pci dev enable cmd\=
+n");
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 return -EIO;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 return 0;
+>> +}
+>> +
+>> +/**
+>> + * ne_pci_dev_disable - Disable PCI device.
+>> + *
+>> + * @pdev: PCI device to disable.
+>> + */
+>> +static void ne_pci_dev_disable(struct pci_dev *pdev)
+>> +{
+>> +=A0=A0=A0 u8 dev_disable_reply =3D 0;
+>> +=A0=A0=A0 struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
+>> +=A0=A0=A0 const unsigned int sleep_time =3D 10; /* 10 ms */
+>> +=A0=A0=A0 unsigned int sleep_time_count =3D 0;
+>> +
+>> +=A0=A0=A0 if (!ne_pci_dev || !ne_pci_dev->iomem_base)
+>> +=A0=A0=A0=A0=A0=A0=A0 return;
+>
+> How can this ever happen?
+>
+>
+> Alex
+
+
+
+
+Amazon Development Center (Romania) S.R.L. registered office: 27A Sf. Lazar=
+ Street, UBC5, floor 2, Iasi, Iasi County, 700045, Romania. Registered in R=
+omania. Registration number J22/2621/2005.
+
