@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0E45214537
-	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 13:30:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A78921453E
+	for <lists+kvm@lfdr.de>; Sat,  4 Jul 2020 13:30:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727968AbgGDLaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Jul 2020 07:30:25 -0400
-Received: from mga04.intel.com ([192.55.52.120]:61341 "EHLO mga04.intel.com"
+        id S1728031AbgGDLar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Jul 2020 07:30:47 -0400
+Received: from mga04.intel.com ([192.55.52.120]:61336 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727838AbgGDLaX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Jul 2020 07:30:23 -0400
-IronPort-SDR: kfWrJzSTzFT+X+71UgTbERK3SmM+UCY02+BAxMG1sPT5GOmsTFeQvl3Ha+KAukS+/KOGBzVfLd
- VS5kqBj7FO2g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9671"; a="144760868"
+        id S1727907AbgGDLaY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Jul 2020 07:30:24 -0400
+IronPort-SDR: WVua2AEegcHUIy4nKFK84CjC7vaIs0Y/8cBDySFJHmhKqSpXfVcIUtEa5rzJHMC6FavcSiOVFe
+ WQ2JsoGYioNA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9671"; a="144760870"
 X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; 
-   d="scan'208";a="144760868"
+   d="scan'208";a="144760870"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2020 04:30:20 -0700
-IronPort-SDR: 1vftf/T72VF/33PVfxz5YkJJCMX9g5IpqYyUl9W9Xm7l4yxtN7hoX1DfklrFNJH4vcD94Jpnmn
- at/miJPUpzvw==
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2020 04:30:22 -0700
+IronPort-SDR: 7ta6wOb5xOKcpdn0M0OkOIQZ09AlIBsce8omzxj0I+pF+KlvUDmtAGDVMZJprPopc6m2ePhms8
+ uAjT72gyklSA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,311,1589266800"; 
-   d="scan'208";a="266146811"
+   d="scan'208";a="266146819"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
-  by fmsmga007.fm.intel.com with ESMTP; 04 Jul 2020 04:30:20 -0700
+  by fmsmga007.fm.intel.com with ESMTP; 04 Jul 2020 04:30:21 -0700
 From:   Liu Yi L <yi.l.liu@intel.com>
 To:     qemu-devel@nongnu.org, alex.williamson@redhat.com,
         peterx@redhat.com
@@ -35,10 +35,12 @@ Cc:     mst@redhat.com, pbonzini@redhat.com, eric.auger@redhat.com,
         kevin.tian@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
         yi.y.sun@intel.com, hao.wu@intel.com, kvm@vger.kernel.org,
         jasowang@redhat.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: [RFC v7 12/25] vfio: init HostIOMMUContext per-container
-Date:   Sat,  4 Jul 2020 04:36:36 -0700
-Message-Id: <1593862609-36135-13-git-send-email-yi.l.liu@intel.com>
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: [RFC v7 14/25] intel_iommu: process PASID cache invalidation
+Date:   Sat,  4 Jul 2020 04:36:38 -0700
+Message-Id: <1593862609-36135-15-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1593862609-36135-1-git-send-email-yi.l.liu@intel.com>
 References: <1593862609-36135-1-git-send-email-yi.l.liu@intel.com>
@@ -47,206 +49,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In this patch, QEMU firstly gets iommu info from kernel to check the
-supported capabilities by a VFIO_IOMMU_TYPE1_NESTING iommu. And inits
-HostIOMMUContet instance.
-
-For vfio-pci devices, it could use pci_device_set/unset_iommu() to
-expose host iommu context to vIOMMU emulators. vIOMMU emulators
-could make use the methods provided by host iommu context. e.g.
-propagate requests to host iommu.
+This patch adds PASID cache invalidation handling. When guest enabled
+PASID usages (e.g. SVA), guest software should issue a proper PASID
+cache invalidation when caching-mode is exposed. This patch only adds
+the draft handling of pasid cache invalidation. Detailed handling will
+be added in subsequent patches.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/vfio/common.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.c    |  17 +++++++++
- 2 files changed, 128 insertions(+)
+rfcv4 (v1) -> rfcv5 (v2):
+*) remove vtd_pasid_cache_gsi(), vtd_pasid_cache_psi()
+   and vtd_pasid_cache_dsi()
+---
+ hw/i386/intel_iommu.c          | 40 +++++++++++++++++++++++++++++++++++-----
+ hw/i386/intel_iommu_internal.h | 12 ++++++++++++
+ hw/i386/trace-events           |  3 +++
+ 3 files changed, 50 insertions(+), 5 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 7b92a58..2abd3d5 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1228,10 +1228,100 @@ static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
-     return ret;
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 46036d4..968a0fc 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2395,6 +2395,37 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
+     return true;
  }
  
-+/**
-+ * Get iommu info from host. Caller of this funcion should free
-+ * the memory pointed by the returned pointer stored in @info
-+ * after a successful calling when finished its usage.
-+ */
-+static int vfio_get_iommu_info(VFIOContainer *container,
-+                         struct vfio_iommu_type1_info **info)
++static bool vtd_process_pasid_desc(IntelIOMMUState *s,
++                                   VTDInvDesc *inv_desc)
 +{
-+
-+    size_t argsz = sizeof(struct vfio_iommu_type1_info);
-+
-+    *info = g_malloc0(argsz);
-+
-+retry:
-+    (*info)->argsz = argsz;
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
-+        g_free(*info);
-+        *info = NULL;
-+        return -errno;
++    if ((inv_desc->val[0] & VTD_INV_DESC_PASIDC_RSVD_VAL0) ||
++        (inv_desc->val[1] & VTD_INV_DESC_PASIDC_RSVD_VAL1) ||
++        (inv_desc->val[2] & VTD_INV_DESC_PASIDC_RSVD_VAL2) ||
++        (inv_desc->val[3] & VTD_INV_DESC_PASIDC_RSVD_VAL3)) {
++        error_report_once("non-zero-field-in-pc_inv_desc hi: 0x%" PRIx64
++                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
++        return false;
 +    }
 +
-+    if (((*info)->argsz > argsz)) {
-+        argsz = (*info)->argsz;
-+        *info = g_realloc(*info, argsz);
-+        goto retry;
++    switch (inv_desc->val[0] & VTD_INV_DESC_PASIDC_G) {
++    case VTD_INV_DESC_PASIDC_DSI:
++        break;
++
++    case VTD_INV_DESC_PASIDC_PASID_SI:
++        break;
++
++    case VTD_INV_DESC_PASIDC_GLOBAL:
++        break;
++
++    default:
++        error_report_once("invalid-inv-granu-in-pc_inv_desc hi: 0x%" PRIx64
++                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
++        return false;
 +    }
 +
-+    return 0;
++    return true;
 +}
 +
-+static struct vfio_info_cap_header *
-+vfio_get_iommu_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    void *ptr = info;
-+
-+    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
-+        return NULL;
-+    }
-+
-+    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
-+        if (hdr->id == id) {
-+            return hdr;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static int vfio_get_nesting_iommu_cap(VFIOContainer *container,
-+                   struct vfio_iommu_type1_info_cap_nesting **cap_nesting)
-+{
-+    struct vfio_iommu_type1_info *info;
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_iommu_type1_info_cap_nesting *cap;
-+    struct iommu_nesting_info *nest_info;
-+    int ret;
-+    uint32_t minsz1, minsz2;
-+
-+    ret = vfio_get_iommu_info(container, &info);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    hdr = vfio_get_iommu_info_cap(info,
-+                        VFIO_IOMMU_TYPE1_INFO_CAP_NESTING);
-+    if (!hdr) {
-+        g_free(info);
-+        return -EINVAL;
-+    }
-+
-+    cap = container_of(hdr,
-+                struct vfio_iommu_type1_info_cap_nesting, header);
-+
-+    nest_info = (struct iommu_nesting_info *) &cap->info;
-+    minsz1 = offsetof(struct iommu_nesting_info, data);
-+    if (nest_info->size < minsz1) {
-+        g_free(info);
-+        return -EINVAL;
-+    }
-+    minsz2 = offsetof(struct vfio_iommu_type1_info_cap_nesting, info);
-+    *cap_nesting = g_malloc0(minsz2 + nest_info->size);
-+    memcpy(*cap_nesting, cap, minsz2 + nest_info->size);
-+
-+    g_free(info);
-+    return 0;
-+}
-+
- static int vfio_init_container(VFIOContainer *container, int group_fd,
-                                bool want_nested, Error **errp)
+ static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
+                                      VTDInvDesc *inv_desc)
  {
-     int iommu_type, ret;
-+    uint64_t flags = 0;
+@@ -2501,12 +2532,11 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+         }
+         break;
  
-     iommu_type = vfio_get_iommu_type(container, want_nested, errp);
-     if (iommu_type < 0) {
-@@ -1259,6 +1349,27 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
-         return -errno;
-     }
- 
-+    if (iommu_type == VFIO_TYPE1_NESTING_IOMMU) {
-+        struct vfio_iommu_type1_info_cap_nesting *nesting = NULL;
-+        struct iommu_nesting_info *nest_info;
-+
-+        ret = vfio_get_nesting_iommu_cap(container, &nesting);
-+        if (ret) {
-+            error_setg_errno(errp, -ret,
-+                             "Failed to get nesting iommu cap");
-+            return ret;
+-    /*
+-     * TODO: the entity of below two cases will be implemented in future series.
+-     * To make guest (which integrates scalable mode support patch set in
+-     * iommu driver) work, just return true is enough so far.
+-     */
+     case VTD_INV_DESC_PC:
++        trace_vtd_inv_desc("pasid-cache", inv_desc.val[1], inv_desc.val[0]);
++        if (!vtd_process_pasid_desc(s, &inv_desc)) {
++            return false;
 +        }
-+
-+        nest_info = (struct iommu_nesting_info *) &nesting->info;
-+        flags |= (nest_info->features & IOMMU_NESTING_FEAT_SYSWIDE_PASID) ?
-+                 HOST_IOMMU_PASID_REQUEST : 0;
-+        host_iommu_ctx_init(&container->iommu_ctx,
-+                            sizeof(container->iommu_ctx),
-+                            TYPE_VFIO_HOST_IOMMU_CONTEXT,
-+                            flags);
-+        g_free(nesting);
-+    }
-+
-     container->iommu_type = iommu_type;
-     return 0;
- }
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 9d8d27f..b7045f0 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2710,6 +2710,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     VFIODevice *vbasedev_iter;
-     VFIOGroup *group;
-+    VFIOContainer *container;
-     char *tmp, *subsys, group_path[PATH_MAX], *group_name;
-     Error *err = NULL;
-     ssize_t len;
-@@ -2787,6 +2788,15 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-         goto error;
-     }
+         break;
  
-+    container = group->container;
-+    if (container->iommu_ctx.initialized &&
-+        pci_device_set_iommu_context(pdev, &container->iommu_ctx)) {
-+        error_setg(errp, "device attachment is denied by vIOMMU, "
-+                   "please check host IOMMU nesting capability");
-+        vfio_put_group(group);
-+        goto error;
-+    }
-+
-     QLIST_FOREACH(vbasedev_iter, &group->device_list, next) {
-         if (strcmp(vbasedev_iter->name, vdev->vbasedev.name) == 0) {
-             error_setg(errp, "device is already attached");
-@@ -3072,9 +3082,16 @@ static void vfio_instance_finalize(Object *obj)
- static void vfio_exitfn(PCIDevice *pdev)
- {
-     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOContainer *container;
+     case VTD_INV_DESC_PIOTLB:
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 64ac0a8..22d0bc5 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -445,6 +445,18 @@ typedef union VTDInvDesc VTDInvDesc;
+         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
+         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
  
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
++#define VTD_INV_DESC_PASIDC_G          (3ULL << 4)
++#define VTD_INV_DESC_PASIDC_PASID(val) (((val) >> 32) & 0xfffffULL)
++#define VTD_INV_DESC_PASIDC_DID(val)   (((val) >> 16) & VTD_DOMAIN_ID_MASK)
++#define VTD_INV_DESC_PASIDC_RSVD_VAL0  0xfff000000000ffc0ULL
++#define VTD_INV_DESC_PASIDC_RSVD_VAL1  0xffffffffffffffffULL
++#define VTD_INV_DESC_PASIDC_RSVD_VAL2  0xffffffffffffffffULL
++#define VTD_INV_DESC_PASIDC_RSVD_VAL3  0xffffffffffffffffULL
 +
-+    container = vdev->vbasedev.group->container;
-+    if (container->iommu_ctx.initialized) {
-+        pci_device_unset_iommu_context(pdev);
-+    }
++#define VTD_INV_DESC_PASIDC_DSI        (0ULL << 4)
++#define VTD_INV_DESC_PASIDC_PASID_SI   (1ULL << 4)
++#define VTD_INV_DESC_PASIDC_GLOBAL     (3ULL << 4)
 +
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-     if (vdev->irqchip_change_notifier.notify) {
-         kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+ /* Information about page-selective IOTLB invalidate */
+ struct VTDIOTLBPageInvInfo {
+     uint16_t domain_id;
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index 71536a7..f7cd4e5 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -22,6 +22,9 @@ vtd_inv_qi_head(uint16_t head) "read head %d"
+ vtd_inv_qi_tail(uint16_t head) "write tail %d"
+ vtd_inv_qi_fetch(void) ""
+ vtd_context_cache_reset(void) ""
++vtd_pasid_cache_gsi(void) ""
++vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
++vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
+ vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
+ vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
+ vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
 -- 
 2.7.4
 
