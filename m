@@ -2,130 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CB97214A74
-	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 07:46:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0B3B214A91
+	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 08:16:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725929AbgGEFpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Jul 2020 01:45:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40388 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725873AbgGEFpD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Jul 2020 01:45:03 -0400
+        id S1725964AbgGEGQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Jul 2020 02:16:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35885 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725873AbgGEGQw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Jul 2020 02:16:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593927901;
+        s=mimecast20190719; t=1593929810;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rU7+c2LbORU78XDpd0ElhyGB/g0DfHC3gDhe0qSgrLM=;
-        b=Sux7snWkipaVj5e1CjnE0QFd97eTTR3P36d/pr66AsDdDhCbz7xi1+CgAB0wro2Gz+8Fa7
-        rZbNwKZfnaVw9kjdbYmmYKeCqwAgzsYCwPiPNfZ/FRgSLcyl0/YpViPd6VVi/TJjRqYLvV
-        N/pX+JHD9b5RfPuIgIsHpw/TtyStEao=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-ZPS8tZ9QNzqtXxMengc9Mg-1; Sun, 05 Jul 2020 01:44:59 -0400
-X-MC-Unique: ZPS8tZ9QNzqtXxMengc9Mg-1
-Received: by mail-wr1-f69.google.com with SMTP id y18so18089463wrq.4
-        for <kvm@vger.kernel.org>; Sat, 04 Jul 2020 22:44:59 -0700 (PDT)
+        bh=3VADVZ6Ej0tDqIflCyu2IGJa04QpD6Nw95M1AmRUqy0=;
+        b=G7qAeS2myoTUTH1ULpx+FehAkbZc3PBZXN+azjMSkuFNYeZnz3dUx7ey3GzjTauUYfi5uf
+        v1qNuyw8UFIAXB9gwmYnelnFXMIx1WFoynr3d9g8UvnQKk+HCr0mxMDI8i8ER4aVsCLiMD
+        4AStgZfRcpsztkVzvdq+ytyMdxQ5NGU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-vKC1CGMgMqe4rdICUKEzUg-1; Sun, 05 Jul 2020 02:16:46 -0400
+X-MC-Unique: vKC1CGMgMqe4rdICUKEzUg-1
+Received: by mail-wm1-f71.google.com with SMTP id z11so41318338wmg.5
+        for <kvm@vger.kernel.org>; Sat, 04 Jul 2020 23:16:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=rU7+c2LbORU78XDpd0ElhyGB/g0DfHC3gDhe0qSgrLM=;
-        b=i0riAPMNig/cEoRGH/k5ySeiz+fxVE/rHsBAJJqD0uPLwT1sbyBNm8a1lT8lMk+4nF
-         +CtyPYGx5KrNupvB0IgDimQ4R9oBfgEuqu6A7TL8zuN/NLB6+SmUsZ7cPX9wtrK7mAcb
-         LdLDKIrhB/dRhRZj83ZBE8h5cSjhdfU1yd9PpGdzlTzTy8yQxKzzfgE8NzRym4jW1sn2
-         D5kMBJPNw+S0uDA2w7vnKzjzqrtAm1Mm2ci8JodvUgij99AuhmVpIr+s+2yId85XYUbx
-         KoONS/8WyAQU8VdZeUput+xLq07qVom2cJ1TWUVb7xk+tOnRe0nJcomWgvwaNGNJ3yZ1
-         NGNg==
-X-Gm-Message-State: AOAM530aO1fVYprAdfUxtypdlqFO25vIMuJExi3CKUmWYfKlbv5uFVLK
-        GOX8FSWadu0XXdOhZr1Ix9DQqpzJJlMj5lYbCmwqmgLH9m7pwPhouvnhdvR9jJXnN4O4aARFrIQ
-        nnwQZTeK0IgI2
-X-Received: by 2002:adf:f083:: with SMTP id n3mr43446866wro.297.1593927898618;
-        Sat, 04 Jul 2020 22:44:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxrOv6H8wqyhW0KbDMY0+O/hcyo6UkG/ZTteYU5A9BINoZgjLbaFRPvN5X/SNOAJKe0/g1kag==
-X-Received: by 2002:adf:f083:: with SMTP id n3mr43446854wro.297.1593927898367;
-        Sat, 04 Jul 2020 22:44:58 -0700 (PDT)
+        bh=3VADVZ6Ej0tDqIflCyu2IGJa04QpD6Nw95M1AmRUqy0=;
+        b=OaVPJNgrPOT3aMxb8qFGVM6syh2dJ6nZ4f2HPjF2QXzbEjVM4GkbietWNWHqn2fgZB
+         Cqb4UtU23CCYe24Isi2boVJCmufMpl2hFiYrS9wFv2QV7+aJ8nOBeBRz6vbrXRYh5xji
+         kB73JfvSWlMaCju1/gs2DAuJOED4YyffF8wvfj9bz8BQMpy8TS11r1m6EI0ysjuPqisO
+         PgWWa6kjNYTKHnaxAtugGlyKvjh1VS6IDUOFgLQoZ3SArV1UrqVAOLN85EXEHJJaJICm
+         1QayNvX5OPTvU8Y1RKLSGYcKOCs5xFgrQcCTVOPp7VGkRZBKQayltbeXTrJ0Kk4edSVb
+         y/RA==
+X-Gm-Message-State: AOAM533FeWGNft54PNOBqB3Hgu7tBtx22FRK5qHFrbl7I/bq4t1sYKyM
+        XP4mTKnLfEMoxQ66DwPOxJ6zpN0VcIUfq1kjxErfwZWLDKbLpSlT575CY/oyrAAkPYUlCA/fw+i
+        z2jVPuckrGG6X
+X-Received: by 2002:adf:80e6:: with SMTP id 93mr42026010wrl.17.1593929805301;
+        Sat, 04 Jul 2020 23:16:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx6bzwIY05j8xBSW3ojgumYkCmyZgKwMx4W7zE3X9NPf1kOCVtE21TGfIM3nG2WCzL7CpksAw==
+X-Received: by 2002:adf:80e6:: with SMTP id 93mr42025995wrl.17.1593929805116;
+        Sat, 04 Jul 2020 23:16:45 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:adf2:29a0:7689:d40c? ([2001:b07:6468:f312:adf2:29a0:7689:d40c])
-        by smtp.gmail.com with ESMTPSA id 207sm20038992wme.13.2020.07.04.22.44.57
+        by smtp.gmail.com with ESMTPSA id w7sm19014289wmc.32.2020.07.04.23.16.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Jul 2020 22:44:57 -0700 (PDT)
-Subject: Re: KVM/VFIO passthrough not working when TRIM_UNUSED_KSYMS is
- enabled
-To:     Gunnar Eggen <geggen54@gmail.com>, alex.williamson@redhat.com,
-        kvm@vger.kernel.org, jeyu@kernel.org
-References: <13e90f87-9062-a7e4-99c0-5c6f5c16cad2@gmail.com>
+        Sat, 04 Jul 2020 23:16:44 -0700 (PDT)
+Subject: Re: [PATCH 0/7] accel/kvm: Simplify few functions that can use global
+ kvm_state
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-arm@nongnu.org,
+        Cornelia Huck <cohuck@redhat.com>, qemu-ppc@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20200623105052.1700-1-philmd@redhat.com>
+ <a36faa0a-6aa9-463d-03a0-b862141a427d@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a43675ef-197d-2bd5-9505-200ac439df6c@redhat.com>
-Date:   Sun, 5 Jul 2020 07:44:57 +0200
+Message-ID: <ad581a87-03dd-17d3-6ad2-cd6c90170f97@redhat.com>
+Date:   Sun, 5 Jul 2020 08:16:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <13e90f87-9062-a7e4-99c0-5c6f5c16cad2@gmail.com>
+In-Reply-To: <a36faa0a-6aa9-463d-03a0-b862141a427d@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/07/20 23:03, Gunnar Eggen wrote:
-> Hi,
-> 
-> It's a bit unclear what subsystem is to blame for this problem, so I'm
-> sending this to both KVM, VFIO and Module support.
-> 
-> The problem is that trimming unused symbols in the kernel breaks VFIO
-> passthrough on x86/amd64 at least. If the option TRIM_UNUSED_KSYMS is
-> enabled you will see the following error when trying to start a VM in
-> QEmu with any pcie device passed via VFIO:
-> 
-> qemu-system-x86_64: -device vfio-pci,host=04:00.0: Failed to add group
-> 25 to KVM VFIO device: Invalid argument
-> 
-> The error will not stop the VM from launching, but it will break things
-> in mysterious ways when e.g. installing graphics drivers.
-> No external modules is involved in this, so I would guess that there is
-> some dependency that the trimming is missing in some way.
-> 
-> With the introduction of UNUSED_KSYMS_WHITELIST in the latest kernels,
-> and some talk about making trimming symbols the default in the future,
-> it would be great if we could get this fixed or at least identify the
-> problematic symbols so that they could be whitelisted if needed.
+On 04/07/20 18:50, Philippe Mathieu-Daudé wrote:
+> kind ping :)
 
-They are:
-- vfio_group_get_external_user
-- vfio_external_group_match_file
-- vfio_group_put_external_user
-- vfio_group_set_kvm
-- vfio_external_check_extension
-- vfio_external_user_iommu_id
-
-and also (unrelated but breaking other stuff):
-- mdev_get_iommu_device
-- mdev_bus_type
-
-However, UNUSED_KSYMS_WHITELIST seems the wrong tool for this.  We would
-need to have something that says: "if KVM && VFIO, then include these
-symbols", for example a macro "IMPORT_SYMBOL" that would be processed by
-cmd_undef_syms.
+Queued all except 4.
 
 Paolo
 
-> Steps to reproduce:
-> 
-> 1 - Have a kernel where TRIM_UNUSED_KSYMS is enabled
-> 2 - Start a VM in QEmu/KVM with a pcie device passed through via vfio-pci
-> 
-> This is a common issue that keeps popping up on user forums related to
-> vfio passthrough, so it should be fairly simple to reproduce.
-> 
-> Let me know if you want more details or perhaps my kernel config or
-> trimmed system map to test with.
-> 
-> Best regards,
-> Gunnar
+> On 6/23/20 12:50 PM, Philippe Mathieu-Daudé wrote:
+>> Following Paolo's idea on kvm_check_extension():
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg713794.html
+>>
+>> CI:
+>> https://travis-ci.org/github/philmd/qemu/builds/701213438
+>>
+>> Philippe Mathieu-Daudé (7):
+>>   accel/kvm: Let kvm_check_extension use global KVM state
+>>   accel/kvm: Simplify kvm_check_extension()
+>>   accel/kvm: Simplify kvm_check_extension_list()
+>>   accel/kvm: Simplify kvm_set_sigmask_len()
+>>   target/i386/kvm: Simplify get_para_features()
+>>   target/i386/kvm: Simplify kvm_get_mce_cap_supported()
+>>   target/i386/kvm: Simplify kvm_get_supported_[feature]_msrs()
+>>
+>>  include/sysemu/kvm.h         |  4 +-
+>>  accel/kvm/kvm-all.c          | 76 +++++++++++++++----------------
+>>  hw/hyperv/hyperv.c           |  2 +-
+>>  hw/i386/kvm/clock.c          |  2 +-
+>>  hw/i386/kvm/i8254.c          |  4 +-
+>>  hw/i386/kvm/ioapic.c         |  2 +-
+>>  hw/intc/arm_gic_kvm.c        |  2 +-
+>>  hw/intc/openpic_kvm.c        |  2 +-
+>>  hw/intc/xics_kvm.c           |  2 +-
+>>  hw/s390x/s390-stattrib-kvm.c |  2 +-
+>>  target/arm/kvm.c             | 13 +++---
+>>  target/arm/kvm32.c           |  2 +-
+>>  target/arm/kvm64.c           | 15 +++---
+>>  target/i386/kvm.c            | 88 +++++++++++++++++-------------------
+>>  target/mips/kvm.c            |  6 +--
+>>  target/ppc/kvm.c             | 34 +++++++-------
+>>  target/s390x/cpu_models.c    |  3 +-
+>>  target/s390x/kvm.c           | 30 ++++++------
+>>  18 files changed, 141 insertions(+), 148 deletions(-)
+>>
 > 
 
