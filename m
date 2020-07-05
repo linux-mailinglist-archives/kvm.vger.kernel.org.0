@@ -2,261 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1C7C214B94
-	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 11:40:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E4E9214BBE
+	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 11:57:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726674AbgGEJkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Jul 2020 05:40:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22628 "EHLO
+        id S1726763AbgGEJ5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Jul 2020 05:57:36 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46374 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726467AbgGEJkm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Jul 2020 05:40:42 -0400
+        by vger.kernel.org with ESMTP id S1726572AbgGEJ5f (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 5 Jul 2020 05:57:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593942040;
+        s=mimecast20190719; t=1593943053;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R3S9naE26LLsywlsiEVd6KhNGZPK/yDfgjAfGIlEZ8Q=;
-        b=QdHUpFJb84A11/z3rmthx0n2SamFWk0booyKYcTDgiugzOGjnZ7ZjOR5gBcqZXzgemYhkt
-        0Lojco9R9ENRva5tZLNKCLZGM8UWfgvnG0S1Sa/mGuXpFLdyIEHrkyfyQP2dTEVLiiqgMK
-        iXS6TywPfbIk1hT4OK6khjBJYPGEAyM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-hD2BViJVP0Og5_7dP_yKXA-1; Sun, 05 Jul 2020 05:40:34 -0400
-X-MC-Unique: hD2BViJVP0Og5_7dP_yKXA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4258C800D5C;
-        Sun,  5 Jul 2020 09:40:32 +0000 (UTC)
-Received: from starship (unknown [10.35.206.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C67310013D0;
-        Sun,  5 Jul 2020 09:40:27 +0000 (UTC)
-Message-ID: <3793ae0da76fe00036ed0205b5ad8f1653f58ef2.camel@redhat.com>
-Subject: Re: [PATCH] kvm: x86: rewrite kvm_spec_ctrl_valid_bits
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        linux-kernel@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Date:   Sun, 05 Jul 2020 12:40:25 +0300
-In-Reply-To: <20200702181606.GF3575@linux.intel.com>
-References: <20200702174455.282252-1-mlevitsk@redhat.com>
-         <20200702181606.GF3575@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=+gUgX92JeD7WLhazOuEI6R4E6yaZ0C2n0lMzBRIGICM=;
+        b=SMJgy7yeipSe9uyPIPsizMi/62fCrf/Ss7vqaOWzbi6RuOxITNyndGmvMraUIKdvwgSB/m
+        p9CjmiMEEzweik7exumt2g2Ii/fqL6dG9RgOo4L5N0DIqApwAwX/lEzeuSjvkv4dcnABEu
+        hcgw3ttIDQRmF7ieVFzl6PVKU33SvkU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-gfgytSTFPKSbQYu7ROJJTg-1; Sun, 05 Jul 2020 05:57:31 -0400
+X-MC-Unique: gfgytSTFPKSbQYu7ROJJTg-1
+Received: by mail-wm1-f72.google.com with SMTP id y204so30379093wmd.2
+        for <kvm@vger.kernel.org>; Sun, 05 Jul 2020 02:57:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=+gUgX92JeD7WLhazOuEI6R4E6yaZ0C2n0lMzBRIGICM=;
+        b=Ace1Fq4r+Pjgs98xWmfzOlDyWMqOLAWx+4tMglak0J5W/1DO7OHI7H0SiZBUk4GnuC
+         692hJc+dwClVBq/U0V/D8GYcgQrEf/CezWWJqngD5KumkC0cvUSs66hyuB7SZhb0SYIo
+         SM17IPqSWF4nj4oRz1rK1rm6qr/c4o5dd0FefEB6c8BnPXs11xynhhMik3PI5F6xTb76
+         PKGUwdYxjdMeCu9hwPhdAG6vev7WPnfD89csKStgJSiJ36x9Q7CJg4UzydJWEf6QNfTP
+         9/ixG2vbgGBxA9p2XOv3EWklYL3RTP6jDJ+qCT3Oy+WorwR+P7xzj9wBW1cTEqw/1dVN
+         Ie4g==
+X-Gm-Message-State: AOAM5320zEq6nS0sLn+xBFJi6zUV8mmqg5E6Y5OmfS8rpA37YSBTjwOZ
+        qhYIiQWVMgFmmG+32QXTgcB8WgLdxLmGT1D7XwxukSa2XSfYKRNy5F9QIJDL6CJndH4kCHe+aQ3
+        c9NlLrep+KjA1
+X-Received: by 2002:a1c:5f41:: with SMTP id t62mr2692282wmb.53.1593943050542;
+        Sun, 05 Jul 2020 02:57:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxirFuQmtmWTsM9nGieBKS0Jk/VlohalmlCkiqhmr/qsz7u6D3jsAKhovtjwGvWv46inRbySg==
+X-Received: by 2002:a1c:5f41:: with SMTP id t62mr2692258wmb.53.1593943050341;
+        Sun, 05 Jul 2020 02:57:30 -0700 (PDT)
+Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.1])
+        by smtp.gmail.com with ESMTPSA id i67sm17186873wma.12.2020.07.05.02.57.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 05 Jul 2020 02:57:29 -0700 (PDT)
+Subject: Re: [RFC PATCH 4/7] accel/kvm: Simplify kvm_set_sigmask_len()
+To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-arm@nongnu.org,
+        Cornelia Huck <cohuck@redhat.com>, qemu-ppc@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20200623105052.1700-1-philmd@redhat.com>
+ <20200623105052.1700-5-philmd@redhat.com>
+ <cc7b7da2-fcf8-5c5c-5c3c-9e96368ddd22@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <73417f60-edae-4a7d-4808-eb371e95044a@redhat.com>
+Date:   Sun, 5 Jul 2020 11:57:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <cc7b7da2-fcf8-5c5c-5c3c-9e96368ddd22@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2020-07-02 at 11:16 -0700, Sean Christopherson wrote:
-> On Thu, Jul 02, 2020 at 08:44:55PM +0300, Maxim Levitsky wrote:
-> > There are few cases when this function was creating a bogus #GP condition,
-> > for example case when and AMD host supports STIBP but doesn't support SSBD.
-> > 
-> > Follow the rules for AMD and Intel strictly instead.
+On 7/5/20 9:12 AM, Paolo Bonzini wrote:
+> On 23/06/20 12:50, Philippe Mathieu-Daudé wrote:
+>> The sigmask_len is a property of the accelerator, not the VM.
+>> Simplify by directly using the global kvm_state, remove the
+>> unnecessary KVMState* argument.
 > 
-> Can you elaborate on the conditions that are problematic, e.g. what does
-> the guest expect to exist that KVM isn't providing?
+> This is not entirely true, if there were multiple KVMStates how would
+> you know which one to read from?  So it would have to be a global variable.
 
-Hi Sean Christopherson!
-Sorry that I haven't explained the issue here.
-I explained it in bugzilla I opened in details and forgot to explain it
-in the commit message.
-https://bugzilla.redhat.com/show_bug.cgi?id=1853447
- 
- 
-The issue is that on my cpu (3970X), it does not support IBRS,
-but it does support STIBP, and thus guest gets the STIBP cpuid bits enabled
-(both the amd one and KVM also enables the intel's cpuid bit for this feature).
- 
-Then, when guest actually starts to use STIBP, it gets #GP because both of these conditions
-potentially don't allow STIBP bit to be set when IBRS is not supported:
- 
-	if (!guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) &&
-	    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS))
-		bits &= ~(SPEC_CTRL_IBRS | SPEC_CTRL_STIBP);
-	if (!boot_cpu_has(X86_FEATURE_SPEC_CTRL) &&
-	    !boot_cpu_has(X86_FEATURE_AMD_IBRS))
-		bits &= ~(SPEC_CTRL_IBRS | SPEC_CTRL_STIBP);
- 
-Most likely it fails on the second condition, since X86_FEATURE_SPEC_CTRL
-is enabled in the guest because host does support IBPB which X86_FEATURE_SPEC_CTRL also cover.
- 
-But the host doesn't support X86_FEATURE_SPEC_CTRL and it doesn't support X86_FEATURE_AMD_IBRS
-thus second condition clears the SPEC_CTRL_STIBP wrongly.
- 
-Now in addition to that, I long ago had known that win10 guests on my machine started to
-crash when qemu added ability to pass through X86_FEATURE_AMD_IBRS.
-I haven't paid much attention to that other than bisecting this and adding '-amd-stibp' to my cpu flags.
- 
-I did notice that I am not the only one to have that issue, for example
-https://www.reddit.com/r/VFIO/comments/gf53o8/upgrading_to_qemu_5_broke_my_setup_windows_bsods/
-https://forum.level1techs.com/t/amd-fix-for-host-passthrough-on-qemu-5-0-0-kernel-5-6/157710
- 
-Now after I debugged this issue in Linux, it occured to me that this might be the same issue as in Windows,
-and indeed it is. The only difference is that Windows doesn't start to play with STIBP when Intel
-specific cpuid bit is set on AMD machine (which KVM sets for long time) but starts to enable it when AMD specific
-bit is set, that is X86_FEATURE_AMD_IBRS, the bit that qemu recently started to set and it gets the same #GP and crashes.
- 
-From findings on my machine, if we cross-reference this with the above posts, I can assume that many Ryzens have this configuration 
-of no support for IBRS but support STIBP.
-In fact I don't see the kernel use IBRS much (it seem only used around firmware calls or so), so it makes sense
-that AMD chose to not enable it.
- 
-For the fix itself,
-I can fix this by only changing the above condition, but then I read the AMD whitepaper on
-this and they mention that bits in IA32_SPEC_CTRL don't #GP even if not supported,
-and to implement this correctly would be too complicated with current logic,
-thus I rewrote the logic to be as simple as possible and as close to the official docs as possible
-as well.
- 
+Ah I guess I understand. Thanks for reviewing and queuing the rest!
 
 > 
-> > AMD #GP rules for IA32_SPEC_CTRL can be found here:
-> > https://bugzilla.kernel.org/show_bug.cgi?id=199889
-> > 
-> > Fixes: 6441fa6178f5 ("KVM: x86: avoid incorrect writes to host MSR_IA32_SPEC_CTRL")
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 57 ++++++++++++++++++++++++++++++++++------------
-> >  1 file changed, 42 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 00c88c2f34e4..a6bed4670b7f 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10670,27 +10670,54 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
-> >  
-> > -u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu)
-> > +
-> > +static u64 kvm_spec_ctrl_valid_bits_host(void)
-> > +{
-> > +	uint64_t bits = 0;
-> > +
-> > +	if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
-> > +		bits |= SPEC_CTRL_IBRS;
-> > +	if (boot_cpu_has(X86_FEATURE_INTEL_STIBP))
-> > +		bits |= SPEC_CTRL_STIBP;
-> > +	if (boot_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD))
-> > +		bits |= SPEC_CTRL_SSBD;
-> > +
-> > +	if (boot_cpu_has(X86_FEATURE_AMD_IBRS) || boot_cpu_has(X86_FEATURE_AMD_STIBP))
-> > +		bits |= SPEC_CTRL_STIBP | SPEC_CTRL_IBRS;
-> > +
-> > +	if (boot_cpu_has(X86_FEATURE_AMD_SSBD))
-> > +		bits |= SPEC_CTRL_STIBP | SPEC_CTRL_IBRS | SPEC_CTRL_SSBD;
-> > +
-> > +	return bits;
-> > +}
+> Paolo
 > 
-> Rather than compute the mask every time, it can be computed once on module
-> load and stashed in a global.  Note, there's a RFC series[*] to support
-> reprobing bugs at runtime, but that has bigger issues with existing KVM
-> functionality to be addressed, i.e. it's not our problem, yet :-).
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  include/sysemu/kvm.h | 2 +-
+>>  accel/kvm/kvm-all.c  | 4 ++--
+>>  target/mips/kvm.c    | 2 +-
+>>  3 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+>> index 3662641c99..44c1767a7f 100644
+>> --- a/include/sysemu/kvm.h
+>> +++ b/include/sysemu/kvm.h
+>> @@ -469,7 +469,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
+>>  uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
+>>  
+>>  
+>> -void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
+>> +void kvm_set_sigmask_len(unsigned int sigmask_len);
+>>  
+>>  #if !defined(CONFIG_USER_ONLY)
+>>  int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index afd14492a0..7b3f76f23d 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -2240,9 +2240,9 @@ err:
+>>      return ret;
+>>  }
+>>  
+>> -void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len)
+>> +void kvm_set_sigmask_len(unsigned int sigmask_len)
+>>  {
+>> -    s->sigmask_len = sigmask_len;
+>> +    kvm_state->sigmask_len = sigmask_len;
+>>  }
+>>  
+>>  static void kvm_handle_io(uint16_t port, MemTxAttrs attrs, void *data, int direction,
+>> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+>> index 0adfa70210..cc3e09bdef 100644
+>> --- a/target/mips/kvm.c
+>> +++ b/target/mips/kvm.c
+>> @@ -48,7 +48,7 @@ unsigned long kvm_arch_vcpu_id(CPUState *cs)
+>>  int kvm_arch_init(MachineState *ms, KVMState *s)
+>>  {
+>>      /* MIPS has 128 signals */
+>> -    kvm_set_sigmask_len(s, 16);
+>> +    kvm_set_sigmask_len(16);
+>>  
+>>      kvm_mips_fpu_cap = kvm_check_extension(KVM_CAP_MIPS_FPU);
+>>      kvm_mips_msa_cap = kvm_check_extension(KVM_CAP_MIPS_MSA);
+>>
 > 
-> [*] https://lkml.kernel.org/r/1593703107-8852-1-git-send-email-mihai.carabas@oracle.com
-
-Thanks for the pointer!
- 
-Note though that the above code only runs once, since after a single successful (non #GP) set
-of it to non-zero value, it is cleared in MSR bitmap for both reads and writes on
-both VMX and SVM.
-This is done because of performance reasons which in this case are more important than absolute correctness.
-Thus to some extent the guest checks in the above are pointless.
- 
-If you ask
-me, I would just remove the kvm_spec_ctrl_valid_bits, and pass this msr to guest
-right away and not on first access.
- 
-I talked with Paulo about this and his opinion if I understand correctly is that the
-above is
-a best effort correctness wise since at least we emulate the bits correctly on first access.
-
-> 
-> > +
-> > +static u64 kvm_spec_ctrl_valid_bits_guest(struct kvm_vcpu *vcpu)
-> >  {
-> > -	uint64_t bits = SPEC_CTRL_IBRS | SPEC_CTRL_STIBP | SPEC_CTRL_SSBD;
-> > +	uint64_t bits = 0;
-> >  
-> > -	/* The STIBP bit doesn't fault even if it's not advertised */
-> > -	if (!guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) &&
-> > -	    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS))
-> > -		bits &= ~(SPEC_CTRL_IBRS | SPEC_CTRL_STIBP);
-> > -	if (!boot_cpu_has(X86_FEATURE_SPEC_CTRL) &&
-> > -	    !boot_cpu_has(X86_FEATURE_AMD_IBRS))
-> > -		bits &= ~(SPEC_CTRL_IBRS | SPEC_CTRL_STIBP);
-> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
-> > +		bits |= SPEC_CTRL_IBRS;
-> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_INTEL_STIBP))
-> > +		bits |= SPEC_CTRL_STIBP;
-> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL_SSBD))
-> > +		bits |= SPEC_CTRL_SSBD;
-> >  
-> > -	if (!guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL_SSBD) &&
-> > -	    !guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD))
-> > -		bits &= ~SPEC_CTRL_SSBD;
-> > -	if (!boot_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD) &&
-> > -	    !boot_cpu_has(X86_FEATURE_AMD_SSBD))
-> > -		bits &= ~SPEC_CTRL_SSBD;
-> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS) ||
-> > +			guest_cpuid_has(vcpu, X86_FEATURE_AMD_STIBP))
-> 
-> Bad indentation.
-True.
-
-> 
-> > +		bits |= SPEC_CTRL_STIBP | SPEC_CTRL_IBRS;
-> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD))
-> > +		bits |= SPEC_CTRL_STIBP | SPEC_CTRL_IBRS | SPEC_CTRL_SSBD;
-> 
-> Would it be feasible to split into two patches?  The first (tagged Fixes:)
-> to make the functional changes without inverting the logic or splitting, and
-> then do the cleanup?  It's really hard to review this patch because I can't
-> easily tease out what's different in terms of functionality.
-
-The new logic follows (hopefully) Intel's spec and AMD spec.
-I will try to split it though.
-
-
-
-> 
-> >  	return bits;
-> >  }
-> > +
-> > +u64 kvm_spec_ctrl_valid_bits(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return kvm_spec_ctrl_valid_bits_host() &
-> > +	       kvm_spec_ctrl_valid_bits_guest(vcpu);
-> > +}
-> > +
-> > +
-> >  EXPORT_SYMBOL_GPL(kvm_spec_ctrl_valid_bits);
-> >  
-> >  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
-> > -- 
-> > 2.25.4
-> > 
-
-Thanks for the review,
-	Best regards,
-		Maxim Levitsky
-
-
 
