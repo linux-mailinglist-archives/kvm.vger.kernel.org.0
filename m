@@ -2,95 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E99D214B33
-	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 10:49:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EFE6214B36
+	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 10:58:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbgGEInf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Jul 2020 04:43:35 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53515 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726355AbgGEInf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Jul 2020 04:43:35 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4B02Kd4FfGz9sSJ; Sun,  5 Jul 2020 18:43:33 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1593938613;
-        bh=Vdr+C7jMOZTKTqw46GAUMPvW/tZdesx/v+gEu7dJuEQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZHjQh853bTzNSvfYDaziPwYJS1IQPGALZv7i+dVWeBQ8FinyZVlHyaL1g/sye2AEU
-         K79+tWeFm9GYBnKDg29usaH2o/g9KGkeXbK6/KR+DxlTQyZ5FqGLchIzi4WWcJgJmo
-         kpcSL1YOXuxR4mtCCebUeGn50c39fHseTOtH7Ie4=
-Date:   Sun, 5 Jul 2020 17:38:13 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     qemu-devel@nongnu.org, brijesh.singh@amd.com, pair@us.ibm.com,
-        pbonzini@redhat.com, frankja@linux.ibm.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org, qemu-ppc@nongnu.org, mst@redhat.com,
-        mdroth@linux.vnet.ibm.com, Richard Henderson <rth@twiddle.net>,
-        cohuck@redhat.com, pasic@linux.ibm.com,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
-        david@redhat.com
-Subject: Re: [PATCH v3 8/9] spapr: PEF: block migration
-Message-ID: <20200705073813.GA12576@umbus.fritz.box>
-References: <20200619020602.118306-1-david@gibson.dropbear.id.au>
- <20200619020602.118306-9-david@gibson.dropbear.id.au>
- <20200626103303.GE3087@work-vm>
+        id S1726496AbgGEI6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Jul 2020 04:58:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38406 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726467AbgGEI6F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Jul 2020 04:58:05 -0400
+Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1ED8C061794
+        for <kvm@vger.kernel.org>; Sun,  5 Jul 2020 01:58:04 -0700 (PDT)
+Received: by mail-lj1-x242.google.com with SMTP id t25so37235839lji.12
+        for <kvm@vger.kernel.org>; Sun, 05 Jul 2020 01:58:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-transfer-encoding:content-language;
+        bh=/5VEnt82qGjxCfGebdnrEM9NIXS3UlUoqgmZfQArlKE=;
+        b=h0IUGyQt7NeulGotxltaoPB/hUkb7edbeFmUJQTS6gaD/GPWz72I03KC+6Qyy7a4tR
+         h5440FnZRlj6iWtG+SL4yE8cYlawxkYMKbazofJbKMWW69vQIZaqRbn8P9rCzxH741hc
+         8+JXk9UBCYYcmm0s1vw47krb1VHNr9SEnbAwGWHYl2t5IODnZWy0x2V2qJ4TEoiDKmtF
+         OCEYOf/DQTPIA439LhZD4fXNHeJS6m1k3n857vAC+8XDSf4DZGdoXmXhDatYS7k6foiG
+         iXKGQ9KY2cP8ZyaFM8wOp28c3yKvkJn/b3LrJWl5Y9IO4puNfz4vRXWKtE1gkBDuoc0x
+         IgLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=/5VEnt82qGjxCfGebdnrEM9NIXS3UlUoqgmZfQArlKE=;
+        b=U8zwakBi7fMmWXZbGDR5Cn0vaVZxyHFbj/Y73qTq3OA5B7zcj/2bxWrhRxhtIBq5SF
+         KhXzs1ek4BOauKj+pfHWzLnIdGegAM6xvDHlxmBEPe8ZbYAQBAhUgdbTpOr5YxRnsL0R
+         ESYzB6fzSyTsWEm8OqjXhl7GzhP1TXsBqhAUynz37tMttbaGvTrRDNYBaJ97V6YedOfA
+         oaa6xLbIPLekW/bwcZOunmckf+5WTsjK+hWzi8ZOs6Nz7aKkhPe5MFtA2bvG6jbgM/V0
+         5xVO+h+8UlQFyd4ge/PViUc1vyhvq52diM49C/Fr3oVP2PNYX4Z1Dk1TAw8rLHsKKKcv
+         TENA==
+X-Gm-Message-State: AOAM533vS8IyCPjWuslwdLxkBJnxJd42Vk3RqB+m2Owvg6ilQowqpTRp
+        CoYWDj+1biAnEyGE270P2pOhpiXtls4=
+X-Google-Smtp-Source: ABdhPJwtltLy2xSWsnv8C23FW/ryO8C2k09ZlCClCM8eJAa13jU5y4m5Q+4qADSqhjTLckq+h9z+TA==
+X-Received: by 2002:a2e:3914:: with SMTP id g20mr24094986lja.19.1593939483004;
+        Sun, 05 Jul 2020 01:58:03 -0700 (PDT)
+Received: from [192.168.0.201] ([78.156.12.4])
+        by smtp.gmail.com with ESMTPSA id s1sm6337718ljj.96.2020.07.05.01.58.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 05 Jul 2020 01:58:02 -0700 (PDT)
+Subject: Re: KVM/VFIO passthrough not working when TRIM_UNUSED_KSYMS is
+ enabled
+To:     Paolo Bonzini <pbonzini@redhat.com>, alex.williamson@redhat.com,
+        kvm@vger.kernel.org, jeyu@kernel.org
+References: <13e90f87-9062-a7e4-99c0-5c6f5c16cad2@gmail.com>
+ <a43675ef-197d-2bd5-9505-200ac439df6c@redhat.com>
+From:   Gunnar Eggen <geggen54@gmail.com>
+Message-ID: <9f12270c-9872-a061-3cfe-4986bb3bffc9@gmail.com>
+Date:   Sun, 5 Jul 2020 10:58:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
-Content-Disposition: inline
-In-Reply-To: <20200626103303.GE3087@work-vm>
+In-Reply-To: <a43675ef-197d-2bd5-9505-200ac439df6c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: nb-NO
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Great! I can confirm that whitelisting the symbols you listed fixes the 
+problem.
 
---YiEDa0DAkWCtVeE4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I hope we get a permanent solution for this eventually, but in the 
+meantime we have a workaround.
 
-On Fri, Jun 26, 2020 at 11:33:03AM +0100, Dr. David Alan Gilbert wrote:
-> * David Gibson (david@gibson.dropbear.id.au) wrote:
-> > We haven't yet implemented the fairly involved handshaking that will be
-> > needed to migrate PEF protected guests.  For now, just use a migration
-> > blocker so we get a meaningful error if someone attempts this (this is =
-the
-> > same approach used by AMD SEV).
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Do you expect this to happen if people run with -cpu host ?
+Thanks so much!
 
-Uh.. I don't really understand the question.  What's the connection
-between cpu model and migration blocking?
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---YiEDa0DAkWCtVeE4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Bg2UACgkQbDjKyiDZ
-s5LH7hAA5EZmRNXj1yivkiYNc1GtXGso5xsJ2GrV/CElKHDYr2mGDqCzzatQybF4
-8obKns+u40a5L+QlnxwSo2HbH1svQ7/3y/mmUmgMIVqFaLDooWjjR0sp4GQnob83
-AhhaSGD0HdwMH4sOvfKLTZzNoJ+GdIr3RWXArVRWxNG6DeWvdHKIzHE920Aj72dF
-Mktk9hnrX2SIFgm0UJhIK5HP9U3gLaCHjsfO/asxjP5LbC4ZslVPZQrV1pD5Jehb
-vDaFSkXKhlVdbnrfELub532PTJ5FRfDZb2OdKbO1AJyuZk4hbCinbc075PuOrmPB
-sX/yW/Ho66UEhj5zZd7IxZ8NHMrbwBgXqh8I0pMKZ3Ml1tvoNtCMyJrH3lOR+RE6
-yH4no8xbq/TF2NYKGQAwF9W1VZNeQYVBdaNpvr2F5ZMYIVDYFkOsmnS0XVZf9Qqx
-qZmcpmvDdf4hiTE45eV9+mGPatvWbLcMCpvWEftOfOrGNbmsW8lF317GqXg4lAFo
-mC04DVZczr5rFtEiX4RIYpF2QSh+SkESzqpXZgnSFTqT447X1ZDoXxBUx91q6EJX
-ZlaacuLtRpl2wMasuvbqmjbnnAyoq/UEgH5BfA7LKptY0gOM74i7wgWsC+e3vuuf
-L6GS4ETEKTen3kMjgW+o3NLRdFpgF5stP7mzdv5dsZhXtxEAWL0=
-=kDum
------END PGP SIGNATURE-----
-
---YiEDa0DAkWCtVeE4--
+On 05.07.2020 07:44, Paolo Bonzini wrote:
+> On 04/07/20 23:03, Gunnar Eggen wrote:
+>> Hi,
+>>
+>> It's a bit unclear what subsystem is to blame for this problem, so I'm
+>> sending this to both KVM, VFIO and Module support.
+>>
+>> The problem is that trimming unused symbols in the kernel breaks VFIO
+>> passthrough on x86/amd64 at least. If the option TRIM_UNUSED_KSYMS is
+>> enabled you will see the following error when trying to start a VM in
+>> QEmu with any pcie device passed via VFIO:
+>>
+>> qemu-system-x86_64: -device vfio-pci,host=04:00.0: Failed to add group
+>> 25 to KVM VFIO device: Invalid argument
+>>
+>> The error will not stop the VM from launching, but it will break things
+>> in mysterious ways when e.g. installing graphics drivers.
+>> No external modules is involved in this, so I would guess that there is
+>> some dependency that the trimming is missing in some way.
+>>
+>> With the introduction of UNUSED_KSYMS_WHITELIST in the latest kernels,
+>> and some talk about making trimming symbols the default in the future,
+>> it would be great if we could get this fixed or at least identify the
+>> problematic symbols so that they could be whitelisted if needed.
+> They are:
+> - vfio_group_get_external_user
+> - vfio_external_group_match_file
+> - vfio_group_put_external_user
+> - vfio_group_set_kvm
+> - vfio_external_check_extension
+> - vfio_external_user_iommu_id
+>
+> and also (unrelated but breaking other stuff):
+> - mdev_get_iommu_device
+> - mdev_bus_type
+>
+> However, UNUSED_KSYMS_WHITELIST seems the wrong tool for this.  We would
+> need to have something that says: "if KVM && VFIO, then include these
+> symbols", for example a macro "IMPORT_SYMBOL" that would be processed by
+> cmd_undef_syms.
+>
+> Paolo
+>
+>> Steps to reproduce:
+>>
+>> 1 - Have a kernel where TRIM_UNUSED_KSYMS is enabled
+>> 2 - Start a VM in QEmu/KVM with a pcie device passed through via vfio-pci
+>>
+>> This is a common issue that keeps popping up on user forums related to
+>> vfio passthrough, so it should be fairly simple to reproduce.
+>>
+>> Let me know if you want more details or perhaps my kernel config or
+>> trimmed system map to test with.
+>>
+>> Best regards,
+>> Gunnar
+>>
