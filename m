@@ -2,176 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E4E9214BBE
-	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 11:57:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D7AB214DA0
+	for <lists+kvm@lfdr.de>; Sun,  5 Jul 2020 17:24:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726763AbgGEJ5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Jul 2020 05:57:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46374 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726572AbgGEJ5f (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 5 Jul 2020 05:57:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593943053;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=+gUgX92JeD7WLhazOuEI6R4E6yaZ0C2n0lMzBRIGICM=;
-        b=SMJgy7yeipSe9uyPIPsizMi/62fCrf/Ss7vqaOWzbi6RuOxITNyndGmvMraUIKdvwgSB/m
-        p9CjmiMEEzweik7exumt2g2Ii/fqL6dG9RgOo4L5N0DIqApwAwX/lEzeuSjvkv4dcnABEu
-        hcgw3ttIDQRmF7ieVFzl6PVKU33SvkU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-gfgytSTFPKSbQYu7ROJJTg-1; Sun, 05 Jul 2020 05:57:31 -0400
-X-MC-Unique: gfgytSTFPKSbQYu7ROJJTg-1
-Received: by mail-wm1-f72.google.com with SMTP id y204so30379093wmd.2
-        for <kvm@vger.kernel.org>; Sun, 05 Jul 2020 02:57:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=+gUgX92JeD7WLhazOuEI6R4E6yaZ0C2n0lMzBRIGICM=;
-        b=Ace1Fq4r+Pjgs98xWmfzOlDyWMqOLAWx+4tMglak0J5W/1DO7OHI7H0SiZBUk4GnuC
-         692hJc+dwClVBq/U0V/D8GYcgQrEf/CezWWJqngD5KumkC0cvUSs66hyuB7SZhb0SYIo
-         SM17IPqSWF4nj4oRz1rK1rm6qr/c4o5dd0FefEB6c8BnPXs11xynhhMik3PI5F6xTb76
-         PKGUwdYxjdMeCu9hwPhdAG6vev7WPnfD89csKStgJSiJ36x9Q7CJg4UzydJWEf6QNfTP
-         9/ixG2vbgGBxA9p2XOv3EWklYL3RTP6jDJ+qCT3Oy+WorwR+P7xzj9wBW1cTEqw/1dVN
-         Ie4g==
-X-Gm-Message-State: AOAM5320zEq6nS0sLn+xBFJi6zUV8mmqg5E6Y5OmfS8rpA37YSBTjwOZ
-        qhYIiQWVMgFmmG+32QXTgcB8WgLdxLmGT1D7XwxukSa2XSfYKRNy5F9QIJDL6CJndH4kCHe+aQ3
-        c9NlLrep+KjA1
-X-Received: by 2002:a1c:5f41:: with SMTP id t62mr2692282wmb.53.1593943050542;
-        Sun, 05 Jul 2020 02:57:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxirFuQmtmWTsM9nGieBKS0Jk/VlohalmlCkiqhmr/qsz7u6D3jsAKhovtjwGvWv46inRbySg==
-X-Received: by 2002:a1c:5f41:: with SMTP id t62mr2692258wmb.53.1593943050341;
-        Sun, 05 Jul 2020 02:57:30 -0700 (PDT)
-Received: from [192.168.1.39] (1.red-83-51-162.dynamicip.rima-tde.net. [83.51.162.1])
-        by smtp.gmail.com with ESMTPSA id i67sm17186873wma.12.2020.07.05.02.57.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Jul 2020 02:57:29 -0700 (PDT)
-Subject: Re: [RFC PATCH 4/7] accel/kvm: Simplify kvm_set_sigmask_len()
-To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, qemu-arm@nongnu.org,
-        Cornelia Huck <cohuck@redhat.com>, qemu-ppc@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20200623105052.1700-1-philmd@redhat.com>
- <20200623105052.1700-5-philmd@redhat.com>
- <cc7b7da2-fcf8-5c5c-5c3c-9e96368ddd22@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <73417f60-edae-4a7d-4808-eb371e95044a@redhat.com>
-Date:   Sun, 5 Jul 2020 11:57:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727123AbgGEPYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Jul 2020 11:24:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37210 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726939AbgGEPYZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 5 Jul 2020 11:24:25 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 065F7J3m146263;
+        Sun, 5 Jul 2020 11:23:13 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3237cf9dqe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 05 Jul 2020 11:23:13 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 065F7hAY146985;
+        Sun, 5 Jul 2020 11:23:12 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3237cf9dpw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 05 Jul 2020 11:23:12 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 065FJwsU022824;
+        Sun, 5 Jul 2020 15:23:10 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 322hd7sc1f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 05 Jul 2020 15:23:10 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 065FN8eb39977132
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 5 Jul 2020 15:23:08 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 45971A405B;
+        Sun,  5 Jul 2020 15:23:08 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 166A0A4054;
+        Sun,  5 Jul 2020 15:23:06 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.148.205.69])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Sun,  5 Jul 2020 15:23:05 +0000 (GMT)
+Date:   Sun, 5 Jul 2020 18:23:04 +0300
+From:   Mike Rapoport <rppt@linux.ibm.com>
+To:     Doug Anderson <dianders@google.com>
+Cc:     Abhishek Bhardwaj <abhishekbh@google.com>,
+        Anthony Steinhauser <asteinhauser@google.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tony Luck <tony.luck@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        x86 <x86@kernel.org>
+Subject: Re: [PATCH v3] x86/speculation/l1tf: Add KConfig for setting the L1D
+ cache flush mode
+Message-ID: <20200705152304.GE2999146@linux.ibm.com>
+References: <20200702221237.2517080-1-abhishekbh@google.com>
+ <e7bc00fc-fe53-800e-8439-f1fbdca5dd26@redhat.com>
+ <CAN_oZf2t+gUqXe19Yo1mTzAgk2xNhssE-9p58EvH-gw5jpuvzA@mail.gmail.com>
+ <CA+noqoj6u9n_KKohZw+QCpD-Qj0EgoCXaPEsryD7ABZ7QpqQfg@mail.gmail.com>
+ <20200703114037.GD2999146@linux.ibm.com>
+ <CAD=FV=XRbrFqSbR619h+9HXNyrYNbqfBF2e-+iUZco9qQ8Wokg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <cc7b7da2-fcf8-5c5c-5c3c-9e96368ddd22@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAD=FV=XRbrFqSbR619h+9HXNyrYNbqfBF2e-+iUZco9qQ8Wokg@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-05_05:2020-07-02,2020-07-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=1 bulkscore=0 priorityscore=1501 phishscore=0 impostorscore=0
+ spamscore=0 adultscore=0 mlxlogscore=999 clxscore=1015
+ cotscore=-2147483648 malwarescore=0 mlxscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2007050116
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/5/20 9:12 AM, Paolo Bonzini wrote:
-> On 23/06/20 12:50, Philippe Mathieu-Daudé wrote:
->> The sigmask_len is a property of the accelerator, not the VM.
->> Simplify by directly using the global kvm_state, remove the
->> unnecessary KVMState* argument.
+On Fri, Jul 03, 2020 at 07:00:11AM -0700, Doug Anderson wrote:
+> Hi,
 > 
-> This is not entirely true, if there were multiple KVMStates how would
-> you know which one to read from?  So it would have to be a global variable.
+> On Fri, Jul 3, 2020 at 4:40 AM Mike Rapoport <rppt@linux.ibm.com> wrote:
+> >
+> > On Thu, Jul 02, 2020 at 11:43:47PM -0700, Abhishek Bhardwaj wrote:
+> > > We have tried to steer away from kernel command line args for a few reasons.
+> > >
+> > > I am paraphrasing my colleague Doug's argument here (CC'ed him as well) -
+> > >
+> > > - The command line args are getting unwieldy. Kernel command line
+> > > parameters are not a scalable way to set kernel config. It's intended
+> > > as a super limited way for the bootloader to pass info to the kernel
+> > > and also as a way for end users who are not compiling the kernel
+> > > themselves to tweak kernel behavior.
+> >
+> > Why cannot you simply add this option to CONFIG_CMDLINE at your kernel build
+> > scripts?
+> 
+> At least in the past I've seen that 'CONFIG_CMDLINE' interacts badly
+> with the bootloader provided command line in some architectures.  In
+> days of yore I tried to post a patch to fix this, at least on ARM
+> targets, but it never seemed to go anywhere upstream.  I'm going to
+> assume this is still a problem because I still see an ANDROID tagged
+> patch in the Chrome OS 5.4 tree:
 
-Ah I guess I understand. Thanks for reviewing and queuing the rest!
+I presume a patch subject should have been here :)
+Anyway, bad iteraction of CONFIG_CMDLINE with bootloader command line
+seems like a bug to me and a bug need to be fixed.
 
-> 
-> Paolo
-> 
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  include/sysemu/kvm.h | 2 +-
->>  accel/kvm/kvm-all.c  | 4 ++--
->>  target/mips/kvm.c    | 2 +-
->>  3 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
->> index 3662641c99..44c1767a7f 100644
->> --- a/include/sysemu/kvm.h
->> +++ b/include/sysemu/kvm.h
->> @@ -469,7 +469,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
->>  uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index);
->>  
->>  
->> -void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len);
->> +void kvm_set_sigmask_len(unsigned int sigmask_len);
->>  
->>  #if !defined(CONFIG_USER_ONLY)
->>  int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index afd14492a0..7b3f76f23d 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -2240,9 +2240,9 @@ err:
->>      return ret;
->>  }
->>  
->> -void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len)
->> +void kvm_set_sigmask_len(unsigned int sigmask_len)
->>  {
->> -    s->sigmask_len = sigmask_len;
->> +    kvm_state->sigmask_len = sigmask_len;
->>  }
->>  
->>  static void kvm_handle_io(uint16_t port, MemTxAttrs attrs, void *data, int direction,
->> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
->> index 0adfa70210..cc3e09bdef 100644
->> --- a/target/mips/kvm.c
->> +++ b/target/mips/kvm.c
->> @@ -48,7 +48,7 @@ unsigned long kvm_arch_vcpu_id(CPUState *cs)
->>  int kvm_arch_init(MachineState *ms, KVMState *s)
->>  {
->>      /* MIPS has 128 signals */
->> -    kvm_set_sigmask_len(s, 16);
->> +    kvm_set_sigmask_len(16);
->>  
->>      kvm_mips_fpu_cap = kvm_check_extension(KVM_CAP_MIPS_FPU);
->>      kvm_mips_msa_cap = kvm_check_extension(KVM_CAP_MIPS_MSA);
->>
-> 
+> In any case, as per my previous arguments, stuffing lots of config
+> into the cmdline is a bit clunky and doesn't scale well.  You end up
+> with a really long run on command line and it's hard to tell where one
+> config option ends and the next one starts and if the same concept is
+> there more than one time it's hard to tell and something might cancel
+> out a previous config option or maybe it won't and by the time you end
+> up finishing this it's hard to tell where you started.  :-)
 
+Configuration options may also have weird interactions between them and
+addition of #ifdef means that most of the non-default paths won't get as
+good test coverage as the default one.
+
+And the proposed #ifdef maze does not look pretty at all...
+
+> > > - Also, we know we want this setting from the start. This is a
+> > > definite smell that it deserves to be a compile time thing rather than
+> > > adding extra code + whatever miniscule time at runtime to pass an
+> > > extra arg.
+> >
+> > This might be a compile time thing in your environment, but not
+> > necessarily it must be the same in others. For instance, what option
+> > should distro kernels select?
+> 
+> Nothing prevents people from continuing to use the command line
+> options if they want, right?  This just allows a different default.
+> So if a distro is security focused and decided that it wanted a slower
+> / more secure default then it could ship that way but individual users
+> could still override, right?
+
+Well, nothing prevents you from continuing to use the command line as
+well ;-)
+
+I can see why whould you want an ability to select compile time default
+for an option, but I'm really not thrilled by the added ifdefery.
+ 
+> > > I think this was what CONFIGS were intended for. I'm happy to add all
+> > > this to the commit message once it's approved in spirit by the
+> > > maintainers.
+> > >
+
+-- 
+Sincerely yours,
+Mike.
