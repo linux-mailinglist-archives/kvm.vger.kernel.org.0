@@ -2,130 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7FDF215A30
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 17:01:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C460215A44
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 17:04:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729489AbgGFPBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 11:01:48 -0400
-Received: from mga14.intel.com ([192.55.52.115]:1771 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729121AbgGFPBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 11:01:48 -0400
-IronPort-SDR: gdygv/P6C2GNO3sjtMQuOnODrauRvPzyFNlU4WnIsdHsNOnwUPxPiEEOL7xO/YFRybAtHwzMqk
- bMyP+3XNg5xA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9673"; a="146504673"
-X-IronPort-AV: E=Sophos;i="5.75,320,1589266800"; 
-   d="scan'208";a="146504673"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 08:01:47 -0700
-IronPort-SDR: C8I4Rf7q1jd2VoYzmkyAUPZEW/3Zv9xkokghzFMebXW85QNKgh2gMe+j02eX4umH5PRW8lFkgD
- R/gQwJYiroAQ==
-X-IronPort-AV: E=Sophos;i="5.75,320,1589266800"; 
-   d="scan'208";a="315191035"
-Received: from smtp.ostc.intel.com ([10.54.29.231])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 08:01:46 -0700
-Received: from localhost (mtg-dev.jf.intel.com [10.54.74.10])
-        by smtp.ostc.intel.com (Postfix) with ESMTP id 5832C637E;
-        Mon,  6 Jul 2020 08:01:46 -0700 (PDT)
-Date:   Mon, 6 Jul 2020 08:01:46 -0700
-From:   mark gross <mgross@linux.intel.com>
-To:     Abhishek Bhardwaj <abhishekbh@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Anthony Steinhauser <asteinhauser@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tony Luck <tony.luck@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Waiman Long <longman@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        x86@kernel.org
-Subject: Re: [PATCH] x86/speculation/l1tf: Add KConfig for setting the L1D
- cache flush mode
-Message-ID: <20200706150146.GA21121@mtg-dev.jf.intel.com>
-Reply-To: mgross@linux.intel.com
-References: <20200702161916.2456342-1-abhishekbh@google.com>
+        id S1729355AbgGFPDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 11:03:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50746 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729121AbgGFPDy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jul 2020 11:03:54 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 066F3NNF033785;
+        Mon, 6 Jul 2020 11:03:49 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 322nun44sv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Jul 2020 11:03:48 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 066F3l7X035838;
+        Mon, 6 Jul 2020 11:03:47 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 322nun43mu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Jul 2020 11:03:46 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 066F0He2008635;
+        Mon, 6 Jul 2020 15:01:51 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 322hd82f05-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 06 Jul 2020 15:01:51 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 066F1mTZ29556810
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 Jul 2020 15:01:48 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C093B52050;
+        Mon,  6 Jul 2020 15:01:48 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.49.44])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DA42A52059;
+        Mon,  6 Jul 2020 15:01:47 +0000 (GMT)
+Subject: Re: [PATCH v3 1/1] s390: virtio: let arch accept devices without
+ IOMMU feature
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, jasowang@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+References: <1592390637-17441-1-git-send-email-pmorel@linux.ibm.com>
+ <1592390637-17441-2-git-send-email-pmorel@linux.ibm.com>
+ <20200629115651-mutt-send-email-mst@kernel.org>
+ <20200629180526.41d0732b.cohuck@redhat.com>
+ <26ecd4c6-837b-1ce6-170b-a0155e4dd4d4@linux.ibm.com>
+ <a677decc-5be3-8095-bc33-0f95634011f6@linux.ibm.com>
+ <20200706163340.2ce7a5f2.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <42f3733d-9f68-91b3-29f9-e88dd4495886@linux.ibm.com>
+Date:   Mon, 6 Jul 2020 17:01:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200702161916.2456342-1-abhishekbh@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20200706163340.2ce7a5f2.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
+ definitions=2020-07-06_11:2020-07-06,2020-07-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0
+ cotscore=-2147483648 lowpriorityscore=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 bulkscore=0
+ malwarescore=0 phishscore=0 adultscore=0 spamscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2007060111
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 02, 2020 at 09:19:16AM -0700, Abhishek Bhardwaj wrote:
-> This change adds a new kernel configuration that sets the l1d cache
-> flush setting at compile time rather than at run time.
 
-Why is this desired?
 
---mark
+On 2020-07-06 16:33, Cornelia Huck wrote:
+> On Mon, 6 Jul 2020 15:37:37 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> On 2020-07-02 15:03, Pierre Morel wrote:
+>>>
+>>>
+>>> On 2020-06-29 18:05, Cornelia Huck wrote:
+>>>> On Mon, 29 Jun 2020 11:57:14 -0400
+>>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>>>   
+>>>>> On Wed, Jun 17, 2020 at 12:43:57PM +0200, Pierre Morel wrote:
+>>>>>> An architecture protecting the guest memory against unauthorized host
+>>>>>> access may want to enforce VIRTIO I/O device protection through the
+>>>>>> use of VIRTIO_F_IOMMU_PLATFORM.
+>>>>>>
+>>>>>> Let's give a chance to the architecture to accept or not devices
+>>>>>> without VIRTIO_F_IOMMU_PLATFORM.
+>>>>>>
+>>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>>>> Acked-by: Jason Wang <jasowang@redhat.com>
+>>>>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>>>> ---
+>>>>>>    arch/s390/mm/init.c     |  6 ++++++
+>>>>>>    drivers/virtio/virtio.c | 22 ++++++++++++++++++++++
+>>>>>>    include/linux/virtio.h  |  2 ++
+>>>>>>    3 files changed, 30 insertions(+)
+>>>>   
+>>>>>> @@ -179,6 +194,13 @@ int virtio_finalize_features(struct
+>>>>>> virtio_device *dev)
+>>>>>>        if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+>>>>>>            return 0;
+>>>>>> +    if (arch_needs_virtio_iommu_platform(dev) &&
+>>>>>> +        !virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
+>>>>>> +        dev_warn(&dev->dev,
+>>>>>> +             "virtio: device must provide VIRTIO_F_IOMMU_PLATFORM\n");
+>>>>>> +        return -ENODEV;
+>>>>>> +    }
+>>>>>> +
+>>>>>>        virtio_add_status(dev, VIRTIO_CONFIG_S_FEATURES_OK);
+>>>>>>        status = dev->config->get_status(dev);
+>>>>>>        if (!(status & VIRTIO_CONFIG_S_FEATURES_OK)) {
+>>>>>
+>>>>> Well don't you need to check it *before* VIRTIO_F_VERSION_1, not after?
+>>>>
+>>>> But it's only available with VERSION_1 anyway, isn't it? So it probably
+>>>> also needs to fail when this feature is needed if VERSION_1 has not been
+>>>> negotiated, I think.
+>>
+>>
+>> would be something like:
+>>
+>> -       if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+>> -               return 0;
+>> +       if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
+>> +               ret = arch_accept_virtio_features(dev);
+>> +               if (ret)
+>> +                       dev_warn(&dev->dev,
+>> +                                "virtio: device must provide
+>> VIRTIO_F_VERSION_1\n");
+>> +               return ret;
+>> +       }
+> 
+> That looks wrong; I think we want to validate in all cases. What about:
+> 
+> ret = arch_accept_virtio_features(dev); // this can include checking for
+>                                          // older or newer features
+> if (ret)
+> 	// assume that the arch callback moaned already
+> 	return ret;
+> 
+> if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+> 	return 0;
+> 
+> // do the virtio-1 only FEATURES_OK dance
+
+hum, you are right, I was too focused on keeping my simple 
+arch_accept_virtio_features() function unchanged.
+It must be more general.
 
 > 
-> Signed-off-by: Abhishek Bhardwaj <abhishekbh@google.com>
-> ---
+>>
+>>
+>> just a thought on the function name:
+>> It becomes more general than just IOMMU_PLATFORM related.
+>>
+>> What do you think of:
+>>
+>> arch_accept_virtio_features()
 > 
->  arch/x86/kernel/cpu/bugs.c |  8 ++++++++
->  arch/x86/kvm/Kconfig       | 17 +++++++++++++++++
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-> index 0b71970d2d3d2..1dcc875cf5547 100644
-> --- a/arch/x86/kernel/cpu/bugs.c
-> +++ b/arch/x86/kernel/cpu/bugs.c
-> @@ -1406,7 +1406,15 @@ enum l1tf_mitigations l1tf_mitigation __ro_after_init = L1TF_MITIGATION_FLUSH;
->  #if IS_ENABLED(CONFIG_KVM_INTEL)
->  EXPORT_SYMBOL_GPL(l1tf_mitigation);
->  #endif
-> +#if (CONFIG_KVM_VMENTRY_L1D_FLUSH == 1)
-> +enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NEVER;
-> +#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 2)
-> +enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_COND;
-> +#elif (CONFIG_KVM_VMENTRY_L1D_FLUSH == 3)
-> +enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_ALWAYS;
-> +#else
->  enum vmx_l1d_flush_state l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
-> +#endif
->  EXPORT_SYMBOL_GPL(l1tf_vmx_mitigation);
->  
->  /*
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index b277a2db62676..f82a0c564e931 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -107,4 +107,21 @@ config KVM_MMU_AUDIT
->  	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
->  	 auditing of KVM MMU events at runtime.
->  
-> +config KVM_VMENTRY_L1D_FLUSH
-> +	int "L1D cache flush settings (1-3)"
-> +	range 1 3
-> +	default "2"
-> +	depends on KVM && X86 && X86_64
-> +	help
-> +	 This setting determines the L1D cache flush behavior before a VMENTER.
-> +	 This is similar to setting the option / parameter to
-> +	 kvm-intel.vmentry_l1d_flush.
-> +	 1 - Never flush.
-> +	 2 - Conditinally flush.
-> +	 3 - Always flush.
-> +
-> +# OK, it's a little counter-intuitive to do this, but it puts it neatly under
-> +# the virtualization menu.
-> +source "drivers/vhost/Kconfig"
-> +
->  endif # VIRTUALIZATION
-> -- 
-> 2.27.0.212.ge8ba1cc988-goog
-> 
+> Or maybe arch_validate_virtio_features()?
+
+OK validated.
+
+Thanks,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
