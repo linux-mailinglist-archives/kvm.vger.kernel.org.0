@@ -2,559 +2,429 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E14C2154CF
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 11:34:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D5982154E8
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 11:47:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728633AbgGFJer (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 05:34:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48684 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728553AbgGFJeq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 05:34:46 -0400
+        id S1728648AbgGFJrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 05:47:07 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26557 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728578AbgGFJrH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jul 2020 05:47:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594028082;
+        s=mimecast20190719; t=1594028825;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5MEDWWvk+qcgc/ZkcrKpEqVi0Kz0+bZ4hd7DqooWYAI=;
-        b=i30VFbDTMTkqUjl8jxg14zfoOkEeKATE6sbaiJy4uIy6TnFP/g4amYw8VQ3Oyaf537ZFJW
-        +UY2Uie6afUDQS30q+2B++yaet1auk7MSfzvcx4u+0MPxYW1I+rOgMnGlfIEIh9oObwPpY
-        qMu8Wftlk4dK+k4uJ7bPVnKxClq8aGU=
+        bh=WcUASd4/BFwE3llK9r5c7gkqDQIiFLWPzjkaK8MCrQI=;
+        b=OAZD6b5CCcEyd5gcJSsN8KxoRyKWqfqBw46EEWA88BwCSHrW3XLrC0/I1/A1zVc67XIESf
+        LqjwPnZPNLPBj9CUYLrfJF9tXtSZv4iI/ILckGuf5SHQ+usQNZNq5hZhIMt5p2MNLwHF7y
+        XjQcZYoAHyegek0pTkrxwAFxRgKp3Z0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-LCCAOYu7Nxyl1o6YT79DLA-1; Mon, 06 Jul 2020 05:34:37 -0400
-X-MC-Unique: LCCAOYu7Nxyl1o6YT79DLA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-481-XHPsKk_XPNe9eIUSX1kHxA-1; Mon, 06 Jul 2020 05:47:03 -0400
+X-MC-Unique: XHPsKk_XPNe9eIUSX1kHxA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48016107ACF4;
-        Mon,  6 Jul 2020 09:34:35 +0000 (UTC)
-Received: from [10.36.113.241] (ovpn-113-241.ams2.redhat.com [10.36.113.241])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 452132DE72;
-        Mon,  6 Jul 2020 09:34:26 +0000 (UTC)
-Subject: Re: [PATCH v4 01/15] vfio/type1: Refactor vfio_iommu_type1_ioctl()
-To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org
-Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
-        stefanha@gmail.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1593861989-35920-1-git-send-email-yi.l.liu@intel.com>
- <1593861989-35920-2-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <0622db04-8254-8068-e00a-4681ec8686a8@redhat.com>
-Date:   Mon, 6 Jul 2020 11:34:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65F8DEC1A0;
+        Mon,  6 Jul 2020 09:47:02 +0000 (UTC)
+Received: from gondolin (ovpn-112-234.ams2.redhat.com [10.36.112.234])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 16FC510013D9;
+        Mon,  6 Jul 2020 09:46:57 +0000 (UTC)
+Date:   Mon, 6 Jul 2020 11:46:55 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        drjones@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v10 9/9] s390x: css: ssch/tsch with sense
+ and interrupt
+Message-ID: <20200706114655.5088b6b7.cohuck@redhat.com>
+In-Reply-To: <1593707480-23921-10-git-send-email-pmorel@linux.ibm.com>
+References: <1593707480-23921-1-git-send-email-pmorel@linux.ibm.com>
+        <1593707480-23921-10-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <1593861989-35920-2-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+On Thu,  2 Jul 2020 18:31:20 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-On 7/4/20 1:26 PM, Liu Yi L wrote:
-> This patch refactors the vfio_iommu_type1_ioctl() to use switch instead of
-> if-else, and each cmd got a helper function.
-command
+> After a channel is enabled we start a SENSE_ID command using
+> the SSCH instruction to recognize the control unit and device.
 > 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Suggested-by: Christoph Hellwig <hch@infradead.org>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> This tests the success of SSCH, the I/O interruption and the TSCH
+> instructions.
+> 
+> The SENSE_ID command response is tested to report 0xff inside
+> its reserved field and to report the same control unit type
+> as the cu_type kernel argument.
+> 
+> Without the cu_type kernel argument, the test expects a device
+> with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 392 ++++++++++++++++++++++------------------
->  1 file changed, 213 insertions(+), 179 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 5e556ac..7accb59 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2453,6 +2453,23 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
->  	return ret;
->  }
->  
-> +static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
-> +					    unsigned long arg)
-> +{
-> +	switch (arg) {
-> +	case VFIO_TYPE1_IOMMU:
-> +	case VFIO_TYPE1v2_IOMMU:
-> +	case VFIO_TYPE1_NESTING_IOMMU:
-> +		return 1;
-> +	case VFIO_DMA_CC_IOMMU:
-> +		if (!iommu)
-> +			return 0;
-> +		return vfio_domains_have_iommu_cache(iommu);
-> +	default:
-> +		return 0;
-> +	}
-> +}
-> +
->  static int vfio_iommu_iova_add_cap(struct vfio_info_cap *caps,
->  		 struct vfio_iommu_type1_info_cap_iova_range *cap_iovas,
->  		 size_t size)
-> @@ -2529,238 +2546,255 @@ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->  	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
->  }
->  
-> -static long vfio_iommu_type1_ioctl(void *iommu_data,
-> -				   unsigned int cmd, unsigned long arg)
-> +static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
-> +				     unsigned long arg)
+>  lib/s390x/asm/arch_def.h |   1 +
+>  lib/s390x/css.h          |  32 ++++++++-
+>  lib/s390x/css_lib.c      | 148 ++++++++++++++++++++++++++++++++++++++-
+>  s390x/css.c              |  94 ++++++++++++++++++++++++-
+>  4 files changed, 272 insertions(+), 3 deletions(-)
+
+(...)
+
+> -int css_enable(int schid)
+> +/*
+> + * css_enable: enable Subchannel
+> + * @schid: Subchannel Identifier
+> + * @isc: Interruption subclass for this subchannel as a number
+
+"number of the interruption subclass to use"?
+
+> + * Return value:
+> + *   On success: 0
+> + *   On error the CC of the faulty instruction
+> + *      or -1 if the retry count is exceeded.
+> + *
+> + */
+> +int css_enable(int schid, int isc)
 >  {
-> -	struct vfio_iommu *iommu = iommu_data;
-> +	struct vfio_iommu_type1_info info;
->  	unsigned long minsz;
-> +	struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
-> +	unsigned long capsz;
-> +	int ret;
+>  	struct pmcw *pmcw = &schib.pmcw;
+>  	int retry_count = 0;
+> @@ -92,6 +103,9 @@ retry:
+>  	/* Update the SCHIB to enable the channel */
+>  	pmcw->flags |= PMCW_ENABLE;
 >  
-> -	if (cmd == VFIO_CHECK_EXTENSION) {
-> -		switch (arg) {
-> -		case VFIO_TYPE1_IOMMU:
-> -		case VFIO_TYPE1v2_IOMMU:
-> -		case VFIO_TYPE1_NESTING_IOMMU:
-> -			return 1;
-> -		case VFIO_DMA_CC_IOMMU:
-> -			if (!iommu)
-> -				return 0;
-> -			return vfio_domains_have_iommu_cache(iommu);
-> -		default:
-> -			return 0;
-> -		}
-> -	} else if (cmd == VFIO_IOMMU_GET_INFO) {
-> -		struct vfio_iommu_type1_info info;
-> -		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
-> -		unsigned long capsz;
-> -		int ret;
-> -
-> -		minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
-> +	minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
->  
-> -		/* For backward compatibility, cannot require this */
-> -		capsz = offsetofend(struct vfio_iommu_type1_info, cap_offset);
-> +	/* For backward compatibility, cannot require this */
-> +	capsz = offsetofend(struct vfio_iommu_type1_info, cap_offset);
->  
-> -		if (copy_from_user(&info, (void __user *)arg, minsz))
-> -			return -EFAULT;
-> +	if (copy_from_user(&info, (void __user *)arg, minsz))
-> +		return -EFAULT;
->  
-> -		if (info.argsz < minsz)
-> -			return -EINVAL;
-> +	if (info.argsz < minsz)
-> +		return -EINVAL;
->  
-> -		if (info.argsz >= capsz) {
-> -			minsz = capsz;
-> -			info.cap_offset = 0; /* output, no-recopy necessary */
-> -		}
-> +	if (info.argsz >= capsz) {
-> +		minsz = capsz;
-> +		info.cap_offset = 0; /* output, no-recopy necessary */
-> +	}
->  
-> -		mutex_lock(&iommu->lock);
-> -		info.flags = VFIO_IOMMU_INFO_PGSIZES;
-> +	mutex_lock(&iommu->lock);
-> +	info.flags = VFIO_IOMMU_INFO_PGSIZES;
->  
-> -		info.iova_pgsizes = iommu->pgsize_bitmap;
-> +	info.iova_pgsizes = iommu->pgsize_bitmap;
->  
-> -		ret = vfio_iommu_migration_build_caps(iommu, &caps);
-> +	ret = vfio_iommu_migration_build_caps(iommu, &caps);
->  
-> -		if (!ret)
-> -			ret = vfio_iommu_iova_build_caps(iommu, &caps);
-> +	if (!ret)
-> +		ret = vfio_iommu_iova_build_caps(iommu, &caps);
->  
-> -		mutex_unlock(&iommu->lock);
-> +	mutex_unlock(&iommu->lock);
->  
-> -		if (ret)
-> -			return ret;
-> +	if (ret)
-> +		return ret;
->  
-> -		if (caps.size) {
-> -			info.flags |= VFIO_IOMMU_INFO_CAPS;
-> +	if (caps.size) {
-> +		info.flags |= VFIO_IOMMU_INFO_CAPS;
->  
-> -			if (info.argsz < sizeof(info) + caps.size) {
-> -				info.argsz = sizeof(info) + caps.size;
-> -			} else {
-> -				vfio_info_cap_shift(&caps, sizeof(info));
-> -				if (copy_to_user((void __user *)arg +
-> -						sizeof(info), caps.buf,
-> -						caps.size)) {
-> -					kfree(caps.buf);
-> -					return -EFAULT;
-> -				}
-> -				info.cap_offset = sizeof(info);
-> +		if (info.argsz < sizeof(info) + caps.size) {
-> +			info.argsz = sizeof(info) + caps.size;
-> +		} else {
-> +			vfio_info_cap_shift(&caps, sizeof(info));
-> +			if (copy_to_user((void __user *)arg +
-> +					sizeof(info), caps.buf,
-> +					caps.size)) {
-> +				kfree(caps.buf);
-> +				return -EFAULT;
->  			}
-> -
-> -			kfree(caps.buf);
-> +			info.cap_offset = sizeof(info);
->  		}
->  
-> -		return copy_to_user((void __user *)arg, &info, minsz) ?
-> -			-EFAULT : 0;
-> +		kfree(caps.buf);
-> +	}
->  
-> -	} else if (cmd == VFIO_IOMMU_MAP_DMA) {
-> -		struct vfio_iommu_type1_dma_map map;
-> -		uint32_t mask = VFIO_DMA_MAP_FLAG_READ |
-> -				VFIO_DMA_MAP_FLAG_WRITE;
-> +	return copy_to_user((void __user *)arg, &info, minsz) ?
-> +			-EFAULT : 0;
-> +}
->  
-> -		minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
-> +static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
-> +				    unsigned long arg)
-> +{
-> +	struct vfio_iommu_type1_dma_map map;
-> +	unsigned long minsz;
-> +	uint32_t mask = VFIO_DMA_MAP_FLAG_READ |
-> +			VFIO_DMA_MAP_FLAG_WRITE;
-nit: may fit into a single line? other examples below.
->  
-> -		if (copy_from_user(&map, (void __user *)arg, minsz))
-> -			return -EFAULT;
-> +	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
->  
-> -		if (map.argsz < minsz || map.flags & ~mask)
-> -			return -EINVAL;
-> +	if (copy_from_user(&map, (void __user *)arg, minsz))
-> +		return -EFAULT;
->  
-> -		return vfio_dma_do_map(iommu, &map);
-> +	if (map.argsz < minsz || map.flags & ~mask)
-> +		return -EINVAL;
->  
-> -	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
-> -		struct vfio_iommu_type1_dma_unmap unmap;
-> -		struct vfio_bitmap bitmap = { 0 };
-> -		int ret;
-> +	return vfio_dma_do_map(iommu, &map);
-> +}
->  
-> -		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
-> +static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
-> +				      unsigned long arg)
-> +{
-> +	struct vfio_iommu_type1_dma_unmap unmap;
-> +	struct vfio_bitmap bitmap = { 0 };
-> +	unsigned long minsz;
-> +	long ret;
-int?
->  
-> -		if (copy_from_user(&unmap, (void __user *)arg, minsz))
-> -			return -EFAULT;
-> +	minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
->  
-> -		if (unmap.argsz < minsz ||
-> -		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
-> -			return -EINVAL;
-> +	if (copy_from_user(&unmap, (void __user *)arg, minsz))
-> +		return -EFAULT;
->  
-> -		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-> -			unsigned long pgshift;
-> +	if (unmap.argsz < minsz ||
-> +	    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
-> +		return -EINVAL;
->  
-> -			if (unmap.argsz < (minsz + sizeof(bitmap)))
-> -				return -EINVAL;
-> +	if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-> +		unsigned long pgshift;
->  
-> -			if (copy_from_user(&bitmap,
-> -					   (void __user *)(arg + minsz),
-> -					   sizeof(bitmap)))
-> -				return -EFAULT;
-> +		if (unmap.argsz < (minsz + sizeof(bitmap)))
-> +			return -EINVAL;
->  
-> -			if (!access_ok((void __user *)bitmap.data, bitmap.size))
-> -				return -EINVAL;
-> +		if (copy_from_user(&bitmap,
-> +				   (void __user *)(arg + minsz),
-> +				   sizeof(bitmap)))
-> +			return -EFAULT;
->  
-> -			pgshift = __ffs(bitmap.pgsize);
-> -			ret = verify_bitmap_size(unmap.size >> pgshift,
-> -						 bitmap.size);
-> -			if (ret)
-> -				return ret;
-> -		}
-> +		if (!access_ok((void __user *)bitmap.data, bitmap.size))
-> +			return -EINVAL;
->  
-> -		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
-> +		pgshift = __ffs(bitmap.pgsize);
-> +		ret = verify_bitmap_size(unmap.size >> pgshift,
-> +					 bitmap.size);
->  		if (ret)
->  			return ret;
-> +	}
+> +	/* Set Interruption Subclass to IO_SCH_ISC */
+
+The specified isc, current callers just happen to pass that value.
+
+> +	pmcw->flags |= (isc << PMCW_ISC_SHIFT);
 > +
-> +	ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
-> +	if (ret)
-> +		return ret;
->  
-> -		return copy_to_user((void __user *)arg, &unmap, minsz) ?
-> +	return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> -	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> -		struct vfio_iommu_type1_dirty_bitmap dirty;
-> -		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> -				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> -				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> -		int ret = 0;
-> +}
->  
-> -		if (!iommu->v2)
-> -			return -EACCES;
-> +static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
-> +					unsigned long arg)
-> +{
-> +	struct vfio_iommu_type1_dirty_bitmap dirty;
-> +	uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +			VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +			VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +	unsigned long minsz;
-> +	int ret = 0;
->  
-> -		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> -				    flags);
-> +	if (!iommu->v2)
-> +		return -EACCES;
->  
-> -		if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> -			return -EFAULT;
-> +	minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +			    flags);
-single line?
->  
-> -		if (dirty.argsz < minsz || dirty.flags & ~mask)
-> -			return -EINVAL;
-> +	if (copy_from_user(&dirty, (void __user *)arg, minsz))
-> +		return -EFAULT;
-> +
-> +	if (dirty.argsz < minsz || dirty.flags & ~mask)
-> +		return -EINVAL;
-> +
-> +	/* only one flag should be set at a time */
-> +	if (__ffs(dirty.flags) != __fls(dirty.flags))
-> +		return -EINVAL;
-> +
-> +	if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +		size_t pgsize;
->  
-> -		/* only one flag should be set at a time */
-> -		if (__ffs(dirty.flags) != __fls(dirty.flags))
-> +		mutex_lock(&iommu->lock);
-> +		pgsize = 1 << __ffs(iommu->pgsize_bitmap);
-> +		if (!iommu->dirty_page_tracking) {
-> +			ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
-> +			if (!ret)
-> +				iommu->dirty_page_tracking = true;
-> +		}
-> +		mutex_unlock(&iommu->lock);
-> +		return ret;
-> +	} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +		mutex_lock(&iommu->lock);
-> +		if (iommu->dirty_page_tracking) {
-> +			iommu->dirty_page_tracking = false;
-> +			vfio_dma_bitmap_free_all(iommu);
-> +		}
-> +		mutex_unlock(&iommu->lock);
-> +		return 0;
-> +	} else if (dirty.flags &
-> +			 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-single line?
-> +		struct vfio_iommu_type1_dirty_bitmap_get range;
-> +		unsigned long pgshift;
-> +		size_t data_size = dirty.argsz - minsz;
-> +		size_t iommu_pgsize;
-> +
-> +		if (!data_size || data_size < sizeof(range))
->  			return -EINVAL;
->  
-> -		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> -			size_t pgsize;
-> +		if (copy_from_user(&range, (void __user *)(arg + minsz),
-> +				   sizeof(range)))
-> +			return -EFAULT;
->  
-> -			mutex_lock(&iommu->lock);
-> -			pgsize = 1 << __ffs(iommu->pgsize_bitmap);
-> -			if (!iommu->dirty_page_tracking) {
-> -				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
-> -				if (!ret)
-> -					iommu->dirty_page_tracking = true;
-> -			}
-> -			mutex_unlock(&iommu->lock);
-> +		if (range.iova + range.size < range.iova)
-> +			return -EINVAL;
-> +		if (!access_ok((void __user *)range.bitmap.data,
-> +			       range.bitmap.size))
-> +			return -EINVAL;
-> +
-> +		pgshift = __ffs(range.bitmap.pgsize);
-> +		ret = verify_bitmap_size(range.size >> pgshift,
-> +					 range.bitmap.size);
-> +		if (ret)
->  			return ret;
-> -		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> -			mutex_lock(&iommu->lock);
-> -			if (iommu->dirty_page_tracking) {
-> -				iommu->dirty_page_tracking = false;
-> -				vfio_dma_bitmap_free_all(iommu);
-> -			}
-> -			mutex_unlock(&iommu->lock);
-> -			return 0;
-> -		} else if (dirty.flags &
-> -				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-idem
-> -			struct vfio_iommu_type1_dirty_bitmap_get range;
-> -			unsigned long pgshift;
-> -			size_t data_size = dirty.argsz - minsz;
-> -			size_t iommu_pgsize;
-> -
-> -			if (!data_size || data_size < sizeof(range))
-> -				return -EINVAL;
-> -
-> -			if (copy_from_user(&range, (void __user *)(arg + minsz),
-> -					   sizeof(range)))
-> -				return -EFAULT;
->  
-> -			if (range.iova + range.size < range.iova)
-> -				return -EINVAL;
-> -			if (!access_ok((void __user *)range.bitmap.data,
-> -				       range.bitmap.size))
-> -				return -EINVAL;
-> +		mutex_lock(&iommu->lock);
->  
-> -			pgshift = __ffs(range.bitmap.pgsize);
-> -			ret = verify_bitmap_size(range.size >> pgshift,
-> -						 range.bitmap.size);
-> -			if (ret)
-> -				return ret;
-> +		iommu_pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
->  
-> -			mutex_lock(&iommu->lock);
-> +		/* allow only smallest supported pgsize */
-> +		if (range.bitmap.pgsize != iommu_pgsize) {
-> +			ret = -EINVAL;
-> +			goto out_unlock;
-> +		}
-> +		if (range.iova & (iommu_pgsize - 1)) {
-> +			ret = -EINVAL;
-> +			goto out_unlock;
-> +		}
-> +		if (!range.size || range.size & (iommu_pgsize - 1)) {
-> +			ret = -EINVAL;
-> +			goto out_unlock;
-> +		}
->  
-> -			iommu_pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
-> +		if (iommu->dirty_page_tracking)
-> +			ret = vfio_iova_dirty_bitmap(range.bitmap.data,
-> +					iommu, range.iova, range.size,
-> +					range.bitmap.pgsize);
-> +		else
-> +			ret = -EINVAL;
-> +out_unlock:
-> +		mutex_unlock(&iommu->lock);
->  
-> -			/* allow only smallest supported pgsize */
-> -			if (range.bitmap.pgsize != iommu_pgsize) {
-> -				ret = -EINVAL;
-> -				goto out_unlock;
-> -			}
-> -			if (range.iova & (iommu_pgsize - 1)) {
-> -				ret = -EINVAL;
-> -				goto out_unlock;
-> -			}
-> -			if (!range.size || range.size & (iommu_pgsize - 1)) {
-> -				ret = -EINVAL;
-> -				goto out_unlock;
-> -			}
-> +		return ret;
-> +	}
->  
-> -			if (iommu->dirty_page_tracking)
-> -				ret = vfio_iova_dirty_bitmap(range.bitmap.data,
-> -						iommu, range.iova, range.size,
-> -						range.bitmap.pgsize);
-> -			else
-> -				ret = -EINVAL;
-> -out_unlock:
-> -			mutex_unlock(&iommu->lock);
-> +	return -EINVAL;
-> +}
->  
-> -			return ret;
-> -		}
-> +static long vfio_iommu_type1_ioctl(void *iommu_data,
-> +				   unsigned int cmd, unsigned long arg)
-> +{
-> +	struct vfio_iommu *iommu = iommu_data;
-> +
-> +	switch (cmd) {
-> +	case VFIO_CHECK_EXTENSION:
-> +		return vfio_iommu_type1_check_extension(iommu, arg);
-> +	case VFIO_IOMMU_GET_INFO:
-> +		return vfio_iommu_type1_get_info(iommu, arg);
-> +	case VFIO_IOMMU_MAP_DMA:
-> +		return vfio_iommu_type1_map_dma(iommu, arg);
-> +	case VFIO_IOMMU_UNMAP_DMA:
-> +		return vfio_iommu_type1_unmap_dma(iommu, arg);
-> +	case VFIO_IOMMU_DIRTY_PAGES:
-> +		return vfio_iommu_type1_dirty_pages(iommu, arg);
-default:
-	return -ENOTTY; ?
+>  	/* Tell the CSS we want to modify the subchannel */
+>  	cc = msch(schid, &schib);
+>  	if (cc) {
+> @@ -114,6 +128,7 @@ retry:
+>  		return cc;
 >  	}
 >  
->  	return -ENOTTY;
-> 
+> +	report_info("stsch: flags: %04x", pmcw->flags);
 
-Besides
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+It feels like all of this already should have been included in the
+previous patch?
 
-Thanks
+>  	if (pmcw->flags & PMCW_ENABLE) {
+>  		report_info("stsch: sch %08x enabled after %d retries",
+>  			    schid, retry_count);
+> @@ -129,3 +144,134 @@ retry:
+>  		    schid, retry_count, pmcw->flags);
+>  	return -1;
+>  }
+> +
+> +static struct irb irb;
+> +
+> +void css_irq_io(void)
+> +{
+> +	int ret = 0;
+> +	char *flags;
+> +	int sid;
+> +
+> +	report_prefix_push("Interrupt");
+> +	sid = lowcore_ptr->subsys_id_word;
+> +	/* Lowlevel set the SID as interrupt parameter. */
+> +	if (lowcore_ptr->io_int_param != sid) {
+> +		report(0,
+> +		       "io_int_param: %x differs from subsys_id_word: %x",
+> +		       lowcore_ptr->io_int_param, sid);
+> +		goto pop;
+> +	}
+> +	report_info("subsys_id_word: %08x io_int_param %08x io_int_word %08x",
+> +			lowcore_ptr->subsys_id_word,
+> +			lowcore_ptr->io_int_param,
+> +			lowcore_ptr->io_int_word);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("tsch");
+> +	ret = tsch(sid, &irb);
+> +	switch (ret) {
+> +	case 1:
+> +		dump_irb(&irb);
+> +		flags = dump_scsw_flags(irb.scsw.ctrl);
+> +		report(0,
+> +		       "I/O interrupt, CC 1 but tsch reporting sch %08x as not status pending: %s",
 
-Eric
+"I/O interrupt, but tsch returns CC 1 for subchannel %08x" ?
+
+> +		       sid, flags);
+> +		break;
+> +	case 2:
+> +		report(0, "tsch returns unexpected CC 2");
+> +		break;
+> +	case 3:
+> +		report(0, "tsch reporting sch %08x as not operational", sid);
+> +		break;
+> +	case 0:
+> +		/* Stay humble on success */
+> +		break;
+> +	}
+> +pop:
+> +	report_prefix_pop();
+> +	lowcore_ptr->io_old_psw.mask &= ~PSW_MASK_WAIT;
+> +}
+> +
+> +int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
+> +{
+> +	struct orb orb = {
+> +		.intparm = sid,
+> +		.ctrl = ORB_CTRL_ISIC|ORB_CTRL_FMT|ORB_LPM_DFLT,
+> +		.cpa = (unsigned int) (unsigned long)ccw,
+> +	};
+> +
+> +	return ssch(sid, &orb);
+> +}
+> +
+> +/*
+> + * In the future, we want to implement support for CCW chains;
+> + * for that, we will need to work with ccw1 pointers.
+> + */
+> +static struct ccw1 unique_ccw;
+> +
+> +int start_single_ccw(unsigned int sid, int code, void *data, int count,
+> +		     unsigned char flags)
+> +{
+> +	int cc;
+> +	struct ccw1 *ccw = &unique_ccw;
+> +
+> +	report_prefix_push("start_subchannel");
+> +	/* Build the CCW chain with a single CCW */
+> +	ccw->code = code;
+> +	ccw->flags = flags; /* No flags need to be set */
+
+s/No flags/No additional flags/
+
+> +	ccw->count = count;
+> +	ccw->data_address = (int)(unsigned long)data;
+> +
+> +	cc = start_ccw1_chain(sid, ccw);
+> +	if (cc) {
+> +		report(0, "start_ccw_chain failed ret=%d", cc);
+> +		report_prefix_pop();
+> +		return cc;
+> +	}
+> +	report_prefix_pop();
+> +	return 0;
+> +}
+> +
+> +/*
+> + * css_residual_count
+> + * We expect no residual count when the ORB request was successful
+
+If we have a short block, but have suppressed the incorrect length
+indication, we may have a successful request with a nonzero count.
+Maybe replace this with "Return the residual count, if it is valid."?
+
+> + * The residual count is valid when the subchannel is status pending
+> + * with primary status and device status only or device status and
+> + * subchannel status with PCI or incorrect length.
+> + * Return value:
+> + * Success: the residual count
+> + * Not meaningful: -1 (-1 can not be a valid count)
+> + */
+> +int css_residual_count(unsigned int schid)
+> +{
+> +
+> +	if (!(irb.scsw.ctrl & (SCSW_SC_PENDING | SCSW_SC_PRIMARY)))
+> +		goto fail;
+
+s/fail/invalid/ ? It's not really a failure :)
+
+> +
+> +	if (irb.scsw.dev_stat)
+> +		if (irb.scsw.sch_stat & ~(SCSW_SCHS_PCI | SCSW_SCHS_IL))
+> +			goto fail;
+> +
+> +	return irb.scsw.count;
+> +
+> +fail:
+> +	report_info("sch  status %02x", irb.scsw.sch_stat);
+> +	report_info("dev  status %02x", irb.scsw.dev_stat);
+> +	report_info("ctrl status %08x", irb.scsw.ctrl);
+> +	report_info("count       %04x", irb.scsw.count);
+> +	report_info("ccw addr    %08x", irb.scsw.ccw_addr);
+
+I don't understand why you dump this data if no valid residual count is
+available. But maybe I don't understand the purpose of this function
+correctly.
+
+> +	return -1;
+> +}
+> +
+> +/*
+> + * enable_io_isc: setup ISC in Control Register 6
+> + * @isc: The interruption Sub Class as a bitfield
+> + */
+> +void enable_io_isc(uint8_t isc)
+> +{
+> +	uint64_t value;
+> +
+> +	value = (uint64_t)isc << 24;
+> +	lctlg(6, value);
+> +}
+> diff --git a/s390x/css.c b/s390x/css.c
+> index 72aec43..60e6434 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -19,7 +19,11 @@
+>  
+>  #include <css.h>
+>  
+> +#define DEFAULT_CU_TYPE		0x3832 /* virtio-ccw */
+> +static unsigned long cu_type = DEFAULT_CU_TYPE;
+> +
+>  static int test_device_sid;
+> +static struct senseid senseid;
+>  
+>  static void test_enumerate(void)
+>  {
+> @@ -40,17 +44,104 @@ static void test_enable(void)
+>  		return;
+>  	}
+>  
+> -	cc = css_enable(test_device_sid);
+> +	cc = css_enable(test_device_sid, IO_SCH_ISC);
+>  
+>  	report(cc == 0, "Enable subchannel %08x", test_device_sid);
+>  }
+>  
+> +/*
+> + * test_sense
+> + * Pre-requisits:
+
+s/Pre-requisists/Pre-requisites/
+
+> + * - We need the test device as the first recognized
+> + *   device by the enumeration.
+> + */
+> +static void test_sense(void)
+> +{
+> +	int ret;
+> +	int len;
+> +
+> +	if (!test_device_sid) {
+> +		report_skip("No device");
+> +		return;
+> +	}
+> +
+> +	ret = css_enable(test_device_sid, IO_SCH_ISC);
+> +	if (ret) {
+> +		report(0,
+> +		       "Could not enable the subchannel: %08x",
+> +		       test_device_sid);
+> +		return;
+> +	}
+> +
+> +	ret = register_io_int_func(css_irq_io);
+> +	if (ret) {
+> +		report(0, "Could not register IRQ handler");
+> +		goto unreg_cb;
+> +	}
+> +
+> +	lowcore_ptr->io_int_param = 0;
+> +
+> +	memset(&senseid, 0, sizeof(senseid));
+> +	ret = start_single_ccw(test_device_sid, CCW_CMD_SENSE_ID,
+> +			       &senseid, sizeof(senseid), CCW_F_SLI);
+> +	if (ret) {
+> +		report(0, "ssch failed for SENSE ID on sch %08x with cc %d",
+> +		       test_device_sid, ret);
+> +		goto unreg_cb;
+> +	}
+> +
+> +	wait_for_interrupt(PSW_MASK_IO);
+> +
+> +	if (lowcore_ptr->io_int_param != test_device_sid) {
+> +		report(0, "ssch succeeded but interrupt parameter is wrong: expect %08x got %08x",
+> +		       test_device_sid, lowcore_ptr->io_int_param);
+> +		goto unreg_cb;
+> +	}
+> +
+> +	ret = css_residual_count(test_device_sid);
+> +	if (ret < 0) {
+> +		report(0, "ssch succeeded for SENSE ID but can not get a valid residual count");
+> +		goto unreg_cb;
+> +	}
+
+I'm not sure what you're testing here. You should first test whether
+the I/O concluded normally (i.e., whether you actually get something
+like status pending with channel end/device end). If not, it does not
+make much sense to look either at the residual count or at the sense id
+data.
+
+If css_residual_count does not return something >= 0 for that 'normal'
+case, something is definitely fishy, though :)
+
+> +
+> +	len = sizeof(senseid) - ret;
+> +	if (ret && len < CSS_SENSEID_COMMON_LEN) {
+> +		report(0,
+> +		       "ssch succeeded for SENSE ID but report a too short length: %d",
+
+s/report/transferred/ ?
+
+> +		       ret);
+> +		goto unreg_cb;
+> +	}
+> +
+> +	if (ret && len)
+> +		report_info("ssch succeeded for SENSE ID but report a shorter length: %d",
+
+Same here.
+
+> +			    len);
+> +
+> +	if (senseid.reserved != 0xff) {
+> +		report(0,
+> +		       "ssch succeeded for SENSE ID but reports garbage: %x",
+> +		       senseid.reserved);
+> +		goto unreg_cb;
+> +	}
+> +
+> +	report_info("senseid length read: %d", ret);
+> +	report_info("reserved %02x cu_type %04x cu_model %02x dev_type %04x dev_model %02x",
+> +		    senseid.reserved, senseid.cu_type, senseid.cu_model,
+> +		    senseid.dev_type, senseid.dev_model);
+> +
+> +	report(senseid.cu_type == cu_type, "cu_type: expect 0x%04x got 0x%04x",
+> +	       (uint16_t) cu_type, senseid.cu_type);
+> +
+> +unreg_cb:
+> +	unregister_io_int_func(css_irq_io);
+> +}
+> +
+>  static struct {
+>  	const char *name;
+>  	void (*func)(void);
+>  } tests[] = {
+>  	{ "enumerate (stsch)", test_enumerate },
+>  	{ "enable (msch)", test_enable },
+> +	{ "sense (ssch/tsch)", test_sense },
+>  	{ NULL, NULL }
+>  };
+>  
+> @@ -59,6 +150,7 @@ int main(int argc, char *argv[])
+>  	int i;
+>  
+>  	report_prefix_push("Channel Subsystem");
+> +	enable_io_isc(0x80 >> IO_SCH_ISC);
+>  	for (i = 0; tests[i].name; i++) {
+>  		report_prefix_push(tests[i].name);
+>  		tests[i].func();
 
