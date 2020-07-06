@@ -2,226 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77E6C215AFF
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 17:44:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58710215B29
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 17:49:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729596AbgGFPmZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 11:42:25 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:36306 "EHLO inva021.nxp.com"
+        id S1729466AbgGFPtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 11:49:12 -0400
+Received: from foss.arm.com ([217.140.110.172]:51076 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729482AbgGFPmS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 11:42:18 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id B2A9E2006DE;
-        Mon,  6 Jul 2020 17:42:15 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id A659B2006D7;
-        Mon,  6 Jul 2020 17:42:15 +0200 (CEST)
-Received: from fsr-ub1864-111.ea.freescale.net (fsr-ub1864-111.ea.freescale.net [10.171.82.141])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 59893203C3;
-        Mon,  6 Jul 2020 17:42:15 +0200 (CEST)
-From:   Diana Craciun <diana.craciun@oss.nxp.com>
-To:     alex.williamson@redhat.com, kvm@vger.kernel.org
-Cc:     bharatb.linux@gmail.com, linux-kernel@vger.kernel.org,
-        laurentiu.tudor@nxp.com, Diana Craciun <diana.craciun@oss.nxp.com>,
-        Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Subject: [PATCH v3 9/9] vfio/fsl-mc: Add read/write support for fsl-mc devices
-Date:   Mon,  6 Jul 2020 18:41:53 +0300
-Message-Id: <20200706154153.11477-10-diana.craciun@oss.nxp.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200706154153.11477-1-diana.craciun@oss.nxp.com>
-References: <20200706154153.11477-1-diana.craciun@oss.nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1729267AbgGFPtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 11:49:12 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EC64C0A;
+        Mon,  6 Jul 2020 08:49:11 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C2183F68F;
+        Mon,  6 Jul 2020 08:49:09 -0700 (PDT)
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com,
+        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        George Cherian <gcherian@marvell.com>,
+        James Morse <james.morse@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Dave Martin <Dave.Martin@arm.com>,
+        linux-arm-kernel@lists.infradead.org
+References: <20200615132719.1932408-1-maz@kernel.org>
+ <20200615132719.1932408-2-maz@kernel.org>
+ <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
+ <9c0044564885d3356f76b55f35426987@kernel.org>
+ <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
+ <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <7fae512d-a4a4-f66c-92c7-d3d3f7ebd488@arm.com>
+Date:   Mon, 6 Jul 2020 16:49:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The software uses a memory-mapped I/O command interface (MC portals) to
-communicate with the MC hardware. This command interface is used to
-discover, enumerate, configure and remove DPAA2 objects. The DPAA2
-objects use MSIs, so the command interface needs to be emulated
-such that the correct MSI is configured in the hardware (the guest
-has the virtual MSIs).
+Hi Marc,
 
-This patch is adding read/write support for fsl-mc devices. The mc
-commands are emulated by the userspace. The host is just passing
-the correct command to the hardware.
+On 7/6/20 1:17 PM, Marc Zyngier wrote:
+> On 2020-06-25 13:19, Alexandru Elisei wrote:
+>> Hi Marc,
+>>
+>> On 6/16/20 5:18 PM, Marc Zyngier wrote:
+>>> Hi Alexandru,
+>>> [..]
+>>>>> [..]
+>>>>>
+>>>>>  /**
+>>>>> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
+>>>>> - * @kvm:    The KVM struct pointer for the VM.
+>>>>> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
+>>>>> + * @kvm:    The pointer to the KVM structure
+>>>>> + * @mmu:    The pointer to the s2 MMU structure
+>>>>>   *
+>>>>>   * Allocates only the stage-2 HW PGD level table(s) of size defined by
+>>>>> - * stage2_pgd_size(kvm).
+>>>>> + * stage2_pgd_size(mmu->kvm).
+>>>>>   *
+>>>>>   * Note we don't need locking here as this is only called when the VM is
+>>>>>   * created, which can only be done once.
+>>>>>   */
+>>>>> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>>>> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+>>>>>  {
+>>>>>      phys_addr_t pgd_phys;
+>>>>>      pgd_t *pgd;
+>>>>> +    int cpu;
+>>>>>
+>>>>> -    if (kvm->arch.pgd != NULL) {
+>>>>> +    if (mmu->pgd != NULL) {
+>>>>>          kvm_err("kvm_arch already initialized?\n");
+>>>>>          return -EINVAL;
+>>>>>      }
+>>>>> @@ -1024,8 +1040,20 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>>>>      if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
+>>>>>          return -EINVAL;
+>>>>
+>>>> We don't free the pgd if we get the error above, but we do free it below, if
+>>>> allocating last_vcpu_ran fails. Shouldn't we free it in both cases?
+>>>
+>>> Worth investigating. This code gets majorly revamped in the NV series, so it is
+>>> likely that I missed something in the middle.
+>>
+>> You didn't miss anything, I checked and it's the same in the upstream
+>> version of KVM.
+>>
+>> kvm_arch_init_vm() returns with an error if this functions fails, so it's up to
+>> the function to do the clean up. kvm_alloc_pages_exact() returns NULL
+>> on error, so
+>> at this point we have a valid allocation of physical contiguous pages.
+>> Failing to
+>> create a VM is not a fatal error for the system, so I'm thinking that maybe we
+>> should free those pages for the rest of the system to use. However, this is a
+>> minor issue, and the patch isn't supposed to make any functional changes, so it
+>> can be probably be left for another patch and not add more to an
+>> already big series.
+>
+> Cool. Will you be posting such patch?
 
-Also the current patch limits userspace to write complete
-64byte command once and read 64byte response by one ioctl.
+I was considering one, but then I realized there's something that I still don't
+understand.
 
-Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
----
- drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 115 +++++++++++++++++++++-
- drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |   1 +
- 2 files changed, 114 insertions(+), 2 deletions(-)
+alloc_pages_exact() allocates 2^order pages (where 2^order pages >=
+stage2_pgd_size()) via __get_free_pages -> alloc_pages(), then it frees the
+unneeded pages at the *end* of the allocation in make_alloc_exact(). So the
+beginning of the allocated physical area remains aligned to 2^order pages, and
+implicitly to stage2_pgd_size().
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index 0c2d4f11dc43..104e3bb78bf8 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -12,6 +12,7 @@
- #include <linux/types.h>
- #include <linux/vfio.h>
- #include <linux/fsl/mc.h>
-+#include <linux/delay.h>
- 
- #include "vfio_fsl_mc_private.h"
- 
-@@ -105,6 +106,9 @@ static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
- 		vdev->regions[i].size = resource_size(res);
- 		vdev->regions[i].flags = VFIO_REGION_INFO_FLAG_MMAP;
- 		vdev->regions[i].type = mc_dev->regions[i].flags & IORESOURCE_BITS;
-+		vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_READ;
-+		if (!(mc_dev->regions[i].flags & IORESOURCE_READONLY))
-+			vdev->regions[i].flags |= VFIO_REGION_INFO_FLAG_WRITE;
- 	}
- 
- 	vdev->num_regions = mc_dev->obj_desc.region_count;
-@@ -113,6 +117,11 @@ static int vfio_fsl_mc_regions_init(struct vfio_fsl_mc_device *vdev)
- 
- static void vfio_fsl_mc_regions_cleanup(struct vfio_fsl_mc_device *vdev)
- {
-+	int i;
-+
-+	for (i = 0; i < vdev->num_regions; i++)
-+		iounmap(vdev->regions[i].ioaddr);
-+
- 	vdev->num_regions = 0;
- 	kfree(vdev->regions);
- }
-@@ -306,13 +315,115 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
- static ssize_t vfio_fsl_mc_read(void *device_data, char __user *buf,
- 				size_t count, loff_t *ppos)
- {
--	return -EINVAL;
-+	struct vfio_fsl_mc_device *vdev = device_data;
-+	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-+	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-+	struct vfio_fsl_mc_region *region;
-+	u64 data[8];
-+	int i;
-+
-+	if (index >= vdev->num_regions)
-+		return -EINVAL;
-+
-+	region = &vdev->regions[index];
-+
-+	if (!(region->flags & VFIO_REGION_INFO_FLAG_READ))
-+		return -EINVAL;
-+
-+	if (!region->ioaddr) {
-+		region->ioaddr = ioremap(region->addr, region->size);
-+		if (!region->ioaddr)
-+			return -ENOMEM;
-+	}
-+
-+	if (count != 64 || off != 0)
-+		return -EINVAL;
-+
-+	for (i = 7; i >= 0; i--)
-+		data[i] = readq(region->ioaddr + i * sizeof(uint64_t));
-+
-+	if (copy_to_user(buf, data, 64))
-+		return -EFAULT;
-+
-+	return count;
-+}
-+
-+#define MC_CMD_COMPLETION_TIMEOUT_MS    5000
-+#define MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS    500
-+
-+static int vfio_fsl_mc_send_command(void __iomem *ioaddr, uint64_t *cmd_data)
-+{
-+	int i;
-+	enum mc_cmd_status status;
-+	unsigned long timeout_usecs = MC_CMD_COMPLETION_TIMEOUT_MS * 1000;
-+
-+	/* Write at command parameter into portal */
-+	for (i = 7; i >= 1; i--)
-+		writeq_relaxed(cmd_data[i], ioaddr + i * sizeof(uint64_t));
-+
-+	/* Write command header in the end */
-+	writeq(cmd_data[0], ioaddr);
-+
-+	/* Wait for response before returning to user-space
-+	 * This can be optimized in future to even prepare response
-+	 * before returning to user-space and avoid read ioctl.
-+	 */
-+	for (;;) {
-+		u64 header;
-+		struct mc_cmd_header *resp_hdr;
-+
-+		header = cpu_to_le64(readq_relaxed(ioaddr));
-+
-+		resp_hdr = (struct mc_cmd_header *)&header;
-+		status = (enum mc_cmd_status)resp_hdr->status;
-+		if (status != MC_CMD_STATUS_READY)
-+			break;
-+
-+		udelay(MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS);
-+		timeout_usecs -= MC_CMD_COMPLETION_POLLING_MAX_SLEEP_USECS;
-+		if (timeout_usecs == 0)
-+			return -ETIMEDOUT;
-+	}
-+
-+	return 0;
- }
- 
- static ssize_t vfio_fsl_mc_write(void *device_data, const char __user *buf,
- 				 size_t count, loff_t *ppos)
- {
--	return -EINVAL;
-+	struct vfio_fsl_mc_device *vdev = device_data;
-+	unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-+	loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-+	struct vfio_fsl_mc_region *region;
-+	u64 data[8];
-+	int ret;
-+
-+	if (index >= vdev->num_regions)
-+		return -EINVAL;
-+
-+	region = &vdev->regions[index];
-+
-+	if (!(region->flags & VFIO_REGION_INFO_FLAG_WRITE))
-+		return -EINVAL;
-+
-+	if (!region->ioaddr) {
-+		region->ioaddr = ioremap(region->addr, region->size);
-+		if (!region->ioaddr)
-+			return -ENOMEM;
-+	}
-+
-+	if (count != 64 || off != 0)
-+		return -EINVAL;
-+
-+	if (copy_from_user(&data, buf, 64))
-+		return -EFAULT;
-+
-+	ret = vfio_fsl_mc_send_command(region->ioaddr, data);
-+	if (ret)
-+		return ret;
-+
-+	return count;
-+
- }
- 
- static int vfio_fsl_mc_mmap_mmio(struct vfio_fsl_mc_region region,
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-index 1f9b518c520d..c407d36b80b5 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
-@@ -32,6 +32,7 @@ struct vfio_fsl_mc_region {
- 	u32			type;
- 	u64			addr;
- 	resource_size_t		size;
-+	void __iomem		*ioaddr;
- };
- 
- struct vfio_fsl_mc_device {
--- 
-2.17.1
+But now I can't figure out why kvm_vttbr_baddr_mask() isn't simply defined as
+~stage2_pgd_size(). Is it possible for kvm_vttbr_baddr_mask() to return an
+alignment larger than the size of the table? I can't seem to find anything to that
+effect in ARM arm (but that doesn't mean that I didn't miss anything).
 
+Thanks,
+Alex
