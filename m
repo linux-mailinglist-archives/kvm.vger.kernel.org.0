@@ -2,125 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B64B215AB7
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 17:29:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FA45215AFA
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 17:44:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729353AbgGFP3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 11:29:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58826 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729197AbgGFP3N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jul 2020 11:29:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594049352;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fue+J+SZ+TQDmSB0+3L8vErWlImPiK/hYfN6zC83Q4g=;
-        b=AmJ9U+Ot+UkZHcaEnjDX0DRmMOwJjduW4a2lILXR++zJn7cCvstbz9XYcxphLv5Gi7J6yn
-        JOuR1peAUtOkSeyjCHCyROHgxFZ+dhRA20BfV8T/9igDKG/Lw8XHWz3PCB/oWZhCLDBMSK
-        pPp3gEsadSlS5Uy7LPEFqF5+vRVsQ0A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-0DfCHj40NE-sE7mqyIK4mQ-1; Mon, 06 Jul 2020 11:29:08 -0400
-X-MC-Unique: 0DfCHj40NE-sE7mqyIK4mQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E993107B274;
-        Mon,  6 Jul 2020 15:29:07 +0000 (UTC)
-Received: from gondolin (ovpn-112-234.ams2.redhat.com [10.36.112.234])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5EF46275E3D;
-        Mon,  6 Jul 2020 15:28:54 +0000 (UTC)
-Date:   Mon, 6 Jul 2020 17:28:51 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     qemu-devel@nongnu.org, Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        qemu-s390x@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v5 11/21] virtio-pci: Proxy for virtio-mem
-Message-ID: <20200706172851.2d3062d9.cohuck@redhat.com>
-In-Reply-To: <20200626072248.78761-12-david@redhat.com>
-References: <20200626072248.78761-1-david@redhat.com>
-        <20200626072248.78761-12-david@redhat.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1729406AbgGFPmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 11:42:14 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:46440 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729197AbgGFPmO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 11:42:14 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 4BC651A072D;
+        Mon,  6 Jul 2020 17:42:12 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 3C1921A072C;
+        Mon,  6 Jul 2020 17:42:12 +0200 (CEST)
+Received: from fsr-ub1864-111.ea.freescale.net (fsr-ub1864-111.ea.freescale.net [10.171.82.141])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id E8F8C203C3;
+        Mon,  6 Jul 2020 17:42:11 +0200 (CEST)
+From:   Diana Craciun <diana.craciun@oss.nxp.com>
+To:     alex.williamson@redhat.com, kvm@vger.kernel.org
+Cc:     bharatb.linux@gmail.com, linux-kernel@vger.kernel.org,
+        laurentiu.tudor@nxp.com, Diana Craciun <diana.craciun@oss.nxp.com>
+Subject: [PATCH v3 0/9] vfio/fsl-mc: VFIO support for FSL-MC devices
+Date:   Mon,  6 Jul 2020 18:41:44 +0300
+Message-Id: <20200706154153.11477-1-diana.craciun@oss.nxp.com>
+X-Mailer: git-send-email 2.17.1
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 26 Jun 2020 09:22:38 +0200
-David Hildenbrand <david@redhat.com> wrote:
+DPAA2 (Data Path Acceleration Architecture) consists in
+mechanisms for processing Ethernet packets, queue management,
+accelerators, etc.
 
-> Let's add a proxy for virtio-mem, make it a memory device, and
-> pass-through the properties.
-> 
-> Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/virtio/Makefile.objs    |   1 +
->  hw/virtio/virtio-mem-pci.c | 129 +++++++++++++++++++++++++++++++++++++
->  hw/virtio/virtio-mem-pci.h |  33 ++++++++++
->  include/hw/pci/pci.h       |   1 +
->  4 files changed, 164 insertions(+)
->  create mode 100644 hw/virtio/virtio-mem-pci.c
->  create mode 100644 hw/virtio/virtio-mem-pci.h
+The Management Complex (mc) is a hardware entity that manages the DPAA2
+hardware resources. It provides an object-based abstraction for software
+drivers to use the DPAA2 hardware. The MC mediates operations such as
+create, discover, destroy of DPAA2 objects.
+The MC provides memory-mapped I/O command interfaces (MC portals) which
+DPAA2 software drivers use to operate on DPAA2 objects.
 
-(...)
+A DPRC is a container object that holds other types of DPAA2 objects.
+Each object in the DPRC is a Linux device and bound to a driver.
+The MC-bus driver is a platform driver (different from PCI or platform
+bus). The DPRC driver does runtime management of a bus instance. It
+performs the initial scan of the DPRC and handles changes in the DPRC
+configuration (adding/removing objects).
 
-> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
-> new file mode 100644
-> index 0000000000..b325303b32
-> --- /dev/null
-> +++ b/hw/virtio/virtio-mem-pci.c
-> @@ -0,0 +1,129 @@
-> +/*
-> + * Virtio MEM PCI device
-> + *
-> + * Copyright (C) 2020 Red Hat, Inc.
-> + *
-> + * Authors:
-> + *  David Hildenbrand <david@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "virtio-mem-pci.h"
-> +#include "hw/mem/memory-device.h"
-> +#include "qapi/error.h"
-> +
-> +static void virtio_mem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> +{
-> +    VirtIOMEMPCI *mem_pci = VIRTIO_MEM_PCI(vpci_dev);
-> +    DeviceState *vdev = DEVICE(&mem_pci->vdev);
-> +
+All objects inside a container share the same hardware isolation
+context, meaning that only an entire DPRC can be assigned to
+a virtual machine.
+When a container is assigned to a virtual machine, all the objects
+within that container are assigned to that virtual machine.
+The DPRC container assigned to the virtual machine is not allowed
+to change contents (add/remove objects) by the guest. The restriction
+is set by the host and enforced by the mc hardware.
 
-As we were having that discussion for other devices recently: I think
-you want to use 
+The DPAA2 objects can be directly assigned to the guest. However
+the MC portals (the memory mapped command interface to the MC) need
+to be emulated because there are commands that configure the
+interrupts and the isolation IDs which are virtual in the guest.
 
-    virtio_pci_force_virtio_1(vpci_dev);
+Example:
+echo vfio-fsl-mc > /sys/bus/fsl-mc/devices/dprc.2/driver_override
+echo dprc.2 > /sys/bus/fsl-mc/drivers/vfio-fsl-mc/bind
 
-here. (Or do it via the names in the type, as virtio-fs does, but I
-think I like forcing it better.)
+The dprc.2 is bound to the VFIO driver and all the objects within
+dprc.2 are going to be bound to the VFIO driver.
 
-> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> +}
+More details about the DPAA2 objects can be found here:
+Documentation/networking/device_drivers/freescale/dpaa2/overview.rst
+
+The patches are dependent on some changes in the mc-bus (bus/fsl-mc)
+driver. The changes were needed in order to re-use code and to export
+some more functions that are needed by the VFIO driver.
+Currenlty the mc-bus patches are under review:
+https://www.spinics.net/lists/kernel/msg3578910.html
+
+v2 --> v3
+- There is no need to align region size to page size
+- read/write implemented for all DPAA2 objects
+- review fixes
+
+v1 --> v2
+- Fixed the container reset, a new flag added to the firmware command
+- Implement a bus notifier for setting driver_override
+
+Bharat Bhushan (1):
+  vfio/fsl-mc: Add VFIO framework skeleton for fsl-mc devices
+
+Diana Craciun (8):
+  vfio/fsl-mc: Scan DPRC objects on vfio-fsl-mc driver bind
+  vfio/fsl-mc: Implement VFIO_DEVICE_GET_INFO ioctl
+  vfio/fsl-mc: Implement VFIO_DEVICE_GET_REGION_INFO ioctl call
+  vfio/fsl-mc: Allow userspace to MMAP fsl-mc device MMIO regions
+  vfio/fsl-mc: Added lock support in preparation for interrupt handling
+  vfio/fsl-mc: Add irq infrastructure for fsl-mc devices
+  vfio/fsl-mc: trigger an interrupt via eventfd
+  vfio/fsl-mc: Add read/write support for fsl-mc devices
+
+ MAINTAINERS                               |   6 +
+ drivers/vfio/Kconfig                      |   1 +
+ drivers/vfio/Makefile                     |   1 +
+ drivers/vfio/fsl-mc/Kconfig               |   9 +
+ drivers/vfio/fsl-mc/Makefile              |   4 +
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c         | 687 ++++++++++++++++++++++
+ drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c    | 221 +++++++
+ drivers/vfio/fsl-mc/vfio_fsl_mc_private.h |  55 ++
+ include/uapi/linux/vfio.h                 |   1 +
+ 9 files changed, 985 insertions(+)
+ create mode 100644 drivers/vfio/fsl-mc/Kconfig
+ create mode 100644 drivers/vfio/fsl-mc/Makefile
+ create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc.c
+ create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+ create mode 100644 drivers/vfio/fsl-mc/vfio_fsl_mc_private.h
+
+-- 
+2.17.1
 
