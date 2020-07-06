@@ -2,166 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E65FA215988
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 16:34:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CFE2215A06
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 16:52:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729321AbgGFOeW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 10:34:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28798 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729307AbgGFOeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 10:34:21 -0400
+        id S1729253AbgGFOwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 10:52:31 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24408 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729227AbgGFOwb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jul 2020 10:52:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594046060;
+        s=mimecast20190719; t=1594047149;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hBET4KTCF7VLtikUgOS5OyaCCHxUdfauUuYPMbcHgTI=;
-        b=g19cmXFHpqK7hfIx+15gLrVhireNzlLK4jRW0rlBXq+IUn+cq70kTHBTjn/R2SSHHXBbzc
-        9NH59PT08CLyY6/SJ5iy/lj6UJpxMtSHPaJdTKbIca2oPDKddMI+WrINnRxfxaaRlhmQF2
-        xpnoB7vBV2JFJuvJ/p3SA/2x8FfewsQ=
+        bh=ZKdVspges85ZduPH9Q6FYljsttWOZWyavYYfs+vHaPE=;
+        b=ZKRePbTZmTkdHnehH0cvK7nCSpzk7fHYlLRFi01RBDowCBUypg922kwEBUtNefXPtOjffv
+        TywU7SaFEdtyyhWWenInk3kkQru2wlOB9VvsKroF3UyWRHVHSCNVb82os/pkbz0pTo+hoK
+        l7CxrHZ8aCq2ruxmQq65Nwnq3nNZwU8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-8UAvHL0EOOKZDXFTB_A5Fw-1; Mon, 06 Jul 2020 10:34:16 -0400
-X-MC-Unique: 8UAvHL0EOOKZDXFTB_A5Fw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-390-6abRn3w7MLOiHY4XoIRN0w-1; Mon, 06 Jul 2020 10:52:27 -0400
+X-MC-Unique: 6abRn3w7MLOiHY4XoIRN0w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7F1B10506E1;
-        Mon,  6 Jul 2020 14:33:49 +0000 (UTC)
-Received: from gondolin (ovpn-112-234.ams2.redhat.com [10.36.112.234])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C3B41A914;
-        Mon,  6 Jul 2020 14:33:43 +0000 (UTC)
-Date:   Mon, 6 Jul 2020 16:33:40 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, jasowang@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v3 1/1] s390: virtio: let arch accept devices without
- IOMMU feature
-Message-ID: <20200706163340.2ce7a5f2.cohuck@redhat.com>
-In-Reply-To: <a677decc-5be3-8095-bc33-0f95634011f6@linux.ibm.com>
-References: <1592390637-17441-1-git-send-email-pmorel@linux.ibm.com>
-        <1592390637-17441-2-git-send-email-pmorel@linux.ibm.com>
-        <20200629115651-mutt-send-email-mst@kernel.org>
-        <20200629180526.41d0732b.cohuck@redhat.com>
-        <26ecd4c6-837b-1ce6-170b-a0155e4dd4d4@linux.ibm.com>
-        <a677decc-5be3-8095-bc33-0f95634011f6@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97E93107ACF9;
+        Mon,  6 Jul 2020 14:52:25 +0000 (UTC)
+Received: from [10.36.113.241] (ovpn-113-241.ams2.redhat.com [10.36.113.241])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 500D260BF3;
+        Mon,  6 Jul 2020 14:52:16 +0000 (UTC)
+Subject: Re: [PATCH v4 06/15] iommu/vt-d: Support setting ioasid set to domain
+To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
+        stefanha@gmail.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1593861989-35920-1-git-send-email-yi.l.liu@intel.com>
+ <1593861989-35920-7-git-send-email-yi.l.liu@intel.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <d47367ab-f986-4c09-2578-3e364aa57835@redhat.com>
+Date:   Mon, 6 Jul 2020 16:52:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <1593861989-35920-7-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 Jul 2020 15:37:37 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Hi Yi,
 
-> On 2020-07-02 15:03, Pierre Morel wrote:
-> >=20
-> >=20
-> > On 2020-06-29 18:05, Cornelia Huck wrote: =20
-> >> On Mon, 29 Jun 2020 11:57:14 -0400
-> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >> =20
-> >>> On Wed, Jun 17, 2020 at 12:43:57PM +0200, Pierre Morel wrote: =20
-> >>>> An architecture protecting the guest memory against unauthorized host
-> >>>> access may want to enforce VIRTIO I/O device protection through the
-> >>>> use of VIRTIO_F_IOMMU_PLATFORM.
-> >>>>
-> >>>> Let's give a chance to the architecture to accept or not devices
-> >>>> without VIRTIO_F_IOMMU_PLATFORM.
-> >>>>
-> >>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> >>>> Acked-by: Jason Wang <jasowang@redhat.com>
-> >>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>>> ---
-> >>>> =C2=A0 arch/s390/mm/init.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 6 ++++++
-> >>>> =C2=A0 drivers/virtio/virtio.c | 22 ++++++++++++++++++++++
-> >>>> =C2=A0 include/linux/virtio.h=C2=A0 |=C2=A0 2 ++
-> >>>> =C2=A0 3 files changed, 30 insertions(+) =20
-> >> =20
-> >>>> @@ -179,6 +194,13 @@ int virtio_finalize_features(struct=20
-> >>>> virtio_device *dev)
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!virtio_has_feature(dev, VIRTIO_F=
-_VERSION_1))
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
-> >>>> +=C2=A0=C2=A0=C2=A0 if (arch_needs_virtio_iommu_platform(dev) &&
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !virtio_has_feature(dev,=
- VIRTIO_F_IOMMU_PLATFORM)) {
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev_warn(&dev->dev,
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 "virtio: device must provide VIRTIO_F_IOMMU_PLATFORM\n");
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENODEV;
-> >>>> +=C2=A0=C2=A0=C2=A0 }
-> >>>> +
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 virtio_add_status(dev, VIRTIO_CONFIG_=
-S_FEATURES_OK);
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 status =3D dev->config->get_status(de=
-v);
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!(status & VIRTIO_CONFIG_S_FEATUR=
-ES_OK)) { =20
-> >>>
-> >>> Well don't you need to check it *before* VIRTIO_F_VERSION_1, not afte=
-r? =20
-> >>
-> >> But it's only available with VERSION_1 anyway, isn't it? So it probably
-> >> also needs to fail when this feature is needed if VERSION_1 has not be=
-en
-> >> negotiated, I think. =20
->=20
->=20
-> would be something like:
->=20
-> -       if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
-> -               return 0;
-> +       if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
-> +               ret =3D arch_accept_virtio_features(dev);
-> +               if (ret)
-> +                       dev_warn(&dev->dev,
-> +                                "virtio: device must provide=20
-> VIRTIO_F_VERSION_1\n");
-> +               return ret;
-> +       }
+On 7/4/20 1:26 PM, Liu Yi L wrote:
+> From IOMMU p.o.v., PASIDs allocated and managed by external components
+> (e.g. VFIO) will be passed in for gpasid_bind/unbind operation. IOMMU
+> needs some knowledge to check the PASID ownership, hence add an interface
+> for those components to tell the PASID owner.
+> 
+> In latest kernel design, PASID ownership is managed by IOASID set where
+> the PASID is allocated from. This patch adds support for setting ioasid
+> set ID to the domains used for nesting/vSVA. Subsequent SVA operations
+> on the PASID will be checked against its IOASID set for proper ownership.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> ---
+>  drivers/iommu/intel/iommu.c | 16 ++++++++++++++++
+>  include/linux/intel-iommu.h |  4 ++++
+>  include/linux/iommu.h       |  1 +
+>  3 files changed, 21 insertions(+)
+> 
+> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+> index 62ebe01..89d708d 100644
+> --- a/drivers/iommu/intel/iommu.c
+> +++ b/drivers/iommu/intel/iommu.c
+> @@ -1793,6 +1793,7 @@ static struct dmar_domain *alloc_domain(int flags)
+>  	if (first_level_by_default())
+>  		domain->flags |= DOMAIN_FLAG_USE_FIRST_LEVEL;
+>  	domain->has_iotlb_device = false;
+> +	domain->ioasid_sid = INVALID_IOASID_SET;
+>  	INIT_LIST_HEAD(&domain->devices);
+>  
+>  	return domain;
+> @@ -6039,6 +6040,21 @@ intel_iommu_domain_set_attr(struct iommu_domain *domain,
+>  		}
+>  		spin_unlock_irqrestore(&device_domain_lock, flags);
+>  		break;
+> +	case DOMAIN_ATTR_IOASID_SID:
+no need to take the device_domain_lock?
+> +		if (!(dmar_domain->flags & DOMAIN_FLAG_NESTING_MODE)) {
+> +			ret = -ENODEV;
+> +			break;
+> +		}
+> +		if ((dmar_domain->ioasid_sid != INVALID_IOASID_SET) &&
+> +		    (dmar_domain->ioasid_sid != (*(int *) data))) {
+storing *(int *) data) in a local variable would increase the
+readability of the code I think.
+> +			pr_warn_ratelimited("multi ioasid_set (%d:%d) setting",
+> +					    dmar_domain->ioasid_sid,
+> +					    (*(int *) data));
+> +			ret = -EBUSY;
+> +			break;
+> +		}
+> +		dmar_domain->ioasid_sid = *(int *) data;
+> +		break;
+>  	default:
+>  		ret = -EINVAL;
+>  		break;
+> diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+> index 3f23c26..0d0ab32 100644
+> --- a/include/linux/intel-iommu.h
+> +++ b/include/linux/intel-iommu.h
+> @@ -549,6 +549,10 @@ struct dmar_domain {
+>  					   2 == 1GiB, 3 == 512GiB, 4 == 1TiB */
+>  	u64		max_addr;	/* maximum mapped address */
+>  
+> +	int		ioasid_sid;	/*
+> +					 * the ioasid set which tracks all
+> +					 * PASIDs used by the domain.
+> +					 */
+>  	int		default_pasid;	/*
+>  					 * The default pasid used for non-SVM
+>  					 * traffic on mediated devices.
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 2567c33..21d32be 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -124,6 +124,7 @@ enum iommu_attr {
+>  	DOMAIN_ATTR_FSL_PAMUV1,
+>  	DOMAIN_ATTR_NESTING,	/* two stages of translation */
+>  	DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE,
+> +	DOMAIN_ATTR_IOASID_SID,
+>  	DOMAIN_ATTR_MAX,
+>  };
+>  
+> 
+Thanks
 
-That looks wrong; I think we want to validate in all cases. What about:
-
-ret =3D arch_accept_virtio_features(dev); // this can include checking for
-                                        // older or newer features
-if (ret)
-	// assume that the arch callback moaned already
-	return ret;
-
-if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
-	return 0;
-
-// do the virtio-1 only FEATURES_OK dance
-
->=20
->=20
-> just a thought on the function name:
-> It becomes more general than just IOMMU_PLATFORM related.
->=20
-> What do you think of:
->=20
-> arch_accept_virtio_features()
-
-Or maybe arch_validate_virtio_features()?
-
->=20
-> ?
->=20
-> Regards,
-> Pierre
->=20
->=20
+Eric
 
