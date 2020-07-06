@@ -2,319 +2,483 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1724A2155B1
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 12:37:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AC1C2155C6
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 12:47:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728943AbgGFKhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 06:37:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27023 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728422AbgGFKhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 06:37:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594031849;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A2TH0l40UUZw3trZBCC+/hrIk4R1Tqn0kicJMiXyx/I=;
-        b=V4iYw2i4v6UpnNcv05AGXiEapWXtOUnqKxFIwqOw2ZJ/Z9PC8xAGeXP5Fqs2mBGtJBXeQo
-        ovwmD44CyPgoEHvf2N0FI8LS0sfrJXI7TyAQ6VKD2HuJC2edn7jAI+tS5+cu8AGsWwwaF8
-        HXIVLiQlaPvd9/5FJ/VF6/DGCDzpC+I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-n2jXDVxFO3Od9r5VdJEaVQ-1; Mon, 06 Jul 2020 06:37:25 -0400
-X-MC-Unique: n2jXDVxFO3Od9r5VdJEaVQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BA66EC1A0;
-        Mon,  6 Jul 2020 10:37:23 +0000 (UTC)
-Received: from [10.36.113.241] (ovpn-113-241.ams2.redhat.com [10.36.113.241])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D380D10013C2;
-        Mon,  6 Jul 2020 10:37:13 +0000 (UTC)
-Subject: Re: [PATCH v4 04/15] vfio/type1: Report iommu nesting info to
- userspace
-To:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org
-Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        ashok.raj@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        jean-philippe@linaro.org, peterx@redhat.com, hao.wu@intel.com,
-        stefanha@gmail.com, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1593861989-35920-1-git-send-email-yi.l.liu@intel.com>
- <1593861989-35920-5-git-send-email-yi.l.liu@intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <d434cbcc-d3b1-d11d-0304-df2d2c93efa0@redhat.com>
-Date:   Mon, 6 Jul 2020 12:37:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1728683AbgGFKrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 06:47:08 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:23852 "EHLO
+        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728514AbgGFKrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 06:47:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1594032426; x=1625568426;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=mngr/DCNG1zQgPe4uz33ML7KchEuJI/oFtw5XXaQ5bI=;
+  b=vgZKQghShw3BEN/84o7Vpbk6AbmBTaG+mQneM1JyNWWXMSjtU3Kq9H8U
+   pGqeI4FjW2GLAFLDlLYLlepOAxcuCLqmBS8zL9APNZJ5Q5FpqE+Jm2/SR
+   PN3rBvY3gZEPHJQdN2i9O4IyUK1ztIfetyNyFWy13h13ddpyeNV3nUaBK
+   c=;
+IronPort-SDR: ibx+QrhuD3wA/1gKbt2iK64wHshbX34Ug3vdF6uJdvVGk2gbzJGTkCSh8fLI69LrEoNC1ar5g6
+ 7MxrkNP5d/cA==
+X-IronPort-AV: E=Sophos;i="5.75,318,1589241600"; 
+   d="scan'208";a="49373822"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1d-9ec21598.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 06 Jul 2020 10:47:00 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-9ec21598.us-east-1.amazon.com (Postfix) with ESMTPS id DC3D6A205C;
+        Mon,  6 Jul 2020 10:46:57 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 6 Jul 2020 10:46:57 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.85) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 6 Jul 2020 10:46:51 +0000
+Subject: Re: [PATCH v4 11/18] nitro_enclaves: Add logic for enclave memory
+ region set
+To:     Andra Paraschiv <andraprs@amazon.com>,
+        <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Bjoern Doebel" <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        "Stefano Garzarella" <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-12-andraprs@amazon.com>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <798dbb9f-0fe4-9fd9-2e64-f6f2bc740abf@amazon.de>
+Date:   Mon, 6 Jul 2020 12:46:39 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <1593861989-35920-5-git-send-email-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200622200329.52996-12-andraprs@amazon.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Originating-IP: [10.43.162.85]
+X-ClientProxiedBy: EX13D16UWB003.ant.amazon.com (10.43.161.194) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Yi,
 
-On 7/4/20 1:26 PM, Liu Yi L wrote:
-> This patch exports iommu nesting capability info to user space through
-> VFIO. User space is expected to check this info for supported uAPIs (e.g.
-> PASID alloc/free, bind page table, and cache invalidation) and the vendor
-> specific format information for first level/stage page table that will be
-> bound to.
-> 
-> The nesting info is available only after the nesting iommu type is set
-> for a container. Current implementation imposes one limitation - one
-> nesting container should include at most one group. The philosophy of
-> vfio container is having all groups/devices within the container share
-> the same IOMMU context. When vSVA is enabled, one IOMMU context could
-> include one 2nd-level address space and multiple 1st-level address spaces.
-> While the 2nd-leve address space is reasonably sharable by multiple groups
-level
-> , blindly sharing 1st-level address spaces across all groups within the
-> container might instead break the guest expectation. In the future sub/
-> super container concept might be introduced to allow partial address space
-> sharing within an IOMMU context. But for now let's go with this restriction
-> by requiring singleton container for using nesting iommu features. Below
-> link has the related discussion about this decision.
-> 
-> https://lkml.org/lkml/2020/5/15/1028
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> CC: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+
+On 22.06.20 22:03, Andra Paraschiv wrote:
+> Another resource that is being set for an enclave is memory. User space
+> memory regions, that need to be backed by contiguous memory regions,
+> are associated with the enclave.
+> =
+
+> One solution for allocating / reserving contiguous memory regions, that
+> is used for integration, is hugetlbfs. The user space process that is
+> associated with the enclave passes to the driver these memory regions.
+> =
+
+> The enclave memory regions need to be from the same NUMA node as the
+> enclave CPUs.
+> =
+
+> Add ioctl command logic for setting user space memory region for an
+> enclave.
+> =
+
+> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 > ---
-> v3 -> v4:
-> *) address comments against v3.
-> 
-> v1 -> v2:
-> *) added in v2
+> Changelog
+> =
+
+> v3 -> v4
+> =
+
+> * Check enclave memory regions are from the same NUMA node as the
+>    enclave CPUs.
+> * Use dev_err instead of custom NE log pattern.
+> * Update the NE ioctl call to match the decoupling from the KVM API.
+> =
+
+> v2 -> v3
+> =
+
+> * Remove the WARN_ON calls.
+> * Update static calls sanity checks.
+> * Update kzfree() calls to kfree().
+> =
+
+> v1 -> v2
+> =
+
+> * Add log pattern for NE.
+> * Update goto labels to match their purpose.
+> * Remove the BUG_ON calls.
+> * Check if enclave max memory regions is reached when setting an enclave
+>    memory region.
+> * Check if enclave state is init when setting an enclave memory region.
 > ---
-> 
->  drivers/vfio/vfio_iommu_type1.c | 105 +++++++++++++++++++++++++++++++++++-----
->  include/uapi/linux/vfio.h       |  16 ++++++
->  2 files changed, 109 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 7accb59..80623b8 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -62,18 +62,20 @@ MODULE_PARM_DESC(dma_entry_limit,
->  		 "Maximum number of user DMA mappings per container (65535).");
->  
->  struct vfio_iommu {
-> -	struct list_head	domain_list;
-> -	struct list_head	iova_list;
-> -	struct vfio_domain	*external_domain; /* domain for external user */
-> -	struct mutex		lock;
-> -	struct rb_root		dma_list;
-> -	struct blocking_notifier_head notifier;
-> -	unsigned int		dma_avail;
-> -	uint64_t		pgsize_bitmap;
-> -	bool			v2;
-> -	bool			nesting;
-> -	bool			dirty_page_tracking;
-> -	bool			pinned_page_dirty_scope;
-> +	struct list_head		domain_list;
-> +	struct list_head		iova_list;
-> +	struct vfio_domain		*external_domain; /* domain for
-> +							     external user */
-nit: put the comment before the field?
-> +	struct mutex			lock;
-> +	struct rb_root			dma_list;
-> +	struct blocking_notifier_head	notifier;
-> +	unsigned int			dma_avail;
-> +	uint64_t			pgsize_bitmap;
-> +	bool				v2;
-> +	bool				nesting;
-> +	bool				dirty_page_tracking;
-> +	bool				pinned_page_dirty_scope;
-> +	struct iommu_nesting_info	*nesting_info;
->  };
->  
->  struct vfio_domain {
-> @@ -130,6 +132,9 @@ struct vfio_regions {
->  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->  					(!list_empty(&iommu->domain_list))
->  
-> +#define IS_DOMAIN_IN_CONTAINER(iommu)	((iommu->external_domain) || \
-> +					 (!list_empty(&iommu->domain_list)))
-rename into something like CONTAINER_HAS_DOMAIN()?
-> +
->  #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
->  
->  /*
-> @@ -1929,6 +1934,13 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
->  
->  	list_splice_tail(iova_copy, iova);
->  }
-> +
-> +static void vfio_iommu_release_nesting_info(struct vfio_iommu *iommu)
+>   drivers/virt/nitro_enclaves/ne_misc_dev.c | 257 ++++++++++++++++++++++
+>   1 file changed, 257 insertions(+)
+> =
+
+> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nit=
+ro_enclaves/ne_misc_dev.c
+> index cfdefa52ed2a..17ccb6cdbd75 100644
+> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
+> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+> @@ -476,6 +476,233 @@ static int ne_create_vcpu_ioctl(struct ne_enclave *=
+ne_enclave, u32 vcpu_id)
+>   	return rc;
+>   }
+>   =
+
+> +/**
+> + * ne_sanity_check_user_mem_region - Sanity check the userspace memory
+> + * region received during the set user memory region ioctl call.
+> + *
+> + * This function gets called with the ne_enclave mutex held.
+> + *
+> + * @ne_enclave: private data associated with the current enclave.
+> + * @mem_region: user space memory region to be sanity checked.
+> + *
+> + * @returns: 0 on success, negative return value on failure.
+> + */
+> +static int ne_sanity_check_user_mem_region(struct ne_enclave *ne_enclave,
+> +	struct ne_user_memory_region *mem_region)
 > +{
-> +	kfree(iommu->nesting_info);
-> +	iommu->nesting_info = NULL;
-> +}
+> +	if (ne_enclave->mm !=3D current->mm)
+> +		return -EIO;
 > +
->  static int vfio_iommu_type1_attach_group(void *iommu_data,
->  					 struct iommu_group *iommu_group)
->  {
-> @@ -1959,6 +1971,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  		}
->  	}
->  
-> +	/* Nesting type container can include only one group */
-> +	if (iommu->nesting && IS_DOMAIN_IN_CONTAINER(iommu)) {
-> +		mutex_unlock(&iommu->lock);
+> +	if ((mem_region->memory_size % NE_MIN_MEM_REGION_SIZE) !=3D 0) {
+> +		dev_err_ratelimited(ne_misc_dev.this_device,
+> +				    "Mem size not multiple of 2 MiB\n");
+> +
 > +		return -EINVAL;
+
+Can we make this an error that gets propagated to user space explicitly? =
+
+I'd rather have a clear error return value of this function than a =
+
+random message in dmesg.
+
 > +	}
 > +
->  	group = kzalloc(sizeof(*group), GFP_KERNEL);
->  	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
->  	if (!group || !domain) {
-> @@ -2029,6 +2047,36 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	if (ret)
->  		goto out_domain;
->  
-> +	/* Nesting cap info is available only after attaching */
-> +	if (iommu->nesting) {
-> +		struct iommu_nesting_info tmp;
-> +		struct iommu_nesting_info *info;
+> +	if ((mem_region->userspace_addr & (NE_MIN_MEM_REGION_SIZE - 1)) ||
+
+This logic already relies on the fact that NE_MIN_MEM_REGION_SIZE is a =
+
+power of two. Can you do the same above on the memory_size check?
+
+> +	    !access_ok((void __user *)(unsigned long)mem_region->userspace_addr,
+> +		       mem_region->memory_size)) {
+> +		dev_err_ratelimited(ne_misc_dev.this_device,
+> +				    "Invalid user space addr range\n");
 > +
-> +		/* First get the size of vendor specific nesting info */
-> +		ret = iommu_domain_get_attr(domain->domain,
-> +					    DOMAIN_ATTR_NESTING,
-> +					    &tmp);
-> +		if (ret)
-> +			goto out_detach;
-> +
-> +		info = kzalloc(tmp.size, GFP_KERNEL);
-nit: you may directly use iommu->nesting_info
-> +		if (!info) {
-> +			ret = -ENOMEM;
-> +			goto out_detach;
-> +		}
-> +
-> +		/* Now get the nesting info */
-> +		info->size = tmp.size;
-> +		ret = iommu_domain_get_attr(domain->domain,
-> +					    DOMAIN_ATTR_NESTING,
-> +					    info);
-> +		if (ret) {
-> +			kfree(info);
-... and set it back to NULL here if it fails
-> +			goto out_detach;
-> +		}
-> +		iommu->nesting_info = info;
+> +		return -EINVAL;
+
+Same comment again. Return different errors for different conditions, so =
+
+that user space has a chance to print proper errors to its users.
+
+Also, don't we have to check alignment of userspace_addr as well?
+
 > +	}
-> +
->  	/* Get aperture info */
->  	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY, &geo);
->  
-> @@ -2138,6 +2186,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	return 0;
->  
->  out_detach:
-> +	vfio_iommu_release_nesting_info(iommu);
->  	vfio_iommu_detach_group(domain, group);
->  out_domain:
->  	iommu_domain_free(domain->domain);
-> @@ -2338,6 +2387,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  					vfio_iommu_unmap_unpin_all(iommu);
->  				else
->  					vfio_iommu_unmap_unpin_reaccount(iommu);
-> +
-> +				vfio_iommu_release_nesting_info(iommu);
->  			}
->  			iommu_domain_free(domain->domain);
->  			list_del(&domain->next);
-> @@ -2546,6 +2597,30 @@ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->  	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
->  }
->  
-> +static int vfio_iommu_info_add_nesting_cap(struct vfio_iommu *iommu,
-> +					   struct vfio_info_cap *caps)
-> +{
-> +	struct vfio_info_cap_header *header;
-> +	struct vfio_iommu_type1_info_cap_nesting *nesting_cap;
-> +	size_t size;
-> +
-> +	size = sizeof(*nesting_cap) + iommu->nesting_info->size;
-> +
-> +	header = vfio_info_cap_add(caps, size,
-> +				   VFIO_IOMMU_TYPE1_INFO_CAP_NESTING, 1);
-> +	if (IS_ERR(header))
-> +		return PTR_ERR(header);
-> +
-> +	nesting_cap = container_of(header,
-> +				   struct vfio_iommu_type1_info_cap_nesting,
-> +				   header);
-> +
-> +	memcpy(&nesting_cap->info, iommu->nesting_info,
-> +	       iommu->nesting_info->size);
 > +
 > +	return 0;
 > +}
 > +
->  static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->  				     unsigned long arg)
->  {
-> @@ -2586,6 +2661,12 @@ static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
->  	if (ret)
->  		return ret;
->  
-> +	if (iommu->nesting_info) {
-> +		ret = vfio_iommu_info_add_nesting_cap(iommu, &caps);
-> +		if (ret)
-> +			return ret;
+> +/**
+> + * ne_set_user_memory_region_ioctl - Add user space memory region to the=
+ slot
+> + * associated with the current enclave.
+> + *
+> + * This function gets called with the ne_enclave mutex held.
+> + *
+> + * @ne_enclave: private data associated with the current enclave.
+> + * @mem_region: user space memory region to be associated with the given=
+ slot.
+> + *
+> + * @returns: 0 on success, negative return value on failure.
+> + */
+> +static int ne_set_user_memory_region_ioctl(struct ne_enclave *ne_enclave,
+> +	struct ne_user_memory_region *mem_region)
+> +{
+> +	struct ne_pci_dev_cmd_reply cmd_reply =3D {};
+> +	long gup_rc =3D 0;
+> +	unsigned long i =3D 0;
+> +	struct ne_mem_region *ne_mem_region =3D NULL;
+> +	unsigned long nr_phys_contig_mem_regions =3D 0;
+> +	unsigned long nr_pinned_pages =3D 0;
+> +	struct page **phys_contig_mem_regions =3D NULL;
+> +	int rc =3D -EINVAL;
+> +	struct slot_add_mem_req slot_add_mem_req =3D {};
+> +
+> +	rc =3D ne_sanity_check_user_mem_region(ne_enclave, mem_region);
+> +	if (rc < 0)
+> +		return rc;
+> +
+> +	ne_mem_region =3D kzalloc(sizeof(*ne_mem_region), GFP_KERNEL);
+> +	if (!ne_mem_region)
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * TODO: Update nr_pages value to handle contiguous virtual address
+> +	 * ranges mapped to non-contiguous physical regions. Hugetlbfs can give
+> +	 * 2 MiB / 1 GiB contiguous physical regions.
+> +	 */
+> +	ne_mem_region->nr_pages =3D mem_region->memory_size /
+> +		NE_MIN_MEM_REGION_SIZE;
+> +
+> +	ne_mem_region->pages =3D kcalloc(ne_mem_region->nr_pages,
+> +				       sizeof(*ne_mem_region->pages),
+> +				       GFP_KERNEL);
+> +	if (!ne_mem_region->pages) {
+> +		kfree(ne_mem_region);
+> +
+> +		return -ENOMEM;
+
+kfree(NULL) is a nop, so you can just set rc and goto free_mem_region =
+
+here and below.
+
 > +	}
 > +
->  	if (caps.size) {
->  		info.flags |= VFIO_IOMMU_INFO_CAPS;
->  
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 9204705..3e3de9c 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1039,6 +1039,22 @@ struct vfio_iommu_type1_info_cap_migration {
->  	__u64	max_dirty_bitmap_size;		/* in bytes */
->  };
->  
-> +#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  3
-
-You may improve the documentation by taking examples from the above caps.
+> +	phys_contig_mem_regions =3D kcalloc(ne_mem_region->nr_pages,
+> +					  sizeof(*phys_contig_mem_regions),
+> +					  GFP_KERNEL);
+> +	if (!phys_contig_mem_regions) {
+> +		kfree(ne_mem_region->pages);
+> +		kfree(ne_mem_region);
 > +
-> +/*
-> + * Reporting nesting info to user space.
-> + *
-> + * @info:	the nesting info provided by IOMMU driver. Today
-> + *		it is expected to be a struct iommu_nesting_info
-> + *		data.
-Is it expected to change?
-> + */
-> +struct vfio_iommu_type1_info_cap_nesting {
-> +	struct	vfio_info_cap_header header;
-> +	__u32	flags;
-You may document flags.
-> +	__u32	padding;
-> +	__u8	info[];
-> +};
+> +		return -ENOMEM;
+> +	}
 > +
->  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
->  
->  /**
-> 
-Thanks
+> +	/*
+> +	 * TODO: Handle non-contiguous memory regions received from user space.
+> +	 * Hugetlbfs can give 2 MiB / 1 GiB contiguous physical regions. The
+> +	 * virtual address space can be seen as contiguous, although it is
+> +	 * mapped underneath to 2 MiB / 1 GiB physical regions e.g. 8 MiB
+> +	 * virtual address space mapped to 4 physically contiguous regions of 2
+> +	 * MiB.
+> +	 */
+> +	do {
+> +		unsigned long tmp_nr_pages =3D ne_mem_region->nr_pages -
+> +			nr_pinned_pages;
+> +		struct page **tmp_pages =3D ne_mem_region->pages +
+> +			nr_pinned_pages;
+> +		u64 tmp_userspace_addr =3D mem_region->userspace_addr +
+> +			nr_pinned_pages * NE_MIN_MEM_REGION_SIZE;
+> +
+> +		gup_rc =3D get_user_pages(tmp_userspace_addr, tmp_nr_pages,
+> +					FOLL_GET, tmp_pages, NULL);
+> +		if (gup_rc < 0) {
+> +			rc =3D gup_rc;
+> +
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Error in gup [rc=3D%d]\n", rc);
+> +
+> +			unpin_user_pages(ne_mem_region->pages, nr_pinned_pages);
+> +
+> +			goto free_mem_region;
+> +		}
+> +
+> +		nr_pinned_pages +=3D gup_rc;
+> +
+> +	} while (nr_pinned_pages < ne_mem_region->nr_pages);
 
-Eric
+Can this deadlock the kernel? Shouldn't we rather return an error when =
+
+we can't pin all pages?
+
+> +
+> +	/*
+> +	 * TODO: Update checks once physically contiguous regions are collected
+> +	 * based on the user space address and get_user_pages() results.
+> +	 */
+> +	for (i =3D 0; i < ne_mem_region->nr_pages; i++) {
+> +		if (!PageHuge(ne_mem_region->pages[i])) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Not a hugetlbfs page\n");
+> +
+> +			goto unpin_pages;
+> +		}
+> +
+> +		if (huge_page_size(page_hstate(ne_mem_region->pages[i])) !=3D
+> +		    NE_MIN_MEM_REGION_SIZE) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Page size isn't 2 MiB\n");
+
+Why is a huge page size of >2MB a problem? Can't we just make =
+
+huge_page_size() the ne mem slot size?
+
+> +
+> +			goto unpin_pages;
+> +		}
+> +
+> +		if (ne_enclave->numa_node !=3D
+> +		    page_to_nid(ne_mem_region->pages[i])) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Page isn't from NUMA node %d\n",
+> +					    ne_enclave->numa_node);
+> +
+> +			goto unpin_pages;
+
+Is there a way to give user space hints on *why* things are going wrong?
+
+> +		}
+> +
+> +		/*
+> +		 * TODO: Update once handled non-contiguous memory regions
+> +		 * received from user space.
+> +		 */
+> +		phys_contig_mem_regions[i] =3D ne_mem_region->pages[i];
+> +	}
+> +
+> +	/*
+> +	 * TODO: Update once handled non-contiguous memory regions received
+> +	 * from user space.
+> +	 */
+> +	nr_phys_contig_mem_regions =3D ne_mem_region->nr_pages;
+> +
+> +	if ((ne_enclave->nr_mem_regions + nr_phys_contig_mem_regions) >
+> +	    ne_enclave->max_mem_regions) {
+> +		dev_err_ratelimited(ne_misc_dev.this_device,
+> +				    "Reached max memory regions %lld\n",
+> +				    ne_enclave->max_mem_regions);
+> +
+> +		goto unpin_pages;
+> +	}
+> +
+> +	for (i =3D 0; i < nr_phys_contig_mem_regions; i++) {
+> +		u64 phys_addr =3D page_to_phys(phys_contig_mem_regions[i]);
+> +
+> +		slot_add_mem_req.slot_uid =3D ne_enclave->slot_uid;
+> +		slot_add_mem_req.paddr =3D phys_addr;
+> +		/*
+> +		 * TODO: Update memory size of physical contiguous memory
+> +		 * region, in case of non-contiguous memory regions received
+> +		 * from user space.
+> +		 */
+> +		slot_add_mem_req.size =3D NE_MIN_MEM_REGION_SIZE;
+
+Yeah, for now, just make it huge_page_size()! :)
+
+> +
+> +		rc =3D ne_do_request(ne_enclave->pdev, SLOT_ADD_MEM,
+> +				   &slot_add_mem_req, sizeof(slot_add_mem_req),
+> +				   &cmd_reply, sizeof(cmd_reply));
+> +		if (rc < 0) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Error in slot add mem [rc=3D%d]\n",
+> +					    rc);
+> +
+> +			/* TODO: Only unpin memory regions not added. */
+
+Are we sure we're not creating an unusable system here?
+
+> +			goto unpin_pages;
+> +		}
+> +
+> +		ne_enclave->mem_size +=3D slot_add_mem_req.size;
+> +		ne_enclave->nr_mem_regions++;
+> +
+> +		memset(&slot_add_mem_req, 0, sizeof(slot_add_mem_req));
+> +		memset(&cmd_reply, 0, sizeof(cmd_reply));
+
+If you define the variables in the for loop scope, you don't need to =
+
+manually zero them again.
+
+
+Alex
+
+> +	}
+> +
+> +	list_add(&ne_mem_region->mem_region_list_entry,
+> +		 &ne_enclave->mem_regions_list);
+> +
+> +	kfree(phys_contig_mem_regions);
+> +
+> +	return 0;
+> +
+> +unpin_pages:
+> +	unpin_user_pages(ne_mem_region->pages, ne_mem_region->nr_pages);
+> +free_mem_region:
+> +	kfree(phys_contig_mem_regions);
+> +	kfree(ne_mem_region->pages);
+> +	kfree(ne_mem_region);
+> +
+> +	return rc;
+> +}
+> +
+>   static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
+>   			     unsigned long arg)
+>   {
+> @@ -561,6 +788,36 @@ static long ne_enclave_ioctl(struct file *file, unsi=
+gned int cmd,
+>   		return 0;
+>   	}
+>   =
+
+> +	case NE_SET_USER_MEMORY_REGION: {
+> +		struct ne_user_memory_region mem_region =3D {};
+> +		int rc =3D -EINVAL;
+> +
+> +		if (copy_from_user(&mem_region, (void *)arg,
+> +				   sizeof(mem_region))) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Error in copy from user\n");
+> +
+> +			return -EFAULT;
+> +		}
+> +
+> +		mutex_lock(&ne_enclave->enclave_info_mutex);
+> +
+> +		if (ne_enclave->state !=3D NE_STATE_INIT) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Enclave isn't in init state\n");
+> +
+> +			mutex_unlock(&ne_enclave->enclave_info_mutex);
+> +
+> +			return -EINVAL;
+> +		}
+> +
+> +		rc =3D ne_set_user_memory_region_ioctl(ne_enclave, &mem_region);
+> +
+> +		mutex_unlock(&ne_enclave->enclave_info_mutex);
+> +
+> +		return rc;
+> +	}
+> +
+>   	default:
+>   		return -ENOTTY;
+>   	}
+> =
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
