@@ -2,136 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58710215B29
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 17:49:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D469A215C02
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 18:39:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729466AbgGFPtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 11:49:12 -0400
-Received: from foss.arm.com ([217.140.110.172]:51076 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729267AbgGFPtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 11:49:12 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EC64C0A;
-        Mon,  6 Jul 2020 08:49:11 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C2183F68F;
-        Mon,  6 Jul 2020 08:49:09 -0700 (PDT)
-Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
- from struct kvm
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com,
-        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        George Cherian <gcherian@marvell.com>,
-        James Morse <james.morse@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        Dave Martin <Dave.Martin@arm.com>,
-        linux-arm-kernel@lists.infradead.org
-References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-2-maz@kernel.org>
- <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
- <9c0044564885d3356f76b55f35426987@kernel.org>
- <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
- <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <7fae512d-a4a4-f66c-92c7-d3d3f7ebd488@arm.com>
-Date:   Mon, 6 Jul 2020 16:49:41 +0100
+        id S1729560AbgGFQjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 12:39:35 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29280 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729420AbgGFQje (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jul 2020 12:39:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594053572;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=KnnK9w/FmABu+AyRsR4MHv+ZnxgnRM5gsJpk2U4XmK0=;
+        b=RxSc779WNO7rVgH4f4uTNPTLiI7SfDqTWhfALbWfMMZUleV1I/dL8h3RHfgn4pqJL1ZIuT
+        80kGTE5rrEMkEXOSmmnt1TrsFNl0NP8v/WY5KAhU6Fpwth4eeWoZPdq9Re4EZfWTUyM+0F
+        2OzY8jHR0bKjv/2mo3crhSgqz4CwyP0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-thMX8ENvM0iA3qNe60Fk9A-1; Mon, 06 Jul 2020 12:39:29 -0400
+X-MC-Unique: thMX8ENvM0iA3qNe60Fk9A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05DA7805EE6;
+        Mon,  6 Jul 2020 16:39:28 +0000 (UTC)
+Received: from [10.36.112.179] (ovpn-112-179.ams2.redhat.com [10.36.112.179])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7B895D9CD;
+        Mon,  6 Jul 2020 16:39:22 +0000 (UTC)
+Subject: Re: [PATCH v5 11/21] virtio-pci: Proxy for virtio-mem
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     qemu-devel@nongnu.org, Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        qemu-s390x@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+References: <20200626072248.78761-1-david@redhat.com>
+ <20200626072248.78761-12-david@redhat.com>
+ <20200706172851.2d3062d9.cohuck@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <f376a26a-c032-9f51-6ca1-e828afeada21@redhat.com>
+Date:   Mon, 6 Jul 2020 18:39:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
+In-Reply-To: <20200706172851.2d3062d9.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 7/6/20 1:17 PM, Marc Zyngier wrote:
-> On 2020-06-25 13:19, Alexandru Elisei wrote:
->> Hi Marc,
+On 06.07.20 17:28, Cornelia Huck wrote:
+> On Fri, 26 Jun 2020 09:22:38 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> Let's add a proxy for virtio-mem, make it a memory device, and
+>> pass-through the properties.
 >>
->> On 6/16/20 5:18 PM, Marc Zyngier wrote:
->>> Hi Alexandru,
->>> [..]
->>>>> [..]
->>>>>
->>>>>  /**
->>>>> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
->>>>> - * @kvm:    The KVM struct pointer for the VM.
->>>>> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
->>>>> + * @kvm:    The pointer to the KVM structure
->>>>> + * @mmu:    The pointer to the s2 MMU structure
->>>>>   *
->>>>>   * Allocates only the stage-2 HW PGD level table(s) of size defined by
->>>>> - * stage2_pgd_size(kvm).
->>>>> + * stage2_pgd_size(mmu->kvm).
->>>>>   *
->>>>>   * Note we don't need locking here as this is only called when the VM is
->>>>>   * created, which can only be done once.
->>>>>   */
->>>>> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
->>>>> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
->>>>>  {
->>>>>      phys_addr_t pgd_phys;
->>>>>      pgd_t *pgd;
->>>>> +    int cpu;
->>>>>
->>>>> -    if (kvm->arch.pgd != NULL) {
->>>>> +    if (mmu->pgd != NULL) {
->>>>>          kvm_err("kvm_arch already initialized?\n");
->>>>>          return -EINVAL;
->>>>>      }
->>>>> @@ -1024,8 +1040,20 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
->>>>>      if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
->>>>>          return -EINVAL;
->>>>
->>>> We don't free the pgd if we get the error above, but we do free it below, if
->>>> allocating last_vcpu_ran fails. Shouldn't we free it in both cases?
->>>
->>> Worth investigating. This code gets majorly revamped in the NV series, so it is
->>> likely that I missed something in the middle.
->>
->> You didn't miss anything, I checked and it's the same in the upstream
->> version of KVM.
->>
->> kvm_arch_init_vm() returns with an error if this functions fails, so it's up to
->> the function to do the clean up. kvm_alloc_pages_exact() returns NULL
->> on error, so
->> at this point we have a valid allocation of physical contiguous pages.
->> Failing to
->> create a VM is not a fatal error for the system, so I'm thinking that maybe we
->> should free those pages for the rest of the system to use. However, this is a
->> minor issue, and the patch isn't supposed to make any functional changes, so it
->> can be probably be left for another patch and not add more to an
->> already big series.
->
-> Cool. Will you be posting such patch?
+>> Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/virtio/Makefile.objs    |   1 +
+>>  hw/virtio/virtio-mem-pci.c | 129 +++++++++++++++++++++++++++++++++++++
+>>  hw/virtio/virtio-mem-pci.h |  33 ++++++++++
+>>  include/hw/pci/pci.h       |   1 +
+>>  4 files changed, 164 insertions(+)
+>>  create mode 100644 hw/virtio/virtio-mem-pci.c
+>>  create mode 100644 hw/virtio/virtio-mem-pci.h
+> 
+> (...)
+> 
+>> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
+>> new file mode 100644
+>> index 0000000000..b325303b32
+>> --- /dev/null
+>> +++ b/hw/virtio/virtio-mem-pci.c
+>> @@ -0,0 +1,129 @@
+>> +/*
+>> + * Virtio MEM PCI device
+>> + *
+>> + * Copyright (C) 2020 Red Hat, Inc.
+>> + *
+>> + * Authors:
+>> + *  David Hildenbrand <david@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "virtio-mem-pci.h"
+>> +#include "hw/mem/memory-device.h"
+>> +#include "qapi/error.h"
+>> +
+>> +static void virtio_mem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>> +{
+>> +    VirtIOMEMPCI *mem_pci = VIRTIO_MEM_PCI(vpci_dev);
+>> +    DeviceState *vdev = DEVICE(&mem_pci->vdev);
+>> +
+> 
+> As we were having that discussion for other devices recently: I think
+> you want to use 
+> 
+>     virtio_pci_force_virtio_1(vpci_dev);
+> 
+> here. (Or do it via the names in the type, as virtio-fs does, but I
+> think I like forcing it better.)
 
-I was considering one, but then I realized there's something that I still don't
-understand.
+Interesting. There is a PULL request pending which includes virtio-mem,
+so I'll send that as an addon. Thanks!
 
-alloc_pages_exact() allocates 2^order pages (where 2^order pages >=
-stage2_pgd_size()) via __get_free_pages -> alloc_pages(), then it frees the
-unneeded pages at the *end* of the allocation in make_alloc_exact(). So the
-beginning of the allocated physical area remains aligned to 2^order pages, and
-implicitly to stage2_pgd_size().
-
-But now I can't figure out why kvm_vttbr_baddr_mask() isn't simply defined as
-~stage2_pgd_size(). Is it possible for kvm_vttbr_baddr_mask() to return an
-alignment larger than the size of the table? I can't seem to find anything to that
-effect in ARM arm (but that doesn't mean that I didn't miss anything).
-
+-- 
 Thanks,
-Alex
+
+David / dhildenb
+
