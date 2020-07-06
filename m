@@ -2,74 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC541215C66
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 18:58:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AB44215C96
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 19:05:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729509AbgGFQ6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 12:58:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50902 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729384AbgGFQ6m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 12:58:42 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9933C061755
-        for <kvm@vger.kernel.org>; Mon,  6 Jul 2020 09:58:42 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id t18so13585613ilh.2
-        for <kvm@vger.kernel.org>; Mon, 06 Jul 2020 09:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=I148QVWGSnT8aY3ZhwEgh0p5Ry6vnMwPKgHHHUUvL9M=;
-        b=cGmcxhhmu13xy6h9ZWRk47I/f6CoSYXPtfKePKEuc+4DwnIsl3Uwq6jqYdgkv4p++P
-         mw83r0VuIcfkjv+5tdkFOJdttzoJEEjQNIeVfWXuJJCIMmIBCLedztU0D8DRHcOCxhb0
-         MAA7q3t8KImhJTvanicotZdnsHotjViivVZRSCrXQzhnTM14wottw5ZBOeNPUeojOiQZ
-         ZVTkctCOWEX2sXoYdaST2ihAenxVJRJH6qZCyBM0QKcNeFc0v+3D0xV5k0uKkwdFw47R
-         qjGjtfbGPUja7G7fbMAcAFODfFSO/G7nOhZ1mrcb4wmyMTtUUZEQKn2mdPNvq0ZguwKL
-         /AWw==
+        id S1729521AbgGFRFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 13:05:41 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30927 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729495AbgGFRFk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jul 2020 13:05:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594055138;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xHW+rYY0Q8vu0hEfh8n5Hoh1YU5C8a7qUY2OrcJ3VUA=;
+        b=bzJBCpacc243oxbCTI97GGVTudpaYA09jptRWWTBdpS0+WqSbO8ApkV/4Avkp1wEwNZ6v/
+        HYleEAg1Azngglet8r/y3+0wuVFd/7Yg4GpqcrbLZB4elzcIl9UV71R1PZhJNChCdx5F6I
+        0Gmie7vqqWBXzhRPJy2P7g5fUJ820uw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-221-uNpf8KcaNGa0sH9LFlhG3Q-1; Mon, 06 Jul 2020 13:05:34 -0400
+X-MC-Unique: uNpf8KcaNGa0sH9LFlhG3Q-1
+Received: by mail-wm1-f70.google.com with SMTP id 65so28414684wmd.8
+        for <kvm@vger.kernel.org>; Mon, 06 Jul 2020 10:05:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=I148QVWGSnT8aY3ZhwEgh0p5Ry6vnMwPKgHHHUUvL9M=;
-        b=n//0g2Ejx4gc9Ngcnxpr7jqyPeecbHuop5ab+rP/zWUCZAuDiKS11d8DucSn7hNdBJ
-         pYDx76BkCrKFMm5GZ+y4NEVatJK8rsoNXYSj7UjJXo7m3wHVTbEMX49Gpl6X6VD6nZil
-         fbr3BUHMDqvWdGsVogIYzwq4N4mOakUD2pvVYgUvqZldGm2krq1Aw2tDvr+YDR2KeNZD
-         sh8xJ2h0unWFhYOoVGH4GOLcYNfqq4ARU3963sbHVk5/2Uc4b0jGYtjjLSF0O91Z3Zeh
-         bJziunoI3GKM1t/d2FJRqKoCp9/Ceokev71yCgQ5Aby6SDdH4rgjZagcSai0ov2evQsZ
-         lydg==
-X-Gm-Message-State: AOAM532pCnAqu9q43Fi4zb8VShMMn8s9QH8DnP3OHm8dk2vb/aPPXXdx
-        cy9u6fZM6mcv1uZPGaPmLbQ+Ki5dIIuUbMlm5px+xw==
-X-Google-Smtp-Source: ABdhPJyhImZRgfT2TwZNlaX0aHjl0BeC+SH38/q9BTrKivgZ9aZJQeEHgi7e4XwOvuLOx5mxrHFvyjJveEok8fiWtXI=
-X-Received: by 2002:a92:b685:: with SMTP id m5mr31643812ill.118.1594054721868;
- Mon, 06 Jul 2020 09:58:41 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xHW+rYY0Q8vu0hEfh8n5Hoh1YU5C8a7qUY2OrcJ3VUA=;
+        b=McD95ojV0CT7HJ5gyHT1sP3kUcuJYNpTLtbK5VYpuiNa0l0eISpvUournkb6OJZAYl
+         sKFO+QqPEkfKhip3uGLyPrkipWk3n8ZaeMNXX6OLRixR9DIkWToW9HmbVUKFcd3AnRvj
+         6sLNLcEqj2OMF41r9ctmDmwRa08j3dW9IY8fBzMzV+Xy2Ft0tVZVKDstG98ZsoIGtAXs
+         1IsEXrB3ZMB7pg75fD1l5G5uLgIfwbHARmyLOO43ZnlPOKBrFcI23Fhlhod5Ln5X18V8
+         NdCReZq/LZCWNcyF0ijkgnX3/Gaou8Pwngtwkii2G8eAVjs+WBZu3N6274jpVAyeukS0
+         zNdQ==
+X-Gm-Message-State: AOAM533lkNDVPlfLa79ureA4xlNTl2DrtqUd+/Rsgp3+TmyIpKNRvRA3
+        Y60uJXIpa2BfKcxGwge9laWLPf1uRIGsFXv/5vQdWk7R5PpD7pgQj6XzUIz5lDHqMVmKr7lXaL9
+        n9uChM4q2mfU4
+X-Received: by 2002:adf:8091:: with SMTP id 17mr37366090wrl.13.1594055132905;
+        Mon, 06 Jul 2020 10:05:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxG4sDAwM7tZdeCLE5A4njYJEWbejVQHYTjYvOGEQWWlAiFhhT95RnAPUF4/X/qRguticHxFw==
+X-Received: by 2002:adf:8091:: with SMTP id 17mr37366071wrl.13.1594055132726;
+        Mon, 06 Jul 2020 10:05:32 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3181:5745:c591:c33e? ([2001:b07:6468:f312:3181:5745:c591:c33e])
+        by smtp.gmail.com with ESMTPSA id z6sm86817wmf.33.2020.07.06.10.05.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Jul 2020 10:05:32 -0700 (PDT)
+Subject: Re: [PATCH 0/2] KVM/arm64 fixes for 5.8, take #3
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Andrew Scull <ascull@google.com>,
+        Andrew Murray <amurray@thegoodpenguin.co.uk>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20200706110521.1615794-1-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aa4d3a7f-3b16-c113-0bed-a6fc4017ce0d@redhat.com>
+Date:   Mon, 6 Jul 2020 19:05:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200706164324.81123-1-imbrenda@linux.ibm.com> <20200706164324.81123-3-imbrenda@linux.ibm.com>
-In-Reply-To: <20200706164324.81123-3-imbrenda@linux.ibm.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 6 Jul 2020 09:58:30 -0700
-Message-ID: <CALMp9eSzbPiN_nCH7pVGKADkEFyXoo7pfVFj06zms6TrGahcXw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/4] lib/alloc_page: change some
- parameter types
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, frankja@linux.ibm.com,
-        thuth@redhat.com, David Hildenbrand <david@redhat.com>,
-        drjones@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200706110521.1615794-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 6, 2020 at 9:43 AM Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
->
-> For size parameters, size_t is probably semantically more appropriate
-> than unsigned long (although they map to the same value).
->
-> For order, unsigned long is just too big. Also, get_order returns an
-> unsigned int anyway.
->
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On 06/07/20 13:05, Marc Zyngier wrote:
+> git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.8-3
+
+Pulled, thanks.
+
+Paolo
+
