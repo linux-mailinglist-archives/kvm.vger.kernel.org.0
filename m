@@ -2,64 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6633021571A
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 14:15:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F39A7215721
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 14:17:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729047AbgGFMPU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 08:15:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52338 "EHLO mail.kernel.org"
+        id S1728938AbgGFMRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 08:17:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53196 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727896AbgGFMPU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 08:15:20 -0400
+        id S1727896AbgGFMRe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 08:17:34 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A2C61206F5;
-        Mon,  6 Jul 2020 12:15:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 49A3F2070C;
+        Mon,  6 Jul 2020 12:17:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594037719;
-        bh=Ln+M2VEKf+2mtxon2h+buvSO35oHmKw8UDIzRkCs7sA=;
+        s=default; t=1594037853;
+        bh=KuxlYi/WPeTd60f/cMp3naUg3QZOGwvNaBWXU66jIVE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=saieF4wXnaKrbWcQ5wO2kfilaGu99az6f3JpECUt5GG3aTMC2oGsFBTUettThgzPo
-         3SKUHtcXYqY5+H9rHbd8VcoaBwyNyWMMvaKddoHl9Vrb/WbcauHdy9jXJcqGk+M5hs
-         xj8axU4pzxZSt0bkqp09RKxTIR0kqec2TsGaT8xc=
+        b=CgttgXoal5cvnNee8/vDQpHse3xCG5b9UzDhFHkcuTafKGilaGK2bDf0F0nsTECi5
+         vpQnUWxcleiB4DOEcoQ90TVvF1AYQEUmfZZ9243cL4JvJa3nfLQKAwtpRj1M2ncV/r
+         GU0xUFi+YHrWj9cX8fvPCLkse+RK0KbdaUylhHyE=
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
         by disco-boy.misterjones.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jsQ1m-009Rbc-6A; Mon, 06 Jul 2020 13:15:18 +0100
+        id 1jsQ3v-009Rdk-KW; Mon, 06 Jul 2020 13:17:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
+Content-Type: text/plain; charset=UTF-8;
  format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 06 Jul 2020 13:15:18 +0100
+Content-Transfer-Encoding: 8bit
+Date:   Mon, 06 Jul 2020 13:17:31 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
+Cc:     Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com,
+        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
         Jintack Lim <jintack@cs.columbia.edu>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        kvmarm@lists.cs.columbia.edu,
         George Cherian <gcherian@marvell.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Andrew Scull <ascull@google.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
         James Morse <james.morse@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 06/17] KVM: arm64: Introduce accessor for ctxt->sys_reg
-In-Reply-To: <a9c3a43e-7850-e74d-5383-905885721ab4@arm.com>
+        Will Deacon <will@kernel.org>,
+        Dave Martin <Dave.Martin@arm.com>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 01/17] KVM: arm64: Factor out stage 2 page table data
+ from struct kvm
+In-Reply-To: <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
 References: <20200615132719.1932408-1-maz@kernel.org>
- <20200615132719.1932408-7-maz@kernel.org>
- <a9c3a43e-7850-e74d-5383-905885721ab4@arm.com>
+ <20200615132719.1932408-2-maz@kernel.org>
+ <17d37bde-2fc8-d165-ee02-7640fc561167@arm.com>
+ <9c0044564885d3356f76b55f35426987@kernel.org>
+ <d3804b25-4ce4-b263-c087-d8e563f939ed@arm.com>
 User-Agent: Roundcube Webmail/1.4.5
-Message-ID: <2595cd556bcb8bd996f60ef527b512ef@kernel.org>
+Message-ID: <b3f34d53dfe8bc3c2b0838187fe12538@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, gcherian@marvell.com, prime.zeng@hisilicon.com, ascull@google.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, mark.rutland@arm.com, kernel-team@android.com, kvm@vger.kernel.org, suzuki.poulose@arm.com, jintack@cs.columbia.edu, andre.przywara@arm.com, christoffer.dall@arm.com, kvmarm@lists.cs.columbia.edu, gcherian@marvell.com, james.morse@arm.com, ascull@google.com, prime.zeng@hisilicon.com, catalin.marinas@arm.com, julien.thierry.kdev@gmail.com, will@kernel.org, Dave.Martin@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
@@ -67,100 +70,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
-
-On 2020-06-26 16:39, Alexandru Elisei wrote:
-> Hi,
+On 2020-06-25 13:19, Alexandru Elisei wrote:
+> Hi Marc,
 > 
-> On 6/15/20 2:27 PM, Marc Zyngier wrote:
->> In order to allow the disintegration of the per-vcpu sysreg array,
->> let's introduce a new helper (ctxt_sys_reg()) that returns the
->> in-memory copy of a system register, picked from a given context.
+> On 6/16/20 5:18 PM, Marc Zyngier wrote:
+>> Hi Alexandru,
+>> [..]
+>>>> [..]
+>>>> 
+>>>>  /**
+>>>> - * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 
+>>>> translation.
+>>>> - * @kvm:    The KVM struct pointer for the VM.
+>>>> + * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
+>>>> + * @kvm:    The pointer to the KVM structure
+>>>> + * @mmu:    The pointer to the s2 MMU structure
+>>>>   *
+>>>>   * Allocates only the stage-2 HW PGD level table(s) of size defined 
+>>>> by
+>>>> - * stage2_pgd_size(kvm).
+>>>> + * stage2_pgd_size(mmu->kvm).
+>>>>   *
+>>>>   * Note we don't need locking here as this is only called when the 
+>>>> VM is
+>>>>   * created, which can only be done once.
+>>>>   */
+>>>> -int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>>> +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+>>>>  {
+>>>>      phys_addr_t pgd_phys;
+>>>>      pgd_t *pgd;
+>>>> +    int cpu;
+>>>> 
+>>>> -    if (kvm->arch.pgd != NULL) {
+>>>> +    if (mmu->pgd != NULL) {
+>>>>          kvm_err("kvm_arch already initialized?\n");
+>>>>          return -EINVAL;
+>>>>      }
+>>>> @@ -1024,8 +1040,20 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>>>>      if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
+>>>>          return -EINVAL;
+>>> 
+>>> We don't free the pgd if we get the error above, but we do free it 
+>>> below, if
+>>> allocating last_vcpu_ran fails. Shouldn't we free it in both cases?
 >> 
->> __vcpu_sys_reg() is rewritten to use this helper.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
->>  1 file changed, 10 insertions(+), 5 deletions(-)
->> 
->> diff --git a/arch/arm64/include/asm/kvm_host.h 
->> b/arch/arm64/include/asm/kvm_host.h
->> index e7fd03271e52..5314399944e7 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -405,12 +405,17 @@ struct kvm_vcpu_arch {
->>  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
->> 
->>  /*
->> - * Only use __vcpu_sys_reg if you know you want the memory backed 
->> version of a
->> - * register, and not the one most recently accessed by a running 
->> VCPU.  For
->> - * example, for userspace access or for system registers that are 
->> never context
->> - * switched, but only emulated.
->> + * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
->> + * memory backed version of a register, and not the one most recently
->> + * accessed by a running VCPU.  For example, for userspace access or
->> + * for system registers that are never context switched, but only
->> + * emulated.
->>   */
->> -#define __vcpu_sys_reg(v,r)	((v)->arch.ctxt.sys_regs[(r)])
->> +#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
->> +
->> +#define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
->> +
->> +#define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
+>> Worth investigating. This code gets majorly revamped in the NV series, 
+>> so it is
+>> likely that I missed something in the middle.
 > 
-> This is confusing - __vcpu_sys_reg() returns the value, but 
-> __ctxt_sys_reg()
-> return a pointer to the value. Because of that, I made the mistake of 
-> thinking
-> that __vcpu_sys_reg() returns a pointer when reviewing the next patch 
-> in the
-> series, and I got really worried that stuff was seriously broken (it 
-> was not).
-
-This is intentional (the behaviour, not the confusing aspect... ;-), as
-__ctx_sys_reg() gets further rewritten as such:
-
--#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
-+static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, 
-int r)
-+{
-+	if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
-+		return &ctxt->vncr_array[r - __VNCR_START__];
-+
-+	return (u64 *)&ctxt->sys_regs[r];
-+}
-
-to deal with the VNCR page (depending on whether you use nesting or not,
-the sysreg is backed by the VNCR page or the usual sysreg array).
-
-To be clear, there shouldn't be much use of __ctxt_sys_reg (there is 
-only
-3 in the current code), all for good reasons (core_reg_addr definitely
-wants the address of a register).
-
-> I'm not sure what the reasonable solution is, or even if there is one.
+> You didn't miss anything, I checked and it's the same in the upstream
+> version of KVM.
 > 
-> Some thoughts: we could have just one macro, ctxt_sys_reg() and 
-> dereference that
-> when we want the value; we could keep both and swap the macro 
-> definitions; or we
-> could encode the fact that a macro returns a pointer in the macro name 
-> (so we
-> would end up with __ctxt_sys_reg() -> __ctxt_sys_regp() and 
-> ctxt_sys_reg ->
-> __ctxt_sys_reg()).
-> 
-> What do you think?
+> kvm_arch_init_vm() returns with an error if this functions fails, so 
+> it's up to
+> the function to do the clean up. kvm_alloc_pages_exact() returns NULL
+> on error, so
+> at this point we have a valid allocation of physical contiguous pages.
+> Failing to
+> create a VM is not a fatal error for the system, so I'm thinking that 
+> maybe we
+> should free those pages for the rest of the system to use. However, 
+> this is a
+> minor issue, and the patch isn't supposed to make any functional 
+> changes, so it
+> can be probably be left for another patch and not add more to an
+> already big series.
 
-I'm not opposed to any of this, provided that it doesn't create
-unnecessary churn and additional confusion. I'll keep it as such
-in the meantime, but I'm definitely willing to take a patch going
-over this if you think this is necessary.
+Cool. Will you be posting such patch?
 
 Thanks,
 
