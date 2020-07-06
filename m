@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 822A02157CA
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 14:55:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D3AE2157C3
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 14:55:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729207AbgGFMz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 08:55:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41572 "EHLO mail.kernel.org"
+        id S1729119AbgGFMzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 08:55:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41370 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729201AbgGFMz4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 08:55:56 -0400
+        id S1729107AbgGFMzt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 08:55:49 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 11CFC2082E;
-        Mon,  6 Jul 2020 12:55:55 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2100A2073E;
+        Mon,  6 Jul 2020 12:55:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1594040155;
-        bh=sQuw+4Tv7Zd44cShYezIKg+TOSdhGiXqUAipF1jKIS8=;
+        s=default; t=1594040148;
+        bh=iQrgl1SR5MMHV2cl+4A1hbUWVDZDb6J94PO8R4zNjcE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=isVgLk3r+/ABTKrAXAAlfclS0JR8VwNuK475x+XUxdKOoYdvU+41OKnOVI4qNZd/M
-         oyrTL4b8IJWIqBSWp58r6PER42573L5wFmGhzI6jKm0PVr4Ilh4RubPVMQaIBMUvCm
-         lcs5/c25WzsAXx7MYAIJOSwcn+hY5xO/o46d6dGA=
+        b=XHWfZ5JO6HY9e1De4JE3HQCc0ZRPPdZeNevNvNO/6ESZYE5GKlTg3wGRj50qCjvZ2
+         C2xpaLaEFxuOlrCoKOi2wGseat28WI+1H7bXxdTqGMSFJyGEscklchX9hHQYfheqaD
+         +qtiTVhB0x53ebbBZHk7V+ew9jShOFJIL6vNvizQ=
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <maz@kernel.org>)
-        id 1jsQeJ-009SCo-IK; Mon, 06 Jul 2020 13:55:08 +0100
+        id 1jsQeL-009SCo-AB; Mon, 06 Jul 2020 13:55:09 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Catalin Marinas <catalin.marinas@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -46,9 +46,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v3 14/17] KVM: arm64: Disintegrate SPSR array
-Date:   Mon,  6 Jul 2020 13:54:22 +0100
-Message-Id: <20200706125425.1671020-15-maz@kernel.org>
+Subject: [PATCH v3 15/17] KVM: arm64: Move SPSR_EL1 to the system register array
+Date:   Mon,  6 Jul 2020 13:54:23 +0100
+Message-Id: <20200706125425.1671020-16-maz@kernel.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200706125425.1671020-1-maz@kernel.org>
 References: <20200706125425.1671020-1-maz@kernel.org>
@@ -63,30 +63,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we're about to move SPSR_EL1 into the VNCR page, we need to
-disassociate it from the rest of the 32bit cruft. Let's break
-the array into individual fields.
+SPSR_EL1 being a VNCR-capable register with ARMv8.4-NV, move it to
+the sysregs array and update the accessors.
 
 Reviewed-by: James Morse <james.morse@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h       |  4 +--
- arch/arm64/include/asm/kvm_host.h          |  6 +++-
- arch/arm64/kvm/guest.c                     | 19 ++++++++----
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 28 +++++++----------
- arch/arm64/kvm/regmap.c                    | 35 ++++++++++++++++++++--
- 5 files changed, 63 insertions(+), 29 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h       | 4 ++--
+ arch/arm64/include/asm/kvm_host.h          | 2 +-
+ arch/arm64/kvm/guest.c                     | 2 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 4 ++--
+ arch/arm64/kvm/regmap.c                    | 4 ++--
+ 5 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index a12b5dc5db0d..5f959fedff09 100644
+index 5f959fedff09..57f9042e7270 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
 @@ -176,7 +176,7 @@ static inline unsigned long vcpu_read_spsr(const struct kvm_vcpu *vcpu)
  	if (vcpu->arch.sysregs_loaded_on_cpu)
  		return read_sysreg_el1(SYS_SPSR);
  	else
--		return vcpu->arch.ctxt.spsr[KVM_SPSR_EL1];
-+		return vcpu->arch.ctxt.spsr_el1;
+-		return vcpu->arch.ctxt.spsr_el1;
++		return __vcpu_sys_reg(vcpu, SPSR_EL1);
  }
  
  static inline void vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long v)
@@ -94,68 +93,54 @@ index a12b5dc5db0d..5f959fedff09 100644
  	if (vcpu->arch.sysregs_loaded_on_cpu)
  		write_sysreg_el1(v, SYS_SPSR);
  	else
--		vcpu->arch.ctxt.spsr[KVM_SPSR_EL1] = v;
-+		vcpu->arch.ctxt.spsr_el1 = v;
+-		vcpu->arch.ctxt.spsr_el1 = v;
++		__vcpu_sys_reg(vcpu, SPSR_EL1) = v;
  }
  
  /*
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 2bd6285eaf4c..dfb97ed2f680 100644
+index dfb97ed2f680..91b1adb6789c 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -241,7 +241,11 @@ enum vcpu_sysreg {
+@@ -187,6 +187,7 @@ enum vcpu_sysreg {
+ 
+ 	ELR_EL1,
+ 	SP_EL1,
++	SPSR_EL1,
+ 
+ 	/* 32bit specific registers. Keep them at the end of the range */
+ 	DACR32_EL2,	/* Domain Access Control Register */
+@@ -241,7 +242,6 @@ enum vcpu_sysreg {
  struct kvm_cpu_context {
  	struct user_pt_regs regs;	/* sp = sp_el0 */
  
--	u64	spsr[KVM_NR_SPSR];
-+	u64	spsr_el1;		/* aka spsr_svc */
-+	u64	spsr_abt;
-+	u64	spsr_und;
-+	u64	spsr_irq;
-+	u64	spsr_fiq;
- 
- 	struct user_fpsimd_state fp_regs;
- 
+-	u64	spsr_el1;		/* aka spsr_svc */
+ 	u64	spsr_abt;
+ 	u64	spsr_und;
+ 	u64	spsr_irq;
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index d614716e073b..70215f3a6f89 100644
+index 70215f3a6f89..dfb5218137ca 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -134,11 +134,20 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	case KVM_REG_ARM_CORE_REG(elr_el1):
+@@ -135,7 +135,7 @@ static void *core_reg_addr(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
  		return __ctxt_sys_reg(&vcpu->arch.ctxt, ELR_EL1);
  
--	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
--	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
--		off -= KVM_REG_ARM_CORE_REG(spsr[0]);
--		off /= 2;
--		return &vcpu->arch.ctxt.spsr[off];
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_EL1]):
-+		return &vcpu->arch.ctxt.spsr_el1;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_ABT]):
-+		return &vcpu->arch.ctxt.spsr_abt;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_UND]):
-+		return &vcpu->arch.ctxt.spsr_und;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_IRQ]):
-+		return &vcpu->arch.ctxt.spsr_irq;
-+
-+	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_FIQ]):
-+		return &vcpu->arch.ctxt.spsr_fiq;
+ 	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_EL1]):
+-		return &vcpu->arch.ctxt.spsr_el1;
++		return __ctxt_sys_reg(&vcpu->arch.ctxt, SPSR_EL1);
  
- 	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
- 	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
+ 	case KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_ABT]):
+ 		return &vcpu->arch.ctxt.spsr_abt;
 diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 4c26ba72120e..fb4bc42e72c5 100644
+index fb4bc42e72c5..7a986030145f 100644
 --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
 +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
 @@ -48,7 +48,7 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
  
  	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
  	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
--	ctxt->spsr[KVM_SPSR_EL1]	= read_sysreg_el1(SYS_SPSR);
-+	ctxt->spsr_el1			= read_sysreg_el1(SYS_SPSR);
+-	ctxt->spsr_el1			= read_sysreg_el1(SYS_SPSR);
++	ctxt_sys_reg(ctxt, SPSR_EL1)	= read_sysreg_el1(SYS_SPSR);
  }
  
  static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
@@ -163,108 +148,33 @@ index 4c26ba72120e..fb4bc42e72c5 100644
  
  	write_sysreg(ctxt_sys_reg(ctxt, SP_EL1),	sp_el1);
  	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
--	write_sysreg_el1(ctxt->spsr[KVM_SPSR_EL1],	SYS_SPSR);
-+	write_sysreg_el1(ctxt->spsr_el1,		SYS_SPSR);
+-	write_sysreg_el1(ctxt->spsr_el1,		SYS_SPSR);
++	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
  }
  
  static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
-@@ -158,17 +158,13 @@ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctx
- 
- static inline void __sysreg32_save_state(struct kvm_vcpu *vcpu)
- {
--	u64 *spsr;
--
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
--	spsr = vcpu->arch.ctxt.spsr;
--
--	spsr[KVM_SPSR_ABT] = read_sysreg(spsr_abt);
--	spsr[KVM_SPSR_UND] = read_sysreg(spsr_und);
--	spsr[KVM_SPSR_IRQ] = read_sysreg(spsr_irq);
--	spsr[KVM_SPSR_FIQ] = read_sysreg(spsr_fiq);
-+	vcpu->arch.ctxt.spsr_abt = read_sysreg(spsr_abt);
-+	vcpu->arch.ctxt.spsr_und = read_sysreg(spsr_und);
-+	vcpu->arch.ctxt.spsr_irq = read_sysreg(spsr_irq);
-+	vcpu->arch.ctxt.spsr_fiq = read_sysreg(spsr_fiq);
- 
- 	__vcpu_sys_reg(vcpu, DACR32_EL2) = read_sysreg(dacr32_el2);
- 	__vcpu_sys_reg(vcpu, IFSR32_EL2) = read_sysreg(ifsr32_el2);
-@@ -179,17 +175,13 @@ static inline void __sysreg32_save_state(struct kvm_vcpu *vcpu)
- 
- static inline void __sysreg32_restore_state(struct kvm_vcpu *vcpu)
- {
--	u64 *spsr;
--
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
--	spsr = vcpu->arch.ctxt.spsr;
--
--	write_sysreg(spsr[KVM_SPSR_ABT], spsr_abt);
--	write_sysreg(spsr[KVM_SPSR_UND], spsr_und);
--	write_sysreg(spsr[KVM_SPSR_IRQ], spsr_irq);
--	write_sysreg(spsr[KVM_SPSR_FIQ], spsr_fiq);
-+	write_sysreg(vcpu->arch.ctxt.spsr_abt, spsr_abt);
-+	write_sysreg(vcpu->arch.ctxt.spsr_und, spsr_und);
-+	write_sysreg(vcpu->arch.ctxt.spsr_irq, spsr_irq);
-+	write_sysreg(vcpu->arch.ctxt.spsr_fiq, spsr_fiq);
- 
- 	write_sysreg(__vcpu_sys_reg(vcpu, DACR32_EL2), dacr32_el2);
- 	write_sysreg(__vcpu_sys_reg(vcpu, IFSR32_EL2), ifsr32_el2);
 diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-index b1596f314087..97c110810527 100644
+index 97c110810527..accc1d5fba61 100644
 --- a/arch/arm64/kvm/regmap.c
 +++ b/arch/arm64/kvm/regmap.c
-@@ -147,8 +147,20 @@ unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
- {
- 	int spsr_idx = vcpu_spsr32_mode(vcpu);
- 
--	if (!vcpu->arch.sysregs_loaded_on_cpu)
--		return vcpu->arch.ctxt.spsr[spsr_idx];
-+	if (!vcpu->arch.sysregs_loaded_on_cpu) {
-+		switch (spsr_idx) {
-+		case KVM_SPSR_SVC:
-+			return vcpu->arch.ctxt.spsr_el1;
-+		case KVM_SPSR_ABT:
-+			return vcpu->arch.ctxt.spsr_abt;
-+		case KVM_SPSR_UND:
-+			return vcpu->arch.ctxt.spsr_und;
-+		case KVM_SPSR_IRQ:
-+			return vcpu->arch.ctxt.spsr_irq;
-+		case KVM_SPSR_FIQ:
-+			return vcpu->arch.ctxt.spsr_fiq;
-+		}
-+	}
- 
- 	switch (spsr_idx) {
- 	case KVM_SPSR_SVC:
-@@ -171,7 +183,24 @@ void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
- 	int spsr_idx = vcpu_spsr32_mode(vcpu);
- 
+@@ -150,7 +150,7 @@ unsigned long vcpu_read_spsr32(const struct kvm_vcpu *vcpu)
  	if (!vcpu->arch.sysregs_loaded_on_cpu) {
--		vcpu->arch.ctxt.spsr[spsr_idx] = v;
-+		switch (spsr_idx) {
-+		case KVM_SPSR_SVC:
-+			vcpu->arch.ctxt.spsr_el1 = v;
-+			break;
-+		case KVM_SPSR_ABT:
-+			vcpu->arch.ctxt.spsr_abt = v;
-+			break;
-+		case KVM_SPSR_UND:
-+			vcpu->arch.ctxt.spsr_und = v;
-+			break;
-+		case KVM_SPSR_IRQ:
-+			vcpu->arch.ctxt.spsr_irq = v;
-+			break;
-+		case KVM_SPSR_FIQ:
-+			vcpu->arch.ctxt.spsr_fiq = v;
-+			break;
-+		}
-+
- 		return;
- 	}
- 
+ 		switch (spsr_idx) {
+ 		case KVM_SPSR_SVC:
+-			return vcpu->arch.ctxt.spsr_el1;
++			return __vcpu_sys_reg(vcpu, SPSR_EL1);
+ 		case KVM_SPSR_ABT:
+ 			return vcpu->arch.ctxt.spsr_abt;
+ 		case KVM_SPSR_UND:
+@@ -185,7 +185,7 @@ void vcpu_write_spsr32(struct kvm_vcpu *vcpu, unsigned long v)
+ 	if (!vcpu->arch.sysregs_loaded_on_cpu) {
+ 		switch (spsr_idx) {
+ 		case KVM_SPSR_SVC:
+-			vcpu->arch.ctxt.spsr_el1 = v;
++			__vcpu_sys_reg(vcpu, SPSR_EL1) = v;
+ 			break;
+ 		case KVM_SPSR_ABT:
+ 			vcpu->arch.ctxt.spsr_abt = v;
 -- 
 2.27.0
 
