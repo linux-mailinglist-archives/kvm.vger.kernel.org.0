@@ -2,429 +2,787 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D5982154E8
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 11:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8945C215539
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 12:12:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728648AbgGFJrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 05:47:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26557 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728578AbgGFJrH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Jul 2020 05:47:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594028825;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WcUASd4/BFwE3llK9r5c7gkqDQIiFLWPzjkaK8MCrQI=;
-        b=OAZD6b5CCcEyd5gcJSsN8KxoRyKWqfqBw46EEWA88BwCSHrW3XLrC0/I1/A1zVc67XIESf
-        LqjwPnZPNLPBj9CUYLrfJF9tXtSZv4iI/ILckGuf5SHQ+usQNZNq5hZhIMt5p2MNLwHF7y
-        XjQcZYoAHyegek0pTkrxwAFxRgKp3Z0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-XHPsKk_XPNe9eIUSX1kHxA-1; Mon, 06 Jul 2020 05:47:03 -0400
-X-MC-Unique: XHPsKk_XPNe9eIUSX1kHxA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65F8DEC1A0;
-        Mon,  6 Jul 2020 09:47:02 +0000 (UTC)
-Received: from gondolin (ovpn-112-234.ams2.redhat.com [10.36.112.234])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 16FC510013D9;
-        Mon,  6 Jul 2020 09:46:57 +0000 (UTC)
-Date:   Mon, 6 Jul 2020 11:46:55 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        drjones@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v10 9/9] s390x: css: ssch/tsch with sense
- and interrupt
-Message-ID: <20200706114655.5088b6b7.cohuck@redhat.com>
-In-Reply-To: <1593707480-23921-10-git-send-email-pmorel@linux.ibm.com>
-References: <1593707480-23921-1-git-send-email-pmorel@linux.ibm.com>
-        <1593707480-23921-10-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1728733AbgGFKMt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 06:12:49 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:14102 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728299AbgGFKMs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 06:12:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1594030365; x=1625566365;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=Cv7VO8jxzC5X+chjycuJAmTFm+/W878z6FB5k0MIIJI=;
+  b=RTXliFND7KoQ3SPk5h5+1a/Gt3PsYgJ1mjheCgnLwK6hnxuK4FfAz5Dv
+   JVvlxhf3t0TWrw+wGNTlIH6ZfQI4iYaBeQNrP3buHxxDLARl/zMBHU3Gr
+   dYXCiGhOiD60cizcAJXkCrSj0ht3Vc//PPljdDD88s17vIapyXMU4y8Yu
+   M=;
+IronPort-SDR: ZyIw+qsWHPGUK+RVK1h3O8vO9PQaE2B7uEy+69GGCLml2aR/A59lPGt+b+Qx4usL0FVawR4ppO
+ /PHFeoN3JTTw==
+X-IronPort-AV: E=Sophos;i="5.75,318,1589241600"; 
+   d="scan'208";a="40182012"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-17c49630.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 06 Jul 2020 10:12:43 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1e-17c49630.us-east-1.amazon.com (Postfix) with ESMTPS id DE119A1E0B;
+        Mon,  6 Jul 2020 10:12:42 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 6 Jul 2020 10:12:42 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.160.156) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 6 Jul 2020 10:12:34 +0000
+Subject: Re: [PATCH v4 09/18] nitro_enclaves: Add logic for enclave vcpu
+ creation
+To:     Andra Paraschiv <andraprs@amazon.com>,
+        <linux-kernel@vger.kernel.org>
+CC:     Anthony Liguori <aliguori@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Bjoern Doebel" <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Frank van der Linden" <fllinden@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        Matt Wilson <msw@amazon.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        "Stefano Garzarella" <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        Uwe Dannowski <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-10-andraprs@amazon.com>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <52e916fc-8fe3-f9bc-009e-ca84ab7dd650@amazon.de>
+Date:   Mon, 6 Jul 2020 12:12:31 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200622200329.52996-10-andraprs@amazon.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.156]
+X-ClientProxiedBy: EX13D23UWC004.ant.amazon.com (10.43.162.219) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  2 Jul 2020 18:31:20 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> After a channel is enabled we start a SENSE_ID command using
-> the SSCH instruction to recognize the control unit and device.
-> 
-> This tests the success of SSCH, the I/O interruption and the TSCH
-> instructions.
-> 
-> The SENSE_ID command response is tested to report 0xff inside
-> its reserved field and to report the same control unit type
-> as the cu_type kernel argument.
-> 
-> Without the cu_type kernel argument, the test expects a device
-> with a default control unit type of 0x3832, a.k.a virtio-net-ccw.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+
+On 22.06.20 22:03, Andra Paraschiv wrote:
+> An enclave, before being started, has its resources set. One of its
+> resources is CPU.
+> =
+
+> The NE CPU pool is set for choosing CPUs for enclaves from it. Offline
+> the CPUs from the NE CPU pool during the pool setup and online them back
+> during the NE CPU pool teardown.
+> =
+
+> The enclave CPUs need to be full cores and from the same NUMA node. CPU
+> 0 and its siblings have to remain available to the primary / parent VM.
+> =
+
+> Add ioctl command logic for enclave vCPU creation. Return as result a
+> file descriptor that is associated with the enclave vCPU.
+> =
+
+> Signed-off-by: Alexandru Vasile <lexnv@amazon.com>
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
 > ---
->  lib/s390x/asm/arch_def.h |   1 +
->  lib/s390x/css.h          |  32 ++++++++-
->  lib/s390x/css_lib.c      | 148 ++++++++++++++++++++++++++++++++++++++-
->  s390x/css.c              |  94 ++++++++++++++++++++++++-
->  4 files changed, 272 insertions(+), 3 deletions(-)
+> Changelog
+> =
 
-(...)
+> v3 -> v4
+> =
 
-> -int css_enable(int schid)
-> +/*
-> + * css_enable: enable Subchannel
-> + * @schid: Subchannel Identifier
-> + * @isc: Interruption subclass for this subchannel as a number
+> * Setup the NE CPU pool at runtime via a sysfs file for the kernel
+>    parameter.
+> * Check enclave CPUs to be from the same NUMA node.
+> * Use dev_err instead of custom NE log pattern.
+> * Update the NE ioctl call to match the decoupling from the KVM API.
+> =
 
-"number of the interruption subclass to use"?
+> v2 -> v3
+> =
 
-> + * Return value:
-> + *   On success: 0
-> + *   On error the CC of the faulty instruction
-> + *      or -1 if the retry count is exceeded.
+> * Remove the WARN_ON calls.
+> * Update static calls sanity checks.
+> * Update kzfree() calls to kfree().
+> * Remove file ops that do nothing for now - open, ioctl and release.
+> =
+
+> v1 -> v2
+> =
+
+> * Add log pattern for NE.
+> * Update goto labels to match their purpose.
+> * Remove the BUG_ON calls.
+> * Check if enclave state is init when setting enclave vcpu.
+> ---
+>   drivers/virt/nitro_enclaves/ne_misc_dev.c | 491 ++++++++++++++++++++++
+>   1 file changed, 491 insertions(+)
+> =
+
+> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nit=
+ro_enclaves/ne_misc_dev.c
+> index f70496813033..d6777008f685 100644
+> --- a/drivers/virt/nitro_enclaves/ne_misc_dev.c
+> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+> @@ -39,7 +39,11 @@
+>    * TODO: Update logic to create new sysfs entries instead of using
+>    * a kernel parameter e.g. if multiple sysfs files needed.
+>    */
+> +static int ne_set_kernel_param(const char *val, const struct kernel_para=
+m *kp);
+> +
+>   static const struct kernel_param_ops ne_cpu_pool_ops =3D {
+> +	.get =3D param_get_string,
+> +	.set =3D ne_set_kernel_param,
+>   };
+>   =
+
+>   static char ne_cpus[PAGE_SIZE];
+> @@ -60,6 +64,485 @@ struct ne_cpu_pool {
+>   =
+
+>   static struct ne_cpu_pool ne_cpu_pool;
+>   =
+
+> +static const struct file_operations ne_enclave_vcpu_fops =3D {
+> +	.owner		=3D THIS_MODULE,
+> +	.llseek		=3D noop_llseek,
+> +};
+
+Do we really need an fd for an object without operations? I think the =
+
+general flow to add CPUs from the pool to the VM is very sensible. But I =
+
+don't think we really need an fd as return value from that operation.
+
+> +
+> +/**
+> + * ne_check_enclaves_created - Verify if at least one enclave has been c=
+reated.
 > + *
+> + * @pdev: PCI device used for enclave lifetime management.
+> + *
+> + * @returns: true if at least one enclave is created, false otherwise.
 > + */
-> +int css_enable(int schid, int isc)
->  {
->  	struct pmcw *pmcw = &schib.pmcw;
->  	int retry_count = 0;
-> @@ -92,6 +103,9 @@ retry:
->  	/* Update the SCHIB to enable the channel */
->  	pmcw->flags |= PMCW_ENABLE;
->  
-> +	/* Set Interruption Subclass to IO_SCH_ISC */
-
-The specified isc, current callers just happen to pass that value.
-
-> +	pmcw->flags |= (isc << PMCW_ISC_SHIFT);
-> +
->  	/* Tell the CSS we want to modify the subchannel */
->  	cc = msch(schid, &schib);
->  	if (cc) {
-> @@ -114,6 +128,7 @@ retry:
->  		return cc;
->  	}
->  
-> +	report_info("stsch: flags: %04x", pmcw->flags);
-
-It feels like all of this already should have been included in the
-previous patch?
-
->  	if (pmcw->flags & PMCW_ENABLE) {
->  		report_info("stsch: sch %08x enabled after %d retries",
->  			    schid, retry_count);
-> @@ -129,3 +144,134 @@ retry:
->  		    schid, retry_count, pmcw->flags);
->  	return -1;
->  }
-> +
-> +static struct irb irb;
-> +
-> +void css_irq_io(void)
+> +static bool ne_check_enclaves_created(struct pci_dev *pdev)
 > +{
-> +	int ret = 0;
-> +	char *flags;
-> +	int sid;
+> +	struct ne_pci_dev *ne_pci_dev =3D pci_get_drvdata(pdev);
 > +
-> +	report_prefix_push("Interrupt");
-> +	sid = lowcore_ptr->subsys_id_word;
-> +	/* Lowlevel set the SID as interrupt parameter. */
-> +	if (lowcore_ptr->io_int_param != sid) {
-> +		report(0,
-> +		       "io_int_param: %x differs from subsys_id_word: %x",
-> +		       lowcore_ptr->io_int_param, sid);
-> +		goto pop;
-> +	}
-> +	report_info("subsys_id_word: %08x io_int_param %08x io_int_word %08x",
-> +			lowcore_ptr->subsys_id_word,
-> +			lowcore_ptr->io_int_param,
-> +			lowcore_ptr->io_int_word);
-> +	report_prefix_pop();
+> +	if (!ne_pci_dev)
+> +		return false;
+
+Please pass in the ne_pci_dev into this function directly.
+
 > +
-> +	report_prefix_push("tsch");
-> +	ret = tsch(sid, &irb);
-> +	switch (ret) {
-> +	case 1:
-> +		dump_irb(&irb);
-> +		flags = dump_scsw_flags(irb.scsw.ctrl);
-> +		report(0,
-> +		       "I/O interrupt, CC 1 but tsch reporting sch %08x as not status pending: %s",
+> +	mutex_lock(&ne_pci_dev->enclaves_list_mutex);
+> +
+> +	if (list_empty(&ne_pci_dev->enclaves_list)) {
+> +		mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
+> +
+> +		return false;
 
-"I/O interrupt, but tsch returns CC 1 for subchannel %08x" ?
+If you make this a return variable, you save on the unlock duplication.
 
-> +		       sid, flags);
-> +		break;
-> +	case 2:
-> +		report(0, "tsch returns unexpected CC 2");
-> +		break;
-> +	case 3:
-> +		report(0, "tsch reporting sch %08x as not operational", sid);
-> +		break;
-> +	case 0:
-> +		/* Stay humble on success */
-> +		break;
 > +	}
-> +pop:
-> +	report_prefix_pop();
-> +	lowcore_ptr->io_old_psw.mask &= ~PSW_MASK_WAIT;
+> +
+> +	mutex_unlock(&ne_pci_dev->enclaves_list_mutex);
+> +
+> +	return true;
 > +}
 > +
-> +int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw)
+> +/**
+> + * ne_setup_cpu_pool - Set the NE CPU pool after handling sanity checks =
+such as
+> + * not sharing CPU cores with the primary / parent VM or not using CPU 0=
+, which
+> + * should remain available for the primary / parent VM. Offline the CPUs=
+ from
+> + * the pool after the checks passed.
+> + *
+> + * @pdev: PCI device used for enclave lifetime management.
+> + * @ne_cpu_list: the CPU list used for setting NE CPU pool.
+> + *
+> + * @returns: 0 on success, negative return value on failure.
+> + */
+> +static int ne_setup_cpu_pool(struct pci_dev *pdev, const char *ne_cpu_li=
+st)
 > +{
-> +	struct orb orb = {
-> +		.intparm = sid,
-> +		.ctrl = ORB_CTRL_ISIC|ORB_CTRL_FMT|ORB_LPM_DFLT,
-> +		.cpa = (unsigned int) (unsigned long)ccw,
-> +	};
+> +	unsigned int cpu =3D 0;
+> +	unsigned int cpu_sibling =3D 0;
+> +	int numa_node =3D -1;
+> +	int rc =3D -EINVAL;
 > +
-> +	return ssch(sid, &orb);
+> +	if (!capable(CAP_SYS_ADMIN)) {
+> +		dev_err(&pdev->dev, "No admin capability for CPU pool setup\n");
+
+No need to print anything here. It only gives non-admin users a chance =
+
+to spill the kernel log. If non-admin users can write at all? Can they?
+
+Also, isn't this at the wrong abstraction level? I would expect such a =
+
+check to happen on the file write function, not here.
+
+> +
+> +		return -EPERM;
+> +	}
+> +
+> +	if (!ne_cpu_list)
+> +		return 0;
+> +
+> +	if (ne_check_enclaves_created(pdev)) {
+> +		dev_err(&pdev->dev, "The CPU pool is used, enclaves created\n");
+> +
+> +		return -EINVAL;
+> +	}
+> +
+> +	mutex_lock(&ne_cpu_pool.mutex);
+> +
+> +	rc =3D cpulist_parse(ne_cpu_list, ne_cpu_pool.avail);
+> +	if (rc < 0) {
+> +		dev_err(&pdev->dev,
+> +			"Error in cpulist parse [rc=3D%d]\n", rc);
+> +
+> +		goto unlock_mutex;
+> +	}
+> +
+> +	/*
+> +	 * Check if CPU 0 and its siblings are included in the provided CPU pool
+> +	 * They should remain available for the primary / parent VM.
+> +	 */
+> +	if (cpumask_test_cpu(0, ne_cpu_pool.avail)) {
+> +
+> +		dev_err(&pdev->dev,
+> +			"CPU 0 has to remain available for the primary VM\n");
+
+Shouldn't this also change the read value of the sysfs file?
+
+> +
+> +		rc =3D -EINVAL;
+> +
+> +		goto unlock_mutex;
+> +	}
+> +
+> +	for_each_cpu(cpu_sibling, topology_sibling_cpumask(0)) {
+> +		if (cpumask_test_cpu(cpu_sibling, ne_cpu_pool.avail)) {
+> +			dev_err(&pdev->dev,
+> +				"CPU sibling %d of CPU 0 is in the CPU pool\n",
+> +				cpu_sibling);
+
+Same here. I would expect the sysfs file to reflect either the previous =
+
+state or <empty> because failures mean no CPUs are donated anymore.
+
+Can we somehow implement the get function of the param as something that =
+
+gets generated dynamically?
+
+> +
+> +			rc =3D -EINVAL;
+> +
+> +			goto unlock_mutex;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Check if CPU siblings are included in the provided CPU pool. The
+> +	 * expectation is that CPU cores are made available in the CPU pool for
+> +	 * enclaves.
+> +	 */
+> +	for_each_cpu(cpu, ne_cpu_pool.avail) {
+> +		for_each_cpu(cpu_sibling, topology_sibling_cpumask(cpu)) {
+> +			if (!cpumask_test_cpu(cpu_sibling, ne_cpu_pool.avail)) {
+> +				dev_err(&pdev->dev,
+> +					"CPU %d is not in the CPU pool\n",
+> +					cpu_sibling);
+> +
+> +				rc =3D -EINVAL;
+> +
+> +				goto unlock_mutex;
+> +			}
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Check if the CPUs from the NE CPU pool are from the same NUMA node.
+> +	 */
+> +	for_each_cpu(cpu, ne_cpu_pool.avail) {
+> +		if (numa_node < 0) {
+> +			numa_node =3D cpu_to_node(cpu);
+> +
+> +			if (numa_node < 0) {
+> +				dev_err(&pdev->dev,
+> +					"Invalid NUMA node %d\n", numa_node);
+> +
+> +				rc =3D -EINVAL;
+> +
+> +				goto unlock_mutex;
+> +			}
+> +		} else {
+> +			if (numa_node !=3D cpu_to_node(cpu)) {
+> +				dev_err(&pdev->dev,
+> +					"CPUs are from different NUMA nodes\n");
+> +
+> +				rc =3D -EINVAL;
+> +
+> +				goto unlock_mutex;
+> +			}
+> +		}
+> +	}
+> +
+
+There should be a comment here that describes the why:
+
+/*
+  * CPUs that are donated to enclaves should not be considered online
+  * by Linux anymore, as the hypervisor will degrade them to floating.
+  *
+  * We offline them here, to not degrade performance and expose correct
+  * topology to Linux and user space.
+  */
+
+> +	for_each_cpu(cpu, ne_cpu_pool.avail) {
+> +		rc =3D remove_cpu(cpu);
+> +		if (rc !=3D 0) {
+> +			dev_err(&pdev->dev,
+> +				"CPU %d is not offlined [rc=3D%d]\n", cpu, rc);
+> +
+> +			goto online_cpus;
+> +		}
+> +	}
+> +
+> +	mutex_unlock(&ne_cpu_pool.mutex);
+> +
+> +	return 0;
+> +
+> +online_cpus:
+> +	for_each_cpu(cpu, ne_cpu_pool.avail)
+> +		add_cpu(cpu);
+> +unlock_mutex:
+> +	mutex_unlock(&ne_cpu_pool.mutex);
+> +
+> +	return rc;
 > +}
 > +
-> +/*
-> + * In the future, we want to implement support for CCW chains;
-> + * for that, we will need to work with ccw1 pointers.
+> +/**
+> + * ne_teardown_cpu_pool - Online the CPUs from the NE CPU pool and clean=
+up the
+> + * CPU pool.
+> + *
+> + * @pdev: PCI device used for enclave lifetime management.
 > + */
-> +static struct ccw1 unique_ccw;
-> +
-> +int start_single_ccw(unsigned int sid, int code, void *data, int count,
-> +		     unsigned char flags)
+> +static void ne_teardown_cpu_pool(struct pci_dev *pdev)
 > +{
-> +	int cc;
-> +	struct ccw1 *ccw = &unique_ccw;
+> +	unsigned int cpu =3D 0;
+> +	int rc =3D -EINVAL;
 > +
-> +	report_prefix_push("start_subchannel");
-> +	/* Build the CCW chain with a single CCW */
-> +	ccw->code = code;
-> +	ccw->flags = flags; /* No flags need to be set */
-
-s/No flags/No additional flags/
-
-> +	ccw->count = count;
-> +	ccw->data_address = (int)(unsigned long)data;
+> +	if (!capable(CAP_SYS_ADMIN)) {
+> +		dev_err(&pdev->dev, "No admin capability for CPU pool setup\n");
 > +
-> +	cc = start_ccw1_chain(sid, ccw);
-> +	if (cc) {
-> +		report(0, "start_ccw_chain failed ret=%d", cc);
-> +		report_prefix_pop();
-> +		return cc;
+> +		return;
 > +	}
-> +	report_prefix_pop();
+> +
+> +	if (!ne_cpu_pool.avail)
+> +		return;
+> +
+> +	if (ne_check_enclaves_created(pdev)) {
+> +		dev_err(&pdev->dev, "The CPU pool is used, enclaves created\n");
+> +
+> +		return;
+> +	}
+> +
+> +	mutex_lock(&ne_cpu_pool.mutex);
+> +
+> +	for_each_cpu(cpu, ne_cpu_pool.avail) {
+> +		rc =3D add_cpu(cpu);
+> +		if (rc !=3D 0)
+> +			dev_err(&pdev->dev,
+> +				"CPU %d is not onlined [rc=3D%d]\n", cpu, rc);
+> +	}
+> +
+> +	cpumask_clear(ne_cpu_pool.avail);
+> +
+> +	mutex_unlock(&ne_cpu_pool.mutex);
+> +}
+> +
+> +static int ne_set_kernel_param(const char *val, const struct kernel_para=
+m *kp)
+> +{
+> +	const char *ne_cpu_list =3D val;
+> +	struct pci_dev *pdev =3D pci_get_device(PCI_VENDOR_ID_AMAZON,
+> +					      PCI_DEVICE_ID_NE, NULL);
+
+Isn't there a better way?
+
+> +	int rc =3D -EINVAL;
+> +
+> +	if (!pdev)
+> +		return -ENODEV;
+> +
+> +	ne_teardown_cpu_pool(pdev);
+> +
+> +	rc =3D ne_setup_cpu_pool(pdev, ne_cpu_list);
+> +	if (rc < 0) {
+> +		dev_err(&pdev->dev, "Error in setup CPU pool [rc=3D%d]\n", rc);
+> +
+> +		return rc;
+> +	}
+> +
+> +	return param_set_copystring(val, kp);
+> +}
+> +
+> +/**
+> + * ne_get_cpu_from_cpu_pool - Get a CPU from the CPU pool. If the vCPU i=
+d is 0,
+> + * the CPU is autogenerated and chosen from the NE CPU pool.
+> + *
+> + * This function gets called with the ne_enclave mutex held.
+> + *
+> + * @ne_enclave: private data associated with the current enclave.
+> + * @vcpu_id: id of the CPU to be associated with the given slot, apic id=
+ on x86.
+> + *
+> + * @returns: 0 on success, negative return value on failure.
+> + */
+> +static int ne_get_cpu_from_cpu_pool(struct ne_enclave *ne_enclave, u32 *=
+vcpu_id)
+
+That's a very awkward API. Can you instead just pass by-value and return =
+
+the resulting CPU ID?
+
+> +{
+> +	unsigned int cpu =3D 0;
+> +	unsigned int cpu_sibling =3D 0;
+> +
+> +	if (*vcpu_id !=3D 0) {
+> +		if (cpumask_test_cpu(*vcpu_id, ne_enclave->cpu_siblings)) {
+> +			cpumask_clear_cpu(*vcpu_id, ne_enclave->cpu_siblings);
+> +
+> +			return 0;
+> +		}
+> +
+> +		mutex_lock(&ne_cpu_pool.mutex);
+> +
+> +		if (!cpumask_test_cpu(*vcpu_id, ne_cpu_pool.avail)) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "CPU %d is not in NE CPU pool\n",
+> +					    *vcpu_id);
+> +
+> +			mutex_unlock(&ne_cpu_pool.mutex);
+> +
+> +			return -EINVAL;
+
+I think you're better off making the return value explicit for the =
+
+error, so that user space can print the error message rather than us.
+
+> +		}
+> +
+> +		cpumask_clear_cpu(*vcpu_id, ne_cpu_pool.avail);
+> +
+> +		/*
+> +		 * Make sure the CPU siblings are not marked as available
+> +		 * anymore.
+> +		 */
+> +		for_each_cpu(cpu_sibling, topology_sibling_cpumask(*vcpu_id)) {
+> +			if (cpu_sibling !=3D *vcpu_id) {
+> +				cpumask_clear_cpu(cpu_sibling,
+> +						  ne_cpu_pool.avail);
+> +
+> +				cpumask_set_cpu(cpu_sibling,
+> +						ne_enclave->cpu_siblings);
+> +			}
+> +		}
+> +
+> +		mutex_unlock(&ne_cpu_pool.mutex);
+> +
+> +		return 0;
+> +	}
+> +
+> +	/* There are CPU siblings available to choose from. */
+> +	cpu =3D cpumask_any(ne_enclave->cpu_siblings);
+> +	if (cpu < nr_cpu_ids) {
+> +		cpumask_clear_cpu(cpu, ne_enclave->cpu_siblings);
+> +
+> +		*vcpu_id =3D cpu;
+> +
+> +		return 0;
+> +	}
+> +
+> +	mutex_lock(&ne_cpu_pool.mutex);
+> +
+> +	/* Choose any CPU from the available CPU pool. */
+> +	cpu =3D cpumask_any(ne_cpu_pool.avail);
+> +	if (cpu >=3D nr_cpu_ids) {
+> +		dev_err_ratelimited(ne_misc_dev.this_device,
+> +				    "No CPUs available in CPU pool\n");
+> +
+> +		mutex_unlock(&ne_cpu_pool.mutex);
+> +
+> +		return -EINVAL;
+
+I think you're better off making the return value explicit for the =
+
+error, so that user space can print the error message rather than us.
+
+> +	}
+> +
+> +	cpumask_clear_cpu(cpu, ne_cpu_pool.avail);
+> +
+> +	/* Make sure the CPU siblings are not marked as available anymore. */
+> +	for_each_cpu(cpu_sibling, topology_sibling_cpumask(cpu)) {
+> +		if (cpu_sibling !=3D cpu) {
+> +			cpumask_clear_cpu(cpu_sibling, ne_cpu_pool.avail);
+> +
+> +			cpumask_set_cpu(cpu_sibling, ne_enclave->cpu_siblings);
+> +		}
+> +	}
+> +
+> +	mutex_unlock(&ne_cpu_pool.mutex);
+
+I find the function slightly confusingly structured. Why can't we do =
+
+something like
+
+
+   if (!vcpu_id) {
+     vcpu_id =3D find_next_free_vcpu_id();
+     if (vcpu_id < 0)
+         return -ENOSPC;
+   }
+
+   [logic to handle an explicit vcpu id]
+
+I think that would be much more readable.
+
+> +
+> +	*vcpu_id =3D cpu;
+> +
 > +	return 0;
 > +}
 > +
-> +/*
-> + * css_residual_count
-> + * We expect no residual count when the ORB request was successful
-
-If we have a short block, but have suppressed the incorrect length
-indication, we may have a successful request with a nonzero count.
-Maybe replace this with "Return the residual count, if it is valid."?
-
-> + * The residual count is valid when the subchannel is status pending
-> + * with primary status and device status only or device status and
-> + * subchannel status with PCI or incorrect length.
-> + * Return value:
-> + * Success: the residual count
-> + * Not meaningful: -1 (-1 can not be a valid count)
+> +/**
+> + * ne_create_vcpu_ioctl - Add vCPU to the slot associated with the curre=
+nt
+> + * enclave. Create vCPU file descriptor to be further used for CPU handl=
+ing.
+> + *
+> + * This function gets called with the ne_enclave mutex held.
+> + *
+> + * @ne_enclave: private data associated with the current enclave.
+> + * @vcpu_id: id of the CPU to be associated with the given slot, apic id=
+ on x86.
+> + *
+> + * @returns: vCPU fd on success, negative return value on failure.
 > + */
-> +int css_residual_count(unsigned int schid)
+> +static int ne_create_vcpu_ioctl(struct ne_enclave *ne_enclave, u32 vcpu_=
+id)
 > +{
+> +	struct ne_pci_dev_cmd_reply cmd_reply =3D {};
+> +	int fd =3D 0;
+> +	struct file *file =3D NULL;
+> +	struct ne_vcpu_id *ne_vcpu_id =3D NULL;
+> +	int rc =3D -EINVAL;
+> +	struct slot_add_vcpu_req slot_add_vcpu_req =3D {};
 > +
-> +	if (!(irb.scsw.ctrl & (SCSW_SC_PENDING | SCSW_SC_PRIMARY)))
-> +		goto fail;
-
-s/fail/invalid/ ? It's not really a failure :)
-
+> +	if (ne_enclave->mm !=3D current->mm)
+> +		return -EIO;
 > +
-> +	if (irb.scsw.dev_stat)
-> +		if (irb.scsw.sch_stat & ~(SCSW_SCHS_PCI | SCSW_SCHS_IL))
-> +			goto fail;
+> +	ne_vcpu_id =3D kzalloc(sizeof(*ne_vcpu_id), GFP_KERNEL);
+> +	if (!ne_vcpu_id)
+> +		return -ENOMEM;
 > +
-> +	return irb.scsw.count;
+> +	fd =3D get_unused_fd_flags(O_CLOEXEC);
+> +	if (fd < 0) {
+> +		rc =3D fd;
 > +
-> +fail:
-> +	report_info("sch  status %02x", irb.scsw.sch_stat);
-> +	report_info("dev  status %02x", irb.scsw.dev_stat);
-> +	report_info("ctrl status %08x", irb.scsw.ctrl);
-> +	report_info("count       %04x", irb.scsw.count);
-> +	report_info("ccw addr    %08x", irb.scsw.ccw_addr);
-
-I don't understand why you dump this data if no valid residual count is
-available. But maybe I don't understand the purpose of this function
-correctly.
-
-> +	return -1;
+> +		dev_err_ratelimited(ne_misc_dev.this_device,
+> +				    "Error in getting unused fd [rc=3D%d]\n", rc);
+> +
+> +		goto free_ne_vcpu_id;
+> +	}
+> +
+> +	/* TODO: Include (vcpu) id in the ne-vm-vcpu naming. */
+> +	file =3D anon_inode_getfile("ne-vm-vcpu", &ne_enclave_vcpu_fops,
+> +				  ne_enclave, O_RDWR);
+> +	if (IS_ERR(file)) {
+> +		rc =3D PTR_ERR(file);
+> +
+> +		dev_err_ratelimited(ne_misc_dev.this_device,
+> +				    "Error in anon inode get file [rc=3D%d]\n",
+> +				    rc);
+> +
+> +		goto put_fd;
+> +	}
+> +
+> +	slot_add_vcpu_req.slot_uid =3D ne_enclave->slot_uid;
+> +	slot_add_vcpu_req.vcpu_id =3D vcpu_id;
+> +
+> +	rc =3D ne_do_request(ne_enclave->pdev, SLOT_ADD_VCPU, &slot_add_vcpu_re=
+q,
+> +			   sizeof(slot_add_vcpu_req), &cmd_reply,
+> +			   sizeof(cmd_reply));
+> +	if (rc < 0) {
+> +		dev_err_ratelimited(ne_misc_dev.this_device,
+> +				    "Error in slot add vcpu [rc=3D%d]\n", rc);
+> +
+> +		goto put_file;
+> +	}
+> +
+> +	ne_vcpu_id->vcpu_id =3D vcpu_id;
+> +
+> +	list_add(&ne_vcpu_id->vcpu_id_list_entry, &ne_enclave->vcpu_ids_list);
+> +
+> +	ne_enclave->nr_vcpus++;
+> +
+> +	fd_install(fd, file);
+> +
+> +	return fd;
+> +
+> +put_file:
+> +	fput(file);
+> +put_fd:
+> +	put_unused_fd(fd);
+> +free_ne_vcpu_id:
+> +	kfree(ne_vcpu_id);
+> +
+> +	return rc;
 > +}
 > +
-> +/*
-> + * enable_io_isc: setup ISC in Control Register 6
-> + * @isc: The interruption Sub Class as a bitfield
-> + */
-> +void enable_io_isc(uint8_t isc)
+> +static long ne_enclave_ioctl(struct file *file, unsigned int cmd,
+> +			     unsigned long arg)
 > +{
-> +	uint64_t value;
+> +	struct ne_enclave *ne_enclave =3D file->private_data;
 > +
-> +	value = (uint64_t)isc << 24;
-> +	lctlg(6, value);
+> +	if (!ne_enclave || !ne_enclave->pdev)
+> +		return -EINVAL;
+> +
+> +	switch (cmd) {
+> +	case NE_CREATE_VCPU: {
+
+Can this be an ADD_VCPU rather than CREATE? We don't really need a vcpu =
+
+fd after all ...
+
+
+Alex
+
+> +		int rc =3D -EINVAL;
+> +		u32 vcpu_id =3D 0;
+> +
+> +		if (copy_from_user(&vcpu_id, (void *)arg, sizeof(vcpu_id))) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Error in copy from user\n");
+> +
+> +			return -EFAULT;
+> +		}
+> +
+> +		mutex_lock(&ne_enclave->enclave_info_mutex);
+> +
+> +		if (ne_enclave->state !=3D NE_STATE_INIT) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Enclave isn't in init state\n");
+> +
+> +			mutex_unlock(&ne_enclave->enclave_info_mutex);
+> +
+> +			return -EINVAL;
+> +		}
+> +
+> +		/* Use the CPU pool for choosing a CPU for the enclave. */
+> +		rc =3D ne_get_cpu_from_cpu_pool(ne_enclave, &vcpu_id);
+> +		if (rc < 0) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Error in get CPU from pool\n");
+> +
+> +			mutex_unlock(&ne_enclave->enclave_info_mutex);
+> +
+> +			return -EINVAL;
+> +		}
+> +
+> +		rc =3D ne_create_vcpu_ioctl(ne_enclave, vcpu_id);
+> +
+> +		/* Put back the CPU in enclave cpu pool, if add vcpu error. */
+> +		if (rc < 0)
+> +			cpumask_set_cpu(vcpu_id, ne_enclave->cpu_siblings);
+> +
+> +		mutex_unlock(&ne_enclave->enclave_info_mutex);
+> +
+> +		if (copy_to_user((void *)arg, &vcpu_id, sizeof(vcpu_id))) {
+> +			dev_err_ratelimited(ne_misc_dev.this_device,
+> +					    "Error in copy to user\n");
+> +
+> +			return -EFAULT;
+> +		}
+> +
+> +		return rc;
+> +	}
+> +
+> +	default:
+> +		return -ENOTTY;
+> +	}
+> +
+> +	return 0;
 > +}
-> diff --git a/s390x/css.c b/s390x/css.c
-> index 72aec43..60e6434 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -19,7 +19,11 @@
->  
->  #include <css.h>
->  
-> +#define DEFAULT_CU_TYPE		0x3832 /* virtio-ccw */
-> +static unsigned long cu_type = DEFAULT_CU_TYPE;
 > +
->  static int test_device_sid;
-> +static struct senseid senseid;
->  
->  static void test_enumerate(void)
->  {
-> @@ -40,17 +44,104 @@ static void test_enable(void)
->  		return;
->  	}
->  
-> -	cc = css_enable(test_device_sid);
-> +	cc = css_enable(test_device_sid, IO_SCH_ISC);
->  
->  	report(cc == 0, "Enable subchannel %08x", test_device_sid);
->  }
->  
-> +/*
-> + * test_sense
-> + * Pre-requisits:
+>   static __poll_t ne_enclave_poll(struct file *file, poll_table *wait)
+>   {
+>   	__poll_t mask =3D 0;
+> @@ -79,6 +562,7 @@ static const struct file_operations ne_enclave_fops =
+=3D {
+>   	.owner		=3D THIS_MODULE,
+>   	.llseek		=3D noop_llseek,
+>   	.poll		=3D ne_enclave_poll,
+> +	.unlocked_ioctl	=3D ne_enclave_ioctl,
+>   };
+>   =
 
-s/Pre-requisists/Pre-requisites/
+>   /**
+> @@ -286,8 +770,15 @@ static int __init ne_init(void)
+>   =
 
-> + * - We need the test device as the first recognized
-> + *   device by the enumeration.
-> + */
-> +static void test_sense(void)
-> +{
-> +	int ret;
-> +	int len;
-> +
-> +	if (!test_device_sid) {
-> +		report_skip("No device");
+>   static void __exit ne_exit(void)
+>   {
+> +	struct pci_dev *pdev =3D pci_get_device(PCI_VENDOR_ID_AMAZON,
+> +					      PCI_DEVICE_ID_NE, NULL);
+> +	if (!pdev)
 > +		return;
-> +	}
 > +
-> +	ret = css_enable(test_device_sid, IO_SCH_ISC);
-> +	if (ret) {
-> +		report(0,
-> +		       "Could not enable the subchannel: %08x",
-> +		       test_device_sid);
-> +		return;
-> +	}
-> +
-> +	ret = register_io_int_func(css_irq_io);
-> +	if (ret) {
-> +		report(0, "Could not register IRQ handler");
-> +		goto unreg_cb;
-> +	}
-> +
-> +	lowcore_ptr->io_int_param = 0;
-> +
-> +	memset(&senseid, 0, sizeof(senseid));
-> +	ret = start_single_ccw(test_device_sid, CCW_CMD_SENSE_ID,
-> +			       &senseid, sizeof(senseid), CCW_F_SLI);
-> +	if (ret) {
-> +		report(0, "ssch failed for SENSE ID on sch %08x with cc %d",
-> +		       test_device_sid, ret);
-> +		goto unreg_cb;
-> +	}
-> +
-> +	wait_for_interrupt(PSW_MASK_IO);
-> +
-> +	if (lowcore_ptr->io_int_param != test_device_sid) {
-> +		report(0, "ssch succeeded but interrupt parameter is wrong: expect %08x got %08x",
-> +		       test_device_sid, lowcore_ptr->io_int_param);
-> +		goto unreg_cb;
-> +	}
-> +
-> +	ret = css_residual_count(test_device_sid);
-> +	if (ret < 0) {
-> +		report(0, "ssch succeeded for SENSE ID but can not get a valid residual count");
-> +		goto unreg_cb;
-> +	}
+>   	pci_unregister_driver(&ne_pci_driver);
+>   =
 
-I'm not sure what you're testing here. You should first test whether
-the I/O concluded normally (i.e., whether you actually get something
-like status pending with channel end/device end). If not, it does not
-make much sense to look either at the residual count or at the sense id
-data.
+> +	ne_teardown_cpu_pool(pdev);
+> +
+>   	free_cpumask_var(ne_cpu_pool.avail);
+>   }
+>   =
 
-If css_residual_count does not return something >= 0 for that 'normal'
-case, something is definitely fishy, though :)
+> =
 
-> +
-> +	len = sizeof(senseid) - ret;
-> +	if (ret && len < CSS_SENSEID_COMMON_LEN) {
-> +		report(0,
-> +		       "ssch succeeded for SENSE ID but report a too short length: %d",
 
-s/report/transferred/ ?
 
-> +		       ret);
-> +		goto unreg_cb;
-> +	}
-> +
-> +	if (ret && len)
-> +		report_info("ssch succeeded for SENSE ID but report a shorter length: %d",
 
-Same here.
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
 
-> +			    len);
-> +
-> +	if (senseid.reserved != 0xff) {
-> +		report(0,
-> +		       "ssch succeeded for SENSE ID but reports garbage: %x",
-> +		       senseid.reserved);
-> +		goto unreg_cb;
-> +	}
-> +
-> +	report_info("senseid length read: %d", ret);
-> +	report_info("reserved %02x cu_type %04x cu_model %02x dev_type %04x dev_model %02x",
-> +		    senseid.reserved, senseid.cu_type, senseid.cu_model,
-> +		    senseid.dev_type, senseid.dev_model);
-> +
-> +	report(senseid.cu_type == cu_type, "cu_type: expect 0x%04x got 0x%04x",
-> +	       (uint16_t) cu_type, senseid.cu_type);
-> +
-> +unreg_cb:
-> +	unregister_io_int_func(css_irq_io);
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
->  } tests[] = {
->  	{ "enumerate (stsch)", test_enumerate },
->  	{ "enable (msch)", test_enable },
-> +	{ "sense (ssch/tsch)", test_sense },
->  	{ NULL, NULL }
->  };
->  
-> @@ -59,6 +150,7 @@ int main(int argc, char *argv[])
->  	int i;
->  
->  	report_prefix_push("Channel Subsystem");
-> +	enable_io_isc(0x80 >> IO_SCH_ISC);
->  	for (i = 0; tests[i].name; i++) {
->  		report_prefix_push(tests[i].name);
->  		tests[i].func();
+
 
