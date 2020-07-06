@@ -2,125 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13D1F21511B
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 04:12:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29D722152F0
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 09:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728647AbgGFCMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Jul 2020 22:12:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728579AbgGFCMO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Jul 2020 22:12:14 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBD88C061794
-        for <kvm@vger.kernel.org>; Sun,  5 Jul 2020 19:12:13 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id v6so24070888iob.4
-        for <kvm@vger.kernel.org>; Sun, 05 Jul 2020 19:12:13 -0700 (PDT)
+        id S1728903AbgGFHNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 03:13:47 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:4793 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728876AbgGFHNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 03:13:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=0EP/LXI4CzHqaVjw0NHIghaG9jR02WWVjhaOMm++lCU=;
-        b=EfdTlpJDEp7js5MOh8VO7TUI+dY6/jZMUaxcsdd7QUjV8s3PY0JfjwtgcoVlDLKMHp
-         abK25PpwU+sjZO5U1XDSzdiNNTEWnT+PnLogEOoQXxJJ8LrPoruYMyIpwIwbmUPPwB0p
-         cKhNd3yj/1ns/o9pJ8FQSJ9fZjMert+saDlPO/wswPZx/p8Uy2ruNhkVifLLaNS5yAIf
-         zWOSYxxvaBZcWxSOCHDyH+kyEAHJKGa61ujJPfn0j7QzCzmnPvS6QdGVUPTpSm7GbpS/
-         /gbkaPYR33TwCd6UBHBJzx4nFxq2h9+6Z3bT8iIHucPFhICQ8MuidR+pTg8fWvyQYj3+
-         +KMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=0EP/LXI4CzHqaVjw0NHIghaG9jR02WWVjhaOMm++lCU=;
-        b=lQ+EOgXJAygMF/Qo5hP76N4Hzj+LObJj7K6FcjKo82QQCzedhcCun4hNQjoy/fD0Tn
-         1qx459BOgevQQWNMRJyFPJaaz92bWPpicIHuECS/OVuvGe1QnnAfH/UOGuxx20gIMk+Q
-         QJqWXKiLGY7jF2xvsHD2hRYson2mK0nurfhnb8TkxIoeFJMfV9R7KzL/M6lb67kblQFl
-         TNmuAU9oVO+zDEyTbIKfioAjCpbqV802pQX09dvtFbpDgx3J6cCKLyUw7EmxEc+wqtvJ
-         kzqYVGG88pumP98Ic7YDgzt3Hii54m1EwUW1ogfO5xPsloqO3mFBHQiISeoe8QYxcm3M
-         sYKA==
-X-Gm-Message-State: AOAM533fcF8NRQs9/sX+I56QuTh0LP/OqApkQBtrdfB4NaQC0UVddDz7
-        G4QTFTEjodSLaXaEDQY8xy6bcoeBq/I=
-X-Google-Smtp-Source: ABdhPJyJhL+zLBGlQG1GM0tX4+f9mMRc8hN9N7+h2qepgrs8aDdKYcvAE/tRx1mnp7fdftEF6fkLcA==
-X-Received: by 2002:a02:a008:: with SMTP id a8mr48500160jah.68.1594001533108;
-        Sun, 05 Jul 2020 19:12:13 -0700 (PDT)
-Received: from ?IPv6:2601:647:4700:9b2:5:addf:db7c:e303? ([2601:647:4700:9b2:5:addf:db7c:e303])
-        by smtp.gmail.com with ESMTPSA id c77sm10861557ill.13.2020.07.05.19.12.11
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 05 Jul 2020 19:12:12 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: Question regarding nested_svm_inject_npf_exit()
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <f297ebf8-15b8-57d3-4c56-fdf3f5d16b9d@redhat.com>
-Date:   Sun, 5 Jul 2020 19:12:11 -0700
-Cc:     kvm <kvm@vger.kernel.org>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1594019625; x=1625555625;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=VB95bLc+g+UmqWSFzbL0u4bPsb7J3t0bL/7bnKUwHs4=;
+  b=HAbD/y9DB6Eo/9r0ahSS+no4unCwo/+DQapfJX19WUZ3odWCw4bF7mQd
+   ntdAnRsVkQjULw9gmSTO9I3bnylatP/H9Wy+m3xAxZ40TdNIlLsZeKcEz
+   mf77upqiTBgbOjZVKPEccAn2JvvOPB923WAbxc405RK0mQ5t6g03miPvR
+   Q=;
+IronPort-SDR: kiJ824QJQ+IdadidvsuVJT+aOsVUniEOlOdVMKHebjWDlsaXcHzny5EzUwawmx4lNzmlAPPZzm
+ 7WG2uX4IxGmQ==
+X-IronPort-AV: E=Sophos;i="5.75,318,1589241600"; 
+   d="scan'208";a="56253262"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 06 Jul 2020 07:13:43 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (Postfix) with ESMTPS id 46F6BA2038;
+        Mon,  6 Jul 2020 07:13:42 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 6 Jul 2020 07:13:41 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.160.65) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 6 Jul 2020 07:13:34 +0000
+Subject: Re: [PATCH v4 07/18] nitro_enclaves: Init misc device providing the
+ ioctl interface
+To:     Andra Paraschiv <andraprs@amazon.com>,
+        <linux-kernel@vger.kernel.org>
+CC:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Bjoern Doebel <doebel@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Frank van der Linden <fllinden@amazon.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Martin Pohlack <mpohlack@amazon.de>,
+        "Matt Wilson" <msw@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Balbir Singh <sblbir@amazon.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Stefan Hajnoczi" <stefanha@redhat.com>,
+        Stewart Smith <trawets@amazon.com>,
+        "Uwe Dannowski" <uwed@amazon.de>, <kvm@vger.kernel.org>,
+        <ne-devel-upstream@amazon.com>
+References: <20200622200329.52996-1-andraprs@amazon.com>
+ <20200622200329.52996-8-andraprs@amazon.com>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <391ad4b0-2011-4d63-8274-9ccb77a5351f@amazon.de>
+Date:   Mon, 6 Jul 2020 09:13:29 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200622200329.52996-8-andraprs@amazon.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.160.65]
+X-ClientProxiedBy: EX13D11UWB002.ant.amazon.com (10.43.161.20) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <2B43FBC4-D265-4005-8FBA-870BDC627231@gmail.com>
-References: <DAFEA995-CFBA-4466-989B-D63466815AB1@gmail.com>
- <f297ebf8-15b8-57d3-4c56-fdf3f5d16b9d@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jul 4, 2020, at 11:38 PM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 04/07/20 02:00, Nadav Amit wrote:
->> Hello Paolo,
->>=20
->> I encountered an issue while running some svm tests. Apparently, the =
-tests
->> =E2=80=9Cnpt_rw_pfwalk=E2=80=9D and =E2=80=9Cnpt_rsv_pfwalk=E2=80=9D =
-expect the present bit to be clear.
->>=20
->> KVM indeed clears this bit in nested_svm_inject_npf_exit():
->>=20
->>       /*
->>        * The present bit is always zero for page structure faults on =
-real
->>        * hardware.
->>        */
->>       if (svm->vmcb->control.exit_info_1 & (2ULL << 32))
->>               svm->vmcb->control.exit_info_1 &=3D ~1;
->>=20
->>=20
->> I could not find documentation of this behavior. Unfortunately, I do =
-not
->> have a bare-metal AMD machine to test the behavior (and some enabling =
-of
->> kvm-unit-tests/svm is required, e.g. this test does not run with more =
-than
->> 4GB of memory).
->>=20
->> Are you sure that this is the way AMD machines behave?
->=20
-> No, I'm not.  The code was added when NPF was changed to synthesize
-> EXITINFO1, instead of simply propagating L0's EXITINFO1 into L1 (see
-> commit 5e3525195196, "KVM: nSVM: propagate the NPF EXITINFO to the
-> guest", 2014-09-03).  With six more years of understanding of KVM, the
-> lack of a present bit might well have been a consequence of how the =
-MMU
-> works.
 
-Thanks. I ran =E2=80=98git blame=E2=80=99 before asking you, and that is =
-the reason I
-assumed you would know best... ;-)
 
-> One of these days I'd like to run the SVM tests under QEMU without =
-KVM.
-> It would probably find bugs in both.
+On 22.06.20 22:03, Andra Paraschiv wrote:
+> The Nitro Enclaves driver provides an ioctl interface to the user space
+> for enclave lifetime management e.g. enclave creation / termination and
+> setting enclave resources such as memory and CPU.
+> =
 
-Well, I think we can agree that bare-metal is a better reference than
-another emulator for the matter. Even without running the tests on
-bare-metal, it is easy to dump EXITINFO1 on the nested page-fault. I =
-will
-try to find a bare-metal machine.
+> This ioctl interface is mapped to a Nitro Enclaves misc device.
+> =
 
-Anyhow, I would appreciate if anyone from AMD would tell whether any =
-result
-should be considered architectural.
+> Signed-off-by: Andra Paraschiv <andraprs@amazon.com>
+> ---
+> Changelog
+> =
+
+> v3 -> v4
+> =
+
+> * Use dev_err instead of custom NE log pattern.
+> * Remove the NE CPU pool init during kernel module loading, as the CPU
+>    pool is now setup at runtime, via a sysfs file for the kernel
+>    parameter.
+> * Add minimum enclave memory size definition.
+> =
+
+> v2 -> v3
+> =
+
+> * Remove the GPL additional wording as SPDX-License-Identifier is
+>    already in place.
+> * Remove the WARN_ON calls.
+> * Remove linux/bug and linux/kvm_host includes that are not needed.
+> * Remove "ratelimited" from the logs that are not in the ioctl call
+>    paths.
+> * Remove file ops that do nothing for now - open and release.
+> =
+
+> v1 -> v2
+> =
+
+> * Add log pattern for NE.
+> * Update goto labels to match their purpose.
+> * Update ne_cpu_pool data structure to include the global mutex.
+> * Update NE misc device mode to 0660.
+> * Check if the CPU siblings are included in the NE CPU pool, as full CPU
+>    cores are given for the enclave(s).
+> ---
+>   drivers/virt/nitro_enclaves/ne_misc_dev.c | 133 ++++++++++++++++++++++
+>   drivers/virt/nitro_enclaves/ne_pci_dev.c  |  11 ++
+>   2 files changed, 144 insertions(+)
+>   create mode 100644 drivers/virt/nitro_enclaves/ne_misc_dev.c
+> =
+
+> diff --git a/drivers/virt/nitro_enclaves/ne_misc_dev.c b/drivers/virt/nit=
+ro_enclaves/ne_misc_dev.c
+> new file mode 100644
+> index 000000000000..628fb10c2b36
+> --- /dev/null
+> +++ b/drivers/virt/nitro_enclaves/ne_misc_dev.c
+> @@ -0,0 +1,133 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserve=
+d.
+> + */
+> +
+> +/**
+> + * Enclave lifetime management driver for Nitro Enclaves (NE).
+> + * Nitro is a hypervisor that has been developed by Amazon.
+> + */
+> +
+> +#include <linux/anon_inodes.h>
+> +#include <linux/capability.h>
+> +#include <linux/cpu.h>
+> +#include <linux/device.h>
+> +#include <linux/file.h>
+> +#include <linux/hugetlb.h>
+> +#include <linux/list.h>
+> +#include <linux/miscdevice.h>
+> +#include <linux/mm.h>
+> +#include <linux/mman.h>
+> +#include <linux/module.h>
+> +#include <linux/mutex.h>
+> +#include <linux/nitro_enclaves.h>
+> +#include <linux/pci.h>
+> +#include <linux/poll.h>
+> +#include <linux/slab.h>
+> +#include <linux/types.h>
+> +
+> +#include "ne_misc_dev.h"
+> +#include "ne_pci_dev.h"
+> +
+> +#define NE_EIF_LOAD_OFFSET (8 * 1024UL * 1024UL)
+> +
+> +#define NE_MIN_ENCLAVE_MEM_SIZE (64 * 1024UL * 1024UL)
+> +
+> +#define NE_MIN_MEM_REGION_SIZE (2 * 1024UL * 1024UL)
+> +
+> +/*
+> + * TODO: Update logic to create new sysfs entries instead of using
+> + * a kernel parameter e.g. if multiple sysfs files needed.
+> + */
+> +static const struct kernel_param_ops ne_cpu_pool_ops =3D {
+
+Adding an empty ops struct looks very odd. If you fill it in a later =
+
+patch, please indicate so in a comment here.
+
+> +};
+> +
+> +static char ne_cpus[PAGE_SIZE];
+
+PAGE_SIZE is a bit excessive, no? Even if you list every single CPU of a =
+
+256 CPU system you are <1024.
+
+
+Alex
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
