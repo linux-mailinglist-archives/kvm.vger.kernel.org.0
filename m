@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 888E0215DF3
-	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 20:07:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82E3C2160FC
+	for <lists+kvm@lfdr.de>; Mon,  6 Jul 2020 23:36:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729747AbgGFSHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 14:07:18 -0400
-Received: from mga02.intel.com ([134.134.136.20]:27827 "EHLO mga02.intel.com"
+        id S1726708AbgGFVgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 17:36:24 -0400
+Received: from mga17.intel.com ([192.55.52.151]:44728 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729589AbgGFSHS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 14:07:18 -0400
-IronPort-SDR: wmMXk2v1EyxpmRiadwLFI8v0dH05DRAB4ShhgMx3/4pQYQghoVuH0w0OhWgI5gigwWKC957CGi
- x475nfQ/ACDQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9673"; a="135718875"
-X-IronPort-AV: E=Sophos;i="5.75,320,1589266800"; 
-   d="gz'50?scan'50,208,50";a="135718875"
+        id S1725942AbgGFVgX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 17:36:23 -0400
+IronPort-SDR: 1xjtS1AmK7Hm7mc7oDWqtdDTPUPNO12qxZ3mofLL1NCA5Nci8O4UTz6pqsxUemerV/4MNFFYtf
+ QoIsAjixeOJQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="127591456"
+X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
+   d="gz'50?scan'50,208,50";a="127591456"
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 11:07:10 -0700
-IronPort-SDR: Q6LAktlALhVa4wlB4fYJNtuVDYwoYVEfgz38+GY3r2QaKUsYL/CL2Ai8H4Yuovk5PtaDuJYezM
- Dth45qJQtSnA==
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 14:19:16 -0700
+IronPort-SDR: OBgCxmAZctc05XvulFLHG6bsrhdRBlHnEW+Rjzo1SPJPOMDWwO3QlkQRlhoXslce/Y8ZvbfolJ
+ 6VVBNharbFpg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,320,1589266800"; 
-   d="gz'50?scan'50,208,50";a="323285122"
+X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
+   d="gz'50?scan'50,208,50";a="322475680"
 Received: from lkp-server01.sh.intel.com (HELO 82346ce9ac16) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 06 Jul 2020 11:07:06 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 06 Jul 2020 14:19:13 -0700
 Received: from kbuild by 82346ce9ac16 with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1jsVWD-0000JZ-Oo; Mon, 06 Jul 2020 18:07:05 +0000
-Date:   Tue, 7 Jul 2020 02:06:45 +0800
+        id 1jsYW8-0000OJ-CE; Mon, 06 Jul 2020 21:19:12 +0000
+Date:   Tue, 7 Jul 2020 05:19:09 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Cathy Zhang <cathy.zhang@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, x86@kernel.org
@@ -39,13 +39,13 @@ Cc:     kbuild-all@lists.01.org, pbonzini@redhat.com,
         sean.j.christopherson@intel.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
         tglx@linutronix.de
-Subject: Re: [PATCH 1/2] x86: Expose SERIALIZE for supported cpuid
-Message-ID: <202007070126.9uAGC9si%lkp@intel.com>
-References: <1593989992-10019-2-git-send-email-cathy.zhang@intel.com>
+Subject: Re: [PATCH 2/2] x86: Expose TSX Suspend Load Address Tracking
+Message-ID: <202007070554.aXOFoSkC%lkp@intel.com>
+References: <1593989992-10019-3-git-send-email-cathy.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="AqsLC8rIMeq19msA"
+Content-Type: multipart/mixed; boundary="SLDf9lqlvOQaIe6s"
 Content-Disposition: inline
-In-Reply-To: <1593989992-10019-2-git-send-email-cathy.zhang@intel.com>
+In-Reply-To: <1593989992-10019-3-git-send-email-cathy.zhang@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -53,7 +53,7 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---AqsLC8rIMeq19msA
+--SLDf9lqlvOQaIe6s
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -82,14 +82,14 @@ All errors (new ones prefixed by >>):
 
    In file included from arch/x86/kvm/cpuid.c:21:
    arch/x86/kvm/cpuid.c: In function 'kvm_set_cpu_caps':
->> arch/x86/kvm/cpuid.h:91:42: error: 'X86_FEATURE_SERIALIZE' undeclared (first use in this function); did you mean 'X86_FEATURE_RETPOLINE'?
+   arch/x86/kvm/cpuid.h:91:42: error: 'X86_FEATURE_SERIALIZE' undeclared (first use in this function); did you mean 'X86_FEATURE_RETPOLINE'?
       91 | #define feature_bit(name)  __feature_bit(X86_FEATURE_##name)
          |                                          ^~~~~~~~~~~~
    arch/x86/kvm/cpuid.c:55:11: note: in expansion of macro 'feature_bit'
       55 | #define F feature_bit
          |           ^~~~~~~~~~~
    arch/x86/kvm/cpuid.c:345:3: note: in expansion of macro 'F'
-     345 |   F(SERIALIZE)
+     345 |   F(SERIALIZE) | F(TSX_LDTRK)
          |   ^
    arch/x86/kvm/cpuid.h:91:42: note: each undeclared identifier is reported only once for each function it appears in
       91 | #define feature_bit(name)  __feature_bit(X86_FEATURE_##name)
@@ -98,25 +98,34 @@ All errors (new ones prefixed by >>):
       55 | #define F feature_bit
          |           ^~~~~~~~~~~
    arch/x86/kvm/cpuid.c:345:3: note: in expansion of macro 'F'
-     345 |   F(SERIALIZE)
+     345 |   F(SERIALIZE) | F(TSX_LDTRK)
          |   ^
+>> arch/x86/kvm/cpuid.h:91:42: error: 'X86_FEATURE_TSX_LDTRK' undeclared (first use in this function); did you mean 'X86_FEATURE_TSC_ADJUST'?
+      91 | #define feature_bit(name)  __feature_bit(X86_FEATURE_##name)
+         |                                          ^~~~~~~~~~~~
+   arch/x86/kvm/cpuid.c:55:11: note: in expansion of macro 'feature_bit'
+      55 | #define F feature_bit
+         |           ^~~~~~~~~~~
+   arch/x86/kvm/cpuid.c:345:18: note: in expansion of macro 'F'
+     345 |   F(SERIALIZE) | F(TSX_LDTRK)
+         |                  ^
 
 vim +91 arch/x86/kvm/cpuid.h
 
-a0a2260c12d8658 Sean Christopherson 2019-12-17  90  
-87382003e355592 Sean Christopherson 2019-12-17 @91  #define feature_bit(name)  __feature_bit(X86_FEATURE_##name)
-87382003e355592 Sean Christopherson 2019-12-17  92  
+a0a2260c12d865 Sean Christopherson 2019-12-17  90  
+87382003e35559 Sean Christopherson 2019-12-17 @91  #define feature_bit(name)  __feature_bit(X86_FEATURE_##name)
+87382003e35559 Sean Christopherson 2019-12-17  92  
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---AqsLC8rIMeq19msA
+--SLDf9lqlvOQaIe6s
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICKJHA18AAy5jb25maWcAlDxLc9w20vf8iinnkhyc1csqp77SAUOCJDx8BQBHM7qwFHns
+H4sICIh3A18AAy5jb25maWcAlDxLc9w20vf8iinnkhyc1csqp77SAUOCJDx8BQBHM7qwFHns
 qFaW/Omxa//77QZAsgGCipNDLHY33o1+Y37+6ecVe3l++HL9fHtzfXf3ffX5cH94vH4+fFx9
 ur07/N8qbVZ1o1c8Ffo3IC5v71++/evb+/P+/Gz17rf3vx29fbw5Xm0Oj/eHu1XycP/p9vML
 tL99uP/p55+Sps5E3idJv+VSiabuNd/pizefb27e/r76JT38eXt9v/r9t1Po5vjsV/vXG9JM
@@ -1029,4 +1038,4 @@ E1ZGvsSUuFeuRjYS9D7LR+anvYsZGRy0m9hpk4wacuOthYKh4/kSvTxABuNZEnpXQ+N4Ad0s
 bS6LZB0UI6OnEtBwOikh2BNKec7riIE5yRSEsIbyp5Qf7JQR+aTdABTA0I6ubG2CJBtZgRjO
 B3TokTUey5XI8bZjtB1ofPZ4f3T1eAkA51cWboAHrDpWz8oio4KHEx9JuSr9HwbI0Ax3JQMA
 
---AqsLC8rIMeq19msA--
+--SLDf9lqlvOQaIe6s--
