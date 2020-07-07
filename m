@@ -2,102 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 255432168A8
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 10:56:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A04E02168FE
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 11:27:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726681AbgGGI4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 04:56:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57256 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725825AbgGGI4n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 04:56:43 -0400
-Received: from mail-oo1-xc42.google.com (mail-oo1-xc42.google.com [IPv6:2607:f8b0:4864:20::c42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90164C061755;
-        Tue,  7 Jul 2020 01:56:43 -0700 (PDT)
-Received: by mail-oo1-xc42.google.com with SMTP id x2so844409oog.5;
-        Tue, 07 Jul 2020 01:56:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZZzWL/xc4mBiRyert9mLtVE7SP6XFUEzRJKwc2vJTLo=;
-        b=jphMRn6XES2wHadQ9X4fBtjp8+n0umR28p140tNHzFSURfwd1MVe/wmCIAILZL7jGT
-         p+lW5yC6ATOc2IOYSYMY3m1koCA8cZJV4fStFv5YQu+g+ckpCcyAgqYNCEzoZ8mqc1TC
-         q2V+CJH7Pz04jC2EDKO/Mxo4HKKbaihO51C/HyejKT9ULWcED7zUgjAnaZGV9aVe7UL9
-         ud3e+bJBvh3WL3dMd5Epb2hlSe8thXGzx1dPxWkVByykFkAN13eDvhtpajehOnBCostg
-         5HZ+RRIGghzmxZWg8MYqobGGMltBfQZU0zTh8WSXSgmjeL7K7BX95zJQxSDgHTj31Gda
-         oTuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZZzWL/xc4mBiRyert9mLtVE7SP6XFUEzRJKwc2vJTLo=;
-        b=Zm3d2G0vdLqr52lp8uvj4Hhy9bImH/VFdX7u32Z4YoNOuPeZK7x3UHf4aLdB/65Z4x
-         3rRVZiZHItQhTQAN+nXM6ICZX7RKDRvjnFhW/uXbiXhVOikwu9WJHe2E1iV0nKvdkkim
-         ff3NmCVcuDzNJ84f9HGU2gdLpF0udsmRPNB1UNucIIoVb+n+MZDKGMsf8xCY0RBTHWsa
-         8PVsq5VWXXStbxFz0K28y2T1PZElQv7GMZxfY66GbUSmGvOBb4gdmiHv0+d/yd8OsqHR
-         y1LC0ZRGOgqaXrN2LzXuI7CQAEX42uhgai2S2iVx6XBuAgLpWAi7UGDq3OPdOB3eU8QM
-         eSJw==
-X-Gm-Message-State: AOAM533CQgVuRxBjIr1CXNg86+5eli709CwKViwzsovzOCjUgPQbKJNI
-        obvr5+xD6/GEfiszi/pQe0wJfH+DCdhce342Z8s=
-X-Google-Smtp-Source: ABdhPJxfwqZPXXjIx+FHumcjPYrKlNWZZqej3ICA99IKgp/Wcn7Dr/HgQsD3Hrh6oJ4thvzuIwZ6TqbPQpEITg4w0OM=
-X-Received: by 2002:a4a:b389:: with SMTP id p9mr11582417ooo.39.1594112201814;
- Tue, 07 Jul 2020 01:56:41 -0700 (PDT)
+        id S1727094AbgGGJ1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 05:27:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37993 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726540AbgGGJ1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 05:27:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594114026;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TOdN6oueiJxGC26XWRVlU9vS6Ei4rnzo4eoopPeqQeU=;
+        b=I+2VSG+66MXfTth3TPMyd3n8VWGhRlLZhyxbcs162btoXSQNE9Pq97+L/MeQrfZKuQqU5P
+        bz6R8hPbsQIPCwR5Vbf/Akj6IozSMRklydRBaFMg6wh/NFL3T356x9ISy2q93nPNyzWBZw
+        hxLhs13/C1LL9hc7QWCdsm6w7GHm4QM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-_ge2CFzUMZOYaw2qde8EQA-1; Tue, 07 Jul 2020 05:27:03 -0400
+X-MC-Unique: _ge2CFzUMZOYaw2qde8EQA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D14F5800406;
+        Tue,  7 Jul 2020 09:27:00 +0000 (UTC)
+Received: from gondolin (ovpn-113-54.ams2.redhat.com [10.36.113.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CE25A60E3E;
+        Tue,  7 Jul 2020 09:26:54 +0000 (UTC)
+Date:   Tue, 7 Jul 2020 11:26:52 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v4 1/2] virtio: let arch validate VIRTIO features
+Message-ID: <20200707112652.42fcab80.cohuck@redhat.com>
+In-Reply-To: <1594111477-15401-2-git-send-email-pmorel@linux.ibm.com>
+References: <1594111477-15401-1-git-send-email-pmorel@linux.ibm.com>
+        <1594111477-15401-2-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200702174455.282252-1-mlevitsk@redhat.com> <20200702181606.GF3575@linux.intel.com>
- <3793ae0da76fe00036ed0205b5ad8f1653f58ef2.camel@redhat.com>
- <20200707061105.GH5208@linux.intel.com> <7c1d9bbe-5f59-5b86-01e9-43c929b24218@redhat.com>
- <20200707081444.GA7417@linux.intel.com>
-In-Reply-To: <20200707081444.GA7417@linux.intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 7 Jul 2020 16:56:30 +0800
-Message-ID: <CANRm+CwyRPMCWO1wZhu_iv22+9uCE6_L3jnJ2_KEgMnA_Spfhg@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: rewrite kvm_spec_ctrl_valid_bits
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Jul 2020 at 16:15, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Aren't you supposed to be on vacation? :-)
+On Tue,  7 Jul 2020 10:44:36 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-A long vacation, enjoy!
+> An architecture may need to validate the VIRTIO devices features
+> based on architecture specificities.
 
->
-> On Tue, Jul 07, 2020 at 10:04:22AM +0200, Paolo Bonzini wrote:
-> > On 07/07/20 08:11, Sean Christopherson wrote:
-> > > One oddity with this whole thing is that by passing through the MSR, KVM is
-> > > allowing the guest to write bits it doesn't know about, which is definitely
-> > > not normal.  It also means the guest could write bits that the host VMM
-> > > can't.
-> >
-> > That's true.  However, the main purpose of the kvm_spec_ctrl_valid_bits
-> > check is to ensure that host-initiated writes are valid; this way, you
-> > don't get a #GP on the next vmentry's WRMSR to MSR_IA32_SPEC_CTRL.
-> > Checking the guest CPUID bit is not even necessary.
->
-> Right, what I'm saying is that rather than try and decipher specs to
-> determine what bits are supported, just throw the value at hardware and
-> go from there.  That's effectively what we end up doing for the guest writes
-> anyways.
->
-> Actually, the current behavior will break migration if there are ever legal
-> bits that KVM doesn't recognize, e.g. guest writes a value that KVM doesn't
-> allow and then migration fails when the destination tries to stuff the value
-> into KVM.
+s/specifities/specifics/
+
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  drivers/virtio/virtio.c       | 19 +++++++++++++++++++
+>  include/linux/virtio_config.h |  1 +
+>  2 files changed, 20 insertions(+)
+> 
+> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> index a977e32a88f2..3179a8aa76f5 100644
+> --- a/drivers/virtio/virtio.c
+> +++ b/drivers/virtio/virtio.c
+> @@ -167,6 +167,21 @@ void virtio_add_status(struct virtio_device *dev, unsigned int status)
+>  }
+>  EXPORT_SYMBOL_GPL(virtio_add_status);
+>  
+> +/*
+> + * arch_needs_virtio_iommu_platform - provide arch specific hook when finalizing
+
+s/arch_needs_virtio_iommu_platform/arch_validate_virtio_features/
+
+:)
+
+> + *				      features for VIRTIO device dev
+> + * @dev: the VIRTIO device being added
+> + *
+> + * Permits the platform to provide architecture specific functionality when
+
+s/provide architecture specific functionality/handle architecture-specific requirements/
+
+?
+
+> + * devices features are finalized. This is the default implementation.
+
+s/devices/device/
+
+> + * Architecture implementations can override this.
+> + */
+> +
+> +int __weak arch_validate_virtio_features(struct virtio_device *dev)
+> +{
+> +	return 0;
+> +}
+> +
+>  int virtio_finalize_features(struct virtio_device *dev)
+>  {
+>  	int ret = dev->config->finalize_features(dev);
+> @@ -176,6 +191,10 @@ int virtio_finalize_features(struct virtio_device *dev)
+>  	if (ret)
+>  		return ret;
+>  
+> +	ret = arch_validate_virtio_features(dev);
+> +	if (ret)
+> +		return ret;
+> +
+>  	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
+>  		return 0;
+>  
+> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+> index bb4cc4910750..3f4117adf311 100644
+> --- a/include/linux/virtio_config.h
+> +++ b/include/linux/virtio_config.h
+> @@ -459,4 +459,5 @@ static inline void virtio_cwrite64(struct virtio_device *vdev,
+>  		_r;							\
+>  	})
+>  
+> +int arch_validate_virtio_features(struct virtio_device *dev);
+>  #endif /* _LINUX_VIRTIO_CONFIG_H */
+
+With the wording fixed,
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
