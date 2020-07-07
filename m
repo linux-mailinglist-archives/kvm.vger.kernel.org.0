@@ -2,427 +2,322 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C99ED216975
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 11:48:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C27C216984
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 11:51:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728025AbgGGJra (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 05:47:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52934 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727097AbgGGJr2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 05:47:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594115245;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HhregYdN+P/IVgyp6XA/13UYgTUXcNUVAnQLSL5XbIE=;
-        b=eoWPZABcgmpV/UxaX0FO10cHo3LrplvbcFaIJ18rWgOAk7q9m3tKo10RUA39C2Zgc5815t
-        pD2sjYdNtGAbn5EF1YKHGFK1bk7YHozdzo4lUdZBpMJo9z/7RWYWDFT7t9J5eM5aM2P7pR
-        MHBInaElewAdXL3H62fHVa/nFBXxN10=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-02kPJQWKO3-yvLnR-dabfg-1; Tue, 07 Jul 2020 05:47:20 -0400
-X-MC-Unique: 02kPJQWKO3-yvLnR-dabfg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE3B9800406;
-        Tue,  7 Jul 2020 09:47:17 +0000 (UTC)
-Received: from [10.72.13.254] (ovpn-13-254.pek2.redhat.com [10.72.13.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F6AD5C1BB;
-        Tue,  7 Jul 2020 09:47:05 +0000 (UTC)
-Subject: Re: [RFC PATCH 00/22] Enhance VHOST to enable SoC-to-SoC
- communication
-To:     Kishon Vijay Abraham I <kishon@ti.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-ntb@googlegroups.com,
-        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20200702082143.25259-1-kishon@ti.com>
- <20200702055026-mutt-send-email-mst@kernel.org>
- <603970f5-3289-cd53-82a9-aa62b292c552@redhat.com>
- <14c6cad7-9361-7fa4-e1c6-715ccc7e5f6b@ti.com>
- <59fd6a0b-8566-44b7-3dae-bb52b468219b@redhat.com>
- <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <da2b671c-b05d-a57f-7bdf-8b1043a41240@redhat.com>
-Date:   Tue, 7 Jul 2020 17:47:03 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <ce9eb6a5-cd3a-a390-5684-525827b30f64@ti.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S1726946AbgGGJva (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 05:51:30 -0400
+Received: from mga07.intel.com ([134.134.136.100]:17055 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725944AbgGGJv3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 05:51:29 -0400
+IronPort-SDR: baWhlI+NRSyIY0u6KKDLpHAhN/hAKRCi5NtS/ybfyQ9RdckAVhxd74EXHcWdBkE3xVwpWoL9c1
+ NwoJIPGsiVIg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="212534542"
+X-IronPort-AV: E=Sophos;i="5.75,323,1589266800"; 
+   d="scan'208";a="212534542"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 02:51:27 -0700
+IronPort-SDR: lAULlTMdItcI63iLzg/uz+/OYP4XIG9p8JeER/HvmkXtfAyHZWJj7tWYM8yrmTFCIokF8ofbPr
+ 1k33x/cqNyDg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,323,1589266800"; 
+   d="scan'208";a="483459179"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by fmsmga005.fm.intel.com with ESMTP; 07 Jul 2020 02:51:26 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 7 Jul 2020 02:51:26 -0700
+Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 7 Jul 2020 02:51:26 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.106)
+ by edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 7 Jul 2020 02:51:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a+XoWX/NH8q03oTlrj6n+zXdNg+LUAmq7RQIdMIfmxFC4/EULoE4iqCwjGvkTpklRyzN0rCiPRqKoDaf0Z3qiE1baI1rf8e3VyNAZDqAiB3CUYi0G5WjYBCY2jWcvK3pPUm/SzN0cnhUF97OS2ymQyIGxIpTnFXg3mewbf61JVSRFjiGy+h5+ls+Srb6EaJ9KeShK2uiTfwiDI1R4Sdv5VicN3K2NGPryxNYOtFeq2NgdP3MVHI4T4OV8P9FEHE1RjKeMyBVxBHPnf4GHmBlJ7RaQ1obcZo2FJgdKLve8CpOpB6VKPBnVMSt/6lYgpFOrY2DAdT4aNVN4Vp+exOuEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p1loW5B6TU7bH6QKKLY3K4zf62iQQH6xEPmjPC2X2Xg=;
+ b=jlFBS8xyf642jpzkBvoGURQhyvQIK6fSNUeyRxtTIlk9N14gwaVhCDDPxLxtwaJPAtUQHEXIR/SPL43TweJa/FgNE7Djq1oNhSUqo3Fmx+6FSWppRk+4vrzJKf6ZaVriyoGG1+MsoTHQv4WiWgF9hvrO+N0s3k6yduwyXX6CkyTET/pwi4DEn0v39fsf6pDaCNsPSzb9HSuWZhgBQwDJ3GD5zCQuKx9pJsRR4wPwVuUHlzxBTcoGu+06l43rMcg67Lz8T774uKJcuh5NKKl2henmKBi/PTAaU5TzQl9on/6nwc8ujWARTqadenC8ZpQN7nWni4ER56bVtOIUFLWESQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p1loW5B6TU7bH6QKKLY3K4zf62iQQH6xEPmjPC2X2Xg=;
+ b=dbzeojpZEKmlxfYf9roNvaDlmc/aN2RiDWw72bYuKVNNoMvteSCtCLOLVQ7Uj7z0Ec/5IcUvwjZ/vze7YTSlLKkQ11s8aDgK1bixWdprTad4MTav/0RT9+2l1Nryb6X8OOSKn1ANOuIXXgka8EHfdznuQi0AoOXMn83rzrS9CLg=
+Received: from CY4PR11MB1432.namprd11.prod.outlook.com (2603:10b6:910:5::22)
+ by CY4PR1101MB2197.namprd11.prod.outlook.com (2603:10b6:910:18::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.27; Tue, 7 Jul
+ 2020 09:51:24 +0000
+Received: from CY4PR11MB1432.namprd11.prod.outlook.com
+ ([fe80::b46e:9dcb:b46b:884a]) by CY4PR11MB1432.namprd11.prod.outlook.com
+ ([fe80::b46e:9dcb:b46b:884a%4]) with mapi id 15.20.3153.029; Tue, 7 Jul 2020
+ 09:51:24 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Auger Eric <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v4 07/15] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
+ (alloc/free)
+Thread-Topic: [PATCH v4 07/15] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
+ (alloc/free)
+Thread-Index: AQHWUfUb2+oo31Iq0U2hNaNw7OjPqaj6rTsAgAE1TZA=
+Date:   Tue, 7 Jul 2020 09:51:23 +0000
+Message-ID: <CY4PR11MB14327F25FF2C50778B29B9BEC3660@CY4PR11MB1432.namprd11.prod.outlook.com>
+References: <1593861989-35920-1-git-send-email-yi.l.liu@intel.com>
+ <1593861989-35920-8-git-send-email-yi.l.liu@intel.com>
+ <f78eac88-eb8e-a6f5-d701-146587660f5f@redhat.com>
+In-Reply-To: <f78eac88-eb8e-a6f5-d701-146587660f5f@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-reaction: no-action
+dlp-version: 11.2.0.6
+dlp-product: dlpe-windows
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.147.214]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6ba371aa-821e-436c-9fa9-08d8225b4f64
+x-ms-traffictypediagnostic: CY4PR1101MB2197:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CY4PR1101MB2197AA59FF0AF126A484C6D1C3660@CY4PR1101MB2197.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0457F11EAF
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dNFBsxtSuRMpohVRb9Dxs3CYAtTI4Cm2//Z5cW/Aj5zTlN80rDe6dkQCOYu/0E1uWy6JoFn+oc469IrmnfXXrfAUVdkv4mxYZ+AU31RHF1YKiKCyouu0EIQ2k8OXiGox5gqgeqqN8HR+nO4CSX1lw9eQ8Y5Gmc8lDNU5vOMz6s3vyLzrBiMki7juvYxa7GZscw6O8k6eN+3AXLcBmuUkWxJf2JVQii4wbuTmbKbYNFNNvFizs6WTvPv+OZGo75OxHkpoUJ2+NmHB8dib1A752CnXThhjG9cVMa5pYsaQRW2BYMf97LEefp8nWNiw85wZkbwl895JDqFgii2YdpSIvA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR11MB1432.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(376002)(346002)(396003)(39860400002)(136003)(8676002)(4326008)(86362001)(71200400001)(5660300002)(83380400001)(33656002)(9686003)(7696005)(7416002)(26005)(55016002)(2906002)(186003)(8936002)(6506007)(478600001)(53546011)(110136005)(66476007)(54906003)(66946007)(66446008)(76116006)(316002)(64756008)(66556008)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: pt6+WHdaNtwtKCaxiWaJArxTyXxL+ff9TRFELDyMz3wtren3xMwGT2pp1qbfAWMkmTHAIqf4LGvlJVtOuzzPVGaRCfTC/FQBCDYCpfKAXHRhHRSWBxolTijZBrJ3V13Yk5bLM9zR/kG9ZqTPn6RQEydmCbBBmnivw5nbZ+qRbhnLhTJqTZAeEhwX/fqb/tKVc5/J3hfrqhN6L/PABmf04CklDGOVVOzxgebXtnl9uNyfv2L0nK+ovwUJeJ5rcfxQye7oiMAQUy+N00i/I3rIWSHFRYRP/y2dsKAV2lJfHRM3B4ZsUxwk4QQCly7Bztx2ZH6M+q85mpI/IPht/Kje0LHlPV2zWFGIv/8TLvAv4vy0TezxIxnsVUUnzfK2vzeseCbK+AR+JYIZLlofDB7GmrguFZFjcAvM8mkhZ+XZ+vbmdP8Gdwp8XKUW6tihmMBM7H00zyBguHlVIxunMQ3NPgo+Nh/Y4QYMJWJrdBLZTf+qvR22wQ37T0JqCC2KfXoG
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR11MB1432.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ba371aa-821e-436c-9fa9-08d8225b4f64
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2020 09:51:24.0438
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7K4WxQ6Bt7Bvq9aRi8obawjf1tCwC3/sudvs2wy24ifQBckG0+bMYMbnFTmeTTt7YwIpkl2zXs0gmhbAWVCA3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1101MB2197
+X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2020/7/6 下午5:32, Kishon Vijay Abraham I wrote:
-> Hi Jason,
->
-> On 7/3/2020 12:46 PM, Jason Wang wrote:
->> On 2020/7/2 下午9:35, Kishon Vijay Abraham I wrote:
->>> Hi Jason,
->>>
->>> On 7/2/2020 3:40 PM, Jason Wang wrote:
->>>> On 2020/7/2 下午5:51, Michael S. Tsirkin wrote:
->>>>> On Thu, Jul 02, 2020 at 01:51:21PM +0530, Kishon Vijay Abraham I wrote:
->>>>>> This series enhances Linux Vhost support to enable SoC-to-SoC
->>>>>> communication over MMIO. This series enables rpmsg communication between
->>>>>> two SoCs using both PCIe RC<->EP and HOST1-NTB-HOST2
->>>>>>
->>>>>> 1) Modify vhost to use standard Linux driver model
->>>>>> 2) Add support in vring to access virtqueue over MMIO
->>>>>> 3) Add vhost client driver for rpmsg
->>>>>> 4) Add PCIe RC driver (uses virtio) and PCIe EP driver (uses vhost) for
->>>>>>       rpmsg communication between two SoCs connected to each other
->>>>>> 5) Add NTB Virtio driver and NTB Vhost driver for rpmsg communication
->>>>>>       between two SoCs connected via NTB
->>>>>> 6) Add configfs to configure the components
->>>>>>
->>>>>> UseCase1 :
->>>>>>
->>>>>>     VHOST RPMSG                     VIRTIO RPMSG
->>>>>>          +                               +
->>>>>>          |                               |
->>>>>>          |                               |
->>>>>>          |                               |
->>>>>>          |                               |
->>>>>> +-----v------+                 +------v-------+
->>>>>> |   Linux    |                 |     Linux    |
->>>>>> |  Endpoint  |                 | Root Complex |
->>>>>> |            <----------------->              |
->>>>>> |            |                 |              |
->>>>>> |    SOC1    |                 |     SOC2     |
->>>>>> +------------+                 +--------------+
->>>>>>
->>>>>> UseCase 2:
->>>>>>
->>>>>>         VHOST RPMSG                                      VIRTIO RPMSG
->>>>>>              +                                                 +
->>>>>>              |                                                 |
->>>>>>              |                                                 |
->>>>>>              |                                                 |
->>>>>>              |                                                 |
->>>>>>       +------v------+                                   +------v------+
->>>>>>       |             |                                   |             |
->>>>>>       |    HOST1    |                                   |    HOST2    |
->>>>>>       |             |                                   |             |
->>>>>>       +------^------+                                   +------^------+
->>>>>>              |                                                 |
->>>>>>              |                                                 |
->>>>>> +---------------------------------------------------------------------+
->>>>>> |  +------v------+                                   +------v------+  |
->>>>>> |  |             |                                   |             |  |
->>>>>> |  |     EP      |                                   |     EP      |  |
->>>>>> |  | CONTROLLER1 |                                   | CONTROLLER2 |  |
->>>>>> |  |             <----------------------------------->             |  |
->>>>>> |  |             |                                   |             |  |
->>>>>> |  |             |                                   |             |  |
->>>>>> |  |             |  SoC With Multiple EP Instances   |             |  |
->>>>>> |  |             |  (Configured using NTB Function)  |             |  |
->>>>>> |  +-------------+                                   +-------------+  |
->>>>>> +---------------------------------------------------------------------+
->>>>>>
->>>>>> Software Layering:
->>>>>>
->>>>>> The high-level SW layering should look something like below. This series
->>>>>> adds support only for RPMSG VHOST, however something similar should be
->>>>>> done for net and scsi. With that any vhost device (PCI, NTB, Platform
->>>>>> device, user) can use any of the vhost client driver.
->>>>>>
->>>>>>
->>>>>>        +----------------+  +-----------+  +------------+  +----------+
->>>>>>        |  RPMSG VHOST   |  | NET VHOST |  | SCSI VHOST |  |    X     |
->>>>>>        +-------^--------+  +-----^-----+  +-----^------+  +----^-----+
->>>>>>                |                 |              |              |
->>>>>>                |                 |              |              |
->>>>>>                |                 |              |              |
->>>>>> +-----------v-----------------v--------------v--------------v----------+
->>>>>> |                            VHOST CORE                                |
->>>>>> +--------^---------------^--------------------^------------------^-----+
->>>>>>             |               |                    |                  |
->>>>>>             |               |                    |                  |
->>>>>>             |               |                    |                  |
->>>>>> +--------v-------+  +----v------+  +----------v----------+  +----v-----+
->>>>>> |  PCI EPF VHOST |  | NTB VHOST |  |PLATFORM DEVICE VHOST|  |    X     |
->>>>>> +----------------+  +-----------+  +---------------------+  +----------+
->>>>>>
->>>>>> This was initially proposed here [1]
->>>>>>
->>>>>> [1] -> https://lore.kernel.org/r/2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com
->>>>> I find this very interesting. A huge patchset so will take a bit
->>>>> to review, but I certainly plan to do that. Thanks!
->>>> Yes, it would be better if there's a git branch for us to have a look.
->>> I've pushed the branch
->>> https://github.com/kishon/linux-wip.git vhost_rpmsg_pci_ntb_rfc
->>
->> Thanks
->>
->>
->>>> Btw, I'm not sure I get the big picture, but I vaguely feel some of the work is
->>>> duplicated with vDPA (e.g the epf transport or vhost bus).
->>> This is about connecting two different HW systems both running Linux and
->>> doesn't necessarily involve virtualization.
->>
->> Right, this is something similar to VOP
->> (Documentation/misc-devices/mic/mic_overview.rst). The different is the
->> hardware I guess and VOP use userspace application to implement the device.
-> I'd also like to point out, this series tries to have communication between two
-> SoCs in vendor agnostic way. Since this series solves for 2 usecases (PCIe
-> RC<->EP and NTB), for the NTB case it directly plugs into NTB framework and any
-> of the HW in NTB below should be able to use a virtio-vhost communication
->
-> #ls drivers/ntb/hw/
-> amd  epf  idt  intel  mscc
->
-> And similarly for the PCIe RC<->EP communication, this adds a generic endpoint
-> function driver and hence any SoC that supports configurable PCIe endpoint can
-> use virtio-vhost communication
->
-> # ls drivers/pci/controller/dwc/*ep*
-> drivers/pci/controller/dwc/pcie-designware-ep.c
-> drivers/pci/controller/dwc/pcie-uniphier-ep.c
-> drivers/pci/controller/dwc/pci-layerscape-ep.c
-
-
-Thanks for those backgrounds.
-
-
->
->>
->>>    So there is no guest or host as in
->>> virtualization but two entirely different systems connected via PCIe cable, one
->>> acting as guest and one as host. So one system will provide virtio
->>> functionality reserving memory for virtqueues and the other provides vhost
->>> functionality providing a way to access the virtqueues in virtio memory. One is
->>> source and the other is sink and there is no intermediate entity. (vhost was
->>> probably intermediate entity in virtualization?)
->>
->> (Not a native English speaker) but "vhost" could introduce some confusion for
->> me since it was use for implementing virtio backend for userspace drivers. I
->> guess "vringh" could be better.
-> Initially I had named this vringh but later decided to choose vhost instead of
-> vringh. vhost is still a virtio backend (not necessarily userspace) though it
-> now resides in an entirely different system. Whatever virtio is for a frontend
-> system, vhost can be that for a backend system. vring can be for accessing
-> virtqueue and can be used either in frontend or backend.
-
-
-Ok.
-
-
->>
->>>> Have you considered to implement these through vDPA?
->>> IIUC vDPA only provides an interface to userspace and an in-kernel rpmsg driver
->>> or vhost net driver is not provided.
->>>
->>> The HW connection looks something like https://pasteboard.co/JfMVVHC.jpg
->>> (usecase2 above),
->>
->> I see.
->>
->>
->>>    all the boards run Linux. The middle board provides NTB
->>> functionality and board on either side provides virtio/vhost functionality and
->>> transfer data using rpmsg.
->>
->> So I wonder whether it's worthwhile for a new bus. Can we use the existed
->> virtio-bus/drivers? It might work as, except for the epf transport, we can
->> introduce a epf "vhost" transport driver.
-> IMHO we'll need two buses one for frontend and other for backend because the
-> two components can then co-operate/interact with each other to provide a
-> functionality. Though both will seemingly provide similar callbacks, they are
-> both provide symmetrical or complimentary funcitonality and need not be same or
-> identical.
->
-> Having the same bus can also create sequencing issues.
->
-> If you look at virtio_dev_probe() of virtio_bus
->
-> device_features = dev->config->get_features(dev);
->
-> Now if we use same bus for both front-end and back-end, both will try to
-> get_features when there has been no set_features. Ideally vhost device should
-> be initialized first with the set of features it supports. Vhost and virtio
-> should use "status" and "features" complimentarily and not identically.
-
-
-Yes, but there's no need for doing status/features passthrough in epf 
-vhost drivers.b
-
-
->
-> virtio device (or frontend) cannot be initialized before vhost device (or
-> backend) gets initialized with data such as features. Similarly vhost (backend)
-> cannot access virqueues or buffers before virtio (frontend) sets
-> VIRTIO_CONFIG_S_DRIVER_OK whereas that requirement is not there for virtio as
-> the physical memory for virtqueues are created by virtio (frontend).
-
-
-epf vhost drivers need to implement two devices: vhost(vringh) device 
-and virtio device (which is a mediated device). The vhost(vringh) device 
-is doing feature negotiation with the virtio device via RC/EP or NTB. 
-The virtio device is doing feature negotiation with local virtio 
-drivers. If there're feature mismatch, epf vhost drivers and do 
-mediation between them.
-
-
->
->> It will have virtqueues but only used for the communication between itself and
->> uppter virtio driver. And it will have vringh queues which will be probe by
->> virtio epf transport drivers. And it needs to do datacopy between virtqueue and
->> vringh queues.
->>
->> It works like:
->>
->> virtio drivers <- virtqueue/virtio-bus -> epf vhost drivers <- vringh queue/epf>
->>
->> The advantages is that there's no need for writing new buses and drivers.
-> I think this will work however there is an addtional copy between vringh queue
-> and virtqueue,
-
-
-I think not? E.g in use case 1), if we stick to virtio bus, we will have:
-
-virtio-rpmsg (EP) <- virtio ring(1) -> epf vhost driver (EP) <- virtio 
-ring(2) -> virtio pci (RC) <-> virtio rpmsg (RC)
-
-What epf vhost driver did is to read from virtio ring(1) about the 
-buffer len and addr and them DMA to Linux(RC)?
-
-
-> in some cases adds latency because of forwarding interrupts
-> between vhost and virtio driver, vhost drivers providing features (which means
-> it has to be aware of which virtio driver will be connected).
-> virtio drivers (front end) generally access the buffers from it's local memory
-> but when in backend it can access over MMIO (like PCI EPF or NTB) or userspace.
->> Does this make sense?
-> Two copies in my opinion is an issue but lets get others opinions as well.
-
-
-Sure.
-
-
->
-> Thanks for your suggestions!
-
-
-You're welcome.
-
-Thanks
-
-
->
-> Regards
-> Kishon
->
->> Thanks
->>
->>
->>> Thanks
->>> Kishon
->>>
->>>> Thanks
->>>>
->>>>
->>>>>> Kishon Vijay Abraham I (22):
->>>>>>      vhost: Make _feature_ bits a property of vhost device
->>>>>>      vhost: Introduce standard Linux driver model in VHOST
->>>>>>      vhost: Add ops for the VHOST driver to configure VHOST device
->>>>>>      vringh: Add helpers to access vring in MMIO
->>>>>>      vhost: Add MMIO helpers for operations on vhost virtqueue
->>>>>>      vhost: Introduce configfs entry for configuring VHOST
->>>>>>      virtio_pci: Use request_threaded_irq() instead of request_irq()
->>>>>>      rpmsg: virtio_rpmsg_bus: Disable receive virtqueue callback when
->>>>>>        reading messages
->>>>>>      rpmsg: Introduce configfs entry for configuring rpmsg
->>>>>>      rpmsg: virtio_rpmsg_bus: Add Address Service Notification support
->>>>>>      rpmsg: virtio_rpmsg_bus: Move generic rpmsg structure to
->>>>>>        rpmsg_internal.h
->>>>>>      virtio: Add ops to allocate and free buffer
->>>>>>      rpmsg: virtio_rpmsg_bus: Use virtio_alloc_buffer() and
->>>>>>        virtio_free_buffer()
->>>>>>      rpmsg: Add VHOST based remote processor messaging bus
->>>>>>      samples/rpmsg: Setup delayed work to send message
->>>>>>      samples/rpmsg: Wait for address to be bound to rpdev for sending
->>>>>>        message
->>>>>>      rpmsg.txt: Add Documentation to configure rpmsg using configfs
->>>>>>      virtio_pci: Add VIRTIO driver for VHOST on Configurable PCIe Endpoint
->>>>>>        device
->>>>>>      PCI: endpoint: Add EP function driver to provide VHOST interface
->>>>>>      NTB: Add a new NTB client driver to implement VIRTIO functionality
->>>>>>      NTB: Add a new NTB client driver to implement VHOST functionality
->>>>>>      NTB: Describe the ntb_virtio and ntb_vhost client in the documentation
->>>>>>
->>>>>>     Documentation/driver-api/ntb.rst              |   11 +
->>>>>>     Documentation/rpmsg.txt                       |   56 +
->>>>>>     drivers/ntb/Kconfig                           |   18 +
->>>>>>     drivers/ntb/Makefile                          |    2 +
->>>>>>     drivers/ntb/ntb_vhost.c                       |  776 +++++++++++
->>>>>>     drivers/ntb/ntb_virtio.c                      |  853 ++++++++++++
->>>>>>     drivers/ntb/ntb_virtio.h                      |   56 +
->>>>>>     drivers/pci/endpoint/functions/Kconfig        |   11 +
->>>>>>     drivers/pci/endpoint/functions/Makefile       |    1 +
->>>>>>     .../pci/endpoint/functions/pci-epf-vhost.c    | 1144 ++++++++++++++++
->>>>>>     drivers/rpmsg/Kconfig                         |   10 +
->>>>>>     drivers/rpmsg/Makefile                        |    3 +-
->>>>>>     drivers/rpmsg/rpmsg_cfs.c                     |  394 ++++++
->>>>>>     drivers/rpmsg/rpmsg_core.c                    |    7 +
->>>>>>     drivers/rpmsg/rpmsg_internal.h                |  136 ++
->>>>>>     drivers/rpmsg/vhost_rpmsg_bus.c               | 1151 +++++++++++++++++
->>>>>>     drivers/rpmsg/virtio_rpmsg_bus.c              |  184 ++-
->>>>>>     drivers/vhost/Kconfig                         |    1 +
->>>>>>     drivers/vhost/Makefile                        |    2 +-
->>>>>>     drivers/vhost/net.c                           |   10 +-
->>>>>>     drivers/vhost/scsi.c                          |   24 +-
->>>>>>     drivers/vhost/test.c                          |   17 +-
->>>>>>     drivers/vhost/vdpa.c                          |    2 +-
->>>>>>     drivers/vhost/vhost.c                         |  730 ++++++++++-
->>>>>>     drivers/vhost/vhost_cfs.c                     |  341 +++++
->>>>>>     drivers/vhost/vringh.c                        |  332 +++++
->>>>>>     drivers/vhost/vsock.c                         |   20 +-
->>>>>>     drivers/virtio/Kconfig                        |    9 +
->>>>>>     drivers/virtio/Makefile                       |    1 +
->>>>>>     drivers/virtio/virtio_pci_common.c            |   25 +-
->>>>>>     drivers/virtio/virtio_pci_epf.c               |  670 ++++++++++
->>>>>>     include/linux/mod_devicetable.h               |    6 +
->>>>>>     include/linux/rpmsg.h                         |    6 +
->>>>>>     {drivers/vhost => include/linux}/vhost.h      |  132 +-
->>>>>>     include/linux/virtio.h                        |    3 +
->>>>>>     include/linux/virtio_config.h                 |   42 +
->>>>>>     include/linux/vringh.h                        |   46 +
->>>>>>     samples/rpmsg/rpmsg_client_sample.c           |   32 +-
->>>>>>     tools/virtio/virtio_test.c                    |    2 +-
->>>>>>     39 files changed, 7083 insertions(+), 183 deletions(-)
->>>>>>     create mode 100644 drivers/ntb/ntb_vhost.c
->>>>>>     create mode 100644 drivers/ntb/ntb_virtio.c
->>>>>>     create mode 100644 drivers/ntb/ntb_virtio.h
->>>>>>     create mode 100644 drivers/pci/endpoint/functions/pci-epf-vhost.c
->>>>>>     create mode 100644 drivers/rpmsg/rpmsg_cfs.c
->>>>>>     create mode 100644 drivers/rpmsg/vhost_rpmsg_bus.c
->>>>>>     create mode 100644 drivers/vhost/vhost_cfs.c
->>>>>>     create mode 100644 drivers/virtio/virtio_pci_epf.c
->>>>>>     rename {drivers/vhost => include/linux}/vhost.h (66%)
->>>>>>
->>>>>> -- 
->>>>>> 2.17.1
->>>>>>
-
+SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
+IFNlbnQ6IE1vbmRheSwgSnVseSA2LCAyMDIwIDExOjE4IFBNDQo+IA0KPiBIaSBZaSwNCj4gDQo+
+IE9uIDcvNC8yMCAxOjI2IFBNLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGFsbG93
+cyB1c2VyIHNwYWNlIHRvIHJlcXVlc3QgUEFTSUQgYWxsb2NhdGlvbi9mcmVlLCBlLmcuIHdoZW4N
+Cj4gPiBzZXJ2aW5nIHRoZSByZXF1ZXN0IGZyb20gdGhlIGd1ZXN0Lg0KPiA+DQo+ID4gUEFTSURz
+IHRoYXQgYXJlIG5vdCBmcmVlZCBieSB1c2Vyc3BhY2UgYXJlIGF1dG9tYXRpY2FsbHkgZnJlZWQg
+d2hlbiB0aGUNCj4gPiBJT0FTSUQgc2V0IGlzIGRlc3Ryb3llZCB3aGVuIHByb2Nlc3MgZXhpdHMu
+DQo+ID4NCj4gPiBDYzogS2V2aW4gVGlhbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+ID4gQ0M6
+IEphY29iIFBhbiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb20+DQo+ID4gQ2M6IEFsZXgg
+V2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+ID4gQ2M6IEVyaWMgQXVn
+ZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT4NCj4gPiBDYzogSmVhbi1QaGlsaXBwZSBCcnVja2Vy
+IDxqZWFuLXBoaWxpcHBlQGxpbmFyby5vcmc+DQo+ID4gQ2M6IEpvZXJnIFJvZWRlbCA8am9yb0A4
+Ynl0ZXMub3JnPg0KPiA+IENjOiBMdSBCYW9sdSA8YmFvbHUubHVAbGludXguaW50ZWwuY29tPg0K
+PiA+IFNpZ25lZC1vZmYtYnk6IExpdSBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gU2ln
+bmVkLW9mZi1ieTogWWkgU3VuIDx5aS55LnN1bkBsaW51eC5pbnRlbC5jb20+DQo+ID4gU2lnbmVk
+LW9mZi1ieTogSmFjb2IgUGFuIDxqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbT4NCj4gPiAt
+LS0NCj4gPiB2MyAtPiB2NDoNCj4gPiAqKSBhZGRyZXNzIGNvbW1lbnRzIGZyb20gdjMsIGV4Y2Vw
+dCB0aGUgYmVsb3cgY29tbWVudCBhZ2FpbnN0IHRoZSByYW5nZQ0KPiA+ICAgIG9mIFBBU0lEX0ZS
+RUUgcmVxdWVzdC4gbmVlZHMgbW9yZSBoZWxwIG9uIGl0Lg0KPiA+ICAgICAiPiAraWYgKHJlcS5y
+YW5nZS5taW4gPiByZXEucmFuZ2UubWF4KQ0KPiA+DQo+ID4gICAgIElzIGl0IGV4cGxvaXRhYmxl
+IHRoYXQgYSB1c2VyIGNhbiBzcGluIHRoZSBrZXJuZWwgZm9yIGEgbG9uZyB0aW1lIGluDQo+ID4g
+ICAgIHRoZSBjYXNlIG9mIGEgZnJlZSBieSBjYWxsaW5nIHRoaXMgd2l0aCBbMCwgTUFYX1VJTlRd
+IHJlZ2FyZGxlc3Mgb2YNCj4gPiAgICAgdGhlaXIgYWN0dWFsIGFsbG9jYXRpb25zPyINCj4gPg0K
+PiA+IHYxIC0+IHYyOg0KPiA+ICopIG1vdmUgdGhlIHZmaW9fbW0gcmVsYXRlZCBjb2RlIHRvIGJl
+IGEgc2VwcmF0ZSBtb2R1bGUNCj4gPiAqKSB1c2UgYSBzaW5nbGUgc3RydWN0dXJlIGZvciBhbGxv
+Yy9mcmVlLCBjb3VsZCBzdXBwb3J0IGEgcmFuZ2Ugb2YgUEFTSURzDQo+ID4gKikgZmV0Y2ggdmZp
+b19tbSBhdCBncm91cF9hdHRhY2ggdGltZSBpbnN0ZWFkIG9mIGF0IGlvbW11IGRyaXZlciBvcGVu
+IHRpbWUNCj4gPiAtLS0NCj4gPiAgZHJpdmVycy92ZmlvL0tjb25maWcgICAgICAgICAgICB8ICAx
+ICsNCj4gPiAgZHJpdmVycy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEuYyB8IDg0DQo+ICsrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ID4gIGRyaXZlcnMvdmZpby92Zmlv
+X3Bhc2lkLmMgICAgICAgfCAxMCArKysrKw0KPiA+ICBpbmNsdWRlL2xpbnV4L3ZmaW8uaCAgICAg
+ICAgICAgIHwgIDYgKysrDQo+ID4gIGluY2x1ZGUvdWFwaS9saW51eC92ZmlvLmggICAgICAgfCAz
+NiArKysrKysrKysrKysrKysrKysNCj4gPiAgNSBmaWxlcyBjaGFuZ2VkLCAxMzcgaW5zZXJ0aW9u
+cygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby9LY29uZmlnIGIvZHJpdmVy
+cy92ZmlvL0tjb25maWcNCj4gPiBpbmRleCAzZDhhMTA4Li45NWQ5MGM2IDEwMDY0NA0KPiA+IC0t
+LSBhL2RyaXZlcnMvdmZpby9LY29uZmlnDQo+ID4gKysrIGIvZHJpdmVycy92ZmlvL0tjb25maWcN
+Cj4gPiBAQCAtMiw2ICsyLDcgQEANCj4gPiAgY29uZmlnIFZGSU9fSU9NTVVfVFlQRTENCj4gPiAg
+CXRyaXN0YXRlDQo+ID4gIAlkZXBlbmRzIG9uIFZGSU8NCj4gPiArCXNlbGVjdCBWRklPX1BBU0lE
+IGlmIChYODYpDQo+ID4gIAlkZWZhdWx0IG4NCj4gPg0KPiA+ICBjb25maWcgVkZJT19JT01NVV9T
+UEFQUl9UQ0UNCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEu
+YyBiL2RyaXZlcnMvdmZpby92ZmlvX2lvbW11X3R5cGUxLmMNCj4gPiBpbmRleCA4MDYyM2I4Li4y
+OTcyNmNhIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvdmZpby92ZmlvX2lvbW11X3R5cGUxLmMN
+Cj4gPiArKysgYi9kcml2ZXJzL3ZmaW8vdmZpb19pb21tdV90eXBlMS5jDQo+ID4gQEAgLTc2LDYg
+Kzc2LDcgQEAgc3RydWN0IHZmaW9faW9tbXUgew0KPiA+ICAJYm9vbAkJCQlkaXJ0eV9wYWdlX3Ry
+YWNraW5nOw0KPiA+ICAJYm9vbAkJCQlwaW5uZWRfcGFnZV9kaXJ0eV9zY29wZTsNCj4gPiAgCXN0
+cnVjdCBpb21tdV9uZXN0aW5nX2luZm8JKm5lc3RpbmdfaW5mbzsNCj4gPiArCXN0cnVjdCB2Zmlv
+X21tCQkJKnZtbTsNCj4gPiAgfTsNCj4gPg0KPiA+ICBzdHJ1Y3QgdmZpb19kb21haW4gew0KPiA+
+IEBAIC0xOTM3LDYgKzE5MzgsMTEgQEAgc3RhdGljIHZvaWQgdmZpb19pb21tdV9pb3ZhX2luc2Vy
+dF9jb3B5KHN0cnVjdA0KPiB2ZmlvX2lvbW11ICppb21tdSwNCj4gPg0KPiA+ICBzdGF0aWMgdm9p
+ZCB2ZmlvX2lvbW11X3JlbGVhc2VfbmVzdGluZ19pbmZvKHN0cnVjdCB2ZmlvX2lvbW11ICppb21t
+dSkNCj4gPiAgew0KPiA+ICsJaWYgKGlvbW11LT52bW0pIHsNCj4gPiArCQl2ZmlvX21tX3B1dChp
+b21tdS0+dm1tKTsNCj4gPiArCQlpb21tdS0+dm1tID0gTlVMTDsNCj4gPiArCX0NCj4gPiArDQo+
+ID4gIAlrZnJlZShpb21tdS0+bmVzdGluZ19pbmZvKTsNCj4gPiAgCWlvbW11LT5uZXN0aW5nX2lu
+Zm8gPSBOVUxMOw0KPiA+ICB9DQo+ID4gQEAgLTIwNzUsNiArMjA4MSwyNSBAQCBzdGF0aWMgaW50
+IHZmaW9faW9tbXVfdHlwZTFfYXR0YWNoX2dyb3VwKHZvaWQNCj4gKmlvbW11X2RhdGEsDQo+ID4g
+IAkJCWdvdG8gb3V0X2RldGFjaDsNCj4gPiAgCQl9DQo+ID4gIAkJaW9tbXUtPm5lc3RpbmdfaW5m
+byA9IGluZm87DQo+ID4gKw0KPiA+ICsJCWlmIChpbmZvLT5mZWF0dXJlcyAmIElPTU1VX05FU1RJ
+TkdfRkVBVF9TWVNXSURFX1BBU0lEKSB7DQo+ID4gKwkJCXN0cnVjdCB2ZmlvX21tICp2bW07DQo+
+ID4gKwkJCWludCBzaWQ7DQo+ID4gKw0KPiA+ICsJCQl2bW0gPSB2ZmlvX21tX2dldF9mcm9tX3Rh
+c2soY3VycmVudCk7DQo+ID4gKwkJCWlmIChJU19FUlIodm1tKSkgew0KPiA+ICsJCQkJcmV0ID0g
+UFRSX0VSUih2bW0pOw0KPiA+ICsJCQkJZ290byBvdXRfZGV0YWNoOw0KPiA+ICsJCQl9DQo+ID4g
+KwkJCWlvbW11LT52bW0gPSB2bW07DQo+ID4gKw0KPiA+ICsJCQlzaWQgPSB2ZmlvX21tX2lvYXNp
+ZF9zaWQodm1tKTsNCj4gPiArCQkJcmV0ID0gaW9tbXVfZG9tYWluX3NldF9hdHRyKGRvbWFpbi0+
+ZG9tYWluLA0KPiA+ICsJCQkJCQkgICAgRE9NQUlOX0FUVFJfSU9BU0lEX1NJRCwNCj4gPiArCQkJ
+CQkJICAgICZzaWQpOw0KPiA+ICsJCQlpZiAocmV0KQ0KPiA+ICsJCQkJZ290byBvdXRfZGV0YWNo
+Ow0KPiA+ICsJCX0NCj4gPiAgCX0NCj4gPg0KPiA+ICAJLyogR2V0IGFwZXJ0dXJlIGluZm8gKi8N
+Cj4gPiBAQCAtMjg2MCw2ICsyODg1LDYzIEBAIHN0YXRpYyBpbnQgdmZpb19pb21tdV90eXBlMV9k
+aXJ0eV9wYWdlcyhzdHJ1Y3QNCj4gdmZpb19pb21tdSAqaW9tbXUsDQo+ID4gIAlyZXR1cm4gLUVJ
+TlZBTDsNCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyBpbnQgdmZpb19pb21tdV90eXBlMV9wYXNp
+ZF9hbGxvYyhzdHJ1Y3QgdmZpb19pb21tdSAqaW9tbXUsDQo+ID4gKwkJCQkJdW5zaWduZWQgaW50
+IG1pbiwNCj4gPiArCQkJCQl1bnNpZ25lZCBpbnQgbWF4KQ0KPiA+ICt7DQo+ID4gKwlpbnQgcmV0
+ID0gLUVPUE5PVFNVUFA7DQo+ID4gKw0KPiA+ICsJbXV0ZXhfbG9jaygmaW9tbXUtPmxvY2spOw0K
+PiA+ICsJaWYgKGlvbW11LT52bW0pDQo+ID4gKwkJcmV0ID0gdmZpb19wYXNpZF9hbGxvYyhpb21t
+dS0+dm1tLCBtaW4sIG1heCk7DQo+ID4gKwltdXRleF91bmxvY2soJmlvbW11LT5sb2NrKTsNCj4g
+PiArCXJldHVybiByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyBpbnQgdmZpb19pb21t
+dV90eXBlMV9wYXNpZF9mcmVlKHN0cnVjdCB2ZmlvX2lvbW11ICppb21tdSwNCj4gPiArCQkJCQl1
+bnNpZ25lZCBpbnQgbWluLA0KPiA+ICsJCQkJCXVuc2lnbmVkIGludCBtYXgpDQo+ID4gK3sNCj4g
+PiArCWludCByZXQgPSAtRU9QTk9UU1VQUDsNCj4gPiArDQo+ID4gKwltdXRleF9sb2NrKCZpb21t
+dS0+bG9jayk7DQo+ID4gKwlpZiAoaW9tbXUtPnZtbSkgew0KPiA+ICsJCXZmaW9fcGFzaWRfZnJl
+ZV9yYW5nZShpb21tdS0+dm1tLCBtaW4sIG1heCk7DQo+ID4gKwkJcmV0ID0gMDsNCj4gPiArCX0N
+Cj4gPiArCW11dGV4X3VubG9jaygmaW9tbXUtPmxvY2spOw0KPiA+ICsJcmV0dXJuIHJldDsNCj4g
+PiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIGludCB2ZmlvX2lvbW11X3R5cGUxX3Bhc2lkX3JlcXVl
+c3Qoc3RydWN0IHZmaW9faW9tbXUgKmlvbW11LA0KPiA+ICsJCQkJCSAgdW5zaWduZWQgbG9uZyBh
+cmcpDQo+ID4gK3sNCj4gPiArCXN0cnVjdCB2ZmlvX2lvbW11X3R5cGUxX3Bhc2lkX3JlcXVlc3Qg
+cmVxOw0KPiA+ICsJdW5zaWduZWQgbG9uZyBtaW5zejsNCj4gPiArDQo+ID4gKwltaW5zeiA9IG9m
+ZnNldG9mZW5kKHN0cnVjdCB2ZmlvX2lvbW11X3R5cGUxX3Bhc2lkX3JlcXVlc3QsIHJhbmdlKTsN
+Cj4gPiArDQo+ID4gKwlpZiAoY29weV9mcm9tX3VzZXIoJnJlcSwgKHZvaWQgX191c2VyICopYXJn
+LCBtaW5zeikpDQo+ID4gKwkJcmV0dXJuIC1FRkFVTFQ7DQo+ID4gKw0KPiA+ICsJaWYgKHJlcS5h
+cmdzeiA8IG1pbnN6IHx8IChyZXEuZmxhZ3MgJiB+VkZJT19QQVNJRF9SRVFVRVNUX01BU0spKQ0K
+PiA+ICsJCXJldHVybiAtRUlOVkFMOw0KPiA+ICsNCj4gPiArCWlmIChyZXEucmFuZ2UubWluID4g
+cmVxLnJhbmdlLm1heCkNCj4gPiArCQlyZXR1cm4gLUVJTlZBTDsNCj4gPiArDQo+ID4gKwlzd2l0
+Y2ggKHJlcS5mbGFncyAmIFZGSU9fUEFTSURfUkVRVUVTVF9NQVNLKSB7DQo+ID4gKwljYXNlIFZG
+SU9fSU9NTVVfRkxBR19BTExPQ19QQVNJRDoNCj4gPiArCQlyZXR1cm4gdmZpb19pb21tdV90eXBl
+MV9wYXNpZF9hbGxvYyhpb21tdSwNCj4gPiArCQkJCQlyZXEucmFuZ2UubWluLCByZXEucmFuZ2Uu
+bWF4KTsNCj4gPiArCWNhc2UgVkZJT19JT01NVV9GTEFHX0ZSRUVfUEFTSUQ6DQo+ID4gKwkJcmV0
+dXJuIHZmaW9faW9tbXVfdHlwZTFfcGFzaWRfZnJlZShpb21tdSwNCj4gPiArCQkJCQlyZXEucmFu
+Z2UubWluLCByZXEucmFuZ2UubWF4KTsNCj4gPiArCWRlZmF1bHQ6DQo+ID4gKwkJcmV0dXJuIC1F
+SU5WQUw7DQo+ID4gKwl9DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBsb25nIHZmaW9faW9t
+bXVfdHlwZTFfaW9jdGwodm9pZCAqaW9tbXVfZGF0YSwNCj4gPiAgCQkJCSAgIHVuc2lnbmVkIGlu
+dCBjbWQsIHVuc2lnbmVkIGxvbmcgYXJnKQ0KPiA+ICB7DQo+ID4gQEAgLTI4NzYsNiArMjk1OCw4
+IEBAIHN0YXRpYyBsb25nIHZmaW9faW9tbXVfdHlwZTFfaW9jdGwodm9pZCAqaW9tbXVfZGF0YSwN
+Cj4gPiAgCQlyZXR1cm4gdmZpb19pb21tdV90eXBlMV91bm1hcF9kbWEoaW9tbXUsIGFyZyk7DQo+
+ID4gIAljYXNlIFZGSU9fSU9NTVVfRElSVFlfUEFHRVM6DQo+ID4gIAkJcmV0dXJuIHZmaW9faW9t
+bXVfdHlwZTFfZGlydHlfcGFnZXMoaW9tbXUsIGFyZyk7DQo+ID4gKwljYXNlIFZGSU9fSU9NTVVf
+UEFTSURfUkVRVUVTVDoNCj4gPiArCQlyZXR1cm4gdmZpb19pb21tdV90eXBlMV9wYXNpZF9yZXF1
+ZXN0KGlvbW11LCBhcmcpOw0KPiA+ICAJfQ0KPiA+DQo+ID4gIAlyZXR1cm4gLUVOT1RUWTsNCj4g
+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL3ZmaW9fcGFzaWQuYyBiL2RyaXZlcnMvdmZpby92
+ZmlvX3Bhc2lkLmMNCj4gPiBpbmRleCBjNDZiODcwLi42ZjkwN2RiIDEwMDY0NA0KPiA+IC0tLSBh
+L2RyaXZlcnMvdmZpby92ZmlvX3Bhc2lkLmMNCj4gPiArKysgYi9kcml2ZXJzL3ZmaW8vdmZpb19w
+YXNpZC5jDQo+ID4gQEAgLTUzLDYgKzUzLDcgQEAgdm9pZCB2ZmlvX21tX3B1dChzdHJ1Y3QgdmZp
+b19tbSAqdm1tKQ0KPiA+ICB7DQo+ID4gIAlrcmVmX3B1dF9tdXRleCgmdm1tLT5rcmVmLCB2Zmlv
+X21tX3JlbGVhc2UsDQo+ICZ2ZmlvX3Bhc2lkLnZmaW9fbW1fbG9jayk7DQo+ID4gIH0NCj4gPiAr
+RVhQT1JUX1NZTUJPTF9HUEwodmZpb19tbV9wdXQpOw0KPiBJIHRoaW5rIHRoaXMgc2hvdWxkIGJl
+IGJlbG9uZyB0byBbNS8xNV0NCg0KeWVhaCwgdGhlIGltcGxlbWVudGF0aW9uIGlzIGluIFs1LzE1
+XSwgYnV0IHRoZSB1c2VyIGlzIGluIHRoaXMgcGF0Y2gsIHNvIGV4cG9ydA0KaXQgaW4gdGhpcyBw
+YXRjaC4NCg0KPiA+DQo+ID4gIHN0YXRpYyB2b2lkIHZmaW9fbW1fZ2V0KHN0cnVjdCB2ZmlvX21t
+ICp2bW0pDQo+ID4gIHsNCj4gPiBAQCAtMTA0LDYgKzEwNSwxMyBAQCBzdHJ1Y3QgdmZpb19tbSAq
+dmZpb19tbV9nZXRfZnJvbV90YXNrKHN0cnVjdA0KPiB0YXNrX3N0cnVjdCAqdGFzaykNCj4gPiAg
+CW1tcHV0KG1tKTsNCj4gPiAgCXJldHVybiB2bW07DQo+ID4gIH0NCj4gPiArRVhQT1JUX1NZTUJP
+TF9HUEwodmZpb19tbV9nZXRfZnJvbV90YXNrKTsNCj4gc2FtZQ0KDQp0aGUgc2FtZSB3aXRoIGFi
+b3ZlLg0KDQo+ID4gKw0KPiA+ICtpbnQgdmZpb19tbV9pb2FzaWRfc2lkKHN0cnVjdCB2ZmlvX21t
+ICp2bW0pDQo+IGV4dGVybj8NCj4gc2FtZQ0KDQp3aHkgbmVlZCBleHRlcm4/IGFzIGl0J3MgdXNl
+ZCBpbiB0aGlzIHBhdGNoLCBzbyBhZGQgaXQgaW4gdGhpcyBwYXRjaC4NCg0KPiA+ICt7DQo+ID4g
+KwlyZXR1cm4gdm1tLT5pb2FzaWRfc2lkOw0KPiA+ICt9DQo+ID4gK0VYUE9SVF9TWU1CT0xfR1BM
+KHZmaW9fbW1faW9hc2lkX3NpZCk7DQo+ID4NCj4gPiAgaW50IHZmaW9fcGFzaWRfYWxsb2Moc3Ry
+dWN0IHZmaW9fbW0gKnZtbSwgaW50IG1pbiwgaW50IG1heCkNCj4gPiAgew0KPiA+IEBAIC0xMTMs
+NiArMTIxLDcgQEAgaW50IHZmaW9fcGFzaWRfYWxsb2Moc3RydWN0IHZmaW9fbW0gKnZtbSwgaW50
+IG1pbiwgaW50IG1heCkNCj4gPg0KPiA+ICAJcmV0dXJuIChwYXNpZCA9PSBJTlZBTElEX0lPQVNJ
+RCkgPyAtRU5PU1BDIDogcGFzaWQ7DQo+ID4gIH0NCj4gPiArRVhQT1JUX1NZTUJPTF9HUEwodmZp
+b19wYXNpZF9hbGxvYyk7DQo+IHNhbWUNCg0Kc2FtZSBhcyBhYm92ZSByZWFzb24uIDotKQ0KDQo+
+ID4NCj4gPiAgdm9pZCB2ZmlvX3Bhc2lkX2ZyZWVfcmFuZ2Uoc3RydWN0IHZmaW9fbW0gKnZtbSwN
+Cj4gPiAgCQkJICAgIGlvYXNpZF90IG1pbiwgaW9hc2lkX3QgbWF4KQ0KPiA+IEBAIC0xMzAsNiAr
+MTM5LDcgQEAgdm9pZCB2ZmlvX3Bhc2lkX2ZyZWVfcmFuZ2Uoc3RydWN0IHZmaW9fbW0gKnZtbSwN
+Cj4gPiAgCWZvciAoOyBwYXNpZCA8PSBtYXg7IHBhc2lkKyspDQo+ID4gIAkJaW9hc2lkX2ZyZWUo
+cGFzaWQpOw0KPiA+ICB9DQo+ID4gK0VYUE9SVF9TWU1CT0xfR1BMKHZmaW9fcGFzaWRfZnJlZV9y
+YW5nZSk7DQo+IHNhbWUNCg0Kc2FtZSBhcyBhYm92ZS4NCg0KPiA+DQo+ID4gIHN0YXRpYyBpbnQg
+X19pbml0IHZmaW9fcGFzaWRfaW5pdCh2b2lkKQ0KPiA+ICB7DQo+ID4gZGlmZiAtLWdpdCBhL2lu
+Y2x1ZGUvbGludXgvdmZpby5oIGIvaW5jbHVkZS9saW51eC92ZmlvLmgNCj4gPiBpbmRleCA5ZGE2
+NDY4Li4zNWM5MjJhIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbGludXgvdmZpby5oDQo+ID4g
+KysrIGIvaW5jbHVkZS9saW51eC92ZmlvLmgNCj4gPiBAQCAtMTAxLDYgKzEwMSw3IEBAIHN0cnVj
+dCB2ZmlvX21tOw0KPiA+ICAjaWYgSVNfRU5BQkxFRChDT05GSUdfVkZJT19QQVNJRCkNCj4gPiAg
+ZXh0ZXJuIHN0cnVjdCB2ZmlvX21tICp2ZmlvX21tX2dldF9mcm9tX3Rhc2soc3RydWN0IHRhc2tf
+c3RydWN0ICp0YXNrKTsNCj4gPiAgZXh0ZXJuIHZvaWQgdmZpb19tbV9wdXQoc3RydWN0IHZmaW9f
+bW0gKnZtbSk7DQo+ID4gK2ludCB2ZmlvX21tX2lvYXNpZF9zaWQoc3RydWN0IHZmaW9fbW0gKnZt
+bSk7DQo+ID4gIGV4dGVybiBpbnQgdmZpb19wYXNpZF9hbGxvYyhzdHJ1Y3QgdmZpb19tbSAqdm1t
+LCBpbnQgbWluLCBpbnQgbWF4KTsNCj4gPiAgZXh0ZXJuIHZvaWQgdmZpb19wYXNpZF9mcmVlX3Jh
+bmdlKHN0cnVjdCB2ZmlvX21tICp2bW0sDQo+ID4gIAkJCQkJaW9hc2lkX3QgbWluLCBpb2FzaWRf
+dCBtYXgpOw0KPiA+IEBAIC0xMTQsNiArMTE1LDExIEBAIHN0YXRpYyBpbmxpbmUgdm9pZCB2Zmlv
+X21tX3B1dChzdHJ1Y3QgdmZpb19tbSAqdm1tKQ0KPiA+ICB7DQo+ID4gIH0NCj4gPg0KPiA+ICtz
+dGF0aWMgaW5saW5lIGludCB2ZmlvX21tX2lvYXNpZF9zaWQoc3RydWN0IHZmaW9fbW0gKnZtbSkN
+Cj4gPiArew0KPiA+ICsJcmV0dXJuIC1FTk9UVFk7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRp
+YyBpbmxpbmUgaW50IHZmaW9fcGFzaWRfYWxsb2Moc3RydWN0IHZmaW9fbW0gKnZtbSwgaW50IG1p
+biwgaW50IG1heCkNCj4gPiAgew0KPiA+ICAJcmV0dXJuIC1FTk9UVFk7DQo+ID4gZGlmZiAtLWdp
+dCBhL2luY2x1ZGUvdWFwaS9saW51eC92ZmlvLmggYi9pbmNsdWRlL3VhcGkvbGludXgvdmZpby5o
+DQo+ID4gaW5kZXggM2UzZGU5Yy4uZmUyNjdiOGUgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVkZS91
+YXBpL2xpbnV4L3ZmaW8uaA0KPiA+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC92ZmlvLmgNCj4g
+PiBAQCAtMTE2OSw2ICsxMTY5LDQyIEBAIHN0cnVjdCB2ZmlvX2lvbW11X3R5cGUxX2RpcnR5X2Jp
+dG1hcF9nZXQgew0KPiA+DQo+ID4gICNkZWZpbmUgVkZJT19JT01NVV9ESVJUWV9QQUdFUyAgICAg
+ICAgICAgICBfSU8oVkZJT19UWVBFLCBWRklPX0JBU0UgKyAxNykNCj4gPg0KPiA+ICsvKioNCj4g
+PiArICogVkZJT19JT01NVV9QQVNJRF9SRVFVRVNUIC0gX0lPV1IoVkZJT19UWVBFLCBWRklPX0JB
+U0UgKyAxOCwNCj4gPiArICoJCQkJc3RydWN0IHZmaW9faW9tbXVfdHlwZTFfcGFzaWRfcmVxdWVz
+dCkNCj4gPiArICoNCj4gPiArICogUEFTSUQgKFByb2Nlc3NvciBBZGRyZXNzIFNwYWNlIElEKSBp
+cyBhIFBDSWUgY29uY2VwdCBmb3IgdGFnZ2luZw0KPiA+ICsgKiBhZGRyZXNzIHNwYWNlcyBpbiBE
+TUEgcmVxdWVzdHMuIFdoZW4gc3lzdGVtLXdpZGUgUEFTSUQgYWxsb2NhdGlvbg0KPiA+ICsgKiBp
+cyByZXF1aXJlZCBieSB1bmRlcmx5aW5nIGlvbW11IGRyaXZlciAoZS5nLiBJbnRlbCBWVC1kKSwg
+dGhpcw0KPiA+ICsgKiBwcm92aWRlcyBhbiBpbnRlcmZhY2UgZm9yIHVzZXJzcGFjZSB0byByZXF1
+ZXN0IHBhc2lkIGFsbG9jL2ZyZWUNCj4gPiArICogZm9yIGl0cyBhc3NpZ25lZCBkZXZpY2VzLiBV
+c2Vyc3BhY2Ugc2hvdWxkIGNoZWNrIHRoZSBhdmFpbGFiaWxpdHkNCj4gPiArICogb2YgdGhpcyBB
+UEkgdGhyb3VnaCBWRklPX0lPTU1VX0dFVF9JTkZPLg0KPiBuYW1lIHRoZSBjYXBhYmlsaXR5Pw0K
+DQp5ZXAuIHdpbGwgYWRkIGl0Lg0KDQpSZWdhcmRzLA0KWWkgTGl1DQoNCj4gPiArICoNCj4gPiAr
+ICogQGZsYWdzPVZGSU9fSU9NTVVfRkxBR19BTExPQ19QQVNJRCwgYWxsb2NhdGUgYSBzaW5nbGUg
+UEFTSUQgd2l0aGluDQo+IEByYW5nZS4NCj4gPiArICogQGZsYWdzPVZGSU9fSU9NTVVfRkxBR19G
+UkVFX1BBU0lELCBmcmVlIHRoZSBQQVNJRHMgd2l0aGluIEByYW5nZS4NCj4gPiArICogQHJhbmdl
+IGlzIFttaW4sIG1heF0sIHdoaWNoIG1lYW5zIGJvdGggQG1pbiBhbmQgQG1heCBhcmUgaW5jbHVz
+aXZlLg0KPiA+ICsgKiBBTExPQ19QQVNJRCBhbmQgRlJFRV9QQVNJRCBhcmUgbXV0dWFsbHkgZXhj
+bHVzaXZlLg0KPiA+ICsgKg0KPiA+ICsgKiByZXR1cm5zOiBhbGxvY2F0ZWQgUEFTSUQgdmFsdWUg
+b24gc3VjY2VzcywgLWVycm5vIG9uIGZhaWx1cmUgZm9yDQo+ID4gKyAqCSAgICAgQUxMT0NfUEFT
+SUQ7DQo+ID4gKyAqCSAgICAgMCBmb3IgRlJFRV9QQVNJRCBvcGVyYXRpb247DQo+ID4gKyAqLw0K
+PiA+ICtzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9wYXNpZF9yZXF1ZXN0IHsNCj4gPiArCV9fdTMy
+CWFyZ3N6Ow0KPiA+ICsjZGVmaW5lIFZGSU9fSU9NTVVfRkxBR19BTExPQ19QQVNJRAkoMSA8PCAw
+KQ0KPiA+ICsjZGVmaW5lIFZGSU9fSU9NTVVfRkxBR19GUkVFX1BBU0lECSgxIDw8IDEpDQo+ID4g
+KwlfX3UzMglmbGFnczs+ICsJc3RydWN0IHsNCj4gPiArCQlfX3UzMgltaW47DQo+ID4gKwkJX191
+MzIJbWF4Ow0KPiA+ICsJfSByYW5nZTsNCj4gPiArfTsNCj4gPiArDQo+ID4gKyNkZWZpbmUgVkZJ
+T19QQVNJRF9SRVFVRVNUX01BU0sJKFZGSU9fSU9NTVVfRkxBR19BTExPQ19QQVNJRCB8IFwNCj4g
+PiArCQkJCQkgVkZJT19JT01NVV9GTEFHX0ZSRUVfUEFTSUQpDQo+ID4gKw0KPiA+ICsjZGVmaW5l
+IFZGSU9fSU9NTVVfUEFTSURfUkVRVUVTVAlfSU8oVkZJT19UWVBFLCBWRklPX0JBU0UgKyAxOCkN
+Cj4gPiArDQo+ID4gIC8qIC0tLS0tLS0tIEFkZGl0aW9uYWwgQVBJIGZvciBTUEFQUiBUQ0UgKFNl
+cnZlciBQT1dFUlBDKSBJT01NVSAtLS0tLS0tLSAqLw0KPiA+DQo+ID4gIC8qDQo+ID4NCj4gDQo+
+IFRoYW5rcw0KPiANCj4gRXJpYw0KDQo=
