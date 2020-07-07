@@ -2,107 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D9B2216427
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 04:52:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD7A221660B
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 07:56:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727876AbgGGCwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 22:52:19 -0400
-Received: from mga07.intel.com ([134.134.136.100]:32557 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726915AbgGGCwT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 22:52:19 -0400
-IronPort-SDR: Td8kwsKDNqcvyySer+GcRKZ+z1318EsHTs8eM7iXQdFHqVUelUU61faC/28b9vMPxCjl+vgBeE
- luB9PgSOOANg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="212503036"
-X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
-   d="scan'208";a="212503036"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 19:52:18 -0700
-IronPort-SDR: a8RBZppPu1jANqtiX8SwjiqdFbHckyN1+a1iLVXD7cZEqKi3ZWXTHWItstkNMmYrBk4kDC+pL9
- DXnVJ0WyO8Zg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
-   d="scan'208";a="305502199"
-Received: from km-skylake-client-platform.sc.intel.com ([10.3.52.141])
-  by fmsmga004.fm.intel.com with ESMTP; 06 Jul 2020 19:52:18 -0700
-Message-ID: <89e07361c8f575bc029071a0f7789e19d0431c0b.camel@intel.com>
-Subject: Re: [PATCH v2 2/4] x86/cpufeatures: Enumerate TSX suspend load
- address tracking instructions
-From:   Kyung Min Park <kyung.min.park@intel.com>
-To:     Cathy Zhang <cathy.zhang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
-Cc:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, ricardo.neri-calderon@linux.intel.com,
-        jpoimboe@redhat.com, gregkh@linuxfoundation.org,
-        ak@linux.intel.com, dave.hansen@intel.com, tony.luck@intel.com,
-        ravi.v.shankar@intel.com
-Date:   Mon, 06 Jul 2020 19:36:27 -0700
-In-Reply-To: <1594088183-7187-3-git-send-email-cathy.zhang@intel.com>
-References: <1594088183-7187-1-git-send-email-cathy.zhang@intel.com>
-         <1594088183-7187-3-git-send-email-cathy.zhang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1728114AbgGGF4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 01:56:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30820 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727827AbgGGF4b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 01:56:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594101388;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=KI7a2ClZlMwCFO1SBXPRqL8eILTZTxkGByXxhshBqFQ=;
+        b=EAROSK1LohZqOuLZ8CpsyqoBxoiK9gfV+jGmit/veThXOD5RGmL+OnJ7GRCG4nY4TuinMJ
+        ZbIsb0w2TsfpdIckO7cZvNr1f2GyHOcUFxlk8er29JiPi9d6x0NHfNyVx9EhF3MVpjvRDq
+        SDk/PkXyQ7NW6NXqpKjVOOSdDemzDjg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-s1z1ynX6NUKY6W_P2OnKEQ-1; Tue, 07 Jul 2020 01:56:26 -0400
+X-MC-Unique: s1z1ynX6NUKY6W_P2OnKEQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B946419067E3;
+        Tue,  7 Jul 2020 05:56:25 +0000 (UTC)
+Received: from thuth.com (ovpn-112-77.ams2.redhat.com [10.36.112.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6A33E70100;
+        Tue,  7 Jul 2020 05:56:21 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [kvm-unit-tests PATCH] s390x/cpumodel: The missing DFP facility on TCG is expected
+Date:   Tue,  7 Jul 2020 07:56:19 +0200
+Message-Id: <20200707055619.6162-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Cathy,
+When running the kvm-unit-tests with TCG on s390x, the cpumodel test
+always reports the error about the missing DFP (decimal floating point)
+facility. This is kind of expected, since DFP is not required for
+running Linux and thus nobody is really interested in implementing
+this facility in TCG. Thus let's mark this as an expected error instead,
+so that we can run the kvm-unit-tests also with TCG without getting
+test failures that we do not care about.
 
-On Tue, 2020-07-07 at 10:16 +0800, Cathy Zhang wrote:
-> Intel TSX suspend load tracking instructions aim to give a way to
-> choose which memory accesses do not need to be tracked in the TSX
-> read set. Add TSX suspend load tracking CPUID feature flag TSXLDTRK
-> for enumeration.
-> 
-> A processor supports Intel TSX suspend load address tracking if
-> CPUID.0x07.0x0:EDX[16] is present. Two instructions XSUSLDTRK,
-> XRESLDTRK
-> are available when this feature is present.
-> 
-> The CPU feature flag is shown as "tsxldtrk" in /proc/cpuinfo.
-> 
-> Detailed information on the instructions and CPUID feature flag
-> TSXLDTRK
-> can be found in the latest Intel Architecture Instruction Set
-> Extensions
-> and Future Features Programming Reference and Intel 64 and IA-32
-> Architectures Software Developer's Manual.
-> 
-> Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
-> Signed-off-by: Cathy Zhang <cathy.zhang@intel.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h
-> b/arch/x86/include/asm/cpufeatures.h
-> index adf45cf..34b66d7 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -366,6 +366,7 @@
->  #define X86_FEATURE_MD_CLEAR		(18*32+10) /* VERW clears CPU
-> buffers */
->  #define X86_FEATURE_TSX_FORCE_ABORT	(18*32+13) /* ""
-> TSX_FORCE_ABORT */
->  #define X86_FEATURE_SERIALIZE		(18*32+14) /* SERIALIZE
-> instruction */
-> +#define X86_FEATURE_TSX_LDTRK           (18*32+16) /* TSX Suspend
-> Load Address Tracking */
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ s390x/cpumodel.c | 51 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 45 insertions(+), 6 deletions(-)
 
-Since you are using the flag name to "TSX_LDTRK", the commit message
-needs to be changed accordingly. The commit message is saying
-"tsxldtrk", not "tsx_ldtrk".
-
->  #define X86_FEATURE_PCONFIG		(18*32+18) /* Intel PCONFIG */
->  #define X86_FEATURE_SPEC_CTRL		(18*32+26) /* ""
-> Speculation Control (IBRS + IBPB) */
->  #define X86_FEATURE_INTEL_STIBP		(18*32+27) /* "" Single
-> Thread Indirect Branch Predictors */
+diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
+index 5d232c6..4310b92 100644
+--- a/s390x/cpumodel.c
++++ b/s390x/cpumodel.c
+@@ -11,6 +11,7 @@
+  */
+ 
+ #include <asm/facility.h>
++#include <alloc_page.h>
+ 
+ static int dep[][2] = {
+ 	/* from SA22-7832-11 4-98 facility indications */
+@@ -38,6 +39,49 @@ static int dep[][2] = {
+ 	{ 155,  77 },
+ };
+ 
++/*
++ * A hack to detect TCG (instead of KVM): QEMU uses "TCGguest" as guest
++ * name by default when we are running with TCG (otherwise it's "KVMguest")
++ */
++static bool is_tcg(void)
++{
++	bool ret = false;
++	uint8_t *buf;
++
++	buf = alloc_page();
++	if (!buf)
++		return false;
++
++	if (stsi(buf, 3, 2, 2)) {
++		goto out;
++	}
++
++	/* Does the name start with "TCG" in EBCDIC? */
++	if (buf[2048] == 0x54 && buf[2049] == 0x43 && buf[2050] == 0x47)
++		ret = true;
++
++out:
++	free_page(buf);
++	return ret;
++}
++
++static void check_dependency(int dep1, int dep2)
++{
++	if (test_facility(dep1)) {
++		if (dep1 == 37) {
++			/* TCG does not have DFP and is unlikely to
++			 * get it implemented soon. */
++			report_xfail(is_tcg(), test_facility(dep2),
++				     "%d implies %d", dep1, dep2);
++		} else {
++			report(test_facility(dep2), "%d implies %d",
++			       dep1, dep2);
++		}
++	} else {
++		report_skip("facility %d not present", dep1);
++	}
++}
++
+ int main(void)
+ {
+ 	int i;
+@@ -46,12 +90,7 @@ int main(void)
+ 
+ 	report_prefix_push("dependency");
+ 	for (i = 0; i < ARRAY_SIZE(dep); i++) {
+-		if (test_facility(dep[i][0])) {
+-			report(test_facility(dep[i][1]), "%d implies %d",
+-				dep[i][0], dep[i][1]);
+-		} else {
+-			report_skip("facility %d not present", dep[i][0]);
+-		}
++		check_dependency(dep[i][0], dep[i][1]);
+ 	}
+ 	report_prefix_pop();
+ 
+-- 
+2.18.1
 
