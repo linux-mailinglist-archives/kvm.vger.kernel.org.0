@@ -2,137 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD7A221660B
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 07:56:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28B8C21661E
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 08:02:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728114AbgGGF4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 01:56:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30820 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727827AbgGGF4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 01:56:31 -0400
+        id S1728066AbgGGGCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 02:02:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33524 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727876AbgGGGCs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 02:02:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594101388;
+        s=mimecast20190719; t=1594101766;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=KI7a2ClZlMwCFO1SBXPRqL8eILTZTxkGByXxhshBqFQ=;
-        b=EAROSK1LohZqOuLZ8CpsyqoBxoiK9gfV+jGmit/veThXOD5RGmL+OnJ7GRCG4nY4TuinMJ
-        ZbIsb0w2TsfpdIckO7cZvNr1f2GyHOcUFxlk8er29JiPi9d6x0NHfNyVx9EhF3MVpjvRDq
-        SDk/PkXyQ7NW6NXqpKjVOOSdDemzDjg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-s1z1ynX6NUKY6W_P2OnKEQ-1; Tue, 07 Jul 2020 01:56:26 -0400
-X-MC-Unique: s1z1ynX6NUKY6W_P2OnKEQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B946419067E3;
-        Tue,  7 Jul 2020 05:56:25 +0000 (UTC)
-Received: from thuth.com (ovpn-112-77.ams2.redhat.com [10.36.112.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6A33E70100;
-        Tue,  7 Jul 2020 05:56:21 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: [kvm-unit-tests PATCH] s390x/cpumodel: The missing DFP facility on TCG is expected
-Date:   Tue,  7 Jul 2020 07:56:19 +0200
-Message-Id: <20200707055619.6162-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=msc0YVCqbe/zeeKFjSXjbyw1u5ayac1sxNjQyaDDims=;
+        b=Hb5sN22PrBjOOsqeD77wZxSy6FbAkZB22wmiqCstPXvMP1MdgPqvjo4c3OWyLz3QnVc+KW
+        Y8LRAuSrpSwx246xeo7LhJt1vJeNdbjhDkDZsHQTAxvtKKxJymUo01t4Y1h4UPpWdxnFXo
+        yvYdN9u7JLbfrW/Nk4iK0ZTMKLpEUns=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-mfydYwlnPAmN6k0dQ2Q6VA-1; Tue, 07 Jul 2020 02:02:44 -0400
+X-MC-Unique: mfydYwlnPAmN6k0dQ2Q6VA-1
+Received: by mail-wr1-f71.google.com with SMTP id b14so47707189wrp.0
+        for <kvm@vger.kernel.org>; Mon, 06 Jul 2020 23:02:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=msc0YVCqbe/zeeKFjSXjbyw1u5ayac1sxNjQyaDDims=;
+        b=WdkgImHfddfkbmk7jK+HK32fZjRPhECV8lD/YvD9ORXG+rlcvYkIEizV+NSBTFrF8U
+         o8IGNCV0ZWLKozVIXJWPPHTYz+sUZwXd3IvTkgsLxzdTu2PHkJ8gpWhMoKK0UdIAITIB
+         gIPgmvgYTfxzyd6IPKu3rMiOjjy1bg0JnD0FgWYXZNB/SMUnLF0v/JIoCyCpLroRm2KH
+         BPBcRSdi6RCIpsv26t7XF+4RSy4C5doCthI5r8QyC3Ut9ya1l0RAxQW2w3VqAuXDqFVi
+         fyY6ZZSMMAhM614MDApqyLfh6qWCMk06Pp9d1lhiW/sVtmKGlJ1CtFByYxBecpIDMt/P
+         9U4g==
+X-Gm-Message-State: AOAM533GtWa+42wK13tDHIH9pK4TIvVcz+UCAU8B5REYwUep5+K9r3My
+        FE0ScRMhHb3EkY9db+HoXd55k8tPWqU3BzuSNCRnNn5f2ikAj0uiuE2UsUWbwuFMb/9QM0fivUI
+        9JwNkszIQJnhx
+X-Received: by 2002:a7b:c5c1:: with SMTP id n1mr2508441wmk.21.1594101762821;
+        Mon, 06 Jul 2020 23:02:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzC1lQ5qbmBqJ3qbsM4HjJ4H2sCV9QcVWDzcuI/cOeg8p1XwZWGJ36wUrex8CYNfdEt2ifyHw==
+X-Received: by 2002:a7b:c5c1:: with SMTP id n1mr2508420wmk.21.1594101762595;
+        Mon, 06 Jul 2020 23:02:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e95f:9718:ec18:4c46? ([2001:b07:6468:f312:e95f:9718:ec18:4c46])
+        by smtp.gmail.com with ESMTPSA id n17sm25960938wrs.2.2020.07.06.23.02.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Jul 2020 23:02:42 -0700 (PDT)
+Subject: Re: Question regarding nested_svm_inject_npf_exit()
+To:     Jim Mattson <jmattson@google.com>,
+        Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm <kvm@vger.kernel.org>
+References: <DAFEA995-CFBA-4466-989B-D63466815AB1@gmail.com>
+ <f297ebf8-15b8-57d3-4c56-fdf3f5d16b9d@redhat.com>
+ <2B43FBC4-D265-4005-8FBA-870BDC627231@gmail.com>
+ <CALMp9eTDCDNctpso23uv+gM0QZUEBzMw47-M9JfNaG79fusa2A@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <773a4e20-3dd3-972c-8671-222672e54825@redhat.com>
+Date:   Tue, 7 Jul 2020 08:02:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eTDCDNctpso23uv+gM0QZUEBzMw47-M9JfNaG79fusa2A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running the kvm-unit-tests with TCG on s390x, the cpumodel test
-always reports the error about the missing DFP (decimal floating point)
-facility. This is kind of expected, since DFP is not required for
-running Linux and thus nobody is really interested in implementing
-this facility in TCG. Thus let's mark this as an expected error instead,
-so that we can run the kvm-unit-tests also with TCG without getting
-test failures that we do not care about.
+On 07/07/20 01:26, Jim Mattson wrote:
+>> Well, I think we can agree that bare-metal is a better reference than
+>> another emulator for the matter. Even without running the tests on
+>> bare-metal, it is easy to dump EXITINFO1 on the nested page-fault. I will
+>> try to find a bare-metal machine.
+>>
+>> Anyhow, I would appreciate if anyone from AMD would tell whether any result
+>> should be considered architectural.
+> 
+> I'd be happy to test on bare metal, but I'm still waiting for
+> instructions that a script kiddie (with read-only console access) can
+> follow.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- s390x/cpumodel.c | 51 ++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 45 insertions(+), 6 deletions(-)
+I'll try to test myself and prepare some instructions.
 
-diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
-index 5d232c6..4310b92 100644
---- a/s390x/cpumodel.c
-+++ b/s390x/cpumodel.c
-@@ -11,6 +11,7 @@
-  */
- 
- #include <asm/facility.h>
-+#include <alloc_page.h>
- 
- static int dep[][2] = {
- 	/* from SA22-7832-11 4-98 facility indications */
-@@ -38,6 +39,49 @@ static int dep[][2] = {
- 	{ 155,  77 },
- };
- 
-+/*
-+ * A hack to detect TCG (instead of KVM): QEMU uses "TCGguest" as guest
-+ * name by default when we are running with TCG (otherwise it's "KVMguest")
-+ */
-+static bool is_tcg(void)
-+{
-+	bool ret = false;
-+	uint8_t *buf;
-+
-+	buf = alloc_page();
-+	if (!buf)
-+		return false;
-+
-+	if (stsi(buf, 3, 2, 2)) {
-+		goto out;
-+	}
-+
-+	/* Does the name start with "TCG" in EBCDIC? */
-+	if (buf[2048] == 0x54 && buf[2049] == 0x43 && buf[2050] == 0x47)
-+		ret = true;
-+
-+out:
-+	free_page(buf);
-+	return ret;
-+}
-+
-+static void check_dependency(int dep1, int dep2)
-+{
-+	if (test_facility(dep1)) {
-+		if (dep1 == 37) {
-+			/* TCG does not have DFP and is unlikely to
-+			 * get it implemented soon. */
-+			report_xfail(is_tcg(), test_facility(dep2),
-+				     "%d implies %d", dep1, dep2);
-+		} else {
-+			report(test_facility(dep2), "%d implies %d",
-+			       dep1, dep2);
-+		}
-+	} else {
-+		report_skip("facility %d not present", dep1);
-+	}
-+}
-+
- int main(void)
- {
- 	int i;
-@@ -46,12 +90,7 @@ int main(void)
- 
- 	report_prefix_push("dependency");
- 	for (i = 0; i < ARRAY_SIZE(dep); i++) {
--		if (test_facility(dep[i][0])) {
--			report(test_facility(dep[i][1]), "%d implies %d",
--				dep[i][0], dep[i][1]);
--		} else {
--			report_skip("facility %d not present", dep[i][0]);
--		}
-+		check_dependency(dep[i][0], dep[i][1]);
- 	}
- 	report_prefix_pop();
- 
--- 
-2.18.1
+Paolo
 
