@@ -2,103 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FCCD216647
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 08:17:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E17321665C
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 08:29:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727094AbgGGGRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 02:17:34 -0400
-Received: from mga05.intel.com ([192.55.52.43]:1426 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725974AbgGGGRd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 02:17:33 -0400
-IronPort-SDR: u3dzJVe6oCRt/JWaMZ3pQv9EAN7l/6jYheOuj/SaYbL0C0ASJTl+RKMPYzDlRYIaxjmdtzykCD
- l7VpVKZs1DrQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="232405481"
-X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
-   d="scan'208";a="232405481"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 23:17:32 -0700
-IronPort-SDR: N34W45B6rEEFTRZ/LgN7qlqRSKG4prvchZenPMGgmsPkxFy9npsOpMiUq7PlQMuhJ4fs58ed5R
- tNn+oUBx9vQg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
-   d="scan'208";a="357684608"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by orsmga001.jf.intel.com with ESMTP; 06 Jul 2020 23:17:32 -0700
-Date:   Mon, 6 Jul 2020 23:17:32 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH v10 02/14] KVM: Cache as_id in kvm_memory_slot
-Message-ID: <20200707061732.GI5208@linux.intel.com>
-References: <20200601115957.1581250-1-peterx@redhat.com>
- <20200601115957.1581250-3-peterx@redhat.com>
- <20200702230849.GL3575@linux.intel.com>
- <20200703184122.GF6677@xz-x1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200703184122.GF6677@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1726918AbgGGG3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 02:29:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34572 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726540AbgGGG3f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 02:29:35 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BE3C061755
+        for <kvm@vger.kernel.org>; Mon,  6 Jul 2020 23:29:35 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id x11so16330893plo.7
+        for <kvm@vger.kernel.org>; Mon, 06 Jul 2020 23:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=+RTRZTL952uD44udP+gYusYwiuZQqcIm9iMrkmjMeo4=;
+        b=fMisAFudjFzYDE9oPrh1YvkFrw2sjhU8LhDoZVeVrPGY55xvkhP0bJKhYgMBQZaP1s
+         ypEq6iZTkAfOfy8qN4cyy1YMw6qSIaJsk27u7Dxrql6d+rwPgffWJuJoym4UZgD7qgSh
+         73k5HDt/UuPavyd+Tig5A/eO0wKTHSEF2FOg+nWwGHv4R56Lak1FAeLQGBDzANzoJjzp
+         Tj8WJHo5C1EL0ayiLvrrF308y3N6MnDQgS4q48IER2RydJqk3PmLQELuLeE3OuL6ospp
+         w7CnABEQc7b9NlJrkAFXDtAtLACjhp4ZiT3A271jZDEPk57C0aktEAuOaTDdAQrgbaW6
+         f2qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=+RTRZTL952uD44udP+gYusYwiuZQqcIm9iMrkmjMeo4=;
+        b=IYdAxgXh+fKXZ5WSLW/acUNW2gvukGqyw2uE0Volf0cA2QlcFUjRCEAeVmYkx1Qgkh
+         meUf+bH4MJCObh1dkedRmXLg33Nd/qlCo7AmunhhcCdYQhzSqRWh/l5AH/MjyyDuyTxG
+         LnAnR0cWG/JY1U5WgF3188FTiWrgmvg/c1eWP3gUWrOKymI3rTZcRy8FaXZ/Ch9DVFm7
+         IKf8vKaYLHJIzxqi0I/lq6xLAq2LY6mUjk1CmHi2VN6S1yU5qQo5XRGFGRU2tr8Ln4ES
+         Pkb1Xadhr5cK8Mjfe0ymUQzoL0UH0Q1JRtUlMlkukf25gpjkaYmp0eqp6fTFForVgstg
+         AhNw==
+X-Gm-Message-State: AOAM5305c80FvPZ6FqUlN9sbB6kWKtZ/GmgH+CQpNPH0BmFVpt0jxTrQ
+        a2s5apA2fNytElgxNi2hBkk=
+X-Google-Smtp-Source: ABdhPJzrqqswll8000CI7st45i4FzY1sq2QhjPw3E9Qcjke+8pvpOg6q3/B2Z9D3DCt4dCyzVSd2AA==
+X-Received: by 2002:a17:90a:e2c7:: with SMTP id fr7mr2737663pjb.103.1594103374645;
+        Mon, 06 Jul 2020 23:29:34 -0700 (PDT)
+Received: from ?IPv6:2601:647:4700:9b2:14d:2097:9aef:eb87? ([2601:647:4700:9b2:14d:2097:9aef:eb87])
+        by smtp.gmail.com with ESMTPSA id g13sm1381691pje.29.2020.07.06.23.29.33
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 Jul 2020 23:29:33 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: Question regarding nested_svm_inject_npf_exit()
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <773a4e20-3dd3-972c-8671-222672e54825@redhat.com>
+Date:   Mon, 6 Jul 2020 23:29:32 -0700
+Cc:     Jim Mattson <jmattson@google.com>, kvm <kvm@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E3FBD050-816C-4FFB-A139-85342CDEAFF6@gmail.com>
+References: <DAFEA995-CFBA-4466-989B-D63466815AB1@gmail.com>
+ <f297ebf8-15b8-57d3-4c56-fdf3f5d16b9d@redhat.com>
+ <2B43FBC4-D265-4005-8FBA-870BDC627231@gmail.com>
+ <CALMp9eTDCDNctpso23uv+gM0QZUEBzMw47-M9JfNaG79fusa2A@mail.gmail.com>
+ <773a4e20-3dd3-972c-8671-222672e54825@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 03, 2020 at 02:41:22PM -0400, Peter Xu wrote:
-> On Thu, Jul 02, 2020 at 04:08:49PM -0700, Sean Christopherson wrote:
-> > On Mon, Jun 01, 2020 at 07:59:45AM -0400, Peter Xu wrote:
-> > > Cache the address space ID just like the slot ID.  It will be used in
-> > > order to fill in the dirty ring entries.
-> > > 
-> > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  include/linux/kvm_host.h | 1 +
-> > >  virt/kvm/kvm_main.c      | 1 +
-> > >  2 files changed, 2 insertions(+)
-> > > 
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > index 01276e3d01b9..5e7bbaf7a36b 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -346,6 +346,7 @@ struct kvm_memory_slot {
-> > >  	unsigned long userspace_addr;
-> > >  	u32 flags;
-> > >  	short id;
-> > > +	u16 as_id;
-> > >  };
-> > >  
-> > >  static inline unsigned long kvm_dirty_bitmap_bytes(struct kvm_memory_slot *memslot)
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 74bdb7bf3295..ebdd98a30e82 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -1243,6 +1243,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-> > >  	if (!mem->memory_size)
-> > >  		return kvm_delete_memslot(kvm, mem, &old, as_id);
-> > 
-> > This technically needs to set as_id in the deleted memslot.  I highly doubt
-> > it will ever matter from a functionality perspective, but it'd be confusing
-> > to encounter a memslot whose as_id did not match that of its owner.
-> 
-> Yeah it shouldn't matter because as_id is directly passed in to look up the
-> pointer of kvm_memslots in kvm_delete_memslot, and memslot->as_id shouldn't be
-> further referenced.
-> 
-> I can add a comment above if this can clarify things a bit:
-> 
-> +	u16 as_id; /* cache of as_id; only valid if npages != 0 */
+> On Jul 6, 2020, at 11:02 PM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>=20
+> On 07/07/20 01:26, Jim Mattson wrote:
+>>> Well, I think we can agree that bare-metal is a better reference =
+than
+>>> another emulator for the matter. Even without running the tests on
+>>> bare-metal, it is easy to dump EXITINFO1 on the nested page-fault. I =
+will
+>>> try to find a bare-metal machine.
+>>>=20
+>>> Anyhow, I would appreciate if anyone from AMD would tell whether any =
+result
+>>> should be considered architectural.
+>>=20
+>> I'd be happy to test on bare metal, but I'm still waiting for
+>> instructions that a script kiddie (with read-only console access) can
+>> follow.
+>=20
+> I'll try to test myself and prepare some instructions.
 
-Why not just set it?  It's a single line of code, and there's more than one
-"shouldn't" in the above.
+Sorry for the late response (divorce, it turns out, is very time =
+consuming).
+
+I will try to send you scripts later on, but I did not automate things
+through the iDRAC.
+
+I managed to get an AMD machine, but unfortunately non of the tests run
+on that machine. I am still trying to figure it out. I will update you
+once I make progress.
+
