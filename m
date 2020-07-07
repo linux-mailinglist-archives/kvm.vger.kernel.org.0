@@ -2,236 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5D38216FBD
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 17:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B76C216FEF
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 17:13:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728288AbgGGPJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 11:09:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37374 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727791AbgGGPJu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 11:09:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 067F3F6U051627
-        for <kvm@vger.kernel.org>; Tue, 7 Jul 2020 11:09:49 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324pxsh7aw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 07 Jul 2020 11:09:49 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 067F3xDo055785
-        for <kvm@vger.kernel.org>; Tue, 7 Jul 2020 11:09:49 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324pxsh79x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 11:09:49 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 067F4Hap007905;
-        Tue, 7 Jul 2020 15:09:47 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 322hd7uj44-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 15:09:46 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 067F8NhF56099152
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Jul 2020 15:08:23 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BBB48A405F;
-        Tue,  7 Jul 2020 15:09:44 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7397CA4066;
-        Tue,  7 Jul 2020 15:09:44 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.183.94])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Jul 2020 15:09:44 +0000 (GMT)
-Subject: Re: [kvm-unit-tests v2 PATCH] s390x/cpumodel: The missing DFP
- facility on TCG is expected
-To:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20200707104205.25085-1-thuth@redhat.com>
- <20200707134415.39e47538.cohuck@redhat.com>
- <ca2ad96f-1d74-723f-e6c0-7345a90b35f8@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <09d34daa-a770-defd-260c-81d3c5c49a3d@linux.ibm.com>
-Date:   Tue, 7 Jul 2020 17:09:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
+        id S1728172AbgGGPMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 11:12:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52708 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726911AbgGGPMA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 11:12:00 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1BAF52065D;
+        Tue,  7 Jul 2020 15:12:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594134720;
+        bh=C4bPJbq0e1P34S5uLx3jO+V10U+5mus3QC4vneFLX1Y=;
+        h=From:To:Cc:Subject:Date:From;
+        b=frYEk8iaPRhfVRhVtZ5aQCYq7V2EWVUpPQ1xar9FIMJtduC6Os5mcGHmWesD2xu0j
+         bxNCIk4f9NvMsPil6ThxO/O7OddeaOOHn2PYV3T/QTBDeqhhHAgqRuAxsXYk1t++rw
+         GVsJbkqA7f3SQDK8ZCTW/skBpHyrtMSbJrTVCyXQ=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jspGI-009mGD-I7; Tue, 07 Jul 2020 16:11:58 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: [PATCH] KVM: arm64: Don't use has_vhe() for CHOOSE_HYP_SYM()
+Date:   Tue,  7 Jul 2020 16:11:12 +0100
+Message-Id: <20200707151112.2514630-1-maz@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <ca2ad96f-1d74-723f-e6c0-7345a90b35f8@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="JWQEVcZ7cpcywhhufcY7bmPxfTwBMwYKw"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-07_08:2020-07-07,2020-07-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- phishscore=0 malwarescore=0 lowpriorityscore=0 clxscore=1015
- impostorscore=0 cotscore=-2147483648 suspectscore=2 adultscore=0
- mlxlogscore=999 spamscore=0 priorityscore=1501 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007070109
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JWQEVcZ7cpcywhhufcY7bmPxfTwBMwYKw
-Content-Type: multipart/mixed; boundary="bOoHGeCIDgZ3WtDuDEF2PR0SzsBW9ldiB"
+The recently introduced CHOOSE_HYP_SYM() macro picks one symbol
+or another, depending on whether the kernel run as a VHE
+hypervisor or not. For that, it uses the has_vhe() helper, which
+is itself implemented as a final capability.
 
---bOoHGeCIDgZ3WtDuDEF2PR0SzsBW9ldiB
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Unfortunately, __copy_hyp_vect_bpi now indirectly uses CHOOSE_HYP_SYM
+to get the __bp_harden_hyp_vecs symbol, using has_vhe() in the process.
+At this stage, the capability isn't final and things explode:
 
-On 7/7/20 1:45 PM, David Hildenbrand wrote:
-> On 07.07.20 13:44, Cornelia Huck wrote:
->> On Tue,  7 Jul 2020 12:42:05 +0200
->> Thomas Huth <thuth@redhat.com> wrote:
->>
->>> When running the kvm-unit-tests with TCG on s390x, the cpumodel test
->>> always reports the error about the missing DFP (decimal floating poin=
-t)
->>> facility. This is kind of expected, since DFP is not required for
->>> running Linux and thus nobody is really interested in implementing
->>> this facility in TCG. Thus let's mark this as an expected error inste=
-ad,
->>> so that we can run the kvm-unit-tests also with TCG without getting
->>> test failures that we do not care about.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  v2:
->>>  - Rewrote the logic, introduced expected_tcg_fail flag
->>>  - Use manufacturer string instead of VM name to detect TCG
->>>
->>>  s390x/cpumodel.c | 49 ++++++++++++++++++++++++++++++++++++++++++----=
---
->>>  1 file changed, 43 insertions(+), 6 deletions(-)
->>
->> (...)
->>
->>> +static bool is_tcg(void)
->>> +{
->>> +	const char qemu_ebcdic[] =3D { 0xd8, 0xc5, 0xd4, 0xe4 };
->>> +	bool ret =3D false;
->>> +	uint8_t *buf;
->>> +
->>> +	buf =3D alloc_page();
->>> +	if (!buf)
->>> +		return false;
->>> +
->>> +	if (stsi(buf, 1, 1, 1)) {
->>> +		goto out;
->>> +	}
->>
->> This does an alloc_page() and a stsi() every time you call it...
->>
->>> +
->>> +	/*
->>> +	 * If the manufacturer string is "QEMU" in EBCDIC, then we are on T=
-CG
->>> +	 * (otherwise the string is "IBM" in EBCDIC)
->>> +	 */
->>> +	if (!memcmp(&buf[32], qemu_ebcdic, sizeof(qemu_ebcdic)))
->>> +		ret =3D  true;
->>> +out:
->>> +	free_page(buf);
->>> +	return ret;
->>> +}
->>> +
->>> +
->>>  int main(void)
->>>  {
->>>  	int i;
->>> @@ -46,11 +81,13 @@ int main(void)
->>> =20
->>>  	report_prefix_push("dependency");
->>
->> ...so maybe cache the value for is_tcg() here instead of checking
->> multiple times in the loop?
->=20
-> Maybe move it to common code and do the detection early during boot? Th=
-e
-> n provide is_tcg() or sth. like that. Could be helpful in other context=
+[    0.000000] ACPI: SRAT not present
+[    0.000000] percpu: Embedded 34 pages/cpu s101264 r8192 d29808 u139264
+[    0.000000] Detected PIPT I-cache on CPU0
+[    0.000000] ------------[ cut here ]------------
+[    0.000000] kernel BUG at arch/arm64/include/asm/cpufeature.h:459!
+[    0.000000] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+[    0.000000] Modules linked in:
+[    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 5.8.0-rc4-00080-gd630681366e5 #1388
+[    0.000000] pstate: 80000085 (Nzcv daIf -PAN -UAO BTYPE=--)
+[    0.000000] pc : check_branch_predictor+0x3a4/0x408
+[    0.000000] lr : check_branch_predictor+0x2a4/0x408
+[    0.000000] sp : ffff800011693e90
+[    0.000000] x29: ffff800011693e90 x28: ffff8000116a1530
+[    0.000000] x27: ffff8000112c1008 x26: ffff800010ca6ff8
+[    0.000000] x25: ffff8000112c1000 x24: ffff8000116a1320
+[    0.000000] x23: 0000000000000000 x22: ffff8000112c1000
+[    0.000000] x21: ffff800010177120 x20: ffff8000116ae108
+[    0.000000] x19: 0000000000000000 x18: ffff800011965c90
+[    0.000000] x17: 0000000000022000 x16: 0000000000000003
+[    0.000000] x15: 00000000ffffffff x14: ffff8000118c3a38
+[    0.000000] x13: 0000000000000021 x12: 0000000000000022
+[    0.000000] x11: d37a6f4de9bd37a7 x10: 000000000000001d
+[    0.000000] x9 : 0000000000000000 x8 : ffff800011f8dad8
+[    0.000000] x7 : ffff800011965ad0 x6 : 0000000000000003
+[    0.000000] x5 : 0000000000000000 x4 : 0000000000000000
+[    0.000000] x3 : 0000000000000100 x2 : 0000000000000004
+[    0.000000] x1 : ffff8000116ae148 x0 : 0000000000000000
+[    0.000000] Call trace:
+[    0.000000]  check_branch_predictor+0x3a4/0x408
+[    0.000000]  update_cpu_capabilities+0x84/0x138
+[    0.000000]  init_cpu_features+0x2c0/0x2d8
+[    0.000000]  cpuinfo_store_boot_cpu+0x54/0x64
+[    0.000000]  smp_prepare_boot_cpu+0x2c/0x60
+[    0.000000]  start_kernel+0x16c/0x574
+[    0.000000] Code: 17ffffc7 91010281 14000198 17ffffca (d4210000)
 
-> maybe.
->=20
+This is addressed using a two-fold process:
+- Replace has_vhe() with is_kernel_in_hyp_mode(), which tests
+  whether we are running at EL2.
+- Make CHOOSE_HYP_SYM() return an *undefined* symbol when
+  compiled in the nVHE hypervisor, as we really should never
+  use this helper in the nVHE-specific code.
 
-Well we also already have a check for zvm 6 with stsi 3.2.2 in skey.c
-I'm not completely convinced that I want to loose two pages and a few
-cycles on every startup for two separate test cases.
+With this in place, we're back to a bootable kernel again.
 
+Fixes: b877e9849d41 ("KVM: arm64: Build hyp-entry.S separately for VHE/nVHE")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_asm.h | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-
---bOoHGeCIDgZ3WtDuDEF2PR0SzsBW9ldiB--
-
---JWQEVcZ7cpcywhhufcY7bmPxfTwBMwYKw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8EkDgACgkQ41TmuOI4
-ufjxBg/+KgqLoYTlArU+xfuClFwjyCKofUtqfGx0V9ucZP9Et8BEtW2eemm7vG2O
-jK808aWu8ul5YFjfkQclPTMGi1VxRdRxYBzvNbHy6mburA179h8CPwaFgTNCFHqH
-pz6XjLbTVcI8QxTSqshCYfQToxMiFHMLPnAW4w5FSD5siK0yCSti6qoOjEgbBydZ
-+ZiBVouiCrkqmSs301/sYuRANn+T2sciEr9t6kVFR1qeV2rjxB6ObvqdJlXGqxMG
-e7tDdRpD4hZj1m1s/Olx1FnICm3RByWltVmFTvHsGDIyOzdavx9lpjrQMNno5AaY
-na79abEbd4gWWIJKNno00wuq1pjqIqQtyIvBvruWSYJfoFzL5iVqhK0w8RYnls3K
-2wdmsgKT+KO+bUA210Y4dKNkKMXQvg+fQOlRqyN/q1/+bk0d0uvOm8Aq2hvyOF8X
-P3lBxyQAY9nvb8ZMmF8rxwQUrrCb17wq4q1+yLmZWY8RITZeXXoPEb24uUSMEmxt
-Ao1gMdRwLrI77RVgHKXs17WSDPrnw6UWh+dPzQ0fZDwvKPulpDtVSDy92Xb5p5yN
-FIrMBF/wnyJtYY9safVrQcjxk6nx94lwwalGlBkD6mSogUTidH0n9sUUAoeoRlnF
-NK5KJtC86SD7egWYt2XajtQefM3g1QqfzAdDHSSzgSl9yGj+e/M=
-=TgeK
------END PGP SIGNATURE-----
-
---JWQEVcZ7cpcywhhufcY7bmPxfTwBMwYKw--
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 5716f5de9707..fb1a922b31ba 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -62,8 +62,26 @@
+ 
+ #define CHOOSE_VHE_SYM(sym)	sym
+ #define CHOOSE_NVHE_SYM(sym)	kvm_nvhe_sym(sym)
+-#define CHOOSE_HYP_SYM(sym)	(has_vhe() ? CHOOSE_VHE_SYM(sym) \
++
++#ifndef __KVM_NVHE_HYPERVISOR__
++/*
++ * BIG FAT WARNINGS:
++ *
++ * - Don't be tempted to change the following is_kernel_in_hyp_mode()
++ *   to has_vhe(). has_vhe() is implemented as a *final* capability,
++ *   while this is used early at boot time, when the capabilities are
++ *   not final yet....
++ *
++ * - Don't let the nVHE hypervisor have access to this, as it will
++ *   pick the *wrong* symbol (yes, it runs at EL2...).
++ */
++#define CHOOSE_HYP_SYM(sym)	(is_kernel_in_hyp_mode() ? CHOOSE_VHE_SYM(sym) \
+ 					   : CHOOSE_NVHE_SYM(sym))
++#else
++/* The nVHE hypervisor shouldn't even try to access anything */
++extern void *__nvhe_undefined_symbol;
++#define CHOOSE_HYP_SYM(sym)	__nvhe_undefined_symbol
++#endif
+ 
+ /* Translate a kernel address @ptr into its equivalent linear mapping */
+ #define kvm_ksym_ref(ptr)						\
+-- 
+2.26.2
 
