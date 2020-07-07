@@ -2,125 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0034216887
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 10:45:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9659A21689F
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 10:51:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727122AbgGGIpA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 04:45:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36976 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726467AbgGGIo7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 04:44:59 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0678YD1h105513;
-        Tue, 7 Jul 2020 04:44:54 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32482kn0pn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 04:44:54 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0678YMRP106482;
-        Tue, 7 Jul 2020 04:44:51 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 32482kn0k9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 04:44:50 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0678eADI020543;
-        Tue, 7 Jul 2020 08:44:44 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 322hd7u6xj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 08:44:44 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0678ifnv56033414
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Jul 2020 08:44:41 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4D84CA4055;
-        Tue,  7 Jul 2020 08:44:41 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E693A4040;
-        Tue,  7 Jul 2020 08:44:40 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.29.12])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Jul 2020 08:44:40 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        mst@redhat.com, jasowang@redhat.com, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-Subject: [PATCH v4 2/2] s390: virtio: PV needs VIRTIO I/O device protection
-Date:   Tue,  7 Jul 2020 10:44:37 +0200
-Message-Id: <1594111477-15401-3-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1594111477-15401-1-git-send-email-pmorel@linux.ibm.com>
-References: <1594111477-15401-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-07_05:2020-07-07,2020-07-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 clxscore=1015 phishscore=0 suspectscore=1 cotscore=-2147483648
- mlxlogscore=999 adultscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- mlxscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2007070066
+        id S1726434AbgGGIvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 04:51:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41130 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725825AbgGGIvP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 04:51:15 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8FB05206C3;
+        Tue,  7 Jul 2020 08:51:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594111874;
+        bh=gm0s9URnfKoM+Mp5/NVoezYw+cdGKKelHr4qyKi0wGg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=J0KDoDrXpqpK1OUy9dsjGwQiB0OyQBcA5oAU/kgyr7sH9PiK0NfSJ4htyaHwDkVcu
+         nktNyTV5oHiBKwix0bSY/eogdSpshkIRXnPCJfWYeUCVEFCLJAPsjZgFcbsSi8TgWA
+         8gehuafDcYGb0BJyv3d0xKLfBx+kDJUGjxG+kupo=
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <maz@kernel.org>)
+        id 1jsjJo-009gSu-Po; Tue, 07 Jul 2020 09:51:13 +0100
+Date:   Tue, 07 Jul 2020 09:51:11 +0100
+Message-ID: <87mu4bemio.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Andrew Scull <ascull@google.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v3 00/17] KVM: arm64: Preliminary NV patches
+In-Reply-To: <20200706172725.GL28170@gaia>
+References: <20200706125425.1671020-1-maz@kernel.org>
+        <20200706172725.GL28170@gaia>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26.3
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, Dave.Martin@arm.com, jintack@cs.columbia.edu, alexandru.elisei@arm.com, gcherian@marvell.com, prime.zeng@hisilicon.com, ascull@google.com, will@kernel.org, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-S390, protecting the guest memory against unauthorized host access
-needs to enforce VIRTIO I/O device protection through the use of
-VIRTIO_F_VERSION_1 and VIRTIO_F_IOMMU_PLATFORM.
+Hi Catalin,
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- arch/s390/kernel/uv.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+On Mon, 06 Jul 2020 18:27:48 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+> 
+> On Mon, Jul 06, 2020 at 01:54:08PM +0100, Marc Zyngier wrote:
+> > Catalin: How do you want to proceed for patches 2, 3, and 4? I could
+> > make a stable branch that gets you pull into the arm64 tree, or the
+> > other way around. Just let me know.
+> 
+> Please create a separate branch for the S2 TTL patches (ideally based on
+> no later than -rc3). I plan to queue the rest of Zhenyu's patches on
+> top.
+> 
+> https://lore.kernel.org/linux-arm-kernel/20200625080314.230-1-yezhenyu2@huawei.com/
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index c296e5c8dbf9..106330f6eda1 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -14,6 +14,7 @@
- #include <linux/memblock.h>
- #include <linux/pagemap.h>
- #include <linux/swap.h>
-+#include <linux/virtio_config.h>
- #include <asm/facility.h>
- #include <asm/sections.h>
- #include <asm/uv.h>
-@@ -413,3 +414,27 @@ static int __init uv_info_init(void)
- }
- device_initcall(uv_info_init);
- #endif
-+
-+/*
-+ * arch_validate_virtio_iommu_platform
-+ * @dev: the VIRTIO device being added
-+ *
-+ * Return value: returns -ENODEV if any features of the
-+ *               device breaks the protected virtualization
-+ *               0 otherwise.
-+ */
-+int arch_validate_virtio_features(struct virtio_device *dev)
-+{
-+	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
-+		dev_warn(&dev->dev, "device must provide VIRTIO_F_VERSION_1\n");
-+		return is_prot_virt_guest() ? -ENODEV : 0;
-+	}
-+
-+	if (!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
-+		dev_warn(&dev->dev,
-+			 "device must provide VIRTIO_F_IOMMU_PLATFORM\n");
-+		return is_prot_virt_guest() ? -ENODEV : 0;
-+	}
-+
-+	return 0;
-+}
+I've now pushed out this branch[1], containing the three patches in
+isolation. Unless you tell me otherwise, I will push this into -next
+today, together with the rest of the KVM/arm64 queue.
+
+Thanks,
+
+	M.
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/ttl-for-arm64
+
+
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
