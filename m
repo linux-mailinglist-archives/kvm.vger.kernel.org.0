@@ -2,136 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C9BF217ABA
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 23:52:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 740CB217B0B
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 00:36:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729084AbgGGVwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 17:52:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20026 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728845AbgGGVwE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 17:52:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594158722;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2er0aNLBQV2gIBNyC9uXErvIZxgp1FWSJ0RFq0zI9K0=;
-        b=A4LDYvuLtuSDEKZuK68Sd7ijKVzD8COfHO6UZ4fM8Auq6qbGHS8pBrJWgVmDAu+46+3Old
-        PZTMgndMsTHnqIKxoFWqYw8t8RrdQfikYD3A/ZpqxUU5lZjFUYNX6g7qK3NDfcGiVB/U2Y
-        uZpY7qkjyM5CxIwgy8nHeb5Rayt7uRA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321--BB8MYI9OsuWll9clt_puw-1; Tue, 07 Jul 2020 17:52:01 -0400
-X-MC-Unique: -BB8MYI9OsuWll9clt_puw-1
-Received: by mail-wm1-f70.google.com with SMTP id q20so797900wme.3
-        for <kvm@vger.kernel.org>; Tue, 07 Jul 2020 14:52:01 -0700 (PDT)
+        id S1729330AbgGGWgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 18:36:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728299AbgGGWgl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 18:36:41 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917E4C061755
+        for <kvm@vger.kernel.org>; Tue,  7 Jul 2020 15:36:41 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id m81so9918839ybf.6
+        for <kvm@vger.kernel.org>; Tue, 07 Jul 2020 15:36:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=iKsgbuR1fTpH0ZFi8jGnta3z0+1/5i8qIQmX7R8d9a0=;
+        b=ddIDDwSAU2FmdCY55ER7+sD8F6BhDGcqVPI60KX3UznCZ29r7IW1XseZe5ol29nDQW
+         302TolJ+AgKBxnY7U5N88aBj3W/Z/F0D1xrkGG9mYobua4fcII+rryuhm/7YYBNVW9Xh
+         6uNzqLk5um6Jdl6faPbiUMMg/BWJimJqJzSaAMbdaMXnCfigVQmd7EobfD4AWl3M8dWQ
+         5K8uSNqHmo8wrIuUfvHuctdH6lBXY0meA2iZvyjSdavFj0l5mc2uXky2ZSM26YKpVygk
+         PuduzEcwBJFD/wUs08tLFyRXcO66mhuocTS9FMFgZIXCFZ3bikm3Wa88qeYVkm1XDm70
+         /l/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2er0aNLBQV2gIBNyC9uXErvIZxgp1FWSJ0RFq0zI9K0=;
-        b=XqHpCJQoIV7Dy6yUxlyOXWRyNuM/tbtNbjUPosLy0rRLTTQ5+PQi2nzoLFRoQkS2ze
-         6xuUGq7vkqqfgSwQYSE8cQqn/1T+TD6Yu+onOZPChXo44NTowviY3LGWhxwD682sM9JG
-         B/G1BseiAaieoeV84Y66auLsbw/e+DBFIyzsXHz7HFDlsGOmKekN6f2i6zqRqTOh0wWI
-         SQz7b09kIwGT8DeZq1E0uL56aoxuXE/IC65A3rIj7zYMbzdKOW+6sSA2RgGjmfmI8Mq3
-         ePaGsWKg7cbCfP7U/yY6UMFw3wnZ7khfOvPwWTtMwsJbPjs4ZuODpUWgt+6VUSODUGUR
-         dBqg==
-X-Gm-Message-State: AOAM531XfJ+4Vj0FUQYqvIeQjbcTtrg7k6OlUVCrRESp+iGfzvPKnAG6
-        Q5It5zrVJUvM8vffLJVDsmqCxtNLptn9rSjTovs8lZC8udelhC8zBA2fXLrE19SynKvREXjze3z
-        xjr8ArIGSZXoR
-X-Received: by 2002:a05:600c:241:: with SMTP id 1mr6023739wmj.119.1594158719932;
-        Tue, 07 Jul 2020 14:51:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIpmpXuw2PJCwb7uqNw0kg7Wrr1nz+wOneSDUnHkzV5klsewRb97ktM0f//9gTqHyZmBrCjg==
-X-Received: by 2002:a05:600c:241:: with SMTP id 1mr6023711wmj.119.1594158719656;
-        Tue, 07 Jul 2020 14:51:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7c9b:2885:1733:3575? ([2001:b07:6468:f312:7c9b:2885:1733:3575])
-        by smtp.gmail.com with ESMTPSA id k11sm2922650wrd.23.2020.07.07.14.51.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2020 14:51:59 -0700 (PDT)
-Subject: Re: [PATCH 2/4] KVM: x86: Introduce paravirt feature CR0/CR4 pinning
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     "Andersen, John" <john.s.andersen@intel.com>, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, shuah@kernel.org, liran.alon@oracle.com,
-        drjones@redhat.com, rick.p.edgecombe@intel.com,
-        kristen@linux.intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        mchehab+huawei@kernel.org, gregkh@linuxfoundation.org,
-        paulmck@kernel.org, pawan.kumar.gupta@linux.intel.com,
-        jgross@suse.com, mike.kravetz@oracle.com, oneukum@suse.com,
-        luto@kernel.org, peterz@infradead.org, fenghua.yu@intel.com,
-        reinette.chatre@intel.com, vineela.tummalapalli@intel.com,
-        dave.hansen@linux.intel.com, arjan@linux.intel.com,
-        caoj.fnst@cn.fujitsu.com, bhe@redhat.com, nivedita@alum.mit.edu,
-        keescook@chromium.org, dan.j.williams@intel.com,
-        eric.auger@redhat.com, aaronlewis@google.com, peterx@redhat.com,
-        makarandsonare@google.com, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        kernel-hardening@lists.openwall.com
-References: <20200617190757.27081-1-john.s.andersen@intel.com>
- <20200617190757.27081-3-john.s.andersen@intel.com>
- <0fa9682e-59d4-75f7-366f-103d6b8e71b8@intel.com>
- <20200618144314.GB23@258ff54ff3c0>
- <124a59a3-a603-701b-e3bb-61e83d70b20d@intel.com>
- <20200707211244.GN20096@linux.intel.com>
- <19b97891-bbb0-1061-5971-549a386f7cfb@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <31eb5b00-9e2a-aa10-0f20-4abc3cd35112@redhat.com>
-Date:   Tue, 7 Jul 2020 23:51:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <19b97891-bbb0-1061-5971-549a386f7cfb@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=iKsgbuR1fTpH0ZFi8jGnta3z0+1/5i8qIQmX7R8d9a0=;
+        b=piZmYvfMZZuRgcESG6d3v92WHIpE0ppZdIVj13WUYoM5sqyt0FYPtqHxEJ6qTyEfks
+         r+6uswdS9ZpsDT4nlKqbGAWdm873X/gu/pp2rdMUK/W4swGBVc4UQBqfB9eZj6CGmlY6
+         tok0tnava336vlQORelpOgghnWssOY63zLHy/EXSIRPeOGZiQm+eWRR4PjeXCLU6jwAC
+         pr8riLX+egZq76SL6Ei6hnnKZgayxh0Rm0YePzcd9NbWP6OtEXhKYj7l5KfaBpzjI2kn
+         sndYkdxjH42/tSQa2S0hV+WD+Qh0QdaCXbCDJufmRhRSNxTX9OBhmC8Z+flNnhMYOATQ
+         mJJQ==
+X-Gm-Message-State: AOAM531RCL3X9lL/z1wECBaXm8uAopU+ppx3f6Rfyl7/5jkZXLhGx5NW
+        Hn7PB9x+l3VcHrNBRccLd/nV4kmix6yDBZwSAQDDt78brMSQ7ZrvU0pYK8MgY+jPUZsL0JLsxG0
+        /bx09qf86kgmdUQXABAjHmXfORENVTiPf6P7kFRN7DsGY7Uy+49FnezxnRX9JF8A=
+X-Google-Smtp-Source: ABdhPJyqGzXsogKiFMYP9vr5Cl6ht62P4lfONGd7FnWULuyATlBNwCEZCNwfy141caWCnZqnFQ2f0lYNHDY2OA==
+X-Received: by 2002:a25:7582:: with SMTP id q124mr66565332ybc.208.1594161400577;
+ Tue, 07 Jul 2020 15:36:40 -0700 (PDT)
+Date:   Tue,  7 Jul 2020 15:36:30 -0700
+Message-Id: <20200707223630.336700-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.27.0.383.g050319c2ae-goog
+Subject: [PATCH] kvm: x86: Read PDPTEs on CR0.CD and CR0.NW changes
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/07/20 23:48, Dave Hansen wrote:
-> On 7/7/20 2:12 PM, Sean Christopherson wrote:
->>>>> Let's say Intel loses its marbles and adds a CR4 bit that lets userspace
->>>>> write to kernel memory.  Linux won't set it, but an attacker would go
->>>>> after it, first thing.
->> That's an orthogonal to pinning.  KVM never lets the guest set CR4 bits that
->> are unknown to KVM.  Supporting CR4.NO_MARBLES would require an explicit KVM
->> change to allow it to be set by the guest, and would also require a userspace
->> VMM to expose NO_MARBLES to the guest.
->>
->> That being said, this series should supporting pinning as much as possible,
->> i.e. if the bit can be exposed to the guest and doesn't require special
->> handling in KVM, allow it to be pinned.  E.g. TS is a special case because
->> pinning would require additional emulator support and IMO isn't interesting
->> enough to justify the extra complexity.  At a glance, I don't see anything
->> that would prevent pinning FSGSBASE.
-> 
-> Thanks for filling in the KVM picture.
-> 
-> If we're supporting as much pinning as possible, can we also add
-> something to make it inconvenient for someone to both make a CR4 bit
-> known to KVM *and* ignore the pinning aspects?
-> 
-> We should really make folks think about it.  Something like:
-> 
-> #define KVM_CR4_KNOWN 0xff
-> #define KVM_CR4_PIN_ALLOWED 0xf0
-> #define KVM_CR4_PIN_NOT_ALLOWED 0x0f
-> 
-> BUILD_BUG_ON(KVM_CR4_KNOWN !=
->              (KVM_CR4_PIN_ALLOWED|KVM_CR4_PIN_NOT_ALLOWED));
-> 
-> So someone *MUST* make an active declaration about new bits being pinned
-> or not?
+According to the SDM, when PAE paging would be in use following a
+MOV-to-CR0 that modifies any of CR0.CD, CR0.NW, or CR0.PG, then the
+PDPTEs are loaded from the address in CR3. Previously, kvm only loaded
+the PDPTEs when PAE paging would be in use following a MOV-to-CR0 that
+modified CR0.PG.
 
-I would just make all unknown bits pinnable (or perhaps all CR4 bits in
-general).
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+---
+ arch/x86/kvm/x86.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Paolo
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 88c593f83b28..5a91c975487d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -775,6 +775,7 @@ EXPORT_SYMBOL_GPL(pdptrs_changed);
+ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ {
+ 	unsigned long old_cr0 = kvm_read_cr0(vcpu);
++	unsigned long pdptr_bits = X86_CR0_CD | X86_CR0_NW | X86_CR0_PG;
+ 	unsigned long update_bits = X86_CR0_PG | X86_CR0_WP;
+ 
+ 	cr0 |= X86_CR0_ET;
+@@ -792,9 +793,9 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ 	if ((cr0 & X86_CR0_PG) && !(cr0 & X86_CR0_PE))
+ 		return 1;
+ 
+-	if (!is_paging(vcpu) && (cr0 & X86_CR0_PG)) {
++	if (cr0 & X86_CR0_PG) {
+ #ifdef CONFIG_X86_64
+-		if ((vcpu->arch.efer & EFER_LME)) {
++		if (!is_paging(vcpu) && (vcpu->arch.efer & EFER_LME)) {
+ 			int cs_db, cs_l;
+ 
+ 			if (!is_pae(vcpu))
+@@ -804,8 +805,8 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ 				return 1;
+ 		} else
+ #endif
+-		if (is_pae(vcpu) && !load_pdptrs(vcpu, vcpu->arch.walk_mmu,
+-						 kvm_read_cr3(vcpu)))
++		if (is_pae(vcpu) && ((cr0 ^ old_cr0) & pdptr_bits) &&
++		    !load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu)))
+ 			return 1;
+ 	}
+ 
+-- 
+2.27.0.383.g050319c2ae-goog
 
