@@ -2,314 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFB01216968
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 11:46:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8471521696C
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 11:46:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727800AbgGGJp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 05:45:59 -0400
-Received: from mga05.intel.com ([192.55.52.43]:24726 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726805AbgGGJp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 05:45:58 -0400
-IronPort-SDR: XUknJoIASVe47Ju0WYxScVhD93qkv9RpAR+OACWWFBJp3e2ZAARpOcwQ6F1WUoAHc18MCt5OZo
- GKFqpBkAwcbw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="232427279"
-X-IronPort-AV: E=Sophos;i="5.75,323,1589266800"; 
-   d="scan'208";a="232427279"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 02:45:55 -0700
-IronPort-SDR: yCLybNT4g30EnAwxIF56JuHBdEbgEdn0aj5JjwMsKnwG0viUau6Vp2MQKPOqjHiVML97Ey23oz
- nonuFBmzPYbQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,323,1589266800"; 
-   d="scan'208";a="483457620"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga005.fm.intel.com with ESMTP; 07 Jul 2020 02:45:54 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 7 Jul 2020 02:45:54 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 7 Jul 2020 02:45:53 -0700
-Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 7 Jul 2020 02:45:53 -0700
-Received: from NAM04-CO1-obe.outbound.protection.outlook.com (104.47.45.53) by
- edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Tue, 7 Jul 2020 02:45:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DresMIwxmnoxC5/ygwD+QqwTFUZltgocNwcNOpEaIdZHQr2Dzca3Yah4LcptYbwouA1DmnrK6PRZg6bYTgO7uzi1waqHgxGX7Fbwc+Ssdb4cjVz3l5BvXXEpvnCC8owqUNSnk1zdzOB0Gjm2/4vXz+vUSbU5Z3PeZlsO2GDQ8VWwOpbinZo+ES6HDy04V6LL3UoH39L6YBe/GY+7WoUFbX77vvKRQTiBn6FDNYfRd8EJ5Wi11ioRptHSDoHFpZaklxR0iW7uLt2YaT1Ttayg77xKXFXwk2Dd2hO1p3W6thWrQaDdTEQkewx/u2BHhnHpf65f5JlVxbOmGRjByTzfuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iHwsTjANDSstXm1MVX7Ob2smGr01Y3ePVG0vIW51IE0=;
- b=mBUHMkMrthp8hzq+3Y9/t5ZThHDfzm31+Ro0IQKX0kquJ6mysEahcPUri8+A+NhH8Pd6WoC48kNPHXEoLk2hpaAj5Vj7beL6NTd4bXRc5vtUxmwmucOw0cqSy8r3DiG2g0LTWYNinneN6qooKrGcLoPobuQMxlCCRRDhTVNt8mdoEUzR2ls6TFVUgwv0wZa+N4NhOrNTMV3bTde2xTwuv177MLUT1q03Cu5MywLZtXrP1UsdCvfi7DzQMLguZaRRozBXoU2KHfD74N+ltlxj7VXXC2KRIwPDRp1naow2DEwHArUJ66TYNaDRy8OY631e1UHfm9PmthwMyj1mjW8oJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iHwsTjANDSstXm1MVX7Ob2smGr01Y3ePVG0vIW51IE0=;
- b=IEa/A4qZE4N+GMAZPPgDiejvDOm55xxGIj5dw6PypmU5WV6H/8nYQydOKDmK8HdXRUCMujcQ2/DtwrRtyLvSL3H7gwfF75U9i8BPSl2yW5i/aH5Q8LctHgmvenZTu5jBcOAAzhAV4YSFr68TP9UP6ANj7kHqPs1KEBbtgbjEngw=
-Received: from CY4PR11MB1432.namprd11.prod.outlook.com (2603:10b6:910:5::22)
- by CY4PR11MB1782.namprd11.prod.outlook.com (2603:10b6:903:11a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3153.27; Tue, 7 Jul
- 2020 09:45:51 +0000
-Received: from CY4PR11MB1432.namprd11.prod.outlook.com
- ([fe80::b46e:9dcb:b46b:884a]) by CY4PR11MB1432.namprd11.prod.outlook.com
- ([fe80::b46e:9dcb:b46b:884a%4]) with mapi id 15.20.3153.029; Tue, 7 Jul 2020
- 09:45:51 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 05/15] vfio: Add PASID allocation/free support
-Thread-Topic: [PATCH v4 05/15] vfio: Add PASID allocation/free support
-Thread-Index: AQHWUfUfZtWjgFI1AUa9gBUFNqeZS6j6pjMAgAE6ewA=
-Date:   Tue, 7 Jul 2020 09:45:51 +0000
-Message-ID: <CY4PR11MB14328D24A466BFF9461CF163C3660@CY4PR11MB1432.namprd11.prod.outlook.com>
-References: <1593861989-35920-1-git-send-email-yi.l.liu@intel.com>
- <1593861989-35920-6-git-send-email-yi.l.liu@intel.com>
- <0d4ad4ac-ae89-a2ca-d302-94463ee5fc7f@redhat.com>
-In-Reply-To: <0d4ad4ac-ae89-a2ca-d302-94463ee5fc7f@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.2.0.6
-dlp-product: dlpe-windows
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.214]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 005b69ce-44b9-4ad3-69fc-08d8225a8934
-x-ms-traffictypediagnostic: CY4PR11MB1782:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR11MB17828C9AE1C6ECC08A196CDBC3660@CY4PR11MB1782.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0457F11EAF
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: vYqTOnt7U44rLgi1GAkKa49bnDm/10gDBOfiUZa9zLzfkktc+Ek0307Xu8rb1tbXmjGGkH3+piR/hGSiJ9+rUy6SccBtsIvBjeIbzmzEbN28BT0YdMulYsMW7XqreohvuOm9EZAAX/uKXkJJJN5QGK38erb4xQi2RImBFKZWxs9Aa9e4oWOrkTxTXo8+kuRgVgDWELHzsEP5JYu/vn4rc4laGfZZC94RNvkGFUnAtvWlWOiMHG8BVO8G5Pc+xCJw+A6arOGkkIun+I/Fi/6e8XjbTLXIHAU5iw+N6TjtkVXFd4koMUM4Dm+CcXwag9ttSPSE0+X0uq3o7A34L8yJBw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR11MB1432.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(136003)(366004)(346002)(396003)(376002)(2906002)(6506007)(53546011)(186003)(71200400001)(83380400001)(66476007)(7416002)(66556008)(66446008)(52536014)(64756008)(66946007)(76116006)(26005)(55016002)(9686003)(8676002)(86362001)(33656002)(478600001)(8936002)(7696005)(5660300002)(4326008)(110136005)(316002)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: vcqJ4ZTqyZD+iyxfyHlSyMUQPsHr+/d/WC2Evud/w/DtY5vSdjffB6X6i2LWAdxwI4u+0FqBPPansTlm3xb42jGcl30Zx6pf8NBzH6gWeSWCdFQQtmCYv8PvWw/OdJREfuQuau+WCHPTHyP++ovRIf52ByIotGy8uDT96SWo6fhRDJfJ7gKcsk7o2HF9ucAtGEam9kfkNqG48cGcTJlIJzpt5FiXHuHdP6j6uuYXxebqsCLeOKUnfcGzmTMrnQ4SGTv02ldZ4lxvMo2wmGGzfcfKvVSdRQWRDVSgLXx070rnenysR+TU1FHset+CeUUix25KybGxuH79g5AYaVIa83TB7zpZQcUO0WnFEoLbqYea12k6P/hhXvkonG6/QcMdR7rcwo+7Wln+iXah+iqyMp/Ff665lEM4JWo1BPRSxpmoeGmWrS+nWORS1P8lxVJHv76Dd88JEE3vKlaB9xJrVXut+CjPoZe6JPLHGR5BPY2g4lMnmlTdB60+zakD2+6M
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1728066AbgGGJqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 05:46:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22234 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728067AbgGGJqt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 05:46:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594115208;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=paElSljDoi/kRmElIyCEk5zdeibZul3cFtMLCVBiU6A=;
+        b=Bq4RkD1YOhYfvLi5QOuORcYtjif4zNChXQngF726hsU9wJ9PEbC/My5CQ319GTlpX6/oRR
+        oGy/DrmfjsDhGRqvd5/EURTnS/buxIzkGOHxzCAU81Da3jZ1hSn3OCJ/JH1JnfnaWXs/AI
+        zXS0DdhDpEbKo5Rm25FnJ3w577Drg80=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-vebczNtdNi-q_vVha5qWyw-1; Tue, 07 Jul 2020 05:46:44 -0400
+X-MC-Unique: vebczNtdNi-q_vVha5qWyw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4893461;
+        Tue,  7 Jul 2020 09:46:42 +0000 (UTC)
+Received: from gondolin (ovpn-113-54.ams2.redhat.com [10.36.113.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 943B160CC0;
+        Tue,  7 Jul 2020 09:46:36 +0000 (UTC)
+Date:   Tue, 7 Jul 2020 11:46:33 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
+        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v4 2/2] s390: virtio: PV needs VIRTIO I/O device
+ protection
+Message-ID: <20200707114633.68122a00.cohuck@redhat.com>
+In-Reply-To: <1594111477-15401-3-git-send-email-pmorel@linux.ibm.com>
+References: <1594111477-15401-1-git-send-email-pmorel@linux.ibm.com>
+        <1594111477-15401-3-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR11MB1432.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 005b69ce-44b9-4ad3-69fc-08d8225a8934
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2020 09:45:51.6200
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dU1gPxAndPxb2rAm9hPOQlHdGfdrDUds5cXgyEwQxK0gM6iICG7ayjyvy1pFF0B/YKf/JljB+L0NjxkZWWOqKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1782
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgRXJpYywNCg0KPiBGcm9tOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
-IFNlbnQ6IE1vbmRheSwgSnVseSA2LCAyMDIwIDEwOjUyIFBNDQo+IA0KPiBIaSBZaSwNCj4gDQo+
-IE9uIDcvNC8yMCAxOjI2IFBNLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBTaGFyZWQgVmlydHVhbCBB
-ZGRyZXNzaW5nIChhLmsuYSBTaGFyZWQgVmlydHVhbCBNZW1vcnkpIGFsbG93cyBzaGFyaW5nDQo+
-ID4gbXVsdGlwbGUgcHJvY2VzcyB2aXJ0dWFsIGFkZHJlc3Mgc3BhY2VzIHdpdGggdGhlIGRldmlj
-ZSBmb3Igc2ltcGxpZmllZA0KPiA+IHByb2dyYW1taW5nIG1vZGVsLiBQQVNJRCBpcyB1c2VkIHRv
-IHRhZyBhbiB2aXJ0dWFsIGFkZHJlc3Mgc3BhY2UgaW4gRE1BDQo+ID4gcmVxdWVzdHMgYW5kIHRv
-IGlkZW50aWZ5IHRoZSByZWxhdGVkIHRyYW5zbGF0aW9uIHN0cnVjdHVyZSBpbiBJT01NVS4gV2hl
-bg0KPiA+IGEgUEFTSUQtY2FwYWJsZSBkZXZpY2UgaXMgYXNzaWduZWQgdG8gYSBWTSwgd2Ugd2Fu
-dCB0aGUgc2FtZSBjYXBhYmlsaXR5DQo+ID4gb2YgdXNpbmcgUEFTSUQgdG8gdGFnIGd1ZXN0IHBy
-b2Nlc3MgdmlydHVhbCBhZGRyZXNzIHNwYWNlcyB0byBhY2hpZXZlDQo+ID4gdmlydHVhbCBTVkEg
-KHZTVkEpLg0KPiA+DQo+ID4gUEFTSUQgbWFuYWdlbWVudCBmb3IgZ3Vlc3QgaXMgdmVuZG9yIHNw
-ZWNpZmljLiBTb21lIHZlbmRvcnMgKGUuZy4gSW50ZWwNCj4gPiBWVC1kKSByZXF1aXJlcyBzeXN0
-ZW0td2lkZSBtYW5hZ2VkIFBBU0lEcyBjcm9zcyBhbGwgZGV2aWNlcywgcmVnYXJkbGVzcw0KPiA+
-IG9mIHdoZXRoZXIgYSBkZXZpY2UgaXMgdXNlZCBieSBob3N0IG9yIGFzc2lnbmVkIHRvIGd1ZXN0
-LiBPdGhlciB2ZW5kb3JzDQo+ID4gKGUuZy4gQVJNIFNNTVUpIG1heSBhbGxvdyBQQVNJRHMgbWFu
-YWdlZCBwZXItZGV2aWNlIHRodXMgY291bGQgYmUgZnVsbHkNCj4gPiBkZWxlZ2F0ZWQgdG8gdGhl
-IGd1ZXN0IGZvciBhc3NpZ25lZCBkZXZpY2VzLg0KPiA+DQo+ID4gRm9yIHN5c3RlbS13aWRlIG1h
-bmFnZWQgUEFTSURzLCB0aGlzIHBhdGNoIGludHJvZHVjZXMgYSB2ZmlvIG1vZHVsZSB0bw0KPiA+
-IGhhbmRsZSBleHBsaWNpdCBQQVNJRCBhbGxvYy9mcmVlIHJlcXVlc3RzIGZyb20gZ3Vlc3QuIEFs
-bG9jYXRlZCBQQVNJRHMNCj4gPiBhcmUgYXNzb2NpYXRlZCB0byBhIHByb2Nlc3MgKG9yLCBtbV9z
-dHJ1Y3QpIGluIElPQVNJRCBjb3JlLiBBIHZmaW9fbW0NCj4gPiBvYmplY3QgaXMgaW50cm9kdWNl
-ZCB0byB0cmFjayBtbV9zdHJ1Y3QuIE11bHRpcGxlIFZGSU8gY29udGFpbmVycyB3aXRoaW4NCj4g
-PiBhIHByb2Nlc3Mgc2hhcmUgdGhlIHNhbWUgdmZpb19tbSBvYmplY3QuDQo+ID4NCj4gPiBBIHF1
-b3RhIG1lY2hhbmlzbSBpcyBwcm92aWRlZCB0byBwcmV2ZW50IG1hbGljaW91cyB1c2VyIGZyb20g
-ZXhoYXVzdGluZw0KPiA+IGF2YWlsYWJsZSBQQVNJRHMuIEN1cnJlbnRseSB0aGUgcXVvdGEgaXMg
-YSBnbG9iYWwgcGFyYW1ldGVyIGFwcGxpZWQgdG8NCj4gPiBhbGwgVkZJTyBkZXZpY2VzLiBJbiB0
-aGUgZnV0dXJlIHBlci1kZXZpY2UgcXVvdGEgbWlnaHQgYmUgc3VwcG9ydGVkIHRvby4NCj4gPg0K
-PiA+IENjOiBLZXZpbiBUaWFuIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gPiBDQzogSmFjb2Ig
-UGFuIDxqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBDYzogRXJpYyBBdWdlciA8
-ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPiA+IENjOiBKZWFuLVBoaWxpcHBlIEJydWNrZXIgPGpl
-YW4tcGhpbGlwcGVAbGluYXJvLm9yZz4NCj4gPiBDYzogSm9lcmcgUm9lZGVsIDxqb3JvQDhieXRl
-cy5vcmc+DQo+ID4gQ2M6IEx1IEJhb2x1IDxiYW9sdS5sdUBsaW51eC5pbnRlbC5jb20+DQo+ID4g
-U3VnZ2VzdGVkLWJ5OiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29t
-Pg0KPiA+IFNpZ25lZC1vZmYtYnk6IExpdSBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4g
-LS0tDQo+ID4gdjMgLT4gdjQ6DQo+ID4gKikgZml4IGxvY2sgbGVhbSBpbiB2ZmlvX21tX2dldF9m
-cm9tX3Rhc2soKQ0KPiA+ICopIGRyb3AgcGFzaWRfcXVvdGEgZmllbGQgaW4gc3RydWN0IHZmaW9f
-bW0NCj4gPiAqKSB2ZmlvX21tX2dldF9mcm9tX3Rhc2soKSByZXR1cm5zIEVSUl9QVFIoLUVOT1RU
-WSkNCj4gd2hlbiAhQ09ORklHX1ZGSU9fUEFTSUQNCj4gPg0KPiA+IHYxIC0+IHYyOg0KPiA+ICop
-IGFkZGVkIGluIHYyLCBzcGxpdCBmcm9tIHRoZSBwYXNpZCBhbGxvYy9mcmVlIHN1cHBvcnQgb2Yg
-djENCj4gPiAtLS0NCj4gPiAgZHJpdmVycy92ZmlvL0tjb25maWcgICAgICB8ICAgNSArKw0KPiA+
-ICBkcml2ZXJzL3ZmaW8vTWFrZWZpbGUgICAgIHwgICAxICsNCj4gPiAgZHJpdmVycy92ZmlvL3Zm
-aW9fcGFzaWQuYyB8IDE1Mg0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrDQo+ID4gIGluY2x1ZGUvbGludXgvdmZpby5oICAgICAgfCAgMjggKysrKysrKysr
-DQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgMTg2IGluc2VydGlvbnMoKykNCj4gPiAgY3JlYXRlIG1v
-ZGUgMTAwNjQ0IGRyaXZlcnMvdmZpby92ZmlvX3Bhc2lkLmMNCj4gPg0KPiA+IGRpZmYgLS1naXQg
-YS9kcml2ZXJzL3ZmaW8vS2NvbmZpZyBiL2RyaXZlcnMvdmZpby9LY29uZmlnDQo+ID4gaW5kZXgg
-ZmQxN2RiOS4uM2Q4YTEwOCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL3ZmaW8vS2NvbmZpZw0K
-PiA+ICsrKyBiL2RyaXZlcnMvdmZpby9LY29uZmlnDQo+ID4gQEAgLTE5LDYgKzE5LDExIEBAIGNv
-bmZpZyBWRklPX1ZJUlFGRA0KPiA+ICAJZGVwZW5kcyBvbiBWRklPICYmIEVWRU5URkQNCj4gPiAg
-CWRlZmF1bHQgbg0KPiA+DQo+ID4gK2NvbmZpZyBWRklPX1BBU0lEDQo+ID4gKwl0cmlzdGF0ZQ0K
-PiA+ICsJZGVwZW5kcyBvbiBJT0FTSUQgJiYgVkZJTw0KPiA+ICsJZGVmYXVsdCBuDQo+ID4gKw0K
-PiA+ICBtZW51Y29uZmlnIFZGSU8NCj4gPiAgCXRyaXN0YXRlICJWRklPIE5vbi1Qcml2aWxlZ2Vk
-IHVzZXJzcGFjZSBkcml2ZXIgZnJhbWV3b3JrIg0KPiA+ICAJZGVwZW5kcyBvbiBJT01NVV9BUEkN
-Cj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL01ha2VmaWxlIGIvZHJpdmVycy92ZmlvL01h
-a2VmaWxlDQo+ID4gaW5kZXggZGU2N2M0Ny4uYmI4MzZhMyAxMDA2NDQNCj4gPiAtLS0gYS9kcml2
-ZXJzL3ZmaW8vTWFrZWZpbGUNCj4gPiArKysgYi9kcml2ZXJzL3ZmaW8vTWFrZWZpbGUNCj4gPiBA
-QCAtMyw2ICszLDcgQEAgdmZpb192aXJxZmQteSA6PSB2aXJxZmQubw0KPiA+DQo+ID4gIG9iai0k
-KENPTkZJR19WRklPKSArPSB2ZmlvLm8NCj4gPiAgb2JqLSQoQ09ORklHX1ZGSU9fVklSUUZEKSAr
-PSB2ZmlvX3ZpcnFmZC5vDQo+ID4gK29iai0kKENPTkZJR19WRklPX1BBU0lEKSArPSB2ZmlvX3Bh
-c2lkLm8NCj4gPiAgb2JqLSQoQ09ORklHX1ZGSU9fSU9NTVVfVFlQRTEpICs9IHZmaW9faW9tbXVf
-dHlwZTEubw0KPiA+ICBvYmotJChDT05GSUdfVkZJT19JT01NVV9TUEFQUl9UQ0UpICs9IHZmaW9f
-aW9tbXVfc3BhcHJfdGNlLm8NCj4gPiAgb2JqLSQoQ09ORklHX1ZGSU9fU1BBUFJfRUVIKSArPSB2
-ZmlvX3NwYXByX2VlaC5vDQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby92ZmlvX3Bhc2lk
-LmMgYi9kcml2ZXJzL3ZmaW8vdmZpb19wYXNpZC5jDQo+ID4gbmV3IGZpbGUgbW9kZSAxMDA2NDQN
-Cj4gPiBpbmRleCAwMDAwMDAwLi5jNDZiODcwDQo+ID4gLS0tIC9kZXYvbnVsbA0KPiA+ICsrKyBi
-L2RyaXZlcnMvdmZpby92ZmlvX3Bhc2lkLmMNCj4gPiBAQCAtMCwwICsxLDE1MiBAQA0KPiA+ICsv
-LyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vbmx5DQo+ID4gKy8qDQo+ID4gKyAq
-IENvcHlyaWdodCAoQykgMjAyMCBJbnRlbCBDb3Jwb3JhdGlvbi4NCj4gPiArICogICAgIEF1dGhv
-cjogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiArICoNCj4gPiArICovDQo+ID4g
-Kw0KPiA+ICsjaW5jbHVkZSA8bGludXgvdmZpby5oPg0KPiA+ICsjaW5jbHVkZSA8bGludXgvZXZl
-bnRmZC5oPg0KPiA+ICsjaW5jbHVkZSA8bGludXgvZmlsZS5oPg0KPiA+ICsjaW5jbHVkZSA8bGlu
-dXgvbW9kdWxlLmg+DQo+ID4gKyNpbmNsdWRlIDxsaW51eC9zbGFiLmg+DQo+ID4gKyNpbmNsdWRl
-IDxsaW51eC9zY2hlZC9tbS5oPg0KPiA+ICsNCj4gPiArI2RlZmluZSBEUklWRVJfVkVSU0lPTiAg
-IjAuMSINCj4gPiArI2RlZmluZSBEUklWRVJfQVVUSE9SICAgIkxpdSBZaSBMIDx5aS5sLmxpdUBp
-bnRlbC5jb20+Ig0KPiA+ICsjZGVmaW5lIERSSVZFUl9ERVNDICAgICAiUEFTSUQgbWFuYWdlbWVu
-dCBmb3IgVkZJTyBidXMgZHJpdmVycyINCj4gPiArDQo+ID4gKyNkZWZpbmUgVkZJT19ERUZBVUxU
-X1BBU0lEX1FVT1RBCTEwMDANCj4gPiArc3RhdGljIGludCBwYXNpZF9xdW90YSA9IFZGSU9fREVG
-QVVMVF9QQVNJRF9RVU9UQTsNCj4gPiArbW9kdWxlX3BhcmFtX25hbWVkKHBhc2lkX3F1b3RhLCBw
-YXNpZF9xdW90YSwgdWludCwgMDQ0NCk7DQo+ID4gK01PRFVMRV9QQVJNX0RFU0MocGFzaWRfcXVv
-dGEsDQo+ID4gKwkJICIgU2V0IHRoZSBxdW90YSBmb3IgbWF4IG51bWJlciBvZiBQQVNJRHMgdGhh
-dCBhbiBhcHBsaWNhdGlvbiBpcw0KPiBhbGxvd2VkIHRvIHJlcXVlc3QgKGRlZmF1bHQgMTAwMCki
-KTsNCj4gPiArDQo+ID4gK3N0cnVjdCB2ZmlvX21tX3Rva2VuIHsNCj4gPiArCXVuc2lnbmVkIGxv
-bmcgbG9uZyB2YWw7DQo+ID4gK307DQo+ID4gKw0KPiA+ICtzdHJ1Y3QgdmZpb19tbSB7DQo+ID4g
-KwlzdHJ1Y3Qga3JlZgkJa3JlZjsNCj4gPiArCWludAkJCWlvYXNpZF9zaWQ7DQo+ID4gKwlzdHJ1
-Y3QgbGlzdF9oZWFkCW5leHQ7DQo+ID4gKwlzdHJ1Y3QgdmZpb19tbV90b2tlbgl0b2tlbjsNCj4g
-PiArfTsNCj4gPiArDQo+ID4gK3N0YXRpYyBzdHJ1Y3QgdmZpb19wYXNpZCB7DQo+ID4gKwlzdHJ1
-Y3QgbXV0ZXgJCXZmaW9fbW1fbG9jazsNCj4gPiArCXN0cnVjdCBsaXN0X2hlYWQJdmZpb19tbV9s
-aXN0Ow0KPiA+ICt9IHZmaW9fcGFzaWQ7DQo+ID4gKw0KPiA+ICsvKiBjYWxsZWQgd2l0aCB2Zmlv
-LnZmaW9fbW1fbG9jayBoZWxkICovDQo+ID4gK3N0YXRpYyB2b2lkIHZmaW9fbW1fcmVsZWFzZShz
-dHJ1Y3Qga3JlZiAqa3JlZikNCj4gPiArew0KPiA+ICsJc3RydWN0IHZmaW9fbW0gKnZtbSA9IGNv
-bnRhaW5lcl9vZihrcmVmLCBzdHJ1Y3QgdmZpb19tbSwga3JlZik7DQo+ID4gKw0KPiA+ICsJbGlz
-dF9kZWwoJnZtbS0+bmV4dCk7DQo+ID4gKwltdXRleF91bmxvY2soJnZmaW9fcGFzaWQudmZpb19t
-bV9sb2NrKTsNCj4gPiArCWlvYXNpZF9mcmVlX3NldCh2bW0tPmlvYXNpZF9zaWQsIHRydWUpOw0K
-PiA+ICsJa2ZyZWUodm1tKTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArdm9pZCB2ZmlvX21tX3B1dChz
-dHJ1Y3QgdmZpb19tbSAqdm1tKQ0KPiA+ICt7DQo+ID4gKwlrcmVmX3B1dF9tdXRleCgmdm1tLT5r
-cmVmLCB2ZmlvX21tX3JlbGVhc2UsDQo+ICZ2ZmlvX3Bhc2lkLnZmaW9fbW1fbG9jayk7DQo+ID4g
-K30NCj4gPiArDQo+ID4gK3N0YXRpYyB2b2lkIHZmaW9fbW1fZ2V0KHN0cnVjdCB2ZmlvX21tICp2
-bW0pDQo+ID4gK3sNCj4gPiArCWtyZWZfZ2V0KCZ2bW0tPmtyZWYpOw0KPiA+ICt9DQo+ID4gKw0K
-PiA+ICtzdHJ1Y3QgdmZpb19tbSAqdmZpb19tbV9nZXRfZnJvbV90YXNrKHN0cnVjdCB0YXNrX3N0
-cnVjdCAqdGFzaykNCj4gPiArew0KPiA+ICsJc3RydWN0IG1tX3N0cnVjdCAqbW0gPSBnZXRfdGFz
-a19tbSh0YXNrKTsNCj4gPiArCXN0cnVjdCB2ZmlvX21tICp2bW07DQo+ID4gKwl1bnNpZ25lZCBs
-b25nIGxvbmcgdmFsID0gKHVuc2lnbmVkIGxvbmcgbG9uZykgbW07DQo+ID4gKwlpbnQgcmV0Ow0K
-PiA+ICsNCj4gPiArCW11dGV4X2xvY2soJnZmaW9fcGFzaWQudmZpb19tbV9sb2NrKTsNCj4gPiAr
-CS8qIFNlYXJjaCBleGlzdGluZyB2ZmlvX21tIHdpdGggY3VycmVudCBtbSBwb2ludGVyICovDQo+
-ID4gKwlsaXN0X2Zvcl9lYWNoX2VudHJ5KHZtbSwgJnZmaW9fcGFzaWQudmZpb19tbV9saXN0LCBu
-ZXh0KSB7DQo+ID4gKwkJaWYgKHZtbS0+dG9rZW4udmFsID09IHZhbCkgew0KPiA+ICsJCQl2Zmlv
-X21tX2dldCh2bW0pOw0KPiA+ICsJCQlnb3RvIG91dDsNCj4gPiArCQl9DQo+ID4gKwl9DQo+ID4g
-Kw0KPiA+ICsJdm1tID0ga3phbGxvYyhzaXplb2YoKnZtbSksIEdGUF9LRVJORUwpOw0KPiA+ICsJ
-aWYgKCF2bW0pIHsNCj4gPiArCQl2bW0gPSBFUlJfUFRSKC1FTk9NRU0pOw0KPiA+ICsJCWdvdG8g
-b3V0Ow0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArCS8qDQo+ID4gKwkgKiBJT0FTSUQgY29yZSBwcm92
-aWRlcyBhICdJT0FTSUQgc2V0JyBjb25jZXB0IHRvIHRyYWNrIGFsbA0KPiA+ICsJICogUEFTSURz
-IGFzc29jaWF0ZWQgd2l0aCBhIHRva2VuLiBIZXJlIHdlIHVzZSBtbV9zdHJ1Y3QgYXMNCj4gPiAr
-CSAqIHRoZSB0b2tlbiBhbmQgY3JlYXRlIGEgSU9BU0lEIHNldCBwZXIgbW1fc3RydWN0LiBBbGwg
-dGhlDQo+ID4gKwkgKiBjb250YWluZXJzIG9mIHRoZSBwcm9jZXNzIHNoYXJlIHRoZSBzYW1lIElP
-QVNJRCBzZXQuDQo+ID4gKwkgKi8NCj4gPiArCXJldCA9IGlvYXNpZF9hbGxvY19zZXQoKHN0cnVj
-dCBpb2FzaWRfc2V0ICopIG1tLCBwYXNpZF9xdW90YSwNCj4gPiArCQkJICAgICAgICZ2bW0tPmlv
-YXNpZF9zaWQpOw0KPiA+ICsJaWYgKHJldCkgew0KPiA+ICsJCWtmcmVlKHZtbSk7DQo+ID4gKwkJ
-dm1tID0gRVJSX1BUUihyZXQpOw0KPiA+ICsJCWdvdG8gb3V0Ow0KPiA+ICsJfQ0KPiA+ICsNCj4g
-PiArCWtyZWZfaW5pdCgmdm1tLT5rcmVmKTsNCj4gPiArCXZtbS0+dG9rZW4udmFsID0gdmFsOw0K
-PiA+ICsNCj4gPiArCWxpc3RfYWRkKCZ2bW0tPm5leHQsICZ2ZmlvX3Bhc2lkLnZmaW9fbW1fbGlz
-dCk7DQo+ID4gK291dDoNCj4gPiArCW11dGV4X3VubG9jaygmdmZpb19wYXNpZC52ZmlvX21tX2xv
-Y2spOw0KPiA+ICsJbW1wdXQobW0pOw0KPiA+ICsJcmV0dXJuIHZtbTsNCj4gPiArfQ0KPiA+ICsN
-Cj4gPiAraW50IHZmaW9fcGFzaWRfYWxsb2Moc3RydWN0IHZmaW9fbW0gKnZtbSwgaW50IG1pbiwg
-aW50IG1heCkNCj4gPiArew0KPiA+ICsJaW9hc2lkX3QgcGFzaWQ7DQo+ID4gKw0KPiA+ICsJcGFz
-aWQgPSBpb2FzaWRfYWxsb2Modm1tLT5pb2FzaWRfc2lkLCBtaW4sIG1heCwgTlVMTCk7DQo+ID4g
-Kw0KPiA+ICsJcmV0dXJuIChwYXNpZCA9PSBJTlZBTElEX0lPQVNJRCkgPyAtRU5PU1BDIDogcGFz
-aWQ7DQo+ID4gK30NCj4gPiArDQo+ID4gK3ZvaWQgdmZpb19wYXNpZF9mcmVlX3JhbmdlKHN0cnVj
-dCB2ZmlvX21tICp2bW0sDQo+ID4gKwkJCSAgICBpb2FzaWRfdCBtaW4sIGlvYXNpZF90IG1heCkN
-Cj4gPiArew0KPiA+ICsJaW9hc2lkX3QgcGFzaWQgPSBtaW47DQo+ID4gKw0KPiA+ICsJaWYgKG1p
-biA+IG1heCkNCj4gPiArCQlyZXR1cm47DQo+IG5pdDogaXMgdGhhdCBjaGVjayByZWFsbHkgdXNl
-ZnVsPw0KDQpsb29rcyB0byBiZSBkdXBsaWNhdGUgYXMgdmZpb19pb21tdV90eXBlMV9wYXNpZF9y
-ZXF1ZXN0KCkgaGFzDQpkb25lIGl0IGFzIHdlbGwuIHdpbGwgcmVtb3ZlIGl0Lg0KDQo+ID4gKw0K
-PiA+ICsJLyoNCj4gPiArCSAqIElPQVNJRCBjb3JlIHdpbGwgbm90aWZ5IFBBU0lEIHVzZXJzIChl
-LmcuIElPTU1VIGRyaXZlcikgdG8NCj4gPiArCSAqIHRlYXJkb3duIG5lY2Vzc2FyeSBzdHJ1Y3R1
-cmVzIGRlcGVuZGluZyBvbiB0aGUgdG8tYmUtZnJlZWQNCj4gPiArCSAqIFBBU0lELg0KPiA+ICsJ
-ICovDQo+ID4gKwlmb3IgKDsgcGFzaWQgPD0gbWF4OyBwYXNpZCsrKQ0KPiA+ICsJCWlvYXNpZF9m
-cmVlKHBhc2lkKTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIGludCBfX2luaXQgdmZpb19w
-YXNpZF9pbml0KHZvaWQpDQo+ID4gK3sNCj4gPiArCW11dGV4X2luaXQoJnZmaW9fcGFzaWQudmZp
-b19tbV9sb2NrKTsNCj4gPiArCUlOSVRfTElTVF9IRUFEKCZ2ZmlvX3Bhc2lkLnZmaW9fbW1fbGlz
-dCk7DQo+ID4gKwlyZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIHZvaWQgX19l
-eGl0IHZmaW9fcGFzaWRfZXhpdCh2b2lkKQ0KPiA+ICt7DQo+ID4gKwlXQVJOX09OKCFsaXN0X2Vt
-cHR5KCZ2ZmlvX3Bhc2lkLnZmaW9fbW1fbGlzdCkpOw0KPiBJcyBpdCBhY2NlcHRhYmxlPyBEb24n
-dCB5b3UgbmVlZCB0byBjbGVhbnVwIGV2ZXJ5dGhpbmcgaGVyZSBpbnN0ZWFkPw0KDQpJIGd1ZXNz
-IHllcy4gVkZJT19QQVNJRCBpcyBzdXBwb3NlZCB0byBiZSByZWZlcmVuY2VkIGJ5IFZGSU9fSU9N
-TVVfVFlQRTENCmFuZCBtYXkgYmUgb3RoZXIgbW9kdWxlLiBvbmNlIHZmaW9fcGFzaWRfZXhpdCgp
-IGlzIHRyaWdnZXJlZCwgdGhhdCBtZWFucw0KaXRzIHVzZXIgKFZGSU9fSU9NTVVfVFlQRTEpIGhh
-cyBiZWVuIHJlbW92ZWQuIFNob3VsZCBhbGwgdGhlIHZmaW9fbW0NCmluc3RhbmNlcyBzaG91bGQg
-aGF2ZSBiZWVuIHJlbGVhc2VkLiBJZiBub3QsIG1lYW5zIHRoZXJlIGlzIHZmaW9fbW0gbGVhaywN
-CnNob3VsZCBiZSBhIGJ1ZyBvZiB1c2VyIG1vZHVsZS4NCg0KUmVnYXJkcywNCllpIExpdQ0KDQo+
-IFRoYW5rcw0KPiANCj4gRXJpYw0KPiA+ICt9DQo+ID4gKw0KPiA+ICttb2R1bGVfaW5pdCh2Zmlv
-X3Bhc2lkX2luaXQpOw0KPiA+ICttb2R1bGVfZXhpdCh2ZmlvX3Bhc2lkX2V4aXQpOw0KPiA+ICsN
-Cj4gPiArTU9EVUxFX1ZFUlNJT04oRFJJVkVSX1ZFUlNJT04pOw0KPiA+ICtNT0RVTEVfTElDRU5T
-RSgiR1BMIHYyIik7DQo+ID4gK01PRFVMRV9BVVRIT1IoRFJJVkVSX0FVVEhPUik7DQo+ID4gK01P
-RFVMRV9ERVNDUklQVElPTihEUklWRVJfREVTQyk7DQo+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
-bGludXgvdmZpby5oIGIvaW5jbHVkZS9saW51eC92ZmlvLmgNCj4gPiBpbmRleCAzOGQzYzZhLi45
-ZGE2NDY4IDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbGludXgvdmZpby5oDQo+ID4gKysrIGIv
-aW5jbHVkZS9saW51eC92ZmlvLmgNCj4gPiBAQCAtOTcsNiArOTcsMzQgQEAgZXh0ZXJuIGludCB2
-ZmlvX3JlZ2lzdGVyX2lvbW11X2RyaXZlcihjb25zdCBzdHJ1Y3QNCj4gdmZpb19pb21tdV9kcml2
-ZXJfb3BzICpvcHMpOw0KPiA+ICBleHRlcm4gdm9pZCB2ZmlvX3VucmVnaXN0ZXJfaW9tbXVfZHJp
-dmVyKA0KPiA+ICAJCQkJY29uc3Qgc3RydWN0IHZmaW9faW9tbXVfZHJpdmVyX29wcyAqb3BzKTsN
-Cj4gPg0KPiA+ICtzdHJ1Y3QgdmZpb19tbTsNCj4gPiArI2lmIElTX0VOQUJMRUQoQ09ORklHX1ZG
-SU9fUEFTSUQpDQo+ID4gK2V4dGVybiBzdHJ1Y3QgdmZpb19tbSAqdmZpb19tbV9nZXRfZnJvbV90
-YXNrKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzayk7DQo+ID4gK2V4dGVybiB2b2lkIHZmaW9fbW1f
-cHV0KHN0cnVjdCB2ZmlvX21tICp2bW0pOw0KPiA+ICtleHRlcm4gaW50IHZmaW9fcGFzaWRfYWxs
-b2Moc3RydWN0IHZmaW9fbW0gKnZtbSwgaW50IG1pbiwgaW50IG1heCk7DQo+ID4gK2V4dGVybiB2
-b2lkIHZmaW9fcGFzaWRfZnJlZV9yYW5nZShzdHJ1Y3QgdmZpb19tbSAqdm1tLA0KPiA+ICsJCQkJ
-CWlvYXNpZF90IG1pbiwgaW9hc2lkX3QgbWF4KTsNCj4gPiArI2Vsc2UNCj4gPiArc3RhdGljIGlu
-bGluZSBzdHJ1Y3QgdmZpb19tbSAqdmZpb19tbV9nZXRfZnJvbV90YXNrKHN0cnVjdCB0YXNrX3N0
-cnVjdCAqdGFzaykNCj4gPiArew0KPiA+ICsJcmV0dXJuIEVSUl9QVFIoLUVOT1RUWSk7DQo+ID4g
-K30NCj4gPiArDQo+ID4gK3N0YXRpYyBpbmxpbmUgdm9pZCB2ZmlvX21tX3B1dChzdHJ1Y3QgdmZp
-b19tbSAqdm1tKQ0KPiA+ICt7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyBpbmxpbmUgaW50
-IHZmaW9fcGFzaWRfYWxsb2Moc3RydWN0IHZmaW9fbW0gKnZtbSwgaW50IG1pbiwgaW50IG1heCkN
-Cj4gPiArew0KPiA+ICsJcmV0dXJuIC1FTk9UVFk7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRp
-YyBpbmxpbmUgdm9pZCB2ZmlvX3Bhc2lkX2ZyZWVfcmFuZ2Uoc3RydWN0IHZmaW9fbW0gKnZtbSwN
-Cj4gPiArCQkJCQkgIGlvYXNpZF90IG1pbiwgaW9hc2lkX3QgbWF4KQ0KPiA+ICt7DQo+ID4gK30N
-Cj4gPiArI2VuZGlmIC8qIENPTkZJR19WRklPX1BBU0lEICovDQo+ID4gKw0KPiA+ICAvKg0KPiA+
-ICAgKiBFeHRlcm5hbCB1c2VyIEFQSQ0KPiA+ICAgKi8NCj4gPg0KPiBUaGFua3MNCj4gDQo+IEVy
-aWMNCg0K
+On Tue,  7 Jul 2020 10:44:37 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> S390, protecting the guest memory against unauthorized host access
+> needs to enforce VIRTIO I/O device protection through the use of
+> VIRTIO_F_VERSION_1 and VIRTIO_F_IOMMU_PLATFORM.
+
+Hm... what about:
+
+"If protected virtualization is active on s390, the virtio queues are
+not accessible to the host, unless VIRTIO_F_IOMMU_PLATFORM has been
+negotiated. Use the new arch_validate_virtio_features() interface to
+enforce this."
+
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  arch/s390/kernel/uv.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+> 
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index c296e5c8dbf9..106330f6eda1 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/memblock.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/swap.h>
+> +#include <linux/virtio_config.h>
+>  #include <asm/facility.h>
+>  #include <asm/sections.h>
+>  #include <asm/uv.h>
+> @@ -413,3 +414,27 @@ static int __init uv_info_init(void)
+>  }
+>  device_initcall(uv_info_init);
+>  #endif
+> +
+> +/*
+> + * arch_validate_virtio_iommu_platform
+
+s/arch_validate_virtio_iommu_platform/arch_validate_virtio_features/
+
+> + * @dev: the VIRTIO device being added
+> + *
+> + * Return value: returns -ENODEV if any features of the
+> + *               device breaks the protected virtualization
+> + *               0 otherwise.
+
+I don't think you need to specify the contract here: that belongs to
+the definition in the virtio core. What about simply adding a sentence
+"Return an error if required features are missing on a guest running
+with protected virtualization." ?
+
+> + */
+> +int arch_validate_virtio_features(struct virtio_device *dev)
+> +{
+
+Maybe jump out immediately if the guest is not protected?
+
+> +	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
+> +		dev_warn(&dev->dev, "device must provide VIRTIO_F_VERSION_1\n");
+> +		return is_prot_virt_guest() ? -ENODEV : 0;
+> +	}
+> +
+> +	if (!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
+> +		dev_warn(&dev->dev,
+> +			 "device must provide VIRTIO_F_IOMMU_PLATFORM\n");
+> +		return is_prot_virt_guest() ? -ENODEV : 0;
+> +	}
+
+if (!is_prot_virt_guest())
+	return 0;
+
+if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1)) {
+	dev_warn(&dev->dev,
+                 "legacy virtio is incompatible with protected guests");
+	return -ENODEV;
+}
+
+if (!virtio_has_feature(dev, VIRTIO_F_IOMMU_PLATFORM)) {
+	dev_warn(&dev->dev,
+		 "device does not work with limited memory access in protected guests");
+	return -ENODEV;
+}
+
+> +
+> +	return 0;
+> +}
+
