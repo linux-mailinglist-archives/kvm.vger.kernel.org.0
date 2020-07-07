@@ -2,121 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9B5E21663E
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 08:11:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FCCD216647
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 08:17:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726540AbgGGGLH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 02:11:07 -0400
-Received: from mga11.intel.com ([192.55.52.93]:46685 "EHLO mga11.intel.com"
+        id S1727094AbgGGGRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 02:17:34 -0400
+Received: from mga05.intel.com ([192.55.52.43]:1426 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725825AbgGGGLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 02:11:07 -0400
-IronPort-SDR: p0PIgJrCUjLrCw3eYmG7Qwf6TMQF1mEERDcY4k5Xsw/TI0gyOQ6rtcg0Jzhum+ZI34+K66Y1fw
- 7Wi47KhbmHfw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="145643551"
+        id S1725974AbgGGGRd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 02:17:33 -0400
+IronPort-SDR: u3dzJVe6oCRt/JWaMZ3pQv9EAN7l/6jYheOuj/SaYbL0C0ASJTl+RKMPYzDlRYIaxjmdtzykCD
+ l7VpVKZs1DrQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="232405481"
 X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
-   d="scan'208";a="145643551"
+   d="scan'208";a="232405481"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 23:11:06 -0700
-IronPort-SDR: Ic5QahZia01aDkIbIo2DsFJbqUaDAzcEjxU8uOBOuZYpCMIDaWYZ82c/A4btsliPneit15TAbl
- P7YTbI4R6aig==
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 23:17:32 -0700
+IronPort-SDR: N34W45B6rEEFTRZ/LgN7qlqRSKG4prvchZenPMGgmsPkxFy9npsOpMiUq7PlQMuhJ4fs58ed5R
+ tNn+oUBx9vQg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
-   d="scan'208";a="305542613"
+   d="scan'208";a="357684608"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
-  by fmsmga004.fm.intel.com with ESMTP; 06 Jul 2020 23:11:06 -0700
-Date:   Mon, 6 Jul 2020 23:11:05 -0700
+  by orsmga001.jf.intel.com with ESMTP; 06 Jul 2020 23:17:32 -0700
+Date:   Mon, 6 Jul 2020 23:17:32 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        linux-kernel@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] kvm: x86: rewrite kvm_spec_ctrl_valid_bits
-Message-ID: <20200707061105.GH5208@linux.intel.com>
-References: <20200702174455.282252-1-mlevitsk@redhat.com>
- <20200702181606.GF3575@linux.intel.com>
- <3793ae0da76fe00036ed0205b5ad8f1653f58ef2.camel@redhat.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>
+Subject: Re: [PATCH v10 02/14] KVM: Cache as_id in kvm_memory_slot
+Message-ID: <20200707061732.GI5208@linux.intel.com>
+References: <20200601115957.1581250-1-peterx@redhat.com>
+ <20200601115957.1581250-3-peterx@redhat.com>
+ <20200702230849.GL3575@linux.intel.com>
+ <20200703184122.GF6677@xz-x1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3793ae0da76fe00036ed0205b5ad8f1653f58ef2.camel@redhat.com>
+In-Reply-To: <20200703184122.GF6677@xz-x1>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jul 05, 2020 at 12:40:25PM +0300, Maxim Levitsky wrote:
-> > Rather than compute the mask every time, it can be computed once on module
-> > load and stashed in a global.  Note, there's a RFC series[*] to support
-> > reprobing bugs at runtime, but that has bigger issues with existing KVM
-> > functionality to be addressed, i.e. it's not our problem, yet :-).
+On Fri, Jul 03, 2020 at 02:41:22PM -0400, Peter Xu wrote:
+> On Thu, Jul 02, 2020 at 04:08:49PM -0700, Sean Christopherson wrote:
+> > On Mon, Jun 01, 2020 at 07:59:45AM -0400, Peter Xu wrote:
+> > > Cache the address space ID just like the slot ID.  It will be used in
+> > > order to fill in the dirty ring entries.
+> > > 
+> > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  include/linux/kvm_host.h | 1 +
+> > >  virt/kvm/kvm_main.c      | 1 +
+> > >  2 files changed, 2 insertions(+)
+> > > 
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index 01276e3d01b9..5e7bbaf7a36b 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -346,6 +346,7 @@ struct kvm_memory_slot {
+> > >  	unsigned long userspace_addr;
+> > >  	u32 flags;
+> > >  	short id;
+> > > +	u16 as_id;
+> > >  };
+> > >  
+> > >  static inline unsigned long kvm_dirty_bitmap_bytes(struct kvm_memory_slot *memslot)
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index 74bdb7bf3295..ebdd98a30e82 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -1243,6 +1243,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > >  	if (!mem->memory_size)
+> > >  		return kvm_delete_memslot(kvm, mem, &old, as_id);
 > > 
-> > [*] https://lkml.kernel.org/r/1593703107-8852-1-git-send-email-mihai.carabas@oracle.com
+> > This technically needs to set as_id in the deleted memslot.  I highly doubt
+> > it will ever matter from a functionality perspective, but it'd be confusing
+> > to encounter a memslot whose as_id did not match that of its owner.
 > 
-> Thanks for the pointer!
->  
-> Note though that the above code only runs once, since after a single
-> successful (non #GP) set of it to non-zero value, it is cleared in MSR bitmap
-> for both reads and writes on both VMX and SVM.
+> Yeah it shouldn't matter because as_id is directly passed in to look up the
+> pointer of kvm_memslots in kvm_delete_memslot, and memslot->as_id shouldn't be
+> further referenced.
+> 
+> I can add a comment above if this can clarify things a bit:
+> 
+> +	u16 as_id; /* cache of as_id; only valid if npages != 0 */
 
-For me the performance is secondary to documenting the fact that the host
-valid bits are fixed for a given instance of the kernel.  There's enough
-going on in kvm_spec_ctrl_valid_bits_host() that's it's not super easy to
-see that it's a "constant" value.
-
-> This is done because of performance reasons which in this case are more
-> important than absolute correctness.  Thus to some extent the guest checks in
-> the above are pointless.
->  
-> If you ask me, I would just remove the kvm_spec_ctrl_valid_bits, and pass
-> this msr to guest right away and not on first access.
-
-That would unnecessarily penalize guests that don't utilize the MSR as KVM
-would need to do a RDMSR on every VM-Exit to grab the guest's value.
-
-One oddity with this whole thing is that by passing through the MSR, KVM is
-allowing the guest to write bits it doesn't know about, which is definitely
-not normal.  It also means the guest could write bits that the host VMM
-can't.
-
-Somehwat crazy idea inbound... rather than calculating the valid bits in
-software, what if we throw the value at the CPU and see if it fails?  At
-least that way the host and guest are subject to the same rules.  E.g.
-
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2062,11 +2062,19 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-                    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
-                        return 1;
-
--               if (data & ~kvm_spec_ctrl_valid_bits(vcpu))
--                       return 1;
--
-+               ret = 0;
-                vmx->spec_ctrl = data;
--               if (!data)
-+
-+               local_irq_disable();
-+               if (rdmsrl_safe(MSR_IA32_SPEC_CTRL, &data))
-+                       ret = 1;
-+               else if (wrmsrl_safe(MSR_IA32_SPEC_CTRL, vmx->spec_ctrl))
-+                       ret = 1;
-+               else
-+                       wrmsrl(MSR_IA32_SPEC_CTRL, data))
-+               local_irq_enable();
-+
-+               if (ret || !vmx->spec_ctrl)
-                        break;
-
-                /*
-
+Why not just set it?  It's a single line of code, and there's more than one
+"shouldn't" in the above.
