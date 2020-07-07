@@ -2,186 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 826E0216A8E
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 12:40:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55E05216A99
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 12:42:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728329AbgGGKjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 06:39:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15960 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728303AbgGGKjy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 06:39:54 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 067AXC68125215;
-        Tue, 7 Jul 2020 06:39:50 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324hfqt9ph-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 06:39:49 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 067Aa30U136538;
-        Tue, 7 Jul 2020 06:39:49 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324hfqt9ns-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 06:39:49 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 067AZnnd028259;
-        Tue, 7 Jul 2020 10:39:47 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 322hd7uata-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 10:39:47 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 067Adihw64553450
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Jul 2020 10:39:44 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 50586A405B;
-        Tue,  7 Jul 2020 10:39:44 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 71D0FA4060;
-        Tue,  7 Jul 2020 10:39:43 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.29.12])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Jul 2020 10:39:43 +0000 (GMT)
-Subject: Re: [PATCH v4 1/2] virtio: let arch validate VIRTIO features
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-References: <1594111477-15401-1-git-send-email-pmorel@linux.ibm.com>
- <1594111477-15401-2-git-send-email-pmorel@linux.ibm.com>
- <20200707112652.42fcab80.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <7bdd36e4-a626-18e0-bc7a-fe1fe1b877d8@linux.ibm.com>
-Date:   Tue, 7 Jul 2020 12:39:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <20200707112652.42fcab80.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-07_06:2020-07-07,2020-07-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- clxscore=1015 cotscore=-2147483648 lowpriorityscore=0 adultscore=0
- mlxlogscore=999 priorityscore=1501 phishscore=0 mlxscore=0 spamscore=0
- suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007070081
+        id S1727120AbgGGKmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 06:42:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47602 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726911AbgGGKmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 06:42:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594118535;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=d/Cdj0P/nQnhxHtwDM4v2QMTaKgZjzQY/xCQv2QzIBo=;
+        b=XMJguhhlRhUO/H8jdwliCb4EBO4kCK9wiOUNJXuzH5P7q7AqlFzt1rfCdcKWceAPCZ2cir
+        wRVxIccVGRhhkBfktqqx9juzPTIRwzxXdEyXu3//BNo740sW7eGwCjTzxnnK/2u5buDBlH
+        ZU/2EBYBBZwN6SyO7W3/bz2kFQRiXCI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-6UQ-BGgAO-ucpzXuoZDGJg-1; Tue, 07 Jul 2020 06:42:13 -0400
+X-MC-Unique: 6UQ-BGgAO-ucpzXuoZDGJg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E953319253CD;
+        Tue,  7 Jul 2020 10:42:11 +0000 (UTC)
+Received: from thuth.com (ovpn-112-77.ams2.redhat.com [10.36.112.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5046B5F7D8;
+        Tue,  7 Jul 2020 10:42:07 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [kvm-unit-tests v2 PATCH] s390x/cpumodel: The missing DFP facility on TCG is expected
+Date:   Tue,  7 Jul 2020 12:42:05 +0200
+Message-Id: <20200707104205.25085-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+When running the kvm-unit-tests with TCG on s390x, the cpumodel test
+always reports the error about the missing DFP (decimal floating point)
+facility. This is kind of expected, since DFP is not required for
+running Linux and thus nobody is really interested in implementing
+this facility in TCG. Thus let's mark this as an expected error instead,
+so that we can run the kvm-unit-tests also with TCG without getting
+test failures that we do not care about.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2:
+ - Rewrote the logic, introduced expected_tcg_fail flag
+ - Use manufacturer string instead of VM name to detect TCG
 
-On 2020-07-07 11:26, Cornelia Huck wrote:
-> On Tue,  7 Jul 2020 10:44:36 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> An architecture may need to validate the VIRTIO devices features
->> based on architecture specificities.
-> 
-> s/specifities/specifics/
+ s390x/cpumodel.c | 49 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 43 insertions(+), 6 deletions(-)
 
-OK
-
-> 
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   drivers/virtio/virtio.c       | 19 +++++++++++++++++++
->>   include/linux/virtio_config.h |  1 +
->>   2 files changed, 20 insertions(+)
->>
->> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
->> index a977e32a88f2..3179a8aa76f5 100644
->> --- a/drivers/virtio/virtio.c
->> +++ b/drivers/virtio/virtio.c
->> @@ -167,6 +167,21 @@ void virtio_add_status(struct virtio_device *dev, unsigned int status)
->>   }
->>   EXPORT_SYMBOL_GPL(virtio_add_status);
->>   
->> +/*
->> + * arch_needs_virtio_iommu_platform - provide arch specific hook when finalizing
-> 
-> s/arch_needs_virtio_iommu_platform/arch_validate_virtio_features/
-> 
-> :)
-
-grrr... yes.
-
-> 
->> + *				      features for VIRTIO device dev
->> + * @dev: the VIRTIO device being added
->> + *
->> + * Permits the platform to provide architecture specific functionality when
-> 
-> s/provide architecture specific functionality/handle architecture-specific requirements/
-> 
-> ?
-
-better, thanks.
-
-> 
->> + * devices features are finalized. This is the default implementation.
-> 
-> s/devices/device/
-
-yes.
-
-> 
->> + * Architecture implementations can override this.
->> + */
->> +
->> +int __weak arch_validate_virtio_features(struct virtio_device *dev)
->> +{
->> +	return 0;
->> +}
->> +
->>   int virtio_finalize_features(struct virtio_device *dev)
->>   {
->>   	int ret = dev->config->finalize_features(dev);
->> @@ -176,6 +191,10 @@ int virtio_finalize_features(struct virtio_device *dev)
->>   	if (ret)
->>   		return ret;
->>   
->> +	ret = arch_validate_virtio_features(dev);
->> +	if (ret)
->> +		return ret;
->> +
->>   	if (!virtio_has_feature(dev, VIRTIO_F_VERSION_1))
->>   		return 0;
->>   
->> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
->> index bb4cc4910750..3f4117adf311 100644
->> --- a/include/linux/virtio_config.h
->> +++ b/include/linux/virtio_config.h
->> @@ -459,4 +459,5 @@ static inline void virtio_cwrite64(struct virtio_device *vdev,
->>   		_r;							\
->>   	})
->>   
->> +int arch_validate_virtio_features(struct virtio_device *dev);
->>   #endif /* _LINUX_VIRTIO_CONFIG_H */
-> 
-> With the wording fixed,
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
-
-Thanks for the review.
-
-regards,
-Pierre
-
-
+diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
+index 5d232c6..190ceb2 100644
+--- a/s390x/cpumodel.c
++++ b/s390x/cpumodel.c
+@@ -11,14 +11,19 @@
+  */
+ 
+ #include <asm/facility.h>
++#include <alloc_page.h>
+ 
+-static int dep[][2] = {
++static struct {
++	int facility;
++	int implied;
++	bool expected_tcg_fail;
++} dep[] = {
+ 	/* from SA22-7832-11 4-98 facility indications */
+ 	{   4,   3 },
+ 	{   5,   3 },
+ 	{   5,   4 },
+ 	{  19,  18 },
+-	{  37,  42 },
++	{  37,  42, true },  /* TCG does not have DFP and won't get it soon */
+ 	{  43,  42 },
+ 	{  73,  49 },
+ 	{ 134, 129 },
+@@ -38,6 +43,36 @@ static int dep[][2] = {
+ 	{ 155,  77 },
+ };
+ 
++/*
++ * A hack to detect TCG (instead of KVM): QEMU uses "TCGguest" as guest
++ * name by default when we are running with TCG (otherwise it's "KVMguest")
++ */
++static bool is_tcg(void)
++{
++	const char qemu_ebcdic[] = { 0xd8, 0xc5, 0xd4, 0xe4 };
++	bool ret = false;
++	uint8_t *buf;
++
++	buf = alloc_page();
++	if (!buf)
++		return false;
++
++	if (stsi(buf, 1, 1, 1)) {
++		goto out;
++	}
++
++	/*
++	 * If the manufacturer string is "QEMU" in EBCDIC, then we are on TCG
++	 * (otherwise the string is "IBM" in EBCDIC)
++	 */
++	if (!memcmp(&buf[32], qemu_ebcdic, sizeof(qemu_ebcdic)))
++		ret =  true;
++out:
++	free_page(buf);
++	return ret;
++}
++
++
+ int main(void)
+ {
+ 	int i;
+@@ -46,11 +81,13 @@ int main(void)
+ 
+ 	report_prefix_push("dependency");
+ 	for (i = 0; i < ARRAY_SIZE(dep); i++) {
+-		if (test_facility(dep[i][0])) {
+-			report(test_facility(dep[i][1]), "%d implies %d",
+-				dep[i][0], dep[i][1]);
++		if (test_facility(dep[i].facility)) {
++			report_xfail(dep[i].expected_tcg_fail && is_tcg(),
++				     test_facility(dep[i].implied),
++				     "%d implies %d",
++				     dep[i].facility, dep[i].implied);
+ 		} else {
+-			report_skip("facility %d not present", dep[i][0]);
++			report_skip("facility %d not present", dep[i].facility);
+ 		}
+ 	}
+ 	report_prefix_pop();
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.18.1
+
