@@ -2,120 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E224216240
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 01:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 580F9216303
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 02:34:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbgGFX0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 19:26:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54350 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbgGFX0a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 19:26:30 -0400
-Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 971D4C061755
-        for <kvm@vger.kernel.org>; Mon,  6 Jul 2020 16:26:30 -0700 (PDT)
-Received: by mail-il1-x144.google.com with SMTP id r12so27220219ilh.4
-        for <kvm@vger.kernel.org>; Mon, 06 Jul 2020 16:26:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=pKPWHJBxnfYVFfiSt6IAtpeBP5q3hqa9XDCGu7gSuaE=;
-        b=gNyZsNZj5tiwq6fyTkcI1bHnWVM+5FjB2m/8ITKdLoR/1c0ramwqJyIDG3vFBXivcm
-         8t/y9nw9eDMazCM2NcAs4kqFyQEpcVsfcbJyRPE0IDbB/Mf9umfprulLebCdG64AqLHv
-         LrCm278+QNaYRAdSOXhK1WTTRkDFNwwdwRaDf1aqKvWx/T1GlNWf3wTRBQTfpqLQ5QYR
-         RRoZqNmVY15L+SgRLBGES8QBtnIRkxe1ALPnKfd4p8+UzYjYEnvw4ftaU+bcDM3Jc8Nw
-         6vNoVySewSBNamxJQIQ8Y58GPqdbdTi38/gRIBs0y0qJt34uMwt4AwChk2fu2eih1sYZ
-         7zeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=pKPWHJBxnfYVFfiSt6IAtpeBP5q3hqa9XDCGu7gSuaE=;
-        b=JiiG3GeNG8AWSJcRRBHdFIyYvr3ZZY0bh5/quJBS1LImJ7dCeJjNMMSkTozUyYbdez
-         AX/WHd0GGfwOTVrpTljlfF9C8tQEqWoBBEYzFOI5YlfAQ4SZJ34Gjp8CUHFMl42Mmv5l
-         vyQE80F50p0hf/fb14iBk8LFA6csJrX3bBsAkTgJExQxWitrD6nPHXQT/6dacCofW3BD
-         ouh0S7w8K7h728S3gNxuMfD9+fY0sWUATK0vgTMrLhflB7ky2/VQc8LvKwg+qa1EHYEw
-         PHhP82xGGwtuxUhV+4LKh7Fb48/zq2f9+XSHwl9MFSk22FeZ/PkZg6+8Uw/f8dPWJ883
-         2Rvg==
-X-Gm-Message-State: AOAM531vu0dcD+h3xnR3/iMHSpXoluMM1DtAsXFa3dA3WGdUeC5BoAVw
-        rgB3StO2P+pP2aDjjR/0X7NV3ALg77ebT4Pw/kySfdwU
-X-Google-Smtp-Source: ABdhPJzpWOoqKP7PWOl7GUOvjxzF9K988L6oix5Rl56b3+GGdwUg3bdIYmKL8E9MQVH0s+jh/f0ZUEGIV5V/DQqJ5Bc=
-X-Received: by 2002:a92:aac8:: with SMTP id p69mr33880879ill.26.1594077989648;
- Mon, 06 Jul 2020 16:26:29 -0700 (PDT)
+        id S1726591AbgGGAeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 20:34:21 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:57166 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726467AbgGGAeT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 20:34:19 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0670WY21046067;
+        Tue, 7 Jul 2020 00:34:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=RTv/6XDovWSvRfYSHR1dcRBY8X/+09W2o7nvuDMFGNI=;
+ b=s+rvaUjbyW3PySo4VM9banLFyeUEJihLZkSuN+AvTCGLXSWrudNSxdQWDyY39FyMte7C
+ DYYJpiF75xOLWDCzvVoVgchqFQYtEB/idQ57vm9ZuU9ItuBLLPPOfC0qixXgRqK9V38b
+ 46aopXtzVxSvgYkqHF4yCGcCPrDmCFjX95RhnIfiZJW++XwUFktQUec2sCS7U65XVyAm
+ FdS1qFWLCNjVuvBy4V+4MQgi4DRFY7sWXsYTiAS3zuAsrT33dOEuw4rKcZ4FOesx88NV
+ v07bcW/9NvYl4zX15BbbPvpax2RfX3Rlw5Zf0OGyJHbOzBLxpa/50WQR1QbhL6YgfPxz Ow== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 322kv699eb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 07 Jul 2020 00:34:16 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0670YAL9074850;
+        Tue, 7 Jul 2020 00:34:15 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 3233pw6yjx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 Jul 2020 00:34:15 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0670YEwU025451;
+        Tue, 7 Jul 2020 00:34:14 GMT
+Received: from localhost.localdomain (/10.159.144.242)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 06 Jul 2020 17:34:14 -0700
+Subject: Re: [PATCH 0/3 v3] KVM: nSVM: Check MBZ bits in CR3 and CR4 on vmrun
+ of nested guests
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20200515053609.3347-1-krish.sadhukhan@oracle.com>
+ <fff40d79-1731-2f24-227a-bf57e8e33b97@oracle.com>
+ <b2276167-0bda-0b31-85c0-63a3a0b789bd@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <4b0fd4e7-465a-428f-c906-ddf0ad367cbb@oracle.com>
+Date:   Mon, 6 Jul 2020 17:34:08 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <DAFEA995-CFBA-4466-989B-D63466815AB1@gmail.com>
- <f297ebf8-15b8-57d3-4c56-fdf3f5d16b9d@redhat.com> <2B43FBC4-D265-4005-8FBA-870BDC627231@gmail.com>
-In-Reply-To: <2B43FBC4-D265-4005-8FBA-870BDC627231@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 6 Jul 2020 16:26:18 -0700
-Message-ID: <CALMp9eTDCDNctpso23uv+gM0QZUEBzMw47-M9JfNaG79fusa2A@mail.gmail.com>
-Subject: Re: Question regarding nested_svm_inject_npf_exit()
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <b2276167-0bda-0b31-85c0-63a3a0b789bd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9674 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2007070001
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9674 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=999 phishscore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 mlxscore=0 adultscore=0
+ cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2007070001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jul 5, 2020 at 7:12 PM Nadav Amit <nadav.amit@gmail.com> wrote:
->
-> > On Jul 4, 2020, at 11:38 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 04/07/20 02:00, Nadav Amit wrote:
-> >> Hello Paolo,
-> >>
-> >> I encountered an issue while running some svm tests. Apparently, the t=
-ests
-> >> =E2=80=9Cnpt_rw_pfwalk=E2=80=9D and =E2=80=9Cnpt_rsv_pfwalk=E2=80=9D e=
-xpect the present bit to be clear.
-> >>
-> >> KVM indeed clears this bit in nested_svm_inject_npf_exit():
-> >>
-> >>       /*
-> >>        * The present bit is always zero for page structure faults on r=
-eal
-> >>        * hardware.
-> >>        */
-> >>       if (svm->vmcb->control.exit_info_1 & (2ULL << 32))
-> >>               svm->vmcb->control.exit_info_1 &=3D ~1;
-> >>
-> >>
-> >> I could not find documentation of this behavior. Unfortunately, I do n=
-ot
-> >> have a bare-metal AMD machine to test the behavior (and some enabling =
-of
-> >> kvm-unit-tests/svm is required, e.g. this test does not run with more =
-than
-> >> 4GB of memory).
-> >>
-> >> Are you sure that this is the way AMD machines behave?
-> >
-> > No, I'm not.  The code was added when NPF was changed to synthesize
-> > EXITINFO1, instead of simply propagating L0's EXITINFO1 into L1 (see
-> > commit 5e3525195196, "KVM: nSVM: propagate the NPF EXITINFO to the
-> > guest", 2014-09-03).  With six more years of understanding of KVM, the
-> > lack of a present bit might well have been a consequence of how the MMU
-> > works.
->
-> Thanks. I ran =E2=80=98git blame=E2=80=99 before asking you, and that is =
-the reason I
-> assumed you would know best... ;-)
->
-> > One of these days I'd like to run the SVM tests under QEMU without KVM.
-> > It would probably find bugs in both.
->
-> Well, I think we can agree that bare-metal is a better reference than
-> another emulator for the matter. Even without running the tests on
-> bare-metal, it is easy to dump EXITINFO1 on the nested page-fault. I will
-> try to find a bare-metal machine.
->
-> Anyhow, I would appreciate if anyone from AMD would tell whether any resu=
-lt
-> should be considered architectural.
 
-I'd be happy to test on bare metal, but I'm still waiting for
-instructions that a script kiddie (with read-only console access) can
-follow.
+On 7/3/20 10:11 AM, Paolo Bonzini wrote:
+> On 03/07/20 00:33, Krish Sadhukhan wrote:
+>> Ping.
+>>
+>> On 5/14/20 10:36 PM, Krish Sadhukhan wrote:
+>>> v2 -> v3:
+>>>      In patch# 1, the mask for guest CR4 reserved bits is now cached in
+>>>      'struct kvm_vcpu_arch', instead of in a global variable.
+>>>
+>>>
+>>> [PATCH 1/3 v3] KVM: x86: Create mask for guest CR4 reserved bits in
+>>> [PATCH 2/3 v3] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are not
+>>> set on
+>>> [PATCH 3/3 v3] KVM: nSVM: Test that MBZ bits in CR3 and CR4 are not
+>>> set on vmrun
+>>>
+>>>    arch/x86/include/asm/kvm_host.h |  2 ++
+>>>    arch/x86/kvm/cpuid.c            |  2 ++
+>>>    arch/x86/kvm/svm/nested.c       | 22 ++++++++++++++++++++--
+>>>    arch/x86/kvm/svm/svm.h          |  5 ++++-
+>>>    arch/x86/kvm/x86.c              | 27 ++++-----------------------
+>>>    arch/x86/kvm/x86.h              | 21 +++++++++++++++++++++
+>>>    6 files changed, 53 insertions(+), 26 deletions(-)
+>>>
+>>> Krish Sadhukhan (2):
+>>>         KVM: x86: Create mask for guest CR4 reserved bits in
+>>> kvm_update_cpuid()
+>>>         nSVM: Check that MBZ bits in CR3 and CR4 are not set on vmrun
+>>> of nested gu
+>>>
+>>>    x86/svm.h       |   6 ++++
+>>>    x86/svm_tests.c | 105
+>>> +++++++++++++++++++++++++++++++++++++++++++++++++-------
+>>>    2 files changed, 99 insertions(+), 12 deletions(-)
+>>>
+>>> Krish Sadhukhan (1):
+>>>         nSVM: Test that MBZ bits in CR3 and CR4 are not set on vmrun of
+>>> nested g
+>>>
+> Sorry, this one was not queued because there were comments (also I think
+> it doesn't apply anymore).
+
+Sorry, Paolo, I got bit lost here :-). IIRC, you had two comments on 
+this set:
+
+     1. kvm_valid_cr4() should be used for checking the reserved bits in 
+guest CR4
+
+     2. LMA shouldn't be checked via guest state
+
+v3 has addressd your first suggestion by caching CR4 reserved bits in 
+kvm_update_cpuid() and then using kvm_valid_cr4() in nested_vmcb_checks().
+
+As for your second suggestion, v3 uses is_long_mode() which uses 
+vcpu->arch.efer for checking long mode.
+
+I will send out a rebased version.
+
+Is there anything I missed ?
+
+
+Thanks.
+
+>
+> Paolo
+>
