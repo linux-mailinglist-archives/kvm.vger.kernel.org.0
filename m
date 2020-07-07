@@ -2,59 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A00E217516
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 19:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3058621751A
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 19:27:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728292AbgGGR0q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 13:26:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45579 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728182AbgGGR0p (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 13:26:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594142804;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3LrO7VqgYVoFRtAEnJtwxKftEVr1AjGjug4X5J7y9k0=;
-        b=F/uPo7luGfoPPqW3ZvwIvtlRDQuev8kovfOIROAiH4AwZLPlfUW5UgJFeAgVThTbygNWmW
-        pCCw95rFDaaF9ZBmPScm6rd6jJqMQq10IYP65qztiCYGLWNDlGXi+btzKXxLcfVYb/cJ66
-        UuMgLg0tthARZZ2zySmiD6tHJqZq3Ew=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-XKt6xsNNPK27gqdAtMTU8g-1; Tue, 07 Jul 2020 13:26:42 -0400
-X-MC-Unique: XKt6xsNNPK27gqdAtMTU8g-1
-Received: by mail-wr1-f72.google.com with SMTP id d11so31728216wrw.12
-        for <kvm@vger.kernel.org>; Tue, 07 Jul 2020 10:26:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3LrO7VqgYVoFRtAEnJtwxKftEVr1AjGjug4X5J7y9k0=;
-        b=QgLe8UenNWHITfSNkVebHYAfks/zWaytvV2Bg67Lwv6wgJGDk6nNX+7KQbbtkh7LDo
-         VRrwMH3zVH2FvEuzZbr1lLyRS2XlVZwbdAbf4rKtu53AZnYeCxZrcKpQrkt1tWWTaOE7
-         THg7TggBTzg3dsYBj/NxYb5nXOGHR+nG37inzvkWLc192vYyj1CN1p+FPJbF0z6D408s
-         sfqTGNXWpWOuFUpmaNVQrBp+n1w2SfA5nUykKcTDOqGhCNfecZNQf3Rt5EcjNK9qmwst
-         qk/oNakwYKYqr5wuppDv8YvxLqrmA9GB4A7fAU59nR59YktjNF4iLTX0mM0cVv//xJwt
-         50aQ==
-X-Gm-Message-State: AOAM531O9BdUWP2XlrhahTvS2YY2d+MXnle4JwJfzB9iH8u16RLAwcqf
-        7ykycUH5aclu4/uYlOEDUi465f51LM9vadhmuRlcMmKjWnbAK6tRAU8f6D/IrtYTxJ3V0ni9hOX
-        mJ6UJnDT8V8uY
-X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr5663948wme.177.1594142801244;
-        Tue, 07 Jul 2020 10:26:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzNNrn3AIg1g3/5R2NVngn8kYJ+htIdF6x+ntfOrYeAJwFW3NKZhvcjYcIPkbdIJED+yPp84A==
-X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr5663931wme.177.1594142801054;
-        Tue, 07 Jul 2020 10:26:41 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e95f:9718:ec18:4c46? ([2001:b07:6468:f312:e95f:9718:ec18:4c46])
-        by smtp.gmail.com with ESMTPSA id a12sm1870753wrv.41.2020.07.07.10.26.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2020 10:26:40 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: rewrite kvm_spec_ctrl_valid_bits
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org,
+        id S1728370AbgGGR11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 13:27:27 -0400
+Received: from mga03.intel.com ([134.134.136.65]:2939 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727834AbgGGR11 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 13:27:27 -0400
+IronPort-SDR: qhnS5c1ONGiJOGylm2vtij2cjGXL+p3F0SvjeTm6tiE4hrD40d1MP3yNGKz566m06IUcgT3t8x
+ fqsn7VYeNZ2g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="147670617"
+X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
+   d="scan'208";a="147670617"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2020 10:27:26 -0700
+IronPort-SDR: OuSpcUAd08hrIa2H9NtKNPS4/LExb711TfIFjx7oAafmvSZKAjzi8BNErBNl2KdZM2gFQdFVkE
+ 1cE4KKPqAWQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,324,1589266800"; 
+   d="scan'208";a="268257264"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.152])
+  by fmsmga008.fm.intel.com with ESMTP; 07 Jul 2020 10:27:25 -0700
+Date:   Tue, 7 Jul 2020 10:27:25 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         linux-kernel@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -63,61 +39,62 @@ Cc:     kvm@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Ingo Molnar <mingo@redhat.com>,
         Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] kvm: x86: rewrite kvm_spec_ctrl_valid_bits
+Message-ID: <20200707172725.GH20096@linux.intel.com>
 References: <20200702174455.282252-1-mlevitsk@redhat.com>
  <20200702181606.GF3575@linux.intel.com>
  <3793ae0da76fe00036ed0205b5ad8f1653f58ef2.camel@redhat.com>
  <20200707061105.GH5208@linux.intel.com>
- <a0ab28aa726df404962dbc1c6d1f833947cc149b.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e49c6f78-ac9a-b001-b3b6-7c7dcccc182c@redhat.com>
-Date:   Tue, 7 Jul 2020 19:26:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ <7c1d9bbe-5f59-5b86-01e9-43c929b24218@redhat.com>
+ <20200707081444.GA7417@linux.intel.com>
+ <f3c243b06b5acfea9ed4e4242d8287c7169ef1be.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a0ab28aa726df404962dbc1c6d1f833947cc149b.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3c243b06b5acfea9ed4e4242d8287c7169ef1be.camel@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/07/20 13:30, Maxim Levitsky wrote:
->> Somehwat crazy idea inbound... rather than calculating the valid bits in
->> software, what if we throw the value at the CPU and see if it fails?  At
->> least that way the host and guest are subject to the same rules.  E.g.
->>
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -2062,11 +2062,19 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>                     !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
->>                         return 1;
->>
->> -               if (data & ~kvm_spec_ctrl_valid_bits(vcpu))
->> -                       return 1;
->> -
->> +               ret = 0;
->>                 vmx->spec_ctrl = data;
->> -               if (!data)
->> +
->> +               local_irq_disable();
->> +               if (rdmsrl_safe(MSR_IA32_SPEC_CTRL, &data))
->> +                       ret = 1;
->> +               else if (wrmsrl_safe(MSR_IA32_SPEC_CTRL, vmx->spec_ctrl))
->> +                       ret = 1;
->> +               else
->> +                       wrmsrl(MSR_IA32_SPEC_CTRL, data))
->> +               local_irq_enable();
->> +
->> +               if (ret || !vmx->spec_ctrl)
->>                         break;
->>
->>                 /*
->>
-> I don't mind this as well, knowing that this is done only one per VM run anyway.
+On Tue, Jul 07, 2020 at 02:35:59PM +0300, Maxim Levitsky wrote:
+> On Tue, 2020-07-07 at 01:14 -0700, Sean Christopherson wrote:
+> > Aren't you supposed to be on vacation? :-)
+> > 
+> > On Tue, Jul 07, 2020 at 10:04:22AM +0200, Paolo Bonzini wrote:
+> > > On 07/07/20 08:11, Sean Christopherson wrote:
+> > > > One oddity with this whole thing is that by passing through the MSR, KVM is
+> > > > allowing the guest to write bits it doesn't know about, which is definitely
+> > > > not normal.  It also means the guest could write bits that the host VMM
+> > > > can't.
+> > > 
+> > > That's true.  However, the main purpose of the kvm_spec_ctrl_valid_bits
+> > > check is to ensure that host-initiated writes are valid; this way, you
+> > > don't get a #GP on the next vmentry's WRMSR to MSR_IA32_SPEC_CTRL.
+> > > Checking the guest CPUID bit is not even necessary.
+> > 
+> > Right, what I'm saying is that rather than try and decipher specs to
+> > determine what bits are supported, just throw the value at hardware and
+> > go from there.  That's effectively what we end up doing for the guest writes
+> > anyways.
+> > 
+> > Actually, the current behavior will break migration if there are ever legal
+> > bits that KVM doesn't recognize, e.g. guest writes a value that KVM doesn't
+> > allow and then migration fails when the destination tries to stuff the value
+> > into KVM.
+> 
+> After thinking about this, I am thinking that we should apply similiar logic
+> as done with the 'cpu-pm' related features.
+> This way the user can choose between passing through the IA32_SPEC_CTRL,
+> (and in this case, we can since the user choose it, pass it right away, and thus
+> avoid using kvm_spec_ctrl_valid_bits completely), and between correctness,
+> in which case we can always emulate this msr, and therefore check all the bits,
+> both regard to guest and host supported values.
+> Does this makes sense, or do you think that this is overkill?
 
-Maxim, this is okay as well; can you send a patch for it?
-
-Paolo
-
+It doesn't really work because the host doesn't have a priori knowledge of
+whether or not the guest will use IA32_SPEC_CTRL.  For PM stuff, there's no
+meaningful overhead in exposing capabilities and the features more or less
+ubiquitous, i.e. odds are very good the guest will use the exposed features
+and there's no penalty if it doesn't.
