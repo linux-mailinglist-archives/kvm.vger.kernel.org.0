@@ -2,112 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6998C216B52
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 13:20:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F691216B6F
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 13:24:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727936AbgGGLTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 07:19:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48008 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725944AbgGGLTm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 07:19:42 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 067B3uPW159667;
-        Tue, 7 Jul 2020 07:19:38 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324pvda5e1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 07:19:38 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 067B4AOk160984;
-        Tue, 7 Jul 2020 07:19:37 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 324pvda5cv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 07:19:37 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 067B0Kbq022100;
-        Tue, 7 Jul 2020 11:19:35 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 322hd7spx0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Jul 2020 11:19:35 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 067BJWIx10682768
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Jul 2020 11:19:32 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 93105A4062;
-        Tue,  7 Jul 2020 11:19:32 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B9378A4064;
-        Tue,  7 Jul 2020 11:19:31 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.29.12])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Jul 2020 11:19:31 +0000 (GMT)
-Subject: Re: [PATCH v4 2/2] s390: virtio: PV needs VIRTIO I/O device
- protection
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, jasowang@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, thomas.lendacky@amd.com,
-        david@gibson.dropbear.id.au, linuxram@us.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com
-References: <1594111477-15401-1-git-send-email-pmorel@linux.ibm.com>
- <1594111477-15401-3-git-send-email-pmorel@linux.ibm.com>
- <20200707114633.68122a00.cohuck@redhat.com>
- <20200707060838-mutt-send-email-mst@kernel.org>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <64057bea-2239-1374-b371-abd7256a32bf@linux.ibm.com>
-Date:   Tue, 7 Jul 2020 13:19:31 +0200
+        id S1727826AbgGGLYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 07:24:25 -0400
+Received: from foss.arm.com ([217.140.110.172]:41650 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727044AbgGGLYY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Jul 2020 07:24:24 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 503631FB;
+        Tue,  7 Jul 2020 04:24:24 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2B04C3F71E;
+        Tue,  7 Jul 2020 04:24:22 -0700 (PDT)
+Subject: Re: [PATCH v3 00/17] KVM: arm64: Preliminary NV patches
+To:     Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        George Cherian <gcherian@marvell.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Andrew Scull <ascull@google.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+References: <20200706125425.1671020-1-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <c5cd34b2-3360-e634-fe0f-9bbb91275235@arm.com>
+Date:   Tue, 7 Jul 2020 12:24:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200707060838-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20200706125425.1671020-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235,18.0.687
- definitions=2020-07-07_07:2020-07-07,2020-07-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- priorityscore=1501 spamscore=0 clxscore=1015 malwarescore=0 bulkscore=0
- phishscore=0 cotscore=-2147483648 impostorscore=0 mlxlogscore=906
- mlxscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2007070085
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
+On 7/6/20 1:54 PM, Marc Zyngier wrote:
+> Hi all,
+>
+> In order not to repeat the 90+ patch series that resulted in a
+> deafening silence last time, I've extracted a smaller set of patches
+> that form the required dependencies that allow the rest of the 65 NV
+> patches to be added on top. Yes, it is that bad.
+>
+> The one real feature here is support for the ARMv8.4-TTL extension at
+> Stage-2 only. The reason to support it is that it helps the hypervisor
+> a lot when it comes to finding out how much to invalidate. It is thus
+> always "supported" with NV.
+>
+> The rest doesn't contain any functionality change. Most of it reworks
+> existing data structures and adds new accessors for the things that
+> get moved around. The reason for this is that:
+>
+> - With NV, we end-up with multiple Stage-2 MMU contexts per VM instead
+>   of a single one. This requires we divorce struct kvm from the S2 MMU
+>   configuration. Of course, we stick with a single MMU context for now.
+>
+> - With ARMv8.4-NV, a number of system register accesses are turned
+>   into memory accesses into the so-called VNCR page. It is thus
+>   convenient to make this VNCR page part of the vcpu context and avoid
+>   copying data back and forth. For this to work, we need to make sure
+>   that all the VNCR-aware sysregs are moved into our per-vcpu sys_regs
+>   array instead of leaving in other data structures (the timers, for
+>   example). The VNCR page itself isn't introduced with these patches.
+>
+> - As some of these data structures change, we need a way to isolate
+>   the userspace ABI from such change.
+>
+> There is also a number of cleanups that were in the full fat series
+> that I decided to move early to get them out of the way.
+>
+> The whole this is a bit of a mix of vaguely unrelated "stuff", but it
+> all comes together if you look at the final series. This applies on
+> top of David Brazdil's series splitting the VHE and nVHE objects.
+>
+> I plan on taking this early into v5.9, and I really mean it this time!
+>
+> Catalin: How do you want to proceed for patches 2, 3, and 4? I could
+> make a stable branch that gets you pull into the arm64 tree, or the
+> other way around. Just let me know.
+>
+> Thanks,
+>
+> 	M.
+>
+> * From v2:
+>   - Rebased on top of David's el2-obj series
 
-On 2020-07-07 13:14, Michael S. Tsirkin wrote:
-> On Tue, Jul 07, 2020 at 11:46:33AM +0200, Cornelia Huck wrote:
->> On Tue,  7 Jul 2020 10:44:37 +0200
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
->>> S390, protecting the guest memory against unauthorized host access
->>> needs to enforce VIRTIO I/O device protection through the use of
->>> VIRTIO_F_VERSION_1 and VIRTIO_F_IOMMU_PLATFORM.
->>
->> Hm... what about:
->>
->> "If protected virtualization is active on s390, the virtio queues are
->> not accessible to the host, unless VIRTIO_F_IOMMU_PLATFORM has been
->> negotiated. Use the new arch_validate_virtio_features() interface to
->> enforce this."
-> 
-> s/enforce this/fail probe if that's not the case, preventing a host error on access attempt/
-> 
+I tried to apply the patches on top of v5.8-rc1, but I get a conflict on the very
+first patch. I guess it's because I don't have the el2-obj series. Is that v4 of
+"Split off nVHE hyp code" patches from David Brazil?
 
-yes, more complete, thanks.
-
-regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Thanks,
+Alex
