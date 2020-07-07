@@ -2,136 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F01FB216B85
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 13:31:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC86216BAC
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 13:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728073AbgGGLbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 07:31:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32865 "EHLO
+        id S1728001AbgGGLgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 07:36:12 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26587 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728001AbgGGLbM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 07:31:12 -0400
+        by vger.kernel.org with ESMTP id S1727058AbgGGLgL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 07:36:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594121470;
+        s=mimecast20190719; t=1594121769;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=W4e4p5dLUhje1SEFTTrCpD000/W8kMbUlw2wtOztRIY=;
-        b=aqSlLTz4s4Y2Y77zZyYs3JwzQhZEldlPSdALOJ85ddwgI4IVClJGDDS4UFpxz3aiqem2p5
-        JvVPY0w4D6sMvekbRZZQlPqw7LihfzQBgbHtU69gI0SsFKankqNVGb6IFKO7CJS9RW5H1r
-        kGOk0LWmPRGSIFzbT4DHMo/y5TieCvg=
+        bh=FbmIz8NhZcLfFDuTmQc7QPHmWye0lSv/TRDqeAjSsg4=;
+        b=BtYFb2CYFIiPnvIfBq6VNi99adKcA3jLKQLcxXgo1278yiJln1OwKuSzJU/m+soT8l2xS8
+        7V4owP1z2utwkxglM36WrOQlaH63RhpA4X+UWsOQUZqNOll051YRBjR3zWXtl+skT/IQsy
+        U9NcS6JgiVGj8ft+tixaT1o/Wlv2y48=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-Pk7q_zGqMpqTU48Rs7fcuA-1; Tue, 07 Jul 2020 07:31:07 -0400
-X-MC-Unique: Pk7q_zGqMpqTU48Rs7fcuA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-394-k2ElBQeHNV-fbuAwkNlZ7g-1; Tue, 07 Jul 2020 07:36:06 -0400
+X-MC-Unique: k2ElBQeHNV-fbuAwkNlZ7g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F3E1A0BD7;
-        Tue,  7 Jul 2020 11:31:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84405800D5C;
+        Tue,  7 Jul 2020 11:36:04 +0000 (UTC)
 Received: from starship (unknown [10.35.206.237])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7021579CE2;
-        Tue,  7 Jul 2020 11:30:58 +0000 (UTC)
-Message-ID: <a0ab28aa726df404962dbc1c6d1f833947cc149b.camel@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 31DA610013D7;
+        Tue,  7 Jul 2020 11:36:00 +0000 (UTC)
+Message-ID: <f3c243b06b5acfea9ed4e4242d8287c7169ef1be.camel@redhat.com>
 Subject: Re: [PATCH] kvm: x86: rewrite kvm_spec_ctrl_valid_bits
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         linux-kernel@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Wanpeng Li <wanpengli@tencent.com>,
         "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Ingo Molnar <mingo@redhat.com>,
         Jim Mattson <jmattson@google.com>
-Date:   Tue, 07 Jul 2020 14:30:57 +0300
-In-Reply-To: <20200707061105.GH5208@linux.intel.com>
+Date:   Tue, 07 Jul 2020 14:35:59 +0300
+In-Reply-To: <20200707081444.GA7417@linux.intel.com>
 References: <20200702174455.282252-1-mlevitsk@redhat.com>
          <20200702181606.GF3575@linux.intel.com>
          <3793ae0da76fe00036ed0205b5ad8f1653f58ef2.camel@redhat.com>
          <20200707061105.GH5208@linux.intel.com>
+         <7c1d9bbe-5f59-5b86-01e9-43c929b24218@redhat.com>
+         <20200707081444.GA7417@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.34.4 (3.34.4-1.fc31) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2020-07-06 at 23:11 -0700, Sean Christopherson wrote:
-> On Sun, Jul 05, 2020 at 12:40:25PM +0300, Maxim Levitsky wrote:
-> > > Rather than compute the mask every time, it can be computed once on module
-> > > load and stashed in a global.  Note, there's a RFC series[*] to support
-> > > reprobing bugs at runtime, but that has bigger issues with existing KVM
-> > > functionality to be addressed, i.e. it's not our problem, yet :-).
-> > > 
-> > > [*] https://lkml.kernel.org/r/1593703107-8852-1-git-send-email-mihai.carabas@oracle.com
+On Tue, 2020-07-07 at 01:14 -0700, Sean Christopherson wrote:
+> Aren't you supposed to be on vacation? :-)
+> 
+> On Tue, Jul 07, 2020 at 10:04:22AM +0200, Paolo Bonzini wrote:
+> > On 07/07/20 08:11, Sean Christopherson wrote:
+> > > One oddity with this whole thing is that by passing through the MSR, KVM is
+> > > allowing the guest to write bits it doesn't know about, which is definitely
+> > > not normal.  It also means the guest could write bits that the host VMM
+> > > can't.
 > > 
-> > Thanks for the pointer!
-> >  
-> > Note though that the above code only runs once, since after a single
-> > successful (non #GP) set of it to non-zero value, it is cleared in MSR bitmap
-> > for both reads and writes on both VMX and SVM.
+> > That's true.  However, the main purpose of the kvm_spec_ctrl_valid_bits
+> > check is to ensure that host-initiated writes are valid; this way, you
+> > don't get a #GP on the next vmentry's WRMSR to MSR_IA32_SPEC_CTRL.
+> > Checking the guest CPUID bit is not even necessary.
 > 
-> For me the performance is secondary to documenting the fact that the host
-> valid bits are fixed for a given instance of the kernel.  There's enough
-> going on in kvm_spec_ctrl_valid_bits_host() that's it's not super easy to
-> see that it's a "constant" value.
+> Right, what I'm saying is that rather than try and decipher specs to
+> determine what bits are supported, just throw the value at hardware and
+> go from there.  That's effectively what we end up doing for the guest writes
+> anyways.
 > 
-> > This is done because of performance reasons which in this case are more
-> > important than absolute correctness.  Thus to some extent the guest checks in
-> > the above are pointless.
-> >  
-> > If you ask me, I would just remove the kvm_spec_ctrl_valid_bits, and pass
-> > this msr to guest right away and not on first access.
-> 
-> That would unnecessarily penalize guests that don't utilize the MSR as KVM
-> would need to do a RDMSR on every VM-Exit to grab the guest's value.
-I haven't thought about this, this makes sense.
+> Actually, the current behavior will break migration if there are ever legal
+> bits that KVM doesn't recognize, e.g. guest writes a value that KVM doesn't
+> allow and then migration fails when the destination tries to stuff the value
+> into KVM.
 
-> 
-> One oddity with this whole thing is that by passing through the MSR, KVM is
-> allowing the guest to write bits it doesn't know about, which is definitely
-> not normal.  It also means the guest could write bits that the host VMM
-> can't.
-> 
-> Somehwat crazy idea inbound... rather than calculating the valid bits in
-> software, what if we throw the value at the CPU and see if it fails?  At
-> least that way the host and guest are subject to the same rules.  E.g.
-> 
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2062,11 +2062,19 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                     !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
->                         return 1;
-> 
-> -               if (data & ~kvm_spec_ctrl_valid_bits(vcpu))
-> -                       return 1;
-> -
-> +               ret = 0;
->                 vmx->spec_ctrl = data;
-> -               if (!data)
-> +
-> +               local_irq_disable();
-> +               if (rdmsrl_safe(MSR_IA32_SPEC_CTRL, &data))
-> +                       ret = 1;
-> +               else if (wrmsrl_safe(MSR_IA32_SPEC_CTRL, vmx->spec_ctrl))
-> +                       ret = 1;
-> +               else
-> +                       wrmsrl(MSR_IA32_SPEC_CTRL, data))
-> +               local_irq_enable();
-> +
-> +               if (ret || !vmx->spec_ctrl)
->                         break;
-> 
->                 /*
-> 
-I don't mind this as well, knowing that this is done only one per VM run anyway.
+After thinking about this, I am thinking that we should apply similiar logic
+as done with the 'cpu-pm' related features.
+This way the user can choose between passing through the IA32_SPEC_CTRL,
+(and in this case, we can since the user choose it, pass it right away, and thus
+avoid using kvm_spec_ctrl_valid_bits completely), and between correctness,
+in which case we can always emulate this msr, and therefore check all the bits,
+both regard to guest and host supported values.
+Does this makes sense, or do you think that this is overkill?
+
+One thing for sure, we currently have a bug about wrong #GP in case STIBP is supported,
+but IBRS isn't. I don't mind fixing it in any way that all of you agree upon.
 
 Best regards,
 	Maxim Levitsky
