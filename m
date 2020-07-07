@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1FA7217514
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 19:26:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A00E217516
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 19:26:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728284AbgGGR0M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Jul 2020 13:26:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49930 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727791AbgGGR0L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Jul 2020 13:26:11 -0400
+        id S1728292AbgGGR0q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Jul 2020 13:26:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45579 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728182AbgGGR0p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Jul 2020 13:26:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594142769;
+        s=mimecast20190719; t=1594142804;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KfTUk9PAGIk1UnNRy8zSV6nw0M/fTj95s0UbcyGGc9I=;
-        b=YxD3WkaQS9phFJe3jt6z3pvdSB1HZ1q/Z41/hxmGQpLKsEsY8of2+rLSNUsuxZL342Nxkm
-        sj5//zrOU+k/q9HrXbgaCtEJEFqHK4s555Tg6bX67f24rETTgtc+D7EcV2QTjK4TpK2ojO
-        jNbD6g5LR1NMLECh/TeBX3NwjuL43AM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-H_XJtt4wPkew1PFf0W-hRw-1; Tue, 07 Jul 2020 13:26:06 -0400
-X-MC-Unique: H_XJtt4wPkew1PFf0W-hRw-1
-Received: by mail-wr1-f70.google.com with SMTP id c6so30018599wru.7
-        for <kvm@vger.kernel.org>; Tue, 07 Jul 2020 10:26:05 -0700 (PDT)
+        bh=3LrO7VqgYVoFRtAEnJtwxKftEVr1AjGjug4X5J7y9k0=;
+        b=F/uPo7luGfoPPqW3ZvwIvtlRDQuev8kovfOIROAiH4AwZLPlfUW5UgJFeAgVThTbygNWmW
+        pCCw95rFDaaF9ZBmPScm6rd6jJqMQq10IYP65qztiCYGLWNDlGXi+btzKXxLcfVYb/cJ66
+        UuMgLg0tthARZZ2zySmiD6tHJqZq3Ew=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-XKt6xsNNPK27gqdAtMTU8g-1; Tue, 07 Jul 2020 13:26:42 -0400
+X-MC-Unique: XKt6xsNNPK27gqdAtMTU8g-1
+Received: by mail-wr1-f72.google.com with SMTP id d11so31728216wrw.12
+        for <kvm@vger.kernel.org>; Tue, 07 Jul 2020 10:26:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=KfTUk9PAGIk1UnNRy8zSV6nw0M/fTj95s0UbcyGGc9I=;
-        b=NbCdT2H7+wAIQqap286k/sNvlvDNTVC4LDjcOtolHLzprjoCMDBSUVX8fHhqyttpW3
-         lRQn6rS+SJhWQB+6GHsVBYA55qLtdawijJOfgQlDrEPZuuliMw8eSh5O79JOP07fFNTA
-         TKtLncMyopeXGoMzSw6cTEAx8PVBb9FFAFF4S4lXkJOA5hh2s5ZPspiOkMiLso/B+WIr
-         7f+i+XYDqPNCqqJxXhXiYSEQKimLDJ/1lm3WZGbpbRDY6uE2yKzuTtKpeSsyfJBSxEV1
-         h3Lqhsb3+RCJVtajBRXHw4WvoyfEr/XQ6rfcaQOR2gNoGF1eMsj5XftoS2oR32s10Ebc
-         KfmA==
-X-Gm-Message-State: AOAM532Vy6sTNmNB5dnBBNZxwf57wdm+0fvYjdcXAbtLT2uoIF2c07eJ
-        seQiQn+jkT2+DrFu/ulAGnGcIZzyTsCj+jmEROjQ+P9ECQVdL3keY4/a1K//BxFehkO4uFYJxvB
-        nlKPxWlVv7JmA
-X-Received: by 2002:a5d:5587:: with SMTP id i7mr53279469wrv.314.1594142764779;
-        Tue, 07 Jul 2020 10:26:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJys31mXYPkvFr+OKDY2YGUbbkO9gWFPb7K0WfeuTUl+TuLBtnwm1fCRnPSymz3Zh67H8Nqlmg==
-X-Received: by 2002:a5d:5587:: with SMTP id i7mr53279447wrv.314.1594142764544;
-        Tue, 07 Jul 2020 10:26:04 -0700 (PDT)
+        bh=3LrO7VqgYVoFRtAEnJtwxKftEVr1AjGjug4X5J7y9k0=;
+        b=QgLe8UenNWHITfSNkVebHYAfks/zWaytvV2Bg67Lwv6wgJGDk6nNX+7KQbbtkh7LDo
+         VRrwMH3zVH2FvEuzZbr1lLyRS2XlVZwbdAbf4rKtu53AZnYeCxZrcKpQrkt1tWWTaOE7
+         THg7TggBTzg3dsYBj/NxYb5nXOGHR+nG37inzvkWLc192vYyj1CN1p+FPJbF0z6D408s
+         sfqTGNXWpWOuFUpmaNVQrBp+n1w2SfA5nUykKcTDOqGhCNfecZNQf3Rt5EcjNK9qmwst
+         qk/oNakwYKYqr5wuppDv8YvxLqrmA9GB4A7fAU59nR59YktjNF4iLTX0mM0cVv//xJwt
+         50aQ==
+X-Gm-Message-State: AOAM531O9BdUWP2XlrhahTvS2YY2d+MXnle4JwJfzB9iH8u16RLAwcqf
+        7ykycUH5aclu4/uYlOEDUi465f51LM9vadhmuRlcMmKjWnbAK6tRAU8f6D/IrtYTxJ3V0ni9hOX
+        mJ6UJnDT8V8uY
+X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr5663948wme.177.1594142801244;
+        Tue, 07 Jul 2020 10:26:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNNrn3AIg1g3/5R2NVngn8kYJ+htIdF6x+ntfOrYeAJwFW3NKZhvcjYcIPkbdIJED+yPp84A==
+X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr5663931wme.177.1594142801054;
+        Tue, 07 Jul 2020 10:26:41 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:e95f:9718:ec18:4c46? ([2001:b07:6468:f312:e95f:9718:ec18:4c46])
-        by smtp.gmail.com with ESMTPSA id a3sm1808226wmb.7.2020.07.07.10.26.03
+        by smtp.gmail.com with ESMTPSA id a12sm1870753wrv.41.2020.07.07.10.26.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jul 2020 10:26:03 -0700 (PDT)
+        Tue, 07 Jul 2020 10:26:40 -0700 (PDT)
 Subject: Re: [PATCH] kvm: x86: rewrite kvm_spec_ctrl_valid_bits
 To:     Maxim Levitsky <mlevitsk@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
@@ -67,16 +67,14 @@ References: <20200702174455.282252-1-mlevitsk@redhat.com>
  <20200702181606.GF3575@linux.intel.com>
  <3793ae0da76fe00036ed0205b5ad8f1653f58ef2.camel@redhat.com>
  <20200707061105.GH5208@linux.intel.com>
- <7c1d9bbe-5f59-5b86-01e9-43c929b24218@redhat.com>
- <20200707081444.GA7417@linux.intel.com>
- <f3c243b06b5acfea9ed4e4242d8287c7169ef1be.camel@redhat.com>
+ <a0ab28aa726df404962dbc1c6d1f833947cc149b.camel@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ed934ade-f377-4de1-55bb-d0c1a2770be0@redhat.com>
-Date:   Tue, 7 Jul 2020 19:26:02 +0200
+Message-ID: <e49c6f78-ac9a-b001-b3b6-7c7dcccc182c@redhat.com>
+Date:   Tue, 7 Jul 2020 19:26:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <f3c243b06b5acfea9ed4e4242d8287c7169ef1be.camel@redhat.com>
+In-Reply-To: <a0ab28aa726df404962dbc1c6d1f833947cc149b.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -85,21 +83,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/07/20 13:35, Maxim Levitsky wrote:
-> After thinking about this, I am thinking that we should apply similiar logic
-> as done with the 'cpu-pm' related features.
-> This way the user can choose between passing through the IA32_SPEC_CTRL,
-> (and in this case, we can since the user choose it, pass it right away, and thus
-> avoid using kvm_spec_ctrl_valid_bits completely), and between correctness,
-> in which case we can always emulate this msr, and therefore check all the bits,
-> both regard to guest and host supported values.
+On 07/07/20 13:30, Maxim Levitsky wrote:
+>> Somehwat crazy idea inbound... rather than calculating the valid bits in
+>> software, what if we throw the value at the CPU and see if it fails?  At
+>> least that way the host and guest are subject to the same rules.  E.g.
+>>
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -2062,11 +2062,19 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>                     !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
+>>                         return 1;
+>>
+>> -               if (data & ~kvm_spec_ctrl_valid_bits(vcpu))
+>> -                       return 1;
+>> -
+>> +               ret = 0;
+>>                 vmx->spec_ctrl = data;
+>> -               if (!data)
+>> +
+>> +               local_irq_disable();
+>> +               if (rdmsrl_safe(MSR_IA32_SPEC_CTRL, &data))
+>> +                       ret = 1;
+>> +               else if (wrmsrl_safe(MSR_IA32_SPEC_CTRL, vmx->spec_ctrl))
+>> +                       ret = 1;
+>> +               else
+>> +                       wrmsrl(MSR_IA32_SPEC_CTRL, data))
+>> +               local_irq_enable();
+>> +
+>> +               if (ret || !vmx->spec_ctrl)
+>>                         break;
+>>
+>>                 /*
+>>
+> I don't mind this as well, knowing that this is done only one per VM run anyway.
 
-Unfortunately, passing it through is just too slow.  So I think it's
-overkill.  There's two ways to deal with badly-behaved guests blocking
-migration: 1) hide SPEC_CTRL altogether 2) kill them when migration
-fails; both are acceptable depending on the situation.
+Maxim, this is okay as well; can you send a patch for it?
 
 Paolo
-
-> Does this makes sense, or do you think that this is overkill?
 
