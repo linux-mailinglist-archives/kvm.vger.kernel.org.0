@@ -2,140 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 580F9216303
-	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 02:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F32F216359
+	for <lists+kvm@lfdr.de>; Tue,  7 Jul 2020 03:31:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726591AbgGGAeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Jul 2020 20:34:21 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:57166 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726467AbgGGAeT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Jul 2020 20:34:19 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0670WY21046067;
-        Tue, 7 Jul 2020 00:34:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=RTv/6XDovWSvRfYSHR1dcRBY8X/+09W2o7nvuDMFGNI=;
- b=s+rvaUjbyW3PySo4VM9banLFyeUEJihLZkSuN+AvTCGLXSWrudNSxdQWDyY39FyMte7C
- DYYJpiF75xOLWDCzvVoVgchqFQYtEB/idQ57vm9ZuU9ItuBLLPPOfC0qixXgRqK9V38b
- 46aopXtzVxSvgYkqHF4yCGcCPrDmCFjX95RhnIfiZJW++XwUFktQUec2sCS7U65XVyAm
- FdS1qFWLCNjVuvBy4V+4MQgi4DRFY7sWXsYTiAS3zuAsrT33dOEuw4rKcZ4FOesx88NV
- v07bcW/9NvYl4zX15BbbPvpax2RfX3Rlw5Zf0OGyJHbOzBLxpa/50WQR1QbhL6YgfPxz Ow== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 322kv699eb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 07 Jul 2020 00:34:16 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0670YAL9074850;
-        Tue, 7 Jul 2020 00:34:15 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 3233pw6yjx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 07 Jul 2020 00:34:15 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0670YEwU025451;
-        Tue, 7 Jul 2020 00:34:14 GMT
-Received: from localhost.localdomain (/10.159.144.242)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 06 Jul 2020 17:34:14 -0700
-Subject: Re: [PATCH 0/3 v3] KVM: nSVM: Check MBZ bits in CR3 and CR4 on vmrun
- of nested guests
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20200515053609.3347-1-krish.sadhukhan@oracle.com>
- <fff40d79-1731-2f24-227a-bf57e8e33b97@oracle.com>
- <b2276167-0bda-0b31-85c0-63a3a0b789bd@redhat.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <4b0fd4e7-465a-428f-c906-ddf0ad367cbb@oracle.com>
-Date:   Mon, 6 Jul 2020 17:34:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1727088AbgGGBbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Jul 2020 21:31:24 -0400
+Received: from mga14.intel.com ([192.55.52.115]:18210 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725892AbgGGBbY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Jul 2020 21:31:24 -0400
+IronPort-SDR: 4pEDHWxX0dOHzIil1bErqeJc4UeFzY3L94QZMomA+26Ei+i3vFlQWSpfV9AQG+SDV4BPsotJsz
+ ZfQJbRqrO4CQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9674"; a="146599373"
+X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
+   d="scan'208";a="146599373"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2020 18:31:19 -0700
+IronPort-SDR: tA+0D3s5q9j2bsbdnUJ+VlwLVewUt/EQ4dKrrU0/pSgG2Uli0PK0zMmfTVNpmRnigfqrYdig8p
+ 7M/gQZxMghkw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,321,1589266800"; 
+   d="scan'208";a="456931133"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.139]) ([10.239.159.139])
+  by orsmga005.jf.intel.com with ESMTP; 06 Jul 2020 18:31:16 -0700
+Cc:     baolu.lu@linux.intel.com, Kevin Tian <kevin.tian@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
+Subject: Re: [PATCH 1/2] iommu: Add iommu_group_get/set_domain()
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+References: <20200627031532.28046-1-baolu.lu@linux.intel.com>
+ <acc0a8fd-bd23-fc34-aecc-67796ab216e7@arm.com>
+ <5dc1cece-6111-9b56-d04c-9553d592675b@linux.intel.com>
+ <48dd9f1e-c18b-77b7-650a-c35ecbb69f2b@arm.com>
+ <c38784ad-9dba-0840-3a61-e2c21e781f1e@linux.intel.com>
+ <ffbb405b-5617-5659-3fc1-302c530aceef@arm.com>
+ <5f3ad162-647c-1295-880b-6b104807ba9a@linux.intel.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <18fab67b-f13c-0052-1b09-b459788981d0@linux.intel.com>
+Date:   Tue, 7 Jul 2020 09:26:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <b2276167-0bda-0b31-85c0-63a3a0b789bd@redhat.com>
+In-Reply-To: <5f3ad162-647c-1295-880b-6b104807ba9a@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9674 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0 spamscore=0
- mlxscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2007070001
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9674 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 mlxlogscore=999 phishscore=0 spamscore=0
- priorityscore=1501 clxscore=1015 impostorscore=0 mlxscore=0 adultscore=0
- cotscore=-2147483648 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2004280000 definitions=main-2007070001
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 7/3/20 10:11 AM, Paolo Bonzini wrote:
-> On 03/07/20 00:33, Krish Sadhukhan wrote:
->> Ping.
+On 7/2/20 10:36 AM, Lu Baolu wrote:
+> Hi Robin,
+> 
+> On 7/1/20 8:18 PM, Robin Murphy wrote:
+>> On 2020-07-01 08:32, Lu Baolu wrote:
+>>> Hi Robin,
+>>>
+>>> On 2020/7/1 0:51, Robin Murphy wrote:
+>>>> On 2020-06-30 02:03, Lu Baolu wrote:
+>>>>> Hi Robin,
+>>>>>
+>>>>> On 6/29/20 7:56 PM, Robin Murphy wrote:
+>>>>>> On 2020-06-27 04:15, Lu Baolu wrote:
+>>>>>>> The hardware assistant vfio mediated device is a use case of iommu
+>>>>>>> aux-domain. The interactions between vfio/mdev and iommu during mdev
+>>>>>>> creation and passthr are:
+>>>>>>>
+>>>>>>> - Create a group for mdev with iommu_group_alloc();
+>>>>>>> - Add the device to the group with
+>>>>>>>          group = iommu_group_alloc();
+>>>>>>>          if (IS_ERR(group))
+>>>>>>>                  return PTR_ERR(group);
+>>>>>>>
+>>>>>>>          ret = iommu_group_add_device(group, &mdev->dev);
+>>>>>>>          if (!ret)
+>>>>>>>                  dev_info(&mdev->dev, "MDEV: group_id = %d\n",
+>>>>>>>                           iommu_group_id(group));
+>>>>>>> - Allocate an aux-domain
+>>>>>>>     iommu_domain_alloc()
+>>>>>>> - Attach the aux-domain to the physical device from which the 
+>>>>>>> mdev is
+>>>>>>>    created.
+>>>>>>>     iommu_aux_attach_device()
+>>>>>>>
+>>>>>>> In the whole process, an iommu group was allocated for the mdev 
+>>>>>>> and an
+>>>>>>> iommu domain was attached to the group, but the group->domain leaves
+>>>>>>> NULL. As the result, iommu_get_domain_for_dev() doesn't work 
+>>>>>>> anymore.
+>>>>>>>
+>>>>>>> This adds iommu_group_get/set_domain() so that group->domain 
+>>>>>>> could be
+>>>>>>> managed whenever a domain is attached or detached through the 
+>>>>>>> aux-domain
+>>>>>>> api's.
+>>>>>>
+>>>>>> Letting external callers poke around directly in the internals of 
+>>>>>> iommu_group doesn't look right to me.
+>>>>>
+>>>>> Unfortunately, it seems that the vifo iommu abstraction is deeply 
+>>>>> bound
+>>>>> to the IOMMU subsystem. We can easily find other examples:
+>>>>>
+>>>>> iommu_group_get/set_iommudata()
+>>>>> iommu_group_get/set_name()
+>>>>> ...
+>>>>
+>>>> Sure, but those are ways for users of a group to attach useful 
+>>>> information of their own to it, that doesn't matter to the IOMMU 
+>>>> subsystem itself. The interface you've proposed gives callers rich 
+>>>> new opportunities to fundamentally break correct operation of the API:
+>>>>
+>>>>      dom = iommu_domain_alloc();
+>>>>      iommu_attach_group(dom, grp);
+>>>>      ...
+>>>>      iommu_group_set_domain(grp, NULL);
+>>>>      // oops, leaked and can't ever detach properly now
+>>>>
+>>>> or perhaps:
+>>>>
+>>>>      grp = iommu_group_alloc();
+>>>>      iommu_group_add_device(grp, dev);
+>>>>      iommu_group_set_domain(grp, dom);
+>>>>      ...
+>>>>      iommu_detach_group(dom, grp);
+>>>>      // oops, IOMMU driver might not handle this
+>>>>
+>>>>>> If a regular device is attached to one or more aux domains for 
+>>>>>> PASID use, iommu_get_domain_for_dev() is still going to return the 
+>>>>>> primary domain, so why should it be expected to behave differently 
+>>>>>> for mediated
+>>>>>
+>>>>> Unlike the normal device attach, we will encounter two devices when it
+>>>>> comes to aux-domain.
+>>>>>
+>>>>> - Parent physical device - this might be, for example, a PCIe device
+>>>>> with PASID feature support, hence it is able to tag an unique PASID
+>>>>> for DMA transfers originated from its subset. The device driver hence
+>>>>> is able to wrapper this subset into an isolated:
+>>>>>
+>>>>> - Mediated device - a fake device created by the device driver 
+>>>>> mentioned
+>>>>> above.
+>>>>>
+>>>>> Yes. All you mentioned are right for the parent device. But for 
+>>>>> mediated
+>>>>> device, iommu_get_domain_for_dev() doesn't work even it has an valid
+>>>>> iommu_group and iommu_domain.
+>>>>>
+>>>>> iommu_get_domain_for_dev() is a necessary interface for device drivers
+>>>>> which want to support aux-domain. For example,
+>>>>
+>>>> Only if they want to follow this very specific notion of using 
+>>>> made-up devices and groups to represent aux attachments. Even if a 
+>>>> driver managing its own aux domains entirely privately does create 
+>>>> child devices for them, it's not like it can't keep its domain 
+>>>> pointers in drvdata if it wants to ;)
+>>>>
+>>>> Let's not conflate the current implementation of vfio_mdev with the 
+>>>> general concepts involved here.
+>>>>
+>>>>>            struct iommu_domain *domain;
+>>>>>            struct device *dev = mdev_dev(mdev);
+>>>>>        unsigned long pasid;
+>>>>>
+>>>>>            domain = iommu_get_domain_for_dev(dev);
+>>>>>            if (!domain)
+>>>>>                    return -ENODEV;
+>>>>>
+>>>>>            pasid = iommu_aux_get_pasid(domain, dev->parent);
+>>>>>        if (pasid == IOASID_INVALID)
+>>>>>            return -EINVAL;
+>>>>>
+>>>>>        /* Program the device context with the PASID value */
+>>>>>        ....
+>>>>>
+>>>>> Without this fix, iommu_get_domain_for_dev() always returns NULL 
+>>>>> and the
+>>>>> device driver has no means to support aux-domain.
+>>>>
+>>>> So either the IOMMU API itself is missing the ability to do the 
+>>>> right thing internally, or the mdev layer isn't using it 
+>>>> appropriately. Either way, simply punching holes in the API for mdev 
+>>>> to hack around its own mess doesn't seem like the best thing to do.
+>>>>
+>>>> The initial impression I got was that it's implicitly assumed here 
+>>>> that the mdev itself is attached to exactly one aux domain and 
+>>>> nothing else, at which point I would wonder why it's using aux at 
+>>>> all, but are you saying that in fact no attach happens with the mdev 
+>>>> group either way, only to the parent device?
+>>>>
+>>>> I'll admit I'm not hugely familiar with any of this, but it seems to 
+>>>> me that the logical flow should be:
+>>>>
+>>>>      - allocate domain
+>>>>      - attach as aux to parent
+>>>>      - retrieve aux domain PASID
+>>>>      - create mdev child based on PASID
+>>>>      - attach mdev to domain (normally)
+>>>>
+>>>> Of course that might require giving the IOMMU API a proper 
+>>>> first-class notion of mediated devices, such that it knows the mdev 
+>>>> represents the PASID, and can recognise the mdev attach is 
+>>>> equivalent to the earlier parent aux attach so not just blindly hand 
+>>>> it down to an IOMMU driver that's never heard of this new device 
+>>>> before. Or perhaps the IOMMU drivers do their own bookkeeping for 
+>>>> the mdev bus, such that they do handle the attach call, and just 
+>>>> validate it internally based on the associated parent device and 
+>>>> PASID. Either way, the inside maintains self-consistency and from 
+>>>> the outside it looks like standard API usage without nasty hacks.
+>>>>
+>>>> I'm pretty sure I've heard suggestions of using mediated devices 
+>>>> beyond VFIO (e.g. within the kernel itself), so chances are this is 
+>>>> a direction that we'll have to take at some point anyway.
+>>>>
+>>>> And, that said, even if people do want an immediate quick fix 
+>>>> regardless of technical debt, I'd still be a lot happier to see 
+>>>> iommu_group_set_domain() lightly respun as iommu_attach_mdev() ;)
+>>>
+>>> Get your point and I agree with your concerns.
+>>>
+>>> To maintain the relationship between mdev's iommu_group and
+>>> iommu_domain, how about extending below existing aux_attach api
+>>>
+>>> int iommu_aux_attach_device(struct iommu_domain *domain,
+>>>                  struct device *dev)
+>>>
+>>> by adding the mdev's iommu_group?
+>>>
+>>> int iommu_aux_attach_device(struct iommu_domain *domain,
+>>>                  struct device *dev,
+>>>                  struct iommu_group *group)
+>>>
+>>> And, in iommu_aux_attach_device(), we require,
+>>>   - @group only has a single device;
+>>>   - @group hasn't been attached by any devices;
+>>>   - Set the @domain to @group
+>>>
+>>> Just like what we've done in iommu_attach_device().
+>>>
+>>> Any thoughts?
 >>
->> On 5/14/20 10:36 PM, Krish Sadhukhan wrote:
->>> v2 -> v3:
->>>      In patch# 1, the mask for guest CR4 reserved bits is now cached in
->>>      'struct kvm_vcpu_arch', instead of in a global variable.
->>>
->>>
->>> [PATCH 1/3 v3] KVM: x86: Create mask for guest CR4 reserved bits in
->>> [PATCH 2/3 v3] KVM: nSVM: Check that MBZ bits in CR3 and CR4 are not
->>> set on
->>> [PATCH 3/3 v3] KVM: nSVM: Test that MBZ bits in CR3 and CR4 are not
->>> set on vmrun
->>>
->>>    arch/x86/include/asm/kvm_host.h |  2 ++
->>>    arch/x86/kvm/cpuid.c            |  2 ++
->>>    arch/x86/kvm/svm/nested.c       | 22 ++++++++++++++++++++--
->>>    arch/x86/kvm/svm/svm.h          |  5 ++++-
->>>    arch/x86/kvm/x86.c              | 27 ++++-----------------------
->>>    arch/x86/kvm/x86.h              | 21 +++++++++++++++++++++
->>>    6 files changed, 53 insertions(+), 26 deletions(-)
->>>
->>> Krish Sadhukhan (2):
->>>         KVM: x86: Create mask for guest CR4 reserved bits in
->>> kvm_update_cpuid()
->>>         nSVM: Check that MBZ bits in CR3 and CR4 are not set on vmrun
->>> of nested gu
->>>
->>>    x86/svm.h       |   6 ++++
->>>    x86/svm_tests.c | 105
->>> +++++++++++++++++++++++++++++++++++++++++++++++++-------
->>>    2 files changed, 99 insertions(+), 12 deletions(-)
->>>
->>> Krish Sadhukhan (1):
->>>         nSVM: Test that MBZ bits in CR3 and CR4 are not set on vmrun of
->>> nested g
->>>
-> Sorry, this one was not queued because there were comments (also I think
-> it doesn't apply anymore).
+>> Rather than pass a bare iommu_group with implicit restrictions, it 
+>> might be neater to just pass an mdev_device, so that the IOMMU core 
+>> can also take care of allocating and setting up the group. Then we 
+>> flag the group internally as a special "mdev group" such that we can 
+>> prevent callers from subsequently trying to add/remove devices or 
+>> attach/detach its domain directly. That seems like it would make a 
+>> pretty straightforward and robust API extension, as long as the mdev 
+>> argument here is optional so that SVA and other aux users don't have 
+>> to care. Other than the slightly different ordering where caller would 
+>> have to allocate the mdev first, then finish it's PASID-based 
+>> configuration afterwards, I guess it's not far off what I was thinking 
+>> yesterday :)
+> 
+> It looks good to me if we pass an *optional* made-up device instead of
+> iommu_group. But it seems that vfio/mdev assumes an iommu_group first
+> and then attaches domains to the groups. Hence, it's hard to move the
+> group allocation and setting up into the attach interface.
+> 
+> As proposed, the new iommu_aux_attach_device() might look like this:
+> 
+> int iommu_aux_attach_device(struct iommu_domain *domain,
+>                              struct device *phys_dev,
+>                              struct device *dev)
+> 
+> where,
+> 
+> @phys_dev: The physical device which supports IOMMU_DEV_FEAT_AUX;
+> @dev: a made-up device which presents the subset resources binding to
+>        the aux-domain. An example use case is vfio/mdev. For cases where
+>        no made-up devices are used, pass NULL instead.
+> 
+> With @dev passed, we can require
+> 
+> - single device in group;
+> - no previous attaching;
+> - set up internal logistics between group and domain;
+> 
+> The iommu_aux_detach_device() needs the equivalent extensions.
 
-Sorry, Paolo, I got bit lost here :-). IIRC, you had two comments on 
-this set:
+Okay, let me send out the code first so that people can comment on the
+code.
 
-     1. kvm_valid_cr4() should be used for checking the reserved bits in 
-guest CR4
-
-     2. LMA shouldn't be checked via guest state
-
-v3 has addressd your first suggestion by caching CR4 reserved bits in 
-kvm_update_cpuid() and then using kvm_valid_cr4() in nested_vmcb_checks().
-
-As for your second suggestion, v3 uses is_long_mode() which uses 
-vcpu->arch.efer for checking long mode.
-
-I will send out a rebased version.
-
-Is there anything I missed ?
-
-
-Thanks.
-
->
-> Paolo
->
+Best regards,
+baolu
