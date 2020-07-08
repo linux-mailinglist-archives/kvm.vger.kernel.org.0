@@ -2,69 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B3CA5218206
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 10:09:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F4BA218210
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 10:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726794AbgGHII4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 04:08:56 -0400
-Received: from mga07.intel.com ([134.134.136.100]:11277 "EHLO mga07.intel.com"
+        id S1727075AbgGHIQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 04:16:21 -0400
+Received: from mga09.intel.com ([134.134.136.24]:1482 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726285AbgGHIIz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 04:08:55 -0400
-IronPort-SDR: d9rdTGCJkiDBhdJSC7csAkzMx0+Hnju9H283gCFuXo47S1b636VHM2lMw1xI0xcHUO4tOv9HfX
- 2c6S4/Xv5vZg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="212700021"
+        id S1725747AbgGHIQU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 04:16:20 -0400
+IronPort-SDR: KWSnhw1a3X25LL/2Y3pSeAB8lO+g8FfYnq241+WL1HwSJzCx+DY6CjoEDuxFhTdY0kYRhR4Z2u
+ ccVi2B7SVExA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9675"; a="149269268"
 X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
-   d="scan'208";a="212700021"
+   d="scan'208";a="149269268"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2020 01:08:51 -0700
-IronPort-SDR: HqExt5Ydq/O2JVGcZl8NU9tduvZ3s/5NI5qHf6mALfhXEQdxZ4Zdzd0qtnjtPctqlY3tvLCzZX
- N1ZN5G/+xNeA==
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2020 01:16:20 -0700
+IronPort-SDR: VOxPFpZecnODV5PmPmvsrTlMcCZzep/dLGUc6htzhU7Scb9yB0j1pHncKSZ9YYcdRbrh80iWgX
+ 1VX4CKOfqw2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.75,327,1589266800"; 
-   d="scan'208";a="297647597"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by orsmga002.jf.intel.com with ESMTP; 08 Jul 2020 01:08:50 -0700
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 8 Jul 2020 01:08:50 -0700
-Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 8 Jul 2020 01:08:42 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 8 Jul 2020 01:08:42 -0700
+   d="scan'208";a="457425564"
+Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
+  by orsmga005.jf.intel.com with ESMTP; 08 Jul 2020 01:16:20 -0700
+Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
+ ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 8 Jul 2020 01:16:19 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
+ edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Wed, 8 Jul 2020 01:16:19 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LzL/GSpR3NS4nC6bU0OYsiHOW4cZem33Y2s98HBshKqK1JK800BozaRlvAvU1Kkx8kXSr8FACsfp8qUmBf0ixyo7446pDe931i87PuDfIhSJB+C9VQY+1hbscslBLWYW1t67shJq1ctsKMrTQpBrE5uaq+2cyk9FHBl4UxYF3n0NXSAdiikxoWSCZNCEv7b8AT7Mo0skhPBAlrNa+BA4UgyvTyhmC94zl/9qczm9RsAALVI5adb/WwRi3ZD3PZUmYNoYl2TGFZCoCXUyi9TpbCaMeBBhCNvc58Q4sWtP39G8M7sgqBniXcF13kGdcyZs0s/Q6vToIIN3VLfp7KLfHw==
+ b=Y8TCb8Op9CV5w1x4AOhCiFc4xYdthvIfag+zOOWy5xWdgCBbPipgrVdQg7kwONHDuJpv0d05bSs6GI7UyMWJkB35/OV/6xYBC+lwfzE8aUdzSRBSNeFfLEEocg/NJ7XVJEMp58PNiRp+GRH6z+7tfwxRiUDYZYzBMIfITq11mOor2DdqNaYLiTQ1p1EGoh7L4GR/Fd9EAPbW4AVtS22zPaO6Nx5na2IZVpjsLuJzAWI+Gv+MD0KYnqoyd15slmalg+ZLweMHMlZVFFfzEvdzLj7vUQbsYkvyF+bwvgADyqsiS7k0kZBLBpyir2Ae4wLNDxOZJ6fuVWMLuFq1LrJkxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a2EwgJFRYruhtOGqjRBGUFgbcUCZvP39L4zSBk5l6co=;
- b=HF3X7SUJxaK3VmExW3cYJ2v8pk/sBqVyZZIlYNmlnZfxSJMlsUIor/4MaWm/jOJpkdnYUscvtBG0Fs1p19/PSN0GK+6/Is+SeOdMNSfhogy/ProX7aIc+Qpg+GlRNdxL2dn3NVQjT+ndhuVTcfFXwL7URon+9upclcbhkHjvS8J7CIeSaF7rrSMIHB3ZU7c5mheSnW4NOApB9QIFBahvNKORlLDe5qu8B0XQ157+NavL492PAM3bhHb0Or7JpLBrQ0SocYRDNQUgyso04TfcYxsvubrx1dRxW19GZVRXevzEu+sVXxhMHJw27057Hg4JmiKDIuZM3uj0UdiVjpQ/fA==
+ bh=E6Nry6+SRCKI/axwqaHQBfa0yAKIqm8Q90S7YuunxII=;
+ b=hYlYjfp0qjRugscqZDWEutDZs3Rp40WXbN34/h4xkOJtDtxRPD8Ata4VQ8VDM2SjA6YnfFuJEyOh1BryJidqn6EYydxRZonLJZrgXPhAamXEQOAIXOKredwqUwaIdDuwfQddRg1JRVSc7OuRPuEVMkv1lcfNRz87QO284Moq9jg3K5Vj+v0lMmgxx9/qRpQcm4w35JfXKl+/nERsiK5CmsR2Ui4/Pj6WXPG3S9D8OzddRc3Rer24sdJ0iTUPm6WvQpIz/SgJuO3U2Quw7SEf7XVsIBUPbJmhyMMGhUq43HBiVI3nfO5hzt0otw0ZtTSsjUsM5uN16cdevGQnYfOTvQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a2EwgJFRYruhtOGqjRBGUFgbcUCZvP39L4zSBk5l6co=;
- b=hXHnik2VNN2zcGj3+/PsFU4UtGcTYnJ+7/zmw520QpYPLKfim7OWhToli65JP25kn3d1qBY0YDD5rMlWteuVBr4iucsMKQ9617sg3ftSJ6YWWMyslnpYyxav7eTtp38J+Yj6VHy0ivkxmo1CJBT1ZJxqUy2CGJ1xwztnFnp9soA=
+ bh=E6Nry6+SRCKI/axwqaHQBfa0yAKIqm8Q90S7YuunxII=;
+ b=qj8SZsY7l++Jhdti5YIMfoK6fsmuqR3H4L7W9/DbuHobETFpBoje64n+MR+9JnKpitSDCp6Wo45W7ERe36SdVrlzsVH8z6Ygmt9TpCHqSXufRaoWVUSt5Hh548ygqs7kLOnpFd5QADPMsaAVvrHnCEJiwQnoLmfBY0gWa2hwMLk=
 Received: from DM5PR11MB1435.namprd11.prod.outlook.com (2603:10b6:4:7::18) by
  DM6PR11MB4530.namprd11.prod.outlook.com (2603:10b6:5:2a4::22) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3153.22; Wed, 8 Jul 2020 08:08:40 +0000
+ 15.20.3153.22; Wed, 8 Jul 2020 08:16:16 +0000
 Received: from DM5PR11MB1435.namprd11.prod.outlook.com
  ([fe80::9002:97a2:d8c0:8364]) by DM5PR11MB1435.namprd11.prod.outlook.com
  ([fe80::9002:97a2:d8c0:8364%10]) with mapi id 15.20.3174.021; Wed, 8 Jul 2020
- 08:08:40 +0000
+ 08:16:16 +0000
 From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
         "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
         "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
         "Raj, Ashok" <ashok.raj@intel.com>,
         "Tian, Jun J" <jun.j.tian@intel.com>,
@@ -72,24 +70,21 @@ CC:     "Tian, Kevin" <kevin.tian@intel.com>,
         "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
         "peterx@redhat.com" <peterx@redhat.com>,
         "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4 04/15] vfio/type1: Report iommu nesting info to
- userspace
-Thread-Topic: [PATCH v4 04/15] vfio/type1: Report iommu nesting info to
- userspace
-Thread-Index: AQHWUfUbywl8Q+WBl0+9l/PlGyuXiKj6XuYAgAAkWACAABBDgIABSlsAgAF6DCA=
-Date:   Wed, 8 Jul 2020 08:08:40 +0000
-Message-ID: <DM5PR11MB143531E2B54ED82FB0649F8CC3670@DM5PR11MB1435.namprd11.prod.outlook.com>
-References: <1593861989-35920-1-git-send-email-yi.l.liu@intel.com>
- <1593861989-35920-5-git-send-email-yi.l.liu@intel.com>
- <d434cbcc-d3b1-d11d-0304-df2d2c93efa0@redhat.com>
- <DM5PR11MB1435290B6CD561EC61027892C3690@DM5PR11MB1435.namprd11.prod.outlook.com>
- <94b4e5d3-8d24-9a55-6bee-ed86f3846996@redhat.com>
- <DM5PR11MB14357A5953EB630A58FF568EC3660@DM5PR11MB1435.namprd11.prod.outlook.com>
-In-Reply-To: <DM5PR11MB14357A5953EB630A58FF568EC3660@DM5PR11MB1435.namprd11.prod.outlook.com>
+Subject: RE: [PATCH v3 06/14] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
+ (alloc/free)
+Thread-Topic: [PATCH v3 06/14] vfio/type1: Add VFIO_IOMMU_PASID_REQUEST
+ (alloc/free)
+Thread-Index: AQHWSgRRzB2G/Oy5QEmxCHQWFS0FB6j02KQAgACUCyCAB/5SUA==
+Date:   Wed, 8 Jul 2020 08:16:16 +0000
+Message-ID: <DM5PR11MB1435B159DA10C8301B89A6F0C3670@DM5PR11MB1435.namprd11.prod.outlook.com>
+References: <1592988927-48009-1-git-send-email-yi.l.liu@intel.com>
+        <1592988927-48009-7-git-send-email-yi.l.liu@intel.com>
+ <20200702151832.048b44d1@x1.home>
+ <CY4PR11MB1432DD97F44EB8AA5CCC87D8C36A0@CY4PR11MB1432.namprd11.prod.outlook.com>
+In-Reply-To: <CY4PR11MB1432DD97F44EB8AA5CCC87D8C36A0@CY4PR11MB1432.namprd11.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -97,34 +92,34 @@ X-MS-TNEF-Correlator:
 dlp-reaction: no-action
 dlp-version: 11.2.0.6
 dlp-product: dlpe-windows
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
+authentication-results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=intel.com;
 x-originating-ip: [117.169.230.114]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e54e2b05-dd4f-4980-2b5e-08d823161ffd
+x-ms-office365-filtering-correlation-id: f06eebfa-debf-4717-9171-08d823172fc5
 x-ms-traffictypediagnostic: DM6PR11MB4530:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR11MB45308D374E10F3131D9271D8C3670@DM6PR11MB4530.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-microsoft-antispam-prvs: <DM6PR11MB45307D5943DC4E8731669848C3670@DM6PR11MB4530.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
 x-forefront-prvs: 04583CED1A
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: jICB7Yt7OF4AoPe8jBNCHe5nWMCRPjg4zDP4LZgSz4IAK5VG0x6DDi6Up5oCCa7xbCZCWo031R8I45jn44zREMQwKCPXv++qeaeOGb2/61yeeXtX2KMpMaKCJx6KRl74+yWhnmGZNzjXym7W0Iw0peiFSnw9TH04HjIFwnrAcTCp3m6DTXQaxda3WlcNPLZQAWyJW8PlT+6iVW4MKiMI0MEsAnxM6w7/Q/XVU4Ru7Vv5Q16QTIxMy0OPLnI5bZb6x53aEK/1RIAcW9Opi9nDjiupPsrrhDTUf9wA9yNXlyym0Rh525UP6vYTZUvRvD/Fi5JoKEojtTkzsYwhrz/TIRTYIZ5nIM9qSJL4guudTVg=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(376002)(136003)(346002)(366004)(54906003)(5660300002)(33656002)(71200400001)(478600001)(8676002)(966005)(8936002)(316002)(4326008)(110136005)(45080400002)(2906002)(64756008)(66946007)(76116006)(7416002)(52536014)(66556008)(66476007)(9686003)(66446008)(55016002)(26005)(186003)(7696005)(6506007)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: n5gIFVGpJXTrVpW7Z3F6R9qQkS0X69H0WLTATRaF5L6P4sGLQc4VjewVzx3rFF5/1yZX7+rYYRqLg3H2bStMf3L9jR6gysBOT1ZYPxRYCMD8HvkqKyiWkNOr2iNXmt/ESy1NSa9g/X3/AyocQUWYc3yn0NQcnbOgKRJaCFNwxiNK6RS8+/gmO2MboOXAP8ebAiN6fCjRGXu+fUn4Pmnm8dfd27SJdybERO8bW3LW8IWU3JTLvdlq8MIaLCFA/oWtnxgOlYYsVVfa/gGelKEnhWxC54pRwAKD52hkd64X+EVJABfM5BH/hM29RtSrChYiuAOR0284+f7FaNlcNBPQDdyuoJM+0lOxqQW8atQne2ShKfwSKtgKNLf+/MFfpxcK3/7BoaG/pIVupot+BH/DdEBYri0woZTv9Z/Y5fVZq95BqoL4CGlKfRSrUa+uHruiR1MNKaxFGT184tH0pkdME1a7ngMUdLdhwdD2dqjqDjMvsdGzcoJCyAkfTJGZ+YyO
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+x-microsoft-antispam-message-info: 4+7wPGAQFN3y78CP7ohUGmuvyegZZT+Die47qLeK9+Xe0sGheVSEgZvcRSYysYIoXrXOF4ImTNSz1enYtTLUmy24tQzpx43qR+79eD4SDXVxO6NjlB2vqFv/j+6LOxZVbFKfvialrXMyhk6zWK71rj1Z3sz8ohbySvUzbuR5nJwQv57JVHbICpmWZ0X+Bumjw7ClJeR+nw6XvjiofZ1M8rss2YRzzPeDiLQI8pQxtA+spMOQnQajaD+1H+PjXERiV31eDcqfJS5nZyEDaunrOVIY+MlSW4YIXioKfCwCfaUcCoLQ1Bo8Qp7FKyi8rRY3/5NZOW5IdUQjEI5JiC+g3Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB1435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(396003)(376002)(136003)(346002)(366004)(54906003)(5660300002)(33656002)(71200400001)(478600001)(8676002)(8936002)(316002)(4326008)(110136005)(2906002)(64756008)(66946007)(76116006)(7416002)(52536014)(66556008)(66476007)(9686003)(66446008)(55016002)(26005)(186003)(7696005)(6506007)(83380400001)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: wRXYgayFvHl/lKg+/H8F5jwaFzVKXKyF7s1PPKSjGEGRayJSrYoIuYJrRPDf7ViuVnlR3qUpqaLzqKkNiCEWDBd+6OieNcIPl6K3DXOSXfTHf1T9TvGQbi6V46dDeO7pMat72NK5+qNHpCjeXmLMWyA70tyKLwh836znSf+kamDoRg9EvboWfEIui8oQXcZmwT/eJTJF3DO9Qhs9hFCZMgu53mvDpsNnbVQnB6YqGcTZeDnJoFBI6ehl+82sQu1QBa4CmA6k97LMJBG7BlzeHIyew+zhuSh1PUEdviSk1wuT54M/BxF/OtbHrCeakCyGt2cH/dtWUHyf7kvdnGPTAXFJ5FJ5NZIJe65MK3SQxv36oFxE8UPjuNY5B38y5GXcpQVTkPg3/tzxUWhqiF03bw6tre9wix3VQicg3wIAz5OjTsgRTUz6W4HCcqJw7S2MbMxHMVkcOl1/GuoNWaRREyd0yBJofAmx/xgMb7z5mN9kCdzBefpbf8mZhS2WHsto
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR11MB1435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e54e2b05-dd4f-4980-2b5e-08d823161ffd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jul 2020 08:08:40.4473
+X-MS-Exchange-CrossTenant-Network-Message-Id: f06eebfa-debf-4717-9171-08d823172fc5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jul 2020 08:16:16.4162
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SzRW2T3KIwwXNxKeRj1mgOO3AjLBwAGqM4TNVqY+Pa9atRZMEms8VfEbmar1E3lfO6I/ear1FiuzGneu+GoZGQ==
+X-MS-Exchange-CrossTenant-userprincipalname: GOaSJsFJ/6HLRQ/h8ftFqClN/w7i1q3OMscTnERqHAwbpCN5BcdJT00Z9F3Oh3pMz1F0KwbTxQd+Vt+kYPxRog==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4530
 X-OriginatorOrg: intel.com
 Sender: kvm-owner@vger.kernel.org
@@ -132,39 +127,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgQWxleCwNCg0KRXJpYyBhc2tlZCBpZiB3ZSB3aWxsIHRvIGhhdmUgZGF0YSBzdHJjdXQgb3Ro
-ZXIgdGhhbiBzdHJ1Y3QgaW9tbXVfbmVzdGluZ19pbmZvDQp0eXBlIGluIHRoZSBzdHJ1Y3QgdmZp
-b19pb21tdV90eXBlMV9pbmZvX2NhcF9uZXN0aW5nIEBpbmZvW10gZmllbGQuIEknbSBub3QNCnF1
-aXQgc3VyZSBvbiBpdC4gSSBndWVzcyB0aGUgYW5zd2VyIG1heSBiZSBub3QgYXMgVkZJTydzIG5l
-c3Rpbmcgc3VwcG9ydCBzaG91bGQNCmJhc2VkIG9uIElPTU1VIFVBUEkuIGhvdyBhYm91dCB5b3Vy
-IG9waW5pb24/DQoNCisjZGVmaW5lIFZGSU9fSU9NTVVfVFlQRTFfSU5GT19DQVBfTkVTVElORyAg
-Mw0KKw0KKy8qDQorICogUmVwb3J0aW5nIG5lc3RpbmcgaW5mbyB0byB1c2VyIHNwYWNlLg0KKyAq
-DQorICogQGluZm86CXRoZSBuZXN0aW5nIGluZm8gcHJvdmlkZWQgYnkgSU9NTVUgZHJpdmVyLiBU
-b2RheQ0KKyAqCQlpdCBpcyBleHBlY3RlZCB0byBiZSBhIHN0cnVjdCBpb21tdV9uZXN0aW5nX2lu
-Zm8NCisgKgkJZGF0YS4NCisgKi8NCitzdHJ1Y3QgdmZpb19pb21tdV90eXBlMV9pbmZvX2NhcF9u
-ZXN0aW5nIHsNCisJc3RydWN0CXZmaW9faW5mb19jYXBfaGVhZGVyIGhlYWRlcjsNCisJX191MzIJ
-ZmxhZ3M7DQorCV9fdTMyCXBhZGRpbmc7DQorCV9fdTgJaW5mb1tdOw0KK307DQoNCmh0dHBzOi8v
-bG9yZS5rZXJuZWwub3JnL2xpbnV4LWlvbW11L0RNNVBSMTFNQjE0MzUyOTBCNkNENTYxRUM2MTAy
-Nzg5MkMzNjkwQERNNVBSMTFNQjE0MzUubmFtcHJkMTEucHJvZC5vdXRsb29rLmNvbS8NCg0KUmVn
-YXJkcywNCllpIExpdQ0KDQo+IEZyb206IExpdSwgWWkgTA0KPiBTZW50OiBUdWVzZGF5LCBKdWx5
-IDcsIDIwMjAgNTozMiBQTQ0KPiANClsuLi5dDQo+ID4gPg0KPiA+ID4+PiArDQo+ID4gPj4+ICsv
-Kg0KPiA+ID4+PiArICogUmVwb3J0aW5nIG5lc3RpbmcgaW5mbyB0byB1c2VyIHNwYWNlLg0KPiA+
-ID4+PiArICoNCj4gPiA+Pj4gKyAqIEBpbmZvOgl0aGUgbmVzdGluZyBpbmZvIHByb3ZpZGVkIGJ5
-IElPTU1VIGRyaXZlci4gVG9kYXkNCj4gPiA+Pj4gKyAqCQlpdCBpcyBleHBlY3RlZCB0byBiZSBh
-IHN0cnVjdCBpb21tdV9uZXN0aW5nX2luZm8NCj4gPiA+Pj4gKyAqCQlkYXRhLg0KPiA+ID4+IElz
-IGl0IGV4cGVjdGVkIHRvIGNoYW5nZT8NCj4gPiA+DQo+ID4gPiBob25lc3RseSwgSSdtIG5vdCBx
-dWl0ZSBzdXJlIG9uIGl0LiBJIGRpZCBjb25zaWRlcmVkIHRvIGVtYmVkIHN0cnVjdA0KPiA+ID4g
-aW9tbXVfbmVzdGluZ19pbmZvIGhlcmUgaW5zdGVhZCBvZiB1c2luZyBpbmZvW10uIGJ1dCBJIGhl
-c2l0YXRlZCBhcw0KPiA+ID4gdXNpbmcgaW5mb1tdIG1heSBsZWF2ZSBtb3JlIGZsZXhpYmlsaXR5
-IG9uIHRoaXMgc3RydWN0LiBob3cgYWJvdXQNCj4gPiA+IHlvdXIgb3Bpbmlvbj8gcGVyaGFwcyBp
-dCdzIGZpbmUgdG8gZW1iZWQgdGhlIHN0cnVjdA0KPiA+ID4gaW9tbXVfbmVzdGluZ19pbmZvIGhl
-cmUgYXMgbG9uZyBhcyBWRklPIGlzIHNldHVwIG5lc3RpbmcgYmFzZWQgb24NCj4gPiA+IElPTU1V
-IFVBUEkuDQo+ID4gPg0KPiA+ID4+PiArICovDQo+ID4gPj4+ICtzdHJ1Y3QgdmZpb19pb21tdV90
-eXBlMV9pbmZvX2NhcF9uZXN0aW5nIHsNCj4gPiA+Pj4gKwlzdHJ1Y3QJdmZpb19pbmZvX2NhcF9o
-ZWFkZXIgaGVhZGVyOw0KPiA+ID4+PiArCV9fdTMyCWZsYWdzOw0KPiA+ID4+IFlvdSBtYXkgZG9j
-dW1lbnQgZmxhZ3MuDQo+ID4gPg0KPiA+ID4gc3VyZS4gaXQncyByZXNlcnZlZCBmb3IgZnV0dXJl
-Lg0KPiA+ID4NCj4gPiA+IFJlZ2FyZHMsDQo+ID4gPiBZaSBMaXUNCj4gPiA+DQo+ID4gPj4+ICsJ
-X191MzIJcGFkZGluZzsNCj4gPiA+Pj4gKwlfX3U4CWluZm9bXTsNCj4gPiA+Pj4gK307DQo+ID4g
-Pj4+ICsNCj4gPiA+Pj4gICNkZWZpbmUgVkZJT19JT01NVV9HRVRfSU5GTyBfSU8oVkZJT19UWVBF
-LCBWRklPX0JBU0UgKyAxMikNCj4gPiA+Pj4NCj4gPiA+Pj4gIC8qKg0KPiA+ID4+Pg0KPiA+ID4+
-IFRoYW5rcw0KPiA+ID4+DQo+ID4gPj4gRXJpYw0KPiA+ID4NCg0K
+Hi Alex,
+
+> From: Liu, Yi L < yi.l.liu@intel.com>
+> Sent: Friday, July 3, 2020 2:28 PM
+>=20
+> Hi Alex,
+>=20
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Friday, July 3, 2020 5:19 AM
+> >
+> > On Wed, 24 Jun 2020 01:55:19 -0700
+> > Liu Yi L <yi.l.liu@intel.com> wrote:
+> >
+> > > This patch allows user space to request PASID allocation/free, e.g.
+> > > when serving the request from the guest.
+> > >
+> > > PASIDs that are not freed by userspace are automatically freed when
+> > > the IOASID set is destroyed when process exits.
+[...]
+> > > +static int vfio_iommu_type1_pasid_request(struct vfio_iommu *iommu,
+> > > +					  unsigned long arg)
+> > > +{
+> > > +	struct vfio_iommu_type1_pasid_request req;
+> > > +	unsigned long minsz;
+> > > +
+> > > +	minsz =3D offsetofend(struct vfio_iommu_type1_pasid_request, range)=
+;
+> > > +
+> > > +	if (copy_from_user(&req, (void __user *)arg, minsz))
+> > > +		return -EFAULT;
+> > > +
+> > > +	if (req.argsz < minsz || (req.flags & ~VFIO_PASID_REQUEST_MASK))
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (req.range.min > req.range.max)
+> >
+> > Is it exploitable that a user can spin the kernel for a long time in
+> > the case of a free by calling this with [0, MAX_UINT] regardless of the=
+ir actual
+> allocations?
+>=20
+> IOASID can ensure that user can only free the PASIDs allocated to the use=
+r. but
+> it's true, kernel needs to loop all the PASIDs within the range provided =
+by user. it
+> may take a long time. is there anything we can do? one thing may limit th=
+e range
+> provided by user?
+
+thought about it more, we have per-VM pasid quota (say 1000), so even if
+user passed down [0, MAX_UNIT], kernel will only loop the 1000 pasids at
+most. do you think we still need to do something on it?
+
+Regards,
+Yi Liu
