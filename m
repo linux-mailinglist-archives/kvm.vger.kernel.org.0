@@ -2,39 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EAF721910A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 21:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59E58219105
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 21:54:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726763AbgGHTyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 15:54:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43998 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725446AbgGHTxo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 15:53:44 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99B4C061A0B;
-        Wed,  8 Jul 2020 12:53:43 -0700 (PDT)
-Message-Id: <20200708195322.037311579@linutronix.de>
+        id S1726724AbgGHTyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 15:54:02 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:53434 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726371AbgGHTxp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Jul 2020 15:53:45 -0400
+Message-Id: <20200708195322.144607767@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1594238022;
+        s=2020; t=1594238023;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:  references:references;
-        bh=L8WFl/qe3bcU20FmleRqAp3Ck6NxoIyNeaRZ5GSxwe4=;
-        b=XfStOCYTMjEEcEia8QQfb1042hqloaB38lQS7WlsinhyyhUFIWoiZ9VhiLnLrdbeQte/7O
-        hMu5HJ8mDj60YbebjR28RGJqvxFv/8tHs6RmLD5m09BmjfwjOJysLReSlEXIPSG7dQ1+/l
-        WrCkyANpnrB0sdnDc/KRLYNrJrDMCzhjL1Oh7PVVIA9x+leep0JQvFH6ppkc7/YQxSCC3I
-        LYOSdCqbgNC2SNmaPlMhlw57uy7En5896yGzyEDdwFrefcm77bfXMDMYHmzk6RtS1Z65/A
-        weabWqpMFEfUFXDJI1yHQLNb3XwEfQUA/25C8quJtCPRzN6j59PFgRGU0DByMQ==
+        bh=4r8tutqjl6w8J75q+Hjv1+S3tRKSERjhTclsLZCy0sw=;
+        b=cpqWCgTMofZ6udiA4LRNbZ3VbhOt5plHIcDLLwBzrm/+KEBjdVfT+4oOHEuOVetIJfzkX7
+        vKxJjA6Mq0780PydLkh8rdXXdMFz/dkhCT1xlT/FhX504DOXGWVWd4463/+TXVQQZPrQV5
+        kUAeHHHAL2GfUGFu2i4nl2Eo91fo1N6LI2UBB11y2Kdq1PWrspqka6O0rVctXWN8SJlwOd
+        YVBD7VDMVTae2TOMPbM6ZSyZOoRIFNKHVLzVLPuLrEKCm7dMK9TR8PHqlzpggrAfSGA/eX
+        B5wB9U9xekhztFonUTOi3IISoz0xlXz0GSdKtFksgznahyYZ/hwUJ16OC3P6Cw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1594238022;
+        s=2020e; t=1594238023;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:  references:references;
-        bh=L8WFl/qe3bcU20FmleRqAp3Ck6NxoIyNeaRZ5GSxwe4=;
-        b=BUkiJ1yYbCQkbC6EL40F2W8tcrxzg/88DJ8ZzOcJVRulQtEThm4BpQs9vw+eNiqtivIsGA
-        y+n9Q9q+BIjdoTCw==
-Date:   Wed, 08 Jul 2020 21:51:57 +0200
+        bh=4r8tutqjl6w8J75q+Hjv1+S3tRKSERjhTclsLZCy0sw=;
+        b=wevcbg9JkI2Sr6SA9i1E8X37rATyR35DdmbyIw6ELkvyrq1Ctxve/r+YSMhl39qa1cRTk0
+        cILqi4070u9d+EDg==
+Date:   Wed, 08 Jul 2020 21:51:58 +0200
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -42,7 +39,7 @@ Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Alexandre Chartre <alexandre.chartre@oracle.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Juergen Gross <jgross@suse.com>
-Subject: [patch V2 4/7] x86/kvm/vmx: Move guest enter/exit into .noinstr.text
+Subject: [patch V2 5/7] x86/kvm/svm: Move guest enter/exit into .noinstr.text
 References: <20200708195153.746357686@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -62,130 +59,19 @@ Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 Acked-by: Peter Zijlstra <peterz@infradead.org>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-
-
 ---
- arch/x86/include/asm/hardirq.h  |    4 -
- arch/x86/include/asm/kvm_host.h |    8 ++
- arch/x86/kvm/vmx/ops.h          |    4 +
- arch/x86/kvm/vmx/vmenter.S      |    5 +
- arch/x86/kvm/vmx/vmx.c          |  111 ++++++++++++++++++++++------------------
- arch/x86/kvm/x86.c              |    2 
- 6 files changed, 81 insertions(+), 53 deletions(-)
+ arch/x86/kvm/svm/svm.c     |   98 +++++++++++++++++++++++++--------------------
+ arch/x86/kvm/svm/vmenter.S |    2 
+ 2 files changed, 56 insertions(+), 44 deletions(-)
 
---- a/arch/x86/include/asm/hardirq.h
-+++ b/arch/x86/include/asm/hardirq.h
-@@ -67,12 +67,12 @@ static inline void kvm_set_cpu_l1tf_flus
- 	__this_cpu_write(irq_stat.kvm_cpu_l1tf_flush_l1d, 1);
- }
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3344,6 +3344,60 @@ static fastpath_t svm_exit_handlers_fast
  
--static inline void kvm_clear_cpu_l1tf_flush_l1d(void)
-+static __always_inline void kvm_clear_cpu_l1tf_flush_l1d(void)
- {
- 	__this_cpu_write(irq_stat.kvm_cpu_l1tf_flush_l1d, 0);
- }
+ void __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
  
--static inline bool kvm_get_cpu_l1tf_flush_l1d(void)
-+static __always_inline bool kvm_get_cpu_l1tf_flush_l1d(void)
- {
- 	return __this_cpu_read(irq_stat.kvm_cpu_l1tf_flush_l1d);
- }
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1636,7 +1636,15 @@ asmlinkage void kvm_spurious_fault(void)
- 	insn "\n\t"							\
- 	"jmp	668f \n\t"						\
- 	"667: \n\t"							\
-+	"1: \n\t"							\
-+	".pushsection .discard.instr_begin \n\t"			\
-+	".long 1b - . \n\t"						\
-+	".popsection \n\t"						\
- 	"call	kvm_spurious_fault \n\t"				\
-+	"1: \n\t"							\
-+	".pushsection .discard.instr_end \n\t"				\
-+	".long 1b - . \n\t"						\
-+	".popsection \n\t"						\
- 	"668: \n\t"							\
- 	_ASM_EXTABLE(666b, 667b)
- 
---- a/arch/x86/kvm/vmx/ops.h
-+++ b/arch/x86/kvm/vmx/ops.h
-@@ -146,7 +146,9 @@ do {									\
- 			  : : op1 : "cc" : error, fault);		\
- 	return;								\
- error:									\
-+	instrumentation_begin();					\
- 	insn##_error(error_args);					\
-+	instrumentation_end();						\
- 	return;								\
- fault:									\
- 	kvm_spurious_fault();						\
-@@ -161,7 +163,9 @@ do {									\
- 			  : : op1, op2 : "cc" : error, fault);		\
- 	return;								\
- error:									\
-+	instrumentation_begin();					\
- 	insn##_error(error_args);					\
-+	instrumentation_end();						\
- 	return;								\
- fault:									\
- 	kvm_spurious_fault();						\
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -27,7 +27,7 @@
- #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
- #endif
- 
--	.text
-+.section .noinstr.text, "ax"
- 
- /**
-  * vmx_vmenter - VM-Enter the current loaded VMCS
-@@ -234,6 +234,9 @@ SYM_FUNC_START(__vmx_vcpu_run)
- 	jmp 1b
- SYM_FUNC_END(__vmx_vcpu_run)
- 
-+
-+.section .text, "ax"
-+
- /**
-  * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
-  * @field:	VMCS field encoding that failed
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6113,7 +6113,7 @@ static int vmx_handle_exit(struct kvm_vc
-  * information but as all relevant affected CPUs have 32KiB L1D cache size
-  * there is no point in doing so.
-  */
--static void vmx_l1d_flush(struct kvm_vcpu *vcpu)
-+static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
- {
- 	int size = PAGE_SIZE << L1D_CACHE_ORDER;
- 
-@@ -6146,7 +6146,7 @@ static void vmx_l1d_flush(struct kvm_vcp
- 	vcpu->stat.l1d_flush++;
- 
- 	if (static_cpu_has(X86_FEATURE_FLUSH_L1D)) {
--		wrmsrl(MSR_IA32_FLUSH_CMD, L1D_FLUSH);
-+		native_wrmsrl(MSR_IA32_FLUSH_CMD, L1D_FLUSH);
- 		return;
- 	}
- 
-@@ -6632,7 +6632,7 @@ static void vmx_update_hv_timer(struct k
- 	}
- }
- 
--void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
-+void noinstr vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
- {
- 	if (unlikely(host_rsp != vmx->loaded_vmcs->host_state.rsp)) {
- 		vmx->loaded_vmcs->host_state.rsp = host_rsp;
-@@ -6654,6 +6654,63 @@ static fastpath_t vmx_exit_handlers_fast
- 
- bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
- 
-+static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-+					struct vcpu_vmx *vmx)
++static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
++					struct vcpu_svm *svm)
 +{
 +	/*
 +	 * VMENTER enables interrupts (host state), but the kernel state is
@@ -207,19 +93,16 @@ Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 +	guest_enter_irqoff();
 +	lockdep_hardirqs_on(CALLER_ADDR0);
 +
-+	/* L1D Flush includes CPU buffer clear to mitigate MDS */
-+	if (static_branch_unlikely(&vmx_l1d_should_flush))
-+		vmx_l1d_flush(vcpu);
-+	else if (static_branch_unlikely(&mds_user_clear))
-+		mds_clear_cpu_buffers();
++	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
 +
-+	if (vcpu->arch.cr2 != read_cr2())
-+		write_cr2(vcpu->arch.cr2);
-+
-+	vmx->fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
-+				   vmx->loaded_vmcs->launched);
-+
-+	vcpu->arch.cr2 = read_cr2();
++#ifdef CONFIG_X86_64
++	wrmsrl(MSR_GS_BASE, svm->host.gs_base);
++#else
++	loadsegment(fs, svm->host.fs);
++#ifndef CONFIG_X86_32_LAZY_GS
++	loadsegment(gs, svm->host.gs);
++#endif
++#endif
 +
 +	/*
 +	 * VMEXIT disables interrupts (host state), but tracing and lockdep
@@ -241,12 +124,12 @@ Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 +	instrumentation_end();
 +}
 +
- static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
  {
  	fastpath_t exit_fastpath;
-@@ -6728,52 +6785,8 @@ static fastpath_t vmx_vcpu_run(struct kv
+@@ -3399,49 +3453,7 @@ static __no_kcsan fastpath_t svm_vcpu_ru
  	 */
- 	x86_spec_ctrl_set_guest(vmx->spec_ctrl, 0);
+ 	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
  
 -	/*
 -	 * VMENTER enables interrupts (host state), but the kernel state is
@@ -265,19 +148,16 @@ Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 -	guest_enter_irqoff();
 -	lockdep_hardirqs_on(CALLER_ADDR0);
 -
--	/* L1D Flush includes CPU buffer clear to mitigate MDS */
--	if (static_branch_unlikely(&vmx_l1d_should_flush))
--		vmx_l1d_flush(vcpu);
--	else if (static_branch_unlikely(&mds_user_clear))
--		mds_clear_cpu_buffers();
+-	__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
 -
--	if (vcpu->arch.cr2 != read_cr2())
--		write_cr2(vcpu->arch.cr2);
--
--	vmx->fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
--				   vmx->loaded_vmcs->launched);
--
--	vcpu->arch.cr2 = read_cr2();
+-#ifdef CONFIG_X86_64
+-	wrmsrl(MSR_GS_BASE, svm->host.gs_base);
+-#else
+-	loadsegment(fs, svm->host.fs);
+-#ifndef CONFIG_X86_32_LAZY_GS
+-	loadsegment(gs, svm->host.gs);
+-#endif
+-#endif
 -
 -	/*
 -	 * VMEXIT disables interrupts (host state), but tracing and lockdep
@@ -294,20 +174,19 @@ Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 -	lockdep_hardirqs_off(CALLER_ADDR0);
 -	guest_exit_irqoff();
 -	trace_hardirqs_off_finish();
-+	/* The actual VMENTER/EXIT is in the .noinstr.text section. */
-+	vmx_vcpu_enter_exit(vcpu, vmx);
++	svm_vcpu_enter_exit(vcpu, svm);
  
  	/*
  	 * We do not use IBRS in the kernel. If this vCPU has used the
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -379,7 +379,7 @@ int kvm_set_apic_base(struct kvm_vcpu *v
- }
- EXPORT_SYMBOL_GPL(kvm_set_apic_base);
+--- a/arch/x86/kvm/svm/vmenter.S
++++ b/arch/x86/kvm/svm/vmenter.S
+@@ -27,7 +27,7 @@
+ #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
+ #endif
  
--asmlinkage __visible void kvm_spurious_fault(void)
-+asmlinkage __visible noinstr void kvm_spurious_fault(void)
- {
- 	/* Fault while not rebooting.  We want the trace. */
- 	BUG_ON(!kvm_rebooting);
+-	.text
++.section .noinstr.text, "ax"
+ 
+ /**
+  * __svm_vcpu_run - Run a vCPU via a transition to SVM guest mode
 
