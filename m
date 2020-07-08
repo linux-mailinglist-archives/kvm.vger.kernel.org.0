@@ -2,124 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58DBA218324
-	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 11:08:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF0342183E8
+	for <lists+kvm@lfdr.de>; Wed,  8 Jul 2020 11:36:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727791AbgGHJIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Jul 2020 05:08:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56452 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbgGHJIm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Jul 2020 05:08:42 -0400
-Received: from mail-ot1-x344.google.com (mail-ot1-x344.google.com [IPv6:2607:f8b0:4864:20::344])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C685C08C5DC;
-        Wed,  8 Jul 2020 02:08:42 -0700 (PDT)
-Received: by mail-ot1-x344.google.com with SMTP id 18so36383568otv.6;
-        Wed, 08 Jul 2020 02:08:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/pO1lbFCUd8JVwU/a/C5IVsUOfyRnCXcTbnllnxeuBc=;
-        b=ghPAhjY89wPTtIb5w/erbhv+0Fu4o6P535grpb4/02l9c5Ecua3V4upA6wSmM9SMx0
-         xtWAAaSRAjVWDWKsxP32g8hKqpQBeku2BlDUNd13Co4gN0YNetcGkuKRwBg8ctlxkJFo
-         CKAbwXQpXIVLXiYlbWcMgia41QD2185eniFbgyffkSDlej7W96qNLpUtpbdmx0fRmi6k
-         OmIyCZ7PiNSYxyOWFHVkgnYI3YuTzx0M4PwOYnYoRGwmkQyN5VfT2Jw0EfqdKCs8qrBC
-         IZrHUpN6YnhJ7cjEbifPgF3IjB8lZqbAbbiCbKKGbEYe67AlNYAYOPDkwSFDKvx91gWA
-         efRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/pO1lbFCUd8JVwU/a/C5IVsUOfyRnCXcTbnllnxeuBc=;
-        b=dHAxM8h+Lw3OaBOoovG9gDkVU7igPuDm0CbgWSncrx/dH9V7baU9arFO2Cgatn0ybQ
-         UdEWVSQZsYwwMNOC/e+6XixRLfqj/zvvyzH9WbOuEaAHl2tKAbtosrEozl5ckXUNHHdn
-         L1OyOW1UANpfmsJP0LqfEONsx9XJxf1L7cAkJXLGQrDx40XYLY8OwDdX145CU8XaXAOK
-         FkdclDCNCCv3E3/g01aoDlrAkWvH07l/FATFuWR4ykGYIgcUlGmeBu+6LnK7MLxmL/7P
-         iZB9rc/iLv4rsNfbDPZIDGeS6jM8IFZ/izZEJABnejoB5OAhZUAA8+LYMYi10YQxpV5S
-         zOcA==
-X-Gm-Message-State: AOAM533p1rGTH++S2YusA1PehNiPyZHJGDAfUsDXEBBgBmzJ5GDRk4rA
-        pw7nLEf2W4rmqZ8JeNttcHSsa4wYhknER4INztlrkg==
-X-Google-Smtp-Source: ABdhPJzG8uWjy+Qg3xQqO7+HHpcnCYMSI0FRT+Xb0hwMEVHj2JqTVkb2Sl5Z6vYWYiJAD/qPNTNH98MTyENK31IFEss=
-X-Received: by 2002:a9d:6f0d:: with SMTP id n13mr36728254otq.254.1594199321840;
- Wed, 08 Jul 2020 02:08:41 -0700 (PDT)
+        id S1728263AbgGHJgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Jul 2020 05:36:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24436 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726445AbgGHJgV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Jul 2020 05:36:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594200980;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=EXLv6hsZ/QhTdQkzMIaq3BPH71+im/fXOsDOYnL4M9A=;
+        b=hni3IOX23dn4Dl54MrkHPIGiTZkDWlx323VWhRKNkGgc7HGgfG5kt1NdJ2y/OWYswjjyDX
+        4hBjmiTcjoMy+ONTZkvfjRXlc5WWcmMl8q9UsMJ6ldjR746fEfJUk6WaodvXlCIQ1aO4Ve
+        vvOtljLb0XYFpEHHj2uCkoyEBzodiM4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-Z9U-hLTZOPGhlVyBIK_szg-1; Wed, 08 Jul 2020 05:36:17 -0400
+X-MC-Unique: Z9U-hLTZOPGhlVyBIK_szg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32429461;
+        Wed,  8 Jul 2020 09:36:15 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0EF215C221;
+        Wed,  8 Jul 2020 09:36:12 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] KVM: nSVM: fix #TF from CR3 switch when entering guest
+Date:   Wed,  8 Jul 2020 11:36:08 +0200
+Message-Id: <20200708093611.1453618-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-References: <20200417163843.71624-1-pbonzini@redhat.com> <20200417163843.71624-2-pbonzini@redhat.com>
- <CANRm+CyWKbSU9FZkGoPx2nff-Se3Qcfn1TXXw8exy-6nuZrirg@mail.gmail.com> <57a405b3-6836-83f0-ed97-79f637f7b456@redhat.com>
-In-Reply-To: <57a405b3-6836-83f0-ed97-79f637f7b456@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 8 Jul 2020 17:08:31 +0800
-Message-ID: <CANRm+CzpFt5SwnQzJjRGp3T_Q=Ws3OWBx4FPmMK79qOx1v3NBQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: SVM: avoid infinite loop on NPF from bad address
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "# v3 . 10+" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 Jul 2020 at 16:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 08/07/20 10:17, Wanpeng Li wrote:
-> > On Sat, 18 Apr 2020 at 00:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> When a nested page fault is taken from an address that does not have
-> >> a memslot associated to it, kvm_mmu_do_page_fault returns RET_PF_EMULATE
-> >> (via mmu_set_spte) and kvm_mmu_page_fault then invokes svm_need_emulation_on_page_fault.
-> >>
-> >> The default answer there is to return false, but in this case this just
-> >> causes the page fault to be retried ad libitum.  Since this is not a
-> >> fast path, and the only other case where it is taken is an erratum,
-> >> just stick a kvm_vcpu_gfn_to_memslot check in there to detect the
-> >> common case where the erratum is not happening.
-> >>
-> >> This fixes an infinite loop in the new set_memory_region_test.
-> >>
-> >> Fixes: 05d5a4863525 ("KVM: SVM: Workaround errata#1096 (insn_len maybe zero on SMAP violation)")
-> >> Cc: stable@vger.kernel.org
-> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> >> ---
-> >>  arch/x86/kvm/svm/svm.c | 7 +++++++
-> >>  virt/kvm/kvm_main.c    | 1 +
-> >>  2 files changed, 8 insertions(+)
-> >>
-> >> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> >> index a91e397d6750..c86f7278509b 100644
-> >> --- a/arch/x86/kvm/svm/svm.c
-> >> +++ b/arch/x86/kvm/svm/svm.c
-> >> @@ -3837,6 +3837,13 @@ static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
-> >>         bool smap = cr4 & X86_CR4_SMAP;
-> >>         bool is_user = svm_get_cpl(vcpu) == 3;
-> >>
-> >> +       /*
-> >> +        * If RIP is invalid, go ahead with emulation which will cause an
-> >> +        * internal error exit.
-> >> +        */
-> >> +       if (!kvm_vcpu_gfn_to_memslot(vcpu, kvm_rip_read(vcpu) >> PAGE_SHIFT))
-> >> +               return true;
-> >> +
-> >>         /*
-> >>          * Detect and workaround Errata 1096 Fam_17h_00_0Fh.
-> >>          *
-> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> >> index e2f60e313c87..e7436d054305 100644
-> >> --- a/virt/kvm/kvm_main.c
-> >> +++ b/virt/kvm/kvm_main.c
-> >> @@ -1602,6 +1602,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
-> >>  {
-> >>         return __gfn_to_memslot(kvm_vcpu_memslots(vcpu), gfn);
-> >>  }
-> >> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
-> >
-> > This commit incurs the linux guest fails to boot once add --overcommit
-> > cpu-pm=on or not intercept hlt instruction, any thoughts?
->
-> Can you write a selftest?
+This is a succesor of "[PATCH] KVM: x86: drop erroneous mmu_check_root()
+from fast_pgd_switch()".
 
-Actually I don't know what's happening here(why not intercept hlt
-instruction has associated with this commit), otherwise, it has
-already been fixed. :)
+Undesired triple fault gets injected to L1 guest on SVM when L2 is
+launched with certain CR3 values. #TF is raised by mmu_check_root()
+check in fast_pgd_switch() and the root cause is that when
+kvm_set_cr3() is called from nested_prepare_vmcb_save() with NPT
+enabled CR3 points to a nGPA so we can't check it with
+kvm_is_visible_gfn().
 
-    Wanpeng
+Fix the issue by moving kvm_mmu_new_pgd() to the right place when switching
+to nested guest and drop the unneeded mmu_check_root() check from
+fast_pgd_switch().
+
+Vitaly Kuznetsov (3):
+  KVM: nSVM: split kvm_init_shadow_npt_mmu() from kvm_init_shadow_mmu()
+  KVM: nSVM: properly call kvm_mmu_new_pgd() upon switching to guest
+  KVM: x86: drop superfluous mmu_check_root() from fast_pgd_switch()
+
+ arch/x86/include/asm/kvm_host.h |  7 ++++++-
+ arch/x86/kvm/mmu.h              |  3 ++-
+ arch/x86/kvm/mmu/mmu.c          | 36 ++++++++++++++++++++++++---------
+ arch/x86/kvm/svm/nested.c       |  5 +++--
+ arch/x86/kvm/x86.c              |  8 +++++---
+ 5 files changed, 43 insertions(+), 16 deletions(-)
+
+-- 
+2.25.4
+
